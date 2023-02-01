@@ -75,6 +75,7 @@ export const GithubRawProfileSubsetSchema = z.object({
   login: z.string(),
   name: z.string().nullable(),
   url: z.string(),
+  html_url: z.string(),
   avatar_url: z.string(),
 })
 

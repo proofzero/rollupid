@@ -16,6 +16,7 @@ export default /* GraphQL */ `
     name: String
     url: String
     verified: Boolean
+    provider: String
   }
 
   type Profile {
@@ -39,6 +40,7 @@ export default /* GraphQL */ `
     name: String
     url: String
     verified: Boolean
+    provider: String
   }
 
   input ProfileInput {

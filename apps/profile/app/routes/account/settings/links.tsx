@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 
-import type { ActionFunction } from 'react-router-dom'
 import {
   Form,
   useTransition,
   useOutletContext,
   useActionData,
+  useLoaderData,
 } from '@remix-run/react'
 
 import { requireJWT } from '~/utils/session.server'
@@ -26,6 +26,19 @@ import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 
+import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
+import { AddressURN } from '@kubelt/urns/address'
+
+import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
+import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
+
+import appleIcon from '@kubelt/design-system/src/assets/social_icons/apple.svg'
+import githubIcon from '@kubelt/design-system/src/assets/social_icons/github.svg'
+import googleIcon from '@kubelt/design-system/src/assets/social_icons/google.svg'
+import microsoftIcon from '@kubelt/design-system/src/assets/social_icons/microsoft.svg'
+import twitterIcon from '@kubelt/design-system/src/assets/social_icons/twitter.svg'
+
 export type ProfileData = {
   targetAddress: string
   displayName: string
@@ -38,7 +51,128 @@ export type ProfileData = {
     name: string
     url: string
     verified: boolean
+    /**
+     * 'provider' represents the source and destionation
+     * of the link. If 'manual' it was manually
+     * added and not verified by default.
+     * If otherwise, it was added through a
+     * connected account. Also used to display
+     * proper icons in public profile.
+     */
+    provider: string
   }[]
+}
+
+/**
+ * Prepares Crypto and OAuth profiles
+ * to be displayed in generic sortable list;
+ * Adds additional properties that are used
+ * for filtering when posting data to the server.
+ */
+const normalizeProfile = (profile: any) => {
+  switch (profile.__typename) {
+    case 'CryptoAddressProfile':
+      return {
+        id: profile.urn,
+        // Some providers can be built on client side
+        address: `https://etherscan.io/address/${profile.address}`,
+        title: profile.displayName,
+        icon: profile.avatar,
+        provider: CryptoAddressType.ETH,
+        /**
+         * 'linkable' allows the account list
+         * to disable non linkable accounts
+         * which are unclear as to how to
+         * generate a public url
+         */
+        linkable: true,
+      }
+    case 'OAuthGoogleProfile':
+      return {
+        id: profile.urn,
+        // Some providers don't have an address
+        // and are thus unlinkable
+        address: '',
+        title: 'Google',
+        icon: googleIcon,
+        provider: OAuthAddressType.Google,
+      }
+    case 'OAuthTwitterProfile':
+      return {
+        id: profile.urn,
+        address: `https://twitter.com/${profile.screen_name}`,
+        title: 'Twitter',
+        icon: profile.profile_image_url_https,
+        provider: twitterIcon,
+        linkable: true,
+      }
+    case 'OAuthGithubProfile':
+      return {
+        id: profile.urn,
+        // Some providers give us public
+        // endpoints
+        address: profile.html_url,
+        title: 'GitHub',
+        icon: githubIcon,
+        provider: OAuthAddressType.GitHub,
+        linkable: true,
+      }
+    case 'OAuthMicrosoftProfile':
+      return {
+        id: profile.urn,
+        address: '',
+        title: 'Microsoft',
+        icon: microsoftIcon,
+        provider: OAuthAddressType.Microsoft,
+      }
+    case 'OAuthAppleProfile':
+      return {
+        id: profile.urn,
+        address: '',
+        title: 'Apple',
+        icon: appleIcon,
+        provider: OAuthAddressType.Apple,
+      }
+  }
+}
+
+// This entire loader is a good target for deferring once added
+export const loader: LoaderFunction = async ({ request }) => {
+  const jwt = await requireJWT(request)
+
+  // We go through this because
+  // the context had connected addresses
+  // but don't have the profiles
+  // and it's complex to send them to a loader / action
+  const addresses = (await getAccountAddresses(jwt)) ?? []
+  const addressTypeUrns = addresses.map((a) => ({
+    urn: a.urn,
+    nodeType: a.rc.node_type,
+  }))
+
+  // We get the full profiles
+  const profiles =
+    (await getAddressProfiles(
+      jwt,
+      addressTypeUrns.map((atu) => atu.urn as AddressURN)
+    )) ?? []
+
+  // This mapps to a new structure that contains urn also;
+  // useful for list keys as well as for address context actions as param
+  const mappedProfiles = profiles.map((p, i) => ({
+    ...addressTypeUrns[i],
+    ...p,
+  }))
+
+  // We need to get them ready to be displayed
+  // in the generic Sortable List
+  const normalizedProfiles = mappedProfiles
+    .map((p) => ({ urn: p.urn, ...p?.profile }))
+    .map(normalizeProfile)
+
+  return {
+    normalizedProfiles,
+  }
 }
 
 export const action: ActionFunction = async ({ request }) => {
@@ -61,6 +195,7 @@ export const action: ActionFunction = async ({ request }) => {
         name,
         url: updatedUrls[i],
         verified: false,
+        provider: 'manual',
       }
     })
   )
@@ -94,9 +229,24 @@ export const action: ActionFunction = async ({ request }) => {
    * pass back-end schema validation
    */
 
+  const connectedAccounts: any = JSON.parse(formData.get('connected') as string)
+  const connectedAccountLinks = connectedAccounts
+    .filter((ca: any) => ca.enabled) // enabled gets changed by toggle
+    .map((ca: any) => ({
+      name: ca.title,
+      url: ca.address,
+      provider: ca.provider,
+      // Connected accounts
+      // so verified by other means
+      verified: true,
+    }))
+
   await galaxyClient.updateLinks(
     {
-      links: updatedLinks,
+      // Links get displayed parsed from this
+      // so order matters. In order to get connected
+      // links to be first; we add them first.
+      links: connectedAccountLinks.concat(updatedLinks),
     },
     {
       [PlatformJWTAssertionHeader]: jwt,
@@ -163,10 +313,27 @@ export default function AccountSettingsLinks() {
   const transition = useTransition()
   const actionData = useActionData()
 
+  const { normalizedProfiles } = useLoaderData()
+
   const initialOldLinks = profile.links || []
 
-  const [links, setLinks] = useState(initialOldLinks)
+  const [links, setLinks] = useState(
+    // Filter out connected links
+    // so they don't get doubled
+    initialOldLinks.filter((iol: any) => iol.provider === 'manual')
+  )
 
+  const [connectedLinks, setConnectedLinks] = useState(
+    // This updates the connected accounts toggle
+    // If they exist in persisted links, they should
+    // be toggled on. Else off.
+    normalizedProfiles.map((profile: any) => ({
+      ...profile,
+      enabled:
+        initialOldLinks.findIndex((iol: any) => profile.address === iol.url) !==
+        -1,
+    }))
+  )
   const [isFormChanged, setFormChanged] = useState(false)
 
   const initialLinks: any[] = []
@@ -187,10 +354,65 @@ export default function AccountSettingsLinks() {
       <Text
         size="base"
         weight="semibold"
-        className="mt-[2.875rem] mb-[1.375rem] text-gray-300"
+        className="mt-[2.875rem] mb-[1.375rem] text-gray-800"
       >
         Connected Account Links
       </Text>
+
+      <SortableList
+        items={connectedLinks.map((l: any) => ({
+          key: `${l.id}`,
+          val: l,
+          disabled: !l.linkable,
+        }))}
+        itemRenderer={(item) => (
+          <div className={`flex flex-row items-center w-full`}>
+            <img className="w-9 h-9 rounded-full mr-3.5" src={item.val.icon} />
+
+            <div className="flex flex-col space-y-1.5 flex-1">
+              <Text size="sm" weight="medium" className="text-gray-700">
+                {item.val.title}
+              </Text>
+              <Text size="xs" weight="normal" className="text-gray-500">
+                {item.val.address}
+              </Text>
+            </div>
+
+            <InputToggle
+              id={`enable_${item.val.id}`}
+              disabled={!item.val.linkable}
+              label={''}
+              checked={item.val.enabled}
+              onToggle={(val) => {
+                const index = connectedLinks.findIndex(
+                  (pl: any) => pl.id === item.val.id
+                )
+
+                // This just updates
+                // toggled connected link
+                // `enabled` property
+                // which is used in action
+                // to persist or not
+                setConnectedLinks([
+                  ...connectedLinks.slice(0, index),
+                  {
+                    ...connectedLinks[index],
+                    enabled: val,
+                  },
+                  ...connectedLinks.slice(index + 1),
+                ])
+
+                setFormChanged(true)
+              }}
+            />
+          </div>
+        )}
+        onItemsReordered={(items) => {
+          setConnectedLinks(items.map((i) => i.val))
+          setFormChanged(true)
+        }}
+      />
+
       <Text
         size="base"
         weight="semibold"
@@ -237,6 +459,11 @@ export default function AccountSettingsLinks() {
               }}
             />
           </div>
+          <input
+            type="hidden"
+            name="connected"
+            value={JSON.stringify(connectedLinks)}
+          />
           <input type="hidden" name="links" value={JSON.stringify(links)} />
           {newLinks.map((link: any, i: number) => {
             //Check if there is an error

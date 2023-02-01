@@ -55,6 +55,14 @@ const normalizeProfile = (profile: any) => {
         icon: profile.picture,
         chain: 'Microsoft',
       }
+    case 'OAuthAppleProfile':
+      return {
+        id: profile.urn,
+        address: profile.name,
+        title: profile.name,
+        icon: profile.picture,
+        chain: 'Apple',
+      }
   }
 }
 

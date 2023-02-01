@@ -16,12 +16,14 @@ query getAddressProfile($addressURN: URN!) {
 
       ... on OAuthTwitterProfile {
         name
+        screen_name
         profile_image_url_https
       }
 
       ... on OAuthGithubProfile {
         name
         avatar_url
+        html_url
       }
 
       ... on OAuthMicrosoftProfile {
@@ -55,12 +57,14 @@ query getAddressProfiles($addressURNList: [URN!]) {
 
       ... on OAuthTwitterProfile {
         name
+        screen_name
         profile_image_url_https
       }
 
       ... on OAuthGithubProfile {
         name
         avatar_url
+        html_url
       }
 
       ... on OAuthMicrosoftProfile {

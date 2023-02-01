@@ -1,11 +1,11 @@
 // import { Form } from '@remix-run/react'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
-import appleIcon from './apple.svg'
-import githubIcon from './github.svg'
-import googleIcon from './google.svg'
-import microsoftIcon from './microsoft.svg'
-import twitterIcon from './twitter.svg'
+import appleIcon from '@kubelt/design-system/src/assets/social_icons/apple.svg'
+import githubIcon from '@kubelt/design-system/src/assets/social_icons/github.svg'
+import googleIcon from '@kubelt/design-system/src/assets/social_icons/google.svg'
+import microsoftIcon from '@kubelt/design-system/src/assets/social_icons/microsoft.svg'
+import twitterIcon from '@kubelt/design-system/src/assets/social_icons/twitter.svg'
 
 type OAuthProvider = 'apple' | 'github' | 'google' | 'microsoft' | 'twitter'
 
