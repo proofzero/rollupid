@@ -10,6 +10,7 @@ import {
   logAnalytics,
   getConnectedAddresses,
   getAlchemyClients,
+  temporaryConvertToPublic,
 } from './utils'
 
 import { Resolvers } from './typedefs'
@@ -403,14 +404,20 @@ const ProfileResolverComposition = {
   'Query.profile': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.links': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.gallery': [setupContext(), hasApiKey(), logAnalytics()],
-  'Query.connectedAddresses': [setupContext(), hasApiKey(), logAnalytics()],
-  // 'Query.profileFromAddress': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.connectedAddresses': [
+    setupContext(),
+    hasApiKey(),
+    logAnalytics(),
+    temporaryConvertToPublic(),
+  ],
+  'Query.profileFromAddress': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.linksFromAddress': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.galleryFromAddress': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.connectedAddressesFromAddress': [
     setupContext(),
     hasApiKey(),
     logAnalytics(),
+    temporaryConvertToPublic(),
   ],
   'Mutation.updateProfile': [
     setupContext(),

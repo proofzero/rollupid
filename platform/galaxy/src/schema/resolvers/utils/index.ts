@@ -40,13 +40,34 @@ export const setupContext = () => (next) => (root, args, context, info) => {
   return next(root, args, { ...context, jwt, apiKey, accountURN }, info)
 }
 
+// TODO: Remove this middleware and it's use once scopes are fully implemented
+// This is being added as a temporary measure to only display public data when
+// accessed through the external Galaxy interface, even when jwt is provided
+export const temporaryConvertToPublic =
+  () => (next) => (root, args, context, info) => {
+    if (!isFromCFBinding(context.request) && context.jwt) delete context.jwt
+    return next(root, args, context, info)
+  }
+
 export const isAuthorized = () => (next) => (root, args, context, info) => {
-  // TODO: update to check if user is authorized with authorzation header
   if (!context.jwt) {
     throw new GraphQLYogaError('You are not authenticated!', {
       extensions: {
         http: {
           status: 401,
+        },
+      },
+    })
+  }
+
+  if (!isFromCFBinding(context.request)) {
+    // TODO: update to check if user is authorized with authorzation header
+    // Currently, until write scopes are implemented, this middleware will always
+    // return http 403, unless call is coming internally from service binding
+    throw new GraphQLYogaError('You are not authorized!', {
+      extensions: {
+        http: {
+          status: 403,
         },
       },
     })
