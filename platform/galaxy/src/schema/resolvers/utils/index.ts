@@ -167,11 +167,17 @@ export const getConnectedAddresses = async ({
   Account: Fetcher
   jwt: any
 }) => {
-  const accountClient = createAccountClient(Account, {
-    headers: {
-      [PlatformJWTAssertionHeader]: jwt,
-    },
-  })
+  const accountClient = createAccountClient(
+    Account,
+    jwt
+      ? {
+          headers: {
+            [PlatformJWTAssertionHeader]: jwt,
+          },
+        }
+      : {}
+  )
+
   const addresses = await accountClient.getAddresses.query({
     account: accountURN,
   })
