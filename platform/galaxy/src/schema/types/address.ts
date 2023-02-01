@@ -46,12 +46,20 @@ export default /* GraphQL */ `
     picture: String!
   }
 
+  type OAuthAppleProfile {
+    email: String
+    name: String
+    picture: String!
+    sub: String
+  }
+
   union AddressProfiles =
       CryptoAddressProfile
     | OAuthGoogleProfile
     | OAuthGithubProfile
     | OAuthTwitterProfile
     | OAuthMicrosoftProfile
+    | OAuthAppleProfile
 
   type AddressProfile {
     type: String!
