@@ -10,6 +10,8 @@ For this step you will need the **Application ID** and the **Application Secret*
 
 Rollup is **standards compliant** so, integrating Rollup into your application is identical to integrating any OAuth-based authentication services like [Auth0](https://auth0.com/), [Okta](https://auth0.com/), [Cognito](https://aws.amazon.com/cognito/), [Azure AD B2C](https://azure.microsoft.com/en-us/services/active-directory/external-identities/b2c/#overview), [Firebase](https://firebase.google.com/) or [Supabase](https://supabase.com/), meaning you can run off-the-shelf open source libraries to build your OAuth flow.
 
+We recommend setting up two routes in your application called `/auth/login` and `/auth/callback` to manage the authorization flow.
+
 {% hint style="info" %}
 We have created a reference implementation using [Remix](https://remix.run/) and the [Remix OAuth](https://github.com/sergiodxa/remix-auth) library [here](https://github.com/kubelt/kubelt/tree/main/apps/profile/app/routes/auth) which we will refer to several times in this step.
 {% endhint %}
@@ -18,8 +20,10 @@ We have created a reference implementation using [Remix](https://remix.run/) and
 
 To begin the authentication flow you will need to redirect users to the [passport](../platform/passport.md) authorization endpoint and include the application id and a random state parameter in the query string so that it looks like this: `https://passport.rollup.id/authorize?client_id=<your app id>&state=<generated state>`
 
+Typically you would do this by redirecting users to an route in your application that redirects users to the above route.&#x20;
+
 {% hint style="info" %}
-We do allow custom CNAMEs of passport for Pro users.&#x20;
+We do allow custom CNAMEs of passport for PRO accounts.&#x20;
 {% endhint %}
 
 The state parameter should be persisted in a cookie or some other storage method so that it can be referred to in a later step. In our reference implementation the remix-oauth library [handles this for us](../../apps/profile/app/routes/auth/index.tsx).
@@ -42,7 +46,7 @@ Your Redirect URL should be prepared to accept an exchange token and state param
 * **State:** this state should match the state you created for the user/client in step 1
 * **Redirect URL**: the redirect url set in your app in the [previous step](create-an-application.md).
 
-The state parameter should match the state you sent when you kicked off the auth flow in step 1. This is a security measure in the protocol to prevent replay attacks. The exchange code is then sent with the **Application Secret** and the **grant type** to passports token endpoint in order to receive the access token and refresh token as base64 encoded signed JWT as well as a minimal user profile completing the flow.
+The state parameter should match the state you sent when you kicked off the auth flow in Step 1. This is a security measure in the auth protocol to prevent replay attacks. The exchange code is then sent with the **Application Secret** and the **grant type** to passports token endpoint in order to receive the access token and refresh token as base64 encoded signed JWT as well as a minimal user profile completing the flow.
 
 {% hint style="info" %}
 We use a javascript library called [jose](https://www.npmjs.com/package/jose) to encode and decode signed JWT. As a open standard there are libraries for all languages that do the same.
