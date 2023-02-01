@@ -129,7 +129,6 @@ export const appRouter = t.router({
     .mutation(setGalleryMethod),
   getAddresses: t.procedure
     .use(JWTAssertionTokenFromHeader)
-    .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
     .use(Analytics)

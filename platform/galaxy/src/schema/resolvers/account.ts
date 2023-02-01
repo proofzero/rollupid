@@ -258,12 +258,14 @@ const accountResolvers: Resolvers = {
       // return the address profile if no account is associated with the address
       if (!accountURN) {
         console.log(
-          'galaxy.galleryFromAddress: attempt to resolve profile from address w/o account'
+          'galaxy.connectedAddressesFromAddress: attempt to resolve profile from address w/o account'
         )
         throw new GraphQLError("Address doesn't have an associated account")
       }
 
-      console.log("galaxy.galleryFromAddress: getting account's gallery")
+      console.log(
+        "galaxy.connectedAddressesFromAddress: getting account's connected addresses"
+      )
       // should also return the handle if it exists
       const connectedAddressesFromAddress = getConnectedAddresses({
         accountURN,
