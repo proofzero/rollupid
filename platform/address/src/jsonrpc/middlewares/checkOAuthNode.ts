@@ -1,7 +1,7 @@
 import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
+import { NodeType } from '@kubelt/types/address'
 
 import { Context } from '../../context'
-import { NodeType } from '../../types'
 import { isOAuthAddressType } from '../../utils'
 
 export const checkOAuthNode: BaseMiddlewareFunction<Context> = async ({

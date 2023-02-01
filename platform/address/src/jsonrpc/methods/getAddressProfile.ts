@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
+import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
+
 import { Context } from '../../context'
-import { CryptoAddressType } from '../../types'
 import {
   AddressProfileSchema,
   AppleProfileSchema,
@@ -11,7 +12,6 @@ import {
   MicrosoftRawProfileSchema,
   TwitterProfileSchema,
 } from '../validators/profile'
-import { OAuthAddressType } from '@kubelt/types/address'
 import CryptoAddress from '../../nodes/crypto'
 import GithubAddress from '../../nodes/github'
 import GoogleAddress from '../../nodes/google'

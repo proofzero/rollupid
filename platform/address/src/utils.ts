@@ -7,7 +7,7 @@ import {
   HandleAddressType,
   NodeType,
   OAuthAddressType,
-} from './types'
+} from '@kubelt/types/address'
 
 export const isNodeType = (type: string): type is NodeType => {
   switch (type) {
