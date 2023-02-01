@@ -33,6 +33,7 @@ import { AddressURN } from '@kubelt/urns/address'
 import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 
+import appleIcon from '@kubelt/design-system/src/assets/social_icons/apple.svg'
 import githubIcon from '@kubelt/design-system/src/assets/social_icons/github.svg'
 import googleIcon from '@kubelt/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@kubelt/design-system/src/assets/social_icons/microsoft.svg'
@@ -123,6 +124,14 @@ const normalizeProfile = (profile: any) => {
         title: 'Microsoft',
         icon: microsoftIcon,
         provider: OAuthAddressType.Microsoft,
+      }
+    case 'OAuthAppleProfile':
+      return {
+        id: profile.urn,
+        address: '',
+        title: 'Apple',
+        icon: appleIcon,
+        provider: OAuthAddressType.Apple,
       }
   }
 }
