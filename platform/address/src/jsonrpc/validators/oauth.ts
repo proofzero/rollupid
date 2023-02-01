@@ -104,6 +104,7 @@ export const AppleProfileSchema = z.object({
       lastName: z.string(),
     })
     .optional(),
+  picture: z.string(),
   sub: z.string(),
   _json: z.undefined(),
 })
