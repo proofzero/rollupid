@@ -8,7 +8,8 @@ export default class AppleAddress extends OAuthAddress {
     const data = await this.getData()
     if (!data) throw new Error('no data')
     const profile = data.profile as OAuthData['profile']
-    return profile as OAuthAppleProfile
+    const picture = await this.node.class.getGradient()
+    return { ...profile, picture } as OAuthAppleProfile
   }
 
   static async alarm(address: Address) {
