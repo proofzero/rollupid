@@ -7,13 +7,13 @@ compatibility_date = "2022-10-05"
 
 
 # We'll access these services through their external names.
-workers_dev = false
+workers_dev = false 
 
-[[build.upload.rules]]
+[[rules]]
 globs = ["**/*.wasm"]
 type = "CompiledWasm"
 
-[[build.upload.rules]]
+[[rules]]
 globs = ["**/*.png"]
 type = "Data"
 

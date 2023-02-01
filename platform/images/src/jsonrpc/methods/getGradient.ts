@@ -10,10 +10,9 @@ export const GetGradientMethodInput = z.object({
 })
 export type GetGradientParams = z.infer<typeof GetGradientMethodInput>
 
-export const GetGradienteMethodOutput = z.object({
-  code: z.string(),
-  state: z.string(),
-})
+export const GetGradienteMethodOutput = z
+  .custom<Response>((val) => typeof val === typeof Response)
+  .or(z.string())
 export type GetAddressesOutputParams = z.infer<typeof GetGradienteMethodOutput>
 
 export const getGradientMethod = async ({
@@ -118,10 +117,5 @@ export const getGradientMethod = async ({
     }>()
   }
 
-  return new Response(
-    responseJSON.result.variants.filter((v) => v.includes('public'))[0],
-    {
-      headers: { 'content-type': 'text/plain' },
-    }
-  )
+  return responseJSON.result.variants.filter((v) => v.includes('public'))[0]
 }

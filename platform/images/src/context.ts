@@ -16,6 +16,7 @@ interface CreateInnerContextOptions
   TOKEN_CLOUDFLARE_API: string
   INTERNAL_CLOUDFLARE_ACCOUNT_ID: string
   HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID: string
+  UPLOAD_WINDOW_SECONDS: number
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.

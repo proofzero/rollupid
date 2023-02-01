@@ -1,41 +1,48 @@
 import { z } from 'zod'
+import { Context } from '../../context'
 
-export const AuthorizeMethodInput = z.object({
-  account: AccountURNInput,
-  responseType: z.string(),
-  clientId: z.string(),
-  redirectUri: z.string(),
-  scope: z.array(z.string()),
-  state: z.string(),
-})
+type CFImageUploadResponse = {
+  success: boolean
+  errors: []
+  result: {
+    id: string
+    filename: string
+    metadata: {
+      [key: string]: string
+    }
+    requiredSignedURLs: boolean
+    variants: string[]
+    uploaded: string
+  }
+}
 
-export const AuthorizeMethodOutput = z.object({
-  code: z.string(),
-  state: z.string(),
-})
+export const uploadImageBlobMethodOutput = z
+  .custom<Response>((val) => typeof val === typeof Response)
+  .nullable()
+  .or(z.string())
 
-export type AuthorizeParams = z.infer<typeof AuthorizeMethodInput>
+export type uploadImageBlobMethodParams = z.infer<
+  typeof uploadImageBlobMethodOutput
+>
 
-export const authorizeMethod = async ({
-  input,
+export const uploadImageBlobMethod = async ({
   ctx,
 }: {
-  input: AuthorizeParams
   ctx: Context
-}) => {
+}): Promise<uploadImageBlobMethodParams> => {
   console.log('New request on /uploadImageBlob')
-  const uploadURL = `https://api.cloudflare.com/client/v4/accounts/${env.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1`
-  const contentType = request.headers.get('content-type')
+  const uploadURL = `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1`
+  const contentType = ctx.req?.headers.get('content-type')
   if (!contentType?.startsWith('multipart/form-data'))
     throw new Error('Bad request: Expecting form data in request.')
 
   let reqFormData = null
   try {
-    reqFormData = await request.formData()
-    if (!reqFormData) throw new Error('No formdata found in request.')
+    reqFormData = await ctx.req?.formData()
+    if (!reqFormData) throw new Error('No form data found in request.')
   } catch (e) {
     console.error('Could not parse form data from request.', e)
-    return
+    return null
   }
   const reqBlob = reqFormData.get('imageBlob')
   if (!reqBlob) throw new Error('Bad request: Expected image blob in request.')
@@ -46,7 +53,7 @@ export const authorizeMethod = async ({
   const uploadRequest = new Request(uploadURL, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${env.TOKEN_CLOUDFLARE_API}`,
+      Authorization: `Bearer ${ctx.TOKEN_CLOUDFLARE_API}`,
     },
     // NB: do *not* explicitly set the Content-Type header to
     // "multipart/form-data"; this prevents the header from being set
@@ -68,10 +75,5 @@ export const authorizeMethod = async ({
     console.error('Could not send upload image blob to Image cache.', e)
   }
 
-  return new Response(result, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    status: 200,
-  })
+  return result
 }

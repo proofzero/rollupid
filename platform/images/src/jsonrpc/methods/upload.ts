@@ -1,46 +1,43 @@
 import { z } from 'zod'
+import { Context } from '../../context'
+import { add as dateAdd, formatRFC3339 as dateFormat } from 'date-fns'
 
-export const AuthorizeMethodInput = z.object({
-  account: AccountURNInput,
-  responseType: z.string(),
-  clientId: z.string(),
-  redirectUri: z.string(),
-  scope: z.array(z.string()),
-  state: z.string(),
-})
+export const uploadMethodOutput = z
+  .custom<Response>((val) => typeof val === typeof Response)
+  .or(
+    z.object({
+      id: z.string(),
+      uploadURL: z.string().url(),
+    })
+  )
 
-export const AuthorizeMethodOutput = z.object({
-  code: z.string(),
-  state: z.string(),
-})
+export type uploadMethodOutputParams = z.infer<typeof uploadMethodOutput>
 
-export type AuthorizeParams = z.infer<typeof AuthorizeMethodInput>
-
-export const authorizeMethod = async ({
-  input,
+export const uploadMethod = async ({
   ctx,
 }: {
-  input: AuthorizeParams
   ctx: Context
-}) => {
+}): Promise<uploadMethodOutputParams> => {
   console.log('New request on /upload')
-  checkEnv(requiredEnv, env as unknown as Record<string, unknown>)
-  const { headers } = request
-  const contentType = headers.get('content-type') || ''
+
+  const headers = ctx.req?.headers
+  const contentType = (headers as Headers).get('content-type') || ''
   // If user supplies a JSON object in POST body, use that as the image metadata.
-  let body = {}
+  let body: any = {}
   if (contentType.includes('application/json')) {
-    body = await request.json()
+    body = await ctx.req?.body
+    console.dir({ body })
   }
   // Arbitrary key/value pairs associated with the image. Can be used
   // for keeping references to another system of record.
   const metadata = JSON.stringify(body)
+
   // The date after which the upload will not be accepted.
   // - minimum: now + 2 minutes
   // - maximum: now + 6 hours
   // NB: Date.now() is the number of milliseconds since the epoch.
   const expiryDate = dateAdd(Date.now(), {
-    seconds: env.UPLOAD_WINDOW_SECONDS,
+    seconds: ctx.UPLOAD_WINDOW_SECONDS,
   })
   // The API expects the expiry time to be an RFC3339-format value.
   const expiry = dateFormat(expiryDate)
@@ -51,7 +48,7 @@ export const authorizeMethod = async ({
   formData.append('metadata', metadata)
   formData.append('expiry', expiry)
   // URL for "Create authenticated direct upload URL V2" endpoint.
-  const url = `https://api.cloudflare.com/client/v4/accounts/${env.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`
+  const url = `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`
   // Direct uploads allow users to upload images without API keys. A
   // common use case are web apps, client-side applications, or mobile
   // devices where users upload content directly to Cloudflare
@@ -64,7 +61,7 @@ export const authorizeMethod = async ({
   const uploadRequest = new Request(url, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${env.TOKEN_CLOUDFLARE_API}`,
+      Authorization: `Bearer ${ctx.TOKEN_CLOUDFLARE_API}`,
     },
     // NB: do *not* explicitly set the Content-Type header to
     // "multipart/form-data"; this prevents the header from being set
@@ -77,6 +74,7 @@ export const authorizeMethod = async ({
   if (!response.ok) {
     return response
   }
+
   // Example response body:
   // {
   //   "success": true,
@@ -96,11 +94,12 @@ export const authorizeMethod = async ({
       status: 500,
     })
   }
-  const result = JSON.stringify(direct_upload.result)
-  return new Response(result, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    status: 200,
-  })
+  const result: { id: string; uploadURL: string } = direct_upload.result as {
+    uploadURL: string
+    id: string
+  }
+
+  console.log(result)
+
+  return result
 }

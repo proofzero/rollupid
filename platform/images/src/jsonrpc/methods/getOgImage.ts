@@ -1,28 +1,28 @@
 import { z } from 'zod'
+import wasm from '../../assets/svg2png_wasm_bg.wasm'
+import { svg2png, initialize } from 'svg2png-wasm'
+import { Context } from '../../context'
 
-export const AuthorizeMethodInput = z.object({
-  account: AccountURNInput,
-  responseType: z.string(),
-  clientId: z.string(),
-  redirectUri: z.string(),
-  scope: z.array(z.string()),
-  state: z.string(),
+export const getOgImageMethodInput = z.object({
+  bgUrl: z.string().url(),
+  fgUrl: z.string().url(),
 })
+export type getOgImageParams = z.infer<typeof getOgImageMethodInput>
 
-export const AuthorizeMethodOutput = z.object({
-  code: z.string(),
-  state: z.string(),
-})
+export const getOgImageMethodOutput = z
+  .custom<Response>((val) => typeof val === typeof Response)
+  .or(z.string())
 
-export type AuthorizeParams = z.infer<typeof AuthorizeMethodInput>
+export type getOgImageOutputParams = z.infer<typeof getOgImageMethodOutput>
 
-export const authorizeMethod = async ({
+export const getOgImageMethod = async ({
   input,
   ctx,
 }: {
-  input: AuthorizeParams
+  input: getOgImageParams
   ctx: Context
-}) => {
+}): Promise<getOgImageOutputParams> => {
+  const { bgUrl, fgUrl } = input
   // Attempt to download arbitrary images and encode them as data URIs with the
   // image-data-uri library. We cannot use the remote calls offered by
   // image-data-uri because it uses a legacy HTTP library that Cryptopunks 403
@@ -55,21 +55,6 @@ export const authorizeMethod = async ({
           console.error(e)
         })
     )
-  }
-
-  const query = new URL(request.url).searchParams
-
-  const bgUrl = query.get('bg')
-  if (!bgUrl) {
-    return new Response('Missing bg query param', {
-      status: 400,
-    })
-  }
-  const fgUrl = query.get('fg')
-  if (!fgUrl) {
-    return new Response('Missing fg query param', {
-      status: 400,
-    })
   }
 
   const bg = await encodeDataURI(bgUrl)
@@ -121,11 +106,11 @@ export const authorizeMethod = async ({
   formData.append('file', new Blob([ogImage], { type: 'image/png' }))
   formData.append('id', id)
   const imageUrlJson = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${env.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1`,
+    `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1`,
     {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${env.TOKEN_CLOUDFLARE_API}`,
+        Authorization: `Bearer ${ctx.TOKEN_CLOUDFLARE_API}`,
       },
       body: formData,
     }
@@ -144,17 +129,12 @@ export const authorizeMethod = async ({
   //prob already exsists
   if (!imageUrlJson?.success) {
     console.log('Constructing og image', imageUrlJson)
-    const cached = `https://imagedelivery.net/${env.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
+    const cached = `https://imagedelivery.net/${ctx.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
 
     return new Response(cached, {
       headers: { 'content-type': 'text/plain' },
     })
   }
 
-  return new Response(
-    imageUrlJson.result.variants.filter((v) => v.includes('public'))[0],
-    {
-      headers: { 'content-type': 'text/plain' },
-    }
-  )
+  return imageUrlJson.result.variants.filter((v) => v.includes('public'))[0]
 }
