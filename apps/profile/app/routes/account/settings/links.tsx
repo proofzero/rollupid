@@ -50,24 +50,47 @@ export type ProfileData = {
     name: string
     url: string
     verified: boolean
+    /**
+     * 'provider' represents the source and destionation
+     * of the link. If 'manual' it was manually
+     * added and not verified by default.
+     * If otherwise, it was added through a
+     * connected account. Also used to display
+     * proper icons in public profile.
+     */
     provider: string
   }[]
 }
 
+/**
+ * Prepares Crypto and OAuth profiles
+ * to be displayed in generic sortable list;
+ * Adds additional properties that are used
+ * for filtering when posting data to the server.
+ */
 const normalizeProfile = (profile: any) => {
   switch (profile.__typename) {
     case 'CryptoAddressProfile':
       return {
         id: profile.urn,
+        // Some providers can be built on client side
         address: `https://etherscan.io/address/${profile.address}`,
         title: profile.displayName,
         icon: profile.avatar,
         provider: CryptoAddressType.ETH,
+        /**
+         * 'linkable' allows the account list
+         * to disable non linkable accounts
+         * which are unclear as to how to
+         * generate a public url
+         */
         linkable: true,
       }
     case 'OAuthGoogleProfile':
       return {
         id: profile.urn,
+        // Some providers don't have an address
+        // and are thus unlinkable
         address: '',
         title: 'Google',
         icon: googleIcon,
@@ -85,6 +108,8 @@ const normalizeProfile = (profile: any) => {
     case 'OAuthGithubProfile':
       return {
         id: profile.urn,
+        // Some providers give us public
+        // endpoints
         address: profile.html_url,
         title: 'GitHub',
         icon: githubIcon,
@@ -102,16 +127,21 @@ const normalizeProfile = (profile: any) => {
   }
 }
 
+// This entire loader is a good target for deferring once added
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
 
+  // We go through this because
+  // the context had connected addresses
+  // but don't have the profiles
+  // and it's complex to send them to a loader / action
   const addresses = (await getAccountAddresses(jwt)) ?? []
   const addressTypeUrns = addresses.map((a) => ({
     urn: a.urn,
     nodeType: a.rc.node_type,
   }))
 
-  // This returns profiles without urns
+  // We get the full profiles
   const profiles =
     (await getAddressProfiles(
       jwt,
@@ -125,12 +155,14 @@ export const loader: LoaderFunction = async ({ request }) => {
     ...p,
   }))
 
-  const oAuthProfiles = mappedProfiles
+  // We need to get them ready to be displayed
+  // in the generic Sortable List
+  const normalizedProfiles = mappedProfiles
     .map((p) => ({ urn: p.urn, ...p?.profile }))
     .map(normalizeProfile)
 
   return {
-    oAuthProfiles,
+    normalizedProfiles,
   }
 }
 
@@ -190,16 +222,21 @@ export const action: ActionFunction = async ({ request }) => {
 
   const connectedAccounts: any = JSON.parse(formData.get('connected') as string)
   const connectedAccountLinks = connectedAccounts
-    .filter((ca: any) => ca.enabled)
+    .filter((ca: any) => ca.enabled) // enabled gets changed by toggle
     .map((ca: any) => ({
       name: ca.title,
       url: ca.address,
       provider: ca.provider,
+      // Connected accounts
+      // so verified by other means
       verified: true,
     }))
 
   await galaxyClient.updateLinks(
     {
+      // Links get displayed parsed from this
+      // so order matters. In order to get connected
+      // links to be first; we add them first.
       links: connectedAccountLinks.concat(updatedLinks),
     },
     {
@@ -267,16 +304,21 @@ export default function AccountSettingsLinks() {
   const transition = useTransition()
   const actionData = useActionData()
 
-  const { oAuthProfiles } = useLoaderData()
+  const { normalizedProfiles } = useLoaderData()
 
   const initialOldLinks = profile.links || []
 
   const [links, setLinks] = useState(
+    // Filter out connected links
+    // so they don't get doubled
     initialOldLinks.filter((iol: any) => iol.provider === 'manual')
   )
 
-  const [oAuthLinks, setOAuthLinks] = useState(
-    oAuthProfiles.map((profile: any) => ({
+  const [connectedLinks, setconnectedLinks] = useState(
+    // This updates the connected accounts toggle
+    // If they exist in persisted links, they should
+    // be toggled on. Else off.
+    normalizedProfiles.map((profile: any) => ({
       ...profile,
       enabled:
         initialOldLinks.findIndex((iol: any) => profile.address === iol.url) !==
@@ -309,7 +351,7 @@ export default function AccountSettingsLinks() {
       </Text>
 
       <SortableList
-        items={oAuthLinks.map((l: any) => ({
+        items={connectedLinks.map((l: any) => ({
           key: `${l.id}`,
           val: l,
           disabled: !l.linkable,
@@ -333,17 +375,22 @@ export default function AccountSettingsLinks() {
               label={''}
               checked={item.val.enabled}
               onToggle={(val) => {
-                const index = oAuthLinks.findIndex(
-                  (oal: any) => oal.id === item.val.id
+                const index = connectedLinks.findIndex(
+                  (pl: any) => pl.id === item.val.id
                 )
 
-                setOAuthLinks([
-                  ...oAuthLinks.slice(0, index),
+                // This just updates
+                // toggled connected link
+                // `enabled` property
+                // which is used in action
+                // to persist or not
+                setconnectedLinks([
+                  ...connectedLinks.slice(0, index),
                   {
-                    ...oAuthLinks[index],
+                    ...connectedLinks[index],
                     enabled: val,
                   },
-                  ...oAuthLinks.slice(index + 1),
+                  ...connectedLinks.slice(index + 1),
                 ])
 
                 setFormChanged(true)
@@ -352,7 +399,7 @@ export default function AccountSettingsLinks() {
           </div>
         )}
         onItemsReordered={(items) => {
-          setOAuthLinks(items.map((i) => i.val))
+          setconnectedLinks(items.map((i) => i.val))
           setFormChanged(true)
         }}
       />
@@ -406,7 +453,7 @@ export default function AccountSettingsLinks() {
           <input
             type="hidden"
             name="connected"
-            value={JSON.stringify(oAuthLinks)}
+            value={JSON.stringify(connectedLinks)}
           />
           <input type="hidden" name="links" value={JSON.stringify(links)} />
           {newLinks.map((link: any, i: number) => {
