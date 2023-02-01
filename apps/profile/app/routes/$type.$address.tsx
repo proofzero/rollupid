@@ -22,7 +22,7 @@ import { gatewayFromIpfs } from '@kubelt/utils'
 import { NodeType } from '@kubelt/platform.address/src/types'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
-import type { Node, Profile } from '@kubelt/galaxy-client'
+import type { Profile } from '@kubelt/galaxy-client'
 
 import { Cover } from '~/components/profile/cover/Cover'
 import ProfileTabs from '~/components/profile/tabs/tabs'
@@ -61,7 +61,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       ...profile.profile,
       links: profile.links,
       gallery: profile.gallery,
-      connectedAddresses: profile.connectedAddresses,
+      addresses: profile.connectedAddresses,
     }
 
     if (!profile) {
@@ -92,17 +92,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const splittedUrl = request.url.split('/')
     const path = splittedUrl[splittedUrl.length - 1]
 
-    const cryptoAddresses = profile.connectedAddresses?.filter(
-      (addr) => addr.rc.node_type === NodeType.Crypto
-    )
-
-    const matches = profile.connectedAddresses?.filter(
-      (addr) => urn === addr.urn
-    )
+    const matches = profile.addresses?.filter((addr) => urn === addr.urn)
 
     return json({
-      profile,
-      cryptoAddresses,
       uname: profile.handle || address,
       ogImage: ogImage || defaultOG,
       path,

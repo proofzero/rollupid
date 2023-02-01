@@ -9,6 +9,7 @@ const Links = () => {
         name: string
         url: string
         verified: string
+        provider: string
       }
     }
   }>()
