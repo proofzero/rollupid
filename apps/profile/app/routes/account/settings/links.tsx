@@ -314,7 +314,7 @@ export default function AccountSettingsLinks() {
     initialOldLinks.filter((iol: any) => iol.provider === 'manual')
   )
 
-  const [connectedLinks, setconnectedLinks] = useState(
+  const [connectedLinks, setConnectedLinks] = useState(
     // This updates the connected accounts toggle
     // If they exist in persisted links, they should
     // be toggled on. Else off.
@@ -384,7 +384,7 @@ export default function AccountSettingsLinks() {
                 // `enabled` property
                 // which is used in action
                 // to persist or not
-                setconnectedLinks([
+                setConnectedLinks([
                   ...connectedLinks.slice(0, index),
                   {
                     ...connectedLinks[index],
@@ -399,7 +399,7 @@ export default function AccountSettingsLinks() {
           </div>
         )}
         onItemsReordered={(items) => {
-          setconnectedLinks(items.map((i) => i.val))
+          setConnectedLinks(items.map((i) => i.val))
           setFormChanged(true)
         }}
       />
