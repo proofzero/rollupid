@@ -41,6 +41,8 @@ Application secret
 
 #### Example
 
+{% tabs %}
+{% tab title="Javascript" %}
 ```typescript
 const tokenForm = new Form()
 tokenForm.append("exchange_code", exchangeCode)
@@ -48,9 +50,20 @@ tokenForm.append("grant_type", grantType)
 
 const {access_code, refresh_token } = await fetch("https://passport.rollup.id/token",
  {
-   body: tokenForm
+   method: "post",
+   body: tokenForm,
  })
 ```
+{% endtab %}
+
+{% tab title="Curl" %}
+```bash
+curl -X POST https://passport.rollup.id/token -d "exchange_code={exchangeCode}&grant_type=authorization_code"
+```
+{% endtab %}
+{% endtabs %}
+
+
 
 #### Source
 

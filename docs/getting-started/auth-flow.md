@@ -52,9 +52,11 @@ The state parameter should match the state you sent when you kicked off the auth
 We use a javascript library called [jose](https://www.npmjs.com/package/jose) to encode and decode signed JWT. As a open standard there are libraries for all languages that do the same.
 {% endhint %}
 
-{% swagger method="post" path="" baseUrl="https://passport.rollup.id/token" summary="Exchange access code for access token" %}
+{% swagger method="post" path="" baseUrl="https://passport.rollup.id/token" summary="Exchange access code for access token" expanded="true" %}
 {% swagger-description %}
 Exchange access code for access token and refresh token.
+
+_(For more details visit the_ [_Passport API_](../platform/passport.md) _page)_
 {% endswagger-description %}
 
 {% swagger-parameter in="body" name="code" type="String" required="true" %}
@@ -66,7 +68,9 @@ Application secret
 {% endswagger-parameter %}
 
 {% swagger-parameter in="body" name="grant_type" type="String" required="true" %}
-"authorization_code" or "refresh_token"
+"authorization\_code" or&#x20;
+
+"refresh\_token"
 {% endswagger-parameter %}
 
 {% swagger-response status="201: Created" description="" %}

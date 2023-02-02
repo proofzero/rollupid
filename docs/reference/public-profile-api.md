@@ -90,9 +90,19 @@ Handle Types:\
 
 Profile from ETH Address
 
+{% tabs %}
+{% tab title="Javascript" %}
 ```typescript
 const profile = await fetch("https://profile.rollup.id/eth/vitalik.eth.json")
 ```
+{% endtab %}
+
+{% tab title="Curl" %}
+```bash
+curl https://profile.rollup.id/eth/vitalik.eth.json
+```
+{% endtab %}
+{% endtabs %}
 
 #### Source
 
