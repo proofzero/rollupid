@@ -70,6 +70,7 @@ export const loader: LoaderFunction = async ({
     email: token.email as string,
     name: user?.name,
     sub: token.sub,
+    picture: '',
   }
 
   const address = AddressURNSpace.componentizedUrn(
@@ -86,11 +87,13 @@ export const loader: LoaderFunction = async ({
       ...current,
       accessToken,
       refreshToken,
+      extraParams,
     })
   } else {
     await addressClient.setOAuthData.mutate({
       accessToken,
       refreshToken,
+      extraParams,
       profile,
     })
   }

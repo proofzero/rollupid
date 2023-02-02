@@ -88,10 +88,13 @@ export const getTwitterStrategy = (env: Env) => {
 }
 
 export const getAppleStrategy = (env: Env) => {
-  return new AppleStrategy({
-    clientID: env.INTERNAL_APPLE_OAUTH_CLIENT_ID,
-    clientSecret: env.SECRET_APPLE_OAUTH_CLIENT_SECRET,
-    callbackURL: env.INTERNAL_APPLE_OAUTH_CALLBACK_URL,
-    scope: 'name email',
-  }, async params => params)
+  return new AppleStrategy(
+    {
+      clientID: env.INTERNAL_APPLE_OAUTH_CLIENT_ID,
+      clientSecret: env.SECRET_APPLE_OAUTH_CLIENT_SECRET,
+      callbackURL: env.INTERNAL_APPLE_OAUTH_CALLBACK_URL,
+      scope: 'name email',
+    },
+    async (params) => params
+  )
 }
