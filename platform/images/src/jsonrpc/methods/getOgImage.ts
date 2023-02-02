@@ -9,10 +9,7 @@ export const getOgImageMethodInput = z.object({
 })
 export type getOgImageParams = z.infer<typeof getOgImageMethodInput>
 
-export const getOgImageMethodOutput = z
-  .custom<Response>((val) => typeof val === typeof Response)
-  .or(z.string())
-
+export const getOgImageMethodOutput = z.string()
 export type getOgImageOutputParams = z.infer<typeof getOgImageMethodOutput>
 
 export const getOgImageMethod = async ({
@@ -131,9 +128,7 @@ export const getOgImageMethod = async ({
     console.log('Constructing og image', imageUrlJson)
     const cached = `https://imagedelivery.net/${ctx.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
 
-    return new Response(cached, {
-      headers: { 'content-type': 'text/plain' },
-    })
+    return cached
   }
 
   return imageUrlJson.result.variants.filter((v) => v.includes('public'))[0]

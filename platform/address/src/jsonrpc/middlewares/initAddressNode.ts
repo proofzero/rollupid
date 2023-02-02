@@ -28,7 +28,7 @@ export const initAddressNode: BaseMiddlewareFunction<Context> = async ({
     }
     const imageClient = await createImageClient(ctx.Images)
     const gradient = await imageClient.getGradient.mutate({
-      address: ctx.alias,
+      gradientSeed: ctx.alias,
     })
     await nodeClient.class.setGradient(gradient)
     await nodeClient.class.setAddress(ctx.alias)

@@ -4,12 +4,7 @@ import { add as dateAdd, formatRFC3339 as dateFormat } from 'date-fns'
 
 export const uploadMethodOutput = z
   .custom<Response>((val) => typeof val === typeof Response)
-  .or(
-    z.object({
-      id: z.string(),
-      uploadURL: z.string().url(),
-    })
-  )
+  .or(z.string().url())
 
 export type uploadMethodOutputParams = z.infer<typeof uploadMethodOutput>
 
@@ -99,7 +94,5 @@ export const uploadMethod = async ({
     id: string
   }
 
-  console.log(result)
-
-  return result
+  return result.uploadURL
 }

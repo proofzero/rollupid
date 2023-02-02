@@ -17,6 +17,6 @@ export const action: ActionFunction = async ({ request }) => {
     },
   })
 
-  const { uploadURL } = await imagesClient.upload.mutate()
+  const uploadURL = await imagesClient.upload.mutate()
   return json(uploadURL)
 }

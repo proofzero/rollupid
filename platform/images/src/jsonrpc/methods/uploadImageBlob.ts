@@ -16,35 +16,29 @@ type CFImageUploadResponse = {
   }
 }
 
-export const uploadImageBlobMethodOutput = z
-  .custom<Response>((val) => typeof val === typeof Response)
-  .nullable()
-  .or(z.string())
+export const uploadImageBlobInput = z.object({
+  blob: z.custom<Blob>((val) => val instanceof Blob),
+})
+
+export type uploadImageBlobInputParams = z.infer<typeof uploadImageBlobInput>
+
+export const uploadImageBlobMethodOutput = z.string().nullable().optional()
 
 export type uploadImageBlobMethodParams = z.infer<
   typeof uploadImageBlobMethodOutput
 >
 
 export const uploadImageBlobMethod = async ({
+  input,
   ctx,
 }: {
+  input: uploadImageBlobInputParams
   ctx: Context
 }): Promise<uploadImageBlobMethodParams> => {
   console.log('New request on /uploadImageBlob')
   const uploadURL = `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1`
-  const contentType = ctx.req?.headers.get('content-type')
-  if (!contentType?.startsWith('multipart/form-data'))
-    throw new Error('Bad request: Expecting form data in request.')
 
-  let reqFormData = null
-  try {
-    reqFormData = await ctx.req?.formData()
-    if (!reqFormData) throw new Error('No form data found in request.')
-  } catch (e) {
-    console.error('Could not parse form data from request.', e)
-    return null
-  }
-  const reqBlob = reqFormData.get('imageBlob')
+  const reqBlob = input.blob
   if (!reqBlob) throw new Error('Bad request: Expected image blob in request.')
 
   const formData = new FormData()
@@ -70,7 +64,7 @@ export const uploadImageBlobMethod = async ({
       throw new Error('Upload unsuccessful', { cause: response.statusText })
 
     //There should be only one variant, as we haven't defined others
-    result = JSON.stringify({ imageUrl: responseJson.result.variants[0] })
+    result = responseJson.result.variants[0]
   } catch (e) {
     console.error('Could not send upload image blob to Image cache.', e)
   }

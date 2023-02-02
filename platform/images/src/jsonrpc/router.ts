@@ -4,6 +4,7 @@ import { initTRPC } from '@trpc/server'
 import { uploadMethod, uploadMethodOutput } from './methods/upload'
 import {
   uploadImageBlobMethod,
+  uploadImageBlobInput,
   uploadImageBlobMethodOutput,
 } from './methods/uploadImageBlob'
 import {
@@ -14,7 +15,7 @@ import {
 import {
   getGradientMethod,
   GetGradientMethodInput,
-  GetGradienteMethodOutput,
+  GetGradientMethodOutput,
 } from './methods/getGradient'
 
 import { Context } from '../context'
@@ -30,6 +31,7 @@ export const appRouter = t.router({
   uploadImageBlob: t.procedure
     .use(LogUsage)
     .use(Analytics)
+    .input(uploadImageBlobInput)
     .output(uploadImageBlobMethodOutput)
     .mutation(uploadImageBlobMethod),
   getOgImage: t.procedure
@@ -42,6 +44,6 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(Analytics)
     .input(GetGradientMethodInput)
-    .output(GetGradienteMethodOutput)
+    .output(GetGradientMethodOutput)
     .mutation(getGradientMethod),
 })

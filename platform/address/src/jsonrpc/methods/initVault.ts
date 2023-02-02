@@ -38,9 +38,9 @@ export const initVaultMethod = async ({
   )
   const baseAddressURN = AddressURNSpace.getBaseURN(address3RN)
   const vaultNode = initAddressNodeByName(baseAddressURN, ctx.Address)
-  const imageClient = await createImageClient(ctx.Images)
+  const imageClient = createImageClient(ctx.Images)
   const gradient = await imageClient.getGradient.mutate({
-    address: vault.address,
+    gradientSeed: vault.address,
   })
   await Promise.all([
     vaultNode.storage.put('privateKey', vault.privateKey), // #TODO: vault class needed

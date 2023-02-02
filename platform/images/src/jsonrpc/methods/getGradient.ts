@@ -6,14 +6,13 @@ import { svg2png, initialize } from 'svg2png-wasm'
 import { Context } from '../../context'
 
 export const GetGradientMethodInput = z.object({
-  address: z.string(),
+  gradientSeed: z.string(),
 })
 export type GetGradientParams = z.infer<typeof GetGradientMethodInput>
 
-export const GetGradienteMethodOutput = z
-  .custom<Response>((val) => typeof val === typeof Response)
-  .or(z.string())
-export type GetAddressesOutputParams = z.infer<typeof GetGradienteMethodOutput>
+export const GetGradientMethodOutput = z.string()
+
+export type GetGradientOutputParams = z.infer<typeof GetGradientMethodOutput>
 
 export const getGradientMethod = async ({
   input,
@@ -21,12 +20,12 @@ export const getGradientMethod = async ({
 }: {
   input: GetGradientParams
   ctx: Context
-}): Promise<GetAddressesOutputParams> => {
-  const { address } = input
+}): Promise<GetGradientOutputParams> => {
+  const { gradientSeed } = input
 
   //Hash input to 42 char in length
   //addresses could be of different types. not only ethereum ones
-  const hash = keccak256(new TextEncoder().encode(address))
+  const hash = keccak256(new TextEncoder().encode(gradientSeed))
 
   // turn address inti UInt8Array and pick colors for color list
   const data = new TextEncoder().encode(hash)
