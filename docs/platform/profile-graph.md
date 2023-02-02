@@ -8,6 +8,17 @@ coverY: 0
 
 At the core of the Rollup Platform is the open source Profile Graph deployed at the edge on [Cloudflare's](https://www.cloudflare.com/en-gb/) global infrastructure.
 
+### Why Profile Graph?
+
+The Profile Graph was inspired by the [W3C decentralized identifier](https://w3c.github.io/did-use-cases/) specification. We originally set out to build a DID fully compatible platform but, as we began building, we quickly learned that the developer experience was complex and that the specification would require multi-party adoption at mass to be successful.
+
+Instead, we looked at already massively successful protocols like OAuth and decided we would build a protocol that was familiar to developers and users but respected the goal of the DID spec:
+
+* **Decentralized**: end users should be the issuers
+* **Persistent**: identifiers should be inherently persistent (and deterministic)
+* **Cryptographically Verifiable**: it should be possivle to prove control of the identifier
+* **Resolvable**: it should be possible to discover metadata about the identifier
+
 ### How it works?
 
 Everything on Rollup is centered around profiles and every profile is represented by a node on the graph. Profile nodes are attached to other nodes on the graph that represent things like accounts, authorizations, storage, and more. &#x20;
@@ -29,4 +40,6 @@ Even if you were to guess as urn you would also need the right authorization to 
 The edges that connect the nodes on the graph together allow for graph traversal queries. However, to traverse the graph proper authorizations are required.&#x20;
 
 To learn more about querying the graph check out the [Galaxy API](../reference/galaxy-api.md).
+
+###
 
