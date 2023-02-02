@@ -2,7 +2,7 @@ import { useOutletContext } from '@remix-run/react'
 import { Links as LinksComponent } from '~/components/profile/links/links'
 
 const Links = () => {
-  const { profile } = useOutletContext<{
+  const { profile, isOwner } = useOutletContext<{
     profile: {
       links: {
         name: string
@@ -10,10 +10,18 @@ const Links = () => {
         verified: boolean
         provider: string
       }[]
+      displayName: string
     }
+    isOwner: boolean
   }>()
 
-  return <LinksComponent links={profile.links} />
+  return (
+    <LinksComponent
+      links={profile.links}
+      isOwner={isOwner}
+      displayName={profile.displayName}
+    />
+  )
 }
 
 export default Links

@@ -10,10 +10,28 @@ type Link = {
 
 type LinksProps = {
   links: Link[]
+  isOwner: boolean
+  displayName: string
 }
 
-export const Links = ({ links }: LinksProps) =>
-  links && (
+export const Links = ({ links, isOwner = false, displayName }: LinksProps) => {
+  if (!links || links.length === 0) {
+    if (isOwner) {
+      return (
+        <Text className="text-center text-gray-300" size="2xl" weight="medium">
+          Looks like you haven't set any links
+        </Text>
+      )
+    } else {
+      return (
+        <Text className="text-center text-gray-300" size="2xl" weight="medium">
+          Looks like {displayName} hasn't set any links
+        </Text>
+      )
+    }
+  }
+
+  return (
     <div className="flex flex-col space-y-4 mx-3 md:mx-0">
       {links
         .map((link) => ({
@@ -47,3 +65,4 @@ export const Links = ({ links }: LinksProps) =>
         ))}
     </div>
   )
+}
