@@ -85,7 +85,7 @@ export const ApplicationAuth = ({
     <section className="flex flex-col space-y-5">
       <div className="flex flex-row justify-between space-x-5">
         <Text size="2xl" weight="semibold" className="text-gray-900">
-          0xAuth
+          OAuth
         </Text>
         <Button type="submit" btnType="primary-alt" disabled={!isFormChanged}>
           Save
@@ -103,7 +103,7 @@ export const ApplicationAuth = ({
 
       <div className="flex flex-col md:flex-row space-y-5 lg:space-y-0 lg:space-x-5">
         <div className="flex-1">
-          <Panel title="0xAuth Settings">
+          <Panel title="OAuth Settings">
             <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
               <div className="flex-1">
                 <ReadOnlyInput

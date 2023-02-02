@@ -65,7 +65,7 @@ export const ApplicationDashboard = ({
           <CTA
             clickHandler={CTAprops.clickHandler}
             header="You're almost there!"
-            description="Head on to the 0xAuth page to complete the setup"
+            description="Head on to the OAuth page to complete the setup"
             btnText="Complete Setup"
           />
         </div>
@@ -108,7 +108,7 @@ export const ApplicationDashboard = ({
           </Panel>
 
           <Panel
-            title="0xAuth"
+            title="OAuth"
             titleCompanion={
               <div>
                 <Text size="xs" weight="medium" className="text-gray-400">
