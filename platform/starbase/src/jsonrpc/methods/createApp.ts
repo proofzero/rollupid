@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { Context } from '../context'
-import * as oauth from '../../0xAuth'
+import * as oauth from '../../OAuth'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@kubelt/urns/application'
 import createEdgesClient from '@kubelt/platform-clients/edges'

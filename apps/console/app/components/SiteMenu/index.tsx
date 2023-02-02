@@ -154,7 +154,7 @@ function AppMenu({ props }: AppMenuProps) {
           >
             <HiOutlineCog className="w-6 h-6" />{' '}
             <Text size="sm" weight="medium">
-              0xAuth
+              OAuth
             </Text>
           </NavLink>
 
