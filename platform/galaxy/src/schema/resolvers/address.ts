@@ -98,7 +98,7 @@ const addressResolvers: Resolvers = {
       if ((obj as OAuthMicrosoftProfile).isMicrosoft) {
         return 'OAuthMicrosoftProfile'
       }
-      if ((obj as OAuthAppleProfile).isTwitter) {
+      if ((obj as OAuthAppleProfile).isApple) {
         return 'OAuthAppleProfile'
       }
       return null
