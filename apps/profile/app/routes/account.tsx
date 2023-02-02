@@ -54,7 +54,6 @@ const subNavigation = [
     icon: HiOutlineViewGridAdd,
     exists: true,
   },
-  { name: 'KYC', href: '#', icon: BiIdCard },
   { name: 'Apps', href: '#', icon: BiLink },
   { name: 'Settings', href: 'settings', icon: BiCog, exists: true },
 ]
