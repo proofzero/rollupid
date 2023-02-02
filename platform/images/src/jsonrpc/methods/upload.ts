@@ -2,27 +2,38 @@ import { z } from 'zod'
 import { Context } from '../../context'
 import { add as dateAdd, formatRFC3339 as dateFormat } from 'date-fns'
 
+export type ImageMetadata = {
+  // The environment from which image was uploaded.
+  env: string
+}
+
+export const uploadMethodInput = z.string().optional()
+
+export type uploadParams = z.infer<typeof uploadMethodInput>
+
 export const uploadMethodOutput = z
   .custom<Response>((val) => typeof val === typeof Response)
-  .or(z.string().url())
+  .or(
+    z.object({
+      id: z.string(),
+      uploadURL: z.string(),
+    })
+  )
 
 export type uploadMethodOutputParams = z.infer<typeof uploadMethodOutput>
 
 export const uploadMethod = async ({
+  input,
   ctx,
 }: {
+  input: uploadParams
   ctx: Context
 }): Promise<uploadMethodOutputParams> => {
   console.log('New request on /upload')
 
-  const headers = ctx.req?.headers
-  const contentType = (headers as Headers).get('content-type') || ''
   // If user supplies a JSON object in POST body, use that as the image metadata.
-  let body: any = {}
-  if (contentType.includes('application/json')) {
-    body = await ctx.req?.body
-    console.dir({ body })
-  }
+  let body: any = input ? input : {}
+
   // Arbitrary key/value pairs associated with the image. Can be used
   // for keeping references to another system of record.
   const metadata = JSON.stringify(body)
@@ -94,5 +105,5 @@ export const uploadMethod = async ({
     id: string
   }
 
-  return result.uploadURL
+  return result
 }

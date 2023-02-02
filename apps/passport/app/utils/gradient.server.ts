@@ -1,7 +1,7 @@
-import createImagesClient from '@kubelt/platform-clients/image'
+import createImageClient from '@kubelt/platform-clients/image'
 
 export const generateGradient = async (gradientSeed: string, env: Env) => {
-  const imagesClient = createImagesClient(env.Images)
-  const gradient = imagesClient.getGradient.mutate({ gradientSeed })
+  const imageClient = createImageClient(env.Images)
+  const gradient = imageClient.getGradient.mutate({ gradientSeed })
   return gradient
 }

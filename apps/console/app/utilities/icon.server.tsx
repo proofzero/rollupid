@@ -5,6 +5,8 @@
 // Types
 // -----------------------------------------------------------------------------
 
+import createImageClient from '@kubelt/platform-clients/image'
+
 export type ImageMetadata = {
   // The environment from which image was uploaded.
   env: string
@@ -24,39 +26,23 @@ export enum ImageVariant {
 // -----------------------------------------------------------------------------
 // Fetch a signed URL that can be used (for a limited time) to upload an image.
 
-type HeadersObject = {
-  'Content-Type': string
-}
-
 async function getUploadURL(metadata: ImageMetadata) {
-  const headers: HeadersObject = {
-    'Content-Type': 'application/json',
-  }
+  try {
+    const imageClient = createImageClient(Images)
+    const uploadURL = await imageClient.upload.mutate(metadata.env)
 
-  const body = JSON.stringify(metadata)
-
-  const request = {
-    method: 'POST',
-    headers,
-    body,
-  }
-
-  const response = await Images.fetch('/upload', request)
-  const json = await response.json()
-
-  if (response.status !== 200) {
+    // Expected response format:
+    // {
+    //   "id": "967521be-9500-4c3b-52e7-6b877f8a5500",
+    //   "uploadURL": "https://upload.imagedelivery.net/GpF42-mqjMIqmRcX5aE9gQ/967521be-9500-4c3b-52e7-6b877f8a5500",
+    // }
+    return uploadURL
+  } catch (err) {
     return {
-      status: response.status,
-      error: json,
+      status: 500,
+      error: 'Something went wrong',
     }
   }
-
-  // Expected response format:
-  // {
-  //   "id": "967521be-9500-4c3b-52e7-6b877f8a5500",
-  //   "uploadURL": "https://upload.imagedelivery.net/GpF42-mqjMIqmRcX5aE9gQ/967521be-9500-4c3b-52e7-6b877f8a5500",
-  // }
-  return json
 }
 
 // uploadImage

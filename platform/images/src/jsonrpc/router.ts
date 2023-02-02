@@ -1,7 +1,11 @@
 import { Analytics } from '@kubelt/platform-middleware/analytics'
 import { LogUsage } from '@kubelt/platform-middleware/log'
 import { initTRPC } from '@trpc/server'
-import { uploadMethod, uploadMethodOutput } from './methods/upload'
+import {
+  uploadMethod,
+  uploadMethodOutput,
+  uploadMethodInput,
+} from './methods/upload'
 import {
   uploadImageBlobMethod,
   uploadImageBlobInput,
@@ -26,6 +30,7 @@ export const appRouter = t.router({
   upload: t.procedure
     .use(LogUsage)
     .use(Analytics)
+    .input(uploadMethodInput)
     .output(uploadMethodOutput)
     .mutation(uploadMethod),
   uploadImageBlob: t.procedure
