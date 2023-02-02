@@ -50,10 +50,9 @@ export const getGoogleAuthenticator = (env: Env) => {
       clientID: env.INTERNAL_GOOGLE_OAUTH_CLIENT_ID,
       clientSecret: env.SECRET_GOOGLE_OAUTH_CLIENT_SECRET,
       callbackURL: env.INTERNAL_GOOGLE_OAUTH_CALLBACK_URL,
+      accessType: 'offline',
     },
-    async ({ ...args }) => {
-      return { ...args }
-    }
+    async (params) => params
   )
 }
 
