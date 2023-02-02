@@ -1,12 +1,5 @@
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-
-import ethereumIcon from '@kubelt/design-system/src/assets/social_icons/ethereum.svg'
-import appleIcon from '@kubelt/design-system/src/assets/social_icons/apple.svg'
-import githubIcon from '@kubelt/design-system/src/assets/social_icons/github.svg'
-import googleIcon from '@kubelt/design-system/src/assets/social_icons/google.svg'
-import microsoftIcon from '@kubelt/design-system/src/assets/social_icons/microsoft.svg'
-import twitterIcon from '@kubelt/design-system/src/assets/social_icons/twitter.svg'
-import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
+import { imageFromAddressType } from '~/helpers'
 
 export const Links = ({ links }: any) =>
   links && (
@@ -18,31 +11,10 @@ export const Links = ({ links }: any) =>
             url: string
             verified: boolean
             provider: string
-          }) => {
-            let providerIcon = null
-            switch (link.provider) {
-              case CryptoAddressType.ETH:
-                providerIcon = ethereumIcon
-                break
-              case OAuthAddressType.Apple:
-                providerIcon = appleIcon
-                break
-              case OAuthAddressType.GitHub:
-                providerIcon = githubIcon
-                break
-              case OAuthAddressType.Google:
-                providerIcon = googleIcon
-                break
-              case OAuthAddressType.Microsoft:
-                providerIcon = microsoftIcon
-                break
-              case OAuthAddressType.Twitter:
-                providerIcon = twitterIcon
-                break
-            }
-
-            return { ...link, providerIcon }
-          }
+          }) => ({
+            ...link,
+            providerIcon: imageFromAddressType(link.provider),
+          })
         )
         .map(
           (
