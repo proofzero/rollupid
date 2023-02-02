@@ -18,6 +18,7 @@ globs = ["**/*.png"]
 type = "Data"
 
 [vars]
+UPLOAD_WINDOW_SECONDS = 200
 HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID = "VqQy1abBMHYDZwVsTbsSMw"
 
 # Secrets are set via the dashboard, or using the wrangler CLI:
