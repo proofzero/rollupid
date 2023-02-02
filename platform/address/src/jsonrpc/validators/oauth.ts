@@ -2,7 +2,7 @@ import { OAuthAddressType } from '@kubelt/types/address'
 import { z } from 'zod'
 import { GoogleRawProfileSchema, MicrosoftRawProfileSchema } from './profile'
 
-export const GoogleProfileSchema = z.object({
+export const GoogleOAuthSchema = z.object({
   provider: z.literal(OAuthAddressType.Google),
   id: z.string(),
   displayName: z.string(),
@@ -21,9 +21,10 @@ export const GoogleProfileSchema = z.object({
     })
   ),
   _json: GoogleRawProfileSchema,
+  isGoogle: z.boolean(),
 })
 
-export const MicrosoftProfileSchema = z.object({
+export const MicrosoftOAuthSchema = z.object({
   provider: z.literal(OAuthAddressType.Microsoft),
   id: z.string(),
   displayName: z.string(),
@@ -35,9 +36,10 @@ export const MicrosoftProfileSchema = z.object({
     })
     .nullable(),
   emails: z.array(z.object({ value: z.string().nullable() })),
+  isMicrosoft: z.boolean(),
 })
 
-export const GithubProfileSchema = z.object({
+export const GithubOAuthSchema = z.object({
   provider: z.literal(OAuthAddressType.GitHub),
   id: z.string(),
   displayName: z.string(),
@@ -81,21 +83,23 @@ export const GithubProfileSchema = z.object({
     public_gists: z.number(),
     followers: z.number(),
     following: z.number(),
+    isGithub: z.boolean(),
     created_at: z.string(),
     updated_at: z.string(),
   }),
 })
 
-export const TwitterProfileSchema = z.object({
+export const TwitterOAuthSchema = z.object({
   provider: z.literal(OAuthAddressType.Twitter),
   id: z.number(),
   name: z.string(),
   screen_name: z.string(),
   profile_image_url_https: z.string(),
   _json: z.undefined(),
+  isTwitter: z.boolean(),
 })
 
-export const AppleProfileSchema = z.object({
+export const AppleOAuthSchema = z.object({
   provider: z.literal(OAuthAddressType.Apple),
   email: z.string(),
   name: z
@@ -107,6 +111,7 @@ export const AppleProfileSchema = z.object({
   picture: z.string(),
   sub: z.string(),
   _json: z.undefined(),
+  isTwitter: z.boolean(),
 })
 
 export const OAuthDataSchema = z.object({
@@ -122,10 +127,10 @@ export const OAuthDataSchema = z.object({
     })
     .optional(),
   profile: z.discriminatedUnion('provider', [
-    GoogleProfileSchema,
-    GithubProfileSchema,
-    TwitterProfileSchema,
-    MicrosoftProfileSchema,
-    AppleProfileSchema,
+    GoogleOAuthSchema,
+    GithubOAuthSchema,
+    TwitterOAuthSchema,
+    MicrosoftOAuthSchema,
+    AppleOAuthSchema,
   ]),
 })
