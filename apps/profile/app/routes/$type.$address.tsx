@@ -280,9 +280,7 @@ const UserAddressLayout = () => {
       //     </a>
       //   </div>
       // }
-      Tabs={
-        <ProfileTabs path={path} handleTab={navigate} enableGallery={true} />
-      }
+      Tabs={<ProfileTabs path={path} handleTab={navigate} />}
     >
       <Outlet
         context={{

@@ -2,10 +2,16 @@ import { useState } from 'react'
 import classNames from 'classnames'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
-const tabs: Record<string, string> = {
-  links: 'Links',
-  activity: 'Activity',
-  gallery: 'Gallery',
+const tabs: Record<
+  string,
+  {
+    title: string
+    disabled?: boolean
+  }
+> = {
+  links: { title: 'Links' },
+  activity: { title: 'Activity', disabled: true },
+  gallery: { title: 'Gallery' },
 }
 
 export type ProfileTabsProps = {
@@ -14,11 +20,7 @@ export type ProfileTabsProps = {
   enableGallery?: boolean
 }
 
-const ProfileTabs = ({
-  path,
-  enableGallery = false,
-  handleTab,
-}: ProfileTabsProps) => {
+const ProfileTabs = ({ path, handleTab }: ProfileTabsProps) => {
   const [currentTab, setCurrentTab] = useState<string>(path || 'links')
   return (
     <div className="block">
@@ -28,9 +30,7 @@ const ProfileTabs = ({
             return (
               <button
                 key={tab}
-                disabled={
-                  tab === 'activity' || (tab === 'gallery' && !enableGallery)
-                }
+                disabled={tabs[tab].disabled}
                 onClick={() => {
                   setCurrentTab(tab)
                   handleTab(`./${tab}`, { replace: true })
@@ -46,12 +46,10 @@ const ProfileTabs = ({
                   size="sm"
                   weight="medium"
                   className={classNames(
-                    tab === 'activity' || (tab === 'gallery' && !enableGallery)
-                      ? 'text-gray-300'
-                      : null
+                    tabs[tab].disabled ? 'text-gray-300' : null
                   )}
                 >
-                  {tabs[tab]}
+                  {tabs[tab].title}
                 </Text>
               </button>
             )
