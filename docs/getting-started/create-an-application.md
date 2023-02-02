@@ -36,7 +36,7 @@ The application secret is only shared once so, if you missed it you can click th
 
 <div>
 
-<figure><img src="../.gitbook/assets/Application Detail - Dashboard.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/Application Detail - Dashboard (2).png" alt=""><figcaption></figcaption></figure>
 
  
 
