@@ -110,6 +110,7 @@ export const AppleProfileSchema = z.object({
 })
 
 export const OAuthDataSchema = z.object({
+  timestamp: z.number().default(() => Date.now()),
   accessToken: z.string(),
   accessTokenSecret: z.string().optional(),
   refreshToken: z.string().optional(),
