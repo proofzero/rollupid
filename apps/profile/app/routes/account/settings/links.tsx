@@ -32,12 +32,7 @@ import { AddressURN } from '@kubelt/urns/address'
 
 import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
-
-import appleIcon from '@kubelt/design-system/src/assets/social_icons/apple.svg'
-import githubIcon from '@kubelt/design-system/src/assets/social_icons/github.svg'
-import googleIcon from '@kubelt/design-system/src/assets/social_icons/google.svg'
-import microsoftIcon from '@kubelt/design-system/src/assets/social_icons/microsoft.svg'
-import twitterIcon from '@kubelt/design-system/src/assets/social_icons/twitter.svg'
+import { imageFromAddressType } from '~/helpers'
 
 export type ProfileData = {
   targetAddress: string
@@ -77,7 +72,7 @@ const normalizeProfile = (profile: any) => {
         // Some providers can be built on client side
         address: `https://etherscan.io/address/${profile.address}`,
         title: profile.displayName,
-        icon: profile.avatar,
+        icon: imageFromAddressType(CryptoAddressType.ETH),
         provider: CryptoAddressType.ETH,
         /**
          * 'linkable' allows the account list
@@ -94,7 +89,7 @@ const normalizeProfile = (profile: any) => {
         // and are thus unlinkable
         address: '',
         title: 'Google',
-        icon: googleIcon,
+        icon: imageFromAddressType(OAuthAddressType.Google),
         provider: OAuthAddressType.Google,
       }
     case 'OAuthTwitterProfile':
@@ -103,7 +98,7 @@ const normalizeProfile = (profile: any) => {
         address: `https://twitter.com/${profile.screen_name}`,
         title: 'Twitter',
         icon: profile.profile_image_url_https,
-        provider: twitterIcon,
+        provider: OAuthAddressType.Twitter,
         linkable: true,
       }
     case 'OAuthGithubProfile':
@@ -113,7 +108,7 @@ const normalizeProfile = (profile: any) => {
         // endpoints
         address: profile.html_url,
         title: 'GitHub',
-        icon: githubIcon,
+        icon: imageFromAddressType(OAuthAddressType.GitHub),
         provider: OAuthAddressType.GitHub,
         linkable: true,
       }
@@ -122,7 +117,7 @@ const normalizeProfile = (profile: any) => {
         id: profile.urn,
         address: '',
         title: 'Microsoft',
-        icon: microsoftIcon,
+        icon: imageFromAddressType(OAuthAddressType.Microsoft),
         provider: OAuthAddressType.Microsoft,
       }
     case 'OAuthAppleProfile':
@@ -130,7 +125,7 @@ const normalizeProfile = (profile: any) => {
         id: profile.urn,
         address: '',
         title: 'Apple',
-        icon: appleIcon,
+        icon: imageFromAddressType(OAuthAddressType.Apple),
         provider: OAuthAddressType.Apple,
       }
   }

@@ -1,12 +1,9 @@
 import FilteredNftGrid from '~/components/nfts/grid/filtered'
 import { useState, useEffect, useMemo } from 'react'
 
-import type { LoaderFunction } from '@remix-run/cloudflare'
-import { redirect } from '@remix-run/cloudflare'
-
 import type { Node, Profile } from '@kubelt/galaxy-client'
 
-import { getGallery, getMoreNftsGallery } from '~/helpers/nfts'
+import { getMoreNftsGallery } from '~/helpers/nfts'
 
 import { useFetcher, useOutletContext } from '@remix-run/react'
 
@@ -22,15 +19,6 @@ export type ProfileData = {
 
 export type GalleryData = {
   gallery: any[]
-}
-
-export const loader: LoaderFunction = async (args) => {
-  const profile = args.params.profile as string
-  const gallery = await getGallery(profile)
-
-  if (!gallery || !gallery.length) return redirect(`/${profile}/collection`)
-
-  return null
 }
 
 const ProfileRoute = () => {

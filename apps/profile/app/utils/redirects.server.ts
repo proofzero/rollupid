@@ -2,7 +2,9 @@ import { Profile } from '@kubelt/galaxy-client'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
 export const getRedirectUrlForProfile = (
-  profile: Profile
+  profile: Profile & {
+    addresses: any[]
+  }
 ): string | undefined => {
   let result = undefined
 

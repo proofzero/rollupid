@@ -31,10 +31,11 @@ export const loader: LoaderFunction = async ({ request }) => {
       }
     )
 
-  const ownedNfts = resColl?.contracts.map((contract: any) => {
-    const nft: any = contract?.ownedNfts ? contract.ownedNfts[0] : {}
-    return decorateNft(nft)
-  })
+  const ownedNfts =
+    resColl?.contracts.map((contract: any) => {
+      const nft: any = contract?.ownedNfts ? contract.ownedNfts[0] : {}
+      return decorateNft(nft)
+    }) ?? []
 
   return json({
     ownedNfts: decorateNfts(ownedNfts),

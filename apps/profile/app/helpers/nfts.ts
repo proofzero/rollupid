@@ -1,8 +1,9 @@
 import { gatewayFromIpfs } from '@kubelt/utils'
 import { getGalaxyClient } from './clients'
-import { getAccountProfile } from './profile'
+import { getAccountProfile, getAddressProfile } from './profile'
 
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import { AddressURN } from '@kubelt/urns/address'
 /**
  * Nfts are being sorted server-side
  * this function then allows to merge client Nfts with newly-fetched Nfts
@@ -96,9 +97,19 @@ export const decorateNfts = (ownedNfts: any) => {
   return sortedNfts
 }
 
-export const getGallery = async (owner: string, jwt: string) => {
+/**
+ * Returns own gallery if JWT is provided or
+ * target address gallery for which only
+ * owner property is required.
+ * @param owner AddressURN of target profile. Can be undefined if JWT is provided.
+ * @param jwt JWT of requester
+ * @returns Gallery or empty array
+ */
+export const getGallery = async (owner: string, jwt?: string) => {
   // TODO: get from account
-  const profile = await getAccountProfile(jwt)
+  const profile = jwt
+    ? await getAccountProfile(jwt)
+    : await getAddressProfile(owner as AddressURN)
 
   const { gallery } = profile
 
@@ -175,7 +186,7 @@ export const getMoreNftsAllCollections = (
 
 // ------ end of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS
 
-export const getGalleryWithMetadata = async (owner: string, jwt: string) => {
+export const getGalleryWithMetadata = async (owner: string, jwt?: string) => {
   const gallery = await getGallery(owner, jwt)
 
   if (!gallery || !gallery.length) {
@@ -191,9 +202,14 @@ export const getGalleryWithMetadata = async (owner: string, jwt: string) => {
         tokenId: nft.tokenId,
       })),
     },
-    {
-      [PlatformJWTAssertionHeader]: jwt,
-    }
+    // Optional for when called by
+    // a non authenticated visitor
+    // of a public profile
+    jwt
+      ? {
+          [PlatformJWTAssertionHeader]: jwt,
+        }
+      : {}
   )
 
   const ownedNfts = metadata?.ownedNfts.map((nft) => {

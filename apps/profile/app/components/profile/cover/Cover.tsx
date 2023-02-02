@@ -48,8 +48,8 @@ export const Cover = ({
   return (
     <div
       className={classNames(
-        `max-w-7xl mx-auto flex justify-center`,
-        'h-[300px] w-full relative rounded-b-xl',
+        `max-w-4xl mx-auto flex justify-center`,
+        'h-48 w-full relative rounded-b-xl',
         `${!handlingCover ? 'hover-child-visible' : ''}`
       )}
       style={{
@@ -121,7 +121,7 @@ export const Cover = ({
           {handlingCover && <Spinner color="#ffffff" />}
 
           {!handlingCover && (
-            <div className="flex flex-row space-x-4 items-center">
+            <div className="flex flex-row space-x-4 items-center -mt-16">
               {src && (
                 <Button
                   btnType={'primary'}

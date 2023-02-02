@@ -1,32 +1,68 @@
-import { FaCheckCircle } from 'react-icons/fa'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { imageFromAddressType } from '~/helpers'
 
-export const Links = ({ links }: any) =>
-  links && (
-    <div
-      className="flex flex-col 
-      sm:flex-row sm:flex-wrap
-    justify-start lg:items-center text-gray-500 font-size-lg"
-    >
-      {links.map((link: any, i: number) => (
-        <button
-          key={`${link.name}-${link.url}-${i}`}
-          className="
+type Link = {
+  name: string
+  url: string
+  verified: boolean
+  provider: string
+}
+
+type LinksProps = {
+  links: Link[]
+  isOwner: boolean
+  displayName: string
+}
+
+export const Links = ({ links, isOwner = false, displayName }: LinksProps) => {
+  if (!links || links.length === 0) {
+    if (isOwner) {
+      return (
+        <Text className="text-center text-gray-300" size="2xl" weight="medium">
+          Looks like you haven't set any links
+        </Text>
+      )
+    } else {
+      return (
+        <Text className="text-center text-gray-300" size="2xl" weight="medium">
+          Looks like {displayName} hasn't set any links
+        </Text>
+      )
+    }
+  }
+
+  return (
+    <div className="flex flex-col space-y-4 mx-3 md:mx-0">
+      {links
+        .map((link) => ({
+          ...link,
+          providerIcon: imageFromAddressType(link.provider),
+        }))
+        .map((link, i: number) => (
+          <button
+            key={`${link.name}-${link.url}-${i}`}
+            className="
           bg-gray-100 hover:bg-gray-200
           transition-colors
           rounded-full
-          text-gray-[#4b5563]
-          flex
           justify-center
           items-center
-          mt-[1.625rem] sm:mr-[16px]
-          w-full sm:w-[131px] 
-          h-[40px]"
-        >
-          <a href={link.url} className="flex flex-row items-center">
-            {link.verified && <FaCheckCircle className="mr-[0.5rem]" />}
-            {link.name}
-          </a>
-        </button>
-      ))}
+          w-full
+          py-5"
+          >
+            <a
+              href={link.url}
+              className="flex flex-row justify-center items-center space-x-2.5"
+            >
+              {link.providerIcon && (
+                <img src={link.providerIcon} className="w-5 h-5" />
+              )}
+              <Text weight="medium" className="text-gray-600">
+                {link.name}
+              </Text>
+            </a>
+          </button>
+        ))}
     </div>
   )
+}

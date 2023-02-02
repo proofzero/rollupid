@@ -74,11 +74,17 @@ const accountResolvers: Resolvers = {
       { env, accountURN, jwt }: ResolverContext
     ) => {
       console.log(`galaxy:gallery: getting gallery for account: ${accountURN}`)
-      const accountClient = createAccountClient(env.Account, {
-        headers: {
-          [PlatformJWTAssertionHeader]: jwt,
-        },
-      })
+      const accountClient = createAccountClient(
+        env.Account,
+        jwt
+          ? {
+              headers: {
+                [PlatformJWTAssertionHeader]: jwt,
+              },
+            }
+          : {}
+      )
+
       let gallery = await accountClient.getGallery.query({
         account: accountURN,
       })
