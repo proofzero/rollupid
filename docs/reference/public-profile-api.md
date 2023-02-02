@@ -91,7 +91,7 @@ Handle Types:\
 Profile from ETH Address
 
 ```typescript
-const profile = await fetch("https://profile.rollup.id/eth/maurerbot.eth.json")
+const profile = await fetch("https://profile.rollup.id/eth/vitalik.eth.json")
 ```
 
 #### Source

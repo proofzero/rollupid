@@ -8,7 +8,7 @@ description: Auth Gateway
 
 Call this method to exchange an exchange code or refresh token for a new access token and refresh token.
 
-{% swagger method="post" path="" baseUrl="https://passport.rollup.id/token" summary="Exchange Token" expanded="false" %}
+{% swagger method="post" path="" baseUrl="https://passport.rollup.id/token" summary="Exchange Token" expanded="true" %}
 {% swagger-description %}
 Call this method to exchange an exchange code or refresh token for a new access token and refresh token.
 {% endswagger-description %}
@@ -25,14 +25,14 @@ Application secret
 "authorization_code" or "refresh_token"
 {% endswagger-parameter %}
 
-{% swagger-response status="201: Created" description="" %}
+{% swagger-response status="201: Created" description="Exchange token response" %}
 ```javascript
 {
-    access_token: "ey....",
-    refresh_token: "ey....",
+    access_token: string,
+    refresh_token: string,
     profile: {
-       id: "abc123",
-       displayName: "Bob"
+       id: string,
+       displayName: string
    }
 }
 ```
