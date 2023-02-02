@@ -24,6 +24,7 @@
 
 * [Passport API](reference/passport-api.md)
 * [Galaxy GQL API](reference/galaxy-api.md)
+* [Public Profile API](reference/public-profile-api.md)
 * [Scopes](reference/scopes.md)
 
 ## Troubleshooting

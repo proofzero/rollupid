@@ -16,18 +16,20 @@ Instead, we looked at already massively successful protocols like OAuth and deci
 
 * **Decentralized**: end users should be the issuers
 * **Persistent**: identifiers should be inherently persistent (and deterministic)
-* **Cryptographically Verifiable**: it should be possivle to prove control of the identifier
+* **Cryptographically Verifiable**: it should be possible to prove control of the identifier
 * **Resolvable**: it should be possible to discover metadata about the identifier
 
 ### How it works?
 
-Everything on Rollup is centered around profiles and every profile is represented by a node on the graph. Profile nodes are attached to other nodes on the graph that represent things like accounts, authorizations, storage, and more. &#x20;
+Everything on Rollup is centered around profiles and every profile is represented by a **persistent** node on the graph. Profile nodes are attached to other nodes on the graph through edges that represent objects and **metadata** like like accounts, authorizations, storage, and more. &#x20;
 
-You can think of nodes as tiny distributed and isolated applications that are only reachable with the right authorizations. Data managed by these nodes also do not mix since each manages it's own data namespace. This also means in order to find a node you need to be able to generate or search for it's unique namespace identifier.
+You can think of nodes as tiny distributed and isolated applications that are only reachable with the right authorizations **issued** to developers by the user. Nodes are the graph are also logically **decentralized** since each manages it's own data namespace issued by the user. This also means in order to find a node you need to be able to generate or search for it's unique namespace identifier.
+
+Furthermore, all authorizations are managed by [scopes](../reference/scopes.md) with signed [JWT](https://jwt.io/introduction)s making them **cryptographically verifiable**.
 
 ### Uniform Resource Names (URN)
 
-The uniform resource name format from [RFC 8141](https://www.rfc-editor.org/rfc/rfc8141) is used in the profile graph to identity nodes on the graph.&#x20;
+The uniform resource name format from [RFC 8141](https://www.rfc-editor.org/rfc/rfc8141) is used in the profile graph to **resolve** nodes on the graph.&#x20;
 
 For example, `urn:rollup:profile/abc123` tells us that within the "rollup" domain get the "profile" node with the namespace id "abc123".  Generating this name usually requires authentication but there are vectors into the graph that do not require this authentication (address nodes are one such example).
 
