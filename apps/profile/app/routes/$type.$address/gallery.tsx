@@ -77,7 +77,7 @@ const ProfileRoute = () => {
         isOwner={isOwner}
         displayText={`Looks like ${
           displayName ?? tempTargetAddress
-        } didn't set curated gallery`}
+        } has not curated a gallery`}
         filters={true}
         pfp={(pfp as any).image as string}
         loadingConditions={loading || refresh}
