@@ -12,7 +12,6 @@ import {
 import { requireJWT } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
 
-import { Tooltip } from 'flowbite-react'
 import { HiOutlineTrash } from 'react-icons/hi'
 import { FiEdit } from 'react-icons/fi'
 import { TbLink } from 'react-icons/tb'
