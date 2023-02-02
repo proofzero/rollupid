@@ -4,6 +4,7 @@ import kubeltLogoSmall from './kubelt.svg'
 import ConnectOAuthButton from '../connect-oauth-button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { lazy, Suspense } from 'react'
+import { Avatar } from '@kubelt/design-system'
 
 const ConnectButton = lazy(() =>
   import('../../../app/components/connect-button/ConnectButton').then(
@@ -13,6 +14,7 @@ const ConnectButton = lazy(() =>
 
 export type AuthenticationProps = {
   logoURL?: string
+  appName?: string
   enableWalletConnect: boolean
   connectCallback: (address: string) => void
   connectErrorCallback: (error: Error) => void
@@ -20,6 +22,7 @@ export type AuthenticationProps = {
 
 export function Authentication({
   logoURL,
+  appName,
   enableWalletConnect = true,
   connectCallback,
   connectErrorCallback,
@@ -38,11 +41,11 @@ export function Authentication({
         borderRadius: 8,
       }}
     >
-      <div className={''}>
-        <img className={''} src={logo} alt="3ID Logo" />
-      </div>
+      <Avatar src={logo} size="sm"></Avatar>
       <div className={'flex flex-col items-center gap-2'}>
-        <h1 className={'font-semibold text-xl'}>Welcome to the Private Web</h1>
+        <h1 className={'font-semibold text-xl'}>
+          {appName ? `Login to ${appName}` : 'Welcome to the Private Web'}
+        </h1>
         <h2 style={{ color: '#6B7280' }} className={'font-medium text-base'}>
           How would you like to continue?
         </h2>
