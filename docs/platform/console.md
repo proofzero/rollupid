@@ -18,6 +18,8 @@ On the left is your application context menu. Here is where you can toggle betwe
 
 The very first screen you will see in Console is the list of all your applications in one place. You can also create apps from this screen using the "Create Application" button.
 
+<figure><img src="../.gitbook/assets/Dashboard.png" alt=""><figcaption></figcaption></figure>
+
 ### Application Management
 
 Within an application context you will be presented with a few tabs.
@@ -33,6 +35,8 @@ The dashboard is where you will be presented with an overview your application k
 The OAuth tab is where you can configure your applications standard OAuth settings including the name and logo that will appear in the [Passport](passport.md) flow for your users.
 
 However, the most important configuration in this tab is the [Scopes](../reference/scopes.md). Every scope is represents an authorization request that will be presented to the user during the auth flow in [Passport](passport.md). These authorizations include access to profile information, connected accounts, provisioning wallets and more.
+
+<figure><img src="../.gitbook/assets/Frame 427320495.png" alt=""><figcaption></figcaption></figure>
 
 #### Smart Contracts
 

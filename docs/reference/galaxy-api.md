@@ -34,6 +34,7 @@ const { profile } = fetch("https://galaxy.rollup.id", {
   method: "post",
   headers: {
     "Authorization": "Bearer: ${jwt}",
+    "X-GALAXY-KEY": "...",
   },
   body: JSON.stringify({ query }),
 })
@@ -64,6 +65,7 @@ const { profile } = fetch("https://galaxy.rollup.id", {
   method: "post",
   headers: {
     "Authorization": "Bearer: ${jwt}",
+    "X-GALAXY-KEY": "...",
   },
   body: JSON.stringify({ query }),
 })
@@ -85,8 +87,8 @@ In this example get two responses. One from "profile" and one from "gallery. The
 And here is one more example operation with variables:
 
 ```typescript
-const query = `query getProfileFromAddress($type, $address) {
-  profile: profileFromAddress(type: $type, address: $address) {
+const query = `query getProfileFromAlias($provider, $alias) {
+  profile: profileFromAlias(provider: $provider, alias: $alias) {
     displayName
     pfp
   }
@@ -95,13 +97,13 @@ const query = `query getProfileFromAddress($type, $address) {
 const { profile } = fetch("https://galaxy.rollup.id", {
   method: "post",
   headers: {
-    "Authorization": "Bearer: ${jwt}",
+    "X-GALAXY-KEY": "...",
   },
   body: JSON.stringify({
     query,
     variables: {
-      type: "eth",
-      address: "vitalik.eth"
+      provider: "eth",
+      alias: "vitalik.eth"
     }
   }),
 })
@@ -116,7 +118,7 @@ const { profile } = fetch("https://galaxy.rollup.id", {
 {% tab title="2. GQL Client" %}
 ### Option 2: GraphQL Clients
 
-Another option is to use a general purpose GQL Client. One such client we recommend for Javascript is [graphql-request.](https://www.npmjs.com/package/graphql-request)
+Our reccomended approach is to use a general purpose GQL Client. One such client we recommend for Javascript is [graphql-request.](https://www.npmjs.com/package/graphql-request)
 
 GraphQL Request helps reduce the overhead of making GQL API calls with a simple fetch. Let's demonstrate the same examples in Option 1 with this library.
 
@@ -126,6 +128,7 @@ First we setup a client:
 const client = new GraphQLClient(endpoint, { 
     headers: {
       "Authorization": "Bearer: ${jwt}",
+      "X-GALAXY-KEY": "...",
     } 
 })
 ```
@@ -171,16 +174,16 @@ Again, just like in Option 1, in this example get two responses. One from "profi
 And finally, one more example operation with variables:
 
 ```typescript
-const query = `query getProfileFromAddress($type, $address) {
-  profile: profileFromAddress(type: $type, address: $address) {
+const query = `query getProfileFromAlias($provider, $alias) {
+  profile: profileFromAlias(provider: $provider, alias: $alias) {
     displayName
     pfp
   }
 }
 
 const { profile } = client.request(query, {
-  type: "eth",
-  address: "vitalik.eth"
+  provider: "eth",
+  alias: "vitalik.eth"
 })
 ```
 
@@ -189,17 +192,29 @@ As you can see, with a GraphQL client lines the overhead of making API calls is 
 
 {% tab title="3. GQL Codegen" %}
 ### Option 3: GraphQL Generator
+
+This option is best if you already have GraphQL well integrated into your application and are looking to extend your GQL client.
+
+A popular tool for generating client is the [GraphQL Code Generator.](https://the-guild.dev/graphql/codegen) With the generator you can reference the Galaxy API schema at http://galaxy.rollup.id in your [codegen configuration](https://the-guild.dev/graphql/codegen/docs/config-reference/codegen-config) and [write your operation documents](https://github.com/kubelt/kubelt/tree/main/packages/galaxy-client/gql) ahead of time too.
+
+With this approach you can then reference your operations directly from your client. For example:
+
+```typescript
+const { profile } = await myGeneratedClient.getProfileFromAddress({ addressURN })
+```
 {% endtab %}
 {% endtabs %}
 
-
-
-
-
 ## Definitions
 
-TODO
+#### X-Galaxy-Key Header
 
-## Resolvers
+This is the API Key that can be found in the dashboard of you [Console](../platform/console.md) App and is required to authenticate into the Galaxy API.
 
-TODO
+#### Authorization Header
+
+This is where you provide the JWT received from your user sessions after the [token exchange during user login](../getting-started/auth-flow.md).
+
+### API Playground
+
+To see the entire API definition you can explore the entire Galaxy API at the [GQL playground](https://galaxy.rollup.id).
