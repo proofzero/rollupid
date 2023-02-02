@@ -97,6 +97,14 @@ export const decorateNfts = (ownedNfts: any) => {
   return sortedNfts
 }
 
+/**
+ * Returns own gallery if JWT is provided or
+ * target address gallery for which only
+ * owner property is required.
+ * @param owner AddressURN of target profile. Can be undefined if JWT is provided.
+ * @param jwt JWT of requester
+ * @returns Gallery or empty array
+ */
 export const getGallery = async (owner: string, jwt?: string) => {
   // TODO: get from account
   const profile = jwt
@@ -194,6 +202,9 @@ export const getGalleryWithMetadata = async (owner: string, jwt?: string) => {
         tokenId: nft.tokenId,
       })),
     },
+    // Optional for when called by
+    // a non authenticated visitor
+    // of a public profile
     jwt
       ? {
           [PlatformJWTAssertionHeader]: jwt,

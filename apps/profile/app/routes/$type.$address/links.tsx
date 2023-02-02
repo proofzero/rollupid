@@ -1,4 +1,3 @@
-import { Profile } from '@kubelt/galaxy-client'
 import { useOutletContext } from '@remix-run/react'
 import { Links as LinksComponent } from '~/components/profile/links/links'
 
@@ -8,9 +7,9 @@ const Links = () => {
       links: {
         name: string
         url: string
-        verified: string
+        verified: boolean
         provider: string
-      }
+      }[]
     }
   }>()
 
