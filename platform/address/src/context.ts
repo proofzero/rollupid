@@ -32,6 +32,22 @@ interface CreateInnerContextOptions
   nodeType?: NodeType
   addrType?: AddressType
   addressDescription?: ENSRes
+
+  INTERNAL_APPLE_OAUTH_CLIENT_ID: string
+  SECRET_APPLE_OAUTH_CLIENT_SECRET: string
+
+  INTERNAL_GITHUB_OAUTH_CLIENT_ID: string
+  SECRET_GITHUB_OAUTH_CLIENT_SECRET: string
+
+  INTERNAL_GOOGLE_OAUTH_CLIENT_ID: string
+  SECRET_GOOGLE_OAUTH_CLIENT_SECRET: string
+
+  INTERNAL_MICROSOFT_OAUTH_CLIENT_ID: string
+  INTERNAL_MICROSOFT_OAUTH_TENANT_ID: string
+  SECRET_MICROSOFT_OAUTH_CLIENT_SECRET: string
+
+  INTERNAL_TWITTER_OAUTH_CLIENT_ID: string
+  SECRET_TWITTER_OAUTH_CLIENT_SECRET: string
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.

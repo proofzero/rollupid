@@ -93,7 +93,7 @@ export const getAddressProfileMethod = async ({
       }
     }
     case OAuthAddressType.Google: {
-      const oAuthNode = new GoogleAddress(nodeClient)
+      const oAuthNode = new GoogleAddress(nodeClient, ctx)
       const profile = await oAuthNode.getProfile()
       return {
         type: OAuthAddressType.Google,
@@ -101,7 +101,7 @@ export const getAddressProfileMethod = async ({
       }
     }
     case OAuthAddressType.Microsoft: {
-      const oAuthNode = new MicrosoftAddress(nodeClient)
+      const oAuthNode = new MicrosoftAddress(nodeClient, ctx)
       const profile = await oAuthNode.getProfile()
       return {
         type: OAuthAddressType.Microsoft,
@@ -109,7 +109,7 @@ export const getAddressProfileMethod = async ({
       }
     }
     case OAuthAddressType.Apple: {
-      const oAuthNode = new AppleAddress(nodeClient)
+      const oAuthNode = new AppleAddress(nodeClient, ctx)
       const profile = await oAuthNode.getProfile()
       return {
         type: OAuthAddressType.Apple,
