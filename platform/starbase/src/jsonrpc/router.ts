@@ -54,6 +54,11 @@ import { NoInput } from '@kubelt/platform-middleware/inputValidators'
 
 import { Analytics } from '@kubelt/platform-middleware/analytics'
 import { OwnAppsMiddleware } from './ownAppsMiddleware'
+import {
+  getAppPublicProps,
+  GetAppPublicPropsInput,
+  GetAppPublicPropsOutput,
+} from './methods/getAppPublicProps'
 
 const t = initTRPC.context<Context>().create()
 
@@ -133,6 +138,12 @@ export const appRouter = t.router({
     .input(CheckAppAuthInput)
     .output(CheckAppAuthOutput)
     .query(checkAppAuth),
+  getAppPublicProps: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAppPublicPropsInput)
+    .output(GetAppPublicPropsOutput)
+    .query(getAppPublicProps),
   publishApp: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)

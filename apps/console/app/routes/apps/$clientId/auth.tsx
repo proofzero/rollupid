@@ -176,6 +176,7 @@ export const action: ActionFunction = async ({ request, params }) => {
         mediumUser: formData.get('mediumUser') as string | undefined,
         mirrorURL: formData.get('mirrorURL') as string | undefined,
         discordUser: formData.get('discordUser') as string | undefined,
+        scopes: Array.from(scopes),
       }
 
       const zodErrors = updatesSchema.safeParse(updates)
@@ -213,12 +214,11 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function AppDetailIndexPage() {
   const submit = useSubmit()
   const actionData = useActionData()
-  const outletContextData =
-    useOutletContext<{
-      notificationHandler: notificationHandlerType
-      appDetails: appDetailsProps
-      rotationResult: any
-    }>()
+  const outletContextData = useOutletContext<{
+    notificationHandler: notificationHandlerType
+    appDetails: appDetailsProps
+    rotationResult: any
+  }>()
   const { scopeMeta } = useLoaderData()
 
   const [isFormChanged, setIsFormChanged] = useState(false)

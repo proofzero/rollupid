@@ -10,7 +10,7 @@ import accountClassIcon from './account-class-icon.svg'
 import addressClassIcon from './address-class-icon.svg'
 
 export type AppProfile = {
-  clientName: string
+  name: string
   published: boolean
   icon: string
   scopes: string[]
@@ -68,9 +68,9 @@ export function Authorization({
         <Avatar src={appProfile.icon} size={'sm'} />
       </div>
       <div className={'flex flex-col items-center justify-center gap-2'}>
-        <h1 className={'font-semibold text-xl'}>{appProfile.clientName}</h1>
+        <h1 className={'font-semibold text-xl'}>{appProfile.name}</h1>
         <p style={{ color: '#6B7280' }} className={'font-light text-base'}>
-          Would like access to the following information
+          would like access to the following information
         </p>
       </div>
       <div className={'flex flex-col gap-4 items-start justify-start'}>

@@ -18,7 +18,7 @@ export const initAuthenticator = (env: Env) => {
       httpOnly: true,
       name: 'oauth',
       path: '/',
-      sameSite: 'lax',
+      sameSite: 'strict',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 4,
       secrets: [env.SECRET_SESSION_SALT],
@@ -88,10 +88,13 @@ export const getTwitterStrategy = (env: Env) => {
 }
 
 export const getAppleStrategy = (env: Env) => {
-  return new AppleStrategy({
-    clientID: env.INTERNAL_APPLE_OAUTH_CLIENT_ID,
-    clientSecret: env.SECRET_APPLE_OAUTH_CLIENT_SECRET,
-    callbackURL: env.INTERNAL_APPLE_OAUTH_CALLBACK_URL,
-    scope: 'name email',
-  }, async params => params)
+  return new AppleStrategy(
+    {
+      clientID: env.INTERNAL_APPLE_OAUTH_CLIENT_ID,
+      clientSecret: env.SECRET_APPLE_OAUTH_CLIENT_SECRET,
+      callbackURL: env.INTERNAL_APPLE_OAUTH_CALLBACK_URL,
+      scope: 'name email',
+    },
+    async (params) => params
+  )
 }
