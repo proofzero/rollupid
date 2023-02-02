@@ -1,5 +1,8 @@
+import createImageClient from '@kubelt/platform-clients/image'
+
 export default async (
   image_retrieval_url: string,
+  env: Env,
   headers?: Record<string, string>
 ): Promise<string> => {
   const retrieveImageReq = fetch(image_retrieval_url, {
@@ -26,11 +29,10 @@ export default async (
   const cacheReqFormData = new FormData()
   cacheReqFormData.append('imageBlob', blob)
 
-  const cacheRes = await Images.fetch('http://localhost/uploadImageBlob', {
-    body: cacheReqFormData,
-    method: 'post',
-  })
-  if (!cacheRes || !cacheRes.ok) throw new Error('Could not cache image.')
-  const cacheResJson = await cacheRes.json<{ imageUrl: string }>()
-  return cacheResJson.imageUrl
+  const imageClient = createImageClient(env.Images)
+  const imageUrl = await imageClient.uploadImageBlob.mutate({ blob })
+
+  if (!imageUrl || !imageUrl.length) throw new Error('Could not cache image.')
+
+  return imageUrl
 }
