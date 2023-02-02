@@ -12,7 +12,11 @@ import {
 } from '@remix-run/react'
 
 import { HiOutlineMapPin } from 'react-icons/hi2'
-import { HiOutlineBriefcase, HiOutlineLockClosed } from 'react-icons/hi'
+import {
+  HiOutlineBriefcase,
+  HiOutlineLockClosed,
+  HiOutlineQuestionMarkCircle,
+} from 'react-icons/hi'
 
 import { getProfileSession } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
@@ -303,13 +307,9 @@ const UserAddressLayout = () => {
 export default UserAddressLayout
 
 export const CatchBoundary = () => {
-  //TODO: try getting params injected, as well as useParams below
   const caught = useCatch()
   console.error('Caught in catch boundary', { caught })
-  //   console.debug('ERROR', error)
-  //   const caught = useCatch()
-  //   console.debug('CAUGHT', caught)
-  const { address, type } = useParams()
+  const { address } = useParams()
 
   return (
     <>
@@ -317,8 +317,8 @@ export const CatchBoundary = () => {
         <HiOutlineLockClosed className="text-gray-200 w-32 h-32" />
 
         <div className="absolute max-w-4xl w-full mx-auto flex justify-center items-center top-3/4">
-          <div className="w-24 h-24 rounded-full bg-white overflow-hidden flex justify-center items-center">
-            <img src={crypto404} />
+          <div className="rounded-full bg-white overflow-hidden flex justify-center items-center">
+            <HiOutlineQuestionMarkCircle className="w-24 h-24" />
           </div>
         </div>
       </div>
@@ -341,7 +341,7 @@ export const CatchBoundary = () => {
           </Text>
         </div>
 
-        <Button btnSize="xl">Login with Wallet</Button>
+        <Button btnSize="xl">Login</Button>
       </div>
     </>
   )
