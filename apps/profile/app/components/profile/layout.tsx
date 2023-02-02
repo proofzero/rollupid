@@ -25,9 +25,10 @@ const ProfileLayout = ({
       <div className="mt-3 max-w-4xl overflow-visible w-full mx-auto py-3 lg:py-0">
         {Claim}
 
-        <div className="mt-12">
+        <div className="py-6">
           {Tabs}
-          {children}
+
+          <div className="py-6">{children}</div>
         </div>
       </div>
     </>

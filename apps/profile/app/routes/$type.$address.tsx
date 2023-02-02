@@ -19,7 +19,6 @@ import { ogImageFromProfile } from '~/helpers/ogImage'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { gatewayFromIpfs } from '@kubelt/utils'
-import { NodeType } from '@kubelt/platform.address/src/types'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import type { Profile } from '@kubelt/galaxy-client'
@@ -30,6 +29,8 @@ import ProfileLayout from '~/components/profile/layout'
 
 import defaultOG from '~/assets/3ID_profiles_OG.png'
 import { getRedirectUrlForProfile } from '~/utils/redirects.server'
+import { NodeType } from '@kubelt/types/address'
+import { AccountURN } from '@kubelt/urns/account'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { address, type } = params
@@ -94,11 +95,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
     const matches = profile.addresses?.filter((addr) => urn === addr.urn)
 
+    const cryptoAddresses = profile.addresses?.filter(
+      (addr) => addr.rc.node_type === NodeType.Crypto
+    )
+
     return json({
       uname: profile.handle || address,
       ogImage: ogImage || defaultOG,
+      profile,
+      addressURN: urn,
+      cryptoAddresses,
       path,
-      isOwner: jwt && matches && matches.length > 0,
+      isOwner: jwt && matches && matches.length > 0 ? true : false,
     })
   } catch (e) {
     console.log(
@@ -143,19 +151,32 @@ export const meta: MetaFunction = ({
 const UserAddressLayout = () => {
   //TODO: this needs to be optimized so profile isn't fetched from the loader
   //but used from context alone.
-  const { path, isOwner } = useLoaderData<{
-    path: string
-    isOwner: boolean
-  }>()
-  const { profile } = useOutletContext<{
+  const { profile, cryptoAddresses, path, isOwner, addressURN } =
+    useLoaderData<{
+      profile: Profile
+      cryptoAddresses: Node[]
+      path: string
+      isOwner: boolean
+      addressURN: string
+    }>()
+
+  const ctx = useOutletContext<{
+    loggedInProfile: Profile | null
     profile: Profile
+    // This gets passed down
+    // from root.tsx
+    // but if not logged in
+    // is null...
+    accountURN: AccountURN
   }>()
+
+  const finalProfile = profile ?? ctx.profile
 
   const navigate = useNavigate()
   const fetcher = useFetcher()
 
   const [coverUrl, setCoverUrl] = useState(
-    gatewayFromIpfs(profile.cover as string)
+    gatewayFromIpfs(finalProfile.cover as string)
   )
 
   useEffect(() => {
@@ -186,7 +207,7 @@ const UserAddressLayout = () => {
       }
       Avatar={
         <Avatar
-          src={gatewayFromIpfs(profile.pfp?.image as string) as string}
+          src={gatewayFromIpfs(finalProfile.pfp?.image as string) as string}
           size="lg"
           hex={true}
           border
@@ -199,7 +220,7 @@ const UserAddressLayout = () => {
             weight="bold"
             size="4xl"
           >
-            {profile.displayName}
+            {finalProfile.displayName}
           </Text>
 
           <div className="flex flex-col justify-center items-center">
@@ -208,27 +229,27 @@ const UserAddressLayout = () => {
               size="base"
               weight="normal"
             >
-              {profile.bio}
+              {finalProfile.bio}
             </Text>
 
             <div
               className="flex flex-col lg:flex-row lg:space-x-10 justify-start
               lg:items-center text-gray-500 font-size-lg"
             >
-              {profile.location && (
+              {finalProfile.location && (
                 <div className="flex flex-row space-x-3 items-center wrap">
                   <HiOutlineMapPin className="h-5 w-5" />
                   <Text weight="medium" className="text-gray-500">
-                    {profile.location}
+                    {finalProfile.location}
                   </Text>
                 </div>
               )}
 
-              {profile.job && (
+              {finalProfile.job && (
                 <div className="flex flex-row space-x-3 items-center">
                   <HiOutlineBriefcase className="h-5 w-5" />
                   <Text weight="medium" className="text-gray-500">
-                    {profile.job}
+                    {finalProfile.job}
                   </Text>
                 </div>
               )}
@@ -263,7 +284,15 @@ const UserAddressLayout = () => {
         <ProfileTabs path={path} handleTab={navigate} enableGallery={true} />
       }
     >
-      <Outlet context={{ profile, path }} />
+      <Outlet
+        context={{
+          accountURN: ctx.accountURN ?? addressURN,
+          profile: finalProfile,
+          cryptoAddresses,
+          path,
+          isOwner,
+        }}
+      />
     </ProfileLayout>
   )
 }

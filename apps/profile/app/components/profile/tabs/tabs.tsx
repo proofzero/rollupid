@@ -28,7 +28,9 @@ const ProfileTabs = ({
             return (
               <button
                 key={tab}
-                disabled={tab === 'activity' || tab === 'gallery'}
+                disabled={
+                  tab === 'activity' || (tab === 'gallery' && !enableGallery)
+                }
                 onClick={() => {
                   setCurrentTab(tab)
                   handleTab(`./${tab}`, { replace: true })
@@ -44,7 +46,7 @@ const ProfileTabs = ({
                   size="sm"
                   weight="medium"
                   className={classNames(
-                    tab === 'activity' || tab === 'gallery'
+                    tab === 'activity' || (tab === 'gallery' && !enableGallery)
                       ? 'text-gray-300'
                       : null
                   )}

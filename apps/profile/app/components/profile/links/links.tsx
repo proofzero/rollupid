@@ -10,7 +10,7 @@ import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 
 export const Links = ({ links }: any) =>
   links && (
-    <div className="flex flex-col space-y-4 py-6 md:mt-10 mx-3 md:mx-0">
+    <div className="flex flex-col space-y-4 mx-3 md:mx-0">
       {links
         .map(
           (link: {

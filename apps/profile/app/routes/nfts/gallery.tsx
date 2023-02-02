@@ -10,7 +10,7 @@ export const loader: LoaderFunction = async (args) => {
   const session = await getProfileSession(args.request)
   const user = session.get('user')
 
-  const jwt = user.accessToken
+  const jwt = user?.accessToken
 
   /**
    * params.profile is called from `$profile/gallery` route

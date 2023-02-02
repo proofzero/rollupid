@@ -28,19 +28,11 @@ export const getAccountAddresses = async (jwt: string) => {
   return addresses
 }
 
-export const getAddressProfile = async (
-  jwt: string,
-  addressURN: AddressURN
-) => {
+export const getAddressProfile = async (addressURN: AddressURN) => {
   const galaxyClient = await getGalaxyClient()
-  const addressProfile = await galaxyClient.getProfileFromAddress(
-    {
-      addressURN,
-    },
-    {
-      [PlatformJWTAssertionHeader]: jwt,
-    }
-  )
+  const addressProfile = await galaxyClient.getProfileFromAddress({
+    addressURN,
+  })
 
   const profile = addressProfile
 
