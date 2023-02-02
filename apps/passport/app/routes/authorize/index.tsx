@@ -17,13 +17,20 @@ import { Profile } from '@kubelt/galaxy-client'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { clientId, redirectUri, scope, state } = context.consoleParams
-
   const jwt = await requireJWT(request, context.consoleParams, context.env)
 
   if (clientId) {
     if (!state) throw json({ message: 'state is required' }, 400)
     if (!redirectUri) throw json({ message: 'redirect_uri is required' }, 400)
-    if (!scope || !Array.isArray(scope) || scope.length === 0) {
+    try {
+      new URL(redirectUri)
+    } catch {
+      throw json(
+        { message: 'valid URI is required in redirect_uri param' },
+        400
+      )
+    }
+    if (!scope || scope.trim() === '') {
       // auto authorize if no scope is provided
 
       const parsedJWT = parseJwt(jwt)
@@ -51,9 +58,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       return redirect(`${redirectUri}?${redirectParams}`)
     }
   } else {
+    //TODO: remove this when implementing scopes and authz
     return redirect(context.env.CONSOLE_APP_URL)
   }
-
   try {
     const sbClient = getStarbaseClient(jwt, context.env)
 

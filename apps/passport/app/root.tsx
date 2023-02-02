@@ -138,6 +138,8 @@ export default function App() {
 // https://remix.run/docs/en/v1/guides/errors
 // @ts-ignore
 export function ErrorBoundary({ error }) {
+  console.error('Error in error boundary', error)
+
   return (
     <html lang="en">
       <head>
@@ -165,6 +167,7 @@ export function ErrorBoundary({ error }) {
 export function CatchBoundary() {
   const browserEnv = useLoaderData()
   const caught = useCatch()
+  console.error('Caught in catch boundary', caught)
   const params = useParams()
   const { status } = caught
 
