@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import wasm from '../../assets/svg2png_wasm_bg.wasm'
+//@ts-ignore
+import wasm from 'svg2png-wasm/svg2png_wasm_bg.wasm'
 import { svg2png, initialize } from 'svg2png-wasm'
 import { Context } from '../../context'
 
