@@ -83,22 +83,22 @@ const addressResolvers: Resolvers = {
   },
   AddressProfiles: {
     __resolveType: (obj: AddressProfiles) => {
-      if ((obj as CryptoAddressProfile).address) {
+      if ((obj as CryptoAddressProfile).isCrypto) {
         return 'CryptoAddressProfile'
       }
-      if ((obj as OAuthGoogleProfile).picture) {
+      if ((obj as OAuthGoogleProfile).isGoogle) {
         return 'OAuthGoogleProfile'
       }
-      if ((obj as OAuthTwitterProfile).profile_image_url_https) {
+      if ((obj as OAuthTwitterProfile).isTwitter) {
         return 'OAuthTwitterProfile'
       }
-      if ((obj as OAuthGithubProfile).avatar_url) {
+      if ((obj as OAuthGithubProfile).isGithub) {
         return 'OAuthGithubProfile'
       }
-      if ((obj as OAuthMicrosoftProfile).sub) {
+      if ((obj as OAuthMicrosoftProfile).isMicrosoft) {
         return 'OAuthMicrosoftProfile'
       }
-      if ((obj as OAuthAppleProfile).sub) {
+      if ((obj as OAuthAppleProfile).isApple) {
         return 'OAuthAppleProfile'
       }
       return null

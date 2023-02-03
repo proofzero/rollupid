@@ -73,7 +73,7 @@ export const getAddressProfileMethod = async ({
       const profile = await cryptoNode.getProfile()
       return {
         type: CryptoAddressType.ETH,
-        profile,
+        profile: { ...profile, isCrypto: true },
       }
     }
     case OAuthAddressType.GitHub: {
@@ -81,7 +81,7 @@ export const getAddressProfileMethod = async ({
       const profile = await oAuthNode.getProfile()
       return {
         type: OAuthAddressType.GitHub,
-        profile,
+        profile: { ...profile, isGithub: true },
       }
     }
     case OAuthAddressType.Twitter: {
@@ -89,7 +89,7 @@ export const getAddressProfileMethod = async ({
       const profile = await oAuthNode.getProfile()
       return {
         type: OAuthAddressType.Twitter,
-        profile,
+        profile: { ...profile, isTwitter: true },
       }
     }
     case OAuthAddressType.Google: {
@@ -97,7 +97,7 @@ export const getAddressProfileMethod = async ({
       const profile = await oAuthNode.getProfile()
       return {
         type: OAuthAddressType.Google,
-        profile,
+        profile: { ...profile, isGoogle: true },
       }
     }
     case OAuthAddressType.Microsoft: {
@@ -105,7 +105,7 @@ export const getAddressProfileMethod = async ({
       const profile = await oAuthNode.getProfile()
       return {
         type: OAuthAddressType.Microsoft,
-        profile,
+        profile: { ...profile, isMicrosoft: true },
       }
     }
     case OAuthAddressType.Apple: {
@@ -113,7 +113,7 @@ export const getAddressProfileMethod = async ({
       const profile = await oAuthNode.getProfile()
       return {
         type: OAuthAddressType.Apple,
-        profile,
+        profile: { ...profile, isApple: true },
       }
     }
     // case OAuthAddressType.GitHub:

@@ -118,6 +118,7 @@ const getCryptoAddressProfile = async (
     address: address,
     displayName: displayName || '',
     avatar: avatar || '',
+    isCrypto: true,
   }
 
   return newProfile

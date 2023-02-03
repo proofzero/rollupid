@@ -1,15 +1,15 @@
 import { z } from 'zod'
 import {
-  AppleProfileSchema,
-  GithubProfileSchema,
-  GoogleProfileSchema,
-  MicrosoftProfileSchema,
+  AppleOAuthSchema,
+  GithubOAuthSchema,
+  GoogleOAuthSchema,
+  MicrosoftOAuthSchema,
   OAuthDataSchema,
+  TwitterOAuthSchema,
 } from './jsonrpc/validators/oauth'
 import {
   CryptoAddressProfileSchema,
   NFTarVoucherSchema,
-  TwitterProfileSchema,
 } from './jsonrpc/validators/profile'
 import { DeploymentMetadata } from '@kubelt/types'
 
@@ -56,13 +56,13 @@ export interface Challenge {
   timestamp: number
 }
 
-export type OAuthGoogleProfile = z.infer<typeof GoogleProfileSchema>['_json']
-export type OAuthTwitterProfile = z.infer<typeof TwitterProfileSchema>
-export type OAuthGithubProfile = z.infer<typeof GithubProfileSchema>['_json']
+export type OAuthGoogleProfile = z.infer<typeof GoogleOAuthSchema>['_json']
+export type OAuthTwitterProfile = z.infer<typeof TwitterOAuthSchema>
+export type OAuthGithubProfile = z.infer<typeof GithubOAuthSchema>['_json']
 export type OAuthMicrosoftProfile = z.infer<
-  typeof MicrosoftProfileSchema
+  typeof MicrosoftOAuthSchema
 >['_json']
-export type OAuthAppleProfile = z.infer<typeof AppleProfileSchema>
+export type OAuthAppleProfile = z.infer<typeof AppleOAuthSchema>
 
 export type CryptoAddressProfile = z.infer<typeof CryptoAddressProfileSchema>
 export type AddressProfile =
