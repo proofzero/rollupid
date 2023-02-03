@@ -9,12 +9,12 @@ workers_dev = false
 
 # The default environment
 # ------------------------------------------------------------------------------
-# name = "three-id-dev"
+# name = "rollup-id-dev"
 # # Whether or not the worker should be deployed to *.workers.dev. Can use
 # # either route or workers_dev, but not both.
 # workers_dev = true
 # routes = [
-#   "3id-dev.kubelt.com/*",
+#   "rollupid-dev.kubelt.com/*",
 # ]
 
 # Services binding for local development

@@ -35,8 +35,7 @@ import { Cover } from '~/components/profile/cover/Cover'
 import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
 
-import defaultOG from '~/assets/3ID_profiles_OG.png'
-
+import defaultOG from '~/assets/Rollup_profiles_OG.png'
 import { getRedirectUrlForProfile } from '~/utils/redirects.server'
 import {
   CryptoAddressType,
@@ -133,28 +132,28 @@ export const meta: MetaFunction = ({
   data: { ogImage: string; uname: string }
 }) => {
   const meta = {
-    'og:title': '3ID Decentralized Profile',
-    'twitter:title': '3ID Decentralized Profile',
+    'og:title': 'Rollup Decentralized Profile',
+    'twitter:title': 'Rollup Decentralized Profile',
     'og:description': 'Claim yours now!',
     'twitter:description': 'Claim yours now!',
-    'og:url': `https://threeid.xyz`,
+    'og:url': `https://rollup.id`,
     'og:image': data ? data.ogImage : defaultOG,
     'og:image:alt': `Profile not found`,
-    'og:site_name': '3ID',
+    'og:site_name': 'Rollup',
     'og:type': 'profile',
     'twitter:image': data ? data.ogImage : defaultOG,
     'twitter:image:alt': `Profile not found`,
-    'twitter:site': '@threeid_xyz',
+    'twitter:site': '@rollupid',
     'twitter:card': 'summary_large_image',
   }
   if (!data || !data.uname) return meta
   return {
     ...meta,
-    'og:title': `${data.uname}'s 3ID Profile`,
-    'twitter:title': `${data.uname}'s 3ID Profile`,
-    'og:url': `https://my.threeid.xyz/u/${data.uname}`,
-    'og:image:alt': `${data.uname}'s 3ID Profile`,
-    'twitter:image:alt': `${data.uname}'s 3ID Profile`,
+    'og:title': `${data.uname}'s Rollup Profile`,
+    'twitter:title': `${data.uname}'s Rollup Profile`,
+    'og:url': `https://my.rollup.id/u/${data.uname}`,
+    'og:image:alt': `${data.uname}'s Rollup Profile`,
+    'twitter:image:alt': `${data.uname}'s Rollup Profile`,
   }
 }
 
@@ -285,7 +284,7 @@ const UserAddressLayout = () => {
       //       </Text>
       //     </div>
 
-      //     <a href="https://passport.threeid.xyz/">
+      //     <a href="https://passport.rollup.id/">
       //       <Button>Claim This Account</Button>
       //     </a>
       //   </div>
@@ -344,7 +343,9 @@ export const CatchBoundary = () => {
         <div className="absolute max-w-4xl w-full mx-auto flex justify-center items-center top-3/4">
           <div className="rounded-full bg-white overflow-hidden flex justify-center items-center w-24 h-24">
             {!icon && <HiOutlineQuestionMarkCircle className="w-16 h-16" />}
-            {icon && <img src={icon} className="w-16 h-16" />}
+            {icon && (
+              <img src={icon} className="w-16 h-16" alt="address icon" />
+            )}
           </div>
         </div>
       </div>

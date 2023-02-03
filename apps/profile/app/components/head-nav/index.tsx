@@ -66,7 +66,7 @@ export default function HeadNav({
             <div className="flex h-20 items-center justify-between px-4 sm:px-0">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <img className="h-10 w-10" src={logo} alt="3ID" />
+                  <img className="h-10 w-10" src={logo} alt="Rollup" />
                 </div>
 
                 <div className="hidden md:block">
@@ -107,11 +107,11 @@ export default function HeadNav({
                       </Link>
 
                       <a
-                        href="https://passport.threeid.xyz/"
+                        href="https://passport.rollup.id/"
                         className="button-base w-full lg:w-fit bg-white py-3 px-8 rounded-md"
                       >
                         <Text weight="semibold" size="sm">
-                          Claim your 3ID
+                          Claim your Rollup
                         </Text>
                       </a>
                     </div>
@@ -197,11 +197,11 @@ export default function HeadNav({
                 {!loggedIn && (
                   <div className="flex flex-row items-center space-x-8">
                     <a
-                      href="https://passport.threeid.xyz/"
+                      href="https://passport.rollup.id/"
                       className="button-base w-full lg:w-fit bg-white py-3 px-8"
                     >
                       <Text weight="bold" size="sm">
-                        Claim your 3ID
+                        Claim your Rollup
                       </Text>
                     </a>
                   </div>

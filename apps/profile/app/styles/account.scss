@@ -11,19 +11,19 @@
 
 .progress-bar {
   width: 100%;
-  background-color: $threeid-light;
+  background-color: $rollupid-light;
   height: 5px;
   margin-bottom: 14px;
 
   .progress-bar__fill {
-    background-color: $threeid-bar;
+    background-color: $rollupid-bar;
     flex: 1;
     height: 5px;
   }
 }
 
 .steps {
-  border: $threeid-light 1px solid;
+  border: $rollupid-light 1px solid;
   padding: 12px;
 
   .step {
@@ -39,9 +39,9 @@
     .roadmap-vote__button {
       width: 44px;
       height: 44px;
-      background-color: $threeid-light;
+      background-color: $rollupid-light;
       border: none;
-      color: $threeid-dark;
+      color: $rollupid-dark;
       // padding: 8px;
       margin: 0;
 

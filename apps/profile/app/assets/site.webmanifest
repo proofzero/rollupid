@@ -1,9 +1,9 @@
 {
-    "name": "3ID",
-    "short_name": "3ID",
-    "start_url": "/",
-    "display": "standalone",
-    "orientation": "portrait",
-    "background_color": "#fff",
-    "theme_color": "#673ab8"
-  }
+  "name": "Rollup",
+  "short_name": "Rollup",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff",
+  "theme_color": "#673ab8"
+}

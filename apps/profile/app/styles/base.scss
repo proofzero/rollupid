@@ -13,11 +13,11 @@ body {
   -ms-overflow-style: scrollbar;
   overscroll-behavior-y: none;
   min-height: 100%;
-  background-color: $threeid-white;
+  background-color: $rollupid-white;
   margin: 0px;
   padding: 0px;
   min-height: 100vh;
-  background-color: $threeid-white;
+  background-color: $rollupid-white;
 }
 
 footer {
@@ -30,12 +30,12 @@ footer {
     font-weight: 400;
     line-height: 24px;
     text-align: center;
-    color: $threeid-darkgrey;
+    color: $rollupid-darkgrey;
   }
 }
 
 .header {
-  background-color: $threeid-header;
+  background-color: $rollupid-header;
   // padding-left: 1em;
   // padding-right: 1em;
 
@@ -99,7 +99,7 @@ div[data-testid='flowbite-tooltip'] div {
     max-width: 758px;
     text-align: center;
     margin-right: 0;
-    color: $threeid-dark;
+    color: $rollupid-dark;
     justify-content: center;
     align-items: center;
   }
@@ -112,7 +112,7 @@ div[data-testid='flowbite-tooltip'] div {
     max-width: 758px;
     text-align: center;
     margin-right: 0;
-    color: $threeid-dark;
+    color: $rollupid-dark;
     justify-content: center;
     align-items: center;
   }

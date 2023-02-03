@@ -35,7 +35,7 @@ footer {
   max-width: 758px;
   text-align: center;
   margin-right: 0;
-  color: $threeid-dark;
+  color: $rollupid-dark;
   justify-content: center;
   align-items: center;
 }
@@ -48,7 +48,7 @@ footer {
   max-width: 758px;
   text-align: center;
   margin-right: 0;
-  color: $threeid-dark;
+  color: $rollupid-dark;
   justify-content: center;
   align-items: center;
 }
@@ -72,7 +72,7 @@ footer {
   font-family: Inter_500Medium;
   font-weight: 500;
   width: 100%;
-  border: 1px solid $threeid-lightgrey;
+  border: 1px solid $rollupid-lightgrey;
   border-radius: 6px;
 
   svg {
@@ -81,7 +81,7 @@ footer {
   }
 
   &[disabled] {
-    background: $threeid-light;
+    background: $rollupid-light;
     opacity: 0.5;
   }
 }
@@ -91,7 +91,7 @@ footer {
   font-family: Inter_700Bold;
   font-size: 14px;
   font-weight: 700;
-  color: $threeid-dark;
+  color: $rollupid-dark;
   text-decoration: underline;
   text-align: center;
   justify-content: center;

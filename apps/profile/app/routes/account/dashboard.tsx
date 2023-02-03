@@ -34,7 +34,7 @@ const comingNext = [
     description: (
       <>
         <Text className="mb-1 text-gray-400" size="sm" weight="normal">
-          Connect more blockchain and social accounts to your 3ID.
+          Connect more blockchain and social accounts to your Rollup.
         </Text>
       </>
     ),
@@ -74,14 +74,14 @@ export default function Welcome() {
           size="base"
           className="mb-6 text-center lg:text-left text-gray-500"
         >
-          Welcome to the 3ID app. We are currently in beta and will be unlocking
+          Welcome to the Profile app. We are currently in beta and will be unlocking
           new features often. Follow us on Twitter and join our Discord to stay
           updated!
         </Text>
 
         <div className="flex flex-row gap-4 justify-center align-center lg:justify-start">
           <ButtonAnchor
-            href="https://twitter.com/threeid_xyz"
+            href="https://twitter.com/rollupid"
             className="bg-gray-100 border-none min-w-[170px]"
           >
             <FaTwitter style={{ color: '#1D9BF0' }} />
@@ -90,7 +90,7 @@ export default function Welcome() {
           </ButtonAnchor>
 
           <ButtonAnchor
-            href="https://discord.gg/threeid"
+            href="https://discord.gg/rollupid"
             className="bg-gray-100 border-none min-w-[170px]"
           >
             <FaDiscord style={{ color: '#1D9BF0' }} />
@@ -127,7 +127,7 @@ export default function Welcome() {
                   <div className="roadmap-next__check mt-1 flex justify-center items-top">
                     <img
                       src={step.isCompleted ? stepComplete : stepSoon}
-                      alt="3ID Step"
+                      alt="Rollup Step"
                     />
                   </div>
 
@@ -154,7 +154,7 @@ export default function Welcome() {
                   key={index}
                 >
                   <div className="roadmap-next__check mt-1 flex justify-center items-top">
-                    <img src={stepSoon} alt="3ID Step" />
+                    <img src={stepSoon} alt="Rollup Step" />
                   </div>
 
                   <div className="col-span-5">
