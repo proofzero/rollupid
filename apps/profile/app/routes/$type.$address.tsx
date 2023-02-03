@@ -34,12 +34,16 @@ import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
 
 import defaultOG from '~/assets/3ID_profiles_OG.png'
-import crypto404 from '~/assets/404/crypto.svg'
 
 import { getRedirectUrlForProfile } from '~/utils/redirects.server'
-import { NodeType } from '@kubelt/types/address'
+import {
+  CryptoAddressType,
+  NodeType,
+  OAuthAddressType,
+} from '@kubelt/types/address'
 import { AccountURN } from '@kubelt/urns/account'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { imageFromAddressType } from '~/helpers'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { address, type } = params
@@ -309,7 +313,31 @@ export default UserAddressLayout
 export const CatchBoundary = () => {
   const caught = useCatch()
   console.error('Caught in catch boundary', { caught })
-  const { address } = useParams()
+
+  const { address, type } = useParams()
+  const icon = imageFromAddressType(type as string)
+
+  let providerCopy
+  switch (type) {
+    case CryptoAddressType.ETH:
+      providerCopy = 'with Wallet'
+      break
+    case OAuthAddressType.Apple:
+      providerCopy = 'with Apple'
+      break
+    case OAuthAddressType.GitHub:
+      providerCopy = 'with GitHub'
+      break
+    case OAuthAddressType.Google:
+      providerCopy = 'with Google'
+      break
+    case OAuthAddressType.Microsoft:
+      providerCopy = 'with Microsoft'
+      break
+    case OAuthAddressType.Twitter:
+      providerCopy = 'with Twitter'
+      break
+  }
 
   return (
     <>
@@ -318,7 +346,8 @@ export const CatchBoundary = () => {
 
         <div className="absolute max-w-4xl w-full mx-auto flex justify-center items-center top-3/4">
           <div className="rounded-full bg-white overflow-hidden flex justify-center items-center">
-            <HiOutlineQuestionMarkCircle className="w-24 h-24" />
+            {!icon && <HiOutlineQuestionMarkCircle className="w-24 h-24" />}
+            {icon && <img src={icon} className="w-24 h-24" />}
           </div>
         </div>
       </div>
@@ -341,7 +370,7 @@ export const CatchBoundary = () => {
           </Text>
         </div>
 
-        <Button btnSize="xl">Login</Button>
+        <Button btnSize="xl">Login {providerCopy}</Button>
       </div>
     </>
   )
