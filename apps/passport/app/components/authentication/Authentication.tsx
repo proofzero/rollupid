@@ -1,5 +1,4 @@
 import circleLogo from './circle-logo.svg'
-import kubeltLogoSmall from './kubelt.svg'
 
 import ConnectOAuthButton from '../connect-oauth-button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
@@ -75,7 +74,6 @@ export function Authentication({
       </div>
 
       <div className="mt-14 flex justify-center items-center space-x-2">
-        <img className="w-4 h-4" src={kubeltLogoSmall} />
         <Text size="xs" weight="normal" className="text-gray-400">
           Powered by rollup.id
         </Text>

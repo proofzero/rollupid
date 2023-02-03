@@ -41,7 +41,7 @@ The [platform/](platform) directory is where all the core identity services are 
 
 ## Apps
 
-The [apps/](apps) directory is where the presentation layer applications (or backend for frontends) live. These apps include the 3ID user experience as well as the Developer Console app.
+The [apps/](apps) directory is where the presentation layer applications (or backend for frontends) live. These apps include the Rollup user experience as well as the Developer Console app.
 
 ## Packages
 

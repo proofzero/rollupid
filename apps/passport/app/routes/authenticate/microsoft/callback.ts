@@ -50,7 +50,7 @@ export const loader: LoaderFunction = async ({
     const imageUrl = await cacheImageToCF(profile._json.picture, context.env, {
       Authorization: `Bearer ${authRes.accessToken}`,
     })
-    profile._json.threeidImageUrl = imageUrl
+    profile._json.rollupidImageUrl = imageUrl
 
     await addressClient.setOAuthData.mutate(authRes)
   }

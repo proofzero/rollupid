@@ -22,7 +22,7 @@ import {
   useLoaderData,
 } from '@remix-run/react'
 
-import { ThreeIdButton } from '~/components'
+import { RollupIdButton } from '~/components'
 
 import globalStyles from '@kubelt/design-system/src/styles/global.css'
 import styles from './styles/tailwind.css'
@@ -30,7 +30,7 @@ import styles from './styles/tailwind.css'
 import appleIcon from '~/assets/apple-touch-icon.png'
 import icon32 from '~/assets/favicon-32x32.png'
 import icon16 from '~/assets/favicon-16x16.png'
-import faviconSvg from '~/assets/three-id-logo.svg'
+import faviconSvg from '~/assets/favicon.svg'
 import social from '~/assets/passport-social.png'
 
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
@@ -40,14 +40,14 @@ import * as gtag from '~/utils/gtags.client'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
-  title: '3ID - Passport',
+  title: 'Rollup - Passport',
   viewport: 'width=device-width,initial-scale=1',
   'og:url': 'https://passport.kubelt.com',
   'og:description': 'User identity in your control.',
   'og:image': social,
   'twitter:card': 'summary_large_image',
-  'twitter:site': '@threeid_xyz',
-  'twitter:creator': '@threeid_xyz',
+  'twitter:site': '@rollupid_xyz',
+  'twitter:creator': '@rollupid_xyz',
   'theme-color': '#673ab8',
   'mobile-web-app-capable': 'yes',
   'apple-mobile-web-app-capable': 'yes',
@@ -199,8 +199,8 @@ export function CatchBoundary() {
             {caught.data?.message && `: ${caught.data?.message}`}
           </p>
           {caught.data?.isAuthenticated && (
-            <ThreeIdButton
-              text={'Continue to 3ID'}
+            <RollupIdButton
+              text={'Continue to Rollup'}
               href={typeof window !== 'undefined' && window.ENV.PROFILE_APP_URL}
             />
           )}

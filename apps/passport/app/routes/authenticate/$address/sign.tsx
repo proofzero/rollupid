@@ -16,9 +16,9 @@ import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { CryptoAddressType, NodeType } from '@kubelt/types/address'
 
-export const signMessageTemplate = `Welcome to 3ID!
+export const signMessageTemplate = `Welcome to Rollup!
 
-Sign this message to accept the 3ID Terms of Service (https://threeid.xyz/tos), no password needed!
+Sign this message to accept the Rollup Terms of Service (https://rollup.id/tos), no password needed!
 
 This will not trigger a blockchain transaction or cost any gas fees.
 

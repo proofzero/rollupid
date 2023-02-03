@@ -8,12 +8,12 @@ export default {
 }
 
 const links = [
-  <ButtonAnchor href="https://twitter.com/threeid_xyz">
+  <ButtonAnchor key="twitter" href="https://twitter.com/threeid_xyz">
     <FaTwitter style={{ color: '#1D9BF0' }} />
 
     <span>Twitter</span>
   </ButtonAnchor>,
-  <ButtonAnchor href="https://discord.gg/threeid">
+  <ButtonAnchor key="discord" href="https://discord.gg/threeid">
     <FaDiscord style={{ color: '#1D9BF0' }} />
 
     <span>Discord</span>

@@ -46,13 +46,13 @@ import { AccountURNSpace } from '@kubelt/urns/account'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
-  title: '3ID',
+  title: 'Rollup',
   viewport: 'width=device-width,initial-scale=1',
-  'og:title': '3ID - Decentralized Identity',
-  'og:site_name': '3ID',
+  'og:title': 'Rollup - Decentralized Identity',
+  'og:site_name': 'Rollup',
   'og:url': 'https://my.threeid.xyz',
   'og:description':
-    '3ID turns your blockchain accounts into multi-chain decentralized identities with improved auth, secure messaging and more.',
+    'Rollup turns your blockchain accounts into multi-chain decentralized identities with improved auth, secure messaging and more.',
   'og:image': social,
   'twitter:card': 'summary_large_image',
   'twitter:site': '@threeid_xyz',

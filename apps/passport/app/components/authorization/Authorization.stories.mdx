@@ -21,13 +21,13 @@ export const Template = (args) => <Authorization {...args} />
     name="Authorization"
     args={{
       appProfile: {
-        clientName: '3ID Profile',
+        clientName: 'Rollup Profile',
         published: true,
         icon: circleLogo,
         scopes: [
-          'scope://threeid.xyz/profile.write',
-          'scope://threeid.xyx/connected-accounts.read',
-          'scope://threeid.xyz/blockchain-account/{{ account }}.manage',
+          'scope://rollup.id/profile.write',
+          'scope://rollup.id/connected-accounts.read',
+          'scope://rollup.id/blockchain-account/{{ account }}.manage',
         ],
         redirectURI: 'localhost:9797/oauth',
         termsURL: '',
@@ -45,22 +45,22 @@ export const Template = (args) => <Authorization {...args} />
         },
       },
       scopeMeta: {
-        'scope://threeid.xyz/profile.read': {
+        'scope://rollup.id/profile.read': {
           name: 'Read Profile',
           description: 'Read your profile information',
           class: 'account',
         },
-        'scope://threeid.xyz/profile.write': {
+        'scope://rollup.id/profile.write': {
           name: 'Edit Profile',
           description: 'Edit your profile information',
           class: 'account',
         },
-        'scope://threeid.xyx/connected-accounts.read': {
+        'scope://rollup.id/connected-accounts.read': {
           name: 'Read Blockchain Accounts',
           description: 'See your viewable connected blockchain accounts',
           class: 'address',
         },
-        'scope://threeid.xyz/blockchain-account/{{ account }}.manage': {
+        'scope://rollup.id/blockchain-account/{{ account }}.manage': {
           name: 'Create Dedicated Blockchain Account',
           description:
             'Create and manage a dedicated blockchain account isolated for this application.',

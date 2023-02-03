@@ -3,17 +3,17 @@ import {
   ButtonProps,
 } from '@kubelt/design-system/src/atoms/buttons/Button'
 
-import threeIdLogo from './3id.svg'
+import logo from './rollup-purple.svg'
 
-export type ThreeIdButtonProps = {
+export type RollupIdButtonProps = {
   href: string
   text?: string
 } & ButtonProps
 
-export function ThreeIdButton({
+export function RollupIdButton({
   href,
   text = 'Private Login',
-}: ThreeIdButtonProps) {
+}: RollupIdButtonProps) {
   return (
     <Button
       onClick={() => {
@@ -22,7 +22,7 @@ export function ThreeIdButton({
       className="flex flex-row gap-4 items-center"
       btnSize="l"
     >
-      <img src={threeIdLogo} />
+      <img src={logo} alt="logo" />
 
       {text}
     </Button>
