@@ -345,9 +345,9 @@ export const CatchBoundary = () => {
         <HiOutlineLockClosed className="text-gray-200 w-32 h-32" />
 
         <div className="absolute max-w-4xl w-full mx-auto flex justify-center items-center top-3/4">
-          <div className="rounded-full bg-white overflow-hidden flex justify-center items-center">
-            {!icon && <HiOutlineQuestionMarkCircle className="w-24 h-24" />}
-            {icon && <img src={icon} className="w-24 h-24" />}
+          <div className="rounded-full bg-white overflow-hidden flex justify-center items-center w-24 h-24">
+            {!icon && <HiOutlineQuestionMarkCircle className="w-16 h-16" />}
+            {icon && <img src={icon} className="w-16 h-16" />}
           </div>
         </div>
       </div>
