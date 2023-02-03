@@ -18,7 +18,8 @@ export const initAuthenticator = (env: Env) => {
       httpOnly: true,
       name: 'oauth',
       path: '/',
-      sameSite: 'strict',
+      //Needs to be lax to allow cookie reads on callback from third-party providers
+      sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 4,
       secrets: [env.SECRET_SESSION_SALT],
