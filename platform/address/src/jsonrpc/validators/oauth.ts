@@ -21,7 +21,7 @@ export const GoogleOAuthSchema = z.object({
     })
   ),
   _json: GoogleRawProfileSchema,
-  isGoogle: z.boolean(),
+  isGoogle: z.boolean().default(true),
 })
 
 export const MicrosoftOAuthSchema = z.object({
@@ -36,7 +36,7 @@ export const MicrosoftOAuthSchema = z.object({
     })
     .nullable(),
   emails: z.array(z.object({ value: z.string().nullable() })),
-  isMicrosoft: z.boolean(),
+  isMicrosoft: z.boolean().default(true),
 })
 
 export const GithubOAuthSchema = z.object({
@@ -83,9 +83,9 @@ export const GithubOAuthSchema = z.object({
     public_gists: z.number(),
     followers: z.number(),
     following: z.number(),
-    isGithub: z.boolean(),
     created_at: z.string(),
     updated_at: z.string(),
+    isGithub: z.boolean().default(true),
   }),
 })
 
@@ -96,7 +96,7 @@ export const TwitterOAuthSchema = z.object({
   screen_name: z.string(),
   profile_image_url_https: z.string(),
   _json: z.undefined(),
-  isTwitter: z.boolean(),
+  isTwitter: z.boolean().default(true),
 })
 
 export const AppleOAuthSchema = z.object({
@@ -111,7 +111,7 @@ export const AppleOAuthSchema = z.object({
   picture: z.string(),
   sub: z.string(),
   _json: z.undefined(),
-  isTwitter: z.boolean(),
+  isApple: z.boolean().default(true),
 })
 
 export const OAuthDataSchema = z.object({

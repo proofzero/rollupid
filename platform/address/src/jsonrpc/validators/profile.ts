@@ -57,7 +57,7 @@ export const CryptoAddressProfileSchema = z.object({
   address: z.string(),
   avatar: z.string().optional(),
   displayName: z.string().optional(),
-  isCrypto: z.boolean(),
+  isCrypto: z.boolean().default(true),
 })
 
 export const GoogleRawProfileSchema = z.object({
@@ -69,7 +69,7 @@ export const GoogleRawProfileSchema = z.object({
   locale: z.string(),
   email: z.string(),
   email_verified: z.boolean(),
-  isGoogle: z.boolean(),
+  isGoogle: z.boolean().default(true),
 })
 
 //Going for a subset of the full profile as there are a lot of (unneeded) fields there
@@ -79,7 +79,7 @@ export const GithubRawProfileSubsetSchema = z.object({
   url: z.string(),
   html_url: z.string(),
   avatar_url: z.string(),
-  isGithub: z.boolean(),
+  isGithub: z.boolean().default(true),
 })
 
 export const TwitterProfileSchema = z.object({
@@ -87,7 +87,7 @@ export const TwitterProfileSchema = z.object({
   name: z.string(),
   screen_name: z.string(),
   profile_image_url_https: z.string(),
-  isTwitter: z.boolean(),
+  isTwitter: z.boolean().default(true),
 })
 
 export const MicrosoftRawProfileSchema = z.object({
@@ -98,7 +98,7 @@ export const MicrosoftRawProfileSchema = z.object({
   email: z.string(),
   picture: z.string(),
   threeidImageUrl: z.string().optional(),
-  isMicrosoft: z.boolean(),
+  isMicrosoft: z.boolean().default(true),
 })
 
 export const AppleProfileSchema = z.object({
@@ -111,7 +111,7 @@ export const AppleProfileSchema = z.object({
     .optional(),
   picture: z.string(),
   sub: z.string(),
-  isApple: z.boolean(),
+  isApple: z.boolean().default(true),
 })
 
 export const AddressProfileSchema = z.union([
