@@ -21,9 +21,9 @@ import {
 import { Disclosure } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
-// KubeltLogo
+// RollupLogo
 // -----------------------------------------------------------------------------
-const KubeltLogo = () => {
+const RollupLogo = () => {
   return (
     <Link to="/">
       <img className="mx-4 my-5 max-w-[180px]" src={consoleLogo} alt="console logo" />
@@ -70,10 +70,10 @@ const MenuLink = (props: MenuLinkProps) => {
   )
 }
 
-// KubeltMenu
+// RollupMenu
 // -----------------------------------------------------------------------------
 
-type KubeltMenuProps = {
+type RollupMenuProps = {
   // An array of application objects.
   apps: {
     clientId: string
@@ -89,11 +89,11 @@ const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
     isActive ? 'bg-gray-800 text-white' : 'text-gray-400'
   } ${disabled ? 'hover:cursor-not-allowed' : ''}`
 
-export default function SiteMenu(props: KubeltMenuProps) {
+export default function SiteMenu(props: RollupMenuProps) {
   return (
     <div className="text-center bg-gray-900 pb-4 md:min-h-screen md:min-w-[256px] md:max-w-sm md:border-r md:text-left">
       <div className="object-left">
-        <KubeltLogo />
+        <RollupLogo />
       </div>
       {/* Mobile menu */}
       <div className="md:hidden ">
@@ -125,7 +125,7 @@ export default function SiteMenu(props: KubeltMenuProps) {
 }
 
 type AppMenuProps = {
-  props: KubeltMenuProps
+  props: RollupMenuProps
 }
 
 function AppMenu({ props }: AppMenuProps) {

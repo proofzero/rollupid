@@ -1,8 +1,8 @@
 #!/bin/bash
 
-dev_url="https://icons-dev.kubelt.com"
-next_url="https://icons-next.kubelt.com"
-prod_url="https://icons.kubelt.com"
+dev_url="https://icons-dev.rollup.id"
+next_url="https://icons-next.rollup.id"
+prod_url="https://icons.rollup.id"
 
 url="${dev_url}"
 

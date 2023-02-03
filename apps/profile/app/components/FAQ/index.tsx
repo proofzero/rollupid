@@ -97,7 +97,7 @@ const contents = [
           <a
             target={'_blank'}
             rel={'noopener noopener noreferrer'}
-            href={`https://github.com/kubelt/kubelt/tree/main/nftar`}
+            href={`https://github.com/proofzero/rollupid/tree/main/nftar`}
             className="mx-1"
           >
             <Text type="span" size="sm" className="text-indigo-500">
@@ -122,11 +122,11 @@ const contents = [
         <a
           target={'_blank'}
           rel={'noopener noopener noreferrer'}
-          href={`https://kubelt.com`}
+          href={`https://rollup.id`}
           className="mx-1"
         >
           <Text type="span" size="sm" className="text-indigo-500">
-            Kubelt
+            Rollup
           </Text>
         </a>
 

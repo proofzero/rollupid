@@ -12,7 +12,7 @@ import classNames from 'classnames'
 import SignOutLink from './sign-out-link'
 import ProfileLink from './profile-link'
 
-// KubeltHeader
+// RollupHeader
 // -----------------------------------------------------------------------------
 
 const userNavigation = [
@@ -21,12 +21,12 @@ const userNavigation = [
   { name: 'Sign out', component: SignOutLink },
 ]
 
-type KubeltHeaderProps = {
+type RollupHeaderProps = {
   avatarUrl: string
   profileURL: string
 }
 
-export default function KubeltHeader(props: KubeltHeaderProps) {
+export default function RollupHeader(props: RollupHeaderProps) {
   return (
     <header className="flex flex-row-reverse shadow-xl p-4 bg-white text-slate-500">
       <Form action="/signout" method="post">

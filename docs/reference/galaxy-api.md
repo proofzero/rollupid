@@ -195,7 +195,7 @@ As you can see, with a GraphQL client lines the overhead of making API calls is 
 
 This option is best if you already have GraphQL well integrated into your application and are looking to extend your GQL client.
 
-A popular tool for generating client is the [GraphQL Code Generator.](https://the-guild.dev/graphql/codegen) With the generator you can reference the Galaxy API schema at http://galaxy.rollup.id in your [codegen configuration](https://the-guild.dev/graphql/codegen/docs/config-reference/codegen-config) and [write your operation documents](https://github.com/kubelt/kubelt/tree/main/packages/galaxy-client/gql) ahead of time too.
+A popular tool for generating client is the [GraphQL Code Generator.](https://the-guild.dev/graphql/codegen) With the generator you can reference the Galaxy API schema at http://galaxy.rollup.id in your [codegen configuration](https://the-guild.dev/graphql/codegen/docs/config-reference/codegen-config) and [write your operation documents](https://github.com/proofzero/rollup/tree/main/packages/galaxy-client/gql) ahead of time too.
 
 With this approach you can then reference your operations directly from your client. For example:
 

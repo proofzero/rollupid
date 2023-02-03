@@ -14,7 +14,7 @@ workers_dev = false
 # # either route or workers_dev, but not both.
 # workers_dev = true
 # routes = [
-#   "rollupid-dev.kubelt.com/*",
+#   "rollupid-dev.rollup.id/*",
 # ]
 
 # Services binding for local development

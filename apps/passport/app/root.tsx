@@ -42,7 +42,7 @@ export const meta: MetaFunction = () => ({
   charset: 'utf-8',
   title: 'Rollup - Passport',
   viewport: 'width=device-width,initial-scale=1',
-  'og:url': 'https://passport.kubelt.com',
+  'og:url': 'https://passport.rollup.id',
   'og:description': 'User identity in your control.',
   'og:image': social,
   'twitter:card': 'summary_large_image',

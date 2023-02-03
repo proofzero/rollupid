@@ -28,32 +28,32 @@ hacking on docs.
 ### Cloudflare Pages
 
 Cloudflare Pages were used to publish the Hugo docs. The Cloudflare Pages app
-had access to the `kubelt/kubelt` repo in GitHub. That access has been removed
+had access to the `proofzero/rollup` repo in GitHub. That access has been removed
 but the app has been left in place because it deploys `redeem` to production.
 
 ### Cloudflare Page Rules
 
 Cloudflare Page Rules does a `301 redirect` for old URLs to the new site.
 
-Specifically: `*.developers.kubelt.com/*` -> `https://docs.kubelt.com/$2`
+Specifically: `*.developers.rollup.id/*` -> `https://docs.rollup.id/$2`
 
 ### Webflow
 
 Webflow does a `301 redirect` for `/docs` subpaths to GitBook:
 
-- `kubelt.com/docs` -> `https://docs.kubelt.com`
+- `rollup.id/docs` -> `https://docs.rollup.id`
 - `rollup.id/docs` -> `https://docs.rollup.id`
 
 ### GitBook Custom Domains
 
 **tl;dr** Current config points everything to https://docs.rollup.id.
 
-GitBook Custom Domains are configured in Cloudflare DNS for `kubelt.com` and
+GitBook Custom Domains are configured in Cloudflare DNS for `rollup.id` and
 `rollup.id`. Both include `CNAME` records pointing `docs` to GitBook. Both
 also include `CAA` records allowing Google to issue certification for the `docs`
 subdomain.
 
-- docs.kubelt.com (organization domain -- see below)
+- docs.rollup.id (organization domain -- see below)
 - docs.rollup.id (space domain -- see below)
 
 GitBook allows creation of domains at three levels: organization, collection,

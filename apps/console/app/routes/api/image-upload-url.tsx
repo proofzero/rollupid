@@ -6,7 +6,11 @@ import { requireJWT } from '~/utilities/session.server'
 export const action: ActionFunction = async ({ request }) => {
   await requireJWT(request)
   const imageClient = createImageClient(Images)
-
-  const { uploadURL } = await imageClient.upload.mutate()
-  return json(uploadURL)
+  try {
+    const { uploadURL } = await imageClient.upload.mutate()
+    return json(uploadURL)
+  } catch (ex) {
+    console.error(ex)
+    return null
+  }
 }

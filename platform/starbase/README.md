@@ -1,6 +1,6 @@
 # @kubelt/starbase
 
-A Kubelt-platform application for managing a user's dapps.
+A Rollup-platform application for managing a user's dapps.
 
 ## development
 

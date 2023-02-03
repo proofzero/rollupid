@@ -106,4 +106,4 @@ curl https://profile.rollup.id/eth/vitalik.eth.json
 
 #### Source
 
-[https://github.com/kubelt/kubelt/blob/main/apps/profile/app/routes/%24type.%24address.tsx](../../apps/profile/app/routes/%24type.%24address.tsx)
+[https://github.com/proofzero/rollup/blob/main/apps/profile/app/routes/%24type.%24address.tsx](../../apps/profile/app/routes/%24type.%24address.tsx)
