@@ -75,7 +75,7 @@ export function Authentication({
 
       <div className="mt-14 flex justify-center items-center space-x-2">
         <Text size="xs" weight="normal" className="text-gray-400">
-          Powered by rollup.id
+          Powered by Rollup.id
         </Text>
       </div>
     </div>
