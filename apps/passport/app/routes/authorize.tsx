@@ -6,6 +6,7 @@ import { Outlet, useLoaderData } from '@remix-run/react'
 import { getAddressClient, getGalaxyClient } from '~/platform.server'
 import { getUserSession, requireJWT } from '~/session.server'
 import { generateGradient } from '~/utils/gradient.server'
+import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
@@ -18,9 +19,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(
     {},
-    {
-      [PlatformJWTAssertionHeader]: jwt,
-    }
+    getAuthzHeaderConditionallyFromToken(jwt)
   )
   const profile = profileRes.profile
 
@@ -123,9 +122,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     // set the default profile
     await galaxyClient.updateProfile(
       { profile: finalProfile },
-      {
-        [PlatformJWTAssertionHeader]: jwt,
-      }
+      getAuthzHeaderConditionallyFromToken(jwt)
     )
   }
 

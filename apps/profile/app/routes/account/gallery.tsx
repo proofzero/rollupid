@@ -34,7 +34,6 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import SaveButton from '~/components/accounts/SaveButton'
 import PfpNftModal from '~/components/accounts/PfpNftModal'
 import { LoadingGridSquaresGallery } from '~/components/nfts/grid/loading'
@@ -47,6 +46,7 @@ import { generateHashedIDRef } from '@kubelt/urns/idref'
 import type { Node, Profile } from '@kubelt/galaxy-client'
 import { CryptoAddressType } from '@kubelt/types/address'
 import { getMoreNftsModal } from '~/helpers/nfts'
+import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
@@ -107,9 +107,7 @@ export const action: ActionFunction = async ({ request }) => {
     {
       gallery,
     },
-    {
-      [PlatformJWTAssertionHeader]: jwt,
-    }
+    getAuthzHeaderConditionallyFromToken(jwt)
   )
 
   // TODO: update gallery on account

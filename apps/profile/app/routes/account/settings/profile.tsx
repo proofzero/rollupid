@@ -14,7 +14,10 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
-import { gatewayFromIpfs } from '@kubelt/utils'
+import {
+  gatewayFromIpfs,
+  getAuthzHeaderConditionallyFromToken,
+} from '@kubelt/utils'
 
 import PfpNftModal from '~/components/accounts/PfpNftModal'
 
@@ -24,7 +27,6 @@ import SaveButton from '~/components/accounts/SaveButton'
 import { getGalaxyClient } from '~/helpers/clients'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import type { Node, Profile } from '@kubelt/galaxy-client'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
 export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
@@ -55,9 +57,7 @@ export const action: ActionFunction = async ({ request }) => {
         },
       },
     },
-    {
-      [PlatformJWTAssertionHeader]: jwt,
-    }
+    getAuthzHeaderConditionallyFromToken(jwt)
   )
 
   return null

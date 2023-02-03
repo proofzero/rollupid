@@ -7,7 +7,7 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import createAccountClient from '@kubelt/platform-clients/account'
 
 import Env from '../../../env'
-import { isFromCFBinding } from '@kubelt/utils'
+import { getAuthzTokenFromReq, isFromCFBinding } from '@kubelt/utils'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
 import { WriteAnalyticsDataPoint } from '@kubelt/packages/platform-clients/analytics'
@@ -30,7 +30,7 @@ export function parseJwt(token: string): JWTPayload {
 }
 
 export const setupContext = () => (next) => (root, args, context, info) => {
-  const jwt = context.request.headers.get(PlatformJWTAssertionHeader)
+  const jwt = getAuthzTokenFromReq(context.request)
   const apiKey = context.request.headers.get('X-GALAXY-KEY')
 
   const parsedJwt = jwt && parseJwt(jwt)

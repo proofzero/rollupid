@@ -25,6 +25,7 @@ import { getGalaxyClient } from '~/utilities/platform.server'
 import { InfoPanelDashboard } from '~/components/InfoPanel/InfoPanelDashboard'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 type LoaderData = {
   apps: {
@@ -60,9 +61,10 @@ export const loader: LoaderFunction = async ({ request }) => {
 
     let avatarUrl = ''
     try {
-      const profileRes = await galaxyClient.getProfile(undefined, {
-        [PlatformJWTAssertionHeader]: jwt,
-      })
+      const profileRes = await galaxyClient.getProfile(
+        undefined,
+        getAuthzHeaderConditionallyFromToken(jwt)
+      )
       avatarUrl = profileRes.profile?.pfp?.image || ''
     } catch (e) {
       console.error('Could not retrieve profile image.', e)

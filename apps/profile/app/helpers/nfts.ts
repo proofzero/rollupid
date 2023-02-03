@@ -1,8 +1,10 @@
-import { gatewayFromIpfs } from '@kubelt/utils'
+import {
+  gatewayFromIpfs,
+  getAuthzHeaderConditionallyFromToken,
+} from '@kubelt/utils'
 import { getGalaxyClient } from './clients'
 import { getAccountProfile, getAddressProfile } from './profile'
 
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { AddressURN } from '@kubelt/urns/address'
 /**
  * Nfts are being sorted server-side
@@ -205,11 +207,7 @@ export const getGalleryWithMetadata = async (owner: string, jwt?: string) => {
     // Optional for when called by
     // a non authenticated visitor
     // of a public profile
-    jwt
-      ? {
-          [PlatformJWTAssertionHeader]: jwt,
-        }
-      : {}
+    getAuthzHeaderConditionallyFromToken(jwt)
   )
 
   const ownedNfts = metadata?.ownedNfts.map((nft) => {
