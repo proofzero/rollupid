@@ -113,7 +113,7 @@ export async function requireJWT(
     }
   }
 
-  // eventSubmit("3ID user event", `request:${request.url}`, session.get("core"))
+  // eventSubmit("Rollup user event", `request:${request.url}`, session.get("core"))
 
   return jwt
 }
