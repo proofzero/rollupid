@@ -3,14 +3,20 @@ import { LoaderFunction, MetaFunction, redirect } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import {
   Outlet,
+  useCatch,
   useFetcher,
   useLoaderData,
   useNavigate,
   useOutletContext,
+  useParams,
 } from '@remix-run/react'
 
 import { HiOutlineMapPin } from 'react-icons/hi2'
-import { HiOutlineBriefcase } from 'react-icons/hi'
+import {
+  HiOutlineBriefcase,
+  HiOutlineLockClosed,
+  HiOutlineQuestionMarkCircle,
+} from 'react-icons/hi'
 
 import { getProfileSession } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
@@ -28,9 +34,16 @@ import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
 
 import defaultOG from '~/assets/3ID_profiles_OG.png'
+
 import { getRedirectUrlForProfile } from '~/utils/redirects.server'
-import { NodeType } from '@kubelt/types/address'
+import {
+  CryptoAddressType,
+  NodeType,
+  OAuthAddressType,
+} from '@kubelt/types/address'
 import { AccountURN } from '@kubelt/urns/account'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { imageFromAddressType } from '~/helpers'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { address, type } = params
@@ -297,20 +310,68 @@ const UserAddressLayout = () => {
 
 export default UserAddressLayout
 
-export function CatchBoundary() {
-  //TODO: try getting params injected, as well as useParams below
-  //   console.debug('ERROR', error)
-  //   const caught = useCatch()
-  //   console.debug('CAUGHT', caught)
-  //   const { address, type } = useParams()
+export const CatchBoundary = () => {
+  const caught = useCatch()
+  console.error('Caught in catch boundary', { caught })
+
+  const { address, type } = useParams()
+  const icon = imageFromAddressType(type as string)
+
+  let providerCopy
+  switch (type) {
+    case CryptoAddressType.ETH:
+      providerCopy = 'with Wallet'
+      break
+    case OAuthAddressType.Apple:
+      providerCopy = 'with Apple'
+      break
+    case OAuthAddressType.GitHub:
+      providerCopy = 'with GitHub'
+      break
+    case OAuthAddressType.Google:
+      providerCopy = 'with Google'
+      break
+    case OAuthAddressType.Microsoft:
+      providerCopy = 'with Microsoft'
+      break
+    case OAuthAddressType.Twitter:
+      providerCopy = 'with Twitter'
+      break
+  }
 
   return (
-    <div>
-      <h3>404 page - Replace me with real, provider-specific components</h3>
-      <div>
-        This account is waiting to be unlocked. Do you own this account?
+    <>
+      <div className="max-w-4xl mx-auto h-48 relative rounded-b-xl bg-gray-100 flex justify-center items-center">
+        <HiOutlineLockClosed className="text-gray-200 w-32 h-32" />
+
+        <div className="absolute max-w-4xl w-full mx-auto flex justify-center items-center top-3/4">
+          <div className="rounded-full bg-white overflow-hidden flex justify-center items-center w-24 h-24">
+            {!icon && <HiOutlineQuestionMarkCircle className="w-16 h-16" />}
+            {icon && <img src={icon} className="w-16 h-16" />}
+          </div>
+        </div>
       </div>
-      <div>{/* {type} / {address} */}</div>
-    </div>
+
+      <Text
+        className="mt-16 text-center"
+        size="3xl"
+        weight="bold"
+      >{`${address?.substring(0, 4)}...${address?.substring(
+        address.length - 4
+      )}`}</Text>
+
+      <div className="mt-8 max-w-4xl mx-auto rounded-xl bg-gray-100 flex justify-between items-center py-5 px-8">
+        <div>
+          <Text size="xl" weight="semibold" className="text-gray-800 mb-1.5">
+            This Account is yet to be unlocked
+          </Text>
+          <Text size="sm" weight="medium" className="text-gray-600">
+            Do you own this account?
+          </Text>
+        </div>
+
+        <Button btnSize="xl">Login {providerCopy}</Button>
+      </div>
+    </>
   )
 }
