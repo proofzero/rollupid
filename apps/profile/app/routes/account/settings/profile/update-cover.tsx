@@ -1,4 +1,4 @@
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import { ActionFunction, json } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/clients'
 import { requireJWT } from '~/utils/session.server'
@@ -16,9 +16,7 @@ export const action: ActionFunction = async ({ request }) => {
         cover: coverUrl,
       },
     },
-    {
-      [PlatformJWTAssertionHeader]: jwt,
-    }
+    getAuthzHeaderConditionallyFromToken(jwt)
   )
 
   return json(coverUrl)

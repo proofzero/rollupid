@@ -24,9 +24,11 @@ import { ogImageFromProfile } from '~/helpers/ogImage'
 
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { gatewayFromIpfs } from '@kubelt/utils'
+import {
+  gatewayFromIpfs,
+  getAuthzHeaderConditionallyFromToken,
+} from '@kubelt/utils'
 import { AddressURNSpace } from '@kubelt/urns/address'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import type { Profile } from '@kubelt/galaxy-client'
 
 import { Cover } from '~/components/profile/cover/Cover'
@@ -57,18 +59,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   // if not handle is this let's assume this is an idref
   let profile = undefined
   try {
-    console.debug('BEFORE CONST')
     const user = session.get('user')
     let jwt = user?.accessToken
     profile = await galaxyClient.getProfileFromAddress(
       {
         addressURN: `${urn}`,
       },
-      jwt
-        ? {
-            [PlatformJWTAssertionHeader]: jwt,
-          }
-        : {}
+      getAuthzHeaderConditionallyFromToken(jwt)
     )
 
     profile = {

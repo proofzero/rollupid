@@ -21,7 +21,6 @@ import type { Profile } from '@kubelt/galaxy-client'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { SortableList } from '@kubelt/design-system/src/atoms/lists/SortableList'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
 import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
@@ -33,6 +32,7 @@ import { AddressURN } from '@kubelt/urns/address'
 import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import { imageFromAddressType } from '~/helpers'
+import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 export type ProfileData = {
   targetAddress: string
@@ -243,9 +243,7 @@ export const action: ActionFunction = async ({ request }) => {
       // links to be first; we add them first.
       links: connectedAccountLinks.concat(updatedLinks),
     },
-    {
-      [PlatformJWTAssertionHeader]: jwt,
-    }
+    getAuthzHeaderConditionallyFromToken(jwt)
   )
 
   return { updatedLinks }

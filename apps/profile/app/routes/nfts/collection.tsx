@@ -1,9 +1,9 @@
+import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
 import { getGalaxyClient } from '~/helpers/clients'
 import { decorateNft, decorateNfts } from '~/helpers/nfts'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { getProfileSession } from '~/utils/session.server'
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -30,9 +30,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       owner,
       contractAddresses: [collection],
     },
-    {
-      [PlatformJWTAssertionHeader]: jwt,
-    }
+    getAuthzHeaderConditionallyFromToken(jwt)
   )
 
   const ownedNfts = resColl?.ownedNfts.map((nft: any) => {

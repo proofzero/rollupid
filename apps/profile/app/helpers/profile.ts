@@ -1,14 +1,15 @@
 import type { Profile, Link, Gallery, Node } from '@kubelt/galaxy-client'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { AddressURN } from '@kubelt/urns/address'
+import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import { getGalaxyClient } from '~/helpers/clients'
 
 export const getAccountProfile = async (jwt: string) => {
   const galaxyClient = await getGalaxyClient()
 
-  const profileRes = await galaxyClient.getProfile(undefined, {
-    [PlatformJWTAssertionHeader]: jwt,
-  })
+  const profileRes = await galaxyClient.getProfile(
+    undefined,
+    getAuthzHeaderConditionallyFromToken(jwt)
+  )
 
   const { profile, links, gallery, connectedAddresses } = profileRes
   return { profile, links, gallery, connectedAddresses } as {
@@ -21,9 +22,11 @@ export const getAccountProfile = async (jwt: string) => {
 
 export const getAccountAddresses = async (jwt: string) => {
   const galaxyClient = await getGalaxyClient()
-  const addressesRes = await galaxyClient.getConnectedAddresses(undefined, {
-    [PlatformJWTAssertionHeader]: jwt,
-  })
+  const addressesRes = await galaxyClient.getConnectedAddresses(
+    undefined,
+    getAuthzHeaderConditionallyFromToken(jwt)
+  )
+
   const addresses = addressesRes.connectedAddresses
   return addresses
 }
@@ -53,9 +56,7 @@ export const getAddressProfiles = async (
     {
       addressURNList,
     },
-    {
-      [PlatformJWTAssertionHeader]: jwt,
-    }
+    getAuthzHeaderConditionallyFromToken(jwt)
   )
 
   const { addressProfiles } = addressProfileRes

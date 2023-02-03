@@ -64,8 +64,6 @@ export async function requireJWT(request: Request, headers = new Headers()) {
 
     const parsedToken = parseJwt(accessToken)
 
-    console.debug({ exp: parsedToken.exp, now: Date.now() })
-
     // if expired throw an error (we can extends Error to create this)
     if (!parsedToken.exp || parsedToken.exp <= Date.now()) {
       throw new AuthorizationError('Expired')

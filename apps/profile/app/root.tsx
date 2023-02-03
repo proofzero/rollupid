@@ -34,7 +34,6 @@ import logo from './assets/three-id-logo.svg'
 
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
-import type { GetProfileQuery } from '@kubelt/galaxy-client'
 
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
@@ -43,8 +42,6 @@ import { getProfileSession } from './utils/session.server'
 import { getRedirectUrlForProfile } from './utils/redirects.server'
 import { parseJwt } from './utils/session.server'
 import { getAccountProfile } from './helpers/profile'
-import type { AddressURN } from '@kubelt/urns/address'
-import { AddressURNSpace } from '@kubelt/urns/address'
 import { AccountURNSpace } from '@kubelt/urns/account'
 
 export const meta: MetaFunction = () => ({
