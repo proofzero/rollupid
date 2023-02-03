@@ -80,7 +80,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const user = session.get('user')
 
   let basePath = undefined
-  let loggedInUserProfile
+  let loggedInUserProfile: FullProfile | undefined
   let accountURN
 
   if (user) {
@@ -125,7 +125,7 @@ export default function App() {
       INTERNAL_GOOGLE_ANALYTICS_TAG: string
       CONSOLE_APP_URL: string
     }
-    loggedInUserProfile: any
+    loggedInUserProfile: FullProfile | undefined
     basePath: string | undefined
     accountURN: string
   }>()

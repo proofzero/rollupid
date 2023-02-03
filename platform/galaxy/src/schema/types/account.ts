@@ -21,7 +21,6 @@ export default /* GraphQL */ `
 
   type Profile {
     displayName: String
-    defaultAddress: URN
     pfp: PFP
     cover: String
     bio: String
@@ -51,7 +50,6 @@ export default /* GraphQL */ `
     job: String
     location: String
     website: String
-    defaultAddress: URN
   }
 
   type Query {

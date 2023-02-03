@@ -73,6 +73,8 @@ export type AddressProfile =
   | OAuthMicrosoftProfile
   | OAuthAppleProfile
 
+export type AddressProfiles = AddressProfile[]
+
 export type OAuthData = z.infer<typeof OAuthDataSchema>
 
 export type NFTarVoucher = z.infer<typeof NFTarVoucherSchema>

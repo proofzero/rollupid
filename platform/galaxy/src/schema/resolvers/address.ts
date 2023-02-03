@@ -3,12 +3,13 @@ import ENSUtils from '@kubelt/platform-clients/ens-utils'
 import createAddressClient from '@kubelt/platform-clients/address'
 import { AddressURN } from '@kubelt/urns/address'
 
-import { Resolvers } from './typedefs'
+import { AddressProfilesUnion, Resolvers } from './typedefs'
 import { hasApiKey, setupContext, logAnalytics, isAuthorized } from './utils'
 
 import { ResolverContext } from './common'
 
 import {
+  AddressProfile,
   AddressProfiles,
   CryptoAddressProfile,
   OAuthAppleProfile,
@@ -47,6 +48,7 @@ const addressResolvers: Resolvers = {
       { addressURNList }: { addressURNList: AddressURN[] },
       { env, jwt }: ResolverContext
     ) => {
+      console.log({ addressURNList })
       const profiles = await Promise.all(
         addressURNList.map(async (urn) => {
           const addressClient = createAddressClient(env.Address, {
@@ -58,7 +60,6 @@ const addressResolvers: Resolvers = {
           return addressClient.getAddressProfile.query()
         })
       )
-
       return profiles
     },
   },
@@ -81,8 +82,8 @@ const addressResolvers: Resolvers = {
       return true
     },
   },
-  AddressProfiles: {
-    __resolveType: (obj: AddressProfiles) => {
+  AddressProfilesUnion: {
+    __resolveType: (obj: AddressProfilesUnion) => {
       if ((obj as CryptoAddressProfile).isCrypto) {
         return 'CryptoAddressProfile'
       }

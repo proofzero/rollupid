@@ -1,3 +1,5 @@
+import type { Gallery, Link, Profile, Node } from '@kubelt/galaxy-client'
+
 export const seviceBindings = true
 
 declare global {
@@ -25,5 +27,11 @@ declare global {
       scopes?: [string]
       redirect_uri?: string
     }
+  }
+
+  type FullProfile = Profile & {
+    links: Link[]
+    gallery: Gallery[]
+    addresses: Node[]
   }
 }

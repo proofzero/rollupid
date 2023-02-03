@@ -12,7 +12,6 @@ export const ProfileSchema = z.object({
     })
     .optional(),
   cover: z.string().optional(),
-  defaultAddress: inputValidators.AddressURNInput.optional(),
   bio: z.string().max(256).optional(),
   job: z.string().max(30).optional(),
   location: z.string().max(30).optional(),
