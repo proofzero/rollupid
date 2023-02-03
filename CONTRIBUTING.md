@@ -4,7 +4,7 @@
 
 When you create a draft or PR intended to land to `main` an action will render the documentation in `/docs`. This allows you and reviewers to check that your changes are properly captured in the documentation portal.
 
-Documentation landed to `main` will publish to `https://docs.threeid.xyz`.
+Documentation landed to `main` will publish to `https://docs.rollup.id`.
 
 ## Environment variables and secrets naming conventions
 

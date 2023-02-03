@@ -34,22 +34,20 @@ export type { Scope }
  *
  * @alpha
  */
-export const SCOPE_ADMIM: Scope = scope('scope://threeid.xyz/admin.admin')
+export const SCOPE_ADMIM: Scope = scope('scope://rollup.id/admin.admin')
 
 // GENERAL
 
 /**
  * The scope required to read account object.
  */
-export const SCOPE_ACCOUNT_READ: Scope = scope(
-  'scope://threeid.xyz/account#read'
-)
+export const SCOPE_ACCOUNT_READ: Scope = scope('scope://rollup.id/account#read')
 
 /**
  * The scope required to write to account object.
  */
 export const SCOPE_ACCOUNT_WRITE: Scope = scope(
-  'scope://threeid.xyz/account#read'
+  'scope://rollup.id/account#read'
 )
 
 /**
@@ -57,9 +55,7 @@ export const SCOPE_ACCOUNT_WRITE: Scope = scope(
  *
  * @alpha
  */
-export const SCOPE_PROFILE_READ: Scope = scope(
-  'scope://threeid.xyz/profile#read'
-)
+export const SCOPE_PROFILE_READ: Scope = scope('scope://rollup.id/profile#read')
 
 /**
  * The scope representing the ability to write profile data.
@@ -67,7 +63,7 @@ export const SCOPE_PROFILE_READ: Scope = scope(
  * @alpha
  */
 export const SCOPE_PROFILE_WRITE: Scope = scope(
-  'scope://threeid.xyz/profile#write'
+  'scope://rollup.id/profile#write'
 )
 
 /**
@@ -76,7 +72,7 @@ export const SCOPE_PROFILE_WRITE: Scope = scope(
  * @alpha
  */
 export const SCOPE_CONNECTED_ACCOUNTS_READ: Scope = scope(
-  'scope://threeid.xyx/connected-accounts#read'
+  'scope://rollup.id/connected-accounts#read'
 )
 
 // SPECIALIZED SCOPES
@@ -87,7 +83,7 @@ export const SCOPE_CONNECTED_ACCOUNTS_READ: Scope = scope(
  * @alpha
  */
 export const SCOPE_BLOCKCHAIN_ACCOUNT_MANAGE: Scope = scope(
-  'scope://threeid.xyz/blockchain-account/{{ idref }}#manage'
+  'scope://rollup.id/blockchain-account/{{ idref }}#manage'
 )
 
 /**
@@ -96,7 +92,7 @@ export const SCOPE_BLOCKCHAIN_ACCOUNT_MANAGE: Scope = scope(
  * @alpha
  */
 export const SCOPE_BLOCKCHAIN_ACCOUNT_TRANSACT: Scope = scope(
-  'scope://threeid.xyz/blockchain-account/transact/{{ idref }}#write'
+  'scope://rollup.id/blockchain-account/transact/{{ idref }}#write'
 )
 
 /**

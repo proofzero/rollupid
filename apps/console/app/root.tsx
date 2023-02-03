@@ -31,6 +31,7 @@ import { useEffect } from 'react'
 
 import globalStyles from '@kubelt/design-system/src/styles/global.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
+import favIcon from './images/favicon.svg'
 
 import * as gtag from '~/utils/gtags.client'
 
@@ -38,8 +39,7 @@ export const links: LinksFunction = () => {
   return [
     { rel: 'stylesheet', href: tailwindStylesheetUrl },
     { rel: 'stylesheet', href: globalStyles },
-
-    { rel: 'icon', href: '/favicon.ico' },
+    { rel: 'icon', href: favIcon },
   ]
 }
 

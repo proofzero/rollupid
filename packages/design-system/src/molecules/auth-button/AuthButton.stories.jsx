@@ -1,10 +1,10 @@
 import React from 'react'
 
 import { AuthButton } from './AuthButton'
-import tidlogo from './3id.svg'
+import tidlogo from './rollup-logo-white.svg'
 
 export default {
-  title: 'Components/AuthButton',
+  title: 'Molecules/AuthButton',
   component: AuthButton,
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
 }

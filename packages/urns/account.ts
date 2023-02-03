@@ -1,6 +1,6 @@
-import { createThreeIdURNSpace, ThreeIdURN } from './index'
+import { createRollupIdURNSpace, RollupIdURN } from './index'
 
-export type AccountURN = ThreeIdURN<`account/${string}`>
-export const AccountURNSpace = createThreeIdURNSpace<'account', never, never>(
+export type AccountURN = RollupIdURN<`account/${string}`>
+export const AccountURNSpace = createRollupIdURNSpace<'account', never, never>(
   'account'
 )

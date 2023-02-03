@@ -13,7 +13,7 @@ export const AccessURNInput = z.custom<AccessURN>((input) => {
     throw new Error(`AccessURNInput is not a string: ${input}`)
   }
   const parsed = AccessURNSpace.parse(input as AccessURN)
-  if (!AccessURNSpace.is(`urn:threeid:${parsed.nss}`)) {
+  if (!AccessURNSpace.is(`urn:rollupid:${parsed.nss}`)) {
     throw new Error(`invalid AccessURN entry: ${input}`)
   }
   return input as AccessURN
@@ -24,7 +24,7 @@ export const AddressURNInput = z.custom<AddressURN>((input) => {
     throw new Error(`AddressURNInput is not a string: ${input}`)
   }
   const parsed = AddressURNSpace.parse(input as AddressURN)
-  if (!AddressURNSpace.is(`urn:threeid:${parsed.nss}`)) {
+  if (!AddressURNSpace.is(`urn:rollupid:${parsed.nss}`)) {
     throw new Error(`invalid AddressURN entry: ${input}`)
   }
   return input as AddressURN

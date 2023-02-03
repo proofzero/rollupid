@@ -1,6 +1,6 @@
 # Table of contents
 
-* [Introduction to Rollup](3id/overview/index.md)
+* [Introduction to Rollup](rollupid/overview/index.md)
 
 ## Getting Started
 

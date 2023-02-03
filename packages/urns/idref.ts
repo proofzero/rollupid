@@ -1,11 +1,12 @@
 import { keccak256 } from '@ethersproject/keccak256'
-import { createThreeIdURNSpace, ThreeIdURN } from '.'
+import { createRollupIdURNSpace, RollupIdURN } from '.'
 import { AddressType } from '../types/address'
 
-export type IDRefURN = ThreeIdURN<`idref/${string}`>
+export type IDRefURN = RollupIdURN<`idref/${string}`>
 export const IDRefURNSpace = <IDRefType extends AddressType>(
   idsrc: IDRefType
-) => createThreeIdURNSpace<`idref:${IDRefType}`, never, never>(`idref:${idsrc}`)
+) =>
+  createRollupIdURNSpace<`idref:${IDRefType}`, never, never>(`idref:${idsrc}`)
 
 type HashedIDRef = string
 
