@@ -25,22 +25,6 @@ export type AddressProfile = {
 
 export type AddressProfiles = CryptoAddressProfile | OAuthAppleProfile | OAuthGithubProfile | OAuthGoogleProfile | OAuthMicrosoftProfile | OAuthTwitterProfile;
 
-export type AuthenticationTokenInput = {
-  clientId: Scalars['String'];
-  code: Scalars['String'];
-  grantType: GrantType;
-  redirectUri: Scalars['String'];
-};
-
-export type AuthorizationTokenInput = {
-  clientId: Scalars['String'];
-  clientSecret: Scalars['String'];
-  code: Scalars['String'];
-  grantType: GrantType;
-  redirectUri: Scalars['String'];
-  scopes?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
-};
-
 export type Chain = {
   __typename?: 'Chain';
   chain?: Maybe<Scalars['String']>;
@@ -79,12 +63,6 @@ export type Edge = {
   tag: Scalars['String'];
 };
 
-export type ExchangeTokenResult = {
-  __typename?: 'ExchangeTokenResult';
-  accessToken: Scalars['String'];
-  refreshToken: Scalars['String'];
-};
-
 export type Gallery = {
   __typename?: 'Gallery';
   contract: Scalars['String'];
@@ -95,12 +73,6 @@ export type GalleryInput = {
   contract: Scalars['String'];
   tokenId: Scalars['String'];
 };
-
-export enum GrantType {
-  AuthenticationCode = 'authentication_code',
-  AuthorizationCode = 'authorization_code',
-  RefreshToken = 'refresh_token'
-}
 
 export type Id = {
   __typename?: 'Id';
@@ -124,22 +96,10 @@ export type LinkInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  exchangeAuthorizationToken?: Maybe<ExchangeTokenResult>;
-  exchangeRefreshToken?: Maybe<ExchangeTokenResult>;
   updateAddressNickname?: Maybe<Scalars['Boolean']>;
   updateGallery?: Maybe<Scalars['Boolean']>;
   updateLinks?: Maybe<Scalars['Boolean']>;
   updateProfile?: Maybe<Scalars['Boolean']>;
-};
-
-
-export type MutationExchangeAuthorizationTokenArgs = {
-  exchange: AuthorizationTokenInput;
-};
-
-
-export type MutationExchangeRefreshTokenArgs = {
-  exchange: RefreshTokenInput;
 };
 
 
@@ -479,19 +439,9 @@ export type QueryProfileFromAddressArgs = {
   addressURN: Scalars['URN'];
 };
 
-export type RefreshTokenInput = {
-  grantType: GrantType;
-  token: Token;
-};
-
 export type StandardPfp = Pfp & {
   __typename?: 'StandardPFP';
   image?: Maybe<Scalars['String']>;
-};
-
-export type Token = {
-  iss: Scalars['String'];
-  token: Scalars['String'];
 };
 
 export enum TokenType {
@@ -510,20 +460,6 @@ export type TokenUriInput = {
   gateway?: InputMaybe<Scalars['String']>;
   raw?: InputMaybe<Scalars['String']>;
 };
-
-export type ExchangeTokenMutationVariables = Exact<{
-  exchange: AuthorizationTokenInput;
-}>;
-
-
-export type ExchangeTokenMutation = { __typename?: 'Mutation', exchangeAuthorizationToken?: { __typename?: 'ExchangeTokenResult', accessToken: string, refreshToken: string } | null };
-
-export type RefreshTokenMutationVariables = Exact<{
-  exchange: RefreshTokenInput;
-}>;
-
-
-export type RefreshTokenMutation = { __typename?: 'Mutation', exchangeRefreshToken?: { __typename?: 'ExchangeTokenResult', accessToken: string, refreshToken: string } | null };
 
 export type GetProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -617,22 +553,6 @@ export type GetNftMetadataQueryVariables = Exact<{
 export type GetNftMetadataQuery = { __typename?: 'Query', getNFTMetadataBatch?: { __typename?: 'NFTs', ownedNfts: Array<{ __typename?: 'NFT', title?: string | null, description?: string | null, error?: string | null, contract?: { __typename?: 'Contract', address?: string | null } | null, id?: { __typename?: 'Id', tokenId?: string | null } | null, media: Array<{ __typename?: 'NFTMedia', raw?: string | null, thumbnail?: string | null }>, metadata?: { __typename?: 'NFTMetadata', properties?: Array<{ __typename?: 'NFTProperty', name?: string | null, value?: string | null, display?: string | null } | null> | null } | null, contractMetadata?: { __typename?: 'ContractMetadata', name?: string | null, tokenType?: TokenType | null } | null }> } | null };
 
 
-export const ExchangeTokenDocument = gql`
-    mutation exchangeToken($exchange: AuthorizationTokenInput!) {
-  exchangeAuthorizationToken(exchange: $exchange) {
-    accessToken
-    refreshToken
-  }
-}
-    `;
-export const RefreshTokenDocument = gql`
-    mutation refreshToken($exchange: RefreshTokenInput!) {
-  exchangeRefreshToken(exchange: $exchange) {
-    accessToken
-    refreshToken
-  }
-}
-    `;
 export const GetProfileDocument = gql`
     query getProfile {
   profile {
@@ -954,12 +874,6 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    exchangeToken(variables: ExchangeTokenMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExchangeTokenMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<ExchangeTokenMutation>(ExchangeTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'exchangeToken', 'mutation');
-    },
-    refreshToken(variables: RefreshTokenMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RefreshTokenMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<RefreshTokenMutation>(RefreshTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'refreshToken', 'mutation');
-    },
     getProfile(variables?: GetProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProfileQuery>(GetProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfile', 'query');
     },
