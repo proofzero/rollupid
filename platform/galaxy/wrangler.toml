@@ -34,7 +34,7 @@ ALCHEMY_ETH_NETWORK="goerli"
 ALCHEMY_POLYGON_NETWORK="mumbai"
 
 [env.dev]
-route = { pattern = "galaxy-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
+route = { pattern = "galaxy-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 services = [
   { binding = "Account", service = "account-dev" },
   { binding = "Access", service = "access-dev" },
@@ -55,7 +55,7 @@ ALCHEMY_ETH_NETWORK="goerli"
 ALCHEMY_POLYGON_NETWORK="mumbai"
 
 [env.next]
-route = { pattern = "galaxy-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
+route = { pattern = "galaxy-next.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 services = [
   { binding = "Account", service = "account-next" },
   { binding = "Address", service = "address-next" },
@@ -76,7 +76,7 @@ ALCHEMY_ETH_NETWORK="goerli"
 ALCHEMY_POLYGON_NETWORK="mumbai"
 
 [env.current]
-route = { pattern = "galaxy.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
+route = { pattern = "galaxy.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 services = [
   { binding = "Account", service = "account-current" },
   { binding = "Address", service = "address-current" },

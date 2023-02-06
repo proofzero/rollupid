@@ -11,7 +11,7 @@ declare global {
 
     SECRET_SESSION_SALT: string
     COOKIE_DOMAIN: string
-    THREEID_APP_URL: string
+    PROFILE_APP_URL: string
     CONSOLE_APP_URL: string
     PASSPORT_REDIRECT_URL: string
     APIKEY_ALCHEMY_PUBLIC: string
