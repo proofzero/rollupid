@@ -67,7 +67,7 @@ export default function HeadNav({
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <img
-                    className="mx-4 my-5 max-w-[180px]"
+                    className="max-w-[180px]"
                     src={logo}
                     alt="Rollup"
                   />
