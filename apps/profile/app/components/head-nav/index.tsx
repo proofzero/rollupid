@@ -8,7 +8,7 @@ import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import classNames from 'classnames'
 
-import logo from '~/assets/rollup-logo-white.svg'
+import logo from '~/assets/profile_logo.svg'
 import defaultAvatar from '~/assets/circle_gradient.png'
 import { SignOutLink, ConsoleLink } from '~/components/hean-nav-links'
 
