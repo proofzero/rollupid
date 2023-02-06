@@ -72,6 +72,8 @@ export const action: ActionFunction = async ({ request }) => {
   }
   const nfts = JSON.parse(updatedGallery)
 
+  console.dir({ nfts, details: nfts.map((nft) => nft.details) })
+
   // TODO: replace with zod?
   nfts.forEach((nft: any) => {
     if (!nft.tokenId) {
@@ -81,6 +83,9 @@ export const action: ActionFunction = async ({ request }) => {
       errors[`contractAddress-${nft.tokenID}`] = [
         'Nft should have contract address',
       ]
+    }
+    if (!nft.network) {
+      errors[`network-${nft.tokenID}`] = ['Nft should have network']
     }
     if (!urn || urn.length === 0) {
       errors[`${nft.contract.address}-${nft.tokenID}`] = [
@@ -102,6 +107,7 @@ export const action: ActionFunction = async ({ request }) => {
   const gallery = nfts.map((nft: any, i: number) => ({
     contract: nft.contract.address,
     tokenId: nft.tokenId,
+    // network: nft.network,
   }))
 
   const galaxyClient = await getGalaxyClient()

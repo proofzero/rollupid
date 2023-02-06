@@ -360,27 +360,40 @@ const accountResolvers: Resolvers = {
       // GALLERY VALIDATION
       const { ethereumClient, polygonClient } = getAlchemyClients({ env })
 
-      const owners: any = await Promise.all(
-        gallery.map(async (token) => {
-          const [ethereumOwners, polygonOwners]: any = await Promise.all([
-            ethereumClient.getOwnersForToken({
-              tokenId: token.tokenId,
-              contractAddress: token.contract,
-            }),
-            polygonClient.getOwnersForToken({
-              tokenId: token.tokenId,
-              contractAddress: token.contract,
-            }),
+      const contractAddresses = gallery.map((nft) => nft.contract)
+
+      const nfts = await Promise.all(
+        connectedAddresses.map((address) =>
+          Promise.all([
+            ethereumClient.getNFTs({ owner: address, contractAddresses }),
+            ethereumClient.getNFTs({ owner: address, contractAddresses }),
           ])
-          return ethereumOwners.owners.concat(polygonOwners.owners)
-        })
+        )
       )
 
-      gallery = gallery.filter((nft, i) => {
-        return connectedAddresses.some((address) => {
-          return owners[i].includes(address)
-        })
-      })
+      console.dir({ nfts: nfts.flat() })
+
+      // const owners: any = await Promise.all(
+      //   gallery.map(async (token) => {
+      //     const [ethereumOwners, polygonOwners]: any = await Promise.all([
+      //       ethereumClient.getOwnersForToken({
+      //         tokenId: token.tokenId,
+      //         contractAddress: token.contract,
+      //       }),
+      //       polygonClient.getOwnersForToken({
+      //         tokenId: token.tokenId,
+      //         contractAddress: token.contract,
+      //       }),
+      //     ])
+      //     return ethereumOwners.owners.concat(polygonOwners.owners)
+      //   })
+      // )
+
+      // gallery = gallery.filter((nft, i) => {
+      //   return connectedAddresses.some((address) => {
+      //     return owners[i].includes(address)
+      //   })
+      // })
 
       await accountClient.setGallery.mutate({
         name: accountURN,

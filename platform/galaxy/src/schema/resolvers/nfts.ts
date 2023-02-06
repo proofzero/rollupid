@@ -25,6 +25,8 @@ import {
   fetchContracts,
 } from './utils'
 
+import type { Nft, NftContract, NftContracts } from './typedefs'
+
 type ResolverContext = {
   env: Env
   jwt?: string
@@ -54,7 +56,7 @@ const nftsResolvers: Resolvers = {
         'BEFORE',
         owner
       )
-      let ownedNfts: any[] = []
+      let ownedNfts: Nft[] = []
 
       const accountURN = owner as AccountURN
 
@@ -78,7 +80,7 @@ const nftsResolvers: Resolvers = {
           getAllNfts(polygonClient, addresses, contractAddresses),
         ])
 
-        ownedNfts = ownedNfts.concat(ethNfts, polyNfts)
+        ownedNfts = ownedNfts.concat(polyNfts, ethNfts)
       } catch (ex) {
         console.error(new GraphQLYogaError(ex as string))
       }
@@ -110,7 +112,7 @@ const nftsResolvers: Resolvers = {
       console.log(
         `galaxy.contractsForAddress: getting contracts for account: ${owner}`
       )
-      let contracts: any[] = []
+      let contracts: NftContract[] = []
 
       const accountURN = owner as AccountURN
       const addresses = (
@@ -131,16 +133,19 @@ const nftsResolvers: Resolvers = {
         const {
           ethereumContracts,
           polygonContracts,
-        }: { ethereumContracts: any; polygonContracts: any } =
-          await fetchContracts({
-            addresses,
-            ethereumClient,
-            polygonClient,
-            excludeFilters,
-          })
+        }: {
+          ethereumContracts: NftContracts
+          polygonContracts: NftContracts
+        } = await fetchContracts({
+          addresses,
+          ethereumClient,
+          polygonClient,
+          excludeFilters,
+        })
 
         // This way in each nested collection we have its own Promise.all
         // And one common Promise.all on top of them.
+
         const [ethNFTs, polygonNFTs] = await Promise.all([
           Promise.all(
             await nftBatchesFetcher({
@@ -196,12 +201,12 @@ const nftsResolvers: Resolvers = {
       },
       { env }: ResolverContext
     ) => {
-      let ownedNfts: any[] = []
+      let ownedNfts: Nft[] = []
 
       try {
         const { ethereumClient, polygonClient } = getAlchemyClients({ env })
 
-        const [ethNfts, polyNfts] = await Promise.all([
+        const [ethNfts, polyNfts]: [Nft[], Nft[]] = await Promise.all([
           ethereumClient.getNFTMetadataBatch(input),
           polygonClient.getNFTMetadataBatch(input),
         ])

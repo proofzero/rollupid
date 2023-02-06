@@ -57,6 +57,8 @@ export const getOgImageMethod = async ({
 
   const bg = bgUrl !== '' ? await encodeDataURI(bgUrl as string) : undefined
   const fg = await encodeDataURI(fgUrl)
+  console.log({ bg })
+  console.log({ fg })
 
   // console.log({ fgUrl, fg })
 
@@ -126,6 +128,7 @@ export const getOgImageMethod = async ({
     )
     .catch((e) => {
       console.error("Couldn't upload og image to CF")
+      console.error(e)
     })
 
   //prob already exsists

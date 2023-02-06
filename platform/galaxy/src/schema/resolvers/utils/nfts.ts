@@ -15,32 +15,36 @@ type ResolverContext = {
   coreId?: string
 }
 
+import type { Nft, NftContract } from '../typedefs'
+
 export const getAllNfts = async (
   alchemyClient: AlchemyClient,
   addresses: string[],
   contractAddresses: string[],
   maxRuns: number = 3
 ) => {
-  let nfts: any[] = []
+  let nfts: Nft[] = []
 
-  for (const address of addresses) {
-    let runs = 0
-    let pageKey
-    do {
-      const res = (await alchemyClient.getNFTs({
-        owner: address,
-        contractAddresses,
-        pageKey,
-      })) as {
-        ownedNfts: any[]
-        pageKey: string | undefined
-      }
+  await Promise.all(
+    addresses.map(async (address) => {
+      let runs = 0
+      let pageKey
+      do {
+        const res = (await alchemyClient.getNFTs({
+          owner: address,
+          contractAddresses,
+          pageKey,
+        })) as {
+          ownedNfts: Nft[]
+          pageKey: string | undefined
+        }
 
-      nfts = nfts.concat(NFTPropertyMapper(res.ownedNfts))
+        nfts = nfts.concat(NFTPropertyMapper(res.ownedNfts))
 
-      pageKey = res.pageKey
-    } while (pageKey && ++runs <= maxRuns)
-  }
+        pageKey = res.pageKey
+      } while (pageKey && ++runs <= maxRuns)
+    })
+  )
 
   return nfts
 }
@@ -65,7 +69,7 @@ export const nftBatchesFetcher = async ({
   addresses,
   alchemyClient,
 }: {
-  contracts: any[]
+  contracts: NftContract[]
   addresses: string[]
   alchemyClient: AlchemyClient
 }) => {
@@ -73,18 +77,18 @@ export const nftBatchesFetcher = async ({
   // We need batches with 45 contracts in each
 
   const batches = sliceIntoChunks(
-    contracts.map((contract: any) => contract.address),
+    contracts.map((contract: NftContract) => contract.address),
     45
   )
   // Promise.all only to avoid promise chains
   // TODO: chang to async npm package
-  return Promise.all(
+  const res = await Promise.all(
     batches.map(async (batch: any) => {
       const visitedMap: any = {}
       batch.forEach((contract: string) => {
         visitedMap[`${contract}`] = true
       })
-      const res: any = []
+      const res: Nft[] = []
       let localBatch = Object.keys(visitedMap)
 
       while (localBatch.length > 0) {
@@ -128,9 +132,12 @@ export const nftBatchesFetcher = async ({
       return res
     })
   )
+  console.log({ res })
+
+  return res[0].flat()
 }
 
-export function sliceIntoChunks(arr: any, chunkSize: number) {
+export function sliceIntoChunks(arr: any[], chunkSize: number) {
   const res = []
   for (let i = 0; i < arr.length; i += chunkSize) {
     const chunk = arr.slice(i, i + chunkSize)
@@ -145,15 +152,15 @@ export const beautifyContracts = ({
   contracts,
   network,
 }: {
-  nfts: any[]
+  nfts: Nft[]
   chain: string
-  contracts: any[]
+  contracts: NftContract[]
   network: string
 }) => {
-  let ownedNfts: any[] = []
+  let ownedNfts: Nft[] = []
 
-  nfts.forEach((batch: any) => {
-    ownedNfts.push(...batch)
+  nfts.forEach((nft: Nft) => {
+    ownedNfts.push(nft)
   })
 
   const collectionsHashMap: any = {}
@@ -161,22 +168,23 @@ export const beautifyContracts = ({
 
   // Creating hashmap with contract addresses as keys
   // And nft arrays as values
-  ownedNfts.forEach((NFT: any) => {
+
+  ownedNfts.forEach((NFT: Nft) => {
     NFT.chain = { chain, network }
     if (
-      collectionsHashMap[`${NFT.contract.address}`] &&
-      collectionsHashMap[`${NFT.contract.address}`].length
+      collectionsHashMap[`${NFT.contract?.address}`] &&
+      collectionsHashMap[`${NFT.contract?.address}`].length
     ) {
-      collectionsHashMap[`${NFT.contract.address}`].push(NFT)
+      collectionsHashMap[`${NFT.contract?.address}`].push(NFT)
     } else {
-      collectionsHashMap[`${NFT.contract.address}`] = [NFT]
+      collectionsHashMap[`${NFT.contract?.address}`] = [NFT]
     }
   })
 
   // Attach NFT array to a contract object
   // With hash map key it is easy to find a needed array to specific
   // collection
-  const beautifiedContracts = contracts.map((contract: any) => {
+  const beautifiedContracts = contracts.map((contract: NftContract) => {
     return {
       ...contract,
       ownedNfts: collectionsHashMap[`${contract.address}`],
@@ -198,26 +206,27 @@ export const fetchContracts = async ({
   polygonClient: AlchemyClient
   excludeFilters: string[]
 }) => {
-  const [ethContracts, polyContracts]: [any[], any[]] = await Promise.all([
-    Promise.all(
-      addresses.map(
-        async (address) =>
-          await ethereumClient.getContractsForOwner({
-            address,
-            excludeFilters,
-          })
-      )
-    ),
-    Promise.all(
-      addresses.map(
-        async (address) =>
-          await polygonClient.getContractsForOwner({
-            address,
-            excludeFilters,
-          })
-      )
-    ),
-  ])
+  const [ethContracts, polyContracts]: [NftContract[], NftContract[]] =
+    await Promise.all([
+      Promise.all(
+        addresses.map(
+          async (address) =>
+            await ethereumClient.getContractsForOwner({
+              address,
+              excludeFilters,
+            })
+        )
+      ),
+      Promise.all(
+        addresses.map(
+          async (address) =>
+            await polygonClient.getContractsForOwner({
+              address,
+              excludeFilters,
+            })
+        )
+      ),
+    ])
 
   const ethereumContracts = ethContracts.reduce(
     (acc, instance) => {
@@ -238,5 +247,8 @@ export const fetchContracts = async ({
     },
     { contracts: [], totalCount: 0 }
   )
+
+  console.log({ ethereumContracts, eth: ethereumContracts.contracts })
+
   return { ethereumContracts, polygonContracts }
 }
