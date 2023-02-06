@@ -1,3 +1,5 @@
+<img src="https://user-images.githubusercontent.com/695698/217101686-88cc3f69-599a-481c-a18e-b9bc220456ba.png" width="450"/>
+
 # Simple & Secure ‍Auth & Identity
 
 ![License](https://img.shields.io/github/license/rollupid/rollupid)
