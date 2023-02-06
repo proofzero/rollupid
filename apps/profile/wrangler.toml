@@ -31,10 +31,10 @@ PASSPORT_TOKEN_URL = "http://127.0.0.1:9696/token"
 CONSOLE_APP_URL = "http://localhost:9898"
 REDIRECT_URI = "http://localhost:9797/auth/callback"
 COOKIE_DOMAIN = "localhost"
-TWITTER_URL = "https://twitter.com/threeid_xyz"
-DISCORD_URL = "https://discord.gg/threeid"
+TWITTER_URL = "https://twitter.com/rollupid"
+DISCORD_URL = "https://discord.gg/rollupid"
 MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
-NFTAR_URL = "https://test.nftar.threeid.xyz/api"
+NFTAR_URL = "https://test.nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
@@ -52,8 +52,9 @@ local_protocol = "http"
 # ------------------------------------------------------------------------------
 [env.dev]
 routes = [
-  { pattern = "app-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
   { pattern = "my-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "my-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" },
+
 ]
 services = [
   { binding = "Galaxy", service = "galaxy-dev" },
@@ -63,17 +64,17 @@ services = [
 ]
 [env.dev.vars]
 
-CONSOLE_APP_URL = "https://console-dev.threeid.xyz"
-PASSPORT_URL = "https://passport-dev.threeid.xyz"
-PASSPORT_AUTH_URL = "https://passport-dev.threeid.xyz/authorize"
-PASSPORT_TOKEN_URL = "https://passport-dev.threeid.xyz/token"
+CONSOLE_APP_URL = "https://console-dev.rollup.id"
+PASSPORT_URL = "https://passport-dev.rollup.id"
+PASSPORT_AUTH_URL = "https://passport-dev.rollup.id/authorize"
+PASSPORT_TOKEN_URL = "https://passport-dev.rollup.id/token"
 CLIENT_ID = "<console client id>"
-REDIRECT_URI = "https://my-dev.threeid.xyz/auth/callback"
-COOKIE_DOMAIN = "threeid.xyz"
-TWITTER_URL = "https://twitter.com/threeid_xyz"
-DISCORD_URL = "https://discord.gg/threeid"
+REDIRECT_URI = "https://my-dev.rollup.id/auth/callback"
+COOKIE_DOMAIN = "rollup.id"
+TWITTER_URL = "https://twitter.com/rollupid"
+DISCORD_URL = "https://discord.gg/rollupid"
 MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
-NFTAR_URL = "https://test.nftar.threeid.xyz/api"
+NFTAR_URL = "https://test.nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
@@ -81,8 +82,8 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 # ------------------------------------------------------------------------------
 [env.next]
 routes = [
-  { pattern = "app-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
   { pattern = "my-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "my-next.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
 services = [
   { binding = "Galaxy", service = "galaxy-next" },
@@ -95,17 +96,17 @@ command = "yarn build"
 
 [env.next.vars]
 
-CONSOLE_APP_URL = "https://console-next.threeid.xyz"
-PASSPORT_URL = "https://passport-next.threeid.xyz"
-PASSPORT_AUTH_URL = "https://passport-next.threeid.xyz/authorize"
-PASSPORT_TOKEN_URL = "https://passport-next.threeid.xyz/token"
+CONSOLE_APP_URL = "https://console-next.rollup.id"
+PASSPORT_URL = "https://passport-next.rollup.id"
+PASSPORT_AUTH_URL = "https://passport-next.rollup.id/authorize"
+PASSPORT_TOKEN_URL = "https://passport-next.rollup.id/token"
 CLIENT_ID = "<console client id>"
-REDIRECT_URI = "https://my-next.threeid.xyz/auth/callback"
-COOKIE_DOMAIN = "threeid.xyz"
-TWITTER_URL = "https://twitter.com/threeid_xyz"
-DISCORD_URL = "https://discord.gg/threeid"
+REDIRECT_URI = "https://my-next.rollup.id/auth/callback"
+COOKIE_DOMAIN = "rollup.id"
+TWITTER_URL = "https://twitter.com/rollupid"
+DISCORD_URL = "https://discord.gg/rollupid"
 MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
-NFTAR_URL = "https://test.nftar.threeid.xyz/api"
+NFTAR_URL = "https://test.nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 
@@ -113,8 +114,9 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 # ------------------------------------------------------------------------------
 [env.current]
 routes = [
-  { pattern = "app.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
   { pattern = "my.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "my-next.rollup.id", custom_domain = true, zone_name = "rollup.id" },
+
 ]
 services = [
   { binding = "Galaxy", service = "galaxy-current" },
@@ -125,16 +127,16 @@ services = [
 command = "yarn build"
 
 [env.current.vars]
-PASSPORT_URL = "https://passport.threeid.xyz"
-CONSOLE_APP_URL = "https://console.threeid.xyz"
-PASSPORT_AUTH_URL = "https://passport.threeid.xyz/authorize"
-PASSPORT_TOKEN_URL = "https://passport.threeid.xyz/token"
+PASSPORT_URL = "https://passport.rollup.id"
+CONSOLE_APP_URL = "https://console.rollup.id"
+PASSPORT_AUTH_URL = "https://passport.rollup.id/authorize"
+PASSPORT_TOKEN_URL = "https://passport.rollup.id/token"
 CLIENT_ID = "<console client id>"
-REDIRECT_URI = "https://my.threeid.xyz/auth/callback"
-COOKIE_DOMAIN = "threeid.xyz"
-TWITTER_URL = "https://twitter.com/threeid_xyz"
-DISCORD_URL = "https://discord.gg/threeid"
+REDIRECT_URI = "https://my.rollup.id/auth/callback"
+COOKIE_DOMAIN = "rollup.id"
+TWITTER_URL = "https://twitter.com/rollupid"
+DISCORD_URL = "https://discord.gg/rollupid"
 MINTPFP_CONTRACT_ADDRESS = "0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
-NFTAR_URL = "https://nftar.threeid.xyz/api"
+NFTAR_URL = "https://nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 1
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"

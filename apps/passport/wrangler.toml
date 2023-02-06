@@ -28,7 +28,7 @@ port = 9696
 local_protocol = "http"
 
 [vars]
-THREEID_APP_URL = "http://localhost:9797"
+PROFILE_APP_URL = "http://localhost:9797"
 CONSOLE_APP_URL = "http://localhost:9898"
 PASSPORT_REDIRECT_URL = "http://localhost:9696/authenticate/token"
 COOKIE_DOMAIN = "localhost"
@@ -42,6 +42,7 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 [env.dev]
 routes = [
   { pattern = "passport-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "passport-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
 services = [
   { binding = "Account", service = "account-dev" },
@@ -53,19 +54,20 @@ services = [
 ]
 
 [env.dev.vars]
-THREEID_APP_URL = "https://my-dev.threeid.xyz"
-CONSOLE_APP_URL = "https://console-dev.threeid.xyz"
-PASSPORT_REDIRECT_URL = "https://passport-dev.threeid.xyz/authenticate/token"
-COOKIE_DOMAIN = "threeid.xyz"
-INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport-dev.threeid.xyz/authenticate/google/callback"
-INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport-dev.threeid.xyz/authenticate/github/callback"
-INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-dev.threeid.xyz/authenticate/twitter/callback"
-INTERNAL_APPLE_OAUTH_CALLBACK_URL = "https://passport-dev.threeid.xyz/authenticate/apple/callback"
+PROFILE_APP_URL = "https://my-dev.rollup.id"
+CONSOLE_APP_URL = "https://console-dev.rollup.id"
+PASSPORT_REDIRECT_URL = "https://passport-dev.rollup.id/authenticate/token"
+COOKIE_DOMAIN = "rollup.id"
+INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport-dev.rollup.id/authenticate/google/callback"
+INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport-dev.rollup.id/authenticate/github/callback"
+INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/authenticate/twitter/callback"
+INTERNAL_APPLE_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/authenticate/apple/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [env.next]
 routes = [
   { pattern = "passport-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "passport-next.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
 services = [
   { binding = "Account", service = "account-next" },
@@ -77,14 +79,14 @@ services = [
 ]
 
 [env.next.vars]
-THREEID_APP_URL = "https://my-next.threeid.xyz"
-CONSOLE_APP_URL = "https://console-next.threeid.xyz"
-PASSPORT_REDIRECT_URL = "https://passport-next.threeid.xyz/authenticate/token"
-COOKIE_DOMAIN = "threeid.xyz"
-INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport-next.threeid.xyz/authenticate/google/callback"
-INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport-next.threeid.xyz/authenticate/github/callback"
-INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-next.threeid.xyz/authenticate/twitter/callback"
-INTERNAL_APPLE_OAUTH_CALLBACK_URL = "https://passport-next.threeid.xyz/authenticate/apple/callback"
+PROFILE_APP_URL = "https://my-next.rollup.id"
+CONSOLE_APP_URL = "https://console-next.rollup.id"
+PASSPORT_REDIRECT_URL = "https://passport-next.rollup.id/authenticate/token"
+COOKIE_DOMAIN = "rollup.id"
+INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport-next.rollup.id/authenticate/google/callback"
+INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport-next.rollup.id/authenticate/github/callback"
+INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/authenticate/twitter/callback"
+INTERNAL_APPLE_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/authenticate/apple/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 
 [env.next.build]
@@ -93,6 +95,7 @@ command = "yarn build"
 [env.current]
 routes = [
   { pattern = "passport.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "passport.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
 services = [
   { binding = "Account", service = "account-current" },
@@ -104,14 +107,14 @@ services = [
 ]
 
 [env.current.vars]
-THREEID_APP_URL = "https://my.threeid.xyz"
-CONSOLE_APP_URL = "https://console.threeid.xyz"
-PASSPORT_REDIRECT_URL = "https://passport.threeid.xyz/authenticate/token"
-COOKIE_DOMAIN = "threeid.xyz"
-INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport.threeid.xyz/authenticate/google/callback"
-INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport.threeid.xyz/authenticate/github/callback"
-INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport.threeid.xyz/authenticate/twitter/callback"
-INTERNAL_APPLE_OAUTH_CALLBACK_URL = "https://passport.threeid.xyz/authenticate/apple/callback"
+PROFILE_APP_URL = "https://my.rollup.id"
+CONSOLE_APP_URL = "https://console.rollup.id"
+PASSPORT_REDIRECT_URL = "https://passport.rollup.id/authenticate/token"
+COOKIE_DOMAIN = "rollup.id"
+INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport.rollup.id/authenticate/google/callback"
+INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport.rollup.id/authenticate/github/callback"
+INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport.rollup.id/authenticate/twitter/callback"
+INTERNAL_APPLE_OAUTH_CALLBACK_URL = "https://passport.rollup.id/authenticate/apple/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 
 [env.current.build]

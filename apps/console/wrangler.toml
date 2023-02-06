@@ -30,7 +30,7 @@ DEPLOY_ENV = "local"
 PASSPORT_URL = "http://localhost:9696"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
-THREEID_APP_URL = "http://localhost:9797"
+PROFILE_APP_URL = "http://localhost:9797"
 COOKIE_DOMAIN = "localhost"
 
 # Site
@@ -64,16 +64,17 @@ services = [
 # ]
 
 routes = [
-  { pattern = "console-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
+  { pattern = "console-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "console-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 ]
 
 [env.dev.vars]
 DEPLOY_ENV = "dev"
-PASSPORT_URL = "https://passport-dev.threeid.xyz"
-COOKIE_DOMAIN = "threeid.xyz"
+PASSPORT_URL = "https://passport-dev.rollup.id"
+COOKIE_DOMAIN = "rollup.id"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
-THREEID_APP_URL = "https://my-dev.threeid.xyz"
+PROFILE_APP_URL = "https://my-dev.rollup.id"
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -91,7 +92,8 @@ services = [
 # ]
 
 routes = [
-  { pattern = "console-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
+  { pattern = "console-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "console-next.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 ]
 
 [env.next.build]
@@ -99,11 +101,11 @@ routes = [
 
 [env.next.vars]
 DEPLOY_ENV = "next"
-PASSPORT_URL = "https://passport-next.threeid.xyz"
-COOKIE_DOMAIN = "threeid.xyz"
+PASSPORT_URL = "https://passport-next.rollup.id"
+COOKIE_DOMAIN = "rollup.id"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
-THREEID_APP_URL = "https://my-next.threeid.xyz"
+PROFILE_APP_URL = "https://my-next.rollup.id"
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -121,7 +123,8 @@ services = [
 # ]
 
 routes = [
-  { pattern = "console.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
+  { pattern = "console.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "console.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 ]
 
 [env.current.build]
@@ -130,8 +133,8 @@ routes = [
 
 [env.current.vars]
 DEPLOY_ENV = "current"
-PASSPORT_URL = "https://passport.threeid.xyz"
-COOKIE_DOMAIN = "threeid.xyz"
+PASSPORT_URL = "https://passport.rollup.id"
+COOKIE_DOMAIN = "rollup.id"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
-THREEID_APP_URL = "https://my.threeid.xyz"
+PROFILE_APP_URL = "https://my.rollup.id"

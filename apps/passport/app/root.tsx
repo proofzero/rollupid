@@ -65,7 +65,7 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = ({ context }) => {
   return json({
     ENV: {
-      THREEID_APP_URL: context.env.THREEID_APP_URL,
+      PROFILE_APP_URL: context.env.PROFILE_APP_URL,
       INTERNAL_GOOGLE_ANALYTICS_TAG: context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
       APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
     },
@@ -201,7 +201,7 @@ export function CatchBoundary() {
           {caught.data?.isAuthenticated && (
             <ThreeIdButton
               text={'Continue to 3ID'}
-              href={typeof window !== 'undefined' && window.ENV.THREEID_APP_URL}
+              href={typeof window !== 'undefined' && window.ENV.PROFILE_APP_URL}
             />
           )}
         </div>
