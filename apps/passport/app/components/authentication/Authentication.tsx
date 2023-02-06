@@ -75,7 +75,10 @@ export function Authentication({
 
       <div className="mt-14 flex justify-center items-center space-x-2">
         <Text size="xs" weight="normal" className="text-gray-400">
-          Powered by Rollup.id
+          Powered by{' '}
+          <a href="https://rollup.id" className="hover:underline">
+            Rollup.id
+          </a>
         </Text>
       </div>
     </div>

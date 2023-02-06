@@ -66,7 +66,11 @@ export default function HeadNav({
             <div className="flex h-20 items-center justify-between px-4 sm:px-0">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <img className="h-10 w-10" src={logo} alt="Rollup" />
+                  <img
+                    className="mx-4 my-5 max-w-[180px]"
+                    src={logo}
+                    alt="Rollup"
+                  />
                 </div>
 
                 <div className="hidden md:block">
