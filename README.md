@@ -1,27 +1,25 @@
-![rollup-banner](https://user-images.githubusercontent.com/695698/215112757-531aba51-9539-4512-9c94-82923c1891fc.png)
+# Simple & Secure ‍Auth & Identity
 
-# Simple & Secure ‍User Identity
-
-![License](https://img.shields.io/github/license/proofzero/rollupid)
+![License](https://img.shields.io/github/license/rollupid/rollupid)
 [![Discord](https://img.shields.io/discord/790660849471062046?label=Discord)](https://discord.gg/UgwAsJf6C5)
 
 #### Build Status
 
 ##### Platform
 
-![](https://github.com/proofzero/rollupid/actions/workflows/main-galaxy.yaml/badge.svg)
-![](https://github.com/proofzero/rollupid/actions/workflows/main-edges.yaml/badge.svg)
-![](https://github.com/proofzero/rollupid/actions/workflows/main-starbase.yaml/badge.svg)
-![](https://github.com/proofzero/rollupid/actions/workflows/main-access.yaml/badge.svg)
-![](https://github.com/proofzero/rollupid/actions/workflows/main-address.yaml/badge.svg)
-![](https://github.com/proofzero/rollupid/actions/workflows/main-account.yaml/badge.svg)
-![](https://github.com/proofzero/rollupid/actions/workflows/main-images.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-galaxy.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-edges.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-starbase.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-access.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-address.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-account.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-images.yaml/badge.svg)
 
 ##### Apps
 
-![](https://github.com/proofzero/rollupid/actions/workflows/main-profile.yaml/badge.svg)
-![](https://github.com/proofzero/rollupid/actions/workflows/main-console.yaml/badge.svg)
-![](https://github.com/proofzero/rollupid/actions/workflows/main-passport.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-profile.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-console.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-passport.yaml/badge.svg)
 
 ##### Packages
 

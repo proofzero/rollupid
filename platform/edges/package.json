@@ -1,7 +1,7 @@
 {
   "name": "@kubelt/platform.edges",
   "version": "0.1.0",
-  "author": "ProofZero Inc.",
+  "author": "Proof Zero Inc.",
   "description": "Graph edge storage and retrieval",
   "private": true,
   "type": "module",

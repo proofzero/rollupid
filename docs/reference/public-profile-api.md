@@ -8,7 +8,7 @@ description: Public Profile Utility API
 
 Call this method to fetch a public profile.
 
-{% swagger method="get" path="" baseUrl="https://profile.rollup.id/$type/$address.json" summary="Public Profile" expanded="true" %}
+{% swagger method="get" path="" baseUrl="https://my.rollup.id/$type/$address.json" summary="Public Profile" expanded="true" %}
 {% swagger-description %}
 Call this method to fetch a public profile.&#x20;
 
@@ -20,44 +20,33 @@ The account type/provider you want to use to resolve the profile.
 
 \
 
-
-
-
 \
-
 
 Possible Values:
 
 \
 
-
 \- Handle (first party)
 
 \
-
 
 \- ETH
 
 \
 
-
 \- Github
 
 \
 
-
 \- Twitter
 
 \
-
 
 \- Discord
 {% endswagger-parameter %}
 
 {% swagger-parameter in="path" required="true" name="address" %}
 The account type handle used to resolve the profile
-
-
 
 Handle Types:\
 \- ETH: account or ens\
@@ -67,6 +56,7 @@ Handle Types:\
 {% endswagger-parameter %}
 
 {% swagger-response status="200: OK" description="" %}
+
 ```javascript
 {
     handle: string | null,
@@ -83,6 +73,7 @@ Handle Types:\
     gallery: [{contract: string, tokenId: string}]
 }
 ```
+
 {% endswagger-response %}
 {% endswagger %}
 
@@ -92,18 +83,22 @@ Profile from ETH Address
 
 {% tabs %}
 {% tab title="Javascript" %}
+
 ```typescript
-const profile = await fetch("https://profile.rollup.id/eth/vitalik.eth.json")
+const profile = await fetch('https://my.rollup.id/eth/vitalik.eth.json')
 ```
+
 {% endtab %}
 
 {% tab title="Curl" %}
+
 ```bash
-curl https://profile.rollup.id/eth/vitalik.eth.json
+curl https://my.rollup.id/eth/vitalik.eth.json
 ```
+
 {% endtab %}
 {% endtabs %}
 
 #### Source
 
-[https://github.com/proofzero/rollup/blob/main/apps/profile/app/routes/%24type.%24address.tsx](../../apps/profile/app/routes/%24type.%24address.tsx)
+[https://github.com/rollupid/rollupid/blob/main/apps/profile/app/routes/%24type.%24address.tsx](../../apps/profile/app/routes/%24type.%24address.tsx)

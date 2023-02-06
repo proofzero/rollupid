@@ -1,7 +1,7 @@
 {
   "name": "@kubelt/security",
   "version": "0.1.0",
-  "author": "ProofZero Inc.",
+  "author": "Proof Zero Inc.",
   "description": "Platform security definitions and utilities",
   "private": true,
   "scripts": {

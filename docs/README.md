@@ -28,7 +28,7 @@ hacking on docs.
 ### Cloudflare Pages
 
 Cloudflare Pages were used to publish the Hugo docs. The Cloudflare Pages app
-had access to the `proofzero/rollup` repo in GitHub. That access has been removed
+had access to the `rollupid/rollupid` repo in GitHub. That access has been removed
 but the app has been left in place because it deploys `redeem` to production.
 
 ### Cloudflare Page Rules

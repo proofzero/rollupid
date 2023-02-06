@@ -26,6 +26,7 @@ Application secret
 {% endswagger-parameter %}
 
 {% swagger-response status="201: Created" description="Exchange token response" %}
+
 ```javascript
 {
     access_token: string,
@@ -36,6 +37,7 @@ Application secret
    }
 }
 ```
+
 {% endswagger-response %}
 {% endswagger %}
 
@@ -43,28 +45,32 @@ Application secret
 
 {% tabs %}
 {% tab title="Javascript" %}
+
 ```typescript
 const tokenForm = new Form()
-tokenForm.append("exchange_code", exchangeCode)
-tokenForm.append("grant_type", grantType)
+tokenForm.append('exchange_code', exchangeCode)
+tokenForm.append('grant_type', grantType)
 
-const {access_code, refresh_token } = await fetch("https://passport.rollup.id/token",
- {
-   method: "post",
-   body: tokenForm,
- })
+const { access_code, refresh_token } = await fetch(
+  'https://passport.rollup.id/token',
+  {
+    method: 'post',
+    body: tokenForm,
+  }
+)
 ```
+
 {% endtab %}
 
 {% tab title="Curl" %}
+
 ```bash
 curl -X POST https://passport.rollup.id/token -d "exchange_code={exchangeCode}&grant_type=authorization_code"
 ```
+
 {% endtab %}
 {% endtabs %}
 
-
-
 #### Source
 
-[https://github.com/proofzero/rollup/blob/main/apps/passport/app/routes/token.tsx](../../apps/passport/app/routes/token.tsx)
+[https://github.com/rollupid/rollupid/blob/main/apps/passport/app/routes/token.tsx](../../apps/passport/app/routes/token.tsx)
