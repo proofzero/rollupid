@@ -30,7 +30,7 @@ import icon32 from './assets/favicon-32x32.png'
 import icon16 from './assets/favicon-16x16.png'
 import faviconSvg from './assets/favicon.svg'
 import maskIcon from './assets/safari-pinned-tab.svg'
-import logo from './assets/three-id-logo.svg'
+import logo from './assets/rollup-id-logo.svg'
 
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
@@ -46,17 +46,17 @@ import { AccountURNSpace } from '@kubelt/urns/account'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
-  title: '3ID',
+  title: 'Profile',
   viewport: 'width=device-width,initial-scale=1',
-  'og:title': '3ID - Decentralized Identity',
-  'og:site_name': '3ID',
-  'og:url': 'https://my.threeid.xyz',
+  'og:title': 'Rollup - Decentralized Identity',
+  'og:site_name': 'Rollup',
+  'og:url': 'https://my.rollup.id',
   'og:description':
-    '3ID turns your blockchain accounts into multi-chain decentralized identities with improved auth, secure messaging and more.',
+    'Rollup turns your blockchain accounts into multi-chain decentralized identities with improved auth, secure messaging and more.',
   'og:image': social,
   'twitter:card': 'summary_large_image',
-  'twitter:site': '@threeid_xyz',
-  'twitter:creator': '@threeid_xyz',
+  'twitter:site': '@rollupid',
+  'twitter:creator': '@rollupid',
   'theme-color': '#673ab8',
   'mobile-web-app-capable': 'yes',
   'apple-mobile-web-app-capable': 'yes',
@@ -219,7 +219,7 @@ export function ErrorBoundary({ error }) {
       <body className="error-screen">
         <div className="wrapper grid grid-row-3 gap-4">
           <nav className="col-span-3">
-            <img src={logo} alt="threeid" />
+            <img src={logo} alt="rollupid" />
           </nav>
 
           <div className="col-span-3">
@@ -265,7 +265,7 @@ export function CatchBoundary() {
       <body className="error-screen">
         <div className="wrapper grid grid-row-3 gap-4">
           <nav className="col-span-3">
-            <img src={logo} alt="threeid" />
+            <img src={logo} alt="rollupid" />
           </nav>
 
           <div className="col-span-3">

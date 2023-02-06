@@ -7,7 +7,7 @@
     "http://acme.co"
   ],
   "scopes": [
-    "scope://threeid.xyz/profile.read"
+    "scope://rollup.id/profile.read"
   ],
   "termsURL": "http://acme.co/tos",
   "websiteURL": "http://acme.co",

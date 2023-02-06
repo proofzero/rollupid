@@ -1,3 +1,3 @@
 export * from './connect-button/ConnectButton'
-export * from './threeid-button/ThreeIdButton'
+export * from './rollupid-button/RollupIdButton'
 export * from './authentication/Authentication'

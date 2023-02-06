@@ -2,7 +2,7 @@
   "name": "@kubelt/types",
   "private": true,
   "version": "0.1.0",
-  "description": "3iD platform types",
+  "description": "RollupId platform types",
   "keywords": [],
   "license": "ISC",
   "author": "Kubelt, Inc.",

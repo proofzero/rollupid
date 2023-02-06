@@ -1,5 +1,5 @@
 import { AddressType, NodeType } from '../types/address'
-import { createThreeIdURNSpace, ThreeIdURN } from './index'
+import { createRollupIdURNSpace, RollupIdURN } from './index'
 
 export type AddressRComp = {
   node_type?: NodeType
@@ -11,8 +11,8 @@ export type AddressQComp = {
   hidden?: string
 }
 
-export type AddressURN = ThreeIdURN<`address/${string}`>
-export const AddressURNSpace = createThreeIdURNSpace<
+export type AddressURN = RollupIdURN<`address/${string}`>
+export const AddressURNSpace = createRollupIdURNSpace<
   'address',
   AddressRComp,
   AddressQComp

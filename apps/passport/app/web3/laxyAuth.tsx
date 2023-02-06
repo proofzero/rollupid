@@ -5,7 +5,7 @@ import { createClient, WagmiConfig } from 'wagmi'
 export function LazyAuth() {
   const client = createClient(
     getDefaultClient({
-      appName: '3ID',
+      appName: 'Rollup',
       alchemyId:
         typeof window !== 'undefined' && window.ENV.APIKEY_ALCHEMY_PUBLIC,
     })

@@ -13,7 +13,7 @@ Rollup is **standards compliant** so, integrating Rollup into your application i
 We recommend setting up two routes in your application called `/auth/login` and `/auth/callback` to manage the authorization flow.
 
 {% hint style="info" %}
-We have created a reference implementation using [Remix](https://remix.run/) and the [Remix OAuth](https://github.com/sergiodxa/remix-auth) library [here](https://github.com/kubelt/kubelt/tree/main/apps/profile/app/routes/auth) which we will refer to several times in this step.
+We have created a reference implementation using [Remix](https://remix.run/) and the [Remix OAuth](https://github.com/sergiodxa/remix-auth) library [here](https://github.com/rollupid/rollupid/tree/main/apps/profile/app/routes/auth) which we will refer to several times in this step.
 {% endhint %}
 
 ### Step 1: Auth
@@ -42,9 +42,9 @@ Your Redirect URL should be prepared to accept an exchange token and state param
 // https://<redirect_url>?code=<exchange code>&state=<state>
 ```
 
-* **Code**: the exchange code needed request an access token
-* **State:** this state should match the state you created for the user/client in step 1
-* **Redirect URL**: the redirect url set in your app in the [previous step](create-an-application.md).
+- **Code**: the exchange code needed request an access token
+- **State:** this state should match the state you created for the user/client in step 1
+- **Redirect URL**: the redirect url set in your app in the [previous step](create-an-application.md).
 
 The state parameter should match the state you sent when you kicked off the auth flow in Step 1. This is a security measure in the auth protocol to prevent replay attacks. The exchange code is then sent with the **Application Secret** and the **grant type** to passports token endpoint in order to receive the access token and refresh token as base64 encoded signed JWT as well as a minimal user profile completing the flow.
 
@@ -68,12 +68,13 @@ Application secret
 {% endswagger-parameter %}
 
 {% swagger-parameter in="body" name="grant_type" type="String" required="true" %}
-"authorization\_code" or&#x20;
+"authorization_code" or&#x20;
 
-"refresh\_token"
+"refresh_token"
 {% endswagger-parameter %}
 
 {% swagger-response status="201: Created" description="" %}
+
 ```javascript
 {
     access_token: "ey....",
@@ -84,10 +85,11 @@ Application secret
    }
 }
 ```
+
 {% endswagger-response %}
 {% endswagger %}
 
-Every access token is valid for **1 hour.** This expiry time is stored in the "exp" property in the JWT.  ****  On the other hand, the refresh token is valid for **90 days** and can be used to request another access token using the same exchange code endpoint with the "refresh\_token" grant type.&#x20;
+Every access token is valid for **1 hour.** This expiry time is stored in the "exp" property in the JWT. \***\* On the other hand, the refresh token is valid for **90 days\*\* and can be used to request another access token using the same exchange code endpoint with the "refresh_token" grant type.&#x20;
 
 There are multiple ways to manage this refresh flow, [here](../../apps/profile/app/utils/session.server.tsx#L52) is our reference implementation. In summary, we store the tokens encrypted in a user cookie that is valid for 90 days and refresh when needed.
 

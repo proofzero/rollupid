@@ -11,5 +11,5 @@ TOKEN_CLOUDFLARE_API = "<replace-me>"
 # The duration in seconds that returned upload URL is good for.
 # - minimum: 2 minutes (120)
 # - maximum: 6 hours (21600)
-# - 3IDefault: 200
+# - RollupDefault: 200
 UPLOAD_WINDOW_SECONDS=200

@@ -10,11 +10,11 @@ export const links = () => [{ rel: 'stylesheet', href: styles }]
 
 const contents = [
   {
-    question: 'How do I use 3ID?',
+    question: 'How do I use Rollup?',
     answer: (
       <>
         <SmallRegularBlock className="mb-4">
-          Now that you've claimed your 3ID, other applications can query your
+          Now that you've claimed your Rollup, other applications can query your
           profile to fetch your public profile details including your avatar.
           Soon you will also be able to promote your profile and NFTs on social
           media.
@@ -53,13 +53,13 @@ const contents = [
     ),
   },
   {
-    question: 'What is my 3ID PFP?',
+    question: 'What is my Rollup PFP?',
     answer: (
       <div className="mb-4">
         <SmallRegularBlock>
-          Your 3ID gradient PFP is a soulbound avatar made up of 4 color traits
-          -- one version color and three common, uncommon, rare and epic colors
-          traits. Rarity is decided by several factors:
+          Your Rollup gradient PFP is a soulbound avatar made up of 4 color
+          traits -- one version color and three common, uncommon, rare and epic
+          colors traits. Rarity is decided by several factors:
         </SmallRegularBlock>
 
         <ol
@@ -97,7 +97,7 @@ const contents = [
           <a
             target={'_blank'}
             rel={'noopener noopener noreferrer'}
-            href={`https://github.com/kubelt/kubelt/tree/main/nftar`}
+            href={`https://github.com/rollupid/rollupid/tree/main/nftar`}
             className="mx-1"
           >
             <Text type="span" size="sm" className="text-indigo-500">
@@ -106,9 +106,9 @@ const contents = [
           </a>
 
           <SmallRegularBlock type="span">
-            to read the code. Once generated, your 3ID gradient PFP is soul
+            to read the code. Once generated, your Rollup gradient PFP is soul
             bound to your identity. More generations of this PFP will be
-            released corresponding with every major version of 3ID.
+            released corresponding with every major version of Rollup.
           </SmallRegularBlock>
         </div>
       </div>
@@ -118,22 +118,22 @@ const contents = [
     question: 'Who is behind this project?',
     answer: (
       <div className="mb-4">
-        <SmallRegularBlock type="span">3ID is created by</SmallRegularBlock>
+        <SmallRegularBlock type="span">Rollup is created by</SmallRegularBlock>
         <a
           target={'_blank'}
           rel={'noopener noopener noreferrer'}
-          href={`https://kubelt.com`}
+          href={`https://rollup.id`}
           className="mx-1"
         >
           <Text type="span" size="sm" className="text-indigo-500">
-            Kubelt
+            Rollup
           </Text>
         </a>
 
         <SmallRegularBlock type="span">
           , a decentralized application platform, and is inspired by Web3 and
           the digital identity specification. Instead of applications
-          centralizing user data, 3ID users like yourself will be able to
+          centralizing user data, Rollup users like yourself will be able to
           permission/revoke applications to access personal data, messages and
           more.
         </SmallRegularBlock>

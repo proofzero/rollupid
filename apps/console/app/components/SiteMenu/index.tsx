@@ -10,7 +10,7 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import AppSelect from './appSelect'
 
 // Images
-import consoleLogo from '~/images/3id_console_logo.svg'
+import consoleLogo from '~/images/console_logo.svg'
 import {
   HiOutlineChartSquareBar,
   HiOutlineCog,
@@ -21,12 +21,12 @@ import {
 import { Disclosure } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
-// KubeltLogo
+// RollupLogo
 // -----------------------------------------------------------------------------
-const KubeltLogo = () => {
+const RollupLogo = () => {
   return (
     <Link to="/">
-      <img className="mx-4 my-5" src={consoleLogo} />
+      <img className="mx-4 my-5 max-w-[180px]" src={consoleLogo} alt="console logo" />
     </Link>
   )
 }
@@ -70,10 +70,10 @@ const MenuLink = (props: MenuLinkProps) => {
   )
 }
 
-// KubeltMenu
+// RollupMenu
 // -----------------------------------------------------------------------------
 
-type KubeltMenuProps = {
+type RollupMenuProps = {
   // An array of application objects.
   apps: {
     clientId: string
@@ -89,44 +89,43 @@ const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
     isActive ? 'bg-gray-800 text-white' : 'text-gray-400'
   } ${disabled ? 'hover:cursor-not-allowed' : ''}`
 
-export default function SiteMenu(props: KubeltMenuProps) {
+export default function SiteMenu(props: RollupMenuProps) {
   return (
     <div className="text-center bg-gray-900 pb-4 md:min-h-screen md:min-w-[256px] md:max-w-sm md:border-r md:text-left">
-        <div className='object-left'>
-          <KubeltLogo/>
-        </div>
-        {/* Mobile menu */}
-        <div className='md:hidden '>
-          <Disclosure>
-            {({ open }) => (
-              <>
-                <Disclosure.Button className="absolute right-0 top-0 my-5 items-right justify-right bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                  <span className="sr-only">Open main menu</span>
-                  {open ? (
-                    <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                  ) : (
-                    <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                  )}
-                </Disclosure.Button>
-                <Disclosure.Panel >
-                  <AppMenu props={props} />
-                </Disclosure.Panel>
-              </>
-            )}
-          </Disclosure>
-        </div>
-
-      {/* Desktop menu */}
-      <div className='hidden md:block'>
-        <AppMenu props={props} />
+      <div className="object-left">
+        <RollupLogo />
+      </div>
+      {/* Mobile menu */}
+      <div className="md:hidden ">
+        <Disclosure>
+          {({ open }) => (
+            <>
+              <Disclosure.Button className="absolute right-0 top-0 my-5 items-right justify-right bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                <span className="sr-only">Open main menu</span>
+                {open ? (
+                  <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                ) : (
+                  <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                )}
+              </Disclosure.Button>
+              <Disclosure.Panel>
+                <AppMenu props={props} />
+              </Disclosure.Panel>
+            </>
+          )}
+        </Disclosure>
       </div>
 
+      {/* Desktop menu */}
+      <div className="hidden md:block">
+        <AppMenu props={props} />
+      </div>
     </div>
   )
 }
 
 type AppMenuProps = {
-  props: KubeltMenuProps
+  props: RollupMenuProps
 }
 
 function AppMenu({ props }: AppMenuProps) {

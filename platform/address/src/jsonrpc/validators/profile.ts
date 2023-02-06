@@ -97,8 +97,8 @@ export const MicrosoftRawProfileSchema = z.object({
   family_name: z.string(),
   email: z.string(),
   picture: z.string(),
-  threeidImageUrl: z.string().optional(),
   isMicrosoft: z.boolean().default(true),
+  rollupidImageUrl: z.string().optional(),
 })
 
 export const AppleProfileSchema = z.object({

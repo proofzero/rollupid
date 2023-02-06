@@ -64,8 +64,7 @@ services = [
 # ]
 
 routes = [
-  { pattern = "console-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
-  { pattern = "console-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" }
+  "console-dev.rollup.id"
 ]
 
 [env.dev.vars]
@@ -92,8 +91,7 @@ services = [
 # ]
 
 routes = [
-  { pattern = "console-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
-  { pattern = "console-next.rollup.id", custom_domain = true, zone_name = "rollup.id" }
+  "console-next.rollup.id"
 ]
 
 [env.next.build]
@@ -123,8 +121,7 @@ services = [
 # ]
 
 routes = [
-  { pattern = "console.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
-  { pattern = "console.rollup.id", custom_domain = true, zone_name = "rollup.id" }
+  "console.rollup.id"
 ]
 
 [env.current.build]

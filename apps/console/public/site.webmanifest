@@ -1,6 +1,6 @@
 {
-  "name": "Kubelt Console",
-  "short_name": "Kubelt",
+  "name": "Rollup Console",
+  "short_name": "Rollup",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

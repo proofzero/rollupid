@@ -9,12 +9,12 @@ workers_dev = false
 
 # The default environment
 # ------------------------------------------------------------------------------
-# name = "three-id-dev"
+# name = "rollup-id-dev"
 # # Whether or not the worker should be deployed to *.workers.dev. Can use
 # # either route or workers_dev, but not both.
 # workers_dev = true
 # routes = [
-#   "3id-dev.kubelt.com/*",
+#   "rollupid-dev.rollup.id/*",
 # ]
 
 # Services binding for local development
@@ -52,9 +52,7 @@ local_protocol = "http"
 # ------------------------------------------------------------------------------
 [env.dev]
 routes = [
-  { pattern = "my-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
-  { pattern = "my-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" },
-
+ "my-dev.rollup.id"
 ]
 services = [
   { binding = "Galaxy", service = "galaxy-dev" },
@@ -82,8 +80,7 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 # ------------------------------------------------------------------------------
 [env.next]
 routes = [
-  { pattern = "my-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
-  { pattern = "my-next.rollup.id", custom_domain = true, zone_name = "rollup.id" },
+  "my-next.rollup.id"
 ]
 services = [
   { binding = "Galaxy", service = "galaxy-next" },
@@ -114,9 +111,7 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 # ------------------------------------------------------------------------------
 [env.current]
 routes = [
-  { pattern = "my.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
-  { pattern = "my-next.rollup.id", custom_domain = true, zone_name = "rollup.id" },
-
+  "my.rollup.id"
 ]
 services = [
   { binding = "Galaxy", service = "galaxy-current" },

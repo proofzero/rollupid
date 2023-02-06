@@ -58,7 +58,7 @@ export function ErrorPage({ code, message, trace, error }: ErrorPageProps) {
         <ButtonAnchor
           btnSize="xxl"
           btnType="secondary"
-          href="https://discord.gg/threeid"
+          href="https://discord.gg/rollupid"
           className="border-none"
         >
           <FaDiscord className="text-2xl" />

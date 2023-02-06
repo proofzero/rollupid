@@ -5,7 +5,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const authenticator = getRollupAuthenticator()
   await authenticator.isAuthenticated(request, {
     successRedirect: '/account',
-    // failureRedirect: 'https://threeid.xyz/profiles',
+    // failureRedirect: 'https://rollup.id/profiles',
   })
 
   return authenticator.authenticate('rollup', request)

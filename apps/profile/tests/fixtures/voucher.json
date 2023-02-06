@@ -1,84 +1,96 @@
 {
-    "metadata": {
-        "name": "3ID PFP: GEN 0",
-        "description": "3ID PFP for 0x961B46647E86d412707A71F460Bb59Ddef1a9381",
-        "external_url": "https://my.threeid.xy/0x961B46647E86d412707A71F460Bb59Ddef1a9381",
-        "properties": {
-            "metadata": {
-                "name": "ethereum",
-                "chainId": 5,
-                "account": "0x961B46647E86d412707A71F460Bb59Ddef1a9381"
+  "metadata": {
+    "name": "3ID PFP: GEN 0",
+    "description": "3ID PFP for 0x961B46647E86d412707A71F460Bb59Ddef1a9381",
+    "external_url": "https://my.threeid.xyz/0x961B46647E86d412707A71F460Bb59Ddef1a9381",
+    "properties": {
+      "metadata": {
+        "name": "ethereum",
+        "chainId": 5,
+        "account": "0x961B46647E86d412707A71F460Bb59Ddef1a9381"
+      },
+      "traits": {
+        "trait0": {
+          "type": "GEN",
+          "value": {
+            "name": "Mint Green (V0)",
+            "rgb": {
+              "r": 45,
+              "g": 74,
+              "b": 277
             },
-            "traits": {
-                "trait0": {
-                    "type": "GEN",
-                    "value": {
-                        "name": "Mint Green (V0)",
-                        "rgb": {
-                            "r": 45,
-                            "g": 74,
-                            "b": 277
-                        },
-                        "rnd": [0.9503043250992715, 0.042381237789902215, 0.41186828209552684, 0.9155365870281487, 0.5965027937863971, 0.39533198991682816]
-                    }
-                },
-                "trait1": {
-                    "type": "UNCOMMON",
-                    "value": {
-                        "name": "Ocean Blue",
-                        "rgb": {
-                            "r": 98,
-                            "g": 115,
-                            "b": 189
-                        },
-                        "rnd": [0.9755040426876944, 0.023508739909156917, 0.5916238319093607, 0.137117588154809, 0.0517846016138106, 0.8276975144254859]
-                    }
-                },
-                "trait2": {
-                    "type": "COMMON",
-                    "value": {
-                        "name": "Soft White",
-                        "rgb": {
-                            "r": 206,
-                            "g": 201,
-                            "b": 175
-                        },
-                        "rnd": [0.08247849892196135, 0.1745519537102549, 0.9280905519361455, 0.3749823117515225, 0.6856695552739007, 0.19895538808504343]
-                    }
-                },
-                "trait3": {
-                    "type": "COMMON",
-                    "value": {
-                        "name": "Lavender",
-                        "rgb": {
-                            "r": 165,
-                            "g": 137,
-                            "b": 152
-                        },
-                        "rnd": [0.42315899636535104, 0.5438995163536371, 0.22212730334647102, 0.23922485805113736, 0.6662057262964609, 0.7734657906406928]
-                    }
-                }
-            },
-            "GEN": "Mint Green (V0)",
-            "Priority": "Ocean Blue",
-            "Friend": "Soft White",
-            "Points": "Lavender"
+            "rnd": [
+              0.9503043250992715, 0.042381237789902215, 0.41186828209552684,
+              0.9155365870281487, 0.5965027937863971, 0.39533198991682816
+            ]
+          }
         },
-        "image": "ipfs://bafybeieufnijv2fj6i2fan3mvwstt4htzr7glcskhytmuc5me42sx26t4e/threeid.png",
-        "cover": "ipfs://bafybeihjwyflyfkhup6sqzrsgwwwnvgeeptqynzvoe7rv5bjenv6cntoam/cover.png",
-        "animation_url": "ipfs://bafybeiao3kxsuhym7k7vbtoixftis362bifodknib6i226leb4c3znnabe/index.html"
+        "trait1": {
+          "type": "UNCOMMON",
+          "value": {
+            "name": "Ocean Blue",
+            "rgb": {
+              "r": 98,
+              "g": 115,
+              "b": 189
+            },
+            "rnd": [
+              0.9755040426876944, 0.023508739909156917, 0.5916238319093607,
+              0.137117588154809, 0.0517846016138106, 0.8276975144254859
+            ]
+          }
+        },
+        "trait2": {
+          "type": "COMMON",
+          "value": {
+            "name": "Soft White",
+            "rgb": {
+              "r": 206,
+              "g": 201,
+              "b": 175
+            },
+            "rnd": [
+              0.08247849892196135, 0.1745519537102549, 0.9280905519361455,
+              0.3749823117515225, 0.6856695552739007, 0.19895538808504343
+            ]
+          }
+        },
+        "trait3": {
+          "type": "COMMON",
+          "value": {
+            "name": "Lavender",
+            "rgb": {
+              "r": 165,
+              "g": 137,
+              "b": 152
+            },
+            "rnd": [
+              0.42315899636535104, 0.5438995163536371, 0.22212730334647102,
+              0.23922485805113736, 0.6662057262964609, 0.7734657906406928
+            ]
+          }
+        }
+      },
+      "GEN": "Mint Green (V0)",
+      "Priority": "Ocean Blue",
+      "Friend": "Soft White",
+      "Points": "Lavender"
     },
-    "voucher": {
-        "recipient": "0x961B46647E86d412707A71F460Bb59Ddef1a9381",
-        "uri": "ipfs://bafyreifmm2bscrp7bwciwrzuqqkludedi5ahgokwwslyew6ct5jouokuz4/metadata.json",
-        "signature": "omit"
-    },
-    "signature": {
-        "message": "omit",
-        "messageHash": "omit",
-        "v": "omit",
-        "r": "omit",
-        "s": "omit",
-        "signature": "omit"
-    }
+    "image": "ipfs://bafybeieufnijv2fj6i2fan3mvwstt4htzr7glcskhytmuc5me42sx26t4e/threeid.png",
+    "cover": "ipfs://bafybeihjwyflyfkhup6sqzrsgwwwnvgeeptqynzvoe7rv5bjenv6cntoam/cover.png",
+    "animation_url": "ipfs://bafybeiao3kxsuhym7k7vbtoixftis362bifodknib6i226leb4c3znnabe/index.html"
+  },
+  "voucher": {
+    "recipient": "0x961B46647E86d412707A71F460Bb59Ddef1a9381",
+    "uri": "ipfs://bafyreifmm2bscrp7bwciwrzuqqkludedi5ahgokwwslyew6ct5jouokuz4/metadata.json",
+    "signature": "omit"
+  },
+  "signature": {
+    "message": "omit",
+    "messageHash": "omit",
+    "v": "omit",
+    "r": "omit",
+    "s": "omit",
+    "signature": "omit"
+  }
 }

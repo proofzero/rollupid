@@ -27,30 +27,30 @@ export const createObjectURNSpace = (): ObjectURNSpace<string> => {
 
 // PLATFORM URN
 export type CompType = { [k: string]: string }
-export type ThreeIdURN<NSS extends string> = BaseURN<'threeid', NSS>
-export type ThreeIdURNSpace<
+export type RollupIdURN<NSS extends string> = BaseURN<'rollupid', NSS>
+export type RollupIdURNSpace<
   NSS extends string,
   RComp extends CompType,
   QComp extends CompType
-> = TypedComponentsURNSpace<'threeid', NSS, RComp, QComp, ThreeIdURN<NSS>>
+> = TypedComponentsURNSpace<'rollupid', NSS, RComp, QComp, RollupIdURN<NSS>>
 
 // general
-export const ThreeIdSpace = new URNSpace('threeid')
+export const RollupIdSpace = new URNSpace('rollupid')
 
-export const createThreeIdURNSpace = <
+export const createRollupIdURNSpace = <
   NSSPrefix extends string,
   RComp extends CompType,
   QComp extends CompType
 >(
   prefix?: string // optional if we want to validate prefix
-): ThreeIdURNSpace<`${NSSPrefix}/${string}`, RComp, QComp> => {
+): RollupIdURNSpace<`${NSSPrefix}/${string}`, RComp, QComp> => {
   return new TypedComponentsURNSpace<
-    'threeid',
+    'rollupid',
     `${NSSPrefix}/${string}`,
     RComp,
     QComp,
-    ThreeIdURN<`${NSSPrefix}/${string}`>
-  >('threeid', {
+    RollupIdURN<`${NSSPrefix}/${string}`>
+  >('rollupid', {
     encode: (val: string): string => {
       if (!prefix) throw 'cannot encode without prefix'
       return `${prefix}/${val}`

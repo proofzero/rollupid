@@ -223,7 +223,7 @@ export const ApplicationAuth = ({
               weight="medium"
               className="text-gray-400"
             >
-              <a className="text-indigo-500" href="https://discord.gg/threeid">
+              <a className="text-indigo-500" href="https://discord.gg/rollupid">
                 Contact us
               </a>{' '}
               to enable this feature

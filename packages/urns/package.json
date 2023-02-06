@@ -2,7 +2,7 @@
   "name": "@kubelt/urns",
   "private": true,
   "version": "1.0.0",
-  "description": "3id URNs",
+  "description": "RollupId URNs",
   "keywords": [],
   "license": "ISC",
   "author": "Kubelt, Inc.",

@@ -6,4 +6,4 @@ description: Frequently Asked Questions
 
 ## Where do I get support?
 
-You can get support from the team by joining our [Discord](https://discord.gg/threeid) or documenting any issues at our [Github](https://github.com/kubelt/kubelt/issues).
+You can get support from the team by joining our [Discord](https://discord.gg/rollupid) or documenting any issues at our [Github](https://github.com/rollupid/rollupid/issues).

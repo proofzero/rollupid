@@ -1,27 +1,25 @@
-![rollup-banner](https://user-images.githubusercontent.com/695698/215112757-531aba51-9539-4512-9c94-82923c1891fc.png)
+# Simple & Secure ‍Auth & Identity
 
-# Simple & Secure ‍User Identity
-
-![License](https://img.shields.io/github/license/kubelt/kubelt)
+![License](https://img.shields.io/github/license/rollupid/rollupid)
 [![Discord](https://img.shields.io/discord/790660849471062046?label=Discord)](https://discord.gg/UgwAsJf6C5)
 
 #### Build Status
 
 ##### Platform
 
-![](https://github.com/kubelt/kubelt/actions/workflows/main-galaxy.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-edges.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-starbase.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-access.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-address.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-account.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-images.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-galaxy.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-edges.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-starbase.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-access.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-address.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-account.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-images.yaml/badge.svg)
 
 ##### Apps
 
-![](https://github.com/kubelt/kubelt/actions/workflows/main-profile.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-console.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-passport.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-profile.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-console.yaml/badge.svg)
+![](https://github.com/rollupid/rollupid/actions/workflows/main-passport.yaml/badge.svg)
 
 ##### Packages
 
@@ -33,15 +31,15 @@ Rollup is authorization infrastructure for you apps so you can build great relat
 
 ## Rollup Monorepo Tour
 
-Let's take a look around at the Kubelt Monorepo layout...
+Let's take a look around at the Rollup Monorepo layout...
 
 ## Platform
 
-The [platform/](platform) directory is where all the core identity services are located. The Kubelt platform is organized by "local-first" (or logically local) nodes (accounts, address, account, and more) organized in a graph by the Galaxy service.
+The [platform/](platform) directory is where all the core identity services are located. The Rollup platform is organized by "local-first" (or logically local) nodes (accounts, address, account, and more) organized in a graph by the Galaxy service.
 
 ## Apps
 
-The [apps/](apps) directory is where the presentation layer applications (or backend for frontends) live. These apps include the 3ID user experience as well as the Developer Console app.
+The [apps/](apps) directory is where the presentation layer applications (or backend for frontends) live. These apps include the Profile user experience as well as the Developer Console app.
 
 ## Packages
 

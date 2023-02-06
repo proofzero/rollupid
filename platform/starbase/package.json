@@ -26,7 +26,6 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20221111.1",
-    "@types/itty-router-extras": "0.4.0",
     "@types/lodash": "4.14.189",
     "esbuild": "0.15.15",
     "eslint": "8.28.0",
@@ -45,8 +44,6 @@
     "@trpc/server": "10.8.1",
     "cross-env": "7.0.3",
     "do-proxy": "1.3.3",
-    "itty-router": "2.6.6",
-    "itty-router-extras": "0.4.2",
     "jose": "4.11.0",
     "lodash": "4.17.21",
     "multiformats": "10.0.2",

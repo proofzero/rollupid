@@ -7,7 +7,7 @@ durable_objects.bindings = [
   { name = "Meta", class_name = "Meta" }
 ]
 r2_buckets = [
-  { binding = "Bucket", bucket_name = "threeid-dev", preview_bucket_name = "threeid-dev" },
+  { binding = "Bucket", bucket_name = "rollup-dev", preview_bucket_name = "rollup-dev" },
 ]
 
 analytics_engine_datasets = [
@@ -27,7 +27,7 @@ durable_objects.bindings = [
   { name = "Meta", class_name = "Meta" }
 ]
 r2_buckets = [
-  { binding = "Bucket", bucket_name = "threeid-dev", preview_bucket_name = "threeid-dev" },
+  { binding = "Bucket", bucket_name = "rollup-dev", preview_bucket_name = "rollup-dev" },
 ]
 
 analytics_engine_datasets = [
@@ -43,7 +43,7 @@ durable_objects.bindings = [
   { name = "Meta", class_name = "Meta" }
 ]
 r2_buckets = [
-  { binding = "Bucket", bucket_name = "threeid-next", preview_bucket_name = "threeid-next" },
+  { binding = "Bucket", bucket_name = "rollup-next", preview_bucket_name = "rollup-next" },
 ]
 
 analytics_engine_datasets = [
@@ -59,7 +59,7 @@ durable_objects.bindings = [
   { name = "Meta", class_name = "Meta" }
 ]
 r2_buckets = [
-  { binding = "Bucket", bucket_name = "threeid-current", preview_bucket_name = "threeid-current" },
+  { binding = "Bucket", bucket_name = "rollup-current", preview_bucket_name = "rollup-current" },
 ]
 
 analytics_engine_datasets = [
