@@ -23,8 +23,6 @@ export const LinksSchema = z
     z.object({
       name: z.string(),
       url: z.string().url().or(z.literal('')),
-      verified: z.boolean().optional(),
-      provider: z.string().optional(),
     })
   )
   .optional()

@@ -6,7 +6,11 @@ import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
 import { requireJWT } from '~/utils/session.server'
 import { AddressURN } from '@kubelt/urns/address'
 import { AddressListItemProps } from '~/components/addresses/AddressListItem'
-import { HeadersFunction, LoaderFunction } from '@remix-run/cloudflare'
+import {
+  ActionFunction,
+  HeadersFunction,
+  LoaderFunction,
+} from '@remix-run/cloudflare'
 import { CryptoAddressProfile } from '@kubelt/galaxy-client'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
@@ -92,6 +96,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   // Keeping the distinctions to only append
   // context actions to desired types
   // e.x. rename to crypto profiles
+  // TODO: async the three reduce calls
   const cryptoProfiles = mappedProfiles
     .filter((p) => p?.nodeType === NodeType.Crypto)
     .map((p) => ({ urn: p.urn, ...p?.profile }))

@@ -17,6 +17,12 @@ export type Scalars = {
   URN: any;
 };
 
+export type AddressEdgeUpdateInput = {
+  addressURN: Scalars['URN'];
+  order: Scalars['Int'];
+  public: Scalars['Boolean'];
+};
+
 export type AddressProfile = {
   __typename?: 'AddressProfile';
   profile: AddressProfilesUnion;
@@ -97,10 +103,16 @@ export type LinkInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  updateAddressEdges?: Maybe<Scalars['Boolean']>;
   updateAddressNickname?: Maybe<Scalars['Boolean']>;
   updateGallery?: Maybe<Scalars['Boolean']>;
   updateLinks?: Maybe<Scalars['Boolean']>;
   updateProfile?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type MutationUpdateAddressEdgesArgs = {
+  addressURNList: Array<AddressEdgeUpdateInput>;
 };
 
 
@@ -520,6 +532,13 @@ export type UpdateAddressNicknameMutationVariables = Exact<{
 
 export type UpdateAddressNicknameMutation = { __typename?: 'Mutation', updateAddressNickname?: boolean | null };
 
+export type UpdateAddressEdgesMutationVariables = Exact<{
+  addressURNList: Array<AddressEdgeUpdateInput> | AddressEdgeUpdateInput;
+}>;
+
+
+export type UpdateAddressEdgesMutation = { __typename?: 'Mutation', updateAddressEdges?: boolean | null };
+
 export type GetEnsProfileQueryVariables = Exact<{
   addressOrEns: Scalars['String'];
 }>;
@@ -752,6 +771,11 @@ export const UpdateAddressNicknameDocument = gql`
   updateAddressNickname(addressURN: $addressURN, nickname: $nickname)
 }
     `;
+export const UpdateAddressEdgesDocument = gql`
+    mutation updateAddressEdges($addressURNList: [AddressEdgeUpdateInput!]!) {
+  updateAddressEdges(addressURNList: $addressURNList)
+}
+    `;
 export const GetEnsProfileDocument = gql`
     query getEnsProfile($addressOrEns: String!) {
   ensProfile(addressOrEns: $addressOrEns) {
@@ -911,6 +935,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateAddressNickname(variables: UpdateAddressNicknameMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateAddressNicknameMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateAddressNicknameMutation>(UpdateAddressNicknameDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateAddressNickname', 'mutation');
+    },
+    updateAddressEdges(variables: UpdateAddressEdgesMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateAddressEdgesMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateAddressEdgesMutation>(UpdateAddressEdgesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateAddressEdges', 'mutation');
     },
     getEnsProfile(variables: GetEnsProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetEnsProfileQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetEnsProfileQuery>(GetEnsProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEnsProfile', 'query');

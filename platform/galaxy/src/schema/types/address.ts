@@ -68,6 +68,12 @@ export default /* GraphQL */ `
     profile: AddressProfilesUnion!
   }
 
+  input AddressEdgeUpdateInput {
+    addressURN: URN!
+    order: Int!
+    public: Boolean!
+  }
+
   type Query {
     ensProfile(addressOrEns: String!): CryptoAddressProfile!
     addressProfile(addressURN: URN!): AddressProfile!
@@ -76,5 +82,6 @@ export default /* GraphQL */ `
 
   type Mutation {
     updateAddressNickname(addressURN: URN!, nickname: String!): Boolean
+    updateAddressEdges(addressURNList: [AddressEdgeUpdateInput!]!): Boolean
   }
 `

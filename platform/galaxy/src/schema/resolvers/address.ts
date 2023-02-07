@@ -81,7 +81,20 @@ const addressResolvers: Resolvers = {
 
       return true
     },
+    updateAddressEdges: async (
+      _parent: any,
+      { addressURNList },
+      { env, jwt }: ResolverContext
+    ) => {
+      const addressClient = createAddressClient(env.Address, {
+        headers: {
+          [PlatformJWTAssertionHeader]: jwt,
+        },
+      })
+      return true
+    },
   },
+
   AddressProfilesUnion: {
     __resolveType: (obj: AddressProfilesUnion) => {
       if ((obj as CryptoAddressProfile).isCrypto) {

@@ -97,3 +97,7 @@ query getAddressProfiles($addressURNList: [URN!]) {
 mutation updateAddressNickname($addressURN: URN!, $nickname: String!) {
   updateAddressNickname(addressURN: $addressURN, nickname: $nickname)
 }
+
+mutation updateAddressEdges($addressURNList: [AddressEdgeUpdateInput!]!) {
+  updateAddressEdges(addressURNList: $addressURNList)
+}

@@ -51,13 +51,6 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
         title: ap.profile.displayName,
         icon: imageFromAddressType(CryptoAddressType.ETH),
         provider: CryptoAddressType.ETH,
-        /**
-         * 'linkable' allows the account list
-         * to disable non linkable accounts
-         * which are unclear as to how to
-         * generate a public url
-         */
-        linkable: true,
       }
     case 'OAuthGoogleProfile':
       return {
@@ -76,7 +69,6 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
         title: 'Twitter',
         icon: ap.profile.profile_image_url_https,
         provider: OAuthAddressType.Twitter,
-        linkable: true,
       }
     case 'OAuthGithubProfile':
       return {
@@ -87,7 +79,6 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
         title: 'GitHub',
         icon: imageFromAddressType(OAuthAddressType.GitHub),
         provider: OAuthAddressType.GitHub,
-        linkable: true,
       }
     case 'OAuthMicrosoftProfile':
       return {
@@ -147,8 +138,6 @@ export const action: ActionFunction = async ({ request }) => {
    */
   const updatedLinks = formData['links'] as Link[]
 
-  console.debug({ updatedLinks })
-
   // TODO: Add validation
 
   const errors: {
@@ -174,23 +163,6 @@ export const action: ActionFunction = async ({ request }) => {
     return { errors }
   }
   const galaxyClient = await getGalaxyClient()
-
-  /** TODO:
-   * fetch errors when this updated profile doesn't
-   * pass back-end schema validation
-   */
-
-  // const connectedAccounts: any = JSON.parse(formData.get('connected') as string)
-  // const connectedAccountLinks = connectedAccounts
-  //   .filter((ca: any) => ca.enabled) // enabled gets changed by toggle
-  //   .map((ca: any) => ({
-  //     name: ca.title,
-  //     url: ca.address,
-  //     provider: ca.provider,
-  //     // Connected accounts
-  //     // so verified by other means
-  //     verified: true,
-  //   }))
 
   await galaxyClient.updateLinks(
     {
@@ -342,6 +314,7 @@ export default function AccountSettingsLinks() {
     normalizedAddressProfiles || []
   )
   const [isFormChanged, setFormChanged] = useState(false)
+  const [isConnectionsChanged, setIsConnectionsChanged] = useState(false)
 
   useEffect(() => {
     if (transition.type === 'actionReload') {
@@ -350,6 +323,19 @@ export default function AccountSettingsLinks() {
       notificationHandler(!actionData?.errors)
     }
   }, [transition])
+
+  useEffect(() => {
+    if (isConnectionsChanged && normalizedAddressProfiles !== connectedLinks) {
+      fetcher.submit(
+        { connections: JSON.stringify(connectedLinks) },
+        {
+          method: 'post',
+          action: '/account/settings/connections/order',
+        }
+      )
+      setIsConnectionsChanged(false)
+    }
+  }, [isConnectionsChanged])
 
   return (
     <>
@@ -362,56 +348,61 @@ export default function AccountSettingsLinks() {
         Connected Account Links
       </Text>
 
-      <SortableList
-        items={connectedLinks.map((l: any) => ({
-          key: `${l.id}`,
-          val: l,
-          disabled: !l.linkable,
-        }))}
-        itemRenderer={(item) => (
-          <div className={`flex flex-row items-center w-full`}>
-            <img className="w-9 h-9 rounded-full mr-3.5" src={item.val.icon} />
+      <fetcher.Form method="post" action="/account/settings/connections/order">
+        <SortableList
+          items={connectedLinks.map((l: any) => ({
+            key: `${l.id}`,
+            val: l,
+          }))}
+          itemRenderer={(item) => (
+            <div className={`flex flex-row items-center w-full`}>
+              <img
+                className="w-9 h-9 rounded-full mr-3.5"
+                src={item.val.icon}
+              />
 
-            <div className="flex flex-col space-y-1.5 flex-1">
-              <Text size="sm" weight="medium" className="text-gray-700">
-                {item.val.title}
-              </Text>
-              <Text size="xs" weight="normal" className="text-gray-500">
-                {item.val.address}
-              </Text>
+              <div className="flex flex-col space-y-1.5 flex-1">
+                <Text size="sm" weight="medium" className="text-gray-700">
+                  {item.val.title}
+                </Text>
+                <Text size="xs" weight="normal" className="text-gray-500">
+                  {item.val.address}
+                </Text>
+              </div>
+
+              <InputToggle
+                id={`enable_${item.val.id}`}
+                label={''}
+                checked={item.val.public}
+                onToggle={(val) => {
+                  const index = connectedLinks.findIndex(
+                    (pl: any) => pl.id === item.val.id
+                  )
+
+                  // This just updates
+                  // toggled connected link
+                  // `public` property
+                  // which is used in action
+                  // to persist or not
+                  setConnectedLinks([
+                    ...connectedLinks.slice(0, index),
+                    {
+                      ...connectedLinks[index],
+                      public: val,
+                    },
+                    ...connectedLinks.slice(index + 1),
+                  ])
+                  setIsConnectionsChanged(true)
+                }}
+              />
             </div>
-
-            <InputToggle
-              id={`enable_${item.val.id}`}
-              disabled={!item.val.linkable}
-              label={''}
-              checked={item.val.enabled}
-              onToggle={(val) => {
-                const index = connectedLinks.findIndex(
-                  (pl: any) => pl.id === item.val.id
-                )
-
-                // This just updates
-                // toggled connected link
-                // `enabled` property
-                // which is used in action
-                // to persist or not
-                setConnectedLinks([
-                  ...connectedLinks.slice(0, index),
-                  {
-                    ...connectedLinks[index],
-                    enabled: val,
-                  },
-                  ...connectedLinks.slice(index + 1),
-                ])
-              }}
-            />
-          </div>
-        )}
-        onItemsReordered={(items) => {
-          setConnectedLinks(items.map((i) => i.val))
-        }}
-      />
+          )}
+          onItemsReordered={(items) => {
+            setConnectedLinks(items.map((i) => i.val))
+            setIsConnectionsChanged(true)
+          }}
+        />
+      </fetcher.Form>
 
       <Text
         size="base"
