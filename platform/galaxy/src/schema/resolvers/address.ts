@@ -1,7 +1,7 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import ENSUtils from '@kubelt/platform-clients/ens-utils'
 import createAddressClient from '@kubelt/platform-clients/address'
-import { AddressURN } from '@kubelt/urns/address'
+import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
 import { AddressProfilesUnion, Resolvers } from './typedefs'
 import { hasApiKey, setupContext, isAuthorized } from './utils'
@@ -18,6 +18,7 @@ import {
   OAuthTwitterProfile,
 } from '@kubelt/platform.address/src/types'
 import { PlatformAddressURNHeader } from '@kubelt/types/headers'
+import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -73,9 +74,30 @@ const addressResolvers: Resolvers = {
     updateConnectedAddressesProperties: async (
       _parent: any,
       { addressURNList },
-      { env, jwt }: ResolverContext
+      { env, jwt, accountURN }: ResolverContext
     ) => {
       console.debug({ jwt, addressURNList })
+      const addressUrnEdges = addressURNList.map((a, i) => {
+        // use the address urn space to construct a new urn with qcomps
+        const parsed = AddressURNSpace.parse(a.addressURN).decoded
+        const fullAddressURN = AddressURNSpace.componentizedUrn(
+          parsed,
+          undefined,
+          {
+            hidden: new Boolean(!!a.public).toString(),
+            order: i.toString(),
+          }
+        )
+
+        return {
+          src: accountURN,
+          dst: fullAddressURN,
+          tag: EDGE_ADDRESS,
+        }
+      })
+
+      // const edgesClient = createAddressClient(env.Edges, {
+
       return true
     },
   },

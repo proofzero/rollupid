@@ -7,8 +7,9 @@ export type AddressRComp = {
 }
 
 export type AddressQComp = {
-  alias: string
+  alias?: string
   hidden?: string
+  order?: string
 }
 
 export type AddressURN = RollupIdURN<`address/${string}`>
