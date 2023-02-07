@@ -50,6 +50,7 @@ export const getOgImageMethod = async ({
         // Error logging and status responses.
         .catch((e) => {
           console.log(`failed to encode image ${url} as data URI`)
+          console.error(e)
         })
     )
   }
