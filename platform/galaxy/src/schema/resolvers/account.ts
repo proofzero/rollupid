@@ -337,7 +337,7 @@ const accountResolvers: Resolvers = {
       { env, jwt, accountURN }: ResolverContext
     ) => {
       console.log(
-        `galaxy.updateProfile: updating profile for account: ${accountURN}`
+        `galaxy.updateGallery: updating gallery for account: ${accountURN}`
       )
 
       const accountClient = createAccountClient(
@@ -357,21 +357,57 @@ const accountResolvers: Resolvers = {
         )
         .map((address) => address.qc.alias.toLowerCase())
 
+      console.log({ 'HERE IS WHERE IT STARTS': 'YES' })
+
       // GALLERY VALIDATION
       const { ethereumClient, polygonClient } = getAlchemyClients({ env })
 
-      const contractAddresses = gallery.map((nft) => nft.contract)
+      const [ethContractAddresses, polyContractAddresses] = gallery.reduce(
+        ([eth, poly], nft) => {
+          return nft.chain === 'eth'
+            ? [[...eth, nft.contract], poly]
+            : [eth, [...poly, nft.contract]]
+        },
+        [[] as string[], [] as string[]]
+      )
+
+      const validator = new Map()
 
       const nfts = await Promise.all(
         connectedAddresses.map((address) =>
           Promise.all([
-            ethereumClient.getNFTs({ owner: address, contractAddresses }),
-            ethereumClient.getNFTs({ owner: address, contractAddresses }),
+            ethereumClient.getNFTs({
+              owner: address,
+              contractAddresses: ethContractAddresses,
+            }),
+            polygonClient.getNFTs({
+              owner: address,
+              contractAddresses: polyContractAddresses,
+            }),
           ])
         )
       )
 
-      console.dir({ nfts: nfts.flat() })
+      nfts.flat().forEach((deeperNfts) => {
+        deeperNfts.ownedNfts.forEach((nft) => {
+          if (validator.has(nft.contract.address)) {
+            validator.set(nft.contract.address, [
+              ...validator.get(nft.contract.address),
+              nft.id.tokenId,
+            ])
+          } else {
+            validator.set(nft.contract.address, [nft.id.tokenId])
+          }
+        })
+      })
+
+      // nfts
+      //   .flat()
+      //   .forEach((internalNfts) =>
+      //     validator.set(internalNfts.ownedNfts.flat().contract.address)
+      //   )
+
+      // console.log({ owned: ownedNfts.flat() })
 
       // const owners: any = await Promise.all(
       //   gallery.map(async (token) => {
@@ -389,11 +425,11 @@ const accountResolvers: Resolvers = {
       //   })
       // )
 
-      // gallery = gallery.filter((nft, i) => {
-      //   return connectedAddresses.some((address) => {
-      //     return owners[i].includes(address)
-      //   })
-      // })
+      gallery = gallery.filter((nft, i) => {
+        return validator.get(nft.contract).includes(nft.tokenId)
+      })
+
+      console.log('FROM ACCOUNT:', { gallery })
 
       await accountClient.setGallery.mutate({
         name: accountURN,

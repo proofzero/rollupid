@@ -113,6 +113,13 @@ export class AlchemyClient {
     )
   }
 
+  getChain() {
+    return {
+      chain: this.#config.chain,
+      network: this.#config.network,
+    }
+  }
+
   constructor(config: AlchemyClientConfig) {
     if (!config || (!config.key && !config.token) || !config.network) {
       throw buildError(
@@ -212,42 +219,30 @@ export class AlchemyClient {
     const cacheKey = cacheKeyArray
       .map((b) => b.toString(16).padStart(2, '0'))
       .join('')
-    let result
-    try {
-      const response = await fetch(urlStr, {
-        cf: {
-          cacheTtl: 1500,
-          cacheEverything: true,
-          cacheKey,
-        },
-      })
-      if (response.status !== 200) {
-        const errorText = await response.text()
-        console.error(errorText)
-        throw buildError(
-          response.status,
-          `Error calling Alchemy getContractsForOwner: ${errorText}`
-        )
-      }
-
-      result = response.json()
-      result = await result
-      result['chain'] = {
-        chain: this.#config.chain,
-        network: this.#config.network,
-      }
-
-      console.log({ result })
-    } catch (ex) {
-      throw buildError(
-        ex.status,
-        `Error calling Alchemy getContractsForOwner: ${ex.message}`
-      )
-    }
-
-    return new Promise((resolve, reject) => {
-      resolve(result)
+    return fetch(urlStr, {
+      cf: {
+        cacheTtl: 1500,
+        cacheEverything: true,
+        cacheKey,
+      },
     })
+      .then(async (r) => {
+        if (r.status !== 200) {
+          const errorText = await r.text()
+          console.error(errorText)
+          throw buildError(
+            r.status,
+            `Error calling Alchemy getContractsForOwner: ${errorText}`
+          )
+        }
+        return r.json()
+      })
+      .catch((e) => {
+        throw buildError(
+          e.status,
+          `Error calling Alchemy getContractsForOwner: ${e.message}`
+        )
+      })
   }
 
   async getOwnersForToken(

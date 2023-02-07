@@ -5,12 +5,26 @@ import {
 import { getGalaxyClient } from './clients'
 import { getAccountProfile, getAddressProfile } from './profile'
 
-import { AddressURN } from '@kubelt/urns/address'
+import type { AddressURN } from '@kubelt/urns/address'
+import type { Nft } from '@kubelt/galaxy-client'
 /**
  * Nfts are being sorted server-side
  * this function then allows to merge client Nfts with newly-fetched Nfts
  * as two sorted arrays. In linear time
  */
+
+export type decoratedNft = {
+  url?: string
+  thumbnailUrl?: string
+  error: boolean
+  title?: Nft['title']
+  contract: Nft['contract']
+  tokenId?: string | null
+  chain: Nft['chain']
+  collectionTitle?: string | null
+  properties?: any[] | null
+  details: { name: string; value?: string | null; isCopyable: boolean }[]
+}
 
 export const mergeSortedNfts = (a: any, b: any) => {
   var sorted = [],
@@ -48,7 +62,7 @@ export const sortNftsFn = (a: any, b: any) => {
  * and get representable nfts for our routes
  */
 
-export const decorateNft = (nft: any) => {
+export const decorateNft = (nft: Nft): decoratedNft => {
   const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
   let error = false
   if (nft.error) {
@@ -66,12 +80,23 @@ export const decorateNft = (nft: any) => {
       value: nft.contractMetadata?.tokenType,
       isCopyable: false,
     },
+    {
+      name: 'Chain',
+      value: nft.chain?.chain,
+      isCopyable: false,
+    },
+    {
+      name: 'Network',
+      value: nft.chain?.network,
+      isCopyable: false,
+    },
   ]
   if (nft.id && nft.id.tokenId) {
     details.push({
       name: 'Token ID',
       value: BigInt(nft.id?.tokenId).toString(10),
       isCopyable: true,
+      // Chain:
     })
   }
 
@@ -82,6 +107,7 @@ export const decorateNft = (nft: any) => {
     title: nft.title,
     contract: nft.contract,
     tokenId: nft.id?.tokenId,
+    chain: nft.chain,
     collectionTitle: nft.contractMetadata?.name,
     properties: nft.metadata?.properties,
     details,
@@ -210,44 +236,47 @@ export const getGalleryWithMetadata = async (owner: string, jwt?: string) => {
     getAuthzHeaderConditionallyFromToken(jwt)
   )
 
-  const ownedNfts = metadata?.ownedNfts.map((nft) => {
-    const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
-    let error = false
-    if (nft.error) {
-      error = true
-    }
+  const ownedNfts: decoratedNft[] | undefined = metadata?.ownedNfts.map(
+    (nft) => {
+      const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
+      let error = false
+      if (nft.error) {
+        error = true
+      }
 
-    const details = [
-      {
-        name: 'NFT Contract',
-        value: nft.contract?.address,
-        isCopyable: true,
-      },
-      {
-        name: 'NFT Standard',
-        value: nft.contractMetadata?.tokenType,
-        isCopyable: false,
-      },
-    ]
-    if (nft.id && nft.id.tokenId) {
-      details.push({
-        name: 'Token ID',
-        value: BigInt(nft.id?.tokenId).toString(10),
-        isCopyable: true,
-      })
+      const details = [
+        {
+          name: 'NFT Contract',
+          value: nft.contract?.address,
+          isCopyable: true,
+        },
+        {
+          name: 'NFT Standard',
+          value: nft.contractMetadata?.tokenType,
+          isCopyable: false,
+        },
+      ]
+      if (nft.id && nft.id.tokenId) {
+        details.push({
+          name: 'Token ID',
+          value: BigInt(nft.id?.tokenId).toString(10),
+          isCopyable: true,
+        })
+      }
+      return {
+        url: gatewayFromIpfs(media?.raw),
+        thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
+        error: error,
+        title: nft.title,
+        tokenId: nft.id?.tokenId,
+        contract: nft.contract,
+        chain: nft.chain,
+        collectionTitle: nft.contractMetadata?.name,
+        properties: nft.metadata?.properties,
+        details,
+      }
     }
-    return {
-      url: gatewayFromIpfs(media?.raw),
-      thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
-      error: error,
-      title: nft.title,
-      tokenId: nft.id?.tokenId,
-      contract: nft.contract,
-      collectionTitle: nft.contractMetadata?.name,
-      properties: nft.metadata?.properties,
-      details,
-    }
-  })
+  )
 
   // Setup og tag data
   // check generate and return og image

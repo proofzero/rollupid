@@ -138,6 +138,7 @@ export default /* GraphQL */ `
   type Gallery {
     contract: String!
     tokenId: String!
+    chain: String!
   }
 
   input ContractInput {
@@ -164,6 +165,7 @@ export default /* GraphQL */ `
   input GalleryInput {
     contract: String!
     tokenId: String!
+    chain: String!
   }
 
   type Query {

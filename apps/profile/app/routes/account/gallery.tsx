@@ -48,6 +48,7 @@ import { generateHashedIDRef } from '@kubelt/urns/idref'
 import type { Node, Profile } from '@kubelt/galaxy-client'
 import { CryptoAddressType } from '@kubelt/types/address'
 import { getMoreNftsModal } from '~/helpers/nfts'
+import type { decoratedNft } from '~/helpers/nfts'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 export const action: ActionFunction = async ({ request }) => {
@@ -61,7 +62,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   const jwt = user.accessToken
 
-  let errors: any = {}
+  let errors = new Map()
 
   /**
    * This part mutates D1 table for gallery
@@ -70,44 +71,42 @@ export const action: ActionFunction = async ({ request }) => {
   if (!updatedGallery) {
     throw new Error('Gallery should not be empty')
   }
-  const nfts = JSON.parse(updatedGallery)
-
-  console.dir({ nfts, details: nfts.map((nft) => nft.details) })
+  const nfts: decoratedNft[] = JSON.parse(updatedGallery)
 
   // TODO: replace with zod?
-  nfts.forEach((nft: any) => {
+  nfts.forEach((nft) => {
     if (!nft.tokenId) {
-      errors[`tokenID`] = ['Nft should have token ID']
+      errors.set('tokenId', ['Nft should have token ID'])
     }
-    if (!nft.contract.address) {
-      errors[`contractAddress-${nft.tokenID}`] = [
+    if (!nft.contract?.address) {
+      errors.set(`contractAddress-${nft.tokenId}`, [
         'Nft should have contract address',
-      ]
+      ])
     }
-    if (!nft.network) {
-      errors[`network-${nft.tokenID}`] = ['Nft should have network']
+    if (!nft.chain?.network) {
+      errors.set(`network-${nft.tokenId}`, ['Nft should have network'])
     }
     if (!urn || urn.length === 0) {
-      errors[`${nft.contract.address}-${nft.tokenID}`] = [
+      errors.set(`${nft.contract?.address}-${nft.tokenId}`, [
         'URN should not be empty',
-      ]
+      ])
     }
 
     if (nft.error) {
-      errors[`${nft.contract.address}-${nft.tokenId}`] = nft.error
+      errors.set(`${nft.contract?.address}-${nft.tokenId}`, nft.error)
     }
   })
 
-  if (Object.keys(errors).length) {
+  if (errors.size) {
     return {
-      errors,
+      errors: Object.fromEntries(errors),
     }
   }
 
-  const gallery = nfts.map((nft: any, i: number) => ({
-    contract: nft.contract.address,
+  const gallery = nfts.map((nft: decoratedNft, i: number) => ({
+    contract: nft.contract?.address,
     tokenId: nft.tokenId,
-    // network: nft.network,
+    chain: nft.chain?.chain,
   }))
 
   const galaxyClient = await getGalaxyClient()

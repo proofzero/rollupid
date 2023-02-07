@@ -4,7 +4,8 @@ import { GraphQLYogaError } from '@graphql-yoga/common'
 import { AddressURN } from '@kubelt/urns/address'
 import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
 
-import { Resolvers } from './typedefs'
+import { Nft, NftContract, NftContracts, Resolvers } from './typedefs'
+import { Profile } from '@kubelt/platform.account/src/types'
 import Env from '../../env'
 import {
   AlchemyChain,
@@ -24,8 +25,6 @@ import {
   getConnectedAddresses,
   fetchContracts,
 } from './utils'
-
-import type { Nft, NftContract, NftContracts } from './typedefs'
 
 type ResolverContext = {
   env: Env
@@ -206,10 +205,25 @@ const nftsResolvers: Resolvers = {
       try {
         const { ethereumClient, polygonClient } = getAlchemyClients({ env })
 
-        const [ethNfts, polyNfts]: [Nft[], Nft[]] = await Promise.all([
+        let [ethNfts, polyNfts]: [Nft[], Nft[]] = await Promise.all([
           ethereumClient.getNFTMetadataBatch(input),
           polygonClient.getNFTMetadataBatch(input),
         ])
+
+        ethNfts = ethNfts.map((nft) => ({
+          ...nft,
+          chain: {
+            chain: AlchemyChain.ethereum,
+            network: env.ALCHEMY_ETH_NETWORK,
+          },
+        }))
+        polyNfts = polyNfts.map((nft) => ({
+          ...nft,
+          chain: {
+            chain: AlchemyChain.polygon,
+            network: env.ALCHEMY_POLYGON_NETWORK,
+          },
+        }))
 
         ownedNfts = ownedNfts.concat(ethNfts, polyNfts)
       } catch (ex) {
