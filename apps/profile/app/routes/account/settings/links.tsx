@@ -6,6 +6,7 @@ import {
   useOutletContext,
   useActionData,
   useLoaderData,
+  useFetcher,
 } from '@remix-run/react'
 
 import { requireJWT } from '~/utils/session.server'
@@ -329,10 +330,11 @@ export default function AccountSettingsLinks() {
 
   const transition = useTransition()
   const actionData = useActionData()
+  const fetcher = useFetcher()
 
   const { normalizedAddressProfiles } = useLoaderData()
 
-  const [links, setLinks] = useState<Link & { editing?: boolean }[]>(
+  const [links, setLinks] = useState<(Link & { editing?: boolean })[]>(
     profile.links || []
   )
 
@@ -402,15 +404,12 @@ export default function AccountSettingsLinks() {
                   },
                   ...connectedLinks.slice(index + 1),
                 ])
-
-                setFormChanged(true)
               }}
             />
           </div>
         )}
         onItemsReordered={(items) => {
           setConnectedLinks(items.map((i) => i.val))
-          setFormChanged(true)
         }}
       />
 
@@ -419,7 +418,7 @@ export default function AccountSettingsLinks() {
         weight="semibold"
         className="mt-[2.875rem] mb-[1.375rem]"
       >
-        Add links manually
+        Add custom links
       </Text>
       <Form
         method="post"
@@ -457,39 +456,25 @@ export default function AccountSettingsLinks() {
               }}
             />
           </div>
-          <input
-            type="hidden"
-            name="connected"
-            value={JSON.stringify(connectedLinks)}
-          />
-          <Button
-            type="button"
-            onClick={() => {
-              setLinks([
-                ...links,
-                { name: '', url: '', verified: false, editing: true },
-              ])
-            }}
-            btnType={'secondary'}
-            btnSize={'xl'}
-            className="right-0 !text-gray-600
+          <div className="flex flex-row">
+            <Button
+              type="button"
+              onClick={() => {
+                setLinks([
+                  ...links,
+                  { name: '', url: '', verified: false, editing: true },
+                ])
+              }}
+              btnType={'secondary'}
+              btnSize={'xl'}
+              className="right-0 !text-gray-600
             border-none mb-4 lg:mb-0 w-max text-left
             flex flew-row items-center justify-between"
-          >
-            <AiOutlinePlus size={22} className="mr-[11px]" /> Add Link
-          </Button>
-        </div>
-
-        {/* Form where this button is used should have 
-          an absolute relative position
-          div below has relative - this way this button sticks to 
-          bottom right
-
-          This div with h-[4rem] prevents everything from overlapping with
-          div with absolute position below  */}
-        <div className="h-[4rem]" />
-        <div className="absolute bottom-0 right-0">
-          <SaveButton isFormChanged={isFormChanged} discardFn={() => {}} />
+            >
+              <AiOutlinePlus size={22} className="mr-[11px]" /> Add Link
+            </Button>
+            <SaveButton isFormChanged={isFormChanged} discardFn={() => {}} />
+          </div>
         </div>
       </Form>
     </>
