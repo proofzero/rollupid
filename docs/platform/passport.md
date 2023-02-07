@@ -18,14 +18,15 @@ Once authenticated the user will the be redirected to the authorization screen.&
 
 Passport's authentication flow currently supports the following authentication methods and are configurable for your app [Console](console.md):
 
-* Connect with Wallet
-* Connect with Email (coming soon)
-* Connect with WebAuthN (coming soon)
-* Connect with Google
-* Connect with Apple
-* Connect with Twitter
-* Connect with Github
-* Connect with Microsoft
+- Connect with Wallet
+- Connect with Email (coming soon)
+- Connect with WebAuthN (coming soon)
+- Connect with Google
+- Connect with Apple
+- Connect with Twitter
+- Connect with Github
+- Connect with Microsoft
+- Connect with Discord
 
 #### Authorization
 
