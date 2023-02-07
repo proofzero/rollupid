@@ -110,6 +110,12 @@ export const ApplicationAuth = ({
                   id="oAuthAppId"
                   label="Application ID"
                   value={oAuth.appId}
+                  copyable
+                  onCopy={() =>
+                    toast.success('Application ID copied to clipboard!', {
+                      duration: 2000,
+                    })
+                  }
                   disabled
                 />
               </div>
