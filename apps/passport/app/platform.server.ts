@@ -4,17 +4,14 @@ import createAddressClient from '@kubelt/platform-clients/address'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 
 import { GraphQLClient } from 'graphql-request'
-import {
-  PlatformAddressURNHeader,
-  PlatformJWTAssertionHeader,
-} from '@kubelt/types/headers'
+import { PlatformAddressURNHeader } from '@kubelt/types/headers'
+import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 export function getStarbaseClient(jwt: string, env: Env) {
-  return createStarbaseClient(env.Starbase, {
-    headers: {
-      [PlatformJWTAssertionHeader]: jwt,
-    },
-  })
+  return createStarbaseClient(
+    env.Starbase,
+    getAuthzHeaderConditionallyFromToken(jwt)
+  )
 }
 
 export function getAccessClient(env: Env) {
@@ -22,12 +19,9 @@ export function getAccessClient(env: Env) {
 }
 
 export function getAddressClient(addressUrn: string, env: Env) {
-  const requestInit = {
-    headers: {
-      [PlatformAddressURNHeader]: addressUrn,
-    },
-  }
-  return createAddressClient(env.Address, requestInit)
+  return createAddressClient(env.Address, {
+    [PlatformAddressURNHeader]: addressUrn,
+  })
 }
 
 export async function getGalaxyClient() {

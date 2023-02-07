@@ -1,30 +1,22 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import { GraphQLYogaError } from '@graphql-yoga/common'
-import createAccountClient from '@kubelt/platform-clients/account'
 
-import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
-import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
+import { AddressURN } from '@kubelt/urns/address'
+import { AccountURNSpace } from '@kubelt/urns/account'
 
 import { Resolvers } from './typedefs'
-import { Profile } from '@kubelt/platform.account/src/types'
 import Env from '../../env'
 import {
   AlchemyChain,
-  AlchemyClient,
-  AlchemyClientConfig,
   NFTPropertyMapper,
 } from '../../../../../packages/alchemy-client'
 
 import { NodeType } from '@kubelt/types/address'
 
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
-
 import {
   hasApiKey,
   setupContext,
-  sliceIntoChunks,
   logAnalytics,
-  logNFTBatchAnalytics,
   getAllNfts,
   getAlchemyClients,
   nftBatchesFetcher,

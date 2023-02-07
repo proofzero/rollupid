@@ -19,10 +19,8 @@ import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { NodeType } from '@kubelt/types/address'
 import { Gallery, Links, Profile } from '@kubelt/platform.account/src/types'
 import { ResolverContext } from './common'
-import {
-  PlatformAddressURNHeader,
-  PlatformJWTAssertionHeader,
-} from '@kubelt/types/headers'
+import { PlatformAddressURNHeader } from '@kubelt/types/headers'
+import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 const accountResolvers: Resolvers = {
   Query: {
@@ -34,13 +32,7 @@ const accountResolvers: Resolvers = {
       console.log(`galaxy:profile: getting profile for account: ${accountURN}`)
       const accountClient = createAccountClient(
         env.Account,
-        jwt
-          ? {
-              headers: {
-                [PlatformJWTAssertionHeader]: jwt,
-              },
-            }
-          : {}
+        getAuthzHeaderConditionallyFromToken(jwt)
       )
       let accountProfile = await accountClient.getProfile.query({
         account: accountURN,
@@ -56,11 +48,10 @@ const accountResolvers: Resolvers = {
       { env, accountURN, jwt }: ResolverContext
     ) => {
       console.log(`galaxy:links: getting links for account: ${accountURN}`)
-      const accountClient = createAccountClient(env.Account, {
-        headers: {
-          [PlatformJWTAssertionHeader]: jwt,
-        },
-      })
+      const accountClient = createAccountClient(
+        env.Account,
+        getAuthzHeaderConditionallyFromToken(jwt)
+      )
       let links = await accountClient.getLinks.query({
         account: accountURN,
       })
@@ -76,13 +67,7 @@ const accountResolvers: Resolvers = {
       console.log(`galaxy:gallery: getting gallery for account: ${accountURN}`)
       const accountClient = createAccountClient(
         env.Account,
-        jwt
-          ? {
-              headers: {
-                [PlatformJWTAssertionHeader]: jwt,
-              },
-            }
-          : {}
+        getAuthzHeaderConditionallyFromToken(jwt)
       )
 
       let gallery = await accountClient.getGallery.query({
@@ -112,9 +97,7 @@ const accountResolvers: Resolvers = {
       { env, jwt }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
-        headers: {
-          [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
-        },
+        [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
       })
       const accountURN = await addressClient.getAccount.query()
 
@@ -129,13 +112,7 @@ const accountResolvers: Resolvers = {
       // get the account profile
       const accountClient = createAccountClient(
         env.Account,
-        jwt
-          ? {
-              headers: {
-                [PlatformJWTAssertionHeader]: jwt,
-              },
-            }
-          : {}
+        getAuthzHeaderConditionallyFromToken(jwt)
       )
 
       console.log("galaxy.profileFromAddress: getting account's profile")
@@ -174,9 +151,7 @@ const accountResolvers: Resolvers = {
       { env, jwt }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
-        headers: {
-          [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
-        },
+        [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
       })
       const accountURN = await addressClient.getAccount.query()
 
@@ -191,13 +166,7 @@ const accountResolvers: Resolvers = {
       // get the account profile
       const accountClient = createAccountClient(
         env.Account,
-        jwt
-          ? {
-              headers: {
-                [PlatformJWTAssertionHeader]: jwt,
-              },
-            }
-          : {}
+        getAuthzHeaderConditionallyFromToken(jwt)
       )
 
       console.log("galaxy.linksFromAddress: getting account's links")
@@ -215,9 +184,7 @@ const accountResolvers: Resolvers = {
       { env, jwt }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
-        headers: {
-          [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
-        },
+        [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
       })
       const accountURN = await addressClient.getAccount.query()
 
@@ -232,13 +199,7 @@ const accountResolvers: Resolvers = {
       // get the account profile
       const accountClient = createAccountClient(
         env.Account,
-        jwt
-          ? {
-              headers: {
-                [PlatformJWTAssertionHeader]: jwt,
-              },
-            }
-          : {}
+        getAuthzHeaderConditionallyFromToken(jwt)
       )
 
       console.log("galaxy.galleryFromAddress: getting account's gallery")
@@ -256,9 +217,7 @@ const accountResolvers: Resolvers = {
       { env, jwt }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
-        headers: {
-          [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
-        },
+        [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
       })
       const accountURN = await addressClient.getAccount.query()
 
@@ -293,11 +252,10 @@ const accountResolvers: Resolvers = {
         `galaxy.updateProfile: updating profile for account: ${accountURN}`
       )
 
-      const accountClient = createAccountClient(env.Account, {
-        headers: {
-          [PlatformJWTAssertionHeader]: jwt,
-        },
-      })
+      const accountClient = createAccountClient(
+        env.Account,
+        getAuthzHeaderConditionallyFromToken(jwt)
+      )
       let currentProfile = await accountClient.getProfile.query({
         account: accountURN,
       })
@@ -323,11 +281,10 @@ const accountResolvers: Resolvers = {
         `galaxy.updateProfile: updating profile for account: ${accountURN}`
       )
 
-      const accountClient = createAccountClient(env.Account, {
-        headers: {
-          [PlatformJWTAssertionHeader]: jwt,
-        },
-      })
+      const accountClient = createAccountClient(
+        env.Account,
+        getAuthzHeaderConditionallyFromToken(jwt)
+      )
 
       await accountClient.setLinks.mutate({
         name: accountURN,
@@ -345,11 +302,10 @@ const accountResolvers: Resolvers = {
         `galaxy.updateProfile: updating profile for account: ${accountURN}`
       )
 
-      const accountClient = createAccountClient(env.Account, {
-        headers: {
-          [PlatformJWTAssertionHeader]: jwt,
-        },
-      })
+      const accountClient = createAccountClient(
+        env.Account,
+        getAuthzHeaderConditionallyFromToken(jwt)
+      )
 
       const connectedAddresses = (
         (await getConnectedAddresses({

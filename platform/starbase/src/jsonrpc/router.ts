@@ -8,7 +8,7 @@ import {
   CreateAppOutputSchema,
 } from './methods/createApp'
 import {
-  JWTAssertionTokenFromHeader,
+  AuthorizationTokenFromHeader,
   ValidateJWT,
 } from '@kubelt/platform-middleware/jwt'
 import { deleteApp, DeleteAppInput } from './methods/deleteApp'
@@ -64,7 +64,7 @@ const t = initTRPC.context<Context>().create()
 
 export const appRouter = t.router({
   createApp: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
@@ -72,7 +72,7 @@ export const appRouter = t.router({
     .output(CreateAppOutputSchema)
     .mutation(createApp),
   deleteApp: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
@@ -80,7 +80,7 @@ export const appRouter = t.router({
     .input(DeleteAppInput)
     .mutation(deleteApp),
   updateApp: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
@@ -88,7 +88,7 @@ export const appRouter = t.router({
     .input(UpdateAppInput)
     .mutation(updateApp),
   getAppDetails: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
@@ -97,7 +97,7 @@ export const appRouter = t.router({
     .output(GetAppDetailsOutput)
     .query(getAppDetails),
   getAppProfile: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
@@ -106,7 +106,7 @@ export const appRouter = t.router({
     .output(GetAppProfileOutput)
     .query(getAppProfile),
   listApps: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
@@ -115,7 +115,7 @@ export const appRouter = t.router({
     .output(ListAppsOutput)
     .query(listApps),
   rotateClientSecret: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
@@ -124,7 +124,7 @@ export const appRouter = t.router({
     .output(RotateClientSecretOutput)
     .mutation(rotateClientSecret),
   rotateApiKey: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
@@ -145,7 +145,7 @@ export const appRouter = t.router({
     .output(GetAppPublicPropsOutput)
     .query(getAppPublicProps),
   publishApp: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)

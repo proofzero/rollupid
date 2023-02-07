@@ -24,7 +24,7 @@ import { getAddressesMethod } from './methods/getAddresses'
 
 import {
   ValidateJWT,
-  JWTAssertionTokenFromHeader,
+  AuthorizationTokenFromHeader,
 } from '@kubelt/platform-middleware/jwt'
 import { LogUsage } from '@kubelt/platform-middleware/log'
 import { Scopes } from '@kubelt/platform-middleware/scopes'
@@ -77,7 +77,7 @@ export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
 
 export const appRouter = t.router({
   getProfile: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(Scopes)
     .use(LogUsage)
     .use(Analytics)
@@ -85,7 +85,7 @@ export const appRouter = t.router({
     .output(GetProfileOutput)
     .query(getProfileMethod),
   setProfile: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(Scopes)
     .use(injectAccountNode)
@@ -94,7 +94,7 @@ export const appRouter = t.router({
     .input(SetProfileInput)
     .mutation(setProfileMethod),
   getLinks: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(Scopes)
     .use(LogUsage)
     .use(Analytics)
@@ -102,7 +102,7 @@ export const appRouter = t.router({
     .output(GetLinksOutput)
     .query(getLinksMethod),
   setLinks: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(Scopes)
     .use(injectAccountNode)
@@ -111,7 +111,7 @@ export const appRouter = t.router({
     .input(SetLinksInput)
     .mutation(setLinksMethod),
   getGallery: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(Scopes)
     .use(LogUsage)
     .use(Analytics)
@@ -119,7 +119,7 @@ export const appRouter = t.router({
     .output(GetGalleryOutput)
     .query(getGalleryMethod),
   setGallery: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(Scopes)
     .use(injectAccountNode)
@@ -128,7 +128,7 @@ export const appRouter = t.router({
     .input(SetGalleryInput)
     .mutation(setGalleryMethod),
   getAddresses: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(Scopes)
     .use(LogUsage)
     .use(Analytics)
@@ -136,7 +136,7 @@ export const appRouter = t.router({
     // .output(AddressListSchema)
     .query(getAddressesMethod),
   getOwnAddresses: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
@@ -151,7 +151,7 @@ export const appRouter = t.router({
     // .output(AddressListSchema)
     .query(getPublicAddressesMethod),
   hasAddresses: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
@@ -159,7 +159,7 @@ export const appRouter = t.router({
     .input(HasAddressesInput)
     .mutation(hasAddressesMethod),
   getSessions: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)

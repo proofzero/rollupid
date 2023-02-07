@@ -24,7 +24,6 @@ import { requireJWT } from '~/utilities/session.server'
 import { getGalaxyClient } from '~/utilities/platform.server'
 import { InfoPanelDashboard } from '~/components/InfoPanel/InfoPanelDashboard'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 type LoaderData = {
@@ -40,11 +39,10 @@ type LoaderData = {
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(Starbase, {
-    headers: {
-      [PlatformJWTAssertionHeader]: jwt,
-    },
-  })
+  const starbaseClient = createStarbaseClient(
+    Starbase,
+    getAuthzHeaderConditionallyFromToken(jwt)
+  )
 
   const galaxyClient = await getGalaxyClient()
   try {
