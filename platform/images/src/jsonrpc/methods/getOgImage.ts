@@ -5,7 +5,7 @@ import { svg2png, initialize } from 'svg2png-wasm'
 import { Context } from '../../context'
 
 export const getOgImageMethodInput = z.object({
-  bgUrl: z.string().url().or(z.literal("")),
+  bgUrl: z.string().url().or(z.literal('')),
   fgUrl: z.string().url(),
 })
 export type getOgImageParams = z.infer<typeof getOgImageMethodInput>
@@ -55,24 +55,7 @@ export const getOgImageMethod = async ({
     )
   }
 
-  let bg
-  // Check that it's indeed a defined string
-  try {
-    // TODO: This check should be done
-    // by zod schema
-    // but requires a product
-    // decision on how we handle
-    // empty covers
-
-    // Check that it's a URL
-    new URL(bgUrl as string)
-
-    bg = await encodeDataURI(bgUrl as string)
-  } catch (ex) {
-    console.log('bgUrl is not a URL')
-    console.error(ex)
-  }
-
+  const bg = bgUrl !== '' ? await encodeDataURI(bgUrl as string) : undefined
   const fg = await encodeDataURI(fgUrl)
 
   // console.log({ fgUrl, fg })
