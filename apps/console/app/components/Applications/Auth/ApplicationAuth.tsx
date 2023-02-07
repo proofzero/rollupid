@@ -110,6 +110,12 @@ export const ApplicationAuth = ({
                   id="oAuthAppId"
                   label="Application ID"
                   value={oAuth.appId}
+                  copyable
+                  onCopy={() =>
+                    toast.success('Application ID copied to clipboard!', {
+                      duration: 2000,
+                    })
+                  }
                   disabled
                 />
               </div>
@@ -163,7 +169,7 @@ export const ApplicationAuth = ({
                 id="published"
                 label="Published"
                 onToggle={() => {
-                  ;(setIsFormChanged as (val: boolean) => {})(true)
+                  ; (setIsFormChanged as (val: boolean) => {})(true)
                 }}
                 checked={formData.published}
               />
