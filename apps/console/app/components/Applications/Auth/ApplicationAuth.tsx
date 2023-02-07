@@ -169,7 +169,7 @@ export const ApplicationAuth = ({
                 id="published"
                 label="Published"
                 onToggle={() => {
-                  ; (setIsFormChanged as (val: boolean) => {})(true)
+                  ;(setIsFormChanged as (val: boolean) => {})(true)
                 }}
                 checked={formData.published}
               />
