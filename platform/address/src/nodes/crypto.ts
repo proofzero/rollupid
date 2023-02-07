@@ -1,6 +1,8 @@
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
+import type { Scope } from '@kubelt/types/access'
+
 import { NONCE_OPTIONS } from '../constants'
 import type { Challenge, CryptoAddressProfile } from '../types'
 import { recoverEthereumAddress } from '../utils'
@@ -20,7 +22,7 @@ export default class CryptoAddress {
     address: string,
     template: string,
     redirectUri: string,
-    scope: string[],
+    scope: Scope,
     state: string
   ): Promise<string> {
     const nonce = hexlify(randomBytes(NONCE_OPTIONS.length))

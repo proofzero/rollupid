@@ -1,7 +1,8 @@
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
+
+import { GrantType } from '@kubelt/types/access'
 import createAccessClient from '@kubelt/platform-clients/access'
-import { GrantType } from '@kubelt/platform.access/src/types'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()

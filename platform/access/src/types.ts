@@ -1,6 +1,8 @@
 import { KeyLike, JWK } from 'jose'
 
 import { DeploymentMetadata } from '@kubelt/types'
+import { Scope } from '@kubelt/types/access'
+
 import IdTokenProfileSchema from './jsonrpc/validators/IdTokenProfileSchema'
 import { z } from 'zod'
 
@@ -29,18 +31,6 @@ export type AuthorizationParameters = {
   scope: Scope
   timestamp: number
 }
-
-export enum GrantType {
-  AuthenticationCode = 'authentication_code', // validate and issue admin token from the account core
-  AuthorizationCode = 'authorization_code', // validate and issue access token from starbase app
-  RefreshToken = 'refresh_token', // valiate and refresh access token from starbase app
-}
-
-export enum ResponseType {
-  Code = 'code',
-}
-
-export type Scope = string[]
 
 export type AuthorizeResult = {
   code: string

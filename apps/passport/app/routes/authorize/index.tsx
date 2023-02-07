@@ -7,7 +7,7 @@ import {
   useTransition,
 } from '@remix-run/react'
 
-import { ResponseType } from '@kubelt/platform.access/src/types'
+import { ResponseType } from '@kubelt/types/access'
 
 import { getAccessClient, getStarbaseClient } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
