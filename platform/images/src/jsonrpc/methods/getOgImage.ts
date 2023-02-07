@@ -5,7 +5,7 @@ import { svg2png, initialize } from 'svg2png-wasm'
 import { Context } from '../../context'
 
 export const getOgImageMethodInput = z.object({
-  bgUrl: z.string().url().or(z.string()),
+  bgUrl: z.string().url().or(z.literal("")),
   fgUrl: z.string().url(),
 })
 export type getOgImageParams = z.infer<typeof getOgImageMethodInput>
