@@ -26,7 +26,6 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   )
 
   const grantType = GrantType.AuthenticationCode
-  const redirectUri = context.env.PASSPORT_REDIRECT_URL
   const clientId = params.address as string
 
   const accessClient = getAccessClient(context.env)
@@ -36,7 +35,6 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     .mutate({
       code,
       clientId,
-      redirectUri,
       grantType,
     })
     .catch((err) => {
