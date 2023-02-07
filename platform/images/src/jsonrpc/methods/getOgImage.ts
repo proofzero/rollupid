@@ -5,7 +5,7 @@ import { svg2png, initialize } from 'svg2png-wasm'
 import { Context } from '../../context'
 
 export const getOgImageMethodInput = z.object({
-  bgUrl: z.string().url(),
+  bgUrl: z.string().url().or(z.literal('')),
   fgUrl: z.string().url(),
 })
 export type getOgImageParams = z.infer<typeof getOgImageMethodInput>
@@ -55,7 +55,7 @@ export const getOgImageMethod = async ({
     )
   }
 
-  const bg = await encodeDataURI(bgUrl)
+  const bg = bgUrl !== '' ? await encodeDataURI(bgUrl as string) : undefined
   const fg = await encodeDataURI(fgUrl)
 
   // console.log({ fgUrl, fg })
@@ -80,7 +80,11 @@ export const getOgImageMethod = async ({
       <pattern id="hexagon" patternContentUnits="objectBoundingBox" width="1" height="1">
           <use xlink:href="#hexagonimage" transform="translate(-1.98598) scale(0.00233645)"/>
       </pattern>
-      <image id="backroundimage" width="64" height="64" xlink:href="${bg}"/>
+      ${
+        bg
+          ? '<image id="backroundimage" width="64" height="64" xlink:href="${bg}"/>'
+          : ''
+      }
       <image id="hexagonimage" width="2128" height="428" xlink:href="${fg}"/>
       </defs>
   </svg>`
