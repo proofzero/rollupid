@@ -145,15 +145,25 @@ export async function upsert(
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<EdgeRecord> {
-  const srcNode = await update.node(g, src)
+): Promise<void> {
+  const batchedStmnts: D1PreparedStatement[] = []
+  const parsedSrcNode = parseUrnForEdge(src)
+  const srcNodeStmts = update.node(g, parsedSrcNode)
   // TODO check for error
 
-  const dstNode = await update.node(g, dst)
+  const parsedDstNode = parseUrnForEdge(dst)
+  const dstNodeStmts = update.node(g, parsedDstNode)
   // TODO check for error
 
   // Return existing edge ID (if found) or new edge ID (if created).
-  return update.edge(g, srcNode.urn, dstNode.urn, tag)
+  const edgeStmt = update.edge(g, parsedSrcNode, parsedDstNode, tag)
+
+  batchedStmnts.concat(srcNodeStmts)
+  batchedStmnts.concat(dstNodeStmts)
+  batchedStmnts.push(edgeStmt)
+
+  await g.db.batch(batchedStmnts)
+  return
 }
 
 /**
@@ -169,14 +179,14 @@ export async function batchUpsert(
       tag: EdgeTag
     }
   ]
-): Promise<EdgeRecord> {
+): Promise<void> {
   const batchedStmnts: D1PreparedStatement[] = []
   edges.map((edge) => {
     const parsedSrcNode = parseUrnForEdge(edge.src)
     const srcNodeStmts = update.node(g, parsedSrcNode)
     // TODO check for error
 
-    const parsedDstNode = parseUrnForEdge(edge.src)
+    const parsedDstNode = parseUrnForEdge(edge.dst)
     const dstNodeStmts = update.node(g, parsedDstNode)
     // TODO check for error
 
@@ -190,7 +200,5 @@ export async function batchUpsert(
 
   await g.db.batch(batchedStmnts)
   // TODO check for error
-
-  // Return existing edge ID (if found) or new edge ID (if created).
-  return update.edge(g, srcNode.urn, dstNode.urn, tag)
+  return
 }

@@ -9,7 +9,7 @@ import { Edge } from '../../db/types'
 import { AnyURN } from '@kubelt/urns'
 import { EdgeURN } from '@kubelt/urns/edge'
 
-export const UpdateEdgeMethodInput = z.array(
+export const UpdateEdgesMethodInput = z.array(
   z.object({
     src: AnyURNInput,
     dst: AnyURNInput,
@@ -17,7 +17,7 @@ export const UpdateEdgeMethodInput = z.array(
   })
 )
 
-export const UpdateEdgeMethodOutput = z.object({
+export const UpdateEdgesMethodOutput = z.object({
   edges: z.array(
     z.object({
       src: AnyURNInput,
@@ -27,22 +27,17 @@ export const UpdateEdgeMethodOutput = z.object({
   ),
 })
 
-export type MakeEdgeParams = z.infer<typeof UpdateEdgeMethodInput>
+export type UpdateEdgesParams = z.infer<typeof UpdateEdgesMethodInput>
+export type UpdateEdhesResult = z.infer<typeof UpdateEdgesMethodOutput>
 
-export const updateEdgeMethod = async ({
+export const updateEdgesMethod = async ({
   input,
   ctx,
 }: {
-  input: MakeEdgeParams
+  input: UpdateEdgesParams
   ctx: Context
-}): Promise<{
-  edge: {
-    src: AnyURN
-    dst: AnyURN
-    tag: EdgeURN
-  }
-}> => {
-  const edge = await db.link(ctx.graph, input.src, input.dst, input.tag)
+}): Promise<UpdateEdhesResult> => {
+  const edges = await db.link(ctx.graph, input.src, input.dst, input.tag)
 
   console.log(
     `created edge ${edge.id}: ${edge.src} =[${edge.tag}]=> ${edge.dst}`
