@@ -371,6 +371,14 @@ const accountResolvers: Resolvers = {
         [[] as string[], [] as string[]]
       )
 
+      /** Struct of this map is like this:
+       {
+        contractAddress1: [all tokens that user own in this contract],
+        contractAddress2: [all tokens that user own in this contract],
+        ...
+        contractAddressN: [all tokens that user own in this contract],
+        } 
+      */
       const validator = new Map()
 
       const nfts = await Promise.all(
@@ -388,6 +396,10 @@ const accountResolvers: Resolvers = {
         )
       )
 
+      // .flat because previous Promise.all returns an array of arrays,
+      // we just need internal arrays of nfts. These internal arrays are arrays
+      // of objects with ownedNfts property
+      // These methods populate validator map to then check if the user owns nfts.
       nfts.flat().forEach((deeperNfts) => {
         deeperNfts.ownedNfts.forEach((nft) => {
           if (validator.has(nft.contract.address)) {
@@ -401,35 +413,9 @@ const accountResolvers: Resolvers = {
         })
       })
 
-      // nfts
-      //   .flat()
-      //   .forEach((internalNfts) =>
-      //     validator.set(internalNfts.ownedNfts.flat().contract.address)
-      //   )
-
-      // console.log({ owned: ownedNfts.flat() })
-
-      // const owners: any = await Promise.all(
-      //   gallery.map(async (token) => {
-      //     const [ethereumOwners, polygonOwners]: any = await Promise.all([
-      //       ethereumClient.getOwnersForToken({
-      //         tokenId: token.tokenId,
-      //         contractAddress: token.contract,
-      //       }),
-      //       polygonClient.getOwnersForToken({
-      //         tokenId: token.tokenId,
-      //         contractAddress: token.contract,
-      //       }),
-      //     ])
-      //     return ethereumOwners.owners.concat(polygonOwners.owners)
-      //   })
-      // )
-
       gallery = gallery.filter((nft, i) => {
         return validator.get(nft.contract).includes(nft.tokenId)
       })
-
-      console.log('FROM ACCOUNT:', { gallery })
 
       await accountClient.setGallery.mutate({
         name: accountURN,

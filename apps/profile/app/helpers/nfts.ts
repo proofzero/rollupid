@@ -13,6 +13,12 @@ import type { Nft } from '@kubelt/galaxy-client'
  * as two sorted arrays. In linear time
  */
 
+export const capitalizeFirstLetter = (string?: string) => {
+  return string ? string.charAt(0).toUpperCase() + string.slice(1) : null
+}
+
+export const createDetails = (nft: Nft) => {}
+
 export type decoratedNft = {
   url?: string
   thumbnailUrl?: string
@@ -82,12 +88,12 @@ export const decorateNft = (nft: Nft): decoratedNft => {
     },
     {
       name: 'Chain',
-      value: nft.chain?.chain,
+      value: capitalizeFirstLetter(nft.chain?.chain),
       isCopyable: false,
     },
     {
       name: 'Network',
-      value: nft.chain?.network,
+      value: capitalizeFirstLetter(nft.chain?.network),
       isCopyable: false,
     },
   ]
@@ -238,43 +244,7 @@ export const getGalleryWithMetadata = async (owner: string, jwt?: string) => {
 
   const ownedNfts: decoratedNft[] | undefined = metadata?.ownedNfts.map(
     (nft) => {
-      const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
-      let error = false
-      if (nft.error) {
-        error = true
-      }
-
-      const details = [
-        {
-          name: 'NFT Contract',
-          value: nft.contract?.address,
-          isCopyable: true,
-        },
-        {
-          name: 'NFT Standard',
-          value: nft.contractMetadata?.tokenType,
-          isCopyable: false,
-        },
-      ]
-      if (nft.id && nft.id.tokenId) {
-        details.push({
-          name: 'Token ID',
-          value: BigInt(nft.id?.tokenId).toString(10),
-          isCopyable: true,
-        })
-      }
-      return {
-        url: gatewayFromIpfs(media?.raw),
-        thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
-        error: error,
-        title: nft.title,
-        tokenId: nft.id?.tokenId,
-        contract: nft.contract,
-        chain: nft.chain,
-        collectionTitle: nft.contractMetadata?.name,
-        properties: nft.metadata?.properties,
-        details,
-      }
+      return decorateNft(nft as Nft)
     }
   )
 
