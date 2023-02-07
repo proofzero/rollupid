@@ -174,9 +174,6 @@ export const action: ActionFunction = async ({ request }) => {
 
   await galaxyClient.updateLinks(
     {
-      // Links get displayed parsed from this
-      // so order matters. In order to get connected
-      // links to be first; we add them first.
       links: updatedLinks,
     },
     getAuthzHeaderConditionallyFromToken(jwt)

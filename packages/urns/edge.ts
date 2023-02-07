@@ -4,7 +4,7 @@
  * Defines a URN space for edges in the database.
  */
 
-import type { BaseURN } from 'urns'
+import { BaseURN, parseURN } from 'urns'
 
 import { URNSpace } from 'urns'
 
@@ -35,3 +35,26 @@ export const EdgeSpace = new URNSpace('edge-tag', {
   }
   */
 })
+
+export const parseUrnForEdge = (urn: string) => {
+  const parsedURN = parseURN(urn)
+
+  // Insert node record into the "node" table.
+  const nid = parsedURN.nid
+  const nss = parsedURN.nss
+  const fc = parsedURN.fragment || ''
+  const qcomponent = parsedURN.qcomponent
+  const rcomponent = parsedURN.rcomponent
+
+  // We store the base URN as the unique node identifer.
+  const id = `urn:${nid}:${nss}`
+
+  return {
+    nid,
+    nss,
+    fc,
+    qcomponent,
+    rcomponent,
+    id,
+  }
+}
