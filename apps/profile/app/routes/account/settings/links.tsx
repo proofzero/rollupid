@@ -146,7 +146,7 @@ export const action: ActionFunction = async ({ request }) => {
    */
   const updatedLinks = formData['links'] as Link[]
 
-  console.log({ updatedLinks })
+  console.debug({ updatedLinks })
 
   // TODO: Add validation
 
@@ -179,24 +179,25 @@ export const action: ActionFunction = async ({ request }) => {
    * pass back-end schema validation
    */
 
-  const connectedAccounts: any = JSON.parse(formData.get('connected') as string)
-  const connectedAccountLinks = connectedAccounts
-    .filter((ca: any) => ca.enabled) // enabled gets changed by toggle
-    .map((ca: any) => ({
-      name: ca.title,
-      url: ca.address,
-      provider: ca.provider,
-      // Connected accounts
-      // so verified by other means
-      verified: true,
-    }))
+  // const connectedAccounts: any = JSON.parse(formData.get('connected') as string)
+  // const connectedAccountLinks = connectedAccounts
+  //   .filter((ca: any) => ca.enabled) // enabled gets changed by toggle
+  //   .map((ca: any) => ({
+  //     name: ca.title,
+  //     url: ca.address,
+  //     provider: ca.provider,
+  //     // Connected accounts
+  //     // so verified by other means
+  //     verified: true,
+  //   }))
 
   await galaxyClient.updateLinks(
     {
       // Links get displayed parsed from this
       // so order matters. In order to get connected
       // links to be first; we add them first.
-      links: connectedAccountLinks.concat(updatedLinks),
+      // links: connectedAccountLinks.concat(updatedLinks),
+      links: updatedLinks,
     },
     getAuthzHeaderConditionallyFromToken(jwt)
   )
@@ -280,7 +281,7 @@ const SortableLink = ({
         <InputText
           type="text"
           id={`${id}-name`}
-          name={`links[name]`}
+          name={`links[${id}][name]`}
           required={true}
           heading="Name"
           placeholder="My Website"
@@ -297,7 +298,7 @@ const SortableLink = ({
         <InputText
           type="url"
           id={`${id}-url`}
-          name={`links[url]`}
+          name={`links[${id}][url]`}
           required={true}
           heading="URL"
           defaultValue={urlInput}
