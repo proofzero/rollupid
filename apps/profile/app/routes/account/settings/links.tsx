@@ -207,20 +207,20 @@ export const action: ActionFunction = async ({ request }) => {
 
 const SortableLink = ({
   id,
-  link: { name, url },
+  link: { name, url, editing = false },
   error,
   setFormChanged,
 }: {
   id: string
-  link: Link
+  link: Link & { editing?: boolean }
   error: any
   setFormChanged: (value: boolean) => void
 }) => {
-  const [editing, setEditing] = useState(false)
+  const [isEditing, setEditing] = useState(editing)
   const [nameInput, setNameInput] = useState(name || '')
   const [urlInput, setUrlInput] = useState(url || '')
 
-  if (!editing) {
+  if (!isEditing) {
     return (
       <div className={`flex flex-row items-center w-full truncate`}>
         <input type="hidden" name={`links[${id}][name]`} value={nameInput} />
@@ -332,7 +332,9 @@ export default function AccountSettingsLinks() {
 
   const { normalizedAddressProfiles } = useLoaderData()
 
-  const [links, setLinks] = useState(profile.links || [])
+  const [links, setLinks] = useState<Link & { editing?: boolean }[]>(
+    profile.links || []
+  )
 
   const [connectedLinks, setConnectedLinks] = useState(
     normalizedAddressProfiles || []
@@ -463,7 +465,10 @@ export default function AccountSettingsLinks() {
           <Button
             type="button"
             onClick={() => {
-              setLinks([...links, { name: '', url: '', verified: false }])
+              setLinks([
+                ...links,
+                { name: '', url: '', verified: false, editing: true },
+              ])
             }}
             btnType={'secondary'}
             btnSize={'xl'}
