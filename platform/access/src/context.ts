@@ -1,5 +1,6 @@
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import createAccountClient from '@kubelt/platform-clients/account'
 import createEdgesClient from '@kubelt/platform-clients/edges'
 import { BaseContext, DeploymentMetadata } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
@@ -24,6 +25,8 @@ interface CreateInnerContextOptions
   Starbase: Fetcher
   starbaseClient?: ReturnType<typeof createStarbaseClient>
   EDGES: Fetcher
+  Account: Fetcher
+  accountClient?: ReturnType<typeof createAccountClient>
   // Added by InjectEdges middleware.
   edgesClient?: ReturnType<typeof createEdgesClient>
   // Added by ValidateJWT middleware.
@@ -40,8 +43,10 @@ interface CreateInnerContextOptions
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
   const starbaseClient = createStarbaseClient(opts.Starbase)
+  const accountClient = createAccountClient(opts.Account)
   return {
     starbaseClient,
+    accountClient,
     ...opts,
   }
 }

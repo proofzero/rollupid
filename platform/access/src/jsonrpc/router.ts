@@ -41,6 +41,11 @@ import {
 import { LogUsage } from '@kubelt/platform-middleware/log'
 
 import { Analytics } from '@kubelt/platform-middleware/analytics'
+import {
+  GetUserInfoInput,
+  getUserInfoMethod,
+  GetUserInfoOutput,
+} from './methods/getUserInfo'
 
 const t = initTRPC.context<Context>().create()
 
@@ -85,4 +90,10 @@ export const appRouter = t.router({
     .input(RevokeSessionMethodInput)
     .output(RevokeSessionMethodOutput)
     .query(revokeSessionMethod),
+  getUserInfo: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetUserInfoInput)
+    .output(GetUserInfoOutput)
+    .query(getUserInfoMethod),
 })

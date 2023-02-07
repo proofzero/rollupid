@@ -20,7 +20,7 @@ We have created a reference implementation using [Remix](https://remix.run/) and
 
 To begin the authentication flow you will need to redirect users to the [passport](../platform/passport.md) authorization endpoint and include the application id and a random state parameter in the query string so that it looks like this: `https://passport.rollup.id/authorize?client_id=<your app id>&state=<generated state>`
 
-Typically you would do this by redirecting users to an route in your application that redirects users to the above route.&#x20;
+Typically you would do this by redirecting users to a route in your application that redirects users to the above route.&#x20;
 
 {% hint style="info" %}
 We do allow custom CNAMEs of passport for PRO accounts.&#x20;
@@ -46,7 +46,7 @@ Your Redirect URL should be prepared to accept an exchange token and state param
 - **State:** this state should match the state you created for the user/client in step 1
 - **Redirect URL**: the redirect url set in your app in the [previous step](create-an-application.md).
 
-The state parameter should match the state you sent when you kicked off the auth flow in Step 1. This is a security measure in the auth protocol to prevent replay attacks. The exchange code is then sent with the **Application Secret** and the **grant type** to passports token endpoint in order to receive the access token and refresh token as base64 encoded signed JWT as well as a minimal user profile completing the flow.
+The state parameter should match the state you sent when you kicked off the auth flow in Step 1. This is a security measure in the auth protocol to prevent replay attacks. The exchange code is then sent with the **Application Secret** and the **grant type** to Passport's token endpoint in order to receive the access token and refresh token as base64 encoded signed JWT as well as a minimal user profile (encoded in an ID token) completing the flow.
 
 {% hint style="info" %}
 We use a javascript library called [jose](https://www.npmjs.com/package/jose) to encode and decode signed JWT. As a open standard there are libraries for all languages that do the same.
@@ -54,7 +54,7 @@ We use a javascript library called [jose](https://www.npmjs.com/package/jose) to
 
 {% swagger method="post" path="" baseUrl="https://passport.rollup.id/token" summary="Exchange access code for access token" expanded="true" %}
 {% swagger-description %}
-Exchange access code for access token and refresh token.
+Exchange access code for access token, refresh token and ID token.
 
 _(For more details visit the_ [_Passport API_](../platform/passport.md) _page)_
 {% endswagger-description %}
@@ -79,10 +79,8 @@ Application secret
 {
     access_token: "ey....",
     refresh_token: "ey....",
-    profile: {
-       id: "abc123",
-       displayName: "Bob"
-   }
+    token_type: 'Bearer',
+    id_token: "ey....",
 }
 ```
 
@@ -95,8 +93,18 @@ There are multiple ways to manage this refresh flow, [here](../../apps/profile/a
 
 If you ever find yourself with an expired refresh token you can consider this as the user being "logged out" and redirect them back to passport for login to repeat this flow.
 
+ID tokens are only supplied when the initial set of tokens is retrieved, and are not provided again during usage of refresh tokens. Use the `/userinfo` endpoint to retrieve fresh user details. The response, as well as what is encoded in the ID token, is shaped follows:
+
+```typescript
+{
+    name: string,
+    picture: string,
+    //...ID token encodes other claims as well
+}
+```
+
 {% hint style="info" %}
-Inside the profile object you will find a unique identifier called "id" which will be consistent across all logins. This id will always match the "sub" property inside the signed JWT.
+Inside the ID token object you will find a unique claim called `sub` which will be consistent across all logins. This will match the value of the `sub` claim in access and refresh tokens also.
 {% endhint %}
 
 Here is a [link](../../apps/profile/app/routes/auth/callback.tsx) to the reference implementation doing just this. With the access token you can make authorized requests to the [Profile Graph](../platform/profile-graph.md) for this user.
