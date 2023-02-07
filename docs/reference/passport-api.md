@@ -31,10 +31,8 @@ Application secret
 {
     access_token: string,
     refresh_token: string,
-    profile: {
-       id: string,
-       displayName: string
-   }
+    token_type: 'Bearer',
+    id_token: string
 }
 ```
 

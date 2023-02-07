@@ -11,15 +11,14 @@ durable_objects.bindings = [
 services = [
   { binding = "EDGES", service = "edges" },
   { binding = "Starbase", service = "starbase" },
+  { binding = "Account", service = "account" },
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalytics"  },
+  { binding = "Analytics", dataset = "PlatformAnalytics" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [dev]
 port = 9393
@@ -33,15 +32,14 @@ durable_objects.bindings = [
 services = [
   { binding = "EDGES", service = "edges-dev" },
   { binding = "Starbase", service = "starbase-dev" },
+  { binding = "Account", service = "account-dev" },
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.next]
 durable_objects.bindings = [
@@ -51,15 +49,14 @@ durable_objects.bindings = [
 services = [
   { binding = "EDGES", service = "edges-next" },
   { binding = "Starbase", service = "starbase-next" },
+  { binding = "Account", service = "account-next" },
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.current]
 durable_objects.bindings = [
@@ -69,15 +66,14 @@ durable_objects.bindings = [
 services = [
   { binding = "EDGES", service = "edges-current" },
   { binding = "Starbase", service = "starbase-current" },
+  { binding = "Account", service = "account-current" },
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [[migrations]]
 tag = "v0"

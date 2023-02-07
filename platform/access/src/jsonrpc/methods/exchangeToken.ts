@@ -10,6 +10,7 @@ import { initAuthorizationNodeByName, initAccessNodeByName } from '../../nodes'
 
 import { GrantType } from '../../types'
 import { tokenValidator } from '../validators/token'
+import getIdTokenProfileFromAccount from '../../utils/getIdTokenProfileFromAccount'
 
 export const ExchangeTokenMethodInput = z.discriminatedUnion('grantType', [
   z.object({
@@ -32,6 +33,7 @@ export const ExchangeTokenMethodInput = z.discriminatedUnion('grantType', [
 export const ExchangeTokenMethodOutput = z.object({
   accessToken: z.string(),
   refreshToken: z.string(),
+  idToken: z.string().optional(),
 })
 
 export type ExchangeTokenParams = z.infer<typeof ExchangeTokenMethodInput>
@@ -118,12 +120,15 @@ export const exchangeTokenMethod = async ({
     // create a new id but use it as the name
     const iss = ctx.Access.newUniqueId().toString()
 
+    const idTokenProfile = await getIdTokenProfileFromAccount(account, ctx)
+
     const accessNode = await initAccessNodeByName(iss, ctx.Access)
     const result = await accessNode.class.generate({
       iss,
       account,
       clientId,
       scope: scopes,
+      idTokenProfile,
     })
 
     // Create an edge between Account and Access nodes to record the
