@@ -19,8 +19,7 @@ export type Scalars = {
 
 export type AddressEdgeUpdateInput = {
   addressURN: Scalars['URN'];
-  order: Scalars['Int'];
-  public: Scalars['Boolean'];
+  public?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type AddressProfile = {

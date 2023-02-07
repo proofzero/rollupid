@@ -86,11 +86,7 @@ const addressResolvers: Resolvers = {
       { addressURNList },
       { env, jwt }: ResolverContext
     ) => {
-      const addressClient = createAddressClient(env.Address, {
-        headers: {
-          [PlatformJWTAssertionHeader]: jwt,
-        },
-      })
+      console.debug({ jwt, addressURNList })
       return true
     },
   },
@@ -130,6 +126,7 @@ const AddressResolverComposition = {
     hasApiKey(),
     isAuthorized(),
   ],
+  'Mutation.updateAddressEdges': [setupContext(), hasApiKey(), isAuthorized()],
 }
 
 export default composeResolvers(addressResolvers, AddressResolverComposition)

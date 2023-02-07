@@ -45,7 +45,7 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
   switch (ap.profile.__typename) {
     case 'CryptoAddressProfile':
       return {
-        id: ap.urn,
+        addressURN: ap.urn,
         // Some providers can be built on client side
         address: `https://etherscan.io/address/${ap.profile.address}`,
         title: ap.profile.displayName,
@@ -54,7 +54,7 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
       }
     case 'OAuthGoogleProfile':
       return {
-        id: ap.urn,
+        addressURN: ap.urn,
         // Some providers don't have an address
         // and are thus unlinkable
         address: '',
@@ -64,7 +64,7 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
       }
     case 'OAuthTwitterProfile':
       return {
-        id: ap.urn,
+        addressURN: ap.urn,
         address: `https://twitter.com/${profile.screen_name}`,
         title: 'Twitter',
         icon: ap.profile.profile_image_url_https,
@@ -72,7 +72,7 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
       }
     case 'OAuthGithubProfile':
       return {
-        id: ap.urn,
+        addressURN: ap.urn,
         // Some providers give us public
         // endpoints
         address: ap.profile.html_url,
@@ -82,7 +82,7 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
       }
     case 'OAuthMicrosoftProfile':
       return {
-        id: ap.urn,
+        addressURN: ap.urn,
         address: '',
         title: 'Microsoft',
         icon: imageFromAddressType(OAuthAddressType.Microsoft),
@@ -90,7 +90,7 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
       }
     case 'OAuthAppleProfile':
       return {
-        id: ap.urn,
+        addressURN: ap.urn,
         address: '',
         title: 'Apple',
         icon: imageFromAddressType(OAuthAddressType.Apple),
@@ -310,9 +310,17 @@ export default function AccountSettingsLinks() {
     profile.links || []
   )
 
-  const [connectedLinks, setConnectedLinks] = useState(
-    normalizedAddressProfiles || []
-  )
+  // TODO: make type for this
+  const [connectedLinks, setConnectedLinks] = useState<
+    {
+      addressURN: string
+      public?: boolean
+      address: string
+      title: string
+      icon: string
+      provider: string
+    }[]
+  >(normalizedAddressProfiles || [])
   const [isFormChanged, setFormChanged] = useState(false)
   const [isConnectionsChanged, setIsConnectionsChanged] = useState(false)
 
@@ -327,7 +335,13 @@ export default function AccountSettingsLinks() {
   useEffect(() => {
     if (isConnectionsChanged && normalizedAddressProfiles !== connectedLinks) {
       fetcher.submit(
-        { connections: JSON.stringify(connectedLinks) },
+        {
+          connections: JSON.stringify(
+            connectedLinks.map((l) => {
+              return { addressURN: l.addressURN, public: l.public || false }
+            })
+          ),
+        },
         {
           method: 'post',
           action: '/account/settings/connections/order',
@@ -351,7 +365,7 @@ export default function AccountSettingsLinks() {
       <fetcher.Form method="post" action="/account/settings/connections/order">
         <SortableList
           items={connectedLinks.map((l: any) => ({
-            key: `${l.id}`,
+            key: `${l.addressURN}`,
             val: l,
           }))}
           itemRenderer={(item) => (
@@ -371,12 +385,12 @@ export default function AccountSettingsLinks() {
               </div>
 
               <InputToggle
-                id={`enable_${item.val.id}`}
+                id={`enable_${item.val.addressURN}`}
                 label={''}
                 checked={item.val.public}
                 onToggle={(val) => {
                   const index = connectedLinks.findIndex(
-                    (pl: any) => pl.id === item.val.id
+                    (pl: any) => pl.addressURN === item.val.addressURN
                   )
 
                   // This just updates

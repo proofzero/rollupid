@@ -11,10 +11,18 @@ export const action: ActionFunction = async ({ request }) => {
 
   const connectionsText = formData.get('connections')
   const connections = JSON.parse(connectionsText as string) as {
-    id: AddressURN
+    addressURN: AddressURN
     public?: boolean
   }[]
   console.debug({ connections })
+
+  const galaxyClient = await getGalaxyClient()
+  await galaxyClient.updateAddressEdges(
+    {
+      addressURNList: connections,
+    },
+    getAuthzHeaderConditionallyFromToken(jwt)
+  )
 
   // const galaxyClient = await getGalaxyClient()
   // galaxyClient.updateAddressNickname(

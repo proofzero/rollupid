@@ -70,8 +70,7 @@ export default /* GraphQL */ `
 
   input AddressEdgeUpdateInput {
     addressURN: URN!
-    order: Int!
-    public: Boolean!
+    public: Boolean
   }
 
   type Query {
