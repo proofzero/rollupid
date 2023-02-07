@@ -31,9 +31,13 @@ export const action: ActionFunction = async ({ request, context }) => {
         code,
         grantType: GrantType.AuthorizationCode,
       })
-
-  return json({
+  const result = {
+    token_type: 'Bearer',
     access_token: tokens.accessToken,
     refresh_token: tokens.refreshToken,
-  })
+  }
+
+  if (tokens.idToken) Object.assign(result, { id_token: tokens.idToken })
+
+  return json(result)
 }

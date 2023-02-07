@@ -15,6 +15,7 @@ import { JWT_OPTIONS } from '../constants'
 
 import {
   ExchangeTokenResult,
+  IdTokenProfile,
   KeyPair,
   KeyPairSerialized,
   SessionDetails,
@@ -34,6 +35,7 @@ export default class Access extends DOProxy {
     account: AccountURN
     clientId: string
     scope: any
+    idTokenProfile?: IdTokenProfile
   }): Promise<ExchangeTokenResult> {
     let [account, clientId, scope] = await Promise.all([
       this.state.storage.get<AccountURN>('account'),
@@ -44,7 +46,16 @@ export default class Access extends DOProxy {
     account ||= params.account
     clientId ||= params.clientId
     scope ||= params.scope
-    return generate(params.iss, account, clientId, scope, this.state.storage)
+    const idTokenProfile = params.idTokenProfile
+
+    return generate(
+      params.iss,
+      account,
+      clientId,
+      scope,
+      this.state.storage,
+      idTokenProfile
+    )
   }
 
   async verify(token: string): Promise<JWTVerifyResult> {
@@ -119,7 +130,8 @@ const generate = async (
   account: AccountURN,
   clientId: string,
   scope: any,
-  storage: DurableObjectStorage
+  storage: DurableObjectStorage,
+  idTokenProfile?: IdTokenProfile
 ) => {
   await storage.put({
     account,
@@ -151,11 +163,13 @@ const generate = async (
   // JWT expiry time is in *seconds* since the epoch.
   const expirationTime = Math.floor((expiryTimeMs * 1000) / 1000)
 
+  const currentTime = Date.now()
   const accessToken = await new SignJWT({ client_id: clientId, scope })
     .setProtectedHeader({ alg })
     .setExpirationTime(expirationTime)
-    .setIssuedAt()
+    .setIssuedAt(currentTime)
     .setIssuer(objectId)
+    .setAudience(clientId)
     .setJti(hexlify(randomBytes(JWT_OPTIONS.jti.length)))
     .setSubject(account)
     .sign(key)
@@ -163,10 +177,28 @@ const generate = async (
   const refreshToken = await new SignJWT({})
     .setProtectedHeader({ alg })
     .setExpirationTime(refreshTimeMs)
-    .setIssuedAt()
+    .setIssuedAt(currentTime)
+    .setAudience(clientId)
     .setIssuer(objectId)
     .setSubject(account)
     .sign(key)
+
+  const result = {
+    accessToken,
+    refreshToken,
+  }
+
+  //Conditionally add the ID token to the result, if it's set
+  if (idTokenProfile) {
+    const idToken = await new SignJWT(idTokenProfile)
+      .setProtectedHeader({ alg })
+      .setExpirationTime(expirationTime)
+      .setAudience(clientId)
+      .setIssuedAt(currentTime)
+      .setIssuer(objectId)
+      .sign(key)
+    Object.assign(result, { idToken })
+  }
 
   // Schedule an alarm that executes after this session expires in order
   // to delete the session state and perform other cleanup. Note that
@@ -176,10 +208,7 @@ const generate = async (
   // Accepts Date or ms since epoch.
   storage.setAlarm(ms)
 
-  return {
-    accessToken,
-    refreshToken,
-  }
+  return result
 }
 
 const verify = async (token: string, storage: DurableObjectStorage) => {

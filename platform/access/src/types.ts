@@ -1,6 +1,8 @@
 import { KeyLike, JWK } from 'jose'
 
 import { DeploymentMetadata } from '@kubelt/types'
+import IdTokenProfileSchema from './jsonrpc/validators/IdTokenProfileSchema'
+import { z } from 'zod'
 
 export interface KeyPair {
   publicKey: KeyLike | Uint8Array
@@ -19,6 +21,7 @@ export interface Environment {
   ServiceDeploymentMetadata: DeploymentMetadata
   EDGES: Fetcher
   Starbase: Fetcher
+  Account: Fetcher
 }
 
 export type AuthorizationParameters = {
@@ -55,3 +58,5 @@ export type SessionDetails = {
   expiry?: string
   expiryTime?: number
 }
+
+export type IdTokenProfile = z.infer<typeof IdTokenProfileSchema>

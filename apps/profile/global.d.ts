@@ -24,6 +24,7 @@ declare global {
     extraParams: {
       scopes?: [string]
       redirect_uri?: string
+      id_token?: string
     }
   }
 }
