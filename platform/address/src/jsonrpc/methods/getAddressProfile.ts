@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { string, z } from 'zod'
 
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 
@@ -18,29 +18,36 @@ import GoogleAddress from '../../nodes/google'
 import TwitterAddress from '../../nodes/twitter'
 import MicrosoftAddress from '../../nodes/microsoft'
 import AppleAddress from '../../nodes/apple'
+import { AddressURNInput } from '@kubelt/platform-middleware/inputValidators'
 
 export const GetAddressProfileOutput = z.discriminatedUnion('type', [
   z.object({
+    urn: AddressURNInput,
     profile: CryptoAddressProfileSchema,
     type: z.literal(CryptoAddressType.ETH),
   }),
   z.object({
+    urn: AddressURNInput,
     profile: GithubRawProfileSubsetSchema,
     type: z.literal(OAuthAddressType.GitHub),
   }),
   z.object({
+    urn: AddressURNInput,
     profile: TwitterProfileSchema,
     type: z.literal(OAuthAddressType.Twitter),
   }),
   z.object({
+    urn: AddressURNInput,
     profile: GoogleRawProfileSchema,
     type: z.literal(OAuthAddressType.Google),
   }),
   z.object({
+    urn: AddressURNInput,
     profile: MicrosoftRawProfileSchema,
     type: z.literal(OAuthAddressType.Microsoft),
   }),
   z.object({
+    urn: AddressURNInput,
     profile: AppleProfileSchema,
     type: z.literal(OAuthAddressType.Apple),
   }),
@@ -65,6 +72,8 @@ export const getAddressProfileMethod = async ({
     throw new Error('missing address or type')
   }
 
+  if (!ctx.addressURN) throw new Error('missing addressURN')
+
   //TODO: update the oauth node type to fetch profile from provider
 
   switch (type) {
@@ -72,6 +81,7 @@ export const getAddressProfileMethod = async ({
       const cryptoNode = new CryptoAddress(nodeClient)
       const profile = await cryptoNode.getProfile()
       return {
+        urn: ctx.addressURN,
         type: CryptoAddressType.ETH,
         profile,
       }
@@ -80,6 +90,7 @@ export const getAddressProfileMethod = async ({
       const oAuthNode = new GithubAddress(nodeClient)
       const profile = await oAuthNode.getProfile()
       return {
+        urn: ctx.addressURN,
         type: OAuthAddressType.GitHub,
         profile,
       }
@@ -88,6 +99,7 @@ export const getAddressProfileMethod = async ({
       const oAuthNode = new TwitterAddress(nodeClient)
       const profile = await oAuthNode.getProfile()
       return {
+        urn: ctx.addressURN,
         type: OAuthAddressType.Twitter,
         profile,
       }
@@ -96,6 +108,7 @@ export const getAddressProfileMethod = async ({
       const oAuthNode = new GoogleAddress(nodeClient, ctx)
       const profile = await oAuthNode.getProfile()
       return {
+        urn: ctx.addressURN,
         type: OAuthAddressType.Google,
         profile,
       }
@@ -104,6 +117,7 @@ export const getAddressProfileMethod = async ({
       const oAuthNode = new MicrosoftAddress(nodeClient, ctx)
       const profile = await oAuthNode.getProfile()
       return {
+        urn: ctx.addressURN,
         type: OAuthAddressType.Microsoft,
         profile,
       }
@@ -112,6 +126,7 @@ export const getAddressProfileMethod = async ({
       const oAuthNode = new AppleAddress(nodeClient, ctx)
       const profile = await oAuthNode.getProfile()
       return {
+        urn: ctx.addressURN,
         type: OAuthAddressType.Apple,
         profile,
       }

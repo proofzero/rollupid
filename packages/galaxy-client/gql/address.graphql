@@ -1,6 +1,7 @@
 query getAddressProfile($addressURN: URN!) {
   addressProfile(addressURN: $addressURN) {
     type
+    urn
     profile {
       __typename
       ... on CryptoAddressProfile {
@@ -21,9 +22,15 @@ query getAddressProfile($addressURN: URN!) {
       }
 
       ... on OAuthGithubProfile {
+        id
         name
         avatar_url
         html_url
+        followers
+        following
+        login
+        public_gists
+        public_repos
       }
 
       ... on OAuthMicrosoftProfile {
@@ -42,6 +49,7 @@ query getAddressProfile($addressURN: URN!) {
 query getAddressProfiles($addressURNList: [URN!]) {
   addressProfiles(addressURNList: $addressURNList) {
     type
+    urn
     profile {
       __typename
       ... on CryptoAddressProfile {
@@ -62,9 +70,15 @@ query getAddressProfiles($addressURNList: [URN!]) {
       }
 
       ... on OAuthGithubProfile {
+        id
         name
         avatar_url
         html_url
+        followers
+        following
+        login
+        public_gists
+        public_repos
       }
 
       ... on OAuthMicrosoftProfile {
@@ -82,4 +96,10 @@ query getAddressProfiles($addressURNList: [URN!]) {
 
 mutation updateAddressNickname($addressURN: URN!, $nickname: String!) {
   updateAddressNickname(addressURN: $addressURN, nickname: $nickname)
+}
+
+mutation updateConnectedAddressesProperties(
+  $addressURNList: [ConnectedAddressPropertiesUpdateInput!]!
+) {
+  updateConnectedAddressesProperties(addressURNList: $addressURNList)
 }

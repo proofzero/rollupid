@@ -114,14 +114,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         }
       })
 
-    const finalProfile = {
-      ...newProfile,
-      defaultAddress: defaultProfileURN,
-    }
-
     // set the default profile
     await galaxyClient.updateProfile(
-      { profile: finalProfile },
+      { profile: newProfile },
       getAuthzHeaderConditionallyFromToken(jwt)
     )
   }

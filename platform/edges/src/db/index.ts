@@ -7,6 +7,7 @@
 import * as insert from './insert'
 import * as remove from './remove'
 import * as select from './select'
+import * as update from './update'
 
 // Imported Types
 // -----------------------------------------------------------------------------
@@ -136,4 +137,30 @@ export async function unlink(
   tag: EdgeTag
 ): Promise<number> {
   return remove.edge(g, src, dst, tag)
+}
+
+/**
+ * Update a link between two nodes.
+ *
+ * @param g - the graph handle returned from init()
+ * @param src - the ID of the source node
+ * @param dst - the ID of the destination node
+ * @param tag - a tag representing the edge type
+ *
+ * @returns the ID of the created edge, or -1 on error
+ */
+export async function upsert(
+  g: Graph,
+  src: AnyURN,
+  dst: AnyURN,
+  tag: EdgeTag
+): Promise<EdgeRecord> {
+  const srcNode = await update.node(g, src)
+  // TODO check for error
+
+  const dstNode = await update.node(g, dst)
+  // TODO check for error
+
+  // Return existing edge ID (if found) or new edge ID (if created).
+  return update.edge(g, srcNode.urn, dstNode.urn, tag)
 }

@@ -4,7 +4,7 @@ const SaveButton = ({ isFormChanged, discardFn, size = 'xl' }: any) => {
   return (
     <>
       {isFormChanged ? (
-        <div className="flex lg:justify-end">
+        <div className="flex grow lg:justify-end">
           <div className="pr-2">
             <Button
               type="reset"
@@ -26,7 +26,7 @@ const SaveButton = ({ isFormChanged, discardFn, size = 'xl' }: any) => {
           </Button>
         </div>
       ) : (
-        <div className="flex lg:justify-end">
+        <div className="flex grow lg:justify-end">
           <Button
             isSubmit
             btnType={'primary'}

@@ -17,14 +17,4 @@ declare global {
   const Galaxy: Fetcher
   const Address: Fetcher
   const Images: Fetcher
-
-  type RollupAuth = {
-    accessToken: string
-    refreshToken: string
-    extraParams: {
-      scopes?: [string]
-      redirect_uri?: string
-      id_token?: string
-    }
-  }
 }

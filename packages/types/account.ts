@@ -7,5 +7,4 @@ export type AccountProfile = {
     image: string
     isToken?: boolean
   }
-  defaultAddress?: AddressURN
 }

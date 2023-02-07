@@ -3,13 +3,12 @@ import ENSUtils from '@kubelt/platform-clients/ens-utils'
 import createAddressClient from '@kubelt/platform-clients/address'
 import { AddressURN } from '@kubelt/urns/address'
 
-import { Resolvers } from './typedefs'
+import { AddressProfilesUnion, Resolvers } from './typedefs'
 import { hasApiKey, setupContext, logAnalytics, isAuthorized } from './utils'
 
 import { ResolverContext } from './common'
 
 import {
-  AddressProfiles,
   CryptoAddressProfile,
   OAuthAppleProfile,
   OAuthGithubProfile,
@@ -17,10 +16,7 @@ import {
   OAuthMicrosoftProfile,
   OAuthTwitterProfile,
 } from '@kubelt/platform.address/src/types'
-import {
-  PlatformAddressURNHeader,
-  PlatformJWTAssertionHeader,
-} from '@kubelt/types/headers'
+import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -58,7 +54,7 @@ const addressResolvers: Resolvers = {
           return addressClient.getAddressProfile.query()
         })
       )
-
+      console.debug({ eth: profiles[0].profile, gh: profiles[1].profile })
       return profiles
     },
   },
@@ -80,9 +76,18 @@ const addressResolvers: Resolvers = {
 
       return true
     },
+    updateConnectedAddressesProperties: async (
+      _parent: any,
+      { addressURNList },
+      { env, jwt }: ResolverContext
+    ) => {
+      console.debug({ jwt, addressURNList })
+      return true
+    },
   },
-  AddressProfiles: {
-    __resolveType: (obj: AddressProfiles) => {
+
+  AddressProfilesUnion: {
+    __resolveType: (obj: AddressProfilesUnion) => {
       if ((obj as CryptoAddressProfile).isCrypto) {
         return 'CryptoAddressProfile'
       }
@@ -112,6 +117,11 @@ const AddressResolverComposition = {
   'Query.addressProfile': [setupContext(), hasApiKey()],
   'Query.addressProfiles': [setupContext(), hasApiKey()],
   'Mutation.updateAddressNickname': [
+    setupContext(),
+    hasApiKey(),
+    isAuthorized(),
+  ],
+  'Mutation.updateConnectedAddressesProperties': [
     setupContext(),
     hasApiKey(),
     isAuthorized(),

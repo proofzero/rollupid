@@ -3,6 +3,7 @@ import { Authenticator } from 'remix-auth'
 import { OAuth2Strategy, OAuth2Profile } from 'remix-auth-oauth2'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
+import { RollupAuth } from '~/types'
 
 // @ts-ignore
 const sessionSecret = SECRET_SESSION_SALT

@@ -6,44 +6,44 @@ export default /* GraphQL */ `
   }
 
   type OAuthGoogleProfile {
-    sub: String!
+    sub: String
     name: String
-    given_name: String!
-    family_name: String!
+    given_name: String
+    family_name: String
     picture: String!
-    email: String!
-    email_verified: Boolean!
-    locale: String!
+    email: String
+    email_verified: Boolean
+    locale: String
   }
 
   type OAuthGithubProfile {
-    loign: String!
-    id: Int!
+    login: String!
+    id: Int
     avatar_url: String!
-    html_url: String!
+    html_url: String
     name: String
     email: String
     bio: Boolean
     location: String
-    followers: Int!
-    following: Int!
-    public_repos: Int!
-    public_gists: Int!
+    followers: Int
+    following: Int
+    public_repos: Int
+    public_gists: Int
   }
 
   type OAuthTwitterProfile {
-    id: Int!
+    id: Int
     name: String
     screen_name: String!
     profile_image_url_https: String!
   }
 
   type OAuthMicrosoftProfile {
-    sub: String!
+    sub: String
     name: String
-    given_name: String!
-    family_name: String!
-    email: String!
+    given_name: String
+    family_name: String
+    email: String
     picture: String!
   }
 
@@ -54,7 +54,7 @@ export default /* GraphQL */ `
     sub: String
   }
 
-  union AddressProfiles =
+  union AddressProfilesUnion =
       CryptoAddressProfile
     | OAuthGoogleProfile
     | OAuthGithubProfile
@@ -63,17 +63,26 @@ export default /* GraphQL */ `
     | OAuthAppleProfile
 
   type AddressProfile {
+    urn: URN!
     type: String!
-    profile: AddressProfiles!
+    profile: AddressProfilesUnion!
+  }
+
+  input ConnectedAddressPropertiesUpdateInput {
+    addressURN: URN!
+    public: Boolean
   }
 
   type Query {
-    ensProfile(addressOrEns: String!): CryptoAddressProfile
-    addressProfile(addressURN: URN!): AddressProfile
-    addressProfiles(addressURNList: [URN!]): [AddressProfile]
+    ensProfile(addressOrEns: String!): CryptoAddressProfile!
+    addressProfile(addressURN: URN!): AddressProfile!
+    addressProfiles(addressURNList: [URN!]): [AddressProfile!]!
   }
 
   type Mutation {
     updateAddressNickname(addressURN: URN!, nickname: String!): Boolean
+    updateConnectedAddressesProperties(
+      addressURNList: [ConnectedAddressPropertiesUpdateInput!]!
+    ): Boolean
   }
 `

@@ -43,6 +43,7 @@ import { getRedirectUrlForProfile } from './utils/redirects.server'
 import { parseJwt } from './utils/session.server'
 import { getAccountProfile } from './helpers/profile'
 import { AccountURNSpace } from '@kubelt/urns/account'
+import { FullProfile } from './types'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -80,7 +81,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const user = session.get('user')
 
   let basePath = undefined
-  let loggedInUserProfile
+  let loggedInUserProfile: FullProfile | undefined
   let accountURN
 
   if (user) {
@@ -125,7 +126,7 @@ export default function App() {
       INTERNAL_GOOGLE_ANALYTICS_TAG: string
       CONSOLE_APP_URL: string
     }
-    loggedInUserProfile: any
+    loggedInUserProfile: FullProfile | undefined
     basePath: string | undefined
     accountURN: string
   }>()
