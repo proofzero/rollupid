@@ -37,10 +37,7 @@ export const action: ActionFunction = async ({ request }) => {
   return redirect(`${request.url}?${searchParams}`)
 }
 
-export const loader: LoaderFunction = async ({
-  request,
-  context,
-}) => {
+export const loader: LoaderFunction = async ({ request, context }) => {
   const appData = await getConsoleParamsSession(request, context.env)
     .then((session) => JSON.parse(session.get('params')))
     .catch((err) => {
@@ -112,3 +109,5 @@ const getUser = (request: Request): AppleUser | undefined => {
     }
   }
 }
+
+export default () => {}

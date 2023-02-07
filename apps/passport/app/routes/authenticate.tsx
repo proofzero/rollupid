@@ -5,6 +5,9 @@ import { Suspense } from 'react'
 import { getUserSession } from '~/session.server'
 
 import React from 'react'
+import { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
+import { useCatch } from '@remix-run/react'
+import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
@@ -41,6 +44,16 @@ export default function Index() {
           <LazyAuth />
         </Suspense>
       </div>
+    </div>
+  )
+}
+
+export const CatchBoundary: CatchBoundaryComponent = () => {
+  const caught = useCatch()
+
+  return (
+    <div className="min-h-[100dvh] flex flex-col justify-center">
+      <ErrorPage code={'' + caught.status} message={caught.data.message} />
     </div>
   )
 }
