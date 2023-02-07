@@ -1,60 +1,32 @@
-import { useOutletContext } from '@remix-run/react'
-import { FaDiscord, FaTwitter } from 'react-icons/fa'
+import { Link, useOutletContext } from '@remix-run/react'
 
-import FAQ from '~/components/FAQ'
-
-import stepComplete from '~/assets/step_complete.png'
-import stepSoon from '~/assets/step_soon.png'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
 import Heading from '~/components/typography/Heading'
 import SectionTitle from '~/components/typography/SectionTitle'
-import SectionHeading from '~/components/typography/SectionHeading'
-import SectionHeadingSubtle from '~/components/typography/SectionHeadingSubtle'
+
 import type { Profile } from '@kubelt/galaxy-client'
+import { useState } from 'react'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
-const completeSteps = [
-  {
-    title: 'Configure Profile',
-    isCompleted: false,
-    description: (
-      <>
-        <Text className="mb-1 text-gray-400" size="sm" weight="normal">
-          Configure your NFT avatar and profile.
-        </Text>
-        <a href="/account/settings">Click here to complete.</a>
-      </>
-    ),
-  },
-]
-
-const comingNext = [
-  {
-    title: 'Link More Accounts',
-    description: (
-      <>
-        <Text className="mb-1 text-gray-400" size="sm" weight="normal">
-          Connect more blockchain and social accounts to your Rollup.
-        </Text>
-      </>
-    ),
-  },
-]
+import dashboardChart from '~/assets/dashboard_chart.svg'
+import { normalizeProfileToLinks } from '~/helpers'
 
 export default function Welcome() {
-  const { profile } = useOutletContext<{ profile: Profile }>()
+  const { profile, addressProfiles } = useOutletContext<{
+    profile: Profile
+    addressProfiles: any[]
+  }>()
 
-  completeSteps[0].isCompleted = Object.keys(profile || {}).length > 1
+  const normalizedProfiles = addressProfiles
+    .map((p) => ({ urn: p.urn, ...p?.profile }))
+    .map(normalizeProfileToLinks)
 
-  const percentage =
-    (completeSteps.filter((step) => step.isCompleted).length /
-      (completeSteps.length + comingNext.length)) *
-    100
+  const [showGetStarted, setShowGetStarted] = useState(true)
 
   return (
     <div className="dashboard flex flex-col gap-4">
       <div
-        className="welcome-banner basis-full"
+        className="welcome-banner basis-full rounded-lg"
         style={{
           backgroundColor: '#F9FAFB',
           padding: '30px 30px 23px 16px',
@@ -72,103 +44,151 @@ export default function Welcome() {
         <Text
           weight="normal"
           size="base"
-          className="mb-6 text-center lg:text-left text-gray-500"
+          className="text-center lg:text-left text-gray-500"
         >
-          Welcome to the Profile app. We are currently in beta and will be unlocking
-          new features often. Follow us on Twitter and join our Discord to stay
-          updated!
+          Welcome to the Rollup. We are currently in beta and will be unlocking
+          new features often.
         </Text>
 
-        <div className="flex flex-row gap-4 justify-center align-center lg:justify-start">
-          <ButtonAnchor
-            href="https://twitter.com/rollupid"
-            className="bg-gray-100 border-none min-w-[170px]"
+        <Text
+          weight="normal"
+          size="base"
+          className="text-center lg:text-left text-gray-500"
+        >
+          Follow us on{' '}
+          <a
+            className="!text-indigo-500"
+            href="https://twitter.com/threeid_xyz"
           >
-            <FaTwitter style={{ color: '#1D9BF0' }} />
-
-            <span>Twitter</span>
-          </ButtonAnchor>
-
-          <ButtonAnchor
-            href="https://discord.gg/rollupid"
-            className="bg-gray-100 border-none min-w-[170px]"
-          >
-            <FaDiscord style={{ color: '#1D9BF0' }} />
-
-            <span>Discord</span>
-          </ButtonAnchor>
-        </div>
+            Twitter
+          </a>{' '}
+          and join our{' '}
+          <a className="!text-indigo-500" href="https://discord.gg/threeid">
+            Discord
+          </a>{' '}
+          to stay updated!
+        </Text>
       </div>
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="faq basis-full lg:basis-6/12 order-2 lg:order-2">
-          <FAQ />
-        </div>
-        <div className="roadmap basis-full lg:basis-6/12 order-1 lg:order-1">
-          <SectionTitle
-            title="Roadmap"
-            subtitle="Discover and try new features as we roll them out"
-          />
 
-          <div className="progress-bar">
+      {showGetStarted && (
+        <div className="flex flex-row p-4 border items-center rounded-lg shadow">
+          <div className="p-2.5 bg-indigo-50 rounded-lg">
+            <svg
+              width="42"
+              height="42"
+              viewBox="0 0 42 42"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g clipPath="url(#clip0_7573_12929)">
+                <path
+                  d="M21 19.25C24.866 19.25 28 16.116 28 12.25C28 8.38401 24.866 5.25 21 5.25C17.134 5.25 14 8.38401 14 12.25C14 16.116 17.134 19.25 21 19.25Z"
+                  stroke="#6366F1"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M10.5 36.75V33.25C10.5 31.3935 11.2375 29.613 12.5503 28.3003C13.863 26.9875 15.6435 26.25 17.5 26.25H24.5C26.3565 26.25 28.137 26.9875 29.4497 28.3003C30.7625 29.613 31.5 31.3935 31.5 33.25V36.75"
+                  stroke="#6366F1"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </g>
+              <defs>
+                <clipPath id="clip0_7573_12929">
+                  <rect width="42" height="42" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+          </div>
+
+          <div className="flex-1 mx-5 flex-col">
+            <Text size="lg" weight="semibold" className="text-gray-800">
+              Get started
+            </Text>
+            <Text size="sm" weight="normal" className="text-gray-500">
+              Fill out your profile information
+            </Text>
+          </div>
+
+          <div className="flex flex-row space-x-6 items-center">
+            <Text
+              size="xs"
+              weight="normal"
+              className="text-indigo-500 cursor-pointer"
+              onClick={() => setShowGetStarted(false)}
+            >
+              Ignore
+            </Text>
+            <Link to="/account/settings">
+              <Button btnType="primary">Go to Settings</Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-col space-y-5 lg:flex-row lg:space-x-5 lg:space-y-0">
+        <div className="flex-1 flex flex-col space-y-5 w-full">
+          <div>
+            <SectionTitle title="Activity" />
+
             <div
-              className="progress-bar__fill"
-              style={{ width: `${percentage}%` }}
-            ></div>
-          </div>
-          <div className="roadmap-ready">
-            <SectionHeadingSubtle title="Ready" />
-
-            <div className="roadmap-ready__steps steps grid grid-rows gap-4">
-              {completeSteps.map((step, index) => (
-                <div
-                  className="roadmap-next__step step flex flex-row gap-4 items-start"
-                  key={index}
-                >
-                  <div className="roadmap-next__check mt-1 flex justify-center items-top">
-                    <img
-                      src={step.isCompleted ? stepComplete : stepSoon}
-                      alt="Rollup Step"
-                    />
-                  </div>
-
-                  <div className="col-span-5">
-                    <SectionHeading>{step.title}</SectionHeading>
-                    <div className="col-span-5">
-                      <Text size="sm" weight="normal" className="text-gray-500">
-                        {step.isCompleted ? 'Completed' : step.description}
-                      </Text>
-                    </div>
-                  </div>
-                </div>
-              ))}
+              className="w-full h-[205px] flex justify-center items-center border-gray-200 rounded-lg shadow"
+              style={{
+                background: `url(${dashboardChart})`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'bottom',
+                backgroundSize: 'contain',
+              }}
+            >
+              <Text weight="medium" className="text-gray-400">
+                Coming Soon
+              </Text>
             </div>
           </div>
 
-          <div className="roadmap-next">
-            <SectionHeadingSubtle title="Coming next" />
+          <div className="">
+            <div className="flex flex-row justify-between items-center">
+              <SectionTitle title="Connected Accounts" />
 
-            <div className="roadmap-next__steps steps grid grid-rows gap-4">
-              {comingNext.map((step, index) => (
-                <div
-                  className="roadmap-next__step step flex flex-row gap-4 items-start"
-                  key={index}
+              <Link className="mb-3" to="/account/settings/connections">
+                <Text
+                  size="xs"
+                  weight="normal"
+                  className="text-indigo-500 cursor-pointer"
                 >
-                  <div className="roadmap-next__check mt-1 flex justify-center items-top">
-                    <img src={stepSoon} alt="Rollup Step" />
-                  </div>
+                  Edit
+                </Text>
+              </Link>
+            </div>
 
-                  <div className="col-span-5">
-                    <SectionHeading className="mb-1">
-                      {step.title}
-                    </SectionHeading>
-                    <div className="col-span-5">{step.description}</div>
+            <div className="flex flex-col space-y-2">
+              {normalizedProfiles.map((np, i) => (
+                <div
+                  key={i}
+                  className="flex flex-row items-center border rounded-lg shadow p-4"
+                >
+                  <img className="w-8 h-8 rounded-full mr-3.5" src={np.icon} />
+
+                  <div className="flex flex-col space-y-1.5 flex-1 break-all">
+                    <Text size="sm" weight="medium" className="text-gray-700">
+                      {np.title}
+                    </Text>
+                    <Text size="xs" weight="normal" className="text-gray-500">
+                      {np.address}
+                    </Text>
                   </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
-        <div className="faq basis-full lg:basis-6/12 lg:hidden order-3"></div>
+
+        <div className="flex-1">
+          <SectionTitle title="My Sessions" />
+        </div>
       </div>
     </div>
   )

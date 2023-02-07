@@ -17,8 +17,9 @@ import { links as faqStyles } from '~/components/FAQ'
 import ConditionalTooltip from '~/components/conditional-tooltip'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { getAccountAddresses } from '~/helpers/profile'
+import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
 import type { Node, Profile } from '@kubelt/galaxy-client'
+import { AddressURN } from '@kubelt/urns/address'
 
 export function links() {
   return [...faqStyles(), { rel: 'stylesheet', href: styles }]
@@ -27,7 +28,29 @@ export function links() {
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
 
-  const addresses = await getAccountAddresses(jwt)
+  // We go through this because
+  // the context had connected addresses
+  // but don't have the profiles
+  // and it's complex to send them to a loader / action
+  const addresses = (await getAccountAddresses(jwt)) ?? []
+  const addressTypeUrns = addresses.map((a) => ({
+    urn: a.urn,
+    nodeType: a.rc.node_type,
+  }))
+
+  // We get the full profiles
+  const profiles =
+    (await getAddressProfiles(
+      jwt,
+      addressTypeUrns.map((atu) => atu.urn as AddressURN)
+    )) ?? []
+
+  // This mapps to a new structure that contains urn also;
+  // useful for list keys as well as for address context actions as param
+  const addressProfiles = profiles.map((p, i) => ({
+    ...addressTypeUrns[i],
+    ...p,
+  }))
 
   const cryptoAddresses =
     addresses?.filter((e) => {
@@ -37,6 +60,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   return json({
     addresses,
+    addressProfiles,
     cryptoAddresses,
   })
 }
@@ -59,8 +83,9 @@ const subNavigation = [
 ]
 
 export default function AccountLayout() {
-  const { addresses, cryptoAddresses } = useLoaderData<{
+  const { addresses, addressProfiles, cryptoAddresses } = useLoaderData<{
     addresses: Node[]
+    addressProfiles: any[]
     cryptoAddresses: Node[]
   }>()
   const { profile, accountURN } = useOutletContext<{
@@ -85,6 +110,7 @@ export default function AccountLayout() {
                 context={{
                   profile,
                   addresses,
+                  addressProfiles,
                   cryptoAddresses,
                   accountURN,
                 }}

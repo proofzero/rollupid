@@ -1,7 +1,9 @@
 import type { Profile, Link, Gallery, Node } from '@kubelt/galaxy-client'
+import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import { AddressURN } from '@kubelt/urns/address'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import { getGalaxyClient } from '~/helpers/clients'
+import { imageFromAddressType } from './icons'
 
 export const getAccountProfile = async (jwt: string) => {
   const galaxyClient = await getGalaxyClient()
@@ -62,4 +64,79 @@ export const getAddressProfiles = async (
   const { addressProfiles } = addressProfileRes
 
   return addressProfiles
+}
+
+/**
+ * Prepares Crypto and OAuth profiles
+ * to be displayed in generic sortable list;
+ * Adds additional properties that are used
+ * for filtering when posting data to the server.
+ */
+export const normalizeProfileToLinks = (profile: any) => {
+  switch (profile.__typename) {
+    case 'CryptoAddressProfile':
+      return {
+        id: profile.urn,
+        // Some providers can be built on client side
+        address: `https://etherscan.io/address/${profile.address}`,
+        title: profile.displayName,
+        icon: imageFromAddressType(CryptoAddressType.ETH),
+        provider: CryptoAddressType.ETH,
+        /**
+         * 'linkable' allows the account list
+         * to disable non linkable accounts
+         * which are unclear as to how to
+         * generate a public url
+         */
+        linkable: true,
+      }
+    case 'OAuthGoogleProfile':
+      return {
+        id: profile.urn,
+        // Some providers don't have an address
+        // and are thus unlinkable
+        address: '',
+        title: 'Google',
+        icon: imageFromAddressType(OAuthAddressType.Google),
+        provider: OAuthAddressType.Google,
+      }
+    case 'OAuthTwitterProfile':
+      return {
+        id: profile.urn,
+        address: `https://twitter.com/${profile.screen_name}`,
+        title: 'Twitter',
+        icon: profile.profile_image_url_https,
+        provider: OAuthAddressType.Twitter,
+        linkable: true,
+      }
+    case 'OAuthGithubProfile':
+      return {
+        id: profile.urn,
+        // Some providers give us public
+        // endpoints
+        address: profile.html_url,
+        title: 'GitHub',
+        icon: imageFromAddressType(OAuthAddressType.GitHub),
+        provider: OAuthAddressType.GitHub,
+        linkable: true,
+      }
+    case 'OAuthMicrosoftProfile':
+      return {
+        id: profile.urn,
+        address: '',
+        title: 'Microsoft',
+        icon: imageFromAddressType(OAuthAddressType.Microsoft),
+        provider: OAuthAddressType.Microsoft,
+      }
+    case 'OAuthAppleProfile':
+      return {
+        id: profile.urn,
+        address: '',
+        title: 'Apple',
+        icon: imageFromAddressType(OAuthAddressType.Apple),
+        provider: OAuthAddressType.Apple,
+      }
+  }
+
+  throw new Error('profile.__typename uknown')
 }
