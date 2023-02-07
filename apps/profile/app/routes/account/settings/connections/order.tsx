@@ -9,29 +9,19 @@ export const action: ActionFunction = async ({ request }) => {
 
   const formData = await request.formData()
 
-  const connectionsText = formData.get('connections')
-  const connections = JSON.parse(connectionsText as string) as {
+  const connectionsData = formData.get('connections')
+  const connections = JSON.parse(connectionsData as string) as {
     addressURN: AddressURN
     public?: boolean
   }[]
-  console.debug({ connections })
 
   const galaxyClient = await getGalaxyClient()
-  await galaxyClient.updateAddressEdges(
+  await galaxyClient.updateConnectedAddressesProperties(
     {
       addressURNList: connections,
     },
     getAuthzHeaderConditionallyFromToken(jwt)
   )
-
-  // const galaxyClient = await getGalaxyClient()
-  // galaxyClient.updateAddressNickname(
-  //   {
-  //     addressURN: id,
-  //     nickname: name,
-  //   },
-  //   getAuthzHeaderConditionallyFromToken(jwt)
-  // )
 
   return null
 }

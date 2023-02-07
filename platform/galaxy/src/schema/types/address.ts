@@ -18,17 +18,17 @@ export default /* GraphQL */ `
 
   type OAuthGithubProfile {
     login: String!
-    id: Int!
+    id: Int
     avatar_url: String!
-    html_url: String!
+    html_url: String
     name: String
     email: String
     bio: Boolean
     location: String
-    followers: Int!
-    following: Int!
-    public_repos: Int!
-    public_gists: Int!
+    followers: Int
+    following: Int
+    public_repos: Int
+    public_gists: Int
   }
 
   type OAuthTwitterProfile {
@@ -68,7 +68,7 @@ export default /* GraphQL */ `
     profile: AddressProfilesUnion!
   }
 
-  input AddressEdgeUpdateInput {
+  input ConnectedAddressPropertiesUpdateInput {
     addressURN: URN!
     public: Boolean
   }
@@ -81,6 +81,8 @@ export default /* GraphQL */ `
 
   type Mutation {
     updateAddressNickname(addressURN: URN!, nickname: String!): Boolean
-    updateAddressEdges(addressURNList: [AddressEdgeUpdateInput!]!): Boolean
+    updateConnectedAddressesProperties(
+      addressURNList: [ConnectedAddressPropertiesUpdateInput!]!
+    ): Boolean
   }
 `

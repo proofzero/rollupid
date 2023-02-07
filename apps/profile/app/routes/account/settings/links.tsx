@@ -34,6 +34,7 @@ import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import { imageFromAddressType } from '~/helpers'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { FullProfile } from '~/types'
 
 /**
  * Prepares Crypto and OAuth profiles
@@ -169,7 +170,6 @@ export const action: ActionFunction = async ({ request }) => {
       // Links get displayed parsed from this
       // so order matters. In order to get connected
       // links to be first; we add them first.
-      // links: connectedAccountLinks.concat(updatedLinks),
       links: updatedLinks,
     },
     getAuthzHeaderConditionallyFromToken(jwt)

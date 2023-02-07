@@ -17,11 +17,6 @@ export type Scalars = {
   URN: any;
 };
 
-export type AddressEdgeUpdateInput = {
-  addressURN: Scalars['URN'];
-  public?: InputMaybe<Scalars['Boolean']>;
-};
-
 export type AddressProfile = {
   __typename?: 'AddressProfile';
   profile: AddressProfilesUnion;
@@ -35,6 +30,11 @@ export type Chain = {
   __typename?: 'Chain';
   chain?: Maybe<Scalars['String']>;
   network?: Maybe<Scalars['String']>;
+};
+
+export type ConnectedAddressPropertiesUpdateInput = {
+  addressURN: Scalars['URN'];
+  public?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type Contract = {
@@ -102,22 +102,22 @@ export type LinkInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  updateAddressEdges?: Maybe<Scalars['Boolean']>;
   updateAddressNickname?: Maybe<Scalars['Boolean']>;
+  updateConnectedAddressesProperties?: Maybe<Scalars['Boolean']>;
   updateGallery?: Maybe<Scalars['Boolean']>;
   updateLinks?: Maybe<Scalars['Boolean']>;
   updateProfile?: Maybe<Scalars['Boolean']>;
 };
 
 
-export type MutationUpdateAddressEdgesArgs = {
-  addressURNList: Array<AddressEdgeUpdateInput>;
-};
-
-
 export type MutationUpdateAddressNicknameArgs = {
   addressURN: Scalars['URN'];
   nickname: Scalars['String'];
+};
+
+
+export type MutationUpdateConnectedAddressesPropertiesArgs = {
+  addressURNList: Array<ConnectedAddressPropertiesUpdateInput>;
 };
 
 
@@ -287,15 +287,15 @@ export type OAuthGithubProfile = {
   avatar_url: Scalars['String'];
   bio?: Maybe<Scalars['Boolean']>;
   email?: Maybe<Scalars['String']>;
-  followers: Scalars['Int'];
-  following: Scalars['Int'];
-  html_url: Scalars['String'];
-  id: Scalars['Int'];
+  followers?: Maybe<Scalars['Int']>;
+  following?: Maybe<Scalars['Int']>;
+  html_url?: Maybe<Scalars['String']>;
+  id?: Maybe<Scalars['Int']>;
   location?: Maybe<Scalars['String']>;
   login: Scalars['String'];
   name?: Maybe<Scalars['String']>;
-  public_gists: Scalars['Int'];
-  public_repos: Scalars['Int'];
+  public_gists?: Maybe<Scalars['Int']>;
+  public_repos?: Maybe<Scalars['Int']>;
 };
 
 export type OAuthGoogleProfile = {
@@ -514,14 +514,14 @@ export type GetAddressProfileQueryVariables = Exact<{
 }>;
 
 
-export type GetAddressProfileQuery = { __typename?: 'Query', addressProfile: { __typename?: 'AddressProfile', type: string, urn: any, profile: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthAppleProfile', name?: string | null, picture: string } | { __typename: 'OAuthGithubProfile', id: number, name?: string | null, avatar_url: string, html_url: string, followers: number, following: number, login: string, public_gists: number, public_repos: number } | { __typename: 'OAuthGoogleProfile', name?: string | null, picture: string } | { __typename: 'OAuthMicrosoftProfile', name?: string | null, picture: string } | { __typename: 'OAuthTwitterProfile', name?: string | null, screen_name: string, profile_image_url_https: string } } };
+export type GetAddressProfileQuery = { __typename?: 'Query', addressProfile: { __typename?: 'AddressProfile', type: string, urn: any, profile: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthAppleProfile', name?: string | null, picture: string } | { __typename: 'OAuthGithubProfile', id?: number | null, name?: string | null, avatar_url: string, html_url?: string | null, followers?: number | null, following?: number | null, login: string, public_gists?: number | null, public_repos?: number | null } | { __typename: 'OAuthGoogleProfile', name?: string | null, picture: string } | { __typename: 'OAuthMicrosoftProfile', name?: string | null, picture: string } | { __typename: 'OAuthTwitterProfile', name?: string | null, screen_name: string, profile_image_url_https: string } } };
 
 export type GetAddressProfilesQueryVariables = Exact<{
   addressURNList?: InputMaybe<Array<Scalars['URN']> | Scalars['URN']>;
 }>;
 
 
-export type GetAddressProfilesQuery = { __typename?: 'Query', addressProfiles: Array<{ __typename?: 'AddressProfile', type: string, urn: any, profile: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthAppleProfile', name?: string | null, picture: string } | { __typename: 'OAuthGithubProfile', id: number, name?: string | null, avatar_url: string, html_url: string, followers: number, following: number, login: string, public_gists: number, public_repos: number } | { __typename: 'OAuthGoogleProfile', name?: string | null, picture: string } | { __typename: 'OAuthMicrosoftProfile', name?: string | null, picture: string } | { __typename: 'OAuthTwitterProfile', name?: string | null, screen_name: string, profile_image_url_https: string } }> };
+export type GetAddressProfilesQuery = { __typename?: 'Query', addressProfiles: Array<{ __typename?: 'AddressProfile', type: string, urn: any, profile: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthAppleProfile', name?: string | null, picture: string } | { __typename: 'OAuthGithubProfile', id?: number | null, name?: string | null, avatar_url: string, html_url?: string | null, followers?: number | null, following?: number | null, login: string, public_gists?: number | null, public_repos?: number | null } | { __typename: 'OAuthGoogleProfile', name?: string | null, picture: string } | { __typename: 'OAuthMicrosoftProfile', name?: string | null, picture: string } | { __typename: 'OAuthTwitterProfile', name?: string | null, screen_name: string, profile_image_url_https: string } }> };
 
 export type UpdateAddressNicknameMutationVariables = Exact<{
   addressURN: Scalars['URN'];
@@ -531,12 +531,12 @@ export type UpdateAddressNicknameMutationVariables = Exact<{
 
 export type UpdateAddressNicknameMutation = { __typename?: 'Mutation', updateAddressNickname?: boolean | null };
 
-export type UpdateAddressEdgesMutationVariables = Exact<{
-  addressURNList: Array<AddressEdgeUpdateInput> | AddressEdgeUpdateInput;
+export type UpdateConnectedAddressesPropertiesMutationVariables = Exact<{
+  addressURNList: Array<ConnectedAddressPropertiesUpdateInput> | ConnectedAddressPropertiesUpdateInput;
 }>;
 
 
-export type UpdateAddressEdgesMutation = { __typename?: 'Mutation', updateAddressEdges?: boolean | null };
+export type UpdateConnectedAddressesPropertiesMutation = { __typename?: 'Mutation', updateConnectedAddressesProperties?: boolean | null };
 
 export type GetEnsProfileQueryVariables = Exact<{
   addressOrEns: Scalars['String'];
@@ -770,9 +770,9 @@ export const UpdateAddressNicknameDocument = gql`
   updateAddressNickname(addressURN: $addressURN, nickname: $nickname)
 }
     `;
-export const UpdateAddressEdgesDocument = gql`
-    mutation updateAddressEdges($addressURNList: [AddressEdgeUpdateInput!]!) {
-  updateAddressEdges(addressURNList: $addressURNList)
+export const UpdateConnectedAddressesPropertiesDocument = gql`
+    mutation updateConnectedAddressesProperties($addressURNList: [ConnectedAddressPropertiesUpdateInput!]!) {
+  updateConnectedAddressesProperties(addressURNList: $addressURNList)
 }
     `;
 export const GetEnsProfileDocument = gql`
@@ -935,8 +935,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     updateAddressNickname(variables: UpdateAddressNicknameMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateAddressNicknameMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateAddressNicknameMutation>(UpdateAddressNicknameDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateAddressNickname', 'mutation');
     },
-    updateAddressEdges(variables: UpdateAddressEdgesMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateAddressEdgesMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateAddressEdgesMutation>(UpdateAddressEdgesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateAddressEdges', 'mutation');
+    updateConnectedAddressesProperties(variables: UpdateConnectedAddressesPropertiesMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateConnectedAddressesPropertiesMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateConnectedAddressesPropertiesMutation>(UpdateConnectedAddressesPropertiesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateConnectedAddressesProperties', 'mutation');
     },
     getEnsProfile(variables: GetEnsProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetEnsProfileQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetEnsProfileQuery>(GetEnsProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEnsProfile', 'query');

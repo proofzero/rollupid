@@ -96,7 +96,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   // Keeping the distinctions to only append
   // context actions to desired types
   // e.x. rename to crypto profiles
-  // TODO: async the three reduce calls
   const cryptoProfiles = mappedProfiles
     .filter((p) => p?.nodeType === NodeType.Crypto)
     .map((p) => ({ urn: p.urn, ...p?.profile }))

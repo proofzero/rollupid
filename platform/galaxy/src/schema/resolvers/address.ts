@@ -9,8 +9,6 @@ import { hasApiKey, setupContext, logAnalytics, isAuthorized } from './utils'
 import { ResolverContext } from './common'
 
 import {
-  AddressProfile,
-  AddressProfiles,
   CryptoAddressProfile,
   OAuthAppleProfile,
   OAuthGithubProfile,
@@ -18,10 +16,7 @@ import {
   OAuthMicrosoftProfile,
   OAuthTwitterProfile,
 } from '@kubelt/platform.address/src/types'
-import {
-  PlatformAddressURNHeader,
-  PlatformJWTAssertionHeader,
-} from '@kubelt/types/headers'
+import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -48,7 +43,6 @@ const addressResolvers: Resolvers = {
       { addressURNList }: { addressURNList: AddressURN[] },
       { env, jwt }: ResolverContext
     ) => {
-      console.log({ addressURNList })
       const profiles = await Promise.all(
         addressURNList.map(async (urn) => {
           const addressClient = createAddressClient(env.Address, {
@@ -60,6 +54,7 @@ const addressResolvers: Resolvers = {
           return addressClient.getAddressProfile.query()
         })
       )
+      console.debug({ eth: profiles[0].profile, gh: profiles[1].profile })
       return profiles
     },
   },
@@ -81,7 +76,7 @@ const addressResolvers: Resolvers = {
 
       return true
     },
-    updateAddressEdges: async (
+    updateConnectedAddressesProperties: async (
       _parent: any,
       { addressURNList },
       { env, jwt }: ResolverContext
@@ -126,7 +121,11 @@ const AddressResolverComposition = {
     hasApiKey(),
     isAuthorized(),
   ],
-  'Mutation.updateAddressEdges': [setupContext(), hasApiKey(), isAuthorized()],
+  'Mutation.updateConnectedAddressesProperties': [
+    setupContext(),
+    hasApiKey(),
+    isAuthorized(),
+  ],
 }
 
 export default composeResolvers(addressResolvers, AddressResolverComposition)

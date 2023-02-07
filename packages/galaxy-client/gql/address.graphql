@@ -98,6 +98,8 @@ mutation updateAddressNickname($addressURN: URN!, $nickname: String!) {
   updateAddressNickname(addressURN: $addressURN, nickname: $nickname)
 }
 
-mutation updateAddressEdges($addressURNList: [AddressEdgeUpdateInput!]!) {
-  updateAddressEdges(addressURNList: $addressURNList)
+mutation updateConnectedAddressesProperties(
+  $addressURNList: [ConnectedAddressPropertiesUpdateInput!]!
+) {
+  updateConnectedAddressesProperties(addressURNList: $addressURNList)
 }
