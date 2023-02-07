@@ -23,6 +23,7 @@ import type {
   EdgeDirection,
   EdgeTag,
 } from './types'
+import { parseUrnForEdge } from '@kubelt/urns/edge'
 
 // Exported Types
 // -----------------------------------------------------------------------------
@@ -98,12 +99,6 @@ export async function outgoing(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
 
 /**
  * Create a link between two nodes.
- *
- * @param g - the graph handle returned from init()
- * @param src - the ID of the source node
- * @param dst - the ID of the destination node
- * @param tag - a tag representing the edge type
- *
  * @returns the ID of the created edge, or -1 on error
  */
 export async function link(
@@ -141,12 +136,6 @@ export async function unlink(
 
 /**
  * Update a link between two nodes.
- *
- * @param g - the graph handle returned from init()
- * @param src - the ID of the source node
- * @param dst - the ID of the destination node
- * @param tag - a tag representing the edge type
- *
  * @returns the ID of the created edge, or -1 on error
  */
 export async function upsert(
@@ -159,6 +148,45 @@ export async function upsert(
   // TODO check for error
 
   const dstNode = await update.node(g, dst)
+  // TODO check for error
+
+  // Return existing edge ID (if found) or new edge ID (if created).
+  return update.edge(g, srcNode.urn, dstNode.urn, tag)
+}
+
+/**
+ * Update a links between two nodes.
+ * @returns the ID of the created edge, or -1 on error
+ */
+export async function batchUpsert(
+  g: Graph,
+  edges: [
+    {
+      src: AnyURN
+      dst: AnyURN
+      tag: EdgeTag
+    }
+  ]
+): Promise<EdgeRecord> {
+  const batchedStmnts: D1PreparedStatement[] = []
+  edges.map((edge) => {
+    const parsedSrcNode = parseUrnForEdge(edge.src)
+    const srcNodeStmts = update.node(g, parsedSrcNode)
+    // TODO check for error
+
+    const parsedDstNode = parseUrnForEdge(edge.src)
+    const dstNodeStmts = update.node(g, parsedDstNode)
+    // TODO check for error
+
+    // Return existing edge ID (if found) or new edge ID (if created).
+    const edgeStmt = update.edge(g, parsedSrcNode, parsedDstNode, edge.tag)
+
+    batchedStmnts.concat(srcNodeStmts)
+    batchedStmnts.concat(dstNodeStmts)
+    batchedStmnts.push(edgeStmt)
+  })
+
+  await g.db.batch(batchedStmnts)
   // TODO check for error
 
   // Return existing edge ID (if found) or new edge ID (if created).
