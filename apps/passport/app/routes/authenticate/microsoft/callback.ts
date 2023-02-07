@@ -57,3 +57,5 @@ export const loader: LoaderFunction = async ({
 
   return authenticateAddress(address, account, appData, context.env)
 }
+
+export default () => {}
