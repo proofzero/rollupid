@@ -102,7 +102,6 @@ export const decorateNft = (nft: Nft): decoratedNft => {
       name: 'Token ID',
       value: BigInt(nft.id?.tokenId).toString(10),
       isCopyable: true,
-      // Chain:
     })
   }
 
