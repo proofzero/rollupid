@@ -39,5 +39,11 @@ export const action: ActionFunction = async ({ request, context }) => {
 
   if (tokens.idToken) Object.assign(result, { id_token: tokens.idToken })
 
-  return json(result)
+  return json(result, {
+    //spec adherence and general good practice
+    headers: {
+      'Cache-Control': 'no-store',
+      Pragma: 'no-cache',
+    },
+  })
 }
