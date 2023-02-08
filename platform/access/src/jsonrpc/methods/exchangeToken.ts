@@ -80,7 +80,6 @@ export const exchangeTokenMethod = async ({
       { client_id: clientId, grant_type: GrantType.AuthenticationCode },
       undefined
     )
-    // const access = AccessURNSpace.urn(iss)
 
     console.log({ access, edgesClient: ctx.edgesClient })
     // NB: we use InjectEdges middleware to inject this service client.
