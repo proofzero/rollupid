@@ -310,7 +310,7 @@ export async function edges(
       const dst: Node = { ...dstNode, id: `urn:${dstNode.nid}:${dstNode.nss}` }
 
       const tag = edgeRec.tag
-      const createdTimestamp = edgeRec.createdTimestamp
+      const createdTimestamp = edgeRec.createdTimestamp || null
 
       return {
         tag,
