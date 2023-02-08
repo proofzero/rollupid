@@ -21,7 +21,14 @@ export {
   sliceIntoChunks,
   beautifyContracts,
   fetchContracts,
+  getNftsForAllChains,
+  sortNftsAlphabetically,
+  getNftMetadataForAllChains,
+  nftBatchesFetcherForAllChains,
+  beautifyContractsForAllChains,
 } from './nfts'
+
+import { NodeType } from '@kubelt/types/address'
 
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {
@@ -202,4 +209,27 @@ export const getConnectedAddresses = async ({
 
   // for alchemy calls they need to be lowercased
   return addresses
+}
+
+export const getConnectedCryptoAddresses = async ({
+  accountURN,
+  Account,
+  jwt,
+}: {
+  accountURN: AccountURN
+  Account: Fetcher
+  jwt: any
+}) => {
+  const cryptoAddresses =
+    (await getConnectedAddresses({
+      accountURN,
+      Account,
+      jwt,
+    })) || []
+
+  return cryptoAddresses
+    .filter((address) =>
+      [NodeType.Crypto, NodeType.Vault].includes(address.rc.node_type)
+    )
+    .map((address) => address.qc.alias.toLowerCase())
 }

@@ -230,10 +230,13 @@ export const getGalleryWithMetadata = async (owner: string, jwt?: string) => {
 
   const { getNFTMetadataBatch: metadata } = await galaxyClient.getNFTMetadata(
     {
-      input: gallery.map((nft: any) => ({
-        contractAddress: nft.contract,
-        tokenId: nft.tokenId,
-      })),
+      input: gallery.map(
+        (nft: { contract: string; tokenId: string; chain: string }) => ({
+          contractAddress: nft.contract,
+          tokenId: nft.tokenId,
+          chain: nft.chain,
+        })
+      ),
     },
     // Optional for when called by
     // a non authenticated visitor
@@ -251,7 +254,7 @@ export const getGalleryWithMetadata = async (owner: string, jwt?: string) => {
   // check generate and return og image
 
   const filteredNfts =
-    ownedNfts?.filter((n: any) => !n.error && n.thumbnailUrl) || []
+    ownedNfts?.filter((n: decoratedNft) => !n.error && n.thumbnailUrl) || []
 
   return {
     gallery: filteredNfts,

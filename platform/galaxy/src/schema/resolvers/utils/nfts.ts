@@ -9,6 +9,11 @@ import {
 
 import Env from '../../../env'
 
+type AlchemyClients = {
+  ethereumClient: AlchemyClient
+  polygonClient: AlchemyClient
+}
+
 type ResolverContext = {
   env: Env
   jwt?: string
@@ -33,7 +38,34 @@ type contracts = {
 // list of NFT contracts
 type NftBatch = string[]
 
-import type { Nft, NftContract } from '../typedefs'
+import type { Nft, NftContract, NftContracts } from '../typedefs'
+
+export const sortNftsAlphabetically = (ownedNfts: Nft[]) => {
+  return ownedNfts.sort((a, b) =>
+    (a.contractMetadata?.name ?? '').localeCompare(
+      b.contractMetadata?.name ?? ''
+    )
+  )
+}
+
+export const getNftsForAllChains = async (
+  alchemyClients: AlchemyClients,
+  addresses: string[],
+  contractAddresses: string[],
+  maxRuns: number = 3
+) => {
+  try {
+    const [ethNfts, polyNfts] = await Promise.all([
+      getAllNfts(alchemyClients.ethereumClient, addresses, contractAddresses),
+      getAllNfts(alchemyClients.polygonClient, addresses, contractAddresses),
+    ])
+
+    return ethNfts.concat(polyNfts)
+  } catch (ex) {
+    console.error(new GraphQLYogaError(ex as string))
+  }
+  return []
+}
 
 export const getAllNfts = async (
   alchemyClient: AlchemyClient,
@@ -63,7 +95,7 @@ export const getAllNfts = async (
       } while (pageKey && ++runs <= maxRuns)
     })
   )
-  const chain = await alchemyClient.getChain()
+  const chain = alchemyClient.getChain()
 
   nfts = nfts.map((nft) => ({ ...nft, chain }))
 
@@ -82,6 +114,46 @@ export const getAlchemyClients = ({ env }: { env: ResolverContext['env'] }) => {
       network: env.ALCHEMY_POLYGON_NETWORK,
       chain: AlchemyChain.polygon,
     } as AlchemyClientConfig),
+  }
+}
+
+export const nftBatchesFetcherForAllChains = async ({
+  contracts,
+  addresses,
+  alchemyClients,
+}: {
+  contracts: {
+    ethereum: NftContract[]
+    polygon: NftContract[]
+  }
+  addresses: string[]
+  alchemyClients: AlchemyClients
+}) => {
+  try {
+    // This way in each nested collection we have its own Promise.all
+    // And one common Promise.all on top of them.
+
+    const NFTs = await Promise.all([
+      Promise.all(
+        await nftBatchesFetcher({
+          contracts: contracts.ethereum,
+          addresses,
+          alchemyClient: alchemyClients.ethereumClient,
+        })
+      ),
+      Promise.all(
+        await nftBatchesFetcher({
+          contracts: contracts.polygon,
+          addresses,
+          alchemyClient: alchemyClients.polygonClient,
+        })
+      ),
+    ])
+
+    return { ethereumNfts: NFTs[0], polygonNfts: NFTs[1] }
+  } catch (ex) {
+    console.error(new GraphQLYogaError(ex as string))
+    return { ethereumNfts: [], polygonNfts: [] }
   }
 }
 
@@ -118,7 +190,7 @@ export const nftBatchesFetcher = async ({
           // Essentially we need to mapreduce through them all
           // - that's why we have nested cycles
           // then we need to combine nfts in one object - thats why we are using
-          // refuce after
+          // reduce after
           const nfts: AlchemyNfts = (
             await Promise.all(
               addresses.map(async (address) => {
@@ -169,6 +241,20 @@ export function sliceIntoChunks(arr: any[], chunkSize: number) {
   return res
 }
 
+export const beautifyContractsForAllChains = (
+  clients: {
+    nfts: Nft[]
+    chain: string
+    contracts: NftContract[]
+    network: string
+  }[]
+) => {
+  const beautifiedContracts = clients.reduce<NftContract[]>((acc, client) => {
+    return [...acc, ...beautifyContracts({ ...client })]
+  }, [])
+  return beautifiedContracts
+}
+
 export const beautifyContracts = ({
   nfts,
   chain,
@@ -180,14 +266,9 @@ export const beautifyContracts = ({
   contracts: NftContract[]
   network: string
 }) => {
-  let ownedNfts: Nft[] = []
-
-  nfts.forEach((nft: Nft) => {
-    ownedNfts.push(nft)
-  })
+  let ownedNfts: Nft[] = NFTPropertyMapper(nfts.flat())
 
   const collectionsHashMap = new Map()
-  ownedNfts = NFTPropertyMapper(ownedNfts.flat())
 
   // Creating hashmap with contract addresses as keys
   // And nft arrays as values
@@ -210,79 +291,125 @@ export const beautifyContracts = ({
   // Attach NFT array to a contract object
   // With hash map key it is easy to find a needed array to specific
   // collection
-  const beautifiedContracts = contracts.map((contract: NftContract) => {
-    return {
-      ...contract,
-      ownedNfts: collectionsHashMap.get(contract.address),
-      chain: { chain, network },
+  const beautifiedContracts: NftContract[] = contracts.map(
+    (contract: NftContract) => {
+      return {
+        ...contract,
+        ownedNfts: collectionsHashMap.get(contract.address),
+        chain: { chain, network },
+      }
     }
-  })
+  )
 
   return beautifiedContracts
 }
 
 export const fetchContracts = async ({
   addresses,
-  ethereumClient,
-  polygonClient,
+  alchemyClients,
   excludeFilters,
 }: {
   addresses: string[]
-  ethereumClient: AlchemyClient
-  polygonClient: AlchemyClient
+  alchemyClients: AlchemyClients
   excludeFilters: string[]
 }) => {
-  const [ethContracts, polyContracts]: [
-    { contracts: NftContract[]; totalCount: number }[],
-    { contracts: NftContract[]; totalCount: number }[]
-  ] = await Promise.all([
-    Promise.all(
-      addresses.map(
-        async (address) =>
-          await ethereumClient.getContractsForOwner({
-            address,
-            excludeFilters,
-          })
-      )
-    ),
-    Promise.all(
-      addresses.map(
-        async (address) =>
-          await polygonClient.getContractsForOwner({
-            address,
-            excludeFilters,
-          })
-      )
-    ),
-  ])
+  try {
+    const [ethContracts, polyContracts]: [
+      { contracts: NftContract[]; totalCount: number }[],
+      { contracts: NftContract[]; totalCount: number }[]
+    ] = await Promise.all([
+      Promise.all(
+        addresses.map(
+          async (address) =>
+            await alchemyClients.ethereumClient.getContractsForOwner({
+              address,
+              excludeFilters,
+            })
+        )
+      ),
+      Promise.all(
+        addresses.map(
+          async (address) =>
+            await alchemyClients.polygonClient.getContractsForOwner({
+              address,
+              excludeFilters,
+            })
+        )
+      ),
+    ])
 
-  const ethereumContracts: contracts = ethContracts.reduce(
-    (acc, instance) => {
-      return {
-        contracts: acc.contracts.concat(instance.contracts),
-        totalCount: acc.totalCount + instance.totalCount,
+    const ethereumContracts: contracts = ethContracts.reduce(
+      (acc, instance) => {
+        return {
+          contracts: acc.contracts.concat(instance.contracts),
+          totalCount: acc.totalCount + instance.totalCount,
+        }
+      },
+      {
+        contracts: [],
+        totalCount: 0,
       }
-    },
-    {
-      contracts: [],
-      totalCount: 0,
+    )
+
+    const polygonContracts: contracts = polyContracts.reduce(
+      (acc, instance) => {
+        return {
+          contracts: acc.contracts.concat(instance.contracts),
+          totalCount: acc.totalCount + instance.totalCount,
+        }
+      },
+      { contracts: [], totalCount: 0 }
+    )
+
+    return {
+      ethereum: ethereumContracts.contracts,
+      polygon: polygonContracts.contracts,
     }
-  )
-
-  ethereumContracts.chain = {
-    network: '',
-    chain: AlchemyChain.ethereum,
+  } catch (ex) {
+    console.error(new GraphQLYogaError(ex as string))
+    return {
+      ethereum: [],
+      polygon: [],
+    }
   }
+}
 
-  const polygonContracts: contracts = polyContracts.reduce(
-    (acc, instance) => {
-      return {
-        contracts: acc.contracts.concat(instance.contracts),
-        totalCount: acc.totalCount + instance.totalCount,
-      }
-    },
-    { contracts: [], totalCount: 0 }
-  )
+export const getNftMetadataForAllChains = async (
+  input: {
+    contractAddress: string
+    tokenId: string
+    chain: string
+  }[],
+  alchemyClients: AlchemyClients,
+  env: ResolverContext['env']
+) => {
+  const ethereumInput = input.filter((inp) => inp.chain === 'eth')
+  const polygonInput = input.filter((inp) => inp.chain === 'polygon')
+  try {
+    const [ethereumNfts, polygonNfts]: [Nft[], Nft[]] = await Promise.all([
+      alchemyClients.ethereumClient.getNFTMetadataBatch(ethereumInput),
+      alchemyClients.polygonClient.getNFTMetadataBatch(polygonInput),
+    ])
 
-  return { ethereumContracts, polygonContracts }
+    return ethereumNfts
+      .map((nft) => ({
+        ...nft,
+        chain: {
+          chain: AlchemyChain.ethereum,
+          network: env.ALCHEMY_ETH_NETWORK,
+        },
+      }))
+      .concat(
+        polygonNfts.map((nft) => ({
+          ...nft,
+          chain: {
+            chain: AlchemyChain.polygon,
+            network: env.ALCHEMY_POLYGON_NETWORK,
+          },
+        }))
+      )
+  } catch (ex) {
+    console.error(new GraphQLYogaError(ex as string))
+    return []
+  }
 }
