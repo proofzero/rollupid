@@ -8,7 +8,7 @@ import { authenticateAddress } from '~/utils/authenticate.server'
 import { getAddressClient } from '~/platform.server'
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
-import { OAuthData } from '@kubelt/platform.address/src/types'
+import type { OAuthData } from '@kubelt/platform.address/src/types'
 import { getConsoleParamsSession } from '~/session.server'
 
 export const loader: LoaderFunction = async ({

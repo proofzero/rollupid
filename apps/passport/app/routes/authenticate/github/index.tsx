@@ -1,4 +1,4 @@
-import { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
+import type { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
 
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
 import { initAuthenticator, getGithubAuthenticator } from '~/auth.server'

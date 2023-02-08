@@ -1,4 +1,4 @@
-import { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
+import type { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
 import { MicrosoftStrategyDefaultName } from 'remix-auth-microsoft'
 import { initAuthenticator, getMicrosoftStrategy } from '~/auth.server'
 

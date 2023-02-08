@@ -64,7 +64,7 @@ services = [
 # ]
 
 routes = [
-  "console-dev.rollup.id"
+  { pattern = "console-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
 
 [env.dev.vars]
@@ -91,7 +91,7 @@ services = [
 # ]
 
 routes = [
-  "console-next.rollup.id"
+  { pattern = "console-next.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
 
 [env.next.build]
@@ -121,7 +121,7 @@ services = [
 # ]
 
 routes = [
-  "console.rollup.id"
+  { pattern = "console.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
 
 [env.current.build]

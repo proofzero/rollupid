@@ -1,5 +1,6 @@
 import { GrantType } from '@kubelt/types/access'
-import { AddressType, CryptoAddressType, NodeType } from '@kubelt/types/address'
+import type { AddressType, NodeType } from '@kubelt/types/address'
+import { CryptoAddressType } from '@kubelt/types/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import type { LoaderFunction } from '@remix-run/cloudflare'

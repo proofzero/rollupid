@@ -1,6 +1,5 @@
-import { LoaderFunction } from '@remix-run/cloudflare'
-import { cli } from '@remix-run/dev'
-import { useLoaderData, useParams } from '@remix-run/react'
+import type { LoaderFunction } from '@remix-run/cloudflare'
+import { useLoaderData } from '@remix-run/react'
 import { useState } from 'react'
 import { Authentication } from '~/components'
 import { getStarbaseClient } from '~/platform.server'

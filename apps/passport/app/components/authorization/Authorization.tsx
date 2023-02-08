@@ -1,8 +1,8 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
-import { Profile } from '@kubelt/galaxy-client'
-import { ScopeMeta } from '@kubelt/types/application'
+import type { Profile } from '@kubelt/galaxy-client'
+import type { ScopeMeta } from '@kubelt/types/application'
 
 import authorizeCheck from '../../assets/authorize-check.svg'
 import iIcon from '../../assets/i.svg'

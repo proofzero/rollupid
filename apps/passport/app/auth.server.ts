@@ -1,4 +1,4 @@
-import { createCookieSessionStorage, json } from '@remix-run/cloudflare'
+import { createCookieSessionStorage } from '@remix-run/cloudflare'
 import { Authenticator } from 'remix-auth'
 import { GitHubStrategy } from 'remix-auth-github'
 import { GoogleStrategy } from 'remix-auth-google'
