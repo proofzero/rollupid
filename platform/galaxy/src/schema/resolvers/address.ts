@@ -4,7 +4,7 @@ import createAddressClient from '@kubelt/platform-clients/address'
 import { AddressURN } from '@kubelt/urns/address'
 
 import { AddressProfilesUnion, Resolvers } from './typedefs'
-import { hasApiKey, setupContext, logAnalytics, isAuthorized } from './utils'
+import { hasApiKey, setupContext, isAuthorized } from './utils'
 
 import { ResolverContext } from './common'
 
@@ -29,9 +29,7 @@ const addressResolvers: Resolvers = {
       { env }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
-        headers: {
-          [PlatformAddressURNHeader]: addressURN,
-        },
+        [PlatformAddressURNHeader]: addressURN,
       })
 
       const addressProfile = await addressClient.getAddressProfile.query()
@@ -46,9 +44,7 @@ const addressResolvers: Resolvers = {
       const profiles = await Promise.all(
         addressURNList.map(async (urn) => {
           const addressClient = createAddressClient(env.Address, {
-            headers: {
-              [PlatformAddressURNHeader]: urn,
-            },
+            [PlatformAddressURNHeader]: urn,
           })
 
           return addressClient.getAddressProfile.query()
@@ -65,9 +61,7 @@ const addressResolvers: Resolvers = {
       { env }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
-        headers: {
-          [PlatformAddressURNHeader]: addressURN,
-        },
+        [PlatformAddressURNHeader]: addressURN,
       })
 
       await addressClient.setNickname.query({

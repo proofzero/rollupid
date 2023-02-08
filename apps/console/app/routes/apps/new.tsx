@@ -1,7 +1,7 @@
 import { ActionFunction, json, redirect } from '@remix-run/cloudflare'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
@@ -11,11 +11,10 @@ export const action: ActionFunction = async ({ request }) => {
 
   const jwt = await requireJWT(request)
 
-  const starbaseClient = createStarbaseClient(Starbase, {
-    headers: {
-      [PlatformJWTAssertionHeader]: jwt,
-    },
-  })
+  const starbaseClient = createStarbaseClient(
+    Starbase,
+    getAuthzHeaderConditionallyFromToken(jwt)
+  )
   try {
     const { clientId } = await starbaseClient.createApp.mutate({ clientName })
     console.log({ clientId })

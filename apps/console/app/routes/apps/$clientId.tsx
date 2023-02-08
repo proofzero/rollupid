@@ -11,7 +11,6 @@ import toast, { Toaster } from 'react-hot-toast'
 import { requireJWT } from '~/utilities/session.server'
 import { getGalaxyClient } from '~/utilities/platform.server'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
 import { RotatedSecrets } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
@@ -35,11 +34,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(Starbase, {
-    headers: {
-      [PlatformJWTAssertionHeader]: jwt,
-    },
-  })
+  const starbaseClient = createStarbaseClient(
+    Starbase,
+    getAuthzHeaderConditionallyFromToken(jwt)
+  )
   const galaxyClient = await getGalaxyClient()
 
   const clientId = params?.clientId

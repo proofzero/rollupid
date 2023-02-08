@@ -6,7 +6,7 @@ import { InjectEdges } from '@kubelt/platform-middleware/edges'
 
 import {
   ValidateJWT,
-  JWTAssertionTokenFromHeader,
+  AuthorizationTokenFromHeader,
   RequireAccount,
 } from '@kubelt/platform-middleware/jwt'
 
@@ -70,7 +70,7 @@ export const appRouter = t.router({
     .output(VerifyAuthorizationMethodOutput)
     .query(verifyAuthorizationMethod),
   getSession: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(RequireAccount)
     .use(setAccessNode)
@@ -80,7 +80,7 @@ export const appRouter = t.router({
     .output(GetSessionMethodOutput)
     .query(getSessionMethod),
   revokeSession: t.procedure
-    .use(JWTAssertionTokenFromHeader)
+    .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(RequireAccount)
     .use(InjectEdges)

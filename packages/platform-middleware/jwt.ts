@@ -1,14 +1,13 @@
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import type { AccountURN } from '@kubelt/urns/account'
 import { AccountURNSpace } from '@kubelt/urns/account'
 import * as jose from 'jose'
 import { BaseMiddlewareFunction } from './types'
+import { getAuthzTokenFromReq } from '@kubelt/utils'
 
-export const JWTAssertionTokenFromHeader: BaseMiddlewareFunction<{
+export const AuthorizationTokenFromHeader: BaseMiddlewareFunction<{
   req?: Request
 }> = ({ ctx, next }) => {
-  const headers = ctx.req?.headers
-  const token = headers?.get(PlatformJWTAssertionHeader)
+  const token = ctx.req ? getAuthzTokenFromReq(ctx.req) : undefined
   return next({
     ctx: {
       ...ctx,

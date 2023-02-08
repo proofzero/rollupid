@@ -20,11 +20,11 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
 import { useEffect, useState } from 'react'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 
 import { z } from 'zod'
 import { RollType } from '~/types'
+import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -114,11 +114,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     throw new Error('Application client id is required for the requested route')
   }
   const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(Starbase, {
-    headers: {
-      [PlatformJWTAssertionHeader]: jwt,
-    },
-  })
+  const starbaseClient = createStarbaseClient(
+    Starbase,
+    getAuthzHeaderConditionallyFromToken(jwt)
+  )
 
   const scopeMeta = await starbaseClient.getScopes.query()
 
@@ -133,11 +132,10 @@ export const action: ActionFunction = async ({ request, params }) => {
   let rotatedSecret, updates
 
   const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(Starbase, {
-    headers: {
-      [PlatformJWTAssertionHeader]: jwt,
-    },
-  })
+  const starbaseClient = createStarbaseClient(
+    Starbase,
+    getAuthzHeaderConditionallyFromToken(jwt)
+  )
 
   const formData = await request.formData()
   const op = formData.get('op')

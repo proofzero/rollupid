@@ -1,5 +1,4 @@
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { AddressURN } from '@kubelt/urns/address'
 import { json, LoaderFunction } from '@remix-run/cloudflare'
 import { Outlet, useLoaderData } from '@remix-run/react'

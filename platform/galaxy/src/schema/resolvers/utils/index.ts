@@ -7,8 +7,11 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import createAccountClient from '@kubelt/platform-clients/account'
 
 import Env from '../../../env'
-import { getAuthzTokenFromReq, isFromCFBinding } from '@kubelt/utils'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import {
+  getAuthzHeaderConditionallyFromToken,
+  getAuthzTokenFromReq,
+  isFromCFBinding,
+} from '@kubelt/utils'
 
 import { WriteAnalyticsDataPoint } from '@kubelt/packages/platform-clients/analytics'
 export {
@@ -190,13 +193,7 @@ export const getConnectedAddresses = async ({
 }) => {
   const accountClient = createAccountClient(
     Account,
-    jwt
-      ? {
-          headers: {
-            [PlatformJWTAssertionHeader]: jwt,
-          },
-        }
-      : {}
+    getAuthzHeaderConditionallyFromToken(jwt)
   )
 
   const addresses = await accountClient.getAddresses.query({

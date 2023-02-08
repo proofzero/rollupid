@@ -14,9 +14,9 @@ import invariant from 'tiny-invariant'
 import { ApplicationDashboard } from '~/components/Applications/Dashboard/ApplicationDashboard'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
 import { RollType, RotatedSecrets } from '~/types'
+import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -30,11 +30,10 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
 
   const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(Starbase, {
-    headers: {
-      [PlatformJWTAssertionHeader]: jwt,
-    },
-  })
+  const starbaseClient = createStarbaseClient(
+    Starbase,
+    getAuthzHeaderConditionallyFromToken(jwt)
+  )
 
   const formData = await request.formData()
   const op = formData.get('op')
@@ -68,11 +67,10 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function AppDetailIndexPage() {
   const submit = useSubmit()
   const actionData = useActionData()
-  const outletContext =
-    useOutletContext<{
-      appDetails: appDetailsProps
-      rotationResult: RotatedSecrets
-    }>()
+  const outletContext = useOutletContext<{
+    appDetails: appDetailsProps
+    rotationResult: RotatedSecrets
+  }>()
   const navigate = useNavigate()
 
   const { appDetails: app } = outletContext
