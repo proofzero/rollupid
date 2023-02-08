@@ -75,7 +75,11 @@ export const exchangeTokenMethod = async ({
 
     // Create an edge between Account and Access nodes to record the
     // existence of a user "session".
-    const access = AccessURNSpace.urn(iss)
+    const access = AccessURNSpace.componentizedUrn(
+      iss,
+      { grant_type: GrantType.AuthenticationCode },
+      undefined
+    )
 
     console.log({ access, edgesClient: ctx.edgesClient })
     // NB: we use InjectEdges middleware to inject this service client.
@@ -133,7 +137,11 @@ export const exchangeTokenMethod = async ({
 
     // Create an edge between Account and Access nodes to record the
     // existence of a user "session".
-    const access = AccessURNSpace.urn(iss)
+    const access = AccessURNSpace.componentizedUrn(
+      iss,
+      { client_id: clientId, grant_type: GrantType.AuthorizationCode },
+      undefined
+    )
 
     console.log({ access, edgesClient: ctx.edgesClient })
     // NB: we use InjectEdges middleware to inject this service client.
