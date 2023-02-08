@@ -77,7 +77,7 @@ export const exchangeTokenMethod = async ({
     // existence of a user "session".
     const access = AccessURNSpace.componentizedUrn(
       iss,
-      { client_id: clientId, grant_type: GrantType.AuthenticationCode },
+      { grant_type: GrantType.AuthenticationCode },
       undefined
     )
 
