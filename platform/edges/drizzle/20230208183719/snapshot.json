@@ -1,0 +1,246 @@
+{
+  "version": "4",
+  "dialect": "sqlite",
+  "id": "cf43a793-63a5-405a-b14e-363ac2594743",
+  "prevId": "f101c24f-261c-4f0b-b56c-9e6f1cef4ad6",
+  "tables": {
+    "edge": {
+      "name": "edge",
+      "columns": {
+        "tag": {
+          "name": "tag",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "src": {
+          "name": "src",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dst": {
+          "name": "dst",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdTimestamp": {
+          "name": "createdTimestamp",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "edge_src_node_urn_fk": {
+          "name": "edge_src_node_urn_fk",
+          "tableFrom": "edge",
+          "tableTo": "node",
+          "columnsFrom": [
+            "src"
+          ],
+          "columnsTo": [
+            "urn"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "edge_dst_node_urn_fk": {
+          "name": "edge_dst_node_urn_fk",
+          "tableFrom": "edge",
+          "tableTo": "node",
+          "columnsFrom": [
+            "dst"
+          ],
+          "columnsTo": [
+            "urn"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "edge_src_dst_tag_pk": {
+          "columns": [
+            "src",
+            "dst",
+            "tag"
+          ]
+        }
+      }
+    },
+    "node": {
+      "name": "node",
+      "columns": {
+        "urn": {
+          "name": "urn",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nid": {
+          "name": "nid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nss": {
+          "name": "nss",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fragment": {
+          "name": "fragment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {}
+    },
+    "node_qcomp": {
+      "name": "node_qcomp",
+      "columns": {
+        "nodeUrn": {
+          "name": "nodeUrn",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "IDX_node_qcomp_nodeUrn": {
+          "name": "IDX_node_qcomp_nodeUrn",
+          "columns": [
+            "nodeUrn"
+          ],
+          "isUnique": false
+        },
+        "IDX_node_qcomp_key": {
+          "name": "IDX_node_qcomp_key",
+          "columns": [
+            "key"
+          ],
+          "isUnique": false
+        },
+        "IDX_node_qcomp_value": {
+          "name": "IDX_node_qcomp_value",
+          "columns": [
+            "value"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "node_qcomp_nodeUrn_node_urn_fk": {
+          "name": "node_qcomp_nodeUrn_node_urn_fk",
+          "tableFrom": "node_qcomp",
+          "tableTo": "node",
+          "columnsFrom": [
+            "nodeUrn"
+          ],
+          "columnsTo": [
+            "urn"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "node_qcomp_nodeUrn_key_pk": {
+          "columns": [
+            "nodeUrn",
+            "key"
+          ]
+        }
+      }
+    },
+    "node_rcomp": {
+      "name": "node_rcomp",
+      "columns": {
+        "nodeUrn": {
+          "name": "nodeUrn",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "IDX_node_rcomp_nodeUrn": {
+          "name": "IDX_node_rcomp_nodeUrn",
+          "columns": [
+            "nodeUrn"
+          ],
+          "isUnique": false
+        },
+        "IDX_node_rcomp_key": {
+          "name": "IDX_node_rcomp_key",
+          "columns": [
+            "key"
+          ],
+          "isUnique": false
+        },
+        "IDX_node_rcomp_value": {
+          "name": "IDX_node_rcomp_value",
+          "columns": [
+            "value"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "node_rcomp_nodeUrn_node_urn_fk": {
+          "name": "node_rcomp_nodeUrn_node_urn_fk",
+          "tableFrom": "node_rcomp",
+          "tableTo": "node",
+          "columnsFrom": [
+            "nodeUrn"
+          ],
+          "columnsTo": [
+            "urn"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "node_rcomp_nodeUrn_key_pk": {
+          "columns": [
+            "nodeUrn",
+            "key"
+          ]
+        }
+      }
+    }
+  },
+  "enums": {}
+}

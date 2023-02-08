@@ -60,6 +60,8 @@ export interface EdgeRecord {
   dst: AnyURN
   // The "type" of the edge.
   tag: EdgeTag
+  // As the name suggests, created datetimestamp of the edge
+  createdTimestamp?: string
 }
 
 export interface QComponent {

@@ -171,10 +171,10 @@ export async function edges(
 
   // Filter edges by tag, if provided.
   if (query.tag) {
-    sql = [sql, 'e.tag = ?2'].join(' AND ')
-
+    sql += ' AND e.tag = ?2 ORDER BY createdTimestamp ASC'
     statement = g.db.prepare(sql).bind(query.id.toString(), query.tag)
   } else {
+    sql += ' ORDER BY createdTimestamp ASC'
     statement = g.db.prepare(sql).bind(query.id.toString())
   }
 
@@ -310,11 +310,13 @@ export async function edges(
       const dst: Node = { ...dstNode, id: `urn:${dstNode.nid}:${dstNode.nss}` }
 
       const tag = edgeRec.tag
+      const createdTimestamp = edgeRec.createdTimestamp
 
       return {
         tag,
         src,
         dst,
+        createdTimestamp,
       }
     })
   )

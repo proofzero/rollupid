@@ -1,0 +1,1 @@
+ALTER TABLE edge ADD `createdTimestamp` text;
