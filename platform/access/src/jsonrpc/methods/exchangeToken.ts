@@ -4,11 +4,11 @@ import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
 
 import { AccessURNSpace } from '@kubelt/urns/access'
 import { AccountURN } from '@kubelt/urns/account'
+import { GrantType, Scope } from '@kubelt/types/access'
 
 import { Context } from '../../context'
 import { initAuthorizationNodeByName, initAccessNodeByName } from '../../nodes'
 
-import { GrantType } from '../../types'
 import { tokenValidator } from '../validators/token'
 import getIdTokenProfileFromAccount from '../../utils/getIdTokenProfileFromAccount'
 

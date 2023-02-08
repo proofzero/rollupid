@@ -1,4 +1,7 @@
 import { z } from 'zod'
+
+import { Scope } from '@kubelt/types/access'
+
 import {
   AppleOAuthSchema,
   GithubOAuthSchema,
@@ -51,7 +54,7 @@ export interface Challenge {
   address: string
   template: string
   redirectUri: string
-  scope: string[]
+  scope: Scope
   state: string
   timestamp: number
 }

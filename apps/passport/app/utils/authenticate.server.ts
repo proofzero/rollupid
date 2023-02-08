@@ -1,7 +1,7 @@
 import type { AddressURN } from '@kubelt/urns/address'
 import type { AccountURN } from '@kubelt/urns/account'
 
-import { GrantType, ResponseType } from '@kubelt/platform.access/src/types'
+import { GrantType, ResponseType } from '@kubelt/types/access'
 
 import { getAccessClient } from '~/platform.server'
 import { createUserSession } from '~/session.server'

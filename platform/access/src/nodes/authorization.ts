@@ -1,13 +1,12 @@
 import { AccountURN } from '@kubelt/urns/account'
 import { DOProxy } from 'do-proxy'
 
+import { ResponseType } from '@kubelt/types/access'
+import type { Scope } from '@kubelt/types/access'
+
 import { CODE_OPTIONS } from '../constants'
 
-import {
-  AuthorizationParameters,
-  AuthorizeResult,
-  ResponseType,
-} from '../types'
+import { AuthorizationParameters, AuthorizeResult } from '../types'
 
 export default class Authorization extends DOProxy {
   declare state: DurableObjectState
@@ -23,7 +22,7 @@ export default class Authorization extends DOProxy {
     responseType: string,
     clientId: string,
     redirectUri: string,
-    scope: any,
+    scope: Scope,
     state: string
   ): Promise<AuthorizeResult> {
     if (responseType != ResponseType.Code) {

@@ -1,8 +1,9 @@
 import { z } from 'zod'
 import { Context } from '../../context'
 
+import { ResponseType } from '@kubelt/types/access'
+
 import getAccessClient from '@kubelt/platform-clients/access'
-import { ResponseType } from '@kubelt/platform.access/src/types' // TODO: move to types?
 
 import { appRouter } from '../router'
 import { Challenge } from '../../types'

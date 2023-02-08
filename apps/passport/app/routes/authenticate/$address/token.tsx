@@ -1,4 +1,4 @@
-import { GrantType } from '@kubelt/platform.access/src/types'
+import { GrantType } from '@kubelt/types/access'
 import { AddressType, CryptoAddressType, NodeType } from '@kubelt/types/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
