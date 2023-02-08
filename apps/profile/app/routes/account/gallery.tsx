@@ -421,7 +421,8 @@ const Gallery = () => {
               className="w-full h-full
               bg-gray-50 hover:bg-gray-100 transition-colors
               rounded-lg"
-              onClick={() => setIsOpen(true)}
+              disabled={!!cryptoAddresses?.length}
+              onClick={() => setIsOpen(!!cryptoAddresses?.length)}
             >
               <div
                 className="flex flex-col justify-center items-center h-full
@@ -433,7 +434,11 @@ const Gallery = () => {
                   fontWeight={100}
                   className="mb-2 font-extralight"
                 />
-                <Text>Add NFT</Text>
+                <Text>
+                  {cryptoAddresses?.length
+                    ? 'Add NFT'
+                    : 'No Crypto Account Detected'}
+                </Text>
               </div>
             </button>
             {galleryFetcher.state === 'loading' && (

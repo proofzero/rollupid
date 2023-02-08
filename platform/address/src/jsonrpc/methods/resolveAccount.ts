@@ -25,32 +25,25 @@ export const resolveAccountMethod = async ({
 }): Promise<ResolveAccountResult> => {
   const nodeClient = ctx.address
 
-  let resultURN: AccountURN
-  let eventName: string
+  let eventName = 'account-resolved'
 
-  const stored = await nodeClient?.storage.get<AccountURN>('account')
-  if (stored) {
-    if (AccountURNSpace.is(stored)) {
-      eventName = 'account-stored'
-      resultURN = stored
-    } else {
-      const urn = AccountURNSpace.componentizedUrn(stored)
-      nodeClient?.storage.put('account', urn)
-      eventName = 'account-created-space'
-      resultURN = urn
-    }
-  } else {
+  let resultURN = await nodeClient?.storage.get<AccountURN>('account')
+  if (!resultURN) {
     const name = hexlify(randomBytes(ACCOUNT_OPTIONS.length))
     const urn = AccountURNSpace.componentizedUrn(name)
 
+    //
     const caller = appRouter.createCaller(ctx)
-    await caller.setAccount(urn)
-    await caller.initVault()
+    await caller.setAccount(urn) // this will lazy create an account node when account worker is called
 
-    eventName = 'account-created-vault'
+    // DISABLING FOR NOW UNTIL WE FIGURE SOLVE FOR VAULT AUTH SCOPES
+    // await caller.initVault()
+
+    eventName = 'account-created'
     resultURN = urn
   }
 
+  // TODO: use "caller" for create so we don't need these special cases
   WriteAnalyticsDataPoint(ctx, {
     blobs: [ctx.alias, resultURN, eventName],
   } as AnalyticsEngineDataPoint)
