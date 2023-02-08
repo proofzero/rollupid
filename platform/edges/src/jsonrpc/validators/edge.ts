@@ -20,4 +20,5 @@ export const Edge = z.object({
   src: Node,
   dst: Node,
   tag: EdgeTagInput,
+  createdTimestamp: z.string().nullable(),
 })

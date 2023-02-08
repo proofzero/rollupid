@@ -114,12 +114,14 @@ export async function edge(
       INSERT INTO edge (
         src,
         dst,
-        tag
+        tag,
+        createdTimestamp
       )
       VALUES (
         ?1,
         ?2,
-        ?3
+        ?3,
+        datetime('now')
       )
       ON CONFLICT DO NOTHING
     `

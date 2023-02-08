@@ -35,6 +35,7 @@ export type EdgeTable = {
   src: NodeTable
   dst: NodeTable
   tag: string
+  createdTimestamp: string | null
 }
 
 export const node = sqliteTable('node', {
@@ -60,6 +61,7 @@ export const edge = sqliteTable(
         onDelete: 'no action',
         onUpdate: 'no action',
       }),
+    createdTimestamp: text('createdTimestamp'),
   },
   (table) => ({
     edge: primaryKey(table.src, table.dst, table.tag),
