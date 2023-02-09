@@ -6,11 +6,16 @@ import { useState } from 'react'
 import { Text } from '@kubelt/design-system'
 
 import { CameraIcon } from '@heroicons/react/24/outline'
+import { ApplicationURN } from '@kubelt/urns/application'
 
 // pickIcon
 // -----------------------------------------------------------------------------
 
-function pickIcon(setIcon, setIconUrl) {
+function pickIcon(
+  appURN: ApplicationURN,
+  setIcon: Function,
+  setIconUrl: Function
+) {
   return async (e) => {
     // e.target is the input control that trigger the event.
     const files = e.target.files
@@ -29,8 +34,11 @@ function pickIcon(setIcon, setIconUrl) {
       }
       reader.readAsDataURL(iconFile)
 
+      const data = new FormData()
+      data.append('appURN', appURN)
       const imgUploadUrl = (await fetch('/api/image-upload-url', {
         method: 'post',
+        body: data,
       }).then((res) => {
         return res.json()
       })) as string
@@ -71,6 +79,7 @@ type IconPickerProps = {
   invalid?: boolean
   // An error message to display
   errorMessage?: string
+  appURN: ApplicationURN
   setIsFormChanged: (val: boolean) => void
   setIsImgUploading: (val: boolean) => void
 }
@@ -80,6 +89,7 @@ export default function IconPicker({
   url,
   invalid,
   errorMessage,
+  appURN,
   setIsFormChanged,
   setIsImgUploading,
 }: IconPickerProps) {
@@ -171,7 +181,11 @@ export default function IconPicker({
                   event.stopPropagation()
                   setIsFormChanged(false)
                   setIsImgUploading(true)
-                  const errors = await pickIcon(setIcon, setIconUrl)(event)
+                  const errors = await pickIcon(
+                    appURN,
+                    setIcon,
+                    setIconUrl
+                  )(event)
                   if (Object.keys(errors).length) {
                     setInvalidState(true)
                     setErrorMessageState(errors[Object.keys(errors)[0]])

@@ -40,11 +40,16 @@ export const getOneTimeImageUploadURLMethod = async ({
   // Configuration for the direct_upload Cloudflare API call:
   const formData = new FormData()
 
+  const metaData = {
+    timestamp: Date.now(),
+  }
   // Is a signature token required to access the uploaded image?
   formData.append('requireSignedURLs', 'false')
+  formData.append('metadata', JSON.stringify(metaData))
   formData.append('expiry', expiry)
   if (input.entity) {
     const id = await getUniqueCFIdForEntity(input.entity)
+    console.debug('CUSTOM ID', { id })
     formData.append('id', id)
   }
   // URL for "Create authenticated direct upload URL V2" endpoint.
@@ -69,9 +74,16 @@ export const getOneTimeImageUploadURLMethod = async ({
     // fields in the request body.
     body: formData,
   })
+  console.debug('FORMDATA', { formData })
   const response = await fetch(uploadRequest)
   // Check the HTTP status.
   if (!response.ok) {
+    console.debug(
+      'RESPONSE',
+      response.status,
+      response.statusText,
+      await response.text()
+    )
     throw new Error(`Could not retrieve a one-time image URL`, {
       cause: response.statusText,
     })

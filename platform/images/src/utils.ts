@@ -5,5 +5,7 @@ export async function getUniqueCFIdForEntity(
 ): Promise<string> {
   const byteString = new TextEncoder().encode(entity)
   const byteHash = await crypto.subtle.digest('SHA-256', byteString)
-  return new TextDecoder().decode(new Uint8Array(byteHash))
+  const hashArray = Array.from(new Uint8Array(byteHash))
+  const digest = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  return digest
 }

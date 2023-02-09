@@ -32,17 +32,13 @@ export const AddressURNInput = z.custom<AddressURN>((input) => {
 })
 
 export const AccountURNInput = z.custom<AccountURN>((input) => {
-  if (AccountURNSpace.parse(input as AccountURN) === null) {
-    throw new Error('Invalid AccountURN entry')
-  }
-  return input as AccountURN
+  const result = AccountURNSpace.is(input as AccountURN)
+  return result
 })
 
 export const ApplicationURNInput = z.custom<ApplicationURN>((input) => {
-  if (ApplicationURNSpace.parse(input as ApplicationURN) === null) {
-    throw new Error('Invalid ApplicationURN entry')
-  }
-  return input as ApplicationURN
+  const result = ApplicationURNSpace.is(input as ApplicationURN)
+  return result
 })
 
 export const CryptoAddressTypeInput = z.custom<CryptoAddressType>((input) => {

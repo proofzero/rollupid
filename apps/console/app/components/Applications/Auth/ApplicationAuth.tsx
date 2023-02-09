@@ -11,6 +11,7 @@ import { useState } from 'react'
 import { RotateCredsModal } from '../../RotateCredsModal/RotateCredsModal'
 import type { ScopeMeta } from '@kubelt/platform/starbase/src/types'
 import toast from 'react-hot-toast'
+import { ApplicationURNSpace } from '@kubelt/urns/application'
 
 export type appDetailsProps = {
   app: {
@@ -81,6 +82,7 @@ export const ApplicationAuth = ({
     }
   })
 
+  const appURN = ApplicationURNSpace.componentizedUrn(appDetails.clientId!)
   return (
     <section className="flex flex-col space-y-5">
       <div className="flex flex-row justify-between space-x-5">
@@ -314,6 +316,7 @@ export const ApplicationAuth = ({
                 errors.hasOwnProperty('icon') &&
                 (errors['icon'] as string).length > 0
               }
+              appURN={appURN}
               setIsFormChanged={setIsFormChanged as (val: boolean) => void}
               setIsImgUploading={setIsImgUploading as (val: boolean) => void}
               url={formData.app.icon}
