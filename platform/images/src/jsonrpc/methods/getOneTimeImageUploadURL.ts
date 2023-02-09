@@ -1,43 +1,33 @@
 import { z } from 'zod'
 import { Context } from '../../context'
 import { add as dateAdd, formatRFC3339 as dateFormat } from 'date-fns'
+import { getUniqueCFIdForEntity } from '../../utils'
+import { AccountOrApplicationURNSchema } from '../../types'
 
-export type ImageMetadata = {
-  // The environment from which image was uploaded.
-  env: string
-}
+export const getOneTimeImageUploadURLInput = z.object({
+  entity: AccountOrApplicationURNSchema.optional(),
+})
 
-export const uploadMethodInput = z.string().optional()
+export type getOneTimeImageUploadURLParam = z.infer<
+  typeof getOneTimeImageUploadURLInput
+>
 
-export type uploadParams = z.infer<typeof uploadMethodInput>
+export const getOneTimeImageUploadURLOutput = z.object({
+  id: z.string(),
+  uploadURL: z.string(),
+})
 
-export const uploadMethodOutput = z
-  .custom<Response>((val) => typeof val === typeof Response)
-  .or(
-    z.object({
-      id: z.string(),
-      uploadURL: z.string(),
-    })
-  )
+export type getOneTimeImageUploadURLOutputParam = z.infer<
+  typeof getOneTimeImageUploadURLOutput
+>
 
-export type uploadMethodOutputParams = z.infer<typeof uploadMethodOutput>
-
-export const uploadMethod = async ({
+export const getOneTimeImageUploadURLMethod = async ({
   input,
   ctx,
 }: {
-  input: uploadParams
+  input: getOneTimeImageUploadURLParam
   ctx: Context
-}): Promise<uploadMethodOutputParams> => {
-  console.log('New request on /upload')
-
-  // If user supplies a JSON object in POST body, use that as the image metadata.
-  let body: any = input ? input : {}
-
-  // Arbitrary key/value pairs associated with the image. Can be used
-  // for keeping references to another system of record.
-  const metadata = JSON.stringify(body)
-
+}): Promise<getOneTimeImageUploadURLOutputParam> => {
   // The date after which the upload will not be accepted.
   // - minimum: now + 2 minutes
   // - maximum: now + 6 hours
@@ -49,10 +39,14 @@ export const uploadMethod = async ({
   const expiry = dateFormat(expiryDate)
   // Configuration for the direct_upload Cloudflare API call:
   const formData = new FormData()
+
   // Is a signature token required to access the uploaded image?
   formData.append('requireSignedURLs', 'false')
-  formData.append('metadata', metadata)
   formData.append('expiry', expiry)
+  if (input.entity) {
+    const id = await getUniqueCFIdForEntity(input.entity)
+    formData.append('id', id)
+  }
   // URL for "Create authenticated direct upload URL V2" endpoint.
   const url = `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`
   // Direct uploads allow users to upload images without API keys. A
@@ -78,7 +72,9 @@ export const uploadMethod = async ({
   const response = await fetch(uploadRequest)
   // Check the HTTP status.
   if (!response.ok) {
-    return response
+    throw new Error(`Could not retrieve a one-time image URL`, {
+      cause: response.statusText,
+    })
   }
 
   // Example response body:
@@ -96,9 +92,10 @@ export const uploadMethod = async ({
     result: object
   }>()
   if (!direct_upload.success) {
-    return new Response(JSON.stringify(direct_upload), {
-      status: 500,
-    })
+    throw new Error(
+      `Retrieval of one-time image upload URL returned unsuccesfully`,
+      { cause: { response: direct_upload } }
+    )
   }
   const result: { id: string; uploadURL: string } = direct_upload.result as {
     uploadURL: string

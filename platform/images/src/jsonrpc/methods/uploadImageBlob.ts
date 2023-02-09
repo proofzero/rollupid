@@ -1,5 +1,7 @@
 import { z } from 'zod'
 import { Context } from '../../context'
+import { AccountOrApplicationURNSchema } from '../../types'
+import { getUniqueCFIdForEntity } from '../../utils'
 
 type CFImageUploadResponse = {
   success: boolean
@@ -16,33 +18,37 @@ type CFImageUploadResponse = {
   }
 }
 
-export const uploadImageBlobInput = z.object({
-  blob: z.custom<Blob>((val) => val instanceof Blob),
+export const uploadImageInput = z.object({
+  imageURLOrBlob: z.custom<Blob>((val) => val instanceof Blob).or(z.string()),
+  entity: AccountOrApplicationURNSchema,
 })
 
-export type uploadImageBlobInputParams = z.infer<typeof uploadImageBlobInput>
+export type uploadImageInputParams = z.infer<typeof uploadImageInput>
 
-export const uploadImageBlobMethodOutput = z.string().nullable().optional()
+export const uploadImageMethodOutput = z.string().nullable().optional()
 
-export type uploadImageBlobMethodParams = z.infer<
-  typeof uploadImageBlobMethodOutput
->
+export type uploadImageMethodParams = z.infer<typeof uploadImageMethodOutput>
 
-export const uploadImageBlobMethod = async ({
+export const uploadImageMethod = async ({
   input,
   ctx,
 }: {
-  input: uploadImageBlobInputParams
+  input: uploadImageInputParams
   ctx: Context
-}): Promise<uploadImageBlobMethodParams> => {
+}): Promise<uploadImageMethodParams> => {
   console.log('New request on /uploadImageBlob')
   const uploadURL = `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1`
 
-  const reqBlob = input.blob
-  if (!reqBlob) throw new Error('Bad request: Expected image blob in request.')
-
   const formData = new FormData()
-  formData.append('file', reqBlob)
+
+  if (input.imageURLOrBlob instanceof Blob) {
+    formData.append('file', input.imageURLOrBlob)
+  } else {
+    formData.append('url', input.imageURLOrBlob)
+  }
+
+  const id = await getUniqueCFIdForEntity(input.entity)
+  formData.append('id', id)
 
   const uploadRequest = new Request(uploadURL, {
     method: 'POST',

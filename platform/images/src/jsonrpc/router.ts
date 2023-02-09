@@ -2,14 +2,14 @@ import { Analytics } from '@kubelt/platform-middleware/analytics'
 import { LogUsage } from '@kubelt/platform-middleware/log'
 import { initTRPC } from '@trpc/server'
 import {
-  uploadMethod,
-  uploadMethodOutput,
-  uploadMethodInput,
-} from './methods/upload'
+  getOneTimeImageUploadURLMethod,
+  getOneTimeImageUploadURLOutput,
+  getOneTimeImageUploadURLInput,
+} from './methods/getOneTimeImageUploadURL'
 import {
-  uploadImageBlobMethod,
-  uploadImageBlobInput,
-  uploadImageBlobMethodOutput,
+  uploadImageMethod,
+  uploadImageInput,
+  uploadImageMethodOutput,
 } from './methods/uploadImageBlob'
 import {
   getOgImageMethod,
@@ -23,22 +23,27 @@ import {
 } from './methods/getGradient'
 
 import { Context } from '../context'
+import {
+  getPrecomputedImageURL,
+  PrecomputedImageURLInput,
+  PrecomputedImageURLOutput,
+} from './methods/getPrecomputedImageURL'
 
 const t = initTRPC.context<Context>().create()
 
 export const appRouter = t.router({
-  upload: t.procedure
+  getOneTimeImageUploadURL: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(uploadMethodInput)
-    .output(uploadMethodOutput)
-    .mutation(uploadMethod),
-  uploadImageBlob: t.procedure
+    .input(getOneTimeImageUploadURLInput)
+    .output(getOneTimeImageUploadURLOutput)
+    .query(getOneTimeImageUploadURLMethod),
+  uploadImage: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(uploadImageBlobInput)
-    .output(uploadImageBlobMethodOutput)
-    .mutation(uploadImageBlobMethod),
+    .input(uploadImageInput)
+    .output(uploadImageMethodOutput)
+    .mutation(uploadImageMethod),
   getOgImage: t.procedure
     .use(LogUsage)
     .use(Analytics)
@@ -51,4 +56,9 @@ export const appRouter = t.router({
     .input(GetGradientMethodInput)
     .output(GetGradientMethodOutput)
     .mutation(getGradientMethod),
+  getPrecomputedImageURL: t.procedure
+    .use(LogUsage)
+    .input(PrecomputedImageURLInput)
+    .output(PrecomputedImageURLOutput)
+    .query(getPrecomputedImageURL),
 })

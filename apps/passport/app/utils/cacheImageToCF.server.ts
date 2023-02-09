@@ -1,6 +1,8 @@
 import createImageClient from '@kubelt/platform-clients/image'
+import { AccountURN } from '@kubelt/urns/account'
 
 export default async (
+  forAccount: AccountURN,
   image_retrieval_url: string,
   env: Env,
   headers?: Record<string, string>
@@ -30,7 +32,10 @@ export default async (
   cacheReqFormData.append('imageBlob', blob)
 
   const imageClient = createImageClient(env.Images)
-  const imageUrl = await imageClient.uploadImageBlob.mutate({ blob })
+  const imageUrl = await imageClient.uploadImage.mutate({
+    entity: forAccount,
+    imageURLOrBlob: blob,
+  })
 
   if (!imageUrl || !imageUrl.length) throw new Error('Could not cache image.')
 

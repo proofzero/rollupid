@@ -5,6 +5,7 @@ import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
 import { AnyURN, parseURN } from '@kubelt/urns'
 import { EdgeURN } from '@kubelt/urns/edge'
 import { CryptoAddressType } from '@kubelt/types/address'
+import { ApplicationURN, ApplicationURNSpace } from '@kubelt/urns/application'
 
 export const NoInput = z.undefined()
 
@@ -35,6 +36,13 @@ export const AccountURNInput = z.custom<AccountURN>((input) => {
     throw new Error('Invalid AccountURN entry')
   }
   return input as AccountURN
+})
+
+export const ApplicationURNInput = z.custom<ApplicationURN>((input) => {
+  if (ApplicationURNSpace.parse(input as ApplicationURN) === null) {
+    throw new Error('Invalid ApplicationURN entry')
+  }
+  return input as ApplicationURN
 })
 
 export const CryptoAddressTypeInput = z.custom<CryptoAddressType>((input) => {

@@ -47,9 +47,14 @@ export const loader: LoaderFunction = async ({
   if (existingOAuthData?.profile == null) {
     //If we don't already have a microsoft oauth data set, we cache
     //the image and set the OAuth data set for the address
-    const imageUrl = await cacheImageToCF(profile._json.picture, context.env, {
-      Authorization: `Bearer ${authRes.accessToken}`,
-    })
+    const imageUrl = await cacheImageToCF(
+      account,
+      profile._json.picture,
+      context.env,
+      {
+        Authorization: `Bearer ${authRes.accessToken}`,
+      }
+    )
     profile._json.rollupidImageUrl = imageUrl
 
     await addressClient.setOAuthData.mutate(authRes)

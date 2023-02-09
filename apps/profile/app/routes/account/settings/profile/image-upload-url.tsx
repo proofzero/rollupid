@@ -13,7 +13,7 @@ export const action: ActionFunction = async ({ request }) => {
   await requireJWT(request)
 
   const imageClient = createImageClient(Images)
-  const { uploadURL } = await imageClient.upload.mutate()
+  const { uploadURL } = await imageClient.getOneTimeImageUploadURL.query({})
   console.log({ uploadURL })
   return json(uploadURL)
 }
