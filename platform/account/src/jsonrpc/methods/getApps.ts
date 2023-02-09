@@ -59,7 +59,10 @@ export const getAppsMethod = async ({
     // and comparisons
     .map((edge) => ({
       rc: edge.dst.rc as AccessRComp,
-      timestamp: new Date(edge.createdTimestamp as string).getTime(),
+      // The UTC addon lets the Date engine know we're
+      // parsing from UTC so the locale of the client
+      // is properly inferred in later usages
+      timestamp: new Date((edge.createdTimestamp as string) + ' UTC').getTime(),
     }))
     // There are some edges without client_id
     // this shouldn't be the case once EDGE_AUTHORIZATION

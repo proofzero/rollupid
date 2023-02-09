@@ -13,22 +13,21 @@ import { normalizeProfileToLinks } from '~/helpers'
 import { LoaderFunction } from 'react-router-dom'
 import { requireJWT } from '~/utils/session.server'
 import { getAccountApps } from '~/helpers/profile'
+import { Tooltip } from 'flowbite-react'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
   const apps = await getAccountApps(jwt)
 
-  console.log({
-    apps,
-  })
-
-  return { sessions: [] }
+  return { apps }
 }
 
 export default function Welcome() {
-  const { sessions } = useLoaderData<{
-    sessions: {
-      urn: string
+  const { apps } = useLoaderData<{
+    apps: {
+      icon: string
+      title: string
+      timestamp: number
     }[]
   }>()
 
@@ -155,7 +154,7 @@ export default function Welcome() {
             <SectionTitle title="Activity" />
 
             <div
-              className="w-full h-[205px] flex justify-center items-center border-gray-200 rounded-lg shadow"
+              className="w-full h-[205px] mt-4 flex justify-center items-center border-gray-200 rounded-lg shadow"
               style={{
                 background: `url(${dashboardChart})`,
                 backgroundRepeat: 'no-repeat',
@@ -207,24 +206,65 @@ export default function Welcome() {
         </div>
 
         <div className="flex-1 flex flex-col">
-          <SectionTitle title="My Sessions" />
+          <SectionTitle title="Applications" />
 
           <div className="border shadow flex-1 flex flex-col rounded-lg">
-            <div className="bg-[#F9FAFB] flex items-center py-5 px-8">
+            <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-t-lg">
               <Text size="sm" weight="medium" className="text-gray-500 flex-1">
                 APPLICATION
               </Text>
               <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-                DATE
+                APPROVED
               </Text>
             </div>
 
-            <div className="flex-1">
-              {sessions.map((s) => (
-                <div key={s.urn} className="py-5 px-8 break-all">
-                  <Text>{s.urn}</Text>
-                </div>
+            <div className="flex flex-1 flex-col">
+              {apps.map((a) => (
+                <article key={a.title} className="flex items-center py-5 px-8">
+                  <div className="flex-1 flex flex-row items-center space-x-4">
+                    <img src={a.icon} className="w-6 h-6 rounded" />
+
+                    <Text
+                      size="sm"
+                      weight="medium"
+                      className="text-gray-500 flex-1"
+                    >
+                      {a.title}
+                    </Text>
+                  </div>
+
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="text-gray-500 flex-1"
+                  >
+                    {new Date(a.timestamp).toLocaleString('default', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    })}
+                  </Text>
+                </article>
               ))}
+            </div>
+
+            <div className="w-full px-8">
+              <div className="border-t border-gray-200"></div>
+            </div>
+
+            <div className="flex flex-row justify-center">
+              <Tooltip content="Coming soon!" trigger="hover">
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="cursor-pointer text-indigo-500 my-4"
+                >
+                  View All
+                </Text>
+              </Tooltip>
             </div>
           </div>
         </div>
