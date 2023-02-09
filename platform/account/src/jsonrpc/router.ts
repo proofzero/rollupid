@@ -44,7 +44,11 @@ import {
   GetGalleryOutput,
 } from './methods/getGallery'
 import { SetGalleryInput, setGalleryMethod } from './methods/setGallery'
-import { GetAppsMethodInput, GetAppsMethodOutput, getAppsMethod } from './methods/getApps'
+import {
+  GetAppsMethodInput,
+  GetAppsMethodOutput,
+  getAppsMethod,
+} from './methods/getApps'
 
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
