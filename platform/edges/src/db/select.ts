@@ -147,9 +147,9 @@ export async function edges(
   // TODO we don't want to allow for the possibility of all edges being
   // returned until pagination is in place. Revisit this behavior if we
   // decide to implement it.
-  if (!query.id) {
-    return []
-  }
+  // if (!query.id) {
+  //   return []
+  // }
 
   // Filter returned edges by direction; if we're asked for "outgoing"
   // edges, the node ID is for the "source" node of the edge. If we're

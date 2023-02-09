@@ -59,6 +59,11 @@ import {
   GetAppPublicPropsInput,
   GetAppPublicPropsOutput,
 } from './methods/getAppPublicProps'
+import {
+  getAuthorizedAccounts,
+  GetAuthorizedAccountsMethodInput,
+  GetAuthorizedAccountsMethodOutput,
+} from './methods/getAuthorizedAccounts'
 
 const t = initTRPC.context<Context>().create()
 
@@ -105,6 +110,15 @@ export const appRouter = t.router({
     .input(GetAppProfileInput)
     .output(GetAppProfileOutput)
     .query(getAppProfile),
+  getAuthorizedAccounts: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .use(OwnAppsMiddleware)
+    .input(GetAuthorizedAccountsMethodInput)
+    .output(GetAuthorizedAccountsMethodOutput)
+    .query(getAuthorizedAccounts),
   listApps: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)

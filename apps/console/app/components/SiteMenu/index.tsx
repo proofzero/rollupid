@@ -26,7 +26,11 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 const RollupLogo = () => {
   return (
     <Link to="/">
-      <img className="mx-4 my-5 max-w-[180px]" src={consoleLogo} alt="console logo" />
+      <img
+        className="mx-4 my-5 max-w-[180px]"
+        src={consoleLogo}
+        alt="console logo"
+      />
     </Link>
   )
 }
@@ -170,10 +174,9 @@ function AppMenu({ props }: AppMenuProps) {
           </NavLink>
 
           <NavLink
-            to={`/apps/${props.selected}/soon`}
+            to={`/apps/${props.selected}/users`}
             end
-            className={({ isActive }) => menuItemClass(isActive, true)}
-            onClick={(e) => e.preventDefault()}
+            className={({ isActive }) => menuItemClass(isActive)}
           >
             <HiOutlineChartSquareBar className="w-6 h-6" />{' '}
             <Text size="sm" weight="medium">
