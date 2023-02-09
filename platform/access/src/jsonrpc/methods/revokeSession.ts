@@ -2,7 +2,7 @@
 
 import { z } from 'zod'
 import { AccessURNInput } from '@kubelt/platform-middleware/inputValidators'
-import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
+import { EDGE_AUTHENTICATES } from '@kubelt/platform.access/src/constants'
 import { Context } from '../../context'
 
 export const RevokeSessionMethodInput = AccessURNInput
@@ -37,7 +37,8 @@ export const revokeSessionMethod = async ({
     // the context definition.
     src: account!,
     dst: access,
-    tag: EDGE_ACCESS,
+    //TODO: This may need to be changed to EDGE_AUTHORIZES when we implement revoke
+    tag: EDGE_AUTHENTICATES,
   })
 
   return true
