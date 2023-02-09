@@ -26,6 +26,13 @@ export type AddressProfile = {
 
 export type AddressProfilesUnion = CryptoAddressProfile | OAuthAppleProfile | OAuthGithubProfile | OAuthGoogleProfile | OAuthMicrosoftProfile | OAuthTwitterProfile;
 
+export type App = {
+  __typename?: 'App';
+  icon: Scalars['String'];
+  timestamp: Scalars['Float'];
+  title: Scalars['String'];
+};
+
 export type Chain = {
   __typename?: 'Chain';
   chain?: Maybe<Scalars['String']>;
@@ -382,6 +389,7 @@ export type Query = {
   __typename?: 'Query';
   addressProfile: AddressProfile;
   addressProfiles: Array<AddressProfile>;
+  apps?: Maybe<Array<Maybe<App>>>;
   connectedAddresses?: Maybe<Array<Node>>;
   connectedAddressesFromAddress?: Maybe<Array<Node>>;
   contractsForAddress?: Maybe<NftContracts>;
@@ -482,6 +490,11 @@ export type GetProfileFromAddressQueryVariables = Exact<{
 
 
 export type GetProfileFromAddressQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string }> | null, connectedAddresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null };
+
+export type GetAppsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAppsQuery = { __typename?: 'Query', apps?: Array<{ __typename?: 'App', icon: string, title: string, timestamp: number } | null> | null };
 
 export type GetConnectedAddressesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -647,6 +660,15 @@ export const GetProfileFromAddressDocument = gql`
     fragment
     qc
     rc
+  }
+}
+    `;
+export const GetAppsDocument = gql`
+    query getApps {
+  apps {
+    icon
+    title
+    timestamp
   }
 }
     `;
@@ -913,6 +935,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getProfileFromAddress(variables: GetProfileFromAddressQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileFromAddressQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProfileFromAddressQuery>(GetProfileFromAddressDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfileFromAddress', 'query');
+    },
+    getApps(variables?: GetAppsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAppsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAppsQuery>(GetAppsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getApps', 'query');
     },
     getConnectedAddresses(variables?: GetConnectedAddressesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetConnectedAddressesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetConnectedAddressesQuery>(GetConnectedAddressesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getConnectedAddresses', 'query');

@@ -2,6 +2,8 @@ import { composeResolvers } from '@graphql-tools/resolvers-composition'
 
 import createAccountClient from '@kubelt/platform-clients/account'
 import createAddressClient from '@kubelt/platform-clients/address'
+import createAccessClient from '@kubelt/platform-clients/access'
+import createStarbaseClient from '@kubelt/platform-clients/starbase'
 
 import {
   setupContext,
@@ -39,6 +41,45 @@ const accountResolvers: Resolvers = {
       })
 
       return accountProfile
+    },
+
+    apps: async (
+      _parent: any,
+      {},
+      { env, accountURN, jwt }: ResolverContext
+    ) => {
+      const accountClient = createAccountClient(
+        env.Account,
+        getAuthzHeaderConditionallyFromToken(jwt)
+      )
+
+      const apps = await accountClient.getApps.query({
+        account: accountURN,
+      })
+
+      const starbaseClient = createStarbaseClient(
+        env.Starbase,
+        getAuthzHeaderConditionallyFromToken(jwt)
+      )
+
+      const mappedApps = await Promise.all(
+        apps.map(async (a) => {
+          const { name, iconURL } =
+            await starbaseClient.getAppPublicProps.query({
+              clientId: a.clientId,
+            })
+
+          return {
+            icon: iconURL,
+            title: name,
+            timestamp: a.timestamp,
+          }
+        })
+      )
+
+      console.log(mappedApps)
+
+      return mappedApps
     },
 
     //@ts-ignore
@@ -364,6 +405,7 @@ const accountResolvers: Resolvers = {
 
 const ProfileResolverComposition = {
   'Query.profile': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.apps': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.links': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.gallery': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.connectedAddresses': [

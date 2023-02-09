@@ -1,4 +1,4 @@
-import { Link, useOutletContext } from '@remix-run/react'
+import { Link, useLoaderData, useOutletContext } from '@remix-run/react'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import Heading from '~/components/typography/Heading'
@@ -10,8 +10,28 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import dashboardChart from '~/assets/dashboard_chart.svg'
 import { normalizeProfileToLinks } from '~/helpers'
+import { LoaderFunction } from 'react-router-dom'
+import { requireJWT } from '~/utils/session.server'
+import { getAccountApps } from '~/helpers/profile'
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const jwt = await requireJWT(request)
+  const apps = await getAccountApps(jwt)
+
+  console.log({
+    apps,
+  })
+
+  return { sessions: [] }
+}
 
 export default function Welcome() {
+  const { sessions } = useLoaderData<{
+    sessions: {
+      urn: string
+    }[]
+  }>()
+
   const { profile, addressProfiles } = useOutletContext<{
     profile: Profile
     addressProfiles: any[]
@@ -186,8 +206,27 @@ export default function Welcome() {
           </div>
         </div>
 
-        <div className="flex-1">
+        <div className="flex-1 flex flex-col">
           <SectionTitle title="My Sessions" />
+
+          <div className="border shadow flex-1 flex flex-col rounded-lg">
+            <div className="bg-[#F9FAFB] flex items-center py-5 px-8">
+              <Text size="sm" weight="medium" className="text-gray-500 flex-1">
+                APPLICATION
+              </Text>
+              <Text size="sm" weight="medium" className="text-gray-500 flex-1">
+                DATE
+              </Text>
+            </div>
+
+            <div className="flex-1">
+              {sessions.map((s) => (
+                <div key={s.urn} className="py-5 px-8 break-all">
+                  <Text>{s.urn}</Text>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

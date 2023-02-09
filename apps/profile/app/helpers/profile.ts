@@ -22,6 +22,17 @@ export const getAccountProfile = async (jwt: string) => {
   }
 }
 
+export const getAccountApps = async (jwt: string) => {
+  const galaxyClient = await getGalaxyClient()
+
+  const { apps } = await galaxyClient.getApps(
+    undefined,
+    getAuthzHeaderConditionallyFromToken(jwt)
+  )
+
+  return apps
+}
+
 export const getAccountAddresses = async (jwt: string) => {
   const galaxyClient = await getGalaxyClient()
   const addressesRes = await galaxyClient.getConnectedAddresses(
