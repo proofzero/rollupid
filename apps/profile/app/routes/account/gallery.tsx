@@ -110,6 +110,7 @@ export const action: ActionFunction = async ({ request }) => {
   }))
 
   const galaxyClient = await getGalaxyClient()
+  console.log({ gallery })
   await galaxyClient.updateGallery(
     {
       gallery,

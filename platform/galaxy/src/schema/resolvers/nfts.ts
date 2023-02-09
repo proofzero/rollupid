@@ -4,8 +4,7 @@ import { GraphQLYogaError } from '@graphql-yoga/common'
 import { AddressURN } from '@kubelt/urns/address'
 import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
 
-import { Nft, NftContract, NftContracts, Resolvers } from './typedefs'
-import { Profile } from '@kubelt/platform.account/src/types'
+import { NftContract, Resolvers } from './typedefs'
 import Env from '../../env'
 import {
   AlchemyChain,
@@ -18,15 +17,13 @@ import {
   hasApiKey,
   setupContext,
   logAnalytics,
-  getAllNfts,
+  logNFTBatchAnalytics,
   sortNftsAlphabetically,
   getNftsForAllChains,
   getAlchemyClients,
-  nftBatchesFetcher,
   getNftMetadataForAllChains,
   nftBatchesFetcherForAllChains,
-  beautifyContractsForAllChains,
-  beautifyContracts,
+  normalizeContractsForAllChains,
   getConnectedCryptoAddresses,
   fetchContracts,
 } from './utils'
@@ -126,7 +123,7 @@ const nftsResolvers: Resolvers = {
         }
       )
 
-      const result = beautifyContractsForAllChains([
+      const result = normalizeContractsForAllChains([
         {
           nfts: ethereumNfts,
           chain: AlchemyChain.ethereum,

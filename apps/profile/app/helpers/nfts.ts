@@ -228,6 +228,8 @@ export const getGalleryWithMetadata = async (owner: string, jwt?: string) => {
 
   const galaxyClient = await getGalaxyClient()
 
+  console.log({ gallery })
+
   const { getNFTMetadataBatch: metadata } = await galaxyClient.getNFTMetadata(
     {
       input: gallery.map(

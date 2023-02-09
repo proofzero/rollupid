@@ -10,8 +10,9 @@ import {
   hasApiKey,
   logAnalytics,
   getConnectedAddresses,
-  getAlchemyClients,
+  getConnectedCryptoAddresses,
   temporaryConvertToPublic,
+  validOwnership,
 } from './utils'
 
 import { Resolvers } from './typedefs'
@@ -96,23 +97,39 @@ const accountResolvers: Resolvers = {
 
       return links
     },
-
+    //@ts-ignore
     gallery: async (
       _parent: any,
       {},
       { env, accountURN, jwt }: ResolverContext
     ) => {
+      console.log({ gallery })
       console.log(`galaxy:gallery: getting gallery for account: ${accountURN}`)
       const accountClient = createAccountClient(
         env.Account,
         getAuthzHeaderConditionallyFromToken(jwt)
       )
 
-      let gallery = await accountClient.getGallery.query({
+      const connectedAddresses = await getConnectedCryptoAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
+      })
+
+      const gallery = await accountClient.getGallery.query({
         account: accountURN,
       })
 
-      return gallery
+      // Validation
+      const validator = await validOwnership(
+        gallery as Gallery,
+        env,
+        connectedAddresses
+      )
+
+      return gallery?.filter((nft) => {
+        return validator.get(nft.contract)?.includes(nft.tokenId)
+      })
     },
 
     connectedAddresses: async (
@@ -120,7 +137,7 @@ const accountResolvers: Resolvers = {
       {},
       { env, accountURN, jwt }: ResolverContext
     ) => {
-      const addresses = getConnectedAddresses({
+      const addresses = await getConnectedAddresses({
         accountURN,
         Account: env.Account,
         jwt,
@@ -215,12 +232,13 @@ const accountResolvers: Resolvers = {
 
       return linksFromAddress
     },
-
+    //@ts-ignore
     galleryFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
       { env, jwt }: ResolverContext
     ) => {
+      console.log("galaxy.galleryFromAddress: getting account's gallery")
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
       })
@@ -240,13 +258,26 @@ const accountResolvers: Resolvers = {
         getAuthzHeaderConditionallyFromToken(jwt)
       )
 
-      console.log("galaxy.galleryFromAddress: getting account's gallery")
-      // should also return the handle if it exists
-      const galleryFromAddress = await accountClient.getGallery.query({
-        account: accountURN,
+      const connectedAddresses = await getConnectedCryptoAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
       })
 
-      return galleryFromAddress
+      // should also return the handle if it exists
+      const gallery = await accountClient.getGallery.query({
+        account: accountURN,
+      })
+      // Validation
+      const validator = await validOwnership(
+        gallery as Gallery,
+        env,
+        connectedAddresses
+      )
+
+      return gallery?.filter((nft) => {
+        return validator.get(nft.contract)?.includes(nft.tokenId)
+      })
     },
 
     connectedAddressesFromAddress: async (
@@ -345,76 +376,17 @@ const accountResolvers: Resolvers = {
         getAuthzHeaderConditionallyFromToken(jwt)
       )
 
-      const connectedAddresses = (
-        (await getConnectedAddresses({
-          accountURN,
-          Account: env.Account,
-          jwt,
-        })) || []
-      )
-        .filter((address) =>
-          [NodeType.Crypto, NodeType.Vault].includes(address.rc.node_type)
-        )
-        .map((address) => address.qc.alias.toLowerCase())
-
-      console.log({ 'HERE IS WHERE IT STARTS': 'YES' })
-
-      // GALLERY VALIDATION
-      const { ethereumClient, polygonClient } = getAlchemyClients({ env })
-
-      const [ethContractAddresses, polyContractAddresses] = gallery.reduce(
-        ([eth, poly], nft) => {
-          return nft.chain === 'eth'
-            ? [[...eth, nft.contract], poly]
-            : [eth, [...poly, nft.contract]]
-        },
-        [[] as string[], [] as string[]]
-      )
-
-      /** Struct of this map is like this:
-       {
-        contractAddress1: [all tokens that user own in this contract],
-        contractAddress2: [all tokens that user own in this contract],
-        ...
-        contractAddressN: [all tokens that user own in this contract],
-        } 
-      */
-      const validator = new Map()
-
-      const nfts = await Promise.all(
-        connectedAddresses.map((address) =>
-          Promise.all([
-            ethereumClient.getNFTs({
-              owner: address,
-              contractAddresses: ethContractAddresses,
-            }),
-            polygonClient.getNFTs({
-              owner: address,
-              contractAddresses: polyContractAddresses,
-            }),
-          ])
-        )
-      )
-
-      // .flat because previous Promise.all returns an array of arrays,
-      // we just need internal arrays of nfts. These internal arrays are arrays
-      // of objects with ownedNfts property
-      // These methods populate validator map to then check if the user owns nfts.
-      nfts.flat().forEach((deeperNfts) => {
-        deeperNfts.ownedNfts.forEach((nft) => {
-          if (validator.has(nft.contract.address)) {
-            validator.set(nft.contract.address, [
-              ...validator.get(nft.contract.address),
-              nft.id.tokenId,
-            ])
-          } else {
-            validator.set(nft.contract.address, [nft.id.tokenId])
-          }
-        })
+      const connectedAddresses = await getConnectedCryptoAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
       })
 
-      gallery = gallery.filter((nft, i) => {
-        return validator.get(nft.contract).includes(nft.tokenId)
+      // Validation
+      const validator = await validOwnership(gallery, env, connectedAddresses)
+
+      gallery = gallery.filter((nft) => {
+        return validator.get(nft.contract)?.includes(nft.tokenId)
       })
 
       await accountClient.setGallery.mutate({

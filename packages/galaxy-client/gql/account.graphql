@@ -35,6 +35,7 @@ query getProfile {
     contract
     tokenId
     chain
+    order
   }
 }
 
@@ -67,6 +68,7 @@ query getProfileFromAddress($addressURN: URN!) {
     contract
     tokenId
     chain
+    order
   }
   connectedAddresses: connectedAddressesFromAddress(addressURN: $addressURN) {
     urn

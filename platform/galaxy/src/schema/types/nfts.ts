@@ -139,6 +139,7 @@ export default /* GraphQL */ `
     contract: String!
     tokenId: String!
     chain: String!
+    order: Int!
   }
 
   input ContractInput {
@@ -159,13 +160,14 @@ export default /* GraphQL */ `
   input NFTMetadataInput {
     contractAddress: String
     tokenId: String
-    tokenType: String
+    chain: String
   }
 
   input GalleryInput {
     contract: String!
     tokenId: String!
     chain: String!
+    order: Int!
   }
 
   type Query {
