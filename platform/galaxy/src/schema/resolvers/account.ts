@@ -77,8 +77,6 @@ const accountResolvers: Resolvers = {
         })
       )
 
-      console.log(mappedApps)
-
       return mappedApps
     },
 
