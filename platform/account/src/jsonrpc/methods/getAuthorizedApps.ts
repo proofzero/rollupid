@@ -1,5 +1,5 @@
 import createEdgesClient from '@kubelt/platform-clients/edges'
-import { AccessRComp } from '@kubelt/urns/access'
+import type { AccessRComp } from '@kubelt/urns/access'
 import { Context } from '../../context'
 import { EDGE_AUTHORIZES } from '@kubelt/platform.access/src/constants'
 import { Graph } from '@kubelt/types'
@@ -76,7 +76,7 @@ export const getAuthorizedAppsMethod = async ({
       const { client_id } = mappedEdge.rc
 
       return {
-        clientId: client_id as string,
+        clientId: client_id,
         timestamp,
       }
     })

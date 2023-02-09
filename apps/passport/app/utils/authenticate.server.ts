@@ -1,3 +1,4 @@
+import { AddressURNSpace } from '@kubelt/urns/address'
 import type { AddressURN } from '@kubelt/urns/address'
 import type { AccountURN } from '@kubelt/urns/account'
 
@@ -18,8 +19,7 @@ export const authenticateAddress = async (
   env: Env
 ) => {
   const accessClient = getAccessClient(env)
-
-  const clientId = address
+  const clientId = AddressURNSpace.decode(address)
   const redirectUri = env.PASSPORT_REDIRECT_URL
   const scope = ['admin']
   const state = ''

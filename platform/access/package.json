@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20221111.1",
+    "@kubelt/types": "workspace:*",
     "@types/async": "3.2.16",
     "@types/node": "18.11.9",
     "@typescript-eslint/eslint-plugin": "5.42.1",

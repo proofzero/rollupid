@@ -6,7 +6,7 @@ import type { Scope } from '@kubelt/types/access'
 
 import { CODE_OPTIONS } from '../constants'
 
-import { AuthorizationParameters, AuthorizeResult } from '../types'
+import { AuthorizeResult } from '../types'
 
 export default class Authorization extends DOProxy {
   declare state: DurableObjectState
@@ -34,7 +34,9 @@ export default class Authorization extends DOProxy {
     await this.state.storage.put({
       account,
       clientId,
-      code: { redirectUri, scope, timestamp },
+      redirectUri,
+      scope,
+      timestamp,
     })
 
     await this.state.storage.setAlarm(Date.now() + CODE_OPTIONS.ttl)
@@ -56,11 +58,6 @@ export default class Authorization extends DOProxy {
       throw new Error('missing client id')
     }
 
-    const params = await this.state.storage.get<AuthorizationParameters>('code')
-    if (!params) {
-      throw new Error('missing code params')
-    }
-
     if (clientId != storedClientId) {
       throw new Error('mismatch client id')
     }
@@ -68,11 +65,7 @@ export default class Authorization extends DOProxy {
     return { code }
   }
 
-  async getScope(): Promise<string[] | undefined> {
-    return await this.state.storage.get<string[]>('scope')
-  }
-
-  async alarm() {
-    await this.state.storage.deleteAll() // self-destruct
+  alarm() {
+    this.state.storage.deleteAll()
   }
 }

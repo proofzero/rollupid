@@ -83,6 +83,8 @@ export async function requireJWT(request: Request, headers = new Headers()) {
       const form = new FormData()
       form.append('grant_type', 'refresh_token')
       form.append('refresh_token', refreshToken.toString())
+      form.append('client_id', PROFILE_CLIENT_ID)
+      form.append('client_secret', PROFILE_CLIENT_SECRET)
       const token = await fetch(PASSPORT_TOKEN_URL, {
         method: 'post',
         body: form,
