@@ -1,8 +1,17 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { AddressList } from '~/components/addresses/AddressList'
-import { useFetcher, useOutletContext } from '@remix-run/react'
+import { Form, useFetcher, useLoaderData, useSubmit } from '@remix-run/react'
+import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
+import { requireJWT } from '~/utils/session.server'
+import { AddressURN } from '@kubelt/urns/address'
 import { AddressListItemProps } from '~/components/addresses/AddressListItem'
+import {
+  ActionFunction,
+  HeadersFunction,
+  LoaderFunction,
+} from '@remix-run/cloudflare'
+import { CryptoAddressProfile } from '@kubelt/galaxy-client'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import InputText from '~/components/inputs/InputText'
@@ -59,27 +68,58 @@ const normalizeProfile = (profile: any) => {
         chain: 'Apple',
       }
   }
+}
 
-  throw new Error('Unknown address type')
+export const loader: LoaderFunction = async ({ request }) => {
+  const jwt = await requireJWT(request)
+
+  const addresses = (await getAccountAddresses(jwt)) ?? []
+  const addressTypeUrns = addresses.map((a) => ({
+    urn: a.urn,
+    nodeType: a.rc.node_type,
+  }))
+
+  // This returns profiles without urns
+  const profiles =
+    (await getAddressProfiles(
+      jwt,
+      addressTypeUrns.map((atu) => atu.urn as AddressURN)
+    )) ?? []
+
+  // This mapps to a new structure that contains urn also;
+  // useful for list keys as well as for address context actions as param
+  const mappedProfiles = profiles.map((p, i) => ({
+    ...addressTypeUrns[i],
+    ...p,
+  }))
+
+  // Keeping the distinctions to only append
+  // context actions to desired types
+  // e.x. rename to crypto profiles
+  const cryptoProfiles = mappedProfiles
+    .filter((p) => p?.nodeType === NodeType.Crypto)
+    .map((p) => ({ urn: p.urn, ...p?.profile }))
+    .map(normalizeProfile)
+
+  const vaultProfiles = mappedProfiles
+    .filter((p) => p?.nodeType === NodeType.Vault)
+    .map((p) => ({ urn: p.urn, ...p?.profile }))
+    .map(normalizeProfile)
+
+  const oAuthProfiles = mappedProfiles
+    .filter((p) => p?.nodeType === NodeType.OAuth)
+    .map((p) => ({ urn: p.urn, ...p?.profile }))
+    .map(normalizeProfile)
+
+  return {
+    cryptoProfiles,
+    vaultProfiles,
+    oAuthProfiles,
+  }
 }
 
 const AccountSettingsConnections = () => {
-  const { addressProfiles } = useOutletContext<{ addressProfiles: any[] }>()
-
-  const cryptoProfiles = addressProfiles
-    .filter((p) => p?.nodeType === NodeType.Crypto)
-    .map((p) => ({ urn: p.urn, ...p?.profile }))
-    .map(normalizeProfile) as any[]
-
-  const vaultProfiles = addressProfiles
-    .filter((p) => p?.nodeType === NodeType.Vault)
-    .map((p) => ({ urn: p.urn, ...p?.profile }))
-    .map(normalizeProfile) as any[]
-
-  const oAuthProfiles = addressProfiles
-    .filter((p) => p?.nodeType === NodeType.OAuth)
-    .map((p) => ({ urn: p.urn, ...p?.profile }))
-    .map(normalizeProfile) as any[]
+  const { cryptoProfiles, vaultProfiles, oAuthProfiles } = useLoaderData()
 
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [actionId, setActionId] = useState<null | string>()
@@ -167,7 +207,7 @@ const AccountSettingsConnections = () => {
             .map((ap: AddressListItemProps) => ({
               ...ap,
               onRenameAccount: ap.title.endsWith('.eth')
-                ? () => {}
+                ? null
                 : (id: string) => {
                     setActionId(id)
                     setRenameModalOpen(true)

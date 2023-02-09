@@ -27,14 +27,14 @@ import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 
 import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
+import { AddressURN } from '@kubelt/urns/address'
 
 import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
+import { imageFromAddressType } from '~/helpers'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import { FullProfile } from '~/types'
-import { imageFromAddressType } from '~/helpers'
-import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
-import { AddressURN } from '@kubelt/urns/address'
 
 /**
  * Prepares Crypto and OAuth profiles
@@ -66,7 +66,7 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
     case 'OAuthTwitterProfile':
       return {
         addressURN: ap.urn,
-        address: `https://twitter.com/${ap.profile.screen_name}`,
+        address: `https://twitter.com/${profile.screen_name}`,
         title: 'Twitter',
         icon: ap.profile.profile_image_url_https,
         provider: OAuthAddressType.Twitter,
