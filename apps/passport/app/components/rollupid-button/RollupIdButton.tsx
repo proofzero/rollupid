@@ -1,7 +1,5 @@
-import {
-  Button,
-  ButtonProps,
-} from '@kubelt/design-system/src/atoms/buttons/Button'
+import type { ButtonProps } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import logo from './rollup-purple.svg'
 

@@ -2,7 +2,7 @@ import circleLogo from './circle-logo.svg'
 
 import ConnectOAuthButton from '../connect-oauth-button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { lazy, Suspense } from 'react'
+import { lazy } from 'react'
 import { Avatar } from '@kubelt/design-system'
 
 const ConnectButton = lazy(() =>
@@ -49,13 +49,11 @@ export function Authentication({
           How would you like to continue?
         </h2>
       </div>
-      <Suspense>
-        <ConnectButton
-          disabled={!enableWalletConnect}
-          connectCallback={connectCallback}
-          connectErrorCallback={connectErrorCallback}
-        />
-      </Suspense>
+      <ConnectButton
+        disabled={!enableWalletConnect}
+        connectCallback={connectCallback}
+        connectErrorCallback={connectErrorCallback}
+      />
       <div className="my-5 flex flex-row items-center space-x-3">
         <hr className="h-px w-16 bg-gray-500" />
         <Text>or</Text>

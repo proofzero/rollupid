@@ -5,7 +5,7 @@ import { GoogleStrategyDefaultName } from 'remix-auth-google'
 import { initAuthenticator, getGoogleAuthenticator } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
-import { OAuthData } from '@kubelt/platform.address/src/types'
+import type { OAuthData } from '@kubelt/platform.address/src/types'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import { getConsoleParamsSession } from '~/session.server'
 

@@ -5,7 +5,7 @@ import { Suspense } from 'react'
 import { getUserSession } from '~/session.server'
 
 import React from 'react'
-import { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
+import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
 import { useCatch } from '@remix-run/react'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
@@ -24,8 +24,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   }
   return null
 }
-let LazyAuth = React.lazy(() =>
-  import('~/web3/laxyAuth').then((module) => ({ default: module.LazyAuth }))
+
+const LazyAuth = React.lazy(() =>
+  import('~/web3/lazyAuth').then((module) => ({ default: module.LazyAuth }))
 )
 
 export default function Index() {

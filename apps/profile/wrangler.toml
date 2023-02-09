@@ -52,7 +52,7 @@ local_protocol = "http"
 # ------------------------------------------------------------------------------
 [env.dev]
 routes = [
- "my-dev.rollup.id"
+  { pattern = "my-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
 services = [
   { binding = "Galaxy", service = "galaxy-dev" },
@@ -80,7 +80,7 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 # ------------------------------------------------------------------------------
 [env.next]
 routes = [
-  "my-next.rollup.id"
+    { pattern = "my-next.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
 services = [
   { binding = "Galaxy", service = "galaxy-next" },
@@ -111,7 +111,7 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 # ------------------------------------------------------------------------------
 [env.current]
 routes = [
-  "my.rollup.id"
+  { pattern = "my.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
 services = [
   { binding = "Galaxy", service = "galaxy-current" },

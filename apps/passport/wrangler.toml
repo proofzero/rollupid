@@ -41,7 +41,7 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [env.dev]
 routes = [
-  "passport-dev.rollup.id"
+  { pattern = "passport-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
 services = [
   { binding = "Account", service = "account-dev" },
@@ -65,7 +65,7 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [env.next]
 routes = [
-  "passport-next.rollup.id"
+  { pattern = "passport-next.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
 services = [
   { binding = "Account", service = "account-next" },
@@ -92,7 +92,7 @@ command = "yarn build"
 
 [env.current]
 routes = [
-  "passport.rollup.id"
+  { pattern = "passport.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
 services = [
   { binding = "Account", service = "account-current" },
