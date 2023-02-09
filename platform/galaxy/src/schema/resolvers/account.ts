@@ -103,7 +103,6 @@ const accountResolvers: Resolvers = {
       {},
       { env, accountURN, jwt }: ResolverContext
     ) => {
-      console.log({ gallery })
       console.log(`galaxy:gallery: getting gallery for account: ${accountURN}`)
       const accountClient = createAccountClient(
         env.Account,
@@ -121,15 +120,19 @@ const accountResolvers: Resolvers = {
       })
 
       // Validation
-      const validator = await validOwnership(
-        gallery as Gallery,
-        env,
-        connectedAddresses
-      )
+      if (gallery) {
+        const validator = await validOwnership(
+          gallery as Gallery,
+          env,
+          connectedAddresses
+        )
 
-      return gallery?.filter((nft) => {
-        return validator.get(nft.contract)?.includes(nft.tokenId)
-      })
+        return gallery.filter((nft) => {
+          return validator.get(nft.contract)?.includes(nft.tokenId)
+        })
+      }
+      // if there is no gallery
+      return []
     },
 
     connectedAddresses: async (
@@ -268,16 +271,20 @@ const accountResolvers: Resolvers = {
       const gallery = await accountClient.getGallery.query({
         account: accountURN,
       })
-      // Validation
-      const validator = await validOwnership(
-        gallery as Gallery,
-        env,
-        connectedAddresses
-      )
+      if (gallery) {
+        // Validation
+        const validator = await validOwnership(
+          gallery as Gallery,
+          env,
+          connectedAddresses
+        )
 
-      return gallery?.filter((nft) => {
-        return validator.get(nft.contract)?.includes(nft.tokenId)
-      })
+        return gallery.filter((nft) => {
+          return validator.get(nft.contract)?.includes(nft.tokenId)
+        })
+      }
+      // if there is no gallery
+      return []
     },
 
     connectedAddressesFromAddress: async (

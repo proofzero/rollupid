@@ -11,7 +11,7 @@ import Env from '../../../env'
 
 // -------------------- TYPES --------------------
 
-import type { Gallery, Nft, NftContract, NfTs } from '../typedefs'
+import type { Gallery, Nft, NftContract, NftContracts, NfTs } from '../typedefs'
 
 type AlchemyClients = {
   ethereumClient: AlchemyClient
@@ -402,40 +402,34 @@ export const getNftMetadataForAllChains = async (
     contractAddress: string
     tokenId: string
     chain: string
-    order: number
   }[],
   alchemyClients: AlchemyClients,
   env: ResolverContext['env']
 ) => {
-  const ethereumInput = input.filter((inp) => inp.chain === 'eth')
-  const polygonInput = input.filter((inp) => inp.chain === 'polygon')
+  const chainedInput = new Map<string, typeof input>()
+  const orders = new Map<string, number>()
+  input.forEach((instance, index) => {
+    orders.set(`${instance.contractAddress}${instance.tokenId}`, index)
+    chainedInput.set(
+      instance.chain,
+      (chainedInput.get(instance.chain) || []).concat([instance])
+    )
+  })
 
   try {
-    const [ethereumNfts, polygonNfts]: [Nft[], Nft[]] = await Promise.all([
-      ethereumInput.length
-        ? alchemyClients.ethereumClient.getNFTMetadataBatch(ethereumInput)
-        : [],
-      polygonInput.length
-        ? alchemyClients.polygonClient.getNFTMetadataBatch(polygonInput)
-        : null,
+    const [ethereumNfts, polygonNfts] = await Promise.all([
+      alchemyClients.ethereumClient.getNFTMetadataBatch(
+        chainedInput.get(AlchemyChain.ethereum)!
+      ) as Promise<Nft[]>,
+      alchemyClients.polygonClient.getNFTMetadataBatch(
+        chainedInput.get(AlchemyChain.polygon)!
+      ) as Promise<Nft[]>,
     ])
 
-    const orders = new Map<string, number>()
+    // Gallery stores as an array in account DO, so not need to keep order separately
+    // But here it fetches metadata asynchronous - so order may be lost
 
-    input.forEach((instance) => {
-      orders.set(
-        `${instance.contractAddress}${instance.tokenId}`,
-        instance.order
-      )
-    })
-
-    return ethereumNfts
-      .reduce<Nft[]>((acc, nft) => {
-        acc[
-          orders.get(`${nft.contract?.address}${nft.id?.tokenId}`) as number
-        ] = nft
-        return acc
-      }, Array(ethereumNfts.length))
+    const nfts = ethereumNfts
       .map((nft) => ({
         ...nft,
         chain: {
@@ -444,21 +438,20 @@ export const getNftMetadataForAllChains = async (
         },
       }))
       .concat(
-        polygonNfts
-          .reduce<Nft[]>((acc, nft) => {
-            acc[
-              orders.get(`${nft.contract?.address}${nft.id?.tokenId}`) as number
-            ] = nft
-            return acc
-          }, Array(polygonNfts.length))
-          .map((nft) => ({
-            ...nft,
-            chain: {
-              chain: AlchemyChain.polygon,
-              network: env.ALCHEMY_POLYGON_NETWORK,
-            },
-          }))
+        polygonNfts.map((nft) => ({
+          ...nft,
+          chain: {
+            chain: AlchemyChain.polygon,
+            network: env.ALCHEMY_POLYGON_NETWORK,
+          },
+        }))
       )
+
+    return nfts.reduce<Nft[]>((acc, nft) => {
+      acc[orders.get(`${nft.contract?.address}${nft.id?.tokenId}`) as number] =
+        nft
+      return acc
+    }, Array(nfts.length))
   } catch (ex) {
     console.error(new GraphQLYogaError(ex as string))
     return []

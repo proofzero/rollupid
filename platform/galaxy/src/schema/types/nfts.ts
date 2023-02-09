@@ -139,7 +139,6 @@ export default /* GraphQL */ `
     contract: String!
     tokenId: String!
     chain: String!
-    order: Int!
   }
 
   input ContractInput {
@@ -167,7 +166,6 @@ export default /* GraphQL */ `
     contract: String!
     tokenId: String!
     chain: String!
-    order: Int!
   }
 
   type Query {

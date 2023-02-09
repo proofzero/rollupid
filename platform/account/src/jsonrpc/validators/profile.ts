@@ -32,7 +32,6 @@ export const GallerySchema = z.array(
     contract: z.string(),
     tokenId: z.string(),
     chain: z.string(),
-    order: z.number(),
   })
 )
 

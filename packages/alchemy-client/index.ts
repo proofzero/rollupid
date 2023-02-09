@@ -311,34 +311,37 @@ export class AlchemyClient {
     const cacheKey = cacheKeyArray
       .map((b) => b.toString(16).padStart(2, '0'))
       .join('')
-    return fetch(urlStr, {
-      method: 'POST',
-      cf: {
-        cacheTtl: 1500,
-        cacheEverything: true,
-        cacheKey,
-      },
-      body: JSON.stringify({
-        tokens: params,
-      }),
-    })
-      .then(async (r) => {
-        if (r.status !== 200) {
-          const errorText = await r.text()
-          console.error(errorText)
+    if (params?.length) {
+      return fetch(urlStr, {
+        method: 'POST',
+        cf: {
+          cacheTtl: 1500,
+          cacheEverything: true,
+          cacheKey,
+        },
+        body: JSON.stringify({
+          tokens: params,
+        }),
+      })
+        .then(async (r) => {
+          if (r.status !== 200) {
+            const errorText = await r.text()
+            console.error(errorText)
+            throw buildError(
+              r.status,
+              `Error calling Alchemy getNFTMetadataBatch: ${errorText}`
+            )
+          }
+          return r.json()
+        })
+        .catch((e) => {
           throw buildError(
-            r.status,
-            `Error calling Alchemy getNFTMetadataBatch: ${errorText}`
+            e.status,
+            `Error calling Alchemy getNFTMetadataBatch: ${e.message}`
           )
-        }
-        return r.json()
-      })
-      .catch((e) => {
-        throw buildError(
-          e.status,
-          `Error calling Alchemy getNFTMetadataBatch: ${e.message}`
-        )
-      })
+        })
+    }
+    return []
   }
 }
 
