@@ -133,6 +133,7 @@ export default /* GraphQL */ `
 
   type NFTContracts {
     contracts: [NFTContract!]!
+    totalCount: Int
   }
 
   type Gallery {

@@ -335,51 +335,31 @@ export const fetchContracts = async ({
   excludeFilters: string[]
 }) => {
   try {
-    const [ethContracts, polyContracts]: [
-      { contracts: NftContract[]; totalCount: number }[],
-      { contracts: NftContract[]; totalCount: number }[]
-    ] = await Promise.all([
-      Promise.all(
-        addresses.map(
-          async (address) =>
-            await alchemyClients.ethereumClient.getContractsForOwner({
-              address,
-              excludeFilters,
-            })
-        )
-      ),
-      Promise.all(
-        addresses.map(
-          async (address) =>
-            await alchemyClients.polygonClient.getContractsForOwner({
-              address,
-              excludeFilters,
-            })
-        )
-      ),
-    ])
-
-    const ethereumContracts: contracts = ethContracts.reduce(
-      (acc, instance) => {
-        return {
-          contracts: acc.contracts.concat(instance.contracts),
-          totalCount: acc.totalCount + instance.totalCount,
-        }
-      },
-      {
-        contracts: [],
-        totalCount: 0,
-      }
+    const instances = await Promise.all(
+      addresses.map(async (address) => {
+        return await Promise.all([
+          alchemyClients.ethereumClient.getContractsForOwner({
+            address,
+            excludeFilters,
+          }) as Promise<NftContracts>,
+          alchemyClients.polygonClient.getContractsForOwner({
+            address,
+            excludeFilters,
+          }) as Promise<NftContracts>,
+        ])
+      })
     )
 
-    const polygonContracts: contracts = polyContracts.reduce(
+    const [ethereumContracts, polygonContracts] = instances.reduce<
+      [NftContracts, NftContracts]
+    >(
       (acc, instance) => {
-        return {
-          contracts: acc.contracts.concat(instance.contracts),
-          totalCount: acc.totalCount + instance.totalCount,
-        }
+        return [
+          { contracts: acc[0].contracts.concat(instance[0].contracts) },
+          { contracts: acc[1].contracts.concat(instance[1].contracts) },
+        ]
       },
-      { contracts: [], totalCount: 0 }
+      [{ contracts: [] }, { contracts: [] }]
     )
 
     return {
