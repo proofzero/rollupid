@@ -49,7 +49,7 @@ Your Redirect URL should be prepared to accept an exchange token and state param
 The state parameter should match the state you sent when you kicked off the auth flow in Step 1. This is a security measure in the auth protocol to prevent replay attacks. The exchange code is then sent with the **Application Secret** and the **grant type** to Passport's token endpoint in order to receive the access token and refresh token as base64 encoded signed JWT as well as a minimal user profile (encoded in an ID token) completing the flow.
 
 {% hint style="info" %}
-We use a javascript library called [jose](https://www.npmjs.com/package/jose) to encode and decode signed JWT. As a open standard there are libraries for all languages that do the same.
+We use a javascript library called [jose](https://www.npmjs.com/package/jose) to encode and decode signed JWT. As an open standard there are libraries for all languages that do the same.
 {% endhint %}
 
 {% swagger method="post" path="" baseUrl="https://passport.rollup.id/token" summary="Exchange access code for access token" expanded="true" %}
@@ -93,7 +93,7 @@ There are multiple ways to manage this refresh flow, [here](../../apps/profile/a
 
 If you ever find yourself with an expired refresh token you can consider this as the user being "logged out" and redirect them back to passport for login to repeat this flow.
 
-ID tokens are only supplied when the initial set of tokens is retrieved, and are not provided again during usage of refresh tokens. Use the `/userinfo` endpoint to retrieve fresh user details. The response, as well as what is encoded in the ID token, is shaped follows:
+ID tokens are only supplied when the initial set of tokens is retrieved, and are not provided again during usage of refresh tokens. Use the `/userinfo` endpoint to retrieve fresh user details. The response, as well as what is encoded in the ID token, is shaped as follows:
 
 ```typescript
 {

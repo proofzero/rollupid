@@ -29,7 +29,7 @@ TODO
 
 ## What is Rollup?
 
-Rollup is authorization infrastructure for you apps so you can build great relationships with your users. For more information please checkout our [website](https://rollup.id) and [docs](https://docs.rollup.id).
+Rollup is authorization infrastructure for your apps so you can build great relationships with your users. For more information please checkout our [website](https://rollup.id) and [docs](https://docs.rollup.id).
 
 ## Rollup Monorepo Tour
 
