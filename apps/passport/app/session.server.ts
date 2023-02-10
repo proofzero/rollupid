@@ -75,7 +75,10 @@ export async function logout(request: Request, env: Env) {
 
 // CONSOLE PARAMS
 
-const getConsoleParamsSessionStorage = (env: Env) => {
+const getConsoleParamsSessionStorage = (
+  env: Env,
+  MAX_AGE = 60 * 60 * 24 * 120
+) => {
   return createCookieSessionStorage({
     cookie: {
       domain: env.COOKIE_DOMAIN,
@@ -83,7 +86,7 @@ const getConsoleParamsSessionStorage = (env: Env) => {
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV == 'production',
-      maxAge: 60 * 60 * 24 * 120,
+      maxAge: MAX_AGE,
       httpOnly: true,
       secrets: [env.SECRET_SESSION_SALT],
     },
