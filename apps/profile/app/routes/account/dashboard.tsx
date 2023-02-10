@@ -1,36 +1,20 @@
-import { Link, useLoaderData, useOutletContext } from '@remix-run/react'
+import { Link, useFetcher, useOutletContext } from '@remix-run/react'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import Heading from '~/components/typography/Heading'
 import SectionTitle from '~/components/typography/SectionTitle'
 
 import type { Profile } from '@kubelt/galaxy-client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import dashboardChart from '~/assets/dashboard_chart.svg'
 import { normalizeProfileToLinks } from '~/helpers'
-import { LoaderFunction } from 'react-router-dom'
-import { requireJWT } from '~/utils/session.server'
-import { getAccountApps } from '~/helpers/profile'
 import { Tooltip } from 'flowbite-react'
-
-export const loader: LoaderFunction = async ({ request }) => {
-  const jwt = await requireJWT(request)
-  const apps = await getAccountApps(jwt)
-
-  return { apps }
-}
+import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
+import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
 export default function Welcome() {
-  const { apps } = useLoaderData<{
-    apps: {
-      icon: string
-      title: string
-      timestamp: number
-    }[]
-  }>()
-
   const { profile, addressProfiles } = useOutletContext<{
     profile: Profile
     addressProfiles: any[]
@@ -41,6 +25,12 @@ export default function Welcome() {
     .map(normalizeProfileToLinks)
 
   const [showGetStarted, setShowGetStarted] = useState(true)
+
+  const appFetcher = useFetcher()
+
+  useEffect(() => {
+    appFetcher.load('/account/dashboard/apps')
+  }, [])
 
   return (
     <div className="dashboard flex flex-col gap-4">
@@ -219,36 +209,51 @@ export default function Welcome() {
             </div>
 
             <div className="flex flex-1 flex-col">
-              {apps.map((a) => (
-                <article key={a.title} className="flex items-center py-5 px-8">
-                  <div className="flex-1 flex flex-row items-center space-x-4">
-                    <img src={a.icon} className="w-6 h-6 rounded" />
-
-                    <Text
-                      size="sm"
-                      weight="medium"
-                      className="text-gray-500 flex-1"
+              {appFetcher.state !== 'idle' && (
+                <div className="flex flex-1 justify-center items-center">
+                  <Spinner />
+                </div>
+              )}
+              {appFetcher.type === 'done' && appFetcher.data?.error && (
+                <ErrorPage code="Oops" message="Something went wrong" />
+              )}
+              {appFetcher.type === 'done' &&
+                !appFetcher.data.error &&
+                appFetcher.data.apps.map(
+                  (a: { icon: string; title: string; timestamp: number }) => (
+                    <article
+                      key={a.title}
+                      className="flex items-center py-5 px-8"
                     >
-                      {a.title}
-                    </Text>
-                  </div>
+                      <div className="flex-1 flex flex-row items-center space-x-4">
+                        <img src={a.icon} className="w-6 h-6 rounded" />
 
-                  <Text
-                    size="sm"
-                    weight="medium"
-                    className="text-gray-500 flex-1"
-                  >
-                    {new Date(a.timestamp).toLocaleString('default', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                    })}
-                  </Text>
-                </article>
-              ))}
+                        <Text
+                          size="sm"
+                          weight="medium"
+                          className="text-gray-500 flex-1"
+                        >
+                          {a.title}
+                        </Text>
+                      </div>
+
+                      <Text
+                        size="sm"
+                        weight="medium"
+                        className="text-gray-500 flex-1"
+                      >
+                        {new Date(a.timestamp).toLocaleString('default', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                        })}
+                      </Text>
+                    </article>
+                  )
+                )}
             </div>
 
             <div className="w-full px-8">
