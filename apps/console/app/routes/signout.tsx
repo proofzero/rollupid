@@ -1,7 +1,6 @@
 import type { ActionFunction } from '@remix-run/cloudflare'
-import { getUserSession, destroyUserSession } from '~/utilities/session.server'
+import { redirect } from '@remix-run/cloudflare'
 
 export const action: ActionFunction = async ({ request }) => {
-  const session = await getUserSession(request)
-  return await destroyUserSession(session)
+  return redirect(`${PASSPORT_URL}/signout`)
 }

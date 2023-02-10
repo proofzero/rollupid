@@ -13,7 +13,7 @@ import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 export const loader: LoaderFunction = async ({ request, context }) => {
   // this will redirect unauthenticated users to the auth page but maintain query params
   const jwt = await requireJWT(request, context.consoleParams, context.env)
-  const session = await getUserSession(request, false, context.env)
+  const session = await getUserSession(request, context.env)
   const defaultProfileURN = session.get('defaultProfileUrn') as AddressURN
 
   const galaxyClient = await getGalaxyClient()

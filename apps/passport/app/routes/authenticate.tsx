@@ -12,7 +12,7 @@ import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 // TODO: loader function check if we have a session already
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const session = await getUserSession(request, false, context.env)
+  const session = await getUserSession(request, context.env)
   const searchParams = new URL(request.url).searchParams
 
   if (session.get('jwt') && searchParams.get('client_id')) {

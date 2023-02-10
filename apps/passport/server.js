@@ -8,11 +8,17 @@ export function parseParams(request) {
   const redirectUri = url.searchParams.get('redirect_uri')
   const scope = url.searchParams.get('scope')
 
+  const decodedScope =
+    scope &&
+    scope.trim() !== '' &&
+    scope.trim() !== 'null' &&
+    decodeURIComponent(scope)
+
   return {
     clientId,
     state,
     redirectUri,
-    scope,
+    scope: decodedScope ? decodedScope.split(' ') : [],
   }
 }
 
