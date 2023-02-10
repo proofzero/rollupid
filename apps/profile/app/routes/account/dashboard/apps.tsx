@@ -1,5 +1,5 @@
 import { LoaderFunction } from '@remix-run/cloudflare'
-import { getAccountApps } from '~/helpers/profile'
+import { getAuthorizedApps } from '~/helpers/profile'
 import { requireJWT } from '~/utils/session.server'
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -9,7 +9,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   // root ErrorBoundary on client-side
   // so return object with error property
   try {
-    const apps = await getAccountApps(jwt)
+    const apps = await getAuthorizedApps(jwt)
 
     return {
       apps,

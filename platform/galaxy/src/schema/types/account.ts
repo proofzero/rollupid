@@ -63,7 +63,7 @@ export default /* GraphQL */ `
     links: [Link!]
     gallery: [Gallery!]
     connectedAddresses: [Node!]
-    apps: [App]
+    authorizedApps: [App]
     profileFromAddress(addressURN: URN!): Profile
     linksFromAddress(addressURN: URN!): [Link!]
     galleryFromAddress(addressURN: URN!): [Gallery!]

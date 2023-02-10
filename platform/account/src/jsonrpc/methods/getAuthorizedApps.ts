@@ -9,16 +9,18 @@ import { z } from 'zod'
 // Input
 // -----------------------------------------------------------------------------
 
-export const GetAppsMethodInput = z.object({
+export const GetAuthorizedAppsMethodInput = z.object({
   account: inputValidators.AccountURNInput,
 })
 
-export type GetAppsParams = z.infer<typeof GetAppsMethodInput>
+export type GetAuthorizedAppsParams = z.infer<
+  typeof GetAuthorizedAppsMethodInput
+>
 
 // Output
 // -----------------------------------------------------------------------------
 
-export const GetAppsMethodOutput = z.array(
+export const GetAuthorizedAppsMethodOutput = z.array(
   z.object({
     clientId: z.string(),
     timestamp: z.number(),
@@ -28,11 +30,11 @@ export const GetAppsMethodOutput = z.array(
 // Method
 // -----------------------------------------------------------------------------
 
-export const getAppsMethod = async ({
+export const getAuthorizedAppsMethod = async ({
   input,
   ctx,
 }: {
-  input: GetAppsParams
+  input: GetAuthorizedAppsParams
   ctx: Context
 }) => {
   const edgesClient = createEdgesClient(ctx.Edges)

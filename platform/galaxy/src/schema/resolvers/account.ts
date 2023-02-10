@@ -2,7 +2,6 @@ import { composeResolvers } from '@graphql-tools/resolvers-composition'
 
 import createAccountClient from '@kubelt/platform-clients/account'
 import createAddressClient from '@kubelt/platform-clients/address'
-import createAccessClient from '@kubelt/platform-clients/access'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 
 import {
@@ -43,7 +42,7 @@ const accountResolvers: Resolvers = {
       return accountProfile
     },
 
-    apps: async (
+    authorizedApps: async (
       _parent: any,
       {},
       { env, accountURN, jwt }: ResolverContext
@@ -53,7 +52,7 @@ const accountResolvers: Resolvers = {
         getAuthzHeaderConditionallyFromToken(jwt)
       )
 
-      const apps = await accountClient.getApps.query({
+      const apps = await accountClient.getAuthorizedApps.query({
         account: accountURN,
       })
 
@@ -403,7 +402,7 @@ const accountResolvers: Resolvers = {
 
 const ProfileResolverComposition = {
   'Query.profile': [setupContext(), hasApiKey(), logAnalytics()],
-  'Query.apps': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.authorizedApps': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.links': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.gallery': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.connectedAddresses': [
