@@ -13,7 +13,7 @@ Rollup is **standards compliant** so, integrating Rollup into your application i
 We recommend setting up two routes in your application called `/auth/login` and `/auth/callback` to manage the authorization flow.
 
 {% hint style="info" %}
-We have created a reference implementation using [Remix](https://remix.run/) and the [Remix OAuth](https://github.com/sergiodxa/remix-auth) library [here](https://github.com/rollupid/rollupid/tree/main/apps/profile/app/routes/auth) which we will refer to several times in this step.
+We have created a reference implementation using [Remix](https://remix.run/) and the [Remix OAuth](https://github.com/sergiodxa/remix-auth) library [here](https://github.com/proofzero/rollupid/tree/main/apps/profile/app/routes/auth) which we will refer to several times in this step.
 {% endhint %}
 
 ### Step 1: Auth

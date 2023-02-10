@@ -17,7 +17,7 @@ const communityLinks = [
 ]
 
 const practiceLinks = [
-  <ButtonAnchor key="github" href="https://github.com/rollupid">
+  <ButtonAnchor key="github" href="https://github.com/proofzero/rollupid">
     <FaGithub className="text-gray-400" />
 
     <span>GitHub</span>

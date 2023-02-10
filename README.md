@@ -9,19 +9,19 @@
 
 ##### Platform
 
-![](https://github.com/rollupid/rollupid/actions/workflows/main-galaxy.yaml/badge.svg)
-![](https://github.com/rollupid/rollupid/actions/workflows/main-edges.yaml/badge.svg)
-![](https://github.com/rollupid/rollupid/actions/workflows/main-starbase.yaml/badge.svg)
-![](https://github.com/rollupid/rollupid/actions/workflows/main-access.yaml/badge.svg)
-![](https://github.com/rollupid/rollupid/actions/workflows/main-address.yaml/badge.svg)
-![](https://github.com/rollupid/rollupid/actions/workflows/main-account.yaml/badge.svg)
-![](https://github.com/rollupid/rollupid/actions/workflows/main-images.yaml/badge.svg)
+![](https://github.com/proofzero/rollupid/actions/workflows/main-galaxy.yaml/badge.svg)
+![](https://github.com/proofzero/rollupid/actions/workflows/main-edges.yaml/badge.svg)
+![](https://github.com/proofzero/rollupid/actions/workflows/main-starbase.yaml/badge.svg)
+![](https://github.com/proofzero/rollupid/actions/workflows/main-access.yaml/badge.svg)
+![](https://github.com/proofzero/rollupid/actions/workflows/main-address.yaml/badge.svg)
+![](https://github.com/proofzero/rollupid/actions/workflows/main-account.yaml/badge.svg)
+![](https://github.com/proofzero/rollupid/actions/workflows/main-images.yaml/badge.svg)
 
 ##### Apps
 
-![](https://github.com/rollupid/rollupid/actions/workflows/main-profile.yaml/badge.svg)
-![](https://github.com/rollupid/rollupid/actions/workflows/main-console.yaml/badge.svg)
-![](https://github.com/rollupid/rollupid/actions/workflows/main-passport.yaml/badge.svg)
+![](https://github.com/proofzero/rollupid/actions/workflows/main-profile.yaml/badge.svg)
+![](https://github.com/proofzero/rollupid/actions/workflows/main-console.yaml/badge.svg)
+![](https://github.com/proofzero/rollupid/actions/workflows/main-passport.yaml/badge.svg)
 
 ##### Packages
 
