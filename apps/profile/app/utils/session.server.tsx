@@ -117,8 +117,11 @@ export async function requireJWT(request: Request, headers = new Headers()) {
       return access_token
     }
 
-    // throw again any unexpected error that could've happened
-    throw redirect('/auth')
+    // force a signout and redirect to profile /auth
+    const authenticator = initAuthenticator()
+    return authenticator.logout(request, {
+      redirectTo: '/auth',
+    })
   }
 }
 

@@ -30,28 +30,21 @@ const MAX_AGE = 60 * 60 * 24 * 90 // 90 days
 // createCookieSessionStorage
 // -----------------------------------------------------------------------------
 // TODO load the SECRET_SESSION_SALT from context injected into Loader and
-// use that to construct a Singleton for the session storage.
-//
-// TODO switch to using a CloudflareKVSessionStorage.
+// use that to construct a Singleton for the session
 
-/**
- *
- */
-const storage = createCookieSessionStorage({
-  cookie: {
-    name: 'PASSPORT_SESSION',
-    domain: COOKIE_DOMAIN,
-    // normally you want this to be `secure: true`
-    // but that doesn't work on localhost for Safari
-    // https://web.dev/when-to-use-local-https/
-    secure: process.env.NODE_ENV === 'production',
-    secrets: [SECRET_SESSION_SALT],
-    sameSite: 'strict',
-    path: '/',
-    maxAge: MAX_AGE,
-    httpOnly: true,
-  },
-})
+const getPassportSessionStorage = (age: number = MAX_AGE) =>
+  createCookieSessionStorage({
+    cookie: {
+      domain: COOKIE_DOMAIN,
+      httpOnly: true,
+      name: 'PASSPORT_SESSION',
+      path: '/',
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: MAX_AGE,
+      secrets: [SECRET_SESSION_SALT],
+    },
+  })
 
 // getUserSession
 // -----------------------------------------------------------------------------
@@ -61,7 +54,7 @@ const storage = createCookieSessionStorage({
  */
 export function getUserSession(request: Request, renew: boolean = true) {
   // TODO can headers be optional here?
-  return storage.getSession(request?.headers.get('Cookie'))
+  return getPassportSessionStorage().getSession(request?.headers.get('Cookie'))
 }
 
 // destroyUserSession
@@ -73,7 +66,7 @@ export function getUserSession(request: Request, renew: boolean = true) {
 export async function destroyUserSession(session: Session) {
   return redirect('/', {
     headers: {
-      'Set-Cookie': await storage.destroySession(session),
+      'Set-Cookie': await getPassportSessionStorage(0).destroySession(session),
     },
   })
 }
