@@ -118,7 +118,7 @@ export async function requireJWT(request: Request, headers = new Headers()) {
     }
 
     // throw again any unexpected error that could've happened
-    throw error
+    throw redirect('/auth')
   }
 }
 
