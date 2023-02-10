@@ -1,6 +1,9 @@
 import { z } from 'zod'
 
-import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
+import {
+  EDGE_AUTHENTICATES,
+  EDGE_AUTHORIZES,
+} from '@kubelt/platform.access/src/constants'
 
 import { AccessURNSpace } from '@kubelt/urns/access'
 import { AccountURN } from '@kubelt/urns/account'
@@ -75,18 +78,14 @@ export const exchangeTokenMethod = async ({
 
     // Create an edge between Account and Access nodes to record the
     // existence of a user "session".
-    const access = AccessURNSpace.componentizedUrn(
-      iss,
-      { grant_type: GrantType.AuthenticationCode },
-      undefined
-    )
+    const access = AccessURNSpace.componentizedUrn(iss, undefined)
 
     console.log({ access, edgesClient: ctx.edgesClient })
     // NB: we use InjectEdges middleware to inject this service client.
     await ctx.edgesClient!.makeEdge.mutate({
       src: account,
       dst: access,
-      tag: EDGE_ACCESS,
+      tag: EDGE_AUTHENTICATES,
     })
 
     return result
@@ -139,7 +138,7 @@ export const exchangeTokenMethod = async ({
     // existence of a user "session".
     const access = AccessURNSpace.componentizedUrn(
       iss,
-      { client_id: clientId, grant_type: GrantType.AuthorizationCode },
+      { client_id: clientId },
       undefined
     )
 
@@ -148,7 +147,7 @@ export const exchangeTokenMethod = async ({
     await ctx.edgesClient!.makeEdge.mutate({
       src: account,
       dst: access,
-      tag: EDGE_ACCESS,
+      tag: EDGE_AUTHORIZES,
     })
 
     return result

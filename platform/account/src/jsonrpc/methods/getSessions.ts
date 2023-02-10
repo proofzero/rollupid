@@ -1,7 +1,7 @@
 import createEdgesClient from '@kubelt/platform-clients/edges'
 import type { AccessURN } from '@kubelt/urns/access'
 import { Context } from '../../context'
-import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
+import { EDGE_AUTHENTICATES } from '@kubelt/platform.access/src/constants'
 import { Graph } from '@kubelt/types'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { z } from 'zod'
@@ -43,7 +43,8 @@ export const getSessionsMethod = async ({
       // We only want edges that start at the provided account node.
       id: input.account,
       // We only want edges that link to Access nodes (sessions).
-      tag: EDGE_ACCESS,
+      //TODO: This may need to be changed to EDGE_AUTHORIZES when we implement revoke
+      tag: EDGE_AUTHENTICATES,
       // Account -> Access edges indicate session ownership.
       dir: Graph.EdgeDirection.Outgoing,
     },
