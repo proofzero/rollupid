@@ -65,14 +65,11 @@ export default function Welcome() {
           className="text-center lg:text-left text-gray-500"
         >
           Follow us on{' '}
-          <a
-            className="!text-indigo-500"
-            href="https://twitter.com/threeid_xyz"
-          >
+          <a className="!text-indigo-500" href="https://twitter.com/rollupid">
             Twitter
           </a>{' '}
           and join our{' '}
-          <a className="!text-indigo-500" href="https://discord.gg/threeid">
+          <a className="!text-indigo-500" href="https://discord.gg/rollupid">
             Discord
           </a>{' '}
           to stay updated!
