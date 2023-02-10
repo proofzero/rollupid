@@ -68,7 +68,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       scope: scope || '',
     })
 
-    redirectURL += `?${appParams}}`
+    redirectURL += `?${appParams}`
   }
 
   return createUserSession(accessToken, redirectURL, addressURN, context.env)
