@@ -1,7 +1,7 @@
 import createEdgesClient from '@kubelt/platform-clients/edges'
-import { AccessRComp, AccessURNSpace } from '@kubelt/urns/access'
+import { AccessRComp } from '@kubelt/urns/access'
 import { Context } from '../../context'
-import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
+import { EDGE_AUTHORIZES } from '@kubelt/platform.access/src/constants'
 import { Graph } from '@kubelt/types'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { z } from 'zod'
@@ -50,7 +50,7 @@ export const getAuthorizedAppsMethod = async ({
       // We only want edges that start at the provided account node.
       id: input.account,
       // We only want edges that link to Access nodes (sessions).
-      tag: EDGE_ACCESS,
+      tag: EDGE_AUTHORIZES,
       // Account -> Access edges indicate session ownership.
       dir: Graph.EdgeDirection.Outgoing,
     },
