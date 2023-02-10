@@ -71,4 +71,4 @@ curl -X POST https://passport.rollup.id/token -d "exchange_code={exchangeCode}&g
 
 #### Source
 
-[https://github.com/rollupid/rollupid/blob/main/apps/passport/app/routes/token.tsx](../../apps/passport/app/routes/token.tsx)
+[https://github.com/proofzero/rollupid/blob/main/apps/passport/app/routes/token.tsx](../../apps/passport/app/routes/token.tsx)

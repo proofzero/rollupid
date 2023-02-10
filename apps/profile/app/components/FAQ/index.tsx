@@ -97,7 +97,7 @@ const contents = [
           <a
             target={'_blank'}
             rel={'noopener noopener noreferrer'}
-            href={`https://github.com/rollupid/rollupid/tree/main/nftar`}
+            href={`https://github.com/proofzero/rollupid/tree/main/nftar`}
             className="mx-1"
           >
             <Text type="span" size="sm" className="text-indigo-500">
