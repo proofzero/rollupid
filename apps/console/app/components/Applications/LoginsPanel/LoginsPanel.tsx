@@ -1,6 +1,8 @@
-import { Panel } from '@kubelt/design-system/src/atoms/panels/Panel'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Tooltip } from 'flowbite-react'
+import type { AuthorizedProfile } from '~/types'
+
+import missingImage from '~/images/missing-img.svg'
 
 const noLoginsSvg = (
   <svg
@@ -58,78 +60,97 @@ const noLoginsSvg = (
 )
 
 type LoginsPanelProps = {
-  logins?: any[]
+  authorizedProfiles: AuthorizedProfile[]
 }
 
-// TODO: Return no-logins page back!
-
-export const LoginsPanel = ({ logins }: LoginsPanelProps) => {
-  const users = [
-    { name: '0ndrej.eth', firstAuth: 'Feb 17 2022 18:32:32', number: 1 },
-    { name: '0xd...a4q1', firstAuth: 'Feb 17 2022 18:32:32', number: 2 },
-    { name: '0x8...1dq0', firstAuth: 'Feb 17 2022 18:32:32', number: 3 },
-    { name: '0ndrej.eth', firstAuth: 'Feb 17 2022 18:32:32', number: 1 },
-    { name: '0xd...a4q1', firstAuth: 'Feb 17 2022 18:32:32', number: 2 },
-    { name: '0x8...1dq0', firstAuth: 'Feb 17 2022 18:32:32', number: 3 },
-    { name: '0ndrej.eth', firstAuth: 'Feb 17 2022 18:32:32', number: 1 },
-    { name: '0xd...a4q1', firstAuth: 'Feb 17 2022 18:32:32', number: 2 },
-  ]
+export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
   return (
     <div className="flex-1 flex flex-col h-full">
-      <Text className="text-gray-600 pb-6" weight="medium" size="base">
+      <Text className="text-gray-600 py-6" weight="medium" size="lg">
         Users
       </Text>
+      {authorizedProfiles.length ? (
+        <div className="border flex-1 flex flex-col rounded-lg h-full pt-2">
+          <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-lg">
+            <Text size="sm" weight="medium" className="text-gray-500 flex-1">
+              USER ID
+            </Text>
+            <Text size="sm" weight="medium" className="text-gray-500 flex-1">
+              APPROVED
+            </Text>
+          </div>
 
-      <div className="border flex-1 flex flex-col rounded-lg h-full">
-        <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-lg">
-          <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-            USER ID
-          </Text>
-          <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-            APPROVED
-          </Text>
-        </div>
-
-        <div
-          className="flex flex-1 flex-col bg-white rounded-br-lg
+          <div
+            className="flex flex-1 flex-col bg-white rounded-br-lg
           rounded-bl-lg h-full"
-        >
-          {users.map((user, i) => (
-            <article key={i} className={`flex items-center py-5 px-8`}>
-              <div className="flex-1 flex flex-row items-center space-x-4">
+          >
+            {authorizedProfiles.map((user, i) => (
+              <article key={i} className={`flex items-center py-5 px-8`}>
+                <div className="flex-1 flex flex-row items-center space-x-4">
+                  <img
+                    src={user.profile.pfp?.image || missingImage}
+                    alt="account pfp"
+                    className="max-h-[24px] max-w-[24px] rounded-full"
+                  />
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="text-gray-500 flex-1"
+                  >
+                    {user.profile.displayName}
+                  </Text>
+                </div>
+
                 <Text
                   size="sm"
                   weight="medium"
                   className="text-gray-500 flex-1"
                 >
-                  {user.name}
+                  {new Date(user.timestamp).toLocaleString('default', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                  })}
                 </Text>
+              </article>
+            ))}
+            <div className="b-0">
+              <div className="w-full px-8">
+                <div className="border-t border-gray-200"></div>
               </div>
 
-              <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-                {user.firstAuth}
-              </Text>
-            </article>
-          ))}
-          <div className="b-0">
-            <div className="w-full px-8">
-              <div className="border-t border-gray-200"></div>
-            </div>
-
-            <div className="flex flex-row justify-center">
-              <Tooltip content="Coming soon!" trigger="hover">
-                <Text
-                  size="sm"
-                  weight="medium"
-                  className="cursor-pointer text-indigo-500 my-4"
-                >
-                  View All
-                </Text>
-              </Tooltip>
+              <div className="flex flex-row justify-center">
+                <Tooltip content="Coming soon!" trigger="hover">
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="cursor-pointer text-indigo-500 my-4"
+                  >
+                    View All
+                  </Text>
+                </Tooltip>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-col bg-[#F9FAFB] justify-center items-center h-full">
+          {noLoginsSvg}
+
+          <Text weight="medium" className="text-gray-500 mt-9 mt-2">
+            No one signed up to your app yet.
+          </Text>
+          <Text weight="medium" className="text-gray-500">
+            <a className="text-indigo-500" href="/">
+              Go to Docs
+            </a>{' '}
+            and try the signup flow.
+          </Text>
+        </div>
+      )}
     </div>
   )
 }

@@ -17,6 +17,7 @@ import { requireJWT } from '~/utilities/session.server'
 import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
 import { RollType, RotatedSecrets } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import type { AuthorizedProfile } from '~/types'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -70,6 +71,7 @@ export default function AppDetailIndexPage() {
   const outletContext = useOutletContext<{
     appDetails: appDetailsProps
     rotationResult: RotatedSecrets
+    authorizedProfiles: AuthorizedProfile[]
   }>()
   const navigate = useNavigate()
 
@@ -90,6 +92,7 @@ export default function AppDetailIndexPage() {
         },
         CTAneeded: !app.app.icon || !app.app.redirectURI || !app.app.name,
       }}
+      authorizedProfiles={outletContext.authorizedProfiles}
       galaxyGql={{
         createdAt: new Date(app.apiKeyTimestamp as number),
         apiKey: rotatedApiKey as string,

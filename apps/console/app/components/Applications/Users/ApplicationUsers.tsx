@@ -1,12 +1,41 @@
 import React from 'react'
 import { Text } from '@kubelt/design-system'
+import type { AuthorizedProfile } from '~/types'
+import missingImage from '~/images/missing-img.svg'
 
-export const ApplicationUsers = () => {
-  const users = [
-    { name: '0ndrej.eth', firstAuth: 'Feb 17 2022 18:32:32', number: 1 },
-    { name: '0xd...a4q1', firstAuth: 'Feb 17 2022 18:32:32', number: 2 },
-    { name: '0x8...1dq0', firstAuth: 'Feb 17 2022 18:32:32', number: 3 },
-  ]
+export const ApplicationUsers = ({
+  authorizedProfiles,
+}: {
+  authorizedProfiles: AuthorizedProfile[]
+}) => {
+  const Users = new Map<
+    string,
+    { pfp?: string; name?: string; authNumber?: number; date?: string }
+  >()
+
+  authorizedProfiles.forEach((authProfile) => {
+    if (Users.has(authProfile.accountURN)) {
+      const user = Users.get(authProfile.accountURN)
+      Users.set(authProfile.accountURN, {
+        ...user,
+        authNumber: user.authNumber + 1,
+      })
+    } else {
+      Users.set(authProfile.accountURN, {
+        name: authProfile.profile.displayName!,
+        date: new Date(authProfile.timestamp).toLocaleString('default', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }),
+        pfp: authProfile.profile.pfp?.image!,
+        authNumber: 1,
+      })
+    }
+  })
 
   return (
     <div>
@@ -19,7 +48,7 @@ export const ApplicationUsers = () => {
             USER ID
           </Text>
           <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-            FIRST AUTHORIZATIONS
+            FIRST AUTHORIZATION
           </Text>
           <Text size="sm" weight="medium" className="text-gray-500 flex-1">
             NO. OF AUTHORIZATIONS
@@ -30,24 +59,29 @@ export const ApplicationUsers = () => {
           className="flex flex-1 flex-col bg-white rounded-br-lg
           rounded-bl-lg"
         >
-          {users.map((user, i) => (
+          {Array.from(Users.keys()).map((key, i) => (
             <article key={i} className={`flex items-center py-5 px-8 border-t`}>
               <div className="flex-1 flex flex-row items-center space-x-4">
+                <img
+                  src={Users.get(key)?.pfp || missingImage}
+                  alt="account pfp"
+                  className="max-h-[24px] max-w-[24px] rounded-full"
+                />
                 <Text
                   size="sm"
                   weight="medium"
                   className="text-gray-500 flex-1"
                 >
-                  {user.name}
+                  {Users.get(key).name}
                 </Text>
               </div>
 
               <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-                {user.firstAuth}
+                {Users.get(key)?.date}
               </Text>
 
               <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-                {user.number}
+                {Users.get(key)?.authNumber}
               </Text>
             </article>
           ))}

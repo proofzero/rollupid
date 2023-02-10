@@ -5,6 +5,7 @@ import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
 // import { Graph } from '@kubelt/types'
 // import { inputValidators } from '@kubelt/platform-middleware'
 import { z } from 'zod'
+import { edge } from '../../../../edges/src/db/insert'
 
 // Input
 // -----------------------------------------------------------------------------
@@ -22,8 +23,9 @@ export type GetAuthorizedAccountsParams = z.infer<
 
 export const GetAuthorizedAccountsMethodOutput = z.array(
   z.object({
-    clientId: z.string(),
+    accountURN: z.string(),
     timestamp: z.number(),
+    grantType: z.string(),
   })
 )
 
@@ -39,55 +41,27 @@ export const getAuthorizedAccounts = async ({
 }) => {
   const edgesClient = createEdgesClient(ctx.Edges)
 
-  // Only the subject of supplied JWT can get sessions; the input
-  // account parameter and header JWT 'sub' must match.
-  //   if (input.client !== ctx.accountURN) {
-  //     throw new Error(`input account and JWT account do not match`)
-  //   }
-
   const edgesResult = await edgesClient.getEdges.query({
     query: {
       tag: EDGE_ACCESS,
-      // Account -> Access edges indicate session ownership.
-      dst: { rc: input.client },
     },
   })
 
-  console.log({ edgesResult })
-
   const mappedEdges = edgesResult.edges
-    //     // Map for easy type definitions
-    //     // and comparisons
-    .map((edge) => ({
-      rc: edge.dst.rc as AccessRComp,
-      // The UTC addon lets the Date engine know we're
-      // parsing from UTC so the locale of the client
-      // is properly inferred in later usages
-      timestamp: new Date((edge.createdTimestamp as string) + ' UTC').getTime(),
-    }))
-    // There are some edges without client_id
-    // this shouldn't be the case once EDGE_AUTHORIZATION
-    // is in place
-    .filter((mappedEdge) => mappedEdge.rc.client_id)
-    // Flatten structure
-    .map((mappedEdge) => {
-      const { timestamp } = mappedEdge
-      const { client_id } = mappedEdge.rc
+    .filter(
+      (edge) => (edge.dst.rc as AccessRComp).client_id //&&
+    )
+    .map((edge) => {
+      const timestamp = new Date(
+        (edge.createdTimestamp as string) + ' UTC'
+      ).getTime()
+      const accountURN = edge.src.urn
+      const grantType = (edge.dst.rc as AccessRComp).grant_type as string
 
-      return {
-        clientId: client_id as string,
-        timestamp,
-      }
+      return { accountURN, timestamp, grantType }
     })
     // Order in ascending order
     .sort((a, b) => a.timestamp - b.timestamp)
-    // Take only the first entry per clientId
-    .filter(
-      (val, ind, self) =>
-        self.findIndex((me) => me.clientId === val.clientId) === ind
-    )
 
-  // Results in the initial authorization for each
-  // clientId
   return mappedEdges
 }

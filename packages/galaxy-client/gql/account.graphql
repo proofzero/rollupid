@@ -84,6 +84,27 @@ query getAuthorizedApps {
   }
 }
 
+query getProfileFromAccount($accountURN: URN!) {
+  profile: profileFromAccount(accountURN: $accountURN) {
+    pfp {
+      ... on StandardPFP {
+        image
+      }
+      ... on NFTPFP {
+        image
+        isToken
+      }
+    }
+    displayName
+    handle
+    cover
+    location
+    job
+    bio
+    website
+  }
+}
+
 query getConnectedAddresses {
   connectedAddresses {
     urn

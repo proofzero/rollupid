@@ -22,6 +22,7 @@ import { Gallery, Links, Profile } from '@kubelt/platform.account/src/types'
 import { ResolverContext } from './common'
 import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { AccountURN } from '@kubelt/urns/account'
 
 const accountResolvers: Resolvers = {
   Query: {
@@ -279,6 +280,37 @@ const accountResolvers: Resolvers = {
 
       return connectedAddressesFromAddress
     },
+
+    //@ts-ignore
+    profileFromAccount: async (
+      _parent: any,
+      { accountURN }: { accountURN: AccountURN },
+      { env, jwt }: ResolverContext
+    ) => {
+      console.log({ accountURN })
+      console.log({ jwt })
+      // return the address profile if no account is associated with the address
+      if (!accountURN) {
+        console.log(
+          'galaxy.profileFromAddress: attempt to resolve profile from address w/o account'
+        )
+        throw new GraphQLError("Address doesn't have an associated account")
+      }
+
+      // get the account profile
+      const accountClient = createAccountClient(
+        env.Account,
+        getAuthzHeaderConditionallyFromToken(jwt)
+      )
+
+      console.log("galaxy.profileFromAccount: getting account's profile")
+      // should also return the handle if it exists
+      let accountProfile = await accountClient.getProfile.query({
+        account: accountURN,
+      })
+
+      return accountProfile
+    },
   },
   Mutation: {
     updateProfile: async (
@@ -420,6 +452,7 @@ const ProfileResolverComposition = {
     logAnalytics(),
     temporaryConvertToPublic(),
   ],
+  'Query.profileFromAccount': [setupContext(), hasApiKey(), logAnalytics()],
   'Mutation.updateProfile': [
     setupContext(),
     hasApiKey(),

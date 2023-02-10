@@ -12,8 +12,9 @@ import { requireJWT } from '~/utilities/session.server'
 import { getGalaxyClient } from '~/utilities/platform.server'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
-import { RotatedSecrets } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import type { AuthorizedProfile, RotatedSecrets } from '~/types'
+import type { Profile } from '@kubelt/galaxy-client'
 
 type AppData = {
   clientId: string
@@ -26,6 +27,7 @@ type LoaderData = {
   avatarUrl: string
   appDetails: appDetailsProps
   rotationResult?: RotatedSecrets
+  authorizedProfiles?: AuthorizedProfile[]
 }
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -39,6 +41,24 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     getAuthzHeaderConditionallyFromToken(jwt)
   )
   const galaxyClient = await getGalaxyClient()
+
+  const authorizations = await starbaseClient.getAuthorizedAccounts.query({
+    client: params.clientId,
+  })
+
+  const authorizedProfiles = await Promise.all(
+    authorizations.map<Promise<AuthorizedProfile>>(async (authorization) => {
+      const profileRes = await galaxyClient.getProfileFromAccount({
+        accountURN: authorization.accountURN,
+      })
+      return {
+        profile: profileRes.profile as Profile,
+        timestamp: authorization.timestamp,
+        grantType: authorization.grantType,
+        accountURN:  authorization.accountURN
+      }
+    })
+  )
 
   const clientId = params?.clientId
 
@@ -85,6 +105,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
 
     return json<LoaderData>({
+      authorizedProfiles,
       apps: reshapedApps,
       avatarUrl,
       appDetails: appDetails as appDetailsProps,
@@ -107,7 +128,7 @@ export default function AppDetailIndexPage() {
   const { profileURL } = useOutletContext<{ profileURL: string }>()
 
   const { apps, avatarUrl } = loaderData
-  const { appDetails, rotationResult } = loaderData
+  const { appDetails, rotationResult, authorizedProfiles } = loaderData
 
   const notify = (success: boolean = true) => {
     if (success) {
@@ -131,6 +152,7 @@ export default function AppDetailIndexPage() {
         <section className="mx-11 my-9">
           <Outlet
             context={{
+              authorizedProfiles,
               notificationHandler: notify,
               appDetails,
               rotationResult,

@@ -7,6 +7,7 @@ import { LoginsPanel } from '../LoginsPanel/LoginsPanel'
 import { RotateCredsModal } from '../../RotateCredsModal/RotateCredsModal'
 import { useState } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
+import type { AuthorizedProfile } from '~/types'
 
 type ApplicationDashboardProps = {
   galaxyGql: {
@@ -25,12 +26,14 @@ type ApplicationDashboardProps = {
     onKeyRoll: () => void
   }
   logins?: any[]
+  authorizedProfiles: AuthorizedProfile[]
 }
 
 export const ApplicationDashboard = ({
   galaxyGql,
   oAuth,
   CTAprops,
+  authorizedProfiles,
 }: ApplicationDashboardProps) => {
   const [apiKeyRollModalOpen, setApiKeyRollModalOpen] = useState(false)
   const [clientSecretRollModalOpen, setClientSecretRollModalOpen] =
@@ -166,7 +169,7 @@ export const ApplicationDashboard = ({
         </div>
 
         <div className="flex-1">
-          <LoginsPanel />
+          <LoginsPanel authorizedProfiles={authorizedProfiles} />
         </div>
       </div>
     </section>

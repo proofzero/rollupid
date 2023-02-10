@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { Node } from './node'
 
 export const EdgeQueryInput = z.object({
-  id: AnyURNInput,
+  id: AnyURNInput.optional(),
   tag: EdgeTagInput.optional(),
   dir: EdgeDirectionInput.optional(),
   src: NodeFilterInput.optional(),
