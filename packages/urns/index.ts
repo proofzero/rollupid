@@ -1,6 +1,8 @@
-import { BaseURN, URNSpace, parseURN, SpaceOptions, FullURN } from 'urns'
+import { BaseURN, URNSpace, parseURN, SpaceOptions } from 'urns'
 
 export { parseURN }
+
+export type CompType = Record<string, string>
 
 // Object URN
 export type ObjectURN = BaseURN<'durable-object', string>
@@ -26,21 +28,20 @@ export const createObjectURNSpace = (): ObjectURNSpace<string> => {
 }
 
 // PLATFORM URN
-export type CompType = { [k: string]: string }
-export type RollupIdURN<NSS extends string> = BaseURN<'rollupid', NSS>
+export type RollupIdURN<NSS extends string = string> = BaseURN<'rollupid', NSS>
 export type RollupIdURNSpace<
-  NSS extends string,
-  RComp extends CompType,
-  QComp extends CompType
+  NSS extends string = string,
+  RComp extends CompType = CompType,
+  QComp extends CompType = CompType
 > = TypedComponentsURNSpace<'rollupid', NSS, RComp, QComp, RollupIdURN<NSS>>
 
 // general
 export const RollupIdSpace = new URNSpace('rollupid')
 
 export const createRollupIdURNSpace = <
-  NSSPrefix extends string,
-  RComp extends CompType,
-  QComp extends CompType
+  NSSPrefix extends string = string,
+  RComp extends CompType = CompType,
+  QComp extends CompType = CompType
 >(
   prefix?: string // optional if we want to validate prefix
 ): RollupIdURNSpace<`${NSSPrefix}/${string}`, RComp, QComp> => {
@@ -66,11 +67,11 @@ export const createRollupIdURNSpace = <
 }
 
 class TypedComponentsURNSpace<
-  NID extends string,
-  NSS extends string,
-  RCompType extends { [k: string]: string } = never,
-  QCompType extends { [k: string]: string } = never,
-  URNType extends BaseURN<NID, NSS> = never
+  NID extends string = string,
+  NSS extends string = string,
+  RCompType extends CompType = CompType,
+  QCompType extends CompType = CompType,
+  URNType extends BaseURN<NID, NSS> = BaseURN<NID, NSS>
 > extends URNSpace<string, string, string> {
   constructor(nid: NID, options?: Partial<SpaceOptions<NSS, string>>) {
     super(nid, options)
@@ -134,10 +135,10 @@ class TypedComponentsURNSpace<
 }
 
 interface ParsedComponentizedURN<
-  NID extends string,
-  NSS extends string,
-  RCompType extends { [k: string]: string },
-  QCompType extends { [k: string]: string }
+  NID extends string = string,
+  NSS extends string = string,
+  RCompType extends CompType = CompType,
+  QCompType extends CompType = CompType
 > {
   nid: NID
   nss: NSS
