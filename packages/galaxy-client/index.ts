@@ -26,13 +26,6 @@ export type AddressProfile = {
 
 export type AddressProfilesUnion = CryptoAddressProfile | OAuthAppleProfile | OAuthGithubProfile | OAuthGoogleProfile | OAuthMicrosoftProfile | OAuthTwitterProfile;
 
-export type App = {
-  __typename?: 'App';
-  icon: Scalars['String'];
-  timestamp: Scalars['Float'];
-  title: Scalars['String'];
-};
-
 export type AppUser = {
   __typename?: 'AppUser';
   icon: Scalars['String'];
@@ -397,7 +390,6 @@ export type Query = {
   addressProfile: AddressProfile;
   addressProfiles: Array<AddressProfile>;
   appUsers: Array<AppUser>;
-  apps?: Maybe<Array<Maybe<App>>>;
   connectedAddresses?: Maybe<Array<Node>>;
   connectedAddressesFromAddress?: Maybe<Array<Node>>;
   contractsForAddress?: Maybe<NftContracts>;
