@@ -1,6 +1,6 @@
 import type { ActionFunction } from '@remix-run/cloudflare'
-import { logout } from '~/utilities/session.server'
+import { redirect } from 'react-router'
 
 export const action: ActionFunction = async ({ request }) => {
-  return await logout(request)
+  return redirect(`${PASSPORT_URL}/signout`)
 }

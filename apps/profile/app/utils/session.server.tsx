@@ -120,7 +120,7 @@ export async function requireJWT(request: Request, headers = new Headers()) {
     // force a signout and redirect to profile /auth
     const authenticator = initAuthenticator()
     return authenticator.logout(request, {
-      redirectTo: '/auth',
+      redirectTo: '/signout',
     })
   }
 }

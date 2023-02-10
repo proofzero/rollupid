@@ -4,6 +4,6 @@ import { initAuthenticator } from '~/utils/session.server'
 export const action: ActionFunction = async ({ request }) => {
   const authenticator = initAuthenticator()
   return authenticator.logout(request, {
-    redirectTo: '/auth',
+    redirectTo: `${PASSPORT_URL}/signout`,
   })
 }

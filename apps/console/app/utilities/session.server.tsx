@@ -5,7 +5,6 @@
 import invariant from 'tiny-invariant'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
-import type { Session } from '@remix-run/cloudflare'
 import {
   createCookieSessionStorage,
   // createCloudflareKVSessionStorage,
@@ -57,52 +56,25 @@ export function getUserSession(request: Request, renew: boolean = true) {
   return getPassportSessionStorage().getSession(request?.headers.get('Cookie'))
 }
 
-// destroyUserSession
-// -----------------------------------------------------------------------------
-
-/**
- *
- */
-export async function destroyUserSession(session: Session) {
-  return redirect('/', {
-    headers: {
-      'Set-Cookie': await getPassportSessionStorage(0).destroySession(session),
-    },
-  })
-}
-
-// logout
-// -----------------------------------------------------------------------------
-
-/**
- *
- */
-export async function logout(request: Request) {
-  const session = await getUserSession(request)
-  return destroyUserSession(session)
-}
-
 // requireJWT
 // -----------------------------------------------------------------------------
 
 /**
  * @return an encoded JWT
  */
-export async function requireJWT(
-  request: Request,
-  redirectTo: string = new URL(request.url).pathname
-) {
+export async function requireJWT(request: Request) {
   const session = await getUserSession(request)
   const jwt = session.get('jwt')
   // const searchParams = new URLSearchParams([['redirectTo', redirectTo]])
 
   if (!jwt || typeof jwt !== 'string') {
-    throw redirect(PASSPORT_URL)
+    throw redirect(`${PASSPORT_URL}/signout`)
   }
   if (jwt) {
     const parsedJWT = parseJwt(jwt)
-    if (parsedJWT.exp < Date.now() / 1000) {
-      throw await destroyUserSession(session)
+    const exp = parsedJWT?.exp
+    if (exp && exp < Date.now() / 1000) {
+      throw redirect(`${PASSPORT_URL}/signout`)
     }
   }
 

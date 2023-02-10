@@ -10,7 +10,7 @@ import type { JWTPayload } from 'jose'
 
 // USER PARAMS
 
-const getUserSessionStorage = (env: Env) => {
+const getUserSessionStorage = (env: Env, MAX_AGE = 60 * 60 * 24 * 90) => {
   return createCookieSessionStorage({
     cookie: {
       domain: env.COOKIE_DOMAIN,
@@ -18,7 +18,7 @@ const getUserSessionStorage = (env: Env) => {
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV == 'production',
-      maxAge: 60 * 60 * 24 * 90,
+      maxAge: MAX_AGE,
       httpOnly: true,
       secrets: [env.SECRET_SESSION_SALT],
     },
@@ -54,22 +54,23 @@ export async function createUserSession(
 }
 
 // TODO: reset cookie maxAge if valid
-export function getUserSession(
-  request: Request,
-  renew: boolean = true,
-  env: Env
-) {
+export function getUserSession(request: Request, env: Env) {
   const storage = getUserSessionStorage(env)
   return storage.getSession(request.headers.get('Cookie'))
 }
 
 export async function destroyUserSession(session: Session, env: Env) {
-  const storage = getUserSessionStorage(env)
+  const storage = getUserSessionStorage(env, 0) // set max age to 0 to kill cookie
   return redirect(`/authenticate`, {
     headers: {
       'Set-Cookie': await storage.destroySession(session),
     },
   })
+}
+
+export async function logout(request: Request, env: Env) {
+  const session = await getUserSession(request, env)
+  return destroyUserSession(session, env)
 }
 
 // CONSOLE PARAMS
@@ -114,7 +115,7 @@ export async function requireJWT(
   consoleParams: ConsoleParams,
   env: Env
 ) {
-  const session = await getUserSession(request, false, env)
+  const session = await getUserSession(request, env)
   const jwt = session.get('jwt')
 
   if (!jwt || typeof jwt !== 'string') {
