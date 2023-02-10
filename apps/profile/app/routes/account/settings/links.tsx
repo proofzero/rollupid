@@ -26,15 +26,15 @@ import { SortableList } from '@kubelt/design-system/src/atoms/lists/SortableList
 import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 
-import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
-import { AddressURN } from '@kubelt/urns/address'
+import type { AddressURN } from '@kubelt/urns/address'
 
 import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import { imageFromAddressType } from '~/helpers'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
-import { FullProfile } from '~/types'
+import type { FullProfile } from '~/types'
 
 /**
  * Prepares Crypto and OAuth profiles
@@ -183,11 +183,13 @@ const SortableLink = ({
   link: { name, url, editing = false },
   error,
   setFormChanged,
+  deleteLink,
 }: {
   id: string
   link: Link & { editing?: boolean }
   error: any
   setFormChanged: (value: boolean) => void
+  deleteLink: (id: string) => void
 }) => {
   const [isEditing, setEditing] = useState(editing)
   const [nameInput, setNameInput] = useState(name || '')
@@ -284,6 +286,7 @@ const SortableLink = ({
       <button
         type="button"
         onClick={() => {
+          deleteLink(id)
           setFormChanged(true)
         }}
         className="mt-[1.15rem]"
@@ -359,7 +362,7 @@ export default function AccountSettingsLinks() {
         weight="semibold"
         className="mt-[2.875rem] mb-[1.375rem] text-gray-800"
       >
-        Connected Account Links
+        Connected Account Links (coming soon)
       </Text>
 
       <fetcher.Form method="post" action="/account/settings/connections/order">
@@ -367,6 +370,7 @@ export default function AccountSettingsLinks() {
           items={connectedLinks.map((l: any) => ({
             key: `${l.addressURN}`,
             val: l,
+            disabled: true,
           }))}
           itemRenderer={(item) => (
             <div className={`flex flex-row items-center w-full`}>
@@ -388,6 +392,7 @@ export default function AccountSettingsLinks() {
                 id={`enable_${item.val.addressURN}`}
                 label={''}
                 checked={item.val.public}
+                disabled={true}
                 onToggle={(val) => {
                   const index = connectedLinks.findIndex(
                     (pl: any) => pl.addressURN === item.val.addressURN
@@ -451,8 +456,10 @@ export default function AccountSettingsLinks() {
                   id={`${item.key}`}
                   link={item.val}
                   setFormChanged={setFormChanged}
-                  error={{}}
-                  // error={actionData?.errors[parseInt(item.key)] || {}}
+                  deleteLink={(id) => {
+                    setLinks(links.filter((l, i) => i !== parseInt(id)))
+                  }}
+                  error={actionData?.errors[parseInt(item.key)] || {}}
                 />
               )}
               onItemsReordered={(items) => {

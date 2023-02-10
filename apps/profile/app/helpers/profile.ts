@@ -65,6 +65,7 @@ export const getAddressProfiles = async (
   addressURNList: AddressURN[]
 ) => {
   const galaxyClient = await getGalaxyClient()
+  console.log({ addressURNList })
   const addressProfileRes = await galaxyClient.getAddressProfiles(
     {
       addressURNList,

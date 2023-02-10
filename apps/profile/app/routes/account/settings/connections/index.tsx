@@ -1,17 +1,12 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { AddressList } from '~/components/addresses/AddressList'
-import { Form, useFetcher, useLoaderData, useSubmit } from '@remix-run/react'
+import { useFetcher, useLoaderData } from '@remix-run/react'
 import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
 import { requireJWT } from '~/utils/session.server'
-import { AddressURN } from '@kubelt/urns/address'
-import { AddressListItemProps } from '~/components/addresses/AddressListItem'
-import {
-  ActionFunction,
-  HeadersFunction,
-  LoaderFunction,
-} from '@remix-run/cloudflare'
-import { CryptoAddressProfile } from '@kubelt/galaxy-client'
+import type { AddressURN } from '@kubelt/urns/address'
+import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
+import type { LoaderFunction } from '@remix-run/cloudflare'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import InputText from '~/components/inputs/InputText'

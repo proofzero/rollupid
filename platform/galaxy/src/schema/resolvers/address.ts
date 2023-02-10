@@ -50,7 +50,6 @@ const addressResolvers: Resolvers = {
           return addressClient.getAddressProfile.query()
         })
       )
-      console.debug({ eth: profiles[0].profile, gh: profiles[1].profile })
       return profiles
     },
   },
