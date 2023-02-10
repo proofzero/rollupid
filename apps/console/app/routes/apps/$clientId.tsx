@@ -26,6 +26,11 @@ type LoaderData = {
   avatarUrl: string
   appDetails: appDetailsProps
   rotationResult?: RotatedSecrets
+  appUsers: {
+    icon: string
+    title: string
+    timestamp: number
+  }[]
 }
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -39,8 +44,28 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     getAuthzHeaderConditionallyFromToken(jwt)
   )
   const galaxyClient = await getGalaxyClient()
-
   const clientId = params?.clientId
+
+  let appUsers: {
+    icon: string
+    title: string
+    timestamp: number
+  }[] = []
+
+  if (clientId) {
+    const appUsersRes = await galaxyClient.getAppUsers(
+      {
+        clientId,
+      },
+      getAuthzHeaderConditionallyFromToken(jwt)
+    )
+
+    appUsers = appUsersRes.appUsers
+  }
+
+  console.log({
+    appUsers,
+  })
 
   try {
     const apps = await starbaseClient.listApps.query()
@@ -89,6 +114,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       avatarUrl,
       appDetails: appDetails as appDetailsProps,
       rotationResult,
+      appUsers,
     })
   } catch (error) {
     console.error('Caught error in loader', { error })
@@ -108,6 +134,7 @@ export default function AppDetailIndexPage() {
 
   const { apps, avatarUrl } = loaderData
   const { appDetails, rotationResult } = loaderData
+  const { appUsers } = loaderData
 
   const notify = (success: boolean = true) => {
     if (success) {
@@ -134,6 +161,7 @@ export default function AppDetailIndexPage() {
               notificationHandler: notify,
               appDetails,
               rotationResult,
+              appUsers,
             }}
           />
         </section>
