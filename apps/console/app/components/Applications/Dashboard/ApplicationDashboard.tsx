@@ -8,6 +8,8 @@ import { RotateCredsModal } from '../../RotateCredsModal/RotateCredsModal'
 import { useState } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
 import type { AuthorizedProfile } from '~/types'
+import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
+import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
 type ApplicationDashboardProps = {
   galaxyGql: {
@@ -25,8 +27,10 @@ type ApplicationDashboardProps = {
     createdAt: Date
     onKeyRoll: () => void
   }
-  logins?: any[]
+  state: { state: string; type: string }
   authorizedProfiles: AuthorizedProfile[]
+  logins?: any[]
+  error?: any
 }
 
 export const ApplicationDashboard = ({
@@ -34,6 +38,8 @@ export const ApplicationDashboard = ({
   oAuth,
   CTAprops,
   authorizedProfiles,
+  state,
+  error,
 }: ApplicationDashboardProps) => {
   const [apiKeyRollModalOpen, setApiKeyRollModalOpen] = useState(false)
   const [clientSecretRollModalOpen, setClientSecretRollModalOpen] =
@@ -168,9 +174,22 @@ export const ApplicationDashboard = ({
           </Panel>
         </div>
 
-        <div className="flex-1">
-          <LoginsPanel authorizedProfiles={authorizedProfiles} />
-        </div>
+        {state.state !== 'idle' && (
+          <div className="flex flex-1 justify-center items-center h-screen">
+            <Spinner />
+          </div>
+        )}
+        {state.type === 'done' && error && (
+          <div className="flex flex-1 justify-center items-center h-screen">
+            <ErrorPage code="Oops" message="Something went wrong" />
+          </div>
+        )}
+
+        {state.type === 'done' && !error && (
+          <div className="flex-1">
+            <LoginsPanel authorizedProfiles={authorizedProfiles} />
+          </div>
+        )}
       </div>
     </section>
   )

@@ -174,9 +174,10 @@ function AppMenu({ props }: AppMenuProps) {
           </NavLink>
 
           <NavLink
-            to={`/apps/${props.selected}/users`}
+            to={`/apps/${props.selected}/soon`}
             end
-            className={({ isActive }) => menuItemClass(isActive)}
+            className={({ isActive }) => menuItemClass(isActive, true)}
+            onClick={(e) => e.preventDefault()}
           >
             <HiOutlineChartSquareBar className="w-6 h-6" />{' '}
             <Text size="sm" weight="medium">

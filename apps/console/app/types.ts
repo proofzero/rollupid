@@ -11,7 +11,6 @@ export type RotatedSecrets = {
 }
 
 export type AuthorizedProfile = {
-  grantType: string
   timestamp: number
   profile: Profile
   accountURN: string

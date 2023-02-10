@@ -66,11 +66,11 @@ type LoginsPanelProps = {
 export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
   return (
     <div className="flex-1 flex flex-col h-full">
-      <Text className="text-gray-600 py-6" weight="medium" size="lg">
+      <Text className="text-gray-600 py-3" weight="medium" size="lg">
         Users
       </Text>
       {authorizedProfiles.length ? (
-        <div className="border flex-1 flex flex-col rounded-lg h-full pt-2">
+        <div className="border flex-1 flex flex-col rounded-lg h-full pt-2 relative">
           <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-lg">
             <Text size="sm" weight="medium" className="text-gray-500 flex-1">
               USER ID
@@ -117,12 +117,15 @@ export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
                 </Text>
               </article>
             ))}
-            <div className="b-0">
+
+            <div className="h-[4rem]" />
+
+            <div className="absolute bottom-0 w-full">
               <div className="w-full px-8">
                 <div className="border-t border-gray-200"></div>
               </div>
 
-              <div className="flex flex-row justify-center">
+              <div className="flex flex-row justify-center ">
                 <Tooltip content="Coming soon!" trigger="hover">
                   <Text
                     size="sm"

@@ -1,6 +1,7 @@
 /**
  * @file app/routes/dashboard/apps/$appId/index.tsx
  */
+import { useEffect } from 'react'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
@@ -9,15 +10,16 @@ import {
   useOutletContext,
   useSubmit,
   useNavigate,
+  useFetcher,
 } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 import { ApplicationDashboard } from '~/components/Applications/Dashboard/ApplicationDashboard'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
-import { RollType, RotatedSecrets } from '~/types'
+import { RollType } from '~/types'
+import type { RotatedSecrets } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
-import type { AuthorizedProfile } from '~/types'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -71,11 +73,17 @@ export default function AppDetailIndexPage() {
   const outletContext = useOutletContext<{
     appDetails: appDetailsProps
     rotationResult: RotatedSecrets
-    authorizedProfiles: AuthorizedProfile[]
   }>()
+  const authFetcher = useFetcher()
   const navigate = useNavigate()
 
   const { appDetails: app } = outletContext
+
+  useEffect(() => {
+    const query = new URLSearchParams()
+    query.set('client', app.clientId!)
+    authFetcher.load(`/api/authorized-accounts?${query}`)
+  }, [])
 
   const { rotatedClientSecret, rotatedApiKey } =
     outletContext?.rotationResult ||
@@ -92,7 +100,9 @@ export default function AppDetailIndexPage() {
         },
         CTAneeded: !app.app.icon || !app.app.redirectURI || !app.app.name,
       }}
-      authorizedProfiles={outletContext.authorizedProfiles}
+      authorizedProfiles={authFetcher.data?.authorizedProfiles || []}
+      error={authFetcher.data?.error || null}
+      state={{ state: authFetcher.state, type: authFetcher.type }}
       galaxyGql={{
         createdAt: new Date(app.apiKeyTimestamp as number),
         apiKey: rotatedApiKey as string,
