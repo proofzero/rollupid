@@ -51,7 +51,7 @@ Next click the "OAuth" link on the left navigation bar to view the full applicat
 Here you will see the standard [OAuth 2.0](https://oauth.net/2/) configuration form where you will need to set the following required fields:
 
 * **Redirect URL**: The address where Rollup will redirect your users to after they have completed the auth flow ([more on next page](auth-flow.md))
-* **App Icon**: The logo of you application you want displayed to users during the auth flow ([see passport for more](../platform/passport.md))
+* **App Icon**: The logo of your application you want displayed to users during the auth flow ([see passport for more](../platform/passport.md))
 * **Terms of Service URL**: A link to your application's TOS
 * **Website**: A link to your application's website
 * **Scopes**: \[coming soon]
