@@ -65,10 +65,10 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       client_id: appId,
       state: appState,
       redirect_uri: consoleAppURI,
-      scope,
+      scope: scope || '',
     })
 
-    redirectURL += `?${appParams}}`
+    redirectURL += `?${appParams}`
   }
 
   return createUserSession(accessToken, redirectURL, addressURN, context.env)
