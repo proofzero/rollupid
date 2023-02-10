@@ -20,7 +20,7 @@ const getProfileSessionStorage = () =>
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 90,
+      maxAge: 7776000 /*60 * 60 * 24 * 90*/,
       secrets: [sessionSecret],
     },
   })
@@ -117,7 +117,7 @@ export async function requireJWT(request: Request, headers = new Headers()) {
       return access_token
     }
 
-    // force a signout and redirect to profile /auth
+    // force a signout and redirect to profile /signout
     const authenticator = initAuthenticator()
     return authenticator.logout(request, {
       redirectTo: '/signout',

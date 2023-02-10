@@ -10,7 +10,10 @@ import type { JWTPayload } from 'jose'
 
 // USER PARAMS
 
-const getUserSessionStorage = (env: Env, MAX_AGE = 60 * 60 * 24 * 90) => {
+const getUserSessionStorage = (
+  env: Env,
+  MAX_AGE = 7776000 /*60 * 60 * 24 * 90*/
+) => {
   return createCookieSessionStorage({
     cookie: {
       domain: env.COOKIE_DOMAIN,
@@ -81,7 +84,7 @@ export async function logout(request: Request, redirectTo: string, env: Env) {
 
 const getConsoleParamsSessionStorage = (
   env: Env,
-  MAX_AGE = 60 * 60 * 24 * 120
+  MAX_AGE = 300 // 5 minutes
 ) => {
   return createCookieSessionStorage({
     cookie: {
