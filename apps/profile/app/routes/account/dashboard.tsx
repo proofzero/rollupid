@@ -201,7 +201,7 @@ export default function Welcome() {
                 APPLICATION
               </Text>
               <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-                APPROVED
+                AUTHORIZED
               </Text>
             </div>
 
