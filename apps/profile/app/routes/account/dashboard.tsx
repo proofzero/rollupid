@@ -258,7 +258,12 @@ export default function Welcome() {
             </div>
 
             <div className="flex flex-row justify-center">
-              <Tooltip content="Coming soon!" trigger="hover" style="dark">
+              <Tooltip
+                content="Coming soon!"
+                trigger="hover"
+                data-tooltip-style="light"
+                style="light"
+              >
                 <Text
                   size="sm"
                   weight="medium"
