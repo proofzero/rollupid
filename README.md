@@ -2,7 +2,7 @@
 
 # Simple & Secure ‍Auth & Identity
 
-![License](https://img.shields.io/github/license/rollupid/rollupid)
+![License](https://img.shields.io/github/license/proofzero/rollupid)
 [![Discord](https://img.shields.io/discord/790660849471062046?label=Discord)](https://discord.gg/UgwAsJf6C5)
 
 #### Build Status
