@@ -76,6 +76,14 @@ query getProfileFromAddress($addressURN: URN!) {
   }
 }
 
+query getAuthorizedApps {
+  authorizedApps {
+    icon
+    title
+    timestamp
+  }
+}
+
 query getConnectedAddresses {
   connectedAddresses {
     urn

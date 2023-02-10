@@ -44,6 +44,11 @@ import {
   GetGalleryOutput,
 } from './methods/getGallery'
 import { SetGalleryInput, setGalleryMethod } from './methods/setGallery'
+import {
+  GetAuthorizedAppsMethodInput,
+  GetAuthorizedAppsMethodOutput,
+  getAuthorizedAppsMethod,
+} from './methods/getAuthorizedApps'
 
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
@@ -166,4 +171,12 @@ export const appRouter = t.router({
     .input(GetSessionsMethodInput)
     .output(GetSessionsMethodOutput)
     .mutation(getSessionsMethod),
+  getAuthorizedApps: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(Scopes)
+    .use(LogUsage)
+    .input(GetAuthorizedAppsMethodInput)
+    .output(GetAuthorizedAppsMethodOutput)
+    .query(getAuthorizedAppsMethod),
 })
