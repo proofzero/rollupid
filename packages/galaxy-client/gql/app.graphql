@@ -1,0 +1,7 @@
+query getAppUsers($clientId: String!) {
+  appUsers(clientId: $clientId) {
+    icon
+    title
+    timestamp
+  }
+}

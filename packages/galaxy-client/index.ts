@@ -26,6 +26,20 @@ export type AddressProfile = {
 
 export type AddressProfilesUnion = CryptoAddressProfile | OAuthAppleProfile | OAuthGithubProfile | OAuthGoogleProfile | OAuthMicrosoftProfile | OAuthTwitterProfile;
 
+export type App = {
+  __typename?: 'App';
+  icon: Scalars['String'];
+  timestamp: Scalars['Float'];
+  title: Scalars['String'];
+};
+
+export type AppUser = {
+  __typename?: 'AppUser';
+  icon: Scalars['String'];
+  timestamp: Scalars['Float'];
+  title: Scalars['String'];
+};
+
 export type Chain = {
   __typename?: 'Chain';
   chain?: Maybe<Scalars['String']>;
@@ -382,6 +396,8 @@ export type Query = {
   __typename?: 'Query';
   addressProfile: AddressProfile;
   addressProfiles: Array<AddressProfile>;
+  appUsers: Array<AppUser>;
+  apps?: Maybe<Array<Maybe<App>>>;
   connectedAddresses?: Maybe<Array<Node>>;
   connectedAddressesFromAddress?: Maybe<Array<Node>>;
   contractsForAddress?: Maybe<NftContracts>;
@@ -404,6 +420,11 @@ export type QueryAddressProfileArgs = {
 
 export type QueryAddressProfilesArgs = {
   addressURNList?: InputMaybe<Array<Scalars['URN']>>;
+};
+
+
+export type QueryAppUsersArgs = {
+  clientId: Scalars['String'];
 };
 
 
@@ -537,6 +558,13 @@ export type UpdateConnectedAddressesPropertiesMutationVariables = Exact<{
 
 
 export type UpdateConnectedAddressesPropertiesMutation = { __typename?: 'Mutation', updateConnectedAddressesProperties?: boolean | null };
+
+export type GetAppUsersQueryVariables = Exact<{
+  clientId: Scalars['String'];
+}>;
+
+
+export type GetAppUsersQuery = { __typename?: 'Query', appUsers: Array<{ __typename?: 'AppUser', icon: string, title: string, timestamp: number }> };
 
 export type GetEnsProfileQueryVariables = Exact<{
   addressOrEns: Scalars['String'];
@@ -775,6 +803,15 @@ export const UpdateConnectedAddressesPropertiesDocument = gql`
   updateConnectedAddressesProperties(addressURNList: $addressURNList)
 }
     `;
+export const GetAppUsersDocument = gql`
+    query getAppUsers($clientId: String!) {
+  appUsers(clientId: $clientId) {
+    icon
+    title
+    timestamp
+  }
+}
+    `;
 export const GetEnsProfileDocument = gql`
     query getEnsProfile($addressOrEns: String!) {
   ensProfile(addressOrEns: $addressOrEns) {
@@ -937,6 +974,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateConnectedAddressesProperties(variables: UpdateConnectedAddressesPropertiesMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateConnectedAddressesPropertiesMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateConnectedAddressesPropertiesMutation>(UpdateConnectedAddressesPropertiesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateConnectedAddressesProperties', 'mutation');
+    },
+    getAppUsers(variables: GetAppUsersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAppUsersQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAppUsersQuery>(GetAppUsersDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAppUsers', 'query');
     },
     getEnsProfile(variables: GetEnsProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetEnsProfileQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetEnsProfileQuery>(GetEnsProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEnsProfile', 'query');

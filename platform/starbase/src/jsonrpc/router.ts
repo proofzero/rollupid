@@ -59,6 +59,11 @@ import {
   GetAppPublicPropsInput,
   GetAppPublicPropsOutput,
 } from './methods/getAppPublicProps'
+import {
+  listAppAccounts,
+  ListAppAccountsInput,
+  ListAppAccountsOutput,
+} from './methods/listAppAccounts'
 
 const t = initTRPC.context<Context>().create()
 
@@ -114,6 +119,15 @@ export const appRouter = t.router({
     .input(NoInput)
     .output(ListAppsOutput)
     .query(listApps),
+  listAppAccounts: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .use(OwnAppsMiddleware)
+    .input(ListAppAccountsInput)
+    .output(ListAppAccountsOutput)
+    .query(listAppAccounts),
   rotateClientSecret: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
