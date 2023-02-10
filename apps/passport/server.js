@@ -14,7 +14,7 @@ export function parseParams(request) {
     redirectUri,
     scope:
       scope && scope.trim() !== 'null' && scope.trim() !== ''
-        ? scope.split(',')
+        ? scope.trim().split(',')
         : [],
   }
 }
