@@ -59,18 +59,22 @@ export function getUserSession(request: Request, env: Env) {
   return storage.getSession(request.headers.get('Cookie'))
 }
 
-export async function destroyUserSession(session: Session, env: Env) {
+export async function destroyUserSession(
+  session: Session,
+  redirectTo: string,
+  env: Env
+) {
   const storage = getUserSessionStorage(env, 0) // set max age to 0 to kill cookie
-  return redirect(`/authenticate`, {
+  return redirect(redirectTo, {
     headers: {
       'Set-Cookie': await storage.destroySession(session),
     },
   })
 }
 
-export async function logout(request: Request, env: Env) {
+export async function logout(request: Request, redirectTo: string, env: Env) {
   const session = await getUserSession(request, env)
-  return destroyUserSession(session, env)
+  return destroyUserSession(session, redirectTo, env)
 }
 
 // CONSOLE PARAMS
@@ -130,7 +134,7 @@ export async function requireJWT(
     const parsedJWT = parseJwt(jwt)
     const exp = parsedJWT?.exp
     if (exp && exp < Date.now() / 1000) {
-      throw await destroyUserSession(session, env)
+      throw await destroyUserSession(session, '/authenticate', env)
     }
   }
 

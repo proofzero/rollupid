@@ -12,7 +12,10 @@ export function parseParams(request) {
     clientId,
     state,
     redirectUri,
-    scope,
+    scope:
+      scope && scope.trim() !== 'null' && scope.trim() !== ''
+        ? scope.split(',')
+        : [],
   }
 }
 

@@ -30,7 +30,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         400
       )
     }
-    if (!scope || scope.trim() === '' || scope.trim() === 'openid') {
+    if (!scope.length || (scope.length == 1 && scope === 'openid')) {
       // auto authorize if no scope is provided or is set to only openid
 
       const parsedJWT = parseJwt(jwt)
