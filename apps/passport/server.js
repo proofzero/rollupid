@@ -18,7 +18,7 @@ export function parseParams(request) {
     clientId,
     state,
     redirectUri,
-    scope: decodedScope ? decodedScope.split(',') : [],
+    scope: decodedScope ? decodedScope.split(' ') : [],
   }
 }
 
