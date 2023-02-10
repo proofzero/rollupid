@@ -201,7 +201,7 @@ export default function Welcome() {
                 APPLICATION
               </Text>
               <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-                APPROVED
+                AUTHORIZED
               </Text>
             </div>
 
@@ -258,7 +258,7 @@ export default function Welcome() {
             </div>
 
             <div className="flex flex-row justify-center">
-              <Tooltip content="Coming soon!" trigger="hover">
+              <Tooltip content="Coming soon!" trigger="hover" style="dark">
                 <Text
                   size="sm"
                   weight="medium"
