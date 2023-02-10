@@ -359,14 +359,16 @@ export default function AccountSettingsLinks() {
         weight="semibold"
         className="mt-[2.875rem] mb-[1.375rem] text-gray-800"
       >
-        Connected Account Links
+        Connected Account Links (coming soon)
       </Text>
 
       <fetcher.Form method="post" action="/account/settings/connections/order">
         <SortableList
+          disabled={true}
           items={connectedLinks.map((l: any) => ({
             key: `${l.addressURN}`,
             val: l,
+            disabled: true,
           }))}
           itemRenderer={(item) => (
             <div className={`flex flex-row items-center w-full`}>
@@ -388,6 +390,7 @@ export default function AccountSettingsLinks() {
                 id={`enable_${item.val.addressURN}`}
                 label={''}
                 checked={item.val.public}
+                disabled={true}
                 onToggle={(val) => {
                   const index = connectedLinks.findIndex(
                     (pl: any) => pl.addressURN === item.val.addressURN
