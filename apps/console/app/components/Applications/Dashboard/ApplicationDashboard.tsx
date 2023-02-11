@@ -175,12 +175,12 @@ export const ApplicationDashboard = ({
         </div>
 
         {state.state !== 'idle' && (
-          <div className="flex flex-1 justify-center items-center h-screen">
+          <div className="flex flex-1 justify-center items-center h-full">
             <Spinner />
           </div>
         )}
         {state.type === 'done' && error && (
-          <div className="flex flex-1 justify-center items-center h-screen">
+          <div className="flex flex-1 justify-center items-center h-full">
             <ErrorPage code="Oops" message="Something went wrong" />
           </div>
         )}
