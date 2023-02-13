@@ -50,7 +50,6 @@ export const getAuthorizedAccounts = async ({
   const mappedEdges = edgesResult.edges
     .filter(
       (edge, index, edges) =>
-        (edge.dst.rc as AccessRComp) &&
         (edge.dst.rc as AccessRComp).client_id &&
         (edge.dst.rc as AccessRComp).client_id === input.client &&
         // take only 1 entry by accountURN
