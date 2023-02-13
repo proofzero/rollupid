@@ -22,7 +22,6 @@ import { Gallery, Links, Profile } from '@kubelt/platform.account/src/types'
 import { ResolverContext } from './common'
 import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
-import { AccountURN } from '@kubelt/urns/account'
 
 const accountResolvers: Resolvers = {
   Query: {
