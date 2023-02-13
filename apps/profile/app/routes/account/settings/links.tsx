@@ -200,15 +200,14 @@ const SortableLink = ({
         <input type="hidden" name={`links[${id}][name]`} value={nameInput} />
         <input type="hidden" name={`links[${id}][url]`} value={urlInput} />
 
-        <a
-          href={urlInput}
+        <div
           className="bg-gray-100 hover:bg-gray-200 transition-colors
               w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
               text-gray-700
         flex items-center justify-center "
         >
           <TbLink size={22} />
-        </a>
+        </div>
         <div className="flex flex-col flex-1">
           <Text weight="medium" className="truncate">
             {name}
