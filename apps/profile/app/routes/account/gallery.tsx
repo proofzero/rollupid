@@ -426,7 +426,7 @@ const Gallery = () => {
                   className="w-full h-full
               bg-gray-50 hover:bg-gray-100 transition-colors
               rounded-lg"
-                  disabled={!!cryptoAddresses?.length}
+                  disabled={!cryptoAddresses?.length}
                   onClick={() => setIsOpen(!!cryptoAddresses?.length)}
                 >
                   <div

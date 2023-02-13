@@ -12,7 +12,6 @@ import {
 import { requireJWT } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
 
-import { Tooltip } from 'flowbite-react'
 import { HiOutlineTrash } from 'react-icons/hi'
 import { FiEdit } from 'react-icons/fi'
 import { TbLink } from 'react-icons/tb'
@@ -201,20 +200,15 @@ const SortableLink = ({
         <input type="hidden" name={`links[${id}][name]`} value={nameInput} />
         <input type="hidden" name={`links[${id}][url]`} value={urlInput} />
 
-        <Tooltip content="Copy" className="text-black">
-          <button
-            type="button"
-            className="bg-gray-100 hover:bg-gray-200 transition-colors
+        <a
+          href={urlInput}
+          className="bg-gray-100 hover:bg-gray-200 transition-colors
               w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
               text-gray-700
         flex items-center justify-center "
-            onClick={() => {
-              navigator.clipboard.writeText(urlInput)
-            }}
-          >
-            <TbLink size={22} />
-          </button>
-        </Tooltip>
+        >
+          <TbLink size={22} />
+        </a>
         <div className="flex flex-col flex-1">
           <Text weight="medium" className="truncate">
             {name}
@@ -459,7 +453,7 @@ export default function AccountSettingsLinks() {
                   deleteLink={(id) => {
                     setLinks(links.filter((l, i) => i !== parseInt(id)))
                   }}
-                  error={actionData?.errors[parseInt(item.key)] || {}}
+                  error={actionData?.errors?.[parseInt(item.key)] || {}}
                 />
               )}
               onItemsReordered={(items) => {
