@@ -17,7 +17,7 @@ type CFImageUploadResponse = {
 }
 
 export const uploadImageBlobInput = z.object({
-  blob: z.string(),
+  b64: z.string(),
 })
 
 export type uploadImageBlobInputParams = z.infer<typeof uploadImageBlobInput>
@@ -27,29 +27,6 @@ export const uploadImageBlobMethodOutput = z.string().nullable().optional()
 export type uploadImageBlobMethodParams = z.infer<
   typeof uploadImageBlobMethodOutput
 >
-
-// as of now trpc does not support blobs, so we use b64 on client and
-// convert it to blob here
-
-const b64toBlob = (b64Data: string, contentType = '', sliceSize = 512) => {
-  const byteCharacters = atob(b64Data)
-  const byteArrays = []
-
-  for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-    const slice = byteCharacters.slice(offset, offset + sliceSize)
-
-    const byteNumbers = new Array(slice.length)
-    for (let i = 0; i < slice.length; i++) {
-      byteNumbers[i] = slice.charCodeAt(i)
-    }
-
-    const byteArray = new Uint8Array(byteNumbers)
-    byteArrays.push(byteArray)
-  }
-
-  const blob = new Blob(byteArrays, { type: contentType })
-  return blob
-}
 
 export const uploadImageBlobMethod = async ({
   input,
@@ -61,11 +38,13 @@ export const uploadImageBlobMethod = async ({
   console.log('New request on /uploadImageBlob')
   const uploadURL = `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1`
 
-  const reqBlob = b64toBlob(input.blob, 'image')
+  const reqBlob = await fetch(input.b64)
   if (!reqBlob) throw new Error('Bad request: Expected image blob in request.')
 
+  const imgFile = await reqBlob.blob()
+
   const formData = new FormData()
-  formData.append('file', reqBlob)
+  formData.append('file', imgFile)
 
   const uploadRequest = new Request(uploadURL, {
     method: 'POST',
