@@ -40,6 +40,7 @@ export type AuthorizeResult = {
 export type ExchangeTokenResult = {
   accessToken: string
   refreshToken: string
+  idToken?: string
 }
 
 export type SessionDetails = {

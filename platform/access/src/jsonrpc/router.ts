@@ -23,20 +23,15 @@ import {
   ExchangeTokenMethodOutput,
 } from './methods/exchangeToken'
 import {
-  verifyAuthorizationMethod,
-  VerifyAuthorizationMethodInput,
-  VerifyAuthorizationMethodOutput,
-} from './methods/verifyAuthorization'
+  verifyTokenMethod,
+  VerifyTokenMethodInput,
+  VerifyTokenMethodOutput,
+} from './methods/verifyToken'
 import {
-  getSessionMethod,
-  GetSessionMethodInput,
-  GetSessionMethodOutput,
-} from './methods/getSession'
-import {
-  revokeSessionMethod,
-  RevokeSessionMethodInput,
-  RevokeSessionMethodOutput,
-} from './methods/revokeSession'
+  revokeTokenMethod,
+  RevokeTokenMethodInput,
+  RevokeTokenMethodOutput,
+} from './methods/revokeToken'
 
 import { LogUsage } from '@kubelt/platform-middleware/log'
 
@@ -63,23 +58,13 @@ export const appRouter = t.router({
     .input(ExchangeTokenMethodInput)
     .output(ExchangeTokenMethodOutput)
     .mutation(exchangeTokenMethod),
-  verifyAuthorization: t.procedure
+  verifyToken: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(VerifyAuthorizationMethodInput)
-    .output(VerifyAuthorizationMethodOutput)
-    .query(verifyAuthorizationMethod),
-  getSession: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(RequireAccount)
-    .use(setAccessNode)
-    .use(LogUsage)
-    .use(Analytics)
-    .input(GetSessionMethodInput)
-    .output(GetSessionMethodOutput)
-    .query(getSessionMethod),
-  revokeSession: t.procedure
+    .input(VerifyTokenMethodInput)
+    .output(VerifyTokenMethodOutput)
+    .query(verifyTokenMethod),
+  revokeToken: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(RequireAccount)
@@ -87,9 +72,9 @@ export const appRouter = t.router({
     .use(setAccessNode)
     .use(LogUsage)
     .use(Analytics)
-    .input(RevokeSessionMethodInput)
-    .output(RevokeSessionMethodOutput)
-    .query(revokeSessionMethod),
+    .input(RevokeTokenMethodInput)
+    .output(RevokeTokenMethodOutput)
+    .mutation(revokeTokenMethod),
   getUserInfo: t.procedure
     .use(LogUsage)
     .use(Analytics)

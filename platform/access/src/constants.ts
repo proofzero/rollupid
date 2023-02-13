@@ -1,8 +1,6 @@
 import { EdgeSpace } from '@kubelt/urns/edge'
 import type { EdgeURN } from '@kubelt/urns/edge'
 
-export const URN_NODE_TYPE_AUTHORIZATION = 'node_type:authorization'
-
 export const CODE_OPTIONS = {
   length: 24,
   ttl: 120000,
@@ -13,8 +11,14 @@ export const JWT_OPTIONS = {
   jti: {
     length: 24,
   },
-  ttl: 3600000,
-  refreshTtl: 7776000000,
+}
+
+export const ACCESS_TOKEN_OPTIONS = {
+  expirationTime: '1 hour',
+}
+
+export const REFRESH_TOKEN_OPTIONS = {
+  expirationTime: '90 days',
 }
 
 /**

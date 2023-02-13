@@ -21,17 +21,21 @@ export const action: ActionFunction = async ({ request, context }) => {
   })
 
   const accessClient = createAccessClient(context.env.Access)
+
   const tokens = refreshToken
     ? await accessClient.exchangeToken.mutate({
-        token: refreshToken,
-        grantType: GrantType.RefreshToken,
-      })
+      grantType: GrantType.RefreshToken,
+      refreshToken,
+      clientId,
+      clientSecret,
+    })
     : await accessClient.exchangeToken.mutate({
-        clientId,
-        clientSecret,
-        code,
-        grantType: GrantType.AuthorizationCode,
-      })
+      grantType: GrantType.AuthorizationCode,
+      code,
+      clientId,
+      clientSecret,
+    })
+
   const result = {
     token_type: 'Bearer',
     access_token: tokens.accessToken,

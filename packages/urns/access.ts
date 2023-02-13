@@ -1,12 +1,10 @@
-import { createRollupIdURNSpace, RollupIdURN } from './index'
-import { GrantType } from '@kubelt/types/access'
+import { createRollupIdURNSpace, RollupIdURN } from '.'
 
 export type AccessRComp = {
-  client_id?: string
+  client_id: string
 }
+
 export type AccessURN = RollupIdURN<`access/${string}`>
-export const AccessURNSpace = createRollupIdURNSpace<
-  'access',
-  AccessRComp,
-  never
->('access')
+export const AccessURNSpace = createRollupIdURNSpace<'access', AccessRComp>(
+  'access'
+)
