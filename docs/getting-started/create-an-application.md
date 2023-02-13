@@ -24,11 +24,11 @@ After logging in you will be redirected to the [Console](../platform/console.md)
 
 </div>
 
-From here you will want to click the  “Create Application” button in the middle of the screen where you will be prompted to give your application a name and finally redirected to your new application's configuration screen.
+From here you will want to click the “Create Application” button in the middle of the screen where you will be prompted to give your application a name and finally redirected to your new application's configuration screen.
 
 ### Step 3: Configure your Application
 
-Once the app is created, the first screen you will see is your application dashboard. This is where you can copy your [Galaxy API key](../reference/galaxy-api.md) and your application keys. **Please copy the application secret and store it somewhere secure.**&#x20;
+Once the app is created, the first screen you will see is your application dashboard. This is where you can copy your [Galaxy API key](../reference/galaxy-api.md) and your application keys. **Please copy the application secret and store it somewhere secure.**
 
 {% hint style="info" %}
 The application secret is only shared once so, if you missed it you can click the "roll keys" link to regenerate the keys.
@@ -36,7 +36,7 @@ The application secret is only shared once so, if you missed it you can click th
 
 <div>
 
-<figure><img src="../.gitbook/assets/Application Detail - Dashboard (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/Application Detail - Dashboard.png" alt=""><figcaption></figcaption></figure>
 
  
 

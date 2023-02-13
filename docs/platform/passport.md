@@ -12,21 +12,21 @@ Passport is an OAuth-based authentication and authorization gateway for your app
 
 The authentication step takes care of identifying profiles on the [Profile Graph](profile-graph.md). The authentication method a user chooses acts like a DNS resolver to a users profile. If a profile is not found, one will be created.
 
-Once authenticated the user will the be redirected to the authorization screen.&#x20;
+Once authenticated the user will the be redirected to the authorization screen.
 
-<figure><img src="../.gitbook/assets/MacBook Pro 14_ - 1 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/MacBook Pro 14_ - 1.png" alt=""><figcaption></figcaption></figure>
 
 Passport's authentication flow currently supports the following authentication methods and are configurable for your app [Console](console.md):
 
-- Connect with Wallet
-- Connect with Email (coming soon)
-- Connect with WebAuthN (coming soon)
-- Connect with Google
-- Connect with Apple
-- Connect with Twitter
-- Connect with Github
-- Connect with Microsoft
-- Connect with Discord
+* Connect with Wallet
+* Connect with Email (coming soon)
+* Connect with WebAuthN (coming soon)
+* Connect with Google
+* Connect with Apple
+* Connect with Twitter
+* Connect with Github
+* Connect with Microsoft
+* Connect with Discord
 
 #### Authorization
 

@@ -1,6 +1,6 @@
 # Table of contents
 
-* [Introduction to Rollup](rollupid/overview/index.md)
+* [Introduction to Rollup](3id/overview/index.md)
 
 ## Getting Started
 
@@ -24,7 +24,6 @@
 
 * [Galaxy GQL API](reference/galaxy-api.md)
 * [Passport API](reference/passport-api.md)
-* [Public Profile API](reference/public-profile-api.md)
 * [Scopes](reference/scopes.md)
 
 ## Troubleshooting
