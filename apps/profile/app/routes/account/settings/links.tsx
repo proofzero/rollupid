@@ -453,7 +453,7 @@ export default function AccountSettingsLinks() {
                   deleteLink={(id) => {
                     setLinks(links.filter((l, i) => i !== parseInt(id)))
                   }}
-                  error={actionData?.errors[parseInt(item.key)] || {}}
+                  error={actionData?.errors?.[parseInt(item.key)] || {}}
                 />
               )}
               onItemsReordered={(items) => {
