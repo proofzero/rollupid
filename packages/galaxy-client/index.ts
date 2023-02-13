@@ -401,7 +401,6 @@ export type Query = {
   linksFromAddress?: Maybe<Array<Link>>;
   nftsForAddress?: Maybe<NfTs>;
   profile?: Maybe<Profile>;
-  profileFromAccount?: Maybe<Profile>;
   profileFromAddress?: Maybe<Profile>;
 };
 
@@ -454,11 +453,6 @@ export type QueryNftsForAddressArgs = {
 };
 
 
-export type QueryProfileFromAccountArgs = {
-  accountURN: Scalars['URN'];
-};
-
-
 export type QueryProfileFromAddressArgs = {
   addressURN: Scalars['URN'];
 };
@@ -501,13 +495,6 @@ export type GetAuthorizedAppsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetAuthorizedAppsQuery = { __typename?: 'Query', authorizedApps?: Array<{ __typename?: 'App', icon: string, title: string, timestamp: number } | null> | null };
-
-export type GetProfileFromAccountQueryVariables = Exact<{
-  accountURN: Scalars['URN'];
-}>;
-
-
-export type GetProfileFromAccountQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null };
 
 export type GetConnectedAddressesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -682,28 +669,6 @@ export const GetAuthorizedAppsDocument = gql`
     icon
     title
     timestamp
-  }
-}
-    `;
-export const GetProfileFromAccountDocument = gql`
-    query getProfileFromAccount($accountURN: URN!) {
-  profile: profileFromAccount(accountURN: $accountURN) {
-    pfp {
-      ... on StandardPFP {
-        image
-      }
-      ... on NFTPFP {
-        image
-        isToken
-      }
-    }
-    displayName
-    handle
-    cover
-    location
-    job
-    bio
-    website
   }
 }
     `;
@@ -973,9 +938,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getAuthorizedApps(variables?: GetAuthorizedAppsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthorizedAppsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetAuthorizedAppsQuery>(GetAuthorizedAppsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthorizedApps', 'query');
-    },
-    getProfileFromAccount(variables: GetProfileFromAccountQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileFromAccountQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProfileFromAccountQuery>(GetProfileFromAccountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfileFromAccount', 'query');
     },
     getConnectedAddresses(variables?: GetConnectedAddressesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetConnectedAddressesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetConnectedAddressesQuery>(GetConnectedAddressesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getConnectedAddresses', 'query');

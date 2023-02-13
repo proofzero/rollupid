@@ -9,7 +9,8 @@ compatibility_date = "2022-04-05"
 services = [
   { binding = "Starbase", service = "starbase"},
   { binding = "Images", service = "images" },
-  { binding = "Galaxy", service = "galaxy"}
+  { binding = "Galaxy", service = "galaxy"},
+  { binding = "Account", service = "account"}
 ]
 
 # development

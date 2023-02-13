@@ -68,7 +68,6 @@ export default /* GraphQL */ `
     linksFromAddress(addressURN: URN!): [Link!]
     galleryFromAddress(addressURN: URN!): [Gallery!]
     connectedAddressesFromAddress(addressURN: URN!): [Node!]
-    profileFromAccount(accountURN: URN!): Profile
   }
 
   type Mutation {

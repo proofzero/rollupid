@@ -10,7 +10,7 @@ export const ApplicationUsers = ({
 }) => {
   const Users = new Map<
     string,
-    { pfp?: string; name?: string; authNumber?: number; date?: string }
+    { pfp?: string; name?: string; numOfAuthorizations: number; date?: string }
   >()
 
   authorizedProfiles.forEach((authProfile) => {
@@ -18,7 +18,7 @@ export const ApplicationUsers = ({
       const user = Users.get(authProfile.accountURN)
       Users.set(authProfile.accountURN, {
         ...user,
-        authNumber: user.authNumber + 1,
+        numOfAuthorizations: user!.numOfAuthorizations + 1,
       })
     } else {
       Users.set(authProfile.accountURN, {
@@ -32,7 +32,7 @@ export const ApplicationUsers = ({
           second: '2-digit',
         }),
         pfp: authProfile.profile.pfp?.image!,
-        authNumber: 1,
+        numOfAuthorizations: 1,
       })
     }
   })
@@ -81,7 +81,7 @@ export const ApplicationUsers = ({
               </Text>
 
               <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-                {Users.get(key)?.authNumber}
+                {Users.get(key)?.numOfAuthorizations}
               </Text>
             </article>
           ))}

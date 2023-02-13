@@ -27,7 +27,7 @@ type ApplicationDashboardProps = {
     createdAt: Date
     onKeyRoll: () => void
   }
-  state: { state: string; type: string }
+  fetcherState: { state: string; type: string }
   authorizedProfiles: AuthorizedProfile[]
   logins?: any[]
   error?: any
@@ -38,7 +38,7 @@ export const ApplicationDashboard = ({
   oAuth,
   CTAprops,
   authorizedProfiles,
-  state,
+  fetcherState,
   error,
 }: ApplicationDashboardProps) => {
   const [apiKeyRollModalOpen, setApiKeyRollModalOpen] = useState(false)
@@ -174,18 +174,18 @@ export const ApplicationDashboard = ({
           </Panel>
         </div>
 
-        {state.state !== 'idle' && (
+        {fetcherState.state !== 'idle' && (
           <div className="flex flex-1 justify-center items-center h-full">
             <Spinner />
           </div>
         )}
-        {state.type === 'done' && error && (
+        {fetcherState.type === 'done' && error && (
           <div className="flex flex-1 justify-center items-center h-full">
             <ErrorPage code="Oops" message="Something went wrong" />
           </div>
         )}
 
-        {state.type === 'done' && !error && (
+        {fetcherState.type === 'done' && !error && (
           <div className="flex-1">
             <LoginsPanel authorizedProfiles={authorizedProfiles} />
           </div>

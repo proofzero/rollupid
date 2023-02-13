@@ -1,12 +1,11 @@
-import { defer, json } from '@remix-run/cloudflare'
-import { getGalaxyClient } from '~/utilities/platform.server'
+import { json } from '@remix-run/cloudflare'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import createAccountClient from '@kubelt/platform-clients/account'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import { requireJWT } from '~/utilities/session.server'
 
 import type { AuthorizedProfile } from '~/types'
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import type { Profile } from '@kubelt/galaxy-client'
 
 type LoaderData = {
   authorizedProfiles?: AuthorizedProfile[]
@@ -27,7 +26,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       Starbase,
       getAuthzHeaderConditionallyFromToken(jwt)
     )
-    const galaxyClient = await getGalaxyClient()
+    const accountClient = createAccountClient(Account)
 
     const authorizations = await starbaseClient.getAuthorizedAccounts.query({
       client,
@@ -35,11 +34,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
     const authorizedProfiles = await Promise.all(
       authorizations.map<Promise<AuthorizedProfile>>(async (authorization) => {
-        const profileRes = await galaxyClient.getProfileFromAccount({
-          accountURN: authorization.accountURN,
+        const profileRes = await accountClient.getProfile.query({
+          account: authorization.accountURN as `urn:rollupid:account/${string}`,
         })
         return {
-          profile: profileRes.profile as Profile,
+          profile: {
+            pfp: { image: profileRes?.pfp?.image as string },
+            displayName: profileRes?.displayName,
+          },
           timestamp: authorization.timestamp,
           accountURN: authorization.accountURN,
         }

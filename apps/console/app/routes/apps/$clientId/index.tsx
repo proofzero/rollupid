@@ -102,7 +102,7 @@ export default function AppDetailIndexPage() {
       }}
       authorizedProfiles={authFetcher.data?.authorizedProfiles || []}
       error={authFetcher.data?.error || null}
-      state={{ state: authFetcher.state, type: authFetcher.type }}
+      fetcherState={{ state: authFetcher.state, type: authFetcher.type }}
       galaxyGql={{
         createdAt: new Date(app.apiKeyTimestamp as number),
         apiKey: rotatedApiKey as string,

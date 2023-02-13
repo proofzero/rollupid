@@ -1,5 +1,3 @@
-import type { Profile } from '@kubelt/galaxy-client'
-
 export enum RollType {
   RollAPIKey = 'roll_api_key',
   RollClientSecret = 'roll_app_secret',
@@ -12,6 +10,11 @@ export type RotatedSecrets = {
 
 export type AuthorizedProfile = {
   timestamp: number
-  profile: Profile
+  profile: {
+    pfp?: {
+      image: string
+    }
+    displayName?: string
+  }
   accountURN: string
 }
