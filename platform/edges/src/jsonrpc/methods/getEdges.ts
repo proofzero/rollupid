@@ -37,8 +37,12 @@ export const getEdgesMethod = async ({
   // result as per any options.
   const edges = await db.edges(ctx.graph, input.query, input.opt)
 
-  return {
-    id: nodeId,
-    edges,
+  if (nodeId) {
+    return {
+      id: nodeId,
+      edges,
+    }
+  } else {
+    return { id: '', edges }
   }
 }

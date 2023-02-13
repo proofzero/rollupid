@@ -7,3 +7,10 @@ export type RotatedSecrets = {
   rotatedApiKey: string
   rotatedClientSecret: string
 }
+
+export type AuthorizedProfile = {
+  timestamp: number
+  name?: string
+  imageURL?: string
+  accountURN: string
+}

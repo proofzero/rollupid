@@ -26,7 +26,11 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 const RollupLogo = () => {
   return (
     <Link to="/">
-      <img className="mx-4 my-5 max-w-[180px]" src={consoleLogo} alt="console logo" />
+      <img
+        className="mx-4 my-5 max-w-[180px]"
+        src={consoleLogo}
+        alt="console logo"
+      />
     </Link>
   )
 }

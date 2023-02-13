@@ -147,35 +147,46 @@ export async function edges(
   // TODO we don't want to allow for the possibility of all edges being
   // returned until pagination is in place. Revisit this behavior if we
   // decide to implement it.
-  if (!query.id) {
-    return []
-  }
+  // if (!query.id) {
+  //   return []
+  // }
 
   // Filter returned edges by direction; if we're asked for "outgoing"
   // edges, the node ID is for the "source" node of the edge. If we're
   // asked for "incoming" edges, the node ID is for the "destination"
   // node of the edge. If no direction is supplied, return all edges
   // that originate or terminate at the given node ID.
-  switch (query.dir) {
-    case Graph.EdgeDirection.Incoming:
-      sql = `SELECT * FROM edge e WHERE (e.dst = ?1)`
-      break
-    case Graph.EdgeDirection.Outgoing:
-      sql = `SELECT * FROM edge e WHERE (e.src = ?1)`
-      break
-    default:
-      sql = `SELECT * FROM edge e WHERE (e.src = ?1 OR e.dst = ?1)`
-  }
-
   let statement
+  if (query.id) {
+    switch (query.dir) {
+      case Graph.EdgeDirection.Incoming:
+        sql = `SELECT * FROM edge e WHERE (e.dst = ?1)`
+        break
+      case Graph.EdgeDirection.Outgoing:
+        sql = `SELECT * FROM edge e WHERE (e.src = ?1)`
+        break
+      default:
+        sql = `SELECT * FROM edge e WHERE (e.src = ?1 OR e.dst = ?1)`
+    }
 
-  // Filter edges by tag, if provided.
-  if (query.tag) {
-    sql += ' AND e.tag = ?2 ORDER BY createdTimestamp ASC'
-    statement = g.db.prepare(sql).bind(query.id.toString(), query.tag)
+    // Filter edges by tag, if provided.
+    if (query.tag) {
+      sql += ' AND e.tag = ?2 ORDER BY createdTimestamp ASC'
+      statement = g.db.prepare(sql).bind(query.id.toString(), query.tag)
+    } else {
+      sql += ' ORDER BY createdTimestamp ASC'
+      statement = g.db.prepare(sql).bind(query.id.toString())
+    }
   } else {
-    sql += ' ORDER BY createdTimestamp ASC'
-    statement = g.db.prepare(sql).bind(query.id.toString())
+    sql = `SELECT * FROM edge e`
+
+    if (query.tag) {
+      sql += ' WHERE e.tag = ?1 ORDER BY createdTimestamp ASC'
+      statement = g.db.prepare(sql).bind(query.tag)
+    } else {
+      sql += ' ORDER BY createdTimestamp ASC'
+      statement = g.db.prepare(sql).bind()
+    }
   }
 
   const result = await statement.all()
