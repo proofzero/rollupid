@@ -27,6 +27,11 @@ import {
 import { LogUsage } from '@kubelt/platform-middleware/log'
 
 import { Analytics } from '@kubelt/platform-middleware/analytics'
+import {
+  updateNodeCompsMethod,
+  UpdateNodeCompsMethodInput,
+  UpdateNodeCompsMethodOutput,
+} from './methods/updateNodeComps'
 
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
@@ -50,6 +55,12 @@ export const appRouter = t.router({
     .input(FindNodeMethodInput)
     .output(FindNodeMethodOutput)
     .query(findNodeMethod),
+  updateNode: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(UpdateNodeCompsMethodInput)
+    .output(UpdateNodeCompsMethodOutput)
+    .mutation(updateNodeCompsMethod),
   getEdges: t.procedure
     .use(LogUsage)
     .use(Analytics)

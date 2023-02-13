@@ -28,7 +28,9 @@ export const createApp = async ({
   // rotateSecret method must be called to generate the initial
   // OAuth secret and return it to the caller.
   const clientId = oauth.makeClientId()
-  const appURN = ApplicationURNSpace.urn(clientId)
+  const appURN = ApplicationURNSpace.componentizedUrn(clientId, undefined, {
+    name: input.clientName,
+  })
   if (!ctx.accountURN) throw new Error('No account URN in context')
 
   const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
