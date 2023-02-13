@@ -1,5 +1,15 @@
 import createImageClient from '@kubelt/platform-clients/image'
 
+const blobToB64 = (blob: Blob): Promise<string | ArrayBuffer | null> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onerror = reject
+    reader.onload = () => {
+      resolve(reader.result)
+    }
+    reader.readAsDataURL(blob)
+  })
+
 export default async (
   image_retrieval_url: string,
   env: Env,
@@ -26,11 +36,16 @@ export default async (
   }
 
   const blob = await retrievedImage.blob()
-  const cacheReqFormData = new FormData()
-  cacheReqFormData.append('imageBlob', blob)
+  const b64Blob = await blobToB64(blob)
+
+  if (!b64Blob) {
+    throw new Error('Error converting image blob to b64')
+  }
 
   const imageClient = createImageClient(env.Images)
-  const imageUrl = await imageClient.uploadImageBlob.mutate({ blob })
+  const imageUrl = await imageClient.uploadImageBlob.mutate({
+    blob: b64Blob?.toString(),
+  })
 
   if (!imageUrl || !imageUrl.length) throw new Error('Could not cache image.')
 
