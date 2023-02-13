@@ -10,9 +10,7 @@ export type RotatedSecrets = {
 
 export type AuthorizedProfile = {
   timestamp: number
-  profile: {
-    pfp?: string
-    displayName?: string
-  }
+  name?: string
+  imageURL?: string
   accountURN: string
 }

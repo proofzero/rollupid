@@ -88,7 +88,7 @@ export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
               <article key={i} className={`flex items-center py-5 px-8`}>
                 <div className="flex-1 flex flex-row items-center space-x-4">
                   <img
-                    src={user.profile.pfp || missingImage}
+                    src={user.imageURL || missingImage}
                     alt="account pfp"
                     className="max-h-[24px] max-w-[24px] rounded-full"
                   />
@@ -97,7 +97,7 @@ export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
                     weight="medium"
                     className="text-gray-500 flex-1"
                   >
-                    {user.profile.displayName}
+                    {user.name}
                   </Text>
                 </div>
 

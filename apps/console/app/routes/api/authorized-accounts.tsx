@@ -39,10 +39,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
           account: authorization.accountURN as AccountURN,
         })
         return {
-          profile: {
-            pfp: profileRes?.pfp?.image as string,
-            displayName: profileRes?.displayName,
-          },
+          imageURL: profileRes?.pfp?.image as string,
+          name: profileRes?.displayName,
           timestamp: authorization.timestamp,
           accountURN: authorization.accountURN,
         }

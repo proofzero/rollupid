@@ -10,7 +10,12 @@ export const ApplicationUsers = ({
 }) => {
   const Users = new Map<
     string,
-    { pfp?: string; name?: string; numOfAuthorizations: number; date?: string }
+    {
+      imageURL?: string
+      name?: string
+      numOfAuthorizations: number
+      date?: string
+    }
   >()
 
   authorizedProfiles.forEach((authProfile) => {
@@ -22,7 +27,7 @@ export const ApplicationUsers = ({
       })
     } else {
       Users.set(authProfile.accountURN, {
-        name: authProfile.profile.displayName!,
+        name: authProfile.name!,
         date: new Date(authProfile.timestamp).toLocaleString('default', {
           day: '2-digit',
           month: 'short',
@@ -31,7 +36,7 @@ export const ApplicationUsers = ({
           minute: '2-digit',
           second: '2-digit',
         }),
-        pfp: authProfile.profile.pfp?.image!,
+        imageURL: authProfile.imageURL!,
         numOfAuthorizations: 1,
       })
     }
@@ -63,7 +68,7 @@ export const ApplicationUsers = ({
             <article key={i} className={`flex items-center py-5 px-8 border-t`}>
               <div className="flex-1 flex flex-row items-center space-x-4">
                 <img
-                  src={Users.get(key)?.pfp || missingImage}
+                  src={Users.get(key)?.imageURL || missingImage}
                   alt="account pfp"
                   className="max-h-[24px] max-w-[24px] rounded-full"
                 />
