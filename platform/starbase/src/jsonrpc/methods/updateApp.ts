@@ -16,8 +16,15 @@ export const updateApp = async ({
   input: z.infer<typeof UpdateAppInput>
   ctx: Context
 }): Promise<void> => {
-  const appURN = ApplicationURNSpace.componentizedUrn(input.clientId)
-  if (!ctx.ownAppURNs || !ctx.ownAppURNs.includes(appURN))
+  const appURN = ApplicationURNSpace.componentizedUrn(
+    input.clientId,
+    undefined,
+    { name: input.updates.name, iconURL: input.updates.icon }
+  )
+  if (
+    !ctx.ownAppURNs ||
+    !ctx.ownAppURNs.includes(ApplicationURNSpace.getBaseURN(appURN))
+  )
     throw new Error(
       `Request received for clientId ${input.clientId} which is not owned by provided account.`
     )
@@ -27,4 +34,7 @@ export const updateApp = async ({
     ctx.StarbaseApp
   )
   appDO.class.update(input.updates)
+
+  //TODO: Make this asynchronous so user doesn't have to wait for the second IO hop
+  ctx.edges.updateNode.mutate({ urnOfNode: appURN })
 }

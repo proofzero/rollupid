@@ -23,7 +23,7 @@ export const OwnAppsMiddleware: BaseMiddlewareFunction<{
 
   const ownAppURNs = []
   for (const edge of edgeList && edgeList.edges) {
-    const appURN = edge.dst.id as ApplicationURN
+    const appURN = ApplicationURNSpace.getBaseURN(edge.dst.id as ApplicationURN)
     ownAppURNs.push(appURN)
   }
 

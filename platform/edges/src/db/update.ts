@@ -9,13 +9,12 @@ import * as urns from 'urns'
 import { AnyURN } from '@kubelt/urns'
 
 import type { EdgeTag, EdgeRecord, Graph, NodeRecord } from './types'
-import { qc } from './select'
 
 // node()
 // -----------------------------------------------------------------------------
 
 /**
- * Insert a node; if it is already present, this is a no-op.
+ * Insert a node; if it is already present, this does an upsert.
  *
  * @returns the inserted node
  */
