@@ -46,9 +46,10 @@ export default async (
     }).then((res) => res.json())
 
     if (!cfUploadRes?.success || !cfUploadRes.result?.variants)
-      throw new Error('Upload unsuccessful')
+      throw new Error('Upload failed')
   } catch (ex) {
     console.error('Could not send upload image blob to Image cache.', ex)
+    return ''
   }
 
   const imageURL = cfUploadRes?.result.variants[0]
