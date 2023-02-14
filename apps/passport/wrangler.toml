@@ -61,6 +61,7 @@ INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/authenticat
 INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/authenticate/github/callback"
 INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/authenticate/twitter/callback"
 INTERNAL_APPLE_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/authenticate/apple/callback"
+INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/authenticate/microsoft/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [env.next]
@@ -85,6 +86,7 @@ INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/authentica
 INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/authenticate/github/callback"
 INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/authenticate/twitter/callback"
 INTERNAL_APPLE_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/authenticate/apple/callback"
+INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/authenticate/microsoft/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 
 [env.next.build]
@@ -112,6 +114,7 @@ INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "https://passport.rollup.id/authenticate/go
 INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "https://passport.rollup.id/authenticate/github/callback"
 INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport.rollup.id/authenticate/twitter/callback"
 INTERNAL_APPLE_OAUTH_CALLBACK_URL = "https://passport.rollup.id/authenticate/apple/callback"
+INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "https://passport.rollup.id/authenticate/microsoft/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 
 [env.current.build]
