@@ -11,6 +11,20 @@ export default async (
   })
   const retrievedImage = await retrieveImageReq
 
+  if (!retrievedImage.ok) {
+    if (retrievedImage.status === 404) {
+      //Valid error
+      console.error('No image found in at that URL.')
+      return ''
+    } else {
+      console.error(
+        'Error retrieving the image from URL.',
+        retrievedImage.statusText
+      )
+      throw new Error('Error retrieving the image from URL')
+    }
+  }
+
   try {
     const imgFile = await retrievedImage.blob()
 
