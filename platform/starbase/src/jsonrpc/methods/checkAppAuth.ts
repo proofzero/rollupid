@@ -22,9 +22,11 @@ export const checkAppAuth = async ({
   const { clientId, clientSecret } = input
 
   const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
-
+  const appDetails = await appDO.class.getDetails()
   const hashedSecret = await secret.hash(clientSecret)
-  const secretValidity = await appDO.class.validateClientSecret(hashedSecret)
+  const secretValidity =
+    (appDetails.published || false) &&
+    (await appDO.class.validateClientSecret(hashedSecret))
 
   return {
     valid: secretValidity,
