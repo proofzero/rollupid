@@ -31,7 +31,7 @@ const CollectionForProfileRoute = () => {
   }>()
 
   // TODO: change the ProfileNFTGallery to take multiple addresses
-  const tempTargetAddress = cryptoAddresses?.map((a) => a.qc.alias)[0]
+  const targetAddresses = cryptoAddresses?.map((a) => a.qc.alias)
 
   const { displayName } = profile
 
@@ -92,11 +92,10 @@ const CollectionForProfileRoute = () => {
         })
       }}
       loadingConditions={loading || refresh}
-      account={tempTargetAddress} // #TODO: replace with list of visible addresses
       isModalNft={true}
       isOwner={isOwner}
       displayText={`Looks like ${
-        displayName ?? tempTargetAddress
+        displayName ?? targetAddresses[0]
       } doesn't own any NFTs`}
       detailsModal
       filters={false}

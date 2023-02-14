@@ -6,16 +6,6 @@ import type { Node, Profile } from '@kubelt/galaxy-client'
 import { useFetcher, useOutletContext, useNavigate } from '@remix-run/react'
 import { getMoreNftsAllCollections } from '~/helpers/nfts'
 
-export type ProfileData = {
-  targetAddress: string
-  displayName: string
-  isOwner: boolean
-  pfp: {
-    image: string
-    isToken: string
-  }
-}
-
 const ProfileRoute = () => {
   const { profile, cryptoAddresses, isOwner, accountURN } = useOutletContext<{
     profile: Profile
@@ -25,7 +15,7 @@ const ProfileRoute = () => {
   }>()
 
   // TODO: change the ProfileNFTGallery to take multiple addresses
-  const tempTargetAddress = cryptoAddresses?.map((a) => a.qc.alias)[0]
+  const targetAddresses = cryptoAddresses?.map((a) => a.qc.alias)
 
   const { displayName, pfp } = profile
 
@@ -89,12 +79,11 @@ const ProfileRoute = () => {
       isModal={false}
       loadingConditions={loading || refresh}
       nfts={loadedNfts}
-      account={tempTargetAddress}
       pfp={(pfp as any).image as string}
       isOwner={isOwner}
       filters={true}
       displayText={`Looks like ${
-        displayName ?? tempTargetAddress
+        displayName ?? targetAddresses[0]
       } doesn't own any NFTs`}
       detailsModal
     />

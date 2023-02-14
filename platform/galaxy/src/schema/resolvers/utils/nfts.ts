@@ -9,7 +9,7 @@ import {
 
 import Env from '../../../env'
 
-// -------------------- TYPES --------------------
+// -------------------- TYPES --------------------------------------------------
 
 import type { Gallery, Nft, NftContract, NftContracts, NfTs } from '../typedefs'
 
@@ -41,9 +41,9 @@ type contracts = {
 
 // list of NFT contracts
 type NftBatch = string[]
-// -------------------- END OF TYPES --------------------
+// -------------------- END OF TYPES -------------------------------------------
 
-// -------------------- HELPERS --------------------
+// -------------------- HELPERS ------------------------------------------------
 
 export const sortNftsAlphabetically = (ownedNfts: Nft[]) => {
   return ownedNfts.sort((a, b) =>
@@ -125,7 +125,7 @@ export const normalizeContracts = ({
   return beautifiedContracts
 }
 
-// -------------------- END OF HELPERS --------------------
+// -------------------- END OF HELPERS -----------------------------------------
 
 export const getAlchemyClients = ({ env }: { env: ResolverContext['env'] }) => {
   return {
@@ -142,7 +142,7 @@ export const getAlchemyClients = ({ env }: { env: ResolverContext['env'] }) => {
   }
 }
 
-// -------------------- ALL NFTS FOR SPECIFIED CONTRACTS --------------------
+// -------------------- ALL NFTS FOR SPECIFIED CONTRACTS -----------------------
 
 export const getNftsForAllChains = async (
   alchemyClients: AlchemyClients,
@@ -169,8 +169,8 @@ export const getNftsForAllChains = async (
     return ethNfts.concat(polyNfts)
   } catch (ex) {
     console.error(new GraphQLYogaError(ex as string))
+    return []
   }
-  return []
 }
 
 export const getNfts = async (
@@ -208,7 +208,7 @@ export const getNfts = async (
   return nfts
 }
 
-// -------------------- ALL CONTRACTS + 1 NFT --------------------
+// -------------------- ALL CONTRACTS + 1 NFT ----------------------------------
 
 export const nftBatchesFetcherForAllChains = async ({
   contracts,
@@ -268,7 +268,7 @@ export const getNftBatches = async ({
   )
 
   // Promise.all only to avoid promise chains
-  // TODO: chang to async npm package
+  // TODO: change to async npm package
   const res = await Promise.all(
     batches.map(async (batch: NftBatch) => {
       const visitedMap = new Map()
@@ -375,7 +375,7 @@ export const fetchContracts = async ({
   }
 }
 
-// -------------------- GALLERY --------------------
+// -------------------- GALLERY ------------------------------------------------
 
 export const getNftMetadataForAllChains = async (
   input: {
@@ -438,7 +438,7 @@ export const getNftMetadataForAllChains = async (
   }
 }
 
-// -------------------- GALLERY VERIFICATION --------------------
+// -------------------- GALLERY VERIFICATION -----------------------------------
 
 export const validOwnership = async (
   gallery: Gallery[],

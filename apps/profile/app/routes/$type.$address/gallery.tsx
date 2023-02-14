@@ -7,20 +7,6 @@ import { getMoreNftsGallery } from '~/helpers/nfts'
 
 import { useFetcher, useOutletContext } from '@remix-run/react'
 
-export type ProfileData = {
-  targetAddress: string
-  displayName: string
-  isOwner: boolean
-  pfp: {
-    image: string
-    isToken: string
-  }
-}
-
-export type GalleryData = {
-  gallery: any[]
-}
-
 const ProfileRoute = () => {
   const { profile, cryptoAddresses, isOwner, accountURN } = useOutletContext<{
     profile: Profile
@@ -30,7 +16,7 @@ const ProfileRoute = () => {
   }>()
 
   // TODO: change the ProfileNFTGallery to take multiple addresses
-  const tempTargetAddress = cryptoAddresses?.map((a) => a.urn)[0]
+  const targetAddresses = cryptoAddresses?.map((a) => a.urn)
 
   const { displayName, pfp } = profile
   /** STATE */
@@ -73,10 +59,9 @@ const ProfileRoute = () => {
     <>
       <FilteredNftGrid
         nfts={loadedNfts}
-        account={tempTargetAddress}
         isOwner={isOwner}
         displayText={`Looks like ${
-          displayName ?? tempTargetAddress
+          displayName ?? targetAddresses[0]
         } has not curated a gallery`}
         filters={true}
         pfp={(pfp as any).image as string}

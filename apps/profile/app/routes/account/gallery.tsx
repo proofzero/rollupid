@@ -110,7 +110,6 @@ export const action: ActionFunction = async ({ request }) => {
   }))
 
   const galaxyClient = await getGalaxyClient()
-  console.log({ gallery })
   await galaxyClient.updateGallery(
     {
       gallery,
@@ -121,14 +120,6 @@ export const action: ActionFunction = async ({ request }) => {
   // TODO: update gallery on account
 
   return true
-}
-
-export type GalleryData = {
-  targetAddress: string
-  pfp: {
-    image: string
-    isToken: string
-  }
 }
 
 /**
@@ -211,7 +202,7 @@ const Gallery = () => {
   }>()
 
   //TODO: update pfp components to take multiple addresses
-  const tempTargetAddress = cryptoAddresses?.map((a) => a.qc.alias)[0]
+  const targetAddresses = cryptoAddresses?.map((a) => a.qc.alias)
 
   const { displayName } = profile
 
@@ -386,7 +377,7 @@ const Gallery = () => {
             collection={collection}
             setCollection={setCollection}
             displayName={displayName as string}
-            account={tempTargetAddress}
+            addresses={targetAddresses}
             loadingConditions={
               refresh || loading || modalFetcher.state !== 'idle'
             }
@@ -484,7 +475,7 @@ const Gallery = () => {
             name="gallery"
             value={JSON.stringify(curatedNfts)}
           />
-          <input type="hidden" name="address" value={tempTargetAddress} />
+          <input type="hidden" name="address" value={targetAddresses[0]} />
 
           {/* Form where this button is used should have 
           an absolute relative position

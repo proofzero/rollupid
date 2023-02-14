@@ -7,7 +7,6 @@ import CollectionFilter from '../../filters'
 import ModaledNft from '../../interactible/modaled'
 
 export type FilteredNftGridProps = {
-  account: string
   nfts: any[]
   pfp?: string
   isOwner?: boolean
@@ -38,7 +37,6 @@ const FilteredNftGrid = ({
   nfts = [],
   loadingConditions,
   isOwner = true,
-  account,
   getMoreNfts,
   pageKey,
   displayText,
