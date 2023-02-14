@@ -1,12 +1,12 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { AddressList } from '~/components/addresses/AddressList'
-import { useFetcher, useLoaderData } from '@remix-run/react'
+import { useFetcher, useLoaderData, useSubmit } from '@remix-run/react'
 import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
 import { requireJWT } from '~/utils/session.server'
 import type { AddressURN } from '@kubelt/urns/address'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
-import type { LoaderFunction } from '@remix-run/cloudflare'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import InputText from '~/components/inputs/InputText'
@@ -113,6 +113,10 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 }
 
+export const action: ActionFunction = async () => {
+  return null
+}
+
 const AccountSettingsConnections = () => {
   const { cryptoProfiles, vaultProfiles, oAuthProfiles } = useLoaderData()
 
@@ -121,6 +125,7 @@ const AccountSettingsConnections = () => {
   const [actionProfile, setActionProfile] = useState<any>()
 
   const fetcher = useFetcher()
+  const submit = useSubmit()
 
   useEffect(() => {
     const selectedProfile = cryptoProfiles
@@ -141,10 +146,32 @@ const AccountSettingsConnections = () => {
     }
   }, [fetcher])
 
+  const requestConnectAccount = () => {
+    window.open('http://localhost:9696/authenticate?prompt=login') // This is not really OpenID flow...
+
+    if (typeof window !== 'undefined') {
+      const handleMessage = (ev: MessageEvent) => {
+        if (ev.data === 'CONNECTED_ACCOUNT') {
+          window.removeEventListener('message', handleMessage)
+
+          submit({})
+        }
+      }
+
+      window.addEventListener('message', handleMessage)
+    }
+  }
+
   return (
     <section>
       <div className="flex flex-row-reverse mt-7">
-        <Button disabled>Connect Account</Button>
+        <Button
+          onClick={() => {
+            requestConnectAccount()
+          }}
+        >
+          Connect Account
+        </Button>
       </div>
 
       <div className="mt-1">

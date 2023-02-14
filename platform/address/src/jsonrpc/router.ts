@@ -103,7 +103,7 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(SetAccountInput)
     .output(SetAccountOutput)
-    .query(setAccountMethod),
+    .mutation(setAccountMethod),
   unsetAccount: t.procedure
     .use(LogUsage)
     .use(parse3RN)
