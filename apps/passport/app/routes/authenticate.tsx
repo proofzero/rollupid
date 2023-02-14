@@ -16,10 +16,16 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const session = await getUserSession(request, context.env)
   const searchParams = new URL(request.url).searchParams
 
+  // If we have the prompt login param, we should show the
+  // interface so that people can select additional profiles
+  // to connect
   if (searchParams.get('prompt') === 'login') {
+    // TODO: Maybe remove account from cookie and use JWT at destination
     const jwt = await requireJWT(request, context.consoleParams, context.env)
     const parsedJWT = parseJwt(jwt)
     const account = parsedJWT.sub
+
+    const openerHost = searchParams.get('opener_host') as string
 
     return json(
       {},
@@ -27,22 +33,36 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         headers: {
           'Set-Cookie': await connect.serialize({
             account,
+            openerHost,
           }),
         },
       }
     )
   }
 
+  // When OAuth redirects to callback
+  // this loader gets called again
+  // and if we don't check for this cookie
+  // it will find a jwt and redirect to
+  // context.env.CONSOLE_APP_URL
   const cookieHeader = request.headers.get('Cookie')
   const connectCookie = await connect.parse(cookieHeader)
 
+  // If there is a cookie, but we're missing the prompt param
+  // it means we're still in the connect account flow
+  // after the authorization callback
+  // so we should signal the parent window
+  // and close the one opened for connecting
   if (connectCookie) {
     return json(
       {
-        connected: true,
+        connected: true, // HMM: false could mean an error state?
+        openerHost: connectCookie.openerHost,
       },
       {
         headers: {
+          // This cookie has expiration date now
+          // so in effect it clears the cookie
           'Set-Cookie': await clearConnect.serialize({}),
         },
       }
@@ -64,12 +84,17 @@ const LazyAuth = React.lazy(() =>
 )
 
 export default function Index() {
-  const ld = useLoaderData<{ connected: boolean }>()
+  const ld = useLoaderData<{ connected: boolean; openerHost: string }>()
 
   if (ld?.connected && typeof window !== 'undefined') {
-    // TODO: Extract event in enum
-    // TODO: Set URL from opener
-    window.opener.postMessage('CONNECTED_ACCOUNT', 'http://localhost:9797')
+    // window.opener.location.host is not available
+    // due to different hosts
+    window.opener.postMessage('CONNECTED_ACCOUNT', ld.openerHost)
+
+    // After posting the message
+    // the opener should intercept and
+    // refresh the list of accounts
+    // so it's safe to close this window.
     window.close()
   }
 

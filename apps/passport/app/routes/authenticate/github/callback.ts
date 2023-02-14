@@ -47,6 +47,7 @@ export const loader: LoaderFunction = async ({
 
   await addressClient.setOAuthData.mutate(authRes)
 
+  // TODO: Make this cookie check generic
   const cookieHeader = request.headers.get('Cookie')
   const connectCookie = await connect.parse(cookieHeader)
   if (connectCookie) {
