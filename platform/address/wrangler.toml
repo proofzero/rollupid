@@ -50,7 +50,7 @@ new_classes = ["OAuthAddress"]
 
 [[migrations]]
 tag = "v4"
-deleted_classes = ["CryptoAddress", "OAuthAddress"]
+deleted_classes = ["CryptoAddress"]
 new_classes = ["Address"]
 
 [env.dev]
