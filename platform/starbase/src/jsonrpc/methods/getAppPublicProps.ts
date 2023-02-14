@@ -23,14 +23,14 @@ export const getAppPublicProps = async ({
   )
   const appDetails = await appDO.class.getDetails()
 
-  if (appDetails && appDetails.app) {
+  if (appDetails && appDetails.app && appDetails.published) {
     return {
       name: appDetails.app?.name,
       iconURL: appDetails.app?.icon || '',
     }
   } else {
     throw new Error(
-      `Could not return properties of application with client ID: ${input.clientId}`
+      `Could not return properties for a published application with client ID: ${input.clientId}`
     )
   }
 }
