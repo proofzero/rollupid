@@ -57,6 +57,7 @@ services = [
   { binding = "Starbase", service = "starbase-dev"},
   { binding = "Images", service = "images-dev" },
   { binding = "Galaxy", service = "galaxy-dev" },
+  { binding = "Account", service = "account"}
 ]
 
 
@@ -85,6 +86,7 @@ services = [
   { binding = "Starbase", service = "starbase-next"},
   { binding = "Images", service = "images-next" },
   { binding = "Galaxy", service = "galaxy-next" },
+  { binding = "Account", service = "account"}
 ]
 
 # kv_namespaces = [
@@ -115,6 +117,7 @@ services = [
   { binding = "Starbase", service = "starbase-current", environment = "production" },
   { binding = "Galaxy", service = "galaxy-current" },
   { binding = "Images", service = "images-current" },
+  { binding = "Account", service = "account"}
 ]
 
 # kv_namespaces = [
