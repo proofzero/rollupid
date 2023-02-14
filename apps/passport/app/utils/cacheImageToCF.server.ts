@@ -25,14 +25,32 @@ export default async (
     }
   }
 
-  const blob = await retrievedImage.blob()
-  const cacheReqFormData = new FormData()
-  cacheReqFormData.append('imageBlob', blob)
+  try {
+    const imgFile = await retrievedImage.blob()
 
-  const imageClient = createImageClient(env.Images)
-  const imageUrl = await imageClient.uploadImageBlob.mutate({ blob })
+    const imageClient = createImageClient(env.Images)
+    const { uploadURL } = await imageClient.upload.mutate()
 
-  if (!imageUrl || !imageUrl.length) throw new Error('Could not cache image.')
+    const formData = new FormData()
+    formData.append('file', imgFile)
 
-  return imageUrl
+    const cfUploadRes: {
+      success: boolean
+      result: {
+        variants: string[]
+      }
+    } = await fetch(uploadURL, {
+      method: 'POST',
+      body: formData,
+    }).then((res) => res.json())
+
+    const imageURL = cfUploadRes.result.variants[0]
+
+    if (!imageURL || !imageURL.length) throw new Error('Could not cache image.')
+
+    return imageURL
+  } catch (ex) {
+    console.error('Could not send upload image blob to Image cache.', ex)
+    return ''
+  }
 }

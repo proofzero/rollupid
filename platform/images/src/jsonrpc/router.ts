@@ -7,11 +7,6 @@ import {
   uploadMethodInput,
 } from './methods/upload'
 import {
-  uploadImageBlobMethod,
-  uploadImageBlobInput,
-  uploadImageBlobMethodOutput,
-} from './methods/uploadImageBlob'
-import {
   getOgImageMethod,
   getOgImageMethodInput,
   getOgImageMethodOutput,
@@ -33,12 +28,6 @@ export const appRouter = t.router({
     .input(uploadMethodInput)
     .output(uploadMethodOutput)
     .mutation(uploadMethod),
-  uploadImageBlob: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .input(uploadImageBlobInput)
-    .output(uploadImageBlobMethodOutput)
-    .mutation(uploadImageBlobMethod),
   getOgImage: t.procedure
     .use(LogUsage)
     .use(Analytics)
