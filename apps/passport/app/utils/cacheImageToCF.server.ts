@@ -11,8 +11,6 @@ export default async (
   })
   const retrievedImage = await retrieveImageReq
 
-  const imgFile = await retrievedImage.blob()
-
   if (!retrievedImage.ok) {
     if (retrievedImage.status === 404) {
       //Valid error
@@ -26,6 +24,8 @@ export default async (
       throw new Error('Error retrieving the image from URL')
     }
   }
+
+  const imgFile = await retrievedImage.blob()
 
   const imageClient = createImageClient(env.Images)
   const { uploadURL } = await imageClient.upload.mutate()
