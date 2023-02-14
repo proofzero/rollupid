@@ -1,15 +1,5 @@
 import createImageClient from '@kubelt/platform-clients/image'
 
-function arrayBufferToBase64(buffer: ArrayBuffer) {
-  var binary = ''
-  var bytes = new Uint8Array(buffer)
-  var len = bytes.byteLength
-  for (var i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i])
-  }
-  return window.btoa(binary)
-}
-
 export default async (
   image_retrieval_url: string,
   env: Env,
@@ -20,6 +10,8 @@ export default async (
     method: 'get',
   })
   const retrievedImage = await retrieveImageReq
+
+  const imgFile = await retrievedImage.blob()
 
   if (!retrievedImage.ok) {
     if (retrievedImage.status === 404) {
@@ -35,19 +27,33 @@ export default async (
     }
   }
 
-  const arrayBuffer = await retrievedImage.arrayBuffer()
-  const b64AB = arrayBufferToBase64(arrayBuffer)
+  const imageClient = createImageClient(env.Images)
+  const { uploadURL } = await imageClient.upload.mutate()
 
-  if (!b64AB) {
-    throw new Error('Error converting image blob to b64')
+  const formData = new FormData()
+  formData.append('file', imgFile)
+  let cfUploadRes: {
+    success: boolean
+    result: {
+      variants: string[]
+    }
+  } | null = null
+
+  try {
+    cfUploadRes = await fetch(uploadURL, {
+      method: 'POST',
+      body: formData,
+    }).then((res) => res.json())
+
+    if (!cfUploadRes?.success || !cfUploadRes.result?.variants)
+      throw new Error('Upload unsuccessful')
+  } catch (ex) {
+    console.error('Could not send upload image blob to Image cache.', ex)
   }
 
-  const imageClient = createImageClient(env.Images)
-  const imageUrl = await imageClient.uploadImageBlob.mutate({
-    b64: b64AB,
-  })
+  const imageURL = cfUploadRes?.result.variants[0]
 
-  if (!imageUrl || !imageUrl.length) throw new Error('Could not cache image.')
+  if (!imageURL || !imageURL.length) throw new Error('Could not cache image.')
 
-  return imageUrl
+  return imageURL
 }
