@@ -154,7 +154,10 @@ export function parseJwt(token: string): JWTPayload {
 }
 
 // TODO: reset cookie maxAge if valid
-export function getProfileSession(request: Request, renew: boolean = true) {
+export async function getProfileSession(
+  request: Request,
+  renew: boolean = true
+) {
   const storage = getProfileSessionStorage()
   return storage.getSession(request.headers.get('Cookie'))
 }
