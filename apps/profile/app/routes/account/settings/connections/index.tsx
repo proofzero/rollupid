@@ -11,6 +11,7 @@ import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import InputText from '~/components/inputs/InputText'
 import { NodeType } from '@kubelt/types/address'
+import { WindowMessage } from '@kubelt/types/events'
 
 const normalizeProfile = (profile: any) => {
   switch (profile.__typename) {
@@ -179,7 +180,7 @@ const AccountSettingsConnections = () => {
     const handleMessage = (ev: MessageEvent) => {
       // TODO: Capture error events?
       // TODO: Capture closing of the opened tab
-      if (ev.data === 'CONNECTED_ACCOUNT') {
+      if (ev.data === WindowMessage.ConnectedAccount) {
         // We can safely unsubscribe
         // once we receive desired event
         window.removeEventListener('message', handleMessage)

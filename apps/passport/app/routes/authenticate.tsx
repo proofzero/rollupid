@@ -9,6 +9,7 @@ import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
 import { useCatch, useLoaderData } from '@remix-run/react'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 import { clearConnect, connect } from '~/cookies/connect'
+import { WindowMessage } from '@kubelt/types/events'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
@@ -89,7 +90,7 @@ export default function Index() {
   if (ld?.connected && typeof window !== 'undefined') {
     // window.opener.location.host is not available
     // due to different hosts
-    window.opener.postMessage('CONNECTED_ACCOUNT', ld.openerHost)
+    window.opener.postMessage(WindowMessage.ConnectedAccount, ld.openerHost)
 
     // After posting the message
     // the opener should intercept and
