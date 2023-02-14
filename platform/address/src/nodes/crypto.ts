@@ -31,7 +31,6 @@ export default class CryptoAddress {
     const challenges =
       (await this.node.storage.get<Record<string, Challenge>>('challenges')) ||
       {}
-    console.log({ challenges })
     // const challenges: Map<string, Challenge> =
     //   (await this.node.storage.get('challenges')) || new Map()
     challenges[nonce] = {
@@ -42,8 +41,8 @@ export default class CryptoAddress {
       state,
       timestamp,
     }
-    this.node.storage.put('challenges', challenges)
-    this.node.storage.setAlarm(Date.now() + NONCE_OPTIONS.ttl)
+    await this.node.storage.put('challenges', challenges)
+    await this.node.storage.setAlarm(Date.now() + NONCE_OPTIONS.ttl)
 
     return nonce
   }
@@ -66,7 +65,7 @@ export default class CryptoAddress {
     }
 
     delete challenges[nonce]
-    this.node.storage.put('challenges', challenges)
+    await this.node.storage.put('challenges', challenges)
 
     return challenge
   }
@@ -101,7 +100,7 @@ export default class CryptoAddress {
     const challenges: Record<string, Challenge> =
       (await address.state.storage.get('challenges')) || {}
     for (const [nonce, challenge] of Object.entries(challenges)) {
-      if (challenge.timestamp + NONCE_OPTIONS.ttl * 1000 <= Date.now()) {
+      if (challenge.timestamp + NONCE_OPTIONS.ttl <= Date.now()) {
         delete challenges[nonce]
       }
     }

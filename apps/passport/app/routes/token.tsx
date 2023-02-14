@@ -16,7 +16,6 @@ export const action: ActionFunction = async ({ request, context }) => {
     GrantType.RefreshToken
 
   console.log({
-    refreshToken,
     grantType,
   })
 
@@ -24,17 +23,17 @@ export const action: ActionFunction = async ({ request, context }) => {
 
   const tokens = refreshToken
     ? await accessClient.exchangeToken.mutate({
-      grantType: GrantType.RefreshToken,
-      refreshToken,
-      clientId,
-      clientSecret,
-    })
+        grantType: GrantType.RefreshToken,
+        refreshToken,
+        clientId,
+        clientSecret,
+      })
     : await accessClient.exchangeToken.mutate({
-      grantType: GrantType.AuthorizationCode,
-      code,
-      clientId,
-      clientSecret,
-    })
+        grantType: GrantType.AuthorizationCode,
+        code,
+        clientId,
+        clientSecret,
+      })
 
   const result = {
     token_type: 'Bearer',

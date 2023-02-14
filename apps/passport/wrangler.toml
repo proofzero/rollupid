@@ -42,6 +42,8 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 [env.dev]
 routes = [
   { pattern = "passport-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" },
+  { pattern = "passport-dev.pz3r0.com", custom_domain = true, zone_name = "pz3r0.com" },
+
 ]
 services = [
   { binding = "Account", service = "account-dev" },
