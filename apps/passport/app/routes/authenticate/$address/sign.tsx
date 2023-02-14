@@ -105,7 +105,7 @@ export default function Sign() {
         { signature: data, nonce, state },
         {
           method: 'post',
-          action: `/authenticate/${address}/sign/${window.location.search}`,
+          action: `/authenticate/${address}/sign`,
         }
       )
     },
