@@ -22,15 +22,6 @@ unsafe.bindings = [
   { type = "metadata", name = "ServiceDeploymentMetadata" },
 ]
 
-[[queues.producers]]
- queue = "blockchain-activity"
- binding = "BLOCKCHAIN_ACTIVITY"
-
-[[queues.consumers]]
-queue = "blockchain-activity"
-max_batch_size = 1 # optional: defaults to 10
-max_batch_timeout = 5 # optional: defaults to 5 seconds
-
 [vars]
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.rollup.id/api"
