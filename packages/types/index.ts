@@ -18,8 +18,6 @@ import { DeploymentMetadata } from './context'
 
 import * as Graph from './graph'
 
-import * as Events from './events'
-
-export { Account, Headers, Router, Graph, Application, Events }
+export { Account, Headers, Router, Graph, Application }
 
 export type { BaseContext, DeploymentMetadata }

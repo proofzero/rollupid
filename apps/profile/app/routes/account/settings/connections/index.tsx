@@ -1,17 +1,16 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { AddressList } from '~/components/addresses/AddressList'
-import { useFetcher, useLoaderData, useSubmit } from '@remix-run/react'
+import { useFetcher, useLoaderData } from '@remix-run/react'
 import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
 import { requireJWT } from '~/utils/session.server'
 import type { AddressURN } from '@kubelt/urns/address'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
-import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import InputText from '~/components/inputs/InputText'
 import { NodeType } from '@kubelt/types/address'
-import { WindowMessage } from '@kubelt/types/events'
 
 const normalizeProfile = (profile: any) => {
   switch (profile.__typename) {
@@ -114,12 +113,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 }
 
-// Empty endpoint that can be submitted to
-// forcing a refresh of the loader data
-export const action: ActionFunction = async () => {
-  return null
-}
-
 const AccountSettingsConnections = () => {
   const { cryptoProfiles, vaultProfiles, oAuthProfiles } = useLoaderData()
 
@@ -128,7 +121,6 @@ const AccountSettingsConnections = () => {
   const [actionProfile, setActionProfile] = useState<any>()
 
   const fetcher = useFetcher()
-  const submit = useSubmit()
 
   useEffect(() => {
     const selectedProfile = cryptoProfiles
