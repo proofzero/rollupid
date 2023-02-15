@@ -28,10 +28,6 @@ export async function getAddressClient(
   if (request) {
     const userSession = await getUserSession(request, env)
     jwt = userSession.get('jwt')
-
-    console.log({
-      jwt,
-    })
   }
 
   return createAddressClient(env.Address, {

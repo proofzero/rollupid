@@ -1,4 +1,4 @@
-import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
+import { LoaderArgs, LoaderFunction, redirect } from '@remix-run/cloudflare'
 
 import { TwitterStrategyDefaultName } from 'remix-auth-twitter'
 import type { TwitterStrategyVerifyParams } from 'remix-auth-twitter'
@@ -46,6 +46,8 @@ export const loader: LoaderFunction = async ({
     accessTokenSecret,
     profile: { ...profile, provider: OAuthAddressType.Twitter },
   })
+
+  if (appData.prompt === 'login') return redirect(appData.redirectUri)
 
   return authenticateAddress(address, account, appData, context.env)
 }
