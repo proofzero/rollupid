@@ -61,10 +61,10 @@ export const getMicrosoftStrategy = (env: Env) => {
   return new MicrosoftStrategy(
     {
       clientId: env.INTERNAL_MICROSOFT_OAUTH_CLIENT_ID,
-      tenantId: env.INTERNAL_MICROSOFT_OAUTH_TENANT_ID,
+      tenantId: 'common',
       clientSecret: env.SECRET_MICROSOFT_OAUTH_CLIENT_SECRET,
       redirectUri: env.INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL,
-      scope: 'openid profile User.Read offline_access',
+      scope: 'openid profile email User.Read offline_access',
       prompt: '',
     },
     async ({ ...args }) => {

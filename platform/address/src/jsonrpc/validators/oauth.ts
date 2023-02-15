@@ -35,7 +35,7 @@ export const MicrosoftOAuthSchema = z.object({
       givenName: z.string().nullable(),
     })
     .nullable(),
-  emails: z.array(z.object({ value: z.string().nullable() })),
+  emails: z.array(z.object({ value: z.string().nullable() }).optional()),
   isMicrosoft: z.boolean().default(true),
 })
 
