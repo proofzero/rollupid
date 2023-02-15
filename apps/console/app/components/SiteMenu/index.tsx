@@ -84,7 +84,7 @@ type RollupMenuProps = {
     name?: string
     icon?: string
   }[]
-  // Current selected client ID.
+  // Current selected Client ID.
   selected?: string
 }
 
