@@ -8,7 +8,6 @@ import { authenticateAddress } from '~/utils/authenticate.server'
 import type { OAuthData } from '@kubelt/platform.address/src/types'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import { getConsoleParamsSession } from '~/session.server'
-import { setOrCreateAccount } from '~/utils/accountBinder.server'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -39,8 +38,8 @@ export const loader: LoaderFunction = async ({
     { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Google },
     { alias: profile._json.email, hidden: 'true' }
   )
-  const addressClient = await getAddressClient(address, context.env)
-  const account = await setOrCreateAccount(addressClient, request, context.env)
+  const addressClient = await getAddressClient(address, context.env, request)
+  const account = await addressClient.resolveAccount.query()
 
   await addressClient.setOAuthData.mutate(authRes)
 

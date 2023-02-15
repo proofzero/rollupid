@@ -10,7 +10,6 @@ import { MicrosoftStrategyDefaultName } from 'remix-auth-microsoft'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { getConsoleParamsSession } from '~/session.server'
 import cacheImageToCF from '~/utils/cacheImageToCF.server'
-import { setOrCreateAccount } from '~/utils/accountBinder.server'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -41,8 +40,8 @@ export const loader: LoaderFunction = async ({
     { alias: profile.displayName, hidden: 'true' }
   )
 
-  const addressClient = await getAddressClient(address, context.env)
-  const account = await setOrCreateAccount(addressClient, request, context.env)
+  const addressClient = await getAddressClient(address, context.env, request)
+  const account = await addressClient.resolveAccount.query()
   const existingOAuthData = await addressClient.getOAuthData.query()
 
   if (existingOAuthData?.profile == null) {

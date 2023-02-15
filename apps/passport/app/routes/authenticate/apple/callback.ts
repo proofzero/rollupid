@@ -17,8 +17,6 @@ import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { getConsoleParamsSession } from '~/session.server'
 
-import { setOrCreateAccount } from '~/utils/accountBinder.server'
-
 type AppleUser = {
   email: string
   name: {
@@ -77,8 +75,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Apple },
     { alias: profile.email, hidden: 'true' }
   )
-  const addressClient = await getAddressClient(address, context.env)
-  const account = await setOrCreateAccount(addressClient, request, context.env)
+  const addressClient = await getAddressClient(address, context.env, request)
+  const account = await addressClient.resolveAccount.query()
   const current = await addressClient.getOAuthData.query()
 
   if (current) {

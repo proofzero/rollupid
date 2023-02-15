@@ -42,7 +42,6 @@ export const loader: LoaderFunction = async ({
     { node_type: NodeType.OAuth, addr_type: OAuthAddressType.GitHub },
     { alias: profile._json.login, hidden: 'true' }
   )
-
   const addressClient = await getAddressClient(address, context.env, request)
   const account = await addressClient.resolveAccount.query()
 
