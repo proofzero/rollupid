@@ -92,9 +92,9 @@ export const TwitterProfileSchema = z.object({
 
 export const MicrosoftRawProfileSchema = z.object({
   sub: z.string(),
-  name: z.string(),
-  given_name: z.string(),
-  family_name: z.string(),
+  name: z.string().optional(),
+  given_name: z.string().optional(),
+  family_name: z.string().optional(),
   email: z.string().optional(),
   picture: z.string(),
   isMicrosoft: z.boolean().default(true),

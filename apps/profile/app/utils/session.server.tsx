@@ -88,11 +88,15 @@ export async function requireJWT(request: Request, headers = new Headers()) {
       const token = await fetch(PASSPORT_TOKEN_URL, {
         method: 'post',
         body: form,
+      }).catch((err) => {
+        console.error('failed to refresh token', err)
+        throw redirect('/signout')
       })
 
       if (!token.ok) {
         const error = await token.text()
-        throw new Error(error)
+        console.error('failed to refresh token', error)
+        throw redirect('/signout')
       }
 
       const { access_token, refresh_token } = await token.json<{
