@@ -33,7 +33,7 @@ const normalizeProfile = (profile: any) => {
     case 'OAuthTwitterProfile':
       return {
         id: profile.urn,
-        address: profile.email,
+        address: profile.name,
         title: profile.name,
         icon: profile.profile_image_url_https,
         chain: 'Twitter',
@@ -41,7 +41,7 @@ const normalizeProfile = (profile: any) => {
     case 'OAuthGithubProfile':
       return {
         id: profile.urn,
-        address: profile.email,
+        address: profile.name,
         title: profile.name,
         icon: profile.avatar_url,
         chain: 'GitHub',
@@ -57,7 +57,7 @@ const normalizeProfile = (profile: any) => {
     case 'OAuthAppleProfile':
       return {
         id: profile.urn,
-        address: profile.email,
+        address: profile.name,
         title: profile.name,
         icon: profile.picture,
         chain: 'Apple',

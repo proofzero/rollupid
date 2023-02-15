@@ -134,7 +134,7 @@ export const normalizeProfileToLinks = (profile: any) => {
     case 'OAuthMicrosoftProfile':
       return {
         id: profile.urn,
-        address: profile.name || '',
+        address: profile.email || '',
         title: 'Microsoft',
         icon: imageFromAddressType(OAuthAddressType.Microsoft),
         provider: OAuthAddressType.Microsoft,

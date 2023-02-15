@@ -11,6 +11,7 @@ query getAddressProfile($addressURN: URN!) {
       }
 
       ... on OAuthGoogleProfile {
+        email
         name
         picture
       }
@@ -60,6 +61,7 @@ query getAddressProfiles($addressURNList: [URN!]) {
       }
 
       ... on OAuthGoogleProfile {
+        email
         name
         picture
       }
