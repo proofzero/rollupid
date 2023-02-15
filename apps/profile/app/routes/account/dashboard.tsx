@@ -176,7 +176,11 @@ export default function Welcome() {
                   key={i}
                   className="flex flex-row items-center border rounded-lg shadow p-4"
                 >
-                  <img className="w-8 h-8 rounded-full mr-3.5" src={np.icon} />
+                  <img
+                    className="w-8 h-8 rounded-full mr-3.5"
+                    alt="normalized profile pic"
+                    src={np.icon}
+                  />
 
                   <div className="flex flex-col space-y-1.5 flex-1 break-all">
                     <Text size="sm" weight="medium" className="text-gray-700">
@@ -223,7 +227,11 @@ export default function Welcome() {
                       className="flex items-center py-5 px-8"
                     >
                       <div className="flex-1 flex flex-row items-center space-x-4">
-                        <img src={a.icon} className="w-6 h-6 rounded" />
+                        <img
+                          src={a.icon}
+                          alt="app icon"
+                          className="w-6 h-6 rounded"
+                        />
 
                         <Text
                           size="sm"

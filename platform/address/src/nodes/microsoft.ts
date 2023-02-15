@@ -6,6 +6,7 @@ import { OAuthData, OAuthMicrosoftProfile } from '../types'
 import Address from './address'
 import OAuthAddress from './oauth'
 import type { AddressNode } from '.'
+import { OAuthAddressType } from '@kubelt/types/address'
 
 export default class MicrosoftAddress extends OAuthAddress {
   declare clientId: string
@@ -22,11 +23,28 @@ export default class MicrosoftAddress extends OAuthAddress {
   async getProfile(): Promise<OAuthMicrosoftProfile> {
     const data = await this.getData()
     if (!data) throw new Error('no data')
-    const profile = data.profile as OAuthData['profile']
-    const gradient = this.node.class.getGradient()
-    return { picture: gradient, ...profile._json } as OAuthMicrosoftProfile
+    if (data.profile.provider === OAuthAddressType.Microsoft) {
+      const profile = data.profile
+      let picture
+      if (profile._json) {
+        if (!profile._json?.name) {
+          profile._json.name =
+            profile.displayName ||
+            profile.name?.givenName ||
+            profile.emails[0]?.value ||
+            profile._json.sub
+        }
+        const gradient = this.node.class.getGradient()
+        picture = profile._json.rollupidImageUrl || gradient
+      }
+      return {
+        ...profile._json,
+        picture,
+      } as OAuthMicrosoftProfile
+    } else {
+      throw new Error("Specified provider isn't set to Microsoft")
+    }
   }
-
   getRefreshTokenParams(refreshToken: string): URLSearchParams {
     const params = super.getRefreshTokenParams(refreshToken)
     params.set('tenant', this.tenantId)

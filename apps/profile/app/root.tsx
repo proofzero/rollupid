@@ -43,7 +43,7 @@ import { getRedirectUrlForProfile } from './utils/redirects.server'
 import { parseJwt } from './utils/session.server'
 import { getAccountProfile } from './helpers/profile'
 import { AccountURNSpace } from '@kubelt/urns/account'
-import { FullProfile } from './types'
+import type { FullProfile } from './types'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
