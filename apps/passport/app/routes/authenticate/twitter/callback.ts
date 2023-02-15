@@ -12,6 +12,7 @@ import { initAuthenticator, getTwitterStrategy } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { getConsoleParamsSession } from '~/session.server'
+import { setOrCreateAccount } from '~/utils/accountBinder.server'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -39,7 +40,7 @@ export const loader: LoaderFunction = async ({
     { alias: profile.name, hidden: 'true' }
   )
   const addressClient = getAddressClient(address, context.env)
-  const account = await addressClient.resolveAccount.query()
+  const account = await setOrCreateAccount(addressClient, request, context.env)
 
   await addressClient.setOAuthData.mutate({
     accessToken,

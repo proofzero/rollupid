@@ -9,11 +9,8 @@ import { getAddressClient } from '~/platform.server'
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import type { OAuthData } from '@kubelt/platform.address/src/types'
-import {
-  getConsoleParamsSession,
-  getUserSession,
-  parseJwt,
-} from '~/session.server'
+import { getConsoleParamsSession } from '~/session.server'
+import { setOrCreateAccount } from '~/utils/accountBinder.server'
 import { AccountURN } from '@kubelt/urns/account'
 
 export const loader: LoaderFunction = async ({
@@ -47,20 +44,11 @@ export const loader: LoaderFunction = async ({
     { node_type: NodeType.OAuth, addr_type: OAuthAddressType.GitHub },
     { alias: profile._json.login, hidden: 'true' }
   )
-  const userSession = await getUserSession(request, context.env)
-  const jwt = userSession.get('jwt')
 
   const addressClient = getAddressClient(address, context.env)
   await addressClient.setOAuthData.mutate(authRes)
 
-  let account: AccountURN
-  if (jwt) {
-    account = parseJwt(jwt).sub as AccountURN
-
-    await addressClient.setAccount.mutate(account)
-  } else {
-    account = await addressClient.resolveAccount.query()
-  }
+  const account = await setOrCreateAccount(addressClient, request, context.env)
 
   return authenticateAddress(
     address,

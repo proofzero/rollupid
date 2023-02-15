@@ -8,6 +8,7 @@ import { authenticateAddress } from '~/utils/authenticate.server'
 import type { OAuthData } from '@kubelt/platform.address/src/types'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import { getConsoleParamsSession } from '~/session.server'
+import { setOrCreateAccount } from '~/utils/accountBinder.server'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -39,7 +40,7 @@ export const loader: LoaderFunction = async ({
     { alias: profile._json.email, hidden: 'true' }
   )
   const addressClient = getAddressClient(address, context.env)
-  const account = await addressClient.resolveAccount.query()
+  const account = await setOrCreateAccount(addressClient, request, context.env)
 
   await addressClient.setOAuthData.mutate(authRes)
 
