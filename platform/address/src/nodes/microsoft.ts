@@ -31,7 +31,7 @@ export default class MicrosoftAddress extends OAuthAddress {
           profile._json.name =
             profile.displayName ||
             profile.name?.givenName ||
-            profile.emails[0]?.value ||
+            profile._json.email ||
             profile._json.sub
         }
         const gradient = this.node.class.getGradient()
