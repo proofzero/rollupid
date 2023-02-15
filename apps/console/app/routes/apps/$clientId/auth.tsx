@@ -111,7 +111,7 @@ const updatesSchema = z.object({
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   if (!params.clientId) {
-    throw new Error('Application client id is required for the requested route')
+    throw new Error('Application Client ID is required for the requested route')
   }
   const jwt = await requireJWT(request)
   const starbaseClient = createStarbaseClient(
@@ -126,7 +126,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 export const action: ActionFunction = async ({ request, params }) => {
   if (!params.clientId) {
-    throw new Error('Application client id is required for the requested route')
+    throw new Error('Application Client ID is required for the requested route')
   }
 
   let rotatedSecret, updates

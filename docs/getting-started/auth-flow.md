@@ -18,7 +18,7 @@ We have created a reference implementation using [Remix](https://remix.run/) and
 
 ### Step 1: Auth
 
-To begin the authentication flow you will need to redirect users to the [passport](../platform/passport.md) authorization endpoint and include the client id and a random state parameter in the query string so that it looks like this: `https://passport.rollup.id/authorize?client_id=<your app id>&state=<generated state>`
+To begin the authentication flow you will need to redirect users to the [passport](../platform/passport.md) authorization endpoint and include the Client ID and a random state parameter in the query string so that it looks like this: `https://passport.rollup.id/authorize?client_id=<your app id>&state=<generated state>`
 
 Typically you would do this by redirecting users to a route in your application that redirects users to the above route.&#x20;
 
@@ -30,7 +30,7 @@ The state parameter should be persisted in a cookie or some other storage method
 
 <figure><img src="../.gitbook/assets/13.png" alt=""><figcaption></figcaption></figure>
 
-From here, Rollup will use the client id provided to lookup your application details so your application name and branding information will be displayed. If your application requires specific authorization scopes the user will then be presented with an authorization screen (example below).
+From here, Rollup will use the Client ID provided to lookup your application details so your application name and branding information will be displayed. If your application requires specific authorization scopes the user will then be presented with an authorization screen (example below).
 
 When completed the user will then be redirected back to your app using the "Redirect URL" set in the previous step.
 
@@ -64,7 +64,7 @@ Exchange code
 {% endswagger-parameter %}
 
 {% swagger-parameter in="body" name="client_secret" type="String" required="true" %}
-Client secret
+Client Secret
 {% endswagger-parameter %}
 
 {% swagger-parameter in="body" name="grant_type" type="String" required="true" %}

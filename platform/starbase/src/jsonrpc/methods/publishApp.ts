@@ -35,7 +35,7 @@ export const publishApp = async ({
 
   const hasClientSecret = await appDO.class.hasClientSecret()
   if (!hasClientSecret)
-    throw new Error('Client secret must be set to publish app')
+    throw new Error('Client Secret must be set to publish app')
 
   await appDO.class.publish(input.published)
 
