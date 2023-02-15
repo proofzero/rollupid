@@ -5,7 +5,7 @@ description: Authenticating and authorizing users into your application.
 # Logging in Users
 
 {% hint style="warning" %}
-For this step you will need the **Application ID** and the **Application Secret** from the [previous step](create-an-application.md).
+For this step you will need the **Client ID** and the **Client Secret** from the [previous step](create-an-application.md).
 {% endhint %}
 
 Rollup is **standards compliant** so, integrating Rollup into your application is identical to integrating any OAuth-based authentication services like [Auth0](https://auth0.com/), [Okta](https://auth0.com/), [Cognito](https://aws.amazon.com/cognito/), [Azure AD B2C](https://azure.microsoft.com/en-us/services/active-directory/external-identities/b2c/#overview), [Firebase](https://firebase.google.com/) or [Supabase](https://supabase.com/), meaning you can run off-the-shelf open source libraries to build your OAuth flow.
@@ -18,7 +18,7 @@ We have created a reference implementation using [Remix](https://remix.run/) and
 
 ### Step 1: Auth
 
-To begin the authentication flow you will need to redirect users to the [passport](../platform/passport.md) authorization endpoint and include the application id and a random state parameter in the query string so that it looks like this: `https://passport.rollup.id/authorize?client_id=<your app id>&state=<generated state>`
+To begin the authentication flow you will need to redirect users to the [passport](../platform/passport.md) authorization endpoint and include the client id and a random state parameter in the query string so that it looks like this: `https://passport.rollup.id/authorize?client_id=<your app id>&state=<generated state>`
 
 Typically you would do this by redirecting users to a route in your application that redirects users to the above route.&#x20;
 
@@ -30,7 +30,7 @@ The state parameter should be persisted in a cookie or some other storage method
 
 <figure><img src="../.gitbook/assets/13.png" alt=""><figcaption></figcaption></figure>
 
-From here, Rollup will use the application id provided to lookup your application details so your application name and branding information will be displayed. If your application requires specific authorization scopes the user will then be presented with an authorization screen (example below).
+From here, Rollup will use the client id provided to lookup your application details so your application name and branding information will be displayed. If your application requires specific authorization scopes the user will then be presented with an authorization screen (example below).
 
 When completed the user will then be redirected back to your app using the "Redirect URL" set in the previous step.
 
@@ -46,7 +46,7 @@ Your Redirect URL should be prepared to accept an exchange token and state param
 - **State:** this state should match the state you created for the user/client in step 1
 - **Redirect URL**: the redirect url set in your app in the [previous step](create-an-application.md).
 
-The state parameter should match the state you sent when you kicked off the auth flow in Step 1. This is a security measure in the auth protocol to prevent replay attacks. The exchange code is then sent with the **Application Secret** and the **grant type** to Passport's token endpoint in order to receive the access token and refresh token as base64 encoded signed JWT as well as a minimal user profile (encoded in an ID token) completing the flow.
+The state parameter should match the state you sent when you kicked off the auth flow in Step 1. This is a security measure in the auth protocol to prevent replay attacks. The exchange code is then sent with the **Client Secret** and the **grant type** to Passport's token endpoint in order to receive the access token and refresh token as base64 encoded signed JWT as well as a minimal user profile (encoded in an ID token) completing the flow.
 
 {% hint style="info" %}
 We use a javascript library called [jose](https://www.npmjs.com/package/jose) to encode and decode signed JWT. As an open standard there are libraries for all languages that do the same.
@@ -64,7 +64,7 @@ Exchange code
 {% endswagger-parameter %}
 
 {% swagger-parameter in="body" name="client_secret" type="String" required="true" %}
-Application secret
+Client secret
 {% endswagger-parameter %}
 
 {% swagger-parameter in="body" name="grant_type" type="String" required="true" %}

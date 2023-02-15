@@ -19,7 +19,7 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-// Given an array of application objects and an application ID, return
+// Given an array of application objects and an client ID, return
 // the array index of the application with the given unique identifier.
 // Note that Array.findIndex() returns -1 if no matching array entry was found.
 function indexFor(
@@ -233,7 +233,7 @@ type AppSelectProps = {
     name?: string
     icon?: string
   }[]
-  // The currently selected application ID.
+  // The currently selected client ID.
   selected?: string
 }
 
