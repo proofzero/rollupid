@@ -77,7 +77,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Apple },
     { alias: profile.email, hidden: 'true' }
   )
-  const addressClient = getAddressClient(address, context.env)
+  const addressClient = await getAddressClient(address, context.env)
   const account = await setOrCreateAccount(addressClient, request, context.env)
   const current = await addressClient.getOAuthData.query()
 

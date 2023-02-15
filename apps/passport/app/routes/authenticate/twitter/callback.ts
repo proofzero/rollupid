@@ -39,7 +39,7 @@ export const loader: LoaderFunction = async ({
     { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Twitter },
     { alias: profile.name, hidden: 'true' }
   )
-  const addressClient = getAddressClient(address, context.env)
+  const addressClient = await getAddressClient(address, context.env)
   const account = await setOrCreateAccount(addressClient, request, context.env)
 
   await addressClient.setOAuthData.mutate({

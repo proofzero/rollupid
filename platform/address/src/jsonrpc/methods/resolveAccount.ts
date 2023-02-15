@@ -11,6 +11,8 @@ import { appRouter } from '../router'
 
 import { WriteAnalyticsDataPoint } from '@kubelt/platform-clients/analytics'
 
+import * as jose from 'jose'
+
 export const ResolveAccountOutput = AccountURNInput
 
 type ResolveAccountResult = z.infer<typeof ResolveAccountOutput>
@@ -29,17 +31,22 @@ export const resolveAccountMethod = async ({
 
   let resultURN = await nodeClient?.storage.get<AccountURN>('account')
   if (!resultURN) {
-    const name = hexlify(randomBytes(ACCOUNT_OPTIONS.length))
-    const urn = AccountURNSpace.componentizedUrn(name)
+    let urn: AccountURN
+    if (ctx.token) {
+      const decodedJwt = jose.decodeJwt(ctx.token)
+      urn = decodedJwt.sub as AccountURN
+    } else {
+      const name = hexlify(randomBytes(ACCOUNT_OPTIONS.length))
+      urn = AccountURNSpace.componentizedUrn(name)
+      eventName = 'account-created'
+    }
 
-    //
     const caller = appRouter.createCaller(ctx)
     await caller.setAccount(urn) // this will lazy create an account node when account worker is called
 
     // DISABLING FOR NOW UNTIL WE FIGURE SOLVE FOR VAULT AUTH SCOPES
     // await caller.initVault()
 
-    eventName = 'account-created'
     resultURN = urn
   }
 

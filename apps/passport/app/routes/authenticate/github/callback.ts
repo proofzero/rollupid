@@ -10,8 +10,6 @@ import { GitHubStrategyDefaultName } from 'remix-auth-github'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import type { OAuthData } from '@kubelt/platform.address/src/types'
 import { getConsoleParamsSession } from '~/session.server'
-import { setOrCreateAccount } from '~/utils/accountBinder.server'
-import { AccountURN } from '@kubelt/urns/account'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -45,17 +43,12 @@ export const loader: LoaderFunction = async ({
     { alias: profile._json.login, hidden: 'true' }
   )
 
-  const addressClient = getAddressClient(address, context.env)
+  const addressClient = await getAddressClient(address, context.env, request)
+  const account = await addressClient.resolveAccount.query()
+
   await addressClient.setOAuthData.mutate(authRes)
 
-  const account = await setOrCreateAccount(addressClient, request, context.env)
-
-  return authenticateAddress(
-    address,
-    account as AccountURN,
-    appData,
-    context.env
-  )
+  return authenticateAddress(address, account, appData, context.env)
 }
 
 export default () => {}

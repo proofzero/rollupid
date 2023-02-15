@@ -50,6 +50,7 @@ import {
   SetAddressNicknameInput,
   setAddressNicknameMethod,
 } from './methods/setAddressNickname'
+import { AuthorizationTokenFromHeader } from '@kubelt/platform-middleware/jwt'
 
 const t = initTRPC.context<Context>().create()
 
@@ -80,6 +81,7 @@ export const appRouter = t.router({
     .use(setAddressNodeClient)
     .use(initAddressNode)
     // .use(injectCustomAnalytics)
+    .use(AuthorizationTokenFromHeader)
     .use(Analytics)
     .output(ResolveAccountOutput)
     .query(resolveAccountMethod),

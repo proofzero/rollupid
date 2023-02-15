@@ -36,7 +36,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     { alias: address }
   )
 
-  const addressClient = getAddressClient(addressURN, context.env)
+  const addressClient = await getAddressClient(addressURN, context.env)
   try {
     const nonce = await addressClient.getNonce.query({
       address: address as string,
@@ -61,7 +61,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     { node_type: NodeType.Crypto, addr_type: CryptoAddressType.ETH },
     { alias: address }
   )
-  const addressClient = getAddressClient(addressURN, context.env)
+  const addressClient = await getAddressClient(addressURN, context.env)
   const formData = await request.formData()
 
   // TODO: validate from data

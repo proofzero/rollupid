@@ -6,6 +6,7 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { GraphQLClient } from 'graphql-request'
 import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { getUserSession } from './session.server'
 
 export function getStarbaseClient(jwt: string, env: Env) {
   return createStarbaseClient(
@@ -18,9 +19,24 @@ export function getAccessClient(env: Env) {
   return createAccessClient(env.Access)
 }
 
-export function getAddressClient(addressUrn: string, env: Env) {
+export async function getAddressClient(
+  addressUrn: string,
+  env: Env,
+  request?: Request
+) {
+  let jwt
+  if (request) {
+    const userSession = await getUserSession(request, env)
+    jwt = userSession.get('jwt')
+
+    console.log({
+      jwt,
+    })
+  }
+
   return createAddressClient(env.Address, {
     [PlatformAddressURNHeader]: addressUrn,
+    ...getAuthzHeaderConditionallyFromToken(jwt),
   })
 }
 

@@ -25,7 +25,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   if (!profile) {
     console.log("Profile doesn't exist, creating one...")
-    const addressClient = getAddressClient(defaultProfileURN, context.env)
+    const addressClient = await getAddressClient(defaultProfileURN, context.env)
     const newProfile = await addressClient.getAddressProfile
       .query()
       .then(async (res) => {

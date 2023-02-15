@@ -41,7 +41,7 @@ export const loader: LoaderFunction = async ({
     { alias: profile.displayName, hidden: 'true' }
   )
 
-  const addressClient = getAddressClient(address, context.env)
+  const addressClient = await getAddressClient(address, context.env)
   const account = await setOrCreateAccount(addressClient, request, context.env)
   const existingOAuthData = await addressClient.getOAuthData.query()
 
