@@ -37,6 +37,7 @@ export const isOAuthAddressType = (type: string | undefined) => {
     case OAuthAddressType.Twitter:
     case OAuthAddressType.Google:
     case OAuthAddressType.Apple:
+    case OAuthAddressType.Discord:
       return NodeType.OAuth
     default:
       return false

@@ -1,6 +1,7 @@
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 
 import appleIcon from '@kubelt/design-system/src/assets/social_icons/apple.svg'
+import discordIcon from '@kubelt/design-system/src/assets/social_icons/discord.svg'
 import githubIcon from '@kubelt/design-system/src/assets/social_icons/github.svg'
 import googleIcon from '@kubelt/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@kubelt/design-system/src/assets/social_icons/microsoft.svg'
@@ -15,6 +16,9 @@ export const imageFromAddressType = (addressType: string) => {
       break
     case OAuthAddressType.Apple:
       providerIcon = appleIcon
+      break
+    case OAuthAddressType.Discord:
+      providerIcon = discordIcon
       break
     case OAuthAddressType.GitHub:
       providerIcon = githubIcon

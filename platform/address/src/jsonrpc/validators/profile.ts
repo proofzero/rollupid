@@ -114,6 +114,15 @@ export const AppleProfileSchema = z.object({
   isApple: z.boolean().default(true),
 })
 
+export const DiscordRawProfileSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  discriminator: z.string(),
+  email: z.string(),
+  avatar: z.string().optional(),
+  isDiscord: z.boolean().default(true),
+})
+
 export const AddressProfileSchema = z.union([
   CryptoAddressProfileSchema,
   GoogleRawProfileSchema,
@@ -121,4 +130,5 @@ export const AddressProfileSchema = z.union([
   TwitterProfileSchema,
   MicrosoftRawProfileSchema,
   AppleProfileSchema,
+  DiscordRawProfileSchema,
 ])

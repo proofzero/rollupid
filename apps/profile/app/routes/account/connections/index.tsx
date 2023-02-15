@@ -62,6 +62,14 @@ const normalizeProfile = (profile: any) => {
         icon: profile.picture,
         chain: 'Apple',
       }
+    case 'OAuthDiscordProfile':
+      return {
+        id: profile.urn,
+        address: profile.email,
+        title: `${profile.username}#${profile.discriminator}`,
+        icon: `https://cdn.discordapp.com/avatars/${profile.discordId}/${profile.avatar}.png`,
+        chain: 'Discord',
+      }
   }
 }
 

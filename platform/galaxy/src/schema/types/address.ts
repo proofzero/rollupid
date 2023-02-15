@@ -54,6 +54,14 @@ export default /* GraphQL */ `
     sub: String
   }
 
+  type OAuthDiscordProfile {
+    id: String
+    email: String
+    username: String
+    discriminator: String
+    avatar: String
+  }
+
   union AddressProfilesUnion =
       CryptoAddressProfile
     | OAuthGoogleProfile
@@ -61,6 +69,7 @@ export default /* GraphQL */ `
     | OAuthTwitterProfile
     | OAuthMicrosoftProfile
     | OAuthAppleProfile
+    | OAuthDiscordProfile
 
   type AddressProfile {
     urn: URN!

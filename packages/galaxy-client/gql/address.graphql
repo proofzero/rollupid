@@ -44,6 +44,14 @@ query getAddressProfile($addressURN: URN!) {
         name
         picture
       }
+
+      ... on OAuthDiscordProfile {
+        discordId: id
+        email
+        username
+        discriminator
+        avatar
+      }
     }
   }
 }
@@ -93,6 +101,14 @@ query getAddressProfiles($addressURNList: [URN!]) {
       ... on OAuthAppleProfile {
         name
         picture
+      }
+
+      ... on OAuthDiscordProfile {
+        discordId: id
+        email
+        username
+        discriminator
+        avatar
       }
     }
   }

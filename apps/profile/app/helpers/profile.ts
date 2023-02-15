@@ -147,6 +147,14 @@ export const normalizeProfileToLinks = (profile: any) => {
         icon: imageFromAddressType(OAuthAddressType.Apple),
         provider: OAuthAddressType.Apple,
       }
+    case 'OAuthDiscordProfile':
+      return {
+        id: profile.urn,
+        address: '',
+        title: 'Discord',
+        icon: imageFromAddressType(OAuthAddressType.Discord),
+        provider: OAuthAddressType.Discord,
+      }
   }
 
   throw new Error('profile.__typename uknown')

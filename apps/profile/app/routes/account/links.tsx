@@ -96,6 +96,14 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
         icon: imageFromAddressType(OAuthAddressType.Apple),
         provider: OAuthAddressType.Apple,
       }
+    case 'OAuthDiscordProfile':
+      return {
+        addressURN: ap.urn,
+        address: '',
+        title: 'Discord',
+        icon: imageFromAddressType(OAuthAddressType.Discord),
+        provider: OAuthAddressType.Discord,
+      }
   }
 }
 

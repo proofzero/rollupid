@@ -20,6 +20,7 @@ export enum OAuthAddressType {
   Twitter = 'twitter',
   Microsoft = 'microsoft',
   Apple = 'apple',
+  Discord = 'discord',
 }
 
 export enum HandleAddressType {

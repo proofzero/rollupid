@@ -7,6 +7,7 @@ import {
   AddressProfileSchema,
   AppleProfileSchema,
   CryptoAddressProfileSchema,
+  DiscordRawProfileSchema,
   GithubRawProfileSubsetSchema,
   GoogleRawProfileSchema,
   MicrosoftRawProfileSchema,
@@ -18,6 +19,7 @@ import GoogleAddress from '../../nodes/google'
 import TwitterAddress from '../../nodes/twitter'
 import MicrosoftAddress from '../../nodes/microsoft'
 import AppleAddress from '../../nodes/apple'
+import DiscordAddress from '../../nodes/discord'
 import { AddressURNInput } from '@kubelt/platform-middleware/inputValidators'
 
 export const GetAddressProfileOutput = z.discriminatedUnion('type', [
@@ -50,6 +52,11 @@ export const GetAddressProfileOutput = z.discriminatedUnion('type', [
     urn: AddressURNInput,
     profile: AppleProfileSchema,
     type: z.literal(OAuthAddressType.Apple),
+  }),
+  z.object({
+    urn: AddressURNInput,
+    profile: DiscordRawProfileSchema,
+    type: z.literal(OAuthAddressType.Discord),
   }),
 ])
 
@@ -128,6 +135,15 @@ export const getAddressProfileMethod = async ({
       return {
         urn: ctx.addressURN,
         type: OAuthAddressType.Apple,
+        profile,
+      }
+    }
+    case OAuthAddressType.Discord: {
+      const oAuthNode = new DiscordAddress(nodeClient, ctx)
+      const profile = await oAuthNode.getProfile()
+      return {
+        urn: ctx.addressURN,
+        type: OAuthAddressType.Discord,
         profile,
       }
     }

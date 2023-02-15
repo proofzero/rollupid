@@ -36,6 +36,7 @@ INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://localhost:9696/connect/github/callb
 INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "http://localhost:9696/connect/twitter/callback"
 INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "http://localhost:9696/connect/microsoft/callback"
 INTERNAL_APPLE_OAUTH_CALLBACK_URL = "http://localhost:9696/connect/appleid/callback"
+INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "http://localhost:9696/connect/discord/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [env.dev]
@@ -62,6 +63,7 @@ INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/connect/git
 INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/connect/twitter/callback"
 INTERNAL_APPLE_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/connect/apple/callback"
 INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/connect/microsoft/callback"
+INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/connect/discord/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [env.next]
@@ -87,6 +89,7 @@ INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/gi
 INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/twitter/callback"
 INTERNAL_APPLE_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/apple/callback"
 INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/microsoft/callback"
+INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/discord/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 
 [env.next.build]
@@ -115,6 +118,7 @@ INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "https://passport.rollup.id/connect/github/
 INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport.rollup.id/connect/twitter/callback"
 INTERNAL_APPLE_OAUTH_CALLBACK_URL = "https://passport.rollup.id/connect/apple/callback"
 INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "https://passport.rollup.id/connect/microsoft/callback"
+INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "https://passport.rollup.id/connect/discord/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 
 [env.current.build]
