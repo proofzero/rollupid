@@ -159,44 +159,16 @@ const AccountSettingsConnections = () => {
     const windowUrl = new URL(
       `${(window as any).ENV.PASSPORT_URL}/authenticate`
     )
-    // opener_host is added because we don't have access to this information in the child window
-    // due to cross origin concerns; it will be used to post back a message to the proper host
-    windowUrl.searchParams.append(
-      'opener_host',
-      `${window.location.protocol}//${window.location.host}`
-    )
+
+    const clientId = (window as any).ENV.PROFILE_CLIENT_ID
 
     // prompt lets passport authentication know this is a connect call
     // not a new account one, and thus generate the proper cookie
     windowUrl.searchParams.append('prompt', 'login')
+    windowUrl.searchParams.append('client_id', clientId)
+    windowUrl.searchParams.append('redirect_uri', window.location.href)
 
-    // Finally we open the passport tab
-    window.open(windowUrl)
-
-    // Keeping handler and subscribing to its events
-    // has no effect as Remix and the multiple redirects
-    // resolve the 'unload' event on first redirect
-    // so we lose possibility to subscribe
-    const handleMessage = (ev: MessageEvent) => {
-      // TODO: Capture error events?
-      // TODO: Capture closing of the opened tab
-      if (ev.data === WindowMessage.ConnectedAccount) {
-        // We can safely unsubscribe
-        // once we receive desired event
-        window.removeEventListener('message', handleMessage)
-
-        // At this point the new address
-        // should be linked to the account
-        // so we can request a refresh
-        // of the page
-        submit({})
-      }
-    }
-
-    // This listens to every event posted
-    // and captures ones we are not interested in also
-    // such as MetaMask, thus evts should be filtered
-    window.addEventListener('message', handleMessage)
+    window.location.href = windowUrl.toString()
   }
 
   return (

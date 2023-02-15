@@ -22,12 +22,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     res = await sbClient.getAppPublicProps.query({ clientId })
   }
 
-  const searchParams = new URL(request.url).searchParams
-
   // If we have the prompt login param, we should prevent
   // the connectCallback which can immediately
   // take us to the sign screen when loading
-  if (searchParams.get('prompt') === 'login') {
+  if (parsedParams?.prompt === 'login') {
     res = {
       ...res,
       preventConnectCallback: true,

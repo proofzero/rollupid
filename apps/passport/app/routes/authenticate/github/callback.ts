@@ -9,8 +9,12 @@ import { getAddressClient } from '~/platform.server'
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import type { OAuthData } from '@kubelt/platform.address/src/types'
-import { getConsoleParamsSession } from '~/session.server'
-import { connect } from '~/cookies/connect'
+import {
+  getConsoleParamsSession,
+  getUserSession,
+  parseJwt,
+} from '~/session.server'
+import { AccountURN } from '@kubelt/urns/account'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -43,21 +47,27 @@ export const loader: LoaderFunction = async ({
     { node_type: NodeType.OAuth, addr_type: OAuthAddressType.GitHub },
     { alias: profile._json.login, hidden: 'true' }
   )
-  const addressClient = getAddressClient(address, context.env)
+  const userSession = await getUserSession(request, context.env)
+  const jwt = userSession.get('jwt')
 
+  const addressClient = getAddressClient(address, context.env)
   await addressClient.setOAuthData.mutate(authRes)
 
-  // TODO: Make this cookie check generic
-  const cookieHeader = request.headers.get('Cookie')
-  const connectCookie = await connect.parse(cookieHeader)
-  if (connectCookie) {
-    await addressClient.setAccount.mutate(connectCookie.account)
+  let account: AccountURN
+  if (jwt) {
+    account = parseJwt(jwt).sub as AccountURN
+
+    await addressClient.setAccount.mutate(account)
   } else {
-    const account = await addressClient.resolveAccount.query()
-    return authenticateAddress(address, account, appData, context.env)
+    account = await addressClient.resolveAccount.query()
   }
 
-  return null
+  return authenticateAddress(
+    address,
+    account as AccountURN,
+    appData,
+    context.env
+  )
 }
 
 export default () => {}

@@ -116,6 +116,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       INTERNAL_GOOGLE_ANALYTICS_TAG,
       CONSOLE_APP_URL,
       PASSPORT_URL,
+      PROFILE_CLIENT_ID,
     },
   })
 }
@@ -127,6 +128,7 @@ export default function App() {
       INTERNAL_GOOGLE_ANALYTICS_TAG: string
       CONSOLE_APP_URL: string
       PASSPORT_URL: string
+      PROFILE_CLIENT_ID: string
     }
     loggedInUserProfile: FullProfile | undefined
     basePath: string | undefined

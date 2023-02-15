@@ -16,7 +16,7 @@ import type { AccountURN } from '@kubelt/urns/account'
 import type { Profile } from '@kubelt/galaxy-client'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const { clientId, redirectUri, scope, state } = context.consoleParams
+  const { clientId, redirectUri, scope, state, prompt } = context.consoleParams
   const jwt = await requireJWT(request, context.consoleParams, context.env)
 
   if (clientId) {
@@ -55,7 +55,11 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         state: authorizeRes.state,
       })
 
-      return redirect(`${redirectUri}?${redirectParams}`)
+      if (prompt === 'login') {
+        return redirect(redirectUri)
+      } else {
+        return redirect(`${redirectUri}?${redirectParams}`)
+      }
     }
   } else {
     //TODO: remove this when implementing scopes and authz
