@@ -2,7 +2,7 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Tooltip } from 'flowbite-react'
 import type { AuthorizedProfile } from '~/types'
 
-import missingImage from '~/images/missing-img.svg'
+import missingImage from '../../../images/missing-img.svg'
 
 const noLoginsSvg = (
   <svg
@@ -65,7 +65,7 @@ type LoginsPanelProps = {
 
 export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
   return (
-    <>
+    <div className="h-full">
       {authorizedProfiles.length ? (
         <div className="border flex-1 flex flex-col rounded-lg h-full pt-2 relative shadow">
           <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-lg">
@@ -154,6 +154,6 @@ export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
           </Text>
         </div>
       )}
-    </>
+    </div>
   )
 }
