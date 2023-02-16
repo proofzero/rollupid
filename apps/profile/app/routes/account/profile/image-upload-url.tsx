@@ -6,7 +6,7 @@ import createImageClient from '@kubelt/platform-clients/image'
 
 export const loader: LoaderFunction = async ({ request }) => {
   await requireJWT(request)
-  return redirect('/account/settings/profile')
+  return redirect('/account/profile')
 }
 
 export const action: ActionFunction = async ({ request }) => {

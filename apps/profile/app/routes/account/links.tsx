@@ -296,6 +296,13 @@ export default function AccountSettingsLinks() {
     notificationHandler: (success: boolean) => void
   }>()
 
+  console.log({
+    notificationHandler,
+    profile,
+    // cryptoAddresses,
+    // accountURN,
+  })
+
   const transition = useTransition()
   const actionData = useActionData()
   const fetcher = useFetcher()
@@ -340,7 +347,7 @@ export default function AccountSettingsLinks() {
         },
         {
           method: 'post',
-          action: '/account/settings/connections/order',
+          action: '/account/connections/order',
         }
       )
       setIsConnectionsChanged(false)
@@ -358,7 +365,7 @@ export default function AccountSettingsLinks() {
         Connected Account Links (coming soon)
       </Text>
 
-      <fetcher.Form method="post" action="/account/settings/connections/order">
+      <fetcher.Form method="post" action="/account/connections/order">
         <SortableList
           items={connectedLinks.map((l: any) => ({
             key: `${l.addressURN}`,
@@ -370,6 +377,7 @@ export default function AccountSettingsLinks() {
               <img
                 className="w-9 h-9 rounded-full mr-3.5"
                 src={item.val.icon}
+                alt="connected addresses"
               />
 
               <div className="flex flex-col space-y-1.5 flex-1">

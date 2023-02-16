@@ -127,12 +127,9 @@ export default function AccountSettingsProfile() {
 
     setPfpUploading(true)
 
-    const imgUploadUrl = (await fetch(
-      '/account/settings/profile/image-upload-url',
-      {
-        method: 'post',
-      }
-    )
+    const imgUploadUrl = (await fetch('/account/profile/image-upload-url', {
+      method: 'post',
+    })
       .then((res) => res.json())
       .catch((e) => {
         console.error(e)
