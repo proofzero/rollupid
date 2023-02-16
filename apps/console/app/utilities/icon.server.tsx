@@ -83,7 +83,7 @@ async function uploadImage(
  * Upload an image to our image hosting service.
  *
  * @param iconBlob a Blob containing binary image data
- * @param appId the application ID that owns the image
+ * @param appId the Client ID that owns the image
  * @param metadata a map of user-supplied image metadata
  * @return the URL of the uploaded image as a string
  */

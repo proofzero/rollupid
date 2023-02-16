@@ -55,11 +55,11 @@ export default class Authorization extends DOProxy {
 
     const storedClientId = await this.state.storage.get<string>('clientId')
     if (!storedClientId) {
-      throw new Error('missing client id')
+      throw new Error('missing Client ID')
     }
 
     if (clientId != storedClientId) {
-      throw new Error('mismatch client id')
+      throw new Error('mismatch Client ID')
     }
 
     return { code }

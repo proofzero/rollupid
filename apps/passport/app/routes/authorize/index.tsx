@@ -74,7 +74,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
     if (!appProfile.published)
       throw new Error(
-        'Could not find a published application with that client ID'
+        'Could not find a published application with that Client ID'
       )
 
     return json({

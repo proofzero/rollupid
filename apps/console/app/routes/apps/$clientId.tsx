@@ -30,7 +30,7 @@ type LoaderData = {
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   if (!params.clientId) {
-    throw new Error('Client id is required for the requested route')
+    throw new Error('Client ID is required for the requested route')
   }
 
   const jwt = await requireJWT(request)

@@ -30,7 +30,7 @@ export const getAppPublicProps = async ({
     }
   } else {
     throw new Error(
-      `Could not return properties for a published application with client ID: ${input.clientId}`
+      `Could not return properties for a published application with Client ID: ${input.clientId}`
     )
   }
 }

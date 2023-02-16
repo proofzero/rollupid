@@ -28,10 +28,10 @@ From here you will want to click the “Create Application” button in the midd
 
 ### Step 3: Configure your Application
 
-Once the app is created, the first screen you will see is your application dashboard. This is where you can copy your [Galaxy API key](../reference/galaxy-api.md) and your application keys. **Please copy the application secret and store it somewhere secure.**
+Once the app is created, the first screen you will see is your application dashboard. This is where you can copy your [Galaxy API key](../reference/galaxy-api.md) and your application keys. **Please copy the Client Secret and store it somewhere secure.**
 
 {% hint style="info" %}
-The application secret is only shared once so, if you missed it you can click the "roll keys" link to regenerate the keys.
+The Client Secret is only shared once so, if you missed it you can click the "roll keys" link to regenerate the keys.
 {% endhint %}
 
 <div>

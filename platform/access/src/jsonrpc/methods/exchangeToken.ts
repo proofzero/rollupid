@@ -179,7 +179,7 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
 
   const payload = decodeJwt(refreshToken) as AccessJWTPayload
   if (clientId != payload.aud[0]) {
-    throw new Error('mismatch client id')
+    throw new Error('mismatch Client ID')
   }
 
   if (!payload.sub) {

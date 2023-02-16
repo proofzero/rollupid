@@ -29,7 +29,7 @@ import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 export const action: ActionFunction = async ({ request, params }) => {
   if (!params.clientId) {
-    throw new Error('Application client id is required for the requested route')
+    throw new Error('Application Client ID is required for the requested route')
   }
 
   const jwt = await requireJWT(request)

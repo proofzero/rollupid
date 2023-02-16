@@ -108,11 +108,11 @@ export const ApplicationAuth = ({
               <div className="flex-1">
                 <ReadOnlyInput
                   id="oAuthAppId"
-                  label="Application ID"
+                  label="Client ID"
                   value={oAuth.appId}
                   copyable
                   onCopy={() =>
-                    toast.success('Application ID copied to clipboard!', {
+                    toast.success('Client ID copied to clipboard!', {
                       duration: 2000,
                     })
                   }
@@ -123,7 +123,7 @@ export const ApplicationAuth = ({
               <div className="flex-1">
                 <ReadOnlyInput
                   id="oAuthAppSecret"
-                  label="Application Secret"
+                  label="Client Secret"
                   value={oAuth.appSecret ?? 's3cr3t-l337-h4x0r5'}
                   hidden={oAuth.appSecret ? false : true}
                   copyable={oAuth.appSecret ? true : false}
