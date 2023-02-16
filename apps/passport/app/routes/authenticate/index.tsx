@@ -18,19 +18,16 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   if (clientId) {
     const sbClient = getStarbaseClient('', context.env)
-    return await sbClient.getAppPublicProps.query({ clientId })
+    const response = await sbClient.getAppPublicProps.query({ clientId })
+    return response
+  } else {
+    return null
   }
-
-  return null
 }
 
 export default function Authenticate() {
   const [enableWalletConnect, setEnableWalletConnect] = useState(true)
-  const loaderData = useLoaderData<{
-    name: string
-    iconURL: string
-    preventConnectCallback: boolean | undefined
-  }>()
+  const loaderData = useLoaderData<{ name: string; iconURL: string }>()
   const name = loaderData?.name || undefined
   const iconURL = loaderData?.iconURL || undefined
 

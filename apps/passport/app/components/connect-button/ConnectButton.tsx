@@ -33,12 +33,14 @@ export function ConnectButton({
     <ConnectKitProvider>
       <CustomConnectKitButton>
         {({ isConnected, isConnecting, show, hide, address, ensName }) => {
-          return isConnected ? (
+          return (
             <Button
               btnType="secondary-alt"
               className={classNames('button', className)}
-              disabled={!address}
-              onClick={() => address && connectCallback(address)}
+              disabled={isConnected ? !address : isConnecting}
+              onClick={
+                isConnected ? () => address && connectCallback(address) : show
+              }
               style={{
                 height: 50,
                 width: '100%',
@@ -60,35 +62,11 @@ export function ConnectButton({
               >
                 <img src={walletsSvg} />
               </span>
-              Login With Wallet
-            </Button>
-          ) : (
-            <Button
-              btnType="secondary-alt"
-              className={classNames('button', className)}
-              onClick={show}
-              style={{
-                height: 50,
-                width: '100%',
-                fontSize: 16,
-                fontWeight: 500,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <span
-                style={{
-                  backgroundRepeat: 'no-repeat',
-                  backgroundSize: '100%',
-                  height: 20,
-                  width: 20,
-                  margin: '0 7px',
-                }}
-              >
-                <img src={walletsSvg} />
-              </span>
-              {!isConnecting ? 'Connect Wallet' : 'Connecting'}
+              {isConnected
+                ? 'Login With Wallet'
+                : !isConnecting
+                ? 'Connect Wallet'
+                : 'Connecting'}
             </Button>
           )
         }}
