@@ -65,12 +65,9 @@ type LoginsPanelProps = {
 
 export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
   return (
-    <div className="flex-1 flex flex-col h-full">
-      <Text className="text-gray-600 py-3" weight="medium" size="lg">
-        Users
-      </Text>
+    <>
       {authorizedProfiles.length ? (
-        <div className="border flex-1 flex flex-col rounded-lg h-full pt-2 relative">
+        <div className="border flex-1 flex flex-col rounded-lg h-full pt-2 relative shadow">
           <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-lg">
             <Text size="sm" weight="medium" className="text-gray-500 flex-1">
               USER ID
@@ -140,7 +137,10 @@ export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col bg-[#F9FAFB] justify-center items-center h-full">
+        <div
+          className="flex flex-col bg-white
+        shadow rounded-lg border justify-center items-center h-full"
+        >
           {noLoginsSvg}
 
           <Text weight="medium" className="text-gray-500 mt-9 mt-2">
@@ -154,6 +154,6 @@ export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
           </Text>
         </div>
       )}
-    </div>
+    </>
   )
 }
