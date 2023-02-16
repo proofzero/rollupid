@@ -88,7 +88,11 @@ export const loader: LoaderFunction = async ({ request, context }) => {
               context.env
             )
             return {
-              displayName: res.profile.name,
+              displayName:
+                res.profile.name ||
+                res.profile.given_name ||
+                res.profile.email ||
+                res.profile.sub,
               pfp: {
                 //Cached profile image
                 image: res.profile.rollupidImageUrl as string,

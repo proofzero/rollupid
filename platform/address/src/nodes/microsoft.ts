@@ -10,13 +10,11 @@ import type { AddressNode } from '.'
 export default class MicrosoftAddress extends OAuthAddress {
   declare clientId: string
   declare clientSecret: string
-  declare tenantId: string
 
   constructor(node: AddressNode, ctx: Context) {
     super(node)
     this.clientId = ctx.INTERNAL_MICROSOFT_OAUTH_CLIENT_ID
     this.clientSecret = ctx.SECRET_MICROSOFT_OAUTH_CLIENT_SECRET
-    this.tenantId = ctx.INTERNAL_MICROSOFT_OAUTH_TENANT_ID
   }
 
   async getProfile(): Promise<OAuthMicrosoftProfile> {
@@ -29,12 +27,12 @@ export default class MicrosoftAddress extends OAuthAddress {
 
   getRefreshTokenParams(refreshToken: string): URLSearchParams {
     const params = super.getRefreshTokenParams(refreshToken)
-    params.set('tenant', this.tenantId)
+    params.set('tenant', 'common')
     return params
   }
 
   getTokenURL(): string {
-    return `https://login.microsoftonline.com/${this.tenantId}/oauth2/v2.0/token`
+    return `https://login.microsoftonline.com/common/oauth2/v2.0/token`
   }
 
   static async alarm(address: Address) {

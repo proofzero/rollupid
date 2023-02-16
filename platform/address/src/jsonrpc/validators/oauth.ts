@@ -27,15 +27,15 @@ export const GoogleOAuthSchema = z.object({
 export const MicrosoftOAuthSchema = z.object({
   provider: z.literal(OAuthAddressType.Microsoft),
   id: z.string(),
-  displayName: z.string(),
+  displayName: z.string().optional(),
   _json: MicrosoftRawProfileSchema,
   name: z
     .object({
-      familyName: z.string().nullable(),
-      givenName: z.string().nullable(),
+      familyName: z.string().nullable().optional(),
+      givenName: z.string().nullable().optional(),
     })
     .nullable(),
-  emails: z.array(z.object({ value: z.string().nullable() })),
+  emails: z.array(z.object({ value: z.string().nullable() }).optional()),
   isMicrosoft: z.boolean().default(true),
 })
 
