@@ -43,7 +43,7 @@ export const loader: LoaderFunction = async ({
 
   await addressClient.setOAuthData.mutate(authRes)
 
-  if (appData.prompt === 'login') return redirect(appData.redirectUri)
+  if (appData?.prompt === 'login') return redirect(appData.redirectUri)
 
   return authenticateAddress(address, account, appData, context.env)
 }
