@@ -53,7 +53,7 @@ export default function HeadNav({
   const navigation = [
     {
       name: 'My Profile',
-      to: basePath ? `${basePath}` : '/account/settings/connections',
+      to: basePath ? `${basePath}` : '/account/connections',
     },
     { name: 'Account', to: '/account' },
   ]

@@ -208,7 +208,7 @@ const UserAddressLayout = () => {
               },
               {
                 method: 'post',
-                action: '/account/settings/profile/update-cover',
+                action: '/account/profile/update-cover',
               }
             )
           }}

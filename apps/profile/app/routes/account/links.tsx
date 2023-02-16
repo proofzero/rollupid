@@ -136,7 +136,7 @@ export const action: ActionFunction = async ({ request }) => {
    * And separately I created hidden input for previous unchanged links
    * to not forget to include them on profile too
    */
-  const updatedLinks = formData['links'] as Link[]
+  const updatedLinks = (formData['links'] || []) as Link[]
 
   // TODO: Add validation
 
@@ -203,16 +203,18 @@ const SortableLink = ({
         <div
           className="bg-gray-100 hover:bg-gray-200 transition-colors
               w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
-              text-gray-700
+              text-gray-700 truncate
         flex items-center justify-center "
         >
           <TbLink size={22} />
         </div>
-        <div className="flex flex-col flex-1">
-          <Text weight="medium" className="truncate">
+        <div className="max-w-[42vw] flex flex-col flex-1 break-all">
+          <Text weight="medium" className="truncate break-all">
             {name}
           </Text>
-          <Text className="text-gray-500 truncate">{url}</Text>
+          <Text className="max-w-full text-gray-500 truncate break-all">
+            {url}
+          </Text>
         </div>
         {/* // Puts current link in "modification" regyme */}
         <Button
@@ -296,6 +298,13 @@ export default function AccountSettingsLinks() {
     notificationHandler: (success: boolean) => void
   }>()
 
+  console.log({
+    notificationHandler,
+    profile,
+    // cryptoAddresses,
+    // accountURN,
+  })
+
   const transition = useTransition()
   const actionData = useActionData()
   const fetcher = useFetcher()
@@ -340,7 +349,7 @@ export default function AccountSettingsLinks() {
         },
         {
           method: 'post',
-          action: '/account/settings/connections/order',
+          action: '/account/connections/order',
         }
       )
       setIsConnectionsChanged(false)
@@ -348,7 +357,7 @@ export default function AccountSettingsLinks() {
   }, [isConnectionsChanged])
 
   return (
-    <>
+    <div className="min-h-[76vh] sm:min-h-[70vh] relative">
       {/* Disabled for now */}
       <Text
         size="base"
@@ -358,7 +367,7 @@ export default function AccountSettingsLinks() {
         Connected Account Links (coming soon)
       </Text>
 
-      <fetcher.Form method="post" action="/account/settings/connections/order">
+      <fetcher.Form method="post" action="/account/connections/order">
         <SortableList
           items={connectedLinks.map((l: any) => ({
             key: `${l.addressURN}`,
@@ -370,9 +379,10 @@ export default function AccountSettingsLinks() {
               <img
                 className="w-9 h-9 rounded-full mr-3.5"
                 src={item.val.icon}
+                alt="connected addresses"
               />
 
-              <div className="flex flex-col space-y-1.5 flex-1">
+              <div className="flex flex-col space-y-1.5 flex-1 break-all">
                 <Text size="sm" weight="medium" className="text-gray-700">
                   {item.val.title}
                 </Text>
@@ -434,7 +444,6 @@ export default function AccountSettingsLinks() {
         onSubmit={() => {
           setFormChanged(false)
         }}
-        className="relative min-h-[35.563rem]"
       >
         <div className="flex flex-col">
           {/* Links that are already in account DO */}
@@ -478,10 +487,20 @@ export default function AccountSettingsLinks() {
             >
               <AiOutlinePlus size={22} className="mr-[11px]" /> Add Link
             </Button>
-            <SaveButton isFormChanged={isFormChanged} discardFn={() => {}} />
           </div>
         </div>
+        {/* Form where this button is used should have 
+          an absolute relative position
+          div below has relative - this way this button sticks to 
+          bottom right
+
+          This div with h-[4rem] prevents everything from overlapping with
+          div with absolute position below  */}
+        <div className="h-[4rem]" />
+        <div className="absolute bottom-0 right-0">
+          <SaveButton isFormChanged={isFormChanged} discardFn={() => {}} />
+        </div>
       </Form>
-    </>
+    </div>
   )
 }

@@ -507,7 +507,7 @@ const Gallery = () => {
       ) : (
         <NoCryptoAddresses
           redirectHandler={() => {
-            navigate('/account/settings/connections')
+            navigate('/account/connections')
           }}
         />
       )}

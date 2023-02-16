@@ -4,9 +4,13 @@ import { useLoaderData, NavLink, useOutletContext } from '@remix-run/react'
 
 import { Outlet } from '@remix-run/react'
 
-import { BiCog, BiIdCard, BiLink } from 'react-icons/bi'
-import { HiOutlineHome, HiOutlineViewGridAdd } from 'react-icons/hi'
+import { BiLink } from 'react-icons/bi'
+import { AiOutlineUser } from 'react-icons/ai'
+import { HiOutlineHome } from 'react-icons/hi'
+import { TbPlugConnected, TbApps } from 'react-icons/tb'
+import { RiCollageLine } from 'react-icons/ri'
 import classNames from 'classnames'
+import { Toaster, toast } from 'react-hot-toast'
 
 import { requireJWT } from '~/utils/session.server'
 
@@ -19,7 +23,7 @@ import ConditionalTooltip from '~/components/conditional-tooltip'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
 import type { Node, Profile } from '@kubelt/galaxy-client'
-import { AddressURN } from '@kubelt/urns/address'
+import type { AddressURN } from '@kubelt/urns/address'
 
 export function links() {
   return [...faqStyles(), { rel: 'stylesheet', href: styles }]
@@ -65,22 +69,53 @@ export const loader: LoaderFunction = async ({ request }) => {
   })
 }
 
-const subNavigation = [
-  {
-    name: 'Dashboard',
-    href: '/account/dashboard',
-    icon: HiOutlineHome,
-    exists: true,
-  },
-  {
-    name: 'NFT Gallery',
-    href: '/account/gallery',
-    icon: HiOutlineViewGridAdd,
-    exists: true,
-  },
-  { name: 'Apps', href: '#', icon: BiLink },
-  { name: 'Settings', href: 'settings', icon: BiCog, exists: true },
-]
+const subNavigation = {
+  general: [
+    {
+      name: 'Home',
+      href: '/account/dashboard',
+      icon: HiOutlineHome,
+      exists: true,
+    },
+  ],
+  publicProfiles: [
+    {
+      name: 'User Settings',
+      href: '/account/profile',
+      icon: AiOutlineUser,
+      exists: true,
+    },
+    {
+      name: 'Profile Links',
+      href: '/account/links',
+      icon: BiLink,
+      exists: true,
+    },
+    {
+      name: 'NFT Gallery',
+      href: '/account/gallery',
+      icon: RiCollageLine,
+      exists: true,
+    },
+  ],
+  connections: [
+    {
+      name: 'Accounts',
+      href: '/account/connections',
+      icon: TbPlugConnected,
+      exists: true,
+    },
+    { name: 'Applications', href: '#', icon: TbApps },
+  ],
+}
+
+const notify = (success: boolean = true) => {
+  if (success) {
+    toast.success('Saved')
+  } else {
+    toast.error('Save Failed -- Please try again')
+  }
+}
 
 export default function AccountLayout() {
   const { addresses, addressProfiles, cryptoAddresses } = useLoaderData<{
@@ -100,12 +135,33 @@ export default function AccountLayout() {
           <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
             <aside className="fixed bottom-0 z-50 w-full lg:relative lg:col-start-1 lg:col-end-3 bg-gray-50">
               <nav className="flex flex-row justify-center items-center lg:flex-none lg:block lg:mt-8 space-y-1">
-                {subNavigation.map((item) => (
+                <Toaster position="top-right" reverseOrder={false} />
+                {subNavigation.general.map((item) => (
+                  <SideNavItem key={item.name} item={item} />
+                ))}
+                <Text
+                  size="sm"
+                  className="ml-5 pt-5 text-gray-500
+                hidden lg:block"
+                >
+                  Public Profiles
+                </Text>
+                {subNavigation.publicProfiles.map((item) => (
+                  <SideNavItem key={item.name} item={item} />
+                ))}
+                <Text
+                  size="sm"
+                  className="ml-5 pt-5 text-gray-500 
+                hidden lg:block"
+                >
+                  Connections
+                </Text>
+                {subNavigation.connections.map((item) => (
                   <SideNavItem key={item.name} item={item} />
                 ))}
               </nav>
             </aside>
-            <div className="divide-y divide-gray-200 px-4 sm:mb-16 lg:col-start-3 lg:col-end-13 lg:p-4 lg:p-8">
+            <div className="divide-y divide-transparent px-4 sm:mb-16 lg:col-start-3 lg:col-end-13 lg:p-4 lg:p-8">
               <Outlet
                 context={{
                   profile,
@@ -113,6 +169,7 @@ export default function AccountLayout() {
                   addressProfiles,
                   cryptoAddresses,
                   accountURN,
+                  notificationHandler: notify,
                 }}
               />
             </div>

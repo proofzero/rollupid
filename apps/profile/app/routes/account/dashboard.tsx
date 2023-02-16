@@ -128,7 +128,7 @@ export default function Welcome() {
             >
               Ignore
             </Text>
-            <Link to="/account/settings">
+            <Link to="/account/profile">
               <Button btnType="primary">Go to Settings</Button>
             </Link>
           </div>
@@ -159,7 +159,7 @@ export default function Welcome() {
             <div className="flex flex-row justify-between items-center">
               <SectionTitle title="Connected Accounts" />
 
-              <Link className="mb-3" to="/account/settings/connections">
+              <Link className="mb-3" to="/account/connections">
                 <Text
                   size="xs"
                   weight="normal"

@@ -137,7 +137,7 @@ const AccountSettingsConnections = () => {
       setActionId(undefined)
     }
     if (fetcher.type === 'actionReload') {
-      fetcher.load('/account/settings/connections')
+      fetcher.load('/account/connections')
     }
   }, [fetcher])
 
@@ -193,7 +193,7 @@ const AccountSettingsConnections = () => {
 
             <fetcher.Form
               method="post"
-              action="/account/settings/connections/rename"
+              action="/account/connections/rename"
             >
               {actionId && <input type="hidden" name="id" value={actionId} />}
 

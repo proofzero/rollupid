@@ -1,5 +1,6 @@
+import type { AddressURN } from '@kubelt/urns/address'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
-import { ActionFunction } from '@remix-run/cloudflare'
+import type { ActionFunction } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/clients'
 import { requireJWT } from '~/utils/session.server'
 
@@ -8,14 +9,16 @@ export const action: ActionFunction = async ({ request }) => {
 
   const formData = await request.formData()
 
-  const id = formData.get('id') as string
-  const name = formData.get('name') as string
+  const connectionsData = formData.get('connections')
+  const connections = JSON.parse(connectionsData as string) as {
+    addressURN: AddressURN
+    public?: boolean
+  }[]
 
   const galaxyClient = await getGalaxyClient()
-  galaxyClient.updateAddressNickname(
+  await galaxyClient.updateConnectedAddressesProperties(
     {
-      addressURN: id,
-      nickname: name,
+      addressURNList: connections,
     },
     getAuthzHeaderConditionallyFromToken(jwt)
   )

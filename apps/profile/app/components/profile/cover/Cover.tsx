@@ -92,7 +92,7 @@ export const Cover = ({
               formData.append('file', coverFile)
 
               const imgUploadUrl = (await fetch(
-                '/account/settings/profile/image-upload-url',
+                '/account/profile/image-upload-url',
                 {
                   method: 'post',
                 }
