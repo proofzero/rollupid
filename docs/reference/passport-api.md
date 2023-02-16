@@ -65,6 +65,7 @@ const { access_code, refresh_token } = await fetch(
 {% tab title="Curl" %}
 ```bash
 curl -X POST https://passport.rollup.id/token -d \
+  --header "Content-Type: application/x-www-form-urlencoded" \
   "client_id={clientId}&client_secret={clientSecret}&exchange_code={exchangeCode}&grant_type=authorization_code"
 ```
 {% endtab %}
