@@ -128,7 +128,7 @@ export default function Welcome() {
             >
               Ignore
             </Text>
-            <Link to="/account/settings">
+            <Link to="/account/profile">
               <Button btnType="primary">Go to Settings</Button>
             </Link>
           </div>

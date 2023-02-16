@@ -65,7 +65,7 @@ export const AddressListItem = ({
       </section>
 
       <section className="flex-1 flex flex-col space-y-1.5">
-        <div className="flex flex-row items-center space-x-2">
+        <div className="flex flex-row items-center space-x-2 ">
           <Text size="base" weight="semibold" className="text-gray-800">
             {title}
           </Text>
@@ -76,7 +76,7 @@ export const AddressListItem = ({
         </div>
 
         <div className="flex flex-row">
-          <Text size="xs" weight="normal" className="text-gray-500">
+          <Text size="xs" weight="normal" className="text-gray-500 break-all">
             {chain} • {address}
           </Text>
         </div>
