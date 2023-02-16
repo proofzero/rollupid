@@ -1,12 +1,8 @@
-import type { LoaderFunction } from '@remix-run/cloudflare'
+import { json, LoaderFunction } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 import { Suspense } from 'react'
 
-import {
-  createConsoleParamsSession,
-  getConsoleParamsSession,
-  getUserSession,
-} from '~/session.server'
+import { getUserSession, setConsoleParamsSession } from '~/session.server'
 
 import React from 'react'
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
@@ -17,21 +13,21 @@ import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context }) => {
   const session = await getUserSession(request, context.env)
-  const appData = await getConsoleParamsSession(request, context.env)
-    .then((session) => JSON.parse(session.get('params')))
-    .catch((err) => {
-      return null
-    })
-
   const searchParams = new URL(request.url).searchParams
-
-  if (appData?.prompt === 'login') {
-    return null
-  }
 
   if (session.get('jwt') && searchParams.get('client_id')) {
     if (searchParams.get('prompt') === 'login') {
-      throw await createConsoleParamsSession(context.consoleParams, context.env)
+      return json(
+        {},
+        {
+          headers: {
+            'Set-Cookie': await setConsoleParamsSession(
+              context.consoleParams,
+              context.env
+            ),
+          },
+        }
+      )
     } else {
       const searchParams = new URL(request.url).searchParams
       return redirect(`/authorize?${searchParams}`)

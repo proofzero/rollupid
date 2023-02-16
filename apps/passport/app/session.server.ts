@@ -115,6 +115,17 @@ export async function createConsoleParamsSession(
   })
 }
 
+export async function setConsoleParamsSession(
+  consoleParams: ConsoleParams,
+  env: Env
+) {
+  const storage = getConsoleParamsSessionStorage(env)
+  const session = await storage.getSession()
+  session.set('params', JSON.stringify(consoleParams))
+
+  return storage.commitSession(session)
+}
+
 export async function getConsoleParamsSession(request: Request, env: Env) {
   const storage = getConsoleParamsSessionStorage(env)
   return storage.getSession(request.headers.get('Cookie'))

@@ -1,4 +1,4 @@
-import { LoaderArgs, LoaderFunction, redirect } from '@remix-run/cloudflare'
+import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { GoogleStrategyDefaultName } from 'remix-auth-google'
@@ -42,8 +42,6 @@ export const loader: LoaderFunction = async ({
   const account = await addressClient.resolveAccount.query()
 
   await addressClient.setOAuthData.mutate(authRes)
-
-  if (appData?.prompt === 'login') return redirect(appData.redirectUri)
 
   return authenticateAddress(address, account, appData, context.env)
 }

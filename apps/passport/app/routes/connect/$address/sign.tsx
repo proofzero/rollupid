@@ -80,7 +80,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     searchParams.set('state', state as string)
   }
 
-  return redirect(`/authenticate/${params.address}/token?${searchParams}`)
+  return redirect(`/connect/${params.address}/token?${searchParams}`)
 }
 
 export default function Sign() {
@@ -105,7 +105,7 @@ export default function Sign() {
         { signature: data, nonce, state },
         {
           method: 'post',
-          action: `/authenticate/${address}/sign`,
+          action: `/connect/${address}/sign`,
         }
       )
     },

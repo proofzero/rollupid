@@ -37,7 +37,7 @@ export default function Authenticate() {
       appName={name}
       enableWalletConnect={enableWalletConnect}
       connectCallback={async (address) => {
-        window.location.href = `/authenticate/${address}/sign`
+        window.location.href = `/connect/${address}/sign`
       }}
       connectErrorCallback={(error) => {
         console.error(error)

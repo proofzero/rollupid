@@ -95,8 +95,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     })
   }
 
-  if (appData?.prompt === 'login') return redirect(appData.redirectUri)
-
   return authenticateAddress(address, account, appData, context.env)
 }
 
