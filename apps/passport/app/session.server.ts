@@ -41,7 +41,7 @@ export async function createUserSession(
   userSession.set('jwt', jwt)
   userSession.set('defaultProfileUrn', defaultProfileUrn)
 
-  const consoleParamsStorage = await getConsoleParamsSessionStorage(env)
+  const consoleParamsStorage = getConsoleParamsSessionStorage(env)
   const consoleParamsSession = await consoleParamsStorage.getSession()
 
   const headers = new Headers()

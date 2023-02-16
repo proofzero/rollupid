@@ -1,6 +1,7 @@
 import { getSdk } from '@kubelt/galaxy-client'
 import createAccessClient from '@kubelt/platform-clients/access'
 import createAddressClient from '@kubelt/platform-clients/address'
+import createAccountClient from '@kubelt/platform-clients/account'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 
 import { GraphQLClient } from 'graphql-request'
@@ -34,6 +35,13 @@ export async function getAddressClient(
     [PlatformAddressURNHeader]: addressUrn,
     ...getAuthzHeaderConditionallyFromToken(jwt),
   })
+}
+
+export function getAccountClient(jwt: string, env: Env) {
+  return createAccountClient(
+    env.Account,
+    getAuthzHeaderConditionallyFromToken(jwt)
+  )
 }
 
 export async function getGalaxyClient() {
