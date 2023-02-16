@@ -1,4 +1,3 @@
-import { GrantType } from '@kubelt/types/access'
 import type { AddressType, NodeType } from '@kubelt/types/address'
 import { CryptoAddressType } from '@kubelt/types/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
@@ -6,8 +5,9 @@ import { generateHashedIDRef } from '@kubelt/urns/idref'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
-import { getAccessClient } from '~/platform.server'
-import { createUserSession, getConsoleParamsSession } from '~/session.server'
+import { getAddressClient } from '~/platform.server'
+import { getConsoleParamsSession } from '~/session.server'
+import { authenticateAddress } from '~/utils/authenticate.server'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const searchParams = new URL(request.url).searchParams
@@ -26,24 +26,8 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     { alias: address }
   )
 
-  const grantType = GrantType.AuthenticationCode
-  const clientId = params.address as string
-
-  const accessClient = getAccessClient(context.env)
-
-  // TODO: handle refresh token
-  const { accessToken, refreshToken } = await accessClient.exchangeToken
-    .mutate({
-      code,
-      clientId,
-      grantType,
-    })
-    .catch((err) => {
-      console.error('Error exchanging token', err)
-      throw json({ message: `Error exchanging token: ${err}` }, 400)
-    })
-
-  // TODO: store refresh token in DO and set alarm to refresh
+  const addressClient = getAddressClient(addressURN, context.env)
+  const accountURN = await addressClient.getAccount.query()
 
   const appData = await getConsoleParamsSession(request, context.env)
     .then((session) => JSON.parse(session.get('params')))
@@ -52,24 +36,5 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       return null
     })
 
-  let redirectURL = `/authorize`
-  if (appData) {
-    const {
-      clientId: appId,
-      redirectUri: consoleAppURI,
-      state: appState,
-      scope,
-    } = appData
-
-    const appParams = new URLSearchParams({
-      client_id: appId,
-      state: appState,
-      redirect_uri: consoleAppURI,
-      scope: scope || '',
-    })
-
-    redirectURL += `?${appParams}`
-  }
-
-  return createUserSession(accessToken, redirectURL, addressURN, context.env)
+  return authenticateAddress(addressURN, accountURN, appData, context.env)
 }

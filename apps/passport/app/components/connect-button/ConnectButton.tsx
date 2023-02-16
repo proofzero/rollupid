@@ -26,27 +26,21 @@ export type ConnectButtonProps = {
 } & ButtonProps
 
 export function ConnectButton({
-  disabled = false,
   connectCallback,
-  connectErrorCallback,
-  provider,
   className,
-  ...rest
 }: ConnectButtonProps) {
   return (
     <ConnectKitProvider>
       <CustomConnectKitButton>
         {({ isConnected, isConnecting, show, hide, address, ensName }) => {
-          if (isConnected && address) {
-            connectCallback(address)
-          }
-
           return (
             <Button
               btnType="secondary-alt"
               className={classNames('button', className)}
-              disabled={isConnecting}
-              onClick={show}
+              disabled={isConnected ? !address : isConnecting}
+              onClick={
+                isConnected ? () => address && connectCallback(address) : show
+              }
               style={{
                 height: 50,
                 width: '100%',
@@ -68,7 +62,11 @@ export function ConnectButton({
               >
                 <img src={walletsSvg} />
               </span>
-              {!isConnecting ? 'Connect With Wallet' : 'Connecting'}
+              {isConnected
+                ? 'Login With Wallet'
+                : !isConnecting
+                ? 'Connect Wallet'
+                : 'Connecting'}
             </Button>
           )
         }}

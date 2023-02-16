@@ -15,6 +15,7 @@ import { getAddressClient } from '~/platform.server'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { CryptoAddressType, NodeType } from '@kubelt/types/address'
+import { getJWTConditionallyFromSession } from '~/session.server'
 
 export const signMessageTemplate = `Welcome to Rollup!
 
@@ -68,6 +69,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const { code } = await addressClient.verifyNonce.mutate({
     nonce: formData.get('nonce') as string,
     signature: formData.get('signature') as string,
+    jwt: await getJWTConditionallyFromSession(request, context.env),
   })
 
   // TODO: handle the error case
@@ -80,7 +82,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     searchParams.set('state', state as string)
   }
 
-  return redirect(`/authenticate/${params.address}/token?${searchParams}`)
+  return redirect(`/connect/${params.address}/token?${searchParams}`)
 }
 
 export default function Sign() {
@@ -105,7 +107,7 @@ export default function Sign() {
         { signature: data, nonce, state },
         {
           method: 'post',
-          action: `/authenticate/${address}/sign`,
+          action: `/connect/${address}/sign`,
         }
       )
     },

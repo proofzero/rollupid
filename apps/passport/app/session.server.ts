@@ -41,7 +41,7 @@ export async function createUserSession(
   userSession.set('jwt', jwt)
   userSession.set('defaultProfileUrn', defaultProfileUrn)
 
-  const consoleParamsStorage = await getConsoleParamsSessionStorage(env)
+  const consoleParamsStorage = getConsoleParamsSessionStorage(env)
   const consoleParamsSession = await consoleParamsStorage.getSession()
 
   const headers = new Headers()
@@ -115,6 +115,17 @@ export async function createConsoleParamsSession(
   })
 }
 
+export async function setConsoleParamsSession(
+  consoleParams: ConsoleParams,
+  env: Env
+) {
+  const storage = getConsoleParamsSessionStorage(env)
+  const session = await storage.getSession()
+  session.set('params', JSON.stringify(consoleParams))
+
+  return storage.commitSession(session)
+}
+
 export async function getConsoleParamsSession(request: Request, env: Env) {
   const storage = getConsoleParamsSessionStorage(env)
   return storage.getSession(request.headers.get('Cookie'))
@@ -140,6 +151,16 @@ export async function requireJWT(
       throw await destroyUserSession(session, '/authenticate', env)
     }
   }
+
+  return jwt
+}
+
+export async function getJWTConditionallyFromSession(
+  request: Request,
+  env: Env
+): Promise<string | undefined> {
+  const session = await getUserSession(request, env)
+  const jwt = session.get('jwt')
 
   return jwt
 }

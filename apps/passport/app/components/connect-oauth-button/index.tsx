@@ -24,7 +24,7 @@ type ConnectOAuthButtonProps = {
 }
 
 const ConnectOAuthButton = ({ provider }: ConnectOAuthButtonProps) => (
-  <form className="w-full" action={`/authenticate/${provider}`} method="post">
+  <form className="w-full" action={`/connect/${provider}`} method="post">
     <Button className={'w-full'} btnType={'secondary-alt'} isSubmit={true}>
       <div className="flex justify-center items-center w-full py-1.5">
         <img

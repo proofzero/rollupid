@@ -1,4 +1,4 @@
-import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
+import { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { AddressURNSpace } from '@kubelt/urns/address'
@@ -9,7 +9,10 @@ import { getAddressClient } from '~/platform.server'
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import type { OAuthData } from '@kubelt/platform.address/src/types'
-import { getConsoleParamsSession } from '~/session.server'
+import {
+  getConsoleParamsSession,
+  getJWTConditionallyFromSession,
+} from '~/session.server'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -43,7 +46,9 @@ export const loader: LoaderFunction = async ({
     { alias: profile._json.login, hidden: 'true' }
   )
   const addressClient = getAddressClient(address, context.env)
-  const account = await addressClient.resolveAccount.query()
+  const account = await addressClient.resolveAccount.query({
+    jwt: await getJWTConditionallyFromSession(request, context.env),
+  })
 
   await addressClient.setOAuthData.mutate(authRes)
 

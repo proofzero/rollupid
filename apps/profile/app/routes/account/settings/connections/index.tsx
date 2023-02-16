@@ -141,10 +141,38 @@ const AccountSettingsConnections = () => {
     }
   }, [fetcher])
 
+  const requestConnectAccount = () => {
+    // Server side remix doesn't have window
+    // so we need to make this comparison
+    if (!(typeof window !== 'undefined')) {
+      return
+    }
+
+    const windowUrl = new URL(
+      `${(window as any).ENV.PASSPORT_URL}/authenticate`
+    )
+
+    const clientId = (window as any).ENV.PROFILE_CLIENT_ID
+
+    // prompt lets passport authentication know this is a connect call
+    // not a new account one, and thus generate the proper cookie
+    windowUrl.searchParams.append('prompt', 'login')
+    windowUrl.searchParams.append('client_id', clientId)
+    windowUrl.searchParams.append('redirect_uri', window.location.href)
+
+    window.location.href = windowUrl.toString()
+  }
+
   return (
     <section>
       <div className="flex flex-row-reverse mt-7">
-        <Button disabled>Connect Account</Button>
+        <Button
+          onClick={() => {
+            requestConnectAccount()
+          }}
+        >
+          Connect Account
+        </Button>
       </div>
 
       <div className="mt-1">

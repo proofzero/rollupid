@@ -13,6 +13,7 @@ import CryptoAddress from '../../nodes/crypto'
 export const VerifyNonceInput = z.object({
   nonce: z.string(),
   signature: z.string(),
+  jwt: z.string().optional(),
 })
 
 // TODO: move to shared validators?
@@ -22,7 +23,6 @@ export const VerifyNonceOutput = z.object({
 })
 
 type VerifyNonceParams = z.infer<typeof VerifyNonceInput>
-
 type VerifyNonceResult = z.infer<typeof VerifyNonceOutput>
 
 export const verifyNonceMethod = async ({
@@ -32,7 +32,7 @@ export const verifyNonceMethod = async ({
   input: VerifyNonceParams
   ctx: Context
 }): Promise<VerifyNonceResult> => {
-  const { nonce, signature } = input
+  const { nonce, signature, jwt } = input
 
   const nodeClient = new CryptoAddress(ctx.address as AddressNode)
   const {
@@ -43,7 +43,9 @@ export const verifyNonceMethod = async ({
   }: Challenge = await nodeClient.verifyNonce(nonce, signature)
 
   const caller = appRouter.createCaller(ctx)
-  const account = await caller.resolveAccount()
+  const account = await caller.resolveAccount({
+    jwt,
+  })
   const responseType = ResponseType.Code
 
   const accessClient = getAccessClient(ctx.Access)
