@@ -15,23 +15,32 @@ export type ErrorPageProps = {
   error?: {
     message: string
   }
+  pepe?: boolean
 }
 
-export function ErrorPage({ code, message, trace, error }: ErrorPageProps) {
+export function ErrorPage({
+  code,
+  message,
+  trace,
+  error,
+  pepe = true,
+}: ErrorPageProps) {
   const json = error?.message.replace('Unexpected error.: ', '')
 
   return (
     <article className="relative m-4">
-      <section
-        className="absolute top-0 hidden lg:block right-0 xl:right-[10%] 2xl:right-[22%]"
-        style={{
-          zIndex: -1,
-        }}
-      >
-        <article className="w-60">
-          <Pepe />
-        </article>
-      </section>
+      {pepe && (
+        <section
+          className="absolute top-0 hidden lg:block right-0 xl:right-[10%] 2xl:right-[22%]"
+          style={{
+            zIndex: -1,
+          }}
+        >
+          <article className="w-60">
+            <Pepe />
+          </article>
+        </section>
+      )}
 
       <section className="flex flex-col justify-center items-center">
         <Text size="6xl" weight="extrabold" className="text-gray-800 mb-3">
@@ -48,7 +57,7 @@ export function ErrorPage({ code, message, trace, error }: ErrorPageProps) {
           btnType="primary"
           onClick={() =>
             window && document.referrer
-              ? (window.location = document.referrer)
+              ? (window.location.href = document.referrer)
               : history.back()
           }
         >

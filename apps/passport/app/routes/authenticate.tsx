@@ -54,7 +54,11 @@ export const CatchBoundary: CatchBoundaryComponent = () => {
 
   return (
     <div className="min-h-[100dvh] flex flex-col justify-center">
-      <ErrorPage code={'' + caught.status} message={caught.data.message} />
+      <ErrorPage
+        code={'' + caught.status}
+        message={caught.data.message}
+        pepe={false}
+      />
     </div>
   )
 }
