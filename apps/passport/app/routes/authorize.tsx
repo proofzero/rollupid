@@ -1,22 +1,18 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import { Outlet, useLoaderData } from '@remix-run/react'
-import { getGalaxyClient } from '~/platform.server'
-import { requireJWT } from '~/session.server'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { getAccountClient } from '~/platform.server'
+import { parseJwt, requireJWT } from '~/session.server'
+import { AccountURN } from '@kubelt/urns/account'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context }) => {
   // this will redirect unauthenticated users to the auth page but maintain query params
   const jwt = await requireJWT(request, context.consoleParams, context.env)
-
-  const galaxyClient = await getGalaxyClient()
-  const profileRes = await galaxyClient.getProfile(
-    {},
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
-  const profile = profileRes.profile
+  const account = parseJwt(jwt).sub as AccountURN
+  const accountClient = getAccountClient(jwt, context.env)
+  const profile = await accountClient.getProfile.query({ account })
 
   return json({ profile })
 }
