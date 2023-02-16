@@ -141,7 +141,7 @@ export default function AccountLayout() {
                 ))}
                 <Text
                   size="sm"
-                  className="ml-5 pt-10 text-gray-500
+                  className="ml-5 pt-5 text-gray-500
                 hidden lg:block"
                 >
                   Public Profiles
@@ -151,7 +151,7 @@ export default function AccountLayout() {
                 ))}
                 <Text
                   size="sm"
-                  className="ml-5 pt-10 text-gray-500 
+                  className="ml-5 pt-5 text-gray-500 
                 hidden lg:block"
                 >
                   Connections
