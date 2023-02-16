@@ -25,7 +25,7 @@ const normalizeProfile = (profile: any) => {
     case 'OAuthGoogleProfile':
       return {
         id: profile.urn,
-        address: profile.name,
+        address: profile.email,
         title: profile.name,
         icon: profile.picture,
         chain: 'Google',
@@ -49,7 +49,7 @@ const normalizeProfile = (profile: any) => {
     case 'OAuthMicrosoftProfile':
       return {
         id: profile.urn,
-        address: profile.name,
+        address: profile.email,
         title: profile.name,
         icon: profile.picture,
         chain: 'Microsoft',

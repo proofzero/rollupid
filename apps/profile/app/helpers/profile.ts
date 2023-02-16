@@ -1,6 +1,6 @@
 import type { Profile, Link, Gallery, Node } from '@kubelt/galaxy-client'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
-import { AddressURN } from '@kubelt/urns/address'
+import type { AddressURN } from '@kubelt/urns/address'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import { getGalaxyClient } from '~/helpers/clients'
 import { imageFromAddressType } from './icons'
@@ -65,7 +65,6 @@ export const getAddressProfiles = async (
   addressURNList: AddressURN[]
 ) => {
   const galaxyClient = await getGalaxyClient()
-  console.log({ addressURNList })
   const addressProfileRes = await galaxyClient.getAddressProfiles(
     {
       addressURNList,
@@ -107,7 +106,7 @@ export const normalizeProfileToLinks = (profile: any) => {
         id: profile.urn,
         // Some providers don't have an address
         // and are thus unlinkable
-        address: '',
+        address: profile.email || '',
         title: 'Google',
         icon: imageFromAddressType(OAuthAddressType.Google),
         provider: OAuthAddressType.Google,
@@ -135,7 +134,7 @@ export const normalizeProfileToLinks = (profile: any) => {
     case 'OAuthMicrosoftProfile':
       return {
         id: profile.urn,
-        address: '',
+        address: profile.email || '',
         title: 'Microsoft',
         icon: imageFromAddressType(OAuthAddressType.Microsoft),
         provider: OAuthAddressType.Microsoft,
@@ -143,7 +142,7 @@ export const normalizeProfileToLinks = (profile: any) => {
     case 'OAuthAppleProfile':
       return {
         id: profile.urn,
-        address: '',
+        address: profile.name || '',
         title: 'Apple',
         icon: imageFromAddressType(OAuthAddressType.Apple),
         provider: OAuthAddressType.Apple,
