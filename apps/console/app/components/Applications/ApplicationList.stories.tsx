@@ -1,6 +1,6 @@
 import React from 'react'
 import { ApplicationList } from './ApplicationList'
-import { ApplicationListItemProps } from './ApplicationListItem'
+import type { ApplicationListItemProps } from './ApplicationListItem'
 
 export default {
   title: 'Molecules/Applications/List',
@@ -9,19 +9,22 @@ export default {
 
 const applications: ApplicationListItemProps[] = [
   {
-    title: 'Courtyard',
-    createdTimestamp: new Date(),
+    id: '1',
+    name: 'Courtyard',
+    createdTimestamp: new Date().getTime(),
     published: true,
-    iconUrl: 'https://picsum.photos/250/250',
+    icon: 'https://picsum.photos/250/250',
   },
   {
-    title: 'Pokemon',
-    createdTimestamp: new Date(),
-    iconUrl: 'https://picsum.photos/250/250',
+    id: '2',
+    name: 'Pokemon',
+    createdTimestamp: new Date().getTime(),
+    icon: 'https://picsum.photos/250/250',
   },
   {
-    title: 'Baseball',
-    createdTimestamp: new Date(),
+    id: '3',
+    name: 'Baseball',
+    createdTimestamp: new Date().getTime(),
     published: true,
   },
 ]

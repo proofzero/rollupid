@@ -9,7 +9,7 @@ import { useState } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
 import type { AuthorizedProfile } from '~/types'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
-import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
+import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
 
 type ApplicationDashboardProps = {
   galaxyGql: {
@@ -173,23 +173,25 @@ export const ApplicationDashboard = ({
             </div>
           </Panel>
         </div>
-
-        {fetcherState.state !== 'idle' && (
-          <div className="flex flex-1 justify-center items-center h-full">
-            <Spinner />
+        <div className="flex-1">
+          <div className="flex h-full flex-col">
+            <Text className="text-gray-600 py-3" weight="medium" size="lg">
+              Users
+            </Text>
+            {fetcherState.state !== 'idle' && (
+              <div
+                className="flex bg-white justify-center items-center h-full
+            rounded-lg border shadow"
+              >
+                <Spinner />
+              </div>
+            )}
+            {fetcherState.type === 'done' && error && <NestedErrorPage />}
+            {fetcherState.type === 'done' && !error && (
+              <LoginsPanel authorizedProfiles={authorizedProfiles} />
+            )}
           </div>
-        )}
-        {fetcherState.type === 'done' && error && (
-          <div className="flex flex-1 justify-center items-center h-full">
-            <ErrorPage code="Oops" message="Something went wrong" />
-          </div>
-        )}
-
-        {fetcherState.type === 'done' && !error && (
-          <div className="flex-1">
-            <LoginsPanel authorizedProfiles={authorizedProfiles} />
-          </div>
-        )}
+        </div>
       </div>
     </section>
   )

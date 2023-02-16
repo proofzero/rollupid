@@ -1,7 +1,7 @@
 import React from 'react'
 import { Text } from '@kubelt/design-system'
 import type { AuthorizedProfile } from '~/types'
-import missingImage from '~/images/missing-img.svg'
+import missingImage from '../../../images/missing-img.svg'
 
 export const ApplicationUsers = ({
   authorizedProfiles,

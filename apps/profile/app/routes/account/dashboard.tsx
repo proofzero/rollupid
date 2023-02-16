@@ -11,7 +11,7 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import dashboardChart from '~/assets/dashboard_chart.svg'
 import { normalizeProfileToLinks } from '~/helpers'
 import { Tooltip } from 'flowbite-react'
-import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
+import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
 export default function Welcome() {
@@ -199,89 +199,98 @@ export default function Welcome() {
         <div className="flex-1 flex flex-col">
           <SectionTitle title="Applications" />
 
-          <div className="border shadow flex-1 flex flex-col rounded-lg">
-            <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-t-lg">
-              <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-                APPLICATION
-              </Text>
-              <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-                AUTHORIZED
-              </Text>
-            </div>
+          {appFetcher.type === 'done' && appFetcher.data?.error ? (
+            <NestedErrorPage />
+          ) : (
+            <div className="border shadow flex-1 flex flex-col rounded-lg">
+              <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-t-lg">
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="text-gray-500 flex-1"
+                >
+                  APPLICATION
+                </Text>
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="text-gray-500 flex-1"
+                >
+                  AUTHORIZED
+                </Text>
+              </div>
 
-            <div className="flex flex-1 flex-col">
-              {appFetcher.state !== 'idle' && (
-                <div className="flex flex-1 justify-center items-center">
-                  <Spinner />
-                </div>
-              )}
-              {appFetcher.type === 'done' && appFetcher.data?.error && (
-                <ErrorPage code="Oops" message="Something went wrong" />
-              )}
-              {appFetcher.type === 'done' &&
-                !appFetcher.data.error &&
-                appFetcher.data.apps.map(
-                  (a: { icon: string; title: string; timestamp: number }) => (
-                    <article
-                      key={a.title}
-                      className="flex items-center py-5 px-8"
-                    >
-                      <div className="flex-1 flex flex-row items-center space-x-4">
-                        <img
-                          src={a.icon}
-                          alt="app icon"
-                          className="w-6 h-6 rounded"
-                        />
+              <div className="flex flex-1 flex-col">
+                {appFetcher.state !== 'idle' && (
+                  <div className="flex flex-1 justify-center items-center">
+                    <Spinner />
+                  </div>
+                )}
+                {appFetcher.type === 'done' &&
+                  !appFetcher.data.error &&
+                  appFetcher.data.apps.map(
+                    (a: { icon: string; title: string; timestamp: number }) => (
+                      <article
+                        key={a.title}
+                        className="flex items-center py-5 px-8"
+                      >
+                        <div className="flex-1 flex flex-row items-center space-x-4">
+                          <img
+                            src={a.icon}
+                            alt="app icon"
+                            className="w-6 h-6 rounded"
+                          />
+
+                          <Text
+                            size="sm"
+                            weight="medium"
+                            className="text-gray-500 flex-1"
+                          >
+                            {a.title}
+                          </Text>
+                        </div>
 
                         <Text
                           size="sm"
                           weight="medium"
                           className="text-gray-500 flex-1"
                         >
-                          {a.title}
+                          {new Date(a.timestamp).toLocaleString('default', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                          })}
                         </Text>
-                      </div>
+                      </article>
+                    )
+                  )}
+              </div>
 
-                      <Text
-                        size="sm"
-                        weight="medium"
-                        className="text-gray-500 flex-1"
-                      >
-                        {new Date(a.timestamp).toLocaleString('default', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit',
-                        })}
-                      </Text>
-                    </article>
-                  )
-                )}
-            </div>
+              <div className="w-full px-8">
+                <div className="border-t border-gray-200"></div>
+              </div>
 
-            <div className="w-full px-8">
-              <div className="border-t border-gray-200"></div>
-            </div>
-
-            <div className="flex flex-row justify-center">
-              <Tooltip
-                content="Coming soon!"
-                trigger="hover"
-                data-tooltip-style="light"
-                style="light"
-              >
-                <Text
-                  size="sm"
-                  weight="medium"
-                  className="cursor-pointer text-indigo-500 my-4"
+              <div className="flex flex-row justify-center">
+                <Tooltip
+                  content="Coming soon!"
+                  trigger="hover"
+                  data-tooltip-style="light"
+                  style="light"
                 >
-                  View All
-                </Text>
-              </Tooltip>
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="cursor-pointer text-indigo-500 my-4"
+                  >
+                    View All
+                  </Text>
+                </Tooltip>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
