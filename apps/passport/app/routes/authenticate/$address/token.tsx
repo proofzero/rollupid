@@ -3,7 +3,7 @@ import type { AddressType, NodeType } from '@kubelt/types/address'
 import { CryptoAddressType } from '@kubelt/types/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
-import type { LoaderFunction } from '@remix-run/cloudflare'
+import { LoaderFunction, redirect } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
 import { getAccessClient } from '~/platform.server'
@@ -59,7 +59,10 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       redirectUri: consoleAppURI,
       state: appState,
       scope,
+      prompt,
     } = appData
+
+    if (appData?.prompt === 'login') return redirect(appData.redirectUri)
 
     const appParams = new URLSearchParams({
       client_id: appId,

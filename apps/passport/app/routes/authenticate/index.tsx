@@ -16,23 +16,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     : undefined
   const clientId = parsedParams?.clientId || undefined
 
-  let res = {}
   if (clientId) {
     const sbClient = getStarbaseClient('', context.env)
-    res = await sbClient.getAppPublicProps.query({ clientId })
+    return await sbClient.getAppPublicProps.query({ clientId })
   }
 
-  // If we have the prompt login param, we should prevent
-  // the connectCallback which can immediately
-  // take us to the sign screen when loading
-  if (parsedParams?.prompt === 'login') {
-    res = {
-      ...res,
-      preventConnectCallback: true,
-    }
-  }
-
-  return res
+  return null
 }
 
 export default function Authenticate() {
@@ -45,22 +34,12 @@ export default function Authenticate() {
   const name = loaderData?.name || undefined
   const iconURL = loaderData?.iconURL || undefined
 
-  const preventConnectCallback = loaderData?.preventConnectCallback
-
   return (
     <Authentication
       logoURL={iconURL}
       appName={name}
       enableWalletConnect={enableWalletConnect}
       connectCallback={async (address) => {
-        // This should stop the ConnectWallet
-        // from automagically redirecting
-        // to the signing page when
-        // requesting extra connection
-        // if already connected
-        // with ETH wallet
-        if (preventConnectCallback) return
-
         window.location.href = `/authenticate/${address}/sign`
       }}
       connectErrorCallback={(error) => {
