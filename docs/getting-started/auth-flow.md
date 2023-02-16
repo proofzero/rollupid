@@ -20,10 +20,10 @@ We have created a reference implementation using [Remix](https://remix.run/) and
 
 To begin the authentication flow you will need to redirect users to the [passport](../platform/passport.md) authorization endpoint and include the application id and a random state parameter in the query string so that it looks like this: `https://passport.rollup.id/authorize?client_id=<your app id>&state=<generated state>`
 
-Typically you would do this by redirecting users to a route in your application that redirects users to the above route.&#x20;
+Typically you would do this by redirecting users to a route in your application that redirects users to the above route.
 
 {% hint style="info" %}
-We do allow custom CNAMEs of passport for PRO accounts.&#x20;
+We do allow custom CNAMEs of passport for PRO accounts.
 {% endhint %}
 
 The state parameter should be persisted in a cookie or some other storage method so that it can be referred to in a later step. In our reference implementation the remix-oauth library [handles this for us](../../apps/profile/app/routes/auth/index.tsx).
@@ -36,15 +36,15 @@ When completed the user will then be redirected back to your app using the "Redi
 
 ### Step 2: Callback
 
-Your Redirect URL should be prepared to accept an exchange token and state parameters.&#x20;
+Your Redirect URL should be prepared to accept an exchange token and state parameters.
 
 ```
 // https://<redirect_url>?code=<exchange code>&state=<state>
 ```
 
-- **Code**: the exchange code needed request an access token
-- **State:** this state should match the state you created for the user/client in step 1
-- **Redirect URL**: the redirect url set in your app in the [previous step](create-an-application.md).
+* **Code**: the exchange code needed request an access token
+* **State:** this state should match the state you created for the user/client in step 1
+* **Redirect URL**: the redirect url set in your app in the [previous step](create-an-application.md).
 
 The state parameter should match the state you sent when you kicked off the auth flow in Step 1. This is a security measure in the auth protocol to prevent replay attacks. The exchange code is then sent with the **Application Secret** and the **grant type** to Passport's token endpoint in order to receive the access token and refresh token as base64 encoded signed JWT as well as a minimal user profile (encoded in an ID token) completing the flow.
 
@@ -52,29 +52,34 @@ The state parameter should match the state you sent when you kicked off the auth
 We use a javascript library called [jose](https://www.npmjs.com/package/jose) to encode and decode signed JWT. As an open standard there are libraries for all languages that do the same.
 {% endhint %}
 
-{% swagger method="post" path="" baseUrl="https://passport.rollup.id/token" summary="Exchange access code for access token" expanded="true" %}
+{% swagger method="post" path="" baseUrl="https://passport.rollup.id/token" summary="Exchange access code for access token" %}
 {% swagger-description %}
 Exchange access code for access token, refresh token and ID token.
 
 _(For more details visit the_ [_Passport API_](../platform/passport.md) _page)_
+
+_Code:_ [_https://github.com/proofzero/rollupid/blob/main/apps/passport/app/routes/token.tsx_](https://github.com/proofzero/rollupid/blob/main/apps/passport/app/routes/token.tsx)__
 {% endswagger-description %}
 
 {% swagger-parameter in="body" name="code" type="String" required="true" %}
 Exchange code
 {% endswagger-parameter %}
 
+{% swagger-parameter in="body" name="client_id" required="true" %}
+Application client id
+{% endswagger-parameter %}
+
 {% swagger-parameter in="body" name="client_secret" type="String" required="true" %}
-Application secret
+Application client secret
 {% endswagger-parameter %}
 
 {% swagger-parameter in="body" name="grant_type" type="String" required="true" %}
-"authorization_code" or&#x20;
+"authorization\_code" or
 
-"refresh_token"
+"refresh\_token"
 {% endswagger-parameter %}
 
 {% swagger-response status="201: Created" description="" %}
-
 ```javascript
 {
     access_token: "ey....",
@@ -83,11 +88,10 @@ Application secret
     id_token: "ey....",
 }
 ```
-
 {% endswagger-response %}
 {% endswagger %}
 
-Every access token is valid for **1 hour.** This expiry time is stored in the "exp" property in the JWT. \***\* On the other hand, the refresh token is valid for **90 days\*\* and can be used to request another access token using the same exchange code endpoint with the "refresh_token" grant type.&#x20;
+Every access token is valid for **1 hour.** This expiry time is stored in the "exp" property in the JWT. \*\*\*\* On the other hand, the refresh token is valid for \*\*90 days\*\* and can be used to request another access token using the same exchange code endpoint with the "refresh\_token" grant type.
 
 There are multiple ways to manage this refresh flow, [here](../../apps/profile/app/utils/session.server.tsx#L52) is our reference implementation. In summary, we store the tokens encrypted in a user cookie that is valid for 90 days and refresh when needed.
 
