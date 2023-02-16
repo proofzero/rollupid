@@ -8,7 +8,10 @@ import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import type { OAuthData } from '@kubelt/platform.address/src/types'
 import { MicrosoftStrategyDefaultName } from 'remix-auth-microsoft'
 import { authenticateAddress } from '~/utils/authenticate.server'
-import { getConsoleParamsSession } from '~/session.server'
+import {
+  getConsoleParamsSession,
+  getJWTConditionallyFromSession,
+} from '~/session.server'
 import cacheImageToCF from '~/utils/cacheImageToCF.server'
 
 export const loader: LoaderFunction = async ({
@@ -40,8 +43,10 @@ export const loader: LoaderFunction = async ({
     { alias: profile.displayName, hidden: 'true' }
   )
 
-  const addressClient = await getAddressClient(address, context.env, request)
-  const account = await addressClient.resolveAccount.query()
+  const addressClient = getAddressClient(address, context.env)
+  const account = await addressClient.resolveAccount.query({
+    jwt: await getJWTConditionallyFromSession(request, context.env),
+  })
   const existingOAuthData = await addressClient.getOAuthData.query()
 
   if (existingOAuthData?.profile == null) {

@@ -7,7 +7,10 @@ import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import type { OAuthData } from '@kubelt/platform.address/src/types'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
-import { getConsoleParamsSession } from '~/session.server'
+import {
+  getConsoleParamsSession,
+  getJWTConditionallyFromSession,
+} from '~/session.server'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -38,8 +41,11 @@ export const loader: LoaderFunction = async ({
     { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Google },
     { alias: profile._json.email, hidden: 'true' }
   )
-  const addressClient = await getAddressClient(address, context.env, request)
-  const account = await addressClient.resolveAccount.query()
+  const addressClient = getAddressClient(address, context.env)
+
+  const account = await addressClient.resolveAccount.query({
+    jwt: await getJWTConditionallyFromSession(request, context.env),
+  })
 
   await addressClient.setOAuthData.mutate(authRes)
 

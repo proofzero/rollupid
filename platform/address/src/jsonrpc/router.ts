@@ -3,6 +3,7 @@ import { initTRPC } from '@trpc/server'
 import { Context } from '../context'
 
 import {
+  ResolveAccountInput,
   resolveAccountMethod,
   ResolveAccountOutput,
 } from './methods/resolveAccount'
@@ -41,16 +42,12 @@ import { getAccountMethod, GetAccountOutput } from './methods/getAccount'
 import { InitVaultOutput, initVaultMethod } from './methods/initVault'
 import { checkOAuthNode } from './middlewares/checkOAuthNode'
 
-import {
-  Analytics,
-  CustomAnalyticsFunctionType,
-} from '@kubelt/platform-middleware/analytics'
+import { Analytics } from '@kubelt/platform-middleware/analytics'
 import { setAddressNodeClient } from './middlewares/setAddressNodeClient'
 import {
   SetAddressNicknameInput,
   setAddressNicknameMethod,
 } from './methods/setAddressNickname'
-import { AuthorizationTokenFromHeader } from '@kubelt/platform-middleware/jwt'
 
 const t = initTRPC.context<Context>().create()
 
@@ -81,8 +78,8 @@ export const appRouter = t.router({
     .use(setAddressNodeClient)
     .use(initAddressNode)
     // .use(injectCustomAnalytics)
-    .use(AuthorizationTokenFromHeader)
     .use(Analytics)
+    .input(ResolveAccountInput)
     .output(ResolveAccountOutput)
     .query(resolveAccountMethod),
   getAccount: t.procedure

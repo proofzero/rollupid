@@ -27,8 +27,8 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     { alias: address }
   )
 
-  const addressClient = await getAddressClient(addressURN, context.env, request)
-  const account = await addressClient.resolveAccount.query()
+  const addressClient = getAddressClient(addressURN, context.env)
+  const account = await addressClient.getAccount.query()
 
   const appData = await getConsoleParamsSession(request, context.env)
     .then((session) => JSON.parse(session.get('params')))

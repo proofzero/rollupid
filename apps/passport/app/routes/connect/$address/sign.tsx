@@ -15,6 +15,7 @@ import { getAddressClient } from '~/platform.server'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { CryptoAddressType, NodeType } from '@kubelt/types/address'
+import { getJWTConditionallyFromSession } from '~/session.server'
 
 export const signMessageTemplate = `Welcome to Rollup!
 
@@ -36,7 +37,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     { alias: address }
   )
 
-  const addressClient = await getAddressClient(addressURN, context.env, request)
+  const addressClient = getAddressClient(addressURN, context.env)
   try {
     const nonce = await addressClient.getNonce.query({
       address: address as string,
@@ -61,13 +62,14 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     { node_type: NodeType.Crypto, addr_type: CryptoAddressType.ETH },
     { alias: address }
   )
-  const addressClient = await getAddressClient(addressURN, context.env, request)
+  const addressClient = getAddressClient(addressURN, context.env)
   const formData = await request.formData()
 
   // TODO: validate from data
   const { code } = await addressClient.verifyNonce.mutate({
     nonce: formData.get('nonce') as string,
     signature: formData.get('signature') as string,
+    jwt: await getJWTConditionallyFromSession(request, context.env),
   })
 
   // TODO: handle the error case

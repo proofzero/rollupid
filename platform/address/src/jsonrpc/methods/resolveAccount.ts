@@ -13,8 +13,13 @@ import { WriteAnalyticsDataPoint } from '@kubelt/platform-clients/analytics'
 
 import * as jose from 'jose'
 
+export const ResolveAccountInput = z.object({
+  jwt: z.string().optional(),
+})
+
 export const ResolveAccountOutput = AccountURNInput
 
+type ResolveAccountParams = z.infer<typeof ResolveAccountInput>
 type ResolveAccountResult = z.infer<typeof ResolveAccountOutput>
 
 // NOTE: this method should only be called for new users
@@ -22,7 +27,7 @@ export const resolveAccountMethod = async ({
   input,
   ctx,
 }: {
-  input: unknown
+  input: ResolveAccountParams
   ctx: Context
 }): Promise<ResolveAccountResult> => {
   const nodeClient = ctx.address
@@ -32,8 +37,8 @@ export const resolveAccountMethod = async ({
   let resultURN = await nodeClient?.storage.get<AccountURN>('account')
   if (!resultURN) {
     let urn: AccountURN
-    if (ctx.token) {
-      const decodedJwt = jose.decodeJwt(ctx.token)
+    if (input.jwt) {
+      const decodedJwt = jose.decodeJwt(input.jwt)
       urn = decodedJwt.sub as AccountURN
     } else {
       const name = hexlify(randomBytes(ACCOUNT_OPTIONS.length))

@@ -15,7 +15,10 @@ import type { AppleExtraParams } from '~/utils/applestrategy.server'
 import { initAuthenticator, getAppleStrategy } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
-import { getConsoleParamsSession } from '~/session.server'
+import {
+  getConsoleParamsSession,
+  getJWTConditionallyFromSession,
+} from '~/session.server'
 
 type AppleUser = {
   email: string
@@ -75,8 +78,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Apple },
     { alias: profile.email, hidden: 'true' }
   )
-  const addressClient = await getAddressClient(address, context.env, request)
-  const account = await addressClient.resolveAccount.query()
+  const addressClient = getAddressClient(address, context.env)
+  const account = await addressClient.resolveAccount.query({
+    jwt: await getJWTConditionallyFromSession(request, context.env),
+  })
   const current = await addressClient.getOAuthData.query()
 
   if (current) {

@@ -155,6 +155,16 @@ export async function requireJWT(
   return jwt
 }
 
+export async function getJWTConditionallyFromSession(
+  request: Request,
+  env: Env
+): Promise<string | undefined> {
+  const session = await getUserSession(request, env)
+  const jwt = session.get('jwt')
+
+  return jwt
+}
+
 export function parseJwt(token: string): JWTPayload {
   const payload = jose.decodeJwt(token)
   if (!payload) {
