@@ -254,7 +254,7 @@ const SortableLink = ({
           heading="Name"
           placeholder="My Website"
           defaultValue={nameInput}
-          onChange={(e) => setNameInput(e.target.value)}
+          onChange={(val) => setNameInput(val)}
           error={error ? error['name'] : ''}
         />
       </div>
@@ -271,7 +271,7 @@ const SortableLink = ({
           heading="URL"
           defaultValue={urlInput}
           placeholder="https://mywebsite.com"
-          onChange={(e) => setUrlInput(e.target.value)}
+          onChange={(val) => setUrlInput(val)}
           error={error ? error['url'] : ''}
         />
       </div>
