@@ -76,7 +76,7 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
   })
 
   if (!profile) {
-    console.log("Profile doesn't exist, creating one...")
+    console.log(`Profile doesn't exist for account ${account}. Creating one...`)
     const addressClient = await getAddressClient(address, env)
     const newProfile = await addressClient.getAddressProfile
       .query()
@@ -160,11 +160,12 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
             )
         }
       })
-
     // set the default profile
     await accountClient.setProfile.mutate({
       name: account,
       profile: newProfile,
     })
+  } else {
+    console.log(`Profile for account ${account} found. Continuing...`)
   }
 }

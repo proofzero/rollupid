@@ -42,7 +42,7 @@ import { getProfileSession } from './utils/session.server'
 import { getRedirectUrlForProfile } from './utils/redirects.server'
 import { parseJwt } from './utils/session.server'
 import { getAccountProfile } from './helpers/profile'
-import { AccountURNSpace } from '@kubelt/urns/account'
+import { AccountURN } from '@kubelt/urns/account'
 import type { FullProfile } from './types'
 
 export const meta: MetaFunction = () => ({
@@ -89,11 +89,12 @@ export const loader: LoaderFunction = async ({ request }) => {
       user: { accessToken: jwt },
     } = session.data
 
-    accountURN = AccountURNSpace.parse(
-      parseJwt(jwt).sub as `urn:${string}:${string}${string}`
-    ).decoded
+    accountURN = parseJwt(jwt).sub as AccountURN
 
     const fetchedLoggedInProfile = await getAccountProfile(jwt)
+
+    if (!fetchedLoggedInProfile)
+      throw new Error('Could not retrieve logged in use profile.')
 
     loggedInUserProfile = {
       ...fetchedLoggedInProfile.profile,
@@ -101,9 +102,6 @@ export const loader: LoaderFunction = async ({ request }) => {
       gallery: fetchedLoggedInProfile.gallery,
       addresses: fetchedLoggedInProfile.connectedAddresses,
     }
-
-    if (!loggedInUserProfile)
-      throw new Error('Could not retrieve logged in use profile.')
 
     basePath = getRedirectUrlForProfile(loggedInUserProfile)
   }
@@ -213,7 +211,7 @@ export default function App() {
 // https://remix.run/docs/en/v1/guides/errors
 // @ts-ignore
 export function ErrorBoundary({ error }) {
-  console.error('ERROR', { error })
+  console.error('Error caught in root error boundary', { error })
   return (
     <html lang="en">
       <head>

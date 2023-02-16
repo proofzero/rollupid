@@ -2,7 +2,7 @@ import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import { GraphQLYogaError } from '@graphql-yoga/common'
 
 import { AddressURN } from '@kubelt/urns/address'
-import { AccountURNSpace } from '@kubelt/urns/account'
+import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
 
 import { Resolvers } from './typedefs'
 import Env from '../../env'
@@ -112,8 +112,7 @@ const nftsResolvers: Resolvers = {
       )
       let contracts: any[] = []
 
-      const accountURN = AccountURNSpace.componentizedUrn(owner)
-
+      const accountURN = owner as AccountURN
       const addresses = (
         (await getConnectedAddresses({
           accountURN,

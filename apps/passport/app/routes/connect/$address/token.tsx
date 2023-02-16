@@ -1,4 +1,3 @@
-import { GrantType } from '@kubelt/types/access'
 import type { AddressType, NodeType } from '@kubelt/types/address'
 import { CryptoAddressType } from '@kubelt/types/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
@@ -28,7 +27,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   )
 
   const addressClient = getAddressClient(addressURN, context.env)
-  const account = await addressClient.getAccount.query()
+  const accountURN = await addressClient.getAccount.query()
 
   const appData = await getConsoleParamsSession(request, context.env)
     .then((session) => JSON.parse(session.get('params')))
@@ -37,5 +36,5 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       return null
     })
 
-  return authenticateAddress(addressURN, account, appData, context.env)
+  return authenticateAddress(addressURN, accountURN, appData, context.env)
 }
