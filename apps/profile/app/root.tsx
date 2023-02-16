@@ -42,7 +42,7 @@ import { getProfileSession } from './utils/session.server'
 import { getRedirectUrlForProfile } from './utils/redirects.server'
 import { parseJwt } from './utils/session.server'
 import { getAccountProfile } from './helpers/profile'
-import { AccountURN } from '@kubelt/urns/account'
+import type { AccountURN } from '@kubelt/urns/account'
 import type { FullProfile } from './types'
 
 export const meta: MetaFunction = () => ({

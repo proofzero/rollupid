@@ -43,20 +43,13 @@ import NoCryptoAddresses from '~/components/accounts/NoCryptoAddresses'
 // Other helpers
 import { getProfileSession } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
-import { AddressURNSpace } from '@kubelt/urns/address'
-import { generateHashedIDRef } from '@kubelt/urns/idref'
 import type { Node, Profile } from '@kubelt/galaxy-client'
-import { CryptoAddressType } from '@kubelt/types/address'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import type { decoratedNft } from '~/helpers/nfts'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
-  const targetAddress = formData.get('address')?.toString() || ''
-  const urn = AddressURNSpace.urn(
-    generateHashedIDRef(CryptoAddressType.ETH, targetAddress)
-  )
   const session = await getProfileSession(request)
   const user = session.get('user')
 
@@ -85,11 +78,6 @@ export const action: ActionFunction = async ({ request }) => {
     }
     if (!nft.chain?.network) {
       errors.set(`network-${nft.tokenId}`, ['Nft should have network'])
-    }
-    if (!urn || urn.length === 0) {
-      errors.set(`${nft.contract?.address}-${nft.tokenId}`, [
-        'URN should not be empty',
-      ])
     }
 
     if (nft.error) {
@@ -475,7 +463,6 @@ const Gallery = () => {
             name="gallery"
             value={JSON.stringify(curatedNfts)}
           />
-          <input type="hidden" name="address" value={targetAddresses[0]} />
 
           {/* Form where this button is used should have 
           an absolute relative position
