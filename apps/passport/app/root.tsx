@@ -153,6 +153,7 @@ export function ErrorBoundary({ error }) {
             message="Something went terribly wrong!"
             trace={error?.stack}
             error={error}
+            pepe={false}
           />
         </div>
 
