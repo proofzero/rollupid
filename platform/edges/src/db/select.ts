@@ -41,7 +41,7 @@ export async function qc(g: GraphDB, nodeId: AnyURN): Promise<QComponents> {
     FROM
       node_qcomp
     WHERE
-      nodeUrn = ?1
+      nodeUrn = ?
   `
   const qcomp = await g.db
     .prepare(query)
@@ -77,7 +77,7 @@ export async function rc(g: GraphDB, nodeId: AnyURN): Promise<RComponents> {
     FROM
       node_rcomp
     WHERE
-      nodeUrn = ?1
+      nodeUrn = ?
   `
   const rcomp = await g.db
     .prepare(query)
@@ -110,7 +110,7 @@ export async function node(
     FROM
       node
     WHERE
-      urn = ?1
+      urn = ?
   `
   const node = await g.db.prepare(query).bind(nodeId.toString()).first<Node>()
 
@@ -160,18 +160,20 @@ export async function edges(
   if (query.id) {
     switch (query.dir) {
       case Graph.EdgeDirection.Incoming:
-        sql = `SELECT * FROM edge e WHERE (e.dst = ?1)`
+        sql = `SELECT * FROM edge e WHERE (e.dst = ?)`
         break
       case Graph.EdgeDirection.Outgoing:
-        sql = `SELECT * FROM edge e WHERE (e.src = ?1)`
+        sql = `SELECT * FROM edge e WHERE (e.src = ?)`
         break
       default:
-        sql = `SELECT * FROM edge e WHERE (e.src = ?1 OR e.dst = ?1)`
+        throw 'no direction currently not supported. see https://github.com/cloudflare/miniflare/issues/504'
+      // default:
+      //   sql = `SELECT * FROM edge e WHERE (e.src = ? OR e.dst = ?)`
     }
 
     // Filter edges by tag, if provided.
     if (query.tag) {
-      sql += ' AND e.tag = ?2 ORDER BY createdTimestamp ASC'
+      sql += ' AND e.tag = ? ORDER BY createdTimestamp ASC'
       statement = g.db.prepare(sql).bind(query.id.toString(), query.tag)
     } else {
       sql += ' ORDER BY createdTimestamp ASC'
@@ -181,7 +183,7 @@ export async function edges(
     sql = `SELECT * FROM edge e`
 
     if (query.tag) {
-      sql += ' WHERE e.tag = ?1 ORDER BY createdTimestamp ASC'
+      sql += ' WHERE e.tag = ? ORDER BY createdTimestamp ASC'
       statement = g.db.prepare(sql).bind(query.tag)
     } else {
       sql += ' ORDER BY createdTimestamp ASC'
@@ -342,7 +344,7 @@ export async function edges(
 export async function incoming(g: GraphDB, nodeId: AnyURN): Promise<Edge[]> {
   return new Promise((resolve, reject) => {
     g.db
-      .prepare('SELECT * FROM edge WHERE dst = ?1')
+      .prepare('SELECT * FROM edge WHERE dst = ?')
       .bind(nodeId.toString())
       .all()
       .then((result) => {
@@ -363,7 +365,7 @@ export async function incoming(g: GraphDB, nodeId: AnyURN): Promise<Edge[]> {
 export async function outgoing(g: GraphDB, nodeId: AnyURN): Promise<Edge[]> {
   return new Promise((resolve, reject) => {
     g.db
-      .prepare('SELECT * FROM edge WHERE src = ?1')
+      .prepare('SELECT * FROM edge WHERE src = ?')
       .bind(nodeId.toString())
       .all()
       .then((result) => {

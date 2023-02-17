@@ -31,7 +31,7 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
 
   await g.db
     .prepare(
-      'INSERT INTO node (urn, nid, nss, fragment) VALUES (?1, ?2, ?3, ?4) \
+      'INSERT INTO node (urn, nid, nss, fragment) VALUES (?, ?, ?, ?) \
         ON CONFLICT(urn) DO UPDATE SET fragment = excluded.fragment'
     )
     .bind(id, nid, nss, fc)
@@ -47,7 +47,7 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
     // Add an entry to the join table for each q-component row that is
     // used in the node URN.
     const qcJoinStmt = g.db.prepare(
-      'INSERT INTO node_qcomp (nodeUrn, key, value) VALUES (?1, ?2, ?3) \
+      'INSERT INTO node_qcomp (nodeUrn, key, value) VALUES (?, ?, ?) \
         ON CONFLICT(nodeUrn, key) DO UPDATE SET value=excluded.value'
     )
     const stmts = []
@@ -69,7 +69,7 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
     // Add an entry to the join table for each q-component row that is
     // used in the node URN.
     const rcJoinStmt = g.db.prepare(
-      'INSERT INTO node_rcomp (nodeUrn, key, value) VALUES (?1, ?2, ?3) \
+      'INSERT INTO node_rcomp (nodeUrn, key, value) VALUES (?, ?, ?) \
         ON CONFLICT(nodeUrn, key) DO UPDATE SET value=excluded.value'
     )
     const stmts = []
@@ -81,7 +81,7 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
 
   // Get the ID of the inserted node.
   const node = g.db
-    .prepare('SELECT * FROM node WHERE urn = ?1')
+    .prepare('SELECT * FROM node WHERE urn = ?')
     .bind(id)
     .first() as unknown
 
@@ -116,9 +116,9 @@ export async function edge(
         tag
       )
       VALUES (
-        ?1,
-        ?2,
-        ?3
+        ?,
+        ?,
+        ?
       )
       ON CONFLICT DO NOTHING
     `
@@ -134,9 +134,7 @@ export async function edge(
         }
 
         const edge = await g.db
-          .prepare(
-            'SELECT * FROM edge WHERE src = ?1 AND dst = ?2 AND tag = ?3'
-          )
+          .prepare('SELECT * FROM edge WHERE src = ? AND dst = ? AND tag = ?')
           .bind(srcParam, dstParam, tagParam)
           .first()
 
