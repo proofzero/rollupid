@@ -115,7 +115,7 @@ const nftsResolvers: Resolvers = {
         excludeFilters,
       })
 
-      const result = await normalizeContractsForAllChains([
+      const result = normalizeContractsForAllChains([
         {
           chain: AlchemyChain.ethereum,
           contracts: contracts.ethereum,
