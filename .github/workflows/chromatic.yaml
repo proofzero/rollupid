@@ -11,7 +11,32 @@ on:
 
 # List of jobs
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      profile: ${{ steps.changes.outputs.profile }}
+      passport: ${{ steps.changes.outputs.passport }}
+      console: ${{ steps.changes.outputs.console }}
+      design: ${{ steps.changes.outputs.design }}
+    steps:
+      # find out what deploy stack to use
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: storybook
+        with:
+          filters: |
+            profile:
+              - 'apps/profile/app/components/**'
+            passport:
+              - 'apps/passport/app/components/**'
+            console:
+              - 'apps/console/app/components/**'
+            design: 
+              - 'packages/design-system/src/**'
+
   chromatic-deployment-design-system:
+    needs: changes
+    if: needs.changes.outputs.design == 'true'
     # Operating System
     runs-on: ubuntu-latest
     # Job steps
@@ -28,7 +53,10 @@ jobs:
           projectToken: ${{ secrets.TOKEN_CHROMATIC_DESIGN_SYSTEM_PROJECT }}
           onlyChanged: true
           workingDir: packages/design-system
+
   chromatic-deployment-passport:
+    needs: changes
+    if: needs.changes.outputs.passport == 'true'
     # Operating System
     runs-on: ubuntu-latest
     # Job steps
@@ -45,7 +73,10 @@ jobs:
           projectToken: ${{ secrets.TOKEN_CHROMATIC_PASSPORT_PROJECT }}
           onlyChanged: true
           workingDir: apps/passport
+
   chromatic-deployment-profile:
+    needs: changes
+    if: needs.changes.outputs.profile == 'true'
     # Operating System
     runs-on: ubuntu-latest
     # Job steps
@@ -62,7 +93,10 @@ jobs:
           projectToken: ${{ secrets.TOKEN_CHROMATIC_THREEID_PROJECT }}
           onlyChanged: true
           workingDir: apps/profile
+
   chromatic-deployment-console:
+    needs: changes
+    if: needs.changes.outputs.console == 'true'
     # Operating System
     runs-on: ubuntu-latest
     # Job steps
