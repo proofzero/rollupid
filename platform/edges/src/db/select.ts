@@ -168,7 +168,7 @@ export async function edges(
       default:
         throw 'no direction currently not supported. see https://github.com/cloudflare/miniflare/issues/504'
       // default:
-      //   sql = `SELECT * FROM edge e WHERE (e.src = ? OR e.dst = ?)`
+      //   sql = `SELECT * FROM edge e WHERE (e.src = ?1 OR e.dst = ?1)`
     }
 
     // Filter edges by tag, if provided.
