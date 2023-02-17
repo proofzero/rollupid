@@ -11,7 +11,32 @@ on:
 
 # List of jobs
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      profile: ${{ steps.changes.outputs.profile }}
+      passport: ${{ steps.changes.outputs.passport }}
+      console: ${{ steps.changes.outputs.console }}
+      design: ${{ steps.changes.outputs.design }}
+    steps:
+      # find out what deploy stack to use
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: storybook
+        with:
+          filters: |
+            profile:
+              - 'apps/profile/app/components/**'
+            passport:
+              - 'apps/passport/app/components/**'
+            console:
+              - 'apps/console/app/components/**'
+            design: 
+              - 'packages/design-system/src/**'
+
   chromatic-deployment-design-system:
+    needs: changes
+    if: needs.changes.outputs.storybook == 'true'
     # Operating System
     runs-on: ubuntu-latest
     # Job steps
