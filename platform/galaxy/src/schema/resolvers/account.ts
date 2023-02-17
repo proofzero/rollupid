@@ -128,7 +128,7 @@ const accountResolvers: Resolvers = {
         )
         // Removal
         if (gallery.length !== filteredGallery.length) {
-          await accountClient.setGallery.mutate({
+          accountClient.setGallery.mutate({
             name: accountURN,
             gallery: filteredGallery,
           })
@@ -285,7 +285,7 @@ const accountResolvers: Resolvers = {
         )
 
         if (gallery.length !== filteredGallery.length) {
-          await accountClient.setGallery.mutate({
+          accountClient.setGallery.mutate({
             name: accountURN,
             gallery: filteredGallery,
           })

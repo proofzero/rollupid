@@ -115,23 +115,13 @@ const nftsResolvers: Resolvers = {
         excludeFilters,
       })
 
-      const { ethereumNfts, polygonNfts } = await nftBatchesFetcherForAllChains(
+      const result = await normalizeContractsForAllChains([
         {
-          contracts,
-          addresses,
-          alchemyClients,
-        }
-      )
-
-      const result = normalizeContractsForAllChains([
-        {
-          nfts: ethereumNfts,
           chain: AlchemyChain.ethereum,
           contracts: contracts.ethereum,
           network: env.ALCHEMY_ETH_NETWORK,
         },
         {
-          nfts: polygonNfts,
           chain: AlchemyChain.polygon,
           network: env.ALCHEMY_POLYGON_NETWORK,
           contracts: contracts.polygon,
