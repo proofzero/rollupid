@@ -10,8 +10,9 @@ import {
   hasApiKey,
   logAnalytics,
   getConnectedAddresses,
-  getAlchemyClients,
+  getConnectedCryptoAddresses,
   temporaryConvertToPublic,
+  validOwnership,
 } from './utils'
 
 import { Resolvers } from './typedefs'
@@ -96,7 +97,7 @@ const accountResolvers: Resolvers = {
 
       return links
     },
-
+    //@ts-ignore
     gallery: async (
       _parent: any,
       {},
@@ -108,11 +109,35 @@ const accountResolvers: Resolvers = {
         getAuthzHeaderConditionallyFromToken(jwt)
       )
 
-      let gallery = await accountClient.getGallery.query({
+      const connectedAddresses = await getConnectedCryptoAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
+      })
+
+      const gallery = await accountClient.getGallery.query({
         account: accountURN,
       })
 
-      return gallery
+      // Validation
+      if (gallery) {
+        const filteredGallery = await validOwnership(
+          gallery,
+          env,
+          connectedAddresses
+        )
+        // Removal
+        if (gallery.length !== filteredGallery.length) {
+          accountClient.setGallery.mutate({
+            name: accountURN,
+            gallery: filteredGallery,
+          })
+        }
+
+        return filteredGallery
+      }
+      // if there is no gallery
+      return []
     },
 
     connectedAddresses: async (
@@ -120,7 +145,7 @@ const accountResolvers: Resolvers = {
       {},
       { env, accountURN, jwt }: ResolverContext
     ) => {
-      const addresses = getConnectedAddresses({
+      const addresses = await getConnectedAddresses({
         accountURN,
         Account: env.Account,
         jwt,
@@ -215,12 +240,13 @@ const accountResolvers: Resolvers = {
 
       return linksFromAddress
     },
-
+    //@ts-ignore
     galleryFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
       { env, jwt }: ResolverContext
     ) => {
+      console.log("galaxy.galleryFromAddress: getting account's gallery")
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
       })
@@ -240,13 +266,35 @@ const accountResolvers: Resolvers = {
         getAuthzHeaderConditionallyFromToken(jwt)
       )
 
-      console.log("galaxy.galleryFromAddress: getting account's gallery")
-      // should also return the handle if it exists
-      const galleryFromAddress = await accountClient.getGallery.query({
-        account: accountURN,
+      const connectedAddresses = await getConnectedCryptoAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
       })
 
-      return galleryFromAddress
+      // should also return the handle if it exists
+      const gallery = await accountClient.getGallery.query({
+        account: accountURN,
+      })
+      if (gallery) {
+        // Validation
+        const filteredGallery = await validOwnership(
+          gallery,
+          env,
+          connectedAddresses
+        )
+
+        if (gallery.length !== filteredGallery.length) {
+          accountClient.setGallery.mutate({
+            name: accountURN,
+            gallery: filteredGallery,
+          })
+        }
+
+        return filteredGallery
+      }
+      // if there is no gallery
+      return []
     },
 
     connectedAddressesFromAddress: async (
@@ -337,7 +385,7 @@ const accountResolvers: Resolvers = {
       { env, jwt, accountURN }: ResolverContext
     ) => {
       console.log(
-        `galaxy.updateProfile: updating profile for account: ${accountURN}`
+        `galaxy.updateGallery: updating gallery for account: ${accountURN}`
       )
 
       const accountClient = createAccountClient(
@@ -345,46 +393,22 @@ const accountResolvers: Resolvers = {
         getAuthzHeaderConditionallyFromToken(jwt)
       )
 
-      const connectedAddresses = (
-        (await getConnectedAddresses({
-          accountURN,
-          Account: env.Account,
-          jwt,
-        })) || []
-      )
-        .filter((address) =>
-          [NodeType.Crypto, NodeType.Vault].includes(address.rc.node_type)
-        )
-        .map((address) => address.qc.alias.toLowerCase())
-
-      // GALLERY VALIDATION
-      const { ethereumClient, polygonClient } = getAlchemyClients({ env })
-
-      const owners: any = await Promise.all(
-        gallery.map(async (token) => {
-          const [ethereumOwners, polygonOwners]: any = await Promise.all([
-            ethereumClient.getOwnersForToken({
-              tokenId: token.tokenId,
-              contractAddress: token.contract,
-            }),
-            polygonClient.getOwnersForToken({
-              tokenId: token.tokenId,
-              contractAddress: token.contract,
-            }),
-          ])
-          return ethereumOwners.owners.concat(polygonOwners.owners)
-        })
-      )
-
-      gallery = gallery.filter((nft, i) => {
-        return connectedAddresses.some((address) => {
-          return owners[i].includes(address)
-        })
+      const connectedAddresses = await getConnectedCryptoAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
       })
+
+      // Validation
+      const filteredGallery = await validOwnership(
+        gallery,
+        env,
+        connectedAddresses
+      )
 
       await accountClient.setGallery.mutate({
         name: accountURN,
-        gallery,
+        gallery: filteredGallery,
       })
 
       return true

@@ -113,6 +113,13 @@ export class AlchemyClient {
     )
   }
 
+  getChain() {
+    return {
+      chain: this.#config.chain,
+      network: this.#config.network,
+    }
+  }
+
   constructor(config: AlchemyClientConfig) {
     if (!config || (!config.key && !config.token) || !config.network) {
       throw buildError(
@@ -293,10 +300,7 @@ export class AlchemyClient {
   ): Promise<GetNFTMedatadaBatchResult | unknown> {
     const url = this.getNFTAPIURL('getNFTMetadataBatch/')
 
-    console.log({ tokens: params })
-
     const urlStr = url.toString()
-    console.log(urlStr)
     const cacheKeyDigest = await crypto.subtle.digest(
       {
         name: 'SHA-256',
@@ -307,34 +311,37 @@ export class AlchemyClient {
     const cacheKey = cacheKeyArray
       .map((b) => b.toString(16).padStart(2, '0'))
       .join('')
-    return fetch(urlStr, {
-      method: 'POST',
-      cf: {
-        cacheTtl: 1500,
-        cacheEverything: true,
-        cacheKey,
-      },
-      body: JSON.stringify({
-        tokens: params,
-      }),
-    })
-      .then(async (r) => {
-        if (r.status !== 200) {
-          const errorText = await r.text()
-          console.error(errorText)
+    if (params?.length) {
+      return fetch(urlStr, {
+        method: 'POST',
+        cf: {
+          cacheTtl: 1500,
+          cacheEverything: true,
+          cacheKey,
+        },
+        body: JSON.stringify({
+          tokens: params,
+        }),
+      })
+        .then(async (r) => {
+          if (r.status !== 200) {
+            const errorText = await r.text()
+            console.error(errorText)
+            throw buildError(
+              r.status,
+              `Error calling Alchemy getNFTMetadataBatch: ${errorText}`
+            )
+          }
+          return r.json()
+        })
+        .catch((e) => {
           throw buildError(
-            r.status,
-            `Error calling Alchemy getNFTMetadataBatch: ${errorText}`
+            e.status,
+            `Error calling Alchemy getNFTMetadataBatch: ${e.message}`
           )
-        }
-        return r.json()
-      })
-      .catch((e) => {
-        throw buildError(
-          e.status,
-          `Error calling Alchemy getNFTMetadataBatch: ${e.message}`
-        )
-      })
+        })
+    }
+    return []
   }
 }
 

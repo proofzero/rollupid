@@ -25,6 +25,10 @@ query getNftsForAddress($owner: String!, $contractAddresses: [String]) {
         name
         tokenType
       }
+      chain {
+        chain
+        network
+      }
     }
   }
 }
@@ -109,6 +113,10 @@ query getNFTMetadata($input: [NFTMetadataInput]) {
       contractMetadata {
         name
         tokenType
+      }
+      chain {
+        chain
+        network
       }
     }
   }

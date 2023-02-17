@@ -7,7 +7,6 @@ import NftGrid from '../../grid'
 import ModaledNft from '../../interactible/modaled'
 
 export type UnfilteredNftGridProps = {
-  account: string
   nfts: any[]
   pfp?: string
   isOwner?: boolean
@@ -39,7 +38,6 @@ const UnfilteredNftGrid = ({
   nfts = [],
   loadingConditions,
   isOwner = true,
-  account,
   getMoreNfts,
   pageKey,
   displayText,
@@ -49,9 +47,7 @@ const UnfilteredNftGrid = ({
   preload = false,
   handleSelectedNft,
   handleRedirect,
-  nftRenderer = (nft) => (
-    <ModaledNft nft={nft} isModal={isModalNft} account={account} />
-  ),
+  nftRenderer = (nft) => <ModaledNft nft={nft} isModal={isModalNft} />,
   nftGrid = <LoadingGrid />,
 }: UnfilteredNftGridProps) => {
   const [displayedNfts, setDisplayedNfts] = useState(nfts)
@@ -135,10 +131,8 @@ const UnfilteredNftGrid = ({
           <NftGrid
             nfts={displayedNfts}
             loadingConditions={loadingConditions}
-            account={account}
             getMoreNfts={getMoreNfts}
             pageKey={pageKey}
-            isModalNft={isModalNft}
             preload={preload}
             nftRenderer={nftRenderer}
             handleSelectedNft={handleSelectedNft}

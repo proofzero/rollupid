@@ -4,7 +4,7 @@ import { GraphQLYogaError } from '@graphql-yoga/common'
 import { AddressURN } from '@kubelt/urns/address'
 import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
 
-import { Resolvers } from './typedefs'
+import { NftContract, NfTs, Resolvers } from './typedefs'
 import Env from '../../env'
 import {
   AlchemyChain,
@@ -17,12 +17,14 @@ import {
   hasApiKey,
   setupContext,
   logAnalytics,
-  getAllNfts,
+  logNFTBatchAnalytics,
+  sortNftsAlphabetically,
+  getNftsForAllChains,
   getAlchemyClients,
-  nftBatchesFetcher,
-  beautifyContracts,
-  getConnectedAddresses,
-  fetchContracts,
+  getNftMetadataForAllChains,
+  normalizeContractsForAllChains,
+  getConnectedCryptoAddresses,
+  getContractsForAllChains,
 } from './utils'
 
 type ResolverContext = {
@@ -54,43 +56,27 @@ const nftsResolvers: Resolvers = {
         'BEFORE',
         owner
       )
-      let ownedNfts: any[] = []
 
       const accountURN = owner as AccountURN
 
-      const addresses = (
-        (await getConnectedAddresses({
-          accountURN,
-          Account: env.Account,
-          jwt,
-        })) || []
+      const addresses = await getConnectedCryptoAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
+      })
+
+      const alchemyClients = getAlchemyClients({ env })
+
+      const ownedNfts = await getNftsForAllChains(
+        alchemyClients,
+        addresses,
+        contractAddresses
       )
-        .filter((address) =>
-          [NodeType.Crypto, NodeType.Vault].includes(address.rc.node_type)
-        )
-        .map((address) => address.qc.alias.toLowerCase())
 
-      try {
-        const { ethereumClient, polygonClient } = getAlchemyClients({ env })
-
-        const [ethNfts, polyNfts] = await Promise.all([
-          getAllNfts(ethereumClient, addresses, contractAddresses),
-          getAllNfts(polygonClient, addresses, contractAddresses),
-        ])
-
-        ownedNfts = ownedNfts.concat(ethNfts, polyNfts)
-      } catch (ex) {
-        console.error(new GraphQLYogaError(ex as string))
-      }
-
-      ownedNfts = ownedNfts.sort((a, b) =>
-        (a.contractMetadata?.name ?? '').localeCompare(
-          b.contractMetadata?.name ?? ''
-        )
-      )
+      const sortedOwnedNfts = sortNftsAlphabetically(ownedNfts)
 
       return {
-        ownedNfts,
+        ownedNfts: sortedOwnedNfts,
       }
     },
     //@ts-ignore
@@ -110,75 +96,39 @@ const nftsResolvers: Resolvers = {
       console.log(
         `galaxy.contractsForAddress: getting contracts for account: ${owner}`
       )
-      let contracts: any[] = []
 
       const accountURN = owner as AccountURN
-      const addresses = (
-        (await getConnectedAddresses({
-          accountURN,
-          Account: env.Account,
-          jwt,
-        })) || []
-      )
-        .filter((address) =>
-          [NodeType.Crypto, NodeType.Vault].includes(address.rc.node_type)
-        )
-        .map((address) => address.qc.alias.toLowerCase())
+      const addresses: string[] = await getConnectedCryptoAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
+      })
 
-      try {
-        const { ethereumClient, polygonClient } = getAlchemyClients({ env })
+      const alchemyClients = getAlchemyClients({ env })
+      const contracts: {
+        ethereum: NftContract[]
+        polygon: NftContract[]
+      } = await getContractsForAllChains({
+        addresses,
+        alchemyClients,
+        excludeFilters,
+      })
 
-        const {
-          ethereumContracts,
-          polygonContracts,
-        }: { ethereumContracts: any; polygonContracts: any } =
-          await fetchContracts({
-            addresses,
-            ethereumClient,
-            polygonClient,
-            excludeFilters,
-          })
-
-        // This way in each nested collection we have its own Promise.all
-        // And one common Promise.all on top of them.
-        const [ethNFTs, polygonNFTs] = await Promise.all([
-          Promise.all(
-            await nftBatchesFetcher({
-              contracts: ethereumContracts.contracts,
-              addresses,
-              alchemyClient: ethereumClient,
-            })
-          ),
-          Promise.all(
-            await nftBatchesFetcher({
-              contracts: polygonContracts.contracts,
-              addresses,
-              alchemyClient: polygonClient,
-            })
-          ),
-        ])
-
-        ethereumContracts.contracts = beautifyContracts({
-          nfts: ethNFTs,
+      const result = normalizeContractsForAllChains([
+        {
           chain: AlchemyChain.ethereum,
-          contracts: ethereumContracts.contracts,
+          contracts: contracts.ethereum,
           network: env.ALCHEMY_ETH_NETWORK,
-        })
-        polygonContracts.contracts = beautifyContracts({
-          nfts: polygonNFTs,
+        },
+        {
           chain: AlchemyChain.polygon,
           network: env.ALCHEMY_POLYGON_NETWORK,
-          contracts: polygonContracts.contracts,
-        })
+          contracts: contracts.polygon,
+        },
+      ])
 
-        contracts = ethereumContracts.contracts.concat(
-          polygonContracts.contracts
-        )
-      } catch (ex) {
-        console.error(new GraphQLYogaError(ex as string))
-      }
       return {
-        contracts,
+        contracts: result,
       }
     },
 
@@ -191,25 +141,17 @@ const nftsResolvers: Resolvers = {
         input: {
           contractAddress: string
           tokenId: string
-          tokenType: string
+          chain: string
         }[]
       },
       { env }: ResolverContext
     ) => {
-      let ownedNfts: any[] = []
-
-      try {
-        const { ethereumClient, polygonClient } = getAlchemyClients({ env })
-
-        const [ethNfts, polyNfts] = await Promise.all([
-          ethereumClient.getNFTMetadataBatch(input),
-          polygonClient.getNFTMetadataBatch(input),
-        ])
-
-        ownedNfts = ownedNfts.concat(ethNfts, polyNfts)
-      } catch (ex) {
-        console.error(new GraphQLYogaError(ex as string))
-      }
+      const alchemyClients = getAlchemyClients({ env })
+      const ownedNfts = await getNftMetadataForAllChains(
+        input,
+        alchemyClients,
+        env
+      )
 
       return {
         ownedNfts: NFTPropertyMapper(ownedNfts.filter((nft) => !nft.error)),

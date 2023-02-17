@@ -42,7 +42,7 @@ import {
   NodeType,
   OAuthAddressType,
 } from '@kubelt/types/address'
-import { AccountURN } from '@kubelt/urns/account'
+import type { AccountURN } from '@kubelt/urns/account'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { imageFromAddressType } from '~/helpers'
 

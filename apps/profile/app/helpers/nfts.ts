@@ -5,12 +5,32 @@ import {
 import { getGalaxyClient } from './clients'
 import { getAccountProfile, getAddressProfile } from './profile'
 
-import { AddressURN } from '@kubelt/urns/address'
+import type { AddressURN } from '@kubelt/urns/address'
+import type { Nft } from '@kubelt/galaxy-client'
 /**
  * Nfts are being sorted server-side
  * this function then allows to merge client Nfts with newly-fetched Nfts
  * as two sorted arrays. In linear time
  */
+
+export const capitalizeFirstLetter = (string?: string) => {
+  return string ? string.charAt(0).toUpperCase() + string.slice(1) : null
+}
+
+export const createDetails = (nft: Nft) => {}
+
+export type decoratedNft = {
+  url?: string
+  thumbnailUrl?: string
+  error: boolean
+  title?: Nft['title']
+  contract: Nft['contract']
+  tokenId?: string | null
+  chain: Nft['chain']
+  collectionTitle?: string | null
+  properties?: any[] | null
+  details: { name: string; value?: string | null; isCopyable: boolean }[]
+}
 
 export const mergeSortedNfts = (a: any, b: any) => {
   var sorted = [],
@@ -48,7 +68,7 @@ export const sortNftsFn = (a: any, b: any) => {
  * and get representable nfts for our routes
  */
 
-export const decorateNft = (nft: any) => {
+export const decorateNft = (nft: Nft): decoratedNft => {
   const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
   let error = false
   if (nft.error) {
@@ -64,6 +84,16 @@ export const decorateNft = (nft: any) => {
     {
       name: 'NFT Standard',
       value: nft.contractMetadata?.tokenType,
+      isCopyable: false,
+    },
+    {
+      name: 'Chain',
+      value: capitalizeFirstLetter(nft.chain?.chain),
+      isCopyable: false,
+    },
+    {
+      name: 'Network',
+      value: capitalizeFirstLetter(nft.chain?.network),
       isCopyable: false,
     },
   ]
@@ -82,6 +112,7 @@ export const decorateNft = (nft: any) => {
     title: nft.title,
     contract: nft.contract,
     tokenId: nft.id?.tokenId,
+    chain: nft.chain,
     collectionTitle: nft.contractMetadata?.name,
     properties: nft.metadata?.properties,
     details,
@@ -199,10 +230,13 @@ export const getGalleryWithMetadata = async (owner: string, jwt?: string) => {
 
   const { getNFTMetadataBatch: metadata } = await galaxyClient.getNFTMetadata(
     {
-      input: gallery.map((nft: any) => ({
-        contractAddress: nft.contract,
-        tokenId: nft.tokenId,
-      })),
+      input: gallery.map(
+        (nft: { contract: string; tokenId: string; chain: string }) => ({
+          contractAddress: nft.contract,
+          tokenId: nft.tokenId,
+          chain: nft.chain,
+        })
+      ),
     },
     // Optional for when called by
     // a non authenticated visitor
@@ -210,50 +244,17 @@ export const getGalleryWithMetadata = async (owner: string, jwt?: string) => {
     getAuthzHeaderConditionallyFromToken(jwt)
   )
 
-  const ownedNfts = metadata?.ownedNfts.map((nft) => {
-    const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
-    let error = false
-    if (nft.error) {
-      error = true
+  const ownedNfts: decoratedNft[] | undefined = metadata?.ownedNfts.map(
+    (nft) => {
+      return decorateNft(nft as Nft)
     }
-
-    const details = [
-      {
-        name: 'NFT Contract',
-        value: nft.contract?.address,
-        isCopyable: true,
-      },
-      {
-        name: 'NFT Standard',
-        value: nft.contractMetadata?.tokenType,
-        isCopyable: false,
-      },
-    ]
-    if (nft.id && nft.id.tokenId) {
-      details.push({
-        name: 'Token ID',
-        value: BigInt(nft.id?.tokenId).toString(10),
-        isCopyable: true,
-      })
-    }
-    return {
-      url: gatewayFromIpfs(media?.raw),
-      thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
-      error: error,
-      title: nft.title,
-      tokenId: nft.id?.tokenId,
-      contract: nft.contract,
-      collectionTitle: nft.contractMetadata?.name,
-      properties: nft.metadata?.properties,
-      details,
-    }
-  })
+  )
 
   // Setup og tag data
   // check generate and return og image
 
   const filteredNfts =
-    ownedNfts?.filter((n: any) => !n.error && n.thumbnailUrl) || []
+    ownedNfts?.filter((n: decoratedNft) => !n.error && n.thumbnailUrl) || []
 
   return {
     gallery: filteredNfts,

@@ -25,6 +25,8 @@ export const getGalleryMethod = async ({
 
   const gallery = await node.class.getGallery()
 
+  console.log({ gallery })
+
   if (!gallery) return null
 
   return gallery

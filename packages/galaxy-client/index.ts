@@ -78,11 +78,13 @@ export type Edge = {
 
 export type Gallery = {
   __typename?: 'Gallery';
+  chain: Scalars['String'];
   contract: Scalars['String'];
   tokenId: Scalars['String'];
 };
 
 export type GalleryInput = {
+  chain: Scalars['String'];
   contract: Scalars['String'];
   tokenId: Scalars['String'];
 };
@@ -144,6 +146,8 @@ export type MutationUpdateProfileArgs = {
 
 export type Nft = {
   __typename?: 'NFT';
+  balance?: Maybe<Scalars['String']>;
+  chain?: Maybe<Chain>;
   contract?: Maybe<Contract>;
   contractMetadata?: Maybe<ContractMetadata>;
   description?: Maybe<Scalars['String']>;
@@ -159,12 +163,16 @@ export type NftContract = {
   __typename?: 'NFTContract';
   address?: Maybe<Scalars['String']>;
   chain?: Maybe<Chain>;
+  contractDeployer?: Maybe<Scalars['String']>;
+  deployedBlockNumber?: Maybe<Scalars['Int']>;
+  isSpam?: Maybe<Scalars['Boolean']>;
   media?: Maybe<NftMedia>;
   name?: Maybe<Scalars['String']>;
   numDistinctTokensOwned?: Maybe<Scalars['Int']>;
   opensea?: Maybe<OpenSeaMetadata>;
-  ownedNfts?: Maybe<Array<NftWithChain>>;
+  ownedNfts?: Maybe<Array<Nft>>;
   symbol?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
   tokenId?: Maybe<Scalars['String']>;
   tokenType?: Maybe<Scalars['String']>;
   totalBalance?: Maybe<Scalars['Int']>;
@@ -173,6 +181,7 @@ export type NftContract = {
 export type NftContracts = {
   __typename?: 'NFTContracts';
   contracts: Array<NftContract>;
+  totalCount?: Maybe<Scalars['Int']>;
 };
 
 export type NftInput = {
@@ -203,9 +212,9 @@ export type NftMetadata = {
 };
 
 export type NftMetadataInput = {
+  chain?: InputMaybe<Scalars['String']>;
   contractAddress?: InputMaybe<Scalars['String']>;
   tokenId?: InputMaybe<Scalars['String']>;
-  tokenType?: InputMaybe<Scalars['String']>;
 };
 
 export type NftNoProps = {
@@ -233,20 +242,6 @@ export type NftProperty = {
   value?: Maybe<Scalars['String']>;
 };
 
-export type NftWithChain = {
-  __typename?: 'NFTWithChain';
-  chain?: Maybe<Chain>;
-  contract?: Maybe<Contract>;
-  contractMetadata?: Maybe<ContractMetadata>;
-  description?: Maybe<Scalars['String']>;
-  error?: Maybe<Scalars['String']>;
-  id?: Maybe<Id>;
-  media: Array<NftMedia>;
-  metadata?: Maybe<NftMetadata>;
-  title?: Maybe<Scalars['String']>;
-  tokenUri?: Maybe<TokenUri>;
-};
-
 export type NfTs = {
   __typename?: 'NFTs';
   ownedNfts: Array<Nft>;
@@ -259,7 +254,7 @@ export type NfTsNoProps = {
 
 export type NfTsWithChain = {
   __typename?: 'NFTsWithChain';
-  ownedNfts: Array<NftWithChain>;
+  ownedNfts: Array<Nft>;
 };
 
 export type Node = {
@@ -491,14 +486,14 @@ export type TokenUriInput = {
 export type GetProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, connectedAddresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string }> | null };
+export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, connectedAddresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string, chain: string }> | null };
 
 export type GetProfileFromAddressQueryVariables = Exact<{
   addressURN: Scalars['URN'];
 }>;
 
 
-export type GetProfileFromAddressQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string }> | null, connectedAddresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null };
+export type GetProfileFromAddressQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string, chain: string }> | null, connectedAddresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null };
 
 export type GetAuthorizedAppsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -573,7 +568,7 @@ export type GetNftsForAddressQueryVariables = Exact<{
 }>;
 
 
-export type GetNftsForAddressQuery = { __typename?: 'Query', nftsForAddress?: { __typename?: 'NFTs', ownedNfts: Array<{ __typename?: 'NFT', title?: string | null, description?: string | null, error?: string | null, contract?: { __typename?: 'Contract', address?: string | null } | null, id?: { __typename?: 'Id', tokenId?: string | null } | null, media: Array<{ __typename?: 'NFTMedia', raw?: string | null, thumbnail?: string | null }>, metadata?: { __typename?: 'NFTMetadata', properties?: Array<{ __typename?: 'NFTProperty', name?: string | null, value?: string | null, display?: string | null } | null> | null } | null, contractMetadata?: { __typename?: 'ContractMetadata', name?: string | null, tokenType?: TokenType | null } | null }> } | null };
+export type GetNftsForAddressQuery = { __typename?: 'Query', nftsForAddress?: { __typename?: 'NFTs', ownedNfts: Array<{ __typename?: 'NFT', title?: string | null, description?: string | null, error?: string | null, contract?: { __typename?: 'Contract', address?: string | null } | null, id?: { __typename?: 'Id', tokenId?: string | null } | null, media: Array<{ __typename?: 'NFTMedia', raw?: string | null, thumbnail?: string | null }>, metadata?: { __typename?: 'NFTMetadata', properties?: Array<{ __typename?: 'NFTProperty', name?: string | null, value?: string | null, display?: string | null } | null> | null } | null, contractMetadata?: { __typename?: 'ContractMetadata', name?: string | null, tokenType?: TokenType | null } | null, chain?: { __typename?: 'Chain', chain?: string | null, network?: string | null } | null }> } | null };
 
 export type GetNftsPerCollectionQueryVariables = Exact<{
   owner: Scalars['String'];
@@ -582,14 +577,14 @@ export type GetNftsPerCollectionQueryVariables = Exact<{
 }>;
 
 
-export type GetNftsPerCollectionQuery = { __typename?: 'Query', contractsForAddress?: { __typename?: 'NFTContracts', contracts: Array<{ __typename?: 'NFTContract', address?: string | null, totalBalance?: number | null, numDistinctTokensOwned?: number | null, name?: string | null, symbol?: string | null, tokenType?: string | null, chain?: { __typename?: 'Chain', chain?: string | null, network?: string | null } | null, ownedNfts?: Array<{ __typename?: 'NFTWithChain', title?: string | null, description?: string | null, error?: string | null, contract?: { __typename?: 'Contract', address?: string | null } | null, id?: { __typename?: 'Id', tokenId?: string | null } | null, media: Array<{ __typename?: 'NFTMedia', raw?: string | null, thumbnail?: string | null }>, metadata?: { __typename?: 'NFTMetadata', properties?: Array<{ __typename?: 'NFTProperty', name?: string | null, value?: string | null, display?: string | null } | null> | null } | null, contractMetadata?: { __typename?: 'ContractMetadata', name?: string | null, tokenType?: TokenType | null } | null, chain?: { __typename?: 'Chain', chain?: string | null, network?: string | null } | null }> | null }> } | null };
+export type GetNftsPerCollectionQuery = { __typename?: 'Query', contractsForAddress?: { __typename?: 'NFTContracts', contracts: Array<{ __typename?: 'NFTContract', address?: string | null, totalBalance?: number | null, numDistinctTokensOwned?: number | null, name?: string | null, symbol?: string | null, tokenType?: string | null, chain?: { __typename?: 'Chain', chain?: string | null, network?: string | null } | null, ownedNfts?: Array<{ __typename?: 'NFT', title?: string | null, description?: string | null, error?: string | null, contract?: { __typename?: 'Contract', address?: string | null } | null, id?: { __typename?: 'Id', tokenId?: string | null } | null, media: Array<{ __typename?: 'NFTMedia', raw?: string | null, thumbnail?: string | null }>, metadata?: { __typename?: 'NFTMetadata', properties?: Array<{ __typename?: 'NFTProperty', name?: string | null, value?: string | null, display?: string | null } | null> | null } | null, contractMetadata?: { __typename?: 'ContractMetadata', name?: string | null, tokenType?: TokenType | null } | null, chain?: { __typename?: 'Chain', chain?: string | null, network?: string | null } | null }> | null }> } | null };
 
 export type GetNftMetadataQueryVariables = Exact<{
   input?: InputMaybe<Array<InputMaybe<NftMetadataInput>> | InputMaybe<NftMetadataInput>>;
 }>;
 
 
-export type GetNftMetadataQuery = { __typename?: 'Query', getNFTMetadataBatch?: { __typename?: 'NFTs', ownedNfts: Array<{ __typename?: 'NFT', title?: string | null, description?: string | null, error?: string | null, contract?: { __typename?: 'Contract', address?: string | null } | null, id?: { __typename?: 'Id', tokenId?: string | null } | null, media: Array<{ __typename?: 'NFTMedia', raw?: string | null, thumbnail?: string | null }>, metadata?: { __typename?: 'NFTMetadata', properties?: Array<{ __typename?: 'NFTProperty', name?: string | null, value?: string | null, display?: string | null } | null> | null } | null, contractMetadata?: { __typename?: 'ContractMetadata', name?: string | null, tokenType?: TokenType | null } | null }> } | null };
+export type GetNftMetadataQuery = { __typename?: 'Query', getNFTMetadataBatch?: { __typename?: 'NFTs', ownedNfts: Array<{ __typename?: 'NFT', title?: string | null, description?: string | null, error?: string | null, contract?: { __typename?: 'Contract', address?: string | null } | null, id?: { __typename?: 'Id', tokenId?: string | null } | null, media: Array<{ __typename?: 'NFTMedia', raw?: string | null, thumbnail?: string | null }>, metadata?: { __typename?: 'NFTMetadata', properties?: Array<{ __typename?: 'NFTProperty', name?: string | null, value?: string | null, display?: string | null } | null> | null } | null, contractMetadata?: { __typename?: 'ContractMetadata', name?: string | null, tokenType?: TokenType | null } | null, chain?: { __typename?: 'Chain', chain?: string | null, network?: string | null } | null }> } | null };
 
 
 export const GetProfileDocument = gql`
@@ -629,6 +624,7 @@ export const GetProfileDocument = gql`
   gallery {
     contract
     tokenId
+    chain
   }
 }
     `;
@@ -661,6 +657,7 @@ export const GetProfileFromAddressDocument = gql`
   gallery: galleryFromAddress(addressURN: $addressURN) {
     contract
     tokenId
+    chain
   }
   connectedAddresses: connectedAddressesFromAddress(addressURN: $addressURN) {
     urn
@@ -861,6 +858,10 @@ export const GetNftsForAddressDocument = gql`
         name
         tokenType
       }
+      chain {
+        chain
+        network
+      }
     }
   }
 }
@@ -944,6 +945,10 @@ export const GetNftMetadataDocument = gql`
       contractMetadata {
         name
         tokenType
+      }
+      chain {
+        chain
+        network
       }
     }
   }

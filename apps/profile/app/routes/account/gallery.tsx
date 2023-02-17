@@ -43,25 +43,19 @@ import NoCryptoAddresses from '~/components/accounts/NoCryptoAddresses'
 // Other helpers
 import { getProfileSession } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
-import { AddressURNSpace } from '@kubelt/urns/address'
-import { generateHashedIDRef } from '@kubelt/urns/idref'
-import type { Node, Profile } from '@kubelt/galaxy-client'
-import { CryptoAddressType } from '@kubelt/types/address'
+import type { Profile } from '@kubelt/galaxy-client'
 import { getMoreNftsModal } from '~/helpers/nfts'
+import type { decoratedNft } from '~/helpers/nfts'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
-  const targetAddress = formData.get('address')?.toString() || ''
-  const urn = AddressURNSpace.urn(
-    generateHashedIDRef(CryptoAddressType.ETH, targetAddress)
-  )
   const session = await getProfileSession(request)
   const user = session.get('user')
 
   const jwt = user.accessToken
 
-  let errors: any = {}
+  let errors = new Map()
 
   /**
    * This part mutates D1 table for gallery
@@ -70,38 +64,37 @@ export const action: ActionFunction = async ({ request }) => {
   if (!updatedGallery) {
     throw new Error('Gallery should not be empty')
   }
-  const nfts = JSON.parse(updatedGallery)
+  const nfts: decoratedNft[] = JSON.parse(updatedGallery)
 
   // TODO: replace with zod?
-  nfts.forEach((nft: any) => {
+  nfts.forEach((nft) => {
     if (!nft.tokenId) {
-      errors[`tokenID`] = ['Nft should have token ID']
+      errors.set('tokenId', ['Nft should have token ID'])
     }
-    if (!nft.contract.address) {
-      errors[`contractAddress-${nft.tokenID}`] = [
+    if (!nft.contract?.address) {
+      errors.set(`contractAddress-${nft.tokenId}`, [
         'Nft should have contract address',
-      ]
+      ])
     }
-    if (!urn || urn.length === 0) {
-      errors[`${nft.contract.address}-${nft.tokenID}`] = [
-        'URN should not be empty',
-      ]
+    if (!nft.chain?.network) {
+      errors.set(`network-${nft.tokenId}`, ['Nft should have network'])
     }
 
     if (nft.error) {
-      errors[`${nft.contract.address}-${nft.tokenId}`] = nft.error
+      errors.set(`${nft.contract?.address}-${nft.tokenId}`, nft.error)
     }
   })
 
-  if (Object.keys(errors).length) {
+  if (errors.size) {
     return {
-      errors,
+      errors: Object.fromEntries(errors),
     }
   }
 
-  const gallery = nfts.map((nft: any, i: number) => ({
-    contract: nft.contract.address,
+  const gallery = nfts.map((nft: decoratedNft, i: number) => ({
+    contract: nft.contract?.address,
     tokenId: nft.tokenId,
+    chain: nft.chain?.chain,
   }))
 
   const galaxyClient = await getGalaxyClient()
@@ -115,14 +108,6 @@ export const action: ActionFunction = async ({ request }) => {
   // TODO: update gallery on account
 
   return true
-}
-
-export type GalleryData = {
-  targetAddress: string
-  pfp: {
-    image: string
-    isToken: string
-  }
 }
 
 /**
@@ -200,12 +185,8 @@ const Gallery = () => {
   const actionData = useActionData()
   const { profile, cryptoAddresses, accountURN } = useOutletContext<{
     profile: Profile
-    cryptoAddresses: Node[]
     accountURN: string
   }>()
-
-  //TODO: update pfp components to take multiple addresses
-  const tempTargetAddress = cryptoAddresses?.map((a) => a.qc.alias)[0]
 
   const { displayName } = profile
 
@@ -380,7 +361,6 @@ const Gallery = () => {
             collection={collection}
             setCollection={setCollection}
             displayName={displayName as string}
-            account={tempTargetAddress}
             loadingConditions={
               refresh || loading || modalFetcher.state !== 'idle'
             }
@@ -478,7 +458,6 @@ const Gallery = () => {
             name="gallery"
             value={JSON.stringify(curatedNfts)}
           />
-          <input type="hidden" name="address" value={tempTargetAddress} />
 
           {/* Form where this button is used should have 
           an absolute relative position

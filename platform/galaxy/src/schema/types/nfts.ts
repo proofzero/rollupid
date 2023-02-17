@@ -74,6 +74,7 @@ export default /* GraphQL */ `
   type NFT {
     contract: Contract
     title: String
+    balance: String
     description: String
     id: Id
     tokenUri: TokenURI
@@ -81,6 +82,7 @@ export default /* GraphQL */ `
     error: String
     metadata: NFTMetadata
     contractMetadata: ContractMetadata
+    chain: Chain
   }
 
   type NFTNoProps {
@@ -107,44 +109,37 @@ export default /* GraphQL */ `
     network: String
   }
 
-  type NFTWithChain {
-    contract: Contract
-    title: String
-    description: String
-    id: Id
-    tokenUri: TokenURI
-    media: [NFTMedia!]!
-    error: String
-    metadata: NFTMetadata
-    contractMetadata: ContractMetadata
-    chain: Chain
-  }
-
   type NFTsWithChain {
-    ownedNfts: [NFTWithChain!]!
+    ownedNfts: [NFT!]!
   }
 
   type NFTContract {
     address: String
     totalBalance: Int
     numDistinctTokensOwned: Int
-    tokenId: String
+    deployedBlockNumber: Int
+    contractDeployer: String
+    isSpam: Boolean
     name: String
     symbol: String
     tokenType: String
+    tokenId: String
+    title: String
     media: NFTMedia
     opensea: OpenSeaMetadata
-    ownedNfts: [NFTWithChain!]
+    ownedNfts: [NFT!]
     chain: Chain
   }
 
   type NFTContracts {
     contracts: [NFTContract!]!
+    totalCount: Int
   }
 
   type Gallery {
     contract: String!
     tokenId: String!
+    chain: String!
   }
 
   input ContractInput {
@@ -165,12 +160,13 @@ export default /* GraphQL */ `
   input NFTMetadataInput {
     contractAddress: String
     tokenId: String
-    tokenType: String
+    chain: String
   }
 
   input GalleryInput {
     contract: String!
     tokenId: String!
+    chain: String!
   }
 
   type Query {

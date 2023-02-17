@@ -126,6 +126,7 @@ export const getOgImageMethod = async ({
     )
     .catch((e) => {
       console.error("Couldn't upload og image to CF")
+      console.error(e)
     })
 
   //prob already exsists
