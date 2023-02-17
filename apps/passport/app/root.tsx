@@ -214,7 +214,6 @@ export function ErrorBoundary({ error }) {
 }
 
 export function CatchBoundary() {
-  const browserEnv = useLoaderData()
   const caught = useCatch()
   console.error('Caught in catch boundary', caught)
   const params = useParams()
@@ -257,13 +256,6 @@ export function CatchBoundary() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `!window ? null : window.ENV = ${JSON.stringify(
-              browserEnv?.ENV
-            )}`,
-          }}
-        />
       </body>
     </html>
   )
