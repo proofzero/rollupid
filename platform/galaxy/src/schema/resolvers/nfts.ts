@@ -56,7 +56,7 @@ const nftsResolvers: Resolvers = {
       )
       let ownedNfts: any[] = []
 
-      const accountURN = AccountURNSpace.componentizedUrn(owner)
+      const accountURN = owner as AccountURN
 
       const addresses = (
         (await getConnectedAddresses({
@@ -88,6 +88,8 @@ const nftsResolvers: Resolvers = {
           b.contractMetadata?.name ?? ''
         )
       )
+
+      console.log({ ownedNfts })
 
       return {
         ownedNfts,
