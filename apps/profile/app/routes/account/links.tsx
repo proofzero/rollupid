@@ -204,25 +204,27 @@ const SortableLink = ({
 
   if (!isEditing) {
     return (
-      <div className={`flex flex-row items-center w-full truncate`}>
+      <div className="flex flex-row items-center w-full truncate">
         <input type="hidden" name={`links[${id}][name]`} value={nameInput} />
         <input type="hidden" name={`links[${id}][url]`} value={urlInput} />
 
-        <div
-          className="bg-gray-100 hover:bg-gray-200 transition-colors
+        <div className="flex flex-row items-center w-full truncate">
+          <div
+            className="bg-gray-100 hover:bg-gray-200 transition-colors
               w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
               text-gray-700 truncate
         flex items-center justify-center "
-        >
-          <TbLink size={22} />
-        </div>
-        <div className="max-w-[42vw] flex flex-col flex-1 break-all">
-          <Text weight="medium" className="truncate break-all">
-            {name}
-          </Text>
-          <Text className="max-w-full text-gray-500 truncate break-all">
-            {url}
-          </Text>
+          >
+            <TbLink size={22} />
+          </div>
+          <div className="max-w-[42vw] flex flex-col flex-1 break-all">
+            <Text weight="medium" className="truncate break-all">
+              {name}
+            </Text>
+            <Text className="max-w-full text-gray-500 truncate break-all">
+              {url}
+            </Text>
+          </div>
         </div>
         {/* // Puts current link in "modification" regyme */}
         <Button
