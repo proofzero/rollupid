@@ -93,5 +93,6 @@ export default /* GraphQL */ `
     updateConnectedAddressesProperties(
       addressURNList: [ConnectedAddressPropertiesUpdateInput!]!
     ): Boolean
+    disconnectAddress(addressURN: URN!): Boolean
   }
 `

@@ -131,6 +131,11 @@ export type Mutation = {
   updateProfile?: Maybe<Scalars['Boolean']>
 }
 
+export type MutationDisconnectAddressArgs = {
+  addressURN: Scalars['URN'];
+};
+
+
 export type MutationUpdateAddressNicknameArgs = {
   addressURN: Scalars['URN']
   nickname: Scalars['String']
@@ -762,6 +767,13 @@ export type UpdateConnectedAddressesPropertiesMutation = {
   __typename?: 'Mutation'
   updateConnectedAddressesProperties?: boolean | null
 }
+
+export type DisconnectAddressMutationVariables = Exact<{
+  addressURN: Scalars['URN'];
+}>;
+
+
+export type DisconnectAddressMutation = { __typename?: 'Mutation', disconnectAddress?: boolean | null };
 
 export type GetEnsProfileQueryVariables = Exact<{
   addressOrEns: Scalars['String']

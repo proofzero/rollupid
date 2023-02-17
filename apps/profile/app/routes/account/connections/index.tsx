@@ -1,7 +1,7 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { AddressList } from '~/components/addresses/AddressList'
-import { useFetcher, useLoaderData } from '@remix-run/react'
+import { useFetcher, useLoaderData, useOutletContext } from '@remix-run/react'
 import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
 import { requireJWT } from '~/utils/session.server'
 import type { AddressURN } from '@kubelt/urns/address'
@@ -11,6 +11,8 @@ import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import InputText from '~/components/inputs/InputText'
 import { NodeType } from '@kubelt/types/address'
+import { AccountURN } from '@kubelt/urns/account'
+import warn from '~/assets/warning.svg'
 
 const normalizeProfile = (profile: any) => {
   switch (profile.__typename) {
@@ -124,7 +126,13 @@ export const loader: LoaderFunction = async ({ request }) => {
 const AccountSettingsConnections = () => {
   const { cryptoProfiles, vaultProfiles, oAuthProfiles } = useLoaderData()
 
+  const { accountURN } = useOutletContext<{
+    accountURN: AccountURN
+  }>()
+
   const [renameModalOpen, setRenameModalOpen] = useState(false)
+  const [disconnectModalOpen, setDisconnectModalOpen] = useState(false)
+
   const [actionId, setActionId] = useState<null | string>()
   const [actionProfile, setActionProfile] = useState<any>()
 
@@ -142,6 +150,8 @@ const AccountSettingsConnections = () => {
   useEffect(() => {
     if (fetcher.state === 'submitting' && fetcher.type === 'actionSubmission') {
       setRenameModalOpen(false)
+      setDisconnectModalOpen(false)
+
       setActionId(undefined)
     }
     if (fetcher.type === 'actionReload') {
@@ -233,6 +243,50 @@ const AccountSettingsConnections = () => {
           </div>
         </Modal>
 
+        <Modal
+          isOpen={disconnectModalOpen}
+          handleClose={() => setDisconnectModalOpen(false)}
+        >
+          <div
+            className={`w-[62vw] transform rounded-lg  bg-white px-4 pt-5 pb-4 
+         text-left shadow-xl transition-all sm:p-6 overflow-y-auto flex items-start space-x-4`}
+          >
+            <img src={warn} />
+
+            <div className="flex-1">
+              <Text size="lg" weight="medium" className="text-gray-900 mb-2">
+                Disconnect account
+              </Text>
+
+              <Text size="sm" weight="normal" className="text-gray-500">
+                Are you sure you want to disconnect "
+                <span className="text-gray-800">{actionProfile?.title}</span>"
+                from Rollup? You might lose access to some functionality.
+              </Text>
+
+              <fetcher.Form
+                method="post"
+                action="/account/connections/disconnect"
+              >
+                {actionId && <input type="hidden" name="id" value={actionId} />}
+
+                <div className="flex justify-end items-center space-x-3 mt-20">
+                  <Button
+                    btnType="secondary-alt"
+                    onClick={() => setDisconnectModalOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button type="submit" btnType="dangerous">
+                    Disconnect
+                  </Button>
+                </div>
+              </fetcher.Form>
+            </div>
+          </div>
+        </Modal>
+
         <AddressList
           addresses={cryptoProfiles
             .map((ap: AddressListItemProps) => ({
@@ -243,6 +297,13 @@ const AccountSettingsConnections = () => {
                     setActionId(id)
                     setRenameModalOpen(true)
                   },
+              onDisconnect:
+                ap.id === accountURN
+                  ? null
+                  : (id: string) => {
+                      setActionId(id)
+                      setDisconnectModalOpen(true)
+                    },
             }))
             .concat(oAuthProfiles)}
         />
