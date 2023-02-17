@@ -53,9 +53,15 @@ export const Links = ({ links, isOwner = false, displayName }: LinksProps) => {
             <a
               href={link.url}
               className="flex flex-row justify-center items-center space-x-2.5"
+              rel="noreferrer"
+              target="_blank"
             >
               {link.providerIcon && (
-                <img src={link.providerIcon} className="w-5 h-5" />
+                <img
+                  src={link.providerIcon}
+                  alt="Something went wrong..."
+                  className="w-5 h-5"
+                />
               )}
               <Text weight="medium" className="text-gray-600">
                 {link.name}

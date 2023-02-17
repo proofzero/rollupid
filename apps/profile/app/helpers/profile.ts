@@ -65,14 +65,14 @@ export const getAddressProfiles = async (
   addressURNList: AddressURN[]
 ) => {
   const galaxyClient = await getGalaxyClient()
-  const addressProfileRes = await galaxyClient.getAddressProfiles(
+  const addressProfilesRes = await galaxyClient.getAddressProfiles(
     {
       addressURNList,
     },
     getAuthzHeaderConditionallyFromToken(jwt)
   )
 
-  const { addressProfiles } = addressProfileRes
+  const { addressProfiles } = addressProfilesRes
 
   return addressProfiles
 }
