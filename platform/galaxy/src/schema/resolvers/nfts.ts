@@ -89,8 +89,6 @@ const nftsResolvers: Resolvers = {
         )
       )
 
-      console.log({ ownedNfts })
-
       return {
         ownedNfts,
       }
