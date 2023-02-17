@@ -73,6 +73,9 @@ jobs:
           projectToken: ${{ secrets.TOKEN_CHROMATIC_PASSPORT_PROJECT }}
           onlyChanged: true
           workingDir: apps/passport
+          filters: |
+            passport:
+              - 'apps/passport/app/components/**/*'
 
   chromatic-deployment-profile:
     needs: changes
@@ -93,6 +96,9 @@ jobs:
           projectToken: ${{ secrets.TOKEN_CHROMATIC_THREEID_PROJECT }}
           onlyChanged: true
           workingDir: apps/profile
+          filters: |
+            profile:
+              - 'apps/profile/app/components/**/*'
 
   chromatic-deployment-console:
     needs: changes
@@ -113,3 +119,6 @@ jobs:
           projectToken: ${{ secrets.TOKEN_CHROMATIC_CONSOLE_PROJECT }}
           onlyChanged: true
           workingDir: apps/console
+          filters: |
+            console:
+              - 'apps/console/app/components/**/*'
