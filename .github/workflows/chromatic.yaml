@@ -26,13 +26,13 @@ jobs:
         with:
           filters: |
             profile:
-              - 'apps/profile/app/components/**'
+              - 'apps/profile/app/components/**/*'
             passport:
-              - 'apps/passport/app/components/**'
+              - 'apps/passport/app/components/**/*'
             console:
-              - 'apps/console/app/components/**'
+              - 'apps/console/app/components/**/*'
             design: 
-              - 'packages/design-system/src/**'
+              - 'packages/design-system/src/**/*'
 
   chromatic-deployment-design-system:
     needs: changes
