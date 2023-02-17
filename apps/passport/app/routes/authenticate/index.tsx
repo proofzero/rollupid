@@ -1,35 +1,19 @@
-import type { LoaderFunction } from '@remix-run/cloudflare'
-import { useLoaderData } from '@remix-run/react'
+import { useOutletContext } from '@remix-run/react'
 import { useState } from 'react'
 import { Authentication } from '~/components'
-import { getStarbaseClient } from '~/platform.server'
-import { getConsoleParamsSession } from '~/session.server'
-
-export const loader: LoaderFunction = async ({ request, context }) => {
-  const consoleParmamsSessionFromCookie = await getConsoleParamsSession(
-    request,
-    context.env
-  )
-  const consoleParamsSession = consoleParmamsSessionFromCookie.get('params')
-  const parsedParams = consoleParamsSession
-    ? await JSON.parse(consoleParamsSession)
-    : undefined
-  const clientId = parsedParams?.clientId || undefined
-
-  if (clientId) {
-    const sbClient = getStarbaseClient('', context.env)
-    const response = await sbClient.getAppPublicProps.query({ clientId })
-    return response
-  } else {
-    return null
-  }
-}
 
 export default function Authenticate() {
   const [enableWalletConnect, setEnableWalletConnect] = useState(true)
-  const loaderData = useLoaderData<{ name: string; iconURL: string }>()
-  const name = loaderData?.name || undefined
-  const iconURL = loaderData?.iconURL || undefined
+
+  const context = useOutletContext<{
+    appProps?: {
+      name: string
+      iconURL: string
+    }
+  }>()
+
+  const name = context.appProps?.name
+  const iconURL = context.appProps?.iconURL
 
   return (
     <Authentication

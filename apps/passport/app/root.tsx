@@ -37,6 +37,8 @@ import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
 import * as gtag from '~/utils/gtags.client'
+import { getConsoleParamsSession } from './session.server'
+import { getStarbaseClient } from './platform.server'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -56,14 +58,27 @@ export const meta: MetaFunction = () => ({
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
   { rel: 'stylesheet', href: globalStyles },
-  { rel: 'apple-touch-icon', href: appleIcon, sizes: '180x180' },
-  { rel: 'icon', type: 'image/png', href: icon32, sizes: '32x32' },
-  { rel: 'icon', type: 'image/png', href: icon16, sizes: '16x16' },
-  { rel: 'shortcut icon', type: 'image/svg+xml', href: faviconSvg },
 ]
 
-export const loader: LoaderFunction = ({ context }) => {
+export const loader: LoaderFunction = async ({ request, context }) => {
+  const consoleParmamsSessionFromCookie = await getConsoleParamsSession(
+    request,
+    context.env
+  )
+  const consoleParamsSession = consoleParmamsSessionFromCookie.get('params')
+  const parsedParams = consoleParamsSession
+    ? await JSON.parse(consoleParamsSession)
+    : undefined
+  const clientId = parsedParams?.clientId || undefined
+
+  let appProps
+  if (clientId) {
+    const sbClient = getStarbaseClient('', context.env)
+    appProps = await sbClient.getAppPublicProps.query({ clientId })
+  }
+
   return json({
+    appProps,
     ENV: {
       PROFILE_APP_URL: context.env.PROFILE_APP_URL,
       INTERNAL_GOOGLE_ANALYTICS_TAG: context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
@@ -89,6 +104,18 @@ export default function App() {
     <html lang="en">
       <head>
         <Meta />
+
+        {browserEnv.appProps ? (
+          <link rel="icon" type="image" href={browserEnv.appProps.iconURL} />
+        ) : (
+          <>
+            <link rel="apple-touch-icon" href={appleIcon} sizes="180x180" />
+            <link rel="shortcut icon" type="image/svg+xml" href={faviconSvg} />
+            <link rel="icon" type="image/png" href={icon32} sizes="32x32" />
+            <link rel="icon" type="image/png" href={icon16} sizes="16x16" />
+          </>
+        )}
+
         <Links />
       </head>
       <body style={{ backgroundColor: '#F9FAFB' }}>
@@ -115,7 +142,11 @@ export default function App() {
           </>
         )}
         {transition.state === 'loading' && <Loader />}
-        <Outlet />
+        <Outlet
+          context={{
+            appProps: browserEnv.appProps,
+          }}
+        />
         <ScrollRestoration />
         <Scripts />
         <script

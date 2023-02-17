@@ -2,7 +2,7 @@ import { Outlet } from '@remix-run/react'
 import { getDefaultClient } from 'connectkit'
 import { createClient, WagmiConfig } from 'wagmi'
 
-export function LazyAuth() {
+export function LazyAuth({ context }: { context?: any }) {
   const client = createClient(
     getDefaultClient({
       appName: 'Rollup',
@@ -12,7 +12,7 @@ export function LazyAuth() {
   )
   return (
     <WagmiConfig client={client}>
-      <Outlet />
+      <Outlet context={context} />
     </WagmiConfig>
   )
 }
