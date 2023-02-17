@@ -7,7 +7,6 @@ import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 type PfpNftModalProps = {
-  addresses: string[]
   text?: string
   nfts: any[]
   pfp: string
@@ -24,7 +23,6 @@ type PfpNftModalProps = {
 const PfpNftModal = ({
   nfts,
   text,
-  addresses,
   isOpen,
   pfp,
   loadingConditions,
@@ -34,9 +32,7 @@ const PfpNftModal = ({
   collection,
   setCollection,
 }: PfpNftModalProps) => {
-  const displayText = `Looks like ${
-    displayName ?? addresses[0]
-  } doesn't own any NFTs`
+  const displayText = `Looks like ${displayName} doesn't own any NFTs`
 
   return (
     <Modal isOpen={isOpen} fixed handleClose={handleClose}>

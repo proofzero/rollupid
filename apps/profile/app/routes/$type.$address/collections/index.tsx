@@ -2,20 +2,18 @@ import FilteredNftGrid from '~/components/nfts/grid/filtered'
 import { mergeSortedNfts } from '~/helpers/nfts'
 import { useState, useEffect, useMemo } from 'react'
 
-import type { Node, Profile } from '@kubelt/galaxy-client'
+import type { Profile } from '@kubelt/galaxy-client'
 import { useFetcher, useOutletContext, useNavigate } from '@remix-run/react'
 import { getMoreNftsAllCollections } from '~/helpers/nfts'
 
 const ProfileRoute = () => {
-  const { profile, cryptoAddresses, isOwner, accountURN } = useOutletContext<{
+  const { profile, isOwner, accountURN } = useOutletContext<{
     profile: Profile
-    cryptoAddresses: Node[]
     isOwner: boolean
     accountURN: string
   }>()
 
   // TODO: change the ProfileNFTGallery to take multiple addresses
-  const targetAddresses = cryptoAddresses?.map((a) => a.qc.alias)
 
   const { displayName, pfp } = profile
 
@@ -82,9 +80,7 @@ const ProfileRoute = () => {
       pfp={(pfp as any).image as string}
       isOwner={isOwner}
       filters={true}
-      displayText={`Looks like ${
-        displayName ?? targetAddresses[0]
-      } doesn't own any NFTs`}
+      displayText={`Looks like ${displayName} doesn't own any NFTs`}
       detailsModal
     />
   )

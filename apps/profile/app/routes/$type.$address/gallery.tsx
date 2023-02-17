@@ -1,22 +1,18 @@
 import FilteredNftGrid from '~/components/nfts/grid/filtered'
 import { useState, useEffect, useMemo } from 'react'
 
-import type { Node, Profile } from '@kubelt/galaxy-client'
+import type { Profile } from '@kubelt/galaxy-client'
 
 import { getMoreNftsGallery } from '~/helpers/nfts'
 
 import { useFetcher, useOutletContext } from '@remix-run/react'
 
 const ProfileRoute = () => {
-  const { profile, cryptoAddresses, isOwner, accountURN } = useOutletContext<{
+  const { profile, isOwner, accountURN } = useOutletContext<{
     profile: Profile
-    cryptoAddresses: Node[]
     isOwner: boolean
     accountURN: string
   }>()
-
-  // TODO: change the ProfileNFTGallery to take multiple addresses
-  const targetAddresses = cryptoAddresses?.map((a) => a.urn)
 
   const { displayName, pfp } = profile
   /** STATE */
@@ -60,9 +56,7 @@ const ProfileRoute = () => {
       <FilteredNftGrid
         nfts={loadedNfts}
         isOwner={isOwner}
-        displayText={`Looks like ${
-          displayName ?? targetAddresses[0]
-        } has not curated a gallery`}
+        displayText={`Looks like ${displayName} has not curated a gallery`}
         filters={true}
         pfp={(pfp as any).image as string}
         loadingConditions={loading || refresh}

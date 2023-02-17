@@ -8,7 +8,7 @@ import {
 } from '@remix-run/react'
 import { useState, useEffect, useMemo } from 'react'
 
-import type { Node, Profile } from '@kubelt/galaxy-client'
+import type { Profile } from '@kubelt/galaxy-client'
 
 import UnfilteredNftGrid from '~/components/nfts/grid/unfiltered'
 import { getMoreNftsSingleCollection } from '~/helpers/nfts'
@@ -23,15 +23,11 @@ export const loader: LoaderFunction = async (args) => {
 
 const CollectionForProfileRoute = () => {
   const { collection } = useLoaderData()
-  const { profile, cryptoAddresses, isOwner, accountURN } = useOutletContext<{
+  const { profile, isOwner, accountURN } = useOutletContext<{
     profile: Profile
-    cryptoAddresses: Node[]
     isOwner: boolean
     accountURN: string
   }>()
-
-  // TODO: change the ProfileNFTGallery to take multiple addresses
-  const targetAddresses = cryptoAddresses?.map((a) => a.qc.alias)
 
   const { displayName } = profile
 
@@ -94,9 +90,7 @@ const CollectionForProfileRoute = () => {
       loadingConditions={loading || refresh}
       isModalNft={true}
       isOwner={isOwner}
-      displayText={`Looks like ${
-        displayName ?? targetAddresses[0]
-      } doesn't own any NFTs`}
+      displayText={`Looks like ${displayName} doesn't own any NFTs`}
       detailsModal
       filters={false}
       collection={collection}

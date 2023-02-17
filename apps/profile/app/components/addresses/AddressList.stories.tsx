@@ -1,6 +1,6 @@
 import React from 'react'
 import { AddressList } from './AddressList'
-import { AddressListItemProps } from './AddressListItem'
+import type { AddressListItemProps } from './AddressListItem'
 
 export default {
   title: 'Molecules/Addresses/List',
