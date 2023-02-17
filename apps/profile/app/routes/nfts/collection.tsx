@@ -19,8 +19,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Error('Owner required')
   }
 
-  console.log({ owner })
-
   const collection = srcUrl.searchParams.get('collection')
   if (!collection) {
     throw new Error('Collection required')
