@@ -1,4 +1,4 @@
-import React, { Children } from 'react'
+import React from 'react'
 import {
   Button,
   ButtonProps,
@@ -10,8 +10,11 @@ export type AuthButtonProps = {
 
 export function AuthButton({ logo, children, ...props }: AuthButtonProps) {
   return (
-    <Button className="flex flex-row gap-4 items-center" {...props}>
-      {logo && <img src={logo} />}
+    <Button
+      className="flex flex-row gap-4 items-center justify-center"
+      {...props}
+    >
+      {logo && <img src={logo} style={{ maxWidth: 24 }} alt="logo" />}
 
       {children}
     </Button>
