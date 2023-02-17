@@ -181,6 +181,7 @@ export type NftContract = {
 export type NftContracts = {
   __typename?: 'NFTContracts';
   contracts: Array<NftContract>;
+  totalCount?: Maybe<Scalars['Int']>;
 };
 
 export type NftInput = {
