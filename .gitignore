@@ -228,6 +228,4 @@ act.secrets
 temp
 storybook-static
 
-# secrets
-**/*.p8
 
