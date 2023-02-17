@@ -34,14 +34,14 @@ export const InfoPanelDashboard = () => (
     <InfoPanel
       className="flex-1 rounded-lg rounded-b-none md:rounded-b-lg md:rounded-r-none"
       heading="Join our community"
-      subheading="Doloribus dolores nostrum quia qui natus officia quod et dolorem."
+      subheading="Connect with us and stay up to date!"
       Icon={HiUsers}
       links={communityLinks}
     />
     <InfoPanel
       className="flex-1 rounded-lg rounded-t-none md:rounded-t-lg md:rounded-l-none"
       heading="Learn best practices"
-      subheading="Doloribus dolores nostrum quia qui natus officia quod et dolorem."
+      subheading="Not sure where to start?"
       Icon={HiAcademicCap}
       links={practiceLinks}
     />
