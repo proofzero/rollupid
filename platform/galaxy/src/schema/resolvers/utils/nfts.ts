@@ -195,9 +195,41 @@ export const getNfts = async (
   return nfts
 }
 
-// -------------------- ALL CONTRACTS + 1 NFT ----------------------------------
+// -------------------- ALL CONTRACTS ------------------------------------------
 
-export const fetchContracts = async ({
+export const getContracts = async (
+  alchemyClient: AlchemyClient,
+  addresses: string[],
+  excludeFilters: string[],
+  maxRuns: number = 3
+) => {
+  let contracts: NftContract[] = []
+
+  await Promise.all(
+    addresses.map(async (address) => {
+      let runs = 0
+      let pageKey
+      do {
+        const res = (await alchemyClient.getContractsForOwner({
+          address,
+          pageKey,
+          excludeFilters,
+        })) as {
+          contracts: NftContract[]
+          pageKey: string | undefined
+        }
+
+        contracts = contracts.concat(res.contracts)
+
+        pageKey = res.pageKey
+      } while (pageKey && ++runs <= maxRuns)
+    })
+  )
+
+  return contracts
+}
+
+export const getContractsForAllChains = async ({
   addresses,
   alchemyClients,
   excludeFilters,
@@ -207,36 +239,14 @@ export const fetchContracts = async ({
   excludeFilters: string[]
 }) => {
   try {
-    const instances = await Promise.all(
-      addresses.map(async (address) => {
-        return await Promise.all([
-          alchemyClients.ethereumClient.getContractsForOwner({
-            address,
-            excludeFilters,
-          }) as Promise<NftContracts>,
-          alchemyClients.polygonClient.getContractsForOwner({
-            address,
-            excludeFilters,
-          }) as Promise<NftContracts>,
-        ])
-      })
-    )
-
-    const [ethereumContracts, polygonContracts] = instances.reduce<
-      [NftContracts, NftContracts]
-    >(
-      (acc, instance) => {
-        return [
-          { contracts: acc[0].contracts.concat(instance[0].contracts) },
-          { contracts: acc[1].contracts.concat(instance[1].contracts) },
-        ]
-      },
-      [{ contracts: [] }, { contracts: [] }]
-    )
+    const [ethereumContracts, polygonContracts] = await Promise.all([
+      getContracts(alchemyClients.ethereumClient, addresses, excludeFilters),
+      getContracts(alchemyClients.polygonClient, addresses, excludeFilters),
+    ])
 
     return {
-      ethereum: ethereumContracts.contracts,
-      polygon: polygonContracts.contracts,
+      ethereum: ethereumContracts,
+      polygon: polygonContracts,
     }
   } catch (ex) {
     console.error(new GraphQLYogaError(ex as string))
@@ -369,121 +379,4 @@ export const validOwnership = async (
   return gallery.filter((nft) => {
     return validator.get(nft.contract)?.includes(nft.tokenId)
   })
-}
-
-// -------------------- OUT OF SCOPE -------------------------------------------
-
-export const nftBatchesFetcherForAllChains = async ({
-  contracts,
-  addresses,
-  alchemyClients,
-}: {
-  contracts: {
-    ethereum: NftContract[]
-    polygon: NftContract[]
-  }
-  addresses: string[]
-  alchemyClients: AlchemyClients
-}) => {
-  try {
-    // This way in each nested collection we have its own Promise.all
-    // And one common Promise.all on top of them.
-
-    const NFTs = await Promise.all([
-      Promise.all(
-        await getNftBatches({
-          contracts: contracts.ethereum,
-          addresses,
-          alchemyClient: alchemyClients.ethereumClient,
-        })
-      ),
-      Promise.all(
-        await getNftBatches({
-          contracts: contracts.polygon,
-          addresses,
-          alchemyClient: alchemyClients.polygonClient,
-        })
-      ),
-    ])
-
-    return { ethereumNfts: NFTs[0], polygonNfts: NFTs[1] }
-  } catch (ex) {
-    console.error(new GraphQLYogaError(ex as string))
-    return { ethereumNfts: [], polygonNfts: [] }
-  }
-}
-
-export const getNftBatches = async ({
-  contracts,
-  addresses,
-  alchemyClient,
-}: {
-  contracts: NftContract[]
-  addresses: string[]
-  alchemyClient: AlchemyClient
-}) => {
-  // Max limit on Alchemy is 45 contract addresses per request.
-  // We need batches with 45 contracts in each
-
-  const batches = sliceIntoChunks(
-    contracts.map((contract: NftContract) => contract.address),
-    45
-  )
-
-  // Promise.all only to avoid promise chains
-  // TODO: change to async npm package
-  const res = await Promise.all(
-    batches.map(async (batch: NftBatch) => {
-      const visitedMap = new Map()
-      batch.forEach((contract: string) => {
-        visitedMap.set(contract, true)
-      })
-      const result: Nft[] = []
-      let localBatch = Array.from(visitedMap.keys())
-      while (localBatch.length > 0) {
-        try {
-          // We have multiple batches and multiple addresses
-          // Essentially we need to mapreduce through them all
-          // - that's why we have nested cycles
-          // then we need to combine nfts in one object - thats why we are using
-          // reduce after
-          const nfts: AlchemyNfts = (
-            await Promise.all(
-              addresses.map(async (address) => {
-                const currentNfts = await alchemyClient.getNFTs({
-                  owner: address,
-                  contractAddresses: localBatch,
-                  pageSize: localBatch.length * 3,
-                })
-                return currentNfts as AlchemyNfts
-              })
-            )
-          ).reduce(
-            (acc, contract) => {
-              return {
-                ownedNfts: acc.ownedNfts.concat(contract.ownedNfts),
-                // they all have same blockHash
-                blockHash: contract.blockHash,
-                totalCount: contract.totalCount + acc.totalCount,
-              }
-            },
-            { ownedNfts: [], blockHash: '', totalCount: 0 }
-          )
-          nfts.ownedNfts.forEach((nft: Nft) => {
-            visitedMap.delete(nft.contract?.address)
-          })
-          localBatch = Array.from(visitedMap.keys())
-
-          result.push(...nfts.ownedNfts)
-        } catch (ex) {
-          console.error(new GraphQLYogaError(ex as string))
-          break
-        }
-      }
-
-      return result
-    })
-  )
-
-  return res.length ? res[0].flat() : []
 }
