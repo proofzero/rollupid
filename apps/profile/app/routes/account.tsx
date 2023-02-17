@@ -38,7 +38,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   // and it's complex to send them to a loader / action
   const addresses = (await getAccountAddresses(jwt)) ?? []
   const addressTypeUrns = addresses.map((a) => ({
-    urn: a.urn,
+    urn: a.baseUrn,
     nodeType: a.rc.node_type,
   }))
 

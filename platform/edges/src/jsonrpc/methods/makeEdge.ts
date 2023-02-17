@@ -40,9 +40,7 @@ export const makeEdgeMethod = async ({
 }> => {
   const edge = await db.link(ctx.graph, input.src, input.dst, input.tag)
 
-  console.log(
-    `created edge ${edge.id}: ${edge.src} =[${edge.tag}]=> ${edge.dst}`
-  )
+  console.log(`created edge ${edge.src} =[${edge.tag}]=> ${edge.dst}`)
 
   return {
     edge: {

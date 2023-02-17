@@ -2,7 +2,6 @@ import { z } from 'zod'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
 
-import { Graph } from '@kubelt/types'
 import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
 import { Node } from '../../../../edges/src/jsonrpc/validators/node'
 
@@ -32,11 +31,9 @@ export const getPublicAddressesMethod = async ({
     // We are only interested in edges that start at the account node and
     // terminate at the address node, assuming that account nodes link to
     // the address nodes that they own.
-    id: input.account,
+    src: { baseUrn: input.account },
     // We only want edges that link to address nodes.
     tag: EDGE_ADDRESS,
-    // Account -> Address edges indicate ownership.
-    dir: Graph.EdgeDirection.Outgoing,
 
     dst: {
       // Only keep edges having the given node type. The node type is

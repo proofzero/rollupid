@@ -12,13 +12,19 @@ import {
   EdgeDirectionInput,
   NodeFilterInput,
 } from '@kubelt/platform-middleware/inputValidators'
-import { EdgeQueryInput, Edge } from '../jsonrpc/validators/edge'
+import {
+  EdgeQueryInput,
+  Edge,
+  EdgeQueryOptionsInput,
+} from '../jsonrpc/validators/edge'
 import { Node } from '../jsonrpc/validators/node'
 
 // Types
 // -----------------------------------------------------------------------------
 
 export type EdgeQuery = z.infer<typeof EdgeQueryInput>
+
+export type EdgeQueryOptions = z.infer<typeof EdgeQueryOptionsInput>
 
 export type Edge = z.infer<typeof Edge>
 
@@ -52,8 +58,6 @@ export interface NodeRecord {
 }
 
 export interface EdgeRecord {
-  // The edge identifier
-  id: number
   // The URN of the source node, where the edge originates.
   src: AnyURN
   // The URN of the sink node, where the edge terminates.

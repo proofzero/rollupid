@@ -1,7 +1,6 @@
 import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 import createEdgesClient from '@kubelt/platform-clients/edges'
 import { AccountURN } from '@kubelt/urns/account'
-import { EdgeDirection } from '@kubelt/types/graph'
 import { EDGE_APPLICATION } from '../types'
 import { ApplicationURN, ApplicationURNSpace } from '@kubelt/urns/application'
 
@@ -15,15 +14,16 @@ export const OwnAppsMiddleware: BaseMiddlewareFunction<{
   const edgesClient = createEdgesClient(ctx.Edges)
   const edgeList = await edgesClient.getEdges.query({
     query: {
-      id: ctx.accountURN,
-      dir: EdgeDirection.Outgoing,
+      src: { baseUrn: ctx.accountURN },
       tag: EDGE_APPLICATION,
     },
   })
 
   const ownAppURNs = []
   for (const edge of edgeList && edgeList.edges) {
-    const appURN = ApplicationURNSpace.getBaseURN(edge.dst.id as ApplicationURN)
+    const appURN = ApplicationURNSpace.getBaseURN(
+      edge.dst.baseUrn as ApplicationURN
+    )
     ownAppURNs.push(appURN)
   }
 
