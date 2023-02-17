@@ -9,7 +9,6 @@ import { useEffect } from 'react'
 
 import dashboardChart from '~/assets/dashboard_chart.svg'
 import { normalizeProfileToLinks } from '~/helpers'
-import { Tooltip } from 'flowbite-react'
 import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import { FullProfile } from '~/types'
@@ -29,7 +28,7 @@ export default function Welcome() {
   const appFetcher = useFetcher()
 
   useEffect(() => {
-    appFetcher.load('/account/dashboard/apps')
+    appFetcher.load('/api/apps')
   }, [])
 
   return (
@@ -182,7 +181,7 @@ export default function Welcome() {
                           <img
                             src={a.icon}
                             alt="app icon"
-                            className="w-6 h-6 rounded"
+                            className="object-cover w-6 h-6 rounded"
                           />
 
                           <Text
@@ -218,13 +217,7 @@ export default function Welcome() {
               </div>
 
               <div className="flex flex-row justify-center">
-                <Tooltip
-                  content="Coming soon!"
-                  trigger="hover"
-                  className="font-[Inter]"
-                  data-tooltip-style="light"
-                  style="light"
-                >
+                <Link to="/account/applications">
                   <Text
                     size="sm"
                     weight="medium"
@@ -232,7 +225,7 @@ export default function Welcome() {
                   >
                     View All
                   </Text>
-                </Tooltip>
+                </Link>
               </div>
             </div>
           )}

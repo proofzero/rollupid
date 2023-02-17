@@ -106,7 +106,12 @@ const subNavigation = {
       icon: TbPlugConnected,
       exists: true,
     },
-    { name: 'Applications', href: '#', icon: TbApps },
+    {
+      name: 'Applications',
+      href: '/account/applications',
+      icon: TbApps,
+      exists: true,
+    },
   ],
 }
 
