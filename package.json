@@ -14,7 +14,7 @@
   "scripts": {
     "gql": "yarn workspaces foreach -p -v -i run gql",
     "dev:gql": "run-p 'gql:* -- --watch'",
-    "start": "echo \"Run yarn start in the apps folder, and run yarn start in apps folder.\"",
+    "start": "echo \"Run yarn dev in the platform folder, and run yarn start in apps folder.\"",
     "dev": "echo \"Run yarn dev in the platform folder, and run yarn start in apps folder.\"",
     "build": "yarn workspaces foreach -p -v -i run build",
     "test": "yarn workspaces foreach -p -v -i run test"
