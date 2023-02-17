@@ -11,6 +11,7 @@ import { ResolverContext } from './common'
 import {
   CryptoAddressProfile,
   OAuthAppleProfile,
+  OAuthDiscordProfile,
   OAuthGithubProfile,
   OAuthGoogleProfile,
   OAuthMicrosoftProfile,
@@ -98,6 +99,9 @@ const addressResolvers: Resolvers = {
       }
       if ((obj as OAuthAppleProfile).isApple) {
         return 'OAuthAppleProfile'
+      }
+      if ((obj as unknown as OAuthDiscordProfile).isDiscord) {
+        return 'OAuthDiscordProfile'
       }
       return null
     },

@@ -5106,6 +5106,7 @@ __metadata:
     react: 18.2.0
     react-dom: 18.2.0
     remix-auth: 3.4.0
+    remix-auth-discord: 1.2.1
     remix-auth-github: 1.3.0
     remix-auth-google: 1.2.0
     remix-auth-microsoft: 2.0.0
@@ -37140,6 +37141,18 @@ __metadata:
   version: 1.0.8
   resolution: "remedial@npm:1.0.8"
   checksum: 12df7c55eb92501d7f33cfe5f5ad12be13bb6ac0c53f494aaa9963d5a5155bb8be2143e8d5e17afa1a500ef5dc71d13642920d35350f2a31b65a9778afab6869
+  languageName: node
+  linkType: hard
+
+"remix-auth-discord@npm:1.2.1":
+  version: 1.2.1
+  resolution: "remix-auth-discord@npm:1.2.1"
+  dependencies:
+    remix-auth: ^3.0.0
+    remix-auth-oauth2: ^1.0.0
+  peerDependencies:
+    "@remix-run/server-runtime": ^1.0.0
+  checksum: 6def0a49a25bfa28baa996cfe750ceff1014748876e8d3f1fc7df83ee54f52abc71c4866836f8829dd0fcb2d0480094d5152a06d578390fd6f0cd32d5434c7c2
   languageName: node
   linkType: hard
 

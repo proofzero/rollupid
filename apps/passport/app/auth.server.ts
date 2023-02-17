@@ -1,5 +1,6 @@
 import { createCookieSessionStorage } from '@remix-run/cloudflare'
 import { Authenticator } from 'remix-auth'
+import { DiscordStrategy } from 'remix-auth-discord'
 import { GitHubStrategy } from 'remix-auth-github'
 import { GoogleStrategy } from 'remix-auth-google'
 import { MicrosoftStrategy } from 'remix-auth-microsoft'
@@ -94,6 +95,18 @@ export const getAppleStrategy = (env: Env) => {
       clientSecret: env.SECRET_APPLE_OAUTH_CLIENT_SECRET,
       callbackURL: env.INTERNAL_APPLE_OAUTH_CALLBACK_URL,
       scope: 'name email',
+    },
+    async (params) => params
+  )
+}
+
+export const getDiscordStrategy = (env: Env) => {
+  return new DiscordStrategy(
+    {
+      clientID: env.INTERNAL_DISCORD_OAUTH_CLIENT_ID,
+      clientSecret: env.SECRET_DISCORD_OAUTH_CLIENT_SECRET,
+      callbackURL: env.INTERNAL_DISCORD_OAUTH_CALLBACK_URL,
+      scope: ['email', 'identify'],
     },
     async (params) => params
   )

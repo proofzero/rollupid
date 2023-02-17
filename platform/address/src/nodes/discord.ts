@@ -3,34 +3,31 @@ import { DurableObjectStubProxy } from 'do-proxy'
 import { OAuthAddressType } from '@kubelt/types/address'
 
 import type { Context } from '../context'
-import { OAuthData, OAuthGoogleProfile } from '../types'
+import type { OAuthData, OAuthDiscordProfile } from '../types'
 
 import Address from './address'
 import OAuthAddress from './oauth'
 import type { AddressNode } from '.'
 
-const TOKEN_URL = 'https://oauth2.googleapis.com/token'
+const TOKEN_URL = 'https://discord.com/api/v10/oauth2/token'
 
-export default class GoogleAddress extends OAuthAddress {
-  declare clientId: string
-  declare clientSecret: string
-
+export default class DiscordAddress extends OAuthAddress {
   constructor(node: AddressNode, ctx: Context) {
     super(node)
-    this.clientId = ctx.INTERNAL_GOOGLE_OAUTH_CLIENT_ID
-    this.clientSecret = ctx.SECRET_GOOGLE_OAUTH_CLIENT_SECRET
+    this.clientId = ctx.INTERNAL_DISCORD_OAUTH_CLIENT_ID
+    this.clientSecret = ctx.SECRET_DISCORD_OAUTH_CLIENT_SECRET
   }
 
-  async getProfile(): Promise<OAuthGoogleProfile> {
+  async getProfile(): Promise<OAuthDiscordProfile> {
     const data = await this.getData()
     if (!data) throw new Error('no data')
 
     const profile = data.profile as OAuthData['profile']
-    if (profile.provider != OAuthAddressType.Google) {
+    if (profile.provider != OAuthAddressType.Discord) {
       throw new Error('unknown provider')
     }
 
-    return profile._json
+    return profile.__json
   }
 
   getTokenURL(): string {
@@ -38,7 +35,7 @@ export default class GoogleAddress extends OAuthAddress {
   }
 
   static async alarm(address: Address) {
-    console.log({ alarm: 'google' })
+    console.log({ alarm: 'discord' })
   }
 }
 

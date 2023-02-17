@@ -63,13 +63,14 @@ export function Authentication({
 
       <div className="flex flex-row space-x-3 justify-evenly w-full">
         <ConnectOAuthButton provider="google" />
+        <ConnectOAuthButton provider="microsoft" />
         <ConnectOAuthButton provider="apple" />
       </div>
 
       <div className="flex flex-row space-x-3 justify-evenly w-full">
         <ConnectOAuthButton provider="twitter" />
+        <ConnectOAuthButton provider="discord" />
         <ConnectOAuthButton provider="github" />
-        <ConnectOAuthButton provider="microsoft" />
       </div>
 
       <div className="mt-14 flex justify-center items-center space-x-2">

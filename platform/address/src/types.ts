@@ -4,6 +4,7 @@ import { Scope } from '@kubelt/types/access'
 
 import {
   AppleOAuthSchema,
+  DiscordOAuthSchema,
   GithubOAuthSchema,
   GoogleOAuthSchema,
   MicrosoftOAuthSchema,
@@ -36,6 +37,9 @@ export interface Environment {
   INTERNAL_APPLE_OAUTH_CLIENT_ID: string
   SECRET_APPLE_OAUTH_CLIENT_SECRET: string
 
+  INTERNAL_DISCORD_OAUTH_CLIENT_ID: string
+  SECRET_DISCORD_OAUTH_CLIENT_SECRET: string
+
   INTERNAL_GITHUB_OAUTH_CLIENT_ID: string
   SECRET_GITHUB_OAUTH_CLIENT_SECRET: string
 
@@ -65,6 +69,7 @@ export type OAuthMicrosoftProfile = z.infer<
   typeof MicrosoftOAuthSchema
 >['_json']
 export type OAuthAppleProfile = z.infer<typeof AppleOAuthSchema>
+export type OAuthDiscordProfile = z.infer<typeof DiscordOAuthSchema>['__json']
 
 export type CryptoAddressProfile = z.infer<typeof CryptoAddressProfileSchema>
 export type AddressProfile =
@@ -74,6 +79,7 @@ export type AddressProfile =
   | OAuthGithubProfile
   | OAuthMicrosoftProfile
   | OAuthAppleProfile
+  | OAuthDiscordProfile
 
 export type AddressProfiles = AddressProfile[]
 

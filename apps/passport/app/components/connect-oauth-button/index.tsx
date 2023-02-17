@@ -2,17 +2,25 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import appleIcon from '@kubelt/design-system/src/assets/social_icons/apple.svg'
+import discordIcon from '@kubelt/design-system/src/assets/social_icons/discord.svg'
 import githubIcon from '@kubelt/design-system/src/assets/social_icons/github.svg'
 import googleIcon from '@kubelt/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@kubelt/design-system/src/assets/social_icons/microsoft.svg'
 import twitterIcon from '@kubelt/design-system/src/assets/social_icons/twitter.svg'
 
-type OAuthProvider = 'apple' | 'github' | 'google' | 'microsoft' | 'twitter'
+type OAuthProvider =
+  | 'apple'
+  | 'discord'
+  | 'github'
+  | 'google'
+  | 'microsoft'
+  | 'twitter'
 
 // Can possibly be replaced with
 // react-icons
 const providerIconDict: { [key in OAuthProvider]: string } = {
   apple: appleIcon,
+  discord: discordIcon,
   github: githubIcon,
   google: googleIcon,
   microsoft: microsoftIcon,

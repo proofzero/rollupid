@@ -1,6 +1,11 @@
 import { OAuthAddressType } from '@kubelt/types/address'
 import { z } from 'zod'
-import { GoogleRawProfileSchema, MicrosoftRawProfileSchema } from './profile'
+
+import {
+  DiscordRawProfileSchema,
+  GoogleRawProfileSchema,
+  MicrosoftRawProfileSchema,
+} from './profile'
 
 export const GoogleOAuthSchema = z.object({
   provider: z.literal(OAuthAddressType.Google),
@@ -114,6 +119,12 @@ export const AppleOAuthSchema = z.object({
   isApple: z.boolean().default(true),
 })
 
+export const DiscordOAuthSchema = z.object({
+  provider: z.literal(OAuthAddressType.Discord),
+  __json: DiscordRawProfileSchema,
+  isDiscord: z.boolean().default(true),
+})
+
 export const OAuthDataSchema = z.object({
   timestamp: z.number().default(() => Date.now()),
   accessToken: z.string(),
@@ -122,7 +133,7 @@ export const OAuthDataSchema = z.object({
   extraParams: z
     .object({
       expires_in: z.number().optional(),
-      scope: z.string().optional(),
+      scope: z.union([z.string().optional(), z.array(z.string())]),
       token_type: z.string().optional(),
       id_token: z.string().optional(),
     })
@@ -133,5 +144,6 @@ export const OAuthDataSchema = z.object({
     TwitterOAuthSchema,
     MicrosoftOAuthSchema,
     AppleOAuthSchema,
+    DiscordOAuthSchema,
   ]),
 })

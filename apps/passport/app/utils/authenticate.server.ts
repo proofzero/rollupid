@@ -154,6 +154,19 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
               displayName: `${firstName} ${lastName}`,
             }
           }
+          case OAuthAddressType.Discord: {
+            const gradient = await generateGradient(res.profile.id, env)
+            const { id, avatar } = res.profile
+            return {
+              cover: gradient,
+              displayName: res.profile.username,
+              pfp: {
+                image: avatar
+                  ? `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`
+                  : gradient,
+              },
+            }
+          }
           default:
             throw new Error(
               'Unsupported OAuth type encountered in profile response.'
