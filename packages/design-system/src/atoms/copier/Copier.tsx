@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { FaCopy } from 'react-icons/fa'
+import { FiCopy } from 'react-icons/fi'
 
 export type CopierProps = {
   value: string
@@ -9,7 +9,7 @@ export type CopierProps = {
 }
 export const Copier = ({ value, visible = true, onCopy }: CopierProps) => {
   return visible ? (
-    <FaCopy
+    <FiCopy
       onClick={() => {
         if (!navigator) {
           console.warn('Copying is not available')

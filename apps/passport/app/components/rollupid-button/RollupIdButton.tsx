@@ -1,7 +1,7 @@
 import type { ButtonProps } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
-import logo from './rollup-purple.svg'
+import logo from '../../assets/rollup-id-logo-white.svg'
 
 export type RollupIdButtonProps = {
   href: string
@@ -11,16 +11,17 @@ export type RollupIdButtonProps = {
 export function RollupIdButton({
   href,
   text = 'Private Login',
+  ...props
 }: RollupIdButtonProps) {
   return (
     <Button
       onClick={() => {
         window.location.href = href
       }}
-      className="flex flex-row gap-4 items-center"
-      btnSize="l"
+      className="flex flex-row gap-4 items-center justify-center"
+      {...props}
     >
-      <img src={logo} alt="logo" />
+      <img src={logo} style={{ maxWidth: 24 }} alt="logo" />
 
       {text}
     </Button>

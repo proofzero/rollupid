@@ -1,4 +1,5 @@
 import circleLogo from './circle-logo.svg'
+import subtractLogo from '../../assets/subtract-logo.svg'
 
 import ConnectOAuthButton from '../connect-oauth-button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
@@ -72,6 +73,7 @@ export function Authentication({
       </div>
 
       <div className="mt-14 flex justify-center items-center space-x-2">
+        <img src={subtractLogo} alt="powered by rollup.id" />
         <Text size="xs" weight="normal" className="text-gray-400">
           Powered by{' '}
           <a href="https://rollup.id" className="hover:underline">

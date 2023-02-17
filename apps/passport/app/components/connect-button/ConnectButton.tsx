@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import type { ButtonProps } from '@kubelt/design-system/src/atoms/buttons/Button'
 
-import walletsSvg from './wallets.svg'
+import walletsSvg from './wallets.png'
 
 const ConnectKitProvider = lazy(() =>
   import('connectkit').then((module) => ({
@@ -36,7 +36,7 @@ export function ConnectButton({
           return (
             <Button
               btnType="secondary-alt"
-              className={classNames('button', className)}
+              className={classNames('button hover:bg-gray-100', className)}
               disabled={isConnected ? !address : isConnecting}
               onClick={
                 isConnected ? () => address && connectCallback(address) : show
