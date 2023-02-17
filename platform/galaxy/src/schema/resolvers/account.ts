@@ -121,15 +121,20 @@ const accountResolvers: Resolvers = {
 
       // Validation
       if (gallery) {
-        const validator = await validOwnership(
-          gallery as Gallery,
+        const filteredGallery = await validOwnership(
+          gallery,
           env,
           connectedAddresses
         )
+        // Removal
+        if (gallery.length !== filteredGallery.length) {
+          await accountClient.setGallery.mutate({
+            name: accountURN,
+            gallery: filteredGallery,
+          })
+        }
 
-        return gallery.filter((nft) => {
-          return validator.get(nft.contract)?.includes(nft.tokenId)
-        })
+        return filteredGallery
       }
       // if there is no gallery
       return []
@@ -273,15 +278,20 @@ const accountResolvers: Resolvers = {
       })
       if (gallery) {
         // Validation
-        const validator = await validOwnership(
-          gallery as Gallery,
+        const filteredGallery = await validOwnership(
+          gallery,
           env,
           connectedAddresses
         )
 
-        return gallery.filter((nft) => {
-          return validator.get(nft.contract)?.includes(nft.tokenId)
-        })
+        if (gallery.length !== filteredGallery.length) {
+          await accountClient.setGallery.mutate({
+            name: accountURN,
+            gallery: filteredGallery,
+          })
+        }
+
+        return filteredGallery
       }
       // if there is no gallery
       return []
@@ -390,15 +400,15 @@ const accountResolvers: Resolvers = {
       })
 
       // Validation
-      const validator = await validOwnership(gallery, env, connectedAddresses)
-
-      gallery = gallery.filter((nft) => {
-        return validator.get(nft.contract)?.includes(nft.tokenId)
-      })
+      const filteredGallery = await validOwnership(
+        gallery,
+        env,
+        connectedAddresses
+      )
 
       await accountClient.setGallery.mutate({
         name: accountURN,
-        gallery,
+        gallery: filteredGallery,
       })
 
       return true

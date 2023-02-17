@@ -439,7 +439,6 @@ export const getNftMetadataForAllChains = async (
 }
 
 // -------------------- GALLERY VERIFICATION -----------------------------------
-
 export const validOwnership = async (
   gallery: Gallery[],
   env: ResolverContext['env'],
@@ -495,5 +494,7 @@ export const validOwnership = async (
     })
   })
 
-  return validator
+  return gallery.filter((nft) => {
+    return validator.get(nft.contract)?.includes(nft.tokenId)
+  })
 }
