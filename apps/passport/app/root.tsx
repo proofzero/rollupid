@@ -37,7 +37,10 @@ import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
 import * as gtag from '~/utils/gtags.client'
-import { getConsoleParamsSession } from './session.server'
+import {
+  getConsoleParamsSession,
+  setConsoleParamsSession,
+} from './session.server'
 import { getStarbaseClient } from './platform.server'
 
 export const meta: MetaFunction = () => ({
@@ -69,7 +72,21 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const parsedParams = consoleParamsSession
     ? await JSON.parse(consoleParamsSession)
     : undefined
-  const clientId = parsedParams?.clientId || undefined
+  let clientId = parsedParams?.clientId || undefined
+
+  // If we have a new clientId incoming
+  // that is different from what we have
+  // stored in cookie
+  if (
+    context.consoleParams.clientId &&
+    context.consoleParams.clientId !== clientId
+  ) {
+    // Update the cookie with new clientId
+    await setConsoleParamsSession(context.consoleParams, context.env)
+
+    // And use the new clientId to query starbase
+    clientId = context.consoleParams.clientId
+  }
 
   let appProps
   if (clientId) {

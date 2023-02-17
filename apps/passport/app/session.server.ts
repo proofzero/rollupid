@@ -84,7 +84,10 @@ export async function logout(request: Request, redirectTo: string, env: Env) {
 
 const getConsoleParamsSessionStorage = (
   env: Env,
-  MAX_AGE = 300 // 5 minutes
+  // https://developer.chrome.com/blog/cookie-max-age-expires/
+  // As of Chrome release M104 (August 2022) cookies can no longer
+  // set an expiration date more than 400 days in the future.
+  MAX_AGE = 34_560_000
 ) => {
   return createCookieSessionStorage({
     cookie: {
