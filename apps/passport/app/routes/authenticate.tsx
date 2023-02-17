@@ -6,7 +6,7 @@ import { getUserSession, setConsoleParamsSession } from '~/session.server'
 
 import React from 'react'
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
-import { useCatch } from '@remix-run/react'
+import { useCatch, useOutletContext } from '@remix-run/react'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
 // TODO: loader function check if we have a session already
@@ -44,6 +44,8 @@ const LazyAuth = React.lazy(() =>
 )
 
 export default function Index() {
+  const context = useOutletContext()
+
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
       <div
@@ -56,7 +58,7 @@ export default function Index() {
       ></div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
         <Suspense fallback={/*Show some spinner*/ ''}>
-          <LazyAuth />
+          <LazyAuth context={context} />
         </Suspense>
       </div>
     </div>
