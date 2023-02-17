@@ -340,7 +340,7 @@ const Gallery = () => {
   // --------------------- END OF MODAL PART ---------------------- //
 
   return (
-    <div className="relative min-h-[80vh] sm:min-h-[70vh]">
+    <div className="relative">
       <Text size="xl" weight="bold" className="my-4 text-gray-900">
         NFT Gallery
       </Text>

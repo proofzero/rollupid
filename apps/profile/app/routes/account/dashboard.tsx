@@ -35,7 +35,7 @@ export default function Welcome() {
   return (
     <div className="dashboard flex flex-col gap-4">
       <div
-        className="welcome-banner basis-full rounded-lg"
+        className="welcome-banner basis-full rounded-lg mt-4"
         style={{
           backgroundColor: '#F9FAFB',
           padding: '30px 30px 23px 16px',
@@ -204,7 +204,7 @@ export default function Welcome() {
           {appFetcher.type === 'done' && appFetcher.data?.error ? (
             <NestedErrorPage />
           ) : (
-            <div className="border shadow flex-1 flex flex-col rounded-lg">
+            <div className="border shadow flex-1 flex flex-col rounded-lg mb-4 sm:mb-0">
               <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-t-lg">
                 <Text
                   size="sm"
