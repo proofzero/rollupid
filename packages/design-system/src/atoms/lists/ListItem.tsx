@@ -14,7 +14,7 @@ export const ListItem = ({ id, children, disabled = false }: ListItemProps) => {
                border border-gray-300 rounded-md
                 py-3 mb-3 bg-white
                 flex flex-row items-center justify-between
-                ${disabled ? 'bg-gray-100' : null}
+                ${disabled ? 'bg-gray-100' : ''}
                  `}
     >
       <button className="text-gray-400 mr-[14px]" type="button"></button>

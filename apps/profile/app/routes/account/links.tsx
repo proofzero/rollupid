@@ -368,6 +368,9 @@ export default function AccountSettingsLinks() {
 
   return (
     <div className="relative">
+      <Text size="xl" weight="bold" className="my-4 text-gray-900">
+        Links
+      </Text>
       {/* Disabled for now */}
       <Text
         size="base"

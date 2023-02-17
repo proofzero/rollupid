@@ -143,7 +143,8 @@ export default function Welcome() {
             <SectionTitle title="Activity" />
 
             <div
-              className="w-full h-[205px] mt-4 flex justify-center items-center border-gray-200 rounded-lg shadow"
+              className="w-full h-[205px] border border-gray-200 
+              rounded-lg shadow mt-4 flex justify-center items-center "
               style={{
                 background: `url(${dashboardChart})`,
                 backgroundRepeat: 'no-repeat',
@@ -164,7 +165,7 @@ export default function Welcome() {
               <Link className="mb-3" to="/account/connections">
                 <Text
                   size="xs"
-                  weight="normal"
+                  weight="medium"
                   className="text-indigo-500 cursor-pointer"
                 >
                   Edit
@@ -279,6 +280,7 @@ export default function Welcome() {
                 <Tooltip
                   content="Coming soon!"
                   trigger="hover"
+                  className="font-[Inter]"
                   data-tooltip-style="light"
                   style="light"
                 >

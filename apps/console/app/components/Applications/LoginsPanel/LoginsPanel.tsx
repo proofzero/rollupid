@@ -123,7 +123,11 @@ export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
               </div>
 
               <div className="flex flex-row justify-center ">
-                <Tooltip content="Coming soon!" trigger="hover">
+                <Tooltip
+                  content="Coming soon!"
+                  trigger="hover"
+                  className="font-[Inter]"
+                >
                   <Text
                     size="sm"
                     weight="medium"

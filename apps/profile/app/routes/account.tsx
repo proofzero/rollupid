@@ -161,7 +161,7 @@ export default function AccountLayout() {
                 ))}
               </nav>
             </aside>
-            <div className="min-h-screen divide-y divide-transparent px-4 sm:mb-16 lg:col-start-3 lg:col-end-13 lg:p-4 lg:p-8">
+            <div className="min-h-screen divide-y divide-transparent px-4 lg:col-start-3 lg:col-end-13 lg:p-4 lg:p-8">
               <Outlet
                 context={{
                   profile,

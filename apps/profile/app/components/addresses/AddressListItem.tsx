@@ -60,7 +60,7 @@ export const AddressListItem = ({
 
   return (
     <div className="flex flex-row w-full items-center">
-      <section className="mx-4">
+      <section className="mx-3">
         <AddressListItemIcon iconUrl={icon} />
       </section>
 

@@ -57,9 +57,6 @@ export const action: ActionFunction = async ({ request }) => {
 
   let errors = new Map()
 
-  /**
-   * This part mutates D1 table for gallery
-   */
   const updatedGallery = formData.get('gallery') as string
   if (!updatedGallery) {
     throw new Error('Gallery should not be empty')

@@ -173,6 +173,9 @@ const AccountSettingsConnections = () => {
 
   return (
     <section>
+      <Text size="xl" weight="bold" className="my-4 text-gray-900">
+        Accounts
+      </Text>
       <div className="flex flex-row-reverse mt-7">
         <Button
           onClick={() => {
@@ -184,7 +187,7 @@ const AccountSettingsConnections = () => {
       </div>
 
       <div className="mt-1">
-        <Text size="sm" weight="normal" className="text-gray-500 mb-7">
+        <Text size="sm" weight="normal" className="text-gray-500 mb-4">
           CONNECTED ACCOUNTS
         </Text>
 
