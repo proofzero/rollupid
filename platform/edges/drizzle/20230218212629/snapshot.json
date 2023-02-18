@@ -1,7 +1,7 @@
 {
   "version": "4",
   "dialect": "sqlite",
-  "id": "3060fea3-8d55-4312-8622-52a4e762353c",
+  "id": "4aa765b2-b4c0-4cab-8474-7fb1147e1aaf",
   "prevId": "cf43a793-63a5-405a-b14e-363ac2594743",
   "tables": {
     "edge": {
@@ -37,13 +37,6 @@
           "name": "IDX_edge_tag",
           "columns": [
             "tag"
-          ],
-          "isUnique": false
-        },
-        "IDX_edge_src": {
-          "name": "IDX_edge_src",
-          "columns": [
-            "src"
           ],
           "isUnique": false
         },
