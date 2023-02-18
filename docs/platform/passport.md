@@ -14,7 +14,7 @@ The authentication step takes care of identifying profiles on the [Profile Graph
 
 Once authenticated the user will the be redirected to the authorization screen.
 
-<figure><img src="../.gitbook/assets/MacBook Pro 14_ - 1.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/MacBook Pro 14_ - 1 (1).png" alt=""><figcaption></figcaption></figure>
 
 Passport's authentication flow currently supports the following authentication methods and are configurable for your app [Console](console.md):
 
