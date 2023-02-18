@@ -63,7 +63,7 @@ _(For more details visit the_ [_Passport API_](../platform/passport.md) _page)_
 Exchange code
 {% endswagger-parameter %}
 
-{% swagger-parameter in="body" name="client_id" required="true" %}
+{% swagger-parameter in="body" name="client_id" required="true" type="String" %}
 Application client id
 {% endswagger-parameter %}
 

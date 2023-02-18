@@ -18,7 +18,7 @@ On the left is your application context menu. Here is where you can toggle betwe
 
 The very first screen you will see in Console is the list of all your applications in one place. You can also create apps from this screen using the "Create Application" button.
 
-<figure><img src="../.gitbook/assets/Dashboard.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/Dashboard (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Application Management
 
