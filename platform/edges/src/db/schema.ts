@@ -65,6 +65,9 @@ export const edge = sqliteTable(
   },
   (table) => ({
     edge: primaryKey(table.src, table.dst, table.tag),
+    tagidx: index('IDX_edge_tag').on(table.tag),
+    srcidx: index('IDX_edge_src').on(table.src),
+    dstidx: index('IDX_edge_dst').on(table.dst),
   })
 )
 
