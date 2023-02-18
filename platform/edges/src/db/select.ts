@@ -141,7 +141,6 @@ export async function edges(
   opt?: EdgeQueryOptions
 ): Promise<Edge[]> {
   const sqlBase = `
-  
   with normalizer as (
     select e.createdTimestamp, e.src, e.tag, e.dst, 'SRCQ' as compType, srcq.key as k, srcq.value as v
     from edge e left join node_qcomp srcq on e.src = srcq.nodeUrn where k not null 
@@ -154,9 +153,16 @@ export async function edges(
     UNION
     select e.createdTimestamp, e.src, e.tag, e.dst, 'DSTR' as compType, dstr.key as k, dstr.value as v
     from edge e left join node_rcomp dstr on e.dst = dstr.nodeUrn where k not null
-    order by src, tag, dst
     ),
-    `
+    
+  extender as (
+    select * from normalizer
+    union
+    select e.*, 'NONE' as compType, null as k, null as v from edge e 
+    where not exists(select 1 from edge n where e.src=n.src and e.tag=n.tag and e.dst=n.dst)   
+    order by src, tag, dst
+  ),
+  `
 
   // Intersection conditions look as follows, for each comp, with the compType being the differentiator
   // intersector as (
@@ -169,8 +175,8 @@ export async function edges(
 
   let sqlFilters = `
   select * from
-  (select dense_rank() over (order by n.src, n.tag,n.dst) as edge_no, n.* 
-  from intersector i left join normalizer n on i.src=n.src and i.tag=n.tag and i.dst=n.dst)
+  (select dense_rank() over (order by x.src, x.tag,x.dst) as edge_no, x.* 
+  from intersector i left join extender x on i.src=x.src and i.tag=x.tag and i.dst=x.dst)
   `
 
   const offset = opt?.offset || 0
@@ -242,7 +248,7 @@ export async function edges(
     const intersectorConditions = []
     for (const { compType, key, val } of compConditionsList) {
       const statmentPrefix = `
-        select distinct src, tag, dst from normalizer where
+        select distinct src, tag, dst from extender where
         compType='${compType}' and k=${key} and v=? 
         `
       prepBindParams.push(val)
@@ -261,7 +267,7 @@ export async function edges(
     )}) `
   } else {
     const statmentPrefix = `
-        select distinct src, tag, dst from normalizer where
+        select distinct src, tag, dst from extender where
         `
     const statementSuffix = edgeConditionsList
       .map((o) => {
@@ -278,16 +284,16 @@ export async function edges(
   //Keep this .debug until we're confident around the logic
   console.debug('FULL STATEMENT', finalSqlStatement)
   console.debug('BIND PARAMS', prepBindParams)
-  console.debug(
-    'TYPE OF BIND PARAMS',
-    prepBindParams.map((v) => typeof v)
-  )
 
   const resultSet = await g.db
     .prepare(finalSqlStatement)
     .bind(...prepBindParams)
     .all()
 
+  console.debug('EXECUTION METADATA', {
+    duration: resultSet.meta.duration,
+    error: resultSet.error,
+  })
   type resultRec = {
     edge_no: number
     createdTimestamp: string
