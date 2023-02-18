@@ -141,18 +141,19 @@ export async function edges(
   opt?: EdgeQueryOptions
 ): Promise<Edge[]> {
   const sqlBase = `
+  
   with normalizer as (
     select e.createdTimestamp, e.src, e.tag, e.dst, 'SRCQ' as compType, srcq.key as k, srcq.value as v
-    from edge e left join node_qcomp srcq on e.src = srcq.nodeUrn where k not null and v not null
+    from edge e left join node_qcomp srcq on e.src = srcq.nodeUrn where k not null 
     union
     select e.createdTimestamp, e.src, e.tag, e.dst, 'SRCR' as compType, srcr.key as k, srcr.value as v
-    from edge e left join node_rcomp srcr on e.src = srcr.nodeUrn where k not null and v not null
+    from edge e left join node_rcomp srcr on e.src = srcr.nodeUrn where k not null
     UNION
     select e.createdTimestamp, e.src, e.tag, e.dst, 'DSTQ' as compType, dstq.key as k, dstq.value as v
-    from edge e left join node_qcomp dstq on e.dst = dstq.nodeUrn where k not null and v not null
+    from edge e left join node_qcomp dstq on e.dst = dstq.nodeUrn where k not null 
     UNION
     select e.createdTimestamp, e.src, e.tag, e.dst, 'DSTR' as compType, dstr.key as k, dstr.value as v
-    from edge e left join node_rcomp dstr on e.dst = dstr.nodeUrn where k not null and v not null
+    from edge e left join node_rcomp dstr on e.dst = dstr.nodeUrn where k not null
     order by src, tag, dst
     ),
     `
@@ -192,8 +193,12 @@ export async function edges(
   const edgeConditionsList: Record<string, string>[] = []
   const compConditionsList: urnCompCondition[] = []
 
+  //We bind prepared statement values only; since keys are set by our code
+  //those get safely injected into queries through string templates
+  const prepBindParams: string[] = []
+
   //Helper function to convert a comp object (record<string,string>)
-  //to a array of urnCompConditions
+  //to an array of urnCompConditions
   function getUrnCompConditions(
     compType: compType,
     comp: Record<string, string | boolean | undefined>
@@ -238,12 +243,14 @@ export async function edges(
     for (const { compType, key, val } of compConditionsList) {
       const statmentPrefix = `
         select distinct src, tag, dst from normalizer where
-        compType='${compType}' and k='${key}' and v='${val}' 
+        compType='${compType}' and k=${key} and v=? 
         `
+      prepBindParams.push(val)
       const statementSuffix = edgeConditionsList
         .map((o) => {
           const [[k, v]] = Object.entries(o)
-          return `${k} = '${v}'`
+          prepBindParams.push(v)
+          return `${k} = ?`
         })
         .join(' AND ')
       const fullCompStatement = statmentPrefix + ' AND ' + statementSuffix
@@ -259,7 +266,8 @@ export async function edges(
     const statementSuffix = edgeConditionsList
       .map((o) => {
         const [[k, v]] = Object.entries(o)
-        return `${k} = '${v}'`
+        prepBindParams.push(v)
+        return `${k} = ?`
       })
       .join(' AND ')
     conditionsStatement = `intersector as (${statmentPrefix} ${statementSuffix}) `
@@ -269,8 +277,16 @@ export async function edges(
 
   //Keep this .debug until we're confident around the logic
   console.debug('FULL STATEMENT', finalSqlStatement)
+  console.debug('BIND PARAMS', prepBindParams)
+  console.debug(
+    'TYPE OF BIND PARAMS',
+    prepBindParams.map((v) => typeof v)
+  )
 
-  const resultSet = await g.db.prepare(finalSqlStatement).all()
+  const resultSet = await g.db
+    .prepare(finalSqlStatement)
+    .bind(...prepBindParams)
+    .all()
 
   type resultRec = {
     edge_no: number
