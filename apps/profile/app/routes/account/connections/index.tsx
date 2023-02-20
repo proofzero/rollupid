@@ -1,7 +1,11 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { AddressList } from '~/components/addresses/AddressList'
-import { useFetcher, useLoaderData, useOutletContext } from '@remix-run/react'
+import {
+  FetcherWithComponents,
+  useFetcher,
+  useLoaderData,
+} from '@remix-run/react'
 import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
 import { requireJWT } from '~/utils/session.server'
 import type { AddressURN } from '@kubelt/urns/address'
@@ -11,7 +15,6 @@ import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import InputText from '~/components/inputs/InputText'
 import { NodeType } from '@kubelt/types/address'
-import { AccountURN } from '@kubelt/urns/account'
 import warn from '~/assets/warning.svg'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 
@@ -125,13 +128,113 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 }
 
+const RenameModal = ({
+  fetcher,
+  isOpen,
+  setIsOpen,
+  id,
+  data,
+}: {
+  fetcher: FetcherWithComponents<any>
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+  id: string
+  data: {
+    title: string
+    address: string
+  }
+}) => (
+  <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
+    <div
+      className={`min-w-[437px] relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
+    >
+      <Text size="lg" weight="semibold" className="text-gray-900 mb-8">
+        Name Your Account
+      </Text>
+
+      <fetcher.Form method="post" action="/account/connections/rename">
+        <input type="hidden" name="id" value={id} />
+
+        <InputText
+          required
+          heading=""
+          name="name"
+          disabled={data.title.endsWith('.eth')}
+          defaultValue={data.title ?? ''}
+        />
+        <Text size="xs" weight="normal" className="text-gray-500 mt-2">
+          address: {data.address}
+        </Text>
+        <div className="flex justify-end items-center space-x-3 mt-20">
+          <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+
+          <Button type="submit" btnType="primary">
+            Save
+          </Button>
+        </div>
+      </fetcher.Form>
+    </div>
+  </Modal>
+)
+
+const DisconnectModal = ({
+  fetcher,
+  isOpen,
+  setIsOpen,
+  id,
+  data,
+}: {
+  fetcher: FetcherWithComponents<any>
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+  id: string
+  data: {
+    title: string
+  }
+}) => (
+  <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
+    <div
+      className={`min-w-[437px] relative transform rounded-lg  bg-white px-4 pt-5 pb-4 
+         text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
+    >
+      <div className=" flex items-start space-x-4">
+        <img src={warn} />
+
+        <div className="flex-1">
+          <Text size="lg" weight="medium" className="text-gray-900 mb-2">
+            Disconnect account
+          </Text>
+
+          <Text size="sm" weight="normal" className="text-gray-500">
+            Are you sure you want to disconnect "
+            <span className="text-gray-800">{data.title}</span>" from Rollup?
+            You might lose access to some functionality.
+          </Text>
+
+          <fetcher.Form method="post" action="/account/connections/disconnect">
+            <input type="hidden" name="id" value={id} />
+
+            <div className="flex justify-end items-center space-x-3 mt-20">
+              <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
+                Cancel
+              </Button>
+
+              <Button type="submit" btnType="dangerous">
+                Disconnect
+              </Button>
+            </div>
+          </fetcher.Form>
+        </div>
+      </div>
+    </div>
+  </Modal>
+)
+
 const AccountSettingsConnections = () => {
   const { cryptoProfiles, vaultProfiles, oAuthProfiles, addressCount } =
     useLoaderData()
-
-  const { accountURN } = useOutletContext<{
-    accountURN: AccountURN
-  }>()
 
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [disconnectModalOpen, setDisconnectModalOpen] = useState(false)
@@ -213,91 +316,25 @@ const AccountSettingsConnections = () => {
           CONNECTED ACCOUNTS
         </Text>
 
-        <Modal
-          isOpen={renameModalOpen}
-          handleClose={() => setRenameModalOpen(false)}
-        >
-          <div
-            className={`min-w-[437px] relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
-          >
-            <Text size="lg" weight="semibold" className="text-gray-900 mb-8">
-              Name Your Account
-            </Text>
+        {actionId && actionProfile && (
+          <>
+            <RenameModal
+              fetcher={fetcher}
+              isOpen={renameModalOpen}
+              setIsOpen={setRenameModalOpen}
+              id={actionId}
+              data={actionProfile}
+            />
 
-            <fetcher.Form method="post" action="/account/connections/rename">
-              {actionId && <input type="hidden" name="id" value={actionId} />}
-
-              <InputText
-                required
-                heading=""
-                name="name"
-                disabled={actionProfile?.title.endsWith('.eth')}
-                defaultValue={actionProfile?.title ?? ''}
-              />
-              {actionProfile?.address && (
-                <Text size="xs" weight="normal" className="text-gray-500 mt-2">
-                  address: {actionProfile?.address}
-                </Text>
-              )}
-              <div className="flex justify-end items-center space-x-3 mt-20">
-                <Button
-                  btnType="secondary-alt"
-                  onClick={() => setRenameModalOpen(false)}
-                >
-                  Cancel
-                </Button>
-
-                <Button type="submit" btnType="primary">
-                  Save
-                </Button>
-              </div>
-            </fetcher.Form>
-          </div>
-        </Modal>
-
-        <Modal
-          isOpen={disconnectModalOpen}
-          handleClose={() => setDisconnectModalOpen(false)}
-        >
-          <div
-            className={`w-[62vw] transform rounded-lg  bg-white px-4 pt-5 pb-4 
-         text-left shadow-xl transition-all sm:p-6 overflow-y-auto flex items-start space-x-4`}
-          >
-            <img src={warn} />
-
-            <div className="flex-1">
-              <Text size="lg" weight="medium" className="text-gray-900 mb-2">
-                Disconnect account
-              </Text>
-
-              <Text size="sm" weight="normal" className="text-gray-500">
-                Are you sure you want to disconnect "
-                <span className="text-gray-800">{actionProfile?.title}</span>"
-                from Rollup? You might lose access to some functionality.
-              </Text>
-
-              <fetcher.Form
-                method="post"
-                action="/account/connections/disconnect"
-              >
-                {actionId && <input type="hidden" name="id" value={actionId} />}
-
-                <div className="flex justify-end items-center space-x-3 mt-20">
-                  <Button
-                    btnType="secondary-alt"
-                    onClick={() => setDisconnectModalOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-
-                  <Button type="submit" btnType="dangerous">
-                    Disconnect
-                  </Button>
-                </div>
-              </fetcher.Form>
-            </div>
-          </div>
-        </Modal>
+            <DisconnectModal
+              fetcher={fetcher}
+              isOpen={disconnectModalOpen}
+              setIsOpen={setDisconnectModalOpen}
+              id={actionId}
+              data={actionProfile}
+            />
+          </>
+        )}
 
         <AddressList
           addresses={cryptoProfiles
