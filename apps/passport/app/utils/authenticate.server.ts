@@ -12,6 +12,7 @@ import {
 import { createUserSession, parseJwt } from '~/session.server'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import { generateGradient } from './gradient.server'
+import { redirect } from '@remix-run/cloudflare'
 
 export const authenticateAddress = async (
   address: AddressURN,
@@ -21,9 +22,14 @@ export const authenticateAddress = async (
     redirectUri: string
     state: string
     scope: string
+    prompt: string
   } | null,
   env: Env
 ) => {
+  if (appData?.prompt === 'login') {
+    return redirect(appData.redirectUri)
+  }
+
   const accessClient = getAccessClient(env)
   const clientId = AddressURNSpace.decode(address)
   const redirectUri = env.PASSPORT_REDIRECT_URL
@@ -77,7 +83,7 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
 
   if (!profile) {
     console.log(`Profile doesn't exist for account ${account}. Creating one...`)
-    const addressClient = await getAddressClient(address, env)
+    const addressClient = getAddressClient(address, env)
     const newProfile = await addressClient.getAddressProfile
       .query()
       .then(async (res) => {
