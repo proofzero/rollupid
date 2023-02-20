@@ -333,8 +333,29 @@ const accountResolvers: Resolvers = {
     disconnectAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
-      { accountURN, env }: ResolverContext
+      { accountURN, env, jwt }: ResolverContext
     ) => {
+      if (!AddressURNSpace.is(addressURN)) {
+        throw new GraphQLError(
+          'Invalid addressURN format. Base address URN expected.'
+        )
+      }
+
+      const addresses = await getConnectedAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
+      })
+
+      const addressURNList = addresses?.map((a) => a.urn) ?? []
+      if (!addressURNList.includes(addressURN)) {
+        throw new GraphQLError('Calling account is not address owner')
+      }
+
+      if (addressURNList.length === 1) {
+        throw new GraphQLError('Cannot disconnect last address')
+      }
+
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN,
       })
