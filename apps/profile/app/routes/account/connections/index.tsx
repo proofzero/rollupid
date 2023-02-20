@@ -13,6 +13,7 @@ import InputText from '~/components/inputs/InputText'
 import { NodeType } from '@kubelt/types/address'
 import { AccountURN } from '@kubelt/urns/account'
 import warn from '~/assets/warning.svg'
+import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 
 const normalizeProfile = (profile: any) => {
   switch (profile.__typename) {
@@ -136,6 +137,8 @@ const AccountSettingsConnections = () => {
   const [actionId, setActionId] = useState<null | string>()
   const [actionProfile, setActionProfile] = useState<any>()
 
+  const [loading, setLoading] = useState(false)
+
   const fetcher = useFetcher()
 
   useEffect(() => {
@@ -156,6 +159,12 @@ const AccountSettingsConnections = () => {
     }
     if (fetcher.type === 'actionReload') {
       fetcher.load('/account/connections')
+    }
+
+    if (fetcher.state !== 'idle') {
+      setLoading(true)
+    } else {
+      setLoading(false)
     }
   }, [fetcher])
 
@@ -186,6 +195,7 @@ const AccountSettingsConnections = () => {
       <Text size="xl" weight="bold" className="my-4 text-gray-900">
         Accounts
       </Text>
+      {loading && <Loader />}
       <div className="flex flex-row-reverse mt-7">
         <Button
           onClick={() => {

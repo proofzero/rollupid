@@ -333,16 +333,14 @@ const accountResolvers: Resolvers = {
     disconnectAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
-      { accountURN }: ResolverContext
+      { accountURN, env }: ResolverContext
     ) => {
-      console.log({
-        addressURN,
-        accountURN,
+      const addressClient = createAddressClient(env.Address, {
+        [PlatformAddressURNHeader]: addressURN,
       })
-      // Get address for calling account
-      // Check that I own the address to be disconnected
-      // Initialize addressClient
-      // Call unset
+
+      await addressClient.unsetAccount.mutate(accountURN)
+
       return true
     },
     updateProfile: async (
