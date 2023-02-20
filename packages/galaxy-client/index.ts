@@ -124,6 +124,7 @@ export type LinkInput = {
 
 export type Mutation = {
   __typename?: 'Mutation'
+  disconnectAddress?: Maybe<Scalars['Boolean']>
   updateAddressNickname?: Maybe<Scalars['Boolean']>
   updateConnectedAddressesProperties?: Maybe<Scalars['Boolean']>
   updateGallery?: Maybe<Scalars['Boolean']>
@@ -132,9 +133,8 @@ export type Mutation = {
 }
 
 export type MutationDisconnectAddressArgs = {
-  addressURN: Scalars['URN'];
-};
-
+  addressURN: Scalars['URN']
+}
 
 export type MutationUpdateAddressNicknameArgs = {
   addressURN: Scalars['URN']
@@ -622,11 +622,13 @@ export type UpdateGalleryMutation = {
 }
 
 export type DisconnectAddressMutationVariables = Exact<{
-  addressURN: Scalars['URN'];
-}>;
+  addressURN: Scalars['URN']
+}>
 
-
-export type DisconnectAddressMutation = { __typename?: 'Mutation', disconnectAddress?: boolean | null };
+export type DisconnectAddressMutation = {
+  __typename?: 'Mutation'
+  disconnectAddress?: boolean | null
+}
 
 export type GetAddressProfileQueryVariables = Exact<{
   addressURN: Scalars['URN']
@@ -1050,6 +1052,11 @@ export const UpdateGalleryDocument = gql`
     updateGallery(gallery: $gallery)
   }
 `
+export const DisconnectAddressDocument = gql`
+  mutation disconnectAddress($addressURN: URN!) {
+    disconnectAddress(addressURN: $addressURN)
+  }
+`
 export const GetAddressProfileDocument = gql`
   query getAddressProfile($addressURN: URN!) {
     addressProfile(addressURN: $addressURN) {
@@ -1423,6 +1430,21 @@ export function getSdk(
             { ...requestHeaders, ...wrappedRequestHeaders }
           ),
         'updateGallery',
+        'mutation'
+      )
+    },
+    disconnectAddress(
+      variables: DisconnectAddressMutationVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<DisconnectAddressMutation> {
+      return withWrapper(
+        (wrappedRequestHeaders) =>
+          client.request<DisconnectAddressMutation>(
+            DisconnectAddressDocument,
+            variables,
+            { ...requestHeaders, ...wrappedRequestHeaders }
+          ),
+        'disconnectAddress',
         'mutation'
       )
     },
