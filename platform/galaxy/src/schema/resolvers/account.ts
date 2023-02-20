@@ -347,7 +347,7 @@ const accountResolvers: Resolvers = {
         jwt,
       })
 
-      const addressURNList = addresses?.map((a) => a.urn) ?? []
+      const addressURNList = addresses?.map((a) => a.baseUrn) ?? []
       if (!addressURNList.includes(addressURN)) {
         throw new GraphQLError('Calling account is not address owner')
       }
