@@ -156,6 +156,16 @@ export default class Access extends DOProxy {
       aud: [clientId],
       scope,
     } = payload as AccessJWTPayload
+
+    await this.state.storage.transaction(async (txn) => {
+      if (!payload.jti) {
+        throw new Error('missing JTI')
+      }
+      const tokens = (await txn.get<Tokens>('tokens')) || {}
+      delete tokens[payload.jti]
+      await txn.put({ tokens })
+    })
+
     return this.generate(account, clientId, scope)
   }
 
