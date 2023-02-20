@@ -78,17 +78,6 @@ const addressResolvers: Resolvers = {
       console.debug({ jwt, addressURNList })
       return true
     },
-    disconnectAddress: async (
-      _parent: any,
-      { addressURN },
-      { env }: ResolverContext
-    ) => {
-      // Get address for calling account
-      // Check that I own the address to be disconnected
-      // Initialize addressClient
-      // Call unset
-      return true
-    },
   },
 
   AddressProfilesUnion: {
@@ -134,7 +123,6 @@ const AddressResolverComposition = {
     hasApiKey(),
     isAuthorized(),
   ],
-  'Mutation.disconnectAddress': [setupContext(), hasApiKey(), isAuthorized()],
 }
 
 export default composeResolvers(addressResolvers, AddressResolverComposition)

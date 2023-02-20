@@ -74,5 +74,6 @@ export default /* GraphQL */ `
     updateProfile(profile: ProfileInput): Boolean
     updateLinks(links: [LinkInput!]): Boolean
     updateGallery(gallery: [GalleryInput!]): Boolean
+    disconnectAddress(addressURN: URN!): Boolean
   }
 `

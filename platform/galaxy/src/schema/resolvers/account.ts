@@ -330,6 +330,21 @@ const accountResolvers: Resolvers = {
     },
   },
   Mutation: {
+    disconnectAddress: async (
+      _parent: any,
+      { addressURN }: { addressURN: AddressURN },
+      { accountURN }: ResolverContext
+    ) => {
+      console.log({
+        addressURN,
+        accountURN,
+      })
+      // Get address for calling account
+      // Check that I own the address to be disconnected
+      // Initialize addressClient
+      // Call unset
+      return true
+    },
     updateProfile: async (
       _parent: any,
       { profile },
@@ -463,6 +478,7 @@ const ProfileResolverComposition = {
     isAuthorized(),
     logAnalytics(),
   ],
+  'Mutation.disconnectAddress': [setupContext(), hasApiKey(), isAuthorized()],
 }
 
 export default composeResolvers(accountResolvers, ProfileResolverComposition)

@@ -123,7 +123,3 @@ mutation updateConnectedAddressesProperties(
 ) {
   updateConnectedAddressesProperties(addressURNList: $addressURNList)
 }
-
-mutation disconnectAddress($addressURN: URN!) {
-  disconnectAddress(addressURN: $addressURN)
-}

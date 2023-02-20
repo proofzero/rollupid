@@ -621,6 +621,13 @@ export type UpdateGalleryMutation = {
   updateGallery?: boolean | null
 }
 
+export type DisconnectAddressMutationVariables = Exact<{
+  addressURN: Scalars['URN'];
+}>;
+
+
+export type DisconnectAddressMutation = { __typename?: 'Mutation', disconnectAddress?: boolean | null };
+
 export type GetAddressProfileQueryVariables = Exact<{
   addressURN: Scalars['URN']
 }>
@@ -767,13 +774,6 @@ export type UpdateConnectedAddressesPropertiesMutation = {
   __typename?: 'Mutation'
   updateConnectedAddressesProperties?: boolean | null
 }
-
-export type DisconnectAddressMutationVariables = Exact<{
-  addressURN: Scalars['URN'];
-}>;
-
-
-export type DisconnectAddressMutation = { __typename?: 'Mutation', disconnectAddress?: boolean | null };
 
 export type GetEnsProfileQueryVariables = Exact<{
   addressOrEns: Scalars['String']
