@@ -11,7 +11,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   const id = formData.get('id') as AddressURN
   const galaxyClient = await getGalaxyClient()
-  galaxyClient.disconnectAddress(
+  await galaxyClient.disconnectAddress(
     {
       addressURN: id,
     },

@@ -478,7 +478,12 @@ const ProfileResolverComposition = {
     isAuthorized(),
     logAnalytics(),
   ],
-  'Mutation.disconnectAddress': [setupContext(), hasApiKey(), isAuthorized()],
+  'Mutation.disconnectAddress': [
+    setupContext(),
+    hasApiKey(),
+    isAuthorized(),
+    logAnalytics(),
+  ],
 }
 
 export default composeResolvers(accountResolvers, ProfileResolverComposition)

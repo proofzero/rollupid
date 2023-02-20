@@ -297,6 +297,10 @@ const AccountSettingsConnections = () => {
                     setActionId(id)
                     setRenameModalOpen(true)
                   },
+            }))
+            .concat(oAuthProfiles)
+            .map((ap: AddressListItemProps) => ({
+              ...ap,
               onDisconnect:
                 ap.id === accountURN
                   ? null
@@ -304,8 +308,7 @@ const AccountSettingsConnections = () => {
                       setActionId(id)
                       setDisconnectModalOpen(true)
                     },
-            }))
-            .concat(oAuthProfiles)}
+            }))}
         />
 
         <Text size="sm" weight="normal" className="text-gray-500 my-7">
