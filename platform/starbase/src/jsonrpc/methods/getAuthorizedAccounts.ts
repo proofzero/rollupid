@@ -58,14 +58,14 @@ export const getAuthorizedAccounts = async ({
             // check that the app is the current app
             (me.dst.rc as AccessRComp).client_id === input.client &&
             // check that accountURN is the needed one
-            me.src.id === edge.src.id
+            me.src.baseUrn === edge.src.baseUrn
         ) === index
     )
     .map((edge) => {
       const timestamp = new Date(
         (edge.createdTimestamp as string) + ' UTC'
       ).getTime()
-      const accountURN = edge.src.urn
+      const accountURN = edge.src.baseUrn
       return { accountURN, timestamp }
     })
     // Order in ascending order

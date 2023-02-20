@@ -69,9 +69,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
     profile = {
       ...profile.profile,
-      links: profile.links,
-      gallery: profile.gallery,
-      addresses: profile.connectedAddresses,
+      links: profile.links || [],
+      gallery: profile.gallery || [],
+      addresses: profile.connectedAddresses || [],
     }
 
     if (!profile) {
@@ -102,7 +102,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const splittedUrl = request.url.split('/')
     const path = splittedUrl[splittedUrl.length - 1]
 
-    const matches = profile.addresses?.filter((addr) => urn === addr.urn)
+    const matches = profile.addresses?.filter((addr) => urn === addr.baseUrn)
 
     const cryptoAddresses = profile.addresses?.filter(
       (addr) => addr.rc.node_type === NodeType.Crypto

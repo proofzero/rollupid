@@ -78,7 +78,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const addresses = (await getAccountAddresses(jwt)) ?? []
   const addressTypeUrns = addresses.map((a) => ({
-    urn: a.urn,
+    urn: a.baseUrn,
     nodeType: a.rc.node_type,
   }))
 
@@ -199,10 +199,7 @@ const AccountSettingsConnections = () => {
               Name Your Account
             </Text>
 
-            <fetcher.Form
-              method="post"
-              action="/account/connections/rename"
-            >
+            <fetcher.Form method="post" action="/account/connections/rename">
               {actionId && <input type="hidden" name="id" value={actionId} />}
 
               <InputText

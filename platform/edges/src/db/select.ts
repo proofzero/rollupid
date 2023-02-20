@@ -7,19 +7,19 @@
 // Imported Types
 // -----------------------------------------------------------------------------
 
-import { Graph } from '@kubelt/types'
 import type { AnyURN } from '@kubelt/urns'
 
 import type {
   Edge,
   Node,
   EdgeQuery,
-  EdgeRecord,
   Graph as GraphDB,
   QComponent,
   QComponents,
   RComponent,
   RComponents,
+  EdgeTag,
+  EdgeQueryOptions,
 } from './types'
 
 // qc()
@@ -118,7 +118,7 @@ export async function node(
     return undefined
   }
 
-  const nodeUrn = node.urn
+  const nodeUrn = node.baseUrn
 
   const qcMap = await qc(g, nodeUrn as AnyURN)
   node.qc = qcMap
@@ -138,201 +138,208 @@ export async function node(
 export async function edges(
   g: GraphDB,
   query: EdgeQuery,
-  opt?: any
+  opt?: EdgeQueryOptions
 ): Promise<Edge[]> {
-  let sql: string
+  const sqlBase = `
+  with normalizer as (
+    select e.createdTimestamp, e.src, e.tag, e.dst, 'SRCQ' as compType, srcq.key as k, srcq.value as v
+    from edge e left join node_qcomp srcq on e.src = srcq.nodeUrn where k not null 
+    union
+    select e.createdTimestamp, e.src, e.tag, e.dst, 'SRCR' as compType, srcr.key as k, srcr.value as v
+    from edge e left join node_rcomp srcr on e.src = srcr.nodeUrn where k not null
+    UNION
+    select e.createdTimestamp, e.src, e.tag, e.dst, 'DSTQ' as compType, dstq.key as k, dstq.value as v
+    from edge e left join node_qcomp dstq on e.dst = dstq.nodeUrn where k not null 
+    UNION
+    select e.createdTimestamp, e.src, e.tag, e.dst, 'DSTR' as compType, dstr.key as k, dstr.value as v
+    from edge e left join node_rcomp dstr on e.dst = dstr.nodeUrn where k not null
+    ),
+    
+  extender as (
+    select * from normalizer
+    union
+    select e.*, 'NONE' as compType, null as k, null as v from edge e 
+    where not exists(select 1 from edge n where e.src=n.src and e.tag=n.tag and e.dst=n.dst)   
+    order by src, tag, dst
+  ),
+  `
 
-  // If a node ID is not supplied, we're returning no edges.
-  //
-  // TODO we don't want to allow for the possibility of all edges being
-  // returned until pagination is in place. Revisit this behavior if we
-  // decide to implement it.
-  // if (!query.id) {
-  //   return []
-  // }
+  // Intersection conditions look as follows, for each comp, with the compType being the differentiator
+  // intersector as (
+  //   select distinct src, tag, dst from normalizer
+  //     where tag='urn:edge-tag:owns/address' and compType='DSTQ' and k='alias' and v='username'
+  //   intersect
+  //   select distinct src, tag, dst from normalizer
+  //     where tag='urn:edge-tag:owns/address' and compType='DSTR' and k='addr_type' and v='github'
+  // )
 
-  // Filter returned edges by direction; if we're asked for "outgoing"
-  // edges, the node ID is for the "source" node of the edge. If we're
-  // asked for "incoming" edges, the node ID is for the "destination"
-  // node of the edge. If no direction is supplied, return all edges
-  // that originate or terminate at the given node ID.
-  let statement
-  if (query.id) {
-    switch (query.dir) {
-      case Graph.EdgeDirection.Incoming:
-        sql = `SELECT * FROM edge e WHERE (e.dst = ?)`
-        break
-      case Graph.EdgeDirection.Outgoing:
-        sql = `SELECT * FROM edge e WHERE (e.src = ?)`
-        break
-      default:
-        throw 'no direction currently not supported. see https://github.com/cloudflare/miniflare/issues/504'
-      // default:
-      //   sql = `SELECT * FROM edge e WHERE (e.src = ?1 OR e.dst = ?1)`
-    }
+  let sqlFilters = `
+  select * from
+  (select dense_rank() over (order by x.src, x.tag,x.dst) as edge_no, x.* 
+  from intersector i left join extender x on i.src=x.src and i.tag=x.tag and i.dst=x.dst)
+  `
 
-    // Filter edges by tag, if provided.
-    if (query.tag) {
-      sql += ' AND e.tag = ? ORDER BY createdTimestamp ASC'
-      statement = g.db.prepare(sql).bind(query.id.toString(), query.tag)
-    } else {
-      sql += ' ORDER BY createdTimestamp ASC'
-      statement = g.db.prepare(sql).bind(query.id.toString())
-    }
-  } else {
-    sql = `SELECT * FROM edge e`
+  const offset = opt?.offset || 0
+  let optionsConditions = `where edge_no > ${offset} `
+  if (opt?.limit) optionsConditions += `and edge_no <= ${offset + opt.limit}`
+  sqlFilters += optionsConditions
 
-    if (query.tag) {
-      sql += ' WHERE e.tag = ? ORDER BY createdTimestamp ASC'
-      statement = g.db.prepare(sql).bind(query.tag)
-    } else {
-      sql += ' ORDER BY createdTimestamp ASC'
-      statement = g.db.prepare(sql).bind()
-    }
+  enum compType {
+    SRCQ = 'SRCQ',
+    SRCR = 'SRCR',
+    DSTQ = 'DSTQ',
+    DSTR = 'DSTR',
   }
 
-  const result = await statement.all()
+  type urnCompCondition = {
+    compType: compType
+    key: string
+    val: string
+  }
+  const edgeConditionsList: Record<string, string>[] = []
+  const compConditionsList: urnCompCondition[] = []
 
-  // TODO check result.success and handle query error
-  let edges: EdgeRecord[] = result.results as EdgeRecord[]
+  //We bind prepared statement values only; since keys are set by our code
+  //those get safely injected into queries through string templates
+  const prepBindParams: string[] = []
 
-  // Returns true if every key/value pair in the query components is
-  // matched exactly in the node components.
-  function hasCompMatches(
-    queryComp: Record<string, string | boolean | undefined>,
-    nodeComp: Record<string, string | boolean>
-  ): boolean {
-    const nodeKeys = Object.keys(nodeComp)
-
-    const compKeys = Object.keys(queryComp)
-      // .flat()
-      .filter((e) => queryComp[e] !== undefined)
-
-    // if there is nothing to filter on then default to true
-    if (!compKeys.length) {
-      return true
-    }
-
-    const matches = nodeKeys.filter((e) => {
-      if (compKeys.includes(e)) {
-        const q = queryComp[e]?.toString() // convert boolean to string
-        const n = nodeComp[e]
-        console.log({
-          e,
-          q: queryComp[e]?.toString(),
-          n: nodeComp[e],
-          pass: q === n,
+  //Helper function to convert a comp object (record<string,string>)
+  //to an array of urnCompConditions
+  function getUrnCompConditions(
+    compType: compType,
+    comp: Record<string, string | boolean | undefined>
+  ): urnCompCondition[] {
+    const results = []
+    for (const [k, v] of Object.entries(comp)) {
+      if (k && v)
+        results.push({
+          compType: compType,
+          key: k,
+          val: v.toString(),
         })
-        return q === n
-      }
-      return true
-    })
-
-    // console.log({ queryComp, qList, nodeComp, matches })
-
-    return matches.length > 0
+    }
+    return results
   }
 
-  async function nodeFilter(
-    edges: EdgeRecord[],
-    query: EdgeQuery
-  ): Promise<EdgeRecord[]> {
-    // A reducing function over a set of edges that discards any edges
-    // which don't match the filter criteria supplied in the EdgeQuery.
-    async function queryFilter(
-      resultPromise: Promise<EdgeRecord[]>,
-      edge: EdgeRecord
-    ): Promise<EdgeRecord[]> {
-      const result = await resultPromise
+  //Logic is split into conditions that apply on edge table columns and
+  //comp table columns. The former either apply by themselves in a single statement,
+  //or they are repeated on the condition statements of the latter to get the
+  //intersector syntax from the comment above
+  let conditionsStatement
+  if (query.tag) edgeConditionsList.push({ tag: query.tag })
+  if (query.src) {
+    const src = query.src
+    if (src.baseUrn) edgeConditionsList.push({ src: src.baseUrn })
+    if (src.qc)
+      compConditionsList.concat(getUrnCompConditions(compType.SRCQ, src.qc))
+    if (src.rc)
+      compConditionsList.concat(getUrnCompConditions(compType.SRCR, src.rc))
+  }
+  if (query.dst) {
+    const dst = query.dst
+    if (dst.baseUrn) edgeConditionsList.push({ dst: dst.baseUrn })
+    if (dst.qc)
+      compConditionsList.concat(getUrnCompConditions(compType.SRCQ, dst.qc))
+    if (dst.rc)
+      compConditionsList.concat(getUrnCompConditions(compType.SRCQ, dst.rc))
+  }
 
-      // SRC
+  if (compConditionsList.length) {
+    const intersectorConditions = []
+    for (const { compType, key, val } of compConditionsList) {
+      const statmentPrefix = `
+        select distinct src, tag, dst from extender where
+        compType='${compType}' and k=${key} and v=? 
+        `
+      prepBindParams.push(val)
+      const statementSuffix = edgeConditionsList
+        .map((o) => {
+          const [[k, v]] = Object.entries(o)
+          prepBindParams.push(v)
+          return `${k} = ?`
+        })
+        .join(' AND ')
+      const fullCompStatement = statmentPrefix + ' AND ' + statementSuffix
+      intersectorConditions.push(fullCompStatement)
+    }
+    conditionsStatement = `intersector as (${intersectorConditions.join(
+      ' INTERSECT '
+    )}) `
+  } else {
+    const statmentPrefix = `
+        select distinct src, tag, dst from extender where
+        `
+    const statementSuffix = edgeConditionsList
+      .map((o) => {
+        const [[k, v]] = Object.entries(o)
+        prepBindParams.push(v)
+        return `${k} = ?`
+      })
+      .join(' AND ')
+    conditionsStatement = `intersector as (${statmentPrefix} ${statementSuffix}) `
+  }
 
-      // fragment
-      if (query?.src?.fr !== undefined) {
-        const srcNode = await node(g, edge.src)
-        if (srcNode !== undefined && srcNode.fragment !== query.src.fr) {
-          return result
-        }
-      }
-      // q-components
-      if (query?.src?.qc !== undefined) {
-        const srcQc = await qc(g, edge.src)
-        if (!hasCompMatches(query.src.qc, srcQc)) {
-          return result
-        }
-      }
-      // r-components
-      if (query?.src?.rc !== undefined) {
-        const srcRc = await rc(g, edge.src)
-        if (!hasCompMatches(query.src.rc, srcRc)) {
-          return result
-        }
-      }
+  const finalSqlStatement = sqlBase + conditionsStatement + sqlFilters
 
-      // DST
+  //Keep this .debug until we're confident around the logic
+  console.debug('FULL STATEMENT', finalSqlStatement)
+  console.debug('BIND PARAMS', prepBindParams)
 
-      // fragment
-      if (query?.dst?.fr) {
-        const dstNode = await node(g, edge.dst)
-        if (dstNode !== undefined && dstNode.fragment !== query.dst.fr) {
-          return result
-        }
-      }
-      // q-components
-      if (query?.dst?.qc && Object.keys(query?.dst?.qc).length) {
-        const dstQc = await qc(g, edge.dst)
-        if (!hasCompMatches(query?.dst?.qc, dstQc)) {
-          return result
-        }
-      }
-      // r-components
-      if (query?.dst?.rc && Object.keys(query?.dst?.rc).length) {
-        const dstRc = await rc(g, edge.dst)
-        if (!hasCompMatches(query.dst.rc, dstRc)) {
-          return result
-        }
-      }
+  const resultSet = await g.db
+    .prepare(finalSqlStatement)
+    .bind(...prepBindParams)
+    .all()
 
-      // Include the current edge in the list of returned edges; it has
-      // passed filtering.
-      result.push(edge)
+  console.debug('EXECUTION METADATA', {
+    duration: resultSet.meta.duration,
+    error: resultSet.error,
+  })
+  type resultRec = {
+    edge_no: number
+    createdTimestamp: string
+    src: AnyURN
+    tag: EdgeTag
+    dst: AnyURN
+    compType: compType
+    k: string
+    v: string
+  }
 
-      return result
+  const results = []
+  let currentEdgeNo
+  let currentEdge: Edge
+  for (const result of (resultSet.results as resultRec[]) || []) {
+    if (currentEdgeNo !== result.edge_no) {
+      currentEdgeNo = result.edge_no
+      currentEdge = {} as Edge
+      results.push(currentEdge)
+      currentEdge.createdTimestamp = result.createdTimestamp
+      currentEdge.tag = result.tag
+      currentEdge.src = { baseUrn: result.src, qc: {}, rc: {} }
+      currentEdge.dst = { baseUrn: result.dst, qc: {}, rc: {} }
     }
 
-    return edges.reduce(queryFilter, Promise.resolve([]))
+    let compToUpdate: Record<string, string>
+    switch (result.compType) {
+      case compType.SRCQ:
+        compToUpdate = currentEdge!.src.qc
+        break
+      case compType.SRCR:
+        compToUpdate = currentEdge!.src.rc
+        break
+      case compType.DSTQ:
+        compToUpdate = currentEdge!.dst.qc
+        break
+      case compType.DSTR:
+        compToUpdate = currentEdge!.dst.rc
+        break
+    }
+    const compRec = { [result.k]: result.v }
+    Object.assign(compToUpdate, compRec)
   }
-
-  if (query?.src !== undefined || query?.dst !== undefined) {
-    edges = await nodeFilter(edges, query)
-  }
-
-  // Enrich each edge with the details of the referenced nodes.
-  return Promise.all(
-    edges.map(async (edgeRec: EdgeRecord): Promise<Edge> => {
-      const srcNode: Node | undefined = await node(g, edgeRec.src)
-      if (!srcNode) {
-        throw new Error(`error getting node: ${edgeRec.src}`)
-      }
-      const src: Node = { ...srcNode, id: `urn:${srcNode.nid}:${srcNode.nss}` }
-
-      const dstNode: Node | undefined = await node(g, edgeRec.dst)
-      if (!dstNode) {
-        throw new Error(`error getting node: ${edgeRec.dst}`)
-      }
-      const dst: Node = { ...dstNode, id: `urn:${dstNode.nid}:${dstNode.nss}` }
-
-      const tag = edgeRec.tag
-      const createdTimestamp = edgeRec.createdTimestamp || null
-
-      return {
-        tag,
-        src,
-        dst,
-        createdTimestamp,
-      }
-    })
-  )
+  //Keep this .debug until we're confident about the logic
+  console.debug('RESULTS', results)
+  return results
 }
 
 // incoming()

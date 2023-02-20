@@ -1,9 +1,6 @@
 export default /* GraphQL */ `
   type Node {
-    urn: String!
-    nid: String!
-    nss: String!
-    fragment: String
+    baseUrn: String!
     qc: JSON
     rc: JSON
   }
@@ -15,10 +12,7 @@ export default /* GraphQL */ `
   }
 
   input NodeInput {
-    urn: String!
-    nid: String!
-    nss: String!
-    fragment: String
+    baseUrn: String!
     qc: JSON
     rc: JSON
   }

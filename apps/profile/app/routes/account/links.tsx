@@ -121,7 +121,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const profiles =
     (await getAddressProfiles(
       jwt,
-      addresses.map((atu) => atu.urn as AddressURN)
+      addresses.map((atu) => atu.baseUrn as AddressURN)
     )) ?? []
 
   // We need to get them ready to be displayed

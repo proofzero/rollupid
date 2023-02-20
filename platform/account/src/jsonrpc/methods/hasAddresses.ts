@@ -5,7 +5,6 @@ import { Context } from '../../context'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
 import type { AddressList } from '../../types'
-import { Graph } from '@kubelt/types'
 import type { AccountURN } from '@kubelt/urns/account'
 import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
 
@@ -49,11 +48,9 @@ export const hasAddressesMethod = async ({
     // We are only interested in edges that start at the account node and
     // terminate at the address node, assuming that account nodes link to
     // the address nodes that they own.
-    id: input.account,
+    src: { baseUrn: input.account },
     // We only want edges that link to address nodes.
     tag: EDGE_ADDRESS,
-    // Account -> Address edges indicate ownership.
-    dir: Graph.EdgeDirection.Outgoing,
 
     qc: {
       hidden: input.account === ctx.accountURN,
@@ -65,7 +62,7 @@ export const hasAddressesMethod = async ({
   // A set of the addresses owned by the account.
   const ownedAddresses = new Set(
     edgeList.map((edge) => {
-      return edge.dst.urn
+      return edge.dst.baseUrn
     })
   )
   // The input set of addresses to check.

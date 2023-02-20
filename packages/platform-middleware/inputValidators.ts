@@ -63,8 +63,7 @@ export const EdgeTagInput = z.custom<EdgeURN>((input) => {
 export const EdgeDirectionInput = z.enum(['incoming', 'outgoing'])
 
 export const NodeFilterInput = z.object({
-  id: AnyURNInput.optional(),
-  fr: z.string().optional(),
+  baseUrn: AnyURNInput.optional(),
   qc: z.record(z.string(), z.string().or(z.boolean()).optional()).optional(),
   rc: z.record(z.string(), z.string().or(z.boolean()).optional()).optional(),
 })

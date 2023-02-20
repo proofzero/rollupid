@@ -23,5 +23,4 @@ export const updateNodeCompsMethod = async ({
   const nodeUrn = input.urnOfNode
   if (!nodeUrn) throw new Error('updateNodeCompsParam: No urn provided')
   const result = await update.node(ctx.graph, nodeUrn)
-  console.debug('updateNodeCompsParam: results ', { result })
 }

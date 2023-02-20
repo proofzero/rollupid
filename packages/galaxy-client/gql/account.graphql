@@ -24,10 +24,7 @@ query getProfile {
     provider
   }
   connectedAddresses {
-    urn
-    nid
-    nss
-    fragment
+    baseUrn
     qc
     rc
   }
@@ -69,10 +66,7 @@ query getProfileFromAddress($addressURN: URN!) {
     chain
   }
   connectedAddresses: connectedAddressesFromAddress(addressURN: $addressURN) {
-    urn
-    nid
-    nss
-    fragment
+    baseUrn
     qc
     rc
   }
@@ -88,10 +82,7 @@ query getAuthorizedApps {
 
 query getConnectedAddresses {
   connectedAddresses {
-    urn
-    nid
-    nss
-    fragment
+    baseUrn
     qc
     rc
   }

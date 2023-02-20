@@ -1,10 +1,8 @@
-import { Node, Profile } from '@kubelt/galaxy-client'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import { FullProfile } from '~/types'
 
 export const getRedirectUrlForProfile = (
-  profile: Profile & {
-    addresses: Node[]
-  }
+  profile: FullProfile
 ): string | undefined => {
   if (profile.handle) {
     //TODO: when handle strategy is implemented, this should redirect to
@@ -13,7 +11,7 @@ export const getRedirectUrlForProfile = (
     console.warn('Handle logic not implemented')
   }
 
-  const addressUrn = profile.addresses[0].urn as AddressURN
+  const addressUrn = profile.addresses[0].baseUrn as AddressURN
   const idref = AddressURNSpace.decode(addressUrn)
   return `/a/${idref}`
 }

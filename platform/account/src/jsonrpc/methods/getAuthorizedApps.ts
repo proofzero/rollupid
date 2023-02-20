@@ -48,11 +48,10 @@ export const getAuthorizedAppsMethod = async ({
   const edgesResult = await edgesClient.getEdges.query({
     query: {
       // We only want edges that start at the provided account node.
-      id: input.account,
+      src: { baseUrn: input.account },
       // We only want edges that link to Access nodes (sessions).
       tag: EDGE_AUTHORIZES,
       // Account -> Access edges indicate session ownership.
-      dir: Graph.EdgeDirection.Outgoing,
     },
   })
 
