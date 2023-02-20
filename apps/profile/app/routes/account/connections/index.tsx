@@ -118,6 +118,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     .map(normalizeProfile)
 
   return {
+    addressCount: addresses.length,
     cryptoProfiles,
     vaultProfiles,
     oAuthProfiles,
@@ -125,7 +126,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 }
 
 const AccountSettingsConnections = () => {
-  const { cryptoProfiles, vaultProfiles, oAuthProfiles } = useLoaderData()
+  const { cryptoProfiles, vaultProfiles, oAuthProfiles, addressCount } =
+    useLoaderData()
 
   const { accountURN } = useOutletContext<{
     accountURN: AccountURN
@@ -312,7 +314,7 @@ const AccountSettingsConnections = () => {
             .map((ap: AddressListItemProps) => ({
               ...ap,
               onDisconnect:
-                ap.id === accountURN
+                addressCount === 1
                   ? null
                   : (id: string) => {
                       setActionId(id)
