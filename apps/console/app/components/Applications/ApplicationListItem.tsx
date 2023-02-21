@@ -73,7 +73,10 @@ export const ApplicationListItem = ({
       {/* Menu could be injected from outside */}
       <Menu>
         <Menu.Button>
-          <div className="w-8 h-8 flex justify-center items-center cursor-pointer">
+          <div
+            className="w-8 h-8 flex justify-center items-center cursor-pointer
+          hover:bg-gray-100 hover:rounded-[6px]"
+          >
             <HiDotsVertical className="text-lg text-gray-400" />
           </div>
         </Menu.Button>
@@ -87,15 +90,19 @@ export const ApplicationListItem = ({
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="absolute z-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y divide-gray-100">
-            <div className="p-1">
+          <Menu.Items
+            className="absolute z-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 
+          rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y
+           divide-gray-100"
+          >
+            <div className="p-1 ">
               <a href={`/apps/${id}`}>
                 <Menu.Item
                   as="div"
-                  className="py-2 px-4 flex items-center space-x-3 cursor-pointer"
+                  className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                  hover:rounded-[6px] hover:bg-gray-100"
                 >
                   <HiOutlineCog className="text-xl font-normal text-gray-400" />
-
                   <Text size="sm" weight="normal" className="text-gray-700">
                     Settings
                   </Text>
@@ -106,7 +113,8 @@ export const ApplicationListItem = ({
             <div className="p-1">
               <Menu.Item
                 as="div"
-                className="py-2 px-4 flex items-center space-x-3 cursor-pointer"
+                className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                hover:rounded-[6px] hover:bg-gray-100"
                 onClick={() => {
                   if (onDeleteApplication) {
                     onDeleteApplication(id, name ?? '')
