@@ -36,7 +36,7 @@ export function ConnectButton({
           return (
             <Button
               btnType="secondary-alt"
-              className={classNames('button hover:bg-gray-100', className)}
+              className={classNames('button', className)}
               disabled={isConnected ? !address : isConnecting}
               onClick={
                 isConnected ? () => address && connectCallback(address) : show

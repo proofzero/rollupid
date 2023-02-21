@@ -78,7 +78,7 @@ export function Authentication({
         <Text size="xs" weight="normal" className="text-gray-400">
           Powered by{' '}
           <a href="https://rollup.id" className="hover:underline">
-            Rollup.id
+            rollup.id
           </a>
         </Text>
       </div>
