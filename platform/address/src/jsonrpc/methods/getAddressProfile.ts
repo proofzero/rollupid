@@ -123,6 +123,12 @@ export const getAddressProfileMethod = async ({
     case OAuthAddressType.Microsoft: {
       const oAuthNode = new MicrosoftAddress(nodeClient, ctx)
       const profile = await oAuthNode.getProfile()
+      console.debug('MICROSOFT PROFILE  :')
+      console.debug({
+        address: ctx.addressURN,
+        profile,
+        picture: profile.picture,
+      })
       return {
         urn: ctx.addressURN,
         type: OAuthAddressType.Microsoft,

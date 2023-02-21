@@ -65,7 +65,7 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
     case 'OAuthTwitterProfile':
       return {
         addressURN: ap.urn,
-        address: `https://twitter.com/${profile.screen_name}`,
+        address: `https://twitter.com/${ap.profile.screen_name}`,
         title: 'Twitter',
         icon: ap.profile.profile_image_url_https,
         provider: OAuthAddressType.Twitter,
