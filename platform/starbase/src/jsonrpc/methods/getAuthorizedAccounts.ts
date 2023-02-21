@@ -24,6 +24,8 @@ export const GetAuthorizedAccountsMethodOutput = z.array(
   z.object({
     accountURN: z.string(),
     timestamp: z.number(),
+    name: z.string(),
+    imageURL: z.string(),
   })
 )
 
@@ -42,36 +44,28 @@ export const getAuthorizedAccounts = async ({
   const edgesResult = await edgesClient.getEdges.query({
     query: {
       tag: EDGE_AUTHORIZES,
+      dst: {
+        rc: {
+          client_id: input.client,
+        },
+      },
     },
     // set limit to not query the whole db
-    opt: { limit: 8 },
+    opt: { limit: 10 },
   })
 
-  const mappedEdges = edgesResult.edges
-    .filter(
-      (edge, index, edges) =>
-        (edge.dst.rc as AccessRComp).client_id &&
-        (edge.dst.rc as AccessRComp).client_id === input.client &&
-        // take only 1 entry by accountURN
-        edges.findIndex(
-          (me) =>
-            // check that the app is the current app
-            (me.dst.rc as AccessRComp).client_id === input.client &&
-            // check that accountURN is the needed one
-            me.src.baseUrn === edge.src.baseUrn
-        ) === index
-    )
-    .map((edge) => {
-      const timestamp = new Date(
-        (edge.createdTimestamp as string) + ' UTC'
-      ).getTime()
-      const accountURN = edge.src.baseUrn
-      return { accountURN, timestamp }
-    })
-    // Order in ascending order
-    .sort((a, b) => a.timestamp - b.timestamp)
-    // Take only 8 entries
-    .slice(0, 8)
+  const mappedEdges = edgesResult.edges.map((edge) => {
+    const timestamp = new Date(
+      (edge.createdTimestamp as string) + ' UTC'
+    ).getTime()
+    const accountURN = edge.src.baseUrn
+    return {
+      accountURN,
+      timestamp,
+      name: edge.src.qc.name,
+      imageURL: edge.src.qc.picture,
+    }
+  })
 
   console.log({ mappedEdges })
 

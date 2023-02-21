@@ -42,7 +42,7 @@ export const getPublicAddressesMethod = async ({
         addr_type: input.filter?.type,
       },
       qc: {
-        hidden: false,
+        hidden: 'false',
       },
     },
   }

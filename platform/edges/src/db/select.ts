@@ -159,8 +159,7 @@ export async function edges(
     select * from normalizer
     union
     select e.*, 'NONE' as compType, null as k, null as v from edge e 
-    where not exists(select 1 from edge n where e.src=n.src and e.tag=n.tag and e.dst=n.dst)   
-    order by src, tag, dst
+    where not exists(select 1 from edge n where e.src=n.src and e.tag=n.tag and e.dst=n.dst)
   ),
   `
 
@@ -181,8 +180,10 @@ export async function edges(
 
   const offset = opt?.offset || 0
   let optionsConditions = `where edge_no > ${offset} `
-  if (opt?.limit) optionsConditions += `and edge_no <= ${offset + opt.limit}`
+  if (opt?.limit) optionsConditions += `and edge_no <= ${offset + opt.limit} `
   sqlFilters += optionsConditions
+
+  const finalSort = `order by createdTimestamp desc`
 
   enum compType {
     SRCQ = 'SRCQ',
@@ -237,19 +238,28 @@ export async function edges(
   }
   if (query.dst) {
     const dst = query.dst
+    console.debug('QUERY DST', dst)
     if (dst.baseUrn) edgeConditionsList.push({ dst: dst.baseUrn })
-    if (dst.qc)
-      compConditionsList.concat(getUrnCompConditions(compType.SRCQ, dst.qc))
-    if (dst.rc)
-      compConditionsList.concat(getUrnCompConditions(compType.SRCQ, dst.rc))
+    if (dst.qc) {
+      const additions = getUrnCompConditions(compType.DSTQ, dst.qc)
+      console.debug('Adding DST QC', additions, dst.qc)
+      compConditionsList.push(...additions)
+    }
+    if (dst.rc) {
+      const additions = getUrnCompConditions(compType.DSTR, dst.rc)
+      console.debug('Adding DST RC', additions, dst.rc)
+      compConditionsList.push(...additions)
+    }
   }
+
+  console.debug('********* compConditions length', compConditionsList.length)
 
   if (compConditionsList.length) {
     const intersectorConditions = []
     for (const { compType, key, val } of compConditionsList) {
       const statmentPrefix = `
         select distinct src, tag, dst from extender where
-        compType='${compType}' and k=${key} and v=? 
+        compType='${compType}' and k='${key}' and v=? 
         `
       prepBindParams.push(val)
       const statementSuffix = edgeConditionsList
@@ -279,7 +289,8 @@ export async function edges(
     conditionsStatement = `intersector as (${statmentPrefix} ${statementSuffix}) `
   }
 
-  const finalSqlStatement = sqlBase + conditionsStatement + sqlFilters
+  const finalSqlStatement =
+    sqlBase + conditionsStatement + sqlFilters + finalSort
 
   //Keep this .debug until we're confident around the logic
   console.debug('FULL STATEMENT', finalSqlStatement)
@@ -338,7 +349,16 @@ export async function edges(
     Object.assign(compToUpdate, compRec)
   }
   //Keep this .debug until we're confident about the logic
-  console.debug('RESULTS', results)
+  console.debug(
+    'RESULTS',
+    results.map((r) => ({
+      r,
+      srcq: r.src.qc,
+      srcr: r.src.rc,
+      dstq: r.dst.qc,
+      dstr: r.dst.rc,
+    }))
+  )
   return results
 }
 
