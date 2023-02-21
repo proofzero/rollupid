@@ -4,6 +4,7 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useState } from 'react'
+import { Pill } from '@kubelt/design-system/src/atoms/pills/Pill'
 
 export const loader = appLoader
 
@@ -92,10 +93,47 @@ export default () => {
           >
             <img src={a.icon} className="object-cover w-16 h-16 rounded" />
 
-            <div className="flex-1">
+            <div className="flex-1 flex flex-col space-y-2">
               <Text weight="semibold" className="text-gray-900">
                 {a.title}
               </Text>
+
+              <div className="flex flex-col space-y-4">
+                <div className="flex flex-row space-x-2 items-center">
+                  <Text size="sm" weight="normal" className="text-gray-500">
+                    Read Only:
+                  </Text>
+
+                  <Pill className="bg-[#F2F4F7]">
+                    <Text size="xs" weight="medium" className="text-gray-500">
+                      Public Profile
+                    </Text>
+                  </Pill>
+
+                  <Pill className="bg-[#F2F4F7]">
+                    <Text size="xs" weight="medium" className="text-gray-500">
+                      Email
+                    </Text>
+                  </Pill>
+
+                  <Pill className="bg-[#F2F4F7]">
+                    <Text size="xs" weight="medium" className="text-gray-500">
+                      Blockchain Information
+                    </Text>
+                  </Pill>
+                </div>
+                <div className="flex flex-row space-x-2 items-center">
+                  <Text size="sm" weight="normal" className="text-gray-500">
+                    Write:
+                  </Text>
+
+                  <Pill className="bg-[#F2F4F7]">
+                    <Text size="xs" weight="medium" className="text-gray-500">
+                      Dedicated Account Vault
+                    </Text>
+                  </Pill>
+                </div>
+              </div>
             </div>
 
             <div className="text-right">
