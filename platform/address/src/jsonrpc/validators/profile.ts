@@ -96,7 +96,7 @@ export const MicrosoftRawProfileSchema = z.object({
   given_name: z.string().optional(),
   family_name: z.string().optional(),
   email: z.string().optional(),
-  picture: z.string(),
+  picture: z.string().or(z.object({})).optional(),
   isMicrosoft: z.boolean().default(true),
   rollupidImageUrl: z.string().optional(),
 })

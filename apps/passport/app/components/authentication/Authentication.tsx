@@ -63,7 +63,7 @@ export function Authentication({
 
       <div className="flex flex-row space-x-3 justify-evenly w-full">
         <ConnectOAuthButton provider="google" />
-        <ConnectOAuthButton provider="microsoft" />
+        {/* <ConnectOAuthButton provider="microsoft" /> */}
         <ConnectOAuthButton provider="apple" />
       </div>
 
