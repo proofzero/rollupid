@@ -97,3 +97,6 @@ mutation updateLinks($links: [LinkInput!]) {
 mutation updateGallery($gallery: [GalleryInput!]) {
   updateGallery(gallery: $gallery)
 }
+mutation disconnectAddress($addressURN: URN!) {
+  disconnectAddress(addressURN: $addressURN)
+}
