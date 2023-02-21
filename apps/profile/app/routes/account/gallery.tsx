@@ -401,6 +401,19 @@ const Gallery = () => {
                 className="grid-cols-2 md:grid-cols-3 lg:grid-cols-4
             flex flex-col justify-center items-center"
               >
+                {galleryFetcher.state === 'loading' && (
+                  <LoadingGridSquaresGallery numberOfCells={30} />
+                )}
+                {curatedNfts.map((nft: any, i: number) => {
+                  return (
+                    <SortableNft
+                      key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
+                      url={nft.url}
+                      index={i}
+                      nft={nft}
+                    />
+                  )
+                })}
                 <button
                   type="button"
                   className="w-full h-full
@@ -419,22 +432,9 @@ const Gallery = () => {
                       fontWeight={100}
                       className="mb-2 font-extralight"
                     />
+                    <Text>Add NFT</Text>
                   </div>
                 </button>
-
-                {galleryFetcher.state === 'loading' && (
-                  <LoadingGridSquaresGallery numberOfCells={30} />
-                )}
-                {curatedNfts.map((nft: any, i: number) => {
-                  return (
-                    <SortableNft
-                      key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
-                      url={nft.url}
-                      index={i}
-                      nft={nft}
-                    />
-                  )
-                })}
               </div>
             </SortableContext>
             <DragOverlay
