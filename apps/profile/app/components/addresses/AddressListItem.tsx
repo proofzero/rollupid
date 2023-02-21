@@ -106,7 +106,8 @@ export const AddressListItem = ({
                   {onRenameAccount && (
                     <Menu.Item
                       as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100"
+                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                      hover:rounded-[6px] hover:bg-gray-100 focus:bg-gray-100"
                       onClick={() => {
                         onRenameAccount(id)
                       }}
@@ -122,7 +123,8 @@ export const AddressListItem = ({
                   {onChangeAvatar && (
                     <Menu.Item
                       as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100"
+                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                      hover:bg-gray-100 focus:bg-gray-100 hover:rounded-[6px]"
                       onClick={() => {
                         onChangeAvatar(id)
                       }}
@@ -138,7 +140,8 @@ export const AddressListItem = ({
                   {onSetPrimary && (
                     <Menu.Item
                       as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100"
+                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer 
+                      hover:bg-gray-100 focus:bg-gray-100 hover:rounded-[6px]"
                       onClick={() => {
                         onSetPrimary(id)
                       }}
@@ -154,7 +157,8 @@ export const AddressListItem = ({
                   {onSetPrivate && (
                     <Menu.Item
                       as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100"
+                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                       hover:bg-gray-100 hover:rounded-[6px] focus:bg-gray-100"
                       onClick={() => {
                         onSetPrivate(id)
                       }}
@@ -172,7 +176,8 @@ export const AddressListItem = ({
                   {onDisconnect && (
                     <Menu.Item
                       as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100"
+                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer 
+                      hover:bg-gray-100 hover:rounded-[6px] focus:bg-gray-100"
                       onClick={() => {
                         onDisconnect(id)
                       }}

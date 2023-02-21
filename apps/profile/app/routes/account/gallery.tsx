@@ -419,7 +419,7 @@ const Gallery = () => {
                   </div>
                 </button>
 
-                {galleryFetcher.state === 'loading' && (
+                {galleryFetcher.state === 'loading' && !curatedNfts.length && (
                   <LoadingGridSquaresGallery numberOfCells={30} />
                 )}
                 {curatedNfts.map((nft: any, i: number) => {
