@@ -29,22 +29,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     )
     const accountClient = createAccountClient(Account)
 
-    const authorizations = await starbaseClient.getAuthorizedAccounts.query({
-      client,
-    })
-
-    const authorizedProfiles = await Promise.all(
-      authorizations.map<Promise<AuthorizedProfile>>(async (authorization) => {
-        const profileRes = await accountClient.getProfile.query({
-          account: authorization.accountURN as AccountURN,
-        })
-        return {
-          imageURL: profileRes?.pfp?.image as string,
-          name: profileRes?.displayName,
-          timestamp: authorization.timestamp,
-          accountURN: authorization.accountURN,
-        }
-      })
+    const authorizedProfiles = await starbaseClient.getAuthorizedAccounts.query(
+      {
+        client,
+      }
     )
 
     return json<LoaderData>({ authorizedProfiles })

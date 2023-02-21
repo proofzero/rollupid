@@ -23,7 +23,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   const addressURN = AddressURNSpace.componentizedUrn(
     generateHashedIDRef(CryptoAddressType.ETH, address),
     { node_type: node_type, addr_type: addr_type },
-    { alias: address }
+    { alias: address, hidden: 'false' }
   )
 
   const addressClient = getAddressClient(addressURN, context.env)

@@ -49,9 +49,6 @@ export const getOwnAddressesMethod = async ({
       rc: {
         addr_type: input.filter?.type,
       },
-      qc: {
-        hidden: true,
-      },
     },
   }
 
