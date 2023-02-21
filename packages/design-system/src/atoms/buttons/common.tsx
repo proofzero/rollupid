@@ -7,6 +7,7 @@ export type ButtonType =
   | 'secondary'
   | 'secondary-alt'
   | 'dangerous'
+  | 'dangerous-alt'
 
 // Dictionary pattern used
 // so Tailwind can find the needed classes
@@ -30,6 +31,8 @@ export const typeToColorsDict = {
     'bg-white text-[#1f2937] shadow-sm border border-solid border-[#d1d5db] hover:bg-gray-100 focus:bg-white focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
   dangerous:
     'bg-red-500 text-white shadow-sm hover:bg-red-400 focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
+  'dangerous-alt':
+    'bg-white text-red-500 border border-solid border-red-500 shadow-sm hover:bg-red-400 focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
 }
 
 export const disabledColorClasses = 'bg-[#f3f4f6] text-[#d1d5db]'
