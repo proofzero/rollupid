@@ -238,21 +238,16 @@ export async function edges(
   }
   if (query.dst) {
     const dst = query.dst
-    console.debug('QUERY DST', dst)
     if (dst.baseUrn) edgeConditionsList.push({ dst: dst.baseUrn })
     if (dst.qc) {
       const additions = getUrnCompConditions(compType.DSTQ, dst.qc)
-      console.debug('Adding DST QC', additions, dst.qc)
       compConditionsList.push(...additions)
     }
     if (dst.rc) {
       const additions = getUrnCompConditions(compType.DSTR, dst.rc)
-      console.debug('Adding DST RC', additions, dst.rc)
       compConditionsList.push(...additions)
     }
   }
-
-  console.debug('********* compConditions length', compConditionsList.length)
 
   if (compConditionsList.length) {
     const intersectorConditions = []
