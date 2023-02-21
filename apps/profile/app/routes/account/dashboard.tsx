@@ -35,7 +35,7 @@ export default function Welcome() {
   return (
     <div className="dashboard flex flex-col gap-4">
       <div
-        className="welcome-banner basis-full rounded-lg"
+        className="welcome-banner basis-full rounded-lg mt-4"
         style={{
           backgroundColor: '#F9FAFB',
           padding: '30px 30px 23px 16px',
@@ -143,7 +143,8 @@ export default function Welcome() {
             <SectionTitle title="Activity" />
 
             <div
-              className="w-full h-[205px] mt-4 flex justify-center items-center border-gray-200 rounded-lg shadow"
+              className="w-full h-[205px] border border-gray-200 
+              rounded-lg shadow mt-4 flex justify-center items-center "
               style={{
                 background: `url(${dashboardChart})`,
                 backgroundRepeat: 'no-repeat',
@@ -164,7 +165,7 @@ export default function Welcome() {
               <Link className="mb-3" to="/account/connections">
                 <Text
                   size="xs"
-                  weight="normal"
+                  weight="medium"
                   className="text-indigo-500 cursor-pointer"
                 >
                   Edit
@@ -204,7 +205,7 @@ export default function Welcome() {
           {appFetcher.type === 'done' && appFetcher.data?.error ? (
             <NestedErrorPage />
           ) : (
-            <div className="border shadow flex-1 flex flex-col rounded-lg">
+            <div className="border shadow flex-1 flex flex-col rounded-lg mb-4 sm:mb-0">
               <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-t-lg">
                 <Text
                   size="sm"
@@ -279,6 +280,7 @@ export default function Welcome() {
                 <Tooltip
                   content="Coming soon!"
                   trigger="hover"
+                  className="font-[Inter]"
                   data-tooltip-style="light"
                   style="light"
                 >

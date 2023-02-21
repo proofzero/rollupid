@@ -219,6 +219,9 @@ export default function AccountSettingsProfile() {
 
   return (
     <>
+      <Text size="xl" weight="bold" className="my-4 text-gray-900">
+        Settings
+      </Text>
       <PfpNftModal
         account={temporaryAddress}
         nfts={loadedNfts}

@@ -65,8 +65,13 @@ const ProfileCard = ({
           navigator.clipboard.writeText(account)
         }}
       >
-        <Tooltip content="Copied!" trigger="click" animation="duration-1000">
-          <Text weight="semibold" className="text-gray-400" size="xs">
+        <Tooltip
+          content="Copied!"
+          trigger="click"
+          animation="duration-1000"
+          className="font-[Inter]"
+        >
+          <Text weight="semibold" className="text-gray-400 " size="xs">
             <span className="flex flex-row items-center">
               <FaCopy className="mr-3" />
 

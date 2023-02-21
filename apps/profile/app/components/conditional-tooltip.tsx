@@ -20,7 +20,7 @@ const ConditionalTooltip = ({
       // placement=
       // without `text-black` text gets white on white bg
       // ¯\_(ツ)_/¯
-      className="text-black bg-white !font-mono"
+      className="text-black bg-white font-[Inter]"
       trigger={trigger}
     >
       {children}

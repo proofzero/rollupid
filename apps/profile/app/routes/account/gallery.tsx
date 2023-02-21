@@ -57,9 +57,6 @@ export const action: ActionFunction = async ({ request }) => {
 
   let errors = new Map()
 
-  /**
-   * This part mutates D1 table for gallery
-   */
   const updatedGallery = formData.get('gallery') as string
   if (!updatedGallery) {
     throw new Error('Gallery should not be empty')
@@ -340,7 +337,7 @@ const Gallery = () => {
   // --------------------- END OF MODAL PART ---------------------- //
 
   return (
-    <div className="relative min-h-[80vh] sm:min-h-[70vh]">
+    <div className="relative">
       <Text size="xl" weight="bold" className="my-4 text-gray-900">
         NFT Gallery
       </Text>
@@ -422,7 +419,7 @@ const Gallery = () => {
                   </div>
                 </button>
 
-                {galleryFetcher.state === 'loading' && (
+                {galleryFetcher.state === 'loading' && !curatedNfts.length && (
                   <LoadingGridSquaresGallery numberOfCells={30} />
                 )}
                 {curatedNfts.map((nft: any, i: number) => {

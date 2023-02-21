@@ -367,7 +367,10 @@ export default function AccountSettingsLinks() {
   }, [isConnectionsChanged])
 
   return (
-    <div className="min-h-[76vh] sm:min-h-[70vh] relative">
+    <div className="relative">
+      <Text size="xl" weight="bold" className="my-4 text-gray-900">
+        Links
+      </Text>
       {/* Disabled for now */}
       <Text
         size="base"

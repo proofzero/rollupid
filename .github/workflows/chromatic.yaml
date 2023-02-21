@@ -22,7 +22,7 @@ jobs:
       # find out what deploy stack to use
       - uses: actions/checkout@v2
       - uses: dorny/paths-filter@v2
-        id: storybook
+        id: changes
         with:
           filters: |
             profile:
