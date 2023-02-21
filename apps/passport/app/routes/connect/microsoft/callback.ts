@@ -49,9 +49,13 @@ export const loader: LoaderFunction = async ({
   })
   const existingOAuthData = await addressClient.getOAuthData.query()
 
-  if (existingOAuthData?.profile == null) {
+  if (
+    existingOAuthData?.profile == null &&
+    typeof profile._json.picture === 'string'
+  ) {
     //If we don't already have a microsoft oauth data set, we cache
     //the image and set the OAuth data set for the address
+
     const imageUrl = await cacheImageToCF(profile._json.picture, context.env, {
       Authorization: `Bearer ${authRes.accessToken}`,
     })

@@ -132,11 +132,7 @@ export const getAddressProfileMethod = async ({
       return {
         urn: ctx.addressURN,
         type: OAuthAddressType.Microsoft,
-        profile: {
-          ...profile,
-          picture:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE8ig7Ys914TypBbWofcsBDRQe9Ha2jIa2z4PEyPHVPw&s',
-        },
+        profile,
       }
     }
     case OAuthAddressType.Apple: {
