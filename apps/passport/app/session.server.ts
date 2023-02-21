@@ -80,6 +80,56 @@ export async function logout(request: Request, redirectTo: string, env: Env) {
   return destroyUserSession(session, redirectTo, env)
 }
 
+// CONNECT COOKIE
+export type ConnectCookieParams = {
+  redirectUri: string
+  clientId: string
+}
+
+const getConnectAccountSessionStorage = (
+  env: Env,
+  MAX_AGE = 60 * 5 // 5 minutes
+) => {
+  return createCookieSessionStorage({
+    cookie: {
+      domain: env.COOKIE_DOMAIN,
+      name: '_connect_account_params',
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV == 'production',
+      maxAge: MAX_AGE,
+      httpOnly: true,
+      secrets: [env.SECRET_SESSION_SALT],
+    },
+  })
+}
+
+export const createConnectAccountCookie = async (
+  params: ConnectCookieParams,
+  env: Env
+) => {
+  const storage = getConnectAccountSessionStorage(env)
+  const session = await storage.getSession()
+  session.set('params', JSON.stringify(params))
+
+  return storage.commitSession(session)
+}
+
+export async function getConnectAccountCookie(
+  request: Request,
+  env: Env,
+  destroy?: boolean
+) {
+  const storage = getConnectAccountSessionStorage(env)
+  const params = storage.getSession(request.headers.get('Cookie'))
+
+  if (destroy) {
+    getConnectAccountSessionStorage(env, 0)
+  }
+
+  return params
+}
+
 // CONSOLE PARAMS
 
 const getConsoleParamsSessionStorage = (

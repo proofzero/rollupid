@@ -7,7 +7,6 @@ export function parseParams(request) {
   const state = url.searchParams.get('state')
   const redirectUri = url.searchParams.get('redirect_uri')
   const scope = url.searchParams.get('scope')
-  const prompt = url.searchParams.get('prompt')
 
   const decodedScope =
     scope &&
@@ -20,7 +19,6 @@ export function parseParams(request) {
     state,
     redirectUri,
     scope: decodedScope ? decodedScope.split(' ') : [],
-    prompt,
   }
 }
 

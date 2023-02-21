@@ -287,9 +287,7 @@ const AccountSettingsConnections = () => {
 
     const clientId = (window as any).ENV.PROFILE_CLIENT_ID
 
-    // prompt lets passport authentication know this is a connect call
-    // not a new account one, and thus generate the proper cookie
-    windowUrl.searchParams.append('prompt', 'login')
+    windowUrl.searchParams.append('connect', 'true')
     windowUrl.searchParams.append('client_id', clientId)
     windowUrl.searchParams.append('redirect_uri', window.location.href)
 
