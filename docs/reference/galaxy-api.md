@@ -6,6 +6,10 @@ description: GraphQL API Docs
 
 Access to Galaxy is served up by a GraphQL (GQL) API at [https://galaxy.rollup.id](https://galaxy.rollup.id)
 
+{% hint style="info" %}
+To prevent abuse, the service limits requests for each application to 10 per minute.
+{% endhint %}
+
 ## Setup Guide
 
 There are several ways you can consume GQL APIs and we've documented how below. If you are interested in a deeper understanding of GraphQL you can visit the [GraphQL documentation portal.](https://graphql.org/learn/)
@@ -16,6 +20,7 @@ For these example we are using Javascript but you would be able to achieve simil
 
 {% tabs %}
 {% tab title="1. Simple Fetch" %}
+
 #### Option 1: Simple Fetch Client
 
 A simple fetch client is the fastest way to consume a GQL API if you are not using GQL anywhere else in your application since this method requires no new dependencies.
@@ -113,9 +118,11 @@ const { profile } = fetch("https://galaxy.rollup.id", {
     return { profile: null }
   })
 ```
+
 {% endtab %}
 
 {% tab title="2. GQL Client" %}
+
 #### Option 2: GraphQL Clients
 
 Our reccomended approach is to use a general purpose GQL Client. One such client we recommend for Javascript is [graphql-request.](https://www.npmjs.com/package/graphql-request)
@@ -191,6 +198,7 @@ As you can see, with a GraphQL client lines the overhead of making API calls is 
 {% endtab %}
 
 {% tab title="3. GQL Codegen" %}
+
 #### Option 3: GraphQL Generator
 
 This option is best if you already have GraphQL well integrated into your application and are looking to extend your GQL client.
@@ -204,6 +212,7 @@ const { profile } = await myGeneratedClient.getProfileFromAddress({
   addressURN,
 })
 ```
+
 {% endtab %}
 {% endtabs %}
 
