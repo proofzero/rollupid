@@ -192,6 +192,7 @@ const DisconnectModal = ({
   id: string
   data: {
     title: string
+    chain: string
   }
 }) => (
   <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
@@ -203,12 +204,12 @@ const DisconnectModal = ({
         <img src={warn} />
 
         <div className="flex-1">
-          <Text size="lg" weight="medium" className="text-gray-900 mb-2">
+          <Text size="lg" weight="medium" className="text-gray-900 my-1">
             Disconnect account
           </Text>
 
-          <Text size="sm" weight="normal" className="text-gray-500">
-            Are you sure you want to disconnect "
+          <Text size="sm" weight="normal" className="text-gray-500 my-7">
+            Are you sure you want to disconnect {data.chain} account "
             <span className="text-gray-800">{data.title}</span>" from Rollup?
             You might lose access to some functionality.
           </Text>
@@ -216,7 +217,7 @@ const DisconnectModal = ({
           <fetcher.Form method="post" action="/account/connections/disconnect">
             <input type="hidden" name="id" value={id} />
 
-            <div className="flex justify-end items-center space-x-3 mt-20">
+            <div className="flex justify-end items-center space-x-3 mt-7">
               <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
                 Cancel
               </Button>
