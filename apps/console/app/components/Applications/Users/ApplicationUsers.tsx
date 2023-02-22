@@ -3,6 +3,7 @@ import type { AuthorizedProfile } from '~/types'
 import missingImage from '../../../images/missing-img.svg'
 import { noLoginsSvg } from '../LoginsPanel/LoginsPanel'
 import { AccountURNSpace } from '@kubelt/urns/account'
+import { HiOutlineExternalLink } from 'react-icons/hi'
 
 export const ApplicationUsers = ({
   authorizedProfiles,
@@ -78,18 +79,23 @@ export const ApplicationUsers = ({
             <Text
               size="sm"
               weight="medium"
-              className="text-center  
-              text-gray-500 flex-1 break-all"
+              className="text-gray-500 flex-1 break-all"
             >
               USER ID
             </Text>
             <Text
               size="sm"
               weight="medium"
-              className="text-center
-              text-gray-500 flex-1 px-2 break-all"
+              className="text-gray-500 flex-1 px-2 break-all"
             >
               FIRST AUTHORIZATION
+            </Text>
+            <Text
+              size="sm"
+              weight="medium"
+              className="text-gray-500 flex-1 break-all text-right"
+            >
+              PROFILE
             </Text>
           </div>
 
@@ -99,44 +105,49 @@ export const ApplicationUsers = ({
           >
             {Array.from(Users.keys()).map((key, i) => (
               <article key={i} className="flex items-center py-5 px-8 border-t">
-                <a
-                  href={`${PROFILE_APP_URL}/p/${key}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <div
                   className="flex-1 flex flex-col 
-                  items-start  justify-center
-                  md:items-center
-                  text-ellipsis md:space-x-4"
-                >
-                  <div
-                    className="flex flex-col 
-                  items-start  justify-center
+                  items-start 
                   md:flex-row md:items-center
                   text-ellipsis md:space-x-4"
+                >
+                  <img
+                    src={Users.get(key)?.imageURL || missingImage}
+                    alt="account pfp"
+                    className="max-h-[24px] max-w-[24px] rounded-full"
+                  />
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="text-gray-500 flex-1"
                   >
-                    <img
-                      src={Users.get(key)?.imageURL || missingImage}
-                      alt="account pfp"
-                      className="max-h-[24px] max-w-[24px] rounded-full"
-                    />
-                    <Text
-                      size="sm"
-                      weight="medium"
-                      className="text-gray-500 flex-1"
-                    >
-                      {Users.get(key)?.name}
-                    </Text>
-                  </div>
-                </a>
+                    {Users.get(key)?.name}
+                  </Text>
+                </div>
 
                 <Text
                   size="sm"
                   weight="medium"
                   className="text-ellipsis text-gray-500
-                   flex-1 text-center px-2"
+                   flex-1 px-2"
                 >
                   {Users.get(key)?.date}
                 </Text>
+                <a
+                  className="flex-1 flex justify-end"
+                  href={`${PROFILE_APP_URL}/p/${key}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button
+                    btnType="secondary-alt"
+                    className="right-0 flex md:flex-row flex-col max-w-max 
+                  text-xs leading-4 items-center md:space-x-2"
+                  >
+                    <HiOutlineExternalLink size={22} />
+                    Public Profile
+                  </Button>
+                </a>
               </article>
             ))}
             <div className="flex items-center py-4 px-8 border-t justify-between">
