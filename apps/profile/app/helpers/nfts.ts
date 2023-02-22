@@ -3,10 +3,15 @@ import {
   getAuthzHeaderConditionallyFromToken,
 } from '@kubelt/utils'
 import { getGalaxyClient } from './clients'
-import { getAccountProfile, getAddressProfile } from './profile'
+import {
+  getAccountProfile,
+  getAddressProfile,
+  getAccountURNProfile,
+} from './profile'
 
 import type { AddressURN } from '@kubelt/urns/address'
 import type { Nft } from '@kubelt/galaxy-client'
+import type { AccountURN } from '@kubelt/urns/account'
 /**
  * Nfts are being sorted server-side
  * this function then allows to merge client Nfts with newly-fetched Nfts
@@ -142,6 +147,10 @@ export const getGallery = async (owner: string, jwt?: string) => {
   // TODO: get from account
   const profile = jwt
     ? await getAccountProfile(jwt)
+    : // if owner is an AccountURN - return from account,
+    // else - return from address
+    owner.includes('account')
+    ? await getAccountURNProfile(owner as AccountURN)
     : await getAddressProfile(owner as AddressURN)
 
   const { gallery } = profile

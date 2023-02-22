@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { ApplicationUsers } from '~/components/Applications/Users/ApplicationUsers'
 import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
 import { useFetcher, useLoaderData, useOutletContext } from '@remix-run/react'
@@ -19,14 +19,18 @@ const Users = () => {
     appDetails: appDetailsProps
   }>()
 
-  const [offset, setOffset] = useState(0)
-
-  useEffect(() => {
+  const loadUsers = (offset: number = 0) => {
     const query = new URLSearchParams()
     query.set('client', appDetails.clientId!)
     query.set('offset', offset.toString())
     authFetcher.load(`/api/authorized-accounts?${query}`)
-  }, [offset])
+  }
+
+  useEffect(() => {
+    loadUsers()
+  }, [])
+
+  console.log({ data: authFetcher.data })
 
   return (
     <ApplicationUsers
@@ -36,9 +40,9 @@ const Users = () => {
         type: authFetcher.type,
       }}
       error={authFetcher.data?.error || null}
-      authorizedProfiles={authFetcher.data?.authorizedProfiles || []}
-      setOffset={setOffset}
-      offset={offset}
+      authorizedProfiles={authFetcher.data?.authorizedProfiles.users || []}
+      loadUsers={loadUsers}
+      metadata={authFetcher.data?.authorizedProfiles.metadata}
     />
   )
 }

@@ -23,14 +23,21 @@ export type GetAuthorizedAccountsParams = z.infer<
 // Output
 // -----------------------------------------------------------------------------
 
-export const GetAuthorizedAccountsMethodOutput = z.array(
-  z.object({
-    accountURN: z.string(),
-    timestamp: z.number(),
-    name: z.string(),
-    imageURL: z.string(),
-  })
-)
+export const GetAuthorizedAccountsMethodOutput = z.object({
+  users: z.array(
+    z.object({
+      accountURN: z.string(),
+      timestamp: z.number(),
+      name: z.string(),
+      imageURL: z.string(),
+    })
+  ),
+  metadata: z.object({
+    offset: z.number().optional(),
+    limit: z.number(),
+    edgesReturned: z.number(),
+  }),
+})
 
 // Method
 // -----------------------------------------------------------------------------
@@ -62,6 +69,7 @@ export const getAuthorizedAccounts = async ({
       (edge.createdTimestamp as string) + ' UTC'
     ).getTime()
     const accountURN = edge.src.baseUrn
+
     return {
       accountURN,
       timestamp,
@@ -70,7 +78,5 @@ export const getAuthorizedAccounts = async ({
     }
   })
 
-  console.log({ mappedEdges })
-
-  return mappedEdges
+  return { users: mappedEdges, metadata: edgesResult.metadata }
 }

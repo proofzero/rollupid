@@ -7,7 +7,14 @@ import type { AuthorizedProfile } from '~/types'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 
 type LoaderData = {
-  authorizedProfiles?: AuthorizedProfile[]
+  authorizedProfiles?: {
+    metadata: {
+      offset: number | undefined
+      limit: number
+      edgesReturned: number
+    }
+    users: AuthorizedProfile[]
+  }
   error?: any
 }
 
@@ -33,11 +40,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       {
         client,
         opt: {
-          offset: offset ? parseInt(offset) * 10 : 0,
+          offset: offset ? parseInt(offset) : 0,
           limit: limit ? parseInt(limit) : 10,
         },
       }
     )
+
+    if (!authorizedProfiles.metadata.offset) {
+      authorizedProfiles.metadata.offset = 0
+    }
 
     return json<LoaderData>({ authorizedProfiles })
   } catch (ex) {

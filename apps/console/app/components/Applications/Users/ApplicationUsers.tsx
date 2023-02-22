@@ -8,21 +8,24 @@ export const ApplicationUsers = ({
   authorizedProfiles,
   fetcherState,
   error,
-  setOffset,
-  offset,
   PROFILE_APP_URL,
+  metadata,
+  loadUsers,
 }: {
   fetcherState: { loadingDetails: string; type: string }
   authorizedProfiles: AuthorizedProfile[]
   error?: any
-  setOffset: (val: number) => void
-  offset: number
+  loadUsers: (val: number) => void
   PROFILE_APP_URL: string
+  metadata: {
+    offset: number
+    limit: number
+    edgesReturned: number
+  }
 }) => {
   const Users = new Map<
     string,
     {
-      numOfAuthorizations: number
       imageURL?: string
       name?: string
       date?: string
@@ -33,27 +36,18 @@ export const ApplicationUsers = ({
     const decodedAccountURN = AccountURNSpace.decode(authProfile.accountURN)
 
     // Keys are decoded accountURNs
-    if (Users.has(decodedAccountURN)) {
-      const user = Users.get(decodedAccountURN)
-      Users.set(decodedAccountURN, {
-        ...user,
-        numOfAuthorizations: user!.numOfAuthorizations + 1,
-      })
-    } else {
-      Users.set(decodedAccountURN, {
-        name: authProfile.name!,
-        date: new Date(authProfile.timestamp).toLocaleString('default', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        }),
-        imageURL: authProfile.imageURL!,
-        numOfAuthorizations: 1,
-      })
-    }
+    Users.set(decodedAccountURN, {
+      name: authProfile.name!,
+      date: new Date(authProfile.timestamp).toLocaleString('default', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      }),
+      imageURL: authProfile.imageURL!,
+    })
   })
 
   return (
@@ -84,7 +78,7 @@ export const ApplicationUsers = ({
             <Text
               size="sm"
               weight="medium"
-              className="text-center md:text-left 
+              className="text-center  
               text-gray-500 flex-1 break-all"
             >
               USER ID
@@ -92,18 +86,10 @@ export const ApplicationUsers = ({
             <Text
               size="sm"
               weight="medium"
-              className="text-center md:text-left 
+              className="text-center
               text-gray-500 flex-1 px-2 break-all"
             >
               FIRST AUTHORIZATION
-            </Text>
-            <Text
-              size="sm"
-              weight="medium"
-              className="text-center md:text-left 
-              text-gray-500 flex-1 break-all"
-            >
-              NO. OF AUTHORIZATIONS
             </Text>
           </div>
 
@@ -118,64 +104,65 @@ export const ApplicationUsers = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 flex flex-col 
-                  items-start
-                  md:flex-row md:items-center
+                  items-start  justify-center
+                  md:items-center
                   text-ellipsis md:space-x-4"
                 >
-                  <img
-                    src={Users.get(key)?.imageURL || missingImage}
-                    alt="account pfp"
-                    className="max-h-[24px] max-w-[24px] rounded-full
-                      left-0"
-                  />
-                  <Text
-                    size="sm"
-                    weight="medium"
-                    className="text-gray-500 flex-1"
+                  <div
+                    className="flex flex-col 
+                  items-start  justify-center
+                  md:flex-row md:items-center
+                  text-ellipsis md:space-x-4"
                   >
-                    {Users.get(key)?.name}
-                  </Text>
+                    <img
+                      src={Users.get(key)?.imageURL || missingImage}
+                      alt="account pfp"
+                      className="max-h-[24px] max-w-[24px] rounded-full"
+                    />
+                    <Text
+                      size="sm"
+                      weight="medium"
+                      className="text-gray-500 flex-1"
+                    >
+                      {Users.get(key)?.name}
+                    </Text>
+                  </div>
                 </a>
 
                 <Text
                   size="sm"
                   weight="medium"
                   className="text-ellipsis text-gray-500
-                   flex-1 max-[768px]:text-center px-2"
+                   flex-1 text-center px-2"
                 >
                   {Users.get(key)?.date}
-                </Text>
-                <Text
-                  size="sm"
-                  weight="medium"
-                  className="text-gray-500 flex-1 max-[768px]:text-center"
-                >
-                  {Users.get(key)?.numOfAuthorizations}
                 </Text>
               </article>
             ))}
             <div className="flex items-center py-4 px-8 border-t justify-between">
               <Text className="text-gray-700">
-                Showing {offset * 10 + 1} to {(offset + 1) * 10} results
+                Showing {metadata.offset + 1} to {metadata.offset + 10} of{' '}
+                {metadata.edgesReturned} results
               </Text>
               <div className="flex flex-col space-y-1 sm:space-y-0 sm:flex-row ml-2">
                 <Button
                   type="button"
-                  disabled={offset === 0}
+                  disabled={metadata.offset === 0}
                   btnSize="l"
                   btnType="secondary-alt"
                   onClick={() => {
-                    setOffset(offset - 1)
+                    loadUsers(metadata.offset - 10)
                   }}
                 >
                   Previous
                 </Button>
                 <Button
                   type="button"
+                  disabled={metadata.offset + 10 >= metadata.edgesReturned}
                   btnSize="l"
                   btnType="secondary-alt"
                   onClick={() => {
-                    setOffset(offset + 1)
+                    loadUsers(metadata.offset + 10)
                   }}
                   className="sm:ml-4"
                 >
