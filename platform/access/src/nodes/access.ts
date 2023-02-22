@@ -7,6 +7,7 @@ import {
   importJWK,
   SignJWT,
   JWTVerifyResult,
+  decodeJwt,
 } from 'jose'
 
 import { hexlify } from '@ethersproject/bytes'
@@ -142,6 +143,23 @@ export default class Access extends DOProxy {
 
       await put(tokenMap, tokenIndex)
     })
+  }
+
+  async list(): Promise<any> {
+    let decodedJwts = []
+
+    const tokens = (await this.state.storage.get<Tokens>('tokens')) || {}
+    const tokenKeys = Object.keys(tokens)
+    for (let i = 0; i < tokenKeys.length; i++) {
+      const tokenJson = decodeJwt(tokens[tokenKeys[i]].jwt)
+      decodedJwts.push(tokenJson)
+    }
+
+    console.log({
+      decodedJwts,
+    })
+
+    return ['a', 'b']
   }
 
   async verify(token: string): Promise<JWTVerifyResult> {
