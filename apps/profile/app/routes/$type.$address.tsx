@@ -138,7 +138,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       uname: profile.handle || address,
       ogImage: ogImage || defaultOG,
       profile,
-      addressURN: urn,
+      publicURN: urn,
       cryptoAddresses,
       path,
       isOwner: jwt && matches && matches.length > 0 ? true : false,
@@ -186,14 +186,13 @@ export const meta: MetaFunction = ({
 const UserAddressLayout = () => {
   //TODO: this needs to be optimized so profile isn't fetched from the loader
   //but used from context alone.
-  const { profile, cryptoAddresses, path, isOwner, addressURN } =
-    useLoaderData<{
-      profile: Profile
-      cryptoAddresses: Node[]
-      path: string
-      isOwner: boolean
-      addressURN: string
-    }>()
+  const { profile, cryptoAddresses, path, isOwner, publicURN } = useLoaderData<{
+    profile: Profile
+    cryptoAddresses: Node[]
+    path: string
+    isOwner: boolean
+    publicURN: string
+  }>()
 
   const ctx = useOutletContext<{
     loggedInProfile: Profile | null
@@ -319,7 +318,7 @@ const UserAddressLayout = () => {
     >
       <Outlet
         context={{
-          accountURN: ctx.accountURN ?? addressURN,
+          accountURN: publicURN ?? ctx.accountURN,
           profile: finalProfile,
           cryptoAddresses,
           path,

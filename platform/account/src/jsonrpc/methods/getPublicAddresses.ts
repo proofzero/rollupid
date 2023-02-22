@@ -41,9 +41,10 @@ export const getPublicAddressesMethod = async ({
       rc: {
         addr_type: input.filter?.type,
       },
-      qc: {
-        hidden: 'false',
-      },
+      // Until when hidden profiles implemented
+      // qc: {
+      //   hidden: 'false',
+      // },
     },
   }
   // Return the list of edges between the account node and any address

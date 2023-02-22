@@ -214,14 +214,6 @@ const accountResolvers: Resolvers = {
           env,
           connectedAddresses
         )
-        // Removal
-        if (gallery.length !== filteredGallery.length) {
-          accountClient.setGallery.mutate({
-            name: accountURN,
-            gallery: filteredGallery,
-          })
-        }
-
         return filteredGallery
       }
       // if there is no gallery
@@ -372,7 +364,7 @@ const accountResolvers: Resolvers = {
           connectedAddresses
         )
 
-        if (gallery.length !== filteredGallery.length) {
+        if (gallery.length !== filteredGallery.length && jwt) {
           accountClient.setGallery.mutate({
             name: accountURN,
             gallery: filteredGallery,

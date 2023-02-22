@@ -10,8 +10,9 @@ import {
 } from './profile'
 
 import type { AddressURN } from '@kubelt/urns/address'
-import type { Nft } from '@kubelt/galaxy-client'
+import type { Gallery, Nft } from '@kubelt/galaxy-client'
 import type { AccountURN } from '@kubelt/urns/account'
+import { parseJwt } from '~/utils/session.server'
 /**
  * Nfts are being sorted server-side
  * this function then allows to merge client Nfts with newly-fetched Nfts
@@ -144,12 +145,16 @@ export const decorateNfts = (ownedNfts: any) => {
  * @returns Gallery or empty array
  */
 export const getGallery = async (owner: string, jwt?: string) => {
-  // TODO: get from account
-  const profile = jwt
-    ? await getAccountProfile(jwt)
+  const isAccount = owner.includes('account')
+  let checker: boolean = !!jwt
+  if (isAccount)
+    checker = jwt ? jwt.length > 0 && parseJwt(jwt).account === owner : false
+
+  const profile = checker
+    ? await getAccountProfile(jwt as string)
     : // if owner is an AccountURN - return from account,
     // else - return from address
-    owner.includes('account')
+    isAccount
     ? await getAccountURNProfile(owner as AccountURN)
     : await getAddressProfile(owner as AddressURN)
 
@@ -235,6 +240,10 @@ export const getGalleryWithMetadata = async (owner: string, jwt?: string) => {
     return { gallery: [] }
   }
 
+  return await getGalleryMetadata(gallery, jwt)
+}
+
+export const getGalleryMetadata = async (gallery: Gallery[], jwt?: string) => {
   const galaxyClient = await getGalaxyClient()
 
   const { getNFTMetadataBatch: metadata } = await galaxyClient.getNFTMetadata(

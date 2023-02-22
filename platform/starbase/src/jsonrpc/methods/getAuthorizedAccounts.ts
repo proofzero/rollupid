@@ -34,7 +34,7 @@ export const GetAuthorizedAccountsMethodOutput = z.object({
   ),
   metadata: z.object({
     offset: z.number().optional(),
-    limit: z.number(),
+    limit: z.number().optional(),
     edgesReturned: z.number(),
   }),
 })
