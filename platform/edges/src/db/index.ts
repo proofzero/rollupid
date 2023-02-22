@@ -23,6 +23,7 @@ import type {
   EdgeDirection,
   EdgeTag,
   EdgeQueryOptions,
+  EdgeQueryResults,
 } from './types'
 
 // Exported Types
@@ -70,7 +71,7 @@ export async function edges(
   g: Graph,
   query: EdgeQuery,
   opt?: EdgeQueryOptions
-): Promise<Edge[]> {
+): Promise<EdgeQueryResults> {
   return select.edges(g, query, opt)
 }
 

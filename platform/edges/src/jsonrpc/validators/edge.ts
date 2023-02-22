@@ -24,3 +24,12 @@ export const Edge = z.object({
   tag: EdgeTagInput,
   createdTimestamp: z.string().nullable(),
 })
+
+export const EdgeQueryResultsOutput = z.object({
+  edges: z.array(Edge),
+  metadata: z.object({
+    edgesReturned: z.number(),
+    limit: z.number().optional(),
+    offset: z.number().optional(),
+  }),
+})
