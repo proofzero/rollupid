@@ -35,6 +35,43 @@ query getProfile {
   }
 }
 
+query getProfileFromAccount($accountURN: URN!) {
+  profile: profileFromAccount(accountURN: $accountURN) {
+    pfp {
+      ... on StandardPFP {
+        image
+      }
+      ... on NFTPFP {
+        image
+        isToken
+      }
+    }
+    displayName
+    handle
+    cover
+    location
+    job
+    bio
+    website
+  }
+  links: linksFromAccount(accountURN: $accountURN) {
+    name
+    url
+    verified
+    provider
+  }
+  connectedAddresses: connectedAddressesFromAccount(accountURN: $accountURN) {
+    baseUrn
+    qc
+    rc
+  }
+  gallery: galleryFromAccount(accountURN: $accountURN) {
+    contract
+    tokenId
+    chain
+  }
+}
+
 query getProfileFromAddress($addressURN: URN!) {
   profile: profileFromAddress(addressURN: $addressURN) {
     pfp {

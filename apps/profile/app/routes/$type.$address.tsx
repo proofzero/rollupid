@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { LoaderFunction, MetaFunction, redirect } from '@remix-run/cloudflare'
+import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
+import { redirect } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import {
   Outlet,
@@ -43,6 +44,7 @@ import {
   OAuthAddressType,
 } from '@kubelt/types/address'
 import type { AccountURN } from '@kubelt/urns/account'
+import { AccountURNSpace } from '@kubelt/urns/account'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { imageFromAddressType } from '~/helpers'
 
@@ -53,25 +55,44 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const session = await getProfileSession(request)
   if (!address) throw new Error('No address provided in URL')
-  const urn = AddressURNSpace.urn(address)
+  const urn =
+    type === 'a' ? AddressURNSpace.urn(address) : AccountURNSpace.urn(address)
 
   // if not handle is this let's assume this is an idref
-  let profile = undefined
+  let profile, jwt
   try {
-    const user = session.get('user')
-    let jwt = user?.accessToken
-    profile = await galaxyClient.getProfileFromAddress(
-      {
-        addressURN: `${urn}`,
-      },
-      getAuthzHeaderConditionallyFromToken(jwt)
-    )
+    if (type === 'a') {
+      const user = session.get('user')
+      jwt = user?.accessToken
+      profile = await galaxyClient.getProfileFromAddress(
+        {
+          addressURN: `${urn}`,
+        },
+        getAuthzHeaderConditionallyFromToken(jwt)
+      )
 
-    profile = {
-      ...profile.profile,
-      links: profile.links || [],
-      gallery: profile.gallery || [],
-      addresses: profile.connectedAddresses || [],
+      profile = {
+        ...profile.profile,
+        links: profile.links || [],
+        gallery: profile.gallery || [],
+        addresses: profile.connectedAddresses || [],
+      }
+    } else if (type === 'p') {
+      const user = session.get('user')
+      jwt = user?.accessToken
+      profile = await galaxyClient.getProfileFromAccount(
+        {
+          accountURN: `${urn}`,
+        },
+        getAuthzHeaderConditionallyFromToken(jwt)
+      )
+
+      profile = {
+        ...profile.profile,
+        links: profile.links || [],
+        gallery: profile.gallery || [],
+        addresses: profile.connectedAddresses || [],
+      }
     }
 
     if (!profile) {
@@ -80,12 +101,17 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
     if (profile) {
       if (type === 'a') {
-        let redirectUrl = getRedirectUrlForProfile(profile)
+        const redirectUrl = getRedirectUrlForProfile(profile)
         const originalRoute = `/${type}/${address}`
         //Redirect if we've found a better route
         if (redirectUrl && originalRoute !== redirectUrl)
           return redirect(redirectUrl)
         //otherwise stay on current route
+      } else if (type === 'p') {
+        // What to do here?
+        // In this case address should be an accountURN
+        // const redirectUrl = `/${type}/${address}`
+        // return redirect(redirectUrl)
       } else if (type === 'u') {
         //TODO: galaxy search by handle
         console.error('Not implemented')

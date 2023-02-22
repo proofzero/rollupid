@@ -195,7 +195,7 @@ export const getConnectedAddresses = async ({
 }: {
   accountURN: AccountURN
   Account: Fetcher
-  jwt: any
+  jwt?: string
 }) => {
   const accountClient = createAccountClient(
     Account,
@@ -217,7 +217,7 @@ export const getConnectedCryptoAddresses = async ({
 }: {
   accountURN: AccountURN
   Account: Fetcher
-  jwt: any
+  jwt?: string
 }) => {
   const cryptoAddresses =
     (await getConnectedAddresses({

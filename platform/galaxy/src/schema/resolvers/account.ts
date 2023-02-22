@@ -18,11 +18,11 @@ import {
 import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
-import { NodeType } from '@kubelt/types/address'
 import { Gallery, Links, Profile } from '@kubelt/platform.account/src/types'
 import { ResolverContext } from './common'
 import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { AccountURN } from '@kubelt/urns/account'
 
 const accountResolvers: Resolvers = {
   Query: {
@@ -139,7 +139,7 @@ const accountResolvers: Resolvers = {
       // if there is no gallery
       return []
     },
-
+    //@ts-ignore
     connectedAddresses: async (
       _parent: any,
       {},
@@ -149,6 +149,93 @@ const accountResolvers: Resolvers = {
         accountURN,
         Account: env.Account,
         jwt,
+      })
+
+      return addresses
+    },
+    //@ts-ignore
+    profileFromAccount: async (
+      _parent: any,
+      { accountURN }: { accountURN: AccountURN },
+      { env }: ResolverContext
+    ) => {
+      console.log(
+        `galaxy:profile: getting profileFromAccount for account: ${accountURN}`
+      )
+      const accountClient = createAccountClient(env.Account, {})
+
+      let accountProfile = await accountClient.getProfile.query({
+        account: accountURN,
+      })
+
+      return accountProfile
+    },
+
+    //@ts-ignore
+    linksFromAccount: async (
+      _parent: any,
+      { accountURN }: { accountURN: AccountURN },
+      { env }: ResolverContext
+    ) => {
+      console.log(
+        `galaxy:links: getting linksFromAccount for account: ${accountURN}`
+      )
+      const accountClient = createAccountClient(env.Account, {})
+      let links = await accountClient.getLinks.query({
+        account: accountURN,
+      })
+
+      return links
+    },
+    //@ts-ignore
+    galleryFromAccount: async (
+      _parent: any,
+      { accountURN }: { accountURN: AccountURN },
+      { env }: ResolverContext
+    ) => {
+      console.log(
+        `galaxy:gallery: getting galleryFromAccount for account: ${accountURN}`
+      )
+      const accountClient = createAccountClient(env.Account, {})
+
+      const connectedAddresses = await getConnectedCryptoAddresses({
+        accountURN: accountURN,
+        Account: env.Account,
+      })
+
+      const gallery = await accountClient.getGallery.query({
+        account: accountURN,
+      })
+
+      // Validation
+      if (gallery) {
+        const filteredGallery = await validOwnership(
+          gallery,
+          env,
+          connectedAddresses
+        )
+        // Removal
+        if (gallery.length !== filteredGallery.length) {
+          accountClient.setGallery.mutate({
+            name: accountURN,
+            gallery: filteredGallery,
+          })
+        }
+
+        return filteredGallery
+      }
+      // if there is no gallery
+      return []
+    },
+
+    connectedAddressesFromAccount: async (
+      _parent: any,
+      { accountURN }: { accountURN: AccountURN },
+      { env }: ResolverContext
+    ) => {
+      const addresses = await getConnectedAddresses({
+        accountURN,
+        Account: env.Account,
       })
 
       return addresses
@@ -465,6 +552,15 @@ const ProfileResolverComposition = {
   'Query.links': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.gallery': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.connectedAddresses': [
+    setupContext(),
+    hasApiKey(),
+    logAnalytics(),
+    temporaryConvertToPublic(),
+  ],
+  'Query.profileFromAccount': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.linksFromAccount': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.galleryFromAccount': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.connectedAddressesFromAccount': [
     setupContext(),
     hasApiKey(),
     logAnalytics(),

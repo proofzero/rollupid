@@ -2,6 +2,7 @@ import { Button, Text } from '@kubelt/design-system'
 import type { AuthorizedProfile } from '~/types'
 import missingImage from '../../../images/missing-img.svg'
 import { noLoginsSvg } from '../LoginsPanel/LoginsPanel'
+import { AccountURNSpace } from '@kubelt/urns/account'
 
 export const ApplicationUsers = ({
   authorizedProfiles,
@@ -9,32 +10,37 @@ export const ApplicationUsers = ({
   error,
   setOffset,
   offset,
+  PROFILE_APP_URL,
 }: {
   fetcherState: { loadingDetails: string; type: string }
   authorizedProfiles: AuthorizedProfile[]
   error?: any
   setOffset: (val: number) => void
   offset: number
+  PROFILE_APP_URL: string
 }) => {
   const Users = new Map<
     string,
     {
+      numOfAuthorizations: number
       imageURL?: string
       name?: string
-      numOfAuthorizations: number
       date?: string
     }
   >()
 
   authorizedProfiles.forEach((authProfile) => {
-    if (Users.has(authProfile.accountURN)) {
-      const user = Users.get(authProfile.accountURN)
-      Users.set(authProfile.accountURN, {
+    const decodedAccountURN = AccountURNSpace.decode(authProfile.accountURN)
+
+    // Keys are decoded accountURNs
+    if (Users.has(decodedAccountURN)) {
+      const user = Users.get(decodedAccountURN)
+      Users.set(decodedAccountURN, {
         ...user,
         numOfAuthorizations: user!.numOfAuthorizations + 1,
       })
     } else {
-      Users.set(authProfile.accountURN, {
+      Users.set(decodedAccountURN, {
         name: authProfile.name!,
         date: new Date(authProfile.timestamp).toLocaleString('default', {
           day: '2-digit',
@@ -75,17 +81,28 @@ export const ApplicationUsers = ({
       ) : (
         <div className="border flex-1 flex flex-col rounded-lg">
           <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-lg">
-            <Text size="sm" weight="medium" className="text-gray-500 flex-1">
+            <Text
+              size="sm"
+              weight="medium"
+              className="text-center md:text-left 
+              text-gray-500 flex-1 break-all"
+            >
               USER ID
             </Text>
             <Text
               size="sm"
               weight="medium"
-              className="text-gray-500 flex-1 px-2"
+              className="text-center md:text-left 
+              text-gray-500 flex-1 px-2 break-all"
             >
               FIRST AUTHORIZATION
             </Text>
-            <Text size="sm" weight="medium" className="text-gray-500 flex-1">
+            <Text
+              size="sm"
+              weight="medium"
+              className="text-center md:text-left 
+              text-gray-500 flex-1 break-all"
+            >
               NO. OF AUTHORIZATIONS
             </Text>
           </div>
@@ -96,9 +113,14 @@ export const ApplicationUsers = ({
           >
             {Array.from(Users.keys()).map((key, i) => (
               <article key={i} className="flex items-center py-5 px-8 border-t">
-                <div
-                  className="flex-1 flex flex-col md:flex-row items-center
-                text-ellipsis md:space-x-4"
+                <a
+                  href={`${PROFILE_APP_URL}/p/${key}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex flex-col 
+                  items-start
+                  md:flex-row md:items-center
+                  text-ellipsis md:space-x-4"
                 >
                   <img
                     src={Users.get(key)?.imageURL || missingImage}
@@ -113,16 +135,16 @@ export const ApplicationUsers = ({
                   >
                     {Users.get(key)?.name}
                   </Text>
-                </div>
+                </a>
 
                 <Text
                   size="sm"
                   weight="medium"
-                  className="text-gray-500 flex-1 max-[768px]:text-center"
+                  className="text-ellipsis text-gray-500
+                   flex-1 max-[768px]:text-center px-2"
                 >
                   {Users.get(key)?.date}
                 </Text>
-
                 <Text
                   size="sm"
                   weight="medium"

@@ -1,10 +1,19 @@
 import { useEffect, useState } from 'react'
 import { ApplicationUsers } from '~/components/Applications/Users/ApplicationUsers'
 import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
-import { useFetcher, useOutletContext } from '@remix-run/react'
+import { useFetcher, useLoaderData, useOutletContext } from '@remix-run/react'
+import type { LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
+
+export const loader: LoaderFunction = (args) => {
+  return json({
+    PROFILE_APP_URL,
+  })
+}
 
 const Users = () => {
   const authFetcher = useFetcher()
+  const { PROFILE_APP_URL } = useLoaderData()
 
   const { appDetails } = useOutletContext<{
     appDetails: appDetailsProps
@@ -21,6 +30,7 @@ const Users = () => {
 
   return (
     <ApplicationUsers
+      PROFILE_APP_URL={PROFILE_APP_URL}
       fetcherState={{
         loadingDetails: authFetcher.state,
         type: authFetcher.type,
