@@ -13,6 +13,10 @@ export const JWT_OPTIONS = {
   },
 }
 
+export const AUTHENTICATION_TOKEN_OPTIONS = {
+  expirationTime: '90 days',
+}
+
 export const ACCESS_TOKEN_OPTIONS = {
   expirationTime: '1 hour',
 }
