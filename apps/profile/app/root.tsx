@@ -38,7 +38,7 @@ import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
 import * as gtag from '~/utils/gtags.client'
-import { getProfileSession } from './utils/session.server'
+import { commitProfileSession, getProfileSession } from './utils/session.server'
 import { getRedirectUrlForProfile } from './utils/redirects.server'
 import { parseJwt } from './utils/session.server'
 import { getAccountProfile } from './helpers/profile'
@@ -75,6 +75,30 @@ export const links: LinksFunction = () => [
   ...headNavLink(),
 ]
 
+const determineProfileCompletionStatus = (profile: FullProfile) => {
+  let baseProfileFilled = false
+  if (
+    profile.bio ||
+    profile.cover ||
+    profile.job ||
+    profile.location ||
+    profile.website
+  ) {
+    baseProfileFilled = true
+  }
+
+  const linksSet = profile.links.length > 0
+  const addressesConnected = profile.addresses.length > 1
+  const galleryFilled = profile.gallery.length > 0
+
+  return {
+    base: baseProfileFilled,
+    links: linksSet,
+    addresses: addressesConnected,
+    gallery: galleryFilled,
+  }
+}
+
 export const loader: LoaderFunction = async ({ request }) => {
   // let's fetch the user profile if they are logged in
   const session = await getProfileSession(request)
@@ -104,19 +128,38 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
 
     basePath = getRedirectUrlForProfile(loggedInUserProfile)
+
+    const profileCompletion =
+      determineProfileCompletionStatus(loggedInUserProfile)
+    if (
+      profileCompletion.base ||
+      profileCompletion.links ||
+      profileCompletion.gallery ||
+      profileCompletion.addresses
+    ) {
+      console.log('SET SESSION FLASH')
+      session.flash('SHOW_CTA', true)
+    }
   }
 
-  return json({
-    basePath,
-    loggedInUserProfile,
-    accountURN,
-    ENV: {
-      INTERNAL_GOOGLE_ANALYTICS_TAG,
-      CONSOLE_APP_URL,
-      PASSPORT_URL,
-      PROFILE_CLIENT_ID,
+  return json(
+    {
+      basePath,
+      loggedInUserProfile,
+      accountURN,
+      ENV: {
+        INTERNAL_GOOGLE_ANALYTICS_TAG,
+        CONSOLE_APP_URL,
+        PASSPORT_URL,
+        PROFILE_CLIENT_ID,
+      },
     },
-  })
+    {
+      headers: {
+        'Set-Cookie': await commitProfileSession(session),
+      },
+    }
+  )
 }
 
 export default function App() {

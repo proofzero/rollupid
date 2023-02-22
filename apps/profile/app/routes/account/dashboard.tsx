@@ -1,4 +1,9 @@
-import { Link, useFetcher, useOutletContext } from '@remix-run/react'
+import {
+  Link,
+  useFetcher,
+  useLoaderData,
+  useOutletContext,
+} from '@remix-run/react'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import Heading from '~/components/typography/Heading'
@@ -13,6 +18,26 @@ import { normalizeProfileToLinks } from '~/helpers'
 import { Tooltip } from 'flowbite-react'
 import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
+import { json, LoaderFunction } from '@remix-run/cloudflare'
+import { commitProfileSession, getProfileSession } from '~/utils/session.server'
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const profileSession = await getProfileSession(request)
+  const showCTA = profileSession.get('SHOW_CTA') || false
+
+  console.log('GOT SESSION FLASH')
+
+  return json(
+    {
+      showCTA,
+    },
+    {
+      headers: {
+        'Set-Cookie': await commitProfileSession(profileSession),
+      },
+    }
+  )
+}
 
 export default function Welcome() {
   const { profile, addressProfiles } = useOutletContext<{
@@ -20,11 +45,15 @@ export default function Welcome() {
     addressProfiles: any[]
   }>()
 
+  const { showCTA } = useLoaderData<{
+    showCTA: boolean
+  }>()
+
   const normalizedProfiles = addressProfiles
     .map((p) => ({ urn: p.urn, ...p?.profile }))
     .map(normalizeProfileToLinks)
 
-  const [showGetStarted, setShowGetStarted] = useState(true)
+  const [showGetStarted, setShowGetStarted] = useState(showCTA)
 
   const appFetcher = useFetcher()
 
