@@ -89,7 +89,7 @@ export default () => {
         {apps.map((a, i) => (
           <article
             key={i}
-            className="flex-1 flex flex-row px-5 py-4 space-x-4 rounded-lg border"
+            className="flex-1 flex flex-row px-5 py-4 space-x-4 rounded-lg border items-center"
           >
             <img src={a.icon} className="object-cover w-16 h-16 rounded" />
 
@@ -97,56 +97,6 @@ export default () => {
               <Text weight="semibold" className="text-gray-900">
                 {a.title}
               </Text>
-
-              <div className="flex flex-col space-y-4">
-                <div className="flex flex-row space-x-2 items-center">
-                  <Text size="sm" weight="normal" className="text-gray-500">
-                    Read Only:
-                  </Text>
-
-                  <Pill className="bg-[#F2F4F7]">
-                    <Text size="xs" weight="medium" className="text-gray-500">
-                      Public Profile
-                    </Text>
-                  </Pill>
-
-                  <Pill className="bg-[#F2F4F7]">
-                    <Text size="xs" weight="medium" className="text-gray-500">
-                      Email
-                    </Text>
-                  </Pill>
-
-                  <Pill className="bg-[#F2F4F7]">
-                    <Text size="xs" weight="medium" className="text-gray-500">
-                      Blockchain Information
-                    </Text>
-                  </Pill>
-                </div>
-                <div className="flex flex-row space-x-2 items-center">
-                  <Text size="sm" weight="normal" className="text-gray-500">
-                    Write:
-                  </Text>
-
-                  <Pill className="bg-[#F2F4F7]">
-                    <Text size="xs" weight="medium" className="text-gray-500">
-                      Dedicated Account Vault
-                    </Text>
-                  </Pill>
-                </div>
-              </div>
-            </div>
-
-            <div className="text-right">
-              <Button
-                btnType="secondary-alt"
-                className="bg-gray-100 mb-4"
-                onClick={() => {
-                  setSelectedApp(a)
-                  setRevocationModalOpen(true)
-                }}
-              >
-                Edit Access
-              </Button>
 
               <Text size="xs" weight="normal" className="text-gray-500">
                 Approved:{' '}
@@ -159,6 +109,19 @@ export default () => {
                   second: '2-digit',
                 })}
               </Text>
+            </div>
+
+            <div className="text-right">
+              <Button
+                btnType="secondary-alt"
+                className="bg-gray-100"
+                onClick={() => {
+                  setSelectedApp(a)
+                  setRevocationModalOpen(true)
+                }}
+              >
+                Edit Access
+              </Button>
             </div>
           </article>
         ))}
