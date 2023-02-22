@@ -102,7 +102,7 @@ const handleAuthenticationCode: ExchangeTokenMethod<
 
   const name = `${AccountURNSpace.decode(account)}@${account}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
-  const result = await accessNode.class.generate(account, clientId, scope, {
+  const result = await accessNode.class.generate(account, 'rollup', scope, {
     accessExpiry: AUTHENTICATION_TOKEN_OPTIONS.expirationTime,
   })
 
