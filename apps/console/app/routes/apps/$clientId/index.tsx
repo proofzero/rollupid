@@ -101,7 +101,7 @@ export default function AppDetailIndexPage() {
         },
         CTAneeded: !app.app.icon || !app.app.redirectURI || !app.app.name,
       }}
-      authorizedProfiles={authFetcher.data?.authorizedProfiles || []}
+      authorizedProfiles={authFetcher.data?.authorizedProfiles.users || []}
       error={authFetcher.data?.error || null}
       fetcherState={{
         loadingDetails: authFetcher.state,
