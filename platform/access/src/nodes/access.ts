@@ -63,7 +63,7 @@ export default class Access extends DOProxy {
     const accessTokenId = hexlify(randomBytes(JWT_OPTIONS.jti.length))
     const refreshTokenId = hexlify(randomBytes(JWT_OPTIONS.jti.length))
 
-    const accessToken = await new SignJWT({ account, clientId, scope })
+    const accessToken = await new SignJWT({ scope })
       .setProtectedHeader({ alg })
       .setExpirationTime(
         options?.accessExpiry || ACCESS_TOKEN_OPTIONS.expirationTime
@@ -74,7 +74,7 @@ export default class Access extends DOProxy {
       .setSubject(account)
       .sign(key)
 
-    const refreshToken = await new SignJWT({ account, clientId, scope })
+    const refreshToken = await new SignJWT({ scope })
       .setProtectedHeader({ alg })
       .setExpirationTime(REFRESH_TOKEN_OPTIONS.expirationTime)
       .setAudience([clientId])
