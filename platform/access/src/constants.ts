@@ -13,6 +13,10 @@ export const JWT_OPTIONS = {
   },
 }
 
+export const AUTHENTICATION_TOKEN_OPTIONS = {
+  expirationTime: '90 days',
+}
+
 export const ACCESS_TOKEN_OPTIONS = {
   expirationTime: '1 hour',
 }
@@ -25,5 +29,4 @@ export const REFRESH_TOKEN_OPTIONS = {
  * An edge linking an account node (representing a user account) and a
  * client session node for that account.
  */
-export const EDGE_AUTHENTICATES: EdgeURN = EdgeSpace.urn('authenticates/access')
 export const EDGE_AUTHORIZES: EdgeURN = EdgeSpace.urn('authorizes/access')

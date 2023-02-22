@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { decodeJwt } from 'jose'
 
 import {
-  EDGE_AUTHENTICATES,
+  AUTHENTICATION_TOKEN_OPTIONS,
   EDGE_AUTHORIZES,
 } from '@kubelt/platform.access/src/constants'
 
@@ -99,14 +99,10 @@ const handleAuthenticationCode: ExchangeTokenMethod<
   )) as AccountURN
   const scope: Scope = (await authorizationNode.storage.get('scope')) || []
 
-  const name = `${AccountURNSpace.decode(account)}@${clientId}`
+  const name = `${AccountURNSpace.decode(account)}@${account}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
-  const result = await accessNode.class.generate(account, clientId, scope)
-  const access = AccessURNSpace.componentizedUrn(name, { client_id: clientId })
-  await ctx.edgesClient!.makeEdge.mutate({
-    src: account,
-    dst: access,
-    tag: EDGE_AUTHENTICATES,
+  const result = await accessNode.class.generate(account, 'rollup', scope, {
+    accessExpiry: AUTHENTICATION_TOKEN_OPTIONS.expirationTime,
   })
 
   return result
@@ -141,12 +137,9 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   const name = `${AccountURNSpace.decode(account)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
   const idTokenProfile = await getIdTokenProfileFromAccount(account, ctx)
-  const result = await accessNode.class.generate(
-    account,
-    clientId,
-    scope,
-    idTokenProfile
-  )
+  const result = await accessNode.class.generate(account, clientId, scope, {
+    idTokenProfile,
+  })
 
   const access = AccessURNSpace.componentizedUrn(name, { client_id: clientId })
   await ctx.edgesClient!.makeEdge.mutate({

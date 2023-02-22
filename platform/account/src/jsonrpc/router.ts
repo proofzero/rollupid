@@ -14,11 +14,6 @@ import {
   GetAddressesInput,
 } from './methods/getOwnAddresses'
 import { hasAddressesMethod, HasAddressesInput } from './methods/hasAddresses'
-import {
-  getSessionsMethod,
-  GetSessionsMethodInput,
-  GetSessionsMethodOutput,
-} from './methods/getSessions'
 
 import { getAddressesMethod } from './methods/getAddresses'
 
@@ -163,14 +158,6 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(HasAddressesInput)
     .mutation(hasAddressesMethod),
-  getSessions: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(Scopes)
-    .use(LogUsage)
-    .input(GetSessionsMethodInput)
-    .output(GetSessionsMethodOutput)
-    .mutation(getSessionsMethod),
   getAuthorizedApps: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)

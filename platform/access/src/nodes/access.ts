@@ -48,7 +48,10 @@ export default class Access extends DOProxy {
     account: AccountURN,
     clientId: string,
     scope: Scope,
-    idTokenProfile?: IdTokenProfile
+    options?: {
+      idTokenProfile?: IdTokenProfile
+      accessExpiry?: string
+    }
   ): Promise<ExchangeTokenResult> {
     const { storage } = this.state
     await storage.put({ account, clientId })
@@ -60,16 +63,18 @@ export default class Access extends DOProxy {
     const accessTokenId = hexlify(randomBytes(JWT_OPTIONS.jti.length))
     const refreshTokenId = hexlify(randomBytes(JWT_OPTIONS.jti.length))
 
-    const accessToken = await new SignJWT({ account, clientId, scope })
+    const accessToken = await new SignJWT({ scope })
       .setProtectedHeader({ alg })
-      .setExpirationTime(ACCESS_TOKEN_OPTIONS.expirationTime)
+      .setExpirationTime(
+        options?.accessExpiry || ACCESS_TOKEN_OPTIONS.expirationTime
+      )
       .setAudience([clientId])
       .setIssuedAt(issuedAt)
       .setJti(accessTokenId)
       .setSubject(account)
       .sign(key)
 
-    const refreshToken = await new SignJWT({ account, clientId, scope })
+    const refreshToken = await new SignJWT({ scope })
       .setProtectedHeader({ alg })
       .setExpirationTime(REFRESH_TOKEN_OPTIONS.expirationTime)
       .setAudience([clientId])
@@ -114,8 +119,8 @@ export default class Access extends DOProxy {
     })
 
     let idToken: string | undefined
-    if (idTokenProfile) {
-      idToken = await new SignJWT(idTokenProfile)
+    if (options?.idTokenProfile) {
+      idToken = await new SignJWT(options.idTokenProfile)
         .setProtectedHeader({ alg })
         .setExpirationTime(ACCESS_TOKEN_OPTIONS.expirationTime)
         .setAudience([clientId])
