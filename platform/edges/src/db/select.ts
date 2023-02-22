@@ -20,6 +20,7 @@ import type {
   RComponents,
   EdgeTag,
   EdgeQueryOptions,
+  EdgeQueryResults,
 } from './types'
 
 // qc()
@@ -139,7 +140,7 @@ export async function edges(
   g: GraphDB,
   query: EdgeQuery,
   opt?: EdgeQueryOptions
-): Promise<Edge[]> {
+): Promise<EdgeQueryResults> {
   const sqlBase = `
   with normalizer as (
     select e.createdTimestamp, e.src, e.tag, e.dst, 'SRCQ' as compType, srcq.key as k, srcq.value as v
@@ -173,9 +174,10 @@ export async function edges(
   // )
 
   let sqlFilters = `
-  select * from
-  (select dense_rank() over (order by x.src, x.tag,x.dst) as edge_no, x.* 
-  from intersector i left join extender x on i.src=x.src and i.tag=x.tag and i.dst=x.dst)
+   countor as (select dense_rank() over (order by x.src, x.tag,x.dst) as edge_no,x.* 
+   from intersector i left join extender x on i.src=x.src and i.tag=x.tag and i.dst=x.dst)
+   
+   select (select max(edge_no) from countor) as total_edges, * from countor
   `
 
   const offset = opt?.offset || 0
@@ -269,7 +271,7 @@ export async function edges(
     }
     conditionsStatement = `intersector as (${intersectorConditions.join(
       ' INTERSECT '
-    )}) `
+    )}), `
   } else {
     const statmentPrefix = `
         select distinct src, tag, dst from extender where
@@ -281,7 +283,7 @@ export async function edges(
         return `${k} = ?`
       })
       .join(' AND ')
-    conditionsStatement = `intersector as (${statmentPrefix} ${statementSuffix}) `
+    conditionsStatement = `intersector as (${statmentPrefix} ${statementSuffix}), `
   }
 
   const finalSqlStatement =
@@ -301,6 +303,7 @@ export async function edges(
     error: resultSet.error,
   })
   type resultRec = {
+    total_edges: number
     edge_no: number
     createdTimestamp: string
     src: AnyURN
@@ -311,20 +314,27 @@ export async function edges(
     v: string
   }
 
-  const results = []
+  const edgeResults = []
   let currentEdgeNo
   let currentEdge: Edge
+  let total_edges = 0
   for (const result of (resultSet.results as resultRec[]) || []) {
+    //We only care to set this once, as the number reflects the total edges in
+    //the whole resultset
+    if (total_edges === 0) total_edges = result.total_edges
+
+    //We set up the base edge, with empty comps
     if (currentEdgeNo !== result.edge_no) {
       currentEdgeNo = result.edge_no
       currentEdge = {} as Edge
-      results.push(currentEdge)
+      edgeResults.push(currentEdge)
       currentEdge.createdTimestamp = result.createdTimestamp
       currentEdge.tag = result.tag
       currentEdge.src = { baseUrn: result.src, qc: {}, rc: {} }
       currentEdge.dst = { baseUrn: result.dst, qc: {}, rc: {} }
     }
 
+    //Set up array of with comps and the values to update in the final result
     let compToUpdate: Record<string, string>
     switch (result.compType) {
       case compType.SRCQ:
@@ -340,21 +350,37 @@ export async function edges(
         compToUpdate = currentEdge!.dst.rc
         break
     }
+
+    //Update the comp in the result object
     const compRec = { [result.k]: result.v }
     Object.assign(compToUpdate, compRec)
   }
+
+  const result: EdgeQueryResults = {
+    edges: edgeResults,
+    metadata: {
+      edgesReturned: total_edges,
+    },
+  }
+  if (opt?.limit) result.metadata.limit = opt.limit
+  if (opt?.offset) result.metadata.offset = opt.offset
+
   //Keep this .debug until we're confident about the logic
   console.debug(
     'RESULTS',
-    results.map((r) => ({
+    result.metadata,
+    edgeResults.map((r) => ({
       r,
+      src: r.src.baseUrn,
+      dst: r.dst.baseUrn,
       srcq: r.src.qc,
       srcr: r.src.rc,
       dstq: r.dst.qc,
       dstr: r.dst.rc,
     }))
   )
-  return results
+
+  return result
 }
 
 // incoming()

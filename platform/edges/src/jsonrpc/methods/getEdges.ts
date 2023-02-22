@@ -5,17 +5,16 @@ import {
   Edge as EdgeInput,
   EdgeQueryInput,
   EdgeQueryOptionsInput,
+  EdgeQueryResultsOutput,
 } from '../validators/edge'
-import { Edge } from '../../db/types'
+import { Edge, EdgeQueryResults } from '../../db/types'
 
 export const GetEdgesMethodInput = z.object({
   query: EdgeQueryInput,
   opt: EdgeQueryOptionsInput,
 })
 
-export const GetEdgesMethodOutput = z.object({
-  edges: z.array(EdgeInput),
-})
+export const GetEdgesMethodOutput = EdgeQueryResultsOutput
 
 export type GetEdgesParams = z.infer<typeof GetEdgesMethodInput>
 
@@ -25,14 +24,10 @@ export const getEdgesMethod = async ({
 }: {
   input: GetEdgesParams
   ctx: Context
-}): Promise<{
-  edges: Edge[]
-}> => {
+}): Promise<EdgeQueryResults> => {
   // Get the list of the edges selected by the query, modifying the
   // result as per any options.
   const edges = await db.edges(ctx.graph, input.query, input.opt)
 
-  return {
-    edges,
-  }
+  return edges
 }

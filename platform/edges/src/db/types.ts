@@ -16,6 +16,7 @@ import {
   EdgeQueryInput,
   Edge,
   EdgeQueryOptionsInput,
+  EdgeQueryResultsOutput,
 } from '../jsonrpc/validators/edge'
 import { Node } from '../jsonrpc/validators/node'
 
@@ -25,6 +26,8 @@ import { Node } from '../jsonrpc/validators/node'
 export type EdgeQuery = z.infer<typeof EdgeQueryInput>
 
 export type EdgeQueryOptions = z.infer<typeof EdgeQueryOptionsInput>
+
+export type EdgeQueryResults = z.infer<typeof EdgeQueryResultsOutput>
 
 export type Edge = z.infer<typeof Edge>
 
