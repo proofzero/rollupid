@@ -3,7 +3,6 @@ import { decodeJwt } from 'jose'
 
 import {
   AUTHENTICATION_TOKEN_OPTIONS,
-  EDGE_AUTHENTICATES,
   EDGE_AUTHORIZES,
 } from '@kubelt/platform.access/src/constants'
 
