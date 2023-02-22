@@ -70,13 +70,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         },
         getAuthzHeaderConditionallyFromToken(jwt)
       )
-
-      profile = {
-        ...profile.profile,
-        links: profile.links || [],
-        gallery: profile.gallery || [],
-        addresses: profile.connectedAddresses || [],
-      }
     } else if (type === 'p') {
       const user = session.get('user')
       jwt = user?.accessToken
@@ -86,38 +79,36 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         },
         getAuthzHeaderConditionallyFromToken(jwt)
       )
-
-      profile = {
-        ...profile.profile,
-        links: profile.links || [],
-        gallery: profile.gallery || [],
-        addresses: profile.connectedAddresses || [],
-      }
     }
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })
     }
 
-    if (profile) {
-      if (type === 'a') {
-        const redirectUrl = getRedirectUrlForProfile(profile)
-        const originalRoute = `/${type}/${address}`
-        //Redirect if we've found a better route
-        if (redirectUrl && originalRoute !== redirectUrl)
-          return redirect(redirectUrl)
-        //otherwise stay on current route
-      } else if (type === 'p') {
-        // What to do here?
-        // In this case address should be an accountURN
-        // const redirectUrl = `/${type}/${address}`
-        // return redirect(redirectUrl)
-      } else if (type === 'u') {
-        //TODO: galaxy search by handle
-        console.error('Not implemented')
-      } else {
-        //TODO: Type-based resolvers to be tackled in separate PR
-      }
+    profile = {
+      ...profile.profile,
+      links: profile.links || [],
+      gallery: profile.gallery || [],
+      addresses: profile.connectedAddresses || [],
+    }
+
+    if (type === 'a') {
+      const redirectUrl = getRedirectUrlForProfile(profile)
+      const originalRoute = `/${type}/${address}`
+      //Redirect if we've found a better route
+      if (redirectUrl && originalRoute !== redirectUrl)
+        return redirect(redirectUrl)
+      //otherwise stay on current route
+    } else if (type === 'p') {
+      // What to do here?
+      // In this case address should be an accountURN
+      // const redirectUrl = `/${type}/${address}`
+      // return redirect(redirectUrl)
+    } else if (type === 'u') {
+      //TODO: galaxy search by handle
+      console.error('Not implemented')
+    } else {
+      //TODO: Type-based resolvers to be tackled in separate PR
     }
 
     const ogImage = await ogImageFromProfile(
