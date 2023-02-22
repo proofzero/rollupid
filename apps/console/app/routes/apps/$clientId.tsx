@@ -123,12 +123,12 @@ export default function AppDetailIndexPage() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row min-h-full">
+    <div className="flex flex-col md:flex-row min-h-full bg-gray-50">
       <SiteMenu apps={apps} selected={appDetails.clientId} />
-      <main className="flex flex-col flex-initial min-h-full w-full bg-gray-50">
+      <main className="flex flex-col flex-initial min-h-full w-full">
         <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
         <Toaster position="top-right" reverseOrder={false} />
-        <section className="mx-11 my-9">
+        <section className="sm:mx-11 my-9">
           <Outlet
             context={{
               notificationHandler: notify,

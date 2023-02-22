@@ -1,5 +1,4 @@
 import createEdgesClient from '@kubelt/platform-clients/edges'
-import type { AccessRComp } from '@kubelt/urns/access'
 import { Context } from '../context'
 import { EDGE_AUTHORIZES } from '@kubelt/platform.access/src/constants'
 // import { Graph } from '@kubelt/types'
@@ -11,6 +10,10 @@ import { z } from 'zod'
 
 export const GetAuthorizedAccountsMethodInput = z.object({
   client: z.string(),
+  opt: z.object({
+    offset: z.number(),
+    limit: z.number(),
+  }),
 })
 
 export type GetAuthorizedAccountsParams = z.infer<
@@ -51,7 +54,7 @@ export const getAuthorizedAccounts = async ({
       },
     },
     // set limit to not query the whole db
-    opt: { limit: 10 },
+    opt: input.opt,
   })
 
   const mappedEdges = edgesResult.edges.map((edge) => {

@@ -4,7 +4,7 @@ import type { AuthorizedProfile } from '~/types'
 
 import missingImage from '../../../images/missing-img.svg'
 
-const noLoginsSvg = (
+export const noLoginsSvg = (
   <svg
     width="148"
     height="164"

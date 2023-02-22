@@ -27,9 +27,8 @@ type ApplicationDashboardProps = {
     createdAt: Date
     onKeyRoll: () => void
   }
-  fetcherState: { state: string; type: string }
+  fetcherState: { loadingDetails: string; type: string }
   authorizedProfiles: AuthorizedProfile[]
-  logins?: any[]
   error?: any
 }
 
@@ -178,7 +177,7 @@ export const ApplicationDashboard = ({
             <Text className="text-gray-600 py-3" weight="medium" size="lg">
               Users
             </Text>
-            {fetcherState.state !== 'idle' && (
+            {fetcherState.loadingDetails !== 'idle' && (
               <div
                 className="flex bg-white justify-center items-center h-full
             rounded-lg border shadow"

@@ -82,6 +82,7 @@ export default function AppDetailIndexPage() {
   useEffect(() => {
     const query = new URLSearchParams()
     query.set('client', app.clientId!)
+    query.set('limit', '8')
     authFetcher.load(`/api/authorized-accounts?${query}`)
   }, [])
 
@@ -102,7 +103,10 @@ export default function AppDetailIndexPage() {
       }}
       authorizedProfiles={authFetcher.data?.authorizedProfiles || []}
       error={authFetcher.data?.error || null}
-      fetcherState={{ state: authFetcher.state, type: authFetcher.type }}
+      fetcherState={{
+        loadingDetails: authFetcher.state,
+        type: authFetcher.type,
+      }}
       galaxyGql={{
         createdAt: new Date(app.apiKeyTimestamp as number),
         apiKey: rotatedApiKey as string,
