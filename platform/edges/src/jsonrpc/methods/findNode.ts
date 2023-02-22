@@ -1,18 +1,21 @@
-import { z } from 'zod'
+import { NodeFilterInput } from '@kubelt/platform-middleware/inputValidators'
 import { Context } from '../../context'
+import { Node as NodeSchema } from '../validators/node'
+import * as db from '../../db'
+import { Node, NodeFilter } from '../../db/types'
 
-export const FindNodeMethodInput = z.any()
+export const FindNodeMethodInput = NodeFilterInput
 
-export const FindNodeMethodOutput = z.any()
-
-export type FindNodeParams = z.infer<typeof FindNodeMethodInput>
+export const FindNodeMethodOutput = NodeSchema.optional()
 
 export const findNodeMethod = async ({
   input,
   ctx,
 }: {
-  input: FindNodeParams
+  input: NodeFilter
   ctx: Context
-}): Promise<unknown> => {
-  throw 'findNode Method Not implemented'
+}): Promise<Node | undefined> => {
+  const node = await db.node(ctx.graph, input)
+
+  return node
 }

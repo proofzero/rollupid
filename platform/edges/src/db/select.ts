@@ -21,7 +21,39 @@ import type {
   EdgeTag,
   EdgeQueryOptions,
   EdgeQueryResults,
+  NodeFilter,
 } from './types'
+
+enum compType {
+  SRCQ = 'SRCQ',
+  SRCR = 'SRCR',
+  DSTQ = 'DSTQ',
+  DSTR = 'DSTR',
+}
+
+type urnCompCondition = {
+  compType: compType
+  key: string
+  val: string
+}
+
+//Helper function to convert a comp object (record<string,string>)
+//to an array of urnCompConditions
+function getUrnCompConditions(
+  compType: compType,
+  comp: Record<string, string | boolean | undefined>
+): urnCompCondition[] {
+  const results = []
+  for (const [k, v] of Object.entries(comp)) {
+    if (k && v)
+      results.push({
+        compType: compType,
+        key: k,
+        val: v.toString(),
+      })
+  }
+  return results
+}
 
 // qc()
 // -----------------------------------------------------------------------------
@@ -99,35 +131,109 @@ export async function rc(g: GraphDB, nodeId: AnyURN): Promise<RComponents> {
 
 export async function node(
   g: GraphDB,
-  nodeId: AnyURN | undefined
+  filter: NodeFilter
 ): Promise<Node | undefined> {
-  if (!nodeId) {
-    return undefined
-  }
+  const sqlBase = `
+   with normalizer as (
+     select n.*, 'SRCQ' as compType, qc.key as k, qc.value as v
+     from node n left join node_qcomp qc on n.urn = qc.nodeUrn where k not null 
+     union
+     select n.*, 'SRCR' as compType, rc.key as k, rc.value as v
+     from node n left join node_rcomp rc on n.urn = rc.nodeUrn where k not null 
+     )
+	 ,	 
+   extender as (
+     select * from normalizer
+     union
+     select n.*, 'NONE' as compType, null as k, null as v from node n
+     where not exists(select 1 from node n1 where n.urn=n1.urn)   
 
-  const query = `
-    SELECT
-      *
-    FROM
-      node
-    WHERE
-      urn = ?
+   ),
   `
-  const node = await g.db.prepare(query).bind(nodeId.toString()).first<Node>()
 
-  if (!node) {
-    return undefined
+  const sqlSuffix = `
+  		 select x.* from  intersector i left join extender x on i.urn=x.urn
+  `
+
+  const compConditionsList: urnCompCondition[] = []
+  let baseUrnCondition
+  let conditionsStatement
+
+  if (filter.baseUrn) baseUrnCondition = filter.baseUrn
+
+  if (filter.qc)
+    compConditionsList.push(...getUrnCompConditions(compType.SRCQ, filter.qc))
+  if (filter.rc)
+    compConditionsList.push(...getUrnCompConditions(compType.SRCR, filter.rc))
+
+  //We bind prepared statement values only; since keys are set by our code
+  //those get safely injected into queries through string templates
+  const prepBindParams: string[] = []
+
+  if (compConditionsList.length) {
+    const intersectorConditions = []
+    for (const { compType, key, val } of compConditionsList) {
+      let statement = `
+        select distinct urn from extender where
+        compType='${compType}' and k='${key}' and v=? 
+        `
+      prepBindParams.push(val)
+      if (baseUrnCondition) {
+        statement += ` AND urn=? `
+        prepBindParams.push(baseUrnCondition)
+      }
+      intersectorConditions.push(statement)
+    }
+    conditionsStatement = `intersector as (${intersectorConditions.join(
+      ' INTERSECT '
+    )}) `
+  } else {
+    if (!baseUrnCondition) throw new Error('No criteria set on findNode call.')
+    let statement = `
+      select distinct urn from extender where
+      urn=?
+      `
+    prepBindParams.push(baseUrnCondition)
+    conditionsStatement = `intersection as (${statement}) `
   }
 
-  const nodeUrn = node.baseUrn
+  const finalSqlStatement = sqlBase + conditionsStatement + sqlSuffix
 
-  const qcMap = await qc(g, nodeUrn as AnyURN)
-  node.qc = qcMap
+  //Keep this .debug until we're confident around the logic
+  console.debug('FULL STATEMENT', finalSqlStatement)
+  console.debug('BIND PARAMS', prepBindParams)
 
-  const rcMap = await rc(g, nodeUrn as AnyURN)
-  node.rc = rcMap
+  const resultSet = await g.db
+    .prepare(finalSqlStatement)
+    .bind(...prepBindParams)
+    .all()
 
-  return node as Node
+  type resultRec = {
+    urn: AnyURN
+    compType: compType
+    k: string
+    v: string
+  }
+
+  let node: Node | undefined = undefined
+  for (const result of (resultSet.results as resultRec[]) || []) {
+    if (!node) node = { baseUrn: result.urn, qc: {}, rc: {} }
+    if (node.baseUrn !== result.urn)
+      throw new Error('More than one node found for given criteria.')
+
+    if (result.compType === compType.SRCQ) {
+      const compRec = { [result.k]: result.v }
+      Object.assign(node.qc, compRec)
+    }
+    if (result.compType === compType.SRCR) {
+      const compRec = { [result.k]: result.v }
+      Object.assign(node.rc, compRec)
+    }
+  }
+
+  //Keep this debug until we're satisfied with the results
+  console.debug('RETURNED NODE', JSON.stringify(node))
+  return node
 }
 
 // edges()
@@ -204,24 +310,6 @@ export async function edges(
   //those get safely injected into queries through string templates
   const prepBindParams: string[] = []
 
-  //Helper function to convert a comp object (record<string,string>)
-  //to an array of urnCompConditions
-  function getUrnCompConditions(
-    compType: compType,
-    comp: Record<string, string | boolean | undefined>
-  ): urnCompCondition[] {
-    const results = []
-    for (const [k, v] of Object.entries(comp)) {
-      if (k && v)
-        results.push({
-          compType: compType,
-          key: k,
-          val: v.toString(),
-        })
-    }
-    return results
-  }
-
   //Logic is split into conditions that apply on edge table columns and
   //comp table columns. The former either apply by themselves in a single statement,
   //or they are repeated on the condition statements of the latter to get the
@@ -232,21 +320,17 @@ export async function edges(
     const src = query.src
     if (src.baseUrn) edgeConditionsList.push({ src: src.baseUrn })
     if (src.qc)
-      compConditionsList.concat(getUrnCompConditions(compType.SRCQ, src.qc))
+      compConditionsList.push(...getUrnCompConditions(compType.SRCQ, src.qc))
     if (src.rc)
-      compConditionsList.concat(getUrnCompConditions(compType.SRCR, src.rc))
+      compConditionsList.push(...getUrnCompConditions(compType.SRCR, src.rc))
   }
   if (query.dst) {
     const dst = query.dst
     if (dst.baseUrn) edgeConditionsList.push({ dst: dst.baseUrn })
-    if (dst.qc) {
-      const additions = getUrnCompConditions(compType.DSTQ, dst.qc)
-      compConditionsList.push(...additions)
-    }
-    if (dst.rc) {
-      const additions = getUrnCompConditions(compType.DSTR, dst.rc)
-      compConditionsList.push(...additions)
-    }
+    if (dst.qc)
+      compConditionsList.push(...getUrnCompConditions(compType.DSTQ, dst.qc))
+    if (dst.rc)
+      compConditionsList.push(...getUrnCompConditions(compType.DSTR, dst.rc))
   }
 
   if (compConditionsList.length) {

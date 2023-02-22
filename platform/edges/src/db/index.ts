@@ -24,6 +24,7 @@ import type {
   EdgeTag,
   EdgeQueryOptions,
   EdgeQueryResults,
+  NodeFilter,
 } from './types'
 import { parseUrnForEdge } from '@kubelt/urns/edge'
 
@@ -57,9 +58,9 @@ export function init(db: D1Database): Graph {
  */
 export async function node(
   g: Graph,
-  nodeId: AnyURN | undefined
+  filter: NodeFilter
 ): Promise<Node | undefined> {
-  return select.node(g, nodeId)
+  return select.node(g, filter)
 }
 
 // edges()
