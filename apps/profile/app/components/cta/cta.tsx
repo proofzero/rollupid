@@ -44,11 +44,6 @@ const CTA = ({ profile }: { profile: FullProfile }) => {
     pcs: ProfileCompletionStatus,
     key: keyof typeof pcs
   ) => {
-    console.log({
-      cta,
-      key,
-    })
-
     if (!pcs[key]) {
       if (!sessionStorage.getItem(`cta.${key}`)) {
         sessionStorage.setItem(`cta.${key}`, 'show')

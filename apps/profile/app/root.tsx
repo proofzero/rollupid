@@ -38,7 +38,7 @@ import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
 import * as gtag from '~/utils/gtags.client'
-import { commitProfileSession, getProfileSession } from './utils/session.server'
+import { getProfileSession } from './utils/session.server'
 import { getRedirectUrlForProfile } from './utils/redirects.server'
 import { parseJwt } from './utils/session.server'
 import { getAccountProfile } from './helpers/profile'

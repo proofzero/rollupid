@@ -1,8 +1,4 @@
-import {
-  createCookieSessionStorage,
-  redirect,
-  Session,
-} from '@remix-run/cloudflare'
+import { createCookieSessionStorage, redirect } from '@remix-run/cloudflare'
 import { Authenticator } from 'remix-auth'
 import { OAuth2Strategy, OAuth2Profile } from 'remix-auth-oauth2'
 import * as jose from 'jose'
@@ -168,9 +164,4 @@ export async function getProfileSession(
 ) {
   const storage = getProfileSessionStorage()
   return storage.getSession(request.headers.get('Cookie'))
-}
-
-export async function commitProfileSession(session: Session) {
-  const sessionStorage = getProfileSessionStorage()
-  return sessionStorage.commitSession(session)
 }
