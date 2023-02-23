@@ -16,11 +16,7 @@ import { randomBytes } from '@ethersproject/random'
 import { AccountURN } from '@kubelt/urns/account'
 import type { AccessJWTPayload, Scope } from '@kubelt/types/access'
 
-import {
-  ACCESS_TOKEN_OPTIONS,
-  JWT_OPTIONS,
-  REFRESH_TOKEN_OPTIONS,
-} from '../constants'
+import { ACCESS_TOKEN_OPTIONS, JWT_OPTIONS } from '../constants'
 
 import type {
   ExchangeTokenResult,
@@ -29,12 +25,19 @@ import type {
   KeyPairSerialized,
 } from '../types'
 
+type TokenStore = DurableObjectStorage | DurableObjectTransaction
+
 type Token = {
   jwt: string
   scope: Scope
 }
 
-type Tokens = Record<string, Token>
+type TokenMap = Record<string, Token>
+type TokenIndex = Array<string>
+type TokenState = {
+  tokenMap: TokenMap
+  tokenIndex: TokenIndex
+}
 
 export default class Access extends DOProxy {
   declare state: DurableObjectState
@@ -42,6 +45,13 @@ export default class Access extends DOProxy {
   constructor(state: DurableObjectState) {
     super(state)
     this.state = state
+  }
+
+  async getTokenState(store: TokenStore): Promise<TokenState> {
+    return {
+      tokenMap: (await store.get<TokenMap>('tokenMap')) || {},
+      tokenIndex: (await store.get<TokenIndex>('tokenIndex')) || [],
+    }
   }
 
   async generate(
@@ -76,7 +86,6 @@ export default class Access extends DOProxy {
 
     const refreshToken = await new SignJWT({ scope })
       .setProtectedHeader({ alg })
-      .setExpirationTime(REFRESH_TOKEN_OPTIONS.expirationTime)
       .setAudience([clientId])
       .setIssuedAt(issuedAt)
       .setJti(refreshTokenId)
@@ -84,29 +93,37 @@ export default class Access extends DOProxy {
       .sign(key)
 
     await storage.transaction(async (txn) => {
-      const tokens = (await txn.get<Tokens>('tokens')) || {}
+      const { tokenMap, tokenIndex } = await this.getTokenState(txn)
 
-      if (tokens[refreshTokenId]) {
+      if (tokenMap[refreshTokenId]) {
         throw new Error('refresh token id exists')
       }
 
-      const put = async (tokens: Tokens): Promise<void> => {
-        tokens[refreshTokenId] = {
-          jwt: refreshToken,
-          scope,
-        }
-
-        await txn.put({ tokens })
+      tokenMap[refreshTokenId] = {
+        jwt: refreshToken,
+        scope,
       }
 
-      try {
-        await put(tokens)
-      } catch (error) {
-        if (error instanceof RangeError) {
-          const pruned = await this.pruneTokens(tokens)
-          await put(pruned)
+      tokenIndex.push(refreshTokenId)
+
+      const put = async (
+        tokenMap: TokenMap,
+        tokenIndex: TokenIndex
+      ): Promise<void> => {
+        try {
+          await txn.put({ tokenMap, tokenIndex })
+        } catch (error) {
+          if (error instanceof RangeError) {
+            const expungeTokenId = tokenIndex.shift()
+            if (expungeTokenId) {
+              delete tokenMap[expungeTokenId]
+            }
+            await put(tokenMap, tokenIndex)
+          }
         }
       }
+
+      await put(tokenMap, tokenIndex)
     })
 
     let idToken: string | undefined
@@ -151,37 +168,17 @@ export default class Access extends DOProxy {
       if (!jti) {
         throw new Error('missing token id')
       }
-      const tokens = (await txn.get<Tokens>('tokens')) || {}
-      delete tokens[jti]
-      await txn.put({ tokens })
-    })
-  }
 
-  async pruneTokens(tokens: Tokens): Promise<Tokens> {
-    const { alg } = JWT_OPTIONS
-    const { publicKey: key } = await this.getJWTSigningKeyPair()
-    const options = { algorithms: [alg] }
+      const { tokenMap, tokenIndex } = await this.getTokenState(txn)
+      delete tokenMap[jti]
 
-    const active = async.reduce<string, Tokens>(
-      Object.keys(tokens),
-      {},
-      async (state: Tokens | undefined, tokenId: string) => {
-        if (!state) {
-          throw new Error('missing tokens')
-        }
-
-        const { jwt } = tokens[tokenId]
-        try {
-          await jwtVerify(jwt, key, options)
-          state[tokenId] = tokens[tokenId]
-          return state
-        } catch (error) {
-          return state
-        }
+      const index = tokenIndex.findIndex((jti) => jti == payload.jti)
+      if (index > -1) {
+        tokenIndex.splice(index, 1)
       }
-    )
 
-    return active
+      await txn.put({ tokenMap, tokenIndex })
+    })
   }
 
   async getJWTSigningKeyPair(): Promise<KeyPair> {
