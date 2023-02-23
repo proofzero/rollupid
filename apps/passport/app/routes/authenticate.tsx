@@ -74,6 +74,7 @@ export const CatchBoundary: CatchBoundaryComponent = () => {
         code={'' + caught.status}
         message={caught.data.message}
         pepe={false}
+        backBtn={false}
       />
     </div>
   )

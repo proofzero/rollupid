@@ -202,6 +202,7 @@ export function ErrorBoundary({ error }) {
             trace={error?.stack}
             error={error}
             pepe={false}
+            backBtn={false}
           />
         </div>
 

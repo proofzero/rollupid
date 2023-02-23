@@ -16,6 +16,7 @@ export type ErrorPageProps = {
     message: string
   }
   pepe?: boolean
+  backBtn?: boolean
 }
 
 export function ErrorPage({
@@ -24,6 +25,7 @@ export function ErrorPage({
   trace,
   error,
   pepe = true,
+  backBtn = true,
 }: ErrorPageProps) {
   const json = error?.message.replace('Unexpected error.: ', '')
 
@@ -52,18 +54,23 @@ export function ErrorPage({
       </section>
 
       <section className="flex flex-col justify-center items-center mt-6">
-        <Button
-          btnSize="xxl"
-          btnType="primary"
-          onClick={() =>
-            window && document.referrer
-              ? (window.location.href = document.referrer)
-              : history.back()
-          }
-        >
-          Go back
-        </Button>
-        <Text className="my-3">or</Text>
+        {backBtn && (
+          <>
+            <Button
+              btnSize="xxl"
+              btnType="primary"
+              onClick={() =>
+                window && document.referrer
+                  ? (window.location.href = document.referrer)
+                  : history.back()
+              }
+            >
+              Go back
+            </Button>
+            <Text className="my-3">or</Text>
+          </>
+        )}
+
         <ButtonAnchor
           btnSize="xxl"
           btnType="secondary"
