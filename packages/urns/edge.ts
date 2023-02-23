@@ -4,7 +4,7 @@
  * Defines a URN space for edges in the database.
  */
 
-import type { BaseURN } from 'urns'
+import { BaseURN, parseURN } from 'urns'
 
 import { URNSpace } from 'urns'
 
@@ -21,17 +21,17 @@ export type EdgeURN = BaseURN<'edge-tag', string>
  * The URN namespace for link edge tags. These tags are attached to
  * edges and indicate the edge "type".
  */
-export const EdgeSpace = new URNSpace('edge-tag', {
-  // TODO constrain allowed values for edge tags. Should possibly allow
-  // sub-typing for more interesting graph queries.
-  /*
-  pred: (s: string) => {
+export const EdgeSpace = new URNSpace('edge-tag', {})
 
+export const parseUrnForEdge = (urn: string) => {
+  const parsedURN = parseURN(urn)
+
+  // We store the base URN as the unique node identifer.
+  const id = `urn:${parsedURN.nid}:${parsedURN.nss}`
+
+  return {
+    ...parsedURN,
+    fc: parsedURN.fragment || '',
+    id,
   }
-  */
-  /*
-  decode: (nss) => {
-    // TODO process the NSS, throw if invalid
-  }
-  */
-})
+}

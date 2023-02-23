@@ -25,6 +25,7 @@ import type {
   EdgeQueryOptions,
   EdgeQueryResults,
 } from './types'
+import { parseUrnForEdge } from '@kubelt/urns/edge'
 
 // Exported Types
 // -----------------------------------------------------------------------------
@@ -75,37 +76,11 @@ export async function edges(
   return select.edges(g, query, opt)
 }
 
-// incoming()
-// -----------------------------------------------------------------------------
-
-/**
- * Return the set of edges that terminate at a node.
- */
-export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
-  return select.incoming(g, nodeId)
-}
-
-// outgoing()
-// -----------------------------------------------------------------------------
-
-/**
- * Return the set of edges that originate at a node.
- */
-export async function outgoing(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
-  return select.outgoing(g, nodeId)
-}
-
 // link()
 // -----------------------------------------------------------------------------
 
 /**
  * Create a link between two nodes.
- *
- * @param g - the graph handle returned from init()
- * @param src - the ID of the source node
- * @param dst - the ID of the destination node
- * @param tag - a tag representing the edge type
- *
  * @returns the ID of the created edge, or -1 on error
  */
 export async function link(
@@ -113,15 +88,25 @@ export async function link(
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<EdgeRecord> {
-  const srcNode = await insert.node(g, src)
+): Promise<void> {
+  const batchedStmnts: D1PreparedStatement[] = []
+  const parsedSrcNode = parseUrnForEdge(src)
+  const srcNodeStmts = insert.node(g, parsedSrcNode)
   // TODO check for error
 
-  const dstNode = await insert.node(g, dst)
+  const parsedDstNode = parseUrnForEdge(dst)
+  const dstNodeStmts = insert.node(g, parsedDstNode)
   // TODO check for error
 
   // Return existing edge ID (if found) or new edge ID (if created).
-  return insert.edge(g, srcNode.urn, dstNode.urn, tag)
+  const edgeStmt = insert.edge(g, parsedSrcNode, parsedDstNode, tag)
+
+  batchedStmnts.push(...srcNodeStmts)
+  batchedStmnts.push(...dstNodeStmts)
+  batchedStmnts.push(edgeStmt)
+
+  await g.db.batch(batchedStmnts)
+  return
 }
 
 // unlink()
@@ -137,18 +122,13 @@ export async function unlink(
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<number> {
-  return remove.edge(g, src, dst, tag)
+): Promise<void> {
+  await remove.edge(g, src, dst, tag).run()
+  return
 }
 
 /**
  * Update a link between two nodes.
- *
- * @param g - the graph handle returned from init()
- * @param src - the ID of the source node
- * @param dst - the ID of the destination node
- * @param tag - a tag representing the edge type
- *
  * @returns the ID of the created edge, or -1 on error
  */
 export async function upsert(
@@ -156,13 +136,58 @@ export async function upsert(
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<EdgeRecord> {
-  const srcNode = await update.node(g, src)
+): Promise<void> {
+  const batchedStmnts: D1PreparedStatement[] = []
+  const parsedSrcNode = parseUrnForEdge(src)
+  const srcNodeStmts = update.node(g, parsedSrcNode)
   // TODO check for error
 
-  const dstNode = await update.node(g, dst)
+  const parsedDstNode = parseUrnForEdge(dst)
+  const dstNodeStmts = update.node(g, parsedDstNode)
   // TODO check for error
 
   // Return existing edge ID (if found) or new edge ID (if created).
-  return update.edge(g, srcNode.urn, dstNode.urn, tag)
+  const edgeStmt = update.edge(g, parsedSrcNode, parsedDstNode, tag)
+
+  batchedStmnts.push(...srcNodeStmts)
+  batchedStmnts.push(...dstNodeStmts)
+  batchedStmnts.push(edgeStmt)
+
+  await g.db.batch(batchedStmnts)
+  return
+}
+
+/**
+ * Update a links between two nodes.
+ * @returns the ID of the created edge, or -1 on error
+ */
+export async function batchUpsert(
+  g: Graph,
+  edges: {
+    src: AnyURN
+    dst: AnyURN
+    tag: EdgeTag
+  }[]
+): Promise<void> {
+  const batchedStmnts: D1PreparedStatement[] = []
+  edges.map((edge) => {
+    const parsedSrcNode = parseUrnForEdge(edge.src)
+    const srcNodeStmts = update.node(g, parsedSrcNode)
+    // TODO check for error
+
+    const parsedDstNode = parseUrnForEdge(edge.dst)
+    const dstNodeStmts = update.node(g, parsedDstNode)
+    // TODO check for error
+
+    // Return existing edge ID (if found) or new edge ID (if created).
+    const edgeStmt = update.edge(g, parsedSrcNode, parsedDstNode, edge.tag)
+
+    batchedStmnts.push(...srcNodeStmts)
+    batchedStmnts.push(...dstNodeStmts)
+    batchedStmnts.push(edgeStmt)
+  })
+
+  await g.db.batch(batchedStmnts)
+  // TODO check for error
+  return
 }

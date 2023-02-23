@@ -1,7 +1,7 @@
 import { AnyURNInput } from '@kubelt/platform-middleware/inputValidators'
+import { parseUrnForEdge } from '@kubelt/urns/edge'
 import { z } from 'zod'
 import { Context } from '../../context'
-import * as db from '../../db'
 import * as update from '../../db/update'
 
 export const UpdateNodeCompsMethodInput = z.object({
@@ -22,5 +22,10 @@ export const updateNodeCompsMethod = async ({
 }): Promise<UpdateNodeCompsResult> => {
   const nodeUrn = input.urnOfNode
   if (!nodeUrn) throw new Error('updateNodeCompsParam: No urn provided')
-  const result = await update.node(ctx.graph, nodeUrn)
+
+  const parsedUrn = parseUrnForEdge(nodeUrn)
+  const stmts = update.node(ctx.graph, parsedUrn)
+  await ctx.graph.db.batch(stmts)
+
+  return
 }
