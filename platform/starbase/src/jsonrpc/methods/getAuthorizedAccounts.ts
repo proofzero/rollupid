@@ -26,7 +26,7 @@ export type GetAuthorizedAccountsParams = z.infer<
 export const GetAuthorizedAccountsMethodOutput = z.object({
   users: z.array(
     z.object({
-      accountURN: z.string(),
+      accountURN: z.string().startsWith('urn:rollupid:account/'),
       timestamp: z.number(),
       name: z.string(),
       imageURL: z.string(),

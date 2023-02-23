@@ -3,7 +3,7 @@
  */
 import { useEffect } from 'react'
 
-import type { ActionFunction } from '@remix-run/cloudflare'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import {
   useActionData,
@@ -11,6 +11,7 @@ import {
   useSubmit,
   useNavigate,
   useFetcher,
+  useLoaderData,
 } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 import { ApplicationDashboard } from '~/components/Applications/Dashboard/ApplicationDashboard'
@@ -26,6 +27,22 @@ import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 /**
  * @file app/routes/dashboard/index.tsx
  */
+
+type LoaderData = {
+  clientId: string
+}
+
+export const loader: LoaderFunction = async ({ params }) => {
+  const { clientId } = params
+
+  if (!clientId) {
+    throw new Error('clientId is required')
+  }
+
+  return json<LoaderData>({
+    clientId,
+  })
+}
 
 export const action: ActionFunction = async ({ request, params }) => {
   if (!params.clientId) {
@@ -74,6 +91,7 @@ export default function AppDetailIndexPage() {
     appDetails: appDetailsProps
     rotationResult: RotatedSecrets
   }>()
+  const { clientId } = useLoaderData()
   const authFetcher = useFetcher()
   const navigate = useNavigate()
 
@@ -81,9 +99,8 @@ export default function AppDetailIndexPage() {
 
   useEffect(() => {
     const query = new URLSearchParams()
-    query.set('client', app.clientId!)
     query.set('limit', '8')
-    authFetcher.load(`/api/authorized-accounts?${query}`)
+    authFetcher.load(`/apps/${clientId}/users?${query}`)
   }, [])
 
   const { rotatedClientSecret, rotatedApiKey } =

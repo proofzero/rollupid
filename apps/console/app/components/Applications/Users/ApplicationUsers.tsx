@@ -7,13 +7,11 @@ import { HiOutlineExternalLink } from 'react-icons/hi'
 
 export const ApplicationUsers = ({
   authorizedProfiles,
-  fetcherState,
   error,
   PROFILE_APP_URL,
   metadata,
   loadUsers,
 }: {
-  fetcherState: { loadingDetails: string; type: string }
   authorizedProfiles: AuthorizedProfile[]
   error?: any
   loadUsers: (val: number) => void
@@ -152,8 +150,9 @@ export const ApplicationUsers = ({
             ))}
             <div className="flex items-center py-4 px-8 border-t justify-between">
               <Text className="text-gray-700">
-                Showing {metadata.offset + 1} to {metadata.offset + 10} of{' '}
-                {metadata.edgesReturned} results
+                Showing {metadata.offset + 1} to{' '}
+                {metadata.offset + metadata.limit} of {metadata.edgesReturned}{' '}
+                results
               </Text>
               <div className="flex flex-col space-y-1 sm:space-y-0 sm:flex-row ml-2">
                 <Button

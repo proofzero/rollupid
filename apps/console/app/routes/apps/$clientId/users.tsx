@@ -1,48 +1,86 @@
-import { useEffect } from 'react'
 import { ApplicationUsers } from '~/components/Applications/Users/ApplicationUsers'
-import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
-import { useFetcher, useLoaderData, useOutletContext } from '@remix-run/react'
+import { useLoaderData, useNavigate } from '@remix-run/react'
 import type { LoaderFunction } from '@remix-run/cloudflare'
+import type { AuthorizedProfile } from '~/types'
+import { requireJWT } from '~/utilities/session.server'
 import { json } from '@remix-run/cloudflare'
+import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
-export const loader: LoaderFunction = (args) => {
-  return json({
-    PROFILE_APP_URL,
-  })
+type LoaderData = {
+  authorizedProfiles?: {
+    metadata: {
+      offset?: number
+      limit?: number
+      edgesReturned: number
+    }
+    users: AuthorizedProfile[]
+  }
+  PROFILE_APP_URL?: string
+  error?: any
+}
+
+export const loader: LoaderFunction = async ({ request, params }) => {
+  const jwt = await requireJWT(request)
+  const srcUrl = new URL(request.url)
+
+  try {
+    const client = params.clientId
+    const page = srcUrl.searchParams.get('page')
+    const stringLimit = srcUrl.searchParams.get('limit')
+
+    // By default the limit is set to 10
+    const limit = stringLimit ? parseInt(stringLimit) : 10
+    // because offset is shown as an integer page number I convert it here
+    // to the actual offset for the database. (page starts with 1, not 0)
+    const offset = page ? (parseInt(page) - 1) * limit : 0
+
+    if (!client) {
+      throw new Error('clientId is required')
+    }
+
+    const starbaseClient = createStarbaseClient(
+      Starbase,
+      getAuthzHeaderConditionallyFromToken(jwt)
+    )
+
+    const authorizedProfiles = await starbaseClient.getAuthorizedAccounts.query(
+      {
+        client,
+        opt: {
+          offset:0,
+          limit,
+        },
+      }
+    )
+
+    if (!authorizedProfiles.metadata.offset) {
+      authorizedProfiles.metadata.offset = 0
+    }
+
+    return json<LoaderData>({ authorizedProfiles, PROFILE_APP_URL })
+  } catch (ex: any) {
+    console.error(ex)
+    return json<LoaderData>({ error: ex })
+  }
 }
 
 const Users = () => {
-  const authFetcher = useFetcher()
-  const { PROFILE_APP_URL } = useLoaderData()
-
-  const { appDetails } = useOutletContext<{
-    appDetails: appDetailsProps
-  }>()
-
-  const loadUsers = (offset: number = 0) => {
-    const query = new URLSearchParams()
-    query.set('client', appDetails.clientId!)
-    query.set('offset', offset.toString())
-    authFetcher.load(`/api/authorized-accounts?${query}`)
-  }
-
-  useEffect(() => {
-    loadUsers()
-  }, [])
-
-  console.log({ data: authFetcher.data })
+  const navigate = useNavigate()
+  const { authorizedProfiles, PROFILE_APP_URL, error } = useLoaderData()
 
   return (
     <ApplicationUsers
       PROFILE_APP_URL={PROFILE_APP_URL}
-      fetcherState={{
-        loadingDetails: authFetcher.state,
-        type: authFetcher.type,
+      loadUsers={(offset: number) => {
+        const query = new URLSearchParams()
+        if (offset || offset === 0)
+          query.set('page', (offset / 10 + 1).toString())
+        navigate(`?${query}`)
       }}
-      error={authFetcher.data?.error || null}
-      authorizedProfiles={authFetcher.data?.authorizedProfiles.users || []}
-      loadUsers={loadUsers}
-      metadata={authFetcher.data?.authorizedProfiles.metadata}
+      error={error || null}
+      authorizedProfiles={authorizedProfiles.users || []}
+      metadata={authorizedProfiles.metadata}
     />
   )
 }

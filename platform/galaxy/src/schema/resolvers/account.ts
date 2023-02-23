@@ -80,7 +80,6 @@ const accountResolvers: Resolvers = {
       return mappedApps
     },
 
-    //@ts-ignore
     links: async (
       _parent: any,
       {},
@@ -97,7 +96,7 @@ const accountResolvers: Resolvers = {
 
       return links
     },
-    //@ts-ignore
+
     gallery: async (
       _parent: any,
       {},
@@ -139,7 +138,7 @@ const accountResolvers: Resolvers = {
       // if there is no gallery
       return []
     },
-    //@ts-ignore
+
     connectedAddresses: async (
       _parent: any,
       {},
@@ -153,7 +152,7 @@ const accountResolvers: Resolvers = {
 
       return addresses
     },
-    //@ts-ignore
+
     profileFromAccount: async (
       _parent: any,
       { accountURN }: { accountURN: AccountURN },
@@ -171,7 +170,6 @@ const accountResolvers: Resolvers = {
       return accountProfile
     },
 
-    //@ts-ignore
     linksFromAccount: async (
       _parent: any,
       { accountURN }: { accountURN: AccountURN },
@@ -187,7 +185,7 @@ const accountResolvers: Resolvers = {
 
       return links
     },
-    //@ts-ignore
+
     galleryFromAccount: async (
       _parent: any,
       { accountURN }: { accountURN: AccountURN },
@@ -320,7 +318,7 @@ const accountResolvers: Resolvers = {
 
       return linksFromAddress
     },
-    //@ts-ignore
+
     galleryFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
@@ -471,7 +469,7 @@ const accountResolvers: Resolvers = {
       })
       return true
     },
-    //@ts-ignore
+
     updateLinks: async (
       _parent: any,
       { links }: { links: Links },
@@ -492,7 +490,7 @@ const accountResolvers: Resolvers = {
       })
       return true
     },
-    //@ts-ignore
+
     updateGallery: async (
       _parent: any,
       { gallery }: { gallery: Gallery },
