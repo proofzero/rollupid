@@ -4,8 +4,6 @@
  * Utilities for inserting data into the database.
  */
 
-import * as urns from 'urns'
-
 import type { EdgeTag, Graph } from './types'
 import { parseUrnForEdge } from '@kubelt/urns/edge'
 
@@ -60,15 +58,14 @@ export function node(
   // JOIN TABLE: node_qcomp_urnr_component (nodeUrn, rcomp)
   if (rcomponent) {
     // Get the IDs of the q-component records for the node URN.
-    const qcParams = new URLSearchParams(rcomponent)
+    const rcParams = new URLSearchParams(rcomponent)
     // Add an entry to the join table for each q-component row that is
     // used in the node URN.
     const rcJoinStmt = g.db.prepare(
       'INSERT INTO node_rcomp (nodeUrn, key, value) VALUES (?, ?, ?) \
         ON CONFLICT(nodeUrn, key) DO UPDATE SET value=excluded.value'
     )
-    const stmts = []
-    for (const [key, value] of qcParams.entries()) {
+    for (const [key, value] of rcParams.entries()) {
       stmts.push(rcJoinStmt.bind(id, key, value))
     }
   }

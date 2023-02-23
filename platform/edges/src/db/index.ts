@@ -105,8 +105,6 @@ export async function link(
   batchedStmnts.push(...dstNodeStmts)
   batchedStmnts.push(edgeStmt)
 
-  console.debug({ srcNodeStmts, dstNodeStmts, batchedStmnts })
-
   await g.db.batch(batchedStmnts)
   return
 }
