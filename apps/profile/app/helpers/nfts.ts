@@ -141,6 +141,7 @@ export const decorateNfts = (ownedNfts: any) => {
  */
 export const getGallery = async (owner: string, jwt?: string) => {
   let profile
+
   if (jwt) {
     //we need to check if logged-in user is checking someone elses' profile
     const accountURN = parseJwt(jwt).account
@@ -148,7 +149,11 @@ export const getGallery = async (owner: string, jwt?: string) => {
     const { addresses } = await galaxyClient.getConnectedAddressesFromAccount({
       accountURN,
     })
-    if (addresses?.map((address) => address.baseUrn).includes(owner)) {
+
+    if (
+      addresses?.map((address) => address.baseUrn).includes(owner) ||
+      accountURN === owner
+    ) {
       profile = await getAccountProfile(jwt as string)
     } else {
       profile = await getAddressProfile(owner as AddressURN)

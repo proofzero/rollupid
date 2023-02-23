@@ -183,6 +183,7 @@ const Gallery = () => {
   const actionData = useActionData()
   const { profile, cryptoAddresses, accountURN } = useOutletContext<{
     profile: Profile
+    cryptoAddresses: string[]
     accountURN: string
     cryptoAddresses: string[]
   }>()
