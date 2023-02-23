@@ -34,17 +34,9 @@ export const updateEdgesMethod = async ({
   input: UpdateEdgesParams
   ctx: Context
 }): Promise<UpdateEdhesResult> => {
-  const edges = await db.link(ctx.graph, input.src, input.dst, input.tag)
-
-  console.log(
-    `created edge ${edge.id}: ${edge.src} =[${edge.tag}]=> ${edge.dst}`
-  )
+  await db.batchUpsert(ctx.graph, input)
 
   return {
-    edge: {
-      src: edge.src,
-      dst: edge.dst,
-      tag: edge.tag,
-    },
+    edges: input,
   }
 }

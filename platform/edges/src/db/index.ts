@@ -108,15 +108,25 @@ export async function link(
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<EdgeRecord> {
-  const srcNode = await insert.node(g, src)
+): Promise<void> {
+  const batchedStmnts: D1PreparedStatement[] = []
+  const parsedSrcNode = parseUrnForEdge(src)
+  const srcNodeStmts = insert.node(g, parsedSrcNode)
   // TODO check for error
 
-  const dstNode = await insert.node(g, dst)
+  const parsedDstNode = parseUrnForEdge(dst)
+  const dstNodeStmts = insert.node(g, parsedDstNode)
   // TODO check for error
 
   // Return existing edge ID (if found) or new edge ID (if created).
-  return insert.edge(g, srcNode.urn, dstNode.urn, tag)
+  const edgeStmt = insert.edge(g, parsedSrcNode, parsedDstNode, tag)
+
+  batchedStmnts.concat(srcNodeStmts)
+  batchedStmnts.concat(dstNodeStmts)
+  batchedStmnts.push(edgeStmt)
+
+  await g.db.batch(batchedStmnts)
+  return
 }
 
 // unlink()
@@ -132,8 +142,9 @@ export async function unlink(
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<number> {
-  return remove.edge(g, src, dst, tag)
+): Promise<void> {
+  await remove.edge(g, src, dst, tag).run()
+  return
 }
 
 /**
@@ -172,13 +183,11 @@ export async function upsert(
  */
 export async function batchUpsert(
   g: Graph,
-  edges: [
-    {
-      src: AnyURN
-      dst: AnyURN
-      tag: EdgeTag
-    }
-  ]
+  edges: {
+    src: AnyURN
+    dst: AnyURN
+    tag: EdgeTag
+  }[]
 ): Promise<void> {
   const batchedStmnts: D1PreparedStatement[] = []
   edges.map((edge) => {

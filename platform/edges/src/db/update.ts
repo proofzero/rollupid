@@ -6,9 +6,7 @@
 
 import { parseUrnForEdge } from '@kubelt/urns/edge'
 
-import { AnyURN } from '@kubelt/urns'
-
-import type { EdgeTag, EdgeRecord, Graph, NodeRecord } from './types'
+import type { EdgeTag, Graph } from './types'
 
 // node()
 // -----------------------------------------------------------------------------
@@ -25,24 +23,10 @@ export function node(
   const stmts = []
   const { id, nid, nss, fc, qcomponent, rcomponent } = parsedUrn
 
-<<<<<<< HEAD
-  // Insert node record into the "node" table.
-  const nid = parsedURN.nid
-  const nss = parsedURN.nss
-  const fc = parsedURN.fragment || ''
-
-  // We store the base URN as the unique node identifer.
-  const id = `urn:${nid}:${nss}`
-
-  await g.db
-    .prepare(
-      'INSERT INTO node (urn, nid, nss, fragment) VALUES (?, ?, ?, ?) \
-=======
   stmts.push(
     g.db
       .prepare(
         'INSERT INTO node (urn, nid, nss, fragment) VALUES (?1, ?2, ?3, ?4) \
->>>>>>> c1a178e3 (feat(edges): batch upserts and txns)
         ON CONFLICT(urn) DO UPDATE SET fragment = excluded.fragment'
       )
       .bind(id, nid, nss, fc)
@@ -91,15 +75,7 @@ export function node(
     // await g.db.batch(stmts)
   }
 
-<<<<<<< HEAD
-  // Get the ID of the inserted node.
-  const node = g.db
-    .prepare('SELECT * FROM node WHERE urn = ?')
-    .bind(id)
-    .first() as unknown
-=======
   return stmts
->>>>>>> c1a178e3 (feat(edges): batch upserts and txns)
 
   // // Get the ID of the inserted node.
   // const node = g.db
@@ -150,19 +126,12 @@ export function edge(
   //     reject()
   //   }
 
-<<<<<<< HEAD
-        const edge = await g.db
-          .prepare('SELECT * FROM edge WHERE src = ? AND dst = ? AND tag = ?')
-          .bind(srcParam, dstParam, tagParam)
-          .first()
-=======
   //   const edge = await g.db
   //     .prepare(
   //       'SELECT * FROM edge WHERE src = ?1 AND dst = ?2 AND tag = ?3'
   //     )
   //     .bind(srcParam, dstParam, tagParam)
   //     .first()
->>>>>>> c1a178e3 (feat(edges): batch upserts and txns)
 
   //   resolve(edge as EdgeRecord)
   // })

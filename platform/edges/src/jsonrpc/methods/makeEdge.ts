@@ -5,7 +5,6 @@ import {
   AnyURNInput,
   EdgeTagInput,
 } from '@kubelt/platform-middleware/inputValidators'
-import { Edge } from '../../db/types'
 import { AnyURN } from '@kubelt/urns'
 import { EdgeURN } from '@kubelt/urns/edge'
 
@@ -38,15 +37,15 @@ export const makeEdgeMethod = async ({
     tag: EdgeURN
   }
 }> => {
-  const edge = await db.link(ctx.graph, input.src, input.dst, input.tag)
+  await db.link(ctx.graph, input.src, input.dst, input.tag)
 
-  console.log(`created edge ${edge.src} =[${edge.tag}]=> ${edge.dst}`)
+  console.log(`created edge ${input.src} =[${input.tag}]=> ${input.dst}`)
 
   return {
     edge: {
-      src: edge.src,
-      dst: edge.dst,
-      tag: edge.tag,
+      src: input.src,
+      dst: input.dst,
+      tag: input.tag,
     },
   }
 }
