@@ -2,8 +2,8 @@ import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import type { AddressURN } from '@kubelt/urns/address'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import { getGalaxyClient } from '~/helpers/clients'
-import type { FullProfile } from '~/types'
 import { imageFromAddressType } from './icons'
+import type { FullProfile } from '~/types'
 
 export const getAccountProfile = async (jwt: string) => {
   const galaxyClient = await getGalaxyClient()
