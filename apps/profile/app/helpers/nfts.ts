@@ -3,15 +3,10 @@ import {
   getAuthzHeaderConditionallyFromToken,
 } from '@kubelt/utils'
 import { getGalaxyClient } from './clients'
-import {
-  getAccountProfile,
-  getAddressProfile,
-  getAccountURNProfile,
-} from './profile'
+import { getAccountProfile, getAddressProfile } from './profile'
 
 import type { AddressURN } from '@kubelt/urns/address'
 import type { Gallery, Nft } from '@kubelt/galaxy-client'
-import type { AccountURN } from '@kubelt/urns/account'
 import { parseJwt } from '~/utils/session.server'
 /**
  * Nfts are being sorted server-side
@@ -145,18 +140,22 @@ export const decorateNfts = (ownedNfts: any) => {
  * @returns Gallery or empty array
  */
 export const getGallery = async (owner: string, jwt?: string) => {
-  const isAccount = owner.includes('account')
-  let checker: boolean = !!jwt
-  if (isAccount)
-    checker = jwt ? jwt.length > 0 && parseJwt(jwt).account === owner : false
-
-  const profile = checker
-    ? await getAccountProfile(jwt as string)
-    : // if owner is an AccountURN - return from account,
-    // else - return from address
-    isAccount
-    ? await getAccountURNProfile(owner as AccountURN)
-    : await getAddressProfile(owner as AddressURN)
+  let profile
+  if (jwt) {
+    //we need to check if logged-in user is checking someone elses' profile
+    const accountURN = parseJwt(jwt).account
+    const galaxyClient = await getGalaxyClient()
+    const { addresses } = await galaxyClient.getConnectedAddressesFromAccount({
+      accountURN,
+    })
+    if (addresses?.map((address) => address.baseUrn).includes(owner)) {
+      profile = await getAccountProfile(jwt as string)
+    } else {
+      profile = await getAddressProfile(owner as AddressURN)
+    }
+  } else {
+    profile = await getAddressProfile(owner as AddressURN)
+  }
 
   const { gallery } = profile
 

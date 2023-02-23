@@ -55,8 +55,16 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const session = await getProfileSession(request)
   if (!address) throw new Error('No address provided in URL')
-  const urn =
-    type === 'a' ? AddressURNSpace.urn(address) : AccountURNSpace.urn(address)
+
+  if (type === 'p') {
+    const { addresses } = await galaxyClient.getConnectedAddressesFromAccount({
+      accountURN: AccountURNSpace.urn(address),
+    })
+
+    return redirect(`/a/${AddressURNSpace.decode(addresses[0].baseUrn)}`)
+  }
+
+  const urn = AddressURNSpace.urn(address)
 
   // if not handle is this let's assume this is an idref
   let profile, jwt
@@ -67,15 +75,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       profile = await galaxyClient.getProfileFromAddress(
         {
           addressURN: `${urn}`,
-        },
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
-    } else if (type === 'p') {
-      const user = session.get('user')
-      jwt = user?.accessToken
-      profile = await galaxyClient.getProfileFromAccount(
-        {
-          accountURN: `${urn}`,
         },
         getAuthzHeaderConditionallyFromToken(jwt)
       )
@@ -99,11 +98,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       if (redirectUrl && originalRoute !== redirectUrl)
         return redirect(redirectUrl)
       //otherwise stay on current route
-    } else if (type === 'p') {
-      // What to do here?
-      // In this case address should be an accountURN
-      // const redirectUrl = `/${type}/${address}`
-      // return redirect(redirectUrl)
     } else if (type === 'u') {
       //TODO: galaxy search by handle
       console.error('Not implemented')

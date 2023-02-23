@@ -400,15 +400,12 @@ export type Query = {
   contractsForAddress?: Maybe<NftContracts>;
   ensProfile: CryptoAddressProfile;
   gallery?: Maybe<Array<Gallery>>;
-  galleryFromAccount?: Maybe<Array<Gallery>>;
   galleryFromAddress?: Maybe<Array<Gallery>>;
   getNFTMetadataBatch?: Maybe<NfTs>;
   links?: Maybe<Array<Link>>;
-  linksFromAccount?: Maybe<Array<Link>>;
   linksFromAddress?: Maybe<Array<Link>>;
   nftsForAddress?: Maybe<NfTs>;
   profile?: Maybe<Profile>;
-  profileFromAccount?: Maybe<Profile>;
   profileFromAddress?: Maybe<Profile>;
 };
 
@@ -445,11 +442,6 @@ export type QueryEnsProfileArgs = {
 };
 
 
-export type QueryGalleryFromAccountArgs = {
-  accountURN: Scalars['URN'];
-};
-
-
 export type QueryGalleryFromAddressArgs = {
   addressURN: Scalars['URN'];
 };
@@ -457,11 +449,6 @@ export type QueryGalleryFromAddressArgs = {
 
 export type QueryGetNftMetadataBatchArgs = {
   input?: InputMaybe<Array<InputMaybe<NftMetadataInput>>>;
-};
-
-
-export type QueryLinksFromAccountArgs = {
-  accountURN: Scalars['URN'];
 };
 
 
@@ -473,11 +460,6 @@ export type QueryLinksFromAddressArgs = {
 export type QueryNftsForAddressArgs = {
   contractAddresses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   owner: Scalars['String'];
-};
-
-
-export type QueryProfileFromAccountArgs = {
-  accountURN: Scalars['URN'];
 };
 
 
@@ -512,19 +494,19 @@ export type GetProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, connectedAddresses?: Array<{ __typename?: 'Node', baseUrn: string, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string, chain: string }> | null };
 
-export type GetProfileFromAccountQueryVariables = Exact<{
-  accountURN: Scalars['URN'];
-}>;
-
-
-export type GetProfileFromAccountQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, connectedAddresses?: Array<{ __typename?: 'Node', baseUrn: string, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string, chain: string }> | null };
-
 export type GetProfileFromAddressQueryVariables = Exact<{
   addressURN: Scalars['URN'];
 }>;
 
 
 export type GetProfileFromAddressQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string, chain: string }> | null, connectedAddresses?: Array<{ __typename?: 'Node', baseUrn: string, qc?: any | null, rc?: any | null }> | null };
+
+export type GetConnectedAddressesFromAccountQueryVariables = Exact<{
+  accountURN: Scalars['URN'];
+}>;
+
+
+export type GetConnectedAddressesFromAccountQuery = { __typename?: 'Query', addresses?: Array<{ __typename?: 'Node', baseUrn: string, qc?: any | null, rc?: any | null }> | null };
 
 export type GetAuthorizedAppsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -663,44 +645,6 @@ export const GetProfileDocument = gql`
   }
 }
     `;
-export const GetProfileFromAccountDocument = gql`
-    query getProfileFromAccount($accountURN: URN!) {
-  profile: profileFromAccount(accountURN: $accountURN) {
-    pfp {
-      ... on StandardPFP {
-        image
-      }
-      ... on NFTPFP {
-        image
-        isToken
-      }
-    }
-    displayName
-    handle
-    cover
-    location
-    job
-    bio
-    website
-  }
-  links: linksFromAccount(accountURN: $accountURN) {
-    name
-    url
-    verified
-    provider
-  }
-  connectedAddresses: connectedAddressesFromAccount(accountURN: $accountURN) {
-    baseUrn
-    qc
-    rc
-  }
-  gallery: galleryFromAccount(accountURN: $accountURN) {
-    contract
-    tokenId
-    chain
-  }
-}
-    `;
 export const GetProfileFromAddressDocument = gql`
     query getProfileFromAddress($addressURN: URN!) {
   profile: profileFromAddress(addressURN: $addressURN) {
@@ -733,6 +677,15 @@ export const GetProfileFromAddressDocument = gql`
     chain
   }
   connectedAddresses: connectedAddressesFromAddress(addressURN: $addressURN) {
+    baseUrn
+    qc
+    rc
+  }
+}
+    `;
+export const GetConnectedAddressesFromAccountDocument = gql`
+    query getConnectedAddressesFromAccount($accountURN: URN!) {
+  addresses: connectedAddressesFromAccount(accountURN: $accountURN) {
     baseUrn
     qc
     rc
@@ -1037,11 +990,11 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getProfile(variables?: GetProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProfileQuery>(GetProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfile', 'query');
     },
-    getProfileFromAccount(variables: GetProfileFromAccountQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileFromAccountQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProfileFromAccountQuery>(GetProfileFromAccountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfileFromAccount', 'query');
-    },
     getProfileFromAddress(variables: GetProfileFromAddressQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileFromAddressQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProfileFromAddressQuery>(GetProfileFromAddressDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfileFromAddress', 'query');
+    },
+    getConnectedAddressesFromAccount(variables: GetConnectedAddressesFromAccountQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetConnectedAddressesFromAccountQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetConnectedAddressesFromAccountQuery>(GetConnectedAddressesFromAccountDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getConnectedAddressesFromAccount', 'query');
     },
     getAuthorizedApps(variables?: GetAuthorizedAppsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthorizedAppsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetAuthorizedAppsQuery>(GetAuthorizedAppsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthorizedApps', 'query');

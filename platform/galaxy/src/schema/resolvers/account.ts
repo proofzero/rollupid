@@ -153,74 +153,9 @@ const accountResolvers: Resolvers = {
       return addresses
     },
 
-    profileFromAccount: async (
-      _parent: any,
-      { accountURN }: { accountURN: AccountURN },
-      { env }: ResolverContext
-    ) => {
-      console.log(
-        `galaxy:profile: getting profileFromAccount for account: ${accountURN}`
-      )
-      const accountClient = createAccountClient(env.Account, {})
-
-      let accountProfile = await accountClient.getProfile.query({
-        account: accountURN,
-      })
-
-      return accountProfile
-    },
-
-    linksFromAccount: async (
-      _parent: any,
-      { accountURN }: { accountURN: AccountURN },
-      { env }: ResolverContext
-    ) => {
-      console.log(
-        `galaxy:links: getting linksFromAccount for account: ${accountURN}`
-      )
-      const accountClient = createAccountClient(env.Account, {})
-      let links = await accountClient.getLinks.query({
-        account: accountURN,
-      })
-
-      return links
-    },
-
-    galleryFromAccount: async (
-      _parent: any,
-      { accountURN }: { accountURN: AccountURN },
-      { env }: ResolverContext
-    ) => {
-      console.log(
-        `galaxy:gallery: getting galleryFromAccount for account: ${accountURN}`
-      )
-      const accountClient = createAccountClient(env.Account, {})
-
-      const connectedAddresses = await getConnectedCryptoAddresses({
-        accountURN: accountURN,
-        Account: env.Account,
-      })
-
-      const gallery = await accountClient.getGallery.query({
-        account: accountURN,
-      })
-
-      // Validation
-      if (gallery) {
-        const filteredGallery = await validOwnership(
-          gallery,
-          env,
-          connectedAddresses
-        )
-        return filteredGallery
-      }
-      // if there is no gallery
-      return []
-    },
-
     connectedAddressesFromAccount: async (
       _parent: any,
-      { accountURN }: { accountURN: AccountURN },
+      { accountURN },
       { env }: ResolverContext
     ) => {
       const addresses = await getConnectedAddresses({
@@ -234,31 +169,33 @@ const accountResolvers: Resolvers = {
     profileFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
-      { env, jwt }: ResolverContext
+      { env, jwt, accountURN }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
       })
-      const accountURN = await addressClient.getAccount.query()
+      const calledAccountURN = await addressClient.getAccount.query()
 
       // return the address profile if no account is associated with the address
-      if (!accountURN) {
+      if (!calledAccountURN) {
         console.log(
           'galaxy.profileFromAddress: attempt to resolve profile from address w/o account'
         )
         throw new GraphQLError("Address doesn't have an associated account")
       }
 
+      const validJWT = accountURN === calledAccountURN ? jwt : undefined
+
       // get the account profile
       const accountClient = createAccountClient(
         env.Account,
-        getAuthzHeaderConditionallyFromToken(jwt)
+        getAuthzHeaderConditionallyFromToken(validJWT)
       )
 
       console.log("galaxy.profileFromAddress: getting account's profile")
       // should also return the handle if it exists
       let accountProfile = await accountClient.getProfile.query({
-        account: accountURN,
+        account: calledAccountURN,
       })
 
       const baseUrn = AddressURNSpace.urn(
@@ -289,31 +226,33 @@ const accountResolvers: Resolvers = {
     linksFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
-      { env, jwt }: ResolverContext
+      { env, jwt, accountURN }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
       })
-      const accountURN = await addressClient.getAccount.query()
+      const calledAccountURN = await addressClient.getAccount.query()
 
       // return the address profile if no account is associated with the address
-      if (!accountURN) {
+      if (!calledAccountURN) {
         console.log(
           'galaxy.linksFromAddress: attempt to resolve profile from address w/o account'
         )
         throw new GraphQLError("Address doesn't have an associated account")
       }
 
+      const validJWT = accountURN === calledAccountURN ? jwt : undefined
+
       // get the account profile
       const accountClient = createAccountClient(
         env.Account,
-        getAuthzHeaderConditionallyFromToken(jwt)
+        getAuthzHeaderConditionallyFromToken(validJWT)
       )
 
       console.log("galaxy.linksFromAddress: getting account's links")
       // should also return the handle if it exists
       const linksFromAddress = await accountClient.getLinks.query({
-        account: accountURN,
+        account: calledAccountURN,
       })
 
       return linksFromAddress
@@ -322,37 +261,39 @@ const accountResolvers: Resolvers = {
     galleryFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
-      { env, jwt }: ResolverContext
+      { env, jwt, accountURN }: ResolverContext
     ) => {
       console.log("galaxy.galleryFromAddress: getting account's gallery")
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
       })
-      const accountURN = await addressClient.getAccount.query()
+      const calledAccountURN = await addressClient.getAccount.query()
 
       // return the address profile if no account is associated with the address
-      if (!accountURN) {
+      if (!calledAccountURN) {
         console.log(
           'galaxy.galleryFromAddress: attempt to resolve profile from address w/o account'
         )
         throw new GraphQLError("Address doesn't have an associated account")
       }
 
+      const validJWT = accountURN === calledAccountURN ? jwt : undefined
+
       // get the account profile
       const accountClient = createAccountClient(
         env.Account,
-        getAuthzHeaderConditionallyFromToken(jwt)
+        getAuthzHeaderConditionallyFromToken(validJWT)
       )
 
       const connectedAddresses = await getConnectedCryptoAddresses({
-        accountURN,
+        accountURN: calledAccountURN,
         Account: env.Account,
-        jwt,
+        jwt: validJWT,
       })
 
       // should also return the handle if it exists
       const gallery = await accountClient.getGallery.query({
-        account: accountURN,
+        account: calledAccountURN,
       })
       if (gallery) {
         // Validation
@@ -364,7 +305,7 @@ const accountResolvers: Resolvers = {
 
         if (gallery.length !== filteredGallery.length && jwt) {
           accountClient.setGallery.mutate({
-            name: accountURN,
+            name: calledAccountURN,
             gallery: filteredGallery,
           })
         }
@@ -378,15 +319,17 @@ const accountResolvers: Resolvers = {
     connectedAddressesFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
-      { env, jwt }: ResolverContext
+      { env, jwt, accountURN }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
       })
-      const accountURN = await addressClient.getAccount.query()
+      const calledAccountURN = await addressClient.getAccount.query()
+
+      const validJWT = accountURN === calledAccountURN ? jwt : undefined
 
       // return the address profile if no account is associated with the address
-      if (!accountURN) {
+      if (!calledAccountURN) {
         console.log(
           'galaxy.connectedAddressesFromAddress: attempt to resolve profile from address w/o account'
         )
@@ -398,9 +341,9 @@ const accountResolvers: Resolvers = {
       )
       // should also return the handle if it exists
       const connectedAddressesFromAddress = getConnectedAddresses({
-        accountURN,
+        accountURN: calledAccountURN,
         Account: env.Account,
-        jwt,
+        jwt: validJWT,
       })
 
       return connectedAddressesFromAddress
@@ -547,9 +490,6 @@ const ProfileResolverComposition = {
     logAnalytics(),
     temporaryConvertToPublic(),
   ],
-  'Query.profileFromAccount': [setupContext(), hasApiKey(), logAnalytics()],
-  'Query.linksFromAccount': [setupContext(), hasApiKey(), logAnalytics()],
-  'Query.galleryFromAccount': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.connectedAddressesFromAccount': [
     setupContext(),
     hasApiKey(),
