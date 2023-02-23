@@ -76,26 +76,6 @@ export async function edges(
   return select.edges(g, query, opt)
 }
 
-// incoming()
-// -----------------------------------------------------------------------------
-
-/**
- * Return the set of edges that terminate at a node.
- */
-export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
-  return select.incoming(g, nodeId)
-}
-
-// outgoing()
-// -----------------------------------------------------------------------------
-
-/**
- * Return the set of edges that originate at a node.
- */
-export async function outgoing(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
-  return select.outgoing(g, nodeId)
-}
-
 // link()
 // -----------------------------------------------------------------------------
 
