@@ -68,6 +68,12 @@ const CTA = ({ profile }: { profile: FullProfile }) => {
     setCTA(ctaKey)
   }
 
+  const ignoreCTA = () => {
+    Object.keys(ctaDict).forEach((key) => sessionStorage.setItem(key, 'false'))
+
+    handleCompletionStatus()
+  }
+
   useEffect(() => {
     handleCompletionStatus()
   }, [])
@@ -124,10 +130,7 @@ const CTA = ({ profile }: { profile: FullProfile }) => {
           size="xs"
           weight="normal"
           className="text-indigo-500 cursor-pointer"
-          onClick={() => {
-            sessionStorage.setItem(cta, 'false')
-            handleCompletionStatus()
-          }}
+          onClick={ignoreCTA}
         >
           Ignore
         </Text>
