@@ -39,6 +39,7 @@ export const getAppScopesMethod = async ({
   ]
 
   const uniqueScopes = scopes.filter((v, i, a) => a.indexOf(v) === i)
+  uniqueScopes.push('scope://rollup.id/openid')
 
   const castScopes = uniqueScopes
     .filter((s) => Object.getOwnPropertySymbols(SCOPES).includes(scope(s)))

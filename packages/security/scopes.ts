@@ -36,6 +36,9 @@ export type { Scope }
  */
 export const SCOPE_ADMIM: Scope = scope('scope://rollup.id/admin.admin')
 
+// IMPLIED
+export const SCOPE_OPENID: Scope = scope('scope://rollup.id/openid')
+
 // GENERAL
 
 /**
@@ -115,6 +118,11 @@ export const SCOPES: ScopeMap = {
     name: 'Connected Accounts',
     description: 'Read your visible connected blockchain accounts.',
     class: 'address',
+  },
+  [SCOPE_OPENID]: {
+    name: 'OpenID',
+    description: 'Read your OpenID profile',
+    class: 'implied',
   },
   // NOT READY YET
   // [SCOPE_BLOCKCHAIN_ACCOUNT_MANAGE]: {
