@@ -86,20 +86,11 @@ export default class Access extends DOProxy {
     await storage.transaction(async (txn) => {
       const tokens = (await txn.get<Tokens>('tokens')) || {}
 
-      if (tokens[accessTokenId]) {
-        throw new Error('access token id exists')
-      }
-
       if (tokens[refreshTokenId]) {
         throw new Error('refresh token id exists')
       }
 
       const put = async (tokens: Tokens): Promise<void> => {
-        tokens[accessTokenId] = {
-          jwt: accessToken,
-          scope,
-        }
-
         tokens[refreshTokenId] = {
           jwt: refreshToken,
           scope,
