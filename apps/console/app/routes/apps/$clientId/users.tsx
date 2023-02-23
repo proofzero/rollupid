@@ -3,19 +3,20 @@ import { useLoaderData, useNavigate } from '@remix-run/react'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import type { AuthorizedProfile } from '~/types'
 import { requireJWT } from '~/utilities/session.server'
-import { json } from '@remix-run/cloudflare'
+import { defer, json } from '@remix-run/cloudflare'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import { useState, useEffect } from 'react'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 type LoaderData = {
-  authorizedProfiles?: {
+  authorizedProfiles?: Promise<{
     metadata: {
       offset?: number
       limit?: number
       edgesReturned: number
     }
     users: AuthorizedProfile[]
-  }
+  }>
   PROFILE_APP_URL?: string
   error?: any
 }
@@ -41,21 +42,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       getAuthzHeaderConditionallyFromToken(jwt)
     )
 
-    const authorizedProfiles = await starbaseClient.getAuthorizedAccounts.query(
-      {
-        client,
-        opt: {
-          offset,
-          limit: 10,
-        },
-      }
-    )
+    const authorizedProfiles = starbaseClient.getAuthorizedAccounts.query({
+      client,
+      opt: {
+        offset,
+        limit: 10,
+      },
+    })
 
-    if (!authorizedProfiles.metadata.offset) {
-      authorizedProfiles.metadata.offset = 0
-    }
-
-    return json<LoaderData>({ authorizedProfiles, PROFILE_APP_URL })
+    return defer<LoaderData>({ authorizedProfiles, PROFILE_APP_URL })
   } catch (ex: any) {
     console.error(ex)
     return json<LoaderData>({ error: ex })
@@ -65,6 +60,20 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 const Users = () => {
   const navigate = useNavigate()
   const { authorizedProfiles, PROFILE_APP_URL, error } = useLoaderData()
+  const [awaitedAuthorizedProfiles, setAwaitedAuthorizedProfiles] = useState({
+    users: null,
+    metadata: null,
+  })
+
+  useEffect(() => {
+    ;(async () => {
+      const _awaitedProfiles = await authorizedProfiles
+      if (!_awaitedProfiles.metadata.offset) {
+        _awaitedProfiles.metadata.offset = 0
+      }
+      setAwaitedAuthorizedProfiles(_awaitedProfiles)
+    })()
+  }, [authorizedProfiles])
 
   return (
     <ApplicationUsers
@@ -76,8 +85,14 @@ const Users = () => {
         navigate(`?${query}`)
       }}
       error={error || null}
-      authorizedProfiles={authorizedProfiles.users || []}
-      metadata={authorizedProfiles.metadata}
+      authorizedProfiles={awaitedAuthorizedProfiles.users || []}
+      metadata={
+        awaitedAuthorizedProfiles.metadata || {
+          offset: 0,
+          limit: 0,
+          edgesReturned: 0,
+        }
+      }
     />
   )
 }
