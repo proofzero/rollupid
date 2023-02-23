@@ -61,9 +61,13 @@ export const noLoginsSvg = (
 
 type LoginsPanelProps = {
   authorizedProfiles: AuthorizedProfile[]
+  appId: string
 }
 
-export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
+export const LoginsPanel = ({
+  authorizedProfiles,
+  appId,
+}: LoginsPanelProps) => {
   return (
     <div className="h-full">
       {authorizedProfiles.length ? (
@@ -123,11 +127,7 @@ export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
               </div>
 
               <div className="flex flex-row justify-center ">
-                <Tooltip
-                  content="Coming soon!"
-                  trigger="hover"
-                  className="font-[Inter]"
-                >
+                <a href={`${appId}/users`}>
                   <Text
                     size="sm"
                     weight="medium"
@@ -135,7 +135,7 @@ export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
                   >
                     View All
                   </Text>
-                </Tooltip>
+                </a>
               </div>
             </div>
           </div>

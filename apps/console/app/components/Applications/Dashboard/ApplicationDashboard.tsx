@@ -187,7 +187,10 @@ export const ApplicationDashboard = ({
             )}
             {fetcherState.type === 'done' && error && <NestedErrorPage />}
             {fetcherState.type === 'done' && !error && (
-              <LoginsPanel authorizedProfiles={authorizedProfiles} />
+              <LoginsPanel
+                authorizedProfiles={authorizedProfiles}
+                appId={oAuth.appId}
+              />
             )}
           </div>
         </div>
