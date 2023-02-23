@@ -1,4 +1,3 @@
-import async from 'async'
 import { DOProxy } from 'do-proxy'
 
 import {
@@ -14,16 +13,11 @@ import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
 import { AccountURN } from '@kubelt/urns/account'
-import type { AccessJWTPayload, Scope } from '@kubelt/types/access'
+import type { Scope } from '@kubelt/types/access'
 
-import { ACCESS_TOKEN_OPTIONS, JWT_OPTIONS } from '../constants'
+import { JWT_OPTIONS } from '../constants'
 
-import type {
-  ExchangeTokenResult,
-  IdTokenProfile,
-  KeyPair,
-  KeyPairSerialized,
-} from '../types'
+import type { IdTokenProfile, KeyPair, KeyPairSerialized } from '../types'
 
 type TokenStore = DurableObjectStorage | DurableObjectTransaction
 
@@ -37,6 +31,26 @@ type TokenIndex = Array<string>
 type TokenState = {
   tokenMap: TokenMap
   tokenIndex: TokenIndex
+}
+
+type AccessTokenOptions = {
+  account: AccountURN
+  clientId: string
+  expirationTime: string
+  scope: Scope
+}
+
+type RefreshTokenOptions = {
+  account: AccountURN
+  clientId: string
+  scope: Scope
+}
+
+type IdTokenOptions = {
+  account: AccountURN
+  clientId: string
+  expirationTime: string
+  idTokenProfile: IdTokenProfile
 }
 
 export default class Access extends DOProxy {
@@ -54,57 +68,60 @@ export default class Access extends DOProxy {
     }
   }
 
-  async generate(
-    account: AccountURN,
-    clientId: string,
-    scope: Scope,
-    options?: {
-      idTokenProfile?: IdTokenProfile
-      accessExpiry?: string
-    }
-  ): Promise<ExchangeTokenResult> {
-    const { storage } = this.state
-    await storage.put({ account, clientId })
+  async generateAccessToken(options: AccessTokenOptions): Promise<string> {
+    const { account, clientId, expirationTime, scope } = options
+    const { alg } = JWT_OPTIONS
+    const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
+    const { privateKey: key } = await this.getJWTSigningKeyPair()
+    return new SignJWT({ scope })
+      .setProtectedHeader({ alg })
+      .setExpirationTime(expirationTime)
+      .setAudience([clientId])
+      .setIssuedAt(Date.now())
+      .setJti(jti)
+      .setSubject(account)
+      .sign(key)
+  }
 
+  async generateRefreshToken(options: RefreshTokenOptions): Promise<string> {
+    const { account, clientId, scope } = options
+    const { alg } = JWT_OPTIONS
+    const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
+    const { privateKey: key } = await this.getJWTSigningKeyPair()
+    const jwt = await new SignJWT({ scope })
+      .setProtectedHeader({ alg })
+      .setAudience([clientId])
+      .setIssuedAt(Date.now())
+      .setJti(jti)
+      .setSubject(account)
+      .sign(key)
+
+    await this.store(jti, jwt, scope)
+    return jwt
+  }
+
+  async generateIdToken(options: IdTokenOptions): Promise<string> {
+    const { account, clientId, expirationTime, idTokenProfile } = options
     const { alg } = JWT_OPTIONS
     const { privateKey: key } = await this.getJWTSigningKeyPair()
-
-    const issuedAt = Date.now()
-    const accessTokenId = hexlify(randomBytes(JWT_OPTIONS.jti.length))
-    const refreshTokenId = hexlify(randomBytes(JWT_OPTIONS.jti.length))
-
-    const accessToken = await new SignJWT({ scope })
+    return new SignJWT(idTokenProfile)
       .setProtectedHeader({ alg })
-      .setExpirationTime(
-        options?.accessExpiry || ACCESS_TOKEN_OPTIONS.expirationTime
-      )
+      .setExpirationTime(expirationTime)
       .setAudience([clientId])
-      .setIssuedAt(issuedAt)
-      .setJti(accessTokenId)
+      .setIssuedAt(Date.now())
       .setSubject(account)
       .sign(key)
+  }
 
-    const refreshToken = await new SignJWT({ scope })
-      .setProtectedHeader({ alg })
-      .setAudience([clientId])
-      .setIssuedAt(issuedAt)
-      .setJti(refreshTokenId)
-      .setSubject(account)
-      .sign(key)
-
-    await storage.transaction(async (txn) => {
+  async store(jti: string, jwt: string, scope: Scope): Promise<void> {
+    await this.state.storage.transaction(async (txn) => {
       const { tokenMap, tokenIndex } = await this.getTokenState(txn)
-
-      if (tokenMap[refreshTokenId]) {
+      if (tokenMap[jti]) {
         throw new Error('refresh token id exists')
       }
 
-      tokenMap[refreshTokenId] = {
-        jwt: refreshToken,
-        scope,
-      }
-
-      tokenIndex.push(refreshTokenId)
+      tokenMap[jti] = { jwt, scope }
+      tokenIndex.push(jti)
 
       const put = async (
         tokenMap: TokenMap,
@@ -125,23 +142,6 @@ export default class Access extends DOProxy {
 
       await put(tokenMap, tokenIndex)
     })
-
-    let idToken: string | undefined
-    if (options?.idTokenProfile) {
-      idToken = await new SignJWT(options.idTokenProfile)
-        .setProtectedHeader({ alg })
-        .setExpirationTime(ACCESS_TOKEN_OPTIONS.expirationTime)
-        .setAudience([clientId])
-        .setIssuedAt(issuedAt)
-        .setIssuer(accessTokenId)
-        .sign(key)
-    }
-
-    return {
-      accessToken,
-      refreshToken,
-      idToken,
-    }
   }
 
   async verify(token: string): Promise<JWTVerifyResult> {
@@ -149,16 +149,6 @@ export default class Access extends DOProxy {
     const { publicKey: key } = await this.getJWTSigningKeyPair()
     const options = { algorithms: [alg] }
     return jwtVerify(token, key, options)
-  }
-
-  async refresh(token: string): Promise<ExchangeTokenResult> {
-    const { payload } = await this.verify(token)
-    const {
-      sub: account,
-      aud: [clientId],
-      scope,
-    } = payload as AccessJWTPayload
-    return this.generate(account, clientId, scope)
   }
 
   async revoke(token: string): Promise<void> {

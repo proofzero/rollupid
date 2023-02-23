@@ -2,9 +2,10 @@ import { z } from 'zod'
 import { decodeJwt } from 'jose'
 
 import {
+  ACCESS_TOKEN_OPTIONS,
   AUTHENTICATION_TOKEN_OPTIONS,
   EDGE_AUTHORIZES,
-} from '@kubelt/platform.access/src/constants'
+} from '../../constants'
 
 import { AccessURNSpace } from '@kubelt/urns/access'
 import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
@@ -23,6 +24,12 @@ const AuthenticationCodeInput = z.object({
 
 type AuthenticationCodeInput = z.infer<typeof AuthenticationCodeInput>
 
+const AuthenticationCodeOutput = z.object({
+  accessToken: z.string(),
+})
+
+type AuthenticationCodeOutput = z.infer<typeof AuthenticationCodeOutput>
+
 const AuthorizationCodeInput = z.object({
   grantType: z.literal(GrantType.AuthorizationCode),
   code: z.string(),
@@ -32,6 +39,14 @@ const AuthorizationCodeInput = z.object({
 
 type AuthorizationCodeInput = z.infer<typeof AuthorizationCodeInput>
 
+const AuthorizationCodeOutput = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+  idToken: z.string(),
+})
+
+type AuthorizationCodeOutput = z.infer<typeof AuthorizationCodeOutput>
+
 const RefreshTokenInput = z.object({
   grantType: z.literal(GrantType.RefreshToken),
   refreshToken: z.string(),
@@ -40,6 +55,12 @@ const RefreshTokenInput = z.object({
 })
 
 type RefreshTokenInput = z.infer<typeof RefreshTokenInput>
+
+const RefreshTokenOutput = z.object({
+  accessToken: z.string(),
+})
+
+type RefreshTokenOutput = z.infer<typeof RefreshTokenOutput>
 
 export const ExchangeTokenMethodInput = z.discriminatedUnion('grantType', [
   AuthenticationCodeInput,
@@ -51,7 +72,7 @@ type ExchangeTokenMethodInput = z.infer<typeof ExchangeTokenMethodInput>
 
 export const ExchangeTokenMethodOutput = z.object({
   accessToken: z.string(),
-  refreshToken: z.string(),
+  refreshToken: z.string().optional(),
   idToken: z.string().optional(),
 })
 
@@ -62,8 +83,11 @@ type ExchangeTokenParams<T = ExchangeTokenMethodInput> = {
   input: T
 }
 
-interface ExchangeTokenMethod<T = ExchangeTokenMethodInput> {
-  (params: ExchangeTokenParams<T>): Promise<ExchangeTokenMethodOutput>
+interface ExchangeTokenMethod<
+  T = ExchangeTokenMethodInput,
+  R = ExchangeTokenMethodOutput
+> {
+  (params: ExchangeTokenParams<T>): Promise<R>
 }
 
 export const exchangeTokenMethod: ExchangeTokenMethod = async ({
@@ -83,7 +107,8 @@ export const exchangeTokenMethod: ExchangeTokenMethod = async ({
 }
 
 const handleAuthenticationCode: ExchangeTokenMethod<
-  AuthenticationCodeInput
+  AuthenticationCodeInput,
+  AuthenticationCodeOutput
 > = async ({ ctx, input }) => {
   const { code, clientId } = input
 
@@ -97,19 +122,26 @@ const handleAuthenticationCode: ExchangeTokenMethod<
   const account = (await authorizationNode.storage.get<AccountURN>(
     'account'
   )) as AccountURN
-  const scope: Scope = (await authorizationNode.storage.get('scope')) || []
 
   const name = `${AccountURNSpace.decode(account)}@${account}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
-  const result = await accessNode.class.generate(account, 'rollup', scope, {
-    accessExpiry: AUTHENTICATION_TOKEN_OPTIONS.expirationTime,
-  })
+  await accessNode.storage.put({ account, clientId: 'rollup' })
 
-  return result
+  const { expirationTime } = AUTHENTICATION_TOKEN_OPTIONS
+  const scope: Scope = (await authorizationNode.storage.get('scope')) || []
+  return {
+    accessToken: await accessNode.class.generateAccessToken({
+      account,
+      clientId,
+      expirationTime,
+      scope,
+    }),
+  }
 }
 
 const handleAuthorizationCode: ExchangeTokenMethod<
-  AuthorizationCodeInput
+  AuthorizationCodeInput,
+  AuthorizationCodeOutput
 > = async ({ ctx, input }) => {
   const { code, clientId, clientSecret } = input
 
@@ -137,7 +169,27 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   const name = `${AccountURNSpace.decode(account)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
   const idTokenProfile = await getIdTokenProfileFromAccount(account, ctx)
-  const result = await accessNode.class.generate(account, clientId, scope, {
+  const { expirationTime } = ACCESS_TOKEN_OPTIONS
+
+  await accessNode.storage.put({ account, clientId })
+
+  const accessToken = await accessNode.class.generateAccessToken({
+    account,
+    clientId,
+    expirationTime,
+    scope,
+  })
+
+  const refreshToken = await accessNode.class.generateRefreshToken({
+    account,
+    clientId,
+    scope,
+  })
+
+  const idToken = await accessNode.class.generateIdToken({
+    account,
+    clientId,
+    expirationTime,
     idTokenProfile,
   })
 
@@ -148,7 +200,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     tag: EDGE_AUTHORIZES,
   })
 
-  return result
+  return { accessToken, refreshToken, idToken }
 }
 
 const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
@@ -182,5 +234,18 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
   const account = payload.sub
   const name = `${AccountURNSpace.decode(account)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
-  return accessNode.class.refresh(refreshToken)
+
+  await accessNode.class.verify(refreshToken)
+
+  const { scope } = payload
+  const { expirationTime } = ACCESS_TOKEN_OPTIONS
+
+  return {
+    accessToken: await accessNode.class.generateAccessToken({
+      account,
+      clientId,
+      expirationTime,
+      scope,
+    }),
+  }
 }
