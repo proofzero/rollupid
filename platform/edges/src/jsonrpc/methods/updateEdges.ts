@@ -25,7 +25,7 @@ export const UpdateEdgesMethodOutput = z.object({
 })
 
 export type UpdateEdgesParams = z.infer<typeof UpdateEdgesMethodInput>
-export type UpdateEdhesResult = z.infer<typeof UpdateEdgesMethodOutput>
+export type UpdateEdgesResult = z.infer<typeof UpdateEdgesMethodOutput>
 
 export const updateEdgesMethod = async ({
   input,
@@ -33,7 +33,7 @@ export const updateEdgesMethod = async ({
 }: {
   input: UpdateEdgesParams
   ctx: Context
-}): Promise<UpdateEdhesResult> => {
+}): Promise<UpdateEdgesResult> => {
   await db.batchUpsert(ctx.graph, input)
 
   return {
