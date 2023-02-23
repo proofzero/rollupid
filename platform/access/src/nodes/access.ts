@@ -83,8 +83,8 @@ export default class Access extends DOProxy {
       .setSubject(account)
       .sign(key)
 
-    await storage.transaction(async () => {
-      const tokens = (await this.state.storage.get<Tokens>('tokens')) || {}
+    await storage.transaction(async (txn) => {
+      const tokens = (await txn.get<Tokens>('tokens')) || {}
 
       if (tokens[accessTokenId]) {
         throw new Error('access token id exists')
@@ -105,7 +105,7 @@ export default class Access extends DOProxy {
           scope,
         }
 
-        await storage.put({ tokens })
+        await txn.put({ tokens })
       }
 
       try {
@@ -165,17 +165,15 @@ export default class Access extends DOProxy {
   }
 
   async revoke(token: string): Promise<void> {
-    const { storage } = this.state
-
-    await storage.transaction(async () => {
-      const { payload } = await this.verify(token)
+    const { payload } = await this.verify(token)
+    await this.state.storage.transaction(async (txn) => {
       const { jti } = payload
       if (!jti) {
         throw new Error('missing token id')
       }
-      const tokens = (await this.state.storage.get<Tokens>('tokens')) || {}
+      const tokens = (await txn.get<Tokens>('tokens')) || {}
       delete tokens[jti]
-      await storage.put({ tokens })
+      await txn.put({ tokens })
     })
   }
 
