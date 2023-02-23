@@ -27,13 +27,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   try {
     const client = params.clientId
     const page = srcUrl.searchParams.get('page')
-    const stringLimit = srcUrl.searchParams.get('limit')
 
-    // By default the limit is set to 10
-    const limit = stringLimit ? parseInt(stringLimit) : 10
     // because offset is shown as an integer page number I convert it here
     // to the actual offset for the database. (page starts with 1, not 0)
-    const offset = page ? (parseInt(page) - 1) * limit : 0
+    const offset = page ? (parseInt(page) - 1) * 10 : 0
 
     if (!client) {
       throw new Error('clientId is required')
@@ -48,8 +45,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       {
         client,
         opt: {
-          offset:0,
-          limit,
+          offset,
+          limit: 10,
         },
       }
     )

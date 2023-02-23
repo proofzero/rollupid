@@ -98,9 +98,7 @@ export default function AppDetailIndexPage() {
   const { appDetails: app } = outletContext
 
   useEffect(() => {
-    const query = new URLSearchParams()
-    query.set('limit', '8')
-    authFetcher.load(`/apps/${clientId}/users?${query}`)
+    authFetcher.load(`/apps/${clientId}/users`)
   }, [])
 
   const { rotatedClientSecret, rotatedApiKey } =
@@ -118,7 +116,10 @@ export default function AppDetailIndexPage() {
         },
         CTAneeded: !app.app.icon || !app.app.redirectURI || !app.app.name,
       }}
-      authorizedProfiles={authFetcher.data?.authorizedProfiles.users || []}
+      authorizedProfiles={
+        // by default we return 10 entries, here we need only 8
+        authFetcher.data?.authorizedProfiles.users.slice(0, 8) || []
+      }
       error={authFetcher.data?.error || null}
       fetcherState={{
         loadingDetails: authFetcher.state,
