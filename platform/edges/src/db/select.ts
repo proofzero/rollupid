@@ -174,7 +174,7 @@ export async function edges(
   // )
 
   let sqlFilters = `
-   countor as (select dense_rank() over (order by x.src, x.tag,x.dst) as edge_no,x.* 
+   countor as (select dense_rank() over (order by x.createdTimestamp desc, x.src, x.tag,x.dst) as edge_no,x.* 
    from intersector i left join extender x on i.src=x.src and i.tag=x.tag and i.dst=x.dst)
    
    select (select max(edge_no) from countor) as total_edges, * from countor
@@ -184,8 +184,6 @@ export async function edges(
   let optionsConditions = `where edge_no > ${offset} `
   if (opt?.limit) optionsConditions += `and edge_no <= ${offset + opt.limit} `
   sqlFilters += optionsConditions
-
-  const finalSort = `order by createdTimestamp desc`
 
   enum compType {
     SRCQ = 'SRCQ',
@@ -286,8 +284,7 @@ export async function edges(
     conditionsStatement = `intersector as (${statmentPrefix} ${statementSuffix}), `
   }
 
-  const finalSqlStatement =
-    sqlBase + conditionsStatement + sqlFilters + finalSort
+  const finalSqlStatement = sqlBase + conditionsStatement + sqlFilters
 
   //Keep this .debug until we're confident around the logic
   console.debug('FULL STATEMENT', finalSqlStatement)
