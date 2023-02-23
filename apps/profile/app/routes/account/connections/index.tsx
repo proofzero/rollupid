@@ -88,8 +88,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     nodeType: a.rc.node_type,
   }))
 
-  console.log({ addresses, addressTypeUrns })
-
   // This returns profiles without urns
   const profiles =
     (await getAddressProfiles(

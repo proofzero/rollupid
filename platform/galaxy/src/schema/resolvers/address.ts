@@ -76,7 +76,6 @@ const addressResolvers: Resolvers = {
       { addressURNList },
       { env, jwt, accountURN }: ResolverContext
     ) => {
-      console.debug({ jwt, addressURNList })
       const addressUrnEdges = addressURNList.map((a, i) => {
         // use the address urn space to construct a new urn with qcomps
         const parsed = AddressURNSpace.parse(a.addressURN).decoded
