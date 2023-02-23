@@ -101,9 +101,11 @@ export async function link(
   // Return existing edge ID (if found) or new edge ID (if created).
   const edgeStmt = insert.edge(g, parsedSrcNode, parsedDstNode, tag)
 
-  batchedStmnts.concat(srcNodeStmts)
-  batchedStmnts.concat(dstNodeStmts)
+  batchedStmnts.push(...srcNodeStmts)
+  batchedStmnts.push(...dstNodeStmts)
   batchedStmnts.push(edgeStmt)
+
+  console.debug({ srcNodeStmts, dstNodeStmts, batchedStmnts })
 
   await g.db.batch(batchedStmnts)
   return
@@ -149,8 +151,8 @@ export async function upsert(
   // Return existing edge ID (if found) or new edge ID (if created).
   const edgeStmt = update.edge(g, parsedSrcNode, parsedDstNode, tag)
 
-  batchedStmnts.concat(srcNodeStmts)
-  batchedStmnts.concat(dstNodeStmts)
+  batchedStmnts.push(...srcNodeStmts)
+  batchedStmnts.push(...dstNodeStmts)
   batchedStmnts.push(edgeStmt)
 
   await g.db.batch(batchedStmnts)
@@ -182,8 +184,8 @@ export async function batchUpsert(
     // Return existing edge ID (if found) or new edge ID (if created).
     const edgeStmt = update.edge(g, parsedSrcNode, parsedDstNode, edge.tag)
 
-    batchedStmnts.concat(srcNodeStmts)
-    batchedStmnts.concat(dstNodeStmts)
+    batchedStmnts.push(...srcNodeStmts)
+    batchedStmnts.push(...dstNodeStmts)
     batchedStmnts.push(edgeStmt)
   })
 

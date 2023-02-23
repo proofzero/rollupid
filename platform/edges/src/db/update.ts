@@ -26,7 +26,7 @@ export function node(
   stmts.push(
     g.db
       .prepare(
-        'INSERT INTO node (urn, nid, nss, fragment) VALUES (?1, ?2, ?3, ?4) \
+        'INSERT INTO node (urn, nid, nss, fragment) VALUES (?, ?, ?, ?) \
         ON CONFLICT(urn) DO UPDATE SET fragment = excluded.fragment'
       )
       .bind(id, nid, nss, fc)
@@ -50,7 +50,6 @@ export function node(
     for (const [key, value] of qcParams.entries()) {
       stmts.push(qcJoinStmt.bind(id, key, value))
     }
-    // await g.db.batch(stmts)
   }
 
   // Update the join table that links a node record and the associated
@@ -72,18 +71,9 @@ export function node(
     for (const [key, value] of qcParams.entries()) {
       stmts.push(rcJoinStmt.bind(id, key, value))
     }
-    // await g.db.batch(stmts)
   }
 
   return stmts
-
-  // // Get the ID of the inserted node.
-  // const node = g.db
-  //   .prepare('SELECT * FROM node WHERE urn = ?1')
-  //   .bind(id)
-  //   .first() as unknown
-
-  // return node as NodeRecord
 }
 
 // edge()
@@ -118,25 +108,4 @@ export function edge(
       ON CONFLICT DO NOTHING
     `
   return g.db.prepare(insertEdge).bind(srcParam, dstParam, tagParam)
-  // .run()
-  // .then(async (result) => {
-  //   // TODO check for error; there is a .success property in the
-  //   // result but referring to it causes a type error.
-  //   if (result.error) {
-  //     reject()
-  //   }
-
-  //   const edge = await g.db
-  //     .prepare(
-  //       'SELECT * FROM edge WHERE src = ?1 AND dst = ?2 AND tag = ?3'
-  //     )
-  //     .bind(srcParam, dstParam, tagParam)
-  //     .first()
-
-  //   resolve(edge as EdgeRecord)
-  // })
-  // .catch((e: Error) => {
-  //   reject(e)
-  // })
-  // })
 }

@@ -5,7 +5,6 @@ import {
   AnyURNInput,
   EdgeTagInput,
 } from '@kubelt/platform-middleware/inputValidators'
-import { Edge } from '../../db/types'
 import { AnyURN } from '@kubelt/urns'
 import { EdgeURN } from '@kubelt/urns/edge'
 

@@ -88,11 +88,9 @@ export function edge(
   dst: ReturnType<typeof parseUrnForEdge>,
   tag: EdgeTag
 ): D1PreparedStatement {
-  const srcParsed = urns.parseURN(src.toString())
-  const srcParam = `urn:${srcParsed.nid}:${srcParsed.nss}`
+  const srcParam = `urn:${src.nid}:${src.nss}`
 
-  const dstParsed = urns.parseURN(dst.toString())
-  const dstParam = `urn:${dstParsed.nid}:${dstParsed.nss}`
+  const dstParam = `urn:${dst.nid}:${dst.nss}`
 
   const tagParam = tag.toString()
 

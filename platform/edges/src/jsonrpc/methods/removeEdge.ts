@@ -12,11 +12,11 @@ export const RemoveEdgeMethodInput = z.object({
   tag: EdgeTagInput,
 })
 
-export const RemoveEdgeMethodOutput = z.object({
-  removed: z.number(),
-})
+export const RemoveEdgeMethodOutput = z.void()
 
 export type RemoveEdgeParams = z.infer<typeof RemoveEdgeMethodInput>
+
+export type RemoveEdgeMethodOutput = z.infer<typeof RemoveEdgeMethodOutput>
 
 export const removeEdgeMethod = async ({
   input,
@@ -24,16 +24,10 @@ export const removeEdgeMethod = async ({
 }: {
   input: RemoveEdgeParams
   ctx: Context
-}): Promise<{
-  removed: number
-}> => {
-  const edgeId = await db.unlink(ctx.graph, input.src, input.dst, input.tag)
+}): Promise<RemoveEdgeMethodOutput> => {
+  await db.unlink(ctx.graph, input.src, input.dst, input.tag)
 
-  console.log(
-    `deleted edge ${edgeId}: ${input.src} =[${input.tag}]=> ${input.dst}`
-  )
+  console.log(`deleted edge: ${input.src} =[${input.tag}]=> ${input.dst}`)
 
-  return {
-    removed: edgeId,
-  }
+  return
 }
