@@ -145,21 +145,8 @@ export default class Access extends DOProxy {
     })
   }
 
-  async list(): Promise<any> {
-    let decodedJwts = []
-
-    const tokens = (await this.state.storage.get<Tokens>('tokens')) || {}
-    const tokenKeys = Object.keys(tokens)
-    for (let i = 0; i < tokenKeys.length; i++) {
-      const tokenJson = decodeJwt(tokens[tokenKeys[i]].jwt)
-      decodedJwts.push(tokenJson)
-    }
-
-    console.log({
-      decodedJwts,
-    })
-
-    return ['a', 'b']
+  async getTokens(): Promise<Tokens> {
+    return (await this.state.storage.get<Tokens>('tokens')) || {}
   }
 
   async verify(token: string): Promise<JWTVerifyResult> {

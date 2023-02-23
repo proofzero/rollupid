@@ -1,56 +1,69 @@
-import { useLoaderData } from '@remix-run/react'
+import { useFetcher, useLoaderData } from '@remix-run/react'
 import { loader as appLoader } from '~/routes/api/apps/index'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
-import { useState } from 'react'
-import { Pill } from '@kubelt/design-system/src/atoms/pills/Pill'
+import { useEffect, useState } from 'react'
 
 export const loader = appLoader
 
 const RevocationModal = ({
   isOpen,
   setIsOpen,
+  clientId,
   icon,
   title,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
+  clientId: string
   icon: string
   title: string
-}) => (
-  <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
-    <div
-      className={`min-w-[908px] relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
-    >
-      <div className="flex flex-row space-x-6 items-center">
-        <img src={icon} className="object-cover w-16 h-16 rounded" />
+}) => {
+  const [scopeData, setScopeData] = useState<string | undefined>()
+  const fetcher = useFetcher()
 
-        <Text weight="semibold" className="text-gray-900">
-          {title}
-        </Text>
+  useEffect(() => {
+    fetcher.load(`/api/apps/${clientId}/scopes`)
+  }, [clientId])
+
+  return (
+    <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
+      <div
+        className={`min-w-[908px] relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
+      >
+        <div className="flex flex-row space-x-6 items-center">
+          <img src={icon} className="object-cover w-16 h-16 rounded" />
+
+          <Text weight="semibold" className="text-gray-900">
+            {title}
+          </Text>
+        </div>
+
+        <div>{scopeData}</div>
+
+        <div className="flex justify-end items-center space-x-3 mt-20">
+          <Button
+            btnType="secondary-alt"
+            onClick={() => setIsOpen(false)}
+            className="bg-gray-100"
+          >
+            Cancel
+          </Button>
+
+          <Button type="submit" btnType="dangerous-alt" disabled>
+            Remove All Access
+          </Button>
+        </div>
       </div>
-
-      <div className="flex justify-end items-center space-x-3 mt-20">
-        <Button
-          btnType="secondary-alt"
-          onClick={() => setIsOpen(false)}
-          className="bg-gray-100"
-        >
-          Cancel
-        </Button>
-
-        <Button type="submit" btnType="dangerous-alt" disabled>
-          Remove All Access
-        </Button>
-      </div>
-    </div>
-  </Modal>
-)
+    </Modal>
+  )
+}
 
 export default () => {
   const { apps } = useLoaderData<{
     apps: {
+      clientId: string
       icon: string
       title: string
       timestamp: number
@@ -60,6 +73,7 @@ export default () => {
   const [selectedApp, setSelectedApp] = useState<
     | undefined
     | {
+        clientId: string
         icon: string
         title: string
         timestamp: number
@@ -77,6 +91,7 @@ export default () => {
       {selectedApp && (
         <>
           <RevocationModal
+            clientId={selectedApp.clientId}
             icon={selectedApp.icon}
             title={selectedApp.title}
             isOpen={revocationModalOpen}

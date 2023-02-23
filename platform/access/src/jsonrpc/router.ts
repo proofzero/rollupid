@@ -43,10 +43,10 @@ import {
 } from './methods/getUserInfo'
 
 import {
-  GetAuthorizedScopesInput,
-  getAuthorizedScopesMethod,
-  GetAuthorizedScopesOutput,
-} from './methods/getAuthorizedScopes'
+  GetAppScopesInput,
+  GetAppScopesOutput,
+  getAppScopesMethod,
+} from './methods/getAppScopes'
 
 const t = initTRPC.context<Context>().create()
 
@@ -107,10 +107,10 @@ export const appRouter = t.router({
     .input(GetUserInfoInput)
     .output(GetUserInfoOutput)
     .query(getUserInfoMethod),
-  getAuthorizedScopes: t.procedure
+  getAppScopes: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(GetAuthorizedScopesInput)
-    .output(GetAuthorizedScopesOutput)
-    .query(getAuthorizedScopesMethod),
+    .input(GetAppScopesInput)
+    .output(GetAppScopesOutput)
+    .query(getAppScopesMethod),
 })

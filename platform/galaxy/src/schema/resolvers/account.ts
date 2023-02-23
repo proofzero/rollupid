@@ -1,6 +1,5 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 
-import createAccessClient from '@kubelt/platform-clients/access'
 import createAccountClient from '@kubelt/platform-clients/account'
 import createAddressClient from '@kubelt/platform-clients/address'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
@@ -63,8 +62,6 @@ const accountResolvers: Resolvers = {
         getAuthzHeaderConditionallyFromToken(jwt)
       )
 
-      const accessClient = createAccessClient(env.Access)
-
       const mappedApps = await Promise.all(
         apps.map(async (a) => {
           const { name, iconURL } =
@@ -72,16 +69,8 @@ const accountResolvers: Resolvers = {
               clientId: a.clientId,
             })
 
-          const result = await accessClient.getAuthorizedScopes.query({
-            account: accountURN,
-            client_id: a.clientId,
-          })
-
-          console.log({
-            result,
-          })
-
           return {
+            clientId: a.clientId,
             icon: iconURL,
             title: name,
             timestamp: a.timestamp,

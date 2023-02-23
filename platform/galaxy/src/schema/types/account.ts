@@ -20,6 +20,7 @@ export default /* GraphQL */ `
   }
 
   type App {
+    clientId: String!
     icon: String!
     title: String!
     timestamp: Float!
