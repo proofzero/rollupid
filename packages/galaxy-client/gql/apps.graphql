@@ -1,6 +1,6 @@
 query getAppScopes($clientId: String!) {
   scopes(clientId: $clientId) {
-    key
-    value
+    permission
+    scopes
   }
 }

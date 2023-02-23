@@ -4,6 +4,7 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
+import { Pill } from '@kubelt/design-system/src/atoms/pills/Pill'
 
 export const loader = appLoader
 
@@ -20,7 +21,6 @@ const RevocationModal = ({
   icon: string
   title: string
 }) => {
-  const [scopeData, setScopeData] = useState<string | undefined>()
   const fetcher = useFetcher()
 
   useEffect(() => {
@@ -40,9 +40,33 @@ const RevocationModal = ({
           </Text>
         </div>
 
-        <div>{scopeData}</div>
+        {fetcher.data && (
+          <div className="my-5">
+            {fetcher.data.map(
+              (scope: { permission: string; scopes: string[] }, i: number) => (
+                <div
+                  className={`flex flex-row space-x-2 items-center py-5 border-b ${
+                    i === 0 ? 'border-t' : ''
+                  }`}
+                >
+                  <Text size="sm" weight="normal" className="text-gray-500">
+                    {scope.permission}:
+                  </Text>
 
-        <div className="flex justify-end items-center space-x-3 mt-20">
+                  {scope.scopes.map((s) => (
+                    <Pill className="bg-[#F2F4F7]">
+                      <Text size="xs" weight="medium" className="text-gray-500">
+                        {s}
+                      </Text>
+                    </Pill>
+                  ))}
+                </div>
+              )
+            )}
+          </div>
+        )}
+
+        <div className="flex justify-end items-center space-x-3">
           <Button
             btnType="secondary-alt"
             onClick={() => setIsOpen(false)}

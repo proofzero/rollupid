@@ -471,8 +471,8 @@ export type QueryScopesArgs = {
 
 export type Scope = {
   __typename?: 'Scope'
-  key: Scalars['String']
-  value: Scalars['String']
+  permission: Scalars['String']
+  scopes: Array<Maybe<Scalars['String']>>
 }
 
 export type StandardPfp = Pfp & {
@@ -815,7 +815,11 @@ export type GetAppScopesQueryVariables = Exact<{
 
 export type GetAppScopesQuery = {
   __typename?: 'Query'
-  scopes: Array<{ __typename?: 'Scope'; key: string; value: string } | null>
+  scopes: Array<{
+    __typename?: 'Scope'
+    permission: string
+    scopes: Array<string | null>
+  } | null>
 }
 
 export type GetEnsProfileQueryVariables = Exact<{
@@ -1229,8 +1233,8 @@ export const UpdateConnectedAddressesPropertiesDocument = gql`
 export const GetAppScopesDocument = gql`
   query getAppScopes($clientId: String!) {
     scopes(clientId: $clientId) {
-      key
-      value
+      permission
+      scopes
     }
   }
 `

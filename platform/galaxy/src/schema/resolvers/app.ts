@@ -18,12 +18,6 @@ const appResolvers: Resolvers = {
         clientId: clientId,
       })
 
-      console.log({
-        accountURN,
-        clientId,
-        scopes,
-      })
-
       return scopes
     },
   },

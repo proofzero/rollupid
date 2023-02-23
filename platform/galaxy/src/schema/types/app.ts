@@ -1,7 +1,7 @@
 export default /* GraphQL */ `
   type Scope {
-    key: String!
-    value: String!
+    permission: String!
+    scopes: [String]!
   }
 
   type Query {
