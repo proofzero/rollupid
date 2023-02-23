@@ -131,18 +131,7 @@ export default class Access extends DOProxy {
     const { alg } = JWT_OPTIONS
     const { publicKey: key } = await this.getJWTSigningKeyPair()
     const options = { algorithms: [alg] }
-    const result = await jwtVerify(token, key, options)
-
-    if (!result.payload.jti) {
-      throw new Error('missing token id')
-    }
-
-    const tokens = (await this.state.storage.get<Tokens>('tokens')) || {}
-    if (!tokens[result.payload.jti]) {
-      throw new Error('token not found')
-    }
-
-    return result
+    return jwtVerify(token, key, options)
   }
 
   async refresh(token: string): Promise<ExchangeTokenResult> {
