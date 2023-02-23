@@ -8,6 +8,8 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { useState, useEffect } from 'react'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
+export const PAGE_LIMIT = 10
+
 type LoaderData = {
   authorizedProfiles?: Promise<{
     metadata: {
@@ -31,7 +33,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
     // because offset is shown as an integer page number I convert it here
     // to the actual offset for the database. (page starts with 1, not 0)
-    const offset = page ? (parseInt(page) - 1) * 10 : 0
+    const offset = page ? (parseInt(page) - 1) * PAGE_LIMIT : 0
 
     if (!client) {
       throw new Error('clientId is required')
@@ -46,7 +48,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       client,
       opt: {
         offset,
-        limit: 10,
+        limit: PAGE_LIMIT,
       },
     })
 
@@ -77,11 +79,12 @@ const Users = () => {
 
   return (
     <ApplicationUsers
+      PAGE_LIMIT={PAGE_LIMIT}
       PROFILE_APP_URL={PROFILE_APP_URL}
       loadUsers={(offset: number) => {
         const query = new URLSearchParams()
         if (offset || offset === 0)
-          query.set('page', (offset / 10 + 1).toString())
+          query.set('page', (offset / PAGE_LIMIT + 1).toString())
         navigate(`?${query}`)
       }}
       error={error || null}
@@ -89,7 +92,7 @@ const Users = () => {
       metadata={
         awaitedAuthorizedProfiles.metadata || {
           offset: 0,
-          limit: 0,
+          limit: PAGE_LIMIT,
           edgesReturned: 0,
         }
       }

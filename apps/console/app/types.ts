@@ -1,4 +1,7 @@
-import type { AccountURN } from '@kubelt/urns/account'
+import type {
+  AuthorizedUser,
+  AuthorizedAccountsOutput,
+} from '@kubelt/platform/starbase/src/types'
 
 export enum RollType {
   RollAPIKey = 'roll_api_key',
@@ -10,9 +13,6 @@ export type RotatedSecrets = {
   rotatedClientSecret: string
 }
 
-export type AuthorizedProfile = {
-  name: string
-  accountURN: AccountURN
-  timestamp: number
-  imageURL: string
-}
+export type AuthorizedProfile = AuthorizedUser
+
+export type edgesMetadata = AuthorizedAccountsOutput['metadata']

@@ -1,5 +1,5 @@
 import { Button, Text } from '@kubelt/design-system'
-import type { AuthorizedProfile } from '~/types'
+import type { AuthorizedProfile, edgesMetadata } from '~/types'
 import missingImage from '../../../images/missing-img.svg'
 import { noLoginsSvg } from '../LoginsPanel/LoginsPanel'
 import { AccountURNSpace } from '@kubelt/urns/account'
@@ -11,16 +11,14 @@ export const ApplicationUsers = ({
   PROFILE_APP_URL,
   metadata,
   loadUsers,
+  PAGE_LIMIT,
 }: {
   authorizedProfiles: AuthorizedProfile[]
   error?: any
   loadUsers: (val: number) => void
   PROFILE_APP_URL: string
-  metadata: {
-    offset: number
-    limit: number
-    edgesReturned: number
-  }
+  PAGE_LIMIT: number
+  metadata: edgesMetadata
 }) => {
   const Users = new Map<
     string,
@@ -67,7 +65,7 @@ export const ApplicationUsers = ({
           <Text weight="medium" className="text-gray-500">
             <a className="text-indigo-500" href="/">
               Go to Docs
-            </a>{' '}
+            </a>
             and try the signup flow.
           </Text>
         </div>
@@ -151,7 +149,8 @@ export const ApplicationUsers = ({
             <div className="flex items-center py-4 px-8 border-t justify-between">
               <Text className="text-gray-700">
                 Showing {metadata.offset + 1} to{' '}
-                {metadata.offset + metadata.limit} of {metadata.edgesReturned}{' '}
+                {Math.max(metadata.offset + PAGE_LIMIT, metadata.edgesReturned)}{' '}
+                of {metadata.edgesReturned}
                 results
               </Text>
               <div className="flex flex-col space-y-1 sm:space-y-0 sm:flex-row ml-2">
@@ -161,18 +160,20 @@ export const ApplicationUsers = ({
                   btnSize="l"
                   btnType="secondary-alt"
                   onClick={() => {
-                    loadUsers(metadata.offset - 10)
+                    loadUsers(metadata.offset - PAGE_LIMIT)
                   }}
                 >
                   Previous
                 </Button>
                 <Button
                   type="button"
-                  disabled={metadata.offset + 10 >= metadata.edgesReturned}
+                  disabled={
+                    metadata.offset + PAGE_LIMIT >= metadata.edgesReturned
+                  }
                   btnSize="l"
                   btnType="secondary-alt"
                   onClick={() => {
-                    loadUsers(metadata.offset + 10)
+                    loadUsers(metadata.offset + PAGE_LIMIT)
                   }}
                   className="sm:ml-4"
                 >

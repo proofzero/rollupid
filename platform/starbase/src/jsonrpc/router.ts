@@ -59,11 +59,11 @@ import {
   GetAppPublicPropsInput,
   GetAppPublicPropsOutput,
 } from './methods/getAppPublicProps'
+import { getAuthorizedAccounts } from './methods/getAuthorizedAccounts'
 import {
-  getAuthorizedAccounts,
   GetAuthorizedAccountsMethodInput,
   GetAuthorizedAccountsMethodOutput,
-} from './methods/getAuthorizedAccounts'
+} from './validators/accounts'
 
 const t = initTRPC.context<Context>().create()
 

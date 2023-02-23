@@ -56,6 +56,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const session = await getProfileSession(request)
   if (!address) throw new Error('No address provided in URL')
 
+  // redirect from accountURN to first addressURNs
   if (type === 'p') {
     const { addresses } = await galaxyClient.getConnectedAddressesFromAccount({
       accountURN: AccountURNSpace.urn(address),

@@ -3,41 +3,8 @@ import { Context } from '../context'
 import { EDGE_AUTHORIZES } from '@kubelt/platform.access/src/constants'
 // import { Graph } from '@kubelt/types'
 // import { inputValidators } from '@kubelt/platform-middleware'
-import { z } from 'zod'
 
-// Input
-// -----------------------------------------------------------------------------
-
-export const GetAuthorizedAccountsMethodInput = z.object({
-  client: z.string(),
-  opt: z.object({
-    offset: z.number(),
-    limit: z.number(),
-  }),
-})
-
-export type GetAuthorizedAccountsParams = z.infer<
-  typeof GetAuthorizedAccountsMethodInput
->
-
-// Output
-// -----------------------------------------------------------------------------
-
-export const GetAuthorizedAccountsMethodOutput = z.object({
-  users: z.array(
-    z.object({
-      accountURN: z.string().startsWith('urn:rollupid:account/'),
-      timestamp: z.number(),
-      name: z.string(),
-      imageURL: z.string(),
-    })
-  ),
-  metadata: z.object({
-    offset: z.number().optional(),
-    limit: z.number().optional(),
-    edgesReturned: z.number(),
-  }),
-})
+import type { GetAuthorizedAccountsParams } from '../validators/accounts'
 
 // Method
 // -----------------------------------------------------------------------------
