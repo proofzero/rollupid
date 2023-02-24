@@ -135,20 +135,8 @@ export const decorateNfts = (ownedNfts: any) => {
  * @param owner AddressURN of target profile. Can be undefined if JWT is provided.
  * @returns Gallery or empty array
  */
-export const getGallery = async (ownerURN: AccountURN | AddressURN) => {
-  let address: AddressURN
-  if (AccountURNSpace.is(ownerURN)) {
-    const galaxyClient = await getGalaxyClient()
-    const { addresses } = await galaxyClient.getConnectedAddressesFromAccount({
-      accountURN: ownerURN,
-    })
-    address = addresses[0].baseUrn
-  } else {
-    address = ownerURN as AddressURN
-  }
-
-  const profile = await getAddressProfile(address)
-
+export const getGallery = async (addressURN: AddressURN) => {
+  const profile = await getAddressProfile(addressURN)
   const { gallery } = profile
 
   return gallery || []
@@ -170,8 +158,8 @@ const getMoreNfts = (fetcher: any, request: string) => {
   fetcher.load(request)
 }
 
-export const getMoreNftsGallery = (fetcher: any, accountURN: string) => {
-  const query = generateQuery([{ name: 'ownerURN', value: accountURN }])
+export const getMoreNftsGallery = (fetcher: any, addressURN: string) => {
+  const query = generateQuery([{ name: 'addressURN', value: addressURN }])
   const request = `/nfts/gallery?${query}`
   getMoreNfts(fetcher, request)
 }
@@ -224,10 +212,8 @@ export const getMoreNftsAllCollections = (
 
 // ------ end of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS
 
-export const getGalleryWithMetadata = async (
-  ownerURN: AccountURN | AddressURN
-) => {
-  const gallery = await getGallery(ownerURN)
+export const getGalleryWithMetadata = async (addressURN: AddressURN) => {
+  const gallery = await getGallery(addressURN)
 
   if (!gallery || !gallery.length) {
     return { gallery: [] }
@@ -257,7 +243,6 @@ export const getGalleryMetadata = async (gallery: Gallery[]) => {
       return decorateNft(nft as Nft)
     }
   )
-
   // Setup og tag data
   // check generate and return og image
 

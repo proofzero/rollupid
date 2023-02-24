@@ -1,5 +1,4 @@
 import type { AddressURN } from '@kubelt/urns/address'
-import type { AccountURN } from '@kubelt/urns/account'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
@@ -12,10 +11,9 @@ export const loader: LoaderFunction = async (args) => {
    * params.profile is called from `$profile/gallery` route
    * searchParams - from `account/gallery?owner=0x123..`
    */
-  const ownerURN = srcUrl.searchParams.get('ownerURN') || args.params.profile
-  const { gallery } = await getGalleryWithMetadata(
-    ownerURN as AccountURN | AddressURN
-  )
+  const addressURN =
+    srcUrl.searchParams.get('addressURN') || args.params.profile
+  const { gallery } = await getGalleryWithMetadata(addressURN as AddressURN)
 
   return json({
     gallery,

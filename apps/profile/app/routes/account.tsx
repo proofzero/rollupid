@@ -22,8 +22,9 @@ import ConditionalTooltip from '~/components/conditional-tooltip'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
-import type { Node, Profile } from '@kubelt/galaxy-client'
+import type { Node } from '@kubelt/galaxy-client'
 import type { AddressURN } from '@kubelt/urns/address'
+import type { FullProfile } from '~/types'
 
 export function links() {
   return [...faqStyles(), { rel: 'stylesheet', href: styles }]
@@ -124,7 +125,7 @@ export default function AccountLayout() {
     cryptoAddresses: Node[]
   }>()
   const { profile, accountURN } = useOutletContext<{
-    profile: Profile
+    profile: FullProfile
     accountURN: string
   }>()
 

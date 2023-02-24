@@ -29,8 +29,8 @@ import {
   gatewayFromIpfs,
   getAuthzHeaderConditionallyFromToken,
 } from '@kubelt/utils'
+import type { AddressURN } from '@kubelt/urns/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
-import type { Profile } from '@kubelt/galaxy-client'
 
 import { Cover } from '~/components/profile/cover/Cover'
 import ProfileTabs from '~/components/profile/tabs/tabs'
@@ -47,6 +47,7 @@ import type { AccountURN } from '@kubelt/urns/account'
 import { AccountURNSpace } from '@kubelt/urns/account'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { imageFromAddressType } from '~/helpers'
+import type { FullProfile } from '~/types'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { address, type } = params
@@ -62,7 +63,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       accountURN: AccountURNSpace.urn(address),
     })
 
-    return redirect(`/a/${AddressURNSpace.decode(addresses[0].baseUrn)}`)
+    return redirect(
+      `/a/${AddressURNSpace.decode(addresses?.[0].baseUrn as AddressURN)}`
+    )
   }
 
   const urn = AddressURNSpace.urn(address)
@@ -70,16 +73,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   // if not handle is this let's assume this is an idref
   let profile, jwt
   try {
-    if (type === 'a') {
-      const user = session.get('user')
-      jwt = user?.accessToken
-      profile = await galaxyClient.getProfileFromAddress(
-        {
-          addressURN: urn,
-        },
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
-    }
+    const user = session.get('user')
+    jwt = user?.accessToken
+    profile = await galaxyClient.getProfileFromAddress(
+      {
+        addressURN: urn,
+      },
+      getAuthzHeaderConditionallyFromToken(jwt)
+    )
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })
@@ -124,7 +125,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       uname: profile.handle || address,
       ogImage: ogImage || defaultOG,
       profile,
-      publicURN: urn,
+      addressURN: urn,
       cryptoAddresses,
       path,
       isOwner: jwt && matches && matches.length > 0 ? true : false,
@@ -172,17 +173,17 @@ export const meta: MetaFunction = ({
 const UserAddressLayout = () => {
   //TODO: this needs to be optimized so profile isn't fetched from the loader
   //but used from context alone.
-  const { profile, cryptoAddresses, path, isOwner, publicURN } = useLoaderData<{
-    profile: Profile
-    cryptoAddresses: Node[]
-    path: string
-    isOwner: boolean
-    publicURN: string
-  }>()
+  const { profile, cryptoAddresses, path, isOwner, addressURN } =
+    useLoaderData<{
+      profile: FullProfile
+      cryptoAddresses: Node[]
+      path: string
+      isOwner: boolean
+      addressURN: string
+    }>()
 
   const ctx = useOutletContext<{
-    loggedInProfile: Profile | null
-    profile: Profile
+    profile: FullProfile
     // This gets passed down
     // from root.tsx
     // but if not logged in
@@ -304,7 +305,7 @@ const UserAddressLayout = () => {
     >
       <Outlet
         context={{
-          ownerURN: publicURN ?? ctx.accountURN,
+          addressURN: addressURN,
           profile: finalProfile,
           cryptoAddresses,
           path,

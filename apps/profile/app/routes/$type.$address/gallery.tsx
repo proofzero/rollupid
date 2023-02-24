@@ -8,10 +8,10 @@ import { getMoreNftsGallery } from '~/helpers/nfts'
 import { useFetcher, useOutletContext } from '@remix-run/react'
 
 const ProfileRoute = () => {
-  const { profile, isOwner, ownerURN } = useOutletContext<{
+  const { profile, isOwner, addressURN } = useOutletContext<{
     profile: Profile
     isOwner: boolean
-    ownerURN: string
+    addressURN: string
   }>()
 
   const { displayName, pfp } = profile
@@ -37,7 +37,7 @@ const ProfileRoute = () => {
 
   useEffect(() => {
     const asyncFn = async () => {
-      getMoreNftsGallery(fetcher, ownerURN)
+      getMoreNftsGallery(fetcher, addressURN)
     }
 
     if (refresh) {

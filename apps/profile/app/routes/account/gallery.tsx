@@ -44,7 +44,7 @@ import NoCryptoAddresses from '~/components/accounts/NoCryptoAddresses'
 // Other helpers
 import { getProfileSession } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
-import type { Profile } from '@kubelt/galaxy-client'
+import type { Profile, Node } from '@kubelt/galaxy-client'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import type { decoratedNft } from '~/helpers/nfts'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
@@ -184,7 +184,7 @@ const Gallery = () => {
   const { profile, cryptoAddresses, accountURN } = useOutletContext<{
     profile: Profile
     accountURN: string
-    cryptoAddresses: string[]
+    cryptoAddresses: Node[]
   }>()
 
   const { displayName } = profile
@@ -224,7 +224,7 @@ const Gallery = () => {
   useEffect(() => {
     ;(async () => {
       const addressQueryParams = new URLSearchParams({
-        ownerURN: accountURN,
+        addressURN: cryptoAddresses[0].baseUrn,
       })
       const request = `/nfts/gallery?${addressQueryParams.toString()}`
 
