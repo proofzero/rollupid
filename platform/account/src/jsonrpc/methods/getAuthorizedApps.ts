@@ -2,7 +2,6 @@ import createEdgesClient from '@kubelt/platform-clients/edges'
 import type { AccessRComp } from '@kubelt/urns/access'
 import { Context } from '../../context'
 import { EDGE_AUTHORIZES } from '@kubelt/platform.access/src/constants'
-import { Graph } from '@kubelt/types'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { z } from 'zod'
 

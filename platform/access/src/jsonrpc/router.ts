@@ -54,12 +54,13 @@ export const appRouter = t.router({
   exchangeToken: t.procedure
     .use(LogUsage)
     .use(({ ctx, path, type, next, input, rawInput, meta }) => {
+      const typedInput = rawInput as { clientId: string; grantType: string }
       const newCtx = {
         ...ctx,
         CustomAnalyticsFunction: () => {
           return {
-            indexes: [rawInput['clientId']],
-            blobs: [rawInput['grantType']],
+            indexes: [typedInput['clientId']],
+            blobs: [typedInput['grantType']],
           }
         },
       }

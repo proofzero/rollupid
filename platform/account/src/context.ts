@@ -1,5 +1,4 @@
 import createEdgesClient from '@kubelt/platform-clients/edges'
-import type { AccountURN } from '@kubelt/urns/account'
 import type { Environment } from './types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import { Account } from '.'
