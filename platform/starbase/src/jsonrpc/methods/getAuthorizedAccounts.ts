@@ -5,6 +5,7 @@ import { EDGE_AUTHORIZES } from '@kubelt/platform.access/src/constants'
 // import { inputValidators } from '@kubelt/platform-middleware'
 
 import type { GetAuthorizedAccountsParams } from '../validators/accounts'
+import type { AccountURN } from '@kubelt/urns/account'
 
 // Method
 // -----------------------------------------------------------------------------
@@ -31,5 +32,23 @@ export const getAuthorizedAccounts = async ({
     opt: input.opt,
   })
 
-  return edgesResult
+  const mappedEdges = edgesResult?.edges.map((edge) => {
+    // TODO: edge.createdTimestamp as string + " UTC"
+    // doesn't work for some reason
+
+    const timestamp = new Date(
+      (edge.createdTimestamp as string) + ' UTC'
+    ).getTime()
+
+    const accountURN = edge.src.baseUrn as AccountURN
+
+    return {
+      accountURN,
+      timestamp,
+      name: edge.src.qc.name,
+      imageURL: edge.src.qc.picture,
+    }
+  })
+
+  return { accounts: mappedEdges, metadata: edgesResult.metadata }
 }

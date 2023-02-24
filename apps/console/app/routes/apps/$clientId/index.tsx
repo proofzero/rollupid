@@ -21,7 +21,6 @@ import type { appDetailsProps } from '~/components/Applications/Auth/Application
 import { RollType } from '~/types'
 import type { RotatedSecrets } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
-import { mapAuthorisedProfiles } from '~/helpers/edges'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -120,7 +119,7 @@ export default function AppDetailIndexPage() {
         CTAneeded: !app.app.icon || !app.app.redirectURI || !app.app.name,
       }}
       authorizedProfiles={
-        mapAuthorisedProfiles(authFetcher.data?.edgesResult).users.slice(
+        authFetcher.data?.edgesResult.accounts.slice(
           0,
           NUMBER_OF_DISPLAYED_USERS
         ) || []

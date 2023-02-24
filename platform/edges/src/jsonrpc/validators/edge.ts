@@ -25,11 +25,13 @@ export const Edge = z.object({
   createdTimestamp: z.string().nullable(),
 })
 
+export const EdgesMetadata = z.object({
+  edgesReturned: z.number(),
+  limit: z.number().optional(),
+  offset: z.number().optional(),
+})
+
 export const EdgeQueryResultsOutput = z.object({
   edges: z.array(Edge),
-  metadata: z.object({
-    edgesReturned: z.number(),
-    limit: z.number().optional(),
-    offset: z.number().optional(),
-  }),
+  metadata: EdgesMetadata,
 })

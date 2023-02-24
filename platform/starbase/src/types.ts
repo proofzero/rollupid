@@ -16,6 +16,7 @@ import {
   AuthorizedUser,
 } from './jsonrpc/validators/accounts'
 import { DeploymentMetadata } from '@kubelt/types'
+import { EdgesMetadata } from '../../edges/src/jsonrpc/validators/edge'
 
 export interface Environment {
   Analytics: AnalyticsEngineDataset
@@ -41,3 +42,4 @@ export type AuthorizedAccountsOutput = z.infer<
   typeof GetAuthorizedAccountsMethodOutput
 >
 export type AuthorizedUser = z.infer<typeof AuthorizedUser>
+export type EdgesMetadata = z.infer<typeof EdgesMetadata>

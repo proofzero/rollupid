@@ -1,7 +1,5 @@
-import type {
-  AuthorizedUser,
-  AuthorizedAccountsOutput,
-} from '@kubelt/platform/starbase/src/types'
+import type { AuthorizedUser } from '@kubelt/platform/starbase/src/types'
+import type { EdgesMetadata } from '@kubelt/platform/starbase/src/types'
 
 export enum RollType {
   RollAPIKey = 'roll_api_key',
@@ -15,4 +13,4 @@ export type RotatedSecrets = {
 
 export type AuthorizedProfile = AuthorizedUser
 
-export type edgesMetadata = AuthorizedAccountsOutput['metadata']
+export type edgesMetadata = EdgesMetadata

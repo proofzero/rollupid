@@ -65,7 +65,7 @@ export const ApplicationUsers = ({
           <Text weight="medium" className="text-gray-500">
             <a className="text-indigo-500" href="/">
               Go to Docs
-            </a>
+            </a>{' '}
             and try the signup flow.
           </Text>
         </div>

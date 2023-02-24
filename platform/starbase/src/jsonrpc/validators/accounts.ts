@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { EdgeQueryResultsOutput } from '@kubelt/platform/edges/src/jsonrpc/validators/edge'
+import { EdgesMetadata } from '@kubelt/platform/edges/src/jsonrpc/validators/edge'
 import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
 
 // Input
@@ -27,4 +27,7 @@ export const AuthorizedUser = z.object({
   imageURL: z.string(),
 })
 
-export const GetAuthorizedAccountsMethodOutput = EdgeQueryResultsOutput
+export const GetAuthorizedAccountsMethodOutput = z.object({
+  accounts: z.array(AuthorizedUser),
+  metadata: EdgesMetadata,
+})
