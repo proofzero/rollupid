@@ -149,9 +149,8 @@ export const ApplicationUsers = ({
             <div className="flex items-center py-4 px-8 border-t justify-between">
               <Text className="text-gray-700">
                 Showing {metadata.offset + 1} to{' '}
-                {Math.max(metadata.offset + PAGE_LIMIT, metadata.edgesReturned)}{' '}
-                of {metadata.edgesReturned}
-                results
+                {Math.min(metadata.offset + PAGE_LIMIT, metadata.edgesReturned)}{' '}
+                of {metadata.edgesReturned} results
               </Text>
               <div className="flex flex-col space-y-1 sm:space-y-0 sm:flex-row ml-2">
                 <Button

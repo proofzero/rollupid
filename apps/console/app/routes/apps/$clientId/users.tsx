@@ -8,7 +8,7 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { useState, useEffect } from 'react'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
-export const PAGE_LIMIT = 10
+export const PAGE_LIMIT = 2
 
 type LoaderData = {
   authorizedProfiles?: Promise<{
