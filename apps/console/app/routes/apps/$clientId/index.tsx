@@ -119,7 +119,7 @@ export default function AppDetailIndexPage() {
         CTAneeded: !app.app.icon || !app.app.redirectURI || !app.app.name,
       }}
       authorizedProfiles={
-        authFetcher.data?.edgesResult.accounts.slice(
+        authFetcher.data?.edgesResult?.accounts.slice(
           0,
           NUMBER_OF_DISPLAYED_USERS
         ) || []

@@ -7,7 +7,6 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { useState, useEffect } from 'react'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { AuthorizedAccountsOutput } from '@kubelt/platform/starbase/src/types'
-import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
 
 // don't change this constant unless it's necessary
 // this constant also affects /$clientId root route
@@ -51,17 +50,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     return defer<LoaderData>({ edgesResult, PROFILE_APP_URL })
   } catch (ex: any) {
     console.error(ex)
-    // this property only has loader, but not fetcher
-    if (request.headers.has('upgrade-insecure-requests'))
-      throw json<LoaderData>({ error: ex })
-    // we can't throw error for fetcher
     return json<LoaderData>({ error: ex })
   }
 }
 
 const Users = () => {
   const navigate = useNavigate()
-  const { edgesResult, PROFILE_APP_URL } = useLoaderData()
+  const { edgesResult, PROFILE_APP_URL, error } = useLoaderData()
   const [authorizedProfiles, setAuthorizedProfiles] = useState({
     accounts: null,
     metadata: null,
@@ -83,6 +78,7 @@ const Users = () => {
   return (
     <ApplicationUsers
       PAGE_LIMIT={PAGE_LIMIT}
+      error={error}
       PROFILE_APP_URL={PROFILE_APP_URL}
       loadUsers={(offset: number) => {
         const query = new URLSearchParams()
@@ -103,18 +99,3 @@ const Users = () => {
 }
 
 export default Users
-
-export const CatchBoundary = ({
-  error,
-}: {
-  error?: {
-    stack: any
-    message: string
-  }
-}) => {
-  return (
-    <div className="w-full  min-h-[360px] h-full">
-      <NestedErrorPage />
-    </div>
-  )
-}
