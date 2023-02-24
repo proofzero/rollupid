@@ -14,7 +14,7 @@ import {
   GetAuthorizedAccountsMethodInput,
   GetAuthorizedAccountsMethodOutput,
   AuthorizedUser,
-} from './jsonrpc/validators/accounts'
+} from './jsonrpc/methods/getAuthorizedAccounts'
 import { DeploymentMetadata } from '@kubelt/types'
 import { EdgesMetadata } from '../../edges/src/jsonrpc/validators/edge'
 

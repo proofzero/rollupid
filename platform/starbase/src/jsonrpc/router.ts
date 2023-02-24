@@ -63,7 +63,7 @@ import { getAuthorizedAccounts } from './methods/getAuthorizedAccounts'
 import {
   GetAuthorizedAccountsMethodInput,
   GetAuthorizedAccountsMethodOutput,
-} from './validators/accounts'
+} from './methods/getAuthorizedAccounts'
 
 const t = initTRPC.context<Context>().create()
 

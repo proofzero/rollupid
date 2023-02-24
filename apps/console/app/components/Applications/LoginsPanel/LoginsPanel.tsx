@@ -1,5 +1,4 @@
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Tooltip } from 'flowbite-react'
 import type { AuthorizedProfile } from '~/types'
 
 import missingImage from '../../../images/missing-img.svg'

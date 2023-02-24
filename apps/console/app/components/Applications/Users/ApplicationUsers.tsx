@@ -7,14 +7,12 @@ import { HiOutlineExternalLink } from 'react-icons/hi'
 
 export const ApplicationUsers = ({
   authorizedProfiles,
-  error,
   PROFILE_APP_URL,
   metadata,
   loadUsers,
   PAGE_LIMIT,
 }: {
   authorizedProfiles: AuthorizedProfile[]
-  error?: any
   loadUsers: (val: number) => void
   PROFILE_APP_URL: string
   PAGE_LIMIT: number
@@ -47,8 +45,13 @@ export const ApplicationUsers = ({
     })
   })
 
+  const orderOfResults = `Showing ${metadata.offset + 1} to ${Math.min(
+    metadata.offset + PAGE_LIMIT,
+    metadata.edgesReturned
+  )} of ${metadata.edgesReturned} results`
+
   return (
-    <div className="w-full">
+    <div className="w-full h-full min-h-[360px]">
       <Text size="2xl" weight="semibold" className="text-gray-900 pb-4">
         Users
       </Text>
@@ -147,11 +150,7 @@ export const ApplicationUsers = ({
               </article>
             ))}
             <div className="flex items-center py-4 px-8 border-t justify-between">
-              <Text className="text-gray-700">
-                Showing {metadata.offset + 1} to{' '}
-                {Math.min(metadata.offset + PAGE_LIMIT, metadata.edgesReturned)}{' '}
-                of {metadata.edgesReturned} results
-              </Text>
+              <Text className="text-gray-700">{orderOfResults}</Text>
               <div className="flex flex-col space-y-1 sm:space-y-0 sm:flex-row ml-2">
                 <Button
                   type="button"
