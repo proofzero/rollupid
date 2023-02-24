@@ -58,7 +58,7 @@ export const appRouter = t.router({
         ...ctx,
         CustomAnalyticsFunction: () => {
           return {
-            indexes: [rawInput['clientId'].slice(-32)],
+            indexes: [rawInput['clientId']],
             blobs: [rawInput['grantType']],
           }
         },
