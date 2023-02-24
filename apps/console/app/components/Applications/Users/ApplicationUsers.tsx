@@ -10,12 +10,12 @@ export const ApplicationUsers = ({
   authorizedProfiles,
   PROFILE_APP_URL,
   metadata,
-  loadUsers,
+  loadUsersSubset,
   error,
   PAGE_LIMIT,
 }: {
   authorizedProfiles: AuthorizedProfile[]
-  loadUsers: (val: number) => void
+  loadUsersSubset: (val: number) => void
   PROFILE_APP_URL: string
   PAGE_LIMIT: number
   error: any
@@ -168,7 +168,7 @@ export const ApplicationUsers = ({
                       btnSize="l"
                       btnType="secondary-alt"
                       onClick={() => {
-                        loadUsers(metadata.offset - PAGE_LIMIT)
+                        loadUsersSubset(metadata.offset - PAGE_LIMIT)
                       }}
                     >
                       Previous
@@ -181,7 +181,7 @@ export const ApplicationUsers = ({
                       btnSize="l"
                       btnType="secondary-alt"
                       onClick={() => {
-                        loadUsers(metadata.offset + PAGE_LIMIT)
+                        loadUsersSubset(metadata.offset + PAGE_LIMIT)
                       }}
                       className="sm:ml-4"
                     >

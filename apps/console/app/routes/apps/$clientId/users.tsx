@@ -62,6 +62,13 @@ const Users = () => {
     metadata: null,
   })
 
+  const loadUsersSubset = (offset: number) => {
+    const query = new URLSearchParams()
+    if (offset || offset === 0)
+      query.set('page', (offset / PAGE_LIMIT + 1).toString())
+    navigate(`?${query}`)
+  }
+
   useEffect(() => {
     ;(async () => {
       if (edgesResult) {
@@ -80,12 +87,7 @@ const Users = () => {
       PAGE_LIMIT={PAGE_LIMIT}
       error={error}
       PROFILE_APP_URL={PROFILE_APP_URL}
-      loadUsers={(offset: number) => {
-        const query = new URLSearchParams()
-        if (offset || offset === 0)
-          query.set('page', (offset / PAGE_LIMIT + 1).toString())
-        navigate(`?${query}`)
-      }}
+      loadUsersSubset={loadUsersSubset}
       authorizedProfiles={authorizedProfiles.accounts || []}
       metadata={
         authorizedProfiles.metadata || {
