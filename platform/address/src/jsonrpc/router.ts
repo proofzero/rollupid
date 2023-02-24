@@ -51,24 +51,6 @@ import {
 
 const t = initTRPC.context<Context>().create()
 
-// Example custom analytics function.
-// export const injectCustomAnalytics = t.middleware(async ({ ctx, next }) => {
-//   const CustomAnalyticsFunction: CustomAnalyticsFunctionType = () => {
-//     return {
-//       blobs: [ctx.alias],
-//       doubles: [],
-//       indexes: [],
-//     } as AnalyticsEngineDataPoint
-//   }
-
-//   return next({
-//     ctx: {
-//       CustomAnalyticsFunction,
-//       ...ctx,
-//     },
-//   })
-// })
-
 export const appRouter = t.router({
   resolveAccount: t.procedure
     .use(LogUsage)
