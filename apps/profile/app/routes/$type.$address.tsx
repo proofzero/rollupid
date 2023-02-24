@@ -75,7 +75,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       jwt = user?.accessToken
       profile = await galaxyClient.getProfileFromAddress(
         {
-          addressURN: `${urn}`,
+          addressURN: urn,
         },
         getAuthzHeaderConditionallyFromToken(jwt)
       )
@@ -304,7 +304,7 @@ const UserAddressLayout = () => {
     >
       <Outlet
         context={{
-          accountURN: publicURN ?? ctx.accountURN,
+          ownerURN: publicURN ?? ctx.accountURN,
           profile: finalProfile,
           cryptoAddresses,
           path,

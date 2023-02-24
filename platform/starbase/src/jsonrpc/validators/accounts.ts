@@ -1,4 +1,6 @@
 import { z } from 'zod'
+import { EdgeQueryResultsOutput } from '@kubelt/platform/edges/src/jsonrpc/validators/edge'
+import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
 
 // Input
 // -----------------------------------------------------------------------------
@@ -19,17 +21,10 @@ export type GetAuthorizedAccountsParams = z.infer<
 // -----------------------------------------------------------------------------
 
 export const AuthorizedUser = z.object({
-  accountURN: z.string().startsWith('urn:rollupid:account/'),
+  accountURN: AccountURNInput,
   timestamp: z.number(),
   name: z.string(),
   imageURL: z.string(),
 })
 
-export const GetAuthorizedAccountsMethodOutput = z.object({
-  users: z.array(AuthorizedUser),
-  metadata: z.object({
-    offset: z.number().optional(),
-    limit: z.number().optional(),
-    edgesReturned: z.number(),
-  }),
-})
+export const GetAuthorizedAccountsMethodOutput = EdgeQueryResultsOutput

@@ -31,19 +31,5 @@ export const getAuthorizedAccounts = async ({
     opt: input.opt,
   })
 
-  const mappedEdges = edgesResult.edges.map((edge) => {
-    const timestamp = new Date(
-      (edge.createdTimestamp as string) + ' UTC'
-    ).getTime()
-    const accountURN = edge.src.baseUrn
-
-    return {
-      accountURN,
-      timestamp,
-      name: edge.src.qc.name,
-      imageURL: edge.src.qc.picture,
-    }
-  })
-
-  return { users: mappedEdges, metadata: edgesResult.metadata }
+  return edgesResult
 }

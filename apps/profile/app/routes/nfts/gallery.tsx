@@ -12,9 +12,9 @@ export const loader: LoaderFunction = async (args) => {
    * params.profile is called from `$profile/gallery` route
    * searchParams - from `account/gallery?owner=0x123..`
    */
-  const owner = srcUrl.searchParams.get('owner') || args.params.profile
+  const ownerURN = srcUrl.searchParams.get('ownerURN') || args.params.profile
   const { gallery } = await getGalleryWithMetadata(
-    owner as AccountURN | AddressURN
+    ownerURN as AccountURN | AddressURN
   )
 
   return json({

@@ -21,12 +21,15 @@ import type { appDetailsProps } from '~/components/Applications/Auth/Application
 import { RollType } from '~/types'
 import type { RotatedSecrets } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { mapAuthorisedProfiles } from '~/helpers/edges'
 
 // Component
 // -----------------------------------------------------------------------------
 /**
  * @file app/routes/dashboard/index.tsx
  */
+
+export const NUMBER_OF_DISPLAYED_USERS = 8
 
 type LoaderData = {
   clientId: string
@@ -117,8 +120,10 @@ export default function AppDetailIndexPage() {
         CTAneeded: !app.app.icon || !app.app.redirectURI || !app.app.name,
       }}
       authorizedProfiles={
-        // by default we return 10 entries, here we need only 8
-        authFetcher.data?.authorizedProfiles.users.slice(0, 8) || []
+        mapAuthorisedProfiles(authFetcher.data?.edgesResult).users.slice(
+          0,
+          NUMBER_OF_DISPLAYED_USERS
+        ) || []
       }
       error={authFetcher.data?.error || null}
       fetcherState={{
