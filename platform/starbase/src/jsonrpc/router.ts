@@ -160,7 +160,6 @@ export const appRouter = t.router({
         CustomAnalyticsFunction: () => {
           return {
             indexes: [rawInput['clientId']],
-            blobs: [''],
           }
         },
       }
