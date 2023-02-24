@@ -18,6 +18,7 @@ import type { ActionFunction } from '@remix-run/cloudflare'
 // Styles
 
 import { HiOutlinePlusCircle } from 'react-icons/hi'
+import { TbTrash } from 'react-icons/tb'
 import {
   DndContext,
   closestCenter,
@@ -43,7 +44,7 @@ import NoCryptoAddresses from '~/components/accounts/NoCryptoAddresses'
 // Other helpers
 import { getProfileSession } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
-import type { Profile } from '@kubelt/galaxy-client'
+import type { Nft, Profile } from '@kubelt/galaxy-client'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import type { decoratedNft } from '~/helpers/nfts'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
@@ -183,6 +184,7 @@ const Gallery = () => {
   const { profile, cryptoAddresses, accountURN } = useOutletContext<{
     profile: Profile
     accountURN: string
+    cryptoAddresses: string[]
   }>()
 
   const { displayName } = profile
@@ -192,8 +194,8 @@ const Gallery = () => {
 
   const [initialState, setInitialState] = useState([])
 
-  const [curatedNfts, setCuratedNfts] = useState([] as any)
-  const [curatedNftsSet, setCuratedNftsSet] = useState(new Set([] as any))
+  const [curatedNfts, setCuratedNfts] = useState([] as Nft[])
+  const [curatedNftsSet, setCuratedNftsSet] = useState(new Set([] as string[]))
   const [isFormChanged, setFormChanged] = useState(false)
 
   const transition = useTransition()
@@ -203,7 +205,7 @@ const Gallery = () => {
   const [activeId, setActiveId] = useState(null)
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor))
 
-  const curatedNftsLinks = curatedNfts.map((nft: any[]) => nft.url)
+  const curatedNftsLinks = curatedNfts.map((nft) => nft.url)
 
   // REACT HOOKS FOR DISPLAYING AND SORTING GALLERY
 
@@ -398,11 +400,38 @@ const Gallery = () => {
                 className="grid-cols-2 md:grid-cols-3 lg:grid-cols-4
             flex flex-col justify-center items-center"
               >
+                {galleryFetcher.state === 'loading' && !curatedNfts.length && (
+                  <LoadingGridSquaresGallery numberOfCells={30} />
+                )}
+                {curatedNfts.map((nft: any, i: number) => {
+                  return (
+                    <div
+                      className="relative group"
+                      key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
+                    >
+                      <SortableNft url={nft.url} index={i} nft={nft} />
+                      <button
+                        className="absolute right-3 bottom-3 opacity-50 rounded-full
+                        h-[47px] w-[47px] items-center justify-center bg-black
+                        hidden group-hover:flex hover:opacity-100 transition-opacity"
+                        onClick={() => {
+                          setCuratedNfts(
+                            curatedNfts.filter((nft, j: number) => j !== i)
+                          )
+                        }}
+                      >
+                        <TbTrash size={25} className="text-white" />
+                      </button>
+                    </div>
+                  )
+                })}
                 <button
                   type="button"
-                  className="w-full h-full
+                  className={`w-full h-full
               bg-gray-50 hover:bg-gray-100 transition-colors
-              rounded-lg"
+              rounded-lg transition-opacity ${
+                activeId ? 'opacity-0' : 'opacity-100'
+              }`}
                   disabled={!cryptoAddresses?.length}
                   onClick={() => setIsOpen(!!cryptoAddresses?.length)}
                 >
@@ -416,22 +445,9 @@ const Gallery = () => {
                       fontWeight={100}
                       className="mb-2 font-extralight"
                     />
+                    <Text>Add NFT</Text>
                   </div>
                 </button>
-
-                {galleryFetcher.state === 'loading' && !curatedNfts.length && (
-                  <LoadingGridSquaresGallery numberOfCells={30} />
-                )}
-                {curatedNfts.map((nft: any, i: number) => {
-                  return (
-                    <SortableNft
-                      key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
-                      url={nft.url}
-                      index={i}
-                      nft={nft}
-                    />
-                  )
-                })}
               </div>
             </SortableContext>
             <DragOverlay
