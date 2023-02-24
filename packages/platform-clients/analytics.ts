@@ -28,7 +28,7 @@ export const WriteAnalyticsDataPoint = (
   const subAcct = sub ? AccountURNSpace.componentizedParse(sub).decoded : null
 
   // TODO: Move to the types from the types package and parse JWT here for account URN.
-  const raw_key = account || subAcct || rayId || null
+  const raw_key = account || subAcct || rayId || new ArrayBuffer(0)
 
   const customAnalytics =
     customDatapoint ||
@@ -36,11 +36,7 @@ export const WriteAnalyticsDataPoint = (
     ({} as AnalyticsEngineDataPoint)
 
   // The custom analytics can override the defauly hashkey.
-  const formattedIndexes =
-    customAnalytics?.indexes?.map(
-      (i) => (i ? i.slice(-32) : null) // Enforce 32 byte limit. The maximum number of indexes is 1.
-    ) || []
-  formattedIndexes.unshift(raw_key) // The first index is the hashkey.
+  const hashkey = customAnalytics?.indexes?.[0] || raw_key
 
   const blobs = [
     service.name,
@@ -63,7 +59,7 @@ export const WriteAnalyticsDataPoint = (
   const point: AnalyticsEngineDataPoint = {
     blobs,
     doubles: [...(customAnalytics?.doubles || [])].slice(0, 20), // The maximum allowed number of doubles is 20.
-    indexes: formattedIndexes,
+    indexes: [hashkey.slice(-32)], // Enforce 32 byte limit. The maximum number of indexes is 1.
   }
 
   console.log('service analytics', JSON.stringify(point))

@@ -154,25 +154,7 @@ export const appRouter = t.router({
     .query(checkAppAuth),
   getAppPublicProps: t.procedure
     .use(LogUsage)
-    .use(({ ctx, path, type, next, input, rawInput, meta }) => {
-      const newCtx = {
-        ...ctx,
-        CustomAnalyticsFunction: () => {
-          return {
-            indexes: [rawInput['clientId']],
-          }
-        },
-      }
-      return Analytics({
-        ctx: newCtx,
-        path,
-        type,
-        next,
-        input,
-        rawInput,
-        meta,
-      })
-    })
+    .use(Analytics)
     .input(GetAppPublicPropsInput)
     .output(GetAppPublicPropsOutput)
     .query(getAppPublicProps),
