@@ -21,10 +21,6 @@ export const ACCESS_TOKEN_OPTIONS = {
   expirationTime: '1 hour',
 }
 
-export const REFRESH_TOKEN_OPTIONS = {
-  expirationTime: '90 days',
-}
-
 /**
  * An edge linking an account node (representing a user account) and a
  * client session node for that account.
