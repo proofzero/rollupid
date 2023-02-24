@@ -1,12 +1,14 @@
 ---
-description: Rollup is authorization infrastructure designed to streamline user onboarding.
+description: Simple Auth & Identity for Developers
 ---
 
 # Introduction to Rollup
 
-Rollup is an open source platform designed to enhance the user experience in your applications with progressive authorizations. With Rollup, you can foster secure and trustworthy relationships with your users, while maintaining the privacy of their rich user data.
+Rollup is an open source auth and identity platform designed around [OAuth standards](https://www.rfc-editor.org/rfc/rfc6749) and inspired by [W3C decentralized identity](https://w3c.github.io/did-core/). With Rollup, you can focus less on integrations and more on growth with tools that streamline user onboarding and acquisition.
 
-Our goal is to simplify the onboarding process for both developers and users by offering a comprehensive suite of tools that enable seamless and secure login experiences -- no matter how those users want to connect you get one unified user profile.
+What sets Rollup apart from other auth solutions is Rollup's ability to turn users into identities bundled with **federated identity services**. By using our progressive authorization framework, **** apps to request scoped access to a users [identity graph](../../platform/profile-graph.md) directly from their users. With this model you can foster secure and trustworthy relationships with your users and eliminate privacy compliance overhead.
+
+And by using standards we can all of this easy.
 
 #### Get Started
 
