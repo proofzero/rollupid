@@ -1,4 +1,3 @@
-import { inputValidators } from '@kubelt/platform-middleware'
 import { z } from 'zod'
 import { Node } from '../../../../edges/src/jsonrpc/validators/node'
 

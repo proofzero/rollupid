@@ -53,7 +53,27 @@ export const appRouter = t.router({
     .mutation(authorizeMethod),
   exchangeToken: t.procedure
     .use(LogUsage)
-    .use(Analytics)
+    .use(({ ctx, path, type, next, input, rawInput, meta }) => {
+      const typedInput = rawInput as { clientId: string; grantType: string }
+      const newCtx = {
+        ...ctx,
+        CustomAnalyticsFunction: () => {
+          return {
+            indexes: [typedInput['clientId']],
+            blobs: [typedInput['grantType']],
+          }
+        },
+      }
+      return Analytics({
+        ctx: newCtx,
+        path,
+        type,
+        next,
+        input,
+        rawInput,
+        meta,
+      })
+    })
     .use(InjectEdges)
     .input(ExchangeTokenMethodInput)
     .output(ExchangeTokenMethodOutput)
