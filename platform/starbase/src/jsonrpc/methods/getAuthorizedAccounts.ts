@@ -64,9 +64,6 @@ export const getAuthorizedAccounts = async ({
   })
 
   const mappedEdges = edgesResult?.edges.map((edge) => {
-    // TODO: edge.createdTimestamp as string + " UTC"
-    // doesn't work for some reason
-
     const timestamp = new Date(
       (edge.createdTimestamp as string) + ' UTC'
     ).getTime()
