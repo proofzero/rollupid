@@ -1,11 +1,12 @@
-import { gatewayFromIpfs } from '@kubelt/utils'
+import {
+  gatewayFromIpfs,
+  getAuthzHeaderConditionallyFromToken,
+} from '@kubelt/utils'
 import { getGalaxyClient } from './clients'
-import { getAddressProfile } from './profile'
+import { getAccountProfile, getAddressProfile } from './profile'
 
 import type { AddressURN } from '@kubelt/urns/address'
-import type { AccountURN } from '@kubelt/urns/account'
-import { AccountURNSpace } from '@kubelt/urns/account'
-import type { Gallery, Nft } from '@kubelt/galaxy-client'
+import type { Nft } from '@kubelt/galaxy-client'
 /**
  * Nfts are being sorted server-side
  * this function then allows to merge client Nfts with newly-fetched Nfts
@@ -130,13 +131,19 @@ export const decorateNfts = (ownedNfts: any) => {
 }
 
 /**
- * Returns target address gallery for which only
+ * Returns own gallery if JWT is provided or
+ * target address gallery for which only
  * owner property is required.
  * @param owner AddressURN of target profile. Can be undefined if JWT is provided.
+ * @param jwt JWT of requester
  * @returns Gallery or empty array
  */
-export const getGallery = async (addressURN: AddressURN) => {
-  const profile = await getAddressProfile(addressURN)
+export const getGallery = async (owner: string, jwt?: string) => {
+  // TODO: get from account
+  const profile = jwt
+    ? await getAccountProfile(jwt)
+    : await getAddressProfile(owner as AddressURN)
+
   const { gallery } = profile
 
   return gallery || []
@@ -158,8 +165,8 @@ const getMoreNfts = (fetcher: any, request: string) => {
   fetcher.load(request)
 }
 
-export const getMoreNftsGallery = (fetcher: any, addressURN: string) => {
-  const query = generateQuery([{ name: 'addressURN', value: addressURN }])
+export const getMoreNftsGallery = (fetcher: any, accountURN: string) => {
+  const query = generateQuery([{ name: 'owner', value: accountURN }])
   const request = `/nfts/gallery?${query}`
   getMoreNfts(fetcher, request)
 }
@@ -212,17 +219,13 @@ export const getMoreNftsAllCollections = (
 
 // ------ end of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS
 
-export const getGalleryWithMetadata = async (addressURN: AddressURN) => {
-  const gallery = await getGallery(addressURN)
+export const getGalleryWithMetadata = async (owner: string, jwt?: string) => {
+  const gallery = await getGallery(owner, jwt)
 
   if (!gallery || !gallery.length) {
     return { gallery: [] }
   }
 
-  return await getGalleryMetadata(gallery)
-}
-
-export const getGalleryMetadata = async (gallery: Gallery[]) => {
   const galaxyClient = await getGalaxyClient()
 
   const { getNFTMetadataBatch: metadata } = await galaxyClient.getNFTMetadata(
@@ -235,7 +238,10 @@ export const getGalleryMetadata = async (gallery: Gallery[]) => {
         })
       ),
     },
-    {}
+    // Optional for when called by
+    // a non authenticated visitor
+    // of a public profile
+    getAuthzHeaderConditionallyFromToken(jwt)
   )
 
   const ownedNfts: decoratedNft[] | undefined = metadata?.ownedNfts.map(
@@ -243,6 +249,7 @@ export const getGalleryMetadata = async (gallery: Gallery[]) => {
       return decorateNft(nft as Nft)
     }
   )
+
   // Setup og tag data
   // check generate and return og image
 
