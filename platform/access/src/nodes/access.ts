@@ -69,6 +69,17 @@ export default class Access extends DOProxy {
     }
   }
 
+  async getParameterlessTokenState(): Promise<TokenState> {
+    return this.state.storage.transaction(async (txn) => {
+      const { tokenMap, tokenIndex } = await this.getTokenState(txn)
+
+      return {
+        tokenMap,
+        tokenIndex,
+      }
+    })
+  }
+
   async generateAccessToken(options: AccessTokenOptions): Promise<string> {
     const { account, clientId, expirationTime, scope } = options
     const { alg } = JWT_OPTIONS
@@ -143,10 +154,6 @@ export default class Access extends DOProxy {
 
       await put(tokenMap, tokenIndex)
     })
-  }
-
-  async getTokens(): Promise<Tokens> {
-    return (await this.state.storage.get<Tokens>('tokens')) || {}
   }
 
   async verify(token: string): Promise<JWTVerifyResult> {

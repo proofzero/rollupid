@@ -23,20 +23,14 @@ export const getAppScopesMethod = async ({
   input: z.infer<typeof GetAppScopesInput>
   ctx: Context
 }): Promise<z.infer<typeof GetAppScopesOutput>> => {
-  // const name = `${AccountURNSpace.decode(input.account)}@${input.clientId}`
-  // const accessNode = await initAccessNodeByName(name, ctx.Access)
+  const name = `${AccountURNSpace.decode(input.account)}@${input.clientId}`
+  const accessNode = await initAccessNodeByName(name, ctx.Access)
 
-  // const tokens = await accessNode.class.getTokens()
-  // const tokenKeys = Object.keys(tokens)
-  // const scopes = tokenKeys.flatMap((tk) => tokens[tk].scope)
-  const scopes = [
-    'scope://rollup.id/admin.admin',
-    'scope://rollup.id/account#read',
-    'scope://rollup.id/account#read',
-    'scope://rollup.id/profile#read',
-    'scope://rollup.id/profile#write',
-    'scope://rollup.id/connected-accounts#read',
-  ]
+  const { tokenIndex, tokenMap } =
+    await accessNode.class.getParameterlessTokenState()
+
+  const tokens = tokenIndex.map((t) => tokenMap[t])
+  const scopes = tokens.flatMap((t) => t.scope)
 
   const uniqueScopes = scopes.filter((v, i, a) => a.indexOf(v) === i)
   uniqueScopes.push('scope://rollup.id/openid')
