@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { LoaderFunction, MetaFunction, redirect } from '@remix-run/cloudflare'
+import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
+import { redirect } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import {
   Outlet,
@@ -28,8 +29,8 @@ import {
   gatewayFromIpfs,
   getAuthzHeaderConditionallyFromToken,
 } from '@kubelt/utils'
+import type { AddressURN } from '@kubelt/urns/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
-import type { Profile } from '@kubelt/galaxy-client'
 
 import { Cover } from '~/components/profile/cover/Cover'
 import ProfileTabs from '~/components/profile/tabs/tabs'
@@ -43,8 +44,10 @@ import {
   OAuthAddressType,
 } from '@kubelt/types/address'
 import type { AccountURN } from '@kubelt/urns/account'
+import { AccountURNSpace } from '@kubelt/urns/account'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { imageFromAddressType } from '~/helpers'
+import type { FullProfile } from '~/types'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { address, type } = params
@@ -53,19 +56,35 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const session = await getProfileSession(request)
   if (!address) throw new Error('No address provided in URL')
+
+  // redirect from accountURN to first addressURNs
+  if (type === 'p') {
+    const { addresses } = await galaxyClient.getConnectedAddressesFromAccount({
+      accountURN: AccountURNSpace.urn(address),
+    })
+
+    return redirect(
+      `/a/${AddressURNSpace.decode(addresses?.[0].baseUrn as AddressURN)}`
+    )
+  }
+
   const urn = AddressURNSpace.urn(address)
 
   // if not handle is this let's assume this is an idref
-  let profile = undefined
+  let profile, jwt
   try {
     const user = session.get('user')
-    let jwt = user?.accessToken
+    jwt = user?.accessToken
     profile = await galaxyClient.getProfileFromAddress(
       {
-        addressURN: `${urn}`,
+        addressURN: urn,
       },
       getAuthzHeaderConditionallyFromToken(jwt)
     )
+
+    if (!profile) {
+      throw json({ message: 'Profile could not be resolved' }, { status: 404 })
+    }
 
     profile = {
       ...profile.profile,
@@ -74,24 +93,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       addresses: profile.connectedAddresses || [],
     }
 
-    if (!profile) {
-      throw json({ message: 'Profile could not be resolved' }, { status: 404 })
-    }
-
-    if (profile) {
-      if (type === 'a') {
-        let redirectUrl = getRedirectUrlForProfile(profile)
-        const originalRoute = `/${type}/${address}`
-        //Redirect if we've found a better route
-        if (redirectUrl && originalRoute !== redirectUrl)
-          return redirect(redirectUrl)
-        //otherwise stay on current route
-      } else if (type === 'u') {
-        //TODO: galaxy search by handle
-        console.error('Not implemented')
-      } else {
-        //TODO: Type-based resolvers to be tackled in separate PR
-      }
+    if (type === 'a') {
+      const redirectUrl = getRedirectUrlForProfile(profile)
+      const originalRoute = `/${type}/${address}`
+      //Redirect if we've found a better route
+      if (redirectUrl && originalRoute !== redirectUrl)
+        return redirect(redirectUrl)
+      //otherwise stay on current route
+    } else if (type === 'u') {
+      //TODO: galaxy search by handle
+      console.error('Not implemented')
+    } else {
+      //TODO: Type-based resolvers to be tackled in separate PR
     }
 
     const ogImage = await ogImageFromProfile(
@@ -162,7 +175,7 @@ const UserAddressLayout = () => {
   //but used from context alone.
   const { profile, cryptoAddresses, path, isOwner, addressURN } =
     useLoaderData<{
-      profile: Profile
+      profile: FullProfile
       cryptoAddresses: Node[]
       path: string
       isOwner: boolean
@@ -170,8 +183,7 @@ const UserAddressLayout = () => {
     }>()
 
   const ctx = useOutletContext<{
-    loggedInProfile: Profile | null
-    profile: Profile
+    profile: FullProfile
     // This gets passed down
     // from root.tsx
     // but if not logged in
@@ -293,7 +305,7 @@ const UserAddressLayout = () => {
     >
       <Outlet
         context={{
-          accountURN: ctx.accountURN ?? addressURN,
+          addressURN: addressURN,
           profile: finalProfile,
           cryptoAddresses,
           path,

@@ -1,16 +1,22 @@
 import createEdgesClient from '@kubelt/platform-clients/edges'
-import type { AccessRComp } from '@kubelt/urns/access'
 import { Context } from '../context'
 import { EDGE_AUTHORIZES } from '@kubelt/platform.access/src/constants'
-// import { Graph } from '@kubelt/types'
-// import { inputValidators } from '@kubelt/platform-middleware'
+
+import type { AccountURN } from '@kubelt/urns/account'
+
 import { z } from 'zod'
+import { EdgesMetadata } from '@kubelt/platform/edges/src/jsonrpc/validators/edge'
+import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
 
 // Input
 // -----------------------------------------------------------------------------
 
 export const GetAuthorizedAccountsMethodInput = z.object({
   client: z.string(),
+  opt: z.object({
+    offset: z.number(),
+    limit: z.number(),
+  }),
 })
 
 export type GetAuthorizedAccountsParams = z.infer<
@@ -20,14 +26,17 @@ export type GetAuthorizedAccountsParams = z.infer<
 // Output
 // -----------------------------------------------------------------------------
 
-export const GetAuthorizedAccountsMethodOutput = z.array(
-  z.object({
-    accountURN: z.string(),
-    timestamp: z.number(),
-    name: z.string(),
-    imageURL: z.string(),
-  })
-)
+export const AuthorizedUser = z.object({
+  accountURN: AccountURNInput,
+  timestamp: z.number(),
+  name: z.string(),
+  imageURL: z.string(),
+})
+
+export const GetAuthorizedAccountsMethodOutput = z.object({
+  accounts: z.array(AuthorizedUser),
+  metadata: EdgesMetadata,
+})
 
 // Method
 // -----------------------------------------------------------------------------
@@ -51,14 +60,16 @@ export const getAuthorizedAccounts = async ({
       },
     },
     // set limit to not query the whole db
-    opt: { limit: 10 },
+    opt: input.opt,
   })
 
-  const mappedEdges = edgesResult.edges.map((edge) => {
+  const mappedEdges = edgesResult?.edges.map((edge) => {
     const timestamp = new Date(
       (edge.createdTimestamp as string) + ' UTC'
     ).getTime()
-    const accountURN = edge.src.baseUrn
+
+    const accountURN = edge.src.baseUrn as AccountURN
+
     return {
       accountURN,
       timestamp,
@@ -67,7 +78,5 @@ export const getAuthorizedAccounts = async ({
     }
   })
 
-  console.log({ mappedEdges })
-
-  return mappedEdges
+  return { accounts: mappedEdges, metadata: edgesResult.metadata }
 }

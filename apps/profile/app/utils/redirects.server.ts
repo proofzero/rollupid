@@ -1,5 +1,6 @@
-import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
-import { FullProfile } from '~/types'
+import type { AddressURN } from '@kubelt/urns/address'
+import { AddressURNSpace } from '@kubelt/urns/address'
+import type { FullProfile } from '~/types'
 
 export const getRedirectUrlForProfile = (
   profile: FullProfile

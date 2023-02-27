@@ -402,6 +402,7 @@ export type Query = {
   addressProfiles: Array<AddressProfile>
   authorizedApps?: Maybe<Array<Maybe<App>>>
   connectedAddresses?: Maybe<Array<Node>>
+  connectedAddressesFromAccount?: Maybe<Array<Node>>
   connectedAddressesFromAddress?: Maybe<Array<Node>>
   contractsForAddress?: Maybe<NftContracts>
   ensProfile: CryptoAddressProfile
@@ -421,6 +422,10 @@ export type QueryAddressProfileArgs = {
 
 export type QueryAddressProfilesArgs = {
   addressURNList?: InputMaybe<Array<Scalars['URN']>>
+}
+
+export type QueryConnectedAddressesFromAccountArgs = {
+  accountURN: Scalars['URN']
 }
 
 export type QueryConnectedAddressesFromAddressArgs = {
@@ -561,6 +566,20 @@ export type GetProfileFromAddressQuery = {
     chain: string
   }> | null
   connectedAddresses?: Array<{
+    __typename?: 'Node'
+    baseUrn: string
+    qc?: any | null
+    rc?: any | null
+  }> | null
+}
+
+export type GetConnectedAddressesFromAccountQueryVariables = Exact<{
+  accountURN: Scalars['URN']
+}>
+
+export type GetConnectedAddressesFromAccountQuery = {
+  __typename?: 'Query'
+  addresses?: Array<{
     __typename?: 'Node'
     baseUrn: string
     qc?: any | null
@@ -1019,6 +1038,15 @@ export const GetProfileFromAddressDocument = gql`
     }
   }
 `
+export const GetConnectedAddressesFromAccountDocument = gql`
+  query getConnectedAddressesFromAccount($accountURN: URN!) {
+    addresses: connectedAddressesFromAccount(accountURN: $accountURN) {
+      baseUrn
+      qc
+      rc
+    }
+  }
+`
 export const GetAuthorizedAppsDocument = gql`
   query getAuthorizedApps {
     authorizedApps {
@@ -1356,6 +1384,21 @@ export function getSdk(
             { ...requestHeaders, ...wrappedRequestHeaders }
           ),
         'getProfileFromAddress',
+        'query'
+      )
+    },
+    getConnectedAddressesFromAccount(
+      variables: GetConnectedAddressesFromAccountQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetConnectedAddressesFromAccountQuery> {
+      return withWrapper(
+        (wrappedRequestHeaders) =>
+          client.request<GetConnectedAddressesFromAccountQuery>(
+            GetConnectedAddressesFromAccountDocument,
+            variables,
+            { ...requestHeaders, ...wrappedRequestHeaders }
+          ),
+        'getConnectedAddressesFromAccount',
         'query'
       )
     },

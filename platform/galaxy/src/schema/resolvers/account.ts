@@ -18,11 +18,11 @@ import {
 import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
-import { NodeType } from '@kubelt/types/address'
 import { Gallery, Links, Profile } from '@kubelt/platform.account/src/types'
 import { ResolverContext } from './common'
 import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { AccountURN } from '@kubelt/urns/account'
 
 const accountResolvers: Resolvers = {
   Query: {
@@ -80,7 +80,6 @@ const accountResolvers: Resolvers = {
       return mappedApps
     },
 
-    //@ts-ignore
     links: async (
       _parent: any,
       {},
@@ -97,7 +96,7 @@ const accountResolvers: Resolvers = {
 
       return links
     },
-    //@ts-ignore
+
     gallery: async (
       _parent: any,
       {},
@@ -154,10 +153,23 @@ const accountResolvers: Resolvers = {
       return addresses
     },
 
+    connectedAddressesFromAccount: async (
+      _parent: any,
+      { accountURN }: { accountURN: AccountURN },
+      { env }: ResolverContext
+    ) => {
+      const addresses = await getConnectedAddresses({
+        accountURN,
+        Account: env.Account,
+      })
+
+      return addresses
+    },
+
     profileFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
-      { env, jwt }: ResolverContext
+      { env }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
@@ -173,10 +185,7 @@ const accountResolvers: Resolvers = {
       }
 
       // get the account profile
-      const accountClient = createAccountClient(
-        env.Account,
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
+      const accountClient = createAccountClient(env.Account, {})
 
       console.log("galaxy.profileFromAddress: getting account's profile")
       // should also return the handle if it exists
@@ -212,7 +221,7 @@ const accountResolvers: Resolvers = {
     linksFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
-      { env, jwt }: ResolverContext
+      { env }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
@@ -228,10 +237,7 @@ const accountResolvers: Resolvers = {
       }
 
       // get the account profile
-      const accountClient = createAccountClient(
-        env.Account,
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
+      const accountClient = createAccountClient(env.Account, {})
 
       console.log("galaxy.linksFromAddress: getting account's links")
       // should also return the handle if it exists
@@ -241,20 +247,20 @@ const accountResolvers: Resolvers = {
 
       return linksFromAddress
     },
-    //@ts-ignore
+
     galleryFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
-      { env, jwt }: ResolverContext
+      { env, jwt, accountURN }: ResolverContext
     ) => {
       console.log("galaxy.galleryFromAddress: getting account's gallery")
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
       })
-      const accountURN = await addressClient.getAccount.query()
+      const calledAccountURN = await addressClient.getAccount.query()
 
       // return the address profile if no account is associated with the address
-      if (!accountURN) {
+      if (!calledAccountURN) {
         console.log(
           'galaxy.galleryFromAddress: attempt to resolve profile from address w/o account'
         )
@@ -268,14 +274,13 @@ const accountResolvers: Resolvers = {
       )
 
       const connectedAddresses = await getConnectedCryptoAddresses({
-        accountURN,
+        accountURN: calledAccountURN,
         Account: env.Account,
-        jwt,
       })
 
       // should also return the handle if it exists
       const gallery = await accountClient.getGallery.query({
-        account: accountURN,
+        account: calledAccountURN,
       })
       if (gallery) {
         // Validation
@@ -285,9 +290,12 @@ const accountResolvers: Resolvers = {
           connectedAddresses
         )
 
-        if (gallery.length !== filteredGallery.length) {
+        if (
+          gallery.length !== filteredGallery.length &&
+          calledAccountURN === accountURN
+        ) {
           accountClient.setGallery.mutate({
-            name: accountURN,
+            name: calledAccountURN,
             gallery: filteredGallery,
           })
         }
@@ -301,15 +309,17 @@ const accountResolvers: Resolvers = {
     connectedAddressesFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
-      { env, jwt }: ResolverContext
+      { env, jwt, accountURN }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
       })
-      const accountURN = await addressClient.getAccount.query()
+      const calledAccountURN = await addressClient.getAccount.query()
+
+      const validJWT = accountURN === calledAccountURN ? jwt : undefined
 
       // return the address profile if no account is associated with the address
-      if (!accountURN) {
+      if (!calledAccountURN) {
         console.log(
           'galaxy.connectedAddressesFromAddress: attempt to resolve profile from address w/o account'
         )
@@ -321,9 +331,9 @@ const accountResolvers: Resolvers = {
       )
       // should also return the handle if it exists
       const connectedAddressesFromAddress = getConnectedAddresses({
-        accountURN,
+        accountURN: calledAccountURN,
         Account: env.Account,
-        jwt,
+        jwt: validJWT,
       })
 
       return connectedAddressesFromAddress
@@ -392,7 +402,7 @@ const accountResolvers: Resolvers = {
       })
       return true
     },
-    //@ts-ignore
+
     updateLinks: async (
       _parent: any,
       { links }: { links: Links },
@@ -413,7 +423,7 @@ const accountResolvers: Resolvers = {
       })
       return true
     },
-    //@ts-ignore
+
     updateGallery: async (
       _parent: any,
       { gallery }: { gallery: Gallery },
@@ -465,6 +475,12 @@ const ProfileResolverComposition = {
   'Query.links': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.gallery': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.connectedAddresses': [
+    setupContext(),
+    hasApiKey(),
+    logAnalytics(),
+    temporaryConvertToPublic(),
+  ],
+  'Query.connectedAddressesFromAccount': [
     setupContext(),
     hasApiKey(),
     logAnalytics(),

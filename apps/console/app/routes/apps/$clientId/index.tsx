@@ -3,7 +3,7 @@
  */
 import { useEffect } from 'react'
 
-import type { ActionFunction } from '@remix-run/cloudflare'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import {
   useActionData,
@@ -11,6 +11,7 @@ import {
   useSubmit,
   useNavigate,
   useFetcher,
+  useLoaderData,
 } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 import { ApplicationDashboard } from '~/components/Applications/Dashboard/ApplicationDashboard'
@@ -26,6 +27,24 @@ import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 /**
  * @file app/routes/dashboard/index.tsx
  */
+
+export const NUMBER_OF_DISPLAYED_USERS = 8
+
+type LoaderData = {
+  clientId: string
+}
+
+export const loader: LoaderFunction = async ({ params }) => {
+  const { clientId } = params
+
+  if (!clientId) {
+    throw new Error('clientId is required')
+  }
+
+  return json<LoaderData>({
+    clientId,
+  })
+}
 
 export const action: ActionFunction = async ({ request, params }) => {
   if (!params.clientId) {
@@ -74,15 +93,14 @@ export default function AppDetailIndexPage() {
     appDetails: appDetailsProps
     rotationResult: RotatedSecrets
   }>()
+  const { clientId } = useLoaderData()
   const authFetcher = useFetcher()
   const navigate = useNavigate()
 
   const { appDetails: app } = outletContext
 
   useEffect(() => {
-    const query = new URLSearchParams()
-    query.set('client', app.clientId!)
-    authFetcher.load(`/api/authorized-accounts?${query}`)
+    authFetcher.load(`/apps/${clientId}/users`)
   }, [])
 
   const { rotatedClientSecret, rotatedApiKey } =
@@ -100,9 +118,17 @@ export default function AppDetailIndexPage() {
         },
         CTAneeded: !app.app.icon || !app.app.redirectURI || !app.app.name,
       }}
-      authorizedProfiles={authFetcher.data?.authorizedProfiles || []}
+      authorizedProfiles={
+        authFetcher.data?.edgesResult?.accounts.slice(
+          0,
+          NUMBER_OF_DISPLAYED_USERS
+        ) || []
+      }
       error={authFetcher.data?.error || null}
-      fetcherState={{ state: authFetcher.state, type: authFetcher.type }}
+      fetcherState={{
+        loadingDetails: authFetcher.state,
+        type: authFetcher.type,
+      }}
       galaxyGql={{
         createdAt: new Date(app.apiKeyTimestamp as number),
         apiKey: rotatedApiKey as string,

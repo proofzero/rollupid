@@ -9,7 +9,14 @@ import {
   AppUpdateableFieldsSchema,
   ScopeMeta,
 } from './jsonrpc/validators/app'
+
+import {
+  GetAuthorizedAccountsMethodInput,
+  GetAuthorizedAccountsMethodOutput,
+  AuthorizedUser,
+} from './jsonrpc/methods/getAuthorizedAccounts'
 import { DeploymentMetadata } from '@kubelt/types'
+import { EdgesMetadata } from '../../edges/src/jsonrpc/validators/edge'
 
 export interface Environment {
   Analytics: AnalyticsEngineDataset
@@ -27,3 +34,12 @@ export type AppAllFields = z.infer<typeof AllFieldsSchema>
 export type AppClientIdParam = z.infer<typeof AppClientIdParamSchema>
 export type AppObject = z.infer<typeof AppObjectSchema>
 export type ScopeMeta = z.infer<typeof ScopeMeta>
+
+export type AuthorizedAccountsParams = z.infer<
+  typeof GetAuthorizedAccountsMethodInput
+>
+export type AuthorizedAccountsOutput = z.infer<
+  typeof GetAuthorizedAccountsMethodOutput
+>
+export type AuthorizedUser = z.infer<typeof AuthorizedUser>
+export type EdgesMetadata = z.infer<typeof EdgesMetadata>

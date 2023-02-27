@@ -111,7 +111,6 @@ export const appRouter = t.router({
     .input(SetLinksInput)
     .mutation(setLinksMethod),
   getGallery: t.procedure
-    .use(AuthorizationTokenFromHeader)
     .use(Scopes)
     .use(LogUsage)
     .use(Analytics)

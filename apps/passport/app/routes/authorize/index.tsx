@@ -13,7 +13,7 @@ import { getAccessClient, getStarbaseClient } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { parseJwt, requireJWT } from '~/session.server'
 import type { AccountURN } from '@kubelt/urns/account'
-import { Profile } from '@kubelt/platform/account/src/types'
+import type { Profile } from '@kubelt/platform/account/src/types'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { clientId, redirectUri, scope, state } = context.consoleParams

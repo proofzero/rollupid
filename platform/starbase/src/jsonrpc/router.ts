@@ -59,8 +59,8 @@ import {
   GetAppPublicPropsInput,
   GetAppPublicPropsOutput,
 } from './methods/getAppPublicProps'
+import { getAuthorizedAccounts } from './methods/getAuthorizedAccounts'
 import {
-  getAuthorizedAccounts,
   GetAuthorizedAccountsMethodInput,
   GetAuthorizedAccountsMethodOutput,
 } from './methods/getAuthorizedAccounts'

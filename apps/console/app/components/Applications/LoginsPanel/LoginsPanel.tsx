@@ -1,10 +1,9 @@
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Tooltip } from 'flowbite-react'
 import type { AuthorizedProfile } from '~/types'
 
 import missingImage from '../../../images/missing-img.svg'
 
-const noLoginsSvg = (
+export const noLoginsSvg = (
   <svg
     width="148"
     height="164"
@@ -61,9 +60,13 @@ const noLoginsSvg = (
 
 type LoginsPanelProps = {
   authorizedProfiles: AuthorizedProfile[]
+  appId: string
 }
 
-export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
+export const LoginsPanel = ({
+  authorizedProfiles,
+  appId,
+}: LoginsPanelProps) => {
   return (
     <div className="h-full">
       {authorizedProfiles.length ? (
@@ -123,11 +126,7 @@ export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
               </div>
 
               <div className="flex flex-row justify-center ">
-                <Tooltip
-                  content="Coming soon!"
-                  trigger="hover"
-                  className="font-[Inter]"
-                >
+                <a href={`${appId}/users`}>
                   <Text
                     size="sm"
                     weight="medium"
@@ -135,7 +134,7 @@ export const LoginsPanel = ({ authorizedProfiles }: LoginsPanelProps) => {
                   >
                     View All
                   </Text>
-                </Tooltip>
+                </a>
               </div>
             </div>
           </div>

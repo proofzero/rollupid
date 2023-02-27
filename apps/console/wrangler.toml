@@ -5,6 +5,8 @@ name = "console"
 workers_dev = false
 main = "./build/index.js"
 compatibility_date = "2022-04-05"
+compatibility_flags = [ "streams_enable_constructors" ]
+
 
 services = [
   { binding = "Starbase", service = "starbase"},

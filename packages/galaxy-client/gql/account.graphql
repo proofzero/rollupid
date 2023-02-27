@@ -72,6 +72,14 @@ query getProfileFromAddress($addressURN: URN!) {
   }
 }
 
+query getConnectedAddressesFromAccount($accountURN: URN!) {
+  addresses: connectedAddressesFromAccount(accountURN: $accountURN) {
+    baseUrn
+    qc
+    rc
+  }
+}
+
 query getAuthorizedApps {
   authorizedApps {
     icon
