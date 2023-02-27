@@ -5027,6 +5027,7 @@ __metadata:
     cross-env: 7.0.3
     eslint: 8.28.0
     ethers: 5.7.2
+    flowbite-react: 0.3.5
     lodash: 4.17.21
     npm-run-all: 4.1.5
     react: 18.2.0
