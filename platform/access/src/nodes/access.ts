@@ -183,6 +183,15 @@ export default class Access extends DOProxy {
     })
   }
 
+  async revokeAll(): Promise<void> {
+    await this.state.storage.transaction(async (txn) => {
+      await txn.put({
+        tokenMap: {},
+        tokenIndex: [],
+      })
+    })
+  }
+
   async getJWTSigningKeyPair(): Promise<KeyPair> {
     const { alg } = JWT_OPTIONS
     const { storage } = this.state

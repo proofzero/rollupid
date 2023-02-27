@@ -48,6 +48,12 @@ import {
   GetAuthorizedAppScopesMethodOutput,
 } from './methods/getAuthorizedAppScopes'
 
+import {
+  revokeAuthorizationsMethod,
+  RevokeAuthorizationsMethodInput,
+  RevokeAuthorizationsMethodOutput,
+} from './methods/revokeAuthorizations'
+
 const t = initTRPC.context<Context>().create()
 
 export const appRouter = t.router({
@@ -101,6 +107,13 @@ export const appRouter = t.router({
     .input(RevokeTokenMethodInput)
     .output(RevokeTokenMethodOutput)
     .mutation(revokeTokenMethod),
+  revokeAuthorizations: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(InjectEdges)
+    .input(RevokeAuthorizationsMethodInput)
+    .output(RevokeAuthorizationsMethodOutput)
+    .mutation(revokeAuthorizationsMethod),
   getUserInfo: t.procedure
     .use(LogUsage)
     .use(Analytics)

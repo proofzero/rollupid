@@ -126,6 +126,11 @@ export type MutationDisconnectAddressArgs = {
 };
 
 
+export type MutationRevokeAuthorizationsArgs = {
+  clientId: Scalars['String']
+  clientSecret: Scalars['String']
+}
+
 export type MutationUpdateAddressNicknameArgs = {
   addressURN: Scalars['URN'];
   nickname: Scalars['String'];
@@ -587,6 +592,16 @@ export type GetAuthorizedAppScopesQueryVariables = Exact<{
 
 
 export type GetAuthorizedAppScopesQuery = { __typename?: 'Query', scopes: Array<{ __typename?: 'Scope', permission: string, scopes: Array<string | null> } | null> };
+
+export type RevokeAuthorizationsMutationVariables = Exact<{
+  clientId: Scalars['String']
+  clientSecret: Scalars['String']
+}>
+
+export type RevokeAuthorizationsMutation = {
+  __typename?: 'Mutation'
+  revokeAuthorizations?: boolean | null
+}
 
 export type GetEnsProfileQueryVariables = Exact<{
   addressOrEns: Scalars['String'];

@@ -27,11 +27,34 @@ const appResolvers: Resolvers = {
       return scopes
     },
   },
+  Mutation: {
+    revokeAuthorizations: async (
+      _parent: any,
+      { clientId, clientSecret },
+      { accountURN, env }: ResolverContext
+    ) => {
+      const accessClient = createAccessClient(env.Access)
+
+      await accessClient.revokeAuthorizations.mutate({
+        accountURN,
+        clientId,
+        clientSecret,
+      })
+
+      return true
+    },
+  },
 }
 
 const AppResolverComposition = {
   'Query.scopes': [
     requestLogging(),
+    setupContext(),
+    hasApiKey(),
+    isAuthorized(),
+    logAnalytics(),
+  ],
+  'Mutation.revokeAuthorizations': [
     setupContext(),
     hasApiKey(),
     isAuthorized(),

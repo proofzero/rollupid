@@ -1,4 +1,8 @@
-import { useFetcher, useLoaderData } from '@remix-run/react'
+import {
+  FetcherWithComponents,
+  useFetcher,
+  useLoaderData,
+} from '@remix-run/react'
 import { loader as appLoader } from '~/routes/api/apps/index'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
@@ -14,17 +18,19 @@ const RevocationModal = ({
   clientId,
   icon,
   title,
+  fetcher,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   clientId: string
   icon: string
   title: string
+  fetcher: FetcherWithComponents<any>
 }) => {
-  const fetcher = useFetcher()
+  const localFetcher = useFetcher()
 
   useEffect(() => {
-    fetcher.load(`/api/apps/${clientId}/scopes`)
+    localFetcher.load(`/api/apps/${clientId}/scopes`)
   }, [clientId])
 
   return (
@@ -40,9 +46,9 @@ const RevocationModal = ({
           </Text>
         </div>
 
-        {fetcher.data && (
+        {localFetcher.data && (
           <div className="my-5">
-            {fetcher.data.map(
+            {localFetcher.data.map(
               (scope: { permission: string; scopes: string[] }, i: number) => (
                 <div
                   className={`flex flex-row space-x-2 items-center py-5 border-b ${
@@ -75,9 +81,14 @@ const RevocationModal = ({
             Cancel
           </Button>
 
-          <Button type="submit" btnType="dangerous-alt" disabled>
-            Remove All Access
-          </Button>
+          <fetcher.Form
+            action={`/account/applications/${clientId}/revoke`}
+            method="post"
+          >
+            <Button type="submit" btnType="dangerous-alt">
+              Remove All Access
+            </Button>
+          </fetcher.Form>
         </div>
       </div>
     </Modal>
@@ -152,6 +163,20 @@ export default () => {
 
   const [revocationModalOpen, setRevocationModalOpen] = useState(false)
 
+  const fetcher = useFetcher()
+
+  useEffect(() => {
+    console.log(fetcher.state)
+    if (fetcher.state === 'submitting' && fetcher.type === 'actionSubmission') {
+      setRevocationModalOpen(false)
+      setSelectedApp(undefined)
+    }
+
+    if (fetcher.type === 'actionReload') {
+      fetcher.load('/account/applicatios')
+    }
+  }, [fetcher])
+
   return (
     <>
       <Text size="xl" weight="semibold" className="text-gray-800 mb-5">
@@ -164,6 +189,7 @@ export default () => {
             clientId={selectedApp.clientId}
             icon={selectedApp.icon}
             title={selectedApp.title}
+            fetcher={fetcher}
             isOpen={revocationModalOpen}
             setIsOpen={setRevocationModalOpen}
           />
