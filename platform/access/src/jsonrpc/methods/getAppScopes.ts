@@ -6,7 +6,7 @@ import { AccountURNSpace } from '@kubelt/urns/account'
 import { scope, SCOPES } from '@kubelt/security/scopes'
 
 export const GetAppScopesInput = z.object({
-  account: inputValidators.AccountURNInput,
+  accountURN: inputValidators.AccountURNInput,
   clientId: z.string(),
 })
 export const GetAppScopesOutput = z.array(
@@ -23,18 +23,26 @@ export const getAppScopesMethod = async ({
   input: z.infer<typeof GetAppScopesInput>
   ctx: Context
 }): Promise<z.infer<typeof GetAppScopesOutput>> => {
-  const name = `${AccountURNSpace.decode(input.account)}@${input.clientId}`
+  const name = `${AccountURNSpace.decode(input.accountURN)}@${input.clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
 
-  const { tokenIndex, tokenMap } =
-    await accessNode.class.getParameterlessTokenState()
+  const { tokenIndex, tokenMap } = await accessNode.class.getTokenState()
 
+  // Get a map of all the scopes
+  // in all authorizations
   const tokens = tokenIndex.map((t) => tokenMap[t])
   const scopes = tokens.flatMap((t) => t.scope)
 
+  // Filter for unique scopes
   const uniqueScopes = scopes.filter((v, i, a) => a.indexOf(v) === i)
+
+  // Add implicit openid scope
   uniqueScopes.push('scope://rollup.id/openid')
 
+  // Generate an array of [{
+  //   permission: 'read' | 'write' | 'root' | ... based on scope structure,
+  //   scope: 'scope'
+  // }]
   const castScopes = uniqueScopes
     .filter((s) => Object.getOwnPropertySymbols(SCOPES).includes(scope(s)))
     .map((s) => ({
@@ -42,10 +50,14 @@ export const getAppScopesMethod = async ({
       permission: s.split('#')[1] ?? 'root',
     }))
 
+  // Get a list of unique permissions
   const uniquePermissions = castScopes
     .map((cs) => cs.permission)
     .filter((v, i, a) => a.indexOf(v) === i)
 
+  // Generate array with
+  // permission and list of scopes
+  // associated to that permission
   const mappedTokens: {
     permission: string
     scopes: string[]
