@@ -47,7 +47,7 @@ export const getAppScopesMethod = async ({
     .filter((s) => Object.getOwnPropertySymbols(SCOPES).includes(scope(s)))
     .map((s) => ({
       name: SCOPES[scope(s)].name,
-      permission: s.split('#')[1] ?? 'root',
+      permission: s.split('#')[1] ?? 'claims',
     }))
 
   // Get a list of unique permissions
