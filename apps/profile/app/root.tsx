@@ -96,9 +96,14 @@ export const loader: LoaderFunction = async ({ request }) => {
     if (!fetchedLoggedInProfile)
       throw new Error('Could not retrieve logged in use profile.')
 
-    loggedInUserProfile = fetchedLoggedInProfile
+    loggedInUserProfile = {
+      ...fetchedLoggedInProfile.profile,
+      links: fetchedLoggedInProfile.links,
+      gallery: fetchedLoggedInProfile.gallery,
+      addresses: fetchedLoggedInProfile.connectedAddresses,
+    }
 
-    basePath = getRedirectUrlForProfile(fetchedLoggedInProfile)
+    basePath = getRedirectUrlForProfile(loggedInUserProfile)
   }
 
   return json({
