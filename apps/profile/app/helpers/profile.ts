@@ -16,7 +16,7 @@ export const getAccountProfile = async ({
   const galaxyClient = await getGalaxyClient()
 
   const profileRes = await galaxyClient.getProfile(
-    accountURN ? { accountURN } : undefined,
+    accountURN ? { targetAccountURN: accountURN } : undefined,
     getAuthzHeaderConditionallyFromToken(jwt)
   )
 

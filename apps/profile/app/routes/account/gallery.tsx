@@ -224,7 +224,7 @@ const Gallery = () => {
   useEffect(() => {
     ;(async () => {
       const addressQueryParams = new URLSearchParams({
-        addressURN: cryptoAddresses[0].baseUrn,
+        accountURN: accountURN,
       })
       const request = `/nfts/gallery?${addressQueryParams.toString()}`
 
