@@ -1,13 +1,11 @@
 import { z } from 'zod'
-import { decodeJwt } from 'jose'
-
-import type { AccessJWTPayload } from '@kubelt/types/access'
 
 import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'
 import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
 
 import { EDGE_AUTHORIZES } from '../../constants'
+import { AccountURNSpace } from '@kubelt/urns/account'
 
 export const RevokeAuthorizationsMethodInput = z.object({
   accountURN: AccountURNInput,
@@ -54,7 +52,7 @@ export const revokeAuthorizationsMethod: RevokeAuthorizationsMethod = async ({
     throw new Error('invalid client credentials')
   }
 
-  const name = `${accountURN}@${clientId}`
+  const name = `${AccountURNSpace.decode(accountURN)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
 
   const edgesResult = await ctx.edgesClient?.getEdges.query({
