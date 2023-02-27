@@ -15,6 +15,9 @@ export const setLinksMethod = async ({
   input: z.infer<typeof SetLinksInput>
   ctx: Context
 }): Promise<void> => {
-  await ctx.account?.class.setLinks(input.links)
+  // if user is calling this method with the same accountURN in jwt
+  if (ctx.accountURN === input.name) {
+    await ctx.account?.class.setLinks(input.links)
+  }
   return
 }

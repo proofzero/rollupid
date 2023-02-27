@@ -60,16 +60,11 @@ export default /* GraphQL */ `
   }
 
   type Query {
-    profile: Profile
-    links: [Link!]
-    gallery: [Gallery!]
-    connectedAddresses: [Node!]
-    connectedAddressesFromAccount(accountURN: URN!): [Node!]
+    profile(targetAccountURN: URN): Profile
+    links(targetAccountURN: URN): [Link!]
+    gallery(targetAccountURN: URN): [Gallery!]
+    connectedAddresses(targetAccountURN: URN): [Node!]
     authorizedApps: [App]
-    profileFromAddress(addressURN: URN!): Profile
-    linksFromAddress(addressURN: URN!): [Link!]
-    galleryFromAddress(addressURN: URN!): [Gallery!]
-    connectedAddressesFromAddress(addressURN: URN!): [Node!]
   }
 
   type Mutation {

@@ -44,7 +44,7 @@ import NoCryptoAddresses from '~/components/accounts/NoCryptoAddresses'
 // Other helpers
 import { getProfileSession } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
-import type { Nft, Profile } from '@kubelt/galaxy-client'
+import type { Profile, Node } from '@kubelt/galaxy-client'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import type { decoratedNft } from '~/helpers/nfts'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
@@ -113,7 +113,7 @@ export const action: ActionFunction = async ({ request }) => {
  * you may take a quick look here:
  * https://codesandbox.io/s/dndkit-sortable-image-grid-py6ve?file=/src/App.jsx*/
 
-const Nft = forwardRef(
+const NFT = forwardRef(
   ({ nft, url, index, faded, isDragging, style, ...props }: any, ref) => {
     /**
      * It re-renders this small component quite often
@@ -167,7 +167,7 @@ const SortableNft = (props: any) => {
   }
 
   return (
-    <Nft
+    <NFT
       nft={props.nft}
       ref={setNodeRef}
       style={style}
@@ -184,7 +184,7 @@ const Gallery = () => {
   const { profile, cryptoAddresses, accountURN } = useOutletContext<{
     profile: Profile
     accountURN: string
-    cryptoAddresses: string[]
+    cryptoAddresses: Node[]
   }>()
 
   const { displayName } = profile
@@ -194,7 +194,7 @@ const Gallery = () => {
 
   const [initialState, setInitialState] = useState([])
 
-  const [curatedNfts, setCuratedNfts] = useState([] as Nft[])
+  const [curatedNfts, setCuratedNfts] = useState([] as decoratedNft[])
   const [curatedNftsSet, setCuratedNftsSet] = useState(new Set([] as string[]))
   const [isFormChanged, setFormChanged] = useState(false)
 
@@ -208,12 +208,11 @@ const Gallery = () => {
   const curatedNftsLinks = curatedNfts.map((nft) => nft.url)
 
   // REACT HOOKS FOR DISPLAYING AND SORTING GALLERY
-
   useEffect(() => {
     if (JSON.stringify(curatedNfts) !== JSON.stringify(initialState)) {
       setFormChanged(true)
     }
-  }, [curatedNfts])
+  }, [curatedNfts, initialState])
 
   useEffect(() => {
     if (transition.type === 'actionReload') {
@@ -225,7 +224,7 @@ const Gallery = () => {
   useEffect(() => {
     ;(async () => {
       const addressQueryParams = new URLSearchParams({
-        owner: accountURN,
+        addressURN: cryptoAddresses[0].baseUrn,
       })
       const request = `/nfts/gallery?${addressQueryParams.toString()}`
 
@@ -376,7 +375,7 @@ const Gallery = () => {
                 setCuratedNfts([...curatedNfts, nft])
                 setIsOpen(false)
               } else {
-                toast('This NFT is already in your list', {
+                toast('This NFT is already in your gallery', {
                   icon: '🤔',
                 })
               }
@@ -390,7 +389,10 @@ const Gallery = () => {
             onDragEnd={handleDragEnd}
             onDragCancel={handleDragCancel}
           >
-            <SortableContext items={curatedNfts} strategy={rectSortingStrategy}>
+            <SortableContext
+              items={Array.from(curatedNftsSet)}
+              strategy={rectSortingStrategy}
+            >
               <div
                 style={{
                   display: 'grid',
@@ -458,7 +460,7 @@ const Gallery = () => {
               }}
             >
               {activeId ? (
-                <Nft
+                <NFT
                   url={activeId}
                   index={curatedNftsLinks.indexOf(activeId)}
                 />
@@ -476,7 +478,6 @@ const Gallery = () => {
           an absolute relative position
           div below has relative - this way this button sticks to 
           bottom right
-
           This div with h-[4rem] prevents everything from overlapping with
           div with absolute position below  */}
           <div className="h-[4rem]" />

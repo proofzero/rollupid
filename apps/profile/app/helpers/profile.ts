@@ -1,25 +1,32 @@
-import type { Profile, Link, Gallery, Node } from '@kubelt/galaxy-client'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import type { AddressURN } from '@kubelt/urns/address'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import { getGalaxyClient } from '~/helpers/clients'
 import { imageFromAddressType } from './icons'
+import type { FullProfile } from '~/types'
+import type { AccountURN } from '@kubelt/urns/account'
 
-export const getAccountProfile = async (jwt: string) => {
+export const getAccountProfile = async ({
+  jwt,
+  accountURN,
+}: {
+  jwt?: string
+  accountURN?: AccountURN
+}) => {
   const galaxyClient = await getGalaxyClient()
 
   const profileRes = await galaxyClient.getProfile(
-    undefined,
+    accountURN ? { accountURN } : undefined,
     getAuthzHeaderConditionallyFromToken(jwt)
   )
 
   const { profile, links, gallery, connectedAddresses } = profileRes
-  return { profile, links, gallery, connectedAddresses } as {
-    profile: Profile
-    links: Link[]
-    gallery: Gallery[]
-    connectedAddresses: Node[]
-  }
+  return {
+    ...profile,
+    links,
+    gallery,
+    addresses: connectedAddresses,
+  } as FullProfile
 }
 
 export const getAuthorizedApps = async (jwt: string) => {

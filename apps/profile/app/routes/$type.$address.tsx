@@ -19,7 +19,7 @@ import {
   HiOutlineQuestionMarkCircle,
 } from 'react-icons/hi'
 
-import { getProfileSession } from '~/utils/session.server'
+import { getProfileSession, parseJwt } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
 import { ogImageFromProfile } from '~/helpers/ogImage'
 
@@ -29,7 +29,6 @@ import {
   gatewayFromIpfs,
   getAuthzHeaderConditionallyFromToken,
 } from '@kubelt/utils'
-import type { AddressURN } from '@kubelt/urns/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
 import { Cover } from '~/components/profile/cover/Cover'
@@ -37,7 +36,6 @@ import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
 
 import defaultOG from '~/assets/Rollup_profiles_OG.png'
-import { getRedirectUrlForProfile } from '~/utils/redirects.server'
 import {
   CryptoAddressType,
   NodeType,
@@ -57,30 +55,30 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const session = await getProfileSession(request)
   if (!address) throw new Error('No address provided in URL')
 
-  // redirect from accountURN to first addressURNs
-  if (type === 'p') {
-    const { addresses } = await galaxyClient.getConnectedAddressesFromAccount({
-      accountURN: AccountURNSpace.urn(address),
-    })
+  // redirect from any addressURN to its addressURNs
+  if (type === 'a') {
+    const { account }: { account: AccountURN } =
+      await galaxyClient.getAccountURN({
+        addressURN: AddressURNSpace.urn(address),
+      })
 
-    return redirect(
-      `/a/${AddressURNSpace.decode(addresses?.[0].baseUrn as AddressURN)}`
-    )
+    return redirect(`/p/${AccountURNSpace.decode(account)}`)
   }
 
-  const urn = AddressURNSpace.urn(address)
+  const accountURN = AccountURNSpace.urn(address) as AccountURN
 
   // if not handle is this let's assume this is an idref
   let profile, jwt
   try {
     const user = session.get('user')
     jwt = user?.accessToken
-    profile = await galaxyClient.getProfileFromAddress(
+    profile = await galaxyClient.getProfile(
       {
-        addressURN: urn,
+        targetAccountURN: accountURN,
       },
       getAuthzHeaderConditionallyFromToken(jwt)
     )
+    console.log({ profile })
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })
@@ -93,14 +91,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       addresses: profile.connectedAddresses || [],
     }
 
-    if (type === 'a') {
-      const redirectUrl = getRedirectUrlForProfile(profile)
-      const originalRoute = `/${type}/${address}`
-      //Redirect if we've found a better route
-      if (redirectUrl && originalRoute !== redirectUrl)
-        return redirect(redirectUrl)
-      //otherwise stay on current route
-    } else if (type === 'u') {
+    if (type === 'u') {
       //TODO: galaxy search by handle
       console.error('Not implemented')
     } else {
@@ -115,7 +106,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const splittedUrl = request.url.split('/')
     const path = splittedUrl[splittedUrl.length - 1]
 
-    const matches = profile.addresses?.filter((addr) => urn === addr.baseUrn)
+    // Check if the accountURN in jwt matches with accountURN in URL
+    const isOwner = parseJwt(jwt).sub === accountURN
 
     const cryptoAddresses = profile.addresses?.filter(
       (addr) => addr.rc.node_type === NodeType.Crypto
@@ -125,14 +117,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       uname: profile.handle || address,
       ogImage: ogImage || defaultOG,
       profile,
-      addressURN: urn,
+      accountURN,
       cryptoAddresses,
       path,
-      isOwner: jwt && matches && matches.length > 0 ? true : false,
+      isOwner,
     })
   } catch (e) {
     console.log(
-      `Galaxy did not return a profile for address ${urn}. Moving on.`
+      `Galaxy did not return a profile for address ${accountURN}. Moving on.`
     )
     throw new Response('No address found', { status: 404 })
   }
@@ -173,13 +165,13 @@ export const meta: MetaFunction = ({
 const UserAddressLayout = () => {
   //TODO: this needs to be optimized so profile isn't fetched from the loader
   //but used from context alone.
-  const { profile, cryptoAddresses, path, isOwner, addressURN } =
+  const { profile, cryptoAddresses, path, isOwner, accountURN } =
     useLoaderData<{
       profile: FullProfile
       cryptoAddresses: Node[]
       path: string
       isOwner: boolean
-      addressURN: string
+      accountURN: string
     }>()
 
   const ctx = useOutletContext<{
@@ -188,7 +180,6 @@ const UserAddressLayout = () => {
     // from root.tsx
     // but if not logged in
     // is null...
-    accountURN: AccountURN
   }>()
 
   const finalProfile = profile ?? ctx.profile
@@ -305,10 +296,9 @@ const UserAddressLayout = () => {
     >
       <Outlet
         context={{
-          addressURN: addressURN,
+          accountURN,
           profile: finalProfile,
           cryptoAddresses,
-          path,
           isOwner,
         }}
       />
