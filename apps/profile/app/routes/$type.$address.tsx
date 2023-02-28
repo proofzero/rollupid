@@ -106,7 +106,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const path = splittedUrl[splittedUrl.length - 1]
 
     // Check if the accountURN in jwt matches with accountURN in URL
-    const isOwner = parseJwt(jwt).sub === accountURN
+    const isOwner = jwt ? parseJwt(jwt).sub === accountURN : false
 
     const cryptoAddresses = profile.addresses?.filter(
       (addr) => addr.rc.node_type === NodeType.Crypto
