@@ -1,6 +1,9 @@
-import * as jose from 'jose'
+import { decodeJwt } from 'jose'
+
+import { AccountURNSpace } from '@kubelt/urns/account'
+import { AccessJWTPayload } from '@kubelt/types/access'
 import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
-import { AccessURNSpace } from '@kubelt/urns/access'
+
 import { initAccessNodeByName } from '../../nodes'
 import { Context } from '../../context'
 
@@ -11,16 +14,21 @@ export const setAccessNode: BaseMiddlewareFunction<Context> = async ({
   // Extract access node ID from JWT `iss` claim. The Access durable
   // object is the token issuer.
   if (!ctx.token) throw new Error('No token found in middleware context')
-  const jwt = jose.decodeJwt(ctx.token)
 
-  if (!jwt.iss) {
-    throw new Error('missing JWT "iss" claim')
-  }
-  if (!AccessURNSpace.is(jwt.iss)) {
-    throw new Error(`invalid accessURN: ${jwt.iss}`)
+  const jwt = decodeJwt(ctx.token) as AccessJWTPayload
+  const account = jwt.sub
+  const [clientId] = jwt.aud
+
+  if (!clientId) {
+    throw new Error('missing client id in the aud claim')
   }
 
-  const accessNode = await initAccessNodeByName(jwt.iss, ctx.Access)
+  if (!AccountURNSpace.is(account)) {
+    throw new Error(`missing account in the sub claim`)
+  }
+
+  const name = `${AccountURNSpace.decode(account)}@${clientId}`
+  const accessNode = await initAccessNodeByName(name, ctx.Access)
 
   if (!accessNode) {
     throw new Error('unable to get access node client')

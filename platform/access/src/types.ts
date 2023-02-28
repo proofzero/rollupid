@@ -24,6 +24,7 @@ export interface Environment {
   EDGES: Fetcher
   Starbase: Fetcher
   Account: Fetcher
+  INTERNAL_JWT_ISS: string
 }
 
 export type AuthorizationParameters = {
