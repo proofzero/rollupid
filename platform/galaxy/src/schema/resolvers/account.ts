@@ -13,7 +13,6 @@ import {
   getConnectedCryptoAddresses,
   temporaryConvertToPublic,
   validOwnership,
-  getCredentials,
 } from './utils'
 
 import { Resolvers } from './typedefs'
@@ -34,14 +33,11 @@ const accountResolvers: Resolvers = {
     ) => {
       console.log(`galaxy:profile: getting profile for account: ${accountURN}`)
 
-      const { finalAccountURN, finalJWT } = getCredentials({
-        accountURN,
-        targetAccountURN,
-        jwt,
-      })
+      const finalAccountURN = targetAccountURN || accountURN
+
       const accountClient = createAccountClient(
         env.Account,
-        getAuthzHeaderConditionallyFromToken(finalJWT)
+        getAuthzHeaderConditionallyFromToken(jwt)
       )
 
       let accountProfile = await accountClient.getProfile.query({
@@ -96,15 +92,11 @@ const accountResolvers: Resolvers = {
     ) => {
       console.log(`galaxy:links: getting links for account: ${accountURN}`)
 
-      const { finalAccountURN, finalJWT } = getCredentials({
-        accountURN,
-        targetAccountURN,
-        jwt,
-      })
+      const finalAccountURN = targetAccountURN || accountURN
 
       const accountClient = createAccountClient(
         env.Account,
-        getAuthzHeaderConditionallyFromToken(finalJWT)
+        getAuthzHeaderConditionallyFromToken(jwt)
       )
       let links = await accountClient.getLinks.query({
         account: finalAccountURN,
@@ -120,21 +112,17 @@ const accountResolvers: Resolvers = {
     ) => {
       console.log(`galaxy:gallery: getting gallery for account: ${accountURN}`)
 
-      const { finalAccountURN, finalJWT } = getCredentials({
-        accountURN,
-        targetAccountURN,
-        jwt,
-      })
+      const finalAccountURN = targetAccountURN || accountURN
 
       const accountClient = createAccountClient(
         env.Account,
-        getAuthzHeaderConditionallyFromToken(finalJWT)
+        getAuthzHeaderConditionallyFromToken(jwt)
       )
 
       const connectedAddresses = await getConnectedCryptoAddresses({
         accountURN: finalAccountURN,
         Account: env.Account,
-        jwt: finalJWT,
+        jwt: jwt,
       })
 
       const gallery = await accountClient.getGallery.query({
@@ -167,16 +155,12 @@ const accountResolvers: Resolvers = {
       { targetAccountURN }: { targetAccountURN?: AccountURN },
       { env, accountURN, jwt }: ResolverContext
     ) => {
-      const { finalAccountURN, finalJWT } = getCredentials({
-        accountURN,
-        targetAccountURN,
-        jwt,
-      })
+      const finalAccountURN = targetAccountURN || accountURN
 
       const addresses = await getConnectedAddresses({
         accountURN: finalAccountURN,
         Account: env.Account,
-        jwt: finalJWT,
+        jwt,
       })
 
       return addresses
