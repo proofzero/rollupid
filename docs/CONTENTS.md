@@ -12,6 +12,7 @@
 ## Guides
 
 - [Adding Users to your Database](guides/connecting-to-your-database.md)
+- [Authenticating Users in your Database](guides/authenticating-users-in-your-app.md)
 
 ## Platform
 
