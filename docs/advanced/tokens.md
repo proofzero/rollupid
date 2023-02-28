@@ -6,10 +6,9 @@ description: How to use OAuth2 tokens
 
 There are two types of tokens that are related to identity: ID tokens and access tokens.
 
-ID tokens
-ID tokens are JSON web tokens (JWTs) meant for use by the application only. For example, if there's an app that uses Google to log in users and to sync their calendars, Google sends an ID token to the app that includes information about the user. The app then parses the token's contents and uses the information (including details like name and profile picture) to customize the user experience.
+## ID tokens
 
-Be sure to validate ID tokens before using the information it contains. You can use a library to help with this task.
+ID tokens are JSON web tokens (JWTs) meant for use by the application only. For example, if there's an app that uses Google to log in users and to sync their calendars, Google sends an ID token to the app that includes information about the user. The app then parses the [token's contents](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims) and uses the information (including details like name and profile picture) to customize the user experience.
 
 Do not use ID tokens to gain access to an API. Each token contains information for the intended audience (which is usually the recipient). According to the OpenID Connect specification, the audience of the ID token (indicated by the aud claim) must be the client ID of the application making the authentication request. If this is not the case, you should not trust the token.
 
@@ -20,17 +19,13 @@ to configure this snippet with your account
 ```json
 {
   "iss": "http://{yourDomain}/",
-  "sub": "auth0|123456",
+  "sub": "{userId}",
   "aud": "{yourClientId}",
   "exp": 1311281970,
   "iat": 1311280970,
   "name": "Jane Doe",
-  "given_name": "Jane",
-  "family_name": "Doe",
-  "gender": "female",
-  "birthdate": "0000-10-31",
-  "email": "janedoe@example.com",
-  "picture": "http://example.com/janedoe/me.jpg"
+  "picture": "http://example.com/janedoe/me.jpg",
+  "email": "janedoe@example.com"
 }
 ```
 
