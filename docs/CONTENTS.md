@@ -23,6 +23,7 @@
 ## Advanced
 
 - [Tokens](advanced/tokens.md)
+- [Create Custom Claims](advanced/custom-claims.md)
 - [Migration Guide](advanced/migration-guide.md)
 
 ## Reference
