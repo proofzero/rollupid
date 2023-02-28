@@ -232,3 +232,20 @@ export const getConnectedCryptoAddresses = async ({
     )
     .map((address) => address.qc.alias.toLowerCase())
 }
+
+export const getCredentials = ({
+  accountURN,
+  targetAccountURN,
+  jwt,
+}: {
+  accountURN?: AccountURN
+  targetAccountURN?: AccountURN
+  jwt?: string
+}) => {
+  const finalAccountURN = targetAccountURN
+    ? targetAccountURN
+    : (accountURN as AccountURN)
+  const finalJWT = accountURN === finalAccountURN ? jwt : undefined
+
+  return { finalAccountURN, finalJWT }
+}

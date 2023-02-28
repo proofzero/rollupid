@@ -78,7 +78,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       },
       getAuthzHeaderConditionallyFromToken(jwt)
     )
-    console.log({ profile })
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })

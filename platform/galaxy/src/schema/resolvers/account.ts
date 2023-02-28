@@ -13,6 +13,7 @@ import {
   getConnectedCryptoAddresses,
   temporaryConvertToPublic,
   validOwnership,
+  getCredentials,
 } from './utils'
 
 import { Resolvers } from './typedefs'
@@ -28,14 +29,16 @@ const accountResolvers: Resolvers = {
   Query: {
     profile: async (
       _parent: any,
-      { targetAccountURN }: { targetAccountURN: AccountURN },
+      { targetAccountURN }: { targetAccountURN?: AccountURN },
       { env, accountURN, jwt }: ResolverContext
     ) => {
       console.log(`galaxy:profile: getting profile for account: ${accountURN}`)
 
-      const finalAccountURN = targetAccountURN ? targetAccountURN : accountURN
-      const finalJWT = accountURN === finalAccountURN ? jwt : undefined
-
+      const { finalAccountURN, finalJWT } = getCredentials({
+        accountURN,
+        targetAccountURN,
+        jwt,
+      })
       const accountClient = createAccountClient(
         env.Account,
         getAuthzHeaderConditionallyFromToken(finalJWT)
@@ -88,13 +91,16 @@ const accountResolvers: Resolvers = {
 
     links: async (
       _parent: any,
-      { targetAccountURN }: { targetAccountURN: AccountURN },
+      { targetAccountURN }: { targetAccountURN?: AccountURN },
       { env, accountURN, jwt }: ResolverContext
     ) => {
       console.log(`galaxy:links: getting links for account: ${accountURN}`)
 
-      const finalAccountURN = targetAccountURN ? targetAccountURN : accountURN
-      const finalJWT = accountURN === finalAccountURN ? jwt : undefined
+      const { finalAccountURN, finalJWT } = getCredentials({
+        accountURN,
+        targetAccountURN,
+        jwt,
+      })
 
       const accountClient = createAccountClient(
         env.Account,
@@ -109,13 +115,16 @@ const accountResolvers: Resolvers = {
 
     gallery: async (
       _parent: any,
-      { targetAccountURN }: { targetAccountURN: AccountURN },
+      { targetAccountURN }: { targetAccountURN?: AccountURN },
       { env, accountURN, jwt }: ResolverContext
     ) => {
       console.log(`galaxy:gallery: getting gallery for account: ${accountURN}`)
 
-      const finalAccountURN = targetAccountURN ? targetAccountURN : accountURN
-      const finalJWT = accountURN === finalAccountURN ? jwt : undefined
+      const { finalAccountURN, finalJWT } = getCredentials({
+        accountURN,
+        targetAccountURN,
+        jwt,
+      })
 
       const accountClient = createAccountClient(
         env.Account,
@@ -158,8 +167,11 @@ const accountResolvers: Resolvers = {
       { targetAccountURN }: { targetAccountURN?: AccountURN },
       { env, accountURN, jwt }: ResolverContext
     ) => {
-      const finalAccountURN = targetAccountURN ? targetAccountURN : accountURN
-      const finalJWT = accountURN === finalAccountURN ? jwt : undefined
+      const { finalAccountURN, finalJWT } = getCredentials({
+        accountURN,
+        targetAccountURN,
+        jwt,
+      })
 
       const addresses = await getConnectedAddresses({
         accountURN: finalAccountURN,

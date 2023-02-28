@@ -354,148 +354,151 @@ const Gallery = () => {
             setFormChanged(false)
           }}
         >
-          <PfpNftModal
-            nfts={loadedNfts}
-            collection={collection}
-            setCollection={setCollection}
-            displayName={displayName as string}
-            loadingConditions={
-              refresh || loading || modalFetcher.state !== 'idle'
-            }
-            text={'Pick curated NFTs'}
-            isOpen={isOpen}
-            pfp={profile?.pfp?.image as string}
-            handleClose={() => {
-              setIsOpen(false)
-            }}
-            handleSelectedNft={(nft: any) => {
-              const ID = nft.contract.address + nft.tokenId
-              if (!curatedNftsSet.has(ID)) {
-                setCuratedNftsSet(new Set([...curatedNftsSet, ID]))
-                setCuratedNfts([...curatedNfts, nft])
-                setIsOpen(false)
-              } else {
-                toast('This NFT is already in your gallery', {
-                  icon: '🤔',
-                })
+          <fieldset disabled={transition.state === 'loading'}>
+            <PfpNftModal
+              nfts={loadedNfts}
+              collection={collection}
+              setCollection={setCollection}
+              displayName={displayName as string}
+              loadingConditions={
+                refresh || loading || modalFetcher.state !== 'idle'
               }
-            }}
-          />
+              text={'Pick curated NFTs'}
+              isOpen={isOpen}
+              pfp={profile?.pfp?.image as string}
+              handleClose={() => {
+                setIsOpen(false)
+              }}
+              handleSelectedNft={(nft: any) => {
+                const ID = nft.contract.address + nft.tokenId
+                if (!curatedNftsSet.has(ID)) {
+                  setCuratedNftsSet(new Set([...curatedNftsSet, ID]))
+                  setCuratedNfts([...curatedNfts, nft])
+                  setIsOpen(false)
+                } else {
+                  toast('This NFT is already in your gallery', {
+                    icon: '🤔',
+                  })
+                }
+              }}
+            />
 
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            onDragCancel={handleDragCancel}
-          >
-            <SortableContext
-              items={Array.from(curatedNftsSet)}
-              strategy={rectSortingStrategy}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+              onDragCancel={handleDragCancel}
             >
-              <div
-                style={{
-                  display: 'grid',
-                  gridGap: 10,
-                  padding: 10,
-                }}
-                className="grid-cols-2 md:grid-cols-3 lg:grid-cols-4
-            flex flex-col justify-center items-center"
+              <SortableContext
+                items={Array.from(curatedNftsSet)}
+                strategy={rectSortingStrategy}
               >
-                {galleryFetcher.state === 'loading' && !curatedNfts.length && (
-                  <LoadingGridSquaresGallery numberOfCells={30} />
-                )}
-                {curatedNfts.map((nft: any, i: number) => {
-                  return (
-                    <div
-                      className="relative group"
-                      key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
-                    >
-                      <SortableNft url={nft.url} index={i} nft={nft} />
-                      <button
-                        className="absolute right-3 bottom-3 opacity-50 rounded-full
+                <div
+                  style={{
+                    display: 'grid',
+                    gridGap: 10,
+                    padding: 10,
+                  }}
+                  className="grid-cols-2 md:grid-cols-3 lg:grid-cols-4
+            flex flex-col justify-center items-center"
+                >
+                  {galleryFetcher.state === 'loading' &&
+                    !curatedNfts.length && (
+                      <LoadingGridSquaresGallery numberOfCells={30} />
+                    )}
+                  {curatedNfts.map((nft: any, i: number) => {
+                    return (
+                      <div
+                        className="relative group"
+                        key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
+                      >
+                        <SortableNft url={nft.url} index={i} nft={nft} />
+                        <button
+                          className="absolute right-3 bottom-3 opacity-50 rounded-full
                         h-[47px] w-[47px] items-center justify-center bg-black
                         hidden group-hover:flex hover:opacity-100 transition-opacity"
-                        onClick={() => {
-                          setCuratedNfts(
-                            curatedNfts.filter((nft, j: number) => j !== i)
-                          )
-                        }}
-                      >
-                        <TbTrash size={25} className="text-white" />
-                      </button>
-                    </div>
-                  )
-                })}
-                <button
-                  type="button"
-                  className={`w-full h-full
+                          onClick={() => {
+                            setCuratedNfts(
+                              curatedNfts.filter((nft, j: number) => j !== i)
+                            )
+                          }}
+                        >
+                          <TbTrash size={25} className="text-white" />
+                        </button>
+                      </div>
+                    )
+                  })}
+                  <button
+                    type="button"
+                    className={`w-full h-full
               bg-gray-50 hover:bg-gray-100 transition-colors
               rounded-lg transition-opacity ${
                 activeId ? 'opacity-0' : 'opacity-100'
               }`}
-                  disabled={!cryptoAddresses?.length}
-                  onClick={() => setIsOpen(!!cryptoAddresses?.length)}
-                >
-                  <div
-                    className="flex flex-col justify-center items-center h-full
+                    disabled={!cryptoAddresses?.length}
+                    onClick={() => setIsOpen(!!cryptoAddresses?.length)}
+                  >
+                    <div
+                      className="flex flex-col justify-center items-center h-full
                 min-h-[12rem] md:min-h-[16rem] lg:min-h-[14rem]
                 text-gray-400"
-                  >
-                    <HiOutlinePlusCircle
-                      size={60}
-                      fontWeight={100}
-                      className="mb-2 font-extralight"
-                    />
-                    <Text>Add NFT</Text>
-                  </div>
-                </button>
-              </div>
-            </SortableContext>
-            <DragOverlay
-              adjustScale={true}
-              dropAnimation={{
-                duration: 200,
-                easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
-              }}
-            >
-              {activeId ? (
-                <NFT
-                  url={activeId}
-                  index={curatedNftsLinks.indexOf(activeId)}
-                />
-              ) : null}
-            </DragOverlay>
-          </DndContext>
+                    >
+                      <HiOutlinePlusCircle
+                        size={60}
+                        fontWeight={100}
+                        className="mb-2 font-extralight"
+                      />
+                      <Text>Add NFT</Text>
+                    </div>
+                  </button>
+                </div>
+              </SortableContext>
+              <DragOverlay
+                adjustScale={true}
+                dropAnimation={{
+                  duration: 200,
+                  easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+                }}
+              >
+                {activeId ? (
+                  <NFT
+                    url={activeId}
+                    index={curatedNftsLinks.indexOf(activeId)}
+                  />
+                ) : null}
+              </DragOverlay>
+            </DndContext>
 
-          <input
-            type="hidden"
-            name="gallery"
-            value={JSON.stringify(curatedNfts)}
-          />
+            <input
+              type="hidden"
+              name="gallery"
+              value={JSON.stringify(curatedNfts)}
+            />
 
-          {/* Form where this button is used should have 
+            {/* Form where this button is used should have 
           an absolute relative position
           div below has relative - this way this button sticks to 
           bottom right
           This div with h-[4rem] prevents everything from overlapping with
           div with absolute position below  */}
-          <div className="h-[4rem]" />
-          <div className="absolute bottom-0 right-0">
-            <SaveButton
-              isFormChanged={isFormChanged}
-              discardFn={() => {
-                setCuratedNfts(initialState)
-                setCuratedNftsSet(
-                  new Set(
-                    initialState.map(
-                      (nft: any) => nft.contract.address + nft.tokenId
+            <div className="h-[4rem]" />
+            <div className="absolute bottom-0 right-0">
+              <SaveButton
+                isFormChanged={isFormChanged}
+                discardFn={() => {
+                  setCuratedNfts(initialState)
+                  setCuratedNftsSet(
+                    new Set(
+                      initialState.map(
+                        (nft: any) => nft.contract.address + nft.tokenId
+                      )
                     )
                   )
-                )
-              }}
-            />
-          </div>
+                }}
+              />
+            </div>
+          </fieldset>
         </Form>
       ) : (
         <NoCryptoAddresses

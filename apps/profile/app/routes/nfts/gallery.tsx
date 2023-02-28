@@ -12,8 +12,7 @@ export const loader: LoaderFunction = async (args) => {
    * searchParams - from `account/gallery?owner=0x123..`
    */
 
-  const accountURN =
-    srcUrl.searchParams.get('accountURN') || args.params.profile
+  const accountURN = srcUrl.searchParams.get('accountURN')
 
   const { gallery } = await getGalleryWithMetadata(accountURN as AccountURN)
 

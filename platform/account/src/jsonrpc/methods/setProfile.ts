@@ -17,6 +17,7 @@ export const setProfileMethod = async ({
   ctx: Context
 }): Promise<void> => {
   // if user is calling this method with the same accountURN in jwt
+  // TODO: validate JWT in "ValidateJWT" middleware
   if (ctx.accountURN === input.name) {
     await ctx.account?.class.setProfile(input.profile)
   }
@@ -32,10 +33,10 @@ export const setProfileMethod = async ({
       qcomps
     )
 
-    //TODO make this asynchornous so user's don't need to wait
-    //for the second leg of IO to complete
     const edge = ctx.edges
-    await edge.updateNode.mutate({ urnOfNode: enhancedUrn })
+    // Don't need to await it
+    // Fire and go
+    edge.updateNode.mutate({ urnOfNode: enhancedUrn })
   }
   return
 }

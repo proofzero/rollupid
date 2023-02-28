@@ -16,8 +16,11 @@ export const setLinksMethod = async ({
   ctx: Context
 }): Promise<void> => {
   // if user is calling this method with the same accountURN in jwt
+  // TODO: validate JWT in "ValidateJWT" middleware
   if (ctx.accountURN === input.name) {
-    await ctx.account?.class.setLinks(input.links)
+    // Don't need to await it
+    // Fire and go
+    ctx.account?.class.setLinks(input.links)
   }
   return
 }
