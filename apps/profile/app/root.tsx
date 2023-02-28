@@ -39,7 +39,7 @@ import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
 import * as gtag from '~/utils/gtags.client'
 import { getProfileSession } from './utils/session.server'
-import { getRedirectUrlForProfile } from './utils/redirects.server'
+import { AccountURNSpace } from '@kubelt/urns/account'
 import { parseJwt } from './utils/session.server'
 import { getAccountProfile } from './helpers/profile'
 import type { AccountURN } from '@kubelt/urns/account'
@@ -98,7 +98,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
     loggedInUserProfile = fetchedLoggedInProfile
 
-    basePath = getRedirectUrlForProfile(fetchedLoggedInProfile)
+    basePath = `/p/${AccountURNSpace.decode(accountURN)}`
   }
 
   return json({
