@@ -37,12 +37,14 @@ type AccessTokenOptions = {
   account: AccountURN
   clientId: string
   expirationTime: string
+  issuer: string
   scope: Scope
 }
 
 type RefreshTokenOptions = {
   account: AccountURN
   clientId: string
+  issuer: string
   scope: Scope
 }
 
@@ -50,6 +52,7 @@ type IdTokenOptions = {
   account: AccountURN
   clientId: string
   expirationTime: string
+  issuer: string
   idTokenProfile: IdTokenProfile
 }
 
@@ -69,7 +72,7 @@ export default class Access extends DOProxy {
   }
 
   async generateAccessToken(options: AccessTokenOptions): Promise<string> {
-    const { account, clientId, expirationTime, scope } = options
+    const { account, clientId, expirationTime, issuer, scope } = options
     const { alg } = JWT_OPTIONS
     const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
     const { privateKey: key } = await this.getJWTSigningKeyPair()
@@ -78,13 +81,14 @@ export default class Access extends DOProxy {
       .setExpirationTime(expirationTime)
       .setAudience([clientId])
       .setIssuedAt()
+      .setIssuer(issuer)
       .setJti(jti)
       .setSubject(account)
       .sign(key)
   }
 
   async generateRefreshToken(options: RefreshTokenOptions): Promise<string> {
-    const { account, clientId, scope } = options
+    const { account, clientId, issuer, scope } = options
     const { alg } = JWT_OPTIONS
     const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
     const { privateKey: key } = await this.getJWTSigningKeyPair()
@@ -92,6 +96,7 @@ export default class Access extends DOProxy {
       .setProtectedHeader({ alg })
       .setAudience([clientId])
       .setIssuedAt()
+      .setIssuer(issuer)
       .setJti(jti)
       .setSubject(account)
       .sign(key)
@@ -101,7 +106,8 @@ export default class Access extends DOProxy {
   }
 
   async generateIdToken(options: IdTokenOptions): Promise<string> {
-    const { account, clientId, expirationTime, idTokenProfile } = options
+    const { account, clientId, expirationTime, idTokenProfile, issuer } =
+      options
     const { alg } = JWT_OPTIONS
     const { privateKey: key } = await this.getJWTSigningKeyPair()
     return new SignJWT(idTokenProfile)
@@ -109,6 +115,7 @@ export default class Access extends DOProxy {
       .setExpirationTime(expirationTime)
       .setAudience([clientId])
       .setIssuedAt()
+      .setIssuer(issuer)
       .setSubject(account)
       .sign(key)
   }

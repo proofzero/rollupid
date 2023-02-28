@@ -128,12 +128,14 @@ const handleAuthenticationCode: ExchangeTokenMethod<
   await accessNode.storage.put({ account, clientId: 'rollup' })
 
   const { expirationTime } = AUTHENTICATION_TOKEN_OPTIONS
+  const issuer = ctx.INTERNAL_JWT_ISS
   const scope: Scope = (await authorizationNode.storage.get('scope')) || []
   return {
     accessToken: await accessNode.class.generateAccessToken({
       account,
       clientId,
       expirationTime,
+      issuer,
       scope,
     }),
   }
@@ -170,6 +172,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   const accessNode = await initAccessNodeByName(name, ctx.Access)
   const idTokenProfile = await getIdTokenProfileFromAccount(account, ctx)
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
+  const issuer = ctx.INTERNAL_JWT_ISS
 
   await accessNode.storage.put({ account, clientId })
 
@@ -177,12 +180,14 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     account,
     clientId,
     expirationTime,
+    issuer,
     scope,
   })
 
   const refreshToken = await accessNode.class.generateRefreshToken({
     account,
     clientId,
+    issuer,
     scope,
   })
 
@@ -191,6 +196,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     clientId,
     expirationTime,
     idTokenProfile,
+    issuer,
   })
 
   const access = AccessURNSpace.componentizedUrn(name, { client_id: clientId })
@@ -239,12 +245,14 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
 
   const { scope } = payload
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
+  const issuer = ctx.INTERNAL_JWT_ISS
 
   return {
     accessToken: await accessNode.class.generateAccessToken({
       account,
       clientId,
       expirationTime,
+      issuer,
       scope,
     }),
   }
