@@ -84,25 +84,71 @@ const RevocationModal = ({
   )
 }
 
+type App = {
+  clientId: string
+  icon: string
+  title: string
+  timestamp: number
+}
+const AppListItem = ({
+  app,
+  setSelectedApp,
+  setRevocationModalOpen,
+}: {
+  app: App
+  setSelectedApp: (app: App) => void
+  setRevocationModalOpen: (val: boolean) => void
+}) => {
+  const [approvedDateTime, setApprovedDateTime] = useState<undefined | string>()
+
+  useEffect(() => {
+    setApprovedDateTime(
+      new Date(app.timestamp).toLocaleString('default', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      })
+    )
+  }, [app])
+  return (
+    <article className="flex-1 flex flex-row px-5 py-4 space-x-4 rounded-lg border items-center">
+      <img src={app.icon} className="object-cover w-16 h-16 rounded" />
+
+      <div className="flex-1 flex flex-col space-y-2">
+        <Text weight="semibold" className="text-gray-900">
+          {app.title}
+        </Text>
+
+        <Text size="xs" weight="normal" className="text-gray-500">
+          Approved: {approvedDateTime}
+        </Text>
+      </div>
+
+      <div className="text-right">
+        <Button
+          btnType="secondary-alt"
+          className="bg-gray-100"
+          onClick={() => {
+            setSelectedApp(app)
+            setRevocationModalOpen(true)
+          }}
+        >
+          Edit Access
+        </Button>
+      </div>
+    </article>
+  )
+}
+
 export default () => {
   const { apps } = useLoaderData<{
-    apps: {
-      clientId: string
-      icon: string
-      title: string
-      timestamp: number
-    }[]
+    apps: App[]
   }>()
 
-  const [selectedApp, setSelectedApp] = useState<
-    | undefined
-    | {
-        clientId: string
-        icon: string
-        title: string
-        timestamp: number
-      }
-  >()
+  const [selectedApp, setSelectedApp] = useState<undefined | App>()
 
   const [revocationModalOpen, setRevocationModalOpen] = useState(false)
 
@@ -126,43 +172,12 @@ export default () => {
 
       <section className="flex flex-col space-y-4">
         {apps.map((a, i) => (
-          <article
+          <AppListItem
             key={i}
-            className="flex-1 flex flex-row px-5 py-4 space-x-4 rounded-lg border items-center"
-          >
-            <img src={a.icon} className="object-cover w-16 h-16 rounded" />
-
-            <div className="flex-1 flex flex-col space-y-2">
-              <Text weight="semibold" className="text-gray-900">
-                {a.title}
-              </Text>
-
-              <Text size="xs" weight="normal" className="text-gray-500">
-                Approved:{' '}
-                {new Date(a.timestamp).toLocaleString('default', {
-                  day: '2-digit',
-                  month: 'short',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit',
-                })}
-              </Text>
-            </div>
-
-            <div className="text-right">
-              <Button
-                btnType="secondary-alt"
-                className="bg-gray-100"
-                onClick={() => {
-                  setSelectedApp(a)
-                  setRevocationModalOpen(true)
-                }}
-              >
-                Edit Access
-              </Button>
-            </div>
-          </article>
+            app={a}
+            setSelectedApp={setSelectedApp}
+            setRevocationModalOpen={setRevocationModalOpen}
+          />
         ))}
       </section>
     </>
