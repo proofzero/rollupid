@@ -1,4 +1,4 @@
-query getAppScopes($clientId: String!) {
+query getAuthorizedAppScopes($clientId: String!) {
   scopes(clientId: $clientId) {
     permission
     scopes

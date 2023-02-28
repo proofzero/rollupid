@@ -5,24 +5,24 @@ import { inputValidators } from '@kubelt/platform-middleware'
 import { AccountURNSpace } from '@kubelt/urns/account'
 import { scope, SCOPES } from '@kubelt/security/scopes'
 
-export const GetAppScopesInput = z.object({
+export const GetAuthorizedAppScopesInput = z.object({
   accountURN: inputValidators.AccountURNInput,
   clientId: z.string(),
 })
-export const GetAppScopesOutput = z.array(
+export const GetAuthorizedAppScopesOutput = z.array(
   z.object({
     permission: z.string(),
     scopes: z.array(z.string()),
   })
 )
 
-export const getAppScopesMethod = async ({
+export const getAuthorizedAppScopesMethod = async ({
   input,
   ctx,
 }: {
-  input: z.infer<typeof GetAppScopesInput>
+  input: z.infer<typeof GetAuthorizedAppScopesInput>
   ctx: Context
-}): Promise<z.infer<typeof GetAppScopesOutput>> => {
+}): Promise<z.infer<typeof GetAuthorizedAppScopesOutput>> => {
   const name = `${AccountURNSpace.decode(input.accountURN)}@${input.clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
 

@@ -13,7 +13,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const galaxyClient = await getGalaxyClient()
 
-  const { scopes } = await galaxyClient.getAppScopes(
+  const { scopes } = await galaxyClient.getAuthorizedAppScopes(
     {
       clientId,
     },

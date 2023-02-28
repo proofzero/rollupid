@@ -809,11 +809,11 @@ export type UpdateConnectedAddressesPropertiesMutation = {
   updateConnectedAddressesProperties?: boolean | null
 }
 
-export type GetAppScopesQueryVariables = Exact<{
+export type GetAuthorizedAppScopesQueryVariables = Exact<{
   clientId: Scalars['String']
 }>
 
-export type GetAppScopesQuery = {
+export type GetAuthorizedAppScopesQuery = {
   __typename?: 'Query'
   scopes: Array<{
     __typename?: 'Scope'
@@ -1230,8 +1230,8 @@ export const UpdateConnectedAddressesPropertiesDocument = gql`
     updateConnectedAddressesProperties(addressURNList: $addressURNList)
   }
 `
-export const GetAppScopesDocument = gql`
-  query getAppScopes($clientId: String!) {
+export const GetAuthorizedAppScopesDocument = gql`
+  query getAuthorizedAppScopes($clientId: String!) {
     scopes(clientId: $clientId) {
       permission
       scopes
@@ -1586,17 +1586,18 @@ export function getSdk(
         'mutation'
       )
     },
-    getAppScopes(
-      variables: GetAppScopesQueryVariables,
+    getAuthorizedAppScopes(
+      variables: GetAuthorizedAppScopesQueryVariables,
       requestHeaders?: Dom.RequestInit['headers']
-    ): Promise<GetAppScopesQuery> {
+    ): Promise<GetAuthorizedAppScopesQuery> {
       return withWrapper(
         (wrappedRequestHeaders) =>
-          client.request<GetAppScopesQuery>(GetAppScopesDocument, variables, {
-            ...requestHeaders,
-            ...wrappedRequestHeaders,
-          }),
-        'getAppScopes',
+          client.request<GetAuthorizedAppScopesQuery>(
+            GetAuthorizedAppScopesDocument,
+            variables,
+            { ...requestHeaders, ...wrappedRequestHeaders }
+          ),
+        'getAuthorizedAppScopes',
         'query'
       )
     },

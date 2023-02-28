@@ -13,7 +13,7 @@ const appResolvers: Resolvers = {
     ) => {
       const accessClient = createAccessClient(env.Access)
 
-      const scopes = await accessClient.getAppScopes.query({
+      const scopes = await accessClient.getAuthorizedAppScopes.query({
         accountURN,
         clientId,
       })
