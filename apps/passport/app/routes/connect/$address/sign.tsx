@@ -82,7 +82,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     jwt: await getJWTConditionallyFromSession(request, context.env),
   })
 
-  if (appData.prompt === 'login' && existing) {
+  if (appData?.prompt === 'login' && existing) {
     return redirect(`${appData.redirectUri}?error=ALREADY_CONNECTED`)
   }
 
