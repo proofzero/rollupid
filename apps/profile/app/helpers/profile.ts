@@ -47,24 +47,8 @@ export const getAccountAddresses = async (jwt: string) => {
     getAuthzHeaderConditionallyFromToken(jwt)
   )
 
-  const addresses = addressesRes.connectedAddresses
+  const addresses = addressesRes.addresses
   return addresses
-}
-
-export const getAddressProfile = async (addressURN: AddressURN) => {
-  const galaxyClient = await getGalaxyClient()
-  const addressProfile = await galaxyClient.getProfileFromAddress({
-    addressURN,
-  })
-
-  const profile = addressProfile
-
-  return {
-    ...profile.profile,
-    links: profile.links,
-    gallery: profile.gallery,
-    connectedAccounts: profile.connectedAddresses,
-  }
 }
 
 export const getAddressProfiles = async (

@@ -11,7 +11,7 @@ import dashboardChart from '~/assets/dashboard_chart.svg'
 import { normalizeProfileToLinks } from '~/helpers'
 import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
-import { FullProfile } from '~/types'
+import type { FullProfile } from '~/types'
 
 import CTA from '~/components/cta/cta'
 
