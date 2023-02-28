@@ -234,6 +234,10 @@ export const getGalleryMetadata = async (gallery: Gallery[]) => {
         })
       ),
     },
+    /**
+     * Since gallery exists in public-only mode
+     * we do not need to specify JWT here
+     */
     {}
   )
 
