@@ -20,6 +20,7 @@ export const VerifyNonceInput = z.object({
 export const VerifyNonceOutput = z.object({
   code: z.string(),
   state: z.string(),
+  existing: z.boolean(),
 })
 
 type VerifyNonceParams = z.infer<typeof VerifyNonceInput>
@@ -43,18 +44,23 @@ export const verifyNonceMethod = async ({
   }: Challenge = await nodeClient.verifyNonce(nonce, signature)
 
   const caller = appRouter.createCaller(ctx)
-  const account = await caller.resolveAccount({
+  const { accountURN, existing } = await caller.resolveAccount({
     jwt,
   })
   const responseType = ResponseType.Code
 
   const accessClient = getAccessClient(ctx.Access)
-  return accessClient.authorize.mutate({
-    account,
+  const authorizeRes = await accessClient.authorize.mutate({
+    account: accountURN,
     responseType,
     clientId,
     redirectUri,
     scope,
     state,
   })
+
+  return {
+    ...authorizeRes,
+    existing,
+  }
 }
