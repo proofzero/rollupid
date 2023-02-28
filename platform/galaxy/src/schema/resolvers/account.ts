@@ -70,6 +70,7 @@ const accountResolvers: Resolvers = {
             })
 
           return {
+            clientId: a.clientId,
             icon: iconURL,
             title: name,
             timestamp: a.timestamp,

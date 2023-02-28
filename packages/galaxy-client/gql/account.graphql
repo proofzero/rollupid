@@ -82,6 +82,7 @@ query getConnectedAddressesFromAccount($accountURN: URN!) {
 
 query getAuthorizedApps {
   authorizedApps {
+    clientId
     icon
     title
     timestamp

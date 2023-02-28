@@ -7,6 +7,7 @@ import {
   importJWK,
   SignJWT,
   JWTVerifyResult,
+  decodeJwt,
 } from 'jose'
 
 import { hexlify } from '@ethersproject/bytes'
@@ -64,7 +65,11 @@ export default class Access extends DOProxy {
     this.state = state
   }
 
-  async getTokenState(store: TokenStore): Promise<TokenState> {
+  async getTokenState(store?: TokenStore): Promise<TokenState> {
+    if (!store) {
+      store = this.state.storage
+    }
+
     return {
       tokenMap: (await store.get<TokenMap>('tokenMap')) || {},
       tokenIndex: (await store.get<TokenIndex>('tokenIndex')) || [],

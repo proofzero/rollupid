@@ -1,0 +1,6 @@
+query getAuthorizedAppScopes($clientId: String!) {
+  scopes(clientId: $clientId) {
+    permission
+    scopes
+  }
+}

@@ -41,6 +41,7 @@ export type AddressProfilesUnion =
 
 export type App = {
   __typename?: 'App'
+  clientId: Scalars['String']
   icon: Scalars['String']
   timestamp: Scalars['Float']
   title: Scalars['String']
@@ -414,6 +415,7 @@ export type Query = {
   nftsForAddress?: Maybe<NfTs>
   profile?: Maybe<Profile>
   profileFromAddress?: Maybe<Profile>
+  scopes: Array<Maybe<Scope>>
 }
 
 export type QueryAddressProfileArgs = {
@@ -461,6 +463,16 @@ export type QueryNftsForAddressArgs = {
 
 export type QueryProfileFromAddressArgs = {
   addressURN: Scalars['URN']
+}
+
+export type QueryScopesArgs = {
+  clientId: Scalars['String']
+}
+
+export type Scope = {
+  __typename?: 'Scope'
+  permission: Scalars['String']
+  scopes: Array<Maybe<Scalars['String']>>
 }
 
 export type StandardPfp = Pfp & {
@@ -593,6 +605,7 @@ export type GetAuthorizedAppsQuery = {
   __typename?: 'Query'
   authorizedApps?: Array<{
     __typename?: 'App'
+    clientId: string
     icon: string
     title: string
     timestamp: number
@@ -794,6 +807,19 @@ export type UpdateConnectedAddressesPropertiesMutationVariables = Exact<{
 export type UpdateConnectedAddressesPropertiesMutation = {
   __typename?: 'Mutation'
   updateConnectedAddressesProperties?: boolean | null
+}
+
+export type GetAuthorizedAppScopesQueryVariables = Exact<{
+  clientId: Scalars['String']
+}>
+
+export type GetAuthorizedAppScopesQuery = {
+  __typename?: 'Query'
+  scopes: Array<{
+    __typename?: 'Scope'
+    permission: string
+    scopes: Array<string | null>
+  } | null>
 }
 
 export type GetEnsProfileQueryVariables = Exact<{
@@ -1050,6 +1076,7 @@ export const GetConnectedAddressesFromAccountDocument = gql`
 export const GetAuthorizedAppsDocument = gql`
   query getAuthorizedApps {
     authorizedApps {
+      clientId
       icon
       title
       timestamp
@@ -1201,6 +1228,14 @@ export const UpdateConnectedAddressesPropertiesDocument = gql`
     $addressURNList: [ConnectedAddressPropertiesUpdateInput!]!
   ) {
     updateConnectedAddressesProperties(addressURNList: $addressURNList)
+  }
+`
+export const GetAuthorizedAppScopesDocument = gql`
+  query getAuthorizedAppScopes($clientId: String!) {
+    scopes(clientId: $clientId) {
+      permission
+      scopes
+    }
   }
 `
 export const GetEnsProfileDocument = gql`
@@ -1549,6 +1584,21 @@ export function getSdk(
           ),
         'updateConnectedAddressesProperties',
         'mutation'
+      )
+    },
+    getAuthorizedAppScopes(
+      variables: GetAuthorizedAppScopesQueryVariables,
+      requestHeaders?: Dom.RequestInit['headers']
+    ): Promise<GetAuthorizedAppScopesQuery> {
+      return withWrapper(
+        (wrappedRequestHeaders) =>
+          client.request<GetAuthorizedAppScopesQuery>(
+            GetAuthorizedAppScopesDocument,
+            variables,
+            { ...requestHeaders, ...wrappedRequestHeaders }
+          ),
+        'getAuthorizedAppScopes',
+        'query'
       )
     },
     getEnsProfile(

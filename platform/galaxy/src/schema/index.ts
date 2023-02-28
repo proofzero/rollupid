@@ -3,7 +3,12 @@ import { mergeTypeDefs } from '@graphql-tools/merge'
 import GraphQLJSON from 'graphql-type-json'
 
 import types from './types'
-import { addressResolver, accountResolver, nftsResolver } from './resolvers'
+import {
+  addressResolver,
+  accountResolver,
+  nftsResolver,
+  appResolver,
+} from './resolvers'
 
 const mergedTypes = mergeTypeDefs(types)
 
@@ -13,6 +18,7 @@ export default makeExecutableSchema({
     addressResolver,
     accountResolver,
     nftsResolver,
+    appResolver,
     {
       JSON: GraphQLJSON,
     },
