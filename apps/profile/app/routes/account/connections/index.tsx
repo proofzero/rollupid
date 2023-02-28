@@ -17,6 +17,7 @@ import InputText from '~/components/inputs/InputText'
 import { NodeType } from '@kubelt/types/address'
 import warn from '~/assets/warning.svg'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
+import { toast } from 'react-hot-toast'
 
 const normalizeProfile = (profile: any) => {
   switch (profile.__typename) {
@@ -79,7 +80,7 @@ const normalizeProfile = (profile: any) => {
   }
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, params }) => {
   const jwt = await requireJWT(request)
 
   const addresses = (await getAccountAddresses(jwt)) ?? []
@@ -120,11 +121,16 @@ export const loader: LoaderFunction = async ({ request }) => {
     .map((p) => ({ urn: p.urn, ...p?.profile }))
     .map(normalizeProfile)
 
+  const reqUrl = new URL(request.url)
+  const reqUrlError = reqUrl.searchParams.get('error')
+
   return {
     addressCount: addresses.length,
     cryptoProfiles,
     vaultProfiles,
     oAuthProfiles,
+
+    reqUrlError,
   }
 }
 
@@ -234,8 +240,13 @@ const DisconnectModal = ({
 )
 
 const AccountSettingsConnections = () => {
-  const { cryptoProfiles, vaultProfiles, oAuthProfiles, addressCount } =
-    useLoaderData()
+  const {
+    cryptoProfiles,
+    vaultProfiles,
+    oAuthProfiles,
+    addressCount,
+    reqUrlError,
+  } = useLoaderData()
 
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [disconnectModalOpen, setDisconnectModalOpen] = useState(false)
@@ -246,6 +257,31 @@ const AccountSettingsConnections = () => {
   const [loading, setLoading] = useState(false)
 
   const fetcher = useFetcher()
+
+  useEffect(() => {
+    if (!sessionStorage.getItem('connection_requested')) {
+      return
+    }
+
+    if (reqUrlError) {
+      sessionStorage.removeItem('connection_requested')
+
+      let error = 'Error'
+      switch (reqUrlError) {
+        case 'ALREADY_CONNECTED':
+          error = 'Account already connected'
+      }
+
+      toast.error(error, {
+        duration: 2000,
+      })
+    } else {
+      sessionStorage.removeItem('connection_requested')
+      toast.success('Account connected', {
+        duration: 2000,
+      })
+    }
+  }, [reqUrlError])
 
   useEffect(() => {
     const selectedProfile = cryptoProfiles
@@ -291,7 +327,15 @@ const AccountSettingsConnections = () => {
     // not a new account one, and thus generate the proper cookie
     windowUrl.searchParams.append('prompt', 'login')
     windowUrl.searchParams.append('client_id', clientId)
-    windowUrl.searchParams.append('redirect_uri', window.location.href)
+
+    // Removing search so that subsequent errors
+    // won't be appended to queryString
+    const currentWindowUrl = new URL(window.location.href)
+    currentWindowUrl.search = ''
+
+    windowUrl.searchParams.append('redirect_uri', currentWindowUrl.toString())
+
+    sessionStorage.setItem('connection_requested', 'true')
 
     window.location.href = windowUrl.toString()
   }
