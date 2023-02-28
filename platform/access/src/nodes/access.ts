@@ -184,12 +184,7 @@ export default class Access extends DOProxy {
   }
 
   async revokeAll(): Promise<void> {
-    await this.state.storage.transaction(async (txn) => {
-      await txn.put({
-        tokenMap: {},
-        tokenIndex: [],
-      })
-    })
+    await this.state.storage.deleteAll()
   }
 
   async getJWTSigningKeyPair(): Promise<KeyPair> {
