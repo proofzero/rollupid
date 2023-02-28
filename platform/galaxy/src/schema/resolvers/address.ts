@@ -25,6 +25,19 @@ const addressResolvers: Resolvers = {
     ensProfile: async (_parent, { addressOrEns }, { env }: ResolverContext) => {
       return new ENSUtils().getEnsEntry(addressOrEns)
     },
+    account: async (
+      _parent,
+      { addressURN }: { addressURN: AddressURN },
+      { env }
+    ) => {
+      const addressClient = createAddressClient(env.Address, {
+        [PlatformAddressURNHeader]: addressURN,
+      })
+
+      const accountURN = await addressClient.getAccount.query()
+
+      return accountURN
+    },
     addressProfile: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
@@ -132,6 +145,7 @@ const addressResolvers: Resolvers = {
 // TODO: add address middleware
 const AddressResolverComposition = {
   'Query.ensProfile': [setupContext(), hasApiKey()],
+  'Query.account': [setupContext(), hasApiKey()],
   'Query.addressProfile': [setupContext(), hasApiKey()],
   'Query.addressProfiles': [setupContext(), hasApiKey()],
   'Mutation.updateAddressNickname': [

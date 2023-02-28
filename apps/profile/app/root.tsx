@@ -39,7 +39,7 @@ import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
 import * as gtag from '~/utils/gtags.client'
 import { getProfileSession } from './utils/session.server'
-import { getRedirectUrlForProfile } from './utils/redirects.server'
+import { AccountURNSpace } from '@kubelt/urns/account'
 import { parseJwt } from './utils/session.server'
 import { getAccountProfile } from './helpers/profile'
 import type { AccountURN } from '@kubelt/urns/account'
@@ -91,19 +91,14 @@ export const loader: LoaderFunction = async ({ request }) => {
 
     accountURN = parseJwt(jwt).sub as AccountURN
 
-    const fetchedLoggedInProfile = await getAccountProfile(jwt)
+    const fetchedLoggedInProfile = await getAccountProfile({ jwt })
 
     if (!fetchedLoggedInProfile)
       throw new Error('Could not retrieve logged in use profile.')
 
-    loggedInUserProfile = {
-      ...fetchedLoggedInProfile.profile,
-      links: fetchedLoggedInProfile.links,
-      gallery: fetchedLoggedInProfile.gallery,
-      addresses: fetchedLoggedInProfile.connectedAddresses,
-    }
+    loggedInUserProfile = fetchedLoggedInProfile
 
-    basePath = getRedirectUrlForProfile(loggedInUserProfile)
+    basePath = `/p/${AccountURNSpace.decode(accountURN)}`
   }
 
   return json({

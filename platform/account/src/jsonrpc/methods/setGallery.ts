@@ -15,6 +15,13 @@ export const setGalleryMethod = async ({
   input: z.infer<typeof SetGalleryInput>
   ctx: Context
 }): Promise<void> => {
-  await ctx.account?.class.setGallery(input.gallery)
+  // if user is calling this method with the same accountURN in jwt
+  // TODO: validate JWT in "ValidateJWT" middleware
+  if (ctx.accountURN === input.name) {
+    // Don't need to await it
+    // Fire and go
+    ctx.account?.class.setGallery(input.gallery)
+  }
+
   return
 }

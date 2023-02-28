@@ -27,9 +27,10 @@ export const getAddressesMethod = async ({
 }): Promise<GetAddressesOutputParams> => {
   const caller = appRouter.createCaller(ctx)
 
-  const getAddressesCall = ctx.token
-    ? caller.getOwnAddresses
-    : caller.getPublicAddresses
+  const getAddressesCall =
+    ctx.accountURN === input.account
+      ? caller.getOwnAddresses
+      : caller.getPublicAddresses
 
   const addresses = await getAddressesCall({ account: input.account })
 

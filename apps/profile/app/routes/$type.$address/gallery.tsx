@@ -6,12 +6,13 @@ import type { Profile } from '@kubelt/galaxy-client'
 import { getMoreNftsGallery } from '~/helpers/nfts'
 
 import { useFetcher, useOutletContext } from '@remix-run/react'
+import type { AccountURN } from '@kubelt/urns/account'
 
 const ProfileRoute = () => {
   const { profile, isOwner, accountURN } = useOutletContext<{
     profile: Profile
     isOwner: boolean
-    accountURN: string
+    accountURN: AccountURN
   }>()
 
   const { displayName, pfp } = profile

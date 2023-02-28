@@ -114,6 +114,10 @@ query getAddressProfiles($addressURNList: [URN!]) {
   }
 }
 
+query getAccountUrnFromAddress($addressURN: URN!) {
+  account(addressURN: $addressURN)
+}
+
 mutation updateAddressNickname($addressURN: URN!, $nickname: String!) {
   updateAddressNickname(addressURN: $addressURN, nickname: $nickname)
 }

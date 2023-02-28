@@ -16,21 +16,27 @@ export const setProfileMethod = async ({
   input: z.infer<typeof SetProfileInput>
   ctx: Context
 }): Promise<void> => {
-  await ctx.account?.class.setProfile(input.profile)
+  // if user is calling this method with the same accountURN in jwt
+  // TODO: validate JWT in "ValidateJWT" middleware
+  if (ctx.accountURN === input.name) {
+    await ctx.account?.class.setProfile(input.profile)
+  }
 
   const qcomps = {
     name: input.profile.displayName,
     picture: input.profile.pfp?.image,
   }
-  const enhancedUrn = AccountURNSpace.componentizedUrn(
-    AccountURNSpace.decode(ctx.accountURN!),
-    undefined,
-    qcomps
-  )
+  if (ctx.accountURN) {
+    const enhancedUrn = AccountURNSpace.componentizedUrn(
+      AccountURNSpace.decode(ctx.accountURN),
+      undefined,
+      qcomps
+    )
 
-  //TODO make this asynchornous so user's don't need to wait
-  //for the second leg of IO to complete
-  const edge = ctx.edges
-  await edge.updateNode.mutate({ urnOfNode: enhancedUrn })
+    const edge = ctx.edges
+    // Don't need to await it
+    // Fire and go
+    edge.updateNode.mutate({ urnOfNode: enhancedUrn })
+  }
   return
 }

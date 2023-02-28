@@ -39,35 +39,26 @@ export const Links = ({ links, isOwner = false, displayName }: LinksProps) => {
           providerIcon: imageFromAddressType(link.provider),
         }))
         .map((link, i: number) => (
-          <button
+          <a
             key={`${link.name}-${link.url}-${i}`}
-            className="
-          bg-gray-100 hover:bg-gray-200
-          transition-colors
-          rounded-full
-          justify-center
-          items-center
-          w-full
-          py-5"
+            href={link.url}
+            className="flex flex-row justify-center items-center space-x-2.5
+            bg-gray-100 hover:bg-gray-200 transition-colors
+            rounded-full justify-center items-center w-full py-5"
+            rel="noreferrer"
+            target="_blank"
           >
-            <a
-              href={link.url}
-              className="flex flex-row justify-center items-center space-x-2.5"
-              rel="noreferrer"
-              target="_blank"
-            >
-              {link.providerIcon && (
-                <img
-                  src={link.providerIcon}
-                  alt="Something went wrong..."
-                  className="w-5 h-5"
-                />
-              )}
-              <Text weight="medium" className="text-gray-600">
-                {link.name}
-              </Text>
-            </a>
-          </button>
+            {link.providerIcon && (
+              <img
+                src={link.providerIcon}
+                alt="Something went wrong..."
+                className="w-5 h-5"
+              />
+            )}
+            <Text weight="medium" className="text-gray-600">
+              {link.name}
+            </Text>
+          </a>
         ))}
     </div>
   )

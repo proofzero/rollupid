@@ -1,5 +1,5 @@
-query getProfile {
-  profile {
+query getProfile($targetAccountURN: URN) {
+  profile(targetAccountURN: $targetAccountURN) {
     pfp {
       ... on StandardPFP {
         image
@@ -17,63 +17,26 @@ query getProfile {
     bio
     website
   }
-  links {
+  links(targetAccountURN: $targetAccountURN) {
     name
     url
     verified
     provider
   }
-  connectedAddresses {
+  connectedAddresses(targetAccountURN: $targetAccountURN) {
     baseUrn
     qc
     rc
   }
-  gallery {
+  gallery(targetAccountURN: $targetAccountURN) {
     contract
     tokenId
     chain
   }
 }
 
-query getProfileFromAddress($addressURN: URN!) {
-  profile: profileFromAddress(addressURN: $addressURN) {
-    pfp {
-      ... on StandardPFP {
-        image
-      }
-      ... on NFTPFP {
-        image
-        isToken
-      }
-    }
-    displayName
-    handle
-    cover
-    location
-    job
-    bio
-    website
-  }
-  links: linksFromAddress(addressURN: $addressURN) {
-    name
-    url
-    verified
-    provider
-  }
-  gallery: galleryFromAddress(addressURN: $addressURN) {
-    contract
-    tokenId
-    chain
-  }
-  connectedAddresses: connectedAddressesFromAddress(addressURN: $addressURN) {
-    baseUrn
-    qc
-    rc
-  }
-}
-
-query getConnectedAddressesFromAccount($accountURN: URN!) {
-  addresses: connectedAddressesFromAccount(accountURN: $accountURN) {
+query getConnectedAddresses($targetAccountURN: URN) {
+  addresses: connectedAddresses(targetAccountURN: $targetAccountURN) {
     baseUrn
     qc
     rc
@@ -86,14 +49,6 @@ query getAuthorizedApps {
     icon
     title
     timestamp
-  }
-}
-
-query getConnectedAddresses {
-  connectedAddresses {
-    baseUrn
-    qc
-    rc
   }
 }
 

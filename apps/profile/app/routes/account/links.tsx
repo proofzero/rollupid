@@ -305,13 +305,6 @@ export default function AccountSettingsLinks() {
     notificationHandler: (success: boolean) => void
   }>()
 
-  console.log({
-    notificationHandler,
-    profile,
-    // cryptoAddresses,
-    // accountURN,
-  })
-
   const transition = useTransition()
   const actionData = useActionData()
   const fetcher = useFetcher()
