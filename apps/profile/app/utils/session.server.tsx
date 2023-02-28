@@ -79,6 +79,8 @@ export async function requireJWT(request: Request, headers = new Headers()) {
         user: { refreshToken },
       } = session.data
 
+      console.log('refreshing token', refreshToken)
+
       // refresh the access token
       const form = new FormData()
       form.append('grant_type', 'refresh_token')
