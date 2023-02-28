@@ -2,10 +2,7 @@ import { json, LoaderFunction } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 import { Suspense } from 'react'
 
-import {
-  createConnectAccountCookie,
-  getUserSession,
-} from '~/session.server'
+import { getUserSession, setConsoleParamsSession } from '~/session.server'
 
 import React from 'react'
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
@@ -19,16 +16,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const searchParams = new URL(request.url).searchParams
 
   if (session.get('jwt') && searchParams.get('client_id')) {
-    if (searchParams.get('connect') === 'true') {
+    if (searchParams.get('prompt') === 'login') {
       return json(
         {},
         {
           headers: {
-            'Set-Cookie': await createConnectAccountCookie(
-              {
-                redirectUri: searchParams.get('redirect_uri') as string,
-                clientId: searchParams.get('client_id') as string,
-              },
+            'Set-Cookie': await setConsoleParamsSession(
+              context.consoleParams,
               context.env
             ),
           },

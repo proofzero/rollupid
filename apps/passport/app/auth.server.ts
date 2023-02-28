@@ -66,6 +66,7 @@ export const getMicrosoftStrategy = (env: Env) => {
       clientSecret: env.SECRET_MICROSOFT_OAUTH_CLIENT_SECRET,
       redirectUri: env.INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL,
       scope: 'openid profile email User.Read offline_access',
+      prompt: '',
     },
     async ({ ...args }) => {
       return { ...args }
