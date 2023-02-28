@@ -15,7 +15,10 @@ import { getAddressClient } from '~/platform.server'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { CryptoAddressType, NodeType } from '@kubelt/types/address'
-import { getJWTConditionallyFromSession } from '~/session.server'
+import {
+  getConsoleParamsSession,
+  getJWTConditionallyFromSession,
+} from '~/session.server'
 
 export const signMessageTemplate = `Welcome to Rollup!
 
@@ -54,6 +57,13 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
+  const appData = await getConsoleParamsSession(request, context.env)
+    .then((session) => JSON.parse(session.get('params')))
+    .catch((err) => {
+      console.log('No console params session found')
+      return null
+    })
+
   const { address } = params
   if (!address) throw new Error('No address included in request')
 
@@ -66,11 +76,15 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const formData = await request.formData()
 
   // TODO: validate from data
-  const { code } = await addressClient.verifyNonce.mutate({
+  const { code, existing } = await addressClient.verifyNonce.mutate({
     nonce: formData.get('nonce') as string,
     signature: formData.get('signature') as string,
     jwt: await getJWTConditionallyFromSession(request, context.env),
   })
+
+  if (appData.prompt === 'login' && existing) {
+    return redirect(`${appData.redirectUri}?error=ALREADY_CONNECTED`)
+  }
 
   // TODO: handle the error case
   const searchParams = new URL(request.url).searchParams

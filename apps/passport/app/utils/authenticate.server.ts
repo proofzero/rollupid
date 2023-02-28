@@ -24,10 +24,13 @@ export const authenticateAddress = async (
     scope: string
     prompt: string
   } | null,
-  env: Env
+  env: Env,
+  existing: boolean = false
 ) => {
   if (appData?.prompt === 'login') {
-    return redirect(appData.redirectUri)
+    return redirect(
+      `${appData.redirectUri}${existing ? `?error=ALREADY_CONNECTED` : ''}`
+    )
   }
 
   const accessClient = getAccessClient(env)

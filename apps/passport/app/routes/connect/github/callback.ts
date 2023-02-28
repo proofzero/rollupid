@@ -46,13 +46,19 @@ export const loader: LoaderFunction = async ({
     { alias: profile._json.login, hidden: 'true' }
   )
   const addressClient = getAddressClient(address, context.env)
-  const account = await addressClient.resolveAccount.query({
+  const { accountURN, existing } = await addressClient.resolveAccount.query({
     jwt: await getJWTConditionallyFromSession(request, context.env),
   })
 
   await addressClient.setOAuthData.mutate(authRes)
 
-  return authenticateAddress(address, account, appData, context.env)
+  return authenticateAddress(
+    address,
+    accountURN,
+    appData,
+    context.env,
+    existing
+  )
 }
 
 export default () => {}

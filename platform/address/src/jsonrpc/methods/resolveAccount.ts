@@ -17,7 +17,10 @@ export const ResolveAccountInput = z.object({
   jwt: z.string().optional(),
 })
 
-export const ResolveAccountOutput = AccountURNInput
+export const ResolveAccountOutput = z.object({
+  accountURN: AccountURNInput,
+  existing: z.boolean(),
+})
 
 type ResolveAccountParams = z.infer<typeof ResolveAccountInput>
 type ResolveAccountResult = z.infer<typeof ResolveAccountOutput>
@@ -35,6 +38,13 @@ export const resolveAccountMethod = async ({
   let eventName = 'account-resolved'
 
   let resultURN = await nodeClient?.storage.get<AccountURN>('account')
+  if (input.jwt && resultURN) {
+    return {
+      accountURN: resultURN,
+      existing: true,
+    }
+  }
+
   if (!resultURN) {
     let urn: AccountURN
     if (input.jwt) {
@@ -60,5 +70,8 @@ export const resolveAccountMethod = async ({
     blobs: [ctx.alias, resultURN, eventName],
   } as AnalyticsEngineDataPoint)
 
-  return resultURN
+  return {
+    accountURN: resultURN,
+    existing: false,
+  }
 }
