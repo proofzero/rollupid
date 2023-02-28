@@ -48,9 +48,15 @@ export const revokeAuthorizationsMethod: RevokeAuthorizationsMethod = async ({
     clientSecret,
   })
 
-  if (!valid) {
-    throw new Error('invalid client credentials')
-  }
+  // !IMPORTANT!
+  // Removing credential check
+  // as we couldn't revoke authorization
+  // of app A from app B
+  // and we need to decide what to do
+
+  // if (!valid) {
+  //   throw new Error('invalid client credentials')
+  // }
 
   const name = `${AccountURNSpace.decode(accountURN)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
