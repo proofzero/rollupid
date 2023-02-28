@@ -114,7 +114,7 @@ query getAddressProfiles($addressURNList: [URN!]) {
   }
 }
 
-query getAccountURN($addressURN: URN!) {
+query getAccountUrnFromAddress($addressURN: URN!) {
   account(addressURN: $addressURN)
 }
 
