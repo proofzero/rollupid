@@ -34,7 +34,7 @@ export const getAppScopesMethod = async ({
   const scopes = tokens.flatMap((t) => t.scope)
 
   // Filter for unique scopes
-  const uniqueScopes = scopes.filter((v, i, a) => a.indexOf(v) === i)
+  const uniqueScopes = Array.from(new Set(scopes))
 
   // Add implicit openid scope
   uniqueScopes.push('scope://rollup.id/openid')
@@ -51,9 +51,9 @@ export const getAppScopesMethod = async ({
     }))
 
   // Get a list of unique permissions
-  const uniquePermissions = castScopes
-    .map((cs) => cs.permission)
-    .filter((v, i, a) => a.indexOf(v) === i)
+  const uniquePermissions = Array.from(
+    new Set(castScopes.map((cs) => cs.permission))
+  )
 
   // Generate array with
   // permission and list of scopes
