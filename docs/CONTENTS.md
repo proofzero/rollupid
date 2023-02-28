@@ -1,6 +1,6 @@
 # Table of contents
 
-- [Introduction to Rollup](3id/overview/index.md)
+- [Introduction to Rollup](overview/index.md)
 
 ## Getting Started
 
@@ -12,7 +12,7 @@
 ## Guides
 
 - [Adding Users to your Database](guides/connecting-to-your-database.md)
-- [Authenticating Users in your Database](guides/authenticating-users-in-your-app.md)
+- [Authenticating Users in your Database](guides/authenticating-users-in-your-app .md)
 
 ## Platform
 
