@@ -20,7 +20,7 @@ export const setLinksMethod = async ({
   if (ctx.accountURN === input.name) {
     // Don't need to await it
     // Fire and go
-    ctx.account?.class.setLinks(input.links)
+    await ctx.account?.class.setLinks(input.links)
   }
   return
 }

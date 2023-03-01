@@ -20,7 +20,7 @@ export const setGalleryMethod = async ({
   if (ctx.accountURN === input.name) {
     // Don't need to await it
     // Fire and go
-    ctx.account?.class.setGallery(input.gallery)
+    await ctx.account?.class.setGallery(input.gallery)
   }
 
   return
