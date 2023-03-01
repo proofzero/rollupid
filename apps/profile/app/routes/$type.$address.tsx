@@ -35,7 +35,7 @@ import { Cover } from '~/components/profile/cover/Cover'
 import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
 
-import defaultOG from '~/assets/Rollup_profiles_OG.png'
+import defaultOG from '~/assets/Rollup_public_profile_OG.png'
 import {
   CryptoAddressType,
   NodeType,
