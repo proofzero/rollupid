@@ -5,6 +5,6 @@ export const Scopes: BaseMiddlewareFunction<BaseContext> = async ({
   ctx,
   next,
 }) => {
-  console.warn('Scopes middleware not implemented yet')
+  //TODO: Implement scopes middleware
   return next({ ctx })
 }

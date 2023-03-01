@@ -13,6 +13,7 @@ import {
   getConnectedCryptoAddresses,
   temporaryConvertToPublic,
   validOwnership,
+  requestLogging,
 } from './utils'
 
 import { Resolvers } from './typedefs'
@@ -297,35 +298,60 @@ const accountResolvers: Resolvers = {
 }
 
 const ProfileResolverComposition = {
-  'Query.profile': [setupContext(), hasApiKey(), logAnalytics()],
-  'Query.authorizedApps': [setupContext(), hasApiKey(), logAnalytics()],
-  'Query.links': [setupContext(), hasApiKey(), logAnalytics()],
-  'Query.gallery': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.profile': [
+    requestLogging(),
+    setupContext(),
+    hasApiKey(),
+    logAnalytics(),
+  ],
+  'Query.authorizedApps': [
+    requestLogging(),
+    setupContext(),
+    hasApiKey(),
+    logAnalytics(),
+  ],
+  'Query.links': [
+    requestLogging(),
+    setupContext(),
+    hasApiKey(),
+    logAnalytics(),
+  ],
+  'Query.gallery': [
+    requestLogging(),
+    setupContext(),
+    hasApiKey(),
+    logAnalytics(),
+  ],
   'Query.connectedAddresses': [
+    requestLogging(),
     setupContext(),
     hasApiKey(),
     logAnalytics(),
     temporaryConvertToPublic(),
   ],
   'Mutation.updateProfile': [
+    requestLogging(),
     setupContext(),
     hasApiKey(),
     isAuthorized(),
     logAnalytics(),
   ],
   'Mutation.updateLinks': [
+    requestLogging(),
     setupContext(),
     hasApiKey(),
     isAuthorized(),
     logAnalytics(),
   ],
   'Mutation.updateGallery': [
+    requestLogging(),
     setupContext(),
     hasApiKey(),
     isAuthorized(),
     logAnalytics(),
   ],
   'Mutation.disconnectAddress': [
+    requestLogging(),
     setupContext(),
     hasApiKey(),
     isAuthorized(),

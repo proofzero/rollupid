@@ -62,8 +62,6 @@ export const WriteAnalyticsDataPoint = (
     indexes: hashkey ? [hashkey.slice(-32)] : [], // Enforce 32 byte limit. The maximum number of indexes is 1.
   }
 
-  console.log('service analytics', JSON.stringify(point))
-
   // Allow the caller to specify a custom dataset.
   const dataset = customDataset ? customDataset : ctx.Analytics
   dataset?.writeDataPoint(point)
