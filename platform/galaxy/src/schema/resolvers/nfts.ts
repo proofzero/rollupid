@@ -21,6 +21,7 @@ import {
   normalizeContractsForAllChains,
   getConnectedCryptoAddresses,
   getContractsForAllChains,
+  requestLogging,
 } from './utils'
 
 type ResolverContext = {
@@ -159,9 +160,23 @@ const nftsResolvers: Resolvers = {
 }
 
 const NFTsResolverComposition = {
-  'Query.nftsForAddress': [setupContext(), hasApiKey(), logAnalytics()],
-  'Query.contractsForAddress': [setupContext(), hasApiKey(), logAnalytics()],
-  'Query.getNFTMetadataBatch': [setupContext(), logAnalytics()],
+  'Query.nftsForAddress': [
+    requestLogging(),
+    setupContext(),
+    hasApiKey(),
+    logAnalytics(),
+  ],
+  'Query.contractsForAddress': [
+    requestLogging(),
+    setupContext(),
+    hasApiKey(),
+    logAnalytics(),
+  ],
+  'Query.getNFTMetadataBatch': [
+    requestLogging(),
+    setupContext(),
+    logAnalytics(),
+  ],
 }
 
 export default composeResolvers(nftsResolvers, NFTsResolverComposition)

@@ -247,6 +247,7 @@ export async function edges(
   query: EdgeQuery,
   opt?: EdgeQueryOptions
 ): Promise<EdgeQueryResults> {
+  const startTime = Date.now()
   const sqlBase = `
   with normalizer as (
     select e.createdTimestamp, e.src, e.tag, e.dst, 'SRCQ' as compType, srcq.key as k, srcq.value as v
@@ -370,16 +371,13 @@ export async function edges(
 
   const finalSqlStatement = sqlBase + conditionsStatement + sqlFilters
 
-  //Keep this .debug until we're confident around the logic
-  console.debug('FULL STATEMENT', finalSqlStatement)
-  console.debug('BIND PARAMS', prepBindParams)
-
-  const resultSet = await g.db
-    .prepare(finalSqlStatement)
-    .bind(...prepBindParams)
-    .all()
-
-  console.debug('EXECUTION METADATA', {
+  const prepStat = g.db.prepare(finalSqlStatement).bind(...prepBindParams)
+  const resultSet = await prepStat.all()
+  console.debug(
+    `TRACE: S${startTime} D1 INVOCATION TIME`,
+    Date.now() - startTime
+  )
+  console.debug(`TRACE: S${startTime} D1 EXECUTION METADATA`, {
     duration: resultSet.meta.duration,
     error: resultSet.error,
   })
@@ -446,20 +444,7 @@ export async function edges(
   if (opt?.limit) result.metadata.limit = opt.limit
   if (opt?.offset) result.metadata.offset = opt.offset
 
-  //Keep this .debug until we're confident about the logic
-  console.debug(
-    'RESULTS',
-    result.metadata,
-    edgeResults.map((r) => ({
-      r,
-      src: r.src.baseUrn,
-      dst: r.dst.baseUrn,
-      srcq: r.src.qc,
-      srcr: r.src.rc,
-      dstq: r.dst.qc,
-      dstr: r.dst.rc,
-    }))
-  )
+  console.debug(`TRACE: S${startTime} BEFORE RETURN`, Date.now() - startTime)
 
   return result
 }

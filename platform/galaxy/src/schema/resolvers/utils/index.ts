@@ -38,6 +38,21 @@ export function parseJwt(token: string): JWTPayload {
   return payload
 }
 
+export const requestLogging =
+  () => (next) => async (root, args, context, info) => {
+    const startTime = Date.now()
+    console.debug(
+      `TRACE: G${startTime} Starting GQL operation: ${context.operationName} resolver: ${info.fieldName}`
+    )
+    const result = await next(root, args, context, info)
+    console.debug(
+      `TRACE: G${startTime} Completed GQL operation: ${
+        context.operationName
+      } resolver: ${info.fieldName} duration: ${Date.now() - startTime}ms`
+    )
+    return result
+  }
+
 export const setupContext = () => (next) => (root, args, context, info) => {
   const jwt = getAuthzTokenFromReq(context.request)
   const apiKey = context.request.headers.get('X-GALAXY-KEY')
@@ -183,7 +198,6 @@ export const logAnalytics =
     }
 
     WriteAnalyticsDataPoint(context, datapoint)
-    console.log('resolver call analytics', JSON.stringify(datapoint))
 
     return next(root, args, context, info)
   }

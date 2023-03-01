@@ -1,7 +1,13 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import { ResolverContext } from './common'
 import type { Resolvers } from './typedefs'
-import { hasApiKey, isAuthorized, logAnalytics, setupContext } from './utils'
+import {
+  hasApiKey,
+  isAuthorized,
+  logAnalytics,
+  requestLogging,
+  setupContext,
+} from './utils'
 import createAccessClient from '@kubelt/platform-clients/access'
 
 const appResolvers: Resolvers = {
@@ -24,7 +30,13 @@ const appResolvers: Resolvers = {
 }
 
 const AppResolverComposition = {
-  'Query.scopes': [setupContext(), hasApiKey(), isAuthorized(), logAnalytics()],
+  'Query.scopes': [
+    requestLogging(),
+    setupContext(),
+    hasApiKey(),
+    isAuthorized(),
+    logAnalytics(),
+  ],
 }
 
 export default composeResolvers(appResolvers, AppResolverComposition)
