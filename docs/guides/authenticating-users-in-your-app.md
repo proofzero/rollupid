@@ -4,7 +4,7 @@ description: How to authenticate users in your app
 
 # Authenticating Users in your App
 
-Once you have completed the [auth flow](../getting-started/auth-flow.md) and have a user's ID token you now have several strategies to authenticate users to in app.
+Once you have completed the [auth flow](../getting-started/auth-flow.md) and have a user's ID token you now have several strategies to manage authenticated users to in app.
 
 See [Tokens](../advanced/token.md) for more information on the ID token.
 

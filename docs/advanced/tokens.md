@@ -18,7 +18,7 @@ to configure this snippet with your account
 
 ```json
 {
-  "iss": "{yourdomain}|https://passport.rollup.id/",
+  "iss": "https://passport.rollup.id/",
   "sub": "{accountUrn}",
   "aud": ["{yourClientId}"],
   "exp": 1311281970,
@@ -28,6 +28,8 @@ to configure this snippet with your account
   "email": "janedoe@example.com"
 }
 ```
+
+{% hint style="info" %}In the Pro version of Rollup you can set the issuer (iss) to your own custom domain. See custom domain feature in your Console app.{% endhint %}
 
 This token can be treated as authentication to your application. The audience (the aud claim) of the token is set to the application's identifier, which means that only this specific application should consume this token. You can store this token with the user's profile in your database using the subject as the unique user identifier and use it to personalize the user's experience.
 
@@ -47,7 +49,7 @@ to configure this snippet with your account
 
 ```json
 {
-  "iss": "{yourdomain}|https://passport.rollup.id/",
+  "iss": "https://passport.rollup.id/",
   "sub": "{accountUrn}",
   "aud": ["{yourClientId}"],
   "azp": "{yourClientId}",
@@ -56,6 +58,8 @@ to configure this snippet with your account
   "scope": "openid profile email read:connected_accounts"
 }
 ```
+
+{% hint style="info" %}In the Pro version of Rollup you can set the issuer (iss) to your own custom domain. See custom domain feature in your Console app.{% endhint %}
 
 Note that the token does not contain any information about the user besides their ID (sub claim). It only contains authorization information about which actions the application is allowed to perform via API (scope claim). This is what makes it useful for securing an API, but not for authenticating a user.
 
