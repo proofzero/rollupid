@@ -99,7 +99,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
     const ogImage = await ogImageFromProfile(
       profile.pfp?.image as string,
-      profile.cover as string
+      profile.cover as string,
+      accountURN
     )
 
     const splittedUrl = request.url.split('/')

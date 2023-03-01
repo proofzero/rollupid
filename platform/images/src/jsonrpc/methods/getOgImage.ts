@@ -33,7 +33,7 @@ export const getOgImageMethod = async ({
     return (
       fetch(url)
         // Get the content type and unfortunately await the body. I would prefer
-        // that retrieving the body here was thennable, but need the header.
+        // that retrieving the body here was then enable, but need the header.
         .then(async (r) => [
           r.headers.get('content-type'),
           await r.arrayBuffer(),
@@ -96,14 +96,6 @@ export const getOgImageMethod = async ({
   const ogImage = await svg2png(svg)
   // return new Response(ogImage, { headers: { 'content-type': 'image/png' } })
 
-  const id = await crypto.subtle
-    .digest('SHA-256', ogImage)
-    .then((digest) =>
-      [...new Uint8Array(digest)]
-        .map((b) => b.toString(16).padStart(2, '0'))
-        .join('')
-    )
-
   const uploadRequest = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`,
     {
@@ -146,12 +138,6 @@ export const getOgImageMethod = async ({
     v.endsWith('public')
   )
 
-  if (publicVariantUrls.length) {
-    const imageUrl = publicVariantUrls[0]
-    return imageUrl
-  }
-
-  const cached = `https://imagedelivery.net/${ctx.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
-
-  return cached
+  const imageUrl = publicVariantUrls[0]
+  return imageUrl
 }
