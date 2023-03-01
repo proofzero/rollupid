@@ -6,6 +6,7 @@ import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
 
 import { EDGE_AUTHORIZES } from '../../constants'
 import { AccountURNSpace } from '@kubelt/urns/account'
+import { AccessURNSpace } from '@kubelt/urns/access'
 
 export const RevokeAppAuthorizationsMethodInput = z.object({
   accountURN: AccountURNInput,
@@ -41,15 +42,13 @@ export const revokeAppAuthorizationsMethod: RevokeAppAuthorizationsMethod =
     }
 
     const name = `${AccountURNSpace.decode(accountURN)}@${clientId}`
-    const accessNode = await initAccessNodeByName(name, ctx.Access)
 
+    const accessDst = AccessURNSpace.componentizedUrn(name)
     const edgesResult = await ctx.edgesClient?.getEdges.query({
       query: {
-        // We only want edges that start at the provided account node.
         src: { baseUrn: accountURN },
-        // We only want edges that link to Access nodes (sessions).
+        dst: { baseUrn: accessDst },
         tag: EDGE_AUTHORIZES,
-        // Account -> Access edges indicate session ownership.
       },
     })
 
@@ -66,5 +65,6 @@ export const revokeAppAuthorizationsMethod: RevokeAppAuthorizationsMethod =
       })
     }
 
+    const accessNode = await initAccessNodeByName(name, ctx.Access)
     await accessNode.class.revokeAll()
   }
