@@ -8,12 +8,9 @@ export const getOgImageMethodInput = z.object({
   bgUrl: z.string().url().or(z.literal('')),
   fgUrl: z.string().url(),
 })
-
 export type getOgImageParams = z.infer<typeof getOgImageMethodInput>
 
-export const getOgImageMethodOutput = z
-  .string()
-  .or(z.custom<Response>((val) => typeof val === typeof Response))
+export const getOgImageMethodOutput = z.string()
 export type getOgImageOutputParams = z.infer<typeof getOgImageMethodOutput>
 
 export const getOgImageMethod = async ({
@@ -23,7 +20,6 @@ export const getOgImageMethod = async ({
   input: getOgImageParams
   ctx: Context
 }): Promise<getOgImageOutputParams> => {
-  console.log('images.getOgImage: getting OG image for public profile')
   const { bgUrl, fgUrl } = input
   // Attempt to download arbitrary images and encode them as data URIs with the
   // image-data-uri library. We cannot use the remote calls offered by
@@ -34,7 +30,7 @@ export const getOgImageMethod = async ({
     return (
       fetch(url)
         // Get the content type and unfortunately await the body. I would prefer
-        // that retrieving the body here was then enable, but need the header.
+        // that retrieving the body here was thennable, but need the header.
         .then(async (r) => [
           r.headers.get('content-type'),
           await r.arrayBuffer(),
@@ -61,6 +57,8 @@ export const getOgImageMethod = async ({
 
   const bg = bgUrl !== '' ? await encodeDataURI(bgUrl as string) : undefined
   const fg = await encodeDataURI(fgUrl)
+
+  // console.log({ fgUrl, fg })
 
   // TODO: Load from assets folder?
   // Constants for populating the SVG (optional).
@@ -97,48 +95,49 @@ export const getOgImageMethod = async ({
   const ogImage = await svg2png(svg)
   // return new Response(ogImage, { headers: { 'content-type': 'image/png' } })
 
-  const uploadRequest = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`,
+  const id = await crypto.subtle
+    .digest('SHA-256', ogImage)
+    .then((digest) =>
+      [...new Uint8Array(digest)]
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
+    )
+
+  //upload to CF images and return the URL
+  var formData = new FormData()
+  formData.append('file', new Blob([ogImage], { type: 'image/png' }))
+  formData.append('id', id)
+  const imageUrlJson = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1`,
     {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${ctx.TOKEN_CLOUDFLARE_API}`,
       },
+      body: formData,
     }
   )
-
-  const direct_upload = await uploadRequest.json<{
-    success: boolean
-    result: object
-  }>()
-  if (!direct_upload.success) {
-    return new Response(JSON.stringify(direct_upload), {
-      status: 500,
+    .then(async (res) => {
+      if (res.status === 409) {
+        console.log('Image already exists.')
+        return
+      }
+      return res.json<{
+        success: boolean
+        result: { variants: string[] }
+        errors: any
+      }>()
     })
+    .catch((e) => {
+      console.error("Couldn't upload og image to CF")
+      console.error(e)
+    })
+
+  //prob already exsists
+  if (!imageUrlJson?.success) {
+    const cached = `https://imagedelivery.net/${ctx.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
+    return cached
   }
-  const { uploadURL } = direct_upload.result as {
-    uploadURL: string
-    id: string
-  }
 
-  //upload to CF images and return the URL
-  var formData = new FormData()
-  formData.append('file', new Blob([ogImage]))
-
-  const cfUploadRes: {
-    success: boolean
-    result: {
-      variants: string[]
-    }
-  } = await fetch(uploadURL, {
-    method: 'POST',
-    body: formData,
-  }).then((res) => res.json())
-
-  const publicVariantUrls = cfUploadRes.result.variants.filter((v) =>
-    v.endsWith('public')
-  )
-
-  const imageUrl = publicVariantUrls[0]
-  return imageUrl
+  return imageUrlJson.result.variants.filter((v) => v.includes('public'))[0]
 }

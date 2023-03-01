@@ -21,15 +21,16 @@ import {
 import { useEffect } from 'react'
 
 import designStyles from '@kubelt/design-system/src/styles/global.css'
-import styles from './styles/tailwind.css'
-import baseStyles from './styles/base.css'
+import styles from '~/styles/tailwind.css'
+import baseStyles from '~/styles/base.css'
 
-import appleIcon from './assets/apple-touch-icon.png'
-import icon32 from './assets/favicon-32x32.png'
-import icon16 from './assets/favicon-16x16.png'
-import faviconSvg from './assets/favicon.svg'
-import maskIcon from './assets/safari-pinned-tab.svg'
-import logo from './assets/rollup-id-logo.svg'
+import appleIcon from '~/assets/apple-touch-icon.png'
+import icon32 from '~/assets/favicon-32x32.png'
+import icon16 from '~/assets/favicon-16x16.png'
+import faviconSvg from '~/assets/favicon.svg'
+import social from '~/assets/social.png'
+import maskIcon from '~/assets/safari-pinned-tab.svg'
+import logo from '~/assets/rollup-id-logo.svg'
 
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
@@ -37,12 +38,12 @@ import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
 import * as gtag from '~/utils/gtags.client'
-import { getProfileSession } from './utils/session.server'
+import { getProfileSession } from '~/utils/session.server'
 import { AccountURNSpace } from '@kubelt/urns/account'
-import { parseJwt } from './utils/session.server'
-import { getAccountProfile } from './helpers/profile'
+import { parseJwt } from '~/utils/session.server'
+import { getAccountProfile } from '~/helpers/profile'
 import type { AccountURN } from '@kubelt/urns/account'
-import type { FullProfile } from './types'
+import type { FullProfile } from '~/types'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -54,8 +55,7 @@ export const meta: MetaFunction = () => ({
   'og:description':
     'Rollup turns your blockchain accounts into multi-chain decentralized identities with improved auth, secure messaging and more.',
   // Hardcoded to not re-upload it every time
-  'og:image':
-    'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/f073c37b-4b5b-49a5-9dda-026aff2cc700/public',
+  'og:image': social,
   'twitter:card': 'summary_large_image',
   'twitter:site': '@rollupid',
   'twitter:creator': '@rollupid',

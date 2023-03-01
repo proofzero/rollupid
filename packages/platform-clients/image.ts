@@ -17,7 +17,9 @@ export default (
       httpBatchLink({
         url: 'http://localhost/trpc',
         fetch: (input, init?: RequestInit<RequestInitCfProperties>) => {
-          defaultsDeep(init, options)
+          if (init && options?.cf) {
+            init.cf = options.cf
+          }
           return fetcher.fetch(input, init)
         }, // NOTE: preflight middleware?
       }),
