@@ -18,8 +18,6 @@ export const setLinksMethod = async ({
   // if user is calling this method with the same accountURN in jwt
   // TODO: validate JWT in "ValidateJWT" middleware
   if (ctx.accountURN === input.name) {
-    // Don't need to await it
-    // Fire and go
     await ctx.account?.class.setLinks(input.links)
   }
   return
