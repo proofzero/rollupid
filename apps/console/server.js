@@ -19,12 +19,15 @@ const handleEvent = async (event) => {
     console.debug(
       `TRACE: B${startTime} Started handler for ${reqURL.pathname}/${reqURL.searchParams}`
     )
-    response = await requestHandler(event)
-    console.debug(
-      `TRACE: B${startTime} Completed handler for ${reqURL.pathname}/${
-        reqURL.searchParams
-      } in ${Date.now() - startTime}ms`
-    )
+    try {
+      response = await requestHandler(event)
+    } finally {
+      console.debug(
+        `TRACE: B${startTime} Completed handler for ${reqURL.pathname}/${
+          reqURL.searchParams
+        } in ${Date.now() - startTime}ms`
+      )
+    }
   }
 
   return response
