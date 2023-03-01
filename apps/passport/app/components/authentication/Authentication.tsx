@@ -31,14 +31,11 @@ export function Authentication({
   return (
     <div
       className={
-        'flex flex-col items-center justify-center gap-4 basis-96 m-auto bg-white p-6'
+        'flex flex-col items-center justify-center gap-4 mx-auto bg-white p-6 h-[100dvh] lg:h-[598px] w-full lg:w-[418px] lg:border-rounded-lg'
       }
       style={{
-        width: 418,
-        height: 598,
         border: '1px solid #D1D5DB',
         boxSizing: 'border-box',
-        borderRadius: 8,
       }}
     >
       <Avatar src={logo} size="sm"></Avatar>
