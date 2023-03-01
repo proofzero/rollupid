@@ -36,7 +36,7 @@ export const action: ActionFunction = async ({ request, params }) => {
       'tooltipMessage',
       JSON.stringify({
         type: 'success',
-        message: 'Succesfully revoked app authorizations',
+        message: 'Access Removed',
       })
     )
   } catch (ex) {
@@ -46,7 +46,7 @@ export const action: ActionFunction = async ({ request, params }) => {
       'tooltipMessage',
       JSON.stringify({
         type: 'error',
-        message: 'There was a problem revoking the authorizations',
+        message: 'Error Removing Access',
       })
     )
   }
