@@ -10,7 +10,7 @@ import { AccessURNSpace } from '@kubelt/urns/access'
 
 export const RevokeAppAuthorizationsMethodInput = z.object({
   accountURN: AccountURNInput,
-  clientId: z.string(),
+  clientId: z.string().min(1),
 })
 
 type RevokeAppAuthorizationsMethodInput = z.infer<
@@ -36,10 +36,6 @@ interface RevokeAppAuthorizationsMethod {
 export const revokeAppAuthorizationsMethod: RevokeAppAuthorizationsMethod =
   async ({ ctx, input }) => {
     const { accountURN, clientId } = input
-
-    if (!ctx.starbaseClient) {
-      throw new Error('missing starbase client')
-    }
 
     const name = `${AccountURNSpace.decode(accountURN)}@${clientId}`
 

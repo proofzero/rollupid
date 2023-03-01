@@ -175,6 +175,5 @@ export async function getProfileSession(
 
 export async function commitProfileSession(session: Session) {
   const storage = getProfileSessionStorage()
-
   return storage.commitSession(session)
 }

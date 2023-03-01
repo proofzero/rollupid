@@ -200,7 +200,6 @@ export default () => {
   const fetcher = useFetcher()
 
   useEffect(() => {
-    console.log(fetcher.state)
     if (fetcher.state === 'submitting' && fetcher.type === 'actionSubmission') {
       setRevocationModalOpen(false)
       setSelectedApp(undefined)
