@@ -62,8 +62,13 @@ export function ConnectButton({
               >
                 <img src={walletsSvg} />
               </span>
-              {isConnected
-                ? 'Login With Wallet'
+              {isConnected && address
+                ? `Login With ${
+                    ensName ??
+                    `${address.substring(0, 4)} ... ${address.substring(
+                      address.length - 4
+                    )}`
+                  }`
                 : !isConnecting
                 ? 'Connect Wallet'
                 : 'Connecting'}
