@@ -118,7 +118,7 @@ const RevocationModal = ({
               btnType="dangerous-alt"
               disabled={clientId === currentClientId}
             >
-              Remove All Access
+              Revoke Access
             </Button>
           </fetcher.Form>
         </div>
