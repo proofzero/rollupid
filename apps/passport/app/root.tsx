@@ -31,7 +31,6 @@ import appleIcon from '~/assets/apple-touch-icon.png'
 import icon32 from '~/assets/favicon-32x32.png'
 import icon16 from '~/assets/favicon-16x16.png'
 import faviconSvg from '~/assets/favicon.svg'
-import social from '~/assets/passport-social.png'
 
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
@@ -49,7 +48,9 @@ export const meta: MetaFunction = () => ({
   viewport: 'width=device-width,initial-scale=1',
   'og:url': 'https://passport.rollup.id',
   'og:description': 'User identity in your control.',
-  'og:image': social,
+  // Hardcoded to not re-upload it every time
+  'og:image':
+    'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/0a34a150-aadf-49b3-433b-7fa028119b00/public',
   'twitter:card': 'summary_large_image',
   'twitter:site': '@rollupid_xyz',
   'twitter:creator': '@rollupid_xyz',

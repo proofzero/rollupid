@@ -92,7 +92,7 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
      * to not upload it every time on each new user
      */
     const cover =
-      'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/295c62b0-6f1d-4045-168d-e6acd93c0c00/public'
+      'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/55eea546-b14f-434e-16b4-e759e563ea00/public'
     const newProfile = await addressClient.getAddressProfile
       .query()
       .then(async (res) => {

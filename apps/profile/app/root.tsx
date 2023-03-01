@@ -24,7 +24,6 @@ import designStyles from '@kubelt/design-system/src/styles/global.css'
 import styles from './styles/tailwind.css'
 import baseStyles from './styles/base.css'
 
-import social from './assets/social.png'
 import appleIcon from './assets/apple-touch-icon.png'
 import icon32 from './assets/favicon-32x32.png'
 import icon16 from './assets/favicon-16x16.png'
@@ -54,7 +53,9 @@ export const meta: MetaFunction = () => ({
   'og:url': 'https://my.rollup.id',
   'og:description':
     'Rollup turns your blockchain accounts into multi-chain decentralized identities with improved auth, secure messaging and more.',
-  'og:image': social,
+  // Hardcoded to not re-upload it every time
+  'og:image':
+    'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/f073c37b-4b5b-49a5-9dda-026aff2cc700/public',
   'twitter:card': 'summary_large_image',
   'twitter:site': '@rollupid',
   'twitter:creator': '@rollupid',

@@ -3,7 +3,7 @@ import { json } from '@remix-run/cloudflare'
 import { Outlet, useLoaderData } from '@remix-run/react'
 import { getAccountClient } from '~/platform.server'
 import { parseJwt, requireJWT } from '~/session.server'
-import { AccountURN } from '@kubelt/urns/account'
+import type { AccountURN } from '@kubelt/urns/account'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in

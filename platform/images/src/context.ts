@@ -1,6 +1,5 @@
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import { BaseContext, DeploymentMetadata } from '@kubelt/types'
-import { DurableObjectStubProxy } from 'do-proxy'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { Environment } from './types'
 
