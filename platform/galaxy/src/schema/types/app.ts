@@ -9,6 +9,6 @@ export default /* GraphQL */ `
   }
 
   type Mutation {
-    revokeAuthorizations(clientId: String!, clientSecret: String!): Boolean
+    revokeAppAuthorizations(clientId: String!): Boolean
   }
 `

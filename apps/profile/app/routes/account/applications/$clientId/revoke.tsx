@@ -12,10 +12,9 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
 
   const galaxyClient = await getGalaxyClient()
-  await galaxyClient.revokeAuthorizations(
+  await galaxyClient.revokeAppAuthorizations(
     {
       clientId,
-      clientSecret: PROFILE_CLIENT_SECRET,
     },
     getAuthzHeaderConditionallyFromToken(jwt)
   )

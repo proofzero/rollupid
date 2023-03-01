@@ -28,17 +28,16 @@ const appResolvers: Resolvers = {
     },
   },
   Mutation: {
-    revokeAuthorizations: async (
+    revokeAppAuthorizations: async (
       _parent: any,
-      { clientId, clientSecret },
+      { clientId },
       { accountURN, env }: ResolverContext
     ) => {
       const accessClient = createAccessClient(env.Access)
 
-      await accessClient.revokeAuthorizations.mutate({
+      await accessClient.revokeAppAuthorizations.mutate({
         accountURN,
         clientId,
-        clientSecret,
       })
 
       return true

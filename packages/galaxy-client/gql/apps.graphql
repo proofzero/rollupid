@@ -5,6 +5,6 @@ query getAuthorizedAppScopes($clientId: String!) {
   }
 }
 
-mutation revokeAuthorizations($clientId: String!, $clientSecret: String!) {
-  revokeAuthorizations(clientId: $clientId, clientSecret: $clientSecret)
+mutation revokeAppAuthorizations($clientId: String!) {
+  revokeAppAuthorizations(clientId: $clientId)
 }
