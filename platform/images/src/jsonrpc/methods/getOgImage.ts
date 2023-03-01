@@ -23,6 +23,7 @@ export const getOgImageMethod = async ({
   input: getOgImageParams
   ctx: Context
 }): Promise<getOgImageOutputParams> => {
+  console.log('images.getOgImage: getting OG image for public profile')
   const { bgUrl, fgUrl } = input
   // Attempt to download arbitrary images and encode them as data URIs with the
   // image-data-uri library. We cannot use the remote calls offered by
