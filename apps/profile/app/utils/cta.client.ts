@@ -11,13 +11,7 @@ export const determineProfileCompletionStatus = (
   profile: FullProfile
 ): ProfileCompletionStatus => {
   let base = false
-  if (
-    profile.bio &&
-    profile.cover &&
-    profile.job &&
-    profile.location &&
-    profile.website
-  ) {
+  if (profile.bio || profile.job || profile.location || profile.website) {
     base = true
   }
 
