@@ -8,9 +8,12 @@ export const getOgImageMethodInput = z.object({
   bgUrl: z.string().url().or(z.literal('')),
   fgUrl: z.string().url(),
 })
+
 export type getOgImageParams = z.infer<typeof getOgImageMethodInput>
 
-export const getOgImageMethodOutput = z.string()
+export const getOgImageMethodOutput = z
+  .string()
+  .or(z.custom<Response>((val) => typeof val === typeof Response))
 export type getOgImageOutputParams = z.infer<typeof getOgImageMethodOutput>
 
 export const getOgImageMethod = async ({
@@ -58,8 +61,6 @@ export const getOgImageMethod = async ({
   const bg = bgUrl !== '' ? await encodeDataURI(bgUrl as string) : undefined
   const fg = await encodeDataURI(fgUrl)
 
-  // console.log({ fgUrl, fg })
-
   // TODO: Load from assets folder?
   // Constants for populating the SVG (optional).
   const OG_WIDTH = 1200
@@ -75,14 +76,14 @@ export const getOgImageMethod = async ({
       </g>
       <defs>
       <pattern id="Backround" patternContentUnits="objectBoundingBox" width="1" height="1">
-          <use xlink:href="#backroundimage" transform="translate(0 -0.452381) scale(0.015625 0.0297619)"/>
+      <use xlink:href="#backroundimage" transform="translate(0 -0.452381) scale(0.015625 0.0297619)"/>
       </pattern>
       <pattern id="hexagon" patternContentUnits="objectBoundingBox" width="1" height="1">
           <use xlink:href="#hexagonimage" transform="translate(-1.98598) scale(0.00233645)"/>
       </pattern>
       ${
         bg
-          ? '<image id="backroundimage" width="64" height="64" xlink:href="${bg}"/>'
+          ? `<image id="backroundimage" width="64" height="64" xlink:href="${bg}"/>`
           : ''
       }
       <image id="hexagonimage" width="2128" height="428" xlink:href="${fg}"/>
@@ -103,39 +104,54 @@ export const getOgImageMethod = async ({
         .join('')
     )
 
-  //upload to CF images and return the URL
-  var formData = new FormData()
-  formData.append('file', new Blob([ogImage], { type: 'image/png' }))
-  formData.append('id', id)
-  const imageUrlJson = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1`,
+  const uploadRequest = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`,
     {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${ctx.TOKEN_CLOUDFLARE_API}`,
       },
-      body: formData,
     }
   )
-    .then((res) =>
-      res.json<{
-        success: boolean
-        result: { variants: string[] }
-        errors: any
-      }>()
-    )
-    .catch((e) => {
-      console.error("Couldn't upload og image to CF")
-      console.error(e)
+
+  const direct_upload = await uploadRequest.json<{
+    success: boolean
+    result: object
+  }>()
+  if (!direct_upload.success) {
+    return new Response(JSON.stringify(direct_upload), {
+      status: 500,
     })
-
-  //prob already exsists
-  if (!imageUrlJson?.success) {
-    console.log('Constructing og image', imageUrlJson)
-    const cached = `https://imagedelivery.net/${ctx.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
-
-    return cached
+  }
+  const { uploadURL } = direct_upload.result as {
+    uploadURL: string
+    id: string
   }
 
-  return imageUrlJson.result.variants.filter((v) => v.includes('public'))[0]
+  //upload to CF images and return the URL
+  var formData = new FormData()
+  formData.append('file', new Blob([ogImage]))
+
+  const cfUploadRes: {
+    success: boolean
+    result: {
+      variants: string[]
+    }
+  } = await fetch(uploadURL, {
+    method: 'POST',
+    body: formData,
+  }).then((res) => res.json())
+
+  const publicVariantUrls = cfUploadRes.result.variants.filter((v) =>
+    v.endsWith('public')
+  )
+
+  if (publicVariantUrls.length) {
+    const imageUrl = publicVariantUrls[0]
+    return imageUrl
+  }
+
+  const cached = `https://imagedelivery.net/${ctx.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
+
+  return cached
 }
