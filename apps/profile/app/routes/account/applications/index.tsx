@@ -206,7 +206,7 @@ export default () => {
     }
 
     if (fetcher.type === 'actionReload') {
-      fetcher.load('/account/applicatios')
+      fetcher.load('/account/applications')
     }
   }, [fetcher])
 
