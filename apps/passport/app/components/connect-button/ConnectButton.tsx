@@ -4,6 +4,7 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import type { ButtonProps } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import walletsSvg from './wallets.png'
+import { Avatar } from 'connectkit'
 
 const ConnectKitProvider = lazy(() =>
   import('connectkit').then((module) => ({
@@ -32,7 +33,15 @@ export function ConnectButton({
   return (
     <ConnectKitProvider>
       <CustomConnectKitButton>
-        {({ isConnected, isConnecting, show, hide, address, ensName }) => {
+        {({
+          isConnected,
+          isConnecting,
+          show,
+          hide,
+          address,
+          truncatedAddress,
+          ensName,
+        }) => {
           return (
             <Button
               btnType="secondary-alt"
@@ -51,24 +60,28 @@ export function ConnectButton({
                 alignItems: 'center',
               }}
             >
-              <span
-                style={{
-                  backgroundRepeat: 'no-repeat',
-                  backgroundSize: '100%',
-                  height: 20,
-                  width: 20,
-                  margin: '0 7px',
-                }}
-              >
-                <img src={walletsSvg} />
-              </span>
+              {ensName && (
+                <span className="mr-[7px]">
+                  <Avatar size={20} name={ensName} />
+                </span>
+              )}
+
+              {!ensName && (
+                <span
+                  style={{
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: '100%',
+                    height: 20,
+                    width: 20,
+                    margin: '0 7px',
+                  }}
+                >
+                  <img src={walletsSvg} />
+                </span>
+              )}
+
               {isConnected && address
-                ? `Login With ${
-                    ensName ??
-                    `${address.substring(0, 4)} ... ${address.substring(
-                      address.length - 4
-                    )}`
-                  }`
+                ? `Login With ${ensName ?? truncatedAddress}`
                 : !isConnecting
                 ? 'Connect Wallet'
                 : 'Connecting'}
