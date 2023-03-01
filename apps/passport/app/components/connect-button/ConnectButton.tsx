@@ -81,7 +81,7 @@ export function ConnectButton({
               )}
 
               {isConnected && address
-                ? `Login With ${ensName ?? truncatedAddress}`
+                ? `Login with ${ensName ?? truncatedAddress}`
                 : !isConnecting
                 ? 'Connect Wallet'
                 : 'Connecting'}
