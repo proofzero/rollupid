@@ -9,13 +9,40 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import { Pill } from '@kubelt/design-system/src/atoms/pills/Pill'
+import { json, LoaderFunction } from '@remix-run/cloudflare'
+import { commitProfileSession, getProfileSession } from '~/utils/session.server'
+import { toast } from 'react-hot-toast'
 
-export const loader = appLoader
+export const loader: LoaderFunction = async (args) => {
+  const session = await getProfileSession(args.request)
+  const { apps } = await appLoader(args)
+
+  const currentClientId = PROFILE_CLIENT_ID
+
+  const sessionTooltipMessage = session.get('tooltipMessage')
+  const tooltipMessage = sessionTooltipMessage
+    ? JSON.parse(sessionTooltipMessage)
+    : undefined
+
+  return json(
+    {
+      apps,
+      currentClientId,
+      tooltipMessage,
+    },
+    {
+      headers: {
+        'Set-Cookie': await commitProfileSession(session),
+      },
+    }
+  )
+}
 
 const RevocationModal = ({
   isOpen,
   setIsOpen,
   clientId,
+  currentClientId,
   icon,
   title,
   fetcher,
@@ -23,6 +50,7 @@ const RevocationModal = ({
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   clientId: string
+  currentClientId: string
   icon: string
   title: string
   fetcher: FetcherWithComponents<any>
@@ -85,7 +113,11 @@ const RevocationModal = ({
             action={`/account/applications/${clientId}/revoke`}
             method="post"
           >
-            <Button type="submit" btnType="dangerous-alt">
+            <Button
+              type="submit"
+              btnType="dangerous-alt"
+              disabled={clientId === currentClientId}
+            >
               Remove All Access
             </Button>
           </fetcher.Form>
@@ -155,8 +187,10 @@ const AppListItem = ({
 }
 
 export default () => {
-  const { apps } = useLoaderData<{
+  const { apps, currentClientId, tooltipMessage } = useLoaderData<{
     apps: App[]
+    currentClientId: string
+    tooltipMessage: undefined | { type: 'success' | 'error'; message: string }
   }>()
 
   const [selectedApp, setSelectedApp] = useState<undefined | App>()
@@ -177,6 +211,21 @@ export default () => {
     }
   }, [fetcher])
 
+  useEffect(() => {
+    if (tooltipMessage) {
+      switch (tooltipMessage.type) {
+        case 'success':
+          toast.success(tooltipMessage.message)
+          break
+        case 'error':
+          toast.error(tooltipMessage.message)
+          break
+        default:
+          toast(tooltipMessage.message)
+      }
+    }
+  }, [tooltipMessage])
+
   return (
     <>
       <Text size="xl" weight="semibold" className="text-gray-800 mb-5">
@@ -187,6 +236,7 @@ export default () => {
         <>
           <RevocationModal
             clientId={selectedApp.clientId}
+            currentClientId={currentClientId}
             icon={selectedApp.icon}
             title={selectedApp.title}
             fetcher={fetcher}

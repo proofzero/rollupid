@@ -1,9 +1,16 @@
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
-import { ActionFunction } from '@remix-run/cloudflare'
+import { ActionFunction, redirect } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/clients'
-import { requireJWT } from '~/utils/session.server'
+
+import {
+  commitProfileSession,
+  getProfileSession,
+  requireJWT,
+} from '~/utils/session.server'
 
 export const action: ActionFunction = async ({ request, params }) => {
+  const session = await getProfileSession(request)
+
   const jwt = await requireJWT(request)
   const { clientId } = params
 
@@ -11,13 +18,42 @@ export const action: ActionFunction = async ({ request, params }) => {
     throw new Error('Client ID is required for query')
   }
 
-  const galaxyClient = await getGalaxyClient()
-  await galaxyClient.revokeAppAuthorizations(
-    {
-      clientId,
-    },
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
+  try {
+    const currentClientId = PROFILE_CLIENT_ID
+    if (clientId === currentClientId) {
+      throw new Error('Unable to revoke current app')
+    }
 
-  return null
+    const galaxyClient = await getGalaxyClient()
+    await galaxyClient.revokeAppAuthorizations(
+      {
+        clientId,
+      },
+      getAuthzHeaderConditionallyFromToken(jwt)
+    )
+
+    session.flash(
+      'tooltipMessage',
+      JSON.stringify({
+        type: 'success',
+        message: 'Succesfully revoked app authorizations',
+      })
+    )
+  } catch (ex) {
+    console.error(ex)
+
+    session.flash(
+      'tooltipMessage',
+      JSON.stringify({
+        type: 'error',
+        message: 'There was a problem revoking the authorizations',
+      })
+    )
+  }
+
+  return redirect('/account/applications', {
+    headers: {
+      'Set-Cookie': await commitProfileSession(session),
+    },
+  })
 }
