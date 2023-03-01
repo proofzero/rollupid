@@ -12,7 +12,7 @@
 ## Guides
 
 - [Adding Users to your Database](guides/connecting-to-your-database.md)
-- [Authenticating Users in your Database](guides/authenticating-users-in-your-app.md)
+- [Authenticating Users in your App](guides/authenticating-users-in-your-app.md)
 
 ## Platform
 
@@ -24,6 +24,7 @@
 ## Advanced
 
 - [Tokens](advanced/tokens.md)
+- [Pop Up Auth Flow](advanced/pop-up-auth.md)
 - [Create Custom Claims](advanced/custom-claims.md)
 - [Migration Guide](advanced/migration-guide.md)
 

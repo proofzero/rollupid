@@ -29,3 +29,9 @@ If you are building a single page application (SPA) without a backend to work wi
 The most common way to authenticate users in a native application is to use a on device secure storage to store tokens and maintain user sessions after the auth flow. The major difference with native apps is that you will need to use a webview or browser to complete the auth flow. This works by setting the redirect URL to a [custom URL scheme](https://www.oauth.com/oauth2-servers/oauth-native-apps/redirect-urls-for-native-apps/) you register for your app.
 
 When Rollup redirects to this URL your app will be able to pick up the exchange code, complete the auth flow, and recieve the ID and access tokens.
+
+# Logging Out
+
+Once a user has logged in you will need to provide a way for them to log out. This is usually done by clearing the session cookie or session storage and redirecting the user back to your login page. Your login page should then redirect the user to the [auth flow](../getting-started/auth-flow.md) if they are not logged in.
+
+The auth flow will prompt the user to continue using their last known identity. If you are using custom domains you can clear this behaviour by also redirecting the user to the passport logout url `https://<your-custom-passport-domain>/signout`.
