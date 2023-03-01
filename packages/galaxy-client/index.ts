@@ -113,6 +113,7 @@ export type LinkInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   disconnectAddress?: Maybe<Scalars['Boolean']>;
+  revokeAuthorizations?: Maybe<Scalars['Boolean']>;
   updateAddressNickname?: Maybe<Scalars['Boolean']>;
   updateConnectedAddressesProperties?: Maybe<Scalars['Boolean']>;
   updateGallery?: Maybe<Scalars['Boolean']>;
@@ -127,9 +128,10 @@ export type MutationDisconnectAddressArgs = {
 
 
 export type MutationRevokeAuthorizationsArgs = {
-  clientId: Scalars['String']
-  clientSecret: Scalars['String']
-}
+  clientId: Scalars['String'];
+  clientSecret: Scalars['String'];
+};
+
 
 export type MutationUpdateAddressNicknameArgs = {
   addressURN: Scalars['URN'];
@@ -594,14 +596,12 @@ export type GetAuthorizedAppScopesQueryVariables = Exact<{
 export type GetAuthorizedAppScopesQuery = { __typename?: 'Query', scopes: Array<{ __typename?: 'Scope', permission: string, scopes: Array<string | null> } | null> };
 
 export type RevokeAuthorizationsMutationVariables = Exact<{
-  clientId: Scalars['String']
-  clientSecret: Scalars['String']
-}>
+  clientId: Scalars['String'];
+  clientSecret: Scalars['String'];
+}>;
 
-export type RevokeAuthorizationsMutation = {
-  __typename?: 'Mutation'
-  revokeAuthorizations?: boolean | null
-}
+
+export type RevokeAuthorizationsMutation = { __typename?: 'Mutation', revokeAuthorizations?: boolean | null };
 
 export type GetEnsProfileQueryVariables = Exact<{
   addressOrEns: Scalars['String'];
@@ -841,6 +841,11 @@ export const GetAuthorizedAppScopesDocument = gql`
   }
 }
     `;
+export const RevokeAuthorizationsDocument = gql`
+    mutation revokeAuthorizations($clientId: String!, $clientSecret: String!) {
+  revokeAuthorizations(clientId: $clientId, clientSecret: $clientSecret)
+}
+    `;
 export const GetEnsProfileDocument = gql`
     query getEnsProfile($addressOrEns: String!) {
   ensProfile(addressOrEns: $addressOrEns) {
@@ -1020,6 +1025,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getAuthorizedAppScopes(variables: GetAuthorizedAppScopesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthorizedAppScopesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetAuthorizedAppScopesQuery>(GetAuthorizedAppScopesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthorizedAppScopes', 'query');
+    },
+    revokeAuthorizations(variables: RevokeAuthorizationsMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RevokeAuthorizationsMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<RevokeAuthorizationsMutation>(RevokeAuthorizationsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'revokeAuthorizations', 'mutation');
     },
     getEnsProfile(variables: GetEnsProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetEnsProfileQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetEnsProfileQuery>(GetEnsProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEnsProfile', 'query');
