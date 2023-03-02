@@ -3,7 +3,6 @@ import { z } from 'zod'
 import wasm from '../../assets/svg2png_wasm_bg.wasm'
 import { svg2png, initialize } from 'svg2png-wasm'
 import { Context } from '../../context'
-//@ts-ignore
 import bg from '../../assets/ogBackgroundB64'
 
 export const getOgImageMethodInput = z.object({
@@ -64,8 +63,6 @@ export const getOgImageMethod = async ({
   }
 
   const fg = await encodeDataURI(fgUrl)
-
-  // console.log({ fgUrl, fg })
 
   // TODO: Load from assets folder?
   // Constants for populating the SVG (optional).
