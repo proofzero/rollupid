@@ -3,9 +3,9 @@ import { z } from 'zod'
 import wasm from '../../assets/svg2png_wasm_bg.wasm'
 import { svg2png, initialize } from 'svg2png-wasm'
 import { Context } from '../../context'
+import bg from '../../assets/ogBackgroundB64'
 
 export const getOgImageMethodInput = z.object({
-  bgUrl: z.string().url().or(z.literal('')),
   fgUrl: z.string().url(),
 })
 export type getOgImageParams = z.infer<typeof getOgImageMethodInput>
@@ -20,7 +20,14 @@ export const getOgImageMethod = async ({
   input: getOgImageParams
   ctx: Context
 }): Promise<getOgImageOutputParams> => {
-  const { bgUrl, fgUrl } = input
+  const cache = await caches.open('rollup:ogimage')
+  const cachedRes = await cache.match(ctx.req!)
+  if (cachedRes) {
+    console.debug({ status: cachedRes.status })
+    return await cachedRes.text()
+  }
+
+  const { fgUrl } = input
   // Attempt to download arbitrary images and encode them as data URIs with the
   // image-data-uri library. We cannot use the remote calls offered by
   // image-data-uri because it uses a legacy HTTP library that Cryptopunks 403
@@ -30,7 +37,7 @@ export const getOgImageMethod = async ({
     return (
       fetch(url)
         // Get the content type and unfortunately await the body. I would prefer
-        // that retrieving the body here was thennable, but need the header.
+        // that retrieving the body here was then enable, but need the header.
         .then(async (r) => [
           r.headers.get('content-type'),
           await r.arrayBuffer(),
@@ -55,7 +62,6 @@ export const getOgImageMethod = async ({
     )
   }
 
-  const bg = bgUrl !== '' ? await encodeDataURI(bgUrl as string) : undefined
   const fg = await encodeDataURI(fgUrl)
 
   // console.log({ fgUrl, fg })
@@ -75,16 +81,12 @@ export const getOgImageMethod = async ({
       </g>
       <defs>
       <pattern id="Backround" patternContentUnits="objectBoundingBox" width="1" height="1">
-          <use xlink:href="#backroundimage" transform="translate(0 -0.452381) scale(0.015625 0.0297619)"/>
+      <use xlink:href="#backroundimage" transform="translate(0 -0.452381) scale(0.015625 0.0297619)"/>
       </pattern>
       <pattern id="hexagon" patternContentUnits="objectBoundingBox" width="1" height="1">
           <use xlink:href="#hexagonimage" transform="translate(-1.98598) scale(0.00233645)"/>
-      </pattern>
-      ${
-        bg
-          ? '<image id="backroundimage" width="64" height="64" xlink:href="${bg}"/>'
-          : ''
-      }
+      </pattern> 
+      <image id="backroundimage" width="64" height="64" xlink:href="${bg}"/>
       <image id="hexagonimage" width="2128" height="428" xlink:href="${fg}"/>
       </defs>
   </svg>`
@@ -107,7 +109,7 @@ export const getOgImageMethod = async ({
   var formData = new FormData()
   formData.append('file', new Blob([ogImage], { type: 'image/png' }))
   formData.append('id', id)
-  const imageUrlJson = await fetch(
+  await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1`,
     {
       method: 'POST',
@@ -117,25 +119,42 @@ export const getOgImageMethod = async ({
       body: formData,
     }
   )
-    .then((res) =>
-      res.json<{
+    .then(async (res) => {
+      if (res.status === 409) {
+        console.log('OG image already exists.')
+        return
+      }
+      return res.json<{
         success: boolean
         result: { variants: string[] }
         errors: any
       }>()
-    )
+    })
     .catch((e) => {
       console.error("Couldn't upload og image to CF")
       console.error(e)
     })
 
-  //prob already exsists
-  if (!imageUrlJson?.success) {
-    console.log('Constructing og image', imageUrlJson)
-    const cached = `https://imagedelivery.net/${ctx.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
+  // We cache it with upload
+  // So might as well just return a cached URL
+  const cached = `https://imagedelivery.net/${ctx.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
 
-    return cached
-  }
+  // Caching strategy
 
-  return imageUrlJson.result.variants.filter((v) => v.includes('public'))[0]
+  const expiryDate = new Date()
+  expiryDate.setDate(expiryDate.getDate() + 90)
+
+  await cache.put(
+    new Request(ctx.req!, {
+      headers: {
+        Expires: expiryDate.toUTCString(),
+      },
+    }),
+    new Response(cached, {
+      status: 200,
+      statusText: 'All good',
+    })
+  )
+
+  return cached
 }

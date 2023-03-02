@@ -32,6 +32,7 @@ port = 8989
 local_protocol = "http"
 
 [env.dev]
+route = { pattern = "images-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 
 [env.dev.vars]
 # The duration in seconds that returned upload URL is good for.
@@ -41,6 +42,7 @@ UPLOAD_WINDOW_SECONDS = 200
 HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID = "VqQy1abBMHYDZwVsTbsSMw"
 
 [env.next]
+route = { pattern = "images-next.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 
 [env.next.vars]
 # The duration in seconds that returned upload URL is good for.
@@ -51,6 +53,7 @@ HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID = "VqQy1abBMHYDZwVsTbsSMw"
 
 
 [env.current]
+route = { pattern = "images.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 
 [env.current.vars]
 # The duration in seconds that returned upload URL is good for.

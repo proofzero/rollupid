@@ -28,6 +28,7 @@ services = [
 PASSPORT_URL = "http://localhost:9696"
 PASSPORT_AUTH_URL = "http://localhost:9696/authorize"
 PASSPORT_TOKEN_URL = "http://127.0.0.1:9696/token"
+IMAGES_URL = "http://localhost/trpc"
 CONSOLE_APP_URL = "http://localhost:9898"
 REDIRECT_URI = "http://localhost:9797/auth/callback"
 COOKIE_DOMAIN = "localhost"
@@ -48,7 +49,7 @@ command = "yarn build -- --sourcemap"
 port = 9797
 local_protocol = "http"
 
-# dev (development)
+# dev (development) 
 # ------------------------------------------------------------------------------
 [env.dev]
 routes = [
@@ -65,6 +66,7 @@ services = [
 CONSOLE_APP_URL = "https://console-dev.rollup.id"
 PASSPORT_URL = "https://passport-dev.rollup.id"
 PASSPORT_AUTH_URL = "https://passport-dev.rollup.id/authorize"
+IMAGES_URL = "https://images-dev.rollup.id/trpc"
 PASSPORT_TOKEN_URL = "https://passport-dev.pz3r0.com/token"
 CLIENT_ID = "<console client id>"
 REDIRECT_URI = "https://my-dev.rollup.id/auth/callback"
@@ -96,6 +98,7 @@ command = "yarn build"
 CONSOLE_APP_URL = "https://console-next.rollup.id"
 PASSPORT_URL = "https://passport-next.rollup.id"
 PASSPORT_AUTH_URL = "https://passport-next.rollup.id/authorize"
+IMAGES_URL = "https://images-next.rollup.id/trpc"
 PASSPORT_TOKEN_URL = "https://passport-next.pz3r0.com/token"
 CLIENT_ID = "<console client id>"
 REDIRECT_URI = "https://my-next.rollup.id/auth/callback"
@@ -125,6 +128,7 @@ command = "yarn build"
 PASSPORT_URL = "https://passport.rollup.id"
 CONSOLE_APP_URL = "https://console.rollup.id"
 PASSPORT_AUTH_URL = "https://passport.rollup.id/authorize"
+IMAGES_URL = "https://images.rollup.id/trpc"
 PASSPORT_TOKEN_URL = "https://passport.pz3r0.com/token"
 CLIENT_ID = "<console client id>"
 REDIRECT_URI = "https://my.rollup.id/auth/callback"

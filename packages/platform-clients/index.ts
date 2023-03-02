@@ -6,7 +6,6 @@ import * as edges from './edges'
 import * as starbase from './starbase'
 import * as ping from './ping'
 import * as ensUtils from './ens-utils'
-import * as cfImageUpload from './cf-image-upload'
 import * as image from './image'
 
 export {
@@ -18,6 +17,5 @@ export {
   starbase,
   ping,
   ensUtils,
-  cfImageUpload,
   image,
 }

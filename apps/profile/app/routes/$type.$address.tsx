@@ -35,7 +35,7 @@ import { Cover } from '~/components/profile/cover/Cover'
 import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
 
-import defaultOG from '~/assets/Rollup_profiles_OG.png'
+import defaultOG from '~/assets/social.png'
 import {
   CryptoAddressType,
   NodeType,
@@ -97,10 +97,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       //TODO: Type-based resolvers to be tackled in separate PR
     }
 
-    const ogImage = await ogImageFromProfile(
-      profile.pfp?.image as string,
-      profile.cover as string
-    )
+    const ogImage = await ogImageFromProfile(profile.pfp?.image as string)
 
     const splittedUrl = request.url.split('/')
     const path = splittedUrl[splittedUrl.length - 1]
@@ -113,7 +110,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     )
 
     return json({
-      uname: profile.handle || address,
+      uname: profile.displayName || address,
       ogImage: ogImage || defaultOG,
       profile,
       accountURN,
@@ -141,11 +138,11 @@ export const meta: MetaFunction = ({
     'og:description': 'Claim yours now!',
     'twitter:description': 'Claim yours now!',
     'og:url': `https://rollup.id`,
-    'og:image': data ? data.ogImage : defaultOG,
+    'og:image': data.ogImage,
     'og:image:alt': `Profile not found`,
     'og:site_name': 'Rollup',
     'og:type': 'profile',
-    'twitter:image': data ? data.ogImage : defaultOG,
+    'twitter:image': data.ogImage,
     'twitter:image:alt': `Profile not found`,
     'twitter:site': '@rollupid',
     'twitter:card': 'summary_large_image',

@@ -1,5 +1,6 @@
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
-import { ActionFunction, json } from '@remix-run/cloudflare'
+import type { ActionFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/clients'
 import { requireJWT } from '~/utils/session.server'
 
