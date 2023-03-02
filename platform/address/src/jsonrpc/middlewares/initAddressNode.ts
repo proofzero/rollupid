@@ -27,7 +27,7 @@ export const initAddressNode: BaseMiddlewareFunction<Context> = async ({
       throw new Error('missing alias')
     }
 
-    const imageClient = createImageClient(ctx.Images, ctx.IMAGES_URL)
+    const imageClient = createImageClient(ctx.Images)
     const gradient = await imageClient.getGradient.mutate({
       gradientSeed: ctx.alias,
     })

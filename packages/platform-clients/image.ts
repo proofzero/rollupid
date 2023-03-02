@@ -4,8 +4,8 @@ import { trpcClientLoggerGenerator } from './utils'
 
 export default (
   fetcher: Fetcher,
-  imagesURL: string,
   options?: {
+    imagesURL?: string
     cf?: RequestInitCfProperties
     headers?: Record<string, string>
   }
@@ -16,7 +16,7 @@ export default (
         logger: trpcClientLoggerGenerator('Image'),
       }),
       httpBatchLink({
-        url: imagesURL,
+        url: options?.imagesURL || 'http://localhost/trpc',
         fetch: (input, init?: RequestInit<RequestInitCfProperties>) => {
           if (init && options?.cf) {
             init.cf = options.cf

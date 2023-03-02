@@ -1,7 +1,7 @@
 import createImageClient from '@kubelt/platform-clients/image'
 
 export const ogImageFromProfile = async (pfp: string) => {
-  const imageClient = createImageClient(Images, IMAGES_URL)
+  const imageClient = createImageClient(Images, { imagesURL: IMAGES_URL })
   const ogImage = await imageClient.getOgImage.query({
     fgUrl: pfp,
   })
@@ -9,7 +9,7 @@ export const ogImageFromProfile = async (pfp: string) => {
 }
 
 export const updateOgImageFromProfile = async (pfp: string) => {
-  const imageClient = createImageClient(Images, IMAGES_URL)
+  const imageClient = createImageClient(Images, { imagesURL: IMAGES_URL })
   const ogImage = await imageClient.updateOgImage.query({
     fgUrl: pfp,
   })

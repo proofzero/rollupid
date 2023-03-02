@@ -14,7 +14,6 @@ declare global {
     PROFILE_APP_URL: string
     CONSOLE_APP_URL: string
     PASSPORT_REDIRECT_URL: string
-    IMAGES_URL: string
     APIKEY_ALCHEMY_PUBLIC: string
 
     INTERNAL_GOOGLE_ANALYTICS_TAG: string

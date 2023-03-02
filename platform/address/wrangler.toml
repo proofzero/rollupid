@@ -25,7 +25,6 @@ unsafe.bindings = [
 [vars]
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.rollup.id/api"
-IMAGES_URL="http://localhost/trpc"
 NFTAR_CHAIN_ID=5
 
 [dev]
@@ -78,7 +77,6 @@ unsafe.bindings = [
 [env.dev.vars]
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.rollup.id/api"
-IMAGES_URL="http://images-dev.rollup.id/trpc"
 NFTAR_CHAIN_ID=5
 
 [env.next]
@@ -105,7 +103,6 @@ unsafe.bindings = [
 [env.next.vars]
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.rollup.id/api"
-IMAGES_URL="http://images-next.rollup.id/trpc"
 NFTAR_CHAIN_ID=5
 
 [env.current]
@@ -132,5 +129,4 @@ unsafe.bindings = [
 [env.current.vars]
 MINTPFP_CONTRACT_ADDRESS="0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
 NFTAR_URL="https://nftar.rollup.id/api"
-IMAGES_URL="http://images.rollup.id/trpc"
 NFTAR_CHAIN_ID=1
