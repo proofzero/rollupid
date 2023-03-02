@@ -4,7 +4,7 @@ import wasm from '../../assets/svg2png_wasm_bg.wasm'
 import { svg2png, initialize } from 'svg2png-wasm'
 import { Context } from '../../context'
 //@ts-ignore
-import bgUrl from '../../assets/ogBackground.png'
+import bg from '../../assets/ogBackgroundB64'
 
 export const getOgImageMethodInput = z.object({
   fgUrl: z.string().url(),
@@ -63,7 +63,6 @@ export const getOgImageMethod = async ({
     )
   }
 
-  const bg = await encodeDataURI(bgUrl)
   const fg = await encodeDataURI(fgUrl)
 
   // console.log({ fgUrl, fg })
