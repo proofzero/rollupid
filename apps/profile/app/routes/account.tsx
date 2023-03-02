@@ -26,6 +26,8 @@ import type { Node } from '@kubelt/galaxy-client'
 import type { AddressURN } from '@kubelt/urns/address'
 import type { FullProfile } from '~/types'
 
+import { ToastError, ToastSuccess } from '@kubelt/design-system/src/atoms/toast'
+
 export function links() {
   return [...faqStyles(), { rel: 'stylesheet', href: styles }]
 }
@@ -117,9 +119,9 @@ const subNavigation = {
 
 const notify = (success: boolean = true) => {
   if (success) {
-    toast.success('Saved')
+    toast.custom(<ToastSuccess message="Saved" />)
   } else {
-    toast.error('Save Failed -- Please try again')
+    toast.custom(<ToastError message="Save Failed -- Please try again" />)
   }
 }
 

@@ -48,6 +48,7 @@ import type { Profile, Node } from '@kubelt/galaxy-client'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import type { decoratedNft } from '~/helpers/nfts'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { ToastError, ToastSuccess } from '@kubelt/design-system/src/atoms/toast'
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
@@ -250,9 +251,9 @@ const Gallery = () => {
   // HANDLERS
   const notify = (success: boolean = true) => {
     if (success) {
-      toast.success('Saved')
+      toast.custom(<ToastSuccess message="Saved" />)
     } else {
-      toast.error('Save Failed -- Please try again')
+      toast.custom(<ToastError message="Save Failed -- Please try again" />)
     }
   }
 

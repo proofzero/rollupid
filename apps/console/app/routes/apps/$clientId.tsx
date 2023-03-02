@@ -14,6 +14,7 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { RotatedSecrets } from '~/types'
+import { ToastError, ToastSuccess } from '@kubelt/design-system/src/atoms/toast'
 
 type AppData = {
   clientId: string
@@ -111,10 +112,10 @@ export default function AppDetailIndexPage() {
 
   const notify = (success: boolean = true) => {
     if (success) {
-      toast.success('Saved', { duration: 2000 })
+      toast.custom(<ToastSuccess message="Saved" />, { duration: 2000 })
     } else {
-      toast.error(
-        'Could not save your changes due to errors noted on the page',
+      toast.custom(
+        <ToastError message="Could not save your changes due to errors noted on the page" />,
         {
           duration: 2000,
         }

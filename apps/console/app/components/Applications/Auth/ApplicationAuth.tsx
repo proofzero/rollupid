@@ -11,6 +11,7 @@ import { useState } from 'react'
 import { RotateCredsModal } from '../../RotateCredsModal/RotateCredsModal'
 import type { ScopeMeta } from '@kubelt/platform/starbase/src/types'
 import toast from 'react-hot-toast'
+import { ToastSuccess } from '@kubelt/design-system/src/atoms/toast'
 
 export type appDetailsProps = {
   app: {
@@ -112,9 +113,12 @@ export const ApplicationAuth = ({
                   value={oAuth.appId}
                   copyable
                   onCopy={() =>
-                    toast.success('Client ID copied to clipboard!', {
-                      duration: 2000,
-                    })
+                    toast.custom(
+                      <ToastSuccess message="Client ID copied to clipboard!" />,
+                      {
+                        duration: 2000,
+                      }
+                    )
                   }
                   disabled
                 />
@@ -128,9 +132,12 @@ export const ApplicationAuth = ({
                   hidden={oAuth.appSecret ? false : true}
                   copyable={oAuth.appSecret ? true : false}
                   onCopy={() =>
-                    toast.success('Client secret copied to clipboard!', {
-                      duration: 2000,
-                    })
+                    toast.custom(
+                      <ToastSuccess message="Client secret copied to clipboard!" />,
+                      {
+                        duration: 2000,
+                      }
+                    )
                   }
                   disabled
                 />
