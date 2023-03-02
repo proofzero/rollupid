@@ -3,9 +3,10 @@ import { z } from 'zod'
 import wasm from '../../assets/svg2png_wasm_bg.wasm'
 import { svg2png, initialize } from 'svg2png-wasm'
 import { Context } from '../../context'
+//@ts-ignore
+import bgUrl from '../../assets/ogBackground.png'
 
 export const getOgImageMethodInput = z.object({
-  bgUrl: z.string().url().or(z.literal('')),
   fgUrl: z.string().url(),
 })
 export type getOgImageParams = z.infer<typeof getOgImageMethodInput>
@@ -21,10 +22,13 @@ export const getOgImageMethod = async ({
   ctx: Context
 }): Promise<getOgImageOutputParams> => {
   const cache = caches.default
-  
-  console.log({ Cached: await cache.match(ctx.req!) })
+  const cached_ = await cache.match(ctx.req!)
+  if (cached_) {
+    console.log({ status: cached_.status })
+    return await cached_.text()
+  }
 
-  const { bgUrl, fgUrl } = input
+  const { fgUrl } = input
   // Attempt to download arbitrary images and encode them as data URIs with the
   // image-data-uri library. We cannot use the remote calls offered by
   // image-data-uri because it uses a legacy HTTP library that Cryptopunks 403
@@ -59,7 +63,7 @@ export const getOgImageMethod = async ({
     )
   }
 
-  const bg = bgUrl !== '' ? await encodeDataURI(bgUrl as string) : undefined
+  const bg = await encodeDataURI(bgUrl)
   const fg = await encodeDataURI(fgUrl)
 
   // console.log({ fgUrl, fg })
@@ -83,12 +87,8 @@ export const getOgImageMethod = async ({
       </pattern>
       <pattern id="hexagon" patternContentUnits="objectBoundingBox" width="1" height="1">
           <use xlink:href="#hexagonimage" transform="translate(-1.98598) scale(0.00233645)"/>
-      </pattern>
-      ${
-        bg
-          ? `<image id="backroundimage" width="64" height="64" xlink:href="${bg}"/>`
-          : ''
-      }
+      </pattern> 
+      <image id="backroundimage" width="64" height="64" xlink:href="${bg}"/>
       <image id="hexagonimage" width="2128" height="428" xlink:href="${fg}"/>
       </defs>
   </svg>`
@@ -111,7 +111,7 @@ export const getOgImageMethod = async ({
   var formData = new FormData()
   formData.append('file', new Blob([ogImage], { type: 'image/png' }))
   formData.append('id', id)
-  const imageUrlJson = await fetch(
+  await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1`,
     {
       method: 'POST',
@@ -143,16 +143,11 @@ export const getOgImageMethod = async ({
 
   // Caching strategy
   await cache.put(
-    ctx.req as RequestInfo,
-    new Response(
-      JSON.stringify({
-        cached,
-      }),
-      {
-        status: 200,
-        statusText: 'All good',
-      }
-    )
+    ctx.req!,
+    new Response(cached, {
+      status: 200,
+      statusText: 'All good',
+    })
   )
 
   return cached

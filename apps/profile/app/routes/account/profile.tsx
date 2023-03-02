@@ -13,6 +13,7 @@ import InputTextarea from '~/components/inputs/InputTextarea'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
+import { updateOgImageFromProfile } from '~/helpers/ogImage'
 
 import {
   gatewayFromIpfs,
@@ -38,9 +39,11 @@ export const action: ActionFunction = async ({ request }) => {
   const location = formData.get('location')?.toString()
   const website = formData.get('website')?.toString()
   const bio = formData.get('bio')?.toString()
+  const image = formData.get('pfp_url') as string
   let computedIsToken =
     formData.get('pfp_isToken')?.toString() === '1' ? true : false
   const galaxyClient = await getGalaxyClient()
+
   // TODO: handle and return form errors
   await galaxyClient.updateProfile(
     {
@@ -52,13 +55,15 @@ export const action: ActionFunction = async ({ request }) => {
         bio,
         website,
         pfp: {
-          image: formData.get('pfp_url') as string,
+          image,
           isToken: computedIsToken,
         },
       },
     },
     getAuthzHeaderConditionallyFromToken(jwt)
   )
+
+  await updateOgImageFromProfile(image)
 
   return null
 }

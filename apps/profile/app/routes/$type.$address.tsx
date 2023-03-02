@@ -35,7 +35,7 @@ import { Cover } from '~/components/profile/cover/Cover'
 import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
 
-import defaultOG from '~/assets/Rollup_public_profile_OG.png'
+import defaultOG from '~/assets/social.png'
 import {
   CryptoAddressType,
   NodeType,
@@ -97,11 +97,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       //TODO: Type-based resolvers to be tackled in separate PR
     }
 
-    const ogImage = await ogImageFromProfile(
-      profile.pfp?.image as string,
-      profile.cover as string,
-      accountURN
-    )
+    const ogImage = await ogImageFromProfile(profile.pfp?.image as string)
 
     const splittedUrl = request.url.split('/')
     const path = splittedUrl[splittedUrl.length - 1]

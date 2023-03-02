@@ -16,6 +16,11 @@ import {
   GetGradientMethodInput,
   GetGradientMethodOutput,
 } from './methods/getGradient'
+import {
+  updateOgImageMethodInput,
+  updateOgImageMethodOutput,
+  updateOgImageMethod,
+} from './methods/updateOgImage'
 
 import { Context } from '../context'
 
@@ -34,6 +39,12 @@ export const appRouter = t.router({
     .input(getOgImageMethodInput)
     .output(getOgImageMethodOutput)
     .query(getOgImageMethod),
+  updateOgImage: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(updateOgImageMethodInput)
+    .output(updateOgImageMethodOutput)
+    .query(updateOgImageMethod),
   getGradient: t.procedure
     .use(LogUsage)
     .use(Analytics)
