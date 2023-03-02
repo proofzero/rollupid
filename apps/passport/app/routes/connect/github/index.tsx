@@ -7,9 +7,8 @@ export const action: ActionFunction = async ({
   request,
   context,
 }: ActionArgs) => {
-  await new Promise((ok) => setTimeout(ok, 50000))
-  // const authenticator = initAuthenticator(context.env)
-  // authenticator.use(getGithubAuthenticator(context.env))
+  const authenticator = initAuthenticator(context.env)
+  authenticator.use(getGithubAuthenticator(context.env))
 
-  // return authenticator.authenticate(GitHubStrategyDefaultName, request)
+  return authenticator.authenticate(GitHubStrategyDefaultName, request)
 }
