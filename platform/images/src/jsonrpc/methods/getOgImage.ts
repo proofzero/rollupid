@@ -20,6 +20,10 @@ export const getOgImageMethod = async ({
   input: getOgImageParams
   ctx: Context
 }): Promise<getOgImageOutputParams> => {
+  const cache = caches.default
+  
+  console.log({ Cached: await cache.match(ctx.req!) })
+
   const { bgUrl, fgUrl } = input
   // Attempt to download arbitrary images and encode them as data URIs with the
   // image-data-uri library. We cannot use the remote calls offered by
@@ -30,7 +34,7 @@ export const getOgImageMethod = async ({
     return (
       fetch(url)
         // Get the content type and unfortunately await the body. I would prefer
-        // that retrieving the body here was thennable, but need the header.
+        // that retrieving the body here was then enable, but need the header.
         .then(async (r) => [
           r.headers.get('content-type'),
           await r.arrayBuffer(),
@@ -119,7 +123,7 @@ export const getOgImageMethod = async ({
   )
     .then(async (res) => {
       if (res.status === 409) {
-        console.log('Image already exists.')
+        console.log('OG image already exists.')
         return
       }
       return res.json<{
@@ -133,11 +137,23 @@ export const getOgImageMethod = async ({
       console.error(e)
     })
 
-  //prob already exsists
-  if (!imageUrlJson?.success) {
-    const cached = `https://imagedelivery.net/${ctx.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
-    return cached
-  }
+  // We cache it with upload
+  // So might as well just return a cached URL
+  const cached = `https://imagedelivery.net/${ctx.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
 
-  return imageUrlJson.result.variants.filter((v) => v.includes('public'))[0]
+  // Caching strategy
+  await cache.put(
+    ctx.req as RequestInfo,
+    new Response(
+      JSON.stringify({
+        cached,
+      }),
+      {
+        status: 200,
+        statusText: 'All good',
+      }
+    )
+  )
+
+  return cached
 }
