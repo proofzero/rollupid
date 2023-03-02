@@ -54,6 +54,7 @@ const AppResolverComposition = {
     logAnalytics(),
   ],
   'Mutation.revokeAuthorizations': [
+    requestLogging(),
     setupContext(),
     hasApiKey(),
     isAuthorized(),
