@@ -141,8 +141,16 @@ export const getOgImageMethod = async ({
   const cached = `https://imagedelivery.net/${ctx.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
 
   // Caching strategy
+
+  const expiryDate = new Date()
+  expiryDate.setDate(expiryDate.getDate() + 90)
+
   await cache.put(
-    ctx.req!,
+    new Request(ctx.req!, {
+      headers: {
+        Expires: expiryDate.toString(),
+      },
+    }),
     new Response(cached, {
       status: 200,
       statusText: 'All good',

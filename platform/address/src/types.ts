@@ -31,7 +31,7 @@ export interface Environment {
   NFTAR_CHAIN_ID: string
   TOKEN_NFTAR: string
   NFTAR_URL: string
-  
+
   BLOCKCHAIN_ACTIVITY: Queue
 
   INTERNAL_APPLE_OAUTH_CLIENT_ID: string
