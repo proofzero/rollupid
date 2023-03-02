@@ -254,13 +254,9 @@ const Gallery = () => {
   // HANDLERS
   const notify = (success: boolean = true) => {
     if (success) {
-      toast(ToastType.Success, { message: 'Saved' }, { duration: 2000 })
+      toast(ToastType.Success, { message: 'Saved' })
     } else {
-      toast(
-        ToastType.Error,
-        { message: 'Save Failed -- Please try again' },
-        { duration: 2000 }
-      )
+      toast(ToastType.Error, { message: 'Save Failed -- Please try again' })
     }
   }
 
