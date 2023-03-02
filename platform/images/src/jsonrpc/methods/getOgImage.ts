@@ -148,7 +148,7 @@ export const getOgImageMethod = async ({
   await cache.put(
     new Request(ctx.req!, {
       headers: {
-        Expires: expiryDate.toString(),
+        Expires: expiryDate.toUTCString(),
       },
     }),
     new Response(cached, {
