@@ -17,7 +17,7 @@ import InputText from '~/components/inputs/InputText'
 import { NodeType } from '@kubelt/types/address'
 import warn from '~/assets/warning.svg'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
-import { toast } from 'react-hot-toast'
+import { toast, ToastType } from '@kubelt/design-system/src/atoms/toast'
 
 const normalizeProfile = (profile: any) => {
   switch (profile.__typename) {
@@ -272,14 +272,14 @@ const AccountSettingsConnections = () => {
           error = 'Account already connected'
       }
 
-      toast.error(error, {
-        duration: 2000,
-      })
+      toast(ToastType.Error, { message: error }, { duration: 2000 })
     } else {
       sessionStorage.removeItem('connection_requested')
-      toast.success('Account connected', {
-        duration: 2000,
-      })
+      toast(
+        ToastType.Success,
+        { message: 'Account connected' },
+        { duration: 2000 }
+      )
     }
   }, [reqUrlError])
 

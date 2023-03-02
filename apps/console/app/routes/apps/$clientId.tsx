@@ -6,14 +6,17 @@ import { json } from '@remix-run/cloudflare'
 import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
-import toast, { Toaster } from 'react-hot-toast'
-
 import { requireJWT } from '~/utilities/session.server'
 import { getGalaxyClient } from '~/utilities/platform.server'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { RotatedSecrets } from '~/types'
+import {
+  toast,
+  Toaster,
+  ToastType,
+} from '@kubelt/design-system/src/atoms/toast'
 
 type AppData = {
   clientId: string
@@ -111,13 +114,15 @@ export default function AppDetailIndexPage() {
 
   const notify = (success: boolean = true) => {
     if (success) {
-      toast.success('Saved', { duration: 2000 })
+      toast(ToastType.Success, { message: 'Saved' }, { duration: 2000 })
     } else {
-      toast.error(
-        'Could not save your changes due to errors noted on the page',
+      toast(
+        ToastType.Error,
         {
-          duration: 2000,
-        }
+          message:
+            'Could not save your changes due to errors noted on the page',
+        },
+        { duration: 2000 }
       )
     }
   }

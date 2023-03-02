@@ -1,7 +1,6 @@
 // React
 
 import { useState, forwardRef, useEffect, useMemo } from 'react'
-import { Toaster, toast } from 'react-hot-toast'
 
 // Remix
 
@@ -48,6 +47,11 @@ import type { Profile, Node } from '@kubelt/galaxy-client'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import type { decoratedNft } from '~/helpers/nfts'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import {
+  toast,
+  Toaster,
+  ToastType,
+} from '@kubelt/design-system/src/atoms/toast'
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
@@ -250,9 +254,9 @@ const Gallery = () => {
   // HANDLERS
   const notify = (success: boolean = true) => {
     if (success) {
-      toast.success('Saved')
+      toast(ToastType.Success, { message: 'Saved' })
     } else {
-      toast.error('Save Failed -- Please try again')
+      toast(ToastType.Error, { message: 'Save Failed -- Please try again' })
     }
   }
 
