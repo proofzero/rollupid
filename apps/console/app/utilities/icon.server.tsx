@@ -28,7 +28,7 @@ export enum ImageVariant {
 
 async function getUploadURL(metadata: ImageMetadata) {
   try {
-    const imageClient = createImageClient(Images)
+    const imageClient = createImageClient(Images, IMAGES_URL)
     const uploadURL = await imageClient.upload.mutate(metadata.env)
 
     // Expected response format:

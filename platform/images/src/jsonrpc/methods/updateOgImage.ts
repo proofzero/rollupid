@@ -19,7 +19,7 @@ export const updateOgImageMethod = async ({
   input: updateOgImageParams
   ctx: Context
 }): Promise<updateOgImageOutputParams> => {
-  const cache = caches.default
+  const cache = await caches.open('rollup:ogimage')
 
   await cache.delete(ctx.req!)
 

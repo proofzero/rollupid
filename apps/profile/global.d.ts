@@ -5,6 +5,7 @@ declare global {
   const COOKIE_DOMAIN: string
   const SECRET_SESSION_SALT: string
   const PASSPORT_URL: string
+  const IMAGES_URL: string
   const PASSPORT_AUTH_URL: string
   const PASSPORT_TOKEN_URL: string
   const CONSOLE_APP_URL: string

@@ -97,10 +97,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       //TODO: Type-based resolvers to be tackled in separate PR
     }
 
-    const ogImage = await ogImageFromProfile(
-      profile.pfp?.image as string,
-      accountURN
-    )
+    const ogImage = await ogImageFromProfile(profile.pfp?.image as string)
 
     const splittedUrl = request.url.split('/')
     const path = splittedUrl[splittedUrl.length - 1]

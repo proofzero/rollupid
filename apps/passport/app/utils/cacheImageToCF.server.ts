@@ -28,7 +28,7 @@ export default async (
   try {
     const imgFile = await retrievedImage.blob()
 
-    const imageClient = createImageClient(env.Images)
+    const imageClient = createImageClient(env.Images, env.IMAGES_URL)
     const { uploadURL } = await imageClient.upload.mutate()
 
     const formData = new FormData()

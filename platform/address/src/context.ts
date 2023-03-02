@@ -17,6 +17,7 @@ interface CreateInnerContextOptions
   TOKEN_NFTAR: string
   NFTAR_CHAIN_ID: string
   NFTAR_URL: string
+  IMAGES_URL: string
   Address: DurableObjectNamespace
   Analytics: AnalyticsEngineDataset
   ServiceDeploymentMetadata: DeploymentMetadata

@@ -22,10 +22,10 @@ export const getOgImageMethod = async ({
   ctx: Context
 }): Promise<getOgImageOutputParams> => {
   const cache = await caches.open('rollup:ogimage')
-  const cached_ = await cache.match(ctx.req!)
-  if (cached_) {
-    console.log({ status: cached_.status })
-    return await cached_.text()
+  const cachedRes = await cache.match(ctx.req!)
+  if (cachedRes) {
+    console.log({ status: cachedRes.status })
+    return await cachedRes.text()
   }
 
   const { fgUrl } = input

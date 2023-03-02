@@ -4,6 +4,7 @@ import { trpcClientLoggerGenerator } from './utils'
 
 export default (
   fetcher: Fetcher,
+  imagesURL: string,
   options?: {
     cf?: RequestInitCfProperties
     headers?: Record<string, string>
@@ -15,12 +16,11 @@ export default (
         logger: trpcClientLoggerGenerator('Image'),
       }),
       httpBatchLink({
-        url: 'https://images-dev.rollup.id/trpc',
+        url: imagesURL,
         fetch: (input, init?: RequestInit<RequestInitCfProperties>) => {
           if (init && options?.cf) {
             init.cf = options.cf
           }
-          console.debug({ options })
           return fetcher.fetch(input, init)
         }, // NOTE: preflight middleware?
       }),
