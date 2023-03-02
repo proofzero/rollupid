@@ -7,11 +7,3 @@ export const ogImageFromProfile = async (pfp: string) => {
   })
   return ogImage
 }
-
-export const updateOgImageFromProfile = async (pfp: string) => {
-  const imageClient = createImageClient(Images, { imagesURL: IMAGES_URL })
-  const ogImage = await imageClient.updateOgImage.query({
-    fgUrl: pfp,
-  })
-  return ogImage
-}

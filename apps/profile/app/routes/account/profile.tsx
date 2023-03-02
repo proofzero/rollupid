@@ -13,7 +13,6 @@ import InputTextarea from '~/components/inputs/InputTextarea'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
-import { updateOgImageFromProfile } from '~/helpers/ogImage'
 
 import {
   gatewayFromIpfs,
@@ -62,8 +61,6 @@ export const action: ActionFunction = async ({ request }) => {
     },
     getAuthzHeaderConditionallyFromToken(jwt)
   )
-
-  await updateOgImageFromProfile(image)
 
   return null
 }
