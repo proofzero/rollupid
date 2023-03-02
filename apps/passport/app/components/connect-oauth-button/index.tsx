@@ -7,8 +7,6 @@ import githubIcon from '@kubelt/design-system/src/assets/social_icons/github.svg
 import googleIcon from '@kubelt/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@kubelt/design-system/src/assets/social_icons/microsoft.svg'
 import twitterIcon from '@kubelt/design-system/src/assets/social_icons/twitter.svg'
-import { useState } from 'react'
-import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 
 type OAuthProvider =
   | 'apple'
@@ -34,31 +32,21 @@ type ConnectOAuthButtonProps = {
 }
 
 const ConnectOAuthButton = ({ provider }: ConnectOAuthButtonProps) => {
-  const [showLoader, setShowLoader] = useState(false)
-
   return (
     <>
-      {showLoader && (
-        <div className="absolute">
-          <Loader />
+      <Button
+        className={'w-full hover:bg-gray-100'}
+        btnType={'secondary-alt'}
+        isSubmit={true}
+      >
+        <div className="flex justify-center items-center w-full py-1.5">
+          <img
+            className="w-5 h-5"
+            src={providerIconDict[provider]}
+            alt={provider}
+          />
         </div>
-      )}
-      <form className="w-full" action={`/connect/${provider}`} method="post">
-        <Button
-          onClick={() => setShowLoader(true)}
-          className={'w-full hover:bg-gray-100'}
-          btnType={'secondary-alt'}
-          isSubmit={true}
-        >
-          <div className="flex justify-center items-center w-full py-1.5">
-            <img
-              className="w-5 h-5"
-              src={providerIconDict[provider]}
-              alt={provider}
-            />
-          </div>
-        </Button>
-      </form>
+      </Button>
     </>
   )
 }

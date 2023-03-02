@@ -1,13 +1,57 @@
 import { Canvas, Meta, Story } from '@storybook/addon-docs'
 
 import { Authentication } from './Authentication'
+import { ConnectButton } from '../connect-button/ConnectButton'
 import { WagmiConfig, createClient } from 'wagmi'
 import { getDefaultClient } from 'connectkit'
 import circleLogo from './circle-logo.svg'
+import ConnectOAuthButton from '../connect-oauth-button'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 <Meta title="Components/Authentication" component={Authentication} />
 
-export const Template = (args) => <Authentication {...args} />
+export const Template = (args) => (
+  <Authentication {...args}>
+    <>
+      <ConnectButton
+        disabled={false}
+        connectCallback={async (address) => {
+          console.log(address)
+        }}
+        connectErrorCallback={(error) => {
+          console.log(error)
+        }}
+      />
+      <div className="my-5 flex flex-row items-center space-x-3">
+        <hr className="h-px w-16 bg-gray-500" />
+        <Text>or</Text>
+        <hr className="h-px w-16 bg-gray-500" />
+      </div>
+      <div className="flex flex-row space-x-3 justify-evenly w-full">
+        <form className="w-full" action={`/connect/google`} method="post">
+          <ConnectOAuthButton provider="google" />
+        </form>
+        <form className="w-full" action={`/connect/microsoft`} method="post">
+          <ConnectOAuthButton provider="microsoft" />
+        </form>
+        <form className="w-full" action={`/connect/apple`} method="post">
+          <ConnectOAuthButton provider="apple" />
+        </form>
+      </div>
+      <div className="flex flex-row space-x-3 justify-evenly w-full">
+        <form className="w-full" action={`/connect/twitter`} method="post">
+          <ConnectOAuthButton provider="twitter" />
+        </form>
+        <form className="w-full" action={`/connect/discord`} method="post">
+          <ConnectOAuthButton provider="discord" />
+        </form>
+        <form className="w-full" action={`/connect/github`} method="post">
+          <ConnectOAuthButton provider="github" />
+        </form>
+      </div>
+    </>
+  </Authentication>
+)
 
 # Authentication
 
