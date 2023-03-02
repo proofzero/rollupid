@@ -10,8 +10,7 @@ import IconPicker from '../../IconPicker'
 import { useState } from 'react'
 import { RotateCredsModal } from '../../RotateCredsModal/RotateCredsModal'
 import type { ScopeMeta } from '@kubelt/platform/starbase/src/types'
-import toast from 'react-hot-toast'
-import { ToastSuccess } from '@kubelt/design-system/src/atoms/toast'
+import { toast, ToastType } from '@kubelt/design-system/src/atoms/toast'
 
 export type appDetailsProps = {
   app: {
@@ -113,8 +112,9 @@ export const ApplicationAuth = ({
                   value={oAuth.appId}
                   copyable
                   onCopy={() =>
-                    toast.custom(
-                      <ToastSuccess message="Client ID copied to clipboard!" />,
+                    toast(
+                      ToastType.Success,
+                      { message: 'Client ID copied to clipboard!' },
                       {
                         duration: 2000,
                       }
@@ -132,8 +132,9 @@ export const ApplicationAuth = ({
                   hidden={oAuth.appSecret ? false : true}
                   copyable={oAuth.appSecret ? true : false}
                   onCopy={() =>
-                    toast.custom(
-                      <ToastSuccess message="Client secret copied to clipboard!" />,
+                    toast(
+                      ToastType.Success,
+                      { message: 'Client secret copied to clipboard!' },
                       {
                         duration: 2000,
                       }

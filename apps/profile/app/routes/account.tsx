@@ -10,7 +10,6 @@ import { HiOutlineHome } from 'react-icons/hi'
 import { TbPlugConnected, TbApps } from 'react-icons/tb'
 import { RiCollageLine } from 'react-icons/ri'
 import classNames from 'classnames'
-import { Toaster, toast } from 'react-hot-toast'
 
 import { requireJWT } from '~/utils/session.server'
 
@@ -25,8 +24,11 @@ import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
 import type { Node } from '@kubelt/galaxy-client'
 import type { AddressURN } from '@kubelt/urns/address'
 import type { FullProfile } from '~/types'
-
-import { ToastError, ToastSuccess } from '@kubelt/design-system/src/atoms/toast'
+import {
+  toast,
+  ToastType,
+  Toaster,
+} from '@kubelt/design-system/src/atoms/toast'
 
 export function links() {
   return [...faqStyles(), { rel: 'stylesheet', href: styles }]
@@ -119,9 +121,13 @@ const subNavigation = {
 
 const notify = (success: boolean = true) => {
   if (success) {
-    toast.custom(<ToastSuccess message="Saved" />)
+    toast(ToastType.Success, { message: 'Saved' }, { duration: 2000 })
   } else {
-    toast.custom(<ToastError message="Save Failed -- Please try again" />)
+    toast(
+      ToastType.Error,
+      { message: 'Save Failed -- Please try again' },
+      { duration: 2000 }
+    )
   }
 }
 

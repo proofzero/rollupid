@@ -1,12 +1,10 @@
 import React from 'react'
-import {
-  ToastError,
-  ToastInfo,
-  ToastSuccess,
-  ToastWarning,
-  ToastWithLink,
-} from '.'
 import { Text } from '../text/Text'
+import { ToastError } from './ToastError'
+import { ToastInfo } from './ToastInfo'
+import { ToastSuccess } from './ToastSuccess'
+import { ToastWarning } from './ToastWarning'
+import { ToastWithLink } from './ToastWithLink'
 
 export default {
   title: 'Atoms/Toast',

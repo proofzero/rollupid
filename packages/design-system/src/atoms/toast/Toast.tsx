@@ -1,8 +1,11 @@
 import React from 'react'
 import { Text } from '../text/Text'
 
-export type ToastProps = {
+export type ToastMessageProps = {
   message: string
+}
+
+type ToastProps = ToastMessageProps & {
   className?: string
   PreMessage?: JSX.Element
   PostMessage?: JSX.Element

@@ -3,7 +3,7 @@ import { HiInformationCircle } from 'react-icons/hi'
 import { Text } from '../text/Text'
 import { Toast } from './Toast'
 
-type ToastWithLinkProps = {
+export type ToastWithLinkProps = {
   message: string
 
   linkHref: string

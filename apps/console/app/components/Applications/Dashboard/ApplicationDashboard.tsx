@@ -6,11 +6,10 @@ import { CTA } from '@kubelt/design-system/src/molecules/cta/cta'
 import { LoginsPanel } from '../LoginsPanel/LoginsPanel'
 import { RotateCredsModal } from '../../RotateCredsModal/RotateCredsModal'
 import { useState } from 'react'
-import { Toaster, toast } from 'react-hot-toast'
 import type { AuthorizedProfile } from '~/types'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
-import { ToastSuccess } from '@kubelt/design-system/src/atoms/toast'
+import { toast, ToastType } from '@kubelt/design-system/src/atoms/toast'
 
 type ApplicationDashboardProps = {
   galaxyGql: {
@@ -109,11 +108,10 @@ export const ApplicationDashboard = ({
               hidden={galaxyGql.apiKey ? false : true}
               copyable={galaxyGql.apiKey ? true : false}
               onCopy={() =>
-                toast.custom(
-                  <ToastSuccess message="Client secret copied to clipboard!" />,
-                  {
-                    duration: 2000,
-                  }
+                toast(
+                  ToastType.Success,
+                  { message: 'Client secret copied to clipboard!' },
+                  { duration: 2000 }
                 )
               }
             />
@@ -147,11 +145,10 @@ export const ApplicationDashboard = ({
                 value={oAuth.appId}
                 copyable
                 onCopy={() =>
-                  toast.custom(
-                    <ToastSuccess message="Client ID copied to clipboard!" />,
-                    {
-                      duration: 2000,
-                    }
+                  toast(
+                    ToastType.Success,
+                    { message: 'Client ID copied to clipboard!' },
+                    { duration: 2000 }
                   )
                 }
               />
@@ -163,11 +160,10 @@ export const ApplicationDashboard = ({
                 hidden={oAuth.appSecret ? false : true}
                 copyable={oAuth.appSecret ? true : false}
                 onCopy={() =>
-                  toast.custom(
-                    <ToastSuccess message="Client secret copied to clipboard!" />,
-                    {
-                      duration: 2000,
-                    }
+                  toast(
+                    ToastType.Success,
+                    { message: 'Client secret copied to clipboard!' },
+                    { duration: 2000 }
                   )
                 }
               />
