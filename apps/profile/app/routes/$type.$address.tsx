@@ -110,7 +110,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     )
 
     return json({
-      uname: profile.handle || address,
+      uname: profile.displayName || address,
       ogImage: ogImage || defaultOG,
       profile,
       accountURN,
