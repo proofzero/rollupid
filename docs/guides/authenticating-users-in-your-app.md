@@ -12,7 +12,7 @@ See [Tokens](../advanced/token.md) for more information on the ID token.
 
 ### Session Cookies
 
-The most common way to authenticate a user's session in a browser application is to user browser session cookies. A session cookie is can store simple user information like the ID token recieved through the auth flow or just a simple user id. You can then use this session cookie to validate the user's session in your app every subsequent request on ther server.
+The most common way to authenticate a user's session in a browser application is to user browser session cookies. A session cookie is can store simple user information like the ID token recieved through the auth flow or just a simple user id. You can then use this session cookie to validate the user's session in your app every subsequent request on the server.
 
 As a developer you can set and reset expiry times on the session cookie to control how long the user is logged in for but most web frameworks have built-in support for session cookies.
 
