@@ -20,13 +20,6 @@ export const getOgImageMethod = async ({
   input: getOgImageParams
   ctx: Context
 }): Promise<getOgImageOutputParams> => {
-  const cache = caches.default
-  const cached_ = await cache.match(ctx.req!)
-  if (cached_) {
-    console.log({ status: cached_.status })
-    return await cached_.text()
-  }
-
   const { fgUrl } = input
   // Attempt to download arbitrary images and encode them as data URIs with the
   // image-data-uri library. We cannot use the remote calls offered by
@@ -136,15 +129,6 @@ export const getOgImageMethod = async ({
   // We cache it with upload
   // So might as well just return a cached URL
   const cached = `https://imagedelivery.net/${ctx.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
-
-  // Caching strategy
-  await cache.put(
-    ctx.req!,
-    new Response(cached, {
-      status: 200,
-      statusText: 'All good',
-    })
-  )
 
   return cached
 }
