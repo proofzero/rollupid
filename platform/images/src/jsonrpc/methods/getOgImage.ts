@@ -3,6 +3,7 @@ import { z } from 'zod'
 import wasm from '../../assets/svg2png_wasm_bg.wasm'
 import { svg2png, initialize } from 'svg2png-wasm'
 import { Context } from '../../context'
+//@ts-ignore
 import bg from '../../assets/ogBackgroundB64'
 
 export const getOgImageMethodInput = z.object({
@@ -20,6 +21,13 @@ export const getOgImageMethod = async ({
   input: getOgImageParams
   ctx: Context
 }): Promise<getOgImageOutputParams> => {
+  const cache = await caches.open('rollup:ogimage')
+  const cached_ = await cache.match(ctx.req!)
+  if (cached_) {
+    console.log({ status: cached_.status })
+    return await cached_.text()
+  }
+
   const { fgUrl } = input
   // Attempt to download arbitrary images and encode them as data URIs with the
   // image-data-uri library. We cannot use the remote calls offered by
@@ -56,6 +64,8 @@ export const getOgImageMethod = async ({
   }
 
   const fg = await encodeDataURI(fgUrl)
+
+  // console.log({ fgUrl, fg })
 
   // TODO: Load from assets folder?
   // Constants for populating the SVG (optional).
@@ -129,6 +139,15 @@ export const getOgImageMethod = async ({
   // We cache it with upload
   // So might as well just return a cached URL
   const cached = `https://imagedelivery.net/${ctx.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
+
+  // Caching strategy
+  await cache.put(
+    ctx.req!,
+    new Response(cached, {
+      status: 200,
+      statusText: 'All good',
+    })
+  )
 
   return cached
 }

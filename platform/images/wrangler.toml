@@ -32,6 +32,7 @@ port = 8989
 local_protocol = "http"
 
 [env.dev]
+route = { pattern = "images-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 
 [env.dev.vars]
 # The duration in seconds that returned upload URL is good for.

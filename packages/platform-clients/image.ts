@@ -15,11 +15,12 @@ export default (
         logger: trpcClientLoggerGenerator('Image'),
       }),
       httpBatchLink({
-        url: 'http://localhost/trpc',
+        url: 'https://images-dev.rollup.id/trpc',
         fetch: (input, init?: RequestInit<RequestInitCfProperties>) => {
           if (init && options?.cf) {
             init.cf = options.cf
           }
+          console.debug({ options })
           return fetcher.fetch(input, init)
         }, // NOTE: preflight middleware?
       }),
