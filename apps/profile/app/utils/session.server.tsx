@@ -99,16 +99,15 @@ export async function requireJWT(request: Request, headers = new Headers()) {
         throw redirect('/signout')
       }
 
-      const { access_token, refresh_token } = await token.json<{
+      const { access_token } = await token.json<{
         access_token: string
-        refresh_token: string
       }>()
 
+      const { user } = session.data
+      user.accessToken = access_token
+
       // update the session with the new values
-      session.set('user', {
-        accessToken: access_token,
-        refreshToken: refresh_token,
-      })
+      session.set('user', user)
 
       // commit the session and append the Set-Cookie header
       headers.append(
