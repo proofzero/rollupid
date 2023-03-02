@@ -1,7 +1,6 @@
 import circleLogo from './circle-logo.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
 
-import ConnectOAuthButton from '../connect-oauth-button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { lazy } from 'react'
 import { Avatar } from '@kubelt/design-system'
@@ -15,17 +14,13 @@ const ConnectButton = lazy(() =>
 export type AuthenticationProps = {
   logoURL?: string
   appName?: string
-  enableWalletConnect: boolean
-  connectCallback: (address: string) => void
-  connectErrorCallback: (error: Error) => void
+  children: JSX.Element
 }
 
 export function Authentication({
   logoURL,
   appName,
-  enableWalletConnect = true,
-  connectCallback,
-  connectErrorCallback,
+  children,
 }: AuthenticationProps) {
   const logo = logoURL || circleLogo
   return (
@@ -47,28 +42,8 @@ export function Authentication({
           How would you like to continue?
         </h2>
       </div>
-      <ConnectButton
-        disabled={!enableWalletConnect}
-        connectCallback={connectCallback}
-        connectErrorCallback={connectErrorCallback}
-      />
-      <div className="my-5 flex flex-row items-center space-x-3">
-        <hr className="h-px w-16 bg-gray-500" />
-        <Text>or</Text>
-        <hr className="h-px w-16 bg-gray-500" />
-      </div>
 
-      <div className="flex flex-row space-x-3 justify-evenly w-full">
-        <ConnectOAuthButton provider="google" />
-        <ConnectOAuthButton provider="microsoft" />
-        <ConnectOAuthButton provider="apple" />
-      </div>
-
-      <div className="flex flex-row space-x-3 justify-evenly w-full">
-        <ConnectOAuthButton provider="twitter" />
-        <ConnectOAuthButton provider="discord" />
-        <ConnectOAuthButton provider="github" />
-      </div>
+      {children}
 
       <div className="mt-14 flex justify-center items-center space-x-2">
         <img src={subtractLogo} alt="powered by rollup.id" />

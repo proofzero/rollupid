@@ -31,22 +31,24 @@ type ConnectOAuthButtonProps = {
   provider: OAuthProvider
 }
 
-const ConnectOAuthButton = ({ provider }: ConnectOAuthButtonProps) => (
-  <form className="w-full" action={`/connect/${provider}`} method="post">
-    <Button
-      className={'w-full hover:bg-gray-100'}
-      btnType={'secondary-alt'}
-      isSubmit={true}
-    >
-      <div className="flex justify-center items-center w-full py-1.5">
-        <img
-          className="w-5 h-5"
-          src={providerIconDict[provider]}
-          alt={provider}
-        />
-      </div>
-    </Button>
-  </form>
-)
+const ConnectOAuthButton = ({ provider }: ConnectOAuthButtonProps) => {
+  return (
+    <>
+      <Button
+        className={'w-full hover:bg-gray-100'}
+        btnType={'secondary-alt'}
+        isSubmit={true}
+      >
+        <div className="flex justify-center items-center w-full py-1.5">
+          <img
+            className="w-5 h-5"
+            src={providerIconDict[provider]}
+            alt={provider}
+          />
+        </div>
+      </Button>
+    </>
+  )
+}
 
 export default ConnectOAuthButton
