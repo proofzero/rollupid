@@ -14,15 +14,15 @@ See [Tokens](../advanced/token.md) for more information on the ID token.
 
 The most common way to authenticate a user's session in a browser application is to user browser session cookies. A session cookie is can store simple user information like the ID token recieved through the auth flow or just a simple user id. You can then use this session cookie to validate the user's session in your app every subsequent request.
 
-As a developer you can set and reset expiry times on the session cookie to control how long the user is logged in for but most web frameworks have built in support for session cookies.
+As a developer you can set and reset expiry times on the session cookie to control how long the user is logged in for but most web frameworks have built-in support for session cookies.
 
 {% hint style="info" %}You may also choose to use server side sessions if you wish to store the user information serverside only instead of on the client with the cookie.{% endhint %}
 
 ### Session Storage
 
-If you are building a single page application (SPA) without a backend to work with cookie sessions you can use browsers session storage to store the ID token using the PKCE auth flow.
+If you are building a single page application (SPA) without a backend you can use browsers session storage to store the access token that will be used in subsequent third-party API calls that the application will perform. To obtain an access token it is reccomended that you use the PKCE flow.
 
-{% hint style="warning" %} This feature is currently unsupported by Rollup. See https://github.com/proofzero/rollupid/issues/1671 {% endhint %}
+{% hint style="warning" %}PKCE feature is currently in development. See https://github.com/proofzero/rollupid/issues/1671{% endhint %}
 
 ## Native Applications
 

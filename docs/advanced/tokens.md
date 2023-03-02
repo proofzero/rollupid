@@ -33,7 +33,7 @@ to configure this snippet with your account
 
 This token can be treated as authentication to your application. The audience (the aud claim) of the token is set to the application's identifier, which means that only this specific application should consume this token. You can store this token with the user's profile in your database using the subject as the unique user identifier and use it to personalize the user's experience.
 
-Conversely, Rollup's Galaxy API expects a different token with the same aud value but with additional parameters for security. Therefore sending an ID token to Galaxy will not work. Since the ID token is not signed by the API, the API would have no way of knowing if the application had modified the token (e.g., adding more scopes) if it were to accept the ID Token.
+Conversely, Rollup's Galaxy API expects a different token with the same aud value but with additional parameters for security. Therefore sending an ID token to Galaxy will not work.
 
 ## Access tokens
 
@@ -63,4 +63,4 @@ to configure this snippet with your account
 
 Note that the token does not contain any information about the user besides their ID (sub claim). It only contains authorization information about which actions the application is allowed to perform via API (scope claim). This is what makes it useful for securing an API, but not for authenticating a user.
 
-In some situations, it may be desirable to put additional information about the user or other custom claims, besides their sub claim, in the access token to save the API from having to do extra work to fetch details about the user. If you choose to do this, bear in mind that these extra claims will be readable in the access token. To learn more, read [Create Custom Claims](advanced/custom-claims.md).
+In some situations, it may be desirable to put additional information about the user or other custom claims, besides their "sub" claim (e.g. roles and other attributes), in the access token to save the API from having to do extra work to fetch details about the user. If you choose to do this, bear in mind that these extra claims will be readable in the access token. Non-access claims however, will be readable in the ID token. To learn more, read [Create Custom Claims](advanced/custom-claims.md).
