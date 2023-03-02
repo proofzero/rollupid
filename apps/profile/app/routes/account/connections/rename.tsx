@@ -12,7 +12,7 @@ export const action: ActionFunction = async ({ request }) => {
   const name = formData.get('name') as string
 
   const galaxyClient = await getGalaxyClient()
-  galaxyClient.updateAddressNickname(
+  await galaxyClient.updateAddressNickname(
     {
       addressURN: id,
       nickname: name,
