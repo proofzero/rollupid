@@ -6,7 +6,6 @@ export default (
   fetcher: Fetcher,
   options?: {
     imagesURL?: string
-    cf?: RequestInitCfProperties
     headers?: Record<string, string>
   }
 ) =>
@@ -17,12 +16,10 @@ export default (
       }),
       httpBatchLink({
         url: options?.imagesURL || 'http://localhost/trpc',
-        fetch: (input, init?: RequestInit<RequestInitCfProperties>) => {
-          if (init && options?.cf) {
-            init.cf = options.cf
-          }
-          return fetcher.fetch(input, init)
-        }, // NOTE: preflight middleware?
+        fetch: fetcher.fetch.bind(fetcher), // NOTE: preflight middleware?
+        headers() {
+          return options?.headers || {}
+        },
       }),
     ],
   })

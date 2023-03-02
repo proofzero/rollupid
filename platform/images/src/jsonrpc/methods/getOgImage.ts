@@ -3,7 +3,6 @@ import { z } from 'zod'
 import wasm from '../../assets/svg2png_wasm_bg.wasm'
 import { svg2png, initialize } from 'svg2png-wasm'
 import { Context } from '../../context'
-//@ts-ignore
 import bg from '../../assets/ogBackgroundB64'
 
 export const getOgImageMethodInput = z.object({
@@ -24,7 +23,7 @@ export const getOgImageMethod = async ({
   const cache = await caches.open('rollup:ogimage')
   const cachedRes = await cache.match(ctx.req!)
   if (cachedRes) {
-    console.log({ status: cachedRes.status })
+    console.debug({ status: cachedRes.status })
     return await cachedRes.text()
   }
 
