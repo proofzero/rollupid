@@ -9,7 +9,11 @@ import { useState } from 'react'
 import type { AuthorizedProfile } from '~/types'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
-import { toast, ToastType } from '@kubelt/design-system/src/atoms/toast'
+import {
+  toast,
+  Toaster,
+  ToastType,
+} from '@kubelt/design-system/src/atoms/toast'
 
 type ApplicationDashboardProps = {
   galaxyGql: {
