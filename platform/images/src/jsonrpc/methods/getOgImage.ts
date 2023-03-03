@@ -90,13 +90,23 @@ export const getOgImageMethod = async ({
       <image id="hexagonimage" width="2128" height="428" xlink:href="${fg}"/>
       </defs>
   </svg>`
-  await initialize(wasm).catch((e: Error) => {
-    //We don't log the expected error
-    if (!e.message.startsWith('Already initialized.')) console.error(e)
-  })
-  const ogImage = await svg2png(svg)
-  // return new Response(ogImage, { headers: { 'content-type': 'image/png' } })
-
+  let ogImage = null
+  try {
+    // const instance = await instantiate()
+    // ogImage = instance.render(svg)
+    // console.debug('rendered svg', ogImage.length)
+    await initialize(wasm).catch((e: Error) => {
+      //We don't log the expected error
+      console.debug("Couldn't initialize wasm", e)
+      if (!e.message.startsWith('Already initialized.')) console.error(e)
+    })
+    console.debug('initialized wasm')
+    ogImage = await svg2png(svg)
+  } catch (e) {
+    console.error('Failed to convert svg to png')
+    console.error(e)
+    return ''
+  }
   const id = await crypto.subtle
     .digest('SHA-256', ogImage)
     .then((digest) =>
