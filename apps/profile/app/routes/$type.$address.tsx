@@ -49,7 +49,6 @@ import type { FullProfile } from '~/types'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { address, type } = params
-
   const galaxyClient = await getGalaxyClient()
 
   const session = await getProfileSession(request)
@@ -97,7 +96,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       //TODO: Type-based resolvers to be tackled in separate PR
     }
 
-    const ogImage = await ogImageFromProfile(profile.pfp?.image as string)
+    let ogImage = null
+    if (request.cf.botManagement.score < 30) {
+      ogImage = await ogImageFromProfile(profile.pfp?.image as string)
+    } else {
+      console.debug(
+        'Human detected, not generating OG image',
+        request.cf.botManagement.score
+      )
+    }
 
     const splittedUrl = request.url.split('/')
     const path = splittedUrl[splittedUrl.length - 1]
