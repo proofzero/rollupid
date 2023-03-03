@@ -24,7 +24,7 @@ interface CreateInnerContextOptions
   authorization?: Authorization
   Starbase: Fetcher
   starbaseClient?: ReturnType<typeof createStarbaseClient>
-  EDGES: Fetcher
+  Edges: Fetcher
   Account: Fetcher
   accountClient?: ReturnType<typeof createAccountClient>
   // Added by InjectEdges middleware.
