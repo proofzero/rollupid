@@ -181,7 +181,7 @@ export default function AccountLayout() {
         <HeadNav
           consoleURL={CONSOLE_APP_URL}
           loggedIn={!!profile}
-          basePath={`/p/${AccountURNSpace.decode(accountURN)}`}
+          basePath={`/p/${AccountURNSpace.decode(accountURN)}/links`}
           avatarUrl={profile?.pfp?.image as string}
         />
       </div>
