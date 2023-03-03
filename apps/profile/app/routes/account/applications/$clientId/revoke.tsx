@@ -25,7 +25,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     }
 
     const galaxyClient = await getGalaxyClient()
-    await galaxyClient.revokeAppAuthorizations(
+    await galaxyClient.revokeAppAuthorization(
       {
         clientId,
       },

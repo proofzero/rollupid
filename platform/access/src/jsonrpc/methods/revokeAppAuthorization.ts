@@ -8,32 +8,32 @@ import { EDGE_AUTHORIZES } from '../../constants'
 import { AccountURNSpace } from '@kubelt/urns/account'
 import { AccessURNSpace } from '@kubelt/urns/access'
 
-export const RevokeAppAuthorizationsMethodInput = z.object({
+export const RevokeAppAuthorizationMethodInput = z.object({
   accountURN: AccountURNInput,
   clientId: z.string().min(1),
 })
 
-type RevokeAppAuthorizationsMethodInput = z.infer<
-  typeof RevokeAppAuthorizationsMethodInput
+type RevokeAppAuthorizationMethodInput = z.infer<
+  typeof RevokeAppAuthorizationMethodInput
 >
 
-export const RevokeAppAuthorizationsMethodOutput = z.void()
-type RevokeAppAuthorizationsMethodOutput = z.infer<
-  typeof RevokeAppAuthorizationsMethodOutput
+export const RevokeAppAuthorizationMethodOutput = z.void()
+type RevokeAppAuthorizationMethodOutput = z.infer<
+  typeof RevokeAppAuthorizationMethodOutput
 >
 
-type RevokeAppAuthorizationsParams = {
+type RevokeAppAuthorizationParams = {
   ctx: Context
-  input: RevokeAppAuthorizationsMethodInput
+  input: RevokeAppAuthorizationMethodInput
 }
 
-interface RevokeAppAuthorizationsMethod {
+interface RevokeAppAuthorizationMethod {
   (
-    params: RevokeAppAuthorizationsParams
-  ): Promise<RevokeAppAuthorizationsMethodOutput>
+    params: RevokeAppAuthorizationParams
+  ): Promise<RevokeAppAuthorizationMethodOutput>
 }
 
-export const revokeAppAuthorizationsMethod: RevokeAppAuthorizationsMethod =
+export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
   async ({ ctx, input }) => {
     const { accountURN, clientId } = input
 

@@ -28,14 +28,14 @@ const appResolvers: Resolvers = {
     },
   },
   Mutation: {
-    revokeAppAuthorizations: async (
+    revokeAppAuthorization: async (
       _parent: any,
       { clientId },
       { accountURN, env }: ResolverContext
     ) => {
       const accessClient = createAccessClient(env.Access)
 
-      await accessClient.revokeAppAuthorizations.mutate({
+      await accessClient.revokeAppAuthorization.mutate({
         accountURN,
         clientId,
       })
@@ -53,7 +53,7 @@ const AppResolverComposition = {
     isAuthorized(),
     logAnalytics(),
   ],
-  'Mutation.revokeAuthorizations': [
+  'Mutation.revokeAppAuthorization': [
     requestLogging(),
     setupContext(),
     hasApiKey(),
