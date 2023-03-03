@@ -37,13 +37,15 @@ type LoaderData = {
   avatarUrl: string
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, context }) => {
   const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(
-    Starbase,
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    //TODO: create TraceContext headers from request context
+    traceparent: 'blah',
+  })
 
+  //TODO: create TraceContext headers from request context
   const galaxyClient = await getGalaxyClient()
   try {
     const apps = await starbaseClient.listApps.query()

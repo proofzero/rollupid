@@ -18,6 +18,8 @@ interface CreateInnerContextOptions
   Edges: Fetcher
   accountURN?: AccountURN
   ownAppURNs?: ApplicationURN[]
+  traceparent?: string
+  tracespan?: string
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
@@ -29,10 +31,16 @@ interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
+  //TODO: Create span from parent
+  const traceparent = opts.req?.headers.get('traceparent') || ''
+  const tracespan = `BLAH${Date.now()}`
+
   const edges = createEdgesClient(opts.Edges)
   return {
     ...opts,
     edges,
+    traceparent,
+    tracespan,
   }
 }
 /**

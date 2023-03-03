@@ -1,14 +1,11 @@
 import { createServer } from '@graphql-yoga/common'
-
-import { checkEnv } from '@kubelt/utils'
-
-import Env, { required as requiredEnv } from './env'
+import Env from './env'
 import schema from './schema'
 
 const yoga = createServer<{ env: Env; ctx: ExecutionContext }>({
   schema,
   context: ({ request, extensions, ...rest }) => {
-    // TODO: setup context
+    //TODO: Create span from parent
     return { request, extensions, ...rest }
   },
 })
@@ -19,7 +16,10 @@ export default {
     env: Env,
     ctx: ExecutionContext
   ): Promise<Response> {
-    checkEnv(requiredEnv, env as unknown as Record<string, unknown>)
-    return yoga.handleRequest(request, { env, ctx })
+    const startTime = Date.now()
+    console.debug('GALAXY START', request.headers)
+    const result = (await yoga.handleRequest(request, { env, ctx })) as Response
+    console.debug('GALAXY END', Date.now() - startTime)
+    return result
   },
 }
