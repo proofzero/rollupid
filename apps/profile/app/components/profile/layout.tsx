@@ -15,7 +15,7 @@ const ProfileLayout = ({
   children,
 }: ProfileLayoutProps) => {
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex flex-col justify-center items-center h-full">
       <div className="max-w-4xl w-full min-h-[192px] mx-auto flex justify-center items-center px-8 mt-12">
         {Avatar}
       </div>
@@ -29,7 +29,9 @@ const ProfileLayout = ({
           <div className="py-6">{children}</div>
         </div>
       </div>
-      {PoweredBy}
+
+      <div className='mb-4'/>
+      <div className="absolute bottom-0">{PoweredBy}</div>
     </div>
   )
 }

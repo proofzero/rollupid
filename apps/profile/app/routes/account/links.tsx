@@ -185,7 +185,7 @@ const SortableLink = ({
           >
             <TbLink size={22} />
           </div>
-          <div className="max-w-[42vw] flex flex-col flex-1 break-all">
+          <div className="max-w-[30vw] sm:max-w-[45vw] flex flex-col flex-1 break-all">
             <Text weight="medium" className="truncate break-all">
               {name}
             </Text>
@@ -199,7 +199,7 @@ const SortableLink = ({
           className="mr-4 h-[40px]
                       bg-gray-100 focus:bg-gray-100 border-none
                       flex flex-row items-center justify-around
-                      text-gray-600"
+                      text-gray-600 overflow-hidden"
           btnType="secondary-alt"
           btnSize="base"
           onClick={() => {
@@ -331,7 +331,7 @@ export default function AccountSettingsLinks() {
   }, [isConnectionsChanged])
 
   return (
-    <div className="relative">
+    <div className="min-h-[70vh] relative">
       <Text size="xl" weight="bold" className="my-4 text-gray-900">
         Links
       </Text>

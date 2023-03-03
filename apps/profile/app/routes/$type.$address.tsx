@@ -248,7 +248,10 @@ const UserAddressLayout = () => {
           <img src={subtractLogo} alt="powered by rollup.id" />
           <Text size="xs" weight="normal" className="text-gray-400">
             Powered by{' '}
-            <a href="https://rollup.id" className="hover:underline text-indigo-500">
+            <a
+              href="https://rollup.id"
+              className="hover:underline text-indigo-500"
+            >
               rollup.id
             </a>
           </Text>

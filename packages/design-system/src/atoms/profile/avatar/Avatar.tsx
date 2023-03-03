@@ -50,7 +50,7 @@ export const Avatar = ({
       <img
         src={src}
         className={classNames(
-          'bg-white',
+          'bg-white object-cover',
           { 'border-white': border },
           { border: border && size === 'sm' }, // TODO: what is the xs border?
           { 'border-4': border && size === 'md' },
