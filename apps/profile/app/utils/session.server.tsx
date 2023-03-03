@@ -7,6 +7,14 @@ import { Authenticator } from 'remix-auth'
 import { OAuth2Strategy, OAuth2Profile } from 'remix-auth-oauth2'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
+
+import {
+  checkToken,
+  refreshAccessToken,
+  ExpiredTokenError,
+  InvalidTokenError,
+} from '@kubelt/utils/token'
+
 import { RollupAuth } from '~/types'
 
 // @ts-ignore
@@ -55,86 +63,34 @@ export const getRollupAuthenticator = () => {
 // we make the headers optional so loaders don't need to pass one
 // https://sergiodxa.com/articles/working-with-refresh-tokens-in-remix
 export async function requireJWT(request: Request, headers = new Headers()) {
-  const AuthorizationError = class extends Error {}
-
   const session = await getProfileSession(request)
-
+  const { user } = session.data
   try {
-    const {
-      user: { accessToken },
-    } = session.data
-
-    // if not found, redirect to login, this means the user is not even logged-in
-    if (!accessToken) throw redirect('/auth')
-
-    const parsedToken = parseJwt(accessToken)
-
-    // if expired throw an error (we can extends Error to create this)
-    if (!parsedToken.exp || parsedToken.exp * 1000 <= Date.now()) {
-      throw new AuthorizationError('Expired')
-    }
-
-    // if not expired, return the access token
-    return accessToken
+    checkToken(user.accessToken)
+    return user.accessToken
   } catch (error) {
-    // here, check if the error is an AuthorizationError (the one we throw above)
-    if (error instanceof AuthorizationError) {
-      const {
-        user: { refreshToken },
-      } = session.data
-
-      if (!refreshToken) {
+    if (error === InvalidTokenError) {
+      throw redirect('/auth')
+    } else if (error === ExpiredTokenError) {
+      if (!user.refreshToken) {
         throw redirect('/signout')
       }
 
-      // refresh the access token
-      const form = new FormData()
-      form.append('grant_type', 'refresh_token')
-      form.append('refresh_token', refreshToken.toString())
-      form.append('client_id', PROFILE_CLIENT_ID)
-      form.append('client_secret', PROFILE_CLIENT_SECRET)
-      const token = await fetch(PASSPORT_TOKEN_URL, {
-        method: 'post',
-        body: form,
-      }).catch((err) => {
-        console.error('failed to refresh token', err)
-        throw redirect('/signout')
+      user.accessToken = await refreshAccessToken({
+        tokenURL: PASSPORT_TOKEN_URL,
+        refreshToken: user.refreshToken,
+        clientId: PROFILE_CLIENT_ID,
+        clientSecret: PROFILE_CLIENT_SECRET,
       })
 
-      if (!token.ok) {
-        const error = await token.text()
-        console.error('failed to refresh token', error)
-        throw redirect('/signout')
-      }
-
-      const { access_token } = await token.json<{
-        access_token: string
-      }>()
-
-      const { user } = session.data
-      user.accessToken = access_token
-
-      // update the session with the new values
       session.set('user', user)
+      const cookie = await getProfileSessionStorage().commitSession(session)
+      headers.append('Set-Cookie', cookie)
 
-      // commit the session and append the Set-Cookie header
-      headers.append(
-        'Set-Cookie',
-        await getProfileSessionStorage().commitSession(session)
-      )
-
-      // redirect to the same URL if the request was a GET (loader)
       if (request.method === 'GET') throw redirect(request.url, { headers })
 
-      // return the access token so you can use it in your action
-      return access_token
+      return user.accessToken
     }
-
-    // force a signout and redirect to profile /signout
-    const authenticator = initAuthenticator()
-    return authenticator.logout(request, {
-      redirectTo: '/signout',
-    })
   }
 }
 

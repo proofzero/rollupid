@@ -7,6 +7,12 @@ import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 import { createCookieSessionStorage, redirect } from '@remix-run/cloudflare'
 
+import {
+  checkToken,
+  ExpiredTokenError,
+  InvalidTokenError,
+} from '@kubelt/utils/token'
+
 // @ts-ignore
 invariant(DEPLOY_ENV, 'DEPLOY_ENV must be set')
 
@@ -57,18 +63,16 @@ export async function requireJWT(request: Request) {
   const session = await getUserSession(request)
   const jwt = session.get('jwt')
 
-  if (!jwt || typeof jwt !== 'string') {
-    throw redirect(`${PASSPORT_URL}/signout`)
-  }
-  if (jwt) {
-    const parsedJWT = parseJwt(jwt)
-    const exp = parsedJWT?.exp
-    if (exp && exp < Date.now() / 1000) {
-      throw redirect(`${PASSPORT_URL}/signout`)
+  try {
+    checkToken(jwt)
+    return jwt
+  } catch (error) {
+    switch (error) {
+      case ExpiredTokenError:
+      case InvalidTokenError:
+        throw redirect(`${PASSPORT_URL}/signout`)
     }
   }
-
-  return jwt
 }
 
 /**
