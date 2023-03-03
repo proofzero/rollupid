@@ -21,7 +21,7 @@ export interface Environment {
   Authorization: DurableObjectNamespace
   Analytics: AnalyticsEngineDataset
   ServiceDeploymentMetadata: DeploymentMetadata
-  EDGES: Fetcher
+  Edges: Fetcher
   Starbase: Fetcher
   Account: Fetcher
   INTERNAL_JWT_ISS: string

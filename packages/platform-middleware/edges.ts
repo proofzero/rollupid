@@ -4,11 +4,11 @@ import { BaseContext } from '@kubelt/types'
 
 export const InjectEdges: BaseMiddlewareFunction<
   {
-    EDGES?: Fetcher
+    Edges?: Fetcher
   } & BaseContext
 > = ({ ctx, next }) => {
-  if (!ctx.EDGES) throw new Error('No EDGES binding found in context')
-  const edgesClient = createEdgesClient(ctx.EDGES)
+  if (!ctx.Edges) throw new Error('No Edges binding found in context')
+  const edgesClient = createEdgesClient(ctx.Edges)
 
   return next({
     ctx: {
