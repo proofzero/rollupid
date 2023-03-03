@@ -2,14 +2,14 @@ import type { HTMLAttributes } from 'react'
 
 export type ProfileLayoutProps = {
   Avatar: JSX.Element
-  Edit: JSX.Element
+  PoweredBy: JSX.Element
   Claim: JSX.Element
   Tabs: JSX.Element
 } & HTMLAttributes<HTMLDivElement>
 
 const ProfileLayout = ({
   Avatar,
-  Edit,
+  PoweredBy,
   Claim,
   Tabs,
   children,
@@ -20,8 +20,6 @@ const ProfileLayout = ({
         {Avatar}
       </div>
 
-      {Edit}
-
       <div className="mt-3 max-w-4xl overflow-visible w-full mx-auto py-3 lg:py-0">
         {Claim}
 
@@ -31,6 +29,7 @@ const ProfileLayout = ({
           <div className="py-6">{children}</div>
         </div>
       </div>
+      {PoweredBy}
     </div>
   )
 }

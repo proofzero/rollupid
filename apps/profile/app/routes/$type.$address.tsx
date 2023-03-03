@@ -14,7 +14,6 @@ import {
   HiOutlineLockClosed,
   HiOutlineQuestionMarkCircle,
 } from 'react-icons/hi'
-import { TiEdit } from 'react-icons/ti'
 
 import { getProfileSession, parseJwt } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
@@ -32,6 +31,7 @@ import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
 
 import defaultOG from '~/assets/social.png'
+import subtractLogo from '~/assets/subtract-logo.svg'
 import {
   CryptoAddressType,
   NodeType,
@@ -199,23 +199,6 @@ const UserAddressLayout = () => {
           border
         />
       }
-      Edit={
-        <Button
-          btnType="secondary-alt"
-          btnSize="base"
-          className="text-gray-500 max-w-max max-h-[40px] 
-          flex justify-center items-center
-        "
-          onClick={() => {
-            navigate('/account/profile')
-          }}
-        >
-          <div className="flex items-center justify-center">
-            <TiEdit size={22} className="mr-2" />
-            Edit Profile
-          </div>
-        </Button>
-      }
       Claim={
         <div className="px-3 lg:px-4">
           <Text
@@ -258,6 +241,17 @@ const UserAddressLayout = () => {
               )}
             </div>
           </div>
+        </div>
+      }
+      PoweredBy={
+        <div className="mb-7 flex justify-center items-center space-x-2">
+          <img src={subtractLogo} alt="powered by rollup.id" />
+          <Text size="xs" weight="normal" className="text-gray-400">
+            Powered by{' '}
+            <a href="https://rollup.id" className="hover:underline text-indigo-500">
+              rollup.id
+            </a>
+          </Text>
         </div>
       }
       // Claim={

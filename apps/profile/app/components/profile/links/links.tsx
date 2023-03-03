@@ -43,7 +43,7 @@ export const Links = ({ links, isOwner = false, displayName }: LinksProps) => {
             key={`${link.name}-${link.url}-${i}`}
             href={link.url}
             className="flex flex-row justify-center items-center space-x-2.5
-            bg-gray-100 hover:bg-gray-200 transition-colors
+            bg-white border shadow hover:bg-gray-200 transition-colors
             rounded-full justify-center items-center w-full py-5"
             rel="noreferrer"
             target="_blank"
