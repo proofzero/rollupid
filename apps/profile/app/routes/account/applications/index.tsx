@@ -1,30 +1,64 @@
-import { useFetcher, useLoaderData } from '@remix-run/react'
+import {
+  FetcherWithComponents,
+  useFetcher,
+  useLoaderData,
+} from '@remix-run/react'
 import { loader as appLoader } from '~/routes/api/apps/index'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import { Pill } from '@kubelt/design-system/src/atoms/pills/Pill'
+import { json, LoaderFunction } from '@remix-run/cloudflare'
+import { commitProfileSession, getProfileSession } from '~/utils/session.server'
+import { toast } from 'react-hot-toast'
 
-export const loader = appLoader
+export const loader: LoaderFunction = async (args) => {
+  const session = await getProfileSession(args.request)
+  const { apps } = await appLoader(args)
+
+  const currentClientId = PROFILE_CLIENT_ID
+
+  const sessionTooltipMessage = session.get('tooltipMessage')
+  const tooltipMessage = sessionTooltipMessage
+    ? JSON.parse(sessionTooltipMessage)
+    : undefined
+
+  return json(
+    {
+      apps,
+      currentClientId,
+      tooltipMessage,
+    },
+    {
+      headers: {
+        'Set-Cookie': await commitProfileSession(session),
+      },
+    }
+  )
+}
 
 const RevocationModal = ({
   isOpen,
   setIsOpen,
   clientId,
+  currentClientId,
   icon,
   title,
+  fetcher,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   clientId: string
+  currentClientId: string
   icon: string
   title: string
+  fetcher: FetcherWithComponents<any>
 }) => {
-  const fetcher = useFetcher()
+  const localFetcher = useFetcher()
 
   useEffect(() => {
-    fetcher.load(`/api/apps/${clientId}/scopes`)
+    localFetcher.load(`/api/apps/${clientId}/scopes`)
   }, [clientId])
 
   return (
@@ -40,9 +74,9 @@ const RevocationModal = ({
           </Text>
         </div>
 
-        {fetcher.data && (
+        {localFetcher.data && (
           <div className="my-5">
-            {fetcher.data.map(
+            {localFetcher.data.map(
               (scope: { permission: string; scopes: string[] }, i: number) => (
                 <div
                   className={`flex flex-row space-x-2 items-center py-5 border-b ${
@@ -75,9 +109,18 @@ const RevocationModal = ({
             Cancel
           </Button>
 
-          <Button type="submit" btnType="dangerous-alt" disabled>
-            Remove All Access
-          </Button>
+          <fetcher.Form
+            action={`/account/applications/${clientId}/revoke`}
+            method="post"
+          >
+            <Button
+              type="submit"
+              btnType="dangerous-alt"
+              disabled={clientId === currentClientId}
+            >
+              Revoke Access
+            </Button>
+          </fetcher.Form>
         </div>
       </div>
     </Modal>
@@ -144,13 +187,43 @@ const AppListItem = ({
 }
 
 export default () => {
-  const { apps } = useLoaderData<{
+  const { apps, currentClientId, tooltipMessage } = useLoaderData<{
     apps: App[]
+    currentClientId: string
+    tooltipMessage: undefined | { type: 'success' | 'error'; message: string }
   }>()
 
   const [selectedApp, setSelectedApp] = useState<undefined | App>()
 
   const [revocationModalOpen, setRevocationModalOpen] = useState(false)
+
+  const fetcher = useFetcher()
+
+  useEffect(() => {
+    if (fetcher.state === 'submitting' && fetcher.type === 'actionSubmission') {
+      setRevocationModalOpen(false)
+      setSelectedApp(undefined)
+    }
+
+    if (fetcher.type === 'actionReload') {
+      fetcher.load('/account/applications')
+    }
+  }, [fetcher])
+
+  useEffect(() => {
+    if (tooltipMessage) {
+      switch (tooltipMessage.type) {
+        case 'success':
+          toast.success(tooltipMessage.message)
+          break
+        case 'error':
+          toast.error(tooltipMessage.message)
+          break
+        default:
+          toast(tooltipMessage.message)
+      }
+    }
+  }, [tooltipMessage])
 
   return (
     <>
@@ -162,8 +235,10 @@ export default () => {
         <>
           <RevocationModal
             clientId={selectedApp.clientId}
+            currentClientId={currentClientId}
             icon={selectedApp.icon}
             title={selectedApp.title}
+            fetcher={fetcher}
             isOpen={revocationModalOpen}
             setIsOpen={setRevocationModalOpen}
           />

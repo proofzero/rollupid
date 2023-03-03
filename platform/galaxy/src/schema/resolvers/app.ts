@@ -9,6 +9,7 @@ import {
   setupContext,
 } from './utils'
 import createAccessClient from '@kubelt/platform-clients/access'
+import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 
 const appResolvers: Resolvers = {
   Query: {
@@ -27,10 +28,35 @@ const appResolvers: Resolvers = {
       return scopes
     },
   },
+  Mutation: {
+    revokeAppAuthorization: async (
+      _parent: any,
+      { clientId },
+      { env, jwt }: ResolverContext
+    ) => {
+      const accessClient = createAccessClient(
+        env.Access,
+        getAuthzHeaderConditionallyFromToken(jwt)
+      )
+
+      await accessClient.revokeAppAuthorization.mutate({
+        clientId,
+      })
+
+      return true
+    },
+  },
 }
 
 const AppResolverComposition = {
   'Query.scopes': [
+    requestLogging(),
+    setupContext(),
+    hasApiKey(),
+    isAuthorized(),
+    logAnalytics(),
+  ],
+  'Mutation.revokeAppAuthorization': [
     requestLogging(),
     setupContext(),
     hasApiKey(),

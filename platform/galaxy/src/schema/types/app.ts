@@ -7,4 +7,8 @@ export default /* GraphQL */ `
   type Query {
     scopes(clientId: String!): [Scope]!
   }
+
+  type Mutation {
+    revokeAppAuthorization(clientId: String!): Boolean
+  }
 `

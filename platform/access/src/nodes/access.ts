@@ -183,6 +183,10 @@ export default class Access extends DOProxy {
     })
   }
 
+  async deleteAll(): Promise<void> {
+    await this.state.storage.deleteAll()
+  }
+
   async getJWTSigningKeyPair(): Promise<KeyPair> {
     const { alg } = JWT_OPTIONS
     const { storage } = this.state
