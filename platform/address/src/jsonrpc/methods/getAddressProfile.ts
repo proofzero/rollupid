@@ -129,6 +129,10 @@ export const getAddressProfileMethod = async ({
         profile,
         picture: profile.picture,
       })
+      if (typeof profile.picture !== 'string') {
+        profile.picture =
+          'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/0df70d41-00b9-4ea2-8ff9-f91f96297700/public'
+      }
       return {
         urn: ctx.addressURN,
         type: OAuthAddressType.Microsoft,
