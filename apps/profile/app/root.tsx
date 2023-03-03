@@ -36,12 +36,6 @@ import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 
 import * as gtag from '~/utils/gtags.client'
-import { getProfileSession } from '~/utils/session.server'
-import { AccountURNSpace } from '@kubelt/urns/account'
-import { parseJwt } from '~/utils/session.server'
-import { getAccountProfile } from '~/helpers/profile'
-import type { AccountURN } from '@kubelt/urns/account'
-import type { FullProfile } from '~/types'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -74,35 +68,7 @@ export const links: LinksFunction = () => [
 ]
 
 export const loader: LoaderFunction = async ({ request }) => {
-  // let's fetch the user profile if they are logged in
-  const session = await getProfileSession(request)
-  const user = session.get('user')
-
-  let basePath = undefined
-  let loggedInUserProfile: FullProfile | undefined
-  let accountURN
-
-  if (user) {
-    const {
-      user: { accessToken: jwt },
-    } = session.data
-
-    accountURN = parseJwt(jwt).sub as AccountURN
-
-    const fetchedLoggedInProfile = await getAccountProfile({ jwt })
-
-    if (!fetchedLoggedInProfile)
-      throw new Error('Could not retrieve logged in use profile.')
-
-    loggedInUserProfile = fetchedLoggedInProfile
-
-    basePath = `/p/${AccountURNSpace.decode(accountURN)}`
-  }
-
   return json({
-    basePath,
-    loggedInUserProfile,
-    accountURN,
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG,
       CONSOLE_APP_URL,
@@ -114,16 +80,13 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function App() {
   const location = useLocation()
-  const { ENV, loggedInUserProfile, basePath, accountURN } = useLoaderData<{
+  const { ENV } = useLoaderData<{
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG: string
       CONSOLE_APP_URL: string
       PASSPORT_URL: string
       PROFILE_CLIENT_ID: string
     }
-    loggedInUserProfile: FullProfile | undefined
-    basePath: string | undefined
-    accountURN: string
   }>()
 
   const transition = useTransition()
@@ -169,8 +132,6 @@ export default function App() {
 
         <Outlet
           context={{
-            profile: loggedInUserProfile,
-            accountURN,
             CONSOLE_APP_URL: ENV.CONSOLE_APP_URL,
           }}
         />

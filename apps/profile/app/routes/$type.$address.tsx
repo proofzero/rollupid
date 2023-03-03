@@ -1,12 +1,10 @@
 import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
-import { redirect } from '@remix-run/cloudflare'
-import { json } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
 import {
   Outlet,
   useCatch,
   useLoaderData,
   useNavigate,
-  useOutletContext,
   useParams,
 } from '@remix-run/react'
 
@@ -46,7 +44,19 @@ import { imageFromAddressType } from '~/helpers'
 import type { FullProfile } from '~/types'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
+  const url = new URL(request.url)
   const { address, type } = params
+
+  /**
+   * If we don't redirect here
+   * we will load loader -> then go to /$type/$address/index
+   * -> then will redirect to /links and call this same
+   * loader second time
+   */
+  if (url.pathname === `/${type}/${address}`) {
+    return redirect(`/${type}/${address}/links`)
+  }
+
   const galaxyClient = await getGalaxyClient()
 
   const session = await getProfileSession(request)
@@ -175,15 +185,7 @@ const UserAddressLayout = () => {
       accountURN: string
     }>()
 
-  const ctx = useOutletContext<{
-    profile: FullProfile
-    // This gets passed down
-    // from root.tsx
-    // but if not logged in
-    // is null...
-  }>()
-
-  const finalProfile = profile ?? ctx.profile
+  const finalProfile = profile
 
   const navigate = useNavigate()
 

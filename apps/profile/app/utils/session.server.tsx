@@ -4,10 +4,11 @@ import {
   Session,
 } from '@remix-run/cloudflare'
 import { Authenticator } from 'remix-auth'
-import { OAuth2Strategy, OAuth2Profile } from 'remix-auth-oauth2'
+import type { OAuth2Profile } from 'remix-auth-oauth2'
+import { OAuth2Strategy } from 'remix-auth-oauth2'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
-import { RollupAuth } from '~/types'
+import type { RollupAuth } from '~/types'
 
 // @ts-ignore
 const sessionSecret = SECRET_SESSION_SALT

@@ -1,20 +1,17 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { AddressList } from '~/components/addresses/AddressList'
-import {
-  FetcherWithComponents,
-  useFetcher,
-  useLoaderData,
-} from '@remix-run/react'
-import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
+import type { FetcherWithComponents } from '@remix-run/react'
+import { useOutletContext } from '@remix-run/react'
+import { useFetcher, useLoaderData } from '@remix-run/react'
 import { requireJWT } from '~/utils/session.server'
-import type { AddressURN } from '@kubelt/urns/address'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import InputText from '~/components/inputs/InputText'
 import { NodeType } from '@kubelt/types/address'
+import type { AddressProfile, Node } from '@kubelt/galaxy-client'
 import warn from '~/assets/warning.svg'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { toast, ToastType } from '@kubelt/design-system/src/atoms/toast'
@@ -80,57 +77,46 @@ const normalizeProfile = (profile: any) => {
   }
 }
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-  const jwt = await requireJWT(request)
-
-  const addresses = (await getAccountAddresses(jwt)) ?? []
-  const addressTypeUrns = addresses.map((a) => ({
-    urn: a.baseUrn,
-    nodeType: a.rc.node_type,
-  }))
-
-  // This returns profiles without urns
-  const profiles =
-    (await getAddressProfiles(
-      jwt,
-      addressTypeUrns.map((atu) => atu.urn as AddressURN)
-    )) ?? []
-
-  // This mapps to a new structure that contains urn also;
-  // useful for list keys as well as for address context actions as param
-  const mappedProfiles = profiles.map((p, i) => ({
-    ...addressTypeUrns[i],
-    ...p,
-  }))
-
-  // Keeping the distinctions to only append
-  // context actions to desired types
-  // e.x. rename to crypto profiles
-  const cryptoProfiles = mappedProfiles
-    .filter((p) => p?.nodeType === NodeType.Crypto)
-    .map((p) => ({ urn: p.urn, ...p?.profile }))
-    .map(normalizeProfile)
-
-  const vaultProfiles = mappedProfiles
-    .filter((p) => p?.nodeType === NodeType.Vault)
-    .map((p) => ({ urn: p.urn, ...p?.profile }))
-    .map(normalizeProfile)
-
-  const oAuthProfiles = mappedProfiles
-    .filter((p) => p?.nodeType === NodeType.OAuth)
-    .map((p) => ({ urn: p.urn, ...p?.profile }))
-    .map(normalizeProfile)
+export const loader: LoaderFunction = async ({ request }) => {
+  await requireJWT(request)
 
   const reqUrl = new URL(request.url)
   const reqUrlError = reqUrl.searchParams.get('error')
 
   return {
-    addressCount: addresses.length,
+    reqUrlError,
+  }
+}
+
+const distinctProfiles = (
+  connectedProfiles: (Node & AddressProfile & { nodeType: string })[]
+) => {
+  // Keeping the distinctions to only append
+  // context actions to desired types
+  // e.x. rename to crypto profiles
+  const cryptoProfiles =
+    connectedProfiles
+      .filter((p) => p?.nodeType === NodeType.Crypto)
+      .map((p) => ({ urn: p.urn, ...p?.profile }))
+      .map(normalizeProfile) || []
+
+  const vaultProfiles =
+    connectedProfiles
+      .filter((p) => p?.nodeType === NodeType.Vault)
+      .map((p) => ({ urn: p.urn, ...p?.profile }))
+      .map(normalizeProfile) || []
+
+  const oAuthProfiles =
+    connectedProfiles
+      .filter((p) => p?.nodeType === NodeType.OAuth)
+      .map((p) => ({ urn: p.urn, ...p?.profile }))
+      .map(normalizeProfile) || []
+
+  return {
+    addressCount: connectedProfiles.length,
     cryptoProfiles,
     vaultProfiles,
     oAuthProfiles,
-
-    reqUrlError,
   }
 }
 
@@ -207,7 +193,7 @@ const DisconnectModal = ({
          text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
     >
       <div className=" flex items-start space-x-4">
-        <img src={warn} />
+        <img src={warn} alt="Not Found" />
 
         <div className="flex-1">
           <Text size="lg" weight="medium" className="text-gray-900 my-1">
@@ -240,13 +226,14 @@ const DisconnectModal = ({
 )
 
 const AccountSettingsConnections = () => {
-  const {
-    cryptoProfiles,
-    vaultProfiles,
-    oAuthProfiles,
-    addressCount,
-    reqUrlError,
-  } = useLoaderData()
+  const { reqUrlError } = useLoaderData()
+
+  const { connectedProfiles } = useOutletContext<{
+    connectedProfiles: (Node & AddressProfile & { nodeType: string })[]
+  }>()
+
+  const { cryptoProfiles, vaultProfiles, oAuthProfiles, addressCount } =
+    distinctProfiles(connectedProfiles)
 
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [disconnectModalOpen, setDisconnectModalOpen] = useState(false)

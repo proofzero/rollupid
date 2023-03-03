@@ -12,7 +12,7 @@ import {
   useFetcher,
   useNavigate,
 } from '@remix-run/react'
-import type { ActionFunction } from '@remix-run/cloudflare'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 
 // Styles
 
@@ -41,7 +41,7 @@ import { LoadingGridSquaresGallery } from '~/components/nfts/grid/loading'
 import NoCryptoAddresses from '~/components/accounts/NoCryptoAddresses'
 
 // Other helpers
-import { getProfileSession } from '~/utils/session.server'
+import { getProfileSession, requireJWT } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
 import type { Profile, Node } from '@kubelt/galaxy-client'
 import { getMoreNftsModal } from '~/helpers/nfts'
@@ -52,6 +52,11 @@ import {
   Toaster,
   ToastType,
 } from '@kubelt/design-system/src/atoms/toast'
+
+export const loader: LoaderFunction = async ({ request }) => {
+  await requireJWT(request)
+  return null
+}
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()

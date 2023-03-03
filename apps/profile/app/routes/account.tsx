@@ -11,7 +11,7 @@ import { TbPlugConnected, TbApps } from 'react-icons/tb'
 import { RiCollageLine } from 'react-icons/ri'
 import classNames from 'classnames'
 
-import { requireJWT } from '~/utils/session.server'
+import { parseJwt, requireJWT } from '~/utils/session.server'
 
 import styles from '~/styles/account.css'
 
@@ -22,8 +22,9 @@ import HeadNav, { links as headNavLink } from '~/components/head-nav'
 import ConditionalTooltip from '~/components/conditional-tooltip'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
-import type { Node } from '@kubelt/galaxy-client'
+import { getProfileSession } from '~/utils/session.server'
+import { getAccountProfile, getAddressProfiles } from '~/helpers/profile'
+import type { Node, Profile } from '@kubelt/galaxy-client'
 import type { AddressURN } from '@kubelt/urns/address'
 import type { FullProfile } from '~/types'
 import {
@@ -43,14 +44,36 @@ export const loader: LoaderFunction = async ({ request }) => {
   // the context had connected addresses
   // but don't have the profiles
   // and it's complex to send them to a loader / action
-  const addresses = (await getAccountAddresses(jwt)) ?? []
-  const addressTypeUrns = addresses.map((a) => ({
+
+  const session = await getProfileSession(request)
+  const user = session.get('user')
+
+  let loggedInUserProfile: FullProfile | undefined
+  let accountURN
+
+  if (user) {
+    const {
+      user: { accessToken: jwt },
+    } = session.data
+
+    accountURN = parseJwt(jwt).sub as AccountURN
+
+    const fetchedLoggedInProfile = await getAccountProfile({ jwt })
+
+    loggedInUserProfile = fetchedLoggedInProfile
+  }
+
+  if (!loggedInUserProfile) {
+    throw new Error('Could not retrieve logged in use profile.')
+  }
+
+  const addressTypeUrns = loggedInUserProfile.addresses.map((a) => ({
     urn: a.baseUrn,
     nodeType: a.rc.node_type,
   }))
 
   // We get the full profiles
-  const profiles =
+  const connectedProfiles =
     (await getAddressProfiles(
       jwt,
       addressTypeUrns.map((atu) => atu.urn as AddressURN)
@@ -58,21 +81,22 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   // This mapps to a new structure that contains urn also;
   // useful for list keys as well as for address context actions as param
-  const addressProfiles = profiles.map((p, i) => ({
+  const normalizedConnectedProfiles = connectedProfiles.map((p, i) => ({
     ...addressTypeUrns[i],
     ...p,
   }))
 
   const cryptoAddresses =
-    addresses?.filter((e) => {
+    loggedInUserProfile.addresses?.filter((e) => {
       if (!e.rc) return false
       return e?.rc?.node_type === 'crypto'
     }) || []
 
   return json({
-    addresses,
-    addressProfiles,
+    connectedProfiles: normalizedConnectedProfiles,
     cryptoAddresses,
+    accountURN,
+    profile: loggedInUserProfile,
   })
 }
 
@@ -134,14 +158,15 @@ const notify = (success: boolean = true) => {
 }
 
 export default function AccountLayout() {
-  const { addresses, addressProfiles, cryptoAddresses } = useLoaderData<{
-    addresses: Node[]
-    addressProfiles: any[]
-    cryptoAddresses: Node[]
-  }>()
-  const { profile, accountURN, CONSOLE_APP_URL } = useOutletContext<{
-    profile: FullProfile
-    accountURN: AccountURN
+  const { profile, accountURN, connectedProfiles, cryptoAddresses } =
+    useLoaderData<{
+      profile: FullProfile
+      accountURN: AccountURN
+      connectedProfiles: Node & Profile[]
+      cryptoAddresses: Node[]
+    }>()
+
+  const { CONSOLE_APP_URL } = useOutletContext<{
     CONSOLE_APP_URL: string
   }>()
 
@@ -196,8 +221,7 @@ export default function AccountLayout() {
                 <Outlet
                   context={{
                     profile,
-                    addresses,
-                    addressProfiles,
+                    connectedProfiles,
                     cryptoAddresses,
                     accountURN,
                     notificationHandler: notify,
@@ -230,14 +254,9 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
   }
   return (
     <div className={'basis-1/4 lg:w-100 content-center self-center z-50'}>
-      <ConditionalTooltip
-        content="Coming Soon"
-        condition={!item.exists}
-        placement={'top-start'}
-      >
+      <ConditionalTooltip content="Coming Soon" condition={!item.exists}>
         <NavLink
           to={item.href}
-          // @ts-ignore
           style={({ isActive }) => {
             return isActive && item.href != '#' ? activeStyle : undefined
           }}

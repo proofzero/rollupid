@@ -5,7 +5,6 @@ import {
   useTransition,
   useOutletContext,
   useActionData,
-  useLoaderData,
   useFetcher,
 } from '@remix-run/react'
 
@@ -26,8 +25,6 @@ import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
-import type { AddressURN } from '@kubelt/urns/address'
 
 import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
@@ -107,30 +104,9 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
   }
 }
 
-// This entire loader is a good target for deferring once added
 export const loader: LoaderFunction = async ({ request }) => {
-  const jwt = await requireJWT(request)
-
-  // We go through this because
-  // the context had connected addresses
-  // but don't have the profiles
-  // and it's complex to send them to a loader / action
-  const addresses = (await getAccountAddresses(jwt)) ?? []
-
-  // We get the full profiles
-  const profiles =
-    (await getAddressProfiles(
-      jwt,
-      addresses.map((atu) => atu.baseUrn as AddressURN)
-    )) ?? []
-
-  // We need to get them ready to be displayed
-  // in the generic Sortable List
-  const normalizedAddressProfiles = profiles.map(normalizeAddressProfile)
-
-  return {
-    normalizedAddressProfiles,
-  }
+  await requireJWT(request)
+  return null
 }
 
 export const action: ActionFunction = async ({ request }) => {
@@ -300,16 +276,19 @@ const SortableLink = ({
 }
 
 export default function AccountSettingsLinks() {
-  const { profile, notificationHandler } = useOutletContext<{
+  const { profile, notificationHandler, connectedProfiles } = useOutletContext<{
     profile: FullProfile
     notificationHandler: (success: boolean) => void
+    connectedProfiles: any[]
   }>()
 
   const transition = useTransition()
   const actionData = useActionData()
   const fetcher = useFetcher()
 
-  const { normalizedAddressProfiles } = useLoaderData()
+  const normalizedAddressProfiles = connectedProfiles.map(
+    normalizeAddressProfile
+  )
 
   const [links, setLinks] = useState<(Link & { editing?: boolean })[]>(
     profile.links || []
