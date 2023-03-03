@@ -8,6 +8,33 @@ import type { Session } from '@remix-run/cloudflare'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
+// FLASH SESSION
+
+const getFlashSessionStorage = (env: Env) => {
+  return createCookieSessionStorage({
+    cookie: {
+      domain: env.COOKIE_DOMAIN,
+      name: 'PASSPORT_FLASH',
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV == 'production',
+      maxAge: 10,
+      httpOnly: true,
+      secrets: [env.SECRET_SESSION_SALT],
+    },
+  })
+}
+
+export function getFlashSession(request: Request, env: Env) {
+  const storage = getFlashSessionStorage(env)
+  return storage.getSession(request.headers.get('Cookie'))
+}
+
+export function commitFlashSession(env: Env, session: Session) {
+  const storage = getFlashSessionStorage(env)
+  return storage.commitSession(session)
+}
+
 // USER PARAMS
 
 const getUserSessionStorage = (
@@ -65,19 +92,30 @@ export function getUserSession(request: Request, env: Env) {
 export async function destroyUserSession(
   session: Session,
   redirectTo: string,
-  env: Env
+  env: Env,
+  manualLogout: boolean = false
 ) {
   const storage = getUserSessionStorage(env, 0) // set max age to 0 to kill cookie
+
+  const headers = new Headers()
+  headers.append('Set-Cookie', await storage.destroySession(session))
+
+  if (manualLogout) {
+    const flashStorage = getFlashSessionStorage(env)
+    const flashSession = await flashStorage.getSession()
+    flashSession.flash('SIGNOUT', 'true')
+
+    headers.append('Set-Cookie', await flashStorage.commitSession(flashSession))
+  }
+
   return redirect(redirectTo, {
-    headers: {
-      'Set-Cookie': await storage.destroySession(session),
-    },
+    headers,
   })
 }
 
 export async function logout(request: Request, redirectTo: string, env: Env) {
   const session = await getUserSession(request, env)
-  return destroyUserSession(session, redirectTo, env)
+  return destroyUserSession(session, redirectTo, env, true)
 }
 
 // CONSOLE PARAMS

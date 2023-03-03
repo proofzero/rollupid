@@ -36,9 +36,17 @@ import social from '~/assets/passport-social.png'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
+import {
+  toast,
+  Toaster,
+  ToastType,
+} from '@kubelt/design-system/src/atoms/toast'
+
 import * as gtag from '~/utils/gtags.client'
 import {
+  commitFlashSession,
   getConsoleParamsSession,
+  getFlashSession,
   setConsoleParamsSession,
 } from './session.server'
 import { getStarbaseClient } from './platform.server'
@@ -65,6 +73,15 @@ export const links: LinksFunction = () => [
 ]
 
 export const loader: LoaderFunction = async ({ request, context }) => {
+  const flashes = []
+  const flashSession = await getFlashSession(request, context.env)
+  if (flashSession.get('SIGNOUT')) {
+    flashes.push({
+      type: ToastType.Info,
+      message: "You've been signed out",
+    })
+  }
+
   const consoleParmamsSessionFromCookie = await getConsoleParamsSession(
     request,
     context.env
@@ -95,14 +112,23 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     appProps = await sbClient.getAppPublicProps.query({ clientId })
   }
 
-  return json({
-    appProps,
-    ENV: {
-      PROFILE_APP_URL: context.env.PROFILE_APP_URL,
-      INTERNAL_GOOGLE_ANALYTICS_TAG: context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
-      APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
+  return json(
+    {
+      flashes,
+      appProps,
+      ENV: {
+        PROFILE_APP_URL: context.env.PROFILE_APP_URL,
+        INTERNAL_GOOGLE_ANALYTICS_TAG:
+          context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
+        APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
+      },
     },
-  })
+    {
+      headers: {
+        'Set-Cookie': await commitFlashSession(context.env, flashSession),
+      },
+    }
+  )
 }
 
 export default function App() {
@@ -117,6 +143,16 @@ export default function App() {
       gtag.pageview(location.pathname, GATag)
     }
   }, [location, GATag])
+
+  useEffect(() => {
+    browserEnv.flashes?.forEach(
+      (flash: { type: ToastType; message: string }) => {
+        toast(flash.type, {
+          message: flash.message,
+        })
+      }
+    )
+  }, [browserEnv.flashes])
 
   return (
     <html lang="en">
@@ -160,6 +196,7 @@ export default function App() {
           </>
         )}
         {transition.state === 'loading' && <Loader />}
+        <Toaster position="top-right" />
         <Outlet
           context={{
             appProps: browserEnv.appProps,
