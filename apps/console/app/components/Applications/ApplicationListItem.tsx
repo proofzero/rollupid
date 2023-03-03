@@ -29,7 +29,7 @@ export const ApplicationListItemIcon = ({
     {!iconUrl && (
       <Text className="text-gray-500">{title?.substring(0, 1)}</Text>
     )}
-    {iconUrl && <img src={iconUrl} className="object-cover" />}
+    {iconUrl && <img src={iconUrl} alt="Not Found" className="object-cover" />}
   </div>
 )
 

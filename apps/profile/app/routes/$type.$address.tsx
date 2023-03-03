@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react'
 import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import {
   Outlet,
   useCatch,
-  useFetcher,
   useLoaderData,
   useNavigate,
   useOutletContext,
@@ -18,6 +16,7 @@ import {
   HiOutlineLockClosed,
   HiOutlineQuestionMarkCircle,
 } from 'react-icons/hi'
+import { TiEdit } from 'react-icons/ti'
 
 import { getProfileSession, parseJwt } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
@@ -31,7 +30,6 @@ import {
 } from '@kubelt/utils'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
-import { Cover } from '~/components/profile/cover/Cover'
 import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
 
@@ -188,38 +186,9 @@ const UserAddressLayout = () => {
   const finalProfile = profile ?? ctx.profile
 
   const navigate = useNavigate()
-  const fetcher = useFetcher()
-
-  const [coverUrl, setCoverUrl] = useState(
-    gatewayFromIpfs(finalProfile.cover as string)
-  )
-
-  useEffect(() => {
-    if (fetcher.type === 'done') {
-      setCoverUrl(fetcher.data)
-    }
-  }, [fetcher])
 
   return (
     <ProfileLayout
-      Cover={
-        <Cover
-          src={coverUrl}
-          isOwner={isOwner}
-          updateCoverHandler={async (cover: string) => {
-            setCoverUrl(cover)
-            return fetcher.submit(
-              {
-                url: cover,
-              },
-              {
-                method: 'post',
-                action: '/account/profile/update-cover',
-              }
-            )
-          }}
-        />
-      }
       Avatar={
         <Avatar
           src={gatewayFromIpfs(finalProfile.pfp?.image as string) as string}
@@ -227,6 +196,23 @@ const UserAddressLayout = () => {
           hex={true}
           border
         />
+      }
+      Edit={
+        <Button
+          btnType="secondary-alt"
+          btnSize="base"
+          className="text-gray-500 max-w-max max-h-[40px] 
+          flex justify-center items-center
+        "
+          onClick={() => {
+            navigate('/account/profile')
+          }}
+        >
+          <div className="flex items-center justify-center">
+            <TiEdit size={22} className="mr-2" />
+            Edit Profile
+          </div>
+        </Button>
       }
       Claim={
         <div className="px-3 lg:px-4">
@@ -248,8 +234,8 @@ const UserAddressLayout = () => {
             </Text>
 
             <div
-              className="flex flex-col lg:flex-row lg:space-x-10 justify-start
-              lg:items-center text-gray-500 font-size-lg"
+              className="flex flex-row justify-between lg:justify-center lg:space-x-10
+              w-[70%] lg:w-full items-center text-gray-500 font-size-lg"
             >
               {finalProfile.location && (
                 <div className="flex flex-row space-x-3 items-center wrap">

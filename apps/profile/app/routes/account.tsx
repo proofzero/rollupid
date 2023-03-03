@@ -1,5 +1,5 @@
 import { json } from '@remix-run/cloudflare'
-import type { LoaderFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction, LinksFunction } from '@remix-run/cloudflare'
 import { useLoaderData, NavLink, useOutletContext } from '@remix-run/react'
 
 import { Outlet } from '@remix-run/react'
@@ -15,7 +15,9 @@ import { requireJWT } from '~/utils/session.server'
 
 import styles from '~/styles/account.css'
 
-import { links as faqStyles } from '~/components/FAQ'
+import type { AccountURN } from '@kubelt/urns/account'
+import { AccountURNSpace } from '@kubelt/urns/account'
+import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
 import ConditionalTooltip from '~/components/conditional-tooltip'
 
@@ -30,8 +32,8 @@ import {
   Toaster,
 } from '@kubelt/design-system/src/atoms/toast'
 
-export function links() {
-  return [...faqStyles(), { rel: 'stylesheet', href: styles }]
+export const links: LinksFunction = () => {
+  return [...headNavLink(), { rel: 'stylesheet', href: styles }]
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -137,60 +139,76 @@ export default function AccountLayout() {
     addressProfiles: any[]
     cryptoAddresses: Node[]
   }>()
-  const { profile, accountURN } = useOutletContext<{
+  const { profile, accountURN, CONSOLE_APP_URL } = useOutletContext<{
     profile: FullProfile
-    accountURN: string
+    accountURN: AccountURN
+    CONSOLE_APP_URL: string
   }>()
 
   return (
-    <main className="-mt-72 pb-12">
-      <div className="mx-auto max-w-screen-xl lg:px-4 md:px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
-        <div className="overflow-hidden bg-white shadow rounded-lg">
-          <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
-            <aside className="fixed bottom-0 z-50 w-full lg:relative lg:col-start-1 lg:col-end-3 bg-gray-50">
-              <nav className="flex flex-row justify-center items-center lg:flex-none lg:block lg:mt-8 space-y-1">
-                <Toaster position="top-right" reverseOrder={false} />
-                {subNavigation.general.map((item) => (
-                  <SideNavItem key={item.name} item={item} />
-                ))}
-                <Text
-                  size="sm"
-                  className="ml-5 pt-5 text-gray-500
+    <div className="bg-white h-full min-h-screen overflow-visible">
+      <div
+        className="header lg:px-4"
+        style={{
+          backgroundColor: '#192030',
+        }}
+      >
+        <HeadNav
+          consoleURL={CONSOLE_APP_URL}
+          loggedIn={!!profile}
+          basePath={`/p/${AccountURNSpace.decode(accountURN)}`}
+          avatarUrl={profile?.pfp?.image as string}
+        />
+      </div>
+      <main className="-mt-72 pb-12">
+        <div className="mx-auto max-w-screen-xl lg:px-4 md:px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
+          <div className="overflow-hidden bg-white shadow rounded-lg">
+            <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
+              <aside className="fixed bottom-0 z-50 w-full lg:relative lg:col-start-1 lg:col-end-3 bg-gray-50">
+                <nav className="flex flex-row justify-center items-center lg:flex-none lg:block lg:mt-8 space-y-1">
+                  <Toaster position="top-right" reverseOrder={false} />
+                  {subNavigation.general.map((item) => (
+                    <SideNavItem key={item.name} item={item} />
+                  ))}
+                  <Text
+                    size="sm"
+                    className="ml-5 pt-5 text-gray-500
                 hidden lg:block"
-                >
-                  Public Profiles
-                </Text>
-                {subNavigation.publicProfiles.map((item) => (
-                  <SideNavItem key={item.name} item={item} />
-                ))}
-                <Text
-                  size="sm"
-                  className="ml-5 pt-5 text-gray-500 
+                  >
+                    Public Profiles
+                  </Text>
+                  {subNavigation.publicProfiles.map((item) => (
+                    <SideNavItem key={item.name} item={item} />
+                  ))}
+                  <Text
+                    size="sm"
+                    className="ml-5 pt-5 text-gray-500 
                 hidden lg:block"
-                >
-                  Connections
-                </Text>
-                {subNavigation.connections.map((item) => (
-                  <SideNavItem key={item.name} item={item} />
-                ))}
-              </nav>
-            </aside>
-            <div className="min-h-screen divide-y divide-transparent px-4 lg:col-start-3 lg:col-end-13 lg:p-4 lg:p-8">
-              <Outlet
-                context={{
-                  profile,
-                  addresses,
-                  addressProfiles,
-                  cryptoAddresses,
-                  accountURN,
-                  notificationHandler: notify,
-                }}
-              />
+                  >
+                    Connections
+                  </Text>
+                  {subNavigation.connections.map((item) => (
+                    <SideNavItem key={item.name} item={item} />
+                  ))}
+                </nav>
+              </aside>
+              <div className="min-h-screen divide-y divide-transparent px-4 lg:col-start-3 lg:col-end-13 lg:p-4 lg:p-8">
+                <Outlet
+                  context={{
+                    profile,
+                    addresses,
+                    addressProfiles,
+                    cryptoAddresses,
+                    accountURN,
+                    notificationHandler: notify,
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   )
 }
 

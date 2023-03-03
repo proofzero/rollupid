@@ -10,7 +10,6 @@ export const ProfileSchema = z.object({
       isToken: z.boolean().optional(),
     })
     .optional(),
-  cover: z.string().optional(),
   bio: z.string().max(256).optional(),
   job: z.string().max(30).optional(),
   location: z.string().max(30).optional(),

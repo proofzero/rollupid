@@ -35,8 +35,6 @@ import logo from '~/assets/rollup-id-logo.svg'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 
-import HeadNav, { links as headNavLink } from '~/components/head-nav'
-
 import * as gtag from '~/utils/gtags.client'
 import { getProfileSession } from '~/utils/session.server'
 import { AccountURNSpace } from '@kubelt/urns/account'
@@ -73,7 +71,6 @@ export const links: LinksFunction = () => [
   { rel: 'icon', type: 'image/png', href: icon16, sizes: '16x16' },
   { rel: 'mask-icon', href: maskIcon, color: '#5bbad5' },
   { rel: 'shortcut icon', type: 'image/svg+xml', href: faviconSvg },
-  ...headNavLink(),
 ]
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -169,28 +166,15 @@ export default function App() {
         )}
         {(transition.state === 'loading' ||
           transition.state === 'submitting') && <Loader />}
-        <div className="bg-white h-full min-h-screen overflow-visible">
-          <div
-            className="header lg:px-4"
-            style={{
-              backgroundColor: '#192030',
-            }}
-          >
-            <HeadNav
-              consoleURL={ENV.CONSOLE_APP_URL}
-              loggedIn={!!loggedInUserProfile}
-              basePath={basePath}
-              avatarUrl={loggedInUserProfile?.pfp?.image as string}
-            />
-          </div>
 
-          <Outlet
-            context={{
-              profile: loggedInUserProfile,
-              accountURN,
-            }}
-          />
-        </div>
+        <Outlet
+          context={{
+            profile: loggedInUserProfile,
+            accountURN,
+            CONSOLE_APP_URL: ENV.CONSOLE_APP_URL,
+          }}
+        />
+
         <ScrollRestoration />
         <Scripts />
         <script

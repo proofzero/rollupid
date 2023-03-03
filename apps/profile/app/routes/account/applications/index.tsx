@@ -67,7 +67,11 @@ const RevocationModal = ({
         className={`min-w-[908px] relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
       >
         <div className="flex flex-row space-x-6 items-center">
-          <img src={icon} className="object-cover w-16 h-16 rounded" />
+          <img
+            src={icon}
+            className="object-cover w-16 h-16 rounded"
+            alt="Not found"
+          />
 
           <Text weight="semibold" className="text-gray-900">
             {title}
@@ -79,6 +83,7 @@ const RevocationModal = ({
             {localFetcher.data.map(
               (scope: { permission: string; scopes: string[] }, i: number) => (
                 <div
+                  key={`${scope.permission}-${i}`}
                   className={`flex flex-row space-x-2 items-center py-5 border-b ${
                     i === 0 ? 'border-t' : ''
                   }`}
@@ -87,8 +92,8 @@ const RevocationModal = ({
                     {scope.permission}:
                   </Text>
 
-                  {scope.scopes.map((s) => (
-                    <Pill className="bg-[#F2F4F7]">
+                  {scope.scopes.map((s, i) => (
+                    <Pill key={`${s}-${i}`} className="bg-[#F2F4F7]">
                       <Text size="xs" weight="medium" className="text-gray-500">
                         {s}
                       </Text>
@@ -158,7 +163,11 @@ const AppListItem = ({
   }, [app])
   return (
     <article className="flex-1 flex flex-row px-5 py-4 space-x-4 rounded-lg border items-center">
-      <img src={app.icon} className="object-cover w-16 h-16 rounded" />
+      <img
+        src={app.icon}
+        alt="Not found"
+        className="object-cover w-16 h-16 rounded"
+      />
 
       <div className="flex-1 flex flex-col space-y-2">
         <Text weight="semibold" className="text-gray-900">

@@ -29,7 +29,6 @@ export default /* GraphQL */ `
   type Profile {
     displayName: String
     pfp: PFP
-    cover: String
     bio: String
     job: String
     location: String
@@ -52,7 +51,6 @@ export default /* GraphQL */ `
   input ProfileInput {
     displayName: String
     pfp: PFPInput
-    cover: String
     bio: String
     job: String
     location: String

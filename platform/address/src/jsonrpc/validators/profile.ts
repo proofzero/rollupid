@@ -30,7 +30,6 @@ export const NFTarVoucherSchema = z.object({
   metadata: z.object({
     name: z.string(),
     description: z.string(),
-    cover: z.string(),
     image: z.string(),
     external_url: z.string(),
     properties: z.object({
