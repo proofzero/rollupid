@@ -71,6 +71,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     name: user?.name,
     sub: token.sub,
     picture: '',
+    isApple: true,
   }
 
   const address = AddressURNSpace.componentizedUrn(
