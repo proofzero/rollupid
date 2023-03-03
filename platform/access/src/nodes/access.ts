@@ -183,7 +183,7 @@ export default class Access extends DOProxy {
     })
   }
 
-  async revokeAll(): Promise<void> {
+  async deleteAll(): Promise<void> {
     await this.state.storage.deleteAll()
   }
 

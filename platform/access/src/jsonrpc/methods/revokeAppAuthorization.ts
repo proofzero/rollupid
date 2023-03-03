@@ -73,5 +73,5 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
     }
 
     const accessNode = await initAccessNodeByName(name, ctx.Access)
-    await accessNode.class.revokeAll()
+    await accessNode.class.deleteAll()
   }
