@@ -39,8 +39,12 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
 
     const name = `${AccountURNSpace.decode(accountURN)}@${clientId}`
 
+    if (!ctx.edgesClient) {
+      throw new Error('Expected edgesClient to pe present')
+    }
+
     const accessDst = AccessURNSpace.componentizedUrn(name)
-    const edgesResult = await ctx.edgesClient?.getEdges.query({
+    const edgesResult = await ctx.edgesClient.getEdges.query({
       query: {
         src: { baseUrn: accountURN },
         dst: { baseUrn: accessDst },
@@ -49,12 +53,19 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
     })
 
     if (!edgesResult) {
-      throw new Error('invalid edge result')
+      console.warn(
+        `Get authorization edge operation failed, app (${clientId}) for account (${accountURN})`
+      )
     }
 
-    // How do we transact this?
-    for (let i = 0; i < edgesResult.edges.length; i++) {
-      ctx.edgesClient?.removeEdge.mutate({
+    if (edgesResult?.edges.length === 0) {
+      console.warn(
+        `No authorization edge found, app (${clientId}) for account (${accountURN})`
+      )
+    }
+
+    for (let i = 0; i < edgesResult?.edges.length; i++) {
+      ctx.edgesClient.removeEdge.mutate({
         tag: EDGE_AUTHORIZES,
         src: edgesResult.edges[i].src.baseUrn,
         dst: edgesResult.edges[i].dst.baseUrn,
