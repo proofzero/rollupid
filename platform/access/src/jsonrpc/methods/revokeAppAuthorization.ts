@@ -2,14 +2,12 @@ import { z } from 'zod'
 
 import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'
-import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
 
 import { EDGE_AUTHORIZES } from '../../constants'
 import { AccountURNSpace } from '@kubelt/urns/account'
 import { AccessURNSpace } from '@kubelt/urns/access'
 
 export const RevokeAppAuthorizationMethodInput = z.object({
-  accountURN: AccountURNInput,
   clientId: z.string().min(1),
 })
 
@@ -35,12 +33,17 @@ interface RevokeAppAuthorizationMethod {
 
 export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
   async ({ ctx, input }) => {
-    const { accountURN, clientId } = input
+    const { clientId } = input
+    const { accountURN } = ctx
+
+    if (!accountURN) {
+      throw new Error('Expected Account URN to be present')
+    }
 
     const name = `${AccountURNSpace.decode(accountURN)}@${clientId}`
 
     if (!ctx.edgesClient) {
-      throw new Error('Expected edgesClient to pe present')
+      throw new Error('Expected edgesClient to be present')
     }
 
     const accessDst = AccessURNSpace.componentizedUrn(name)

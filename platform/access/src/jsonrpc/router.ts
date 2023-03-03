@@ -109,7 +109,7 @@ export const appRouter = t.router({
     .mutation(revokeTokenMethod),
   revokeAppAuthorization: t.procedure
     .use(AuthorizationTokenFromHeader)
-    // .use(ValidateJWT)
+    .use(ValidateJWT)
     .use(InjectEdges)
     .use(LogUsage)
     .use(Analytics)
