@@ -34,8 +34,6 @@ export const setProfileMethod = async ({
     )
 
     const edge = ctx.edges
-    // Don't need to await it
-    // Fire and go
     await edge.updateNode.mutate({ urnOfNode: enhancedUrn })
   }
   return
