@@ -25,8 +25,6 @@ export default function Welcome() {
     .map((p) => ({ urn: p.urn, ...p?.profile }))
     .map(normalizeProfileToLinks)
 
-  console.log({ normalizedConnectedProfiles })
-
   const appFetcher = useFetcher()
 
   useEffect(() => {

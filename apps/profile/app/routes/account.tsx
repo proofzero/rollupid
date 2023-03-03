@@ -1,4 +1,4 @@
-import { json } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
 import type { LoaderFunction, LinksFunction } from '@remix-run/cloudflare'
 import { useLoaderData, NavLink, useOutletContext } from '@remix-run/react'
 
@@ -38,6 +38,16 @@ export const links: LinksFunction = () => {
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
+  /**
+   * If we don't redirect here
+   * we will load loader -> then go to /$type/$address/index
+   * -> then will redirect to /links and call this same
+   * loader second time
+   */
+  const url = new URL(request.url)
+  if (url.pathname === '/account') {
+    return redirect('/account/dashboard')
+  }
   const jwt = await requireJWT(request)
 
   // We go through this because
@@ -181,7 +191,7 @@ export default function AccountLayout() {
         <HeadNav
           consoleURL={CONSOLE_APP_URL}
           loggedIn={!!profile}
-          basePath={`/p/${AccountURNSpace.decode(accountURN)}/links`}
+          basePath={`/p/${AccountURNSpace.decode(accountURN)}`}
           avatarUrl={profile?.pfp?.image as string}
         />
       </div>

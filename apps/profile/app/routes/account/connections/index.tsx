@@ -4,7 +4,6 @@ import { AddressList } from '~/components/addresses/AddressList'
 import type { FetcherWithComponents } from '@remix-run/react'
 import { useOutletContext } from '@remix-run/react'
 import { useFetcher, useLoaderData } from '@remix-run/react'
-import { requireJWT } from '~/utils/session.server'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
@@ -78,8 +77,6 @@ const normalizeProfile = (profile: any) => {
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
-  await requireJWT(request)
-
   const reqUrl = new URL(request.url)
   const reqUrlError = reqUrl.searchParams.get('error')
 

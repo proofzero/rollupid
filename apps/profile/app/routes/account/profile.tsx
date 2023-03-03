@@ -22,16 +22,11 @@ import {
 import PfpNftModal from '~/components/accounts/PfpNftModal'
 
 import { useEffect, useRef, useState, useMemo } from 'react'
-import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import type { ActionFunction } from '@remix-run/cloudflare'
 import SaveButton from '~/components/accounts/SaveButton'
 import { getGalaxyClient } from '~/helpers/clients'
 import { getMoreNftsModal } from '~/helpers/nfts'
-import type { Node, Profile } from '@kubelt/galaxy-client'
-
-export const loader: LoaderFunction = async ({ request }) => {
-  await requireJWT(request)
-  return null
-}
+import type { Profile } from '@kubelt/galaxy-client'
 
 export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request)

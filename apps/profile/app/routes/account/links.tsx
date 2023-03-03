@@ -104,11 +104,6 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
   }
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
-  await requireJWT(request)
-  return null
-}
-
 export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
 
