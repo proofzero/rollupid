@@ -86,7 +86,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       getAuthzHeaderConditionallyFromToken(jwt)
     )
 
-    if (!profile) {
+    if (!profile?.profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })
     }
 
@@ -145,13 +145,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 export const meta: MetaFunction = ({
   data,
 }: {
-  data: { ogImage: string; uname: string }
+  data: { ogImage: string; uname: string; profile: FullProfile }
 }) => {
+  const desc =
+    data.profile && data.profile.bio ? data.profile.bio : 'Claim yours now!'
   const meta = {
     'og:title': 'Rollup Decentralized Profile',
     'twitter:title': 'Rollup Decentralized Profile',
-    'og:description': 'Claim yours now!',
-    'twitter:description': 'Claim yours now!',
+    'og:description': desc,
+    'twitter:description': desc,
     'og:url': `https://rollup.id`,
     'og:image': data.ogImage,
     'og:image:alt': `Profile not found`,
