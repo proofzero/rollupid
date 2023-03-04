@@ -55,7 +55,6 @@ export default function HeadNav({
       name: 'My Profile',
       to: basePath ? `${basePath}` : '/account/connections',
     },
-    { name: 'Account', to: '/account' },
   ]
 
   return (
@@ -66,11 +65,7 @@ export default function HeadNav({
             <div className="flex h-20 items-center justify-between px-4 sm:px-0">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <img
-                    className="max-w-[180px]"
-                    src={logo}
-                    alt="Rollup"
-                  />
+                  <img className="max-w-[180px]" src={logo} alt="Rollup" />
                 </div>
 
                 <div className="hidden md:block">
@@ -81,6 +76,8 @@ export default function HeadNav({
                         <NavLink
                           key={item.name}
                           to={item.to}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           // @ts-ignore
                           style={({ isActive }) => {
                             return isActive ? activeStyle : undefined

@@ -87,12 +87,6 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
   if (!profile) {
     console.log(`Profile doesn't exist for account ${account}. Creating one...`)
     const addressClient = getAddressClient(address, env)
-    /**
-     * Hardcoded url for default cover image
-     * to not upload it every time on each new user
-     */
-    const cover =
-      'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/55eea546-b14f-434e-16b4-e759e563ea00/public'
     const newProfile = await addressClient.getAddressProfile
       .query()
       .then(async (res) => {
@@ -104,7 +98,6 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
               pfp: {
                 image: res.profile.avatar || gradient,
               },
-              cover,
             }
           }
           case OAuthAddressType.GitHub: {
@@ -114,7 +107,6 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
               pfp: {
                 image: res.profile.avatar_url || gradient,
               },
-              cover,
             }
           }
           case OAuthAddressType.Google: {
@@ -123,7 +115,6 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
               pfp: {
                 image: res.profile.picture,
               },
-              cover,
             }
           }
           case OAuthAddressType.Twitter: {
@@ -132,7 +123,6 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
               pfp: {
                 image: res.profile.profile_image_url_https,
               },
-              cover,
             }
           }
           case OAuthAddressType.Microsoft: {
@@ -146,13 +136,11 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
                 //Cached profile image
                 image: res.profile.rollupidImageUrl as string,
               },
-              cover,
             }
           }
           case OAuthAddressType.Apple: {
             const { firstName, lastName } = res.profile.name!
             return {
-              cover,
               displayName: `${firstName} ${lastName}`,
             }
           }
@@ -160,7 +148,6 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
             const gradient = await generateGradient(res.profile.id, env)
             const { id, avatar } = res.profile
             return {
-              cover,
               displayName: res.profile.username,
               pfp: {
                 image: avatar

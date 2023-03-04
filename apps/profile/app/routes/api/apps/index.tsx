@@ -1,4 +1,4 @@
-import { LoaderFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
 import { getAuthorizedApps } from '~/helpers/profile'
 import { requireJWT } from '~/utils/session.server'
 

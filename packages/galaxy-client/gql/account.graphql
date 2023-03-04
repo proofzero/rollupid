@@ -11,7 +11,6 @@ query getProfile($targetAccountURN: URN) {
     }
     displayName
     handle
-    cover
     location
     job
     bio

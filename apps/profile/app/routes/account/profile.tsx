@@ -26,7 +26,7 @@ import type { ActionFunction } from '@remix-run/cloudflare'
 import SaveButton from '~/components/accounts/SaveButton'
 import { getGalaxyClient } from '~/helpers/clients'
 import { getMoreNftsModal } from '~/helpers/nfts'
-import type { Node, Profile } from '@kubelt/galaxy-client'
+import type { Profile } from '@kubelt/galaxy-client'
 
 export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
@@ -66,19 +66,13 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 export default function AccountSettingsProfile() {
-  const { notificationHandler, profile, cryptoAddresses, accountURN } =
-    useOutletContext<{
-      profile: Profile
-      cryptoAddresses: Node[]
-      notificationHandler: (success: boolean) => void
-      accountURN: string
-    }>()
+  const { notificationHandler, profile, accountURN } = useOutletContext<{
+    profile: Profile
+    notificationHandler: (success: boolean) => void
+    accountURN: string
+  }>()
 
   //TODO: update pfp components to take multiple addresses
-  const temporaryAddress =
-    cryptoAddresses && cryptoAddresses.length
-      ? cryptoAddresses?.map((a) => a.qc.alias)[0]
-      : ''
 
   const {
     displayName,
@@ -225,7 +219,6 @@ export default function AccountSettingsProfile() {
         Settings
       </Text>
       <PfpNftModal
-        account={temporaryAddress}
         nfts={loadedNfts}
         collection={collection}
         setCollection={setCollection}

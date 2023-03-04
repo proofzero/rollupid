@@ -2,14 +2,12 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { useEffect, useState } from 'react'
 import LoadingGrid from '../loading'
 import NftGrid from '../'
-import ShowPartners from '../../partners'
 import CollectionFilter from '../../filters'
 import ModaledNft from '../../interactible/modaled'
 
 export type FilteredNftGridProps = {
   nfts: any[]
   pfp?: string
-  isOwner?: boolean
   displayText: string
   preload?: boolean
   detailsModal?: boolean
@@ -36,7 +34,6 @@ export type FilteredNftGridProps = {
 const FilteredNftGrid = ({
   nfts = [],
   loadingConditions,
-  isOwner = true,
   getMoreNfts,
   pageKey,
   displayText,
@@ -103,7 +100,6 @@ const FilteredNftGrid = ({
   return (
     <>
       {!loadingConditions &&
-        !isOwner &&
         !displayedNfts.length &&
         curFilter !== 'Untitled Collections' && (
           <Text
@@ -114,10 +110,6 @@ const FilteredNftGrid = ({
             {displayText}
           </Text>
         )}
-      {!loadingConditions &&
-        !displayedNfts.length &&
-        isOwner &&
-        curFilter !== 'Untitled Collections' && <ShowPartners />}
       {/* If we browse all collections of a user */}
       {(displayedNfts.length && !loadingConditions) ||
       curFilter === 'Untitled Collections' ? (

@@ -1,14 +1,10 @@
-import { useEffect, useState } from 'react'
 import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
-import { redirect } from '@remix-run/cloudflare'
-import { json } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
 import {
   Outlet,
   useCatch,
-  useFetcher,
   useLoaderData,
   useNavigate,
-  useOutletContext,
   useParams,
 } from '@remix-run/react'
 
@@ -31,11 +27,11 @@ import {
 } from '@kubelt/utils'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
-import { Cover } from '~/components/profile/cover/Cover'
 import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
 
 import defaultOG from '~/assets/social.png'
+import subtractLogo from '~/assets/subtract-logo.svg'
 import {
   CryptoAddressType,
   NodeType,
@@ -48,7 +44,19 @@ import { imageFromAddressType } from '~/helpers'
 import type { FullProfile } from '~/types'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
+  const url = new URL(request.url)
   const { address, type } = params
+
+  /**
+   * If we don't redirect here
+   * we will load loader -> then go to /$type/$address/index
+   * -> then will redirect to /links and call this same
+   * loader second time
+   */
+  if (url.pathname === `/${type}/${address}`) {
+    return redirect(`/${type}/${address}/links`)
+  }
+
   const galaxyClient = await getGalaxyClient()
 
   const session = await getProfileSession(request)
@@ -177,54 +185,17 @@ const UserAddressLayout = () => {
       accountURN: string
     }>()
 
-  const ctx = useOutletContext<{
-    profile: FullProfile
-    // This gets passed down
-    // from root.tsx
-    // but if not logged in
-    // is null...
-  }>()
-
-  const finalProfile = profile ?? ctx.profile
+  const finalProfile = profile
 
   const navigate = useNavigate()
-  const fetcher = useFetcher()
-
-  const [coverUrl, setCoverUrl] = useState(
-    gatewayFromIpfs(finalProfile.cover as string)
-  )
-
-  useEffect(() => {
-    if (fetcher.type === 'done') {
-      setCoverUrl(fetcher.data)
-    }
-  }, [fetcher])
 
   return (
     <ProfileLayout
-      Cover={
-        <Cover
-          src={coverUrl}
-          isOwner={isOwner}
-          updateCoverHandler={async (cover: string) => {
-            setCoverUrl(cover)
-            return fetcher.submit(
-              {
-                url: cover,
-              },
-              {
-                method: 'post',
-                action: '/account/profile/update-cover',
-              }
-            )
-          }}
-        />
-      }
       Avatar={
         <Avatar
           src={gatewayFromIpfs(finalProfile.pfp?.image as string) as string}
           size="lg"
-          hex={true}
+          hex={finalProfile.pfp?.isToken as boolean}
           border
         />
       }
@@ -248,8 +219,8 @@ const UserAddressLayout = () => {
             </Text>
 
             <div
-              className="flex flex-col lg:flex-row lg:space-x-10 justify-start
-              lg:items-center text-gray-500 font-size-lg"
+              className="flex flex-row justify-between lg:justify-center lg:space-x-10
+              w-[70%] lg:w-full items-center text-gray-500 font-size-lg"
             >
               {finalProfile.location && (
                 <div className="flex flex-row space-x-3 items-center wrap">
@@ -270,6 +241,20 @@ const UserAddressLayout = () => {
               )}
             </div>
           </div>
+        </div>
+      }
+      PoweredBy={
+        <div className="mb-7 flex justify-center items-center space-x-2">
+          <img src={subtractLogo} alt="powered by rollup.id" />
+          <Text size="xs" weight="normal" className="text-gray-400">
+            Powered by{' '}
+            <a
+              href="https://rollup.id"
+              className="hover:underline text-indigo-500"
+            >
+              rollup.id
+            </a>
+          </Text>
         </div>
       }
       // Claim={

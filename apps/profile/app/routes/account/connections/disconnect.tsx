@@ -1,4 +1,4 @@
-import { AddressURN } from '@kubelt/urns/address'
+import type { AddressURN } from '@kubelt/urns/address'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/clients'

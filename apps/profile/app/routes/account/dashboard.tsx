@@ -16,12 +16,12 @@ import type { FullProfile } from '~/types'
 import CTA from '~/components/cta/cta'
 
 export default function Welcome() {
-  const { profile, addressProfiles } = useOutletContext<{
+  const { profile, connectedProfiles } = useOutletContext<{
     profile: FullProfile
-    addressProfiles: any[]
+    connectedProfiles: any[]
   }>()
 
-  const normalizedProfiles = addressProfiles
+  const normalizedConnectedProfiles = connectedProfiles
     .map((p) => ({ urn: p.urn, ...p?.profile }))
     .map(normalizeProfileToLinks)
 
@@ -114,7 +114,7 @@ export default function Welcome() {
             </div>
 
             <div className="flex flex-col space-y-2">
-              {normalizedProfiles.map((np, i) => (
+              {normalizedConnectedProfiles.map((np, i) => (
                 <div
                   key={i}
                   className="flex flex-row items-center border rounded-lg shadow p-4"

@@ -242,7 +242,7 @@ export type NftNoProps = {
   tokenUri?: Maybe<TokenUri>;
 };
 
-export type Nftpfp = Pfp & {
+export type Nftpfp = {
   __typename?: 'NFTPFP';
   image?: Maybe<Scalars['String']>;
   isToken?: Maybe<Scalars['Boolean']>;
@@ -365,9 +365,7 @@ export enum OpenSeaSafeListStatus {
   Verified = 'verified'
 }
 
-export type Pfp = {
-  image?: Maybe<Scalars['String']>;
-};
+export type Pfp = Nftpfp | StandardPfp;
 
 export type PfpInput = {
   image: Scalars['String'];
@@ -377,7 +375,6 @@ export type PfpInput = {
 export type Profile = {
   __typename?: 'Profile';
   bio?: Maybe<Scalars['String']>;
-  cover?: Maybe<Scalars['String']>;
   displayName?: Maybe<Scalars['String']>;
   handle?: Maybe<Scalars['String']>;
   job?: Maybe<Scalars['String']>;
@@ -388,7 +385,6 @@ export type Profile = {
 
 export type ProfileInput = {
   bio?: InputMaybe<Scalars['String']>;
-  cover?: InputMaybe<Scalars['String']>;
   displayName?: InputMaybe<Scalars['String']>;
   job?: InputMaybe<Scalars['String']>;
   location?: InputMaybe<Scalars['String']>;
@@ -482,7 +478,7 @@ export type Scope = {
   scopes: Array<Maybe<Scalars['String']>>;
 };
 
-export type StandardPfp = Pfp & {
+export type StandardPfp = {
   __typename?: 'StandardPFP';
   image?: Maybe<Scalars['String']>;
 };
@@ -509,7 +505,7 @@ export type GetProfileQueryVariables = Exact<{
 }>;
 
 
-export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, connectedAddresses?: Array<{ __typename?: 'Node', baseUrn: string, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string, chain: string }> | null };
+export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, connectedAddresses?: Array<{ __typename?: 'Node', baseUrn: string, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string, chain: string }> | null };
 
 export type GetConnectedAddressesQueryVariables = Exact<{
   targetAccountURN?: InputMaybe<Scalars['URN']>;
@@ -647,7 +643,6 @@ export const GetProfileDocument = gql`
     }
     displayName
     handle
-    cover
     location
     job
     bio

@@ -3,7 +3,7 @@ import type { AddressListItemProps } from './AddressListItem'
 import { AddressListItem } from './AddressListItem'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
-type AddressListProps = {
+export type AddressListProps = {
   addresses: AddressListItemProps[]
 }
 

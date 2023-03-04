@@ -57,7 +57,6 @@ export const meta: MetaFunction = () => ({
   viewport: 'width=device-width,initial-scale=1',
   'og:url': 'https://passport.rollup.id',
   'og:description': 'User identity in your control.',
-  // Hardcoded to not re-upload it every time
   'og:image': social,
   'twitter:card': 'summary_large_image',
   'twitter:site': '@rollupid_xyz',

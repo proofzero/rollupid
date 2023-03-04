@@ -5,7 +5,6 @@ import {
   useTransition,
   useOutletContext,
   useActionData,
-  useLoaderData,
   useFetcher,
 } from '@remix-run/react'
 
@@ -26,8 +25,6 @@ import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
-import type { AddressURN } from '@kubelt/urns/address'
 
 import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
@@ -104,32 +101,6 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
         icon: imageFromAddressType(OAuthAddressType.Discord),
         provider: OAuthAddressType.Discord,
       }
-  }
-}
-
-// This entire loader is a good target for deferring once added
-export const loader: LoaderFunction = async ({ request }) => {
-  const jwt = await requireJWT(request)
-
-  // We go through this because
-  // the context had connected addresses
-  // but don't have the profiles
-  // and it's complex to send them to a loader / action
-  const addresses = (await getAccountAddresses(jwt)) ?? []
-
-  // We get the full profiles
-  const profiles =
-    (await getAddressProfiles(
-      jwt,
-      addresses.map((atu) => atu.baseUrn as AddressURN)
-    )) ?? []
-
-  // We need to get them ready to be displayed
-  // in the generic Sortable List
-  const normalizedAddressProfiles = profiles.map(normalizeAddressProfile)
-
-  return {
-    normalizedAddressProfiles,
   }
 }
 
@@ -214,7 +185,7 @@ const SortableLink = ({
           >
             <TbLink size={22} />
           </div>
-          <div className="max-w-[42vw] flex flex-col flex-1 break-all">
+          <div className="max-w-[30vw] sm:max-w-[45vw] flex flex-col flex-1 break-all">
             <Text weight="medium" className="truncate break-all">
               {name}
             </Text>
@@ -228,7 +199,7 @@ const SortableLink = ({
           className="mr-4 h-[40px]
                       bg-gray-100 focus:bg-gray-100 border-none
                       flex flex-row items-center justify-around
-                      text-gray-600"
+                      text-gray-600 overflow-hidden"
           btnType="secondary-alt"
           btnSize="base"
           onClick={() => {
@@ -300,16 +271,19 @@ const SortableLink = ({
 }
 
 export default function AccountSettingsLinks() {
-  const { profile, notificationHandler } = useOutletContext<{
+  const { profile, notificationHandler, connectedProfiles } = useOutletContext<{
     profile: FullProfile
     notificationHandler: (success: boolean) => void
+    connectedProfiles: any[]
   }>()
 
   const transition = useTransition()
   const actionData = useActionData()
   const fetcher = useFetcher()
 
-  const { normalizedAddressProfiles } = useLoaderData()
+  const normalizedAddressProfiles = connectedProfiles.map(
+    normalizeAddressProfile
+  )
 
   const [links, setLinks] = useState<(Link & { editing?: boolean })[]>(
     profile.links || []
@@ -357,7 +331,7 @@ export default function AccountSettingsLinks() {
   }, [isConnectionsChanged])
 
   return (
-    <div className="relative">
+    <div className="min-h-[70vh] relative">
       <Text size="xl" weight="bold" className="my-4 text-gray-900">
         Links
       </Text>

@@ -13,4 +13,8 @@ export type FullProfile = Profile & {
   links: Link[]
   gallery: Gallery[]
   addresses: Node[]
+  pfp: {
+    image: string
+    isToken?: boolean
+  }
 }

@@ -56,8 +56,9 @@ const ProfileRoute = () => {
     <>
       <FilteredNftGrid
         nfts={loadedNfts}
-        isOwner={isOwner}
-        displayText={`Looks like ${displayName} has not curated a gallery`}
+        displayText={`Looks like ${
+          isOwner ? 'you have' : `${displayName} has`
+        } not curated a gallery`}
         filters={true}
         pfp={(pfp as any).image as string}
         loadingConditions={loading || refresh}
