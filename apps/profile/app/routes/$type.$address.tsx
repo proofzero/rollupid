@@ -202,7 +202,7 @@ const UserAddressLayout = () => {
       Claim={
         <div className="px-3 lg:px-4">
           <Text
-            className="mt-5 mb-5 text-gray-800 text-center"
+            className="mb-5 text-gray-800 text-center"
             weight="bold"
             size="4xl"
           >
@@ -210,20 +210,23 @@ const UserAddressLayout = () => {
           </Text>
 
           <div className="flex flex-col justify-center items-center">
-            <Text
-              className="break-normal text-gray-500 mb-12 text-center"
-              size="base"
-              weight="normal"
-            >
-              {finalProfile.bio}
-            </Text>
+            {finalProfile.bio && (
+              <Text
+                className="break-normal text-gray-500 mb-5 text-center"
+                size="base"
+                weight="normal"
+              >
+                {finalProfile.bio}
+              </Text>
+            )}
 
             <div
-              className="flex flex-row justify-between lg:justify-center lg:space-x-10
-              w-[70%] lg:w-full items-center text-gray-500 font-size-lg"
+              className="flex flex-col space-x-0 space-y-5 justify-between w-[70%] 
+              lg:justify-center lg:w-full lg:flex-row lg:space-x-10 lg:space-y-0
+              items-center text-gray-500 font-size-lg "
             >
               {finalProfile.location && (
-                <div className="flex flex-row space-x-3 items-center wrap">
+                <div className="flex flex-row space-x-3 items-center">
                   <HiOutlineMapPin className="h-5 w-5" />
                   <Text weight="medium" className="text-gray-500">
                     {finalProfile.location}
@@ -257,29 +260,6 @@ const UserAddressLayout = () => {
           </Text>
         </div>
       }
-      // Claim={
-      //   <div
-      //     className="rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row
-      //     space-y-4 lg:space-y-0 flex-row justify-between mt-7 px-3 lg:px-4"
-      //   >
-      //     <div>
-      //       <Text className="text-gray-600" size="lg" weight="semibold">
-      //         This Account is yet to be claimed - Are you the owner?
-      //       </Text>
-      //       <Text
-      //         className="break-all text-gray-500"
-      //         size="base"
-      //         weight="normal"
-      //       >
-      //         {profile.address}
-      //       </Text>
-      //     </div>
-
-      //     <a href="https://passport.rollup.id/">
-      //       <Button>Claim This Account</Button>
-      //     </a>
-      //   </div>
-      // }
       Tabs={<ProfileTabs path={path} handleTab={navigate} />}
     >
       <Outlet
