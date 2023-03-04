@@ -8,6 +8,12 @@ import type { Session } from '@remix-run/cloudflare'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
+import {
+  checkToken,
+  ExpiredTokenError,
+  InvalidTokenError,
+} from '@kubelt/utils/token'
+
 // FLASH SESSION
 
 const getFlashSessionStorage = (env: Env) => {
@@ -180,20 +186,18 @@ export async function requireJWT(
   const session = await getUserSession(request, env)
   const jwt = session.get('jwt')
 
-  if (!jwt || typeof jwt !== 'string') {
-    if (consoleParams.clientId)
-      throw await createConsoleParamsSession(consoleParams, env)
-    else throw redirect('/authenticate')
-  }
-  if (jwt) {
-    const parsedJWT = parseJwt(jwt)
-    const exp = parsedJWT?.exp
-    if (exp && exp < Date.now() / 1000) {
+  try {
+    checkToken(jwt)
+    return jwt
+  } catch (error) {
+    if (error === InvalidTokenError)
+      if (consoleParams.clientId)
+        throw await createConsoleParamsSession(consoleParams, env)
+      else throw redirect('/authenticate')
+    else if (error === ExpiredTokenError) {
       throw await destroyUserSession(session, '/authenticate', env)
     }
   }
-
-  return jwt
 }
 
 export async function getJWTConditionallyFromSession(

@@ -5003,6 +5003,7 @@ __metadata:
     "@heroicons/react": 2.0.13
     "@kubelt/design-system": "workspace:*"
     "@kubelt/platform-clients": "workspace:*"
+    "@kubelt/utils": "workspace:*"
     "@mdx-js/react": 2.1.5
     "@remix-run/cloudflare": 1.11.1
     "@remix-run/cloudflare-workers": 1.11.1
@@ -5051,6 +5052,7 @@ __metadata:
     "@kubelt/design-system": "*"
     "@kubelt/platform-clients": "workspace:*"
     "@kubelt/platform.access": "workspace:*"
+    "@kubelt/utils": "workspace:*"
     "@mdx-js/react": ^1.6.22
     "@playwright/test": 1.25.2
     "@remix-run/cloudflare": 1.11.1
@@ -5134,6 +5136,7 @@ __metadata:
     "@kubelt/design-system": "*"
     "@kubelt/platform-clients": "workspace:*"
     "@kubelt/urns": "workspace:*"
+    "@kubelt/utils": "workspace:*"
     "@mdx-js/react": 2.1.5
     "@playwright/test": 1.28.1
     "@remix-run/cloudflare": 1.11.1
@@ -5693,7 +5696,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/utils@workspace:packages/utils":
+"@kubelt/utils@workspace:*, @kubelt/utils@workspace:packages/utils":
   version: 0.0.0-use.local
   resolution: "@kubelt/utils@workspace:packages/utils"
   dependencies:
@@ -5707,6 +5710,8 @@ __metadata:
     npm-run-all: 4.1.5
     prettier: 2.7.1
     typescript: 4.8.4
+  peerDependencies:
+    jose: "*"
   languageName: unknown
   linkType: soft
 
