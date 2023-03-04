@@ -5,6 +5,7 @@ import { initAccountNodeByName } from '../../nodes'
 import { appRouter } from '../router'
 import { ProfileSchema } from '../validators/profile'
 import { Node } from '../../../../edges/src/jsonrpc/validators/node'
+import { AccountURNSpace } from '@kubelt/urns/account'
 
 export const GetProfileInput = z.object({
   account: inputValidators.AccountURNInput,
@@ -40,6 +41,20 @@ export const getProfileMethod = async ({
     getAddressesCall({ account: input.account }),
   ])
   if (!profile) return null
+
+  console.debug({ profile, addresses })
+  const qcomps = {
+    name: profile.displayName,
+    picture: profile.pfp?.image,
+  }
+  const enhancedUrn = AccountURNSpace.componentizedUrn(
+    AccountURNSpace.decode(input.account),
+    undefined,
+    qcomps
+  )
+
+  const edge = ctx.edges
+  await edge.updateNode.mutate({ urnOfNode: enhancedUrn })
 
   return { ...profile, addresses, handle: undefined }
 }
