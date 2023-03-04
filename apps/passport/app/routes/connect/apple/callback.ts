@@ -80,7 +80,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     { alias: profile.email, hidden: 'true' }
   )
   const addressClient = getAddressClient(address, context.env)
-  const account = await addressClient.resolveAccount.query({
+  const { accountURN } = await addressClient.resolveAccount.query({
     jwt: await getJWTConditionallyFromSession(request, context.env),
   })
   const current = await addressClient.getOAuthData.query()
@@ -101,7 +101,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     })
   }
 
-  return authenticateAddress(address, account, appData, context.env)
+  return authenticateAddress(address, accountURN, appData, context.env)
 }
 
 const getUser = (request: Request): AppleUser | undefined => {
