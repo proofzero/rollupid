@@ -1,14 +1,10 @@
-import { useEffect, useState } from 'react'
 import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
-import { redirect } from '@remix-run/cloudflare'
-import { json } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
 import {
   Outlet,
   useCatch,
-  useFetcher,
   useLoaderData,
   useNavigate,
-  useOutletContext,
   useParams,
 } from '@remix-run/react'
 
@@ -31,11 +27,11 @@ import {
 } from '@kubelt/utils'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
-import { Cover } from '~/components/profile/cover/Cover'
 import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
 
 import defaultOG from '~/assets/social.png'
+import subtractLogo from '~/assets/subtract-logo.svg'
 import {
   CryptoAddressType,
   NodeType,
@@ -48,7 +44,19 @@ import { imageFromAddressType } from '~/helpers'
 import type { FullProfile } from '~/types'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
+  const url = new URL(request.url)
   const { address, type } = params
+
+  /**
+   * If we don't redirect here
+   * we will load loader -> then go to /$type/$address/index
+   * -> then will redirect to /links and call this same
+   * loader second time
+   */
+  if (url.pathname === `/${type}/${address}`) {
+    return redirect(`/${type}/${address}/links`)
+  }
+
   const galaxyClient = await getGalaxyClient()
 
   const session = await getProfileSession(request)
@@ -78,7 +86,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       getAuthzHeaderConditionallyFromToken(jwt)
     )
 
-    if (!profile) {
+    if (!profile?.profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })
     }
 
@@ -137,13 +145,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 export const meta: MetaFunction = ({
   data,
 }: {
-  data: { ogImage: string; uname: string }
+  data: { ogImage: string; uname: string; profile: FullProfile }
 }) => {
+  const desc =
+    data.profile && data.profile.bio ? data.profile.bio : 'Claim yours now!'
   const meta = {
     'og:title': 'Rollup Decentralized Profile',
     'twitter:title': 'Rollup Decentralized Profile',
-    'og:description': 'Claim yours now!',
-    'twitter:description': 'Claim yours now!',
+    'og:description': desc,
+    'twitter:description': desc,
     'og:url': `https://rollup.id`,
     'og:image': data.ogImage,
     'og:image:alt': `Profile not found`,
@@ -177,61 +187,24 @@ const UserAddressLayout = () => {
       accountURN: string
     }>()
 
-  const ctx = useOutletContext<{
-    profile: FullProfile
-    // This gets passed down
-    // from root.tsx
-    // but if not logged in
-    // is null...
-  }>()
-
-  const finalProfile = profile ?? ctx.profile
+  const finalProfile = profile
 
   const navigate = useNavigate()
-  const fetcher = useFetcher()
-
-  const [coverUrl, setCoverUrl] = useState(
-    gatewayFromIpfs(finalProfile.cover as string)
-  )
-
-  useEffect(() => {
-    if (fetcher.type === 'done') {
-      setCoverUrl(fetcher.data)
-    }
-  }, [fetcher])
 
   return (
     <ProfileLayout
-      Cover={
-        <Cover
-          src={coverUrl}
-          isOwner={isOwner}
-          updateCoverHandler={async (cover: string) => {
-            setCoverUrl(cover)
-            return fetcher.submit(
-              {
-                url: cover,
-              },
-              {
-                method: 'post',
-                action: '/account/profile/update-cover',
-              }
-            )
-          }}
-        />
-      }
       Avatar={
         <Avatar
           src={gatewayFromIpfs(finalProfile.pfp?.image as string) as string}
           size="lg"
-          hex={true}
+          hex={finalProfile.pfp?.isToken as boolean}
           border
         />
       }
       Claim={
         <div className="px-3 lg:px-4">
           <Text
-            className="mt-5 mb-5 text-gray-800 text-center"
+            className="mb-5 text-gray-800 text-center"
             weight="bold"
             size="4xl"
           >
@@ -239,20 +212,23 @@ const UserAddressLayout = () => {
           </Text>
 
           <div className="flex flex-col justify-center items-center">
-            <Text
-              className="break-normal text-gray-500 mb-12 text-center"
-              size="base"
-              weight="normal"
-            >
-              {finalProfile.bio}
-            </Text>
+            {finalProfile.bio && (
+              <Text
+                className="break-normal text-gray-500 mb-5 text-center"
+                size="base"
+                weight="normal"
+              >
+                {finalProfile.bio}
+              </Text>
+            )}
 
             <div
-              className="flex flex-col lg:flex-row lg:space-x-10 justify-start
-              lg:items-center text-gray-500 font-size-lg"
+              className="flex flex-col space-x-0 space-y-5 justify-between w-[70%] 
+              lg:justify-center lg:w-full lg:flex-row lg:space-x-10 lg:space-y-0
+              items-center text-gray-500 font-size-lg "
             >
               {finalProfile.location && (
-                <div className="flex flex-row space-x-3 items-center wrap">
+                <div className="flex flex-row space-x-3 items-center">
                   <HiOutlineMapPin className="h-5 w-5" />
                   <Text weight="medium" className="text-gray-500">
                     {finalProfile.location}
@@ -272,29 +248,20 @@ const UserAddressLayout = () => {
           </div>
         </div>
       }
-      // Claim={
-      //   <div
-      //     className="rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row
-      //     space-y-4 lg:space-y-0 flex-row justify-between mt-7 px-3 lg:px-4"
-      //   >
-      //     <div>
-      //       <Text className="text-gray-600" size="lg" weight="semibold">
-      //         This Account is yet to be claimed - Are you the owner?
-      //       </Text>
-      //       <Text
-      //         className="break-all text-gray-500"
-      //         size="base"
-      //         weight="normal"
-      //       >
-      //         {profile.address}
-      //       </Text>
-      //     </div>
-
-      //     <a href="https://passport.rollup.id/">
-      //       <Button>Claim This Account</Button>
-      //     </a>
-      //   </div>
-      // }
+      PoweredBy={
+        <div className="mb-7 flex justify-center items-center space-x-2">
+          <img src={subtractLogo} alt="powered by rollup.id" />
+          <Text size="xs" weight="normal" className="text-gray-400">
+            Powered by{' '}
+            <a
+              href="https://rollup.id"
+              className="hover:underline text-indigo-500"
+            >
+              rollup.id
+            </a>
+          </Text>
+        </div>
+      }
       Tabs={<ProfileTabs path={path} handleTab={navigate} />}
     >
       <Outlet

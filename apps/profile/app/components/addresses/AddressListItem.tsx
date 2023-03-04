@@ -17,7 +17,7 @@ type AddressListItemIconProps = {
 }
 export const AddressListItemIcon = ({ iconUrl }: AddressListItemIconProps) => (
   <div className="rounded-full w-8 h-8 flex justify-center items-center bg-gray-200 overflow-hidden">
-    <img src={iconUrl} className="object-cover" />
+    <img src={iconUrl} alt="Not Found" className="object-cover" />
   </div>
 )
 

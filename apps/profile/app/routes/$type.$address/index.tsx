@@ -1,6 +1,6 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import { redirect } from 'react-router-dom'
+import { redirect } from '@remix-run/cloudflare'
 
 export const loader: LoaderFunction = () => {
-  return redirect('./links')
+  return redirect('links')
 }
