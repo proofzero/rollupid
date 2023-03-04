@@ -4,13 +4,13 @@ import { AddressList } from '~/components/addresses/AddressList'
 import type { FetcherWithComponents } from '@remix-run/react'
 import { useOutletContext } from '@remix-run/react'
 import { useFetcher, useLoaderData } from '@remix-run/react'
+import type { AddressListProps } from '~/components/addresses/AddressList'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import InputText from '~/components/inputs/InputText'
 import { NodeType } from '@kubelt/types/address'
-import type { AddressProfile, Node } from '@kubelt/galaxy-client'
 import warn from '~/assets/warning.svg'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { toast, ToastType } from '@kubelt/design-system/src/atoms/toast'
@@ -85,29 +85,30 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 }
 
-const distinctProfiles = (
-  connectedProfiles: (Node & AddressProfile & { nodeType: string })[]
-) => {
+const distinctProfiles = (connectedProfiles: any[]) => {
   // Keeping the distinctions to only append
   // context actions to desired types
   // e.x. rename to crypto profiles
-  const cryptoProfiles =
-    connectedProfiles
+  const cryptoProfiles = {
+    addresses: connectedProfiles
       .filter((p) => p?.nodeType === NodeType.Crypto)
       .map((p) => ({ urn: p.urn, ...p?.profile }))
-      .map(normalizeProfile) || []
+      .map(normalizeProfile),
+  } as AddressListProps
 
-  const vaultProfiles =
-    connectedProfiles
+  const vaultProfiles = {
+    addresses: connectedProfiles
       .filter((p) => p?.nodeType === NodeType.Vault)
       .map((p) => ({ urn: p.urn, ...p?.profile }))
-      .map(normalizeProfile) || []
+      .map(normalizeProfile),
+  } as AddressListProps
 
-  const oAuthProfiles =
-    connectedProfiles
+  const oAuthProfiles = {
+    addresses: connectedProfiles
       .filter((p) => p?.nodeType === NodeType.OAuth)
       .map((p) => ({ urn: p.urn, ...p?.profile }))
-      .map(normalizeProfile) || []
+      .map(normalizeProfile),
+  } as AddressListProps
 
   return {
     addressCount: connectedProfiles.length,
@@ -226,7 +227,7 @@ const AccountSettingsConnections = () => {
   const { reqUrlError } = useLoaderData()
 
   const { connectedProfiles } = useOutletContext<{
-    connectedProfiles: (Node & AddressProfile & { nodeType: string })[]
+    connectedProfiles: any[]
   }>()
 
   const { cryptoProfiles, vaultProfiles, oAuthProfiles, addressCount } =
@@ -268,9 +269,9 @@ const AccountSettingsConnections = () => {
   }, [reqUrlError])
 
   useEffect(() => {
-    const selectedProfile = cryptoProfiles
-      .concat(vaultProfiles)
-      .concat(oAuthProfiles)
+    const selectedProfile = cryptoProfiles.addresses
+      .concat(vaultProfiles.addresses)
+      .concat(oAuthProfiles.addresses)
       .find((p: any) => p.id === actionId)
 
     setActionProfile(selectedProfile)
@@ -366,22 +367,22 @@ const AccountSettingsConnections = () => {
         )}
 
         <AddressList
-          addresses={cryptoProfiles
+          addresses={cryptoProfiles.addresses
             .map((ap: AddressListItemProps) => ({
               ...ap,
               onRenameAccount: ap.title.endsWith('.eth')
-                ? null
+                ? undefined
                 : (id: string) => {
                     setActionId(id)
                     setRenameModalOpen(true)
                   },
             }))
-            .concat(oAuthProfiles)
+            .concat(oAuthProfiles.addresses)
             .map((ap: AddressListItemProps) => ({
               ...ap,
               onDisconnect:
                 addressCount === 1
-                  ? null
+                  ? undefined
                   : (id: string) => {
                       setActionId(id)
                       setDisconnectModalOpen(true)
@@ -394,13 +395,15 @@ const AccountSettingsConnections = () => {
         </Text>
 
         <AddressList
-          addresses={vaultProfiles.map((ap: AddressListItemProps) => ({
-            ...ap,
-            onRenameAccount: (id: string) => {
-              setActionId(id)
-              setRenameModalOpen(true)
-            },
-          }))}
+          addresses={vaultProfiles.addresses.map(
+            (ap: AddressListItemProps) => ({
+              ...ap,
+              onRenameAccount: (id: string) => {
+                setActionId(id)
+                setRenameModalOpen(true)
+              },
+            })
+          )}
         />
       </div>
     </section>
