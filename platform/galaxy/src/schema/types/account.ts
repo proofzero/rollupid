@@ -1,13 +1,9 @@
 export default /* GraphQL */ `
-  interface PFP {
+  type StandardPFP {
     image: String
   }
 
-  type StandardPFP implements PFP {
-    image: String
-  }
-
-  type NFTPFP implements PFP {
+  type NFTPFP {
     image: String
     isToken: Boolean
   }
@@ -25,6 +21,8 @@ export default /* GraphQL */ `
     title: String!
     timestamp: Float!
   }
+
+  union PFP = StandardPFP | NFTPFP
 
   type Profile {
     displayName: String

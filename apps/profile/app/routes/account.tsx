@@ -55,27 +55,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   // but don't have the profiles
   // and it's complex to send them to a loader / action
 
-  const session = await getProfileSession(request)
-  const user = session.get('user')
+  const accountURN = parseJwt(jwt).sub as AccountURN
 
-  let loggedInUserProfile: FullProfile | undefined
-  let accountURN
-
-  if (user) {
-    const {
-      user: { accessToken: jwt },
-    } = session.data
-
-    accountURN = parseJwt(jwt).sub as AccountURN
-
-    const fetchedLoggedInProfile = await getAccountProfile({ jwt })
-
-    loggedInUserProfile = fetchedLoggedInProfile
-  }
-
-  if (!loggedInUserProfile) {
-    throw new Error('Could not retrieve logged in use profile.')
-  }
+  const loggedInUserProfile = await getAccountProfile({ jwt })
 
   const addressTypeUrns = loggedInUserProfile.addresses.map((a) => ({
     urn: a.baseUrn,

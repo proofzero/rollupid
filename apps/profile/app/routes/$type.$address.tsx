@@ -195,7 +195,7 @@ const UserAddressLayout = () => {
         <Avatar
           src={gatewayFromIpfs(finalProfile.pfp?.image as string) as string}
           size="lg"
-          hex={true}
+          hex={finalProfile.pfp?.isToken as boolean}
           border
         />
       }

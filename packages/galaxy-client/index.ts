@@ -242,7 +242,7 @@ export type NftNoProps = {
   tokenUri?: Maybe<TokenUri>;
 };
 
-export type Nftpfp = Pfp & {
+export type Nftpfp = {
   __typename?: 'NFTPFP';
   image?: Maybe<Scalars['String']>;
   isToken?: Maybe<Scalars['Boolean']>;
@@ -365,9 +365,7 @@ export enum OpenSeaSafeListStatus {
   Verified = 'verified'
 }
 
-export type Pfp = {
-  image?: Maybe<Scalars['String']>;
-};
+export type Pfp = Nftpfp | StandardPfp;
 
 export type PfpInput = {
   image: Scalars['String'];
@@ -480,7 +478,7 @@ export type Scope = {
   scopes: Array<Maybe<Scalars['String']>>;
 };
 
-export type StandardPfp = Pfp & {
+export type StandardPfp = {
   __typename?: 'StandardPFP';
   image?: Maybe<Scalars['String']>;
 };
