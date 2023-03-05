@@ -66,6 +66,8 @@ export const getRollupAuthenticator = () => {
 export async function requireJWT(request: Request, headers = new Headers()) {
   const session = await getProfileSession(request)
   const { user } = session.data
+  if (!user) throw redirect('/auth')
+
   try {
     checkToken(user.accessToken)
     return user.accessToken
