@@ -31,7 +31,7 @@
     "@remix-run/cloudflare-workers": "1.14.0",
     "@remix-run/react": "1.14.0",
     "@tailwindcss/forms": "0.5.3",
-    "connectkit": "1.1.1",
+    "connectkit": "1.2.0",
     "flowbite": "1.5.4",
     "graphql-request": "5.0.0",
     "jose": "4.11.0",
@@ -44,7 +44,7 @@
     "remix-auth-microsoft": "2.0.0",
     "remix-auth-oauth2": "1.5.0",
     "remix-auth-twitter": "0.1.1",
-    "wagmi": "0.10.8"
+    "wagmi": "0.11.7"
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",

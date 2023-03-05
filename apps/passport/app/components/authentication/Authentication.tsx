@@ -2,14 +2,7 @@ import circleLogo from './circle-logo.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { lazy } from 'react'
 import { Avatar } from '@kubelt/design-system'
-
-const ConnectButton = lazy(() =>
-  import('../../../app/components/connect-button/ConnectButton').then(
-    (module) => ({ default: module.ConnectButton })
-  )
-)
 
 export type AuthenticationProps = {
   logoURL?: string

@@ -1,11 +1,9 @@
 # https://developers.cloudflare.com/workers/platform/compatibility-dates
 compatibility_date = "2022-04-05"
-
 main = "./build/index.js"
-
 name = "passport"
-
 workers_dev = false
+compatibility_flags = [ "streams_enable_constructors" ]
 
 # Services binding for local development
 services = [
