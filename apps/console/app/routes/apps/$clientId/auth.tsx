@@ -25,6 +25,7 @@ import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { z } from 'zod'
 import { RollType } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -109,22 +110,22 @@ const updatesSchema = z.object({
     .or(z.string().length(0)),
 })
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader: LoaderFunction = async ({ request, params, context }) => {
   if (!params.clientId) {
     throw new Error('Application Client ID is required for the requested route')
   }
   const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(
-    Starbase,
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...generateTraceContextHeaders(context.traceSpan),
+  })
 
   const scopeMeta = await starbaseClient.getScopes.query()
 
   return json({ scopeMeta })
 }
 
-export const action: ActionFunction = async ({ request, params }) => {
+export const action: ActionFunction = async ({ request, params, context }) => {
   if (!params.clientId) {
     throw new Error('Application Client ID is required for the requested route')
   }
@@ -132,10 +133,10 @@ export const action: ActionFunction = async ({ request, params }) => {
   let rotatedSecret, updates
 
   const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(
-    Starbase,
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...generateTraceContextHeaders(context.traceSpan),
+  })
 
   const formData = await request.formData()
   const op = formData.get('op')

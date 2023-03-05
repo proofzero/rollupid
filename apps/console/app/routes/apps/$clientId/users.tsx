@@ -7,6 +7,7 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { useState, useEffect } from 'react'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { AuthorizedAccountsOutput } from '@kubelt/platform/starbase/src/types'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 // don't change this constant unless it's necessary
 // this constant also affects /$clientId root route
@@ -18,7 +19,7 @@ type LoaderData = {
   error?: any
 }
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader: LoaderFunction = async ({ request, params, context }) => {
   const jwt = await requireJWT(request)
   const srcUrl = new URL(request.url)
 
@@ -34,10 +35,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       throw new Error('clientId is required')
     }
 
-    const starbaseClient = createStarbaseClient(
-      Starbase,
-      getAuthzHeaderConditionallyFromToken(jwt)
-    )
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...generateTraceContextHeaders(context.traceSpan),
+    })
 
     const edgesResult = starbaseClient.getAuthorizedAccounts.query({
       client,

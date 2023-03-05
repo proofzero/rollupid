@@ -28,8 +28,7 @@ export const deleteApp = async ({
     ctx.StarbaseApp
   )
 
-  const edgesClient = createEdgesClient(ctx.Edges)
-  await edgesClient.removeEdge.mutate({
+  await ctx.edges.removeEdge.mutate({
     src: ctx.accountURN,
     dst: appURN,
     tag: EDGE_APPLICATION,

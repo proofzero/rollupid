@@ -25,6 +25,7 @@ import { getGalaxyClient } from '~/utilities/platform.server'
 import { InfoPanelDashboard } from '~/components/InfoPanel/InfoPanelDashboard'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 type LoaderData = {
   apps: {
@@ -39,10 +40,10 @@ type LoaderData = {
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const jwt = await requireJWT(request)
+  console.debug('TRACE TEST', context.traceSpan)
   const starbaseClient = createStarbaseClient(Starbase, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
-    //TODO: create TraceContext headers from request context
-    traceparent: 'blah',
+    ...generateTraceContextHeaders(context.traceSpan),
   })
 
   //TODO: create TraceContext headers from request context

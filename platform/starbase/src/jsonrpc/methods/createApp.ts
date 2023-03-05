@@ -38,8 +38,7 @@ export const createApp = async ({
 
   // We need to create an edge between the logged in user node (aka
   // account) and the new app.
-  const edgesClient = createEdgesClient(ctx.Edges)
-  const edgeRes = await edgesClient.makeEdge.mutate({
+  const edgeRes = await ctx.edges.makeEdge.mutate({
     src: ctx.accountURN,
     dst: appURN,
     tag: EDGE_APPLICATION,

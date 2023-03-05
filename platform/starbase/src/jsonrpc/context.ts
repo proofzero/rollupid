@@ -5,6 +5,11 @@ import createEdgesClient from '@kubelt/platform-clients/edges'
 import { AccountURN } from '@kubelt/urns/account'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import { ApplicationURN } from '@kubelt/urns/application'
+import {
+  generateTraceContextHeaders,
+  generateTraceSpan,
+  TraceSpan,
+} from '@kubelt/platform-middleware/trace'
 
 /**
  * Defines your inner context shape.
@@ -16,10 +21,10 @@ interface CreateInnerContextOptions
   ServiceDeploymentMetadata: DeploymentMetadata
   StarbaseApp: DurableObjectNamespace
   Edges: Fetcher
+  edges?: ReturnType<typeof createEdgesClient>
   accountURN?: AccountURN
   ownAppURNs?: ApplicationURN[]
-  traceparent?: string
-  tracespan?: string
+  traceSpan?: TraceSpan
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
@@ -31,16 +36,15 @@ interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
-  //TODO: Create span from parent
-  const traceparent = opts.req?.headers.get('traceparent') || ''
-  const tracespan = `BLAH${Date.now()}`
-
-  const edges = createEdgesClient(opts.Edges)
+  const traceSpan = generateTraceSpan(opts.req?.headers)
+  const edges = createEdgesClient(opts.Edges, {
+    ...generateTraceContextHeaders(traceSpan),
+  })
+  console.debug('STARBASE TRPC TRACE', traceSpan)
   return {
     ...opts,
     edges,
-    traceparent,
-    tracespan,
+    traceSpan,
   }
 }
 /**

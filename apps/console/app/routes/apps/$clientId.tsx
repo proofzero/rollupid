@@ -17,6 +17,7 @@ import {
   Toaster,
   ToastType,
 } from '@kubelt/design-system/src/atoms/toast'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 type AppData = {
   clientId: string
@@ -31,16 +32,16 @@ type LoaderData = {
   rotationResult?: RotatedSecrets
 }
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader: LoaderFunction = async ({ request, params, context }) => {
   if (!params.clientId) {
     throw new Error('Client ID is required for the requested route')
   }
 
   const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(
-    Starbase,
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...generateTraceContextHeaders(context.traceSpan),
+  })
   const galaxyClient = await getGalaxyClient()
 
   const clientId = params?.clientId
