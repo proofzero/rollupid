@@ -73,7 +73,7 @@ export async function requireJWT(request: Request, headers = new Headers()) {
     return user.accessToken
   } catch (error) {
     if (error === InvalidTokenError) {
-      throw redirect('/auth')
+      throw redirect('/signout')
     } else if (error === ExpiredTokenError) {
       if (!user.refreshToken) {
         throw redirect('/signout')
