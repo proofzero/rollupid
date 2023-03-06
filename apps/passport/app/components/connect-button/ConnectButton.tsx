@@ -117,7 +117,9 @@ export function ConnectButton({
                 {(isSigning || isLoading) && isConnected ? (
                   <>
                     <Spinner />
-                    {status !== 'idle' && 'Signing (please check wallet)'}
+                    {isSigning
+                      ? 'Signing... (please check wallet)'
+                      : 'Continuing...'}
                   </>
                 ) : (
                   <>
