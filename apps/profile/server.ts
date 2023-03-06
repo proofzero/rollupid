@@ -1,5 +1,8 @@
-import { generateTraceSpan, TraceSpan } from '@kubelt/platform-middleware/trace'
-import { TraceableFetchEvent } from '@kubelt/platform-middleware/TraceableFetchEvent'
+import {
+  generateTraceSpan,
+  TraceableFetchEvent,
+  TraceSpan,
+} from '@kubelt/platform-middleware/trace'
 import {
   createRequestHandler,
   handleAsset,
@@ -31,17 +34,13 @@ const handleEvent = async (event: FetchEvent) => {
     const newTraceSpan = generateTraceSpan()
 
     const reqURL = new URL(event.request.url)
-    const modifiedEvent = new TraceableFetchEvent(
-      'FetchEvent',
-      event,
-      newTraceSpan
-    )
-
-    console.debug(
+    //Have to force injection of new field so it is available in the context setup above
+    const newEvent = Object.assign(event, { traceSpan: newTraceSpan })
+    console.log(
       `Started HTTP handler for ${reqURL.pathname}/${reqURL.searchParams} span: ${newTraceSpan}`
     )
     try {
-      response = await requestHandler(modifiedEvent)
+      response = await requestHandler(newEvent)
     } finally {
       console.debug(
         `Completed HTTP handler for ${reqURL.pathname}/${reqURL.searchParams} span: ${newTraceSpan}`
