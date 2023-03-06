@@ -100,11 +100,7 @@ export function ConnectButton({
               <Button
                 btnType="secondary-alt"
                 className={classNames('button', className)}
-                disabled={
-                  isConnected
-                    ? !address
-                    : isConnecting || isSigning || isLoading
-                }
+                disabled={isConnecting || isSigning || isLoading}
                 onClick={
                   isConnected ? () => address && connectCallback(address) : show
                 }
