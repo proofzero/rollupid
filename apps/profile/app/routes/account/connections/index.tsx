@@ -14,67 +14,7 @@ import { NodeType } from '@kubelt/types/address'
 import warn from '~/assets/warning.svg'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { toast, ToastType } from '@kubelt/design-system/src/atoms/toast'
-
-const normalizeProfile = (profile: any) => {
-  switch (profile.__typename) {
-    case 'CryptoAddressProfile':
-      return {
-        id: profile.urn,
-        address: profile.address,
-        title: profile.displayName,
-        icon: profile.avatar,
-        chain: 'Ethereum',
-      }
-    case 'OAuthGoogleProfile':
-      return {
-        id: profile.urn,
-        address: profile.email,
-        title: profile.name,
-        icon: profile.picture,
-        chain: 'Google',
-      }
-    case 'OAuthTwitterProfile':
-      return {
-        id: profile.urn,
-        address: profile.name,
-        title: profile.name,
-        icon: profile.profile_image_url_https,
-        chain: 'Twitter',
-      }
-    case 'OAuthGithubProfile':
-      return {
-        id: profile.urn,
-        address: profile.name,
-        title: profile.name,
-        icon: profile.avatar_url,
-        chain: 'GitHub',
-      }
-    case 'OAuthMicrosoftProfile':
-      return {
-        id: profile.urn,
-        address: profile.email,
-        title: profile.name,
-        icon: profile.picture,
-        chain: 'Microsoft',
-      }
-    case 'OAuthAppleProfile':
-      return {
-        id: profile.urn,
-        address: profile.name,
-        title: profile.name,
-        icon: profile.picture,
-        chain: 'Apple',
-      }
-    case 'OAuthDiscordProfile':
-      return {
-        id: profile.urn,
-        address: profile.email,
-        title: `${profile.username}#${profile.discriminator}`,
-        icon: `https://cdn.discordapp.com/avatars/${profile.discordId}/${profile.avatar}.png`,
-        chain: 'Discord',
-      }
-  }
-}
+import { normalizeProfileToConnection } from '~/helpers/profile'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const reqUrl = new URL(request.url)
@@ -93,21 +33,21 @@ const distinctProfiles = (connectedProfiles: any[]) => {
     addresses: connectedProfiles
       .filter((p) => p?.nodeType === NodeType.Crypto)
       .map((p) => ({ urn: p.urn, ...p?.profile }))
-      .map(normalizeProfile),
+      .map(normalizeProfileToConnection),
   } as AddressListProps
 
   const vaultProfiles = {
     addresses: connectedProfiles
       .filter((p) => p?.nodeType === NodeType.Vault)
       .map((p) => ({ urn: p.urn, ...p?.profile }))
-      .map(normalizeProfile),
+      .map(normalizeProfileToConnection),
   } as AddressListProps
 
   const oAuthProfiles = {
     addresses: connectedProfiles
       .filter((p) => p?.nodeType === NodeType.OAuth)
       .map((p) => ({ urn: p.urn, ...p?.profile }))
-      .map(normalizeProfile),
+      .map(normalizeProfileToConnection),
   } as AddressListProps
 
   return {
@@ -377,7 +317,12 @@ const AccountSettingsConnections = () => {
                     setRenameModalOpen(true)
                   },
             }))
-            .concat(oAuthProfiles.addresses)
+            .concat(
+              oAuthProfiles.addresses.map((ap) => ({
+                ...ap,
+                onRenameAccount: undefined,
+              }))
+            )
             .map((ap: AddressListItemProps) => ({
               ...ap,
               onDisconnect:
