@@ -1,14 +1,14 @@
-import { json, LoaderFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 import { Suspense } from 'react'
 
 import { getUserSession, setConsoleParamsSession } from '~/session.server'
 
-import React from 'react'
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
 import { useCatch, useOutletContext } from '@remix-run/react'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
-
+import { LazyAuth } from '~/web3/lazyAuth'
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 
 // TODO: loader function check if we have a session already
@@ -41,10 +41,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   return null
 }
 
-const LazyAuth = React.lazy(() =>
-  import('~/web3/lazyAuth').then((module) => ({ default: module.LazyAuth }))
-)
-
 export default function Index() {
   const context = useOutletContext()
 
@@ -58,8 +54,8 @@ export default function Index() {
         <img src={sideGraphics} />
       </div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
-        <Suspense fallback={/*Show some spinner*/ ''}>
-          <LazyAuth context={context} />
+        <Suspense fallback={''}>
+          <LazyAuth context={context} autoConnect={true} />
         </Suspense>
       </div>
     </div>

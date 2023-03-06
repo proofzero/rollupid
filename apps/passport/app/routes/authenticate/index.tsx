@@ -1,13 +1,29 @@
-import { Form, useOutletContext, useTransition } from '@remix-run/react'
-import { useState } from 'react'
+import {
+  Form,
+  useOutletContext,
+  useSubmit,
+  useTransition,
+} from '@remix-run/react'
+import { useEffect, useState } from 'react'
 import { Authentication, ConnectButton } from '~/components'
 import ConnectOAuthButton from '~/components/connect-oauth-button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
+import { toast, ToastType } from '@kubelt/design-system/src/atoms/toast'
 
 export default function Authenticate() {
-  const [enableWalletConnect, setEnableWalletConnect] = useState(true)
-
+  const [signData, setSignData] = useState<{
+    nonce: string | undefined
+    state: string | undefined
+    address: string | undefined
+    signature: string | undefined
+  }>({
+    nonce: undefined,
+    state: undefined,
+    address: undefined,
+    signature: undefined,
+  })
+  const [loading, setLoading] = useState(false)
   const context = useOutletContext<{
     appProps?: {
       name: string
@@ -19,6 +35,13 @@ export default function Authenticate() {
   const iconURL = context.appProps?.iconURL
 
   const transition = useTransition()
+  const submit = useSubmit()
+
+  useEffect(() => {
+    if (transition.state === 'idle') {
+      setLoading(false)
+    }
+  }, [transition.state])
 
   return (
     <>
@@ -27,14 +50,58 @@ export default function Authenticate() {
       <Authentication logoURL={iconURL} appName={name}>
         <>
           <ConnectButton
-            disabled={!enableWalletConnect}
+            signData={signData}
+            isLoading={loading}
             connectCallback={async (address) => {
-              window.location.href = `/connect/${address}/sign`
+              if (loading) return
+              // fetch nonce and kickoff sign flow
+              setLoading(true)
+              fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
+                .then((res) =>
+                  res.json<{ nonce: string; state: string; address: string }>()
+                )
+                .then(({ nonce, state, address }) => {
+                  setSignData({
+                    nonce,
+                    state,
+                    address,
+                    signature: undefined,
+                  })
+                })
+                .catch((err) => {
+                  toast(ToastType.Error, {
+                    message:
+                      'Could not fetch nonce for signing authentication message',
+                  })
+                })
+            }}
+            signCallback={(address, signature, nonce, state) => {
+              console.debug('signing complete')
+              setSignData({
+                ...signData,
+                signature,
+              })
+              submit(
+                { signature, nonce, state },
+                {
+                  method: 'post',
+                  action: `/connect/${address}/sign`,
+                }
+              )
             }}
             connectErrorCallback={(error) => {
-              console.error(error)
-              alert('Error connecting to wallet')
-              setEnableWalletConnect(false)
+              console.debug('transition.state: ', transition.state)
+              if (transition.state !== 'idle' || !loading) {
+                return
+              }
+              if (error) {
+                console.error(error)
+                toast(ToastType.Error, {
+                  message:
+                    'Failed to complete signing. Please try again or contact support.',
+                })
+                setLoading(false)
+              }
             }}
           />
           <div className="my-5 flex flex-row items-center space-x-3">

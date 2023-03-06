@@ -5,9 +5,9 @@ import { generateHashedIDRef } from '@kubelt/urns/idref'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
-import { getAddressClient } from '~/platform.server'
-import { getConsoleParamsSession } from '~/session.server'
-import { authenticateAddress } from '~/utils/authenticate.server'
+import { getAddressClient } from '../../../platform.server'
+import { getConsoleParamsSession } from '../../../session.server'
+import { authenticateAddress } from '../../../utils/authenticate.server'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const searchParams = new URL(request.url).searchParams

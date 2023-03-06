@@ -11,7 +11,7 @@ export const Spinner = ({ color = '#000000' }: SpinnerProps) => (
       width: '32px',
       height: '32px',
       clear: 'both',
-      margin: '20px auto',
+      margin: '20px 1em',
       border: '4px rgba(0, 0, 0, 0.25) solid',
       borderTop: `4px ${color} solid`,
       borderRadius: '50%',
