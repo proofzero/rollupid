@@ -7,7 +7,7 @@ import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 export const action: ActionFunction = async ({ request, context }) => {
   await requireJWT(request)
   const imageClient = createImageClient(Images, {
-    ...generateTraceContextHeaders(context.traceSpan),
+    headers: generateTraceContextHeaders(context.traceSpan),
   })
   try {
     const { uploadURL } = await imageClient.upload.mutate()

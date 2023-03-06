@@ -34,7 +34,7 @@ export default async (
     const imgFile = await retrievedImage.blob()
 
     const imageClient = createImageClient(env.Images, {
-      ...generateTraceContextHeaders(traceSpan),
+      headers: generateTraceContextHeaders(traceSpan),
     })
     const { uploadURL } = await imageClient.upload.mutate()
 

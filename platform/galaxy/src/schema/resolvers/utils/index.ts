@@ -119,9 +119,10 @@ export const hasApiKey = () => (next) => async (root, args, context, info) => {
 
     const env = context.env as Env
     const traceSpan = context.traceSpan as TraceSpan
-    const starbaseClient = createStarbaseClient(env.Starbase, {
-      ...generateTraceContextHeaders(traceSpan),
-    })
+    const starbaseClient = createStarbaseClient(
+      env.Starbase,
+      generateTraceContextHeaders(traceSpan)
+    )
 
     let apiKeyValidity
     try {

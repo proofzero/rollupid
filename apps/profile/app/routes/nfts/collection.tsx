@@ -25,9 +25,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     throw new Error('Collection required')
   }
 
-  const galaxyClient = await getGalaxyClient({
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(context.traceSpan)
+  )
   const { nftsForAddress: resColl } = await galaxyClient.getNftsForAddress(
     {
       owner,

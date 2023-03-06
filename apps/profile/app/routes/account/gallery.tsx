@@ -100,9 +100,9 @@ export const action: ActionFunction = async ({ request, context }) => {
     chain: nft.chain?.chain,
   }))
 
-  const galaxyClient = await getGalaxyClient({
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(context.traceSpan)
+  )
   await galaxyClient.updateGallery(
     {
       gallery,

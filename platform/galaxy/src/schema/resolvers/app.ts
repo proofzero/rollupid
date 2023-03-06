@@ -19,9 +19,10 @@ const appResolvers: Resolvers = {
       { clientId },
       { env, accountURN, traceSpan }: ResolverContext
     ) => {
-      const accessClient = createAccessClient(env.Access, {
-        ...generateTraceContextHeaders(traceSpan),
-      })
+      const accessClient = createAccessClient(
+        env.Access,
+        generateTraceContextHeaders(traceSpan)
+      )
 
       const scopes = await accessClient.getAuthorizedAppScopes.query({
         accountURN,

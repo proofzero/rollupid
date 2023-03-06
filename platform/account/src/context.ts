@@ -35,9 +35,10 @@ interface CreateInnerContextOptions
 export async function createContextInner(opts: CreateInnerContextOptions) {
   const traceSpan = generateTraceSpan(opts.req?.headers)
 
-  const edges = createEdgesClient(opts.Edges, {
-    ...generateTraceContextHeaders(traceSpan),
-  })
+  const edges = createEdgesClient(
+    opts.Edges,
+    generateTraceContextHeaders(traceSpan)
+  )
   return {
     ...opts,
     traceSpan,

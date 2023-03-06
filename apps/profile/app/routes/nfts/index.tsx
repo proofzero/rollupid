@@ -20,9 +20,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     return json({})
   }
 
-  const galaxyClient = await getGalaxyClient({
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(context.traceSpan)
+  )
   const { contractsForAddress: resColl } =
     await galaxyClient.getNftsPerCollection(
       {

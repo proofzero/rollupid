@@ -31,9 +31,10 @@ export const unsetAccountMethod = async ({
   ctx: Context
 }): Promise<UnsetAccountResult> => {
   // TODO replace with usage of InjectEdges middleware
-  const edgesClient = getEdgesClient(ctx.Edges, {
-    ...generateTraceContextHeaders(ctx.traceSpan),
-  })
+  const edgesClient = getEdgesClient(
+    ctx.Edges,
+    generateTraceContextHeaders(ctx.traceSpan)
+  )
   const nodeClient = ctx.address
 
   // Get the address associated with the authorization header included in the request.

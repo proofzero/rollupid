@@ -18,9 +18,7 @@ export function getStarbaseClient(jwt: string, env: Env, traceSpan: TraceSpan) {
 }
 
 export function getAccessClient(env: Env, traceSpan: TraceSpan) {
-  return createAccessClient(env.Access, {
-    ...generateTraceContextHeaders(traceSpan),
-  })
+  return createAccessClient(env.Access, generateTraceContextHeaders(traceSpan))
 }
 
 export function getAddressClient(

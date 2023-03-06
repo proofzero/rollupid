@@ -42,9 +42,9 @@ export const action: ActionFunction = async ({ request, context }) => {
   const image = formData.get('pfp_url') as string
   let computedIsToken =
     formData.get('pfp_isToken')?.toString() === '1' ? true : false
-  const galaxyClient = await getGalaxyClient({
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(context.traceSpan)
+  )
   // TODO: handle and return form errors
   await galaxyClient.updateProfile(
     {

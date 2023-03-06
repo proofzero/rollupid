@@ -235,9 +235,9 @@ export const getGalleryMetadata = async (
   gallery: Gallery[],
   traceSpan: TraceSpan
 ) => {
-  const galaxyClient = await getGalaxyClient({
-    ...generateTraceContextHeaders(traceSpan),
-  })
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(traceSpan)
+  )
 
   const { getNFTMetadataBatch: metadata } = await galaxyClient.getNFTMetadata(
     {

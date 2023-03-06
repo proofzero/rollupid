@@ -11,9 +11,9 @@ export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
 
   const id = formData.get('id') as AddressURN
-  const galaxyClient = await getGalaxyClient({
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(context.traceSpan)
+  )
 
   try {
     await galaxyClient.disconnectAddress(

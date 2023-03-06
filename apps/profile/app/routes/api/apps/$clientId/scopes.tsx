@@ -12,9 +12,9 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     throw new Error('Client ID is required for query')
   }
 
-  const galaxyClient = await getGalaxyClient({
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(context.traceSpan)
+  )
 
   const { scopes } = await galaxyClient.getAuthorizedAppScopes(
     {

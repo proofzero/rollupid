@@ -14,7 +14,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   await requireJWT(request)
 
   const imageClient = createImageClient(Images, {
-    ...generateTraceContextHeaders(context.traceSpan),
+    headers: generateTraceContextHeaders(context.traceSpan),
   })
   const { uploadURL } = await imageClient.upload.mutate()
   return json(uploadURL)

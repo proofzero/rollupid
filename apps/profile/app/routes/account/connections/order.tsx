@@ -16,9 +16,9 @@ export const action: ActionFunction = async ({ request, context }) => {
     public?: boolean
   }[]
 
-  const galaxyClient = await getGalaxyClient({
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(context.traceSpan)
+  )
   await galaxyClient.updateConnectedAddressesProperties(
     {
       addressURNList: connections,

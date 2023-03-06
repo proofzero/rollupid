@@ -20,9 +20,10 @@ export const action: ActionFunction = async ({ request, context }) => {
     grantType,
   })
 
-  const accessClient = createAccessClient(context.env.Access, {
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
+  const accessClient = createAccessClient(
+    context.env.Access,
+    generateTraceContextHeaders(context.traceSpan)
+  )
 
   const tokens = refreshToken
     ? await accessClient.exchangeToken.mutate({

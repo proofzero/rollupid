@@ -58,9 +58,9 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     return redirect(`/${type}/${address}/links`)
   }
 
-  const galaxyClient = await getGalaxyClient({
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(context.traceSpan)
+  )
   const session = await getProfileSession(request)
   if (!address) throw new Error('No address provided in URL')
 
@@ -108,7 +108,10 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
     let ogImage = null
     if (request.cf.botManagement.score < 30) {
-      ogImage = await ogImageFromProfile(profile.pfp?.image as string, context.traceSpan)
+      ogImage = await ogImageFromProfile(
+        profile.pfp?.image as string,
+        context.traceSpan
+      )
     } else {
       console.debug(
         'Human detected, not generating OG image',
