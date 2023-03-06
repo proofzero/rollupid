@@ -100,7 +100,11 @@ export function ConnectButton({
               <Button
                 btnType="secondary-alt"
                 className={classNames('button', className)}
-                disabled={isConnected ? !address : isConnecting}
+                disabled={
+                  isConnected
+                    ? !address
+                    : isConnecting || isSigning || isLoading
+                }
                 onClick={
                   isConnected ? () => address && connectCallback(address) : show
                 }
@@ -161,7 +165,7 @@ export function ConnectButton({
                     disconnect()
                   }}
                 >
-                  Disconnect
+                  Disconnect Wallet
                 </button>
               )}
             </>
