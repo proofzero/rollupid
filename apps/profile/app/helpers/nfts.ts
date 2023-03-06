@@ -3,7 +3,6 @@ import { getGalaxyClient } from './clients'
 import { getAccountProfile } from './profile'
 
 import type { AccountURN } from '@kubelt/urns/account'
-import { AccountURNSpace } from '@kubelt/urns/account'
 import type { Gallery, Nft } from '@kubelt/galaxy-client'
 import {
   generateTraceContextHeaders,
@@ -102,7 +101,7 @@ export const decorateNft = (nft: Nft): decoratedNft => {
   if (nft.id && nft.id.tokenId) {
     details.push({
       name: 'Token ID',
-      value: BigInt(nft.id?.tokenId).toString(10),
+      value: BigInt(nft.id.tokenId).toString(10),
       isCopyable: true,
     })
   }
@@ -166,7 +165,7 @@ const getMoreNfts = (fetcher: any, request: string) => {
 
 export const getMoreNftsGallery = (fetcher: any, accountURN: string) => {
   const query = generateQuery([{ name: 'accountURN', value: accountURN }])
-  const request = `/nfts/gallery?${query}`
+  const request = `/api/nfts/gallery?${query}`
   getMoreNfts(fetcher, request)
 }
 
@@ -182,9 +181,9 @@ export const getMoreNftsModal = (
     { name: 'collection', value: collection },
   ])
   if (collection) {
-    getMoreNfts(fetcher, `/nfts/collection?${query}`)
+    getMoreNfts(fetcher, `/api/nfts/collection?${query}`)
   } else {
-    getMoreNfts(fetcher, `/nfts?${query}`)
+    getMoreNfts(fetcher, `/api/nfts?${query}`)
   }
 }
 
@@ -199,7 +198,7 @@ export const getMoreNftsSingleCollection = (
     { name: 'pageKey', value: pageKey },
     { name: 'collection', value: collection },
   ])
-  const request = `/nfts/collection?${query}`
+  const request = `/api/nfts/collection?${query}`
   getMoreNfts(fetcher, request)
 }
 
@@ -212,7 +211,7 @@ export const getMoreNftsAllCollections = (
     { name: 'owner', value: accountURN },
     { name: 'pageKey', value: pageKey },
   ])
-  const request = `/nfts?${query}`
+  const request = `/api/nfts?${query}`
   getMoreNfts(fetcher, request)
 }
 

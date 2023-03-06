@@ -131,15 +131,28 @@ export default /* GraphQL */ `
     chain: Chain
   }
 
+  type NFTDetail {
+    name: String
+    value: String
+    isCopyable: Boolean
+  }
+
   type NFTContracts {
     contracts: [NFTContract!]!
     totalCount: Int
   }
 
   type Gallery {
-    contract: String!
+    url: String
+    thumbnailUrl: String
+    error: Boolean!
+    title: String
+    contract: Contract!
     tokenId: String!
-    chain: String!
+    chain: Chain!
+    collectionTitle: String
+    properties: [NFTProperty!]
+    details: [NFTDetail!]!
   }
 
   input ContractInput {
@@ -163,10 +176,34 @@ export default /* GraphQL */ `
     chain: String
   }
 
+  input ChainInput {
+    chain: String
+    network: String
+  }
+
+  input NFTPropertyInput {
+    name: String
+    value: String
+    display: String
+  }
+
+  input NFTDetailInput {
+    name: String
+    value: String
+    isCopyable: Boolean
+  }
+
   input GalleryInput {
-    contract: String!
+    url: String
+    thumbnailUrl: String
+    error: Boolean!
+    title: String
+    contract: ContractInput!
     tokenId: String!
-    chain: String!
+    chain: ChainInput!
+    collectionTitle: String
+    properties: [NFTPropertyInput!]
+    details: [NFTDetailInput!]!
   }
 
   type Query {

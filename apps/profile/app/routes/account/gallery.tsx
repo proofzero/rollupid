@@ -43,7 +43,7 @@ import NoCryptoAddresses from '~/components/accounts/NoCryptoAddresses'
 // Other helpers
 import { getProfileSession } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
-import type { Profile, Node } from '@kubelt/galaxy-client'
+import type { Profile, Node, GalleryInput } from '@kubelt/galaxy-client'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import type { decoratedNft } from '~/helpers/nfts'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
@@ -67,14 +67,14 @@ export const action: ActionFunction = async ({ request, context }) => {
   if (!updatedGallery) {
     throw new Error('Gallery should not be empty')
   }
-  const nfts: decoratedNft[] = JSON.parse(updatedGallery)
+  const nfts: GalleryInput[] = JSON.parse(updatedGallery)
 
   // TODO: replace with zod?
   nfts.forEach((nft) => {
     if (!nft.tokenId) {
       errors.set('tokenId', ['Nft should have token ID'])
     }
-    if (!nft.contract?.address) {
+    if (!nft.contract?.address && nft.contract.address?.length === 0) {
       errors.set(`contractAddress-${nft.tokenId}`, [
         'Nft should have contract address',
       ])
@@ -82,7 +82,11 @@ export const action: ActionFunction = async ({ request, context }) => {
     if (!nft.chain?.network) {
       errors.set(`network-${nft.tokenId}`, ['Nft should have network'])
     }
-
+    if (!nft.details) {
+      errors.set(`${nft.contract?.address}-${nft.tokenId}`, [
+        'Nft should have attached details',
+      ])
+    }
     if (nft.error) {
       errors.set(`${nft.contract?.address}-${nft.tokenId}`, nft.error)
     }
@@ -93,19 +97,17 @@ export const action: ActionFunction = async ({ request, context }) => {
       errors: Object.fromEntries(errors),
     }
   }
-
-  const gallery = nfts.map((nft: decoratedNft, i: number) => ({
-    contract: nft.contract?.address,
-    tokenId: nft.tokenId,
-    chain: nft.chain?.chain,
-  }))
+  console.log({ nfts })
+  console.log({ contracts: nfts[0].contract })
+  console.log({ details: nfts[0].details })
+  console.log({ chain: nfts[0].chain })
 
   const galaxyClient = await getGalaxyClient(
     generateTraceContextHeaders(context.traceSpan)
   )
   await galaxyClient.updateGallery(
     {
-      gallery,
+      gallery: nfts,
     },
     getAuthzHeaderConditionallyFromToken(jwt)
   )
@@ -233,7 +235,7 @@ const Gallery = () => {
       const addressQueryParams = new URLSearchParams({
         accountURN: accountURN,
       })
-      const request = `/nfts/gallery?${addressQueryParams.toString()}`
+      const request = `/api/nfts/gallery?${addressQueryParams.toString()}`
 
       galleryFetcher.load(request)
     })()
@@ -343,6 +345,8 @@ const Gallery = () => {
   }, [refresh])
 
   // --------------------- END OF MODAL PART ---------------------- //
+
+  console.log({ curatedNfts })
 
   return (
     <div className="relative min-h-[70vh]">

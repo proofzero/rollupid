@@ -64,9 +64,9 @@ export default /* GraphQL */ `
   }
 
   type Mutation {
-    updateProfile(profile: ProfileInput): Boolean
-    updateLinks(links: [LinkInput!]): Boolean
-    updateGallery(gallery: [GalleryInput!]): Boolean
+    updateProfile(profile: ProfileInput!): Boolean
+    updateLinks(links: [LinkInput!]!): Boolean
+    updateGallery(gallery: [GalleryInput!]!): Boolean
     disconnectAddress(addressURN: URN!): Boolean
   }
 `

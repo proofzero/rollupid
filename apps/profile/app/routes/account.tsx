@@ -22,7 +22,6 @@ import HeadNav, { links as headNavLink } from '~/components/head-nav'
 import ConditionalTooltip from '~/components/conditional-tooltip'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { getProfileSession } from '~/utils/session.server'
 import { getAccountProfile, getAddressProfiles } from '~/helpers/profile'
 import type { Node, Profile } from '@kubelt/galaxy-client'
 import type { AddressURN } from '@kubelt/urns/address'

@@ -40,6 +40,11 @@ export type Chain = {
   network?: Maybe<Scalars['String']>;
 };
 
+export type ChainInput = {
+  chain?: InputMaybe<Scalars['String']>;
+  network?: InputMaybe<Scalars['String']>;
+};
+
 export type ConnectedAddressPropertiesUpdateInput = {
   addressURN: Scalars['URN'];
   public?: InputMaybe<Scalars['Boolean']>;
@@ -79,15 +84,29 @@ export type Edge = {
 
 export type Gallery = {
   __typename?: 'Gallery';
-  chain: Scalars['String'];
-  contract: Scalars['String'];
+  chain: Chain;
+  collectionTitle?: Maybe<Scalars['String']>;
+  contract: Contract;
+  details: Array<NftDetail>;
+  error: Scalars['Boolean'];
+  properties?: Maybe<Array<NftProperty>>;
+  thumbnailUrl?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
   tokenId: Scalars['String'];
+  url?: Maybe<Scalars['String']>;
 };
 
 export type GalleryInput = {
-  chain: Scalars['String'];
-  contract: Scalars['String'];
+  chain: ChainInput;
+  collectionTitle?: InputMaybe<Scalars['String']>;
+  contract: ContractInput;
+  details: Array<NftDetailInput>;
+  error: Scalars['Boolean'];
+  properties?: InputMaybe<Array<NftPropertyInput>>;
+  thumbnailUrl?: InputMaybe<Scalars['String']>;
+  title?: InputMaybe<Scalars['String']>;
   tokenId: Scalars['String'];
+  url?: InputMaybe<Scalars['String']>;
 };
 
 export type Id = {
@@ -144,17 +163,17 @@ export type MutationUpdateConnectedAddressesPropertiesArgs = {
 
 
 export type MutationUpdateGalleryArgs = {
-  gallery?: InputMaybe<Array<GalleryInput>>;
+  gallery: Array<GalleryInput>;
 };
 
 
 export type MutationUpdateLinksArgs = {
-  links?: InputMaybe<Array<LinkInput>>;
+  links: Array<LinkInput>;
 };
 
 
 export type MutationUpdateProfileArgs = {
-  profile?: InputMaybe<ProfileInput>;
+  profile: ProfileInput;
 };
 
 export type Nft = {
@@ -195,6 +214,19 @@ export type NftContracts = {
   __typename?: 'NFTContracts';
   contracts: Array<NftContract>;
   totalCount?: Maybe<Scalars['Int']>;
+};
+
+export type NftDetail = {
+  __typename?: 'NFTDetail';
+  isCopyable?: Maybe<Scalars['Boolean']>;
+  name?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
+};
+
+export type NftDetailInput = {
+  isCopyable?: InputMaybe<Scalars['Boolean']>;
+  name?: InputMaybe<Scalars['String']>;
+  value?: InputMaybe<Scalars['String']>;
 };
 
 export type NftInput = {
@@ -253,6 +285,12 @@ export type NftProperty = {
   display?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
   value?: Maybe<Scalars['String']>;
+};
+
+export type NftPropertyInput = {
+  display?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+  value?: InputMaybe<Scalars['String']>;
 };
 
 export type NfTs = {
@@ -505,7 +543,7 @@ export type GetProfileQueryVariables = Exact<{
 }>;
 
 
-export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, connectedAddresses?: Array<{ __typename?: 'Node', baseUrn: string, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string, chain: string }> | null };
+export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, connectedAddresses?: Array<{ __typename?: 'Node', baseUrn: string, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', url?: string | null, thumbnailUrl?: string | null, error: boolean, title?: string | null, tokenId: string, collectionTitle?: string | null, contract: { __typename?: 'Contract', address?: string | null }, chain: { __typename?: 'Chain', chain?: string | null, network?: string | null }, properties?: Array<{ __typename?: 'NFTProperty', name?: string | null, value?: string | null, display?: string | null }> | null, details: Array<{ __typename?: 'NFTDetail', name?: string | null, value?: string | null, isCopyable?: boolean | null }> }> | null };
 
 export type GetConnectedAddressesQueryVariables = Exact<{
   targetAccountURN?: InputMaybe<Scalars['URN']>;
@@ -520,21 +558,21 @@ export type GetAuthorizedAppsQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetAuthorizedAppsQuery = { __typename?: 'Query', authorizedApps?: Array<{ __typename?: 'App', clientId: string, icon: string, title: string, timestamp: number } | null> | null };
 
 export type UpdateProfileMutationVariables = Exact<{
-  profile?: InputMaybe<ProfileInput>;
+  profile: ProfileInput;
 }>;
 
 
 export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile?: boolean | null };
 
 export type UpdateLinksMutationVariables = Exact<{
-  links?: InputMaybe<Array<LinkInput> | LinkInput>;
+  links: Array<LinkInput> | LinkInput;
 }>;
 
 
 export type UpdateLinksMutation = { __typename?: 'Mutation', updateLinks?: boolean | null };
 
 export type UpdateGalleryMutationVariables = Exact<{
-  gallery?: InputMaybe<Array<GalleryInput> | GalleryInput>;
+  gallery: Array<GalleryInput> | GalleryInput;
 }>;
 
 
@@ -660,9 +698,29 @@ export const GetProfileDocument = gql`
     rc
   }
   gallery(targetAccountURN: $targetAccountURN) {
-    contract
+    url
+    thumbnailUrl
+    error
+    title
+    contract {
+      address
+    }
     tokenId
-    chain
+    chain {
+      chain
+      network
+    }
+    collectionTitle
+    properties {
+      name
+      value
+      display
+    }
+    details {
+      name
+      value
+      isCopyable
+    }
   }
 }
     `;
@@ -686,17 +744,17 @@ export const GetAuthorizedAppsDocument = gql`
 }
     `;
 export const UpdateProfileDocument = gql`
-    mutation updateProfile($profile: ProfileInput) {
+    mutation updateProfile($profile: ProfileInput!) {
   updateProfile(profile: $profile)
 }
     `;
 export const UpdateLinksDocument = gql`
-    mutation updateLinks($links: [LinkInput!]) {
+    mutation updateLinks($links: [LinkInput!]!) {
   updateLinks(links: $links)
 }
     `;
 export const UpdateGalleryDocument = gql`
-    mutation updateGallery($gallery: [GalleryInput!]) {
+    mutation updateGallery($gallery: [GalleryInput!]!) {
   updateGallery(gallery: $gallery)
 }
     `;
@@ -989,13 +1047,13 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getAuthorizedApps(variables?: GetAuthorizedAppsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthorizedAppsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetAuthorizedAppsQuery>(GetAuthorizedAppsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthorizedApps', 'query');
     },
-    updateProfile(variables?: UpdateProfileMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateProfileMutation> {
+    updateProfile(variables: UpdateProfileMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateProfileMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateProfileMutation>(UpdateProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateProfile', 'mutation');
     },
-    updateLinks(variables?: UpdateLinksMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateLinksMutation> {
+    updateLinks(variables: UpdateLinksMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateLinksMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateLinksMutation>(UpdateLinksDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateLinks', 'mutation');
     },
-    updateGallery(variables?: UpdateGalleryMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateGalleryMutation> {
+    updateGallery(variables: UpdateGalleryMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateGalleryMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateGalleryMutation>(UpdateGalleryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateGallery', 'mutation');
     },
     disconnectAddress(variables: DisconnectAddressMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DisconnectAddressMutation> {
