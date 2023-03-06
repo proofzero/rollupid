@@ -11,7 +11,7 @@ const Template = () => (
     oAuth={{
       appId: 'APP_ID',
       appSecret: 'APP_SECRET',
-      createdAt: new Date(),
+      createdAt: new Date(2023, 0),
       onKeyRoll: () => {},
     }}
     onDelete={() => {}}
