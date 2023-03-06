@@ -197,7 +197,6 @@ export const normalizeProfileToConnection = (profile: any) => {
         chain: 'Twitter',
       }
     case 'OAuthGithubProfile':
-      console.log('githubh', { profile })
       return {
         id: profile.urn,
         address: profile.login,
