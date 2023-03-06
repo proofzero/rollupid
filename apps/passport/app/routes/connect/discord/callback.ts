@@ -40,7 +40,11 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Discord },
     { alias: profile.__json.email, hidden: 'true' }
   )
-  const addressClient = getAddressClient(address, context.env)
+  const addressClient = getAddressClient(
+    address,
+    context.env,
+    context.traceSpan
+  )
   const { accountURN, existing } = await addressClient.resolveAccount.query({
     jwt: await getJWTConditionallyFromSession(request, context.env),
   })
@@ -52,6 +56,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     accountURN,
     appData,
     context.env,
+    context.traceSpan,
     existing
   )
 }

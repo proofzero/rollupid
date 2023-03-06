@@ -5,12 +5,14 @@ export const LogUsage: BaseMiddlewareFunction<BaseContext> = async ({
   next,
   path,
   type,
+  ctx,
 }) => {
-  const start = Date.now()
+  console.debug(
+    `Starting tRPC handler for ${type} ${path} span: ${ctx.traceSpan}`
+  )
   const result = await next()
-  const durationMs = Date.now() - start
-  result.ok
-    ? console.log('OK request timing:', { path, type, durationMs })
-    : console.log('Non-OK request timing', { path, type, durationMs })
+  console.debug(
+    `Completed tRPC handler for ${type} ${path} span: ${ctx.traceSpan}`
+  )
   return result
 }

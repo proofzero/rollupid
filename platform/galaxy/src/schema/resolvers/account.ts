@@ -24,22 +24,26 @@ import { ResolverContext } from './common'
 import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { AccountURN } from '@kubelt/urns/account'
+import {
+  generateTraceContextHeaders,
+  TraceSpan,
+} from '@kubelt/packages/platform-middleware/trace'
 
 const accountResolvers: Resolvers = {
   Query: {
     profile: async (
       _parent: any,
       { targetAccountURN }: { targetAccountURN?: AccountURN },
-      { env, accountURN, jwt }: ResolverContext
+      { env, accountURN, jwt, traceSpan }: ResolverContext
     ) => {
       console.log(`galaxy:profile: getting profile for account: ${accountURN}`)
 
       const finalAccountURN = targetAccountURN || accountURN
 
-      const accountClient = createAccountClient(
-        env.Account,
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
+      const accountClient = createAccountClient(env.Account, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+      })
 
       let accountProfile = await accountClient.getProfile.query({
         account: finalAccountURN,
@@ -51,21 +55,21 @@ const accountResolvers: Resolvers = {
     authorizedApps: async (
       _parent: any,
       {},
-      { env, accountURN, jwt }: ResolverContext
+      { env, accountURN, jwt, traceSpan }: ResolverContext
     ) => {
-      const accountClient = createAccountClient(
-        env.Account,
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
+      const accountClient = createAccountClient(env.Account, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+      })
 
       const apps = await accountClient.getAuthorizedApps.query({
         account: accountURN,
       })
 
-      const starbaseClient = createStarbaseClient(
-        env.Starbase,
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
+      const starbaseClient = createStarbaseClient(env.Starbase, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+      })
 
       const mappedApps = await Promise.all(
         apps.map(async (a) => {
@@ -89,16 +93,16 @@ const accountResolvers: Resolvers = {
     links: async (
       _parent: any,
       { targetAccountURN }: { targetAccountURN?: AccountURN },
-      { env, accountURN, jwt }: ResolverContext
+      { env, accountURN, jwt, traceSpan }: ResolverContext
     ) => {
       console.log(`galaxy:links: getting links for account: ${accountURN}`)
 
       const finalAccountURN = targetAccountURN || accountURN
 
-      const accountClient = createAccountClient(
-        env.Account,
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
+      const accountClient = createAccountClient(env.Account, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+      })
       let links = await accountClient.getLinks.query({
         account: finalAccountURN,
       })
@@ -109,21 +113,22 @@ const accountResolvers: Resolvers = {
     gallery: async (
       _parent: any,
       { targetAccountURN }: { targetAccountURN?: AccountURN },
-      { env, accountURN, jwt }: ResolverContext
+      { env, accountURN, jwt, traceSpan }: ResolverContext
     ) => {
       console.log(`galaxy:gallery: getting gallery for account: ${accountURN}`)
 
       const finalAccountURN = targetAccountURN || accountURN
 
-      const accountClient = createAccountClient(
-        env.Account,
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
+      const accountClient = createAccountClient(env.Account, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+      })
 
       const connectedAddresses = await getConnectedCryptoAddresses({
         accountURN: finalAccountURN,
         Account: env.Account,
         jwt: jwt,
+        traceSpan,
       })
 
       const gallery = await accountClient.getGallery.query({
@@ -154,7 +159,7 @@ const accountResolvers: Resolvers = {
     connectedAddresses: async (
       _parent: any,
       { targetAccountURN }: { targetAccountURN?: AccountURN },
-      { env, accountURN, jwt }: ResolverContext
+      { env, accountURN, jwt, traceSpan }: ResolverContext
     ) => {
       const finalAccountURN = targetAccountURN || accountURN
 
@@ -162,6 +167,7 @@ const accountResolvers: Resolvers = {
         accountURN: finalAccountURN,
         Account: env.Account,
         jwt,
+        traceSpan,
       })
 
       return addresses
@@ -171,7 +177,7 @@ const accountResolvers: Resolvers = {
     disconnectAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
-      { accountURN, env, jwt }: ResolverContext
+      { accountURN, env, jwt, traceSpan }: ResolverContext
     ) => {
       if (!AddressURNSpace.is(addressURN)) {
         throw new GraphQLError(
@@ -183,6 +189,7 @@ const accountResolvers: Resolvers = {
         accountURN,
         Account: env.Account,
         jwt,
+        traceSpan,
       })
 
       const addressURNList = addresses?.map((a) => a.baseUrn) ?? []
@@ -196,6 +203,7 @@ const accountResolvers: Resolvers = {
 
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN,
+        ...generateTraceContextHeaders(traceSpan),
       })
 
       await addressClient.unsetAccount.mutate(accountURN)
@@ -205,16 +213,16 @@ const accountResolvers: Resolvers = {
     updateProfile: async (
       _parent: any,
       { profile },
-      { env, jwt, accountURN }: ResolverContext
+      { env, jwt, accountURN, traceSpan }: ResolverContext
     ) => {
       console.log(
         `galaxy.updateProfile: updating profile for account: ${accountURN}`
       )
 
-      const accountClient = createAccountClient(
-        env.Account,
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
+      const accountClient = createAccountClient(env.Account, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+      })
       let currentProfile = await accountClient.getProfile.query({
         account: accountURN,
       })
@@ -234,16 +242,16 @@ const accountResolvers: Resolvers = {
     updateLinks: async (
       _parent: any,
       { links }: { links: Links },
-      { env, jwt, accountURN }: ResolverContext
+      { env, jwt, accountURN, traceSpan }: ResolverContext
     ) => {
       console.log(
         `galaxy.updateProfile: updating profile for account: ${accountURN}`
       )
 
-      const accountClient = createAccountClient(
-        env.Account,
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
+      const accountClient = createAccountClient(env.Account, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+      })
 
       await accountClient.setLinks.mutate({
         name: accountURN,
@@ -255,21 +263,22 @@ const accountResolvers: Resolvers = {
     updateGallery: async (
       _parent: any,
       { gallery }: { gallery: Gallery },
-      { env, jwt, accountURN }: ResolverContext
+      { env, jwt, accountURN, traceSpan }: ResolverContext
     ) => {
       console.log(
         `galaxy.updateGallery: updating gallery for account: ${accountURN}`
       )
 
-      const accountClient = createAccountClient(
-        env.Account,
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
+      const accountClient = createAccountClient(env.Account, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+      })
 
       const connectedAddresses = await getConnectedCryptoAddresses({
         accountURN,
         Account: env.Account,
         jwt,
+        traceSpan,
       })
 
       // Validation

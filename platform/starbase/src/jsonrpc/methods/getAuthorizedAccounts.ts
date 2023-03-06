@@ -48,9 +48,7 @@ export const getAuthorizedAccounts = async ({
   input: GetAuthorizedAccountsParams
   ctx: Context
 }) => {
-  const edgesClient = createEdgesClient(ctx.Edges)
-
-  const edgesResult = await edgesClient.getEdges.query({
+  const edgesResult = await ctx.edges.getEdges.query({
     query: {
       tag: EDGE_AUTHORIZES,
       dst: {

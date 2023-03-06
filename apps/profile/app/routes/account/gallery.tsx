@@ -52,8 +52,9 @@ import {
   Toaster,
   ToastType,
 } from '@kubelt/design-system/src/atoms/toast'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
-export const action: ActionFunction = async ({ request }) => {
+export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
   const session = await getProfileSession(request)
   const user = session.get('user')
@@ -99,7 +100,9 @@ export const action: ActionFunction = async ({ request }) => {
     chain: nft.chain?.chain,
   }))
 
-  const galaxyClient = await getGalaxyClient()
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(context.traceSpan)
+  )
   await galaxyClient.updateGallery(
     {
       gallery,

@@ -23,12 +23,14 @@ import {
   getContractsForAllChains,
   requestLogging,
 } from './utils'
+import { TraceSpan } from '@kubelt/platform-middleware/trace'
 
 type ResolverContext = {
   env: Env
   jwt?: string
   coreId?: string
   addressURN: AddressURN
+  traceSpan: TraceSpan
 }
 
 const nftsResolvers: Resolvers = {
@@ -44,7 +46,7 @@ const nftsResolvers: Resolvers = {
         owner: string
         contractAddresses: string[]
       },
-      { env, jwt }: ResolverContext
+      { env, jwt, traceSpan }: ResolverContext
     ) => {
       logAnalytics(
         env.Analytics,
@@ -60,6 +62,7 @@ const nftsResolvers: Resolvers = {
         accountURN,
         Account: env.Account,
         jwt,
+        traceSpan,
       })
 
       const alchemyClients = getAlchemyClients({ env })
@@ -88,7 +91,7 @@ const nftsResolvers: Resolvers = {
         excludeFilters: string[]
         pageSize: number
       },
-      { env, jwt }: ResolverContext
+      { env, jwt, traceSpan }: ResolverContext
     ) => {
       console.log(
         `galaxy.contractsForAddress: getting contracts for account: ${owner}`
@@ -99,6 +102,7 @@ const nftsResolvers: Resolvers = {
         accountURN,
         Account: env.Account,
         jwt,
+        traceSpan,
       })
 
       const alchemyClients = getAlchemyClients({ env })

@@ -1,18 +1,19 @@
 import { createTRPCProxyClient, httpBatchLink, loggerLink } from '@trpc/client'
 import { Router } from '@kubelt/types'
 import { trpcClientLoggerGenerator } from './utils'
+import { PlatformHeaders } from './base'
 
 export default (
   fetcher: Fetcher,
-  options?: {
+  options: {
     imagesURL?: string
-    headers?: Record<string, string>
+    headers: PlatformHeaders
   }
 ) =>
   createTRPCProxyClient<Router.ImageRouter>({
     links: [
       loggerLink({
-        logger: trpcClientLoggerGenerator('Image'),
+        logger: trpcClientLoggerGenerator('Image', options.headers),
       }),
       httpBatchLink({
         url: options?.imagesURL || 'http://localhost/trpc',

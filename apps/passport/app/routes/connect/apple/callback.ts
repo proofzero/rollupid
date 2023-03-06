@@ -79,8 +79,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Apple },
     { alias: profile.email, hidden: 'true' }
   )
-  const addressClient = getAddressClient(address, context.env)
-  const { accountURN } = await addressClient.resolveAccount.query({
+  const addressClient = getAddressClient(
+    address,
+    context.env,
+    context.traceSpan
+  )
+  const account = await addressClient.resolveAccount.query({
     jwt: await getJWTConditionallyFromSession(request, context.env),
   })
   const current = await addressClient.getOAuthData.query()
@@ -101,7 +105,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     })
   }
 
-  return authenticateAddress(address, accountURN, appData, context.env)
+  return authenticateAddress(
+    address,
+    account.accountURN,
+    appData,
+    context.env,
+    context.traceSpan
+  )
 }
 
 const getUser = (request: Request): AppleUser | undefined => {

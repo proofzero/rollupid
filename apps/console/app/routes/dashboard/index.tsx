@@ -25,6 +25,7 @@ import { getGalaxyClient } from '~/utilities/platform.server'
 import { InfoPanelDashboard } from '~/components/InfoPanel/InfoPanelDashboard'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 type LoaderData = {
   apps: {
@@ -37,15 +38,16 @@ type LoaderData = {
   avatarUrl: string
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, context }) => {
   const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(
-    Starbase,
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
+  const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-  const galaxyClient = await getGalaxyClient()
+  const galaxyClient = await getGalaxyClient(traceHeader)
   try {
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
     const apps = await starbaseClient.listApps.query()
     const reshapedApps = apps.map((a) => {
       return {

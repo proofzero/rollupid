@@ -5,6 +5,11 @@ import createEdgesClient from '@kubelt/platform-clients/edges'
 import { AccountURN } from '@kubelt/urns/account'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import { ApplicationURN } from '@kubelt/urns/application'
+import {
+  generateTraceContextHeaders,
+  generateTraceSpan,
+  TraceSpan,
+} from '@kubelt/platform-middleware/trace'
 
 /**
  * Defines your inner context shape.
@@ -16,6 +21,7 @@ interface CreateInnerContextOptions
   ServiceDeploymentMetadata: DeploymentMetadata
   StarbaseApp: DurableObjectNamespace
   Edges: Fetcher
+  edges?: ReturnType<typeof createEdgesClient>
   accountURN?: AccountURN
   ownAppURNs?: ApplicationURN[]
 }
@@ -29,10 +35,15 @@ interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
-  const edges = createEdgesClient(opts.Edges)
+  const traceSpan = generateTraceSpan(opts.req?.headers)
+  const edges = createEdgesClient(
+    opts.Edges,
+    generateTraceContextHeaders(traceSpan)
+  )
   return {
     ...opts,
     edges,
+    traceSpan,
   }
 }
 /**

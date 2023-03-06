@@ -31,7 +31,7 @@ export const AddressURNInput = z.custom<AddressURN>((input) => {
 })
 
 export const AccountURNInput = z.custom<AccountURN>((input) => {
-  if (AccountURNSpace.parse(input as AccountURN) === null) {
+  if (!AccountURNSpace.is(input as AccountURN)) {
     throw new Error('Invalid AccountURN entry')
   }
   return input as AccountURN

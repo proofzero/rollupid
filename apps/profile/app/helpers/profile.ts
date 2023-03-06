@@ -5,15 +5,24 @@ import { getGalaxyClient } from '~/helpers/clients'
 import { imageFromAddressType } from './icons'
 import type { FullProfile } from '~/types'
 import type { AccountURN } from '@kubelt/urns/account'
+import {
+  generateTraceContextHeaders,
+  TraceSpan,
+} from '@kubelt/platform-middleware/trace'
 
-export const getAccountProfile = async ({
-  jwt,
-  accountURN,
-}: {
-  jwt?: string
-  accountURN?: AccountURN
-}) => {
-  const galaxyClient = await getGalaxyClient()
+export const getAccountProfile = async (
+  {
+    jwt,
+    accountURN,
+  }: {
+    jwt?: string
+    accountURN?: AccountURN
+  },
+  traceSpan: TraceSpan
+) => {
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(traceSpan)
+  )
 
   const profileRes = await galaxyClient.getProfile(
     accountURN ? { targetAccountURN: accountURN } : undefined,
@@ -29,8 +38,10 @@ export const getAccountProfile = async ({
   } as FullProfile
 }
 
-export const getAuthorizedApps = async (jwt: string) => {
-  const galaxyClient = await getGalaxyClient()
+export const getAuthorizedApps = async (jwt: string, traceSpan: TraceSpan) => {
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(traceSpan)
+  )
 
   const { authorizedApps } = await galaxyClient.getAuthorizedApps(
     undefined,
@@ -40,8 +51,13 @@ export const getAuthorizedApps = async (jwt: string) => {
   return authorizedApps
 }
 
-export const getAccountAddresses = async (jwt: string) => {
-  const galaxyClient = await getGalaxyClient()
+export const getAccountAddresses = async (
+  jwt: string,
+  traceSpan: TraceSpan
+) => {
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(traceSpan)
+  )
   const addressesRes = await galaxyClient.getConnectedAddresses(
     undefined,
     getAuthzHeaderConditionallyFromToken(jwt)
@@ -53,9 +69,12 @@ export const getAccountAddresses = async (jwt: string) => {
 
 export const getAddressProfiles = async (
   jwt: string,
-  addressURNList: AddressURN[]
+  addressURNList: AddressURN[],
+  traceSpan: TraceSpan
 ) => {
-  const galaxyClient = await getGalaxyClient()
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(traceSpan)
+  )
   const addressProfilesRes = await galaxyClient.getAddressProfiles(
     {
       addressURNList,

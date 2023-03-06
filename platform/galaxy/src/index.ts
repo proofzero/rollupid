@@ -1,14 +1,17 @@
 import { createServer } from '@graphql-yoga/common'
-
-import { checkEnv } from '@kubelt/utils'
-
-import Env, { required as requiredEnv } from './env'
+import { generateTraceSpan, TraceSpan } from '@kubelt/platform-middleware/trace'
+import Env from './env'
 import schema from './schema'
 
-const yoga = createServer<{ env: Env; ctx: ExecutionContext }>({
+type GalaxyServerContext = {
+  env: Env
+  ctx: ExecutionContext
+  traceSpan: TraceSpan
+}
+
+const yoga = createServer<GalaxyServerContext>({
   schema,
   context: ({ request, extensions, ...rest }) => {
-    // TODO: setup context
     return { request, extensions, ...rest }
   },
 })
@@ -19,7 +22,14 @@ export default {
     env: Env,
     ctx: ExecutionContext
   ): Promise<Response> {
-    checkEnv(requiredEnv, env as unknown as Record<string, unknown>)
-    return yoga.handleRequest(request, { env, ctx })
+    const traceSpan = generateTraceSpan(request.headers)
+    console.debug('Starting GQL handler, trace span: ', traceSpan.toString())
+    const result = (await yoga.handleRequest(request, {
+      env,
+      ctx,
+      traceSpan,
+    })) as Response
+    console.debug('Completed GQL handler, trace span: ', traceSpan.toString())
+    return result
   },
 }

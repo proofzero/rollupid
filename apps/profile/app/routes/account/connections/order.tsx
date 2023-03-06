@@ -1,10 +1,11 @@
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 import type { AddressURN } from '@kubelt/urns/address'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/clients'
 import { requireJWT } from '~/utils/session.server'
 
-export const action: ActionFunction = async ({ request }) => {
+export const action: ActionFunction = async ({ request, context }) => {
   const jwt = await requireJWT(request)
 
   const formData = await request.formData()
@@ -15,7 +16,9 @@ export const action: ActionFunction = async ({ request }) => {
     public?: boolean
   }[]
 
-  const galaxyClient = await getGalaxyClient()
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(context.traceSpan)
+  )
   await galaxyClient.updateConnectedAddressesProperties(
     {
       addressURNList: connections,

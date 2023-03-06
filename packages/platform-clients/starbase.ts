@@ -1,12 +1,13 @@
 import { createTRPCProxyClient, httpBatchLink, loggerLink } from '@trpc/client'
 import { Router } from '@kubelt/types'
 import { trpcClientLoggerGenerator } from './utils'
+import { PlatformHeaders } from './base'
 
-export default (fetcher: Fetcher, headers?: Record<string, string>) =>
+export default (fetcher: Fetcher, headers: PlatformHeaders) =>
   createTRPCProxyClient<Router.StarbaseRouter>({
     links: [
       loggerLink({
-        logger: trpcClientLoggerGenerator('Starbase'),
+        logger: trpcClientLoggerGenerator('Starbase', headers),
       }),
       httpBatchLink({
         url: 'http://localhost/trpc',

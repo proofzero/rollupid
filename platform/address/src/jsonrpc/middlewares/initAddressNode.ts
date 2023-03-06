@@ -1,4 +1,5 @@
 import createImageClient from '@kubelt/platform-clients/image'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 import { Context } from '../../context'
 
@@ -26,8 +27,9 @@ export const initAddressNode: BaseMiddlewareFunction<Context> = async ({
     if (!ctx.alias) {
       throw new Error('missing alias')
     }
-
-    const imageClient = createImageClient(ctx.Images)
+    const imageClient = await createImageClient(ctx.Images, {
+      headers: generateTraceContextHeaders(ctx.traceSpan),
+    })
     const gradient = await imageClient.getGradient.mutate({
       gradientSeed: ctx.alias,
     })

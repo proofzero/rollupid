@@ -31,6 +31,7 @@ import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import { imageFromAddressType } from '~/helpers'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { FullProfile } from '~/types'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 /**
  * Prepares Crypto and OAuth profiles
@@ -104,7 +105,7 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
   }
 }
 
-export const action: ActionFunction = async ({ request }) => {
+export const action: ActionFunction = async ({ request, context }) => {
   const jwt = await requireJWT(request)
 
   const formDataText = await request.text()
@@ -141,7 +142,9 @@ export const action: ActionFunction = async ({ request }) => {
   if (Object.keys(errors).length) {
     return { errors }
   }
-  const galaxyClient = await getGalaxyClient()
+  const galaxyClient = await getGalaxyClient({
+    ...generateTraceContextHeaders(context.traceSpan),
+  })
 
   await galaxyClient.updateLinks(
     {

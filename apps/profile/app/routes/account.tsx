@@ -37,7 +37,7 @@ export const links: LinksFunction = () => {
   return [...headNavLink(), { rel: 'stylesheet', href: styles }]
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, context }) => {
   /**
    * If we don't redirect here
    * we will load loader -> then go to /$type/$address/index
@@ -57,7 +57,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const accountURN = parseJwt(jwt).sub as AccountURN
 
-  const loggedInUserProfile = await getAccountProfile({ jwt })
+  const loggedInUserProfile = await getAccountProfile({ jwt }, context.traceSpan)
 
   const addressTypeUrns = loggedInUserProfile.addresses.map((a) => ({
     urn: a.baseUrn,
@@ -68,7 +68,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const connectedProfiles =
     (await getAddressProfiles(
       jwt,
-      addressTypeUrns.map((atu) => atu.urn as AddressURN)
+      addressTypeUrns.map((atu) => atu.urn as AddressURN), context.traceSpan
     )) ?? []
 
   // This mapps to a new structure that contains urn also;

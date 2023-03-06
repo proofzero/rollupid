@@ -17,6 +17,7 @@ import {
   Toaster,
   ToastType,
 } from '@kubelt/design-system/src/atoms/toast'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 type AppData = {
   clientId: string
@@ -31,21 +32,22 @@ type LoaderData = {
   rotationResult?: RotatedSecrets
 }
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader: LoaderFunction = async ({ request, params, context }) => {
   if (!params.clientId) {
     throw new Error('Client ID is required for the requested route')
   }
 
   const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(
-    Starbase,
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
-  const galaxyClient = await getGalaxyClient()
+  const traceHeader = generateTraceContextHeaders(context.traceSpan)
+  const galaxyClient = await getGalaxyClient(traceHeader)
 
   const clientId = params?.clientId
 
   try {
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
     const apps = await starbaseClient.listApps.query()
     const reshapedApps = apps.map((a) => {
       return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon }

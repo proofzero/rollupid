@@ -19,6 +19,8 @@ import {
 } from '@kubelt/platform.address/src/types'
 import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import { trace } from '@kubelt/platform-middleware'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -28,10 +30,11 @@ const addressResolvers: Resolvers = {
     account: async (
       _parent,
       { addressURN }: { addressURN: AddressURN },
-      { env }
+      { env, traceSpan }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN,
+        ...generateTraceContextHeaders(traceSpan),
       })
 
       const accountURN = await addressClient.getAccount.query()
@@ -41,10 +44,11 @@ const addressResolvers: Resolvers = {
     addressProfile: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
-      { env }: ResolverContext
+      { env, traceSpan }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN,
+        ...generateTraceContextHeaders(traceSpan),
       })
 
       const addressProfile = await addressClient.getAddressProfile.query()
@@ -54,12 +58,13 @@ const addressResolvers: Resolvers = {
     addressProfiles: async (
       _parent: any,
       { addressURNList }: { addressURNList: AddressURN[] },
-      { env, jwt }: ResolverContext
+      { env, traceSpan }: ResolverContext
     ) => {
       const profiles = await Promise.all(
         addressURNList.map(async (urn) => {
           const addressClient = createAddressClient(env.Address, {
             [PlatformAddressURNHeader]: urn,
+            ...generateTraceContextHeaders(traceSpan),
           })
 
           return addressClient.getAddressProfile.query()
@@ -72,10 +77,11 @@ const addressResolvers: Resolvers = {
     updateAddressNickname: async (
       _parent: any,
       { nickname, addressURN },
-      { env }: ResolverContext
+      { env, traceSpan }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
         [PlatformAddressURNHeader]: addressURN,
+        ...generateTraceContextHeaders(traceSpan),
       })
 
       await addressClient.setNickname.query({

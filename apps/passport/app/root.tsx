@@ -107,7 +107,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   let appProps
   if (clientId) {
-    const sbClient = getStarbaseClient('', context.env)
+    const sbClient = getStarbaseClient('', context.env, context.traceSpan)
     appProps = await sbClient.getAppPublicProps.query({ clientId })
   }
 

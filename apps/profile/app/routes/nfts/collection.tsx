@@ -1,3 +1,4 @@
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
@@ -6,7 +7,7 @@ import { getGalaxyClient } from '~/helpers/clients'
 import { decorateNft, decorateNfts } from '~/helpers/nfts'
 import { getProfileSession } from '~/utils/session.server'
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, context }) => {
   const srcUrl = new URL(request.url)
 
   const session = await getProfileSession(request)
@@ -24,7 +25,9 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Error('Collection required')
   }
 
-  const galaxyClient = await getGalaxyClient()
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(context.traceSpan)
+  )
   const { nftsForAddress: resColl } = await galaxyClient.getNftsForAddress(
     {
       owner,

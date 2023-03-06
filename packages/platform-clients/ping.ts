@@ -1,12 +1,13 @@
 import { createTRPCProxyClient, httpBatchLink, loggerLink } from '@trpc/client'
 import { Router } from '@kubelt/types'
 import { trpcClientLoggerGenerator } from './utils'
+import { PlatformHeaders } from './base'
 
-export default (fetcher: Fetcher, headers?: Record<string, string>) =>
+export default (fetcher: Fetcher, headers: PlatformHeaders) =>
   createTRPCProxyClient<Router.PingRouter>({
     links: [
       loggerLink({
-        logger: trpcClientLoggerGenerator('Ping'),
+        logger: trpcClientLoggerGenerator('Ping', headers),
       }),
       httpBatchLink({
         url: 'http://localhost/trpc',

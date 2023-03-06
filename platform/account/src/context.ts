@@ -5,6 +5,10 @@ import { Account } from '.'
 import { BaseContext, DeploymentMetadata } from '@kubelt/types'
 import { DurableObjectStubProxy } from 'do-proxy'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
+import {
+  generateTraceContextHeaders,
+  generateTraceSpan,
+} from '@kubelt/platform-middleware/trace'
 
 /**
  * Defines your inner context shape.
@@ -29,9 +33,15 @@ interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
-  const edges = createEdgesClient(opts.Edges)
+  const traceSpan = generateTraceSpan(opts.req?.headers)
+
+  const edges = createEdgesClient(
+    opts.Edges,
+    generateTraceContextHeaders(traceSpan)
+  )
   return {
     ...opts,
+    traceSpan,
     edges,
   }
 }

@@ -1,5 +1,6 @@
 import { AccountURN } from '@kubelt/urns/account'
 import { CustomAnalyticsFunctionType } from '@kubelt/platform-middleware/analytics'
+import { TraceSpan } from '@kubelt/platform-middleware/trace'
 export const GeoContext = 'com.kubelt.geo/location'
 
 export type DeploymentMetadata = {
@@ -13,6 +14,7 @@ export type DeploymentMetadata = {
 
 type BaseContext = {
   req?: Request
+  traceSpan?: TraceSpan
   Analytics?: AnalyticsEngineDataset
   ServiceDeploymentMetadata?: DeploymentMetadata
   CustomAnalyticsFunction?: CustomAnalyticsFunctionType

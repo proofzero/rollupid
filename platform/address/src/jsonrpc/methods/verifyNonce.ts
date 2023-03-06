@@ -9,6 +9,7 @@ import { appRouter } from '../router'
 import { Challenge } from '../../types'
 import { AddressNode } from '../../nodes'
 import CryptoAddress from '../../nodes/crypto'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 export const VerifyNonceInput = z.object({
   nonce: z.string(),
@@ -49,7 +50,9 @@ export const verifyNonceMethod = async ({
   })
   const responseType = ResponseType.Code
 
-  const accessClient = getAccessClient(ctx.Access)
+  const accessClient = getAccessClient(ctx.Access, {
+    ...generateTraceContextHeaders(ctx.traceSpan),
+  })
   const authorizeRes = await accessClient.authorize.mutate({
     account: accountURN,
     responseType,

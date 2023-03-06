@@ -13,6 +13,7 @@ import { createUserSession, parseJwt } from '~/session.server'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import { generateGradient } from './gradient.server'
 import { redirect } from '@remix-run/cloudflare'
+import { TraceSpan } from '@kubelt/platform-middleware/trace'
 
 export const authenticateAddress = async (
   address: AddressURN,
@@ -25,6 +26,7 @@ export const authenticateAddress = async (
     prompt: string
   } | null,
   env: Env,
+  traceSpan: TraceSpan,
   existing: boolean = false
 ) => {
   if (appData?.prompt === 'login') {
@@ -33,7 +35,7 @@ export const authenticateAddress = async (
     )
   }
 
-  const accessClient = getAccessClient(env)
+  const accessClient = getAccessClient(env, traceSpan)
   const clientId = AddressURNSpace.decode(address)
   const redirectUri = env.PASSPORT_REDIRECT_URL
   const scope = ['admin']
@@ -54,7 +56,7 @@ export const authenticateAddress = async (
     clientId,
   })
 
-  await provisionProfile(accessToken, env, address)
+  await provisionProfile(accessToken, env, traceSpan, address)
 
   let redirectURL = '/authorize'
   if (appData) {
@@ -75,8 +77,13 @@ export const authenticateAddress = async (
   return createUserSession(accessToken, redirectURL, address, env)
 }
 
-const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
-  const accountClient = getAccountClient(jwt, env)
+const provisionProfile = async (
+  jwt: string,
+  env: Env,
+  traceSpan: TraceSpan,
+  address: AddressURN
+) => {
+  const accountClient = getAccountClient(jwt, env, traceSpan)
   const parsedJWT = parseJwt(jwt)
   const account = parsedJWT.sub as AccountURN
 
@@ -86,13 +93,17 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
 
   if (!profile) {
     console.log(`Profile doesn't exist for account ${account}. Creating one...`)
-    const addressClient = getAddressClient(address, env)
+    const addressClient = getAddressClient(address, env, traceSpan)
     const newProfile = await addressClient.getAddressProfile
       .query()
       .then(async (res) => {
         switch (res.type) {
           case CryptoAddressType.ETH: {
-            const gradient = await generateGradient(res.profile.address, env)
+            const gradient = await generateGradient(
+              res.profile.address,
+              env,
+              traceSpan
+            )
             return {
               displayName: res.profile.displayName || res.profile.address,
               pfp: {
@@ -101,7 +112,11 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
             }
           }
           case OAuthAddressType.GitHub: {
-            const gradient = await generateGradient(res.profile.login, env)
+            const gradient = await generateGradient(
+              res.profile.login,
+              env,
+              traceSpan
+            )
             return {
               displayName: res.profile.name || res.profile.login,
               pfp: {
@@ -145,7 +160,11 @@ const provisionProfile = async (jwt: string, env: Env, address: AddressURN) => {
             }
           }
           case OAuthAddressType.Discord: {
-            const gradient = await generateGradient(res.profile.id, env)
+            const gradient = await generateGradient(
+              res.profile.id,
+              env,
+              traceSpan
+            )
             const { id, avatar } = res.profile
             return {
               displayName: res.profile.username,

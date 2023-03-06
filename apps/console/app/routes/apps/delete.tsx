@@ -2,8 +2,9 @@ import { ActionFunction, json, redirect } from '@remix-run/cloudflare'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
-export const action: ActionFunction = async ({ request }) => {
+export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
   const clientId = formData.get('clientId')?.toString()
 
@@ -11,10 +12,10 @@ export const action: ActionFunction = async ({ request }) => {
 
   const jwt = await requireJWT(request)
 
-  const starbaseClient = createStarbaseClient(
-    Starbase,
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...generateTraceContextHeaders(context.traceSpan),
+  })
   try {
     await starbaseClient.deleteApp.mutate({
       clientId,

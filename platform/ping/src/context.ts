@@ -1,3 +1,4 @@
+import { generateTraceSpan } from '@kubelt/platform-middleware/trace'
 import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
@@ -25,8 +26,11 @@ interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
+  const traceSpan = generateTraceSpan(opts.req?.headers)
+
   return {
     ...opts,
+    traceSpan,
   }
 }
 /**

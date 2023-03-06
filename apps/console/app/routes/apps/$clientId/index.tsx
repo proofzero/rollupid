@@ -21,6 +21,7 @@ import type { appDetailsProps } from '~/components/Applications/Auth/Application
 import { RollType } from '~/types'
 import type { RotatedSecrets } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -46,16 +47,16 @@ export const loader: LoaderFunction = async ({ params }) => {
   })
 }
 
-export const action: ActionFunction = async ({ request, params }) => {
+export const action: ActionFunction = async ({ request, params, context }) => {
   if (!params.clientId) {
     throw new Error('Application Client ID is required for the requested route')
   }
 
   const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(
-    Starbase,
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...generateTraceContextHeaders(context.traceSpan),
+  })
 
   const formData = await request.formData()
   const op = formData.get('op')

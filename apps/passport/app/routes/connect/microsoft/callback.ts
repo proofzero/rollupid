@@ -43,7 +43,11 @@ export const loader: LoaderFunction = async ({
     { alias: profile.displayName, hidden: 'true' }
   )
 
-  const addressClient = getAddressClient(address, context.env)
+  const addressClient = getAddressClient(
+    address,
+    context.env,
+    context.traceSpan
+  )
   const { accountURN, existing } = await addressClient.resolveAccount.query({
     jwt: await getJWTConditionallyFromSession(request, context.env),
   })
@@ -56,9 +60,14 @@ export const loader: LoaderFunction = async ({
     //If we don't already have a microsoft oauth data set, we cache
     //the image and set the OAuth data set for the address
 
-    const imageUrl = await cacheImageToCF(profile._json.picture, context.env, {
-      Authorization: `Bearer ${authRes.accessToken}`,
-    })
+    const imageUrl = await cacheImageToCF(
+      profile._json.picture,
+      context.env,
+      context.traceSpan,
+      {
+        Authorization: `Bearer ${authRes.accessToken}`,
+      }
+    )
     profile._json.rollupidImageUrl = imageUrl
 
     await addressClient.setOAuthData.mutate(authRes)
@@ -69,6 +78,7 @@ export const loader: LoaderFunction = async ({
     accountURN,
     appData,
     context.env,
+    context.traceSpan,
     existing
   )
 }

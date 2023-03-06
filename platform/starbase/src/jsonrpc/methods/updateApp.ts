@@ -36,5 +36,5 @@ export const updateApp = async ({
   appDO.class.update(input.updates)
 
   //TODO: Make this asynchronous so user doesn't have to wait for the second IO hop
-  ctx.edges.updateNode.mutate({ urnOfNode: appURN })
+  await ctx.edges.updateNode.mutate({ urnOfNode: appURN })
 }
