@@ -227,7 +227,7 @@ export const getGalleryWithMetadata = async (
     return { gallery: [] }
   }
 
-  return await getGalleryMetadata(gallery, traceSpan)
+  return { gallery } as { gallery: Gallery[] }
 }
 
 export const getGalleryMetadata = async (
