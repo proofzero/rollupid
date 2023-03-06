@@ -38,15 +38,16 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   }
 
   const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
-  const galaxyClient = await getGalaxyClient()
+  const traceHeader = generateTraceContextHeaders(context.traceSpan)
+  const galaxyClient = await getGalaxyClient(traceHeader)
 
   const clientId = params?.clientId
 
   try {
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
     const apps = await starbaseClient.listApps.query()
     const reshapedApps = apps.map((a) => {
       return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon }

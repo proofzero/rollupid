@@ -1,12 +1,13 @@
 import { createTRPCProxyClient, httpBatchLink, loggerLink } from '@trpc/client'
 import { Router } from '@kubelt/types'
 import { trpcClientLoggerGenerator } from './utils'
+import { PlatformHeaders } from './base'
 
-export default (fetcher: Fetcher, headers?: Record<string, string>) =>
+export default (fetcher: Fetcher, headers: PlatformHeaders) =>
   createTRPCProxyClient<Router.ObjectRouter>({
     links: [
       loggerLink({
-        logger: trpcClientLoggerGenerator('Object'),
+        logger: trpcClientLoggerGenerator('Object', headers),
       }),
       httpBatchLink({
         url: 'http://localhost/trpc',

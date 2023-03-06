@@ -10,6 +10,7 @@ import { Context } from '../../context'
 import { CryptoAddressType, NodeType } from '@kubelt/types/address'
 import { initAddressNodeByName } from '../../nodes'
 import createImageClient from '@kubelt/platform-clients/image'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 export const InitVaultOutput = AddressURNInput
 
@@ -38,7 +39,9 @@ export const initVaultMethod = async ({
   )
   const baseAddressURN = AddressURNSpace.getBaseURN(address3RN)
   const vaultNode = initAddressNodeByName(baseAddressURN, ctx.Address)
-  const imageClient = createImageClient(ctx.Images)
+  const imageClient = createImageClient(ctx.Images, {
+    ...generateTraceContextHeaders(ctx.traceSpan),
+  })
   const gradient = await imageClient.getGradient.mutate({
     gradientSeed: vault.address,
   })

@@ -3,6 +3,7 @@ import { json } from '@remix-run/cloudflare'
 
 import { GrantType } from '@kubelt/types/access'
 import createAccessClient from '@kubelt/platform-clients/access'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
@@ -19,7 +20,9 @@ export const action: ActionFunction = async ({ request, context }) => {
     grantType,
   })
 
-  const accessClient = createAccessClient(context.env.Access)
+  const accessClient = createAccessClient(context.env.Access, {
+    ...generateTraceContextHeaders(context.traceSpan),
+  })
 
   const tokens = refreshToken
     ? await accessClient.exchangeToken.mutate({

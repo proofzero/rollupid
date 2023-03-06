@@ -5,6 +5,10 @@ import { getAccountProfile } from './profile'
 import type { AccountURN } from '@kubelt/urns/account'
 import { AccountURNSpace } from '@kubelt/urns/account'
 import type { Gallery, Nft } from '@kubelt/galaxy-client'
+import {
+  generateTraceContextHeaders,
+  TraceSpan,
+} from '@kubelt/platform-middleware/trace'
 /**
  * Nfts are being sorted server-side
  * this function then allows to merge client Nfts with newly-fetched Nfts
@@ -211,18 +215,26 @@ export const getMoreNftsAllCollections = (
 
 // ------ end of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS
 
-export const getGalleryWithMetadata = async (accountURN: AccountURN) => {
+export const getGalleryWithMetadata = async (
+  accountURN: AccountURN,
+  traceSpan: TraceSpan
+) => {
   const gallery = await getGallery(accountURN)
 
   if (!gallery || !gallery.length) {
     return { gallery: [] }
   }
 
-  return await getGalleryMetadata(gallery)
+  return await getGalleryMetadata(gallery, traceSpan)
 }
 
-export const getGalleryMetadata = async (gallery: Gallery[]) => {
-  const galaxyClient = await getGalaxyClient()
+export const getGalleryMetadata = async (
+  gallery: Gallery[],
+  traceSpan: TraceSpan
+) => {
+  const galaxyClient = await getGalaxyClient({
+    ...generateTraceContextHeaders(traceSpan),
+  })
 
   const { getNFTMetadataBatch: metadata } = await galaxyClient.getNFTMetadata(
     {

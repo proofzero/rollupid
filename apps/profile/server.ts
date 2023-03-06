@@ -1,16 +1,14 @@
 import {
-  createRequestHandler,
-  handleAsset,
-} from '@remix-run/cloudflare-workers'
-import * as build from '@remix-run/dev/server-build'
-import {
   generateTraceSpan,
   TraceableFetchEvent,
   TraceSpan,
 } from '@kubelt/platform-middleware/trace'
+import {
+  createRequestHandler,
+  handleAsset,
+} from '@remix-run/cloudflare-workers'
+import * as build from '@remix-run/dev/server-build'
 
-//Extending the remix untyped AppLoadContext with the type
-//we inject into the context
 declare module '@remix-run/server-runtime' {
   interface AppLoadContext {
     traceSpan: TraceSpan

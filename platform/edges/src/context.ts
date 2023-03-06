@@ -3,6 +3,7 @@ import type { inferAsyncReturnType } from '@trpc/server'
 import type { Environment } from './types'
 import * as db from './db'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
+import { generateTraceSpan } from '@kubelt/platform-middleware/trace'
 
 /**
  * Defines your inner context shape.
@@ -24,9 +25,12 @@ interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
+  const traceSpan = generateTraceSpan(opts.req?.headers)
   const graph = db.init(opts.EDGES)
+
   return {
     graph,
+    traceSpan,
     ...opts,
   }
 }

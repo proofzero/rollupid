@@ -10,15 +10,18 @@ import {
 } from './utils'
 import createAccessClient from '@kubelt/platform-clients/access'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 const appResolvers: Resolvers = {
   Query: {
     scopes: async (
       _parent: any,
       { clientId },
-      { env, accountURN }: ResolverContext
+      { env, accountURN, traceSpan }: ResolverContext
     ) => {
-      const accessClient = createAccessClient(env.Access)
+      const accessClient = createAccessClient(env.Access, {
+        ...generateTraceContextHeaders(traceSpan),
+      })
 
       const scopes = await accessClient.getAuthorizedAppScopes.query({
         accountURN,
@@ -32,12 +35,12 @@ const appResolvers: Resolvers = {
     revokeAppAuthorization: async (
       _parent: any,
       { clientId },
-      { env, jwt }: ResolverContext
+      { env, jwt, traceSpan }: ResolverContext
     ) => {
-      const accessClient = createAccessClient(
-        env.Access,
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
+      const accessClient = createAccessClient(env.Access, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+      })
 
       await accessClient.revokeAppAuthorization.mutate({
         clientId,

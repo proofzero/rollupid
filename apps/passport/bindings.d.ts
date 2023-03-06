@@ -1,3 +1,5 @@
+import { TraceSpan } from '@kubelt/platform-middleware/trace'
+
 export const seviceBindings = true
 
 declare global {
@@ -44,16 +46,17 @@ declare global {
   }
 
   interface ConsoleParams {
-    clientId: string
-    redirectUri: string
-    scope: string
-    state: string
-    prompt: string | undefined
+    clientId: string | null
+    redirectUri: string | null
+    scope: string[] | null
+    state: string | null
+    prompt: string | null
   }
 }
 declare module '@remix-run/cloudflare' {
   export interface AppLoadContext {
-    env: Env
     consoleParams: ConsoleParams
+    env: Env
+    traceSpan: TraceSpan
   }
 }

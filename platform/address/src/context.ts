@@ -7,6 +7,10 @@ import createEdgesClient from '@kubelt/platform-clients/edges'
 import { AddressURN } from '@kubelt/urns/address'
 import { ENSRes } from '@kubelt/platform-clients/ens-utils'
 import { AddressNode } from './nodes'
+import {
+  generateTraceContextHeaders,
+  generateTraceSpan,
+} from '@kubelt/platform-middleware/trace'
 
 /**
  * Defines your inner context shape.
@@ -61,9 +65,13 @@ interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
-  const edges = createEdgesClient(opts.Edges)
+  const traceSpan = generateTraceSpan(opts.req?.headers)
+  const edges = createEdgesClient(opts.Edges, {
+    ...generateTraceContextHeaders(traceSpan),
+  })
   return {
     ...opts,
+    traceSpan,
     edges,
   }
 }

@@ -9,6 +9,7 @@ import { AccountURNSpace } from '@kubelt/urns/account'
 import { Context } from '../../context'
 import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
 import { z } from 'zod'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 export const SetAccountInput = AccountURNInput
 export const SetAccountOutput = z.object({
@@ -40,7 +41,9 @@ export const setAccountMethod = async ({
   // Store the owning account for the address node in the node itself.
   await nodeClient?.class.setAccount(account)
 
-  const edgesClient = createEdgesClient(ctx.Edges)
+  const edgesClient = createEdgesClient(ctx.Edges, {
+    ...generateTraceContextHeaders(ctx.traceSpan),
+  })
   const linkResult = await edgesClient.makeEdge.mutate({
     src: account,
     dst: address,

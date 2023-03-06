@@ -24,7 +24,6 @@ interface CreateInnerContextOptions
   edges?: ReturnType<typeof createEdgesClient>
   accountURN?: AccountURN
   ownAppURNs?: ApplicationURN[]
-  traceSpan?: TraceSpan
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
@@ -40,7 +39,6 @@ export async function createContextInner(opts: CreateInnerContextOptions) {
   const edges = createEdgesClient(opts.Edges, {
     ...generateTraceContextHeaders(traceSpan),
   })
-  console.debug('STARBASE TRPC TRACE', traceSpan)
   return {
     ...opts,
     edges,

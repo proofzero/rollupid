@@ -8,6 +8,10 @@ import { Access, Authorization } from '.'
 import type { Environment } from './types'
 import type { AccountURN } from '@kubelt/urns/account'
 import { DurableObjectStubProxy } from 'do-proxy'
+import {
+  generateTraceContextHeaders,
+  generateTraceSpan,
+} from '@kubelt/platform-middleware/trace'
 
 /**
  * Defines your inner context shape.
@@ -43,11 +47,14 @@ interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
-  const starbaseClient = createStarbaseClient(opts.Starbase)
-  const accountClient = createAccountClient(opts.Account)
+  const traceSpan = generateTraceSpan(opts.req?.headers)
+  const traceHeader = generateTraceContextHeaders(traceSpan)
+  const starbaseClient = createStarbaseClient(opts.Starbase, { ...traceHeader })
+  const accountClient = createAccountClient(opts.Account, { ...traceHeader })
   return {
     starbaseClient,
     accountClient,
+    traceSpan,
     ...opts,
   }
 }

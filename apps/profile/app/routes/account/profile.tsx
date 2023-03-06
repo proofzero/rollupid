@@ -27,8 +27,9 @@ import SaveButton from '~/components/accounts/SaveButton'
 import { getGalaxyClient } from '~/helpers/clients'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import type { Profile } from '@kubelt/galaxy-client'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
-export const action: ActionFunction = async ({ request }) => {
+export const action: ActionFunction = async ({ request, context }) => {
   const jwt = await requireJWT(request)
 
   const formData = await request.formData()
@@ -41,8 +42,9 @@ export const action: ActionFunction = async ({ request }) => {
   const image = formData.get('pfp_url') as string
   let computedIsToken =
     formData.get('pfp_isToken')?.toString() === '1' ? true : false
-  const galaxyClient = await getGalaxyClient()
-
+  const galaxyClient = await getGalaxyClient({
+    ...generateTraceContextHeaders(context.traceSpan),
+  })
   // TODO: handle and return form errors
   await galaxyClient.updateProfile(
     {

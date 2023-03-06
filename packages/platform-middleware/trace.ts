@@ -1,7 +1,16 @@
 type TraceId = string
 type TraceParentId = string
 type TraceParent = `00-${TraceId}-${TraceParentId}-00`
-export const TRACEPARENT_HEADER_NAME = 'traceparent'
+export const TRACEPARENT_HEADER_NAME = 'traceparent' as const
+type TRACEPARENT_HEADER_NAME = typeof TRACEPARENT_HEADER_NAME
+
+export class TraceableFetchEvent extends FetchEvent {
+  traceSpan: TraceSpan
+  constructor(type: string, eventInitDict: EventInit, traceSpan: TraceSpan) {
+    super(type, eventInitDict)
+    this.traceSpan = traceSpan
+  }
+}
 
 export class TraceSpan {
   traceId: string
@@ -33,7 +42,6 @@ export const generateTraceSpan = (
   headers?: Record<string, string> | Headers
 ): TraceSpan => {
   let result: TraceSpan
-  console.debug('BLAH')
 
   if (headers) {
     let traceparent
@@ -41,7 +49,6 @@ export const generateTraceSpan = (
       traceparent = headers.get(TRACEPARENT_HEADER_NAME)
     else traceparent = headers[TRACEPARENT_HEADER_NAME]
 
-    console.debug('TRACEPARENT', traceparent)
     if (traceparent) result = createTraceSpan(traceparent as TraceParent)
   }
   //If result hasn't been set (due to missing traceparent in header), create new trace
@@ -53,7 +60,7 @@ export const generateTraceSpan = (
  * outbound requests */
 export const generateTraceContextHeaders = (
   currentSpan: TraceSpan
-): Record<string, string> => {
+): Record<TRACEPARENT_HEADER_NAME, string> => {
   return { [TRACEPARENT_HEADER_NAME]: getTraceParentForSpan(currentSpan) }
 }
 

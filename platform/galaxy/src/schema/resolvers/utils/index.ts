@@ -28,6 +28,10 @@ export {
 } from './nfts'
 
 import { NodeType } from '@kubelt/types/address'
+import {
+  generateTraceContextHeaders,
+  TraceSpan,
+} from '@kubelt/platform-middleware/trace'
 
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {
@@ -42,13 +46,11 @@ export const requestLogging =
   () => (next) => async (root, args, context, info) => {
     const startTime = Date.now()
     console.debug(
-      `TRACE: G${startTime} Starting GQL operation: ${context.operationName} resolver: ${info.fieldName}`
+      `Starting GQL handler, operation: ${context.operationName} resolver: ${info.fieldName} trace span: ${context.traceSpan}`
     )
     const result = await next(root, args, context, info)
     console.debug(
-      `TRACE: G${startTime} Completed GQL operation: ${
-        context.operationName
-      } resolver: ${info.fieldName} duration: ${Date.now() - startTime}ms`
+      `Completed GQL handler, operation: ${context.operationName} resolver: ${info.fieldName} traceSpan: ${context.traceSpan}`
     )
     return result
   }
@@ -116,7 +118,10 @@ export const hasApiKey = () => (next) => async (root, args, context, info) => {
     }
 
     const env = context.env as Env
-    const starbaseClient = createStarbaseClient(env.Starbase)
+    const traceSpan = context.traceSpan as TraceSpan
+    const starbaseClient = createStarbaseClient(env.Starbase, {
+      ...generateTraceContextHeaders(traceSpan),
+    })
 
     let apiKeyValidity
     try {
@@ -206,15 +211,17 @@ export const getConnectedAddresses = async ({
   accountURN,
   Account,
   jwt,
+  traceSpan,
 }: {
   accountURN: AccountURN
   Account: Fetcher
   jwt?: string
+  traceSpan: TraceSpan
 }) => {
-  const accountClient = createAccountClient(
-    Account,
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
+  const accountClient = createAccountClient(Account, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...generateTraceContextHeaders(traceSpan),
+  })
 
   const addresses = await accountClient.getAddresses.query({
     account: accountURN,
@@ -228,16 +235,19 @@ export const getConnectedCryptoAddresses = async ({
   accountURN,
   Account,
   jwt,
+  traceSpan,
 }: {
   accountURN: AccountURN
   Account: Fetcher
   jwt?: string
+  traceSpan: TraceSpan
 }) => {
   const cryptoAddresses =
     (await getConnectedAddresses({
       accountURN,
       Account,
       jwt,
+      traceSpan,
     })) || []
 
   return cryptoAddresses

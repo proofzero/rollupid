@@ -42,8 +42,9 @@ import { AccountURNSpace } from '@kubelt/urns/account'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { imageFromAddressType } from '~/helpers'
 import type { FullProfile } from '~/types'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader: LoaderFunction = async ({ request, params, context }) => {
   const url = new URL(request.url)
   const { address, type } = params
 
@@ -57,8 +58,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     return redirect(`/${type}/${address}/links`)
   }
 
-  const galaxyClient = await getGalaxyClient()
-
+  const galaxyClient = await getGalaxyClient({
+    ...generateTraceContextHeaders(context.traceSpan),
+  })
   const session = await getProfileSession(request)
   if (!address) throw new Error('No address provided in URL')
 

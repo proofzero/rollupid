@@ -1,10 +1,14 @@
 import {
+  generateTraceSpan,
+  TraceableFetchEvent,
+} from '@kubelt/platform-middleware/trace'
+import {
   createRequestHandler,
   handleAsset,
 } from '@remix-run/cloudflare-workers'
 import * as build from '@remix-run/dev/server-build'
 
-export function parseParams(request) {
+export function parseParams(request: Request) {
   const url = new URL(request.url)
   const clientId = url.searchParams.get('client_id')
   const state = url.searchParams.get('state')
@@ -31,31 +35,37 @@ const requestHandler = createRequestHandler({
   build,
   mode: process.env.NODE_ENV,
   getLoadContext: (event) => {
+    const traceSpan = (event as TraceableFetchEvent).traceSpan
     return {
       consoleParams: parseParams(event.request),
-      env: global, // or globalThis?
-      reqStartTime: Date.now(),
+      env: globalThis as unknown as Env,
+      traceSpan,
     }
   },
 })
 
-const handleEvent = async (event) => {
-  const startTime = Date.now()
-
+const handleEvent = async (event: FetchEvent) => {
   let response = await handleAsset(event, build)
 
   if (!response) {
+    //Create a new trace span with no parent
+    const newTraceSpan = generateTraceSpan()
+
     const reqURL = new URL(event.request.url)
+    const modifiedEvent = new TraceableFetchEvent(
+      'FetchEvent',
+      event,
+      newTraceSpan
+    )
+
     console.debug(
-      `TRACE: B${startTime} Started handler for ${reqURL.pathname}/${reqURL.searchParams}`
+      `Started HTTP handler for ${reqURL.pathname}/${reqURL.searchParams} span: ${newTraceSpan}`
     )
     try {
-      response = await requestHandler(event)
+      response = await requestHandler(modifiedEvent)
     } finally {
       console.debug(
-        `TRACE: B${startTime} Completed handler for ${reqURL.pathname}/${
-          reqURL.searchParams
-        } in ${Date.now() - startTime}ms`
+        `Completed HTTP handler for ${reqURL.pathname}/${reqURL.searchParams} span ${newTraceSpan}`
       )
     }
   }
@@ -63,6 +73,6 @@ const handleEvent = async (event) => {
   return response
 }
 
-addEventListener('fetch', async (event) => {
+addEventListener('fetch', async (event: FetchEvent) => {
   event.respondWith(handleEvent(event))
 })

@@ -40,15 +40,14 @@ type LoaderData = {
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const jwt = await requireJWT(request)
-  console.debug('TRACE TEST', context.traceSpan)
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
+  const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-  //TODO: create TraceContext headers from request context
-  const galaxyClient = await getGalaxyClient()
+  const galaxyClient = await getGalaxyClient(traceHeader)
   try {
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
     const apps = await starbaseClient.listApps.query()
     const reshapedApps = apps.map((a) => {
       return {

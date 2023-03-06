@@ -1,8 +1,13 @@
 import createImageClient from '@kubelt/platform-clients/image'
+import {
+  generateTraceContextHeaders,
+  TraceSpan,
+} from '@kubelt/platform-middleware/trace'
 
 export default async (
   image_retrieval_url: string,
   env: Env,
+  traceSpan: TraceSpan,
   headers?: Record<string, string>
 ): Promise<string> => {
   const retrieveImageReq = fetch(image_retrieval_url, {
@@ -28,7 +33,9 @@ export default async (
   try {
     const imgFile = await retrievedImage.blob()
 
-    const imageClient = createImageClient(env.Images)
+    const imageClient = createImageClient(env.Images, {
+      ...generateTraceContextHeaders(traceSpan),
+    })
     const { uploadURL } = await imageClient.upload.mutate()
 
     const formData = new FormData()

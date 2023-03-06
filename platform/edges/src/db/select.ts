@@ -247,7 +247,6 @@ export async function edges(
   query: EdgeQuery,
   opt?: EdgeQueryOptions
 ): Promise<EdgeQueryResults> {
-  const startTime = Date.now()
   const sqlBase = `
   with normalizer as (
     select e.createdTimestamp, e.src, e.tag, e.dst, 'SRCQ' as compType, srcq.key as k, srcq.value as v
@@ -373,11 +372,7 @@ export async function edges(
 
   const prepStat = g.db.prepare(finalSqlStatement).bind(...prepBindParams)
   const resultSet = await prepStat.all()
-  console.debug(
-    `TRACE: S${startTime} D1 INVOCATION TIME`,
-    Date.now() - startTime
-  )
-  console.debug(`TRACE: S${startTime} D1 EXECUTION METADATA`, {
+  console.debug(`D1 EXECUTION METADATA`, {
     duration: resultSet.meta.duration,
     error: resultSet.error,
   })
@@ -443,8 +438,6 @@ export async function edges(
   }
   if (opt?.limit) result.metadata.limit = opt.limit
   if (opt?.offset) result.metadata.offset = opt.offset
-
-  console.debug(`TRACE: S${startTime} BEFORE RETURN`, Date.now() - startTime)
 
   return result
 }

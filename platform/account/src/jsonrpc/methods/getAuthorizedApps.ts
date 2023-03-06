@@ -4,6 +4,8 @@ import { Context } from '../../context'
 import { EDGE_AUTHORIZES } from '@kubelt/platform.access/src/constants'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { z } from 'zod'
+import { generateHashedIDRef } from '@kubelt/urns/idref'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 // Input
 // -----------------------------------------------------------------------------
@@ -36,7 +38,9 @@ export const getAuthorizedAppsMethod = async ({
   input: GetAuthorizedAppsParams
   ctx: Context
 }) => {
-  const edgesClient = createEdgesClient(ctx.Edges)
+  const edgesClient = createEdgesClient(ctx.Edges, {
+    ...generateTraceContextHeaders(ctx.traceSpan),
+  })
 
   // Only the subject of supplied JWT can get sessions; the input
   // account parameter and header JWT 'sub' must match.
