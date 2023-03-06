@@ -8,12 +8,14 @@ import SectionTitle from '~/components/typography/SectionTitle'
 import { useEffect } from 'react'
 
 import dashboardChart from '~/assets/dashboard_chart.svg'
-import { normalizeProfileToLinks } from '~/helpers'
 import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import type { FullProfile } from '~/types'
 
 import CTA from '~/components/cta/cta'
+import { normalizeProfileToConnection } from '~/helpers/profile'
+import { AddressList } from '~/components/addresses/AddressList'
+import { AddressListItemProps } from '~/components/addresses/AddressListItem'
 
 export default function Welcome() {
   const { profile, connectedProfiles } = useOutletContext<{
@@ -23,7 +25,7 @@ export default function Welcome() {
 
   const normalizedConnectedProfiles = connectedProfiles
     .map((p) => ({ urn: p.urn, ...p?.profile }))
-    .map(normalizeProfileToLinks)
+    .map(normalizeProfileToConnection)
 
   const appFetcher = useFetcher()
 
@@ -113,29 +115,9 @@ export default function Welcome() {
               </Link>
             </div>
 
-            <div className="flex flex-col space-y-2">
-              {normalizedConnectedProfiles.map((np, i) => (
-                <div
-                  key={i}
-                  className="flex flex-row items-center border rounded-lg shadow p-4"
-                >
-                  <img
-                    className="w-8 h-8 rounded-full mr-3.5"
-                    alt="normalized profile pic"
-                    src={np.icon}
-                  />
-
-                  <div className="flex flex-col space-y-1.5 flex-1 break-all">
-                    <Text size="sm" weight="medium" className="text-gray-700">
-                      {np.title}
-                    </Text>
-                    <Text size="xs" weight="normal" className="text-gray-500">
-                      {np.address}
-                    </Text>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <AddressList
+              addresses={normalizedConnectedProfiles as AddressListItemProps[]}
+            />
           </div>
         </div>
 
