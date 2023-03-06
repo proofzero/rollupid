@@ -26,7 +26,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     { alias: address, hidden: 'false' }
   )
 
-  const addressClient = getAddressClient(addressURN, context.env)
+  const addressClient = getAddressClient(addressURN, context.env, context.traceSpan)
   const accountURN = await addressClient.getAccount.query()
 
   const appData = await getConsoleParamsSession(request, context.env)
@@ -36,5 +36,5 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       return null
     })
 
-  return authenticateAddress(addressURN, accountURN, appData, context.env)
+  return authenticateAddress(addressURN, accountURN, appData, context.env, context.traceSpan)
 }

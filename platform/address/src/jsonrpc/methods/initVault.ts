@@ -40,7 +40,7 @@ export const initVaultMethod = async ({
   const baseAddressURN = AddressURNSpace.getBaseURN(address3RN)
   const vaultNode = initAddressNodeByName(baseAddressURN, ctx.Address)
   const imageClient = createImageClient(ctx.Images, {
-    ...generateTraceContextHeaders(ctx.traceSpan),
+    headers: generateTraceContextHeaders(ctx.traceSpan),
   })
   const gradient = await imageClient.getGradient.mutate({
     gradientSeed: vault.address,

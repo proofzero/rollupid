@@ -11,7 +11,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   // this will redirect unauthenticated users to the auth page but maintain query params
   const jwt = await requireJWT(request, context.consoleParams, context.env)
   const account = parseJwt(jwt).sub as AccountURN
-  const accountClient = getAccountClient(jwt, context.env)
+  const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
   const profile = await accountClient.getProfile.query({ account })
 
   return json({ profile })

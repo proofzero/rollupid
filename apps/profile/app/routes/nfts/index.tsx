@@ -7,7 +7,7 @@ import { getGalaxyClient } from '~/helpers/clients'
 import { decorateNft, decorateNfts } from '~/helpers/nfts'
 import { getProfileSession } from '~/utils/session.server'
 
-export const loader: LoaderFunction = async ({ reques, context }) => {
+export const loader: LoaderFunction = async ({ request, context }) => {
   const srcUrl = new URL(request.url)
 
   const session = await getProfileSession(request)

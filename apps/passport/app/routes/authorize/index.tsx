@@ -36,7 +36,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       const parsedJWT = parseJwt(jwt)
       const account = parsedJWT.sub as AccountURN
       const responseType = ResponseType.Code
-      const accessClient = getAccessClient(context.env)
+      const accessClient = getAccessClient(context.env, context.traceSpan)
       const authorizeRes = await accessClient.authorize.mutate({
         account,
         responseType,
@@ -62,7 +62,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     return redirect(context.env.CONSOLE_APP_URL)
   }
   try {
-    const sbClient = getStarbaseClient(jwt, context.env)
+    const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
 
     // When scopes are powered by an index we can just query for the scopes we have in the app
     const [scopeMeta, appProfile] = await Promise.all([
@@ -112,7 +112,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     throw json({ message: 'Missing required fields' }, 400)
   }
 
-  const accessClient = getAccessClient(context.env)
+  const accessClient = getAccessClient(context.env, context.traceSpan)
   const authorizeRes = await accessClient.authorize.mutate({
     account,
     responseType,

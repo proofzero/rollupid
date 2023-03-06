@@ -10,11 +10,11 @@ export async function getGalaxyClient(reqHeaders: PlatformHeaders) {
     fetch: Galaxy.fetch.bind(Galaxy),
     requestMiddleware: (r) => {
       r.headers = { ...reqHeaders, ...(r.headers as Record<string, string>) }
-      console.debug(`Starting GQL request ${traceparent}`)
+      console.debug(`Starting GQL client request. Traceparent: ${traceparent}`)
       return r
     },
     responseMiddleware(response) {
-      console.debug(`Completed GQL request ${traceparent}`)
+      console.debug(`Completed GQL request. Traceparent: ${traceparent}`)
     },
   })
   return getSdk(gqlClient)

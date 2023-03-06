@@ -1,7 +1,5 @@
-import {
-  generateTraceSpan,
-  TraceableFetchEvent,
-} from '@kubelt/platform-middleware/trace'
+import { generateTraceSpan } from '@kubelt/platform-middleware/trace'
+import { TraceableFetchEvent } from '@kubelt/platform-middleware/TraceableFetchEvent'
 import {
   createRequestHandler,
   handleAsset,

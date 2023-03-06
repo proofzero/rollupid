@@ -4,14 +4,6 @@ type TraceParent = `00-${TraceId}-${TraceParentId}-00`
 export const TRACEPARENT_HEADER_NAME = 'traceparent' as const
 type TRACEPARENT_HEADER_NAME = typeof TRACEPARENT_HEADER_NAME
 
-export class TraceableFetchEvent extends FetchEvent {
-  traceSpan: TraceSpan
-  constructor(type: string, eventInitDict: EventInit, traceSpan: TraceSpan) {
-    super(type, eventInitDict)
-    this.traceSpan = traceSpan
-  }
-}
-
 export class TraceSpan {
   traceId: string
   spanId: string

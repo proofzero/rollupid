@@ -14,13 +14,13 @@ export const trpcClientLoggerGenerator = (
       console.debug(
         `Starting tRPC client call ${serviceName} ${props.path} call ${
           props.id
-        } traceparent: ${headers ? headers[TRACEPARENT_HEADER_NAME] : ''}`
+        } traceparent: ${headers ? headers[TRACEPARENT_HEADER_NAME] : 'None'}`
       )
     else
       console.debug(
         `Completed tRPC client call ${serviceName} ${props.path} call ${
           props.id
-        } traceparent ${headers ? headers[TRACEPARENT_HEADER_NAME] : ''}`
+        } traceparent ${headers ? headers[TRACEPARENT_HEADER_NAME] : 'None'}`
       )
   }
 }

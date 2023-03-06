@@ -108,7 +108,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
     let ogImage = null
     if (request.cf.botManagement.score < 30) {
-      ogImage = await ogImageFromProfile(profile.pfp?.image as string)
+      ogImage = await ogImageFromProfile(profile.pfp?.image as string, context.traceSpan)
     } else {
       console.debug(
         'Human detected, not generating OG image',

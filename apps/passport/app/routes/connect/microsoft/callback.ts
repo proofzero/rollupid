@@ -43,7 +43,11 @@ export const loader: LoaderFunction = async ({
     { alias: profile.displayName, hidden: 'true' }
   )
 
-  const addressClient = getAddressClient(address, context.env)
+  const addressClient = getAddressClient(
+    address,
+    context.env,
+    context.traceSpan
+  )
   const { accountURN, existing } = await addressClient.resolveAccount.query({
     jwt: await getJWTConditionallyFromSession(request, context.env),
   })
@@ -74,6 +78,7 @@ export const loader: LoaderFunction = async ({
     accountURN,
     appData,
     context.env,
+    context.traceSpan,
     existing
   )
 }

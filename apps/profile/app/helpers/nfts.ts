@@ -138,8 +138,11 @@ export const decorateNfts = (ownedNfts: any) => {
  * @param owner AccountURN of target profile. Can be undefined if JWT is provided.
  * @returns Gallery or empty array
  */
-export const getGallery = async (accountURN: AccountURN) => {
-  const profile = await getAccountProfile({ accountURN })
+export const getGallery = async (
+  accountURN: AccountURN,
+  traceSpan: TraceSpan
+) => {
+  const profile = await getAccountProfile({ accountURN }, traceSpan)
   const { gallery } = profile
 
   return gallery || []
@@ -219,7 +222,7 @@ export const getGalleryWithMetadata = async (
   accountURN: AccountURN,
   traceSpan: TraceSpan
 ) => {
-  const gallery = await getGallery(accountURN)
+  const gallery = await getGallery(accountURN, traceSpan)
 
   if (!gallery || !gallery.length) {
     return { gallery: [] }

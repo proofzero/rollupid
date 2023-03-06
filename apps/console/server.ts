@@ -3,11 +3,8 @@ import {
   handleAsset,
 } from '@remix-run/cloudflare-workers'
 import * as build from '@remix-run/dev/server-build'
-import {
-  generateTraceSpan,
-  TraceableFetchEvent,
-  TraceSpan,
-} from '@kubelt/platform-middleware/trace'
+import { generateTraceSpan, TraceSpan } from '@kubelt/platform-middleware/trace'
+import { TraceableFetchEvent } from '@kubelt/platform-middleware/TraceableFetchEvent'
 
 //Extending the remix untyped AppLoadContext with the type
 //we inject into the context
@@ -49,7 +46,7 @@ const handleEvent = async (event: FetchEvent) => {
       response = await requestHandler(modifiedEvent)
     } finally {
       console.debug(
-        `Completed HTTP handler for ${reqURL.pathname}/${reqURL.searchParams} span ${newTraceSpan}`
+        `Completed HTTP handler for ${reqURL.pathname}/${reqURL.searchParams} span: ${newTraceSpan}`
       )
     }
   }
