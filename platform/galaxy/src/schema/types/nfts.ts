@@ -43,7 +43,7 @@ export default /* GraphQL */ `
   }
 
   type Contract {
-    address: String
+    address: String!
   }
 
   type Id {
@@ -56,9 +56,9 @@ export default /* GraphQL */ `
   }
 
   type NFTProperty {
-    name: String
-    value: String
-    display: String
+    name: String!
+    value: String!
+    display: String!
   }
 
   type NFTMetadata {
@@ -105,8 +105,8 @@ export default /* GraphQL */ `
   }
 
   type Chain {
-    chain: String
-    network: String
+    chain: String!
+    network: String!
   }
 
   type NFTsWithChain {
@@ -132,9 +132,9 @@ export default /* GraphQL */ `
   }
 
   type NFTDetail {
-    name: String
-    value: String
-    isCopyable: Boolean
+    name: String!
+    value: String!
+    isCopyable: Boolean!
   }
 
   type NFTContracts {
@@ -156,7 +156,7 @@ export default /* GraphQL */ `
   }
 
   input ContractInput {
-    address: String
+    address: String!
   }
 
   input TokenURIInput {
@@ -177,20 +177,20 @@ export default /* GraphQL */ `
   }
 
   input ChainInput {
-    chain: String
-    network: String
+    chain: String!
+    network: String!
   }
 
   input NFTPropertyInput {
-    name: String
-    value: String
-    display: String
+    name: String!
+    value: String!
+    display: String!
   }
 
   input NFTDetailInput {
-    name: String
-    value: String
-    isCopyable: Boolean
+    name: String!
+    value: String!
+    isCopyable: Boolean!
   }
 
   input GalleryInput {

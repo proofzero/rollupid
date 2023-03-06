@@ -25,19 +25,6 @@ export const LinksSchema = z
   )
   .optional()
 
-// export const GallerySchema = z.custom<GalleryInput[]>((input) => {
-//   input.forEach((nft) => {
-//     if (!nft.chain) throw new Error('Missing chain in gallery instance')
-//     if (!nft.details) throw new Error('Missing details in gallery instance')
-//     if (!nft.tokenId) throw new Error('Missing tokenId in gallery instance')
-//     if (!nft.contract)
-//       throw new Error('Missing contract address in gallery instance')
-//   })
-
-//   return input as GalleryInput[]
-// })
-//z.array(
-
 export const GallerySchema = z.array(
   z.object({
     url: z.string().url().optional().nullable(),

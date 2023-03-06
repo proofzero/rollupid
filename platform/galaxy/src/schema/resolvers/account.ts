@@ -137,25 +137,21 @@ const accountResolvers: Resolvers = {
 
       // Validation
       if (gallery) {
-        //   const filteredGallery = await validOwnership(
-        //     gallery,
-        //     env,
-        //     connectedAddresses
-        //   )
-        //   // Removal
-        //   if (gallery.length !== filteredGallery.length) {
-        //     accountClient.setGallery.mutate({
-        //       name: finalAccountURN,
-        //       gallery: filteredGallery,
-        //     })
-        //   }
-        console.log({ gallery })
-        console.log({ contracts: gallery?.[0].contract })
-        console.log({ details: gallery?.[0].details })
-        console.log({ chain: gallery?.[0].chain })
-        return gallery
+        const filteredGallery = await validOwnership(
+          gallery,
+          env,
+          connectedAddresses
+        )
+        // Removal
+        if (gallery.length !== filteredGallery.length) {
+          accountClient.setGallery.mutate({
+            name: finalAccountURN,
+            gallery: filteredGallery,
+          })
+        }
+
+        return filteredGallery
       }
-      console.log('Returning null gallery')
       // if there is no gallery
       return []
     },
@@ -286,12 +282,11 @@ const accountResolvers: Resolvers = {
       })
 
       // Validation
-      // const filteredGallery = await validOwnership(
-      //   gallery,
-      //   env,
-      //   connectedAddresses
-      // )
-      const filteredGallery = gallery
+      const filteredGallery = await validOwnership(
+        gallery,
+        env,
+        connectedAddresses
+      )
 
       await accountClient.setGallery.mutate({
         name: accountURN,

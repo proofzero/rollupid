@@ -40,8 +40,8 @@ export default /* GraphQL */ `
   }
 
   input LinkInput {
-    name: String
-    url: String
+    name: String!
+    url: String!
     verified: Boolean
     provider: String
   }

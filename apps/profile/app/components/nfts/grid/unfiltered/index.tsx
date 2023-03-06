@@ -2,7 +2,6 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { HiArrowNarrowLeft } from 'react-icons/hi'
 import { useEffect, useState } from 'react'
 import LoadingGrid from '../loading'
-import ShowPartners from '../../partners'
 import NftGrid from '../../grid'
 import ModaledNft from '../../interactible/modaled'
 
@@ -37,11 +36,9 @@ export type UnfilteredNftGridProps = {
 const UnfilteredNftGrid = ({
   nfts = [],
   loadingConditions,
-  isOwner = true,
   getMoreNfts,
   pageKey,
   displayText,
-  isModal = false,
   isModalNft = false,
   setCollection,
   preload = false,
@@ -57,18 +54,16 @@ const UnfilteredNftGrid = ({
 
   return (
     <>
-      {!loadingConditions && !isOwner && !displayedNfts.length && (
+      {!loadingConditions && !displayedNfts.length && (
         <Text className="text-center text-gray-300" size="2xl" weight="medium">
           {displayText}
         </Text>
       )}
-      {!loadingConditions && !displayedNfts.length && isOwner && (
-        <ShowPartners />
-      )}
+
       {/* If we browse all collections of a user */}
       {displayedNfts.length && !loadingConditions ? (
         <>
-          {isModal ? (
+          {!(handleRedirect || setCollection) ? null : (
             <button
               onClick={() => {
                 ;(setCollection as (s: string) => void)('')
@@ -82,34 +77,6 @@ const UnfilteredNftGrid = ({
               >
                 {displayedNfts[0].collectionTitle?.length ? (
                   <div>
-                    <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
-                    {displayedNfts[0].collectionTitle}
-                  </div>
-                ) : (
-                  <Text
-                    className="mt-9 mb-12 text-gray-600"
-                    size="base"
-                    weight="semibold"
-                  >
-                    <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
-                    Back to collections
-                  </Text>
-                )}
-              </Text>
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                ;(handleRedirect as () => void)()
-              }}
-            >
-              <Text
-                className="mt-9 mb-12 text-gray-600"
-                size="base"
-                weight="semibold"
-              >
-                {displayedNfts[0].collectionTitle?.length ? (
-                  <div className="lg:px-4 px-3">
                     <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
                     {displayedNfts[0].collectionTitle}
                   </div>

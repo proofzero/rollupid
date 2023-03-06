@@ -330,9 +330,9 @@ export const validOwnership = async (
 
   const [ethContractAddresses, polyContractAddresses] = gallery.reduce(
     ([ethereum, polygon], nft) => {
-      return nft.chain === 'eth'
-        ? [[...ethereum, nft.contract], polygon]
-        : [ethereum, [...polygon, nft.contract]]
+      return nft.chain.chain === 'eth'
+        ? [[...ethereum, nft.contract.address], polygon]
+        : [ethereum, [...polygon, nft.contract.address]]
     },
     [[] as string[], [] as string[]]
   )
@@ -377,6 +377,6 @@ export const validOwnership = async (
   })
 
   return gallery.filter((nft) => {
-    return validator.get(nft.contract)?.includes(nft.tokenId)
+    return validator.get(nft.contract.address)?.includes(nft.tokenId)
   })
 }

@@ -1,6 +1,6 @@
 // React
 
-import { useState, forwardRef, useEffect, useMemo } from 'react'
+import { useState, forwardRef, useEffect } from 'react'
 
 // Remix
 
@@ -37,22 +37,24 @@ import { CSS } from '@dnd-kit/utilities'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import SaveButton from '~/components/accounts/SaveButton'
 import PfpNftModal from '~/components/accounts/PfpNftModal'
-import { LoadingGridSquaresGallery } from '~/components/nfts/grid/loading'
 import NoCryptoAddresses from '~/components/accounts/NoCryptoAddresses'
 
 // Other helpers
 import { getProfileSession } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
-import type { Profile, Node, GalleryInput } from '@kubelt/galaxy-client'
+import type { Node, GalleryInput } from '@kubelt/galaxy-client'
 import { getMoreNftsModal } from '~/helpers/nfts'
-import type { decoratedNft } from '~/helpers/nfts'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import {
   toast,
   Toaster,
   ToastType,
 } from '@kubelt/design-system/src/atoms/toast'
+<<<<<<< HEAD
 import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+=======
+import type { FullProfile } from '~/types'
+>>>>>>> 0b8da695 (wip)
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
@@ -97,10 +99,6 @@ export const action: ActionFunction = async ({ request, context }) => {
       errors: Object.fromEntries(errors),
     }
   }
-  console.log({ nfts })
-  console.log({ contracts: nfts[0].contract })
-  console.log({ details: nfts[0].details })
-  console.log({ chain: nfts[0].chain })
 
   const galaxyClient = await getGalaxyClient(
     generateTraceContextHeaders(context.traceSpan)
@@ -191,72 +189,37 @@ const SortableNft = (props: any) => {
 const Gallery = () => {
   const actionData = useActionData()
   const { profile, cryptoAddresses, accountURN } = useOutletContext<{
-    profile: Profile
+    profile: FullProfile
     accountURN: string
     cryptoAddresses: Node[]
   }>()
 
   const { displayName } = profile
 
-  // ------------------- START OF GALLERY PART -------------------- //
-  // STATE
+  // ------------------- STATE -------------------------------------------------
+  // ------------------- GALLERY PART ---------------------------------
 
-  const [initialState, setInitialState] = useState([])
+  const initialState = profile.gallery
 
-  const [curatedNfts, setCuratedNfts] = useState([] as decoratedNft[])
+  const [curatedNfts, setCuratedNfts] = useState(profile.gallery)
   const [curatedNftsSet, setCuratedNftsSet] = useState(new Set([] as string[]))
-  const [isFormChanged, setFormChanged] = useState(false)
+  const [activeId, setActiveId] = useState(null)
 
   const transition = useTransition()
-  const galleryFetcher = useFetcher()
   const navigate = useNavigate()
-
-  const [activeId, setActiveId] = useState(null)
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor))
 
-  const curatedNftsLinks = curatedNfts.map((nft) => nft.url)
+  // Needed for sortable component to work properly
+  const curatedNftsLinks = curatedNfts.map((nft) => nft.url!)
 
-  // REACT HOOKS FOR DISPLAYING AND SORTING GALLERY
-  useEffect(() => {
-    if (JSON.stringify(curatedNfts) !== JSON.stringify(initialState)) {
-      setFormChanged(true)
-    }
-  }, [curatedNfts, initialState])
+  // ------------------- COLLECTED NFTS MODAL PART -----------------------------
 
-  useEffect(() => {
-    if (transition.type === 'actionReload') {
-      setFormChanged(false)
-      notify(!actionData?.errors)
-    }
-  }, [transition])
+  const [isOpen, setIsOpen] = useState(false)
+  const [collection, setCollection] = useState('')
 
-  useEffect(() => {
-    ;(async () => {
-      const addressQueryParams = new URLSearchParams({
-        accountURN: accountURN,
-      })
-      const request = `/api/nfts/gallery?${addressQueryParams.toString()}`
+  const modalFetcher = useFetcher()
 
-      galleryFetcher.load(request)
-    })()
-  }, [])
-
-  useEffect(() => {
-    if (galleryFetcher.data) {
-      // Do not need to sort them alphabetically here
-      setInitialState(galleryFetcher.data.gallery)
-      setCuratedNfts(galleryFetcher.data.gallery)
-      setCuratedNftsSet(
-        new Set(
-          galleryFetcher.data.gallery.map(
-            (nft: any) => nft.contract.address + nft.tokenId
-          )
-        )
-      )
-    }
-  }, [galleryFetcher.data])
-
-  // HANDLERS
+  // ------------------- NOTIFICATIONS HANDLER ---------------------------------
   const notify = (success: boolean = true) => {
     if (success) {
       toast(ToastType.Success, { message: 'Saved' })
@@ -265,6 +228,7 @@ const Gallery = () => {
     }
   }
 
+  // ------------------- DND HANDLERS ------------------------------------------
   const handleDragCancel = () => {
     setActiveId(null)
   }
@@ -288,65 +252,17 @@ const Gallery = () => {
     setActiveId(null)
   }
 
-  // ------------------- END OF GALLERY PART ---------------------- //
-  // ------------------- START OF MODAL PART ---------------------- //
-  // STATE
-  const [refresh, setRefresh] = useState(true)
-  const [loadedNfts, setLoadedNfts] = useState([] as any[])
-  const [pageKey, setPageLink] = useState<string | undefined>()
-  const [loading, setLoading] = useState(true)
-  const [isOpen, setIsOpen] = useState(false)
-  const [collection, setCollection] = useState('')
+  // ------------------- HOOKS -------------------------------------------------
 
-  const modalFetcher = useFetcher()
-
-  // HOOKS
   useEffect(() => {
-    if (modalFetcher.data) {
-      /* We already have only 1 NFT per collection
-       ** No need to put it in additional set
-       */
-
-      setLoadedNfts(modalFetcher.data.ownedNfts)
-      setPageLink(modalFetcher.data.pageKey ?? null)
-
-      if (refresh) {
-        setRefresh(false)
-      }
+    if (transition.type === 'actionReload') {
+      notify(!actionData?.errors)
     }
-  }, [modalFetcher.data])
+  }, [transition, actionData?.errors])
 
   useEffect(() => {
-    getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
+    getMoreNftsModal(modalFetcher, accountURN, collection)
   }, [collection])
-
-  useEffect(() => {
-    if (pageKey) {
-      setLoading(true)
-      getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
-    } else if (pageKey === null) {
-      setLoading(false)
-    }
-  }, [pageKey])
-
-  useMemo(() => {
-    setRefresh(true)
-    setLoadedNfts([])
-    setPageLink(undefined)
-  }, [])
-
-  useEffect(() => {
-    const asyncFn = async () => {
-      getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
-    }
-    if (refresh) {
-      asyncFn()
-    }
-  }, [refresh])
-
-  // --------------------- END OF MODAL PART ---------------------- //
-
-  console.log({ curatedNfts })
 
   return (
     <div className="relative min-h-[70vh]">
@@ -359,21 +275,14 @@ const Gallery = () => {
         NFTs
       </Text>
       {cryptoAddresses?.length ? (
-        <Form
-          method="post"
-          onReset={() => {
-            setFormChanged(false)
-          }}
-        >
+        <Form method="post">
           <fieldset disabled={transition.state === 'loading'}>
             <PfpNftModal
-              nfts={loadedNfts}
+              nfts={modalFetcher.data?.ownedNfts}
               collection={collection}
               setCollection={setCollection}
               displayName={displayName as string}
-              loadingConditions={
-                refresh || loading || modalFetcher.state !== 'idle'
-              }
+              loadingConditions={modalFetcher.state !== 'idle'}
               text={'Pick curated NFTs'}
               isOpen={isOpen}
               pfp={profile?.pfp?.image as string}
@@ -387,9 +296,13 @@ const Gallery = () => {
                   setCuratedNfts([...curatedNfts, nft])
                   setIsOpen(false)
                 } else {
-                  toast('This NFT is already in your gallery', {
-                    icon: '🤔',
-                  })
+                  toast(
+                    ToastType.Warning,
+                    { message: 'This NFT is already in your gallery' },
+                    {
+                      icon: '🤔',
+                    }
+                  )
                 }
               }}
             />
@@ -402,7 +315,7 @@ const Gallery = () => {
               onDragCancel={handleDragCancel}
             >
               <SortableContext
-                items={Array.from(curatedNftsSet)}
+                items={curatedNftsLinks}
                 strategy={rectSortingStrategy}
               >
                 <div
@@ -414,10 +327,6 @@ const Gallery = () => {
                   className="grid-cols-2 md:grid-cols-3 lg:grid-cols-4
             flex flex-col justify-center items-center"
                 >
-                  {galleryFetcher.state === 'loading' &&
-                    !curatedNfts.length && (
-                      <LoadingGridSquaresGallery numberOfCells={30} />
-                    )}
                   {curatedNfts.map((nft: any, i: number) => {
                     return (
                       <div
@@ -496,7 +405,9 @@ const Gallery = () => {
             <div className="h-[4rem]" />
             <div className="absolute bottom-0 right-0">
               <SaveButton
-                isFormChanged={isFormChanged}
+                isFormChanged={
+                  JSON.stringify(curatedNfts) !== JSON.stringify(initialState)
+                }
                 discardFn={() => {
                   setCuratedNfts(initialState)
                   setCuratedNftsSet(

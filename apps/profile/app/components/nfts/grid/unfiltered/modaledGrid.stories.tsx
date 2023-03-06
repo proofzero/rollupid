@@ -35,7 +35,6 @@ const Template = ({ quantity }: { quantity: number }) => {
       <UnfilteredGrid
         nfts={nfts}
         loadingConditions={false}
-        account={'0x123...'}
         getMoreNfts={() => {}}
         displayText={'Lorem Ipsum'}
         isModal={false}
