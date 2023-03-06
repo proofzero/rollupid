@@ -8,11 +8,16 @@ import {
 } from '../../../../../../packages/alchemy-client'
 
 import Env from '../../../env'
-import { TokenType } from '../typedefs'
 
 // -------------------- TYPES --------------------------------------------------
 
-import type { Gallery, Nft, NftContract, NftContracts, NfTs } from '../typedefs'
+import type {
+  Gallery,
+  Nft,
+  NftContract,
+  NftMedia,
+  OwnedNfTs,
+} from '../typedefs'
 
 type AlchemyClients = {
   ethereumClient: AlchemyClient
@@ -25,25 +30,6 @@ type ResolverContext = {
   coreId?: string
 }
 
-type AlchemyNfts = {
-  ownedNfts: Nft[]
-  blockHash: string
-  totalCount: number
-}
-
-type contracts = {
-  contracts: NftContract[]
-  totalCount: number
-  chain?: {
-    network: string
-    chain: string
-  }
-}
-
-// list of NFT contracts
-type NftBatch = string[]
-// -------------------- END OF TYPES -------------------------------------------
-
 // -------------------- HELPERS ------------------------------------------------
 
 export const sortNftsAlphabetically = (ownedNfts: Nft[]) => {
@@ -52,15 +38,6 @@ export const sortNftsAlphabetically = (ownedNfts: Nft[]) => {
       b.contractMetadata?.name ?? ''
     )
   )
-}
-
-export function sliceIntoChunks(arr: any[], chunkSize: number) {
-  const res = []
-  for (let i = 0; i < arr.length; i += chunkSize) {
-    const chunk = arr.slice(i, i + chunkSize)
-    res.push(chunk)
-  }
-  return res
 }
 
 export const normalizeContractsForAllChains = (
@@ -103,7 +80,7 @@ export const normalizeContracts = ({
         },
         chain: ct.chain,
         balance: ct.totalBalance?.toString(),
-        contract: { address: ct.address },
+        contract: { address: ct.address! },
       },
     ]
     return ct
@@ -257,69 +234,6 @@ export const getContractsForAllChains = async ({
   }
 }
 
-// -------------------- GALLERY ------------------------------------------------
-
-export const getNftMetadataForAllChains = async (
-  input: {
-    contractAddress: string
-    tokenId: string
-    chain: string
-  }[],
-  alchemyClients: AlchemyClients,
-  env: ResolverContext['env']
-) => {
-  const chainedInput = new Map<string, typeof input>()
-  const orders = new Map<string, number>()
-  input.forEach((instance, index) => {
-    orders.set(`${instance.contractAddress}${instance.tokenId}`, index)
-    chainedInput.set(
-      instance.chain,
-      (chainedInput.get(instance.chain) || []).concat([instance])
-    )
-  })
-
-  try {
-    const [ethereumNfts, polygonNfts] = await Promise.all([
-      alchemyClients.ethereumClient.getNFTMetadataBatch(
-        chainedInput.get(AlchemyChain.ethereum)!
-      ) as Promise<Nft[]>,
-      alchemyClients.polygonClient.getNFTMetadataBatch(
-        chainedInput.get(AlchemyChain.polygon)!
-      ) as Promise<Nft[]>,
-    ])
-
-    // Gallery stores as an array in account DO, so not need to keep order separately
-    // But here it fetches metadata asynchronous - so order may be lost
-
-    const nfts = ethereumNfts
-      .map((nft) => ({
-        ...nft,
-        chain: {
-          chain: AlchemyChain.ethereum,
-          network: env.ALCHEMY_ETH_NETWORK,
-        },
-      }))
-      .concat(
-        polygonNfts.map((nft) => ({
-          ...nft,
-          chain: {
-            chain: AlchemyChain.polygon,
-            network: env.ALCHEMY_POLYGON_NETWORK,
-          },
-        }))
-      )
-
-    return nfts.reduce<Nft[]>((acc, nft) => {
-      acc[orders.get(`${nft.contract?.address}${nft.id?.tokenId}`) as number] =
-        nft
-      return acc
-    }, Array(nfts.length))
-  } catch (ex) {
-    console.error(new GraphQLYogaError(ex as string))
-    return []
-  }
-}
-
 // -------------------- GALLERY VERIFICATION -----------------------------------
 export const validOwnership = async (
   gallery: Gallery[],
@@ -347,7 +261,7 @@ export const validOwnership = async (
   */
   const validator = new Map<string, string[]>()
 
-  const nfts: [NfTs, NfTs] = await Promise.all(
+  const nfts: [OwnedNfTs, OwnedNfTs] = await Promise.all(
     connectedAddresses.map((address) =>
       Promise.all([
         ethereumClient.getNFTs({

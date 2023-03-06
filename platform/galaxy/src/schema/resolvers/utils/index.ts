@@ -17,13 +17,11 @@ import { WriteAnalyticsDataPoint } from '@kubelt/packages/platform-clients/analy
 export {
   getNfts,
   getAlchemyClients,
-  sliceIntoChunks,
   normalizeContracts,
   getContractsForAllChains,
   validOwnership,
   getNftsForAllChains,
   sortNftsAlphabetically,
-  getNftMetadataForAllChains,
   normalizeContractsForAllChains,
 } from './nfts'
 
