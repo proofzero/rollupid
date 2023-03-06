@@ -191,15 +191,16 @@ export const normalizeProfileToConnection = (profile: any) => {
     case 'OAuthTwitterProfile':
       return {
         id: profile.urn,
-        address: profile.name,
+        address: `@${profile.screen_name}`,
         title: profile.name,
         icon: profile.profile_image_url_https,
         chain: 'Twitter',
       }
     case 'OAuthGithubProfile':
+      console.log('githubh', { profile })
       return {
         id: profile.urn,
-        address: profile.name,
+        address: profile.login,
         title: profile.name,
         icon: profile.avatar_url,
         chain: 'GitHub',
@@ -223,8 +224,8 @@ export const normalizeProfileToConnection = (profile: any) => {
     case 'OAuthDiscordProfile':
       return {
         id: profile.urn,
-        address: profile.email,
-        title: `${profile.username}#${profile.discriminator}`,
+        address: `${profile.username}#${profile.discriminator}`,
+        title: profile.username,
         icon: `https://cdn.discordapp.com/avatars/${profile.discordId}/${profile.avatar}.png`,
         chain: 'Discord',
       }
