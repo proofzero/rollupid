@@ -1,6 +1,7 @@
 import React from 'react'
 import { ApplicationList } from './ApplicationList'
 import type { ApplicationListItemProps } from './ApplicationListItem'
+import { blue, gray } from '@kubelt/design-system/src/placeholders/rollup/b64'
 
 export default {
   title: 'Molecules/Applications/List',
@@ -11,20 +12,20 @@ const applications: ApplicationListItemProps[] = [
   {
     id: '1',
     name: 'Courtyard',
-    createdTimestamp: new Date().getTime(),
+    createdTimestamp: new Date(2023, 0).getTime(),
     published: true,
-    icon: 'https://picsum.photos/250/250',
+    icon: blue,
   },
   {
     id: '2',
     name: 'Pokemon',
-    createdTimestamp: new Date().getTime(),
-    icon: 'https://picsum.photos/250/250',
+    createdTimestamp: new Date(2023, 0).getTime(),
+    icon: gray,
   },
   {
     id: '3',
     name: 'Baseball',
-    createdTimestamp: new Date().getTime(),
+    createdTimestamp: new Date(2023, 0).getTime(),
     published: true,
   },
 ]

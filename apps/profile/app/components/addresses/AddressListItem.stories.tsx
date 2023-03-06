@@ -1,6 +1,8 @@
 import React from 'react'
 import { AddressListItem } from './AddressListItem'
 
+import { blue } from '@kubelt/design-system/src/placeholders/rollup/b64'
+
 export default {
   title: 'Atoms/Addresses/List item',
   component: AddressListItem,
@@ -12,7 +14,7 @@ export default {
       defaultValue: 'Lorem Ipsum',
     },
     icon: {
-      defaultValue: 'https://picsum.photos/250',
+      defaultValue: blue,
     },
     wallet: {
       defaultValue: 'Metamask',

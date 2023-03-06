@@ -2,6 +2,12 @@ import React from 'react'
 import { AddressList } from './AddressList'
 import type { AddressListItemProps } from './AddressListItem'
 
+import {
+  blue,
+  gray,
+  green,
+} from '@kubelt/design-system/src/placeholders/rollup/b64'
+
 export default {
   title: 'Molecules/Addresses/List',
   component: AddressList,
@@ -11,7 +17,7 @@ const addresses: AddressListItemProps[] = [
   {
     id: '1',
     title: 'Ondrej.eth',
-    icon: 'https://picsum.photos/250/250',
+    icon: blue,
     wallet: 'Metamask',
     network: 'Ethereum',
     chain: 'Mainnet',
@@ -26,7 +32,7 @@ const addresses: AddressListItemProps[] = [
   {
     id: '2',
     title: 'Account 2',
-    icon: 'https://picsum.photos/250/250',
+    icon: gray,
     wallet: 'Metamask',
     network: 'Ethereum',
     chain: 'Mainnet',
@@ -38,7 +44,7 @@ const addresses: AddressListItemProps[] = [
   {
     id: '3',
     title: 'Account 3',
-    icon: 'https://picsum.photos/250/250',
+    icon: green,
     wallet: 'Metamask',
     network: 'Polygon',
     chain: 'Mainnet',

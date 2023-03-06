@@ -1,4 +1,5 @@
 import React from 'react'
+import { blue } from '../../../placeholders/rollup/b64'
 
 import { Avatar, AvatarProps } from './Avatar'
 
@@ -10,7 +11,7 @@ export default {
   component: Avatar,
   argTypes: {
     src: {
-      defaultValue: 'https://picsum.photos/128',
+      defaultValue: blue,
     },
     size: {
       defaultValue: 'md',

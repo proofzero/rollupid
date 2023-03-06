@@ -10,19 +10,27 @@ const Template = () => (
     fetcherState={{ type: 'done', state: 'idle' }}
     CTAprops={{ clickHandler: () => {}, CTAneeded: false }}
     authorizedProfiles={[
-      { name: 'Eve', timestamp: new Date().getTime(), accountURN: '' },
-      { name: 'Bob', timestamp: new Date().getTime() + 1000, accountURN: '' },
-      { name: 'Sam', timestamp: new Date().getTime() + 2000, accountURN: '' },
+      { name: 'Eve', timestamp: new Date(2023, 0).getTime(), accountURN: '' },
+      {
+        name: 'Bob',
+        timestamp: new Date(2023, 0).getTime() + 1000,
+        accountURN: '',
+      },
+      {
+        name: 'Sam',
+        timestamp: new Date(2023, 0).getTime() + 2000,
+        accountURN: '',
+      },
     ]}
     galaxyGql={{
       apiKey: 'API_KEY',
-      createdAt: new Date(),
+      createdAt: new Date(2023, 0),
       onKeyRoll: () => {},
     }}
     oAuth={{
       appId: 'APP_ID',
       appSecret: 'APP_SECRET',
-      createdAt: new Date(),
+      createdAt: new Date(2023, 0),
       onKeyRoll: () => {},
     }}
   />
