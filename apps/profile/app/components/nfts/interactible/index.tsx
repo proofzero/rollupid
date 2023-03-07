@@ -52,7 +52,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
           </div>
 
           <img
-            className="object-contain
+            className="object-cover
             w-full
             rounded-lg
             md:h-[424px]
@@ -84,7 +84,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
           }}
         >
           <img
-            className="object-contain
+            className="object-cover
             w-full
             rounded-t-lg
             md:h-[424px]
