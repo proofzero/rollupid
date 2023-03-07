@@ -14,6 +14,8 @@ const ModaledNft = ({ nft, isModal, handleRedirect }: any) => {
   const [showModal, setShowModal] = useState(false)
 
   const [loadFail, setLoadFail] = useState(false)
+
+  const url = gatewayFromIpfs(nft.url)
   return (
     <>
       {isModal ? (
@@ -64,9 +66,9 @@ const ModaledNft = ({ nft, isModal, handleRedirect }: any) => {
             </div>
 
             <img
-              className="object-contain
-              min-w-full
-              rounded-lg"
+              className="object-cover
+              w-full
+              rounded-lg md:h-[424px] lg:h-[270px]"
               src={
                 loadFail
                   ? missingNftSvg
@@ -93,9 +95,9 @@ const ModaledNft = ({ nft, isModal, handleRedirect }: any) => {
           }}
         >
           <img
-            className="rounded-t-lg
-              w-full
-              object-contain
+            className="object-cover
+            w-full
+            rounded-lg md:h-[424px] lg:h-[270px]
               "
             src={
               loadFail
