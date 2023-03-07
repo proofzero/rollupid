@@ -18,7 +18,6 @@ import {
   getNftMetadataForAllChains,
 } from './utils'
 
-import { NFTPropertyMapper } from '@kubelt/packages/alchemy-client'
 import { decorateNfts } from './utils/nfts'
 
 import { Resolvers } from './typedefs'

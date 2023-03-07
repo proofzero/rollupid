@@ -264,12 +264,16 @@ export const getNftMetadataForAllChains = async (
 
   try {
     let [ethereumNfts, polygonNfts] = await Promise.all([
-      alchemyClients.ethereumClient.getNFTMetadataBatch(
-        chainedInput.get(AlchemyChain.ethereum)!
-      ) as Promise<Nft[]>,
-      alchemyClients.polygonClient.getNFTMetadataBatch(
-        chainedInput.get(AlchemyChain.polygon)!
-      ) as Promise<Nft[]>,
+      chainedInput.has(AlchemyChain.ethereum)
+        ? (alchemyClients.ethereumClient.getNFTMetadataBatch(
+            chainedInput.get(AlchemyChain.ethereum)!
+          ) as Promise<Nft[]>)
+        : [],
+      chainedInput.has(AlchemyChain.polygon)
+        ? (alchemyClients.polygonClient.getNFTMetadataBatch(
+            chainedInput.get(AlchemyChain.polygon)!
+          ) as Promise<Nft[]>)
+        : [],
     ])
 
     // Gallery stores as an array in account DO, so not need to keep order separately
@@ -315,14 +319,18 @@ export const validOwnership = async (
 ) => {
   const { ethereumClient, polygonClient } = getAlchemyClients({ env })
 
-  const [ethContractAddresses, polyContractAddresses] = gallery.reduce(
+  const [ethContractAddressesSet, polyContractAddressesSet] = gallery.reduce(
     ([ethereum, polygon], nft) => {
-      return nft.chain.chain === 'eth'
-        ? [[...ethereum, nft.contract.address], polygon]
-        : [ethereum, [...polygon, nft.contract.address]]
+      nft.chain.chain === 'eth'
+        ? ethereum.add(nft.contract.address)
+        : polygon.add(nft.contract.address)
+      return [ethereum, polygon]
     },
-    [[] as string[], [] as string[]]
+    [new Set([] as string[]), new Set([] as string[])]
   )
+
+  const ethContractAddresses = Array.from(ethContractAddressesSet)
+  const polyContractAddresses = Array.from(polyContractAddressesSet)
 
   /** Struct of this map is like this:
    {
