@@ -50,11 +50,8 @@ import {
   Toaster,
   ToastType,
 } from '@kubelt/design-system/src/atoms/toast'
-<<<<<<< HEAD
 import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
-=======
 import type { FullProfile } from '~/types'
->>>>>>> 0b8da695 (wip)
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()

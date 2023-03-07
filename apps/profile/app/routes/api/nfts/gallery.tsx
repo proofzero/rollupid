@@ -14,14 +14,10 @@ export const loader: LoaderFunction = async (args) => {
 
   const accountURN = srcUrl.searchParams.get('accountURN')
 
-<<<<<<< HEAD
-  const { gallery } = await getGalleryWithMetadata(
+  const { gallery } = await getGallery(
     accountURN as AccountURN,
     args.context.traceSpan
   )
-=======
-  const { gallery } = await getGallery(accountURN as AccountURN)
->>>>>>> 0b8da695 (wip)
 
   return json({
     gallery,
