@@ -52,7 +52,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
           </div>
 
           <img
-            className="object-cover
+            className="object-contain
             w-full
             rounded-lg
             md:h-[424px]
@@ -62,7 +62,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
             src={
               loadFail
                 ? missingNftSvg
-                : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
+                : gatewayFromIpfs(nft.url ?? nft.thumbnailUrl)
             }
             onError={(e) => setLoadFail(true)}
             alt="collection-item"
@@ -84,7 +84,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
           }}
         >
           <img
-            className="object-cover
+            className="object-contain
             w-full
             rounded-t-lg
             md:h-[424px]
@@ -95,7 +95,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
             src={
               loadFail
                 ? missingNftSvg
-                : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
+                : gatewayFromIpfs(nft.url ?? nft.thumbnailUrl)
             }
             onError={(e) => setLoadFail(true)}
             alt="collection-representation"

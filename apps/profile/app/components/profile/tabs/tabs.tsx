@@ -10,7 +10,6 @@ const tabs: Record<
   }
 > = {
   links: { title: 'Links' },
-  activity: { title: 'Activity', disabled: true },
   gallery: { title: 'Gallery' },
 }
 
