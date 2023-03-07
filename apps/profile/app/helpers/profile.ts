@@ -5,10 +5,8 @@ import { getGalaxyClient } from '~/helpers/clients'
 import { imageFromAddressType } from './icons'
 import type { FullProfile } from '~/types'
 import type { AccountURN } from '@kubelt/urns/account'
-import {
-  generateTraceContextHeaders,
-  TraceSpan,
-} from '@kubelt/platform-middleware/trace'
+import type { TraceSpan } from '@kubelt/platform-middleware/trace'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 export const getAccountProfile = async (
   {
