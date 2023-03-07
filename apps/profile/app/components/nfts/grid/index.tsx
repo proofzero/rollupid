@@ -54,8 +54,8 @@ const NftGrid = ({
             <Masonry
               breakpointCols={{
                 default: 3,
-                1024: 2,
-                768: 1,
+                1023: 2,
+                767: 1,
               }}
               className="flex 
               w-full

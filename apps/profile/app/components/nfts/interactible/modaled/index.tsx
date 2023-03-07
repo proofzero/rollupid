@@ -68,7 +68,9 @@ const ModaledNft = ({ nft, isModal, handleRedirect }: any) => {
             <img
               className="object-cover
               w-full
-              rounded-lg md:h-[424px] lg:h-[270px]"
+              rounded-lg 
+              md:h-[424px]
+              lg:h-[270px]"
               src={
                 loadFail
                   ? missingNftSvg
@@ -97,8 +99,10 @@ const ModaledNft = ({ nft, isModal, handleRedirect }: any) => {
           <img
             className="object-cover
             w-full
-            rounded-lg md:h-[424px] lg:h-[270px]
-              "
+            rounded-t-lg 
+            md:h-[424px]
+            lg:h-[270px] 
+            xl:h-[270px]"
             src={
               loadFail
                 ? missingNftSvg

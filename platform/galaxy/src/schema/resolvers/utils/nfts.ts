@@ -13,7 +13,7 @@ import Env from '../../../env'
 
 import type { Nft, NftContract, OwnedNfTs } from '../typedefs'
 
-import { Gallery } from '@kubelt/platform.account/src/types'
+import { Gallery, GalleryItem } from '@kubelt/platform.account/src/types'
 
 type AlchemyClients = {
   ethereumClient: AlchemyClient
@@ -380,7 +380,10 @@ export const validOwnership = async (
   })
 }
 
-const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
+// -------- TEMPORARY MIGRATION PART -------------------------------------------
+const gatewayFromIpfs = (
+  ipfsUrl: string | undefined | null
+): string | undefined | null => {
   const regex =
     /ipfs:\/\/(?<prefix>ipfs\/)?(?<cid>[a-zA-Z0-9]+)(?<path>(?:\/[\w.-]+)+)?/
   const match = ipfsUrl?.match(regex)
@@ -408,7 +411,7 @@ export const sortNftsFn = (a: any, b: any) => {
   }
 }
 
-const decorateNft = (nft: Nft): decoratedNft => {
+const decorateNft = (nft: Nft): GalleryItem => {
   const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
   let error = false
   if (nft.error) {
@@ -423,7 +426,7 @@ const decorateNft = (nft: Nft): decoratedNft => {
     },
     {
       name: 'NFT Standard',
-      value: nft.contractMetadata?.tokenType,
+      value: nft.contractMetadata?.tokenType?.toString(),
       isCopyable: false,
     },
     {
@@ -450,12 +453,12 @@ const decorateNft = (nft: Nft): decoratedNft => {
     thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
     error: error,
     title: nft.title,
-    contract: nft.contract,
-    tokenId: nft.id?.tokenId,
-    chain: nft.chain,
+    contract: nft.contract!,
+    tokenId: nft.id?.tokenId!,
+    chain: nft.chain!,
     collectionTitle: nft.contractMetadata?.name,
     properties: nft.metadata?.properties,
-    details,
+    details: details,
   }
 }
 

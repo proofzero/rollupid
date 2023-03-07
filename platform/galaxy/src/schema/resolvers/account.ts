@@ -20,10 +20,15 @@ import {
 
 import { decorateNfts } from './utils/nfts'
 
-import { Resolvers } from './typedefs'
+import { NftProperty, Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
-import { Gallery, Links, Profile } from '@kubelt/platform.account/src/types'
+import type {
+  Gallery,
+  GalleryItem,
+  Links,
+  Profile,
+} from '@kubelt/platform.account/src/types'
 import { ResolverContext } from './common'
 import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
@@ -139,12 +144,12 @@ const accountResolvers: Resolvers = {
         account: finalAccountURN,
       })
 
-      if (gallery && !gallery[0].details) {
+      if (gallery && !Object.keys(gallery[0]).includes('details')) {
         const alchemyClients = getAlchemyClients({ env })
         const input = gallery.map((nft) => ({
-          contractAddress: nft.contract,
-          chain: nft.chain,
-          tokenId: nft.tokenId,
+          contractAddress: nft.contract as string,
+          chain: nft.chain as string,
+          tokenId: nft.tokenId as string,
         }))
 
         const ownedNfts = await getNftMetadataForAllChains(
@@ -153,22 +158,26 @@ const accountResolvers: Resolvers = {
           env
         )
 
-        gallery = decorateNfts(ownedNfts)
+        gallery = decorateNfts(ownedNfts) as GalleryItem[]
 
-        const filteredGallery = await validOwnership(
+        const filteredGallery = (await validOwnership(
           gallery,
           env,
           connectedAddresses
-        )
+        )) as GalleryItem[]
 
-        console.log({ 'MIGRATION IN PROGRESS': { gallery } })
-
-        // Migration itself
+        /** MIGRATION
+         * It'll be done only once for each user who's logging in profile app
+         * and has gallery with old schema set up. Once done the "if" condition
+         * on line 142 will return false and this code block won't run.
+         */
         await accountClient.setGallery.mutate({
           name: accountURN,
           gallery: filteredGallery.map((nft) => {
-            nft.properties = nft.properties.map((prop) => {
-              prop.value = prop.value.toString()
+            nft.properties = nft.properties?.map((prop: NftProperty | null) => {
+              if (prop) {
+                prop.value = prop.value.toString()
+              }
               return prop
             })
             return nft
