@@ -11,17 +11,26 @@ import Env from '../../../env'
 
 // -------------------- TYPES --------------------------------------------------
 
-import type {
-  Gallery,
-  Nft,
-  NftContract,
-  NftMedia,
-  OwnedNfTs,
-} from '../typedefs'
+import type { Nft, NftContract, OwnedNfTs } from '../typedefs'
+
+import { Gallery } from '@kubelt/platform.account/src/types'
 
 type AlchemyClients = {
   ethereumClient: AlchemyClient
   polygonClient: AlchemyClient
+}
+
+type decoratedNft = {
+  url?: string
+  thumbnailUrl?: string
+  error: boolean
+  title?: Nft['title']
+  contract: Nft['contract']
+  tokenId?: string | null
+  chain: Nft['chain']
+  collectionTitle?: string | null
+  properties?: any[] | null
+  details: { name: string; value?: string | null; isCopyable: boolean }[]
 }
 
 type ResolverContext = {
@@ -234,9 +243,73 @@ export const getContractsForAllChains = async ({
   }
 }
 
+export const getNftMetadataForAllChains = async (
+  input: {
+    contractAddress: string
+    tokenId: string
+    chain: string
+  }[],
+  alchemyClients: AlchemyClients,
+  env: ResolverContext['env']
+) => {
+  const chainedInput = new Map<string, typeof input>()
+  const orders = new Map<string, number>()
+  input.forEach((instance, index) => {
+    orders.set(`${instance.contractAddress}${instance.tokenId}`, index)
+    chainedInput.set(
+      instance.chain,
+      (chainedInput.get(instance.chain) || []).concat([instance])
+    )
+  })
+
+  try {
+    let [ethereumNfts, polygonNfts] = await Promise.all([
+      alchemyClients.ethereumClient.getNFTMetadataBatch(
+        chainedInput.get(AlchemyChain.ethereum)!
+      ) as Promise<Nft[]>,
+      alchemyClients.polygonClient.getNFTMetadataBatch(
+        chainedInput.get(AlchemyChain.polygon)!
+      ) as Promise<Nft[]>,
+    ])
+
+    // Gallery stores as an array in account DO, so not need to keep order separately
+    // But here it fetches metadata asynchronous - so order may be lost
+
+    ethereumNfts = NFTPropertyMapper(ethereumNfts)
+    polygonNfts = NFTPropertyMapper(polygonNfts)
+
+    const nfts = ethereumNfts
+      .map((nft) => ({
+        ...nft,
+        chain: {
+          chain: AlchemyChain.ethereum,
+          network: env.ALCHEMY_ETH_NETWORK,
+        },
+      }))
+      .concat(
+        polygonNfts.map((nft) => ({
+          ...nft,
+          chain: {
+            chain: AlchemyChain.polygon,
+            network: env.ALCHEMY_POLYGON_NETWORK,
+          },
+        }))
+      )
+
+    return nfts.reduce<Nft[]>((acc, nft) => {
+      acc[orders.get(`${nft.contract?.address}${nft.id?.tokenId}`) as number] =
+        nft
+      return acc
+    }, Array(nfts.length))
+  } catch (ex) {
+    console.error(new GraphQLYogaError(ex as string))
+    return []
+  }
+}
+
 // -------------------- GALLERY VERIFICATION -----------------------------------
 export const validOwnership = async (
-  gallery: Gallery[],
+  gallery: Gallery,
   env: ResolverContext['env'],
   connectedAddresses: string[]
 ) => {
@@ -293,4 +366,98 @@ export const validOwnership = async (
   return gallery.filter((nft) => {
     return validator.get(nft.contract.address)?.includes(nft.tokenId)
   })
+}
+
+const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
+  const regex =
+    /ipfs:\/\/(?<prefix>ipfs\/)?(?<cid>[a-zA-Z0-9]+)(?<path>(?:\/[\w.-]+)+)?/
+  const match = ipfsUrl?.match(regex)
+
+  if (!ipfsUrl || !match) return ipfsUrl
+
+  const prefix = match[1]
+  const cid = match[2]
+  const path = match[3]
+
+  return `https://nftstorage.link/${prefix ? `${prefix}` : 'ipfs/'}${cid}${
+    path ? `${path}` : ''
+  }`
+}
+
+const capitalizeFirstLetter = (string?: string) => {
+  return string ? string.charAt(0).toUpperCase() + string.slice(1) : null
+}
+
+export const sortNftsFn = (a: any, b: any) => {
+  if (b.collectionTitle === null) {
+    return -1
+  } else {
+    return a.collectionTitle?.localeCompare(b.collectionTitle) || 1
+  }
+}
+
+const decorateNft = (nft: Nft): decoratedNft => {
+  const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
+  let error = false
+  if (nft.error) {
+    error = true
+  }
+
+  const details = [
+    {
+      name: 'NFT Contract',
+      value: nft.contract?.address,
+      isCopyable: true,
+    },
+    {
+      name: 'NFT Standard',
+      value: nft.contractMetadata?.tokenType,
+      isCopyable: false,
+    },
+    {
+      name: 'Chain',
+      value: capitalizeFirstLetter(nft.chain?.chain),
+      isCopyable: false,
+    },
+    {
+      name: 'Network',
+      value: capitalizeFirstLetter(nft.chain?.network),
+      isCopyable: false,
+    },
+  ]
+  if (nft.id && nft.id.tokenId) {
+    details.push({
+      name: 'Token ID',
+      value: BigInt(nft.id.tokenId).toString(10),
+      isCopyable: true,
+    })
+  }
+
+  return {
+    url: gatewayFromIpfs(media?.raw),
+    thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
+    error: error,
+    title: nft.title,
+    contract: nft.contract,
+    tokenId: nft.id?.tokenId,
+    chain: nft.chain,
+    collectionTitle: nft.contractMetadata?.name,
+    properties: nft.metadata?.properties,
+    details,
+  }
+}
+
+/**
+ * Sort and filter errors out
+ */
+export const decorateNfts = (ownedNfts: Nft[]) => {
+  const decoratedNfts = ownedNfts.map((nft: Nft) => {
+    return decorateNft(nft)
+  })
+
+  const filteredNfts =
+    decoratedNfts?.filter((n: any) => !n.error && n.thumbnailUrl) || []
+
+  const sortedNfts = filteredNfts.sort(sortNftsFn)
+  return sortedNfts
 }

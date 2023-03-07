@@ -199,7 +199,13 @@ const Gallery = () => {
   const initialState = profile.gallery
 
   const [curatedNfts, setCuratedNfts] = useState(profile.gallery)
-  const [curatedNftsSet, setCuratedNftsSet] = useState(new Set([] as string[]))
+  const [curatedNftsSet, setCuratedNftsSet] = useState(
+    new Set(
+      profile.gallery.map((nft) => {
+        return nft.contract.address + nft.tokenId
+      })
+    )
+  )
   const [activeId, setActiveId] = useState(null)
 
   const transition = useTransition()

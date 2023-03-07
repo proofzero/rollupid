@@ -26,29 +26,37 @@ export const LinksSchema = z
   .optional()
 
 export const GallerySchema = z.array(
-  z.object({
-    url: z.string().url().optional().nullable(),
-    thumbnailUrl: z.string().url().optional().nullable(),
-    error: z.boolean(),
-    title: z.string().optional().nullable(),
-    contract: z.object({ address: z.string() }),
-    tokenId: z.string(),
-    chain: z.object({ chain: z.string(), network: z.string() }),
-    collectionTitle: z.string().optional().nullable(),
-    properties: z
-      .array(
-        z.object({ display: z.string(), name: z.string(), value: z.string() })
-      )
-      .optional()
-      .nullable(),
-    details: z.array(
+  z
+    .object({
+      url: z.string().url().optional().nullable(),
+      thumbnailUrl: z.string().url().optional().nullable(),
+      error: z.boolean(),
+      title: z.string().optional().nullable(),
+      contract: z.object({ address: z.string() }),
+      tokenId: z.string(),
+      chain: z.object({ chain: z.string(), network: z.string() }),
+      collectionTitle: z.string().optional().nullable(),
+      properties: z
+        .array(
+          z.object({ display: z.string(), name: z.string(), value: z.string() })
+        )
+        .optional()
+        .nullable(),
+      details: z.array(
+        z.object({
+          name: z.string(),
+          value: z.string(),
+          isCopyable: z.boolean(),
+        })
+      ),
+    })
+    .or(
       z.object({
-        name: z.string(),
-        value: z.string(),
-        isCopyable: z.boolean(),
+        chain: z.string(),
+        tokenId: z.string(),
+        contract: z.string(),
       })
-    ),
-  })
+    )
 )
 
 export const AddressesSchema = z.array(Node)

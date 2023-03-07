@@ -2,11 +2,9 @@ import { gatewayFromIpfs } from '@kubelt/utils'
 import { getAccountProfile } from './profile'
 
 import type { AccountURN } from '@kubelt/urns/account'
-import type { Gallery, Nft } from '@kubelt/galaxy-client'
-import {
-  generateTraceContextHeaders,
-  TraceSpan,
-} from '@kubelt/platform-middleware/trace'
+import type { Nft } from '@kubelt/galaxy-client'
+import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import type { TraceSpan } from '@kubelt/platform-middleware/trace'
 
 /**
  * Nfts are being sorted server-side
@@ -99,9 +97,13 @@ export const decorateNft = (nft: Nft): decoratedNft => {
 /**
  * Sort and filter errors out
  */
-export const decorateNfts = (ownedNfts: any) => {
+export const decorateNfts = (ownedNfts: Nft[]) => {
+  const decoratedNfts = ownedNfts.map((nft: Nft) => {
+    return decorateNft(nft)
+  })
+
   const filteredNfts =
-    ownedNfts?.filter((n: any) => !n.error && n.thumbnailUrl) || []
+    decoratedNfts?.filter((n: any) => !n.error && n.thumbnailUrl) || []
 
   const sortedNfts = filteredNfts.sort(sortNftsFn)
   return sortedNfts

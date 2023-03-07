@@ -1,10 +1,11 @@
+import type { Nft } from '@kubelt/galaxy-client'
 import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
 import { getGalaxyClient } from '~/helpers/clients'
-import { decorateNft, decorateNfts } from '~/helpers/nfts'
+import { decorateNfts } from '~/helpers/nfts'
 import { getProfileSession } from '~/utils/session.server'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
@@ -32,10 +33,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       getAuthzHeaderConditionallyFromToken(jwt)
     )
 
-  const ownedNfts =
+  const ownedNfts: Nft[] =
     resColl?.contracts.map((contract: any) => {
       const nft: any = contract?.ownedNfts ? contract.ownedNfts[0] : {}
-      return decorateNft(nft)
+      return nft
     }) ?? []
 
   return json({

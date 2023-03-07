@@ -14,7 +14,12 @@ import {
   temporaryConvertToPublic,
   validOwnership,
   requestLogging,
+  getAlchemyClients,
+  getNftMetadataForAllChains,
 } from './utils'
+
+import { NFTPropertyMapper } from '@kubelt/packages/alchemy-client'
+import { decorateNfts } from './utils/nfts'
 
 import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
@@ -131,12 +136,51 @@ const accountResolvers: Resolvers = {
         traceSpan,
       })
 
-      const gallery = await accountClient.getGallery.query({
+      let gallery = await accountClient.getGallery.query({
         account: finalAccountURN,
       })
 
-      // Validation
+      if (gallery && !gallery[0].details) {
+        const alchemyClients = getAlchemyClients({ env })
+        const input = gallery.map((nft) => ({
+          contractAddress: nft.contract,
+          chain: nft.chain,
+          tokenId: nft.tokenId,
+        }))
+
+        const ownedNfts = await getNftMetadataForAllChains(
+          input,
+          alchemyClients,
+          env
+        )
+
+        gallery = decorateNfts(ownedNfts)
+
+        const filteredGallery = await validOwnership(
+          gallery,
+          env,
+          connectedAddresses
+        )
+
+        console.log({ 'MIGRATION IN PROGRESS': { gallery } })
+
+        // Migration itself
+        await accountClient.setGallery.mutate({
+          name: accountURN,
+          gallery: filteredGallery.map((nft) => {
+            nft.properties = nft.properties.map((prop) => {
+              prop.value = prop.value.toString()
+              return prop
+            })
+            return nft
+          }),
+        })
+
+        return filteredGallery
+      }
+
       if (gallery) {
+        // Validation
         const filteredGallery = await validOwnership(
           gallery,
           env,
