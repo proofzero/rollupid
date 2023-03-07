@@ -15,7 +15,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   const galaxyClient = await getGalaxyClient({
     ...generateTraceContextHeaders(context.traceSpan),
   })
-  galaxyClient.updateAddressNickname(
+  await galaxyClient.updateAddressNickname(
     {
       addressURN: id,
       nickname: name,
