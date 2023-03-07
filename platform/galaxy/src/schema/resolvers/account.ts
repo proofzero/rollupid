@@ -144,6 +144,8 @@ const accountResolvers: Resolvers = {
         account: finalAccountURN,
       })
 
+      // -------- TEMPORARY MIGRATION PART START S-------------------------------
+
       if (gallery && !Object.keys(gallery[0]).includes('details')) {
         const alchemyClients = getAlchemyClients({ env })
         const input = gallery.map((nft) => ({
@@ -186,7 +188,7 @@ const accountResolvers: Resolvers = {
 
         return filteredGallery
       }
-
+      // -------- TEMPORARY MIGRATION PART END ---------------------------------
       if (gallery) {
         // Validation
         const filteredGallery = await validOwnership(

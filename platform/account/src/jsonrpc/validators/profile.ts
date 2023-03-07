@@ -53,6 +53,7 @@ export const GalleryItemSchema = z.object({
 
 export const GallerySchema = z.array(
   GalleryItemSchema.or(
+    // TEMPORARY MIGRATIONS' "OR"
     z.object({
       chain: z.string(),
       tokenId: z.string(),
