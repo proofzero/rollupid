@@ -177,7 +177,7 @@ const appSubmenuStruct: {
       {
         title: 'Team & Contact',
         icon: TbUsers,
-        disabled: true,
+        subroute: '/team',
       },
       {
         title: 'Billing',

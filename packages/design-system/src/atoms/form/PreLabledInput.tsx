@@ -5,7 +5,7 @@ import { Text } from '../text/Text'
 export type PreLabeledInputProps = InputHTMLAttributes<HTMLInputElement> & {
   id: string
   label: string
-  preLabel: string
+  preLabel: string | JSX.Element
 }
 
 export const PreLabeledInput = ({
