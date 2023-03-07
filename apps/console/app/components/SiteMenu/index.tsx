@@ -137,7 +137,7 @@ const appSubmenuStruct: {
       {
         title: 'Designer',
         icon: HiOutlineColorSwatch,
-        disabled: true,
+        subroute: '/designer',
       },
       {
         title: 'Custom Domain',
