@@ -147,6 +147,7 @@ export class AlchemyClient {
       })
     }
 
+    // Is supported ONLY on ethereum and polygon mainnets
     ;['SPAM'].forEach((filter) => {
       url.searchParams.append('excludeFilters[]', filter)
     })

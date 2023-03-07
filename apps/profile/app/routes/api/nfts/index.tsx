@@ -28,6 +28,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     await galaxyClient.getNftsPerCollection(
       {
         owner,
+        // Is supported ONLY on ethereum and polygon mainnets
         excludeFilters: ['SPAM'],
       },
       getAuthzHeaderConditionallyFromToken(jwt)

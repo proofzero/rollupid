@@ -78,6 +78,7 @@ const nftsResolvers: Resolvers = {
       _parent: any,
       {
         owner,
+        // Is supported ONLY on ethereum and polygon mainnets
         excludeFilters = ['SPAM', 'AIRDROPS'],
         pageSize = 1,
       }: {

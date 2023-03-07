@@ -345,14 +345,18 @@ export const validOwnership = async (
   const nfts: [OwnedNfTs, OwnedNfTs] = await Promise.all(
     connectedAddresses.map((address) =>
       Promise.all([
-        ethereumClient.getNFTs({
-          owner: address,
-          contractAddresses: ethContractAddresses,
-        }),
-        polygonClient.getNFTs({
-          owner: address,
-          contractAddresses: polyContractAddresses,
-        }),
+        ethContractAddresses.length
+          ? ethereumClient.getNFTs({
+              owner: address,
+              contractAddresses: ethContractAddresses,
+            })
+          : [],
+        polyContractAddresses.length
+          ? polygonClient.getNFTs({
+              owner: address,
+              contractAddresses: polyContractAddresses,
+            })
+          : [],
       ])
     )
   )
@@ -362,7 +366,7 @@ export const validOwnership = async (
   // of objects with ownedNfts property
   // These methods populate validator map to then check if the user owns nfts.
   nfts.flat().forEach((deeperNfts) => {
-    deeperNfts.ownedNfts.forEach((nft) => {
+    deeperNfts.ownedNfts?.forEach((nft) => {
       const val = validator.get(nft.contract?.address as string)
       validator.set(
         nft.contract?.address as string,
