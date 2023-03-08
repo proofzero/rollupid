@@ -132,7 +132,7 @@ const appSubmenuStruct: {
       {
         title: 'Blockchain',
         icon: HiOutlineDocument,
-        disabled: true,
+        subroute: '/blockchain',
       },
       {
         title: 'Designer',
