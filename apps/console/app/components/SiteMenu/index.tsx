@@ -162,7 +162,7 @@ const appSubmenuStruct: {
       {
         title: 'Messaging',
         icon: TbMessage,
-        disabled: true,
+        subroute: '/messaging',
       },
       {
         title: 'Audience Builder',
