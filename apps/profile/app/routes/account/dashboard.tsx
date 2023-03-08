@@ -15,7 +15,7 @@ import type { FullProfile } from '~/types'
 import CTA from '~/components/cta/cta'
 import { normalizeProfileToConnection } from '~/helpers/profile'
 import { AddressList } from '~/components/addresses/AddressList'
-import { AddressListItemProps } from '~/components/addresses/AddressListItem'
+import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 
 export default function Welcome() {
   const { profile, connectedProfiles } = useOutletContext<{
@@ -77,7 +77,7 @@ export default function Welcome() {
         </Text>
       </div>
 
-      <CTA profile={profile} />
+      <CTA profile={profile} addresses={connectedProfiles} />
 
       <div className="flex flex-col space-y-5 lg:flex-row lg:space-x-5 lg:space-y-0">
         <div className="flex-1 flex flex-col space-y-5 w-full">

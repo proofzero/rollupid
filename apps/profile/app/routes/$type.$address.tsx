@@ -81,21 +81,10 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   try {
     const user = session.get('user')
     jwt = user?.accessToken
-    profile = await galaxyClient.getProfile(
-      {
-        targetAccountURN: accountURN,
-      },
-      getAuthzHeaderConditionallyFromToken(jwt)
-    )
+    profile = await ProfileKV.get<FullProfile>(accountURN, 'json')
 
-    if (!profile?.profile) {
+    if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })
-    }
-
-    profile = {
-      ...profile.profile,
-      links: profile.links || [],
-      gallery: profile.gallery || [],
     }
 
     if (type === 'u') {

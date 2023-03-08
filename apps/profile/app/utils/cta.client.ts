@@ -1,4 +1,4 @@
-import { FullProfile } from '~/types'
+import type { FullProfile } from '~/types'
 
 export type ProfileCompletionStatus = {
   base: boolean
@@ -8,7 +8,8 @@ export type ProfileCompletionStatus = {
 }
 
 export const determineProfileCompletionStatus = (
-  profile: FullProfile
+  profile: FullProfile,
+  addresses: any[]
 ): ProfileCompletionStatus => {
   let base = false
   if (profile.bio || profile.job || profile.location || profile.website) {
@@ -16,7 +17,7 @@ export const determineProfileCompletionStatus = (
   }
 
   const links = profile.links?.length > 0
-  const connections = profile.addresses.length > 1
+  const connections = addresses.length > 1
   const gallery = profile.gallery.length > 0
 
   return {

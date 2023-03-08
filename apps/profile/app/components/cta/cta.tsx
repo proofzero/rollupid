@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react'
-import { FullProfile } from '~/types'
-import {
-  ProfileCompletionStatus,
-  determineProfileCompletionStatus,
-} from '~/utils/cta.client'
+import type { FullProfile } from '~/types'
+import type { ProfileCompletionStatus } from '~/utils/cta.client'
+import { determineProfileCompletionStatus } from '~/utils/cta.client'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Link } from '@remix-run/react'
 
-const CTA = ({ profile }: { profile: FullProfile }) => {
+const CTA = ({
+  profile,
+  addresses,
+}: {
+  profile: FullProfile
+  addresses: any[]
+}) => {
   const ctaDict: {
     [key: string]: {
       copy: string
@@ -57,7 +61,7 @@ const CTA = ({ profile }: { profile: FullProfile }) => {
   }
 
   const handleCompletionStatus = () => {
-    const pcs = determineProfileCompletionStatus(profile)
+    const pcs = determineProfileCompletionStatus(profile, addresses)
 
     let ctaKey
     ctaKey = handleCTAKey(pcs, 'gallery') || ctaKey
