@@ -49,6 +49,8 @@ import {
   ToastType,
 } from '@kubelt/design-system/src/atoms/toast'
 import type { FullProfile } from '~/types'
+import type { GalleryItem } from '@kubelt/platform/account/src/types'
+import type { Maybe } from 'graphql/jsutils/Maybe'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
@@ -110,7 +112,7 @@ export const action: ActionFunction = async ({ request, context }) => {
  * https://codesandbox.io/s/dndkit-sortable-image-grid-py6ve?file=/src/App.jsx*/
 
 const NFT = forwardRef(
-  ({ nft, url, index, faded, isDragging, style, ...props }: any, ref) => {
+  ({ url, faded, isDragging, style, ...props }: any, ref) => {
     /**
      * It re-renders this small component quite often
      * every time user changes screen size
@@ -146,8 +148,8 @@ const NFT = forwardRef(
   }
 )
 
-const SortableNft = (props: any) => {
-  const sortable = useSortable({ id: props.url })
+const SortableNft = (props: { url?: Maybe<string>; id: string }) => {
+  const sortable = useSortable({ id: props.id })
   const {
     attributes,
     listeners,
@@ -164,7 +166,6 @@ const SortableNft = (props: any) => {
 
   return (
     <NFT
-      nft={props.nft}
       ref={setNodeRef}
       style={style}
       isDragging={isDragging}
@@ -205,7 +206,9 @@ const Gallery = () => {
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor))
 
   // Needed for sortable component to work properly
-  const curatedNftsLinks = curatedNfts.map((nft) => nft.url!)
+  const curatedNftsIDs = curatedNfts.map(
+    (nft) => nft.chain.chain + nft.contract.address + nft.tokenId
+  )
 
   // ------------------- COLLECTED NFTS MODAL PART -----------------------------
 
@@ -237,8 +240,8 @@ const Gallery = () => {
 
     if (active.id !== over.id) {
       setCuratedNfts((curatedNfts: any[]) => {
-        const oldIndex = curatedNftsLinks.indexOf(active.id)
-        const newIndex = curatedNftsLinks.indexOf(over.id)
+        const oldIndex = curatedNftsIDs.indexOf(active.id)
+        const newIndex = curatedNftsIDs.indexOf(over.id)
 
         return arrayMove(curatedNfts, oldIndex, newIndex)
       })
@@ -310,7 +313,7 @@ const Gallery = () => {
               onDragCancel={handleDragCancel}
             >
               <SortableContext
-                items={curatedNftsLinks}
+                items={curatedNftsIDs}
                 strategy={rectSortingStrategy}
               >
                 <div
@@ -322,13 +325,18 @@ const Gallery = () => {
                   className="grid-cols-2 md:grid-cols-3 lg:grid-cols-4
             flex flex-col justify-center items-center"
                 >
-                  {curatedNfts.map((nft: any, i: number) => {
+                  {curatedNfts.map((nft: GalleryItem, i: number) => {
                     return (
                       <div
                         className="relative group"
                         key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
                       >
-                        <SortableNft url={nft.url} index={i} nft={nft} />
+                        <SortableNft
+                          id={
+                            nft.chain.chain + nft.contract.address + nft.tokenId
+                          }
+                          url={nft.url}
+                        />
                         <button
                           className="absolute right-3 bottom-3 opacity-50 rounded-full
                         h-[47px] w-[47px] items-center justify-center bg-black
@@ -378,8 +386,8 @@ const Gallery = () => {
               >
                 {activeId ? (
                   <NFT
-                    url={activeId}
-                    index={curatedNftsLinks.indexOf(activeId)}
+                    url={curatedNfts[curatedNftsIDs.indexOf(activeId)].url}
+                    index={curatedNftsIDs.indexOf(activeId)}
                   />
                 ) : null}
               </DragOverlay>
