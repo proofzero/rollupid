@@ -264,91 +264,6 @@ const accountResolvers: Resolvers = {
 
       return true
     },
-    updateProfile: async (
-      _parent: any,
-      { profile },
-      { env, jwt, accountURN, traceSpan }: ResolverContext
-    ) => {
-      console.log(
-        `galaxy.updateProfile: updating profile for account: ${accountURN}`
-      )
-
-      const accountClient = createAccountClient(env.Account, {
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...generateTraceContextHeaders(traceSpan),
-      })
-      let currentProfile = await accountClient.getProfile.query({
-        account: accountURN,
-      })
-
-      const newProfile = {
-        ...currentProfile,
-        ...profile,
-      } as Profile
-
-      await accountClient.setProfile.mutate({
-        name: accountURN,
-        profile: newProfile,
-      })
-      return true
-    },
-
-    updateLinks: async (
-      _parent: any,
-      { links }: { links: Links },
-      { env, jwt, accountURN, traceSpan }: ResolverContext
-    ) => {
-      console.log(
-        `galaxy.updateProfile: updating profile for account: ${accountURN}`
-      )
-
-      const accountClient = createAccountClient(env.Account, {
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...generateTraceContextHeaders(traceSpan),
-      })
-
-      await accountClient.setLinks.mutate({
-        name: accountURN,
-        links,
-      })
-      return true
-    },
-
-    updateGallery: async (
-      _parent: any,
-      { gallery }: { gallery: Gallery },
-      { env, jwt, accountURN, traceSpan }: ResolverContext
-    ) => {
-      console.log(
-        `galaxy.updateGallery: updating gallery for account: ${accountURN}`
-      )
-
-      const accountClient = createAccountClient(env.Account, {
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...generateTraceContextHeaders(traceSpan),
-      })
-
-      const connectedAddresses = await getConnectedCryptoAddresses({
-        accountURN,
-        Account: env.Account,
-        jwt,
-        traceSpan,
-      })
-
-      // Validation
-      const filteredGallery = await validOwnership(
-        gallery,
-        env,
-        connectedAddresses
-      )
-
-      await accountClient.setGallery.mutate({
-        name: accountURN,
-        gallery: filteredGallery,
-      })
-
-      return true
-    },
   },
   PFP: {
     __resolveType: (obj: any) => {
@@ -392,27 +307,7 @@ const ProfileResolverComposition = {
     logAnalytics(),
     temporaryConvertToPublic(),
   ],
-  'Mutation.updateProfile': [
-    requestLogging(),
-    setupContext(),
-    hasApiKey(),
-    isAuthorized(),
-    logAnalytics(),
-  ],
-  'Mutation.updateLinks': [
-    requestLogging(),
-    setupContext(),
-    hasApiKey(),
-    isAuthorized(),
-    logAnalytics(),
-  ],
-  'Mutation.updateGallery': [
-    requestLogging(),
-    setupContext(),
-    hasApiKey(),
-    isAuthorized(),
-    logAnalytics(),
-  ],
+
   'Mutation.disconnectAddress': [
     requestLogging(),
     setupContext(),

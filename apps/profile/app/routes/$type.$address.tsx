@@ -18,6 +18,7 @@ import {
 import { getProfileSession, parseJwt } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
 import { ogImageFromProfile } from '~/helpers/ogImage'
+import { getAccountProfile } from '~/helpers/profile'
 
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
@@ -78,7 +79,12 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   try {
     const user = session.get('user')
     jwt = user?.accessToken
-    profile = await ProfileKV.get<FullProfile>(accountURN, 'json')
+
+    // TODO: delete after migration
+    profile = await getAccountProfile({ jwt, accountURN }, context.traceSpan)
+
+    // TODO: Uncomment after migration
+    // profile = await ProfileKV.get<FullProfile>(accountURN, 'json')
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })

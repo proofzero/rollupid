@@ -18,10 +18,14 @@ export const getAccountProfile = async (
   },
   traceSpan: TraceSpan
 ) => {
-  // note: jwt is only important for setting profile in profile account settings
-  const profile = await ProfileKV.get<FullProfile>(accountURN, 'json')
-
-  if (profile) return profile
+  /**
+   * note: jwt is only important for setting profile in profile account settings
+   * TODO: uncomment after migrations
+   *
+   * const profile = await ProfileKV.get<FullProfile>(accountURN, 'json')
+   *
+   * if (profile) return profile
+   */
 
   // TODO: DEPRECATE THIS PROFILE MIGRATION
   const galaxyClient = await getGalaxyClient(

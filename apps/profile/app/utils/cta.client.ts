@@ -17,8 +17,8 @@ export const determineProfileCompletionStatus = (
   }
 
   const links = profile.links?.length > 0
+  const gallery = profile.gallery?.length > 0
   const connections = addresses.length > 1
-  const gallery = profile.gallery.length > 0
 
   return {
     base,
