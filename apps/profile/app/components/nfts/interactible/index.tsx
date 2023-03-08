@@ -55,10 +55,15 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
             className="object-cover
             w-full
             rounded-lg
-            md:h-[424px]
-            lg:h-[180px] 
-            xl:h-[270px]
-            2xl:h-[300px]  "
+            max-[380px]:h-[104px]
+            max-[400px]:h-[116px]
+            h-[128px]
+            min-[480px]:h-[144px]
+            min-[580px]:h-[168px]
+            sm:h-[196px]
+            md:h-[228px]
+            min-[890px]:h-[256px]
+            lg:h-[270px]"
             src={
               loadFail
                 ? missingNftSvg
@@ -87,11 +92,15 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
             className="object-cover
             w-full
             rounded-t-lg
-            md:h-[424px]
-            lg:h-[180px] 
-            xl:h-[270px]
-            2xl:h-[300px]  
-            "
+            max-[380px]:h-[104px]
+            max-[400px]:h-[116px]
+            h-[128px]
+            min-[480px]:h-[144px]
+            min-[580px]:h-[168px]
+            sm:h-[196px]
+            md:h-[228px]
+            min-[890px]:h-[256px]
+            lg:h-[270px]"
             src={
               loadFail
                 ? missingNftSvg

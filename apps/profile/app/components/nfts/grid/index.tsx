@@ -54,8 +54,6 @@ const NftGrid = ({
             <Masonry
               breakpointCols={{
                 default: 3,
-                1023: 2,
-                767: 1,
               }}
               className="flex 
               w-full
@@ -66,8 +64,7 @@ const NftGrid = ({
                */
               columnClassName="bg-clip-padding 
               min-w-[calc(33.33333%-10.667)]
-              max-[1024]:min-w-[calc(50% - 8px)]
-              max-[768]:min-w-full"
+              "
             >
               {nfts.map((nft, index) => {
                 return (

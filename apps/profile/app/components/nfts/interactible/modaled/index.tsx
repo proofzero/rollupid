@@ -69,7 +69,14 @@ const ModaledNft = ({ nft, isModal, handleRedirect }: any) => {
               className="object-cover
               w-full
               rounded-lg 
-              md:h-[424px]
+              max-[380px]:h-[104px]
+              max-[400px]:h-[116px]
+              h-[128px]
+              min-[480px]:h-[144px]
+              min-[580px]:h-[168px]
+              sm:h-[196px]
+              md:h-[228px]
+              min-[890px]:h-[256px]
               lg:h-[270px]"
               src={
                 loadFail
@@ -100,9 +107,15 @@ const ModaledNft = ({ nft, isModal, handleRedirect }: any) => {
             className="object-cover
             w-full
             rounded-t-lg 
-            md:h-[424px]
-            lg:h-[270px] 
-            xl:h-[270px]"
+            max-[380px]:h-[104px]
+            max-[400px]:h-[116px]
+            h-[128px]
+            min-[480px]:h-[144px]
+            min-[580px]:h-[168px]
+            sm:h-[196px]
+            md:h-[228px]
+            min-[890px]:h-[256px]
+            lg:h-[270px]"
             src={
               loadFail
                 ? missingNftSvg
