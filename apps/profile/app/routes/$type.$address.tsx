@@ -32,11 +32,7 @@ import ProfileLayout from '~/components/profile/layout'
 
 import defaultOG from '~/assets/social.png'
 import subtractLogo from '~/assets/subtract-logo.svg'
-import {
-  CryptoAddressType,
-  NodeType,
-  OAuthAddressType,
-} from '@kubelt/types/address'
+import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import type { AccountURN } from '@kubelt/urns/account'
 import { AccountURNSpace } from '@kubelt/urns/account'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
@@ -66,6 +62,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
   // redirect from any addressURN to its addressURNs
   if (type === 'a') {
+    // TODO: does this remain a galaxy call?
     const { account }: { account: AccountURN } =
       await galaxyClient.getAccountUrnFromAddress({
         addressURN: AddressURNSpace.urn(address),

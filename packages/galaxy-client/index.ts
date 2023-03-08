@@ -135,9 +135,6 @@ export type Mutation = {
   revokeAppAuthorization?: Maybe<Scalars['Boolean']>;
   updateAddressNickname?: Maybe<Scalars['Boolean']>;
   updateConnectedAddressesProperties?: Maybe<Scalars['Boolean']>;
-  updateGallery?: Maybe<Scalars['Boolean']>;
-  updateLinks?: Maybe<Scalars['Boolean']>;
-  updateProfile?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -159,21 +156,6 @@ export type MutationUpdateAddressNicknameArgs = {
 
 export type MutationUpdateConnectedAddressesPropertiesArgs = {
   addressURNList: Array<ConnectedAddressPropertiesUpdateInput>;
-};
-
-
-export type MutationUpdateGalleryArgs = {
-  gallery: Array<GalleryInput>;
-};
-
-
-export type MutationUpdateLinksArgs = {
-  links: Array<LinkInput>;
-};
-
-
-export type MutationUpdateProfileArgs = {
-  profile: ProfileInput;
 };
 
 export type Nft = {
@@ -519,27 +501,6 @@ export type GetAuthorizedAppsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetAuthorizedAppsQuery = { __typename?: 'Query', authorizedApps?: Array<{ __typename?: 'App', clientId: string, icon: string, title: string, timestamp: number } | null> | null };
 
-export type UpdateProfileMutationVariables = Exact<{
-  profile: ProfileInput;
-}>;
-
-
-export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile?: boolean | null };
-
-export type UpdateLinksMutationVariables = Exact<{
-  links: Array<LinkInput> | LinkInput;
-}>;
-
-
-export type UpdateLinksMutation = { __typename?: 'Mutation', updateLinks?: boolean | null };
-
-export type UpdateGalleryMutationVariables = Exact<{
-  gallery: Array<GalleryInput> | GalleryInput;
-}>;
-
-
-export type UpdateGalleryMutation = { __typename?: 'Mutation', updateGallery?: boolean | null };
-
 export type DisconnectAddressMutationVariables = Exact<{
   addressURN: Scalars['URN'];
 }>;
@@ -720,21 +681,6 @@ export const GetAuthorizedAppsDocument = gql`
     title
     timestamp
   }
-}
-    `;
-export const UpdateProfileDocument = gql`
-    mutation updateProfile($profile: ProfileInput!) {
-  updateProfile(profile: $profile)
-}
-    `;
-export const UpdateLinksDocument = gql`
-    mutation updateLinks($links: [LinkInput!]!) {
-  updateLinks(links: $links)
-}
-    `;
-export const UpdateGalleryDocument = gql`
-    mutation updateGallery($gallery: [GalleryInput!]!) {
-  updateGallery(gallery: $gallery)
 }
     `;
 export const DisconnectAddressDocument = gql`
@@ -992,15 +938,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getAuthorizedApps(variables?: GetAuthorizedAppsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthorizedAppsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetAuthorizedAppsQuery>(GetAuthorizedAppsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthorizedApps', 'query');
-    },
-    updateProfile(variables: UpdateProfileMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateProfileMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateProfileMutation>(UpdateProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateProfile', 'mutation');
-    },
-    updateLinks(variables: UpdateLinksMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateLinksMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateLinksMutation>(UpdateLinksDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateLinks', 'mutation');
-    },
-    updateGallery(variables: UpdateGalleryMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateGalleryMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateGalleryMutation>(UpdateGalleryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateGallery', 'mutation');
     },
     disconnectAddress(variables: DisconnectAddressMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<DisconnectAddressMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<DisconnectAddressMutation>(DisconnectAddressDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'disconnectAddress', 'mutation');
