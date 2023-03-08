@@ -167,7 +167,7 @@ const appSubmenuStruct: {
       {
         title: 'Audience Builder',
         icon: TbCrosshair,
-        disabled: true,
+        subroute: '/audience',
       },
     ],
   },
