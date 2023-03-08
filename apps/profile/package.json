@@ -15,7 +15,7 @@
     "dev:remix": "remix watch",
     "dev:wrangler": "wrangler dev --local --persist",
     "dev": "echo \"No dev for profile. Please use start.\"",
-    "start": "run-p 'dev:*'",
+    "start": "env-cmd --file .dev.env run-p 'dev:*'",
     "e2e": "cross-env NODE_ENV=test npx playwright test",
     "storybook": "start-storybook -p 6007",
     "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook"
@@ -87,6 +87,7 @@
     "chromatic": "6.13.1",
     "concurrently": "7.6.0",
     "css-loader": "6.7.2",
+    "env-cmd": "10.1.0",
     "eslint": "8.28.0",
     "eslint-config-airbnb-typescript": "17.0.0",
     "eslint-config-prettier": "8.5.0",
