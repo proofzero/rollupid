@@ -1,7 +1,7 @@
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 import domainSVG from '~/assets/early/domain.svg'
 
-const AppCustomDomainPage = () => (
+export default () => (
   <EarlyAccessPanel
     title="Custom Domain"
     subtitle="Configure Custom Domain"
@@ -9,5 +9,3 @@ const AppCustomDomainPage = () => (
     imgSrc={domainSVG}
   />
 )
-
-export default AppCustomDomainPage

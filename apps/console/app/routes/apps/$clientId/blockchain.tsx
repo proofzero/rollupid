@@ -1,7 +1,7 @@
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 import blockchainSVG from '~/assets/early/blockchain.svg'
 
-const AppBlockchainPage = () => (
+export default () => (
   <EarlyAccessPanel
     title="Blockchain"
     subtitle="Heading"
@@ -9,5 +9,3 @@ const AppBlockchainPage = () => (
     imgSrc={blockchainSVG}
   />
 )
-
-export default AppBlockchainPage

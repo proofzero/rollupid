@@ -1,7 +1,7 @@
 import designerSVG from '~/assets/early/designer.svg'
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 
-const AppDesignerPage = () => (
+export default () => (
   <EarlyAccessPanel
     title="Designer"
     subtitle="Customise your login experience"
@@ -9,5 +9,3 @@ const AppDesignerPage = () => (
     imgSrc={designerSVG}
   />
 )
-
-export default AppDesignerPage
