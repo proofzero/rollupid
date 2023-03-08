@@ -142,7 +142,7 @@ const appSubmenuStruct: {
       {
         title: 'Custom Domain',
         icon: TbWorld,
-        disabled: true,
+        subroute: '/domain',
       },
     ],
   },
