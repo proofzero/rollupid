@@ -15,7 +15,8 @@ const ModaledNft = ({ nft, isModal, handleRedirect }: any) => {
 
   const [loadFail, setLoadFail] = useState(false)
 
-  const url = gatewayFromIpfs(nft.url)
+  const url = gatewayFromIpfs(nft.url ?? nft.thumbnailUrl)
+
   return (
     <>
       {isModal ? (
@@ -78,11 +79,7 @@ const ModaledNft = ({ nft, isModal, handleRedirect }: any) => {
               md:h-[228px]
               min-[890px]:h-[256px]
               lg:h-[270px]"
-              src={
-                loadFail
-                  ? missingNftSvg
-                  : gatewayFromIpfs(nft.url ?? nft.thumbnailUrl)
-              }
+              src={loadFail ? missingNftSvg : url}
               onError={(e) => setLoadFail(true)}
               alt="collection-item"
             />
@@ -116,11 +113,7 @@ const ModaledNft = ({ nft, isModal, handleRedirect }: any) => {
             md:h-[228px]
             min-[890px]:h-[256px]
             lg:h-[270px]"
-            src={
-              loadFail
-                ? missingNftSvg
-                : gatewayFromIpfs(nft.url ?? nft.thumbnailUrl)
-            }
+            src={loadFail ? missingNftSvg : url}
             onError={(e) => setLoadFail(true)}
             alt="collection representative"
           />

@@ -47,7 +47,7 @@ export default /* GraphQL */ `
   }
 
   type Id {
-    tokenId: String
+    tokenId: String!
   }
 
   type TokenURI {
@@ -72,11 +72,11 @@ export default /* GraphQL */ `
     timeLastUpdated: String
   }
   type NFT {
-    contract: Contract
+    contract: Contract!
     title: String
     balance: String
     description: String
-    id: Id
+    id: Id!
     tokenUri: TokenURI
     media: [NFTMedia!]!
     error: String

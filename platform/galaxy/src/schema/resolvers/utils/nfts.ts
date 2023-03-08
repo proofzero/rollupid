@@ -11,7 +11,8 @@ import Env from '../../../env'
 
 // -------------------- TYPES --------------------------------------------------
 
-import type { Nft, NftContract, OwnedNfTs } from '../typedefs'
+import type { Nft, NftContract } from '../typedefs'
+import type { GetNFTsResult } from '../../../../../../packages/alchemy-client'
 
 import { Gallery, GalleryItem } from '@kubelt/platform.account/src/types'
 
@@ -321,6 +322,7 @@ export const validOwnership = async (
 
   const [ethContractAddressesSet, polyContractAddressesSet] = gallery.reduce(
     ([ethereum, polygon], nft) => {
+      // type error will go away after cleaning gallery schema
       nft.chain.chain === 'eth'
         ? ethereum.add(nft.contract.address)
         : polygon.add(nft.contract.address)
@@ -342,30 +344,32 @@ export const validOwnership = async (
   */
   const validator = new Map<string, string[]>()
 
-  const nfts: [OwnedNfTs, OwnedNfTs] = await Promise.all(
-    connectedAddresses.map((address) =>
-      Promise.all([
-        ethContractAddresses.length
-          ? ethereumClient.getNFTs({
-              owner: address,
-              contractAddresses: ethContractAddresses,
-            })
-          : [],
-        polyContractAddresses.length
-          ? polygonClient.getNFTs({
-              owner: address,
-              contractAddresses: polyContractAddresses,
-            })
-          : [],
-      ])
+  const nfts: GetNFTsResult[] = (
+    await Promise.all(
+      connectedAddresses.map((address) =>
+        Promise.all([
+          ethContractAddresses.length
+            ? ethereumClient.getNFTs({
+                owner: address,
+                contractAddresses: ethContractAddresses,
+              })
+            : ({ ownedNfts: [] } as GetNFTsResult),
+          polyContractAddresses.length
+            ? polygonClient.getNFTs({
+                owner: address,
+                contractAddresses: polyContractAddresses,
+              })
+            : ({ ownedNfts: [] } as GetNFTsResult),
+        ])
+      )
     )
-  )
+  ).flat()
 
   // .flat because previous Promise.all returns an array of arrays,
   // we just need internal arrays of nfts. These internal arrays are arrays
   // of objects with ownedNfts property
   // These methods populate validator map to then check if the user owns nfts.
-  nfts.flat().forEach((deeperNfts) => {
+  nfts.forEach((deeperNfts) => {
     deeperNfts.ownedNfts?.forEach((nft) => {
       const val = validator.get(nft.contract?.address as string)
       validator.set(
@@ -376,6 +380,7 @@ export const validOwnership = async (
   })
 
   return gallery.filter((nft) => {
+    // type error will go away after cleaning gallery schema
     return validator.get(nft.contract.address)?.includes(nft.tokenId)
   })
 }
@@ -453,8 +458,8 @@ const decorateNft = (nft: Nft): GalleryItem => {
     thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
     error: error,
     title: nft.title,
-    contract: nft.contract!,
-    tokenId: nft.id?.tokenId!,
+    contract: nft.contract,
+    tokenId: nft.id.tokenId,
     chain: nft.chain!,
     collectionTitle: nft.contractMetadata?.name,
     properties: nft.metadata?.properties,
