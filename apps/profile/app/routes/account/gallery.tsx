@@ -41,7 +41,7 @@ import NoCryptoAddresses from '~/components/accounts/NoCryptoAddresses'
 
 // Other helpers
 import { getProfileSession, parseJwt } from '~/utils/session.server'
-import type { Node, GalleryInput } from '@kubelt/galaxy-client'
+import type { Node } from '@kubelt/galaxy-client'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import {
   toast,
@@ -49,8 +49,8 @@ import {
   ToastType,
 } from '@kubelt/design-system/src/atoms/toast'
 import type { FullProfile } from '~/types'
-import type { GalleryItem } from '@kubelt/platform/account/src/types'
 import type { Maybe } from 'graphql/jsutils/Maybe'
+import type { GalleryItem } from '~/types'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
@@ -66,7 +66,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   if (!updatedGallery) {
     throw new Error('Gallery should not be empty')
   }
-  const nfts: GalleryInput[] = JSON.parse(updatedGallery)
+  const nfts: GalleryItem[] = JSON.parse(updatedGallery)
 
   // TODO: replace with zod?
   nfts.forEach((nft) => {

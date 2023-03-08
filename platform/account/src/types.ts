@@ -1,11 +1,6 @@
 import { z } from 'zod'
 import { AddressListSchema } from './jsonrpc/validators/addressList'
-import {
-  ProfileSchema,
-  LinksSchema,
-  GallerySchema,
-  GalleryItemSchema,
-} from './jsonrpc/validators/profile'
+import { ProfileSchema } from './jsonrpc/validators/profile'
 import { DeploymentMetadata } from '@kubelt/types'
 
 export interface Environment {
@@ -15,11 +10,7 @@ export interface Environment {
   ServiceDeploymentMetadata: DeploymentMetadata
 }
 
-export type AddressList = z.infer<typeof AddressListSchema>
-
 // TODO: move to types packages
+export type AddressList = z.infer<typeof AddressListSchema>
 export type Profile = z.infer<typeof ProfileSchema>
-export type Links = z.infer<typeof LinksSchema>
-export type GalleryItem = z.infer<typeof GalleryItemSchema>
-export type Gallery = z.infer<typeof GallerySchema>
 export type Addresses = z.infer<typeof AddressListSchema>

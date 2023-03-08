@@ -123,19 +123,6 @@ export default /* GraphQL */ `
     ownedNfts: [NFT!]!
   }
 
-  type Gallery {
-    url: String
-    thumbnailUrl: String
-    error: Boolean!
-    title: String
-    contract: Contract!
-    tokenId: String!
-    chain: Chain!
-    collectionTitle: String
-    properties: [NFTProperty!]
-    details: [NFTDetail!]!
-  }
-
   input ContractInput {
     address: String!
   }
@@ -155,19 +142,6 @@ export default /* GraphQL */ `
     name: String!
     value: String!
     isCopyable: Boolean!
-  }
-
-  input GalleryInput {
-    url: String
-    thumbnailUrl: String
-    error: Boolean!
-    title: String
-    contract: ContractInput!
-    tokenId: String!
-    chain: ChainInput!
-    collectionTitle: String
-    properties: [NFTPropertyInput!]
-    details: [NFTDetailInput!]!
   }
 
   type Query {

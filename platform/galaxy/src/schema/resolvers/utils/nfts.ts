@@ -14,8 +14,6 @@ import Env from '../../../env'
 import type { Nft, NftContract } from '../typedefs'
 import type { GetNFTsResult } from '../../../../../../packages/alchemy-client'
 
-import { Gallery, GalleryItem } from '@kubelt/platform.account/src/types'
-
 type AlchemyClients = {
   ethereumClient: AlchemyClient
   polygonClient: AlchemyClient
@@ -80,8 +78,8 @@ export const normalizeContracts = ({
     ct.ownedNfts = [
       {
         title: ct.title,
-        id: { tokenId: ct.tokenId },
-        tokenUri: { raw: ct.media?.raw, gateway: ct.media?.gateway },
+        id: { tokenId: ct.tokenId! },
+        tokenUri: { raw: ct.media?.[0].raw, gateway: ct.media?.[0].gateway },
         media: ct.media,
         contractMetadata: {
           name: ct.name,
@@ -310,174 +308,4 @@ export const getNftMetadataForAllChains = async (
     console.error(new GraphQLYogaError(ex as string))
     return []
   }
-}
-
-// -------------------- GALLERY VERIFICATION -----------------------------------
-export const validOwnership = async (
-  gallery: Gallery,
-  env: ResolverContext['env'],
-  connectedAddresses: string[]
-) => {
-  const { ethereumClient, polygonClient } = getAlchemyClients({ env })
-
-  const [ethContractAddressesSet, polyContractAddressesSet] = gallery.reduce(
-    ([ethereum, polygon], nft) => {
-      // type error will go away after cleaning gallery schema
-      nft.chain.chain === 'eth'
-        ? ethereum.add(nft.contract.address)
-        : polygon.add(nft.contract.address)
-      return [ethereum, polygon]
-    },
-    [new Set([] as string[]), new Set([] as string[])]
-  )
-
-  const ethContractAddresses = Array.from(ethContractAddressesSet)
-  const polyContractAddresses = Array.from(polyContractAddressesSet)
-
-  /** Struct of this map is like this:
-   {
-    contractAddress1: [all tokens that user own in this contract],
-    contractAddress2: [all tokens that user own in this contract],
-    ...
-    contractAddressN: [all tokens that user own in this contract],
-    } 
-  */
-  const validator = new Map<string, string[]>()
-
-  const nfts: GetNFTsResult[] = (
-    await Promise.all(
-      connectedAddresses.map((address) =>
-        Promise.all([
-          ethContractAddresses.length
-            ? ethereumClient.getNFTs({
-                owner: address,
-                contractAddresses: ethContractAddresses,
-              })
-            : ({ ownedNfts: [] } as GetNFTsResult),
-          polyContractAddresses.length
-            ? polygonClient.getNFTs({
-                owner: address,
-                contractAddresses: polyContractAddresses,
-              })
-            : ({ ownedNfts: [] } as GetNFTsResult),
-        ])
-      )
-    )
-  ).flat()
-
-  // .flat because previous Promise.all returns an array of arrays,
-  // we just need internal arrays of nfts. These internal arrays are arrays
-  // of objects with ownedNfts property
-  // These methods populate validator map to then check if the user owns nfts.
-  nfts.forEach((deeperNfts) => {
-    deeperNfts.ownedNfts?.forEach((nft) => {
-      const val = validator.get(nft.contract?.address as string)
-      validator.set(
-        nft.contract?.address as string,
-        (val ? val : []).concat([nft.id?.tokenId as string])
-      )
-    })
-  })
-
-  return gallery.filter((nft) => {
-    // type error will go away after cleaning gallery schema
-    return validator.get(nft.contract.address)?.includes(nft.tokenId)
-  })
-}
-
-// -------- TEMPORARY MIGRATION PART -------------------------------------------
-const gatewayFromIpfs = (
-  ipfsUrl: string | undefined | null
-): string | undefined | null => {
-  const regex =
-    /ipfs:\/\/(?<prefix>ipfs\/)?(?<cid>[a-zA-Z0-9]+)(?<path>(?:\/[\w.-]+)+)?/
-  const match = ipfsUrl?.match(regex)
-
-  if (!ipfsUrl || !match) return ipfsUrl
-
-  const prefix = match[1]
-  const cid = match[2]
-  const path = match[3]
-
-  return `https://nftstorage.link/${prefix ? `${prefix}` : 'ipfs/'}${cid}${
-    path ? `${path}` : ''
-  }`
-}
-
-const capitalizeFirstLetter = (string?: string) => {
-  return string ? string.charAt(0).toUpperCase() + string.slice(1) : null
-}
-
-export const sortNftsFn = (a: any, b: any) => {
-  if (b.collectionTitle === null) {
-    return -1
-  } else {
-    return a.collectionTitle?.localeCompare(b.collectionTitle) || 1
-  }
-}
-
-const decorateNft = (nft: Nft): GalleryItem => {
-  const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
-  let error = false
-  if (nft.error) {
-    error = true
-  }
-
-  const details = [
-    {
-      name: 'NFT Contract',
-      value: nft.contract?.address,
-      isCopyable: true,
-    },
-    {
-      name: 'NFT Standard',
-      value: nft.contractMetadata?.tokenType?.toString(),
-      isCopyable: false,
-    },
-    {
-      name: 'Chain',
-      value: capitalizeFirstLetter(nft.chain?.chain),
-      isCopyable: false,
-    },
-    {
-      name: 'Network',
-      value: capitalizeFirstLetter(nft.chain?.network),
-      isCopyable: false,
-    },
-  ]
-  if (nft.id && nft.id.tokenId) {
-    details.push({
-      name: 'Token ID',
-      value: BigInt(nft.id.tokenId).toString(10),
-      isCopyable: true,
-    })
-  }
-
-  return {
-    url: gatewayFromIpfs(media?.raw),
-    thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
-    error: error,
-    title: nft.title,
-    contract: nft.contract,
-    tokenId: nft.id.tokenId,
-    chain: nft.chain!,
-    collectionTitle: nft.contractMetadata?.name,
-    properties: nft.metadata?.properties,
-    details: details,
-  }
-}
-
-/**
- * Sort and filter errors out
- */
-export const decorateNfts = (ownedNfts: Nft[]) => {
-  const decoratedNfts = ownedNfts.map((nft: Nft) => {
-    return decorateNft(nft)
-  })
-
-  const filteredNfts =
-    decoratedNfts?.filter((n: any) => !n.error && n.thumbnailUrl) || []
-
-  const sortedNfts = filteredNfts.sort(sortNftsFn)
-  return sortedNfts
 }

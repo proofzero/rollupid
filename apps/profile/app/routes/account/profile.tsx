@@ -35,8 +35,6 @@ export const action: ActionFunction = async ({ request, context }) => {
   const displayName = formData.get('displayName')?.toString()
   const job = formData.get('job')?.toString()
   const location = formData.get('location')?.toString()
-  const website = formData.get('website')?.toString()
-  const bio = formData.get('bio')?.toString()
   const image = formData.get('pfp_url') as string
   let computedIsToken =
     formData.get('pfp_isToken')?.toString() === '1' ? true : false
@@ -46,8 +44,6 @@ export const action: ActionFunction = async ({ request, context }) => {
     displayName,
     job,
     location,
-    bio,
-    website,
     pfp: {
       image,
       isToken: computedIsToken,
@@ -71,8 +67,6 @@ export default function AccountSettingsProfile() {
     displayName,
     job,
     location,
-    bio,
-    website,
     pfp,
     // address,
     // generatedPfp,
@@ -352,36 +346,6 @@ export default function AccountSettingsProfile() {
               )}
             </div>
           </div>
-
-          <InputText
-            type="url"
-            id="website"
-            heading="Website"
-            Icon={FaGlobe}
-            defaultValue={website || ''}
-            error={actionData?.errors?.website}
-          />
-
-          {actionData?.errors?.website && (
-            <Text className="mb-1.5 text-gray-400" size="xs" weight="normal">
-              {actionData.errors.website}
-            </Text>
-          )}
-
-          <InputTextarea
-            id="bio"
-            heading="Bio"
-            charLimit={256}
-            rows={3}
-            defaultValue={bio || ''}
-            error={actionData?.errors.bio}
-          />
-
-          {actionData?.errors.bio && (
-            <Text className="mb-1.5 text-gray-400" size="xs" weight="normal">
-              {actionData?.errors.bio}
-            </Text>
-          )}
 
           {/* Form where this button is used should have 
           an absolute relative position

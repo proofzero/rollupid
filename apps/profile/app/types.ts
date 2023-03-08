@@ -54,12 +54,38 @@ export type FullProfile = {
     image: string
     isToken?: boolean
   }
-  bio?: string
   job?: string
   location?: string
-  website?: string
   links: Link[]
   gallery: Gallery[]
   handle?: string
   version: number
+}
+
+export type GalleryItem = {
+  url?: string | null
+  thumbnailUrl?: string | null
+  error: boolean
+  title?: string | null
+  contract: {
+    address: string
+  }
+  tokenId: string
+  chain: { chain: string; network: string }
+  collectionTitle: string | null
+  properties?:
+    | {
+        display: string
+        name: string
+        value: string
+      }[]
+    | null
+
+  details:
+    | {
+        isCopyable: boolean
+        name: string
+        value?: string | null
+      }[]
+    | null
 }

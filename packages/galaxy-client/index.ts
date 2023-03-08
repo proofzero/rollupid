@@ -82,51 +82,9 @@ export type Edge = {
   tag: Scalars['String'];
 };
 
-export type Gallery = {
-  __typename?: 'Gallery';
-  chain: Chain;
-  collectionTitle?: Maybe<Scalars['String']>;
-  contract: Contract;
-  details: Array<NftDetail>;
-  error: Scalars['Boolean'];
-  properties?: Maybe<Array<NftProperty>>;
-  thumbnailUrl?: Maybe<Scalars['String']>;
-  title?: Maybe<Scalars['String']>;
-  tokenId: Scalars['String'];
-  url?: Maybe<Scalars['String']>;
-};
-
-export type GalleryInput = {
-  chain: ChainInput;
-  collectionTitle?: InputMaybe<Scalars['String']>;
-  contract: ContractInput;
-  details: Array<NftDetailInput>;
-  error: Scalars['Boolean'];
-  properties?: InputMaybe<Array<NftPropertyInput>>;
-  thumbnailUrl?: InputMaybe<Scalars['String']>;
-  title?: InputMaybe<Scalars['String']>;
-  tokenId: Scalars['String'];
-  url?: InputMaybe<Scalars['String']>;
-};
-
 export type Id = {
   __typename?: 'Id';
   tokenId: Scalars['String'];
-};
-
-export type Link = {
-  __typename?: 'Link';
-  name?: Maybe<Scalars['String']>;
-  provider?: Maybe<Scalars['String']>;
-  url?: Maybe<Scalars['String']>;
-  verified?: Maybe<Scalars['Boolean']>;
-};
-
-export type LinkInput = {
-  name: Scalars['String'];
-  provider?: InputMaybe<Scalars['String']>;
-  url: Scalars['String'];
-  verified?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type Mutation = {
@@ -360,22 +318,18 @@ export type PfpInput = {
 
 export type Profile = {
   __typename?: 'Profile';
-  bio?: Maybe<Scalars['String']>;
   displayName?: Maybe<Scalars['String']>;
   handle?: Maybe<Scalars['String']>;
   job?: Maybe<Scalars['String']>;
   location?: Maybe<Scalars['String']>;
   pfp?: Maybe<Pfp>;
-  website?: Maybe<Scalars['String']>;
 };
 
 export type ProfileInput = {
-  bio?: InputMaybe<Scalars['String']>;
   displayName?: InputMaybe<Scalars['String']>;
   job?: InputMaybe<Scalars['String']>;
   location?: InputMaybe<Scalars['String']>;
   pfp?: InputMaybe<PfpInput>;
-  website?: InputMaybe<Scalars['String']>;
 };
 
 export type Query = {
@@ -387,8 +341,6 @@ export type Query = {
   connectedAddresses?: Maybe<Array<Node>>;
   contractsForAddress?: Maybe<NftContracts>;
   ensProfile: CryptoAddressProfile;
-  gallery?: Maybe<Array<Gallery>>;
-  links?: Maybe<Array<Link>>;
   nftsForAddress?: Maybe<OwnedNfTs>;
   profile?: Maybe<Profile>;
   scopes: Array<Maybe<Scope>>;
@@ -424,16 +376,6 @@ export type QueryContractsForAddressArgs = {
 
 export type QueryEnsProfileArgs = {
   addressOrEns: Scalars['String'];
-};
-
-
-export type QueryGalleryArgs = {
-  targetAccountURN?: InputMaybe<Scalars['URN']>;
-};
-
-
-export type QueryLinksArgs = {
-  targetAccountURN?: InputMaybe<Scalars['URN']>;
 };
 
 
@@ -480,14 +422,7 @@ export type GetProfileQueryVariables = Exact<{
 }>;
 
 
-export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, gallery?: Array<{ __typename?: 'Gallery', url?: string | null, thumbnailUrl?: string | null, error: boolean, title?: string | null, tokenId: string, collectionTitle?: string | null, contract: { __typename?: 'Contract', address: string }, chain: { __typename?: 'Chain', chain: string, network: string }, properties?: Array<{ __typename?: 'NFTProperty', name: string, value: string, display: string }> | null, details: Array<{ __typename?: 'NFTDetail', name: string, value: string, isCopyable: boolean }> }> | null };
-
-export type GetGalleryQueryVariables = Exact<{
-  targetAccountURN?: InputMaybe<Scalars['URN']>;
-}>;
-
-
-export type GetGalleryQuery = { __typename?: 'Query', gallery?: Array<{ __typename?: 'Gallery', url?: string | null, thumbnailUrl?: string | null, error: boolean, title?: string | null, tokenId: string, collectionTitle?: string | null, contract: { __typename?: 'Contract', address: string }, chain: { __typename?: 'Chain', chain: string, network: string }, properties?: Array<{ __typename?: 'NFTProperty', name: string, value: string, display: string }> | null, details: Array<{ __typename?: 'NFTDetail', name: string, value: string, isCopyable: boolean }> }> | null };
+export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, location?: string | null, job?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null };
 
 export type GetConnectedAddressesQueryVariables = Exact<{
   targetAccountURN?: InputMaybe<Scalars['URN']>;
@@ -599,68 +534,6 @@ export const GetProfileDocument = gql`
     handle
     location
     job
-    bio
-    website
-  }
-  links(targetAccountURN: $targetAccountURN) {
-    name
-    url
-    verified
-    provider
-  }
-  gallery(targetAccountURN: $targetAccountURN) {
-    url
-    thumbnailUrl
-    error
-    title
-    contract {
-      address
-    }
-    tokenId
-    chain {
-      chain
-      network
-    }
-    collectionTitle
-    properties {
-      name
-      value
-      display
-    }
-    details {
-      name
-      value
-      isCopyable
-    }
-  }
-}
-    `;
-export const GetGalleryDocument = gql`
-    query getGallery($targetAccountURN: URN) {
-  gallery(targetAccountURN: $targetAccountURN) {
-    url
-    thumbnailUrl
-    error
-    title
-    contract {
-      address
-    }
-    tokenId
-    chain {
-      chain
-      network
-    }
-    collectionTitle
-    properties {
-      name
-      value
-      display
-    }
-    details {
-      name
-      value
-      isCopyable
-    }
   }
 }
     `;
@@ -929,9 +802,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
   return {
     getProfile(variables?: GetProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProfileQuery>(GetProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfile', 'query');
-    },
-    getGallery(variables?: GetGalleryQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetGalleryQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetGalleryQuery>(GetGalleryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getGallery', 'query');
     },
     getConnectedAddresses(variables?: GetConnectedAddressesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetConnectedAddressesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetConnectedAddressesQuery>(GetConnectedAddressesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getConnectedAddresses', 'query');

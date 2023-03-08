@@ -24,29 +24,7 @@ export const getAccountProfile = async (
 
   if (profile && profile.version) return profile
 
-  // TODO: DEPRECATE THIS PROFILE MIGRATION
-  const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(traceSpan)
-  )
-
-  const profileRes = await galaxyClient.getProfile(
-    accountURN ? { targetAccountURN: accountURN } : undefined,
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
-
-  const { profile: acctProfile, links, gallery } = profileRes
-
-  const fullProfile = {
-    ...acctProfile,
-    links,
-    gallery,
-    // note: It gets called only from BFF so env vars are in the context
-    version: PROFILE_VERSION,
-  } as FullProfile
-
-  await ProfileKV.put(accountURN, JSON.stringify(fullProfile))
-  return { ...fullProfile }
-  // END OF PROFILE MIGRATION
+  // TODO: validate gallery here
 }
 
 export const getAuthorizedApps = async (jwt: string, traceSpan: TraceSpan) => {
