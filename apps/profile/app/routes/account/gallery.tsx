@@ -40,17 +40,14 @@ import PfpNftModal from '~/components/accounts/PfpNftModal'
 import NoCryptoAddresses from '~/components/accounts/NoCryptoAddresses'
 
 // Other helpers
-import { getProfileSession } from '~/utils/session.server'
-import { getGalaxyClient } from '~/helpers/clients'
+import { getProfileSession, parseJwt } from '~/utils/session.server'
 import type { Node, GalleryInput } from '@kubelt/galaxy-client'
 import { getMoreNftsModal } from '~/helpers/nfts'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import {
   toast,
   Toaster,
   ToastType,
 } from '@kubelt/design-system/src/atoms/toast'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 import type { FullProfile } from '~/types'
 
 export const action: ActionFunction = async ({ request, context }) => {
@@ -59,6 +56,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   const user = session.get('user')
 
   const jwt = user.accessToken
+  const { sub: accountURN } = parseJwt(jwt)
 
   let errors = new Map()
 
@@ -97,17 +95,11 @@ export const action: ActionFunction = async ({ request, context }) => {
     }
   }
 
-  const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(context.traceSpan)
-  )
-  await galaxyClient.updateGallery(
-    {
-      gallery: nfts,
-    },
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
-
-  // TODO: update gallery on account
+  const currentProfile = await ProfileKV.get<FullProfile>(accountURN!, 'json')
+  const updatedProfile = Object.assign(currentProfile || {}, {
+    gallery: nfts,
+  })
+  await ProfileKV.put(accountURN!, JSON.stringify(updatedProfile))
 
   return true
 }

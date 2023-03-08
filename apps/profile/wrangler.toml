@@ -25,7 +25,7 @@ services = [
 ]
 
 kv_namespaces = [
-  { binding = "ProfileKV", id = "6510b0e703694f0388ced3de37df869d" }
+  { binding = "ProfileKV", id = "6510b0e703694f0388ced3de37df869d", preview_id = "b827cd51f02e4a569ed7b9ff2c680a75" }
 ]
 
 [vars]

@@ -16,7 +16,7 @@ import {
   InvalidTokenError,
 } from '@kubelt/utils/token'
 
-import type { RollupAuth } from '~/types'
+import type { FullProfile, RollupAuth } from '~/types'
 
 // @ts-ignore
 const sessionSecret = SECRET_SESSION_SALT
@@ -53,6 +53,22 @@ export const getRollupAuthenticator = () => {
       callbackURL: REDIRECT_URI,
     },
     async ({ accessToken, refreshToken, extraParams }) => {
+      const parsedId = parseJwt(extraParams.id_token)
+      console.debug('STRATEGY', { parsedId, extraParams })
+
+      const { sub, name, picture } = parsedId
+      const profile = await ProfileKV.get(sub!, 'json')
+      console.debug({ profile })
+      if (!profile) {
+        console.log("Profile doesn't exist, creating...")
+        const newProfile = {
+          displayName: name,
+          pfp: {
+            image: picture,
+          },
+        } as FullProfile
+        await ProfileKV.put(sub!, JSON.stringify(newProfile))
+      }
       return { accessToken, refreshToken, extraParams }
     }
   )

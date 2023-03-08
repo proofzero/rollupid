@@ -8,29 +8,27 @@ import {
 import { FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import InputText from '~/components/inputs/InputText'
-import { requireJWT } from '~/utils/session.server'
+import { getProfileSession, parseJwt } from '~/utils/session.server'
 import InputTextarea from '~/components/inputs/InputTextarea'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
-import {
-  gatewayFromIpfs,
-  getAuthzHeaderConditionallyFromToken,
-} from '@kubelt/utils'
+import { gatewayFromIpfs } from '@kubelt/utils'
 
 import PfpNftModal from '~/components/accounts/PfpNftModal'
 
 import { useEffect, useRef, useState, useMemo } from 'react'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import SaveButton from '~/components/accounts/SaveButton'
-import { getGalaxyClient } from '~/helpers/clients'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import type { Profile } from '@kubelt/galaxy-client'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import type { FullProfile } from '~/types'
 
 export const action: ActionFunction = async ({ request, context }) => {
-  const jwt = await requireJWT(request)
+  const session = await getProfileSession(request)
+  const user = session.get('user')
+  const { sub: accountURN } = parseJwt(user.accessToken)
 
   const formData = await request.formData()
 
@@ -42,27 +40,20 @@ export const action: ActionFunction = async ({ request, context }) => {
   const image = formData.get('pfp_url') as string
   let computedIsToken =
     formData.get('pfp_isToken')?.toString() === '1' ? true : false
-  const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(context.traceSpan)
-  )
-  // TODO: handle and return form errors
-  await galaxyClient.updateProfile(
-    {
-      profile: {
-        displayName,
-        // TODO: support for default address
-        job,
-        location,
-        bio,
-        website,
-        pfp: {
-          image,
-          isToken: computedIsToken,
-        },
-      },
+
+  const currentProfile = await ProfileKV.get<FullProfile>(accountURN!, 'json')
+  const updatedProfile = Object.assign(currentProfile || {}, {
+    displayName,
+    job,
+    location,
+    bio,
+    website,
+    pfp: {
+      image,
+      isToken: computedIsToken,
     },
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
+  })
+  await ProfileKV.put(accountURN!, JSON.stringify(updatedProfile))
 
   return null
 }
@@ -164,7 +155,6 @@ export default function AccountSettingsProfile() {
   const [loadedNfts, setLoadedNfts] = useState([] as any[])
   const [pageKey, setPageLink] = useState<string | undefined>()
   const [loading, setLoading] = useState(true)
-  const [isOpen, setIsOpen] = useState(false)
   const [collection, setCollection] = useState('')
 
   const modalFetcher = useFetcher()
