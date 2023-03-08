@@ -42,6 +42,7 @@ MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL = "https://test.nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
+PROFILE_VERSION = 1
 
 [site]
 bucket = "./public"
@@ -84,6 +85,7 @@ MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL = "https://test.nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
+PROFILE_VERSION = 1
 
 # next (staging)
 # ------------------------------------------------------------------------------
@@ -119,6 +121,7 @@ MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL = "https://test.nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
+PROFILE_VERSION = 1
 
 # current (production)
 # ------------------------------------------------------------------------------
@@ -152,3 +155,4 @@ MINTPFP_CONTRACT_ADDRESS = "0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
 NFTAR_URL = "https://nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 1
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
+PROFILE_VERSION = 1

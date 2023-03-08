@@ -46,7 +46,8 @@ const NftGrid = ({
         <>
           {/* GENERIC GRID FOR ALL NFT-RELATED COMPONENTS */}
           <InfiniteScroll
-            dataLength={nfts.length} //This is important field to render the next data
+            dataLength={nfts.length}
+            // This is important field to render the next data
             next={preload ? () => {} : (getMoreNfts as () => void)}
             hasMore={preload ? false : pageKey != null}
             loader={<Spinner />}
@@ -73,7 +74,7 @@ const NftGrid = ({
                     className="flex
                       justify-center
                       min-w-full
-                      mb-10"
+                      mb-6"
                   >
                     {nftRenderer(
                       nft,

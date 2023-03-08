@@ -22,10 +22,7 @@ import { getAccountProfile } from '~/helpers/profile'
 
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import {
-  gatewayFromIpfs,
-  getAuthzHeaderConditionallyFromToken,
-} from '@kubelt/utils'
+import { gatewayFromIpfs } from '@kubelt/utils'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
 import ProfileTabs from '~/components/profile/tabs/tabs'

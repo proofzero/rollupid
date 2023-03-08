@@ -20,4 +20,5 @@ declare global {
   const Images: Fetcher
 
   const ProfileKV: KVNamespace
+  const PROFILE_VERSION: number
 }

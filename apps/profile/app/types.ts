@@ -61,4 +61,5 @@ export type FullProfile = {
   links: Link[]
   gallery: Gallery[]
   handle?: string
+  version: number
 }
