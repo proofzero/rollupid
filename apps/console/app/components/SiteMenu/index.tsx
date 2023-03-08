@@ -157,7 +157,7 @@ const appSubmenuStruct: {
       {
         title: 'KYC',
         icon: TbScan,
-        disabled: true,
+        subroute: '/kyc',
       },
       {
         title: 'Messaging',
