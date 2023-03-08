@@ -8,8 +8,7 @@ import {
   useFetcher,
 } from '@remix-run/react'
 
-import { requireJWT } from '~/utils/session.server'
-import { getGalaxyClient } from '~/helpers/clients'
+import { getProfileSession, parseJwt } from '~/utils/session.server'
 
 import { HiOutlineTrash } from 'react-icons/hi'
 import { FiEdit } from 'react-icons/fi'
@@ -24,14 +23,12 @@ import { SortableList } from '@kubelt/design-system/src/atoms/lists/SortableList
 import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 
-import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import type { ActionFunction } from '@remix-run/cloudflare'
 
 import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import { imageFromAddressType } from '~/helpers'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { FullProfile } from '~/types'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 /**
  * Prepares Crypto and OAuth profiles
@@ -106,7 +103,10 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
 }
 
 export const action: ActionFunction = async ({ request, context }) => {
-  const jwt = await requireJWT(request)
+  const session = await getProfileSession(request)
+  const user = session.get('user')
+
+  const { sub: accountURN } = parseJwt(user.accessToken)
 
   const formDataText = await request.text()
   const formData = qs.parse(formDataText)
@@ -142,16 +142,12 @@ export const action: ActionFunction = async ({ request, context }) => {
   if (Object.keys(errors).length) {
     return { errors }
   }
-  const galaxyClient = await getGalaxyClient({
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
 
-  await galaxyClient.updateLinks(
-    {
-      links: updatedLinks,
-    },
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
+  const currentProfile = await ProfileKV.get<FullProfile>(accountURN!, 'json')
+  const updatedProfile = Object.assign(currentProfile || {}, {
+    links: updatedLinks,
+  })
+  await ProfileKV.put(accountURN!, JSON.stringify(updatedProfile))
 
   return { updatedLinks }
 }

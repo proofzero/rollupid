@@ -9,7 +9,75 @@ export type GetNFTsParams = {
   pageSize?: number
 }
 
-export type GetNFTsResult = unknown
+enum OpenSeaSafeListStatus {
+  Approved = 'approved',
+  NotRequested = 'not_requested',
+  Requested = 'requested',
+  Verified = 'verified',
+}
+
+enum TokenType {
+  Erc721 = 'ERC721',
+  Erc1155 = 'ERC1155',
+  Unknown = 'UNKNOWN',
+}
+
+export type GetNFTsResult = {
+  ownedNfts: {
+    balance?: string | null
+    chain?: {
+      chain: string
+      network: string
+    } | null
+    contract?: { address: string } | null
+    contractMetadata?: {
+      name?: string | null
+      openSea: {
+        collectionName?: string | null
+        description?: string | null
+        discordUrl?: string | null
+        externalUrl?: string | null
+        floorPrice?: number | null
+        imageUrl?: string | null
+        safeListRequestStatus?: OpenSeaSafeListStatus | null
+        twitterUsername?: string | null
+      }
+      symbol?: string | null
+      tokenType?: TokenType | null
+      totalSupply?: string | null
+    } | null
+    description?: string | null
+    error?: string | null
+    id?: { tokenId?: string | null } | null
+    media: {
+      bytes?: string | null
+      format?: string | null
+      gateway?: string | null
+      raw?: string | null
+      thumbnail?: string | null
+    }[]
+    metadata?: {
+      background_color?: string | null
+      description?: string | null
+      external_url?: string | null
+      image?: string | null
+      media: {
+        bytes?: string | null
+        format?: string | null
+        gateway?: string | null
+        raw?: string | null
+        thumbnail?: string | null
+      }[]
+      name?: string | null
+      timeLastUpdated?: string | null
+    }
+    title?: string | null
+    tokenUri?: {
+      gateway?: string | null
+      raw?: string | null
+    } | null
+  }[]
+}
 
 export type GetContractsForOwnerParams = {
   address: string
@@ -147,6 +215,7 @@ export class AlchemyClient {
       })
     }
 
+    // Is supported ONLY on ethereum and polygon mainnets
     ;['SPAM'].forEach((filter) => {
       url.searchParams.append('excludeFilters[]', filter)
     })
@@ -185,7 +254,7 @@ export class AlchemyClient {
           e.status,
           `Error calling Alchemy getNFTs: ${e.message}`
         )
-      })
+      }) as Promise<GetNFTsResult>
   }
 
   async getContractsForOwner(

@@ -8,15 +8,30 @@ import {
 } from '../../../../../../packages/alchemy-client'
 
 import Env from '../../../env'
-import { TokenType } from '../typedefs'
 
 // -------------------- TYPES --------------------------------------------------
 
-import type { Gallery, Nft, NftContract, NftContracts, NfTs } from '../typedefs'
+import type { Nft, NftContract } from '../typedefs'
+import type { GetNFTsResult } from '../../../../../../packages/alchemy-client'
+
+import { Gallery, GalleryItem } from '@kubelt/platform.account/src/types'
 
 type AlchemyClients = {
   ethereumClient: AlchemyClient
   polygonClient: AlchemyClient
+}
+
+type decoratedNft = {
+  url?: string
+  thumbnailUrl?: string
+  error: boolean
+  title?: Nft['title']
+  contract: Nft['contract']
+  tokenId?: string | null
+  chain: Nft['chain']
+  collectionTitle?: string | null
+  properties?: any[] | null
+  details: { name: string; value?: string | null; isCopyable: boolean }[]
 }
 
 type ResolverContext = {
@@ -24,25 +39,6 @@ type ResolverContext = {
   jwt?: string
   coreId?: string
 }
-
-type AlchemyNfts = {
-  ownedNfts: Nft[]
-  blockHash: string
-  totalCount: number
-}
-
-type contracts = {
-  contracts: NftContract[]
-  totalCount: number
-  chain?: {
-    network: string
-    chain: string
-  }
-}
-
-// list of NFT contracts
-type NftBatch = string[]
-// -------------------- END OF TYPES -------------------------------------------
 
 // -------------------- HELPERS ------------------------------------------------
 
@@ -52,15 +48,6 @@ export const sortNftsAlphabetically = (ownedNfts: Nft[]) => {
       b.contractMetadata?.name ?? ''
     )
   )
-}
-
-export function sliceIntoChunks(arr: any[], chunkSize: number) {
-  const res = []
-  for (let i = 0; i < arr.length; i += chunkSize) {
-    const chunk = arr.slice(i, i + chunkSize)
-    res.push(chunk)
-  }
-  return res
 }
 
 export const normalizeContractsForAllChains = (
@@ -103,7 +90,7 @@ export const normalizeContracts = ({
         },
         chain: ct.chain,
         balance: ct.totalBalance?.toString(),
-        contract: { address: ct.address },
+        contract: { address: ct.address! },
       },
     ]
     return ct
@@ -257,8 +244,6 @@ export const getContractsForAllChains = async ({
   }
 }
 
-// -------------------- GALLERY ------------------------------------------------
-
 export const getNftMetadataForAllChains = async (
   input: {
     contractAddress: string
@@ -279,17 +264,24 @@ export const getNftMetadataForAllChains = async (
   })
 
   try {
-    const [ethereumNfts, polygonNfts] = await Promise.all([
-      alchemyClients.ethereumClient.getNFTMetadataBatch(
-        chainedInput.get(AlchemyChain.ethereum)!
-      ) as Promise<Nft[]>,
-      alchemyClients.polygonClient.getNFTMetadataBatch(
-        chainedInput.get(AlchemyChain.polygon)!
-      ) as Promise<Nft[]>,
+    let [ethereumNfts, polygonNfts] = await Promise.all([
+      chainedInput.has(AlchemyChain.ethereum)
+        ? (alchemyClients.ethereumClient.getNFTMetadataBatch(
+            chainedInput.get(AlchemyChain.ethereum)!
+          ) as Promise<Nft[]>)
+        : [],
+      chainedInput.has(AlchemyChain.polygon)
+        ? (alchemyClients.polygonClient.getNFTMetadataBatch(
+            chainedInput.get(AlchemyChain.polygon)!
+          ) as Promise<Nft[]>)
+        : [],
     ])
 
     // Gallery stores as an array in account DO, so not need to keep order separately
     // But here it fetches metadata asynchronous - so order may be lost
+
+    ethereumNfts = NFTPropertyMapper(ethereumNfts)
+    polygonNfts = NFTPropertyMapper(polygonNfts)
 
     const nfts = ethereumNfts
       .map((nft) => ({
@@ -322,20 +314,25 @@ export const getNftMetadataForAllChains = async (
 
 // -------------------- GALLERY VERIFICATION -----------------------------------
 export const validOwnership = async (
-  gallery: Gallery[],
+  gallery: Gallery,
   env: ResolverContext['env'],
   connectedAddresses: string[]
 ) => {
   const { ethereumClient, polygonClient } = getAlchemyClients({ env })
 
-  const [ethContractAddresses, polyContractAddresses] = gallery.reduce(
+  const [ethContractAddressesSet, polyContractAddressesSet] = gallery.reduce(
     ([ethereum, polygon], nft) => {
-      return nft.chain === 'eth'
-        ? [[...ethereum, nft.contract], polygon]
-        : [ethereum, [...polygon, nft.contract]]
+      // type error will go away after cleaning gallery schema
+      nft.chain.chain === 'eth'
+        ? ethereum.add(nft.contract.address)
+        : polygon.add(nft.contract.address)
+      return [ethereum, polygon]
     },
-    [[] as string[], [] as string[]]
+    [new Set([] as string[]), new Set([] as string[])]
   )
+
+  const ethContractAddresses = Array.from(ethContractAddressesSet)
+  const polyContractAddresses = Array.from(polyContractAddressesSet)
 
   /** Struct of this map is like this:
    {
@@ -347,27 +344,33 @@ export const validOwnership = async (
   */
   const validator = new Map<string, string[]>()
 
-  const nfts: [NfTs, NfTs] = await Promise.all(
-    connectedAddresses.map((address) =>
-      Promise.all([
-        ethereumClient.getNFTs({
-          owner: address,
-          contractAddresses: ethContractAddresses,
-        }),
-        polygonClient.getNFTs({
-          owner: address,
-          contractAddresses: polyContractAddresses,
-        }),
-      ])
+  const nfts: GetNFTsResult[] = (
+    await Promise.all(
+      connectedAddresses.map((address) =>
+        Promise.all([
+          ethContractAddresses.length
+            ? ethereumClient.getNFTs({
+                owner: address,
+                contractAddresses: ethContractAddresses,
+              })
+            : ({ ownedNfts: [] } as GetNFTsResult),
+          polyContractAddresses.length
+            ? polygonClient.getNFTs({
+                owner: address,
+                contractAddresses: polyContractAddresses,
+              })
+            : ({ ownedNfts: [] } as GetNFTsResult),
+        ])
+      )
     )
-  )
+  ).flat()
 
   // .flat because previous Promise.all returns an array of arrays,
   // we just need internal arrays of nfts. These internal arrays are arrays
   // of objects with ownedNfts property
   // These methods populate validator map to then check if the user owns nfts.
-  nfts.flat().forEach((deeperNfts) => {
-    deeperNfts.ownedNfts.forEach((nft) => {
+  nfts.forEach((deeperNfts) => {
+    deeperNfts.ownedNfts?.forEach((nft) => {
       const val = validator.get(nft.contract?.address as string)
       validator.set(
         nft.contract?.address as string,
@@ -377,6 +380,104 @@ export const validOwnership = async (
   })
 
   return gallery.filter((nft) => {
-    return validator.get(nft.contract)?.includes(nft.tokenId)
+    // type error will go away after cleaning gallery schema
+    return validator.get(nft.contract.address)?.includes(nft.tokenId)
   })
+}
+
+// -------- TEMPORARY MIGRATION PART -------------------------------------------
+const gatewayFromIpfs = (
+  ipfsUrl: string | undefined | null
+): string | undefined | null => {
+  const regex =
+    /ipfs:\/\/(?<prefix>ipfs\/)?(?<cid>[a-zA-Z0-9]+)(?<path>(?:\/[\w.-]+)+)?/
+  const match = ipfsUrl?.match(regex)
+
+  if (!ipfsUrl || !match) return ipfsUrl
+
+  const prefix = match[1]
+  const cid = match[2]
+  const path = match[3]
+
+  return `https://nftstorage.link/${prefix ? `${prefix}` : 'ipfs/'}${cid}${
+    path ? `${path}` : ''
+  }`
+}
+
+const capitalizeFirstLetter = (string?: string) => {
+  return string ? string.charAt(0).toUpperCase() + string.slice(1) : null
+}
+
+export const sortNftsFn = (a: any, b: any) => {
+  if (b.collectionTitle === null) {
+    return -1
+  } else {
+    return a.collectionTitle?.localeCompare(b.collectionTitle) || 1
+  }
+}
+
+const decorateNft = (nft: Nft): GalleryItem => {
+  const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
+  let error = false
+  if (nft.error) {
+    error = true
+  }
+
+  const details = [
+    {
+      name: 'NFT Contract',
+      value: nft.contract?.address,
+      isCopyable: true,
+    },
+    {
+      name: 'NFT Standard',
+      value: nft.contractMetadata?.tokenType?.toString(),
+      isCopyable: false,
+    },
+    {
+      name: 'Chain',
+      value: capitalizeFirstLetter(nft.chain?.chain),
+      isCopyable: false,
+    },
+    {
+      name: 'Network',
+      value: capitalizeFirstLetter(nft.chain?.network),
+      isCopyable: false,
+    },
+  ]
+  if (nft.id && nft.id.tokenId) {
+    details.push({
+      name: 'Token ID',
+      value: BigInt(nft.id.tokenId).toString(10),
+      isCopyable: true,
+    })
+  }
+
+  return {
+    url: gatewayFromIpfs(media?.raw),
+    thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
+    error: error,
+    title: nft.title,
+    contract: nft.contract,
+    tokenId: nft.id.tokenId,
+    chain: nft.chain!,
+    collectionTitle: nft.contractMetadata?.name,
+    properties: nft.metadata?.properties,
+    details: details,
+  }
+}
+
+/**
+ * Sort and filter errors out
+ */
+export const decorateNfts = (ownedNfts: Nft[]) => {
+  const decoratedNfts = ownedNfts.map((nft: Nft) => {
+    return decorateNft(nft)
+  })
+
+  const filteredNfts =
+    decoratedNfts?.filter((n: any) => !n.error && n.thumbnailUrl) || []
+
+  const sortedNfts = filteredNfts.sort(sortNftsFn)
+  return sortedNfts
 }

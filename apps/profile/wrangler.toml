@@ -24,6 +24,10 @@ services = [
   { binding = "Images", service = "images" },
 ]
 
+kv_namespaces = [
+  { binding = "ProfileKV", id = "6510b0e703694f0388ced3de37df869d", preview_id = "b827cd51f02e4a569ed7b9ff2c680a75" }
+]
+
 [vars]
 PASSPORT_URL = "http://localhost:9696"
 PASSPORT_AUTH_URL = "http://localhost:9696/authorize"
@@ -38,6 +42,7 @@ MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL = "https://test.nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
+PROFILE_VERSION = 1
 
 [site]
 bucket = "./public"
@@ -61,6 +66,9 @@ services = [
   { binding = "Images", service = "images-dev" },
 
 ]
+kv_namespaces = [
+  { binding = "ProfileKV", id = "6510b0e703694f0388ced3de37df869d" }
+]
 [env.dev.vars]
 
 CONSOLE_APP_URL = "https://console-dev.rollup.id"
@@ -77,6 +85,7 @@ MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL = "https://test.nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
+PROFILE_VERSION = 1
 
 # next (staging)
 # ------------------------------------------------------------------------------
@@ -89,6 +98,9 @@ services = [
   { binding = "Address", service = "address-next" },
   { binding = "Images", service = "images-next" },
 
+]
+kv_namespaces = [
+  { binding = "ProfileKV", id = "451e189131d74dca87b41701555a839d" }
 ]
 [env.next.build]
 command = "yarn build"
@@ -109,6 +121,7 @@ MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL = "https://test.nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
+PROFILE_VERSION = 1
 
 # current (production)
 # ------------------------------------------------------------------------------
@@ -121,6 +134,9 @@ services = [
   { binding = "Address", service = "address-current" },
   { binding = "Images", service = "images-current" },
 ]
+kv_namespaces = [
+  { binding = "ProfileKV", id = "3a5214b7dab24414a1cb65733a6143b2" }
+] 
 [env.current.build]
 command = "yarn build"
 
@@ -139,3 +155,4 @@ MINTPFP_CONTRACT_ADDRESS = "0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
 NFTAR_URL = "https://nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 1
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
+PROFILE_VERSION = 1

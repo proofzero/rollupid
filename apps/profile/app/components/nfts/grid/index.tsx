@@ -46,18 +46,15 @@ const NftGrid = ({
         <>
           {/* GENERIC GRID FOR ALL NFT-RELATED COMPONENTS */}
           <InfiniteScroll
-            dataLength={nfts.length} //This is important field to render the next data
+            dataLength={nfts.length}
+            // This is important field to render the next data
             next={preload ? () => {} : (getMoreNfts as () => void)}
             hasMore={preload ? false : pageKey != null}
             loader={<Spinner />}
           >
             <Masonry
               breakpointCols={{
-                default: 5,
-                1280: 4,
-                1024: 3,
-                768: 2,
-                640: 1,
+                default: 3,
               }}
               className="flex 
               w-full
@@ -67,11 +64,8 @@ const NftGrid = ({
                *  spacing between nfts constant
                */
               columnClassName="bg-clip-padding 
-              min-w-[calc(20%-12.8px)]
-              max-[1280px]:min-w-[calc(25%-12px)]
-              max-[1024px]:min-w-[calc(33.33333%-10.667px)]
-              max-[768px]:min-w-[calc(50%-8px)]
-              max-[640px]:min-w-full"
+              min-w-[calc(33.33333%-10.667)]
+              "
             >
               {nfts.map((nft, index) => {
                 return (
@@ -80,7 +74,7 @@ const NftGrid = ({
                     className="flex
                       justify-center
                       min-w-full
-                      mb-10"
+                      mb-6"
                   >
                     {nftRenderer(
                       nft,

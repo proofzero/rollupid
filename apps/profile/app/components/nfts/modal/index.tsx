@@ -203,7 +203,7 @@ const NftModal = ({
               <div
                 className="
               border-t-0 border-l-0 border-r-0
-              rounded-none bg-white mt-2 lg:mt-4"
+              rounded-none bg-white my-2 lg:my-4"
               >
                 <Text
                   className="

@@ -25,12 +25,41 @@ export const LinksSchema = z
   )
   .optional()
 
+export const GalleryItemSchema = z.object({
+  url: z.string().url().optional().nullable(),
+  thumbnailUrl: z.string().url().optional().nullable(),
+  error: z.boolean(),
+  title: z.string().optional().nullable(),
+  contract: z.object({ address: z.string() }),
+  tokenId: z.string(),
+  chain: z.object({ chain: z.string(), network: z.string() }),
+  collectionTitle: z.string().optional().nullable(),
+  properties: z
+    .array(
+      z
+        .object({ display: z.string(), name: z.string(), value: z.string() })
+        .nullable()
+    )
+    .optional()
+    .nullable(),
+  details: z.array(
+    z.object({
+      name: z.string(),
+      value: z.string().nullable().optional(),
+      isCopyable: z.boolean(),
+    })
+  ),
+})
+
 export const GallerySchema = z.array(
-  z.object({
-    contract: z.string(),
-    tokenId: z.string(),
-    chain: z.string(),
-  })
+  GalleryItemSchema.or(
+    // TEMPORARY MIGRATIONS' "OR"
+    z.object({
+      chain: z.string(),
+      tokenId: z.string(),
+      contract: z.string(),
+    })
+  )
 )
 
 export const AddressesSchema = z.array(Node)

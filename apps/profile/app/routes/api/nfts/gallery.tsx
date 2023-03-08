@@ -2,7 +2,7 @@ import type { AccountURN } from '@kubelt/urns/account'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
-import { getGalleryWithMetadata } from '~/helpers/nfts'
+import { getGallery } from '~/helpers/nfts'
 
 export const loader: LoaderFunction = async (args) => {
   const srcUrl = new URL(args.request.url)
@@ -14,7 +14,7 @@ export const loader: LoaderFunction = async (args) => {
 
   const accountURN = srcUrl.searchParams.get('accountURN')
 
-  const { gallery } = await getGalleryWithMetadata(
+  const { gallery } = await getGallery(
     accountURN as AccountURN,
     args.context.traceSpan
   )

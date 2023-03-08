@@ -14,6 +14,9 @@ const ModaledNft = ({ nft, isModal, handleRedirect }: any) => {
   const [showModal, setShowModal] = useState(false)
 
   const [loadFail, setLoadFail] = useState(false)
+
+  const url = gatewayFromIpfs(nft.url ?? nft.thumbnailUrl)
+
   return (
     <>
       {isModal ? (
@@ -64,14 +67,19 @@ const ModaledNft = ({ nft, isModal, handleRedirect }: any) => {
             </div>
 
             <img
-              className="object-contain
-              min-w-full
-              rounded-lg"
-              src={
-                loadFail
-                  ? missingNftSvg
-                  : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
-              }
+              className="object-cover
+              w-full
+              rounded-lg 
+              max-[380px]:h-[104px]
+              max-[400px]:h-[116px]
+              h-[128px]
+              min-[480px]:h-[144px]
+              min-[580px]:h-[168px]
+              sm:h-[196px]
+              md:h-[228px]
+              min-[890px]:h-[256px]
+              lg:h-[270px]"
+              src={loadFail ? missingNftSvg : url}
               onError={(e) => setLoadFail(true)}
               alt="collection-item"
             />
@@ -93,15 +101,19 @@ const ModaledNft = ({ nft, isModal, handleRedirect }: any) => {
           }}
         >
           <img
-            className="rounded-t-lg
-              w-full
-              object-contain
-              "
-            src={
-              loadFail
-                ? missingNftSvg
-                : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
-            }
+            className="object-cover
+            w-full
+            rounded-t-lg 
+            max-[380px]:h-[104px]
+            max-[400px]:h-[116px]
+            h-[128px]
+            min-[480px]:h-[144px]
+            min-[580px]:h-[168px]
+            sm:h-[196px]
+            md:h-[228px]
+            min-[890px]:h-[256px]
+            lg:h-[270px]"
+            src={loadFail ? missingNftSvg : url}
             onError={(e) => setLoadFail(true)}
             alt="collection representative"
           />

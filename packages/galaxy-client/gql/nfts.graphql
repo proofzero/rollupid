@@ -86,38 +86,3 @@ query getNftsPerCollection(
     }
   }
 }
-
-query getNFTMetadata($input: [NFTMetadataInput]) {
-  getNFTMetadataBatch(input: $input) {
-    ownedNfts {
-      contract {
-        address
-      }
-      title
-      description
-      id {
-        tokenId
-      }
-      media {
-        raw
-        thumbnail
-      }
-      metadata {
-        properties {
-          name
-          value
-          display
-        }
-      }
-      error
-      contractMetadata {
-        name
-        tokenType
-      }
-      chain {
-        chain
-        network
-      }
-    }
-  }
-}

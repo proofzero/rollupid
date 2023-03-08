@@ -1,10 +1,11 @@
+import type { Nft } from '@kubelt/galaxy-client'
 import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
 import { getGalaxyClient } from '~/helpers/clients'
-import { decorateNft, decorateNfts } from '~/helpers/nfts'
+import { decorateNfts } from '~/helpers/nfts'
 import { getProfileSession } from '~/utils/session.server'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
@@ -17,28 +18,28 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const owner = srcUrl.searchParams.get('owner')
   if (!owner) {
-    return json({})
+    throw new Error('Owner required')
+  }
+
+  const collection = srcUrl.searchParams.get('collection')
+  if (!collection) {
+    throw new Error('Collection required')
   }
 
   const galaxyClient = await getGalaxyClient(
     generateTraceContextHeaders(context.traceSpan)
   )
-  const { contractsForAddress: resColl } =
-    await galaxyClient.getNftsPerCollection(
-      {
-        owner,
-        excludeFilters: ['SPAM'],
-      },
-      getAuthzHeaderConditionallyFromToken(jwt)
-    )
-
-  const ownedNfts =
-    resColl?.contracts.map((contract: any) => {
-      const nft: any = contract?.ownedNfts ? contract.ownedNfts[0] : {}
-      return decorateNft(nft)
-    }) ?? []
+  const { nftsForAddress: resColl } = await galaxyClient.getNftsForAddress(
+    {
+      owner,
+      contractAddresses: [collection],
+    },
+    getAuthzHeaderConditionallyFromToken(jwt)
+  )
 
   return json({
-    ownedNfts: decorateNfts(ownedNfts),
+    ownedNfts: resColl?.ownedNfts
+      ? decorateNfts(resColl?.ownedNfts as Nft[])
+      : [],
   })
 }

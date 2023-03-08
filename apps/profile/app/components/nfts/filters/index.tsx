@@ -130,7 +130,7 @@ const Filters = ({
 
                     {curFilter === colName.title ||
                     curFilter === 'Untitled Collection' ? (
-                      <Text
+                      <div
                         className="
                                focus:outline-none w-full
                                 px-3 flex flex-row items-center
@@ -140,7 +140,7 @@ const Filters = ({
                           {colName.title}
                         </div>
                         <HiOutlineCheck size={20} />
-                      </Text>
+                      </div>
                     ) : (
                       <Text className="focus:outline-none pl-3">
                         {colName.title}

@@ -18,4 +18,7 @@ declare global {
   const Galaxy: Fetcher
   const Address: Fetcher
   const Images: Fetcher
+
+  const ProfileKV: KVNamespace
+  const PROFILE_VERSION: number
 }

@@ -43,11 +43,11 @@ export default /* GraphQL */ `
   }
 
   type Contract {
-    address: String
+    address: String!
   }
 
   type Id {
-    tokenId: String
+    tokenId: String!
   }
 
   type TokenURI {
@@ -56,9 +56,9 @@ export default /* GraphQL */ `
   }
 
   type NFTProperty {
-    name: String
-    value: String
-    display: String
+    name: String!
+    value: String!
+    display: String!
   }
 
   type NFTMetadata {
@@ -72,11 +72,11 @@ export default /* GraphQL */ `
     timeLastUpdated: String
   }
   type NFT {
-    contract: Contract
+    contract: Contract!
     title: String
     balance: String
     description: String
-    id: Id
+    id: Id!
     tokenUri: TokenURI
     media: [NFTMedia!]!
     error: String
@@ -85,32 +85,9 @@ export default /* GraphQL */ `
     chain: Chain
   }
 
-  type NFTNoProps {
-    contract: Contract
-    title: String
-    description: String
-    id: Id
-    tokenUri: TokenURI
-    media: [NFTMedia!]!
-    error: String
-    contractMetadata: ContractMetadata
-  }
-
-  type NFTs {
-    ownedNfts: [NFT!]!
-  }
-
-  type NFTsNoProps {
-    ownedNfts: [NFTNoProps!]!
-  }
-
   type Chain {
-    chain: String
-    network: String
-  }
-
-  type NFTsWithChain {
-    ownedNfts: [NFT!]!
+    chain: String!
+    network: String!
   }
 
   type NFTContract {
@@ -125,10 +102,16 @@ export default /* GraphQL */ `
     tokenType: String
     tokenId: String
     title: String
-    media: NFTMedia
+    media: [NFTMedia!]!
     opensea: OpenSeaMetadata
     ownedNfts: [NFT!]
     chain: Chain
+  }
+
+  type NFTDetail {
+    name: String!
+    value: String!
+    isCopyable: Boolean!
   }
 
   type NFTContracts {
@@ -136,46 +119,63 @@ export default /* GraphQL */ `
     totalCount: Int
   }
 
+  type OwnedNFTs {
+    ownedNfts: [NFT!]!
+  }
+
   type Gallery {
-    contract: String!
+    url: String
+    thumbnailUrl: String
+    error: Boolean!
+    title: String
+    contract: Contract!
     tokenId: String!
-    chain: String!
+    chain: Chain!
+    collectionTitle: String
+    properties: [NFTProperty!]
+    details: [NFTDetail!]!
   }
 
   input ContractInput {
-    address: String
+    address: String!
   }
 
-  input TokenURIInput {
-    raw: String
-    gateway: String
+  input ChainInput {
+    chain: String!
+    network: String!
   }
 
-  input NFTInput {
-    tokenId: String
-    contract: String
-    addressURN: String
+  input NFTPropertyInput {
+    name: String!
+    value: String!
+    display: String!
   }
 
-  input NFTMetadataInput {
-    contractAddress: String
-    tokenId: String
-    chain: String
+  input NFTDetailInput {
+    name: String!
+    value: String!
+    isCopyable: Boolean!
   }
 
   input GalleryInput {
-    contract: String!
+    url: String
+    thumbnailUrl: String
+    error: Boolean!
+    title: String
+    contract: ContractInput!
     tokenId: String!
-    chain: String!
+    chain: ChainInput!
+    collectionTitle: String
+    properties: [NFTPropertyInput!]
+    details: [NFTDetailInput!]!
   }
 
   type Query {
-    nftsForAddress(owner: String!, contractAddresses: [String]): NFTs
+    nftsForAddress(owner: String!, contractAddresses: [String]): OwnedNFTs
     contractsForAddress(
       owner: String!
       excludeFilters: [String]
       pageSize: Int
     ): NFTContracts
-    getNFTMetadataBatch(input: [NFTMetadataInput]): NFTs
   }
 `

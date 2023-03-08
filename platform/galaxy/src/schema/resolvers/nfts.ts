@@ -5,10 +5,7 @@ import { AccountURN } from '@kubelt/urns/account'
 
 import { NftContract, Resolvers } from './typedefs'
 import Env from '../../env'
-import {
-  AlchemyChain,
-  NFTPropertyMapper,
-} from '../../../../../packages/alchemy-client'
+import { AlchemyChain } from '../../../../../packages/alchemy-client'
 
 import {
   hasApiKey,
@@ -17,7 +14,6 @@ import {
   sortNftsAlphabetically,
   getNftsForAllChains,
   getAlchemyClients,
-  getNftMetadataForAllChains,
   normalizeContractsForAllChains,
   getConnectedCryptoAddresses,
   getContractsForAllChains,
@@ -75,15 +71,14 @@ const nftsResolvers: Resolvers = {
 
       const sortedOwnedNfts = sortNftsAlphabetically(ownedNfts)
 
-      return {
-        ownedNfts: sortedOwnedNfts,
-      }
+      return { ownedNfts: sortedOwnedNfts }
     },
     //@ts-ignore
     contractsForAddress: async (
       _parent: any,
       {
         owner,
+        // Is supported ONLY on ethereum and polygon mainnets
         excludeFilters = ['SPAM', 'AIRDROPS'],
         pageSize = 1,
       }: {
@@ -132,32 +127,6 @@ const nftsResolvers: Resolvers = {
         contracts: result,
       }
     },
-
-    //@ts-ignore
-    getNFTMetadataBatch: async (
-      _parent: any,
-      {
-        input,
-      }: {
-        input: {
-          contractAddress: string
-          tokenId: string
-          chain: string
-        }[]
-      },
-      { env }: ResolverContext
-    ) => {
-      const alchemyClients = getAlchemyClients({ env })
-      const ownedNfts = await getNftMetadataForAllChains(
-        input,
-        alchemyClients,
-        env
-      )
-
-      return {
-        ownedNfts: NFTPropertyMapper(ownedNfts.filter((nft) => !nft.error)),
-      }
-    },
   },
 
   Mutation: {},
@@ -174,11 +143,6 @@ const NFTsResolverComposition = {
     requestLogging(),
     setupContext(),
     hasApiKey(),
-    logAnalytics(),
-  ],
-  'Query.getNFTMetadataBatch': [
-    requestLogging(),
-    setupContext(),
     logAnalytics(),
   ],
 }

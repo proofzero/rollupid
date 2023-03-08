@@ -18,13 +18,11 @@ import {
 import { getProfileSession, parseJwt } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
 import { ogImageFromProfile } from '~/helpers/ogImage'
+import { getAccountProfile } from '~/helpers/profile'
 
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import {
-  gatewayFromIpfs,
-  getAuthzHeaderConditionallyFromToken,
-} from '@kubelt/utils'
+import { gatewayFromIpfs } from '@kubelt/utils'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
 import ProfileTabs from '~/components/profile/tabs/tabs'
@@ -32,11 +30,7 @@ import ProfileLayout from '~/components/profile/layout'
 
 import defaultOG from '~/assets/social.png'
 import subtractLogo from '~/assets/subtract-logo.svg'
-import {
-  CryptoAddressType,
-  NodeType,
-  OAuthAddressType,
-} from '@kubelt/types/address'
+import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import type { AccountURN } from '@kubelt/urns/account'
 import { AccountURNSpace } from '@kubelt/urns/account'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
@@ -66,6 +60,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
   // redirect from any addressURN to its addressURNs
   if (type === 'a') {
+    // TODO: does this remain a galaxy call?
     const { account }: { account: AccountURN } =
       await galaxyClient.getAccountUrnFromAddress({
         addressURN: AddressURNSpace.urn(address),
@@ -81,22 +76,15 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   try {
     const user = session.get('user')
     jwt = user?.accessToken
-    profile = await galaxyClient.getProfile(
-      {
-        targetAccountURN: accountURN,
-      },
-      getAuthzHeaderConditionallyFromToken(jwt)
-    )
 
-    if (!profile?.profile) {
+    // TODO: delete after migration
+    profile = await getAccountProfile({ jwt, accountURN }, context.traceSpan)
+
+    // TODO: Uncomment after migration
+    // profile = await ProfileKV.get<FullProfile>(accountURN, 'json')
+
+    if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })
-    }
-
-    profile = {
-      ...profile.profile,
-      links: profile.links || [],
-      gallery: profile.gallery || [],
-      addresses: profile.connectedAddresses || [],
     }
 
     if (type === 'u') {
@@ -125,16 +113,11 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     // Check if the accountURN in jwt matches with accountURN in URL
     const isOwner = jwt ? parseJwt(jwt).sub === accountURN : false
 
-    const cryptoAddresses = profile.addresses?.filter(
-      (addr) => addr.rc.node_type === NodeType.Crypto
-    )
-
     return json({
       uname: profile.displayName || address,
       ogImage: ogImage || defaultOG,
       profile,
       accountURN,
-      cryptoAddresses,
       path,
       isOwner,
     })
@@ -183,14 +166,12 @@ export const meta: MetaFunction = ({
 const UserAddressLayout = () => {
   //TODO: this needs to be optimized so profile isn't fetched from the loader
   //but used from context alone.
-  const { profile, cryptoAddresses, path, isOwner, accountURN } =
-    useLoaderData<{
-      profile: FullProfile
-      cryptoAddresses: Node[]
-      path: string
-      isOwner: boolean
-      accountURN: string
-    }>()
+  const { profile, path, isOwner, accountURN } = useLoaderData<{
+    profile: FullProfile
+    path: string
+    isOwner: boolean
+    accountURN: string
+  }>()
 
   const finalProfile = profile
 
@@ -273,7 +254,6 @@ const UserAddressLayout = () => {
         context={{
           accountURN,
           profile: finalProfile,
-          cryptoAddresses,
           isOwner,
         }}
       />

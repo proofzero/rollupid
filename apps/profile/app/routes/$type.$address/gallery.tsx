@@ -1,67 +1,29 @@
-import FilteredNftGrid from '~/components/nfts/grid/filtered'
-import { useState, useEffect, useMemo } from 'react'
+import UnfilteredNftGrid from '~/components/nfts/grid/unfiltered'
 
-import type { Profile } from '@kubelt/galaxy-client'
-
-import { getMoreNftsGallery } from '~/helpers/nfts'
-
-import { useFetcher, useOutletContext } from '@remix-run/react'
+import { useOutletContext } from '@remix-run/react'
 import type { AccountURN } from '@kubelt/urns/account'
+import type { FullProfile } from '~/types'
 
 const ProfileRoute = () => {
-  const { profile, isOwner, accountURN } = useOutletContext<{
-    profile: Profile
+  const { profile, isOwner } = useOutletContext<{
+    profile: FullProfile
     isOwner: boolean
     accountURN: AccountURN
   }>()
 
   const { displayName, pfp } = profile
   /** STATE */
-  const [refresh, setRefresh] = useState(true)
-  const [loadedNfts, setLoadedNfts] = useState([] as any[])
-  const [loading, setLoading] = useState(true)
-
-  const fetcher = useFetcher()
-
-  /** HOOKS */
-  useEffect(() => {
-    if (fetcher.data) {
-      // Do not need to sort them alphabetically here
-      setLoadedNfts([...loadedNfts, ...fetcher.data.gallery])
-
-      if (refresh) {
-        setRefresh(false)
-      }
-      setLoading(false)
-    }
-  }, [fetcher.data])
-
-  useEffect(() => {
-    const asyncFn = async () => {
-      getMoreNftsGallery(fetcher, accountURN)
-    }
-
-    if (refresh) {
-      asyncFn()
-      setLoading(false)
-    }
-  }, [refresh])
-
-  useMemo(() => {
-    setRefresh(true)
-    setLoadedNfts([])
-  }, [])
 
   return (
     <>
-      <FilteredNftGrid
-        nfts={loadedNfts}
+      <UnfilteredNftGrid
+        nfts={profile.gallery}
         displayText={`Looks like ${
           isOwner ? 'you have' : `${displayName} has`
         } not curated a gallery`}
         filters={true}
         pfp={(pfp as any).image as string}
-        loadingConditions={loading || refresh}
+        loadingConditions={false}
         isModalNft={true}
         isModal={false}
         detailsModal

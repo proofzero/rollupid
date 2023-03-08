@@ -52,13 +52,22 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
           </div>
 
           <img
-            className="object-contain
-             min-w-full
-             rounded-lg"
+            className="object-cover
+            w-full
+            rounded-lg
+            max-[380px]:h-[104px]
+            max-[400px]:h-[116px]
+            h-[128px]
+            min-[480px]:h-[144px]
+            min-[580px]:h-[168px]
+            sm:h-[196px]
+            md:h-[228px]
+            min-[890px]:h-[256px]
+            lg:h-[270px]"
             src={
               loadFail
                 ? missingNftSvg
-                : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
+                : gatewayFromIpfs(nft.url ?? nft.thumbnailUrl)
             }
             onError={(e) => setLoadFail(true)}
             alt="collection-item"
@@ -80,14 +89,22 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
           }}
         >
           <img
-            className="rounded-t-lg
+            className="object-cover
             w-full
-            object-contain
-            "
+            rounded-t-lg
+            max-[380px]:h-[104px]
+            max-[400px]:h-[116px]
+            h-[128px]
+            min-[480px]:h-[144px]
+            min-[580px]:h-[168px]
+            sm:h-[196px]
+            md:h-[228px]
+            min-[890px]:h-[256px]
+            lg:h-[270px]"
             src={
               loadFail
                 ? missingNftSvg
-                : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
+                : gatewayFromIpfs(nft.url ?? nft.thumbnailUrl)
             }
             onError={(e) => setLoadFail(true)}
             alt="collection-representation"
