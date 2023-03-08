@@ -30,9 +30,6 @@ unsafe.bindings = [
   { type = "metadata", name = "ServiceDeploymentMetadata" },
 ]
 
-[vars]
-ALCHEMY_ETH_NETWORK="goerli"
-ALCHEMY_POLYGON_NETWORK="mumbai"
 
 [env.dev]
 route = { pattern = "galaxy-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" }
@@ -51,10 +48,6 @@ unsafe.bindings = [
   { type = "metadata", name = "ServiceDeploymentMetadata" },
 ]
 
-[env.dev.vars]
-ALCHEMY_ETH_NETWORK="goerli"
-ALCHEMY_POLYGON_NETWORK="mumbai"
-
 [env.next]
 route = { pattern = "galaxy-next.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 services = [
@@ -72,10 +65,6 @@ unsafe.bindings = [
   { type = "metadata", name = "ServiceDeploymentMetadata" },
 ]
 
-[env.next.vars]
-ALCHEMY_ETH_NETWORK="goerli"
-ALCHEMY_POLYGON_NETWORK="mumbai"
-
 [env.current]
 route = { pattern = "galaxy.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 services = [
@@ -92,9 +81,3 @@ analytics_engine_datasets = [
 unsafe.bindings = [
   { type = "metadata", name = "ServiceDeploymentMetadata" },
 ]
-
-[env.current.vars]
-ALCHEMY_ETH_NETWORK="mainnet"
-ALCHEMY_POLYGON_NETWORK="mainnet"
-
-

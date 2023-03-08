@@ -131,8 +131,7 @@ export const meta: MetaFunction = ({
 }: {
   data: { ogImage: string; uname: string; profile: FullProfile }
 }) => {
-  const desc =
-    data.profile && data.profile.bio ? data.profile.bio : 'Claim yours now!'
+  const desc = 'Claim yours now!'
   const meta = {
     'og:title': 'Rollup Decentralized Profile',
     'twitter:title': 'Rollup Decentralized Profile',

@@ -11,42 +11,12 @@ import Env from '../../../env'
 
 // -------------------- TYPES --------------------------------------------------
 
-import type { Nft, NftContract } from '../typedefs'
-import type { GetNFTsResult } from '../../../../../../packages/alchemy-client'
-
 type AlchemyClients = {
   ethereumClient: AlchemyClient
   polygonClient: AlchemyClient
 }
 
-type decoratedNft = {
-  url?: string
-  thumbnailUrl?: string
-  error: boolean
-  title?: Nft['title']
-  contract: Nft['contract']
-  tokenId?: string | null
-  chain: Nft['chain']
-  collectionTitle?: string | null
-  properties?: any[] | null
-  details: { name: string; value?: string | null; isCopyable: boolean }[]
-}
-
-type ResolverContext = {
-  env: Env
-  jwt?: string
-  coreId?: string
-}
-
 // -------------------- HELPERS ------------------------------------------------
-
-export const sortNftsAlphabetically = (ownedNfts: Nft[]) => {
-  return ownedNfts.sort((a, b) =>
-    (a.contractMetadata?.name ?? '').localeCompare(
-      b.contractMetadata?.name ?? ''
-    )
-  )
-}
 
 export const normalizeContractsForAllChains = (
   clients: {
@@ -99,16 +69,16 @@ export const normalizeContracts = ({
 
 // -------------------- END OF HELPERS -----------------------------------------
 
-export const getAlchemyClients = ({ env }: { env: ResolverContext['env'] }) => {
+export const getAlchemyClients = () => {
   return {
     ethereumClient: new AlchemyClient({
-      key: env.APIKEY_ALCHEMY_ETH,
-      network: env.ALCHEMY_ETH_NETWORK,
+      key: APIKEY_ALCHEMY_ETH,
+      network: ALCHEMY_ETH_NETWORK,
       chain: AlchemyChain.ethereum,
     } as AlchemyClientConfig),
     polygonClient: new AlchemyClient({
-      key: env.APIKEY_ALCHEMY_POLYGON,
-      network: env.ALCHEMY_POLYGON_NETWORK,
+      key: APIKEY_ALCHEMY_POLYGON,
+      network: ALCHEMY_POLYGON_NETWORK,
       chain: AlchemyChain.polygon,
     } as AlchemyClientConfig),
   }

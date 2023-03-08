@@ -21,4 +21,8 @@ declare global {
 
   const ProfileKV: KVNamespace
   const PROFILE_VERSION: number
+  const ALCHEMY_ETH_NETWORK: string
+  const APIKEY_ALCHEMY_ETH: string
+  const ALCHEMY_POLYGON_NETWORK: string
+  const APIKEY_ALCHEMY_POLYGON: string
 }

@@ -10,15 +10,11 @@ import {
   hasApiKey,
   logAnalytics,
   getConnectedAddresses,
-  getConnectedCryptoAddresses,
   temporaryConvertToPublic,
-  validOwnership,
   requestLogging,
-  getAlchemyClients,
-  getNftMetadataForAllChains,
 } from './utils'
 
-import { NftProperty, Resolvers } from './typedefs'
+import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { ResolverContext } from './common'

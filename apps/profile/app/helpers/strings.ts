@@ -10,3 +10,11 @@ export const cacheKey = async (key: string) => {
   const cacheKeyArray = Array.from(new Uint8Array(cacheKeyDigest))
   return cacheKeyArray.map((b) => b.toString(16).padStart(2, '0')).join('')
 }
+
+export const sortNftsAlphabetically = (ownedNfts: Nft[]) => {
+  return ownedNfts.sort((a, b) =>
+    (a.contractMetadata?.name ?? '').localeCompare(
+      b.contractMetadata?.name ?? ''
+    )
+  )
+}

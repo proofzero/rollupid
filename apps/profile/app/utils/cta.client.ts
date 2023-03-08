@@ -12,7 +12,7 @@ export const determineProfileCompletionStatus = (
   addresses: any[]
 ): ProfileCompletionStatus => {
   let base = false
-  if (profile.job || profile.location || profile.website) {
+  if (profile.job || profile.location) {
     base = true
   }
 
