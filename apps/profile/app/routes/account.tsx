@@ -22,7 +22,11 @@ import HeadNav, { links as headNavLink } from '~/components/head-nav'
 import ConditionalTooltip from '~/components/conditional-tooltip'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { getAccountProfile, getAddressProfiles } from '~/helpers/profile'
+import {
+  getAccountAddresses,
+  getAccountProfile,
+  getAddressProfiles,
+} from '~/helpers/profile'
 import type { Node, Profile } from '@kubelt/galaxy-client'
 import type { AddressURN } from '@kubelt/urns/address'
 import type { FullProfile } from '~/types'
@@ -56,9 +60,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const accountURN = parseJwt(jwt).sub as AccountURN
 
-  const loggedInUserProfile = await getAccountProfile({ jwt }, context.traceSpan)
+  const [loggedInUserProfile, addresses] = await Promise.all([
+    getAccountProfile({ jwt, accountURN }, context.traceSpan),
+    getAccountAddresses(jwt, context.traceSpan),
+  ])
 
-  const addressTypeUrns = loggedInUserProfile.addresses.map((a) => ({
+  const addressTypeUrns = addresses.map((a) => ({
     urn: a.baseUrn,
     nodeType: a.rc.node_type,
   }))
@@ -67,7 +74,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const connectedProfiles =
     (await getAddressProfiles(
       jwt,
-      addressTypeUrns.map((atu) => atu.urn as AddressURN), context.traceSpan
+      addressTypeUrns.map((atu) => atu.urn as AddressURN),
+      context.traceSpan
     )) ?? []
 
   // This mapps to a new structure that contains urn also;
@@ -78,7 +86,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   }))
 
   const cryptoAddresses =
-    loggedInUserProfile.addresses?.filter((e) => {
+    addresses?.filter((e) => {
       if (!e.rc) return false
       return e?.rc?.node_type === 'crypto'
     }) || []

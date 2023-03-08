@@ -1,10 +1,10 @@
 import { gatewayFromIpfs } from '@kubelt/utils'
-import { getAccountProfile } from './profile'
 
 import type { AccountURN } from '@kubelt/urns/account'
 import type { Nft } from '@kubelt/galaxy-client'
 import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 import type { TraceSpan } from '@kubelt/platform-middleware/trace'
+import { getGalaxyClient } from './clients'
 
 /**
  * Nfts are being sorted server-side
@@ -119,10 +119,11 @@ export const getGallery = async (
   accountURN: AccountURN,
   traceSpan: TraceSpan
 ) => {
-  const profile = await getAccountProfile({ accountURN }, traceSpan)
-  const { gallery } = profile
-
-  return { gallery: gallery || [] }
+  const galaxyClient = await getGalaxyClient(
+    generateTraceContextHeaders(traceSpan)
+  )
+  const gallery = await galaxyClient.getGallery(accountURN)
+  return { gallery: gallery.gallery || [] }
 }
 
 // ------ beginning of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS

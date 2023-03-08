@@ -24,6 +24,10 @@ services = [
   { binding = "Images", service = "images" },
 ]
 
+kv_namespaces = [
+  { binding = "ProfileKV", id = "6510b0e703694f0388ced3de37df869d" }
+]
+
 [vars]
 PASSPORT_URL = "http://localhost:9696"
 PASSPORT_AUTH_URL = "http://localhost:9696/authorize"
@@ -61,6 +65,9 @@ services = [
   { binding = "Images", service = "images-dev" },
 
 ]
+kv_namespaces = [
+  { binding = "ProfileKV", id = "6510b0e703694f0388ced3de37df869d" }
+]
 [env.dev.vars]
 
 CONSOLE_APP_URL = "https://console-dev.rollup.id"
@@ -89,6 +96,9 @@ services = [
   { binding = "Address", service = "address-next" },
   { binding = "Images", service = "images-next" },
 
+]
+kv_namespaces = [
+  { binding = "ProfileKV", id = "451e189131d74dca87b41701555a839d" }
 ]
 [env.next.build]
 command = "yarn build"
@@ -121,6 +131,9 @@ services = [
   { binding = "Address", service = "address-current" },
   { binding = "Images", service = "images-current" },
 ]
+kv_namespaces = [
+  { binding = "ProfileKV", id = "3a5214b7dab24414a1cb65733a6143b2" }
+] 
 [env.current.build]
 command = "yarn build"
 

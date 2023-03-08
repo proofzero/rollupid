@@ -10,14 +10,20 @@ import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 export const getAccountProfile = async (
   {
-    jwt,
     accountURN,
+    jwt,
   }: {
+    accountURN: AccountURN
     jwt?: string
-    accountURN?: AccountURN
   },
   traceSpan: TraceSpan
 ) => {
+  // note: jwt is only important for setting profile in profile account settings
+  const profile = await ProfileKV.get<FullProfile>(accountURN, 'json')
+
+  if (profile) return profile
+
+  // TODO: DEPRECATE THIS PROFILE MIGRATION
   const galaxyClient = await getGalaxyClient(
     generateTraceContextHeaders(traceSpan)
   )
@@ -27,13 +33,17 @@ export const getAccountProfile = async (
     getAuthzHeaderConditionallyFromToken(jwt)
   )
 
-  const { profile, links, gallery, connectedAddresses } = profileRes
-  return {
-    ...profile,
+  const { profile: acctProfile, links, gallery } = profileRes
+
+  const fullProfile = {
+    ...acctProfile,
     links,
     gallery,
-    addresses: connectedAddresses,
   } as FullProfile
+
+  await ProfileKV.put(accountURN, JSON.stringify(fullProfile))
+  return { ...fullProfile }
+  // END OF PROFILE MIGRATION
 }
 
 export const getAuthorizedApps = async (jwt: string, traceSpan: TraceSpan) => {
@@ -61,8 +71,7 @@ export const getAccountAddresses = async (
     getAuthzHeaderConditionallyFromToken(jwt)
   )
 
-  const addresses = addressesRes.addresses
-  return addresses
+  return addressesRes.addresses || []
 }
 
 export const getAddressProfiles = async (

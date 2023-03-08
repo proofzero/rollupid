@@ -96,7 +96,6 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
       ...profile.profile,
       links: profile.links || [],
       gallery: profile.gallery || [],
-      addresses: profile.connectedAddresses || [],
     }
 
     if (type === 'u') {
@@ -125,16 +124,11 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     // Check if the accountURN in jwt matches with accountURN in URL
     const isOwner = jwt ? parseJwt(jwt).sub === accountURN : false
 
-    const cryptoAddresses = profile.addresses?.filter(
-      (addr) => addr.rc.node_type === NodeType.Crypto
-    )
-
     return json({
       uname: profile.displayName || address,
       ogImage: ogImage || defaultOG,
       profile,
       accountURN,
-      cryptoAddresses,
       path,
       isOwner,
     })
@@ -183,14 +177,12 @@ export const meta: MetaFunction = ({
 const UserAddressLayout = () => {
   //TODO: this needs to be optimized so profile isn't fetched from the loader
   //but used from context alone.
-  const { profile, cryptoAddresses, path, isOwner, accountURN } =
-    useLoaderData<{
-      profile: FullProfile
-      cryptoAddresses: Node[]
-      path: string
-      isOwner: boolean
-      accountURN: string
-    }>()
+  const { profile, path, isOwner, accountURN } = useLoaderData<{
+    profile: FullProfile
+    path: string
+    isOwner: boolean
+    accountURN: string
+  }>()
 
   const finalProfile = profile
 
@@ -273,7 +265,6 @@ const UserAddressLayout = () => {
         context={{
           accountURN,
           profile: finalProfile,
-          cryptoAddresses,
           isOwner,
         }}
       />

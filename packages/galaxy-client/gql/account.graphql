@@ -22,11 +22,34 @@ query getProfile($targetAccountURN: URN) {
     verified
     provider
   }
-  connectedAddresses(targetAccountURN: $targetAccountURN) {
-    baseUrn
-    qc
-    rc
+  gallery(targetAccountURN: $targetAccountURN) {
+    url
+    thumbnailUrl
+    error
+    title
+    contract {
+      address
+    }
+    tokenId
+    chain {
+      chain
+      network
+    }
+    collectionTitle
+    properties {
+      name
+      value
+      display
+    }
+    details {
+      name
+      value
+      isCopyable
+    }
   }
+}
+
+query getGallery($targetAccountURN: URN) {
   gallery(targetAccountURN: $targetAccountURN) {
     url
     thumbnailUrl
