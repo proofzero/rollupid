@@ -10,8 +10,6 @@ export const ProfileSchema = z.object({
       isToken: z.boolean().optional(),
     })
     .optional(),
-  job: z.string().max(30).optional(),
-  location: z.string().max(30).optional(),
 })
 
 export const AddressesSchema = z.array(Node)

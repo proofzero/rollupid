@@ -65,8 +65,6 @@ export type FullProfile = {
     image: string
     isToken?: boolean
   }
-  job?: string
-  location?: string
   links: Links
   gallery: Gallery
   handle?: string

@@ -51,6 +51,8 @@ import {
 import type { FullProfile } from '~/types'
 import type { Maybe } from 'graphql/jsutils/Maybe'
 import type { NFT } from '~/types'
+import { getValidGallery } from '~/helpers/alchemy'
+import type { AccountURN } from '@kubelt/urns/account'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
@@ -98,6 +100,14 @@ export const action: ActionFunction = async ({ request, context }) => {
   const updatedProfile = Object.assign(currentProfile || {}, {
     gallery: nfts,
   })
+
+  //Validation
+  updatedProfile.gallery = await getValidGallery({
+    gallery: updatedProfile.gallery,
+    accountURN: accountURN as AccountURN,
+    traceSpan: context.traceSpan,
+  })
+
   await ProfileKV.put(accountURN!, JSON.stringify(updatedProfile))
 
   return true

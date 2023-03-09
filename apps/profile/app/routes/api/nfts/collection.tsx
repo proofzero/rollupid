@@ -30,7 +30,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     throw new Error('Chain is required')
   }
 
-  const addresses = await getAccountCryptoAddresses(jwt, context.traceSpan)
+  const addresses = await getAccountCryptoAddresses({
+    jwt,
+    traceSpan: context.traceSpan,
+  })
 
   const nftsForAccount = await getNfts({
     addresses,

@@ -20,8 +20,6 @@ export default /* GraphQL */ `
   type Profile {
     displayName: String
     pfp: PFP
-    job: String
-    location: String
     handle: String
   }
 
@@ -33,8 +31,6 @@ export default /* GraphQL */ `
   input ProfileInput {
     displayName: String
     pfp: PFPInput
-    job: String
-    location: String
   }
 
   type Query {

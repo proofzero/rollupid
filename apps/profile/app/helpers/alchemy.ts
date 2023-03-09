@@ -10,9 +10,12 @@ import type {
   GetNFTsResult,
   GetContractsForOwnerResult,
 } from '@kubelt/packages/alchemy-client'
-import type { Chain, NFT } from '~/types'
+import type { Chain, Gallery, NFT } from '~/types'
 import { NFTContractNormalizer, NFTNormalizer } from './nfts'
 import { sortNftsFn } from './strings'
+import type { AccountURN } from '@kubelt/urns/account'
+import { getAccountCryptoAddresses } from './profile'
+import type { TraceSpan } from '@kubelt/platform-middleware/trace'
 
 // -------------------- TYPES --------------------------------------------------
 
@@ -33,6 +36,15 @@ export const getAlchemyClient = (chain: Chain): AlchemyClient => {
     key: chain.chain === 'eth' ? APIKEY_ALCHEMY_ETH : APIKEY_ALCHEMY_POLYGON,
     ...chain,
   })
+}
+
+export const getAlchemyClients = () => {
+  return {
+    ethereumClient: getAlchemyClient(
+      getChainWithNetwork(AlchemyChain.ethereum)
+    ),
+    polygonClient: getAlchemyClient(getChainWithNetwork(AlchemyChain.polygon)),
+  }
 }
 
 // -------------------- ALL NFTS FOR SPECIFIED CONTRACTS -----------------------
@@ -160,4 +172,85 @@ export const getContractsForAllChains = async ({
       ownedNfts: [] as NFT[],
     }
   }
+}
+
+export const getValidGallery = async ({
+  gallery,
+  accountURN,
+  traceSpan,
+}: {
+  gallery: Gallery
+  accountURN: AccountURN
+  traceSpan: TraceSpan
+}) => {
+  const { ethereumClient, polygonClient } = getAlchemyClients()
+
+  const cryptoAddresses = await getAccountCryptoAddresses({
+    accountURN,
+    traceSpan,
+  })
+
+  const [ethContractAddressesSet, polyContractAddressesSet] = gallery.reduce(
+    ([ethereum, polygon], nft) => {
+      // type error will go away after cleaning gallery schema
+      nft.chain.chain === 'eth'
+        ? ethereum.add(nft.contract.address)
+        : polygon.add(nft.contract.address)
+      return [ethereum, polygon]
+    },
+    [new Set([] as string[]), new Set([] as string[])]
+  )
+
+  const ethContractAddresses = Array.from(ethContractAddressesSet)
+  const polyContractAddresses = Array.from(polyContractAddressesSet)
+
+  /** Struct of this map is like this:
+   {
+    contractAddress1: [all tokens that user own in this contract],
+    contractAddress2: [all tokens that user own in this contract],
+    ...
+    contractAddressN: [all tokens that user own in this contract],
+    } 
+  */
+  const validator = new Map<string, string[]>()
+
+  const nfts: GetNFTsResult[] = (
+    await Promise.all(
+      cryptoAddresses.map((address) =>
+        Promise.all([
+          ethContractAddresses.length
+            ? ethereumClient.getNFTs({
+                owner: address,
+                contractAddresses: ethContractAddresses,
+              })
+            : ({ ownedNfts: [] } as GetNFTsResult),
+          polyContractAddresses.length
+            ? polygonClient.getNFTs({
+                owner: address,
+                contractAddresses: polyContractAddresses,
+              })
+            : ({ ownedNfts: [] } as GetNFTsResult),
+        ])
+      )
+    )
+  ).flat()
+
+  // .flat because previous Promise.all returns an array of arrays,
+  // we just need internal arrays of nfts. These internal arrays are arrays
+  // of objects with ownedNfts property
+  // These methods populate validator map to then check if the user owns nfts.
+  nfts.forEach((deeperNfts) => {
+    deeperNfts.ownedNfts?.forEach((nft) => {
+      const val = validator.get(nft.contract?.address as string)
+      validator.set(
+        nft.contract?.address as string,
+        (val ? val : []).concat([nft.id?.tokenId as string])
+      )
+    })
+  })
+
+  return gallery.filter((nft) => {
+    // type error will go away after cleaning gallery schema
+    return validator.get(nft.contract.address)?.includes(nft.tokenId)
+  })
 }

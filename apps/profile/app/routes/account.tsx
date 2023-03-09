@@ -62,7 +62,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const [loggedInUserProfile, addresses] = await Promise.all([
     getAccountProfile({ jwt, accountURN }, context.traceSpan),
-    getAccountAddresses(jwt, context.traceSpan),
+    getAccountAddresses({ jwt, traceSpan: context.traceSpan }),
   ])
 
   const addressTypeUrns = addresses.map((a) => ({

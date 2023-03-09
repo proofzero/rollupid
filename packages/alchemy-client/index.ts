@@ -127,8 +127,8 @@ export type GetContractsForOwnerParams = {
 export type GetNFTsResult = {
   ownedNfts: AlchemyNFT[]
   pageKey?: string | null
-  tokenId: string
-  blockHash: string
+  tokenId?: string
+  blockHash?: string
 }
 
 export type GetContractsForOwnerResult = {

@@ -11,8 +11,6 @@ query getProfile($targetAccountURN: URN) {
     }
     displayName
     handle
-    location
-    job
   }
 }
 

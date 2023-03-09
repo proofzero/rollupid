@@ -11,6 +11,7 @@ import type { FullProfile } from '~/types'
 import type { AccountURN } from '@kubelt/urns/account'
 import type { TraceSpan } from '@kubelt/platform-middleware/trace'
 import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import { getValidGallery } from './alchemy'
 
 export const getAccountProfile = async (
   {
@@ -26,9 +27,14 @@ export const getAccountProfile = async (
 
   const profile = await ProfileKV.get<FullProfile>(accountURN, 'json')
 
-  if (profile && profile.version) return profile
+  if (profile)
+    profile.gallery = await getValidGallery({
+      gallery: profile.gallery,
+      accountURN,
+      traceSpan,
+    })
 
-  // TODO: validate gallery here
+  return profile
 }
 
 export const getAuthorizedApps = async (jwt: string, traceSpan: TraceSpan) => {
@@ -44,26 +50,36 @@ export const getAuthorizedApps = async (jwt: string, traceSpan: TraceSpan) => {
   return authorizedApps
 }
 
-export const getAccountAddresses = async (
-  jwt: string,
+export const getAccountAddresses = async ({
+  jwt,
+  accountURN,
+  traceSpan,
+}: {
+  jwt?: string
+  accountURN?: AccountURN
   traceSpan: TraceSpan
-) => {
+}) => {
   const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(traceSpan)
+    generateTraceContextHeaders(traceSpan!)
   )
   const addressesRes = await galaxyClient.getConnectedAddresses(
-    undefined,
+    { targetAccountURN: accountURN },
     getAuthzHeaderConditionallyFromToken(jwt)
   )
 
   return addressesRes.addresses || []
 }
 
-export const getAccountCryptoAddresses = async (
-  jwt: string,
+export const getAccountCryptoAddresses = async ({
+  jwt,
+  accountURN,
+  traceSpan,
+}: {
+  jwt?: string
+  accountURN?: AccountURN
   traceSpan: TraceSpan
-) => {
-  const addresses = await getAccountAddresses(jwt, traceSpan)
+}) => {
+  const addresses = await getAccountAddresses({ jwt, accountURN, traceSpan })
 
   // TODO: need to type qc and rc
   const cryptoAddresses =

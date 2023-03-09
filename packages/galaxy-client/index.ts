@@ -175,15 +175,11 @@ export type Profile = {
   __typename?: 'Profile';
   displayName?: Maybe<Scalars['String']>;
   handle?: Maybe<Scalars['String']>;
-  job?: Maybe<Scalars['String']>;
-  location?: Maybe<Scalars['String']>;
   pfp?: Maybe<Pfp>;
 };
 
 export type ProfileInput = {
   displayName?: InputMaybe<Scalars['String']>;
-  job?: InputMaybe<Scalars['String']>;
-  location?: InputMaybe<Scalars['String']>;
   pfp?: InputMaybe<PfpInput>;
 };
 
@@ -250,7 +246,7 @@ export type GetProfileQueryVariables = Exact<{
 }>;
 
 
-export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, location?: string | null, job?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null };
+export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null };
 
 export type GetConnectedAddressesQueryVariables = Exact<{
   targetAccountURN?: InputMaybe<Scalars['URN']>;
@@ -343,8 +339,6 @@ export const GetProfileDocument = gql`
     }
     displayName
     handle
-    location
-    job
   }
 }
     `;
