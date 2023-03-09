@@ -56,3 +56,5 @@ jobs:
           workingDirectory: 'platform/edges'
           command: publish --env dev
           environment: 'dev'
+        env:
+          NODE_ENV: 'development'

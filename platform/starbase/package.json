@@ -7,7 +7,7 @@
     "check": "run-s format:check lint:check types:check",
     "deploy": "wrangler publish",
     "deploy:dev": "wrangler publish --env dev",
-    "dev": "run-s dev:local",
+    "dev": "env-cmd --file .dev.env run-s dev:local",
     "dev:local": "run-s types:check wrangler:local",
     "dev:remote": "run-s types:check wrangler:remote",
     "dev:wrangler": "wrangler dev --local --persist",
@@ -27,6 +27,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "4.20221111.1",
     "@types/lodash": "4.14.189",
+    "env-cmd": "10.1.0",
     "esbuild": "0.15.15",
     "eslint": "8.28.0",
     "eslint-config-prettier": "8.5.0",

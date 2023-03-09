@@ -4,6 +4,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "4.20221111.1",
     "concurrently": "7.5.0",
+    "env-cmd": "10.1.0",
     "npm-run-all": "4.1.5",
     "typescript": "4.8.4",
     "wrangler": "2.12.0"
@@ -13,7 +14,7 @@
     "test": "echo \"Error: no test specified\" && exit 0",
     "build": "wrangler publish --dry-run --outdir=dist",
     "dev:wrangler": "wrangler dev --local --persist",
-    "dev": "run-p 'dev:*'",
+    "dev": "env-cmd --file .dev.env run-p 'dev:*'",
     "start": "echo \"No start for galaxy. Please use dev.\""
   },
   "dependencies": {
