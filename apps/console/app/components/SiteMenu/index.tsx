@@ -182,7 +182,7 @@ const appSubmenuStruct: {
       {
         title: 'Billing',
         icon: TbReceipt2,
-        disabled: true,
+        subroute: '/billing',
       },
     ],
   },
