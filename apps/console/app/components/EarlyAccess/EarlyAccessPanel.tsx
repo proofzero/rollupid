@@ -30,7 +30,7 @@ const EarlyAccessPanel = ({
             <FeaturePill text="Early Access" />
           </div>
 
-          <Text size="2xl" weight="semibold" className="text-gray-900">
+          <Text size="2xl" weight="semibold" className="text-gray-900 mb-2">
             {subtitle}
           </Text>
 
