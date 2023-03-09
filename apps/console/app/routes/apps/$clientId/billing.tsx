@@ -218,7 +218,7 @@ export default () => (
           </div>
         </div>
         <a
-          href="https://docs.kubelt.com/"
+          href="https://discord.gg/rollupid"
           className="btn-secondary full-width w-button"
         >
           Contact us
@@ -300,7 +300,7 @@ export default () => (
           </div>
         </div>
         <a
-          href="https://docs.kubelt.com/"
+          href="https://discord.gg/rollupid"
           className="btn-secondary full-width w-button"
         >
           Contact us
