@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
     "build": "run-s 'build:*'",
-    "build:css": "npx tailwindcss -o ./app/styles/tailwind.css",
+    "build:css": "npx tailwindcss -o ./app/styles/tailwind.css --minify",
     "build:sass": "sass app/:app/ --no-source-map",
     "build:remix": "remix build",
     "deploy": "wrangler publish",
