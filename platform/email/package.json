@@ -1,0 +1,18 @@
+{
+  "name": "@kubelt/services.email",
+  "version": "0.0.0",
+  "devDependencies": {
+    "@cloudflare/workers-types": "4.20221111.1",
+    "npm-run-all": "4.1.5",
+    "typescript": "4.8.4",
+    "wrangler": "2.12.2"
+  },
+  "private": true,
+  "scripts": {
+    "build": "wrangler publish --dry-run --outdir=dist",
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "dev:wrangler": "wrangler dev --local --persist",
+    "dev": "run-p 'dev:*'",
+    "deploy": "wrangler publish"
+  }
+}

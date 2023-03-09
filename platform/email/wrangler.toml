@@ -1,0 +1,36 @@
+name = "email"
+
+main = "src/index.ts"
+compatibility_date = "2022-10-05"
+
+workers_dev = false
+
+[dev]
+port = 10105
+inspector_port = 11105
+local_protocol = "http"
+
+[env]
+DefaultEmailFromName = "Rollup (Local) - Notification"
+DefaultEmailFromAddress = "noreply@localhost.local"
+DKIMDomain = "localhost.local"
+DKIMSelector = "none"
+DKIMPrivateKey = "none"
+
+[env.dev.vars]
+DefaultEmailFromName = "Rollup (Dev) - Notifcation"
+DefaultEmailFromAddress = "noreply@aubergineone.com"
+DKIMDomain = "realdomain"
+DKIMSelector = "realkey"
+
+[env.next.vars]
+DefaultEmailFromName = "Rollup (Next) - Notifcation"
+DefaultEmailFromAddress = "noreply@aubergineone.com"
+DKIMDomain = "realdomain"
+DKIMSelector = "realkey"
+
+[env.current.vars]
+DefaultEmailFromName = "Rollup - Notifcation"
+DefaultEmailFromAddress = "noreply@aubergineone.com"
+DKIMDomain = "realdomain"
+DKIMSelector = "realkey"

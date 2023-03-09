@@ -6,6 +6,7 @@ import { appRouter as pingRouter } from '@kubelt/platform/ping/src/jsonrpc/route
 import { appRouter as objectRouter } from '@kubelt/platform/object/src/jsonrpc/router'
 import { appRouter as starbaseRouter } from '@kubelt/platform/starbase/src/jsonrpc/router'
 import { appRouter as imageRouter } from '@kubelt/platform/images/src/jsonrpc/router'
+import { appRouter as emailRouter } from '@kubelt/platform/email/src/jsonrpc/router'
 
 export type AccountRouter = typeof accountRouter
 
@@ -22,3 +23,5 @@ export type ObjectRouter = typeof objectRouter
 export type StarbaseRouter = typeof starbaseRouter
 
 export type ImageRouter = typeof imageRouter
+
+export type EmailRouter = typeof emailRouter
