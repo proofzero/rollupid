@@ -5,11 +5,10 @@ import {
   useTransition,
   useFetcher,
 } from '@remix-run/react'
-import { FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
+import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import InputText from '~/components/inputs/InputText'
 import { getProfileSession, parseJwt } from '~/utils/session.server'
-import InputTextarea from '~/components/inputs/InputTextarea'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
@@ -18,12 +17,12 @@ import { gatewayFromIpfs } from '@kubelt/utils'
 
 import PfpNftModal from '~/components/accounts/PfpNftModal'
 
-import { useEffect, useRef, useState, useMemo } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import SaveButton from '~/components/accounts/SaveButton'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import type { Profile } from '@kubelt/galaxy-client'
-import type { FullProfile } from '~/types'
+import type { FullProfile, NFT } from '~/types'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const session = await getProfileSession(request)
@@ -145,58 +144,21 @@ export default function AccountSettingsProfile() {
 
   // ------------------- START OF MODAL PART ---------------------- //
   // STATE
-  const [refresh, setRefresh] = useState(true)
-  const [loadedNfts, setLoadedNfts] = useState([] as any[])
-  const [pageKey, setPageLink] = useState<string | undefined>()
-  const [loading, setLoading] = useState(true)
   const [collection, setCollection] = useState('')
 
   const modalFetcher = useFetcher()
 
   // HOOKS
-  useEffect(() => {
-    if (modalFetcher.data) {
-      /* We already have only 1 NFT per collection
-       ** No need to put it in additional set
-       */
-
-      setLoadedNfts(modalFetcher.data.ownedNfts)
-      setPageLink(modalFetcher.data.pageKey ?? null)
-
-      if (refresh) {
-        setRefresh(false)
-      }
-    }
-  }, [modalFetcher.data])
 
   useEffect(() => {
-    getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
+    const chain =
+      collection !== ''
+        ? modalFetcher.data?.ownedNfts.filter(
+            (nft: NFT) => nft.contract.address === collection
+          )[0].chain.chain
+        : null
+    getMoreNftsModal(modalFetcher, accountURN, collection, chain)
   }, [collection])
-
-  useEffect(() => {
-    if (pageKey) {
-      setLoading(true)
-      getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
-    } else if (pageKey === null) {
-      setLoading(false)
-    }
-  }, [pageKey])
-
-  useMemo(() => {
-    setRefresh(true)
-    setLoadedNfts([])
-    setPageLink(undefined)
-  }, [])
-
-  useEffect(() => {
-    const asyncFn = async () => {
-      getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
-    }
-    if (refresh) {
-      asyncFn()
-    }
-  }, [refresh])
-
   // --------------------- END OF MODAL PART ---------------------- //
 
   return (
@@ -205,11 +167,11 @@ export default function AccountSettingsProfile() {
         Settings
       </Text>
       <PfpNftModal
-        nfts={loadedNfts}
+        nfts={modalFetcher.data?.ownedNfts}
         collection={collection}
         setCollection={setCollection}
         displayName={displayName as string}
-        loadingConditions={refresh || loading || modalFetcher.state !== 'idle'}
+        loadingConditions={modalFetcher.state !== 'idle'}
         text={'Select NFT Avatar'}
         isOpen={nftPfpModalOpen}
         pfp={pfpUrl as string}

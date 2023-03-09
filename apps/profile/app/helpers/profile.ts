@@ -1,4 +1,8 @@
-import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
+import {
+  CryptoAddressType,
+  NodeType,
+  OAuthAddressType,
+} from '@kubelt/types/address'
 import type { AddressURN } from '@kubelt/urns/address'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import { getGalaxyClient } from '~/helpers/clients'
@@ -53,6 +57,22 @@ export const getAccountAddresses = async (
   )
 
   return addressesRes.addresses || []
+}
+
+export const getAccountCryptoAddresses = async (
+  jwt: string,
+  traceSpan: TraceSpan
+) => {
+  const addresses = await getAccountAddresses(jwt, traceSpan)
+
+  // TODO: need to type qc and rc
+  const cryptoAddresses =
+    addresses
+      .filter((e) => [NodeType.Crypto, NodeType.Vault].includes(e.rc.node_type))
+      .map((address) => address.qc.alias.toLowerCase() as string) ||
+    ([] as string[])
+
+  return cryptoAddresses
 }
 
 export const getAddressProfiles = async (

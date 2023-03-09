@@ -1,12 +1,11 @@
-import type { Nft } from '@kubelt/galaxy-client'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import type { AccountURN } from '@kubelt/urns/account'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
-import { getGalaxyClient } from '~/helpers/clients'
-import { decorateNfts } from '~/helpers/nfts'
 import { getProfileSession } from '~/utils/session.server'
+import { getNfts } from '~/helpers/alchemy'
+import { getAccountCryptoAddresses } from '~/helpers/profile'
+import type { AlchemyChain } from '@kubelt/packages/alchemy-client'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const srcUrl = new URL(request.url)
@@ -16,30 +15,30 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const jwt = user.accessToken
 
-  const owner = srcUrl.searchParams.get('owner')
+  const owner = srcUrl.searchParams.get('owner') as AccountURN
   if (!owner) {
-    throw new Error('Owner required')
+    throw new Error('Owner is required')
   }
 
   const collection = srcUrl.searchParams.get('collection')
   if (!collection) {
-    throw new Error('Collection required')
+    throw new Error('Collection is required')
   }
 
-  const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(context.traceSpan)
-  )
-  const { nftsForAddress: resColl } = await galaxyClient.getNftsForAddress(
-    {
-      owner,
-      contractAddresses: [collection],
-    },
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
+  const chain = srcUrl.searchParams.get('chain') as AlchemyChain
+  if (!chain) {
+    throw new Error('Chain is required')
+  }
+
+  const addresses = await getAccountCryptoAddresses(jwt, context.traceSpan)
+
+  const nftsForAccount = await getNfts({
+    addresses,
+    contractAddresses: [collection],
+    chain,
+  })
 
   return json({
-    ownedNfts: resColl?.ownedNfts
-      ? decorateNfts(resColl?.ownedNfts as Nft[])
-      : [],
+    ownedNfts: nftsForAccount,
   })
 }

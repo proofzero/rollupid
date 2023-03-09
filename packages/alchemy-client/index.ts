@@ -2,144 +2,9 @@ function buildError(code: number, message: string) {
   return new Error(`${code}: ${message}`)
 }
 
-export type GetNFTsParams = {
-  owner: string
-  contractAddresses: string[]
-  pageKey?: string
-  pageSize?: number
-}
+// --------------------- HELPERS -----------------------------------------------
 
-enum OpenSeaSafeListStatus {
-  Approved = 'approved',
-  NotRequested = 'not_requested',
-  Requested = 'requested',
-  Verified = 'verified',
-}
-
-enum TokenType {
-  Erc721 = 'ERC721',
-  Erc1155 = 'ERC1155',
-  Unknown = 'UNKNOWN',
-}
-
-export type GetNFTsResult = {
-  ownedNfts: {
-    balance?: string | null
-    chain?: {
-      chain: string
-      network: string
-    } | null
-    contract?: { address: string } | null
-    contractMetadata?: {
-      name?: string | null
-      openSea: {
-        collectionName?: string | null
-        description?: string | null
-        discordUrl?: string | null
-        externalUrl?: string | null
-        floorPrice?: number | null
-        imageUrl?: string | null
-        safeListRequestStatus?: OpenSeaSafeListStatus | null
-        twitterUsername?: string | null
-      }
-      symbol?: string | null
-      tokenType?: TokenType | null
-      totalSupply?: string | null
-    } | null
-    description?: string | null
-    error?: string | null
-    id?: { tokenId?: string | null } | null
-    media: {
-      bytes?: string | null
-      format?: string | null
-      gateway?: string | null
-      raw?: string | null
-      thumbnail?: string | null
-    }[]
-    metadata?: {
-      background_color?: string | null
-      description?: string | null
-      external_url?: string | null
-      image?: string | null
-      media: {
-        bytes?: string | null
-        format?: string | null
-        gateway?: string | null
-        raw?: string | null
-        thumbnail?: string | null
-      }[]
-      name?: string | null
-      timeLastUpdated?: string | null
-    }
-    title?: string | null
-    tokenUri?: {
-      gateway?: string | null
-      raw?: string | null
-    } | null
-  }[]
-}
-
-export type GetContractsForOwnerParams = {
-  address: string
-  pageKey?: string
-  pageSize?: number
-  excludeFilters?: string[]
-}
-
-export type GetContractsForOwnerResult = unknown
-
-export type GetOwnersForTokenParams = {
-  contractAddress: string
-  tokenId: string
-}
-
-export type GetOwnersForTokenResult = {
-  owners: string[]
-}
-
-export type GetNFTMedatadaParams = {
-  contractAddress: string
-  tokenId: string
-}
-
-export type GetNFTMedatadaResult = unknown
-
-export type GetNFTMedatadaBatchParams = GetNFTMedatadaParams[]
-
-export type GetNFTMedatadaBatchResult = unknown
-
-export enum WebhookType {
-  MINED_TRANSACTION = 'MINED_TRANSACTION',
-  DROPPED_TRANSACTION = 'DROPPED_TRANSACTION',
-  ADDRESS_ACTIVIY = 'ADDRESS_ACTIVIY',
-  NFT_ACTIVIY = 'NFT_ACTIVIY',
-  NFT_METADATA_UPDATE = 'NFT_METADATA_UPDATE',
-}
-export type CreateWebhookParams = {
-  network: string
-  webhookType: WebhookType
-  webhookUrl: string
-  app_id?: string
-  addresses?: string[]
-  nft_filters?: { contract_address: string; token_id: string }[]
-  nft_metadata_filters?: { contract_address: string; token_id: string }[]
-}
-
-export type CreateWebhookResult = {
-  data: {
-    id: string
-    network: AlchemyNetwork
-    webhook_type: WebhookType
-    webhook_url: string
-    is_active: boolean
-    time_created: number
-    addresses: string[]
-    version: string
-    signing_key: string
-  }
-}
-
-enum AlchemyNetwork {
+export enum AlchemyNetwork {
   mainnet = 'mainnet',
   goerli = 'goerli',
   mumbai = 'mumbai',
@@ -150,14 +15,141 @@ export enum AlchemyChain {
   polygon = 'polygon',
 }
 
+enum TokenType {
+  Erc721 = 'ERC721',
+  Erc1155 = 'ERC1155',
+  Unknown = 'UNKNOWN',
+}
+
+enum OpenSeaSafeListStatus {
+  Approved = 'approved',
+  NotRequested = 'not_requested',
+  Requested = 'requested',
+  Verified = 'verified',
+}
+
+export type OpenSea = {
+  floorPrice?: number | null
+  collectionName?: string | null
+  safeListRequestStatus?: OpenSeaSafeListStatus | null
+  imageUrl?: string | null
+  description?: string | null
+  externalUrl?: string | null
+  twitterUsername?: string | null
+  discordUrl?: string | null
+  lastIngestedAt?: string | null
+}
+
+export type NFTMedia = {
+  raw: string
+  bytes?: number | null
+  format?: string | null
+  gateway?: string | null
+  thumbnail?: string | null
+}
+
+export type AlchemyContract = {
+  address: string
+  totalBalance: number
+  numDistinctTokensOwned: number
+  isSpam: boolean
+  tokenId: string
+  name: string
+  title: string
+  symbol: string
+  tokenType: TokenType
+  contractDeployer: string
+  deployedBlockNumber: number
+  media: NFTMedia
+  opensea: OpenSea
+}
+
+export type AlchemyNFT = {
+  contract: { address: string }
+  id: { tokenId: string }
+  balance: string
+  title?: string | null
+  description?: string | null
+  tokenUri: {
+    raw: string
+    gateway?: string | null
+  }
+  media: NFTMedia
+  metadata: {
+    image?: string | null
+    external_url?: string | null
+    background_color?: string | null
+    name?: string | null
+    description?: string | null
+    attributes?: {
+      value: string
+      trait_type: string
+    }[]
+    media: NFTMedia
+  }
+  timeLastUpdated: string
+  error?: string | null
+  contractMetadata: {
+    name?: string | null
+    symbol: string
+    totalSupply: string
+    tokenType: TokenType
+    contractDeployer: string
+    deployedBlockNumber: number
+    opensea?: OpenSea | null
+  }
+  spamInfo?: { isSpam: string; classifications: string[] } | null
+}
+
+// --------------------- PARAMS ------------------------------------------------
+
+export type GetNFTsParams = {
+  owner: string
+  contractAddresses: string[]
+  pageKey?: string
+  pageSize?: number
+}
+
+export type GetOwnersForTokenParams = {
+  contractAddress: string
+  tokenId: string
+}
+
+export type GetContractsForOwnerParams = {
+  address: string
+  pageKey?: string
+  pageSize?: number
+  excludeFilters?: string[]
+}
+
+// --------------------- RESULTS -----------------------------------------------
+
+export type GetNFTsResult = {
+  ownedNfts: AlchemyNFT[]
+  pageKey?: string | null
+  tokenId: string
+  blockHash: string
+}
+
+export type GetContractsForOwnerResult = {
+  contracts: AlchemyContract[]
+  pageKey?: string | null
+  totalCount: string
+}
+
+export type GetOwnersForTokenResult = {
+  owners: string[]
+}
+
 export type AlchemyClientConfig = {
   key: string
   network: AlchemyNetwork
-  chain?: AlchemyChain
+  chain: AlchemyChain
   url?: string
   token?: string
 }
 
+// --------------------- MAIN FUNCTIONALITY ------------------------------------
 export class AlchemyClient {
   #config: AlchemyClientConfig
 
@@ -216,11 +208,14 @@ export class AlchemyClient {
     }
 
     // Is supported ONLY on ethereum and polygon mainnets
+    // !! Doesn't work for goerly, mumbai etc and almost anything else !!
+    // https://docs.alchemy.com/reference/getspamcontracts
     ;['SPAM'].forEach((filter) => {
       url.searchParams.append('excludeFilters[]', filter)
     })
 
     const urlStr = url.toString()
+
     const cacheKeyDigest = await crypto.subtle.digest(
       {
         name: 'SHA-256',
@@ -278,6 +273,7 @@ export class AlchemyClient {
     }
 
     const urlStr = url.toString()
+
     const cacheKeyDigest = await crypto.subtle.digest(
       {
         name: 'SHA-256',
@@ -311,12 +307,12 @@ export class AlchemyClient {
           e.status,
           `Error calling Alchemy getContractsForOwner: ${e.message}`
         )
-      })
+      }) as Promise<GetContractsForOwnerResult>
   }
 
   async getOwnersForToken(
     params: GetOwnersForTokenParams
-  ): Promise<GetOwnersForTokenResult | unknown> {
+  ): Promise<GetOwnersForTokenResult> {
     const url = this.getAPIURL('getOwnersForToken/')
 
     const { contractAddress, tokenId } = params
@@ -328,6 +324,7 @@ export class AlchemyClient {
     // const response = await fetch(`${url}?${urlSearchParams}`)
     // const body: GetOwnersForTokenResult = await response.json()
     // return body
+
     const urlStr = url.toString()
     const cacheKeyDigest = await crypto.subtle.digest(
       {
@@ -362,101 +359,6 @@ export class AlchemyClient {
           500,
           `Error calling Alchemy getOwnersForToken: ${e.message}`
         )
-      })
-  }
-  async getNFTMetadataBatch(
-    params: GetNFTMedatadaBatchParams
-  ): Promise<GetNFTMedatadaBatchResult | unknown> {
-    const url = this.getNFTAPIURL('getNFTMetadataBatch/')
-
-    const urlStr = url.toString()
-    const cacheKeyDigest = await crypto.subtle.digest(
-      {
-        name: 'SHA-256',
-      },
-      new TextEncoder().encode(urlStr)
-    )
-    const cacheKeyArray = Array.from(new Uint8Array(cacheKeyDigest))
-    const cacheKey = cacheKeyArray
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('')
-    if (params?.length) {
-      return fetch(urlStr, {
-        method: 'POST',
-        cf: {
-          cacheTtl: 1500,
-          cacheEverything: true,
-          cacheKey,
-        },
-        body: JSON.stringify({
-          tokens: params,
-        }),
-      })
-        .then(async (r) => {
-          if (r.status !== 200) {
-            const errorText = await r.text()
-            console.error(errorText)
-            throw buildError(
-              r.status,
-              `Error calling Alchemy getNFTMetadataBatch: ${errorText}`
-            )
-          }
-          return r.json()
-        })
-        .catch((e) => {
-          throw buildError(
-            e.status,
-            `Error calling Alchemy getNFTMetadataBatch: ${e.message}`
-          )
-        })
-    }
-    return []
+      }) as Promise<GetOwnersForTokenResult>
   }
 }
-
-export const NFTPropertyMapper = (nfts: any[]) =>
-  nfts
-    .filter((nft: any) => nft.contractMetadata?.tokenType !== 'UNKNOWN')
-    .map((nft: any) => {
-      let properties: {
-        name: string
-        value: any
-        display: string
-      }[] = []
-
-      // TODO: is this here b/c pfp does not conform to standard?
-      if (nft.metadata?.properties) {
-        const validProps = Object.keys(nft.metadata.properties)
-          .filter((k) => typeof nft.metadata.properties[k] !== 'object')
-          .map((k) => ({
-            name: k,
-            value: nft.metadata.properties[k],
-            display: typeof nft.metadata.properties[k],
-          }))
-
-        properties = properties.concat(validProps)
-      }
-
-      if (nft.metadata.attributes?.length) {
-        const mappedAttributes = nft.metadata.attributes
-          .filter((a: any) => a != null)
-          .map((a: any) => ({
-            name: a.trait_type,
-            value: a.value,
-            display: a.display_type || 'string',
-          }))
-
-        properties = properties.concat(mappedAttributes)
-      }
-
-      if (typeof nft.metadata === 'object') {
-        nft.metadata.properties = properties.filter(
-          (p) => typeof p.value !== 'object'
-        )
-      }
-      if (nft.metadata.attributes) {
-        delete nft.metadata.attributes
-      }
-
-      return nft
-    })

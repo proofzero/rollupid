@@ -22,7 +22,6 @@ export type UnfilteredNftGridProps = {
 
   getMoreNfts?: () => void
   handleSelectedNft?: (nft: any) => void
-  handleRedirect?: () => void
   setCollection?: (s: string) => void
 
   nftRenderer?: (
@@ -43,7 +42,6 @@ const UnfilteredNftGrid = ({
   setCollection,
   preload = false,
   handleSelectedNft,
-  handleRedirect,
   nftRenderer = (nft) => <ModaledNft nft={nft} isModal={isModalNft} />,
   nftGrid = <LoadingGrid />,
 }: UnfilteredNftGridProps) => {
@@ -63,10 +61,10 @@ const UnfilteredNftGrid = ({
       {/* If we browse all collections of a user */}
       {displayedNfts.length && !loadingConditions ? (
         <>
-          {!(handleRedirect || setCollection) ? null : (
+          {!setCollection ? null : (
             <button
               onClick={() => {
-                ;(setCollection as (s: string) => void)('')
+                setCollection('')
               }}
               className="lg:px-4 px-3"
             >

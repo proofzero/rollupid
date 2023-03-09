@@ -50,7 +50,7 @@ import {
 } from '@kubelt/design-system/src/atoms/toast'
 import type { FullProfile } from '~/types'
 import type { Maybe } from 'graphql/jsutils/Maybe'
-import type { GalleryItem } from '~/types'
+import type { NFT } from '~/types'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
@@ -66,7 +66,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   if (!updatedGallery) {
     throw new Error('Gallery should not be empty')
   }
-  const nfts: GalleryItem[] = JSON.parse(updatedGallery)
+  const nfts: NFT[] = JSON.parse(updatedGallery)
 
   // TODO: replace with zod?
   nfts.forEach((nft) => {
@@ -85,9 +85,6 @@ export const action: ActionFunction = async ({ request, context }) => {
       errors.set(`${nft.contract?.address}-${nft.tokenId}`, [
         'Nft should have attached details',
       ])
-    }
-    if (nft.error) {
-      errors.set(`${nft.contract?.address}-${nft.tokenId}`, nft.error)
     }
   })
 
@@ -111,7 +108,7 @@ export const action: ActionFunction = async ({ request, context }) => {
  * you may take a quick look here:
  * https://codesandbox.io/s/dndkit-sortable-image-grid-py6ve?file=/src/App.jsx*/
 
-const NFT = forwardRef(
+const NFTComponent = forwardRef(
   ({ url, faded, isDragging, style, ...props }: any, ref) => {
     /**
      * It re-renders this small component quite often
@@ -165,7 +162,7 @@ const SortableNft = (props: { url?: Maybe<string>; id: string }) => {
   }
 
   return (
-    <NFT
+    <NFTComponent
       ref={setNodeRef}
       style={style}
       isDragging={isDragging}
@@ -259,7 +256,14 @@ const Gallery = () => {
   }, [transition, actionData?.errors])
 
   useEffect(() => {
-    getMoreNftsModal(modalFetcher, accountURN, collection)
+    const chain =
+      collection !== ''
+        ? modalFetcher.data?.ownedNfts.filter(
+            (nft: NFT) => nft.contract.address === collection
+          )[0].chain.chain
+        : null
+
+    getMoreNftsModal(modalFetcher, accountURN, collection, chain)
   }, [collection])
 
   return (
@@ -325,7 +329,7 @@ const Gallery = () => {
                   className="grid-cols-2 md:grid-cols-3 lg:grid-cols-4
             flex flex-col justify-center items-center"
                 >
-                  {curatedNfts.map((nft: GalleryItem, i: number) => {
+                  {curatedNfts.map((nft: NFT, i: number) => {
                     return (
                       <div
                         className="relative group"
@@ -385,7 +389,7 @@ const Gallery = () => {
                 }}
               >
                 {activeId ? (
-                  <NFT
+                  <NFTComponent
                     url={curatedNfts[curatedNftsIDs.indexOf(activeId)].url}
                     index={curatedNftsIDs.indexOf(activeId)}
                   />
