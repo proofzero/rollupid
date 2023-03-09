@@ -1,9 +1,9 @@
 export interface Environment {
   DefaultEmailFromName: string
-  DefaultEmailFromAddress: string
-  DKIMDomain: string
-  DKIMSelector: string
-  DKIMPrivateKey: string
+  DefaultEmailFromUser: string
+  KEY_DKIM_PRIVATEKEY: string
+  INTERNAL_DKIM_SELECTOR: string
+  INTERNAL_DKIM_DOMAIN: string
 }
 
 /** CF EmailMessage type; not provided in CF types lib */

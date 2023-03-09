@@ -12,25 +12,16 @@ local_protocol = "http"
 
 [env]
 DefaultEmailFromName = "Rollup (Local) - Notification"
-DefaultEmailFromAddress = "noreply@localhost.local"
-DKIMDomain = "localhost.local"
-DKIMSelector = "none"
-DKIMPrivateKey = "none"
+DefaultEmailFromUser = "noreply"
 
 [env.dev.vars]
 DefaultEmailFromName = "Rollup (Dev) - Notifcation"
-DefaultEmailFromAddress = "noreply@aubergineone.com"
-DKIMDomain = "realdomain"
-DKIMSelector = "realkey"
+DefaultEmailFromUser = 'noreply'
 
 [env.next.vars]
 DefaultEmailFromName = "Rollup (Next) - Notifcation"
-DefaultEmailFromAddress = "noreply@aubergineone.com"
-DKIMDomain = "realdomain"
-DKIMSelector = "realkey"
+DefaultEmailFromUser = 'noreply'
 
 [env.current.vars]
 DefaultEmailFromName = "Rollup - Notifcation"
-DefaultEmailFromAddress = "noreply@aubergineone.com"
-DKIMDomain = "realdomain"
-DKIMSelector = "realkey"
+DefaultEmailFromUser = 'noreply'

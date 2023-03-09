@@ -27,11 +27,11 @@ export const sendEmailNotificationMethod = async ({
 }): Promise<sendOTPEmailMethodOutputParams> => {
   if (
     !(
-      ctx.DefaultEmailFromAddress &&
+      ctx.DefaultEmailFromUser &&
       ctx.DefaultEmailFromName &&
-      ctx.DKIMDomain &&
-      ctx.DKIMPrivateKey &&
-      ctx.DKIMSelector
+      ctx.INTERNAL_DKIM_DOMAIN &&
+      ctx.KEY_DKIM_PRIVATEKEY &&
+      ctx.INTERNAL_DKIM_SELECTOR
     )
   )
     throw new Error(
@@ -39,11 +39,11 @@ export const sendEmailNotificationMethod = async ({
     )
 
   const env: Environment = {
-    DefaultEmailFromAddress: ctx.DefaultEmailFromAddress,
-    DefaultEmailFromName: ctx.DefaultEmailFromAddress,
-    DKIMDomain: ctx.DKIMDomain,
-    DKIMPrivateKey: ctx.DKIMPrivateKey,
-    DKIMSelector: ctx.DKIMSelector,
+    DefaultEmailFromUser: ctx.DefaultEmailFromUser,
+    DefaultEmailFromName: ctx.DefaultEmailFromName,
+    INTERNAL_DKIM_DOMAIN: ctx.INTERNAL_DKIM_DOMAIN,
+    KEY_DKIM_PRIVATEKEY: ctx.KEY_DKIM_PRIVATEKEY,
+    INTERNAL_DKIM_SELECTOR: ctx.INTERNAL_DKIM_SELECTOR,
   }
 
   const otpEmailTemplate = getOTPEmailContent(input.otpCode)

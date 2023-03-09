@@ -28,7 +28,10 @@ export async function send(
   message: EmailMessage,
   env: Environment
 ): Promise<void> {
-  if (!env.DKIMDomain || env.DKIMDomain === 'localhost.local') {
+  if (
+    !env.INTERNAL_DKIM_DOMAIN ||
+    env.INTERNAL_DKIM_DOMAIN === 'localhost.local'
+  ) {
     //We're running locally, so we don't send the email but only log it's content to console
     console.info('Email:', message)
     return
@@ -43,9 +46,9 @@ export async function send(
             name: message.recipient.name,
           },
         ],
-        dkim_domain: env.DKIMDomain,
-        dkim_selector: env.DKIMSelector,
-        dkim_private_key: env.DKIMPrivateKey,
+        dkim_domain: env.INTERNAL_DKIM_DOMAIN,
+        dkim_selector: env.INTERNAL_DKIM_SELECTOR,
+        dkim_private_key: env.KEY_DKIM_PRIVATEKEY,
       },
     ],
     from: {
@@ -85,7 +88,7 @@ export async function sendNotification(
     ...notification,
     from: {
       name: env.DefaultEmailFromName,
-      address: env.DefaultEmailFromAddress,
+      address: `${env.DefaultEmailFromUser}@${env.INTERNAL_DKIM_DOMAIN}`,
     },
   }
   await send(message, env)
