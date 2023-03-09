@@ -37,38 +37,6 @@ export const getAlchemyClient = (chain: Chain): AlchemyClient => {
 
 // -------------------- ALL NFTS FOR SPECIFIED CONTRACTS -----------------------
 
-export const getNftsForAllChains = async ({
-  addresses,
-  contractAddresses,
-  maxRuns = 3,
-}: {
-  addresses: string[]
-  contractAddresses: string[]
-  maxRuns?: number
-}) => {
-  try {
-    const [ethNfts, polyNfts] = await Promise.all([
-      getNfts({
-        addresses,
-        contractAddresses,
-        maxRuns,
-        chain: AlchemyChain.ethereum,
-      }),
-      getNfts({
-        addresses,
-        contractAddresses,
-        maxRuns,
-        chain: AlchemyChain.polygon,
-      }),
-    ])
-
-    return ethNfts.concat(polyNfts)
-  } catch (ex) {
-    console.error(new GraphQLYogaError(ex as string))
-    return []
-  }
-}
-
 export const getNfts = async ({
   addresses,
   contractAddresses,
@@ -157,6 +125,9 @@ export const getContractsForAllChains = async ({
   addresses: string[]
   excludeFilters: string[]
 }) => {
+  // To avoid duplication - if one collection comes from different addresses
+  const visitedContracts = new Map<string, boolean>()
+
   try {
     const [ethereumContracts, polygonContracts] = await Promise.all([
       getContracts({
@@ -171,8 +142,17 @@ export const getContractsForAllChains = async ({
       }),
     ])
 
+    const ownedNfts = ethereumContracts
+      .concat(polygonContracts)
+      .sort(sortNftsFn)
+      .filter((nft) =>
+        visitedContracts.has(nft.contract.address)
+          ? false
+          : visitedContracts.set(nft.contract.address, true)
+      )
+
     return {
-      ownedNfts: ethereumContracts.concat(polygonContracts).sort(sortNftsFn),
+      ownedNfts,
     }
   } catch (ex) {
     console.error(new GraphQLYogaError(ex as string))
