@@ -34,7 +34,7 @@ DEPLOY_ENV = "local"
 PASSPORT_URL = "http://localhost:10001"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
-PROFILE_APP_URL = "http://localhost:10002"
+PROFILE_APP_URL = "http://localhost:10003"
 COOKIE_DOMAIN = "localhost"
 
 # Site
