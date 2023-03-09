@@ -29,12 +29,12 @@ kv_namespaces = [
 ]
 
 [vars]
-PASSPORT_URL = "http://localhost:9696"
-PASSPORT_AUTH_URL = "http://localhost:9696/authorize"
-PASSPORT_TOKEN_URL = "http://127.0.0.1:9696/token"
+PASSPORT_URL = "http://localhost:10001"
+PASSPORT_AUTH_URL = "http://localhost:10001/authorize"
+PASSPORT_TOKEN_URL = "http://127.0.0.1:10001/token"
 IMAGES_URL = "http://localhost/trpc"
-CONSOLE_APP_URL = "http://localhost:9898"
-REDIRECT_URI = "http://localhost:9797/auth/callback"
+CONSOLE_APP_URL = "http://localhost:10002"
+REDIRECT_URI = "http://localhost:10003/auth/callback"
 COOKIE_DOMAIN = "localhost"
 TWITTER_URL = "https://twitter.com/rollupid"
 DISCORD_URL = "https://discord.gg/rollupid"
