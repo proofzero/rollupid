@@ -51,7 +51,8 @@ bucket = "./public"
 command = "yarn build -- --sourcemap"
 
 [dev]
-port = 9797
+port = 10003
+inspector_port = 11003
 local_protocol = "http"
 
 # dev (development) 

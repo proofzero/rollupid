@@ -24,7 +24,8 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 INTERNAL_JWT_ISS = "http://localhost:9696"
 
 [dev]
-port = 9393
+port = 10101
+inspector_port = 11101
 local_protocol = "http"
 
 [env.dev]

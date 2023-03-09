@@ -28,7 +28,8 @@ NFTAR_URL="https://test.nftar.rollup.id/api"
 NFTAR_CHAIN_ID=5
 
 [dev]
-port = 9191
+port = 10102
+inspector_port = 11102
 local_protocol = "http"
 
 [[migrations]]

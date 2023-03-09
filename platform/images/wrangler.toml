@@ -28,7 +28,8 @@ HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID = "VqQy1abBMHYDZwVsTbsSMw"
 # - CLOUDFLARE_ACCOUNT_ID: the CF account ID of the uploaded image owner
 # - CLOUDFLARE_IMAGES_KEY: an API token with Images permissions
 [dev]
-port = 8989
+port = 10502
+inspector_port = 11502
 local_protocol = "http"
 
 [env.dev]

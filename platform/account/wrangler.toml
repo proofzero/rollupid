@@ -24,7 +24,8 @@ unsafe.bindings = [
 ]
 
 [dev]
-port = 9494
+port = 10201
+inspector_port = 11201
 local_protocol = "http"
 
 [env.dev]
