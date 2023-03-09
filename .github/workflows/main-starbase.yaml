@@ -48,3 +48,5 @@ jobs:
           workingDirectory: 'platform/starbase'
           command: publish --env dev
           environment: 'dev'
+        env:
+          NODE_ENV: 'development'

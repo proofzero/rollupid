@@ -5184,6 +5184,7 @@ __metadata:
     "@typescript-eslint/parser": 5.42.1
     async: 3.2.4
     do-proxy: 1.3.3
+    env-cmd: 10.1.0
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
     jose: 4.11.0
@@ -5209,6 +5210,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
     do-proxy: 1.3.3
+    env-cmd: 10.1.0
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
     npm-run-all: 4.1.5
@@ -5240,6 +5242,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
     do-proxy: 1.3.3
+    env-cmd: 10.1.0
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
     jose: 4.11.0
@@ -5268,6 +5271,7 @@ __metadata:
     drizzle-kit: 0.16.1
     drizzle-orm: 0.16.1
     drizzle-orm-sqlite: 0.16.1
+    env-cmd: 10.1.0
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
     prettier: 2.7.1
@@ -5295,6 +5299,7 @@ __metadata:
     "@graphql-tools/stitch": 8.7.13
     "@graphql-yoga/common": 2.12.12
     concurrently: 7.5.0
+    env-cmd: 10.1.0
     graphql: 16.6.0
     graphql-type-json: 0.3.2
     npm-run-all: 4.1.5
@@ -5352,6 +5357,7 @@ __metadata:
     "@types/lodash": 4.14.189
     cross-env: 7.0.3
     do-proxy: 1.3.3
+    env-cmd: 10.1.0
     esbuild: 0.15.15
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
@@ -5406,6 +5412,7 @@ __metadata:
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/keccak256": 5.7.0
     date-fns: 2.29.3
+    env-cmd: 10.1.0
     image-data-uri: 2.0.1
     npm-run-all: 4.1.5
     svg2png-wasm: 1.3.4

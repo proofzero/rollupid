@@ -55,5 +55,6 @@ jobs:
             APIKEY_ALCHEMY_ETH
             APIKEY_ALCHEMY_POLYGON
         env:
+          NODE_ENV: 'development'
           APIKEY_ALCHEMY_ETH: ${{ secrets.APIKEY_ALCHEMY_GALAXY_GOERLI }}
           APIKEY_ALCHEMY_POLYGON: ${{ secrets.APIKEY_ALCHEMY_POLYGON_MUMBAI }}

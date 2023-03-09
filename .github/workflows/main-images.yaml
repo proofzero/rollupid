@@ -54,5 +54,6 @@ jobs:
             INTERNAL_CLOUDFLARE_ACCOUNT_ID
             TOKEN_CLOUDFLARE_API
         env:
+          NODE_ENV: 'development'
           INTERNAL_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           TOKEN_CLOUDFLARE_API: ${{ secrets.TOKEN_CLOUDFLARE_API }}
