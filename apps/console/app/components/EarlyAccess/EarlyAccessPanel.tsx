@@ -8,6 +8,7 @@ type EarlyAccessPanelProps = {
   subtitle: string
   copy: string
   imgSrc: string
+  imgClassName?: string
 }
 
 const EarlyAccessPanel = ({
@@ -15,6 +16,7 @@ const EarlyAccessPanel = ({
   subtitle,
   copy,
   imgSrc,
+  imgClassName,
 }: EarlyAccessPanelProps) => {
   return (
     <>
@@ -69,7 +71,7 @@ const EarlyAccessPanel = ({
         </section>
 
         <section className="hidden lg:block">
-          <img src={imgSrc} />
+          <img src={imgSrc} className={imgClassName ?? ''} />
         </section>
       </div>
     </>
