@@ -43,32 +43,32 @@ const EarlyAccessPanel = ({
               Follow us for updates
             </Text>
 
-            <div className="flex flex-row space-x-2">
+            <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-2">
               <ButtonAnchor key="twitter" href="https://twitter.com/rollupid">
-                <FaTwitter style={{ color: '#1D9BF0' }} />
+                <FaTwitter className="text-base text-[#1D9BF0]" />
 
-                <span>Twitter</span>
+                <Text>Twitter</Text>
               </ButtonAnchor>
 
               <ButtonAnchor key="discord" href="https://discord.gg/rollupid">
-                <FaDiscord style={{ color: '#1D9BF0' }} />
+                <FaDiscord className="text-base text-[#5865F2]" />
 
-                <span>Discord</span>
+                <Text>Discord</Text>
               </ButtonAnchor>
 
               <ButtonAnchor
                 key="github"
                 href="https://github.com/proofzero/rollupid"
               >
-                <FaGithub />
+                <FaGithub className="text-base" />
 
-                <span>GitHub</span>
+                <Text>GitHub</Text>
               </ButtonAnchor>
             </div>
           </div>
         </section>
 
-        <section>
+        <section className="hidden lg:block">
           <img src={imgSrc} />
         </section>
       </div>
