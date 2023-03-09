@@ -26,16 +26,16 @@ inspector_port = 11001
 local_protocol = "http"
 
 [vars]
-PROFILE_APP_URL = "http://localhost:9797"
-CONSOLE_APP_URL = "http://localhost:9898"
-PASSPORT_REDIRECT_URL = "http://localhost:9696/connect/token"
+PROFILE_APP_URL = "http://localhost:10003"
+CONSOLE_APP_URL = "http://localhost:10002"
+PASSPORT_REDIRECT_URL = "http://localhost:10001/connect/token"
 COOKIE_DOMAIN = "localhost"
-INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://localhost:9696/connect/google/callback"
-INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://localhost:9696/connect/github/callback"
-INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "http://localhost:9696/connect/twitter/callback"
-INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "http://localhost:9696/connect/microsoft/callback"
-INTERNAL_APPLE_OAUTH_CALLBACK_URL = "http://localhost:9696/connect/appleid/callback"
-INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "http://localhost:9696/connect/discord/callback"
+INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/google/callback"
+INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/github/callback"
+INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/twitter/callback"
+INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/microsoft/callback"
+INTERNAL_APPLE_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/appleid/callback"
+INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/discord/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [env.dev]

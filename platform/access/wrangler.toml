@@ -21,7 +21,7 @@ analytics_engine_datasets = [
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [vars]
-INTERNAL_JWT_ISS = "http://localhost:9696"
+INTERNAL_JWT_ISS = "http://localhost:10001"
 
 [dev]
 port = 10101
