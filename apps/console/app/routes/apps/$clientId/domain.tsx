@@ -5,7 +5,7 @@ export default () => (
   <EarlyAccessPanel
     title="Custom Domain"
     subtitle="Configure Custom Domain"
-    copy="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec ipsum massa, ullamcorper in, auctor et, scelerisque sed, est. Aenean vel massa quis mauris vehicula lacinia. Ut tempus purus at lorem. Suspendisse sagittis ultrices augue. Cras elementum. Etiam bibendum elit eget erat."
+    copy="A custom domain feature in an authentication tool allows an organization to use its own domain name instead of the tool's default domain. This provides a more seamless user experience, improves brand consistency, and enhances the security of the authentication process by reducing the risk of phishing scams."
     imgSrc={domainSVG}
   />
 )

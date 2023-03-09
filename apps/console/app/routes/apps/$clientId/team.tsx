@@ -4,8 +4,8 @@ import teamSVG from '~/assets/early/team.svg'
 export default () => (
   <EarlyAccessPanel
     title="Team & Contact"
-    subtitle="Manage roles & Permissions"
-    copy="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec ipsum massa, ullamcorper in, auctor et, scelerisque sed, est. Aenean vel massa quis mauris vehicula lacinia. Ut tempus purus at lorem. Suspendisse sagittis ultrices augue. Cras elementum. Etiam bibendum elit eget erat."
+    subtitle="Manage Permissions"
+    copy="The team management, roles, and permissions feature allows yo to control access and enhance security by defining roles and permissions for team members."
     imgSrc={teamSVG}
   />
 )

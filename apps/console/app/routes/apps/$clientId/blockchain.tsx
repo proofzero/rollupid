@@ -4,8 +4,8 @@ import blockchainSVG from '~/assets/early/blockchain.svg'
 export default () => (
   <EarlyAccessPanel
     title="Blockchain"
-    subtitle="Heading"
-    copy="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec ipsum massa, ullamcorper in, auctor et, scelerisque sed, est. Aenean vel massa quis mauris vehicula lacinia. Ut tempus purus at lorem. Suspendisse sagittis ultrices augue. Cras elementum. Etiam bibendum elit eget erat."
+    subtitle="Onboard users to blockchain"
+    copy="Ethereum account abstraction and user deposit vault accounts provide secure and flexible management of funds on the Ethereum blockchain. With this feature, apps can sponsor gas fees can interact with a smart contract wallet using the Galaxy API, while each user's funds are kept in a separate deposit vault account, reducing the risk of unauthorized access or loss of funds."
     imgSrc={blockchainSVG}
   />
 )

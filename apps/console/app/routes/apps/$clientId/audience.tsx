@@ -4,8 +4,8 @@ import audienceSVG from '~/assets/early/audience.svg'
 export default () => (
   <EarlyAccessPanel
     title="Audience Builder"
-    subtitle="Heading"
-    copy="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec ipsum massa, ullamcorper in, auctor et, scelerisque sed, est. Aenean vel massa quis mauris vehicula lacinia. Ut tempus purus at lorem. Suspendisse sagittis ultrices augue. Cras elementum. Etiam bibendum elit eget erat."
+    subtitle="Aquire users for your app"
+    copy="With the zero-knowledge audience builder tool, businesses can identify and target specific groups of potential users, creating personalized marketing messages that optimize user acquisition efforts. This feature enables businesses to launch their application and acquire their first and next users efficiently and effectively, ensuring a successful launch."
     imgSrc={audienceSVG}
   />
 )

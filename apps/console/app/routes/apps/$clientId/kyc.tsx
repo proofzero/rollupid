@@ -3,9 +3,9 @@ import kycSVG from '~/assets/early/kyc.svg'
 
 export default () => (
   <EarlyAccessPanel
-    title="KYC"
-    subtitle="Heading"
-    copy="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec ipsum massa, ullamcorper in, auctor et, scelerisque sed, est. Aenean vel massa quis mauris vehicula lacinia. Ut tempus purus at lorem. Suspendisse sagittis ultrices augue. Cras elementum. Etiam bibendum elit eget erat."
+    title="Know Your Customer"
+    subtitle="Fast KYC"
+    copy="The KYC feature enables fast and secure user onboarding by streamlining the identity verification process. It helps businesses comply with regulations related to fraud prevention and anti-money laundering, ensuring a safer environment for both the organization and its customers. KYC is an essential feature for businesses looking to onboard users quickly and efficiently while maintaining compliance with regulations."
     imgSrc={kycSVG}
   />
 )

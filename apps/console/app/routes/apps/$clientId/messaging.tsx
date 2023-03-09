@@ -4,8 +4,8 @@ import messagingSVG from '~/assets/early/messaging.svg'
 export default () => (
   <EarlyAccessPanel
     title="Messaging"
-    subtitle="Heading"
-    copy="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec ipsum massa, ullamcorper in, auctor et, scelerisque sed, est. Aenean vel massa quis mauris vehicula lacinia. Ut tempus purus at lorem. Suspendisse sagittis ultrices augue. Cras elementum. Etiam bibendum elit eget erat."
+    subtitle="Communicate directly to users"
+    copy="A messaging tool inside a CRM allows businesses to communicate with their users and prospects from a single platform, providing a more efficient and streamlined process. It enables automation, personalized communication, and improved user engagement, resulting in stronger relationships and increased productivity."
     imgSrc={messagingSVG}
   />
 )
