@@ -20,7 +20,11 @@ const EarlyAccessPanel = ({
 }: EarlyAccessPanelProps) => {
   return (
     <>
-      <Text size="2xl" weight="semibold" className="text-gray-900 mb-5">
+      <Text
+        size="2xl"
+        weight="semibold"
+        className="text-gray-900 mb-5 ml-2 lg:ml-0 "
+      >
         {title}
       </Text>
 
