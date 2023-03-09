@@ -18,7 +18,8 @@ unsafe.bindings = [
 ]
 
 [dev]
-port = 8787
+port = 10401
+inspector_port = 11401
 local_protocol = "http"
 
 analytics_engine_datasets = [

@@ -45,7 +45,8 @@ ENVIRONMENT = "local"
 # -----------------------------------------------------------------------------
 
 [dev]
-port = 8686
+port = 10501
+inspector_port = 11501
 local_protocol = "http"
 
 analytics_engine_datasets = [
