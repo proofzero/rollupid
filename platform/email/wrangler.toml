@@ -12,15 +12,15 @@ local_protocol = "http"
 
 [env]
 NotificationFromName = "Rollup (Local) - Notification"
-NotificationFromUser = "noreply"
+NotificationFromUser = "noreplylocal"
 
 [env.dev.vars]
 NotificationFromName = "Rollup (Dev) - Notifcation"
-NotificationFromUser = 'noreply'
+NotificationFromUser = 'noreply-dev'
 
 [env.next.vars]
 NotificationFromName = "Rollup (Next) - Notifcation"
-NotificationFromUser = 'noreply'
+NotificationFromUser = 'noreply-next'
 
 [env.current.vars]
 NotificationFromName = "Rollup - Notifcation"
