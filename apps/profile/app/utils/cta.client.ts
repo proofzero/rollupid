@@ -11,7 +11,11 @@ export const determineProfileCompletionStatus = (
   profile: FullProfile,
   addresses: any[]
 ): ProfileCompletionStatus => {
-  let base = true
+  let base = false
+
+  if (profile.job || profile.location) {
+    base = true
+  }
 
   const links = profile.links?.length > 0
   const gallery = profile.gallery?.length > 0
