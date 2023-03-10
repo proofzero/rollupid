@@ -23,6 +23,7 @@ import SaveButton from '~/components/accounts/SaveButton'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import type { Profile } from '@kubelt/galaxy-client'
 import type { FullProfile, NFT } from '~/types'
+import InputTextarea from '~/components/inputs/InputTextarea'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const session = await getProfileSession(request)
@@ -34,6 +35,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   const displayName = formData.get('displayName')?.toString()
   const job = formData.get('job')?.toString()
   const location = formData.get('location')?.toString()
+  const bio = formData.get('bio')?.toString()
   const image = formData.get('pfp_url') as string
   let computedIsToken =
     formData.get('pfp_isToken')?.toString() === '1' ? true : false
@@ -45,6 +47,7 @@ export const action: ActionFunction = async ({ request, context }) => {
       image,
       isToken: computedIsToken,
     },
+    bio,
     job,
     location,
   })
@@ -55,7 +58,7 @@ export const action: ActionFunction = async ({ request, context }) => {
 
 export default function AccountSettingsProfile() {
   const { notificationHandler, profile, accountURN } = useOutletContext<{
-    profile: Profile
+    profile: FullProfile
     notificationHandler: (success: boolean) => void
     accountURN: string
   }>()
@@ -65,6 +68,7 @@ export default function AccountSettingsProfile() {
   const {
     displayName,
     pfp,
+    bio,
     job,
     location,
     // address,
@@ -307,6 +311,20 @@ export default function AccountSettingsProfile() {
               )}
             </div>
           </div>
+          <InputTextarea
+            id="bio"
+            heading="Bio"
+            charLimit={256}
+            rows={3}
+            defaultValue={bio || ''}
+            error={actionData?.errors.bio}
+          />
+
+          {actionData?.errors.bio && (
+            <Text className="mb-1.5 text-gray-400" size="xs" weight="normal">
+              {actionData?.errors.bio}
+            </Text>
+          )}
 
           {/* Form where this button is used should have 
           an absolute relative position
