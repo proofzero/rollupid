@@ -5,10 +5,13 @@ import { Link, NavLink } from '@remix-run/react'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 
+import { FiExternalLink } from 'react-icons/fi'
+
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import classNames from 'classnames'
 
 import logo from '~/assets/profile_logo.svg'
+import mobileLogo from '~/assets/profile_logo_mobile.svg'
 import defaultAvatar from '~/assets/circle_gradient.png'
 import { SignOutLink, ConsoleLink } from '~/components/hean-nav-links'
 
@@ -65,9 +68,17 @@ export default function HeadNav({
             <div className="flex h-20 items-center justify-between px-4 sm:px-0">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <img className="max-w-[180px]" src={logo} alt="Rollup" />
+                  <img
+                    className="max-w-[180px] hidden md:block"
+                    src={logo}
+                    alt="Rollup"
+                  />
+                  <img
+                    className="max-w-[180px] block md:hidden"
+                    src={mobileLogo}
+                    alt="Rollup"
+                  />
                 </div>
-
                 <div className="hidden md:block">
                   <div className="ml-10 flex items-baseline space-x-4">
                     {loggedIn &&
@@ -211,8 +222,8 @@ export default function HeadNav({
             </div>
           </div>
 
-          <Disclosure.Panel className="border-b border-gray-700 md:hidden">
-            <div className="space-y-1 px-2 py-3 sm:px-3">
+          <Disclosure.Panel className="md:hidden">
+            <div className="space-y-1 px-2 pt-3 sm:px-3">
               {loggedIn &&
                 navigation.map((item) => (
                   <NavLink
@@ -223,53 +234,53 @@ export default function HeadNav({
                       return isActive ? activeStyle : undefined
                     }}
                     className={
-                      'block px-3 py-2 text-sm font-medium nav-link-text'
+                      'block px-3 py-4 text-sm font-medium nav-link-text\
+                      border-y border-gray-700 hover:bg-gray-700'
                     }
                   >
-                    <Text size="sm" weight="medium" className="text-white">
-                      {item.name}
-                    </Text>
+                    <div className="flex flex-row items-center">
+                      <Text
+                        size="sm"
+                        weight="medium"
+                        className="text-white pr-2"
+                      >
+                        {item.name}
+                      </Text>
+                      <FiExternalLink size={16} className="text-white" />
+                    </div>
                   </NavLink>
                 ))}
             </div>
 
-            <div className="border-t border-gray-700 pt-4 pb-3">
-              {loggedIn && (
-                <div className="flex items-center px-5">
-                  <div className="flex-shrink-0">
-                    <Avatar
-                      src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
-                      hex={isToken}
-                      size="xs"
-                      style={
-                        isToken
-                          ? {
-                              visibility: 'visible',
-                            }
-                          : undefined
-                      }
-                    />
-                  </div>
-                  {/* <button
+            {loggedIn && (
+              <div className="flex items-center px-5">
+                {/* <button
                     type="button"
                     className="ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                   >
                     <span className="sr-only">View notifications</span>
                     <HiOutlineBell className="h-6 w-6" aria-hidden="true" />
                   </button> */}
-                </div>
-              )}
+              </div>
+            )}
 
-              <div className="mt-3 space-y-1 px-2">
-                {loggedIn &&
-                  userNavigation.map((item) => (
+            <div className="px-2">
+              {loggedIn &&
+                userNavigation.map((item) => {
+                  return (
                     <Disclosure.Button
                       key={item.name}
-                      as={item.component}
-                      className="block px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                      as={() =>
+                        item.component({
+                          consoleURL,
+                          className:
+                            'block px-3 py-4 text-base font-medium text-white\
+                              hover:bg-gray-700 border-b border-gray-700 md:hidden',
+                        })
+                      }
                     />
-                  ))}
-              </div>
+                  )
+                })}
             </div>
           </Disclosure.Panel>
         </>
