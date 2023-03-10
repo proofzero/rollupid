@@ -11,15 +11,15 @@ inspector_port = 11105
 local_protocol = "http"
 
 [env]
-NotificationFromName = "Rollup (Local) - Notification"
+NotificationFromName = "Rollup Local - Notification"
 NotificationFromUser = "noreplylocal"
 
 [env.dev.vars]
-NotificationFromName = "Rollup (Dev) - Notifcation"
+NotificationFromName = "Rollup Dev - Notifcation"
 NotificationFromUser = 'noreply-dev'
 
 [env.next.vars]
-NotificationFromName = "Rollup (Next) - Notifcation"
+NotificationFromName = "Rollup Next - Notifcation"
 NotificationFromUser = 'noreply-next'
 
 [env.current.vars]
