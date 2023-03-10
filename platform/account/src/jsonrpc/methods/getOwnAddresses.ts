@@ -2,7 +2,6 @@ import { z } from 'zod'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
 
-import { Graph } from '@kubelt/types'
 import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
 import { Node } from '../../../../edges/src/jsonrpc/validators/node'
 

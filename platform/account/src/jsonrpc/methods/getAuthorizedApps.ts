@@ -4,7 +4,6 @@ import { Context } from '../../context'
 import { EDGE_AUTHORIZES } from '@kubelt/platform.access/src/constants'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { z } from 'zod'
-import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 // Input

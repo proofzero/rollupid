@@ -1,10 +1,12 @@
 import { gatewayFromIpfs } from '@kubelt/utils'
 
-import type { AccountURN } from '@kubelt/urns/account'
-import type { Nft } from '@kubelt/galaxy-client'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
-import type { TraceSpan } from '@kubelt/platform-middleware/trace'
-import { getGalaxyClient } from './clients'
+import type {
+  AlchemyNFT,
+  AlchemyContract,
+  AlchemyChain,
+} from '@kubelt/packages/alchemy-client'
+import type { Chain, NFT, NFTDetail, NFTProperty } from '~/types'
+import { capitalizeFirstLetter } from './strings'
 
 /**
  * Nfts are being sorted server-side
@@ -12,119 +14,7 @@ import { getGalaxyClient } from './clients'
  * as two sorted arrays. In linear time
  */
 
-export const capitalizeFirstLetter = (string?: string) => {
-  return string ? string.charAt(0).toUpperCase() + string.slice(1) : null
-}
-
-export type decoratedNft = {
-  url?: string
-  thumbnailUrl?: string
-  error: boolean
-  title?: Nft['title']
-  contract: Nft['contract']
-  tokenId?: string | null
-  chain: Nft['chain']
-  collectionTitle?: string | null
-  properties?: any[] | null
-  details: { name: string; value?: string | null; isCopyable: boolean }[]
-}
-
 /** Function to compare two collections alphabetically */
-export const sortNftsFn = (a: any, b: any) => {
-  if (b.collectionTitle === null) {
-    return -1
-  } else {
-    return a.collectionTitle?.localeCompare(b.collectionTitle) || 1
-  }
-}
-
-/**
- * Shared loader function to modify response from galaxy
- * and get representable nfts for our routes
- */
-
-export const decorateNft = (nft: Nft): decoratedNft => {
-  const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
-  let error = false
-  if (nft.error) {
-    error = true
-  }
-
-  const details = [
-    {
-      name: 'NFT Contract',
-      value: nft.contract?.address,
-      isCopyable: true,
-    },
-    {
-      name: 'NFT Standard',
-      value: nft.contractMetadata?.tokenType,
-      isCopyable: false,
-    },
-    {
-      name: 'Chain',
-      value: capitalizeFirstLetter(nft.chain?.chain),
-      isCopyable: false,
-    },
-    {
-      name: 'Network',
-      value: capitalizeFirstLetter(nft.chain?.network),
-      isCopyable: false,
-    },
-  ]
-  if (nft.id && nft.id.tokenId) {
-    details.push({
-      name: 'Token ID',
-      value: BigInt(nft.id.tokenId).toString(10),
-      isCopyable: true,
-    })
-  }
-
-  return {
-    url: gatewayFromIpfs(media?.raw),
-    thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
-    error: error,
-    title: nft.title,
-    contract: nft.contract,
-    tokenId: nft.id?.tokenId,
-    chain: nft.chain,
-    collectionTitle: nft.contractMetadata?.name,
-    properties: nft.metadata?.properties,
-    details,
-  }
-}
-
-/**
- * Sort and filter errors out
- */
-export const decorateNfts = (ownedNfts: Nft[]) => {
-  const decoratedNfts = ownedNfts.map((nft: Nft) => {
-    return decorateNft(nft)
-  })
-
-  const filteredNfts =
-    decoratedNfts?.filter((n: any) => !n.error && n.thumbnailUrl) || []
-
-  const sortedNfts = filteredNfts.sort(sortNftsFn)
-  return sortedNfts
-}
-
-/**
- * Returns target address gallery for which only
- * owner property is required.
- * @param owner AccountURN of target profile. Can be undefined if JWT is provided.
- * @returns Gallery or empty array
- */
-export const getGallery = async (
-  accountURN: AccountURN,
-  traceSpan: TraceSpan
-) => {
-  const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(traceSpan)
-  )
-  const gallery = await galaxyClient.getGallery(accountURN)
-  return { gallery: gallery.gallery || [] }
-}
 
 // ------ beginning of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS
 
@@ -145,11 +35,13 @@ const getMoreNfts = (fetcher: any, request: string) => {
 export const getMoreNftsModal = (
   fetcher: any,
   accountURN: string,
-  collection?: string
+  collection?: string,
+  chain?: AlchemyChain
 ) => {
   const query = generateQuery([
     { name: 'owner', value: accountURN },
     { name: 'collection', value: collection },
+    { name: 'chain', value: chain },
   ])
   if (collection) {
     getMoreNfts(fetcher, `/api/nfts/collection?${query}`)
@@ -159,3 +51,126 @@ export const getMoreNftsModal = (
 }
 
 // ------ end of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS
+
+export const NFTNormalizer = ({
+  nfts,
+  chain,
+}: {
+  nfts: AlchemyNFT[]
+  chain: Chain
+}): NFT[] => {
+  return nfts
+    .filter((nft) => {
+      return (
+        nft.contractMetadata?.tokenType !== 'UNKNOWN' &&
+        (nft.error ? nft.error === 'false' || !nft.error : true)
+      )
+    })
+    .map((nft) => {
+      // ------ PROPERTIES MAPPING ---------------------------------------------
+      let properties: {
+        name: string
+        value: string
+        display: string
+      }[] = []
+
+      if (nft.metadata.attributes?.length) {
+        const mappedAttributes = nft.metadata.attributes
+          .filter((a) => a != null)
+          .map((a) => ({
+            name: a.trait_type,
+            value: a.value,
+            display: 'string',
+          }))
+
+        properties = properties.concat(mappedAttributes)
+      }
+
+      properties = properties.filter((p) => typeof p.value !== 'object')
+
+      if (nft.metadata.attributes) {
+        delete nft.metadata.attributes
+      }
+
+      // ------ DETAILS MAPPING ------------------------------------------------
+      const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
+
+      const details = [
+        {
+          name: 'NFT Contract',
+          value: nft.contract.address,
+          isCopyable: true,
+        },
+        {
+          name: 'NFT Standard',
+          value: nft.contractMetadata.tokenType,
+          isCopyable: false,
+        },
+        {
+          name: 'Chain',
+          value: capitalizeFirstLetter(chain.chain),
+          isCopyable: false,
+        },
+        {
+          name: 'Network',
+          value: capitalizeFirstLetter(chain.network),
+          isCopyable: false,
+        },
+        {
+          name: 'Token ID',
+          value: BigInt(nft.id.tokenId).toString(10),
+          isCopyable: true,
+        },
+      ]
+
+      return {
+        url: gatewayFromIpfs(media?.raw),
+        thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
+        title: nft.title,
+        contract: nft.contract,
+        tokenId: nft.id?.tokenId,
+        chain: chain,
+        collectionTitle: nft.contractMetadata?.name,
+        properties: properties,
+        details,
+      } as NFT
+    })
+}
+
+export const NFTContractNormalizer = ({
+  chain,
+  contracts,
+}: {
+  chain: Chain
+  contracts: AlchemyContract[]
+}): NFT[] => {
+  const beautifiedContracts = contracts
+    .filter((ct) => {
+      return !ct.isSpam && (ct.media.raw || ct.media[0].raw)
+    })
+    .map((ct) => {
+      const media = Array.isArray(ct.media) ? ct.media[0] : ct.media
+
+      return {
+        url: gatewayFromIpfs(media?.raw),
+        thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
+        title: ct.title,
+        contract: { address: ct.address },
+        tokenId: ct.tokenId,
+        chain: chain,
+        collectionTitle: ct.name,
+
+        /**
+         * We don't care about properties and details in this call
+         * Since it's just showing nfts of all contracts on the screen
+         * For properties and details "NFTNormalizer" will be called
+         * Even more - properties attribute isn't returned
+         * on call for the contracts
+         */
+        properties: [] as NFTProperty[],
+        details: [] as NFTDetail[],
+      }
+    })
+
+  return beautifiedContracts
+}

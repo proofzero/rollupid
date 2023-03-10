@@ -1,12 +1,10 @@
-import type { Nft } from '@kubelt/galaxy-client'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import type { AccountURN } from '@kubelt/urns/account'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
-import { getGalaxyClient } from '~/helpers/clients'
-import { decorateNfts } from '~/helpers/nfts'
 import { getProfileSession } from '~/utils/session.server'
+import { getContractsForAllChains } from '~/helpers/alchemy'
+import { getAccountCryptoAddresses } from '~/helpers/profile'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const srcUrl = new URL(request.url)
@@ -16,31 +14,22 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const jwt = user.accessToken
 
-  const owner = srcUrl.searchParams.get('owner')
+  const owner = srcUrl.searchParams.get('owner') as AccountURN
   if (!owner) {
-    return json({})
+    throw new Error('Owner is required')
   }
 
-  const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(context.traceSpan)
-  )
-  const { contractsForAddress: resColl } =
-    await galaxyClient.getNftsPerCollection(
-      {
-        owner,
-        // Is supported ONLY on ethereum and polygon mainnets
-        excludeFilters: ['SPAM'],
-      },
-      getAuthzHeaderConditionallyFromToken(jwt)
-    )
+  const addresses = await getAccountCryptoAddresses({
+    jwt,
+    traceSpan: context.traceSpan,
+  })
 
-  const ownedNfts: Nft[] =
-    resColl?.contracts.map((contract: any) => {
-      const nft: any = contract?.ownedNfts ? contract.ownedNfts[0] : {}
-      return nft
-    }) ?? []
+  const nftsForAccount = await getContractsForAllChains({
+    addresses,
+    excludeFilters: ['SPAM'],
+  })
 
   return json({
-    ownedNfts: decorateNfts(ownedNfts),
+    ...nftsForAccount,
   })
 }

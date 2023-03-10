@@ -5,11 +5,10 @@ import {
   useTransition,
   useFetcher,
 } from '@remix-run/react'
-import { FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
 import InputText from '~/components/inputs/InputText'
 import { getProfileSession, parseJwt } from '~/utils/session.server'
-import InputTextarea from '~/components/inputs/InputTextarea'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
@@ -18,12 +17,12 @@ import { gatewayFromIpfs } from '@kubelt/utils'
 
 import PfpNftModal from '~/components/accounts/PfpNftModal'
 
-import { useEffect, useRef, useState, useMemo } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import SaveButton from '~/components/accounts/SaveButton'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import type { Profile } from '@kubelt/galaxy-client'
-import type { FullProfile } from '~/types'
+import type { FullProfile, NFT } from '~/types'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const session = await getProfileSession(request)
@@ -35,8 +34,6 @@ export const action: ActionFunction = async ({ request, context }) => {
   const displayName = formData.get('displayName')?.toString()
   const job = formData.get('job')?.toString()
   const location = formData.get('location')?.toString()
-  const website = formData.get('website')?.toString()
-  const bio = formData.get('bio')?.toString()
   const image = formData.get('pfp_url') as string
   let computedIsToken =
     formData.get('pfp_isToken')?.toString() === '1' ? true : false
@@ -44,14 +41,12 @@ export const action: ActionFunction = async ({ request, context }) => {
   const currentProfile = await ProfileKV.get<FullProfile>(accountURN!, 'json')
   const updatedProfile = Object.assign(currentProfile || {}, {
     displayName,
-    job,
-    location,
-    bio,
-    website,
     pfp: {
       image,
       isToken: computedIsToken,
     },
+    job,
+    location,
   })
   await ProfileKV.put(accountURN!, JSON.stringify(updatedProfile))
 
@@ -69,11 +64,9 @@ export default function AccountSettingsProfile() {
 
   const {
     displayName,
+    pfp,
     job,
     location,
-    bio,
-    website,
-    pfp,
     // address,
     // generatedPfp,
     // generatedPfpMinted,
@@ -151,58 +144,21 @@ export default function AccountSettingsProfile() {
 
   // ------------------- START OF MODAL PART ---------------------- //
   // STATE
-  const [refresh, setRefresh] = useState(true)
-  const [loadedNfts, setLoadedNfts] = useState([] as any[])
-  const [pageKey, setPageLink] = useState<string | undefined>()
-  const [loading, setLoading] = useState(true)
   const [collection, setCollection] = useState('')
 
   const modalFetcher = useFetcher()
 
   // HOOKS
-  useEffect(() => {
-    if (modalFetcher.data) {
-      /* We already have only 1 NFT per collection
-       ** No need to put it in additional set
-       */
-
-      setLoadedNfts(modalFetcher.data.ownedNfts)
-      setPageLink(modalFetcher.data.pageKey ?? null)
-
-      if (refresh) {
-        setRefresh(false)
-      }
-    }
-  }, [modalFetcher.data])
 
   useEffect(() => {
-    getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
+    const chain =
+      collection !== ''
+        ? modalFetcher.data?.ownedNfts.filter(
+            (nft: NFT) => nft.contract.address === collection
+          )[0].chain.chain
+        : null
+    getMoreNftsModal(modalFetcher, accountURN, collection, chain)
   }, [collection])
-
-  useEffect(() => {
-    if (pageKey) {
-      setLoading(true)
-      getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
-    } else if (pageKey === null) {
-      setLoading(false)
-    }
-  }, [pageKey])
-
-  useMemo(() => {
-    setRefresh(true)
-    setLoadedNfts([])
-    setPageLink(undefined)
-  }, [])
-
-  useEffect(() => {
-    const asyncFn = async () => {
-      getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
-    }
-    if (refresh) {
-      asyncFn()
-    }
-  }, [refresh])
-
   // --------------------- END OF MODAL PART ---------------------- //
 
   return (
@@ -211,11 +167,11 @@ export default function AccountSettingsProfile() {
         Settings
       </Text>
       <PfpNftModal
-        nfts={loadedNfts}
+        nfts={modalFetcher.data?.ownedNfts}
         collection={collection}
         setCollection={setCollection}
         displayName={displayName as string}
-        loadingConditions={refresh || loading || modalFetcher.state !== 'idle'}
+        loadingConditions={modalFetcher.state !== 'idle'}
         text={'Select NFT Avatar'}
         isOpen={nftPfpModalOpen}
         pfp={pfpUrl as string}
@@ -308,7 +264,6 @@ export default function AccountSettingsProfile() {
               {actionData.errors.displayName}
             </Text>
           )}
-
           <div className="flex flex-col lg:flex-row lg:space-x-9">
             <div className="flex-1 mb-4 lg:mb-0">
               <InputText
@@ -352,36 +307,6 @@ export default function AccountSettingsProfile() {
               )}
             </div>
           </div>
-
-          <InputText
-            type="url"
-            id="website"
-            heading="Website"
-            Icon={FaGlobe}
-            defaultValue={website || ''}
-            error={actionData?.errors?.website}
-          />
-
-          {actionData?.errors?.website && (
-            <Text className="mb-1.5 text-gray-400" size="xs" weight="normal">
-              {actionData.errors.website}
-            </Text>
-          )}
-
-          <InputTextarea
-            id="bio"
-            heading="Bio"
-            charLimit={256}
-            rows={3}
-            defaultValue={bio || ''}
-            error={actionData?.errors.bio}
-          />
-
-          {actionData?.errors.bio && (
-            <Text className="mb-1.5 text-gray-400" size="xs" weight="normal">
-              {actionData?.errors.bio}
-            </Text>
-          )}
 
           {/* Form where this button is used should have 
           an absolute relative position

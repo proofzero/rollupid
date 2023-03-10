@@ -1,4 +1,8 @@
-import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
+import {
+  CryptoAddressType,
+  NodeType,
+  OAuthAddressType,
+} from '@kubelt/types/address'
 import type { AddressURN } from '@kubelt/urns/address'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import { getGalaxyClient } from '~/helpers/clients'
@@ -7,6 +11,7 @@ import type { FullProfile } from '~/types'
 import type { AccountURN } from '@kubelt/urns/account'
 import type { TraceSpan } from '@kubelt/platform-middleware/trace'
 import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import { getValidGallery } from './alchemy'
 
 export const getAccountProfile = async (
   {
@@ -22,31 +27,14 @@ export const getAccountProfile = async (
 
   const profile = await ProfileKV.get<FullProfile>(accountURN, 'json')
 
-  if (profile && profile.version) return profile
+  if (profile)
+    profile.gallery = await getValidGallery({
+      gallery: profile.gallery,
+      accountURN,
+      traceSpan,
+    })
 
-  // TODO: DEPRECATE THIS PROFILE MIGRATION
-  const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(traceSpan)
-  )
-
-  const profileRes = await galaxyClient.getProfile(
-    accountURN ? { targetAccountURN: accountURN } : undefined,
-    getAuthzHeaderConditionallyFromToken(jwt)
-  )
-
-  const { profile: acctProfile, links, gallery } = profileRes
-
-  const fullProfile = {
-    ...acctProfile,
-    links,
-    gallery,
-    // note: It gets called only from BFF so env vars are in the context
-    version: PROFILE_VERSION,
-  } as FullProfile
-
-  await ProfileKV.put(accountURN, JSON.stringify(fullProfile))
-  return { ...fullProfile }
-  // END OF PROFILE MIGRATION
+  return profile
 }
 
 export const getAuthorizedApps = async (jwt: string, traceSpan: TraceSpan) => {
@@ -62,19 +50,45 @@ export const getAuthorizedApps = async (jwt: string, traceSpan: TraceSpan) => {
   return authorizedApps
 }
 
-export const getAccountAddresses = async (
-  jwt: string,
+export const getAccountAddresses = async ({
+  jwt,
+  accountURN,
+  traceSpan,
+}: {
+  jwt?: string
+  accountURN?: AccountURN
   traceSpan: TraceSpan
-) => {
+}) => {
   const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(traceSpan)
+    generateTraceContextHeaders(traceSpan!)
   )
   const addressesRes = await galaxyClient.getConnectedAddresses(
-    undefined,
+    { targetAccountURN: accountURN },
     getAuthzHeaderConditionallyFromToken(jwt)
   )
 
   return addressesRes.addresses || []
+}
+
+export const getAccountCryptoAddresses = async ({
+  jwt,
+  accountURN,
+  traceSpan,
+}: {
+  jwt?: string
+  accountURN?: AccountURN
+  traceSpan: TraceSpan
+}) => {
+  const addresses = await getAccountAddresses({ jwt, accountURN, traceSpan })
+
+  // TODO: need to type qc and rc
+  const cryptoAddresses =
+    addresses
+      .filter((e) => [NodeType.Crypto, NodeType.Vault].includes(e.rc.node_type))
+      .map((address) => address.qc.alias.toLowerCase() as string) ||
+    ([] as string[])
+
+  return cryptoAddresses
 }
 
 export const getAddressProfiles = async (

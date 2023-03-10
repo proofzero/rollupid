@@ -27,18 +27,7 @@ import { Scopes } from '@kubelt/platform-middleware/scopes'
 import { initAccountNodeByName } from '../nodes'
 import { Analytics } from '@kubelt/platform-middleware/analytics'
 import { getPublicAddressesMethod } from './methods/getPublicAddresses'
-import { SetLinksInput, setLinksMethod } from './methods/setLinks'
-import {
-  GetLinksInput,
-  getLinksMethod,
-  GetLinksOutput,
-} from './methods/getLinks'
-import {
-  GetGalleryInput,
-  getGalleryMethod,
-  GetGalleryOutput,
-} from './methods/getGallery'
-import { SetGalleryInput, setGalleryMethod } from './methods/setGallery'
+
 import {
   GetAuthorizedAppsMethodInput,
   GetAuthorizedAppsMethodOutput,
@@ -93,39 +82,6 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(SetProfileInput)
     .mutation(setProfileMethod),
-  getLinks: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(Scopes)
-    .use(LogUsage)
-    .use(Analytics)
-    .input(GetLinksInput)
-    .output(GetLinksOutput)
-    .query(getLinksMethod),
-  setLinks: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(Scopes)
-    .use(injectAccountNode)
-    .use(LogUsage)
-    .use(Analytics)
-    .input(SetLinksInput)
-    .mutation(setLinksMethod),
-  getGallery: t.procedure
-    .use(Scopes)
-    .use(LogUsage)
-    .use(Analytics)
-    .input(GetGalleryInput)
-    .output(GetGalleryOutput)
-    .query(getGalleryMethod),
-  setGallery: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(Scopes)
-    .use(injectAccountNode)
-    .use(LogUsage)
-    .use(Analytics)
-    .input(SetGalleryInput)
-    .mutation(setGalleryMethod),
   getAddresses: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(Scopes)

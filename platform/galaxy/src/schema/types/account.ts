@@ -8,13 +8,6 @@ export default /* GraphQL */ `
     isToken: Boolean
   }
 
-  type Link {
-    name: String
-    url: String
-    verified: Boolean
-    provider: String
-  }
-
   type App {
     clientId: String!
     icon: String!
@@ -27,11 +20,6 @@ export default /* GraphQL */ `
   type Profile {
     displayName: String
     pfp: PFP
-    bio: String
-    job: String
-    location: String
-    website: String
-    handle: String
   }
 
   input PFPInput {
@@ -39,26 +27,13 @@ export default /* GraphQL */ `
     isToken: Boolean
   }
 
-  input LinkInput {
-    name: String!
-    url: String!
-    verified: Boolean
-    provider: String
-  }
-
   input ProfileInput {
     displayName: String
     pfp: PFPInput
-    bio: String
-    job: String
-    location: String
-    website: String
   }
 
   type Query {
     profile(targetAccountURN: URN): Profile
-    links(targetAccountURN: URN): [Link!]
-    gallery(targetAccountURN: URN): [Gallery!]
     connectedAddresses(targetAccountURN: URN): [Node!]
     authorizedApps: [App]
   }

@@ -43,6 +43,8 @@ NFTAR_URL = "https://test.nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 PROFILE_VERSION = 1
+ALCHEMY_ETH_NETWORK="mainnet"
+ALCHEMY_POLYGON_NETWORK="mainnet"
 
 [site]
 bucket = "./public"
@@ -87,6 +89,8 @@ NFTAR_URL = "https://test.nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 PROFILE_VERSION = 1
+ALCHEMY_ETH_NETWORK="mainnet"
+ALCHEMY_POLYGON_NETWORK="mainnet"
 
 # next (staging)
 # ------------------------------------------------------------------------------
@@ -123,6 +127,8 @@ NFTAR_URL = "https://test.nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 PROFILE_VERSION = 1
+ALCHEMY_ETH_NETWORK="mainnet"
+ALCHEMY_POLYGON_NETWORK="mainnet"
 
 # current (production)
 # ------------------------------------------------------------------------------
@@ -157,3 +163,5 @@ NFTAR_URL = "https://nftar.rollup.id/api"
 NFTAR_CHAIN_ID = 1
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 PROFILE_VERSION = 1
+ALCHEMY_ETH_NETWORK="mainnet"
+ALCHEMY_POLYGON_NETWORK="mainnet"

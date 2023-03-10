@@ -77,11 +77,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     const user = session.get('user')
     jwt = user?.accessToken
 
-    // TODO: delete after migration
     profile = await getAccountProfile({ jwt, accountURN }, context.traceSpan)
-
-    // TODO: Uncomment after migration
-    // profile = await ProfileKV.get<FullProfile>(accountURN, 'json')
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })
@@ -135,8 +131,7 @@ export const meta: MetaFunction = ({
 }: {
   data: { ogImage: string; uname: string; profile: FullProfile }
 }) => {
-  const desc =
-    data.profile && data.profile.bio ? data.profile.bio : 'Claim yours now!'
+  const desc = 'Claim yours now!'
   const meta = {
     'og:title': 'Rollup Decentralized Profile',
     'twitter:title': 'Rollup Decentralized Profile',
@@ -198,16 +193,6 @@ const UserAddressLayout = () => {
           </Text>
 
           <div className="flex flex-col justify-center items-center">
-            {finalProfile.bio && (
-              <Text
-                className="break-normal text-gray-500 mb-5 text-center"
-                size="base"
-                weight="normal"
-              >
-                {finalProfile.bio}
-              </Text>
-            )}
-
             <div
               className="flex flex-col space-x-0 space-y-5 justify-between w-[70%] 
               lg:justify-center lg:w-full lg:flex-row lg:space-x-10 lg:space-y-0

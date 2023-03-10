@@ -1,3 +1,8 @@
+import type {
+  AlchemyChain,
+  AlchemyNetwork,
+} from '@kubelt/packages/alchemy-client'
+
 export type RollupAuth = {
   accessToken: string
   refreshToken: string
@@ -7,39 +12,43 @@ export type RollupAuth = {
   }
 }
 
+// -------------------------- NFTs ---------------------------------------------
+
 export type Chain = {
-  chain: 'eth' | 'ethereum' | 'polygon'
-  network: 'mainnet' | 'goerli' | 'mumbai'
+  chain: AlchemyChain
+  network: AlchemyNetwork
 }
 
 export type Contract = {
   address: string
 }
 
-export type NftDetail = {
+export type NFTDetail = {
   isCopyable: boolean
   name: string
   value: string
 }
 
-export type NftProperty = {
+export type NFTProperty = {
   display: string
   name: string
   value: string
 }
 
-export type Gallery = {
-  chain: Chain
-  collectionTitle?: string
+export type NFT = {
+  url?: string | null
+  thumbnailUrl?: string | null
+  title?: string | null
   contract: Contract
-  details: Array<NftDetail>
-  error: boolean
-  properties?: Array<NftProperty>
-  thumbnailUrl?: string
-  title?: string
   tokenId: string
-  url?: string
+  chain: Chain
+  collectionTitle?: string | null
+  properties?: NFTProperty[] | null
+  details: NFTDetail[]
 }
+
+// -------------------------- Profile ------------------------------------------
+export type Gallery = NFT[]
 
 export type Link = {
   name?: string
@@ -48,18 +57,18 @@ export type Link = {
   verified?: boolean
 }
 
+export type Links = Link[]
+
 export type FullProfile = {
   displayName: string
   pfp: {
     image: string
     isToken?: boolean
   }
-  bio?: string
-  job?: string
-  location?: string
-  website?: string
-  links: Link[]
-  gallery: Gallery[]
+  links: Links
+  gallery: Gallery
   handle?: string
   version: number
+  job: string
+  location: string
 }

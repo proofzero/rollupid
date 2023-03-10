@@ -10,25 +10,13 @@ import {
   hasApiKey,
   logAnalytics,
   getConnectedAddresses,
-  getConnectedCryptoAddresses,
   temporaryConvertToPublic,
-  validOwnership,
   requestLogging,
-  getAlchemyClients,
-  getNftMetadataForAllChains,
 } from './utils'
 
-import { decorateNfts } from './utils/nfts'
-
-import { NftProperty, Resolvers } from './typedefs'
+import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
-import type {
-  Gallery,
-  GalleryItem,
-  Links,
-  Profile,
-} from '@kubelt/platform.account/src/types'
 import { ResolverContext } from './common'
 import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
@@ -97,117 +85,6 @@ const accountResolvers: Resolvers = {
       )
 
       return mappedApps
-    },
-
-    links: async (
-      _parent: any,
-      { targetAccountURN }: { targetAccountURN?: AccountURN },
-      { env, accountURN, jwt, traceSpan }: ResolverContext
-    ) => {
-      console.log(`galaxy:links: getting links for account: ${accountURN}`)
-
-      const finalAccountURN = targetAccountURN || accountURN
-
-      const accountClient = createAccountClient(env.Account, {
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...generateTraceContextHeaders(traceSpan),
-      })
-      let links = await accountClient.getLinks.query({
-        account: finalAccountURN,
-      })
-
-      return links
-    },
-
-    gallery: async (
-      _parent: any,
-      { targetAccountURN }: { targetAccountURN?: AccountURN },
-      { env, accountURN, jwt, traceSpan }: ResolverContext
-    ) => {
-      console.log(`galaxy:gallery: getting gallery for account: ${accountURN}`)
-
-      const finalAccountURN = targetAccountURN || accountURN
-
-      const accountClient = createAccountClient(env.Account, {
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...generateTraceContextHeaders(traceSpan),
-      })
-
-      const connectedAddresses = await getConnectedCryptoAddresses({
-        accountURN: finalAccountURN,
-        Account: env.Account,
-        jwt: jwt,
-        traceSpan,
-      })
-
-      let gallery = await accountClient.getGallery.query({
-        account: finalAccountURN,
-      })
-
-      // -------- TEMPORARY MIGRATION PART START S-------------------------------
-
-      if (gallery && !Object.keys(gallery[0]).includes('details')) {
-        const alchemyClients = getAlchemyClients({ env })
-        const input = gallery.map((nft) => ({
-          contractAddress: nft.contract as string,
-          chain: nft.chain as string,
-          tokenId: nft.tokenId as string,
-        }))
-
-        const ownedNfts = await getNftMetadataForAllChains(
-          input,
-          alchemyClients,
-          env
-        )
-
-        gallery = decorateNfts(ownedNfts) as GalleryItem[]
-
-        const filteredGallery = (await validOwnership(
-          gallery,
-          env,
-          connectedAddresses
-        )) as GalleryItem[]
-
-        /** MIGRATION
-         * It'll be done only once for each user who's logging in profile app
-         * and has gallery with old schema set up. Once done the "if" condition
-         * on line 142 will return false and this code block won't run.
-         */
-        await accountClient.setGallery.mutate({
-          name: accountURN,
-          gallery: filteredGallery.map((nft) => {
-            nft.properties = nft.properties?.map((prop: NftProperty | null) => {
-              if (prop) {
-                prop.value = prop.value.toString()
-              }
-              return prop
-            })
-            return nft
-          }),
-        })
-
-        return filteredGallery
-      }
-      // -------- TEMPORARY MIGRATION PART END ---------------------------------
-      if (gallery) {
-        // Validation
-        const filteredGallery = await validOwnership(
-          gallery,
-          env,
-          connectedAddresses
-        )
-        // Removal
-        if (gallery.length !== filteredGallery.length) {
-          accountClient.setGallery.mutate({
-            name: finalAccountURN,
-            gallery: filteredGallery,
-          })
-        }
-
-        return filteredGallery
-      }
-      // if there is no gallery
-      return []
     },
 
     connectedAddresses: async (
@@ -283,18 +160,6 @@ const ProfileResolverComposition = {
     logAnalytics(),
   ],
   'Query.authorizedApps': [
-    requestLogging(),
-    setupContext(),
-    hasApiKey(),
-    logAnalytics(),
-  ],
-  'Query.links': [
-    requestLogging(),
-    setupContext(),
-    hasApiKey(),
-    logAnalytics(),
-  ],
-  'Query.gallery': [
     requestLogging(),
     setupContext(),
     hasApiKey(),

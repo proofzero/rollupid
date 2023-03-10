@@ -21,4 +21,8 @@ declare global {
 
   const ProfileKV: KVNamespace
   const PROFILE_VERSION: number
+  const ALCHEMY_ETH_NETWORK: 'mainnet' | 'goerli'
+  const APIKEY_ALCHEMY_ETH: string
+  const ALCHEMY_POLYGON_NETWORK: 'mainnet' | 'mumbai'
+  const APIKEY_ALCHEMY_POLYGON: string
 }

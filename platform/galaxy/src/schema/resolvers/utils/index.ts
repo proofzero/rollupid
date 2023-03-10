@@ -14,17 +14,6 @@ import {
 } from '@kubelt/utils'
 
 import { WriteAnalyticsDataPoint } from '@kubelt/packages/platform-clients/analytics'
-export {
-  getNfts,
-  getAlchemyClients,
-  getNftMetadataForAllChains,
-  normalizeContracts,
-  getContractsForAllChains,
-  validOwnership,
-  getNftsForAllChains,
-  sortNftsAlphabetically,
-  normalizeContractsForAllChains,
-} from './nfts'
 
 import { NodeType } from '@kubelt/types/address'
 import {

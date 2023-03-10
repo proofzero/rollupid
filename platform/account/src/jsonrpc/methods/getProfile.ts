@@ -41,5 +41,5 @@ export const getProfileMethod = async ({
   ])
   if (!profile) return null
 
-  return { ...profile, addresses, handle: undefined }
+  return { ...profile, addresses }
 }
