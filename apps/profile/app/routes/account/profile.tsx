@@ -6,6 +6,7 @@ import {
   useFetcher,
 } from '@remix-run/react'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
 import InputText from '~/components/inputs/InputText'
 import { getProfileSession, parseJwt } from '~/utils/session.server'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
@@ -31,6 +32,8 @@ export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
 
   const displayName = formData.get('displayName')?.toString()
+  const job = formData.get('job')?.toString()
+  const location = formData.get('location')?.toString()
   const image = formData.get('pfp_url') as string
   let computedIsToken =
     formData.get('pfp_isToken')?.toString() === '1' ? true : false
@@ -40,6 +43,8 @@ export const action: ActionFunction = async ({ request, context }) => {
     displayName,
     pfp: {
       image,
+      job,
+      location,
       isToken: computedIsToken,
     },
   })
@@ -60,6 +65,8 @@ export default function AccountSettingsProfile() {
   const {
     displayName,
     pfp,
+    job,
+    location,
     // address,
     // generatedPfp,
     // generatedPfpMinted,
@@ -257,6 +264,49 @@ export default function AccountSettingsProfile() {
               {actionData.errors.displayName}
             </Text>
           )}
+          <div className="flex flex-col lg:flex-row lg:space-x-9">
+            <div className="flex-1 mb-4 lg:mb-0">
+              <InputText
+                id="job"
+                heading="Job"
+                placeholder="Your Job"
+                Icon={FaBriefcase}
+                defaultValue={job || ''}
+                maxChars={30}
+              />
+
+              {actionData?.errors.job && (
+                <Text
+                  className="mb-1.5 text-gray-400"
+                  size="xs"
+                  weight="normal"
+                >
+                  {actionData.errors.job}
+                </Text>
+              )}
+            </div>
+
+            <div className="flex-1">
+              <InputText
+                id="location"
+                heading="Location"
+                placeholder="Your Location"
+                Icon={FaMapMarkerAlt}
+                defaultValue={location || ''}
+                maxChars={30}
+              />
+
+              {actionData?.errors.location && (
+                <Text
+                  className="mb-1.5 text-gray-400"
+                  size="xs"
+                  weight="normal"
+                >
+                  {actionData.errors.location}
+                </Text>
+              )}
+            </div>
+          </div>
 
           {/* Form where this button is used should have 
           an absolute relative position

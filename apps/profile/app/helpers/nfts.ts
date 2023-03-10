@@ -145,7 +145,9 @@ export const NFTContractNormalizer = ({
   contracts: AlchemyContract[]
 }): NFT[] => {
   const beautifiedContracts = contracts
-    .filter((ct) => !ct.isSpam && (ct.media.raw || ct.media[0].raw))
+    .filter((ct) => {
+      return !ct.isSpam && (ct.media.raw || ct.media[0].raw)
+    })
     .map((ct) => {
       const media = Array.isArray(ct.media) ? ct.media[0] : ct.media
 

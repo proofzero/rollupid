@@ -26,7 +26,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const nftsForAccount = await getContractsForAllChains({
     addresses,
-    excludeFilters: ['SPAM', 'AIRDROPS'],
+    excludeFilters: ['SPAM'],
   })
 
   return json({

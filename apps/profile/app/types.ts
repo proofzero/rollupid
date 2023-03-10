@@ -69,4 +69,6 @@ export type FullProfile = {
   gallery: Gallery
   handle?: string
   version: number
+  job: string
+  location: string
 }

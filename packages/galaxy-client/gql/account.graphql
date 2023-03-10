@@ -10,7 +10,6 @@ query getProfile($targetAccountURN: URN) {
       }
     }
     displayName
-    handle
   }
 }
 

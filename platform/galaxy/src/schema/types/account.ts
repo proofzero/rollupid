@@ -20,7 +20,6 @@ export default /* GraphQL */ `
   type Profile {
     displayName: String
     pfp: PFP
-    handle: String
   }
 
   input PFPInput {

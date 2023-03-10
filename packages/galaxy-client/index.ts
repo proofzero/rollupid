@@ -174,7 +174,6 @@ export type PfpInput = {
 export type Profile = {
   __typename?: 'Profile';
   displayName?: Maybe<Scalars['String']>;
-  handle?: Maybe<Scalars['String']>;
   pfp?: Maybe<Pfp>;
 };
 
@@ -246,7 +245,7 @@ export type GetProfileQueryVariables = Exact<{
 }>;
 
 
-export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null };
+export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null };
 
 export type GetConnectedAddressesQueryVariables = Exact<{
   targetAccountURN?: InputMaybe<Scalars['URN']>;
@@ -338,7 +337,6 @@ export const GetProfileDocument = gql`
       }
     }
     displayName
-    handle
   }
 }
     `;

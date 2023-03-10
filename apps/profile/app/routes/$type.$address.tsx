@@ -8,7 +8,9 @@ import {
   useParams,
 } from '@remix-run/react'
 
+import { HiOutlineMapPin } from 'react-icons/hi2'
 import {
+  HiOutlineBriefcase,
   HiOutlineLockClosed,
   HiOutlineQuestionMarkCircle,
 } from 'react-icons/hi'
@@ -195,7 +197,25 @@ const UserAddressLayout = () => {
               className="flex flex-col space-x-0 space-y-5 justify-between w-[70%] 
               lg:justify-center lg:w-full lg:flex-row lg:space-x-10 lg:space-y-0
               items-center text-gray-500 font-size-lg "
-            ></div>
+            >
+              {finalProfile.location && (
+                <div className="flex flex-row space-x-3 items-center">
+                  <HiOutlineMapPin className="h-5 w-5" />
+                  <Text weight="medium" className="text-gray-500">
+                    {finalProfile.location}
+                  </Text>
+                </div>
+              )}
+
+              {finalProfile.job && (
+                <div className="flex flex-row space-x-3 items-center">
+                  <HiOutlineBriefcase className="h-5 w-5" />
+                  <Text weight="medium" className="text-gray-500">
+                    {finalProfile.job}
+                  </Text>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       }
