@@ -88,8 +88,6 @@ export default function HeadNav({
                           key={item.name}
                           to={item.to}
                           target="_blank"
-                          rel="noopener noreferrer"
-                          // @ts-ignore
                           style={({ isActive }) => {
                             return isActive ? activeStyle : undefined
                           }}
@@ -197,7 +195,11 @@ export default function HeadNav({
               <div className="-mr-2 flex md:hidden">
                 {/* Mobile menu button */}
                 {loggedIn && (
-                  <Disclosure.Button className="inline-flex items-center justify-center bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                  <Disclosure.Button
+                    className="inline-flex items-center justify-center bg-gray-800 p-2
+                   text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none 
+                   focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                  >
                     <span className="sr-only">Open main menu</span>
                     {open ? (
                       <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -223,65 +225,72 @@ export default function HeadNav({
           </div>
 
           <Disclosure.Panel className="md:hidden">
-            <div className="space-y-1 px-2 pt-3 sm:px-3">
-              {loggedIn &&
-                navigation.map((item) => (
-                  <NavLink
-                    key={item.name}
-                    to={item.to}
-                    // @ts-ignore
-                    style={({ isActive }) => {
-                      return isActive ? activeStyle : undefined
-                    }}
-                    className={
-                      'block px-3 py-4 text-sm font-medium nav-link-text\
-                      border-y border-gray-700 hover:bg-gray-700'
-                    }
-                  >
-                    <div className="flex flex-row items-center">
-                      <Text
-                        size="sm"
-                        weight="medium"
-                        className="text-white pr-2"
+            {({ close }) => (
+              <>
+                <div className="space-y-1 px-2 pt-3 sm:px-3">
+                  {loggedIn &&
+                    navigation.map((item) => (
+                      <NavLink
+                        key={item.name}
+                        to={item.to}
+                        onClick={() => {
+                          close()
+                        }}
+                        target="_blank"
+                        className="flex flex-row items-center block px-3 h-14 text-sm font-medium nav-link-text\
+                        border-y border-gray-700 hover:bg-gray-700 w-full"
+                        style={({ isActive }) => {
+                          return isActive ? activeStyle : undefined
+                        }}
                       >
-                        {item.name}
-                      </Text>
-                      <FiExternalLink size={16} className="text-white" />
-                    </div>
-                  </NavLink>
-                ))}
-            </div>
+                        <Text
+                          size="sm"
+                          weight="medium"
+                          className="text-white pr-2"
+                        >
+                          {item.name}
+                        </Text>
+                        <FiExternalLink size={16} className="text-white" />
+                      </NavLink>
+                    ))}
+                </div>
 
-            {loggedIn && (
-              <div className="flex items-center px-5">
-                {/* <button
+                {loggedIn && (
+                  <div className="flex items-center px-5">
+                    {/* <button
                     type="button"
                     className="ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                   >
                     <span className="sr-only">View notifications</span>
                     <HiOutlineBell className="h-6 w-6" aria-hidden="true" />
                   </button> */}
-              </div>
-            )}
+                  </div>
+                )}
 
-            <div className="px-2">
-              {loggedIn &&
-                userNavigation.map((item) => {
-                  return (
-                    <Disclosure.Button
-                      key={item.name}
-                      as={() =>
-                        item.component({
-                          consoleURL,
-                          className:
-                            'block px-3 py-4 text-base font-medium text-white\
-                              hover:bg-gray-700 border-b border-gray-700 md:hidden',
-                        })
-                      }
-                    />
-                  )
-                })}
-            </div>
+                <div className="px-2">
+                  {loggedIn &&
+                    userNavigation.map((item) => {
+                      return (
+                        <div
+                          key={item.name}
+                          onClick={() => {
+                            close()
+                          }}
+                        >
+                          <item.component
+                            consoleURL={consoleURL}
+                            className={
+                              'block px-3 py-4 hover:bg-gray-700\
+                           border-b border-gray-700 md:hidden w-full\
+                           text-base font-medium text-white h-full'
+                            }
+                          />
+                        </div>
+                      )
+                    })}
+                </div>
+              </>
+            )}
           </Disclosure.Panel>
         </>
       )}
