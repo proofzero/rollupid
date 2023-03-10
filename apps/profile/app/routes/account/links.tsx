@@ -15,10 +15,12 @@ import { FiEdit } from 'react-icons/fi'
 import { TbLink } from 'react-icons/tb'
 import { AiOutlinePlus } from 'react-icons/ai'
 
-import type { AddressProfile, Link } from '@kubelt/galaxy-client'
+import type { AddressProfile } from '@kubelt/galaxy-client'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { SortableList } from '@kubelt/design-system/src/atoms/lists/SortableList'
+
+import type { Link } from '~/types'
 
 import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
@@ -195,7 +197,7 @@ const SortableLink = ({
         </div>
         {/* // Puts current link in "modification" regyme */}
         <Button
-          className="mr-4 h-[40px]
+          className="sm:mr-4 h-[40px]
                       bg-gray-100 focus:bg-gray-100 border-none
                       flex flex-row items-center justify-around
                       text-gray-600 overflow-hidden"
@@ -215,44 +217,46 @@ const SortableLink = ({
   return (
     <div
       className="
-          flex flex-col w-full
-          sm:flex-row sm:w-full sm:justify-start sm:items-center
-          mb-4 py-3 px-3 truncate
+          flex flex-row 
+          sm:flex-col sm:w-full sm:justify-start sm:items-end
+          mb-4 py-3 px-4 sm:px-3 truncate
           rounded-md border border-gray-300 "
     >
-      <div
-        className="
+      <div className="flex flex-col w-full">
+        <div
+          className="
     w-full mb-2
-    sm:w-[35.5%] sm:mr-[3%] sm:mb-0"
-      >
-        <InputText
-          type="text"
-          id={`${id}-name`}
-          name={`links[${id}][name]`}
-          required={true}
-          heading="Name"
-          placeholder="My Website"
-          defaultValue={nameInput}
-          onChange={(val) => setNameInput(val)}
-          error={error ? error['name'] : ''}
-        />
-      </div>
-      <div
-        className="
+    sm:mr-[3%] sm:mb-0"
+        >
+          <InputText
+            type="text"
+            id={`${id}-name`}
+            name={`links[${id}][name]`}
+            required={true}
+            heading="Name"
+            placeholder="My Website"
+            defaultValue={nameInput}
+            onChange={(val) => setNameInput(val)}
+            error={error ? error['name'] : ''}
+          />
+        </div>
+        <div
+          className="
     w-full
-    sm:w-[53%] sm:mr-[3%]"
-      >
-        <InputText
-          type="url"
-          id={`${id}-url`}
-          name={`links[${id}][url]`}
-          required={true}
-          heading="URL"
-          defaultValue={urlInput}
-          placeholder="https://mywebsite.com"
-          onChange={(val) => setUrlInput(val)}
-          error={error ? error['url'] : ''}
-        />
+    sm:mr-[3%]"
+        >
+          <InputText
+            type="url"
+            id={`${id}-url`}
+            name={`links[${id}][url]`}
+            required={true}
+            heading="URL"
+            defaultValue={urlInput}
+            placeholder="https://mywebsite.com"
+            onChange={(val) => setUrlInput(val)}
+            error={error ? error['url'] : ''}
+          />
+        </div>
       </div>
       {/* Delete current link */}
       <button
@@ -261,7 +265,7 @@ const SortableLink = ({
           deleteLink(id)
           setFormChanged(true)
         }}
-        className="mt-[1.15rem]"
+        className="mt-[1.15rem] pl-4"
       >
         <HiOutlineTrash size={22} className="text-gray-400" />
       </button>
@@ -290,15 +294,18 @@ export default function AccountSettingsLinks() {
 
   // TODO: make type for this
   const [connectedLinks, setConnectedLinks] = useState<
-    {
-      addressURN: string
-      public?: boolean
-      address: string
-      title: string
-      icon: string
-      provider: string
-    }[]
-  >(normalizedAddressProfiles || [])
+    (
+      | {
+          addressURN?: string
+          public?: boolean
+          address?: string | null
+          title?: string | null
+          icon?: string | null
+          provider?: string
+        }
+      | undefined
+    )[]
+  >(normalizedAddressProfiles)
   const [isFormChanged, setFormChanged] = useState(false)
   const [isConnectionsChanged, setIsConnectionsChanged] = useState(false)
 
@@ -316,7 +323,7 @@ export default function AccountSettingsLinks() {
         {
           connections: JSON.stringify(
             connectedLinks.map((l) => {
-              return { addressURN: l.addressURN, public: l.public || false }
+              return { addressURN: l?.addressURN, public: l?.public || false }
             })
           ),
         },
@@ -343,7 +350,11 @@ export default function AccountSettingsLinks() {
         Connected Account Links (coming soon)
       </Text>
 
-      <fetcher.Form method="post" action="/account/connections/order">
+      <fetcher.Form
+        method="post"
+        action="/account/connections/order"
+        className="w-screen -mx-4 sm:w-full sm:mx-0"
+      >
         <SortableList
           items={connectedLinks.map((l: any) => ({
             key: `${l.addressURN}`,
@@ -407,7 +418,7 @@ export default function AccountSettingsLinks() {
         weight="semibold"
         className="mt-[2.875rem] mb-[1.375rem]"
       >
-        Add custom links
+        Add custom Links
       </Text>
       <Form
         method="post"
@@ -421,25 +432,34 @@ export default function AccountSettingsLinks() {
           setFormChanged(false)
         }}
       >
-        <div className="flex flex-col">
+        <div
+          className="flex flex-col 
+        w-screen -mx-4 sm:w-full sm:mx-0"
+        >
           {/* Links that are already in account DO */}
           <div className="flex flex-col mb-3">
             <SortableList
-              items={links.map((l, i) => ({ key: `${i}`, val: l }))}
-              itemRenderer={(item) => (
-                <SortableLink
-                  key={`${item.val.name || 'My Website'}-${
-                    item.val.url || 'https://mywebsite.com'
-                  }-${item.key}`}
-                  id={`${item.key}`}
-                  link={item.val}
-                  setFormChanged={setFormChanged}
-                  deleteLink={(id) => {
-                    setLinks(links.filter((l, i) => i !== parseInt(id)))
-                  }}
-                  error={actionData?.errors?.[parseInt(item.key)] || {}}
-                />
-              )}
+              items={links.map((l, i) => ({
+                key: `${i}`,
+                val: l,
+                isSortable: !l.editing,
+              }))}
+              itemRenderer={(item) => {
+                return (
+                  <SortableLink
+                    key={`${item.val.name || 'My Website'}-${
+                      item.val.url || 'https://mywebsite.com'
+                    }-${item.key}`}
+                    id={`${item.key}`}
+                    link={item.val}
+                    setFormChanged={setFormChanged}
+                    deleteLink={(id) => {
+                      setLinks(links.filter((l, i) => i !== parseInt(id)))
+                    }}
+                    error={actionData?.errors?.[parseInt(item.key)] || {}}
+                  />
+                )
+              }}
               onItemsReordered={(items) => {
                 setLinks(items.map((i) => i.val))
                 setFormChanged(true)
@@ -457,9 +477,9 @@ export default function AccountSettingsLinks() {
               }}
               btnType={'secondary'}
               btnSize={'xl'}
-              className="right-0 !text-gray-600
-            border-none mb-4 lg:mb-0 w-max text-left
-            flex flew-row items-center justify-between"
+              className="right-0 !text-gray-700
+            border-none mb-4 lg:mb-0 w-full sm:w-max text-left
+            flex flew-row items-center justify-center sm:justify-between"
             >
               <AiOutlinePlus size={22} className="mr-[11px]" /> Add Link
             </Button>
