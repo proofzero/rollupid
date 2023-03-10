@@ -27,7 +27,7 @@ export const getAccountProfile = async (
 
   const profile = await ProfileKV.get<FullProfile>(accountURN, 'json')
 
-  if (profile)
+  if (profile && profile.gallery)
     profile.gallery = await getValidGallery({
       gallery: profile.gallery,
       accountURN,

@@ -54,13 +54,10 @@ export const getRollupAuthenticator = () => {
     },
     async ({ accessToken, refreshToken, extraParams }) => {
       const parsedId = parseJwt(extraParams.id_token)
-      console.debug('STRATEGY', { parsedId, extraParams })
 
       const { sub, name, picture } = parsedId
       const profile = await ProfileKV.get(sub!, 'json')
-      console.debug({ profile })
       if (!profile) {
-        console.log("Profile doesn't exist, creating...")
         const newProfile = {
           displayName: name,
           pfp: {
