@@ -196,12 +196,12 @@ const Gallery = () => {
   // ------------------- STATE -------------------------------------------------
   // ------------------- GALLERY PART ---------------------------------
 
-  const initialState = profile.gallery
+  const initialState = profile.gallery || []
 
-  const [curatedNfts, setCuratedNfts] = useState(profile.gallery)
+  const [curatedNfts, setCuratedNfts] = useState(initialState)
   const [curatedNftsSet, setCuratedNftsSet] = useState(
     new Set(
-      profile.gallery.map((nft) => {
+      initialState.map((nft) => {
         return nft.contract.address + nft.tokenId
       })
     )
