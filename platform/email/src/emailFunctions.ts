@@ -87,8 +87,8 @@ export async function sendNotification(
   const message: EmailMessage = {
     ...notification,
     from: {
-      name: env.DefaultEmailFromName,
-      address: `${env.DefaultEmailFromUser}@${env.INTERNAL_DKIM_DOMAIN}`,
+      name: env.NotificationFromName,
+      address: `${env.NotificationFromUser}@${env.INTERNAL_DKIM_DOMAIN}`,
     },
   }
   await send(message, env)

@@ -1,6 +1,6 @@
 export interface Environment {
-  DefaultEmailFromName: string
-  DefaultEmailFromUser: string
+  NotificationFromName: string
+  NotificationFromUser: string
   KEY_DKIM_PRIVATEKEY: string
   INTERNAL_DKIM_SELECTOR: string
   INTERNAL_DKIM_DOMAIN: string

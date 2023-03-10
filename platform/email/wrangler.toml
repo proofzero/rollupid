@@ -11,17 +11,17 @@ inspector_port = 11105
 local_protocol = "http"
 
 [env]
-DefaultEmailFromName = "Rollup (Local) - Notification"
-DefaultEmailFromUser = "noreply"
+NotificationFromName = "Rollup (Local) - Notification"
+NotificationFromUser = "noreply"
 
 [env.dev.vars]
-DefaultEmailFromName = "Rollup (Dev) - Notifcation"
-DefaultEmailFromUser = 'noreply'
+NotificationFromName = "Rollup (Dev) - Notifcation"
+NotificationFromUser = 'noreply'
 
 [env.next.vars]
-DefaultEmailFromName = "Rollup (Next) - Notifcation"
-DefaultEmailFromUser = 'noreply'
+NotificationFromName = "Rollup (Next) - Notifcation"
+NotificationFromUser = 'noreply'
 
 [env.current.vars]
-DefaultEmailFromName = "Rollup - Notifcation"
-DefaultEmailFromUser = 'noreply'
+NotificationFromName = "Rollup - Notifcation"
+NotificationFromUser = 'noreply'

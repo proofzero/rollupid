@@ -27,8 +27,8 @@ export const sendEmailNotificationMethod = async ({
 }): Promise<sendOTPEmailMethodOutputParams> => {
   if (
     !(
-      ctx.DefaultEmailFromUser &&
-      ctx.DefaultEmailFromName &&
+      ctx.NotificationFromUser &&
+      ctx.NotificationFromName &&
       ctx.INTERNAL_DKIM_DOMAIN &&
       ctx.KEY_DKIM_PRIVATEKEY &&
       ctx.INTERNAL_DKIM_SELECTOR
@@ -39,8 +39,8 @@ export const sendEmailNotificationMethod = async ({
     )
 
   const env: Environment = {
-    DefaultEmailFromUser: ctx.DefaultEmailFromUser,
-    DefaultEmailFromName: ctx.DefaultEmailFromName,
+    NotificationFromUser: ctx.NotificationFromUser,
+    NotificationFromName: ctx.NotificationFromName,
     INTERNAL_DKIM_DOMAIN: ctx.INTERNAL_DKIM_DOMAIN,
     KEY_DKIM_PRIVATEKEY: ctx.KEY_DKIM_PRIVATEKEY,
     INTERNAL_DKIM_SELECTOR: ctx.INTERNAL_DKIM_SELECTOR,
