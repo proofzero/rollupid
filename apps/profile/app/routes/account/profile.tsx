@@ -43,10 +43,10 @@ export const action: ActionFunction = async ({ request, context }) => {
     displayName,
     pfp: {
       image,
-      job,
-      location,
       isToken: computedIsToken,
     },
+    job,
+    location,
   })
   await ProfileKV.put(accountURN!, JSON.stringify(updatedProfile))
 
