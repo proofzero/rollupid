@@ -50,9 +50,3 @@ jobs:
           workingDirectory: 'platform/galaxy'
           command: publish --env next
           environment: 'next'
-          secrets: |
-            APIKEY_ALCHEMY_ETH
-            APIKEY_ALCHEMY_POLYGON
-        env:
-          APIKEY_ALCHEMY_ETH: ${{ secrets.APIKEY_ALCHEMY_GALAXY_GOERLI }}
-          APIKEY_ALCHEMY_POLYGON: ${{ secrets.APIKEY_ALCHEMY_POLYGON_MUMBAI }}
