@@ -24,6 +24,7 @@
     "@headlessui/react": "1.7.4",
     "@heroicons/react": "2.0.13",
     "@proofzero/design-system": "*",
+    "@proofzero/errors": "workspace:*",
     "@proofzero/platform-clients": "workspace:*",
     "@proofzero/urns": "workspace:*",
     "@proofzero/utils": "workspace:*",

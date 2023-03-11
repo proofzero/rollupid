@@ -5843,6 +5843,7 @@ __metadata:
     "@mdx-js/react": 2.1.5
     "@playwright/test": 1.28.1
     "@proofzero/design-system": "*"
+    "@proofzero/errors": "workspace:*"
     "@proofzero/platform-clients": "workspace:*"
     "@proofzero/urns": "workspace:*"
     "@proofzero/utils": "workspace:*"
