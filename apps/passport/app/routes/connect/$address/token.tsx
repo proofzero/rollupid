@@ -35,10 +35,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
   const appData = await getConsoleParamsSession(request, context.env)
     .then((session) => JSON.parse(session.get('params')))
-    .catch((err) => {
-      console.log('No console params session found', err)
-      return null
-    })
+    .catch(() => null)
 
   return authenticateAddress(
     addressURN,
