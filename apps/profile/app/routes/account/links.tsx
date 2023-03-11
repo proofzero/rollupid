@@ -251,6 +251,7 @@ const SortableLink = ({
             name={`links[${id}][url]`}
             required={true}
             heading="URL"
+            autoCompute={false}
             defaultValue={urlInput}
             placeholder="https://mywebsite.com"
             onChange={(val) => setUrlInput(val)}
