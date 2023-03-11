@@ -10,7 +10,7 @@ export function SignOutLink({ className }: { className: string }) {
       style={{ cursor: 'pointer' }}
       onClick={() => submit(null, { method: 'post', action: `/signout/` })}
     >
-      <Text className="truncate text-gray-800" size="sm" weight="medium">
+      <Text className="truncate" size="sm" weight="medium">
         Sign Out
       </Text>
     </button>
@@ -28,9 +28,11 @@ export function ConsoleLink({
     <a
       className={`${className}  w-full text-left`}
       style={{ cursor: 'pointer' }}
+      rel="noreferrer"
+      target="_blank"
       href={consoleURL}
     >
-      <Text className="truncate text-gray-800" size="sm" weight="medium">
+      <Text className="truncate" size="sm" weight="medium">
         Console
       </Text>
     </a>

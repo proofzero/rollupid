@@ -76,9 +76,10 @@ const RenameModal = ({
 }) => (
   <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
     <div
-      className={`min-w-[437px] relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
+      className={`min-w-[300px] sm:min-w-[437px] relative transform rounded-lg 
+      bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
     >
-      <Text size="lg" weight="semibold" className="text-gray-900 mb-8">
+      <Text size="lg" weight="semibold" className="text-gray-900 mb-4">
         Name Your Account
       </Text>
 
@@ -95,7 +96,7 @@ const RenameModal = ({
         <Text size="xs" weight="normal" className="text-gray-500 mt-2">
           address: {data.address}
         </Text>
-        <div className="flex justify-end items-center space-x-3 mt-20">
+        <div className="flex justify-end items-center space-x-3 mt-6">
           <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
             Cancel
           </Button>

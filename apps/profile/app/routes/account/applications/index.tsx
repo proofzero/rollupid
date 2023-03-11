@@ -64,7 +64,9 @@ const RevocationModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div
-        className={`min-w-[908px] relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
+        className={`min-w-[330px] sm:min-w-[620px] md:min-w-[700px] lg:min-w-[908px]
+         relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left
+        shadow-xl transition-all sm:p-6 overflow-y-auto`}
       >
         <div className="flex flex-row space-x-6 items-center">
           <img

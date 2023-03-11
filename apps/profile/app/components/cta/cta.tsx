@@ -15,28 +15,33 @@ const CTA = ({
 }) => {
   const ctaDict: {
     [key: string]: {
+      head: string
       copy: string
       action: string
       actionURL: string
     }
   } = {
     'cta.base': {
-      copy: 'Fill out your profile information',
+      head: 'Welcome to your profile!',
+      copy: 'Get started by filling out your profile information',
       action: 'Go to Settings',
       actionURL: '/account/profile',
     },
     'cta.links': {
-      copy: 'Add profile links',
+      head: 'Add links',
+      copy: 'Share with the world your social accounts, websites, and more',
       action: 'Go to Links',
       actionURL: '/account/links',
     },
     'cta.connections': {
-      copy: 'Connect more accounts',
+      head: 'Connect more accounts',
+      copy: 'Verify your other accounts to unlock more features',
       action: 'Go to Connections',
       actionURL: '/account/connections',
     },
     'cta.gallery': {
-      copy: 'Curate your NFT gallery',
+      head: 'Add NFTs to your gallery',
+      copy: 'Curate and show your the best of your NFT collection',
       action: 'Go to Gallery',
       actionURL: '/account/gallery',
     },
@@ -121,7 +126,7 @@ const CTA = ({
 
         <div className="flex-1 flex-col">
           <Text size="lg" weight="semibold" className="text-gray-800">
-            Get started
+            {ctaDict[cta].head}
           </Text>
           <Text size="sm" weight="normal" className="text-gray-500">
             {ctaDict[cta].copy}

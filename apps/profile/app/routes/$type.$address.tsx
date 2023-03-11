@@ -131,7 +131,8 @@ export const meta: MetaFunction = ({
 }: {
   data: { ogImage: string; uname: string; profile: FullProfile }
 }) => {
-  const desc = 'Claim yours now!'
+  const desc =
+    data.profile && data.profile.bio ? data.profile.bio : 'Claim yours now!'
   const meta = {
     'og:title': 'Rollup Decentralized Profile',
     'twitter:title': 'Rollup Decentralized Profile',
@@ -193,6 +194,15 @@ const UserAddressLayout = () => {
           </Text>
 
           <div className="flex flex-col justify-center items-center">
+            {finalProfile.bio && (
+              <Text
+                className="break-normal text-gray-500 mb-5 text-center w-full"
+                size="base"
+                weight="normal"
+              >
+                {finalProfile.bio}
+              </Text>
+            )}
             <div
               className="flex flex-col space-x-0 space-y-5 justify-between w-[70%] 
               lg:justify-center lg:w-full lg:flex-row lg:space-x-10 lg:space-y-0

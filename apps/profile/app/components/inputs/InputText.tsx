@@ -14,6 +14,7 @@ export type InputTextProps = {
   placeholder?: string
   defaultValue?: InputTextValType
   disabled?: boolean
+  autoCompute?: boolean
   Icon?: IconType
   iconPosition?: InputIconPosType
   addon?: string
@@ -31,6 +32,7 @@ const InputText = ({
   placeholder,
   defaultValue,
   disabled,
+  autoCompute = true,
   Icon,
   iconPosition,
   addon,
@@ -105,6 +107,7 @@ const InputText = ({
             type={type ?? 'text'}
             name={computedName}
             id={id}
+            autoComplete={autoCompute.toString()}
             required={required}
             onChange={(e) => {
               if (onChange) onChange(e.target.value)

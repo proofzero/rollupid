@@ -21,6 +21,7 @@ type SortableItem = {
   key: Key
   val: any
   disabled?: boolean
+  isSortable?: boolean
 }
 
 export type SortableListProps<T extends SortableItem> = {
@@ -78,15 +79,19 @@ export const SortableList = <T extends SortableItem>({
           items={itemList.map((item) => item.key)}
           strategy={verticalListSortingStrategy}
         >
-          {itemList.map((item) => (
-            <SortableListItem
-              key={item.key}
-              id={item.key}
-              disabled={item.disabled}
-            >
-              {itemRenderer(item)}
-            </SortableListItem>
-          ))}
+          {itemList.map((item) =>
+            item.isSortable || item.isSortable === undefined ? (
+              <SortableListItem
+                key={item.key}
+                id={item.key}
+                disabled={item.disabled}
+              >
+                {itemRenderer(item)}
+              </SortableListItem>
+            ) : (
+              itemRenderer(item)
+            )
+          )}
         </SortableContext>
       </DndContext>
     </section>

@@ -1,8 +1,6 @@
-function buildError(code: number, message: string) {
-  return new Error(`${code}: ${message}`)
-}
+// --------------------- TYPES -----------------------------------------------
 
-// --------------------- HELPERS -----------------------------------------------
+// HELPERS
 
 export enum AlchemyNetwork {
   mainnet = 'mainnet',
@@ -101,7 +99,7 @@ export type AlchemyNFT = {
   spamInfo?: { isSpam: string; classifications: string[] } | null
 }
 
-// --------------------- PARAMS ------------------------------------------------
+// PARAMS
 
 export type GetNFTsParams = {
   owner: string
@@ -122,7 +120,7 @@ export type GetContractsForOwnerParams = {
   excludeFilters?: string[]
 }
 
-// --------------------- RESULTS -----------------------------------------------
+// RESULTS
 
 export type GetNFTsResult = {
   ownedNfts: AlchemyNFT[]
@@ -150,6 +148,10 @@ export type AlchemyClientConfig = {
 }
 
 // --------------------- MAIN FUNCTIONALITY ------------------------------------
+function buildError(code: number, message: string) {
+  return new Error(`${code}: ${message}`)
+}
+
 export class AlchemyClient {
   #config: AlchemyClientConfig
 
@@ -308,57 +310,5 @@ export class AlchemyClient {
           `Error calling Alchemy getContractsForOwner: ${e.message}`
         )
       }) as Promise<GetContractsForOwnerResult>
-  }
-
-  async getOwnersForToken(
-    params: GetOwnersForTokenParams
-  ): Promise<GetOwnersForTokenResult> {
-    const url = this.getAPIURL('getOwnersForToken/')
-
-    const { contractAddress, tokenId } = params
-
-    url.searchParams.set('contractAddress', contractAddress)
-    url.searchParams.set('tokenId', tokenId.toString())
-
-    // Not currently tested. Was:
-    // const response = await fetch(`${url}?${urlSearchParams}`)
-    // const body: GetOwnersForTokenResult = await response.json()
-    // return body
-
-    const urlStr = url.toString()
-    const cacheKeyDigest = await crypto.subtle.digest(
-      {
-        name: 'SHA-256',
-      },
-      new TextEncoder().encode(urlStr)
-    )
-    const cacheKeyArray = Array.from(new Uint8Array(cacheKeyDigest))
-    const cacheKey = cacheKeyArray
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('')
-    return fetch(urlStr, {
-      cf: {
-        cacheTtl: 1500,
-        cacheEverything: true,
-        cacheKey,
-      },
-    })
-      .then(async (r) => {
-        if (r.status !== 200) {
-          const errorText = await r.text()
-          console.error(errorText)
-          throw buildError(
-            r.status,
-            `Error calling Alchemy getOwnersForToken: ${errorText}`
-          )
-        }
-        return r.json()
-      })
-      .catch((e) => {
-        throw buildError(
-          500,
-          `Error calling Alchemy getOwnersForToken: ${e.message}`
-        )
-      }) as Promise<GetOwnersForTokenResult>
   }
 }

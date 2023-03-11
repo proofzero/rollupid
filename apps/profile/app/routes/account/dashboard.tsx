@@ -2,7 +2,6 @@ import { Link, useFetcher, useOutletContext } from '@remix-run/react'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
-import Heading from '~/components/typography/Heading'
 import SectionTitle from '~/components/typography/SectionTitle'
 
 import { useEffect } from 'react'
@@ -34,49 +33,7 @@ export default function Welcome() {
   }, [])
 
   return (
-    <div className="dashboard flex flex-col gap-4">
-      <div
-        className="welcome-banner basis-full rounded-lg mt-4"
-        style={{
-          backgroundColor: '#F9FAFB',
-          padding: '30px 30px 23px 16px',
-        }}
-      >
-        <Heading className="mb-3 flex flex-col lg:flex-row gap-4">
-          <span className="order-2 text-center justify-center align-center lg:order-1">
-            Congratulations, {profile.displayName}!
-          </span>
-          <span className="order-1 text-center justify-center align-center lg:order-2">
-            🎉
-          </span>
-        </Heading>
-
-        <Text
-          weight="normal"
-          size="base"
-          className="text-center lg:text-left text-gray-500"
-        >
-          Welcome to the Rollup. We are currently in beta and will be unlocking
-          new features often.
-        </Text>
-
-        <Text
-          weight="normal"
-          size="base"
-          className="text-center lg:text-left text-gray-500"
-        >
-          Follow us on{' '}
-          <a className="!text-indigo-500" href="https://twitter.com/rollupid">
-            Twitter
-          </a>{' '}
-          and join our{' '}
-          <a className="!text-indigo-500" href="https://discord.gg/rollupid">
-            Discord
-          </a>{' '}
-          to stay updated!
-        </Text>
-      </div>
-
+    <div className="dashboard flex flex-col gap-4 py-2">
       <CTA profile={profile} addresses={connectedProfiles} />
 
       <div className="flex flex-col space-y-5 lg:flex-row lg:space-x-5 lg:space-y-0">
