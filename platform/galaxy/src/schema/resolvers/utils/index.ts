@@ -20,7 +20,8 @@ import {
   generateTraceContextHeaders,
   TraceSpan,
 } from '@kubelt/platform-middleware/trace'
-import { ApplicationURN, ApplicationURNSpace } from '@kubelt/urns/application'
+import type { ApplicationURN } from '@kubelt/urns/application'
+import { ApplicationURNSpace } from '@kubelt/urns/application'
 
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {
