@@ -25,36 +25,25 @@ import {
 import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
 import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
-import { trace } from '@kubelt/platform-middleware'
 
 const addressResolvers: Resolvers = {
   Query: {
     ensProfile: async (_parent, { addressOrEns }, { env }: ResolverContext) => {
       return new ENSUtils().getEnsEntry(addressOrEns)
     },
-    account: async (
+    accountFromAlias: async (
       _parent,
       { provider, alias }: { provider: string; alias: string },
       { env, traceSpan }: ResolverContext
     ) => {
-      let addressClient, accountURN
-      switch (provider) {
-        case 'a':
-          addressClient = createAddressClient(env.Address, {
-            [PlatformAddressURNHeader]: alias,
-            ...generateTraceContextHeaders(traceSpan),
-          })
-          accountURN = await addressClient.getAccount.query()
-          break
-        default:
-          addressClient = createAddressClient(env.Address, {
-            ...generateTraceContextHeaders(traceSpan),
-          })
-          accountURN = await addressClient.getAccountByAlias.query({
-            alias,
-            provider,
-          })
-      }
+      const addressClient = createAddressClient(env.Address, {
+        ...generateTraceContextHeaders(traceSpan),
+      })
+      const accountURN = await addressClient.getAccountByAlias.query({
+        alias,
+        provider,
+      })
+
       return accountURN
     },
     addressProfile: async (
@@ -71,6 +60,7 @@ const addressResolvers: Resolvers = {
 
       return addressProfile
     },
+
     addressProfiles: async (
       _parent: any,
       { addressURNList }: { addressURNList: AddressURN[] },

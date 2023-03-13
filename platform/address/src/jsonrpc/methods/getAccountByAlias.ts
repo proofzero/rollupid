@@ -36,6 +36,10 @@ export const getAccountByAliasMethod = async ({
    *              .map((edge) => edge.src.baseUrn)[0]
    */
 
+  if (edges.length > 1) {
+    throw new Error('500 Internal server error.')
+  }
+
   const account = edges.map((edge) => edge.src.baseUrn)[0]
 
   return account as AccountURN

@@ -184,7 +184,7 @@ export type ProfileInput = {
 
 export type Query = {
   __typename?: 'Query';
-  account: Scalars['URN'];
+  accountFromAlias: Scalars['URN'];
   addressProfile: AddressProfile;
   addressProfiles: Array<AddressProfile>;
   authorizedApps?: Maybe<Array<Maybe<App>>>;
@@ -195,7 +195,7 @@ export type Query = {
 };
 
 
-export type QueryAccountArgs = {
+export type QueryAccountFromAliasArgs = {
   alias: Scalars['String'];
   provider: Scalars['String'];
 };
@@ -281,13 +281,13 @@ export type GetAddressProfilesQueryVariables = Exact<{
 
 export type GetAddressProfilesQuery = { __typename?: 'Query', addressProfiles: Array<{ __typename?: 'AddressProfile', type: string, urn: any, profile: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthAppleProfile', name?: string | null, picture: string } | { __typename: 'OAuthDiscordProfile', email?: string | null, username?: string | null, discriminator?: string | null, avatar?: string | null, discordId?: string | null } | { __typename: 'OAuthGithubProfile', id?: number | null, name?: string | null, avatar_url: string, html_url?: string | null, followers?: number | null, following?: number | null, login: string, public_gists?: number | null, public_repos?: number | null } | { __typename: 'OAuthGoogleProfile', email?: string | null, name?: string | null, picture: string } | { __typename: 'OAuthMicrosoftProfile', name?: string | null, picture: string, email?: string | null } | { __typename: 'OAuthTwitterProfile', name?: string | null, screen_name: string, profile_image_url_https: string } }> };
 
-export type GetAccountUrnQueryVariables = Exact<{
+export type GetAccountUrnFromAliasQueryVariables = Exact<{
   provider: Scalars['String'];
   alias: Scalars['String'];
 }>;
 
 
-export type GetAccountUrnQuery = { __typename?: 'Query', account: any };
+export type GetAccountUrnFromAliasQuery = { __typename?: 'Query', accountFromAlias: any };
 
 export type UpdateAddressNicknameMutationVariables = Exact<{
   addressURN: Scalars['URN'];
@@ -472,9 +472,9 @@ export const GetAddressProfilesDocument = gql`
   }
 }
     `;
-export const GetAccountUrnDocument = gql`
-    query getAccountUrn($provider: String!, $alias: String!) {
-  account(provider: $provider, alias: $alias)
+export const GetAccountUrnFromAliasDocument = gql`
+    query getAccountUrnFromAlias($provider: String!, $alias: String!) {
+  accountFromAlias(provider: $provider, alias: $alias)
 }
     `;
 export const UpdateAddressNicknameDocument = gql`
@@ -535,8 +535,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getAddressProfiles(variables?: GetAddressProfilesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAddressProfilesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetAddressProfilesQuery>(GetAddressProfilesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAddressProfiles', 'query');
     },
-    getAccountUrn(variables: GetAccountUrnQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAccountUrnQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetAccountUrnQuery>(GetAccountUrnDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAccountUrn', 'query');
+    getAccountUrnFromAlias(variables: GetAccountUrnFromAliasQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAccountUrnFromAliasQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAccountUrnFromAliasQuery>(GetAccountUrnFromAliasDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAccountUrnFromAlias', 'query');
     },
     updateAddressNickname(variables: UpdateAddressNicknameMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateAddressNicknameMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateAddressNicknameMutation>(UpdateAddressNicknameDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateAddressNickname', 'mutation');

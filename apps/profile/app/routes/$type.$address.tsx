@@ -61,12 +61,12 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
   // redirect from any addressURN to its addressURNs
   if (type !== 'p') {
-    const account = await galaxyClient.getAccountUrn({
+    const { accountFromAlias } = await galaxyClient.getAccountUrnFromAlias({
       provider: type,
-      alias: type === 'a' ? AddressURNSpace.urn(address) : address,
+      alias: address,
     })
 
-    return redirect(`/p/${AccountURNSpace.decode(account?.account)}`)
+    return redirect(`/p/${AccountURNSpace.decode(accountFromAlias)}`)
   }
 
   const accountURN = AccountURNSpace.urn(address) as AccountURN
