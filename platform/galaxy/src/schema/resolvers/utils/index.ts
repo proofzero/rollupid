@@ -49,9 +49,10 @@ export const setupContext = () => (next) => (root, args, context, info) => {
 
   const parsedJwt = jwt && parseJwt(jwt)
 
-  const accountURN: AccountURN = parsedJwt && parsedJwt.sub
+  const accountURN = jwt ? parsedJwt?.sub : undefined
+  const aud = jwt ? parsedJwt?.aud : undefined
 
-  return next(root, args, { ...context, jwt, apiKey, accountURN }, info)
+  return next(root, args, { ...context, jwt, apiKey, accountURN, aud }, info)
 }
 
 // TODO: Remove this middleware and it's use once scopes are fully implemented
@@ -95,6 +96,7 @@ export const hasApiKey = () => (next) => async (root, args, context, info) => {
   //otherwise we passthrough to next middleware
   if (!isFromCFBinding(context.request)) {
     const apiKey = context.apiKey
+    const aud = context.aud
     if (!apiKey) {
       throw new GraphQLYogaError('No API Key provided.', {
         extensions: {
@@ -114,7 +116,7 @@ export const hasApiKey = () => (next) => async (root, args, context, info) => {
 
     let apiKeyValidity
     try {
-      apiKeyValidity = await starbaseClient.checkApiKey.query({ apiKey })
+      apiKeyValidity = await starbaseClient.checkApiKey.query({ apiKey, aud })
     } catch (e) {
       throw new GraphQLYogaError('Unable to validate given API key.', {
         extensions: {
@@ -127,6 +129,15 @@ export const hasApiKey = () => (next) => async (root, args, context, info) => {
 
     if (!apiKeyValidity.valid) {
       throw new GraphQLYogaError('Invalid API key provided.', {
+        extensions: {
+          http: {
+            status: 401,
+          },
+        },
+      })
+    }
+    if (!apiKeyValidity.clientIdInJwtAud) {
+      throw new GraphQLYogaError("JWT isn't valid for this application.", {
         extensions: {
           http: {
             status: 401,

@@ -6,10 +6,12 @@ import { decodeJwt } from 'jose'
 
 export const CheckApiKeyInput = z.object({
   apiKey: z.string(),
+  aud: z.array(z.string()),
 })
 
 export const CheckApiKeyOutput = z.object({
   valid: z.boolean(),
+  clientIdInJwtAud: z.boolean(),
 })
 
 export const checkApiKey = async ({
@@ -22,10 +24,13 @@ export const checkApiKey = async ({
   const jwtSub = decodeJwt(input.apiKey).sub as ApplicationURN
   const clientId = ApplicationURNSpace.parse(jwtSub).decoded
 
+  const clientIdInJwtAud = input.aud.includes(clientId)
+
   const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
-  const result = await appDO.class.checkApiKey(input.apiKey)
+  const valid = await appDO.class.validateApiKey(input.apiKey)
 
   return {
-    valid: result,
+    valid,
+    clientIdInJwtAud,
   }
 }
