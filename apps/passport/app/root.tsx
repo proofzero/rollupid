@@ -47,9 +47,12 @@ import {
   commitFlashSession,
   getConsoleParamsSession,
   getFlashSession,
+  getUserSession,
+  parseJwt,
   setConsoleParamsSession,
 } from './session.server'
-import { getStarbaseClient } from './platform.server'
+import { getAccountClient, getStarbaseClient } from './platform.server'
+import { AccountURN } from '@kubelt/urns/account'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -111,6 +114,16 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     appProps = await sbClient.getAppPublicProps.query({ clientId })
   }
 
+  const session = await getUserSession(request, context.env)
+
+  let profile
+  const jwt = session.get('jwt')
+  if (jwt) {
+    const account = parseJwt(jwt).sub as AccountURN
+    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
+    profile = await accountClient.getProfile.query({ account })
+  }
+
   return json(
     {
       flashes,
@@ -121,6 +134,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
           context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
         APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
       },
+      profile,
     },
     {
       headers: {
@@ -199,6 +213,7 @@ export default function App() {
         <Outlet
           context={{
             appProps: browserEnv.appProps,
+            profile: browserEnv.profile,
           }}
         />
         <ScrollRestoration />

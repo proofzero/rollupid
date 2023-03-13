@@ -15,6 +15,7 @@ import * as jose from 'jose'
 
 export const ResolveAccountInput = z.object({
   jwt: z.string().optional(),
+  force: z.boolean().optional().default(false),
 })
 
 export const ResolveAccountOutput = z.object({
@@ -47,7 +48,7 @@ export const resolveAccountMethod = async ({
 
   if (!resultURN) {
     let urn: AccountURN
-    if (input.jwt) {
+    if (input.jwt && !input.force) {
       const decodedJwt = jose.decodeJwt(input.jwt)
       urn = decodedJwt.sub as AccountURN
     } else {

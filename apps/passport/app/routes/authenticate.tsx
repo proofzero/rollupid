@@ -17,8 +17,16 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const session = await getUserSession(request, context.env)
   const searchParams = new URL(request.url).searchParams
 
-  if (session.get('jwt') && searchParams.get('client_id')) {
-    if (searchParams.get('prompt') === 'login') {
+  const jwt = session.get('jwt')
+  const prompt = searchParams.get('prompt')
+  const clientId = searchParams.get('client_id')
+
+  if (jwt) {
+    if (prompt === 'none') {
+      return redirect(`/authorize?${searchParams}`)
+    }
+
+    if (clientId) {
       return json(
         {},
         {
@@ -30,14 +38,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
           },
         }
       )
-    } else {
-      const searchParams = new URL(request.url).searchParams
-      return redirect(`/authorize?${searchParams}`)
     }
   }
-  if (session.get('jwt')) {
-    return redirect(context.env.CONSOLE_APP_URL)
-  }
+
   return null
 }
 
