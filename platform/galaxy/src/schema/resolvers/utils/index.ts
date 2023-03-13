@@ -148,7 +148,7 @@ export const jwtHasClientID =
     //otherwise we passthrough to next middleware
     if (!isFromCFBinding(context.request)) {
       // Don't need to check API key existence.
-      // it's being checked in other middleware
+      // it's being checked in another middleware
       const apiKey = context.apiKey
       const aud = context.aud
 
