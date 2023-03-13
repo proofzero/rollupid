@@ -3,6 +3,7 @@ import { useLoaderData, useNavigate } from '@remix-run/react'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import { defer, json } from '@remix-run/cloudflare'
+import { useTransition } from '@remix-run/react'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { useState, useEffect } from 'react'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
@@ -57,6 +58,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
 const Users = () => {
   const navigate = useNavigate()
+  const transition = useTransition()
   const { edgesResult, PROFILE_APP_URL, error } = useLoaderData()
   const [authorizedProfiles, setAuthorizedProfiles] = useState({
     accounts: null,
@@ -87,6 +89,7 @@ const Users = () => {
     <ApplicationUsers
       PAGE_LIMIT={PAGE_LIMIT}
       error={error}
+      transitionState={transition.state}
       PROFILE_APP_URL={PROFILE_APP_URL}
       loadUsersSubset={loadUsersSubset}
       authorizedProfiles={authorizedProfiles.accounts || []}
