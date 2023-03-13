@@ -97,7 +97,6 @@ export const hasApiKey = () => (next) => async (root, args, context, info) => {
   //otherwise we passthrough to next middleware
   if (!isFromCFBinding(context.request)) {
     const apiKey = context.apiKey
-    const aud = context.aud
     if (!apiKey) {
       throw new GraphQLYogaError('No API Key provided.', {
         extensions: {
