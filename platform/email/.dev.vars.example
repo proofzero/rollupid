@@ -1,0 +1,6 @@
+#This is only set in the CF environments, as a secret. Locally it can be set to anything
+KEY_DKIM_PRIVATEKEY = "none"
+INTERNAL_DKIM_SELECTOR = "realkey"
+
+#This is relevant in CF and local envs; keep as localhost.local locally
+INTERNAL_DKIM_DOMAIN = "localhost.local"
