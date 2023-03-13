@@ -57,16 +57,16 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   )
   const session = await getProfileSession(request)
   if (!address) throw new Error('No address provided in URL')
+  if (!type) throw new Error('No provider specified in URL')
 
   // redirect from any addressURN to its addressURNs
-  if (type === 'a') {
-    // TODO: does this remain a galaxy call?
-    const { account }: { account: AccountURN } =
-      await galaxyClient.getAccountUrnFromAddress({
-        addressURN: AddressURNSpace.urn(address),
-      })
+  if (type !== 'p') {
+    const account = await galaxyClient.getAccountUrn({
+      provider: type,
+      alias: type === 'a' ? AddressURNSpace.urn(address) : address,
+    })
 
-    return redirect(`/p/${AccountURNSpace.decode(account)}`)
+    return redirect(`/p/${AccountURNSpace.decode(account?.account)}`)
   }
 
   const accountURN = AccountURNSpace.urn(address) as AccountURN
@@ -81,13 +81,6 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })
-    }
-
-    if (type === 'u') {
-      //TODO: galaxy search by handle
-      console.error('Not implemented')
-    } else {
-      //TODO: Type-based resolvers to be tackled in separate PR
     }
 
     let ogImage = null

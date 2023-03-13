@@ -34,16 +34,27 @@ const addressResolvers: Resolvers = {
     },
     account: async (
       _parent,
-      { addressURN }: { addressURN: AddressURN },
+      { provider, alias }: { provider: string; alias: string },
       { env, traceSpan }: ResolverContext
     ) => {
-      const addressClient = createAddressClient(env.Address, {
-        [PlatformAddressURNHeader]: addressURN,
-        ...generateTraceContextHeaders(traceSpan),
-      })
-
-      const accountURN = await addressClient.getAccount.query()
-
+      let addressClient, accountURN
+      switch (provider) {
+        case 'a':
+          addressClient = createAddressClient(env.Address, {
+            [PlatformAddressURNHeader]: alias,
+            ...generateTraceContextHeaders(traceSpan),
+          })
+          accountURN = await addressClient.getAccount.query()
+          break
+        default:
+          addressClient = createAddressClient(env.Address, {
+            ...generateTraceContextHeaders(traceSpan),
+          })
+          accountURN = await addressClient.getAccountByAlias.query({
+            alias,
+            provider,
+          })
+      }
       return accountURN
     },
     addressProfile: async (
