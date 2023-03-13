@@ -5,6 +5,7 @@ import { noLoginsSvg } from '../LoginsPanel/LoginsPanel'
 import { AccountURNSpace } from '@kubelt/urns/account'
 import { HiOutlineExternalLink } from 'react-icons/hi'
 import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
+import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
 export const ApplicationUsers = ({
   authorizedProfiles,
@@ -13,12 +14,14 @@ export const ApplicationUsers = ({
   loadUsersSubset,
   error,
   PAGE_LIMIT,
+  transitionState,
 }: {
   authorizedProfiles: AuthorizedProfile[]
   loadUsersSubset: (val: number) => void
   PROFILE_APP_URL: string
   PAGE_LIMIT: number
   error: any
+  transitionState: string
   metadata: edgesMetadata
 }) => {
   const Users = new Map<
@@ -109,56 +112,65 @@ export const ApplicationUsers = ({
                 className="flex flex-1 flex-col bg-white rounded-br-lg
           rounded-bl-lg"
               >
-                {Array.from(Users.keys()).map((key, i) => (
-                  <article
-                    key={i}
-                    className="flex items-center py-5 px-8 border-t"
+                {transitionState === 'loading' ? (
+                  <div
+                    className="flex bg-white justify-center items-center h-full
+            rounded-lg border shadow"
                   >
-                    <div
-                      className="flex-1 flex flex-col 
+                    <Spinner />
+                  </div>
+                ) : (
+                  Array.from(Users.keys()).map((key, i) => (
+                    <article
+                      key={i}
+                      className="flex items-center py-5 px-8 border-t"
+                    >
+                      <div
+                        className="flex-1 flex flex-col 
                   items-start 
                   md:flex-row md:items-center
                   text-ellipsis md:space-x-4"
-                    >
-                      <img
-                        src={Users.get(key)?.imageURL || missingImage}
-                        alt="account pfp"
-                        className="max-h-[24px] max-w-[24px] rounded-full"
-                      />
+                      >
+                        <img
+                          src={Users.get(key)?.imageURL || missingImage}
+                          alt="account pfp"
+                          className="max-h-[24px] max-w-[24px] rounded-full"
+                        />
+                        <Text
+                          size="sm"
+                          weight="medium"
+                          className="text-gray-500 flex-1"
+                        >
+                          {Users.get(key)?.name}
+                        </Text>
+                      </div>
+
                       <Text
                         size="sm"
                         weight="medium"
-                        className="text-gray-500 flex-1"
-                      >
-                        {Users.get(key)?.name}
-                      </Text>
-                    </div>
-
-                    <Text
-                      size="sm"
-                      weight="medium"
-                      className="text-ellipsis text-gray-500
+                        className="text-ellipsis text-gray-500
                    flex-1 px-2"
-                    >
-                      {Users.get(key)?.date}
-                    </Text>
-                    <a
-                      className="flex-1 flex justify-end"
-                      href={`${PROFILE_APP_URL}/p/${key}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Button
-                        btnType="secondary-alt"
-                        className="right-0 flex md:flex-row flex-col max-w-max 
-                  text-xs leading-4 items-center md:space-x-2"
                       >
-                        <HiOutlineExternalLink size={22} />
-                        Public Profile
-                      </Button>
-                    </a>
-                  </article>
-                ))}
+                        {Users.get(key)?.date}
+                      </Text>
+                      <a
+                        className="flex-1 flex justify-end"
+                        href={`${PROFILE_APP_URL}/p/${key}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button
+                          btnType="secondary-alt"
+                          className="right-0 flex md:flex-row flex-col max-w-max 
+                  text-xs leading-4 items-center md:space-x-2"
+                        >
+                          <HiOutlineExternalLink size={22} />
+                          Public Profile
+                        </Button>
+                      </a>
+                    </article>
+                  ))
+                )}
                 <div className="flex items-center py-4 px-8 border-t justify-between">
                   <Text className="text-gray-700">{orderOfResults}</Text>
                   <div className="flex flex-col space-y-1 sm:space-y-0 sm:flex-row ml-2">
