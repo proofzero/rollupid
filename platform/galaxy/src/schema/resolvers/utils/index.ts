@@ -2,7 +2,7 @@ import { GraphQLYogaError } from '@graphql-yoga/common'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
-import { AccountURN } from '@kubelt/urns/account'
+import type { AccountURN } from '@kubelt/urns/account'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import createAccountClient from '@kubelt/platform-clients/account'
 
@@ -20,6 +20,7 @@ import {
   generateTraceContextHeaders,
   TraceSpan,
 } from '@kubelt/platform-middleware/trace'
+import { ApplicationURN, ApplicationURNSpace } from '@kubelt/urns/application'
 
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {
@@ -116,7 +117,7 @@ export const hasApiKey = () => (next) => async (root, args, context, info) => {
 
     let apiKeyValidity
     try {
-      apiKeyValidity = await starbaseClient.checkApiKey.query({ apiKey, aud })
+      apiKeyValidity = await starbaseClient.checkApiKey.query({ apiKey })
     } catch (e) {
       throw new GraphQLYogaError('Unable to validate given API key.', {
         extensions: {
@@ -136,19 +137,40 @@ export const hasApiKey = () => (next) => async (root, args, context, info) => {
         },
       })
     }
-    if (!apiKeyValidity.clientIdInJwtAud) {
-      throw new GraphQLYogaError("JWT isn't valid for this application.", {
-        extensions: {
-          http: {
-            status: 401,
-          },
-        },
-      })
-    }
   }
 
   return next(root, args, context, info)
 }
+
+export const jwtHasClientID =
+  () => (next) => async (root, args, context, info) => {
+    //If request isn't coming from a service binding then we check for API key validity;
+    //otherwise we passthrough to next middleware
+    if (!isFromCFBinding(context.request)) {
+      // Don't need to check API key existence.
+      // it's being checked in other middleware
+      const apiKey = context.apiKey
+      const aud = context.aud
+
+      const jwtSub = jose.decodeJwt(apiKey).sub as ApplicationURN
+      const clientId = ApplicationURNSpace.parse(jwtSub).decoded
+
+      if (!aud.includes(clientId)) {
+        throw new GraphQLYogaError(
+          "App Client Id isn't included in JWT aud field.",
+          {
+            extensions: {
+              http: {
+                status: 401,
+              },
+            },
+          }
+        )
+      }
+    }
+
+    return next(root, args, context, info)
+  }
 
 export async function checkHTTPStatus(response: Response) {
   if (response.status !== 200) {

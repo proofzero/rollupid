@@ -4,7 +4,13 @@ import createAddressClient from '@kubelt/platform-clients/address'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
 import { AddressProfilesUnion, Resolvers } from './typedefs'
-import { hasApiKey, setupContext, isAuthorized, requestLogging } from './utils'
+import {
+  hasApiKey,
+  setupContext,
+  isAuthorized,
+  requestLogging,
+  jwtHasClientID,
+} from './utils'
 
 import { ResolverContext } from './common'
 
@@ -159,12 +165,14 @@ const AddressResolverComposition = {
     setupContext(),
     hasApiKey(),
     isAuthorized(),
+    jwtHasClientID(),
   ],
   'Mutation.updateConnectedAddressesProperties': [
     requestLogging(),
     setupContext(),
     hasApiKey(),
     isAuthorized(),
+    jwtHasClientID(),
   ],
 }
 
