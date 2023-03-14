@@ -50,6 +50,7 @@ export const loader: LoaderFunction = async ({
   )
   const { accountURN, existing } = await addressClient.resolveAccount.query({
     jwt: await getJWTConditionallyFromSession(request, context.env),
+    force: !appData || appData.prompt !== 'login',
   })
   const existingOAuthData = await addressClient.getOAuthData.query()
 

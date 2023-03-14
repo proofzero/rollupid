@@ -30,7 +30,11 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     { alias: address }
   )
 
-  const addressClient = getAddressClient(addressURN, context.env, context.traceSpan)
+  const addressClient = getAddressClient(
+    addressURN,
+    context.env,
+    context.traceSpan
+  )
   try {
     const nonce = await addressClient.getNonce.query({
       address: address as string,
@@ -62,7 +66,11 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     { node_type: NodeType.Crypto, addr_type: CryptoAddressType.ETH },
     { alias: address }
   )
-  const addressClient = getAddressClient(addressURN, context.env, context.traceSpan)
+  const addressClient = getAddressClient(
+    addressURN,
+    context.env,
+    context.traceSpan
+  )
   const formData = await request.formData()
 
   // TODO: validate from data
@@ -70,6 +78,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     nonce: formData.get('nonce') as string,
     signature: formData.get('signature') as string,
     jwt: await getJWTConditionallyFromSession(request, context.env),
+    forceAccountCreation: !appData || appData.prompt !== 'login',
   })
 
   if (appData?.prompt === 'login' && existing) {

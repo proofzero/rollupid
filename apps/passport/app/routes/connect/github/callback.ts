@@ -51,10 +51,9 @@ export const loader: LoaderFunction = async ({
     context.traceSpan
   )
 
-  const forceAccountCreation = !appData || appData.prompt !== 'login'
   const { accountURN, existing } = await addressClient.resolveAccount.query({
     jwt: await getJWTConditionallyFromSession(request, context.env),
-    force: forceAccountCreation,
+    force: !appData || appData.prompt !== 'login',
   })
 
   await addressClient.setOAuthData.mutate(authRes)
