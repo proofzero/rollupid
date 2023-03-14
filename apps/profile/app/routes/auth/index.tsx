@@ -1,4 +1,4 @@
-import { LoaderFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
 import { getRollupAuthenticator } from '~/utils/session.server'
 
 export const loader: LoaderFunction = async ({ request }) => {

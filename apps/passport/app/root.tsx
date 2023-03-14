@@ -43,13 +43,7 @@ import {
 } from '@kubelt/design-system/src/atoms/toast'
 
 import * as gtag from '~/utils/gtags.client'
-import {
-  commitFlashSession,
-  getConsoleParamsSession,
-  getFlashSession,
-  setConsoleParamsSession,
-} from './session.server'
-import { getStarbaseClient } from './platform.server'
+import { commitFlashSession, getFlashSession } from './session.server'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -81,40 +75,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     })
   }
 
-  const consoleParmamsSessionFromCookie = await getConsoleParamsSession(
-    request,
-    context.env
-  )
-  const consoleParamsSession = consoleParmamsSessionFromCookie.get('params')
-  const parsedParams = consoleParamsSession
-    ? await JSON.parse(consoleParamsSession)
-    : undefined
-  let clientId = parsedParams?.clientId || undefined
-
-  // If we have a new clientId incoming
-  // that is different from what we have
-  // stored in cookie
-  if (
-    context.consoleParams.clientId &&
-    context.consoleParams.clientId !== clientId
-  ) {
-    // Update the cookie with new clientId
-    await setConsoleParamsSession(context.consoleParams, context.env)
-
-    // And use the new clientId to query starbase
-    clientId = context.consoleParams.clientId
-  }
-
-  let appProps
-  if (clientId) {
-    const sbClient = getStarbaseClient('', context.env, context.traceSpan)
-    appProps = await sbClient.getAppPublicProps.query({ clientId })
-  }
-
   return json(
     {
       flashes,
-      appProps,
       ENV: {
         PROFILE_APP_URL: context.env.PROFILE_APP_URL,
         INTERNAL_GOOGLE_ANALYTICS_TAG:
@@ -196,11 +159,7 @@ export default function App() {
         )}
         {transition.state === 'loading' && <Loader />}
         <Toaster position="top-right" />
-        <Outlet
-          context={{
-            appProps: browserEnv.appProps,
-          }}
-        />
+        <Outlet />
         <ScrollRestoration />
         <Scripts />
         <script

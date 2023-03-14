@@ -50,7 +50,7 @@ declare global {
     redirectUri: string | null
     scope: string[] | null
     state: string | null
-    prompt: string | null
+    prompt?: string | null
   }
 }
 declare module '@remix-run/cloudflare' {

@@ -122,8 +122,6 @@ export const action: ActionFunction = async ({ request, context }) => {
     state,
   })
 
-  console.log({ authorizeRes })
-
   if (!authorizeRes) {
     throw json({ message: 'Failed to authorize' }, 400)
   }

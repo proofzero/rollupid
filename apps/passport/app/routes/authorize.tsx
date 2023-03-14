@@ -1,13 +1,27 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
+import { redirect } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import { Outlet, useLoaderData } from '@remix-run/react'
 import { getAccountClient } from '~/platform.server'
-import { parseJwt, requireJWT } from '~/session.server'
+import {
+  createConsoleParamsSession,
+  parseJwt,
+  requireJWT,
+} from '~/session.server'
 import type { AccountURN } from '@kubelt/urns/account'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context }) => {
+  const params = new URL(request.url).searchParams
+  const prompt = params.get('prompt')
+
+  if (prompt !== 'none') {
+    if (context.consoleParams.clientId)
+      throw await createConsoleParamsSession(context.consoleParams, context.env)
+    else throw redirect(context.env.CONSOLE_APP_URL)
+  }
+
   // this will redirect unauthenticated users to the auth page but maintain query params
   const jwt = await requireJWT(request, context.consoleParams, context.env)
   const account = parseJwt(jwt).sub as AccountURN
