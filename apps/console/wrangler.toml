@@ -34,7 +34,6 @@ DEPLOY_ENV = "local"
 PASSPORT_URL = "http://localhost:10001"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
-PROFILE_APP_URL = "http://localhost:10003"
 COOKIE_DOMAIN = "localhost"
 
 # Site
@@ -78,7 +77,6 @@ PASSPORT_URL = "https://passport-dev.rollup.id"
 COOKIE_DOMAIN = "rollup.id"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
-PROFILE_APP_URL = "https://my-dev.rollup.id"
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -109,7 +107,6 @@ PASSPORT_URL = "https://passport-next.rollup.id"
 COOKIE_DOMAIN = "rollup.id"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
-PROFILE_APP_URL = "https://my-next.rollup.id"
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -141,4 +138,3 @@ PASSPORT_URL = "https://passport.rollup.id"
 COOKIE_DOMAIN = "rollup.id"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
-PROFILE_APP_URL = "https://my.rollup.id"
