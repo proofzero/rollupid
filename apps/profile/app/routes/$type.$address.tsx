@@ -23,7 +23,6 @@ import { getAccountProfile } from '~/helpers/profile'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { gatewayFromIpfs } from '@kubelt/utils'
-import { AddressURNSpace } from '@kubelt/urns/address'
 
 import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
@@ -61,12 +60,20 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
   // redirect from any addressURN to its addressURNs
   if (type !== 'p') {
-    const { accountFromAlias } = await galaxyClient.getAccountUrnFromAlias({
-      provider: type,
-      alias: address,
-    })
+    try {
+      const { accountFromAlias } = await galaxyClient.getAccountUrnFromAlias({
+        provider: type,
+        alias: address,
+      })
 
-    return redirect(`/p/${AccountURNSpace.decode(accountFromAlias)}`)
+      if (!accountFromAlias) {
+        throw json({ message: 'Not Found' }, { status: 404 })
+      }
+
+      return redirect(`/p/${AccountURNSpace.decode(accountFromAlias)}`)
+    } catch (ex) {
+      throw json({ message: 'ex' }, { status: 500 })
+    }
   }
 
   const accountURN = AccountURNSpace.urn(address) as AccountURN
@@ -125,18 +132,20 @@ export const meta: MetaFunction = ({
   data: { ogImage: string; uname: string; profile: FullProfile }
 }) => {
   const desc =
-    data.profile && data.profile.bio ? data.profile.bio : 'Claim yours now!'
+    data && data.profile && data.profile.bio
+      ? data.profile.bio
+      : 'Claim yours now!'
   const meta = {
     'og:title': 'Rollup Decentralized Profile',
     'twitter:title': 'Rollup Decentralized Profile',
     'og:description': desc,
     'twitter:description': desc,
     'og:url': `https://rollup.id`,
-    'og:image': data.ogImage,
+    'og:image': data && data.ogImage,
     'og:image:alt': `Profile not found`,
     'og:site_name': 'Rollup',
     'og:type': 'profile',
-    'twitter:image': data.ogImage,
+    'twitter:image': data && data.ogImage,
     'twitter:image:alt': `Profile not found`,
     'twitter:site': '@rollupid',
     'twitter:card': 'summary_large_image',
@@ -251,9 +260,9 @@ const UserAddressLayout = () => {
 
 export default UserAddressLayout
 
-export const CatchBoundary = () => {
+export function CatchBoundary() {
   const caught = useCatch()
-  console.error('Caught in catch boundary', { caught })
+  console.error('Caught in $type/$address catch boundary', { caught })
 
   const { address, type } = useParams()
   const icon = imageFromAddressType(type as string)
