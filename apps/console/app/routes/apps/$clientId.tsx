@@ -9,7 +9,7 @@ import SiteHeader from '~/components/SiteHeader'
 import { requireJWT } from '~/utilities/session.server'
 import { getGalaxyClient } from '~/utilities/platform.server'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
-import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
+import type { appDetailsProps } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { RotatedSecrets } from '~/types'
 import {

@@ -94,7 +94,6 @@ const Users = () => {
         if (!awaitedEdgesResult.metadata.offset) {
           awaitedEdgesResult.metadata.offset = 0
         }
-
         setAuthorizedProfiles(awaitedEdgesResult)
       }
     })()

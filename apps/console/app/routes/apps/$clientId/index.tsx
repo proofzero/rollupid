@@ -30,7 +30,7 @@ import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/Ne
 
 import { LoginsPanel } from '~/components/Applications/LoginsPanel/LoginsPanel'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
-import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
+import type { appDetailsProps } from '~/types'
 
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
