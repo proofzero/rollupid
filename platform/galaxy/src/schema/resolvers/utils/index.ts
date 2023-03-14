@@ -97,79 +97,73 @@ export const isAuthorized = () => (next) => (root, args, context, info) => {
   return next(root, args, context, info)
 }
 
-export const hasApiKey = () => (next) => async (root, args, context, info) => {
-  //If request isn't coming from a service binding then we check for API key validity;
-  //otherwise we passthrough to next middleware
-  if (!isFromCFBinding(context.request)) {
-    const apiKey = context.apiKey
-    if (!apiKey) {
-      throw new GraphQLYogaError('No API Key provided.', {
-        extensions: {
-          http: {
-            status: 400,
-          },
-        },
-      })
-    }
-
-    const env = context.env as Env
-    const traceSpan = context.traceSpan as TraceSpan
-    const starbaseClient = createStarbaseClient(
-      env.Starbase,
-      generateTraceContextHeaders(traceSpan)
-    )
-
-    let apiKeyValidity
-    try {
-      apiKeyValidity = await starbaseClient.checkApiKey.query({ apiKey })
-    } catch (e) {
-      throw new GraphQLYogaError('Unable to validate given API key.', {
-        extensions: {
-          http: {
-            status: 401,
-          },
-        },
-      })
-    }
-
-    if (!apiKeyValidity.valid) {
-      throw new GraphQLYogaError('Invalid API key provided.', {
-        extensions: {
-          http: {
-            status: 401,
-          },
-        },
-      })
-    }
-  }
-
-  return next(root, args, context, info)
-}
-
-export const matchingClientIdsInCredentials =
+export const validateApiKey =
   () => (next) => async (root, args, context, info) => {
     //If request isn't coming from a service binding then we check for API key validity;
     //otherwise we passthrough to next middleware
     if (!isFromCFBinding(context.request)) {
-      // Don't need to check API key existence.
-      // it's being checked in another middleware
       const apiKey = context.apiKey
-      const aud = context.parsedJwt.aud
-
-      const jwtSub = jose.decodeJwt(apiKey).sub as ApplicationURN
-      const clientId = ApplicationURNSpace.parse(jwtSub).decoded
-
-      if (!aud.includes(clientId)) {
-        throw new GraphQLYogaError(
-          "Client ID in API key doesn't match with the one in JWT.",
-          {
-            extensions: {
-              http: {
-                status: 401,
-              },
+      if (!apiKey) {
+        throw new GraphQLYogaError('No API Key provided.', {
+          extensions: {
+            http: {
+              status: 400,
             },
-          }
-        )
+          },
+        })
+      }
+
+      const env = context.env as Env
+      const traceSpan = context.traceSpan as TraceSpan
+      const starbaseClient = createStarbaseClient(
+        env.Starbase,
+        generateTraceContextHeaders(traceSpan)
+      )
+
+      // API key validation
+      let apiKeyValidity
+      try {
+        apiKeyValidity = await starbaseClient.checkApiKey.query({ apiKey })
+      } catch (e) {
+        throw new GraphQLYogaError('Unable to validate given API key.', {
+          extensions: {
+            http: {
+              status: 401,
+            },
+          },
+        })
+      }
+
+      if (!apiKeyValidity.valid) {
+        throw new GraphQLYogaError('Invalid API key provided.', {
+          extensions: {
+            http: {
+              status: 401,
+            },
+          },
+        })
+      }
+
+      // Check matching between ClientId in API Key and in audience list of jwt
+      // This is being checked only if jwt is presented
+      if (context.jwt && context.jwt.length) {
+        const aud = context.parsedJwt.aud
+
+        const jwtSub = jose.decodeJwt(apiKey).sub as ApplicationURN
+        const clientId = ApplicationURNSpace.parse(jwtSub).decoded
+
+        if (!aud.includes(clientId)) {
+          throw new GraphQLYogaError(
+            "Client ID in API key doesn't match with the one in JWT.",
+            {
+              extensions: {
+                http: {
+                  status: 401,
+                },
+              },
+            }
+          )
+        }
       }
     }
 

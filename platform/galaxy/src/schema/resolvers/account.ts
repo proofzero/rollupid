@@ -7,12 +7,11 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import {
   setupContext,
   isAuthorized,
-  hasApiKey,
+  validateApiKey,
   logAnalytics,
   getConnectedAddresses,
   temporaryConvertToPublic,
   requestLogging,
-  matchingClientIdsInCredentials,
 } from './utils'
 
 import { Resolvers } from './typedefs'
@@ -157,20 +156,19 @@ const ProfileResolverComposition = {
   'Query.profile': [
     requestLogging(),
     setupContext(),
-    hasApiKey(),
+    validateApiKey(),
     logAnalytics(),
   ],
   'Query.authorizedApps': [
     requestLogging(),
     setupContext(),
-    hasApiKey(),
-    matchingClientIdsInCredentials(),
+    validateApiKey(),
     logAnalytics(),
   ],
   'Query.connectedAddresses': [
     requestLogging(),
     setupContext(),
-    hasApiKey(),
+    validateApiKey(),
     logAnalytics(),
     temporaryConvertToPublic(),
   ],
@@ -178,9 +176,8 @@ const ProfileResolverComposition = {
   'Mutation.disconnectAddress': [
     requestLogging(),
     setupContext(),
-    hasApiKey(),
+    validateApiKey(),
     isAuthorized(),
-    matchingClientIdsInCredentials(),
     logAnalytics(),
   ],
 }
