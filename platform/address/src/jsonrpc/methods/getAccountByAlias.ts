@@ -37,7 +37,13 @@ export const getAccountByAliasMethod = async ({
    */
 
   if (edges.length > 1) {
-    throw new Error('500 Internal server error.')
+    throw new Error(
+      'In some apps it is possible to change usernames.\
+      This means that one multiple accounts may have one username.\
+      This is what happened here. In this case we cannot resolve \
+      profile by username and this provider.\
+      500 Internal server error'
+    )
   }
 
   const account = edges.map((edge) => edge.src.baseUrn)[0]
