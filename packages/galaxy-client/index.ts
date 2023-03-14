@@ -185,7 +185,6 @@ export type ProfileInput = {
 export type Query = {
   __typename?: 'Query';
   accountFromAlias: Scalars['URN'];
-  accountFromEns: Scalars['URN'];
   addressProfile: AddressProfile;
   addressProfiles: Array<AddressProfile>;
   authorizedApps?: Maybe<Array<Maybe<App>>>;
@@ -198,11 +197,6 @@ export type Query = {
 export type QueryAccountFromAliasArgs = {
   alias: Scalars['String'];
   provider: Scalars['String'];
-};
-
-
-export type QueryAccountFromEnsArgs = {
-  ens: Scalars['String'];
 };
 
 
@@ -317,13 +311,6 @@ export type RevokeAppAuthorizationMutationVariables = Exact<{
 
 
 export type RevokeAppAuthorizationMutation = { __typename?: 'Mutation', revokeAppAuthorization?: boolean | null };
-
-export type GetAccountFromEnsQueryVariables = Exact<{
-  ens: Scalars['String'];
-}>;
-
-
-export type GetAccountFromEnsQuery = { __typename?: 'Query', accountFromEns: any };
 
 
 export const GetProfileDocument = gql`
@@ -500,11 +487,6 @@ export const RevokeAppAuthorizationDocument = gql`
   revokeAppAuthorization(clientId: $clientId)
 }
     `;
-export const GetAccountFromEnsDocument = gql`
-    query getAccountFromEns($ens: String!) {
-  accountFromEns(ens: $ens)
-}
-    `;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
 
@@ -545,9 +527,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     revokeAppAuthorization(variables: RevokeAppAuthorizationMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RevokeAppAuthorizationMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<RevokeAppAuthorizationMutation>(RevokeAppAuthorizationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'revokeAppAuthorization', 'mutation');
-    },
-    getAccountFromEns(variables: GetAccountFromEnsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAccountFromEnsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetAccountFromEnsQuery>(GetAccountFromEnsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAccountFromEns', 'query');
     }
   };
 }

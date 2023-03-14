@@ -1,3 +1,0 @@
-query getAccountFromEns($ens: String!) {
-  accountFromEns(ens: $ens)
-}

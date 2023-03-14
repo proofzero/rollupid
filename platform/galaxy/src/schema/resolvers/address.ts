@@ -28,22 +28,6 @@ import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 const addressResolvers: Resolvers = {
   Query: {
-    accountFromEns: async (
-      _parent,
-      { ens }: { ens: string },
-      { env, traceSpan }: ResolverContext
-    ) => {
-      const address = (await new ENSUtils().getEnsEntry(ens)).address
-      const addressClient = createAddressClient(env.Address, {
-        ...generateTraceContextHeaders(traceSpan),
-      })
-      const accountURN = await addressClient.getAccountByAlias.query({
-        alias: address,
-        provider: 'eth',
-      })
-
-      return accountURN
-    },
     accountFromAlias: async (
       _parent,
       { provider, alias }: { provider: string; alias: string },
@@ -169,7 +153,6 @@ const addressResolvers: Resolvers = {
 
 // TODO: add address middleware
 const AddressResolverComposition = {
-  'Query.accountFromEns': [requestLogging(), setupContext(), validateApiKey()],
   'Query.account': [requestLogging(), setupContext(), validateApiKey()],
   'Query.addressProfile': [requestLogging(), setupContext(), validateApiKey()],
   'Query.addressProfiles': [requestLogging(), setupContext(), validateApiKey()],

@@ -61,21 +61,11 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   // redirect from any addressURN to its addressURNs
   if (type !== 'p') {
     try {
-      let accountURN
-      // ens lookup is slower, so we don't use it with
-      // regular ethereum addresses.
-      if (type === 'eth' && address.endsWith('.eth')) {
-        const { accountFromEns } = await galaxyClient.getAccountFromEns({
-          ens: address,
-        })
-        accountURN = accountFromEns
-      } else {
-        const { accountFromAlias } = await galaxyClient.getAccountUrnFromAlias({
-          provider: type,
-          alias: address,
-        })
-        accountURN = accountFromAlias
-      }
+      const { accountFromAlias } = await galaxyClient.getAccountUrnFromAlias({
+        provider: type,
+        alias: address,
+      })
+      const accountURN = accountFromAlias
 
       if (!accountURN) {
         throw json({ message: 'Not Found' }, { status: 404 })
