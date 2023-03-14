@@ -38,11 +38,11 @@ export const getAccountByAliasMethod = async ({
 
   if (edges.length > 1) {
     throw new Error(
-      'In some apps it is possible to change usernames.\
-      This means that one multiple accounts may have one username.\
-      This is what happened here. In this case we cannot resolve \
-      profile by username and this provider.\
-      500 Internal server error'
+      `Most likely ${input.provider}-provider allows users to change usernames.
+      It is possible that user you are looking for has changed their username in
+      past and another user obtained it. We have multiple entries of this username
+      for different users. In this case we cannot resolve profile by username for
+      this provider. 500 Internal server error`
     )
   }
 
