@@ -46,7 +46,6 @@ export function ConnectButton({
     error,
     status,
     signMessage,
-    signMessageAsync,
     reset,
   } = useSignMessage({
     onSuccess(data, variables) {
@@ -112,6 +111,7 @@ export function ConnectButton({
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
+                  padding: '1em',
                 }}
               >
                 {(isSigning || isLoading) && isConnected ? (
@@ -144,7 +144,7 @@ export function ConnectButton({
                     )}
 
                     {isConnected && address
-                      ? `Login with ${ensName ?? truncatedAddress}`
+                      ? `Continue with ${ensName ?? truncatedAddress}`
                       : !isConnecting
                       ? 'Connect Wallet'
                       : 'Connecting'}

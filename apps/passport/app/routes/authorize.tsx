@@ -19,7 +19,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   if (prompt !== 'none') {
     if (context.consoleParams.clientId)
       throw await createConsoleParamsSession(context.consoleParams, context.env)
-    else throw redirect('/authenticate')
+    else throw redirect(context.env.CONSOLE_APP_URL)
   }
 
   // this will redirect unauthenticated users to the auth page but maintain query params

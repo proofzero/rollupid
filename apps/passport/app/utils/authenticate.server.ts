@@ -13,7 +13,7 @@ import { createUserSession, parseJwt } from '~/session.server'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import { generateGradient } from './gradient.server'
 import { redirect } from '@remix-run/cloudflare'
-import { TraceSpan } from '@kubelt/platform-middleware/trace'
+import type { TraceSpan } from '@kubelt/platform-middleware/trace'
 
 export const authenticateAddress = async (
   address: AddressURN,

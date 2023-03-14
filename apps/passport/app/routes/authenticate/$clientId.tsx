@@ -1,19 +1,21 @@
-import { Form, useLoaderData, useSubmit, useTransition } from '@remix-run/react'
+import {
+  Form,
+  useLoaderData,
+  useOutletContext,
+  useSubmit,
+  useTransition,
+} from '@remix-run/react'
 import { useEffect, useState } from 'react'
 import { Authentication, ConnectButton } from '~/components'
 import ConnectOAuthButton from '~/components/connect-oauth-button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { toast, ToastType } from '@kubelt/design-system/src/atoms/toast'
-import { Profile } from '@kubelt/platform/account/src/types'
+import type { Profile } from '@kubelt/platform/account/src/types'
 import { HiCheck } from 'react-icons/hi'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import {
-  ActionFunction,
-  json,
-  LoaderFunction,
-  redirect,
-} from '@remix-run/cloudflare'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
 import {
   destroyConsoleParamsSession,
   getConsoleParamsSession,
@@ -22,7 +24,7 @@ import {
   requireJWT,
   setConsoleParamsSession,
 } from '~/session.server'
-import { AccountURN } from '@kubelt/urns/account'
+import type { AccountURN } from '@kubelt/urns/account'
 import { ResponseType } from '@kubelt/types/access'
 import {
   getAccessClient,
@@ -34,7 +36,9 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   let clientId
   const headers = new Headers()
 
+  console.debug('PARAMS CLIENT ID', params)
   if (params.clientId !== 'console') {
+    console.debug('HERE CONSOLE')
     const consoleParmamsSessionFromCookie = await getConsoleParamsSession(
       request,
       context.env,
@@ -43,10 +47,10 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     const consoleParamsSession = consoleParmamsSessionFromCookie.get('params')
     const parsedParams = consoleParamsSession
       ? await JSON.parse(consoleParamsSession)
-      : undefined
+      : context.consoleParams
     clientId = parsedParams?.clientId || undefined
 
-    if (!clientId) {
+    if (!clientId && !context.consoleParams.clientId) {
       throw json(
         {
           message: 'App not found',
@@ -60,6 +64,11 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     headers.append(
       'Set-Cookie',
       await setConsoleParamsSession(parsedParams, context.env, 'last')
+    )
+  } else {
+    headers.append(
+      'Set-Cookie',
+      await destroyConsoleParamsSession(request, context.env, 'last')
     )
   }
 
@@ -136,7 +145,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const headers = new Headers()
   headers.append(
     'Set-Cookie',
-    await destroyConsoleParamsSession(request, context.env, clientId)
+    await destroyConsoleParamsSession(request, context.env)
   )
 
   return redirect(`${redirectUri}?${redirectParams}`, {
@@ -145,6 +154,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 }
 
 export default function Authenticate() {
+  const { prompt } = useOutletContext<{ prompt?: string }>()
   const [signData, setSignData] = useState<{
     nonce: string | undefined
     state: string | undefined
@@ -183,7 +193,7 @@ export default function Authenticate() {
 
       <Authentication logoURL={iconURL} appName={name}>
         <>
-          {profile && (
+          {profile && prompt !== 'login' && (
             <>
               <Button
                 btnType="secondary-alt"
@@ -217,7 +227,7 @@ export default function Authenticate() {
                   <HiCheck className="w-3.5 h-3.5 text-indigo-500" />
                 </div>
               </Button>
-              <div className="my-5 flex flex-row items-center space-x-3">
+              <div className="my-1 flex flex-row items-center space-x-3">
                 <hr className="h-px w-16 bg-gray-500" />
                 <Text>or</Text>
                 <hr className="h-px w-16 bg-gray-500" />
@@ -282,7 +292,7 @@ export default function Authenticate() {
           />
 
           {!profile && (
-            <div className="my-5 flex flex-row items-center space-x-3">
+            <div className="my-2 flex flex-row items-center space-x-3">
               <hr className="h-px w-16 bg-gray-500" />
               <Text>or</Text>
               <hr className="h-px w-16 bg-gray-500" />

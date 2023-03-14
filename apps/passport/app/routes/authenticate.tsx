@@ -1,11 +1,12 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 import { Suspense } from 'react'
 
 import { getUserSession } from '~/session.server'
 
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
-import { useCatch, useOutletContext } from '@remix-run/react'
+import { useCatch, useLoaderData, useOutletContext } from '@remix-run/react'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 import { LazyAuth } from '~/web3/lazyAuth'
 import sideGraphics from '~/assets/auth-side-graphics.svg'
@@ -13,19 +14,10 @@ import sideGraphics from '~/assets/auth-side-graphics.svg'
 // TODO: loader function check if we have a session already
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context, params }) => {
-  if (!params.clientId) {
-    return redirect(`/authenticate/console`)
-  }
-
   const searchParams = new URL(request.url).searchParams
   const prompt = searchParams.get('prompt')
-  const clientId = searchParams.get('client_id')
 
-  const session = await getUserSession(
-    request,
-    context.env,
-    clientId ?? undefined
-  )
+  const session = await getUserSession(request, context.env, params.clientId)
   const jwt = session.get('jwt')
 
   if (jwt) {
@@ -34,11 +26,18 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     }
   }
 
-  return null
+  if (!params.clientId) {
+    return redirect(`/authenticate/console`)
+  }
+
+  return json({
+    prompt,
+  })
 }
 
 export default function Index() {
-  const context = useOutletContext()
+  const context = useOutletContext() || {}
+  const data = useLoaderData()
 
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
@@ -51,7 +50,7 @@ export default function Index() {
       </div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
         <Suspense fallback={''}>
-          <LazyAuth context={context} autoConnect={true} />
+          <LazyAuth context={{ ...context, ...data }} autoConnect={true} />
         </Suspense>
       </div>
     </div>

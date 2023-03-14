@@ -13,7 +13,7 @@ import classNames from 'classnames'
 import logo from '~/assets/profile_logo.svg'
 import mobileLogo from '~/assets/profile_logo_mobile.svg'
 import defaultAvatar from '~/assets/circle_gradient.png'
-import { SignOutLink, ConsoleLink } from '~/components/hean-nav-links'
+import { SignOutLink } from '~/components/hean-nav-links'
 
 import styles from './headNav.css'
 import { gatewayFromIpfs } from '@kubelt/utils'
@@ -24,7 +24,6 @@ export const links = () => [{ rel: 'stylesheet', href: styles }]
 const userNavigation = [
   // { name: 'Copy Address', href: '#' },
   // { name: 'Account', href: '#' },
-  { name: 'Console', component: ConsoleLink },
   { name: 'Sign out', component: SignOutLink },
 ]
 
@@ -37,7 +36,6 @@ type HeadNavProps = {
   avatarUrl?: string | undefined
   isToken?: boolean | undefined
   loggedIn?: boolean | undefined
-  consoleURL: string
 }
 
 export default function HeadNav({
@@ -45,7 +43,6 @@ export default function HeadNav({
   avatarUrl,
   loggedIn,
   isToken = false,
-  consoleURL,
 }: HeadNavProps) {
   const activeStyle = {
     fontWeight: 600,
@@ -177,7 +174,6 @@ export default function HeadNav({
                               <Menu.Item key={item.name}>
                                 {({ active }) => (
                                   <item.component
-                                    consoleURL={consoleURL}
                                     className={classNames(
                                       active ? 'bg-gray-100' : '',
                                       'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
@@ -278,7 +274,6 @@ export default function HeadNav({
                           }}
                         >
                           <item.component
-                            consoleURL={consoleURL}
                             className={
                               'block px-3 py-4 hover:bg-gray-700\
                            border-b border-gray-700 md:hidden w-full\
