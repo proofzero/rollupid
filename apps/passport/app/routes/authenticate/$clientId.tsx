@@ -36,9 +36,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   let clientId
   const headers = new Headers()
 
-  console.debug('PARAMS CLIENT ID', params)
   if (params.clientId !== 'console') {
-    console.debug('HERE CONSOLE')
     const consoleParmamsSessionFromCookie = await getConsoleParamsSession(
       request,
       context.env,

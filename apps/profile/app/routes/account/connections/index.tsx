@@ -243,11 +243,11 @@ const AccountSettingsConnections = () => {
       return
     }
 
-    const windowUrl = new URL(
-      `${(window as any).ENV.PASSPORT_URL}/authenticate`
-    )
-
     const clientId = (window as any).ENV.PROFILE_CLIENT_ID
+
+    const windowUrl = new URL(
+      `${(window as any).ENV.PASSPORT_URL}/authenticate/${clientId}`
+    )
 
     // prompt lets passport authentication know this is a connect call
     // not a new account one, and thus generate the proper cookie
