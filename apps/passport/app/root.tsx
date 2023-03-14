@@ -114,7 +114,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     appProps = await sbClient.getAppPublicProps.query({ clientId })
   }
 
-  const session = await getUserSession(request, context.env)
+  const session = await getUserSession(request, context.env, clientId)
 
   let profile
   const jwt = session.get('jwt')

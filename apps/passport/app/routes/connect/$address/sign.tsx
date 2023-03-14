@@ -77,7 +77,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const { code, existing } = await addressClient.verifyNonce.mutate({
     nonce: formData.get('nonce') as string,
     signature: formData.get('signature') as string,
-    jwt: await getJWTConditionallyFromSession(request, context.env),
+    jwt: await getJWTConditionallyFromSession(request, context.env, appData?.clientId),
     forceAccountCreation: !appData || appData.prompt !== 'login',
   })
 

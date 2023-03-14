@@ -14,12 +14,16 @@ import sideGraphics from '~/assets/auth-side-graphics.svg'
 // TODO: loader function check if we have a session already
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const session = await getUserSession(request, context.env)
   const searchParams = new URL(request.url).searchParams
-
-  const jwt = session.get('jwt')
   const prompt = searchParams.get('prompt')
   const clientId = searchParams.get('client_id')
+
+  const session = await getUserSession(
+    request,
+    context.env,
+    clientId ?? undefined
+  )
+  const jwt = session.get('jwt')
 
   if (jwt) {
     if (prompt === 'none') {

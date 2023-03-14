@@ -75,7 +75,13 @@ export const authenticateAddress = async (
     redirectURL += `?${urlParams}`
   }
 
-  return createUserSession(accessToken, redirectURL, address, env)
+  return createUserSession(
+    accessToken,
+    redirectURL,
+    address,
+    env,
+    appData?.clientId
+  )
 }
 
 const provisionProfile = async (
