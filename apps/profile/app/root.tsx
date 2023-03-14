@@ -71,7 +71,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json({
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG,
-      CONSOLE_APP_URL,
       PASSPORT_URL,
       PROFILE_CLIENT_ID,
     },
@@ -83,7 +82,6 @@ export default function App() {
   const { ENV } = useLoaderData<{
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG: string
-      CONSOLE_APP_URL: string
       PASSPORT_URL: string
       PROFILE_CLIENT_ID: string
     }
@@ -130,11 +128,7 @@ export default function App() {
         {(transition.state === 'loading' ||
           transition.state === 'submitting') && <Loader />}
 
-        <Outlet
-          context={{
-            CONSOLE_APP_URL: ENV.CONSOLE_APP_URL,
-          }}
-        />
+        <Outlet context={{}} />
 
         <ScrollRestoration />
         <Scripts />
