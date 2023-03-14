@@ -33,7 +33,7 @@ const getPassportSessionStorage = (MAX_AGE = 7776000 /*60 * 60 * 24 * 90*/) =>
     cookie: {
       domain: COOKIE_DOMAIN,
       httpOnly: true,
-      name: 'PASSPORT_SESSION',
+      name: '_rollup_session',
       path: '/',
       sameSite: 'strict',
       secure: process.env.NODE_ENV === 'production',
