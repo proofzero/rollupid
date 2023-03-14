@@ -8,7 +8,8 @@ import { createConsoleParamsSession, requireJWT } from '~/session.server'
 export const loader: LoaderFunction = async ({ request, context }) => {
   const params = new URL(request.url).searchParams
   const prompt = params.get('prompt')
-  if (prompt === 'select_account') {
+
+  if (prompt !== 'none') {
     if (context.consoleParams.clientId)
       throw await createConsoleParamsSession(context.consoleParams, context.env)
     else throw redirect('/authenticate')
