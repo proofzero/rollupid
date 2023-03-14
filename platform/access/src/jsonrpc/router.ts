@@ -1,5 +1,7 @@
 import { initTRPC } from '@trpc/server'
 
+import { errorFormatter } from '@proofzero/utils/trpc'
+
 import { Context } from '../context'
 
 import { InjectEdges } from '@proofzero/platform-middleware/edges'
@@ -54,7 +56,7 @@ import {
   revokeAppAuthorizationMethod,
 } from './methods/revokeAppAuthorization'
 
-const t = initTRPC.context<Context>().create()
+const t = initTRPC.context<Context>().create({ errorFormatter })
 
 export const appRouter = t.router({
   authorize: t.procedure

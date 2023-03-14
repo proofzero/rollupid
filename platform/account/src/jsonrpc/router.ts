@@ -1,5 +1,6 @@
 import { initTRPC } from '@trpc/server'
-import { ZodError } from 'zod'
+
+import { errorFormatter } from '@proofzero/utils/trpc'
 
 import { Context } from '../context'
 
@@ -34,20 +35,7 @@ import {
   getAuthorizedAppsMethod,
 } from './methods/getAuthorizedApps'
 
-const t = initTRPC.context<Context>().create({
-  errorFormatter({ shape, error }) {
-    return {
-      ...shape,
-      data: {
-        ...shape.data,
-        zodError:
-          error.code === 'BAD_REQUEST' && error.cause instanceof ZodError
-            ? error.cause.flatten()
-            : null,
-      },
-    }
-  },
-})
+const t = initTRPC.context<Context>().create({ errorFormatter })
 
 export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
   const accountURN = ctx.accountURN

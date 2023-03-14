@@ -1,5 +1,7 @@
 import { initTRPC } from '@trpc/server'
 
+import { errorFormatter } from '@proofzero/utils/trpc'
+
 import { Context } from '../context'
 
 import {
@@ -64,7 +66,7 @@ import {
   VerifyEmailOTPOutput,
 } from './methods/verifyEmailOTP'
 
-const t = initTRPC.context<Context>().create()
+const t = initTRPC.context<Context>().create({ errorFormatter })
 
 export const appRouter = t.router({
   resolveAccount: t.procedure

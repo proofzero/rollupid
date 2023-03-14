@@ -1,5 +1,7 @@
 import { initTRPC } from '@trpc/server'
 
+import { errorFormatter } from '@proofzero/utils/trpc'
+
 import { Context } from './context'
 import { LogUsage } from '@proofzero/platform-middleware/log'
 import {
@@ -65,7 +67,7 @@ import {
   GetAuthorizedAccountsMethodOutput,
 } from './methods/getAuthorizedAccounts'
 
-const t = initTRPC.context<Context>().create()
+const t = initTRPC.context<Context>().create({ errorFormatter })
 
 export const appRouter = t.router({
   createApp: t.procedure

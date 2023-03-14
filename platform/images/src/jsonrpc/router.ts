@@ -1,6 +1,9 @@
+import { initTRPC } from '@trpc/server'
+
 import { Analytics } from '@proofzero/platform-middleware/analytics'
 import { LogUsage } from '@proofzero/platform-middleware/log'
-import { initTRPC } from '@trpc/server'
+import { errorFormatter } from '@proofzero/utils/trpc'
+
 import {
   uploadMethod,
   uploadMethodOutput,
@@ -19,7 +22,7 @@ import {
 
 import { Context } from '../context'
 
-const t = initTRPC.context<Context>().create()
+const t = initTRPC.context<Context>().create({ errorFormatter })
 
 export const appRouter = t.router({
   upload: t.procedure
