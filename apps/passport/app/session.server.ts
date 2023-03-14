@@ -178,6 +178,12 @@ export async function getConsoleParamsSession(request: Request, env: Env) {
   return storage.getSession(request.headers.get('Cookie'))
 }
 
+export async function destroyConsoleParamsSession(request: Request, env: Env) {
+  const gps = await getConsoleParamsSession(request, env)
+  const storage = getConsoleParamsSessionStorage(env)
+  return storage.destroySession(gps)
+}
+
 export async function requireJWT(
   request: Request,
   consoleParams: ConsoleParams,

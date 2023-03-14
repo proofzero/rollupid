@@ -13,6 +13,58 @@ import { toast, ToastType } from '@kubelt/design-system/src/atoms/toast'
 import { Profile } from '@kubelt/platform/account/src/types'
 import { HiCheck } from 'react-icons/hi'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { ActionFunction, json, redirect } from '@remix-run/cloudflare'
+import {
+  destroyConsoleParamsSession,
+  getConsoleParamsSession,
+  parseJwt,
+  requireJWT,
+} from '~/session.server'
+import { AccountURN } from '@kubelt/urns/account'
+import { ResponseType } from '@kubelt/types/access'
+import { getAccessClient } from '~/platform.server'
+
+export const action: ActionFunction = async ({ request, context }) => {
+  const consoleParams = await getConsoleParamsSession(request, context.env)
+    .then((session) => JSON.parse(session.get('params')))
+    .catch((err) => {
+      console.log('No console params session found')
+      return null
+    })
+
+  if (!consoleParams) return redirect(context.env.CONSOLE_APP_URL)
+
+  const { redirectUri, state, clientId } = consoleParams
+
+  const jwt = await requireJWT(request, consoleParams, context.env)
+  const parsedJWT = parseJwt(jwt)
+  const account = parsedJWT.sub as AccountURN
+  const responseType = ResponseType.Code
+  const accessClient = getAccessClient(context.env, context.traceSpan)
+  const authorizeRes = await accessClient.authorize.mutate({
+    account,
+    responseType,
+    clientId,
+    redirectUri,
+    scope: [],
+    state,
+  })
+
+  if (!authorizeRes) {
+    throw json({ message: 'Failed to authorize' }, 400)
+  }
+
+  const redirectParams = new URLSearchParams({
+    code: authorizeRes.code,
+    state: authorizeRes.state,
+  })
+
+  return redirect(`${redirectUri}?${redirectParams}`, {
+    headers: {
+      'Set-Cookie': await destroyConsoleParamsSession(request, context.env),
+    },
+  })
+}
 
 export default function Authenticate() {
   const [signData, setSignData] = useState<{
@@ -65,6 +117,14 @@ export default function Authenticate() {
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
+                }}
+                onClick={() => {
+                  submit(
+                    {},
+                    {
+                      method: 'post',
+                    }
+                  )
                 }}
               >
                 <div className="flex flex-row items-center space-x-3">

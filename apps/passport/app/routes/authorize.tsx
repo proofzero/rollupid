@@ -9,7 +9,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const params = new URL(request.url).searchParams
   const prompt = params.get('prompt')
   if (prompt === 'select_account') {
-    return createConsoleParamsSession(context.consoleParams, context.env)
+    if (context.consoleParams.clientId)
+      throw await createConsoleParamsSession(context.consoleParams, context.env)
+    else throw redirect('/authenticate')
   }
 
   // this will redirect unauthenticated users to the auth page but maintain query params
