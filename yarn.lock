@@ -6084,6 +6084,7 @@ __metadata:
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/bytes": 5.7.0
     "@ethersproject/random": 5.7.0
+    "@proofzero/errors": "workspace:*"
     "@proofzero/platform-clients": "workspace:*"
     "@proofzero/platform-middleware": "workspace:*"
     "@proofzero/types": "workspace:*"

@@ -16,6 +16,13 @@ import { initAuthorizationNodeByName, initAccessNodeByName } from '../../nodes'
 
 import getIdTokenProfileFromAccount from '../../utils/getIdTokenProfileFromAccount'
 
+import {
+  InvalidClientCredentialsError,
+  MismatchClientIdError,
+  MissingSubjectError,
+  UnsupportedGrantTypeError,
+} from '../../errors'
+
 const AuthenticationCodeInput = z.object({
   grantType: z.literal(GrantType.AuthenticationCode),
   code: z.string(),
@@ -102,7 +109,7 @@ export const exchangeTokenMethod: ExchangeTokenMethod = async ({
   } else if (grantType == GrantType.RefreshToken) {
     return handleRefreshToken({ ctx, input })
   } else {
-    throw new Error(`unsupported grant type: ${grantType}`)
+    throw new UnsupportedGrantTypeError(grantType)
   }
 }
 
@@ -152,9 +159,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     clientSecret,
   })
 
-  if (!valid) {
-    throw new Error('invalid client credentials')
-  }
+  if (!valid) throw InvalidClientCredentialsError
 
   const authorizationNode = await initAuthorizationNodeByName(
     code,
@@ -224,18 +229,11 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
     clientSecret,
   })
 
-  if (!valid) {
-    throw new Error('invalid client credentials')
-  }
+  if (!valid) throw InvalidClientCredentialsError
 
   const payload = decodeJwt(refreshToken) as AccessJWTPayload
-  if (clientId != payload.aud[0]) {
-    throw new Error('mismatch Client ID')
-  }
-
-  if (!payload.sub) {
-    throw new Error('missing subject')
-  }
+  if (clientId != payload.aud[0]) throw MismatchClientIdError
+  if (!payload.sub) throw MissingSubjectError
 
   const account = payload.sub
   const name = `${AccountURNSpace.decode(account)}@${clientId}`

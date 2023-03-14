@@ -8,6 +8,13 @@ import { CODE_OPTIONS } from '../constants'
 
 import { AuthorizeResult } from '../types'
 
+import {
+  MismatchClientIdError,
+  MissingAccountNameError,
+  MissingClientIdError,
+  UnsupportedResponseTypeError,
+} from '../errors'
+
 export default class Authorization extends DOProxy {
   declare state: DurableObjectState
 
@@ -25,9 +32,8 @@ export default class Authorization extends DOProxy {
     scope: Scope,
     state: string
   ): Promise<AuthorizeResult> {
-    if (responseType != ResponseType.Code) {
-      throw `unsupported response type: ${responseType}`
-    }
+    if (responseType != ResponseType.Code)
+      throw new UnsupportedResponseTypeError(responseType)
 
     const timestamp: number = Date.now()
 
@@ -49,18 +55,11 @@ export default class Authorization extends DOProxy {
     clientId: string
   ): Promise<{ code: string }> {
     const account = await this.state.storage.get<AccountURN>('account')
-    if (!account) {
-      throw new Error('missing account name')
-    }
+    if (!account) throw MissingAccountNameError
 
     const storedClientId = await this.state.storage.get<string>('clientId')
-    if (!storedClientId) {
-      throw new Error('missing Client ID')
-    }
-
-    if (clientId != storedClientId) {
-      throw new Error('mismatch Client ID')
-    }
+    if (!storedClientId) throw MissingClientIdError
+    if (clientId != storedClientId) throw MismatchClientIdError
 
     return { code }
   }

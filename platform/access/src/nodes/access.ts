@@ -1,14 +1,6 @@
 import { DOProxy } from 'do-proxy'
 
-import {
-  exportJWK,
-  generateKeyPair,
-  jwtVerify,
-  importJWK,
-  SignJWT,
-  JWTVerifyResult,
-  decodeJwt,
-} from 'jose'
+import * as jose from 'jose'
 
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
@@ -19,6 +11,13 @@ import type { Scope } from '@proofzero/types/access'
 import { JWT_OPTIONS } from '../constants'
 
 import type { IdTokenProfile, KeyPair, KeyPairSerialized } from '../types'
+
+import {
+  ExpiredTokenError,
+  InvalidTokenError,
+  TokenClaimValidationFailedError,
+  TokenVerificationFailedError,
+} from '../errors'
 
 type TokenStore = DurableObjectStorage | DurableObjectTransaction
 
@@ -81,7 +80,7 @@ export default class Access extends DOProxy {
     const { alg } = JWT_OPTIONS
     const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
     const { privateKey: key } = await this.getJWTSigningKeyPair()
-    return new SignJWT({ scope })
+    return new jose.SignJWT({ scope })
       .setProtectedHeader({ alg })
       .setExpirationTime(expirationTime)
       .setAudience([clientId])
@@ -97,7 +96,7 @@ export default class Access extends DOProxy {
     const { alg } = JWT_OPTIONS
     const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
     const { privateKey: key } = await this.getJWTSigningKeyPair()
-    const jwt = await new SignJWT({ scope })
+    const jwt = await new jose.SignJWT({ scope })
       .setProtectedHeader({ alg })
       .setAudience([clientId])
       .setIssuedAt()
@@ -115,7 +114,7 @@ export default class Access extends DOProxy {
       options
     const { alg } = JWT_OPTIONS
     const { privateKey: key } = await this.getJWTSigningKeyPair()
-    return new SignJWT(idTokenProfile)
+    return new jose.SignJWT(idTokenProfile)
       .setProtectedHeader({ alg })
       .setExpirationTime(expirationTime)
       .setAudience([clientId])
@@ -156,11 +155,19 @@ export default class Access extends DOProxy {
     })
   }
 
-  async verify(token: string): Promise<JWTVerifyResult> {
+  async verify(token: string): Promise<jose.JWTVerifyResult> {
     const { alg } = JWT_OPTIONS
     const { publicKey: key } = await this.getJWTSigningKeyPair()
     const options = { algorithms: [alg] }
-    return jwtVerify(token, key, options)
+    try {
+      return await jose.jwtVerify(token, key, options)
+    } catch (error) {
+      if (error instanceof jose.errors.JWTClaimValidationFailed)
+        throw TokenClaimValidationFailedError
+      else if (error instanceof jose.errors.JWTExpired) throw ExpiredTokenError
+      else if (error instanceof jose.errors.JWTInvalid) throw InvalidTokenError
+      else throw TokenVerificationFailedError
+    }
   }
 
   async revoke(token: string): Promise<void> {
@@ -194,18 +201,18 @@ export default class Access extends DOProxy {
     const stored = await storage.get<KeyPairSerialized>('signingKey')
     if (stored) {
       return {
-        publicKey: await importJWK(stored.publicKey, alg),
-        privateKey: await importJWK(stored.privateKey, alg),
+        publicKey: await jose.importJWK(stored.publicKey, alg),
+        privateKey: await jose.importJWK(stored.privateKey, alg),
       }
     }
 
-    const generated: KeyPair = await generateKeyPair(alg, {
+    const generated: KeyPair = await jose.generateKeyPair(alg, {
       extractable: true,
     })
 
     await storage.put('signingKey', {
-      publicKey: await exportJWK(generated.publicKey),
-      privateKey: await exportJWK(generated.privateKey),
+      publicKey: await jose.exportJWK(generated.publicKey),
+      privateKey: await jose.exportJWK(generated.privateKey),
     })
 
     return generated
