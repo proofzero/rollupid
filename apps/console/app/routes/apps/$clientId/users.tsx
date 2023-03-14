@@ -1,21 +1,17 @@
-import { useLoaderData, useNavigate } from '@remix-run/react'
+import { Await, useLoaderData, useNavigate } from '@remix-run/react'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import { defer, json } from '@remix-run/cloudflare'
-import { useTransition } from '@remix-run/react'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
-import { useState, useEffect } from 'react'
+import { Suspense } from 'react'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import type { AuthorizedAccountsOutput } from '@kubelt/platform/starbase/src/types'
 import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
-import type { AuthorizedProfile, edgesMetadata } from '~/types'
 
 import { AccountURNSpace } from '@kubelt/urns/account'
 
-import missingImage from '~/images/missing-img.svg'
 import { noLoginsSvg } from '~/components/Applications/LoginsPanel/LoginsPanel'
-
-import { HiOutlineExternalLink } from 'react-icons/hi'
+import { User } from '~/components/Applications/Users/User'
 
 import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
@@ -69,16 +65,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
 const Users = () => {
   const navigate = useNavigate()
-  const transition = useTransition()
-  const { edgesResult, PROFILE_APP_URL, error } = useLoaderData()
-  const [authorizedProfiles, setAuthorizedProfiles] = useState({
-    accounts: [] as AuthorizedProfile[],
-    metadata: {
-      offset: 0,
-      limit: PAGE_LIMIT,
-      edgesReturned: 0,
-    } as edgesMetadata,
-  })
+  const { edgesResult, PROFILE_APP_URL } = useLoaderData<LoaderData>()
 
   const loadUsersSubset = (offset: number) => {
     const query = new URLSearchParams()
@@ -86,18 +73,6 @@ const Users = () => {
       query.set('page', (offset / PAGE_LIMIT + 1).toString())
     navigate(`?${query}`)
   }
-
-  useEffect(() => {
-    ;(async () => {
-      if (edgesResult) {
-        const awaitedEdgesResult = await edgesResult
-        if (!awaitedEdgesResult.metadata.offset) {
-          awaitedEdgesResult.metadata.offset = 0
-        }
-        setAuthorizedProfiles(awaitedEdgesResult)
-      }
-    })()
-  }, [edgesResult])
 
   const Users = new Map<
     string,
@@ -108,186 +83,155 @@ const Users = () => {
     }
   >()
 
-  authorizedProfiles.accounts.forEach((authProfile) => {
-    const decodedAccountURN = AccountURNSpace.decode(authProfile.accountURN)
-
-    // Keys are decoded accountURNs
-    Users.set(decodedAccountURN, {
-      name: authProfile.name!,
-      date: new Date(authProfile.timestamp).toLocaleString('default', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      }),
-      imageURL: authProfile.imageURL!,
-    })
-  })
-
-  const orderOfResults = `Showing ${
-    authorizedProfiles.metadata.offset + 1
-  } to ${Math.min(
-    authorizedProfiles.metadata.offset + PAGE_LIMIT,
-    authorizedProfiles.metadata.edgesReturned
-  )} of ${authorizedProfiles.metadata.edgesReturned} results`
-
   return (
     <div className="w-full h-full min-h-[360px]">
-      {error ? (
-        <NestedErrorPage />
-      ) : (
-        <>
-          <Text size="2xl" weight="semibold" className="text-gray-900 pb-4">
-            Users
-          </Text>
-          {!Users.size ? (
-            <div
-              className="flex flex-col bg-white
-        shadow rounded-lg border justify-center items-center min-h-[360px] h-full"
-            >
-              {noLoginsSvg}
+      <Text size="2xl" weight="semibold" className="text-gray-900 pb-4">
+        Users
+      </Text>
+      <Suspense
+        fallback={
+          <div
+            className="flex bg-white justify-center items-center h-full
+rounded-lg border shadow"
+          >
+            <Spinner />
+          </div>
+        }
+      >
+        <Await resolve={edgesResult} errorElement={<NestedErrorPage />}>
+          {(edgesResult: AuthorizedAccountsOutput) => {
+            console.log({ edgesResult })
+            if (!edgesResult.metadata.offset) {
+              edgesResult.metadata.offset = 0
+            }
+            const authorizedProfiles = edgesResult
+            edgesResult.accounts.forEach((account) => {
+              const decodedAccountURN = AccountURNSpace.decode(
+                account.accountURN
+              )
 
-              <Text weight="medium" className="text-gray-500 mt-9 mt-2">
-                No one signed up to your app yet.
-              </Text>
-              <Text weight="medium" className="text-gray-500">
-                <a className="text-indigo-500" href="/">
-                  Go to Docs
-                </a>{' '}
-                and try the signup flow.
-              </Text>
-            </div>
-          ) : (
-            <div className="border flex-1 flex flex-col rounded-lg">
-              <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-lg">
-                <Text
-                  size="sm"
-                  weight="medium"
-                  className="text-gray-500 flex-1 break-all"
-                >
-                  USER ID
-                </Text>
-                <Text
-                  size="sm"
-                  weight="medium"
-                  className="text-gray-500 flex-1 px-2 break-all"
-                >
-                  FIRST AUTHORIZATION
-                </Text>
-                <Text
-                  size="sm"
-                  weight="medium"
-                  className="text-gray-500 flex-1 break-all text-right"
-                >
-                  PROFILE
-                </Text>
-              </div>
+              // Keys are decoded accountURNs
+              Users.set(decodedAccountURN, {
+                name: account.name!,
+                date: new Date(account.timestamp).toLocaleString('default', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                }),
+                imageURL: account.imageURL!,
+              })
+            })
 
-              <div
-                className="flex flex-1 flex-col bg-white rounded-br-lg
-          rounded-bl-lg"
-              >
-                {transition.state === 'loading' ? (
+            const orderOfResults = `Showing ${
+              authorizedProfiles.metadata.offset + 1
+            } to ${Math.min(
+              authorizedProfiles.metadata.offset + PAGE_LIMIT,
+              authorizedProfiles.metadata.edgesReturned
+            )} of ${authorizedProfiles.metadata.edgesReturned} results`
+            return (
+              <>
+                {!Users.size ? (
                   <div
-                    className="flex bg-white justify-center items-center h-full
-            rounded-lg border shadow"
+                    className="flex flex-col bg-white
+        shadow rounded-lg border justify-center items-center min-h-[360px] h-full"
                   >
-                    <Spinner />
+                    {noLoginsSvg}
+
+                    <Text weight="medium" className="text-gray-500 mt-9 mt-2">
+                      No one signed up to your app yet.
+                    </Text>
+                    <Text weight="medium" className="text-gray-500">
+                      <a className="text-indigo-500" href="/">
+                        Go to Docs
+                      </a>{' '}
+                      and try the signup flow.
+                    </Text>
                   </div>
                 ) : (
-                  Array.from(Users.keys()).map((key, i) => (
-                    <article
-                      key={i}
-                      className="flex items-center py-5 px-8 border-t"
-                    >
-                      <div
-                        className="flex-1 flex flex-col 
-                  items-start 
-                  md:flex-row md:items-center
-                  text-ellipsis md:space-x-4"
-                      >
-                        <img
-                          src={Users.get(key)?.imageURL || missingImage}
-                          alt="account pfp"
-                          className="max-h-[24px] max-w-[24px] rounded-full"
-                        />
-                        <Text
-                          size="sm"
-                          weight="medium"
-                          className="text-gray-500 flex-1"
-                        >
-                          {Users.get(key)?.name}
-                        </Text>
-                      </div>
-
+                  <div className="border flex-1 flex flex-col rounded-lg">
+                    <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-lg">
                       <Text
                         size="sm"
                         weight="medium"
-                        className="text-ellipsis text-gray-500
-                   flex-1 px-2"
+                        className="text-gray-500 flex-1 break-all"
                       >
-                        {Users.get(key)?.date}
+                        USER ID
                       </Text>
-                      <a
-                        className="flex-1 flex justify-end"
-                        href={`${PROFILE_APP_URL}/p/${key}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <Text
+                        size="sm"
+                        weight="medium"
+                        className="text-gray-500 flex-1 px-2 break-all"
                       >
-                        <Button
-                          btnType="secondary-alt"
-                          className="right-0 flex md:flex-row flex-col max-w-max 
-                  text-xs leading-4 items-center md:space-x-2"
-                        >
-                          <HiOutlineExternalLink size={22} />
-                          Public Profile
-                        </Button>
-                      </a>
-                    </article>
-                  ))
-                )}
-                <div className="flex items-center py-4 px-8 border-t justify-between">
-                  <Text className="text-gray-700">{orderOfResults}</Text>
-                  <div className="flex flex-col space-y-1 sm:space-y-0 sm:flex-row ml-2">
-                    <Button
-                      type="button"
-                      disabled={authorizedProfiles.metadata.offset === 0}
-                      btnSize="l"
-                      btnType="secondary-alt"
-                      onClick={() => {
-                        loadUsersSubset(
-                          authorizedProfiles.metadata.offset - PAGE_LIMIT
-                        )
-                      }}
+                        FIRST AUTHORIZATION
+                      </Text>
+                      <Text
+                        size="sm"
+                        weight="medium"
+                        className="text-gray-500 flex-1 break-all text-right"
+                      >
+                        PROFILE
+                      </Text>
+                    </div>
+
+                    <div
+                      className="flex flex-1 flex-col bg-white rounded-br-lg
+          rounded-bl-lg"
                     >
-                      Previous
-                    </Button>
-                    <Button
-                      type="button"
-                      disabled={
-                        authorizedProfiles.metadata.offset + PAGE_LIMIT >=
-                        authorizedProfiles.metadata.edgesReturned
-                      }
-                      btnSize="l"
-                      btnType="secondary-alt"
-                      onClick={() => {
-                        loadUsersSubset(
-                          authorizedProfiles.metadata.offset + PAGE_LIMIT
-                        )
-                      }}
-                      className="sm:ml-4"
-                    >
-                      Next
-                    </Button>
+                      {Array.from(Users.keys()).map((key) => (
+                        <User
+                          key={key}
+                          imageURL={Users.get(key)?.imageURL}
+                          name={Users.get(key)?.name}
+                          date={Users.get(key)?.date}
+                          PROFILE_APP_URL={PROFILE_APP_URL}
+                        />
+                      ))}
+                      <div className="flex items-center py-4 px-8 border-t justify-between">
+                        <Text className="text-gray-700">{orderOfResults}</Text>
+                        <div className="flex flex-col space-y-1 sm:space-y-0 sm:flex-row ml-2">
+                          <Button
+                            type="button"
+                            disabled={authorizedProfiles.metadata.offset === 0}
+                            btnSize="l"
+                            btnType="secondary-alt"
+                            onClick={() => {
+                              loadUsersSubset(
+                                authorizedProfiles.metadata.offset - PAGE_LIMIT
+                              )
+                            }}
+                          >
+                            Previous
+                          </Button>
+                          <Button
+                            type="button"
+                            disabled={
+                              authorizedProfiles.metadata.offset + PAGE_LIMIT >=
+                              authorizedProfiles.metadata.edgesReturned
+                            }
+                            btnSize="l"
+                            btnType="secondary-alt"
+                            onClick={() => {
+                              loadUsersSubset(
+                                authorizedProfiles.metadata.offset + PAGE_LIMIT
+                              )
+                            }}
+                            className="sm:ml-4"
+                          >
+                            Next
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </>
-      )}
+                )}
+              </>
+            )
+          }}
+        </Await>
+      </Suspense>
     </div>
   )
 }

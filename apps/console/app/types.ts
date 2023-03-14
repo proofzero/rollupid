@@ -1,5 +1,8 @@
-import type { AuthorizedUser } from '@kubelt/platform/starbase/src/types'
-import type { EdgesMetadata } from '@kubelt/platform/starbase/src/types'
+import type {
+  AuthorizedUser,
+  AppObject,
+  EdgesMetadata,
+} from '@kubelt/platform/starbase/src/types'
 
 export enum RollType {
   RollAPIKey = 'roll_api_key',
@@ -12,18 +15,7 @@ export type RotatedSecrets = {
 }
 
 export type appDetailsProps = {
-  app: {
-    name: string
-    scopes: string[]
-    icon?: string
-    redirectURI?: string
-    termsURL?: string
-    websiteURL?: string
-    twitterUser?: string
-    mediumUser?: string
-    mirrorURL?: string
-    discordUser?: string
-  }
+  app: AppObject
   published?: boolean
   clientId?: string
   secretTimestamp?: number
