@@ -10,14 +10,12 @@ import { Fragment } from 'react'
 
 import classNames from 'classnames'
 import SignOutLink from './sign-out-link'
-import ProfileLink from './profile-link'
 
 // RollupHeader
 // -----------------------------------------------------------------------------
 
 const userNavigation = [
   // { name: 'Copy Address', href: '#' },
-  { name: 'Profile', component: ProfileLink },
   { name: 'Sign out', component: SignOutLink },
 ]
 
@@ -59,7 +57,6 @@ export default function RollupHeader(props: RollupHeaderProps) {
                         active ? 'bg-gray-100' : '',
                         'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
                       )}
-                      profileURL={props.profileURL}
                     />
                   )}
                 </Menu.Item>

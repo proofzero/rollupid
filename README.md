@@ -16,6 +16,7 @@
 ![](https://github.com/proofzero/rollupid/actions/workflows/main-address.yaml/badge.svg)
 ![](https://github.com/proofzero/rollupid/actions/workflows/main-account.yaml/badge.svg)
 ![](https://github.com/proofzero/rollupid/actions/workflows/main-images.yaml/badge.svg)
+![](https://github.com/proofzero/rollupid/actions/workflows/main-email.yaml/badge.svg)
 
 ##### Apps
 

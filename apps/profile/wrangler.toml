@@ -33,7 +33,6 @@ PASSPORT_URL = "http://localhost:10001"
 PASSPORT_AUTH_URL = "http://localhost:10001/authorize"
 PASSPORT_TOKEN_URL = "http://127.0.0.1:10001/token"
 IMAGES_URL = "http://localhost/trpc"
-CONSOLE_APP_URL = "http://localhost:10002"
 REDIRECT_URI = "http://localhost:10003/auth/callback"
 COOKIE_DOMAIN = "localhost"
 TWITTER_URL = "https://twitter.com/rollupid"
@@ -74,7 +73,6 @@ kv_namespaces = [
 ]
 [env.dev.vars]
 
-CONSOLE_APP_URL = "https://console-dev.rollup.id"
 PASSPORT_URL = "https://passport-dev.rollup.id"
 PASSPORT_AUTH_URL = "https://passport-dev.rollup.id/authorize"
 IMAGES_URL = "https://images-dev.rollup.id/trpc"
@@ -112,7 +110,6 @@ command = "yarn build"
 
 [env.next.vars]
 
-CONSOLE_APP_URL = "https://console-next.rollup.id"
 PASSPORT_URL = "https://passport-next.rollup.id"
 PASSPORT_AUTH_URL = "https://passport-next.rollup.id/authorize"
 IMAGES_URL = "https://images-next.rollup.id/trpc"
@@ -149,7 +146,6 @@ command = "yarn build"
 
 [env.current.vars]
 PASSPORT_URL = "https://passport.rollup.id"
-CONSOLE_APP_URL = "https://console.rollup.id"
 PASSPORT_AUTH_URL = "https://passport.rollup.id/authorize"
 IMAGES_URL = "https://images.rollup.id/trpc"
 PASSPORT_TOKEN_URL = "https://passport.pz3r0.com/token"
