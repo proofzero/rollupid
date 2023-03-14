@@ -36,4 +36,4 @@ When Rollup redirects to this URL your app will be able to pick up the exchange 
 
 Once a user has logged in you will need to provide a way for them to log out. This is usually done by clearing the session cookie or session storage and redirecting the user back to your login page. Your login page should then redirect the user to the [auth flow](../getting-started/auth-flow.md) if they are not logged in.
 
-The auth flow will prompt the user to continue using their last known identity. If you are using custom domains you can clear this behaviour by also redirecting the user to the passport logout url `https://<your-custom-passport-domain>/signout`.
+The auth flow will prompt the user to continue using their last known identity.
