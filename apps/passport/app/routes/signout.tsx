@@ -1,5 +1,5 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import { getConsoleParamsSession, logout } from '~/session.server'
+import { logout } from '~/session.server'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)

@@ -1,17 +1,19 @@
 import { json, redirect } from '@remix-run/cloudflare'
 import type { LoaderFunction, ActionFunction } from '@remix-run/cloudflare'
-import { useLoaderData, useSubmit, useTransition } from '@remix-run/react'
+import {
+  useLoaderData,
+  useOutletContext,
+  useSubmit,
+  useTransition,
+} from '@remix-run/react'
 
 import { ResponseType } from '@kubelt/types/access'
 
-import {
-  getAccessClient,
-  getAccountClient,
-  getStarbaseClient,
-} from '~/platform.server'
+import { getAccessClient, getStarbaseClient } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { parseJwt, requireJWT } from '~/session.server'
 import type { AccountURN } from '@kubelt/urns/account'
+import type { Profile } from '@kubelt/platform/account/src/types'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { clientId, redirectUri, scope, state } = context.consoleParams
@@ -75,14 +77,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         'Could not find a published application with that Client ID'
       )
 
-    const account = parseJwt(jwt).sub as AccountURN
-    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-    const profile = await accountClient.getProfile.query({ account })
-
     return json({
       clientId,
       appProfile,
-      profile,
       scopeMeta: scopeMeta,
       state,
       redirectOverride: redirectUri,
@@ -125,8 +122,6 @@ export const action: ActionFunction = async ({ request, context }) => {
     state,
   })
 
-  console.log({ authorizeRes })
-
   if (!authorizeRes) {
     throw json({ message: 'Failed to authorize' }, 400)
   }
@@ -142,13 +137,16 @@ export const action: ActionFunction = async ({ request, context }) => {
 export default function Authorize() {
   const {
     clientId,
-    profile: userProfile,
     appProfile,
     scopeMeta,
     state,
     redirectOverride,
     scopeOverride,
   } = useLoaderData()
+
+  const { profile: userProfile } = useOutletContext<{
+    profile: Required<Profile>
+  }>()
 
   const submit = useSubmit()
   const transition = useTransition()
