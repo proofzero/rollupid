@@ -1,15 +1,13 @@
-import {
-  FetcherWithComponents,
-  useFetcher,
-  useLoaderData,
-} from '@remix-run/react'
+import { useFetcher, useLoaderData } from '@remix-run/react'
+import type { FetcherWithComponents } from '@remix-run/react'
 import { loader as appLoader } from '~/routes/api/apps/index'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import { Pill } from '@kubelt/design-system/src/atoms/pills/Pill'
-import { json, LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
 import { commitProfileSession, getProfileSession } from '~/utils/session.server'
 import { toast } from 'react-hot-toast'
 

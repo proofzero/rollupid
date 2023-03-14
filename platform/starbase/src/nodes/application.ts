@@ -177,7 +177,7 @@ export default class StarbaseApp extends DOProxy {
     return generated
   }
 
-  async checkApiKey(apiKey: string): Promise<boolean> {
+  async validateApiKey(apiKey: string): Promise<boolean> {
     const validJWTForClient = await this.verify(apiKey)
     const storedKey = await this.state.storage.get('apiKey')
     return validJWTForClient && apiKey === storedKey

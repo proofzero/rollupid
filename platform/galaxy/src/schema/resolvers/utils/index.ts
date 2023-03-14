@@ -2,7 +2,7 @@ import { GraphQLYogaError } from '@graphql-yoga/common'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
-import { AccountURN } from '@kubelt/urns/account'
+import type { AccountURN } from '@kubelt/urns/account'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import createAccountClient from '@kubelt/platform-clients/account'
 
@@ -20,6 +20,8 @@ import {
   generateTraceContextHeaders,
   TraceSpan,
 } from '@kubelt/platform-middleware/trace'
+import type { ApplicationURN } from '@kubelt/urns/application'
+import { ApplicationURNSpace } from '@kubelt/urns/application'
 
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {
@@ -49,9 +51,14 @@ export const setupContext = () => (next) => (root, args, context, info) => {
 
   const parsedJwt = jwt && parseJwt(jwt)
 
-  const accountURN: AccountURN = parsedJwt && parsedJwt.sub
+  const accountURN = jwt ? parsedJwt?.sub : undefined
 
-  return next(root, args, { ...context, jwt, apiKey, accountURN }, info)
+  return next(
+    root,
+    args,
+    { ...context, jwt, apiKey, accountURN, parsedJwt },
+    info
+  )
 }
 
 // TODO: Remove this middleware and it's use once scopes are fully implemented
@@ -90,54 +97,78 @@ export const isAuthorized = () => (next) => (root, args, context, info) => {
   return next(root, args, context, info)
 }
 
-export const hasApiKey = () => (next) => async (root, args, context, info) => {
-  //If request isn't coming from a service binding then we check for API key validity;
-  //otherwise we passthrough to next middleware
-  if (!isFromCFBinding(context.request)) {
-    const apiKey = context.apiKey
-    if (!apiKey) {
-      throw new GraphQLYogaError('No API Key provided.', {
-        extensions: {
-          http: {
-            status: 400,
+export const validateApiKey =
+  () => (next) => async (root, args, context, info) => {
+    //If request isn't coming from a service binding then we check for API key validity;
+    //otherwise we passthrough to next middleware
+    if (!isFromCFBinding(context.request)) {
+      const apiKey = context.apiKey
+      if (!apiKey) {
+        throw new GraphQLYogaError('No API Key provided.', {
+          extensions: {
+            http: {
+              status: 400,
+            },
           },
-        },
-      })
+        })
+      }
+
+      const env = context.env as Env
+      const traceSpan = context.traceSpan as TraceSpan
+      const starbaseClient = createStarbaseClient(
+        env.Starbase,
+        generateTraceContextHeaders(traceSpan)
+      )
+
+      // API key validation
+      let apiKeyValidity
+      try {
+        apiKeyValidity = await starbaseClient.checkApiKey.query({ apiKey })
+      } catch (e) {
+        throw new GraphQLYogaError('Unable to validate given API key.', {
+          extensions: {
+            http: {
+              status: 401,
+            },
+          },
+        })
+      }
+
+      if (!apiKeyValidity.valid) {
+        throw new GraphQLYogaError('Invalid API key provided.', {
+          extensions: {
+            http: {
+              status: 401,
+            },
+          },
+        })
+      }
+
+      // Check matching between ClientId in API Key and in audience list of jwt
+      // This is being checked only if jwt is presented
+      if (context.jwt && context.jwt.length) {
+        const aud = context.parsedJwt.aud
+
+        const jwtSub = jose.decodeJwt(apiKey).sub as ApplicationURN
+        const clientId = ApplicationURNSpace.parse(jwtSub).decoded
+
+        if (!aud.includes(clientId)) {
+          throw new GraphQLYogaError(
+            "Client ID in API key doesn't match with the one in JWT.",
+            {
+              extensions: {
+                http: {
+                  status: 401,
+                },
+              },
+            }
+          )
+        }
+      }
     }
 
-    const env = context.env as Env
-    const traceSpan = context.traceSpan as TraceSpan
-    const starbaseClient = createStarbaseClient(
-      env.Starbase,
-      generateTraceContextHeaders(traceSpan)
-    )
-
-    let apiKeyValidity
-    try {
-      apiKeyValidity = await starbaseClient.checkApiKey.query({ apiKey })
-    } catch (e) {
-      throw new GraphQLYogaError('Unable to validate given API key.', {
-        extensions: {
-          http: {
-            status: 401,
-          },
-        },
-      })
-    }
-
-    if (!apiKeyValidity.valid) {
-      throw new GraphQLYogaError('Invalid API key provided.', {
-        extensions: {
-          http: {
-            status: 401,
-          },
-        },
-      })
-    }
+    return next(root, args, context, info)
   }
-
-  return next(root, args, context, info)
-}
 
 export async function checkHTTPStatus(response: Response) {
   if (response.status !== 200) {
@@ -218,30 +249,4 @@ export const getConnectedAddresses = async ({
 
   // for alchemy calls they need to be lowercased
   return addresses
-}
-
-export const getConnectedCryptoAddresses = async ({
-  accountURN,
-  Account,
-  jwt,
-  traceSpan,
-}: {
-  accountURN: AccountURN
-  Account: Fetcher
-  jwt?: string
-  traceSpan: TraceSpan
-}) => {
-  const cryptoAddresses =
-    (await getConnectedAddresses({
-      accountURN,
-      Account,
-      jwt,
-      traceSpan,
-    })) || []
-
-  return cryptoAddresses
-    .filter((address) =>
-      [NodeType.Crypto, NodeType.Vault].includes(address.rc.node_type)
-    )
-    .map((address) => address.qc.alias.toLowerCase())
 }

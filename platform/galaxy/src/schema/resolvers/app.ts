@@ -2,7 +2,7 @@ import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import { ResolverContext } from './common'
 import type { Resolvers } from './typedefs'
 import {
-  hasApiKey,
+  validateApiKey,
   isAuthorized,
   logAnalytics,
   requestLogging,
@@ -56,14 +56,14 @@ const AppResolverComposition = {
   'Query.scopes': [
     requestLogging(),
     setupContext(),
-    hasApiKey(),
+    validateApiKey(),
     isAuthorized(),
     logAnalytics(),
   ],
   'Mutation.revokeAppAuthorization': [
     requestLogging(),
     setupContext(),
-    hasApiKey(),
+    validateApiKey(),
     isAuthorized(),
     logAnalytics(),
   ],

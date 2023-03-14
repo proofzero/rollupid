@@ -4,7 +4,12 @@ import createAddressClient from '@kubelt/platform-clients/address'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
 import { AddressProfilesUnion, Resolvers } from './typedefs'
-import { hasApiKey, setupContext, isAuthorized, requestLogging } from './utils'
+import {
+  validateApiKey,
+  setupContext,
+  isAuthorized,
+  requestLogging,
+} from './utils'
 
 import { ResolverContext } from './common'
 
@@ -150,20 +155,20 @@ const addressResolvers: Resolvers = {
 
 // TODO: add address middleware
 const AddressResolverComposition = {
-  'Query.ensProfile': [requestLogging(), setupContext(), hasApiKey()],
-  'Query.account': [requestLogging(), setupContext(), hasApiKey()],
-  'Query.addressProfile': [requestLogging(), setupContext(), hasApiKey()],
-  'Query.addressProfiles': [requestLogging(), setupContext(), hasApiKey()],
+  'Query.ensProfile': [requestLogging(), setupContext(), validateApiKey()],
+  'Query.account': [requestLogging(), setupContext(), validateApiKey()],
+  'Query.addressProfile': [requestLogging(), setupContext(), validateApiKey()],
+  'Query.addressProfiles': [requestLogging(), setupContext(), validateApiKey()],
   'Mutation.updateAddressNickname': [
     requestLogging(),
     setupContext(),
-    hasApiKey(),
+    validateApiKey(),
     isAuthorized(),
   ],
   'Mutation.updateConnectedAddressesProperties': [
     requestLogging(),
     setupContext(),
-    hasApiKey(),
+    validateApiKey(),
     isAuthorized(),
   ],
 }
