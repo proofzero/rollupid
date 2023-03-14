@@ -5,9 +5,10 @@ import { DeleteAppModal } from '../DeleteAppModal/DeleteAppModal'
 
 import {
   ApplicationListItem,
-  ApplicationListItemProps,
   ApplicationListItemPublishedState,
 } from './ApplicationListItem'
+
+import type { ApplicationListItemProps } from './ApplicationListItem'
 
 type ApplicationListProps = {
   applications: ApplicationListItemProps[]
