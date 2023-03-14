@@ -185,7 +185,7 @@ export type ProfileInput = {
 export type Query = {
   __typename?: 'Query';
   accountFromAlias: Scalars['URN'];
-  accountFromEth: Scalars['URN'];
+  accountFromEns: Scalars['URN'];
   addressProfile: AddressProfile;
   addressProfiles: Array<AddressProfile>;
   authorizedApps?: Maybe<Array<Maybe<App>>>;
@@ -201,8 +201,8 @@ export type QueryAccountFromAliasArgs = {
 };
 
 
-export type QueryAccountFromEthArgs = {
-  addressOrEns: Scalars['String'];
+export type QueryAccountFromEnsArgs = {
+  ens: Scalars['String'];
 };
 
 
@@ -318,12 +318,12 @@ export type RevokeAppAuthorizationMutationVariables = Exact<{
 
 export type RevokeAppAuthorizationMutation = { __typename?: 'Mutation', revokeAppAuthorization?: boolean | null };
 
-export type GetAccountUrnFromEthQueryVariables = Exact<{
-  addressOrEns: Scalars['String'];
+export type GetAccountFromEnsQueryVariables = Exact<{
+  ens: Scalars['String'];
 }>;
 
 
-export type GetAccountUrnFromEthQuery = { __typename?: 'Query', accountFromEth: any };
+export type GetAccountFromEnsQuery = { __typename?: 'Query', accountFromEns: any };
 
 
 export const GetProfileDocument = gql`
@@ -500,9 +500,9 @@ export const RevokeAppAuthorizationDocument = gql`
   revokeAppAuthorization(clientId: $clientId)
 }
     `;
-export const GetAccountUrnFromEthDocument = gql`
-    query getAccountURNFromEth($addressOrEns: String!) {
-  accountFromEth(addressOrEns: $addressOrEns)
+export const GetAccountFromEnsDocument = gql`
+    query getAccountFromEns($ens: String!) {
+  accountFromEns(ens: $ens)
 }
     `;
 
@@ -546,8 +546,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     revokeAppAuthorization(variables: RevokeAppAuthorizationMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RevokeAppAuthorizationMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<RevokeAppAuthorizationMutation>(RevokeAppAuthorizationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'revokeAppAuthorization', 'mutation');
     },
-    getAccountURNFromEth(variables: GetAccountUrnFromEthQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAccountUrnFromEthQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetAccountUrnFromEthQuery>(GetAccountUrnFromEthDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAccountURNFromEth', 'query');
+    getAccountFromEns(variables: GetAccountFromEnsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAccountFromEnsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAccountFromEnsQuery>(GetAccountFromEnsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAccountFromEns', 'query');
     }
   };
 }

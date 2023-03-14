@@ -62,11 +62,13 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   if (type !== 'p') {
     try {
       let accountURN
-      if (type === 'eth') {
-        const { accountFromEth } = await galaxyClient.getAccountURNFromEth({
-          addressOrEns: address,
+      // ens lookup is slower, so we don't use it with
+      // regular ethereum addresses.
+      if (type === 'eth' && address.endsWith('.eth')) {
+        const { accountFromEns } = await galaxyClient.getAccountFromEns({
+          ens: address,
         })
-        accountURN = accountFromEth
+        accountURN = accountFromEns
       } else {
         const { accountFromAlias } = await galaxyClient.getAccountUrnFromAlias({
           provider: type,
@@ -81,7 +83,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
       return redirect(`/p/${AccountURNSpace.decode(accountURN)}`)
     } catch (ex) {
-      throw json({ message: 'ex' }, { status: 500 })
+      throw json({ message: ex }, { status: 500 })
     }
   }
 
