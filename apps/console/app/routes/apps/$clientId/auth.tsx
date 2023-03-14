@@ -2,7 +2,7 @@
  * @file app/routes/dashboard/apps/$appId/index.tsx
  */
 
-import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import type { ScopeMeta } from '@kubelt/platform/starbase/src/types'
 import { json } from '@remix-run/cloudflare'
 import {
@@ -39,6 +39,8 @@ import { toast, ToastType } from '@kubelt/design-system/src/atoms/toast'
 /**
  * @file app/routes/dashboard/index.tsx
  */
+
+// TODO: create a separate helper file for schemas and helper functions
 
 type notificationHandlerType = (val: boolean) => void
 
@@ -171,8 +173,6 @@ export const action: ActionFunction = async ({ request, params, context }) => {
           return entry[0].endsWith('][id]')
         })
         .map((entry) => entry[1] as string)
-
-      console.log({ scopes })
 
       updates = {
         name: formData.get('name')?.toString(),
@@ -601,33 +601,6 @@ export default function AppDetailIndexPage() {
               </Text>
             </Panel>
           </section>
-
-          {/* <ApplicationAuth
-            appDetails={appDetails}
-            scopeMeta={scopeMeta.scopes}
-            setIsImgUploading={setIsImgUploading}
-            oAuth={{
-              appId: appDetails.clientId as string,
-              appSecret: rotatedSecret,
-              createdAt: new Date(appDetails.secretTimestamp as number),
-              onKeyRoll: () => {
-                submit(
-                  {
-                    op: RollType.RollClientSecret,
-                  },
-                  {
-                    method: 'post',
-                  }
-                )
-              },
-            }}
-            errors={errors}
-            isFormChanged={isFormChanged}
-            setIsFormChanged={setIsFormChanged}
-            onDelete={() => {
-              setDeleteModalOpen(true)
-            }}
-          /> */}
         </fieldset>
       </Form>
     </>
