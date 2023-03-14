@@ -45,10 +45,10 @@ jobs:
           workingDirectory: platform/email
           command: publish --env current
           environment: current
-        secrets: |
-          INTERNAL_DKIM_DOMAIN
-          INTERNAL_DKIM_SELECTOR
-          KEY_DKIM_PRIVATEKEY
+          secrets: |
+            INTERNAL_DKIM_DOMAIN
+            INTERNAL_DKIM_SELECTOR
+            KEY_DKIM_PRIVATEKEY
         env:
           INTERNAL_DKIM_DOMAIN: ${{ secrets.INTERNAL_DKIM_DOMAIN }}
           INTERNAL_DKIM_SELECTOR: ${{ secrets.INTERNAL_DKIM_SELECTOR }}
