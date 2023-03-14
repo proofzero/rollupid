@@ -27,6 +27,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "4.20221111.1",
     "@types/lodash": "4.14.189",
+    "@types/node": "18.15.3",
     "env-cmd": "10.1.0",
     "esbuild": "0.15.15",
     "eslint": "8.28.0",

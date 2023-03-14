@@ -6031,6 +6031,7 @@ __metadata:
     "@proofzero/platform.starbase": "workspace:*"
     "@proofzero/urns": "workspace:*"
     "@trpc/client": 10.8.1
+    "@types/node": 18.15.3
     "@typescript-eslint/eslint-plugin": 5.45.0
     "@typescript-eslint/parser": 5.45.0
     eslint: 8.29.0
@@ -6048,6 +6049,7 @@ __metadata:
     "@proofzero/types": "workspace:*"
     "@proofzero/urns": "workspace:*"
     "@trpc/server": 10.8.1
+    "@types/node": 18.15.3
     "@typescript-eslint/eslint-plugin": 5.45.0
     "@typescript-eslint/parser": 5.45.0
     eslint: 8.29.0
@@ -6074,7 +6076,7 @@ __metadata:
     "@proofzero/urns": "workspace:*"
     "@trpc/server": 10.8.1
     "@types/async": 3.2.16
-    "@types/node": 18.11.9
+    "@types/node": 18.15.3
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
     async: 3.2.4
@@ -6101,7 +6103,7 @@ __metadata:
     "@proofzero/platform.access": "workspace:*"
     "@proofzero/types": "workspace:*"
     "@trpc/server": 10.8.1
-    "@types/node": 18.11.9
+    "@types/node": 18.15.3
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
     do-proxy: 1.3.3
@@ -6134,6 +6136,7 @@ __metadata:
     "@proofzero/types": "workspace:*"
     "@proofzero/urns": "workspace:*"
     "@trpc/server": 10.8.1
+    "@types/node": 18.15.3
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
     do-proxy: 1.3.3
@@ -6159,6 +6162,7 @@ __metadata:
     "@proofzero/security": "workspace:*"
     "@proofzero/urns": "workspace:*"
     "@trpc/server": 10.8.1
+    "@types/node": 18.15.3
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
     better-sqlite3: 8.0.1
@@ -6250,6 +6254,7 @@ __metadata:
     "@proofzero/urns": "workspace:*"
     "@trpc/server": 10.8.1
     "@types/lodash": 4.14.189
+    "@types/node": 18.15.3
     cross-env: 7.0.3
     do-proxy: 1.3.3
     env-cmd: 10.1.0
@@ -6316,6 +6321,7 @@ __metadata:
   resolution: "@proofzero/services.email@workspace:platform/email"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
+    "@types/node": 18.15.3
     npm-run-all: 4.1.5
     typescript: 4.8.4
     wrangler: 2.12.2
@@ -6328,6 +6334,7 @@ __metadata:
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/keccak256": 5.7.0
+    "@types/node": 18.15.3
     date-fns: 2.29.3
     env-cmd: 10.1.0
     image-data-uri: 2.0.1
@@ -6343,6 +6350,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@proofzero/types@workspace:packages/types"
   dependencies:
+    "@types/node": 18.15.3
     "@typescript-eslint/eslint-plugin": 5.45.0
     "@typescript-eslint/parser": 5.45.0
     eslint: 8.29.0
@@ -6377,6 +6385,7 @@ __metadata:
     "@cloudflare/workers-types": 4.20221111.1
     "@proofzero/platform.account": "workspace:*"
     "@proofzero/platform.address": "workspace:*"
+    "@types/node": 18.15.3
     "@typescript-eslint/eslint-plugin": 5.41.0
     "@typescript-eslint/parser": 5.41.0
     eslint: 8.28.0
@@ -11745,6 +11754,13 @@ __metadata:
   version: 18.11.9
   resolution: "@types/node@npm:18.11.9"
   checksum: cc0aae109e9b7adefc32eecb838d6fad931663bb06484b5e9cbbbf74865c721b03d16fd8d74ad90e31dbe093d956a7c2c306ba5429ba0c00f3f7505103d7a496
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:18.15.3":
+  version: 18.15.3
+  resolution: "@types/node@npm:18.15.3"
+  checksum: 31b1d92475a82c30de29aa6c0771b18a276552d191283b4423ba2d61b3f01159bf0d02576c0b7cc834b043997893800db6bb47f246083ed85aa45e79c80875d7
   languageName: node
   linkType: hard
 
