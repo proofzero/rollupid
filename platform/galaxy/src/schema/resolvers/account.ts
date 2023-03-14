@@ -12,7 +12,7 @@ import {
   getConnectedAddresses,
   temporaryConvertToPublic,
   requestLogging,
-  jwtHasClientID,
+  matchingClientIdsInCredentials,
 } from './utils'
 
 import { Resolvers } from './typedefs'
@@ -164,6 +164,7 @@ const ProfileResolverComposition = {
     requestLogging(),
     setupContext(),
     hasApiKey(),
+    matchingClientIdsInCredentials(),
     logAnalytics(),
   ],
   'Query.connectedAddresses': [
@@ -179,7 +180,7 @@ const ProfileResolverComposition = {
     setupContext(),
     hasApiKey(),
     isAuthorized(),
-    jwtHasClientID(),
+    matchingClientIdsInCredentials(),
     logAnalytics(),
   ],
 }

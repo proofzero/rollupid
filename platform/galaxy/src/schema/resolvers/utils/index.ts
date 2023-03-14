@@ -52,9 +52,13 @@ export const setupContext = () => (next) => (root, args, context, info) => {
   const parsedJwt = jwt && parseJwt(jwt)
 
   const accountURN = jwt ? parsedJwt?.sub : undefined
-  const aud = jwt ? parsedJwt?.aud : undefined
 
-  return next(root, args, { ...context, jwt, apiKey, accountURN, aud }, info)
+  return next(
+    root,
+    args,
+    { ...context, jwt, apiKey, accountURN, parsedJwt },
+    info
+  )
 }
 
 // TODO: Remove this middleware and it's use once scopes are fully implemented
@@ -142,7 +146,7 @@ export const hasApiKey = () => (next) => async (root, args, context, info) => {
   return next(root, args, context, info)
 }
 
-export const jwtHasClientID =
+export const matchingClientIdsInCredentials =
   () => (next) => async (root, args, context, info) => {
     //If request isn't coming from a service binding then we check for API key validity;
     //otherwise we passthrough to next middleware
@@ -150,14 +154,14 @@ export const jwtHasClientID =
       // Don't need to check API key existence.
       // it's being checked in another middleware
       const apiKey = context.apiKey
-      const aud = context.aud
+      const aud = context.parsedJwt.aud
 
       const jwtSub = jose.decodeJwt(apiKey).sub as ApplicationURN
       const clientId = ApplicationURNSpace.parse(jwtSub).decoded
 
       if (!aud.includes(clientId)) {
         throw new GraphQLYogaError(
-          "App Client Id isn't included in JWT aud field.",
+          "Client ID in API key doesn't match with the one in JWT.",
           {
             extensions: {
               http: {
@@ -251,30 +255,4 @@ export const getConnectedAddresses = async ({
 
   // for alchemy calls they need to be lowercased
   return addresses
-}
-
-export const getConnectedCryptoAddresses = async ({
-  accountURN,
-  Account,
-  jwt,
-  traceSpan,
-}: {
-  accountURN: AccountURN
-  Account: Fetcher
-  jwt?: string
-  traceSpan: TraceSpan
-}) => {
-  const cryptoAddresses =
-    (await getConnectedAddresses({
-      accountURN,
-      Account,
-      jwt,
-      traceSpan,
-    })) || []
-
-  return cryptoAddresses
-    .filter((address) =>
-      [NodeType.Crypto, NodeType.Vault].includes(address.rc.node_type)
-    )
-    .map((address) => address.qc.alias.toLowerCase())
 }

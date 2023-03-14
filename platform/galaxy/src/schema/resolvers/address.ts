@@ -9,7 +9,7 @@ import {
   setupContext,
   isAuthorized,
   requestLogging,
-  jwtHasClientID,
+  matchingClientIdsInCredentials,
 } from './utils'
 
 import { ResolverContext } from './common'
@@ -156,23 +156,43 @@ const addressResolvers: Resolvers = {
 
 // TODO: add address middleware
 const AddressResolverComposition = {
-  'Query.ensProfile': [requestLogging(), setupContext(), hasApiKey()],
-  'Query.account': [requestLogging(), setupContext(), hasApiKey()],
-  'Query.addressProfile': [requestLogging(), setupContext(), hasApiKey()],
-  'Query.addressProfiles': [requestLogging(), setupContext(), hasApiKey()],
+  'Query.ensProfile': [
+    requestLogging(),
+    setupContext(),
+    hasApiKey(),
+    matchingClientIdsInCredentials(),
+  ],
+  'Query.account': [
+    requestLogging(),
+    setupContext(),
+    hasApiKey(),
+    matchingClientIdsInCredentials(),
+  ],
+  'Query.addressProfile': [
+    requestLogging(),
+    setupContext(),
+    hasApiKey(),
+    matchingClientIdsInCredentials(),
+  ],
+  'Query.addressProfiles': [
+    requestLogging(),
+    setupContext(),
+    hasApiKey(),
+    matchingClientIdsInCredentials(),
+  ],
   'Mutation.updateAddressNickname': [
     requestLogging(),
     setupContext(),
     hasApiKey(),
     isAuthorized(),
-    jwtHasClientID(),
+    matchingClientIdsInCredentials(),
   ],
   'Mutation.updateConnectedAddressesProperties': [
     requestLogging(),
     setupContext(),
     hasApiKey(),
     isAuthorized(),
-    jwtHasClientID(),
+    matchingClientIdsInCredentials(),
   ],
 }
 
