@@ -1,9 +1,4 @@
-import {
-  Form,
-  useOutletContext,
-  useSubmit,
-  useTransition,
-} from '@remix-run/react'
+import { Form, useLoaderData, useSubmit, useTransition } from '@remix-run/react'
 import { useEffect, useState } from 'react'
 import { Authentication, ConnectButton } from '~/components'
 import ConnectOAuthButton from '~/components/connect-oauth-button'
@@ -13,25 +8,104 @@ import { toast, ToastType } from '@kubelt/design-system/src/atoms/toast'
 import { Profile } from '@kubelt/platform/account/src/types'
 import { HiCheck } from 'react-icons/hi'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import { ActionFunction, json, redirect } from '@remix-run/cloudflare'
+import {
+  ActionFunction,
+  json,
+  LoaderFunction,
+  redirect,
+} from '@remix-run/cloudflare'
 import {
   destroyConsoleParamsSession,
   getConsoleParamsSession,
+  getUserSession,
   parseJwt,
   requireJWT,
+  setConsoleParamsSession,
 } from '~/session.server'
 import { AccountURN } from '@kubelt/urns/account'
 import { ResponseType } from '@kubelt/types/access'
-import { getAccessClient } from '~/platform.server'
+import {
+  getAccessClient,
+  getAccountClient,
+  getStarbaseClient,
+} from '~/platform.server'
 
-export const action: ActionFunction = async ({ request, context }) => {
-  const consoleParams = await getConsoleParamsSession(request, context.env)
-    .then((session) => JSON.parse(session.get('params')))
-    .catch((err) => {
-      console.log('No console params session found')
-      return null
-    })
+export const loader: LoaderFunction = async ({ request, context, params }) => {
+  let clientId
+  const headers = new Headers()
 
+  if (params.clientId !== 'console') {
+    const consoleParmamsSessionFromCookie = await getConsoleParamsSession(
+      request,
+      context.env,
+      params.clientId!
+    )
+    const consoleParamsSession = consoleParmamsSessionFromCookie.get('params')
+    const parsedParams = consoleParamsSession
+      ? await JSON.parse(consoleParamsSession)
+      : undefined
+    clientId = parsedParams?.clientId || undefined
+
+    if (!clientId) {
+      throw json(
+        {
+          message: 'App not found',
+        },
+        {
+          status: 404,
+        }
+      )
+    }
+
+    headers.append(
+      'Set-Cookie',
+      await setConsoleParamsSession(parsedParams, context.env, 'last')
+    )
+  }
+
+  let appProps
+  if (clientId) {
+    const sbClient = getStarbaseClient('', context.env, context.traceSpan)
+    appProps = await sbClient.getAppPublicProps.query({ clientId })
+  }
+
+  const session = await getUserSession(request, context.env, clientId)
+
+  let profile
+  const jwt = session.get('jwt')
+  if (jwt) {
+    const account = parseJwt(jwt).sub as AccountURN
+    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
+    profile = await accountClient.getProfile.query({ account })
+  }
+
+  return json(
+    {
+      appProps,
+      profile,
+    },
+    {
+      headers,
+    }
+  )
+}
+
+export const action: ActionFunction = async ({ request, context, params }) => {
+  let consoleParams
+  if (params.clientId !== 'console') {
+    consoleParams = await getConsoleParamsSession(
+      request,
+      context.env,
+      params.clientId!
+    )
+      .then((session) => JSON.parse(session.get('params')))
+      .catch((err) => {
+        console.log('No console params session found')
+        return null
+      })
+  }
+
+  // TODO: Make decision based on clientId params (console?)
   if (!consoleParams) return redirect(context.env.CONSOLE_APP_URL)
 
   const { redirectUri, state, clientId } = consoleParams
@@ -59,10 +133,14 @@ export const action: ActionFunction = async ({ request, context }) => {
     state: authorizeRes.state,
   })
 
+  const headers = new Headers()
+  headers.append(
+    'Set-Cookie',
+    await destroyConsoleParamsSession(request, context.env, clientId)
+  )
+
   return redirect(`${redirectUri}?${redirectParams}`, {
-    headers: {
-      'Set-Cookie': await destroyConsoleParamsSession(request, context.env),
-    },
+    headers,
   })
 }
 
@@ -79,7 +157,7 @@ export default function Authenticate() {
     signature: undefined,
   })
   const [loading, setLoading] = useState(false)
-  const context = useOutletContext<{
+  const { appProps, profile } = useLoaderData<{
     appProps?: {
       name: string
       iconURL: string
@@ -87,8 +165,8 @@ export default function Authenticate() {
     profile?: Required<Profile>
   }>()
 
-  const name = context.appProps?.name
-  const iconURL = context.appProps?.iconURL
+  const name = appProps?.name
+  const iconURL = appProps?.iconURL
 
   const transition = useTransition()
   const submit = useSubmit()
@@ -105,7 +183,7 @@ export default function Authenticate() {
 
       <Authentication logoURL={iconURL} appName={name}>
         <>
-          {context.profile && (
+          {profile && (
             <>
               <Button
                 btnType="secondary-alt"
@@ -130,10 +208,10 @@ export default function Authenticate() {
                 <div className="flex flex-row items-center space-x-3">
                   <img
                     className="w-6 h-6 rounded-full"
-                    src={context.profile.pfp.image}
+                    src={profile.pfp.image}
                   />
                   <Text weight="medium" className="text-gray-800">
-                    {context.profile.displayName}
+                    {profile.displayName}
                   </Text>
 
                   <HiCheck className="w-3.5 h-3.5 text-indigo-500" />
@@ -203,7 +281,7 @@ export default function Authenticate() {
             }}
           />
 
-          {!context.profile && (
+          {!profile && (
             <div className="my-5 flex flex-row items-center space-x-3">
               <hr className="h-px w-16 bg-gray-500" />
               <Text>or</Text>

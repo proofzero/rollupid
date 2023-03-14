@@ -22,10 +22,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 }
 
 export default function Authorize() {
-  const { profile } = useOutletContext<{
-    profile: Required<Profile>
-  }>()
-
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
       <div
@@ -37,7 +33,7 @@ export default function Authorize() {
         className={'basis-2/5 h-screen w-full hidden lg:block'}
       ></div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
-        <Outlet context={{ profile }} />
+        <Outlet />
       </div>
     </div>
   )

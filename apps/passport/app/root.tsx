@@ -43,16 +43,7 @@ import {
 } from '@kubelt/design-system/src/atoms/toast'
 
 import * as gtag from '~/utils/gtags.client'
-import {
-  commitFlashSession,
-  getConsoleParamsSession,
-  getFlashSession,
-  getUserSession,
-  parseJwt,
-  setConsoleParamsSession,
-} from './session.server'
-import { getAccountClient, getStarbaseClient } from './platform.server'
-import { AccountURN } from '@kubelt/urns/account'
+import { commitFlashSession, getFlashSession } from './session.server'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -84,57 +75,15 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     })
   }
 
-  const consoleParmamsSessionFromCookie = await getConsoleParamsSession(
-    request,
-    context.env
-  )
-  const consoleParamsSession = consoleParmamsSessionFromCookie.get('params')
-  const parsedParams = consoleParamsSession
-    ? await JSON.parse(consoleParamsSession)
-    : undefined
-  let clientId = parsedParams?.clientId || undefined
-
-  // If we have a new clientId incoming
-  // that is different from what we have
-  // stored in cookie
-  if (
-    context.consoleParams.clientId &&
-    context.consoleParams.clientId !== clientId
-  ) {
-    // Update the cookie with new clientId
-    await setConsoleParamsSession(context.consoleParams, context.env)
-
-    // And use the new clientId to query starbase
-    clientId = context.consoleParams.clientId
-  }
-
-  let appProps
-  if (clientId) {
-    const sbClient = getStarbaseClient('', context.env, context.traceSpan)
-    appProps = await sbClient.getAppPublicProps.query({ clientId })
-  }
-
-  const session = await getUserSession(request, context.env, clientId)
-
-  let profile
-  const jwt = session.get('jwt')
-  if (jwt) {
-    const account = parseJwt(jwt).sub as AccountURN
-    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-    profile = await accountClient.getProfile.query({ account })
-  }
-
   return json(
     {
       flashes,
-      appProps,
       ENV: {
         PROFILE_APP_URL: context.env.PROFILE_APP_URL,
         INTERNAL_GOOGLE_ANALYTICS_TAG:
           context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
         APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
       },
-      profile,
     },
     {
       headers: {
@@ -210,12 +159,7 @@ export default function App() {
         )}
         {transition.state === 'loading' && <Loader />}
         <Toaster position="top-right" />
-        <Outlet
-          context={{
-            appProps: browserEnv.appProps,
-            profile: browserEnv.profile,
-          }}
-        />
+        <Outlet />
         <ScrollRestoration />
         <Scripts />
         <script

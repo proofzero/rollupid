@@ -1,9 +1,8 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import { json } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 import { Suspense } from 'react'
 
-import { getUserSession, setConsoleParamsSession } from '~/session.server'
+import { getUserSession } from '~/session.server'
 
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
 import { useCatch, useOutletContext } from '@remix-run/react'
@@ -13,7 +12,11 @@ import sideGraphics from '~/assets/auth-side-graphics.svg'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
-export const loader: LoaderFunction = async ({ request, context }) => {
+export const loader: LoaderFunction = async ({ request, context, params }) => {
+  if (!params.clientId) {
+    return redirect(`/authenticate/console`)
+  }
+
   const searchParams = new URL(request.url).searchParams
   const prompt = searchParams.get('prompt')
   const clientId = searchParams.get('client_id')
@@ -28,20 +31,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   if (jwt) {
     if (prompt === 'none') {
       return redirect(`/authorize?${searchParams}`)
-    }
-
-    if (clientId) {
-      return json(
-        {},
-        {
-          headers: {
-            'Set-Cookie': await setConsoleParamsSession(
-              context.consoleParams,
-              context.env
-            ),
-          },
-        }
-      )
     }
   }
 

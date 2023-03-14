@@ -50,7 +50,7 @@ const getUserSessionStorage = (
 ) => {
   let cookieName = `_rollup_session`
   if (clientId) {
-    cookieName += `_${clientId}`
+    cookieName += `_last`
   }
 
   return createCookieSessionStorage({
@@ -81,15 +81,19 @@ export async function createUserSession(
   userSession.set('jwt', jwt)
   userSession.set('defaultProfileUrn', defaultProfileUrn)
 
-  const consoleParamsStorage = getConsoleParamsSessionStorage(env)
-  const consoleParamsSession = await consoleParamsStorage.getSession()
-
   const headers = new Headers()
+
+  if (clientId) {
+    const consoleParamsStorage = getConsoleParamsSessionStorage(env, clientId)
+    const consoleParamsSession = await consoleParamsStorage.getSession()
+
+    headers.append(
+      'Set-Cookie',
+      await consoleParamsStorage.destroySession(consoleParamsSession)
+    )
+  }
+
   headers.append('Set-Cookie', await userStorage.commitSession(userSession))
-  headers.append(
-    'Set-Cookie',
-    await consoleParamsStorage.destroySession(consoleParamsSession)
-  )
 
   return redirect(redirectTo, {
     headers,
@@ -141,6 +145,7 @@ export async function logout(
 
 const getConsoleParamsSessionStorage = (
   env: Env,
+  clientId: string = 'last',
   // https://developer.chrome.com/blog/cookie-max-age-expires/
   // As of Chrome release M104 (August 2022) cookies can no longer
   // set an expiration date more than 400 days in the future.
@@ -149,7 +154,7 @@ const getConsoleParamsSessionStorage = (
   return createCookieSessionStorage({
     cookie: {
       domain: env.COOKIE_DOMAIN,
-      name: '_rollup_client_params',
+      name: `_rollup_client_params_${clientId}`,
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV == 'production',
@@ -164,11 +169,11 @@ export async function createConsoleParamsSession(
   consoleParams: ConsoleParams,
   env: Env
 ) {
-  const storage = getConsoleParamsSessionStorage(env)
+  const storage = getConsoleParamsSessionStorage(env, consoleParams.clientId!)
   const session = await storage.getSession()
   session.set('params', JSON.stringify(consoleParams))
 
-  return redirect('/authenticate', {
+  return redirect(`/authenticate/${consoleParams.clientId}`, {
     headers: {
       'Set-Cookie': await storage.commitSession(session),
     },
@@ -177,23 +182,32 @@ export async function createConsoleParamsSession(
 
 export async function setConsoleParamsSession(
   consoleParams: ConsoleParams,
-  env: Env
+  env: Env,
+  clientId?: string
 ) {
-  const storage = getConsoleParamsSessionStorage(env)
+  const storage = getConsoleParamsSessionStorage(env, clientId)
   const session = await storage.getSession()
   session.set('params', JSON.stringify(consoleParams))
 
   return storage.commitSession(session)
 }
 
-export async function getConsoleParamsSession(request: Request, env: Env) {
-  const storage = getConsoleParamsSessionStorage(env)
+export async function getConsoleParamsSession(
+  request: Request,
+  env: Env,
+  clientId?: string
+) {
+  const storage = getConsoleParamsSessionStorage(env, clientId)
   return storage.getSession(request.headers.get('Cookie'))
 }
 
-export async function destroyConsoleParamsSession(request: Request, env: Env) {
-  const gps = await getConsoleParamsSession(request, env)
-  const storage = getConsoleParamsSessionStorage(env)
+export async function destroyConsoleParamsSession(
+  request: Request,
+  env: Env,
+  clientId?: string
+) {
+  const gps = await getConsoleParamsSession(request, env, clientId)
+  const storage = getConsoleParamsSessionStorage(env, clientId)
   return storage.destroySession(gps)
 }
 
