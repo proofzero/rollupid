@@ -1,7 +1,3 @@
-query getEnsProfile($addressOrEns: String!) {
-  ensProfile(addressOrEns: $addressOrEns) {
-    address
-    avatar
-    displayName
-  }
+query getAccountURNFromEth($addressOrEns: String!) {
+  accountFromEth(addressOrEns: $addressOrEns)
 }

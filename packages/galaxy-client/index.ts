@@ -185,11 +185,11 @@ export type ProfileInput = {
 export type Query = {
   __typename?: 'Query';
   accountFromAlias: Scalars['URN'];
+  accountFromEth: Scalars['URN'];
   addressProfile: AddressProfile;
   addressProfiles: Array<AddressProfile>;
   authorizedApps?: Maybe<Array<Maybe<App>>>;
   connectedAddresses?: Maybe<Array<Node>>;
-  ensProfile: CryptoAddressProfile;
   profile?: Maybe<Profile>;
   scopes: Array<Maybe<Scope>>;
 };
@@ -198,6 +198,11 @@ export type Query = {
 export type QueryAccountFromAliasArgs = {
   alias: Scalars['String'];
   provider: Scalars['String'];
+};
+
+
+export type QueryAccountFromEthArgs = {
+  addressOrEns: Scalars['String'];
 };
 
 
@@ -213,11 +218,6 @@ export type QueryAddressProfilesArgs = {
 
 export type QueryConnectedAddressesArgs = {
   targetAccountURN?: InputMaybe<Scalars['URN']>;
-};
-
-
-export type QueryEnsProfileArgs = {
-  addressOrEns: Scalars['String'];
 };
 
 
@@ -318,12 +318,12 @@ export type RevokeAppAuthorizationMutationVariables = Exact<{
 
 export type RevokeAppAuthorizationMutation = { __typename?: 'Mutation', revokeAppAuthorization?: boolean | null };
 
-export type GetEnsProfileQueryVariables = Exact<{
+export type GetAccountUrnFromEthQueryVariables = Exact<{
   addressOrEns: Scalars['String'];
 }>;
 
 
-export type GetEnsProfileQuery = { __typename?: 'Query', ensProfile: { __typename?: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } };
+export type GetAccountUrnFromEthQuery = { __typename?: 'Query', accountFromEth: any };
 
 
 export const GetProfileDocument = gql`
@@ -500,13 +500,9 @@ export const RevokeAppAuthorizationDocument = gql`
   revokeAppAuthorization(clientId: $clientId)
 }
     `;
-export const GetEnsProfileDocument = gql`
-    query getEnsProfile($addressOrEns: String!) {
-  ensProfile(addressOrEns: $addressOrEns) {
-    address
-    avatar
-    displayName
-  }
+export const GetAccountUrnFromEthDocument = gql`
+    query getAccountURNFromEth($addressOrEns: String!) {
+  accountFromEth(addressOrEns: $addressOrEns)
 }
     `;
 
@@ -550,8 +546,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     revokeAppAuthorization(variables: RevokeAppAuthorizationMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RevokeAppAuthorizationMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<RevokeAppAuthorizationMutation>(RevokeAppAuthorizationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'revokeAppAuthorization', 'mutation');
     },
-    getEnsProfile(variables: GetEnsProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetEnsProfileQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetEnsProfileQuery>(GetEnsProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEnsProfile', 'query');
+    getAccountURNFromEth(variables: GetAccountUrnFromEthQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAccountUrnFromEthQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAccountUrnFromEthQuery>(GetAccountUrnFromEthDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAccountURNFromEth', 'query');
     }
   };
 }
