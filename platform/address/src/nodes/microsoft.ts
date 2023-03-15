@@ -32,7 +32,7 @@ export default class MicrosoftAddress extends OAuthAddress {
             profile._json.email ||
             profile._json.sub
         }
-        const gradient = this.node.class.getGradient()
+        const gradient = await this.node.class.getGradient()
         picture = profile._json.rollupidImageUrl || gradient
       }
       return {
