@@ -1,17 +1,17 @@
 /**
  * @file app/routes/dashboard/apps/$appId/index.tsx
  */
-import { useEffect, useState } from 'react'
+import { Suspense, useState } from 'react'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { json } from '@remix-run/cloudflare'
+import { defer, json } from '@remix-run/cloudflare'
 import {
   useActionData,
   useOutletContext,
   useSubmit,
   useNavigate,
-  useFetcher,
   useLoaderData,
+  Await,
 } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 
@@ -39,6 +39,9 @@ import { RollType } from '~/types'
 import type { RotatedSecrets } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import { loader as usersLoader } from './users'
+import type { AuthorizedAccountsOutput } from '@kubelt/platform/starbase/src/types'
+import type { UsersLoaderData } from './users'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -49,18 +52,23 @@ import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 export const NUMBER_OF_DISPLAYED_USERS = 8
 
 type LoaderData = {
-  clientId: string
+  edgesResult: Promise<AuthorizedAccountsOutput>
 }
 
-export const loader: LoaderFunction = async ({ params }) => {
+export const loader: LoaderFunction = async ({ request, params, context }) => {
   const { clientId } = params
+  const { data }: { data: UsersLoaderData } = await usersLoader({
+    request,
+    params,
+    context,
+  })
 
   if (!clientId) {
     throw new Error('clientId is required')
   }
 
-  return json<LoaderData>({
-    clientId,
+  return defer<LoaderData>({
+    edgesResult: data.edgesResult!,
   })
 }
 
@@ -111,8 +119,8 @@ export default function AppDetailIndexPage() {
     appDetails: appDetailsProps
     rotationResult: RotatedSecrets
   }>()
-  const { clientId } = useLoaderData()
-  const authFetcher = useFetcher()
+  const { edgesResult } = useLoaderData()
+
   const navigate = useNavigate()
 
   const [apiKeyRollModalOpen, setApiKeyRollModalOpen] = useState(false)
@@ -120,10 +128,6 @@ export default function AppDetailIndexPage() {
     useState(false)
 
   const { appDetails: app } = outletContext
-
-  useEffect(() => {
-    authFetcher.load(`/apps/${clientId}/users`)
-  }, [])
 
   const { rotatedClientSecret, rotatedApiKey } =
     outletContext?.rotationResult ||
@@ -287,28 +291,33 @@ export default function AppDetailIndexPage() {
             <Text className="text-gray-600 py-3" weight="medium" size="lg">
               Users
             </Text>
-            {authFetcher.state !== 'idle' && (
-              <div
-                className="flex bg-white justify-center items-center h-full
+            <Suspense
+              fallback={
+                <div
+                  className="flex bg-white justify-center items-center h-full
             rounded-lg border shadow"
-              >
-                <Spinner />
-              </div>
-            )}
-            {authFetcher.type === 'done' && authFetcher.data?.error && (
-              <NestedErrorPage />
-            )}
-            {authFetcher.type === 'done' && !authFetcher.data?.error && (
-              <LoginsPanel
-                authorizedProfiles={
-                  authFetcher.data?.edgesResult?.accounts.slice(
-                    0,
-                    NUMBER_OF_DISPLAYED_USERS
-                  ) || []
-                }
-                appId={app.clientId!}
-              />
-            )}
+                >
+                  <Spinner />
+                </div>
+              }
+            >
+              <Await resolve={edgesResult} errorElement={<NestedErrorPage />}>
+                {(edgesResult) => {
+                  return (
+                    <LoginsPanel
+                      authorizedProfiles={
+                        edgesResult.accounts.slice(
+                          0,
+                          NUMBER_OF_DISPLAYED_USERS
+                        ) || []
+                      }
+                      appId={app.clientId!}
+                    />
+                  )
+                }}
+              </Await>
+              )
+            </Suspense>
           </div>
         </div>
       </div>

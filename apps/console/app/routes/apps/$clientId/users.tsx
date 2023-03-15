@@ -5,7 +5,10 @@ import { defer, json } from '@remix-run/cloudflare'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { Suspense } from 'react'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
-import type { AuthorizedAccountsOutput } from '@kubelt/platform/starbase/src/types'
+import type {
+  AuthorizedAccountsOutput,
+  AuthorizedUser,
+} from '@kubelt/platform/starbase/src/types'
 import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 
 import { AccountURNSpace } from '@kubelt/urns/account'
@@ -21,7 +24,7 @@ import { Button, Text } from '@kubelt/design-system'
 // this constant also affects /$clientId root route
 export const PAGE_LIMIT = 10
 
-type LoaderData = {
+export type UsersLoaderData = {
   edgesResult?: Promise<AuthorizedAccountsOutput>
   PROFILE_APP_URL?: string
   error: any
@@ -56,16 +59,16 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
       },
     })
 
-    return defer<LoaderData>({ edgesResult, PROFILE_APP_URL, error: null })
+    return defer<UsersLoaderData>({ edgesResult, PROFILE_APP_URL, error: null })
   } catch (ex: any) {
     console.error(ex)
-    return json<LoaderData>({ error: ex })
+    return json<UsersLoaderData>({ error: ex })
   }
 }
 
 const Users = () => {
   const navigate = useNavigate()
-  const { edgesResult, PROFILE_APP_URL } = useLoaderData<LoaderData>()
+  const { edgesResult, PROFILE_APP_URL } = useLoaderData()
 
   const loadUsersSubset = (offset: number) => {
     const query = new URLSearchParams()
@@ -99,13 +102,12 @@ rounded-lg border shadow"
         }
       >
         <Await resolve={edgesResult} errorElement={<NestedErrorPage />}>
-          {(edgesResult: AuthorizedAccountsOutput) => {
-            console.log({ edgesResult })
+          {(edgesResult) => {
             if (!edgesResult.metadata.offset) {
               edgesResult.metadata.offset = 0
             }
             const authorizedProfiles = edgesResult
-            edgesResult.accounts.forEach((account) => {
+            edgesResult.accounts.forEach((account: AuthorizedUser) => {
               const decodedAccountURN = AccountURNSpace.decode(
                 account.accountURN
               )
