@@ -176,7 +176,8 @@ export default function AccountLayout() {
         <HeadNav
           loggedIn={!!profile}
           basePath={`/p/${AccountURNSpace.decode(accountURN)}`}
-          avatarUrl={profile?.pfp?.image as string}
+          avatarUrl={profile.pfp?.image as string}
+          displayName={profile.displayName}
         />
       </div>
       <main className="-mt-72 pb-12">

@@ -8,18 +8,16 @@ import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar
 import { FiExternalLink } from 'react-icons/fi'
 
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import classNames from 'classnames'
 
 import logo from '~/assets/profile_logo.svg'
 import mobileLogo from '~/assets/profile_logo_mobile.svg'
 import defaultAvatar from '~/assets/circle_gradient.png'
-import { SignOutLink } from '~/components/hean-nav-links'
+import { UserNavigation, SignOutLink } from '~/components/hean-nav-links'
 
 import styles from './headNav.css'
 import { gatewayFromIpfs } from '@proofzero/utils'
 
 export const links = () => [{ rel: 'stylesheet', href: styles }]
-
 // TODO: this should be it's own component. These are also function calls not links
 const userNavigation = [
   // { name: 'Copy Address', href: '#' },
@@ -32,16 +30,18 @@ const user = {
 }
 
 type HeadNavProps = {
-  basePath: string | undefined
-  avatarUrl?: string | undefined
-  isToken?: boolean | undefined
-  loggedIn?: boolean | undefined
+  basePath?: string
+  avatarUrl?: string
+  displayName?: string
+  isToken?: boolean
+  loggedIn?: boolean
 }
 
 export default function HeadNav({
   basePath,
   avatarUrl,
   loggedIn,
+  displayName,
   isToken = false,
 }: HeadNavProps) {
   const activeStyle = {
@@ -56,7 +56,6 @@ export default function HeadNav({
       to: basePath ? `${basePath}` : '/account/connections',
     },
   ]
-
   return (
     <Disclosure as="nav">
       {({ open }) => (
@@ -75,27 +74,6 @@ export default function HeadNav({
                     src={mobileLogo}
                     alt="Rollup"
                   />
-                </div>
-                <div className="hidden md:block">
-                  <div className="ml-10 flex items-baseline space-x-4">
-                    {loggedIn &&
-                      navigation.map((item) => (
-                        // TODO: convert to NavLink to remove "disabled" and "current" https://remix.run/docs/en/v1/api/remix#navlink
-                        <NavLink
-                          key={item.name}
-                          to={item.to}
-                          target="_blank"
-                          style={({ isActive }) => {
-                            return isActive ? activeStyle : undefined
-                          }}
-                          className={
-                            'px-3 py-2 text-white text-sm font-medium nav-link-text rounded-md hover:bg-gray-800'
-                          }
-                        >
-                          {item.name}
-                        </NavLink>
-                      ))}
-                  </div>
                 </div>
               </div>
 
@@ -169,19 +147,19 @@ export default function HeadNav({
                          origin-top-right bg-white py-1
                           shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none rounded-md"
                         >
-                          {loggedIn &&
-                            userNavigation.map((item) => (
-                              <Menu.Item key={item.name}>
-                                {({ active }) => (
-                                  <item.component
-                                    className={classNames(
-                                      active ? 'bg-gray-100' : '',
-                                      'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
-                                    )}
-                                  />
-                                )}
-                              </Menu.Item>
-                            ))}
+                          {loggedIn && (
+                            <Menu.Item>
+                              <UserNavigation
+                                avatarUrl={avatarUrl}
+                                displayName={displayName}
+                                profileUrl={
+                                  basePath
+                                    ? `${basePath}`
+                                    : '/account/connections'
+                                }
+                              />
+                            </Menu.Item>
+                          )}
                         </Menu.Items>
                       </Transition>
                     </Menu>
