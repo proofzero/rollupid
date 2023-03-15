@@ -83,8 +83,7 @@ export default /* GraphQL */ `
   }
 
   type Query {
-    ensProfile(addressOrEns: String!): CryptoAddressProfile!
-    account(addressURN: URN!): URN!
+    accountFromAlias(provider: String!, alias: String!): URN!
     addressProfile(addressURN: URN!): AddressProfile!
     addressProfiles(addressURNList: [URN!]): [AddressProfile!]!
   }

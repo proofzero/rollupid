@@ -184,19 +184,19 @@ export type ProfileInput = {
 
 export type Query = {
   __typename?: 'Query';
-  account: Scalars['URN'];
+  accountFromAlias: Scalars['URN'];
   addressProfile: AddressProfile;
   addressProfiles: Array<AddressProfile>;
   authorizedApps?: Maybe<Array<Maybe<App>>>;
   connectedAddresses?: Maybe<Array<Node>>;
-  ensProfile: CryptoAddressProfile;
   profile?: Maybe<Profile>;
   scopes: Array<Maybe<Scope>>;
 };
 
 
-export type QueryAccountArgs = {
-  addressURN: Scalars['URN'];
+export type QueryAccountFromAliasArgs = {
+  alias: Scalars['String'];
+  provider: Scalars['String'];
 };
 
 
@@ -212,11 +212,6 @@ export type QueryAddressProfilesArgs = {
 
 export type QueryConnectedAddressesArgs = {
   targetAccountURN?: InputMaybe<Scalars['URN']>;
-};
-
-
-export type QueryEnsProfileArgs = {
-  addressOrEns: Scalars['String'];
 };
 
 
@@ -280,12 +275,13 @@ export type GetAddressProfilesQueryVariables = Exact<{
 
 export type GetAddressProfilesQuery = { __typename?: 'Query', addressProfiles: Array<{ __typename?: 'AddressProfile', type: string, urn: any, profile: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthAppleProfile', name?: string | null, picture: string } | { __typename: 'OAuthDiscordProfile', email?: string | null, username?: string | null, discriminator?: string | null, avatar?: string | null, discordId?: string | null } | { __typename: 'OAuthGithubProfile', id?: number | null, name?: string | null, avatar_url: string, html_url?: string | null, followers?: number | null, following?: number | null, login: string, public_gists?: number | null, public_repos?: number | null } | { __typename: 'OAuthGoogleProfile', email?: string | null, name?: string | null, picture: string } | { __typename: 'OAuthMicrosoftProfile', name?: string | null, picture: string, email?: string | null } | { __typename: 'OAuthTwitterProfile', name?: string | null, screen_name: string, profile_image_url_https: string } }> };
 
-export type GetAccountUrnFromAddressQueryVariables = Exact<{
-  addressURN: Scalars['URN'];
+export type GetAccountUrnFromAliasQueryVariables = Exact<{
+  provider: Scalars['String'];
+  alias: Scalars['String'];
 }>;
 
 
-export type GetAccountUrnFromAddressQuery = { __typename?: 'Query', account: any };
+export type GetAccountUrnFromAliasQuery = { __typename?: 'Query', accountFromAlias: any };
 
 export type UpdateAddressNicknameMutationVariables = Exact<{
   addressURN: Scalars['URN'];
@@ -315,13 +311,6 @@ export type RevokeAppAuthorizationMutationVariables = Exact<{
 
 
 export type RevokeAppAuthorizationMutation = { __typename?: 'Mutation', revokeAppAuthorization?: boolean | null };
-
-export type GetEnsProfileQueryVariables = Exact<{
-  addressOrEns: Scalars['String'];
-}>;
-
-
-export type GetEnsProfileQuery = { __typename?: 'Query', ensProfile: { __typename?: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } };
 
 
 export const GetProfileDocument = gql`
@@ -470,9 +459,9 @@ export const GetAddressProfilesDocument = gql`
   }
 }
     `;
-export const GetAccountUrnFromAddressDocument = gql`
-    query getAccountUrnFromAddress($addressURN: URN!) {
-  account(addressURN: $addressURN)
+export const GetAccountUrnFromAliasDocument = gql`
+    query getAccountUrnFromAlias($provider: String!, $alias: String!) {
+  accountFromAlias(provider: $provider, alias: $alias)
 }
     `;
 export const UpdateAddressNicknameDocument = gql`
@@ -496,15 +485,6 @@ export const GetAuthorizedAppScopesDocument = gql`
 export const RevokeAppAuthorizationDocument = gql`
     mutation revokeAppAuthorization($clientId: String!) {
   revokeAppAuthorization(clientId: $clientId)
-}
-    `;
-export const GetEnsProfileDocument = gql`
-    query getEnsProfile($addressOrEns: String!) {
-  ensProfile(addressOrEns: $addressOrEns) {
-    address
-    avatar
-    displayName
-  }
 }
     `;
 
@@ -533,8 +513,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getAddressProfiles(variables?: GetAddressProfilesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAddressProfilesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetAddressProfilesQuery>(GetAddressProfilesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAddressProfiles', 'query');
     },
-    getAccountUrnFromAddress(variables: GetAccountUrnFromAddressQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAccountUrnFromAddressQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetAccountUrnFromAddressQuery>(GetAccountUrnFromAddressDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAccountUrnFromAddress', 'query');
+    getAccountUrnFromAlias(variables: GetAccountUrnFromAliasQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAccountUrnFromAliasQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAccountUrnFromAliasQuery>(GetAccountUrnFromAliasDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAccountUrnFromAlias', 'query');
     },
     updateAddressNickname(variables: UpdateAddressNicknameMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateAddressNicknameMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateAddressNicknameMutation>(UpdateAddressNicknameDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateAddressNickname', 'mutation');
@@ -547,9 +527,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     revokeAppAuthorization(variables: RevokeAppAuthorizationMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RevokeAppAuthorizationMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<RevokeAppAuthorizationMutation>(RevokeAppAuthorizationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'revokeAppAuthorization', 'mutation');
-    },
-    getEnsProfile(variables: GetEnsProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetEnsProfileQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetEnsProfileQuery>(GetEnsProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEnsProfile', 'query');
     }
   };
 }

@@ -23,7 +23,6 @@ import { getAccountProfile } from '~/helpers/profile'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { gatewayFromIpfs } from '@kubelt/utils'
-import { AddressURNSpace } from '@kubelt/urns/address'
 
 import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
@@ -57,16 +56,25 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   )
   const session = await getProfileSession(request)
   if (!address) throw new Error('No address provided in URL')
+  if (!type) throw new Error('No provider specified in URL')
 
   // redirect from any addressURN to its addressURNs
-  if (type === 'a') {
-    // TODO: does this remain a galaxy call?
-    const { account }: { account: AccountURN } =
-      await galaxyClient.getAccountUrnFromAddress({
-        addressURN: AddressURNSpace.urn(address),
+  if (type !== 'p') {
+    try {
+      const { accountFromAlias } = await galaxyClient.getAccountUrnFromAlias({
+        provider: type,
+        alias: address,
       })
+      const accountURN = accountFromAlias
 
-    return redirect(`/p/${AccountURNSpace.decode(account)}`)
+      if (!accountURN) {
+        throw json({ message: 'Not Found' }, { status: 404 })
+      }
+
+      return redirect(`/p/${AccountURNSpace.decode(accountURN)}`)
+    } catch (ex) {
+      throw json({ message: ex }, { status: 500 })
+    }
   }
 
   const accountURN = AccountURNSpace.urn(address) as AccountURN
@@ -81,13 +89,6 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })
-    }
-
-    if (type === 'u') {
-      //TODO: galaxy search by handle
-      console.error('Not implemented')
-    } else {
-      //TODO: Type-based resolvers to be tackled in separate PR
     }
 
     let ogImage = null
@@ -132,18 +133,18 @@ export const meta: MetaFunction = ({
   data: { ogImage: string; uname: string; profile: FullProfile }
 }) => {
   const desc =
-    data.profile && data.profile.bio ? data.profile.bio : 'Claim yours now!'
+    data && data.profile && data.profile.bio
+      ? data.profile.bio
+      : 'Claim yours now!'
   const meta = {
     'og:title': 'Rollup Decentralized Profile',
     'twitter:title': 'Rollup Decentralized Profile',
     'og:description': desc,
     'twitter:description': desc,
     'og:url': `https://rollup.id`,
-    'og:image': data.ogImage,
     'og:image:alt': `Profile not found`,
     'og:site_name': 'Rollup',
     'og:type': 'profile',
-    'twitter:image': data.ogImage,
     'twitter:image:alt': `Profile not found`,
     'twitter:site': '@rollupid',
     'twitter:card': 'summary_large_image',
@@ -151,6 +152,8 @@ export const meta: MetaFunction = ({
   if (!data || !data.uname) return meta
   return {
     ...meta,
+    'og:image': data.ogImage,
+    'twitter:image': data.ogImage,
     'og:title': `${data.uname}'s Rollup Profile`,
     'twitter:title': `${data.uname}'s Rollup Profile`,
     'og:url': `https://my.rollup.id/u/${data.uname}`,
@@ -258,9 +261,9 @@ const UserAddressLayout = () => {
 
 export default UserAddressLayout
 
-export const CatchBoundary = () => {
+export function CatchBoundary() {
   const caught = useCatch()
-  console.error('Caught in catch boundary', { caught })
+  console.error('Caught in $type/$address catch boundary', { caught })
 
   const { address, type } = useParams()
   const icon = imageFromAddressType(type as string)

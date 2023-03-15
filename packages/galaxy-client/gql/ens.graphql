@@ -1,7 +1,0 @@
-query getEnsProfile($addressOrEns: String!) {
-  ensProfile(addressOrEns: $addressOrEns) {
-    address
-    avatar
-    displayName
-  }
-}

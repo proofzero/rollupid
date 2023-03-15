@@ -33,6 +33,11 @@ import {
 } from './methods/verifyNonce'
 import { getOAuthDataMethod, GetOAuthDataOutput } from './methods/getOAuthData'
 import { setOAuthDataMethod, SetOAuthDataInput } from './methods/setOAuthData'
+import {
+  getAccountByAliasMethod,
+  GetAccountByAliasInput,
+  GetAccountByAliasOutput,
+} from './methods/getAccountByAlias'
 
 import { LogUsage } from '@kubelt/platform-middleware/log'
 import { parse3RN } from './middlewares/parse3RN'
@@ -74,6 +79,12 @@ export const appRouter = t.router({
     .use(Analytics)
     .output(GetAccountOutput)
     .query(getAccountMethod),
+  getAccountByAlias: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAccountByAliasInput)
+    .output(GetAccountByAliasOutput)
+    .query(getAccountByAliasMethod),
   setAccount: t.procedure
     .use(LogUsage)
     .use(parse3RN)
