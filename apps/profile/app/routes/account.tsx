@@ -1,13 +1,12 @@
 import { json, redirect } from '@remix-run/cloudflare'
 import type { LoaderFunction, LinksFunction } from '@remix-run/cloudflare'
-import { useLoaderData, NavLink } from '@remix-run/react'
+import { useLoaderData, NavLink, Link } from '@remix-run/react'
 
 import { Outlet } from '@remix-run/react'
 
 import { BiLink } from 'react-icons/bi'
 import { AiOutlineUser } from 'react-icons/ai'
-import { HiOutlineHome } from 'react-icons/hi'
-import { TbPlugConnected, TbApps } from 'react-icons/tb'
+import { HiOutlineExternalLink } from 'react-icons/hi'
 import { RiCollageLine } from 'react-icons/ri'
 import classNames from 'classnames'
 
@@ -100,14 +99,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 }
 
 const subNavigation = {
-  general: [
-    {
-      name: 'Home',
-      href: '/account/dashboard',
-      icon: HiOutlineHome,
-      exists: true,
-    },
-  ],
   publicProfiles: [
     {
       name: 'User Settings',
@@ -125,20 +116,6 @@ const subNavigation = {
       name: 'NFT Gallery',
       href: '/account/gallery',
       icon: RiCollageLine,
-      exists: true,
-    },
-  ],
-  connections: [
-    {
-      name: 'Accounts',
-      href: '/account/connections',
-      icon: TbPlugConnected,
-      exists: true,
-    },
-    {
-      name: 'Applications',
-      href: '/account/applications',
-      icon: TbApps,
       exists: true,
     },
   ],
@@ -187,27 +164,29 @@ export default function AccountLayout() {
               <aside className="fixed bottom-0 z-50 w-full lg:relative lg:col-start-1 lg:col-end-3 bg-gray-50">
                 <nav className="flex flex-row justify-center items-center lg:flex-none lg:block lg:mt-8 space-y-1">
                   <Toaster position="top-right" reverseOrder={false} />
-                  {subNavigation.general.map((item) => (
-                    <SideNavItem key={item.name} item={item} />
-                  ))}
-                  <Text
-                    size="sm"
-                    className="ml-5 pt-5 text-gray-500
-                hidden lg:block"
-                  >
-                    Public Profiles
-                  </Text>
+                  <div className="flex flex-row items-center mx-3 pb-6 truncate">
+                    <img
+                      src={profile.pfp?.image}
+                      className="w-[42px] h-[42px] rounded-full mr-2"
+                      alt="PFP"
+                    />
+                    <div className="flex-1 w-1 flex flex-col">
+                      <Text size="sm" weight="medium" className="truncate mb-1.5">
+                        {profile.displayName}
+                      </Text>
+                      <Link
+                        to={`/p/${AccountURNSpace.decode(accountURN)}`}
+                        target="_blank"
+                        className="flex flex-row items-center text-indigo-500"
+                      >
+                        <Text size="xs" className="truncate">
+                          Open my Profile
+                        </Text>
+                        <HiOutlineExternalLink size={16} className="ml-2" />
+                      </Link>
+                    </div>
+                  </div>
                   {subNavigation.publicProfiles.map((item) => (
-                    <SideNavItem key={item.name} item={item} />
-                  ))}
-                  <Text
-                    size="sm"
-                    className="ml-5 pt-5 text-gray-500 
-                hidden lg:block"
-                  >
-                    Connections
-                  </Text>
-                  {subNavigation.connections.map((item) => (
                     <SideNavItem key={item.name} item={item} />
                   ))}
                 </nav>
