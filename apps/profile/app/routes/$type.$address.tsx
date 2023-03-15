@@ -142,11 +142,9 @@ export const meta: MetaFunction = ({
     'og:description': desc,
     'twitter:description': desc,
     'og:url': `https://rollup.id`,
-    'og:image': data && data.ogImage,
     'og:image:alt': `Profile not found`,
     'og:site_name': 'Rollup',
     'og:type': 'profile',
-    'twitter:image': data && data.ogImage,
     'twitter:image:alt': `Profile not found`,
     'twitter:site': '@rollupid',
     'twitter:card': 'summary_large_image',
@@ -154,6 +152,8 @@ export const meta: MetaFunction = ({
   if (!data || !data.uname) return meta
   return {
     ...meta,
+    'og:image': data.ogImage,
+    'twitter:image': data.ogImage,
     'og:title': `${data.uname}'s Rollup Profile`,
     'twitter:title': `${data.uname}'s Rollup Profile`,
     'og:url': `https://my.rollup.id/u/${data.uname}`,
