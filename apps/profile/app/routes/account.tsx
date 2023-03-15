@@ -18,9 +18,8 @@ import type { AccountURN } from '@proofzero/urns/account'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
-import ConditionalTooltip from '~/components/conditional-tooltip'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import {
   getAccountAddresses,
   getAccountProfile,
@@ -162,7 +161,10 @@ export default function AccountLayout() {
           <div className="overflow-hidden bg-white shadow rounded-lg">
             <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
               <aside className="fixed bottom-0 z-50 w-full lg:relative lg:col-start-1 lg:col-end-3 bg-gray-50">
-                <nav className="flex flex-row justify-center items-center lg:flex-none lg:block lg:mt-8 space-y-1">
+                <nav
+                  className="flex flex-row justify-center items-center lg:flex-none 
+                  hidden lg:block lg:mt-8 space-y-1"
+                >
                   <Toaster position="top-right" reverseOrder={false} />
                   <div className="flex flex-row items-center mx-3 pb-6 truncate">
                     <img
@@ -171,7 +173,11 @@ export default function AccountLayout() {
                       alt="PFP"
                     />
                     <div className="flex-1 w-1 flex flex-col">
-                      <Text size="sm" weight="medium" className="truncate mb-1.5">
+                      <Text
+                        size="sm"
+                        weight="medium"
+                        className="truncate mb-1.5"
+                      >
                         {profile.displayName}
                       </Text>
                       <Link
@@ -228,41 +234,42 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
   }
   return (
     <div className={'basis-1/4 lg:w-100 content-center self-center z-50'}>
-      <ConditionalTooltip content="Coming Soon" condition={!item.exists}>
-        <NavLink
-          to={item.href}
-          style={({ isActive }) => {
-            return isActive && item.href != '#' ? activeStyle : undefined
+      <NavLink
+        to={item.href}
+        style={({ isActive }) => {
+          return isActive && item.href != '#' ? activeStyle : undefined
+        }}
+        className="text-sm group lg:border-l-2 px-4 py-4
+                     flex self-center justify-center items-center
+                     flex-row lg:justify-start lg:items-start
+                     hover:text-gray-500 hover:bg-gray-100"
+      >
+        <item.icon
+          className={classNames(
+            !item.exists && 'opacity-25 cursor-not-allowed',
+            'text-sm flex-shrink-0 -ml-1 lg:mr-3 h-6 w-6 self-center'
+          )}
+          style={{
+            color: '#4B5563',
           }}
-          className="text-sm group lg:border-l-2 px-4 py-4 flex self-center justify-center items-center flex-row lg:justify-start lg:items-start hover:text-gray-500 hover:bg-gray-100"
-        >
-          <item.icon
-            className={classNames(
-              !item.exists && 'opacity-25 cursor-not-allowed',
-              'text-sm flex-shrink-0 -ml-1 lg:mr-3 h-6 w-6 self-center'
-            )}
-            style={{
-              color: '#4B5563',
-            }}
-            aria-hidden="true"
-          />
+          aria-hidden="true"
+        />
 
-          <span
-            className={classNames(
-              !item.exists && 'opacity-25 cursor-not-allowed',
-              'hidden lg:block self-center'
-            )}
+        <span
+          className={classNames(
+            !item.exists && 'opacity-25 cursor-not-allowed',
+            ' self-center'
+          )}
+        >
+          <Text
+            className="truncate self-center text-gray-600"
+            size="sm"
+            weight="medium"
           >
-            <Text
-              className="truncate self-center text-gray-600"
-              size="sm"
-              weight="medium"
-            >
-              {item.name}
-            </Text>
-          </span>
-        </NavLink>{' '}
-      </ConditionalTooltip>
+            {item.name}
+          </Text>
+        </span>
+      </NavLink>{' '}
     </div>
   )
 }
