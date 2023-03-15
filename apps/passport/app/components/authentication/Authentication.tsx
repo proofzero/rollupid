@@ -19,7 +19,7 @@ export function Authentication({
   return (
     <div
       className={
-        'flex shrink flex-col items-center justify-center gap-4 mx-auto bg-white p-6 h-[100dvh] lg:h-[598px] lg:max-h-[100dvh] lg:h-1 w-full lg:w-[418px] lg:border-rounded-lg'
+        'flex shrink flex-col items-center justify-center gap-4 mx-auto bg-white p-6 h-[100dvh] lg:h-[598px] lg:max-h-[100dvh] w-full lg:w-[418px] lg:border-rounded-lg'
       }
       style={{
         border: '1px solid #D1D5DB',
