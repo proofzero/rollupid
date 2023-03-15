@@ -44,6 +44,12 @@ export default class Address extends DOProxy {
   }
 
   async getAccount(): Promise<AccountURN | undefined> {
+    // TODO: remove this log after migration
+    const data = await this.state.storage.get('data')
+    console.log(
+      'Data from getAccount method in address node',
+      JSON.stringify(data)
+    )
     return this.state.storage.get<AccountURN>('account')
   }
 
