@@ -11,7 +11,7 @@ import { Context } from '../context'
 const t = initTRPC.context<Context>().create()
 
 export const appRouter = t.router({
-  upload: t.procedure
+  sendEmailNotification: t.procedure
     .use(LogUsage)
     .use(Analytics)
     .input(sendOTPEmailMethodInput)

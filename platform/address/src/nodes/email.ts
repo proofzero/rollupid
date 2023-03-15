@@ -5,7 +5,7 @@ import { EMAIL_VERIFICATION_OPTIONS } from '../constants'
 import Address from './address'
 
 type EmailVerification = {
-  address: string
+  state: string
   //Other things will need to go here, like redirectUri, scope, state, timestamp
 }
 
@@ -16,7 +16,7 @@ export default class EmailAddress {
     this.node = node
   }
 
-  async generateVerificationCode(address: string): Promise<string> {
+  async generateVerificationCode(state: string): Promise<string> {
     const code = generateRandomString(8)
     const verificationCodes =
       (await this.node.storage.get<Record<string, EmailVerification>>(
@@ -24,7 +24,7 @@ export default class EmailAddress {
       )) || {}
 
     verificationCodes[code] = {
-      address,
+      state,
     }
 
     await this.node.storage.put('codes', verificationCodes)
@@ -35,24 +35,27 @@ export default class EmailAddress {
     return code
   }
 
-  async verifyCode(code: string): Promise<EmailVerification> {
+  async verifyCode(code: string, state: string): Promise<boolean> {
     const codes =
       (await this.node.storage.get<Record<string, EmailVerification>>(
         'codes'
       )) || {}
     const emailVerification = codes ? codes[code] : undefined
-    if (!codes || !emailVerification)
-      throw new Error('Verification code did not match.')
+    if (!codes || !emailVerification || state !== emailVerification.state) {
+      console.log('OTP verification code and state did not match')
+      return false
+    }
 
     delete codes[code]
 
     await this.node.storage.put('codes', codes)
 
-    return emailVerification
+    return true
   }
 
   static async alarm(address: Address) {
-    console.log({ alarm: 'oauth' })
+    //TODO: have to fix alarm
+    console.log('Alarm for email', { alarm: 'oauth' })
   }
 }
 export type EmailAddressProxyStub = DurableObjectStubProxy<EmailAddress>
