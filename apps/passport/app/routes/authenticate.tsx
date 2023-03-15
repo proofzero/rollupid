@@ -43,7 +43,7 @@ export default function Index() {
     <div className={'flex flex-row h-screen justify-center items-center'}>
       <div
         className={
-          'basis-2/5 h-screen w-full hidden lg:flex justify-center items-center bg-indigo-50'
+          'basis-2/5 h-screen w-full hidden lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
         }
       >
         <img src={sideGraphics} />
