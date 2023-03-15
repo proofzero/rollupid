@@ -156,7 +156,7 @@ const provisionProfile = async (
                 res.profile.sub,
               pfp: {
                 //Cached profile image
-                image: res.profile.rollupidImageUrl as string,
+                image: res.profile.picture as string,
               },
             }
           }
