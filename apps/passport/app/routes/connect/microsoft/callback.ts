@@ -40,7 +40,7 @@ export const loader: LoaderFunction = async ({
   const address = AddressURNSpace.componentizedUrn(
     generateHashedIDRef(OAuthAddressType.Microsoft, profile.id),
     { addr_type: OAuthAddressType.Microsoft, node_type: NodeType.OAuth },
-    { alias: profile.displayName, hidden: 'true' }
+    { alias: profile.emails[0]?.value || profile._json.email, hidden: 'true' }
   )
 
   const addressClient = getAddressClient(
@@ -49,7 +49,11 @@ export const loader: LoaderFunction = async ({
     context.traceSpan
   )
   const { accountURN, existing } = await addressClient.resolveAccount.query({
-    jwt: await getJWTConditionallyFromSession(request, context.env, appData?.clientId),
+    jwt: await getJWTConditionallyFromSession(
+      request,
+      context.env,
+      appData?.clientId
+    ),
     force: !appData || appData.prompt !== 'login',
   })
   const existingOAuthData = await addressClient.getOAuthData.query()
