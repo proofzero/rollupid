@@ -1,4 +1,4 @@
-import { getCSP, SELF, STRICT_DYNAMIC, UNSAFE_INLINE, DATA } from 'csp-header'
+import { getCSP, SELF, STRICT_DYNAMIC, UNSAFE_INLINE, NONE } from 'csp-header'
 
 const contentSecurityPolicy = (nonce: string, dev: boolean = false): string => {
   return getCSP({
@@ -19,7 +19,7 @@ const contentSecurityPolicy = (nonce: string, dev: boolean = false): string => {
       // 'img-src': [SELF, DATA, 'imagedelivery.net'],
       'img-src': ['*'],
       'font-src': [SELF, 'fonts.cdnfonts.com'],
-      'object-src': [SELF],
+      'object-src': [NONE],
       'base-uri': [SELF],
       'form-action': [SELF],
       'frame-ancestors': [SELF],
