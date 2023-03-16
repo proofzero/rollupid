@@ -1,19 +1,15 @@
-import {
-  CryptoAddressType,
-  EmailAddressType,
-  NodeType,
-} from '@kubelt/types/address'
+import { EmailAddressType, NodeType } from '@kubelt/types/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
 import { getAddressClient } from '~/platform.server'
+import generateRandomString from '@kubelt/utils/generateRandomString'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const qp = new URL(request.url).searchParams
   const address = qp.get('address')
   if (!address) throw new Error('No address included in request')
 
-  const state = Math.random().toString(36).substring(7)
   const addressURN = AddressURNSpace.componentizedUrn(
     generateHashedIDRef(EmailAddressType.Email, address),
     { node_type: NodeType.Email, addr_type: EmailAddressType.Email },
@@ -26,9 +22,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     context.traceSpan
   )
   try {
-    const code = await addressClient.generateEmailOTP.mutate({
+    const state = await addressClient.generateEmailOTP.mutate({
       address,
-      state,
     })
     return json({ state })
   } catch (e) {

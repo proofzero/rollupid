@@ -1,4 +1,3 @@
-import email from '@kubelt/platform-clients/email'
 import { EmailAddressType, NodeType } from '@kubelt/types/address'
 import generateRandomString from '@kubelt/utils/generateRandomString'
 import { DurableObjectStubProxy } from 'do-proxy'
@@ -6,10 +5,9 @@ import { AddressNode } from '.'
 import { EMAIL_VERIFICATION_OPTIONS } from '../constants'
 import Address from './address'
 
-type EmailVerification = {
+type VerificationPayload = {
   state: string
-  codeExpiry: number
-  //Other things will need to go here, like redirectUri, scope, state, timestamp
+  creationTimestamp: number
 }
 
 const CODES_KEY_NAME = 'codes'
@@ -22,38 +20,57 @@ export default class EmailAddress {
   }
 
   async generateVerificationCode(state: string): Promise<string> {
-    const codeExpiry = Date.now() + EMAIL_VERIFICATION_OPTIONS.ttlInMs
-    const code = generateRandomString(8)
     const verificationCodes =
-      (await this.node.storage.get<Record<string, EmailVerification>>(
+      (await this.node.storage.get<Record<string, VerificationPayload>>(
         CODES_KEY_NAME
       )) || {}
 
+    for (const [_, payload] of Object.entries(verificationCodes)) {
+      if (
+        payload.creationTimestamp + EMAIL_VERIFICATION_OPTIONS.regenDelayInMs >
+        Date.now()
+      )
+        throw new Error(
+          `Cannot generate new code for the address. You can only generate a new code once every ${
+            EMAIL_VERIFICATION_OPTIONS.regenDelayInMs / 1000
+          } seconds`
+        )
+    }
+
+    const creationTimestamp = Date.now()
+    const code = generateRandomString(8)
     verificationCodes[code] = {
       state,
-      codeExpiry,
+      creationTimestamp,
     }
 
     this.node.class.setNodeType(NodeType.Email)
     this.node.class.setType(EmailAddressType.Email)
     await this.node.storage.put(CODES_KEY_NAME, verificationCodes)
-    await this.node.storage.setAlarm(codeExpiry)
+    await this.node.storage.setAlarm(
+      creationTimestamp + EMAIL_VERIFICATION_OPTIONS.ttlInMs
+    )
 
     return code
   }
 
   async verifyCode(code: string, state: string): Promise<boolean> {
     const codes =
-      (await this.node.storage.get<Record<string, EmailVerification>>(
+      (await this.node.storage.get<Record<string, VerificationPayload>>(
         CODES_KEY_NAME
       )) || {}
+
     const emailVerification = codes ? codes[code] : undefined
     if (!codes || !emailVerification || state !== emailVerification.state) {
       console.log('OTP verification code and state did not match')
       return false
     }
 
-    if (emailVerification.codeExpiry <= Date.now()) {
+    if (
+      emailVerification.creationTimestamp +
+        EMAIL_VERIFICATION_OPTIONS.ttlInMs <=
+      Date.now()
+    ) {
       //We anticipate we'll encounter this only if an address has multiple OTP codes in the
       //codes property, where the alarm to clean them up will be the latter of the codeExpiry
       // times of all of those codes. Alarms will still clean them up eventually.
@@ -70,14 +87,19 @@ export default class EmailAddress {
 
   static async alarm(address: Address) {
     const codes =
-      (await address.state.storage.get<Record<string, EmailVerification>>(
+      (await address.state.storage.get<Record<string, VerificationPayload>>(
         CODES_KEY_NAME
       )) || {}
+
     for (const [code, verification] of Object.entries(codes)) {
-      if (verification.codeExpiry <= Date.now()) {
+      if (
+        verification.creationTimestamp + EMAIL_VERIFICATION_OPTIONS.ttlInMs <=
+        Date.now()
+      ) {
         delete codes[code]
       }
     }
+
     await address.state.storage.put(CODES_KEY_NAME, codes)
   }
 }

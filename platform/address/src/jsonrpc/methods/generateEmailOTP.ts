@@ -1,3 +1,4 @@
+import generateRandomString from '@kubelt/utils/generateRandomString'
 import { z } from 'zod'
 import { Context } from '../../context'
 import { AddressNode } from '../../nodes'
@@ -5,7 +6,6 @@ import EmailAddress from '../../nodes/email'
 
 export const GenerateEmailOTPInput = z.object({
   address: z.string(),
-  state: z.string(),
 })
 
 export const GenerateEmailOTPOutput = z.string()
@@ -19,9 +19,10 @@ export const generateEmailOTPMethod = async ({
   input: GenerateEmailOTPParams
   ctx: Context
 }): Promise<string> => {
-  const { address, state } = input
+  const { address } = input
   const emailAddressNode = new EmailAddress(ctx.address as AddressNode)
 
+  const state = generateRandomString(12)
   const code = await emailAddressNode.generateVerificationCode(state)
   await ctx.emailClient.sendEmailNotification.mutate({
     emailAddress: address,
