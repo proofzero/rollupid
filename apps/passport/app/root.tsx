@@ -178,7 +178,7 @@ export default function App() {
         <LiveReload nonce={nonce} />
         {/* REMOVE THIS BEFORE MERGE */}
         {/* <script
-          nonce=''
+          // nonce=''
           dangerouslySetInnerHTML={{ __html: "alert('Should be prevented')" }}
         /> */}
         <script
@@ -194,6 +194,8 @@ export default function App() {
 // https://remix.run/docs/en/v1/guides/errors
 // @ts-ignore
 export function ErrorBoundary({ error }) {
+  const nonce = useContext(NonceContext)
+
   console.error('Error in error boundary', error)
 
   return (
@@ -214,9 +216,9 @@ export function ErrorBoundary({ error }) {
           />
         </div>
 
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload port={8002} />
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
+        <LiveReload port={8002} nonce={nonce} />
       </body>
     </html>
   )
