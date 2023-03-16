@@ -1,7 +1,7 @@
 import { useSubmit } from '@remix-run/react'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { HiOutlineExternalLink } from 'react-icons/hi'
+import { FiExternalLink } from 'react-icons/fi'
 import { IoMdExit } from 'react-icons/io'
 import { IoIosCheckmark } from 'react-icons/io'
 
@@ -58,7 +58,7 @@ export const UserNavigation = ({
         target="_blank"
         rel="noreferrer"
       >
-        <HiOutlineExternalLink size={22} className="mr-2" />
+        <FiExternalLink size={22} className="mr-2" />
         <Text className="truncate" size="sm" weight="medium">
           Open my Profile
         </Text>

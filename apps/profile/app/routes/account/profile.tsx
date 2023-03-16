@@ -21,7 +21,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import SaveButton from '~/components/accounts/SaveButton'
 import { getMoreNftsModal } from '~/helpers/nfts'
-import type { Profile } from '@proofzero/galaxy-client'
+
 import type { FullProfile, NFT } from '~/types'
 import InputTextarea from '~/components/inputs/InputTextarea'
 
