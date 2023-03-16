@@ -30,7 +30,6 @@ Application client secret
 {% endswagger-parameter %}
 
 {% swagger-response status="201: Created" description="Exchange token response" %}
-
 ```javascript
 {
     access_token: string,
@@ -39,7 +38,6 @@ Application client secret
     id_token: string
 }
 ```
-
 {% endswagger-response %}
 {% endswagger %}
 
@@ -47,7 +45,6 @@ Application client secret
 
 {% tabs %}
 {% tab title="Javascript" %}
-
 ```typescript
 const tokenForm = new Form()
 tokenForm.append('exchange_code', exchangeCode)
@@ -63,17 +60,17 @@ const { access_code, refresh_token } = await fetch(
   }
 )
 ```
-
 {% endtab %}
 
 {% tab title="Curl" %}
-
 ```bash
-curl -X POST https://passport.rollup.id/token -d \
+curl https://passport.rollup.id/token -X POST \
   --header "Content-Type: application/x-www-form-urlencoded" \
-  "client_id={clientId}&client_secret={clientSecret}&exchange_code={exchangeCode}&grant_type=authorization_code"
+  --data-urlencode "client_id={clientId}" \
+  --data-urlencode "client_secret={clientSecret}"
+  --data-urlencode "exchange_code={exchangeCode}"
+  --data-urlencode "grant_type=authorization_code"
 ```
-
 {% endtab %}
 {% endtabs %}
 
