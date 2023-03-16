@@ -21,7 +21,12 @@ import {
 import type { Node, Profile } from '@proofzero/galaxy-client'
 import type { AddressURN } from '@proofzero/urns/address'
 import type { FullProfile } from '~/types'
-import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
+import {
+  toast,
+  ToastType,
+  Toaster,
+} from '@proofzero/design-system/src/atoms/toast'
+
 import { Popover } from '@headlessui/react'
 
 export const links: LinksFunction = () => {
@@ -112,10 +117,10 @@ export default function AccountLayout() {
     <Popover className="bg-white h-full min-h-screen overflow-visible">
       {({ open }) => {
         return (
-          <div className={`${open ? '' : ''}`}>
+          <>
             <div
-              className={`lg:px-4 transition-colors md:pb-72 md:bg-[#192030] ${
-                open ? 'bg-white' : 'bg-[#192030] sm:max-md:pb-72'
+              className={`lg:px-4 transition-colors lg:pb-72 lg:bg-[#192030] ${
+                open ? 'max-sm:bg-[#192030]' : 'bg-[#192030] sm:max-lg:pb-72'
               }`}
             >
               <HeadNav
@@ -130,14 +135,17 @@ export default function AccountLayout() {
             <main
               className={`transition-opacity transition-colors ${
                 open
-                  ? 'max-md:bg-[#192030] max-md:opacity-50 max-md:pt-72 \
-                  h-[125vh] overflow-hidden'
+                  ? 'max-lg:bg-[#192030] max-lg:opacity-50 sm:max-lg:pt-72 \
+                   max-sm:h-[calc(100vh-80px)] sm:h-[calc(100vh+208px)] overflow-hidden'
                   : 'opacity-100'
-              } -mt-72 max-sm:pt-72 lg:pb-12 min-h-max`}
+              } sm:-mt-72  lg:pb-12 min-h-max`}
             >
               <div className="mx-auto max-w-screen-xl lg:px-4 md:px-4 md:pb-6 sm:px-6 lg:px-8 lg:pb-16">
-                <div className={`overflow-hidden bg-white  shadow rounded-lg`}>
+                <div
+                  className={`overflow-hidden bg-white  shadow sm:rounded-lg`}
+                >
                   <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
+                    <Toaster position="top-right" reverseOrder={false} />
                     <DesktopSideNav
                       profile={profile}
                       accountURN={AccountURNSpace.decode(accountURN)}
@@ -157,7 +165,7 @@ export default function AccountLayout() {
                 </div>
               </div>
             </main>
-          </div>
+          </>
         )
       }}
     </Popover>

@@ -7,7 +7,6 @@ import { IoMdExit } from 'react-icons/io'
 import { HiOutlineExternalLink } from 'react-icons/hi'
 
 import { Text } from '@kubelt/design-system'
-import { Toaster } from '@kubelt/design-system/src/atoms/toast'
 
 import { SideNavItem } from './item'
 
@@ -56,9 +55,16 @@ export const DesktopSideNav = ({
 export const MobileSideNav = ({
   profile,
   accountURN,
+  close,
 }: {
   profile: { displayName: string; pfp?: { image: string } }
   accountURN: string
+  close: (
+    focusableElement?:
+      | HTMLElement
+      | React.MutableRefObject<HTMLElement | null>
+      | undefined
+  ) => void
 }) => {
   const submit = useSubmit()
 
@@ -67,13 +73,20 @@ export const MobileSideNav = ({
       className="flex-none justify-center items-center 
        block relative h-full"
     >
-      <SideNavBarebone profile={profile} accountURN={accountURN} />
+      <SideNavBarebone
+        profile={profile}
+        accountURN={accountURN}
+        close={close}
+      />
 
       <button
         className="absolute bottom-0 px-4 py-4 hover:bg-gray-100 w-full
          text-left flex items-center text-red-500 text-sm"
         style={{ cursor: 'pointer' }}
-        onClick={() => submit(null, { method: 'post', action: '/signout/' })}
+        onClick={() => {
+          close()
+          submit(null, { method: 'post', action: '/signout/' })
+        }}
       >
         <IoMdExit size={22} className="mr-2" />
         <Text className="truncate" size="sm" weight="medium">
@@ -87,13 +100,24 @@ export const MobileSideNav = ({
 export const SideNavBarebone = ({
   profile,
   accountURN,
+  close,
 }: {
   profile: { displayName: string; pfp?: { image: string } }
   accountURN: string
+  close?: (
+    focusableElement?:
+      | HTMLElement
+      | React.MutableRefObject<HTMLElement | null>
+      | undefined
+  ) => void
 }) => {
   return (
-    <>
-      <Toaster position="top-right" reverseOrder={false} />
+    <div
+      className="w-full"
+      onClick={() => {
+        if (close) close()
+      }}
+    >
       <div className="flex flex-row items-center mx-3 pb-6 pt-8 truncate">
         <img
           src={profile.pfp?.image}
@@ -119,6 +143,6 @@ export const SideNavBarebone = ({
       {subNavigation.publicProfiles.map((item) => (
         <SideNavItem key={item.name} item={item} />
       ))}
-    </>
+    </div>
   )
 }

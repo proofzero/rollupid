@@ -51,13 +51,13 @@ export default function HeadNav({
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <img
-                className="max-w-[180px] hidden md:block"
+                className="max-w-[180px] hidden lg:block"
                 src={logo}
                 alt="Rollup"
               />
               <img
-                className={`max-w-[180px] block md:hidden transition-opacity ${
-                  open ? 'opacity-50' : ''
+                className={`max-w-[180px] block lg:hidden transition-opacity ${
+                  open ? 'sm:opacity-50' : ''
                 }`}
                 src={mobileLogo}
                 alt="Rollup"
@@ -65,7 +65,7 @@ export default function HeadNav({
             </div>
           </div>
 
-          <div className="hidden md:block">
+          <div className="hidden lg:block">
             <div className="ml-4 flex items-center md:ml-6">
               {!loggedIn && (
                 <div className="flex flex-row items-center space-x-8">
@@ -139,7 +139,7 @@ export default function HeadNav({
               )}
             </div>
           </div>
-          <div className="-mr-2 flex md:hidden">
+          <div className="-mr-2 flex lg:hidden">
             {/* Mobile menu button */}
             {loggedIn && (
               <Popover.Button
@@ -176,8 +176,8 @@ export default function HeadNav({
 
       <Popover.Panel
         className={`
-            ${open ? 'fixed right-0' : ''}
-            md:hidden h-full col-start-1 col-end-3 bg-gray-50
+          ${open ? 'fixed right-0' : ''}
+            lg:hidden h-full col-start-1 col-end-3 bg-gray-50
             border mt-5 absolute bottom-0 z-[100] 
              h-[calc(100vh-80px)] w-[240px]`}
         ref={setPopperElement}
@@ -190,6 +190,7 @@ export default function HeadNav({
               pfp: { image: avatarUrl! },
               displayName: displayName!,
             }}
+            close={close}
             accountURN={accountURN!}
           />
         )}
