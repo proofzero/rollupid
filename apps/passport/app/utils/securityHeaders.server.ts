@@ -28,25 +28,24 @@ export const securityHeaders = (
   const owaspHeaders = new Headers()
 
   owaspHeaders.set('Content-Security-Policy', contentSecurityPolicy(nonce, dev))
-  owaspHeaders.set('Cross-Origin-Embedder-Policy', 'same-origin')
+  owaspHeaders.set('Cross-Origin-Embedder-Policy', 'require-corp')
   owaspHeaders.set('Cross-Origin-Opener-Policy', 'same-origin')
   owaspHeaders.set('Cross-Origin-Resource-Policy', 'same-origin')
   owaspHeaders.set('Origin-Agent-Cluster', '?1')
-  owaspHeaders.set(
-    'Permissions-Policy',
-    'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()'
-  )
-  owaspHeaders.set('Referrer-Policy', 'origin-when-cross-origin')
-  owaspHeaders.set(
-    'Strict-Transport-Security',
-    'max-age=31536000; includeSubDomains'
-  )
+  owaspHeaders.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   owaspHeaders.set('X-Content-Type-Options', 'nosniff')
   owaspHeaders.set('X-DNS-Prefetch-Control', 'off')
   owaspHeaders.set('X-Download-Options', 'noopen')
-  owaspHeaders.set('X-Frame-Options', 'SAMEORIGIN')
   owaspHeaders.set('X-Permitted-Cross-Domain-Policies', 'none')
-  owaspHeaders.set('X-XSS-Protection', '0')
+  owaspHeaders.set('X-Frame-Options', 'DENY')
+  owaspHeaders.set(
+    'Permissions-Policy',
+    'geolocation=(), microphone=(), camera=(), magnetometer=(), gyroscope=(), fullscreen=(self), payment=(), sync-xhr=(), accelerometer=(), usb=()'
+  )
+  owaspHeaders.set(
+    'Strict-Transport-Security',
+    'max-age=34560000; includeSubDomains; preload'
+  )
 
   return owaspHeaders
 }
