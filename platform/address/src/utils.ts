@@ -4,6 +4,7 @@ import { computeAddress } from '@ethersproject/transactions'
 
 import {
   CryptoAddressType,
+  EmailAddressType,
   HandleAddressType,
   NodeType,
   OAuthAddressType,
@@ -14,6 +15,7 @@ export const isNodeType = (type: string): type is NodeType => {
     case NodeType.Crypto:
     case NodeType.Contract:
     case NodeType.OAuth:
+    case NodeType.Email:
     case NodeType.Handle:
       return true
     default:
@@ -44,6 +46,15 @@ export const isOAuthAddressType = (type: string | undefined) => {
   }
 }
 
+export const isEmailAddressType = (type: string | undefined) => {
+  switch (type) {
+    case EmailAddressType.Email:
+      return NodeType.Email
+    default:
+      return false
+  }
+}
+
 export const isHandleAddressType = (type: string) => {
   switch (type) {
     case HandleAddressType.Handle:
@@ -57,6 +68,7 @@ export const isValidAddressType = (type: string) => {
   return (
     isCryptoAddressType(type) ||
     isOAuthAddressType(type) ||
+    isEmailAddressType(type) ||
     isHandleAddressType(type)
   )
 }

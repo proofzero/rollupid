@@ -13,6 +13,7 @@ import {
 } from './jsonrpc/validators/oauth'
 import {
   CryptoAddressProfileSchema,
+  EmailProfileSchema,
   NFTarVoucherSchema,
 } from './jsonrpc/validators/profile'
 import { DeploymentMetadata } from '@kubelt/types'
@@ -71,6 +72,7 @@ export type OAuthMicrosoftProfile = z.infer<
 >['_json']
 export type OAuthAppleProfile = z.infer<typeof AppleOAuthSchema>
 export type OAuthDiscordProfile = z.infer<typeof DiscordOAuthSchema>['__json']
+export type EmailAddressProfile = z.infer<typeof EmailProfileSchema>
 
 export type CryptoAddressProfile = z.infer<typeof CryptoAddressProfileSchema>
 export type AddressProfile =
@@ -81,6 +83,7 @@ export type AddressProfile =
   | OAuthMicrosoftProfile
   | OAuthAppleProfile
   | OAuthDiscordProfile
+  | EmailAddressProfile
 
 export type AddressProfiles = AddressProfile[]
 

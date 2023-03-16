@@ -1,6 +1,10 @@
 import { string, z } from 'zod'
 
-import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
+import {
+  CryptoAddressType,
+  EmailAddressType,
+  OAuthAddressType,
+} from '@kubelt/types/address'
 
 import { Context } from '../../context'
 import {
@@ -8,6 +12,7 @@ import {
   AppleProfileSchema,
   CryptoAddressProfileSchema,
   DiscordRawProfileSchema,
+  EmailProfileSchema,
   GithubRawProfileSubsetSchema,
   GoogleRawProfileSchema,
   MicrosoftRawProfileSchema,
@@ -21,6 +26,7 @@ import MicrosoftAddress from '../../nodes/microsoft'
 import AppleAddress from '../../nodes/apple'
 import DiscordAddress from '../../nodes/discord'
 import { AddressURNInput } from '@kubelt/platform-middleware/inputValidators'
+import EmailAddress from '../../nodes/email'
 
 export const GetAddressProfileOutput = z.discriminatedUnion('type', [
   z.object({
@@ -57,6 +63,11 @@ export const GetAddressProfileOutput = z.discriminatedUnion('type', [
     urn: AddressURNInput,
     profile: DiscordRawProfileSchema,
     type: z.literal(OAuthAddressType.Discord),
+  }),
+  z.object({
+    urn: AddressURNInput,
+    profile: EmailProfileSchema,
+    type: z.literal(EmailAddressType.Email),
   }),
 ])
 
@@ -147,13 +158,15 @@ export const getAddressProfileMethod = async ({
         profile,
       }
     }
-    // case OAuthAddressType.GitHub:
-    // case OAuthAddressType.Twitter:
-    // case OAuthAddressType.Google:
-    // case OAuthAddressType.Microsoft: {
-    //   const oAuthNode = new OAuthAddress(nodeClient)
-    //   return oAuthNode.getProfile()
-    // }
+    case EmailAddressType.Email: {
+      const emailNode = new EmailAddress(nodeClient)
+      const profile = await emailNode.getProfile()
+      return {
+        urn: ctx.addressURN,
+        type: EmailAddressType.Email,
+        profile,
+      }
+    }
     default:
       // if we don't have a profile at this point then something is wrong
       // profiles are set on OAuth nodes when setData is called

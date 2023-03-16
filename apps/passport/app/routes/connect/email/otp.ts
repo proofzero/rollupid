@@ -3,7 +3,7 @@ import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
 import { getAddressClient } from '~/platform.server'
-import generateRandomString from '@kubelt/utils/generateRandomString'
+import { getJWTConditionallyFromSession } from '~/session.server'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const qp = new URL(request.url).searchParams
@@ -51,6 +51,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   const sucessfulVerification = await addressClient.verifyEmailOTP.mutate({
     code: formData.get('code') as string,
     state: formData.get('state') as string,
+    jwt: await getJWTConditionallyFromSession(request, context.env),
   })
 
   return json({ sucessfulVerification })

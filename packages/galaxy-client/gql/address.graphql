@@ -52,6 +52,12 @@ query getAddressProfile($addressURN: URN!) {
         discriminator
         avatar
       }
+
+      ... on EmailAddressProfile {
+        name
+        picture
+        email
+      }
     }
   }
 }
@@ -109,6 +115,12 @@ query getAddressProfiles($addressURNList: [URN!]) {
         username
         discriminator
         avatar
+      }
+
+      ... on EmailAddressProfile {
+        name
+        picture
+        email
       }
     }
   }

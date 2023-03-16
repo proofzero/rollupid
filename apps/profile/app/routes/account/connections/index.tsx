@@ -50,11 +50,19 @@ const distinctProfiles = (connectedProfiles: any[]) => {
       .map(normalizeProfileToConnection),
   } as AddressListProps
 
+  const emailProfiles = {
+    addresses: connectedProfiles
+      .filter((p) => p?.nodeType === NodeType.Email)
+      .map((p) => ({ urn: p.urn, ...p?.profile }))
+      .map(normalizeProfileToConnection),
+  } as AddressListProps
+
   return {
     addressCount: connectedProfiles.length,
     cryptoProfiles,
     vaultProfiles,
     oAuthProfiles,
+    emailProfiles,
   }
 }
 
@@ -171,8 +179,13 @@ const AccountSettingsConnections = () => {
     connectedProfiles: any[]
   }>()
 
-  const { cryptoProfiles, vaultProfiles, oAuthProfiles, addressCount } =
-    distinctProfiles(connectedProfiles)
+  const {
+    cryptoProfiles,
+    vaultProfiles,
+    oAuthProfiles,
+    emailProfiles,
+    addressCount,
+  } = distinctProfiles(connectedProfiles)
 
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [disconnectModalOpen, setDisconnectModalOpen] = useState(false)
@@ -213,6 +226,7 @@ const AccountSettingsConnections = () => {
     const selectedProfile = cryptoProfiles.addresses
       .concat(vaultProfiles.addresses)
       .concat(oAuthProfiles.addresses)
+      .concat(emailProfiles.addresses)
       .find((p: any) => p.id === actionId)
 
     setActionProfile(selectedProfile)
@@ -322,6 +336,15 @@ const AccountSettingsConnections = () => {
               oAuthProfiles.addresses.map((ap) => ({
                 ...ap,
                 onRenameAccount: undefined,
+              }))
+            )
+            .concat(
+              emailProfiles.addresses.map((ap: AddressListItemProps) => ({
+                ...ap,
+                onRenameAccount: (id: string) => {
+                  setActionId(id)
+                  setRenameModalOpen(true)
+                },
               }))
             )
             .map((ap: AddressListItemProps) => ({

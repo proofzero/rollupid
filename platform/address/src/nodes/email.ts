@@ -1,8 +1,10 @@
+import { add } from '@dnd-kit/utilities'
 import { EmailAddressType, NodeType } from '@kubelt/types/address'
 import generateRandomString from '@kubelt/utils/generateRandomString'
 import { DurableObjectStubProxy } from 'do-proxy'
 import { AddressNode } from '.'
 import { EMAIL_VERIFICATION_OPTIONS } from '../constants'
+import { EmailAddressProfile } from '../types'
 import Address from './address'
 
 type VerificationPayload = {
@@ -101,6 +103,23 @@ export default class EmailAddress {
     }
 
     await address.state.storage.put(CODES_KEY_NAME, codes)
+  }
+
+  async getProfile(): Promise<EmailAddressProfile> {
+    const [nickname, gradient, address] = await Promise.all([
+      this.node.class.getNickname(),
+      this.node.class.getGradient(),
+      this.node.class.getAddress(),
+    ])
+    if (!address) throw new Error('Cannot load profile for email address node')
+    const result: EmailAddressProfile = {
+      address,
+      email: address,
+      isEmail: true,
+      name: nickname ?? address,
+      picture: gradient,
+    }
+    return result
   }
 }
 export type EmailAddressProxyStub = DurableObjectStubProxy<EmailAddress>
