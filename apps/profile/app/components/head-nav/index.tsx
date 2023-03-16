@@ -89,52 +89,59 @@ export default function HeadNav({
               {/* Profile dropdown */}
               {loggedIn && (
                 <Menu as="div" className="relative ml-3">
-                  <div>
-                    <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm">
-                      <span className="sr-only">Open user menu</span>
-                      <Avatar
-                        src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
-                        hex={isToken}
-                        size="xs"
-                        style={
-                          isToken
-                            ? {
-                                visibility: 'visible',
+                  {({ close }) => {
+                    return (
+                      <>
+                        <div>
+                          <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm">
+                            <span className="sr-only">Open user menu</span>
+                            <Avatar
+                              src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
+                              hex={isToken}
+                              size="xs"
+                              style={
+                                isToken
+                                  ? {
+                                      visibility: 'visible',
+                                    }
+                                  : undefined
                               }
-                            : undefined
-                        }
-                      />
-                    </Menu.Button>
-                  </div>
-                  <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-100"
-                    enterFrom="transform opacity-0 scale-95"
-                    enterTo="transform opacity-100 scale-100"
-                    leave="transition ease-in duration-75"
-                    leaveFrom="transform opacity-100 scale-100"
-                    leaveTo="transform opacity-0 scale-95"
-                  >
-                    <Menu.Items
-                      className="absolute right-0 z-10 mt-2 w-48
+                            />
+                          </Menu.Button>
+                        </div>
+                        <Transition
+                          as={Fragment}
+                          enter="transition ease-out duration-100"
+                          enterFrom="transform opacity-0 scale-95"
+                          enterTo="transform opacity-100 scale-100"
+                          leave="transition ease-in duration-75"
+                          leaveFrom="transform opacity-100 scale-100"
+                          leaveTo="transform opacity-0 scale-95"
+                        >
+                          <Menu.Items
+                            className="absolute right-0 z-10 mt-2 w-48
                          origin-top-right bg-white py-1
                           shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none rounded-md"
-                    >
-                      {loggedIn && (
-                        <Menu.Item>
-                          <UserNavigation
-                            avatarUrl={avatarUrl}
-                            displayName={displayName}
-                            profileUrl={
-                              accountURN
-                                ? `/p/${accountURN}`
-                                : '/account/connections'
-                            }
-                          />
-                        </Menu.Item>
-                      )}
-                    </Menu.Items>
-                  </Transition>
+                          >
+                            {loggedIn && (
+                              <Menu.Item>
+                                <UserNavigation
+                                  avatarUrl={avatarUrl}
+                                  displayName={displayName}
+                                  close={close}
+                                  profileUrl={
+                                    accountURN
+                                      ? `/p/${accountURN}`
+                                      : '/account/connections'
+                                  }
+                                />
+                              </Menu.Item>
+                            )}
+                          </Menu.Items>
+                        </Transition>
+                      </>
+                    )
+                  }}
                 </Menu>
               )}
             </div>
@@ -174,27 +181,39 @@ export default function HeadNav({
         </div>
       </div>
 
-      <Popover.Panel
-        className={`
-          ${open ? 'fixed right-0' : ''}
-            lg:hidden h-full col-start-1 col-end-3 bg-gray-50
-            border mt-5 absolute bottom-0 z-[100] 
-             h-[calc(100vh-80px)] w-[240px]`}
-        ref={setPopperElement}
-        style={styles.popper}
-        {...attributes.popper}
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
       >
-        {({ close }) => (
-          <MobileSideNav
-            profile={{
-              pfp: { image: avatarUrl! },
-              displayName: displayName!,
-            }}
-            close={close}
-            accountURN={accountURN!}
-          />
-        )}
-      </Popover.Panel>
+        <Popover.Panel
+          className={`
+          ${open ? 'fixed right-0' : ''}
+            lg:hidden col-start-1 col-end-3 bg-gray-50
+            border sm:-mt-[60px] max-sm:mt-5 z-[100] 
+             max-sm:h-[calc(100vh-80px)] h-[calc(100vh+2px)] w-[240px]`}
+          ref={setPopperElement}
+          style={styles.popper}
+          {...attributes.popper}
+        >
+          {({ close }) => (
+            <MobileSideNav
+              profile={{
+                pfp: { image: avatarUrl! },
+                displayName: displayName!,
+              }}
+              close={close}
+              accountURN={accountURN!}
+              ref={setReferenceElement}
+              open={open}
+            />
+          )}
+        </Popover.Panel>
+      </Transition>
     </div>
   )
 }

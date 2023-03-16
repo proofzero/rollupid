@@ -5,8 +5,11 @@ import { AiOutlineUser } from 'react-icons/ai'
 import { RiCollageLine } from 'react-icons/ri'
 import { IoMdExit } from 'react-icons/io'
 import { HiOutlineExternalLink } from 'react-icons/hi'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 import { Text } from '@kubelt/design-system'
+
+import { Popover } from '@headlessui/react'
 
 import { SideNavItem } from './item'
 
@@ -56,6 +59,8 @@ export const MobileSideNav = ({
   profile,
   accountURN,
   close,
+  ref,
+  open,
 }: {
   profile: { displayName: string; pfp?: { image: string } }
   accountURN: string
@@ -65,6 +70,8 @@ export const MobileSideNav = ({
       | React.MutableRefObject<HTMLElement | null>
       | undefined
   ) => void
+  ref?: React.Dispatch<React.SetStateAction<undefined>>
+  open?: boolean
 }) => {
   const submit = useSubmit()
 
@@ -73,6 +80,23 @@ export const MobileSideNav = ({
       className="flex-none justify-center items-center 
        block relative h-full"
     >
+      <div className="hidden h-[80px] sm:max-lg:flex w-full items-center justify-end">
+        <Popover.Button
+          ref={ref}
+          className="bg-gray-50 inline-flex items-center justify-center mr-2
+                   text-gray-500 hover:text-gray-400 focus:outline-none p-2
+                   focus:ring-2 focus:ring-gray-800 focus:ring-offset-2 focus:ring-offset-gray-800
+                   rounded-lg"
+        >
+          <span className="sr-only">Open main menu</span>
+          {open ? (
+            <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+          ) : (
+            <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+          )}
+        </Popover.Button>
+      </div>
+
       <SideNavBarebone
         profile={profile}
         accountURN={accountURN}

@@ -25,7 +25,9 @@ export const UserNavigation = ({
   avatarUrl,
   displayName,
   profileUrl,
+  close,
 }: {
+  close: () => void
   avatarUrl?: string
   displayName?: string
   profileUrl?: string
@@ -54,6 +56,9 @@ export const UserNavigation = ({
         className="pl-3 pr-2 py-3 hover:bg-gray-100 
         w-full text-left flex items-center border text-gray-700"
         style={{ cursor: 'pointer' }}
+        onClick={() => {
+          close()
+        }}
         href={profileUrl}
         target="_blank"
         rel="noreferrer"
@@ -67,7 +72,10 @@ export const UserNavigation = ({
         className="pl-3 pr-2 py-3 hover:bg-gray-100 w-full
          text-left flex items-center text-red-500"
         style={{ cursor: 'pointer' }}
-        onClick={() => submit(null, { method: 'post', action: '/signout/' })}
+        onClick={() => {
+          close()
+          submit(null, { method: 'post', action: '/signout/' })
+        }}
       >
         <IoMdExit size={22} className="mr-2" />
         <Text className="truncate" size="sm" weight="medium">
