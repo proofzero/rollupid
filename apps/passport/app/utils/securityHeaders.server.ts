@@ -13,7 +13,11 @@ const contentSecurityPolicy = (nonce: string, dev: boolean = false): string => {
       ],
       'script-src': [SELF, `'nonce-${nonce}' ${STRICT_DYNAMIC}`],
       'style-src': [SELF, UNSAFE_INLINE, 'fonts.cdnfonts.com'],
-      'img-src': [SELF, DATA, 'imagedelivery.net'],
+      // Disabled due to OAuth provider avatars
+      // we might be able to catch them all
+      // at which point we can re-enable it
+      // 'img-src': [SELF, DATA, 'imagedelivery.net'],
+      'img-src': ['*'],
       'font-src': [SELF, 'fonts.cdnfonts.com'],
       'object-src': [SELF],
       'base-uri': [SELF],
