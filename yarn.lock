@@ -17917,6 +17917,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"csp-header@npm:5.1.0":
+  version: 5.1.0
+  resolution: "csp-header@npm:5.1.0"
+  checksum: 8afdb6e8238e5ca9b89b503519a78589c88c2a719253a6cfef641d82375f9a4f17cff47ea1c783c6a466d01229eb4d35d5a0e600ee4e052cb7a6e97f7f8c8dd4
+  languageName: node
+  linkType: hard
+
 "css-blank-pseudo@npm:^3.0.3":
   version: 3.0.3
   resolution: "css-blank-pseudo@npm:3.0.3"
