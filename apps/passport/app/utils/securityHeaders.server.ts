@@ -17,6 +17,8 @@ const contentSecurityPolicy = (nonce: string, dev: boolean = false): string => {
       'font-src': [SELF, 'fonts.cdnfonts.com'],
       'object-src': [SELF],
       'base-uri': [SELF],
+      'form-action': [SELF],
+      'frame-ancestors': [SELF],
     },
   })
 }
@@ -28,7 +30,7 @@ export const securityHeaders = (
   const owaspHeaders = new Headers()
 
   owaspHeaders.set('Content-Security-Policy', contentSecurityPolicy(nonce, dev))
-  owaspHeaders.set('Cross-Origin-Embedder-Policy', 'require-corp')
+  owaspHeaders.set('Cross-Origin-Embedder-Policy', 'same-origin')
   owaspHeaders.set('Cross-Origin-Opener-Policy', 'same-origin')
   owaspHeaders.set('Cross-Origin-Resource-Policy', 'same-origin')
   owaspHeaders.set('Origin-Agent-Cluster', '?1')
