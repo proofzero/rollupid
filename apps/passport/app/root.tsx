@@ -176,11 +176,6 @@ export default function App() {
           }}
         />
         <LiveReload nonce={nonce} />
-        {/* REMOVE THIS BEFORE MERGE */}
-        {/* <script
-          // nonce=''
-          dangerouslySetInnerHTML={{ __html: "alert('Should be prevented')" }}
-        /> */}
         <script
           async
           nonce={nonce}
