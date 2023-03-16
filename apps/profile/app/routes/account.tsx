@@ -136,7 +136,7 @@ export default function AccountLayout() {
               className={`transition-opacity transition-colors ${
                 open
                   ? 'max-lg:bg-[#192030] max-lg:opacity-50 sm:max-lg:pt-72 \
-                   max-lg:h-[calc(100vh-80px)] overflow-hidden'
+                   h-[calc(100vh-80px)] sm:max-lg:h-[calc(100vh+208px)]  overflow-hidden'
                   : 'opacity-100'
               } sm:-mt-72  lg:pb-12`}
             >
