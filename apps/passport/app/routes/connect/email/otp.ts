@@ -43,9 +43,9 @@ export const action: ActionFunction = async ({ request, context }) => {
   if (!address) throw new Error('No address included in request')
 
   const addressURN = AddressURNSpace.componentizedUrn(
-    generateHashedIDRef(CryptoAddressType.ETH, address),
-    { node_type: NodeType.Crypto, addr_type: CryptoAddressType.ETH },
-    { alias: address }
+    generateHashedIDRef(EmailAddressType.Email, address),
+    { node_type: NodeType.Email, addr_type: EmailAddressType.Email },
+    { alias: address, hidden: 'true' }
   )
   const addressClient = getAddressClient(
     addressURN,
