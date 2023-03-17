@@ -52,6 +52,12 @@ query getAddressProfile($addressURN: URN!) {
         discriminator
         avatar
       }
+
+      ... on EmailAddressProfile {
+        name
+        picture
+        email
+      }
     }
   }
 }
@@ -110,12 +116,18 @@ query getAddressProfiles($addressURNList: [URN!]) {
         discriminator
         avatar
       }
+
+      ... on EmailAddressProfile {
+        name
+        picture
+        email
+      }
     }
   }
 }
 
-query getAccountUrnFromAddress($addressURN: URN!) {
-  account(addressURN: $addressURN)
+query getAccountUrnFromAlias($provider: String!, $alias: String!) {
+  accountFromAlias(provider: $provider, alias: $alias)
 }
 
 mutation updateAddressNickname($addressURN: URN!, $nickname: String!) {

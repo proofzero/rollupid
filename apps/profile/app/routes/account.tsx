@@ -1,6 +1,6 @@
 import { json, redirect } from '@remix-run/cloudflare'
 import type { LoaderFunction, LinksFunction } from '@remix-run/cloudflare'
-import { useLoaderData, NavLink, useOutletContext } from '@remix-run/react'
+import { useLoaderData, NavLink } from '@remix-run/react'
 
 import { Outlet } from '@remix-run/react'
 
@@ -165,10 +165,6 @@ export default function AccountLayout() {
       cryptoAddresses: Node[]
     }>()
 
-  const { CONSOLE_APP_URL } = useOutletContext<{
-    CONSOLE_APP_URL: string
-  }>()
-
   return (
     <div className="bg-white h-full min-h-screen overflow-visible">
       <div
@@ -178,7 +174,6 @@ export default function AccountLayout() {
         }}
       >
         <HeadNav
-          consoleURL={CONSOLE_APP_URL}
           loggedIn={!!profile}
           basePath={`/p/${AccountURNSpace.decode(accountURN)}`}
           avatarUrl={profile?.pfp?.image as string}

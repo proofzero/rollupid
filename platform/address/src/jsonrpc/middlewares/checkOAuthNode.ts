@@ -18,14 +18,14 @@ export const checkOAuthNode: BaseMiddlewareFunction<Context> = async ({
   console.log('checkOAuthNode: addrType', addrType)
 
   const nodeType = isOAuthAddressType(addrType)
-  if (addrType && !nodeType) {
-    throw `invalid oauth address type: ${addrType}`
+  if (nodeType) {
+    return next({
+      ctx: {
+        ...ctx,
+        nodeType,
+      },
+    })
+  } else {
+    return next({ ctx })
   }
-
-  return next({
-    ctx: {
-      ...ctx,
-      nodeType,
-    },
-  })
 }

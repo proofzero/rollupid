@@ -15,6 +15,7 @@ export const VerifyNonceInput = z.object({
   nonce: z.string(),
   signature: z.string(),
   jwt: z.string().optional(),
+  forceAccountCreation: z.boolean().optional(),
 })
 
 // TODO: move to shared validators?
@@ -47,6 +48,7 @@ export const verifyNonceMethod = async ({
   const caller = appRouter.createCaller(ctx)
   const { accountURN, existing } = await caller.resolveAccount({
     jwt,
+    force: input.forceAccountCreation,
   })
   const responseType = ResponseType.Code
 

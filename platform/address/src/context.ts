@@ -4,6 +4,7 @@ import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import type { Environment } from './types'
 import type { AddressType, NodeType } from '@kubelt/types/address'
 import createEdgesClient from '@kubelt/platform-clients/edges'
+import createEmailClient from '@kubelt/platform-clients/email'
 import { AddressURN } from '@kubelt/urns/address'
 import { ENSRes } from '@kubelt/platform-clients/ens-utils'
 import { AddressNode } from './nodes'
@@ -26,6 +27,7 @@ interface CreateInnerContextOptions
   ServiceDeploymentMetadata: DeploymentMetadata
   HANDLES: KVNamespace
   Edges: Fetcher
+  Email: Fetcher
   Access: Fetcher
   Images: Fetcher
   address?: AddressNode
@@ -70,10 +72,15 @@ export async function createContextInner(opts: CreateInnerContextOptions) {
     opts.Edges,
     generateTraceContextHeaders(traceSpan)
   )
+  const emailClient = createEmailClient(
+    opts.Email,
+    generateTraceContextHeaders(traceSpan)
+  )
   return {
     ...opts,
     traceSpan,
     edges,
+    emailClient,
   }
 }
 /**

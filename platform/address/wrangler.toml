@@ -4,28 +4,25 @@ compatibility_date = "2022-10-26"
 node_compat = true
 workers_dev = false
 
-durable_objects.bindings = [
-  { name = "Address", class_name = "Address" },
-]
+durable_objects.bindings = [{ name = "Address", class_name = "Address" }]
 
 services = [
   { binding = "Access", service = "access" },
   { binding = "Edges", service = "edges" },
-  { binding = "Images", service= "images"}
+  { binding = "Images", service = "images" },
+  { binding = "Email", service = "email" },
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalytics"  },
+  { binding = "Analytics", dataset = "PlatformAnalytics" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [vars]
-MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
-NFTAR_URL="https://test.nftar.rollup.id/api"
-NFTAR_CHAIN_ID=5
+MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL = "https://test.nftar.rollup.id/api"
+NFTAR_CHAIN_ID = 5
 
 [dev]
 port = 10102
@@ -55,79 +52,71 @@ deleted_classes = ["CryptoAddress"]
 new_classes = ["Address"]
 
 [env.dev]
-durable_objects.bindings = [
-  { name = "Address", class_name = "Address" },
-]
+durable_objects.bindings = [{ name = "Address", class_name = "Address" }]
 services = [
   { binding = "Access", service = "access-dev" },
   { binding = "Edges", service = "edges-dev" },
-  { binding = "Images", service= "images-dev"}
+  { binding = "Images", service = "images-dev" },
+  { binding = "Email", service = "email-dev" },
 ]
 kv_namespaces = [
-  { binding = "HANDLES", id = "fca42f2091f14eebb9226513ed8a4c09" }
+  { binding = "HANDLES", id = "fca42f2091f14eebb9226513ed8a4c09" },
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.dev.vars]
-MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
-NFTAR_URL="https://test.nftar.rollup.id/api"
-NFTAR_CHAIN_ID=5
+MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL = "https://test.nftar.rollup.id/api"
+NFTAR_CHAIN_ID = 5
 
 [env.next]
-durable_objects.bindings = [
-  { name = "Address", class_name = "Address" },
-]
+durable_objects.bindings = [{ name = "Address", class_name = "Address" }]
 services = [
   { binding = "Access", service = "access-next" },
   { binding = "Edges", service = "edges-next" },
-  { binding = "Images", service= "images-next"}
+  { binding = "Images", service = "images-next" },
+  { binding = "Email", service = "email-next" },
+
 ]
 kv_namespaces = [
-  { binding = "HANDLES", id = "814a8ca024cd4fda8a667a4143cb4825" }
+  { binding = "HANDLES", id = "814a8ca024cd4fda8a667a4143cb4825" },
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.next.vars]
-MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
-NFTAR_URL="https://test.nftar.rollup.id/api"
-NFTAR_CHAIN_ID=5
+MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL = "https://test.nftar.rollup.id/api"
+NFTAR_CHAIN_ID = 5
 
 [env.current]
-durable_objects.bindings = [
-  { name = "Address", class_name = "Address" },
-]
+durable_objects.bindings = [{ name = "Address", class_name = "Address" }]
 services = [
   { binding = "Access", service = "access-current" },
   { binding = "Edges", service = "edges-current" },
-  { binding = "Images", service= "images-current"}
+  { binding = "Images", service = "images-current" },
+  { binding = "Email", service = "email-current" },
 ]
 kv_namespaces = [
-  { binding = "HANDLES", id = "d7d0ac60a79f4848bf8372b01a487888" }
+  { binding = "HANDLES", id = "d7d0ac60a79f4848bf8372b01a487888" },
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.current.vars]
-MINTPFP_CONTRACT_ADDRESS="0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
-NFTAR_URL="https://nftar.rollup.id/api"
-NFTAR_CHAIN_ID=1
+MINTPFP_CONTRACT_ADDRESS = "0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
+NFTAR_URL = "https://nftar.rollup.id/api"
+NFTAR_CHAIN_ID = 1

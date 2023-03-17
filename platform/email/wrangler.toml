@@ -10,7 +10,7 @@ port = 10105
 inspector_port = 11105
 local_protocol = "http"
 
-[env]
+[vars]
 NotificationFromName = "Rollup Local - Notification"
 NotificationFromUser = "noreplylocal"
 

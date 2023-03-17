@@ -20,7 +20,7 @@ const getFlashSessionStorage = (env: Env) => {
   return createCookieSessionStorage({
     cookie: {
       domain: env.COOKIE_DOMAIN,
-      name: 'PASSPORT_FLASH',
+      name: '_rollup_flash',
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV == 'production',
@@ -45,12 +45,18 @@ export function commitFlashSession(env: Env, session: Session) {
 
 const getUserSessionStorage = (
   env: Env,
+  clientId?: string,
   MAX_AGE = 7776000 /*60 * 60 * 24 * 90*/
 ) => {
+  let cookieName = `_rollup_session`
+  if (clientId) {
+    cookieName += `_last`
+  }
+
   return createCookieSessionStorage({
     cookie: {
       domain: env.COOKIE_DOMAIN,
-      name: 'PASSPORT_SESSION',
+      name: cookieName,
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV == 'production',
@@ -65,24 +71,29 @@ export async function createUserSession(
   jwt: string,
   redirectTo: string,
   defaultProfileUrn: string, // NOTE: storing this temporarily in the session util RPC url remove address
-  env: Env
+  env: Env,
+  clientId?: string
 ) {
-  const userStorage = getUserSessionStorage(env)
+  const userStorage = getUserSessionStorage(env, clientId)
   const parsedJWT = parseJwt(jwt)
   const userSession = await userStorage.getSession()
   userSession.set('core', parsedJWT.iss)
   userSession.set('jwt', jwt)
   userSession.set('defaultProfileUrn', defaultProfileUrn)
 
-  const consoleParamsStorage = getConsoleParamsSessionStorage(env)
-  const consoleParamsSession = await consoleParamsStorage.getSession()
-
   const headers = new Headers()
+
+  if (clientId) {
+    const consoleParamsStorage = getConsoleParamsSessionStorage(env, clientId)
+    const consoleParamsSession = await consoleParamsStorage.getSession()
+
+    headers.append(
+      'Set-Cookie',
+      await consoleParamsStorage.destroySession(consoleParamsSession)
+    )
+  }
+
   headers.append('Set-Cookie', await userStorage.commitSession(userSession))
-  headers.append(
-    'Set-Cookie',
-    await consoleParamsStorage.destroySession(consoleParamsSession)
-  )
 
   return redirect(redirectTo, {
     headers,
@@ -90,8 +101,8 @@ export async function createUserSession(
 }
 
 // TODO: reset cookie maxAge if valid
-export function getUserSession(request: Request, env: Env) {
-  const storage = getUserSessionStorage(env)
+export function getUserSession(request: Request, env: Env, clientId?: string) {
+  const storage = getUserSessionStorage(env, clientId)
   return storage.getSession(request.headers.get('Cookie'))
 }
 
@@ -99,9 +110,10 @@ export async function destroyUserSession(
   session: Session,
   redirectTo: string,
   env: Env,
+  clientId?: string,
   manualLogout: boolean = false
 ) {
-  const storage = getUserSessionStorage(env, 0) // set max age to 0 to kill cookie
+  const storage = getUserSessionStorage(env, clientId) // set max age to 0 to kill cookie
 
   const headers = new Headers()
   headers.append('Set-Cookie', await storage.destroySession(session))
@@ -119,15 +131,21 @@ export async function destroyUserSession(
   })
 }
 
-export async function logout(request: Request, redirectTo: string, env: Env) {
-  const session = await getUserSession(request, env)
-  return destroyUserSession(session, redirectTo, env, true)
+export async function logout(
+  request: Request,
+  redirectTo: string,
+  env: Env,
+  clientId?: string
+) {
+  const session = await getUserSession(request, env, clientId)
+  return destroyUserSession(session, redirectTo, env, clientId, true)
 }
 
 // CONSOLE PARAMS
 
 const getConsoleParamsSessionStorage = (
   env: Env,
+  clientId: string = 'last',
   // https://developer.chrome.com/blog/cookie-max-age-expires/
   // As of Chrome release M104 (August 2022) cookies can no longer
   // set an expiration date more than 400 days in the future.
@@ -136,7 +154,7 @@ const getConsoleParamsSessionStorage = (
   return createCookieSessionStorage({
     cookie: {
       domain: env.COOKIE_DOMAIN,
-      name: 'CONSOLE_PARAMS_SESSION',
+      name: `_rollup_client_params_${clientId}`,
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV == 'production',
@@ -151,11 +169,11 @@ export async function createConsoleParamsSession(
   consoleParams: ConsoleParams,
   env: Env
 ) {
-  const storage = getConsoleParamsSessionStorage(env)
+  const storage = getConsoleParamsSessionStorage(env, consoleParams.clientId!)
   const session = await storage.getSession()
   session.set('params', JSON.stringify(consoleParams))
 
-  return redirect('/authenticate', {
+  return redirect(`/authenticate/${consoleParams.clientId}`, {
     headers: {
       'Set-Cookie': await storage.commitSession(session),
     },
@@ -164,18 +182,33 @@ export async function createConsoleParamsSession(
 
 export async function setConsoleParamsSession(
   consoleParams: ConsoleParams,
-  env: Env
+  env: Env,
+  clientId?: string
 ) {
-  const storage = getConsoleParamsSessionStorage(env)
+  const storage = getConsoleParamsSessionStorage(env, clientId)
   const session = await storage.getSession()
   session.set('params', JSON.stringify(consoleParams))
 
   return storage.commitSession(session)
 }
 
-export async function getConsoleParamsSession(request: Request, env: Env) {
-  const storage = getConsoleParamsSessionStorage(env)
+export async function getConsoleParamsSession(
+  request: Request,
+  env: Env,
+  clientId?: string
+) {
+  const storage = getConsoleParamsSessionStorage(env, clientId)
   return storage.getSession(request.headers.get('Cookie'))
+}
+
+export async function destroyConsoleParamsSession(
+  request: Request,
+  env: Env,
+  clientId?: string
+) {
+  const gps = await getConsoleParamsSession(request, env, clientId)
+  const storage = getConsoleParamsSessionStorage(env, clientId)
+  return storage.destroySession(gps)
 }
 
 export async function requireJWT(
@@ -183,7 +216,11 @@ export async function requireJWT(
   consoleParams: ConsoleParams,
   env: Env
 ) {
-  const session = await getUserSession(request, env)
+  const session = await getUserSession(
+    request,
+    env,
+    consoleParams?.clientId ?? undefined
+  )
   const jwt = session.get('jwt')
 
   try {
@@ -195,16 +232,22 @@ export async function requireJWT(
         throw await createConsoleParamsSession(consoleParams, env)
       else throw redirect('/authenticate')
     else if (error === ExpiredTokenError) {
-      throw await destroyUserSession(session, '/authenticate', env)
+      throw await destroyUserSession(
+        session,
+        '/authenticate',
+        env,
+        consoleParams?.clientId ?? undefined
+      )
     }
   }
 }
 
 export async function getJWTConditionallyFromSession(
   request: Request,
-  env: Env
+  env: Env,
+  clientId?: string
 ): Promise<string | undefined> {
-  const session = await getUserSession(request, env)
+  const session = await getUserSession(request, env, clientId)
   const jwt = session.get('jwt')
 
   return jwt

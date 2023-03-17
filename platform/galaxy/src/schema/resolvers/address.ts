@@ -21,28 +21,26 @@ import {
   OAuthGoogleProfile,
   OAuthMicrosoftProfile,
   OAuthTwitterProfile,
+  EmailAddressProfile,
 } from '@kubelt/platform.address/src/types'
 import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
 import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
-import { trace } from '@kubelt/platform-middleware'
 
 const addressResolvers: Resolvers = {
   Query: {
-    ensProfile: async (_parent, { addressOrEns }, { env }: ResolverContext) => {
-      return new ENSUtils().getEnsEntry(addressOrEns)
-    },
-    account: async (
+    accountFromAlias: async (
       _parent,
-      { addressURN }: { addressURN: AddressURN },
+      { provider, alias }: { provider: string; alias: string },
       { env, traceSpan }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
-        [PlatformAddressURNHeader]: addressURN,
         ...generateTraceContextHeaders(traceSpan),
       })
-
-      const accountURN = await addressClient.getAccount.query()
+      const accountURN = await addressClient.getAccountByAlias.query({
+        alias,
+        provider,
+      })
 
       return accountURN
     },
@@ -60,6 +58,7 @@ const addressResolvers: Resolvers = {
 
       return addressProfile
     },
+
     addressProfiles: async (
       _parent: any,
       { addressURNList }: { addressURNList: AddressURN[] },
@@ -148,6 +147,10 @@ const addressResolvers: Resolvers = {
       if ((obj as unknown as OAuthDiscordProfile).isDiscord) {
         return 'OAuthDiscordProfile'
       }
+      if ((obj as unknown as EmailAddressProfile).isEmail) {
+        return 'EmailAddressProfile'
+      }
+
       return null
     },
   },
@@ -155,7 +158,6 @@ const addressResolvers: Resolvers = {
 
 // TODO: add address middleware
 const AddressResolverComposition = {
-  'Query.ensProfile': [requestLogging(), setupContext(), validateApiKey()],
   'Query.account': [requestLogging(), setupContext(), validateApiKey()],
   'Query.addressProfile': [requestLogging(), setupContext(), validateApiKey()],
   'Query.addressProfiles': [requestLogging(), setupContext(), validateApiKey()],

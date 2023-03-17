@@ -46,10 +46,10 @@ jobs:
           workingDirectory: platform/email
           command: publish --env dev
           environment: dev
-        secrets: |
-          INTERNAL_DKIM_DOMAIN
-          INTERNAL_DKIM_SELECTOR
-          KEY_DKIM_PRIVATEKEY
+          secrets: |
+            INTERNAL_DKIM_DOMAIN
+            INTERNAL_DKIM_SELECTOR
+            KEY_DKIM_PRIVATEKEY
         env:
           NODE_ENV: 'development'
           INTERNAL_DKIM_DOMAIN: ${{ secrets.INTERNAL_DKIM_DOMAIN }}

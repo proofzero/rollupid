@@ -33,6 +33,11 @@ import {
 } from './methods/verifyNonce'
 import { getOAuthDataMethod, GetOAuthDataOutput } from './methods/getOAuthData'
 import { setOAuthDataMethod, SetOAuthDataInput } from './methods/setOAuthData'
+import {
+  getAccountByAliasMethod,
+  GetAccountByAliasInput,
+  GetAccountByAliasOutput,
+} from './methods/getAccountByAlias'
 
 import { LogUsage } from '@kubelt/platform-middleware/log'
 import { parse3RN } from './middlewares/parse3RN'
@@ -48,6 +53,16 @@ import {
   SetAddressNicknameInput,
   setAddressNicknameMethod,
 } from './methods/setAddressNickname'
+import {
+  GenerateEmailOTPInput,
+  generateEmailOTPMethod,
+  GenerateEmailOTPOutput,
+} from './methods/generateEmailOTP'
+import {
+  VerifyEmailOTPInput,
+  verifyEmailOTPMethod,
+  VerifyEmailOTPOutput,
+} from './methods/verifyEmailOTP'
 
 const t = initTRPC.context<Context>().create()
 
@@ -74,6 +89,12 @@ export const appRouter = t.router({
     .use(Analytics)
     .output(GetAccountOutput)
     .query(getAccountMethod),
+  getAccountByAlias: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAccountByAliasInput)
+    .output(GetAccountByAliasOutput)
+    .query(getAccountByAliasMethod),
   setAccount: t.procedure
     .use(LogUsage)
     .use(parse3RN)
@@ -115,6 +136,22 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(SetAddressNicknameInput)
     .query(setAddressNicknameMethod),
+  generateEmailOTP: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setAddressNodeClient)
+    .use(Analytics)
+    .input(GenerateEmailOTPInput)
+    .output(GenerateEmailOTPOutput)
+    .mutation(generateEmailOTPMethod),
+  verifyEmailOTP: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setAddressNodeClient)
+    .use(Analytics)
+    .input(VerifyEmailOTPInput)
+    .output(VerifyEmailOTPOutput)
+    .mutation(verifyEmailOTPMethod),
   getNonce: t.procedure
     .use(LogUsage)
     .use(parse3RN)

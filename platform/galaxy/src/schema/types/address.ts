@@ -54,6 +54,13 @@ export default /* GraphQL */ `
     sub: String
   }
 
+  type EmailAddressProfile {
+    address: String!
+    name: String
+    picture: String!
+    email: String
+  }
+
   type OAuthDiscordProfile {
     id: String
     email: String
@@ -70,6 +77,7 @@ export default /* GraphQL */ `
     | OAuthMicrosoftProfile
     | OAuthAppleProfile
     | OAuthDiscordProfile
+    | EmailAddressProfile
 
   type AddressProfile {
     urn: URN!
@@ -83,8 +91,7 @@ export default /* GraphQL */ `
   }
 
   type Query {
-    ensProfile(addressOrEns: String!): CryptoAddressProfile!
-    account(addressURN: URN!): URN!
+    accountFromAlias(provider: String!, alias: String!): URN!
     addressProfile(addressURN: URN!): AddressProfile!
     addressProfiles(addressURNList: [URN!]): [AddressProfile!]!
   }

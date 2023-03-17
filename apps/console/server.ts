@@ -3,11 +3,11 @@ import {
   handleAsset,
 } from '@remix-run/cloudflare-workers'
 import * as build from '@remix-run/dev/server-build'
-import {
-  generateTraceSpan,
+import type {
   TraceableFetchEvent,
   TraceSpan,
 } from '@kubelt/platform-middleware/trace'
+import { generateTraceSpan } from '@kubelt/platform-middleware/trace'
 
 //Extending the remix untyped AppLoadContext with the type
 //we inject into the context

@@ -13,7 +13,7 @@ import { createUserSession, parseJwt } from '~/session.server'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import { generateGradient } from './gradient.server'
 import { redirect } from '@remix-run/cloudflare'
-import { TraceSpan } from '@kubelt/platform-middleware/trace'
+import type { TraceSpan } from '@kubelt/platform-middleware/trace'
 
 export const authenticateAddress = async (
   address: AddressURN,
@@ -69,12 +69,19 @@ export const authenticateAddress = async (
       redirect_uri: authRedirectUri,
       state: authState,
       scope: authScope,
+      prompt: 'none',
     })
 
     redirectURL += `?${urlParams}`
   }
 
-  return createUserSession(accessToken, redirectURL, address, env)
+  return createUserSession(
+    accessToken,
+    redirectURL,
+    address,
+    env,
+    appData?.clientId
+  )
 }
 
 const provisionProfile = async (
@@ -149,7 +156,7 @@ const provisionProfile = async (
                 res.profile.sub,
               pfp: {
                 //Cached profile image
-                image: res.profile.rollupidImageUrl as string,
+                image: res.profile.picture as string,
               },
             }
           }
