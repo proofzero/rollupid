@@ -1,27 +1,47 @@
 /**
  * @file app/routes/dashboard/apps/$appId/index.tsx
  */
-import { useEffect } from 'react'
+import { Suspense, useState } from 'react'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { json } from '@remix-run/cloudflare'
+import { defer, json } from '@remix-run/cloudflare'
 import {
   useActionData,
   useOutletContext,
   useSubmit,
   useNavigate,
-  useFetcher,
   useLoaderData,
+  Await,
 } from '@remix-run/react'
 import invariant from 'tiny-invariant'
-import { ApplicationDashboard } from '~/components/Applications/Dashboard/ApplicationDashboard'
+
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Panel } from '@kubelt/design-system/src/atoms/panels/Panel'
+import { ReadOnlyInput } from '@kubelt/design-system/src/atoms/form/ReadOnlyInput'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { CTA } from '@kubelt/design-system/src/molecules/cta/cta'
+import {
+  toast,
+  Toaster,
+  ToastType,
+} from '@kubelt/design-system/src/atoms/toast'
+import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
+import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
+
+import { LoginsPanel } from '~/components/Applications/LoginsPanel/LoginsPanel'
+import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
+import type { appDetailsProps } from '~/types'
+
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
-import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
+
 import { RollType } from '~/types'
 import type { RotatedSecrets } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
 import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import { loader as usersLoader } from './users'
+import type { AuthorizedAccountsOutput } from '@kubelt/platform/starbase/src/types'
+import type { UsersLoaderData } from './users'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -32,18 +52,23 @@ import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
 export const NUMBER_OF_DISPLAYED_USERS = 8
 
 type LoaderData = {
-  clientId: string
+  edgesResult: Promise<AuthorizedAccountsOutput>
 }
 
-export const loader: LoaderFunction = async ({ params }) => {
+export const loader: LoaderFunction = async ({ request, params, context }) => {
   const { clientId } = params
+  const { data }: { data: UsersLoaderData } = await usersLoader({
+    request,
+    params,
+    context,
+  })
 
   if (!clientId) {
     throw new Error('clientId is required')
   }
 
-  return json<LoaderData>({
-    clientId,
+  return defer<LoaderData>({
+    edgesResult: data.edgesResult!,
   })
 }
 
@@ -94,15 +119,15 @@ export default function AppDetailIndexPage() {
     appDetails: appDetailsProps
     rotationResult: RotatedSecrets
   }>()
-  const { clientId } = useLoaderData()
-  const authFetcher = useFetcher()
+  const { edgesResult } = useLoaderData()
+
   const navigate = useNavigate()
 
-  const { appDetails: app } = outletContext
+  const [apiKeyRollModalOpen, setApiKeyRollModalOpen] = useState(false)
+  const [clientSecretRollModalOpen, setClientSecretRollModalOpen] =
+    useState(false)
 
-  useEffect(() => {
-    authFetcher.load(`/apps/${clientId}/users`)
-  }, [])
+  const { appDetails: app } = outletContext
 
   const { rotatedClientSecret, rotatedApiKey } =
     outletContext?.rotationResult ||
@@ -112,28 +137,16 @@ export default function AppDetailIndexPage() {
       }
 
   return (
-    <ApplicationDashboard
-      CTAprops={{
-        clickHandler: () => {
-          navigate('./auth')
-        },
-        CTAneeded: !app.app.icon || !app.app.redirectURI || !app.app.name,
-      }}
-      authorizedProfiles={
-        authFetcher.data?.edgesResult?.accounts.slice(
-          0,
-          NUMBER_OF_DISPLAYED_USERS
-        ) || []
-      }
-      error={authFetcher.data?.error || null}
-      fetcherState={{
-        loadingDetails: authFetcher.state,
-        type: authFetcher.type,
-      }}
-      galaxyGql={{
-        createdAt: new Date(app.apiKeyTimestamp as number),
-        apiKey: rotatedApiKey as string,
-        onKeyRoll: () => {
+    <section>
+      <Text size="2xl" weight="semibold" className="text-gray-900 mb-5">
+        Dashboard
+      </Text>
+
+      <Toaster position="top-right" reverseOrder={false} />
+      <RotateCredsModal
+        isOpen={apiKeyRollModalOpen}
+        rotateCallback={() => {
+          setApiKeyRollModalOpen(false)
           submit(
             {
               op: RollType.RollAPIKey,
@@ -142,13 +155,13 @@ export default function AppDetailIndexPage() {
               method: 'post',
             }
           )
-        },
-      }}
-      oAuth={{
-        appId: app.clientId as string,
-        appSecret: rotatedClientSecret as string,
-        createdAt: new Date(app.secretTimestamp as number),
-        onKeyRoll: () => {
+        }}
+        closeCallback={() => setApiKeyRollModalOpen(false)}
+      />
+      <RotateCredsModal
+        isOpen={clientSecretRollModalOpen}
+        rotateCallback={() => {
+          setClientSecretRollModalOpen(false)
           submit(
             {
               op: RollType.RollClientSecret,
@@ -157,8 +170,157 @@ export default function AppDetailIndexPage() {
               method: 'post',
             }
           )
-        },
-      }}
-    />
+        }}
+        closeCallback={() => setClientSecretRollModalOpen(false)}
+      />
+
+      {(!app.app.icon || !app.app.redirectURI || !app.app.name) && (
+        <div className="mb-3">
+          <CTA
+            clickHandler={() => {
+              navigate('./auth')
+            }}
+            header="You're almost there!"
+            description="Head on to the OAuth page to complete the setup"
+            btnText="Complete Setup"
+          />
+        </div>
+      )}
+      <div className="flex flex-col md:flex-row space-y-5 md:space-y-0 md:space-x-5">
+        <div className="flex-1 flex flex-col space-y-5">
+          <Panel
+            title="Galaxy GraphQL API Key"
+            titleCompanion={
+              <div>
+                <Text size="xs" weight="medium" className="text-gray-400">
+                  Created: {new Date(app.apiKeyTimestamp!).toDateString()}
+                </Text>
+                <div className="text-right">
+                  <Text
+                    type="span"
+                    size="xs"
+                    weight="medium"
+                    className="text-indigo-500 cursor-pointer"
+                    onClick={() => setApiKeyRollModalOpen(true)}
+                  >
+                    Roll keys
+                  </Text>
+                </div>
+              </div>
+            }
+          >
+            <ReadOnlyInput
+              id="gqlApiKey"
+              label="API Key"
+              value={rotatedApiKey ?? 's3cr3t-l337-h4x0r5'}
+              hidden={rotatedApiKey ? false : true}
+              copyable={rotatedApiKey ? true : false}
+              onCopy={() =>
+                toast(
+                  ToastType.Success,
+                  { message: 'Client secret copied to clipboard!' },
+                  { duration: 2000 }
+                )
+              }
+            />
+          </Panel>
+
+          <Panel
+            title="OAuth"
+            titleCompanion={
+              <div>
+                <Text size="xs" weight="medium" className="text-gray-400">
+                  Created: {new Date(app.secretTimestamp as number).toString()}
+                </Text>
+                <div className="text-right">
+                  <Text
+                    type="span"
+                    size="xs"
+                    weight="medium"
+                    className="text-indigo-500 cursor-pointer"
+                    onClick={() => setClientSecretRollModalOpen(true)}
+                  >
+                    Roll keys
+                  </Text>
+                </div>
+              </div>
+            }
+          >
+            <div className="flex flex-col space-y-4">
+              <ReadOnlyInput
+                id="oAuthAppId"
+                label="Client ID"
+                value={app.clientId!}
+                copyable
+                onCopy={() =>
+                  toast(
+                    ToastType.Success,
+                    { message: 'Client ID copied to clipboard!' },
+                    { duration: 2000 }
+                  )
+                }
+              />
+
+              <ReadOnlyInput
+                id="oAuthAppSecret"
+                label="Client Secret"
+                value={rotatedClientSecret ?? 's3cr3t-l337-h4x0r5'}
+                hidden={rotatedClientSecret ? false : true}
+                copyable={rotatedClientSecret ? true : false}
+                onCopy={() =>
+                  toast(
+                    ToastType.Success,
+                    { message: 'Client secret copied to clipboard!' },
+                    { duration: 2000 }
+                  )
+                }
+              />
+            </div>
+          </Panel>
+
+          <Panel title="Smart Contracts">
+            <div className="flex justify-center p-8">
+              <Button btnType="secondary-alt" btnSize="xxl" disabled>
+                Connect Smart Contract
+              </Button>
+            </div>
+          </Panel>
+        </div>
+        <div className="flex-1">
+          <div className="flex h-full flex-col">
+            <Text className="text-gray-600 py-3" weight="medium" size="lg">
+              Users
+            </Text>
+            <Suspense
+              fallback={
+                <div
+                  className="flex bg-white justify-center items-center h-full
+            rounded-lg border shadow"
+                >
+                  <Spinner />
+                </div>
+              }
+            >
+              <Await resolve={edgesResult} errorElement={<NestedErrorPage />}>
+                {(edgesResult) => {
+                  return (
+                    <LoginsPanel
+                      authorizedProfiles={
+                        edgesResult.accounts.slice(
+                          0,
+                          NUMBER_OF_DISPLAYED_USERS
+                        ) || []
+                      }
+                      appId={app.clientId!}
+                    />
+                  )
+                }}
+              </Await>
+              )
+            </Suspense>
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
