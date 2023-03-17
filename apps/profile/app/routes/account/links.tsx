@@ -124,6 +124,8 @@ export const action: ActionFunction = async ({ request, context }) => {
   // Schema Validation
   const zodValidation = LinksSchema.safeParse(updatedLinks)
 
+  console.log({ links: JSON.stringify(zodValidation) })
+
   if (!zodValidation.success) {
     return {
       errors: zodValidation.error.issues[0].message,

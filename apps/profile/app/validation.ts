@@ -78,7 +78,7 @@ export const LinkSchema = z.object({
   name: z.string().optional(),
   provider: z.string().optional(),
   url: z.string().optional(),
-  verified: z.boolean(),
+  verified: z.boolean().default(false),
 })
 
 //optional because could be changed to empty
