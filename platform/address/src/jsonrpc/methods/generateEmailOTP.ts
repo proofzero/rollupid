@@ -1,5 +1,6 @@
 import generateRandomString from '@kubelt/utils/generateRandomString'
 import { z } from 'zod'
+import { EMAIL_VERIFICATION_OPTIONS } from '../../constants'
 import { Context } from '../../context'
 import { AddressNode } from '../../nodes'
 import EmailAddress from '../../nodes/email'
@@ -22,7 +23,7 @@ export const generateEmailOTPMethod = async ({
   const { address } = input
   const emailAddressNode = new EmailAddress(ctx.address as AddressNode)
 
-  const state = generateRandomString(12)
+  const state = generateRandomString(EMAIL_VERIFICATION_OPTIONS.stateLength)
   const code = await emailAddressNode.generateVerificationCode(state)
   await ctx.emailClient.sendEmailNotification.mutate({
     emailAddress: address,

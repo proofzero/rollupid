@@ -40,7 +40,7 @@ export default class EmailAddress {
     }
 
     const creationTimestamp = Date.now()
-    const code = generateRandomString(8)
+    const code = generateRandomString(EMAIL_VERIFICATION_OPTIONS.codeLength)
     verificationCodes[code] = {
       state,
       creationTimestamp,
