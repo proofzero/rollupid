@@ -6000,6 +6000,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@proofzero/errors@workspace:*, @proofzero/errors@workspace:packages/errors":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/errors@workspace:packages/errors"
+  dependencies:
+    "@typescript-eslint/eslint-plugin": 5.45.0
+    "@typescript-eslint/parser": 5.45.0
+    eslint: 8.29.0
+    eslint-config-prettier: 8.5.0
+    npm-run-all: 4.1.5
+    prettier: 2.8.0
+    typescript: 4.8.4
+  languageName: unknown
+  linkType: soft
+
 "@proofzero/galaxy-client@workspace:packages/galaxy-client":
   version: 0.0.0-use.local
   resolution: "@proofzero/galaxy-client@workspace:packages/galaxy-client"
@@ -6383,6 +6397,7 @@ __metadata:
   resolution: "@proofzero/utils@workspace:packages/utils"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
+    "@proofzero/errors": "workspace:*"
     "@proofzero/platform.account": "workspace:*"
     "@proofzero/platform.address": "workspace:*"
     "@types/node": 18.15.3
@@ -6394,6 +6409,7 @@ __metadata:
     prettier: 2.7.1
     typescript: 4.8.4
   peerDependencies:
+    "@remix-run/cloudflare": "*"
     jose: "*"
   languageName: unknown
   linkType: soft

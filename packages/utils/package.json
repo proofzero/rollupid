@@ -33,6 +33,10 @@
     "typescript": "4.8.4"
   },
   "peerDependencies": {
+    "@remix-run/cloudflare": "*",
     "jose": "*"
+  },
+  "dependencies": {
+    "@proofzero/errors": "workspace:*"
   }
 }
