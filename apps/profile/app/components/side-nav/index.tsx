@@ -4,7 +4,8 @@ import { BiLink } from 'react-icons/bi'
 import { AiOutlineUser } from 'react-icons/ai'
 import { RiCollageLine } from 'react-icons/ri'
 import { IoMdExit } from 'react-icons/io'
-import { HiOutlineExternalLink } from 'react-icons/hi'
+import { HiOutlineExternalLink, HiOutlineHome } from 'react-icons/hi'
+import { TbPlugConnected, TbApps } from 'react-icons/tb'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 import { Text } from '@kubelt/design-system'
@@ -14,6 +15,14 @@ import { Popover } from '@headlessui/react'
 import { SideNavItem } from './item'
 
 const subNavigation = {
+  general: [
+    {
+      name: 'Home',
+      href: '/account/dashboard',
+      icon: HiOutlineHome,
+      exists: true,
+    },
+  ],
   publicProfiles: [
     {
       name: 'User Settings',
@@ -34,6 +43,20 @@ const subNavigation = {
       exists: true,
     },
   ],
+  connections: [
+    {
+      name: 'Accounts',
+      href: '/account/connections',
+      icon: TbPlugConnected,
+      exists: true,
+    },
+    {
+      name: 'Applications',
+      href: '/account/applications',
+      icon: TbApps,
+      exists: true,
+    },
+  ],
 }
 
 export const DesktopSideNav = ({
@@ -44,7 +67,10 @@ export const DesktopSideNav = ({
   accountURN: string
 }) => {
   return (
-    <aside className="fixed bottom-0 z-50 w-full lg:relative lg:col-start-1 lg:col-end-3 bg-gray-50">
+    <aside
+      className="fixed bottom-0 z-50 w-full lg:relative 
+      lg:col-start-1 lg:col-end-3 bg-gray-50"
+    >
       <nav
         className="flex flex-row justify-center items-center lg:flex-none 
       hidden lg:block space-y-1"
@@ -80,13 +106,16 @@ export const MobileSideNav = ({
       className="flex-none justify-center items-center 
        block relative h-full"
     >
-      <div className="hidden h-[80px] sm:max-lg:flex w-full items-center justify-end">
+      <div
+        className="hidden h-[80px] sm:max-lg:flex w-full 
+      items-center justify-end"
+      >
         <Popover.Button
           ref={ref}
           className="bg-gray-50 inline-flex items-center justify-center mr-2
                    text-gray-500 hover:text-gray-400 focus:outline-none p-2
-                   focus:ring-2 focus:ring-gray-800 focus:ring-offset-2 focus:ring-offset-gray-800
-                   rounded-lg"
+                   focus:ring-2 focus:ring-gray-800 focus:ring-offset-2 
+                   focus:ring-offset-gray-800 rounded-lg"
         >
           <span className="sr-only">Open main menu</span>
           {open ? (
@@ -164,7 +193,19 @@ export const SideNavBarebone = ({
           </Link>
         </div>
       </div>
+      {subNavigation.general.map((item) => (
+        <SideNavItem key={item.name} item={item} />
+      ))}
+      <Text size="xs" className="ml-3 pt-5 pb-1 text-gray-500">
+        PUBLIC PROFILES
+      </Text>
       {subNavigation.publicProfiles.map((item) => (
+        <SideNavItem key={item.name} item={item} />
+      ))}
+      <Text size="xs" className="ml-3 pt-5 pb-1 text-gray-500">
+        CONNECTIONS
+      </Text>
+      {subNavigation.connections.map((item) => (
         <SideNavItem key={item.name} item={item} />
       ))}
     </div>
