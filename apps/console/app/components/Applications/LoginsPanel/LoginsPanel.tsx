@@ -152,7 +152,7 @@ export const LoginsPanel = ({
       ) : (
         <div
           className="h-full flex flex-col 
-        px-6 justify-center items-center pb-3"
+        px-6 justify-center items-center py-3"
         >
           {noLoginsSvg}
 
