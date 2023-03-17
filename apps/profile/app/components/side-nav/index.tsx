@@ -8,7 +8,7 @@ import { HiOutlineExternalLink, HiOutlineHome } from 'react-icons/hi'
 import { TbPlugConnected, TbApps } from 'react-icons/tb'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
-import { Text } from '@kubelt/design-system'
+import { Text } from '@proofzero/design-system'
 
 import { Popover } from '@headlessui/react'
 

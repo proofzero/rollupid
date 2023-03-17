@@ -356,62 +356,64 @@ export default function AccountSettingsLinks() {
         action="/account/connections/order"
         className="w-screen -mx-4 sm:w-full sm:mx-0"
       >
-        <SortableList
-          items={connectedLinks.map((l: any) => ({
-            key: `${l.addressURN}`,
-            val: l,
-            disabled: true,
-          }))}
-          itemRenderer={(item) => (
-            <div className={`flex flex-row items-center w-full`}>
-              <img
-                className="w-9 h-9 rounded-full mr-3.5"
-                src={item.val.icon}
-                alt="connected addresses"
-              />
+        <fieldset disabled={true}>
+          <SortableList
+            items={connectedLinks.map((l: any) => ({
+              key: `${l.addressURN}`,
+              val: l,
+              disabled: true,
+            }))}
+            itemRenderer={(item) => (
+              <div className={`flex flex-row items-center w-full`}>
+                <img
+                  className="w-9 h-9 rounded-full mr-3.5"
+                  src={item.val.icon}
+                  alt="connected addresses"
+                />
 
-              <div className="flex flex-col space-y-1.5 flex-1 break-all">
-                <Text size="sm" weight="medium" className="text-gray-700">
-                  {item.val.title}
-                </Text>
-                <Text size="xs" weight="normal" className="text-gray-500">
-                  {item.val.address}
-                </Text>
+                <div className="flex flex-col space-y-1.5 flex-1 break-all">
+                  <Text size="sm" weight="medium" className="text-gray-700">
+                    {item.val.title}
+                  </Text>
+                  <Text size="xs" weight="normal" className="text-gray-500">
+                    {item.val.address}
+                  </Text>
+                </div>
+
+                <InputToggle
+                  id={`enable_${item.val.addressURN}`}
+                  label={''}
+                  checked={item.val.public}
+                  disabled={true}
+                  onToggle={(val) => {
+                    const index = connectedLinks.findIndex(
+                      (pl: any) => pl.addressURN === item.val.addressURN
+                    )
+
+                    // This just updates
+                    // toggled connected link
+                    // `public` property
+                    // which is used in action
+                    // to persist or not
+                    setConnectedLinks([
+                      ...connectedLinks.slice(0, index),
+                      {
+                        ...connectedLinks[index],
+                        public: val,
+                      },
+                      ...connectedLinks.slice(index + 1),
+                    ])
+                    setIsConnectionsChanged(true)
+                  }}
+                />
               </div>
-
-              <InputToggle
-                id={`enable_${item.val.addressURN}`}
-                label={''}
-                checked={item.val.public}
-                disabled={true}
-                onToggle={(val) => {
-                  const index = connectedLinks.findIndex(
-                    (pl: any) => pl.addressURN === item.val.addressURN
-                  )
-
-                  // This just updates
-                  // toggled connected link
-                  // `public` property
-                  // which is used in action
-                  // to persist or not
-                  setConnectedLinks([
-                    ...connectedLinks.slice(0, index),
-                    {
-                      ...connectedLinks[index],
-                      public: val,
-                    },
-                    ...connectedLinks.slice(index + 1),
-                  ])
-                  setIsConnectionsChanged(true)
-                }}
-              />
-            </div>
-          )}
-          onItemsReordered={(items) => {
-            setConnectedLinks(items.map((i) => i.val))
-            setIsConnectionsChanged(true)
-          }}
-        />
+            )}
+            onItemsReordered={(items) => {
+              setConnectedLinks(items.map((i) => i.val))
+              setIsConnectionsChanged(true)
+            }}
+          />
+        </fieldset>
       </fetcher.Form>
 
       <Text

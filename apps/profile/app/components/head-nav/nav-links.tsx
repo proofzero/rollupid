@@ -1,6 +1,6 @@
 import { useSubmit } from '@remix-run/react'
 
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { FiExternalLink } from 'react-icons/fi'
 import { IoMdExit } from 'react-icons/io'
 import { IoIosCheckmark } from 'react-icons/io'

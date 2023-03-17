@@ -2,7 +2,7 @@ import { NavLink } from '@remix-run/react'
 
 import classNames from 'classnames'
 
-import { Text } from '@kubelt/design-system'
+import { Text } from '@proofzero/design-system'
 
 type SideNavItemProps = {
   item: {

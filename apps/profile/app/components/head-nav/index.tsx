@@ -14,7 +14,7 @@ import defaultAvatar from '~/assets/circle_gradient.png'
 import { UserNavigation } from '~/components/head-nav/nav-links'
 
 import styles from './headNav.css'
-import { gatewayFromIpfs } from '@kubelt/utils'
+import { gatewayFromIpfs } from '@proofzero/utils'
 import { MobileSideNav } from '../side-nav'
 
 export const links = () => [{ rel: 'stylesheet', href: styles }]
