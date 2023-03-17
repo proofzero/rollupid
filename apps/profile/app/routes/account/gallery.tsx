@@ -356,8 +356,17 @@ const Gallery = () => {
                         h-[47px] w-[47px] items-center justify-center bg-black
                         hidden group-hover:flex hover:opacity-100 transition-opacity"
                           onClick={() => {
-                            setCuratedNfts(
-                              curatedNfts.filter((nft, j: number) => j !== i)
+                            const updatedCuratedNfts = curatedNfts.filter(
+                              (nft, j: number) => j !== i
+                            )
+                            setCuratedNfts(updatedCuratedNfts)
+                            setCuratedNftsSet(
+                              new Set(
+                                updatedCuratedNfts.map(
+                                  (nft: any) =>
+                                    nft.contract.address + nft.tokenId
+                                )
+                              )
                             )
                           }}
                         >

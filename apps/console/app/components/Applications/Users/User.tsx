@@ -26,8 +26,13 @@ md:flex-row md:items-center
 text-ellipsis md:space-x-4"
       >
         <img
-          src={imageURL || missingImage}
-          alt="account pfp"
+          src={imageURL}
+          alt="pfp"
+          onError={({ currentTarget }) => {
+            currentTarget.onerror = null
+            currentTarget.src = missingImage
+            currentTarget.style.filter = 'brightness(88%)'
+          }}
           className="max-h-[24px] max-w-[24px] rounded-full"
         />
         <Text size="sm" weight="medium" className="text-gray-500 flex-1">

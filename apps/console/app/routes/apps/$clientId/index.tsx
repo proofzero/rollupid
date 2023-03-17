@@ -288,9 +288,9 @@ export default function AppDetailIndexPage() {
         </div>
         <div className="flex-1">
           <div className="flex h-full flex-col">
-            <Text className="text-gray-600 py-3" weight="medium" size="lg">
+            <Text className="text-gray-900 py-3 px-6" weight="medium" size="lg">
               Users
-            </Text>
+            </Text>{' '}
             <Suspense
               fallback={
                 <div
@@ -316,7 +316,6 @@ export default function AppDetailIndexPage() {
                   )
                 }}
               </Await>
-              )
             </Suspense>
           </div>
         </div>

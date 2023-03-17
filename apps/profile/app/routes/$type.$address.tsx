@@ -59,25 +59,25 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   if (!type) throw new Error('No provider specified in URL')
 
   // redirect from any addressURN to its addressURNs
+  let accountURN: AccountURN
   if (type !== 'p') {
     try {
       const { accountFromAlias } = await galaxyClient.getAccountUrnFromAlias({
         provider: type,
         alias: address,
       })
-      const accountURN = accountFromAlias
 
-      if (!accountURN) {
+      if (!accountFromAlias) {
         throw json({ message: 'Not Found' }, { status: 404 })
       }
 
-      return redirect(`/p/${AccountURNSpace.decode(accountURN)}`)
+      accountURN = accountFromAlias
     } catch (ex) {
       throw json({ message: ex }, { status: 500 })
     }
+  } else {
+    accountURN = AccountURNSpace.urn(address) as AccountURN
   }
-
-  const accountURN = AccountURNSpace.urn(address) as AccountURN
 
   // if not handle is this let's assume this is an idref
   let profile, jwt
