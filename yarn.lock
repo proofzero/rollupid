@@ -4794,696 +4794,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@kubelt/alchemy-client@workspace:packages/alchemy-client":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/alchemy-client@workspace:packages/alchemy-client"
-  dependencies:
-    eslint: 8.28.0
-    eslint-plugin-tsdoc: 0.2.17
-    prettier: 2.7.1
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/apps.console@workspace:apps/console":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/apps.console@workspace:apps/console"
-  dependencies:
-    "@babel/core": 7.20.2
-    "@cloudflare/workers-types": 4.20221111.1
-    "@headlessui/react": 1.7.5
-    "@heroicons/react": 2.0.13
-    "@kubelt/design-system": "workspace:*"
-    "@kubelt/platform-clients": "workspace:*"
-    "@kubelt/utils": "workspace:*"
-    "@mdx-js/react": 2.1.5
-    "@remix-run/cloudflare": 1.14.0
-    "@remix-run/cloudflare-workers": 1.14.0
-    "@remix-run/dev": 1.14.0
-    "@remix-run/eslint-config": 1.14.0
-    "@remix-run/react": 1.14.0
-    "@storybook/addon-actions": 6.5.15
-    "@storybook/addon-docs": 6.5.15
-    "@storybook/addon-essentials": 6.5.15
-    "@storybook/addon-interactions": 6.5.15
-    "@storybook/addon-links": 6.5.15
-    "@storybook/builder-webpack5": 6.5.15
-    "@storybook/manager-webpack5": 6.5.15
-    "@storybook/react": 6.5.15
-    "@storybook/testing-library": 0.0.13
-    "@tailwindcss/forms": 0.5.3
-    "@types/react": 18.0.27
-    "@types/react-dom": 18.0.10
-    babel-loader: 9.1.0
-    bcryptjs: 2.4.3
-    chromatic: 6.13.1
-    cross-env: 7.0.3
-    env-cmd: 10.1.0
-    eslint: 8.28.0
-    ethers: 5.7.2
-    flowbite-react: 0.3.5
-    lodash: 4.17.21
-    npm-run-all: 4.1.5
-    react: 18.2.0
-    react-dom: 18.2.0
-    react-icons: 4.7.1
-    tailwindcss: 3.2.4
-    tiny-invariant: 1.3.1
-    typescript: 4.8.4
-    wagmi: 0.10.8
-    wrangler: 2.12.2
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/apps.passport@workspace:apps/passport":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/apps.passport@workspace:apps/passport"
-  dependencies:
-    "@babel/core": ^7.20.2
-    "@cloudflare/workers-types": 4.20221111.1
-    "@ethersproject/keccak256": 5.7.0
-    "@kubelt/design-system": "*"
-    "@kubelt/platform-clients": "workspace:*"
-    "@kubelt/platform.access": "workspace:*"
-    "@kubelt/utils": "workspace:*"
-    "@mdx-js/react": ^1.6.22
-    "@playwright/test": 1.25.2
-    "@remix-run/cloudflare": 1.14.0
-    "@remix-run/cloudflare-workers": 1.14.0
-    "@remix-run/dev": 1.14.0
-    "@remix-run/eslint-config": 1.14.0
-    "@remix-run/react": 1.14.0
-    "@remix-run/serve": 1.14.0
-    "@storybook/addon-actions": 6.5.16
-    "@storybook/addon-docs": 6.5.16
-    "@storybook/addon-essentials": 6.5.16
-    "@storybook/addon-interactions": 6.5.16
-    "@storybook/addon-links": 6.5.16
-    "@storybook/builder-webpack5": 6.5.13
-    "@storybook/manager-webpack5": 6.5.13
-    "@storybook/react": 6.5.16
-    "@storybook/testing-library": 0.0.13
-    "@tailwindcss/forms": 0.5.3
-    "@types/node": 18.11.9
-    "@types/puppeteer": 5.4.6
-    "@types/react": 18.0.27
-    "@types/react-dom": 18.0.10
-    "@typescript-eslint/eslint-plugin": 5.42.1
-    "@typescript-eslint/parser": 5.42.1
-    autoprefixer: 10.4.8
-    babel-loader: ^8.3.0
-    babel-plugin-named-exports-order: 0.0.2
-    chromatic: 6.11.4
-    concurrently: 7.3.0
-    connectkit: 1.2.0
-    cross-env: 7.0.3
-    css-loader: 6.7.1
-    env-cmd: 10.1.0
-    eslint: 8.28.0
-    eslint-config-airbnb-typescript: 17.0.0
-    eslint-config-prettier: 8.5.0
-    eslint-config-standard: 17.0.0
-    eslint-plugin-import: 2.26.0
-    eslint-plugin-jest: 27.1.5
-    eslint-plugin-node: 11.1.0
-    eslint-plugin-prettier: 4.2.1
-    eslint-plugin-promise: 6.1.1
-    eslint-plugin-react: 7.31.10
-    eslint-plugin-standard: 5.0.0
-    eslint-plugin-storybook: 0.6.7
-    flowbite: 1.5.4
-    graphql-request: 5.0.0
-    jose: 4.11.0
-    npm-run-all: 4.1.5
-    postcss: 8.4.19
-    prettier: 2.7.1
-    prop-types: 15.8.1
-    react: 18.2.0
-    react-dom: 18.2.0
-    react-icons: 4.7.1
-    remix-auth: 3.4.0
-    remix-auth-discord: 1.2.1
-    remix-auth-github: 1.3.0
-    remix-auth-google: 1.2.0
-    remix-auth-microsoft: 2.0.0
-    remix-auth-oauth2: 1.5.0
-    remix-auth-twitter: 0.1.1
-    sass: 1.54.7
-    sass-loader: 13.2.0
-    storybook-addon-sass-postcss: 0.1.3
-    style-loader: 3.3.1
-    tailwindcss: 3.1.8
-    typescript: 4.7.4
-    wagmi: 0.11.7
-    webpack: 5.75.0
-    wrangler: 2.12.2
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/apps.profile@workspace:apps/profile":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/apps.profile@workspace:apps/profile"
-  dependencies:
-    "@babel/core": 7.20.2
-    "@cloudflare/workers-types": 4.20221111.1
-    "@headlessui/react": 1.7.4
-    "@heroicons/react": 2.0.13
-    "@kubelt/design-system": "*"
-    "@kubelt/platform-clients": "workspace:*"
-    "@kubelt/urns": "workspace:*"
-    "@kubelt/utils": "workspace:*"
-    "@mdx-js/react": 2.1.5
-    "@playwright/test": 1.28.1
-    "@remix-run/cloudflare": 1.14.0
-    "@remix-run/cloudflare-workers": 1.14.0
-    "@remix-run/dev": 1.14.0
-    "@remix-run/eslint-config": 1.14.0
-    "@remix-run/react": 1.14.0
-    "@remix-run/serve": 1.14.0
-    "@storybook/addon-a11y": 6.5.16
-    "@storybook/addon-actions": 6.5.16
-    "@storybook/addon-docs": 6.5.16
-    "@storybook/addon-essentials": 6.5.16
-    "@storybook/addon-interactions": 6.5.16
-    "@storybook/addon-links": 6.5.16
-    "@storybook/builder-webpack4": 6.5.16
-    "@storybook/builder-webpack5": 6.5.13
-    "@storybook/manager-webpack4": 6.5.16
-    "@storybook/manager-webpack5": 6.5.13
-    "@storybook/react": 6.5.13
-    "@storybook/testing-library": 0.0.13
-    "@tailwindcss/forms": 0.5.3
-    "@tanstack/react-query": 4.16.1
-    "@trpc/client": 10.8.1
-    "@types/node": 18.11.9
-    "@types/puppeteer": 5.4.7
-    "@types/react": 18.0.27
-    "@types/react-dom": 18.0.10
-    "@typescript-eslint/eslint-plugin": 5.44.0
-    "@typescript-eslint/parser": 5.44.0
-    autoprefixer: 10.4.13
-    babel-loader: 9.1.0
-    babel-plugin-named-exports-order: 0.0.2
-    chromatic: 6.13.1
-    classnames: 2.3.2
-    concurrently: 7.6.0
-    cross-env: 7.0.3
-    css-loader: 6.7.2
-    env-cmd: 10.1.0
-    eslint: 8.28.0
-    eslint-config-airbnb-typescript: 17.0.0
-    eslint-config-prettier: 8.5.0
-    eslint-config-standard: 17.0.0
-    eslint-plugin-import: 2.26.0
-    eslint-plugin-jest: 27.1.6
-    eslint-plugin-node: 11.1.0
-    eslint-plugin-prettier: 4.2.1
-    eslint-plugin-promise: 6.1.1
-    eslint-plugin-react: 7.31.11
-    eslint-plugin-standard: 5.0.0
-    ethers: 5.7.2
-    flowbite: 1.5.4
-    flowbite-react: 0.3.5
-    graphql: 16.6.0
-    graphql-request: 5.0.0
-    graphql-tag: 2.12.6
-    history: 5.3.0
-    npm-run-all: 4.1.5
-    postcss: 8.4.19
-    prettier: 2.8.0
-    prop-types: 15.8.1
-    qs: 6.11.0
-    react: 18.2.0
-    react-dom: 18.2.0
-    react-icons: 4.7.1
-    react-infinite-scroll-component: 6.1.0
-    react-masonry-css: 1.0.16
-    react-router-dom: 6.4.3
-    remix-auth: 3.4.0
-    remix-auth-oauth2: 1.5.0
-    sass: 1.56.1
-    sass-loader: 13.2.0
-    storybook-addon-sass-postcss: 0.1.3
-    style-loader: 3.3.1
-    tailwindcss: 3.2.4
-    tw-elements: 1.0.0-alpha12
-    typescript: 4.9.3
-    urns: 0.6.0
-    wagmi: 0.10.8
-    webpack: 5.75.0
-    wrangler: 2.12.2
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/apps@workspace:apps":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/apps@workspace:apps"
-  dependencies:
-    "@playwright/test": ^1.27.1
-    graphql: 16.6.0
-    npm-run-all: 4.1.5
-    typescript: 4.8.4
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/design-system@*, @kubelt/design-system@workspace:*, @kubelt/design-system@workspace:packages/design-system":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/design-system@workspace:packages/design-system"
-  dependencies:
-    "@babel/cli": 7.19.3
-    "@headlessui/react": 1.7.5
-    "@mdx-js/react": 1.6.22
-    "@storybook/addon-actions": 6.5.13
-    "@storybook/addon-docs": 6.5.13
-    "@storybook/addon-essentials": 6.5.13
-    "@storybook/addon-interactions": 6.5.13
-    "@storybook/addon-links": 6.5.13
-    "@storybook/addon-postcss": 2.0.0
-    "@storybook/builder-webpack5": 6.5.13
-    "@storybook/manager-webpack5": 6.5.13
-    "@storybook/node-logger": 6.5.13
-    "@storybook/preset-create-react-app": 4.1.2
-    "@storybook/preset-scss": 1.0.3
-    "@storybook/preset-typescript": 3.0.0
-    "@storybook/react": 6.5.13
-    "@storybook/testing-library": 0.0.13
-    "@tailwindcss/forms": 0.5.3
-    "@typescript-eslint/eslint-plugin": 5.42.1
-    "@typescript-eslint/parser": 5.42.1
-    autoprefixer: latest
-    chromatic: 6.11.4
-    cra-template-typescript: 1.2.0
-    cross-env: 7.0.3
-    css-loader: 6.7.1
-    eslint: 8.28.0
-    eslint-config-airbnb-typescript: 17.0.0
-    eslint-config-prettier: 8.5.0
-    eslint-config-standard: 17.0.0
-    eslint-plugin-import: 2.26.0
-    eslint-plugin-jest: 27.1.5
-    eslint-plugin-node: 11.1.0
-    eslint-plugin-prettier: 4.2.1
-    eslint-plugin-promise: 6.1.1
-    eslint-plugin-react: 7.31.10
-    eslint-plugin-standard: 5.0.0
-    microbundle: 0.15.1
-    npm-run-all: 4.1.5
-    postcss: latest
-    prettier: 2.7.1
-    prop-types: 15.8.1
-    react: 18.2.0
-    react-dom: 18.2.0
-    react-hot-toast: 2.4.0
-    react-icons: 4.7.1
-    react-json-pretty: 2.2.0
-    react-scripts: 5.0.1
-    sass-loader: 13.2.0
-    storybook-addon-sass-postcss: 0.1.3
-    storybook-css-modules-preset: 1.1.1
-    style-loader: 3.3.1
-    styled-components: 5.3.6
-    tailwindcss: latest
-    webpack: 5.75.0
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/galaxy-client@workspace:packages/galaxy-client":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/galaxy-client@workspace:packages/galaxy-client"
-  dependencies:
-    "@graphql-codegen/cli": 2.16.3
-    "@graphql-codegen/client-preset": 1.1.1
-    "@graphql-codegen/typescript-graphql-request": 4.5.7
-    "@graphql-codegen/typescript-resolvers": 2.7.5
-    npm-run-all: 4.1.5
-    prettier: 2.8.0
-    typescript: 4.8.4
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/packages@workspace:packages":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/packages@workspace:packages"
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/platform-clients@workspace:*, @kubelt/platform-clients@workspace:packages/platform-clients":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/platform-clients@workspace:packages/platform-clients"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@kubelt/platform.access": "workspace:*"
-    "@kubelt/platform.address": "workspace:*"
-    "@kubelt/platform.object": "workspace:*"
-    "@kubelt/platform.starbase": "workspace:*"
-    "@kubelt/urns": "workspace:*"
-    "@trpc/client": 10.8.1
-    "@typescript-eslint/eslint-plugin": 5.45.0
-    "@typescript-eslint/parser": 5.45.0
-    eslint: 8.29.0
-    eslint-config-prettier: 8.5.0
-    npm-run-all: 4.1.5
-    prettier: 2.8.0
-    typescript: 4.8.4
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/platform-middleware@workspace:*, @kubelt/platform-middleware@workspace:packages/platform-middleware":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/platform-middleware@workspace:packages/platform-middleware"
-  dependencies:
-    "@kubelt/types": "workspace:*"
-    "@kubelt/urns": "workspace:*"
-    "@trpc/server": 10.8.1
-    "@typescript-eslint/eslint-plugin": 5.45.0
-    "@typescript-eslint/parser": 5.45.0
-    eslint: 8.29.0
-    eslint-config-prettier: 8.5.0
-    jose: 4.11.1
-    npm-run-all: 4.1.5
-    prettier: 2.8.0
-    typed-json-rpc: 1.1.0
-    typescript: 4.8.4
-    zod: 3.20.2
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/platform.access@workspace:*, @kubelt/platform.access@workspace:platform/access":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/platform.access@workspace:platform/access"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@ethersproject/bytes": 5.7.0
-    "@ethersproject/random": 5.7.0
-    "@kubelt/platform-clients": "workspace:*"
-    "@kubelt/platform-middleware": "workspace:*"
-    "@kubelt/types": "workspace:*"
-    "@kubelt/urns": "workspace:*"
-    "@trpc/server": 10.8.1
-    "@types/async": 3.2.16
-    "@types/node": 18.11.9
-    "@typescript-eslint/eslint-plugin": 5.42.1
-    "@typescript-eslint/parser": 5.42.1
-    async: 3.2.4
-    do-proxy: 1.3.3
-    env-cmd: 10.1.0
-    eslint: 8.28.0
-    eslint-config-prettier: 8.5.0
-    jose: 4.11.0
-    npm-run-all: 4.1.5
-    prettier: 2.7.1
-    typescript: 4.8.4
-    wrangler: 2.12.2
-    zod: 3.20.2
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/platform.account@workspace:*, @kubelt/platform.account@workspace:platform/account":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/platform.account@workspace:platform/account"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@ethersproject/address": 5.7.0
-    "@kubelt/platform-middleware": "workspace:*"
-    "@kubelt/platform.access": "workspace:*"
-    "@kubelt/types": "workspace:*"
-    "@trpc/server": 10.8.1
-    "@types/node": 18.11.9
-    "@typescript-eslint/eslint-plugin": 5.42.1
-    "@typescript-eslint/parser": 5.42.1
-    do-proxy: 1.3.3
-    env-cmd: 10.1.0
-    eslint: 8.28.0
-    eslint-config-prettier: 8.5.0
-    npm-run-all: 4.1.5
-    prettier: 2.7.1
-    ts-set-utils: 0.2.0
-    typed-json-rpc: 1.1.0
-    typescript: 4.8.4
-    urns: 0.6.0
-    wrangler: 2.12.2
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/platform.address@workspace:*, @kubelt/platform.address@workspace:platform/address":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/platform.address@workspace:platform/address"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@ethersproject/address": 5.7.0
-    "@ethersproject/bytes": 5.7.0
-    "@ethersproject/keccak256": 5.7.0
-    "@ethersproject/random": 5.7.0
-    "@ethersproject/signing-key": 5.7.0
-    "@ethersproject/transactions": 5.7.0
-    "@ethersproject/wallet": 5.7.0
-    "@kubelt/platform-clients": "workspace:*"
-    "@kubelt/types": "workspace:*"
-    "@kubelt/urns": "workspace:*"
-    "@trpc/server": 10.8.1
-    "@typescript-eslint/eslint-plugin": 5.42.1
-    "@typescript-eslint/parser": 5.42.1
-    do-proxy: 1.3.3
-    env-cmd: 10.1.0
-    eslint: 8.28.0
-    eslint-config-prettier: 8.5.0
-    jose: 4.11.0
-    npm-run-all: 4.1.5
-    prettier: 2.7.1
-    remix-auth-google: 1.2.0
-    typescript: 4.8.4
-    wrangler: 2.12.2
-    zod: 3.20.2
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/platform.edges@workspace:platform/edges":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/platform.edges@workspace:platform/edges"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@kubelt/security": "workspace:*"
-    "@kubelt/urns": "workspace:*"
-    "@microsoft/api-extractor": 7.33.6
-    "@trpc/server": 10.8.1
-    "@typescript-eslint/eslint-plugin": 5.42.1
-    "@typescript-eslint/parser": 5.42.1
-    better-sqlite3: 8.0.1
-    cross-env: 7.0.3
-    drizzle-kit: 0.16.1
-    drizzle-orm: 0.16.1
-    drizzle-orm-sqlite: 0.16.1
-    env-cmd: 10.1.0
-    eslint: 8.28.0
-    eslint-config-prettier: 8.5.0
-    prettier: 2.7.1
-    reflect-metadata: 0.1.13
-    sqlite3: 5.1.2
-    tap: 16.3.2
-    typeorm: 0.3.10
-    typescript: 4.8.4
-    urns: 0.6.0
-    wrangler: 2.12.2
-    yarn-run-all: 3.1.1
-    zod: 3.20.2
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/platform.galaxy@workspace:platform/galaxy":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/platform.galaxy@workspace:platform/galaxy"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@ethersproject/providers": 5.7.2
-    "@graphql-tools/merge": 8.3.6
-    "@graphql-tools/resolvers-composition": 6.5.6
-    "@graphql-tools/schema": 9.0.4
-    "@graphql-tools/stitch": 8.7.13
-    "@graphql-yoga/common": 2.12.12
-    concurrently: 7.5.0
-    env-cmd: 10.1.0
-    graphql: 16.6.0
-    graphql-type-json: 0.3.2
-    npm-run-all: 4.1.5
-    typescript: 4.8.4
-    wrangler: 2.12.0
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/platform.object@workspace:*, @kubelt/platform.object@workspace:platform/object":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/platform.object@workspace:platform/object"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@trpc/server": 10.8.1
-    "@typescript-eslint/eslint-plugin": 5.42.1
-    "@typescript-eslint/parser": 5.42.1
-    do-proxy: 1.3.3
-    eslint: 8.28.0
-    eslint-config-prettier: 8.5.0
-    npm-run-all: 4.1.5
-    prettier: 2.7.1
-    typescript: 4.8.4
-    wrangler: 2.12.2
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/platform.ping@workspace:platform/ping":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/platform.ping@workspace:platform/ping"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@trpc/server": 10.8.1
-    "@typescript-eslint/eslint-plugin": 5.42.1
-    "@typescript-eslint/parser": 5.42.1
-    do-proxy: 1.3.3
-    eslint: 8.28.0
-    eslint-config-prettier: 8.5.0
-    npm-run-all: 4.1.5
-    prettier: 2.7.1
-    typed-json-rpc: 1.1.0
-    typescript: 4.8.4
-    wrangler: 2.12.2
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/platform.starbase@workspace:*, @kubelt/platform.starbase@workspace:platform/starbase":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/platform.starbase@workspace:platform/starbase"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@ethersproject/bytes": 5.7.0
-    "@kubelt/security": "workspace:*"
-    "@kubelt/urns": "workspace:*"
-    "@trpc/server": 10.8.1
-    "@types/lodash": 4.14.189
-    cross-env: 7.0.3
-    do-proxy: 1.3.3
-    env-cmd: 10.1.0
-    esbuild: 0.15.15
-    eslint: 8.28.0
-    eslint-config-prettier: 8.5.0
-    eslint-plugin-prettier: 4.2.1
-    eslint-plugin-tsdoc: 0.2.17
-    jose: 4.11.0
-    lodash: 4.17.21
-    multiformats: 10.0.2
-    npm-run-all: 4.1.5
-    prettier: 2.8.0
-    tiny-invariant: 1.3.1
-    ts-set-utils: 0.2.0
-    typescript: 4.8.4
-    wrangler: 2.12.2
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/platform@workspace:platform":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/platform@workspace:platform"
-  dependencies:
-    "@graphql-codegen/cli": 2.16.3
-    "@graphql-codegen/client-preset": 1.1.1
-    "@graphql-codegen/typescript-graphql-request": 4.5.7
-    "@graphql-codegen/typescript-resolvers": 2.7.5
-    "@playwright/test": 1.27.1
-    graphql: 16.6.0
-    npm-run-all: 4.1.5
-    typescript: 4.8.4
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/security@workspace:*, @kubelt/security@workspace:packages/security":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/security@workspace:packages/security"
-  dependencies:
-    "@microsoft/api-extractor": 7.33.6
-    "@types/psl": 1.1.0
-    cross-env: 7.0.3
-    eslint: 8.28.0
-    npm-run-all: 4.1.5
-    prettier: 2.7.1
-    psl: 1.9.0
-    typescript: 4.8.4
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/services.email@workspace:platform/email":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/services.email@workspace:platform/email"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    npm-run-all: 4.1.5
-    typescript: 4.8.4
-    wrangler: 2.12.2
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/services.images@workspace:platform/images":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/services.images@workspace:platform/images"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@ethersproject/keccak256": 5.7.0
-    date-fns: 2.29.3
-    env-cmd: 10.1.0
-    image-data-uri: 2.0.1
-    npm-run-all: 4.1.5
-    svg2png-wasm: 1.3.4
-    tiny-invariant: 1.3.1
-    typescript: 4.8.4
-    wrangler: 2.12.2
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/types@workspace:*, @kubelt/types@workspace:packages/types":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/types@workspace:packages/types"
-  dependencies:
-    "@typescript-eslint/eslint-plugin": 5.45.0
-    "@typescript-eslint/parser": 5.45.0
-    eslint: 8.29.0
-    eslint-config-prettier: 8.5.0
-    jose: 4.11.4
-    npm-run-all: 4.1.5
-    prettier: 2.8.0
-    typescript: 4.8.4
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/urns@workspace:*, @kubelt/urns@workspace:packages/urns":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/urns@workspace:packages/urns"
-  dependencies:
-    "@ethersproject/keccak256": 5.7.0
-    "@typescript-eslint/eslint-plugin": 5.45.0
-    "@typescript-eslint/parser": 5.45.0
-    eslint: 8.29.0
-    eslint-config-prettier: 8.5.0
-    npm-run-all: 4.1.5
-    prettier: 2.8.0
-    typescript: 4.8.4
-    urns: 0.6.0
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/utils@workspace:*, @kubelt/utils@workspace:packages/utils":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/utils@workspace:packages/utils"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@kubelt/platform.account": "workspace:*"
-    "@kubelt/platform.address": "workspace:*"
-    "@typescript-eslint/eslint-plugin": 5.41.0
-    "@typescript-eslint/parser": 5.41.0
-    eslint: 8.28.0
-    eslint-config-prettier: 8.5.0
-    npm-run-all: 4.1.5
-    prettier: 2.7.1
-    typescript: 4.8.4
-  peerDependencies:
-    jose: "*"
-  languageName: unknown
-  linkType: soft
-
 "@ledgerhq/connect-kit-loader@npm:^1.0.1":
   version: 1.0.2
   resolution: "@ledgerhq/connect-kit-loader@npm:1.0.2"
@@ -6375,6 +5685,696 @@ __metadata:
   checksum: 47fb328cec1924559d759b48235c78574f2d71a8a6c4c03edb6de5d7074078371633b91e39bbf3f901b32aa8af9b9d8f82834856d2f5737a23475036b16817f0
   languageName: node
   linkType: hard
+
+"@proofzero/alchemy-client@workspace:packages/alchemy-client":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/alchemy-client@workspace:packages/alchemy-client"
+  dependencies:
+    eslint: 8.28.0
+    eslint-plugin-tsdoc: 0.2.17
+    prettier: 2.7.1
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/apps.console@workspace:apps/console":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/apps.console@workspace:apps/console"
+  dependencies:
+    "@babel/core": 7.20.2
+    "@cloudflare/workers-types": 4.20221111.1
+    "@headlessui/react": 1.7.5
+    "@heroicons/react": 2.0.13
+    "@mdx-js/react": 2.1.5
+    "@proofzero/design-system": "workspace:*"
+    "@proofzero/platform-clients": "workspace:*"
+    "@proofzero/utils": "workspace:*"
+    "@remix-run/cloudflare": 1.14.0
+    "@remix-run/cloudflare-workers": 1.14.0
+    "@remix-run/dev": 1.14.0
+    "@remix-run/eslint-config": 1.14.0
+    "@remix-run/react": 1.14.0
+    "@storybook/addon-actions": 6.5.15
+    "@storybook/addon-docs": 6.5.15
+    "@storybook/addon-essentials": 6.5.15
+    "@storybook/addon-interactions": 6.5.15
+    "@storybook/addon-links": 6.5.15
+    "@storybook/builder-webpack5": 6.5.15
+    "@storybook/manager-webpack5": 6.5.15
+    "@storybook/react": 6.5.15
+    "@storybook/testing-library": 0.0.13
+    "@tailwindcss/forms": 0.5.3
+    "@types/react": 18.0.27
+    "@types/react-dom": 18.0.10
+    babel-loader: 9.1.0
+    bcryptjs: 2.4.3
+    chromatic: 6.13.1
+    cross-env: 7.0.3
+    env-cmd: 10.1.0
+    eslint: 8.28.0
+    ethers: 5.7.2
+    flowbite-react: 0.3.5
+    lodash: 4.17.21
+    npm-run-all: 4.1.5
+    react: 18.2.0
+    react-dom: 18.2.0
+    react-icons: 4.7.1
+    tailwindcss: 3.2.4
+    tiny-invariant: 1.3.1
+    typescript: 4.8.4
+    wagmi: 0.10.8
+    wrangler: 2.12.2
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/apps.passport@workspace:apps/passport":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/apps.passport@workspace:apps/passport"
+  dependencies:
+    "@babel/core": ^7.20.2
+    "@cloudflare/workers-types": 4.20221111.1
+    "@ethersproject/keccak256": 5.7.0
+    "@mdx-js/react": ^1.6.22
+    "@playwright/test": 1.25.2
+    "@proofzero/design-system": "*"
+    "@proofzero/platform-clients": "workspace:*"
+    "@proofzero/platform.access": "workspace:*"
+    "@proofzero/utils": "workspace:*"
+    "@remix-run/cloudflare": 1.14.0
+    "@remix-run/cloudflare-workers": 1.14.0
+    "@remix-run/dev": 1.14.0
+    "@remix-run/eslint-config": 1.14.0
+    "@remix-run/react": 1.14.0
+    "@remix-run/serve": 1.14.0
+    "@storybook/addon-actions": 6.5.16
+    "@storybook/addon-docs": 6.5.16
+    "@storybook/addon-essentials": 6.5.16
+    "@storybook/addon-interactions": 6.5.16
+    "@storybook/addon-links": 6.5.16
+    "@storybook/builder-webpack5": 6.5.13
+    "@storybook/manager-webpack5": 6.5.13
+    "@storybook/react": 6.5.16
+    "@storybook/testing-library": 0.0.13
+    "@tailwindcss/forms": 0.5.3
+    "@types/node": 18.11.9
+    "@types/puppeteer": 5.4.6
+    "@types/react": 18.0.27
+    "@types/react-dom": 18.0.10
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
+    autoprefixer: 10.4.8
+    babel-loader: ^8.3.0
+    babel-plugin-named-exports-order: 0.0.2
+    chromatic: 6.11.4
+    concurrently: 7.3.0
+    connectkit: 1.2.0
+    cross-env: 7.0.3
+    css-loader: 6.7.1
+    env-cmd: 10.1.0
+    eslint: 8.28.0
+    eslint-config-airbnb-typescript: 17.0.0
+    eslint-config-prettier: 8.5.0
+    eslint-config-standard: 17.0.0
+    eslint-plugin-import: 2.26.0
+    eslint-plugin-jest: 27.1.5
+    eslint-plugin-node: 11.1.0
+    eslint-plugin-prettier: 4.2.1
+    eslint-plugin-promise: 6.1.1
+    eslint-plugin-react: 7.31.10
+    eslint-plugin-standard: 5.0.0
+    eslint-plugin-storybook: 0.6.7
+    flowbite: 1.5.4
+    graphql-request: 5.0.0
+    jose: 4.11.0
+    npm-run-all: 4.1.5
+    postcss: 8.4.19
+    prettier: 2.7.1
+    prop-types: 15.8.1
+    react: 18.2.0
+    react-dom: 18.2.0
+    react-icons: 4.7.1
+    remix-auth: 3.4.0
+    remix-auth-discord: 1.2.1
+    remix-auth-github: 1.3.0
+    remix-auth-google: 1.2.0
+    remix-auth-microsoft: 2.0.0
+    remix-auth-oauth2: 1.5.0
+    remix-auth-twitter: 0.1.1
+    sass: 1.54.7
+    sass-loader: 13.2.0
+    storybook-addon-sass-postcss: 0.1.3
+    style-loader: 3.3.1
+    tailwindcss: 3.1.8
+    typescript: 4.7.4
+    wagmi: 0.11.7
+    webpack: 5.75.0
+    wrangler: 2.12.2
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/apps.profile@workspace:apps/profile":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/apps.profile@workspace:apps/profile"
+  dependencies:
+    "@babel/core": 7.20.2
+    "@cloudflare/workers-types": 4.20221111.1
+    "@headlessui/react": 1.7.4
+    "@heroicons/react": 2.0.13
+    "@mdx-js/react": 2.1.5
+    "@playwright/test": 1.28.1
+    "@proofzero/design-system": "*"
+    "@proofzero/platform-clients": "workspace:*"
+    "@proofzero/urns": "workspace:*"
+    "@proofzero/utils": "workspace:*"
+    "@remix-run/cloudflare": 1.14.0
+    "@remix-run/cloudflare-workers": 1.14.0
+    "@remix-run/dev": 1.14.0
+    "@remix-run/eslint-config": 1.14.0
+    "@remix-run/react": 1.14.0
+    "@remix-run/serve": 1.14.0
+    "@storybook/addon-a11y": 6.5.16
+    "@storybook/addon-actions": 6.5.16
+    "@storybook/addon-docs": 6.5.16
+    "@storybook/addon-essentials": 6.5.16
+    "@storybook/addon-interactions": 6.5.16
+    "@storybook/addon-links": 6.5.16
+    "@storybook/builder-webpack4": 6.5.16
+    "@storybook/builder-webpack5": 6.5.13
+    "@storybook/manager-webpack4": 6.5.16
+    "@storybook/manager-webpack5": 6.5.13
+    "@storybook/react": 6.5.13
+    "@storybook/testing-library": 0.0.13
+    "@tailwindcss/forms": 0.5.3
+    "@tanstack/react-query": 4.16.1
+    "@trpc/client": 10.8.1
+    "@types/node": 18.11.9
+    "@types/puppeteer": 5.4.7
+    "@types/react": 18.0.27
+    "@types/react-dom": 18.0.10
+    "@typescript-eslint/eslint-plugin": 5.44.0
+    "@typescript-eslint/parser": 5.44.0
+    autoprefixer: 10.4.13
+    babel-loader: 9.1.0
+    babel-plugin-named-exports-order: 0.0.2
+    chromatic: 6.13.1
+    classnames: 2.3.2
+    concurrently: 7.6.0
+    cross-env: 7.0.3
+    css-loader: 6.7.2
+    env-cmd: 10.1.0
+    eslint: 8.28.0
+    eslint-config-airbnb-typescript: 17.0.0
+    eslint-config-prettier: 8.5.0
+    eslint-config-standard: 17.0.0
+    eslint-plugin-import: 2.26.0
+    eslint-plugin-jest: 27.1.6
+    eslint-plugin-node: 11.1.0
+    eslint-plugin-prettier: 4.2.1
+    eslint-plugin-promise: 6.1.1
+    eslint-plugin-react: 7.31.11
+    eslint-plugin-standard: 5.0.0
+    ethers: 5.7.2
+    flowbite: 1.5.4
+    flowbite-react: 0.3.5
+    graphql: 16.6.0
+    graphql-request: 5.0.0
+    graphql-tag: 2.12.6
+    history: 5.3.0
+    npm-run-all: 4.1.5
+    postcss: 8.4.19
+    prettier: 2.8.0
+    prop-types: 15.8.1
+    qs: 6.11.0
+    react: 18.2.0
+    react-dom: 18.2.0
+    react-icons: 4.7.1
+    react-infinite-scroll-component: 6.1.0
+    react-masonry-css: 1.0.16
+    react-router-dom: 6.4.3
+    remix-auth: 3.4.0
+    remix-auth-oauth2: 1.5.0
+    sass: 1.56.1
+    sass-loader: 13.2.0
+    storybook-addon-sass-postcss: 0.1.3
+    style-loader: 3.3.1
+    tailwindcss: 3.2.4
+    tw-elements: 1.0.0-alpha12
+    typescript: 4.9.3
+    urns: 0.6.0
+    wagmi: 0.10.8
+    webpack: 5.75.0
+    wrangler: 2.12.2
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/apps@workspace:apps":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/apps@workspace:apps"
+  dependencies:
+    "@playwright/test": ^1.27.1
+    graphql: 16.6.0
+    npm-run-all: 4.1.5
+    typescript: 4.8.4
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/design-system@*, @proofzero/design-system@workspace:*, @proofzero/design-system@workspace:packages/design-system":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/design-system@workspace:packages/design-system"
+  dependencies:
+    "@babel/cli": 7.19.3
+    "@headlessui/react": 1.7.5
+    "@mdx-js/react": 1.6.22
+    "@storybook/addon-actions": 6.5.13
+    "@storybook/addon-docs": 6.5.13
+    "@storybook/addon-essentials": 6.5.13
+    "@storybook/addon-interactions": 6.5.13
+    "@storybook/addon-links": 6.5.13
+    "@storybook/addon-postcss": 2.0.0
+    "@storybook/builder-webpack5": 6.5.13
+    "@storybook/manager-webpack5": 6.5.13
+    "@storybook/node-logger": 6.5.13
+    "@storybook/preset-create-react-app": 4.1.2
+    "@storybook/preset-scss": 1.0.3
+    "@storybook/preset-typescript": 3.0.0
+    "@storybook/react": 6.5.13
+    "@storybook/testing-library": 0.0.13
+    "@tailwindcss/forms": 0.5.3
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
+    autoprefixer: latest
+    chromatic: 6.11.4
+    cra-template-typescript: 1.2.0
+    cross-env: 7.0.3
+    css-loader: 6.7.1
+    eslint: 8.28.0
+    eslint-config-airbnb-typescript: 17.0.0
+    eslint-config-prettier: 8.5.0
+    eslint-config-standard: 17.0.0
+    eslint-plugin-import: 2.26.0
+    eslint-plugin-jest: 27.1.5
+    eslint-plugin-node: 11.1.0
+    eslint-plugin-prettier: 4.2.1
+    eslint-plugin-promise: 6.1.1
+    eslint-plugin-react: 7.31.10
+    eslint-plugin-standard: 5.0.0
+    microbundle: 0.15.1
+    npm-run-all: 4.1.5
+    postcss: latest
+    prettier: 2.7.1
+    prop-types: 15.8.1
+    react: 18.2.0
+    react-dom: 18.2.0
+    react-hot-toast: 2.4.0
+    react-icons: 4.7.1
+    react-json-pretty: 2.2.0
+    react-scripts: 5.0.1
+    sass-loader: 13.2.0
+    storybook-addon-sass-postcss: 0.1.3
+    storybook-css-modules-preset: 1.1.1
+    style-loader: 3.3.1
+    styled-components: 5.3.6
+    tailwindcss: latest
+    webpack: 5.75.0
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/galaxy-client@workspace:packages/galaxy-client":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/galaxy-client@workspace:packages/galaxy-client"
+  dependencies:
+    "@graphql-codegen/cli": 2.16.3
+    "@graphql-codegen/client-preset": 1.1.1
+    "@graphql-codegen/typescript-graphql-request": 4.5.7
+    "@graphql-codegen/typescript-resolvers": 2.7.5
+    npm-run-all: 4.1.5
+    prettier: 2.8.0
+    typescript: 4.8.4
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/packages@workspace:packages":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/packages@workspace:packages"
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/platform-clients@workspace:*, @proofzero/platform-clients@workspace:packages/platform-clients":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/platform-clients@workspace:packages/platform-clients"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@proofzero/platform.access": "workspace:*"
+    "@proofzero/platform.address": "workspace:*"
+    "@proofzero/platform.object": "workspace:*"
+    "@proofzero/platform.starbase": "workspace:*"
+    "@proofzero/urns": "workspace:*"
+    "@trpc/client": 10.8.1
+    "@typescript-eslint/eslint-plugin": 5.45.0
+    "@typescript-eslint/parser": 5.45.0
+    eslint: 8.29.0
+    eslint-config-prettier: 8.5.0
+    npm-run-all: 4.1.5
+    prettier: 2.8.0
+    typescript: 4.8.4
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/platform-middleware@workspace:*, @proofzero/platform-middleware@workspace:packages/platform-middleware":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/platform-middleware@workspace:packages/platform-middleware"
+  dependencies:
+    "@proofzero/types": "workspace:*"
+    "@proofzero/urns": "workspace:*"
+    "@trpc/server": 10.8.1
+    "@typescript-eslint/eslint-plugin": 5.45.0
+    "@typescript-eslint/parser": 5.45.0
+    eslint: 8.29.0
+    eslint-config-prettier: 8.5.0
+    jose: 4.11.1
+    npm-run-all: 4.1.5
+    prettier: 2.8.0
+    typed-json-rpc: 1.1.0
+    typescript: 4.8.4
+    zod: 3.20.2
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/platform.access@workspace:*, @proofzero/platform.access@workspace:platform/access":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/platform.access@workspace:platform/access"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@ethersproject/bytes": 5.7.0
+    "@ethersproject/random": 5.7.0
+    "@proofzero/platform-clients": "workspace:*"
+    "@proofzero/platform-middleware": "workspace:*"
+    "@proofzero/types": "workspace:*"
+    "@proofzero/urns": "workspace:*"
+    "@trpc/server": 10.8.1
+    "@types/async": 3.2.16
+    "@types/node": 18.11.9
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
+    async: 3.2.4
+    do-proxy: 1.3.3
+    env-cmd: 10.1.0
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    jose: 4.11.0
+    npm-run-all: 4.1.5
+    prettier: 2.7.1
+    typescript: 4.8.4
+    wrangler: 2.12.2
+    zod: 3.20.2
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/platform.account@workspace:*, @proofzero/platform.account@workspace:platform/account":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/platform.account@workspace:platform/account"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@ethersproject/address": 5.7.0
+    "@proofzero/platform-middleware": "workspace:*"
+    "@proofzero/platform.access": "workspace:*"
+    "@proofzero/types": "workspace:*"
+    "@trpc/server": 10.8.1
+    "@types/node": 18.11.9
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
+    do-proxy: 1.3.3
+    env-cmd: 10.1.0
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    npm-run-all: 4.1.5
+    prettier: 2.7.1
+    ts-set-utils: 0.2.0
+    typed-json-rpc: 1.1.0
+    typescript: 4.8.4
+    urns: 0.6.0
+    wrangler: 2.12.2
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/platform.address@workspace:*, @proofzero/platform.address@workspace:platform/address":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/platform.address@workspace:platform/address"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@ethersproject/address": 5.7.0
+    "@ethersproject/bytes": 5.7.0
+    "@ethersproject/keccak256": 5.7.0
+    "@ethersproject/random": 5.7.0
+    "@ethersproject/signing-key": 5.7.0
+    "@ethersproject/transactions": 5.7.0
+    "@ethersproject/wallet": 5.7.0
+    "@proofzero/platform-clients": "workspace:*"
+    "@proofzero/types": "workspace:*"
+    "@proofzero/urns": "workspace:*"
+    "@trpc/server": 10.8.1
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
+    do-proxy: 1.3.3
+    env-cmd: 10.1.0
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    jose: 4.11.0
+    npm-run-all: 4.1.5
+    prettier: 2.7.1
+    remix-auth-google: 1.2.0
+    typescript: 4.8.4
+    wrangler: 2.12.2
+    zod: 3.20.2
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/platform.edges@workspace:platform/edges":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/platform.edges@workspace:platform/edges"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@microsoft/api-extractor": 7.33.6
+    "@proofzero/security": "workspace:*"
+    "@proofzero/urns": "workspace:*"
+    "@trpc/server": 10.8.1
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
+    better-sqlite3: 8.0.1
+    cross-env: 7.0.3
+    drizzle-kit: 0.16.1
+    drizzle-orm: 0.16.1
+    drizzle-orm-sqlite: 0.16.1
+    env-cmd: 10.1.0
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    prettier: 2.7.1
+    reflect-metadata: 0.1.13
+    sqlite3: 5.1.2
+    tap: 16.3.2
+    typeorm: 0.3.10
+    typescript: 4.8.4
+    urns: 0.6.0
+    wrangler: 2.12.2
+    yarn-run-all: 3.1.1
+    zod: 3.20.2
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/platform.galaxy@workspace:platform/galaxy":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/platform.galaxy@workspace:platform/galaxy"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@ethersproject/providers": 5.7.2
+    "@graphql-tools/merge": 8.3.6
+    "@graphql-tools/resolvers-composition": 6.5.6
+    "@graphql-tools/schema": 9.0.4
+    "@graphql-tools/stitch": 8.7.13
+    "@graphql-yoga/common": 2.12.12
+    concurrently: 7.5.0
+    env-cmd: 10.1.0
+    graphql: 16.6.0
+    graphql-type-json: 0.3.2
+    npm-run-all: 4.1.5
+    typescript: 4.8.4
+    wrangler: 2.12.0
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/platform.object@workspace:*, @proofzero/platform.object@workspace:platform/object":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/platform.object@workspace:platform/object"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@trpc/server": 10.8.1
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
+    do-proxy: 1.3.3
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    npm-run-all: 4.1.5
+    prettier: 2.7.1
+    typescript: 4.8.4
+    wrangler: 2.12.2
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/platform.ping@workspace:platform/ping":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/platform.ping@workspace:platform/ping"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@trpc/server": 10.8.1
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
+    do-proxy: 1.3.3
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    npm-run-all: 4.1.5
+    prettier: 2.7.1
+    typed-json-rpc: 1.1.0
+    typescript: 4.8.4
+    wrangler: 2.12.2
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/platform.starbase@workspace:*, @proofzero/platform.starbase@workspace:platform/starbase":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/platform.starbase@workspace:platform/starbase"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@ethersproject/bytes": 5.7.0
+    "@proofzero/security": "workspace:*"
+    "@proofzero/urns": "workspace:*"
+    "@trpc/server": 10.8.1
+    "@types/lodash": 4.14.189
+    cross-env: 7.0.3
+    do-proxy: 1.3.3
+    env-cmd: 10.1.0
+    esbuild: 0.15.15
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    eslint-plugin-prettier: 4.2.1
+    eslint-plugin-tsdoc: 0.2.17
+    jose: 4.11.0
+    lodash: 4.17.21
+    multiformats: 10.0.2
+    npm-run-all: 4.1.5
+    prettier: 2.8.0
+    tiny-invariant: 1.3.1
+    ts-set-utils: 0.2.0
+    typescript: 4.8.4
+    wrangler: 2.12.2
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/platform@workspace:platform":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/platform@workspace:platform"
+  dependencies:
+    "@graphql-codegen/cli": 2.16.3
+    "@graphql-codegen/client-preset": 1.1.1
+    "@graphql-codegen/typescript-graphql-request": 4.5.7
+    "@graphql-codegen/typescript-resolvers": 2.7.5
+    "@playwright/test": 1.27.1
+    graphql: 16.6.0
+    npm-run-all: 4.1.5
+    typescript: 4.8.4
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/security@workspace:*, @proofzero/security@workspace:packages/security":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/security@workspace:packages/security"
+  dependencies:
+    "@microsoft/api-extractor": 7.33.6
+    "@types/psl": 1.1.0
+    cross-env: 7.0.3
+    eslint: 8.28.0
+    npm-run-all: 4.1.5
+    prettier: 2.7.1
+    psl: 1.9.0
+    typescript: 4.8.4
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/services.email@workspace:platform/email":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/services.email@workspace:platform/email"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    npm-run-all: 4.1.5
+    typescript: 4.8.4
+    wrangler: 2.12.2
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/services.images@workspace:platform/images":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/services.images@workspace:platform/images"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@ethersproject/keccak256": 5.7.0
+    date-fns: 2.29.3
+    env-cmd: 10.1.0
+    image-data-uri: 2.0.1
+    npm-run-all: 4.1.5
+    svg2png-wasm: 1.3.4
+    tiny-invariant: 1.3.1
+    typescript: 4.8.4
+    wrangler: 2.12.2
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/types@workspace:*, @proofzero/types@workspace:packages/types":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/types@workspace:packages/types"
+  dependencies:
+    "@typescript-eslint/eslint-plugin": 5.45.0
+    "@typescript-eslint/parser": 5.45.0
+    eslint: 8.29.0
+    eslint-config-prettier: 8.5.0
+    jose: 4.11.4
+    npm-run-all: 4.1.5
+    prettier: 2.8.0
+    typescript: 4.8.4
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/urns@workspace:*, @proofzero/urns@workspace:packages/urns":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/urns@workspace:packages/urns"
+  dependencies:
+    "@ethersproject/keccak256": 5.7.0
+    "@typescript-eslint/eslint-plugin": 5.45.0
+    "@typescript-eslint/parser": 5.45.0
+    eslint: 8.29.0
+    eslint-config-prettier: 8.5.0
+    npm-run-all: 4.1.5
+    prettier: 2.8.0
+    typescript: 4.8.4
+    urns: 0.6.0
+  languageName: unknown
+  linkType: soft
+
+"@proofzero/utils@workspace:*, @proofzero/utils@workspace:packages/utils":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/utils@workspace:packages/utils"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@proofzero/platform.account": "workspace:*"
+    "@proofzero/platform.address": "workspace:*"
+    "@typescript-eslint/eslint-plugin": 5.41.0
+    "@typescript-eslint/parser": 5.41.0
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    npm-run-all: 4.1.5
+    prettier: 2.7.1
+    typescript: 4.8.4
+  peerDependencies:
+    jose: "*"
+  languageName: unknown
+  linkType: soft
 
 "@remix-run/cloudflare-workers@npm:1.14.0":
   version: 1.14.0
