@@ -56,7 +56,6 @@ export const resolveAccountMethod = async ({
       urn = AccountURNSpace.componentizedUrn(name)
       eventName = 'account-created'
     }
-
     const caller = appRouter.createCaller(ctx)
     await caller.setAccount(urn) // this will lazy create an account node when account worker is called
 

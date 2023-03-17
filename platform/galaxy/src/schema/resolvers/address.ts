@@ -21,6 +21,7 @@ import {
   OAuthGoogleProfile,
   OAuthMicrosoftProfile,
   OAuthTwitterProfile,
+  EmailAddressProfile,
 } from '@kubelt/platform.address/src/types'
 import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
@@ -146,6 +147,10 @@ const addressResolvers: Resolvers = {
       if ((obj as unknown as OAuthDiscordProfile).isDiscord) {
         return 'OAuthDiscordProfile'
       }
+      if ((obj as unknown as EmailAddressProfile).isEmail) {
+        return 'EmailAddressProfile'
+      }
+
       return null
     },
   },

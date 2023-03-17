@@ -8,6 +8,7 @@ import type { Environment } from '../types'
 import ContractAddress from './contract'
 import CryptoAddress from './crypto'
 import OAuthAddress from './oauth'
+import EmailAddress from './email'
 
 export default class Address extends DOProxy {
   declare state: DurableObjectState
@@ -80,6 +81,8 @@ export default class Address extends DOProxy {
         return OAuthAddress.alarm(this)
       case NodeType.Contract:
         return ContractAddress.alarm(this)
+      case NodeType.Email:
+        return EmailAddress.alarm(this)
       default:
         console.log('Unknown node type', type)
     }

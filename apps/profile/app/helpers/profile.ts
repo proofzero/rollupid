@@ -252,5 +252,13 @@ export const normalizeProfileToConnection = (profile: any) => {
         icon: `https://cdn.discordapp.com/avatars/${profile.discordId}/${profile.avatar}.png`,
         chain: 'Discord',
       }
+    case 'EmailAddressProfile':
+      return {
+        id: profile.urn,
+        address: profile.email,
+        title: profile.name,
+        icon: profile.picture,
+        chain: 'Email',
+      }
   }
 }

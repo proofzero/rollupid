@@ -53,6 +53,16 @@ import {
   SetAddressNicknameInput,
   setAddressNicknameMethod,
 } from './methods/setAddressNickname'
+import {
+  GenerateEmailOTPInput,
+  generateEmailOTPMethod,
+  GenerateEmailOTPOutput,
+} from './methods/generateEmailOTP'
+import {
+  VerifyEmailOTPInput,
+  verifyEmailOTPMethod,
+  VerifyEmailOTPOutput,
+} from './methods/verifyEmailOTP'
 
 const t = initTRPC.context<Context>().create()
 
@@ -126,6 +136,22 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(SetAddressNicknameInput)
     .query(setAddressNicknameMethod),
+  generateEmailOTP: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setAddressNodeClient)
+    .use(Analytics)
+    .input(GenerateEmailOTPInput)
+    .output(GenerateEmailOTPOutput)
+    .mutation(generateEmailOTPMethod),
+  verifyEmailOTP: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setAddressNodeClient)
+    .use(Analytics)
+    .input(VerifyEmailOTPInput)
+    .output(VerifyEmailOTPOutput)
+    .mutation(verifyEmailOTPMethod),
   getNonce: t.procedure
     .use(LogUsage)
     .use(parse3RN)

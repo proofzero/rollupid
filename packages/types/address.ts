@@ -3,6 +3,7 @@ export enum NodeType {
   Vault = 'vault',
   Contract = 'contract',
   OAuth = 'oauth',
+  Email = 'email',
   Handle = 'handle',
 }
 
@@ -23,6 +24,10 @@ export enum OAuthAddressType {
   Discord = 'discord',
 }
 
+export enum EmailAddressType {
+  Email = 'email',
+}
+
 export enum HandleAddressType {
   Handle = 'handle',
 }
@@ -32,3 +37,4 @@ export type AddressType =
   | OAuthAddressType
   | ContractAddressType
   | HandleAddressType
+  | EmailAddressType

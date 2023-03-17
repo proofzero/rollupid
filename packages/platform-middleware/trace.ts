@@ -1,3 +1,5 @@
+import generateRandomString from '@kubelt/packages/utils/generateRandomString'
+
 type TraceId = string
 type TraceParentId = string
 type TraceParent = `00-${TraceId}-${TraceParentId}-00`
@@ -66,7 +68,7 @@ const getTraceParentForSpan = (span: TraceSpan): TraceParent => {
 }
 
 const createTraceSpan = (traceparent?: TraceParent): TraceSpan => {
-  const newSpanId = generateId(16)
+  const newSpanId = generateRandomString(16)
 
   let result: TraceSpan
   if (traceparent) {
@@ -83,20 +85,7 @@ const createTraceSpan = (traceparent?: TraceParent): TraceSpan => {
   //If there was no traceparent or the values weren't valid, we create a new one
   //with no parentId
   if (!result!) {
-    result = new TraceSpan(generateId(32), newSpanId)
+    result = new TraceSpan(generateRandomString(32), newSpanId)
   }
-  return result
-}
-
-const generateId = (length: number): string => {
-  if (!length || length < 0)
-    throw new Error('Length of ID to be generated has to be a positive number')
-
-  const buffer = new Uint8Array(length / 2)
-  const randomBuffer = crypto.getRandomValues(buffer)
-  const result = Array.from(randomBuffer, (i) =>
-    i.toString(16).padStart(2, '0')
-  ).join('')
-  console.assert(result.length === length)
   return result
 }

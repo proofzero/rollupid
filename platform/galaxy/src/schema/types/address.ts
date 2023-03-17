@@ -54,6 +54,13 @@ export default /* GraphQL */ `
     sub: String
   }
 
+  type EmailAddressProfile {
+    address: String!
+    name: String
+    picture: String!
+    email: String
+  }
+
   type OAuthDiscordProfile {
     id: String
     email: String
@@ -70,6 +77,7 @@ export default /* GraphQL */ `
     | OAuthMicrosoftProfile
     | OAuthAppleProfile
     | OAuthDiscordProfile
+    | EmailAddressProfile
 
   type AddressProfile {
     urn: URN!
