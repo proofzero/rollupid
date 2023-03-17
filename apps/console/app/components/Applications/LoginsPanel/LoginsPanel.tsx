@@ -68,28 +68,38 @@ export const LoginsPanel = ({
   appId,
 }: LoginsPanelProps) => {
   return (
-    <div className="h-full">
+    <div
+      className="border flex-1 flex flex-col rounded-lg h-full pb-7
+     relative shadow bg-white"
+    >
       {authorizedProfiles.length ? (
-        <div className="border flex-1 flex flex-col rounded-lg h-full pt-2 relative shadow">
-          <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-lg">
-            <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-              USER ID
-            </Text>
-            <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-              APPROVED
-            </Text>
+        <>
+          {' '}
+          <div className="bg-[#F9FAFB] w-full">
+            <div className=" flex items-center py-5 px-6 rounded-lg">
+              <Text size="sm" weight="medium" className="text-gray-500 flex-1">
+                USER ID
+              </Text>
+              <Text size="sm" weight="medium" className="text-gray-500 flex-1">
+                APPROVED
+              </Text>
+            </div>
           </div>
-
           <div
             className="flex flex-1 flex-col bg-white rounded-br-lg
           rounded-bl-lg h-full"
           >
             {authorizedProfiles.map((user, i) => (
-              <article key={i} className={`flex items-center py-5 px-8`}>
+              <article key={i} className={`px-6 flex items-center py-5`}>
                 <div className="flex-1 flex flex-row items-center space-x-4">
                   <img
-                    src={user.imageURL || missingImage}
-                    alt="account pfp"
+                    src={user.imageURL}
+                    onError={({ currentTarget }) => {
+                      currentTarget.onerror = null
+                      currentTarget.src = missingImage
+                      currentTarget.style.filter = 'brightness(88%)'
+                    }}
+                    alt="pfp"
                     className="max-h-[24px] max-w-[24px] rounded-full"
                   />
                   <Text
@@ -120,8 +130,8 @@ export const LoginsPanel = ({
 
             <div className="h-[4rem]" />
 
-            <div className="absolute bottom-0 w-full">
-              <div className="w-full px-8">
+            <div className="px-6 absolute bottom-0 w-full">
+              <div className="w-full">
                 <div className="border-t border-gray-200"></div>
               </div>
 
@@ -130,7 +140,7 @@ export const LoginsPanel = ({
                   <Text
                     size="sm"
                     weight="medium"
-                    className="cursor-pointer text-indigo-500 my-4"
+                    className="cursor-pointer text-gray-300 hover:text-indigo-500 my-4"
                   >
                     View All
                   </Text>
@@ -138,11 +148,11 @@ export const LoginsPanel = ({
               </div>
             </div>
           </div>
-        </div>
+        </>
       ) : (
         <div
-          className="flex flex-col bg-white
-        shadow rounded-lg border justify-center items-center h-full"
+          className="h-full flex flex-col 
+        px-6 justify-center items-center pb-3"
         >
           {noLoginsSvg}
 
