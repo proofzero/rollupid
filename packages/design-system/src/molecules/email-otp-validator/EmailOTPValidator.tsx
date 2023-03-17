@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
 import { Button } from '../../atoms/buttons/Button'
 import { Text } from '../../atoms/text/Text'
@@ -54,6 +54,7 @@ export default ({
               ref={ref}
               id={`code_${i}`}
               name={`code_${i}`}
+              required
               maxLength={1}
               minLength={1}
               onChange={(ev) => {
