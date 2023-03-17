@@ -48,9 +48,10 @@ import {
   Toaster,
   ToastType,
 } from '@proofzero/design-system/src/atoms/toast'
-import type { FullProfile } from '~/types'
+import type { FullProfile, Gallery } from '~/types'
 import type { Maybe } from 'graphql/jsutils/Maybe'
 import type { NFT } from '~/types'
+import { GallerySchema } from '~/validation'
 import { getValidGallery } from '~/helpers/alchemy'
 import type { AccountURN } from '@proofzero/urns/account'
 
@@ -62,46 +63,27 @@ export const action: ActionFunction = async ({ request, context }) => {
   const jwt = user.accessToken
   const { sub: accountURN } = parseJwt(jwt)
 
-  let errors = new Map()
-
   const updatedGallery = formData.get('gallery') as string
   if (!updatedGallery) {
     throw new Error('Gallery should not be empty')
   }
-  const nfts: NFT[] = JSON.parse(updatedGallery)
+  const nfts: Gallery = JSON.parse(updatedGallery)
 
-  // TODO: replace with zod?
-  nfts.forEach((nft) => {
-    if (!nft.tokenId) {
-      errors.set('tokenId', ['Nft should have token ID'])
-    }
-    if (!nft.contract?.address && nft.contract.address?.length === 0) {
-      errors.set(`contractAddress-${nft.tokenId}`, [
-        'Nft should have contract address',
-      ])
-    }
-    if (!nft.chain?.network) {
-      errors.set(`network-${nft.tokenId}`, ['Nft should have network'])
-    }
-    if (!nft.details) {
-      errors.set(`${nft.contract?.address}-${nft.tokenId}`, [
-        'Nft should have attached details',
-      ])
-    }
-  })
+  // Schema Validation
+  const zodValidation = GallerySchema.safeParse(nfts)
 
-  if (errors.size) {
+  if (!zodValidation.success) {
     return {
-      errors: Object.fromEntries(errors),
+      errors: zodValidation.error.issues[0].message,
     }
   }
 
   const currentProfile = await ProfileKV.get<FullProfile>(accountURN!, 'json')
   const updatedProfile = Object.assign(currentProfile || {}, {
-    gallery: nfts,
+    gallery: zodValidation.data,
   })
 
-  //Validation
+  //Ownership Validation
   updatedProfile.gallery = await getValidGallery({
     gallery: updatedProfile.gallery,
     accountURN: accountURN as AccountURN,
@@ -183,12 +165,13 @@ const SortableNft = (props: { url?: Maybe<string>; id: string }) => {
   )
 }
 
-const Gallery = () => {
+const GalleryComponent = () => {
   const actionData = useActionData()
-  const { profile, cryptoAddresses, accountURN } = useOutletContext<{
+  const { profile, cryptoAddresses, notify, accountURN } = useOutletContext<{
     profile: FullProfile
     accountURN: string
     cryptoAddresses: Node[]
+    notify: (success: boolean) => void
   }>()
 
   const { displayName } = profile
@@ -223,15 +206,6 @@ const Gallery = () => {
   const [collection, setCollection] = useState('')
 
   const modalFetcher = useFetcher()
-
-  // ------------------- NOTIFICATIONS HANDLER ---------------------------------
-  const notify = (success: boolean = true) => {
-    if (success) {
-      toast(ToastType.Success, { message: 'Saved' })
-    } else {
-      toast(ToastType.Error, { message: 'Save Failed -- Please try again' })
-    }
-  }
 
   // ------------------- DND HANDLERS ------------------------------------------
   const handleDragCancel = () => {
@@ -459,4 +433,4 @@ const Gallery = () => {
   )
 }
 
-export default Gallery
+export default GalleryComponent

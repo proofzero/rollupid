@@ -1,75 +1,37 @@
-import type {
-  AlchemyChain,
-  AlchemyNetwork,
-} from '@proofzero/packages/alchemy-client'
+import type { z } from 'zod'
 
-export type RollupAuth = {
-  accessToken: string
-  refreshToken: string
-  extraParams: {
-    scopes?: [string]
-    redirect_uri?: string
-  }
-}
+import type {
+  RollupAuthSchema,
+  ChainSchema,
+  ContractSchema,
+  NFTDetailSchema,
+  NFTPropertySchema,
+  NFTSchema,
+  GallerySchema,
+  LinkSchema,
+  LinksSchema,
+  FullProfileSchema,
+} from './validation'
+
+export type RollupAuth = z.infer<typeof RollupAuthSchema>
 
 // -------------------------- NFTs ---------------------------------------------
 
-export type Chain = {
-  chain: AlchemyChain
-  network: AlchemyNetwork
-}
+export type Chain = z.infer<typeof ChainSchema>
 
-export type Contract = {
-  address: string
-}
+export type Contract = z.infer<typeof ContractSchema>
 
-export type NFTDetail = {
-  isCopyable: boolean
-  name: string
-  value: string
-}
+export type NFTDetail = z.infer<typeof NFTDetailSchema>
 
-export type NFTProperty = {
-  display: string
-  name: string
-  value: string
-}
+export type NFTProperty = z.infer<typeof NFTPropertySchema>
 
-export type NFT = {
-  url?: string | null
-  thumbnailUrl?: string | null
-  title?: string | null
-  contract: Contract
-  tokenId: string
-  chain: Chain
-  collectionTitle?: string | null
-  properties?: NFTProperty[] | null
-  details: NFTDetail[]
-}
+export type NFT = z.infer<typeof NFTSchema>
 
 // -------------------------- Profile ------------------------------------------
-export type Gallery = NFT[]
+export type Gallery = z.infer<typeof GallerySchema>
 
-export type Link = {
-  name?: string
-  provider?: string
-  url?: string
-  verified?: boolean
-}
+export type Link = z.infer<typeof LinkSchema>
 
-export type Links = Link[]
+export type Links = z.infer<typeof LinksSchema>
 
-export type FullProfile = {
-  displayName: string
-  pfp: {
-    image: string
-    isToken?: boolean
-  }
-  links: Links
-  gallery: Gallery
-  handle?: string
-  version: number
-  bio: string
-  job: string
-  location: string
-}
+export type FullProfile = z.infer<typeof FullProfileSchema>
