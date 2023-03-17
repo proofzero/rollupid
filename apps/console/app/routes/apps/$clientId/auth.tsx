@@ -3,7 +3,7 @@
  */
 
 import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import type { ScopeMeta } from '@kubelt/platform/starbase/src/types'
+import type { ScopeMeta } from '@proofzero/platform/starbase/src/types'
 import { json } from '@remix-run/cloudflare'
 import {
   Form,
@@ -12,29 +12,29 @@ import {
   useOutletContext,
   useLoaderData,
 } from '@remix-run/react'
-import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
 import { RollType } from '~/types'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
 import type { appDetailsProps, errorsAuthProps } from '~/types'
 import IconPicker from '~/components/IconPicker'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
 
-import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Panel } from '@kubelt/design-system/src/atoms/panels/Panel'
-import { ReadOnlyInput } from '@kubelt/design-system/src/atoms/form/ReadOnlyInput'
-import { Input } from '@kubelt/design-system/src/atoms/form/Input'
-import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
-import { MultiSelect } from '@kubelt/design-system/src/atoms/form/MultiSelect'
-import { PreLabeledInput } from '@kubelt/design-system/src/atoms/form/PreLabledInput'
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import { toast, ToastType } from '@kubelt/design-system/src/atoms/toast'
+import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Panel } from '@proofzero/design-system/src/atoms/panels/Panel'
+import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
+import { Input } from '@proofzero/design-system/src/atoms/form/Input'
+import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
+import { MultiSelect } from '@proofzero/design-system/src/atoms/form/MultiSelect'
+import { PreLabeledInput } from '@proofzero/design-system/src/atoms/form/PreLabledInput'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 
 /**
  * @file app/routes/dashboard/index.tsx

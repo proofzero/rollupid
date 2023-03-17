@@ -1,7 +1,7 @@
 import UnfilteredNftGrid from '~/components/nfts/grid/unfiltered'
 
 import { useOutletContext } from '@remix-run/react'
-import type { AccountURN } from '@kubelt/urns/account'
+import type { AccountURN } from '@proofzero/urns/account'
 import type { FullProfile } from '~/types'
 
 const ProfileRoute = () => {

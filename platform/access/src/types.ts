@@ -1,7 +1,7 @@
 import { KeyLike, JWK } from 'jose'
 
-import { DeploymentMetadata } from '@kubelt/types'
-import { Scope } from '@kubelt/types/access'
+import { DeploymentMetadata } from '@proofzero/types'
+import { Scope } from '@proofzero/types/access'
 
 import IdTokenProfileSchema from './jsonrpc/validators/IdTokenProfileSchema'
 import { z } from 'zod'

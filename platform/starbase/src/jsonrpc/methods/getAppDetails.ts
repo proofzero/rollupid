@@ -6,8 +6,8 @@ import {
   AppReadableFieldsSchema,
   AppUpdateableFieldsSchema,
 } from '../validators/app'
-import createEdgesClient from '@kubelt/platform-clients/edges'
-import { ApplicationURNSpace } from '@kubelt/urns/application'
+import createEdgesClient from '@proofzero/platform-clients/edges'
+import { ApplicationURNSpace } from '@proofzero/urns/application'
 
 export const GetAppDetailsInput = AppClientIdParamSchema
 

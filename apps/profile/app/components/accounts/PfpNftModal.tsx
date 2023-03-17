@@ -3,8 +3,8 @@ import UnfilteredNftGrid from '~/components/nfts/grid/unfiltered'
 import SelectableNft from '~/components/nfts/interactible'
 import { LoadingGridSquares } from '~/components/nfts/grid/loading'
 
-import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 type PfpNftModalProps = {
   text?: string

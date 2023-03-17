@@ -2,15 +2,15 @@ import {
   CryptoAddressType,
   NodeType,
   OAuthAddressType,
-} from '@kubelt/types/address'
-import type { AddressURN } from '@kubelt/urns/address'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+} from '@proofzero/types/address'
+import type { AddressURN } from '@proofzero/urns/address'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { getGalaxyClient } from '~/helpers/clients'
 import { imageFromAddressType } from './icons'
 import type { FullProfile } from '~/types'
-import type { AccountURN } from '@kubelt/urns/account'
-import type { TraceSpan } from '@kubelt/platform-middleware/trace'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import type { AccountURN } from '@proofzero/urns/account'
+import type { TraceSpan } from '@proofzero/platform-middleware/trace'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getValidGallery } from './alchemy'
 
 export const getAccountProfile = async (

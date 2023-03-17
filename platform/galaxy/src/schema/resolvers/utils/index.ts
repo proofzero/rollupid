@@ -2,26 +2,26 @@ import { GraphQLYogaError } from '@graphql-yoga/common'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
-import type { AccountURN } from '@kubelt/urns/account'
-import createStarbaseClient from '@kubelt/platform-clients/starbase'
-import createAccountClient from '@kubelt/platform-clients/account'
+import type { AccountURN } from '@proofzero/urns/account'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createAccountClient from '@proofzero/platform-clients/account'
 
 import Env from '../../../env'
 import {
   getAuthzHeaderConditionallyFromToken,
   getAuthzTokenFromReq,
   isFromCFBinding,
-} from '@kubelt/utils'
+} from '@proofzero/utils'
 
-import { WriteAnalyticsDataPoint } from '@kubelt/packages/platform-clients/analytics'
+import { WriteAnalyticsDataPoint } from '@proofzero/packages/platform-clients/analytics'
 
-import { NodeType } from '@kubelt/types/address'
+import { NodeType } from '@proofzero/types/address'
 import {
   generateTraceContextHeaders,
   TraceSpan,
-} from '@kubelt/platform-middleware/trace'
-import type { ApplicationURN } from '@kubelt/urns/application'
-import { ApplicationURNSpace } from '@kubelt/urns/application'
+} from '@proofzero/platform-middleware/trace'
+import type { ApplicationURN } from '@proofzero/urns/application'
+import { ApplicationURNSpace } from '@proofzero/urns/application'
 
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {

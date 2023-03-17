@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/utils",
+  "name": "@proofzero/utils",
   "private": true,
   "version": "1.0.0",
   "description": "Kubelt Utilities",
@@ -21,8 +21,8 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20221111.1",
-    "@kubelt/platform.account": "workspace:*",
-    "@kubelt/platform.address": "workspace:*",
+    "@proofzero/platform.account": "workspace:*",
+    "@proofzero/platform.address": "workspace:*",
     "@typescript-eslint/eslint-plugin": "5.41.0",
     "@typescript-eslint/parser": "5.41.0",
     "eslint": "8.28.0",

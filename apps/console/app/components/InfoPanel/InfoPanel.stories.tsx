@@ -1,4 +1,4 @@
-import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
+import { ButtonAnchor } from '@proofzero/design-system/src/atoms/buttons/ButtonAnchor'
 import { FaAddressBook, FaDiscord, FaTwitter } from 'react-icons/fa'
 import { InfoPanel } from './InfoPanel'
 

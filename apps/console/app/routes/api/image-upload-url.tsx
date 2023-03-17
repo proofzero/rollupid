@@ -1,8 +1,8 @@
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
-import createImageClient from '@kubelt/platform-clients/image'
+import createImageClient from '@proofzero/platform-clients/image'
 import { requireJWT } from '~/utilities/session.server'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 export const action: ActionFunction = async ({ request, context }) => {
   await requireJWT(request)

@@ -1,9 +1,9 @@
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
-import { GrantType } from '@kubelt/types/access'
-import createAccessClient from '@kubelt/platform-clients/access'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import { GrantType } from '@proofzero/types/access'
+import createAccessClient from '@proofzero/platform-clients/access'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()

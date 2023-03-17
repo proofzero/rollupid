@@ -1,7 +1,7 @@
-import type { AddressType, NodeType } from '@kubelt/types/address'
-import { CryptoAddressType } from '@kubelt/types/address'
-import { AddressURNSpace } from '@kubelt/urns/address'
-import { generateHashedIDRef } from '@kubelt/urns/idref'
+import type { AddressType, NodeType } from '@proofzero/types/address'
+import { CryptoAddressType } from '@proofzero/types/address'
+import { AddressURNSpace } from '@proofzero/urns/address'
+import { generateHashedIDRef } from '@proofzero/urns/idref'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
@@ -26,7 +26,11 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     { alias: address, hidden: 'false' }
   )
 
-  const addressClient = getAddressClient(addressURN, context.env, context.traceSpan)
+  const addressClient = getAddressClient(
+    addressURN,
+    context.env,
+    context.traceSpan
+  )
   const accountURN = await addressClient.getAccount.query()
 
   const appData = await getConsoleParamsSession(request, context.env)
@@ -36,5 +40,11 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       return null
     })
 
-  return authenticateAddress(addressURN, accountURN, appData, context.env, context.traceSpan)
+  return authenticateAddress(
+    addressURN,
+    accountURN,
+    appData,
+    context.env,
+    context.traceSpan
+  )
 }

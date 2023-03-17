@@ -1,8 +1,8 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 
-import createAccountClient from '@kubelt/platform-clients/account'
-import createAddressClient from '@kubelt/platform-clients/address'
-import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import createAccountClient from '@proofzero/platform-clients/account'
+import createAddressClient from '@proofzero/platform-clients/address'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
 import {
   setupContext,
@@ -16,15 +16,15 @@ import {
 
 import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
-import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
 import { ResolverContext } from './common'
-import { PlatformAddressURNHeader } from '@kubelt/types/headers'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
-import type { AccountURN } from '@kubelt/urns/account'
+import { PlatformAddressURNHeader } from '@proofzero/types/headers'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import type { AccountURN } from '@proofzero/urns/account'
 import {
   generateTraceContextHeaders,
   TraceSpan,
-} from '@kubelt/packages/platform-middleware/trace'
+} from '@proofzero/packages/platform-middleware/trace'
 
 const accountResolvers: Resolvers = {
   Query: {

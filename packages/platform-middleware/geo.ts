@@ -1,4 +1,4 @@
-import { GeoContext } from '@kubelt/types/context'
+import { GeoContext } from '@proofzero/types/context'
 import type { BaseMiddlewareFunction } from './types'
 
 /**

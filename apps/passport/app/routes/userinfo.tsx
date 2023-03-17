@@ -1,8 +1,8 @@
 import { json } from '@remix-run/cloudflare'
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import createAccessClient from '@kubelt/platform-clients/access'
-import { getAuthzTokenFromReq } from '@kubelt/utils'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import createAccessClient from '@proofzero/platform-clients/access'
+import { getAuthzTokenFromReq } from '@proofzero/utils'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const access_token = getAuthzTokenFromReq(request)

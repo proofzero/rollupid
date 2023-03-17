@@ -1,13 +1,13 @@
-import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
+import { BaseMiddlewareFunction } from '@proofzero/platform-middleware/types'
 import { isAddress as isEthAddress } from '@ethersproject/address'
 
-import { NodeType } from '@kubelt/types/address'
+import { NodeType } from '@proofzero/types/address'
 
 import { Context } from '../../context'
 import { isCryptoAddressType } from '../../utils'
-import ENSUtils from '@kubelt/platform-clients/ens-utils'
-import { CryptoAddressType } from '@kubelt/types/address'
-import { generateHashedIDRef } from '@kubelt/urns/idref'
+import ENSUtils from '@proofzero/platform-clients/ens-utils'
+import { CryptoAddressType } from '@proofzero/types/address'
+import { generateHashedIDRef } from '@proofzero/urns/idref'
 
 export const checkCryptoNodes: BaseMiddlewareFunction<Context> = async ({
   next,

@@ -1,7 +1,7 @@
 import { initTRPC } from '@trpc/server'
 
 import { Context } from './context'
-import { LogUsage } from '@kubelt/platform-middleware/log'
+import { LogUsage } from '@proofzero/platform-middleware/log'
 import {
   createApp,
   CreateAppInputSchema,
@@ -10,7 +10,7 @@ import {
 import {
   AuthorizationTokenFromHeader,
   ValidateJWT,
-} from '@kubelt/platform-middleware/jwt'
+} from '@proofzero/platform-middleware/jwt'
 import { deleteApp, DeleteAppInput } from './methods/deleteApp'
 import {
   getAppDetails,
@@ -50,9 +50,9 @@ import {
   CheckApiKeyOutput,
 } from './methods/checkApiKey'
 import { getScopes } from './methods/getScopes'
-import { NoInput } from '@kubelt/platform-middleware/inputValidators'
+import { NoInput } from '@proofzero/platform-middleware/inputValidators'
 
-import { Analytics } from '@kubelt/platform-middleware/analytics'
+import { Analytics } from '@proofzero/platform-middleware/analytics'
 import { OwnAppsMiddleware } from './ownAppsMiddleware'
 import {
   getAppPublicProps,

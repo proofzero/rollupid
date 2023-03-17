@@ -1,4 +1,4 @@
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 
 const SaveButton = ({ isFormChanged, discardFn, size = 'xl' }: any) => {
   return (

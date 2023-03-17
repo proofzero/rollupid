@@ -1,14 +1,14 @@
-import createAccessClient from '@kubelt/platform-clients/access'
-import createAddressClient from '@kubelt/platform-clients/address'
-import createAccountClient from '@kubelt/platform-clients/account'
-import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import createAccessClient from '@proofzero/platform-clients/access'
+import createAddressClient from '@proofzero/platform-clients/address'
+import createAccountClient from '@proofzero/platform-clients/account'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
-import { PlatformAddressURNHeader } from '@kubelt/types/headers'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { PlatformAddressURNHeader } from '@proofzero/types/headers'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import {
   generateTraceContextHeaders,
   TraceSpan,
-} from '@kubelt/platform-middleware/trace'
+} from '@proofzero/platform-middleware/trace'
 
 export function getStarbaseClient(jwt: string, env: Env, traceSpan: TraceSpan) {
   return createStarbaseClient(env.Starbase, {

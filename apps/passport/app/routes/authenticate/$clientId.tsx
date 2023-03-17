@@ -8,12 +8,12 @@ import {
 import { useEffect, useState } from 'react'
 import { Authentication, ConnectButton } from '~/components'
 import ConnectOAuthButton from '~/components/connect-oauth-button'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
-import { toast, ToastType } from '@kubelt/design-system/src/atoms/toast'
-import type { Profile } from '@kubelt/platform/account/src/types'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
+import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
+import type { Profile } from '@proofzero/platform/account/src/types'
 import { HiCheck } from 'react-icons/hi'
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { json, redirect } from '@remix-run/cloudflare'
 import {
@@ -24,8 +24,8 @@ import {
   requireJWT,
   setConsoleParamsSession,
 } from '~/session.server'
-import type { AccountURN } from '@kubelt/urns/account'
-import { ResponseType } from '@kubelt/types/access'
+import type { AccountURN } from '@proofzero/urns/account'
+import { ResponseType } from '@proofzero/types/access'
 import {
   getAccessClient,
   getAccountClient,

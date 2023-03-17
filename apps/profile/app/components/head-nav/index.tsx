@@ -2,8 +2,8 @@ import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Link, NavLink } from '@remix-run/react'
 
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
 
 import { FiExternalLink } from 'react-icons/fi'
 
@@ -16,7 +16,7 @@ import defaultAvatar from '~/assets/circle_gradient.png'
 import { SignOutLink } from '~/components/hean-nav-links'
 
 import styles from './headNav.css'
-import { gatewayFromIpfs } from '@kubelt/utils'
+import { gatewayFromIpfs } from '@proofzero/utils'
 
 export const links = () => [{ rel: 'stylesheet', href: styles }]
 

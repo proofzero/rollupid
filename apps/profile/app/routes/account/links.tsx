@@ -15,10 +15,10 @@ import { FiEdit } from 'react-icons/fi'
 import { TbLink } from 'react-icons/tb'
 import { AiOutlinePlus } from 'react-icons/ai'
 
-import type { AddressProfile } from '@kubelt/galaxy-client'
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { SortableList } from '@kubelt/design-system/src/atoms/lists/SortableList'
+import type { AddressProfile } from '@proofzero/galaxy-client'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { SortableList } from '@proofzero/design-system/src/atoms/lists/SortableList'
 
 import type { Link } from '~/types'
 
@@ -27,8 +27,8 @@ import SaveButton from '~/components/accounts/SaveButton'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
 
-import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
-import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
+import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
+import { CryptoAddressType, OAuthAddressType } from '@proofzero/types/address'
 import { imageFromAddressType } from '~/helpers'
 import type { FullProfile } from '~/types'
 

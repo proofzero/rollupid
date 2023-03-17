@@ -1,5 +1,5 @@
 import { InfoPanelIcon, InfoPanelIconProps } from './InfoPanelIcon'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 type InfoPanelProps = InfoPanelIconProps & {
   heading: string

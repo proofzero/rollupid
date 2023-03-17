@@ -5,7 +5,7 @@
 import * as React from 'react'
 
 import { Link, NavLink } from '@remix-run/react'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 import AppSelect from './appSelect'
 

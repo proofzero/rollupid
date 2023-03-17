@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/platform.account",
+  "name": "@proofzero/platform.account",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -32,9 +32,9 @@
   },
   "dependencies": {
     "@ethersproject/address": "5.7.0",
-    "@kubelt/platform-middleware": "workspace:*",
-    "@kubelt/platform.access": "workspace:*",
-    "@kubelt/types": "workspace:*",
+    "@proofzero/platform-middleware": "workspace:*",
+    "@proofzero/platform.access": "workspace:*",
+    "@proofzero/types": "workspace:*",
     "@trpc/server": "10.8.1",
     "do-proxy": "1.3.3",
     "ts-set-utils": "0.2.0",

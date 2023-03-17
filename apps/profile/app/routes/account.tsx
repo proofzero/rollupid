@@ -15,26 +15,26 @@ import { parseJwt, requireJWT } from '~/utils/session.server'
 
 import styles from '~/styles/account.css'
 
-import type { AccountURN } from '@kubelt/urns/account'
-import { AccountURNSpace } from '@kubelt/urns/account'
+import type { AccountURN } from '@proofzero/urns/account'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
 import ConditionalTooltip from '~/components/conditional-tooltip'
 
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import {
   getAccountAddresses,
   getAccountProfile,
   getAddressProfiles,
 } from '~/helpers/profile'
-import type { Node, Profile } from '@kubelt/galaxy-client'
-import type { AddressURN } from '@kubelt/urns/address'
+import type { Node, Profile } from '@proofzero/galaxy-client'
+import type { AddressURN } from '@proofzero/urns/address'
 import type { FullProfile } from '~/types'
 import {
   toast,
   ToastType,
   Toaster,
-} from '@kubelt/design-system/src/atoms/toast'
+} from '@proofzero/design-system/src/atoms/toast'
 
 export const links: LinksFunction = () => {
   return [...headNavLink(), { rel: 'stylesheet', href: styles }]

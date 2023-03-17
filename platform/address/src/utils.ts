@@ -8,7 +8,7 @@ import {
   HandleAddressType,
   NodeType,
   OAuthAddressType,
-} from '@kubelt/types/address'
+} from '@proofzero/types/address'
 
 export const isNodeType = (type: string): type is NodeType => {
   switch (type) {

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { EdgeSpace, EdgeURN } from '@kubelt/urns/edge'
+import { EdgeSpace, EdgeURN } from '@proofzero/urns/edge'
 import {
   AllFieldsSchema,
   AppClientIdParamSchema,
@@ -15,7 +15,7 @@ import {
   GetAuthorizedAccountsMethodOutput,
   AuthorizedUser,
 } from './jsonrpc/methods/getAuthorizedAccounts'
-import { DeploymentMetadata } from '@kubelt/types'
+import { DeploymentMetadata } from '@proofzero/types'
 import { EdgesMetadata } from '../../edges/src/jsonrpc/validators/edge'
 
 export interface Environment {

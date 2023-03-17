@@ -1,6 +1,6 @@
 import { JWTPayload } from 'jose'
 
-import { AccountURN } from '@kubelt/urns/account'
+import { AccountURN } from '@proofzero/urns/account'
 
 export type Scope = string[]
 

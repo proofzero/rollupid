@@ -1,6 +1,6 @@
 import Masonry from 'react-masonry-css'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
+import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import LoadingGrid from './loading'
 import { useState } from 'react'
 

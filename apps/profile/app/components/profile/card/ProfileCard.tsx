@@ -1,7 +1,7 @@
 import { Tooltip } from 'flowbite-react'
 import { FaCopy, FaDiscord, FaGlobe, FaTwitter } from 'react-icons/fa'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 
 export type ProfileCardProps = {
   account: string

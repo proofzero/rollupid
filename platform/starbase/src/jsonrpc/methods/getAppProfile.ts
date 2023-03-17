@@ -5,7 +5,7 @@ import {
   AppClientIdParamSchema,
   AppUpdateableFieldsSchema,
 } from '../validators/app'
-import { ApplicationURNSpace } from '@kubelt/urns/application'
+import { ApplicationURNSpace } from '@proofzero/urns/application'
 
 export const GetAppProfileInput = AppClientIdParamSchema
 

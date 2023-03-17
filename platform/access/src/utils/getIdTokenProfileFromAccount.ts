@@ -1,4 +1,4 @@
-import { AccountURN } from '@kubelt/urns/account'
+import { AccountURN } from '@proofzero/urns/account'
 import { Context } from '../context'
 import { IdTokenProfile } from '../types'
 

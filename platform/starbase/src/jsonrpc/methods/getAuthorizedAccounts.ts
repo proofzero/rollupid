@@ -1,12 +1,12 @@
-import createEdgesClient from '@kubelt/platform-clients/edges'
+import createEdgesClient from '@proofzero/platform-clients/edges'
 import { Context } from '../context'
-import { EDGE_AUTHORIZES } from '@kubelt/platform.access/src/constants'
+import { EDGE_AUTHORIZES } from '@proofzero/platform.access/src/constants'
 
-import type { AccountURN } from '@kubelt/urns/account'
+import type { AccountURN } from '@proofzero/urns/account'
 
 import { z } from 'zod'
-import { EdgesMetadata } from '@kubelt/platform/edges/src/jsonrpc/validators/edge'
-import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
+import { EdgesMetadata } from '@proofzero/platform/edges/src/jsonrpc/validators/edge'
+import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 
 // Input
 // -----------------------------------------------------------------------------

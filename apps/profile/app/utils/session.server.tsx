@@ -14,7 +14,7 @@ import {
   refreshAccessToken,
   ExpiredTokenError,
   InvalidTokenError,
-} from '@kubelt/utils/token'
+} from '@proofzero/utils/token'
 
 import type { FullProfile, RollupAuth } from '~/types'
 

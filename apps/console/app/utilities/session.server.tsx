@@ -11,7 +11,7 @@ import {
   checkToken,
   ExpiredTokenError,
   InvalidTokenError,
-} from '@kubelt/utils/token'
+} from '@proofzero/utils/token'
 
 // @ts-ignore
 invariant(DEPLOY_ENV, 'DEPLOY_ENV must be set')

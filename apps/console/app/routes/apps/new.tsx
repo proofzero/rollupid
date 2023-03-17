@@ -1,8 +1,8 @@
 import { ActionFunction, json, redirect } from '@remix-run/cloudflare'
-import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()

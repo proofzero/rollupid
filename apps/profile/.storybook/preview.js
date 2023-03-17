@@ -1,5 +1,5 @@
 import '../app/styles/tailwind.css'
-import '@kubelt/design-system/src/styles/global.css'
+import '@proofzero/design-system/src/styles/global.css'
 // import '../app/components/FAQ/FAQ.css'
 
 export const parameters = {

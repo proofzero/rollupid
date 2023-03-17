@@ -1,10 +1,10 @@
-// @kubelt/platform.edges:src/db/impl/remove.ts
+// @proofzero/platform.edges:src/db/impl/remove.ts
 
 /**
  * Utilities for removing data from the database.
  */
 
-import { AnyURN } from '@kubelt/urns'
+import { AnyURN } from '@proofzero/urns'
 
 import type { Graph, EdgeTag } from './types'
 

@@ -1,6 +1,6 @@
 import { BaseMiddlewareFunction } from './types'
-import createEdgesClient from '@kubelt/platform-clients/edges'
-import { BaseContext } from '@kubelt/types'
+import createEdgesClient from '@proofzero/platform-clients/edges'
+import { BaseContext } from '@proofzero/types'
 import { generateTraceContextHeaders } from './trace'
 
 export const InjectEdges: BaseMiddlewareFunction<

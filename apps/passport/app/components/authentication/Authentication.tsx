@@ -1,8 +1,8 @@
 import circleLogo from './circle-logo.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
 
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Avatar } from '@kubelt/design-system'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Avatar } from '@proofzero/design-system'
 
 export type AuthenticationProps = {
   logoURL?: string

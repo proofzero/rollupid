@@ -1,14 +1,14 @@
 import { Link, useFetcher, useOutletContext } from '@remix-run/react'
 
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 import SectionTitle from '~/components/typography/SectionTitle'
 
 import { useEffect } from 'react'
 
 import dashboardChart from '~/assets/dashboard_chart.svg'
-import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
-import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
+import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
+import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import type { FullProfile } from '~/types'
 
 import CTA from '~/components/cta/cta'

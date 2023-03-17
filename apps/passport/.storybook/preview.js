@@ -1,4 +1,4 @@
-import '@kubelt/design-system/src/styles/global.css'
+import '@proofzero/design-system/src/styles/global.css'
 import '../app/styles/tailwind.css'
 
 export const parameters = {

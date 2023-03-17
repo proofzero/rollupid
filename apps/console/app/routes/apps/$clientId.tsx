@@ -8,16 +8,16 @@ import SiteHeader from '~/components/SiteHeader'
 
 import { requireJWT } from '~/utilities/session.server'
 import { getGalaxyClient } from '~/utilities/platform.server'
-import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import type { appDetailsProps } from '~/types'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import type { RotatedSecrets } from '~/types'
 import {
   toast,
   Toaster,
   ToastType,
-} from '@kubelt/design-system/src/atoms/toast'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+} from '@proofzero/design-system/src/atoms/toast'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 type AppData = {
   clientId: string

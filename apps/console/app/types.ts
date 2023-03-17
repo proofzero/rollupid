@@ -2,7 +2,7 @@ import type {
   AuthorizedUser,
   AppObject,
   EdgesMetadata,
-} from '@kubelt/platform/starbase/src/types'
+} from '@proofzero/platform/starbase/src/types'
 
 export enum RollType {
   RollAPIKey = 'roll_api_key',

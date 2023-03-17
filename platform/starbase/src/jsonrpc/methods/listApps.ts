@@ -1,15 +1,18 @@
 import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import { ApplicationURN, ApplicationURNSpace } from '@kubelt/urns/application'
-import createEdgesClient from '@kubelt/platform-clients/edges'
+import {
+  ApplicationURN,
+  ApplicationURNSpace,
+} from '@proofzero/urns/application'
+import createEdgesClient from '@proofzero/platform-clients/edges'
 import {
   AppReadableFieldsSchema,
   AppUpdateableFieldsSchema,
 } from '../validators/app'
-import { EdgeDirection } from '@kubelt/types/graph'
+import { EdgeDirection } from '@proofzero/types/graph'
 import { EDGE_APPLICATION } from '../../types'
-import { NoInput } from '@kubelt/platform-middleware/inputValidators'
+import { NoInput } from '@proofzero/platform-middleware/inputValidators'
 
 export const ListAppsOutput = z.array(
   AppUpdateableFieldsSchema.merge(AppReadableFieldsSchema)

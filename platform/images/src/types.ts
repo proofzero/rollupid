@@ -1,4 +1,4 @@
-import { DeploymentMetadata } from '@kubelt/types'
+import { DeploymentMetadata } from '@proofzero/types'
 
 export interface Environment {
   Images: DurableObjectNamespace

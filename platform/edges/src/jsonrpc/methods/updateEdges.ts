@@ -4,7 +4,7 @@ import { Context } from '../../context'
 import {
   AnyURNInput,
   EdgeTagInput,
-} from '@kubelt/platform-middleware/inputValidators'
+} from '@proofzero/platform-middleware/inputValidators'
 
 export const UpdateEdgesMethodInput = z.array(
   z.object({

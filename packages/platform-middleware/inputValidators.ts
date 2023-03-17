@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { AccessURN, AccessURNSpace } from '@kubelt/urns/access'
-import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
-import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
-import { AnyURN, parseURN } from '@kubelt/urns'
-import { EdgeURN } from '@kubelt/urns/edge'
-import { CryptoAddressType } from '@kubelt/types/address'
+import { AccessURN, AccessURNSpace } from '@proofzero/urns/access'
+import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
+import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
+import { AnyURN, parseURN } from '@proofzero/urns'
+import { EdgeURN } from '@proofzero/urns/edge'
+import { CryptoAddressType } from '@proofzero/types/address'
 
 export const NoInput = z.undefined()
 

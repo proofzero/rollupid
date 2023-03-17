@@ -1,7 +1,7 @@
 import {
   EdgeTagInput,
   NodeFilterInput,
-} from '@kubelt/platform-middleware/inputValidators'
+} from '@proofzero/platform-middleware/inputValidators'
 import { z } from 'zod'
 import { Node } from './node'
 

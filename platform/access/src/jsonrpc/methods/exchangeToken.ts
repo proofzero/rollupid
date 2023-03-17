@@ -7,9 +7,9 @@ import {
   EDGE_AUTHORIZES,
 } from '../../constants'
 
-import { AccessURNSpace } from '@kubelt/urns/access'
-import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
-import { AccessJWTPayload, GrantType, Scope } from '@kubelt/types/access'
+import { AccessURNSpace } from '@proofzero/urns/access'
+import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
+import { AccessJWTPayload, GrantType, Scope } from '@proofzero/types/access'
 
 import { Context } from '../../context'
 import { initAuthorizationNodeByName, initAccessNodeByName } from '../../nodes'

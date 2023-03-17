@@ -1,5 +1,5 @@
 import React from 'react'
-import { SCOPES_JSON } from '@kubelt/security/scopes'
+import { SCOPES_JSON } from '@proofzero/security/scopes'
 import { MultiSelect } from './MultiSelect'
 
 export default {

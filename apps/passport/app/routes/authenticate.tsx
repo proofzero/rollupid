@@ -7,7 +7,7 @@ import { getUserSession } from '~/session.server'
 
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
 import { useCatch, useLoaderData, useOutletContext } from '@remix-run/react'
-import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
+import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
 import { LazyAuth } from '~/web3/lazyAuth'
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 

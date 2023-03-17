@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
+import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { Context } from '../../context'
 import { isHandleAddressType } from '../../utils'
 

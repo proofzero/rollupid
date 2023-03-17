@@ -1,4 +1,4 @@
-import { DeploymentMetadata } from '@kubelt/types'
+import { DeploymentMetadata } from '@proofzero/types'
 
 export default interface Env {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/

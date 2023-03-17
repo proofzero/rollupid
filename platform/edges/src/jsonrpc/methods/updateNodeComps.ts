@@ -1,5 +1,5 @@
-import { AnyURNInput } from '@kubelt/platform-middleware/inputValidators'
-import { parseUrnForEdge } from '@kubelt/urns/edge'
+import { AnyURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { parseUrnForEdge } from '@proofzero/urns/edge'
 import { z } from 'zod'
 import { Context } from '../../context'
 import * as update from '../../db/update'

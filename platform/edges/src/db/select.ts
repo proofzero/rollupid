@@ -1,4 +1,4 @@
-// @kubelt/platform.edges:src/db/impl/select.ts
+// @proofzero/platform.edges:src/db/impl/select.ts
 
 /**
  * Utilities for selecting data from the database.
@@ -7,7 +7,7 @@
 // Imported Types
 // -----------------------------------------------------------------------------
 
-import type { AnyURN } from '@kubelt/urns'
+import type { AnyURN } from '@proofzero/urns'
 
 import type {
   Edge,

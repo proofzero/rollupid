@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { inputValidators } from '@kubelt/platform-middleware'
+import { inputValidators } from '@proofzero/platform-middleware'
 import { Context } from '../../context'
 
-import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
+import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 import { Node } from '../../../../edges/src/jsonrpc/validators/node'
 
 export const GetAddressesInput = z.object({

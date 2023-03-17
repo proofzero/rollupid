@@ -1,8 +1,8 @@
 import { decodeJwt } from 'jose'
 
-import { AccountURNSpace } from '@kubelt/urns/account'
-import { AccessJWTPayload } from '@kubelt/types/access'
-import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
+import { AccountURNSpace } from '@proofzero/urns/account'
+import { AccessJWTPayload } from '@proofzero/types/access'
+import { BaseMiddlewareFunction } from '@proofzero/platform-middleware/types'
 
 import { initAccessNodeByName } from '../../nodes'
 import { Context } from '../../context'

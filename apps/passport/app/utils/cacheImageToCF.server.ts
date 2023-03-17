@@ -1,8 +1,8 @@
-import createImageClient from '@kubelt/platform-clients/image'
+import createImageClient from '@proofzero/platform-clients/image'
 import {
   generateTraceContextHeaders,
   TraceSpan,
-} from '@kubelt/platform-middleware/trace'
+} from '@proofzero/platform-middleware/trace'
 
 export default async (
   image_retrieval_url: string,

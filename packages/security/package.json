@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/security",
+  "name": "@proofzero/security",
   "version": "0.1.0",
   "author": "Proof Zero Inc.",
   "description": "Platform security definitions and utilities",

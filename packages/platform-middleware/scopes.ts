@@ -1,4 +1,4 @@
-import { BaseContext } from '@kubelt/types'
+import { BaseContext } from '@proofzero/types'
 import { BaseMiddlewareFunction } from './types'
 
 export const Scopes: BaseMiddlewareFunction<BaseContext> = async ({

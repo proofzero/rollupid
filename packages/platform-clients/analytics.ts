@@ -1,6 +1,6 @@
-import { BaseContext } from '@kubelt/types'
-import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
-import { getAuthzTokenFromReq } from '@kubelt/utils'
+import { BaseContext } from '@proofzero/types'
+import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
+import { getAuthzTokenFromReq } from '@proofzero/utils'
 import { decodeJwt } from 'jose'
 type PathContext = { path?: string; type?: string } & BaseContext
 

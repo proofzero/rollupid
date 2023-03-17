@@ -1,5 +1,5 @@
-import { Button } from '@kubelt/design-system'
-import { Text } from '@kubelt/design-system'
+import { Button } from '@proofzero/design-system'
+import { Text } from '@proofzero/design-system'
 
 const NoCryptoAddresses = ({
   redirectHandler,

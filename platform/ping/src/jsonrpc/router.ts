@@ -1,6 +1,6 @@
 import { initTRPC } from '@trpc/server'
 
-import { geo } from '@kubelt/platform-middleware'
+import { geo } from '@proofzero/platform-middleware'
 
 import { Context } from '../context'
 
@@ -9,7 +9,7 @@ import { delayInitMethod, DelayInitInputOutput } from './methods/delayInit'
 import { pingMethod, PingOutput } from './methods/ping'
 import { pongMethod } from './methods/pong'
 
-import { LogUsage } from '@kubelt/platform-middleware/log'
+import { LogUsage } from '@proofzero/platform-middleware/log'
 
 const t = initTRPC.context<Context>().create()
 

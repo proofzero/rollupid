@@ -1,7 +1,7 @@
-import { List } from '@kubelt/design-system/src/atoms/lists/List'
+import { List } from '@proofzero/design-system/src/atoms/lists/List'
 import type { AddressListItemProps } from './AddressListItem'
 import { AddressListItem } from './AddressListItem'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 export type AddressListProps = {
   addresses: AddressListItemProps[]

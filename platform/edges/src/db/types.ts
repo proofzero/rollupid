@@ -1,4 +1,4 @@
-// @kubelt/platform.edges:src/db/types.ts
+// @proofzero/platform.edges:src/db/types.ts
 
 /**
  * Edge-related types.
@@ -6,12 +6,12 @@
 
 import { z } from 'zod'
 
-import type { AnyURN } from '@kubelt/urns'
-import { EdgeURN } from '@kubelt/urns/edge'
+import type { AnyURN } from '@proofzero/urns'
+import { EdgeURN } from '@proofzero/urns/edge'
 import {
   EdgeDirectionInput,
   NodeFilterInput,
-} from '@kubelt/platform-middleware/inputValidators'
+} from '@proofzero/platform-middleware/inputValidators'
 import {
   EdgeQueryInput,
   Edge,

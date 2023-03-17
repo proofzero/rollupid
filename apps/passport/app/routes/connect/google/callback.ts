@@ -1,12 +1,12 @@
 import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
-import { generateHashedIDRef } from '@kubelt/urns/idref'
-import { AddressURNSpace } from '@kubelt/urns/address'
+import { generateHashedIDRef } from '@proofzero/urns/idref'
+import { AddressURNSpace } from '@proofzero/urns/address'
 import { GoogleStrategyDefaultName } from 'remix-auth-google'
 import { initAuthenticator, getGoogleAuthenticator } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
-import type { OAuthData } from '@kubelt/platform.address/src/types'
-import { NodeType, OAuthAddressType } from '@kubelt/types/address'
+import type { OAuthData } from '@proofzero/platform.address/src/types'
+import { NodeType, OAuthAddressType } from '@proofzero/types/address'
 import {
   getConsoleParamsSession,
   getJWTConditionallyFromSession,
@@ -48,7 +48,11 @@ export const loader: LoaderFunction = async ({
   )
 
   const { accountURN, existing } = await addressClient.resolveAccount.query({
-    jwt: await getJWTConditionallyFromSession(request, context.env, appData?.clientId),
+    jwt: await getJWTConditionallyFromSession(
+      request,
+      context.env,
+      appData?.clientId
+    ),
     force: !appData || appData.prompt !== 'login',
   })
 

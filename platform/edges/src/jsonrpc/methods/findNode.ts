@@ -1,4 +1,4 @@
-import { NodeFilterInput } from '@kubelt/platform-middleware/inputValidators'
+import { NodeFilterInput } from '@proofzero/platform-middleware/inputValidators'
 import { Context } from '../../context'
 import { Node as NodeSchema } from '../validators/node'
 import * as db from '../../db'

@@ -1,4 +1,4 @@
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import type { AuthorizedProfile } from '~/types'
 
 import missingImage from '../../../images/missing-img.svg'

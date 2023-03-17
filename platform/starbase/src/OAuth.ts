@@ -1,4 +1,4 @@
-// @kubelt/platform.starbase:src/oauth.ts
+// @proofzero/platform.starbase:src/oauth.ts
 
 /**
  * Utilities for generating an OAuth profile.

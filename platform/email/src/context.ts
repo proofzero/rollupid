@@ -1,8 +1,8 @@
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
-import { BaseContext } from '@kubelt/types'
+import { BaseContext } from '@proofzero/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { Environment } from './types'
-import { generateTraceSpan } from '@kubelt/platform-middleware/trace'
+import { generateTraceSpan } from '@proofzero/platform-middleware/trace'
 
 interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext & Environment> {}

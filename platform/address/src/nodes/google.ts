@@ -1,6 +1,6 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 
-import { OAuthAddressType } from '@kubelt/types/address'
+import { OAuthAddressType } from '@proofzero/types/address'
 
 import type { Context } from '../context'
 import { OAuthData, OAuthGoogleProfile } from '../types'

@@ -1,15 +1,15 @@
-import getEdgesClient from '@kubelt/platform-clients/edges'
-import type { AddressURN } from '@kubelt/urns/address'
-import { AccountURNSpace } from '@kubelt/urns/account'
+import getEdgesClient from '@proofzero/platform-clients/edges'
+import type { AddressURN } from '@proofzero/urns/address'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import { Context } from '../../context'
-import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
+import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 import { z } from 'zod'
 
 import {
   AccountURNInput,
   AddressURNInput,
-} from '@kubelt/platform-middleware/inputValidators'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+} from '@proofzero/platform-middleware/inputValidators'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 export const UnsetAccountInput = AccountURNInput
 

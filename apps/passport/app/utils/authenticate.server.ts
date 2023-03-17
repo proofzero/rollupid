@@ -1,8 +1,8 @@
-import { AddressURNSpace } from '@kubelt/urns/address'
-import type { AddressURN } from '@kubelt/urns/address'
-import type { AccountURN } from '@kubelt/urns/account'
+import { AddressURNSpace } from '@proofzero/urns/address'
+import type { AddressURN } from '@proofzero/urns/address'
+import type { AccountURN } from '@proofzero/urns/account'
 
-import { GrantType, ResponseType } from '@kubelt/types/access'
+import { GrantType, ResponseType } from '@proofzero/types/access'
 
 import {
   getAccessClient,
@@ -10,10 +10,10 @@ import {
   getAddressClient,
 } from '~/platform.server'
 import { createUserSession, parseJwt } from '~/session.server'
-import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
+import { CryptoAddressType, OAuthAddressType } from '@proofzero/types/address'
 import { generateGradient } from './gradient.server'
 import { redirect } from '@remix-run/cloudflare'
-import type { TraceSpan } from '@kubelt/platform-middleware/trace'
+import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 
 export const authenticateAddress = async (
   address: AddressURN,

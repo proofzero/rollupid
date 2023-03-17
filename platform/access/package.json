@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/platform.access",
+  "name": "@proofzero/platform.access",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20221111.1",
-    "@kubelt/types": "workspace:*",
+    "@proofzero/types": "workspace:*",
     "@types/async": "3.2.16",
     "@types/node": "18.11.9",
     "@typescript-eslint/eslint-plugin": "5.42.1",
@@ -35,9 +35,9 @@
   "dependencies": {
     "@ethersproject/bytes": "5.7.0",
     "@ethersproject/random": "5.7.0",
-    "@kubelt/platform-clients": "workspace:*",
-    "@kubelt/platform-middleware": "workspace:*",
-    "@kubelt/urns": "workspace:*",
+    "@proofzero/platform-clients": "workspace:*",
+    "@proofzero/platform-middleware": "workspace:*",
+    "@proofzero/urns": "workspace:*",
     "@trpc/server": "10.8.1",
     "async": "3.2.4",
     "do-proxy": "1.3.3",

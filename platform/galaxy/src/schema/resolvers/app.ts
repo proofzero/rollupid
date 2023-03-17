@@ -8,9 +8,9 @@ import {
   requestLogging,
   setupContext,
 } from './utils'
-import createAccessClient from '@kubelt/platform-clients/access'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import createAccessClient from '@proofzero/platform-clients/access'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 const appResolvers: Resolvers = {
   Query: {

@@ -1,5 +1,5 @@
-import { generateTraceSpan } from '@kubelt/platform-middleware/trace'
-import { BaseContext, DeploymentMetadata } from '@kubelt/types'
+import { generateTraceSpan } from '@proofzero/platform-middleware/trace'
+import { BaseContext, DeploymentMetadata } from '@proofzero/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import type { Environment } from './types'

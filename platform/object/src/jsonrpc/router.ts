@@ -14,7 +14,7 @@ import {
   PutObjectOutput,
 } from './methods/putObject'
 
-import { LogUsage } from '@kubelt/platform-middleware/log'
+import { LogUsage } from '@proofzero/platform-middleware/log'
 
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
@@ -31,7 +31,7 @@ const t = initTRPC.context<Context>().create({
   },
 })
 
-import { Analytics } from '@kubelt/platform-middleware/analytics'
+import { Analytics } from '@proofzero/platform-middleware/analytics'
 
 export const appRouter = t.router({
   getProfile: t.procedure

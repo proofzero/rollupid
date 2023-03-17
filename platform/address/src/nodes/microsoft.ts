@@ -6,7 +6,7 @@ import { OAuthData, OAuthMicrosoftProfile } from '../types'
 import Address from './address'
 import OAuthAddress from './oauth'
 import type { AddressNode } from '.'
-import { OAuthAddressType } from '@kubelt/types/address'
+import { OAuthAddressType } from '@proofzero/types/address'
 
 export default class MicrosoftAddress extends OAuthAddress {
   declare clientId: string

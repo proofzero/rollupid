@@ -1,5 +1,5 @@
-import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
-import { AddressURNSpace } from '@kubelt/urns/address'
+import { BaseMiddlewareFunction } from '@proofzero/platform-middleware/types'
+import { AddressURNSpace } from '@proofzero/urns/address'
 import { Context } from '../../context'
 import { initAddressNodeByName } from '../../nodes'
 

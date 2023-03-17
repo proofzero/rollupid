@@ -1,4 +1,4 @@
-// @kubelt/security:packages/security/scopes.ts
+// @proofzero/security:packages/security/scopes.ts
 
 /**
  * Platform scope definitions and utilities.

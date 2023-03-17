@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/platform-clients",
+  "name": "@proofzero/platform-clients",
   "version": "1.0.0",
   "private": true,
   "description": "Kubelt Platform Clients",
@@ -21,11 +21,11 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20221111.1",
-    "@kubelt/platform.access": "workspace:*",
-    "@kubelt/platform.address": "workspace:*",
-    "@kubelt/platform.object": "workspace:*",
-    "@kubelt/platform.starbase": "workspace:*",
-    "@kubelt/urns": "workspace:*",
+    "@proofzero/platform.access": "workspace:*",
+    "@proofzero/platform.address": "workspace:*",
+    "@proofzero/platform.object": "workspace:*",
+    "@proofzero/platform.starbase": "workspace:*",
+    "@proofzero/urns": "workspace:*",
     "@typescript-eslint/eslint-plugin": "5.45.0",
     "@typescript-eslint/parser": "5.45.0",
     "eslint": "8.29.0",

@@ -39,7 +39,7 @@ import {
   GetAccountByAliasOutput,
 } from './methods/getAccountByAlias'
 
-import { LogUsage } from '@kubelt/platform-middleware/log'
+import { LogUsage } from '@proofzero/platform-middleware/log'
 import { parse3RN } from './middlewares/parse3RN'
 import { checkCryptoNodes } from './middlewares/checkCryptoNode'
 import { initAddressNode } from './middlewares/initAddressNode'
@@ -47,7 +47,7 @@ import { getAccountMethod, GetAccountOutput } from './methods/getAccount'
 import { InitVaultOutput, initVaultMethod } from './methods/initVault'
 import { checkOAuthNode } from './middlewares/checkOAuthNode'
 
-import { Analytics } from '@kubelt/platform-middleware/analytics'
+import { Analytics } from '@proofzero/platform-middleware/analytics'
 import { setAddressNodeClient } from './middlewares/setAddressNodeClient'
 import {
   SetAddressNicknameInput,

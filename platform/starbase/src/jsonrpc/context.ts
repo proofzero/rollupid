@@ -1,15 +1,15 @@
-import { BaseContext, DeploymentMetadata } from '@kubelt/types'
+import { BaseContext, DeploymentMetadata } from '@proofzero/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { Environment } from '../types'
-import createEdgesClient from '@kubelt/platform-clients/edges'
-import { AccountURN } from '@kubelt/urns/account'
+import createEdgesClient from '@proofzero/platform-clients/edges'
+import { AccountURN } from '@proofzero/urns/account'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
-import { ApplicationURN } from '@kubelt/urns/application'
+import { ApplicationURN } from '@proofzero/urns/application'
 import {
   generateTraceContextHeaders,
   generateTraceSpan,
   TraceSpan,
-} from '@kubelt/platform-middleware/trace'
+} from '@proofzero/platform-middleware/trace'
 
 /**
  * Defines your inner context shape.

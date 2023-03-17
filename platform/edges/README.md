@@ -1,4 +1,4 @@
-# @kubelt/platform.edges
+# @proofzero/platform.edges
 
 Define a D1 database for storage and retrieval of graph edges.
 

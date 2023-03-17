@@ -24,9 +24,9 @@ import {
   RemoveEdgeMethodOutput,
 } from './methods/removeEdge'
 
-import { LogUsage } from '@kubelt/platform-middleware/log'
+import { LogUsage } from '@proofzero/platform-middleware/log'
 
-import { Analytics } from '@kubelt/platform-middleware/analytics'
+import { Analytics } from '@proofzero/platform-middleware/analytics'
 import {
   updateNodeCompsMethod,
   UpdateNodeCompsMethodInput,

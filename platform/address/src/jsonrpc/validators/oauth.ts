@@ -1,4 +1,4 @@
-import { OAuthAddressType } from '@kubelt/types/address'
+import { OAuthAddressType } from '@proofzero/types/address'
 import { z } from 'zod'
 
 import {

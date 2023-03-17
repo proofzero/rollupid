@@ -4,7 +4,7 @@ import {
   CryptoAddressType,
   EmailAddressType,
   OAuthAddressType,
-} from '@kubelt/types/address'
+} from '@proofzero/types/address'
 
 import { Context } from '../../context'
 import {
@@ -25,7 +25,7 @@ import TwitterAddress from '../../nodes/twitter'
 import MicrosoftAddress from '../../nodes/microsoft'
 import AppleAddress from '../../nodes/apple'
 import DiscordAddress from '../../nodes/discord'
-import { AddressURNInput } from '@kubelt/platform-middleware/inputValidators'
+import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 import EmailAddress from '../../nodes/email'
 
 export const GetAddressProfileOutput = z.discriminatedUnion('type', [

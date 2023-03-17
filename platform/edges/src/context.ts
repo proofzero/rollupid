@@ -1,9 +1,9 @@
-import { BaseContext, DeploymentMetadata } from '@kubelt/types'
+import { BaseContext, DeploymentMetadata } from '@proofzero/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { Environment } from './types'
 import * as db from './db'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
-import { generateTraceSpan } from '@kubelt/platform-middleware/trace'
+import { generateTraceSpan } from '@proofzero/platform-middleware/trace'
 
 /**
  * Defines your inner context shape.

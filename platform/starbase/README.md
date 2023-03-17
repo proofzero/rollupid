@@ -1,4 +1,4 @@
-# @kubelt/starbase
+# @proofzero/starbase
 
 A Rollup-platform application for managing a user's dapps.
 

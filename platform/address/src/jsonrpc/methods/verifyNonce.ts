@@ -1,15 +1,15 @@
 import { z } from 'zod'
 import { Context } from '../../context'
 
-import { ResponseType } from '@kubelt/types/access'
+import { ResponseType } from '@proofzero/types/access'
 
-import getAccessClient from '@kubelt/platform-clients/access'
+import getAccessClient from '@proofzero/platform-clients/access'
 
 import { appRouter } from '../router'
 import { Challenge } from '../../types'
 import { AddressNode } from '../../nodes'
 import CryptoAddress from '../../nodes/crypto'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 export const VerifyNonceInput = z.object({
   nonce: z.string(),

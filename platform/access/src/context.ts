@@ -1,17 +1,17 @@
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
-import createStarbaseClient from '@kubelt/platform-clients/starbase'
-import createAccountClient from '@kubelt/platform-clients/account'
-import createEdgesClient from '@kubelt/platform-clients/edges'
-import { BaseContext, DeploymentMetadata } from '@kubelt/types'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createAccountClient from '@proofzero/platform-clients/account'
+import createEdgesClient from '@proofzero/platform-clients/edges'
+import { BaseContext, DeploymentMetadata } from '@proofzero/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import { Access, Authorization } from '.'
 import type { Environment } from './types'
-import type { AccountURN } from '@kubelt/urns/account'
+import type { AccountURN } from '@proofzero/urns/account'
 import { DurableObjectStubProxy } from 'do-proxy'
 import {
   generateTraceContextHeaders,
   generateTraceSpan,
-} from '@kubelt/platform-middleware/trace'
+} from '@proofzero/platform-middleware/trace'
 
 /**
  * Defines your inner context shape.
