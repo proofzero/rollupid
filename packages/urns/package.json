@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/urns",
+  "name": "@proofzero/urns",
   "private": true,
   "version": "1.0.0",
   "description": "RollupId URNs",

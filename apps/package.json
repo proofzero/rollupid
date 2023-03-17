@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/apps",
+  "name": "@proofzero/apps",
   "version": "0.1.0",
   "private": true,
   "useWorkspaces": true,

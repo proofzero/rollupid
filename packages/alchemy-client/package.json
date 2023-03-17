@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/alchemy-client",
+  "name": "@proofzero/alchemy-client",
   "version": "0.1.0",
   "description": "A client for Alchemy calls.",
   "main": "index.ts",

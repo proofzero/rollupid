@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/types",
+  "name": "@proofzero/types",
   "private": true,
   "version": "0.1.0",
   "description": "RollupId platform types",

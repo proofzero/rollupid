@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/apps.profile",
+  "name": "@proofzero/apps.profile",
   "version": "0.1.0",
   "private": true,
   "sideEffects": true,
@@ -23,10 +23,10 @@
   "dependencies": {
     "@headlessui/react": "1.7.4",
     "@heroicons/react": "2.0.13",
-    "@kubelt/design-system": "*",
-    "@kubelt/platform-clients": "workspace:*",
-    "@kubelt/urns": "workspace:*",
-    "@kubelt/utils": "workspace:*",
+    "@proofzero/design-system": "*",
+    "@proofzero/platform-clients": "workspace:*",
+    "@proofzero/urns": "workspace:*",
+    "@proofzero/utils": "workspace:*",
     "@remix-run/cloudflare": "1.14.0",
     "@remix-run/cloudflare-workers": "1.14.0",
     "@remix-run/react": "1.14.0",

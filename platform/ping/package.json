@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/platform.ping",
+  "name": "@proofzero/platform.ping",
   "version": "0.0.0",
   "private": true,
   "scripts": {

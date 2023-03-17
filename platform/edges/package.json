@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/platform.edges",
+  "name": "@proofzero/platform.edges",
   "version": "0.1.0",
   "author": "Proof Zero Inc.",
   "description": "Graph edge storage and retrieval",
@@ -44,8 +44,8 @@
     "yarn-run-all": "3.1.1"
   },
   "dependencies": {
-    "@kubelt/security": "workspace:*",
-    "@kubelt/urns": "workspace:*",
+    "@proofzero/security": "workspace:*",
+    "@proofzero/urns": "workspace:*",
     "@trpc/server": "10.8.1",
     "cross-env": "7.0.3",
     "drizzle-orm": "0.16.1",

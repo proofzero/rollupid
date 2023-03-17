@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/apps.passport",
+  "name": "@proofzero/apps.passport",
   "version": "0.1.0",
   "private": true,
   "sideEffects": true,
@@ -23,10 +23,10 @@
   },
   "dependencies": {
     "@ethersproject/keccak256": "5.7.0",
-    "@kubelt/design-system": "*",
-    "@kubelt/platform-clients": "workspace:*",
-    "@kubelt/platform.access": "workspace:*",
-    "@kubelt/utils": "workspace:*",
+    "@proofzero/design-system": "*",
+    "@proofzero/platform-clients": "workspace:*",
+    "@proofzero/platform.access": "workspace:*",
+    "@proofzero/utils": "workspace:*",
     "@remix-run/cloudflare": "1.14.0",
     "@remix-run/cloudflare-workers": "1.14.0",
     "@remix-run/react": "1.14.0",

@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/platform-middleware",
+  "name": "@proofzero/platform-middleware",
   "version": "1.0.0",
   "private": true,
   "description": "Kubelt Platform Middleware",
@@ -20,8 +20,8 @@
     "test": "run-s check"
   },
   "devDependencies": {
-    "@kubelt/types": "workspace:*",
-    "@kubelt/urns": "workspace:*",
+    "@proofzero/types": "workspace:*",
+    "@proofzero/urns": "workspace:*",
     "@typescript-eslint/eslint-plugin": "5.45.0",
     "@typescript-eslint/parser": "5.45.0",
     "eslint": "8.29.0",
