@@ -12,8 +12,8 @@ type EmailOTPValidatorProps = {
 
 export default ({ email, goBack, requestResend }: EmailOTPValidatorProps) => {
   const inputLen = 5
-  const [inputRefs] = useState(() =>
-    Array.from({ length: inputLen }, () => useRef<HTMLInputElement>())
+  const inputRefs = Array.from({ length: inputLen }, () =>
+    useRef<HTMLInputElement>()
   )
 
   return (
