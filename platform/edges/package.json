@@ -47,6 +47,7 @@
   "dependencies": {
     "@proofzero/security": "workspace:*",
     "@proofzero/urns": "workspace:*",
+    "@proofzero/utils": "workspace:*",
     "@trpc/server": "10.8.1",
     "cross-env": "7.0.3",
     "drizzle-orm": "0.16.1",

@@ -44,6 +44,7 @@
     "@proofzero/platform-clients": "workspace:*",
     "@proofzero/types": "workspace:*",
     "@proofzero/urns": "workspace:*",
+    "@proofzero/utils": "workspace:*",
     "@trpc/server": "10.8.1",
     "@types/node": "18.15.3",
     "do-proxy": "1.3.3",

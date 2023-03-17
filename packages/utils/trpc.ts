@@ -5,6 +5,17 @@ import type { TRPCError } from '@trpc/server/src/error/TRPCError'
 
 import { RollupError, HTTP_STATUS_CODES } from '@proofzero/errors'
 
+type OnErrorOptions = { error: TRPCError }
+
+interface OnErrorFunction {
+  (options: OnErrorOptions): void
+}
+
+export const serverOnError: OnErrorFunction = ({ error }) => {
+  if (error.cause instanceof RollupError) console.error(error.cause)
+  else console.error(error)
+}
+
 type ErrorFormatterOptions = { shape: TRPCErrorShape; error: TRPCError }
 
 interface ErrorFormatterFunction {

@@ -38,6 +38,7 @@
     "@proofzero/platform-clients": "workspace:*",
     "@proofzero/platform-middleware": "workspace:*",
     "@proofzero/urns": "workspace:*",
+    "@proofzero/utils": "workspace:*",
     "@trpc/server": "10.8.1",
     "async": "3.2.4",
     "do-proxy": "1.3.3",

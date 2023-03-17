@@ -15,5 +15,8 @@
     "dev:wrangler": "wrangler dev --local --persist",
     "dev": "run-p 'dev:*'",
     "deploy": "wrangler publish"
+  },
+  "dependencies": {
+    "@proofzero/utils": "workspace:*"
   }
 }

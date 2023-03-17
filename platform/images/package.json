@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@ethersproject/keccak256": "5.7.0",
+    "@proofzero/utils": "workspace:*",
     "date-fns": "2.29.3",
     "image-data-uri": "2.0.1",
     "svg2png-wasm": "1.3.4",

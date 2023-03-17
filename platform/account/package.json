@@ -35,6 +35,7 @@
     "@proofzero/platform-middleware": "workspace:*",
     "@proofzero/platform.access": "workspace:*",
     "@proofzero/types": "workspace:*",
+    "@proofzero/utils": "workspace:*",
     "@trpc/server": "10.8.1",
     "do-proxy": "1.3.3",
     "ts-set-utils": "0.2.0",
