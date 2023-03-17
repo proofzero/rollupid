@@ -12,5 +12,5 @@ export const setAddressNicknameMethod = async ({
   input: z.infer<typeof SetAddressNicknameInput>
   ctx: Context
 }): Promise<void> => {
-  ctx.address?.class.setNickname(input.nickname)
+  await ctx.address?.class.setNickname(input.nickname)
 }
