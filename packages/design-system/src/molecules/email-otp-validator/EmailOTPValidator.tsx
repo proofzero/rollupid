@@ -59,6 +59,12 @@ export default ({ email, goBack, requestResend }: EmailOTPValidatorProps) => {
                   inputRefs[(i - 1 + inputLen) % inputLen].current.select()
                 }
               }}
+              onKeyUp={(ev) => {
+                if (ev.key === inputRefs[i].current.value) {
+                  inputRefs[(i + 1) % inputLen].current.focus()
+                  inputRefs[(i + 1) % inputLen].current.select()
+                }
+              }}
               onPaste={(ev) => {
                 ev.preventDefault()
                 const text = ev.clipboardData.getData('text')
