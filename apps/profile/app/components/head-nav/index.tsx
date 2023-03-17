@@ -11,7 +11,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import logo from '~/assets/profile_logo.svg'
 import mobileLogo from '~/assets/profile_logo_mobile.svg'
 import defaultAvatar from '~/assets/circle_gradient.png'
-import { UserNavigation } from '~/components/hean-nav-links'
+import { UserNavigation } from '~/components/head-nav/nav-links'
 
 import styles from './headNav.css'
 import { gatewayFromIpfs } from '@kubelt/utils'
