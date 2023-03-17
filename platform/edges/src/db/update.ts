@@ -1,10 +1,10 @@
-// @kubelt/platform.edges:src/db/impl/insert.ts
+// @proofzero/platform.edges:src/db/impl/insert.ts
 
 /**
  * Utilities for inserting data into the database.
  */
 
-import { parseUrnForEdge } from '@kubelt/urns/edge'
+import { parseUrnForEdge } from '@proofzero/urns/edge'
 
 import type { EdgeTag, Graph } from './types'
 

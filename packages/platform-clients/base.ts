@@ -1,4 +1,4 @@
-import { TRACEPARENT_HEADER_NAME } from '@kubelt/platform-middleware/trace'
+import { TRACEPARENT_HEADER_NAME } from '@proofzero/platform-middleware/trace'
 import type { Func } from 'typed-json-rpc'
 
 export interface BaseApi {

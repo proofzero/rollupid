@@ -1,5 +1,5 @@
 import '../app/styles/tailwind.css'
-import '@kubelt/design-system/src/styles/global.css'
+import '@proofzero/design-system/src/styles/global.css'
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },

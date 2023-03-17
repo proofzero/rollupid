@@ -20,22 +20,22 @@ import { getGalaxyClient } from '~/helpers/clients'
 import { ogImageFromProfile } from '~/helpers/ogImage'
 import { getAccountProfile } from '~/helpers/profile'
 
-import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { gatewayFromIpfs } from '@kubelt/utils'
+import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { gatewayFromIpfs } from '@proofzero/utils'
 
 import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
 
 import defaultOG from '~/assets/social.png'
 import subtractLogo from '~/assets/subtract-logo.svg'
-import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
-import type { AccountURN } from '@kubelt/urns/account'
-import { AccountURNSpace } from '@kubelt/urns/account'
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { CryptoAddressType, OAuthAddressType } from '@proofzero/types/address'
+import type { AccountURN } from '@proofzero/urns/account'
+import { AccountURNSpace } from '@proofzero/urns/account'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { imageFromAddressType } from '~/helpers'
 import type { FullProfile } from '~/types'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
   const url = new URL(request.url)

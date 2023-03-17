@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { inputValidators } from '@kubelt/platform-middleware'
+import { inputValidators } from '@proofzero/platform-middleware'
 import { Context } from '../../context'
 import { ProfileSchema } from '../validators/profile'
-import { AccountURNSpace } from '@kubelt/urns/account'
+import { AccountURNSpace } from '@proofzero/urns/account'
 
 export const SetProfileInput = z.object({
   name: inputValidators.AccountURNInput,

@@ -1,4 +1,4 @@
-import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
+import { ButtonAnchor } from '@proofzero/design-system/src/atoms/buttons/ButtonAnchor'
 import { FaBook, FaDiscord, FaGithub, FaTwitter } from 'react-icons/fa'
 import { HiAcademicCap, HiUsers } from 'react-icons/hi2'
 import { InfoPanel } from './InfoPanel'

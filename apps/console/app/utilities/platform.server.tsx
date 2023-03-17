@@ -1,7 +1,7 @@
 import { GraphQLClient } from 'graphql-request'
-import { getSdk } from '@kubelt/galaxy-client'
-import { TRACEPARENT_HEADER_NAME } from '@kubelt/platform-middleware/trace'
-import { PlatformHeaders } from '@kubelt/platform-clients/base'
+import { getSdk } from '@proofzero/galaxy-client'
+import { TRACEPARENT_HEADER_NAME } from '@proofzero/platform-middleware/trace'
+import { PlatformHeaders } from '@proofzero/platform-clients/base'
 
 export async function getGalaxyClient(reqHeaders: PlatformHeaders) {
   const traceparent = reqHeaders ? reqHeaders[TRACEPARENT_HEADER_NAME] : 'None'

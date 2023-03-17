@@ -24,7 +24,7 @@ import {
 
 import { RollupIdButton } from '~/components'
 
-import globalStyles from '@kubelt/design-system/src/styles/global.css'
+import globalStyles from '@proofzero/design-system/src/styles/global.css'
 import styles from './styles/tailwind.css'
 
 import appleIcon from '~/assets/apple-touch-icon.png'
@@ -33,14 +33,14 @@ import icon16 from '~/assets/favicon-16x16.png'
 import faviconSvg from '~/assets/favicon.svg'
 import social from '~/assets/passport-social.png'
 
-import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
-import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
+import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
+import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
 
 import {
   toast,
   Toaster,
   ToastType,
-} from '@kubelt/design-system/src/atoms/toast'
+} from '@proofzero/design-system/src/atoms/toast'
 
 import * as gtag from '~/utils/gtags.client'
 import { commitFlashSession, getFlashSession } from './session.server'

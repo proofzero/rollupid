@@ -1,5 +1,5 @@
-import { AnyURN } from '@kubelt/urns'
-import { EdgeURN } from '@kubelt/urns/edge'
+import { AnyURN } from '@proofzero/urns'
+import { EdgeURN } from '@proofzero/urns/edge'
 
 export type Permission = string
 

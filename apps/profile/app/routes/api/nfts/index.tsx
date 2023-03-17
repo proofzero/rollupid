@@ -1,4 +1,4 @@
-import type { AccountURN } from '@kubelt/urns/account'
+import type { AccountURN } from '@proofzero/urns/account'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 

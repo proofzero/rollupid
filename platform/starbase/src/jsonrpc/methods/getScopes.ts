@@ -1,5 +1,5 @@
 import { Context } from '../context'
-import { SCOPES_JSON } from '@kubelt/security/scopes'
+import { SCOPES_JSON } from '@proofzero/security/scopes'
 
 export const getScopes = async ({
   input,

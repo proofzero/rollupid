@@ -7,13 +7,13 @@ import {
   useTransition,
 } from '@remix-run/react'
 
-import { ResponseType } from '@kubelt/types/access'
+import { ResponseType } from '@proofzero/types/access'
 
 import { getAccessClient, getStarbaseClient } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { parseJwt, requireJWT } from '~/session.server'
-import type { AccountURN } from '@kubelt/urns/account'
-import type { Profile } from '@kubelt/platform/account/src/types'
+import type { AccountURN } from '@proofzero/urns/account'
+import type { Profile } from '@proofzero/platform/account/src/types'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { clientId, redirectUri, scope, state } = context.consoleParams

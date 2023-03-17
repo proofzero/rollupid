@@ -1,5 +1,5 @@
 import { createTRPCProxyClient, httpBatchLink, loggerLink } from '@trpc/client'
-import { Router } from '@kubelt/types'
+import { Router } from '@proofzero/types'
 import { trpcClientLoggerGenerator } from './utils'
 import { PlatformHeaders } from './base'
 

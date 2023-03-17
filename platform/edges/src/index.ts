@@ -1,4 +1,4 @@
-// @kubelt/platform.edges:/src/index.ts
+// @proofzero/platform.edges:/src/index.ts
 
 /**
  * This Cloudflare worker is for experimenting with the graph "edges"

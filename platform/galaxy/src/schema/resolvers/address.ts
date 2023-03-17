@@ -1,7 +1,7 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
-import ENSUtils from '@kubelt/platform-clients/ens-utils'
-import createAddressClient from '@kubelt/platform-clients/address'
-import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import ENSUtils from '@proofzero/platform-clients/ens-utils'
+import createAddressClient from '@proofzero/platform-clients/address'
+import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
 
 import { AddressProfilesUnion, Resolvers } from './typedefs'
 import {
@@ -22,10 +22,10 @@ import {
   OAuthMicrosoftProfile,
   OAuthTwitterProfile,
   EmailAddressProfile,
-} from '@kubelt/platform.address/src/types'
-import { PlatformAddressURNHeader } from '@kubelt/types/headers'
-import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+} from '@proofzero/platform.address/src/types'
+import { PlatformAddressURNHeader } from '@proofzero/types/headers'
+import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 const addressResolvers: Resolvers = {
   Query: {

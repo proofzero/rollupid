@@ -1,7 +1,7 @@
 import {
   generateTraceSpan,
   TraceableFetchEvent,
-} from '@kubelt/platform-middleware/trace'
+} from '@proofzero/platform-middleware/trace'
 import {
   createRequestHandler,
   handleAsset,

@@ -1,6 +1,6 @@
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
-import { ApplicationURN } from '@kubelt/urns/application'
+import { ApplicationURN } from '@proofzero/urns/application'
 import { DOProxy } from 'do-proxy'
 import {
   exportJWK,

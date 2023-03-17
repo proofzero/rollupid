@@ -6,8 +6,8 @@ import * as build from '@remix-run/dev/server-build'
 import type {
   TraceableFetchEvent,
   TraceSpan,
-} from '@kubelt/platform-middleware/trace'
-import { generateTraceSpan } from '@kubelt/platform-middleware/trace'
+} from '@proofzero/platform-middleware/trace'
+import { generateTraceSpan } from '@proofzero/platform-middleware/trace'
 
 //Extending the remix untyped AppLoadContext with the type
 //we inject into the context

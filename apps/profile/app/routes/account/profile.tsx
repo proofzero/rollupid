@@ -5,15 +5,15 @@ import {
   useTransition,
   useFetcher,
 } from '@remix-run/react'
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
 import InputText from '~/components/inputs/InputText'
 import { getProfileSession, parseJwt } from '~/utils/session.server'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
-import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
+import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 
-import { gatewayFromIpfs } from '@kubelt/utils'
+import { gatewayFromIpfs } from '@proofzero/utils'
 
 import PfpNftModal from '~/components/accounts/PfpNftModal'
 
@@ -21,7 +21,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import SaveButton from '~/components/accounts/SaveButton'
 import { getMoreNftsModal } from '~/helpers/nfts'
-import type { Profile } from '@kubelt/galaxy-client'
+import type { Profile } from '@proofzero/galaxy-client'
 import type { FullProfile, NFT } from '~/types'
 import InputTextarea from '~/components/inputs/InputTextarea'
 

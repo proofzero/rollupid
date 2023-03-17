@@ -1,4 +1,4 @@
-import { AnyURNInput } from '@kubelt/platform-middleware/inputValidators'
+import { AnyURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { z } from 'zod'
 
 export const Node = z.object({

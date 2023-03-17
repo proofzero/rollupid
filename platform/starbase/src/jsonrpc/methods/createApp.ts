@@ -2,8 +2,8 @@ import { z } from 'zod'
 import { Context } from '../context'
 import * as oauth from '../../OAuth'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import { ApplicationURNSpace } from '@kubelt/urns/application'
-import createEdgesClient from '@kubelt/platform-clients/edges'
+import { ApplicationURNSpace } from '@proofzero/urns/application'
+import createEdgesClient from '@proofzero/platform-clients/edges'
 import { EDGE_APPLICATION } from '../../types'
 
 export const CreateAppInputSchema = z.object({

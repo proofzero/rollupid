@@ -2,8 +2,8 @@ import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { json, redirect } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utils/session.server'
 
-import createImageClient from '@kubelt/platform-clients/image'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import createImageClient from '@proofzero/platform-clients/image'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 export const loader: LoaderFunction = async ({ request }) => {
   await requireJWT(request)

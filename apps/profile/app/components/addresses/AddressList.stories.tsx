@@ -6,7 +6,7 @@ import {
   blue,
   gray,
   green,
-} from '@kubelt/design-system/src/placeholders/rollup/b64'
+} from '@proofzero/design-system/src/placeholders/rollup/b64'
 
 export default {
   title: 'Molecules/Addresses/List',

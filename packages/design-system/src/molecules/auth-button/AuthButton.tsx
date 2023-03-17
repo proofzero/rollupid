@@ -2,7 +2,7 @@ import React from 'react'
 import {
   Button,
   ButtonProps,
-} from '@kubelt/design-system/src/atoms/buttons/Button'
+} from '@proofzero/design-system/src/atoms/buttons/Button'
 
 export type AuthButtonProps = {
   logo?: string

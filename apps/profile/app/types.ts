@@ -1,7 +1,7 @@
 import type {
   AlchemyChain,
   AlchemyNetwork,
-} from '@kubelt/packages/alchemy-client'
+} from '@proofzero/packages/alchemy-client'
 
 export type RollupAuth = {
   accessToken: string

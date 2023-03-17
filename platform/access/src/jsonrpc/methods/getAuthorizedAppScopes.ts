@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'
-import { inputValidators } from '@kubelt/platform-middleware'
-import { AccountURNSpace } from '@kubelt/urns/account'
-import { scope, SCOPES } from '@kubelt/security/scopes'
+import { inputValidators } from '@proofzero/platform-middleware'
+import { AccountURNSpace } from '@proofzero/urns/account'
+import { scope, SCOPES } from '@proofzero/security/scopes'
 
 export const GetAuthorizedAppScopesMethodInput = z.object({
   accountURN: inputValidators.AccountURNInput,

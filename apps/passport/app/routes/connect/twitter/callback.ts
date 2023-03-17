@@ -3,10 +3,10 @@ import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 import { TwitterStrategyDefaultName } from 'remix-auth-twitter'
 import type { TwitterStrategyVerifyParams } from 'remix-auth-twitter'
 
-import { NodeType, OAuthAddressType } from '@kubelt/types/address'
+import { NodeType, OAuthAddressType } from '@proofzero/types/address'
 
-import { AddressURNSpace } from '@kubelt/urns/address'
-import { generateHashedIDRef } from '@kubelt/urns/idref'
+import { AddressURNSpace } from '@proofzero/urns/address'
+import { generateHashedIDRef } from '@proofzero/urns/idref'
 
 import { initAuthenticator, getTwitterStrategy } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
@@ -47,7 +47,11 @@ export const loader: LoaderFunction = async ({
     context.traceSpan
   )
   const { accountURN, existing } = await addressClient.resolveAccount.query({
-    jwt: await getJWTConditionallyFromSession(request, context.env, appData?.clientId),
+    jwt: await getJWTConditionallyFromSession(
+      request,
+      context.env,
+      appData?.clientId
+    ),
     force: !appData || appData.prompt !== 'login',
   })
 

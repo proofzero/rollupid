@@ -1,8 +1,8 @@
-import { AccountURN } from '@kubelt/urns/account'
+import { AccountURN } from '@proofzero/urns/account'
 import { DOProxy } from 'do-proxy'
 
-import { ResponseType } from '@kubelt/types/access'
-import type { Scope } from '@kubelt/types/access'
+import { ResponseType } from '@proofzero/types/access'
+import type { Scope } from '@proofzero/types/access'
 
 import { CODE_OPTIONS } from '../constants'
 

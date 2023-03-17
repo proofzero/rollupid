@@ -4,8 +4,8 @@ import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'
 
 import { EDGE_AUTHORIZES } from '../../constants'
-import { AccountURNSpace } from '@kubelt/urns/account'
-import { AccessURNSpace } from '@kubelt/urns/access'
+import { AccountURNSpace } from '@proofzero/urns/account'
+import { AccessURNSpace } from '@proofzero/urns/access'
 
 export const RevokeAppAuthorizationMethodInput = z.object({
   clientId: z.string().min(1),

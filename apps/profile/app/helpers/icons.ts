@@ -1,12 +1,12 @@
-import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
+import { CryptoAddressType, OAuthAddressType } from '@proofzero/types/address'
 
-import appleIcon from '@kubelt/design-system/src/assets/social_icons/apple.svg'
-import discordIcon from '@kubelt/design-system/src/assets/social_icons/discord.svg'
-import githubIcon from '@kubelt/design-system/src/assets/social_icons/github.svg'
-import googleIcon from '@kubelt/design-system/src/assets/social_icons/google.svg'
-import microsoftIcon from '@kubelt/design-system/src/assets/social_icons/microsoft.svg'
-import twitterIcon from '@kubelt/design-system/src/assets/social_icons/twitter.svg'
-import ethereumIcon from '@kubelt/design-system/src/assets/social_icons/ethereum.svg'
+import appleIcon from '@proofzero/design-system/src/assets/social_icons/apple.svg'
+import discordIcon from '@proofzero/design-system/src/assets/social_icons/discord.svg'
+import githubIcon from '@proofzero/design-system/src/assets/social_icons/github.svg'
+import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
+import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
+import twitterIcon from '@proofzero/design-system/src/assets/social_icons/twitter.svg'
+import ethereumIcon from '@proofzero/design-system/src/assets/social_icons/ethereum.svg'
 
 export const imageFromAddressType = (addressType: string) => {
   let providerIcon = null

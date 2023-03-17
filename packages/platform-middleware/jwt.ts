@@ -1,8 +1,8 @@
-import type { AccountURN } from '@kubelt/urns/account'
-import { AccountURNSpace } from '@kubelt/urns/account'
+import type { AccountURN } from '@proofzero/urns/account'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import * as jose from 'jose'
 import { BaseMiddlewareFunction } from './types'
-import { getAuthzTokenFromReq } from '@kubelt/utils'
+import { getAuthzTokenFromReq } from '@proofzero/utils'
 
 export const AuthorizationTokenFromHeader: BaseMiddlewareFunction<{
   req?: Request

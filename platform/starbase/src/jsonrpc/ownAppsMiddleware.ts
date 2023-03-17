@@ -1,8 +1,11 @@
-import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
-import createEdgesClient from '@kubelt/platform-clients/edges'
-import { AccountURN } from '@kubelt/urns/account'
+import { BaseMiddlewareFunction } from '@proofzero/platform-middleware/types'
+import createEdgesClient from '@proofzero/platform-clients/edges'
+import { AccountURN } from '@proofzero/urns/account'
 import { EDGE_APPLICATION } from '../types'
-import { ApplicationURN, ApplicationURNSpace } from '@kubelt/urns/application'
+import {
+  ApplicationURN,
+  ApplicationURNSpace,
+} from '@proofzero/urns/application'
 import { Context } from './context'
 
 export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({

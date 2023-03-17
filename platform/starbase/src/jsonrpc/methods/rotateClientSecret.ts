@@ -4,7 +4,7 @@ import * as oauth from '../../OAuth'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import * as secret from '../../secret'
 import { AppClientIdParamSchema } from '../validators/app'
-import { ApplicationURNSpace } from '@kubelt/urns/application'
+import { ApplicationURNSpace } from '@proofzero/urns/application'
 
 export const RotateClientSecretInput = AppClientIdParamSchema
 export const RotateClientSecretOutput = z.object({

@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 import dangerVector from '../../images/danger.svg'
 

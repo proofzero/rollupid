@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { AppObjectSchema } from '../validators/app'
-import { ApplicationURNSpace } from '@kubelt/urns/application'
+import { ApplicationURNSpace } from '@proofzero/urns/application'
 
 export const UpdateAppInput = z.object({
   clientId: z.string(),

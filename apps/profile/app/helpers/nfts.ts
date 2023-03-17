@@ -1,10 +1,10 @@
-import { gatewayFromIpfs } from '@kubelt/utils'
+import { gatewayFromIpfs } from '@proofzero/utils'
 
 import type {
   AlchemyNFT,
   AlchemyContract,
   AlchemyChain,
-} from '@kubelt/packages/alchemy-client'
+} from '@proofzero/packages/alchemy-client'
 import type { Chain, NFT, NFTDetail, NFTProperty } from '~/types'
 import { capitalizeFirstLetter } from './strings'
 

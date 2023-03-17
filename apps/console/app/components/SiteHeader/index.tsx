@@ -3,8 +3,8 @@
  */
 
 import { Form } from '@remix-run/react'
-import { gatewayFromIpfs } from '@kubelt/utils'
-import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
+import { gatewayFromIpfs } from '@proofzero/utils'
+import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
 import { Menu, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
 

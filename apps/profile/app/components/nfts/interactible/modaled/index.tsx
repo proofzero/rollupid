@@ -2,11 +2,11 @@ import { useState } from 'react'
 
 import NftModal from '../../modal'
 
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 import { HiArrowNarrowRight } from 'react-icons/hi'
 
-import { gatewayFromIpfs } from '@kubelt/utils'
+import { gatewayFromIpfs } from '@proofzero/utils'
 
 import missingNftSvg from '../../../../assets/missing-nft.svg'
 

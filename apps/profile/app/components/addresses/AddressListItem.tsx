@@ -1,6 +1,6 @@
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { PrimaryPill } from '@kubelt/design-system/src/atoms/pills/PrimaryPill'
-import { IconPill } from '@kubelt/design-system/src/atoms/pills/IconPill'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { PrimaryPill } from '@proofzero/design-system/src/atoms/pills/PrimaryPill'
+import { IconPill } from '@proofzero/design-system/src/atoms/pills/IconPill'
 import {
   HiDotsHorizontal,
   HiOutlineEyeOff,

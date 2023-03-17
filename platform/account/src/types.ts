@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { AddressListSchema } from './jsonrpc/validators/addressList'
 import { ProfileSchema } from './jsonrpc/validators/profile'
-import { DeploymentMetadata } from '@kubelt/types'
+import { DeploymentMetadata } from '@proofzero/types'
 
 export interface Environment {
   Account: DurableObjectNamespace

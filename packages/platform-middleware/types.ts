@@ -1,4 +1,4 @@
-import { BaseContext } from '@kubelt/types'
+import { BaseContext } from '@proofzero/types'
 import { MiddlewareFunction, ProcedureParams } from '@trpc/server'
 
 export type BaseMiddlewareFunction<$ContextIn extends BaseContext> =

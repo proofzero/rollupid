@@ -2,9 +2,9 @@ import { json, redirect } from '@remix-run/cloudflare'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 
 import { getAddressClient } from '../../../platform.server'
-import { AddressURNSpace } from '@kubelt/urns/address'
-import { generateHashedIDRef } from '@kubelt/urns/idref'
-import { CryptoAddressType, NodeType } from '@kubelt/types/address'
+import { AddressURNSpace } from '@proofzero/urns/address'
+import { generateHashedIDRef } from '@proofzero/urns/idref'
+import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import {
   getConsoleParamsSession,
   getJWTConditionallyFromSession,
@@ -77,7 +77,11 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const { code, existing } = await addressClient.verifyNonce.mutate({
     nonce: formData.get('nonce') as string,
     signature: formData.get('signature') as string,
-    jwt: await getJWTConditionallyFromSession(request, context.env, appData?.clientId),
+    jwt: await getJWTConditionallyFromSession(
+      request,
+      context.env,
+      appData?.clientId
+    ),
     forceAccountCreation: !appData || appData.prompt !== 'login',
   })
 

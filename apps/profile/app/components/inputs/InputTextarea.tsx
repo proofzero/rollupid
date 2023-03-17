@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 export type InputTextareaProps = {
   id?: string

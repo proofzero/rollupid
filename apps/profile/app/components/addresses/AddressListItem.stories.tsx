@@ -1,7 +1,7 @@
 import React from 'react'
 import { AddressListItem } from './AddressListItem'
 
-import { blue } from '@kubelt/design-system/src/placeholders/rollup/b64'
+import { blue } from '@proofzero/design-system/src/placeholders/rollup/b64'
 
 export default {
   title: 'Atoms/Addresses/List item',

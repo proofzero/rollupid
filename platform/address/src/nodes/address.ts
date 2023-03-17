@@ -1,7 +1,7 @@
 import { DOProxy, DurableObjectStubProxy } from 'do-proxy'
 
-import { AccountURN } from '@kubelt/urns/account'
-import { AddressType, NodeType } from '@kubelt/types/address'
+import { AccountURN } from '@proofzero/urns/account'
+import { AddressType, NodeType } from '@proofzero/types/address'
 
 import type { Environment } from '../types'
 

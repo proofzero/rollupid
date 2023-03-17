@@ -1,5 +1,5 @@
-import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
-import { NodeType } from '@kubelt/types/address'
+import { BaseMiddlewareFunction } from '@proofzero/platform-middleware/types'
+import { NodeType } from '@proofzero/types/address'
 
 import { Context } from '../../context'
 import { isOAuthAddressType } from '../../utils'

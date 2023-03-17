@@ -1,14 +1,14 @@
 import { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 
-import { generateHashedIDRef } from '@kubelt/urns/idref'
-import { AddressURNSpace } from '@kubelt/urns/address'
+import { generateHashedIDRef } from '@proofzero/urns/idref'
+import { AddressURNSpace } from '@proofzero/urns/address'
 
 import { initAuthenticator, getGithubAuthenticator } from '~/auth.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { getAddressClient } from '~/platform.server'
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
-import { NodeType, OAuthAddressType } from '@kubelt/types/address'
-import type { OAuthData } from '@kubelt/platform.address/src/types'
+import { NodeType, OAuthAddressType } from '@proofzero/types/address'
+import type { OAuthData } from '@proofzero/platform.address/src/types'
 import {
   getConsoleParamsSession,
   getJWTConditionallyFromSession,

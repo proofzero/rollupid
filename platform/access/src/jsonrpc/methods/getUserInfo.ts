@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import { decodeJwt } from 'jose'
 
-import { AccountURNSpace } from '@kubelt/urns/account'
-import { AccessJWTPayload } from '@kubelt/types/access'
+import { AccountURNSpace } from '@proofzero/urns/account'
+import { AccessJWTPayload } from '@proofzero/types/access'
 
 import { Context } from '../../context'
 import IdTokenProfileSchema from '../validators/IdTokenProfileSchema'

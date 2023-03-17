@@ -1,4 +1,4 @@
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { ActionFunction, redirect } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/clients'
 

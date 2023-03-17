@@ -1,5 +1,5 @@
-import { EdgeSpace } from '@kubelt/urns/edge'
-import type { EdgeURN } from '@kubelt/urns/edge'
+import { EdgeSpace } from '@proofzero/urns/edge'
+import type { EdgeURN } from '@proofzero/urns/edge'
 
 export const CODE_OPTIONS = {
   length: 24,

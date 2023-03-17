@@ -1,6 +1,6 @@
 import type { AnyRouter } from '@trpc/server'
 import type { LoggerLinkOptions } from '@trpc/client/links/loggerLink'
-import { TRACEPARENT_HEADER_NAME } from '@kubelt/platform-middleware/trace'
+import { TRACEPARENT_HEADER_NAME } from '@proofzero/platform-middleware/trace'
 
 //tRPC doesn't expose the inner logger type directly; have to extract it this way
 type loggerFunction = LoggerLinkOptions<AnyRouter>['logger']

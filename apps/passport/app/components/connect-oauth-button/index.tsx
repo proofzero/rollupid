@@ -1,12 +1,12 @@
 // import { Form } from '@remix-run/react'
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 
-import appleIcon from '@kubelt/design-system/src/assets/social_icons/apple.svg'
-import discordIcon from '@kubelt/design-system/src/assets/social_icons/discord.svg'
-import githubIcon from '@kubelt/design-system/src/assets/social_icons/github.svg'
-import googleIcon from '@kubelt/design-system/src/assets/social_icons/google.svg'
-import microsoftIcon from '@kubelt/design-system/src/assets/social_icons/microsoft.svg'
-import twitterIcon from '@kubelt/design-system/src/assets/social_icons/twitter.svg'
+import appleIcon from '@proofzero/design-system/src/assets/social_icons/apple.svg'
+import discordIcon from '@proofzero/design-system/src/assets/social_icons/discord.svg'
+import githubIcon from '@proofzero/design-system/src/assets/social_icons/github.svg'
+import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
+import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
+import twitterIcon from '@proofzero/design-system/src/assets/social_icons/twitter.svg'
 
 type OAuthProvider =
   | 'apple'

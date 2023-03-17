@@ -1,6 +1,6 @@
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { FeaturePill } from '@kubelt/design-system/src/atoms/pills/FeaturePill'
-import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { FeaturePill } from '@proofzero/design-system/src/atoms/pills/FeaturePill'
+import { ButtonAnchor } from '@proofzero/design-system/src/atoms/buttons/ButtonAnchor'
 import { FaDiscord, FaGithub, FaTwitter } from 'react-icons/fa'
 
 type EarlyAccessPanelProps = {

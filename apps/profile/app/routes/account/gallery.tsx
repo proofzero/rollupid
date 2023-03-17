@@ -34,25 +34,25 @@ import {
   useSortable,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import SaveButton from '~/components/accounts/SaveButton'
 import PfpNftModal from '~/components/accounts/PfpNftModal'
 import NoCryptoAddresses from '~/components/accounts/NoCryptoAddresses'
 
 // Other helpers
 import { getProfileSession, parseJwt } from '~/utils/session.server'
-import type { Node } from '@kubelt/galaxy-client'
+import type { Node } from '@proofzero/galaxy-client'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import {
   toast,
   Toaster,
   ToastType,
-} from '@kubelt/design-system/src/atoms/toast'
+} from '@proofzero/design-system/src/atoms/toast'
 import type { FullProfile } from '~/types'
 import type { Maybe } from 'graphql/jsutils/Maybe'
 import type { NFT } from '~/types'
 import { getValidGallery } from '~/helpers/alchemy'
-import type { AccountURN } from '@kubelt/urns/account'
+import type { AccountURN } from '@proofzero/urns/account'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()

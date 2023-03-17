@@ -8,7 +8,7 @@ import {
   parseJwt,
   requireJWT,
 } from '~/session.server'
-import type { AccountURN } from '@kubelt/urns/account'
+import type { AccountURN } from '@proofzero/urns/account'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in

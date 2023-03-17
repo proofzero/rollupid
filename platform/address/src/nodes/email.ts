@@ -1,6 +1,6 @@
 import { add } from '@dnd-kit/utilities'
-import { EmailAddressType, NodeType } from '@kubelt/types/address'
-import generateRandomString from '@kubelt/utils/generateRandomString'
+import { EmailAddressType, NodeType } from '@proofzero/types/address'
+import generateRandomString from '@proofzero/utils/generateRandomString'
 import { DurableObjectStubProxy } from 'do-proxy'
 import { AddressNode } from '.'
 import { EMAIL_VERIFICATION_OPTIONS } from '../constants'

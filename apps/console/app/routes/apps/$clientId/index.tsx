@@ -15,32 +15,32 @@ import {
 } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Panel } from '@kubelt/design-system/src/atoms/panels/Panel'
-import { ReadOnlyInput } from '@kubelt/design-system/src/atoms/form/ReadOnlyInput'
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import { CTA } from '@kubelt/design-system/src/molecules/cta/cta'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Panel } from '@proofzero/design-system/src/atoms/panels/Panel'
+import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { CTA } from '@proofzero/design-system/src/molecules/cta/cta'
 import {
   toast,
   Toaster,
   ToastType,
-} from '@kubelt/design-system/src/atoms/toast'
-import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
-import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
+} from '@proofzero/design-system/src/atoms/toast'
+import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
+import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
 
 import { LoginsPanel } from '~/components/Applications/LoginsPanel/LoginsPanel'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
 import type { appDetailsProps } from '~/types'
 
-import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 
 import { RollType } from '~/types'
 import type { RotatedSecrets } from '~/types'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { loader as usersLoader } from './users'
-import type { AuthorizedAccountsOutput } from '@kubelt/platform/starbase/src/types'
+import type { AuthorizedAccountsOutput } from '@proofzero/platform/starbase/src/types'
 import type { UsersLoaderData } from './users'
 
 // Component

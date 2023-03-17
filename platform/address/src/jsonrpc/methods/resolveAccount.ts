@@ -2,14 +2,14 @@ import { z } from 'zod'
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
-import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
-import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
+import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 
 import { ACCOUNT_OPTIONS } from '../../constants'
 import { Context } from '../../context'
 import { appRouter } from '../router'
 
-import { WriteAnalyticsDataPoint } from '@kubelt/platform-clients/analytics'
+import { WriteAnalyticsDataPoint } from '@proofzero/platform-clients/analytics'
 
 import * as jose from 'jose'
 

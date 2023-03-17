@@ -1,5 +1,5 @@
-import { Text } from '@kubelt/design-system'
-import { Button } from '@kubelt/design-system'
+import { Text } from '@proofzero/design-system'
+import { Button } from '@proofzero/design-system'
 import missingImage from '../../../images/missing-img.svg'
 
 import { HiOutlineExternalLink } from 'react-icons/hi'

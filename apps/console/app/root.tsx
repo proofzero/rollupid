@@ -8,11 +8,11 @@ import type {
   LoaderFunction,
 } from '@remix-run/cloudflare'
 
-import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
+import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 
 import { json } from '@remix-run/cloudflare'
 
-import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
+import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
 
 import {
   Links,
@@ -29,7 +29,7 @@ import {
 
 import { useEffect } from 'react'
 
-import globalStyles from '@kubelt/design-system/src/styles/global.css'
+import globalStyles from '@proofzero/design-system/src/styles/global.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 import favIcon from './images/favicon.svg'
 

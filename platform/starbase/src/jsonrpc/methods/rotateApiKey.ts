@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import { ApplicationURNSpace } from '@kubelt/urns/application'
+import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { AppClientIdParamSchema } from '../validators/app'
 
 export const RotateApiKeyInput = AppClientIdParamSchema

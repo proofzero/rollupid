@@ -1,5 +1,8 @@
 import { createServer } from '@graphql-yoga/common'
-import { generateTraceSpan, TraceSpan } from '@kubelt/platform-middleware/trace'
+import {
+  generateTraceSpan,
+  TraceSpan,
+} from '@proofzero/platform-middleware/trace'
 import Env from './env'
 import schema from './schema'
 

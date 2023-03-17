@@ -1,4 +1,4 @@
-import { AnyURN } from '@kubelt/urns'
+import { AnyURN } from '@proofzero/urns'
 import {
   integer,
   sqliteTable,

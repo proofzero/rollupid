@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { Scope } from '@kubelt/types/access'
+import { Scope } from '@proofzero/types/access'
 
 import {
   AppleOAuthSchema,
@@ -16,7 +16,7 @@ import {
   EmailProfileSchema,
   NFTarVoucherSchema,
 } from './jsonrpc/validators/profile'
-import { DeploymentMetadata } from '@kubelt/types'
+import { DeploymentMetadata } from '@proofzero/types'
 
 export interface Environment {
   Access: Fetcher

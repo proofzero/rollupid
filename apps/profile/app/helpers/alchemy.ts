@@ -4,18 +4,18 @@ import {
   AlchemyChain,
   AlchemyClient,
   AlchemyNetwork,
-} from '@kubelt/packages/alchemy-client'
+} from '@proofzero/packages/alchemy-client'
 
 import type {
   GetNFTsResult,
   GetContractsForOwnerResult,
-} from '@kubelt/packages/alchemy-client'
+} from '@proofzero/packages/alchemy-client'
 import type { Chain, Gallery, NFT } from '~/types'
 import { NFTContractNormalizer, NFTNormalizer } from './nfts'
 import { sortNftsFn } from './strings'
-import type { AccountURN } from '@kubelt/urns/account'
+import type { AccountURN } from '@proofzero/urns/account'
 import { getAccountCryptoAddresses } from './profile'
-import type { TraceSpan } from '@kubelt/platform-middleware/trace'
+import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 
 // -------------------- TYPES --------------------------------------------------
 

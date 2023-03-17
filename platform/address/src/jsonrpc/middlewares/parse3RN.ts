@@ -1,9 +1,9 @@
-import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
-import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
+import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
+import { BaseMiddlewareFunction } from '@proofzero/platform-middleware/types'
 
 import { Context } from '../../context'
 import { isValidAddressType } from '../../utils'
-import { PlatformAddressURNHeader } from '@kubelt/types/headers'
+import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 
 export const parse3RN: BaseMiddlewareFunction<Context> = async ({
   ctx,

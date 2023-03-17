@@ -1,14 +1,14 @@
 import * as set from 'ts-set-utils'
 import { z } from 'zod'
-import { inputValidators } from '@kubelt/platform-middleware'
+import { inputValidators } from '@proofzero/platform-middleware'
 import { Context } from '../../context'
-import { AddressURNSpace } from '@kubelt/urns/address'
+import { AddressURNSpace } from '@proofzero/urns/address'
 
 import type { AddressList } from '../../types'
-import type { AccountURN } from '@kubelt/urns/account'
-import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
+import type { AccountURN } from '@proofzero/urns/account'
+import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 
-// Should this live in @kubelt/platform-middlewares/inputValidators?
+// Should this live in @proofzero/platform-middlewares/inputValidators?
 export const AddressListInput = z.custom<AddressList>((input) => {
   if (!Array.isArray(input)) {
     throw new Error('address list must be an array')

@@ -1,5 +1,5 @@
 import InputText from '../../inputs/InputText'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 import noFilter from '../../../assets/no-filter.svg'
 

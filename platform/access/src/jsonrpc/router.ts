@@ -2,13 +2,13 @@ import { initTRPC } from '@trpc/server'
 
 import { Context } from '../context'
 
-import { InjectEdges } from '@kubelt/platform-middleware/edges'
+import { InjectEdges } from '@proofzero/platform-middleware/edges'
 
 import {
   ValidateJWT,
   AuthorizationTokenFromHeader,
   RequireAccount,
-} from '@kubelt/platform-middleware/jwt'
+} from '@proofzero/platform-middleware/jwt'
 
 import { setAccessNode } from './middleware/setAccessNode'
 
@@ -33,9 +33,9 @@ import {
   RevokeTokenMethodOutput,
 } from './methods/revokeToken'
 
-import { LogUsage } from '@kubelt/platform-middleware/log'
+import { LogUsage } from '@proofzero/platform-middleware/log'
 
-import { Analytics } from '@kubelt/platform-middleware/analytics'
+import { Analytics } from '@proofzero/platform-middleware/analytics'
 import {
   GetUserInfoInput,
   getUserInfoMethod,

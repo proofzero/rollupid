@@ -20,12 +20,12 @@ import { getAddressesMethod } from './methods/getAddresses'
 import {
   ValidateJWT,
   AuthorizationTokenFromHeader,
-} from '@kubelt/platform-middleware/jwt'
-import { LogUsage } from '@kubelt/platform-middleware/log'
-import { Scopes } from '@kubelt/platform-middleware/scopes'
+} from '@proofzero/platform-middleware/jwt'
+import { LogUsage } from '@proofzero/platform-middleware/log'
+import { Scopes } from '@proofzero/platform-middleware/scopes'
 
 import { initAccountNodeByName } from '../nodes'
-import { Analytics } from '@kubelt/platform-middleware/analytics'
+import { Analytics } from '@proofzero/platform-middleware/analytics'
 import { getPublicAddressesMethod } from './methods/getPublicAddresses'
 
 import {

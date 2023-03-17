@@ -1,4 +1,4 @@
-// @kubelt/security:packages/security/index.ts
+// @proofzero/security:packages/security/index.ts
 
 /**
  * Platform security definitions and utilities.
@@ -23,6 +23,4 @@ import {
 
 export type { Scope }
 
-export {
-  scope,
-}
+export { scope }

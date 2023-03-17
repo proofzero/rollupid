@@ -1,4 +1,4 @@
-// @kubelt/types:index.ts
+// @proofzero/types:index.ts
 
 /**
  * Platform types.

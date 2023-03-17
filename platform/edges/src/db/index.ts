@@ -1,4 +1,4 @@
-// @kubelt/platform.edges:src/db/index.ts
+// @proofzero/platform.edges:src/db/index.ts
 
 /**
  * Platform edges database interface.
@@ -12,7 +12,7 @@ import * as update from './update'
 // Imported Types
 // -----------------------------------------------------------------------------
 
-import type { AnyURN } from '@kubelt/urns'
+import type { AnyURN } from '@proofzero/urns'
 
 import type {
   Edge,
@@ -26,7 +26,7 @@ import type {
   EdgeQueryResults,
   NodeFilter,
 } from './types'
-import { parseUrnForEdge } from '@kubelt/urns/edge'
+import { parseUrnForEdge } from '@proofzero/urns/edge'
 
 // Exported Types
 // -----------------------------------------------------------------------------

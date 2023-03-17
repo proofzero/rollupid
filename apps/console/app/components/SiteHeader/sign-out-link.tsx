@@ -1,5 +1,5 @@
 import { useSubmit } from '@remix-run/react'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 export default function SignOut({ className }: { className: string }) {
   let submit = useSubmit()

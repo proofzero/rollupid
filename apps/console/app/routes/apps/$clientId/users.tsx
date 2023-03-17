@@ -2,23 +2,23 @@ import { Await, useLoaderData, useNavigate } from '@remix-run/react'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import { defer, json } from '@remix-run/cloudflare'
-import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { Suspense } from 'react'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import type {
   AuthorizedAccountsOutput,
   AuthorizedUser,
-} from '@kubelt/platform/starbase/src/types'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+} from '@proofzero/platform/starbase/src/types'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
-import { AccountURNSpace } from '@kubelt/urns/account'
+import { AccountURNSpace } from '@proofzero/urns/account'
 
 import { noLoginsSvg } from '~/components/Applications/LoginsPanel/LoginsPanel'
 import { User } from '~/components/Applications/Users/User'
 
-import { NestedErrorPage } from '@kubelt/design-system/src/pages/nested-error/NestedErrorPage'
-import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
-import { Button, Text } from '@kubelt/design-system'
+import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
+import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
+import { Button, Text } from '@proofzero/design-system'
 
 // don't change this constant unless it's necessary
 // this constant also affects /$clientId root route

@@ -1,17 +1,17 @@
-import { BaseContext, DeploymentMetadata } from '@kubelt/types'
+import { BaseContext, DeploymentMetadata } from '@proofzero/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import type { Environment } from './types'
-import type { AddressType, NodeType } from '@kubelt/types/address'
-import createEdgesClient from '@kubelt/platform-clients/edges'
-import createEmailClient from '@kubelt/platform-clients/email'
-import { AddressURN } from '@kubelt/urns/address'
-import { ENSRes } from '@kubelt/platform-clients/ens-utils'
+import type { AddressType, NodeType } from '@proofzero/types/address'
+import createEdgesClient from '@proofzero/platform-clients/edges'
+import createEmailClient from '@proofzero/platform-clients/email'
+import { AddressURN } from '@proofzero/urns/address'
+import { ENSRes } from '@proofzero/platform-clients/ens-utils'
 import { AddressNode } from './nodes'
 import {
   generateTraceContextHeaders,
   generateTraceSpan,
-} from '@kubelt/platform-middleware/trace'
+} from '@proofzero/platform-middleware/trace'
 
 /**
  * Defines your inner context shape.

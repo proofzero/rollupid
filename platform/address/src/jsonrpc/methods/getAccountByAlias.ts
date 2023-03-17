@@ -1,9 +1,9 @@
-import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
+import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { Context } from '../../context'
-import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
+import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 import { z } from 'zod'
-import { AccountURN } from '@kubelt/urns/account'
-import ENSUtils from '@kubelt/platform-clients/ens-utils'
+import { AccountURN } from '@proofzero/urns/account'
+import ENSUtils from '@proofzero/platform-clients/ens-utils'
 
 export const GetAccountByAliasInput = z.object({
   provider: z.string(),

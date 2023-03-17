@@ -1,4 +1,4 @@
-// @kubelt/urns:edge.ts
+// @proofzero/urns:edge.ts
 
 /**
  * Defines a URN space for edges in the database.

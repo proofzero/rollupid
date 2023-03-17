@@ -1,7 +1,7 @@
 import React from 'react'
-import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
+import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import SaveButton from './SaveButton'
-import { Text } from '@kubelt/design-system'
+import { Text } from '@proofzero/design-system'
 
 import warn from '~/assets/warning.svg'
 

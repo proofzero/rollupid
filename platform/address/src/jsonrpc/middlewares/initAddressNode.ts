@@ -1,6 +1,6 @@
-import createImageClient from '@kubelt/platform-clients/image'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
-import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
+import createImageClient from '@proofzero/platform-clients/image'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import { BaseMiddlewareFunction } from '@proofzero/platform-middleware/types'
 import { Context } from '../../context'
 
 export const initAddressNode: BaseMiddlewareFunction<Context> = async ({

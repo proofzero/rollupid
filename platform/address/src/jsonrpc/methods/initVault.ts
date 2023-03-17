@@ -1,16 +1,16 @@
 import { z } from 'zod'
 import { Wallet } from '@ethersproject/wallet'
 
-import { AddressURNSpace } from '@kubelt/urns/address'
-import { generateHashedIDRef } from '@kubelt/urns/idref'
-import { AddressURNInput } from '@kubelt/platform-middleware/inputValidators'
+import { AddressURNSpace } from '@proofzero/urns/address'
+import { generateHashedIDRef } from '@proofzero/urns/idref'
+import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 
 import { appRouter } from '../router'
 import { Context } from '../../context'
-import { CryptoAddressType, NodeType } from '@kubelt/types/address'
+import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import { initAddressNodeByName } from '../../nodes'
-import createImageClient from '@kubelt/platform-clients/image'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import createImageClient from '@proofzero/platform-clients/image'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 export const InitVaultOutput = AddressURNInput
 

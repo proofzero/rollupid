@@ -1,9 +1,9 @@
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 
 import { HiChevronDown } from 'react-icons/hi'
 
-import { gatewayFromIpfs } from '@kubelt/utils'
+import { gatewayFromIpfs } from '@proofzero/utils'
 
 import { useState } from 'react'
 

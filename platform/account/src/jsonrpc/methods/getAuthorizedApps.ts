@@ -1,10 +1,10 @@
-import createEdgesClient from '@kubelt/platform-clients/edges'
-import type { AccessRComp } from '@kubelt/urns/access'
+import createEdgesClient from '@proofzero/platform-clients/edges'
+import type { AccessRComp } from '@proofzero/urns/access'
 import { Context } from '../../context'
-import { EDGE_AUTHORIZES } from '@kubelt/platform.access/src/constants'
-import { inputValidators } from '@kubelt/platform-middleware'
+import { EDGE_AUTHORIZES } from '@proofzero/platform.access/src/constants'
+import { inputValidators } from '@proofzero/platform-middleware'
 import { z } from 'zod'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 // Input
 // -----------------------------------------------------------------------------

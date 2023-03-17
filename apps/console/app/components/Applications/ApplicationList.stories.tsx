@@ -1,7 +1,10 @@
 import React from 'react'
 import { ApplicationList } from './ApplicationList'
 import type { ApplicationListItemProps } from './ApplicationListItem'
-import { blue, gray } from '@kubelt/design-system/src/placeholders/rollup/b64'
+import {
+  blue,
+  gray,
+} from '@proofzero/design-system/src/placeholders/rollup/b64'
 
 export default {
   title: 'Molecules/Applications/List',

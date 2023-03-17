@@ -3,11 +3,11 @@ import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 
 import { decodeJwt } from 'jose'
 
-import { NodeType, OAuthAddressType } from '@kubelt/types/address'
-import type { OAuthAppleProfile } from '@kubelt/platform.address/src/types'
+import { NodeType, OAuthAddressType } from '@proofzero/types/address'
+import type { OAuthAppleProfile } from '@proofzero/platform.address/src/types'
 
-import { AddressURNSpace } from '@kubelt/urns/address'
-import { generateHashedIDRef } from '@kubelt/urns/idref'
+import { AddressURNSpace } from '@proofzero/urns/address'
+import { generateHashedIDRef } from '@proofzero/urns/idref'
 
 import { AppleStrategyDefaultName } from '~/utils/applestrategy.server'
 import type { AppleExtraParams } from '~/utils/applestrategy.server'
@@ -84,7 +84,11 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     context.traceSpan
   )
   const account = await addressClient.resolveAccount.query({
-    jwt: await getJWTConditionallyFromSession(request, context.env, appData?.clientId),
+    jwt: await getJWTConditionallyFromSession(
+      request,
+      context.env,
+      appData?.clientId
+    ),
     force: !appData || appData.prompt !== 'login',
   })
   const current = await addressClient.getOAuthData.query()

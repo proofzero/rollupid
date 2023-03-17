@@ -1,8 +1,8 @@
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
-import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
-import { Profile } from '@kubelt/platform/account/src/types'
-import type { ScopeMeta } from '@kubelt/types/application'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
+import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
+import { Profile } from '@proofzero/platform/account/src/types'
+import type { ScopeMeta } from '@proofzero/types/application'
 
 import authorizeCheck from '../../assets/authorize-check.svg'
 import iIcon from '../../assets/i.svg'

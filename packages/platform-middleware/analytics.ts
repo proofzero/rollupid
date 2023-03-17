@@ -1,7 +1,7 @@
-import { AccountURN } from '@kubelt/urns/account'
-import { DeploymentMetadata } from '@kubelt/types'
+import { AccountURN } from '@proofzero/urns/account'
+import { DeploymentMetadata } from '@proofzero/types'
 import { BaseMiddlewareFunction } from './types'
-import { WriteAnalyticsDataPoint } from '@kubelt/platform-clients/analytics'
+import { WriteAnalyticsDataPoint } from '@proofzero/platform-clients/analytics'
 
 export type CustomAnalyticsFunctionType = () => AnalyticsEngineDataPoint
 

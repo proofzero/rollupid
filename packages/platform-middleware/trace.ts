@@ -1,4 +1,4 @@
-import generateRandomString from '@kubelt/packages/utils/generateRandomString'
+import generateRandomString from '@proofzero/packages/utils/generateRandomString'
 
 type TraceId = string
 type TraceParentId = string

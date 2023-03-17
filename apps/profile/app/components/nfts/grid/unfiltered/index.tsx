@@ -1,4 +1,4 @@
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { HiArrowNarrowLeft } from 'react-icons/hi'
 import { useEffect, useState } from 'react'
 import LoadingGrid from '../loading'

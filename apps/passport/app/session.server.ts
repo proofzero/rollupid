@@ -12,7 +12,7 @@ import {
   checkToken,
   ExpiredTokenError,
   InvalidTokenError,
-} from '@kubelt/utils/token'
+} from '@proofzero/utils/token'
 
 // FLASH SESSION
 

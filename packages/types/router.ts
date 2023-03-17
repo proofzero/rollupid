@@ -1,12 +1,12 @@
-import { appRouter as accountRouter } from '@kubelt/platform/account/src/jsonrpc/router'
-import { appRouter as accessRouter } from '@kubelt/platform/access/src/jsonrpc/router'
-import { appRouter as addressRouter } from '@kubelt/platform/address/src/jsonrpc/router'
-import { appRouter as edgesRouter } from '@kubelt/platform/edges/src/jsonrpc/router'
-import { appRouter as pingRouter } from '@kubelt/platform/ping/src/jsonrpc/router'
-import { appRouter as objectRouter } from '@kubelt/platform/object/src/jsonrpc/router'
-import { appRouter as starbaseRouter } from '@kubelt/platform/starbase/src/jsonrpc/router'
-import { appRouter as imageRouter } from '@kubelt/platform/images/src/jsonrpc/router'
-import { appRouter as emailRouter } from '@kubelt/platform/email/src/jsonrpc/router'
+import { appRouter as accountRouter } from '@proofzero/platform/account/src/jsonrpc/router'
+import { appRouter as accessRouter } from '@proofzero/platform/access/src/jsonrpc/router'
+import { appRouter as addressRouter } from '@proofzero/platform/address/src/jsonrpc/router'
+import { appRouter as edgesRouter } from '@proofzero/platform/edges/src/jsonrpc/router'
+import { appRouter as pingRouter } from '@proofzero/platform/ping/src/jsonrpc/router'
+import { appRouter as objectRouter } from '@proofzero/platform/object/src/jsonrpc/router'
+import { appRouter as starbaseRouter } from '@proofzero/platform/starbase/src/jsonrpc/router'
+import { appRouter as imageRouter } from '@proofzero/platform/images/src/jsonrpc/router'
+import { appRouter as emailRouter } from '@proofzero/platform/email/src/jsonrpc/router'
 
 export type AccountRouter = typeof accountRouter
 

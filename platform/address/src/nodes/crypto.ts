@@ -1,7 +1,7 @@
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
-import type { Scope } from '@kubelt/types/access'
+import type { Scope } from '@proofzero/types/access'
 
 import { NONCE_OPTIONS } from '../constants'
 import type { Challenge, CryptoAddressProfile } from '../types'
@@ -9,7 +9,7 @@ import { recoverEthereumAddress } from '../utils'
 
 import { AddressNode } from '.'
 import Address from './address'
-import ENSUtils from '@kubelt/platform-clients/ens-utils'
+import ENSUtils from '@proofzero/platform-clients/ens-utils'
 
 export default class CryptoAddress {
   declare node: AddressNode

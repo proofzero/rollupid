@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { decodeJwt } from 'jose'
 
-import type { AccessJWTPayload } from '@kubelt/types/access'
+import type { AccessJWTPayload } from '@proofzero/types/access'
 
 import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'

@@ -4,9 +4,9 @@ import { Context } from '../../context'
 import {
   AnyURNInput,
   EdgeTagInput,
-} from '@kubelt/platform-middleware/inputValidators'
-import { AnyURN } from '@kubelt/urns'
-import { EdgeURN } from '@kubelt/urns/edge'
+} from '@proofzero/platform-middleware/inputValidators'
+import { AnyURN } from '@proofzero/urns'
+import { EdgeURN } from '@proofzero/urns/edge'
 
 export const UpdateEdgeMethodInput = z.object({
   src: AnyURNInput,

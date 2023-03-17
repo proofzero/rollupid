@@ -1,5 +1,5 @@
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { useState } from 'react'
 import { DeleteAppModal } from '../DeleteAppModal/DeleteAppModal'
 

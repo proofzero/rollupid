@@ -1,4 +1,4 @@
-import { TraceSpan } from '@kubelt/platform-middleware/trace'
+import { TraceSpan } from '@proofzero/platform-middleware/trace'
 
 export const seviceBindings = true
 

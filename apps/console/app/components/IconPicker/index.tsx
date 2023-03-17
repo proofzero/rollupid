@@ -3,7 +3,7 @@
  */
 
 import { useState } from 'react'
-import { Text } from '@kubelt/design-system'
+import { Text } from '@proofzero/design-system'
 
 import { CameraIcon } from '@heroicons/react/24/outline'
 

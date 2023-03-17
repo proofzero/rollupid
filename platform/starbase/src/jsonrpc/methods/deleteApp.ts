@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import { ApplicationURNSpace } from '@kubelt/urns/application'
-import createEdgesClient from '@kubelt/platform-clients/edges'
+import { ApplicationURNSpace } from '@proofzero/urns/application'
+import createEdgesClient from '@proofzero/platform-clients/edges'
 import { AppClientIdParamSchema } from '../validators/app'
 import { EDGE_APPLICATION } from '../../types'
 

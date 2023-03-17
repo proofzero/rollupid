@@ -1,7 +1,7 @@
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Input } from '@kubelt/design-system/src/atoms/form/Input'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { useState } from 'react'
 import { RiLoader5Fill } from 'react-icons/ri'
 

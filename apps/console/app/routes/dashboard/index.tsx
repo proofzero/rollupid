@@ -9,8 +9,8 @@ import { json } from '@remix-run/cloudflare'
 
 import folderPlus from '~/images/folderPlus.svg'
 
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 //import { useUser } from "~/utils";
 
@@ -23,9 +23,9 @@ import { NewAppModal } from '~/components/NewAppModal/NewAppModal'
 import { requireJWT } from '~/utilities/session.server'
 import { getGalaxyClient } from '~/utilities/platform.server'
 import { InfoPanelDashboard } from '~/components/InfoPanel/InfoPanelDashboard'
-import createStarbaseClient from '@kubelt/platform-clients/starbase'
-import { getAuthzHeaderConditionallyFromToken } from '@kubelt/utils'
-import { generateTraceContextHeaders } from '@kubelt/platform-middleware/trace'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 type LoaderData = {
   apps: {

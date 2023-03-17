@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
 import classNames from 'classnames'
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import type { ButtonProps } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import type { ButtonProps } from '@proofzero/design-system/src/atoms/buttons/Button'
 
 import walletsSvg from './wallets.png'
 import { Avatar } from 'connectkit'
-import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
+import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import { useAccount, useDisconnect, useSignMessage } from 'wagmi'
 import { ConnectKitProvider, ConnectKitButton } from 'connectkit'
 

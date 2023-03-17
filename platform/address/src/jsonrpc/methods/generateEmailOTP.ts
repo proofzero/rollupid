@@ -1,4 +1,4 @@
-import generateRandomString from '@kubelt/utils/generateRandomString'
+import generateRandomString from '@proofzero/utils/generateRandomString'
 import { z } from 'zod'
 import { EMAIL_VERIFICATION_OPTIONS } from '../../constants'
 import { Context } from '../../context'

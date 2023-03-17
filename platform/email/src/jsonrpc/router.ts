@@ -1,5 +1,5 @@
-import { Analytics } from '@kubelt/platform-middleware/analytics'
-import { LogUsage } from '@kubelt/platform-middleware/log'
+import { Analytics } from '@proofzero/platform-middleware/analytics'
+import { LogUsage } from '@proofzero/platform-middleware/log'
 import { initTRPC } from '@trpc/server'
 import {
   sendOTPEmailMethodOutput,

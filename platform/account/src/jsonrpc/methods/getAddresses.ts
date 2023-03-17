@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { inputValidators } from '@kubelt/platform-middleware'
+import { inputValidators } from '@proofzero/platform-middleware'
 import { Context } from '../../context'
 import { appRouter } from '../router'
 import { AddressesSchema } from '../validators/profile'

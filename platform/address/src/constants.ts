@@ -1,4 +1,4 @@
-import { EdgeSpace, EdgeURN } from '@kubelt/urns/edge'
+import { EdgeSpace, EdgeURN } from '@proofzero/urns/edge'
 
 export const ACCOUNT_OPTIONS = {
   length: 24,

@@ -1,5 +1,5 @@
-import type { ButtonProps } from '@kubelt/design-system/src/atoms/buttons/Button'
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import type { ButtonProps } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 
 import logo from '../../assets/rollup-id-logo-white.svg'
 

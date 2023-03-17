@@ -20,7 +20,7 @@ import {
 
 import { useEffect } from 'react'
 
-import designStyles from '@kubelt/design-system/src/styles/global.css'
+import designStyles from '@proofzero/design-system/src/styles/global.css'
 import styles from '~/styles/tailwind.css'
 import baseStyles from '~/styles/base.css'
 
@@ -32,8 +32,8 @@ import social from '~/assets/social.png'
 import maskIcon from '~/assets/safari-pinned-tab.svg'
 import logo from '~/assets/rollup-id-logo.svg'
 
-import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
-import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
+import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
+import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 
 import * as gtag from '~/utils/gtags.client'
 
