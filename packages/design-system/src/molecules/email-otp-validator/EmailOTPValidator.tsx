@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
 import { Button } from '../../atoms/buttons/Button'
 import { Text } from '../../atoms/text/Text'
@@ -7,14 +7,26 @@ type EmailOTPValidatorProps = {
   email: string
 
   goBack: () => void
-  requestResend: (email: string) => void
+  requestResend: (email: string) => Promise<void>
+  requestVerification: (code: string) => Promise<boolean>
 }
 
-export default ({ email, goBack, requestResend }: EmailOTPValidatorProps) => {
+export default ({
+  email,
+  goBack,
+  requestResend,
+  requestVerification,
+}: EmailOTPValidatorProps) => {
   const inputLen = 5
   const inputRefs = Array.from({ length: inputLen }, () =>
     useRef<HTMLInputElement>()
   )
+
+  const [fullCode, setFullCode] = useState('')
+  const updateFullCode = useCallback(() => {
+    const updatedCode = inputRefs.map((ir) => ir.current?.value).join('')
+    setFullCode(updatedCode)
+  }, [inputRefs])
 
   return (
     <div className="bg-white rounded-lg p-9 flex flex-col h-full">
@@ -50,6 +62,8 @@ export default ({ email, goBack, requestResend }: EmailOTPValidatorProps) => {
                 inputRefs[(i + 1) % inputLen].current.value === ''
                 inputRefs[(i + 1) % inputLen].current.focus()
                 inputRefs[(i + 1) % inputLen].current.select()
+
+                updateFullCode()
               }}
               onKeyDown={(ev) => {
                 if (
@@ -59,6 +73,8 @@ export default ({ email, goBack, requestResend }: EmailOTPValidatorProps) => {
                   inputRefs[(i - 1 + inputLen) % inputLen].current.focus()
                   inputRefs[(i - 1 + inputLen) % inputLen].current.select()
                 }
+
+                updateFullCode()
               }}
               onKeyUp={(ev) => {
                 if (ev.key === inputRefs[i].current.value) {
@@ -76,6 +92,8 @@ export default ({ email, goBack, requestResend }: EmailOTPValidatorProps) => {
                     inputRefs[(i + j) % inputLen].current.value = char
                     inputRefs[(i + j) % inputLen].current.blur()
                   })
+
+                updateFullCode()
               }}
               className="flex text-2xl py-7 px-3.5 h-20 justify-center items-center text-gray-600 border rounded text-center"
             />
@@ -101,7 +119,14 @@ export default ({ email, goBack, requestResend }: EmailOTPValidatorProps) => {
         <Button btnType="secondary-alt" className="flex-1">
           Cancel
         </Button>
-        <Button btnType="primary-alt" className="flex-1" disabled>
+        <Button
+          btnType="primary-alt"
+          className="flex-1"
+          disabled={fullCode.length !== inputLen}
+          onClick={async () => {
+            await requestVerification(fullCode)
+          }}
+        >
           Verify
         </Button>
       </section>
