@@ -37,6 +37,7 @@ export default ({ email, goBack, requestResend }: EmailOTPValidatorProps) => {
         <div className="grid grid-cols-5 gap-2.5">
           {inputRefs.map((ref, i) => (
             <input
+              key={i}
               autoFocus={i === 0}
               ref={ref}
               id={`code_${i}`}
