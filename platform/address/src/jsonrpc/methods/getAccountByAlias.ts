@@ -27,10 +27,24 @@ export const getAccountByAliasMethod = async ({
     alias = (await new ENSUtils().getEnsEntry(input.alias)).address
   }
 
+  /**
+   * When we have proper `hidden`-address functionality
+   * we'll need to do it like this:
+   *  query: {
+   *   tag: EDGE_ADDRESS,
+   *   dst: {
+   *     rc: { addr_type: input.provider },
+   *     qc: { alias, hidden: false },
+   *   },
+   */
+
   const { edges } = await ctx.edges.getEdges.query({
     query: {
       tag: EDGE_ADDRESS,
-      dst: { rc: { addr_type: input.provider }, qc: { alias } },
+      dst: {
+        rc: { addr_type: input.provider },
+        qc: { alias },
+      },
     },
   })
 
@@ -38,13 +52,6 @@ export const getAccountByAliasMethod = async ({
     throw new Error('Cannot resolve unique alias due to data conflict.')
   }
 
-  /**
-   * When we have proper `hidden`-address functionality
-   * we'll need to do it like this:
-   * const account = edges
-   *              .filter(edge => !edge.dst.qc.hidden)
-   *              .map((edge) => edge.src.baseUrn)[0]
-   */
   const account = edges.map((edge) => edge.src.baseUrn)[0]
 
   return account as AccountURN

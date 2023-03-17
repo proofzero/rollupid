@@ -38,7 +38,7 @@ export const UserNavigation = ({
     <>
       <div className="pl-3 pr-2 py-2 flex w-full flex-col">
         <Text size="xs" className="text-gray-500">
-          CURRNETLY IN
+          CURRENTLY IN
         </Text>
         <div className="flex flex-row items-center mt-2">
           <img
