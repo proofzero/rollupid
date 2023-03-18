@@ -8,6 +8,7 @@ const contentSecurityPolicy = (nonce: string, dev: boolean = false): string => {
         SELF,
         'wss://*.bridge.walletconnect.org',
         '*.alchemyapi.io',
+        '*.google-analytics.com',
         // Used for Remix WebSocket Live Reaload
         ...(dev ? ['ws://localhost:*/socket'] : []),
       ],
