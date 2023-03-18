@@ -20,7 +20,8 @@ import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { SortableList } from '@proofzero/design-system/src/atoms/lists/SortableList'
 
-import type { Link } from '~/types'
+import type { Link, Links } from '~/types'
+import { LinksSchema } from '~/validation'
 
 import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
@@ -111,47 +112,33 @@ export const action: ActionFunction = async ({ request, context }) => {
   const { sub: accountURN } = parseJwt(user.accessToken)
 
   const formDataText = await request.text()
-  const formData = qs.parse(formDataText)
+  const formData = qs.parse(formDataText) as unknown as { links: Links }
 
   /**
    * Updated names and urls are fetched from inputText
    * And separately I created hidden input for previous unchanged links
    * to not forget to include them on profile too
    */
-  const updatedLinks = (formData['links'] || []) as Link[]
+  const updatedLinks = formData['links']
 
-  // TODO: Add validation
+  // Schema Validation
+  const zodValidation = LinksSchema.safeParse(updatedLinks)
 
-  const errors: {
-    [key: string | number]: { name?: string; url?: string }
-  } = {}
+  console.log({ links: JSON.stringify(zodValidation) })
 
-  updatedLinks.forEach((link: any, id: number) => {
-    /** This is the way
-     * I attach new props to an empty object
-     */
-
-    if (!link.name) {
-      errors[`${id}`] = {}
-      errors[`${id}`].name = 'All links must have name'
+  if (!zodValidation.success) {
+    return {
+      errors: zodValidation.error.issues[0].message,
     }
-    if (!link.url) {
-      if (!errors[`${id}`]) errors[`${id}`] = {}
-      errors[`${id}`].url = 'All links must have URL'
-    }
-  })
-
-  if (Object.keys(errors).length) {
-    return { errors }
   }
 
   const currentProfile = await ProfileKV.get<FullProfile>(accountURN!, 'json')
   const updatedProfile = Object.assign(currentProfile || {}, {
-    links: updatedLinks,
+    links: zodValidation.data,
   })
   await ProfileKV.put(accountURN!, JSON.stringify(updatedProfile))
 
-  return { updatedLinks }
+  return { updatedLinks: updatedLinks || [] }
 }
 
 const SortableLink = ({
@@ -242,7 +229,7 @@ const SortableLink = ({
         </div>
         <div
           className="
-    w-full
+    w-full my-1 max-sm:my-2
     sm:mr-[3%]"
         >
           <InputText
@@ -275,9 +262,9 @@ const SortableLink = ({
 }
 
 export default function AccountSettingsLinks() {
-  const { profile, notificationHandler, connectedProfiles } = useOutletContext<{
+  const { profile, notify, connectedProfiles } = useOutletContext<{
     profile: FullProfile
-    notificationHandler: (success: boolean) => void
+    notify: (success: boolean) => void
     connectedProfiles: any[]
   }>()
 
@@ -290,7 +277,7 @@ export default function AccountSettingsLinks() {
   )
 
   const [links, setLinks] = useState<(Link & { editing?: boolean })[]>(
-    profile.links || []
+    profile?.links || []
   )
 
   // TODO: make type for this
@@ -312,9 +299,11 @@ export default function AccountSettingsLinks() {
 
   useEffect(() => {
     if (transition.type === 'actionReload') {
-      setFormChanged(false)
-      setLinks(actionData?.updatedLinks)
-      notificationHandler(!actionData?.errors)
+      if (!actionData.errors) {
+        setFormChanged(false)
+        setLinks(actionData.updatedLinks)
+      }
+      notify(!actionData.errors)
     }
   }, [transition])
 

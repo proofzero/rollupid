@@ -23,6 +23,7 @@ import SaveButton from '~/components/accounts/SaveButton'
 import { getMoreNftsModal } from '~/helpers/nfts'
 
 import type { FullProfile, NFT } from '~/types'
+import { FullProfileSchema } from '~/validation'
 import InputTextarea from '~/components/inputs/InputTextarea'
 
 export const action: ActionFunction = async ({ request, context }) => {
@@ -51,30 +52,29 @@ export const action: ActionFunction = async ({ request, context }) => {
     job,
     location,
   })
-  await ProfileKV.put(accountURN!, JSON.stringify(updatedProfile))
+
+  const zodValidation = FullProfileSchema.safeParse(updatedProfile)
+
+  if (!zodValidation.success) {
+    console.log({ err: JSON.stringify(zodValidation.error) })
+    return {
+      errors: zodValidation.error.issues[0].message,
+    }
+  }
+
+  await ProfileKV.put(accountURN!, JSON.stringify(zodValidation.data))
 
   return null
 }
 
 export default function AccountSettingsProfile() {
-  const { notificationHandler, profile, accountURN } = useOutletContext<{
+  const { notify, profile, accountURN } = useOutletContext<{
     profile: FullProfile
-    notificationHandler: (success: boolean) => void
+    notify: (success: boolean) => void
     accountURN: string
   }>()
 
-  //TODO: update pfp components to take multiple addresses
-
-  const {
-    displayName,
-    pfp,
-    bio,
-    job,
-    location,
-    // address,
-    // generatedPfp,
-    // generatedPfpMinted,
-  } = profile
+  const { displayName, pfp, bio, job, location } = profile
 
   const [pfpUrl, setPfpUrl] = useState(pfp?.image || undefined)
   const [isToken, setIsToken] = useState<boolean>(false)
@@ -82,12 +82,15 @@ export default function AccountSettingsProfile() {
   const actionData = useActionData()
 
   const transition = useTransition()
+
   useEffect(() => {
     if (transition.type === 'actionReload') {
-      setFormChanged(false)
-      notificationHandler(!actionData?.errors)
+      if (!actionData?.errors) {
+        setFormChanged(false)
+      }
+      notify(!actionData?.errors)
     }
-  }, [actionData?.errors, notificationHandler, transition])
+  }, [actionData?.errors, transition])
 
   const [nftPfpModalOpen, setNftPfpModalOpen] = useState(false)
 
@@ -322,7 +325,7 @@ export default function AccountSettingsProfile() {
 
           {actionData?.errors.bio && (
             <Text className="mb-1.5 text-gray-400" size="xs" weight="normal">
-              {actionData?.errors.bio}
+              {actionData.errors.bio}
             </Text>
           )}
 
@@ -333,6 +336,7 @@ export default function AccountSettingsProfile() {
 
           This div with h-[4rem] prevents everything from overlapping with
           div with absolute position below  */}
+
           <div className="h-[4rem]" />
           <div className="absolute bottom-0 right-0">
             <SaveButton

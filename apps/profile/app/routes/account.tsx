@@ -171,7 +171,7 @@ export default function AccountLayout() {
                           connectedProfiles,
                           cryptoAddresses,
                           accountURN,
-                          notificationHandler: notify,
+                          notify,
                         }}
                       />
                     </div>
