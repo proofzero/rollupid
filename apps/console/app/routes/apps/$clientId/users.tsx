@@ -188,7 +188,7 @@ rounded-lg border shadow"
                           imageURL={Users.get(key)?.imageURL}
                           name={Users.get(key)?.name}
                           date={Users.get(key)?.date}
-                          PROFILE_APP_URL={PROFILE_APP_URL}
+                          publicProfileURL={`${PROFILE_APP_URL}/p/${key}`}
                         />
                       ))}
                       <div className="flex items-center py-4 px-8 border-t justify-between">
