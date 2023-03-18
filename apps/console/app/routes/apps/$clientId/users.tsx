@@ -112,8 +112,6 @@ rounded-lg border shadow"
                 account.accountURN
               )
 
-              console.debug({ decodedAccountURN })
-
               // Keys are decoded accountURNs
               Users.set(decodedAccountURN, {
                 name: account.name!,
