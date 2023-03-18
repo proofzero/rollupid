@@ -5,14 +5,12 @@ import missingImage from '../../../images/missing-img.svg'
 import { HiOutlineExternalLink } from 'react-icons/hi'
 
 export const User = ({
-  key,
-  PROFILE_APP_URL,
+  publicProfileURL,
   name,
   imageURL,
   date,
 }: {
-  key: string
-  PROFILE_APP_URL: string
+  publicProfileURL: string
   name?: string
   imageURL?: string
   date?: string
@@ -50,7 +48,7 @@ text-ellipsis md:space-x-4"
       </Text>
       <a
         className="flex-1 flex justify-end"
-        href={`${PROFILE_APP_URL}/p/${key}`}
+        href={publicProfileURL}
         target="_blank"
         rel="noopener noreferrer"
       >
