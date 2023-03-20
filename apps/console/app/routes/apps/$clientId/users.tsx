@@ -94,7 +94,7 @@ const Users = () => {
           Users
         </Text>
         <DocumentationBadge
-          url={'https://docs.rollup.id/platform/console#users'}
+          url={'https://docs.rollup.id/platform/console/users'}
         />
       </div>
       <Suspense

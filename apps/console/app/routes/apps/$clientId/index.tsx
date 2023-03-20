@@ -144,7 +144,7 @@ export default function AppDetailIndexPage() {
           Dashboard
         </Text>
         <DocumentationBadge
-          url={'https://docs.rollup.id/platform/console#dashboard'}
+          url={'https://docs.rollup.id/platform/console/dashboard'}
         />
       </div>
 

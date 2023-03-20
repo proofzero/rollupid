@@ -284,7 +284,7 @@ export default function AppDetailIndexPage() {
                   OAuth
                 </Text>
                 <DocumentationBadge
-                  url={'https://docs.rollup.id/platform/console#oauth'}
+                  url={'https://docs.rollup.id/platform/console/oauth'}
                 />
               </div>
               <Button

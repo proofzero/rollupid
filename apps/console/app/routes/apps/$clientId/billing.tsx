@@ -1,5 +1,5 @@
 import { ButtonAnchor } from '@proofzero/design-system/src/atoms/buttons/ButtonAnchor'
-import { LinksFunction } from '@remix-run/cloudflare'
+import type { LinksFunction } from '@remix-run/cloudflare'
 import { FaDiscord, FaGithub, FaTwitter } from 'react-icons/fa'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
