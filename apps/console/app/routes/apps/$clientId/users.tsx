@@ -19,6 +19,7 @@ import { User } from '~/components/Applications/Users/User'
 import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import { Button, Text } from '@proofzero/design-system'
+import { DocumentationBadge } from '~/components/DocumentationBadge'
 
 // don't change this constant unless it's necessary
 // this constant also affects /$clientId root route
@@ -88,9 +89,14 @@ const Users = () => {
 
   return (
     <div className="w-full h-full min-h-[360px]">
-      <Text size="2xl" weight="semibold" className="text-gray-900 pb-4">
-        Users
-      </Text>
+      <div className="flex flex-row items-center space-x-3 pb-4">
+        <Text size="2xl" weight="semibold" className="text-gray-900">
+          Users
+        </Text>
+        <DocumentationBadge
+          url={'https://docs.rollup.id/platform/console/users'}
+        />
+      </div>
       <Suspense
         fallback={
           <div

@@ -30,6 +30,7 @@ type LoaderData = {
   avatarUrl: string
   appDetails: appDetailsProps
   rotationResult?: RotatedSecrets
+  PASSPORT_URL: string
 }
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
@@ -94,6 +95,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
       avatarUrl,
       appDetails: appDetails as appDetailsProps,
       rotationResult,
+      PASSPORT_URL,
     })
   } catch (error) {
     console.error('Caught error in loader', { error })
@@ -111,7 +113,7 @@ export default function AppDetailIndexPage() {
 
   const { profileURL } = useOutletContext<{ profileURL: string }>()
 
-  const { apps, avatarUrl } = loaderData
+  const { apps, avatarUrl, PASSPORT_URL } = loaderData
   const { appDetails, rotationResult } = loaderData
 
   const notify = (success: boolean = true) => {
@@ -131,7 +133,11 @@ export default function AppDetailIndexPage() {
 
   return (
     <div className="flex flex-col md:flex-row min-h-full bg-gray-50">
-      <SiteMenu apps={apps} selected={appDetails.clientId} />
+      <SiteMenu
+        apps={apps}
+        selected={appDetails.clientId}
+        PASSPORT_URL={PASSPORT_URL}
+      />
       <main className="flex flex-col flex-initial min-h-full w-full">
         <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
         <Toaster position="top-right" reverseOrder={false} />

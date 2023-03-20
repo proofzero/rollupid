@@ -35,6 +35,7 @@ import { MultiSelect } from '@proofzero/design-system/src/atoms/form/MultiSelect
 import { PreLabeledInput } from '@proofzero/design-system/src/atoms/form/PreLabledInput'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
+import { DocumentationBadge } from '~/components/DocumentationBadge'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -278,9 +279,14 @@ export default function AppDetailIndexPage() {
 
           <section className="flex flex-col space-y-5">
             <div className="flex flex-row justify-between space-x-5">
-              <Text size="2xl" weight="semibold" className="text-gray-900">
-                OAuth
-              </Text>
+              <div className="flex flex-row items-center space-x-3">
+                <Text size="2xl" weight="semibold" className="text-gray-900">
+                  OAuth
+                </Text>
+                <DocumentationBadge
+                  url={'https://docs.rollup.id/platform/console/oauth'}
+                />
+              </div>
               <Button
                 type="submit"
                 btnType="primary-alt"

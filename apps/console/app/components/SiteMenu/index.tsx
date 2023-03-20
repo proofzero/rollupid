@@ -17,6 +17,8 @@ import {
   HiOutlineColorSwatch,
   HiOutlineDocument,
   HiOutlineHome,
+  HiOutlineBookOpen,
+  HiOutlineExternalLink,
 } from 'react-icons/hi'
 import {
   TbScan,
@@ -26,9 +28,10 @@ import {
   TbUsers,
   TbWorld,
 } from 'react-icons/tb'
+import { BsGear } from 'react-icons/bs'
 import { Disclosure } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { IconType } from 'react-icons'
+import type { IconType } from 'react-icons'
 
 // RollupLogo
 // -----------------------------------------------------------------------------
@@ -56,6 +59,7 @@ type RollupMenuProps = {
   }[]
   // Current selected Client ID.
   selected?: string
+  PASSPORT_URL: string
 }
 
 const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
@@ -65,7 +69,11 @@ const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
 
 export default function SiteMenu(props: RollupMenuProps) {
   return (
-    <div className="text-center bg-gray-900 pb-4 md:min-h-screen md:min-w-[256px] md:max-w-sm md:border-r md:text-left">
+    <div
+      className="text-center bg-gray-900 pb-4 md:min-h-screen
+    md:min-w-[256px] md:max-w-sm md:border-r md:text-left
+    flex flex-col"
+    >
       <div className="object-left">
         <RollupLogo />
       </div>
@@ -74,7 +82,12 @@ export default function SiteMenu(props: RollupMenuProps) {
         <Disclosure>
           {({ open }) => (
             <>
-              <Disclosure.Button className="absolute right-0 top-0 my-5 items-right justify-right bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+              <Disclosure.Button
+                className="absolute right-0 top-0 my-5 items-right
+              justify-right bg-gray-800 p-2 text-gray-400 hover:bg-gray-700
+              hover:text-white focus:outline-none focus:ring-2 focus:ring-white
+              focus:ring-offset-2 focus:ring-offset-gray-800"
+              >
                 <span className="sr-only">Open main menu</span>
                 {open ? (
                   <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -84,6 +97,10 @@ export default function SiteMenu(props: RollupMenuProps) {
               </Disclosure.Button>
               <Disclosure.Panel>
                 <AppMenu props={props} />
+                <ExternalLinks
+                  PASSPORT_URL={props.PASSPORT_URL}
+                  docsURL={'https://docs.rollup.id'}
+                />
               </Disclosure.Panel>
             </>
           )}
@@ -93,6 +110,12 @@ export default function SiteMenu(props: RollupMenuProps) {
       {/* Desktop menu */}
       <div className="hidden md:block">
         <AppMenu props={props} />
+      </div>
+      <div className="hidden md:block mt-auto">
+        <ExternalLinks
+          PASSPORT_URL={props.PASSPORT_URL}
+          docsURL={'https://docs.rollup.id'}
+        />
       </div>
     </div>
   )
@@ -206,7 +229,7 @@ const AppSubmenu = (appSubroute: string) =>
             className={({ isActive }) => menuItemClass(isActive, al.disabled)}
             end
           >
-            <al.icon className="w-6 h-6" />
+            <al.icon size={24} />
             <Text size="sm" weight="medium">
               {al.title}
             </Text>
@@ -226,6 +249,49 @@ function AppMenu({ props }: AppMenuProps) {
           {AppSubmenu(props.selected)}
         </section>
       )}
+    </div>
+  )
+}
+
+type ExternalLinksProps = {
+  PASSPORT_URL: string
+  docsURL: string
+}
+
+function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
+  return (
+    <div className="mt-2 border-t border-gray-700">
+      {/* Hidden until new passport lands */}
+      <div className="px-2 pt-2 hidden">
+        <NavLink
+          to={PASSPORT_URL}
+          target="_blank"
+          className={({ isActive }) => `${menuItemClass(isActive, false)} `}
+        >
+          <BsGear size={24} className="mr-2" />
+          <div className="flex flex-row w-full items-center justify-between">
+            <Text size="sm" weight="medium">
+              User Settings
+            </Text>
+            <HiOutlineExternalLink size={22} className="right-0" />
+          </div>
+        </NavLink>
+      </div>
+      <div className="px-2 pt-2">
+        <NavLink
+          to={docsURL}
+          target="_blank"
+          className={({ isActive }) => menuItemClass(isActive, false)}
+        >
+          <HiOutlineBookOpen size={24} className="mr-2" />
+          <div className="flex flex-row w-full items-center justify-between">
+            <Text size="sm" weight="medium">
+              Documentation
+            </Text>
+            <HiOutlineExternalLink size={22} className="right-0" />
+          </div>
+        </NavLink>
+      </div>
     </div>
   )
 }

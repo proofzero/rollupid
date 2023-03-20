@@ -2,12 +2,14 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { FeaturePill } from '@proofzero/design-system/src/atoms/pills/FeaturePill'
 import { ButtonAnchor } from '@proofzero/design-system/src/atoms/buttons/ButtonAnchor'
 import { FaDiscord, FaGithub, FaTwitter } from 'react-icons/fa'
+import { DocumentationBadge } from '../DocumentationBadge'
 
 type EarlyAccessPanelProps = {
   title: string
   subtitle: string
   copy: string
   imgSrc: string
+  url: string
   imgClassName?: string
 }
 
@@ -16,17 +18,21 @@ const EarlyAccessPanel = ({
   subtitle,
   copy,
   imgSrc,
+  url,
   imgClassName,
 }: EarlyAccessPanelProps) => {
   return (
     <>
-      <Text
-        size="2xl"
-        weight="semibold"
-        className="text-gray-900 mb-5 ml-2 lg:ml-0 "
-      >
-        {title}
-      </Text>
+      <div className="flex flex-row items-center space-x-3 pb-5">
+        <Text
+          size="2xl"
+          weight="semibold"
+          className="text-gray-900 ml-2 lg:ml-0 "
+        >
+          {title}
+        </Text>
+        <DocumentationBadge url={url} />
+      </div>
 
       <div className="bg-white p-10 rounded-lg shadow flex flex-col lg:flex-row lg:space-x-28 space-y-4 lg:space-y-0">
         <section className="flex-1">
