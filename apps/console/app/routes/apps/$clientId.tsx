@@ -134,14 +134,7 @@ export default function AppDetailIndexPage() {
       <SiteMenu apps={apps} selected={appDetails.clientId} />
       <main className="flex flex-col flex-initial min-h-full w-full">
         <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
-        <Toaster
-          position={
-            typeof window !== 'undefined' && window.innerWidth >= 1510
-              ? 'top-right'
-              : 'top-center'
-          }
-          reverseOrder={false}
-        />
+        <Toaster position={'top-right'} reverseOrder={false} />
         <section className="sm:mx-11 my-9">
           <Outlet
             context={{

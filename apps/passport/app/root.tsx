@@ -163,13 +163,7 @@ export default function App() {
           </>
         )}
         {transition.state === 'loading' && <Loader />}
-        <Toaster
-          position={
-            typeof window !== 'undefined' && window.innerWidth >= 1510
-              ? 'top-right'
-              : 'top-center'
-          }
-        />
+        <Toaster position={'top-right'} />
         <Outlet />
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />

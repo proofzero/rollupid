@@ -9,7 +9,7 @@ import { Pill } from '@proofzero/design-system/src/atoms/pills/Pill'
 import { json } from '@remix-run/cloudflare'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { commitProfileSession, getProfileSession } from '~/utils/session.server'
-import { toast } from 'react-hot-toast'
+import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 
 export const loader: LoaderFunction = async (args) => {
   const session = await getProfileSession(args.request)
@@ -223,13 +223,13 @@ export default () => {
     if (tooltipMessage) {
       switch (tooltipMessage.type) {
         case 'success':
-          toast.success(tooltipMessage.message)
+          toast(ToastType.Success, { message: tooltipMessage.message })
           break
         case 'error':
-          toast.error(tooltipMessage.message)
+          toast(ToastType.Error, { message: tooltipMessage.message })
           break
         default:
-          toast(tooltipMessage.message)
+          toast(ToastType.Info, { message: tooltipMessage.message })
       }
     }
   }, [tooltipMessage])
