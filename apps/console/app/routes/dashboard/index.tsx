@@ -4,7 +4,7 @@
 
 import type { LoaderFunction } from '@remix-run/cloudflare'
 
-import { Link, useLoaderData, useOutletContext } from '@remix-run/react'
+import { useLoaderData, useOutletContext } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
 import folderPlus from '~/images/folderPlus.svg'
@@ -36,6 +36,7 @@ type LoaderData = {
     createdTimestamp?: number
   }[]
   avatarUrl: string
+  PASSPORT_URL: string
 }
 
 export const loader: LoaderFunction = async ({ request, context }) => {
@@ -70,7 +71,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       console.error('Could not retrieve profile image.', e)
     }
 
-    return json<LoaderData>({ apps: reshapedApps, avatarUrl })
+    return json<LoaderData>({ apps: reshapedApps, avatarUrl, PASSPORT_URL })
   } catch (error) {
     console.error({ error })
     return json({ error }, { status: 500 })
@@ -81,13 +82,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 // -----------------------------------------------------------------------------
 
 export default function DashboardIndexPage() {
-  const { apps, avatarUrl } = useLoaderData<LoaderData>()
+  const { apps, avatarUrl, PASSPORT_URL } = useLoaderData<LoaderData>()
   const [newAppModalOpen, setNewAppModalOpen] = useState(false)
 
   const { profileURL } = useOutletContext<{ profileURL: string }>()
   return (
     <div className="flex flex-col md:flex-row min-h-full">
-      <SiteMenu apps={apps} />
+      <SiteMenu apps={apps} PASSPORT_URL={PASSPORT_URL} />
       <main className="flex flex-col flex-initial min-h-full w-full bg-white">
         <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
         <div className="bg-gray-50 p-6 h-full">

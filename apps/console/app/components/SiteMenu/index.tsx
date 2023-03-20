@@ -59,6 +59,7 @@ type RollupMenuProps = {
   }[]
   // Current selected Client ID.
   selected?: string
+  PASSPORT_URL: string
 }
 
 const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
@@ -96,7 +97,10 @@ export default function SiteMenu(props: RollupMenuProps) {
               </Disclosure.Button>
               <Disclosure.Panel>
                 <AppMenu props={props} />
-                <ExternalLinks />
+                <ExternalLinks
+                  PASSPORT_URL={props.PASSPORT_URL}
+                  docsURL={'https://docs.rollup.id'}
+                />
               </Disclosure.Panel>
             </>
           )}
@@ -108,7 +112,10 @@ export default function SiteMenu(props: RollupMenuProps) {
         <AppMenu props={props} />
       </div>
       <div className="hidden md:block mt-auto">
-        <ExternalLinks />
+        <ExternalLinks
+          PASSPORT_URL={props.PASSPORT_URL}
+          docsURL={'https://docs.rollup.id'}
+        />
       </div>
     </div>
   )
@@ -246,12 +253,18 @@ function AppMenu({ props }: AppMenuProps) {
   )
 }
 
-function ExternalLinks({ props }: ExternalLinksProps) {
+type ExternalLinksProps = {
+  PASSPORT_URL: string
+  docsURL: string
+}
+
+function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
   return (
     <div className="mt-2 border-t border-gray-700">
       <div className="px-2 pt-2">
         <NavLink
-          to="https://passport.rollup.id"
+          to={PASSPORT_URL}
+          target="_blank"
           className={({ isActive }) => `${menuItemClass(isActive, false)} `}
         >
           <BsGear size={24} className="mr-2" />
@@ -266,7 +279,8 @@ function ExternalLinks({ props }: ExternalLinksProps) {
 
       <div className="px-2">
         <NavLink
-          to="https://docs.rollup.id"
+          to={docsURL}
+          target="_blank"
           className={({ isActive }) => menuItemClass(isActive, false)}
         >
           <HiOutlineBookOpen size={24} className="mr-2" />
