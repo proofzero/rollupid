@@ -12,11 +12,13 @@ export type ToastWithLinkProps = {
 
 export const ToastWithLink = ({
   message,
+  remove,
   linkHref,
   linkText,
-}: ToastWithLinkProps) => (
+}: ToastWithLinkProps & { remove: () => void }) => (
   <Toast
     message={message}
+    remove={remove}
     PreMessage={<HiInformationCircle className="text-indigo-400 w-5 h-5" />}
     PostMessage={
       <a href={linkHref}>

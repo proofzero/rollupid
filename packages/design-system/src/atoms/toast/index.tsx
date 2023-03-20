@@ -24,21 +24,27 @@ const toast = (
 ) => {
   let component: JSX.Element
 
+  const remove = () => {
+    rhToast.remove()
+  }
+
   switch (type) {
     case ToastType.WithLink:
-      component = <ToastWithLink {...(props as ToastWithLinkProps)} />
+      component = (
+        <ToastWithLink remove={remove} {...(props as ToastWithLinkProps)} />
+      )
       break
     case ToastType.Info:
-      component = <ToastInfo {...props} />
+      component = <ToastInfo remove={remove} {...props} />
       break
     case ToastType.Success:
-      component = <ToastSuccess {...props} />
+      component = <ToastSuccess remove={remove} {...props} />
       break
     case ToastType.Warning:
-      component = <ToastWarning {...props} />
+      component = <ToastWarning remove={remove} {...props} />
       break
     case ToastType.Error:
-      component = <ToastError {...props} />
+      component = <ToastError remove={remove} {...props} />
       break
   }
 

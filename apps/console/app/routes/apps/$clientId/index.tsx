@@ -20,11 +20,7 @@ import { Panel } from '@proofzero/design-system/src/atoms/panels/Panel'
 import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { CTA } from '@proofzero/design-system/src/molecules/cta/cta'
-import {
-  toast,
-  Toaster,
-  ToastType,
-} from '@proofzero/design-system/src/atoms/toast'
+import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
 
@@ -142,7 +138,6 @@ export default function AppDetailIndexPage() {
         Dashboard
       </Text>
 
-      <Toaster position="top-right" reverseOrder={false} />
       <RotateCredsModal
         isOpen={apiKeyRollModalOpen}
         rotateCallback={() => {

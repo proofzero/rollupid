@@ -6,8 +6,12 @@ type ToastWarningProps = {
   message: string
 }
 
-export const ToastWarning = ({ message }: ToastWarningProps) => (
+export const ToastWarning = ({
+  message,
+  remove,
+}: ToastWarningProps & { remove: () => void }) => (
   <Toast
+    remove={remove}
     message={message}
     PreMessage={<HiExclamation className="text-orange-400 w-5 h-5" />}
     className="bg-orange-50 text-orange-600"

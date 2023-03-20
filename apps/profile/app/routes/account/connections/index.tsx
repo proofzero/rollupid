@@ -84,7 +84,7 @@ const RenameModal = ({
 }) => (
   <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
     <div
-      className={`min-w-[300px] sm:min-w-[437px] relative transform rounded-lg 
+      className={`min-w-[300px] sm:min-w-[437px] relative transform rounded-lg
       bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
     >
       <Text size="lg" weight="semibold" className="text-gray-900 mb-4">
@@ -136,7 +136,7 @@ const DisconnectModal = ({
 }) => (
   <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
     <div
-      className={`min-w-[437px] relative transform rounded-lg  bg-white px-4 pt-5 pb-4 
+      className={`min-w-[437px] relative transform rounded-lg  bg-white px-4 pt-5 pb-4
          text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
     >
       <div className=" flex items-start space-x-4">

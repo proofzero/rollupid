@@ -143,14 +143,14 @@ export default function AccountLayout() {
               } sm:-mt-72  lg:pb-12`}
             >
               <div
-                className="mx-auto max-w-screen-xl lg:px-4 
+                className="mx-auto max-w-screen-xl lg:px-4
               md:px-4 md:pb-6 sm:px-6 lg:px-8 lg:pb-16"
               >
                 <div className={`bg-white  shadow sm:rounded-lg`}>
                   <div
-                    className="divide-y divide-gray-200 
-                  lg:grid 
-                  lg:max-[1200px]:grid-cols-10 min-[1200px]:grid-cols-12 
+                    className="divide-y divide-gray-200
+                  lg:grid
+                  lg:max-[1200px]:grid-cols-10 min-[1200px]:grid-cols-12
                   lg:divide-y-0 lg:divide-x"
                   >
                     <Toaster position="top-right" reverseOrder={false} />
@@ -159,9 +159,9 @@ export default function AccountLayout() {
                       accountURN={AccountURNSpace.decode(accountURN)}
                     />
                     <div
-                      className="min-h-screen divide-y divide-transparent px-4 
-                    lg:col-start-3 
-                    lg:max-[1200px]:col-end-11 min-[1200px]:col-end-13 
+                      className="min-h-screen divide-y divide-transparent px-4
+                    lg:col-start-3
+                    lg:max-[1200px]:col-end-11 min-[1200px]:col-end-13
                     lg:p-4 lg:p-8"
                     >
                       <Outlet

@@ -43,11 +43,7 @@ import NoCryptoAddresses from '~/components/accounts/NoCryptoAddresses'
 import { getProfileSession, parseJwt } from '~/utils/session.server'
 import type { Node } from '@proofzero/galaxy-client'
 import { getMoreNftsModal } from '~/helpers/nfts'
-import {
-  toast,
-  Toaster,
-  ToastType,
-} from '@proofzero/design-system/src/atoms/toast'
+import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import type { FullProfile, Gallery } from '~/types'
 import type { Maybe } from 'graphql/jsutils/Maybe'
 import type { NFT } from '~/types'
@@ -255,7 +251,6 @@ const GalleryComponent = () => {
       <Text size="xl" weight="bold" className="my-4 text-gray-900">
         NFT Gallery
       </Text>
-      <Toaster position="top-right" reverseOrder={false} />
       <Text className="border-none pb-6 text-gray-500">
         Here you can curate your profile gallery to show off your most precious
         NFTs
@@ -396,9 +391,9 @@ const GalleryComponent = () => {
               value={JSON.stringify(curatedNfts)}
             />
 
-            {/* Form where this button is used should have 
+            {/* Form where this button is used should have
           an absolute relative position
-          div below has relative - this way this button sticks to 
+          div below has relative - this way this button sticks to
           bottom right
           This div with h-[4rem] prevents everything from overlapping with
           div with absolute position below  */}
