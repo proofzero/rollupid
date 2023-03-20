@@ -135,9 +135,10 @@ export default function AccountLayout() {
             <main
               className={`transition-opacity transition-colors ${
                 open
-                  ? 'max-lg:bg-[#192030] max-lg:opacity-50 sm:max-lg:pt-72 \
-                   h-[calc(100vh-80px)] sm:max-lg:h-[calc(100vh+208px)]\
-                    overflow-hidden'
+                  ? 'max-lg:bg-[#192030] max-lg:opacity-50  \
+                  h-[calc(100vh-80px)] min-h-[568px] \
+                  sm:max-lg:pt-72 sm:max-lg:h-[calc(100vh+208px)] sm:max-lg:min-h-[856px]\
+                  overflow-hidden'
                   : 'opacity-100'
               } sm:-mt-72  lg:pb-12`}
             >
@@ -145,9 +146,7 @@ export default function AccountLayout() {
                 className="mx-auto max-w-screen-xl lg:px-4 
               md:px-4 md:pb-6 sm:px-6 lg:px-8 lg:pb-16"
               >
-                <div
-                  className={`overflow-hidden bg-white  shadow sm:rounded-lg`}
-                >
+                <div className={`bg-white  shadow sm:rounded-lg`}>
                   <div
                     className="divide-y divide-gray-200 
                   lg:grid 
