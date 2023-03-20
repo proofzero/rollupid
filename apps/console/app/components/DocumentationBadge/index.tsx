@@ -1,4 +1,3 @@
-import React from 'react'
 import { HiOutlineBookOpen } from 'react-icons/hi'
 import { Text } from '@proofzero/design-system'
 

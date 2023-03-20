@@ -1,8 +1,7 @@
-import React from 'react'
-import { DocumentationBadge } from './'
+import { DocumentationBadge } from './index'
 
 export default {
-  title: 'Atoms/DocumentationBadge/',
+  title: 'Atoms/DocumentationBadge',
   component: DocumentationBadge,
 }
 
