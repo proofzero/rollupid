@@ -14,9 +14,9 @@ The authentication step takes care of identifying profiles on the [Profile Graph
 
 Once authenticated the user will the be redirected to the authorization screen.
 
-<figure><img src="../.gitbook/assets/MacBook Pro 14_ - 1 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/MacBook Pro 14_ - 1.png" alt=""><figcaption></figcaption></figure>
 
-Passport's authentication flow currently supports the following authentication methods and are configurable for your app [Console](console.md):
+Passport's authentication flow currently supports the following authentication methods and are configurable for your app [Console](console/):
 
 * Connect with Wallet
 * Connect with Email (coming soon)
@@ -30,7 +30,7 @@ Passport's authentication flow currently supports the following authentication m
 
 #### Authorization
 
-The key feature about Rollup's Profile is the authorization step. Based on what you set as your [Scopes](../reference/scopes.md) in the [Console](console.md) OAuth settings, the user will be presented with a branded authorization request to permission and/or provision access to the users identity features on the [Profile Graph](profile-graph.md).
+The key feature about Rollup's Profile is the authorization step. Based on what you set as your [Scopes](../reference/scopes.md) in the [Console](console/) OAuth settings, the user will be presented with a branded authorization request to permission and/or provision access to the users identity features on the [Profile Graph](profile-graph.md).
 
 {% hint style="info" %}
 No scope is equivalent to an auto authorization with access only to public profile information. If no scopes are configured in Console the user will not be presented the authorization screen.

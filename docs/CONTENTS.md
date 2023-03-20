@@ -16,7 +16,18 @@
 
 ## Platform
 
-* [Console](platform/console.md)
+* [Console](platform/console/README.md)
+  * [Dashboard](platform/console/dashboard.md)
+  * [OAuth](platform/console/oauth.md)
+  * [Blockchain](platform/console/blockchain.md)
+  * [Designer](platform/console/designer.md)
+  * [Custom Domain](platform/console/custom-domain.md)
+  * [Users](platform/console/users.md)
+  * [KYC](platform/console/kyc.md)
+  * [Messaging](platform/console/messaging.md)
+  * [Audience Builder](platform/console/audience-builder.md)
+  * [Teams & Contact](platform/console/teams-and-contact.md)
+  * [Billing](platform/console/billing.md)
 * [Passport](platform/passport.md)
 * [Profile](platform/my-profile.md)
 * [Galaxy](platform/profile-graph.md)

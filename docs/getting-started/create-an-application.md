@@ -6,13 +6,13 @@ description: Step-by-step guide to creating a Rollup application.
 
 ### Step 1: Connect with Rollup Passport
 
-First, login to [Console](../platform/console.md) with Rollup Passport by visiting [https://passport.rollup.id](https://passport.rollup.id) where you will see a screen like this where you can choose your favorite authentication method to register / login with:
+First, login to [Console](../platform/console/) with Rollup Passport by visiting [https://passport.rollup.id](https://passport.rollup.id) where you will see a screen like this where you can choose your favorite authentication method to register / login with:
 
 <figure><img src="../.gitbook/assets/authenticate.svg" alt=""><figcaption><p>Rollup Passport Authentication</p></figcaption></figure>
 
 ### Step 2: Create an App
 
-After logging in you will be redirected to the [Console](../platform/console.md) dashboard. This is where you’ll register and configure your Rollup Application.
+After logging in you will be redirected to the [Console](../platform/console/) dashboard. This is where you’ll register and configure your Rollup Application.
 
 <div>
 
@@ -36,7 +36,7 @@ The Client Secret is only shared once so, if you missed it you can click the "ro
 
 <div>
 
-<figure><img src="../.gitbook/assets/Application Detail - Dashboard.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/Application Detail - Dashboard (2).png" alt=""><figcaption></figcaption></figure>
 
  
 

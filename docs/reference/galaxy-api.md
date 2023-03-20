@@ -20,8 +20,7 @@ For these example we are using Javascript but you would be able to achieve simil
 
 {% tabs %}
 {% tab title="1. Simple Fetch" %}
-
-#### Option 1: Simple Fetch Client
+**Option 1: Simple Fetch Client**
 
 A simple fetch client is the fastest way to consume a GQL API if you are not using GQL anywhere else in your application since this method requires no new dependencies.
 
@@ -118,12 +117,10 @@ const { profile } = fetch("https://galaxy.rollup.id", {
     return { profile: null }
   })
 ```
-
 {% endtab %}
 
 {% tab title="2. GQL Client" %}
-
-#### Option 2: GraphQL Clients
+**Option 2: GraphQL Clients**
 
 Our reccomended approach is to use a general purpose GQL Client. One such client we recommend for Javascript is [graphql-request.](https://www.npmjs.com/package/graphql-request)
 
@@ -198,8 +195,7 @@ As you can see, with a GraphQL client lines the overhead of making API calls is 
 {% endtab %}
 
 {% tab title="3. GQL Codegen" %}
-
-#### Option 3: GraphQL Generator
+**Option 3: GraphQL Generator**
 
 This option is best if you already have GraphQL well integrated into your application and are looking to extend your GQL client.
 
@@ -212,7 +208,6 @@ const { profile } = await myGeneratedClient.getProfileFromAddress({
   addressURN,
 })
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -220,7 +215,7 @@ const { profile } = await myGeneratedClient.getProfileFromAddress({
 
 #### X-Galaxy-Key Header
 
-This is the API Key that can be found in the dashboard of you [Console](../platform/console.md) App and is required to authenticate into the Galaxy API.
+This is the API Key that can be found in the dashboard of you [Console](../platform/console/) App and is required to authenticate into the Galaxy API.
 
 #### Authorization Header
 
