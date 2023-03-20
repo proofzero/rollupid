@@ -1,4 +1,11 @@
-import { getCSP, SELF, STRICT_DYNAMIC, UNSAFE_INLINE, NONE } from 'csp-header'
+import {
+  getCSP,
+  SELF,
+  STRICT_DYNAMIC,
+  UNSAFE_INLINE,
+  NONE,
+  DATA,
+} from 'csp-header'
 
 const contentSecurityPolicy = (nonce: string, dev: boolean = false): string => {
   return getCSP({
@@ -18,7 +25,7 @@ const contentSecurityPolicy = (nonce: string, dev: boolean = false): string => {
       // we might be able to catch them all
       // at which point we can re-enable it
       // 'img-src': [SELF, DATA, 'imagedelivery.net'],
-      'img-src': ['*'],
+      'img-src': [dev ? 'http:' : 'https:', DATA],
       'font-src': [SELF, 'fonts.cdnfonts.com'],
       'object-src': [NONE],
       'base-uri': [SELF],
