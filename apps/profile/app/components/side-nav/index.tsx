@@ -102,10 +102,7 @@ export const MobileSideNav = ({
   const submit = useSubmit()
 
   return (
-    <nav
-      className="flex-none justify-center items-center 
-       block relative h-full"
-    >
+    <nav className="flex flex-col flex-none justify-center items-center h-full">
       <div
         className="hidden h-[80px] sm:max-lg:flex w-full 
       items-center justify-end"
@@ -133,7 +130,7 @@ export const MobileSideNav = ({
       />
 
       <button
-        className="absolute bottom-0 px-4 py-4 hover:bg-gray-100 w-full
+        className="mt-auto px-4 py-4 hover:bg-gray-100 w-full
          text-left flex items-center text-red-500 text-sm"
         style={{ cursor: 'pointer' }}
         onClick={() => {
