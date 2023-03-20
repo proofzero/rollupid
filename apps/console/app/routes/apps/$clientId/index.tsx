@@ -42,6 +42,7 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import { loader as usersLoader } from './users'
 import type { AuthorizedAccountsOutput } from '@proofzero/platform/starbase/src/types'
 import type { UsersLoaderData } from './users'
+import { DocumentationBadge } from '~/components/Documentation'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -138,9 +139,14 @@ export default function AppDetailIndexPage() {
 
   return (
     <section>
-      <Text size="2xl" weight="semibold" className="text-gray-900 mb-5">
-        Dashboard
-      </Text>
+      <div className="flex flex-row items-center space-x-3 pb-5">
+        <Text size="2xl" weight="semibold" className="text-gray-900">
+          Dashboard
+        </Text>
+        <DocumentationBadge
+          url={'https://docs.rollup.id/platform/console#dashboard'}
+        />
+      </div>
 
       <Toaster position="top-right" reverseOrder={false} />
       <RotateCredsModal
