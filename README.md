@@ -70,6 +70,13 @@ Note that docker doesn't fully work using nix packages.
 
 This monorepo is managed by Yarn workspaces and nested workspaces. You can run `yarn` commands (i.e., `yarn dev`) to run all the platform services and dependencies together. Applications require more resources so it is recommended to run them individually.
 
+##### Running
+
+1. Install dependencies with `yarn`
+2. Setup local edges with `cd platform/edges && yarn db:execute`
+3. Run the platform with from the platfrom directory with `yarn dev`
+4. Run the apps with from the apps directory with `yarn start`
+
 ## Contributing
 
 We are happy to accept contributions of all sized. Feel free to submit a pull request.
