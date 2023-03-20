@@ -114,7 +114,7 @@ export default ({
                   setIsInvalid(false)
                 }
               }}
-              className={`flex text-base lg:text-2xl py-7 px-3.5 h-20 justify-center items-center text-gray-600 border rounded text-center ${
+              className={`flex text-base lg:text-2xl py-7 px-3.5 h-20 justify-center items-center text-gray-600 border rounded-lg text-center ${
                 isInvalid ? 'border-red-500' : ''
               }`}
             />
