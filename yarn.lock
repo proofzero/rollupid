@@ -6285,6 +6285,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@proofzero/rollupid@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/rollupid@workspace:."
+  dependencies:
+    "@dnd-kit/core": 6.0.6
+    "@dnd-kit/sortable": 7.0.1
+    auto: 10.37.6
+    npm-run-all: 4.1.5
+  languageName: unknown
+  linkType: soft
+
 "@proofzero/security@workspace:*, @proofzero/security@workspace:packages/security":
   version: 0.0.0-use.local
   resolution: "@proofzero/security@workspace:packages/security"
@@ -26595,17 +26606,6 @@ __metadata:
   checksum: 8c976126ea252b766e648a4866e1bccff9d3b08432474ad80c559f6c7265cf7caede2498d463754d8c88c4759895edd8210c85c0d3155e6aae4968362889466f
   languageName: node
   linkType: hard
-
-"kubelt@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "kubelt@workspace:."
-  dependencies:
-    "@dnd-kit/core": 6.0.6
-    "@dnd-kit/sortable": 7.0.1
-    auto: 10.37.6
-    npm-run-all: 4.1.5
-  languageName: unknown
-  linkType: soft
 
 "language-subtag-registry@npm:^0.3.20":
   version: 0.3.22
