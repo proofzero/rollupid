@@ -116,7 +116,7 @@ export default function AppDetailIndexPage() {
 
   const notify = (success: boolean = true) => {
     if (success) {
-      toast(ToastType.Success, { message: 'Saved' }, { duration: 1500 })
+      toast(ToastType.Success, { message: 'Saved' }, { duration: 2000 })
     } else {
       toast(
         ToastType.Error,
@@ -134,7 +134,7 @@ export default function AppDetailIndexPage() {
       <SiteMenu apps={apps} selected={appDetails.clientId} />
       <main className="flex flex-col flex-initial min-h-full w-full">
         <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
-        <Toaster position={'top-right'} reverseOrder={false} />
+        <Toaster position="top-right" reverseOrder={false} />
         <section className="sm:mx-11 my-9">
           <Outlet
             context={{

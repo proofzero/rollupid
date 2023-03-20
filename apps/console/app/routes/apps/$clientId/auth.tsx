@@ -319,9 +319,7 @@ export default function AppDetailIndexPage() {
                         onCopy={() =>
                           toast(
                             ToastType.Success,
-                            {
-                              message: 'Client ID copied to clipboard!',
-                            },
+                            { message: 'Client ID copied to clipboard!' },
                             {
                               duration: 2000,
                             }

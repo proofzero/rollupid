@@ -153,7 +153,7 @@ export default function AccountLayout() {
                   lg:max-[1200px]:grid-cols-10 min-[1200px]:grid-cols-12
                   lg:divide-y-0 lg:divide-x"
                   >
-                    <Toaster position={'top-right'} reverseOrder={false} />
+                    <Toaster position="top-right" reverseOrder={false} />
                     <DesktopSideNav
                       profile={profile}
                       accountURN={AccountURNSpace.decode(accountURN)}
