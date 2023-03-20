@@ -1,8 +1,10 @@
+import { RollupError } from '@proofzero/errors'
 import type { AccountURN } from '@proofzero/urns/account'
 import { AccountURNSpace } from '@proofzero/urns/account'
-import * as jose from 'jose'
-import { BaseMiddlewareFunction } from './types'
 import { getAuthzTokenFromReq } from '@proofzero/utils'
+import { checkToken } from '@proofzero/utils/token'
+
+import { BaseMiddlewareFunction } from './types'
 
 export const AuthorizationTokenFromHeader: BaseMiddlewareFunction<{
   req?: Request
@@ -19,20 +21,24 @@ export const AuthorizationTokenFromHeader: BaseMiddlewareFunction<{
 export const ValidateJWT: BaseMiddlewareFunction<{
   token?: string
 }> = ({ ctx, next }) => {
-  if (!ctx.token) throw new Error('No token found in middleware context')
+  if (ctx.token) {
+    try {
+      const { sub: subject } = checkToken(ctx.token)
+      if (subject && AccountURNSpace.is(subject)) {
+        return next({
+          ctx: {
+            ...ctx,
+            accountURN: subject,
+          },
+        })
+      }
+    } catch (error) {
+      if (error instanceof RollupError) return next({ ctx })
+      else throw error
+    }
+  }
 
-  const jwt = ctx.token !== 'null' ? jose.decodeJwt(ctx.token) : undefined
-
-  // TODO: validate token
-
-  const accountURN = jwt ? (jwt.sub as AccountURN) : undefined
-
-  return next({
-    ctx: {
-      ...ctx,
-      accountURN,
-    },
-  })
+  return next({ ctx })
 }
 
 /**

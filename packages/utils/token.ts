@@ -1,7 +1,16 @@
 import * as jose from 'jose'
 
-export const InvalidTokenError = new Error('invalid token')
-export const ExpiredTokenError = new Error('expired token')
+import { RollupError, UnauthorizedError } from '@proofzero/errors'
+
+import { getErrorCause } from './errors'
+
+export const InvalidTokenError = new RollupError({
+  message: 'invalid token',
+})
+
+export const ExpiredTokenError = new UnauthorizedError({
+  message: 'expired token',
+})
 
 interface CheckTokenFunction {
   (token: string): jose.JWTPayload
@@ -16,7 +25,12 @@ export const checkToken: CheckTokenFunction = (token) => {
     }
     return payload
   } catch (error) {
-    throw InvalidTokenError
+    if (error instanceof RollupError) throw error
+    else if (error instanceof jose.errors.JWTInvalid) throw InvalidTokenError
+    else {
+      console.error(error)
+      throw InvalidTokenError
+    }
   }
 }
 
@@ -50,9 +64,8 @@ export const refreshAccessToken: RefreshAccessTokenFunction = async ({
 
   const response = await fetch(tokenURL, { method, body })
   if (!response.ok) {
-    throw new Error('refresh token request failed', {
-      cause: await response.text(),
-    })
+    const body = await response.json()
+    throw getErrorCause(body)
   }
 
   const { access_token } = await response.json<RefreshTokenExchangeResult>()

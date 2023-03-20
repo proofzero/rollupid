@@ -126,7 +126,7 @@ export const ErrorBoundary = ({
     message: string
   }
 }) => {
-  console.error('Error in error boundary', error)
+  console.error('ErrorBoundary', error)
   return (
     <html lang="en">
       <head>
@@ -153,8 +153,8 @@ export const ErrorBoundary = ({
 
 export function CatchBoundary() {
   const caught = useCatch()
+  console.error('CatchBoundary', { caught })
 
-  console.error('Error in Catch boundary', { caught })
   let secondary = 'Something went wrong'
   switch (caught.status) {
     case 404:

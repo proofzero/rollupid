@@ -2,6 +2,9 @@ import {
   fetchRequestHandler,
   FetchCreateContextFnOptions,
 } from '@trpc/server/adapters/fetch'
+
+import { serverOnError as onError } from '@proofzero/utils/trpc'
+
 import { createContext } from './context'
 import { appRouter } from './jsonrpc/router'
 
@@ -13,10 +16,7 @@ export default {
       endpoint: '/trpc',
       req: request,
       router: appRouter,
-      onError({ error, type, path, input, ctx, req }) {
-        console.error('Error:', type, path, input, error)
-        // TODO: report somehwere
-      },
+      onError,
       createContext: (opts) =>
         createContext(opts as FetchCreateContextFnOptions, env),
     })

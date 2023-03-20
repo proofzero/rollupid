@@ -191,7 +191,7 @@ export default function App() {
 export function ErrorBoundary({ error }) {
   const nonce = useContext(NonceContext)
 
-  console.error('Error in error boundary', error)
+  console.error('ErrorBoundary', error)
 
   return (
     <html lang="en">
@@ -221,8 +221,8 @@ export function ErrorBoundary({ error }) {
 
 export function CatchBoundary() {
   const caught = useCatch()
-  console.error('Caught in catch boundary', caught)
-  const params = useParams()
+  console.error('CaughtBoundary', caught)
+
   const { status } = caught
 
   let secondary = 'Something went wrong'

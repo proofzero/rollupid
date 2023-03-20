@@ -1,5 +1,7 @@
+import { UnauthorizedError } from '@proofzero/errors'
 import createEdgesClient from '@proofzero/platform-clients/edges'
 import type { AccessRComp } from '@proofzero/urns/access'
+
 import { Context } from '../../context'
 import { EDGE_AUTHORIZES } from '@proofzero/platform.access/src/constants'
 import { inputValidators } from '@proofzero/platform-middleware'
@@ -37,15 +39,12 @@ export const getAuthorizedAppsMethod = async ({
   input: GetAuthorizedAppsParams
   ctx: Context
 }) => {
+  if (!ctx.accountURN)
+    throw new UnauthorizedError({ message: 'account not found' })
+
   const edgesClient = createEdgesClient(ctx.Edges, {
     ...generateTraceContextHeaders(ctx.traceSpan),
   })
-
-  // Only the subject of supplied JWT can get sessions; the input
-  // account parameter and header JWT 'sub' must match.
-  if (input.account !== ctx.accountURN) {
-    throw new Error(`input account and JWT account do not match`)
-  }
 
   const edgesResult = await edgesClient.getEdges.query({
     query: {

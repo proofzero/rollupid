@@ -1,7 +1,9 @@
-import type { ActionFunction } from '@remix-run/cloudflare'
+import { ActionFunction, redirect } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
 import { GrantType } from '@proofzero/types/access'
+import { throwJSONError } from '@proofzero/utils/errors'
+
 import createAccessClient from '@proofzero/platform-clients/access'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
@@ -16,42 +18,42 @@ export const action: ActionFunction = async ({ request, context }) => {
     (formData.get('grant_type') as GrantType.AuthorizationCode) ||
     GrantType.RefreshToken
 
-  console.log({
-    grantType,
-  })
-
   const accessClient = createAccessClient(
     context.env.Access,
     generateTraceContextHeaders(context.traceSpan)
   )
 
-  const tokens = refreshToken
-    ? await accessClient.exchangeToken.mutate({
+  try {
+    const tokens = refreshToken
+      ? await accessClient.exchangeToken.mutate({
         grantType: GrantType.RefreshToken,
         refreshToken,
         clientId,
         clientSecret,
       })
-    : await accessClient.exchangeToken.mutate({
+      : await accessClient.exchangeToken.mutate({
         grantType: GrantType.AuthorizationCode,
         code,
         clientId,
         clientSecret,
       })
 
-  const result = {
-    token_type: 'Bearer',
-    access_token: tokens.accessToken,
-    refresh_token: tokens.refreshToken,
+    const result = {
+      token_type: 'Bearer',
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken,
+    }
+
+    if (tokens.idToken) Object.assign(result, { id_token: tokens.idToken })
+
+    return json(result, {
+      //spec adherence and general good practice
+      headers: {
+        'Cache-Control': 'no-store',
+        Pragma: 'no-cache',
+      },
+    })
+  } catch (error) {
+    throwJSONError(error)
   }
-
-  if (tokens.idToken) Object.assign(result, { id_token: tokens.idToken })
-
-  return json(result, {
-    //spec adherence and general good practice
-    headers: {
-      'Cache-Control': 'no-store',
-      Pragma: 'no-cache',
-    },
-  })
 }

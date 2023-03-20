@@ -23,6 +23,7 @@
     "@cloudflare/workers-types": "4.20221111.1",
     "@proofzero/platform.account": "workspace:*",
     "@proofzero/platform.address": "workspace:*",
+    "@types/node": "18.15.3",
     "@typescript-eslint/eslint-plugin": "5.41.0",
     "@typescript-eslint/parser": "5.41.0",
     "eslint": "8.28.0",
@@ -32,6 +33,10 @@
     "typescript": "4.8.4"
   },
   "peerDependencies": {
+    "@remix-run/cloudflare": "*",
     "jose": "*"
+  },
+  "dependencies": {
+    "@proofzero/errors": "workspace:*"
   }
 }

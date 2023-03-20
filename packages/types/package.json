@@ -20,6 +20,7 @@
     "test": "run-s check"
   },
   "devDependencies": {
+    "@types/node": "18.15.3",
     "@typescript-eslint/eslint-plugin": "5.45.0",
     "@typescript-eslint/parser": "5.45.0",
     "eslint": "8.29.0",

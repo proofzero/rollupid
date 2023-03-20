@@ -9,6 +9,8 @@ import { OAuth2Strategy } from 'remix-auth-oauth2'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
+import { UnauthorizedError } from '@proofzero/errors'
+
 import {
   checkToken,
   refreshAccessToken,
@@ -85,19 +87,23 @@ export async function requireJWT(request: Request, headers = new Headers()) {
     checkToken(user.accessToken)
     return user.accessToken
   } catch (error) {
-    if (error === InvalidTokenError) {
-      throw redirect('/signout')
-    } else if (error === ExpiredTokenError) {
-      if (!user.refreshToken) {
+    switch (error) {
+      case InvalidTokenError:
         throw redirect('/signout')
-      }
+    }
 
-      user.accessToken = await refreshAccessToken({
-        tokenURL: PASSPORT_TOKEN_URL,
-        refreshToken: user.refreshToken,
-        clientId: PROFILE_CLIENT_ID,
-        clientSecret: PROFILE_CLIENT_SECRET,
-      })
+    if (error === ExpiredTokenError) {
+      try {
+        user.accessToken = await refreshAccessToken({
+          tokenURL: PASSPORT_TOKEN_URL,
+          refreshToken: user.refreshToken,
+          clientId: PROFILE_CLIENT_ID,
+          clientSecret: PROFILE_CLIENT_SECRET,
+        })
+      } catch (error) {
+        if (error instanceof UnauthorizedError) throw redirect('/signout')
+        else throw error
+      }
 
       session.set('user', user)
       const cookie = await getProfileSessionStorage().commitSession(session)
@@ -106,6 +112,8 @@ export async function requireJWT(request: Request, headers = new Headers()) {
       if (request.method === 'GET') throw redirect(request.url, { headers })
 
       return user.accessToken
+    } else {
+      throw redirect('/signout')
     }
   }
 }

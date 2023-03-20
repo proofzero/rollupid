@@ -30,6 +30,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "4.20221111.1",
     "@microsoft/api-extractor": "7.33.6",
+    "@types/node": "18.15.3",
     "@typescript-eslint/eslint-plugin": "5.42.1",
     "@typescript-eslint/parser": "5.42.1",
     "better-sqlite3": "8.0.1",
@@ -46,6 +47,7 @@
   "dependencies": {
     "@proofzero/security": "workspace:*",
     "@proofzero/urns": "workspace:*",
+    "@proofzero/utils": "workspace:*",
     "@trpc/server": "10.8.1",
     "cross-env": "7.0.3",
     "drizzle-orm": "0.16.1",

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { decodeJwt } from 'jose'
 
+import { BadRequestError } from '@proofzero/errors'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { AccessJWTPayload } from '@proofzero/types/access'
 
@@ -27,13 +28,15 @@ export const getUserInfoMethod = async ({
   const account = jwt.sub
   const [clientId] = jwt.aud
 
-  if (!clientId) {
-    throw new Error('missing client id in the aud claim')
-  }
+  if (!clientId)
+    throw new BadRequestError({
+      message: 'missing client id in the aud claim',
+    })
 
-  if (!AccountURNSpace.is(account)) {
-    throw new Error(`missing account in the sub claim`)
-  }
+  if (!AccountURNSpace.is(account))
+    throw new BadRequestError({
+      message: 'missing account in the sub claim',
+    })
 
   const name = `${AccountURNSpace.decode(account)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)

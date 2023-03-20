@@ -2,6 +2,7 @@ import { AddressURNSpace } from '@proofzero/urns/address'
 import type { AddressURN } from '@proofzero/urns/address'
 import type { AccountURN } from '@proofzero/urns/account'
 
+import { throwJSONError } from '@proofzero/utils/errors'
 import { GrantType, ResponseType } from '@proofzero/types/access'
 
 import {
@@ -35,53 +36,57 @@ export const authenticateAddress = async (
     )
   }
 
-  const accessClient = getAccessClient(env, traceSpan)
-  const clientId = AddressURNSpace.decode(address)
-  const redirectUri = env.PASSPORT_REDIRECT_URL
-  const scope = ['admin']
-  const state = ''
-  const { code } = await accessClient.authorize.mutate({
-    account,
-    responseType: ResponseType.Code,
-    clientId,
-    redirectUri,
-    scope,
-    state,
-  })
-
-  const grantType = GrantType.AuthenticationCode
-  const { accessToken } = await accessClient.exchangeToken.mutate({
-    grantType,
-    code,
-    clientId,
-  })
-
-  await provisionProfile(accessToken, env, traceSpan, address)
-
-  let redirectURL = '/authorize'
-  if (appData) {
-    const authAppId = appData.clientId
-    const authRedirectUri = appData.redirectUri
-    const authState = appData.state
-    const authScope = appData.scope
-    const urlParams = new URLSearchParams({
-      client_id: authAppId,
-      redirect_uri: authRedirectUri,
-      state: authState,
-      scope: authScope,
-      prompt: 'none',
+  try {
+    const accessClient = getAccessClient(env, traceSpan)
+    const clientId = AddressURNSpace.decode(address)
+    const redirectUri = env.PASSPORT_REDIRECT_URL
+    const scope = ['admin']
+    const state = ''
+    const { code } = await accessClient.authorize.mutate({
+      account,
+      responseType: ResponseType.Code,
+      clientId,
+      redirectUri,
+      scope,
+      state,
     })
 
-    redirectURL += `?${urlParams}`
-  }
+    const grantType = GrantType.AuthenticationCode
+    const { accessToken } = await accessClient.exchangeToken.mutate({
+      grantType,
+      code,
+      clientId,
+    })
 
-  return createUserSession(
-    accessToken,
-    redirectURL,
-    address,
-    env,
-    appData?.clientId
-  )
+    await provisionProfile(accessToken, env, traceSpan, address)
+
+    let redirectURL = '/authorize'
+    if (appData) {
+      const authAppId = appData.clientId
+      const authRedirectUri = appData.redirectUri
+      const authState = appData.state
+      const authScope = appData.scope
+      const urlParams = new URLSearchParams({
+        client_id: authAppId,
+        redirect_uri: authRedirectUri,
+        state: authState,
+        scope: authScope,
+        prompt: 'none',
+      })
+
+      redirectURL += `?${urlParams}`
+    }
+
+    return createUserSession(
+      accessToken,
+      redirectURL,
+      address,
+      env,
+      appData?.clientId
+    )
+  } catch (error) {
+    throwJSONError(error)
+  }
 }
 
 const provisionProfile = async (

@@ -6,6 +6,12 @@ import type { AccessJWTPayload } from '@proofzero/types/access'
 import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'
 
+import {
+  InvalidClientCredentialsError,
+  MismatchClientIdError,
+  MissingSubjectError,
+} from '../../errors'
+
 export const RevokeTokenMethodInput = z.object({
   token: z.string(),
   clientId: z.string(),
@@ -37,18 +43,11 @@ export const revokeTokenMethod: RevokeTokenMethod = async ({ ctx, input }) => {
     clientSecret,
   })
 
-  if (!valid) {
-    throw new Error('invalid client credentials')
-  }
+  if (!valid) throw InvalidClientCredentialsError
 
   const payload = decodeJwt(token) as AccessJWTPayload
-  if (clientId != payload.aud[0]) {
-    throw new Error('mismatch Client ID')
-  }
-
-  if (!payload.sub) {
-    throw new Error('missing subject')
-  }
+  if (clientId != payload.aud[0]) throw MismatchClientIdError
+  if (!payload.sub) throw MissingSubjectError
 
   const account = payload.sub
   const name = `${account}@${clientId}`
