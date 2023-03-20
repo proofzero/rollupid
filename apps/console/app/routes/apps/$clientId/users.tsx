@@ -19,7 +19,7 @@ import { User } from '~/components/Applications/Users/User'
 import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import { Button, Text } from '@proofzero/design-system'
-import { DocumentationBadge } from '~/components/Documentation'
+import { DocumentationBadge } from '~/components/DocumentationBadge'
 
 // don't change this constant unless it's necessary
 // this constant also affects /$clientId root route

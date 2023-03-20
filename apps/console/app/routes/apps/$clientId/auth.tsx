@@ -35,7 +35,7 @@ import { MultiSelect } from '@proofzero/design-system/src/atoms/form/MultiSelect
 import { PreLabeledInput } from '@proofzero/design-system/src/atoms/form/PreLabledInput'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
-import { DocumentationBadge } from '~/components/Documentation'
+import { DocumentationBadge } from '~/components/DocumentationBadge'
 
 /**
  * @file app/routes/dashboard/index.tsx

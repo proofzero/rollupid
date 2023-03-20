@@ -70,7 +70,7 @@ const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
 export default function SiteMenu(props: RollupMenuProps) {
   return (
     <div
-      className="text-center bg-gray-900 pb-4 md:min-h-screen 
+      className="text-center bg-gray-900 pb-4 md:min-h-screen
     md:min-w-[256px] md:max-w-sm md:border-r md:text-left
     flex flex-col"
     >
@@ -260,7 +260,8 @@ type ExternalLinksProps = {
 
 function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
   return (
-    <div className="mt-2 border-t border-gray-700">
+    // Hidden until new passport lands
+    <div className="mt-2 border-t border-gray-700 hidden">
       <div className="px-2 pt-2">
         <NavLink
           to={PASSPORT_URL}

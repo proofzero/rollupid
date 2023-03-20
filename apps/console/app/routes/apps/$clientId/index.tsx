@@ -42,7 +42,7 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import { loader as usersLoader } from './users'
 import type { AuthorizedAccountsOutput } from '@proofzero/platform/starbase/src/types'
 import type { UsersLoaderData } from './users'
-import { DocumentationBadge } from '~/components/Documentation'
+import { DocumentationBadge } from '~/components/DocumentationBadge'
 
 // Component
 // -----------------------------------------------------------------------------
