@@ -69,6 +69,9 @@ export default ({
               required
               maxLength={1}
               minLength={1}
+              onClick={() => {
+                inputRefs[i].current.select()
+              }}
               onChange={(ev) => {
                 if (ev.target.value === '' || i === inputLen - 1) return
 
