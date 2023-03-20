@@ -138,7 +138,7 @@ export default function AppDetailIndexPage() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row min-h-full bg-gray-50">
+    <div className="flex flex-col lg:flex-row min-h-full bg-gray-50">
       <SiteMenu
         apps={apps}
         selected={appDetails.clientId}

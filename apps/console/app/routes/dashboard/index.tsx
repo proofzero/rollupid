@@ -92,7 +92,7 @@ export default function DashboardIndexPage() {
 
   const { profileURL } = useOutletContext<{ profileURL: string }>()
   return (
-    <div className="flex flex-col md:flex-row min-h-full">
+    <div className="flex flex-col lg:flex-row min-h-full">
       <SiteMenu apps={apps} PASSPORT_URL={PASSPORT_URL} />
       <main className="flex flex-col flex-initial min-h-full w-full bg-white">
         <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />

@@ -135,7 +135,7 @@ export default function AppDetailIndexPage() {
 
   return (
     <section>
-      <div className="flex flex-row items-center space-x-3 pb-5">
+      <div className="flex flex-row items-center space-x-3 pb-5 max-sm:px-6">
         <Text size="2xl" weight="semibold" className="text-gray-900">
           Dashboard
         </Text>
@@ -289,7 +289,11 @@ export default function AppDetailIndexPage() {
         </div>
         <div className="flex-1">
           <div className="flex h-full flex-col">
-            <Text className="text-gray-900 py-3 px-6" weight="medium" size="lg">
+            <Text
+              className="text-gray-900 py-3 px-6"
+              weight="semibold"
+              size="lg"
+            >
               Users
             </Text>{' '}
             <Suspense
