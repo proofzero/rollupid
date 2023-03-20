@@ -4,6 +4,8 @@ import { Button } from '../../atoms/buttons/Button'
 import { Text } from '../../atoms/text/Text'
 import { Loader } from '../loader/Loader'
 
+import { CountdownCircleTimer } from 'react-countdown-circle-timer'
+
 type EmailOTPValidatorProps = {
   email: string
 
@@ -32,6 +34,8 @@ export default ({
   const [isInvalid, setIsInvalid] = useState(false)
   const [showInvalidMessage, setShowInvalidMessage] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  const [resendRequested, setResendRequested] = useState(false)
 
   return (
     <div className="bg-white rounded-lg p-9 flex flex-col h-full">
@@ -134,10 +138,33 @@ export default ({
           <Text
             type="span"
             size="sm"
-            className="text-indigo-500 cursor-pointer"
-            onClick={() => requestResend(email)}
+            className={`${
+              resendRequested ? 'text-gray-300' : 'text-indigo-500'
+            } cursor-pointer relative`}
+            onClick={() => {
+              if (resendRequested) return
+
+              requestResend(email)
+              setResendRequested(true)
+            }}
           >
             Click to resend
+            {resendRequested && (
+              <div className="absolute right-[-20px] top-[2.5px]">
+                <CountdownCircleTimer
+                  size={16}
+                  strokeWidth={3}
+                  isPlaying
+                  duration={60}
+                  rotation={'counterclockwise'}
+                  colors={'#FFFFFF'}
+                  trailColor={'#D1D5DB'}
+                  trailStrokeWidth={2}
+                  isGrowing={true}
+                  onComplete={() => setResendRequested(false)}
+                />
+              </div>
+            )}
           </Text>
         </div>
       </section>
