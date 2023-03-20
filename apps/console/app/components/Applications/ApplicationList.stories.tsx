@@ -15,20 +15,20 @@ const applications: ApplicationListItemProps[] = [
   {
     id: '1',
     name: 'Courtyard',
-    createdTimestamp: new Date(2023, 0).getTime(),
+    createdTimestamp: 1672549200000,
     published: true,
     icon: blue,
   },
   {
     id: '2',
     name: 'Pokemon',
-    createdTimestamp: new Date(2023, 0).getTime(),
+    createdTimestamp: 1672549200000,
     icon: gray,
   },
   {
     id: '3',
     name: 'Baseball',
-    createdTimestamp: new Date(2023, 0).getTime(),
+    createdTimestamp: 1672549200000,
     published: true,
   },
 ]

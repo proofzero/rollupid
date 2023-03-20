@@ -9,7 +9,7 @@ export default {
       defaultValue: 'Loremipsum',
     },
     created: {
-      defaultValue: new Date(2023, 0),
+      defaultValue: 1672549200000,
       control: 'date',
     },
   },
