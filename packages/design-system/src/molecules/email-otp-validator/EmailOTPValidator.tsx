@@ -170,10 +170,11 @@ export default ({
       </section>
 
       <section className="flex flex-row space-x-4">
-        <Button btnType="secondary-alt" className="flex-1">
+        <Button btnSize="xl" btnType="secondary-alt" className="flex-1">
           Cancel
         </Button>
         <Button
+          btnSize="xl"
           btnType="primary-alt"
           className="flex-1"
           disabled={fullCode.length !== inputLen || loading}
