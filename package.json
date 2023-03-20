@@ -1,5 +1,5 @@
 {
-  "name": "kubelt",
+  "name": "@proofzero/rollupid",
   "version": "0.1.0",
   "private": true,
   "useWorkspaces": true,
