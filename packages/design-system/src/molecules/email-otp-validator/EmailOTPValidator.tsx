@@ -43,7 +43,7 @@ export default ({
       <section className="relative flex justify-center items-center">
         {goBack && (
           <HiOutlineArrowLeft
-            className="absolute left-0 w-6 h-6 cursor-pointer"
+            className="absolute -left-8 -top-8 lg:left-0 lg:top-0 w-6 h-6 cursor-pointer"
             onClick={goBack}
           />
         )}
@@ -114,7 +114,7 @@ export default ({
                   setIsInvalid(false)
                 }
               }}
-              className={`flex text-2xl py-7 px-3.5 h-20 justify-center items-center text-gray-600 border rounded text-center ${
+              className={`flex text-base lg:text-2xl py-7 px-3.5 h-20 justify-center items-center text-gray-600 border rounded text-center ${
                 isInvalid ? 'border-red-500' : ''
               }`}
             />
@@ -131,7 +131,7 @@ export default ({
           </Text>
         )}
 
-        <div className="flex flex-row space-x-1 justify-center items-center mt-4">
+        <div className="flex flex-col lg:flex-row space-x-1 justify-center items-center mt-4">
           <Text type="span" size="sm" className="text-gray-500">
             Didn't get the code?
           </Text>
