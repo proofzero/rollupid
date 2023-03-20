@@ -6,7 +6,7 @@ import type {
 
 import { json } from '@remix-run/cloudflare'
 
-import { useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 
 import {
   Links,
@@ -44,6 +44,7 @@ import {
 
 import * as gtag from '~/utils/gtags.client'
 import { commitFlashSession, getFlashSession } from './session.server'
+import { NonceContext } from './components/nonce-context'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -94,6 +95,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 }
 
 export default function App() {
+  const nonce = useContext(NonceContext)
+
   const location = useLocation()
   const transition = useTransition()
   const browserEnv = useLoaderData()
@@ -139,9 +142,11 @@ export default function App() {
           <>
             <script
               async
+              nonce={nonce}
               src={`https://www.googletagmanager.com/gtag/js?id=${GATag}`}
             />
             <script
+              nonce={nonce}
               async
               id="gtag-init"
               dangerouslySetInnerHTML={{
@@ -160,18 +165,20 @@ export default function App() {
         {transition.state === 'loading' && <Loader />}
         <Toaster position="top-right" />
         <Outlet />
-        <ScrollRestoration />
-        <Scripts />
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `!window ? null : window.ENV = ${JSON.stringify(
               browserEnv.ENV
             )}`,
           }}
         />
-        <LiveReload />
+        <LiveReload nonce={nonce} />
         <script
           async
+          nonce={nonce}
           src="https://unpkg.com/flowbite@1.5.4/dist/flowbite.js"
         ></script>
       </body>
@@ -182,6 +189,8 @@ export default function App() {
 // https://remix.run/docs/en/v1/guides/errors
 // @ts-ignore
 export function ErrorBoundary({ error }) {
+  const nonce = useContext(NonceContext)
+
   console.error('Error in error boundary', error)
 
   return (
@@ -202,9 +211,9 @@ export function ErrorBoundary({ error }) {
           />
         </div>
 
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload port={8002} />
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
+        <LiveReload port={8002} nonce={nonce} />
       </body>
     </html>
   )
