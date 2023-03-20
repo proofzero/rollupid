@@ -11,7 +11,6 @@ compatibility_flags = [ "streams_enable_constructors" ]
 services = [
   { binding = "Starbase", service = "starbase"},
   { binding = "Images", service = "images" },
-  { binding = "Galaxy", service = "galaxy"},
   { binding = "Account", service = "account"}
 ]
 
@@ -59,7 +58,6 @@ COOKIE_DOMAIN = "localhost"
 services = [
   { binding = "Starbase", service = "starbase-dev"},
   { binding = "Images", service = "images-dev" },
-  { binding = "Galaxy", service = "galaxy-dev" },
   { binding = "Account", service = "account-dev"}
 ]
 
@@ -88,7 +86,6 @@ PROFILE_APP_URL = "https://my-dev.rollup.id"
 services = [
   { binding = "Starbase", service = "starbase-next"},
   { binding = "Images", service = "images-next" },
-  { binding = "Galaxy", service = "galaxy-next" },
   { binding = "Account", service = "account-next"}
 ]
 
@@ -118,7 +115,6 @@ PROFILE_APP_URL = "https://my-next.rollup.id"
 
 services = [
   { binding = "Starbase", service = "starbase-current", environment = "production" },
-  { binding = "Galaxy", service = "galaxy-current" },
   { binding = "Images", service = "images-current" },
   { binding = "Account", service = "account-current"}
 ]
