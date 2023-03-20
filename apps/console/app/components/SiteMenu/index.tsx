@@ -260,9 +260,9 @@ type ExternalLinksProps = {
 
 function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
   return (
-    // Hidden until new passport lands
-    <div className="mt-2 border-t border-gray-700 hidden">
-      <div className="px-2 pt-2">
+    <div className="mt-2 border-t border-gray-700">
+      {/* Hidden until new passport lands */}
+      <div className="px-2 pt-2 hidden">
         <NavLink
           to={PASSPORT_URL}
           target="_blank"
@@ -277,8 +277,7 @@ function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
           </div>
         </NavLink>
       </div>
-
-      <div className="px-2">
+      <div className="px-2 pt-2">
         <NavLink
           to={docsURL}
           target="_blank"
