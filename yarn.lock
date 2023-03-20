@@ -5788,6 +5788,7 @@ __metadata:
     concurrently: 7.3.0
     connectkit: 1.2.0
     cross-env: 7.0.3
+    csp-header: 5.1.0
     css-loader: 6.7.1
     env-cmd: 10.1.0
     eslint: 8.28.0
