@@ -166,13 +166,8 @@ const provisionProfile = async (
             }
           }
           case OAuthAddressType.Apple: {
-            let displayName = ''
-            if (res.profile.name) {
-              const { firstName, lastName } = res.profile.name
-              displayName = `${firstName} ${lastName}`
-            }
             return {
-              displayName,
+              displayName: res.profile.name,
               pfp: {
                 image: res.profile.picture,
               },
