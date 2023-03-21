@@ -20,12 +20,13 @@ import SiteHeader from '~/components/SiteHeader'
 import AppBox from '~/components/AppBox'
 import { useState } from 'react'
 import { NewAppModal } from '~/components/NewAppModal/NewAppModal'
-import { requireJWT } from '~/utilities/session.server'
-import { getGalaxyClient } from '~/utilities/platform.server'
+import { parseJwt, requireJWT } from '~/utilities/session.server'
 import { InfoPanelDashboard } from '~/components/InfoPanel/InfoPanelDashboard'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createAccountClient from '@proofzero/platform-clients/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import type { AccountURN } from '@proofzero/urns/account'
 
 type LoaderData = {
   apps: {
@@ -42,9 +43,14 @@ type LoaderData = {
 export const loader: LoaderFunction = async ({ request, context }) => {
   const jwt = await requireJWT(request)
   const traceHeader = generateTraceContextHeaders(context.traceSpan)
+  const parsedJwt = parseJwt(jwt)
+  const accountURN = parsedJwt.sub as AccountURN
 
-  const galaxyClient = await getGalaxyClient(traceHeader)
   try {
+    const accountClient = createAccountClient(Account, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
     const starbaseClient = createStarbaseClient(Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
@@ -62,11 +68,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
     let avatarUrl = ''
     try {
-      const profileRes = await galaxyClient.getProfile(
-        undefined,
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
-      avatarUrl = profileRes.profile?.pfp?.image || ''
+      const profile = await accountClient.getProfile.query({
+        account: accountURN,
+      })
+      avatarUrl = profile?.pfp?.image || ''
     } catch (e) {
       console.error('Could not retrieve profile image.', e)
     }

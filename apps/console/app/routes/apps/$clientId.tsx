@@ -6,8 +6,8 @@ import { json } from '@remix-run/cloudflare'
 import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
-import { requireJWT } from '~/utilities/session.server'
-import { getGalaxyClient } from '~/utilities/platform.server'
+import { parseJwt, requireJWT } from '~/utilities/session.server'
+import createAccountClient from '@proofzero/platform-clients/account'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import type { appDetailsProps } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -18,6 +18,7 @@ import {
   ToastType,
 } from '@proofzero/design-system/src/atoms/toast'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import type { AccountURN } from '@proofzero/urns/account'
 
 type AppData = {
   clientId: string
@@ -40,26 +41,31 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
   const jwt = await requireJWT(request)
   const traceHeader = generateTraceContextHeaders(context.traceSpan)
-  const galaxyClient = await getGalaxyClient(traceHeader)
-
   const clientId = params?.clientId
 
+  const parsedJwt = parseJwt(jwt)
+  const accountURN = parsedJwt.sub as AccountURN
+
   try {
+    const accountClient = createAccountClient(Account, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
     const starbaseClient = createStarbaseClient(Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
+
     const apps = await starbaseClient.listApps.query()
     const reshapedApps = apps.map((a) => {
       return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon }
     })
     let avatarUrl = ''
     try {
-      const profileRes = await galaxyClient.getProfile(
-        undefined,
-        getAuthzHeaderConditionallyFromToken(jwt)
-      )
-      avatarUrl = profileRes.profile?.pfp?.image || ''
+      const profile = await accountClient.getProfile.query({
+        account: accountURN,
+      })
+      avatarUrl = profile?.pfp?.image || ''
     } catch (e) {
       console.error('Could not retrieve profile image.', e)
     }
