@@ -1,6 +1,6 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 import { AddressNode } from '.'
-import { AddressProfile, OAuthData } from '../types'
+import { OAuthData } from '../types'
 import Address from './address'
 
 type RefreshTokenResponse = {
