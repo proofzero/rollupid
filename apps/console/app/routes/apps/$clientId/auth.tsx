@@ -278,7 +278,7 @@ export default function AppDetailIndexPage() {
           <input type="hidden" name="op" value="update_app" />
 
           <section className="flex flex-col space-y-5">
-            <div className="flex flex-row justify-between space-x-5 max-sm:px-6">
+            <div className="flex flex-row justify-between space-x-5 max-sm:pl-6">
               <div className="flex flex-row items-center space-x-3">
                 <Text size="2xl" weight="semibold" className="text-gray-900">
                   OAuth
