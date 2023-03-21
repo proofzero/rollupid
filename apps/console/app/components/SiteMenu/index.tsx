@@ -70,15 +70,15 @@ const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
 export default function SiteMenu(props: RollupMenuProps) {
   return (
     <div
-      className="text-center bg-gray-900 pb-4 md:min-h-screen
-    md:min-w-[256px] md:max-w-sm md:border-r md:text-left
+      className="text-center bg-gray-900 pb-4 lg:min-h-screen
+    lg:min-w-[256px] lg:max-w-sm lg:border-r lg:text-left
     flex flex-col"
     >
       <div className="object-left">
         <RollupLogo />
       </div>
       {/* Mobile menu */}
-      <div className="md:hidden ">
+      <div className="lg:hidden ">
         <Disclosure>
           {({ open }) => (
             <>
@@ -108,10 +108,10 @@ export default function SiteMenu(props: RollupMenuProps) {
       </div>
 
       {/* Desktop menu */}
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         <AppMenu props={props} />
       </div>
-      <div className="hidden md:block mt-auto">
+      <div className="hidden lg:block mt-auto">
         <ExternalLinks
           PASSPORT_URL={props.PASSPORT_URL}
           docsURL={'https://docs.rollup.id'}
@@ -245,7 +245,7 @@ function AppMenu({ props }: AppMenuProps) {
       <AppSelect apps={props.apps} selected={props.selected} />
 
       {props.selected && (
-        <section className="px-2 md:flex md:flex-col">
+        <section className="px-2 lg:flex lg:flex-col">
           {AppSubmenu(props.selected)}
         </section>
       )}

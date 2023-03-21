@@ -39,7 +39,7 @@ export const PreLabeledInput = ({
           {preLabel}
         </Text>
         <input
-          className={`flex-1 border-none rounded-r form-input text-sm text-gray-900 font-normal ${className}`}
+          className={`w-full border-none rounded-r form-input text-sm text-gray-900 font-normal ${className}`}
           id={id}
           name={computedName}
           {...rest}

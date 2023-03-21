@@ -87,11 +87,14 @@ export const LoginsPanel = ({
           </div>
           <div
             className="flex flex-1 flex-col bg-white rounded-br-lg
-          rounded-bl-lg h-full"
+          rounded-bl-lg h-full w-full"
           >
             {authorizedProfiles.map((user, i) => (
-              <article key={i} className={`px-6 flex items-center py-5`}>
-                <div className="flex-1 flex flex-row items-center space-x-4">
+              <article
+                key={i}
+                className={`px-6 flex flex-row items-center py-5`}
+              >
+                <div className="flex-1 flex flex-row items-center space-x-4 truncate">
                   <img
                     src={user.imageURL}
                     onError={({ currentTarget }) => {
@@ -105,7 +108,7 @@ export const LoginsPanel = ({
                   <Text
                     size="sm"
                     weight="medium"
-                    className="text-gray-500 flex-1"
+                    className="text-gray-500 w-full truncate flex-1"
                   >
                     {user.name}
                   </Text>
@@ -151,7 +154,7 @@ export const LoginsPanel = ({
         </>
       ) : (
         <div
-          className="h-full flex flex-col 
+          className="h-full flex flex-col
         px-6 justify-center items-center py-3"
         >
           {noLoginsSvg}

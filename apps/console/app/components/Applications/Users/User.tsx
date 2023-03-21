@@ -18,10 +18,10 @@ export const User = ({
   return (
     <article className="flex items-center py-5 px-8 border-t">
       <div
-        className="flex-1 flex flex-col 
-items-start 
+        className="flex-1 flex flex-col
+items-start
 md:flex-row md:items-center
-text-ellipsis md:space-x-4"
+text-ellipsis md:space-x-4 truncate"
       >
         <img
           src={imageURL}
@@ -33,7 +33,11 @@ text-ellipsis md:space-x-4"
           }}
           className="max-h-[24px] max-w-[24px] rounded-full"
         />
-        <Text size="sm" weight="medium" className="text-gray-500 flex-1">
+        <Text
+          size="sm"
+          weight="medium"
+          className="text-gray-500 flex-1 w-full truncate"
+        >
           {name}
         </Text>
       </div>
@@ -54,7 +58,7 @@ text-ellipsis md:space-x-4"
       >
         <Button
           btnType="secondary-alt"
-          className="right-0 flex md:flex-row flex-col max-w-max 
+          className="right-0 flex md:flex-row flex-col max-w-max
 text-xs leading-4 items-center md:space-x-2"
         >
           <HiOutlineExternalLink size={22} />
