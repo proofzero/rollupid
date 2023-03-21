@@ -12,6 +12,8 @@ type EmailOTPValidatorProps = {
   goBack?: () => void
   requestRegeneration: (email: string) => Promise<void>
   requestVerification: (code: string) => Promise<boolean>
+
+  regenerationTimerSeconds: number
 }
 
 export default ({
@@ -19,6 +21,7 @@ export default ({
   goBack,
   requestRegeneration,
   requestVerification,
+  regenerationTimerSeconds = 60,
 }: EmailOTPValidatorProps) => {
   const inputLen = 5
   const inputRefs = Array.from({ length: inputLen }, () =>
@@ -165,10 +168,10 @@ export default ({
                   size={16}
                   strokeWidth={3}
                   isPlaying
-                  duration={60}
+                  duration={regenerationTimerSeconds}
                   rotation={'counterclockwise'}
-                  colors={['#004777', '#F7B801', '#A30000', '#A30000']}
-                  colorsTime={[7, 5, 2, 0]}
+                  colors={'#FFFFFF'}
+                  trailColor={'#D1D5DB'}
                   trailStrokeWidth={2}
                   isGrowing={true}
                   onComplete={() => setRegenerationRequested(false)}
