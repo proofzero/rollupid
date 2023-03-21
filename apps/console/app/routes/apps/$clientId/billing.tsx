@@ -74,7 +74,7 @@ export default () => (
             </div>
             <div className="separator dark"></div>
             <div className="pricing-check soon white">
-              <div className="div-block-40">
+              <div className="div-block-40 mr-4">
                 <img
                   src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
                   alt=""
@@ -87,7 +87,7 @@ export default () => (
               </div>
             </div>
             <div className="pricing-check soon white">
-              <div className="div-block-40">
+              <div className="div-block-40 mr-4">
                 <img
                   src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
                   alt=""

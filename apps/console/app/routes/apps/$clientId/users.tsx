@@ -89,7 +89,7 @@ const Users = () => {
 
   return (
     <div className="w-full h-full min-h-[360px]">
-      <div className="flex flex-row items-center space-x-3 pb-4">
+      <div className="flex flex-row items-center space-x-3 pb-4 max-sm:px-6">
         <Text size="2xl" weight="semibold" className="text-gray-900">
           Users
         </Text>
