@@ -214,10 +214,12 @@ export default function Authenticate() {
                 }}
               >
                 <div className="flex flex-row items-center space-x-3">
-                  <img
-                    className="w-6 h-6 rounded-full"
-                    src={profile.pfp.image}
-                  />
+                  {profile.pfp?.image && (
+                    <img
+                      className="w-6 h-6 rounded-full"
+                      src={profile.pfp.image}
+                    />
+                  )}
                   <Text weight="medium" className="text-gray-800">
                     {profile.displayName}
                   </Text>
