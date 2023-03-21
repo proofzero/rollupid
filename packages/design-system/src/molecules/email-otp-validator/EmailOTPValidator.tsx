@@ -83,8 +83,6 @@ export default ({
                   inputRefs[(i + 1) % inputLen].current.focus()
                   inputRefs[(i + 1) % inputLen].current.select()
                 }
-
-                updateFullCode()
               }}
               onKeyDown={(ev) => {
                 if (
@@ -95,10 +93,10 @@ export default ({
                   inputRefs[(i - 1 + inputLen) % inputLen].current.focus()
                   inputRefs[(i - 1 + inputLen) % inputLen].current.select()
                 }
-
-                updateFullCode()
               }}
               onKeyUp={(ev) => {
+                updateFullCode()
+
                 if (i === inputLen - 1) return
 
                 if (ev.key === inputRefs[i].current.value) {
