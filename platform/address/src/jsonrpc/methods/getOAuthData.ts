@@ -16,5 +16,19 @@ export const getOAuthDataMethod = async ({
 }): Promise<z.infer<typeof GetOAuthDataOutput>> => {
   const nodeClient = new OAuthAddress(ctx.address as AddressNode)
   const data = (await nodeClient.getData()) as OAuthData
+  if (
+    data?.profile.provider === 'apple' &&
+    typeof data?.profile.name === 'object'
+  ) {
+    const newData = {
+      ...data,
+      profile: {
+        ...data.profile,
+        name: Object.values(data.profile.name).join(' '),
+      },
+    }
+    await nodeClient.setData(newData)
+    return newData
+  }
   return data
 }
