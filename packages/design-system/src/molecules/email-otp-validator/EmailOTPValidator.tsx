@@ -10,14 +10,14 @@ type EmailOTPValidatorProps = {
   email: string
 
   goBack?: () => void
-  requestResend: (email: string) => Promise<void>
+  requestRegeneration: (email: string) => Promise<void>
   requestVerification: (code: string) => Promise<boolean>
 }
 
 export default ({
   email,
   goBack,
-  requestResend,
+  requestRegeneration,
   requestVerification,
 }: EmailOTPValidatorProps) => {
   const inputLen = 5
@@ -35,7 +35,7 @@ export default ({
   const [showInvalidMessage, setShowInvalidMessage] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const [regenerationRequested, setResendRequested] = useState(false)
+  const [regenerationRequested, setRegenerationRequested] = useState(false)
 
   return (
     <div className="bg-white rounded-lg p-9 flex flex-col h-full">
@@ -154,8 +154,8 @@ export default ({
             onClick={() => {
               if (regenerationRequested) return
 
-              requestResend(email)
-              setResendRequested(true)
+              requestRegeneration(email)
+              setRegenerationRequested(true)
             }}
           >
             Click to send another
@@ -167,11 +167,11 @@ export default ({
                   isPlaying
                   duration={60}
                   rotation={'counterclockwise'}
-                  colors={'#FFFFFF'}
-                  trailColor={'#D1D5DB'}
+                  colors={['#004777', '#F7B801', '#A30000', '#A30000']}
+                  colorsTime={[7, 5, 2, 0]}
                   trailStrokeWidth={2}
                   isGrowing={true}
-                  onComplete={() => setResendRequested(false)}
+                  onComplete={() => setRegenerationRequested(false)}
                 />
               </div>
             )}
