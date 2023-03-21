@@ -86,7 +86,8 @@ export default ({
               onKeyDown={(ev) => {
                 if (
                   ev.key === 'Backspace' &&
-                  inputRefs[i].current.value === ''
+                  inputRefs[i].current.value === '' &&
+                  i !== 0
                 ) {
                   inputRefs[(i - 1 + inputLen) % inputLen].current.focus()
                   inputRefs[(i - 1 + inputLen) % inputLen].current.select()
