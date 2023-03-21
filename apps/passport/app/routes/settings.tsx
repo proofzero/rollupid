@@ -1,17 +1,23 @@
 import { Outlet, useLoaderData } from '@remix-run/react'
-import { Text } from '@proofzero/design-system'
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import { getUserSession, parseJwt } from '~/session.server'
 
 import createAccountClient from '@proofzero/platform-clients/account'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import createAddressClient from '@proofzero/platform-clients/address'
 
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import { getUserSession, parseJwt } from '~/session.server'
+
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { PlatformAddressURNHeader } from '@proofzero/types/headers'
+
+import { Text } from '@proofzero/design-system'
+import { Popover } from '@headlessui/react'
+import SideMenu from '~/components/SideMenu'
+import Header from '~/components/Header'
+
 import type { AccountURN } from '@proofzero/urns/account'
 import type { AddressURN } from '@proofzero/urns/address'
-import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { data } = await getUserSession(request, context.env)
@@ -28,46 +34,62 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     ...traceHeader,
   })
 
-  const starbaseClient = createStarbaseClient(context.env.Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...traceHeader,
-  })
+  // const starbaseClient = createStarbaseClient(context.env.Starbase, {
+  //   ...getAuthzHeaderConditionallyFromToken(jwt),
+  //   ...traceHeader,
+  // })
 
-  const connectedProfiles = await accountClient.getAddresses.query({
+  const accountProfile = await accountClient.getProfile.query({
     account: accountURN,
   })
 
-  const addressURNList = connectedProfiles?.map(
-    (profile) => profile.baseUrn as AddressURN
-  ) as AddressURN[]
+  // const addressURNList = accountProfile?.addresses?.map(
+  //   (profile) => profile.baseUrn as AddressURN
+  // ) as AddressURN[]
 
-  const awaitedResult = await Promise.all([
-    starbaseClient.listApps.query(),
-    ...addressURNList.map((address) => {
-      const addressClient = createAddressClient(context.env.Address, {
-        [PlatformAddressURNHeader]: address,
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...traceHeader,
-      })
-      return addressClient.getAddressProfile.query()
-    }),
-  ])
+  // const awaitedResult = await Promise.all([
+  //   starbaseClient.listApps.query(),
+  //   ...addressURNList.map((address) => {
+  //     const addressClient = createAddressClient(context.env.Address, {
+  //       [PlatformAddressURNHeader]: address,
+  //       ...getAuthzHeaderConditionallyFromToken(jwt),
+  //       ...traceHeader,
+  //     })
+  //     return addressClient.getAddressProfile.query()
+  //   }),
+  // ])
 
-  const authorizedApps = awaitedResult[0]
-  const addressProfiles = awaitedResult.slice(1)
+  // const authorizedApps = awaitedResult[0]
+  // const addressProfiles = awaitedResult.slice(1)
 
-  return { authorizedApps, addressProfiles }
+  return {
+    pfpUrl: accountProfile?.pfp?.image,
+    displayName: accountProfile?.displayName,
+    // authorizedApps,
+    // addressProfiles,
+    CONSOLE_URL: context.env.CONSOLE_APP_URL,
+  }
 }
 
 export default function SettingsLayout() {
-  const { authorizedApps, addressProfiles } = useLoaderData()
-
-  console.log({ authorizedApps, addressProfiles })
+  const { authorizedApps, addressProfiles, displayName, pfpUrl, CONSOLE_URL } =
+    useLoaderData()
 
   return (
-    <div>
-      <Text>Passport Setting</Text>
-      <Outlet />
-    </div>
+    <Popover className="bg-gray-50 min-h-screen relative">
+      {({ open }) => {
+        return (
+          <div className="flex lg:flex-row">
+            <SideMenu CONSOLE_URL={CONSOLE_URL} open={open} />
+            <div className="flex flex-col w-full">
+              <Header pfpUrl={pfpUrl} />
+              <div>
+                <Outlet />
+              </div>
+            </div>
+          </div>
+        )
+      }}
+    </Popover>
   )
 }
