@@ -166,13 +166,11 @@ export default ({
               <div className="absolute right-[-20px] top-[2.5px]">
                 <CountdownCircleTimer
                   size={16}
-                  strokeWidth={3}
+                  strokeWidth={2}
                   isPlaying
                   duration={regenerationTimerSeconds}
                   rotation={'counterclockwise'}
-                  colors={'#FFFFFF'}
-                  trailColor={'#D1D5DB'}
-                  trailStrokeWidth={2}
+                  colors={'#6366f1'}
                   isGrowing={true}
                   onComplete={() => setRegenerationRequested(false)}
                 />
