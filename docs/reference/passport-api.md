@@ -30,6 +30,7 @@ Application client secret
 {% endswagger-parameter %}
 
 {% swagger-response status="201: Created" description="Exchange token response" %}
+
 ```javascript
 {
     access_token: string,
@@ -38,6 +39,7 @@ Application client secret
     id_token: string
 }
 ```
+
 {% endswagger-response %}
 {% endswagger %}
 
@@ -45,6 +47,7 @@ Application client secret
 
 {% tabs %}
 {% tab title="Javascript" %}
+
 ```typescript
 const tokenForm = new Form()
 tokenForm.append('exchange_code', exchangeCode)
@@ -60,9 +63,11 @@ const { access_code, refresh_token } = await fetch(
   }
 )
 ```
+
 {% endtab %}
 
 {% tab title="Curl" %}
+
 ```bash
 curl https://passport.rollup.id/token -X POST \
   --header "Content-Type: application/x-www-form-urlencoded" \
@@ -71,9 +76,64 @@ curl https://passport.rollup.id/token -X POST \
   --data-urlencode "exchange_code={exchangeCode}"
   --data-urlencode "grant_type=authorization_code"
 ```
+
 {% endtab %}
 {% endtabs %}
 
 #### Source
 
 [https://github.com/proofzero/rollupid/blob/main/apps/passport/app/routes/token.tsx](../../apps/passport/app/routes/token.tsx)
+
+### User Info
+
+Call this method to retrieve basic identity information for the user. This endpoint retrieves fresh data that would have been included in the ID token when the app was initially authorized by the user.
+
+{% swagger method="post" path="userinfo" baseUrl="https://passport.rollup.id/" summary="User Info" %}
+{% swagger-description %}
+Call this method to retrieve basic identity information for the user.
+{% endswagger-description %}
+
+{% swagger-parameter in="header" name="Authorization" type="String" required="true" %}
+`Bearer {access token}`
+{% endswagger-parameter %}
+
+{% swagger-response status="200: OK" description="User Info response" %}
+
+```javascript
+{
+    name: '(some name here)',
+    picture: '(URL of some picture here)'
+}
+```
+
+{% endswagger-response %}
+{% endswagger %}
+
+#### Example
+
+{% tabs %}
+{% tab title="Javascript" %}
+
+```typescript
+const access_token = '(some access token value)'
+
+const response = await fetch('https://passport.rollup.id/userinfo', {
+  headers: {
+    Authorization: `Bearer ${access_token}`,
+  },
+})
+const { name, picture } = await response.json()
+```
+
+{% endtab %}
+
+{% tab title="Curl" %}
+
+```bash
+export token="(some token value)"
+curl https://passport.rollup.id/userinfo \
+  --header "Authorization: Bearer $token"
+```
+
+{% endtab %}
+{% endtabs %}
