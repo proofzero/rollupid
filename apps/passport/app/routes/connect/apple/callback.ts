@@ -68,9 +68,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const profile: OAuthAppleProfile = {
     provider: OAuthAddressType.Apple,
     email: token.email as string,
-    name: user?.name,
+    name: user?.name
+      ? `${user.name.firstName} ${user.name.lastName}`
+      : (token.email as string),
     sub: token.sub,
     picture: '',
+    isApple: true,
   }
 
   const address = AddressURNSpace.componentizedUrn(

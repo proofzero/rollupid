@@ -102,12 +102,7 @@ export const MicrosoftRawProfileSchema = z.object({
 
 export const AppleProfileSchema = z.object({
   email: z.string(),
-  name: z
-    .object({
-      firstName: z.string(),
-      lastName: z.string(),
-    })
-    .optional(),
+  name: z.string().optional(),
   picture: z.string(),
   sub: z.string(),
   isApple: z.boolean().default(true),

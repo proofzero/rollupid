@@ -166,9 +166,11 @@ const provisionProfile = async (
             }
           }
           case OAuthAddressType.Apple: {
-            const { firstName, lastName } = res.profile.name!
             return {
-              displayName: `${firstName} ${lastName}`,
+              displayName: res.profile.name,
+              pfp: {
+                image: res.profile.picture,
+              },
             }
           }
           case OAuthAddressType.Discord: {

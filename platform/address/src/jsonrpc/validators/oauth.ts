@@ -107,12 +107,7 @@ export const TwitterOAuthSchema = z.object({
 export const AppleOAuthSchema = z.object({
   provider: z.literal(OAuthAddressType.Apple),
   email: z.string(),
-  name: z
-    .object({
-      firstName: z.string(),
-      lastName: z.string(),
-    })
-    .optional(),
+  name: z.string().optional(),
   picture: z.string(),
   sub: z.string(),
   _json: z.undefined(),

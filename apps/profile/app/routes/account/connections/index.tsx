@@ -98,7 +98,7 @@ const RenameModal = ({
           required
           heading=""
           name="name"
-          disabled={data.title.endsWith('.eth')}
+          disabled={data.title && data.title.endsWith('.eth')}
           defaultValue={data.title ?? ''}
         />
         <Text size="xs" weight="normal" className="text-gray-500 mt-2">
@@ -148,9 +148,13 @@ const DisconnectModal = ({
           </Text>
 
           <Text size="sm" weight="normal" className="text-gray-500 my-7">
-            Are you sure you want to disconnect {data.chain} account "
-            <span className="text-gray-800">{data.title}</span>" from Rollup?
-            You might lose access to some functionality.
+            Are you sure you want to disconnect {data.chain} account
+            {data.title && (
+              <>
+                "<span className="text-gray-800">{data.title}</span>"
+              </>
+            )}
+            from Rollup? You might lose access to some functionality.
           </Text>
 
           <fetcher.Form method="post" action="/account/connections/disconnect">
