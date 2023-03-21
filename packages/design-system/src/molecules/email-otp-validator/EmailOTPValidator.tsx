@@ -35,7 +35,7 @@ export default ({
   const [showInvalidMessage, setShowInvalidMessage] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const [resendRequested, setResendRequested] = useState(false)
+  const [regenerationRequested, setResendRequested] = useState(false)
 
   return (
     <div className="bg-white rounded-lg p-9 flex flex-col h-full">
@@ -73,11 +73,13 @@ export default ({
                 inputRefs[i].current.select()
               }}
               onChange={(ev) => {
-                if (ev.target.value === '' || i === inputLen - 1) return
+                if (ev.target.value === '') return
 
-                inputRefs[(i + 1) % inputLen].current.value === ''
-                inputRefs[(i + 1) % inputLen].current.focus()
-                inputRefs[(i + 1) % inputLen].current.select()
+                if (i !== inputLen - 1) {
+                  inputRefs[(i + 1) % inputLen].current.value === ''
+                  inputRefs[(i + 1) % inputLen].current.focus()
+                  inputRefs[(i + 1) % inputLen].current.select()
+                }
 
                 updateFullCode()
               }}
@@ -114,12 +116,12 @@ export default ({
                 updateFullCode()
               }}
               onFocus={() => {
-                if (isInvalid) {
+                if (isInvalid && inputRefs[i].current) {
                   inputRefs[i].current.value = ''
                   setIsInvalid(false)
                 }
 
-                inputRefs[i].current.select()
+                inputRefs[i].current?.select()
               }}
               className={`flex text-base lg:text-2xl py-7 px-3.5 h-20 justify-center items-center text-gray-600 border rounded-lg text-center ${
                 isInvalid ? 'border-red-500' : ''
@@ -146,17 +148,17 @@ export default ({
             type="span"
             size="sm"
             className={`${
-              resendRequested ? 'text-gray-300' : 'text-indigo-500'
+              regenerationRequested ? 'text-gray-300' : 'text-indigo-500'
             } cursor-pointer relative`}
             onClick={() => {
-              if (resendRequested) return
+              if (regenerationRequested) return
 
               requestResend(email)
               setResendRequested(true)
             }}
           >
-            Click to resend
-            {resendRequested && (
+            Click to send another
+            {regenerationRequested && (
               <div className="absolute right-[-20px] top-[2.5px]">
                 <CountdownCircleTimer
                   size={16}
