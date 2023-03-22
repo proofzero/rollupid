@@ -17,6 +17,7 @@ import Header from '~/components/Header'
 
 import type { AccountURN } from '@proofzero/urns/account'
 import type { AddressURN } from '@proofzero/urns/address'
+import { UnauthorizedError } from '@proofzero/errors'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { data } = await getUserSession(request, context.env)
@@ -25,7 +26,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const accountURN = parseJwt(jwt).sub as AccountURN
 
   if (!jwt) {
-    throw new Error('You need to be logged in')
+    throw new UnauthorizedError({ message: 'not authenticated' })
   }
 
   const accountClient = createAccountClient(context.env.Account, {
