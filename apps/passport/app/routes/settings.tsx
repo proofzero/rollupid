@@ -25,7 +25,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const accountURN = parseJwt(jwt).sub as AccountURN
 
   if (!jwt) {
-    throw new Error('You need to log-in first.')
+    throw new Error('You need to be logged in')
   }
 
   const accountClient = createAccountClient(context.env.Account, {
