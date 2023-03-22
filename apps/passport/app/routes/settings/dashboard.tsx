@@ -27,8 +27,8 @@ export default function DashboardLayout() {
     .map(normalizeProfileToConnection)
 
   return (
-    <div className="w-full h-full flex flex-col pb-5 md:pb-10">
-      <div className="py-6">
+    <div className="w-full h-full flex flex-col">
+      <div className="pb-6">
         <Text weight="semibold" size="2xl">
           Dashboard
         </Text>

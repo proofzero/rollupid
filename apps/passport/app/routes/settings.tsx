@@ -114,7 +114,8 @@ export default function SettingsLayout() {
                     max-lg:overflow-hidden\
                     max-lg:h-[calc(100vh-80px)]'
                     : 'h-full'
-                } px-2 sm:max-md:px-5 md:px-10`}
+                } px-2 sm:max-md:px-5 md:px-10
+                pb-5 md:pb-10 pt-6`}
               >
                 <Outlet context={{ authorizedApps, connectedProfiles }} />
               </div>
