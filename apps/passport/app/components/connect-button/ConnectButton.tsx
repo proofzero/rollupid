@@ -109,7 +109,6 @@ export function ConnectButton({
                   fontSize: 16,
                   fontWeight: 500,
                   display: 'flex',
-                  justifyContent: 'center',
                   alignItems: 'center',
                   padding: '1em',
                 }}
@@ -123,25 +122,18 @@ export function ConnectButton({
                   </>
                 ) : (
                   <>
-                    {ensName && (
-                      <span className="mr-[7px]">
-                        <Avatar size={20} name={ensName} />
-                      </span>
-                    )}
-
-                    {!ensName && (
-                      <span
-                        style={{
-                          backgroundRepeat: 'no-repeat',
-                          backgroundSize: '100%',
-                          height: 20,
-                          width: 20,
-                          margin: '0 7px',
-                        }}
-                      >
-                        <img src={walletsSvg} />
-                      </span>
-                    )}
+                    <span
+                      style={{
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: '100%',
+                        height: 20,
+                        width: 20,
+                        margin: '0 7px',
+                      }}
+                    >
+                      {!ensName && <img src={walletsSvg} />}
+                      {ensName && <Avatar size={20} name={ensName} />}
+                    </span>
 
                     {isConnected && address
                       ? `Continue with ${ensName ?? truncatedAddress}`

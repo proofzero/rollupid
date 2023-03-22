@@ -1,29 +1,40 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
 import { Button } from '../../atoms/buttons/Button'
 import { Text } from '../../atoms/text/Text'
-import { Loader } from '../loader/Loader'
 
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 
 type EmailOTPValidatorProps = {
+  loading: boolean
+
   email: string
+  state: string
+
+  invalid: boolean
 
   goBack?: () => void
   requestRegeneration: (email: string) => Promise<void>
-  requestVerification: (code: string) => Promise<boolean>
+  requestVerification: (
+    email: string,
+    code: string,
+    state: string
+  ) => Promise<void>
 
-  regenerationTimerSeconds: number
+  regenerationTimerSeconds?: number
 }
 
 export default ({
+  loading,
   email,
+  state,
+  invalid,
   goBack,
   requestRegeneration,
   requestVerification,
   regenerationTimerSeconds = 60,
 }: EmailOTPValidatorProps) => {
-  const inputLen = 5
+  const inputLen = 6
   const inputRefs = Array.from({ length: inputLen }, () =>
     useRef<HTMLInputElement>()
   )
@@ -34,15 +45,23 @@ export default ({
     setFullCode(updatedCode)
   }, [inputRefs])
 
-  const [isInvalid, setIsInvalid] = useState(false)
+  const [isInvalid, setIsInvalid] = useState(invalid)
   const [showInvalidMessage, setShowInvalidMessage] = useState(false)
-  const [loading, setLoading] = useState(false)
 
   const [regenerationRequested, setRegenerationRequested] = useState(false)
 
+  useEffect(() => {
+    setIsInvalid(invalid)
+
+    if (invalid) {
+      setShowInvalidMessage(true)
+      inputRefs[0].current.focus()
+      inputRefs[0].current.select()
+    }
+  }, [invalid])
+
   return (
-    <div className="bg-white rounded-lg p-9 flex flex-col h-full">
-      {loading && <Loader />}
+    <>
       <section className="relative flex justify-center items-center">
         {goBack && (
           <HiOutlineArrowLeft
@@ -61,7 +80,7 @@ export default ({
           <Text className="text-gray-500 font-medium">{email}</Text>
         </div>
 
-        <div className="grid grid-cols-5 gap-2.5">
+        <div className="grid grid-cols-6 gap-2.5">
           {inputRefs.map((ref, i) => (
             <input
               key={i}
@@ -188,24 +207,14 @@ export default ({
           className="flex-1"
           disabled={fullCode.length !== inputLen || loading}
           onClick={async () => {
-            setLoading(true)
             setShowInvalidMessage(false)
 
-            const valid = await requestVerification(fullCode)
-            setIsInvalid(!valid)
-
-            if (!valid) {
-              setShowInvalidMessage(true)
-              inputRefs[0].current.focus()
-              inputRefs[0].current.select()
-            }
-
-            setLoading(false)
+            await requestVerification(email, fullCode, state)
           }}
         >
           Verify
         </Button>
       </section>
-    </div>
+    </>
   )
 }
