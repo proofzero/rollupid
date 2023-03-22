@@ -11,7 +11,6 @@ import { getUserSession, parseJwt } from '~/session.server'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 
-import { Text } from '@proofzero/design-system'
 import { Popover } from '@headlessui/react'
 import SideMenu from '~/components/SideMenu'
 import Header from '~/components/Header'
@@ -34,39 +33,39 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     ...traceHeader,
   })
 
-  // const starbaseClient = createStarbaseClient(context.env.Starbase, {
-  //   ...getAuthzHeaderConditionallyFromToken(jwt),
-  //   ...traceHeader,
-  // })
+  const starbaseClient = createStarbaseClient(context.env.Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...traceHeader,
+  })
 
   const accountProfile = await accountClient.getProfile.query({
     account: accountURN,
   })
 
-  // const addressURNList = accountProfile?.addresses?.map(
-  //   (profile) => profile.baseUrn as AddressURN
-  // ) as AddressURN[]
+  const addressURNList = accountProfile?.addresses?.map(
+    (profile) => profile.baseUrn as AddressURN
+  ) as AddressURN[]
 
-  // const awaitedResult = await Promise.all([
-  //   starbaseClient.listApps.query(),
-  //   ...addressURNList.map((address) => {
-  //     const addressClient = createAddressClient(context.env.Address, {
-  //       [PlatformAddressURNHeader]: address,
-  //       ...getAuthzHeaderConditionallyFromToken(jwt),
-  //       ...traceHeader,
-  //     })
-  //     return addressClient.getAddressProfile.query()
-  //   }),
-  // ])
+  const awaitedResult = await Promise.all([
+    starbaseClient.listApps.query(),
+    ...addressURNList.map((address) => {
+      const addressClient = createAddressClient(context.env.Address, {
+        [PlatformAddressURNHeader]: address,
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...traceHeader,
+      })
+      return addressClient.getAddressProfile.query()
+    }),
+  ])
 
-  // const authorizedApps = awaitedResult[0]
-  // const addressProfiles = awaitedResult.slice(1)
+  const authorizedApps = awaitedResult[0]
+  const addressProfiles = awaitedResult.slice(1)
 
   return {
     pfpUrl: accountProfile?.pfp?.image,
     displayName: accountProfile?.displayName,
-    // authorizedApps,
-    // addressProfiles,
+    authorizedApps,
+    addressProfiles,
     CONSOLE_URL: context.env.CONSOLE_APP_URL,
   }
 }
