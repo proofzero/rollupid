@@ -262,7 +262,6 @@ export async function getValidatedSessionContext(
       console.error(
         'Session/token error encountered. Invalidating session and redirecting to login page'
       )
-      console.debug('CONSOLE PARAMS', consoleParams)
       throw await destroyUserSession(
         session,
         redirectTo,
