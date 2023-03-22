@@ -1,3 +1,3 @@
-export default function AdvancedLayout() {
+export default function AccountsLayout() {
   return <div></div>
 }
