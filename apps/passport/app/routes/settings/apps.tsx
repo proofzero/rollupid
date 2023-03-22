@@ -1,3 +1,3 @@
-export default function SettingsLayout() {
+export default function ApplicationsLayout() {
   return <div></div>
 }

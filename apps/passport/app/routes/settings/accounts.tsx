@@ -1,3 +1,3 @@
-export default function SettingsLayout() {
+export default function AdvancedLayout() {
   return <div></div>
 }
