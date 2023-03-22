@@ -5742,7 +5742,7 @@ __metadata:
     tiny-invariant: 1.3.1
     typescript: 4.8.4
     wagmi: 0.10.8
-    wrangler: 2.12.2
+    wrangler: 2.13.0
   languageName: unknown
   linkType: soft
 
@@ -5828,7 +5828,7 @@ __metadata:
     typescript: 4.7.4
     wagmi: 0.11.7
     webpack: 5.75.0
-    wrangler: 2.12.2
+    wrangler: 2.13.0
   languageName: unknown
   linkType: soft
 
@@ -5925,7 +5925,7 @@ __metadata:
     urns: 0.6.0
     wagmi: 0.10.8
     webpack: 5.75.0
-    wrangler: 2.12.2
+    wrangler: 2.13.0
   languageName: unknown
   linkType: soft
 
@@ -6106,7 +6106,7 @@ __metadata:
     npm-run-all: 4.1.5
     prettier: 2.7.1
     typescript: 4.8.4
-    wrangler: 2.12.2
+    wrangler: 2.13.0
     zod: 3.20.2
   languageName: unknown
   linkType: soft
@@ -6135,7 +6135,7 @@ __metadata:
     typed-json-rpc: 1.1.0
     typescript: 4.8.4
     urns: 0.6.0
-    wrangler: 2.12.2
+    wrangler: 2.13.0
   languageName: unknown
   linkType: soft
 
@@ -6168,7 +6168,7 @@ __metadata:
     prettier: 2.7.1
     remix-auth-google: 1.2.0
     typescript: 4.8.4
-    wrangler: 2.12.2
+    wrangler: 2.13.0
     zod: 3.20.2
   languageName: unknown
   linkType: soft
@@ -6201,7 +6201,7 @@ __metadata:
     typeorm: 0.3.10
     typescript: 4.8.4
     urns: 0.6.0
-    wrangler: 2.12.2
+    wrangler: 2.13.0
     yarn-run-all: 3.1.1
     zod: 3.20.2
   languageName: unknown
@@ -6224,7 +6224,7 @@ __metadata:
     graphql-type-json: 0.3.2
     npm-run-all: 4.1.5
     typescript: 4.8.4
-    wrangler: 2.12.0
+    wrangler: 2.13.0
   languageName: unknown
   linkType: soft
 
@@ -6242,7 +6242,7 @@ __metadata:
     npm-run-all: 4.1.5
     prettier: 2.7.1
     typescript: 4.8.4
-    wrangler: 2.12.2
+    wrangler: 2.13.0
   languageName: unknown
   linkType: soft
 
@@ -6261,7 +6261,7 @@ __metadata:
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
     typescript: 4.8.4
-    wrangler: 2.12.2
+    wrangler: 2.13.0
   languageName: unknown
   linkType: soft
 
@@ -6293,7 +6293,7 @@ __metadata:
     tiny-invariant: 1.3.1
     ts-set-utils: 0.2.0
     typescript: 4.8.4
-    wrangler: 2.12.2
+    wrangler: 2.13.0
   languageName: unknown
   linkType: soft
 
@@ -6347,7 +6347,7 @@ __metadata:
     "@types/node": 18.15.3
     npm-run-all: 4.1.5
     typescript: 4.8.4
-    wrangler: 2.12.2
+    wrangler: 2.13.0
   languageName: unknown
   linkType: soft
 
@@ -6366,7 +6366,7 @@ __metadata:
     svg2png-wasm: 1.3.4
     tiny-invariant: 1.3.1
     typescript: 4.8.4
-    wrangler: 2.12.2
+    wrangler: 2.13.0
   languageName: unknown
   linkType: soft
 
@@ -38779,9 +38779,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wrangler@npm:2.12.0":
-  version: 2.12.0
-  resolution: "wrangler@npm:2.12.0"
+"wrangler@npm:2.13.0":
+  version: 2.13.0
+  resolution: "wrangler@npm:2.13.0"
   dependencies:
     "@cloudflare/kv-asset-handler": ^0.2.0
     "@esbuild-plugins/node-globals-polyfill": ^0.1.1
@@ -38805,37 +38805,7 @@ __metadata:
   bin:
     wrangler: bin/wrangler.js
     wrangler2: bin/wrangler.js
-  checksum: fda942ab624e794720e4dc7ed8aba425a6551fec827c0f093e638dbb7efb9987e1c16d4d727dd0d0b59975e8fee73212b1aaad3c15af47cc867501d8596081ac
-  languageName: node
-  linkType: hard
-
-"wrangler@npm:2.12.2":
-  version: 2.12.2
-  resolution: "wrangler@npm:2.12.2"
-  dependencies:
-    "@cloudflare/kv-asset-handler": ^0.2.0
-    "@esbuild-plugins/node-globals-polyfill": ^0.1.1
-    "@esbuild-plugins/node-modules-polyfill": ^0.1.4
-    "@miniflare/core": 2.12.1
-    "@miniflare/d1": 2.12.1
-    "@miniflare/durable-objects": 2.12.1
-    blake3-wasm: ^2.1.5
-    chokidar: ^3.5.3
-    esbuild: 0.16.3
-    fsevents: ~2.3.2
-    miniflare: 2.12.1
-    nanoid: ^3.3.3
-    path-to-regexp: ^6.2.0
-    selfsigned: ^2.0.1
-    source-map: ^0.7.4
-    xxhash-wasm: ^1.0.1
-  dependenciesMeta:
-    fsevents:
-      optional: true
-  bin:
-    wrangler: bin/wrangler.js
-    wrangler2: bin/wrangler.js
-  checksum: 9c22ce368466b9c987b637855cfa4e2b7c28207442400885815ce66b1648cd4b4f80c3aa06935d370f04a9ddd7e5a85fab57b8dea69c002361a8f630ea80496b
+  checksum: bf755fdf2d791e5bf68b4df346f07d2b2c4a942d786094ba1479ab4fb1dd5b40f2c1498b83b7643b69dd48a77e00514402addf2c278763f0f7bc6d9ae60de384
   languageName: node
   linkType: hard
 
