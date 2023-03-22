@@ -9,7 +9,9 @@ export default {
 
 const Template = (args) => (
   <div className="w-[402px] h-[491px]">
-    <EmailOTPValidator {...args} />
+    <div className="bg-white rounded-lg p-9 flex flex-col h-full">
+      <EmailOTPValidator {...args} />
+    </div>
   </div>
 )
 

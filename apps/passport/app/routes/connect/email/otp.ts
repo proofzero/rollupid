@@ -3,7 +3,11 @@ import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
 import { getAddressClient } from '~/platform.server'
-import { getJWTConditionallyFromSession } from '~/session.server'
+import {
+  getConsoleParamsSession,
+  getJWTConditionallyFromSession,
+} from '~/session.server'
+import { authenticateAddress } from '~/utils/authenticate.server'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const qp = new URL(request.url).searchParams
@@ -53,6 +57,22 @@ export const action: ActionFunction = async ({ request, context }) => {
     state: formData.get('state') as string,
     jwt: await getJWTConditionallyFromSession(request, context.env),
   })
+
+  if (sucessfulVerification) {
+    const appData = await getConsoleParamsSession(request, context.env)
+      .then((session) => JSON.parse(session.get('params')))
+      .catch(() => null)
+
+    const accountURN = await addressClient.getAccount.query()
+
+    return authenticateAddress(
+      addressURN,
+      accountURN,
+      appData,
+      context.env,
+      context.traceSpan
+    )
+  }
 
   return json({ sucessfulVerification })
 }
