@@ -11,13 +11,17 @@ import { ResponseType } from '@proofzero/types/access'
 
 import { getAccessClient, getStarbaseClient } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
-import { parseJwt, requireJWT } from '~/session.server'
-import type { AccountURN } from '@proofzero/urns/account'
+import { getValidatedSessionContext } from '~/session.server'
 import type { Profile } from '@proofzero/platform/account/src/types'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { clientId, redirectUri, scope, state } = context.consoleParams
-  const jwt = await requireJWT(request, context.consoleParams, context.env)
+  const { jwt, accountUrn } = await getValidatedSessionContext(
+    request,
+    context.consoleParams,
+    context.env,
+    context.traceSpan
+  )
 
   if (clientId) {
     if (!state) throw json({ message: 'state is required' }, 400)
@@ -33,12 +37,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     if (!scope.length || (scope.length == 1 && scope[0].trim() === 'openid')) {
       // auto authorize if no scope is provided or is set to only openid
 
-      const parsedJWT = parseJwt(jwt)
-      const account = parsedJWT.sub as AccountURN
       const responseType = ResponseType.Code
       const accessClient = getAccessClient(context.env, context.traceSpan)
       const authorizeRes = await accessClient.authorize.mutate({
-        account,
+        account: accountUrn,
         responseType,
         clientId,
         redirectUri,
@@ -92,6 +94,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 }
 
 export const action: ActionFunction = async ({ request, context }) => {
+  const { accountUrn } = await getValidatedSessionContext(
+    request,
+    context.consoleParams,
+    context.env,
+    context.traceSpan
+  )
+
   const form = await request.formData()
   const cancel = form.get('cancel') as string
 
@@ -99,22 +108,19 @@ export const action: ActionFunction = async ({ request, context }) => {
     return redirect(cancel)
   }
 
-  const jwt = await requireJWT(request, context.consoleParams, context.env)
-  const parsedJWT = parseJwt(jwt)
-  const account = parsedJWT.sub as AccountURN
   const responseType = ResponseType.Code
   const redirectUri = form.get('redirect_uri') as string
   const scope = (form.get('scopes') as string).split(',')
   const state = form.get('state') as string
   const clientId = form.get('client_id') as string
 
-  if (!account || !responseType || !redirectUri || !scope || !state) {
+  if (!accountUrn || !responseType || !redirectUri || !scope || !state) {
     throw json({ message: 'Missing required fields' }, 400)
   }
 
   const accessClient = getAccessClient(context.env, context.traceSpan)
   const authorizeRes = await accessClient.authorize.mutate({
-    account,
+    account: accountUrn,
     responseType,
     clientId,
     redirectUri,

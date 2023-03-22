@@ -34,6 +34,7 @@ import {
   GetAuthorizedAppsMethodOutput,
   getAuthorizedAppsMethod,
 } from './methods/getAuthorizedApps'
+import { isValidMethod, IsValidOutput } from './methods/isValid'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -71,6 +72,14 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(SetProfileInput)
     .mutation(setProfileMethod),
+  isValid: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(injectAccountNode)
+    .use(LogUsage)
+    .use(Analytics)
+    .output(IsValidOutput)
+    .query(isValidMethod),
   getAddresses: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
