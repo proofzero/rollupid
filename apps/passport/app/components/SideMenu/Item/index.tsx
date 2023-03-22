@@ -9,9 +9,10 @@ type SideNavItemProps = {
     icon: any
     exists?: boolean
   }
+  close?: () => void
 }
 
-export const SideMenuItem = ({ item }: SideNavItemProps) => {
+export const SideMenuItem = ({ item, close }: SideNavItemProps) => {
   const activeStyle = {
     backgroundColor: 'rgb(243 244 246)',
     borderColor: '#6366f1',
@@ -24,6 +25,7 @@ export const SideMenuItem = ({ item }: SideNavItemProps) => {
         to={item.href}
         onClick={(e) => {
           if (!item.exists) e.preventDefault()
+          if (close) close()
         }}
         style={({ isActive }) => {
           return isActive && item.href != '#' ? activeStyle : undefined

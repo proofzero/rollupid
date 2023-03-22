@@ -25,7 +25,7 @@ export type AddressListItemProps = {
   id: string
   icon: string
   title: string
-  chain: string
+  type: string
   address: string
   primary?: boolean
   hidden?: boolean
@@ -41,7 +41,7 @@ export const AddressListItem = ({
   id,
   icon,
   title,
-  chain,
+  type,
   address,
   primary = false,
   hidden = false,
@@ -77,7 +77,7 @@ export const AddressListItem = ({
 
         <div className="flex flex-row">
           <Text size="xs" weight="normal" className="text-gray-500 break-all">
-            {chain} • {address}
+            {type} • {address}
           </Text>
         </div>
       </section>
@@ -140,7 +140,7 @@ export const AddressListItem = ({
                   {onSetPrimary && (
                     <Menu.Item
                       as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer 
+                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer
                       hover:bg-gray-100 focus:bg-gray-100 hover:rounded-[6px]"
                       onClick={() => {
                         onSetPrimary(id)
@@ -176,7 +176,7 @@ export const AddressListItem = ({
                   {onDisconnect && (
                     <Menu.Item
                       as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer 
+                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer
                       hover:bg-gray-100 hover:rounded-[6px] focus:bg-gray-100"
                       onClick={() => {
                         onDisconnect(id)

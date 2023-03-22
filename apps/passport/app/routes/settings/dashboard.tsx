@@ -141,8 +141,7 @@ export default function DashboardLayout() {
                 <Text
                   size="sm"
                   weight="medium"
-                  className="cursor-pointer text-gray-400
-                hover:text-indigo-500 hover:underline my-4"
+                  className="cursor-pointer text-indigo-500 hover:underline my-4"
                 >
                   View All
                 </Text>

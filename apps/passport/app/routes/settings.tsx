@@ -5,14 +5,14 @@ import { Popover } from '@headlessui/react'
 import SideMenu from '~/components/SideMenu'
 import Header from '~/components/Header'
 
-import type { AddressURN } from '@proofzero/urns/address'
-import type { NodeType } from '@proofzero/types/address'
 import {
   getAccountClient,
   getAddressClient,
   getStarbaseClient,
 } from '~/platform.server'
 import type { AccountURN } from '@proofzero/urns/account'
+import type { AddressURN } from '@proofzero/urns/address'
+import type { NodeType } from '@proofzero/types/address'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { jwt, accountUrn } = await getValidatedSessionContext(

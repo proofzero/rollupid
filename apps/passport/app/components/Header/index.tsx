@@ -13,7 +13,7 @@ const Header = ({ pfpUrl }: { pfpUrl: string }) => {
       className="w-full min-h-[80px] h-[80px] border-b bg-white
     flex items-center justify-start lg:justify-end px-2"
     >
-      <NavLink to="/">
+      <NavLink to="/settings">
         <img
           src={PassportIcon}
           alt="Passport Icon"

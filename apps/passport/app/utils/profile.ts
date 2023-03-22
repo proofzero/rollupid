@@ -12,7 +12,7 @@ export const normalizeProfileToConnection = (profile: any) => {
         address: profile.address,
         title: profile.displayName,
         icon: profile.avatar,
-        chain: 'Ethereum',
+        type: 'Ethereum',
       }
     case OAuthAddressType.Google:
       return {
@@ -20,7 +20,7 @@ export const normalizeProfileToConnection = (profile: any) => {
         address: profile.email,
         title: profile.name,
         icon: profile.picture,
-        chain: 'Google',
+        type: 'Google',
       }
     case OAuthAddressType.Twitter:
       return {
@@ -28,7 +28,7 @@ export const normalizeProfileToConnection = (profile: any) => {
         address: `@${profile.screen_name}`,
         title: profile.name,
         icon: profile.profile_image_url_https,
-        chain: 'Twitter',
+        type: 'Twitter',
       }
     case OAuthAddressType.GitHub:
       return {
@@ -36,7 +36,7 @@ export const normalizeProfileToConnection = (profile: any) => {
         address: profile.login,
         title: profile.name,
         icon: profile.avatar_url,
-        chain: 'GitHub',
+        type: 'GitHub',
       }
     case 'microsoft':
       return {
@@ -44,7 +44,7 @@ export const normalizeProfileToConnection = (profile: any) => {
         address: profile.email,
         title: profile.name,
         icon: profile.picture,
-        chain: 'Microsoft',
+        type: 'Microsoft',
       }
     case OAuthAddressType.Apple:
       return {
@@ -52,7 +52,7 @@ export const normalizeProfileToConnection = (profile: any) => {
         address: profile.name,
         title: profile.name,
         icon: profile.picture,
-        chain: 'Apple',
+        type: 'Apple',
       }
     case OAuthAddressType.Discord:
       return {
@@ -60,7 +60,7 @@ export const normalizeProfileToConnection = (profile: any) => {
         address: `${profile.username}#${profile.discriminator}`,
         title: profile.username,
         icon: `https://cdn.discordapp.com/avatars/${profile.discordId}/${profile.avatar}.png`,
-        chain: 'Discord',
+        type: 'Discord',
       }
     case EmailAddressType.Email:
       return {
@@ -68,7 +68,7 @@ export const normalizeProfileToConnection = (profile: any) => {
         address: profile.email,
         title: profile.name,
         icon: profile.picture,
-        chain: 'Email',
+        type: 'Email',
       }
   }
 }
