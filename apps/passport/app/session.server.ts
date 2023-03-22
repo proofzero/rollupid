@@ -250,17 +250,22 @@ export async function getValidatedSessionContext(
       accountUrn: payload.sub as AccountURN,
     }
   } catch (error) {
+    const redirectTo = `/authenticate/${consoleParams?.clientId ?? ''}`
     if (error === InvalidTokenError)
       if (consoleParams.clientId)
         throw await createConsoleParamsSession(consoleParams, env)
-      else throw redirect('/authenticate')
+      else throw redirect(redirectTo)
     else if (
       error === ExpiredTokenError ||
       error === InvalidSessionAccountError
     ) {
+      console.error(
+        'Session/token error encountered. Invalidating session and redirecting to login page'
+      )
+      console.debug('CONSOLE PARAMS', consoleParams)
       throw await destroyUserSession(
         session,
-        '/authenticate',
+        redirectTo,
         env,
         consoleParams?.clientId ?? undefined,
         true
