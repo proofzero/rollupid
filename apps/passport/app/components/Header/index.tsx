@@ -10,7 +10,7 @@ import { Text } from '@proofzero/design-system'
 const Header = ({ pfpUrl }: { pfpUrl: string }) => {
   return (
     <div
-      className="w-full h-[80px] border-b bg-white
+      className="w-full min-h-[80px] h-[80px] border-b bg-white
     flex items-center justify-start lg:justify-end px-2"
     >
       <NavLink to="/">

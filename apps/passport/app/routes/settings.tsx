@@ -6,11 +6,13 @@ import SideMenu from '~/components/SideMenu'
 import Header from '~/components/Header'
 
 import type { AddressURN } from '@proofzero/urns/address'
+import type { NodeType } from '@proofzero/types/address'
 import {
   getAccountClient,
   getAddressClient,
   getStarbaseClient,
 } from '~/platform.server'
+import type { AccountURN } from '@proofzero/urns/account'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { jwt, accountUrn } = await getValidatedSessionContext(
@@ -28,30 +30,55 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     account: accountUrn,
   })
 
-  const addressURNList = accountProfile?.addresses?.map(
-    (profile) => profile.baseUrn as AddressURN
-  ) as AddressURN[]
+  const addressTypeUrns = accountProfile?.addresses.map((a) => ({
+    urn: a.baseUrn,
+    nodeType: a.rc.node_type,
+  })) as { urn: AddressURN; nodeType: NodeType }[]
 
-  const awaitedResult = await Promise.all([
-    starbaseClient.listApps.query(),
-    ...addressURNList.map((address) => {
-      const addressClient = getAddressClient(
-        address,
-        context.env,
-        context.traceSpan
-      )
-      return addressClient.getAddressProfile.query()
-    }),
+  const apps = await accountClient.getAuthorizedApps.query({
+    account: accountUrn,
+  })
+
+  const awaitedResults = await Promise.all([
+    Promise.all(
+      apps.map(async (a) => {
+        const { name, iconURL } = await starbaseClient.getAppPublicProps.query({
+          clientId: a.clientId,
+        })
+
+        return {
+          clientId: a.clientId,
+          icon: iconURL,
+          title: name,
+          timestamp: a.timestamp,
+        }
+      })
+    ),
+    Promise.all(
+      addressTypeUrns.map((address) => {
+        const addressClient = getAddressClient(
+          address.urn,
+          context.env,
+          context.traceSpan
+        )
+        return addressClient.getAddressProfile.query()
+      })
+    ),
   ])
 
-  const authorizedApps = awaitedResult[0]
-  const addressProfiles = awaitedResult.slice(1)
+  const authorizedApps = awaitedResults[0]
+  const addressProfiles = awaitedResults[1]
+
+  const normalizedConnectedProfiles = addressProfiles.map((p, i) => ({
+    ...addressTypeUrns[i],
+    ...p,
+  }))
 
   return {
     pfpUrl: accountProfile?.pfp?.image,
     displayName: accountProfile?.displayName,
-    authorizedApps,
-    addressProfiles,
+    authorizedApps: authorizedApps,
+    connectedProfiles: normalizedConnectedProfiles,
     CONSOLE_URL: context.env.CONSOLE_APP_URL,
   }
 }
@@ -63,20 +90,33 @@ export const meta: MetaFunction = () => ({
 })
 
 export default function SettingsLayout() {
-  const { authorizedApps, addressProfiles, displayName, pfpUrl, CONSOLE_URL } =
-    useLoaderData()
+  const {
+    authorizedApps,
+    connectedProfiles,
+    displayName,
+    pfpUrl,
+    CONSOLE_URL,
+  } = useLoaderData()
 
   return (
     <Popover className="bg-gray-50 min-h-screen relative">
       {({ open }) => {
         return (
-          <div className="flex lg:flex-row">
+          <div className="flex lg:flex-row h-full">
             <SideMenu CONSOLE_URL={CONSOLE_URL} open={open} />
 
             <div className={`flex flex-col w-full`}>
               <Header pfpUrl={pfpUrl} />
-              <div className={`${open ? 'max-lg:opacity-50' : ''}`}>
-                <Outlet />
+              <div
+                className={`${
+                  open
+                    ? 'max-lg:opacity-50\
+                    max-lg:overflow-hidden\
+                    max-lg:h-[calc(100vh-80px)]'
+                    : 'h-full'
+                }`}
+              >
+                <Outlet context={{ authorizedApps, connectedProfiles }} />
               </div>
             </div>
           </div>

@@ -112,7 +112,7 @@ export default function SideMenu({ open, CONSOLE_URL }: PassportMenuProps) {
       {/* Mobile Menu */}
       <div className="lg:hidden">
         <Popover.Button
-          className="absolute top-0 right-2 my-5 items-right rounded-lg
+          className="absolute top-0 right-2 my-[19px] items-right rounded-lg
               justify-right bg-white border p-2 text-black hover:bg-gray-50
                focus:outline-none focus:ring-2 focus:ring-white
               focus:ring-offset-2 focus:ring-offset-gray-800"
@@ -137,7 +137,7 @@ export default function SideMenu({ open, CONSOLE_URL }: PassportMenuProps) {
       >
         <Popover.Panel
           className={`
-          bg-white border mt-[80px] lg:hidden z-[100] min-h-[calc(100%-80px)] w-[240px]
+          bg-white border mt-[80px] lg:hidden z-[100] h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] w-[240px]
           flex flex-col`}
           ref={setPopperElement}
           style={{ position: 'absolute', right: '0', top: '0' }}
