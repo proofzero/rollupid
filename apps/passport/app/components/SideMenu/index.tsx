@@ -5,17 +5,14 @@
 import React, { useState, Fragment } from 'react'
 import { usePopper } from 'react-popper'
 
-import { Link } from '@remix-run/react'
+import { Link, NavLink } from '@remix-run/react'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 // Images
 import passportLogo from '../../assets/PassportLogoBlack.svg'
 import consoleLogo from '../../assets/consoleLogo.svg'
-import {
-  HiOutlineHome,
-  HiOutlineBookOpen,
-  HiOutlineExternalLink,
-} from 'react-icons/hi'
+import { HiOutlineHome, HiOutlineExternalLink } from 'react-icons/hi'
+import { IoMdExit } from 'react-icons/io'
 import { TbPlugConnected, TbApps } from 'react-icons/tb'
 import { BsGear } from 'react-icons/bs'
 
@@ -23,6 +20,13 @@ import { Popover, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 import { SideMenuItem } from './Item'
+
+const activeStyle = {
+  backgroundColor: 'rgb(243 244 246)',
+  borderColor: '#6366f1',
+  fontWeight: 600,
+  color: '#1f2937',
+}
 
 // Passport Logo
 // -----------------------------------------------------------------------------
@@ -38,11 +42,44 @@ const PassportLogo = () => {
   )
 }
 
-const ConsoleLogo = () => {
-  return <img src={consoleLogo} className="-ml-3 mr-3" alt="console logo" />
+const ConsolenNavItem = ({ CONSOLE_URL }: { CONSOLE_URL: string }) => {
+  return (
+    <NavLink
+      target="_blank"
+      to={CONSOLE_URL}
+      style={({ isActive }) => {
+        return isActive ? activeStyle : undefined
+      }}
+      className={({ isActive }) => `text-sm group ${
+        isActive ? 'border-l-2' : ''
+      } px-4 py-4
+               flex self-center justify-between
+               flex-row  items-center
+               hover:bg-gray-100`}
+    >
+      <div className="flex flex-row items-center">
+        <img
+          src={consoleLogo}
+          className="mr-3 -ml-1 h-6 w-6"
+          alt="console logo"
+        />
+
+        <span className={'self-center'}>
+          <Text
+            className="truncate self-center text-gray-600"
+            size="sm"
+            weight="medium"
+          >
+            Developer Console
+          </Text>
+        </span>
+      </div>
+      <HiOutlineExternalLink size={22} />
+    </NavLink>
+  )
 }
 
-// RollupMenu
+// PassportMenu
 // -----------------------------------------------------------------------------
 
 type PassportMenuProps = {
@@ -57,26 +94,19 @@ export default function SideMenu({ open, CONSOLE_URL }: PassportMenuProps) {
 
   return (
     <div
-      className="text-center bg-white lg:pb-4 lg:min-h-screen
+      className="text-center bg-white lg:min-h-screen
     lg:min-w-[256px] lg:max-w-sm lg:border-r lg:text-left
     flex flex-col"
     >
       {/* Desktop Menu */}
-      <div className="hidden lg:block h-full ">
+      <div className="hidden lg:block h-full">
         <div className="object-left">
           <PassportLogo />
         </div>
         <AppSubmenu />
       </div>
-      <div className="mt-auto hidden lg:block">
-        <SideMenuItem
-          item={{
-            name: 'Developer Console',
-            icon: ConsoleLogo,
-            href: CONSOLE_URL,
-            exists: true,
-          }}
-        />
+      <div className="mt-auto hidden border-t lg:block">
+        <ConsolenNavItem CONSOLE_URL={CONSOLE_URL} />
       </div>
 
       {/* Mobile Menu */}
@@ -114,15 +144,32 @@ export default function SideMenu({ open, CONSOLE_URL }: PassportMenuProps) {
           {...attributes.popper}
         >
           <MobileAppSubmenu ref={setReferenceElement} />
-          <div className="mt-auto block lg:hidden">
-            <SideMenuItem
-              item={{
-                name: 'Developer Console',
-                icon: ConsoleLogo,
-                href: CONSOLE_URL,
-                exists: true,
+          <div className="mt-auto block border-t lg:hidden">
+            <ConsolenNavItem CONSOLE_URL={CONSOLE_URL} />
+            <NavLink
+              target="_blank"
+              to={'/signout'}
+              style={({ isActive }) => {
+                return isActive ? activeStyle : undefined
               }}
-            />
+              className={({ isActive }) => `text-sm group ${
+                isActive ? 'border-l-2' : ''
+              } px-4 py-4
+               flex self-center justify-start
+               flex-row  items-center text-red-500 hover:bg-gray-100`}
+            >
+              <IoMdExit size={24} className="-ml-1 mr-3" />
+
+              <span className={'self-center'}>
+                <Text
+                  className="truncate self-center"
+                  size="sm"
+                  weight="medium"
+                >
+                  Sign Out
+                </Text>
+              </span>
+            </NavLink>
           </div>
         </Popover.Panel>
       </Transition>

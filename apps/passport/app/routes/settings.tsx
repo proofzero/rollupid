@@ -81,9 +81,10 @@ export default function SettingsLayout() {
         return (
           <div className="flex lg:flex-row">
             <SideMenu CONSOLE_URL={CONSOLE_URL} open={open} />
-            <div className="flex flex-col w-full">
+
+            <div className={`flex flex-col w-full`}>
               <Header pfpUrl={pfpUrl} />
-              <div>
+              <div className={`${open ? 'max-lg:opacity-50' : ''}`}>
                 <Outlet />
               </div>
             </div>
