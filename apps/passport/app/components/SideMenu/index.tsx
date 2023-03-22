@@ -112,7 +112,7 @@ export default function SideMenu({ open, CONSOLE_URL }: PassportMenuProps) {
       {/* Mobile Menu */}
       <div className="lg:hidden">
         <Popover.Button
-          className="absolute right-0 top-0 my-5 items-right mr-12
+          className="absolute top-0 right-2 my-5 items-right rounded-lg
               justify-right bg-white border p-2 text-black hover:bg-gray-50
                focus:outline-none focus:ring-2 focus:ring-white
               focus:ring-offset-2 focus:ring-offset-gray-800"

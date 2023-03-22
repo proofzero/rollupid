@@ -11,16 +11,18 @@ const Header = ({ pfpUrl }: { pfpUrl: string }) => {
   return (
     <div
       className="w-full h-[80px] border-b bg-white
-    flex items-center justify-start lg:justify-end px-12"
+    flex items-center justify-start lg:justify-end px-2"
     >
-      <img
-        src={PassportIcon}
-        alt="Passport Icon"
-        className="h-[40px] w-[40px] lg:hidden"
-      />
+      <NavLink to="/">
+        <img
+          src={PassportIcon}
+          alt="Passport Icon"
+          className="h-[40px] w-[40px] lg:hidden"
+        />
+      </NavLink>
       <Form className="max-lg:hidden">
         <Menu>
-          <Menu.Button>
+          <Menu.Button className={'rounded-full bg-gray-800'}>
             <Avatar size="xs" src={pfpUrl} />
           </Menu.Button>
           <Transition
