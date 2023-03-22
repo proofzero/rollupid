@@ -1,5 +1,5 @@
 import { Outlet, useLoaderData } from '@remix-run/react'
-import type { LoaderFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
 
 import createAccountClient from '@proofzero/platform-clients/account'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
@@ -69,6 +69,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     CONSOLE_URL: context.env.CONSOLE_APP_URL,
   }
 }
+
+export const meta: MetaFunction = () => ({
+  charset: 'utf-8',
+  title: 'Passport Settings',
+  viewport: 'width=device-width,initial-scale=1',
+})
 
 export default function SettingsLayout() {
   const { authorizedApps, addressProfiles, displayName, pfpUrl, CONSOLE_URL } =
