@@ -55,6 +55,7 @@ export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
 export const appRouter = t.router({
   getProfile: t.procedure
     .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
     .use(Analytics)
@@ -72,6 +73,7 @@ export const appRouter = t.router({
     .mutation(setProfileMethod),
   getAddresses: t.procedure
     .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
     .use(Analytics)
