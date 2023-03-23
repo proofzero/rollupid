@@ -19,6 +19,7 @@ import { getValidatedSessionContext } from '~/session.server'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
 import type { AddressURN } from '@proofzero/urns/address'
+import { RollupError, ERROR_CODES } from '@proofzero/errors'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const { jwt, accountUrn } = await getValidatedSessionContext(
@@ -32,36 +33,44 @@ export const action: ActionFunction = async ({ request, context }) => {
     formData.get('appClientIds') as string
   ) as string[]
 
-  const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-  const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
+  try {
+    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
+    const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
 
-  const addresses = await accountClient.getAddresses.query({
-    account: accountUrn,
-  })
+    const addresses = await accountClient.getAddresses.query({
+      account: accountUrn,
+    })
 
-  const addressURNs = addresses?.map(
-    (address) => address.baseUrn
-  ) as AddressURN[]
+    const addressURNs = addresses?.map(
+      (address) => address.baseUrn
+    ) as AddressURN[]
 
-  await Promise.all([
-    Promise.all(
-      addressURNs.map((addressURN) => {
-        const addressClient = getAddressClient(
-          addressURN,
-          context.env,
-          context.traceSpan,
-          jwt
-        )
-        return addressClient.deleteAddressNodeMethod.mutate(accountUrn)
-      })
-    ),
-    accountClient.deleteAccountNode.mutate({ account: accountUrn }),
-    Promise.all(
-      clientIds.map((clientId) => {
-        return accessClient.revokeAppAuthorization.mutate({ clientId })
-      })
-    ),
-  ])
+    await Promise.all([
+      Promise.all(
+        addressURNs.map((addressURN) => {
+          const addressClient = getAddressClient(
+            addressURN,
+            context.env,
+            context.traceSpan,
+            jwt
+          )
+          return addressClient.deleteAddressNodeMethod.mutate(accountUrn)
+        })
+      ),
+      accountClient.deleteAccountNode.mutate({ account: accountUrn }),
+      Promise.all(
+        clientIds.map((clientId) => {
+          return accessClient.revokeAppAuthorization.mutate({ clientId })
+        })
+      ),
+    ])
+  } catch (ex) {
+    console.error(ex)
+    throw new RollupError({
+      message: 'Unable to delete Rollup Identity',
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+    })
+  }
   return redirect('/')
 }
 
