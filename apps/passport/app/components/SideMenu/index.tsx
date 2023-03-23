@@ -207,7 +207,7 @@ const navigation = {
       name: 'Applications',
       href: '/settings/applications',
       icon: TbApps,
-      exists: false,
+      exists: true,
     },
   ],
   advanced: [

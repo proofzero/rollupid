@@ -52,7 +52,7 @@ const RevocationModal = ({
   const localFetcher = useFetcher()
 
   useEffect(() => {
-    localFetcher.load(`/settings/apps/${clientId}/scopes`)
+    localFetcher.load(`/settings/applications/${clientId}/scopes`)
   }, [clientId])
 
   return (
@@ -111,7 +111,7 @@ const RevocationModal = ({
           </Button>
 
           <fetcher.Form
-            action={`/settings/apps/${clientId}/revoke`}
+            action={`/settings/applications/${clientId}/revoke`}
             method="post"
           >
             <Button type="submit" btnType="dangerous-alt">

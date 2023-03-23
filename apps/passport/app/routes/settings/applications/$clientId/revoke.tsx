@@ -46,7 +46,7 @@ export const action: ActionFunction = async ({ request, params, context }) => {
     )
   }
 
-  return redirect('/settings/apps', {
+  return redirect('/settings/applications', {
     headers: {
       'Set-Cookie': await commitFlashSession(context.env, session),
     },
