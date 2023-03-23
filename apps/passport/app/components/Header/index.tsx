@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 import { Avatar } from '@proofzero/design-system'
-import { Form, NavLink } from '@remix-run/react'
+import { NavLink } from '@remix-run/react'
 import { Menu, Transition } from '@headlessui/react'
 import PassportIcon from '../../assets/PassportIcon.svg'
 
@@ -20,7 +20,7 @@ const Header = ({ pfpUrl }: { pfpUrl: string }) => {
           className="h-[40px] w-[40px] lg:hidden"
         />
       </NavLink>
-      <Form className="max-lg:hidden">
+      <div className="hidden lg:block">
         <Menu>
           <Menu.Button className={'rounded-full bg-gray-800'}>
             <Avatar size="xs" src={pfpUrl} />
@@ -60,7 +60,7 @@ const Header = ({ pfpUrl }: { pfpUrl: string }) => {
             </Menu.Items>
           </Transition>
         </Menu>
-      </Form>
+      </div>
     </div>
   )
 }

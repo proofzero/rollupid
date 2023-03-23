@@ -29,8 +29,6 @@ export type AddressListItemProps = {
   address: string
   primary?: boolean
   hidden?: boolean
-  wallet?: string
-  network?: string
   onRenameAccount?: (id: string) => void
   onChangeAvatar?: (id: string) => void
   onSetPrimary?: (id: string) => void
