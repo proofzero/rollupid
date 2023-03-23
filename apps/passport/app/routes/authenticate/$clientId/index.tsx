@@ -26,9 +26,8 @@ import {
 import { getAccessClient } from '~/platform.server'
 import {
   getConsoleParamsSession,
-  requireJWT,
-  parseJwt,
   destroyConsoleParamsSession,
+  getValidatedSessionContext,
 } from '~/session.server'
 
 export const loader: LoaderFunction = async ({ params }) => {
@@ -52,18 +51,23 @@ export const action: ActionFunction = async ({ request, context, params }) => {
       })
   }
 
+  //Need to validate session before any redirects
+  const { accountUrn } = await getValidatedSessionContext(
+    request,
+    consoleParams,
+    context.env,
+    context.traceSpan
+  )
+
   // TODO: Make decision based on clientId params (console?)
   if (!consoleParams) return redirect(context.env.CONSOLE_APP_URL)
 
   const { redirectUri, state, clientId } = consoleParams
 
-  const jwt = await requireJWT(request, consoleParams, context.env)
-  const parsedJWT = parseJwt(jwt)
-  const account = parsedJWT.sub as AccountURN
   const responseType = ResponseType.Code
   const accessClient = getAccessClient(context.env, context.traceSpan)
   const authorizeRes = await accessClient.authorize.mutate({
-    account,
+    account: accountUrn,
     responseType,
     clientId,
     redirectUri,
