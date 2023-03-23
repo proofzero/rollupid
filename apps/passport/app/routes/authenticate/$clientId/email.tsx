@@ -124,7 +124,7 @@ export default () => {
               },
               {
                 method: 'post',
-                action: `/connect/email/otp`,
+                action: `/connect/email/register`,
               }
             )
           }}
