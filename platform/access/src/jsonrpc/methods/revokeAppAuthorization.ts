@@ -76,13 +76,6 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
       })
     }
 
-    // remove edge between app and accountURN
-    ctx.edgesClient.removeEdge.mutate({
-      tag: EDGE_AUTHORIZES,
-      src: accountURN,
-      dst: ApplicationURNSpace.urn(clientId),
-    })
-
     const accessNode = await initAccessNodeByName(name, ctx.Access)
     await accessNode.class.deleteAll()
   }
