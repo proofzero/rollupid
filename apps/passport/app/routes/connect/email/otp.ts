@@ -47,10 +47,10 @@ export const action: ActionFunction = async ({ request, context }) => {
     context.traceSpan
   )
 
-  const sucessfulVerification = await addressClient.verifyEmailOTP.mutate({
+  const successfulVerification = await addressClient.verifyEmailOTP.mutate({
     code: formData.get('code') as string,
     state: formData.get('state') as string,
   })
 
-  return json({ sucessfulVerification })
+  return json({ addressURN, successfulVerification })
 }
