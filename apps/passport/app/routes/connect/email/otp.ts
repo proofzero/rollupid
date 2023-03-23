@@ -55,7 +55,6 @@ export const action: ActionFunction = async ({ request, context }) => {
   const sucessfulVerification = await addressClient.verifyEmailOTP.mutate({
     code: formData.get('code') as string,
     state: formData.get('state') as string,
-    jwt: await getJWTConditionallyFromSession(request, context.env),
   })
 
   if (sucessfulVerification) {
@@ -63,14 +62,22 @@ export const action: ActionFunction = async ({ request, context }) => {
       .then((session) => JSON.parse(session.get('params')))
       .catch(() => null)
 
-    const accountURN = await addressClient.getAccount.query()
+    const { accountURN, existing } = await addressClient.resolveAccount.query({
+      jwt: await getJWTConditionallyFromSession(
+        request,
+        context.env,
+        appData?.clientId
+      ),
+      force: !appData || appData.prompt !== 'login',
+    })
 
     return authenticateAddress(
       addressURN,
       accountURN,
       appData,
       context.env,
-      context.traceSpan
+      context.traceSpan,
+      existing
     )
   }
 
