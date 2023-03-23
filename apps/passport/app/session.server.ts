@@ -181,7 +181,14 @@ export async function createConsoleParamsSession(
   const session = await storage.getSession()
   session.set('params', JSON.stringify(consoleParams))
 
-  return redirect(`/authenticate/${consoleParams.clientId}`, {
+  let redirectURL = `/authenticate/${consoleParams.clientId}`
+  if (consoleParams.prompt) {
+    const qp = new URLSearchParams()
+    qp.append('prompt', consoleParams.prompt)
+    redirectURL += `?${qp.toString()}`
+  }
+
+  return redirect(redirectURL, {
     headers: {
       'Set-Cookie': await storage.commitSession(session),
     },
