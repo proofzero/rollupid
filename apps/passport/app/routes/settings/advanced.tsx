@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import { Form, useOutletContext } from '@remix-run/react'
+import { redirect } from '@remix-run/cloudflare'
 
 import { Text } from '@proofzero/design-system'
 import { Button } from '@proofzero/design-system'
@@ -61,6 +62,7 @@ export const action: ActionFunction = async ({ request, context }) => {
       })
     ),
   ])
+  return redirect('/')
 }
 
 const DeleteRollupIdentityModal = ({
