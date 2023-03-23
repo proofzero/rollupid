@@ -25,6 +25,21 @@ const EmailPanel = ({ loading, onSendCode, onGoBack }: EmailPanelProps) => {
   const [isValidEmail, setIsValidEmail] = useState(false)
   const [email, setEmail] = useState('')
 
+  useEffect(() => {
+    const handleKeyPress = (evt: KeyboardEvent) => {
+      if (evt.key === 'Enter' && isValidEmail) {
+        evt.preventDefault()
+        onSendCode(email)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [isValidEmail, email])
+
   return (
     <>
       <section className="relative flex justify-center items-center mb-8">

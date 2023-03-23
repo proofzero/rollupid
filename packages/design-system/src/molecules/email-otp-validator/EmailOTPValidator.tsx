@@ -60,6 +60,31 @@ export default ({
     }
   }, [invalid])
 
+  useEffect(() => {
+    const handleKeyPress = (evt: KeyboardEvent) => {
+      if (
+        evt.key === 'Enter' &&
+        fullCode.length === inputLen &&
+        !loading &&
+        !isInvalid
+      ) {
+        evt.preventDefault()
+
+        const asyncFn = async () => {
+          await requestVerification(email, fullCode, state)
+        }
+
+        asyncFn()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [email, fullCode, state, loading, isInvalid])
+
   return (
     <>
       <section className="relative flex justify-center items-center">
@@ -205,7 +230,12 @@ export default ({
           btnSize="xl"
           btnType="primary-alt"
           className="flex-1"
-          disabled={fullCode.length !== inputLen || loading}
+          disabled={
+            fullCode.length !== inputLen ||
+            loading ||
+            isInvalid ||
+            showInvalidMessage
+          }
           onClick={async () => {
             setShowInvalidMessage(false)
 
