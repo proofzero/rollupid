@@ -13,6 +13,14 @@ import {
   ExpiredTokenError,
   InvalidTokenError,
 } from '@proofzero/utils/token'
+import { getAccountClient } from './platform.server'
+import { TraceSpan } from '@proofzero/platform-middleware/trace'
+import { UnauthorizedError } from '@proofzero/errors'
+import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
+
+export const InvalidSessionAccountError = new UnauthorizedError({
+  message: 'Session account is not valid',
+})
 
 // FLASH SESSION
 
@@ -138,7 +146,7 @@ export async function logout(
   clientId?: string
 ) {
   const session = await getUserSession(request, env, clientId)
-  return destroyUserSession(session, redirectTo, env, clientId, true)
+  return await destroyUserSession(session, redirectTo, env, clientId, true)
 }
 
 // CONSOLE PARAMS
@@ -211,11 +219,16 @@ export async function destroyConsoleParamsSession(
   return storage.destroySession(gps)
 }
 
-export async function requireJWT(
+export type ValidatedSessionContext = {
+  jwt: string
+  accountUrn: AccountURN
+}
+export async function getValidatedSessionContext(
   request: Request,
   consoleParams: ConsoleParams,
-  env: Env
-) {
+  env: Env,
+  traceSpan: TraceSpan
+): Promise<ValidatedSessionContext> {
   const session = await getUserSession(
     request,
     env,
@@ -223,23 +236,42 @@ export async function requireJWT(
   )
   const jwt = session.get('jwt')
 
+  let result: ValidatedSessionContext
   try {
-    checkToken(jwt)
-    return jwt
+    const payload = checkToken(jwt)
+    const accountClient = getAccountClient(jwt, env, traceSpan)
+    if (
+      !AccountURNSpace.is(payload.sub!) ||
+      !(await accountClient.isValid.query())
+    )
+      throw InvalidSessionAccountError
+    return {
+      jwt,
+      accountUrn: payload.sub as AccountURN,
+    }
   } catch (error) {
+    const redirectTo = `/authenticate/${consoleParams?.clientId ?? ''}`
     if (error === InvalidTokenError)
       if (consoleParams.clientId)
         throw await createConsoleParamsSession(consoleParams, env)
-      else throw redirect('/authenticate')
-    else if (error === ExpiredTokenError) {
+      else throw redirect(redirectTo)
+    else if (
+      error === ExpiredTokenError ||
+      error === InvalidSessionAccountError
+    ) {
+      console.error(
+        'Session/token error encountered. Invalidating session and redirecting to login page'
+      )
       throw await destroyUserSession(
         session,
-        '/authenticate',
+        redirectTo,
         env,
-        consoleParams?.clientId ?? undefined
+        consoleParams?.clientId ?? undefined,
+        true
       )
     }
   }
+  return result!
 }
 
 export async function getJWTConditionallyFromSession(

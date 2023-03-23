@@ -1,46 +1,31 @@
 import { Outlet, useLoaderData } from '@remix-run/react'
 import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
-
-import createAccountClient from '@proofzero/platform-clients/account'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
-import createAddressClient from '@proofzero/platform-clients/address'
-
-import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import { getUserSession, parseJwt } from '~/session.server'
-
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import { PlatformAddressURNHeader } from '@proofzero/types/headers'
-
+import { getValidatedSessionContext } from '~/session.server'
 import { Popover } from '@headlessui/react'
 import SideMenu from '~/components/SideMenu'
 import Header from '~/components/Header'
 
-import type { AccountURN } from '@proofzero/urns/account'
 import type { AddressURN } from '@proofzero/urns/address'
-import { UnauthorizedError } from '@proofzero/errors'
+import {
+  getAccountClient,
+  getAddressClient,
+  getStarbaseClient,
+} from '~/platform.server'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const { data } = await getUserSession(request, context.env)
-  const jwt = data.jwt
-  const traceHeader = generateTraceContextHeaders(context.traceSpan)
-  const accountURN = parseJwt(jwt).sub as AccountURN
+  const { jwt, accountUrn } = await getValidatedSessionContext(
+    request,
+    context.consoleParams,
+    context.env,
+    context.traceSpan
+  )
 
-  if (!jwt) {
-    throw new UnauthorizedError({ message: 'not authenticated' })
-  }
+  const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
 
-  const accountClient = createAccountClient(context.env.Account, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...traceHeader,
-  })
-
-  const starbaseClient = createStarbaseClient(context.env.Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...traceHeader,
-  })
+  const starbaseClient = getStarbaseClient(jwt, context.env, context.traceSpan)
 
   const accountProfile = await accountClient.getProfile.query({
-    account: accountURN,
+    account: accountUrn,
   })
 
   const addressURNList = accountProfile?.addresses?.map(
@@ -50,11 +35,11 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const awaitedResult = await Promise.all([
     starbaseClient.listApps.query(),
     ...addressURNList.map((address) => {
-      const addressClient = createAddressClient(context.env.Address, {
-        [PlatformAddressURNHeader]: address,
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...traceHeader,
-      })
+      const addressClient = getAddressClient(
+        address,
+        context.env,
+        context.traceSpan
+      )
       return addressClient.getAddressProfile.query()
     }),
   ])

@@ -5,10 +5,8 @@ import { Outlet, useLoaderData } from '@remix-run/react'
 import { getAccountClient } from '~/platform.server'
 import {
   createConsoleParamsSession,
-  parseJwt,
-  requireJWT,
+  getValidatedSessionContext,
 } from '~/session.server'
-import type { AccountURN } from '@proofzero/urns/account'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
@@ -23,10 +21,14 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   }
 
   // this will redirect unauthenticated users to the auth page but maintain query params
-  const jwt = await requireJWT(request, context.consoleParams, context.env)
-  const account = parseJwt(jwt).sub as AccountURN
+  const { jwt, accountUrn } = await getValidatedSessionContext(
+    request,
+    context.consoleParams,
+    context.env,
+    context.traceSpan
+  )
   const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-  const profile = await accountClient.getProfile.query({ account })
+  const profile = await accountClient.getProfile.query({ account: accountUrn })
 
   return json({ profile })
 }
