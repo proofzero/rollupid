@@ -87,6 +87,10 @@ export default () => {
 
           break
         case 'verify':
+          if (fetcher.data.state) {
+            setState(fetcher.data.state)
+          }
+
           setVerified(fetcher.data.sucessfulVerification)
 
           break
