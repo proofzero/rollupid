@@ -1,4 +1,3 @@
-import { Button } from '@proofzero/design-system'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
@@ -16,7 +15,6 @@ import { HiCheck, HiOutlineMail } from 'react-icons/hi'
 import { Authentication, ConnectButton } from '~/components'
 import ConnectOAuthButton from '~/components/connect-oauth-button'
 import { ResponseType } from '@proofzero/types/access'
-import { AccountURN } from '@proofzero/urns/account'
 import {
   ActionFunction,
   redirect,
