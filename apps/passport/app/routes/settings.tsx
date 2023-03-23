@@ -10,7 +10,6 @@ import {
   getAddressClient,
   getStarbaseClient,
 } from '~/platform.server'
-import type { AccountURN } from '@proofzero/urns/account'
 import type { AddressURN } from '@proofzero/urns/address'
 import type { NodeType } from '@proofzero/types/address'
 
