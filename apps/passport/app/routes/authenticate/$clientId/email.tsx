@@ -1,9 +1,5 @@
 import { json, LoaderFunction } from '@remix-run/cloudflare'
-import {
-  useFetcher,
-  useLoaderData,
-  useNavigate,
-} from '@remix-run/react'
+import { useFetcher, useLoaderData, useNavigate } from '@remix-run/react'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
@@ -107,7 +103,14 @@ export default () => {
           email={email!}
           state={state!}
           invalid={verified === false}
-          requestRegeneration={async () => {}}
+          requestRegeneration={async () => {
+            if (!email) return
+
+            const qp = new URLSearchParams()
+            qp.append('address', email)
+
+            fetcher.load(`/connect/email/otp?${qp.toString()}`)
+          }}
           requestVerification={async (email, code, state) => {
             fetcher.submit(
               {
