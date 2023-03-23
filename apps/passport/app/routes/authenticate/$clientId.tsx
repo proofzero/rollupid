@@ -12,7 +12,6 @@ import type { AccountURN } from '@proofzero/urns/account'
 import { getAccountClient, getStarbaseClient } from '~/platform.server'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
-  console.log('RAAAN')
   let clientId
   const headers = new Headers()
 

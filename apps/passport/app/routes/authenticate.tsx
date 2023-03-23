@@ -3,7 +3,7 @@ import { json } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 import { Suspense } from 'react'
 
-import { getConsoleParamsSession, getUserSession } from '~/session.server'
+import { getUserSession } from '~/session.server'
 
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
 import { useCatch, useLoaderData, useOutletContext } from '@remix-run/react'
