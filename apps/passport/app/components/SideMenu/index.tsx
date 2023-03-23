@@ -32,7 +32,7 @@ const activeStyle = {
 // -----------------------------------------------------------------------------
 const PassportLogo = () => {
   return (
-    <Link to="/">
+    <Link to="/settings">
       <img
         className="mx-4 h-[80px] max-w-[180px]"
         src={passportLogo}
@@ -112,7 +112,7 @@ export default function SideMenu({ open, CONSOLE_URL }: PassportMenuProps) {
       {/* Mobile Menu */}
       <div className="lg:hidden">
         <Popover.Button
-          className="absolute top-0 right-2 my-5 items-right rounded-lg
+          className="absolute top-0 right-2 my-[19px] items-right rounded-lg
               justify-right bg-white border p-2 text-black hover:bg-gray-50
                focus:outline-none focus:ring-2 focus:ring-white
               focus:ring-offset-2 focus:ring-offset-gray-800"
@@ -137,40 +137,50 @@ export default function SideMenu({ open, CONSOLE_URL }: PassportMenuProps) {
       >
         <Popover.Panel
           className={`
-          bg-white border mt-[80px] lg:hidden z-[100] min-h-[calc(100%-80px)] w-[240px]
-          flex flex-col`}
+          bg-white border mt-[80px] lg:hidden z-[100]
+          min-h-[416px] h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] w-[240px]
+          `}
           ref={setPopperElement}
           style={{ position: 'absolute', right: '0', top: '0' }}
           {...attributes.popper}
         >
-          <MobileAppSubmenu ref={setReferenceElement} />
-          <div className="mt-auto block border-t lg:hidden">
-            <ConsolenNavItem CONSOLE_URL={CONSOLE_URL} />
-            <NavLink
-              target="_blank"
-              to={'/signout'}
-              style={({ isActive }) => {
-                return isActive ? activeStyle : undefined
-              }}
-              className={({ isActive }) => `text-sm group ${
-                isActive ? 'border-l-2' : ''
-              } px-4 py-4
-               flex self-center justify-start
-               flex-row  items-center text-red-500 hover:bg-gray-100`}
-            >
-              <IoMdExit size={24} className="-ml-1 mr-3" />
+          {({ close }) => {
+            return (
+              <div className="flex h-full flex-col">
+                <MobileAppSubmenu ref={setReferenceElement} close={close} />
+                <div className="mt-auto block border-t lg:hidden">
+                  <ConsolenNavItem CONSOLE_URL={CONSOLE_URL} />
+                  <NavLink
+                    target="_blank"
+                    to={'/signout'}
+                    onClick={() => {
+                      close()
+                    }}
+                    style={({ isActive }) => {
+                      return isActive ? activeStyle : undefined
+                    }}
+                    className={({ isActive }) => `text-sm group ${
+                      isActive ? 'border-l-2' : ''
+                    } px-4 py-4
+                  flex self-center justify-start
+                  flex-row  items-center text-red-500 hover:bg-gray-100`}
+                  >
+                    <IoMdExit size={24} className="-ml-1 mr-3" />
 
-              <span className={'self-center'}>
-                <Text
-                  className="truncate self-center"
-                  size="sm"
-                  weight="medium"
-                >
-                  Sign Out
-                </Text>
-              </span>
-            </NavLink>
-          </div>
+                    <span className={'self-center'}>
+                      <Text
+                        className="truncate self-center"
+                        size="sm"
+                        weight="medium"
+                      >
+                        Sign Out
+                      </Text>
+                    </span>
+                  </NavLink>
+                </div>
+              </div>
+            )
+          }}
         </Popover.Panel>
       </Transition>
     </div>
@@ -232,23 +242,23 @@ const AppSubmenu = () => {
   )
 }
 
-const MobileAppSubmenu = () => {
+const MobileAppSubmenu = ({ close }: { close: () => void }) => {
   return (
     <div>
       {navigation.general.map((item) => (
-        <SideMenuItem key={item.name} item={item} />
+        <SideMenuItem key={item.name} item={item} close={close} />
       ))}
       <Text size="xs" className="text-left ml-3 pt-5 pb-1 text-gray-500">
         CONNECTIONS
       </Text>
       {navigation.connections.map((item) => (
-        <SideMenuItem key={item.name} item={item} />
+        <SideMenuItem key={item.name} item={item} close={close} />
       ))}
       <Text size="xs" className="text-left ml-3 pt-5 pb-1 text-gray-500">
         ADVANCED
       </Text>
       {navigation.advanced.map((item) => (
-        <SideMenuItem key={item.name} item={item} />
+        <SideMenuItem key={item.name} item={item} close={close} />
       ))}
     </div>
   )
