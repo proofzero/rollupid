@@ -117,7 +117,7 @@ export default ({
               maxLength={1}
               minLength={1}
               onClick={() => {
-                inputRefs[i].current.select()
+                inputRefs[i].current.focus()
               }}
               onChange={(ev) => {
                 if (ev.target.value === '') return
@@ -163,7 +163,6 @@ export default ({
               }}
               onFocus={() => {
                 if (isInvalid && inputRefs[i].current) {
-                  inputRefs[i].current.value = ''
                   setIsInvalid(false)
                 }
 
@@ -230,12 +229,7 @@ export default ({
           btnSize="xl"
           btnType="primary-alt"
           className="flex-1"
-          disabled={
-            fullCode.length !== inputLen ||
-            loading ||
-            isInvalid ||
-            showInvalidMessage
-          }
+          disabled={fullCode.length !== inputLen || loading || isInvalid}
           onClick={async () => {
             setShowInvalidMessage(false)
 

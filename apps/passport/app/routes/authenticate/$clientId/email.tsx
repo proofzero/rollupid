@@ -59,6 +59,7 @@ const EmailPanel = ({ loading, onSendCode, onGoBack }: EmailPanelProps) => {
           label="Enter your email address"
           pattern="[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
           required
+          autoFocus
           onChange={(evt) => {
             setEmail(evt.target.value)
             setIsValidEmail(evt.target.checkValidity())
@@ -106,7 +107,7 @@ export default () => {
             setState(fetcher.data.state)
           }
 
-          setVerified(fetcher.data.sucessfulVerification)
+          setVerified(fetcher.data.successfulVerification)
 
           break
       }

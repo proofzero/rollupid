@@ -8,32 +8,24 @@ import {
   getJWTConditionallyFromSession,
 } from '~/session.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
+import { action as otpAction } from './otp'
 
-export const action: ActionFunction = async ({ request, context }) => {
-  const formData = await request.formData()
-  const address = formData.get('address') as string
-  if (!address) throw new Error('No address included in request')
+export const action: ActionFunction = async (args) => {
+  const actionRes = await otpAction(args)
+  const { addressURN, successfulVerification } = await actionRes.json()
 
-  const addressURN = AddressURNSpace.componentizedUrn(
-    generateHashedIDRef(EmailAddressType.Email, address),
-    { node_type: NodeType.Email, addr_type: EmailAddressType.Email },
-    { alias: address, hidden: 'true' }
-  )
-  const addressClient = getAddressClient(
-    addressURN,
-    context.env,
-    context.traceSpan
-  )
+  if (successfulVerification) {
+    const { request, context } = args
 
-  const sucessfulVerification = await addressClient.verifyEmailOTP.mutate({
-    code: formData.get('code') as string,
-    state: formData.get('state') as string,
-  })
-
-  if (sucessfulVerification) {
     const appData = await getConsoleParamsSession(request, context.env)
       .then((session) => JSON.parse(session.get('params')))
       .catch(() => null)
+
+    const addressClient = getAddressClient(
+      addressURN,
+      context.env,
+      context.traceSpan
+    )
 
     const { accountURN, existing } = await addressClient.resolveAccount.query({
       jwt: await getJWTConditionallyFromSession(
@@ -53,6 +45,5 @@ export const action: ActionFunction = async ({ request, context }) => {
       existing
     )
   }
-
-  return json({ sucessfulVerification })
+  return json({ successfulVerification })
 }
