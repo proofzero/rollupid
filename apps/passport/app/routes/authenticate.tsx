@@ -3,7 +3,7 @@ import { json } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 import { Suspense } from 'react'
 
-import { getUserSession } from '~/session.server'
+import { getConsoleParamsSession, getUserSession } from '~/session.server'
 
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
 import { useCatch, useLoaderData, useOutletContext } from '@remix-run/react'
@@ -14,8 +14,16 @@ import sideGraphics from '~/assets/auth-side-graphics.svg'
 // TODO: loader function check if we have a session already
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context, params }) => {
+  const lastCPS = await getConsoleParamsSession(request, context.env, 'last')
+    .then((session) => JSON.parse(session.get('params')))
+    .catch((err) => {
+      console.log('No console params session found')
+      return null
+    })
+
+  const prompt = lastCPS?.prompt
+
   const searchParams = new URL(request.url).searchParams
-  const prompt = searchParams.get('prompt')
 
   const session = await getUserSession(request, context.env, params.clientId)
   const jwt = session.get('jwt')
