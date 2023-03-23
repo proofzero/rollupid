@@ -5,10 +5,9 @@ import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import {
-  generateTraceContextHeaders,
-  TraceSpan,
-} from '@proofzero/platform-middleware/trace'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+
+import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 
 export function getStarbaseClient(jwt: string, env: Env, traceSpan: TraceSpan) {
   return createStarbaseClient(env.Starbase, {
@@ -17,17 +16,22 @@ export function getStarbaseClient(jwt: string, env: Env, traceSpan: TraceSpan) {
   })
 }
 
-export function getAccessClient(env: Env, traceSpan: TraceSpan) {
-  return createAccessClient(env.Access, generateTraceContextHeaders(traceSpan))
+export function getAccessClient(env: Env, traceSpan: TraceSpan, jwt?: string) {
+  return createAccessClient(env.Access, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...generateTraceContextHeaders(traceSpan),
+  })
 }
 
 export function getAddressClient(
   addressUrn: string,
   env: Env,
-  traceSpan: TraceSpan
+  traceSpan: TraceSpan,
+  jwt?: string
 ) {
   return createAddressClient(env.Address, {
     [PlatformAddressURNHeader]: addressUrn,
+    ...getAuthzHeaderConditionallyFromToken(jwt),
     ...generateTraceContextHeaders(traceSpan),
   })
 }

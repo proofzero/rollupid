@@ -6,6 +6,7 @@ import { initAccessNodeByName } from '../../nodes'
 import { EDGE_AUTHORIZES } from '../../constants'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { AccessURNSpace } from '@proofzero/urns/access'
+import { ApplicationURNSpace } from '@proofzero/urns/application'
 
 export const RevokeAppAuthorizationMethodInput = z.object({
   clientId: z.string().min(1),
@@ -74,6 +75,13 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
         dst: edgesResult.edges[i].dst.baseUrn,
       })
     }
+
+    // remove edge between app and accountURN
+    ctx.edgesClient.removeEdge.mutate({
+      tag: EDGE_AUTHORIZES,
+      src: accountURN,
+      dst: ApplicationURNSpace.urn(clientId),
+    })
 
     const accessNode = await initAccessNodeByName(name, ctx.Access)
     await accessNode.class.deleteAll()

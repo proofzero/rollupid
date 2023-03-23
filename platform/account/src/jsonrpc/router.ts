@@ -28,13 +28,16 @@ import { Scopes } from '@proofzero/platform-middleware/scopes'
 import { initAccountNodeByName } from '../nodes'
 import { Analytics } from '@proofzero/platform-middleware/analytics'
 import { getPublicAddressesMethod } from './methods/getPublicAddresses'
-
 import {
   GetAuthorizedAppsMethodInput,
   GetAuthorizedAppsMethodOutput,
   getAuthorizedAppsMethod,
 } from './methods/getAuthorizedApps'
 import { isValidMethod, IsValidOutput } from './methods/isValid'
+import {
+  DeleteAccountNodeInput,
+  deleteAccountNodeMethod,
+} from './methods/deleteAccountNode'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -120,4 +123,10 @@ export const appRouter = t.router({
     .input(GetAuthorizedAppsMethodInput)
     .output(GetAuthorizedAppsMethodOutput)
     .query(getAuthorizedAppsMethod),
+  deleteAccountNode: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .input(DeleteAccountNodeInput)
+    .mutation(deleteAccountNodeMethod),
 })
