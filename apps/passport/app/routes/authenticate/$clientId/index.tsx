@@ -29,6 +29,7 @@ import {
   destroyConsoleParamsSession,
   getValidatedSessionContext,
 } from '~/session.server'
+import AuthButton from '~/components/connect-button/AuthButton'
 
 export const loader: LoaderFunction = async ({ params }) => {
   return json({
@@ -126,6 +127,8 @@ export default () => {
   const transition = useTransition()
   const submit = useSubmit()
 
+  const navigate = useNavigate()
+
   useEffect(() => {
     if (transition.state === 'idle') {
       setLoading(false)
@@ -140,17 +143,7 @@ export default () => {
         <>
           {profile && prompt !== 'login' && (
             <>
-              <Button
-                btnType="secondary-alt"
-                style={{
-                  height: 50,
-                  width: '100%',
-                  fontSize: 16,
-                  fontWeight: 500,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
+              <AuthButton
                 onClick={() => {
                   submit(
                     {},
@@ -159,21 +152,20 @@ export default () => {
                     }
                   )
                 }}
-              >
-                <div className="flex flex-row items-center space-x-3">
-                  {profile.pfp?.image && (
-                    <img
-                      className="w-6 h-6 rounded-full"
-                      src={profile.pfp.image}
-                    />
-                  )}
-                  <Text weight="medium" className="text-gray-800">
-                    {profile.displayName}
-                  </Text>
+                Graphic={
+                  <>
+                    {profile.pfp?.image && (
+                      <img
+                        className="w-6 h-6 rounded-full"
+                        src={profile.pfp.image}
+                      />
+                    )}
+                  </>
+                }
+                text={profile.displayName}
+                Addon={<HiCheck className="w-3.5 h-3.5 text-indigo-500" />}
+              />
 
-                  <HiCheck className="w-3.5 h-3.5 text-indigo-500" />
-                </div>
-              </Button>
               <div className="my-1 flex flex-row items-center space-x-3">
                 <hr className="h-px w-16 bg-gray-500" />
                 <Text>or</Text>
@@ -236,6 +228,12 @@ export default () => {
                 setLoading(false)
               }
             }}
+          />
+
+          <AuthButton
+            onClick={() => navigate(`/authenticate/${clientId}/email`)}
+            Graphic={<HiOutlineMail className="w-full h-full" />}
+            text={'Connect with Email'}
           />
 
           {!profile && (
