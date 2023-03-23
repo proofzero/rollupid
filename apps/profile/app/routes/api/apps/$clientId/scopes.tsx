@@ -1,6 +1,6 @@
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import { LoaderFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/clients'
 import { requireJWT } from '~/utils/session.server'
 
