@@ -6,7 +6,6 @@ import { initAccessNodeByName } from '../../nodes'
 import { EDGE_AUTHORIZES } from '../../constants'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { AccessURNSpace } from '@proofzero/urns/access'
-import { ApplicationURNSpace } from '@proofzero/urns/application'
 
 export const RevokeAppAuthorizationMethodInput = z.object({
   clientId: z.string().min(1),
