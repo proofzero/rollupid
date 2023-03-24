@@ -38,8 +38,8 @@ import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
 import {
   FLASH_MESSAGE_KEY,
   FLASH_MESSAGE_VALUES,
-  FLASH_MESSAGE,
 } from './utils/flashMessage.server'
+import type { FLASH_MESSAGE } from './utils/flashMessage.server'
 
 import { getFlashSession, commitFlashSession } from './session.server'
 
@@ -88,19 +88,11 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
   const flashes = []
   const flashSession = await getFlashSession(request, context.env)
-  const flashMessageType = flashSession.get(FLASH_MESSAGE_KEY)
-  console.log({ flashMessageType })
-  if (
-    flashMessageType &&
-    Object.keys(FLASH_MESSAGE).includes(flashMessageType)
-  ) {
-    const messageType =
-      FLASH_MESSAGE[flashMessageType as keyof typeof FLASH_MESSAGE]
-    console.log({ messageType })
-    console.log({ blah: FLASH_MESSAGE_VALUES[messageType] })
+  const flashMessageType = flashSession.get(FLASH_MESSAGE_KEY) as FLASH_MESSAGE
+  if (flashMessageType) {
     flashes.push({
       type: ToastType.Info,
-      message: FLASH_MESSAGE_VALUES[messageType],
+      message: FLASH_MESSAGE_VALUES[flashMessageType],
     })
   }
 

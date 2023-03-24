@@ -1,9 +1,9 @@
 export const FLASH_MESSAGE_KEY = 'FLASH_MESSAGE_KEY'
 
-export const FLASH_MESSAGE = {
-  DELETE: 'DELETE',
-  SIGNOUT: 'SIGNOUT',
-} as const
+export enum FLASH_MESSAGE {
+  DELETE = 'DELETE',
+  SIGNOUT = 'SIGNOUT',
+}
 
 export const FLASH_MESSAGE_VALUES = {
   [FLASH_MESSAGE.DELETE]: 'Your Rollup Identity has been deleted.',
