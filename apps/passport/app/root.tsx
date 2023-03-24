@@ -16,7 +16,6 @@ import {
   Scripts,
   ScrollRestoration,
   useCatch,
-  useParams,
   useLocation,
   useTransition,
   useLoaderData,
@@ -48,7 +47,7 @@ import { NonceContext } from './components/nonce-context'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
-  title: 'Rollup - Passport',
+  title: 'Passport',
   viewport: 'width=device-width,initial-scale=1',
   'og:url': 'https://passport.rollup.id',
   'og:description': 'User identity in your control.',
