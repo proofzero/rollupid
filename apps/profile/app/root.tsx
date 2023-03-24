@@ -39,7 +39,7 @@ import * as gtag from '~/utils/gtags.client'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
-  title: 'Profile',
+  title: 'Profile - Rollup',
   viewport: 'width=device-width,initial-scale=1',
   'og:title': 'Rollup - Decentralized Identity',
   'og:site_name': 'Rollup',

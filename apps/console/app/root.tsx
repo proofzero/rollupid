@@ -31,7 +31,10 @@ import { useEffect } from 'react'
 
 import globalStyles from '@proofzero/design-system/src/styles/global.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
-import favIcon from './images/favicon.svg'
+import faviconSvg from './images/favicon.svg'
+import appleIcon from './images/apple-touch-icon.png'
+import icon32 from './images/favicon-32x32.png'
+import icon16 from './images/favicon-16x16.png'
 
 import * as gtag from '~/utils/gtags.client'
 
@@ -39,13 +42,16 @@ export const links: LinksFunction = () => {
   return [
     { rel: 'stylesheet', href: tailwindStylesheetUrl },
     { rel: 'stylesheet', href: globalStyles },
-    { rel: 'icon', href: favIcon },
+    { rel: 'apple-touch-icon', href: appleIcon, sizes: '180x180' },
+    { rel: 'icon', type: 'image/png', href: icon32, sizes: '32x32' },
+    { rel: 'icon', type: 'image/png', href: icon16, sizes: '16x16' },
+    { rel: 'shortcut icon', href: faviconSvg },
   ]
 }
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
-  title: 'Console',
+  title: 'Console - Rollup',
   viewport: 'width=device-width,initial-scale=1',
 })
 

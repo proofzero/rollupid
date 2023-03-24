@@ -26,10 +26,10 @@ import { RollupIdButton } from '~/components'
 import globalStyles from '@proofzero/design-system/src/styles/global.css'
 import styles from './styles/tailwind.css'
 
-import appleIcon from '~/assets/apple-touch-icon.png'
-import icon32 from '~/assets/favicon-32x32.png'
-import icon16 from '~/assets/favicon-16x16.png'
-import faviconSvg from '~/assets/favicon.svg'
+import appleIcon from '~/assets/root-apple-touch-icon.png'
+import icon32 from '~/assets/root-favicon-32x32.png'
+import icon16 from '~/assets/root-favicon-16x16.png'
+import faviconSvg from '~/assets/root-favicon.svg'
 import social from '~/assets/passport-social.png'
 
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
@@ -47,7 +47,7 @@ import { NonceContext } from './components/nonce-context'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
-  title: 'Passport',
+  title: 'Passport - Rollup',
   viewport: 'width=device-width,initial-scale=1',
   'og:url': 'https://passport.rollup.id',
   'og:description': 'User identity in your control.',
