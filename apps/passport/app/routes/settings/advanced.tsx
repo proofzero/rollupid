@@ -72,7 +72,8 @@ export const action: ActionFunction = async ({ request, context }) => {
       code: ERROR_CODES.INTERNAL_SERVER_ERROR,
     })
   }
-  return redirect('/')
+
+  return redirect('/signout')
 }
 
 const DeleteRollupIdentityModal = ({
