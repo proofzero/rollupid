@@ -26,12 +26,10 @@ export function getAccessClient(env: Env, traceSpan: TraceSpan, jwt?: string) {
 export function getAddressClient(
   addressUrn: string,
   env: Env,
-  traceSpan: TraceSpan,
-  jwt?: string
+  traceSpan: TraceSpan
 ) {
   return createAddressClient(env.Address, {
     [PlatformAddressURNHeader]: addressUrn,
-    ...getAuthzHeaderConditionallyFromToken(jwt),
     ...generateTraceContextHeaders(traceSpan),
   })
 }

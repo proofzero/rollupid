@@ -1,7 +1,6 @@
 import { useState } from 'react'
 
-import { Form, useOutletContext } from '@remix-run/react'
-import { redirect } from '@remix-run/cloudflare'
+import { Form } from '@remix-run/react'
 
 import { Text } from '@proofzero/design-system'
 import { Button } from '@proofzero/design-system'
@@ -31,18 +30,19 @@ export const action: ActionFunction = async ({ request, context }) => {
     context.env,
     context.traceSpan
   )
-  const formData = await request.formData()
-  const clientIds = JSON.parse(
-    formData.get('appClientIds') as string
-  ) as string[]
 
   try {
     const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
     const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
 
-    const addresses = await accountClient.getAddresses.query({
-      account: accountUrn,
-    })
+    const [addresses, apps] = await Promise.all([
+      accountClient.getAddresses.query({
+        account: accountUrn,
+      }),
+      accountClient.getAuthorizedApps.query({
+        account: accountUrn,
+      }),
+    ])
 
     const addressURNs = addresses?.map(
       (address) => address.baseUrn
@@ -54,15 +54,16 @@ export const action: ActionFunction = async ({ request, context }) => {
           const addressClient = getAddressClient(
             addressURN,
             context.env,
-            context.traceSpan,
-            jwt
+            context.traceSpan
           )
           return addressClient.deleteAddressNode.mutate(accountUrn)
         })
       ),
       Promise.allSettled(
-        clientIds.map((clientId) => {
-          return accessClient.revokeAppAuthorization.mutate({ clientId })
+        apps.map((app) => {
+          return accessClient.revokeAppAuthorization.mutate({
+            clientId: app.clientId,
+          })
         })
       ),
     ])
@@ -73,6 +74,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     throw new RollupError({
       message: 'Unable to delete Rollup Identity',
       code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      cause: ex,
     })
   }
 
@@ -82,11 +84,9 @@ export const action: ActionFunction = async ({ request, context }) => {
 const DeleteRollupIdentityModal = ({
   isOpen,
   setIsOpen,
-  appClientIds,
 }: {
   isOpen: boolean
   setIsOpen: (val: boolean) => void
-  appClientIds: string[]
 }) => {
   const [confirmationString, setConfirmationString] = useState('')
 
@@ -134,11 +134,6 @@ const DeleteRollupIdentityModal = ({
           </Button>
 
           <Form method="post">
-            <input
-              type="hidden"
-              name="appClientIds"
-              value={JSON.stringify(appClientIds)}
-            />
             <Button
               type="submit"
               btnType="dangerous-alt"
@@ -154,15 +149,6 @@ const DeleteRollupIdentityModal = ({
 }
 
 export default function AdvancedLayout() {
-  const { authorizedApps } = useOutletContext<{
-    authorizedApps: {
-      clientId: string
-      icon: string
-      title: string
-      timestamp: number
-    }[]
-  }>()
-  const appClientIds = authorizedApps?.map((app) => app.clientId) || []
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -170,11 +156,7 @@ export default function AdvancedLayout() {
       <Text weight="semibold" size="2xl" className="pb-6">
         Advanced Settings
       </Text>
-      <DeleteRollupIdentityModal
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        appClientIds={appClientIds}
-      />
+      <DeleteRollupIdentityModal isOpen={isOpen} setIsOpen={setIsOpen} />
       <article
         className="flex-1 flex flex-col sm:flex-row
       px-5 py-4 space-x-4 rounded-lg border items-end
