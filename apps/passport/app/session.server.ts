@@ -121,13 +121,18 @@ export function getUserSession(request: Request, env: Env, clientId?: string) {
 }
 
 export async function destroyUserSession(
-  request: Request,
+  requestOrSession: Request | Session,
   redirectTo: string,
   env: Env,
   flashMessage: FLASH_MESSAGE,
   clientId?: string
 ) {
-  const session = await getUserSession(request, env, clientId)
+  let session
+  if (requestOrSession instanceof Request) {
+    session = await getUserSession(requestOrSession, env, clientId)
+  } else {
+    session = requestOrSession
+  }
   const storage = getUserSessionStorage(env, clientId) // set max age to 0 to kill cookie
 
   const headers = new Headers()
@@ -259,7 +264,7 @@ export async function getValidatedSessionContext(
         'Session/token error encountered. Invalidating session and redirecting to login page'
       )
       throw await destroyUserSession(
-        request,
+        session,
         redirectTo,
         env,
         FLASH_MESSAGE.SIGNOUT,
