@@ -98,18 +98,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
-  title: 'Passport Settings',
+  title: 'Passport Settings - Rollup',
   viewport: 'width=device-width,initial-scale=1',
 })
 
 export default function SettingsLayout() {
-  const {
-    authorizedApps,
-    connectedProfiles,
-    displayName,
-    pfpUrl,
-    CONSOLE_URL,
-  } = useLoaderData()
+  const { authorizedApps, connectedProfiles, pfpUrl, CONSOLE_URL } =
+    useLoaderData()
 
   return (
     <Popover className="bg-gray-50 min-h-screen relative">
