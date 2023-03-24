@@ -16,7 +16,8 @@ import {
 } from '~/platform.server'
 import {
   getValidatedSessionContext,
-  deleteRollupIdentity,
+  destroyUserSession,
+  FLASH_MESSAGE,
 } from '~/session.server'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
@@ -78,7 +79,12 @@ export const action: ActionFunction = async ({ request, context }) => {
     })
   }
 
-  return await deleteRollupIdentity(request, '/', context.env)
+  return await destroyUserSession(
+    request,
+    '/',
+    context.env,
+    FLASH_MESSAGE.DELETE
+  )
 }
 
 const DeleteRollupIdentityModal = ({
