@@ -88,6 +88,7 @@ export default () => {
 
   const [email, setEmail] = useState<undefined | string>()
   const [state, setState] = useState<undefined | string>()
+  const [error, setError] = useState<undefined | string>()
 
   const [verified, setVerified] = useState<undefined | boolean>()
 
@@ -103,7 +104,9 @@ export default () => {
 
           break
         case 'verify':
-          if (fetcher.data.state) {
+          if (fetcher.data.error) {
+            setError(fetcher.data.message)
+          } else if (fetcher.data.state) {
             setState(fetcher.data.state)
           }
 
@@ -123,13 +126,14 @@ export default () => {
           email={email!}
           state={state!}
           invalid={verified === false}
+          error={error}
           requestRegeneration={async () => {
             if (!email) return
 
             const qp = new URLSearchParams()
             qp.append('address', email)
 
-            fetcher.load(`/connect/email/otp?${qp.toString()}`)
+            fetcher.load(`/connect/email/register?${qp.toString()}`)
           }}
           requestVerification={async (email, code, state) => {
             fetcher.submit(
@@ -160,7 +164,7 @@ export default () => {
             const qp = new URLSearchParams()
             qp.append('address', email)
 
-            fetcher.load(`/connect/email/otp?${qp.toString()}`)
+            fetcher.load(`/connect/email/register?${qp.toString()}`)
           }}
         />
       )

@@ -1,14 +1,34 @@
-import { EmailAddressType, NodeType } from '@proofzero/types/address'
-import { AddressURNSpace } from '@proofzero/urns/address'
-import { generateHashedIDRef } from '@proofzero/urns/idref'
-import { ActionFunction, json } from '@remix-run/cloudflare'
+import { ActionFunction, json, TypedResponse } from '@remix-run/cloudflare'
+import { LoaderFunction } from 'react-router'
 import { getAddressClient } from '~/platform.server'
 import {
   getConsoleParamsSession,
   getJWTConditionallyFromSession,
 } from '~/session.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
-import { action as otpAction } from './otp'
+import { loader as otpLoader, action as otpAction } from './otp'
+
+export const loader: LoaderFunction = async ({
+  request,
+  params,
+  context,
+}): Promise<
+  | TypedResponse<{ state: any }>
+  | TypedResponse<{ error: boolean; message: string }>
+> => {
+  try {
+    const loaderRes = await otpLoader({ request, params, context })
+    const { state } = await loaderRes.json()
+
+    return json({ state })
+  } catch (e) {
+    const parsedException = await (e as Response).json()
+    return json({
+      error: true,
+      message: parsedException as string,
+    })
+  }
+}
 
 export const action: ActionFunction = async (args) => {
   const actionRes = await otpAction(args)
