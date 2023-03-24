@@ -4,7 +4,7 @@ import type {
   LoaderFunction,
 } from '@remix-run/cloudflare'
 
-import { json } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
 
 import { useContext, useEffect } from 'react'
 
@@ -65,13 +65,32 @@ export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: globalStyles },
 ]
 
-export const loader: LoaderFunction = async ({ request, context }) => {
+export const loader: LoaderFunction = async ({ request, context, params }) => {
+  const url = new URL(request.url)
+  /**
+   * We use the same technique in profile for `$type/$address` route.
+   * This redirect here prevents us from calling this loader multiple times.
+   * In this case it's essential since flashSessions gets wiped out without
+   * displaying toast messages.
+   */
+
+  if (url.pathname === `/`) {
+    return redirect(`/authenticate`)
+  }
+
   const flashes = []
   const flashSession = await getFlashSession(request, context.env)
   if (flashSession.get('SIGNOUT')) {
     flashes.push({
       type: ToastType.Info,
       message: "You've been signed out",
+    })
+  }
+
+  if (flashSession.get('DELETE')) {
+    flashes.push({
+      type: ToastType.Info,
+      message: 'Your Rollup Identity has been deleted.',
     })
   }
 

@@ -292,3 +292,26 @@ export function parseJwt(token: string): JWTPayload {
   }
   return payload
 }
+
+export async function deleteRollupIdentity(
+  request: Request,
+  redirectTo: string,
+  env: Env,
+  clientId?: string
+) {
+  const session = await getUserSession(request, env, clientId)
+  const storage = getUserSessionStorage(env, clientId) // set max age to 0 to kill cookie
+
+  const headers = new Headers()
+  headers.append('Set-Cookie', await storage.destroySession(session))
+
+  const flashStorage = getFlashSessionStorage(env)
+  const flashSession = await flashStorage.getSession()
+  flashSession.flash('DELETE', 'true')
+
+  headers.append('Set-Cookie', await flashStorage.commitSession(flashSession))
+
+  return redirect(redirectTo, {
+    headers,
+  })
+}

@@ -15,7 +15,10 @@ import {
   getAccessClient,
   getAddressClient,
 } from '~/platform.server'
-import { getValidatedSessionContext } from '~/session.server'
+import {
+  getValidatedSessionContext,
+  deleteRollupIdentity,
+} from '~/session.server'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
 import type { AddressURN } from '@proofzero/urns/address'
@@ -73,7 +76,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     })
   }
 
-  return redirect('/signout')
+  return await deleteRollupIdentity(request, '/', context.env)
 }
 
 const DeleteRollupIdentityModal = ({

@@ -26,10 +26,6 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     }
   }
 
-  if (!params.clientId) {
-    return redirect(`/authenticate/console`)
-  }
-
   return json({
     prompt,
   })
@@ -46,7 +42,7 @@ export default function Index() {
           'basis-2/5 h-screen w-full hidden lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
         }
       >
-        <img src={sideGraphics} />
+        <img src={sideGraphics} alt="Not Found" />
       </div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
         <Suspense fallback={''}>
