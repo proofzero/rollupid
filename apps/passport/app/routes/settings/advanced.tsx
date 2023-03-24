@@ -17,8 +17,9 @@ import {
 import {
   getValidatedSessionContext,
   destroyUserSession,
-  FLASH_MESSAGE,
 } from '~/session.server'
+
+import { FLASH_MESSAGE } from '~/utils/flashMessage.server'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
 import type { AddressURN } from '@proofzero/urns/address'

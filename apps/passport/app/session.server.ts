@@ -19,14 +19,11 @@ import { UnauthorizedError } from '@proofzero/errors'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import type { AccountURN } from '@proofzero/urns/account'
 
+import { FLASH_MESSAGE, FLASH_MESSAGE_KEY } from './utils/flashMessage.server'
+
 export const InvalidSessionAccountError = new UnauthorizedError({
   message: 'Session account is not valid',
 })
-
-export enum FLASH_MESSAGE {
-  DELETE = 'DELETE',
-  SIGNOUT = 'SIGNOUT',
-}
 
 // FLASH SESSION
 
@@ -141,7 +138,7 @@ export async function destroyUserSession(
   const flashStorage = getFlashSessionStorage(env)
   const flashSession = await flashStorage.getSession()
 
-  flashSession.flash(flashMessage, 'true')
+  flashSession.flash(FLASH_MESSAGE_KEY, flashMessage)
 
   headers.append('Set-Cookie', await flashStorage.commitSession(flashSession))
 

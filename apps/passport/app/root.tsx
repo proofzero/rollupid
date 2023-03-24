@@ -36,13 +36,21 @@ import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
 
 import {
+  FLASH_MESSAGE_KEY,
+  FLASH_MESSAGE_VALUES,
+  FLASH_MESSAGE,
+} from './utils/flashMessage.server'
+
+import { getFlashSession, commitFlashSession } from './session.server'
+
+import {
   toast,
   Toaster,
   ToastType,
 } from '@proofzero/design-system/src/atoms/toast'
 
 import * as gtag from '~/utils/gtags.client'
-import { commitFlashSession, getFlashSession } from './session.server'
+
 import { NonceContext } from './components/nonce-context'
 
 export const meta: MetaFunction = () => ({
@@ -80,17 +88,19 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
   const flashes = []
   const flashSession = await getFlashSession(request, context.env)
-  if (flashSession.get('SIGNOUT')) {
+  const flashMessageType = flashSession.get(FLASH_MESSAGE_KEY)
+  console.log({ flashMessageType })
+  if (
+    flashMessageType &&
+    Object.keys(FLASH_MESSAGE).includes(flashMessageType)
+  ) {
+    const messageType =
+      FLASH_MESSAGE[flashMessageType as keyof typeof FLASH_MESSAGE]
+    console.log({ messageType })
+    console.log({ blah: FLASH_MESSAGE_VALUES[messageType] })
     flashes.push({
       type: ToastType.Info,
-      message: "You've been signed out",
-    })
-  }
-
-  if (flashSession.get('DELETE')) {
-    flashes.push({
-      type: ToastType.Info,
-      message: 'Your Rollup Identity has been deleted.',
+      message: FLASH_MESSAGE_VALUES[messageType],
     })
   }
 

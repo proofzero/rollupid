@@ -1,5 +1,7 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import { destroyUserSession, FLASH_MESSAGE } from '~/session.server'
+import { destroyUserSession } from '~/session.server'
+
+import { FLASH_MESSAGE } from '~/utils/flashMessage.server'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
