@@ -1,8 +1,6 @@
 import { z } from 'zod'
 import { inputValidators } from '@proofzero/platform-middleware'
 import { Context } from '../../context'
-import { deleteAccountNodeByName } from '../../nodes'
-import { UnauthorizedError } from '@proofzero/errors'
 
 export const DeleteAccountNodeInput = z.object({
   account: inputValidators.AccountURNInput,
@@ -17,11 +15,8 @@ export const deleteAccountNodeMethod = async ({
   input: DeleteAccountNodeParams
   ctx: Context
 }) => {
-  if (!ctx.accountURN)
-    throw new UnauthorizedError({ message: 'account not found' })
-
   if (ctx.accountURN === input.account) {
-    await deleteAccountNodeByName(input.account, ctx.Account)
+    await ctx.account?.storage.deleteAll()
   }
 
   return null

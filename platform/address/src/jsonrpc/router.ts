@@ -203,7 +203,7 @@ export const appRouter = t.router({
     .use(initAddressNode)
     .output(InitVaultOutput)
     .mutation(initVaultMethod),
-  deleteAddressNodeMethod: t.procedure
+  deleteAddressNode: t.procedure
     .use(LogUsage)
     .use(parse3RN)
     .use(checkCryptoNodes)

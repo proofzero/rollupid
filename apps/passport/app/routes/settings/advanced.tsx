@@ -54,7 +54,7 @@ export const action: ActionFunction = async ({ request, context }) => {
             context.traceSpan,
             jwt
           )
-          return addressClient.deleteAddressNodeMethod.mutate(accountUrn)
+          return addressClient.deleteAddressNode.mutate(accountUrn)
         })
       ),
       accountClient.deleteAccountNode.mutate({ account: accountUrn }),
