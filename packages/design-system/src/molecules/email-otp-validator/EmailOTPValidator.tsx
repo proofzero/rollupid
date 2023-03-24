@@ -178,7 +178,7 @@ export default ({
           ))}
         </div>
 
-        {showInvalidMessage && (
+        {showInvalidMessage && invalid && (
           <Text
             size="sm"
             weight="medium"

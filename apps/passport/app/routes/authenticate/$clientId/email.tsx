@@ -1,9 +1,6 @@
 import { json, LoaderFunction } from '@remix-run/cloudflare'
 import { useFetcher, useLoaderData, useNavigate } from '@remix-run/react'
-import { HiOutlineArrowLeft } from 'react-icons/hi'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { Input } from '@proofzero/design-system/src/atoms/form/Input'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { EmailPanel } from '~/components/email/EmailPanel'
 import { EmailOTPValidator } from '@proofzero/design-system/src/molecules/email-otp-validator'
 import { useEffect, useState } from 'react'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
@@ -12,73 +9,6 @@ export const loader: LoaderFunction = async ({ params }) => {
   return json({
     clientId: params.clientId,
   })
-}
-
-type EmailPanelProps = {
-  loading: boolean
-
-  onSendCode: (email: string) => Promise<void>
-  onGoBack: () => void
-}
-
-const EmailPanel = ({ loading, onSendCode, onGoBack }: EmailPanelProps) => {
-  const [isValidEmail, setIsValidEmail] = useState(false)
-  const [email, setEmail] = useState('')
-
-  useEffect(() => {
-    const handleKeyPress = (evt: KeyboardEvent) => {
-      if (evt.key === 'Enter' && isValidEmail) {
-        evt.preventDefault()
-        onSendCode(email)
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyPress)
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress)
-    }
-  }, [isValidEmail, email])
-
-  return (
-    <>
-      <section className="relative flex justify-center items-center mb-8">
-        <HiOutlineArrowLeft
-          className="absolute -left-8 -top-8 lg:left-0 lg:top-0 w-6 h-6 cursor-pointer"
-          onClick={onGoBack}
-        />
-
-        <Text size="xl" weight="semibold" className="text-[#2D333A]">
-          Your Email Address
-        </Text>
-      </section>
-      <section className="flex-1">
-        <Input
-          type="email"
-          id="email"
-          label="Enter your email address"
-          pattern="[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
-          required
-          autoFocus
-          onChange={(evt) => {
-            setEmail(evt.target.value)
-            setIsValidEmail(evt.target.checkValidity())
-          }}
-        />
-      </section>
-      <section>
-        <Button
-          btnSize="xl"
-          btnType="primary-alt"
-          className="w-full"
-          disabled={!isValidEmail || loading}
-          onClick={() => onSendCode(email)}
-        >
-          Send Code
-        </Button>
-      </section>
-    </>
-  )
 }
 
 export default () => {
@@ -90,27 +20,36 @@ export default () => {
   const [state, setState] = useState<undefined | string>()
   const [error, setError] = useState<undefined | string>()
 
-  const [verified, setVerified] = useState<undefined | boolean>()
+  const [invalid, setInvalid] = useState<boolean>(false)
 
   const navigate = useNavigate()
+
   const fetcher = useFetcher()
 
   useEffect(() => {
     if (fetcher.type === 'done') {
       switch (screen) {
         case 'email':
-          setState(fetcher.data.state)
-          setScreen('verify')
+          if (fetcher.data.error) {
+            setError(fetcher.data.message)
+          } else if (fetcher.data.state) {
+            setError(undefined)
+            setState(fetcher.data.state)
+            setScreen('verify')
+          }
 
           break
         case 'verify':
           if (fetcher.data.error) {
             setError(fetcher.data.message)
           } else if (fetcher.data.state) {
+            setError(undefined)
             setState(fetcher.data.state)
           }
 
-          setVerified(fetcher.data.successfulVerification)
+          if (fetcher.data.invalid) {
+            setInvalid(true)
+          }
 
           break
       }
@@ -125,7 +64,7 @@ export default () => {
           loading={fetcher.state !== 'idle'}
           email={email!}
           state={state!}
-          invalid={verified === false}
+          invalid={invalid}
           error={error}
           requestRegeneration={async () => {
             if (!email) return
@@ -157,6 +96,7 @@ export default () => {
       component = (
         <EmailPanel
           loading={fetcher.state !== 'idle'}
+          error={error}
           onGoBack={() => navigate(`/authenticate/${clientId}`)}
           onSendCode={async (email) => {
             setEmail(email)

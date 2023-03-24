@@ -65,5 +65,6 @@ export const action: ActionFunction = async (args) => {
       existing
     )
   }
-  return json({ successfulVerification })
+
+  return json({ invalid: true })
 }
