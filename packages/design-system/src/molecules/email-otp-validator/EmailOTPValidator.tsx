@@ -13,6 +13,8 @@ type EmailOTPValidatorProps = {
 
   invalid: boolean
 
+  error?: string
+
   goBack?: () => void
   requestRegeneration: (email: string) => Promise<void>
   requestVerification: (
@@ -29,6 +31,7 @@ export default ({
   email,
   state,
   invalid,
+  error,
   goBack,
   requestRegeneration,
   requestVerification,
@@ -182,6 +185,16 @@ export default ({
             className="text-red-500 mt-4 mb-2 text-center"
           >
             Wrong or expired code. Please try again.
+          </Text>
+        )}
+
+        {error && (
+          <Text
+            size="sm"
+            weight="medium"
+            className="text-red-500 mt-4 mb-2 text-center"
+          >
+            {error}
           </Text>
         )}
 
