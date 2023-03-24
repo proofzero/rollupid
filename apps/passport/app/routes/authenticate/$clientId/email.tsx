@@ -88,6 +88,7 @@ export default () => {
             )
           }}
           goBack={() => setScreen('email')}
+          onCancel={() => navigate(`/authenticate/${clientId}`)}
         />
       )
       break
