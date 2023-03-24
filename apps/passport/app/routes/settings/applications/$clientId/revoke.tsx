@@ -5,6 +5,7 @@ import { getValidatedSessionContext } from '~/session.server'
 import { getAccessClient } from '~/platform.server'
 
 import { getFlashSession, commitFlashSession } from '~/session.server'
+import { BadRequestError } from '@proofzero/errors'
 
 export const action: ActionFunction = async ({ request, params, context }) => {
   const session = await getFlashSession(request, context.env)
@@ -19,7 +20,7 @@ export const action: ActionFunction = async ({ request, params, context }) => {
   const { clientId } = params
 
   if (!clientId) {
-    throw new Error('Client ID is required for query')
+    throw new BadRequestError({ message: 'Client ID is required for query' })
   }
 
   try {

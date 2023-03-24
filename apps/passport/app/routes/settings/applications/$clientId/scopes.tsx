@@ -1,6 +1,7 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { getValidatedSessionContext } from '~/session.server'
 import { getAccessClient } from '~/platform.server'
+import { BadRequestError } from '@proofzero/errors'
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
   const { accountUrn } = await getValidatedSessionContext(
@@ -12,7 +13,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   const { clientId } = params
 
   if (!clientId) {
-    throw new Error('Client ID is required for query')
+    throw new BadRequestError({ message: 'Client ID is required for query' })
   }
 
   const accessClient = getAccessClient(context.env, context.traceSpan)

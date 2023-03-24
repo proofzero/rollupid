@@ -101,9 +101,9 @@ const ConfirmRevocationModal = ({
             <Button
               type="submit"
               btnType="dangerous-alt"
-              disabled={confirmationString !== 'DELETE'}
+              disabled={confirmationString !== 'REVOKE'}
             >
-              Delete Rollup Identity
+              Revoke Access
             </Button>
           </fetcher.Form>
         </div>
