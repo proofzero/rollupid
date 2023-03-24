@@ -3,7 +3,10 @@ import { useEffect, useState } from 'react'
 import { useFetcher, useLoaderData, useOutletContext } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
+import warningImg from '~/assets/warning.svg'
+
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import InputText from '~/components/inputs/InputText'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { Pill } from '@proofzero/design-system/src/atoms/pills/Pill'
@@ -34,26 +37,102 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   )
 }
 
+const ConfirmRevocationModal = ({
+  title,
+  clientId,
+  isOpen,
+  setIsOpen,
+  fetcher,
+}: {
+  title: string
+  clientId: string
+  isOpen: boolean
+  setIsOpen: (val: boolean) => void
+  fetcher: FetcherWithComponents<any>
+}) => {
+  const [confirmationString, setConfirmationString] = useState('')
+
+  return (
+    <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
+      <div
+        className={`min-w-[260px] sm:min-w-[400px] md:max-w-[512px] lg:max-w-[512px]
+     relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left
+    shadow-xl transition-all sm:p-6 overflow-y-auto`}
+      >
+        <div className="flex flex-row space-x-6 items-center justify-start">
+          <img
+            src={warningImg}
+            className="object-cover w-10 h-10 rounded"
+            alt="Not found"
+          />
+
+          <div className="flex flex-col space-y-2">
+            <Text weight="medium" size="lg" className="text-gray-900">
+              Revoke Access
+            </Text>
+            <Text size="xs" weight="normal">
+              {`Are you sure you want to revoke access to ${title}? This action
+              cannot be undone once confirmed.`}
+            </Text>
+          </div>
+        </div>
+        <div className="flex flex-col my-7 space-y-2">
+          <InputText
+            onChange={(text: string) => {
+              setConfirmationString(text)
+            }}
+            heading="Type REVOKE to confirm*"
+          />
+        </div>
+
+        <div className="flex justify-end items-center space-x-3">
+          <Button
+            btnType="secondary-alt"
+            onClick={() => setIsOpen(false)}
+            className="bg-gray-100"
+          >
+            Cancel
+          </Button>
+
+          <fetcher.Form
+            action={`/settings/applications/${clientId}/revoke`}
+            method="post"
+          >
+            <Button
+              type="submit"
+              btnType="dangerous-alt"
+              disabled={confirmationString !== 'DELETE'}
+            >
+              Delete Rollup Identity
+            </Button>
+          </fetcher.Form>
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
 const RevocationModal = ({
   isOpen,
   setIsOpen,
   clientId,
   icon,
   title,
-  fetcher,
+  setConfirmationOpen,
 }: {
   isOpen: boolean
-  setIsOpen: (open: boolean) => void
+
   clientId: string
   icon: string
   title: string
-  fetcher: FetcherWithComponents<any>
+  setIsOpen: (open: boolean) => void
+  setConfirmationOpen: (val: boolean) => void
 }) => {
   const localFetcher = useFetcher()
 
   useEffect(() => {
     localFetcher.load(`/settings/applications/${clientId}/scopes`)
-  }, [clientId])
+  }, [])
 
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
@@ -110,14 +189,16 @@ const RevocationModal = ({
             Cancel
           </Button>
 
-          <fetcher.Form
-            action={`/settings/applications/${clientId}/revoke`}
-            method="post"
+          <Button
+            type="submit"
+            btnType="dangerous-alt"
+            onClick={() => {
+              setIsOpen(false)
+              setConfirmationOpen(true)
+            }}
           >
-            <Button type="submit" btnType="dangerous-alt">
-              Revoke Access
-            </Button>
-          </fetcher.Form>
+            Revoke Access
+          </Button>
         </div>
       </div>
     </Modal>
@@ -202,6 +283,7 @@ export default function ApplicationsLayout() {
   const [selectedApp, setSelectedApp] = useState<undefined | App>()
 
   const [revocationModalOpen, setRevocationModalOpen] = useState(false)
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
 
   const fetcher = useFetcher()
 
@@ -242,9 +324,16 @@ export default function ApplicationsLayout() {
             clientId={selectedApp.clientId}
             icon={selectedApp.icon}
             title={selectedApp.title}
-            fetcher={fetcher}
             isOpen={revocationModalOpen}
             setIsOpen={setRevocationModalOpen}
+            setConfirmationOpen={setConfirmationModalOpen}
+          />
+          <ConfirmRevocationModal
+            title={selectedApp.title}
+            clientId={selectedApp.clientId}
+            fetcher={fetcher}
+            isOpen={confirmationModalOpen}
+            setIsOpen={setConfirmationModalOpen}
           />
         </>
       )}
