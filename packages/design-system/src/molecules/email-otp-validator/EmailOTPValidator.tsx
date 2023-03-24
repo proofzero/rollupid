@@ -16,6 +16,8 @@ type EmailOTPValidatorProps = {
   error?: string
 
   goBack?: () => void
+  onCancel: () => void
+
   requestRegeneration: (email: string) => Promise<void>
   requestVerification: (
     email: string,
@@ -33,6 +35,7 @@ export default ({
   invalid,
   error,
   goBack,
+  onCancel,
   requestRegeneration,
   requestVerification,
   regenerationTimerSeconds = 60,
@@ -235,7 +238,12 @@ export default ({
       </section>
 
       <section className="flex flex-row space-x-4">
-        <Button btnSize="xl" btnType="secondary-alt" className="flex-1">
+        <Button
+          btnSize="xl"
+          btnType="secondary-alt"
+          className="flex-1"
+          onClick={onCancel}
+        >
           Cancel
         </Button>
         <Button

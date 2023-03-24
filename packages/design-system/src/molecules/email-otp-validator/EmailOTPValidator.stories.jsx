@@ -19,6 +19,8 @@ export const EmailOTPValidatorExample = Template.bind({})
 EmailOTPValidatorExample.args = {
   email: 'john@email.com',
   regenerationTimerSeconds: 60,
+  state: 'foobar',
+  onCancel: async () => {},
   goBack: async () => {},
   requestRegeneration: async () => {},
   requestVerification: async () => {
