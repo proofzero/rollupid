@@ -223,7 +223,7 @@ const navigation = {
       name: 'Accounts',
       href: '/settings/accounts',
       icon: TbPlugConnected,
-      exists: false,
+      exists: true,
     },
     {
       name: 'Applications',
