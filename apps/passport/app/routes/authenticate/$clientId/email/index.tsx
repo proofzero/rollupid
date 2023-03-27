@@ -4,6 +4,7 @@ import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { ActionFunction, redirect } from '@remix-run/cloudflare'
 import { Form } from '@remix-run/react'
+import { useState } from 'react'
 
 export const action: ActionFunction = async ({ request, params }) => {
   const fd = await request.formData()
@@ -20,6 +21,8 @@ export const action: ActionFunction = async ({ request, params }) => {
 }
 
 export default () => {
+  const [isValidEmail, setIsValidEmail] = useState(false)
+
   return (
     <div
       className={
@@ -49,6 +52,9 @@ export default () => {
             pattern="[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
             required
             autoFocus
+            onChange={(e) => {
+              setIsValidEmail(e.target.validity.valid)
+            }}
           />
         </section>
         <section>
@@ -57,6 +63,7 @@ export default () => {
             btnSize="xl"
             btnType="primary-alt"
             className="w-full"
+            disabled={!isValidEmail}
           >
             Send Code
           </Button>
