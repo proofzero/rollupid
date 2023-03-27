@@ -8,6 +8,8 @@ import { HiOutlineExternalLink, HiOutlineHome } from 'react-icons/hi'
 import { TbPlugConnected, TbApps } from 'react-icons/tb'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
+import missingImage from '../../assets/missing-nft.svg'
+
 import { Text } from '@proofzero/design-system'
 
 import { Popover } from '@headlessui/react'
@@ -68,11 +70,11 @@ export const DesktopSideNav = ({
 }) => {
   return (
     <aside
-      className="fixed bottom-0 z-50 w-full lg:relative 
+      className="fixed bottom-0 z-50 w-full lg:relative
       lg:col-start-1 lg:col-end-3 bg-gray-50"
     >
       <nav
-        className="flex flex-row justify-center items-center lg:flex-none 
+        className="flex flex-row justify-center items-center lg:flex-none
       hidden lg:block space-y-1"
       >
         <SideNavBarebone profile={profile} accountURN={accountURN} />
@@ -104,14 +106,14 @@ export const MobileSideNav = ({
   return (
     <nav className="flex flex-col flex-none justify-center items-center h-full">
       <div
-        className="hidden h-[80px] sm:max-lg:flex w-full 
+        className="hidden h-[80px] sm:max-lg:flex w-full
       items-center justify-end"
       >
         <Popover.Button
           ref={ref}
           className="bg-gray-50 inline-flex items-center justify-center mr-2
                    text-gray-500 hover:text-gray-400 focus:outline-none p-2
-                   focus:ring-2 focus:ring-gray-800 focus:ring-offset-2 
+                   focus:ring-2 focus:ring-gray-800 focus:ring-offset-2
                    focus:ring-offset-gray-800 rounded-lg"
         >
           <span className="sr-only">Open main menu</span>
@@ -173,6 +175,10 @@ export const SideNavBarebone = ({
           src={profile.pfp?.image}
           className="w-[42px] h-[42px] rounded-full mr-2"
           alt="PFP"
+          onError={({ currentTarget }) => {
+            currentTarget.onerror = null
+            currentTarget.src = missingImage
+          }}
         />
         <div className="flex-1 w-1 flex flex-col">
           <Text size="sm" weight="medium" className="truncate mb-1.5">

@@ -5,6 +5,8 @@ import { FiExternalLink } from 'react-icons/fi'
 import { IoMdExit } from 'react-icons/io'
 import { IoIosCheckmark } from 'react-icons/io'
 
+import missingImage from '../../assets/missing-nft.svg'
+
 export function SignOutLink({ className }: { className: string }) {
   let submit = useSubmit()
 
@@ -45,6 +47,10 @@ export const UserNavigation = ({
             src={avatarUrl}
             alt="PFP loading error"
             className="h-[24px] w-[24px] rounded-full mr-2"
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null
+              currentTarget.src = missingImage
+            }}
           />
           <Text size="sm" className="max-w-[122px] truncate">
             {displayName}
@@ -53,7 +59,7 @@ export const UserNavigation = ({
         </div>
       </div>
       <a
-        className="pl-3 pr-2 py-3 hover:bg-gray-100 
+        className="pl-3 pr-2 py-3 hover:bg-gray-100
         w-full text-left flex items-center border text-gray-700"
         style={{ cursor: 'pointer' }}
         onClick={() => {
