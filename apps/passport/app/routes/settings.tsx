@@ -5,6 +5,11 @@ import { Popover } from '@headlessui/react'
 import SideMenu from '~/components/SideMenu'
 import Header from '~/components/Header'
 
+import appleIcon from '~/assets/apple-touch-icon.png'
+import icon32 from '~/assets/favicon-32x32.png'
+import icon16 from '~/assets/favicon-16x16.png'
+import faviconSvg from '~/assets/favicon.svg'
+
 import {
   getAccountClient,
   getAddressClient,
@@ -12,6 +17,15 @@ import {
 } from '~/platform.server'
 import type { AddressURN } from '@proofzero/urns/address'
 import type { NodeType } from '@proofzero/types/address'
+
+import type { LinksFunction } from '@remix-run/cloudflare'
+
+export const links: LinksFunction = () => [
+  { rel: 'apple-touch-icon', href: appleIcon, sizes: '180x180' },
+  { rel: 'icon', type: 'image/png', href: icon32, sizes: '32x32' },
+  { rel: 'icon', type: 'image/png', href: icon16, sizes: '16x16' },
+  { rel: 'shortcut icon', type: 'image/svg+xml', href: faviconSvg },
+]
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { jwt, accountUrn } = await getValidatedSessionContext(
@@ -84,18 +98,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
-  title: 'Passport Settings',
+  title: 'Passport Settings - Rollup',
   viewport: 'width=device-width,initial-scale=1',
 })
 
 export default function SettingsLayout() {
-  const {
-    authorizedApps,
-    connectedProfiles,
-    displayName,
-    pfpUrl,
-    CONSOLE_URL,
-  } = useLoaderData()
+  const { authorizedApps, connectedProfiles, pfpUrl, CONSOLE_URL } =
+    useLoaderData()
 
   return (
     <Popover className="bg-gray-50 min-h-screen relative">
