@@ -76,13 +76,13 @@ export const GallerySchema = z.array(NFTSchema)
 //optional because could be changed to empty
 export const LinkSchema = z.object({
   name: z.string().optional(),
-  provider: z.string().optional(),
   url: z.string().optional(),
+  provider: z.string().optional(),
   verified: z.boolean().default(false),
 })
 
 //optional because could be changed to empty
-export const LinksSchema = z.array(LinkSchema).optional()
+export const LinksSchema = z.array(LinkSchema)
 
 export const FullProfileSchema = z.object({
   displayName: z.string(),
@@ -90,8 +90,8 @@ export const FullProfileSchema = z.object({
     image: z.string(),
     isToken: z.boolean().optional(),
   }),
-  links: LinksSchema,
-  gallery: GallerySchema,
+  links: LinksSchema.optional(),
+  gallery: GallerySchema.optional(),
   handle: z.string().optional(),
   version: z.number().optional(),
   bio: z.string(),
