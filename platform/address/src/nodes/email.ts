@@ -1,4 +1,4 @@
-import { add } from '@dnd-kit/utilities'
+import { BadRequestError } from '@proofzero/errors'
 import { EmailAddressType, NodeType } from '@proofzero/types/address'
 import generateRandomString from '@proofzero/utils/generateRandomString'
 import { DurableObjectStubProxy } from 'do-proxy'
@@ -32,11 +32,11 @@ export default class EmailAddress {
         payload.creationTimestamp + EMAIL_VERIFICATION_OPTIONS.regenDelayInMs >
         Date.now()
       )
-        throw new Error(
-          `Cannot generate new code for the address. You can only generate a new code once every ${
+        throw new BadRequestError({
+          message: `Cannot generate new code for the address. You can only generate a new code once every ${
             EMAIL_VERIFICATION_OPTIONS.regenDelayInMs / 1000
-          } seconds`
-        )
+          } seconds`,
+        })
     }
 
     const creationTimestamp = Date.now()
