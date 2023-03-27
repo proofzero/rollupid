@@ -18,7 +18,7 @@ type EmailOTPValidatorProps = {
   goBack?: () => void
   onCancel: () => void
 
-  requestRegeneration: (email: string) => Promise<void>
+  requestRegeneration: (email: string) => void
   requestVerification: (
     email: string,
     code: string,
@@ -84,7 +84,7 @@ export default ({
         evt.preventDefault()
 
         const asyncFn = async () => {
-          await requestVerification(email, fullCode, loadedState)
+          requestVerification(email, fullCode, loadedState)
         }
 
         asyncFn()
@@ -211,8 +211,8 @@ export default ({
             onClick={() => {
               if (regenerationRequested) return
 
-              requestRegeneration(email)
               setRegenerationRequested(true)
+              requestRegeneration(email)
             }}
           >
             Click to send another
@@ -233,7 +233,9 @@ export default ({
           </Text>
         </div>
 
-        {children && <div className="my-3">{children}</div>}
+        {children && regenerationRequested && (
+          <div className="my-3">{children}</div>
+        )}
       </section>
 
       <section className="flex flex-row space-x-4">

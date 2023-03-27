@@ -53,7 +53,20 @@ export const getErrorCause = (error: unknown): Error => {
 }
 
 export const throwJSONError = (error: unknown): void => {
-  const cause = getErrorCause(error)
+  let cause
+
+  try {
+    cause = getErrorCause(error)
+  } catch (e) {
+    console.error('Error handling error', e)
+
+    throw json(
+      {
+        message: 'unknown error',
+      },
+      500
+    )
+  }
   const body = { ...cause, message: cause.message }
   if (cause instanceof RollupError) {
     const status = HTTP_STATUS_CODES[cause.code]

@@ -99,7 +99,7 @@ export default () => {
         email={address}
         state={matchData?.state}
         invalid={ad?.error}
-        requestRegeneration={async () => navigate(`?address=${address}`)}
+        requestRegeneration={() => navigate(`?address=${address}`)}
         requestVerification={async (email, code, state) => {
           submit(
             {
