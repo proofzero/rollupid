@@ -13,7 +13,7 @@ type EmailOTPValidatorProps = {
 
   invalid: boolean
 
-  error?: string
+  children?: JSX.Element
 
   goBack?: () => void
   onCancel: () => void
@@ -33,7 +33,7 @@ export default ({
   email,
   state,
   invalid,
-  error,
+  children,
   goBack,
   onCancel,
   requestRegeneration,
@@ -93,10 +93,10 @@ export default ({
 
   return (
     <>
-      <section className="relative flex justify-center items-center">
+      <section className="relative flex justify-center items-center w-full">
         {goBack && (
           <HiOutlineArrowLeft
-            className="absolute -left-8 -top-8 lg:left-0 lg:top-0 w-6 h-6 cursor-pointer"
+            className="absolute left-0 lg:left-0 lg:top-[0.15rem] w-6 h-6 cursor-pointer"
             onClick={goBack}
           />
         )}
@@ -191,16 +191,6 @@ export default ({
           </Text>
         )}
 
-        {error && (
-          <Text
-            size="sm"
-            weight="medium"
-            className="text-red-500 mt-4 mb-2 text-center"
-          >
-            {error}
-          </Text>
-        )}
-
         <div className="flex flex-col lg:flex-row space-x-1 justify-center items-center mt-4">
           <Text type="span" size="sm" className="text-gray-500">
             Didn't get the code?
@@ -235,6 +225,8 @@ export default ({
             )}
           </Text>
         </div>
+
+        {children && <div className="my-3">{children}</div>}
       </section>
 
       <section className="flex flex-row space-x-4">
