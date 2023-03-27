@@ -300,7 +300,7 @@ export default function AccountsLayout() {
     currentWindowUrl.search = ''
 
     return navigate(
-      `/authorize?prompt=login&redirect_uri=${currentWindowUrl.toString()}`
+      `/authenticate/connect?redirect_uri=${currentWindowUrl.toString()}`
     )
   }
 
@@ -316,7 +316,6 @@ export default function AccountsLayout() {
             requestConnectAccount()
           }}
           btnType="primary-alt"
-          disabled={true}
         >
           Connect Account
         </Button>

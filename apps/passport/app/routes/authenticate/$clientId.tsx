@@ -15,12 +15,15 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   let clientId
   const headers = new Headers()
 
+  console.log({ HELLO: 'HELLO' })
+
   if (params.clientId !== 'console') {
     const consoleParmamsSessionFromCookie = await getConsoleParamsSession(
       request,
       context.env,
       params.clientId!
     )
+    console.log({ params })
     const consoleParamsSession = consoleParmamsSessionFromCookie.get('params')
     const parsedParams = consoleParamsSession
       ? await JSON.parse(consoleParamsSession)
