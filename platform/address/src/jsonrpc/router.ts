@@ -66,6 +66,11 @@ import {
   VerifyEmailOTPOutput,
 } from './methods/verifyEmailOTP'
 
+import {
+  deleteAddressNodeMethod,
+  DeleteAddressNodeInput,
+} from './methods/deleteAddressNode'
+
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
 export const appRouter = t.router({
@@ -198,4 +203,13 @@ export const appRouter = t.router({
     .use(initAddressNode)
     .output(InitVaultOutput)
     .mutation(initVaultMethod),
+  deleteAddressNode: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(setAddressNodeClient)
+    .use(initAddressNode)
+    .use(Analytics)
+    .input(DeleteAddressNodeInput)
+    .mutation(deleteAddressNodeMethod),
 })

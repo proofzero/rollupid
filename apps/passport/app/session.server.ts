@@ -14,9 +14,12 @@ import {
   InvalidTokenError,
 } from '@proofzero/utils/token'
 import { getAccountClient } from './platform.server'
-import { TraceSpan } from '@proofzero/platform-middleware/trace'
+import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 import { UnauthorizedError } from '@proofzero/errors'
-import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
+import { AccountURNSpace } from '@proofzero/urns/account'
+import type { AccountURN } from '@proofzero/urns/account'
+
+import { FLASH_MESSAGE, FLASH_MESSAGE_KEY } from './utils/flashMessage.server'
 
 export const InvalidSessionAccountError = new UnauthorizedError({
   message: 'Session account is not valid',
@@ -115,38 +118,33 @@ export function getUserSession(request: Request, env: Env, clientId?: string) {
 }
 
 export async function destroyUserSession(
-  session: Session,
+  requestOrSession: Request | Session,
   redirectTo: string,
   env: Env,
-  clientId?: string,
-  manualLogout: boolean = false
+  flashMessage: FLASH_MESSAGE,
+  clientId?: string
 ) {
+  let session
+  if (requestOrSession instanceof Request) {
+    session = await getUserSession(requestOrSession, env, clientId)
+  } else {
+    session = requestOrSession
+  }
   const storage = getUserSessionStorage(env, clientId) // set max age to 0 to kill cookie
 
   const headers = new Headers()
   headers.append('Set-Cookie', await storage.destroySession(session))
 
-  if (manualLogout) {
-    const flashStorage = getFlashSessionStorage(env)
-    const flashSession = await flashStorage.getSession()
-    flashSession.flash('SIGNOUT', 'true')
+  const flashStorage = getFlashSessionStorage(env)
+  const flashSession = await flashStorage.getSession()
 
-    headers.append('Set-Cookie', await flashStorage.commitSession(flashSession))
-  }
+  flashSession.flash(FLASH_MESSAGE_KEY, flashMessage)
+
+  headers.append('Set-Cookie', await flashStorage.commitSession(flashSession))
 
   return redirect(redirectTo, {
     headers,
   })
-}
-
-export async function logout(
-  request: Request,
-  redirectTo: string,
-  env: Env,
-  clientId?: string
-) {
-  const session = await getUserSession(request, env, clientId)
-  return await destroyUserSession(session, redirectTo, env, clientId, true)
 }
 
 // CONSOLE PARAMS
@@ -266,8 +264,8 @@ export async function getValidatedSessionContext(
         session,
         redirectTo,
         env,
-        consoleParams?.clientId ?? undefined,
-        true
+        FLASH_MESSAGE.SIGNOUT,
+        consoleParams?.clientId ?? undefined
       )
     }
   }

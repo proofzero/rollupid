@@ -28,20 +28,25 @@ import { Scopes } from '@proofzero/platform-middleware/scopes'
 import { initAccountNodeByName } from '../nodes'
 import { Analytics } from '@proofzero/platform-middleware/analytics'
 import { getPublicAddressesMethod } from './methods/getPublicAddresses'
-
 import {
   GetAuthorizedAppsMethodInput,
   GetAuthorizedAppsMethodOutput,
   getAuthorizedAppsMethod,
 } from './methods/getAuthorizedApps'
 import { isValidMethod, IsValidOutput } from './methods/isValid'
+import {
+  DeleteAccountNodeInput,
+  deleteAccountNodeMethod,
+} from './methods/deleteAccountNode'
+import { UnauthorizedError } from '@proofzero/errors'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
 export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
   const accountURN = ctx.accountURN
 
-  if (!accountURN) throw new Error('No accountURN in context')
+  if (!accountURN)
+    throw new UnauthorizedError({ message: 'No accountURN in context' })
 
   const account = await initAccountNodeByName(accountURN, ctx.Account)
 
@@ -120,4 +125,11 @@ export const appRouter = t.router({
     .input(GetAuthorizedAppsMethodInput)
     .output(GetAuthorizedAppsMethodOutput)
     .query(getAuthorizedAppsMethod),
+  deleteAccountNode: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(injectAccountNode)
+    .use(LogUsage)
+    .input(DeleteAccountNodeInput)
+    .mutation(deleteAccountNodeMethod),
 })

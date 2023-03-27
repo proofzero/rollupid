@@ -215,7 +215,7 @@ const navigation = {
       name: 'Advanced Settings',
       href: '/settings/advanced',
       icon: BsGear,
-      exists: false,
+      exists: true,
     },
   ],
 }

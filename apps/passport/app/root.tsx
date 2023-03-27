@@ -4,7 +4,7 @@ import type {
   LoaderFunction,
 } from '@remix-run/cloudflare'
 
-import { json } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
 
 import { useContext, useEffect } from 'react'
 
@@ -36,13 +36,21 @@ import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
 
 import {
+  FLASH_MESSAGE_KEY,
+  FLASH_MESSAGE_VALUES,
+} from './utils/flashMessage.server'
+import type { FLASH_MESSAGE } from './utils/flashMessage.server'
+
+import { getFlashSession, commitFlashSession } from './session.server'
+
+import {
   toast,
   Toaster,
   ToastType,
 } from '@proofzero/design-system/src/atoms/toast'
 
 import * as gtag from '~/utils/gtags.client'
-import { commitFlashSession, getFlashSession } from './session.server'
+
 import { NonceContext } from './components/nonce-context'
 
 export const meta: MetaFunction = () => ({
@@ -65,13 +73,26 @@ export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: globalStyles },
 ]
 
-export const loader: LoaderFunction = async ({ request, context }) => {
+export const loader: LoaderFunction = async ({ request, context, params }) => {
+  const url = new URL(request.url)
+  /**
+   * We use the same technique in profile for `$type/$address` route.
+   * This redirect here prevents us from calling this loader multiple times.
+   * In this case it's essential since flashSessions gets wiped out without
+   * displaying toast messages.
+   */
+
+  if (url.pathname === `/`) {
+    return redirect(`/authenticate`)
+  }
+
   const flashes = []
   const flashSession = await getFlashSession(request, context.env)
-  if (flashSession.get('SIGNOUT')) {
+  const flashMessageType = flashSession.get(FLASH_MESSAGE_KEY) as FLASH_MESSAGE
+  if (flashMessageType) {
     flashes.push({
       type: ToastType.Info,
-      message: "You've been signed out",
+      message: FLASH_MESSAGE_VALUES[flashMessageType],
     })
   }
 
