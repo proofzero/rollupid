@@ -17,9 +17,6 @@ export default () => {}
 
 export function CatchBoundary() {
   const caught = useCatch()
-  console.log({
-    caught,
-  })
 
   let message = 'Something went terribly wrong!'
   if (caught?.data?.code === ERROR_CODES.BAD_REQUEST) {

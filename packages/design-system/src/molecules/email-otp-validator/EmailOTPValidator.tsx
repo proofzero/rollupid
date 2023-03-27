@@ -229,6 +229,8 @@ export default ({
         {children && <div className="my-3">{children}</div>}
       </section>
 
+      {children && <section>{children}</section>}
+
       <section className="flex flex-row space-x-4">
         <Button
           btnSize="xl"
