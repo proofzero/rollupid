@@ -56,6 +56,13 @@ export default ({
 
   const [regenerationRequested, setRegenerationRequested] = useState(false)
 
+  const [loadedState, setLoadedState] = useState<undefined | string>()
+  useEffect(() => {
+    if (state) {
+      setLoadedState(state)
+    }
+  }, [state])
+
   useEffect(() => {
     setIsInvalid(invalid)
 
@@ -77,7 +84,7 @@ export default ({
         evt.preventDefault()
 
         const asyncFn = async () => {
-          await requestVerification(email, fullCode, state)
+          await requestVerification(email, fullCode, loadedState)
         }
 
         asyncFn()
@@ -89,7 +96,7 @@ export default ({
     return () => {
       window.removeEventListener('keydown', handleKeyPress)
     }
-  }, [email, fullCode, state, loading, isInvalid])
+  }, [email, fullCode, loadedState, loading, isInvalid])
 
   return (
     <>
@@ -246,7 +253,7 @@ export default ({
           onClick={async () => {
             setShowInvalidMessage(false)
 
-            await requestVerification(email, fullCode, state)
+            await requestVerification(email, fullCode, loadedState)
           }}
         >
           Verify
