@@ -42,7 +42,7 @@ export default function Welcome() {
             <SectionTitle title="Activity" />
 
             <div
-              className="w-full h-[205px] border border-gray-200 
+              className="w-full h-[205px] border border-gray-200
               rounded-lg shadow mt-4 flex justify-center items-center "
               style={{
                 background: `url(${dashboardChart})`,
@@ -82,7 +82,7 @@ export default function Welcome() {
           <SectionTitle title="Applications" />
 
           {appFetcher.type === 'done' && appFetcher.data?.error ? (
-            <NestedErrorPage />
+            <NestedErrorPage text={'Data Loading Error'} />
           ) : (
             <div className="border shadow flex-1 flex flex-col rounded-lg mb-4 sm:mb-0">
               <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-t-lg">

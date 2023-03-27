@@ -107,7 +107,10 @@ rounded-lg border shadow"
           </div>
         }
       >
-        <Await resolve={edgesResult} errorElement={<NestedErrorPage />}>
+        <Await
+          resolve={edgesResult}
+          errorElement={<NestedErrorPage text={'Data Loading Error'} />}
+        >
           {(edgesResult) => {
             if (!edgesResult.metadata.offset) {
               edgesResult.metadata.offset = 0
