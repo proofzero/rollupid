@@ -11,6 +11,7 @@ import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { Pill } from '@proofzero/design-system/src/atoms/pills/Pill'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
+import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
 
 import { getFlashSession, commitFlashSession } from '~/session.server'
 
@@ -338,16 +339,22 @@ export default function ApplicationsLayout() {
         </>
       )}
 
-      <section className="flex flex-col space-y-4">
-        {authorizedApps.map((a, i) => (
-          <AppListItem
-            key={i}
-            app={a}
-            setSelectedApp={setSelectedApp}
-            setRevocationModalOpen={setRevocationModalOpen}
-          />
-        ))}
-      </section>
+      {authorizedApps.length === 0 ? (
+        <section className="h-[512px] sm:h-[256px]">
+          <NestedErrorPage text={'No applications found'} />
+        </section>
+      ) : (
+        <section className="flex flex-col space-y-4">
+          {authorizedApps.map((a, i) => (
+            <AppListItem
+              key={i}
+              app={a}
+              setSelectedApp={setSelectedApp}
+              setRevocationModalOpen={setRevocationModalOpen}
+            />
+          ))}
+        </section>
+      )}
     </>
   )
 }

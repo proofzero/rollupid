@@ -7,6 +7,7 @@ import { Link } from '@remix-run/react'
 
 import dashboardChart from '~/assets/dashboard_chart.svg'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
+import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
 
 import { useOutletContext } from '@remix-run/react'
 import { normalizeProfileToConnection } from '~/utils/profile'
@@ -80,74 +81,86 @@ export default function DashboardLayout() {
         </div>
         <div className="flex flex-col md:flex-1 h-full w-full">
           <SectionTitle title="Applications" />
-          <div className="border bg-white shadow flex-1 flex flex-col rounded-lg mb-4 sm:mb-0">
-            <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-t-lg">
-              <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-                APPLICATION
-              </Text>
-              <Text size="sm" weight="medium" className="text-gray-500 flex-1">
-                AUTHORIZED
-              </Text>
-            </div>
+          {authorizedApps.length === 0 ? (
+            <NestedErrorPage text={'No Application Available'} />
+          ) : (
+            <div className="border bg-white shadow flex-1 flex flex-col rounded-lg mb-4 sm:mb-0">
+              <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-t-lg">
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="text-gray-500 flex-1"
+                >
+                  APPLICATION
+                </Text>
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="text-gray-500 flex-1"
+                >
+                  AUTHORIZED
+                </Text>
+              </div>
 
-            <div className="flex flex-1 flex-col">
-              {authorizedApps.map(
-                (a: { icon: string; title: string; timestamp: number }) => (
-                  <article
-                    key={a.title}
-                    className="flex items-center py-5 px-8"
-                  >
-                    <div className="flex-1 flex flex-row items-center space-x-4">
-                      <img
-                        src={a.icon}
-                        alt="app icon"
-                        className="object-cover w-6 h-6 rounded"
-                      />
+              <div className="flex flex-1 flex-col">
+                {authorizedApps.map(
+                  (a: { icon: string; title: string; timestamp: number }) => (
+                    <article
+                      key={a.title}
+                      className="flex items-center py-5 px-8"
+                    >
+                      <div className="flex-1 flex flex-row items-center space-x-4">
+                        <img
+                          src={a.icon}
+                          alt="app icon"
+                          className="object-cover w-6 h-6 rounded"
+                        />
+
+                        <Text
+                          size="sm"
+                          weight="medium"
+                          className="text-gray-500 flex-1"
+                        >
+                          {a.title}
+                        </Text>
+                      </div>
 
                       <Text
                         size="sm"
                         weight="medium"
                         className="text-gray-500 flex-1"
                       >
-                        {a.title}
+                        {new Date(a.timestamp).toLocaleString('default', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                        })}
                       </Text>
-                    </div>
+                    </article>
+                  )
+                )}
+              </div>
 
-                    <Text
-                      size="sm"
-                      weight="medium"
-                      className="text-gray-500 flex-1"
-                    >
-                      {new Date(a.timestamp).toLocaleString('default', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                      })}
-                    </Text>
-                  </article>
-                )
-              )}
-            </div>
+              <div className="w-full px-8">
+                <div className="border-t border-gray-200"></div>
+              </div>
 
-            <div className="w-full px-8">
-              <div className="border-t border-gray-200"></div>
+              <div className="flex flex-row justify-center">
+                <Link to="/settings/applications">
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="cursor-pointer text-indigo-500 hover:underline my-4"
+                  >
+                    View All
+                  </Text>
+                </Link>
+              </div>
             </div>
-
-            <div className="flex flex-row justify-center">
-              <Link to="/settings/apps">
-                <Text
-                  size="sm"
-                  weight="medium"
-                  className="cursor-pointer text-indigo-500 hover:underline my-4"
-                >
-                  View All
-                </Text>
-              </Link>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

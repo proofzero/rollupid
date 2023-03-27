@@ -306,7 +306,10 @@ export default function AppDetailIndexPage() {
                 </div>
               }
             >
-              <Await resolve={edgesResult} errorElement={<NestedErrorPage />}>
+              <Await
+                resolve={edgesResult}
+                errorElement={<NestedErrorPage text={'Data Loading Error'} />}
+              >
                 {(edgesResult) => {
                   return (
                     <LoginsPanel
