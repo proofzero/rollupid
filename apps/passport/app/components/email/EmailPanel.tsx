@@ -1,4 +1,3 @@
-import React from 'react'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
