@@ -90,7 +90,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   return {
     pfpUrl: accountProfile?.pfp?.image,
     displayName: accountProfile?.displayName,
-    connectedEmailProfiles: connectedEmailProfiles,
     authorizedApps: authorizedApps,
     connectedProfiles: normalizedConnectedProfiles,
     CONSOLE_URL: context.env.CONSOLE_APP_URL,
@@ -104,13 +103,8 @@ export const meta: MetaFunction = () => ({
 })
 
 export default function SettingsLayout() {
-  const {
-    authorizedApps,
-    connectedProfiles,
-    pfpUrl,
-    CONSOLE_URL,
-    connectedEmailProfiles,
-  } = useLoaderData()
+  const { authorizedApps, connectedProfiles, pfpUrl, CONSOLE_URL } =
+    useLoaderData()
 
   return (
     <Popover className="bg-gray-50 min-h-screen relative">
@@ -136,7 +130,6 @@ export default function SettingsLayout() {
                   context={{
                     authorizedApps,
                     connectedProfiles,
-                    connectedEmailProfiles,
                   }}
                 />
               </div>

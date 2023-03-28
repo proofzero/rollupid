@@ -2,7 +2,6 @@ import {
   EmailAddressType,
   OAuthAddressType,
   CryptoAddressType,
-  NodeType,
 } from '@proofzero/types/address'
 
 export const normalizeProfileToConnection = (profile: any) => {
