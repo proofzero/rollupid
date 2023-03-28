@@ -1,5 +1,5 @@
 import { DOProxy } from 'do-proxy'
-import type { Profile, Addresses } from '../types'
+import type { Profile, AddressList } from '../types'
 
 export default class Account extends DOProxy {
   declare state: DurableObjectState
@@ -18,8 +18,8 @@ export default class Account extends DOProxy {
     return this.state.storage.put('profile', profile)
   }
 
-  async getAddresses(): Promise<Addresses | null> {
-    const stored = await this.state.storage.get<Addresses>('addresses')
+  async getAddresses(): Promise<AddressList | null> {
+    const stored = await this.state.storage.get<AddressList>('addresses')
     return stored || null
   }
 }

@@ -73,16 +73,3 @@ export const normalizeProfileToConnection = (profile: any) => {
       }
   }
 }
-
-export const getEmailProfiles = (normalizedConnectedProfiles: any[]) => {
-  const emailProfiles = normalizedConnectedProfiles.filter(
-    (profile) =>
-      (profile.nodeType === NodeType.OAuth &&
-        (profile.type === OAuthAddressType.Google ||
-          profile.type === OAuthAddressType.Microsoft)) ||
-      (profile.type === EmailAddressType.Email &&
-        profile.nodeType === NodeType.Email)
-  )
-
-  return emailProfiles
-}

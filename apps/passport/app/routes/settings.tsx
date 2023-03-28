@@ -19,7 +19,6 @@ import type { AddressURN } from '@proofzero/urns/address'
 import type { NodeType } from '@proofzero/types/address'
 
 import type { LinksFunction } from '@remix-run/cloudflare'
-import { getEmailProfiles } from '~/utils/profile'
 
 export const links: LinksFunction = () => [
   { rel: 'apple-touch-icon', href: appleIcon, sizes: '180x180' },
@@ -87,10 +86,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     ...addressTypeUrns[i],
     ...p,
   }))
-
-  const connectedEmailProfiles = getEmailProfiles(
-    normalizedConnectedProfiles
-  ) as typeof normalizedConnectedProfiles
 
   return {
     pfpUrl: accountProfile?.pfp?.image,

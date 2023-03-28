@@ -4,7 +4,7 @@ import { Listbox, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { HiCheck } from 'react-icons/hi'
-import { TbCircleMinus, TbCirclePlus } from 'react-icons/tb'
+import { TbCircleOff, TbCirclePlus } from 'react-icons/tb'
 import { MdOutlineAlternateEmail } from 'react-icons/md'
 
 type EmailSelectListItem = {
@@ -106,7 +106,7 @@ export const EmailSelect = ({
                 >
                   {({ selected }) => (
                     <div className="flex flex-row items-center space-x-3">
-                      <TbCircleMinus className="w-4 h-4" />
+                      <TbCircleOff className="w-4 h-4" />
 
                       <Text
                         size="sm"
