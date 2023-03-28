@@ -115,7 +115,7 @@ export default () => {
         goBack={() => navigate(`/authenticate/${clientId}/email`)}
         onCancel={() => navigate(`/authenticate/${clientId}`)}
       >
-        <Outlet />
+        {transition.state === 'idle' ? <Outlet /> : undefined}
       </EmailOTPValidator>
     </div>
   )
