@@ -11,7 +11,11 @@ import {
   getAddressClient,
 } from '~/platform.server'
 import { createUserSession, parseJwt } from '~/session.server'
-import { CryptoAddressType, OAuthAddressType } from '@proofzero/types/address'
+import {
+  CryptoAddressType,
+  EmailAddressType,
+  OAuthAddressType,
+} from '@proofzero/types/address'
 import { generateGradient } from './gradient.server'
 import { redirect } from '@remix-run/cloudflare'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
@@ -186,6 +190,20 @@ const provisionProfile = async (
                 image: avatar
                   ? `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`
                   : gradient,
+              },
+            }
+          }
+          case EmailAddressType.Email: {
+            const gradient = await generateGradient(
+              res.profile.email,
+              env,
+              traceSpan
+            )
+
+            return {
+              displayName: res.profile.name || res.profile.email,
+              pfp: {
+                image: gradient,
               },
             }
           }

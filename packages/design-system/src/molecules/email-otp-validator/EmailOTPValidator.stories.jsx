@@ -9,7 +9,9 @@ export default {
 
 const Template = (args) => (
   <div className="w-[402px] h-[491px]">
-    <EmailOTPValidator {...args} />
+    <div className="bg-white rounded-lg p-9 flex flex-col h-full">
+      <EmailOTPValidator {...args} />
+    </div>
   </div>
 )
 
@@ -17,6 +19,8 @@ export const EmailOTPValidatorExample = Template.bind({})
 EmailOTPValidatorExample.args = {
   email: 'john@email.com',
   regenerationTimerSeconds: 60,
+  state: 'foobar',
+  onCancel: async () => {},
   goBack: async () => {},
   requestRegeneration: async () => {},
   requestVerification: async () => {

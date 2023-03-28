@@ -1,6 +1,4 @@
 import { useEffect } from 'react'
-import classNames from 'classnames'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import type { ButtonProps } from '@proofzero/design-system/src/atoms/buttons/Button'
 
 import walletsSvg from './wallets.png'
@@ -10,6 +8,7 @@ import { useAccount, useDisconnect, useSignMessage } from 'wagmi'
 import { ConnectKitProvider, ConnectKitButton } from 'connectkit'
 
 import { signMessageTemplate } from '../../routes/connect/$address/sign'
+import AuthButton from './AuthButton'
 
 export type ConnectButtonProps = {
   connectCallback: (address: string) => void
@@ -96,61 +95,34 @@ export function ConnectButton({
           }
           return (
             <>
-              <Button
-                btnType="secondary-alt"
-                className={classNames('button', className)}
+              <AuthButton
                 disabled={isConnecting || isSigning || isLoading}
                 onClick={
                   isConnected ? () => address && connectCallback(address) : show
                 }
-                style={{
-                  height: 50,
-                  width: '100%',
-                  fontSize: 16,
-                  fontWeight: 500,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  padding: '1em',
-                }}
-              >
-                {(isSigning || isLoading) && isConnected ? (
-                  <>
-                    <Spinner />
-                    {isSigning
+                Graphic={
+                  (isSigning || isLoading) && isConnected ? (
+                    <Spinner size={16} />
+                  ) : (
+                    <>
+                      {!ensName && <img src={walletsSvg} />}
+                      {ensName && <Avatar size={20} name={ensName} />}
+                    </>
+                  )
+                }
+                text={
+                  (isSigning || isLoading) && isConnected
+                    ? isSigning
                       ? 'Signing... (please check wallet)'
-                      : 'Continuing...'}
-                  </>
-                ) : (
-                  <>
-                    {ensName && (
-                      <span className="mr-[7px]">
-                        <Avatar size={20} name={ensName} />
-                      </span>
-                    )}
+                      : 'Continuing...'
+                    : isConnected && address
+                    ? `Continue with ${ensName ?? truncatedAddress}`
+                    : !isConnecting
+                    ? 'Connect Wallet'
+                    : 'Connecting'
+                }
+              />
 
-                    {!ensName && (
-                      <span
-                        style={{
-                          backgroundRepeat: 'no-repeat',
-                          backgroundSize: '100%',
-                          height: 20,
-                          width: 20,
-                          margin: '0 7px',
-                        }}
-                      >
-                        <img src={walletsSvg} />
-                      </span>
-                    )}
-
-                    {isConnected && address
-                      ? `Continue with ${ensName ?? truncatedAddress}`
-                      : !isConnecting
-                      ? 'Connect Wallet'
-                      : 'Connecting'}
-                  </>
-                )}
-              </Button>
               {isConnected && (
                 <button
                   className={

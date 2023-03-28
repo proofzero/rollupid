@@ -1,29 +1,46 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
 import { Button } from '../../atoms/buttons/Button'
 import { Text } from '../../atoms/text/Text'
-import { Loader } from '../loader/Loader'
 
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 
 type EmailOTPValidatorProps = {
+  loading: boolean
+
   email: string
+  state: string
+
+  invalid: boolean
+
+  children?: JSX.Element
 
   goBack?: () => void
-  requestRegeneration: (email: string) => Promise<void>
-  requestVerification: (code: string) => Promise<boolean>
+  onCancel: () => void
 
-  regenerationTimerSeconds: number
+  requestRegeneration: (email: string) => void
+  requestVerification: (
+    email: string,
+    code: string,
+    state: string
+  ) => Promise<void>
+
+  regenerationTimerSeconds?: number
 }
 
 export default ({
+  loading,
   email,
+  state,
+  invalid,
+  children,
   goBack,
+  onCancel,
   requestRegeneration,
   requestVerification,
   regenerationTimerSeconds = 60,
 }: EmailOTPValidatorProps) => {
-  const inputLen = 5
+  const inputLen = 6
   const inputRefs = Array.from({ length: inputLen }, () =>
     useRef<HTMLInputElement>()
   )
@@ -34,19 +51,60 @@ export default ({
     setFullCode(updatedCode)
   }, [inputRefs])
 
-  const [isInvalid, setIsInvalid] = useState(false)
+  const [isInvalid, setIsInvalid] = useState(invalid)
   const [showInvalidMessage, setShowInvalidMessage] = useState(false)
-  const [loading, setLoading] = useState(false)
 
   const [regenerationRequested, setRegenerationRequested] = useState(false)
+  const [showChildren, setShowChildren] = useState(true)
+
+  const [loadedState, setLoadedState] = useState<undefined | string>()
+  useEffect(() => {
+    if (state) {
+      setLoadedState(state)
+    }
+  }, [state])
+
+  useEffect(() => {
+    setIsInvalid(invalid)
+
+    if (invalid) {
+      setShowInvalidMessage(true)
+      inputRefs[0].current.focus()
+      inputRefs[0].current.select()
+    }
+  }, [invalid])
+
+  useEffect(() => {
+    const handleKeyPress = (evt: KeyboardEvent) => {
+      if (
+        evt.key === 'Enter' &&
+        fullCode.length === inputLen &&
+        !loading &&
+        !isInvalid
+      ) {
+        evt.preventDefault()
+
+        const asyncFn = async () => {
+          requestVerification(email, fullCode, loadedState)
+        }
+
+        asyncFn()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [email, fullCode, loadedState, loading, isInvalid])
 
   return (
-    <div className="bg-white rounded-lg p-9 flex flex-col h-full">
-      {loading && <Loader />}
-      <section className="relative flex justify-center items-center">
+    <>
+      <section className="relative flex justify-center items-center w-full">
         {goBack && (
           <HiOutlineArrowLeft
-            className="absolute -left-8 -top-8 lg:left-0 lg:top-0 w-6 h-6 cursor-pointer"
+            className="absolute left-0 lg:left-0 lg:top-[0.15rem] w-6 h-6 cursor-pointer"
             onClick={goBack}
           />
         )}
@@ -61,7 +119,7 @@ export default ({
           <Text className="text-gray-500 font-medium">{email}</Text>
         </div>
 
-        <div className="grid grid-cols-5 gap-2.5">
+        <div className="grid grid-cols-6 gap-2.5">
           {inputRefs.map((ref, i) => (
             <input
               key={i}
@@ -73,7 +131,7 @@ export default ({
               maxLength={1}
               minLength={1}
               onClick={() => {
-                inputRefs[i].current.select()
+                inputRefs[i].current.focus()
               }}
               onChange={(ev) => {
                 if (ev.target.value === '') return
@@ -119,7 +177,6 @@ export default ({
               }}
               onFocus={() => {
                 if (isInvalid && inputRefs[i].current) {
-                  inputRefs[i].current.value = ''
                   setIsInvalid(false)
                 }
 
@@ -132,7 +189,7 @@ export default ({
           ))}
         </div>
 
-        {showInvalidMessage && (
+        {showInvalidMessage && invalid && (
           <Text
             size="sm"
             weight="medium"
@@ -155,8 +212,9 @@ export default ({
             onClick={() => {
               if (regenerationRequested) return
 
-              requestRegeneration(email)
               setRegenerationRequested(true)
+              requestRegeneration(email)
+              setShowChildren(true)
             }}
           >
             Click to send another
@@ -170,42 +228,42 @@ export default ({
                   rotation={'counterclockwise'}
                   colors={'#6366f1'}
                   isGrowing={true}
-                  onComplete={() => setRegenerationRequested(false)}
+                  onComplete={() => {
+                    setRegenerationRequested(false)
+                    setShowChildren(false)
+                  }}
                 />
               </div>
             )}
           </Text>
         </div>
+
+        {children && showChildren && <div className="my-3">{children}</div>}
       </section>
 
       <section className="flex flex-row space-x-4">
-        <Button btnSize="xl" btnType="secondary-alt" className="flex-1">
+        <Button
+          btnSize="xl"
+          btnType="secondary-alt"
+          className="flex-1"
+          onClick={onCancel}
+        >
           Cancel
         </Button>
         <Button
           btnSize="xl"
           btnType="primary-alt"
           className="flex-1"
-          disabled={fullCode.length !== inputLen || loading}
+          disabled={fullCode.length !== inputLen || loading || isInvalid}
           onClick={async () => {
-            setLoading(true)
             setShowInvalidMessage(false)
 
-            const valid = await requestVerification(fullCode)
-            setIsInvalid(!valid)
-
-            if (!valid) {
-              setShowInvalidMessage(true)
-              inputRefs[0].current.focus()
-              inputRefs[0].current.select()
-            }
-
-            setLoading(false)
+            await requestVerification(email, fullCode, loadedState)
           }}
         >
           Verify
         </Button>
       </section>
-    </div>
+    </>
   )
 }
