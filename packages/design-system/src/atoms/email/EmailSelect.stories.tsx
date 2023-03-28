@@ -1,3 +1,4 @@
+import React from 'react'
 import { EmailSelect } from './EmailSelect'
 
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'

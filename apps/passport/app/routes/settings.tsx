@@ -19,6 +19,7 @@ import type { AddressURN } from '@proofzero/urns/address'
 import type { NodeType } from '@proofzero/types/address'
 
 import type { LinksFunction } from '@remix-run/cloudflare'
+import { getEmailProfiles } from '~/utils/profile'
 
 export const links: LinksFunction = () => [
   { rel: 'apple-touch-icon', href: appleIcon, sizes: '180x180' },
@@ -87,9 +88,14 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     ...p,
   }))
 
+  const connectedEmailProfiles = getEmailProfiles(
+    normalizedConnectedProfiles
+  ) as typeof normalizedConnectedProfiles
+
   return {
     pfpUrl: accountProfile?.pfp?.image,
     displayName: accountProfile?.displayName,
+    connectedEmailProfiles: connectedEmailProfiles,
     authorizedApps: authorizedApps,
     connectedProfiles: normalizedConnectedProfiles,
     CONSOLE_URL: context.env.CONSOLE_APP_URL,
@@ -103,8 +109,13 @@ export const meta: MetaFunction = () => ({
 })
 
 export default function SettingsLayout() {
-  const { authorizedApps, connectedProfiles, pfpUrl, CONSOLE_URL } =
-    useLoaderData()
+  const {
+    authorizedApps,
+    connectedProfiles,
+    pfpUrl,
+    CONSOLE_URL,
+    connectedEmailProfiles,
+  } = useLoaderData()
 
   return (
     <Popover className="bg-gray-50 min-h-screen relative">
@@ -126,7 +137,13 @@ export default function SettingsLayout() {
                 } px-2 sm:max-md:px-5 md:px-10
                 pb-5 md:pb-10 pt-6`}
               >
-                <Outlet context={{ authorizedApps, connectedProfiles }} />
+                <Outlet
+                  context={{
+                    authorizedApps,
+                    connectedProfiles,
+                    connectedEmailProfiles,
+                  }}
+                />
               </div>
             </div>
           </div>

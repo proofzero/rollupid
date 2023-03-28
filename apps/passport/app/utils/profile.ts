@@ -2,6 +2,7 @@ import {
   EmailAddressType,
   OAuthAddressType,
   CryptoAddressType,
+  NodeType,
 } from '@proofzero/types/address'
 
 export const normalizeProfileToConnection = (profile: any) => {
@@ -71,4 +72,17 @@ export const normalizeProfileToConnection = (profile: any) => {
         type: 'Email',
       }
   }
+}
+
+export const getEmailProfiles = (normalizedConnectedProfiles: any[]) => {
+  const emailProfiles = normalizedConnectedProfiles.filter(
+    (profile) =>
+      (profile.nodeType === NodeType.OAuth &&
+        (profile.type === OAuthAddressType.Google ||
+          profile.type === OAuthAddressType.Microsoft)) ||
+      (profile.type === EmailAddressType.Email &&
+        profile.nodeType === NodeType.Email)
+  )
+
+  return emailProfiles
 }
