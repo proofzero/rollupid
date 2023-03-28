@@ -1,5 +1,6 @@
 import { Outlet, useLoaderData } from '@remix-run/react'
-import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
+
+import { json } from '@remix-run/cloudflare'
 import { getValidatedSessionContext } from '~/session.server'
 import { Popover } from '@headlessui/react'
 import SideMenu from '~/components/SideMenu'
@@ -15,9 +16,10 @@ import {
   getAddressClient,
   getStarbaseClient,
 } from '~/platform.server'
+
 import type { AddressURN } from '@proofzero/urns/address'
 import type { NodeType } from '@proofzero/types/address'
-
+import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
 import type { LinksFunction } from '@remix-run/cloudflare'
 
 export const links: LinksFunction = () => [
@@ -87,13 +89,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     ...p,
   }))
 
-  return {
+  return json({
     pfpUrl: accountProfile?.pfp?.image,
     displayName: accountProfile?.displayName,
     authorizedApps: authorizedApps,
     connectedProfiles: normalizedConnectedProfiles,
     CONSOLE_URL: context.env.CONSOLE_APP_URL,
-  }
+  })
 }
 
 export const meta: MetaFunction = () => ({
