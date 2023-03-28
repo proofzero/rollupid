@@ -16,21 +16,30 @@ type EmailSelectProps = {
   allowEmpty?: boolean
 }
 
+enum OptionType {
+  Email,
+  AddNew,
+  None,
+}
+
 export const EmailSelect = ({
   items,
   enableAddNew = false,
   allowEmpty = false,
 }: EmailSelectProps) => {
-  const [selected, setSelected] = useState(
-    items[0]?.email ?? 'No email address available'
-  )
+  const options = items.map((item) => ({
+    ...item,
+    type: OptionType.Email,
+  }))
+
+  const [selected, setSelected] = useState(options[0])
 
   return (
-    <Listbox value={selected} onChange={setSelected}>
+    <Listbox value={selected} onChange={setSelected} by="email">
       <div className="relative">
         <Listbox.Button className="border shadow-sm rounded-lg w-full flex flex-row space-between items-center py-2 px-3 hover:ring-1 hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500">
           <Text size="sm" className="flex-1 text-left text-gray-800">
-            {selected}
+            {selected.email}
           </Text>
           <ChevronDownIcon className="w-5 h-5" />
         </Listbox.Button>
@@ -45,7 +54,7 @@ export const EmailSelect = ({
             {items.map((item, i) => (
               <Listbox.Option
                 key={i}
-                value={item.email}
+                value={item}
                 className="py-2 px-3 cursor-pointer"
               >
                 {({ selected }) => (
@@ -69,7 +78,10 @@ export const EmailSelect = ({
 
             {allowEmpty && (
               <Listbox.Option
-                value={'None'}
+                value={{
+                  type: OptionType.None,
+                  email: 'None',
+                }}
                 className="py-2 px-3 cursor-pointer"
               >
                 {({ selected }) => (
@@ -93,7 +105,10 @@ export const EmailSelect = ({
 
             {enableAddNew && (
               <Listbox.Option
-                value={'Connect new email address'}
+                value={{
+                  type: OptionType.AddNew,
+                  email: 'Connect new email address',
+                }}
                 className="py-2 px-3 cursor-pointer"
               >
                 {({ selected }) => (
