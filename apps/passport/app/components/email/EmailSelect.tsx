@@ -3,7 +3,7 @@ import { Listbox, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { HiCheck } from 'react-icons/hi'
-import { TbCirclePlus } from 'react-icons/tb'
+import { TbCircleMinus, TbCirclePlus } from 'react-icons/tb'
 
 type EmailSelectListItem = {
   iconURL: string
@@ -12,9 +12,15 @@ type EmailSelectListItem = {
 
 type EmailSelectProps = {
   items: EmailSelectListItem[]
+  enableAddNew?: boolean
+  allowEmpty?: boolean
 }
 
-export const EmailSelect = ({ items }: EmailSelectProps) => {
+export const EmailSelect = ({
+  items,
+  enableAddNew = false,
+  allowEmpty = false,
+}: EmailSelectProps) => {
   const [selected, setSelected] = useState(
     items[0]?.email ?? 'No email address available'
   )
@@ -61,25 +67,53 @@ export const EmailSelect = ({ items }: EmailSelectProps) => {
               </Listbox.Option>
             ))}
 
-            <Listbox.Option
-              value={'Connect new email address'}
-              className="py-2 px-3 cursor-pointer"
-            >
-              {({ selected }) => (
-                <div className="flex flex-row items-center space-x-3">
-                  <TbCirclePlus className="w-4 h-4" />
+            {allowEmpty && (
+              <Listbox.Option
+                value={'None'}
+                className="py-2 px-3 cursor-pointer"
+              >
+                {({ selected }) => (
+                  <div className="flex flex-row items-center space-x-3">
+                    <TbCircleMinus className="w-4 h-4" />
 
-                  <Text
-                    size="sm"
-                    weight={selected ? 'semibold' : 'normal'}
-                    className={`${selected ? '' : ''} flex-1 truncate`}
-                  >
-                    Connect new email address
-                  </Text>
-                  {selected && <HiCheck className="w-5 h-5 text-indigo-500" />}
-                </div>
-              )}
-            </Listbox.Option>
+                    <Text
+                      size="sm"
+                      weight={selected ? 'semibold' : 'normal'}
+                      className={`${selected ? '' : ''} flex-1 truncate`}
+                    >
+                      None
+                    </Text>
+                    {selected && (
+                      <HiCheck className="w-5 h-5 text-indigo-500" />
+                    )}
+                  </div>
+                )}
+              </Listbox.Option>
+            )}
+
+            {enableAddNew && (
+              <Listbox.Option
+                value={'Connect new email address'}
+                className="py-2 px-3 cursor-pointer"
+              >
+                {({ selected }) => (
+                  <div className="flex flex-row items-center space-x-3">
+                    <TbCirclePlus className="w-4 h-4" />
+
+                    <Text
+                      size="sm"
+                      weight={selected ? 'semibold' : 'normal'}
+                      className={`${selected ? '' : ''} flex-1 truncate`}
+                    >
+                      Connect new email address
+                    </Text>
+                    {selected && (
+                      <HiCheck className="w-5 h-5 text-indigo-500" />
+                    )}
+                  </div>
+                )}
+              </Listbox.Option>
+            )}
           </Listbox.Options>
         </Transition>
       </div>

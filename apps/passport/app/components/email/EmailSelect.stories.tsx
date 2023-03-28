@@ -19,10 +19,13 @@ const listItems = [
   },
 ]
 
-const Template = () => (
+const Template = (args: any) => (
   <div className="w-[262px]">
-    <EmailSelect items={listItems} />
+    <EmailSelect items={listItems} {...args} />
   </div>
 )
 
-export const Default = Template.bind({})
+export const EmailSelectExample = Template.bind({}) as any
+EmailSelectExample.args = {
+  enableAddNew: true,
+}
