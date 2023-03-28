@@ -55,6 +55,7 @@ export default ({
   const [showInvalidMessage, setShowInvalidMessage] = useState(false)
 
   const [regenerationRequested, setRegenerationRequested] = useState(false)
+  const [showChildren, setShowChildren] = useState(true)
 
   const [loadedState, setLoadedState] = useState<undefined | string>()
   useEffect(() => {
@@ -213,6 +214,7 @@ export default ({
 
               setRegenerationRequested(true)
               requestRegeneration(email)
+              setShowChildren(true)
             }}
           >
             Click to send another
@@ -226,16 +228,17 @@ export default ({
                   rotation={'counterclockwise'}
                   colors={'#6366f1'}
                   isGrowing={true}
-                  onComplete={() => setRegenerationRequested(false)}
+                  onComplete={() => {
+                    setRegenerationRequested(false)
+                    setShowChildren(false)
+                  }}
                 />
               </div>
             )}
           </Text>
         </div>
 
-        {children && regenerationRequested && (
-          <div className="my-3">{children}</div>
-        )}
+        {children && showChildren && <div className="my-3">{children}</div>}
       </section>
 
       <section className="flex flex-row space-x-4">
