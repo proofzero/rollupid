@@ -3,9 +3,17 @@ import {
   OAuthAddressType,
   EmailAddressType,
 } from '@proofzero/types/address'
-import type { Addresses } from '@proofzero/platform.account/src/types'
 
-export default function (connectedAddresses: Addresses) {
+import type { Addresses } from '@proofzero/platform.account/src/types'
+import { AddressURN } from '@proofzero/urns/address'
+
+export type EmailSelectListItem = {
+  email: string
+  addressURN: AddressURN
+  type?: string
+}
+
+export default function (connectedAddresses: Addresses): EmailSelectListItem[] {
   return connectedAddresses
     .filter((address) => {
       return (
@@ -36,5 +44,5 @@ export default function (connectedAddresses: Addresses) {
           email: address.qc.alias,
           addressURN: address.baseUrn,
         }
-    })
+    }) as EmailSelectListItem[]
 }

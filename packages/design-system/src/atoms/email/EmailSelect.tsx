@@ -12,18 +12,12 @@ import { OAuthAddressType } from '@proofzero/types/address'
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
 
-import type { AddressURN } from '@proofzero/urns/address'
-
-type EmailSelectListItem = {
-  email: string
-  addressURN: AddressURN
-  type?: string
-}
+import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
 
 type EmailSelectProps = {
   items: EmailSelectListItem[]
   enableAddNew?: boolean
-  allowEmpty?: boolean
+  enableNone?: boolean
 }
 
 enum OptionType {
@@ -35,7 +29,7 @@ enum OptionType {
 export const EmailSelect = ({
   items,
   enableAddNew = false,
-  allowEmpty = false,
+  enableNone = false,
 }: EmailSelectProps) => {
   const options = items.map((item) => ({
     ...item,
@@ -117,7 +111,7 @@ export const EmailSelect = ({
                 )
               })}
 
-              {allowEmpty && (
+              {enableNone && (
                 <Listbox.Option
                   value={{
                     type: OptionType.None,
