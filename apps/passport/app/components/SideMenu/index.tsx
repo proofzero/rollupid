@@ -11,10 +11,13 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 // Images
 import passportLogo from '../../assets/PassportLogoBlack.svg'
 import consoleLogo from '../../assets/consoleLogo.svg'
-import { HiOutlineHome, HiOutlineExternalLink } from 'react-icons/hi'
+import {
+  HiOutlineHome,
+  HiOutlineExternalLink,
+  HiOutlineCog,
+} from 'react-icons/hi'
 import { IoMdExit } from 'react-icons/io'
 import { TbPlugConnected, TbApps } from 'react-icons/tb'
-import { BsGear } from 'react-icons/bs'
 
 import { Popover, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
@@ -112,10 +115,11 @@ export default function SideMenu({ open, CONSOLE_URL }: PassportMenuProps) {
       {/* Mobile Menu */}
       <div className="lg:hidden">
         <Popover.Button
-          className="absolute top-0 right-2 my-[19px] items-right rounded-lg
-              justify-right bg-white border p-2 text-black hover:bg-gray-50
-               focus:outline-none focus:ring-2 focus:ring-white
-              focus:ring-offset-2 focus:ring-offset-gray-800"
+          className="absolute top-0 right-2 sm:max-md:right-5 md:right-10
+                my-[19px] items-right rounded-lg
+                justify-right bg-white border p-2 text-black hover:bg-gray-50
+                focus:outline-none focus:ring-2 focus:ring-white
+                focus:ring-offset-2 focus:ring-offset-gray-800"
         >
           <span className="sr-only">Open main menu</span>
           {open ? (
@@ -214,7 +218,7 @@ const navigation = {
     {
       name: 'Advanced Settings',
       href: '/settings/advanced',
-      icon: BsGear,
+      icon: HiOutlineCog,
       exists: true,
     },
   ],

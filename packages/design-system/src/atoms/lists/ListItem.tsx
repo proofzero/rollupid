@@ -14,6 +14,7 @@ export const ListItem = ({ id, children, disabled = false }: ListItemProps) => {
                border border-gray-300 rounded-md
                 py-3 mb-3 bg-white
                 flex flex-row items-center justify-between
+                shadow-sm
                 ${disabled ? 'bg-gray-100' : ''}
                  `}
     >
