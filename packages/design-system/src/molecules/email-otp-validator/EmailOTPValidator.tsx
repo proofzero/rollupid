@@ -28,7 +28,7 @@ type EmailOTPValidatorProps = {
   regenerationTimerSeconds?: number
 }
 
-export default ({
+export default function EmailOTPValidator({
   loading,
   email,
   state,
@@ -39,7 +39,7 @@ export default ({
   requestRegeneration,
   requestVerification,
   regenerationTimerSeconds = 60,
-}: EmailOTPValidatorProps) => {
+}: EmailOTPValidatorProps) {
   const inputLen = 6
   const inputRefs = Array.from({ length: inputLen }, () =>
     useRef<HTMLInputElement>()
@@ -101,7 +101,10 @@ export default ({
 
   return (
     <>
-      <section className="relative flex justify-center items-center w-full">
+      <section
+        className="relative flex justify-center items-center w-full
+      mb-8 mt-6"
+      >
         {goBack && (
           <HiOutlineArrowLeft
             className="absolute left-0 lg:left-0 lg:top-[0.15rem] w-6 h-6 cursor-pointer"
