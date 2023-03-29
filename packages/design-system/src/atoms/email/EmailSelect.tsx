@@ -7,9 +7,14 @@ import { HiCheck } from 'react-icons/hi'
 import { TbCircleOff, TbCirclePlus } from 'react-icons/tb'
 import { MdOutlineAlternateEmail } from 'react-icons/md'
 
+import { OAuthAddressType, EmailAddressType } from '@proofzero/types/address'
+
+import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
+import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
+
 type EmailSelectListItem = {
   email: string
-  iconURL?: string
+  type?: string
 }
 
 type EmailSelectProps = {
@@ -34,7 +39,12 @@ export const EmailSelect = ({
     type: OptionType.Email,
   }))
 
-  const [selected, setSelected] = useState(options[0])
+  const [selected, setSelected] = useState(
+    options[0] || {
+      type: OptionType.None,
+      email: 'None',
+    }
+  )
 
   return (
     <Listbox value={selected} onChange={setSelected} by="email">
@@ -65,35 +75,44 @@ export const EmailSelect = ({
               className="border shadow-lg rounded-lg
              absolute w-full mt-1 bg-white"
             >
-              {items.map((item, i) => (
-                <Listbox.Option
-                  key={i}
-                  value={item}
-                  className="py-2 px-3 cursor-pointer
-                  hover:bg-gray-50"
-                >
-                  {({ selected }) => (
-                    <div className="flex flex-row items-center">
-                      {item.iconURL ? (
-                        <img src={item.iconURL} className="w-4 h-4 mr-3" />
-                      ) : (
-                        <MdOutlineAlternateEmail className="w-4 h-4 mr-3" />
-                      )}
+              {items.map((item, i) => {
+                const iconURL =
+                  item.type === OAuthAddressType.Microsoft
+                    ? microsoftIcon
+                    : item.type === OAuthAddressType.Google
+                    ? googleIcon
+                    : null
 
-                      <Text
-                        size="sm"
-                        weight={selected ? 'semibold' : 'normal'}
-                        className={`${selected ? '' : ''} flex-1`}
-                      >
-                        {item.email}
-                      </Text>
-                      {selected && (
-                        <HiCheck className="w-5 h-5 text-indigo-500" />
-                      )}
-                    </div>
-                  )}
-                </Listbox.Option>
-              ))}
+                return (
+                  <Listbox.Option
+                    key={i}
+                    value={item}
+                    className="py-2 px-3 cursor-pointer
+                  hover:bg-gray-50"
+                  >
+                    {({ selected }) => (
+                      <div className="flex flex-row items-center">
+                        {iconURL ? (
+                          <img src={iconURL} className="w-4 h-4 mr-3" />
+                        ) : (
+                          <MdOutlineAlternateEmail className="w-4 h-4 mr-3" />
+                        )}
+
+                        <Text
+                          size="sm"
+                          weight={selected ? 'semibold' : 'normal'}
+                          className={`${selected ? '' : ''} flex-1`}
+                        >
+                          {item.email}
+                        </Text>
+                        {selected && (
+                          <HiCheck className="w-5 h-5 text-indigo-500" />
+                        )}
+                      </div>
+                    )}
+                  </Listbox.Option>
+                )
+              })}
 
               {allowEmpty && (
                 <Listbox.Option
