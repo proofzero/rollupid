@@ -191,7 +191,7 @@ export default function SideMenu({
                           size="sm"
                           weight="medium"
                         >
-                          {displayName + displayName + displayName}
+                          {displayName}
                         </Text>
                       </span>
                     </div>
