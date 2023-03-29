@@ -37,7 +37,7 @@ export const loader: LoaderFunction = async ({ params }) => {
 
 export const action: ActionFunction = async ({ request, context, params }) => {
   let consoleParams
-  if (params.clientId !== 'console') {
+  if (params.clientId !== 'console' && params.clientId !== 'passport') {
     consoleParams = await getConsoleParamsSession(
       request,
       context.env,
@@ -59,7 +59,12 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   )
 
   // TODO: Make decision based on clientId params (console?)
-  if (!consoleParams) return redirect(context.env.CONSOLE_APP_URL)
+  if (!consoleParams) {
+    let redirectURL =
+      params.clientId === 'console' ? context.env.CONSOLE_APP_URL : '/settings'
+
+    return redirect(redirectURL)
+  }
 
   const { redirectUri, state, clientId } = consoleParams
 

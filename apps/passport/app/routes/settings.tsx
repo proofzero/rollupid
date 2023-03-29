@@ -1,7 +1,7 @@
 import { Outlet, useLoaderData } from '@remix-run/react'
 
 import { json } from '@remix-run/cloudflare'
-import { getValidatedSessionContext } from '~/session.server'
+import { getValidatedPassportContext } from '~/session.server'
 import { Popover } from '@headlessui/react'
 import SideMenu from '~/components/SideMenu'
 import Header from '~/components/Header'
@@ -30,15 +30,13 @@ export const links: LinksFunction = () => [
 ]
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const { jwt, accountUrn } = await getValidatedSessionContext(
+  const { jwt, accountUrn } = await getValidatedPassportContext(
     request,
-    context.consoleParams,
     context.env,
     context.traceSpan
   )
 
   const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-
   const starbaseClient = getStarbaseClient(jwt, context.env, context.traceSpan)
 
   const accountProfile = await accountClient.getProfile.query({

@@ -15,15 +15,12 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   let clientId
   const headers = new Headers()
 
-  console.log({ HELLO: 'HELLO' })
-
-  if (params.clientId !== 'console') {
+  if (params.clientId !== 'console' && params.clientId !== 'passport') {
     const consoleParmamsSessionFromCookie = await getConsoleParamsSession(
       request,
       context.env,
       params.clientId!
     )
-    console.log({ params })
     const consoleParamsSession = consoleParmamsSessionFromCookie.get('params')
     const parsedParams = consoleParamsSession
       ? await JSON.parse(consoleParamsSession)
@@ -51,9 +48,8 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       await destroyConsoleParamsSession(request, context.env, 'last')
     )
   }
-
   let appProps
-  if (clientId) {
+  if (clientId && clientId !== 'console' && clientId !== 'passport') {
     const sbClient = getStarbaseClient('', context.env, context.traceSpan)
     appProps = await sbClient.getAppPublicProps.query({ clientId })
   }
