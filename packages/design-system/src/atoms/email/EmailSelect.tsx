@@ -7,13 +7,16 @@ import { HiCheck } from 'react-icons/hi'
 import { TbCircleOff, TbCirclePlus } from 'react-icons/tb'
 import { MdOutlineAlternateEmail } from 'react-icons/md'
 
-import { OAuthAddressType, EmailAddressType } from '@proofzero/types/address'
+import { OAuthAddressType } from '@proofzero/types/address'
 
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
 
+import type { AddressURN } from '@proofzero/urns/address'
+
 type EmailSelectListItem = {
   email: string
+  addressURN: AddressURN
   type?: string
 }
 

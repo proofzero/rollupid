@@ -19,9 +19,22 @@ export default function (connectedAddresses: Addresses) {
     .map((address) => {
       if (address.rc.node_type === NodeType.OAuth) {
         if (address.rc.addr_type === OAuthAddressType.Google)
-          return { type: OAuthAddressType.Google, email: address.qc.alias }
+          return {
+            type: OAuthAddressType.Google,
+            email: address.qc.alias,
+            addressURN: address.baseUrn,
+          }
         if (address.rc.addr_type === OAuthAddressType.Microsoft)
-          return { type: OAuthAddressType.Microsoft, email: address.qc.alias }
-      } else return { type: EmailAddressType.Email, email: address.qc.alias }
+          return {
+            type: OAuthAddressType.Microsoft,
+            email: address.qc.alias,
+            addressURN: address.baseUrn,
+          }
+      } else
+        return {
+          type: EmailAddressType.Email,
+          email: address.qc.alias,
+          addressURN: address.baseUrn,
+        }
     })
 }
