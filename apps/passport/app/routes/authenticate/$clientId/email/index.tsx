@@ -2,9 +2,11 @@ import { HiOutlineArrowLeft } from 'react-icons/hi'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
-import { ActionFunction, redirect } from '@remix-run/cloudflare'
+import { redirect } from '@remix-run/cloudflare'
 import { Form } from '@remix-run/react'
 import { useState } from 'react'
+
+import type { ActionFunction } from '@remix-run/cloudflare'
 
 export const action: ActionFunction = async ({ request, params }) => {
   const fd = await request.formData()
@@ -26,7 +28,10 @@ export default () => {
   return (
     <div
       className={
-        'flex shrink flex-col items-center justify-center gap-4 mx-auto bg-white p-6 h-[100dvh] lg:h-[675px] lg:max-h-[100dvh] w-full lg:w-[418px] lg:border-rounded-lg'
+        'flex shrink flex-col items-center\
+         justify-center gap-4 mx-auto bg-white p-6 h-[100dvh]\
+          lg:h-[675px] lg:max-h-[100dvh] w-full lg:w-[418px]\
+          lg:rounded-lg'
       }
       style={{
         border: '1px solid #D1D5DB',
@@ -34,9 +39,13 @@ export default () => {
       }}
     >
       <Form className="flex-1 flex flex-col w-full" method="post">
-        <section className="relative flex justify-center items-center mb-8">
+        <section
+          className="relative flex justify-center
+         items-center mb-8 mt-6 "
+        >
           <HiOutlineArrowLeft
-            className="absolute left-0 lg:left-0 lg:top-[0.15rem] w-6 h-6 cursor-pointer"
+            className="absolute left-0 lg:left-0 lg:top-[0.15rem] w-6 h-6
+            text-gray-600 cursor-pointer"
             onClick={() => history.back()}
           />
 
@@ -50,7 +59,7 @@ export default () => {
             id="address"
             label="Enter your email address"
             pattern="[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
-            required
+            className="h-12 rounded-lg"
             autoFocus
             onChange={(e) => {
               setIsValidEmail(e.target.validity.valid)

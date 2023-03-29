@@ -167,7 +167,7 @@ export default function AdvancedLayout() {
       <article
         className="flex-1 flex flex-col sm:flex-row
       px-5 py-4 space-x-4 rounded-lg border items-end
-      sm:items-center bg-white"
+      sm:items-center bg-white shadow-sm"
       >
         <div className="flex-1 flex flex-col space-y-2">
           <Text weight="semibold" className="text-gray-900">

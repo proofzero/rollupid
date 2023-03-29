@@ -12,7 +12,7 @@ const SectionTitle = ({ className, title, subtitle }: SectionTitleProps) => {
 
   return (
     <div className={cleanedClassName}>
-      <Text className="mb-1 text-gray-800" weight="semibold" size="xl">
+      <Text className="text-gray-800" weight="semibold" size="xl">
         {title}
       </Text>
 

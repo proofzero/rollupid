@@ -45,9 +45,10 @@ export default function DashboardLayout() {
             <SectionTitle title="Activity" />
             <div
               className="w-full h-[205px] border border-gray-200
-              rounded-lg shadow flex justify-center items-center "
+              rounded-lg shadow flex justify-center items-center
+              shadow-sm"
               style={{
-                background: `url(${dashboardChart})`,
+                background: `url(${dashboardChart}), #FFFFFF`,
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'bottom',
                 backgroundSize: 'contain',
@@ -84,7 +85,10 @@ export default function DashboardLayout() {
           {authorizedApps.length === 0 ? (
             <NestedErrorPage text={'No Application Available'} />
           ) : (
-            <div className="border bg-white shadow flex-1 flex flex-col rounded-lg mb-4 sm:mb-0">
+            <div
+              className="border bg-white shadow-sm flex-1 flex flex-col
+             rounded-lg mb-4 sm:mb-0"
+            >
               <div className="bg-[#F9FAFB] flex items-center py-5 px-8 rounded-t-lg">
                 <Text
                   size="sm"
