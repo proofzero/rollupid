@@ -23,6 +23,7 @@ import { Popover, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 import { SideMenuItem } from './Item'
+import { Avatar } from '@proofzero/design-system'
 
 const activeStyle = {
   backgroundColor: 'rgb(243 244 246)',
@@ -88,9 +89,16 @@ const ConsolenNavItem = ({ CONSOLE_URL }: { CONSOLE_URL: string }) => {
 type PassportMenuProps = {
   open: boolean
   CONSOLE_URL: string
+  pfpUrl: string
+  displayName: string
 }
 
-export default function SideMenu({ open, CONSOLE_URL }: PassportMenuProps) {
+export default function SideMenu({
+  open,
+  CONSOLE_URL,
+  pfpUrl,
+  displayName,
+}: PassportMenuProps) {
   let [referenceElement, setReferenceElement] = useState()
   let [popperElement, setPopperElement] = useState()
   let { attributes } = usePopper(referenceElement, popperElement)
@@ -142,7 +150,7 @@ export default function SideMenu({ open, CONSOLE_URL }: PassportMenuProps) {
         <Popover.Panel
           className={`
           bg-white border mt-[80px] lg:hidden z-[100]
-          min-h-[416px] h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] w-[240px]
+          min-h-[416px] h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] w-[280px]
           `}
           ref={setPopperElement}
           style={{ position: 'absolute', right: '0', top: '0' }}
@@ -166,20 +174,28 @@ export default function SideMenu({ open, CONSOLE_URL }: PassportMenuProps) {
                     className={({ isActive }) => `text-sm group ${
                       isActive ? 'border-l-2' : ''
                     } px-4 py-4
-                  flex self-center justify-start
-                  flex-row  items-center text-red-500 hover:bg-gray-100`}
+                  flex self-center justify-between w-full
+                  flex-row items-center text-gray-600 hover:bg-gray-100`}
                   >
-                    <IoMdExit size={24} className="-ml-1 mr-3" />
+                    <div className="flex flex-row items-center">
+                      <Avatar
+                        src={pfpUrl}
+                        size="xs"
+                        className="mr-3 -ml-2 h-6 w-6 border"
+                      />
 
-                    <span className={'self-center'}>
-                      <Text
-                        className="truncate self-center"
-                        size="sm"
-                        weight="medium"
-                      >
-                        Sign Out
-                      </Text>
-                    </span>
+                      <span className={'self-center'}>
+                        <Text
+                          className="max-w-[140px]
+                        truncate self-center"
+                          size="sm"
+                          weight="medium"
+                        >
+                          {displayName + displayName + displayName}
+                        </Text>
+                      </span>
+                    </div>
+                    <IoMdExit size={24} />
                   </NavLink>
                 </div>
               </div>

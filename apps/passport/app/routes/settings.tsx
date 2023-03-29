@@ -105,15 +105,25 @@ export const meta: MetaFunction = () => ({
 })
 
 export default function SettingsLayout() {
-  const { authorizedApps, connectedProfiles, pfpUrl, CONSOLE_URL } =
-    useLoaderData()
+  const {
+    authorizedApps,
+    connectedProfiles,
+    pfpUrl,
+    CONSOLE_URL,
+    displayName,
+  } = useLoaderData()
 
   return (
     <Popover className="bg-gray-50 min-h-screen relative">
       {({ open }) => {
         return (
           <div className="flex lg:flex-row h-full">
-            <SideMenu CONSOLE_URL={CONSOLE_URL} open={open} />
+            <SideMenu
+              CONSOLE_URL={CONSOLE_URL}
+              pfpUrl={pfpUrl}
+              open={open}
+              displayName={displayName}
+            />
 
             <div className={`flex flex-col w-full`}>
               <Header pfpUrl={pfpUrl} />
