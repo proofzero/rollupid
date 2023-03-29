@@ -1,8 +1,7 @@
 import React from 'react'
 import { EmailSelect } from './EmailSelect'
 
-import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
-import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
+import { OAuthAddressType, EmailAddressType } from '@proofzero/types/address'
 
 export default {
   title: 'Atoms/Email/Select',
@@ -11,12 +10,16 @@ export default {
 
 const listItems = [
   {
-    iconURL: googleIcon,
+    type: OAuthAddressType.Google,
     email: 'email@gmail.com',
   },
   {
-    iconURL: microsoftIcon,
-    email: 'email@msft.com',
+    type: OAuthAddressType.Microsoft,
+    email: 'email@microsoft.com',
+  },
+  {
+    type: EmailAddressType.Email,
+    email: 'email@yahoo.com',
   },
 ]
 
