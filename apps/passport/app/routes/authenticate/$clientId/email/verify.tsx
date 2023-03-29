@@ -112,7 +112,7 @@ export default () => {
             }
           )
         }}
-        goBack={() => navigate(`/authenticate/${clientId}/email`)}
+        goBack={() => history.back()}
         onCancel={() => navigate(`/authenticate/${clientId}`)}
       >
         {transition.state === 'idle' ? <Outlet /> : undefined}

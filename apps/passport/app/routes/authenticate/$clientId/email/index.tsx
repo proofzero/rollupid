@@ -6,8 +6,6 @@ import { redirect } from '@remix-run/cloudflare'
 import { Form } from '@remix-run/react'
 import { useState } from 'react'
 
-import { useNavigate } from '@remix-run/react'
-
 import type { ActionFunction } from '@remix-run/cloudflare'
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -26,7 +24,6 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 export default () => {
   const [isValidEmail, setIsValidEmail] = useState(false)
-  const navigate = useNavigate()
 
   return (
     <div
@@ -49,7 +46,7 @@ export default () => {
           <HiOutlineArrowLeft
             className="absolute left-0 lg:left-0 lg:top-[0.15rem] w-6 h-6
             text-gray-600 cursor-pointer"
-            onClick={() => navigate('/authenticate/console')}
+            onClick={() => history.back()}
           />
 
           <Text size="xl" weight="semibold" className="text-[#2D333A]">

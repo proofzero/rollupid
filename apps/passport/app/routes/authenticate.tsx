@@ -25,9 +25,6 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       return redirect(`/authorize?${searchParams}`)
     }
   }
-  if (!params.clientId) {
-    return redirect(`/authenticate/console`)
-  }
 
   return json({
     prompt,
