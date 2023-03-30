@@ -82,15 +82,16 @@ export default function SiteMenu(props: RollupMenuProps) {
     <div
       className="text-center bg-gray-900 lg:min-h-screen
     lg:min-w-[256px] lg:max-w-sm lg:text-left
-    flex flex-col"
+    flex flex-col max-h-screen"
     >
       {/* Desktop menu */}
-      <div className="hidden lg:block">
-        <div className="object-left">
-          <ConsoleLogo />
-        </div>
+      <div className="hidden lg:block object-left">
+        <ConsoleLogo />
+      </div>
+      <div className="hidden lg:block overflow-scroll">
         <AppMenu props={props} />
       </div>
+
       <div className="hidden lg:block mt-auto">
         <ExternalLinks
           PASSPORT_URL={props.PASSPORT_URL}
