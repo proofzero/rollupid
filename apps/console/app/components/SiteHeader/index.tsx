@@ -8,6 +8,8 @@ import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar
 import { Menu, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
 
+import { ConsoleLogo } from '../SiteMenu'
+
 import classNames from 'classnames'
 import SignOutLink from './sign-out-link'
 
@@ -26,8 +28,17 @@ type RollupHeaderProps = {
 
 export default function RollupHeader(props: RollupHeaderProps) {
   return (
-    <header className="flex flex-row-reverse shadow p-4 bg-white text-slate-500 hidden lg:block">
-      <Form action="/signout" method="post">
+    <header
+      className="w-full min-h-[80px] h-[80px] bg-gray-900
+      lg:bg-white lg:border-b lg:shadow-lg
+      flex items-center justify-start lg:justify-end
+      px-2 sm:max-md:px-5 md:px-10"
+    >
+      <div className="lg:hidden">
+        <ConsoleLogo />
+      </div>
+
+      <Form action="/signout" method="post" className="hidden lg:block">
         <Menu as="div" className="relative ml-3">
           <div>
             <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm">

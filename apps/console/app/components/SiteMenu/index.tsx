@@ -36,7 +36,7 @@ import type { IconType } from 'react-icons'
 
 // RollupLogo
 // -----------------------------------------------------------------------------
-const RollupLogo = () => {
+export const ConsoleLogo = () => {
   return (
     <Link to="/">
       <img
@@ -77,13 +77,13 @@ export default function SiteMenu(props: RollupMenuProps) {
   return (
     <div
       className="text-center bg-gray-900 lg:min-h-screen
-    lg:min-w-[256px] lg:max-w-sm lg:border-r lg:text-left
+    lg:min-w-[256px] lg:max-w-sm lg:text-left
     flex flex-col"
     >
       {/* Desktop menu */}
       <div className="hidden lg:block">
         <div className="object-left">
-          <RollupLogo />
+          <ConsoleLogo />
         </div>
         <AppMenu props={props} />
       </div>
@@ -121,7 +121,7 @@ export default function SiteMenu(props: RollupMenuProps) {
         >
           <Popover.Panel
             className={`
-        bg-gray-900 border mt-[80px] lg:hidden z-[100]
+        flex flex-col bg-gray-900 mt-[80px] lg:hidden z-[100]
         min-h-[416px] h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] w-[280px]
         `}
             ref={setPopperElement}
@@ -129,10 +129,12 @@ export default function SiteMenu(props: RollupMenuProps) {
             {...attributes.popper}
           >
             <AppMenu props={props} />
-            <ExternalLinks
-              PASSPORT_URL={props.PASSPORT_URL}
-              docsURL={'https://docs.rollup.id'}
-            />
+            <div className="mt-auto">
+              <ExternalLinks
+                PASSPORT_URL={props.PASSPORT_URL}
+                docsURL={'https://docs.rollup.id'}
+              />
+            </div>
           </Popover.Panel>
         </Transition>
       </div>

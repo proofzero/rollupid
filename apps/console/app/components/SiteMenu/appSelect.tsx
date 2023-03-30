@@ -95,7 +95,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
       <Listbox value={selected} onChange={setSelected}>
         {({ open }) => (
           <>
-            <div className="relative mt-1">
+            <div className="relative">
               <Listbox.Button
                 className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-700
                bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none sm:text-sm"
@@ -114,7 +114,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                     <>
                       {!selected.icon && (
                         <div
-                          className="rounded-full w-6 h-6 flex justify-center shrink-0 
+                          className="rounded-full w-6 h-6 flex justify-center shrink-0
                         items-center bg-gray-200 overflow-hidden mr-2.5"
                         >
                           <Text className="text-gray-500">
