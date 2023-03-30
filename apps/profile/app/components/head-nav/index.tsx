@@ -9,7 +9,6 @@ import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 import logo from '~/assets/profile_logo.svg'
-import mobileLogo from '~/assets/profile_logo_mobile.svg'
 import defaultAvatar from '~/assets/circle_gradient.png'
 import { UserNavigation } from '~/components/head-nav/nav-links'
 
@@ -21,6 +20,18 @@ export const links = () => [{ rel: 'stylesheet', href: styles }]
 
 const user = {
   imageUrl: defaultAvatar,
+}
+
+export const ProfileLogo = () => {
+  return (
+    <Link to="/">
+      <img
+        className="mx-4 my-5 h-[40px] lg:h-[80px] max-w-[180px]"
+        src={logo}
+        alt="profile logo"
+      />
+    </Link>
+  )
 }
 
 type HeadNavProps = {
@@ -46,24 +57,9 @@ export default function HeadNav({
 
   return (
     <div>
-      <div className="mx-auto max-w-screen-xl px-4">
-        <div className="flex h-20 items-center justify-between px-4 sm:px-0">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <img
-                className="max-w-[180px] hidden lg:block"
-                src={logo}
-                alt="Rollup"
-              />
-              <img
-                className={`max-w-[180px] block lg:hidden transition-opacity ${
-                  open ? 'sm:opacity-50' : ''
-                }`}
-                src={mobileLogo}
-                alt="Rollup"
-              />
-            </div>
-          </div>
+      <div className="mx-auto max-w-screen-xl px-2 lg:px-4">
+        <div className="flex h-20 items-center justify-between sm:px-0">
+          <ProfileLogo />
 
           <div className="hidden lg:block">
             <div className="ml-4 flex items-center md:ml-6">
@@ -152,7 +148,7 @@ export default function HeadNav({
               <Popover.Button
                 ref={setReferenceElement}
                 className="inline-flex items-center justify-center bg-gray-800 p-2
-                   text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none 
+                   text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none
                    focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800
                    rounded-lg
                    "
@@ -194,7 +190,7 @@ export default function HeadNav({
           className={`
           ${open ? 'fixed right-0' : ''}
             lg:hidden col-start-1 col-end-3 bg-gray-50
-            border sm:-mt-[60px] max-sm:mt-5 z-[100] 
+            border sm:-mt-[60px] max-sm:mt-5 z-[100]
              max-sm:h-[calc(100vh-80px)] max-sm:min-h-[568px]
               min-h-[648px] h-[calc(100vh+2px)] w-[240px]`}
           ref={setPopperElement}
