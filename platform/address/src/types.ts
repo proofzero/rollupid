@@ -14,7 +14,6 @@ import {
 import {
   CryptoAddressProfileSchema,
   EmailProfileSchema,
-  NFTarVoucherSchema,
 } from './jsonrpc/validators/profile'
 import { DeploymentMetadata } from '@proofzero/types'
 
@@ -28,11 +27,6 @@ export interface Environment {
   ServiceDeploymentMetadata: DeploymentMetadata
 
   HANDLES: KVNamespace
-
-  MINTPFP_CONTRACT_ADDRESS: string
-  NFTAR_CHAIN_ID: string
-  TOKEN_NFTAR: string
-  NFTAR_URL: string
 
   BLOCKCHAIN_ACTIVITY: Queue
 
@@ -88,5 +82,3 @@ export type AddressProfile =
 export type AddressProfiles = AddressProfile[]
 
 export type OAuthData = z.infer<typeof OAuthDataSchema>
-
-export type NFTarVoucher = z.infer<typeof NFTarVoucherSchema>

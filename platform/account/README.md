@@ -1,8 +1,8 @@
-# Console App
+# Account Worker
 
 ## Overview
 
-This app manages the developer console for Rollup.
+This app manages the account node.
 
 ## Setup
 

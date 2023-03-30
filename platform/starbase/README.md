@@ -1,11 +1,11 @@
-# @proofzero/starbase
+# Starbase Worker
 
-A Rollup-platform application for managing a user's dapps.
+## Overview
 
-## development
+This app manages the app node.
 
-- Run `wrangler dev src/index.ts` in your terminal to start a development server
-- Open a browser tab at http://localhost:8787/ to see your worker in action
-- Run `wrangler publish src/index.ts --name my-worker` to publish your worker
+## Setup
 
-Learn more at https://developers.cloudflare.com/workers/
+### Local Env
+
+1. Copy `.dev.vars.example` to `.dev.vars` and fill in the values.

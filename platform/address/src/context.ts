@@ -19,9 +19,6 @@ import {
  */
 interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
-  TOKEN_NFTAR: string
-  NFTAR_CHAIN_ID: string
-  NFTAR_URL: string
   Address: DurableObjectNamespace
   Analytics: AnalyticsEngineDataset
   ServiceDeploymentMetadata: DeploymentMetadata
