@@ -3,7 +3,7 @@ import { json } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 import { Suspense } from 'react'
 
-import { getUserSession } from '~/session.server'
+import { getConsoleParamsSession, getUserSession } from '~/session.server'
 
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
 import { useCatch, useLoaderData, useOutletContext } from '@remix-run/react'
@@ -17,12 +17,33 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   const searchParams = new URL(request.url).searchParams
   const prompt = searchParams.get('prompt')
 
+  const consoleParams = await getConsoleParamsSession(
+    request,
+    context.env,
+    params.clientId!
+  )
+    .then((session) => JSON.parse(session.get('params')))
+    .catch((err) => {
+      console.log('No console params session found')
+      return null
+    })
+
+  console.log('authenticate.tsx', {
+    consoleParams,
+  })
+
   const session = await getUserSession(request, context.env, params.clientId)
   const jwt = session.get('jwt')
 
   if (jwt) {
     if (prompt === 'none') {
-      return redirect(`/authorize?${searchParams}`)
+      const qp = new URLSearchParams()
+      qp.append('client_id', consoleParams.clientId)
+      qp.append('redirect_uri', consoleParams.redirectUri)
+      qp.append('state', consoleParams.state)
+      qp.append('scope', consoleParams.scope)
+
+      return redirect(`/authorize?${qp.toString()}`)
     }
   }
 

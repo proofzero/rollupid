@@ -36,67 +36,26 @@ export const loader: LoaderFunction = async ({ params }) => {
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
-  let consoleParams
-  if (params.clientId !== 'console' && params.clientId !== 'passport') {
-    consoleParams = await getConsoleParamsSession(
-      request,
-      context.env,
-      params.clientId!
-    )
-      .then((session) => JSON.parse(session.get('params')))
-      .catch((err) => {
-        console.log('No console params session found')
-        return null
-      })
-  }
-
-  //Need to validate session before any redirects
-  const { accountUrn } = await getValidatedSessionContext(
+  const consoleParams = await getConsoleParamsSession(
     request,
-    consoleParams,
     context.env,
-    context.traceSpan
+    params.clientId!
   )
+    .then((session) => JSON.parse(session.get('params')))
+    .catch((err) => {
+      console.log('No console params session found')
+      return null
+    })
 
-  // TODO: Make decision based on clientId params (console?)
-  if (!consoleParams) {
-    let redirectURL =
-      params.clientId === 'console' ? context.env.CONSOLE_APP_URL : '/settings'
+  const { redirectUri, state, scope, clientId } = consoleParams
 
-    return redirect(redirectURL)
-  }
+  const qp = new URLSearchParams()
+  qp.append('clientId', clientId)
+  qp.append('redirectUri', redirectUri)
+  qp.append('state', state)
+  qp.append('scope', scope)
 
-  const { redirectUri, state, clientId } = consoleParams
-
-  const responseType = ResponseType.Code
-  const accessClient = getAccessClient(context.env, context.traceSpan)
-  const authorizeRes = await accessClient.authorize.mutate({
-    account: accountUrn,
-    responseType,
-    clientId,
-    redirectUri,
-    scope: [],
-    state,
-  })
-
-  if (!authorizeRes) {
-    throw json({ message: 'Failed to authorize' }, 400)
-  }
-
-  const redirectParams = new URLSearchParams({
-    code: authorizeRes.code,
-    state: authorizeRes.state,
-  })
-
-  const headers = new Headers()
-  headers.append(
-    'Set-Cookie',
-    await destroyConsoleParamsSession(request, context.env)
-  )
-
-  return redirect(`${redirectUri}?${redirectParams}`, {
-    headers,
-  })
+  return redirect(`/authorize?${qp.toString()}`)
 }
 
 export default () => {

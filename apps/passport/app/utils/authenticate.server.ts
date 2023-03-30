@@ -34,6 +34,10 @@ export const authenticateAddress = async (
   traceSpan: TraceSpan,
   existing: boolean = false
 ) => {
+  console.log('authenticateAddress', {
+    appData,
+  })
+
   if (appData?.prompt === 'login') {
     return redirect(
       `${appData.redirectUri}${existing ? `?error=ALREADY_CONNECTED` : ''}`

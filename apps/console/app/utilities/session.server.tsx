@@ -70,7 +70,15 @@ export async function requireJWT(request: Request) {
     switch (error) {
       case ExpiredTokenError:
       case InvalidTokenError:
-        throw redirect(`${PASSPORT_URL}/signout`)
+        const qp = new URLSearchParams()
+        qp.append('client_id', 'console')
+        // TODO: this should be the current URL
+        qp.append('redirect_uri', 'http://localhost:10002')
+
+        qp.append('scope', '')
+        qp.append('state', 'skip')
+
+        throw redirect(`${PASSPORT_URL}/authorize?${qp.toString()}`)
     }
   }
 }

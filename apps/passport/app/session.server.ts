@@ -59,10 +59,17 @@ const getUserSessionStorage = (
   clientId?: string,
   MAX_AGE = 7776000 /*60 * 60 * 24 * 90*/
 ) => {
+  console.log({
+    clientId,
+  })
   let cookieName = `_rollup_session`
-  if (clientId) {
+  if (clientId && clientId !== 'passport' && clientId !== 'console') {
     cookieName += `_last`
   }
+
+  console.log({
+    cookieName,
+  })
 
   return createCookieSessionStorage({
     cookie: {
@@ -85,6 +92,11 @@ export async function createUserSession(
   env: Env,
   clientId?: string
 ) {
+  console.log('CREATE USER SESSION')
+  console.log({
+    clientId,
+  })
+
   const userStorage = getUserSessionStorage(env, clientId)
   const parsedJWT = parseJwt(jwt)
   const userSession = await userStorage.getSession()
@@ -93,16 +105,6 @@ export async function createUserSession(
   userSession.set('defaultProfileUrn', defaultProfileUrn)
 
   const headers = new Headers()
-
-  if (clientId) {
-    const consoleParamsStorage = getConsoleParamsSessionStorage(env, clientId)
-    const consoleParamsSession = await consoleParamsStorage.getSession()
-
-    headers.append(
-      'Set-Cookie',
-      await consoleParamsStorage.destroySession(consoleParamsSession)
-    )
-  }
 
   headers.append('Set-Cookie', await userStorage.commitSession(userSession))
 
@@ -124,6 +126,7 @@ export async function destroyUserSession(
   flashMessage: FLASH_MESSAGE,
   clientId?: string
 ) {
+  console.log('DOOOOM')
   let session
   if (requestOrSession instanceof Request) {
     session = await getUserSession(requestOrSession, env, clientId)
@@ -175,6 +178,9 @@ export async function createConsoleParamsSession(
   consoleParams: ConsoleParams,
   env: Env
 ) {
+  console.log({
+    consoleParams,
+  })
   const storage = getConsoleParamsSessionStorage(env, consoleParams.clientId!)
   const session = await storage.getSession()
   session.set('params', JSON.stringify(consoleParams))
@@ -186,10 +192,15 @@ export async function createConsoleParamsSession(
     redirectURL += `?${qp.toString()}`
   }
 
+  const headers = new Headers()
+  headers.append(
+    'Set-Cookie',
+    await setConsoleParamsSession(consoleParams, env, 'last')
+  )
+  headers.append('Set-Cookie', await storage.commitSession(session))
+
   return redirect(redirectURL, {
-    headers: {
-      'Set-Cookie': await storage.commitSession(session),
-    },
+    headers,
   })
 }
 
@@ -234,8 +245,12 @@ export async function getValidatedPassportContext(
   env: Env,
   traceSpan: TraceSpan
 ): Promise<ValidatedSessionContext> {
-  const session = await getUserSession(request, env)
+  const session = await getUserSession(request, env, 'passport')
   const jwt = session.get('jwt')
+
+  console.log({
+    jwt,
+  })
 
   try {
     const payload = checkToken(jwt)
@@ -251,6 +266,9 @@ export async function getValidatedPassportContext(
       accountUrn: payload.sub as AccountURN,
     }
   } catch (error) {
+    console.log('passport.session.server.getValidatedPassportContext', {
+      error,
+    })
     const redirectTo = `/authenticate/passport`
     throw redirect(redirectTo)
   }
@@ -283,6 +301,7 @@ export async function getValidatedSessionContext(
       accountUrn: payload.sub as AccountURN,
     }
   } catch (error) {
+    // TODO: Revise this logic
     const redirectTo = `/authenticate/${consoleParams?.clientId ?? ''}`
     if (error === InvalidTokenError)
       if (consoleParams.clientId)

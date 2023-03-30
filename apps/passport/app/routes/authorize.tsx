@@ -5,6 +5,8 @@ import { Outlet, useLoaderData } from '@remix-run/react'
 import { getAccountClient } from '~/platform.server'
 import {
   createConsoleParamsSession,
+  destroyConsoleParamsSession,
+  getConsoleParamsSession,
   getValidatedSessionContext,
 } from '~/session.server'
 
@@ -14,10 +16,54 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const params = new URL(request.url).searchParams
   const prompt = params.get('prompt')
 
-  if (prompt !== 'none') {
-    if (context.consoleParams.clientId)
-      throw await createConsoleParamsSession(context.consoleParams, context.env)
-    else throw redirect(context.env.CONSOLE_APP_URL)
+  const consoleParmamsSessionFromCookie = await getConsoleParamsSession(
+    request,
+    context.env,
+    'last'
+  )
+  const consoleParamsSession = consoleParmamsSessionFromCookie.get('params')
+  const parsedParams = consoleParamsSession
+    ? await JSON.parse(consoleParamsSession)
+    : context.consoleParams
+
+  const headers = new Headers()
+
+  const clientId = parsedParams?.clientId || undefined
+
+  console.log('FRESH', {
+    cp: context.consoleParams,
+  })
+
+  if (clientId) {
+    headers.append(
+      'Set-Cookie',
+      await destroyConsoleParamsSession(request, context.env, 'last')
+    )
+
+    headers.append(
+      'Set-Cookie',
+      await destroyConsoleParamsSession(request, context.env, clientId)
+    )
+
+    // This is to facilitate returning back
+    // to settings after the connected
+    // account flow
+    if (parsedParams.prompt === 'login') {
+      return redirect('/settings', {
+        headers,
+      })
+    }
+  } else {
+    if (prompt !== 'none') {
+      console.log('authorize.tsx', {
+        cId: context.consoleParams,
+      })
+      if (context.consoleParams.clientId)
+        throw await createConsoleParamsSession(
+          context.consoleParams,
+          context.env
+        )
+    }
   }
 
   // this will redirect unauthenticated users to the auth page but maintain query params
@@ -27,10 +73,16 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     context.env,
     context.traceSpan
   )
+
   const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
   const profile = await accountClient.getProfile.query({ account: accountUrn })
 
-  return json({ profile })
+  return json(
+    { profile },
+    {
+      headers,
+    }
+  )
 }
 
 export default function Authorize() {
