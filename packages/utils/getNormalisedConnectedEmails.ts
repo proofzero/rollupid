@@ -10,7 +10,7 @@ import { AddressURN } from '@proofzero/urns/address'
 export type EmailSelectListItem = {
   email: string
   addressURN: AddressURN
-  type?: string
+  type?: OAuthAddressType | EmailAddressType
 }
 
 export default function (connectedAddresses: Addresses): EmailSelectListItem[] {
@@ -30,19 +30,20 @@ export default function (connectedAddresses: Addresses): EmailSelectListItem[] {
           return {
             type: OAuthAddressType.Google,
             email: address.qc.alias,
-            addressURN: address.baseUrn,
+            addressURN: address.baseUrn as AddressURN,
           }
         if (address.rc.addr_type === OAuthAddressType.Microsoft)
           return {
             type: OAuthAddressType.Microsoft,
             email: address.qc.alias,
-            addressURN: address.baseUrn,
+            addressURN: address.baseUrn as AddressURN,
           }
-      } else
-        return {
-          type: EmailAddressType.Email,
-          email: address.qc.alias,
-          addressURN: address.baseUrn,
-        }
-    }) as EmailSelectListItem[]
+      }
+
+      return {
+        type: EmailAddressType.Email,
+        email: address.qc.alias,
+        addressURN: address.baseUrn as AddressURN,
+      }
+    })
 }
