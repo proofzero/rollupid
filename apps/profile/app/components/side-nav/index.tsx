@@ -3,8 +3,11 @@ import { Link, useSubmit } from '@remix-run/react'
 import { BiLink } from 'react-icons/bi'
 import { AiOutlineUser } from 'react-icons/ai'
 import { RiCollageLine } from 'react-icons/ri'
-import { IoMdExit } from 'react-icons/io'
-import { HiOutlineExternalLink, HiOutlineHome } from 'react-icons/hi'
+import {
+  HiOutlineExternalLink,
+  HiOutlineHome,
+  HiOutlineLogout,
+} from 'react-icons/hi'
 import { TbPlugConnected, TbApps } from 'react-icons/tb'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
@@ -140,7 +143,7 @@ export const MobileSideNav = ({
           submit(null, { method: 'post', action: '/signout/' })
         }}
       >
-        <IoMdExit size={22} className="mr-2" />
+        <HiOutlineLogout size={22} className="mr-2" />
         <Text className="truncate" size="sm" weight="medium">
           Sign Out
         </Text>

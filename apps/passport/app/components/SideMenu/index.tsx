@@ -15,8 +15,8 @@ import {
   HiOutlineHome,
   HiOutlineExternalLink,
   HiOutlineCog,
+  HiOutlineLogout,
 } from 'react-icons/hi'
-import { IoMdExit } from 'react-icons/io'
 import { TbPlugConnected, TbApps } from 'react-icons/tb'
 
 import { Popover, Transition } from '@headlessui/react'
@@ -178,11 +178,12 @@ export default function SideMenu({
                   flex-row items-center text-gray-600 hover:bg-gray-100`}
                   >
                     <div className="flex flex-row items-center">
-                      <Avatar
-                        src={pfpUrl}
-                        size="xs"
-                        className="mr-3 -ml-2 h-6 w-6 border"
-                      />
+                      <div
+                        className="flex items-center
+                      rounded-full bg-gray-800 mr-3 -ml-2"
+                      >
+                        <Avatar src={pfpUrl} size="2xs" />
+                      </div>
 
                       <span className={'self-center'}>
                         <Text
@@ -195,7 +196,7 @@ export default function SideMenu({
                         </Text>
                       </span>
                     </div>
-                    <IoMdExit size={24} />
+                    <HiOutlineLogout size={24} />
                   </NavLink>
                 </div>
               </div>

@@ -4,7 +4,7 @@ import { NavLink } from '@remix-run/react'
 import { Menu, Transition } from '@headlessui/react'
 import PassportIcon from '../../assets/PassportIcon.svg'
 
-import { IoMdExit } from 'react-icons/io'
+import { HiOutlineLogout } from 'react-icons/hi'
 import { Text } from '@proofzero/design-system'
 
 const Header = ({ pfpUrl }: { pfpUrl: string }) => {
@@ -50,7 +50,7 @@ const Header = ({ pfpUrl }: { pfpUrl: string }) => {
                        flex flex-row items-center text-red-500`}
                       style={{ cursor: 'pointer' }}
                     >
-                      <IoMdExit size={22} className="mr-2" />
+                      <HiOutlineLogout size={22} className="mr-2" />
                       <Text className="truncate" size="sm" weight="medium">
                         Sign Out
                       </Text>
