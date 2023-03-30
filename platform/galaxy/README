@@ -2,14 +2,6 @@
 
 A GraphQL server for querying and mutating Rollup platform object.
 
-## Getting Started
-
-## Notes
-
-This project is a work in progress and is not yet ready for production use.
-
-We should consider using GraphQL Mesh to generate the schema from the source handlers like gRPC and OpenAPI. We should also consider using Envelop to write custom plugins for dealing with authentication concerns.
-
 ## Setup
 
 ### Local Env

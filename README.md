@@ -72,9 +72,9 @@ This monorepo is managed by Yarn workspaces and nested workspaces. You can run `
 
 ##### Running
 
-This monorepo is managed by Yarn workspaces and nested workspaces. You can run `yarn` commands (i.e., `yarn dev`) to run all the platform services and dependencies together. Applications require more resources so it is recommended to run them individually.
+This monorepo is managed by Yarn workspaces and nested workspaces. You can run `yarn` commands (e.g., `yarn dev`) to run all the platform services and dependencies together. Applications require more resources so it is recommended to run them individually.
 
-Before started, please visit each project's README for more information on initial setup.
+Before getting started, please visit each project's README for more information on initial setup.
 
 Please follow the steps below to get started:
 
