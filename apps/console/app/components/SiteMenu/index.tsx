@@ -82,7 +82,7 @@ export default function SiteMenu(props: RollupMenuProps) {
     <div
       className="text-center bg-gray-900 lg:min-h-screen
     lg:min-w-[256px] lg:max-w-sm lg:text-left
-    flex flex-col max-h-screen"
+    flex flex-col lg:min-h-screen lg:sticky lg:top-0 max-h-screen"
     >
       {/* Desktop menu */}
       <div className="hidden lg:block object-left">
@@ -127,53 +127,61 @@ export default function SiteMenu(props: RollupMenuProps) {
           <Popover.Panel
             className={`
         flex flex-col bg-gray-900 mt-[80px] lg:hidden z-50
-        min-h-[762px] h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] w-[280px] overflow-scroll
+        min-h-[706px] h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] w-[280px] overflow-scroll
         `}
             ref={setPopperElement}
             style={{ position: 'absolute', right: '0', top: '0' }}
             {...attributes.popper}
           >
-            <AppMenu props={props} />
-            <div className="mt-auto">
-              <ExternalLinks
-                PASSPORT_URL={props.PASSPORT_URL}
-                docsURL={'https://docs.rollup.id'}
-              />
-            </div>
-            <div
-              className="px-2 py-2 w-full bg-gray-700 hover:bg-gray-700 sticky bottom-0
-            z-[60]"
-            >
-              <NavLink
-                to="/signout"
-                target="_blank"
-                className={`w-full flex self-center justify-between w-full
-                flex-row items-center -mr-3 text-gray-400 hover:text-white max-w-[260px]
-                z-[70]`}
-              >
-                <div className="flex flex-row items-center ">
-                  <div
-                    className="flex items-center
-                      rounded-full bg-gray-800 mr-3 "
-                  >
-                    <Avatar src={props.pfpUrl} size="2xs" />
-                  </div>
-
-                  <span className={'self-center'}>
-                    <Text
-                      className="max-w-[140px] text-white
-                        truncate self-center"
-                      size="sm"
-                      weight="medium"
-                    >
-                      {props.displayName}
-                    </Text>
-                  </span>
+            {({ close }) => (
+              <>
+                <AppMenu props={props} close={close} />
+                <div className="mt-auto">
+                  <ExternalLinks
+                    PASSPORT_URL={props.PASSPORT_URL}
+                    docsURL={'https://docs.rollup.id'}
+                    close={close}
+                  />
                 </div>
+                <div
+                  className="px-2 py-2 w-full bg-gray-700 hover:bg-gray-700 sticky bottom-0
+              z-[60]"
+                >
+                  <NavLink
+                    to="/signout"
+                    target="_blank"
+                    className={`w-full flex self-center justify-between w-full
+                  flex-row items-center -mr-3 text-gray-400 hover:text-white max-w-[260px]
+                  z-[70]`}
+                    onClick={() => {
+                      close()
+                    }}
+                  >
+                    <div className="flex flex-row items-center ">
+                      <div
+                        className="flex items-center
+                        rounded-full bg-gray-800 mr-3 "
+                      >
+                        <Avatar src={props.pfpUrl} size="2xs" />
+                      </div>
 
-                <HiOutlineLogout size={24} />
-              </NavLink>
-            </div>
+                      <span className={'self-center'}>
+                        <Text
+                          className="max-w-[140px] text-white
+                          truncate self-center"
+                          size="sm"
+                          weight="medium"
+                        >
+                          {props.displayName}
+                        </Text>
+                      </span>
+                    </div>
+
+                    <HiOutlineLogout size={24} />
+                  </NavLink>
+                </div>
+              </>
+            )}
           </Popover.Panel>
         </Transition>
       </div>
@@ -183,6 +191,7 @@ export default function SiteMenu(props: RollupMenuProps) {
 
 type AppMenuProps = {
   props: RollupMenuProps
+  close?: () => void
 }
 
 const appSubmenuStruct: {
@@ -271,7 +280,7 @@ const appSubmenuStruct: {
   },
 ]
 
-const AppSubmenu = (appSubroute: string) =>
+const AppSubmenu = (appSubroute: string, close?: () => void) =>
   appSubmenuStruct.map((ass) => (
     <div key={ass.title} className="mt-6">
       <Text size="xs" weight="medium" className="uppercase text-gray-500">
@@ -285,7 +294,10 @@ const AppSubmenu = (appSubroute: string) =>
             to={`/apps/${appSubroute}${
               al.disabled || al.subroute == undefined ? '/soon' : al.subroute
             }`}
-            onClick={al.disabled ? (e) => e.preventDefault() : undefined}
+            onClick={(e) => {
+              if (al.disabled) e.preventDefault()
+              if (close) close()
+            }}
             className={({ isActive }) => menuItemClass(isActive, al.disabled)}
             end
           >
@@ -299,17 +311,14 @@ const AppSubmenu = (appSubroute: string) =>
     </div>
   ))
 
-function AppMenu({ props }: AppMenuProps) {
+function AppMenu({ props, close }: AppMenuProps) {
   return (
     <div>
-      <AppSelect
-        apps={[...props.apps, props.apps[0], props.apps[0]]}
-        selected={props.selected}
-      />
+      <AppSelect apps={props.apps} selected={props.selected} />
 
       {props.selected && (
         <section className="px-2 lg:flex lg:flex-col">
-          {AppSubmenu(props.selected)}
+          {AppSubmenu(props.selected, close)}
         </section>
       )}
     </div>
@@ -319,6 +328,7 @@ function AppMenu({ props }: AppMenuProps) {
 type ExternalLinksProps = {
   PASSPORT_URL: string
   docsURL: string
+  close?: () => void
 }
 
 function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
@@ -330,6 +340,9 @@ function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
           to={PASSPORT_URL}
           target="_blank"
           className={({ isActive }) => `${menuItemClass(isActive, false)} `}
+          onClick={() => {
+            if (close) close()
+          }}
         >
           <BsGear size={24} className="mr-2" />
           <div className="flex flex-row w-full items-center justify-between">
