@@ -17,8 +17,10 @@ const Header = ({ pfpUrl }: { pfpUrl: string }) => {
     flex items-center justify-start lg:justify-end
     px-2 sm:max-md:px-5 md:px-10"
     >
-      <PassportLogo />
-      <div className="hidden lg:block">
+      <div className="lg:hidden">
+        <PassportLogo />
+      </div>
+      <div className="max-lg:hidden">
         <Menu>
           <Menu.Button className={'rounded-full bg-gray-800'}>
             <Avatar size="xs" src={pfpUrl} />

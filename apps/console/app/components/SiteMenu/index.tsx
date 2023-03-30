@@ -19,6 +19,7 @@ import {
   HiOutlineHome,
   HiOutlineBookOpen,
   HiOutlineExternalLink,
+  HiOutlineLogout,
 } from 'react-icons/hi'
 import {
   TbScan,
@@ -33,6 +34,7 @@ import { Popover, Transition } from '@headlessui/react'
 import { usePopper } from 'react-popper'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import type { IconType } from 'react-icons'
+import { Avatar } from '@proofzero/design-system'
 
 // RollupLogo
 // -----------------------------------------------------------------------------
@@ -62,6 +64,8 @@ type RollupMenuProps = {
   selected?: string
   open: boolean
   PASSPORT_URL: string
+  pfpUrl: string
+  displayName: string
 }
 
 const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
@@ -94,7 +98,7 @@ export default function SiteMenu(props: RollupMenuProps) {
         />
       </div>
       {/* Mobile menu */}
-      <div className="lg:hidden ">
+      <div className="lg:hidden">
         <Popover.Button
           ref={setReferenceElement}
           className="absolute top-0 right-2 sm:max-md:right-5 md:right-10
@@ -121,8 +125,8 @@ export default function SiteMenu(props: RollupMenuProps) {
         >
           <Popover.Panel
             className={`
-        flex flex-col bg-gray-900 mt-[80px] lg:hidden z-[100]
-        min-h-[416px] h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] w-[280px]
+        flex flex-col bg-gray-900 mt-[80px] lg:hidden z-50
+        min-h-[762px] h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] w-[280px] overflow-scroll
         `}
             ref={setPopperElement}
             style={{ position: 'absolute', right: '0', top: '0' }}
@@ -134,6 +138,40 @@ export default function SiteMenu(props: RollupMenuProps) {
                 PASSPORT_URL={props.PASSPORT_URL}
                 docsURL={'https://docs.rollup.id'}
               />
+            </div>
+            <div
+              className="px-2 py-2 w-full bg-gray-700 hover:bg-gray-700 sticky bottom-0
+            z-[60]"
+            >
+              <NavLink
+                to="/signout"
+                target="_blank"
+                className={`w-full flex self-center justify-between w-full
+                flex-row items-center -mr-3 text-gray-400 hover:text-white max-w-[260px]
+                z-[70]`}
+              >
+                <div className="flex flex-row items-center ">
+                  <div
+                    className="flex items-center
+                      rounded-full bg-gray-800 mr-3 "
+                  >
+                    <Avatar src={props.pfpUrl} size="2xs" />
+                  </div>
+
+                  <span className={'self-center'}>
+                    <Text
+                      className="max-w-[140px] text-white
+                        truncate self-center"
+                      size="sm"
+                      weight="medium"
+                    >
+                      {props.displayName}
+                    </Text>
+                  </span>
+                </div>
+
+                <HiOutlineLogout size={24} />
+              </NavLink>
             </div>
           </Popover.Panel>
         </Transition>
@@ -263,7 +301,10 @@ const AppSubmenu = (appSubroute: string) =>
 function AppMenu({ props }: AppMenuProps) {
   return (
     <div>
-      <AppSelect apps={props.apps} selected={props.selected} />
+      <AppSelect
+        apps={[...props.apps, props.apps[0], props.apps[0]]}
+        selected={props.selected}
+      />
 
       {props.selected && (
         <section className="px-2 lg:flex lg:flex-col">

@@ -11,6 +11,8 @@ import createAccountClient from '@proofzero/platform-clients/account'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import type { appDetailsProps } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { Popover } from '@headlessui/react'
+
 import type { RotatedSecrets } from '~/types'
 import {
   toast,
@@ -32,6 +34,7 @@ type LoaderData = {
   appDetails: appDetailsProps
   rotationResult?: RotatedSecrets
   PASSPORT_URL: string
+  displayName: string
 }
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
@@ -61,11 +64,13 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
       return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon }
     })
     let avatarUrl = ''
+    let displayName = ''
     try {
       const profile = await accountClient.getProfile.query({
         account: accountURN,
       })
       avatarUrl = profile?.pfp?.image || ''
+      displayName = profile?.displayName || ''
     } catch (e) {
       console.error('Could not retrieve profile image.', e)
     }
@@ -99,6 +104,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     return json<LoaderData>({
       apps: reshapedApps,
       avatarUrl,
+      displayName,
       appDetails: appDetails as appDetailsProps,
       rotationResult,
       PASSPORT_URL,
@@ -119,7 +125,7 @@ export default function AppDetailIndexPage() {
 
   const { profileURL } = useOutletContext<{ profileURL: string }>()
 
-  const { apps, avatarUrl, PASSPORT_URL } = loaderData
+  const { apps, avatarUrl, PASSPORT_URL, displayName } = loaderData
   const { appDetails, rotationResult } = loaderData
 
   const notify = (success: boolean = true) => {
@@ -138,25 +144,42 @@ export default function AppDetailIndexPage() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-full bg-gray-50">
-      <SiteMenu
-        apps={apps}
-        selected={appDetails.clientId}
-        PASSPORT_URL={PASSPORT_URL}
-      />
-      <main className="flex flex-col flex-initial min-h-full w-full">
-        <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
-        <Toaster position="top-right" reverseOrder={false} />
-        <section className="sm:mx-11 my-9">
-          <Outlet
-            context={{
-              notificationHandler: notify,
-              appDetails,
-              rotationResult,
-            }}
+    <Popover className="min-h-screen relative">
+      {({ open }) => (
+        <div className="flex flex-col lg:flex-row min-h-full bg-gray-50">
+          <SiteMenu
+            apps={apps}
+            open={open}
+            selected={appDetails.clientId}
+            PASSPORT_URL={PASSPORT_URL}
+            displayName={displayName}
+            pfpUrl={avatarUrl}
           />
-        </section>
-      </main>
-    </div>
+          <main className="flex flex-col flex-initial min-h-full w-full">
+            <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
+            <Toaster position="top-right" reverseOrder={false} />
+
+            <section
+              className={`${
+                open
+                  ? 'max-lg:opacity-50\
+                    max-lg:overflow-hidden\
+                    max-lg:h-[calc(100vh-80px)]\
+                    min-h-[636px]'
+                  : 'h-full '
+              } py-9 sm:mx-11`}
+            >
+              <Outlet
+                context={{
+                  notificationHandler: notify,
+                  appDetails,
+                  rotationResult,
+                }}
+              />
+            </section>
+          </main>
+        </div>
+      )}
+    </Popover>
   )
 }

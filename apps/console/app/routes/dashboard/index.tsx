@@ -39,6 +39,7 @@ type LoaderData = {
   }[]
   avatarUrl: string
   PASSPORT_URL: string
+  displayName: string
 }
 
 export const loader: LoaderFunction = async ({ request, context }) => {
@@ -68,16 +69,23 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     })
 
     let avatarUrl = ''
+    let displayName = ''
     try {
       const profile = await accountClient.getProfile.query({
         account: accountURN,
       })
       avatarUrl = profile?.pfp?.image || ''
+      displayName = profile?.displayName || ''
     } catch (e) {
       console.error('Could not retrieve profile image.', e)
     }
 
-    return json<LoaderData>({ apps: reshapedApps, avatarUrl, PASSPORT_URL })
+    return json<LoaderData>({
+      apps: reshapedApps,
+      avatarUrl,
+      PASSPORT_URL,
+      displayName,
+    })
   } catch (error) {
     console.error({ error })
     return json({ error }, { status: 500 })
@@ -88,7 +96,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 // -----------------------------------------------------------------------------
 
 export default function DashboardIndexPage() {
-  const { apps, avatarUrl, PASSPORT_URL } = useLoaderData<LoaderData>()
+  const { apps, avatarUrl, PASSPORT_URL, displayName } =
+    useLoaderData<LoaderData>()
   const [newAppModalOpen, setNewAppModalOpen] = useState(false)
 
   const { profileURL } = useOutletContext<{ profileURL: string }>()
@@ -96,10 +105,25 @@ export default function DashboardIndexPage() {
     <Popover className="min-h-screen relative">
       {({ open }) => (
         <div className="flex lg:flex-row h-full">
-          <SiteMenu apps={apps} PASSPORT_URL={PASSPORT_URL} open={open} />
+          <SiteMenu
+            apps={apps}
+            PASSPORT_URL={PASSPORT_URL}
+            open={open}
+            pfpUrl={avatarUrl}
+            displayName={displayName}
+          />
           <main className="flex flex-col flex-initial min-h-full w-full bg-white">
             <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
-            <div className="bg-gray-50 p-6 h-full">
+            <div
+              className={`${
+                open
+                  ? 'max-lg:opacity-50\
+                    max-lg:overflow-hidden\
+                    max-lg:h-[calc(100vh-80px)]\
+                    min-h-[635px]'
+                  : 'h-full'
+              }} bg-gray-50 p-6 h-full`}
+            >
               <div className="mb-11">
                 <InfoPanelDashboard />
               </div>
