@@ -2,7 +2,7 @@
  * @file app/shared/components/SiteMenu/index.tsx
  */
 
-import * as React from 'react'
+import React, { Fragment, useState } from 'react'
 
 import { Link, NavLink } from '@remix-run/react'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
@@ -29,7 +29,8 @@ import {
   TbWorld,
 } from 'react-icons/tb'
 import { BsGear } from 'react-icons/bs'
-import { Disclosure } from '@headlessui/react'
+import { Popover, Transition } from '@headlessui/react'
+import { usePopper } from 'react-popper'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import type { IconType } from 'react-icons'
 
@@ -39,7 +40,7 @@ const RollupLogo = () => {
   return (
     <Link to="/">
       <img
-        className="mx-4 my-5 max-w-[180px]"
+        className="mx-4 my-5 h-[40px] lg:h-[80px] max-w-[180px]"
         src={consoleLogo}
         alt="console logo"
       />
@@ -59,6 +60,7 @@ type RollupMenuProps = {
   }[]
   // Current selected Client ID.
   selected?: string
+  open: boolean
   PASSPORT_URL: string
 }
 
@@ -68,47 +70,21 @@ const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
   } ${disabled ? 'hover:cursor-not-allowed' : ''}`
 
 export default function SiteMenu(props: RollupMenuProps) {
+  let [referenceElement, setReferenceElement] = useState()
+  let [popperElement, setPopperElement] = useState()
+  let { attributes } = usePopper(referenceElement, popperElement)
+
   return (
     <div
-      className="text-center bg-gray-900 pb-4 lg:min-h-screen
+      className="text-center bg-gray-900 lg:min-h-screen
     lg:min-w-[256px] lg:max-w-sm lg:border-r lg:text-left
     flex flex-col"
     >
-      <div className="object-left">
-        <RollupLogo />
-      </div>
-      {/* Mobile menu */}
-      <div className="lg:hidden ">
-        <Disclosure>
-          {({ open }) => (
-            <>
-              <Disclosure.Button
-                className="absolute right-0 top-0 my-5 items-right
-              justify-right bg-gray-800 p-2 text-gray-400 hover:bg-gray-700
-              hover:text-white focus:outline-none focus:ring-2 focus:ring-white
-              focus:ring-offset-2 focus:ring-offset-gray-800"
-              >
-                <span className="sr-only">Open main menu</span>
-                {open ? (
-                  <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                ) : (
-                  <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                )}
-              </Disclosure.Button>
-              <Disclosure.Panel>
-                <AppMenu props={props} />
-                <ExternalLinks
-                  PASSPORT_URL={props.PASSPORT_URL}
-                  docsURL={'https://docs.rollup.id'}
-                />
-              </Disclosure.Panel>
-            </>
-          )}
-        </Disclosure>
-      </div>
-
       {/* Desktop menu */}
       <div className="hidden lg:block">
+        <div className="object-left">
+          <RollupLogo />
+        </div>
         <AppMenu props={props} />
       </div>
       <div className="hidden lg:block mt-auto">
@@ -116,6 +92,49 @@ export default function SiteMenu(props: RollupMenuProps) {
           PASSPORT_URL={props.PASSPORT_URL}
           docsURL={'https://docs.rollup.id'}
         />
+      </div>
+      {/* Mobile menu */}
+      <div className="lg:hidden ">
+        <Popover.Button
+          ref={setReferenceElement}
+          className="absolute top-0 right-2 sm:max-md:right-5 md:right-10
+              top-0 my-5 items-right rounded-lg
+              justify-right bg-gray-800 p-2 text-gray-400 hover:bg-gray-700
+              hover:text-white focus:outline-none focus:ring-2 focus:ring-white
+              focus:ring-offset-2 focus:ring-offset-gray-800"
+        >
+          <span className="sr-only">Open main menu</span>
+          {props.open ? (
+            <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+          ) : (
+            <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+          )}
+        </Popover.Button>
+        <Transition
+          as={Fragment}
+          enter="transition ease-out duration-100"
+          enterFrom="transform opacity-0 scale-95"
+          enterTo="transform opacity-100 scale-100"
+          leave="transition ease-in duration-75"
+          leaveFrom="transform opacity-100 scale-100"
+          leaveTo="transform opacity-0 scale-95"
+        >
+          <Popover.Panel
+            className={`
+        bg-gray-900 border mt-[80px] lg:hidden z-[100]
+        min-h-[416px] h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] w-[280px]
+        `}
+            ref={setPopperElement}
+            style={{ position: 'absolute', right: '0', top: '0' }}
+            {...attributes.popper}
+          >
+            <AppMenu props={props} />
+            <ExternalLinks
+              PASSPORT_URL={props.PASSPORT_URL}
+              docsURL={'https://docs.rollup.id'}
+            />
+          </Popover.Panel>
+        </Transition>
       </div>
     </div>
   )
@@ -262,7 +281,7 @@ function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
   return (
     <div className="mt-2 border-t border-gray-700">
       {/* Hidden until new passport lands */}
-      <div className="px-2 pt-2 hidden">
+      <div className="px-2 pt-2 hidden hover:bg-gray-800">
         <NavLink
           to={PASSPORT_URL}
           target="_blank"
@@ -277,7 +296,7 @@ function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
           </div>
         </NavLink>
       </div>
-      <div className="px-2 pt-2">
+      <div className="px-2 py-2 hover:bg-gray-800">
         <NavLink
           to={docsURL}
           target="_blank"

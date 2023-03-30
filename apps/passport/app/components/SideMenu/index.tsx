@@ -5,7 +5,7 @@
 import React, { useState, Fragment } from 'react'
 import { usePopper } from 'react-popper'
 
-import { Link, NavLink } from '@remix-run/react'
+import { NavLink } from '@remix-run/react'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 // Images
@@ -34,15 +34,15 @@ const activeStyle = {
 
 // Passport Logo
 // -----------------------------------------------------------------------------
-const PassportLogo = () => {
+export const PassportLogo = () => {
   return (
-    <Link to="/settings">
+    <NavLink to="/settings">
       <img
-        className="mx-4 h-[80px] max-w-[180px]"
+        className="mx-4  h-[40px] lg:h-[80px] max-w-[180px]"
         src={passportLogo}
         alt="passport logo"
       />
-    </Link>
+    </NavLink>
   )
 }
 
@@ -123,6 +123,7 @@ export default function SideMenu({
       {/* Mobile Menu */}
       <div className="lg:hidden">
         <Popover.Button
+          ref={setReferenceElement}
           className="absolute top-0 right-2 sm:max-md:right-5 md:right-10
                 my-[19px] items-right rounded-lg
                 justify-right bg-white border p-2 text-black hover:bg-gray-50
@@ -159,7 +160,7 @@ export default function SideMenu({
           {({ close }) => {
             return (
               <div className="flex h-full flex-col">
-                <MobileAppSubmenu ref={setReferenceElement} close={close} />
+                <MobileAppSubmenu close={close} />
                 <div className="mt-auto block border-t lg:hidden">
                   <ConsolenNavItem CONSOLE_URL={CONSOLE_URL} />
                   <NavLink

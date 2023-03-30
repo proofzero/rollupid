@@ -18,6 +18,7 @@ import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
 import AppBox from '~/components/AppBox'
+import { Popover } from '@headlessui/react'
 import { useState } from 'react'
 import { NewAppModal } from '~/components/NewAppModal/NewAppModal'
 import { parseJwt, requireJWT } from '~/utilities/session.server'
@@ -92,63 +93,67 @@ export default function DashboardIndexPage() {
 
   const { profileURL } = useOutletContext<{ profileURL: string }>()
   return (
-    <div className="flex flex-col lg:flex-row min-h-full">
-      <SiteMenu apps={apps} PASSPORT_URL={PASSPORT_URL} />
-      <main className="flex flex-col flex-initial min-h-full w-full bg-white">
-        <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
-        <div className="bg-gray-50 p-6 h-full">
-          <div className="mb-11">
-            <InfoPanelDashboard />
-          </div>
-
-          {apps?.length > 0 && (
-            <AppBox createLink="/dashboard/new" apps={apps} />
-          )}
-
-          {apps?.length === 0 && (
-            <>
-              <Text
-                size="base"
-                weight="semibold"
-                className="text-gray-900 mb-6"
-              >
-                Your Applications
-              </Text>
-
-              <div className="text-center m-auto">
-                <img
-                  className="inline-block mb-2"
-                  src={folderPlus}
-                  alt="Wallet icon"
-                />
-
-                <Text weight="semibold" className="text-gray-900">
-                  No Applications
-                </Text>
-                <Text weight="medium" className="text-gray-500 mb-6">
-                  Get started by creating an Application.
-                </Text>
-
-                <Button
-                  btnType="primary-alt"
-                  btnSize="l"
-                  onClick={() => {
-                    setNewAppModalOpen(true)
-                  }}
-                >
-                  Create Application
-                </Button>
+    <Popover className="min-h-screen relative">
+      {({ open }) => (
+        <div className="flex lg:flex-row h-full">
+          <SiteMenu apps={apps} PASSPORT_URL={PASSPORT_URL} open={open} />
+          <main className="flex flex-col flex-initial min-h-full w-full bg-white">
+            <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
+            <div className="bg-gray-50 p-6 h-full">
+              <div className="mb-11">
+                <InfoPanelDashboard />
               </div>
-              <NewAppModal
-                isOpen={newAppModalOpen}
-                newAppCreateCallback={(app) => {
-                  setNewAppModalOpen(false)
-                }}
-              />
-            </>
-          )}
+
+              {apps?.length > 0 && (
+                <AppBox createLink="/dashboard/new" apps={apps} />
+              )}
+
+              {apps?.length === 0 && (
+                <>
+                  <Text
+                    size="base"
+                    weight="semibold"
+                    className="text-gray-900 mb-6"
+                  >
+                    Your Applications
+                  </Text>
+
+                  <div className="text-center m-auto">
+                    <img
+                      className="inline-block mb-2"
+                      src={folderPlus}
+                      alt="Wallet icon"
+                    />
+
+                    <Text weight="semibold" className="text-gray-900">
+                      No Applications
+                    </Text>
+                    <Text weight="medium" className="text-gray-500 mb-6">
+                      Get started by creating an Application.
+                    </Text>
+
+                    <Button
+                      btnType="primary-alt"
+                      btnSize="l"
+                      onClick={() => {
+                        setNewAppModalOpen(true)
+                      }}
+                    >
+                      Create Application
+                    </Button>
+                  </div>
+                  <NewAppModal
+                    isOpen={newAppModalOpen}
+                    newAppCreateCallback={(app) => {
+                      setNewAppModalOpen(false)
+                    }}
+                  />
+                </>
+              )}
+            </div>
+          </main>
         </div>
-      </main>
-    </div>
+      )}
+    </Popover>
   )
 }

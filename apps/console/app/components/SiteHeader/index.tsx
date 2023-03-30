@@ -26,7 +26,7 @@ type RollupHeaderProps = {
 
 export default function RollupHeader(props: RollupHeaderProps) {
   return (
-    <header className="flex flex-row-reverse shadow p-4 bg-white text-slate-500">
+    <header className="flex flex-row-reverse shadow p-4 bg-white text-slate-500 hidden lg:block">
       <Form action="/signout" method="post">
         <Menu as="div" className="relative ml-3">
           <div>

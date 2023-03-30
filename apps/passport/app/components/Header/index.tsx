@@ -2,7 +2,10 @@ import { Fragment } from 'react'
 import { Avatar } from '@proofzero/design-system'
 import { NavLink } from '@remix-run/react'
 import { Menu, Transition } from '@headlessui/react'
-import PassportIcon from '../../assets/PassportIcon.svg'
+
+import { PassportLogo } from '../SideMenu'
+
+// import PassportIcon from '../../assets/PassportIcon.svg'
 
 import { HiOutlineLogout } from 'react-icons/hi'
 import { Text } from '@proofzero/design-system'
@@ -14,13 +17,7 @@ const Header = ({ pfpUrl }: { pfpUrl: string }) => {
     flex items-center justify-start lg:justify-end
     px-2 sm:max-md:px-5 md:px-10"
     >
-      <NavLink to="/settings">
-        <img
-          src={PassportIcon}
-          alt="Passport Icon"
-          className="h-[40px] w-[40px] lg:hidden"
-        />
-      </NavLink>
+      <PassportLogo />
       <div className="hidden lg:block">
         <Menu>
           <Menu.Button className={'rounded-full bg-gray-800'}>
