@@ -7,7 +7,6 @@ workers_dev = false
 durable_objects.bindings = [{ name = "Address", class_name = "Address" }]
 
 services = [
-  { binding = "Access", service = "access" },
   { binding = "Edges", service = "edges" },
   { binding = "Images", service = "images" },
   { binding = "Email", service = "email" },
@@ -54,7 +53,6 @@ new_classes = ["Address"]
 [env.dev]
 durable_objects.bindings = [{ name = "Address", class_name = "Address" }]
 services = [
-  { binding = "Access", service = "access-dev" },
   { binding = "Edges", service = "edges-dev" },
   { binding = "Images", service = "images-dev" },
   { binding = "Email", service = "email-dev" },
@@ -77,7 +75,6 @@ NFTAR_CHAIN_ID = 5
 [env.next]
 durable_objects.bindings = [{ name = "Address", class_name = "Address" }]
 services = [
-  { binding = "Access", service = "access-next" },
   { binding = "Edges", service = "edges-next" },
   { binding = "Images", service = "images-next" },
   { binding = "Email", service = "email-next" },
@@ -101,7 +98,6 @@ NFTAR_CHAIN_ID = 5
 [env.current]
 durable_objects.bindings = [{ name = "Address", class_name = "Address" }]
 services = [
-  { binding = "Access", service = "access-current" },
   { binding = "Edges", service = "edges-current" },
   { binding = "Images", service = "images-current" },
   { binding = "Email", service = "email-current" },
