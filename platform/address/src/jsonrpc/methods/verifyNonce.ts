@@ -20,8 +20,6 @@ export const VerifyNonceInput = z.object({
 
 // TODO: move to shared validators?
 export const VerifyNonceOutput = z.object({
-  code: z.string(),
-  state: z.string(),
   existing: z.boolean(),
 })
 
@@ -38,34 +36,16 @@ export const verifyNonceMethod = async ({
   const { nonce, signature, jwt } = input
 
   const nodeClient = new CryptoAddress(ctx.address as AddressNode)
-  const {
-    address: clientId,
-    redirectUri,
-    scope,
-    state,
-  }: Challenge = await nodeClient.verifyNonce(nonce, signature)
+
+  await nodeClient.verifyNonce(nonce, signature)
 
   const caller = appRouter.createCaller(ctx)
-  const { accountURN, existing } = await caller.resolveAccount({
+  const { existing } = await caller.resolveAccount({
     jwt,
     force: input.forceAccountCreation,
   })
-  const responseType = ResponseType.Code
-
-  const accessClient = getAccessClient(ctx.Access, {
-    ...generateTraceContextHeaders(ctx.traceSpan),
-  })
-  const authorizeRes = await accessClient.authorize.mutate({
-    account: accountURN,
-    responseType,
-    clientId,
-    redirectUri,
-    scope,
-    state,
-  })
 
   return {
-    ...authorizeRes,
     existing,
   }
 }

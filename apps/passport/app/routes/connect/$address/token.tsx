@@ -14,9 +14,8 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   const { address } = params
   const node_type = searchParams.get('node_type') as NodeType
   const addr_type = searchParams.get('addr_type') as AddressType
-  const code = searchParams.get('code') as string
 
-  if (!address || !node_type || !addr_type || !code) {
+  if (!address || !node_type || !addr_type) {
     throw json({ message: 'Invalid params' }, 400)
   }
 

@@ -74,7 +74,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const formData = await request.formData()
 
   // TODO: validate from data
-  const { code, existing } = await addressClient.verifyNonce.mutate({
+  const { existing } = await addressClient.verifyNonce.mutate({
     nonce: formData.get('nonce') as string,
     signature: formData.get('signature') as string,
     jwt: await getJWTConditionallyFromSession(
@@ -93,7 +93,6 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const searchParams = new URL(request.url).searchParams
   searchParams.set('node_type', 'crypto')
   searchParams.set('addr_type', 'eth')
-  searchParams.set('code', code)
   const state = formData.get('state')
   if (state) {
     searchParams.set('state', state as string)
