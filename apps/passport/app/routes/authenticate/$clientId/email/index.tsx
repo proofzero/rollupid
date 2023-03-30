@@ -3,7 +3,7 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { redirect } from '@remix-run/cloudflare'
-import { Form } from '@remix-run/react'
+import { Form, useTransition } from '@remix-run/react'
 import { useState } from 'react'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
@@ -24,6 +24,8 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 export default () => {
   const [isValidEmail, setIsValidEmail] = useState(false)
+
+  const transition = useTransition()
 
   return (
     <div
@@ -72,7 +74,7 @@ export default () => {
             btnSize="xl"
             btnType="primary-alt"
             className="w-full"
-            disabled={!isValidEmail}
+            disabled={!isValidEmail || transition.state === 'loading'}
           >
             Send Code
           </Button>

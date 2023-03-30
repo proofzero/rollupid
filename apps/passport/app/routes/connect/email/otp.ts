@@ -2,8 +2,10 @@ import { EmailAddressType, NodeType } from '@proofzero/types/address'
 import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { throwJSONError } from '@proofzero/utils/errors'
-import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import { getAddressClient } from '~/platform.server'
+
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   try {
