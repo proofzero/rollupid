@@ -6,7 +6,7 @@ description: The access bridge to your users, everywhere
 
 Welcome to Rollup ID, the user management platform for the private web. Rollup ID provides a secure, user-centric, and privacy-focused approach to digital identity, empowering your users with greater control over their data and online identities, while also providing you and your business with enhanced security, control, and lifecycle management.&#x20;
 
-Our open-source platform is built on open standards and protocols, ensuring compatibility with existing infrastructure and services, and making it easy to integrate and collaborate across various systems. Whether you're a web3 developer or a traditional SaaS company, Rollup ID offers a flexible and scalable infrastructure that reduces costs, improves user experiences, and ensures interoperability.&#x20;
+Our open-source platform is built on open standards and protocols, ensuring compatibility with existing infrastructure and services, and making it easy to integrate and collaborate across various systems. Whether you're a Web3 or SaaS company, Rollup ID offers a flexible and scalable infrastructure that reduces costs, improves user experiences, and ensures interoperability.&#x20;
 
 We're excited to have you on board and look forward to working with you to make the web an safer place to operate. Let's build a more secure and connected internet together with Rollup ID, the access bridge to your users, everywhere.
 
