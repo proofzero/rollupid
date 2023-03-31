@@ -7,7 +7,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const { protocol, host } = url
 
   qp.append('client_id', 'passport')
-  qp.append('redirect_uri', `${protocol}://${host}/settings`)
+  qp.append('redirect_uri', `${protocol}//${host}/settings`)
   qp.append('state', 'skip')
   qp.append('scope', '')
 
