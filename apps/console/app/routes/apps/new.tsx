@@ -6,14 +6,16 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import { Button, Text } from '@proofzero/design-system'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { RiLoader5Fill } from 'react-icons/ri'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
-import type { ActionFunction } from '@remix-run/cloudflare'
 import { Popover } from '@headlessui/react'
 import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
-import { useFetcher } from '@remix-run/react'
+import { useOutletContext } from '@remix-run/react'
+
+import type { LoaderData as OutletContextData } from '~/root'
+import type { ActionFunction } from '@remix-run/cloudflare'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
@@ -40,35 +42,27 @@ export const action: ActionFunction = async ({ request, context }) => {
 export default function CreateNewApp() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const fetcher = useFetcher()
-
-  useEffect(() => {
-    fetcher.load('/dashboard/')
-  }, [])
-
-  console.log(fetcher.data ? 'yes' : 'no')
-  console.log(fetcher.state)
+  const { apps, avatarUrl, PASSPORT_URL, displayName } =
+    useOutletContext<OutletContextData>()
 
   return (
     <Popover className="min-h-screen relative">
       {({ open }) => (
         <div className="flex flex-col relative lg:flex-row min-h-screen bg-gray-50">
-          {fetcher.type === 'done' ? (
-            <SiteMenu
-              apps={fetcher.data.apps}
-              open={open}
-              PASSPORT_URL={fetcher.data.PASSPORT_URL}
-              displayName={fetcher.data.displayName}
-              pfpUrl={fetcher.data.avatarUrl}
-            />
-          ) : null}
+          <SiteMenu
+            apps={apps}
+            open={open}
+            PASSPORT_URL={PASSPORT_URL}
+            displayName={displayName}
+            pfpUrl={avatarUrl}
+          />
+
           <main
             className="flex flex-col
            flex-initial min-h-full w-full"
           >
-            {fetcher.type === 'done' ? (
-              <SiteHeader avatarUrl={fetcher.data.avatarUrl} />
-            ) : null}
+            <SiteHeader avatarUrl={avatarUrl} />
+
             <section
               className={`${
                 open

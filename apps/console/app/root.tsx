@@ -37,6 +37,13 @@ import icon32 from './images/favicon-32x32.png'
 import icon16 from './images/favicon-16x16.png'
 
 import * as gtag from '~/utils/gtags.client'
+import { parseJwt, requireJWT } from './utilities/session.server'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createAccountClient from '@proofzero/platform-clients/account'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+
+import type { AccountURN } from '@proofzero/urns/account'
 
 export const links: LinksFunction = () => {
   return [
@@ -55,21 +62,81 @@ export const meta: MetaFunction = () => ({
   viewport: 'width=device-width,initial-scale=1',
 })
 
-export const loader: LoaderFunction = () => {
-  return json({
-    ENV: {
-      INTERNAL_GOOGLE_ANALYTICS_TAG,
-      PROFILE_APP_URL,
-    },
-  })
+export type LoaderData = {
+  apps: {
+    clientId: string
+    name?: string
+    icon?: string
+    published?: boolean
+    createdTimestamp?: number
+  }[]
+  avatarUrl: string
+  PASSPORT_URL: string
+  displayName: string
+  ENV: {
+    INTERNAL_GOOGLE_ANALYTICS_TAG: string
+  }
+}
+
+export const loader: LoaderFunction = async ({ request, context }) => {
+  const jwt = await requireJWT(request)
+  const traceHeader = generateTraceContextHeaders(context.traceSpan)
+  const parsedJwt = parseJwt(jwt)
+  const accountURN = parsedJwt.sub as AccountURN
+
+  try {
+    const accountClient = createAccountClient(Account, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+    const apps = await starbaseClient.listApps.query()
+    const reshapedApps = apps.map((a) => {
+      return {
+        clientId: a.clientId,
+        name: a.app?.name,
+        icon: a.app?.icon,
+        published: a.published,
+        createdTimestamp: a.createdTimestamp,
+      }
+    })
+
+    let avatarUrl = ''
+    let displayName = ''
+    try {
+      const profile = await accountClient.getProfile.query({
+        account: accountURN,
+      })
+      avatarUrl = profile?.pfp?.image || ''
+      displayName = profile?.displayName || ''
+    } catch (e) {
+      console.error('Could not retrieve profile image.', e)
+    }
+
+    return json<LoaderData>({
+      apps: reshapedApps,
+      avatarUrl,
+      PASSPORT_URL,
+      ENV: { INTERNAL_GOOGLE_ANALYTICS_TAG },
+      displayName,
+    })
+  } catch (error) {
+    console.error({ error })
+    return json({ error }, { status: 500 })
+  }
 }
 
 export default function App() {
   const transition = useTransition()
   const location = useLocation()
-  const browserEnv = useLoaderData()
+  const loaderData = useLoaderData()
 
-  const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+  const GATag = loaderData.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+
+  const { apps, avatarUrl, PASSPORT_URL, displayName } = loaderData
 
   useEffect(() => {
     if (GATag) {
@@ -107,12 +174,12 @@ export default function App() {
           </>
         )}
         {transition.state === 'loading' ? <Loader /> : null}
-        <Outlet />
+        <Outlet context={{ apps, avatarUrl, PASSPORT_URL, displayName }} />
         <ScrollRestoration />
         <script
           dangerouslySetInnerHTML={{
             __html: `!window ? null : window.ENV = ${JSON.stringify(
-              browserEnv.ENV
+              loaderData.ENV
             )}`,
           }}
         />

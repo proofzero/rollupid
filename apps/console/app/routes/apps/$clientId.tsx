@@ -6,8 +6,7 @@ import { json } from '@remix-run/cloudflare'
 import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
-import { parseJwt, requireJWT } from '~/utilities/session.server'
-import createAccountClient from '@proofzero/platform-clients/account'
+import { requireJWT } from '~/utilities/session.server'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import type { appDetailsProps } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -20,21 +19,11 @@ import {
   ToastType,
 } from '@proofzero/design-system/src/atoms/toast'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import type { AccountURN } from '@proofzero/urns/account'
-
-type AppData = {
-  clientId: string
-  name?: string
-  icon?: string
-}[]
+import type { LoaderData as OutletContextData } from '~/root'
 
 type LoaderData = {
-  apps: AppData
-  avatarUrl: string
   appDetails: appDetailsProps
   rotationResult?: RotatedSecrets
-  PASSPORT_URL: string
-  displayName: string
 }
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
@@ -46,34 +35,11 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   const traceHeader = generateTraceContextHeaders(context.traceSpan)
   const clientId = params?.clientId
 
-  const parsedJwt = parseJwt(jwt)
-  const accountURN = parsedJwt.sub as AccountURN
-
   try {
-    const accountClient = createAccountClient(Account, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
     const starbaseClient = createStarbaseClient(Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
-
-    const apps = await starbaseClient.listApps.query()
-    const reshapedApps = apps.map((a) => {
-      return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon }
-    })
-    let avatarUrl = ''
-    let displayName = ''
-    try {
-      const profile = await accountClient.getProfile.query({
-        account: accountURN,
-      })
-      avatarUrl = profile?.pfp?.image || ''
-      displayName = profile?.displayName || ''
-    } catch (e) {
-      console.error('Could not retrieve profile image.', e)
-    }
 
     const appDetails = await starbaseClient.getAppDetails.query({
       clientId: clientId as string,
@@ -102,12 +68,8 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     }
 
     return json<LoaderData>({
-      apps: reshapedApps,
-      avatarUrl,
-      displayName,
       appDetails: appDetails as appDetailsProps,
       rotationResult,
-      PASSPORT_URL,
     })
   } catch (error) {
     console.error('Caught error in loader', { error })
@@ -123,7 +85,8 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 export default function AppDetailIndexPage() {
   const loaderData = useLoaderData<LoaderData>()
 
-  const { apps, avatarUrl, PASSPORT_URL, displayName } = loaderData
+  const { apps, avatarUrl, PASSPORT_URL, displayName } =
+    useOutletContext<OutletContextData>()
   const { appDetails, rotationResult } = loaderData
 
   const notify = (success: boolean = true) => {

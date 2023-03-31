@@ -72,7 +72,7 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
 
   useEffect(() => {
     updateSelected(initiateSelectedApp(apps, selectedAppIndex))
-  }, [apps])
+  }, [selectedAppIndex, apps])
 
   const setSelected = (selected: { clientId: string }) => {
     // I think it does now („• ֊ •„)

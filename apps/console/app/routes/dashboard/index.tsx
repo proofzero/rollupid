@@ -2,10 +2,7 @@
  * @file app/routes/dashboard/index.tsx
  */
 
-import type { LoaderFunction } from '@remix-run/cloudflare'
-
-import { useLoaderData, useNavigate } from '@remix-run/react'
-import { json } from '@remix-run/cloudflare'
+import { useNavigate, useOutletContext } from '@remix-run/react'
 
 import folderPlus from '~/images/folderPlus.svg'
 
@@ -19,83 +16,16 @@ import SiteHeader from '~/components/SiteHeader'
 
 import AppBox from '~/components/AppBox'
 import { Popover } from '@headlessui/react'
-import { parseJwt, requireJWT } from '~/utilities/session.server'
 import { InfoPanelDashboard } from '~/components/InfoPanel/InfoPanelDashboard'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
-import createAccountClient from '@proofzero/platform-clients/account'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import type { AccountURN } from '@proofzero/urns/account'
 
-type LoaderData = {
-  apps: {
-    clientId: string
-    name?: string
-    icon?: string
-    published?: boolean
-    createdTimestamp?: number
-  }[]
-  avatarUrl: string
-  PASSPORT_URL: string
-  displayName: string
-}
-
-export const loader: LoaderFunction = async ({ request, context }) => {
-  const jwt = await requireJWT(request)
-  const traceHeader = generateTraceContextHeaders(context.traceSpan)
-  const parsedJwt = parseJwt(jwt)
-  const accountURN = parsedJwt.sub as AccountURN
-
-  try {
-    const accountClient = createAccountClient(Account, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-    const starbaseClient = createStarbaseClient(Starbase, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-    const apps = await starbaseClient.listApps.query()
-    const reshapedApps = apps.map((a) => {
-      return {
-        clientId: a.clientId,
-        name: a.app?.name,
-        icon: a.app?.icon,
-        published: a.published,
-        createdTimestamp: a.createdTimestamp,
-      }
-    })
-
-    let avatarUrl = ''
-    let displayName = ''
-    try {
-      const profile = await accountClient.getProfile.query({
-        account: accountURN,
-      })
-      avatarUrl = profile?.pfp?.image || ''
-      displayName = profile?.displayName || ''
-    } catch (e) {
-      console.error('Could not retrieve profile image.', e)
-    }
-
-    return json<LoaderData>({
-      apps: reshapedApps,
-      avatarUrl,
-      PASSPORT_URL,
-      displayName,
-    })
-  } catch (error) {
-    console.error({ error })
-    return json({ error }, { status: 500 })
-  }
-}
+import type { LoaderData as OutletContextData } from '~/root'
 
 // Component
 // -----------------------------------------------------------------------------
 
 export default function DashboardIndexPage() {
   const { apps, avatarUrl, PASSPORT_URL, displayName } =
-    useLoaderData<LoaderData>()
+    useOutletContext<OutletContextData>()
 
   const navigate = useNavigate()
 
