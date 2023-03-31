@@ -86,3 +86,12 @@ export class NotFoundError extends RollupError {
     super(options)
   }
 }
+
+export class InternalServerError extends RollupError {
+  constructor(options?: RollupErrorOptions) {
+    if (!options) options = {}
+    options.code = options.code ?? ERROR_CODES.INTERNAL_SERVER_ERROR
+    options.message = options.message ?? ERROR_MESSAGES.INTERNAL_SERVER_ERROR
+    super(options)
+  }
+}

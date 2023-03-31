@@ -37,6 +37,10 @@ export const InvalidClientCredentialsError = new BadRequestError({
   message: 'invalid client credentials',
 })
 
+export const ExpiredCodeError = new UnauthorizedError({
+  message: 'expired code',
+})
+
 export const ExpiredTokenError = new UnauthorizedError({
   message: 'expired token',
 })

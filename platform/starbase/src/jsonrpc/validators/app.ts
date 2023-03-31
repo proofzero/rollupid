@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const ScopeMeta = z.record(
-  z.string().refine((k) => k.startsWith('scope://')),
+  z.string(),
   z.object({
     name: z.string(),
     description: z.string(),

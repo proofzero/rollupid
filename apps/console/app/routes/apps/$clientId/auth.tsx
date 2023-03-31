@@ -132,7 +132,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     ...generateTraceContextHeaders(context.traceSpan),
   })
 
-  const scopeMeta = await starbaseClient.getScopes.query()
+  const scopeMeta = await (await starbaseClient.getScopes.query()).scopes
 
   return json({ scopeMeta })
 }
@@ -416,7 +416,10 @@ export default function AppDetailIndexPage() {
                   <div className="flex-1">
                     <MultiSelect
                       label="Scopes"
-                      disabled={true}
+                      disabled={false}
+                      onChange={() => {
+                        setIsFormChanged(true)
+                      }}
                       fieldName="scopes"
                       items={Object.entries(scopeMeta).map(([key, value]) => {
                         return {

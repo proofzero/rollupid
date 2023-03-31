@@ -55,6 +55,11 @@ import {
   RevokeAppAuthorizationMethodOutput,
   revokeAppAuthorizationMethod,
 } from './methods/revokeAppAuthorization'
+import {
+  GetPersonaDataInput,
+  getPersonaDataMethod,
+  GetPersonaDataOutput,
+} from './methods/getPersonaData'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -124,6 +129,12 @@ export const appRouter = t.router({
     .input(GetUserInfoInput)
     .output(GetUserInfoOutput)
     .query(getUserInfoMethod),
+  getPersonaData: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetPersonaDataInput)
+    .output(GetPersonaDataOutput)
+    .query(getPersonaDataMethod),
   getAuthorizedAppScopes: t.procedure
     .use(LogUsage)
     .use(Analytics)

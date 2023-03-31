@@ -194,7 +194,7 @@ export async function node(
       urn=?
       `
     prepBindParams.push(baseUrnCondition)
-    conditionsStatement = `intersection as (${statement}) `
+    conditionsStatement = `intersector as (${statement}) `
   }
 
   const finalSqlStatement = sqlBase + conditionsStatement + sqlSuffix
