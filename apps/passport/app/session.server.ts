@@ -227,36 +227,6 @@ export type ValidatedSessionContext = {
   accountUrn: AccountURN
 }
 
-export async function getValidatedPassportContext(
-  request: Request,
-  env: Env,
-  traceSpan: TraceSpan
-): Promise<ValidatedSessionContext> {
-  const session = await getUserSession(request, env, 'passport')
-  const jwt = session.get('jwt')
-
-  try {
-    const payload = checkToken(jwt)
-    const accountClient = getAccountClient(jwt, env, traceSpan)
-    if (
-      !AccountURNSpace.is(payload.sub!) ||
-      !(await accountClient.isValid.query())
-    )
-      throw InvalidSessionAccountError
-
-    return {
-      jwt,
-      accountUrn: payload.sub as AccountURN,
-    }
-  } catch (error) {
-    console.log('passport.session.server.getValidatedPassportContext', {
-      error,
-    })
-    const redirectTo = `/authenticate/passport`
-    throw redirect(redirectTo)
-  }
-}
-
 export async function getValidatedSessionContext(
   request: Request,
   consoleParams: ConsoleParams,
