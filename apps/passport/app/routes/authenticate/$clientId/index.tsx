@@ -14,20 +14,15 @@ import { useEffect, useState } from 'react'
 import { HiCheck, HiOutlineMail } from 'react-icons/hi'
 import { Authentication, ConnectButton } from '~/components'
 import ConnectOAuthButton from '~/components/connect-oauth-button'
-import { ResponseType } from '@proofzero/types/access'
 import {
   ActionFunction,
   redirect,
   json,
   LoaderFunction,
 } from '@remix-run/cloudflare'
-import { getAccessClient } from '~/platform.server'
-import {
-  getConsoleParamsSession,
-  destroyConsoleParamsSession,
-  getValidatedSessionContext,
-} from '~/session.server'
+
 import AuthButton from '~/components/connect-button/AuthButton'
+import { getConsoleParams } from '~/session.server'
 
 export const loader: LoaderFunction = async ({ params }) => {
   return json({
@@ -36,16 +31,11 @@ export const loader: LoaderFunction = async ({ params }) => {
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
-  const consoleParams = await getConsoleParamsSession(
+  const consoleParams = await getConsoleParams(
     request,
     context.env,
-    params.clientId!
+    params.clientId
   )
-    .then((session) => JSON.parse(session.get('params')))
-    .catch((err) => {
-      console.log('No console params session found')
-      return null
-    })
 
   const { redirectUri, state, scope, clientId } = consoleParams
 

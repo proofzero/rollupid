@@ -1,10 +1,7 @@
 import { Outlet, useLoaderData } from '@remix-run/react'
 
 import { json } from '@remix-run/cloudflare'
-import {
-  getConsoleParamsSession,
-  getValidatedSessionContext,
-} from '~/session.server'
+import { getConsoleParams, getValidatedSessionContext } from '~/session.server'
 import { Popover } from '@headlessui/react'
 import SideMenu from '~/components/SideMenu'
 import Header from '~/components/Header'
@@ -33,12 +30,7 @@ export const links: LinksFunction = () => [
 ]
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const lastCP = await getConsoleParamsSession(request, context.env, 'last')
-    .then((session) => JSON.parse(session.get('params')))
-    .catch((err) => {
-      console.log('No console params session found')
-      return null
-    })
+  const lastCP = await getConsoleParams(request, context.env)
 
   const { jwt, accountUrn } = await getValidatedSessionContext(
     request,

@@ -3,7 +3,7 @@ import { json } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 import { Suspense } from 'react'
 
-import { getConsoleParamsSession, getUserSession } from '~/session.server'
+import { getConsoleParams, getUserSession } from '~/session.server'
 
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
 import { useCatch, useLoaderData, useOutletContext } from '@remix-run/react'
@@ -17,16 +17,11 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   const searchParams = new URL(request.url).searchParams
   const prompt = searchParams.get('prompt')
 
-  const consoleParams = await getConsoleParamsSession(
+  const consoleParams = await getConsoleParams(
     request,
     context.env,
-    params.clientId!
+    params.clientId
   )
-    .then((session) => JSON.parse(session.get('params')))
-    .catch((err) => {
-      console.log('No console params session found')
-      return null
-    })
 
   const session = await getUserSession(request, context.env, params.clientId)
   const jwt = session.get('jwt')

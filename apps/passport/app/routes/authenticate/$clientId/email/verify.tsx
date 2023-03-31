@@ -11,7 +11,7 @@ import {
   useTransition,
 } from '@remix-run/react'
 import {
-  getConsoleParamsSession,
+  getConsoleParams,
   getJWTConditionallyFromSession,
 } from '~/session.server'
 import { getAddressClient } from '~/platform.server'
@@ -35,10 +35,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const { addressURN, successfulVerification } = await actionRes.json()
 
   if (successfulVerification) {
-    const appData = await getConsoleParamsSession(request, context.env)
-      .then((session) => JSON.parse(session.get('params')))
-      .catch(() => null)
-
+    const appData = await getConsoleParams(request, context.env)
     const addressClient = getAddressClient(
       addressURN,
       context.env,

@@ -10,15 +10,13 @@ import type { OAuthData } from '@proofzero/platform.address/src/types'
 import { initAuthenticator, getDiscordStrategy } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import {
-  getConsoleParamsSession,
+  getConsoleParams,
   getJWTConditionallyFromSession,
 } from '~/session.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const appData = await getConsoleParamsSession(request, context.env)
-    .then((session) => JSON.parse(session.get('params')))
-    .catch(() => null)
+  const appData = await getConsoleParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)
   authenticator.use(getDiscordStrategy(context.env))

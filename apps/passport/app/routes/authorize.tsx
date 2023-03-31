@@ -6,7 +6,7 @@ import { getAccountClient } from '~/platform.server'
 import {
   createConsoleParamsSession,
   destroyConsoleParamsSession,
-  getConsoleParamsSession,
+  getConsoleParams,
   getValidatedSessionContext,
 } from '~/session.server'
 
@@ -23,26 +23,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   let clientCPId
   let clientCPRedirectUri
   if (contextCPId) {
-    const clientCP = await getConsoleParamsSession(
-      request,
-      context.env,
-      contextCPId
-    )
-      .then((session) => JSON.parse(session.get('params')))
-      .catch((err) => {
-        console.log('No console params session found')
-        return null
-      })
+    const clientCP = await getConsoleParams(request, context.env, contextCPId)
+
     clientCPId = clientCP?.clientId
     clientCPRedirectUri = clientCP?.redirectUri
   }
 
-  const lastCP = await getConsoleParamsSession(request, context.env, 'last')
-    .then((session) => JSON.parse(session.get('params')))
-    .catch((err) => {
-      console.log('No console params session found')
-      return null
-    })
+  const lastCP = await getConsoleParams(request, context.env)
   const lastCPId = lastCP?.clientId
 
   if (clientCPId) {

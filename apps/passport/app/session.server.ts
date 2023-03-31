@@ -222,6 +222,19 @@ export async function destroyConsoleParamsSession(
   return storage.destroySession(gps)
 }
 
+export async function getConsoleParams(
+  request: Request,
+  env: Env,
+  clientId?: string
+) {
+  return getConsoleParamsSession(request, env, clientId)
+    .then((session) => JSON.parse(session.get('params')))
+    .catch((err) => {
+      console.log('No console params session found')
+      return null
+    })
+}
+
 export type ValidatedSessionContext = {
   jwt: string
   accountUrn: AccountURN

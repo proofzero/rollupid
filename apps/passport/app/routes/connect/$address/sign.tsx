@@ -6,7 +6,7 @@ import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import {
-  getConsoleParamsSession,
+  getConsoleParams,
   getJWTConditionallyFromSession,
 } from '../../../session.server'
 
@@ -51,12 +51,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
-  const appData = await getConsoleParamsSession(request, context.env)
-    .then((session) => JSON.parse(session.get('params')))
-    .catch((err) => {
-      console.log('No console params session found')
-      return null
-    })
+  const appData = await getConsoleParams(request, context.env)
 
   const { address } = params
   if (!address) throw new Error('No address included in request')
