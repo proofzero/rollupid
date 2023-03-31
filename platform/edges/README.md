@@ -1,5 +1,12 @@
-# @proofzero/platform.edges
+# Edges Worker
 
-Define a D1 database for storage and retrieval of graph edges.
+## Overview
 
-NB: the worker defined here is for convenience in testing, it's _not_ a production service.
+This app manages graph edges.
+
+## Setup
+
+### Local Env
+
+1. Copy `.dev.vars.example` to `.dev.vars` and fill in the values.
+2. Run `yarn db:execute` to create the database.

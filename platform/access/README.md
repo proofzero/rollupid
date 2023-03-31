@@ -1,8 +1,8 @@
-# Console App
+# Access Worker
 
 ## Overview
 
-This app manages the developer console for Rollup.
+This app manages the access node.
 
 ## Setup
 

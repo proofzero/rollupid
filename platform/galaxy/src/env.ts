@@ -15,19 +15,6 @@ export default interface Env {
   Address: Fetcher
   Starbase: Fetcher
   Access: Fetcher
-  APIKEY_ALCHEMY_ETH: string
-  ALCHEMY_ETH_NETWORK: string
-  APIKEY_ALCHEMY_POLYGON: string
-  ALCHEMY_POLYGON_NETWORK: string
 }
 
-export const required = [
-  'Account',
-  'Address',
-  'Starbase',
-  'Access',
-  'APIKEY_ALCHEMY_ETH',
-  'ALCHEMY_ETH_NETWORK',
-  'APIKEY_ALCHEMY_POLYGON',
-  'ALCHEMY_POLYGON_NETWORK',
-]
+export const required = ['Account', 'Address', 'Starbase', 'Access']
