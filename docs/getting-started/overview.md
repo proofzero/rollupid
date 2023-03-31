@@ -1,5 +1,5 @@
 ---
-description: Get to know your way around Rollup
+description: User management for the private web
 ---
 
 # Overview

@@ -1,14 +1,14 @@
 ---
-description: Simple Auth & Identity for Developers
+description: The access bridge to your users, everywhere
 ---
 
 # Introduction to Rollup
 
-Rollup is an open source auth and identity platform designed around [OAuth standards](https://www.rfc-editor.org/rfc/rfc6749) and inspired by [W3C decentralized identity](https://w3c.github.io/did-core/) -- a "BYOI" (bring your own identity) protocol. With Rollup, you can focus less on integrations and more on growth with tools that streamline user onboarding and acquisition.
+Welcome to Rollup ID, the user management platform for the private web. Rollup ID provides a secure, user-centric, and privacy-focused approach to digital identity, empowering your users with greater control over their data and online identities, while also providing you and your business with enhanced security, control, and lifecycle management.&#x20;
 
-What sets Rollup apart from other auth solutions is Rollup's ability to turn users into federated identities with bundles services. Access to these services are managed through user consent using Rollup's progressive authorization framework -- a privacy-first model where apps request access to a users [identity graph](../../platform/profile-graph.md) directly from their users. This exchange for authorizations not only allows you to build trustworthy relationships with your users but also minimizes your compliance overhead.
+Our open-source platform is built on open standards and protocols, ensuring compatibility with existing infrastructure and services, and making it easy to integrate and collaborate across various systems. Whether you're a web3 developer or a traditional SaaS company, Rollup ID offers a flexible and scalable infrastructure that reduces costs, improves user experiences, and ensures interoperability.&#x20;
 
-Rollup is also easy. It has a minimal code requirements and is compatible with any off the shelf OAuth library.
+We're excited to have you on board and look forward to working with you to make the web an safer place to operate. Let's build a more secure and connected internet together with Rollup ID, the access bridge to your users, everywhere.
 
 #### Get Started
 

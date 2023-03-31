@@ -1,6 +1,6 @@
 ---
 description: Decentralized Profile Graph with Connected Services
-cover: ../.gitbook/assets/Docs_-_Overview_V1.png
+cover: ../.gitbook/assets/Docs_-_Overview_V1 (1).png
 coverY: 0
 ---
 

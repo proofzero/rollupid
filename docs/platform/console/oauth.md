@@ -8,7 +8,7 @@ The OAuth tab is where you can configure your applications standard OAuth settin
 
 This is the most important configuration in this tab is the [Scopes](../../reference/scopes.md). Every scope is represents an authorization request that will be presented to the user during the auth flow in Passport. These authorizations include access to profile information, connected accounts, provisioning wallets and more.
 
-<figure><img src="../../.gitbook/assets/OAuth.png" alt=""><figcaption><p>OAuth Config Screen</p></figcaption></figure>
+<figure><img src="broken-reference" alt=""><figcaption><p>OAuth Config Screen</p></figcaption></figure>
 
 ### Settings Panel
 
