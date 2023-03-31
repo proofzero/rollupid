@@ -70,10 +70,12 @@ export async function requireJWT(request: Request) {
     switch (error) {
       case ExpiredTokenError:
       case InvalidTokenError:
+        const url = new URL(request.url)
+        const { href } = url
+
         const qp = new URLSearchParams()
         qp.append('client_id', 'console')
-        // TODO: this should be the current URL
-        qp.append('redirect_uri', 'http://localhost:10002')
+        qp.append('redirect_uri', `${href}`)
 
         qp.append('scope', '')
         qp.append('state', 'skip')
