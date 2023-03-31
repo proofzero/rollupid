@@ -59,9 +59,6 @@ const getUserSessionStorage = (
   clientId?: string,
   MAX_AGE = 7776000 /*60 * 60 * 24 * 90*/
 ) => {
-  console.log({
-    clientId,
-  })
   let cookieName = `_rollup_session`
   if (clientId && clientId !== 'passport' && clientId !== 'console') {
     cookieName += `_last`
