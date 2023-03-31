@@ -96,6 +96,6 @@ export const EmailConnection = ({ providers }: EmailConnectionsProps) => {
       </Button>
     </div>
   ) : (
-    <NestedErrorPage text="No email providers configures" />
+    <NestedErrorPage text="No email providers configured" />
   )
 }
