@@ -290,18 +290,24 @@ export default function AccountsLayout() {
   const requestConnectAccount = () => {
     // Server side remix doesn't have window
     // so we need to make this comparison
-    if (typeof window === 'undefined') {
+    if (!(typeof window !== 'undefined')) {
       return
     }
+
+    const qp = new URLSearchParams()
+    qp.append('prompt', 'login')
+    qp.append('client_id', 'passport')
 
     // Removing search so that subsequent errors
     // won't be appended to queryString
     const currentWindowUrl = new URL(window.location.href)
     currentWindowUrl.search = ''
 
-    return navigate(
-      `/authenticate/connect?redirect_uri=${currentWindowUrl.toString()}`
-    )
+    qp.append('redirect_uri', currentWindowUrl.toString())
+
+    sessionStorage.setItem('connection_requested', 'true')
+
+    navigate(`/authorize?${qp.toString()}`)
   }
 
   return (
