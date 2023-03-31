@@ -19,6 +19,7 @@ type AppBoxProps = {
   }[]
   // Link target for creating a new application.
   createLink: string
+  onCreate: () => void
 }
 
 export default function AppBox(props: AppBoxProps) {
@@ -33,7 +34,7 @@ export default function AppBox(props: AppBoxProps) {
 
   return (
     <div className="mt-8">
-      <ApplicationList applications={mappedApps} />
+      <ApplicationList applications={mappedApps} onCreate={props.onCreate} />
     </div>
   )
 }

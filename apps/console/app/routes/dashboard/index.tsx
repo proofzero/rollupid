@@ -57,7 +57,15 @@ export default function DashboardIndexPage() {
               </div>
 
               {apps?.length > 0 && (
-                <AppBox createLink="/dashboard/new" apps={apps} />
+                <>
+                  <AppBox
+                    createLink="/dashboard/new"
+                    onCreate={() => {
+                      navigate('/apps/new')
+                    }}
+                    apps={apps}
+                  />
+                </>
               )}
 
               {apps?.length === 0 && (
