@@ -1,21 +1,42 @@
-import React from 'react'
+import React, { FC } from 'react'
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
 
 import { MdOutlineEmail } from 'react-icons/md'
-
 import { Text } from '../../atoms/text/Text'
 import { Button } from '../../build'
 
+import { EmailAddressType, OAuthAddressType } from '@proofzero/types/address'
+
+type NonEmptyArray<T> = [T, ...T[]]
+
 export type EmailConnectionProps = {
-  microsoft?: boolean
-  google?: boolean
+  providers: NonEmptyArray<{
+    addr_type: string
+    callback: () => void
+  }>
 }
 
-export const EmailConnection = ({
-  microsoft = true,
-  google = true,
-}: EmailConnectionProps) => {
+const iconMapper = {
+  [OAuthAddressType.Google]: (
+    <img src={googleIcon} alt="google" className="my-2" />
+  ),
+  [OAuthAddressType.Microsoft]: (
+    <img src={microsoftIcon} alt="microsoft" className="my-2" />
+  ),
+  [EmailAddressType.Email]: <MdOutlineEmail size={24} className="my-2" />,
+}
+
+export const EmailConnection = ({ providers }: EmailConnectionProps) => {
+  // We want to remove duplicate providers
+  const uniqueProvidersMap = new Map<string, typeof providers[0]>()
+
+  providers.forEach((provider) => {
+    uniqueProvidersMap.set(provider.addr_type, provider)
+  })
+
+  const uniqueProviders = Array.from(uniqueProvidersMap.values())
+
   return (
     <div
       className="flex flex-col items-center justify-center
@@ -28,16 +49,17 @@ export const EmailConnection = ({
         btnType="secondary-alt"
         className="border rounded-lg p-2
       w-full"
+        onClick={uniqueProviders[0].callback}
       >
         <div
           className="flex flex-row p-2
         items-center w-full space-x-4"
         >
-          <MdOutlineEmail size={22} />
+          {iconMapper[uniqueProviders[0].addr_type]}
           <Text size="lg">Connect with Email</Text>
         </div>
       </Button>
-      {microsoft || google ? (
+      {uniqueProviders.length > 1 ? (
         <div className="w-full">
           <div className="my-1 flex flex-row items-center space-x-3 my-1.5">
             <hr className="flex-1 h-px bg-gray-500" />
@@ -48,22 +70,18 @@ export const EmailConnection = ({
             className="flex flex-row items-center
       justify-center space-x-4 mb-4"
           >
-            {google ? (
-              <Button
-                btnType="secondary-alt"
-                className="flex justify-center border rounded-lg w-full"
-              >
-                <img src={googleIcon} alt="google" className="py-2" />
-              </Button>
-            ) : null}
-            {microsoft ? (
-              <Button
-                btnType="secondary-alt"
-                className="flex justify-center border rounded-lg w-full"
-              >
-                <img src={microsoftIcon} alt="microsoft" className="py-2" />
-              </Button>
-            ) : null}
+            {uniqueProviders.slice(1).map((provider) => {
+              return (
+                <Button
+                  key={provider.addr_type}
+                  btnType="secondary-alt"
+                  onClick={provider.callback}
+                  className="flex justify-center border rounded-lg w-full"
+                >
+                  {iconMapper[provider.addr_type]}
+                </Button>
+              )
+            })}
           </div>
         </div>
       ) : null}
