@@ -67,10 +67,6 @@ const getUserSessionStorage = (
     cookieName += `_last`
   }
 
-  console.log({
-    cookieName,
-  })
-
   return createCookieSessionStorage({
     cookie: {
       domain: env.COOKIE_DOMAIN,
@@ -92,11 +88,6 @@ export async function createUserSession(
   env: Env,
   clientId?: string
 ) {
-  console.log('CREATE USER SESSION')
-  console.log({
-    clientId,
-  })
-
   const userStorage = getUserSessionStorage(env, clientId)
   const parsedJWT = parseJwt(jwt)
   const userSession = await userStorage.getSession()
@@ -126,7 +117,6 @@ export async function destroyUserSession(
   flashMessage: FLASH_MESSAGE,
   clientId?: string
 ) {
-  console.log('DOOOOM')
   let session
   if (requestOrSession instanceof Request) {
     session = await getUserSession(requestOrSession, env, clientId)
@@ -178,9 +168,6 @@ export async function createConsoleParamsSession(
   consoleParams: ConsoleParams,
   env: Env
 ) {
-  console.log({
-    consoleParams,
-  })
   const storage = getConsoleParamsSessionStorage(env, consoleParams.clientId!)
   const session = await storage.getSession()
   session.set('params', JSON.stringify(consoleParams))
@@ -247,10 +234,6 @@ export async function getValidatedPassportContext(
 ): Promise<ValidatedSessionContext> {
   const session = await getUserSession(request, env, 'passport')
   const jwt = session.get('jwt')
-
-  console.log({
-    jwt,
-  })
 
   try {
     const payload = checkToken(jwt)

@@ -66,9 +66,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     }
   } else {
     if (prompt !== 'none') {
-      console.log('authorize.tsx', {
-        cId: context.consoleParams,
-      })
       if (context.consoleParams.clientId)
         throw await createConsoleParamsSession(
           context.consoleParams,

@@ -28,10 +28,6 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       return null
     })
 
-  console.log('authenticate.tsx', {
-    consoleParams,
-  })
-
   const session = await getUserSession(request, context.env, params.clientId)
   const jwt = session.get('jwt')
 

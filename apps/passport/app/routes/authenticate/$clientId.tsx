@@ -14,10 +14,6 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     })
   }
 
-  console.log('/authenticate/$clientId.tsx', {
-    cId: params.clientId,
-  })
-
   const session = await getUserSession(request, context.env, params.clientId)
 
   let profile

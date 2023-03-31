@@ -25,10 +25,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     context.traceSpan
   )
 
-  console.log({
-    context,
-  })
-
   if (clientId) {
     if (!state) throw json({ message: 'state is required' }, 400)
     if (!redirectUri) throw json({ message: 'redirect_uri is required' }, 400)
@@ -66,7 +62,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       return redirect(`${redirectUri}?${redirectParams}`)
     }
   } else {
-    console.log("THIS IS WHAT'S HAPPENING")
     //TODO: remove this when implementing scopes and authz
     return redirect('/settings')
   }
