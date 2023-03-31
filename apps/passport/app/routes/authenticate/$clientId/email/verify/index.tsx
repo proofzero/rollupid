@@ -1,8 +1,10 @@
 import { ERROR_CODES } from '@proofzero/errors'
-import { json, LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import { useCatch } from '@remix-run/react'
 import { loader as otpLoader } from '~/routes/connect/email/otp'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+
+import type { LoaderFunction } from '@remix-run/cloudflare'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const otpLoaderRes = await otpLoader({ request, context, params })
