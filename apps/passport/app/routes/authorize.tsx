@@ -13,45 +13,56 @@ import {
 // TODO: loader function check if we have a session already
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context }) => {
+  const headers = new Headers()
+
   const params = new URL(request.url).searchParams
   const prompt = params.get('prompt')
 
-  const consoleParmamsSessionFromCookie = await getConsoleParamsSession(
-    request,
-    context.env,
-    'last'
-  )
-  const consoleParamsSession = consoleParmamsSessionFromCookie.get('params')
-  const parsedParams = consoleParamsSession
-    ? await JSON.parse(consoleParamsSession)
-    : context.consoleParams
+  const contextCPId = context.consoleParams.clientId
 
-  const headers = new Headers()
-
-  const clientId = parsedParams?.clientId || undefined
-
-  console.log('FRESH', {
-    cp: context.consoleParams,
-  })
-
-  if (clientId) {
-    headers.append(
-      'Set-Cookie',
-      await destroyConsoleParamsSession(request, context.env, 'last')
+  let clientCPId
+  let clientCPRedirectUri
+  if (contextCPId) {
+    const clientCP = await getConsoleParamsSession(
+      request,
+      context.env,
+      contextCPId
     )
+      .then((session) => JSON.parse(session.get('params')))
+      .catch((err) => {
+        console.log('No console params session found')
+        return null
+      })
+    clientCPId = clientCP?.clientId
+    clientCPRedirectUri = clientCP?.redirectUri
+  }
 
+  const lastCP = await getConsoleParamsSession(request, context.env, 'last')
+    .then((session) => JSON.parse(session.get('params')))
+    .catch((err) => {
+      console.log('No console params session found')
+      return null
+    })
+  const lastCPId = lastCP?.clientId
+
+  if (clientCPId) {
     headers.append(
       'Set-Cookie',
-      await destroyConsoleParamsSession(request, context.env, clientId)
+      await destroyConsoleParamsSession(request, context.env, clientCPId)
     )
 
     // This is to facilitate returning back
     // to settings after the connected
     // account flow
-    if (parsedParams.prompt === 'login') {
-      return redirect('/settings', {
+    if (prompt === 'login' || prompt === 'none') {
+      return redirect(clientCPRedirectUri, {
         headers,
       })
+    }
+
+    if (lastCPId) {
+      let redirectURL = `/authenticate/${lastCPId}`
+      return redirect(redirectURL)
     }
   } else {
     if (prompt !== 'none') {
