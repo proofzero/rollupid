@@ -4,7 +4,7 @@
 
 import type { LoaderFunction } from '@remix-run/cloudflare'
 
-import { useLoaderData, useOutletContext } from '@remix-run/react'
+import { useLoaderData, useNavigate } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
 import folderPlus from '~/images/folderPlus.svg'
@@ -19,8 +19,6 @@ import SiteHeader from '~/components/SiteHeader'
 
 import AppBox from '~/components/AppBox'
 import { Popover } from '@headlessui/react'
-import { useState } from 'react'
-import { NewAppModal } from '~/components/NewAppModal/NewAppModal'
 import { parseJwt, requireJWT } from '~/utilities/session.server'
 import { InfoPanelDashboard } from '~/components/InfoPanel/InfoPanelDashboard'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
@@ -98,9 +96,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 export default function DashboardIndexPage() {
   const { apps, avatarUrl, PASSPORT_URL, displayName } =
     useLoaderData<LoaderData>()
-  const [newAppModalOpen, setNewAppModalOpen] = useState(false)
 
-  const { profileURL } = useOutletContext<{ profileURL: string }>()
+  const navigate = useNavigate()
+
   return (
     <Popover className="min-h-screen relative">
       {({ open }) => (
@@ -113,7 +111,7 @@ export default function DashboardIndexPage() {
             displayName={displayName}
           />
           <main className="flex flex-col flex-initial min-h-full w-full bg-white">
-            <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
+            <SiteHeader avatarUrl={avatarUrl} />
             <div
               className={`${
                 open
@@ -160,18 +158,12 @@ export default function DashboardIndexPage() {
                       btnType="primary-alt"
                       btnSize="l"
                       onClick={() => {
-                        setNewAppModalOpen(true)
+                        navigate('/apps/new')
                       }}
                     >
                       Create Application
                     </Button>
                   </div>
-                  <NewAppModal
-                    isOpen={newAppModalOpen}
-                    newAppCreateCallback={(app) => {
-                      setNewAppModalOpen(false)
-                    }}
-                  />
                 </>
               )}
             </div>

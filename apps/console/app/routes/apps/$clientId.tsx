@@ -123,8 +123,6 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 export default function AppDetailIndexPage() {
   const loaderData = useLoaderData<LoaderData>()
 
-  const { profileURL } = useOutletContext<{ profileURL: string }>()
-
   const { apps, avatarUrl, PASSPORT_URL, displayName } = loaderData
   const { appDetails, rotationResult } = loaderData
 
@@ -156,7 +154,7 @@ export default function AppDetailIndexPage() {
             pfpUrl={avatarUrl}
           />
           <main className="flex flex-col flex-initial min-h-full w-full">
-            <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
+            <SiteHeader avatarUrl={avatarUrl} />
             <Toaster position="top-right" reverseOrder={false} />
 
             <section

@@ -314,7 +314,7 @@ const AppSubmenu = (appSubroute: string, close?: () => void) =>
 function AppMenu({ props, close }: AppMenuProps) {
   return (
     <div>
-      <AppSelect apps={props.apps} selected={props.selected} />
+      <AppSelect apps={props.apps} selected={props.selected} close={close} />
 
       {props.selected && (
         <section className="px-2 lg:flex lg:flex-col">

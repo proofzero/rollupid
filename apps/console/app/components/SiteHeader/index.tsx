@@ -23,7 +23,6 @@ const userNavigation = [
 
 type RollupHeaderProps = {
   avatarUrl: string
-  profileURL: string
 }
 
 export default function RollupHeader(props: RollupHeaderProps) {

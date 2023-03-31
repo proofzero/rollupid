@@ -12,19 +12,9 @@ import type { ApplicationListItemProps } from './ApplicationListItem'
 
 type ApplicationListProps = {
   applications: ApplicationListItemProps[]
-  onCreateApplication?: () => void
 }
 
-export const ApplicationList = ({
-  applications,
-  onCreateApplication,
-}: ApplicationListProps) => {
-  const handleCreateApplication = () => {
-    if (onCreateApplication) {
-      onCreateApplication()
-    }
-  }
-
+export const ApplicationList = ({ applications }: ApplicationListProps) => {
   const [actionApp, setActionApp] = useState<
     | {
         clientId: string
@@ -41,9 +31,7 @@ export const ApplicationList = ({
           Your Applications
         </Text>
 
-        <Button btnType="primary-alt" onClick={handleCreateApplication}>
-          Create Application
-        </Button>
+        <Button btnType="primary-alt">Create Application</Button>
       </section>
 
       <section className="flex space-x-4 my-4">
