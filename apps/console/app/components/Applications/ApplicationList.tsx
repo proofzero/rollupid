@@ -12,19 +12,13 @@ import type { ApplicationListItemProps } from './ApplicationListItem'
 
 type ApplicationListProps = {
   applications: ApplicationListItemProps[]
-  onCreateApplication?: () => void
+  onCreate: () => void
 }
 
 export const ApplicationList = ({
   applications,
-  onCreateApplication,
+  onCreate,
 }: ApplicationListProps) => {
-  const handleCreateApplication = () => {
-    if (onCreateApplication) {
-      onCreateApplication()
-    }
-  }
-
   const [actionApp, setActionApp] = useState<
     | {
         clientId: string
@@ -41,7 +35,7 @@ export const ApplicationList = ({
           Your Applications
         </Text>
 
-        <Button btnType="primary-alt" onClick={handleCreateApplication}>
+        <Button btnType="primary-alt" onClick={onCreate}>
           Create Application
         </Button>
       </section>

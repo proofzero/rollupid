@@ -6,11 +6,12 @@ import { json } from '@remix-run/cloudflare'
 import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
-import { parseJwt, requireJWT } from '~/utilities/session.server'
-import createAccountClient from '@proofzero/platform-clients/account'
+import { requireJWT } from '~/utilities/session.server'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import type { appDetailsProps } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { Popover } from '@headlessui/react'
+
 import type { RotatedSecrets } from '~/types'
 import {
   toast,
@@ -18,20 +19,11 @@ import {
   ToastType,
 } from '@proofzero/design-system/src/atoms/toast'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import type { AccountURN } from '@proofzero/urns/account'
-
-type AppData = {
-  clientId: string
-  name?: string
-  icon?: string
-}[]
+import type { LoaderData as OutletContextData } from '~/root'
 
 type LoaderData = {
-  apps: AppData
-  avatarUrl: string
   appDetails: appDetailsProps
   rotationResult?: RotatedSecrets
-  PASSPORT_URL: string
 }
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
@@ -43,32 +35,11 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   const traceHeader = generateTraceContextHeaders(context.traceSpan)
   const clientId = params?.clientId
 
-  const parsedJwt = parseJwt(jwt)
-  const accountURN = parsedJwt.sub as AccountURN
-
   try {
-    const accountClient = createAccountClient(Account, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
     const starbaseClient = createStarbaseClient(Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
-
-    const apps = await starbaseClient.listApps.query()
-    const reshapedApps = apps.map((a) => {
-      return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon }
-    })
-    let avatarUrl = ''
-    try {
-      const profile = await accountClient.getProfile.query({
-        account: accountURN,
-      })
-      avatarUrl = profile?.pfp?.image || ''
-    } catch (e) {
-      console.error('Could not retrieve profile image.', e)
-    }
 
     const appDetails = await starbaseClient.getAppDetails.query({
       clientId: clientId as string,
@@ -97,11 +68,8 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     }
 
     return json<LoaderData>({
-      apps: reshapedApps,
-      avatarUrl,
       appDetails: appDetails as appDetailsProps,
       rotationResult,
-      PASSPORT_URL,
     })
   } catch (error) {
     console.error('Caught error in loader', { error })
@@ -117,9 +85,8 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 export default function AppDetailIndexPage() {
   const loaderData = useLoaderData<LoaderData>()
 
-  const { profileURL } = useOutletContext<{ profileURL: string }>()
-
-  const { apps, avatarUrl, PASSPORT_URL } = loaderData
+  const { apps, avatarUrl, PASSPORT_URL, displayName } =
+    useOutletContext<OutletContextData>()
   const { appDetails, rotationResult } = loaderData
 
   const notify = (success: boolean = true) => {
@@ -138,25 +105,42 @@ export default function AppDetailIndexPage() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-full bg-gray-50">
-      <SiteMenu
-        apps={apps}
-        selected={appDetails.clientId}
-        PASSPORT_URL={PASSPORT_URL}
-      />
-      <main className="flex flex-col flex-initial min-h-full w-full">
-        <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
-        <Toaster position="top-right" reverseOrder={false} />
-        <section className="sm:mx-11 my-9">
-          <Outlet
-            context={{
-              notificationHandler: notify,
-              appDetails,
-              rotationResult,
-            }}
+    <Popover className="min-h-screen relative">
+      {({ open }) => (
+        <div className="flex flex-col relative lg:flex-row min-h-full bg-gray-50">
+          <SiteMenu
+            apps={apps}
+            open={open}
+            selected={appDetails.clientId}
+            PASSPORT_URL={PASSPORT_URL}
+            displayName={displayName}
+            pfpUrl={avatarUrl}
           />
-        </section>
-      </main>
-    </div>
+          <main className="flex flex-col flex-initial min-h-full w-full">
+            <SiteHeader avatarUrl={avatarUrl} />
+            <Toaster position="top-right" reverseOrder={false} />
+
+            <section
+              className={`${
+                open
+                  ? 'max-lg:opacity-50\
+                    max-lg:overflow-hidden\
+                    max-lg:h-[calc(100vh-80px)]\
+                    min-h-[636px]'
+                  : 'h-full '
+              } py-9 sm:mx-11`}
+            >
+              <Outlet
+                context={{
+                  notificationHandler: notify,
+                  appDetails,
+                  rotationResult,
+                }}
+              />
+            </section>
+          </main>
+        </div>
+      )}
+    </Popover>
   )
 }

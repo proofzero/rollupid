@@ -2,7 +2,7 @@ import { useSubmit } from '@remix-run/react'
 
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { FiExternalLink } from 'react-icons/fi'
-import { IoMdExit } from 'react-icons/io'
+import { HiOutlineLogout } from 'react-icons/hi'
 import { IoIosCheckmark } from 'react-icons/io'
 
 import missingImage from '../../assets/missing-nft.svg'
@@ -83,7 +83,7 @@ export const UserNavigation = ({
           submit(null, { method: 'post', action: '/signout/' })
         }}
       >
-        <IoMdExit size={22} className="mr-2" />
+        <HiOutlineLogout size={22} className="mr-2" />
         <Text className="truncate" size="sm" weight="medium">
           Sign Out
         </Text>

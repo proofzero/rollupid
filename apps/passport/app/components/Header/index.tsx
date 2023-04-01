@@ -2,26 +2,25 @@ import { Fragment } from 'react'
 import { Avatar } from '@proofzero/design-system'
 import { NavLink } from '@remix-run/react'
 import { Menu, Transition } from '@headlessui/react'
-import PassportIcon from '../../assets/PassportIcon.svg'
 
-import { IoMdExit } from 'react-icons/io'
+import { PassportLogo } from '../SideMenu'
+
+// import PassportIcon from '../../assets/PassportIcon.svg'
+
+import { HiOutlineLogout } from 'react-icons/hi'
 import { Text } from '@proofzero/design-system'
 
 const Header = ({ pfpUrl }: { pfpUrl: string }) => {
   return (
-    <div
+    <header
       className="w-full min-h-[80px] h-[80px] border-b bg-white
     flex items-center justify-start lg:justify-end
     px-2 sm:max-md:px-5 md:px-10"
     >
-      <NavLink to="/settings">
-        <img
-          src={PassportIcon}
-          alt="Passport Icon"
-          className="h-[40px] w-[40px] lg:hidden"
-        />
-      </NavLink>
-      <div className="hidden lg:block">
+      <div className="lg:hidden">
+        <PassportLogo />
+      </div>
+      <div className="max-lg:hidden">
         <Menu>
           <Menu.Button className={'rounded-full bg-gray-800'}>
             <Avatar size="xs" src={pfpUrl} />
@@ -50,7 +49,7 @@ const Header = ({ pfpUrl }: { pfpUrl: string }) => {
                        flex flex-row items-center text-red-500`}
                       style={{ cursor: 'pointer' }}
                     >
-                      <IoMdExit size={22} className="mr-2" />
+                      <HiOutlineLogout size={22} className="mr-2" />
                       <Text className="truncate" size="sm" weight="medium">
                         Sign Out
                       </Text>
@@ -62,7 +61,7 @@ const Header = ({ pfpUrl }: { pfpUrl: string }) => {
           </Transition>
         </Menu>
       </div>
-    </div>
+    </header>
   )
 }
 
