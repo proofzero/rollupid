@@ -17,7 +17,6 @@ import { validatePersonaData } from '@proofzero/security/persona'
 import { PersonaData } from '@proofzero/types/application'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  console.debug('AUTHORIZE INDEX')
   const { clientId, redirectUri, scope, state } = context.consoleParams
   const { jwt, accountUrn } = await getValidatedSessionContext(
     request,
@@ -37,7 +36,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         400
       )
     }
-    console.debug('SCOPE BEFORE CHECK', scope)
     if (!scope?.length || (scope.length == 1 && scope[0].trim() === 'openid')) {
       // auto authorize if no scope is provided or is set to only openid
 
@@ -115,6 +113,8 @@ export const action: ActionFunction = async ({ request, context }) => {
   const responseType = ResponseType.Code
   const redirectUri = form.get('redirect_uri') as string
   const scope = (form.get('scopes') as string).split(',')
+  /* This stores the selection made from the user in the authorization
+  screen; gets validated and stored for later retrieval at token generation stage */
   const personaData = JSON.parse(
     form.get('personaData') as string
   ) as PersonaData

@@ -176,11 +176,12 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   const account = (await authorizationNode.storage.get<AccountURN>(
     'account'
   )) as AccountURN
-  const scope: string[] =
-    (await authorizationNode.storage.get<Scope>('scope')) || []
-  const personaData: PersonaData =
-    (await authorizationNode.storage.get<PersonaData>('personaData')) || {}
-
+  const resultMap = await authorizationNode.storage.get([
+    'scope',
+    'personaData',
+  ])
+  const scope = resultMap.get('scope') as string[]
+  const personaData = resultMap.get('personaData') as PersonaData
   const name = `${AccountURNSpace.decode(account)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
   const { expirationTime } = ACCESS_TOKEN_OPTIONS

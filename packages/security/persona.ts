@@ -22,6 +22,9 @@ export async function validatePersonaData(
   env: { addressFetcher: Fetcher },
   traceSpan: TraceSpan
 ): Promise<void> {
+  //If there's nothing to validate, return right away
+  if (!personaData) return
+
   for (const [scopeName, claimValue] of Object.entries(personaData)) {
     //TODO: Make this more generic to apply to any claims
     if (scopeName === 'email') {
