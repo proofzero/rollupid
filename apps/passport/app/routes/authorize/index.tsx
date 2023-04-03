@@ -46,7 +46,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         responseType,
         clientId,
         redirectUri,
-        scope: [],
+        scope: scope || [],
         state,
       })
 

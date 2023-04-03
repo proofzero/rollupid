@@ -3,6 +3,7 @@ import { JWTPayload } from 'jose'
 import { AccountURN } from '@proofzero/urns/account'
 
 export type Scope = string[]
+export type ScopeString = string
 
 export enum GrantType {
   AuthenticationCode = 'authentication_code',
@@ -17,5 +18,5 @@ export enum ResponseType {
 export interface AccessJWTPayload extends JWTPayload {
   aud: string[]
   sub: AccountURN
-  scope: Scope
+  scope: ScopeString
 }

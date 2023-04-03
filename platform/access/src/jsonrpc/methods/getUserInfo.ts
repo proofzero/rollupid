@@ -6,15 +6,15 @@ import { AccountURNSpace } from '@proofzero/urns/account'
 import { AccessJWTPayload } from '@proofzero/types/access'
 
 import { Context } from '../../context'
-import IdTokenProfileSchema from '../validators/IdTokenProfileSchema'
-import getIdTokenProfileFromAccount from '../../utils/getIdTokenProfileFromAccount'
 import { initAccessNodeByName } from '../../nodes'
+import { getClaimValues } from '@proofzero/security/persona'
+import { PersonaData } from '@proofzero/types/application'
 
 export const GetUserInfoInput = z.object({
   access_token: z.string(),
 })
 
-export const GetUserInfoOutput = IdTokenProfileSchema
+export const GetUserInfoOutput = z.record(z.string())
 
 export const getUserInfoMethod = async ({
   input,
@@ -27,6 +27,7 @@ export const getUserInfoMethod = async ({
   const jwt = decodeJwt(token) as AccessJWTPayload
   const account = jwt.sub
   const [clientId] = jwt.aud
+  const scope = jwt.scope.split(' ')
 
   if (!clientId)
     throw new BadRequestError({
@@ -42,5 +43,17 @@ export const getUserInfoMethod = async ({
   const accessNode = await initAccessNodeByName(name, ctx.Access)
 
   await accessNode.class.verify(token)
-  return getIdTokenProfileFromAccount(account, ctx)
+  const personaData = await accessNode.storage.get<PersonaData>('personaData')
+  const claimValues = await getClaimValues(
+    account,
+    clientId,
+    scope,
+    {
+      edgesFetcher: ctx.Edges,
+    },
+    ctx.traceSpan,
+    personaData
+  )
+  //`sub` is a mandatory field in the userinfo result
+  return { ...claimValues, sub: jwt.sub }
 }

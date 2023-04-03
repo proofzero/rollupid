@@ -10,7 +10,7 @@ import type { Scope } from '@proofzero/types/access'
 
 import { JWT_OPTIONS } from '../constants'
 
-import type { IdTokenProfile, KeyPair, KeyPairSerialized } from '../types'
+import type { KeyPair, KeyPairSerialized } from '../types'
 
 import {
   ExpiredTokenError,
@@ -81,7 +81,8 @@ export default class Access extends DOProxy {
     const { alg } = JWT_OPTIONS
     const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
     const { privateKey: key } = await this.getJWTSigningKeyPair()
-    return new jose.SignJWT({ scope })
+    //Need to convert scope array to space-delimited string, per spec
+    return new jose.SignJWT({ scope: scope.join(' ') })
       .setProtectedHeader({ alg })
       .setExpirationTime(expirationTime)
       .setAudience([clientId])

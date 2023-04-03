@@ -3,9 +3,6 @@ import { KeyLike, JWK } from 'jose'
 import { DeploymentMetadata } from '@proofzero/types'
 import { Scope } from '@proofzero/types/access'
 
-import IdTokenProfileSchema from './jsonrpc/validators/IdTokenProfileSchema'
-import { z } from 'zod'
-
 export interface KeyPair {
   publicKey: KeyLike | Uint8Array
   privateKey: KeyLike | Uint8Array
@@ -50,5 +47,3 @@ export type SessionDetails = {
   expiry?: string
   expiryTime?: number
 }
-
-export type IdTokenProfile = z.infer<typeof IdTokenProfileSchema>

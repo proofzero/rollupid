@@ -14,8 +14,6 @@ import { AccessJWTPayload, GrantType, Scope } from '@proofzero/types/access'
 import { Context } from '../../context'
 import { initAuthorizationNodeByName, initAccessNodeByName } from '../../nodes'
 
-import getIdTokenProfileFromAccount from '../../utils/getIdTokenProfileFromAccount'
-
 import {
   InvalidClientCredentialsError,
   MismatchClientIdError,
