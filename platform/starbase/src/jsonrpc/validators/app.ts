@@ -50,3 +50,11 @@ export const AllFieldsSchema = AppUpdateableFieldsSchema.merge(
 export const AppClientIdParamSchema = z.object({
   clientId: z.string(),
 })
+
+export const AppPublicPropsSchema = z.object({
+  name: z.string(),
+  iconURL: z.string(),
+  scopes: z.array(z.string()),
+})
+
+export type AppPublicProps = z.infer<typeof AppPublicPropsSchema>

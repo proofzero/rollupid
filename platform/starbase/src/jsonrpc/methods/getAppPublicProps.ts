@@ -1,14 +1,11 @@
 import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import { AppClientIdParamSchema } from '../validators/app'
+import { AppClientIdParamSchema, AppPublicPropsSchema } from '../validators/app'
 
 export const GetAppPublicPropsInput = AppClientIdParamSchema
 
-export const GetAppPublicPropsOutput = z.object({
-  name: z.string(),
-  iconURL: z.string(),
-})
+export const GetAppPublicPropsOutput = AppPublicPropsSchema
 
 export const getAppPublicProps = async ({
   input,
@@ -27,6 +24,8 @@ export const getAppPublicProps = async ({
     return {
       name: appDetails.app?.name,
       iconURL: appDetails.app?.icon || '',
+      //As app.scopes can be a Set<string>, the following works universally
+      scopes: Array.from(appDetails.app?.scopes || []),
     }
   } else {
     throw new Error(

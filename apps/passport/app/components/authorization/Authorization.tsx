@@ -8,13 +8,7 @@ import authorizeCheck from '../../assets/authorize-check.svg'
 import iIcon from '../../assets/i.svg'
 import accountClassIcon from './account-class-icon.svg'
 import addressClassIcon from './address-class-icon.svg'
-
-export type AppProfile = {
-  name: string
-  published: boolean
-  icon: string
-  scopes: string[]
-}
+import { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 
 export type UserProfile = {
   displayName: string
@@ -26,7 +20,7 @@ export type UserProfile = {
 
 export type AuthorizationProps = {
   userProfile: Required<Profile>
-  appProfile: AppProfile
+  appProfile: AppPublicProps
   scopeMeta: Record<string, ScopeMeta>
   transition: 'idle' | 'loading' | 'submitting'
   cancelCallback: () => void
@@ -65,7 +59,7 @@ export function Authorization({
           // alt="User Profile"
         />
         <img src={authorizeCheck} alt="Authorize Check" />
-        <Avatar src={appProfile.icon} size={'sm'} />
+        <Avatar src={appProfile.iconURL} size={'sm'} />
       </div>
       <div className={'flex flex-col items-center justify-center gap-2'}>
         <h1 className={'font-semibold text-xl'}>{appProfile.name}</h1>
