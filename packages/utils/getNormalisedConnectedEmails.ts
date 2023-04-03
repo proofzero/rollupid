@@ -13,7 +13,10 @@ export type EmailSelectListItem = {
   type?: OAuthAddressType | EmailAddressType
 }
 
-export default function (connectedAddresses: Addresses): EmailSelectListItem[] {
+export default function (
+  connectedAddresses?: Addresses | null
+): EmailSelectListItem[] {
+  if (!connectedAddresses) return []
   return connectedAddresses
     .filter((address) => {
       return (

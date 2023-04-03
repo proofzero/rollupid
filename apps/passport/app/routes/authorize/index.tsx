@@ -8,7 +8,11 @@ import {
 } from '@remix-run/react'
 
 import { ResponseType } from '@proofzero/types/access'
-import { getAccessClient, getStarbaseClient } from '~/platform.server'
+import {
+  getAccessClient,
+  getStarbaseClient,
+  getAccountClient,
+} from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import {
   destroyConsoleParamsSession,
@@ -19,17 +23,20 @@ import { validatePersonaData } from '@proofzero/security/persona'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
+import { EmailSelect } from '@proofzero/design-system/src/atoms/email/EmailSelect'
 
 import authorizeCheck from '~/assets/authorize-check.svg'
 import iIcon from '~/assets/i.svg'
-import accountClassIcon from '~/components/authorization/account-class-icon.svg'
+
+import profileClassIcon from '~/components/authorization/profile-class-icon.svg'
 import addressClassIcon from '~/components/authorization/address-class-icon.svg'
+import emailClassIcon from '~/components/authorization/email-class-icon.svg'
 
 import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { Profile } from '@proofzero/platform/account/src/types'
-
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { PersonaData } from '@proofzero/types/application'
+import getNormalisedConnectedEmails from '@proofzero/utils/getNormalisedConnectedEmails'
 
 export type AppProfile = {
   name: string
@@ -124,28 +131,29 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   }
   try {
     const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
+    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
 
     // When scopes are powered by an index we can just query for the scopes we have in the app
-    const [scopeMeta, appPublicProps] = await Promise.all([
+    const [scopeMeta, appPublicProps, connectedAccounts] = await Promise.all([
       sbClient.getScopes.query(),
       sbClient.getAppPublicProps.query({
         clientId: clientId as string,
       }),
+      accountClient.getAddresses.query({
+        account: accountUrn,
+      }),
     ])
+    const connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
 
-    return json(
-      {
-        clientId,
-        appProfile: appPublicProps,
-        scopeMeta: scopeMeta,
-        state,
-        redirectOverride: redirectUri,
-        scopeOverride: scope,
-      },
-      {
-        headers,
-      }
-    )
+    return json({
+      clientId,
+      appProfile: appPublicProps,
+      scopeMeta: scopeMeta,
+      state,
+      redirectOverride: redirectUri,
+      scopeOverride: scope,
+      connectedEmails,
+    })
   } catch (e) {
     console.error(e)
     throw json({ message: 'Failed to fetch application info' }, 400)
@@ -215,8 +223,9 @@ export const action: ActionFunction = async ({ request, context }) => {
 }
 
 const scopeIcons: Record<string, string> = {
-  account: accountClassIcon,
   address: addressClassIcon,
+  profile: profileClassIcon,
+  email: emailClassIcon,
 }
 
 export default function Authorize() {
@@ -227,6 +236,7 @@ export default function Authorize() {
     state,
     redirectOverride,
     scopeOverride,
+    connectedEmails,
   } = useLoaderData()
 
   const { profile: userProfile } = useOutletContext<{
@@ -241,7 +251,7 @@ export default function Authorize() {
     redirectOverride,
     scopeOverride,
     userProfile,
-    app: appProfile.app,
+    app: appProfile,
   })
   const submit = useSubmit()
   const transition = useTransition()
@@ -249,7 +259,7 @@ export default function Authorize() {
   const cancelCallback = () => {
     submit(
       {
-        cancel: `${appProfile.app.redirectURI}?=error=access_denied&state=${state}`,
+        cancel: `${appProfile.redirectURI}?=error=access_denied&state=${state}`,
       },
       { method: 'post' }
     )
@@ -295,16 +305,16 @@ export default function Authorize() {
           // alt="User Profile"
         />
         <img src={authorizeCheck} alt="Authorize Check" />
-        <Avatar src={appProfile.app.iconURL} size={'sm'} />
+        <Avatar src={appProfile.iconURL} size={'sm'} />
       </div>
       <div className={'flex flex-col items-center justify-center gap-2'}>
-        <h1 className={'font-semibold text-xl'}>{appProfile.app.name}</h1>
+        <h1 className={'font-semibold text-xl'}>{appProfile.name}</h1>
         <p style={{ color: '#6B7280' }} className={'font-light text-base'}>
           would like access to the following information
         </p>
       </div>
-      <div className={'flex flex-col gap-4 items-start justify-start'}>
-        <div className={'items-start justify-start'}>
+      <div className={'flex flex-col gap-4 items-start justify-start w-full'}>
+        <div className={'items-start justify-start w-full'}>
           <p
             style={{ color: '#6B7280' }}
             className={'mb-2 font-extralight text-sm'}
@@ -313,49 +323,75 @@ export default function Authorize() {
           </p>
           <ul
             style={{ color: '#6B7280' }}
-            className={'flex flex-col font-light text-base gap-2'}
+            className={'flex flex-col font-light text-base gap-2 w-full'}
           >
-            {appProfile.app.scopes.map((scope, i) => {
-              return (
-                <li key={i} className={'flex flex-row gap-4 items-center'}>
-                  <span>
-                    <img
-                      src={scopeIcons[scopeMeta.scopes[scope].class]}
-                      alt={`${scope} Icon`}
-                    />
-                  </span>
-                  {scopeMeta.scopes[scope].name}
-                  <span
-                    className={'cursor-pointer'}
-                    data-popover-target={`popover-${scope}`}
-                    data-tooltip-placement="right"
+            {appProfile.scopes
+              .filter((scope: string) => {
+                console.log({
+                  scope,
+                  scopeMeta,
+                  sccope: scopeMeta.scopes[`${scope}`],
+                })
+                return !scopeMeta.scopes[scope].hidden
+              })
+              .map((scope: string, i: number) => {
+                return (
+                  <li
+                    key={i}
+                    className={
+                      'flex flex-row gap-2 items-center justify-between w-full'
+                    }
                   >
-                    <img
-                      src={iIcon}
-                      alt={`${scopeMeta.scopes[scope].name} info`}
-                    />
-                  </span>
-                  <div
-                    data-popover
-                    id={`popover-${scope}`}
-                    role="tooltip"
-                    className="absolute z-10 invisible inline-block
+                    <div
+                      className="flex gap-2 flex-row
+                     items-center justify-center"
+                    >
+                      <span>
+                        <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
+                      </span>
+                      {scope !== 'email' ? scopeMeta.scopes[scope].name : null}
+                    </div>
+                    {scope === 'email' ? (
+                      <div className="w-[260px]">
+                        <EmailSelect
+                          items={connectedEmails}
+                          enableAddNew={true}
+                          enableNone={true}
+                        />
+                      </div>
+                    ) : null}
+                    <span
+                      className={'cursor-pointer'}
+                      data-popover-target={`popover-${scope}`}
+                      data-tooltip-placement="right"
+                    >
+                      <img
+                        src={iIcon}
+                        alt={`${scopeMeta.scopes[scope].name} info`}
+                      />
+                    </span>
+
+                    <div
+                      data-popover
+                      id={`popover-${scope}`}
+                      role="tooltip"
+                      className="absolute z-10 invisible inline-block
                     font-[Inter]
                      min-w-64 text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
-                  >
-                    <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
-                        {scope}
-                      </h3>
+                    >
+                      <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                          {scope}
+                        </h3>
+                      </div>
+                      <div className="px-3 py-2">
+                        <p>{scopeMeta.scopes[scope].description}</p>
+                      </div>
+                      <div data-popper-arrow></div>
                     </div>
-                    <div className="px-3 py-2">
-                      <p>{scopeMeta.scopes[scope].description}</p>
-                    </div>
-                    <div data-popper-arrow></div>
-                  </div>
-                </li>
-              )
-            })}
+                  </li>
+                )
+              })}
           </ul>
         </div>
       </div>
@@ -373,7 +409,7 @@ export default function Authorize() {
             <Button
               btnType="primary-alt"
               onClick={() => {
-                authorizeCallback(appProfile.app.scopes)
+                authorizeCallback(appProfile.scopes)
               }}
             >
               Continue
