@@ -98,7 +98,7 @@ export default class Access extends DOProxy {
     const { alg } = JWT_OPTIONS
     const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
     const { privateKey: key } = await this.getJWTSigningKeyPair()
-    const jwt = await new jose.SignJWT({ scope })
+    const jwt = await new jose.SignJWT({ scope: scope.join(' ') })
       .setProtectedHeader({ alg })
       .setAudience([clientId])
       .setIssuedAt()
