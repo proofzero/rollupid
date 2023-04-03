@@ -178,8 +178,8 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     'scope',
     'personaData',
   ])
-  const scope = (resultMap.get('scope') as string[]) || []
-  const personaData = (resultMap.get('personaData') as PersonaData) || {}
+  const scope = (resultMap.get('scope') || []) as string[]
+  const personaData = (resultMap.get('personaData') || {}) as PersonaData
   const name = `${AccountURNSpace.decode(account)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
