@@ -12,8 +12,10 @@ import { OAuthAddressType } from '@proofzero/types/address'
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
 
-import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
+import { OptionType } from '@proofzero/utils/getNormalisedConnectedEmails'
+
 import type { AddressURN } from '@proofzero/urns/address'
+import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
 
 type EmailSelectProps = {
   items: EmailSelectListItem[]
@@ -22,54 +24,50 @@ type EmailSelectProps = {
   onSelect?: (emailAddressURN: AddressURN) => void
 }
 
-enum OptionType {
-  Email,
-  AddNew,
-  None,
-}
-
 export const EmailSelect = ({
   items,
   enableAddNew = false,
   enableNone = false,
   onSelect,
 }: EmailSelectProps) => {
-  const options = items.map((item) => ({
-    ...item,
-    type: OptionType.Email,
-  }))
-
-  const [selected, setSelected] = useState(
-    options[0] || {
-      type: OptionType.None,
-      email: 'None',
-    }
-  )
+  const [selected, setSelected] = useState({
+    type: OptionType.None,
+    email: 'None',
+  } as EmailSelectListItem)
 
   return (
     <Listbox
       value={selected}
       onChange={(selected) => {
-        onSelect && 'addressURN' in selected && onSelect(selected.addressURN)
+        if (onSelect && 'addressURN' in selected) {
+          onSelect(selected.addressURN)
+        }
         setSelected(selected)
       }}
+      disabled={items.length === 0}
       by="email"
     >
       {({ open }) => (
         <div className="relative bg-white">
           <Listbox.Button
-            className="border shadow-sm rounded-lg w-full transition-transform
-            flex flex-row space-between items-center py-2 px-3 hover:ring-1
-            hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white"
+            className={`border shadow-sm rounded-lg w-full transition-transform
+            flex flex-row space-between items-center py-2 px-3 ${
+              items.length === 0
+                ? ''
+                : 'hover:ring-1\
+            hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500'
+            } bg-white`}
           >
             <Text size="sm" className="bg-white flex-1 text-left text-gray-800">
               {selected.email}
             </Text>
-            {open ? (
-              <ChevronDownIcon className="w-5 h-5 rotate-180" />
-            ) : (
-              <ChevronDownIcon className="w-5 h-5" />
-            )}
+            {items.length !== 0 ? (
+              open ? (
+                <ChevronDownIcon className="w-5 h-5 rotate-180" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5" />
+              )
+            ) : null}
           </Listbox.Button>
 
           <Transition

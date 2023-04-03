@@ -7,10 +7,15 @@ import {
 import type { Addresses } from '@proofzero/platform.account/src/types'
 import { AddressURN } from '@proofzero/urns/address'
 
+export enum OptionType {
+  AddNew,
+  None,
+}
+
 export type EmailSelectListItem = {
   email: string
-  addressURN: AddressURN
-  type?: OAuthAddressType | EmailAddressType
+  type: OAuthAddressType | EmailAddressType | OptionType
+  addressURN?: AddressURN
 }
 
 export default function (

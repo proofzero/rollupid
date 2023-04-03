@@ -2,32 +2,44 @@ import { getAccountClient } from '~/platform.server'
 import getNormalisedConnectedEmails from '@proofzero/utils/getNormalisedConnectedEmails'
 
 import type { AccountURN } from '@proofzero/urns/account'
-import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { PersonaData } from '@proofzero/types/application'
 import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
+import { UnauthorizedError } from '@proofzero/errors'
+
+export type DataForScopes = {
+  connectedEmails: EmailSelectListItem[]
+  personaData: PersonaData
+  superScopes: string[]
+}
+
+export function getSupersetFromArrays<T>(args: T[][]): T[] {
+  const set = new Set([] as T[])
+  args.forEach((arr) => arr.forEach((item: T) => set.add(item)))
+  return Array.from(set)
+}
 
 export const getDataForScopes = async (
-  scopeLookUpTable: Record<string, ScopeDescriptor>,
-  urlScopes: string[] | null,
+  urlScopes: string[],
   appScopes: string[],
   accountURN: AccountURN,
   jwt?: string,
   env?: any,
   traceSpan?: any
-) => {
-  if (!accountURN) return
+): Promise<DataForScopes> => {
+  if (!accountURN)
+    throw new UnauthorizedError({ message: 'Account URN is required' })
 
-  const scopesFromApp = appScopes.filter(
-    (scope) => !scopeLookUpTable[scope].hidden
-  )
-  const scopesFromUrl =
-    urlScopes?.filter((scope) => !scopeLookUpTable[scope].hidden) || []
-
-  const unitedScopes = new Set([...scopesFromApp, ...scopesFromUrl])
+  const superScopes = getSupersetFromArrays([appScopes, urlScopes])
 
   let connectedEmails: EmailSelectListItem[] = []
   const accountClient = getAccountClient(jwt || '', env, traceSpan)
-  if (unitedScopes.has('email')) {
+  if (superScopes.includes('email')) {
+    const indexOfTypeEmail = superScopes.indexOf('email')
+
+    // swap it with the last element and put last element in the index of email
+    superScopes[indexOfTypeEmail] = superScopes[superScopes.length - 1]
+    superScopes[superScopes.length - 1] = 'email'
+
     const connectedAccounts = await accountClient.getAddresses.query({
       account: accountURN,
     })
@@ -37,11 +49,9 @@ export const getDataForScopes = async (
 
   const personaData: PersonaData = {}
 
-  if (connectedEmails.length) personaData.email = connectedEmails[0].addressURN
-
   return {
     connectedEmails,
     personaData,
-    unitedScopes: Array.from(unitedScopes),
+    superScopes: Array.from(superScopes),
   }
 }
