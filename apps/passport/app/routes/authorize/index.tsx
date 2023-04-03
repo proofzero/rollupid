@@ -295,7 +295,7 @@ export default function Authorize() {
           // alt="User Profile"
         />
         <img src={authorizeCheck} alt="Authorize Check" />
-        <Avatar src={appProfile.app.icon} size={'sm'} />
+        <Avatar src={appProfile.app.iconURL} size={'sm'} />
       </div>
       <div className={'flex flex-col items-center justify-center gap-2'}>
         <h1 className={'font-semibold text-xl'}>{appProfile.app.name}</h1>

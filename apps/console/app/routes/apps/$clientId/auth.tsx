@@ -2,8 +2,8 @@
  * @file app/routes/dashboard/apps/$appId/index.tsx
  */
 
-import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import type { ScopeDescriptor } from '@proofzero/security/scopes'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import type { ScopeMeta } from '@proofzero/security/scopes'
 import { json } from '@remix-run/cloudflare'
 import {
   Form,
@@ -228,7 +228,7 @@ export default function AppDetailIndexPage() {
     appDetails: appDetailsProps
     rotationResult: any
   }>()
-  const { scopeMeta }: { scopeMeta: ScopeDescriptor[] } = useLoaderData()
+  const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
 
   const [isFormChanged, setIsFormChanged] = useState(false)
   const [isImgUploading, setIsImgUploading] = useState(false)

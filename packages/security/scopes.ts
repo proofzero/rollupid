@@ -23,6 +23,7 @@ export const ScopeSchema = z.object({
 
 export const ScopeMeta = z.record(z.string(), ScopeSchema)
 
+export type ScopeMeta = z.infer<typeof ScopeMeta>
 export type ScopeDescriptor = z.infer<typeof ScopeSchema>
 
 interface ScopeMap {
