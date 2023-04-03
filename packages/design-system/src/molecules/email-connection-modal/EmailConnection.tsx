@@ -11,7 +11,7 @@ import { NestedErrorPage } from '../../pages/nested-error/NestedErrorPage'
 
 type NonEmptyArray<T> = [T, ...T[]]
 
-export type EmailConnectionProps = {
+export type EmailConnectionProp = {
   addr_type:
     | EmailAddressType.Email
     | OAuthAddressType.Google
@@ -20,7 +20,7 @@ export type EmailConnectionProps = {
 }
 
 export type EmailConnectionsProps = {
-  providers: NonEmptyArray<EmailConnectionProps>
+  providers: NonEmptyArray<EmailConnectionProp>
   cancelCallback: () => void
 }
 
