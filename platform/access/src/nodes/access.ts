@@ -18,6 +18,7 @@ import {
   TokenClaimValidationFailedError,
   TokenVerificationFailedError,
 } from '../errors'
+import { ClaimValueType } from '@proofzero/security/persona'
 
 type TokenStore = DurableObjectStorage | DurableObjectTransaction
 
@@ -53,7 +54,7 @@ type IdTokenOptions = {
   clientId: string
   expirationTime: string
   issuer: string
-  idTokenProfile: IdTokenProfile
+  idTokenClaims: Record<string, ClaimValueType>
 }
 
 export default class Access extends DOProxy {
@@ -110,11 +111,10 @@ export default class Access extends DOProxy {
   }
 
   async generateIdToken(options: IdTokenOptions): Promise<string> {
-    const { account, clientId, expirationTime, idTokenProfile, issuer } =
-      options
+    const { account, clientId, expirationTime, idTokenClaims, issuer } = options
     const { alg } = JWT_OPTIONS
     const { privateKey: key } = await this.getJWTSigningKeyPair()
-    return new jose.SignJWT(idTokenProfile)
+    return new jose.SignJWT(idTokenClaims)
       .setProtectedHeader({ alg })
       .setExpirationTime(expirationTime)
       .setAudience([clientId])

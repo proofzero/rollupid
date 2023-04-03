@@ -27,6 +27,7 @@ export type MultiSelectProps = {
   items: SelectItem[]
   selectedItems?: SelectItem[]
   disabled?: boolean
+  onChange?: () => void
 }
 
 export function MultiSelect({
@@ -35,6 +36,7 @@ export function MultiSelect({
   items,
   disabled = false,
   selectedItems = [],
+  onChange,
 }: MultiSelectProps) {
   const [query, setQuery] = useState('')
   const [selectedValues, setSelectedValues] = useState(selectedItems)
@@ -56,10 +58,8 @@ export function MultiSelect({
       value={selectedValues}
       disabled={disabled}
       onChange={(e) => {
-        console.log({ e })
-        console.log({ selectedValues })
-
         setSelectedValues(e)
+        !!onChange && onChange()
       }}
       name={fieldName}
       multiple

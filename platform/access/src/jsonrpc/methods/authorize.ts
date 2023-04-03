@@ -7,6 +7,7 @@ import { CODE_OPTIONS } from '../../constants'
 import { initAuthorizationNodeByName } from '../../nodes'
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
+import { PersonaData } from '@proofzero/types/application'
 
 export const AuthorizeMethodInput = z.object({
   account: AccountURNInput,
@@ -14,6 +15,7 @@ export const AuthorizeMethodInput = z.object({
   clientId: z.string(),
   redirectUri: z.string(),
   scope: z.array(z.string()),
+  personaData: PersonaData.optional(),
   state: z.string(),
 })
 
@@ -31,7 +33,15 @@ export const authorizeMethod = async ({
   input: AuthorizeParams
   ctx: Context
 }) => {
-  const { account, responseType, clientId, redirectUri, scope, state } = input
+  const {
+    account,
+    responseType,
+    clientId,
+    redirectUri,
+    scope,
+    personaData,
+    state,
+  } = input
 
   const code = hexlify(randomBytes(CODE_OPTIONS.length))
 
@@ -45,7 +55,8 @@ export const authorizeMethod = async ({
     clientId,
     redirectUri,
     scope,
-    state
+    state,
+    personaData
   )
 
   return { ...result }

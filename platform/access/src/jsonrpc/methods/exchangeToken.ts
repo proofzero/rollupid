@@ -22,6 +22,11 @@ import {
   MissingSubjectError,
   UnsupportedGrantTypeError,
 } from '../../errors'
+import { PersonaData } from '@proofzero/types/application'
+import {
+  getClaimValues,
+  setPersonaReferences,
+} from '@proofzero/security/persona'
 
 const AuthenticationCodeInput = z.object({
   grantType: z.literal(GrantType.AuthenticationCode),
@@ -171,15 +176,31 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   const account = (await authorizationNode.storage.get<AccountURN>(
     'account'
   )) as AccountURN
-  const scope: string[] = []
-
+  const resultMap = await authorizationNode.storage.get([
+    'scope',
+    'personaData',
+  ])
+  const scope = resultMap.get('scope') as string[]
+  const personaData = resultMap.get('personaData') as PersonaData
   const name = `${AccountURNSpace.decode(account)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
-  const idTokenProfile = await getIdTokenProfileFromAccount(account, ctx)
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
   const issuer = ctx.INTERNAL_JWT_ISS
 
-  await accessNode.storage.put({ account, clientId })
+  await accessNode.storage.put({ account, clientId, personaData })
+  const access = AccessURNSpace.componentizedUrn(name, { client_id: clientId })
+  await ctx.edgesClient!.makeEdge.mutate({
+    src: account,
+    dst: access,
+    tag: EDGE_AUTHORIZES,
+  })
+  await setPersonaReferences(
+    access,
+    scope,
+    personaData,
+    { edgesFetcher: ctx.Edges },
+    ctx.traceSpan
+  )
 
   const accessToken = await accessNode.class.generateAccessToken({
     account,
@@ -196,19 +217,22 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     scope,
   })
 
+  //TODO: this will need to use a more specific getIdTokenClaimValues()
+  //in the next iteration of this
+  const idTokenClaims = await getClaimValues(
+    account,
+    clientId,
+    scope,
+    { edgesFetcher: ctx.Edges },
+    ctx.traceSpan,
+    personaData
+  )
   const idToken = await accessNode.class.generateIdToken({
     account,
     clientId,
     expirationTime,
-    idTokenProfile,
+    idTokenClaims: idTokenClaims,
     issuer,
-  })
-
-  const access = AccessURNSpace.componentizedUrn(name, { client_id: clientId })
-  await ctx.edgesClient!.makeEdge.mutate({
-    src: account,
-    dst: access,
-    tag: EDGE_AUTHORIZES,
   })
 
   return { accessToken, refreshToken, idToken }

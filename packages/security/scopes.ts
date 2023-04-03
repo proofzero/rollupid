@@ -36,11 +36,10 @@ export type { Scope }
  */
 export const SCOPE_ADMIM: Scope = scope('scope://rollup.id/admin.admin')
 
-// IMPLIED
-export const SCOPE_OPENID: Scope = scope('scope://rollup.id/openid')
-
-// GENERAL
-
+//Standard OIDC email claim
+export const SCOPE_EMAIL: Scope = scope('email')
+export const SCOPE_PROFILE: Scope = scope('profile')
+export const SCOPE_OPENID: Scope = scope('openid')
 /**
  * The scope required to read account object.
  */
@@ -104,27 +103,37 @@ export const SCOPE_BLOCKCHAIN_ACCOUNT_TRANSACT: Scope = scope(
  * @alpha
  */
 export const SCOPES: ScopeMap = {
-  [SCOPE_PROFILE_READ]: {
-    name: 'Public Profile',
-    description: 'Read your profile data.',
-    class: 'account',
-  },
-  [SCOPE_PROFILE_WRITE]: {
-    name: 'Edit Profile',
-    description: 'Write your profile data.',
-    class: 'account',
-  },
-  [SCOPE_CONNECTED_ACCOUNTS_READ]: {
-    name: 'Connected Accounts',
-    description: 'Read your visible connected blockchain accounts.',
-    class: 'address',
-  },
   [SCOPE_OPENID]: {
     name: 'OpenID',
     description: 'Read your OpenID profile',
     class: 'implied',
   },
+  [SCOPE_EMAIL]: {
+    name: 'Email',
+    description: 'Read your chosen email address',
+    class: 'address',
+  },
+  [SCOPE_PROFILE]: {
+    name: 'Profile',
+    description: 'Read a basic profile of your account',
+    class: 'profile',
+  },
   // NOT READY YET
+  // [SCOPE_PROFILE_READ]: {
+  //   name: 'Public Profile',
+  //   description: 'Read your profile data.',
+  //   class: 'account',
+  // },
+  // [SCOPE_PROFILE_WRITE]: {
+  //   name: 'Edit Profile',
+  //   description: 'Write your profile data.',
+  //   class: 'account',
+  // },
+  // [SCOPE_CONNECTED_ACCOUNTS_READ]: {
+  //   name: 'Connected Accounts',
+  //   description: 'Read your visible connected blockchain accounts.',
+  //   class: 'address',
+  // },
   // [SCOPE_BLOCKCHAIN_ACCOUNT_MANAGE]: {
   //   name: 'Create Dedicated Blockchain Account',
   //   description:

@@ -13,6 +13,8 @@ import { getAccessClient, getStarbaseClient } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { getValidatedSessionContext } from '~/session.server'
 import type { Profile } from '@proofzero/platform/account/src/types'
+import { validatePersonaData } from '@proofzero/security/persona'
+import { PersonaData } from '@proofzero/types/application'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { clientId, redirectUri, scope, state } = context.consoleParams
@@ -34,7 +36,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         400
       )
     }
-    if (!scope.length || (scope.length == 1 && scope[0].trim() === 'openid')) {
+    if (!scope?.length || (scope.length == 1 && scope[0].trim() === 'openid')) {
       // auto authorize if no scope is provided or is set to only openid
 
       const responseType = ResponseType.Code
@@ -111,12 +113,26 @@ export const action: ActionFunction = async ({ request, context }) => {
   const responseType = ResponseType.Code
   const redirectUri = form.get('redirect_uri') as string
   const scope = (form.get('scopes') as string).split(',')
+  /* This stores the selection made from the user in the authorization
+  screen; gets validated and stored for later retrieval at token generation stage */
+  const personaData = JSON.parse(
+    form.get('personaData') as string
+  ) as PersonaData
   const state = form.get('state') as string
   const clientId = form.get('client_id') as string
 
   if (!accountUrn || !responseType || !redirectUri || !scope || !state) {
     throw json({ message: 'Missing required fields' }, 400)
   }
+
+  await validatePersonaData(
+    accountUrn,
+    personaData,
+    {
+      addressFetcher: context.env.Address,
+    },
+    context.traceSpan
+  )
 
   const accessClient = getAccessClient(context.env, context.traceSpan)
   const authorizeRes = await accessClient.authorize.mutate({
@@ -125,6 +141,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     clientId,
     redirectUri,
     scope,
+    personaData,
     state,
   })
 
@@ -174,6 +191,18 @@ export default function Authorize() {
     form.append('state', state)
     form.append('client_id', clientId)
     form.append('redirect_uri', redirectOverride)
+
+    /* TODO: implement hookup for dropdown selection. 
+    form.append('personaData', JSON.stringify(personaData))
+
+    Will need to be set in the Authorization component itself based on 
+    user selection, having a structure as follows:
+    const personaData: PersonaData = {
+      email:
+        '${selectedEmailAddressUrn}',
+    }
+     */
+
     submit(form, { method: 'post' })
   }
 
