@@ -7,7 +7,6 @@ import {
   AppObjectSchema,
   AppReadableFieldsSchema,
   AppUpdateableFieldsSchema,
-  ScopeMeta,
 } from './jsonrpc/validators/app'
 
 import {
@@ -33,7 +32,6 @@ export type AppInternalField = z.infer<typeof AppInternalFieldSchema>
 export type AppAllFields = z.infer<typeof AllFieldsSchema>
 export type AppClientIdParam = z.infer<typeof AppClientIdParamSchema>
 export type AppObject = z.infer<typeof AppObjectSchema>
-export type ScopeMeta = z.infer<typeof ScopeMeta>
 
 export type AuthorizedAccountsParams = z.infer<
   typeof GetAuthorizedAccountsMethodInput

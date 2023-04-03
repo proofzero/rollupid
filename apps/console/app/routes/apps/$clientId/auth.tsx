@@ -3,7 +3,7 @@
  */
 
 import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import type { ScopeMeta } from '@proofzero/platform/starbase/src/types'
+import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import { json } from '@remix-run/cloudflare'
 import {
   Form,
@@ -228,7 +228,7 @@ export default function AppDetailIndexPage() {
     appDetails: appDetailsProps
     rotationResult: any
   }>()
-  const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
+  const { scopeMeta }: { scopeMeta: ScopeDescriptor[] } = useLoaderData()
 
   const [isFormChanged, setIsFormChanged] = useState(false)
   const [isImgUploading, setIsImgUploading] = useState(false)

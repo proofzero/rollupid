@@ -1,8 +1,8 @@
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
-import { Profile } from '@proofzero/platform/account/src/types'
-import type { ScopeMeta } from '@proofzero/types/application'
+import type { Profile } from '@proofzero/platform/account/src/types'
+import type { ScopeDescriptor } from '@proofzero/security/scopes'
 
 import authorizeCheck from '../../assets/authorize-check.svg'
 import iIcon from '../../assets/i.svg'
@@ -21,7 +21,7 @@ export type UserProfile = {
 export type AuthorizationProps = {
   userProfile: Required<Profile>
   appProfile: AppPublicProps
-  scopeMeta: Record<string, ScopeMeta>
+  scopeMeta: Record<string, ScopeDescriptor>
   transition: 'idle' | 'loading' | 'submitting'
   cancelCallback: () => void
   authorizeCallback: (scopes: string[]) => void

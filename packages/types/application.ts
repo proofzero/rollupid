@@ -7,11 +7,5 @@ export type ClaimName = z.infer<typeof ClaimName>
 export const ClaimValue = z.any()
 export type ClaimValue = z.infer<typeof ClaimValue>
 
-export type ScopeMeta = {
-  name: ClaimName
-  description: string
-  class: string
-}
-
 export const PersonaData = z.record(ClaimName, ClaimValue)
 export type PersonaData = z.infer<typeof PersonaData>
