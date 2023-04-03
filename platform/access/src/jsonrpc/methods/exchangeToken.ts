@@ -14,8 +14,6 @@ import { AccessJWTPayload, GrantType, Scope } from '@proofzero/types/access'
 import { Context } from '../../context'
 import { initAuthorizationNodeByName, initAccessNodeByName } from '../../nodes'
 
-import getIdTokenProfileFromAccount from '../../utils/getIdTokenProfileFromAccount'
-
 import {
   InvalidClientCredentialsError,
   MismatchClientIdError,
@@ -265,7 +263,7 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
 
   await accessNode.class.verify(refreshToken)
 
-  const { scope } = payload
+  const scope = payload.scope.split(' ')
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
   const issuer = ctx.INTERNAL_JWT_ISS
 

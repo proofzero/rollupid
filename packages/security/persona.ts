@@ -126,8 +126,8 @@ export async function getClaimValues(
     env.edgesFetcher,
     generateTraceContextHeaders(traceSpan)
   )
-  for (const scopeClaim of scope) {
-    if (scopeClaim === 'email') {
+  for (const scopeValue of scope) {
+    if (scopeValue === 'email') {
       const emailAddressUrn = personaData.email
       const edgesResults = await edgesClient.getEdges.query({
         query: {
@@ -136,15 +136,9 @@ export async function getClaimValues(
           tag: EDGE_AUTHORIZES_REF_TO,
         },
       })
-      console.debug('EDGE RESULTS', {
-        emailUrn: emailAddressUrn,
-        accessUrn: accessUrn,
-        meta: edgesResults.metadata,
-        edges: edgesResults.edges,
-      })
       const emailAddress = edgesResults.edges[0].dst.qc.alias
       result = { ...result, email: emailAddress }
-    } else if (scopeClaim === 'profile') {
+    } else if (scopeValue === 'profile') {
       const nodeResult = await edgesClient.findNode.query({
         baseUrn: accountUrn,
       })
@@ -157,6 +151,5 @@ export async function getClaimValues(
       }
     }
   }
-
   return result
 }
