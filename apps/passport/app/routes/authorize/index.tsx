@@ -36,7 +36,8 @@ import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { Profile } from '@proofzero/platform/account/src/types'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { PersonaData } from '@proofzero/types/application'
-import getNormalisedConnectedEmails from '@proofzero/utils/getNormalisedConnectedEmails'
+import type { AddressURN } from '@proofzero/urns/address'
+import { getDataForScopes } from '~/utils/authorize.server'
 
 export type AppProfile = {
   name: string
@@ -131,19 +132,24 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   }
   try {
     const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
-    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
 
     // When scopes are powered by an index we can just query for the scopes we have in the app
-    const [scopeMeta, appPublicProps, connectedAccounts] = await Promise.all([
+    const [scopeMeta, appPublicProps] = await Promise.all([
       sbClient.getScopes.query(),
       sbClient.getAppPublicProps.query({
         clientId: clientId as string,
       }),
-      accountClient.getAddresses.query({
-        account: accountUrn,
-      }),
     ])
-    const connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
+
+    const dataForScopes = await getDataForScopes(
+      scopeMeta.scopes,
+      scope,
+      appPublicProps.scopes,
+      accountUrn,
+      jwt,
+      context.env,
+      context.traceSpan
+    )
 
     return json({
       clientId,
@@ -152,7 +158,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       state,
       redirectOverride: redirectUri,
       scopeOverride: scope,
-      connectedEmails,
+      dataForScopes,
     })
   } catch (e) {
     console.error(e)
@@ -183,10 +189,18 @@ export const action: ActionFunction = async ({ request, context }) => {
   const personaData = JSON.parse(
     form.get('personaData') as string
   ) as PersonaData
+
   const state = form.get('state') as string
   const clientId = form.get('client_id') as string
 
-  if (!accountUrn || !responseType || !redirectUri || !scope || !state) {
+  if (
+    !accountUrn ||
+    !responseType ||
+    !redirectUri ||
+    !scope ||
+    !state ||
+    !personaData
+  ) {
     throw json({ message: 'Missing required fields' }, 400)
   }
 
@@ -217,6 +231,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   const redirectParams = new URLSearchParams({
     code: authorizeRes.code,
     state: authorizeRes.state,
+    personaData: JSON.stringify(personaData),
   })
 
   return redirect(`${redirectUri}?${redirectParams}`)
@@ -236,23 +251,15 @@ export default function Authorize() {
     state,
     redirectOverride,
     scopeOverride,
-    connectedEmails,
+    dataForScopes,
   } = useLoaderData()
+
+  const { connectedEmails, personaData, unitedScopes } = dataForScopes
 
   const { profile: userProfile } = useOutletContext<{
     profile: Required<Profile>
   }>()
 
-  console.log({
-    clientId,
-    appProfile,
-    scopeMeta,
-    state,
-    redirectOverride,
-    scopeOverride,
-    userProfile,
-    app: appProfile,
-  })
   const submit = useSubmit()
   const transition = useTransition()
 
@@ -271,17 +278,7 @@ export default function Authorize() {
     form.append('state', state)
     form.append('client_id', clientId)
     form.append('redirect_uri', redirectOverride)
-
-    /* TODO: implement hookup for dropdown selection.
     form.append('personaData', JSON.stringify(personaData))
-
-    Will need to be set in the Authorization component itself based on
-    user selection, having a structure as follows:
-    const personaData: PersonaData = {
-      email:
-        '${selectedEmailAddressUrn}',
-    }
-     */
 
     submit(form, { method: 'post' })
   }
@@ -325,73 +322,65 @@ export default function Authorize() {
             style={{ color: '#6B7280' }}
             className={'flex flex-col font-light text-base gap-2 w-full'}
           >
-            {appProfile.scopes
-              .filter((scope: string) => {
-                console.log({
-                  scope,
-                  scopeMeta,
-                  sccope: scopeMeta.scopes[`${scope}`],
-                })
-                return !scopeMeta.scopes[scope].hidden
-              })
-              .map((scope: string, i: number) => {
-                return (
-                  <li
-                    key={i}
-                    className={
-                      'flex flex-row gap-2 items-center justify-between w-full'
-                    }
-                  >
-                    <div
-                      className="flex gap-2 flex-row
+            {unitedScopes.map((scope: string, i: number) => {
+              return (
+                <li
+                  key={i}
+                  className={
+                    'flex flex-row gap-2 items-center justify-between w-full'
+                  }
+                >
+                  <div
+                    className="flex gap-2 flex-row
                      items-center justify-center"
-                    >
-                      <span>
-                        <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
-                      </span>
-                      {scope !== 'email' ? scopeMeta.scopes[scope].name : null}
-                    </div>
-                    {scope === 'email' ? (
-                      <div className="w-[260px]">
-                        <EmailSelect
-                          items={connectedEmails}
-                          enableAddNew={true}
-                          enableNone={true}
-                        />
-                      </div>
-                    ) : null}
-                    <span
-                      className={'cursor-pointer'}
-                      data-popover-target={`popover-${scope}`}
-                      data-tooltip-placement="right"
-                    >
-                      <img
-                        src={iIcon}
-                        alt={`${scopeMeta.scopes[scope].name} info`}
-                      />
+                  >
+                    <span>
+                      <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
                     </span>
+                    {scope !== 'email' ? scopeMeta.scopes[scope].name : null}
+                  </div>
+                  {scope === 'email' ? (
+                    <div className="w-[260px]">
+                      <EmailSelect
+                        items={connectedEmails}
+                        onSelect={(emailAddressURN: AddressURN) => {
+                          personaData.email = emailAddressURN
+                        }}
+                      />
+                    </div>
+                  ) : null}
+                  <span
+                    className={'cursor-pointer'}
+                    data-popover-target={`popover-${scope}`}
+                    data-tooltip-placement="right"
+                  >
+                    <img
+                      src={iIcon}
+                      alt={`${scopeMeta.scopes[scope].name} info`}
+                    />
+                  </span>
 
-                    <div
-                      data-popover
-                      id={`popover-${scope}`}
-                      role="tooltip"
-                      className="absolute z-10 invisible inline-block
+                  <div
+                    data-popover
+                    id={`popover-${scope}`}
+                    role="tooltip"
+                    className="absolute z-10 invisible inline-block
                     font-[Inter]
                      min-w-64 text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
-                    >
-                      <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {scope}
-                        </h3>
-                      </div>
-                      <div className="px-3 py-2">
-                        <p>{scopeMeta.scopes[scope].description}</p>
-                      </div>
-                      <div data-popper-arrow></div>
+                  >
+                    <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                        {scope}
+                      </h3>
                     </div>
-                  </li>
-                )
-              })}
+                    <div className="px-3 py-2">
+                      <p>{scopeMeta.scopes[scope].description}</p>
+                    </div>
+                    <div data-popper-arrow></div>
+                  </div>
+                </li>
+              )
+            })}
           </ul>
         </div>
       </div>
@@ -408,6 +397,7 @@ export default function Authorize() {
             </Button>
             <Button
               btnType="primary-alt"
+              disabled={!connectedEmails || !connectedEmails.length}
               onClick={() => {
                 authorizeCallback(appProfile.scopes)
               }}

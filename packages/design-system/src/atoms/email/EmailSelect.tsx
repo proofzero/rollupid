@@ -13,11 +13,13 @@ import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
 
 import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
+import type { AddressURN } from '@proofzero/urns/address'
 
 type EmailSelectProps = {
   items: EmailSelectListItem[]
   enableAddNew?: boolean
   enableNone?: boolean
+  onSelect?: (emailAddressURN: AddressURN) => void
 }
 
 enum OptionType {
@@ -30,6 +32,7 @@ export const EmailSelect = ({
   items,
   enableAddNew = false,
   enableNone = false,
+  onSelect,
 }: EmailSelectProps) => {
   const options = items.map((item) => ({
     ...item,
@@ -44,7 +47,14 @@ export const EmailSelect = ({
   )
 
   return (
-    <Listbox value={selected} onChange={setSelected} by="email">
+    <Listbox
+      value={selected}
+      onChange={(selected) => {
+        onSelect && 'addressURN' in selected && onSelect(selected.addressURN)
+        setSelected(selected)
+      }}
+      by="email"
+    >
       {({ open }) => (
         <div className="relative bg-white">
           <Listbox.Button
