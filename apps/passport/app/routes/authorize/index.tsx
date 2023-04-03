@@ -69,21 +69,16 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
 
     // When scopes are powered by an index we can just query for the scopes we have in the app
-    const [scopeMeta, appProfile] = await Promise.all([
+    const [scopeMeta, appPublicProps] = await Promise.all([
       sbClient.getScopes.query(),
-      sbClient.getAppProfile.query({
+      sbClient.getAppPublicProps.query({
         clientId: clientId as string,
       }),
     ])
 
-    if (!appProfile.published)
-      throw new Error(
-        'Could not find a published application with that Client ID'
-      )
-
     return json({
       clientId,
-      appProfile,
+      appProfile: appPublicProps,
       scopeMeta: scopeMeta,
       state,
       redirectOverride: redirectUri,
@@ -208,7 +203,7 @@ export default function Authorize() {
 
   return (
     <Authorization
-      appProfile={appProfile.app}
+      appProfile={appProfile}
       userProfile={userProfile}
       scopeMeta={scopeMeta.scopes}
       transition={transition.state}
