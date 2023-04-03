@@ -37,7 +37,7 @@ export const getDataForScopes = async (
 
   const personaData: PersonaData = {}
 
-  if (connectedEmails.length) personaData.email = connectedEmails[0].email
+  if (connectedEmails.length) personaData.email = connectedEmails[0].addressURN
 
   return {
     connectedEmails,

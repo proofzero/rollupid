@@ -231,7 +231,6 @@ export const action: ActionFunction = async ({ request, context }) => {
   const redirectParams = new URLSearchParams({
     code: authorizeRes.code,
     state: authorizeRes.state,
-    personaData: JSON.stringify(personaData),
   })
 
   return redirect(`${redirectUri}?${redirectParams}`)
