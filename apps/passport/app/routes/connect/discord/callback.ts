@@ -55,6 +55,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   await addressClient.setOAuthData.mutate(authRes)
 
   return authenticateAddress(
+    request,
     address,
     accountURN,
     appData,
