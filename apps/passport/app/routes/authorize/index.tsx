@@ -11,7 +11,11 @@ import { ResponseType } from '@proofzero/types/access'
 
 import { getAccessClient, getStarbaseClient } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
-import { getValidatedSessionContext } from '~/session.server'
+import {
+  destroyConsoleParamsSession,
+  getConsoleParams,
+  getValidatedSessionContext,
+} from '~/session.server'
 import type { Profile } from '@proofzero/platform/account/src/types'
 import { validatePersonaData } from '@proofzero/security/persona'
 import { PersonaData } from '@proofzero/types/application'
@@ -24,6 +28,20 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     context.env,
     context.traceSpan
   )
+
+  const headers = new Headers()
+  const lastCP = await getConsoleParams(request, context.env)
+  if (lastCP) {
+    headers.append(
+      'Set-Cookie',
+      await destroyConsoleParamsSession(request, context.env, lastCP.clientId)
+    )
+
+    headers.append(
+      'Set-Cookie',
+      await destroyConsoleParamsSession(request, context.env)
+    )
+  }
 
   if (clientId) {
     if (!state) throw json({ message: 'state is required' }, 400)
@@ -59,11 +77,15 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         state: authorizeRes.state,
       })
 
-      return redirect(`${redirectUri}?${redirectParams}`)
+      return redirect(`${redirectUri}?${redirectParams}`, {
+        headers,
+      })
     }
   } else {
     //TODO: remove this when implementing scopes and authz
-    return redirect(context.env.CONSOLE_APP_URL)
+    return redirect('/settings', {
+      headers,
+    })
   }
   try {
     const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
@@ -76,14 +98,19 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       }),
     ])
 
-    return json({
-      clientId,
-      appProfile: appPublicProps,
-      scopeMeta: scopeMeta,
-      state,
-      redirectOverride: redirectUri,
-      scopeOverride: scope,
-    })
+    return json(
+      {
+        clientId,
+        appProfile: appPublicProps,
+        scopeMeta: scopeMeta,
+        state,
+        redirectOverride: redirectUri,
+        scopeOverride: scope,
+      },
+      {
+        headers,
+      }
+    )
   } catch (e) {
     console.error(e)
     throw json({ message: 'Failed to fetch application info' }, 400)

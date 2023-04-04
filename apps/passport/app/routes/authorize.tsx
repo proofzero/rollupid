@@ -5,19 +5,22 @@ import { Outlet, useLoaderData } from '@remix-run/react'
 import { getAccountClient } from '~/platform.server'
 import {
   createConsoleParamsSession,
+  destroyConsoleParamsSession,
+  getConsoleParams,
   getValidatedSessionContext,
 } from '~/session.server'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const params = new URL(request.url).searchParams
-  const prompt = params.get('prompt')
+  const headers = new Headers()
 
-  if (prompt !== 'none') {
-    if (context.consoleParams.clientId)
-      throw await createConsoleParamsSession(context.consoleParams, context.env)
-    else throw redirect(context.env.CONSOLE_APP_URL)
+  const contextCPId = context.consoleParams.clientId
+  if (!contextCPId) throw new Error('No client id provided')
+
+  const lastCP = await getConsoleParams(request, context.env)
+  if (!lastCP) {
+    throw await createConsoleParamsSession(context.consoleParams, context.env)
   }
 
   // this will redirect unauthenticated users to the auth page but maintain query params
@@ -27,10 +30,16 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     context.env,
     context.traceSpan
   )
+
   const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
   const profile = await accountClient.getProfile.query({ account: accountUrn })
 
-  return json({ profile })
+  return json(
+    { profile },
+    {
+      headers,
+    }
+  )
 }
 
 export default function Authorize() {

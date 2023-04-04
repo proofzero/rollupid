@@ -16,7 +16,7 @@ import { initAuthenticator, getAppleStrategy } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import {
-  getConsoleParamsSession,
+  getConsoleParams,
   getJWTConditionallyFromSession,
 } from '~/session.server'
 
@@ -41,12 +41,7 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const appData = await getConsoleParamsSession(request, context.env)
-    .then((session) => JSON.parse(session.get('params')))
-    .catch((err) => {
-      console.log('No console params session found')
-      return null
-    })
+  const appData = await getConsoleParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)
   authenticator.use(getAppleStrategy(context.env))
@@ -113,6 +108,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   }
 
   return authenticateAddress(
+    request,
     address,
     account.accountURN,
     appData,

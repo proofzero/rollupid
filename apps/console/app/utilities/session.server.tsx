@@ -70,7 +70,17 @@ export async function requireJWT(request: Request) {
     switch (error) {
       case ExpiredTokenError:
       case InvalidTokenError:
-        throw redirect(`${PASSPORT_URL}/signout`)
+        const url = new URL(request.url)
+        const { href } = url
+
+        const qp = new URLSearchParams()
+        qp.append('client_id', 'console')
+        qp.append('redirect_uri', `${href}`)
+
+        qp.append('scope', '')
+        qp.append('state', 'skip')
+
+        throw redirect(`${PASSPORT_URL}/authorize?${qp.toString()}`)
     }
   }
 }
@@ -84,4 +94,16 @@ export function parseJwt(token: string): JWTPayload {
     throw new Error('Invalid JWT')
   }
   return payload
+}
+
+export async function destroyUserSession(request: Request, redirectTo: string) {
+  const session = await getUserSession(request)
+  const storage = getPassportSessionStorage()
+
+  const headers = new Headers()
+  headers.append('Set-Cookie', await storage.destroySession(session))
+
+  return redirect(redirectTo, {
+    headers,
+  })
 }

@@ -9,7 +9,7 @@ import type { OAuthData } from '@proofzero/platform.address/src/types'
 import { MicrosoftStrategyDefaultName } from 'remix-auth-microsoft'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import {
-  getConsoleParamsSession,
+  getConsoleParams,
   getJWTConditionallyFromSession,
 } from '~/session.server'
 import cacheImageToCF from '~/utils/cacheImageToCF.server'
@@ -18,12 +18,7 @@ export const loader: LoaderFunction = async ({
   request,
   context,
 }: LoaderArgs) => {
-  const appData = await getConsoleParamsSession(request, context.env)
-    .then((session) => JSON.parse(session.get('params')))
-    .catch((err) => {
-      console.log('No console params session found')
-      return null
-    })
+  const appData = await getConsoleParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)
   authenticator.use(getMicrosoftStrategy(context.env))
@@ -79,6 +74,7 @@ export const loader: LoaderFunction = async ({
   }
 
   return authenticateAddress(
+    request,
     address,
     accountURN,
     appData,

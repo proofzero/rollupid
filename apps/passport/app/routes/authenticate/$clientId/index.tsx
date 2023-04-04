@@ -14,89 +14,50 @@ import { useEffect, useState } from 'react'
 import { HiCheck, HiOutlineMail } from 'react-icons/hi'
 import { Authentication, ConnectButton } from '~/components'
 import ConnectOAuthButton from '~/components/connect-oauth-button'
-import { ResponseType } from '@proofzero/types/access'
 import {
   ActionFunction,
   redirect,
   json,
   LoaderFunction,
 } from '@remix-run/cloudflare'
-import { getAccessClient } from '~/platform.server'
-import {
-  getConsoleParamsSession,
-  destroyConsoleParamsSession,
-  getValidatedSessionContext,
-} from '~/session.server'
-import AuthButton from '~/components/connect-button/AuthButton'
 
-export const loader: LoaderFunction = async ({ params }) => {
+import AuthButton from '~/components/connect-button/AuthButton'
+import { getConsoleParams, getUserSession } from '~/session.server'
+
+export const loader: LoaderFunction = async ({ request, context, params }) => {
+  const userSession = await getUserSession(
+    request,
+    context.env,
+    params.clientId
+  )
+  const showContinueWithExistingUser = userSession ? true : false
+
   return json({
     clientId: params.clientId,
+    showContinueWithExistingUser,
   })
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
-  let consoleParams
-  if (params.clientId !== 'console') {
-    consoleParams = await getConsoleParamsSession(
-      request,
-      context.env,
-      params.clientId!
-    )
-      .then((session) => JSON.parse(session.get('params')))
-      .catch((err) => {
-        console.log('No console params session found')
-        return null
-      })
-  }
-
-  //Need to validate session before any redirects
-  const { accountUrn } = await getValidatedSessionContext(
+  const consoleParams = await getConsoleParams(
     request,
-    consoleParams,
     context.env,
-    context.traceSpan
+    params.clientId
   )
 
-  // TODO: Make decision based on clientId params (console?)
-  if (!consoleParams) return redirect(context.env.CONSOLE_APP_URL)
+  const { redirectUri, state, scope, clientId } = consoleParams
 
-  const { redirectUri, state, clientId } = consoleParams
+  const qp = new URLSearchParams()
+  qp.append('client_id', clientId)
+  qp.append('redirect_uri', redirectUri)
+  qp.append('state', state)
+  qp.append('scope', scope)
 
-  const responseType = ResponseType.Code
-  const accessClient = getAccessClient(context.env, context.traceSpan)
-  const authorizeRes = await accessClient.authorize.mutate({
-    account: accountUrn,
-    responseType,
-    clientId,
-    redirectUri,
-    scope: [],
-    state,
-  })
-
-  if (!authorizeRes) {
-    throw json({ message: 'Failed to authorize' }, 400)
-  }
-
-  const redirectParams = new URLSearchParams({
-    code: authorizeRes.code,
-    state: authorizeRes.state,
-  })
-
-  const headers = new Headers()
-  headers.append(
-    'Set-Cookie',
-    await destroyConsoleParamsSession(request, context.env)
-  )
-
-  return redirect(`${redirectUri}?${redirectParams}`, {
-    headers,
-  })
+  return redirect(`/authorize?${qp.toString()}`)
 }
 
 export default () => {
-  const { prompt, appProps, profile } = useOutletContext<{
-    prompt?: string
+  const { appProps, profile } = useOutletContext<{
     appProps?: {
       name: string
       iconURL: string
@@ -104,7 +65,7 @@ export default () => {
     profile?: Required<Profile>
   }>()
 
-  const { clientId } = useLoaderData()
+  const { clientId, showContinueWithExistingUser } = useLoaderData()
 
   const [signData, setSignData] = useState<{
     nonce: string | undefined
@@ -139,7 +100,7 @@ export default () => {
 
       <Authentication logoURL={iconURL} appName={name}>
         <>
-          {profile && prompt !== 'login' && (
+          {profile && showContinueWithExistingUser && (
             <>
               <AuthButton
                 onClick={() => {

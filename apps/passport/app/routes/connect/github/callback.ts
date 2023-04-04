@@ -10,7 +10,7 @@ import { GitHubStrategyDefaultName } from 'remix-auth-github'
 import { NodeType, OAuthAddressType } from '@proofzero/types/address'
 import type { OAuthData } from '@proofzero/platform.address/src/types'
 import {
-  getConsoleParamsSession,
+  getConsoleParams,
   getJWTConditionallyFromSession,
 } from '~/session.server'
 
@@ -18,12 +18,7 @@ export const loader: LoaderFunction = async ({
   request,
   context,
 }: LoaderArgs) => {
-  const appData = await getConsoleParamsSession(request, context.env)
-    .then((session) => JSON.parse(session.get('params')))
-    .catch((err) => {
-      console.log('No console params session found')
-      return null
-    })
+  const appData = await getConsoleParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)
   authenticator.use(getGithubAuthenticator(context.env))
@@ -63,6 +58,7 @@ export const loader: LoaderFunction = async ({
   await addressClient.setOAuthData.mutate(authRes)
 
   return authenticateAddress(
+    request,
     address,
     accountURN,
     appData,

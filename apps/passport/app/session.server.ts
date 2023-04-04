@@ -60,7 +60,7 @@ const getUserSessionStorage = (
   MAX_AGE = 7776000 /*60 * 60 * 24 * 90*/
 ) => {
   let cookieName = `_rollup_session`
-  if (clientId) {
+  if (clientId && clientId !== 'passport' && clientId !== 'console') {
     cookieName += `_last`
   }
 
@@ -93,16 +93,6 @@ export async function createUserSession(
   userSession.set('defaultProfileUrn', defaultProfileUrn)
 
   const headers = new Headers()
-
-  if (clientId) {
-    const consoleParamsStorage = getConsoleParamsSessionStorage(env, clientId)
-    const consoleParamsSession = await consoleParamsStorage.getSession()
-
-    headers.append(
-      'Set-Cookie',
-      await consoleParamsStorage.destroySession(consoleParamsSession)
-    )
-  }
 
   headers.append('Set-Cookie', await userStorage.commitSession(userSession))
 
@@ -175,9 +165,9 @@ export async function createConsoleParamsSession(
   consoleParams: ConsoleParams,
   env: Env
 ) {
-  const storage = getConsoleParamsSessionStorage(env, consoleParams.clientId!)
-  const session = await storage.getSession()
-  session.set('params', JSON.stringify(consoleParams))
+  if (!consoleParams.clientId) {
+    throw new Error('Missing clientId in consoleParams')
+  }
 
   let redirectURL = `/authenticate/${consoleParams.clientId}`
   if (consoleParams.prompt) {
@@ -186,10 +176,18 @@ export async function createConsoleParamsSession(
     redirectURL += `?${qp.toString()}`
   }
 
+  const headers = new Headers()
+  headers.append(
+    'Set-Cookie',
+    await setConsoleParamsSession(consoleParams, env, consoleParams.clientId)
+  )
+  headers.append(
+    'Set-Cookie',
+    await setConsoleParamsSession(consoleParams, env)
+  )
+
   return redirect(redirectURL, {
-    headers: {
-      'Set-Cookie': await storage.commitSession(session),
-    },
+    headers,
   })
 }
 
@@ -224,10 +222,38 @@ export async function destroyConsoleParamsSession(
   return storage.destroySession(gps)
 }
 
+export async function getConsoleParams(
+  request: Request,
+  env: Env,
+  clientId?: string
+) {
+  return getConsoleParamsSession(request, env, clientId)
+    .then((session) => JSON.parse(session.get('params')))
+    .catch((err) => {
+      console.log('No console params session found')
+      return null
+    })
+}
+
+export function getDefaultConsoleParams(request: Request): ConsoleParams {
+  const url = new URL(request.url)
+  const { protocol, host } = url
+
+  const cp = {
+    clientId: 'passport',
+    redirectUri: `${protocol}//${host}/settings`,
+    state: 'skip',
+    scope: [],
+  }
+
+  return cp
+}
+
 export type ValidatedSessionContext = {
   jwt: string
   accountUrn: AccountURN
 }
+
 export async function getValidatedSessionContext(
   request: Request,
   consoleParams: ConsoleParams,
@@ -255,6 +281,7 @@ export async function getValidatedSessionContext(
       accountUrn: payload.sub as AccountURN,
     }
   } catch (error) {
+    // TODO: Revise this logic
     const redirectTo = `/authenticate/${consoleParams?.clientId ?? ''}`
     if (error === InvalidTokenError)
       if (consoleParams.clientId)

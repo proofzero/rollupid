@@ -3,38 +3,31 @@ import { json } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 import { Suspense } from 'react'
 
-import { getUserSession } from '~/session.server'
+import { getConsoleParams, getUserSession } from '~/session.server'
 
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
-import { useCatch, useLoaderData, useOutletContext } from '@remix-run/react'
+import { useCatch } from '@remix-run/react'
 import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
 import { LazyAuth } from '~/web3/lazyAuth'
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 
-// TODO: loader function check if we have a session already
-// redirect if logged in
+import { loader as indexLoader } from '~/routes/index'
+
 export const loader: LoaderFunction = async ({ request, context, params }) => {
-  const searchParams = new URL(request.url).searchParams
-  const prompt = searchParams.get('prompt')
+  const consoleParams = await getConsoleParams(
+    request,
+    context.env,
+    params.clientId
+  )
 
-  const session = await getUserSession(request, context.env, params.clientId)
-  const jwt = session.get('jwt')
-
-  if (jwt) {
-    if (prompt === 'none') {
-      return redirect(`/authorize?${searchParams}`)
-    }
+  if (!consoleParams) {
+    return indexLoader({ request, context, params })
   }
 
-  return json({
-    prompt,
-  })
+  return null
 }
 
 export default function Index() {
-  const context = useOutletContext() || {}
-  const data = useLoaderData()
-
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
       <div
@@ -46,7 +39,7 @@ export default function Index() {
       </div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
         <Suspense fallback={''}>
-          <LazyAuth context={{ ...context, ...data }} autoConnect={true} />
+          <LazyAuth autoConnect={true} />
         </Suspense>
       </div>
     </div>
