@@ -4,15 +4,19 @@ description: Step-by-step guide to creating a Rollup application.
 
 # Create an application
 
+Follow these steps to create and configure your Rollup ID application:
+
 ### Step 1: Connect with Rollup Passport
 
-First, login to [Console](../platform/console/) with Rollup Passport by visiting [https://passport.rollup.id](https://passport.rollup.id) where you will see a screen like this where you can choose your favorite authentication method to register / login with:
+First, visit [https://console.rollup.id](https://passport.rollup.id/) and log in to the [Console](../platform/console/) using Rollup Passport. You'll see a screen that offers various authentication methods to register or log in.
 
 <figure><img src="../.gitbook/assets/authenticate.svg" alt=""><figcaption><p>Rollup Passport Authentication</p></figcaption></figure>
 
 ### Step 2: Create an App
 
-After logging in you will be redirected to the [Console](../platform/console/) dashboard. This is where you’ll register and configure your Rollup Application.
+Once you've logged in, you'll be redirected to the Console dashboard. Here, you can register and configure your Rollup ID application.&#x20;
+
+Click on the "Create Application" button in the center of the screen. You'll be prompted to enter a name for your application and then redirected to the application's configuration screen.
 
 <div>
 
@@ -24,13 +28,11 @@ After logging in you will be redirected to the [Console](../platform/console/) d
 
 </div>
 
-From here you will want to click the “Create Application” button in the middle of the screen where you will be prompted to give your application a name and finally redirected to your new application's configuration screen.
-
 ### Step 3: Configure your Application
 
-Once the app is created, the first screen you will see is your application dashboard. This is where you can copy your [Galaxy API key](../reference/galaxy-api.md) and your application keys. **Please copy the Client Secret and store it somewhere secure.**
+Upon creating your app, you'll land on the application dashboard. This is where you can obtain your [Galaxy API](../reference/galaxy-api.md) key and application keys.
 
-{% hint style="info" %}
+{% hint style="warning" %}
 The Client Secret is only shared once so, if you missed it you can click the "roll keys" link to regenerate the keys.
 {% endhint %}
 
@@ -44,23 +46,23 @@ The Client Secret is only shared once so, if you missed it you can click the "ro
 
 </div>
 
-Next click the "OAuth" link on the left navigation bar to view the full application configuration screen.
+Next, click the "OAuth" link in the left navigation bar to access the full application configuration screen. Here, you'll find a standard [OAuth 2.0](https://oauth.net/2/) configuration form.
 
 <figure><img src="../.gitbook/assets/oauth.png" alt=""><figcaption></figcaption></figure>
 
-Here you will see the standard [OAuth 2.0](https://oauth.net/2/) configuration form where you will need to set the following required fields:
+Fill in the following required fields:
 
-* **Redirect URL**: The address where Rollup will redirect your users to after they have completed the auth flow ([more on next page](auth-flow.md))
-* **App Icon**: The logo of your application you want displayed to users during the auth flow ([see passport for more](../platform/passport.md))
+* **Redirect URL**: The address where Rollup will redirect your users to after they have completed the auth flow ([more on next page](auth-flow.md)).
+* **App Icon**: Your application's logo, which will be displayed to users during the auth flow ([see passport for more](../platform/passport.md)).
 * **Terms of Service URL**: A link to your application's TOS
 * **Website**: A link to your application's website
 * **Scopes**: \[coming soon]
 * **Domains**: \[coming soon]
 
 {% hint style="warning" %}
-In most cases you will need to setup an app for each environment and save the correct **redirect url** for each. For example, a "localhost" redirect url for local development and a "staging" redirect url for test environments.
+In most cases, you'll need to set up an app for each environment and provide the appropriate **redirect URL** for each. For instance, you might use a "**localhost**" redirect URL for local development and a "staging" redirect URL for test environments.
 {% endhint %}
 
-All other fields are optional. Once complete click the "Published" toggle and "Save" button.
+Fill in any additional optional fields as needed. When you're done, click the "Published" toggle and then the "Save" button.
 
-Now that you have a fully configured application you can complete the integration.
+With your application fully configured, you're now ready to complete the integration.
