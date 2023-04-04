@@ -235,6 +235,20 @@ export async function getConsoleParams(
     })
 }
 
+export function getDefaultConsoleParams(request: Request): ConsoleParams {
+  const url = new URL(request.url)
+  const { protocol, host } = url
+
+  const cp = {
+    clientId: 'passport',
+    redirectUri: `${protocol}//${host}/settings`,
+    state: 'skip',
+    scope: [],
+  }
+
+  return cp
+}
+
 export type ValidatedSessionContext = {
   jwt: string
   accountUrn: AccountURN
