@@ -18,6 +18,26 @@ export function getSupersetFromArrays<T>(args: T[][]): T[] {
   return Array.from(set)
 }
 
+// Deterministically sort scopes so that they are always in the same order
+// when returned to the client. Email is always last.
+// -----------------------------------------------------------------------------
+const orderOfScopes: Record<string, number> = {
+  openid: 0,
+  profile: 1,
+  email: 100,
+}
+
+export const reorderScopes = (scopes: string[]): string[] => {
+  return scopes.sort((a, b) => {
+    const aIndex = orderOfScopes[a]
+    const bIndex = orderOfScopes[b]
+    if (aIndex === undefined) return 1
+    if (bIndex === undefined) return -1
+    return aIndex - bIndex
+  })
+}
+// -----------------------------------------------------------------------------
+
 export const getDataForScopes = async (
   urlScopes: string[],
   appScopes: string[],
@@ -29,23 +49,18 @@ export const getDataForScopes = async (
   if (!accountURN)
     throw new UnauthorizedError({ message: 'Account URN is required' })
 
-  const superScopes = getSupersetFromArrays([appScopes, urlScopes])
+  const superScopes = reorderScopes(
+    getSupersetFromArrays([appScopes, urlScopes])
+  )
 
   let connectedEmails: EmailSelectListItem[] = []
   const accountClient = getAccountClient(jwt || '', env, traceSpan)
-  if (superScopes.includes('email')) {
-    const indexOfTypeEmail = superScopes.indexOf('email')
 
-    // swap it with the last element and put last element in the index of email
-    superScopes[indexOfTypeEmail] = superScopes[superScopes.length - 1]
-    superScopes[superScopes.length - 1] = 'email'
-
-    const connectedAccounts = await accountClient.getAddresses.query({
-      account: accountURN,
-    })
-    if (connectedAccounts && connectedAccounts.length)
-      connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
-  }
+  const connectedAccounts = await accountClient.getAddresses.query({
+    account: accountURN,
+  })
+  if (connectedAccounts && connectedAccounts.length)
+    connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
 
   const personaData: PersonaData = {}
 
