@@ -59,7 +59,7 @@ export const normalizeProfileToConnection = (profile: any) => {
         id: profile.urn,
         address: `${profile.username}#${profile.discriminator}`,
         title: profile.username,
-        icon: `https://cdn.discordapp.com/avatars/${profile.discordId}/${profile.avatar}.png`,
+        icon: `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`,
         type: 'Discord',
       }
     case EmailAddressType.Email:
