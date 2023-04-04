@@ -95,3 +95,15 @@ export function parseJwt(token: string): JWTPayload {
   }
   return payload
 }
+
+export async function destroyUserSession(request: Request, redirectTo: string) {
+  const session = await getUserSession(request)
+  const storage = getPassportSessionStorage()
+
+  const headers = new Headers()
+  headers.append('Set-Cookie', await storage.destroySession(session))
+
+  return redirect(redirectTo, {
+    headers,
+  })
+}
