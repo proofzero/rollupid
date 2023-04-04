@@ -7,6 +7,8 @@ import {
   useTransition,
 } from '@remix-run/react'
 
+import subtractLogo from '~/assets/subtract-logo.svg'
+
 import { ResponseType } from '@proofzero/types/access'
 import {
   getAccessClient,
@@ -41,6 +43,7 @@ import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/va
 import type { PersonaData } from '@proofzero/types/application'
 import type { AddressURN } from '@proofzero/urns/address'
 import type { DataForScopes } from '~/utils/authorize.server'
+import { Text } from '@proofzero/design-system'
 
 export type UserProfile = {
   displayName: string
@@ -320,7 +323,7 @@ export default function Authorize() {
         <div className={'items-start justify-start w-full'}>
           <p
             style={{ color: '#6B7280' }}
-            className={'mb-2 font-extralight text-sm'}
+            className={'mb-2 font-extralight text-xs'}
           >
             REQUESTED
           </p>
@@ -340,16 +343,11 @@ export default function Authorize() {
                       'flex flex-row gap-2 items-center justify-between w-full'
                     }
                   >
-                    <div
-                      className="flex gap-2 flex-row
-                     items-center justify-center"
-                    >
-                      <span>
-                        <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
-                      </span>
+                    <div className="flex flex-row w-full gap-2 items-center">
+                      <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
                       {scope !== 'email' ? scopeMeta.scopes[scope].name : null}
                       {scope === 'email' ? (
-                        <div className="w-[260px]">
+                        <div className="w-full">
                           <EmailSelect
                             items={connectedEmails}
                             onSelect={(emailAddressURN: AddressURN) => {
@@ -360,16 +358,10 @@ export default function Authorize() {
                       ) : null}
                     </div>
 
-                    <span
-                      className={'cursor-pointer'}
-                      data-popover-target={`popover-${scope}`}
-                      data-tooltip-placement="right"
-                    >
-                      <img
-                        src={iIcon}
-                        alt={`${scopeMeta.scopes[scope].name} info`}
-                      />
-                    </span>
+                    <img
+                      src={iIcon}
+                      alt={`${scopeMeta.scopes[scope].name} info`}
+                    />
 
                     <div
                       data-popover
@@ -395,10 +387,15 @@ export default function Authorize() {
           </ul>
         </div>
       </div>
-      <div className={'flex flex-row items-end justify-center gap-4 mt-auto'}>
+      <div
+        className={
+          'flex flex-row w-full items-end justify-center gap-4 mt-auto'
+        }
+      >
         {transition.state === 'idle' && (
           <>
             <Button
+              btnSize="xl"
               btnType="secondary-alt"
               onClick={() => {
                 cancelCallback()
@@ -407,6 +404,7 @@ export default function Authorize() {
               Cancel
             </Button>
             <Button
+              btnSize="xl"
               btnType="primary-alt"
               disabled={!connectedEmails?.length || !persona?.email?.length}
               onClick={() => {
@@ -418,6 +416,15 @@ export default function Authorize() {
           </>
         )}
         {transition.state !== 'idle' && <Spinner />}
+      </div>
+      <div className="mt-7 flex justify-center items-center space-x-2">
+        <img src={subtractLogo} alt="powered by rollup.id" />
+        <Text size="xs" weight="normal" className="text-gray-400">
+          Powered by{' '}
+          <a href="https://rollup.id" className="hover:underline">
+            rollup.id
+          </a>
+        </Text>
       </div>
     </div>
   )
