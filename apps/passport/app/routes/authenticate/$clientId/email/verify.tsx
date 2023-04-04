@@ -2,10 +2,11 @@ import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
 import { action as otpAction } from '~/routes/connect/email/otp'
 import { EmailOTPValidator } from '@proofzero/design-system/src/molecules/email-otp-validator'
 import {
-  Outlet,
   useActionData,
+  useCatch,
+  useFetcher,
   useLoaderData,
-  useMatches,
+  useLocation,
   useNavigate,
   useSubmit,
   useTransition,
@@ -17,6 +18,9 @@ import {
 import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
+import { useEffect } from 'react'
+import { Text } from '@proofzero/design-system'
+import { ERROR_CODES } from '@proofzero/errors'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const qp = new URL(request.url).searchParams
@@ -65,27 +69,25 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   return json({ error: true })
 }
 
-export default () => {
+const Layout = ({ children }: { children?: JSX.Element }) => {
   const { address, clientId } = useLoaderData()
   const ad = useActionData()
-
+  const submit = useSubmit()
   const navigate = useNavigate()
   const transition = useTransition()
+  const location = useLocation()
+  const fetcher = useFetcher()
 
-  const submit = useSubmit()
-
-  const matches = useMatches()
-  const indexMatch = matches.find(
-    (m) => m.id === 'routes/authenticate/$clientId/email/verify/index'
-  )
-  const matchData = indexMatch?.data
+  useEffect(() => {
+    fetcher.load(`/connect/email/otp${location.search}`)
+  }, [])
 
   return (
     <div
       className={
         'flex shrink flex-col items-center justify-center gap-4 mx-auto\
-        bg-white p-6 h-[100dvh] lg:h-[675px] lg:max-h-[100dvh] w-full\
-         lg:w-[418px] lg:border-rounded-lg'
+      bg-white p-6 h-[100dvh] lg:h-[675px] lg:max-h-[100dvh] w-full\
+       lg:w-[418px] lg:border-rounded-lg'
       }
       style={{
         border: '1px solid #D1D5DB',
@@ -95,11 +97,17 @@ export default () => {
       {transition.state !== 'idle' && <Loader />}
 
       <EmailOTPValidator
-        loading={transition.state !== 'idle'}
+        loading={transition.state !== 'idle' || fetcher.state !== 'idle'}
         email={address}
-        state={matchData?.state}
+        state={fetcher.data?.state}
         invalid={ad?.error}
-        requestRegeneration={() => navigate(`?address=${address}`)}
+        requestRegeneration={async () => {
+          try {
+            fetcher.load(`/connect/email/otp${location.search}`)
+          } catch (err) {
+            console.error(err)
+          }
+        }}
         requestVerification={async (email, code, state) => {
           submit(
             {
@@ -115,8 +123,35 @@ export default () => {
         goBack={() => history.back()}
         onCancel={() => navigate(`/authenticate/${clientId}`)}
       >
-        {transition.state === 'idle' ? <Outlet /> : undefined}
+        {transition.state === 'idle' && fetcher.state === 'idle' && children
+          ? children
+          : undefined}
       </EmailOTPValidator>
     </div>
+  )
+}
+
+export default () => {
+  return <Layout />
+}
+
+export function CatchBoundary() {
+  const caught = useCatch()
+
+  let message = 'Something went terribly wrong!'
+  if (caught?.data?.code === ERROR_CODES.BAD_REQUEST) {
+    message = caught.data.message
+  }
+
+  return (
+    <Layout>
+      <Text
+        size="sm"
+        weight="medium"
+        className="text-red-500 mt-4 mb-2 text-center"
+      >
+        {message}
+      </Text>
+    </Layout>
   )
 }
