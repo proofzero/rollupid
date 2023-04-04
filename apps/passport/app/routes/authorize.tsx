@@ -1,11 +1,9 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import { redirect } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import { Outlet, useLoaderData } from '@remix-run/react'
 import { getAccountClient } from '~/platform.server'
 import {
   createConsoleParamsSession,
-  destroyConsoleParamsSession,
   getConsoleParams,
   getValidatedSessionContext,
 } from '~/session.server'

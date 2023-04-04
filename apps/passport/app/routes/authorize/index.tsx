@@ -93,33 +93,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         400
       )
     }
-    if (!scope?.length || (scope.length == 1 && scope[0].trim() === 'openid')) {
-      // auto authorize if no scope is provided or is set to only openid
-
-      const responseType = ResponseType.Code
-      const accessClient = getAccessClient(context.env, context.traceSpan)
-      const authorizeRes = await accessClient.authorize.mutate({
-        account: accountUrn,
-        responseType,
-        clientId,
-        redirectUri,
-        scope: scope || [],
-        state,
-      })
-
-      if (!authorizeRes) {
-        throw json({ message: 'Failed to authorize' }, 400)
-      }
-
-      const redirectParams = new URLSearchParams({
-        code: authorizeRes.code,
-        state: authorizeRes.state,
-      })
-
-      return redirect(`${redirectUri}?${redirectParams}`, {
-        headers,
-      })
-    }
   } else {
     //TODO: remove this when implementing scopes and authz
     return redirect('/settings', {
@@ -137,14 +110,21 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       }),
     ])
 
+    let actualScope = scope || appPublicProps.scopes
+    if (actualScope.length === 0) {
+      actualScope = ['openid', 'profile'] // default scopes
+    }
+
     const dataForScopes = await getDataForScopes(
-      scope || [],
+      actualScope,
       appPublicProps.scopes,
       accountUrn,
       jwt,
       context.env,
       context.traceSpan
     )
+
+    console.log({ actualScope, scope, appPublicProps })
 
     return json<LoaderData>({
       redirectUri,
@@ -153,7 +133,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       scopeMeta: scopeMeta,
       state,
       redirectOverride: redirectUri,
-      scopeOverride: scope || [],
+      scopeOverride: actualScope,
       dataForScopes,
     })
   } catch (e) {
