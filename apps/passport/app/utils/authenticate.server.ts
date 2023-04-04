@@ -95,7 +95,6 @@ export const authenticateAddress = async (
         redirect_uri: authRedirectUri,
         state: authState,
         scope: authScope,
-        prompt: 'none',
       })
 
       redirectURL += `?${urlParams}`

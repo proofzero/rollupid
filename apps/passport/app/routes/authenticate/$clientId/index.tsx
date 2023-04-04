@@ -22,11 +22,19 @@ import {
 } from '@remix-run/cloudflare'
 
 import AuthButton from '~/components/connect-button/AuthButton'
-import { getConsoleParams } from '~/session.server'
+import { getConsoleParams, getUserSession } from '~/session.server'
 
-export const loader: LoaderFunction = async ({ params }) => {
+export const loader: LoaderFunction = async ({ request, context, params }) => {
+  const userSession = await getUserSession(
+    request,
+    context.env,
+    params.clientId
+  )
+  const showContinueWithExistingUser = userSession ? true : false
+
   return json({
     clientId: params.clientId,
+    showContinueWithExistingUser,
   })
 }
 
@@ -40,8 +48,8 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const { redirectUri, state, scope, clientId } = consoleParams
 
   const qp = new URLSearchParams()
-  qp.append('clientId', clientId)
-  qp.append('redirectUri', redirectUri)
+  qp.append('client_id', clientId)
+  qp.append('redirect_uri', redirectUri)
   qp.append('state', state)
   qp.append('scope', scope)
 
@@ -49,8 +57,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 }
 
 export default () => {
-  const { prompt, appProps, profile } = useOutletContext<{
-    prompt?: string
+  const { appProps, profile } = useOutletContext<{
     appProps?: {
       name: string
       iconURL: string
@@ -58,7 +65,7 @@ export default () => {
     profile?: Required<Profile>
   }>()
 
-  const { clientId } = useLoaderData()
+  const { clientId, showContinueWithExistingUser } = useLoaderData()
 
   const [signData, setSignData] = useState<{
     nonce: string | undefined
@@ -93,7 +100,7 @@ export default () => {
 
       <Authentication logoURL={iconURL} appName={name}>
         <>
-          {profile && prompt !== 'login' && (
+          {profile && showContinueWithExistingUser && (
             <>
               <AuthButton
                 onClick={() => {

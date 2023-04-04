@@ -15,53 +15,12 @@ import {
 export const loader: LoaderFunction = async ({ request, context }) => {
   const headers = new Headers()
 
-  const params = new URL(request.url).searchParams
-  const prompt = params.get('prompt')
-
   const contextCPId = context.consoleParams.clientId
-
-  let clientCPId
-  let clientCPRedirectUri
-  if (contextCPId) {
-    const clientCP = await getConsoleParams(request, context.env, contextCPId)
-
-    clientCPId = clientCP?.clientId
-    clientCPRedirectUri = clientCP?.redirectUri
-  }
+  if (!contextCPId) throw new Error('No client id provided')
 
   const lastCP = await getConsoleParams(request, context.env)
-  const lastCPId = lastCP?.clientId
-
-  if (lastCP) {
-    headers.append(
-      'Set-Cookie',
-      await destroyConsoleParamsSession(request, context.env, lastCPId)
-    )
-
-    headers.append(
-      'Set-Cookie',
-      await destroyConsoleParamsSession(request, context.env)
-    )
-
-    // This is to facilitate returning back
-    // to settings after the connected
-    // account flow
-    if (prompt === 'login' || prompt === 'none') {
-      return redirect(clientCPRedirectUri, {
-        headers,
-      })
-    }
-
-    // let redirectURL = `/authenticate/${lastCPId}`
-    // return redirect(redirectURL)
-  } else {
-    if (prompt !== 'none') {
-      if (context.consoleParams.clientId)
-        throw await createConsoleParamsSession(
-          context.consoleParams,
-          context.env
-        )
-    }
+  if (!lastCP) {
+    throw await createConsoleParamsSession(context.consoleParams, context.env)
   }
 
   // this will redirect unauthenticated users to the auth page but maintain query params

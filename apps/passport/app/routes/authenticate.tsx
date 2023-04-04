@@ -6,47 +6,28 @@ import { Suspense } from 'react'
 import { getConsoleParams, getUserSession } from '~/session.server'
 
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
-import { useCatch, useLoaderData, useOutletContext } from '@remix-run/react'
+import { useCatch } from '@remix-run/react'
 import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
 import { LazyAuth } from '~/web3/lazyAuth'
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 
-// TODO: loader function check if we have a session already
-// redirect if logged in
-export const loader: LoaderFunction = async ({ request, context, params }) => {
-  const searchParams = new URL(request.url).searchParams
-  const prompt = searchParams.get('prompt')
+import { loader as indexLoader } from '~/routes/index'
 
+export const loader: LoaderFunction = async ({ request, context, params }) => {
   const consoleParams = await getConsoleParams(
     request,
     context.env,
     params.clientId
   )
 
-  const session = await getUserSession(request, context.env, params.clientId)
-  const jwt = session.get('jwt')
-
-  if (jwt) {
-    if (prompt === 'none') {
-      const qp = new URLSearchParams()
-      qp.append('client_id', consoleParams.clientId)
-      qp.append('redirect_uri', consoleParams.redirectUri)
-      qp.append('state', consoleParams.state)
-      qp.append('scope', consoleParams.scope)
-
-      return redirect(`/authorize?${qp.toString()}`)
-    }
+  if (!consoleParams) {
+    return indexLoader({ request, context, params })
   }
 
-  return json({
-    prompt,
-  })
+  return null
 }
 
 export default function Index() {
-  const context = useOutletContext() || {}
-  const data = useLoaderData()
-
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
       <div
@@ -58,7 +39,7 @@ export default function Index() {
       </div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
         <Suspense fallback={''}>
-          <LazyAuth context={{ ...context, ...data }} autoConnect={true} />
+          <LazyAuth autoConnect={true} />
         </Suspense>
       </div>
     </div>

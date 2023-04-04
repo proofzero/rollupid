@@ -31,10 +31,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 }
 
 export default () => {
-  const context = useOutletContext<{
-    prompt?: string
-  }>()
   const { appProps, profile } = useLoaderData()
 
-  return <Outlet context={{ ...context, appProps, profile }} />
+  return <Outlet context={{ appProps, profile }} />
 }
