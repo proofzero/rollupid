@@ -1,9 +1,9 @@
-import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import { action as otpAction } from '~/routes/connect/email/otp'
 import { EmailOTPValidator } from '@proofzero/design-system/src/molecules/email-otp-validator'
 import {
+  Outlet,
   useActionData,
-  useCatch,
   useFetcher,
   useLoaderData,
   useLocation,
@@ -19,8 +19,8 @@ import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { useEffect } from 'react'
-import { Text } from '@proofzero/design-system'
-import { ERROR_CODES } from '@proofzero/errors'
+
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const qp = new URL(request.url).searchParams
@@ -69,7 +69,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   return json({ error: true })
 }
 
-const Layout = ({ children }: { children?: JSX.Element }) => {
+export default () => {
   const { address, clientId } = useLoaderData()
   const ad = useActionData()
   const submit = useSubmit()
@@ -123,35 +123,8 @@ const Layout = ({ children }: { children?: JSX.Element }) => {
         goBack={() => history.back()}
         onCancel={() => navigate(`/authenticate/${clientId}`)}
       >
-        {transition.state === 'idle' && fetcher.state === 'idle' && children
-          ? children
-          : undefined}
+        {transition.state === 'idle' ? <Outlet /> : undefined}
       </EmailOTPValidator>
     </div>
-  )
-}
-
-export default () => {
-  return <Layout />
-}
-
-export function CatchBoundary() {
-  const caught = useCatch()
-
-  let message = 'Something went terribly wrong!'
-  if (caught?.data?.code === ERROR_CODES.BAD_REQUEST) {
-    message = caught.data.message
-  }
-
-  return (
-    <Layout>
-      <Text
-        size="sm"
-        weight="medium"
-        className="text-red-500 mt-4 mb-2 text-center"
-      >
-        {message}
-      </Text>
-    </Layout>
   )
 }
