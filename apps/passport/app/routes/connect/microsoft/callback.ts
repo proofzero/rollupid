@@ -74,6 +74,7 @@ export const loader: LoaderFunction = async ({
   }
 
   return authenticateAddress(
+    request,
     address,
     accountURN,
     appData,

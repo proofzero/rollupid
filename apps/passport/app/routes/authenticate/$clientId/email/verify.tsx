@@ -52,6 +52,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     })
 
     return authenticateAddress(
+      request,
       addressURN,
       accountURN,
       appData,

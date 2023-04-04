@@ -10,7 +10,11 @@ import {
   getAccountClient,
   getAddressClient,
 } from '~/platform.server'
-import { createUserSession, parseJwt } from '~/session.server'
+import {
+  createUserSession,
+  destroyConsoleParamsSession,
+  parseJwt,
+} from '~/session.server'
 import {
   CryptoAddressType,
   EmailAddressType,
@@ -21,6 +25,7 @@ import { redirect } from '@remix-run/cloudflare'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 
 export const authenticateAddress = async (
+  request: Request,
   address: AddressURN,
   account: AccountURN,
   appData: {
@@ -35,8 +40,23 @@ export const authenticateAddress = async (
   existing: boolean = false
 ) => {
   if (appData?.prompt === 'login') {
+    const headers = new Headers()
+
+    headers.append(
+      'Set-Cookie',
+      await destroyConsoleParamsSession(request, env, appData.clientId)
+    )
+
+    headers.append(
+      'Set-Cookie',
+      await destroyConsoleParamsSession(request, env)
+    )
+
     return redirect(
-      `${appData.redirectUri}${existing ? `?error=ALREADY_CONNECTED` : ''}`
+      `${appData.redirectUri}${existing ? `?error=ALREADY_CONNECTED` : ''}`,
+      {
+        headers,
+      }
     )
   }
 

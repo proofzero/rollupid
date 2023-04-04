@@ -165,9 +165,9 @@ export async function createConsoleParamsSession(
   consoleParams: ConsoleParams,
   env: Env
 ) {
-  const storage = getConsoleParamsSessionStorage(env, consoleParams.clientId!)
-  const session = await storage.getSession()
-  session.set('params', JSON.stringify(consoleParams))
+  if (!consoleParams.clientId) {
+    throw new Error('Missing clientId in consoleParams')
+  }
 
   let redirectURL = `/authenticate/${consoleParams.clientId}`
   if (consoleParams.prompt) {
@@ -179,9 +179,12 @@ export async function createConsoleParamsSession(
   const headers = new Headers()
   headers.append(
     'Set-Cookie',
-    await setConsoleParamsSession(consoleParams, env, 'last')
+    await setConsoleParamsSession(consoleParams, env, consoleParams.clientId)
   )
-  headers.append('Set-Cookie', await storage.commitSession(session))
+  headers.append(
+    'Set-Cookie',
+    await setConsoleParamsSession(consoleParams, env)
+  )
 
   return redirect(redirectURL, {
     headers,

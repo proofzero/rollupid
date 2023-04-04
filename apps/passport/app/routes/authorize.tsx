@@ -32,10 +32,15 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const lastCP = await getConsoleParams(request, context.env)
   const lastCPId = lastCP?.clientId
 
-  if (clientCPId) {
+  if (lastCP) {
     headers.append(
       'Set-Cookie',
-      await destroyConsoleParamsSession(request, context.env, clientCPId)
+      await destroyConsoleParamsSession(request, context.env, lastCPId)
+    )
+
+    headers.append(
+      'Set-Cookie',
+      await destroyConsoleParamsSession(request, context.env)
     )
 
     // This is to facilitate returning back
@@ -47,10 +52,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       })
     }
 
-    if (lastCPId) {
-      let redirectURL = `/authenticate/${lastCPId}`
-      return redirect(redirectURL)
-    }
+    // let redirectURL = `/authenticate/${lastCPId}`
+    // return redirect(redirectURL)
   } else {
     if (prompt !== 'none') {
       if (context.consoleParams.clientId)
