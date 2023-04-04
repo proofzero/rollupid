@@ -9,11 +9,22 @@
 
 type Scope = symbol
 
-export interface ScopeDescriptor {
-  name: string
-  description: string
-  class: string
-}
+import { z } from 'zod'
+
+export const ScopeSchema = z.object({
+  name: z.string(),
+  description: z.string(),
+  class: z.string(),
+  /**
+   * Some scopes are hidden from the user and are only used internally
+   */
+  hidden: z.boolean().optional(),
+})
+
+export const ScopeMeta = z.record(z.string(), ScopeSchema)
+
+export type ScopeMeta = z.infer<typeof ScopeMeta>
+export type ScopeDescriptor = z.infer<typeof ScopeSchema>
 
 interface ScopeMap {
   [scope: Scope]: ScopeDescriptor
@@ -107,6 +118,7 @@ export const SCOPES: ScopeMap = {
     name: 'OpenID',
     description: 'Read your OpenID profile',
     class: 'implied',
+    hidden: true,
   },
   [SCOPE_EMAIL]: {
     name: 'Email',

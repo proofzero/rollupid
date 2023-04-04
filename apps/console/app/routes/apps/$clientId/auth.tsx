@@ -2,8 +2,8 @@
  * @file app/routes/dashboard/apps/$appId/index.tsx
  */
 
-import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import type { ScopeMeta } from '@proofzero/platform/starbase/src/types'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import type { ScopeMeta } from '@proofzero/security/scopes'
 import { json } from '@remix-run/cloudflare'
 import {
   Form,

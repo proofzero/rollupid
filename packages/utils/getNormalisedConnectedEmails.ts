@@ -7,13 +7,21 @@ import {
 import type { Addresses } from '@proofzero/platform.account/src/types'
 import { AddressURN } from '@proofzero/urns/address'
 
-export type EmailSelectListItem = {
-  email: string
-  addressURN: AddressURN
-  type?: OAuthAddressType | EmailAddressType
+export enum OptionType {
+  AddNew,
+  None,
 }
 
-export default function (connectedAddresses: Addresses): EmailSelectListItem[] {
+export type EmailSelectListItem = {
+  email: string
+  type: OAuthAddressType | EmailAddressType | OptionType
+  addressURN?: AddressURN
+}
+
+export default function (
+  connectedAddresses?: Addresses | null
+): EmailSelectListItem[] {
+  if (!connectedAddresses) return []
   return connectedAddresses
     .filter((address) => {
       return (

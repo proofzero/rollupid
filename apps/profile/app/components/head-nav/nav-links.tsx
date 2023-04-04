@@ -45,7 +45,7 @@ export const UserNavigation = ({
         <div className="flex flex-row items-center mt-2">
           <img
             src={avatarUrl}
-            alt="PFP loading error"
+            alt="PFP"
             className="h-[24px] w-[24px] rounded-full mr-2"
             onError={({ currentTarget }) => {
               currentTarget.onerror = null

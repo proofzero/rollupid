@@ -1,14 +1,5 @@
 import { z } from 'zod'
 
-export const ScopeMeta = z.record(
-  z.string(),
-  z.object({
-    name: z.string(),
-    description: z.string(),
-    class: z.string(),
-  })
-)
-
 export const AppObjectSchema = z.object({
   name: z.string(),
   scopes: z.set(z.string()).or(z.array(z.string())).optional(), // some reason we can't send Set because it fails as object?
