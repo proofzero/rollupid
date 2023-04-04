@@ -5,7 +5,7 @@
 import type { EntryContext } from '@remix-run/cloudflare'
 import { RemixServer } from '@remix-run/react'
 import { renderToString } from 'react-dom/server'
-import { NonceContext } from './components/nonce-context'
+import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
 import { addSecurityHeaders } from './utils/securityHeaders.server'
 
 export default function handleRequest(

@@ -45,7 +45,7 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 
 import type { AccountURN } from '@proofzero/urns/account'
 
-import { NonceContext } from './components/nonce-context'
+import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
 
 export const links: LinksFunction = () => {
   return [

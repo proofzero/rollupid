@@ -37,7 +37,7 @@ import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 
 import * as gtag from '~/utils/gtags.client'
 
-import { NonceContext } from './components/nonce-context'
+import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
