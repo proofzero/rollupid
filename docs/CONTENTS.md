@@ -54,3 +54,5 @@
 ***
 
 * [Roadmap](https://github.com/proofzero/rollupid/milestones?direction=desc\&sort=completeness\&state=open)
+* [Contributing](https://github.com/proofzero/rollupid/blob/main/CONTRIBUTING.md)
+* [Login to Console](https://console.rollup.id)
