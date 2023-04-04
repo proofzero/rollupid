@@ -184,7 +184,7 @@ export const action: ActionFunction = async ({ request, context }) => {
 
   const responseType = ResponseType.Code
   const redirectUri = form.get('redirect_uri') as string
-  const scope = JSON.parse(form.get('scopes') as string).split(',')
+  const scope = (form.get('scopes') as string).split(' ')
   /* This stores the selection made from the user in the authorization
   screen; gets validated and stored for later retrieval at token generation stage */
   const personaData = JSON.parse(
@@ -280,10 +280,7 @@ export default function Authorize() {
 
   const authorizeCallback = async (scopes: string[]) => {
     const form = new FormData()
-    form.append(
-      'scopes',
-      scopes ? JSON.stringify(scopes.join(',')) : JSON.stringify(scopeOverride)
-    )
+    form.append('scopes', scopes.join(' '))
     form.append('state', state)
     form.append('client_id', clientId)
     form.append('redirect_uri', redirectOverride)

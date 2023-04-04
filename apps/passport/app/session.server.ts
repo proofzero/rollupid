@@ -15,7 +15,7 @@ import {
 } from '@proofzero/utils/token'
 import { getAccountClient } from './platform.server'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
-import { UnauthorizedError } from '@proofzero/errors'
+import { InternalServerError, UnauthorizedError } from '@proofzero/errors'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import type { AccountURN } from '@proofzero/urns/account'
 
@@ -267,7 +267,6 @@ export async function getValidatedSessionContext(
   )
   const jwt = session.get('jwt')
 
-  let result: ValidatedSessionContext
   try {
     const payload = checkToken(jwt)
     const accountClient = getAccountClient(jwt, env, traceSpan)
@@ -301,9 +300,12 @@ export async function getValidatedSessionContext(
         FLASH_MESSAGE.SIGNOUT,
         consoleParams?.clientId ?? undefined
       )
-    }
+    } else
+      throw new InternalServerError({
+        message: 'Unexpected session error',
+        cause: error,
+      })
   }
-  return result!
 }
 
 export async function getJWTConditionallyFromSession(
