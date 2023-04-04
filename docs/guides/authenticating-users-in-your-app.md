@@ -4,36 +4,50 @@ description: How to authenticate users in your app
 
 # Authenticating Users in your App
 
-Once you have completed the [auth flow](../getting-started/auth-flow.md) and have a user's ID token you now have several strategies to manage authenticated users to in app.
+After completing the [auth flow](../getting-started/auth-flow.md) and obtaining a user's ID token, you can apply various strategies to manage authenticated users within your app.&#x20;
 
-See [Tokens](../advanced/token.md) for more information on the ID token.
+For more information on the ID token, refer to the [Tokens](../advanced/tokens.md) documentation.
 
-## Browser Applications
+### Browser Applications
 
-### Session Cookies
+#### Session Cookies
 
-The most common way to authenticate a user's session in a browser application is to user browser session cookies. A session cookie is can store simple user information like the ID token recieved through the auth flow or just a simple user id. You can then use this session cookie to validate the user's session in your app every subsequent request on the server.
+The most common method to authenticate a user's session in a browser application is by using session cookies. A session cookie can store simple user information, such as the ID token received through the authentication flow or a basic user ID. You can use this session cookie to validate the user's session for every subsequent server request.&#x20;
 
-As a developer you can set and reset expiry times on the session cookie to control how long the user is logged in for but most web frameworks have built-in support for session cookies.
+As a developer, you can set and reset expiry times on the session cookie to control the duration of the user's login. Most web frameworks have built-in support for session cookies.&#x20;
 
-{% hint style="info" %}You may also choose to store session information on the server (e.g. Redis) and only store a session key in the cookie to facilitate the lookup.{% endhint %}
+TODO: example code
 
-### Session Storage
+{% hint style="info" %}
+Alternatively, you can store session information on the server (e.g., Redis) and use a session key in the cookie for lookup.
+{% endhint %}
 
-If you are building a single page application (SPA) without a backend you can use browsers session storage to store tokens.
+#### Session Storage
 
-{% hint style="warning" %}For added security, it is recommended you obtain an tokens using the PKCE flow. PKCE feature is currently in development. See [https://github.com/proofzero/rollupid/issues/1671](https://github.com/proofzero/rollupid/issues/1671){% endhint %}
+For single-page applications (SPAs) without a backend, you can use browser session storage to store tokens.&#x20;
 
-## Native Applications
+TODO: example code
 
-The most common way to authenticate users in a native application is to use a on device secure storage to store tokens and maintain user sessions after the auth flow. The major difference with native apps is that you will need to use a webview or browser to complete the auth flow. This works by setting the redirect URL to a [custom URL scheme](https://www.oauth.com/oauth2-servers/oauth-native-apps/redirect-urls-for-native-apps/) you register for your app.
+{% hint style="info" %}
+For client side auth you can also choose to use our session server. This requires a PRO account with custom hostnames. Track this feature here: [https://github.com/proofzero/rollupid/issues/1906](https://github.com/proofzero/rollupid/issues/1906)
+{% endhint %}
 
-When Rollup redirects to this URL your app will be able to pick up the exchange code, complete the auth flow, and recieve the ID and access tokens.
+{% hint style="warning" %}
+For added security, it is recommended to obtain tokens using the PKCE flow, which is currently in development. See [https://github.com/proofzero/rollupid/issues/1671](https://github.com/proofzero/rollupid/issues/1671).
+{% endhint %}
 
-{% hint style="warning" %}In the future you can use the PKCE addition to the auth flow to futher secure this process. See [https://github.com/proofzero/rollupid/issues/1671](https://github.com/proofzero/rollupid/issues/1671){% endhint %}
+### Native Applications
 
-# Logging Out
+The most common way to authenticate users in a native application is by using on-device secure storage to store tokens and maintain user sessions after the authentication flow. The primary difference with native apps is that you will need to use a WebView or browser to complete the authentication flow. This is achieved by setting the redirect URL to a custom URL scheme you register for your app.&#x20;
 
-Once a user has logged in you will need to provide a way for them to log out. This is usually done by clearing the session cookie or session storage and redirecting the user back to your login page. Your login page should then redirect the user to the [auth flow](../getting-started/auth-flow.md) if they are not logged in.
+When Rollup redirects to this URL, your app can pick up the exchange code, complete the authentication flow, and receive the ID and access tokens.
 
-The auth flow will prompt the user to continue using their last known identity.
+TODO: example code
+
+{% hint style="warning" %}
+For added security, it is recommended to obtain tokens using the PKCE flow, which is currently in development. See [https://github.com/proofzero/rollupid/issues/1671](https://github.com/proofzero/rollupid/issues/1671).
+{% endhint %}
+
+## Logging Out
+
+To enable users to log out, clear the session cookie or session storage and redirect them to your login page. Your login page should then redirect users to the authentication flow if they are not logged in. The authentication flow will prompt users to continue using their last known identity.

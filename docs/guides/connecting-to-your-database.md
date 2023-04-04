@@ -2,18 +2,16 @@
 description: How to connect users to your database
 ---
 
-# Connecting Users To Your Database
+# Adding Users to your Database
 
-Once you have completed the [auth flow](../getting-started/auth-flow.md) and have a user's ID token and access token, you now have several strategies to connect users to your app's database.
-
-See [Tokens](../advanced/token.md) for more information on the ID token.
+After completing the [auth flow](../getting-started/auth-flow.md) and obtaining a user's ID token and access token, you can choose from several strategies to connect users to your app's database. For more information on the ID token, refer to the [Tokens](../advanced/tokens.md) documentation.
 
 ## ID Token
 
-You can use the ID token to create a user in your database. The ID token contains the user's unique identifier in the subject (sub) field of the ID token, which you can use to identify the user in your database. The ID token also contains the user's profile information, which you can use to populate user details in your database.
+You can create a user in your database using the ID token. The ID token contains the user's unique identifier in the subject (sub) field, which can serve as a reference for the user in your database. The ID token also includes the user's profile information, allowing you to populate user details in your database accordingly.
 
 ## Access Token
 
-Within the access token, you can find the user's unique identifier in the subject (sub) field of the access token, which you can use to identify the user in your database. The access token also contains the user's consented scopes, which you can use to determine what information you can access from the user's profile using the [Galaxy API](../platform/profile-graph.md).
+The access token also contains the user's unique identifier in the subject (sub) field. You can use this to identify the user in your database. Additionally, the access token includes the user's consented scopes, which help you determine the information you can access from the user's profile using the [Galaxy API](../reference/galaxy-api.md).
 
-You should store this access token in your database or some other secure storage mechanism that is accessible to your application.
+Make sure to store the access token securely in your database or another safe storage mechanism accessible to your application.

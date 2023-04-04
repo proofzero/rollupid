@@ -4,10 +4,10 @@ description: Using Galaxy to access the user profile graph.
 
 # Accessing Profile API
 
-With the access token received in the [previous step ](auth-flow.md)we can now make authorized requests to the [Galaxy API](../reference/galaxy-api.md).&#x20;
+Now that you have the access token from the previous step, you can make authorized requests to the [Galaxy API](../reference/galaxy-api.md) and [Passport API](../reference/passport-api.md).
 
-The Galaxy API is a GraphQL API that is reachable at [https://galaxy.rollup.id](https://galaxy.rollup.id). You can use GraphQL codegen tools to include our GQL schemas in your GraphQL client.&#x20;
+The Galaxy API is a GraphQL API accessible at [https://galaxy.rollup.id](https://galaxy.rollup.id/). To incorporate our GQL schemas into your GraphQL client, you can use GraphQL codegen tools.
 
-To call the API you will need to include the [Galaxy API key](create-an-application.md) from your app and sometimes the signed JWT / access token.
+When calling the API, you'll need to include the [Galaxy API key](create-an-application.md) from your app and, in some cases, the signed JWT/access token.
 
-The full API reference documentation can be found [here](../reference/galaxy-api.md).
+For a comprehensive overview of the API, please refer to the full API reference documentation available [here](../reference/galaxy-api.md).
