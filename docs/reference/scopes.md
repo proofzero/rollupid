@@ -4,4 +4,13 @@ description: Scopes Definitions
 
 # Scopes
 
-TODO
+| Scope Name              | Scope Description | Availability |
+| ----------------------- | ----------------- | ------------ |
+| `openid`                |                   | ✅            |
+| `profile`               |                   | ✅            |
+| `email`                 |                   | ⏳            |
+| `connected accounts`    |                   | ⏳            |
+| `smart contract wallet` |                   | ⏳            |
+| `storage`               |                   | ⏳            |
+| `kyc`                   |                   | 📅           |
+
