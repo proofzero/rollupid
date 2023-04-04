@@ -10,12 +10,7 @@ import {
 import subtractLogo from '~/assets/subtract-logo.svg'
 
 import { ResponseType } from '@proofzero/types/access'
-import {
-  getAccessClient,
-  getStarbaseClient,
-  getAccountClient,
-} from '~/platform.server'
-import { Authorization } from '~/components/authorization/Authorization'
+import { getAccessClient, getStarbaseClient } from '~/platform.server'
 import {
   destroyConsoleParamsSession,
   getConsoleParams,
@@ -193,7 +188,6 @@ export const action: ActionFunction = async ({ request, context }) => {
 
   const state = form.get('state') as string
   const clientId = form.get('client_id') as string
-
   if (
     !accountUrn ||
     !responseType ||
@@ -250,12 +244,11 @@ export default function Authorize() {
     scopeMeta,
     state,
     redirectOverride,
-    scopeOverride,
     dataForScopes,
     redirectUri,
   } = useLoaderData<LoaderData>()
 
-  const { connectedEmails, personaData, superScopes } = dataForScopes
+  const { connectedEmails, personaData, effectiveScope } = dataForScopes
 
   const { profile: userProfile } = useOutletContext<{
     profile: Required<Profile>
@@ -328,7 +321,7 @@ export default function Authorize() {
             style={{ color: '#6B7280' }}
             className={'flex flex-col font-light text-base gap-2 w-full'}
           >
-            {superScopes
+            {effectiveScope
               .filter((scope: string) => {
                 if (scopeMeta.scopes[scope])
                   return !scopeMeta.scopes[scope].hidden
@@ -407,9 +400,12 @@ export default function Authorize() {
             <Button
               btnSize="xl"
               btnType="primary-alt"
-              disabled={!connectedEmails?.length || !persona?.email?.length}
+              disabled={
+                effectiveScope.includes('email') &&
+                (!connectedEmails?.length || !persona?.email?.length)
+              }
               onClick={() => {
-                authorizeCallback(appProfile.scopes)
+                authorizeCallback(effectiveScope)
               }}
             >
               Continue
