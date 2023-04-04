@@ -27,7 +27,7 @@ import {
   useCatch,
 } from '@remix-run/react'
 
-import { useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 
 import globalStyles from '@proofzero/design-system/src/styles/global.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
@@ -44,6 +44,8 @@ import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 import type { AccountURN } from '@proofzero/urns/account'
+
+import { NonceContext } from './components/nonce-context'
 
 export const links: LinksFunction = () => {
   return [
@@ -130,6 +132,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 }
 
 export default function App() {
+  const nonce = useContext(NonceContext)
+
   const transition = useTransition()
   const location = useLocation()
   const loaderData = useLoaderData()
@@ -156,6 +160,7 @@ export default function App() {
             <script
               async
               src={`https://www.googletagmanager.com/gtag/js?id=${GATag}`}
+              nonce={nonce}
             />
             <script
               async
@@ -170,21 +175,23 @@ export default function App() {
                   });
               `,
               }}
+              nonce={nonce}
             />
           </>
         )}
         {transition.state === 'loading' ? <Loader /> : null}
         <Outlet context={{ apps, avatarUrl, PASSPORT_URL, displayName }} />
-        <ScrollRestoration />
+        <ScrollRestoration nonce={nonce} />
         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `!window ? null : window.ENV = ${JSON.stringify(
               loaderData.ENV
             )}`,
           }}
         />
-        <Scripts />
-        <LiveReload />
+        <Scripts nonce={nonce} />
+        <LiveReload nonce={nonce} />
       </body>
     </html>
   )
@@ -198,6 +205,8 @@ export const ErrorBoundary = ({
     message: string
   }
 }) => {
+  const nonce = useContext(NonceContext)
+
   console.error('ErrorBoundary', error)
   return (
     <html lang="en">
@@ -216,8 +225,8 @@ export const ErrorBoundary = ({
           />
         </div>
 
-        <ScrollRestoration />
-        <Scripts />
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
       </body>
     </html>
   )
