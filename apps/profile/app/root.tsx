@@ -18,7 +18,7 @@ import {
   useCatch,
 } from '@remix-run/react'
 
-import { useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 
 import designStyles from '@proofzero/design-system/src/styles/global.css'
 import styles from '~/styles/tailwind.css'
@@ -36,6 +36,8 @@ import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 
 import * as gtag from '~/utils/gtags.client'
+
+import { NonceContext } from './components/nonce-context'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -78,6 +80,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 }
 
 export default function App() {
+  const nonce = useContext(NonceContext)
+
   const location = useLocation()
   const { ENV } = useLoaderData<{
     ENV: {
@@ -107,10 +111,12 @@ export default function App() {
           <>
             <script
               async
+              nonce={nonce}
               src={`https://www.googletagmanager.com/gtag/js?id=${GATag}`}
             />
             <script
               async
+              nonce={nonce}
               id="gtag-init"
               dangerouslySetInnerHTML={{
                 __html: `
@@ -130,14 +136,15 @@ export default function App() {
 
         <Outlet context={{}} />
 
-        <ScrollRestoration />
-        <Scripts />
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `!window ? null : window.ENV = ${JSON.stringify(ENV)}`,
           }}
         />
-        <LiveReload port={8002} />
+        <LiveReload nonce={nonce} port={8002} />
       </body>
     </html>
   )
@@ -146,6 +153,8 @@ export default function App() {
 // https://remix.run/docs/en/v1/guides/errors
 // @ts-ignore
 export function ErrorBoundary({ error }) {
+  const nonce = useContext(NonceContext)
+
   console.error('ErrorBoundary', error)
   return (
     <html lang="en">
@@ -170,9 +179,9 @@ export function ErrorBoundary({ error }) {
           </div>
         </div>
 
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload port={8002} />
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
+        <LiveReload nonce={nonce} port={8002} />
       </body>
     </html>
   )
