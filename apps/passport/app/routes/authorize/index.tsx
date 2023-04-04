@@ -333,7 +333,11 @@ export default function Authorize() {
           >
             {superScopes
               .filter((scope: string) => {
-                return !scopeMeta.scopes[scope].hidden
+                if (scopeMeta.scopes[scope])
+                  return !scopeMeta.scopes[scope].hidden
+                // If we do not have scope from url in our lookup table -
+                // we can't show it
+                return false
               })
               .map((scope: string, i: number) => {
                 return (
