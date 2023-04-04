@@ -1,6 +1,6 @@
 const securityHeaders = (
   nonce: string,
-  dev: boolean = false,
+  dev = false,
   cspFn: (nonce: string, dev: boolean) => string
 ): Headers => {
   const owaspHeaders = new Headers()
@@ -31,7 +31,7 @@ const securityHeaders = (
 export const addSecurityHeaders = (
   headers: Headers,
   nonce: string,
-  dev: boolean = false,
+  dev = false,
   cspFn: (nonce: string, dev: boolean) => string
 ): Headers => {
   const owaspHeaders = securityHeaders(nonce, dev, cspFn)
