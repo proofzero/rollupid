@@ -1,42 +1,11 @@
-import {
-  getCSP,
-  SELF,
-  STRICT_DYNAMIC,
-  UNSAFE_INLINE,
-  NONE,
-  DATA,
-} from 'csp-header'
-
-const contentSecurityPolicy = (nonce: string, dev: boolean = false): string => {
-  return getCSP({
-    directives: {
-      'default-src': [SELF],
-      'connect-src': [
-        SELF,
-        '*.google-analytics.com',
-        'https://upload.imagedelivery.net',
-        // Used for Remix WebSocket Live Reaload
-        ...(dev ? ['ws://localhost:*/socket'] : []),
-      ],
-      'script-src': [SELF, `'nonce-${nonce}' ${STRICT_DYNAMIC}`],
-      'style-src': [SELF, UNSAFE_INLINE, 'fonts.cdnfonts.com'],
-      'img-src': [dev ? 'http:' : 'https:', DATA],
-      'font-src': [SELF, 'fonts.cdnfonts.com'],
-      'object-src': [NONE],
-      'base-uri': [SELF],
-      'form-action': [SELF],
-      'frame-ancestors': [SELF],
-    },
-  })
-}
-
-export const securityHeaders = (
+const securityHeaders = (
   nonce: string,
-  dev: boolean = false
+  dev: boolean = false,
+  cspFn: (nonce: string, dev: boolean) => string
 ): Headers => {
   const owaspHeaders = new Headers()
 
-  owaspHeaders.set('Content-Security-Policy', contentSecurityPolicy(nonce, dev))
+  owaspHeaders.set('Content-Security-Policy', cspFn(nonce, dev))
   owaspHeaders.set('Cross-Origin-Embedder-Policy', 'same-origin')
   owaspHeaders.set('Cross-Origin-Opener-Policy', 'same-origin')
   owaspHeaders.set('Cross-Origin-Resource-Policy', 'same-origin')
@@ -62,9 +31,10 @@ export const securityHeaders = (
 export const addSecurityHeaders = (
   headers: Headers,
   nonce: string,
-  dev: boolean = false
+  dev: boolean = false,
+  cspFn: (nonce: string, dev: boolean) => string
 ): Headers => {
-  const owaspHeaders = securityHeaders(nonce, dev)
+  const owaspHeaders = securityHeaders(nonce, dev, cspFn)
 
   owaspHeaders.forEach((value, key) => {
     headers.set(key, value)
