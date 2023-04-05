@@ -436,13 +436,6 @@ export default function AppDetailIndexPage() {
                           desc: meta.description,
                         }
                       })}
-                      defaultItems={[
-                        {
-                          id: 'openid',
-                          val: scopeMeta['openid'].name,
-                          desc: scopeMeta['openid'].description,
-                        },
-                      ]}
                       requiredItems={[
                         {
                           id: 'openid',
