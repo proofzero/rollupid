@@ -263,7 +263,7 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
 
   await accessNode.class.verify(refreshToken)
 
-  const scope = payload.scope.split(' ')
+  const scope = payload.scope?.split(' ')
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
   const issuer = ctx.INTERNAL_JWT_ISS
 

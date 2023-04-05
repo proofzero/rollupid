@@ -26,6 +26,8 @@ export type MultiSelectProps = {
   fieldName: string
   items: SelectItem[]
   selectedItems?: SelectItem[]
+  defaultItems?: SelectItem[]
+  requiredItems?: SelectItem[]
   disabled?: boolean
   onChange?: () => void
 }
@@ -36,10 +38,16 @@ export function MultiSelect({
   items,
   disabled = false,
   selectedItems = [],
+  defaultItems = [],
+  requiredItems = [],
   onChange,
 }: MultiSelectProps) {
   const [query, setQuery] = useState('')
-  const [selectedValues, setSelectedValues] = useState(selectedItems)
+  const [selectedValues, setSelectedValues] = useState(
+    selectedItems.length ? selectedItems : defaultItems
+  )
+
+  console.debug({ selectedValues, selectedItems, defaultItems })
 
   const filterItems =
     query === ''
@@ -58,7 +66,8 @@ export function MultiSelect({
       value={selectedValues}
       disabled={disabled}
       onChange={(e) => {
-        setSelectedValues(e)
+        const hasOpenID = e.filter((item) => item.id === 'openid').length
+        setSelectedValues(hasOpenID ? e : requiredItems.concat(e))
         !!onChange && onChange()
       }}
       name={fieldName}

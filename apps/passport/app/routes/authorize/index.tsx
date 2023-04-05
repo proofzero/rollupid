@@ -111,8 +111,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     ])
 
     let actualScope = scope || appPublicProps.scopes
-    if (actualScope.length === 0) {
-      actualScope = ['openid', 'profile'] // default scopes
+
+    if (actualScope.length === 0 || !actualScope.includes('openid')) {
+      throw json(
+        { message: 'Application configured incorrectly: missing scopes' },
+        400
+      )
     }
 
     const dataForScopes = await getDataForScopes(
