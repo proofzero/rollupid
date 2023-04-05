@@ -99,6 +99,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     }
   }
 
+  //Special case for console and passport - we just redirect
+  if (['console', 'passport'].includes(clientId))
+    return redirect(`${redirectUri}`, {
+      headers,
+    })
+
   //Scope validation
   try {
     const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
