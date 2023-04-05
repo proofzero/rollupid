@@ -1,8 +1,9 @@
 ---
 name: Feature
-about: Feature issue template
-title: "FEAT([DOMAIN]): [TITLE]"
-labels: types » enhancement
+about: Propose a new feature to be implemented
+title: 'feat(scope): Short description of the new feature'
+labels: 'feature'
+assignees: ''
 ---
 
 # Why

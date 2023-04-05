@@ -1,33 +1,21 @@
-# Description
+---
+name: Pull Request
+about: Create a pull request to propose and implement a change
+title: 'type(scope): Short description of the change'
+labels: ''
+assignees: ''
+---
 
-Please include a summary of the changes and the related issue. Please also include relevant motivation and context. List any dependencies that are required for this change.
+### Description
 
-- Closes # (issue)
-- Closes # (issue)
-- Closes # (issue)
+[Provide a more detailed description of the change]
 
-## Type of change
+### Related Issues
 
-Please delete options that are not relevant.
+- Closes Issue #1
 
-- Bug fix (non-breaking change which fixes an issue)
-- New feature (non-breaking change which adds functionality)
-- Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- This change requires or is a documentation update
-- Security Fix
+### Checklist
 
-# How Has This Been Tested?
-
-Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration
-
-# Checklist:
-
-- [ ] My code follows the style guidelines of this project
-- [ ] I have performed a self-review of my code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation website
-- [ ] I have made corresponding changes to the literal docs
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
-- [ ] Any dependent changes have been merged and published in downstream modules
+- [ ] I have read the [CONTRIBUTING](CONTRIBUTING.md) guidelines
+- [ ] I have tested my code
+- [ ] I have updated the documentation (if necessary)

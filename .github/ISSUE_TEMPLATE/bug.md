@@ -1,23 +1,27 @@
 ---
 name: Bug
-about: Bug issue template
-title: "BUG([DOMAIN]): [TITLE]"
-labels: types » bug
+about: Report a bug to help us improve
+title: 'fix(scope): Short description of the bug'
+labels: 'bug'
+assignees: ''
 ---
 
-## What is the current behavior?
+### Description
 
-Please provide the steps to reproduce and if possible a minimal demo of the problem.
+[Provide a more detailed description of the bug]
 
-## What is the expected behavior?
+### Steps to Reproduce
 
-## What is the motivation / use case for changing the behavior?
+1. [First Step]
+2. [Second Step]
+3. [and so on...]
 
-## Please tell us about your environment:
+### Expected Behavior
 
-Version:
-Os:
-Browser:
-Wallet:
+[Describe what you expected to happen]
 
-... and anything else that could isolate the issue.
+### Actual Behavior
+
+[Describe what actually happened]
+
+### Screenshots (if applicable)
