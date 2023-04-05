@@ -44,9 +44,22 @@ export const initAuthenticator = () => {
   const oauthStorage = getProfileSessionStorage()
   return new Authenticator<RollupAuth>(oauthStorage)
 }
+
+export class RollupAuthStrategy<User> extends OAuth2Strategy<
+  User,
+  OAuth2Profile,
+  Record<string, string>
+> {
+  protected authorizationParams(params: URLSearchParams): URLSearchParams {
+    const result = new URLSearchParams()
+    result.append('scope', 'openid')
+    return result
+  }
+}
+
 export const getRollupAuthenticator = () => {
   const authenticator = initAuthenticator()
-  const rollupStrategy = new OAuth2Strategy<RollupAuth, OAuth2Profile>(
+  const rollupStrategy = new RollupAuthStrategy(
     {
       authorizationURL: PASSPORT_AUTH_URL,
       tokenURL: PASSPORT_TOKEN_URL,

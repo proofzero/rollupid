@@ -110,9 +110,6 @@ export function MultiSelect({
               py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none
                focus:ring-1 focus:ring-indigo-500 sm:text-sm`}
               onChange={(event) => setQuery(event.target.value)}
-              // displayValue={(items) =>
-              //   selectedValues.map((item) => item.class).join(',')
-              // }
               placeholder="filter scopes"
             />
             {filterItems.map((item) => (

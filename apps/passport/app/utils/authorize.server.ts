@@ -9,13 +9,7 @@ import { UnauthorizedError } from '@proofzero/errors'
 export type DataForScopes = {
   connectedEmails: EmailSelectListItem[]
   personaData: PersonaData
-  effectiveScope: string[]
-}
-
-export function getSupersetFromArrays<T>(args: T[][]): T[] {
-  const set = new Set([] as T[])
-  args.forEach((arr) => arr.forEach((item: T) => set.add(item)))
-  return Array.from(set)
+  requestedScope: string[]
 }
 
 // Deterministically sort scopes so that they are always in the same order
@@ -39,8 +33,7 @@ export const reorderScope = (scopes: string[]): string[] => {
 // -----------------------------------------------------------------------------
 
 export const getDataForScopes = async (
-  urlScopes: string[],
-  appScopes: string[],
+  requestedScope: string[],
   accountURN: AccountURN,
   jwt?: string,
   env?: any,
@@ -48,10 +41,6 @@ export const getDataForScopes = async (
 ): Promise<DataForScopes> => {
   if (!accountURN)
     throw new UnauthorizedError({ message: 'Account URN is required' })
-
-  const effectiveScope = reorderScope(
-    getSupersetFromArrays([appScopes, urlScopes])
-  )
 
   let connectedEmails: EmailSelectListItem[] = []
   const accountClient = getAccountClient(jwt || '', env, traceSpan)
@@ -67,6 +56,6 @@ export const getDataForScopes = async (
   return {
     connectedEmails,
     personaData,
-    effectiveScope: Array.from(effectiveScope),
+    requestedScope: reorderScope(requestedScope),
   }
 }
