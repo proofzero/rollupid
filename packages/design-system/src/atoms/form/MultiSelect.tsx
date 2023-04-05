@@ -31,6 +31,12 @@ export type MultiSelectProps = {
   onChange?: () => void
 }
 
+const itemsUnion = (selected, required) => {
+  const selectedIds = selected.map((item) => item.id)
+  const addRequired = required.filter((item) => !selectedIds.includes(item.id))
+  return addRequired.concat(selected)
+}
+
 export function MultiSelect({
   label,
   fieldName,
@@ -42,7 +48,7 @@ export function MultiSelect({
 }: MultiSelectProps) {
   const [query, setQuery] = useState('')
   const [selectedValues, setSelectedValues] = useState(
-    selectedItems.length ? selectedItems : requiredItems
+    itemsUnion(selectedItems, requiredItems)
   )
 
   const filterItems =
@@ -62,11 +68,7 @@ export function MultiSelect({
       value={selectedValues}
       disabled={disabled}
       onChange={(e) => {
-        const selectedIds = e.map((item) => item.id)
-        const addRequired = requiredItems.filter(
-          (item) => !selectedIds.includes(item.id)
-        )
-        setSelectedValues(addRequired.concat(e))
+        setSelectedValues(itemsUnion(e, requiredItems))
         !!onChange && onChange()
       }}
       name={fieldName}
