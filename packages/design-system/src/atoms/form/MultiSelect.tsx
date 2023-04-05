@@ -62,8 +62,11 @@ export function MultiSelect({
       value={selectedValues}
       disabled={disabled}
       onChange={(e) => {
-        const hasOpenID = e.filter((item) => item.id === 'openid').length
-        setSelectedValues(hasOpenID ? e : requiredItems.concat(e))
+        const selectedIds = e.map((item) => item.id)
+        const addRequired = requiredItems.filter(
+          (item) => !selectedIds.includes(item.id)
+        )
+        setSelectedValues(addRequired.concat(e))
         !!onChange && onChange()
       }}
       name={fieldName}
