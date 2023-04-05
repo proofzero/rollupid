@@ -2,7 +2,7 @@
 name: Feature
 about: Propose a new feature to be implemented
 title: 'feat(scope): Short description of the new feature'
-labels: 'feature'
+labels: 'enhancement'
 assignees: ''
 ---
 

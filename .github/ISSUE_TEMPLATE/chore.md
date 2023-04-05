@@ -2,7 +2,7 @@
 name: Chore
 about: Propose a chore to improve the project
 title: 'chore(scope): Short description of the chore'
-labels: 'chore'
+labels: ''
 assignees: ''
 ---
 
