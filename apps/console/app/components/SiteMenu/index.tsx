@@ -4,7 +4,7 @@
 
 import React, { Fragment, useState } from 'react'
 
-import { Link, NavLink } from '@remix-run/react'
+import { useSubmit, Link, NavLink } from '@remix-run/react'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 import AppSelect from './appSelect'
@@ -78,6 +78,8 @@ export default function SiteMenu(props: RollupMenuProps) {
   let [popperElement, setPopperElement] = useState()
   let { attributes } = usePopper(referenceElement, popperElement)
 
+  const submit = useSubmit()
+
   return (
     <div
       className="text-center bg-gray-900 lg:min-h-screen
@@ -147,15 +149,14 @@ export default function SiteMenu(props: RollupMenuProps) {
                   className="px-2 py-2 w-full bg-gray-700 hover:bg-gray-700 sticky bottom-0
               z-[60]"
                 >
-                  <NavLink
-                    to="/signout"
-                    target="_blank"
+                  <button
+                    onClick={() => {
+                      close()
+                      submit(null, { method: 'post', action: 'signout' })
+                    }}
                     className={`w-full flex self-center justify-between w-full
                   flex-row items-center -mr-3 text-gray-400 hover:text-white max-w-[260px]
                   z-[70]`}
-                    onClick={() => {
-                      close()
-                    }}
                   >
                     <div className="flex flex-row items-center ">
                       <div
@@ -178,7 +179,7 @@ export default function SiteMenu(props: RollupMenuProps) {
                     </div>
 
                     <HiOutlineLogout size={24} />
-                  </NavLink>
+                  </button>
                 </div>
               </>
             )}
