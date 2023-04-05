@@ -200,13 +200,7 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
                   value={{ clientId: 'new' }}
                   className="w-full justify-center border border-l-0 border-r-0 border-gray-700 px-4 py-3"
                 >
-                  <Button
-                    className="w-full"
-                    btnType="primary-alt"
-                    onClick={() => {
-                      navigate(`/apps/new`, { replace: true })
-                    }}
-                  >
+                  <Button className="w-full" btnType="primary-alt">
                     Create Application
                   </Button>
                 </Listbox.Option>
