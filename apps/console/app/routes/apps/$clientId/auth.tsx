@@ -77,6 +77,12 @@ const updatesSchema = z.object({
     },
     { message: HTTP_MESSAGE }
   ),
+  scopes: z.array(z.string()).refine(
+    (val) => {
+      return val && val.length
+    },
+    { message: 'At least one allowed scope value must be set' }
+  ),
 
   termsURL: z
     .string()
@@ -209,6 +215,7 @@ export const action: ActionFunction = async ({ request, params, context }) => {
       }
       break
   }
+  console.debug('ERRORS', errors)
 
   return json({
     rotatedSecret,
@@ -411,11 +418,12 @@ export default function AppDetailIndexPage() {
                       defaultValue={appDetails.app.name}
                       required
                     />
+                    <div className="sm:mb-[1.755rem]" />
                   </div>
 
                   <div className="flex-1">
                     <MultiSelect
-                      label="Scopes"
+                      label="Allowed scope*"
                       disabled={false}
                       onChange={() => {
                         setIsFormChanged(true)
@@ -437,6 +445,17 @@ export default function AppDetailIndexPage() {
                         }
                       })}
                     />
+                    {errors?.scopes ? (
+                      <Text
+                        className="mb-1.5 mt-1.5 text-red-500"
+                        size="xs"
+                        weight="normal"
+                      >
+                        {errors.scopes || ''}
+                      </Text>
+                    ) : (
+                      <div className="sm:mb-[1.755rem]" />
+                    )}
                   </div>
                 </div>
 

@@ -39,6 +39,8 @@ import type { PersonaData } from '@proofzero/types/application'
 import type { AddressURN } from '@proofzero/urns/address'
 import type { DataForScopes } from '~/utils/authorize.server'
 import { Text } from '@proofzero/design-system'
+import { BadRequestError } from '@proofzero/errors'
+import { throwJSONError } from '@proofzero/utils/errors'
 
 export type UserProfile = {
   displayName: string
@@ -82,20 +84,55 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     )
   }
 
-  if (clientId) {
-    if (!state) throw json({ message: 'state is required' }, 400)
-    if (!redirectUri) throw json({ message: 'redirect_uri is required' }, 400)
+  //Request parameter pre-checks
+  if (!clientId) throw new BadRequestError({ message: 'client_id is required' })
+  if (!state) throw new BadRequestError({ message: 'state is required' })
+  if (!redirectUri)
+    throw new BadRequestError({ message: 'redirect_uri is required' })
+  else {
     try {
       new URL(redirectUri)
     } catch {
-      throw json(
-        { message: 'valid URI is required in redirect_uri param' },
-        400
-      )
+      throw new BadRequestError({
+        message: 'valid URI is required in redirect_uri param',
+      })
     }
-    if (!scope?.length || (scope.length == 1 && scope[0].trim() === 'openid')) {
-      // auto authorize if no scope is provided or is set to only openid
+  }
 
+  //Scope validation
+  try {
+    const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
+
+    const [scopeMeta, appPublicProps] = await Promise.all([
+      sbClient.getScopes.query(),
+      sbClient.getAppPublicProps.query({
+        clientId: clientId as string,
+      }),
+    ])
+
+    if (!appPublicProps.scopes || !appPublicProps.scopes.length)
+      throw new BadRequestError({
+        message: 'No allowed scope was configured for the app',
+      })
+    if (!scope || !scope.length)
+      throw new BadRequestError({ message: 'No scope requested' })
+
+    //If requested scope values are a subset of allowed scope values
+    if (
+      !scope.every((scopeValue) => appPublicProps.scopes.includes(scopeValue))
+    )
+      throw new BadRequestError({
+        message:
+          'Requested scope value not in the configured allowed scope list',
+      })
+
+    if (
+      scope.every(
+        (scopeValue) =>
+          scopeMeta.scopes[scopeValue] && scopeMeta.scopes[scopeValue].hidden
+      )
+    ) {
+      //Pre-authorize if requested scope values are hidden (ie. system) scope values
       const responseType = ResponseType.Code
       const accessClient = getAccessClient(context.env, context.traceSpan)
       const authorizeRes = await accessClient.authorize.mutate({
@@ -103,13 +140,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         responseType,
         clientId,
         redirectUri,
-        scope: scope || [],
+        scope: scope,
         state,
       })
-
-      if (!authorizeRes) {
-        throw json({ message: 'Failed to authorize' }, 400)
-      }
 
       const redirectParams = new URLSearchParams({
         code: authorizeRes.code,
@@ -120,26 +153,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         headers,
       })
     }
-  } else {
-    //TODO: remove this when implementing scopes and authz
-    return redirect('/settings', {
-      headers,
-    })
-  }
-  try {
-    const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
-
-    // When scopes are powered by an index we can just query for the scopes we have in the app
-    const [scopeMeta, appPublicProps] = await Promise.all([
-      sbClient.getScopes.query(),
-      sbClient.getAppPublicProps.query({
-        clientId: clientId as string,
-      }),
-    ])
 
     const dataForScopes = await getDataForScopes(
-      scope || [],
-      appPublicProps.scopes,
+      scope,
       accountUrn,
       jwt,
       context.env,
@@ -158,7 +174,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     })
   } catch (e) {
     console.error(e)
-    throw json({ message: 'Failed to fetch application info' }, 400)
+    throwJSONError(e)
   }
 }
 
@@ -248,7 +264,7 @@ export default function Authorize() {
     redirectUri,
   } = useLoaderData<LoaderData>()
 
-  const { connectedEmails, personaData, effectiveScope } = dataForScopes
+  const { connectedEmails, personaData, requestedScope } = dataForScopes
 
   const { profile: userProfile } = useOutletContext<{
     profile: Required<Profile>
@@ -321,7 +337,7 @@ export default function Authorize() {
             style={{ color: '#6B7280' }}
             className={'flex flex-col font-light text-base gap-2 w-full'}
           >
-            {effectiveScope
+            {requestedScope
               .filter((scope: string) => {
                 if (scopeMeta.scopes[scope])
                   return !scopeMeta.scopes[scope].hidden
@@ -401,11 +417,11 @@ export default function Authorize() {
               btnSize="xl"
               btnType="primary-alt"
               disabled={
-                effectiveScope.includes('email') &&
+                requestedScope.includes('email') &&
                 (!connectedEmails?.length || !persona?.email?.length)
               }
               onClick={() => {
-                authorizeCallback(effectiveScope)
+                authorizeCallback(requestedScope)
               }}
             >
               Continue
