@@ -197,7 +197,7 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
                   </Listbox.Option>
                 ))}
                 <Listbox.Option
-                  value={{ clientId: 'create' }}
+                  value={{ clientId: 'new' }}
                   className="w-full justify-center border border-l-0 border-r-0 border-gray-700 px-4 py-3"
                 >
                   <Button
