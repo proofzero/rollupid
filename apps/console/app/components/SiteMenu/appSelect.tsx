@@ -130,7 +130,7 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
                 <Text
                   weight="medium"
                   className={`${
-                    apps?.length === 0 ? 'text-gray-600' : 'text-white'
+                    apps?.length === 0 ? 'text-gray-300' : 'text-white'
                   } truncate`}
                 >
                   {selected.name}
@@ -145,7 +145,7 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
             </Listbox.Button>
 
             <Transition
-              show={open && (apps.length > 0 || selected.clientId !== 'none')}
+              show={open}
               as="div"
               leave="transition ease-in duration-100"
               leaveFrom="opacity-100"
@@ -153,18 +153,20 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
               className="bg-gray-800"
             >
               <Listbox.Options static className="w-full text-gray-300">
-                <Listbox.Option
-                  className="flex items-center px-4 py-4 border border-l-0 border-r-0 border-t-0 border-gray-700 cursor-pointer hover:bg-gray-700"
-                  value={{
-                    clientId: 'all',
-                  }}
-                >
-                  <HiGlobeAlt className={`h-6 w-6 mr-2.5`} />
+                {apps.length ? (
+                  <Listbox.Option
+                    className="flex items-center px-4 py-4 border border-l-0 border-r-0 border-t-0 border-gray-700 cursor-pointer hover:bg-gray-700"
+                    value={{
+                      clientId: 'all',
+                    }}
+                  >
+                    <HiGlobeAlt className={`h-6 w-6 mr-2.5`} />
 
-                  <Text size="sm" weight="medium">
-                    All Applications
-                  </Text>
-                </Listbox.Option>
+                    <Text size="sm" weight="medium">
+                      All Applications
+                    </Text>
+                  </Listbox.Option>
+                ) : null}
 
                 {apps?.map((app) => (
                   <Listbox.Option key={app.clientId} value={app}>
@@ -194,17 +196,20 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
                     )}
                   </Listbox.Option>
                 ))}
-                <div className="w-full justify-center border border-l-0 border-r-0 border-gray-700 px-4 py-3">
+                <Listbox.Option
+                  value={{ clientId: 'create' }}
+                  className="w-full justify-center border border-l-0 border-r-0 border-gray-700 px-4 py-3"
+                >
                   <Button
                     className="w-full"
                     btnType="primary-alt"
-                    onClick={(event) => {
+                    onClick={() => {
                       navigate(`/apps/new`, { replace: true })
                     }}
                   >
                     Create Application
                   </Button>
-                </div>
+                </Listbox.Option>
               </Listbox.Options>
             </Transition>
           </div>
