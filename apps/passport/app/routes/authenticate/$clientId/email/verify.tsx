@@ -2,7 +2,6 @@ import { json } from '@remix-run/cloudflare'
 import { action as otpAction } from '~/routes/connect/email/otp'
 import { EmailOTPValidator } from '@proofzero/design-system/src/molecules/email-otp-validator'
 import {
-  Outlet,
   useActionData,
   useFetcher,
   useLoaderData,
@@ -21,6 +20,8 @@ import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { useEffect } from 'react'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { ERROR_CODES } from '@proofzero/errors'
+import { Text } from '@proofzero/design-system'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const qp = new URL(request.url).searchParams
@@ -79,8 +80,15 @@ export default () => {
   const fetcher = useFetcher()
 
   useEffect(() => {
-    fetcher.load(`/connect/email/otp${location.search}`)
-  }, [])
+    if (fetcher.state === 'idle' && !fetcher.data) {
+      fetcher.load(`/connect/email/otp${location.search}`)
+    }
+  }, [fetcher, location])
+
+  let message = 'Something went terribly wrong!'
+  if (fetcher.data?.error?.data?.code === ERROR_CODES.BAD_REQUEST) {
+    message = fetcher.data?.error?.shape?.message
+  }
 
   return (
     <div
@@ -102,11 +110,7 @@ export default () => {
         state={fetcher.data?.state}
         invalid={ad?.error}
         requestRegeneration={async () => {
-          try {
-            fetcher.load(`/connect/email/otp${location.search}`)
-          } catch (err) {
-            console.error(err)
-          }
+          fetcher.load(`/connect/email/otp${location.search}`)
         }}
         requestVerification={async (email, code, state) => {
           submit(
@@ -123,7 +127,17 @@ export default () => {
         goBack={() => history.back()}
         onCancel={() => navigate(`/authenticate/${clientId}`)}
       >
-        {transition.state === 'idle' ? <Outlet /> : undefined}
+        {transition.state === 'idle' &&
+        fetcher.state === 'idle' &&
+        fetcher.data?.error ? (
+          <Text
+            size="sm"
+            weight="medium"
+            className="text-red-500 mt-4 mb-2 text-center"
+          >
+            {message}
+          </Text>
+        ) : undefined}
       </EmailOTPValidator>
     </div>
   )

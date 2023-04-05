@@ -32,7 +32,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     return json({ state })
   } catch (e) {
     console.error('Error generating email OTP', e)
-    throwJSONError(e)
+    return json({ error: e })
   }
 }
 
