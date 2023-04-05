@@ -2,7 +2,7 @@ import { AddressURNSpace } from '@proofzero/urns/address'
 import type { AddressURN } from '@proofzero/urns/address'
 import type { AccountURN } from '@proofzero/urns/account'
 
-import { throwJSONError } from '@proofzero/utils/errors'
+import { JsonError } from '@proofzero/utils/errors'
 import { GrantType, ResponseType } from '@proofzero/types/access'
 
 import {
@@ -108,7 +108,7 @@ export const authenticateAddress = async (
       appData?.clientId
     )
   } catch (error) {
-    throwJSONError(error)
+    throw JsonError(error)
   }
 }
 

@@ -1,7 +1,7 @@
 import { EmailAddressType, NodeType } from '@proofzero/types/address'
 import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
-import { throwJSONError } from '@proofzero/utils/errors'
+import { JsonError } from '@proofzero/utils/errors'
 import { json } from '@remix-run/cloudflare'
 import { getAddressClient } from '~/platform.server'
 
@@ -32,7 +32,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     return json({ state })
   } catch (e) {
     console.error('Error generating email OTP', e)
-    throwJSONError(e)
+    throw JsonError(e)
   }
 }
 

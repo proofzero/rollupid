@@ -52,7 +52,7 @@ export const getErrorCause = (error: unknown): Error => {
   }
 }
 
-export const throwJSONError = (error: unknown): void => {
+export const JsonError = (error: unknown) => {
   let cause
 
   try {
@@ -60,7 +60,7 @@ export const throwJSONError = (error: unknown): void => {
   } catch (e) {
     console.error('Error handling error', e)
 
-    throw json(
+    return json(
       {
         message: 'unknown error',
       },
@@ -70,10 +70,10 @@ export const throwJSONError = (error: unknown): void => {
   const body = { ...cause, message: cause.message }
   if (cause instanceof RollupError) {
     const status = HTTP_STATUS_CODES[cause.code]
-    throw json(body, status)
+    return json(body, status)
   } else if (cause instanceof TRPCClientError) {
-    throw json(body, cause.data.httpStatus)
+    return json(body, cause.data.httpStatus)
   } else {
-    throw json(body, 500)
+    return json(body, 500)
   }
 }

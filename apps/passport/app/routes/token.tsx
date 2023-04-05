@@ -2,7 +2,7 @@ import { ActionFunction, redirect } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
 import { GrantType } from '@proofzero/types/access'
-import { throwJSONError } from '@proofzero/utils/errors'
+import { JsonError } from '@proofzero/utils/errors'
 
 import createAccessClient from '@proofzero/platform-clients/access'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
@@ -26,17 +26,17 @@ export const action: ActionFunction = async ({ request, context }) => {
   try {
     const tokens = refreshToken
       ? await accessClient.exchangeToken.mutate({
-        grantType: GrantType.RefreshToken,
-        refreshToken,
-        clientId,
-        clientSecret,
-      })
+          grantType: GrantType.RefreshToken,
+          refreshToken,
+          clientId,
+          clientSecret,
+        })
       : await accessClient.exchangeToken.mutate({
-        grantType: GrantType.AuthorizationCode,
-        code,
-        clientId,
-        clientSecret,
-      })
+          grantType: GrantType.AuthorizationCode,
+          code,
+          clientId,
+          clientSecret,
+        })
 
     const result = {
       token_type: 'Bearer',
@@ -54,6 +54,6 @@ export const action: ActionFunction = async ({ request, context }) => {
       },
     })
   } catch (error) {
-    throwJSONError(error)
+    throw JsonError(error)
   }
 }
