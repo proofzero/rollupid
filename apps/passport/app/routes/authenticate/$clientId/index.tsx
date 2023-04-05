@@ -117,6 +117,7 @@ export default () => {
                       <img
                         className="w-6 h-6 rounded-full"
                         src={profile.pfp.image}
+                        alt="PFP"
                       />
                     )}
                   </>

@@ -17,10 +17,10 @@ import {
 import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { ERROR_CODES } from '@proofzero/errors'
+import { ERROR_CODES, HTTP_STATUS_CODES } from '@proofzero/errors'
 import { Text } from '@proofzero/design-system'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
@@ -79,16 +79,29 @@ export default () => {
   const location = useLocation()
   const fetcher = useFetcher()
 
-  useEffect(() => {
-    if (fetcher.state === 'idle' && !fetcher.data) {
-      fetcher.load(`/connect/email/otp${location.search}`)
-    }
-  }, [fetcher, location])
+  const [errorMessage, setErrorMessage] = useState('')
+  const [state, setState] = useState('')
 
-  let message = 'Something went terribly wrong!'
-  if (fetcher.data?.error?.data?.code === ERROR_CODES.BAD_REQUEST) {
-    message = fetcher.data?.error?.shape?.message
+  const asyncFn = async () => {
+    try {
+      const resObj = await fetch('/connect/email/otp' + location.search)
+      const res = await resObj.json()
+      if (resObj.status === HTTP_STATUS_CODES[ERROR_CODES.BAD_REQUEST]) {
+        setErrorMessage(res.message)
+      }
+      if (res.state) {
+        setState(res.state)
+      }
+    } catch (e) {
+      setErrorMessage(e.toString())
+    }
   }
+
+  useEffect(() => {
+    ;(async () => {
+      await asyncFn()
+    })()
+  }, [])
 
   return (
     <div
@@ -107,10 +120,10 @@ export default () => {
       <EmailOTPValidator
         loading={transition.state !== 'idle' || fetcher.state !== 'idle'}
         email={address}
-        state={fetcher.data?.state}
+        state={state}
         invalid={ad?.error}
         requestRegeneration={async () => {
-          fetcher.load(`/connect/email/otp${location.search}`)
+          await asyncFn()
         }}
         requestVerification={async (email, code, state) => {
           submit(
@@ -127,15 +140,13 @@ export default () => {
         goBack={() => history.back()}
         onCancel={() => navigate(`/authenticate/${clientId}`)}
       >
-        {transition.state === 'idle' &&
-        fetcher.state === 'idle' &&
-        fetcher.data?.error ? (
+        {errorMessage ? (
           <Text
             size="sm"
             weight="medium"
             className="text-red-500 mt-4 mb-2 text-center"
           >
-            {message}
+            {errorMessage}
           </Text>
         ) : undefined}
       </EmailOTPValidator>
