@@ -1,11 +1,11 @@
-import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import { action as otpAction } from '~/routes/connect/email/otp'
 import { EmailOTPValidator } from '@proofzero/design-system/src/molecules/email-otp-validator'
 import {
-  Outlet,
   useActionData,
+  useFetcher,
   useLoaderData,
-  useMatches,
+  useLocation,
   useNavigate,
   useSubmit,
   useTransition,
@@ -17,6 +17,11 @@ import {
 import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
+import { useEffect, useState } from 'react'
+
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { ERROR_CODES, HTTP_STATUS_CODES } from '@proofzero/errors'
+import { Text } from '@proofzero/design-system'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const qp = new URL(request.url).searchParams
@@ -68,24 +73,42 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 export default () => {
   const { address, clientId } = useLoaderData()
   const ad = useActionData()
-
+  const submit = useSubmit()
   const navigate = useNavigate()
   const transition = useTransition()
+  const location = useLocation()
+  const fetcher = useFetcher()
 
-  const submit = useSubmit()
+  const [errorMessage, setErrorMessage] = useState('')
+  const [state, setState] = useState('')
 
-  const matches = useMatches()
-  const indexMatch = matches.find(
-    (m) => m.id === 'routes/authenticate/$clientId/email/verify/index'
-  )
-  const matchData = indexMatch?.data
+  const asyncFn = async () => {
+    try {
+      const resObj = await fetch('/connect/email/otp' + location.search)
+      const res = await resObj.json()
+      if (resObj.status === HTTP_STATUS_CODES[ERROR_CODES.BAD_REQUEST]) {
+        setErrorMessage(res.message)
+      }
+      if (res.state) {
+        setState(res.state)
+      }
+    } catch (e) {
+      setErrorMessage(e.toString())
+    }
+  }
+
+  useEffect(() => {
+    ;(async () => {
+      await asyncFn()
+    })()
+  }, [])
 
   return (
     <div
       className={
         'flex shrink flex-col items-center justify-center gap-4 mx-auto\
-        bg-white p-6 h-[100dvh] lg:h-[675px] lg:max-h-[100dvh] w-full\
-         lg:w-[418px] lg:border-rounded-lg'
+      bg-white p-6 h-[100dvh] lg:h-[675px] lg:max-h-[100dvh] w-full\
+       lg:w-[418px] lg:border-rounded-lg'
       }
       style={{
         border: '1px solid #D1D5DB',
@@ -95,11 +118,13 @@ export default () => {
       {transition.state !== 'idle' && <Loader />}
 
       <EmailOTPValidator
-        loading={transition.state !== 'idle'}
+        loading={transition.state !== 'idle' || fetcher.state !== 'idle'}
         email={address}
-        state={matchData?.state}
+        state={state}
         invalid={ad?.error}
-        requestRegeneration={() => navigate(`?address=${address}`)}
+        requestRegeneration={async () => {
+          await asyncFn()
+        }}
         requestVerification={async (email, code, state) => {
           submit(
             {
@@ -115,7 +140,15 @@ export default () => {
         goBack={() => history.back()}
         onCancel={() => navigate(`/authenticate/${clientId}`)}
       >
-        {transition.state === 'idle' ? <Outlet /> : undefined}
+        {errorMessage ? (
+          <Text
+            size="sm"
+            weight="medium"
+            className="text-red-500 mt-4 mb-2 text-center"
+          >
+            {errorMessage}
+          </Text>
+        ) : undefined}
       </EmailOTPValidator>
     </div>
   )
