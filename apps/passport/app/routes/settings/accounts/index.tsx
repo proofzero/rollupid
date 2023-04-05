@@ -13,6 +13,8 @@ import { Button } from '@proofzero/design-system'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 
+import { TbCrown } from 'react-icons/tb'
+
 import { AddressList } from '~/components/addresses/AddressList'
 import InputText from '~/components/inputs/InputText'
 
@@ -26,6 +28,7 @@ import type { AddressListProps } from '~/components/addresses/AddressList'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 
 import warn from '~/assets/warning.svg'
+import { Pill } from '@proofzero/design-system/src/atoms/pills/Pill'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const reqUrl = new URL(request.url)
@@ -129,7 +132,7 @@ const RenameModal = ({
           required
           heading=""
           name="name"
-          disabled={data.title && data.title.endsWith('.eth')}
+          disabled={data.title && data.title.endsWith('.eth') ? true : false}
           defaultValue={data.title ?? ''}
         />
         <Text size="xs" weight="normal" className="text-gray-500 mt-2">
@@ -210,7 +213,7 @@ const DisconnectModal = ({
 export default function AccountsLayout() {
   const { reqUrlError } = useLoaderData()
 
-  const { connectedProfiles } = useOutletContext<{
+  const { connectedProfiles, primaryAddressURN } = useOutletContext<{
     connectedProfiles: any[]
   }>()
 
@@ -312,11 +315,11 @@ export default function AccountsLayout() {
 
   return (
     <section>
-      <Text size="xl" weight="bold" className="my-4 text-gray-900">
-        Accounts
-      </Text>
-      {loading && <Loader />}
-      <div className="flex flex-row-reverse mt-7">
+      <div className="my-4 text-gray-900 flex flex-row justify-between">
+        <Text size="xl" weight="bold">
+          Accounts
+        </Text>
+
         <Button
           onClick={() => {
             requestConnectAccount()
@@ -326,6 +329,18 @@ export default function AccountsLayout() {
           Connect Account
         </Button>
       </div>
+      <div className="flex flex-col mb-6">
+        <div className="flex flex-row justify-start">
+          <div className="bg-gray-100 px-2 mx-2 rounded-xl">
+            <TbCrown className="text-yellow-500" />
+          </div>
+          <Text size="sm" weight="normal" className="text-gray-500">
+            Primary account drives which name and picture is shared with
+            authorised applications
+          </Text>
+        </div>
+      </div>
+      {loading && <Loader />}
 
       <div className="mt-1">
         <Text size="sm" weight="normal" className="text-gray-500 mb-4">
@@ -353,6 +368,7 @@ export default function AccountsLayout() {
         )}
 
         <AddressList
+          primaryAddressURN={primaryAddressURN}
           addresses={cryptoProfiles.addresses
             .map((ap: AddressListItemProps) => ({
               ...ap,
@@ -395,6 +411,7 @@ export default function AccountsLayout() {
         </Text>
 
         <AddressList
+          primaryAddressURN={primaryAddressURN}
           addresses={vaultProfiles.addresses.map(
             (ap: AddressListItemProps) => ({
               ...ap,

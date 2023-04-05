@@ -1,4 +1,4 @@
-import { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
+import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { AddressURNSpace } from '@proofzero/urns/address'

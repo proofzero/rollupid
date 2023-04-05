@@ -144,6 +144,7 @@ const provisionProfile = async (
               pfp: {
                 image: res.profile.avatar || gradient,
               },
+              primaryAddressURN: address,
             }
           }
           case OAuthAddressType.GitHub: {
@@ -157,6 +158,7 @@ const provisionProfile = async (
               pfp: {
                 image: res.profile.avatar_url || gradient,
               },
+              primaryAddressURN: address,
             }
           }
           case OAuthAddressType.Google: {
@@ -165,6 +167,7 @@ const provisionProfile = async (
               pfp: {
                 image: res.profile.picture,
               },
+              primaryAddressURN: address,
             }
           }
           case OAuthAddressType.Twitter: {
@@ -173,6 +176,7 @@ const provisionProfile = async (
               pfp: {
                 image: res.profile.profile_image_url_https,
               },
+              primaryAddressURN: address,
             }
           }
           case OAuthAddressType.Microsoft: {
@@ -186,6 +190,7 @@ const provisionProfile = async (
                 //Cached profile image
                 image: res.profile.picture as string,
               },
+              primaryAddressURN: address,
             }
           }
           case OAuthAddressType.Apple: {
@@ -194,6 +199,7 @@ const provisionProfile = async (
               pfp: {
                 image: res.profile.picture,
               },
+              primaryAddressURN: address,
             }
           }
           case OAuthAddressType.Discord: {
@@ -210,6 +216,7 @@ const provisionProfile = async (
                   ? `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`
                   : gradient,
               },
+              primaryAddressURN: address,
             }
           }
           case EmailAddressType.Email: {
@@ -224,6 +231,7 @@ const provisionProfile = async (
               pfp: {
                 image: gradient,
               },
+              primaryAddressURN: address,
             }
           }
           default:
@@ -239,5 +247,32 @@ const provisionProfile = async (
     })
   } else {
     console.log(`Profile for account ${account} found. Continuing...`)
+  }
+}
+
+export const updateProfile = async (
+  jwt: string,
+  env: Env,
+  traceSpan: TraceSpan,
+  newPrimaryAddress: AddressURN
+) => {
+  const accountClient = getAccountClient(jwt, env, traceSpan)
+  const parsedJWT = parseJwt(jwt)
+  const account = parsedJWT.sub as AccountURN
+
+  const profile = await accountClient.getProfile.query({
+    account,
+  })
+
+  // Update the profile with the new primary address if it exists
+  if (profile) {
+    await accountClient.setProfile.mutate({
+      name: account,
+      profile: {
+        displayName: profile?.displayName,
+        pfp: profile.pfp,
+        primaryAddressURN: newPrimaryAddress,
+      },
+    })
   }
 }
