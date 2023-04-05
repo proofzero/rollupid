@@ -2,6 +2,7 @@ import { json, redirect } from '@remix-run/cloudflare'
 import type { LoaderFunction, ActionFunction } from '@remix-run/cloudflare'
 import {
   useLoaderData,
+  useNavigate,
   useOutletContext,
   useSubmit,
   useTransition,
@@ -41,6 +42,10 @@ import type { DataForScopes } from '~/utils/authorize.server'
 import { Text } from '@proofzero/design-system'
 import { BadRequestError } from '@proofzero/errors'
 import { JsonError } from '@proofzero/utils/errors'
+import {
+  EmailSelectListItem,
+  OptionType,
+} from '@proofzero/utils/getNormalisedConnectedEmails'
 
 export type UserProfile = {
   displayName: string
@@ -117,50 +122,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         clientId: clientId as string,
       }),
     ])
-
-    if (!appPublicProps.scopes || !appPublicProps.scopes.length)
-      throw new BadRequestError({
-        message: 'No allowed scope was configured for the app',
-      })
-    if (!scope || !scope.length)
-      throw new BadRequestError({ message: 'No scope requested' })
-
-    //If requested scope values are a subset of allowed scope values
-    if (
-      !scope.every((scopeValue) => appPublicProps.scopes.includes(scopeValue))
-    )
-      throw new BadRequestError({
-        message:
-          'Requested scope value not in the configured allowed scope list',
-      })
-
-    if (
-      scope.every(
-        (scopeValue) =>
-          scopeMeta.scopes[scopeValue] && scopeMeta.scopes[scopeValue].hidden
-      )
-    ) {
-      //Pre-authorize if requested scope values are hidden (ie. system) scope values
-      const responseType = ResponseType.Code
-      const accessClient = getAccessClient(context.env, context.traceSpan)
-      const authorizeRes = await accessClient.authorize.mutate({
-        account: accountUrn,
-        responseType,
-        clientId,
-        redirectUri,
-        scope: scope,
-        state,
-      })
-
-      const redirectParams = new URLSearchParams({
-        code: authorizeRes.code,
-        state: authorizeRes.state,
-      })
-
-      return redirect(`${redirectUri}?${redirectParams}`, {
-        headers,
-      })
-    }
 
     const dataForScopes = await getDataForScopes(
       scope,
@@ -281,12 +242,14 @@ export default function Authorize() {
     profile: Required<Profile>
   }>()
 
-  const [persona, setPersona] = useState<PersonaData>(personaData)
+  const [persona] = useState<PersonaData>(personaData)
+  const [selectedEmail, setSelectedEmail] = useState<EmailSelectListItem>()
 
   // Re-render the component every time persona gets updated
   useEffect(() => {}, [persona])
 
   const submit = useSubmit()
+  const navigate = useNavigate()
   const transition = useTransition()
 
   const cancelCallback = () => {
@@ -299,12 +262,20 @@ export default function Authorize() {
   }
 
   const authorizeCallback = async (scopes: string[]) => {
+    if (!selectedEmail || !('addressURN' in selectedEmail)) return
+
     const form = new FormData()
     form.append('scopes', scopes.join(' '))
     form.append('state', state)
     form.append('client_id', clientId)
     form.append('redirect_uri', redirectOverride)
-    form.append('personaData', JSON.stringify(persona))
+    form.append(
+      'personaData',
+      JSON.stringify({
+        ...persona,
+        email: selectedEmail.addressURN,
+      })
+    )
 
     submit(form, { method: 'post' })
   }
@@ -371,8 +342,10 @@ export default function Authorize() {
                         <div className="w-full">
                           <EmailSelect
                             items={connectedEmails}
-                            onSelect={(emailAddressURN: AddressURN) => {
-                              setPersona({ ...persona, email: emailAddressURN })
+                            enableNone={connectedEmails.length === 0}
+                            enableAddNew={connectedEmails.length > 0}
+                            onSelect={(selected: EmailSelectListItem) => {
+                              setSelectedEmail(selected)
                             }}
                           />
                         </div>
@@ -427,12 +400,22 @@ export default function Authorize() {
             <Button
               btnSize="xl"
               btnType="primary-alt"
-              disabled={
-                requestedScope.includes('email') &&
-                (!connectedEmails?.length || !persona?.email?.length)
-              }
               onClick={() => {
-                authorizeCallback(requestedScope)
+                if (
+                  requestedScope.includes('email') &&
+                  (!connectedEmails?.length ||
+                    selectedEmail?.type === OptionType.AddNew)
+                ) {
+                  const qp = new URLSearchParams()
+                  qp.append('scopes', requestedScope.join(' '))
+                  qp.append('state', state)
+                  qp.append('client_id', clientId)
+                  qp.append('redirect_uri', redirectOverride)
+
+                  navigate(`/authorize/email?${qp.toString()}`)
+                } else {
+                  authorizeCallback(requestedScope)
+                }
               }}
             >
               Continue

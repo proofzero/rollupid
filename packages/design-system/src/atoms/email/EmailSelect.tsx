@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Fragment, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
@@ -21,7 +21,7 @@ type EmailSelectProps = {
   items: EmailSelectListItem[]
   enableAddNew?: boolean
   enableNone?: boolean
-  onSelect?: (emailAddressURN: AddressURN) => void
+  onSelect?: (selected: EmailSelectListItem) => void
 }
 
 export const EmailSelect = ({
@@ -30,18 +30,18 @@ export const EmailSelect = ({
   enableNone = false,
   onSelect,
 }: EmailSelectProps) => {
-  const [selected, setSelected] = useState({
-    type: OptionType.None,
-    email: 'None',
-  } as EmailSelectListItem)
+  const [selected, setSelected] = useState(items[0])
+
+  useEffect(() => {
+    if (onSelect) {
+      onSelect(selected)
+    }
+  }, [selected])
 
   return (
     <Listbox
       value={selected}
       onChange={(selected) => {
-        if (onSelect && 'addressURN' in selected) {
-          onSelect(selected.addressURN)
-        }
         setSelected(selected)
       }}
       disabled={items.length === 0}
@@ -50,6 +50,7 @@ export const EmailSelect = ({
       {({ open }) => (
         <div className="relative bg-white">
           <Listbox.Button
+            disabled={items.length === 0}
             className={`border shadow-sm rounded-lg w-full transition-transform
             flex flex-row space-between items-center py-2 px-3 ${
               items.length === 0
@@ -59,7 +60,7 @@ export const EmailSelect = ({
             } bg-white`}
           >
             <Text size="sm" className="bg-white flex-1 text-left text-gray-800">
-              {selected.email}
+              {selected?.email ?? 'None'}
             </Text>
             {items.length !== 0 ? (
               open ? (
