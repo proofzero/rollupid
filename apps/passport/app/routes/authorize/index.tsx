@@ -128,8 +128,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       context.traceSpan
     )
 
-    console.log({ actualScope, scope, appPublicProps })
-
     return json<LoaderData>({
       redirectUri,
       clientId,
