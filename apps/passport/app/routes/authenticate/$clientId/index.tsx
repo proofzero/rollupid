@@ -51,7 +51,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   qp.append('client_id', clientId)
   qp.append('redirect_uri', redirectUri)
   qp.append('state', state)
-  qp.append('scope', scope)
+  qp.append('scope', scope.join(' '))
 
   return redirect(`/authorize?${qp.toString()}`)
 }
