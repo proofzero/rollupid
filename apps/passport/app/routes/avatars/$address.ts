@@ -28,7 +28,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
   return new Response(buffer, {
     headers: {
-      'cache-control': `max-age=${5 * 60}`,
+      'cache-control': `max-age=${6 * 60 * 60}`,
     },
   })
 }

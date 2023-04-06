@@ -4,6 +4,8 @@ import {
   CryptoAddressType,
 } from '@proofzero/types/address'
 
+import { AddressURNSpace } from '@proofzero/urns/address'
+
 export const normalizeProfileToConnection = (profile: any) => {
   switch (profile.type) {
     case CryptoAddressType.ETH:
@@ -39,11 +41,12 @@ export const normalizeProfileToConnection = (profile: any) => {
         type: 'GitHub',
       }
     case 'microsoft':
+      const address = AddressURNSpace.decode(profile.urn)
       return {
         id: profile.urn,
         address: profile.email,
         title: profile.name,
-        icon: profile.picture,
+        icon: `/avatars/${address}`,
         type: 'Microsoft',
       }
     case OAuthAddressType.Apple:

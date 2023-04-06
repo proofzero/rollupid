@@ -6,6 +6,7 @@ import Address from './address'
 import OAuthAddress from './oauth'
 import type { AddressNode } from '.'
 
+const PHOTO_URL = 'https://graph.microsoft.com/v1.0/me/photo/$value'
 const USERINFO_URL = 'https://graph.microsoft.com/oidc/userinfo'
 
 export default class MicrosoftAddress extends OAuthAddress {
@@ -16,6 +17,31 @@ export default class MicrosoftAddress extends OAuthAddress {
     super(node)
     this.clientId = ctx.INTERNAL_MICROSOFT_OAUTH_CLIENT_ID
     this.clientSecret = ctx.SECRET_MICROSOFT_OAUTH_CLIENT_SECRET
+  }
+
+  async getAvatar() {
+    const address = await this.node.class.getAddress()
+    const response = await fetch(PHOTO_URL, {
+      headers: {
+        authorization: await this.getAuthorizationHeader(),
+      },
+      cf: {
+        cacheTtl: 5 * 60,
+        cacheEverything: true,
+        cacheKey: `avatar-${address}`,
+      },
+    })
+
+    if (response.ok) {
+      let data = ''
+      new Uint8Array(await response.arrayBuffer()).forEach(
+        (byte) => (data += String.fromCharCode(byte))
+      )
+      return btoa(data)
+    } else {
+      console.error(await response.text())
+      throw new Error("couldn't fetch photo")
+    }
   }
 
   getRefreshTokenParams(refreshToken: string): URLSearchParams {
