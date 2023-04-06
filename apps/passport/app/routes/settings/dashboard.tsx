@@ -11,12 +11,15 @@ import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error
 
 import { useOutletContext } from '@remix-run/react'
 import { normalizeProfileToConnection } from '~/utils/profile'
+import type { AddressURN } from '@proofzero/urns/address'
 
 export default function DashboardLayout() {
-  const { connectedProfiles, authorizedApps } = useOutletContext<{
-    connectedProfiles: any[]
-    authorizedApps: any[]
-  }>()
+  const { connectedProfiles, authorizedApps, primaryAddressURN } =
+    useOutletContext<{
+      connectedProfiles: any[]
+      authorizedApps: any[]
+      primaryAddressURN: AddressURN
+    }>()
 
   const normalizedConnectedProfiles = connectedProfiles
     .map((p) => ({
@@ -76,6 +79,7 @@ export default function DashboardLayout() {
             </div>
 
             <AddressList
+              primaryAddressURN={primaryAddressURN}
               addresses={normalizedConnectedProfiles as AddressListItemProps[]}
             />
           </div>
