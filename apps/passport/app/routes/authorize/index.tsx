@@ -196,7 +196,21 @@ export const action: ActionFunction = async ({ request, context }) => {
   const cancel = form.get('cancel') as string
 
   if (cancel) {
-    return redirect(cancel)
+    const headers = new Headers()
+    const lastCP = await getConsoleParams(request, context.env)
+    if (lastCP) {
+      headers.append(
+        'Set-Cookie',
+        await destroyConsoleParamsSession(request, context.env, lastCP.clientId)
+      )
+
+      headers.append(
+        'Set-Cookie',
+        await destroyConsoleParamsSession(request, context.env)
+      )
+    }
+
+    return redirect(cancel, { headers })
   }
 
   const responseType = ResponseType.Code
