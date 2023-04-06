@@ -20,6 +20,10 @@ import {
   UnsetAccountOutput,
 } from './methods/unsetAccount'
 import {
+  getAddressAvatarMethod,
+  GetAddressAvatarOutput,
+} from './methods/getAddressAvatar'
+import {
   getAddressProfileMethod,
   GetAddressProfileOutput,
 } from './methods/getAddressProfile'
@@ -124,6 +128,16 @@ export const appRouter = t.router({
     .input(UnsetAccountInput)
     .output(UnsetAccountOutput)
     .mutation(unsetAccountMethod),
+  getAddressAvatar: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(checkOAuthNode)
+    .use(setAddressNodeClient)
+    .use(initAddressNode)
+    .use(Analytics)
+    .output(GetAddressAvatarOutput)
+    .query(getAddressAvatarMethod),
   getAddressProfile: t.procedure
     .use(LogUsage)
     .use(parse3RN)
