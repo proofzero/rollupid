@@ -62,8 +62,9 @@ export type LoaderData = {
 }
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const { clientId, redirectUri, scope, state } = context.consoleParams
-  const uniqueScopes = [...new Set(scope)]
+  const { clientId, redirectUri, state } = context.consoleParams
+  const scope = [...new Set(context.consoleParams.scope)]
+
   const { jwt, accountUrn } = await getValidatedSessionContext(
     request,
     context.consoleParams,
@@ -121,14 +122,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       throw new BadRequestError({
         message: 'No allowed scope was configured for the app',
       })
-    if (!uniqueScopes || !uniqueScopes.length)
+    if (!scope || !scope.length)
       throw new BadRequestError({ message: 'No scope requested' })
 
     //If requested scope values are a subset of allowed scope values
     if (
-      !uniqueScopes.every((scopeValue) =>
-        appPublicProps.scopes.includes(scopeValue)
-      )
+      !scope.every((scopeValue) => appPublicProps.scopes.includes(scopeValue))
     )
       throw new BadRequestError({
         message:
@@ -136,7 +135,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       })
 
     if (
-      uniqueScopes.every(
+      scope.every(
         (scopeValue) =>
           scopeMeta.scopes[scopeValue] && scopeMeta.scopes[scopeValue].hidden
       )
@@ -149,7 +148,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         responseType,
         clientId,
         redirectUri,
-        scope: uniqueScopes,
+        scope: scope,
         state,
       })
 
@@ -164,7 +163,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     }
 
     const dataForScopes = await getDataForScopes(
-      uniqueScopes,
+      scope,
       accountUrn,
       jwt,
       context.env,
@@ -178,7 +177,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       scopeMeta: scopeMeta,
       state,
       redirectOverride: redirectUri,
-      scopeOverride: uniqueScopes || [],
+      scopeOverride: scope || [],
       dataForScopes,
     })
   } catch (e) {
