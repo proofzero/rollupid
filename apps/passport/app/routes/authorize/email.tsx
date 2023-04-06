@@ -3,27 +3,26 @@ import { OAuthAddressType } from '@proofzero/types/address'
 import { EmailAddressType } from '@proofzero/types/address'
 import { LoaderFunction, json } from '@remix-run/cloudflare'
 import { useLoaderData, useNavigate, useSubmit } from '@remix-run/react'
-import { setConsoleParamsSession } from '~/session.server'
+import { getConsoleParams, setConsoleParamsSession } from '~/session.server'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const { clientId } = context.consoleParams
+  const lastCP = await getConsoleParams(request, context.env)
+
+  const { clientId } = lastCP
   if (!clientId) throw new Error('No client id provided')
 
   const headers = new Headers()
   headers.append(
     'Set-Cookie',
     await setConsoleParamsSession(
-      { ...context.consoleParams, prompt: 'connect' },
+      { ...lastCP, prompt: 'connect' },
       context.env,
       clientId
     )
   )
   headers.append(
     'Set-Cookie',
-    await setConsoleParamsSession(
-      { ...context.consoleParams, prompt: 'connect' },
-      context.env
-    )
+    await setConsoleParamsSession({ ...lastCP, prompt: 'connect' }, context.env)
   )
 
   return json(
