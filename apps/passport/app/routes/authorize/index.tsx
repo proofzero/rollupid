@@ -168,16 +168,19 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       context.traceSpan
     )
 
-    return json<LoaderData>({
-      redirectUri,
-      clientId,
-      appProfile: appPublicProps,
-      scopeMeta: scopeMeta,
-      state,
-      redirectOverride: redirectUri,
-      scopeOverride: scope || [],
-      dataForScopes,
-    })
+    return json<LoaderData>(
+      {
+        redirectUri,
+        clientId,
+        appProfile: appPublicProps,
+        scopeMeta: scopeMeta,
+        state,
+        redirectOverride: redirectUri,
+        scopeOverride: scope || [],
+        dataForScopes,
+      },
+      { headers }
+    )
   } catch (e) {
     console.error(e)
     throw JsonError(e)
