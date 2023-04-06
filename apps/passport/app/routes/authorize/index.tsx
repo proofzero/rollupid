@@ -168,16 +168,19 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       context.traceSpan
     )
 
-    return json<LoaderData>({
-      redirectUri,
-      clientId,
-      appProfile: appPublicProps,
-      scopeMeta: scopeMeta,
-      state,
-      redirectOverride: redirectUri,
-      scopeOverride: scope || [],
-      dataForScopes,
-    })
+    return json<LoaderData>(
+      {
+        redirectUri,
+        clientId,
+        appProfile: appPublicProps,
+        scopeMeta: scopeMeta,
+        state,
+        redirectOverride: redirectUri,
+        scopeOverride: scope || [],
+        dataForScopes,
+      },
+      { headers }
+    )
   } catch (e) {
     console.error(e)
     throw JsonError(e)
@@ -196,21 +199,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   const cancel = form.get('cancel') as string
 
   if (cancel) {
-    const headers = new Headers()
-    const lastCP = await getConsoleParams(request, context.env)
-    if (lastCP) {
-      headers.append(
-        'Set-Cookie',
-        await destroyConsoleParamsSession(request, context.env, lastCP.clientId)
-      )
-
-      headers.append(
-        'Set-Cookie',
-        await destroyConsoleParamsSession(request, context.env)
-      )
-    }
-
-    return redirect(cancel, { headers })
+    return redirect(cancel)
   }
 
   const responseType = ResponseType.Code
