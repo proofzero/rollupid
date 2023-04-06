@@ -186,6 +186,7 @@ const DisconnectModal = ({
   setIsOpen,
   id,
   data,
+  primaryAddressURN,
 }: {
   fetcher: FetcherWithComponents<any>
   isOpen: boolean
@@ -195,6 +196,7 @@ const DisconnectModal = ({
     title: string
     type: string
   }
+  primaryAddressURN: AddressURN
 }) => (
   <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
     <div
@@ -209,16 +211,23 @@ const DisconnectModal = ({
             Disconnect account
           </Text>
 
-          <Text size="sm" weight="normal" className="text-gray-500 my-7">
-            Are you sure you want to disconnect {data.type} account
-            {data.title && (
-              <>
-                "<span className="text-gray-800">{data.title}</span>"
-              </>
-            )}
-            from Rollup? You might lose access to some functionality.
-          </Text>
-
+          {primaryAddressURN !== id ? (
+            <Text size="sm" weight="normal" className="text-gray-500 my-7">
+              Are you sure you want to disconnect {data.type} account
+              {data.title && (
+                <>
+                  <span className="text-gray-800"> "{data.title}" </span>
+                </>
+              )}
+              from Rollup? You might lose access to some functionality.
+            </Text>
+          ) : (
+            <Text size="sm" weight="normal" className="text-gray-500 my-7">
+              It looks like you are trying to disconnect your primary account.
+              You need to set another account primary to be able to disconnect
+              this one.
+            </Text>
+          )}
           <fetcher.Form method="post" action="/settings/accounts/disconnect">
             <input type="hidden" name="id" value={id} />
 
@@ -227,9 +236,11 @@ const DisconnectModal = ({
                 Cancel
               </Button>
 
-              <Button type="submit" btnType="dangerous">
-                Disconnect
-              </Button>
+              {primaryAddressURN !== id && (
+                <Button type="submit" btnType="dangerous">
+                  Disconnect
+                </Button>
+              )}
             </div>
           </fetcher.Form>
         </div>
@@ -397,6 +408,7 @@ export default function AccountsLayout() {
               setIsOpen={setDisconnectModalOpen}
               id={actionId}
               data={actionProfile}
+              primaryAddressURN={primaryAddressURN}
             />
           </>
         )}
