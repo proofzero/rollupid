@@ -268,14 +268,6 @@ export const setNewPrimaryAddress = async (
 
   // Update the profile with the new primary address if it exists
 
-  console.log({
-    profile: {
-      displayName: displayName,
-      pfp: { ...profile?.pfp, image: pfp },
-      primaryAddressURN: newPrimaryAddress,
-    },
-  })
-
   if (profile) {
     await accountClient.setProfile.mutate({
       name: account,
