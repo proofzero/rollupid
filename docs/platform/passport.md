@@ -14,7 +14,7 @@ The authentication step takes care of identifying profiles on the [Profile Graph
 
 Once authenticated the user will the be redirected to the authorization screen.
 
-<figure><img src="../.gitbook/assets/MacBook Pro 14_ - 1.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/MacBook Pro 14_ - 1 (1).png" alt=""><figcaption></figcaption></figure>
 
 Passport's authentication flow currently supports the following authentication methods and are configurable for your app [Console](console/):
 
@@ -42,6 +42,6 @@ Once authorized your the user will be redirected back to your application with t
 
 ### Tokens & Sessions
 
-The passport application is also responsible for issuing access and refresh tokens via the [Profile API](my-profile.md). It is recommended that these tokens be managed by your application in either a session cookie and/or user record. Tokens can be continuously refreshed so long as the user has not explicitly revoked access.
+The passport application is also responsible for issuing access and refresh tokens via the [Profile API](broken-reference). It is recommended that these tokens be managed by your application in either a session cookie and/or user record. Tokens can be continuously refreshed so long as the user has not explicitly revoked access.
 
 Authenticated users will also maintain their session with passport for 90 days and that session will be extended long as the user user visits the passport app within the 90 day period. This also means that If your application session expires and the user is redirected to passport you will automatically get another access token and refresh token.

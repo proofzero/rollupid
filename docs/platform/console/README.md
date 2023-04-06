@@ -10,7 +10,7 @@ Console is your control centre where you register and manage all your applicatio
 
 The navigation consists of two main sections.
 
-At the top right you have your profile menu. Here is where you can sign out and visit your [Profile](../my-profile.md).
+At the top right you have your profile menu. Here is where you can sign out and visit your [Profile](broken-reference).
 
 On the left is your application context menu. Here is where you can toggle between your applications and also create new ones.
 

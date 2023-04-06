@@ -1,6 +1,7 @@
 # Table of contents
 
 * [Introduction to Rollup](3id/overview/index.md)
+* [How it works](how-it-works.md)
 
 ## Getting Started
 
@@ -31,7 +32,6 @@
   * [Teams & Contact](platform/console/teams-and-contact.md)
   * [Billing](platform/console/billing.md)
 * [Passport](platform/passport.md)
-* [Profile](platform/my-profile.md)
 * [Galaxy](platform/profile-graph.md)
 
 ## Advanced
