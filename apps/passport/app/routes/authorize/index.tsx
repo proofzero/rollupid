@@ -123,6 +123,50 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       }),
     ])
 
+    if (!appPublicProps.scopes || !appPublicProps.scopes.length)
+      throw new BadRequestError({
+        message: 'No allowed scope was configured for the app',
+      })
+    if (!scope || !scope.length)
+      throw new BadRequestError({ message: 'No scope requested' })
+
+    //If requested scope values are a subset of allowed scope values
+    if (
+      !scope.every((scopeValue) => appPublicProps.scopes.includes(scopeValue))
+    )
+      throw new BadRequestError({
+        message:
+          'Requested scope value not in the configured allowed scope list',
+      })
+
+    if (
+      scope.every(
+        (scopeValue) =>
+          scopeMeta.scopes[scopeValue] && scopeMeta.scopes[scopeValue].hidden
+      )
+    ) {
+      //Pre-authorize if requested scope values are hidden (ie. system) scope values
+      const responseType = ResponseType.Code
+      const accessClient = getAccessClient(context.env, context.traceSpan)
+      const authorizeRes = await accessClient.authorize.mutate({
+        account: accountUrn,
+        responseType,
+        clientId,
+        redirectUri,
+        scope: scope,
+        state,
+      })
+
+      const redirectParams = new URLSearchParams({
+        code: authorizeRes.code,
+        state: authorizeRes.state,
+      })
+
+      return redirect(`${redirectUri}?${redirectParams}`, {
+        headers,
+      })
+    }
+
     const dataForScopes = await getDataForScopes(
       scope,
       accountUrn,
