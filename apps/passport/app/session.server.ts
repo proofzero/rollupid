@@ -198,7 +198,11 @@ export async function setConsoleParamsSession(
 ) {
   const storage = getConsoleParamsSessionStorage(env, clientId)
   const session = await storage.getSession()
-  session.set('params', JSON.stringify(consoleParams))
+
+  //Convert string array scope to space-delimited scope before setting cookie value
+  const { scope, ...otherProps } = consoleParams
+  const externalEncodedCP = { ...otherProps, scope: scope?.join(' ') || '' }
+  session.set('params', JSON.stringify(externalEncodedCP))
 
   return storage.commitSession(session)
 }
@@ -228,7 +232,12 @@ export async function getConsoleParams(
   clientId?: string
 ) {
   return getConsoleParamsSession(request, env, clientId)
-    .then((session) => JSON.parse(session.get('params')))
+    .then((session) => {
+      const externalEncodedCookie = JSON.parse(session.get('params'))
+      //Convert space-delimited scope to string array
+      const { scope, ...otherProps } = externalEncodedCookie
+      return { ...otherProps, scope: scope.split(' ') }
+    })
     .catch((err) => {
       console.log('No console params session found')
       return null

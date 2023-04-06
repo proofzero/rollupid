@@ -32,7 +32,7 @@ export const authenticateAddress = async (
     clientId: string
     redirectUri: string
     state: string
-    scope: string
+    scope: string[]
     prompt: string
   } | null,
   env: Env,
@@ -94,7 +94,7 @@ export const authenticateAddress = async (
         client_id: authAppId,
         redirect_uri: authRedirectUri,
         state: authState,
-        scope: authScope,
+        scope: authScope.join(' '),
       })
 
       redirectURL += `?${urlParams}`
