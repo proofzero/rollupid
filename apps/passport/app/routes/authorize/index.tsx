@@ -40,7 +40,7 @@ import type { AddressURN } from '@proofzero/urns/address'
 import type { DataForScopes } from '~/utils/authorize.server'
 import { Text } from '@proofzero/design-system'
 import { BadRequestError } from '@proofzero/errors'
-import { throwJSONError } from '@proofzero/utils/errors'
+import { JsonError } from '@proofzero/utils/errors'
 
 export type UserProfile = {
   displayName: string
@@ -180,7 +180,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     })
   } catch (e) {
     console.error(e)
-    throwJSONError(e)
+    throw JsonError(e)
   }
 }
 
