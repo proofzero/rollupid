@@ -9,11 +9,13 @@ import type { AddressURN } from '@proofzero/urns/address'
 export type AddressListProps = {
   addresses: AddressListItemProps[]
   primaryAddressURN: AddressURN
+  onSetPrimary?: (id: string) => void
 }
 
 export const AddressList = ({
   addresses,
   primaryAddressURN,
+  onSetPrimary,
 }: AddressListProps) => {
   return addresses.length ? (
     <List
@@ -25,7 +27,12 @@ export const AddressList = ({
           AddressURNSpace.decode(primaryAddressURN),
       }))}
       itemRenderer={(item) => (
-        <AddressListItem key={item.key} {...item.val} primary={item.primary} />
+        <AddressListItem
+          key={item.key}
+          {...item.val}
+          primary={item.primary}
+          onSetPrimary={onSetPrimary}
+        />
       )}
     />
   ) : (

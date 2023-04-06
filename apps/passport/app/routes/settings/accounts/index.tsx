@@ -3,6 +3,7 @@ import {
   useLoaderData,
   useFetcher,
   useNavigate,
+  useSubmit,
 } from '@remix-run/react'
 
 import { useState, useEffect } from 'react'
@@ -23,12 +24,14 @@ import { normalizeProfileToConnection } from '~/utils/profile'
 import { NodeType } from '@proofzero/types/address'
 
 import type { FetcherWithComponents } from '@remix-run/react'
-import type { LoaderFunction } from '@remix-run/cloudflare'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import type { AddressListProps } from '~/components/addresses/AddressList'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 
 import warn from '~/assets/warning.svg'
-import { Pill } from '@proofzero/design-system/src/atoms/pills/Pill'
+import { getValidatedSessionContext } from '~/session.server'
+import { setNewPrimaryAddress } from '~/utils/authenticate.server'
+import type { AddressURN } from '@proofzero/urns/address'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const reqUrl = new URL(request.url)
@@ -37,6 +40,29 @@ export const loader: LoaderFunction = async ({ request }) => {
   return {
     reqUrlError,
   }
+}
+
+export const action: ActionFunction = async ({ request, context }) => {
+  const { jwt } = await getValidatedSessionContext(
+    request,
+    context.consoleParams,
+    context.env,
+    context.traceSpan
+  )
+
+  const formData = await request.formData()
+  const primaryAddressURN = formData.get('primaryAddressURN') as AddressURN
+
+  if (primaryAddressURN) {
+    await setNewPrimaryAddress(
+      jwt,
+      context.env,
+      context.traceSpan,
+      primaryAddressURN
+    )
+  }
+
+  return null
 }
 
 const distinctProfiles = (connectedProfiles: any[]) => {
@@ -213,8 +239,11 @@ const DisconnectModal = ({
 export default function AccountsLayout() {
   const { reqUrlError } = useLoaderData()
 
+  const submit = useSubmit()
+
   const { connectedProfiles, primaryAddressURN } = useOutletContext<{
     connectedProfiles: any[]
+    primaryAddressURN: AddressURN
   }>()
 
   const {
@@ -369,6 +398,11 @@ export default function AccountsLayout() {
 
         <AddressList
           primaryAddressURN={primaryAddressURN}
+          onSetPrimary={(id: string) => {
+            const form = new FormData()
+            form.set('primaryAddressURN', id)
+            submit(form, { method: 'post', action: '/settings/accounts' })
+          }}
           addresses={cryptoProfiles.addresses
             .map((ap: AddressListItemProps) => ({
               ...ap,

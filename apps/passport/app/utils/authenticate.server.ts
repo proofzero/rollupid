@@ -250,7 +250,7 @@ const provisionProfile = async (
   }
 }
 
-export const updateProfile = async (
+export const setNewPrimaryAddress = async (
   jwt: string,
   env: Env,
   traceSpan: TraceSpan,

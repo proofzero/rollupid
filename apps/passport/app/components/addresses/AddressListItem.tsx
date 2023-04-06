@@ -100,75 +100,95 @@ export const AddressListItem = ({
               leaveTo="transform opacity-0 scale-95"
             >
               <Menu.Items className="absolute z-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y divide-gray-100">
-                <div className="p-1">
-                  {onRenameAccount && (
-                    <Menu.Item
-                      as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                {onRenameAccount ||
+                onChangeAvatar ||
+                (onSetPrimary && !primary) ? (
+                  <div className="p-1">
+                    {onRenameAccount && (
+                      <Menu.Item
+                        as="div"
+                        className="py-2 px-4 flex items-center space-x-3 cursor-pointer
                       hover:rounded-[6px] hover:bg-gray-100 focus:bg-gray-100"
-                      onClick={() => {
-                        onRenameAccount(id)
-                      }}
-                    >
-                      <HiOutlinePencilAlt className="text-xl font-normal text-gray-600" />
+                        onClick={() => {
+                          onRenameAccount(id)
+                        }}
+                      >
+                        <HiOutlinePencilAlt className="text-xl font-normal text-gray-600" />
 
-                      <Text size="sm" weight="normal" className="text-gray-700">
-                        Rename Account
-                      </Text>
-                    </Menu.Item>
-                  )}
+                        <Text
+                          size="sm"
+                          weight="normal"
+                          className="text-gray-700"
+                        >
+                          Rename Account
+                        </Text>
+                      </Menu.Item>
+                    )}
 
-                  {onChangeAvatar && (
-                    <Menu.Item
-                      as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                    {onChangeAvatar && (
+                      <Menu.Item
+                        as="div"
+                        className="py-2 px-4 flex items-center space-x-3 cursor-pointer
                       hover:bg-gray-100 focus:bg-gray-100 hover:rounded-[6px]"
-                      onClick={() => {
-                        onChangeAvatar(id)
-                      }}
-                    >
-                      <HiOutlinePhotograph className="text-xl font-normal text-gray-600" />
+                        onClick={() => {
+                          onChangeAvatar(id)
+                        }}
+                      >
+                        <HiOutlinePhotograph className="text-xl font-normal text-gray-600" />
 
-                      <Text size="sm" weight="normal" className="text-gray-700">
-                        Change Avatar
-                      </Text>
-                    </Menu.Item>
-                  )}
+                        <Text
+                          size="sm"
+                          weight="normal"
+                          className="text-gray-700"
+                        >
+                          Change Avatar
+                        </Text>
+                      </Menu.Item>
+                    )}
 
-                  {onSetPrimary && (
-                    <Menu.Item
-                      as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                    {onSetPrimary && !primary && (
+                      <Menu.Item
+                        as="div"
+                        className="py-2 px-4 flex items-center space-x-3 cursor-pointer
                       hover:bg-gray-100 focus:bg-gray-100 hover:rounded-[6px]"
-                      onClick={() => {
-                        onSetPrimary(id)
-                      }}
-                    >
-                      <HiOutlineStar className="text-xl font-normal text-gray-600" />
+                        onClick={() => {
+                          onSetPrimary(id)
+                        }}
+                      >
+                        <HiOutlineStar className="text-xl font-normal text-gray-600" />
 
-                      <Text size="sm" weight="normal" className="text-gray-700">
-                        Set as Primary
-                      </Text>
-                    </Menu.Item>
-                  )}
+                        <Text
+                          size="sm"
+                          weight="normal"
+                          className="text-gray-700"
+                        >
+                          Set as Primary
+                        </Text>
+                      </Menu.Item>
+                    )}
 
-                  {onSetPrivate && (
-                    <Menu.Item
-                      as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                    {onSetPrivate && (
+                      <Menu.Item
+                        as="div"
+                        className="py-2 px-4 flex items-center space-x-3 cursor-pointer
                        hover:bg-gray-100 hover:rounded-[6px] focus:bg-gray-100"
-                      onClick={() => {
-                        onSetPrivate(id)
-                      }}
-                    >
-                      <HiOutlineEyeOff className="text-xl font-normal text-gray-600" />
+                        onClick={() => {
+                          onSetPrivate(id)
+                        }}
+                      >
+                        <HiOutlineEyeOff className="text-xl font-normal text-gray-600" />
 
-                      <Text size="sm" weight="normal" className="text-gray-700">
-                        Set as Private
-                      </Text>
-                    </Menu.Item>
-                  )}
-                </div>
+                        <Text
+                          size="sm"
+                          weight="normal"
+                          className="text-gray-700"
+                        >
+                          Set as Private
+                        </Text>
+                      </Menu.Item>
+                    )}
+                  </div>
+                ) : null}
 
                 <div className="p-1">
                   {onDisconnect && (
