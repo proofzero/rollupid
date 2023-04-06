@@ -42,28 +42,51 @@ export default () => {
   const navigate = useNavigate()
 
   return (
-    <EmailConnection
-      providers={[
-        {
-          callback: () => navigate(`/authenticate/${clientId}/email`),
-          addr_type: EmailAddressType.Email,
-        },
-        {
-          callback: () => {
-            submit(
-              {},
-              {
-                action: 'connect/microsoft',
-                method: 'post',
-              }
-            )
-          },
-          addr_type: OAuthAddressType.Microsoft,
-        },
-      ]}
-      cancelCallback={function (): void {
-        throw new Error('Function not implemented.')
+    <div
+      className={'flex flex-col gap-4 basis-96 m-auto bg-white p-6'}
+      style={{
+        width: 418,
+        height: 598,
+        border: '1px solid #D1D5DB',
+        boxSizing: 'border-box',
+        borderRadius: 8,
       }}
-    />
+    >
+      <EmailConnection
+        providers={[
+          {
+            callback: () => navigate(`/authenticate/${clientId}/email`),
+            addr_type: EmailAddressType.Email,
+          },
+          {
+            callback: () => {
+              submit(
+                {},
+                {
+                  action: 'connect/microsoft',
+                  method: 'post',
+                }
+              )
+            },
+            addr_type: OAuthAddressType.Microsoft,
+          },
+          {
+            callback: () => {
+              submit(
+                {},
+                {
+                  action: 'connect/google',
+                  method: 'post',
+                }
+              )
+            },
+            addr_type: OAuthAddressType.Google,
+          },
+        ]}
+        cancelCallback={function (): void {
+          throw new Error('Function not implemented.')
+        }}
+      />
+    </div>
   )
 }
