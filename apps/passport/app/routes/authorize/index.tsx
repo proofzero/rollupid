@@ -272,6 +272,8 @@ export default function Authorize() {
 
   const { connectedEmails, personaData, requestedScope } = dataForScopes
 
+  const uniqueScope = Array.from(new Set(requestedScope))
+
   const { profile: userProfile } = useOutletContext<{
     profile: Required<Profile>
   }>()
@@ -343,7 +345,7 @@ export default function Authorize() {
             style={{ color: '#6B7280' }}
             className={'flex flex-col font-light text-base gap-2 w-full'}
           >
-            {requestedScope
+            {uniqueScope
               .filter((scope: string) => {
                 if (scopeMeta.scopes[scope])
                   return !scopeMeta.scopes[scope].hidden
@@ -423,11 +425,11 @@ export default function Authorize() {
               btnSize="xl"
               btnType="primary-alt"
               disabled={
-                requestedScope.includes('email') &&
+                uniqueScope.includes('email') &&
                 (!connectedEmails?.length || !persona?.email?.length)
               }
               onClick={() => {
-                authorizeCallback(requestedScope)
+                authorizeCallback(uniqueScope)
               }}
             >
               Continue
