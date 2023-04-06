@@ -4,11 +4,11 @@ import Address from './address'
 import OAuthAddress from './oauth'
 
 export default class TwitterAddress extends OAuthAddress {
-  async getProfile(): Promise<OAuthTwitterProfile> {
+  async getProfile<T = OAuthTwitterProfile>(): Promise<T> {
     const data = await this.getData()
     if (!data) throw new Error('no data')
     const profile = data.profile as OAuthData['profile']
-    return profile as OAuthTwitterProfile
+    return profile as T
   }
 
   static async alarm(address: Address) {

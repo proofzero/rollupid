@@ -27,6 +27,15 @@ import AppleAddress from '../../nodes/apple'
 import DiscordAddress from '../../nodes/discord'
 import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 import EmailAddress from '../../nodes/email'
+import {
+  EmailAddressProfile,
+  OAuthAppleProfile,
+  OAuthDiscordProfile,
+  OAuthGithubProfile,
+  OAuthGoogleProfile,
+  OAuthMicrosoftProfile,
+  OAuthTwitterProfile,
+} from '../../types'
 
 export const GetAddressProfileOutput = z.discriminatedUnion('type', [
   z.object({
@@ -106,7 +115,10 @@ export const getAddressProfileMethod = async ({
     }
     case OAuthAddressType.GitHub: {
       const oAuthNode = new GithubAddress(nodeClient)
-      const profile = await oAuthNode.getProfile()
+      const profile = await oAuthNode.getProfile<OAuthGithubProfile>()
+      if (!profile) {
+        throw new Error('missing profile')
+      }
       return {
         urn: ctx.addressURN,
         type: OAuthAddressType.GitHub,
@@ -115,7 +127,7 @@ export const getAddressProfileMethod = async ({
     }
     case OAuthAddressType.Twitter: {
       const oAuthNode = new TwitterAddress(nodeClient)
-      const profile = await oAuthNode.getProfile()
+      const profile = await oAuthNode.getProfile<OAuthTwitterProfile>()
       return {
         urn: ctx.addressURN,
         type: OAuthAddressType.Twitter,
@@ -124,7 +136,10 @@ export const getAddressProfileMethod = async ({
     }
     case OAuthAddressType.Google: {
       const oAuthNode = new GoogleAddress(nodeClient, ctx)
-      const profile = await oAuthNode.getProfile()
+      const profile = await oAuthNode.getProfile<OAuthGoogleProfile>()
+      if (!profile) {
+        throw new Error('missing profile')
+      }
       return {
         urn: ctx.addressURN,
         type: OAuthAddressType.Google,
@@ -133,7 +148,10 @@ export const getAddressProfileMethod = async ({
     }
     case OAuthAddressType.Microsoft: {
       const oAuthNode = new MicrosoftAddress(nodeClient, ctx)
-      const profile = await oAuthNode.getProfile()
+      const profile = await oAuthNode.getProfile<OAuthMicrosoftProfile>()
+      if (!profile) {
+        throw new Error('missing profile')
+      }
       return {
         urn: ctx.addressURN,
         type: OAuthAddressType.Microsoft,
@@ -143,6 +161,9 @@ export const getAddressProfileMethod = async ({
     case OAuthAddressType.Apple: {
       const oAuthNode = new AppleAddress(nodeClient, ctx)
       const profile = await oAuthNode.getProfile()
+      if (!profile) {
+        throw new Error('missing profile')
+      }
       return {
         urn: ctx.addressURN,
         type: OAuthAddressType.Apple,
@@ -151,7 +172,10 @@ export const getAddressProfileMethod = async ({
     }
     case OAuthAddressType.Discord: {
       const oAuthNode = new DiscordAddress(nodeClient, ctx)
-      const profile = await oAuthNode.getProfile()
+      const profile = await oAuthNode.getProfile<OAuthDiscordProfile>()
+      if (!profile) {
+        throw new Error('missing profile')
+      }
       return {
         urn: ctx.addressURN,
         type: OAuthAddressType.Discord,

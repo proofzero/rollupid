@@ -29,6 +29,27 @@ export default class OAuthAddress {
     return this.node.storage.put('data', data)
   }
 
+  async getProfile<T>(): Promise<T | undefined> {
+    const address = await this.node.class.getAddress()
+    try {
+      const response = await fetch(this.getUserInfoURL(), {
+        cf: {
+          cacheTtl: 5 * 60,
+          cacheEverything: true,
+          cacheKey: `profile-${address}`,
+        },
+        headers: await this.getRequestHeaders(),
+      })
+      if (!response.ok) {
+        console.error(await response.text())
+        throw new Error('an error occurred')
+      }
+      return response.json()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   async getAccessToken(): Promise<string | undefined> {
     const data = await this.getData()
     if (!data) {
@@ -36,6 +57,11 @@ export default class OAuthAddress {
     }
 
     const { accessToken, timestamp, extraParams } = data
+
+    if (!accessToken) {
+      return this.refreshToken()
+    }
+
     if (!extraParams?.expires_in) {
       return accessToken
     }
@@ -45,6 +71,22 @@ export default class OAuthAddress {
     } else {
       return accessToken
     }
+  }
+
+  async getRequestHeaders() {
+    return {
+      authorization: await this.getAuthorizationHeader(),
+    }
+  }
+
+  async getAuthorizationHeader(): Promise<string> {
+    const accessToken = await this.getAccessToken()
+
+    if (!accessToken) {
+      throw new Error('missing access token')
+    }
+
+    return `Bearer ${accessToken}`
   }
 
   async refreshToken(): Promise<string | undefined> {
@@ -94,11 +136,9 @@ export default class OAuthAddress {
     throw new Error('not implemented')
   }
 
-  // async getProfile() {
-  //   const data = await this.getData()
-  //   if (!data) throw new Error('no data')
-  //   return data.profile
-  // }
+  getUserInfoURL(): string {
+    throw new Error('not implemented')
+  }
 
   static async alarm(address: Address) {
     console.log({ alarm: 'oauth' })

@@ -1,22 +1,31 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 
-import { OAuthAddressType } from '@proofzero/types/address'
-
-import { OAuthData, OAuthGithubProfile } from '../types'
 import Address from './address'
 import OAuthAddress from './oauth'
 
-export default class GithubAddress extends OAuthAddress {
-  async getProfile(): Promise<OAuthGithubProfile> {
-    const data = await this.getData()
-    if (!data) throw new Error('no data')
+const USERINFO_URL = 'https://api.github.com/user'
 
-    const profile = data.profile as OAuthData['profile']
-    if (profile.provider != OAuthAddressType.GitHub) {
-      throw new Error('unknown provider')
+export default class GithubAddress extends OAuthAddress {
+  async getRequestHeaders() {
+    return {
+      accept: 'application/vnd.github.v3+json',
+      authorization: await this.getAuthorizationHeader(),
+      'user-agent': 'rollup',
+    }
+  }
+
+  async getAuthorizationHeader(): Promise<string> {
+    const accessToken = await this.getAccessToken()
+
+    if (!accessToken) {
+      throw new Error('missing access token')
     }
 
-    return profile._json
+    return `token ${accessToken}`
+  }
+
+  getUserInfoURL(): string {
+    return USERINFO_URL
   }
 
   static async alarm(address: Address) {

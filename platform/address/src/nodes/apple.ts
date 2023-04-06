@@ -19,12 +19,12 @@ export default class AppleAddress extends OAuthAddress {
     this.clientSecret = ctx.SECRET_APPLE_OAUTH_CLIENT_SECRET
   }
 
-  async getProfile(): Promise<OAuthAppleProfile> {
+  async getProfile<T = OAuthAppleProfile>(): Promise<T> {
     const data = await this.getData()
     if (!data) throw new Error('no data')
     const profile = data.profile as OAuthData['profile']
     const picture = await this.node.class.getGradient()
-    return { ...profile, picture } as OAuthAppleProfile
+    return { ...profile, picture } as T
   }
 
   getTokenURL(): string {
