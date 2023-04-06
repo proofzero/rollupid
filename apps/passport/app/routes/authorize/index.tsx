@@ -63,6 +63,7 @@ export type LoaderData = {
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { clientId, redirectUri, scope, state } = context.consoleParams
+  const uniqueScopes = [...new Set(scope)]
   const { jwt, accountUrn } = await getValidatedSessionContext(
     request,
     context.consoleParams,
@@ -120,12 +121,14 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       throw new BadRequestError({
         message: 'No allowed scope was configured for the app',
       })
-    if (!scope || !scope.length)
+    if (!uniqueScopes || !uniqueScopes.length)
       throw new BadRequestError({ message: 'No scope requested' })
 
     //If requested scope values are a subset of allowed scope values
     if (
-      !scope.every((scopeValue) => appPublicProps.scopes.includes(scopeValue))
+      !uniqueScopes.every((scopeValue) =>
+        appPublicProps.scopes.includes(scopeValue)
+      )
     )
       throw new BadRequestError({
         message:
@@ -133,7 +136,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       })
 
     if (
-      scope.every(
+      uniqueScopes.every(
         (scopeValue) =>
           scopeMeta.scopes[scopeValue] && scopeMeta.scopes[scopeValue].hidden
       )
@@ -146,7 +149,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         responseType,
         clientId,
         redirectUri,
-        scope: scope,
+        scope: uniqueScopes,
         state,
       })
 
@@ -161,7 +164,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     }
 
     const dataForScopes = await getDataForScopes(
-      scope,
+      uniqueScopes,
       accountUrn,
       jwt,
       context.env,
@@ -175,7 +178,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       scopeMeta: scopeMeta,
       state,
       redirectOverride: redirectUri,
-      scopeOverride: scope || [],
+      scopeOverride: uniqueScopes || [],
       dataForScopes,
     })
   } catch (e) {

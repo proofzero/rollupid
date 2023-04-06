@@ -56,6 +56,6 @@ export const getDataForScopes = async (
   return {
     connectedEmails,
     personaData,
-    requestedScope: reorderScope(Array.from(new Set(requestedScope))),
+    requestedScope: reorderScope(requestedScope),
   }
 }
