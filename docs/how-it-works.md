@@ -1,5 +1,5 @@
 ---
-description: Concepts Overview of the Rollup Profile Graph
+description: Concepts Overview of the Rollup Identity Graph
 ---
 
 # How it works
@@ -55,3 +55,9 @@ graph TD
   C --> H[Smart Contract Wallet]
   C --> I[KYC Payload]
 ```
+
+### User Passports
+
+With Rollup, users have "passports" they can log in to and manage their identities, issued tokens, and other aspects of their Rollup experience. Passports provide users with full control and transparency over their data and authorizations.
+
+You can lear more about Passports [here](platform/passport.md).
