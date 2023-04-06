@@ -254,7 +254,9 @@ export const setNewPrimaryAddress = async (
   jwt: string,
   env: Env,
   traceSpan: TraceSpan,
-  newPrimaryAddress: AddressURN
+  newPrimaryAddress: AddressURN,
+  pfp: string,
+  displayName: string
 ) => {
   const accountClient = getAccountClient(jwt, env, traceSpan)
   const parsedJWT = parseJwt(jwt)
@@ -265,12 +267,21 @@ export const setNewPrimaryAddress = async (
   })
 
   // Update the profile with the new primary address if it exists
+
+  console.log({
+    profile: {
+      displayName: displayName,
+      pfp: { ...profile?.pfp, image: pfp },
+      primaryAddressURN: newPrimaryAddress,
+    },
+  })
+
   if (profile) {
     await accountClient.setProfile.mutate({
       name: account,
       profile: {
-        displayName: profile?.displayName,
-        pfp: profile.pfp,
+        displayName: displayName,
+        pfp: { ...profile.pfp, image: pfp },
         primaryAddressURN: newPrimaryAddress,
       },
     })

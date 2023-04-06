@@ -51,14 +51,16 @@ export const action: ActionFunction = async ({ request, context }) => {
   )
 
   const formData = await request.formData()
-  const primaryAddressURN = formData.get('primaryAddressURN') as AddressURN
+  const primaryAddress = JSON.parse(formData.get('primaryAddress') as string)
 
-  if (primaryAddressURN) {
+  if (primaryAddress) {
     await setNewPrimaryAddress(
       jwt,
       context.env,
       context.traceSpan,
-      primaryAddressURN
+      primaryAddress.id,
+      primaryAddress.icon,
+      primaryAddress.title
     )
   }
 
@@ -254,6 +256,11 @@ export default function AccountsLayout() {
     addressCount,
   } = distinctProfiles(connectedProfiles)
 
+  const connectedAddresses = cryptoProfiles.addresses
+    .concat(vaultProfiles.addresses)
+    .concat(oAuthProfiles.addresses)
+    .concat(emailProfiles.addresses)
+
   const navigate = useNavigate()
 
   const [renameModalOpen, setRenameModalOpen] = useState(false)
@@ -292,11 +299,9 @@ export default function AccountsLayout() {
   }, [reqUrlError])
 
   useEffect(() => {
-    const selectedProfile = cryptoProfiles.addresses
-      .concat(vaultProfiles.addresses)
-      .concat(oAuthProfiles.addresses)
-      .concat(emailProfiles.addresses)
-      .find((p: any) => p.id === actionId)
+    const selectedProfile = connectedAddresses.find(
+      (p: any) => p.id === actionId
+    )
 
     setActionProfile(selectedProfile)
   }, [actionId])
@@ -400,7 +405,10 @@ export default function AccountsLayout() {
           primaryAddressURN={primaryAddressURN}
           onSetPrimary={(id: string) => {
             const form = new FormData()
-            form.set('primaryAddressURN', id)
+            form.set(
+              'primaryAddress',
+              JSON.stringify(connectedAddresses.find((p) => p.id === id))
+            )
             submit(form, { method: 'post', action: '/settings/accounts' })
           }}
           addresses={cryptoProfiles.addresses
