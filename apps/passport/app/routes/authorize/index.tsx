@@ -63,6 +63,7 @@ export type LoaderData = {
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { clientId, redirectUri, state } = context.consoleParams
+  // We need a unique set of scopes to avoid duplicates
   const scope = [...new Set(context.consoleParams.scope)]
 
   const { jwt, accountUrn } = await getValidatedSessionContext(
@@ -110,7 +111,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   //Scope validation
   try {
     const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
-
     const [scopeMeta, appPublicProps] = await Promise.all([
       sbClient.getScopes.query(),
       sbClient.getAppPublicProps.query({
