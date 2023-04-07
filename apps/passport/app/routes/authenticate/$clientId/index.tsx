@@ -22,19 +22,35 @@ import {
 } from '@remix-run/cloudflare'
 
 import AuthButton from '~/components/connect-button/AuthButton'
-import { getConsoleParams, getUserSession } from '~/session.server'
+import { getConsoleParams } from '~/session.server'
 
-export const loader: LoaderFunction = async ({ request, context, params }) => {
-  const userSession = await getUserSession(
-    request,
-    context.env,
-    params.clientId
-  )
-  const showContinueWithExistingUser = userSession ? true : false
+export const loader: LoaderFunction = async ({ request, params }) => {
+  const url = new URL(request.url)
+
+  const displayDict: { [key: string]: boolean } = {
+    wallet: true,
+    email: true,
+    google: true,
+    microsoft: true,
+    apple: true,
+    twitter: true,
+    discord: true,
+    github: true,
+  }
+
+  const loginHint = url.searchParams.get('login_hint')
+  if (loginHint) {
+    const hints = new Set(loginHint.split(','))
+    for (const key of Object.keys(displayDict)) {
+      if (!hints.has(key)) {
+        displayDict[key] = false
+      }
+    }
+  }
 
   return json({
     clientId: params.clientId,
-    showContinueWithExistingUser,
+    displayDict,
   })
 }
 
@@ -65,7 +81,7 @@ export default () => {
     profile?: Required<Profile>
   }>()
 
-  const { clientId, showContinueWithExistingUser } = useLoaderData()
+  const { clientId, displayDict } = useLoaderData()
 
   const [signData, setSignData] = useState<{
     nonce: string | undefined
@@ -100,140 +116,126 @@ export default () => {
 
       <Authentication logoURL={iconURL} appName={name}>
         <>
-          {profile && showContinueWithExistingUser && (
-            <>
-              <AuthButton
-                onClick={() => {
-                  submit(
-                    {},
-                    {
-                      method: 'post',
-                    }
+          {displayDict.wallet && (
+            <ConnectButton
+              signData={signData}
+              isLoading={loading}
+              connectCallback={async (address) => {
+                if (loading) return
+                // fetch nonce and kickoff sign flow
+                setLoading(true)
+                fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
+                  .then((res) =>
+                    res.json<{
+                      nonce: string
+                      state: string
+                      address: string
+                    }>()
                   )
-                }}
-                Graphic={
-                  <>
-                    {profile.pfp?.image && (
-                      <img
-                        className="w-6 h-6 rounded-full"
-                        src={profile.pfp.image}
-                        alt="PFP"
-                      />
-                    )}
-                  </>
-                }
-                text={profile.displayName}
-                Addon={<HiCheck className="w-3.5 h-3.5 text-indigo-500" />}
-              />
-
-              <div className="my-1 flex flex-row items-center space-x-3">
-                <hr className="h-px w-16 bg-gray-500" />
-                <Text>or</Text>
-                <hr className="h-px w-16 bg-gray-500" />
-              </div>
-            </>
-          )}
-
-          <ConnectButton
-            signData={signData}
-            isLoading={loading}
-            connectCallback={async (address) => {
-              if (loading) return
-              // fetch nonce and kickoff sign flow
-              setLoading(true)
-              fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
-                .then((res) =>
-                  res.json<{ nonce: string; state: string; address: string }>()
-                )
-                .then(({ nonce, state, address }) => {
-                  setSignData({
-                    nonce,
-                    state,
-                    address,
-                    signature: undefined,
+                  .then(({ nonce, state, address }) => {
+                    setSignData({
+                      nonce,
+                      state,
+                      address,
+                      signature: undefined,
+                    })
                   })
+                  .catch((err) => {
+                    toast(ToastType.Error, {
+                      message:
+                        'Could not fetch nonce for signing authentication message',
+                    })
+                  })
+              }}
+              signCallback={(address, signature, nonce, state) => {
+                console.debug('signing complete')
+                setSignData({
+                  ...signData,
+                  signature,
                 })
-                .catch((err) => {
+                submit(
+                  { signature, nonce, state },
+                  {
+                    method: 'post',
+                    action: `/connect/${address}/sign`,
+                  }
+                )
+              }}
+              connectErrorCallback={(error) => {
+                console.debug('transition.state: ', transition.state)
+                if (transition.state !== 'idle' || !loading) {
+                  return
+                }
+                if (error) {
+                  console.error(error)
                   toast(ToastType.Error, {
                     message:
-                      'Could not fetch nonce for signing authentication message',
+                      'Failed to complete signing. Please try again or contact support.',
                   })
-                })
-            }}
-            signCallback={(address, signature, nonce, state) => {
-              console.debug('signing complete')
-              setSignData({
-                ...signData,
-                signature,
-              })
-              submit(
-                { signature, nonce, state },
-                {
-                  method: 'post',
-                  action: `/connect/${address}/sign`,
+                  setLoading(false)
                 }
-              )
-            }}
-            connectErrorCallback={(error) => {
-              console.debug('transition.state: ', transition.state)
-              if (transition.state !== 'idle' || !loading) {
-                return
-              }
-              if (error) {
-                console.error(error)
-                toast(ToastType.Error, {
-                  message:
-                    'Failed to complete signing. Please try again or contact support.',
-                })
-                setLoading(false)
-              }
-            }}
-          />
+              }}
+            />
+          )}
 
-          <AuthButton
-            onClick={() => navigate(`/authenticate/${clientId}/email`)}
-            Graphic={<HiOutlineMail className="w-full h-full" />}
-            text={'Connect with Email'}
-          />
-
-          {!profile && (
-            <div className="my-2 flex flex-row items-center space-x-3">
-              <hr className="h-px w-16 bg-gray-500" />
-              <Text>or</Text>
-              <hr className="h-px w-16 bg-gray-500" />
-            </div>
+          {displayDict.email && (
+            <AuthButton
+              onClick={() => navigate(`/authenticate/${clientId}/email`)}
+              Graphic={<HiOutlineMail className="w-full h-full" />}
+              text={'Connect with Email'}
+            />
           )}
 
           <div className="flex flex-row space-x-3 justify-evenly w-full">
-            <Form className="w-full" action={`/connect/google`} method="post">
-              <ConnectOAuthButton provider="google" />
-            </Form>
+            {displayDict.google && (
+              <Form className="w-full" action={`/connect/google`} method="post">
+                <ConnectOAuthButton provider="google" />
+              </Form>
+            )}
 
-            <Form
-              className="w-full"
-              action={`/connect/microsoft`}
-              method="post"
-            >
-              <ConnectOAuthButton provider="microsoft" />
-            </Form>
+            {displayDict.microsoft && (
+              <Form
+                className="w-full"
+                action={`/connect/microsoft`}
+                method="post"
+              >
+                <ConnectOAuthButton provider="microsoft" />
+              </Form>
+            )}
 
-            <Form className="w-full" action={`/connect/apple`} method="post">
-              <ConnectOAuthButton provider="apple" />
-            </Form>
+            {displayDict.apple && (
+              <Form className="w-full" action={`/connect/apple`} method="post">
+                <ConnectOAuthButton provider="apple" />
+              </Form>
+            )}
           </div>
 
           <div className="flex flex-row space-x-3 justify-evenly w-full">
-            <Form className="w-full" action={`/connect/twitter`} method="post">
-              <ConnectOAuthButton provider="twitter" />
-            </Form>
+            {displayDict.twitter && (
+              <Form
+                className="w-full"
+                action={`/connect/twitter`}
+                method="post"
+              >
+                <ConnectOAuthButton provider="twitter" />
+              </Form>
+            )}
 
-            <Form className="w-full" action={`/connect/discord`} method="post">
-              <ConnectOAuthButton provider="discord" />
-            </Form>
+            {displayDict.discord && (
+              <Form
+                className="w-full"
+                action={`/connect/discord`}
+                method="post"
+              >
+                <ConnectOAuthButton provider="discord" />
+              </Form>
+            )}
 
-            <Form className="w-full" action={`/connect/github`} method="post">
-              <ConnectOAuthButton provider="github" />
-            </Form>
+            {displayDict.github && (
+              <Form className="w-full" action={`/connect/github`} method="post">
+                <ConnectOAuthButton provider="github" />
+              </Form>
+            )}
           </div>
         </>
       </Authentication>

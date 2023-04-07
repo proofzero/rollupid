@@ -163,7 +163,8 @@ const getConsoleParamsSessionStorage = (
 
 export async function createConsoleParamsSession(
   consoleParams: ConsoleParams,
-  env: Env
+  env: Env,
+  qp: URLSearchParams = new URLSearchParams()
 ) {
   if (!consoleParams.clientId) {
     throw new Error('Missing clientId in consoleParams')
@@ -171,7 +172,6 @@ export async function createConsoleParamsSession(
 
   let redirectURL = `/authenticate/${consoleParams.clientId}`
   if (consoleParams.prompt) {
-    const qp = new URLSearchParams()
     qp.append('prompt', consoleParams.prompt)
     redirectURL += `?${qp.toString()}`
   }

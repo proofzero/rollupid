@@ -1,11 +1,9 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import { redirect } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import { Outlet, useLoaderData } from '@remix-run/react'
 import { getAccountClient } from '~/platform.server'
 import {
   createConsoleParamsSession,
-  destroyConsoleParamsSession,
   getConsoleParams,
   getValidatedSessionContext,
 } from '~/session.server'
@@ -18,7 +16,18 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const lastCP = await getConsoleParams(request, context.env)
   if (!lastCP) {
-    throw await createConsoleParamsSession(context.consoleParams, context.env)
+    const qp = new URLSearchParams()
+
+    const url = new URL(request.url)
+    if (url.searchParams.has('login_hint')) {
+      qp.append('login_hint', url.searchParams.get('login_hint')!)
+    }
+
+    throw await createConsoleParamsSession(
+      context.consoleParams,
+      context.env,
+      qp
+    )
   }
 
   // this will redirect unauthenticated users to the auth page but maintain query params

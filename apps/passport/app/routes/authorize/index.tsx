@@ -458,6 +458,7 @@ export default function Authorize() {
                   qp.append('client_id', clientId)
                   qp.append('redirect_uri', redirectOverride)
                   qp.append('prompt', 'connect')
+                  qp.append('login_hint', 'email,microsoft,google')
 
                   navigate(`/authorize/?${qp.toString()}`)
                 } else {
