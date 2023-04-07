@@ -175,16 +175,21 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       context.traceSpan
     )
 
-    return json<LoaderData>({
-      redirectUri,
-      clientId,
-      appProfile: appPublicProps,
-      scopeMeta: scopeMeta,
-      state,
-      redirectOverride: redirectUri,
-      scopeOverride: scope || [],
-      dataForScopes,
-    })
+    return json<LoaderData>(
+      {
+        redirectUri,
+        clientId,
+        appProfile: appPublicProps,
+        scopeMeta: scopeMeta,
+        state,
+        redirectOverride: redirectUri,
+        scopeOverride: scope || [],
+        dataForScopes,
+      },
+      {
+        headers,
+      }
+    )
   } catch (e) {
     console.error(e)
     throw JsonError(e)
@@ -257,23 +262,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     state: authorizeRes.state,
   })
 
-  const headers = new Headers()
-  const lastCP = await getConsoleParams(request, context.env)
-  if (lastCP) {
-    headers.append(
-      'Set-Cookie',
-      await destroyConsoleParamsSession(request, context.env, lastCP.clientId)
-    )
-
-    headers.append(
-      'Set-Cookie',
-      await destroyConsoleParamsSession(request, context.env)
-    )
-  }
-
-  return redirect(`${redirectUri}?${redirectParams}`, {
-    headers,
-  })
+  return redirect(`${redirectUri}?${redirectParams}`)
 }
 
 const scopeIcons: Record<string, string> = {
@@ -464,12 +453,13 @@ export default function Authorize() {
                     selectedEmail?.type === OptionType.AddNew)
                 ) {
                   const qp = new URLSearchParams()
-                  qp.append('scopes', requestedScope.join(' '))
+                  qp.append('scope', requestedScope.join(' '))
                   qp.append('state', state)
                   qp.append('client_id', clientId)
                   qp.append('redirect_uri', redirectOverride)
+                  qp.append('prompt', 'connect')
 
-                  navigate(`/authorize/email?${qp.toString()}`)
+                  navigate(`/authorize/?${qp.toString()}`)
                 } else {
                   authorizeCallback(requestedScope)
                 }
