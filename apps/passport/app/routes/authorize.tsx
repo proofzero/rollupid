@@ -13,8 +13,6 @@ import {
 // TODO: loader function check if we have a session already
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const headers = new Headers()
-
   const contextCPId = context.consoleParams.clientId
   if (!contextCPId) throw new Error('No client id provided')
 
@@ -34,12 +32,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
   const profile = await accountClient.getProfile.query({ account: accountUrn })
 
-  return json(
-    { profile },
-    {
-      headers,
-    }
-  )
+  return json({ profile })
 }
 
 export default function Authorize() {
