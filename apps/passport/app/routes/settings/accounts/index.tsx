@@ -356,7 +356,7 @@ export default function AccountsLayout() {
     }
 
     const qp = new URLSearchParams()
-    qp.append('prompt', 'login')
+    qp.append('prompt', 'connect')
     qp.append('client_id', 'passport')
 
     // Removing search so that subsequent errors

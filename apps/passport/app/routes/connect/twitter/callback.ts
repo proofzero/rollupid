@@ -47,7 +47,7 @@ export const loader: LoaderFunction = async ({
       context.env,
       appData?.clientId
     ),
-    force: !appData || appData.prompt !== 'login',
+    force: !appData || appData.prompt !== 'connect',
   })
 
   await addressClient.setOAuthData.mutate({
@@ -57,7 +57,6 @@ export const loader: LoaderFunction = async ({
   })
 
   return authenticateAddress(
-    request,
     address,
     accountURN,
     appData,

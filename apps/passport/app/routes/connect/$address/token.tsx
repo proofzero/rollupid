@@ -35,7 +35,6 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   const appData = await getConsoleParams(request, context.env)
 
   return authenticateAddress(
-    request,
     addressURN,
     accountURN,
     appData,

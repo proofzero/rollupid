@@ -49,7 +49,7 @@ export const loader: LoaderFunction = async ({
       context.env,
       appData?.clientId
     ),
-    force: !appData || appData.prompt !== 'login',
+    force: !appData || appData.prompt !== 'connect',
   })
   const existingOAuthData = await addressClient.getOAuthData.query()
 
@@ -74,7 +74,6 @@ export const loader: LoaderFunction = async ({
   }
 
   return authenticateAddress(
-    request,
     address,
     accountURN,
     appData,
