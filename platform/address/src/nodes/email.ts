@@ -14,7 +14,11 @@ type EmailAddressProfile = AddressProfile<EmailAddressType.Email>
 
 type VerificationPayload = {
   state: string
-  record: { creationTimestamp: number; callNumber: number }
+  record: {
+    creationTimestamp: number
+    numberOfAttempts: number
+    firstAttemptTimestamp: number
+  }
 }
 
 const CODES_KEY_NAME = 'codes'
@@ -32,7 +36,10 @@ export default class EmailAddress {
         CODES_KEY_NAME
       )) || {}
 
-    let callNumber
+    let numberOfAttempts
+    let firstAttemptTimestamp
+    let keepAttemptsNumber = true
+
     for (const [_, payload] of Object.entries(verificationCodes)) {
       if (
         payload.record.creationTimestamp +
@@ -45,10 +52,13 @@ export default class EmailAddress {
           } seconds`,
         })
       }
-      callNumber = payload.record.callNumber
+      numberOfAttempts = payload.record.numberOfAttempts
+      firstAttemptTimestamp = payload.record.firstAttemptTimestamp
+
+      // We count 10 minutes from the first attempt
       if (
-        callNumber >= 5 &&
-        payload.record.creationTimestamp +
+        numberOfAttempts >= EMAIL_VERIFICATION_OPTIONS.numberOfAttempts &&
+        payload.record.firstAttemptTimestamp +
           EMAIL_VERIFICATION_OPTIONS.regenDelayFor5SubsCallsInMs >
           Date.now()
       ) {
@@ -57,6 +67,15 @@ export default class EmailAddress {
           You can only generate a new code 5 times every ${EMAIL_VERIFICATION_OPTIONS.regenDelayFor5SubsCallsInMins}
           minutes`,
         })
+      }
+
+      // Every 10 minutes we wipe the number of attempts and first attempt timestamp
+      if (
+        payload.record.firstAttemptTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.regenDelayFor5SubsCallsInMs <
+        Date.now()
+      ) {
+        keepAttemptsNumber = false
       }
     }
 
@@ -68,7 +87,13 @@ export default class EmailAddress {
       state,
       record: {
         creationTimestamp,
-        callNumber: callNumber && callNumber < 5 ? callNumber + 1 : 1,
+        // RE: Every 10 minutes we wipe the number of attempts and first attempt timestamp
+        numberOfAttempts:
+          numberOfAttempts && keepAttemptsNumber ? numberOfAttempts + 1 : 1,
+        firstAttemptTimestamp:
+          firstAttemptTimestamp && keepAttemptsNumber
+            ? firstAttemptTimestamp
+            : creationTimestamp,
       },
     }
 
