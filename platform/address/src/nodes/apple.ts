@@ -1,11 +1,15 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 
+import { OAuthAddressType } from '@proofzero/types/address'
+
 import { Context } from '../context'
-import { OAuthData, OAuthAppleProfile } from '../types'
+import { AddressProfile, AppleOAuthProfile } from '../types'
 
 import Address from './address'
 import OAuthAddress from './oauth'
 import type { AddressNode } from '.'
+
+type AppleAddressProfile = AddressProfile<OAuthAddressType.Apple>
 
 const TOKEN_URL = 'https://appleid.apple.com/auth/token'
 
@@ -19,12 +23,17 @@ export default class AppleAddress extends OAuthAddress {
     this.clientSecret = ctx.SECRET_APPLE_OAUTH_CLIENT_SECRET
   }
 
-  async getProfile<T = OAuthAppleProfile>(): Promise<T> {
+  async getProfile(): Promise<AppleAddressProfile> {
     const data = await this.getData()
     if (!data) throw new Error('no data')
-    const profile = data.profile as OAuthData['profile']
+    const profile = data.profile as AppleOAuthProfile
     const picture = await this.node.class.getGradient()
-    return { ...profile, picture } as T
+    return {
+      address: profile.email,
+      title: profile.name,
+      icon: picture,
+      type: OAuthAddressType.Apple,
+    }
   }
 
   getTokenURL(): string {

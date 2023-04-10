@@ -1,11 +1,16 @@
+import { DurableObjectStubProxy } from 'do-proxy'
+
 import { BadRequestError } from '@proofzero/errors'
 import { EmailAddressType, NodeType } from '@proofzero/types/address'
 import generateRandomString from '@proofzero/utils/generateRandomString'
-import { DurableObjectStubProxy } from 'do-proxy'
-import { AddressNode } from '.'
+
 import { EMAIL_VERIFICATION_OPTIONS } from '../constants'
-import { EmailAddressProfile } from '../types'
+import { AddressProfile } from '../types'
+
+import { AddressNode } from '.'
 import Address from './address'
+
+type EmailAddressProfile = AddressProfile<EmailAddressType.Email>
 
 type VerificationPayload = {
   state: string
@@ -114,14 +119,12 @@ export default class EmailAddress {
       this.node.class.getAddress(),
     ])
     if (!address) throw new Error('Cannot load profile for email address node')
-    const result: EmailAddressProfile = {
+    return {
       address,
-      email: address,
-      isEmail: true,
-      name: nickname ?? address,
-      picture: gradient,
+      title: nickname ?? address,
+      icon: gradient,
+      type: EmailAddressType.Email,
     }
-    return result
   }
 }
 export type EmailAddressProxyStub = DurableObjectStubProxy<EmailAddress>

@@ -10,7 +10,6 @@ import type { AddressListItemProps } from '~/components/addresses/AddressListIte
 import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
 
 import { useOutletContext } from '@remix-run/react'
-import { normalizeProfileToConnection } from '~/utils/profile'
 import type { AddressURN } from '@proofzero/urns/address'
 
 export default function DashboardLayout() {
@@ -20,15 +19,6 @@ export default function DashboardLayout() {
       authorizedApps: any[]
       primaryAddressURN: AddressURN
     }>()
-
-  const normalizedConnectedProfiles = connectedProfiles
-    .map((p) => ({
-      urn: p.urn,
-      type: p.type,
-      nodeType: p.nodeType,
-      ...p?.profile,
-    }))
-    .map(normalizeProfileToConnection)
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -80,7 +70,7 @@ export default function DashboardLayout() {
 
             <AddressList
               primaryAddressURN={primaryAddressURN}
-              addresses={normalizedConnectedProfiles as AddressListItemProps[]}
+              addresses={connectedProfiles as AddressListItemProps[]}
             />
           </div>
         </div>

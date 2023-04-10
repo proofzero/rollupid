@@ -12,6 +12,8 @@ import {
 import { Menu, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
 
+import { getProfileTypeTitle } from '../../utils/profile'
+
 type AddressListItemIconProps = {
   iconUrl: string
 }
@@ -75,7 +77,7 @@ export const AddressListItem = ({
 
         <div className="flex flex-row">
           <Text size="xs" weight="normal" className="text-gray-500 break-all">
-            {type} • {address}
+            {getProfileTypeTitle(type)} • {address}
           </Text>
         </div>
       </section>

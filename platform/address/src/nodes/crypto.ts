@@ -2,14 +2,17 @@ import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
 import type { Scope } from '@proofzero/types/access'
+import { CryptoAddressType } from '@proofzero/types/address'
 
 import { NONCE_OPTIONS } from '../constants'
-import type { Challenge, CryptoAddressProfile } from '../types'
+import type { AddressProfile, Challenge } from '../types'
 import { recoverEthereumAddress } from '../utils'
 
 import { AddressNode } from '.'
 import Address from './address'
 import ENSUtils from '@proofzero/platform-clients/ens-utils'
+
+type CryptoAddressProfile = AddressProfile<CryptoAddressType.ETH>
 
 export default class CryptoAddress {
   declare node: AddressNode
@@ -80,18 +83,13 @@ export default class CryptoAddress {
     if (!address) throw new Error('address not found')
 
     const profile = await getCryptoAddressProfile(address)
+    profile.icon = profile.icon || gradient
 
-    if (!profile.avatar) {
-      profile.avatar = gradient
+    if (profile.title.startsWith('0x') && nickname) {
+      profile.title = nickname
     }
 
-    if (profile.displayName?.startsWith('0x') && nickname) {
-      profile.displayName = nickname
-    }
-
-    if (!profile.displayName) {
-      profile.displayName = address
-    }
+    profile.title = profile.title || address
 
     return profile
   }
@@ -112,14 +110,13 @@ const getCryptoAddressProfile = async (
   address: string
 ): Promise<CryptoAddressProfile> => {
   const ensClient = new ENSUtils()
-  console.log('getCryptoAddressProfile: address', address)
   const { avatar, displayName } = await ensClient.getEnsEntry(address)
 
-  const newProfile: CryptoAddressProfile = {
+  const newProfile = {
     address: address,
-    displayName: displayName || '',
-    avatar: avatar || '',
-    isCrypto: true,
+    title: displayName || '',
+    icon: avatar || '',
+    type: CryptoAddressType.ETH,
   }
 
   return newProfile

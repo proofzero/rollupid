@@ -1,10 +1,11 @@
+import { AddressURNSpace } from '@proofzero/urns/address'
+import type { AddressURN } from '@proofzero/urns/address'
+
 import { List } from '@proofzero/design-system/src/atoms/lists/List'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+
 import type { AddressListItemProps } from './AddressListItem'
 import { AddressListItem } from './AddressListItem'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { AddressURNSpace } from '@proofzero/urns/address'
-
-import type { AddressURN } from '@proofzero/urns/address'
 
 export type AddressListProps = {
   addresses: AddressListItemProps[]

@@ -29,7 +29,7 @@ export default class OAuthAddress {
     return this.node.storage.put('data', data)
   }
 
-  async getProfile<T>(): Promise<T | undefined> {
+  async fetchProfile<T>(): Promise<T | undefined> {
     const address = await this.node.class.getAddress()
     try {
       const response = await fetch(this.getUserInfoURL(), {

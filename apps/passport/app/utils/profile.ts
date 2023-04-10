@@ -4,74 +4,25 @@ import {
   CryptoAddressType,
 } from '@proofzero/types/address'
 
-import { AddressURNSpace } from '@proofzero/urns/address'
-
-export const normalizeProfileToConnection = (profile: any) => {
-  switch (profile.type) {
+export const getProfileTypeTitle = (type: string) => {
+  switch (type) {
     case CryptoAddressType.ETH:
-      return {
-        id: profile.urn,
-        address: profile.address,
-        title: profile.displayName,
-        icon: profile.avatar,
-        type: 'Ethereum',
-      }
-    case OAuthAddressType.Google:
-      return {
-        id: profile.urn,
-        address: profile.email,
-        title: profile.name,
-        icon: profile.picture,
-        type: 'Google',
-      }
-    case OAuthAddressType.Twitter:
-      return {
-        id: profile.urn,
-        address: `@${profile.screen_name}`,
-        title: profile.name,
-        icon: profile.profile_image_url_https,
-        type: 'Twitter',
-      }
-    case OAuthAddressType.GitHub:
-      return {
-        id: profile.urn,
-        address: profile.login,
-        title: profile.name,
-        icon: profile.avatar_url,
-        type: 'GitHub',
-      }
-    case 'microsoft':
-      const address = AddressURNSpace.decode(profile.urn)
-      return {
-        id: profile.urn,
-        address: profile.email,
-        title: profile.name,
-        icon: `/avatars/${address}`,
-        type: 'Microsoft',
-      }
-    case OAuthAddressType.Apple:
-      return {
-        id: profile.urn,
-        address: profile.name,
-        title: profile.name,
-        icon: profile.picture,
-        type: 'Apple',
-      }
-    case OAuthAddressType.Discord:
-      return {
-        id: profile.urn,
-        address: `${profile.username}#${profile.discriminator}`,
-        title: profile.username,
-        icon: `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`,
-        type: 'Discord',
-      }
+      return 'Ethereum'
     case EmailAddressType.Email:
-      return {
-        id: profile.urn,
-        address: profile.email,
-        title: profile.name,
-        icon: profile.picture,
-        type: 'Email',
-      }
+      return 'Email'
+    case OAuthAddressType.Apple:
+      return 'Apple'
+    case OAuthAddressType.Discord:
+      return 'Discord'
+    case OAuthAddressType.GitHub:
+      return 'GitHub'
+    case OAuthAddressType.Google:
+      return 'Google'
+    case OAuthAddressType.Microsoft:
+      return 'Microsoft'
+    case OAuthAddressType.Twitter:
+      return 'Twitter'
+    default:
+      return ''
   }
 }

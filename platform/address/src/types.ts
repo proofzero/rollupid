@@ -1,21 +1,9 @@
 import { z } from 'zod'
 
 import { Scope } from '@proofzero/types/access'
-
-import {
-  AppleOAuthSchema,
-  DiscordOAuthSchema,
-  GithubOAuthSchema,
-  GoogleOAuthSchema,
-  MicrosoftOAuthSchema,
-  OAuthDataSchema,
-  TwitterOAuthSchema,
-} from './jsonrpc/validators/oauth'
-import {
-  CryptoAddressProfileSchema,
-  EmailProfileSchema,
-} from './jsonrpc/validators/profile'
 import { DeploymentMetadata } from '@proofzero/types'
+
+import { OAuthDataSchema } from './jsonrpc/validators/oauth'
 
 export interface Environment {
   Access: Fetcher
@@ -60,27 +48,49 @@ export interface Challenge {
   timestamp: number
 }
 
-export type OAuthGoogleProfile = z.infer<typeof GoogleOAuthSchema>['_json']
-export type OAuthTwitterProfile = z.infer<typeof TwitterOAuthSchema>
-export type OAuthGithubProfile = z.infer<typeof GithubOAuthSchema>['_json']
-export type OAuthMicrosoftProfile = z.infer<
-  typeof MicrosoftOAuthSchema
->['_json']
-export type OAuthAppleProfile = z.infer<typeof AppleOAuthSchema>
-export type OAuthDiscordProfile = z.infer<typeof DiscordOAuthSchema>['__json']
-export type EmailAddressProfile = z.infer<typeof EmailProfileSchema>
-
-export type CryptoAddressProfile = z.infer<typeof CryptoAddressProfileSchema>
-export type AddressProfile =
-  | CryptoAddressProfile
-  | OAuthGoogleProfile
-  | OAuthTwitterProfile
-  | OAuthGithubProfile
-  | OAuthMicrosoftProfile
-  | OAuthAppleProfile
-  | OAuthDiscordProfile
-  | EmailAddressProfile
+export interface AddressProfile<Type = string> {
+  type: Type
+  address: string
+  title: string
+  icon?: string
+}
 
 export type AddressProfiles = AddressProfile[]
 
 export type OAuthData = z.infer<typeof OAuthDataSchema>
+
+export interface GitHubOAuthProfile {
+  login: string
+  name: string
+  avatar_url: string
+}
+
+export interface AppleOAuthProfile {
+  email: string
+  name: string
+  picture: string
+}
+
+export interface DiscordOAuthProfile {
+  id: string
+  username: string
+  discriminator: string
+  avatar: string
+}
+
+export interface GoogleOAuthProfile {
+  email: string
+  name: string
+  picture: string
+}
+
+export interface MicrosoftOAuthProfile {
+  email: string
+  name: string
+}
+
+export interface TwitterOAuthProfile {
+  name: string
+  screen_name: string
+  profile_image_url_https: string
+}

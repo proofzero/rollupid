@@ -40,17 +40,43 @@ import type { FullProfile } from '~/types'
  * for filtering when posting data to the server.
  */
 const normalizeAddressProfile = (ap: AddressProfile) => {
-  switch (ap.profile.__typename) {
-    case 'CryptoAddressProfile':
+  switch (ap.type) {
+    case CryptoAddressType.ETH:
       return {
         addressURN: ap.urn,
         // Some providers can be built on client side
-        address: `https://etherscan.io/address/${ap.profile.address}`,
-        title: ap.profile.displayName,
+        address: `https://etherscan.io/address/${ap.address}`,
+        title: ap.title,
         icon: imageFromAddressType(CryptoAddressType.ETH),
         provider: CryptoAddressType.ETH,
       }
-    case 'OAuthGoogleProfile':
+    case OAuthAddressType.Apple:
+      return {
+        addressURN: ap.urn,
+        address: '',
+        title: 'Apple',
+        icon: imageFromAddressType(OAuthAddressType.Apple),
+        provider: OAuthAddressType.Apple,
+      }
+    case OAuthAddressType.Discord:
+      return {
+        addressURN: ap.urn,
+        address: '',
+        title: 'Discord',
+        icon: imageFromAddressType(OAuthAddressType.Discord),
+        provider: OAuthAddressType.Discord,
+      }
+    case OAuthAddressType.GitHub:
+      return {
+        addressURN: ap.urn,
+        // Some providers give us public
+        // endpoints
+        address: ap.address,
+        title: 'GitHub',
+        icon: imageFromAddressType(OAuthAddressType.GitHub),
+        provider: OAuthAddressType.GitHub,
+      }
+    case OAuthAddressType.Google:
       return {
         addressURN: ap.urn,
         // Some providers don't have an address
@@ -60,25 +86,7 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
         icon: imageFromAddressType(OAuthAddressType.Google),
         provider: OAuthAddressType.Google,
       }
-    case 'OAuthTwitterProfile':
-      return {
-        addressURN: ap.urn,
-        address: `https://twitter.com/${ap.profile.screen_name}`,
-        title: 'Twitter',
-        icon: ap.profile.profile_image_url_https,
-        provider: OAuthAddressType.Twitter,
-      }
-    case 'OAuthGithubProfile':
-      return {
-        addressURN: ap.urn,
-        // Some providers give us public
-        // endpoints
-        address: ap.profile.html_url,
-        title: 'GitHub',
-        icon: imageFromAddressType(OAuthAddressType.GitHub),
-        provider: OAuthAddressType.GitHub,
-      }
-    case 'OAuthMicrosoftProfile':
+    case OAuthAddressType.Microsoft:
       return {
         addressURN: ap.urn,
         address: '',
@@ -86,21 +94,13 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
         icon: imageFromAddressType(OAuthAddressType.Microsoft),
         provider: OAuthAddressType.Microsoft,
       }
-    case 'OAuthAppleProfile':
+    case OAuthAddressType.Twitter:
       return {
         addressURN: ap.urn,
-        address: '',
-        title: 'Apple',
-        icon: imageFromAddressType(OAuthAddressType.Apple),
-        provider: OAuthAddressType.Apple,
-      }
-    case 'OAuthDiscordProfile':
-      return {
-        addressURN: ap.urn,
-        address: '',
-        title: 'Discord',
-        icon: imageFromAddressType(OAuthAddressType.Discord),
-        provider: OAuthAddressType.Discord,
+        address: `https://twitter.com/${ap.address}`,
+        title: 'Twitter',
+        icon: ap.icon,
+        provider: OAuthAddressType.Twitter,
       }
   }
 }
@@ -204,7 +204,7 @@ const SortableLink = ({
   return (
     <div
       className="
-          flex flex-row 
+          flex flex-row
           sm:flex-col sm:w-full sm:justify-start sm:items-end
           mb-4 py-3 px-4 sm:px-3 truncate
           rounded-md border border-gray-300 "
@@ -425,7 +425,7 @@ export default function AccountSettingsLinks() {
         }}
       >
         <div
-          className="flex flex-col 
+          className="flex flex-col
         w-screen -mx-4 sm:w-full sm:mx-0"
         >
           {/* Links that are already in account DO */}
@@ -477,9 +477,9 @@ export default function AccountSettingsLinks() {
             </Button>
           </div>
         </div>
-        {/* Form where this button is used should have 
+        {/* Form where this button is used should have
           an absolute relative position
-          div below has relative - this way this button sticks to 
+          div below has relative - this way this button sticks to
           bottom right
 
           This div with h-[4rem] prevents everything from overlapping with
