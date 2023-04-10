@@ -206,57 +206,65 @@ const DisconnectModal = ({
     type: string
   }
   primaryAddressURN: AddressURN
-}) => (
-  <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
-    <div
-      className={`min-w-[437px] relative transform rounded-lg  bg-white px-4 pt-5 pb-4
+}) => {
+  console.log({ id, primaryAddressURN })
+
+  return (
+    <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
+      <div
+        className={`min-w-[437px] relative transform rounded-lg  bg-white px-4 pt-5 pb-4
          text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
-    >
-      <div className=" flex items-start space-x-4">
-        <img src={warn} alt="Not Found" />
+      >
+        <div className=" flex items-start space-x-4">
+          <img src={warn} alt="Not Found" />
 
-        <div className="flex-1">
-          <Text size="lg" weight="medium" className="text-gray-900 my-1">
-            Disconnect account
-          </Text>
-
-          {primaryAddressURN !== id ? (
-            <Text size="sm" weight="normal" className="text-gray-500 my-7">
-              Are you sure you want to disconnect {data.type} account
-              {data.title && (
-                <>
-                  <span className="text-gray-800"> "{data.title}" </span>
-                </>
-              )}
-              from Rollup? You might lose access to some functionality.
+          <div className="flex-1">
+            <Text size="lg" weight="medium" className="text-gray-900 my-1">
+              Disconnect account
             </Text>
-          ) : (
-            <Text size="sm" weight="normal" className="text-gray-500 my-7">
-              It looks like you are trying to disconnect your primary account.
-              You need to set another account as primary to be able to
-              disconnect this one.
-            </Text>
-          )}
-          <fetcher.Form method="post" action="/settings/accounts/disconnect">
-            <input type="hidden" name="id" value={id} />
 
-            <div className="flex justify-end items-center space-x-3 mt-7">
-              <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
-                Cancel
-              </Button>
+            {primaryAddressURN !== id ? (
+              <Text size="sm" weight="normal" className="text-gray-500 my-7">
+                Are you sure you want to disconnect {data.type} account
+                {data.title && (
+                  <>
+                    <span className="text-gray-800"> "{data.title}" </span>
+                  </>
+                )}
+                from Rollup? You might lose access to some functionality.
+              </Text>
+            ) : (
+              <Text size="sm" weight="normal" className="text-gray-500 my-7">
+                It looks like you are trying to disconnect your primary account.
+                You need to set another account as primary to be able to
+                disconnect this one.
+              </Text>
+            )}
+            <fetcher.Form method="post" action="/settings/accounts/disconnect">
+              <input type="hidden" name="id" value={id} />
+              <input type="hidden" name="id" value={primaryAddressURN} />
 
-              {primaryAddressURN !== id && (
-                <Button type="submit" btnType="dangerous">
-                  Disconnect
+              <div className="flex justify-end items-center space-x-3 mt-7">
+                <Button
+                  btnType="secondary-alt"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Cancel
                 </Button>
-              )}
-            </div>
-          </fetcher.Form>
+
+                {primaryAddressURN !== id && (
+                  <Button type="submit" btnType="dangerous">
+                    Disconnect
+                  </Button>
+                )}
+              </div>
+            </fetcher.Form>
+          </div>
         </div>
       </div>
-    </div>
-  </Modal>
-)
+    </Modal>
+  )
+}
 
 export default function AccountsLayout() {
   const { reqUrlError } = useLoaderData()
