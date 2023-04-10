@@ -170,7 +170,7 @@ export async function createConsoleParamsSession(
     throw new Error('Missing clientId in consoleParams')
   }
 
-  let redirectURL = `/authenticate/${consoleParams.clientId}`
+  let redirectURL = `/authenticate/${consoleParams.clientId}/account`
   if (consoleParams.prompt) {
     qp.append('prompt', consoleParams.prompt)
     redirectURL += `?${qp.toString()}`
@@ -290,7 +290,7 @@ export async function getValidatedSessionContext(
     }
   } catch (error) {
     // TODO: Revise this logic
-    const redirectTo = `/authenticate/${consoleParams?.clientId ?? ''}`
+    const redirectTo = `/authenticate/${consoleParams?.clientId ?? ''}/account`
     if (error === InvalidTokenError)
       if (consoleParams.clientId)
         throw await createConsoleParamsSession(consoleParams, env)

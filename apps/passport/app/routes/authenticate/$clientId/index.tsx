@@ -1,7 +1,5 @@
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { Profile } from '@proofzero/platform/account/src/types'
 import {
   Form,
   useLoaderData,
@@ -11,7 +9,7 @@ import {
   useTransition,
 } from '@remix-run/react'
 import { useEffect, useState } from 'react'
-import { HiCheck, HiOutlineMail } from 'react-icons/hi'
+import { HiOutlineMail } from 'react-icons/hi'
 import { Authentication, ConnectButton } from '~/components'
 import ConnectOAuthButton from '~/components/connect-oauth-button'
 import {
@@ -73,12 +71,11 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 }
 
 export default () => {
-  const { appProps, profile } = useOutletContext<{
+  const { appProps } = useOutletContext<{
     appProps?: {
       name: string
       iconURL: string
     }
-    profile?: Required<Profile>
   }>()
 
   const { clientId, displayDict } = useLoaderData()
