@@ -5,6 +5,7 @@ import { initAccountNodeByName } from '../../nodes'
 import { appRouter } from '../router'
 import { ProfileSchema } from '../validators/profile'
 import { Node } from '../../../../edges/src/jsonrpc/validators/node'
+import { AddressURN } from '@proofzero/urns/address'
 
 export const GetProfileInput = z.object({
   account: inputValidators.AccountURNInput,
@@ -40,6 +41,17 @@ export const getProfileMethod = async ({
     getAddressesCall({ account: input.account }),
   ])
   if (!profile) return null
+  if (!profile.primaryAddressURN) {
+    const caller = appRouter.createCaller(ctx)
+    await caller.setProfile({
+      name: input.account,
+      profile: {
+        ...profile,
+        primaryAddressURN: addresses[addresses.length - 1]
+          .baseUrn as AddressURN,
+      },
+    })
+  }
 
   return { ...profile, addresses }
 }
