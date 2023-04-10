@@ -46,9 +46,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
   }
 
+  const showGoBack = url.searchParams.get('prompt') === 'connect'
+
   return json({
     clientId: params.clientId,
     displayDict,
+    showGoBack,
   })
 }
 
@@ -78,7 +81,7 @@ export default () => {
     }
   }>()
 
-  const { clientId, displayDict } = useLoaderData()
+  const { clientId, displayDict, showGoBack } = useLoaderData()
 
   const [signData, setSignData] = useState<{
     nonce: string | undefined
@@ -111,7 +114,7 @@ export default () => {
     <>
       {transition.state !== 'idle' && <Loader />}
 
-      <Authentication logoURL={iconURL} appName={name}>
+      <Authentication logoURL={iconURL} appName={name} showGoBack={showGoBack}>
         <>
           {displayDict.wallet && (
             <ConnectButton

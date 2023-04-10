@@ -3,49 +3,63 @@ import subtractLogo from '../../assets/subtract-logo.svg'
 
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/design-system'
+import { HiOutlineArrowLeft } from 'react-icons/hi'
 
 export type AuthenticationProps = {
   logoURL?: string
   appName?: string
+  showGoBack?: boolean
   children: JSX.Element
 }
 
 export function Authentication({
   logoURL,
   appName,
+  showGoBack = false,
   children,
 }: AuthenticationProps) {
   const logo = logoURL || circleLogo
   return (
-    <div
-      className={
-        'flex shrink flex-col items-center justify-center gap-4 mx-auto bg-white p-6 h-[100dvh] lg:h-[675px] lg:max-h-[100dvh] w-full lg:w-[418px] lg:border-rounded-lg'
-      }
-      style={{
-        border: '1px solid #D1D5DB',
-        boxSizing: 'border-box',
-      }}
-    >
-      <Avatar src={logo} size="sm"></Avatar>
-      <div className={'flex flex-col items-center gap-2'}>
-        <h1 className={'font-semibold text-xl'}>
-          {appName ? `Login to ${appName}` : 'Welcome to the Private Web'}
-        </h1>
-        <h2 style={{ color: '#6B7280' }} className={'font-medium text-base'}>
-          How would you like to continue?
-        </h2>
-      </div>
+    <div className="relative">
+      {showGoBack && (
+        <div className="relative mx-auto w-full lg:w-[418px]">
+          <HiOutlineArrowLeft
+            className="absolute left-6 top-6 w-6 h-6 cursor-pointer z-10"
+            onClick={() => history.back()}
+          />
+        </div>
+      )}
 
-      {children}
+      <div
+        className={
+          'relative flex shrink flex-col items-center justify-center gap-4 mx-auto bg-white p-6 h-[100dvh] lg:h-[675px] lg:max-h-[100dvh] w-full lg:w-[418px] lg:border-rounded-lg'
+        }
+        style={{
+          border: '1px solid #D1D5DB',
+          boxSizing: 'border-box',
+        }}
+      >
+        <Avatar src={logo} size="sm"></Avatar>
+        <div className={'flex flex-col items-center gap-2'}>
+          <h1 className={'font-semibold text-xl'}>
+            {appName ? `Login to ${appName}` : 'Welcome to the Private Web'}
+          </h1>
+          <h2 style={{ color: '#6B7280' }} className={'font-medium text-base'}>
+            How would you like to continue?
+          </h2>
+        </div>
 
-      <div className="mt-14 flex justify-center items-center space-x-2">
-        <img src={subtractLogo} alt="powered by rollup.id" />
-        <Text size="xs" weight="normal" className="text-gray-400">
-          Powered by{' '}
-          <a href="https://rollup.id" className="hover:underline">
-            rollup.id
-          </a>
-        </Text>
+        {children}
+
+        <div className="mt-14 flex justify-center items-center space-x-2">
+          <img src={subtractLogo} alt="powered by rollup.id" />
+          <Text size="xs" weight="normal" className="text-gray-400">
+            Powered by{' '}
+            <a href="https://rollup.id" className="hover:underline">
+              rollup.id
+            </a>
+          </Text>
+        </div>
       </div>
     </div>
   )
