@@ -393,9 +393,23 @@ export default function Authorize() {
                         <div className="w-full">
                           <EmailSelect
                             items={connectedEmails}
-                            enableNone={connectedEmails.length === 0}
-                            enableAddNew={connectedEmails.length > 0}
+                            enableAddNew={true}
                             onSelect={(selected: EmailSelectListItem) => {
+                              if (selected?.type === OptionType.AddNew) {
+                                const qp = new URLSearchParams()
+                                qp.append('scope', requestedScope.join(' '))
+                                qp.append('state', state)
+                                qp.append('client_id', clientId)
+                                qp.append('redirect_uri', redirectOverride)
+                                qp.append('prompt', 'connect')
+                                qp.append(
+                                  'login_hint',
+                                  'email,microsoft,google'
+                                )
+
+                                return navigate(`/authorize/?${qp.toString()}`)
+                              }
+
                               setSelectedEmail(selected)
                             }}
                           />
@@ -451,24 +465,12 @@ export default function Authorize() {
             <Button
               btnSize="xl"
               btnType="primary-alt"
+              disabled={
+                requestedScope.includes('email') &&
+                (!connectedEmails?.length || !selectedEmail)
+              }
               onClick={() => {
-                if (
-                  requestedScope.includes('email') &&
-                  (!connectedEmails?.length ||
-                    selectedEmail?.type === OptionType.AddNew)
-                ) {
-                  const qp = new URLSearchParams()
-                  qp.append('scope', requestedScope.join(' '))
-                  qp.append('state', state)
-                  qp.append('client_id', clientId)
-                  qp.append('redirect_uri', redirectOverride)
-                  qp.append('prompt', 'connect')
-                  qp.append('login_hint', 'email,microsoft,google')
-
-                  navigate(`/authorize/?${qp.toString()}`)
-                } else {
-                  authorizeCallback(requestedScope)
-                }
+                authorizeCallback(requestedScope)
               }}
             >
               Continue

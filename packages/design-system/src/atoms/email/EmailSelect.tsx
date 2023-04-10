@@ -14,7 +14,6 @@ import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/micr
 
 import { OptionType } from '@proofzero/utils/getNormalisedConnectedEmails'
 
-import type { AddressURN } from '@proofzero/urns/address'
 import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
 
 type EmailSelectProps = {
@@ -44,13 +43,11 @@ export const EmailSelect = ({
       onChange={(selected) => {
         setSelected(selected)
       }}
-      disabled={items.length === 0}
       by="email"
     >
       {({ open }) => (
         <div className="relative bg-white">
           <Listbox.Button
-            disabled={items.length === 0}
             className={`border shadow-sm rounded-lg w-full transition-transform
             flex flex-row space-between items-center py-2 px-3 ${
               items.length === 0
@@ -62,13 +59,11 @@ export const EmailSelect = ({
             <Text size="sm" className="bg-white flex-1 text-left text-gray-800">
               {selected?.email ?? 'None'}
             </Text>
-            {items.length !== 0 ? (
-              open ? (
-                <ChevronDownIcon className="w-5 h-5 rotate-180" />
-              ) : (
-                <ChevronDownIcon className="w-5 h-5" />
-              )
-            ) : null}
+            {open ? (
+              <ChevronDownIcon className="w-5 h-5 rotate-180" />
+            ) : (
+              <ChevronDownIcon className="w-5 h-5" />
+            )}
           </Listbox.Button>
 
           <Transition
