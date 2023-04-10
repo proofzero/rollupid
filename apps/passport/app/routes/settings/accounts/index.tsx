@@ -207,8 +207,6 @@ const DisconnectModal = ({
   }
   primaryAddressURN: AddressURN
 }) => {
-  console.log({ id, primaryAddressURN })
-
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div
@@ -222,7 +220,6 @@ const DisconnectModal = ({
             <Text size="lg" weight="medium" className="text-gray-900 my-1">
               Disconnect account
             </Text>
-
             {primaryAddressURN !== id ? (
               <Text size="sm" weight="normal" className="text-gray-500 my-7">
                 Are you sure you want to disconnect {data.type} account
@@ -242,7 +239,6 @@ const DisconnectModal = ({
             )}
             <fetcher.Form method="post" action="/settings/accounts/disconnect">
               <input type="hidden" name="id" value={id} />
-              <input type="hidden" name="id" value={primaryAddressURN} />
 
               <div className="flex justify-end items-center space-x-3 mt-7">
                 <Button
