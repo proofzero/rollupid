@@ -38,7 +38,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const loginHint = url.searchParams.get('login_hint')
   if (loginHint) {
-    const hints = new Set(loginHint.split(','))
+    const hints = new Set(loginHint.split(' '))
     for (const key of Object.keys(displayDict)) {
       if (!hints.has(key)) {
         displayDict[key] = false
