@@ -32,6 +32,8 @@ import warn from '~/assets/warning.svg'
 import { getValidatedSessionContext } from '~/session.server'
 import { setNewPrimaryAddress } from '~/utils/authenticate.server'
 import type { AddressURN } from '@proofzero/urns/address'
+import { RollupError } from '@proofzero/errors'
+import { ERROR_CODES } from '@proofzero/errors'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const reqUrl = new URL(request.url)
@@ -50,21 +52,28 @@ export const action: ActionFunction = async ({ request, context }) => {
     context.traceSpan
   )
 
-  const formData = await request.formData()
-  const primaryAddress = JSON.parse(formData.get('primaryAddress') as string)
+  try {
+    const formData = await request.formData()
+    const primaryAddress = JSON.parse(formData.get('primaryAddress') as string)
 
-  if (primaryAddress) {
-    await setNewPrimaryAddress(
-      jwt,
-      context.env,
-      context.traceSpan,
-      primaryAddress.id,
-      primaryAddress.icon,
-      primaryAddress.title
-    )
+    if (primaryAddress) {
+      await setNewPrimaryAddress(
+        jwt,
+        context.env,
+        context.traceSpan,
+        primaryAddress.id,
+        primaryAddress.icon,
+        primaryAddress.title
+      )
+    }
+
+    return null
+  } catch (e) {
+    throw new RollupError({
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      message: 'Failed to set new primary address',
+    })
   }
-
-  return null
 }
 
 const distinctProfiles = (connectedProfiles: any[]) => {
@@ -224,8 +233,8 @@ const DisconnectModal = ({
           ) : (
             <Text size="sm" weight="normal" className="text-gray-500 my-7">
               It looks like you are trying to disconnect your primary account.
-              You need to set another account primary to be able to disconnect
-              this one.
+              You need to set another account as primary to be able to
+              disconnect this one.
             </Text>
           )}
           <fetcher.Form method="post" action="/settings/accounts/disconnect">
