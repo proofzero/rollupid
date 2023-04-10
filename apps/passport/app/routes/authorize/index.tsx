@@ -262,7 +262,12 @@ export const action: ActionFunction = async ({ request, context }) => {
     state: authorizeRes.state,
   })
 
-  return redirect(`${redirectUri}?${redirectParams}`)
+  const redirectUrl = new URL(redirectUri)
+  for (const [key, value] of redirectParams) {
+    redirectUrl.searchParams.set(key, value)
+  }
+
+  return redirect(`${redirectUrl}`)
 }
 
 const scopeIcons: Record<string, string> = {

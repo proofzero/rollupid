@@ -170,11 +170,14 @@ export async function createConsoleParamsSession(
     throw new Error('Missing clientId in consoleParams')
   }
 
-  let redirectURL = `/authenticate/${consoleParams.clientId}/account`
+  let redirectURL = `/authenticate/${consoleParams.clientId}${
+    consoleParams.prompt === 'connect' ? `` : `/account`
+  }`
+
   if (consoleParams.prompt) {
     qp.append('prompt', consoleParams.prompt)
-    redirectURL += `?${qp.toString()}`
   }
+  redirectURL += `?${qp.toString()}`
 
   const headers = new Headers()
   headers.append(

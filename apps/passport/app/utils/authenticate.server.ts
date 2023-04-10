@@ -45,7 +45,9 @@ export const authenticateAddress = async (
       appData.redirectUri += '?error=ALREADY_CONNECTED'
     }
 
-    return redirect(getRedirectURL(appData))
+    return redirect(
+      getRedirectURL(appData, existing ? `ALREADY_CONNECTED` : null)
+    )
   }
 
   try {
@@ -84,7 +86,7 @@ export const authenticateAddress = async (
   }
 }
 
-const getRedirectURL = (appData: AppData) => {
+const getRedirectURL = (appData: AppData, error?: string | null) => {
   let redirectURL = '/authorize'
   const authAppId = appData.clientId
   const authRedirectUri = appData.redirectUri
@@ -96,6 +98,10 @@ const getRedirectURL = (appData: AppData) => {
     state: authState,
     scope: authScope.join(' '),
   })
+
+  if (error) {
+    urlParams.append('error', error)
+  }
 
   redirectURL += `?${urlParams}`
 
