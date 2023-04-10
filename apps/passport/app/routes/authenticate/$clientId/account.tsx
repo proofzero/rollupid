@@ -66,7 +66,7 @@ export default () => {
   const submit = useSubmit()
 
   return (
-    <Authentication logoURL={appProps.iconURL} appName={appProps.name}>
+    <Authentication logoURL={appProps?.iconURL} appName={appProps?.name}>
       <>
         <AuthButton
           onClick={() => {

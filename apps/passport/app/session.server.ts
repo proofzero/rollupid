@@ -293,7 +293,7 @@ export async function getValidatedSessionContext(
     }
   } catch (error) {
     // TODO: Revise this logic
-    const redirectTo = `/authenticate/${consoleParams?.clientId ?? ''}/account`
+    const redirectTo = `/authenticate/${consoleParams?.clientId}`
     if (error === InvalidTokenError)
       if (consoleParams.clientId)
         throw await createConsoleParamsSession(consoleParams, env)

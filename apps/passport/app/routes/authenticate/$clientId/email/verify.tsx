@@ -137,7 +137,7 @@ export default () => {
           )
         }}
         goBack={() => history.back()}
-        onCancel={() => navigate(`/authenticate/${clientId}/account`)}
+        onCancel={() => navigate(`/authenticate/${clientId}`)}
       >
         {errorMessage ? (
           <Text
