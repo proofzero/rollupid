@@ -25,6 +25,7 @@ export const setProfileMethod = async ({
   const qcomps = {
     name: input.profile.displayName,
     picture: input.profile.pfp?.image,
+    primaryAddressURN: input.profile?.primaryAddressURN,
   }
   if (ctx.accountURN) {
     const enhancedUrn = AccountURNSpace.componentizedUrn(

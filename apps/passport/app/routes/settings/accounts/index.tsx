@@ -3,6 +3,7 @@ import {
   useLoaderData,
   useFetcher,
   useNavigate,
+  useSubmit,
 } from '@remix-run/react'
 
 import { useState, useEffect } from 'react'
@@ -13,6 +14,8 @@ import { Button } from '@proofzero/design-system'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 
+import { TbCrown } from 'react-icons/tb'
+
 import { AddressList } from '~/components/addresses/AddressList'
 import InputText from '~/components/inputs/InputText'
 
@@ -21,11 +24,16 @@ import { normalizeProfileToConnection } from '~/utils/profile'
 import { NodeType } from '@proofzero/types/address'
 
 import type { FetcherWithComponents } from '@remix-run/react'
-import type { LoaderFunction } from '@remix-run/cloudflare'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import type { AddressListProps } from '~/components/addresses/AddressList'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 
 import warn from '~/assets/warning.svg'
+import { getValidatedSessionContext } from '~/session.server'
+import { setNewPrimaryAddress } from '~/utils/authenticate.server'
+import type { AddressURN } from '@proofzero/urns/address'
+import { RollupError } from '@proofzero/errors'
+import { ERROR_CODES } from '@proofzero/errors'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const reqUrl = new URL(request.url)
@@ -33,6 +41,38 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   return {
     reqUrlError,
+  }
+}
+
+export const action: ActionFunction = async ({ request, context }) => {
+  const { jwt } = await getValidatedSessionContext(
+    request,
+    context.consoleParams,
+    context.env,
+    context.traceSpan
+  )
+
+  try {
+    const formData = await request.formData()
+    const primaryAddress = JSON.parse(formData.get('primaryAddress') as string)
+
+    if (primaryAddress) {
+      await setNewPrimaryAddress(
+        jwt,
+        context.env,
+        context.traceSpan,
+        primaryAddress.id,
+        primaryAddress.icon,
+        primaryAddress.title
+      )
+    }
+
+    return null
+  } catch (e) {
+    throw new RollupError({
+      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+      message: 'Failed to set new primary address',
+    })
   }
 }
 
@@ -129,7 +169,7 @@ const RenameModal = ({
           required
           heading=""
           name="name"
-          disabled={data.title && data.title.endsWith('.eth')}
+          disabled={data.title && data.title.endsWith('.eth') ? true : false}
           defaultValue={data.title ?? ''}
         />
         <Text size="xs" weight="normal" className="text-gray-500 mt-2">
@@ -155,6 +195,7 @@ const DisconnectModal = ({
   setIsOpen,
   id,
   data,
+  primaryAddressURN,
 }: {
   fetcher: FetcherWithComponents<any>
   isOpen: boolean
@@ -164,54 +205,71 @@ const DisconnectModal = ({
     title: string
     type: string
   }
-}) => (
-  <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
-    <div
-      className={`min-w-[437px] relative transform rounded-lg  bg-white px-4 pt-5 pb-4
+  primaryAddressURN: AddressURN
+}) => {
+  return (
+    <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
+      <div
+        className={`min-w-[437px] relative transform rounded-lg  bg-white px-4 pt-5 pb-4
          text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
-    >
-      <div className=" flex items-start space-x-4">
-        <img src={warn} alt="Not Found" />
+      >
+        <div className=" flex items-start space-x-4">
+          <img src={warn} alt="Not Found" />
 
-        <div className="flex-1">
-          <Text size="lg" weight="medium" className="text-gray-900 my-1">
-            Disconnect account
-          </Text>
-
-          <Text size="sm" weight="normal" className="text-gray-500 my-7">
-            Are you sure you want to disconnect {data.type} account
-            {data.title && (
-              <>
-                "<span className="text-gray-800">{data.title}</span>"
-              </>
+          <div className="flex-1">
+            <Text size="lg" weight="medium" className="text-gray-900 my-1">
+              Disconnect account
+            </Text>
+            {primaryAddressURN !== id ? (
+              <Text size="sm" weight="normal" className="text-gray-500 my-7">
+                Are you sure you want to disconnect {data.type} account
+                {data.title && (
+                  <>
+                    <span className="text-gray-800"> "{data.title}" </span>
+                  </>
+                )}
+                from Rollup? You might lose access to some functionality.
+              </Text>
+            ) : (
+              <Text size="sm" weight="normal" className="text-gray-500 my-7">
+                It looks like you are trying to disconnect your primary account.
+                You need to set another account as primary to be able to
+                disconnect this one.
+              </Text>
             )}
-            from Rollup? You might lose access to some functionality.
-          </Text>
+            <fetcher.Form method="post" action="/settings/accounts/disconnect">
+              <input type="hidden" name="id" value={id} />
 
-          <fetcher.Form method="post" action="/settings/accounts/disconnect">
-            <input type="hidden" name="id" value={id} />
+              <div className="flex justify-end items-center space-x-3 mt-7">
+                <Button
+                  btnType="secondary-alt"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Cancel
+                </Button>
 
-            <div className="flex justify-end items-center space-x-3 mt-7">
-              <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
-                Cancel
-              </Button>
-
-              <Button type="submit" btnType="dangerous">
-                Disconnect
-              </Button>
-            </div>
-          </fetcher.Form>
+                {primaryAddressURN !== id && (
+                  <Button type="submit" btnType="dangerous">
+                    Disconnect
+                  </Button>
+                )}
+              </div>
+            </fetcher.Form>
+          </div>
         </div>
       </div>
-    </div>
-  </Modal>
-)
+    </Modal>
+  )
+}
 
 export default function AccountsLayout() {
   const { reqUrlError } = useLoaderData()
 
-  const { connectedProfiles } = useOutletContext<{
+  const submit = useSubmit()
+
+  const { connectedProfiles, primaryAddressURN } = useOutletContext<{
     connectedProfiles: any[]
+    primaryAddressURN: AddressURN
   }>()
 
   const {
@@ -221,6 +279,11 @@ export default function AccountsLayout() {
     emailProfiles,
     addressCount,
   } = distinctProfiles(connectedProfiles)
+
+  const connectedAddresses = cryptoProfiles.addresses
+    .concat(vaultProfiles.addresses)
+    .concat(oAuthProfiles.addresses)
+    .concat(emailProfiles.addresses)
 
   const navigate = useNavigate()
 
@@ -260,11 +323,9 @@ export default function AccountsLayout() {
   }, [reqUrlError])
 
   useEffect(() => {
-    const selectedProfile = cryptoProfiles.addresses
-      .concat(vaultProfiles.addresses)
-      .concat(oAuthProfiles.addresses)
-      .concat(emailProfiles.addresses)
-      .find((p: any) => p.id === actionId)
+    const selectedProfile = connectedAddresses.find(
+      (p: any) => p.id === actionId
+    )
 
     setActionProfile(selectedProfile)
   }, [actionId])
@@ -312,11 +373,11 @@ export default function AccountsLayout() {
 
   return (
     <section>
-      <Text size="xl" weight="bold" className="my-4 text-gray-900">
-        Accounts
-      </Text>
-      {loading && <Loader />}
-      <div className="flex flex-row-reverse mt-7">
+      <div className="my-4 text-gray-900 flex flex-row justify-between">
+        <Text size="xl" weight="bold">
+          Accounts
+        </Text>
+
         <Button
           onClick={() => {
             requestConnectAccount()
@@ -326,6 +387,18 @@ export default function AccountsLayout() {
           Connect Account
         </Button>
       </div>
+      <div className="flex flex-col mb-6">
+        <div className="flex flex-row justify-start">
+          <div className="bg-gray-100 h-[16px] px-2 mx-2 rounded-xl">
+            <TbCrown className="text-yellow-500" />
+          </div>
+          <Text size="sm" weight="normal" className="text-gray-500">
+            Primary account drives which name and picture is shared with
+            authorised applications
+          </Text>
+        </div>
+      </div>
+      {loading && <Loader />}
 
       <div className="mt-1">
         <Text size="sm" weight="normal" className="text-gray-500 mb-4">
@@ -348,11 +421,21 @@ export default function AccountsLayout() {
               setIsOpen={setDisconnectModalOpen}
               id={actionId}
               data={actionProfile}
+              primaryAddressURN={primaryAddressURN}
             />
           </>
         )}
 
         <AddressList
+          primaryAddressURN={primaryAddressURN}
+          onSetPrimary={(id: string) => {
+            const form = new FormData()
+            form.set(
+              'primaryAddress',
+              JSON.stringify(connectedAddresses.find((p) => p.id === id))
+            )
+            submit(form, { method: 'post', action: '/settings/accounts' })
+          }}
           addresses={cryptoProfiles.addresses
             .map((ap: AddressListItemProps) => ({
               ...ap,
@@ -395,6 +478,7 @@ export default function AccountsLayout() {
         </Text>
 
         <AddressList
+          primaryAddressURN={primaryAddressURN}
           addresses={vaultProfiles.addresses.map(
             (ap: AddressListItemProps) => ({
               ...ap,

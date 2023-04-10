@@ -235,9 +235,39 @@ const provisionProfile = async (
     // set the default profile
     await accountClient.setProfile.mutate({
       name: account,
-      profile: newProfile,
+      profile: { ...newProfile, primaryAddressURN: address },
     })
   } else {
     console.log(`Profile for account ${account} found. Continuing...`)
+  }
+}
+
+export const setNewPrimaryAddress = async (
+  jwt: string,
+  env: Env,
+  traceSpan: TraceSpan,
+  newPrimaryAddress: AddressURN,
+  pfp: string,
+  displayName: string
+) => {
+  const accountClient = getAccountClient(jwt, env, traceSpan)
+  const parsedJWT = parseJwt(jwt)
+  const account = parsedJWT.sub as AccountURN
+
+  const profile = await accountClient.getProfile.query({
+    account,
+  })
+
+  // Update the profile with the new primary address if it exists
+
+  if (profile) {
+    await accountClient.setProfile.mutate({
+      name: account,
+      profile: {
+        displayName: displayName,
+        pfp: { ...profile.pfp, image: pfp },
+        primaryAddressURN: newPrimaryAddress,
+      },
+    })
   }
 }

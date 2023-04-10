@@ -10,6 +10,7 @@ import {
   AddressURNInput,
 } from '@proofzero/platform-middleware/inputValidators'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import { ERROR_CODES, RollupError } from '@proofzero/errors'
 
 export const UnsetAccountInput = AccountURNInput
 
@@ -37,6 +38,19 @@ export const unsetAccountMethod = async ({
   )
   const nodeClient = ctx.address
 
+  const accountEdge = await edgesClient.findNode.query({
+    baseUrn: input,
+  })
+
+  const primaryAddressURN = accountEdge?.qc.primaryAddressURN
+
+  if (primaryAddressURN === ctx.addressURN) {
+    throw new RollupError({
+      code: ERROR_CODES.BAD_REQUEST,
+      message: 'Cannot disconnect primary address',
+    })
+  }
+
   // Get the address associated with the authorization header included in the request.
   const address = ctx.addressURN as AddressURN
 
@@ -45,15 +59,17 @@ export const unsetAccountMethod = async ({
     throw new Error('Invalid account URN')
   }
 
-  // Remove the stored account in the node.
-  await nodeClient?.class.unsetAccount()
+  await Promise.all([
+    // Remove the stored account in the node.
+    nodeClient?.class.unsetAccount(),
 
-  // Unlink the address and account nodes, removing the "account" edge.
-  await edgesClient.removeEdge.mutate({
-    src: account,
-    dst: address,
-    tag: EDGE_ADDRESS,
-  })
+    // Unlink the address and account nodes, removing the "account" edge.
+    edgesClient.removeEdge.mutate({
+      src: account,
+      dst: address,
+      tag: EDGE_ADDRESS,
+    }),
+  ])
 
   return {
     unset: {

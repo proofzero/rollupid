@@ -15,12 +15,10 @@ export default {
 
 const addresses: AddressListItemProps[] = [
   {
-    id: '1',
+    id: 'urn:rollupid:address/1',
     title: 'Ondrej.eth',
     icon: blue,
-    wallet: 'Metamask',
-    network: 'Ethereum',
-    chain: 'Mainnet',
+    type: 'Ethereum',
     address: '0x3c153bE191088a34bAc04013b511EF538718d645',
     primary: true,
     onRenameAccount: (id) => {},
@@ -30,29 +28,30 @@ const addresses: AddressListItemProps[] = [
     onDisconnect: (id) => {},
   },
   {
-    id: '2',
+    id: 'urn:rollupid:address/2',
     title: 'Account 2',
     icon: gray,
-    wallet: 'Metamask',
-    network: 'Ethereum',
-    chain: 'Mainnet',
+    type: 'Ethereum',
     address: '0x2062dDb9924991c5CfB6af89A12FB4F405965d3d',
     onRenameAccount: (id) => {},
     onChangeAvatar: (id) => {},
     onDisconnect: (id) => {},
   },
   {
-    id: '3',
+    id: 'urn:rollupid:address/3',
     title: 'Account 3',
     icon: green,
-    wallet: 'Metamask',
-    network: 'Polygon',
-    chain: 'Mainnet',
+    type: 'Ethereum',
     address: '0x012AC2a88F9244f004255b29AFCD349beE097B48',
     hidden: true,
   },
 ]
 
-const Template = () => <AddressList addresses={addresses} />
+const Template = () => (
+  <AddressList
+    addresses={addresses}
+    primaryAddressURN="urn:rollupid:address/1"
+  />
+)
 
 export const Default = Template.bind({})

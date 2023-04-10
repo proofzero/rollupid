@@ -96,6 +96,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     authorizedApps: authorizedApps,
     connectedProfiles: normalizedConnectedProfiles,
     CONSOLE_URL: context.env.CONSOLE_APP_URL,
+    primaryAddressURN: accountProfile?.primaryAddressURN,
   })
 }
 
@@ -112,6 +113,7 @@ export default function SettingsLayout() {
     pfpUrl,
     CONSOLE_URL,
     displayName,
+    primaryAddressURN,
   } = useLoaderData()
 
   return (
@@ -139,7 +141,13 @@ export default function SettingsLayout() {
                 } px-2 sm:max-md:px-5 md:px-10
                 pb-5 md:pb-10 pt-6`}
               >
-                <Outlet context={{ authorizedApps, connectedProfiles }} />
+                <Outlet
+                  context={{
+                    authorizedApps,
+                    connectedProfiles,
+                    primaryAddressURN,
+                  }}
+                />
               </div>
             </div>
           </div>

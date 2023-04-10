@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { inputValidators } from '@proofzero/platform-middleware'
 import { Node } from '../../../../edges/src/jsonrpc/validators/node'
 
 export const ProfileSchema = z.object({
@@ -9,6 +10,7 @@ export const ProfileSchema = z.object({
       isToken: z.boolean().optional(),
     })
     .optional(),
+  primaryAddressURN: inputValidators.AddressURNInput.optional(),
 })
 
 export const AddressesSchema = z.array(Node)
