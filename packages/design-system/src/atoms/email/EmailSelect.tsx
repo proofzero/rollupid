@@ -37,6 +37,13 @@ export const EmailSelect = ({
     }
   }, [selected])
 
+  const selectedIconURL =
+    selected?.type === OAuthAddressType.Microsoft
+      ? microsoftIcon
+      : selected?.type === OAuthAddressType.Google
+      ? googleIcon
+      : null
+
   return (
     <Listbox
       value={selected}
@@ -56,6 +63,12 @@ export const EmailSelect = ({
             hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500'
             } bg-white`}
           >
+            {selectedIconURL ? (
+              <img src={selectedIconURL} className="w-4 h-4 mr-3" />
+            ) : (
+              <MdOutlineAlternateEmail className="w-4 h-4 mr-3" />
+            )}
+
             <Text size="sm" className="bg-white flex-1 text-left text-gray-800">
               {selected?.email ?? 'None'}
             </Text>
