@@ -304,9 +304,12 @@ export default function Authorize() {
   const transition = useTransition()
 
   const cancelCallback = () => {
+    const redirectURL = new URL(redirectUri)
+    redirectURL.search = `?=error=access_denied&state=${state}`
+
     submit(
       {
-        cancel: `${redirectUri}?=error=access_denied&state=${state}`,
+        cancel: redirectURL.toString(),
       },
       { method: 'post' }
     )
