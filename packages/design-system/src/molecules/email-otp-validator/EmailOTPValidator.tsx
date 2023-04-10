@@ -38,7 +38,7 @@ export default function EmailOTPValidator({
   onCancel,
   requestRegeneration,
   requestVerification,
-  regenerationTimerSeconds = 60,
+  regenerationTimerSeconds = 30,
 }: EmailOTPValidatorProps) {
   const inputLen = 6
   const inputRefs = Array.from({ length: inputLen }, () =>

@@ -14,7 +14,7 @@ type EmailAddressProfile = AddressProfile<EmailAddressType.Email>
 
 type VerificationPayload = {
   state: string
-  creationTimestamp: number
+  record: { creationTimestamp: number; callNumber: number }
 }
 
 const CODES_KEY_NAME = 'codes'
@@ -32,16 +32,32 @@ export default class EmailAddress {
         CODES_KEY_NAME
       )) || {}
 
+    let callNumber
     for (const [_, payload] of Object.entries(verificationCodes)) {
       if (
-        payload.creationTimestamp + EMAIL_VERIFICATION_OPTIONS.regenDelayInMs >
+        payload.record.creationTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.regenDelaySubsCallInMs >
         Date.now()
-      )
+      ) {
         throw new BadRequestError({
           message: `Cannot generate new code for the address. You can only generate a new code once every ${
-            EMAIL_VERIFICATION_OPTIONS.regenDelayInMs / 1000
+            EMAIL_VERIFICATION_OPTIONS.regenDelaySubsCallInMs / 1000
           } seconds`,
         })
+      }
+      callNumber = payload.record.callNumber
+      if (
+        callNumber >= 5 &&
+        payload.record.creationTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.regenDelayFor5SubsCallsInMs >
+          Date.now()
+      ) {
+        throw new BadRequestError({
+          message: `Cannot generate new code for the address.
+          You can only generate a new code 5 times every ${EMAIL_VERIFICATION_OPTIONS.regenDelayFor5SubsCallsInMins}
+          minutes`,
+        })
+      }
     }
 
     const creationTimestamp = Date.now()
@@ -50,7 +66,10 @@ export default class EmailAddress {
     ).toUpperCase()
     verificationCodes[code] = {
       state,
-      creationTimestamp,
+      record: {
+        creationTimestamp,
+        callNumber: callNumber && callNumber < 5 ? callNumber + 1 : 1,
+      },
     }
 
     this.node.class.setNodeType(NodeType.Email)
@@ -76,13 +95,13 @@ export default class EmailAddress {
     }
 
     if (
-      emailVerification.creationTimestamp +
+      emailVerification.record.creationTimestamp +
         EMAIL_VERIFICATION_OPTIONS.ttlInMs <=
       Date.now()
     ) {
       //We anticipate we'll encounter this only if an address has multiple OTP codes in the
       //codes property, where the alarm to clean them up will be the latter of the codeExpiry
-      // times of all of those codes. Alarms will still clean them up eventually.
+      //times of all of those codes. Alarms will still clean them up eventually.
       console.error('OTP code has expired')
       return false
     }
@@ -102,7 +121,8 @@ export default class EmailAddress {
 
     for (const [code, verification] of Object.entries(codes)) {
       if (
-        verification.creationTimestamp + EMAIL_VERIFICATION_OPTIONS.ttlInMs <=
+        verification.record.creationTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.ttlInMs <=
         Date.now()
       ) {
         delete codes[code]
