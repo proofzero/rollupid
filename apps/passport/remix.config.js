@@ -8,7 +8,7 @@ module.exports = {
   // Keycloak rewrites. Needed here for CSR, also done in Cloudflare for SSR.
   routes: async (defineRoutes) => {
     return defineRoutes((route) => {
-      route('/protocol/openid-connect/auth', 'routes/authorize/index.tsx', {
+      route('/protocol/openid-connect/auth', 'routes/authorize.tsx', {
         id: 'keycloakAuthIndex',
         caseSensitive: true,
         index: true
