@@ -8,48 +8,66 @@ import { HiOutlineArrowLeft } from 'react-icons/hi'
 export type AuthenticationProps = {
   logoURL?: string
   appName?: string
-  showGoBack?: boolean
+  generic?: boolean
   children: JSX.Element
 }
 
 export function Authentication({
   logoURL,
   appName,
-  showGoBack = false,
+  generic = false,
   children,
 }: AuthenticationProps) {
   const logo = logoURL || circleLogo
   return (
     <div className="relative">
-      {showGoBack && (
+      {generic && (
         <div className="relative mx-auto w-full lg:w-[418px]">
           <HiOutlineArrowLeft
-            className="absolute left-6 top-6 w-6 h-6 cursor-pointer z-10"
+            className="absolute left-6 top-[3.25rem] w-6 h-6 cursor-pointer z-10"
             onClick={() => history.back()}
           />
         </div>
       )}
 
       <div
-        className={
-          'relative flex shrink flex-col items-center justify-center gap-4 mx-auto bg-white p-6 h-[100dvh] lg:h-[675px] lg:max-h-[100dvh] w-full lg:w-[418px] lg:border-rounded-lg'
-        }
+        className={`relative flex shrink flex-col items-center ${
+          generic ? '' : 'justify-center'
+        } gap-4 mx-auto bg-white p-6 h-[100dvh] lg:h-[675px] lg:max-h-[100dvh] w-full lg:w-[418px] lg:border-rounded-lg`}
         style={{
           border: '1px solid #D1D5DB',
           boxSizing: 'border-box',
         }}
       >
-        <Avatar src={logo} size="sm"></Avatar>
-        <div className={'flex flex-col items-center gap-2'}>
-          <h1 className={'font-semibold text-xl'}>
-            {appName ? `Login to ${appName}` : 'Welcome to the Private Web'}
-          </h1>
-          <h2 style={{ color: '#6B7280' }} className={'font-medium text-base'}>
-            How would you like to continue?
-          </h2>
-        </div>
+        {generic && (
+          <>
+            <Text
+              size="xl"
+              weight="semibold"
+              className="text-[#2D333A] mt-6 mb-8"
+            >
+              Connect Account
+            </Text>
+          </>
+        )}
+        {!generic && (
+          <>
+            <Avatar src={logo} size="sm"></Avatar>
+            <div className={'flex flex-col items-center gap-2'}>
+              <h1 className={'font-semibold text-xl'}>
+                {appName ? `Login to ${appName}` : 'Welcome to the Private Web'}
+              </h1>
+              <h2
+                style={{ color: '#6B7280' }}
+                className={'font-medium text-base'}
+              >
+                How would you like to continue?
+              </h2>
+            </div>
+          </>
+        )}
 
-        {children}
+        <div className="flex-1 w-full flex flex-col gap-4">{children}</div>
 
         <div className="mt-14 flex justify-center items-center space-x-2">
           <img src={subtractLogo} alt="powered by rollup.id" />
