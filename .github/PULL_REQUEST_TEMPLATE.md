@@ -14,6 +14,10 @@ assignees: ''
 
 - Closes Issue #1
 
+### Testing
+
+[Describe which cases you tested and their steps, if PR does not contain automated tests for them]
+
 ### Checklist
 
 - [ ] I have read the [CONTRIBUTING](CONTRIBUTING.md) guidelines

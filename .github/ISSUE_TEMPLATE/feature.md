@@ -1,6 +1,6 @@
 ---
 name: Feature
-about: Propose a new feature to be implemented
+about: Describe a new feature
 title: 'feat(scope): Short description of the new feature'
 labels: 'enhancement'
 assignees: ''
