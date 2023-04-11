@@ -92,7 +92,7 @@ export default () => {
           Addon={<HiCheck className="w-3.5 h-3.5 text-indigo-500" />}
         />
 
-        <div className="my-1 flex flex-row items-center space-x-3">
+        <div className="my-1 flex flex-row items-center justify-center space-x-3">
           <hr className="h-px w-16 bg-gray-500" />
           <Text>or</Text>
           <hr className="h-px w-16 bg-gray-500" />

@@ -1,4 +1,3 @@
-import createEdgesClient from '@proofzero/platform-clients/edges'
 import { Context } from '../context'
 import { EDGE_AUTHORIZES } from '@proofzero/platform.access/src/constants'
 
@@ -71,8 +70,8 @@ export const getAuthorizedAccounts = async ({
     return {
       accountURN,
       timestamp,
-      name: edge.src.qc.name,
-      imageURL: edge.src.qc.picture,
+      name: edge.src.qc.name || accountURN,
+      imageURL: edge.src.qc.picture || '',
     }
   })
 

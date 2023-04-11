@@ -45,7 +45,7 @@ export const getPublicAddressesMethod = async ({
   }
   // Return the list of edges between the account node and any address
   // nodes, filtered by address type if provided.
-  return ctx.edges.getEdges
+  return await ctx.edges.getEdges
     .query({ query })
     .then((res) => res.edges.map((e) => e.dst))
 }
