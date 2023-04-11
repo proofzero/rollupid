@@ -335,8 +335,7 @@ type ExternalLinksProps = {
 function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
   return (
     <div className="mt-2 border-t border-gray-700">
-      {/* Hidden until new passport lands */}
-      <div className="px-2 pt-2 hidden hover:bg-gray-800">
+      <div className="px-2 p-2 hover:bg-gray-800">
         <NavLink
           to={PASSPORT_URL}
           target="_blank"
