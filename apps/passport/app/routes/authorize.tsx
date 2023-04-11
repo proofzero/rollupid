@@ -53,6 +53,7 @@ import {
 } from '@proofzero/utils/getNormalisedConnectedEmails'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
+import Info from '~/components/authorization/Info'
 
 export type UserProfile = {
   displayName: string
@@ -507,9 +508,9 @@ export default function Authorize() {
                           ) : null}
                         </div>
 
-                        <img
-                          src={iIcon}
-                          alt={`${scopeMeta.scopes[scope].name} info`}
+                        <Info
+                          name={scopeMeta.scopes[scope].name}
+                          description={scopeMeta.scopes[scope].description}
                         />
 
                         <div
