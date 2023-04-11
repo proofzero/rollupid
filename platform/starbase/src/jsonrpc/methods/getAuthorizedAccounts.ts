@@ -72,7 +72,7 @@ export const getAuthorizedAccounts = async ({
     return {
       accountURN,
       timestamp,
-      name: edge.src.qc.name || 'unnamed',
+      name: edge.src.qc.name || accountURN,
       imageURL: edge.src.qc.picture || '',
     }
   })
