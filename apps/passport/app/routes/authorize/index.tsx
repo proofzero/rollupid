@@ -37,7 +37,6 @@ import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { Profile } from '@proofzero/platform/account/src/types'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { PersonaData } from '@proofzero/types/application'
-import type { AddressURN } from '@proofzero/urns/address'
 import type { DataForScopes } from '~/utils/authorize.server'
 import { Text } from '@proofzero/design-system'
 import { BadRequestError } from '@proofzero/errors'
@@ -162,7 +161,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         state: authorizeRes.state,
       })
 
-      return redirect(`${redirectUri}?${redirectParams}`, {
+      const redirectURL = new URL(redirectUri)
+      for (const [key, value] of redirectParams) {
+        redirectURL.searchParams.append(key, value)
+      }
+
+      return redirect(redirectURL.toString(), {
         headers,
       })
     }

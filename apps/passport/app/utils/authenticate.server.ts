@@ -41,6 +41,10 @@ export const authenticateAddress = async (
   existing: boolean = false
 ) => {
   if (appData?.prompt === 'connect') {
+    if (existing) {
+      appData.redirectUri += '?error=ALREADY_CONNECTED'
+    }
+
     return redirect(
       getRedirectURL(appData, existing ? `ALREADY_CONNECTED` : null)
     )
