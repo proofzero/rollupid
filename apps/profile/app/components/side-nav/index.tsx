@@ -3,12 +3,7 @@ import { Link, useSubmit } from '@remix-run/react'
 import { BiLink } from 'react-icons/bi'
 import { AiOutlineUser } from 'react-icons/ai'
 import { RiCollageLine } from 'react-icons/ri'
-import {
-  HiOutlineExternalLink,
-  HiOutlineHome,
-  HiOutlineLogout,
-} from 'react-icons/hi'
-import { TbPlugConnected, TbApps } from 'react-icons/tb'
+import { HiOutlineExternalLink, HiOutlineLogout } from 'react-icons/hi'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 import missingImage from '../../assets/missing-nft.svg'
@@ -19,50 +14,26 @@ import { Popover } from '@headlessui/react'
 
 import { SideNavItem } from './item'
 
-const subNavigation = {
-  general: [
-    {
-      name: 'Home',
-      href: '/account/dashboard',
-      icon: HiOutlineHome,
-      exists: true,
-    },
-  ],
-  publicProfiles: [
-    {
-      name: 'User Settings',
-      href: '/account/profile',
-      icon: AiOutlineUser,
-      exists: true,
-    },
-    {
-      name: 'Profile Links',
-      href: '/account/links',
-      icon: BiLink,
-      exists: true,
-    },
-    {
-      name: 'NFT Gallery',
-      href: '/account/gallery',
-      icon: RiCollageLine,
-      exists: true,
-    },
-  ],
-  connections: [
-    {
-      name: 'Accounts',
-      href: '/account/connections',
-      icon: TbPlugConnected,
-      exists: true,
-    },
-    {
-      name: 'Applications',
-      href: '/account/applications',
-      icon: TbApps,
-      exists: true,
-    },
-  ],
-}
+const subNavigation = [
+  {
+    name: 'User Settings',
+    href: '/account/profile',
+    icon: AiOutlineUser,
+    exists: true,
+  },
+  {
+    name: 'Profile Links',
+    href: '/account/links',
+    icon: BiLink,
+    exists: true,
+  },
+  {
+    name: 'NFT Gallery',
+    href: '/account/gallery',
+    icon: RiCollageLine,
+    exists: true,
+  },
+]
 
 export const DesktopSideNav = ({
   profile,
@@ -199,19 +170,7 @@ export const SideNavBarebone = ({
           </Link>
         </div>
       </div>
-      {subNavigation.general.map((item) => (
-        <SideNavItem key={item.name} item={item} />
-      ))}
-      <Text size="xs" className="ml-3 pt-5 pb-1 text-gray-500">
-        PUBLIC PROFILES
-      </Text>
-      {subNavigation.publicProfiles.map((item) => (
-        <SideNavItem key={item.name} item={item} />
-      ))}
-      <Text size="xs" className="ml-3 pt-5 pb-1 text-gray-500">
-        CONNECTIONS
-      </Text>
-      {subNavigation.connections.map((item) => (
+      {subNavigation.map((item) => (
         <SideNavItem key={item.name} item={item} />
       ))}
     </div>
