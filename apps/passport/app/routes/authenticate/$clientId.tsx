@@ -1,11 +1,9 @@
-import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
-import type { LoaderFunction } from '@remix-run/cloudflare'
+import { Outlet, useLoaderData } from '@remix-run/react'
+import { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
-import { getUserSession, parseJwt } from '~/session.server'
-import type { AccountURN } from '@proofzero/urns/account'
-import { getAccountClient, getStarbaseClient } from '~/platform.server'
+import { getStarbaseClient } from '~/platform.server'
 
-export const loader: LoaderFunction = async ({ request, context, params }) => {
+export const loader: LoaderFunction = async ({ context, params }) => {
   let appProps
   if (params.clientId !== 'console' && params.clientId !== 'passport') {
     const sbClient = getStarbaseClient('', context.env, context.traceSpan)
@@ -14,24 +12,14 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     })
   }
 
-  const session = await getUserSession(request, context.env, params.clientId)
-
-  let profile
-  const jwt = session.get('jwt')
-  if (jwt) {
-    const account = parseJwt(jwt).sub as AccountURN
-    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-    profile = await accountClient.getProfile.query({ account })
-  }
-
   return json({
+    clientId: params.clientId,
     appProps,
-    profile,
   })
 }
 
 export default () => {
-  const { appProps, profile } = useLoaderData()
+  const { clientId, appProps } = useLoaderData()
 
-  return <Outlet context={{ appProps, profile }} />
+  return <Outlet context={{ clientId, appProps }} />
 }

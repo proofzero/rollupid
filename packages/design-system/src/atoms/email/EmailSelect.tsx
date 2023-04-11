@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Fragment, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
@@ -14,14 +14,13 @@ import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/micr
 
 import { OptionType } from '@proofzero/utils/getNormalisedConnectedEmails'
 
-import type { AddressURN } from '@proofzero/urns/address'
 import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
 
 type EmailSelectProps = {
   items: EmailSelectListItem[]
   enableAddNew?: boolean
   enableNone?: boolean
-  onSelect?: (emailAddressURN: AddressURN) => void
+  onSelect?: (selected: EmailSelectListItem) => void
 }
 
 export const EmailSelect = ({
@@ -30,21 +29,27 @@ export const EmailSelect = ({
   enableNone = false,
   onSelect,
 }: EmailSelectProps) => {
-  const [selected, setSelected] = useState({
-    type: OptionType.None,
-    email: 'None',
-  } as EmailSelectListItem)
+  const [selected, setSelected] = useState(items[0])
+
+  useEffect(() => {
+    if (onSelect) {
+      onSelect(selected)
+    }
+  }, [selected])
+
+  const selectedIconURL =
+    selected?.type === OAuthAddressType.Microsoft
+      ? microsoftIcon
+      : selected?.type === OAuthAddressType.Google
+      ? googleIcon
+      : null
 
   return (
     <Listbox
       value={selected}
       onChange={(selected) => {
-        if (onSelect && 'addressURN' in selected) {
-          onSelect(selected.addressURN)
-        }
         setSelected(selected)
       }}
-      disabled={items.length === 0}
       by="email"
     >
       {({ open }) => (
@@ -58,16 +63,20 @@ export const EmailSelect = ({
             hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500'
             } bg-white`}
           >
+            {selectedIconURL ? (
+              <img src={selectedIconURL} className="w-4 h-4 mr-3" />
+            ) : (
+              <MdOutlineAlternateEmail className="w-4 h-4 mr-3" />
+            )}
+
             <Text size="sm" className="bg-white flex-1 text-left text-gray-800">
-              {selected.email}
+              {selected?.email ?? 'None'}
             </Text>
-            {items.length !== 0 ? (
-              open ? (
-                <ChevronDownIcon className="w-5 h-5 rotate-180" />
-              ) : (
-                <ChevronDownIcon className="w-5 h-5" />
-              )
-            ) : null}
+            {open ? (
+              <ChevronDownIcon className="w-5 h-5 rotate-180" />
+            ) : (
+              <ChevronDownIcon className="w-5 h-5" />
+            )}
           </Listbox.Button>
 
           <Transition

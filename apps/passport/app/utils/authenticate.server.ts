@@ -24,39 +24,29 @@ import { generateGradient } from './gradient.server'
 import { redirect } from '@remix-run/cloudflare'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 
+type AppData = {
+  clientId: string
+  redirectUri: string
+  state: string
+  scope: string[]
+  prompt: string
+}
+
 export const authenticateAddress = async (
-  request: Request,
   address: AddressURN,
   account: AccountURN,
-  appData: {
-    clientId: string
-    redirectUri: string
-    state: string
-    scope: string[]
-    prompt: string
-  } | null,
+  appData: AppData,
   env: Env,
   traceSpan: TraceSpan,
   existing: boolean = false
 ) => {
-  if (appData?.prompt === 'login') {
-    const headers = new Headers()
-
-    headers.append(
-      'Set-Cookie',
-      await destroyConsoleParamsSession(request, env, appData.clientId)
-    )
-
-    headers.append(
-      'Set-Cookie',
-      await destroyConsoleParamsSession(request, env)
-    )
+  if (appData?.prompt === 'connect') {
+    if (existing) {
+      appData.redirectUri += '?error=ALREADY_CONNECTED'
+    }
 
     return redirect(
-      `${appData.redirectUri}${existing ? `?error=ALREADY_CONNECTED` : ''}`,
-      {
-        headers,
-      }
+      getRedirectURL(appData, existing ? `ALREADY_CONNECTED` : null)
     )
   }
 
@@ -84,25 +74,9 @@ export const authenticateAddress = async (
 
     await provisionProfile(accessToken, env, traceSpan, address)
 
-    let redirectURL = '/authorize'
-    if (appData) {
-      const authAppId = appData.clientId
-      const authRedirectUri = appData.redirectUri
-      const authState = appData.state
-      const authScope = appData.scope
-      const urlParams = new URLSearchParams({
-        client_id: authAppId,
-        redirect_uri: authRedirectUri,
-        state: authState,
-        scope: authScope.join(' '),
-      })
-
-      redirectURL += `?${urlParams}`
-    }
-
     return createUserSession(
       accessToken,
-      redirectURL,
+      getRedirectURL(appData),
       address,
       env,
       appData?.clientId
@@ -110,6 +84,28 @@ export const authenticateAddress = async (
   } catch (error) {
     throw JsonError(error)
   }
+}
+
+const getRedirectURL = (appData: AppData, error?: string | null) => {
+  let redirectURL = '/authorize'
+  const authAppId = appData.clientId
+  const authRedirectUri = appData.redirectUri
+  const authState = appData.state
+  const authScope = appData.scope
+  const urlParams = new URLSearchParams({
+    client_id: authAppId,
+    redirect_uri: authRedirectUri,
+    state: authState,
+    scope: authScope.join(' '),
+  })
+
+  if (error) {
+    urlParams.append('error', error)
+  }
+
+  redirectURL += `?${urlParams}`
+
+  return redirectURL
 }
 
 const provisionProfile = async (

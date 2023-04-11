@@ -77,10 +77,10 @@ export const action: ActionFunction = async ({ request, context, params }) => {
       context.env,
       appData?.clientId
     ),
-    forceAccountCreation: !appData || appData.prompt !== 'login',
+    forceAccountCreation: !appData || appData.prompt !== 'connect',
   })
 
-  if (appData?.prompt === 'login' && existing) {
+  if (appData?.prompt === 'connect' && existing) {
     return redirect(`${appData.redirectUri}?error=ALREADY_CONNECTED`)
   }
 

@@ -53,11 +53,10 @@ export const action: ActionFunction = async ({ request, context, params }) => {
         context.env,
         appData?.clientId
       ),
-      force: !appData || appData.prompt !== 'login',
+      force: !appData || appData.prompt !== 'connect',
     })
 
     return authenticateAddress(
-      request,
       addressURN,
       accountURN,
       appData,

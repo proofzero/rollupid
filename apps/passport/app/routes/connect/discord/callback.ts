@@ -49,13 +49,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       context.env,
       appData?.clientId
     ),
-    force: !appData || appData.prompt !== 'login',
+    force: !appData || appData.prompt !== 'connect',
   })
 
   await addressClient.setOAuthData.mutate(authRes)
 
   return authenticateAddress(
-    request,
     address,
     accountURN,
     appData,

@@ -87,7 +87,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       context.env,
       appData?.clientId
     ),
-    force: !appData || appData.prompt !== 'login',
+    force: !appData || appData.prompt !== 'connect',
   })
   const current = await addressClient.getOAuthData.query()
 
@@ -108,7 +108,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   }
 
   return authenticateAddress(
-    request,
     address,
     account.accountURN,
     appData,

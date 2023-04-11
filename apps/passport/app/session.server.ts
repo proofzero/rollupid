@@ -163,18 +163,21 @@ const getConsoleParamsSessionStorage = (
 
 export async function createConsoleParamsSession(
   consoleParams: ConsoleParams,
-  env: Env
+  env: Env,
+  qp: URLSearchParams = new URLSearchParams()
 ) {
   if (!consoleParams.clientId) {
     throw new Error('Missing clientId in consoleParams')
   }
 
-  let redirectURL = `/authenticate/${consoleParams.clientId}`
+  let redirectURL = `/authenticate/${consoleParams.clientId}${
+    consoleParams.prompt === 'connect' ? `` : `/account`
+  }`
+
   if (consoleParams.prompt) {
-    const qp = new URLSearchParams()
     qp.append('prompt', consoleParams.prompt)
-    redirectURL += `?${qp.toString()}`
   }
+  redirectURL += `?${qp.toString()}`
 
   const headers = new Headers()
   headers.append(
@@ -290,7 +293,7 @@ export async function getValidatedSessionContext(
     }
   } catch (error) {
     // TODO: Revise this logic
-    const redirectTo = `/authenticate/${consoleParams?.clientId ?? ''}`
+    const redirectTo = `/authenticate/${consoleParams?.clientId}`
     if (error === InvalidTokenError)
       if (consoleParams.clientId)
         throw await createConsoleParamsSession(consoleParams, env)
