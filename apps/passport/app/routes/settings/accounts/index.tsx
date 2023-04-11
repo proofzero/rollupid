@@ -358,6 +358,8 @@ export default function AccountsLayout() {
     const qp = new URLSearchParams()
     qp.append('prompt', 'connect')
     qp.append('client_id', 'passport')
+    qp.append('state', 'skip')
+    qp.append('scope', '')
 
     // Removing search so that subsequent errors
     // won't be appended to queryString
