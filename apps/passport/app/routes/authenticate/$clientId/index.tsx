@@ -21,6 +21,19 @@ import {
 
 import AuthButton from '~/components/connect-button/AuthButton'
 import { getConsoleParams } from '~/session.server'
+import { createClient, WagmiConfig } from 'wagmi'
+import { getDefaultClient } from 'connectkit'
+
+const client = createClient(
+  // @ts-ignore
+  getDefaultClient({
+    appName: 'Rollup',
+    autoConnect: true,
+    alchemyId:
+      // @ts-ignore
+      typeof window !== 'undefined' && window.ENV.APIKEY_ALCHEMY_PUBLIC,
+  })
+)
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const url = new URL(request.url)
@@ -111,7 +124,8 @@ export default () => {
   }, [transition.state])
 
   return (
-    <>
+    // Maybe suspense here?
+    <WagmiConfig client={client}>
       {transition.state !== 'idle' && <Loader />}
 
       <Authentication logoURL={iconURL} appName={name} generic={connectFlow}>
@@ -239,6 +253,6 @@ export default () => {
           </div>
         </>
       </Authentication>
-    </>
+    </WagmiConfig>
   )
 }
