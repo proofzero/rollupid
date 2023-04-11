@@ -30,7 +30,7 @@ cd apps/console
 cp .dev.vars.example .dev.vars
 ```
 
-Update the .dev.vars file with the required API keys and app keys. You'll need a Cloudflare account and reccomend setting up a Github App for SSO flow.
+Update the .dev.vars file with the required API keys and app keys. You'll need a Cloudflare account and recommend setting up a Github App for SSO flow.
 
 ## Optional: Nix
 
@@ -39,6 +39,11 @@ Although not required, using Nix can be useful for the development environment. 
 ```bash
 nix-shell
 ```
+
+## Setup the Edges DB
+
+1. Run `cd platform/edges`
+2. Run `yarn db:execute` to create the database.
 
 ## Running the frontend applications
 
@@ -80,3 +85,7 @@ yarn add <dependency-name>
 When working on multiple projects within the monorepo, ensure that you follow the same code style, contribution guidelines, and testing procedures for each project. This will help maintain consistency and quality across the entire codebase.
 
 Remember to thoroughly test your code and update any relevant documentation or tests before submitting your changes. Create a pull request with a clear description of your changes and reference any related issues or discussions.
+
+## Community
+
+Join us on [Discord](https://discord.gg/rollupid) and [Twitter](https://twitter.com/rollupid) to discuss RollupID and learn more about the project.
