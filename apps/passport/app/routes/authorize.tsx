@@ -1,6 +1,8 @@
+import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import { Outlet, useLoaderData } from '@remix-run/react'
+import { useEffect } from 'react'
 import { getAccountClient } from '~/platform.server'
 import {
   createConsoleParamsSession,
@@ -41,11 +43,27 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
   const profile = await accountClient.getProfile.query({ account: accountUrn })
 
-  return json({ profile })
+  const reqUrl = new URL(request.url)
+  const reqUrlError = reqUrl.searchParams.get('error')
+
+  return json({ profile, reqUrlError })
 }
 
 export default function Authorize() {
-  const { profile } = useLoaderData()
+  const { profile, reqUrlError } = useLoaderData()
+
+  useEffect(() => {
+    switch (reqUrlError) {
+      case 'ALREADY_CONNECTED':
+        toast(
+          ToastType.Error,
+          { message: 'Account already connected' },
+          { duration: 2000 }
+        )
+        break
+    }
+  }, [reqUrlError])
+
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
       <div
