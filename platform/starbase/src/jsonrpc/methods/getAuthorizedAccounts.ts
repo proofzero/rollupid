@@ -67,8 +67,6 @@ export const getAuthorizedAccounts = async ({
 
     const accountURN = edge.src.baseUrn as AccountURN
 
-    console.debug({ edge })
-
     return {
       accountURN,
       timestamp,
