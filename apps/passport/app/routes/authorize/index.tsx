@@ -1,13 +1,11 @@
 import { json, redirect } from '@remix-run/cloudflare'
 import type { LoaderFunction, ActionFunction } from '@remix-run/cloudflare'
-import { Tooltip } from 'flowbite-react'
 import {
   useLoaderData,
   useOutletContext,
   useSubmit,
   useTransition,
 } from '@remix-run/react'
-
 import subtractLogo from '~/assets/subtract-logo.svg'
 
 import { ResponseType } from '@proofzero/types/access'
@@ -24,14 +22,19 @@ import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import { EmailSelect } from '@proofzero/design-system/src/atoms/email/EmailSelect'
 
 import authorizeCheck from '~/assets/authorize-check.svg'
-import iIcon from '~/assets/i.svg'
 
 import profileClassIcon from '~/components/authorization/profile-class-icon.svg'
 import addressClassIcon from '~/components/authorization/address-class-icon.svg'
 import emailClassIcon from '~/components/authorization/email-class-icon.svg'
 
+import Info from '../../components/authorization/Info'
+
 import { getDataForScopes } from '~/utils/authorize.server'
 import { useEffect, useState } from 'react'
+
+import { Text } from '@proofzero/design-system'
+import { BadRequestError } from '@proofzero/errors'
+import { JsonError } from '@proofzero/utils/errors'
 
 import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { Profile } from '@proofzero/platform/account/src/types'
@@ -39,9 +42,6 @@ import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/va
 import type { PersonaData } from '@proofzero/types/application'
 import type { AddressURN } from '@proofzero/urns/address'
 import type { DataForScopes } from '~/utils/authorize.server'
-import { Text } from '@proofzero/design-system'
-import { BadRequestError } from '@proofzero/errors'
-import { JsonError } from '@proofzero/utils/errors'
 
 export type UserProfile = {
   displayName: string
@@ -347,7 +347,7 @@ export default function Authorize() {
           </p>
           <ul
             style={{ color: '#6B7280' }}
-            className={'flex flex-col font-light text-base gap-2 w-full'}
+            className={'flex flex-col font-light text-base gap-2 w-full '}
           >
             {requestedScope
               .filter((scope: string) => {
@@ -362,35 +362,32 @@ export default function Authorize() {
                   <li
                     key={i}
                     className={
-                      'flex flex-row gap-2 items-center justify-between w-full'
+                      'flex flex-row gap-2 items-center justify-between w-full\
+                      relative z-50'
                     }
                   >
                     <div className="flex flex-row w-full gap-2 items-center">
                       <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
                       {scope !== 'email' ? scopeMeta.scopes[scope].name : null}
                       {scope === 'email' ? (
-                        <div className="w-full">
+                        <div className="w-full z-20">
                           <EmailSelect
                             items={connectedEmails}
                             onSelect={(emailAddressURN: AddressURN) => {
-                              setPersona({ ...persona, email: emailAddressURN })
+                              setPersona({
+                                ...persona,
+                                email: emailAddressURN,
+                              })
                             }}
                           />
                         </div>
                       ) : null}
                     </div>
 
-                    <Tooltip
-                      content={`${scopeMeta.scopes[scope].description}`}
-                      placement={scope === 'email' ? 'bottom' : 'right'}
-                      className="bg-white text-black border shadow-lg"
-                      arrow={true}
-                    >
-                      <img
-                        src={iIcon}
-                        alt={`${scopeMeta.scopes[scope].name} info`}
-                      />
-                    </Tooltip>
+                    <Info
+                      name={scopeMeta.scopes[scope].name}
+                      description={scopeMeta.scopes[scope].description}
+                    />
                   </li>
                 )
               })}
