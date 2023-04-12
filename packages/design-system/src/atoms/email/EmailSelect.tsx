@@ -70,7 +70,8 @@ export const EmailSelect = ({
             )}
 
             <Text size="sm" className="bg-white flex-1 text-left text-gray-800">
-              {selected?.email ?? 'None'}
+              {selected?.email ??
+                (enableAddNew ? 'Connect new email address' : 'None')}
             </Text>
             {open ? (
               <ChevronDownIcon className="w-5 h-5 rotate-180" />
