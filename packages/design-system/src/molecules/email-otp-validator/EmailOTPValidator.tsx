@@ -4,6 +4,7 @@ import { Button } from '../../atoms/buttons/Button'
 import { Text } from '../../atoms/text/Text'
 
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
+import { EMAIL_VERIFICATION_OPTIONS } from '@proofzero/platform.address/src/constants'
 
 type EmailOTPValidatorProps = {
   loading: boolean
@@ -38,7 +39,8 @@ export default function EmailOTPValidator({
   onCancel,
   requestRegeneration,
   requestVerification,
-  regenerationTimerSeconds = 30,
+  regenerationTimerSeconds = EMAIL_VERIFICATION_OPTIONS.regenDelaySubsCallInMs /
+    1000,
 }: EmailOTPValidatorProps) {
   const inputLen = 6
   const inputRefs = Array.from({ length: inputLen }, () =>

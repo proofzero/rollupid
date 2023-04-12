@@ -30,77 +30,93 @@ export default class EmailAddress {
   }
 
   async generateVerificationCode(state: string): Promise<string> {
-    const verificationCodes =
-      (await this.node.storage.get<Record<string, VerificationPayload>>(
-        CODES_KEY_NAME
-      )) || {}
+    const verificationPayloads =
+      await this.node.storage.list<VerificationPayload>({
+        prefix: `${CODES_KEY_NAME}/`,
+      })
 
-    let numberOfAttempts
+    let numberOfAttempts = 1
     let firstAttemptTimestamp
 
-    for (const [code, payload] of Object.entries(verificationCodes)) {
-      if (
-        payload.creationTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenDelaySubsCallInMs >
-        Date.now()
-      ) {
-        throw new BadRequestError({
-          message: `Cannot generate new code for the address. You can only generate a new code once every ${
-            EMAIL_VERIFICATION_OPTIONS.regenDelaySubsCallInMs / 1000
-          } seconds`,
-        })
-      }
-      numberOfAttempts = payload.numberOfAttempts
-      firstAttemptTimestamp = payload.firstAttemptTimestamp
-
-      // Once the limit of 5 attempts is hit, we count 10 minutes from the last attempt
-      if (
-        payload.delayStartTimestamp &&
-        payload.delayStartTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs >
+    if (verificationPayloads) {
+      for (const [code, payload] of verificationPayloads.entries()) {
+        if (
+          payload.creationTimestamp +
+            EMAIL_VERIFICATION_OPTIONS.regenDelaySubsCallInMs >
           Date.now()
-      ) {
-        const timeLeft =
+        ) {
+          throw new BadRequestError({
+            message: `Cannot generate new code for the address. You can only generate a new code once every ${
+              EMAIL_VERIFICATION_OPTIONS.regenDelaySubsCallInMs / 1000
+            } seconds`,
+          })
+        }
+
+        firstAttemptTimestamp = payload.firstAttemptTimestamp
+        // because they're not sorted and we need the max (previous attempt)
+        numberOfAttempts = numberOfAttempts
+          ? Math.max(payload.numberOfAttempts, numberOfAttempts)
+          : payload.numberOfAttempts
+
+        // Once the limit of 5 attempts is hit, we count 10 minutes from the last attempt
+        if (
+          payload.delayStartTimestamp &&
           payload.delayStartTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs -
-          Date.now()
+            EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs >
+            Date.now()
+        ) {
+          const timeLeft =
+            payload.delayStartTimestamp +
+            EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs -
+            Date.now()
 
-        throw new BadRequestError({
-          message: `Cannot generate new code for the address. You can only generate a new code after ${Math.floor(
-            timeLeft / 1000 / 60
-          )} minutes and ${(timeLeft / 1000) % 60} seconds`,
-        })
-      }
+          throw new BadRequestError({
+            message: `Cannot generate new code for the address. You will be able to try after ${Math.floor(
+              timeLeft / 1000 / 60
+            )} minutes ${
+              Math.floor((timeLeft / 1000) % 60)
+                ? `and ${Math.floor((timeLeft / 1000) % 60)}  seconds`
+                : ''
+            }`,
+          })
+        }
 
-      // We count 5 minutes from the first attempt
-      if (
-        numberOfAttempts >= EMAIL_VERIFICATION_OPTIONS.maxAttempts &&
-        payload.firstAttemptTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.maxAttempsTimePeriod >
-          Date.now()
-      ) {
-        payload.delayStartTimestamp = Date.now()
-        throw new BadRequestError({
-          message: `Cannot generate new code for the address.
+        // We count 5 minutes from the first attempt
+        if (
+          numberOfAttempts > EMAIL_VERIFICATION_OPTIONS.maxAttempts &&
+          payload.firstAttemptTimestamp +
+            EMAIL_VERIFICATION_OPTIONS.maxAttempsTimePeriod >
+            Date.now()
+        ) {
+          const delayStartTimestamp = Date.now()
+          payload.delayStartTimestamp = delayStartTimestamp
+          await this.node.storage.put(`${code}`, payload)
+          await this.node.storage.setAlarm(
+            delayStartTimestamp +
+              EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs
+          )
+          throw new BadRequestError({
+            message: `Cannot generate new code for the address.
           You can only generate  ${
             EMAIL_VERIFICATION_OPTIONS.maxAttempts
           } new codes within ${
-            EMAIL_VERIFICATION_OPTIONS.maxAttempsTimePeriod / 1000 / 60
-          }
+              EMAIL_VERIFICATION_OPTIONS.maxAttempsTimePeriod / 1000 / 60
+            }
           minutes. Please try again in ${
             EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs / 1000 / 60
           } minutes.`,
-        })
-      }
+          })
+        }
 
-      // Every 5 minutes we wipe the code if the limit of 5 attempt wasn't hit
-      if (
-        numberOfAttempts < EMAIL_VERIFICATION_OPTIONS.maxAttempts &&
-        payload.firstAttemptTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.maxAttempsTimePeriod <
-          Date.now()
-      ) {
-        delete verificationCodes[code]
+        // Every 5 minutes we wipe the code if the limit of 5 attempt wasn't hit
+        if (
+          numberOfAttempts <= EMAIL_VERIFICATION_OPTIONS.maxAttempts &&
+          payload.firstAttemptTimestamp +
+            EMAIL_VERIFICATION_OPTIONS.maxAttempsTimePeriod <=
+            Date.now()
+        ) {
+          await this.node.storage.delete(`${code}`)
+        }
       }
     }
 
@@ -108,11 +124,10 @@ export default class EmailAddress {
     const code = generateRandomString(
       EMAIL_VERIFICATION_OPTIONS.codeLength
     ).toUpperCase()
-    verificationCodes[code] = {
+    const payload = {
       state,
       creationTimestamp,
-      // RE: Every 10 minutes we wipe the number of attempts and first attempt timestamp
-      numberOfAttempts: numberOfAttempts ? numberOfAttempts + 1 : 1,
+      numberOfAttempts: numberOfAttempts + 1,
       firstAttemptTimestamp: firstAttemptTimestamp
         ? firstAttemptTimestamp
         : creationTimestamp,
@@ -120,7 +135,7 @@ export default class EmailAddress {
 
     this.node.class.setNodeType(NodeType.Email)
     this.node.class.setType(EmailAddressType.Email)
-    await this.node.storage.put(CODES_KEY_NAME, verificationCodes)
+    await this.node.storage.put(`${CODES_KEY_NAME}/${code}`, payload)
     await this.node.storage.setAlarm(
       creationTimestamp + EMAIL_VERIFICATION_OPTIONS.ttlInMs
     )
@@ -129,13 +144,19 @@ export default class EmailAddress {
   }
 
   async verifyCode(code: string, state: string): Promise<boolean> {
-    const codes =
-      (await this.node.storage.get<Record<string, VerificationPayload>>(
-        CODES_KEY_NAME
-      )) || {}
+    const verificationPayloads =
+      await this.node.storage.list<VerificationPayload>({
+        start: `${CODES_KEY_NAME}/`,
+      })
 
-    const emailVerification = codes ? codes[code] : undefined
-    if (!codes || !emailVerification || state !== emailVerification.state) {
+    const emailVerification = verificationPayloads
+      ? verificationPayloads.get(`${CODES_KEY_NAME}/${code}`)
+      : undefined
+    if (
+      !verificationPayloads ||
+      !emailVerification ||
+      state !== emailVerification.state
+    ) {
       console.log('OTP verification code and state did not match')
       return false
     }
@@ -152,29 +173,35 @@ export default class EmailAddress {
       return false
     }
 
-    delete codes[code]
-
-    await this.node.storage.put(CODES_KEY_NAME, codes)
+    await this.node.storage.delete(`${CODES_KEY_NAME}/${code}`)
 
     return true
   }
 
   static async alarm(address: Address) {
-    const codes =
-      (await address.state.storage.get<Record<string, VerificationPayload>>(
-        CODES_KEY_NAME
-      )) || {}
+    const verificationPayloads =
+      await address.state.storage.list<VerificationPayload>({
+        start: `${CODES_KEY_NAME}/`,
+      })
 
-    for (const [code, verification] of Object.entries(codes)) {
+    for (const [code, payload] of verificationPayloads.entries()) {
       if (
-        verification.creationTimestamp + EMAIL_VERIFICATION_OPTIONS.ttlInMs <=
+        // we only have delayStartTimestamp if the limit of 5 attempts was hit
+        // this is how we check if the limit was hit and delete node
+        payload.delayStartTimestamp &&
+        payload.delayStartTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs <=
+          Date.now()
+      ) {
+        await address.state.storage.deleteAll()
+      }
+      if (
+        payload.creationTimestamp + EMAIL_VERIFICATION_OPTIONS.ttlInMs <=
         Date.now()
       ) {
-        delete codes[code]
+        await address.state.storage.delete(`${CODES_KEY_NAME}/${code}`)
       }
     }
-
-    await address.state.storage.put(CODES_KEY_NAME, codes)
   }
 
   async getProfile(): Promise<EmailAddressProfile> {
