@@ -19,12 +19,12 @@ export type Scalars = {
 
 export type AddressProfile = {
   __typename?: 'AddressProfile';
-  profile: AddressProfilesUnion;
-  type: Scalars['String'];
-  urn: Scalars['URN'];
+  address?: Maybe<Scalars['String']>;
+  icon?: Maybe<Scalars['String']>;
+  id: Scalars['URN'];
+  title?: Maybe<Scalars['String']>;
+  type?: Maybe<Scalars['String']>;
 };
-
-export type AddressProfilesUnion = CryptoAddressProfile | EmailAddressProfile | OAuthAppleProfile | OAuthDiscordProfile | OAuthGithubProfile | OAuthGoogleProfile | OAuthMicrosoftProfile | OAuthTwitterProfile;
 
 export type App = {
   __typename?: 'App';
@@ -39,26 +39,11 @@ export type ConnectedAddressPropertiesUpdateInput = {
   public?: InputMaybe<Scalars['Boolean']>;
 };
 
-export type CryptoAddressProfile = {
-  __typename?: 'CryptoAddressProfile';
-  address: Scalars['String'];
-  avatar?: Maybe<Scalars['String']>;
-  displayName?: Maybe<Scalars['String']>;
-};
-
 export type Edge = {
   __typename?: 'Edge';
   dst: Node;
   src: Node;
   tag: Scalars['String'];
-};
-
-export type EmailAddressProfile = {
-  __typename?: 'EmailAddressProfile';
-  address: Scalars['String'];
-  email?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
-  picture: Scalars['String'];
 };
 
 export type Mutation = {
@@ -107,69 +92,6 @@ export type NodeInput = {
   baseUrn: Scalars['String'];
   qc?: InputMaybe<Scalars['JSON']>;
   rc?: InputMaybe<Scalars['JSON']>;
-};
-
-export type OAuthAppleProfile = {
-  __typename?: 'OAuthAppleProfile';
-  email?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
-  picture: Scalars['String'];
-  sub?: Maybe<Scalars['String']>;
-};
-
-export type OAuthDiscordProfile = {
-  __typename?: 'OAuthDiscordProfile';
-  avatar?: Maybe<Scalars['String']>;
-  discriminator?: Maybe<Scalars['String']>;
-  email?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['String']>;
-  username?: Maybe<Scalars['String']>;
-};
-
-export type OAuthGithubProfile = {
-  __typename?: 'OAuthGithubProfile';
-  avatar_url: Scalars['String'];
-  bio?: Maybe<Scalars['Boolean']>;
-  email?: Maybe<Scalars['String']>;
-  followers?: Maybe<Scalars['Int']>;
-  following?: Maybe<Scalars['Int']>;
-  html_url?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['Int']>;
-  location?: Maybe<Scalars['String']>;
-  login: Scalars['String'];
-  name?: Maybe<Scalars['String']>;
-  public_gists?: Maybe<Scalars['Int']>;
-  public_repos?: Maybe<Scalars['Int']>;
-};
-
-export type OAuthGoogleProfile = {
-  __typename?: 'OAuthGoogleProfile';
-  email?: Maybe<Scalars['String']>;
-  email_verified?: Maybe<Scalars['Boolean']>;
-  family_name?: Maybe<Scalars['String']>;
-  given_name?: Maybe<Scalars['String']>;
-  locale?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
-  picture: Scalars['String'];
-  sub?: Maybe<Scalars['String']>;
-};
-
-export type OAuthMicrosoftProfile = {
-  __typename?: 'OAuthMicrosoftProfile';
-  email?: Maybe<Scalars['String']>;
-  family_name?: Maybe<Scalars['String']>;
-  given_name?: Maybe<Scalars['String']>;
-  name?: Maybe<Scalars['String']>;
-  picture: Scalars['String'];
-  sub?: Maybe<Scalars['String']>;
-};
-
-export type OAuthTwitterProfile = {
-  __typename?: 'OAuthTwitterProfile';
-  id?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
-  profile_image_url_https: Scalars['String'];
-  screen_name: Scalars['String'];
 };
 
 export type Pfp = Nftpfp | StandardPfp;
@@ -274,14 +196,14 @@ export type GetAddressProfileQueryVariables = Exact<{
 }>;
 
 
-export type GetAddressProfileQuery = { __typename?: 'Query', addressProfile: { __typename?: 'AddressProfile', type: string, urn: any, profile: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'EmailAddressProfile', name?: string | null, picture: string, email?: string | null } | { __typename: 'OAuthAppleProfile', name?: string | null, picture: string } | { __typename: 'OAuthDiscordProfile', email?: string | null, username?: string | null, discriminator?: string | null, avatar?: string | null, discordId?: string | null } | { __typename: 'OAuthGithubProfile', id?: number | null, name?: string | null, avatar_url: string, html_url?: string | null, followers?: number | null, following?: number | null, login: string, public_gists?: number | null, public_repos?: number | null } | { __typename: 'OAuthGoogleProfile', email?: string | null, name?: string | null, picture: string } | { __typename: 'OAuthMicrosoftProfile', name?: string | null, picture: string, email?: string | null } | { __typename: 'OAuthTwitterProfile', name?: string | null, screen_name: string, profile_image_url_https: string } } };
+export type GetAddressProfileQuery = { __typename?: 'Query', addressProfile: { __typename?: 'AddressProfile', id: any, type?: string | null, address?: string | null, title?: string | null, icon?: string | null } };
 
 export type GetAddressProfilesQueryVariables = Exact<{
   addressURNList?: InputMaybe<Array<Scalars['URN']> | Scalars['URN']>;
 }>;
 
 
-export type GetAddressProfilesQuery = { __typename?: 'Query', addressProfiles: Array<{ __typename?: 'AddressProfile', type: string, urn: any, profile: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'EmailAddressProfile', name?: string | null, picture: string, email?: string | null } | { __typename: 'OAuthAppleProfile', name?: string | null, picture: string } | { __typename: 'OAuthDiscordProfile', email?: string | null, username?: string | null, discriminator?: string | null, avatar?: string | null, discordId?: string | null } | { __typename: 'OAuthGithubProfile', id?: number | null, name?: string | null, avatar_url: string, html_url?: string | null, followers?: number | null, following?: number | null, login: string, public_gists?: number | null, public_repos?: number | null } | { __typename: 'OAuthGoogleProfile', email?: string | null, name?: string | null, picture: string } | { __typename: 'OAuthMicrosoftProfile', name?: string | null, picture: string, email?: string | null } | { __typename: 'OAuthTwitterProfile', name?: string | null, screen_name: string, profile_image_url_https: string } }> };
+export type GetAddressProfilesQuery = { __typename?: 'Query', addressProfiles: Array<{ __typename?: 'AddressProfile', id: any, type?: string | null, address?: string | null, title?: string | null, icon?: string | null }> };
 
 export type GetAccountUrnFromAliasQueryVariables = Exact<{
   provider: Scalars['String'];
@@ -364,116 +286,22 @@ export const DisconnectAddressDocument = gql`
 export const GetAddressProfileDocument = gql`
     query getAddressProfile($addressURN: URN!) {
   addressProfile(addressURN: $addressURN) {
+    id
     type
-    urn
-    profile {
-      __typename
-      ... on CryptoAddressProfile {
-        address
-        avatar
-        displayName
-      }
-      ... on OAuthGoogleProfile {
-        email
-        name
-        picture
-      }
-      ... on OAuthTwitterProfile {
-        name
-        screen_name
-        profile_image_url_https
-      }
-      ... on OAuthGithubProfile {
-        id
-        name
-        avatar_url
-        html_url
-        followers
-        following
-        login
-        public_gists
-        public_repos
-      }
-      ... on OAuthMicrosoftProfile {
-        name
-        picture
-        email
-      }
-      ... on OAuthAppleProfile {
-        name
-        picture
-      }
-      ... on OAuthDiscordProfile {
-        discordId: id
-        email
-        username
-        discriminator
-        avatar
-      }
-      ... on EmailAddressProfile {
-        name
-        picture
-        email
-      }
-    }
+    address
+    title
+    icon
   }
 }
     `;
 export const GetAddressProfilesDocument = gql`
     query getAddressProfiles($addressURNList: [URN!]) {
   addressProfiles(addressURNList: $addressURNList) {
+    id
     type
-    urn
-    profile {
-      __typename
-      ... on CryptoAddressProfile {
-        address
-        avatar
-        displayName
-      }
-      ... on OAuthGoogleProfile {
-        email
-        name
-        picture
-      }
-      ... on OAuthTwitterProfile {
-        name
-        screen_name
-        profile_image_url_https
-      }
-      ... on OAuthGithubProfile {
-        id
-        name
-        avatar_url
-        html_url
-        followers
-        following
-        login
-        public_gists
-        public_repos
-      }
-      ... on OAuthMicrosoftProfile {
-        name
-        picture
-        email
-      }
-      ... on OAuthAppleProfile {
-        name
-        picture
-      }
-      ... on OAuthDiscordProfile {
-        discordId: id
-        email
-        username
-        discriminator
-        avatar
-      }
-      ... on EmailAddressProfile {
-        name
-        picture
-        email
-      }
-    }
+    address
+    title
+    icon
   }
 }
     `;

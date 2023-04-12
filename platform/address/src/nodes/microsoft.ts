@@ -1,48 +1,56 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 
+import { OAuthAddressType } from '@proofzero/types/address'
+
 import { Context } from '../context'
-import { OAuthData, OAuthMicrosoftProfile } from '../types'
+import type { AddressProfile, MicrosoftOAuthProfile } from '../types'
 
 import Address from './address'
 import OAuthAddress from './oauth'
 import type { AddressNode } from '.'
-import { OAuthAddressType } from '@proofzero/types/address'
+
+type MicrosoftAddressProfile = AddressProfile<OAuthAddressType.Microsoft>
+
+const PHOTO_URL = 'https://graph.microsoft.com/v1.0/me/photo/$value'
+const USERINFO_URL = 'https://graph.microsoft.com/oidc/userinfo'
 
 export default class MicrosoftAddress extends OAuthAddress {
+  declare ctx: Context
   declare clientId: string
   declare clientSecret: string
 
   constructor(node: AddressNode, ctx: Context) {
     super(node)
+    this.ctx = ctx
     this.clientId = ctx.INTERNAL_MICROSOFT_OAUTH_CLIENT_ID
     this.clientSecret = ctx.SECRET_MICROSOFT_OAUTH_CLIENT_SECRET
   }
 
-  async getProfile(): Promise<OAuthMicrosoftProfile> {
-    const data = await this.getData()
-    if (!data) throw new Error('no data')
-    if (data.profile.provider === OAuthAddressType.Microsoft) {
-      const profile = data.profile
-      let picture
-      if (profile._json) {
-        if (!profile._json?.name) {
-          profile._json.name =
-            profile.displayName ||
-            profile.name?.givenName ||
-            profile._json.email ||
-            profile._json.sub
-        }
-        const gradient = await this.node.class.getGradient()
-        picture = profile._json.rollupidImageUrl || gradient
-      }
-      return {
-        ...profile._json,
-        picture,
-      } as OAuthMicrosoftProfile
+  async getAvatar() {
+    const address = await this.node.class.getAddress()
+    const response = await fetch(PHOTO_URL, {
+      headers: {
+        authorization: await this.getAuthorizationHeader(),
+      },
+      cf: {
+        cacheTtl: 5 * 60,
+        cacheEverything: true,
+        cacheKey: `avatar-${address}`,
+      },
+    })
+
+    if (response.ok) {
+      let data = ''
+      new Uint8Array(await response.arrayBuffer()).forEach(
+        (byte) => (data += String.fromCharCode(byte))
+      )
+      return btoa(data)
     } else {
-      throw new Error("Specified provider isn't set to Microsoft")
+      console.error(await response.text())
+      throw new Error("couldn't fetch photo")
     }
   }
+
   getRefreshTokenParams(refreshToken: string): URLSearchParams {
     const params = super.getRefreshTokenParams(refreshToken)
     params.set('tenant', 'common')
@@ -51,6 +59,23 @@ export default class MicrosoftAddress extends OAuthAddress {
 
   getTokenURL(): string {
     return `https://login.microsoftonline.com/common/oauth2/v2.0/token`
+  }
+
+  getUserInfoURL(): string {
+    return USERINFO_URL
+  }
+
+  async getProfile(): Promise<MicrosoftAddressProfile> {
+    const profile = await super.fetchProfile<MicrosoftOAuthProfile>()
+    if (!profile) {
+      throw new Error('missing profile')
+    }
+    return {
+      address: profile.email,
+      title: profile.name,
+      icon: `${this.ctx.PASSPORT_URL}/avatars/${this.ctx.hashedIdref}`,
+      type: OAuthAddressType.Microsoft,
+    }
   }
 
   static async alarm(address: Address) {

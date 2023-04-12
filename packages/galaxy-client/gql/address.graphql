@@ -1,128 +1,20 @@
 query getAddressProfile($addressURN: URN!) {
   addressProfile(addressURN: $addressURN) {
+    id
     type
-    urn
-    profile {
-      __typename
-      ... on CryptoAddressProfile {
-        address
-        avatar
-        displayName
-      }
-
-      ... on OAuthGoogleProfile {
-        email
-        name
-        picture
-      }
-
-      ... on OAuthTwitterProfile {
-        name
-        screen_name
-        profile_image_url_https
-      }
-
-      ... on OAuthGithubProfile {
-        id
-        name
-        avatar_url
-        html_url
-        followers
-        following
-        login
-        public_gists
-        public_repos
-      }
-
-      ... on OAuthMicrosoftProfile {
-        name
-        picture
-        email
-      }
-
-      ... on OAuthAppleProfile {
-        name
-        picture
-      }
-
-      ... on OAuthDiscordProfile {
-        discordId: id
-        email
-        username
-        discriminator
-        avatar
-      }
-
-      ... on EmailAddressProfile {
-        name
-        picture
-        email
-      }
-    }
+    address
+    title
+    icon
   }
 }
 
 query getAddressProfiles($addressURNList: [URN!]) {
   addressProfiles(addressURNList: $addressURNList) {
+    id
     type
-    urn
-    profile {
-      __typename
-      ... on CryptoAddressProfile {
-        address
-        avatar
-        displayName
-      }
-
-      ... on OAuthGoogleProfile {
-        email
-        name
-        picture
-      }
-
-      ... on OAuthTwitterProfile {
-        name
-        screen_name
-        profile_image_url_https
-      }
-
-      ... on OAuthGithubProfile {
-        id
-        name
-        avatar_url
-        html_url
-        followers
-        following
-        login
-        public_gists
-        public_repos
-      }
-
-      ... on OAuthMicrosoftProfile {
-        name
-        picture
-        email
-      }
-
-      ... on OAuthAppleProfile {
-        name
-        picture
-      }
-
-      ... on OAuthDiscordProfile {
-        discordId: id
-        email
-        username
-        discriminator
-        avatar
-      }
-
-      ... on EmailAddressProfile {
-        name
-        picture
-        email
-      }
-    }
+    address
+    title
+    icon
   }
 }
 

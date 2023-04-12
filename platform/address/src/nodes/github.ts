@@ -2,21 +2,49 @@ import { DurableObjectStubProxy } from 'do-proxy'
 
 import { OAuthAddressType } from '@proofzero/types/address'
 
-import { OAuthData, OAuthGithubProfile } from '../types'
+import type { AddressProfile, GitHubOAuthProfile } from '../types'
+
 import Address from './address'
 import OAuthAddress from './oauth'
 
-export default class GithubAddress extends OAuthAddress {
-  async getProfile(): Promise<OAuthGithubProfile> {
-    const data = await this.getData()
-    if (!data) throw new Error('no data')
+type GithubAddressProfile = AddressProfile<OAuthAddressType.GitHub>
 
-    const profile = data.profile as OAuthData['profile']
-    if (profile.provider != OAuthAddressType.GitHub) {
-      throw new Error('unknown provider')
+const USERINFO_URL = 'https://api.github.com/user'
+
+export default class GithubAddress extends OAuthAddress {
+  async getRequestHeaders() {
+    return {
+      accept: 'application/vnd.github.v3+json',
+      authorization: await this.getAuthorizationHeader(),
+      'user-agent': 'rollup',
+    }
+  }
+
+  async getAuthorizationHeader(): Promise<string> {
+    const accessToken = await this.getAccessToken()
+
+    if (!accessToken) {
+      throw new Error('missing access token')
     }
 
-    return profile._json
+    return `token ${accessToken}`
+  }
+
+  getUserInfoURL(): string {
+    return USERINFO_URL
+  }
+
+  async getProfile(): Promise<GithubAddressProfile> {
+    const profile = await super.fetchProfile<GitHubOAuthProfile>()
+    if (!profile) {
+      throw new Error('missing profile')
+    }
+    return {
+      address: profile.login,
+      title: profile.name,
+      icon: profile.avatar_url,
+      type: OAuthAddressType.GitHub,
+    }
   }
 
   static async alarm(address: Address) {

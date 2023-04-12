@@ -10,7 +10,7 @@ import type {
   GetNFTsResult,
   GetContractsForOwnerResult,
 } from '@proofzero/packages/alchemy-client'
-import type { Chain, Gallery, NFT } from '~/types'
+import type { Chain, Gallery, NFT } from '../types'
 import { NFTContractNormalizer, NFTNormalizer } from './nfts'
 import { sortNftsFn } from './strings'
 import type { AccountURN } from '@proofzero/urns/account'
@@ -210,7 +210,7 @@ export const getValidGallery = async ({
     contractAddress2: [all tokens that user own in this contract],
     ...
     contractAddressN: [all tokens that user own in this contract],
-    } 
+    }
   */
   const validator = new Map<string, string[]>()
 

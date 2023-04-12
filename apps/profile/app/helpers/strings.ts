@@ -1,4 +1,4 @@
-import type { NFT } from '~/types'
+import type { NFT } from '../types'
 
 export const shortenedAccount = (targetAddress: string) => {
   return `${targetAddress.substring(0, 4)} ... ${targetAddress.substring(

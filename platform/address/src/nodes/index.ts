@@ -1,5 +1,25 @@
 import Address from './address'
 
+import AppleAddress from './apple'
+import CryptoAddress from './crypto'
+import DiscordAddress from './discord'
+import EmailAddress from './email'
+import GithubAddress from './github'
+import GoogleAddress from './google'
+import MicrosoftAddress from './microsoft'
+import TwitterAddress from './twitter'
+
+export {
+  AppleAddress,
+  CryptoAddress,
+  DiscordAddress,
+  EmailAddress,
+  GithubAddress,
+  GoogleAddress,
+  MicrosoftAddress,
+  TwitterAddress,
+}
+
 export const initAddressNodeByName = (
   name: string,
   durableObject: DurableObjectNamespace

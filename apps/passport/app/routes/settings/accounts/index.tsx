@@ -19,8 +19,6 @@ import { TbCrown } from 'react-icons/tb'
 import { AddressList } from '~/components/addresses/AddressList'
 import InputText from '~/components/inputs/InputText'
 
-import { normalizeProfileToConnection } from '~/utils/profile'
-
 import { NodeType } from '@proofzero/types/address'
 
 import type { FetcherWithComponents } from '@remix-run/react'
@@ -81,51 +79,19 @@ const distinctProfiles = (connectedProfiles: any[]) => {
   // context actions to desired types
   // e.x. rename to crypto profiles
   const cryptoProfiles = {
-    addresses: connectedProfiles
-      .filter((p) => p?.nodeType === NodeType.Crypto)
-      .map((p) => ({
-        urn: p.urn,
-        type: p.type,
-        nodeType: p.nodeType,
-        ...p?.profile,
-      }))
-      .map(normalizeProfileToConnection),
+    addresses: connectedProfiles.filter((p) => p.nodeType === NodeType.Crypto),
   } as AddressListProps
 
   const vaultProfiles = {
-    addresses: connectedProfiles
-      .filter((p) => p?.nodeType === NodeType.Vault)
-      .map((p) => ({
-        urn: p.urn,
-        type: p.type,
-        nodeType: p.nodeType,
-        ...p?.profile,
-      }))
-      .map(normalizeProfileToConnection),
+    addresses: connectedProfiles.filter((p) => p.nodeType === NodeType.Vault),
   } as AddressListProps
 
   const oAuthProfiles = {
-    addresses: connectedProfiles
-      .filter((p) => p?.nodeType === NodeType.OAuth)
-      .map((p) => ({
-        urn: p.urn,
-        type: p.type,
-        nodeType: p.nodeType,
-        ...p?.profile,
-      }))
-      .map(normalizeProfileToConnection),
+    addresses: connectedProfiles.filter((p) => p.nodeType === NodeType.OAuth),
   } as AddressListProps
 
   const emailProfiles = {
-    addresses: connectedProfiles
-      .filter((p) => p?.nodeType === NodeType.Email)
-      .map((p) => ({
-        urn: p.urn,
-        type: p.type,
-        nodeType: p.nodeType,
-        ...p?.profile,
-      }))
-      .map(normalizeProfileToConnection),
+    addresses: connectedProfiles.filter((p) => p.nodeType === NodeType.Email),
   } as AddressListProps
 
   return {

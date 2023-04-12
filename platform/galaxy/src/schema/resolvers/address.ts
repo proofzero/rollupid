@@ -3,7 +3,7 @@ import ENSUtils from '@proofzero/platform-clients/ens-utils'
 import createAddressClient from '@proofzero/platform-clients/address'
 import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
 
-import { AddressProfilesUnion, Resolvers } from './typedefs'
+import { Resolvers } from './typedefs'
 import {
   validateApiKey,
   setupContext,
@@ -11,21 +11,11 @@ import {
   requestLogging,
 } from './utils'
 
-import { ResolverContext } from './common'
-
-import {
-  CryptoAddressProfile,
-  OAuthAppleProfile,
-  OAuthDiscordProfile,
-  OAuthGithubProfile,
-  OAuthGoogleProfile,
-  OAuthMicrosoftProfile,
-  OAuthTwitterProfile,
-  EmailAddressProfile,
-} from '@proofzero/platform.address/src/types'
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+
+import { ResolverContext } from './common'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -121,37 +111,6 @@ const addressResolvers: Resolvers = {
       // const edgesClient = createAddressClient(env.Edges, {
 
       return true
-    },
-  },
-
-  AddressProfilesUnion: {
-    __resolveType: (obj: AddressProfilesUnion) => {
-      if ((obj as CryptoAddressProfile).isCrypto) {
-        return 'CryptoAddressProfile'
-      }
-      if ((obj as OAuthGoogleProfile).isGoogle) {
-        return 'OAuthGoogleProfile'
-      }
-      if ((obj as OAuthTwitterProfile).isTwitter) {
-        return 'OAuthTwitterProfile'
-      }
-      if ((obj as OAuthGithubProfile).isGithub) {
-        return 'OAuthGithubProfile'
-      }
-      if ((obj as OAuthMicrosoftProfile).isMicrosoft) {
-        return 'OAuthMicrosoftProfile'
-      }
-      if ((obj as OAuthAppleProfile).isApple) {
-        return 'OAuthAppleProfile'
-      }
-      if ((obj as unknown as OAuthDiscordProfile).isDiscord) {
-        return 'OAuthDiscordProfile'
-      }
-      if ((obj as unknown as EmailAddressProfile).isEmail) {
-        return 'EmailAddressProfile'
-      }
-
-      return null
     },
   },
 }

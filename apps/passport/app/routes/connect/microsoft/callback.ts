@@ -43,6 +43,8 @@ export const loader: LoaderFunction = async ({
     context.env,
     context.traceSpan
   )
+  await addressClient.setOAuthData.mutate(authRes)
+
   const { accountURN, existing } = await addressClient.resolveAccount.query({
     jwt: await getJWTConditionallyFromSession(
       request,
@@ -51,27 +53,6 @@ export const loader: LoaderFunction = async ({
     ),
     force: !appData || appData.prompt !== 'connect',
   })
-  const existingOAuthData = await addressClient.getOAuthData.query()
-
-  if (
-    existingOAuthData?.profile == null &&
-    typeof profile._json.picture === 'string'
-  ) {
-    //If we don't already have a microsoft oauth data set, we cache
-    //the image and set the OAuth data set for the address
-
-    const imageUrl = await cacheImageToCF(
-      profile._json.picture,
-      context.env,
-      context.traceSpan,
-      {
-        Authorization: `Bearer ${authRes.accessToken}`,
-      }
-    )
-    profile._json.rollupidImageUrl = imageUrl
-
-    await addressClient.setOAuthData.mutate(authRes)
-  }
 
   return authenticateAddress(
     address,
@@ -83,4 +64,4 @@ export const loader: LoaderFunction = async ({
   )
 }
 
-export default () => {}
+export default () => { }

@@ -8,9 +8,9 @@ import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar
 
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
-import logo from '~/assets/profile_logo.svg'
-import defaultAvatar from '~/assets/circle_gradient.png'
-import { UserNavigation } from '~/components/head-nav/nav-links'
+import logo from '../../assets/profile_logo.svg'
+import defaultAvatar from '../../assets/circle_gradient.png'
+import { UserNavigation } from '../../components/head-nav/nav-links'
 
 import styles from './headNav.css'
 import { gatewayFromIpfs } from '@proofzero/utils'

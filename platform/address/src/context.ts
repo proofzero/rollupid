@@ -36,6 +36,8 @@ interface CreateInnerContextOptions
   addrType?: AddressType
   addressDescription?: ENSRes
 
+  PASSPORT_URL: string
+
   INTERNAL_APPLE_OAUTH_CLIENT_ID: string
   SECRET_APPLE_OAUTH_CLIENT_SECRET: string
 

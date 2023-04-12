@@ -5,7 +5,7 @@ import type {
   AlchemyContract,
   AlchemyChain,
 } from '@proofzero/packages/alchemy-client'
-import type { Chain, NFT, NFTDetail, NFTProperty } from '~/types'
+import type { Chain, NFT, NFTDetail, NFTProperty } from '../types'
 import { capitalizeFirstLetter } from './strings'
 
 /**
