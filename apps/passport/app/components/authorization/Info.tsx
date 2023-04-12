@@ -13,9 +13,8 @@ export default function Info({
   return (
     <Tooltip
       content={description}
-      className="bg-white text-black shadow-xl absolute z-5"
+      className="bg-white text-black shadow-xl absolute z-5 w-fit"
       placement={placement}
-      trigger="click"
     >
       <img src={iIcon} alt={`${name} info`} />
     </Tooltip>
