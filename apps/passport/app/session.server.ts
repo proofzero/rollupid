@@ -239,7 +239,10 @@ export async function getConsoleParams(
       const externalEncodedCookie = JSON.parse(session.get('params'))
       //Convert space-delimited scope to string array
       const { scope, ...otherProps } = externalEncodedCookie
-      return { ...otherProps, scope: scope.split(' ') }
+      return {
+        ...otherProps,
+        scope: scope.trim().length ? scope.split(' ') : [],
+      }
     })
     .catch((err) => {
       console.log('No console params session found')

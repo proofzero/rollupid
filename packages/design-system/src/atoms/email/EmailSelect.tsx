@@ -69,9 +69,22 @@ export const EmailSelect = ({
               <MdOutlineAlternateEmail className="w-4 h-4 mr-3" />
             )}
 
-            <Text size="sm" className="bg-white flex-1 text-left text-gray-800">
-              {selected?.email ?? 'None'}
-            </Text>
+            {!selected && (
+              <Text
+                size="sm"
+                className="bg-white flex-1 text-left text-gray-400"
+              >
+                {enableAddNew ? 'Connect new email address' : 'None'}
+              </Text>
+            )}
+            {selected && (
+              <Text
+                size="sm"
+                className="bg-white flex-1 text-left text-gray-800"
+              >
+                {selected?.email}
+              </Text>
+            )}
             {open ? (
               <ChevronDownIcon className="w-5 h-5 rotate-180" />
             ) : (

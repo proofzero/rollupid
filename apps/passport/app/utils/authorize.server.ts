@@ -5,6 +5,7 @@ import type { AccountURN } from '@proofzero/urns/account'
 import type { PersonaData } from '@proofzero/types/application'
 import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
 import { UnauthorizedError } from '@proofzero/errors'
+import { createConsoleParamsSession } from '~/session.server'
 
 export type DataForScopes = {
   connectedEmails: EmailSelectListItem[]
@@ -58,4 +59,47 @@ export const getDataForScopes = async (
     personaData,
     requestedScope: reorderScope(requestedScope),
   }
+}
+
+/** Creates an authorization cookie, capturing current authz query params,
+ * and redirects to the authentication route
+ */
+export async function createAuthzParamCookieAndAuthenticate(
+  request: Request,
+  authzParams: ConsoleParams,
+  env: Env
+) {
+  const qp = new URLSearchParams()
+
+  const url = new URL(request.url)
+  if (url.searchParams.has('login_hint')) {
+    qp.append('login_hint', url.searchParams.get('login_hint')!)
+  }
+
+  throw await createConsoleParamsSession(authzParams, env, qp)
+}
+
+/** Checks whether the authorization cookie parameters match with
+ * authorization query parameters. Only the "standard" params get
+ * checked.
+ */
+export function authzParamsMatch(
+  authzCookieParams: ConsoleParams,
+  authzQueryParams: ConsoleParams
+) {
+  const scopesMatch = !!(
+    authzCookieParams &&
+    authzCookieParams.scope &&
+    authzQueryParams &&
+    authzQueryParams.scope &&
+    authzCookieParams.scope.length === authzQueryParams.scope.length &&
+    authzQueryParams.scope.every((e) => authzCookieParams.scope!.includes(e))
+  )
+
+  return (
+    scopesMatch &&
+    authzCookieParams.clientId === authzQueryParams.clientId &&
+    authzCookieParams.redirectUri === authzQueryParams.redirectUri &&
+    authzCookieParams.state === authzQueryParams.state
+  )
 }

@@ -16,7 +16,6 @@ import {
   getStarbaseClient,
 } from '~/platform.server'
 import {
-  createConsoleParamsSession,
   destroyConsoleParamsSession,
   getConsoleParams,
   getValidatedSessionContext,
@@ -34,7 +33,11 @@ import profileClassIcon from '~/components/authorization/profile-class-icon.svg'
 import addressClassIcon from '~/components/authorization/address-class-icon.svg'
 import emailClassIcon from '~/components/authorization/email-class-icon.svg'
 
-import { getDataForScopes } from '~/utils/authorize.server'
+import {
+  authzParamsMatch,
+  createAuthzParamCookieAndAuthenticate,
+  getDataForScopes,
+} from '~/utils/authorize.server'
 import { useEffect, useState } from 'react'
 
 import type { ScopeDescriptor } from '@proofzero/security/scopes'
@@ -91,23 +94,34 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   }
 
   const lastCP = await getConsoleParams(request, context.env)
-  if (!lastCP) {
-    const qp = new URLSearchParams()
 
-    const url = new URL(request.url)
-    if (url.searchParams.has('login_hint')) {
-      qp.append('login_hint', url.searchParams.get('login_hint')!)
-    }
-
-    throw await createConsoleParamsSession(
+  //If no authorization cookie and we're not logging into
+  //Passport Settings, then we create authz cookie & authenticate
+  if (
+    !lastCP &&
+    !(
+      context.consoleParams.clientId === 'passport' &&
+      context.consoleParams.redirectUri ===
+        `${new URL(request.url).origin}/settings`
+    )
+  ) {
+    await createAuthzParamCookieAndAuthenticate(
+      request,
       context.consoleParams,
-      context.env,
-      qp
+      context.env
     )
   }
 
   const headers = new Headers()
   if (lastCP) {
+    if (!authzParamsMatch(lastCP, context.consoleParams)) {
+      await createAuthzParamCookieAndAuthenticate(
+        request,
+        context.consoleParams,
+        context.env
+      )
+    }
+
     headers.append(
       'Set-Cookie',
       await destroyConsoleParamsSession(request, context.env, lastCP.clientId)
@@ -372,18 +386,19 @@ export default function Authorize() {
   }
 
   const authorizeCallback = async (scopes: string[]) => {
-    if (!selectedEmail || !('addressURN' in selectedEmail)) return
-
     const form = new FormData()
     form.append('scopes', scopes.join(' '))
     form.append('state', state)
     form.append('client_id', clientId)
     form.append('redirect_uri', redirectOverride)
+    // TODO: Everything should be a form field now handled by javascript
+    // This helps keeps things generic has if a form input is not present
+    // it doesn't end up being submitted
     form.append(
       'personaData',
       JSON.stringify({
         ...persona,
-        email: selectedEmail.addressURN,
+        email: selectedEmail?.addressURN,
       })
     )
 
@@ -541,6 +556,7 @@ export default function Authorize() {
                   btnSize="xl"
                   btnType="primary-alt"
                   disabled={
+                    // TODO: make generic!
                     requestedScope.includes('email') &&
                     (!connectedEmails?.length || !selectedEmail)
                   }

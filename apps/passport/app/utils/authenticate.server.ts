@@ -10,11 +10,7 @@ import {
   getAccountClient,
   getAddressClient,
 } from '~/platform.server'
-import {
-  createUserSession,
-  destroyConsoleParamsSession,
-  parseJwt,
-} from '~/session.server'
+import { createUserSession, parseJwt } from '~/session.server'
 import {
   CryptoAddressType,
   EmailAddressType,
