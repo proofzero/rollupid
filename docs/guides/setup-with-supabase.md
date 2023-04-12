@@ -4,7 +4,9 @@ description: How to use Rollup ID with Supabase
 
 # Overview
 
-Rollup implements the Keycloak interface for authentication and authorization with Supabase. This involves multiple redirects:
+As of April 2023, Supabase does not support [the OIDC standard](https://openid.net/developers/specs/) as a form of authentication. As a workaround, Rollup repurposes their Keycloak plugin to achieve the same effect.
+
+This involves multiple redirects:
 
 ```mermaid
 sequenceDiagram
@@ -43,7 +45,7 @@ Save your settings.
 Within your application, use the Supabase library to sign the user in with the configured Keycloak provider:
 
 ```javascript
-const { createClient } = supabase // This comes from another import or script tag load.
+const { createClient } = supabase // This comes from the supabase-js import or script tag load.
 const Supabase = createClient('YOUR_SUPABASE_APP_URL', 'YOUR_SUPABASE_PUBLIC_API_KEY')
 const { data, error } = await Supabase.auth.signInWithOAuth({
   provider: 'keycloak',
