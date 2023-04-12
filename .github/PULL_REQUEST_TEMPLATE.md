@@ -1,11 +1,3 @@
----
-name: Pull Request
-about: Create a pull request to propose and implement a change
-title: 'type(scope): Short description of the change'
-labels: ''
-assignees: ''
----
-
 ### Description
 
 [Provide a more detailed description of the change]
