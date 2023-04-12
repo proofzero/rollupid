@@ -1,5 +1,5 @@
 ---
-name: Feature
+name: Feature Definition
 about: Describe a new feature
 title: 'feat(scope): Short description of the new feature'
 labels: 'enhancement'
