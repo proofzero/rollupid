@@ -1,5 +1,5 @@
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { imageFromAddressType } from '~/helpers'
+import { imageFromAddressType } from '../../../helpers'
 
 type Link = {
   name: string

@@ -1,10 +1,10 @@
-import FilteredNftGrid from '~/components/nfts/grid/filtered'
-import UnfilteredNftGrid from '~/components/nfts/grid/unfiltered'
-import SelectableNft from '~/components/nfts/interactible'
-import { LoadingGridSquares } from '~/components/nfts/grid/loading'
-
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+
+import FilteredNftGrid from '../nfts/grid/filtered'
+import UnfilteredNftGrid from '../nfts/grid/unfiltered'
+import SelectableNft from '../nfts/interactible'
+import { LoadingGridSquares } from '../nfts/grid/loading'
 
 type PfpNftModalProps = {
   text?: string
@@ -37,8 +37,8 @@ const PfpNftModal = ({
   return (
     <Modal isOpen={isOpen} fixed handleClose={handleClose}>
       <div
-        className="flex-1 relative transform rounded-lg bg-white 
-        overflow-x-visible max-h-[900px] w-screen min-[480px]:w-full px-2 pt-5 
+        className="flex-1 relative transform rounded-lg bg-white
+        overflow-x-visible max-h-[900px] w-screen min-[480px]:w-full px-2 pt-5
       pb-4 text-left shadow-xl transition-all overflow-y-auto"
       >
         {text?.length && (

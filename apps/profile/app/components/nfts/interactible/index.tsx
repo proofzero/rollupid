@@ -3,7 +3,7 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 import { gatewayFromIpfs } from '@proofzero/utils'
 
-import missingNftSvg from '~/assets/missing-nft.svg'
+import missingNftSvg from '../../../assets/missing-nft.svg'
 import { useState } from 'react'
 
 const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
@@ -77,9 +77,9 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
         <button
           className="rounded-lg
             truncate
-            shadow 
+            shadow
             transition-shadow
-            text-sm 
+            text-sm
             font-semibold
             w-full
             hover:shadow-lg
@@ -111,7 +111,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
           />
           <div
             className="flex text-gray-600
-            flex-row whitespace-nowrap 
+            flex-row whitespace-nowrap
             w-full
             justify-between items-center px-4 py-3"
           >

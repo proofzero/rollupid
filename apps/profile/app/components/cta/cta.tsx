@@ -1,10 +1,12 @@
+import { Link } from '@remix-run/react'
 import { useState, useEffect } from 'react'
-import type { FullProfile } from '~/types'
-import type { ProfileCompletionStatus } from '~/utils/cta.client'
-import { determineProfileCompletionStatus } from '~/utils/cta.client'
+
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
-import { Link } from '@remix-run/react'
+
+import type { FullProfile } from '../../types'
+import type { ProfileCompletionStatus } from '../../utils/cta.client'
+import { determineProfileCompletionStatus } from '../../utils/cta.client'
 
 const CTA = ({
   profile,

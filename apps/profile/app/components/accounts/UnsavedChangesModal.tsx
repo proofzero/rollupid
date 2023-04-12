@@ -3,7 +3,7 @@ import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import SaveButton from './SaveButton'
 import { Text } from '@proofzero/design-system'
 
-import warn from '~/assets/warning.svg'
+import warn from '../../assets/warning.svg'
 
 const UnsavedChangesModal = ({ isOpen, handleClose }) => {
   return (
@@ -21,9 +21,9 @@ const UnsavedChangesModal = ({ isOpen, handleClose }) => {
               </Text>
             </div>
           </div>
-          {/* Form where this button is used should have 
+          {/* Form where this button is used should have
           an absolute relative position
-          div below has relative - this way this button sticks to 
+          div below has relative - this way this button sticks to
           bottom right
 
           This div with h-[4rem] prevents everything from overlapping with

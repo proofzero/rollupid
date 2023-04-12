@@ -10,7 +10,7 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import AppSelect from './appSelect'
 
 // Images
-import consoleLogo from '~/images/console_logo.svg'
+import consoleLogo from '../../images/console_logo.svg'
 import {
   HiOutlineChartSquareBar,
   HiOutlineCog,
