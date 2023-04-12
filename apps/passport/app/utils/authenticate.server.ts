@@ -11,11 +11,6 @@ import {
   getAddressClient,
 } from '~/platform.server'
 import { createUserSession, parseJwt } from '~/session.server'
-import {
-  CryptoAddressType,
-  EmailAddressType,
-  OAuthAddressType,
-} from '@proofzero/types/address'
 import { generateGradient } from './gradient.server'
 import { redirect } from '@remix-run/cloudflare'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
@@ -41,9 +36,7 @@ export const authenticateAddress = async (
       appData.redirectUri += '?error=ALREADY_CONNECTED'
     }
 
-    return redirect(
-      getRedirectURL(appData, existing ? `ALREADY_CONNECTED` : null)
-    )
+    return redirect(getRedirectURL(appData))
   }
 
   try {
