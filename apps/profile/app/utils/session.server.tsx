@@ -52,7 +52,7 @@ export class RollupAuthStrategy<User> extends OAuth2Strategy<
 > {
   protected authorizationParams(params: URLSearchParams): URLSearchParams {
     const result = new URLSearchParams()
-    result.append('scope', 'openid')
+    result.append('scope', 'openid profile')
     return result
   }
 }

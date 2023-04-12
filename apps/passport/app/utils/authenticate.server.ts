@@ -128,104 +128,12 @@ const provisionProfile = async (
     const newProfile = await addressClient.getAddressProfile
       .query()
       .then(async (res) => {
-        switch (res.type) {
-          case CryptoAddressType.ETH: {
-            const gradient = await generateGradient(
-              res.profile.address,
-              env,
-              traceSpan
-            )
-            return {
-              displayName: res.profile.displayName || res.profile.address,
-              pfp: {
-                image: res.profile.avatar || gradient,
-              },
-            }
-          }
-          case OAuthAddressType.GitHub: {
-            const gradient = await generateGradient(
-              res.profile.login,
-              env,
-              traceSpan
-            )
-            return {
-              displayName: res.profile.name || res.profile.login,
-              pfp: {
-                image: res.profile.avatar_url || gradient,
-              },
-            }
-          }
-          case OAuthAddressType.Google: {
-            return {
-              displayName: res.profile.name,
-              pfp: {
-                image: res.profile.picture,
-              },
-            }
-          }
-          case OAuthAddressType.Twitter: {
-            return {
-              displayName: res.profile.name,
-              pfp: {
-                image: res.profile.profile_image_url_https,
-              },
-            }
-          }
-          case OAuthAddressType.Microsoft: {
-            return {
-              displayName:
-                res.profile.name ||
-                res.profile.given_name ||
-                res.profile.email ||
-                res.profile.sub,
-              pfp: {
-                //Cached profile image
-                image: res.profile.picture as string,
-              },
-            }
-          }
-          case OAuthAddressType.Apple: {
-            return {
-              displayName: res.profile.name || res.profile.email,
-              pfp: {
-                image: res.profile.picture,
-              },
-            }
-          }
-          case OAuthAddressType.Discord: {
-            const gradient = await generateGradient(
-              res.profile.id,
-              env,
-              traceSpan
-            )
-            const { id, avatar } = res.profile
-            return {
-              displayName: res.profile.username,
-              pfp: {
-                image: avatar
-                  ? `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`
-                  : gradient,
-              },
-            }
-          }
-          case EmailAddressType.Email: {
-            const gradient = await generateGradient(
-              res.profile.email,
-              env,
-              traceSpan
-            )
-
-            return {
-              displayName: res.profile.name || res.profile.email,
-              pfp: {
-                image: gradient,
-              },
-            }
-          }
-          default:
-            throw new Error(
-              'Unsupported OAuth type encountered in profile response.'
-            )
+        const gradient = await generateGradient(res.address, env, traceSpan)
+        return {
+          displayName: res.title,
+          pfp: {
+            image: res.icon || gradient,
+          },
         }
       })
     // set the default profile
