@@ -127,7 +127,7 @@ export const SCOPES: ScopeMap = {
   },
   [SCOPE_PROFILE]: {
     name: 'Profile',
-    description: 'Read a basic profile of your account',
+    description: `Read your name and picture.`,
     class: 'profile',
   },
   // NOT READY YET
