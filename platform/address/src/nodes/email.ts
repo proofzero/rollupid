@@ -53,6 +53,25 @@ export default class EmailAddress {
       numberOfAttempts = payload.numberOfAttempts
       firstAttemptTimestamp = payload.firstAttemptTimestamp
 
+      // Once the limit of 5 attempts is hit, we count 10 minutes from the last attempt
+      if (
+        payload.delayStartTimestamp &&
+        payload.delayStartTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs >
+          Date.now()
+      ) {
+        const timeLeft =
+          payload.delayStartTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs -
+          Date.now()
+
+        throw new BadRequestError({
+          message: `Cannot generate new code for the address. You can only generate a new code after ${Math.floor(
+            timeLeft / 1000 / 60
+          )} minutes and ${(timeLeft / 1000) % 60} seconds`,
+        })
+      }
+
       // We count 5 minutes from the first attempt
       if (
         numberOfAttempts >= EMAIL_VERIFICATION_OPTIONS.maxAttempts &&
@@ -70,26 +89,7 @@ export default class EmailAddress {
           }
           minutes. Please try again in ${
             EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs / 1000 / 60
-          } minutes.}`,
-        })
-      }
-
-      // Once the limit of 5 attempts is hit, we count 10 minutes from the last attempt
-      if (
-        payload.delayStartTimestamp &&
-        payload.delayStartTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs >
-          Date.now()
-      ) {
-        const timeLeft =
-          payload.delayStartTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs -
-          Date.now()
-
-        throw new BadRequestError({
-          message: `Cannot generate new code for the address. You can only generate a new code after ${Math.floor(
-            timeLeft / 1000 / 60
-          )} minutes and ${(timeLeft / 1000) % 60} seconds`,
+          } minutes.`,
         })
       }
 
