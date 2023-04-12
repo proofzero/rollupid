@@ -1,32 +1,91 @@
-# Contribution guide
+# Guide: Setting Up the Development Environment for RollupID (Yarn Workspace Monorepo Setup)
 
-## Documentation Standards
+This guide will help you set up the development environment for RollupID using the provided README files in the [RollupID repository](https://github.com/proofzero/rollupid). The RollupID project uses a Yarn Workspace monorepo setup, and each project within the monorepo has its own short guide to get started.
 
-When you create a draft or PR intended to land to `main` an action will render the documentation in `/docs`. This allows you and reviewers to check that your changes are properly captured in the documentation portal.
+## Clone the repository
 
-Documentation landed to `main` will publish to `https://docs.rollup.id`.
+First, clone the repository using the following command:
 
-## Environment variables and secrets naming conventions
+```bash
+git clone https://github.com/proofzero/rollupid.git
+```
 
-Environment variables and secret names should follow the naming convention below. This convention is used to set the values for secrets and internal values in GitHub Actions secrets as well as for referencing the same from within Github Action pipelines. The same convention is to be followed for local development by setting the respective dev values in .dev environment files (for secret vars( or wrangler.toml files (for non-secret env vars). See .dev.examples files in each project folder, for samples of vars that need to be set to run a particular project/app.
+## Install dependencies
 
-Convention: `(type)_(name of service/system)_(optional qualifier)_(environment name)`
+Navigate to the root directory of the cloned repository and install the required dependencies using Yarn:
 
-> Note: `(environment name)` should be used for environment-specific secrets in GitHub actions, both to set the value as well as to reference which secret to read off of, however, it should not be used in the name that the app or the tool running in the pipeline expects to be available as an env var, eg. app env var `APIKEY_APP` should be reading a secret from `secret.APIKEY_APP_DEV` by the Dev pipeline.
+```bash
+cd rollupid
+yarn
+```
 
-Types:
-- `TOKEN`
-- `PASSWORD`
-- `APIKEY`
-- `KEY`
-- `INTERNAL` (generic non-secrets intended for internal use, eg. app IDs, contract addresses, non-static service URLs/endpoints, etc)
-- `SECRET` (generic secrets not covered above, if any)
-Note: Any public variables should go in the appropriate variable files, eg. wrangler.toml for workers, etc.
+## Configure environment variables
 
-Examples:
-- `APIKEY_ALCHEMY_PUBLIC_MAINNET`
-- `INTERNAL_CLOUDFLARE_ACCOUNT_ID`
-- `TOKEN_NFT_STORAGE_TESTNET`
-- `INTERNAL_ALCHEMY_API_URL`
-- `INTERNAL_ENS_CONTRACT_ADDRESS`
+Many projects in the repository have a .dev.vars.example file. Copy this file to a new file named .dev.vars and update the environment variables as required. Some projects may require you to obtain API keys and app keys.
 
+For example, in the Console app:
+
+```bash
+cd apps/console
+cp .dev.vars.example .dev.vars
+```
+
+Update the .dev.vars file with the required API keys and app keys. You'll need a Cloudflare account and recommend setting up a Github App for SSO flow.
+
+## Optional: Nix
+
+Although not required, using Nix can be useful for the development environment. Nix shell scripts are available at the root, apps, and platform directories. To use Nix, install it on your system and enter the Nix shell using the following command:
+
+```bash
+nix-shell
+```
+
+## Setup the Edges DB
+
+1. Run `cd platform/edges`
+2. Run `yarn db:execute` to create the database.
+
+## Running the frontend applications
+
+To run all frontend applications simultaneously, navigate to the `apps` directory and use the following command:
+
+```bash
+cd apps
+yarn start
+```
+
+This command will start all frontend services simultaneously.
+
+## Running the backend services
+
+To run all backend services simultaneously, navigate to the `platform` directory and use the following command:
+
+```bash
+cd platform
+yarn dev
+```
+
+This command will start all backend services simultaneously.
+
+## Packages
+
+The packages directory contains dependencies for the projects within the monorepo. These dependencies are shared among the projects to ensure consistency and reduce duplication.
+
+### Adding new dependencies
+
+To add new dependencies to a specific project within the monorepo, navigate to the project directory and use Yarn to add the dependency:
+
+```bash
+cd <project-directory>
+yarn add <dependency-name>
+```
+
+## Contributing
+
+When working on multiple projects within the monorepo, ensure that you follow the same code style, contribution guidelines, and testing procedures for each project. This will help maintain consistency and quality across the entire codebase.
+
+Remember to thoroughly test your code and update any relevant documentation or tests before submitting your changes. Create a pull request with a clear description of your changes and reference any related issues or discussions.
+
+## Community
+
+Join us on [Discord](https://discord.gg/rollupid) and [Twitter](https://twitter.com/rollupid) to discuss RollupID and learn more about the project.
