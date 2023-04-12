@@ -12,7 +12,7 @@ assignees: ''
 
 ### Related Issues
 
-- Closes Issue #1
+- Closes #1
 
 ### Testing
 
