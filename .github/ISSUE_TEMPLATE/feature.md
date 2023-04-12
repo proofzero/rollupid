@@ -1,8 +1,9 @@
 ---
-name: Feature
-about: Feature issue template
-title: "FEAT([DOMAIN]): [TITLE]"
-labels: types » enhancement
+name: Feature Definition
+about: Describe a new feature
+title: 'feat(scope): Short description of the new feature'
+labels: 'enhancement'
+assignees: ''
 ---
 
 # Why

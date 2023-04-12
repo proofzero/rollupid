@@ -1,19 +1,15 @@
 ---
 name: Chore
-about: Chore issue template
-title: "CHORE([DOMAIN]): [TITLE]"
+about: Propose a chore to improve the project
+title: 'chore(scope): Short description of the chore'
+labels: ''
+assignees: ''
 ---
 
-# Why
+### Description
 
-> Description
+[Provide a more detailed description of the chore]
 
-# What
+### Proposed Solution (if applicable)
 
-- [ ] Chore #0
-- [ ] Chore #0
-- [ ] Chore #0
-
-# Notes
-
-- N/A
+### Additional Context (if applicable)
