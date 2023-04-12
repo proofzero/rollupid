@@ -8,10 +8,10 @@ Rollup implements the Keycloak interface for authentication and authorization wi
 
 ```mermaid
 sequenceDiagram
-  Your App->Supabase: Redirect to connect using Keycloak
-  Supabase->Rollup ID: Redirect to auth with Rollup ID
-  Rollup ID->Supabase: Rollup redirects back to Supabase.
-  Supabase->Your App: Supabase redirects back to your application.
+  Your App->>Supabase: App redirects to Supabase with Keycloak provider.
+  Supabase->>Rollup ID: Supabase redirect to Rollup ID for auth.
+  Rollup ID->>Supabase: Rollup redirects back to Supabase callback endpoint.
+  Supabase->>Your App: Supabase redirects back to your application callback endpoint.
 ```
 
 In order to implement these hops, configure Rollup, Supabase, and your app as follows:
