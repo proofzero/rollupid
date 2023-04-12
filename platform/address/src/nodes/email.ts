@@ -14,11 +14,10 @@ type EmailAddressProfile = AddressProfile<EmailAddressType.Email>
 
 type VerificationPayload = {
   state: string
-  record: {
-    creationTimestamp: number
-    numberOfAttempts: number
-    firstAttemptTimestamp: number
-  }
+  creationTimestamp: number
+  numberOfAttempts: number
+  firstAttemptTimestamp: number
+  delayStartTimestamp?: number
 }
 
 const CODES_KEY_NAME = 'codes'
@@ -38,11 +37,10 @@ export default class EmailAddress {
 
     let numberOfAttempts
     let firstAttemptTimestamp
-    let keepAttemptsNumber = true
 
-    for (const [_, payload] of Object.entries(verificationCodes)) {
+    for (const [code, payload] of Object.entries(verificationCodes)) {
       if (
-        payload.record.creationTimestamp +
+        payload.creationTimestamp +
           EMAIL_VERIFICATION_OPTIONS.regenDelaySubsCallInMs >
         Date.now()
       ) {
@@ -52,30 +50,57 @@ export default class EmailAddress {
           } seconds`,
         })
       }
-      numberOfAttempts = payload.record.numberOfAttempts
-      firstAttemptTimestamp = payload.record.firstAttemptTimestamp
+      numberOfAttempts = payload.numberOfAttempts
+      firstAttemptTimestamp = payload.firstAttemptTimestamp
 
-      // We count 10 minutes from the first attempt
+      // We count 5 minutes from the first attempt
       if (
-        numberOfAttempts >= EMAIL_VERIFICATION_OPTIONS.numberOfAttempts &&
-        payload.record.firstAttemptTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenDelayFor5SubsCallsInMs >
+        numberOfAttempts >= EMAIL_VERIFICATION_OPTIONS.maxAttempts &&
+        payload.firstAttemptTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.maxAttempsTimePeriod >
           Date.now()
       ) {
+        payload.delayStartTimestamp = Date.now()
         throw new BadRequestError({
           message: `Cannot generate new code for the address.
-          You can only generate a new code 5 times every ${EMAIL_VERIFICATION_OPTIONS.regenDelayFor5SubsCallsInMins}
-          minutes`,
+          You can only generate  ${
+            EMAIL_VERIFICATION_OPTIONS.maxAttempts
+          } new codes within ${
+            EMAIL_VERIFICATION_OPTIONS.maxAttempsTimePeriod / 1000 / 60
+          }
+          minutes. Please try again in ${
+            EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs / 1000 / 60
+          } minutes.}`,
         })
       }
 
-      // Every 10 minutes we wipe the number of attempts and first attempt timestamp
+      // Once the limit of 5 attempts is hit, we count 10 minutes from the last attempt
       if (
-        payload.record.firstAttemptTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenDelayFor5SubsCallsInMs <
-        Date.now()
+        payload.delayStartTimestamp &&
+        payload.delayStartTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs >
+          Date.now()
       ) {
-        keepAttemptsNumber = false
+        const timeLeft =
+          payload.delayStartTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs -
+          Date.now()
+
+        throw new BadRequestError({
+          message: `Cannot generate new code for the address. You can only generate a new code after ${Math.floor(
+            timeLeft / 1000 / 60
+          )} minutes and ${(timeLeft / 1000) % 60} seconds`,
+        })
+      }
+
+      // Every 5 minutes we wipe the code if the limit of 5 attempt wasn't hit
+      if (
+        numberOfAttempts < EMAIL_VERIFICATION_OPTIONS.maxAttempts &&
+        payload.firstAttemptTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.maxAttempsTimePeriod <
+          Date.now()
+      ) {
+        delete verificationCodes[code]
       }
     }
 
@@ -85,16 +110,12 @@ export default class EmailAddress {
     ).toUpperCase()
     verificationCodes[code] = {
       state,
-      record: {
-        creationTimestamp,
-        // RE: Every 10 minutes we wipe the number of attempts and first attempt timestamp
-        numberOfAttempts:
-          numberOfAttempts && keepAttemptsNumber ? numberOfAttempts + 1 : 1,
-        firstAttemptTimestamp:
-          firstAttemptTimestamp && keepAttemptsNumber
-            ? firstAttemptTimestamp
-            : creationTimestamp,
-      },
+      creationTimestamp,
+      // RE: Every 10 minutes we wipe the number of attempts and first attempt timestamp
+      numberOfAttempts: numberOfAttempts ? numberOfAttempts + 1 : 1,
+      firstAttemptTimestamp: firstAttemptTimestamp
+        ? firstAttemptTimestamp
+        : creationTimestamp,
     }
 
     this.node.class.setNodeType(NodeType.Email)
@@ -120,7 +141,7 @@ export default class EmailAddress {
     }
 
     if (
-      emailVerification.record.creationTimestamp +
+      emailVerification.creationTimestamp +
         EMAIL_VERIFICATION_OPTIONS.ttlInMs <=
       Date.now()
     ) {
@@ -146,8 +167,7 @@ export default class EmailAddress {
 
     for (const [code, verification] of Object.entries(codes)) {
       if (
-        verification.record.creationTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.ttlInMs <=
+        verification.creationTimestamp + EMAIL_VERIFICATION_OPTIONS.ttlInMs <=
         Date.now()
       ) {
         delete codes[code]
