@@ -35,7 +35,6 @@ export default class EmailAddress {
       await this.node.storage.get<VerificationPayload>(OTP_KEY_NAME)
 
     if (verificationPayload) {
-      console.log({ verificationPayload })
       if (
         verificationPayload.creationTimestamp +
           EMAIL_VERIFICATION_OPTIONS.regenDelaySubsCallInMs >
