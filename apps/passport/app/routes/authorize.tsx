@@ -386,18 +386,19 @@ export default function Authorize() {
   }
 
   const authorizeCallback = async (scopes: string[]) => {
-    if (!selectedEmail || !('addressURN' in selectedEmail)) return
-
     const form = new FormData()
     form.append('scopes', scopes.join(' '))
     form.append('state', state)
     form.append('client_id', clientId)
     form.append('redirect_uri', redirectOverride)
+    // TODO: Everything should be a form field now handled by javascript
+    // This helps keeps things generic has if a form input is not present
+    // it doesn't end up being submitted
     form.append(
       'personaData',
       JSON.stringify({
         ...persona,
-        email: selectedEmail.addressURN,
+        email: selectedEmail?.addressURN,
       })
     )
 
@@ -555,10 +556,12 @@ export default function Authorize() {
                   btnSize="xl"
                   btnType="primary-alt"
                   disabled={
+                    // TODO: make generic!
                     requestedScope.includes('email') &&
                     (!connectedEmails?.length || !selectedEmail)
                   }
                   onClick={() => {
+                    console.debug('I AM CLICKED', requestedScope)
                     authorizeCallback(requestedScope)
                   }}
                 >
