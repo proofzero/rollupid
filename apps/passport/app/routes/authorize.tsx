@@ -27,7 +27,7 @@ import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import { EmailSelect } from '@proofzero/design-system/src/atoms/email/EmailSelect'
 
 import authorizeCheck from '~/assets/authorize-check.svg'
-import iIcon from '~/assets/i.svg'
+import Info from '~/components/authorization/Info'
 
 import profileClassIcon from '~/components/authorization/profile-class-icon.svg'
 import addressClassIcon from '~/components/authorization/address-class-icon.svg'
@@ -39,6 +39,7 @@ import {
   getDataForScopes,
 } from '~/utils/authorize.server'
 import { useEffect, useState } from 'react'
+import { OptionType } from '@proofzero/utils/getNormalisedConnectedEmails'
 
 import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
@@ -47,13 +48,9 @@ import type { DataForScopes } from '~/utils/authorize.server'
 import { Text } from '@proofzero/design-system'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { JsonError } from '@proofzero/utils/errors'
-import {
-  EmailSelectListItem,
-  OptionType,
-} from '@proofzero/utils/getNormalisedConnectedEmails'
+import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
-import { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
-import Info from '~/components/authorization/Info'
+import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
 
 export type UserProfile = {
   displayName: string
