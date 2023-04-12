@@ -40,16 +40,16 @@ import {
 } from '~/utils/authorize.server'
 import { useEffect, useState } from 'react'
 import { OptionType } from '@proofzero/utils/getNormalisedConnectedEmails'
+import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
+import { Text } from '@proofzero/design-system'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
+import { JsonError } from '@proofzero/utils/errors'
 
 import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { PersonaData } from '@proofzero/types/application'
 import type { DataForScopes } from '~/utils/authorize.server'
-import { Text } from '@proofzero/design-system'
-import { BadRequestError, InternalServerError } from '@proofzero/errors'
-import { JsonError } from '@proofzero/utils/errors'
 import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
-import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
 
 export type UserProfile = {
