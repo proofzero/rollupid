@@ -561,7 +561,6 @@ export default function Authorize() {
                     (!connectedEmails?.length || !selectedEmail)
                   }
                   onClick={() => {
-                    console.debug('I AM CLICKED', requestedScope)
                     authorizeCallback(requestedScope)
                   }}
                 >
