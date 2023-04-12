@@ -95,11 +95,18 @@ export function authzParamsMatch(
     authzCookieParams.scope.length === authzQueryParams.scope.length &&
     authzQueryParams.scope.every((e) => authzCookieParams.scope!.includes(e))
   )
+  const authzReqRedirectURL = authzQueryParams.redirectUri
+    ? new URL(authzQueryParams.redirectUri)
+    : undefined
+  const authzReqCookieRedirectURL = authzCookieParams.redirectUri
+    ? new URL(authzCookieParams.redirectUri)
+    : undefined
 
   return (
     scopesMatch &&
     authzCookieParams.clientId === authzQueryParams.clientId &&
-    authzCookieParams.redirectUri === authzQueryParams.redirectUri &&
+    `${authzReqRedirectURL?.origin}${authzReqRedirectURL?.pathname}` ===
+      `${authzReqCookieRedirectURL?.origin}${authzReqCookieRedirectURL?.pathname}` &&
     authzCookieParams.state === authzQueryParams.state
   )
 }
