@@ -3,10 +3,7 @@ import { z } from 'zod'
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 
 import { Context } from '../../context'
-import { CODE_OPTIONS } from '../../constants'
-import { initAccessNodeByName, initAuthorizationNodeByName } from '../../nodes'
-import { hexlify } from '@ethersproject/bytes'
-import { randomBytes } from '@ethersproject/random'
+import { initAccessNodeByName } from '../../nodes'
 import { PersonaData } from '@proofzero/types/application'
 import { appRouter } from '../router'
 import { AccountURNSpace } from '@proofzero/urns/account'
@@ -45,18 +42,20 @@ export const preauthorizeMethod = async ({
 }): Promise<PreAuthorizeOutputParams> => {
   let preauthorized = false
 
-  const { account, clientId, scope } = input
+  const { account, clientId, scope: requestedScope } = input
 
-  console.debug('PREAUTH REQUEST', { scope })
   //If all scope values are system (ie. hidden) scope values, then we preauthorize
   if (
-    scope.every((scopeVal) => {
+    requestedScope.every((scopeVal) => {
       return (
         SCOPES[scopeSymbol(scopeVal)] && SCOPES[scopeSymbol(scopeVal)].hidden
       )
     })
   ) {
-    console.debug('PREAUTHORIZED BASED ON HIDDEN SCOPE', { scope })
+    console.log(
+      'Pre-authorizing based on scope containing only hidden scope values',
+      { requestedScope }
+    )
     preauthorized = true
   }
 
@@ -67,10 +66,12 @@ export const preauthorizeMethod = async ({
     const { tokenMap } = await accessNode.class.getTokenState()
     for (const [k, v] of Object.entries(tokenMap)) {
       const existingScopeValSet = new Set(v.scope)
-      if (scope.every((scopeVal) => existingScopeValSet.has(scopeVal))) {
-        console.debug('PREAUTHORIZED BASED ON SCOPE SUBSET', {
-          scope,
-          existingScopeValSet,
+      if (
+        requestedScope.every((scopeVal) => existingScopeValSet.has(scopeVal))
+      ) {
+        console.log('Pre-authorizing based on matching scope subset:', {
+          requestedScope,
+          matchingExistingScopeSet: v.scope,
         })
         preauthorized = true
         break
