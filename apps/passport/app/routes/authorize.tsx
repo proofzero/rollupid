@@ -412,7 +412,7 @@ export default function Authorize() {
           'basis-2/5 h-screen w-full hidden lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
         }
       >
-        <img src={sideGraphics} alt="Error loading background" />
+        <img src={sideGraphics} alt="Background graphics" />
       </div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
         <div
