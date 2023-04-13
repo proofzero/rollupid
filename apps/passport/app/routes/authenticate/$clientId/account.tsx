@@ -122,17 +122,15 @@ export default () => {
           }}
         />
 
-        <Text size="sm" className="text-gray-500 mt-7">
-          Before using this app, you can review Company's{' '}
-          <a href="" className="text-indigo-500">
-            privacy policy
-          </a>{' '}
-          and{' '}
-          <a href="" className="text-indigo-500">
-            terms of service
-          </a>
-          .
-        </Text>
+        {appProps?.termsURL && (
+          <Text size="sm" className="text-gray-500 mt-7">
+            Before using this app, you can review Company's{' '}
+            <a href={appProps.termsURL} className="text-indigo-500">
+              terms of service
+            </a>
+            .
+          </Text>
+        )}
       </>
     </Authentication>
   )
