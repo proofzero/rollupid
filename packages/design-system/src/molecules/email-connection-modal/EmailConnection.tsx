@@ -1,6 +1,7 @@
 import React, { FC } from 'react'
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
+import { AiFillApple } from 'react-icons/ai'
 
 import { MdOutlineEmail } from 'react-icons/md'
 import { Text } from '../../atoms/text/Text'
@@ -16,6 +17,7 @@ export type EmailConnectionProp = {
     | EmailAddressType.Email
     | OAuthAddressType.Google
     | OAuthAddressType.Microsoft
+    | OAuthAddressType.Apple
   callback: () => void
 }
 
@@ -31,6 +33,7 @@ const iconMapper = {
   [OAuthAddressType.Microsoft]: (
     <img src={microsoftIcon} alt="microsoft" className="my-2" />
   ),
+  [OAuthAddressType.Apple]: <AiFillApple size={24} className="my-2" />,
   [EmailAddressType.Email]: <MdOutlineEmail size={24} className="my-2" />,
 }
 
