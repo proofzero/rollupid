@@ -35,7 +35,7 @@ export default function Index() {
           'basis-2/5 h-screen w-full hidden lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
         }
       >
-        <img src={sideGraphics} alt="Not Found" />
+        <img src={sideGraphics} alt="Error loading background" />
       </div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
         <Suspense fallback={''}>
