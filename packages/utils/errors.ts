@@ -23,7 +23,7 @@ export const getErrorCause = (error: unknown): Error => {
   if (error instanceof RollupError) {
     return error
   } else if (error instanceof TRPCClientError) {
-    if ('rollupError' in error.data) {
+    if (error.data && 'rollupError' in error.data) {
       const cause = (error.data as { rollupError: RollupError }).rollupError
       if (ERROR_CODES[cause.code]) {
         const ErrorClass = ROLLUP_ERROR_CLASS_BY_CODE[cause.code]
@@ -31,7 +31,7 @@ export const getErrorCause = (error: unknown): Error => {
       } else {
         return new RollupError(cause)
       }
-    } else if ('zodError' in error.data) {
+    } else if (error.data && 'zodError' in error.data) {
       const cause = (error.data as { zodError: object }).zodError
       return new Error('data error', { cause })
     } else return error
@@ -72,7 +72,11 @@ export const JsonError = (error: unknown) => {
     const status = HTTP_STATUS_CODES[cause.code]
     return json(body, status)
   } else if (cause instanceof TRPCClientError) {
-    return json(body, cause.data.httpStatus)
+    return json(
+      body,
+      cause.data?.httpStatus ||
+        HTTP_STATUS_CODES[ERROR_CODES.INTERNAL_SERVER_ERROR]
+    )
   } else {
     return json(body, 500)
   }

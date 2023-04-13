@@ -41,7 +41,7 @@ export default class GithubAddress extends OAuthAddress {
     }
     return {
       address: profile.login,
-      title: profile.name,
+      title: profile.name || profile.login,
       icon: profile.avatar_url,
       type: OAuthAddressType.GitHub,
     }
