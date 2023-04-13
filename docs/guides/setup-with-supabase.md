@@ -24,6 +24,13 @@ Request authorization for the `Email` scope and set the Redirect URL to the Supa
 
 <figure><img src="../img/console-app-0xauth-supabase.png" alt="Set the redirect URL in Console to the Supabase callback URL and request the email scope."><figcaption><p>Rollup Console Configuration for the Supabase callback and required scope.</p></figcaption></figure>
 
+Required scopes are:
+
+* `Email`
+* `Profile`
+
+`OpenID` is an optional scope suggested for standards-compliant OIDC connections.
+
 Save and publish your application.
 
 # Supabase Configuration
