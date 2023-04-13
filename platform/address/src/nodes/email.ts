@@ -37,43 +37,43 @@ export default class EmailAddress {
     const creationTimestamp = Date.now()
     let numberOfAttempts = 1,
       firstAttemptTimestamp = creationTimestamp
-    // This value is not undefined only when the limit of 5 attempts is hit
+    // This value is only defined when the limit of 5 attempts is hit
     let cooldownStartTimestamp = undefined
 
     if (verificationPayload) {
-      // Subsequent calls to generate a new code are limited to one per 30 seconds
-      if (
-        verificationPayload.creationTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenDelaySubsCallInMs >
-        Date.now()
-      ) {
-        throw new BadRequestError({
-          message: `Cannot generate new code for the address. You can only generate a new code once every ${
-            EMAIL_VERIFICATION_OPTIONS.regenDelaySubsCallInMs / 1000
-          } seconds`,
-        })
-      }
-
       // cooldownStartTimestamp is set only when the limit of 5 attempts per 5 minutes was hit
       // when this is set, we don't allow the user to generate a new code until the delay is over
       if (
         verificationPayload.cooldownStartTimestamp &&
         verificationPayload.cooldownStartTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttemptsInMs >
+          EMAIL_VERIFICATION_OPTIONS.regenCooldownPeriodInMs >
           Date.now()
       ) {
         const timeLeft =
           verificationPayload.cooldownStartTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttemptsInMs -
+          EMAIL_VERIFICATION_OPTIONS.regenCooldownPeriodInMs -
           Date.now()
 
         throw new BadRequestError({
           message: `Cannot generate new code for the address. You can only generate  ${
             EMAIL_VERIFICATION_OPTIONS.maxAttempts
           } new codes within ${
-            EMAIL_VERIFICATION_OPTIONS.maxAttemptsTimePeriod / 1000 / 60
+            EMAIL_VERIFICATION_OPTIONS.maxAttemptsTimePeriodInMs / 1000 / 60
           }
           minutes. Try again in ${Math.ceil(timeLeft / 1000 / 60)} minutes`,
+        })
+      }
+
+      // Subsequent calls to generate a new code are limited to one per 30 seconds
+      if (
+        verificationPayload.creationTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.delayBetweenRegenAttemptsInMs >
+        Date.now()
+      ) {
+        throw new BadRequestError({
+          message: `Cannot generate new code for the address. You can only generate a new code once every ${
+            EMAIL_VERIFICATION_OPTIONS.delayBetweenRegenAttemptsInMs / 1000
+          } seconds`,
         })
       }
 
@@ -84,10 +84,21 @@ export default class EmailAddress {
       if (
         numberOfAttempts >= EMAIL_VERIFICATION_OPTIONS.maxAttempts &&
         firstAttemptTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.maxAttemptsTimePeriod >
+          EMAIL_VERIFICATION_OPTIONS.maxAttemptsTimePeriodInMs >
           Date.now()
       ) {
         cooldownStartTimestamp = creationTimestamp
+      }
+
+      // We go to this block if user has not hit the limit of 5 attempts within 5 minutes
+      // and 5 minutes have passed since the first attempt
+      if (
+        firstAttemptTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.maxAttemptsTimePeriodInMs <=
+        Date.now()
+      ) {
+        numberOfAttempts = 1
+        firstAttemptTimestamp = creationTimestamp
       }
     }
 
@@ -113,7 +124,7 @@ export default class EmailAddress {
     if (cooldownStartTimestamp) {
       await this.node.storage.setAlarm(
         cooldownStartTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttemptsInMs
+          EMAIL_VERIFICATION_OPTIONS.delayBetweenRegenAttemptsInMs
       )
     }
     // 2. If the user has not hit the limit of 5 attempts, we set a TTL of 5 minutes
