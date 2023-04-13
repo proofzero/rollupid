@@ -18,7 +18,7 @@ type VerificationPayload = {
   numberOfAttempts: number
   firstAttemptTimestamp: number
   code: string
-  delayStartTimestamp?: number
+  cooldownStartTimestamp?: number
 }
 
 const OTP_KEY_NAME = 'otp'
@@ -34,7 +34,14 @@ export default class EmailAddress {
     const verificationPayload =
       await this.node.storage.get<VerificationPayload>(OTP_KEY_NAME)
 
+    const creationTimestamp = Date.now()
+    let numberOfAttempts = 0,
+      firstAttemptTimestamp = creationTimestamp
+    // This value not undefined only when the limit of 5 attempts was hit
+    let cooldownStartTimestamp = undefined
+
     if (verificationPayload) {
+      // Subsequent calls to generate a new code will be limited to once every 30 seconds
       if (
         verificationPayload.creationTimestamp +
           EMAIL_VERIFICATION_OPTIONS.regenDelaySubsCallInMs >
@@ -46,67 +53,44 @@ export default class EmailAddress {
           } seconds`,
         })
       }
-      // Once the limit of 5 attempts is hit, we count 10 minutes from the last attempt
+
+      // cooldownStartTimestamp is set only when the limit of 5 attempts was hit
+      // when this is set, we don't allow the user to generate a new code until the delay is over
       if (
-        verificationPayload.delayStartTimestamp &&
-        verificationPayload.delayStartTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs >
+        verificationPayload.cooldownStartTimestamp &&
+        verificationPayload.cooldownStartTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttemptsInMs >
           Date.now()
       ) {
         const timeLeft =
-          verificationPayload.delayStartTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs -
+          verificationPayload.cooldownStartTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttemptsInMs -
           Date.now()
 
         throw new BadRequestError({
-          message: `Cannot generate new code for the address. You will be able to try after ${Math.floor(
-            timeLeft / 1000 / 60
-          )} minutes ${
-            Math.floor((timeLeft / 1000) % 60)
-              ? `and ${Math.floor((timeLeft / 1000) % 60)}  seconds`
-              : ''
-          }`,
-        })
-      }
-
-      // We count 5 minutes from the first attempt
-      if (
-        verificationPayload.numberOfAttempts >
-          EMAIL_VERIFICATION_OPTIONS.maxAttempts &&
-        verificationPayload.firstAttemptTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.maxAttempsTimePeriod >
-          Date.now()
-      ) {
-        const delayStartTimestamp = Date.now()
-        verificationPayload.delayStartTimestamp = delayStartTimestamp
-        await this.node.storage.put(OTP_KEY_NAME, verificationPayload)
-        await this.node.storage.setAlarm(
-          delayStartTimestamp +
-            EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs
-        )
-        throw new BadRequestError({
-          message: `Cannot generate new code for the address.
-            You can only generate  ${
-              EMAIL_VERIFICATION_OPTIONS.maxAttempts
-            } new codes within ${
-            EMAIL_VERIFICATION_OPTIONS.maxAttempsTimePeriod / 1000 / 60
+          message: `Cannot generate new code for the address. You can only generate  ${
+            EMAIL_VERIFICATION_OPTIONS.maxAttempts
+          } new codes within ${
+            EMAIL_VERIFICATION_OPTIONS.maxAttemptsTimePeriod / 1000 / 60
           }
-            minutes. Please try again in ${
-              EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs /
-              1000 /
-              60
-            } minutes.`,
+          minutes. Try again in ${Math.ceil(timeLeft / 1000 / 60)} minutes`,
         })
       }
-    }
 
-    const creationTimestamp = Date.now()
-    let numberOfAttempts = 1,
-      firstAttemptTimestamp = creationTimestamp
-    if (verificationPayload) {
       numberOfAttempts = verificationPayload.numberOfAttempts + 1
       firstAttemptTimestamp = verificationPayload.firstAttemptTimestamp
+      // we limit the number of attempts to 5 within 5 minutes
+      // once the limit of 5 attempts is hit, we set a cool down 10 minutes from the last attempt
+      if (
+        numberOfAttempts >= EMAIL_VERIFICATION_OPTIONS.maxAttempts &&
+        firstAttemptTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.maxAttemptsTimePeriod >
+          Date.now()
+      ) {
+        cooldownStartTimestamp = creationTimestamp
+      }
     }
+
     const code = generateRandomString(
       EMAIL_VERIFICATION_OPTIONS.codeLength
     ).toUpperCase()
@@ -116,14 +100,29 @@ export default class EmailAddress {
       numberOfAttempts,
       firstAttemptTimestamp,
       code,
+      // this will be undefined if the limit of 5 attempts was not hit
+      cooldownStartTimestamp,
     }
 
     this.node.class.setNodeType(NodeType.Email)
     this.node.class.setType(EmailAddressType.Email)
     await this.node.storage.put(OTP_KEY_NAME, payload)
-    await this.node.storage.setAlarm(
-      creationTimestamp + EMAIL_VERIFICATION_OPTIONS.ttlInMs
-    )
+
+    // We have 2 types of alarms to set
+    // 1. If the user has hit the limit of 5 attempts, we set a cool down of 10 minutes
+    if (cooldownStartTimestamp) {
+      await this.node.storage.setAlarm(
+        cooldownStartTimestamp +
+          EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttemptsInMs
+      )
+      return code
+    }
+    // 2. If the user has not hit the limit of 5 attempts, we set a TTL of 5 minutes
+    else {
+      await this.node.storage.setAlarm(
+        creationTimestamp + EMAIL_VERIFICATION_OPTIONS.ttlInMs
+      )
+    }
 
     return code
   }
@@ -168,15 +167,12 @@ export default class EmailAddress {
 
   static async alarm(address: Address) {
     const verificationPayload =
-      await address.state.storage.get<VerificationPayload>(OTP_KEY_NAME)
+      (await address.state.storage.get<VerificationPayload>(OTP_KEY_NAME))!
 
     if (
-      // we only have delayStartTimestamp if the limit of 5 attempts was hit
+      // we only have cooldownStartTimestamp if the limit of 5 attempts was hit
       // this is how we check if the limit was hit and delete node
-      verificationPayload?.delayStartTimestamp &&
-      verificationPayload.delayStartTimestamp +
-        EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttepmtsInMs <=
-        Date.now()
+      verificationPayload.cooldownStartTimestamp
     ) {
       // check if account exists
       const account = await address.getAccount()
@@ -187,14 +183,8 @@ export default class EmailAddress {
       else {
         await address.state.storage.deleteAll()
       }
-    }
-    // if the limit was not hit we follow this path
-    if (
-      verificationPayload &&
-      verificationPayload.creationTimestamp +
-        EMAIL_VERIFICATION_OPTIONS.ttlInMs <=
-        Date.now()
-    ) {
+    } else {
+      // if the limit was not hit we follow this path
       await address.state.storage.delete(OTP_KEY_NAME)
     }
   }
