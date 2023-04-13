@@ -32,7 +32,7 @@ const query = `query getProfile() {
     displayName
     pfp
   }
-}
+}`
 
 const { profile } = fetch("https://galaxy.rollup.id", {
   method: "post",
