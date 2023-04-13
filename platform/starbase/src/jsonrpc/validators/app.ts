@@ -26,6 +26,7 @@ export const AppReadableFieldsSchema = z.object({
   secretTimestamp: z.number().optional(),
   apiKeyTimestamp: z.number().optional(),
   createdTimestamp: z.number().optional(),
+  termsURL: z.string().optional(),
 })
 
 export const AppInternalFieldSchema = z.object({
@@ -46,6 +47,7 @@ export const AppPublicPropsSchema = z.object({
   name: z.string(),
   iconURL: z.string(),
   scopes: z.array(z.string()),
+  termsURL: z.string().optional(),
 })
 
 export type AppPublicProps = z.infer<typeof AppPublicPropsSchema>

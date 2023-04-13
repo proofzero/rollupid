@@ -26,6 +26,7 @@ export const getAppPublicProps = async ({
       iconURL: appDetails.app?.icon || '',
       //As app.scopes can be a Set<string>, the following works universally
       scopes: Array.from(appDetails.app?.scopes || []),
+      termsURL: appDetails.app?.termsURL,
     }
   } else {
     throw new Error(
