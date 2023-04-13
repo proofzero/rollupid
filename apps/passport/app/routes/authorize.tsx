@@ -45,6 +45,8 @@ import { Text } from '@proofzero/design-system'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { JsonError } from '@proofzero/utils/errors'
 
+import sideGraphics from '~/assets/auth-side-graphics.svg'
+
 import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { PersonaData } from '@proofzero/types/application'
@@ -406,13 +408,12 @@ export default function Authorize() {
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
       <div
-        style={{
-          backgroundImage: `url(https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/918fa1e6-d9c2-40d3-15cf-63131a2d8400/public)`,
-          backgroundSize: 'cover',
-          backgroundRepeat: 'no-repeat',
-        }}
-        className={'basis-2/5 h-screen w-full hidden lg:block'}
-      ></div>
+        className={
+          'basis-2/5 h-screen w-full hidden lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
+        }
+      >
+        <img src={sideGraphics} alt="Background graphics" />
+      </div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
         <div
           className={'flex flex-col gap-4 basis-96 m-auto bg-white p-6'}
