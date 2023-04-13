@@ -66,31 +66,48 @@ export default () => {
   const submit = useSubmit()
 
   return (
-    <Authentication logoURL={appProps?.iconURL} appName={appProps?.name}>
+    <Authentication
+      logoURL={appProps?.iconURL}
+      appName={appProps?.name}
+      accountSelect={true}
+    >
       <>
-        <AuthButton
-          onClick={() => {
-            submit(
-              {},
-              {
-                method: 'post',
-              }
-            )
-          }}
-          Graphic={
-            <>
-              {profile.pfp?.image && (
-                <img
-                  className="w-6 h-6 rounded-full"
-                  src={profile.pfp.image}
-                  alt="PFP"
-                />
-              )}
-            </>
-          }
-          text={profile.displayName}
-          Addon={<HiCheck className="w-3.5 h-3.5 text-indigo-500" />}
-        />
+        <div className="relative">
+          <AuthButton
+            onClick={() => {
+              submit(
+                {},
+                {
+                  method: 'post',
+                }
+              )
+            }}
+            Graphic={
+              <>
+                {profile.pfp?.image && (
+                  <img
+                    className="w-6 h-6 rounded-full"
+                    src={profile.pfp.image}
+                    alt="PFP"
+                  />
+                )}
+              </>
+            }
+            text={profile.displayName}
+          />
+
+          <div className="absolute z-10 right-0 top-0 bottom-0 flex flex-row-reverse justify-center items-center px-3">
+            <Text
+              size="xs"
+              className="cursor-pointer text-gray-500"
+              onClick={() => {
+                navigate('/signout')
+              }}
+            >
+              Sign out
+            </Text>
+          </div>
+        </div>
 
         <div className="my-1 flex flex-row items-center justify-center space-x-3">
           <hr className="h-px w-16 bg-gray-500" />
@@ -104,6 +121,18 @@ export default () => {
             navigate(`/authenticate/${clientId}`)
           }}
         />
+
+        <Text size="sm" className="text-gray-500 mt-7">
+          Before using this app, you can review Company's{' '}
+          <a href="" className="text-indigo-500">
+            privacy policy
+          </a>{' '}
+          and{' '}
+          <a href="" className="text-indigo-500">
+            terms of service
+          </a>
+          .
+        </Text>
       </>
     </Authentication>
   )
