@@ -107,7 +107,7 @@ export default class OAuthAddress {
         ...data,
         timestamp: Date.now(),
         accessToken: body.access_token,
-        refreshToken: body.refresh_token,
+        refreshToken: body.refresh_token ?? data.refreshToken,
         extraParams: {
           ...data.extraParams,
           expires_in: body.expires_in,
