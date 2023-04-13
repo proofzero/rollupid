@@ -37,11 +37,11 @@ export default class EmailAddress {
     const creationTimestamp = Date.now()
     let numberOfAttempts = 1,
       firstAttemptTimestamp = creationTimestamp
-    // This value not undefined only when the limit of 5 attempts was hit
+    // This value is not undefined only when the limit of 5 attempts is hit
     let cooldownStartTimestamp = undefined
 
     if (verificationPayload) {
-      // Subsequent calls to generate a new code will be limited to once every 30 seconds
+      // Subsequent calls to generate a new code are limited to one per 30 seconds
       if (
         verificationPayload.creationTimestamp +
           EMAIL_VERIFICATION_OPTIONS.regenDelaySubsCallInMs >
@@ -54,7 +54,7 @@ export default class EmailAddress {
         })
       }
 
-      // cooldownStartTimestamp is set only when the limit of 5 attempts was hit
+      // cooldownStartTimestamp is set only when the limit of 5 attempts per 5 minutes was hit
       // when this is set, we don't allow the user to generate a new code until the delay is over
       if (
         verificationPayload.cooldownStartTimestamp &&
@@ -127,14 +127,11 @@ export default class EmailAddress {
   }
 
   async verifyCode(code: string, state: string): Promise<boolean> {
-    const verificationPayload =
-      await this.node.storage.get<VerificationPayload>(OTP_KEY_NAME)
+    const emailVerification = await this.node.storage.get<VerificationPayload>(
+      OTP_KEY_NAME
+    )
 
-    const emailVerification = verificationPayload
-      ? verificationPayload
-      : undefined
-
-    if (!verificationPayload || !emailVerification) {
+    if (!emailVerification) {
       console.log('Missing OTP verification code')
       return false
     }
