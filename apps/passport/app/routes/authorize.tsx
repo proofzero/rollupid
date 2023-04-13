@@ -75,6 +75,8 @@ export type LoaderData = {
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { clientId, redirectUri, state } = context.consoleParams
+  const proxyURL =
+    new URL(request.url).searchParams.get('proxy_url') ?? undefined
 
   //Request parameter pre-checks
   if (!clientId) throw new BadRequestError({ message: 'client_id is required' })
@@ -106,7 +108,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     await createAuthzParamCookieAndAuthenticate(
       request,
       context.consoleParams,
-      context.env
+      context.env,
+      proxyURL
     )
   }
 
@@ -116,7 +119,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       await createAuthzParamCookieAndAuthenticate(
         request,
         context.consoleParams,
-        context.env
+        context.env,
+        proxyURL
       )
     }
 
@@ -482,11 +486,16 @@ export default function Authorize() {
                                 enableAddNew={true}
                                 onSelect={(selected: EmailSelectListItem) => {
                                   if (selected?.type === OptionType.AddNew) {
+                                    const proxyURL = new URL(
+                                      window.location.href
+                                    )
+
                                     const qp = new URLSearchParams()
                                     qp.append('scope', requestedScope.join(' '))
                                     qp.append('state', state)
                                     qp.append('client_id', clientId)
                                     qp.append('redirect_uri', redirectOverride)
+                                    qp.append('proxy_url', proxyURL.toString())
                                     qp.append('prompt', 'connect')
                                     qp.append(
                                       'login_hint',

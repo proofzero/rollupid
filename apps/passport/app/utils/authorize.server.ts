@@ -67,13 +67,18 @@ export const getDataForScopes = async (
 export async function createAuthzParamCookieAndAuthenticate(
   request: Request,
   authzParams: ConsoleParams,
-  env: Env
+  env: Env,
+  proxyURL?: string
 ) {
   const qp = new URLSearchParams()
 
   const url = new URL(request.url)
   if (url.searchParams.has('login_hint')) {
     qp.append('login_hint', url.searchParams.get('login_hint')!)
+  }
+
+  if (proxyURL) {
+    qp.append('proxy_url', proxyURL)
   }
 
   throw await createConsoleParamsSession(authzParams, env, qp)
