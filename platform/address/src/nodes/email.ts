@@ -35,7 +35,7 @@ export default class EmailAddress {
       await this.node.storage.get<VerificationPayload>(OTP_KEY_NAME)
 
     const creationTimestamp = Date.now()
-    let numberOfAttempts = 0,
+    let numberOfAttempts = 1,
       firstAttemptTimestamp = creationTimestamp
     // This value not undefined only when the limit of 5 attempts was hit
     let cooldownStartTimestamp = undefined
@@ -115,7 +115,6 @@ export default class EmailAddress {
         cooldownStartTimestamp +
           EMAIL_VERIFICATION_OPTIONS.regenDelayForMaxAttemptsInMs
       )
-      return code
     }
     // 2. If the user has not hit the limit of 5 attempts, we set a TTL of 5 minutes
     else {
@@ -166,6 +165,7 @@ export default class EmailAddress {
   }
 
   static async alarm(address: Address) {
+    // If we hit an alarm, we know we have a verification payload
     const verificationPayload =
       (await address.state.storage.get<VerificationPayload>(OTP_KEY_NAME))!
 
@@ -174,7 +174,8 @@ export default class EmailAddress {
       // this is how we check if the limit was hit and delete node
       verificationPayload.cooldownStartTimestamp
     ) {
-      // check if account exists
+      // If account exists we don't delete the whole node
+      // we just delete the code
       const account = await address.getAccount()
       if (account) {
         await address.state.storage.delete(OTP_KEY_NAME)
@@ -184,7 +185,7 @@ export default class EmailAddress {
         await address.state.storage.deleteAll()
       }
     } else {
-      // if the limit was not hit we follow this path
+      // if the limit was not hit we delete the code
       await address.state.storage.delete(OTP_KEY_NAME)
     }
   }
