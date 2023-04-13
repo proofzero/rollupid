@@ -32,12 +32,12 @@ const query = `query getProfile() {
     displayName
     pfp
   }
-}
+}`
 
 const { profile } = fetch("https://galaxy.rollup.id", {
   method: "post",
   headers: {
-    "Authorization": "Bearer: ${jwt}",
+    "Authorization": `Bearer: ${jwt}`,
     "X-GALAXY-KEY": "...",
   },
   body: JSON.stringify({ query }),
