@@ -27,7 +27,8 @@ export default function (
       return (
         (address.rc.node_type === NodeType.OAuth &&
           (address.rc.addr_type === OAuthAddressType.Google ||
-            address.rc.addr_type === OAuthAddressType.Microsoft)) ||
+            address.rc.addr_type === OAuthAddressType.Microsoft ||
+            address.rc.addr_type === OAuthAddressType.Apple)) ||
         (address.rc.node_type === NodeType.Email &&
           address.rc.addr_type === EmailAddressType.Email)
       )
@@ -37,6 +38,12 @@ export default function (
         if (address.rc.addr_type === OAuthAddressType.Google)
           return {
             type: OAuthAddressType.Google,
+            email: address.qc.alias,
+            addressURN: address.baseUrn as AddressURN,
+          }
+        if (address.rc.addr_type === OAuthAddressType.Apple)
+          return {
+            type: OAuthAddressType.Apple,
             email: address.qc.alias,
             addressURN: address.baseUrn as AddressURN,
           }

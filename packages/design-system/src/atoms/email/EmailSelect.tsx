@@ -11,6 +11,7 @@ import { OAuthAddressType } from '@proofzero/types/address'
 
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
+import { AiFillApple } from 'react-icons/ai'
 
 import { OptionType } from '@proofzero/utils/getNormalisedConnectedEmails'
 
@@ -65,6 +66,8 @@ export const EmailSelect = ({
           >
             {selectedIconURL ? (
               <img src={selectedIconURL} className="w-4 h-4 mr-3" />
+            ) : selected?.type === OAuthAddressType.Apple ? (
+              <AiFillApple className="w-4 h-4 mr-3" />
             ) : (
               <MdOutlineAlternateEmail className="w-4 h-4 mr-3" />
             )}
@@ -121,6 +124,8 @@ export const EmailSelect = ({
                       <div className="flex flex-row items-center">
                         {iconURL ? (
                           <img src={iconURL} className="w-4 h-4 mr-3" />
+                        ) : item.type === OAuthAddressType.Apple ? (
+                          <AiFillApple className="w-4 h-4 mr-3" />
                         ) : (
                           <MdOutlineAlternateEmail className="w-4 h-4 mr-3" />
                         )}
