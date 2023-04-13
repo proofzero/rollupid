@@ -37,7 +37,7 @@ const query = `query getProfile() {
 const { profile } = fetch("https://galaxy.rollup.id", {
   method: "post",
   headers: {
-    "Authorization": "Bearer: ${jwt}",
+    "Authorization": `Bearer: ${jwt}`,
     "X-GALAXY-KEY": "...",
   },
   body: JSON.stringify({ query }),
