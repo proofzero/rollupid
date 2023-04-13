@@ -30,6 +30,8 @@ Save and publish your application.
 
 Within Supabase, select "Authentication" and then under "Configuration" select "Providers" and open "Keycloak".
 
+Enable Keycloak.
+
 Update your Keycloak configuration's Client ID and secret with the values from your Rollup Console Application.
 
 Set your Keycloak Realm to `https://passport.rollup.id` (the screenshot below shows our development environment).
