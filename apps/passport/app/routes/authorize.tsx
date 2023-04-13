@@ -176,27 +176,22 @@ export const loader: LoaderFunction = async ({ request, context }) => {
           'Requested scope value not in the configured allowed scope list',
       })
 
-    if (
-      scope.every(
-        (scopeValue) =>
-          scopeMeta.scopes[scopeValue] && scopeMeta.scopes[scopeValue].hidden
-      )
-    ) {
-      //Pre-authorize if requested scope values are hidden (ie. system) scope values
-      const responseType = ResponseType.Code
-      const accessClient = getAccessClient(context.env, context.traceSpan)
-      const authorizeRes = await accessClient.authorize.mutate({
-        account: accountUrn,
-        responseType,
-        clientId,
-        redirectUri,
-        scope: scope,
-        state,
-      })
+    //Pre-authorize, if possible
+    const responseType = ResponseType.Code
+    const accessClient = getAccessClient(context.env, context.traceSpan)
+    const preauthorizeRes = await accessClient.preauthorize.mutate({
+      account: accountUrn,
+      responseType,
+      clientId,
+      redirectUri,
+      scope: scope,
+      state,
+    })
 
+    if (preauthorizeRes.preauthorized) {
       const redirectParams = new URLSearchParams({
-        code: authorizeRes.code,
-        state: authorizeRes.state,
+        code: preauthorizeRes.code,
+        state: preauthorizeRes.state,
       })
 
       const redirectURL = new URL(redirectUri)
@@ -207,7 +202,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       return redirect(redirectURL.toString(), {
         headers,
       })
-    }
+    } //else we present the authz screen below
 
     const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
     const profile = await accountClient.getProfile.query({

@@ -60,6 +60,11 @@ import {
   getPersonaDataMethod,
   GetPersonaDataOutput,
 } from './methods/getPersonaData'
+import {
+  preauthorizeMethod,
+  PreAuthorizeMethodInput,
+  PreAuthorizeMethodOutput,
+} from './methods/preauthorize'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -70,6 +75,12 @@ export const appRouter = t.router({
     .input(AuthorizeMethodInput)
     .output(AuthorizeMethodOutput)
     .mutation(authorizeMethod),
+  preauthorize: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(PreAuthorizeMethodInput)
+    .output(PreAuthorizeMethodOutput)
+    .mutation(preauthorizeMethod),
   exchangeToken: t.procedure
     .use(LogUsage)
     .use(({ ctx, path, type, next, input, rawInput, meta }) => {
