@@ -5,7 +5,7 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/design-system'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
 
-import passportLogo from '~/assets/PassportLogoIndigo.svg'
+import passportLogo from '../../assets/PassportLogoIndigo.svg'
 
 export type AuthenticationProps = {
   logoURL?: string
