@@ -125,6 +125,16 @@ export async function destroyUserSession(
   const headers = new Headers()
   headers.append('Set-Cookie', await storage.destroySession(session))
 
+  if (!clientId || clientId === 'passport' || clientId === 'console') {
+    const lastSession =
+      requestOrSession instanceof Request
+        ? await getUserSession(requestOrSession, env, 'last')
+        : requestOrSession
+    const lastStorage = getUserSessionStorage(env, 'last')
+
+    headers.append('Set-Cookie', await lastStorage.destroySession(lastSession))
+  }
+
   const flashStorage = getFlashSessionStorage(env)
   const flashSession = await flashStorage.getSession()
 
