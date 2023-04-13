@@ -13,6 +13,7 @@ export type AuthenticationProps = {
   appName?: string
   generic?: boolean
   accountSelect?: boolean
+  onBack?: () => void
   children: JSX.Element
 }
 
@@ -21,18 +22,18 @@ export function Authentication({
   appName,
   generic = false,
   accountSelect = false,
+  onBack,
   children,
 }: AuthenticationProps) {
   const logo = logoURL || circleLogo
-  const navigate = useNavigate()
 
   return (
     <div className="relative">
-      {generic && (
+      {onBack && (
         <div className="relative mx-auto w-full lg:w-[418px]">
           <HiOutlineArrowLeft
             className="absolute left-6 top-[3.25rem] w-6 h-6 cursor-pointer z-10"
-            onClick={() => navigate('/authenticate/cancel')}
+            onClick={onBack}
           />
         </div>
       )}

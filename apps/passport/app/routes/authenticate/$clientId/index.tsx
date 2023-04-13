@@ -128,7 +128,14 @@ export default () => {
     <WagmiConfig client={client}>
       {transition.state !== 'idle' && <Loader />}
 
-      <Authentication logoURL={iconURL} appName={name} generic={connectFlow}>
+      <Authentication
+        logoURL={iconURL}
+        appName={name}
+        generic={connectFlow}
+        onBack={
+          connectFlow ? () => navigate('/authenticate/cancel') : undefined
+        }
+      >
         <>
           {displayDict.wallet && (
             <ConnectButton
