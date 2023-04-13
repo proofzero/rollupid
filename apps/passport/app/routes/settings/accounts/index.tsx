@@ -268,18 +268,21 @@ export default function AccountsLayout() {
       return
     }
 
-    if (reqUrlError) {
-      sessionStorage.removeItem('connection_requested')
+    sessionStorage.removeItem('connection_requested')
 
+    if (reqUrlError) {
       let error = 'Error'
       switch (reqUrlError) {
         case 'ALREADY_CONNECTED':
           error = 'Account already connected'
+          break
+        case 'access_denied':
+          error = 'Access denied'
+          break
       }
 
       toast(ToastType.Error, { message: error }, { duration: 2000 })
     } else {
-      sessionStorage.removeItem('connection_requested')
       toast(
         ToastType.Success,
         { message: 'Account connected' },
