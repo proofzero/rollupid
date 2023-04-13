@@ -156,9 +156,18 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       }),
     ])
 
+    const providedUrl = new URL(redirectUri)
+    const configuredUrl = new URL(appPublicProps.redirectURI)
+
     if (!appPublicProps.scopes || !appPublicProps.scopes.length)
       throw new BadRequestError({
         message: 'No allowed scope was configured for the app',
+      })
+
+    if (providedUrl.hostname !== configuredUrl.hostname)
+      throw new BadRequestError({
+        message:
+          'Provided redirect URI did not match with configured redirect URI',
       })
 
     // We need a unique set of scopes to avoid duplicates

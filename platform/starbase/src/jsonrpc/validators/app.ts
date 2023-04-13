@@ -46,6 +46,7 @@ export const AppPublicPropsSchema = z.object({
   name: z.string(),
   iconURL: z.string(),
   scopes: z.array(z.string()),
+  redirectURI: z.string(),
 })
 
 export type AppPublicProps = z.infer<typeof AppPublicPropsSchema>
