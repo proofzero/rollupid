@@ -12,15 +12,11 @@ import { useEffect, useState } from 'react'
 import { HiOutlineMail } from 'react-icons/hi'
 import { Authentication, ConnectButton } from '~/components'
 import ConnectOAuthButton from '~/components/connect-oauth-button'
-import {
-  ActionFunction,
-  redirect,
-  json,
-  LoaderFunction,
-} from '@remix-run/cloudflare'
+import { redirect, json } from '@remix-run/cloudflare'
 
 import AuthButton from '~/components/connect-button/AuthButton'
 import { getConsoleParams } from '~/session.server'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const url = new URL(request.url)
