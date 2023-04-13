@@ -264,7 +264,8 @@ export default function AccountsLayout() {
   const fetcher = useFetcher()
 
   useEffect(() => {
-    if (!sessionStorage.getItem('connection_requested')) {
+    const conReq = sessionStorage.getItem('connection_requested')
+    if (!conReq) {
       return
     }
 
@@ -283,11 +284,12 @@ export default function AccountsLayout() {
 
       toast(ToastType.Error, { message: error }, { duration: 2000 })
     } else {
-      toast(
-        ToastType.Success,
-        { message: 'Account connected' },
-        { duration: 2000 }
-      )
+      if (connectedAddresses.length > Number(conReq))
+        toast(
+          ToastType.Success,
+          { message: 'Account connected' },
+          { duration: 2000 }
+        )
     }
   }, [reqUrlError])
 
@@ -337,7 +339,10 @@ export default function AccountsLayout() {
 
     qp.append('redirect_uri', currentWindowUrl.toString())
 
-    sessionStorage.setItem('connection_requested', 'true')
+    sessionStorage.setItem(
+      'connection_requested',
+      `${connectedAddresses.length}`
+    )
 
     navigate(`/authorize?${qp.toString()}`)
   }
