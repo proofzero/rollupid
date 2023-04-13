@@ -6,6 +6,7 @@ import { Avatar } from '@proofzero/design-system'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
 
 import passportLogo from '../../assets/PassportLogoIndigo.svg'
+import { useNavigate } from '@remix-run/react'
 
 export type AuthenticationProps = {
   logoURL?: string
@@ -23,13 +24,15 @@ export function Authentication({
   children,
 }: AuthenticationProps) {
   const logo = logoURL || circleLogo
+  const navigate = useNavigate()
+
   return (
     <div className="relative">
       {generic && (
         <div className="relative mx-auto w-full lg:w-[418px]">
           <HiOutlineArrowLeft
             className="absolute left-6 top-[3.25rem] w-6 h-6 cursor-pointer z-10"
-            onClick={() => history.back()}
+            onClick={() => navigate('/authenticate/cancel')}
           />
         </div>
       )}
