@@ -103,9 +103,6 @@ export default class EmailAddress {
         })
       }
 
-      await this.node.storage.setAlarm(
-        currentTime + EMAIL_VERIFICATION_OPTIONS.ttlInMs
-      )
       // we limit the number of attempts to 5 within 5 minutes
       // once the limit of 5 attempts is hit, we set a cool down 10 minutes from the last attempt
       // and we set new alarm
@@ -119,9 +116,14 @@ export default class EmailAddress {
         await this.node.storage.setAlarm(
           currentTime + EMAIL_VERIFICATION_OPTIONS.regenCooldownPeriodInMs
         )
+      } else {
+        // we set alarm here. it'll be reset in the next condition if its triggered
+        await this.node.storage.setAlarm(
+          currentTime + EMAIL_VERIFICATION_OPTIONS.ttlInMs
+        )
       }
-      // we increment the number of attempts independently of any conditions
 
+      // we increment the number of attempts independently of any conditions
       await this.createCode({
         state,
         creationTimestamp: currentTime,
@@ -131,21 +133,23 @@ export default class EmailAddress {
       })
 
       return code
-    } else {
-      await this.node.storage.setAlarm(
-        currentTime + EMAIL_VERIFICATION_OPTIONS.ttlInMs
-      )
-
-      await this.createCode({
-        state,
-        creationTimestamp: currentTime,
-        numberOfAttempts: 1,
-        firstAttemptTimestamp: currentTime,
-        code,
-      })
-
-      return code
     }
+    await this.node.storage.setAlarm(
+      currentTime + EMAIL_VERIFICATION_OPTIONS.ttlInMs
+    )
+
+    await this.node.class.setNodeType(NodeType.Email)
+    await this.node.class.setType(EmailAddressType.Email)
+
+    await this.createCode({
+      state,
+      creationTimestamp: currentTime,
+      numberOfAttempts: 1,
+      firstAttemptTimestamp: currentTime,
+      code,
+    })
+
+    return code
   }
 
   async verifyCode(code: string, state: string): Promise<boolean> {
