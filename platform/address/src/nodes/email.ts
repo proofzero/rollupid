@@ -63,6 +63,10 @@ export default class EmailAddress {
       await this.node.storage.get<VerificationPayload>(OTP_KEY_NAME)
 
     const currentTime = Date.now()
+
+    await this.node.class.setNodeType(NodeType.Email)
+    await this.node.class.setType(EmailAddressType.Email)
+
     const code = generateRandomString(this.ctx.CODE_LENGTH).toUpperCase()
 
     if (verificationPayload) {
@@ -134,9 +138,6 @@ export default class EmailAddress {
       return code
     }
     await this.node.storage.setAlarm(currentTime + this.ctx.TTL_IN_MS)
-
-    await this.node.class.setNodeType(NodeType.Email)
-    await this.node.class.setType(EmailAddressType.Email)
 
     await this.createCode({
       state,
