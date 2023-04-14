@@ -11,7 +11,6 @@ import {
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
-import { HiCheck } from 'react-icons/hi'
 import { Authentication } from '~/components'
 import AuthButton from '~/components/connect-button/AuthButton'
 import { getAccountClient } from '~/platform.server'
@@ -101,7 +100,11 @@ export default () => {
               size="xs"
               className="cursor-pointer text-gray-500"
               onClick={() => {
-                navigate('/signout')
+                navigate(
+                  `/signout?redirect_uri=${new URL(
+                    window.location.href
+                  ).toString()}&client_id=${clientId}`
+                )
               }}
             >
               Sign out
