@@ -1,6 +1,5 @@
 import React from 'react'
 import { InputHTMLAttributes } from 'react'
-import { HiEyeOff } from 'react-icons/hi'
 import { Copier } from '../copier/Copier'
 import { Text } from '../text/Text'
 
@@ -18,7 +17,6 @@ export const ReadOnlyInput = ({
   label,
   id,
   name,
-  readOnly,
   value,
   className,
   copyable = false,
@@ -52,10 +50,6 @@ export const ReadOnlyInput = ({
           {...rest}
           value={value}
         />
-
-        <span className="absolute right-0 top-0 bottom-0 flex justify-center items-center pr-3">
-          {hidden && <HiEyeOff className="w-5 h-5 text-gray-400" />}
-        </span>
       </div>
     </div>
   )
