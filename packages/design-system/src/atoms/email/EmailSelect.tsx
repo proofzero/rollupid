@@ -68,6 +68,10 @@ export const EmailSelect = ({
               <img src={selectedIconURL} className="w-4 h-4 mr-3" />
             ) : selected?.type === OAuthAddressType.Apple ? (
               <img src={appleIcon} className="w-4 h-4 mr-3" />
+            ) : selected?.type === OAuthAddressType.Microsoft ? (
+              <img src={microsoftIcon} className="w-4 h-4 mr-3" />
+            ) : selected?.type === OAuthAddressType.Google ? (
+              <img src={googleIcon} className="w-4 h-4 mr-3" />
             ) : (
               <MdOutlineAlternateEmail className="w-4 h-4 mr-3" />
             )}
