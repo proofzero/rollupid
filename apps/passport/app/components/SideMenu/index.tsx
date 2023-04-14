@@ -164,7 +164,6 @@ export default function SideMenu({
                 <div className="mt-auto block border-t lg:hidden">
                   <ConsolenNavItem CONSOLE_URL={CONSOLE_URL} />
                   <NavLink
-                    target="_blank"
                     to={'/signout'}
                     onClick={() => {
                       close()
