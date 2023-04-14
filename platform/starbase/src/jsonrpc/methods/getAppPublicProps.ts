@@ -22,10 +22,11 @@ export const getAppPublicProps = async ({
 
   if (appDetails && appDetails.app && appDetails.published) {
     return {
-      name: appDetails.app?.name,
-      iconURL: appDetails.app?.icon || '',
+      name: appDetails.app.name,
+      iconURL: appDetails.app.icon || '',
+      redirectURI: appDetails.app.redirectURI || '',
       //As app.scopes can be a Set<string>, the following works universally
-      scopes: Array.from(appDetails.app?.scopes || []),
+      scopes: Array.from(appDetails.app.scopes || []),
     }
   } else {
     throw new Error(
