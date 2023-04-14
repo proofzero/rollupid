@@ -90,7 +90,7 @@ export default function SiteMenu(props: RollupMenuProps) {
       <div className="hidden lg:block object-left">
         <ConsoleLogo />
       </div>
-      <div className="hidden lg:block overflow-scroll">
+      <div className="hidden lg:block overflow-scroll no-scrollbar">
         <AppMenu props={props} />
       </div>
 
@@ -129,8 +129,8 @@ export default function SiteMenu(props: RollupMenuProps) {
           <Popover.Panel
             className={`
         flex flex-col bg-gray-900 mt-[80px] lg:hidden z-50
-        min-h-[706px] h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] w-[280px] overflow-scroll
-        `}
+        min-h-[706px] h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] w-[280px]
+        overflow-scroll no-scrollbar`}
             ref={setPopperElement}
             style={{ position: 'absolute', right: '0', top: '0' }}
             {...attributes.popper}
