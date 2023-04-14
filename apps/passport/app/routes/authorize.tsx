@@ -106,7 +106,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       context.consoleParams.clientId === 'passport' &&
       context.consoleParams.redirectUri ===
         `${new URL(request.url).origin}/settings`
-    )
+    ) &&
+    connectResult !== 'CANCEL'
   ) {
     await createAuthzParamCookieAndAuthenticate(
       request,
