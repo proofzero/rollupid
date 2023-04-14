@@ -34,29 +34,8 @@ export default function (
       )
     })
     .map((address) => {
-      if (address.rc.node_type === NodeType.OAuth) {
-        if (address.rc.addr_type === OAuthAddressType.Google)
-          return {
-            type: OAuthAddressType.Google,
-            email: address.qc.alias,
-            addressURN: address.baseUrn as AddressURN,
-          }
-        if (address.rc.addr_type === OAuthAddressType.Apple)
-          return {
-            type: OAuthAddressType.Apple,
-            email: address.qc.alias,
-            addressURN: address.baseUrn as AddressURN,
-          }
-        if (address.rc.addr_type === OAuthAddressType.Microsoft)
-          return {
-            type: OAuthAddressType.Microsoft,
-            email: address.qc.alias,
-            addressURN: address.baseUrn as AddressURN,
-          }
-      }
-
       return {
-        type: EmailAddressType.Email,
+        type: address.rc.addr_type as OAuthAddressType | EmailAddressType,
         email: address.qc.alias,
         addressURN: address.baseUrn as AddressURN,
       }
