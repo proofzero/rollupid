@@ -85,14 +85,19 @@ export default () => {
     try {
       const resObj = await fetch('/connect/email/otp' + location.search)
       const res = await resObj.json()
+
       if (resObj.status === HTTP_STATUS_CODES[ERROR_CODES.BAD_REQUEST]) {
         setErrorMessage(res.message)
+      } else if (errorMessage.length) {
+        // In the case error was hit in last call
+        // here we want to reset the error message
+        setErrorMessage('')
       }
       if (res.state) {
         setState(res.state)
       }
     } catch (e) {
-      setErrorMessage(e.toString())
+      setErrorMessage(e.message ? e.message : e.toString())
     }
   }
 

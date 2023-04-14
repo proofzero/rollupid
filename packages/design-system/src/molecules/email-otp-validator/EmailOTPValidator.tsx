@@ -38,7 +38,7 @@ export default function EmailOTPValidator({
   onCancel,
   requestRegeneration,
   requestVerification,
-  regenerationTimerSeconds = 60,
+  regenerationTimerSeconds = 30,
 }: EmailOTPValidatorProps) {
   const inputLen = 6
   const inputRefs = Array.from({ length: inputLen }, () =>
@@ -204,7 +204,7 @@ export default function EmailOTPValidator({
 
         <div className="flex flex-col lg:flex-row space-x-1 justify-center items-center mt-4">
           <Text type="span" size="sm" className="text-gray-500">
-            Didn't get the code?
+            Did not get the code?
           </Text>
           <Text
             type="span"

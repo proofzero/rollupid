@@ -10,9 +10,8 @@ export const NONCE_OPTIONS = {
 }
 
 export const EMAIL_VERIFICATION_OPTIONS = {
-  codeLength: 6,
-  stateLength: 12, //Why 12? Why not..
-  ttlInMs: 300_000, //5min * 60s * 1000ms,
-  regenDelayInMs: 60_000, //1min * 60s * 1000ms
+  CODE_LENGTH: 6,
+  STATE_LENGTH: 12,
 }
+
 export const EDGE_ADDRESS: EdgeURN = EdgeSpace.urn('owns/address')
