@@ -124,7 +124,8 @@ export default () => {
 
         {appProps?.termsURL && (
           <Text size="sm" className="text-gray-500 mt-7">
-            Before using this app, you can review Company's{' '}
+            Before using this app, you can review {appProps?.name ?? `Company`}
+            's{' '}
             <a href={appProps.termsURL} className="text-indigo-500">
               terms of service
             </a>

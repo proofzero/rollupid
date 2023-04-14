@@ -5,8 +5,6 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/design-system'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
 
-import passportLogo from '../../assets/PassportLogoIndigo.svg'
-
 export type AuthenticationProps = {
   logoURL?: string
   appName?: string
@@ -48,7 +46,7 @@ export function Authentication({
 
         {accountSelect && (
           <>
-            <Avatar src={passportLogo} size="sm"></Avatar>
+            <Avatar src={logo} size="sm"></Avatar>
             <div className={'flex flex-col items-center gap-2'}>
               <Text size="xl" weight="semibold">
                 Choose an account
