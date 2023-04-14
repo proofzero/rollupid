@@ -9,4 +9,9 @@ export const NONCE_OPTIONS = {
   ttl: 60000,
 }
 
+export const EMAIL_VERIFICATION_OPTIONS = {
+  CODE_LENGTH: 6,
+  STATE_LENGTH: 12,
+}
+
 export const EDGE_ADDRESS: EdgeURN = EdgeSpace.urn('owns/address')

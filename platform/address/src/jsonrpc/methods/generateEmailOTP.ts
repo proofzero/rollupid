@@ -5,6 +5,8 @@ import { Context } from '../../context'
 import { AddressNode } from '../../nodes'
 import EmailAddress from '../../nodes/email'
 
+import { EMAIL_VERIFICATION_OPTIONS } from '../../constants'
+
 export const GenerateEmailOTPInput = z.object({
   address: z.string(),
 })
@@ -23,7 +25,7 @@ export const generateEmailOTPMethod = async ({
   const { address } = input
   const emailAddressNode = new EmailAddress(ctx.address as AddressNode, ctx)
 
-  const state = generateRandomString(ctx.STATE_LENGTH)
+  const state = generateRandomString(EMAIL_VERIFICATION_OPTIONS.STATE_LENGTH)
   const code = await emailAddressNode.generateVerificationCode(state)
   await ctx.emailClient.sendEmailNotification.mutate({
     emailAddress: address,

@@ -6,6 +6,8 @@ import generateRandomString from '@proofzero/utils/generateRandomString'
 
 import { AddressProfile } from '../types'
 
+import { EMAIL_VERIFICATION_OPTIONS } from '../constants'
+
 import { AddressNode } from '.'
 import Address from './address'
 import { Context } from '../context'
@@ -67,7 +69,9 @@ export default class EmailAddress {
     await this.node.class.setNodeType(NodeType.Email)
     await this.node.class.setType(EmailAddressType.Email)
 
-    const code = generateRandomString(this.ctx.CODE_LENGTH).toUpperCase()
+    const code = generateRandomString(
+      EMAIL_VERIFICATION_OPTIONS.CODE_LENGTH
+    ).toUpperCase()
 
     if (verificationPayload) {
       const { numberOfAttempts, creationTimestamp, firstAttemptTimestamp } =

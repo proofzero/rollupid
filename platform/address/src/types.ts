@@ -20,8 +20,6 @@ export interface Environment {
 
   PASSPORT_URL: string
 
-  CODE_LENGTH: number
-  STATE_LENGTH: number
   TTL_IN_MS: number
   MAX_ATTEMPTS: number
   DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS: number
