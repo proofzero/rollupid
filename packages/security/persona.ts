@@ -75,7 +75,7 @@ export async function setPersonaReferences(
   )
   for (const scopeEntry of scope) {
     //TODO: make this more generic so it applies to all claims
-    if (scopeEntry === 'email') {
+    if (scopeEntry === 'email' && personaData.email) {
       const claimAddressUrnForEmail = personaData.email as AddressURN
       const createdEdge = await edgesClient.makeEdge.mutate({
         src: accessNode,
@@ -127,7 +127,7 @@ export async function getClaimValues(
     generateTraceContextHeaders(traceSpan)
   )
   for (const scopeValue of scope) {
-    if (scopeValue === 'email') {
+    if (scopeValue === 'email' && personaData.email) {
       const emailAddressUrn = personaData.email
       const edgesResults = await edgesClient.getEdges.query({
         query: {
