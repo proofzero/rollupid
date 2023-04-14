@@ -41,6 +41,7 @@ export const preauthorizeMethod = async ({
   ctx: Context
 }): Promise<PreAuthorizeOutputParams> => {
   let preauthorized = false
+  let existingPersonaData = undefined
 
   const { account, clientId, scope: requestedScope } = input
 
@@ -63,6 +64,7 @@ export const preauthorizeMethod = async ({
   if (!preauthorized) {
     const name = `${AccountURNSpace.decode(account)}@${clientId}`
     const accessNode = await initAccessNodeByName(name, ctx.Access)
+    existingPersonaData = await accessNode.storage.get('personaData')
     const { tokenMap } = await accessNode.class.getTokenState()
     for (const [k, v] of Object.entries(tokenMap)) {
       const existingScopeValSet = new Set(v.scope)
@@ -81,6 +83,7 @@ export const preauthorizeMethod = async ({
 
   //If we're preauthorizing, we create a new code with the scope requested
   if (preauthorized) {
+    if (existingPersonaData) input.personaData = existingPersonaData
     const callRouter = appRouter.createCaller(ctx)
     const authRezults = await callRouter.authorize(input)
     return { ...authRezults, preauthorized }
