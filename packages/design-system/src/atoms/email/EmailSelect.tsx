@@ -7,7 +7,7 @@ import { HiCheck } from 'react-icons/hi'
 import { TbCircleOff, TbCirclePlus } from 'react-icons/tb'
 import { MdOutlineAlternateEmail } from 'react-icons/md'
 
-import { OAuthAddressType } from '@proofzero/types/address'
+import { EmailAddressType, OAuthAddressType } from '@proofzero/types/address'
 
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
@@ -24,6 +24,20 @@ type EmailSelectProps = {
   onSelect?: (selected: EmailSelectListItem) => void
 }
 
+const getIconUrl = (
+  type?: OAuthAddressType | EmailAddressType | OptionType
+) => {
+  return type
+    ? type === OAuthAddressType.Microsoft
+      ? microsoftIcon
+      : type === OAuthAddressType.Apple
+      ? appleIcon
+      : type === OAuthAddressType.Google
+      ? googleIcon
+      : null
+    : null
+}
+
 export const EmailSelect = ({
   items,
   enableAddNew = false,
@@ -38,12 +52,7 @@ export const EmailSelect = ({
     }
   }, [selected])
 
-  const selectedIconURL =
-    selected?.type === OAuthAddressType.Microsoft
-      ? microsoftIcon
-      : selected?.type === OAuthAddressType.Google
-      ? googleIcon
-      : null
+  const selectedIconURL = getIconUrl(selected?.type)
 
   return (
     <Listbox
@@ -66,12 +75,6 @@ export const EmailSelect = ({
           >
             {selectedIconURL ? (
               <img src={selectedIconURL} className="w-4 h-4 mr-3" />
-            ) : selected?.type === OAuthAddressType.Apple ? (
-              <img src={appleIcon} className="w-4 h-4 mr-3" />
-            ) : selected?.type === OAuthAddressType.Microsoft ? (
-              <img src={microsoftIcon} className="w-4 h-4 mr-3" />
-            ) : selected?.type === OAuthAddressType.Google ? (
-              <img src={googleIcon} className="w-4 h-4 mr-3" />
             ) : (
               <MdOutlineAlternateEmail className="w-4 h-4 mr-3" />
             )}
@@ -110,13 +113,7 @@ export const EmailSelect = ({
              absolute w-full mt-1 bg-white"
             >
               {items.map((item, i) => {
-                const iconURL =
-                  item.type === OAuthAddressType.Microsoft
-                    ? microsoftIcon
-                    : item.type === OAuthAddressType.Google
-                    ? googleIcon
-                    : null
-
+                const iconURL = getIconUrl(item.type)
                 return (
                   <Listbox.Option
                     key={i}
@@ -128,8 +125,6 @@ export const EmailSelect = ({
                       <div className="flex flex-row items-center">
                         {iconURL ? (
                           <img src={iconURL} className="w-4 h-4 mr-3" />
-                        ) : item.type === OAuthAddressType.Apple ? (
-                          <img src={appleIcon} className="w-4 h-4 mr-3" />
                         ) : (
                           <MdOutlineAlternateEmail className="w-4 h-4 mr-3" />
                         )}
