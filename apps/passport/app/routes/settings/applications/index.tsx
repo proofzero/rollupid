@@ -13,12 +13,22 @@ import { Pill } from '@proofzero/design-system/src/atoms/pills/Pill'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
 
-import { getFlashSession, commitFlashSession } from '~/session.server'
+import {
+  getFlashSession,
+  commitFlashSession,
+  getValidatedSessionContext,
+} from '~/session.server'
 
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import type { FetcherWithComponents } from '@remix-run/react'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
+  await getValidatedSessionContext(
+    request,
+    context.consoleParams,
+    context.env,
+    context.traceSpan
+  )
   const session = await getFlashSession(request, context.env)
 
   const sessionTooltipMessage = session.get('tooltipMessage')
