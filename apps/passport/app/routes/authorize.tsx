@@ -495,7 +495,7 @@ export default function Authorize() {
                                     qp.append('prompt', 'connect')
                                     qp.append(
                                       'login_hint',
-                                      'email microsoft google'
+                                      'email microsoft google apple'
                                     )
 
                                     return navigate(

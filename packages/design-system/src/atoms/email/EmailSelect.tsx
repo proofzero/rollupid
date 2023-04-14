@@ -7,10 +7,11 @@ import { HiCheck } from 'react-icons/hi'
 import { TbCircleOff, TbCirclePlus } from 'react-icons/tb'
 import { MdOutlineAlternateEmail } from 'react-icons/md'
 
-import { OAuthAddressType } from '@proofzero/types/address'
+import { EmailAddressType, OAuthAddressType } from '@proofzero/types/address'
 
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
+import appleIcon from '@proofzero/design-system/src/assets/social_icons/apple.svg'
 
 import { OptionType } from '@proofzero/utils/getNormalisedConnectedEmails'
 
@@ -21,6 +22,20 @@ type EmailSelectProps = {
   enableAddNew?: boolean
   enableNone?: boolean
   onSelect?: (selected: EmailSelectListItem) => void
+}
+
+const getIconUrl = (
+  type?: OAuthAddressType | EmailAddressType | OptionType
+) => {
+  return type
+    ? type === OAuthAddressType.Microsoft
+      ? microsoftIcon
+      : type === OAuthAddressType.Apple
+      ? appleIcon
+      : type === OAuthAddressType.Google
+      ? googleIcon
+      : null
+    : null
 }
 
 export const EmailSelect = ({
@@ -37,12 +52,7 @@ export const EmailSelect = ({
     }
   }, [selected])
 
-  const selectedIconURL =
-    selected?.type === OAuthAddressType.Microsoft
-      ? microsoftIcon
-      : selected?.type === OAuthAddressType.Google
-      ? googleIcon
-      : null
+  const selectedIconURL = getIconUrl(selected?.type)
 
   return (
     <Listbox
@@ -103,13 +113,7 @@ export const EmailSelect = ({
              absolute w-full mt-1 bg-white"
             >
               {items.map((item, i) => {
-                const iconURL =
-                  item.type === OAuthAddressType.Microsoft
-                    ? microsoftIcon
-                    : item.type === OAuthAddressType.Google
-                    ? googleIcon
-                    : null
-
+                const iconURL = getIconUrl(item.type)
                 return (
                   <Listbox.Option
                     key={i}

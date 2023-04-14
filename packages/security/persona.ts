@@ -49,6 +49,7 @@ export async function validatePersonaData(
       if (
         addressProfile.type !== OAuthAddressType.Google &&
         addressProfile.type !== OAuthAddressType.Microsoft &&
+        addressProfile.type !== OAuthAddressType.Apple &&
         addressProfile.type !== EmailAddressType.Email
       )
         throw new BadRequestError({

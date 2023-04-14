@@ -27,29 +27,15 @@ export default function (
       return (
         (address.rc.node_type === NodeType.OAuth &&
           (address.rc.addr_type === OAuthAddressType.Google ||
-            address.rc.addr_type === OAuthAddressType.Microsoft)) ||
+            address.rc.addr_type === OAuthAddressType.Microsoft ||
+            address.rc.addr_type === OAuthAddressType.Apple)) ||
         (address.rc.node_type === NodeType.Email &&
           address.rc.addr_type === EmailAddressType.Email)
       )
     })
     .map((address) => {
-      if (address.rc.node_type === NodeType.OAuth) {
-        if (address.rc.addr_type === OAuthAddressType.Google)
-          return {
-            type: OAuthAddressType.Google,
-            email: address.qc.alias,
-            addressURN: address.baseUrn as AddressURN,
-          }
-        if (address.rc.addr_type === OAuthAddressType.Microsoft)
-          return {
-            type: OAuthAddressType.Microsoft,
-            email: address.qc.alias,
-            addressURN: address.baseUrn as AddressURN,
-          }
-      }
-
       return {
-        type: EmailAddressType.Email,
+        type: address.rc.addr_type as OAuthAddressType | EmailAddressType,
         email: address.qc.alias,
         addressURN: address.baseUrn as AddressURN,
       }

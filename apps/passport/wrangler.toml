@@ -35,7 +35,7 @@ INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/google/call
 INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/github/callback"
 INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/twitter/callback"
 INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/microsoft/callback"
-INTERNAL_APPLE_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/appleid/callback"
+INTERNAL_APPLE_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/apple/callback"
 INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/discord/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
