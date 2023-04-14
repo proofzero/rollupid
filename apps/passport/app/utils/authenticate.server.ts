@@ -39,11 +39,12 @@ export const authenticateAddress = async (
     })
   }
   if (appData?.prompt === 'connect') {
-    if (existing) {
-      appData.redirectUri += '?error=ALREADY_CONNECTED'
-    }
+    const redirectURL = getRedirectURL(
+      appData,
+      existing ? 'ALREADY_CONNECTED' : undefined
+    )
 
-    return redirect(getRedirectURL(appData))
+    return redirect(redirectURL)
   }
 
   try {
@@ -82,7 +83,7 @@ export const authenticateAddress = async (
   }
 }
 
-const getRedirectURL = (appData: AppData, error?: string | null) => {
+const getRedirectURL = (appData: AppData, result: string = 'SUCCESS') => {
   let redirectURL = '/authorize'
   const authAppId = appData.clientId
   const authRedirectUri = appData.redirectUri
@@ -93,11 +94,8 @@ const getRedirectURL = (appData: AppData, error?: string | null) => {
     redirect_uri: authRedirectUri,
     state: authState,
     scope: authScope.join(' '),
+    connect_result: result,
   })
-
-  if (error) {
-    urlParams.append('error', error)
-  }
 
   redirectURL += `?${urlParams}`
 

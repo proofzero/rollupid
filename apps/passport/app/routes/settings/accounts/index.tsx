@@ -1,6 +1,5 @@
 import {
   useOutletContext,
-  useLoaderData,
   useFetcher,
   useNavigate,
   useSubmit,
@@ -12,7 +11,6 @@ import { Text } from '@proofzero/design-system'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { Button } from '@proofzero/design-system'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
-import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 
 import { TbCrown } from 'react-icons/tb'
 
@@ -22,7 +20,7 @@ import InputText from '~/components/inputs/InputText'
 import { NodeType } from '@proofzero/types/address'
 
 import type { FetcherWithComponents } from '@remix-run/react'
-import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import type { ActionFunction } from '@remix-run/cloudflare'
 import type { AddressListProps } from '~/components/addresses/AddressList'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 
@@ -30,24 +28,8 @@ import warn from '~/assets/warning.svg'
 import { getValidatedSessionContext } from '~/session.server'
 import { setNewPrimaryAddress } from '~/utils/authenticate.server'
 import type { AddressURN } from '@proofzero/urns/address'
-import { RollupError } from '@proofzero/errors'
-import { ERROR_CODES } from '@proofzero/errors'
-
-export const loader: LoaderFunction = async ({ request, context }) => {
-  await getValidatedSessionContext(
-    request,
-    context.consoleParams,
-    context.env,
-    context.traceSpan
-  )
-
-  const reqUrl = new URL(request.url)
-  const reqUrlError = reqUrl.searchParams.get('error')
-
-  return {
-    reqUrlError,
-  }
-}
+import { ERROR_CODES, RollupError } from '@proofzero/errors'
+import useConnectResult from '~/hooks/useConnectResult'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const { jwt } = await getValidatedSessionContext(
@@ -236,8 +218,6 @@ const DisconnectModal = ({
 }
 
 export default function AccountsLayout() {
-  const { reqUrlError } = useLoaderData()
-
   const submit = useSubmit()
 
   const { connectedProfiles, primaryAddressURN } = useOutletContext<{
@@ -270,30 +250,7 @@ export default function AccountsLayout() {
 
   const fetcher = useFetcher()
 
-  useEffect(() => {
-    if (!sessionStorage.getItem('connection_requested')) {
-      return
-    }
-
-    if (reqUrlError) {
-      sessionStorage.removeItem('connection_requested')
-
-      let error = 'Error'
-      switch (reqUrlError) {
-        case 'ALREADY_CONNECTED':
-          error = 'Account already connected'
-      }
-
-      toast(ToastType.Error, { message: error }, { duration: 2000 })
-    } else {
-      sessionStorage.removeItem('connection_requested')
-      toast(
-        ToastType.Success,
-        { message: 'Account connected' },
-        { duration: 2000 }
-      )
-    }
-  }, [reqUrlError])
+  useConnectResult()
 
   useEffect(() => {
     const selectedProfile = connectedAddresses.find(
@@ -340,8 +297,6 @@ export default function AccountsLayout() {
     currentWindowUrl.search = ''
 
     qp.append('redirect_uri', currentWindowUrl.toString())
-
-    sessionStorage.setItem('connection_requested', 'true')
 
     navigate(`/authorize?${qp.toString()}`)
   }
