@@ -4,11 +4,11 @@ import { BadRequestError } from '@proofzero/errors'
 import { EmailAddressType, NodeType } from '@proofzero/types/address'
 import generateRandomString from '@proofzero/utils/generateRandomString'
 
-import { EMAIL_VERIFICATION_OPTIONS } from '../constants'
 import { AddressProfile } from '../types'
 
 import { AddressNode } from '.'
 import Address from './address'
+import { Context } from '../context'
 
 type EmailAddressProfile = AddressProfile<EmailAddressType.Email>
 
@@ -25,9 +25,11 @@ const OTP_KEY_NAME = 'otp'
 
 export default class EmailAddress {
   declare node: AddressNode
+  declare ctx: Context
 
-  constructor(node: AddressNode) {
+  constructor(node: AddressNode, ctx: Context) {
     this.node = node
+    this.ctx = ctx
   }
 
   private createCode = async ({
@@ -38,8 +40,7 @@ export default class EmailAddress {
     code,
   }: VerificationPayload) => {
     if (
-      firstAttemptTimestamp +
-        EMAIL_VERIFICATION_OPTIONS.maxAttemptsTimePeriodInMs <=
+      firstAttemptTimestamp + this.ctx.MAX_ATTEMPTS_TIME_PERIOD_IN_MS <=
       Date.now()
     ) {
       numberOfAttempts = 1
@@ -62,43 +63,46 @@ export default class EmailAddress {
       await this.node.storage.get<VerificationPayload>(OTP_KEY_NAME)
 
     const currentTime = Date.now()
-    const code = generateRandomString(
-      EMAIL_VERIFICATION_OPTIONS.codeLength
-    ).toUpperCase()
+    const code = generateRandomString(this.ctx.CODE_LENGTH).toUpperCase()
 
     if (verificationPayload) {
+      const { numberOfAttempts, creationTimestamp, firstAttemptTimestamp } =
+        verificationPayload
+
+      // Extracted common calculations and constants for better readability
+      const isAboveMaxAttempts = numberOfAttempts + 1 > this.ctx.MAX_ATTEMPTS
+      const isCooldownPeriodActive =
+        creationTimestamp + this.ctx.REGENERATION_COOLDOWN_PERIOD_IN_MS >
+        currentTime
+      const isRegenDelayActive =
+        creationTimestamp + this.ctx.DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS >
+        currentTime
+      const isMaxAttemptsReachedWithinTimePeriod =
+        firstAttemptTimestamp + this.ctx.MAX_ATTEMPTS_TIME_PERIOD_IN_MS >
+        currentTime
+
       // After limit for 5 attempts is hit, we set a cool down 10 minutes from the last attempt
-      if (
-        verificationPayload.numberOfAttempts + 1 >
-          EMAIL_VERIFICATION_OPTIONS.maxAttempts &&
-        verificationPayload.creationTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenCooldownPeriodInMs >
-          currentTime
-      ) {
+      if (isAboveMaxAttempts && isCooldownPeriodActive) {
         const timeLeft =
           verificationPayload.creationTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.regenCooldownPeriodInMs -
+          this.ctx.REGENERATION_COOLDOWN_PERIOD_IN_MS -
           currentTime
 
         throw new BadRequestError({
           message: `Cannot generate new code for the address. You can only generate  ${
-            EMAIL_VERIFICATION_OPTIONS.maxAttempts
+            this.ctx.MAX_ATTEMPTS
           } new codes within ${
-            EMAIL_VERIFICATION_OPTIONS.maxAttemptsTimePeriodInMs / 1000 / 60
+            this.ctx.MAX_ATTEMPTS_TIME_PERIOD_IN_MS / 1000 / 60
           }
           minutes. Try again in ${Math.ceil(timeLeft / 1000 / 60)} minutes`,
         })
       }
 
       // Subsequent calls to generate a new code are limited to one per 30 seconds
-      if (
-        verificationPayload.creationTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.delayBetweenRegenAttemptsInMs >
-        currentTime
-      ) {
+      if (isRegenDelayActive) {
         throw new BadRequestError({
           message: `Cannot generate new code for the address. You can only generate a new code once every ${
-            EMAIL_VERIFICATION_OPTIONS.delayBetweenRegenAttemptsInMs / 1000
+            this.ctx.DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS / 1000
           } seconds`,
         })
       }
@@ -107,36 +111,29 @@ export default class EmailAddress {
       // once the limit of 5 attempts is hit, we set a cool down 10 minutes from the last attempt
       // and we set new alarm
       if (
-        verificationPayload.numberOfAttempts + 1 ===
-          EMAIL_VERIFICATION_OPTIONS.maxAttempts &&
-        verificationPayload.firstAttemptTimestamp +
-          EMAIL_VERIFICATION_OPTIONS.maxAttemptsTimePeriodInMs >
-          currentTime
+        numberOfAttempts + 1 === this.ctx.MAX_ATTEMPTS &&
+        isMaxAttemptsReachedWithinTimePeriod
       ) {
         await this.node.storage.setAlarm(
-          currentTime + EMAIL_VERIFICATION_OPTIONS.regenCooldownPeriodInMs
+          currentTime + this.ctx.REGENERATION_COOLDOWN_PERIOD_IN_MS
         )
       } else {
-        // we set alarm here. it'll be reset in the next condition if its triggered
-        await this.node.storage.setAlarm(
-          currentTime + EMAIL_VERIFICATION_OPTIONS.ttlInMs
-        )
+        // If limit wasn't hit, we set this alarm
+        await this.node.storage.setAlarm(currentTime + this.ctx.TTL_IN_MS)
       }
 
       // we increment the number of attempts independently of any conditions
       await this.createCode({
         state,
         creationTimestamp: currentTime,
-        numberOfAttempts: verificationPayload.numberOfAttempts + 1,
-        firstAttemptTimestamp: verificationPayload.firstAttemptTimestamp,
+        numberOfAttempts: numberOfAttempts + 1,
+        firstAttemptTimestamp: firstAttemptTimestamp,
         code,
       })
 
       return code
     }
-    await this.node.storage.setAlarm(
-      currentTime + EMAIL_VERIFICATION_OPTIONS.ttlInMs
-    )
+    await this.node.storage.setAlarm(currentTime + this.ctx.TTL_IN_MS)
 
     await this.node.class.setNodeType(NodeType.Email)
     await this.node.class.setType(EmailAddressType.Email)
@@ -171,8 +168,7 @@ export default class EmailAddress {
     }
 
     if (
-      emailVerification.creationTimestamp +
-        EMAIL_VERIFICATION_OPTIONS.ttlInMs <=
+      emailVerification.creationTimestamp + this.ctx.TTL_IN_MS <=
       Date.now()
     ) {
       //We anticipate we'll encounter this only if an address has multiple OTP codes in the

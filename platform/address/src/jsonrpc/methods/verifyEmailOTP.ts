@@ -20,7 +20,7 @@ export const verifyEmailOTPMethod = async ({
   ctx: Context
 }): Promise<z.infer<typeof VerifyEmailOTPOutput>> => {
   const { code, state } = input
-  const emailAddressNode = new EmailAddress(ctx.address as AddressNode)
+  const emailAddressNode = new EmailAddress(ctx.address as AddressNode, ctx)
   const successfulVerification = await emailAddressNode.verifyCode(code, state)
 
   return successfulVerification

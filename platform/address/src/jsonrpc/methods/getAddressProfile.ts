@@ -57,7 +57,7 @@ export const getAddressProfileMethod: GetAddressProfileMethod = async ({
       case CryptoAddressType.ETH:
         return new CryptoAddress(nodeClient)
       case EmailAddressType.Email:
-        return new EmailAddress(nodeClient)
+        return new EmailAddress(nodeClient, ctx)
       case OAuthAddressType.Apple:
         return new AppleAddress(nodeClient, ctx)
       case OAuthAddressType.Discord:
