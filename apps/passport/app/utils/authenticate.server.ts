@@ -14,6 +14,7 @@ import { createUserSession, parseJwt } from '~/session.server'
 import { generateGradient } from './gradient.server'
 import { redirect } from '@remix-run/cloudflare'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
+import { InternalServerError } from '@proofzero/errors'
 
 type AppData = {
   clientId: string
@@ -31,6 +32,12 @@ export const authenticateAddress = async (
   traceSpan: TraceSpan,
   existing: boolean = false
 ) => {
+  if (!appData?.redirectUri) {
+    throw new InternalServerError({
+      message:
+        'Could not complete authentication. Please return to application and try again.',
+    })
+  }
   if (appData?.prompt === 'connect') {
     if (existing) {
       appData.redirectUri += '?error=ALREADY_CONNECTED'

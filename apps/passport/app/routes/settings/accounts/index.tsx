@@ -33,7 +33,14 @@ import type { AddressURN } from '@proofzero/urns/address'
 import { RollupError } from '@proofzero/errors'
 import { ERROR_CODES } from '@proofzero/errors'
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, context }) => {
+  await getValidatedSessionContext(
+    request,
+    context.consoleParams,
+    context.env,
+    context.traceSpan
+  )
+
   const reqUrl = new URL(request.url)
   const reqUrlError = reqUrl.searchParams.get('error')
 
