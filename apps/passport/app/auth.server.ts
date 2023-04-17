@@ -81,6 +81,7 @@ export const getTwitterStrategy = (env: Env) => {
       clientSecret: env.SECRET_TWITTER_OAUTH_CLIENT_SECRET,
       callbackURL: env.INTERNAL_TWITTER_OAUTH_CALLBACK_URL,
       includeEmail: true,
+      alwaysReauthorize: false,
     },
     async ({ ...args }) => {
       return { ...args }
