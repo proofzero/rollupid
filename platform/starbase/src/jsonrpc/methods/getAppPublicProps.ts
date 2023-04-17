@@ -24,7 +24,7 @@ export const getAppPublicProps = async ({
     return {
       name: appDetails.app.name,
       iconURL: appDetails.app.icon || '',
-      redirectURI: appDetails.app.redirectURI || '',
+      redirectURI: appDetails.app.redirectURI,
       //As app.scopes can be a Set<string>, the following works universally
       scopes: Array.from(appDetails.app.scopes || []),
     }
