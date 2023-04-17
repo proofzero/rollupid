@@ -17,8 +17,9 @@ import { redirect, json } from '@remix-run/cloudflare'
 import AuthButton from '~/components/connect-button/AuthButton'
 import { getConsoleParams } from '~/session.server'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader: LoaderFunction = async ({ request, params, context }) => {
   const url = new URL(request.url)
 
   const displayDict: { [key: string]: boolean } = {
@@ -42,12 +43,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
   }
 
-  const connectFlow = url.searchParams.get('prompt') === 'connect'
-
   return json({
     clientId: params.clientId,
     displayDict,
-    connectFlow,
   })
 }
 
@@ -70,14 +68,15 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 }
 
 export default () => {
-  const { appProps } = useOutletContext<{
+  const { appProps, connectFlow } = useOutletContext<{
     appProps?: {
       name: string
       iconURL: string
     }
+    connectFlow: boolean
   }>()
 
-  const { clientId, displayDict, connectFlow } = useLoaderData()
+  const { clientId, displayDict } = useLoaderData()
 
   const [signData, setSignData] = useState<{
     nonce: string | undefined
@@ -233,6 +232,19 @@ export default () => {
               </Form>
             )}
           </div>
+
+          {connectFlow && (
+            <div className="flex flex-1 items-end">
+              <Button
+                btnSize="l"
+                btnType="secondary-alt"
+                className="w-full hover:bg-gray-100"
+                onClick={() => navigate('/authenticate/cancel')}
+              >
+                Cancel
+              </Button>
+            </div>
+          )}
         </>
       </Authentication>
     </>

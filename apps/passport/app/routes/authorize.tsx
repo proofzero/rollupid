@@ -53,6 +53,7 @@ import type { PersonaData } from '@proofzero/types/application'
 import type { DataForScopes } from '~/utils/authorize.server'
 import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
 import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
+import useConnectResult from '~/hooks/useConnectResult'
 
 export type UserProfile = {
   displayName: string
@@ -72,11 +73,13 @@ export type LoaderData = {
   redirectOverride: string
   dataForScopes: DataForScopes
   profile: GetProfileOutputParams
-  reqUrlError: string | null
 }
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { clientId, redirectUri, state } = context.consoleParams
+
+  const connectResult =
+    new URL(request.url).searchParams.get('connect_result') ?? undefined
 
   //Request parameter pre-checks
   if (!clientId) throw new BadRequestError({ message: 'client_id is required' })
@@ -103,7 +106,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       context.consoleParams.clientId === 'passport' &&
       context.consoleParams.redirectUri ===
         `${new URL(request.url).origin}/settings`
-    )
+    ) &&
+    connectResult !== 'CANCEL'
   ) {
     await createAuthzParamCookieAndAuthenticate(
       request,
@@ -141,10 +145,16 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   )
 
   //Special case for console and passport - we just redirect
-  if (['console', 'passport'].includes(clientId))
-    return redirect(`${redirectUri}`, {
+  if (['console', 'passport'].includes(clientId)) {
+    const redirectURL = new URL(redirectUri)
+    if (connectResult) {
+      redirectURL.searchParams.set('connect_result', connectResult)
+    }
+
+    return redirect(redirectURL.toString(), {
       headers,
     })
+  }
 
   //Scope validation
   try {
@@ -218,9 +228,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       account: accountUrn,
     })
 
-    const reqUrl = new URL(request.url)
-    const reqUrlError = reqUrl.searchParams.get('error')
-
     const dataForScopes = await getDataForScopes(
       scope,
       accountUrn,
@@ -246,7 +253,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         scopeOverride: scope || [],
         dataForScopes,
         profile,
-        reqUrlError,
       },
       {
         headers,
@@ -348,7 +354,6 @@ export default function Authorize() {
     dataForScopes,
     redirectUri,
     profile,
-    reqUrlError,
   } = useLoaderData<LoaderData>()
 
   const userProfile = profile as UserProfile
@@ -365,17 +370,7 @@ export default function Authorize() {
   const navigate = useNavigate()
   const transition = useTransition()
 
-  useEffect(() => {
-    switch (reqUrlError) {
-      case 'ALREADY_CONNECTED':
-        toast(
-          ToastType.Error,
-          { message: 'Account already connected' },
-          { duration: 2000 }
-        )
-        break
-    }
-  }, [reqUrlError])
+  useConnectResult(['ALREADY_CONNECTED', 'CANCEL'])
 
   const cancelCallback = () => {
     const redirectURL = new URL(redirectUri)

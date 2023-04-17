@@ -7,6 +7,7 @@ import {
   useLoaderData,
   useLocation,
   useNavigate,
+  useOutletContext,
   useSubmit,
   useTransition,
 } from '@remix-run/react'
@@ -21,7 +22,7 @@ import { useEffect, useState } from 'react'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { ERROR_CODES, HTTP_STATUS_CODES } from '@proofzero/errors'
-import { Text } from '@proofzero/design-system'
+import { Button, Text } from '@proofzero/design-system'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const qp = new URL(request.url).searchParams
@@ -70,6 +71,10 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 }
 
 export default () => {
+  const { connectFlow } = useOutletContext<{
+    connectFlow: boolean
+  }>()
+
   const { address, clientId } = useLoaderData()
   const ad = useActionData()
   const submit = useSubmit()
@@ -142,7 +147,6 @@ export default () => {
           )
         }}
         goBack={() => history.back()}
-        onCancel={() => navigate(`/authenticate/${clientId}`)}
       >
         {errorMessage ? (
           <Text
@@ -154,6 +158,19 @@ export default () => {
           </Text>
         ) : undefined}
       </EmailOTPValidator>
+
+      {connectFlow && (
+        <div className="flex flex-1 w-full items-end">
+          <Button
+            btnSize="l"
+            btnType="secondary-alt"
+            className="w-full hover:bg-gray-100"
+            onClick={() => navigate('/authenticate/cancel')}
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

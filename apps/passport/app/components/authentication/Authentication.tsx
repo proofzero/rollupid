@@ -21,15 +21,6 @@ export function Authentication({
   const logo = logoURL || circleLogo
   return (
     <div className="relative">
-      {generic && (
-        <div className="relative mx-auto w-full lg:w-[418px]">
-          <HiOutlineArrowLeft
-            className="absolute left-6 top-[3.25rem] w-6 h-6 cursor-pointer z-10"
-            onClick={() => history.back()}
-          />
-        </div>
-      )}
-
       <div
         className={`relative flex shrink flex-col items-center ${
           generic ? '' : 'justify-center'
