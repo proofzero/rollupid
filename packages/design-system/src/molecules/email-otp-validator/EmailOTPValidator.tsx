@@ -16,7 +16,7 @@ type EmailOTPValidatorProps = {
   children?: JSX.Element
 
   goBack?: () => void
-  onCancel: () => void
+  onCancel?: () => void
 
   requestRegeneration: (email: string) => void
   requestVerification: (
@@ -244,19 +244,21 @@ export default function EmailOTPValidator({
         {children && showChildren && <div className="my-3">{children}</div>}
       </section>
 
-      <section className="flex flex-row space-x-4">
-        <Button
-          btnSize="xl"
-          btnType="secondary-alt"
-          className="flex-1"
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>
+      <section className="flex flex-row space-x-4 w-full">
+        {onCancel && (
+          <Button
+            btnSize="xl"
+            btnType="secondary-alt"
+            className="flex-1 w-full"
+            onClick={onCancel}
+          >
+            Cancel
+          </Button>
+        )}
         <Button
           btnSize="xl"
           btnType="primary-alt"
-          className="flex-1"
+          className="flex-1 w-full"
           disabled={fullCode.length !== inputLen || loading || isInvalid}
           onClick={async () => {
             setShowInvalidMessage(false)
