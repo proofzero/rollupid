@@ -3,7 +3,12 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { redirect } from '@remix-run/cloudflare'
-import { Form, useTransition } from '@remix-run/react'
+import {
+  Form,
+  useNavigate,
+  useOutletContext,
+  useTransition,
+} from '@remix-run/react'
 import { useState } from 'react'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
@@ -23,9 +28,14 @@ export const action: ActionFunction = async ({ request, params }) => {
 }
 
 export default () => {
+  const { connectFlow } = useOutletContext<{
+    connectFlow: boolean
+  }>()
+
   const [isValidEmail, setIsValidEmail] = useState(false)
 
   const transition = useTransition()
+  const navigate = useNavigate()
 
   return (
     <div
@@ -80,6 +90,19 @@ export default () => {
           </Button>
         </section>
       </Form>
+
+      {connectFlow && (
+        <div className="flex w-full">
+          <Button
+            btnSize="l"
+            btnType="secondary-alt"
+            className="w-full hover:bg-gray-100"
+            onClick={() => navigate('/authenticate/cancel')}
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
