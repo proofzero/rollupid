@@ -20,6 +20,7 @@ import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { createClient, WagmiConfig } from 'wagmi'
 import { getDefaultClient } from 'connectkit'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 const client = createClient(
   // @ts-ignore
@@ -85,6 +86,7 @@ export default () => {
     appProps?: {
       name: string
       iconURL: string
+      termsURL?: string
     }
     connectFlow: boolean
   }>()
@@ -246,6 +248,18 @@ export default () => {
               </Form>
             )}
           </div>
+
+          {appProps?.termsURL && (
+            <Text size="sm" className="text-gray-500 mt-7">
+              Before using this app, you can review{' '}
+              {appProps?.name ?? `Company`}
+              's{' '}
+              <a href={appProps.termsURL} className="text-indigo-500">
+                terms of service
+              </a>
+              .
+            </Text>
+          )}
 
           {connectFlow && (
             <div className="flex flex-1 items-end">
