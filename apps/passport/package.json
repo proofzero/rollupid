@@ -4,7 +4,6 @@
   "private": true,
   "sideEffects": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0",
     "build": "run-s 'build:*'",
     "build:css": "npx tailwindcss -o ./app/styles/tailwind.css --minify",
     "build:sass": "sass app/:app/ --no-source-map",
@@ -53,7 +52,7 @@
     "@babel/core": "^7.20.2",
     "@cloudflare/workers-types": "4.20221111.1",
     "@mdx-js/react": "^1.6.22",
-    "@playwright/test": "1.25.2",
+    "@playwright/test": "1.32.3",
     "@remix-run/dev": "1.14.0",
     "@remix-run/eslint-config": "1.14.0",
     "@remix-run/serve": "1.14.0",

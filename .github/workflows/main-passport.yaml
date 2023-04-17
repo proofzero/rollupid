@@ -10,6 +10,9 @@ defaults:
   run:
     working-directory: ./apps
 
+env:
+  PLAYWRIGHT_BASE_URL: https://passport-dev.rollup.id
+
 jobs:
   build-publish-test-passport-dev:
     runs-on: ubuntu-latest
@@ -79,3 +82,19 @@ jobs:
           SECRET_APPLE_OAUTH_CLIENT_SECRET: ${{ secrets.SECRET_APPLE_OAUTH_CLIENT_SECRET_DEV }}
           INTERNAL_DISCORD_OAUTH_CLIENT_ID: ${{ secrets.INTERNAL_DISCORD_OAUTH_CLIENT_ID_DEV }}
           SECRET_DISCORD_OAUTH_CLIENT_SECRET: ${{ secrets.SECRET_DISCORD_OAUTH_CLIENT_SECRET_DEV }}
+
+      - name: Setup Playwright
+        with:
+          workingDirectory: 'apps/passport'
+        run: yarn playwright install --with-deps
+      - name: Run Playwright tests
+        with:
+          workingDirectory: 'apps/passport'
+        run: yarn playwright test
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          workingDirectory: 'apps/passport'
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30

@@ -11,6 +11,9 @@ defaults:
   run:
     working-directory: ./apps
 
+env:
+  PLAYWRIGHT_BASE_URL: https://console-dev.rollup.id
+
 jobs:
   build-publish-test-console-dev:
     runs-on: ubuntu-latest
@@ -56,3 +59,19 @@ jobs:
           # A secret used for session encryption.
           SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_DEV }}
           # CF_ROUTE: https://console-dev.kubelt.com/*
+
+      - name: Setup Playwright
+        with:
+          workingDirectory: 'apps/console'
+        run: yarn playwright install --with-deps
+      - name: Run Playwright tests
+        with:
+          workingDirectory: 'apps/console'
+        run: yarn playwright test
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          workingDirectory: 'apps/console'
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
