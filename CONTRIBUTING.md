@@ -80,6 +80,12 @@ cd <project-directory>
 yarn add <dependency-name>
 ```
 
+## Testing
+
+### Apps E2E Testing
+
+In the apps directory of the monorepo, each project is setup with Playwright e2e test framework. To run the tests simply run `yarn playwright test` in the app directory you want to test.
+
 ## Contributing
 
 When working on multiple projects within the monorepo, ensure that you follow the same code style, contribution guidelines, and testing procedures for each project. This will help maintain consistency and quality across the entire codebase.
