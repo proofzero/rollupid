@@ -5,6 +5,7 @@ import { getStarbaseClient } from '~/platform.server'
 import { getConsoleParams } from '~/session.server'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
+import LogoIndigo from '~/assets/PassportLogoIndigo.svg'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   let appProps
@@ -13,6 +14,12 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     appProps = await sbClient.getAppPublicProps.query({
       clientId: params.clientId as string,
     })
+  } else {
+    appProps = {
+      name: 'Rollup ID',
+      iconURL: LogoIndigo,
+      termsURL: 'https://rollup.id/tos',
+    }
   }
 
   const cp = await getConsoleParams(request, context.env)
