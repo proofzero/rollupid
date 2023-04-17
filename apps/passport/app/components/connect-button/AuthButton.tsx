@@ -24,12 +24,16 @@ export default ({
   >
     <div className="flex flex-row items-center space-x-3 py-1.5">
       {Graphic && (
-        <div className="w-6 h-6 flex justify-center items-center overflow-hidden">
+        <div
+          className="min-w-6 min-h-6 w-6 h-6
+        flex justify-center items-center overflow-hidden
+        shrink-0"
+        >
           {Graphic}
         </div>
       )}
 
-      <Text weight="medium" className="text-gray-800">
+      <Text weight="medium" className="text-gray-800 truncate">
         {text}
       </Text>
 
