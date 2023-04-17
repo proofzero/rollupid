@@ -1,7 +1,11 @@
 import { z } from 'zod'
 
 //TODO: Will have to revise and integrated with Scope in next iteration
-export const ClaimName = z.union([z.literal('email'), z.literal('openid')])
+export const ClaimName = z.union([
+  z.literal('email'),
+  z.literal('openid'),
+  z.literal('connected_addresses'),
+])
 export type ClaimName = z.infer<typeof ClaimName>
 
 export const ClaimValue = z.any()
