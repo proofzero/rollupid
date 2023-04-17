@@ -1,9 +1,7 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import { json } from '@remix-run/cloudflare'
-import { redirect } from '@remix-run/cloudflare'
 import { Suspense } from 'react'
 
-import { getConsoleParams, getUserSession } from '~/session.server'
+import { getConsoleParams } from '~/session.server'
 
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules'
 import { useCatch } from '@remix-run/react'

@@ -5760,7 +5760,7 @@ __metadata:
     remix-auth-google: 1.2.0
     remix-auth-microsoft: 2.0.0
     remix-auth-oauth2: 1.5.0
-    remix-auth-twitter: 0.1.1
+    remix-auth-twitter: 1.0.0
     sass: 1.54.7
     sass-loader: 13.2.0
     storybook-addon-sass-postcss: 0.1.3
@@ -31894,19 +31894,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^17.0.2":
-  version: 17.0.2
-  resolution: "react-dom@npm:17.0.2"
-  dependencies:
-    loose-envify: ^1.1.0
-    object-assign: ^4.1.1
-    scheduler: ^0.20.2
-  peerDependencies:
-    react: 17.0.2
-  checksum: 1c1eaa3bca7c7228d24b70932e3d7c99e70d1d04e13bb0843bbf321582bc25d7961d6b8a6978a58a598af2af496d1cedcfb1bf65f6b0960a0a8161cb8dab743c
-  languageName: node
-  linkType: hard
-
 "react-element-to-jsx-string@npm:^14.3.4":
   version: 14.3.4
   resolution: "react-element-to-jsx-string@npm:14.3.4"
@@ -32782,18 +32769,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remix-auth-twitter@npm:0.1.1":
-  version: 0.1.1
-  resolution: "remix-auth-twitter@npm:0.1.1"
+"remix-auth-twitter@npm:1.0.0":
+  version: 1.0.0
+  resolution: "remix-auth-twitter@npm:1.0.0"
   dependencies:
     crypto-js: ^4.1.1
     debug: ^4.3.3
-    react-dom: ^17.0.2
     remix-auth: ^3.2.2
     uuid: ^8.3.2
   peerDependencies:
     "@remix-run/server-runtime": ^1.6.3
-  checksum: eb81a539cf66658c44110decc4b278e516ad060f1afb6700dec60773ee1bbed45785771bdef10c92298fcefc2d76416cf378336f5ecc0b3e055677e72cdc6436
+  checksum: b2f8dbd17499f01b3aad9378c09be133bc674ac3a329c05f4fc1fe9400e95c6fe22e79247ddd9323c7fbf500213c698b962b936d3ff69aa3b74b307c0226f445
   languageName: node
   linkType: hard
 
