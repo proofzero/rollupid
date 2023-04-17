@@ -10,9 +10,6 @@ defaults:
   run:
     working-directory: ./apps
 
-env:
-  PLAYWRIGHT_BASE_URL: https://passport-dev.rollup.id
-
 jobs:
   build-publish-test-passport-dev:
     runs-on: ubuntu-latest
@@ -90,6 +87,20 @@ jobs:
       - name: Run Playwright tests
         with:
           workingDirectory: 'apps/passport'
+        env:
+          PLAYWRIGHT_BASE_URL: https://passport-dev.rollup.id
+          INTERNAL_TWITTER_USERNAME_TEST: ${{ secrets.INTERNAL_TWITTER_USERNAME_TEST }}
+          INTERNAL_TWITTER_PASSWORD_TEST: ${{ secrets.INTERNAL_TWITTER_PASSWORD_TEST }}
+          INTERNAL_GITHUB_USERNAME_TEST: ${{ secrets.INTERNAL_GITHUB_USERNAME_TEST }}
+          INTERNAL_GITHUB_PASSWORD_TEST: ${{ secrets.INTERNAL_GITHUB_PASSWORD_TEST }}
+          INTERNAL_GOOGLE_USERNAME_TEST: ${{ secrets.INTERNAL_GOOGLE_USERNAME_TEST }}
+          INTERNAL_GOOGLE_PASSWORD_TEST: ${{ secrets.INTERNAL_GOOGLE_PASSWORD_TEST }}
+          INTERNAL_MICROSOFT_USERNAME_TEST: ${{ secrets.INTERNAL_MICROSOFT_USERNAME_TEST }}
+          INTERNAL_MICROSOFT_PASSWORD_TEST: ${{ secrets.INTERNAL_MICROSOFT_PASSWORD_TEST }}
+          INTERNAL_APPLE_USERNAME_TEST: ${{ secrets.INTERNAL_APPLE_USERNAME_TEST }}
+          INTERNAL_APPLE_PASSWORD_TEST: ${{ secrets.INTERNAL_APPLE_PASSWORD_TEST }}
+          INTERNAL_DISCORD_USERNAME_TEST: ${{ secrets.INTERNAL_DISCORD_USERNAME_TEST }}
+          INTERNAL_DISCORD_PASSWORD_TEST: ${{ secrets.INTERNAL_DISCORD_PASSWORD_TEST }}
         run: yarn playwright test
       - uses: actions/upload-artifact@v3
         if: always()
