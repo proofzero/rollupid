@@ -21,6 +21,8 @@ import {
   TwitterAddress,
 } from '../../nodes'
 
+import { wasa } from '../../contractsEthersjs'
+
 import { AddressProfileSchema } from '../validators/profile'
 
 export const GetAddressProfileOutput = AddressProfileSchema.extend({
@@ -77,6 +79,8 @@ export const getAddressProfileMethod: GetAddressProfileMethod = async ({
   if (!node) {
     throw new Error('unsupported address type')
   }
+
+  await wasa(ctx.WALLET_PRIVATE_KEY, ctx.ETH_PROVIDER_URL)
 
   const profile = await node.getProfile()
 

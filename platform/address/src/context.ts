@@ -37,6 +37,8 @@ interface CreateInnerContextOptions
   addressDescription?: ENSRes
 
   PASSPORT_URL: string
+  WALLET_PRIVATE_KEY: string
+  ETH_PROVIDER_URL: string
 
   TTL_IN_MS: number
   MAX_ATTEMPTS: number
