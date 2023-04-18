@@ -212,7 +212,6 @@ export async function getClaimValues(
     generateTraceContextHeaders(traceSpan)
   )
   for (const scopeValue of scope) {
-    console.debug('SCOPPVAL', { scopeValue, personaData })
     if (scopeValue === 'email' && personaData.email) {
       const emailAddressUrn = personaData.email
       const edgesResults = await edgesClient.getEdges.query({

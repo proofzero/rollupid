@@ -54,7 +54,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   qp.append('redirect_uri', redirectUri)
   qp.append('state', state)
   qp.append('scope', scope.join(' '))
-  console.debug('ACCOUNT CONSOLE PARAMS', consoleParams)
+
   if (prompt) qp.append('prompt', prompt)
 
   return redirect(`/authorize?${qp.toString()}`)

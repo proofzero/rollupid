@@ -199,10 +199,6 @@ export async function node(
 
   const finalSqlStatement = sqlBase + conditionsStatement + sqlSuffix
 
-  //Keep this .debug until we're confident around the logic
-  console.debug('FULL STATEMENT', finalSqlStatement)
-  console.debug('BIND PARAMS', prepBindParams)
-
   const resultSet = await g.db
     .prepare(finalSqlStatement)
     .bind(...prepBindParams)

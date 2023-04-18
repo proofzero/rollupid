@@ -185,12 +185,6 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
   const issuer = ctx.INTERNAL_JWT_ISS
 
-  console.debug('EXCHANGE TOKEN PERSONADATA', {
-    name,
-    account,
-    clientId,
-    personaData,
-  })
   await accessNode.storage.put({ account, clientId, personaData })
   const access = AccessURNSpace.componentizedUrn(name, { client_id: clientId })
   await ctx.edgesClient!.makeEdge.mutate({

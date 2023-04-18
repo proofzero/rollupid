@@ -14,7 +14,7 @@ export const GetUserInfoInput = z.object({
   access_token: z.string(),
 })
 
-export const GetUserInfoOutput = z.record(z.string())
+export const GetUserInfoOutput = z.record(z.any())
 
 export const getUserInfoMethod = async ({
   input,

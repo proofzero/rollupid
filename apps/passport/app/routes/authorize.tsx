@@ -95,7 +95,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       })
     }
   }
-  console.debug('AUTHZ query params', context.consoleParams)
+
   if (prompt && !['consent', 'connect'].includes(prompt))
     throw new BadRequestError({ message: 'only prompt supported is "consent"' })
 
