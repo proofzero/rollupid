@@ -6,11 +6,13 @@ import type { PersonaData } from '@proofzero/types/application'
 import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
 import { UnauthorizedError } from '@proofzero/errors'
 import { createConsoleParamsSession } from '~/session.server'
+import { AddressURN } from '@proofzero/urns/address'
 
 export type DataForScopes = {
   connectedEmails: EmailSelectListItem[]
   personaData: PersonaData
   requestedScope: string[]
+  connectedAddresses: AddressURN[]
 }
 
 // Deterministically sort scopes so that they are always in the same order
@@ -58,6 +60,8 @@ export const getDataForScopes = async (
     connectedEmails,
     personaData,
     requestedScope: reorderScope(requestedScope),
+    connectedAddresses:
+      connectedAccounts?.map((a) => a.baseUrn as AddressURN) || [],
   }
 }
 

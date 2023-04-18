@@ -3,6 +3,7 @@ import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
 import createEdgesClient from '@proofzero/platform-clients/edges'
 import createAddressClient from '@proofzero/platform-clients/address'
 import createAccessClient from '@proofzero/platform-clients/access'
+import createAccountClient from '@proofzero/platform-clients/account'
 import {
   generateTraceContextHeaders,
   TraceSpan,
@@ -10,16 +11,25 @@ import {
 import { EdgeSpace, EdgeURN } from '@proofzero/urns/edge'
 import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
-import { BadRequestError, InternalServerError } from '@proofzero/errors'
+import {
+  BadRequestError,
+  InternalServerError,
+  UnauthorizedError,
+} from '@proofzero/errors'
 import { EmailAddressType, OAuthAddressType } from '@proofzero/types/address'
 import { PersonaData } from '@proofzero/types/application'
+import { SCOPES, SCOPES_JSON } from './scopes'
+import { Scopes } from '@proofzero/platform-middleware/scopes'
+import account from '@proofzero/platform-clients/account'
+import { MakeEdgeParams } from '@proofzero/platform/edges/src/jsonrpc/methods/makeEdge'
+import { AnyURN } from '@proofzero/urns'
 
 export const EDGE_AUTHORIZES_REF_TO: EdgeURN = EdgeSpace.urn('authorizes/refTo')
 
 export async function validatePersonaData(
   accountUrn: AccountURN,
   personaData: PersonaData,
-  env: { addressFetcher: Fetcher },
+  env: { addressFetcher: Fetcher; accountFetcher: Fetcher },
   traceSpan: TraceSpan
 ): Promise<void> {
   //If there's nothing to validate, return right away
@@ -55,6 +65,41 @@ export async function validatePersonaData(
         throw new BadRequestError({
           message: 'Address provided is not an email-compatible address',
         })
+    } else if (scopeName === 'connected_addresses') {
+      const authorizedAddressUrns = claimValue
+
+      //Check expected data type in personaData, ie. AddressURN[]
+      if (
+        !(
+          authorizedAddressUrns &&
+          authorizedAddressUrns instanceof Array &&
+          authorizedAddressUrns.every((e) => AddressURNSpace.is(e))
+        )
+      ) {
+        throw new BadRequestError({
+          message: 'Bad data received for list of address identifiers',
+        })
+      }
+
+      const accountClient = createAccountClient(env.accountFetcher, {
+        ...generateTraceContextHeaders(traceSpan),
+      })
+      const accountAddresses = await accountClient.getAddresses.query({
+        account: accountUrn,
+      })
+
+      //Check if authorized address set is fully owned by the account doing the authorization
+      if (
+        !accountAddresses ||
+        !accountAddresses.every((e) =>
+          authorizedAddressUrns.includes(e.baseUrn as AddressURN)
+        )
+      ) {
+        throw new UnauthorizedError({
+          message:
+            'Mismatch in addresses provided vs addresses connected to account',
+        })
+      }
     }
   }
 }
@@ -70,21 +115,59 @@ export async function setPersonaReferences(
   },
   traceSpan: TraceSpan
 ) {
+  //We could have multiple nodes being referenced across multiple scope values
+  //so we create a unique listing of them before creating the edges
+  const uniqueAuthorizationReferences = new Set<AnyURN>()
+
+  for (const scopeEntry of scope) {
+    //TODO: make this more generic so it applies to all claims
+    if (scopeEntry === 'email' && personaData.email) {
+      uniqueAuthorizationReferences.add(personaData.email)
+    } else if (
+      scopeEntry === 'connected_addresses' &&
+      personaData.connected_addresses &&
+      personaData.connected_addresses instanceof Array
+    ) {
+      personaData.connected_addresses.forEach((addressUrn) =>
+        uniqueAuthorizationReferences.add(addressUrn)
+      )
+    }
+  }
+
   const edgesClient = createEdgesClient(
     env.edgesFetcher,
     generateTraceContextHeaders(traceSpan)
   )
-  for (const scopeEntry of scope) {
-    //TODO: make this more generic so it applies to all claims
-    if (scopeEntry === 'email' && personaData.email) {
-      const claimAddressUrnForEmail = personaData.email as AddressURN
-      const createdEdge = await edgesClient.makeEdge.mutate({
+
+  //TODO: The next set of 3 operations will need to be optmizied into a single
+  //SQL transaction
+
+  //Get existing references
+  const edgesToDelete = await edgesClient.getEdges.query({
+    query: { tag: EDGE_AUTHORIZES_REF_TO, src: { baseUrn: accessNode } },
+  })
+
+  //Delete existing references
+  edgesToDelete.edges.forEach(
+    async (edge) =>
+      await edgesClient.removeEdge.mutate({
+        tag: edge.tag,
+        dst: edge.dst.baseUrn,
+        src: edge.src.baseUrn,
+      })
+  )
+
+  //Add new references
+  const edges = await Promise.allSettled(
+    [...uniqueAuthorizationReferences].map((refUrn) => {
+      //This returns promises that get awaited collectively above
+      return edgesClient.makeEdge.mutate({
         src: accessNode,
         tag: EDGE_AUTHORIZES_REF_TO,
-        dst: claimAddressUrnForEmail,
+        dst: refUrn,
       })
-    }
-  }
+    })
+  )
 }
 
 export type ClaimValueType =
@@ -92,6 +175,7 @@ export type ClaimValueType =
   | {
       [K: string]: ClaimValueType
     }
+  | ClaimValueType[]
 
 export async function getClaimValues(
   accountUrn: AccountURN,
@@ -150,6 +234,27 @@ export async function getClaimValues(
           picture: nodeResult.qc.picture,
         }
       }
+    } else if (scopeValue === 'connected_addresses') {
+      const authorizedAddresses =
+        personaData.connected_addresses as AddressURN[]
+      const edgePromises = authorizedAddresses.map((address) => {
+        return edgesClient.findNode.query({ baseUrn: address })
+      })
+      const edgeResults = await Promise.allSettled(edgePromises)
+
+      //Make typescript gods happy
+      type connectedAddressType = { type: string; alias: string }
+      const isDefined = (
+        optionallyDefined: connectedAddressType | undefined
+      ): optionallyDefined is connectedAddressType => !!optionallyDefined
+
+      const claimResults = edgeResults
+        .map((e) => {
+          if (e.status === 'fulfilled')
+            return { type: e.value.rc.addr_type, alias: e.value.qc.alias }
+        })
+        .filter(isDefined)
+      result = { ...result, connected_addresses: claimResults }
     }
   }
   return result

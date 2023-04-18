@@ -102,9 +102,24 @@ Call this method to retrieve basic identity information for the user.
 ```javascript
 {
     name: '(some name here)',
-    picture: '(URL of some picture here)'
-    email: '(email address connected to the account)'
-    sub: '(unique identifier of the account aka. accountURN)'
+    picture: '(URL of some picture here)',
+    email: '(email address connected to the account)',
+    sub: '(unique identifier of the account aka. accountURN)',
+    connected_addresses: [
+      {
+        type: 'eth',
+        alias: '(eth address)'
+      },
+      {
+        type: 'email',
+        alias: '(email address of connected account)'
+      },
+      {
+        type: 'github',
+        alias: '(github username)'
+      }
+      //other addresses
+    ]
 }
 ```
 

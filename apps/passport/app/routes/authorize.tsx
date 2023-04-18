@@ -76,7 +76,7 @@ export type LoaderData = {
 }
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const { clientId, redirectUri, state } = context.consoleParams
+  const { clientId, redirectUri, state, prompt } = context.consoleParams
 
   const connectResult =
     new URL(request.url).searchParams.get('connect_result') ?? undefined
@@ -95,6 +95,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       })
     }
   }
+
+  if (prompt && !['consent', 'connect'].includes(prompt))
+    throw new BadRequestError({ message: 'only prompt supported is "consent"' })
 
   const lastCP = await getConsoleParams(request, context.env)
 
@@ -195,34 +198,41 @@ export const loader: LoaderFunction = async ({ request, context }) => {
           'Requested scope value not in the configured allowed scope list',
       })
 
-    //Pre-authorize, if possible
-    const responseType = ResponseType.Code
-    const accessClient = getAccessClient(context.env, context.traceSpan)
-    const preauthorizeRes = await accessClient.preauthorize.mutate({
-      account: accountUrn,
-      responseType,
-      clientId,
-      redirectUri,
-      scope: scope,
-      state,
-    })
-
-    if (preauthorizeRes.preauthorized) {
-      const redirectParams = new URLSearchParams({
-        code: preauthorizeRes.code,
-        state: preauthorizeRes.state,
+    //Go through pre-authorization if not explicitly requested to prompt user for
+    //consent through query params
+    if (
+      !(
+        context.consoleParams.prompt &&
+        context.consoleParams.prompt === 'consent'
+      )
+    ) {
+      const responseType = ResponseType.Code
+      const accessClient = getAccessClient(context.env, context.traceSpan)
+      const preauthorizeRes = await accessClient.preauthorize.mutate({
+        account: accountUrn,
+        responseType,
+        clientId,
+        redirectUri,
+        scope: scope,
+        state,
       })
 
-      const redirectURL = new URL(redirectUri)
-      for (const [key, value] of redirectParams) {
-        redirectURL.searchParams.append(key, value)
-      }
+      if (preauthorizeRes.preauthorized) {
+        const redirectParams = new URLSearchParams({
+          code: preauthorizeRes.code,
+          state: preauthorizeRes.state,
+        })
 
-      return redirect(redirectURL.toString(), {
-        headers,
-      })
-    } //else we present the authz screen below
+        const redirectURL = new URL(redirectUri)
+        for (const [key, value] of redirectParams) {
+          redirectURL.searchParams.append(key, value)
+        }
 
+        return redirect(redirectURL.toString(), {
+          headers,
+        })
+      } //else we present the authz screen below
+    }
     const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
     const profile = await accountClient.getProfile.query({
       account: accountUrn,
@@ -306,6 +316,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     personaData,
     {
       addressFetcher: context.env.Address,
+      accountFetcher: context.env.Account,
     },
     context.traceSpan
   )
@@ -339,7 +350,7 @@ export const action: ActionFunction = async ({ request, context }) => {
 }
 
 const scopeIcons: Record<string, string> = {
-  address: addressClassIcon,
+  connected_addresses: addressClassIcon,
   profile: profileClassIcon,
   email: emailClassIcon,
 }
@@ -358,7 +369,8 @@ export default function Authorize() {
 
   const userProfile = profile as UserProfile
 
-  const { connectedEmails, personaData, requestedScope } = dataForScopes
+  const { connectedEmails, personaData, requestedScope, connectedAddresses } =
+    dataForScopes
 
   const [persona] = useState<PersonaData>(personaData)
   const [selectedEmail, setSelectedEmail] = useState<EmailSelectListItem>()
@@ -393,14 +405,14 @@ export default function Authorize() {
     // TODO: Everything should be a form field now handled by javascript
     // This helps keeps things generic has if a form input is not present
     // it doesn't end up being submitted
-    form.append(
-      'personaData',
-      JSON.stringify({
-        ...persona,
-        email: selectedEmail?.addressURN,
-      })
-    )
 
+    let personaData = {}
+    if (scopes.includes('email'))
+      personaData = { ...persona, email: selectedEmail?.addressURN }
+    if (scopes.includes('connected_addresses'))
+      personaData = { ...persona, connected_addresses: connectedAddresses }
+
+    form.append('personaData', JSON.stringify(personaData))
     submit(form, { method: 'post' })
   }
 
