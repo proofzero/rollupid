@@ -42,7 +42,7 @@ export const initSmartContractWalletMethod = async ({
     generateHashedIDRef(CryptoAddressType.ETH, owner.address),
     {
       node_type: NodeType.SmartContract,
-      addr_type: ContractAddressType.WalletETH,
+      addr_type: ContractAddressType.ETHWallet,
     },
     { alias: owner.address, hidden: 'true' }
   )

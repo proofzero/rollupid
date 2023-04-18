@@ -13,7 +13,7 @@ export enum CryptoAddressType {
 }
 
 export enum ContractAddressType {
-  WalletETH = 'wallet_eth',
+  ETHWallet = 'wallet_eth',
 }
 
 export enum OAuthAddressType {
