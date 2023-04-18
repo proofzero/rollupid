@@ -4,6 +4,7 @@ import { decodeJwt } from 'jose'
 import type { AccessJWTPayload } from '@proofzero/types/access'
 
 import { Context } from '../../context'
+import { getJWKS } from '../../jwk'
 import { initAccessNodeByName } from '../../nodes'
 
 import {
@@ -52,5 +53,7 @@ export const revokeTokenMethod: RevokeTokenMethod = async ({ ctx, input }) => {
   const account = payload.sub
   const name = `${account}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
-  await accessNode.class.revoke(token)
+
+  const jwks = getJWKS(ctx)
+  await accessNode.class.revoke(token, jwks)
 }

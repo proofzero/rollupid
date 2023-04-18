@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { decodeJwt } from 'jose'
+import * as jose from 'jose'
 
 import {
   ACCESS_TOKEN_OPTIONS,
@@ -12,6 +12,7 @@ import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 import { AccessJWTPayload, GrantType, Scope } from '@proofzero/types/access'
 
 import { Context } from '../../context'
+import { getJWKS, getPrivateJWK } from '../../jwk'
 import { initAuthorizationNodeByName, initAccessNodeByName } from '../../nodes'
 
 import {
@@ -20,6 +21,7 @@ import {
   MissingSubjectError,
   UnsupportedGrantTypeError,
 } from '../../errors'
+
 import { PersonaData } from '@proofzero/types/application'
 import {
   getClaimValues,
@@ -142,8 +144,12 @@ const handleAuthenticationCode: ExchangeTokenMethod<
 
   const { expirationTime } = AUTHENTICATION_TOKEN_OPTIONS
   const scope: Scope = (await authorizationNode.storage.get('scope')) || []
+
+  const jwk = getPrivateJWK(ctx)
+
   return {
     accessToken: await accessNode.class.generateAccessToken({
+      jwk,
       account,
       clientId,
       expirationTime,
@@ -201,7 +207,10 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     ctx.traceSpan
   )
 
+  const jwk = getPrivateJWK(ctx)
+
   const accessToken = await accessNode.class.generateAccessToken({
+    jwk,
     account,
     clientId,
     expirationTime,
@@ -210,6 +219,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   })
 
   const refreshToken = await accessNode.class.generateRefreshToken({
+    jwk,
     account,
     clientId,
     issuer,
@@ -227,6 +237,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     personaData
   )
   const idToken = await accessNode.class.generateIdToken({
+    jwk,
     account,
     clientId,
     expirationTime,
@@ -254,7 +265,7 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
 
   if (!valid) throw InvalidClientCredentialsError
 
-  const payload = decodeJwt(refreshToken) as AccessJWTPayload
+  const payload = jose.decodeJwt(refreshToken) as AccessJWTPayload
   if (clientId != payload.aud[0]) throw MismatchClientIdError
   if (!payload.sub) throw MissingSubjectError
 
@@ -262,13 +273,17 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
   const name = `${AccountURNSpace.decode(account)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
 
-  await accessNode.class.verify(refreshToken)
+  const jwks = getJWKS(ctx)
+  await accessNode.class.verify(refreshToken, jwks)
 
   const scope = payload.scope.split(' ')
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
 
+  const jwk = getPrivateJWK(ctx)
+
   return {
     accessToken: await accessNode.class.generateAccessToken({
+      jwk,
       account,
       clientId,
       expirationTime,

@@ -6,7 +6,9 @@ import { AccountURNSpace } from '@proofzero/urns/account'
 import { AccessJWTPayload } from '@proofzero/types/access'
 
 import { Context } from '../../context'
+import { getJWKS } from '../../jwk'
 import { initAccessNodeByName } from '../../nodes'
+
 import { getClaimValues } from '@proofzero/security/persona'
 import { PersonaData } from '@proofzero/types/application'
 
@@ -42,7 +44,9 @@ export const getUserInfoMethod = async ({
   const name = `${AccountURNSpace.decode(account)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
 
-  await accessNode.class.verify(token)
+  const jwks = getJWKS(ctx)
+  await accessNode.class.verify(token, jwks)
+
   const personaData = await accessNode.storage.get<PersonaData>('personaData')
   const claimValues = await getClaimValues(
     account,
