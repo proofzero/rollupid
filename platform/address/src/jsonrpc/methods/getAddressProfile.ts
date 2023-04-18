@@ -31,7 +31,7 @@ type GetAddressProfileParams = {
   ctx: Context
 }
 
-type GetAddressProfileResult = z.infer<typeof GetAddressProfileOutput>
+export type GetAddressProfileResult = z.infer<typeof GetAddressProfileOutput>
 
 interface GetAddressProfileMethod {
   (params: GetAddressProfileParams): Promise<GetAddressProfileResult>
