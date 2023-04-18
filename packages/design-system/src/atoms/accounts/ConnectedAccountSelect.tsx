@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { AccountURN } from '@proofzero/urns/account'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
@@ -22,6 +22,9 @@ export const ConnectedAccountSelect = ({
     Array<ConnectedAccountSelectListItem>
   >([])
 
+  const allConnectedAccountsSelected =
+    selectedAccounts.length > 0 && selectedAccounts.length === accounts.length
+
   return (
     <Listbox
       value={selectedAccounts}
@@ -30,7 +33,7 @@ export const ConnectedAccountSelect = ({
       by="accountURN"
     >
       {({ open }) => (
-        <div className="relative">
+        <div className="relative select-none">
           <Listbox.Button className="border shadow-sm rounded-lg w-full transition-transform flex flex-row justify-between items-center py-2 px-3 hover:ring-1 hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white">
             {(!selectedAccounts || selectedAccounts.length === 0) && (
               <Text size="sm" className="text-gray-800">
@@ -38,14 +41,20 @@ export const ConnectedAccountSelect = ({
               </Text>
             )}
 
-            {selectedAccounts?.length === 1 && (
+            {selectedAccounts?.length === 1 && !allConnectedAccountsSelected && (
               <Text size="sm" className="text-gray-800">
                 {selectedAccounts[0].address}
               </Text>
             )}
-            {selectedAccounts?.length > 1 && (
+            {selectedAccounts?.length > 1 && !allConnectedAccountsSelected && (
               <Text size="sm" className="text-gray-800">
                 {selectedAccounts.length} accounts selected
+              </Text>
+            )}
+
+            {allConnectedAccountsSelected && (
+              <Text size="sm" className="text-gray-800">
+                All connected accounts
               </Text>
             )}
 
@@ -63,25 +72,70 @@ export const ConnectedAccountSelect = ({
             leaveTo="opacity-0"
           >
             <Listbox.Options className="border shadow-lg rounded-lg absolute w-full mt-1 bg-white px-4 py-3 space-y-3">
+              <div
+                className="flex flex-row space-x-2 cursor-pointer items-center"
+                onClick={() =>
+                  allConnectedAccountsSelected
+                    ? setSelectedAccounts([])
+                    : setSelectedAccounts(accounts)
+                }
+              >
+                <div>
+                  <input
+                    readOnly
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-50 text-indigo-500 focus:ring-indigo-500"
+                    checked={allConnectedAccountsSelected}
+                  />
+                </div>
+                <div className="flex-1">
+                  <Text size="sm" weight="medium" className="text-gray-900">
+                    All connected accounts
+                  </Text>
+                </div>
+              </div>
+
+              <div className="w-100 border-b border-gray-200"></div>
+
               {accounts?.map((account) => (
                 <Listbox.Option
                   key={account.accountURN}
                   value={account}
                   className="flex flex-row space-x-2 cursor-pointer"
+                  disabled={allConnectedAccountsSelected}
                 >
                   <div>
                     <input
                       readOnly
                       type="checkbox"
                       className="h-4 w-4 rounded border-gray-300 bg-gray-50 text-indigo-500 focus:ring-indigo-500"
-                      checked={selectedAccounts?.includes(account)}
+                      checked={
+                        !allConnectedAccountsSelected &&
+                        selectedAccounts?.includes(account)
+                      }
                     />
                   </div>
                   <div className="flex-1 flex flex-col">
-                    <Text size="sm" weight="medium" className="text-gray-900">
+                    <Text
+                      size="sm"
+                      weight="medium"
+                      className={`${
+                        allConnectedAccountsSelected
+                          ? 'text-gray-400'
+                          : 'text-gray-900'
+                      }`}
+                    >
                       {account.title}
                     </Text>
-                    <Text size="xs" weight="normal" className="text-gray-500">
+                    <Text
+                      size="xs"
+                      weight="normal"
+                      className={`${
+                        allConnectedAccountsSelected
+                          ? 'text-gray-400'
+                          : 'text-gray-500'
+                      }`}
+                    >
                       {account.provider} - {account.address}
                     </Text>
                   </div>
