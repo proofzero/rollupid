@@ -7,13 +7,11 @@ import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 
 import { appRouter } from '../router'
 import { Context } from '../../context'
-import {
-  ContractAddressType,
-  CryptoAddressType,
-  NodeType,
-} from '@proofzero/types/address'
+import { ContractAddressType, NodeType } from '@proofzero/types/address'
 import { initAddressNodeByName } from '../../nodes'
 import createImageClient from '@proofzero/platform-clients/image'
+import { getZeroDevSigner } from '@zerodevapp/sdk'
+
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 export const InitSmartContractWalletOutput = AddressURNInput
@@ -36,30 +34,39 @@ export const initSmartContractWalletMethod = async ({
     throw new Error('missing account')
   }
 
-  const owner = Wallet.createRandom()
+  const smartContractWallet = Wallet.createRandom()
 
   const address3RN = AddressURNSpace.componentizedUrn(
-    generateHashedIDRef(CryptoAddressType.ETH, owner.address),
+    generateHashedIDRef(
+      ContractAddressType.ETHWallet,
+      smartContractWallet.address
+    ),
     {
-      node_type: NodeType.SmartContract,
+      node_type: NodeType.Crypto,
       addr_type: ContractAddressType.ETHWallet,
     },
-    { alias: owner.address, hidden: 'true' }
+    { alias: smartContractWallet.address, hidden: 'true' }
   )
   const baseAddressURN = AddressURNSpace.getBaseURN(address3RN)
-  const ownerNode = initAddressNodeByName(baseAddressURN, ctx.Address)
+  const smartContractWalletNode = initAddressNodeByName(
+    baseAddressURN,
+    ctx.Address
+  )
   const imageClient = createImageClient(ctx.Images, {
     headers: generateTraceContextHeaders(ctx.traceSpan),
   })
   const gradient = await imageClient.getGradient.mutate({
-    gradientSeed: owner.address,
+    gradientSeed: smartContractWallet.address,
   })
   await Promise.all([
-    ownerNode.storage.put('privateKey', owner.privateKey), // #TODO: vault class needed
-    ownerNode.class.setAddress(owner.address),
-    ownerNode.class.setNodeType(NodeType.SmartContract),
-    ownerNode.class.setType(CryptoAddressType.ETH),
-    ownerNode.class.setGradient(gradient),
+    smartContractWalletNode.storage.put(
+      'privateKey',
+      smartContractWallet.privateKey
+    ), // #TODO: vault class needed
+    smartContractWalletNode.class.setAddress(smartContractWallet.address),
+    smartContractWalletNode.class.setNodeType(NodeType.Crypto),
+    smartContractWalletNode.class.setType(ContractAddressType.ETHWallet),
+    smartContractWalletNode.class.setGradient(gradient),
   ])
 
   const caller = appRouter.createCaller({

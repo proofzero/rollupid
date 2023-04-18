@@ -58,9 +58,7 @@ export const resolveAccountMethod = async ({
     }
     const caller = appRouter.createCaller(ctx)
     await caller.setAccount(urn) // this will lazy create an account node when account worker is called
-
-    // DISABLING FOR NOW UNTIL WE FIGURE SOLVE FOR VAULT AUTH SCOPES
-    // await caller.initSmartContractWallet()
+    await caller.initSmartContractWallet()
 
     resultURN = urn
   }
