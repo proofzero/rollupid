@@ -6,9 +6,16 @@ export default {
   component: ConnectedAccountSelect,
 }
 
+const accounts = Array.from({ length: 10 }, (_, i) => ({
+  accountURN: `urn:proofzero:account:${i}`,
+  title: `Account ${i}`,
+  provider: `Provider ${i}`,
+  address: `Address ${i}`,
+}))
+
 const Template = (args: any) => (
   <div className="w-[262px]">
-    <ConnectedAccountSelect {...args} />
+    <ConnectedAccountSelect accounts={accounts} {...args} />
   </div>
 )
 
