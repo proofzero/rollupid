@@ -350,7 +350,7 @@ export const action: ActionFunction = async ({ request, context }) => {
 }
 
 const scopeIcons: Record<string, string> = {
-  address: addressClassIcon,
+  connected_addresses: addressClassIcon,
   profile: profileClassIcon,
   email: emailClassIcon,
 }
