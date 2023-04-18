@@ -9,6 +9,7 @@ export type AuthenticationProps = {
   logoURL?: string
   appName?: string
   generic?: boolean
+  accountSelect?: boolean
   children: JSX.Element
 }
 
@@ -16,6 +17,7 @@ export function Authentication({
   logoURL,
   appName,
   generic = false,
+  accountSelect = false,
   children,
 }: AuthenticationProps) {
   const logo = logoURL || circleLogo
@@ -41,7 +43,26 @@ export function Authentication({
             </Text>
           </>
         )}
-        {!generic && (
+
+        {accountSelect && (
+          <>
+            <Avatar src={logo} size="sm"></Avatar>
+            <div className={'flex flex-col items-center gap-2'}>
+              <Text size="xl" weight="semibold">
+                Choose an account
+              </Text>
+
+              {appName && (
+                <Text className="text-gray-500">
+                  to continue to "
+                  <span className="text-indigo-500">{appName}</span>"
+                </Text>
+              )}
+            </div>
+          </>
+        )}
+
+        {!generic && !accountSelect && (
           <>
             <Avatar src={logo} size="sm"></Avatar>
             <div className={'flex flex-col items-center gap-2'}>
