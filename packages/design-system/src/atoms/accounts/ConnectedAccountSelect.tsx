@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
@@ -13,10 +13,12 @@ type ConnectedAccountSelectListItem = {
 
 type ConnectedAccountSelectProps = {
   accounts: Array<ConnectedAccountSelectListItem>
+  onSelect?: (selected: Array<ConnectedAccountSelectListItem>) => void
 }
 
 export const ConnectedAccountSelect = ({
   accounts,
+  onSelect,
 }: ConnectedAccountSelectProps) => {
   const [selectedAccounts, setSelectedAccounts] = useState<
     Array<ConnectedAccountSelectListItem>
@@ -29,6 +31,12 @@ export const ConnectedAccountSelect = ({
     address.length > 17
       ? address.substring(0, 7) + '...' + address.substring(address.length - 7)
       : address
+
+  useEffect(() => {
+    if (onSelect) {
+      onSelect(selectedAccounts)
+    }
+  }, [selectedAccounts])
 
   return (
     <Listbox
