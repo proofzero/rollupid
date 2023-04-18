@@ -1,6 +1,7 @@
 export enum NodeType {
   Crypto = 'crypto',
   Vault = 'vault',
+  SmartContract = 'smart_contract',
   Contract = 'contract',
   OAuth = 'oauth',
   Email = 'email',
@@ -12,7 +13,7 @@ export enum CryptoAddressType {
 }
 
 export enum ContractAddressType {
-  ETH = 'eth',
+  WalletETH = 'wallet_eth',
 }
 
 export enum OAuthAddressType {

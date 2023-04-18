@@ -60,7 +60,7 @@ export const resolveAccountMethod = async ({
     await caller.setAccount(urn) // this will lazy create an account node when account worker is called
 
     // DISABLING FOR NOW UNTIL WE FIGURE SOLVE FOR VAULT AUTH SCOPES
-    // await caller.initVault()
+    // await caller.initSmartContractWallet()
 
     resultURN = urn
   }

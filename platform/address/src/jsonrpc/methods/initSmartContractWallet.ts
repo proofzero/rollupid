@@ -7,22 +7,28 @@ import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 
 import { appRouter } from '../router'
 import { Context } from '../../context'
-import { CryptoAddressType, NodeType } from '@proofzero/types/address'
+import {
+  ContractAddressType,
+  CryptoAddressType,
+  NodeType,
+} from '@proofzero/types/address'
 import { initAddressNodeByName } from '../../nodes'
 import createImageClient from '@proofzero/platform-clients/image'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
-export const InitVaultOutput = AddressURNInput
+export const InitSmartContractWalletOutput = AddressURNInput
 
-type InitVaultResult = z.infer<typeof InitVaultOutput>
+type InitSmartContractWalletResult = z.infer<
+  typeof InitSmartContractWalletOutput
+>
 
-export const initVaultMethod = async ({
+export const initSmartContractWalletMethod = async ({
   input,
   ctx,
 }: {
   input: unknown
   ctx: Context
-}): Promise<InitVaultResult> => {
+}): Promise<InitSmartContractWalletResult> => {
   const nodeClient = ctx.address
   const account = await nodeClient?.class.getAccount()
 
@@ -30,27 +36,30 @@ export const initVaultMethod = async ({
     throw new Error('missing account')
   }
 
-  const vault = Wallet.createRandom()
+  const owner = Wallet.createRandom()
 
   const address3RN = AddressURNSpace.componentizedUrn(
-    generateHashedIDRef(CryptoAddressType.ETH, vault.address),
-    { node_type: NodeType.Vault, addr_type: CryptoAddressType.ETH },
-    { alias: vault.address, hidden: 'true' }
+    generateHashedIDRef(CryptoAddressType.ETH, owner.address),
+    {
+      node_type: NodeType.SmartContract,
+      addr_type: ContractAddressType.WalletETH,
+    },
+    { alias: owner.address, hidden: 'true' }
   )
   const baseAddressURN = AddressURNSpace.getBaseURN(address3RN)
-  const vaultNode = initAddressNodeByName(baseAddressURN, ctx.Address)
+  const ownerNode = initAddressNodeByName(baseAddressURN, ctx.Address)
   const imageClient = createImageClient(ctx.Images, {
     headers: generateTraceContextHeaders(ctx.traceSpan),
   })
   const gradient = await imageClient.getGradient.mutate({
-    gradientSeed: vault.address,
+    gradientSeed: owner.address,
   })
   await Promise.all([
-    vaultNode.storage.put('privateKey', vault.privateKey), // #TODO: vault class needed
-    vaultNode.class.setAddress(vault.address),
-    vaultNode.class.setNodeType(NodeType.Vault),
-    vaultNode.class.setType(CryptoAddressType.ETH),
-    vaultNode.class.setGradient(gradient),
+    ownerNode.storage.put('privateKey', owner.privateKey), // #TODO: vault class needed
+    ownerNode.class.setAddress(owner.address),
+    ownerNode.class.setNodeType(NodeType.SmartContract),
+    ownerNode.class.setType(CryptoAddressType.ETH),
+    ownerNode.class.setGradient(gradient),
   ])
 
   const caller = appRouter.createCaller({
