@@ -405,15 +405,14 @@ export default function Authorize() {
     // TODO: Everything should be a form field now handled by javascript
     // This helps keeps things generic has if a form input is not present
     // it doesn't end up being submitted
-    form.append(
-      'personaData',
-      JSON.stringify({
-        ...persona,
-        email: selectedEmail?.addressURN,
-        connected_addresses: connectedAddresses,
-      })
-    )
 
+    let personaData = {}
+    if (scopes.includes('email'))
+      personaData = { ...persona, email: selectedEmail?.addressURN }
+    if (scopes.includes('connected_addresses'))
+      personaData = { ...persona, connected_addresses: connectedAddresses }
+
+    form.append('personaData', JSON.stringify(personaData))
     submit(form, { method: 'post' })
   }
 
