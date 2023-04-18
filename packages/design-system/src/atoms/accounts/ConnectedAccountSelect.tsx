@@ -124,7 +124,9 @@ export const ConnectedAccountSelect = ({
                       className="h-4 w-4 rounded border-gray-300 bg-gray-50 text-indigo-500 focus:ring-indigo-500"
                       checked={
                         !allConnectedAccountsSelected &&
-                        selectedAccounts?.includes(account)
+                        selectedAccounts
+                          .map((sa) => sa.addressURN)
+                          .includes(account.addressURN)
                       }
                     />
                   </div>
