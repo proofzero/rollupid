@@ -81,7 +81,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   })
 
   if (appData?.prompt === 'connect' && existing) {
-    return redirect(`${appData.redirectUri}?error=ALREADY_CONNECTED`)
+    return redirect(`${appData.redirectUri}?connect_result=ALREADY_CONNECTED`)
   }
 
   // TODO: handle the error case
