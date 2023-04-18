@@ -7,7 +7,7 @@ export default {
 }
 
 const accounts = Array.from({ length: 10 }, (_, i) => ({
-  accountURN: `urn:proofzero:account:${i}`,
+  addressURN: `urn:proofzero:address:${i}`,
   title: `Account ${i}`,
   provider: `Provider ${i}`,
   address: `Address ${i}`,

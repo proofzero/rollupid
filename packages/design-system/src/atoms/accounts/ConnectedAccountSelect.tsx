@@ -1,11 +1,11 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
-import { AccountURN } from '@proofzero/urns/account'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
+import { AddressURN } from '@proofzero/urns/address'
 
 type ConnectedAccountSelectListItem = {
-  accountURN: AccountURN
+  addressURN: AddressURN
   title: string
   provider: string
   address: string
@@ -25,12 +25,17 @@ export const ConnectedAccountSelect = ({
   const allConnectedAccountsSelected =
     selectedAccounts.length > 0 && selectedAccounts.length === accounts.length
 
+  const truncateAddress = (address: string) =>
+    address.length > 17
+      ? address.substring(0, 7) + '...' + address.substring(address.length - 7)
+      : address
+
   return (
     <Listbox
       value={selectedAccounts}
       onChange={setSelectedAccounts}
       multiple
-      by="accountURN"
+      by="addressURN"
     >
       {({ open }) => (
         <div className="relative select-none">
@@ -43,7 +48,7 @@ export const ConnectedAccountSelect = ({
 
             {selectedAccounts?.length === 1 && !allConnectedAccountsSelected && (
               <Text size="sm" className="text-gray-800">
-                {selectedAccounts[0].address}
+                {truncateAddress(selectedAccounts[0].address)}
               </Text>
             )}
             {selectedAccounts?.length > 1 && !allConnectedAccountsSelected && (
@@ -99,7 +104,7 @@ export const ConnectedAccountSelect = ({
 
               {accounts?.map((account) => (
                 <Listbox.Option
-                  key={account.accountURN}
+                  key={account.addressURN}
                   value={account}
                   className="flex flex-row space-x-2 cursor-pointer"
                   disabled={allConnectedAccountsSelected}
@@ -136,7 +141,7 @@ export const ConnectedAccountSelect = ({
                           : 'text-gray-500'
                       }`}
                     >
-                      {account.provider} - {account.address}
+                      {account.provider} - {truncateAddress(account.address)}
                     </Text>
                   </div>
                 </Listbox.Option>
