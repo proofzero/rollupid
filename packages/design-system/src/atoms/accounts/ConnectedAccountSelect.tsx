@@ -32,6 +32,10 @@ export const ConnectedAccountSelect = ({
       ? address.substring(0, 7) + '...' + address.substring(address.length - 7)
       : address
 
+  const capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1)
+  }
+
   useEffect(() => {
     if (onSelect) {
       onSelect(selectedAccounts)
@@ -151,7 +155,8 @@ export const ConnectedAccountSelect = ({
                           : 'text-gray-500'
                       }`}
                     >
-                      {account.provider} - {truncateAddress(account.address)}
+                      {capitalizeFirstLetter(account.provider)} -{' '}
+                      {truncateAddress(account.address)}
                     </Text>
                   </div>
                 </Listbox.Option>
