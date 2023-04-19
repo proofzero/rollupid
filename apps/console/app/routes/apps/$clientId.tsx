@@ -135,6 +135,7 @@ export default function AppDetailIndexPage() {
                   notificationHandler: notify,
                   appDetails,
                   rotationResult,
+                  PASSPORT_URL,
                 }}
               />
             </section>

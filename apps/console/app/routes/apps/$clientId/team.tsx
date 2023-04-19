@@ -1,7 +1,7 @@
 import { Text } from '@proofzero/design-system'
 import { HiOutlineMail } from 'react-icons/hi'
 import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/AuthButton'
-import { useLoaderData, useSubmit } from '@remix-run/react'
+import { useLoaderData, useOutletContext, useSubmit } from '@remix-run/react'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { ActionFunction, LoaderFunction, redirect } from '@remix-run/cloudflare'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
@@ -25,7 +25,7 @@ import { EmailSelect } from '@proofzero/design-system/src/atoms/email/EmailSelec
 import { AddressURN } from '@proofzero/urns/address'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
-export function getAccountClient(jwt: string, env: any, traceSpan: TraceSpan) {
+const getAccountClient = (jwt: string, env: any, traceSpan: TraceSpan) => {
   return createAccountClient(env.Account, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...generateTraceContextHeaders(traceSpan),
@@ -33,6 +33,8 @@ export function getAccountClient(jwt: string, env: any, traceSpan: TraceSpan) {
 }
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
+  const clientId = params.clientId as string
+
   const jwt = await requireJWT(request)
   const payload = checkToken(jwt)
   const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
@@ -59,13 +61,13 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     ...generateTraceContextHeaders(context.traceSpan),
   })
 
-  const appContactEmail = await starbaseClient.getAppContactAddress.query({
-    clientId: params.clientId as string,
+  const appContactAddress = await starbaseClient.getAppContactAddress.query({
+    clientId,
   })
 
   return {
     connectedEmails,
-    appContactEmail,
+    appContactAddress,
   }
 }
 
@@ -73,44 +75,21 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const clientId = params.clientId as string
   const jwt = await requireJWT(request)
 
-  // get type from formData
   const fd = await request.formData()
-  const type = fd.get('type')
-
-  switch (type) {
-    case 'set':
-      const addressURN = fd.get('addressURN') as AddressURN
-      if (!addressURN) {
-        throw new Error('No addressURN')
-      }
-
-      const starbaseClient = createStarbaseClient(Starbase, {
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...generateTraceContextHeaders(context.traceSpan),
-      })
-
-      await starbaseClient.upsertAppContactAddress.mutate({
-        address: addressURN,
-        clientId,
-      })
-
-      break
-    case 'redirect':
-    default:
-      const currentURL = new URL(request.url)
-      currentURL.search = ''
-
-      const qp = new URLSearchParams()
-      qp.append('scope', '')
-      qp.append('state', 'skip')
-      qp.append('client_id', 'console')
-
-      qp.append('redirect_uri', currentURL.toString())
-      qp.append('prompt', 'connect')
-      qp.append('login_hint', 'email microsoft google apple')
-
-      return redirect(`${PASSPORT_URL}/authorize?${qp.toString()}`)
+  const addressURN = fd.get('addressURN') as AddressURN
+  if (!addressURN) {
+    throw new Error('No addressURN')
   }
+
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...generateTraceContextHeaders(context.traceSpan),
+  })
+
+  await starbaseClient.upsertAppContactAddress.mutate({
+    address: addressURN,
+    clientId,
+  })
 
   return null
 }
@@ -120,10 +99,30 @@ export default () => {
 
   const submit = useSubmit()
 
-  const { connectedEmails, appContactEmail } = useLoaderData<{
+  const { connectedEmails, appContactAddress } = useLoaderData<{
     connectedEmails: EmailSelectListItem[]
-    appContactEmail: AddressURN | undefined
+    appContactAddress: AddressURN | undefined
   }>()
+
+  const { PASSPORT_URL } = useOutletContext<{
+    PASSPORT_URL: string
+  }>()
+
+  const redirectToPassport = () => {
+    const currentURL = new URL(window.location.href)
+    currentURL.search = ''
+
+    const qp = new URLSearchParams()
+    qp.append('scope', '')
+    qp.append('state', 'skip')
+    qp.append('client_id', 'console')
+
+    qp.append('redirect_uri', currentURL.toString())
+    qp.append('prompt', 'connect')
+    qp.append('login_hint', 'email microsoft google apple')
+
+    window.location.href = `${PASSPORT_URL}/authorize?${qp.toString()}`
+  }
 
   return (
     <>
@@ -147,14 +146,7 @@ export default () => {
         <div className="self-start mb-8 w-80">
           {connectedEmails && !connectedEmails.length && (
             <AuthButton
-              onClick={() =>
-                submit(
-                  {
-                    type: 'redirect',
-                  },
-                  { method: 'post' }
-                )
-              }
+              onClick={redirectToPassport}
               Graphic={<HiOutlineMail className="w-full h-full" />}
               text={'Connect Email Address'}
             />
@@ -170,15 +162,14 @@ export default () => {
               <EmailSelect
                 items={connectedEmails}
                 enableAddNew={true}
-                defaultAddress={appContactEmail}
+                defaultAddress={appContactAddress}
                 onSelect={(selected: EmailSelectListItem) => {
                   if (selected?.type === OptionType.AddNew) {
-                    return submit(
-                      {
-                        type: 'redirect',
-                      },
-                      { method: 'post' }
-                    )
+                    return redirectToPassport()
+                  }
+
+                  if (selected.addressURN === appContactAddress) {
+                    return
                   }
 
                   if (!selected.addressURN) {
@@ -188,7 +179,6 @@ export default () => {
 
                   submit(
                     {
-                      type: 'set',
                       addressURN: selected.addressURN,
                     },
                     {
