@@ -24,7 +24,7 @@ test('login to passport using Twitter', async ({ page }) => {
     .fill(process.env.INTERNAL_TWITTER_TEST_USERNAME)
   await page
     .getByPlaceholder('Password')
-    .fill(process.env.INTERNAL_TWITTER_TEST_PASSWORD)
+    .fill(process.env.SECRET_TWITTER_TEST_USER_PASSWORD)
   await page.getByRole('button').filter({ hasText: 'Sign In' }).click()
   await page.waitForURL(/.*settings\/dashboard/, {
     timeout: 5000,
