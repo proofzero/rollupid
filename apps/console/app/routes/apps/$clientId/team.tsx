@@ -91,6 +91,13 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     clientId,
   })
 
+  const requestURL = new URL(request.url)
+  const connectResult = requestURL.searchParams.get('connect_result')
+  if (connectResult) {
+    requestURL.searchParams.delete('connect_result')
+    return redirect(requestURL.toString())
+  }
+
   return null
 }
 
