@@ -144,7 +144,7 @@ export default () => {
         </Text>
 
         <div className="self-start mb-8 w-80">
-          {connectedEmails && !connectedEmails.length && (
+          {connectedEmails && connectedEmails.length === 0 && (
             <AuthButton
               onClick={redirectToPassport}
               Graphic={<HiOutlineMail className="w-full h-full" />}
@@ -152,7 +152,7 @@ export default () => {
             />
           )}
 
-          {connectedEmails && connectedEmails.length && (
+          {connectedEmails && connectedEmails.length > 0 && (
             <>
               <Text size="sm" weight="medium" className="text-gray-700 mb-0.5">
                 <sup>*</sup>
