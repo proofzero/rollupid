@@ -23,7 +23,7 @@ import {
 } from '@proofzero/types/application'
 import { AnyURN } from '@proofzero/urns'
 
-export const EDGE_AUTHORIZES_REF_TO: EdgeURN = EdgeSpace.urn('authorizes/refTo')
+export const EDGE_HAS_REFERENCE_TO: EdgeURN = EdgeSpace.urn('has/refTo')
 
 export async function validatePersonaData(
   accountUrn: AccountURN,
@@ -148,7 +148,7 @@ export async function setPersonaReferences(
 
   //Get existing references
   const edgesToDelete = await edgesClient.getEdges.query({
-    query: { tag: EDGE_AUTHORIZES_REF_TO, src: { baseUrn: accessNode } },
+    query: { tag: EDGE_HAS_REFERENCE_TO, src: { baseUrn: accessNode } },
   })
 
   //Delete existing references
@@ -167,7 +167,7 @@ export async function setPersonaReferences(
       //This returns promises that get awaited collectively above
       return edgesClient.makeEdge.mutate({
         src: accessNode,
-        tag: EDGE_AUTHORIZES_REF_TO,
+        tag: EDGE_HAS_REFERENCE_TO,
         dst: refUrn,
       })
     })
@@ -223,7 +223,7 @@ export async function getClaimValues(
         query: {
           src: { baseUrn: accessUrn },
           dst: { baseUrn: emailAddressUrn },
-          tag: EDGE_AUTHORIZES_REF_TO,
+          tag: EDGE_HAS_REFERENCE_TO,
         },
       })
       const emailAddress = edgesResults.edges[0].dst.qc.alias
