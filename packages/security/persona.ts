@@ -86,15 +86,18 @@ export async function validatePersonaData(
       const accountClient = createAccountClient(env.accountFetcher, {
         ...generateTraceContextHeaders(traceSpan),
       })
-      const accountAddresses = await accountClient.getAddresses.query({
-        account: accountUrn,
-      })
+      const accountAddresses =
+        (await accountClient.getAddresses.query({
+          account: accountUrn,
+        })) || []
+
+      const ownedAddressURNList = accountAddresses.map((aa) => aa.baseUrn)
 
       //Check if authorized address set is fully owned by the account doing the authorization
       if (
-        !accountAddresses ||
-        !accountAddresses.every((e) =>
-          authorizedAddressUrns.includes(e.baseUrn as AddressURN)
+        ownedAddressURNList.length === 0 ||
+        !authorizedAddressUrns.every((addressURN) =>
+          ownedAddressURNList.includes(addressURN)
         )
       ) {
         throw new UnauthorizedError({
