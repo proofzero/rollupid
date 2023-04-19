@@ -1,10 +1,61 @@
 import { Text } from '@proofzero/design-system'
 import { HiOutlineMail } from 'react-icons/hi'
 import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/AuthButton'
-import { useSubmit } from '@remix-run/react'
+import { useLoaderData, useSubmit } from '@remix-run/react'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
-import { ActionFunction, redirect } from '@remix-run/cloudflare'
+import { ActionFunction, LoaderFunction, redirect } from '@remix-run/cloudflare'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
+import { requireJWT } from '~/utilities/session.server'
+import { checkToken } from '@proofzero/utils/token'
+
+import createAccountClient from '@proofzero/platform-clients/account'
+
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+
+import type { TraceSpan } from '@proofzero/platform-middleware/trace'
+import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
+
+import getNormalisedConnectedEmails, {
+  EmailSelectListItem,
+  OptionType,
+} from '@proofzero/utils/getNormalisedConnectedEmails'
+
+import { EmailSelect } from '@proofzero/design-system/src/atoms/email/EmailSelect'
+
+export function getAccountClient(jwt: string, env: any, traceSpan: TraceSpan) {
+  return createAccountClient(env.Account, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...generateTraceContextHeaders(traceSpan),
+  })
+}
+
+export const loader: LoaderFunction = async ({ request, context }) => {
+  const jwt = await requireJWT(request)
+  const payload = checkToken(jwt)
+  const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
+  if (
+    !AccountURNSpace.is(payload.sub!) ||
+    !(await accountClient.isValid.query())
+  )
+    throw new Error('Foo')
+
+  const accountURN = payload.sub as AccountURN
+
+  const connectedAccounts = await accountClient.getAddresses.query({
+    account: accountURN,
+  })
+
+  if (!connectedAccounts || !connectedAccounts.length) {
+    throw new Error('Bar')
+  }
+
+  const connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
+
+  return {
+    connectedEmails,
+  }
+}
 
 export const action: ActionFunction = async ({ request }) => {
   const currentURL = new URL(request.url)
@@ -27,6 +78,10 @@ export default () => {
 
   const submit = useSubmit()
 
+  const { connectedEmails } = useLoaderData<{
+    connectedEmails: EmailSelectListItem[]
+  }>()
+
   return (
     <>
       <div className="flex flex-row items-center space-x-3 pb-5">
@@ -47,11 +102,25 @@ export default () => {
         </Text>
 
         <div className="self-start mb-8">
-          <AuthButton
-            onClick={() => submit({}, { method: 'post' })}
-            Graphic={<HiOutlineMail className="w-full h-full" />}
-            text={'Connect Email Address'}
-          />
+          {connectedEmails && !connectedEmails.length && (
+            <AuthButton
+              onClick={() => submit({}, { method: 'post' })}
+              Graphic={<HiOutlineMail className="w-full h-full" />}
+              text={'Connect Email Address'}
+            />
+          )}
+
+          {connectedEmails && connectedEmails.length && (
+            <EmailSelect
+              items={connectedEmails}
+              enableAddNew={true}
+              onSelect={(selected: EmailSelectListItem) => {
+                if (selected?.type === OptionType.AddNew) {
+                  return submit({}, { method: 'post' })
+                }
+              }}
+            />
+          )}
         </div>
 
         <Text size="sm" weight="normal" className="text-gray-500">
