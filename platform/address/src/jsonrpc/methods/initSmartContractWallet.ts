@@ -72,7 +72,7 @@ export const initSmartContractWalletMethod = async ({
   })
   await Promise.all([
     smartContractWalletNode.storage.put('privateKey', owner.privateKey),
-    smartContractWalletNode.class.setAddress(smartContractWalletAddress),
+    smartContractWalletNode.class.setAddress(input.alias),
     smartContractWalletNode.class.setNodeType(NodeType.Crypto),
     smartContractWalletNode.class.setType(CryptoAddressType.Wallet),
     smartContractWalletNode.class.setGradient(gradient),
