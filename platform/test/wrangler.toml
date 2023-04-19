@@ -1,0 +1,14 @@
+name = "test"
+main = "src/index.ts"
+compatibility_date = "2023-04-19"
+workers_dev = false
+
+services = [{ binding = "Address", service = "address" }]
+
+[dev]
+port = 20200
+inspector_port = 21200
+local_protocol = "http"
+
+[env.dev]
+services = [{ binding = "Address", service = "address-dev" }]
