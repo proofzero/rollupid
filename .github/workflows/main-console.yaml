@@ -67,9 +67,9 @@ jobs:
         env:
           PLAYWRIGHT_BASE_URL: https://console-dev.rollup.id
           INTERNAL_GITHUB_TEST_USERNAME: ${{ secrets.INTERNAL_GITHUB_TEST_USERNAME }}
-          INTERNAL_GITHUB_TEST_PASSWORD: ${{ secrets.INTERNAL_GITHUB_TEST_PASSWORD }}
+          SECRET_GITHUB_TEST_USER_PASSWORD: ${{ secrets.SECRET_GITHUB_TEST_USER_PASSWORD }}
           INTERNAL_MICROSOFT_TEST_USERNAME: ${{ secrets.INTERNAL_MICROSOFT_TEST_USERNAME }}
-          INTERNAL_MICROSOFT_TEST_PASSWORD: ${{ secrets.INTERNAL_MICROSOFT_TEST_PASSWORD }}
+          SECRET_MICROSOFT_TEST_USER_PASSWORD: ${{ secrets.SECRET_MICROSOFT_TEST_USER_PASSWORD }}
         run: yarn playwright test
       - uses: actions/upload-artifact@v3
         if: always()
