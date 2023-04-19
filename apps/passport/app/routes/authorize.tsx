@@ -408,9 +408,9 @@ export default function Authorize() {
 
     let personaData = {}
     if (scopes.includes('email'))
-      personaData = { ...persona, email: selectedEmail?.addressURN }
+      personaData = { ...personaData, email: selectedEmail?.addressURN }
     if (scopes.includes('connected_addresses'))
-      personaData = { ...persona, connected_addresses: connectedAddresses }
+      personaData = { ...personaData, connected_addresses: connectedAddresses }
 
     form.append('personaData', JSON.stringify(personaData))
     submit(form, { method: 'post' })
