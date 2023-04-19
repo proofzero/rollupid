@@ -11,6 +11,7 @@ type ToastProps = ToastMessageProps & {
   className?: string
   PreMessage?: JSX.Element
   PostMessage?: JSX.Element
+  remove?: () => void
 }
 
 export const Toast = ({
@@ -19,7 +20,7 @@ export const Toast = ({
   className,
   PreMessage,
   PostMessage,
-}: ToastProps & { remove: () => void }) => (
+}: ToastProps) => (
   <div
     className={`flex flex-row items-center p-4 pr-6 space-x-3 rounded-md ${
       className ?? ''
@@ -28,12 +29,14 @@ export const Toast = ({
     {PreMessage && <div>{PreMessage}</div>}
     <Text className="flex-1">{message}</Text>{' '}
     {PostMessage && <div>{PostMessage}</div>}
-    <button
-      onClick={() => {
-        remove()
-      }}
-    >
-      <IoMdClose size={16} />
-    </button>
+    {remove && (
+      <button
+        onClick={() => {
+          remove()
+        }}
+      >
+        <IoMdClose size={16} />
+      </button>
+    )}
   </div>
 )

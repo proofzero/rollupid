@@ -5,9 +5,10 @@ import { Toast } from './Toast'
 
 export type ToastWithLinkProps = {
   message: string
-
   linkHref: string
   linkText: string
+
+  remove?: () => void
 }
 
 export const ToastWithLink = ({
@@ -15,7 +16,7 @@ export const ToastWithLink = ({
   remove,
   linkHref,
   linkText,
-}: ToastWithLinkProps & { remove: () => void }) => (
+}: ToastWithLinkProps) => (
   <Toast
     message={message}
     remove={remove}
