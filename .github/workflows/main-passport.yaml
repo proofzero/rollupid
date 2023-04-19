@@ -99,7 +99,6 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: always()
         with:
-          workingDirectory: 'apps/passport'
           name: playwright-report
-          path: playwright-report/
+          path: apps/passport/playwright-report/
           retention-days: 30

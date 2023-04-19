@@ -74,7 +74,6 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: always()
         with:
-          workingDirectory: 'apps/console'
           name: playwright-report
-          path: playwright-report/
+          path: apps/console/playwright-report/
           retention-days: 30

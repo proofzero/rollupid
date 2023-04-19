@@ -16,7 +16,7 @@ test('login to passport using Twitter', async ({ page }) => {
   // Login with Twitter
   await page.getByRole('button', { name: 'twitter' }).click()
   await page.waitForURL(/.*api\.twitter\.com\/oauth\/authenticate/, {
-    timeout: 5000,
+    timeout: 10000,
     waitUntil: 'networkidle',
   })
   await page
@@ -27,7 +27,7 @@ test('login to passport using Twitter', async ({ page }) => {
     .fill(process.env.SECRET_TWITTER_TEST_USER_PASSWORD)
   await page.getByRole('button').filter({ hasText: 'Sign In' }).click()
   await page.waitForURL(/.*settings\/dashboard/, {
-    timeout: 5000,
+    timeout: 10000,
     waitUntil: 'networkidle',
   })
   await expect(page).toHaveURL(/.*settings\/dashboard/)
