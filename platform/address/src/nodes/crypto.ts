@@ -12,7 +12,7 @@ import { AddressNode } from '.'
 import Address from './address'
 import ENSUtils from '@proofzero/platform-clients/ens-utils'
 
-type CryptoAddressProfile = AddressProfile<CryptoAddressType.ETH>
+type CryptoAddressProfile = AddressProfile<CryptoAddressType>
 
 export default class CryptoAddress {
   declare node: AddressNode
