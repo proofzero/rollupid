@@ -26,6 +26,13 @@ test('login to passport using Twitter', async ({ page }) => {
     .getByPlaceholder('Password')
     .fill(process.env.SECRET_TWITTER_TEST_USER_PASSWORD)
   await page.getByRole('button').filter({ hasText: 'Sign In' }).click()
+
+  const currentURL = new URL(page.url())
+  if (currentURL.host.includes('twitter.com')) {
+    await page.getByPlaceholder(/.**/).fill('demo@rollup.id')
+    await page.getByRole('button').click()
+  }
+
   await page.waitForURL(/.*settings\/dashboard/, {
     timeout: 10000,
     waitUntil: 'networkidle',
