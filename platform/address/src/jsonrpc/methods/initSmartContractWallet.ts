@@ -10,7 +10,7 @@ import { Context } from '../../context'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import { initAddressNodeByName } from '../../nodes'
 import createImageClient from '@proofzero/platform-clients/image'
-import { getPrivateKeyOwner, getZeroDevSigner } from '@zerodevapp/sdk'
+import { getZeroDevSigner } from '@zerodevapp/sdk'
 
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
@@ -46,7 +46,7 @@ export const initSmartContractWalletMethod = async ({
 
   const smartContractWallet = await getZeroDevSigner({
     projectId: ctx.ZERODEV_PROJECT_ID,
-    owner: getPrivateKeyOwner(owner.privateKey),
+    owner,
   })
 
   const smartContractWalletAddress = await smartContractWallet.getAddress()
