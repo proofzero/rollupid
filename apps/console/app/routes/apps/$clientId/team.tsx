@@ -144,7 +144,7 @@ export default () => {
           Contact Email
         </Text>
 
-        <div className="self-start mb-8 w-[262px]">
+        <div className="self-start mb-8 w-80">
           {connectedEmails && !connectedEmails.length && (
             <AuthButton
               onClick={() =>
