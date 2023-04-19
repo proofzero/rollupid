@@ -82,12 +82,10 @@ jobs:
 
       - name: Setup Playwright
         run: yarn playwright install --with-deps
-        with:
-          workingDirectory: 'apps/passport'
+        working-directory: 'apps/passport'
       - name: Run Playwright tests
         run: yarn playwright test
-        with:
-          workingDirectory: 'apps/passport'
+        working-directory: 'apps/passport'
         env:
           PLAYWRIGHT_BASE_URL: https://passport-dev.rollup.id
           INTERNAL_TWITTER_TEST_USERNAME: ${{ secrets.INTERNAL_TWITTER_TEST_USERNAME }}
