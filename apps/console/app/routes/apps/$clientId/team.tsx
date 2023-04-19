@@ -22,6 +22,8 @@ import getNormalisedConnectedEmails, {
 } from '@proofzero/utils/getNormalisedConnectedEmails'
 
 import { EmailSelect } from '@proofzero/design-system/src/atoms/email/EmailSelect'
+import { AddressURN } from '@proofzero/urns/address'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
 export function getAccountClient(jwt: string, env: any, traceSpan: TraceSpan) {
   return createAccountClient(env.Account, {
@@ -30,7 +32,7 @@ export function getAccountClient(jwt: string, env: any, traceSpan: TraceSpan) {
   })
 }
 
-export const loader: LoaderFunction = async ({ request, context }) => {
+export const loader: LoaderFunction = async ({ request, context, params }) => {
   const jwt = await requireJWT(request)
   const payload = checkToken(jwt)
   const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
@@ -52,25 +54,65 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
 
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...generateTraceContextHeaders(context.traceSpan),
+  })
+
+  const appContactEmail = await starbaseClient.getAppContactEmail.query({
+    clientId: params.clientId as string,
+  })
+
   return {
     connectedEmails,
+    appContactEmail,
   }
 }
 
-export const action: ActionFunction = async ({ request }) => {
-  const currentURL = new URL(request.url)
-  currentURL.search = ''
+export const action: ActionFunction = async ({ request, context, params }) => {
+  const clientId = params.clientId as string
+  const jwt = await requireJWT(request)
 
-  const qp = new URLSearchParams()
-  qp.append('scope', '')
-  qp.append('state', 'skip')
-  qp.append('client_id', 'console')
+  // get type from formData
+  const fd = await request.formData()
+  const type = fd.get('type')
 
-  qp.append('redirect_uri', currentURL.toString())
-  qp.append('prompt', 'connect')
-  qp.append('login_hint', 'email microsoft google apple')
+  switch (type) {
+    case 'set':
+      const addressURN = fd.get('addressURN') as AddressURN
+      if (!addressURN) {
+        throw new Error('No addressURN')
+      }
 
-  return redirect(`${PASSPORT_URL}/authorize?${qp.toString()}`)
+      const starbaseClient = createStarbaseClient(Starbase, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(context.traceSpan),
+      })
+
+      await starbaseClient.upsertAppContactEmail.mutate({
+        address: addressURN,
+        clientId,
+      })
+
+      break
+    case 'redirect':
+    default:
+      const currentURL = new URL(request.url)
+      currentURL.search = ''
+
+      const qp = new URLSearchParams()
+      qp.append('scope', '')
+      qp.append('state', 'skip')
+      qp.append('client_id', 'console')
+
+      qp.append('redirect_uri', currentURL.toString())
+      qp.append('prompt', 'connect')
+      qp.append('login_hint', 'email microsoft google apple')
+
+      return redirect(`${PASSPORT_URL}/authorize?${qp.toString()}`)
+  }
+
+  return null
 }
 
 export default () => {
@@ -78,8 +120,9 @@ export default () => {
 
   const submit = useSubmit()
 
-  const { connectedEmails } = useLoaderData<{
+  const { connectedEmails, appContactEmail } = useLoaderData<{
     connectedEmails: EmailSelectListItem[]
+    appContactEmail: AddressURN | undefined
   }>()
 
   return (
@@ -101,25 +144,60 @@ export default () => {
           Contact Email
         </Text>
 
-        <div className="self-start mb-8">
+        <div className="self-start mb-8 w-[262px]">
           {connectedEmails && !connectedEmails.length && (
             <AuthButton
-              onClick={() => submit({}, { method: 'post' })}
+              onClick={() =>
+                submit(
+                  {
+                    type: 'redirect',
+                  },
+                  { method: 'post' }
+                )
+              }
               Graphic={<HiOutlineMail className="w-full h-full" />}
               text={'Connect Email Address'}
             />
           )}
 
           {connectedEmails && connectedEmails.length && (
-            <EmailSelect
-              items={connectedEmails}
-              enableAddNew={true}
-              onSelect={(selected: EmailSelectListItem) => {
-                if (selected?.type === OptionType.AddNew) {
-                  return submit({}, { method: 'post' })
-                }
-              }}
-            />
+            <>
+              <Text size="sm" weight="medium" className="text-gray-700 mb-0.5">
+                <sup>*</sup>
+                Email
+              </Text>
+
+              <EmailSelect
+                items={connectedEmails}
+                enableAddNew={true}
+                defaultAddress={appContactEmail}
+                onSelect={(selected: EmailSelectListItem) => {
+                  if (selected?.type === OptionType.AddNew) {
+                    return submit(
+                      {
+                        type: 'redirect',
+                      },
+                      { method: 'post' }
+                    )
+                  }
+
+                  if (!selected.addressURN) {
+                    console.error('No addressURN')
+                    return
+                  }
+
+                  submit(
+                    {
+                      type: 'set',
+                      addressURN: selected.addressURN,
+                    },
+                    {
+                      method: 'post',
+                    }
+                  )
+                }}
+              />
+            </>
           )}
         </div>
 
