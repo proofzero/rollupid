@@ -11,7 +11,9 @@ export const UpsertAppContactAddressInput = z.object({
   address: AddressURNInput,
 })
 
-type UpsertAppContactAddressParams = z.infer<typeof UpsertAppContactAddressInput>
+type UpsertAppContactAddressParams = z.infer<
+  typeof UpsertAppContactAddressInput
+>
 
 export const upsertAppContactAddress = async ({
   input,
