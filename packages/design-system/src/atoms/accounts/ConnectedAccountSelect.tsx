@@ -88,7 +88,7 @@ export const ConnectedAccountSelect = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="border shadow-lg rounded-lg absolute w-full mt-1 bg-white px-4 py-3 space-y-3">
+            <Listbox.Options className="border shadow-lg rounded-lg absolute w-full mt-1 bg-white px-4 py-3 space-y-3 z-10">
               <div
                 className="flex flex-row space-x-2 cursor-pointer items-center"
                 onClick={() =>

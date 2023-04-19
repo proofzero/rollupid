@@ -1,4 +1,4 @@
-import { getAccountClient } from '~/platform.server'
+import { getAccountClient, getAddressClient } from '~/platform.server'
 import getNormalisedConnectedEmails from '@proofzero/utils/getNormalisedConnectedEmails'
 
 import type { AccountURN } from '@proofzero/urns/account'
@@ -6,13 +6,14 @@ import type { PersonaData } from '@proofzero/types/application'
 import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
 import { UnauthorizedError } from '@proofzero/errors'
 import { createConsoleParamsSession } from '~/session.server'
-import { AddressURN } from '@proofzero/urns/address'
+
+import { GetAddressProfileResult } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressProfile'
 
 export type DataForScopes = {
   connectedEmails: EmailSelectListItem[]
   personaData: PersonaData
   requestedScope: string[]
-  connectedAddresses: AddressURN[]
+  connectedAddresses: GetAddressProfileResult[]
 }
 
 // Deterministically sort scopes so that they are always in the same order
@@ -46,13 +47,22 @@ export const getDataForScopes = async (
     throw new UnauthorizedError({ message: 'Account URN is required' })
 
   let connectedEmails: EmailSelectListItem[] = []
+  let connectedAddresses: GetAddressProfileResult[] = []
+
   const accountClient = getAccountClient(jwt || '', env, traceSpan)
 
   const connectedAccounts = await accountClient.getAddresses.query({
     account: accountURN,
   })
-  if (connectedAccounts && connectedAccounts.length)
+  if (connectedAccounts && connectedAccounts.length) {
     connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
+    connectedAddresses = await Promise.all(
+      connectedAccounts.map((ca) => {
+        const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
+        return addressClient.getAddressProfile.query()
+      })
+    )
+  }
 
   const personaData: PersonaData = {}
 
@@ -60,8 +70,7 @@ export const getDataForScopes = async (
     connectedEmails,
     personaData,
     requestedScope: reorderScope(requestedScope),
-    connectedAddresses:
-      connectedAccounts?.map((a) => a.baseUrn as AddressURN) || [],
+    connectedAddresses,
   }
 }
 

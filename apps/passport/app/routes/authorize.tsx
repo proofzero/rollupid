@@ -30,7 +30,7 @@ import authorizeCheck from '~/assets/authorize-check.svg'
 import Info from '~/components/authorization/Info'
 
 import profileClassIcon from '~/components/authorization/profile-class-icon.svg'
-import addressClassIcon from '~/components/authorization/address-class-icon.svg'
+import addressClassIcon from '~/components/authorization/connected-addresses-class-icon.svg'
 import emailClassIcon from '~/components/authorization/email-class-icon.svg'
 
 import {
@@ -39,7 +39,6 @@ import {
   getDataForScopes,
 } from '~/utils/authorize.server'
 import { useEffect, useState } from 'react'
-import { OptionType } from '@proofzero/utils/getNormalisedConnectedEmails'
 import { Text } from '@proofzero/design-system'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { JsonError } from '@proofzero/utils/errors'
@@ -50,9 +49,15 @@ import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { PersonaData } from '@proofzero/types/application'
 import type { DataForScopes } from '~/utils/authorize.server'
-import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
+import {
+  EmailSelectListItem,
+  OptionType,
+} from '@proofzero/utils/getNormalisedConnectedEmails'
 import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
 import useConnectResult from '~/hooks/useConnectResult'
+
+import { ConnectedAccountSelect } from '@proofzero/design-system/src/atoms/accounts/ConnectedAccountSelect'
+import { AddressURN } from '@proofzero/urns/address'
 
 export type UserProfile = {
   displayName: string
@@ -372,7 +377,11 @@ export default function Authorize() {
     dataForScopes
 
   const [persona] = useState<PersonaData>(personaData)
+
   const [selectedEmail, setSelectedEmail] = useState<EmailSelectListItem>()
+  const [selectedAddresses, setSelectedAddresses] = useState<Array<AddressURN>>(
+    []
+  )
 
   // Re-render the component every time persona gets updated
   useEffect(() => {}, [persona])
@@ -401,17 +410,28 @@ export default function Authorize() {
     form.append('state', state)
     form.append('client_id', clientId)
     form.append('redirect_uri', redirectOverride)
+
+    const personaData: any = {
+      ...persona,
+    }
+
+    if (requestedScope.includes('email') && selectedEmail) {
+      personaData.email = selectedEmail.addressURN
+    }
+
+    if (
+      requestedScope.includes('connected_addresses') &&
+      selectedAddresses.length > 0
+    ) {
+      personaData.connected_addresses = selectedAddresses
+    }
+
     // TODO: Everything should be a form field now handled by javascript
     // This helps keeps things generic has if a form input is not present
     // it doesn't end up being submitted
 
-    let personaData = {}
-    if (scopes.includes('email'))
-      personaData = { ...personaData, email: selectedEmail?.addressURN }
-    if (scopes.includes('connected_addresses'))
-      personaData = { ...personaData, connected_addresses: connectedAddresses }
-
     form.append('personaData', JSON.stringify(personaData))
+
     submit(form, { method: 'post' })
   }
 
@@ -454,96 +474,110 @@ export default function Authorize() {
           <div
             className={'flex flex-col gap-4 items-start justify-start w-full'}
           >
-            <div className={'items-start justify-start w-full'}>
-              <p
-                style={{ color: '#6B7280' }}
-                className={'mb-2 font-extralight text-xs'}
-              >
-                REQUESTED
-              </p>
-              <ul
-                style={{ color: '#6B7280' }}
-                className={'flex flex-col font-light text-base gap-2 w-full'}
-              >
-                {requestedScope
-                  .filter((scope: string) => {
-                    if (scopeMeta.scopes[scope])
-                      return !scopeMeta.scopes[scope].hidden
-                    // If we do not have scope from url in our lookup table -
-                    // we can't show it
-                    return false
-                  })
-                  .map((scope: string, i: number) => {
-                    return (
-                      <li
-                        key={i}
-                        className={
-                          'flex flex-row gap-2 items-center justify-between w-full'
-                        }
-                      >
-                        <div className="flex flex-row w-full gap-2 items-center">
-                          <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
-                          {scope !== 'email'
-                            ? scopeMeta.scopes[scope].name
-                            : null}
-                          {scope === 'email' ? (
-                            <div className="w-full">
-                              <EmailSelect
-                                items={connectedEmails}
-                                enableAddNew={true}
-                                onSelect={(selected: EmailSelectListItem) => {
-                                  if (selected?.type === OptionType.AddNew) {
-                                    const qp = new URLSearchParams()
-                                    qp.append('scope', requestedScope.join(' '))
-                                    qp.append('state', state)
-                                    qp.append('client_id', clientId)
-                                    qp.append('redirect_uri', redirectOverride)
-                                    qp.append('prompt', 'connect')
-                                    qp.append(
-                                      'login_hint',
-                                      'email microsoft google apple'
-                                    )
+            <p
+              style={{ color: '#6B7280' }}
+              className={'mb-2 font-extralight text-xs'}
+            >
+              REQUESTED
+            </p>
+            <ul
+              style={{ color: '#6B7280' }}
+              className={'flex flex-col font-light text-base gap-2 w-full'}
+            >
+              {requestedScope
+                .filter((scope: string) => {
+                  if (scopeMeta.scopes[scope])
+                    return !scopeMeta.scopes[scope].hidden
+                  // If we do not have scope from url in our lookup table -
+                  // we can't show it
+                  return false
+                })
+                .map((scope: string, i: number) => {
+                  return (
+                    <li
+                      key={i}
+                      className={'flex flex-row gap-2 items-center w-full'}
+                    >
+                      <div className="flex flex-row w-full gap-2 items-center">
+                        <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
+                        {scope !== 'email' &&
+                          scope !== 'connected_addresses' &&
+                          scopeMeta.scopes[scope].name}
 
-                                    return navigate(
-                                      `/authorize?${qp.toString()}`
-                                    )
-                                  }
+                        {scope === 'email' && (
+                          <div className="w-full">
+                            <EmailSelect
+                              items={connectedEmails}
+                              enableAddNew={true}
+                              onSelect={(selected: EmailSelectListItem) => {
+                                if (selected?.type === OptionType.AddNew) {
+                                  const qp = new URLSearchParams()
+                                  qp.append('scope', requestedScope.join(' '))
+                                  qp.append('state', state)
+                                  qp.append('client_id', clientId)
+                                  qp.append('redirect_uri', redirectOverride)
+                                  qp.append('prompt', 'connect')
+                                  qp.append(
+                                    'login_hint',
+                                    'email microsoft google apple'
+                                  )
 
-                                  setSelectedEmail(selected)
-                                }}
-                              />
-                            </div>
-                          ) : null}
-                        </div>
+                                  return navigate(`/authorize?${qp.toString()}`)
+                                }
 
-                        <Info
-                          name={scopeMeta.scopes[scope].name}
-                          description={scopeMeta.scopes[scope].description}
-                        />
+                                setSelectedEmail(selected)
+                              }}
+                            />
+                          </div>
+                        )}
 
-                        <div
-                          data-popover
-                          id={`popover-${scope}`}
-                          role="tooltip"
-                          className="absolute z-10 invisible inline-block
+                        {scope === 'connected_addresses' && (
+                          <div className="flex-1">
+                            <ConnectedAccountSelect
+                              accounts={connectedAddresses.map((ca) => ({
+                                addressURN: ca.id,
+                                address: ca.address,
+                                title: ca.title,
+                                provider:
+                                  ca.type === 'eth' ? 'metamask' : ca.type,
+                              }))}
+                              onSelect={(addresses) => {
+                                setSelectedAddresses(
+                                  addresses.map((a) => a.addressURN)
+                                )
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <Info
+                        name={scopeMeta.scopes[scope].name}
+                        description={scopeMeta.scopes[scope].description}
+                      />
+
+                      <div
+                        data-popover
+                        id={`popover-${scope}`}
+                        role="tooltip"
+                        className="absolute z-10 invisible inline-block
                     font-[Inter]
                      min-w-64 text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
-                        >
-                          <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-                            <h3 className="font-semibold text-gray-900 dark:text-white">
-                              {scope}
-                            </h3>
-                          </div>
-                          <div className="px-3 py-2">
-                            <p>{scopeMeta.scopes[scope].description}</p>
-                          </div>
-                          <div data-popper-arrow></div>
+                      >
+                        <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+                          <h3 className="font-semibold text-gray-900 dark:text-white">
+                            {scope}
+                          </h3>
                         </div>
-                      </li>
-                    )
-                  })}
-              </ul>
-            </div>
+                        <div className="px-3 py-2">
+                          <p>{scopeMeta.scopes[scope].description}</p>
+                        </div>
+                        <div data-popper-arrow></div>
+                      </div>
+                    </li>
+                  )
+                })}
+            </ul>
           </div>
           <div
             className={

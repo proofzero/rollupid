@@ -110,7 +110,7 @@ export const EmailSelect = ({
           >
             <Listbox.Options
               className="border shadow-lg rounded-lg
-             absolute w-full mt-1 bg-white"
+             absolute w-full mt-1 bg-white z-10"
             >
               {items.map((item, i) => {
                 const iconURL = getIconUrl(item.type)
