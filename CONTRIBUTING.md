@@ -92,6 +92,8 @@ Currently we run E2E tests in the Console and Passports apps found in the apps d
 
 In the future we will be able to run tests in parallel using multiple browser contexts and multiple authentication credentials ([see issue](https://github.com/proofzero/rollupid/issues/2123)).
 
+Avoid testing minor UI changes like copy and images and instead focus on flows and functionality.
+
 If tests fail after PR is landed please open an issue and assign it to the author of the PR.
 
 #### Console

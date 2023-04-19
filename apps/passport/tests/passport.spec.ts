@@ -10,9 +10,6 @@ test('has title', async ({ page }) => {
 test('login to passport using Twitter', async ({ page }) => {
   await page.goto('/')
 
-  // // Click the get started link.
-  // await page.getByRole('link', { name: 'Get started' }).click()
-
   // Expects the URL to contain intro.
   await expect(page).toHaveURL(/.*authenticate\/passport/)
 
