@@ -7,10 +7,10 @@ import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 
 import { appRouter } from '../router'
 import { Context } from '../../context'
-import { ContractAddressType, NodeType } from '@proofzero/types/address'
+import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import { initAddressNodeByName } from '../../nodes'
 import createImageClient from '@proofzero/platform-clients/image'
-import { getZeroDevSigner } from '@zerodevapp/sdk'
+import { getPrivateKeyOwner, getZeroDevSigner } from '@zerodevapp/sdk'
 
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
@@ -34,20 +34,24 @@ export const initSmartContractWalletMethod = async ({
     throw new Error('missing account')
   }
 
-  const smartContractWallet = Wallet.createRandom()
+  const owner = Wallet.createRandom()
 
-  const address3RN = AddressURNSpace.componentizedUrn(
-    generateHashedIDRef(
-      ContractAddressType.ETHWallet,
-      smartContractWallet.address
-    ),
+  const smartContractWallet = await getZeroDevSigner({
+    projectId: ctx.ZERODEV_PROJECT_ID,
+    owner: getPrivateKeyOwner(owner.privateKey),
+  })
+
+  const smartContractWalletAddress = await smartContractWallet.getAddress()
+
+  const addressURN = AddressURNSpace.componentizedUrn(
+    generateHashedIDRef(CryptoAddressType.Wallet, smartContractWalletAddress),
     {
       node_type: NodeType.Crypto,
-      addr_type: ContractAddressType.ETHWallet,
+      addr_type: CryptoAddressType.Wallet,
     },
-    { alias: smartContractWallet.address, hidden: 'true' }
+    { alias: smartContractWalletAddress, hidden: 'true' }
   )
-  const baseAddressURN = AddressURNSpace.getBaseURN(address3RN)
+  const baseAddressURN = AddressURNSpace.getBaseURN(addressURN)
   const smartContractWalletNode = initAddressNodeByName(
     baseAddressURN,
     ctx.Address
@@ -56,26 +60,23 @@ export const initSmartContractWalletMethod = async ({
     headers: generateTraceContextHeaders(ctx.traceSpan),
   })
   const gradient = await imageClient.getGradient.mutate({
-    gradientSeed: smartContractWallet.address,
+    gradientSeed: smartContractWalletAddress,
   })
   await Promise.all([
-    smartContractWalletNode.storage.put(
-      'privateKey',
-      smartContractWallet.privateKey
-    ), // #TODO: vault class needed
-    smartContractWalletNode.class.setAddress(smartContractWallet.address),
+    smartContractWalletNode.storage.put('privateKey', owner.privateKey),
+    smartContractWalletNode.class.setAddress(smartContractWalletAddress),
     smartContractWalletNode.class.setNodeType(NodeType.Crypto),
-    smartContractWalletNode.class.setType(ContractAddressType.ETHWallet),
+    smartContractWalletNode.class.setType(CryptoAddressType.Wallet),
     smartContractWalletNode.class.setGradient(gradient),
   ])
 
   const caller = appRouter.createCaller({
     ...ctx,
-    address3RN,
+    addressURN,
   })
 
   caller.setAccount(account)
   caller.getAddressProfile()
 
-  return address3RN
+  return addressURN
 }

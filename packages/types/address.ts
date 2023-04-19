@@ -9,10 +9,7 @@ export enum NodeType {
 
 export enum CryptoAddressType {
   ETH = 'eth',
-}
-
-export enum ContractAddressType {
-  ETHWallet = 'smart_contract_wallet_eth',
+  Wallet = 'smart_contract_wallet',
 }
 
 export enum OAuthAddressType {
@@ -35,6 +32,5 @@ export enum HandleAddressType {
 export type AddressType =
   | CryptoAddressType
   | OAuthAddressType
-  | ContractAddressType
   | HandleAddressType
   | EmailAddressType
