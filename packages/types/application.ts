@@ -13,3 +13,11 @@ export type ClaimValue = z.infer<typeof ClaimValue>
 
 export const PersonaData = z.record(ClaimName, ClaimValue)
 export type PersonaData = z.infer<typeof PersonaData>
+
+export enum AuthorizationControlSelection {
+  ALL,
+  NONE,
+}
+export const AuthorizationControlSelectionEnum = z.nativeEnum(
+  AuthorizationControlSelection
+)

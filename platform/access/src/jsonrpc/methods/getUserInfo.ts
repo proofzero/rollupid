@@ -50,6 +50,7 @@ export const getUserInfoMethod = async ({
     scope,
     {
       edgesFetcher: ctx.Edges,
+      accountFetcher: ctx.Account,
     },
     ctx.traceSpan,
     personaData
