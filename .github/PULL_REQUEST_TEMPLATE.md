@@ -13,5 +13,5 @@
 ### Checklist
 
 - [ ] I have read the [CONTRIBUTING](CONTRIBUTING.md) guidelines
-- [ ] I have tested my code
+- [ ] I have tested my code (manually and/or automated if applicable)
 - [ ] I have updated the documentation (if necessary)

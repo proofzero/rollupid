@@ -56,3 +56,25 @@ jobs:
           # A secret used for session encryption.
           SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_DEV }}
           # CF_ROUTE: https://console-dev.kubelt.com/*
+
+      - name: Setup Playwright
+        with:
+          workingDirectory: 'apps/console'
+        run: yarn playwright install --with-deps
+      - name: Run Playwright tests
+        with:
+          workingDirectory: 'apps/console'
+        env:
+          PLAYWRIGHT_BASE_URL: https://console-dev.rollup.id
+          INTERNAL_GITHUB_TEST_USERNAME: ${{ secrets.INTERNAL_GITHUB_TEST_USERNAME }}
+          SECRET_GITHUB_TEST_USER_PASSWORD: ${{ secrets.SECRET_GITHUB_TEST_USER_PASSWORD }}
+          INTERNAL_MICROSOFT_TEST_USERNAME: ${{ secrets.INTERNAL_MICROSOFT_TEST_USERNAME }}
+          SECRET_MICROSOFT_TEST_USER_PASSWORD: ${{ secrets.SECRET_MICROSOFT_TEST_USER_PASSWORD }}
+        run: yarn playwright test
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          workingDirectory: 'apps/console'
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30

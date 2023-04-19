@@ -38,6 +38,7 @@ const ConnectOAuthButton = ({ provider }: ConnectOAuthButtonProps) => {
         className={'w-full hover:bg-gray-100'}
         btnType={'secondary-alt'}
         isSubmit={true}
+        role={provider}
       >
         <div className="flex justify-center items-center w-full py-1.5">
           <img

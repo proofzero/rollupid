@@ -5543,39 +5543,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:1.25.2":
-  version: 1.25.2
-  resolution: "@playwright/test@npm:1.25.2"
+"@playwright/test@npm:1.32.3":
+  version: 1.32.3
+  resolution: "@playwright/test@npm:1.32.3"
   dependencies:
     "@types/node": "*"
-    playwright-core: 1.25.2
+    fsevents: 2.3.2
+    playwright-core: 1.32.3
+  dependenciesMeta:
+    fsevents:
+      optional: true
   bin:
     playwright: cli.js
-  checksum: 3c24027bd9b305a3985cae35a4046e656dd0ffb76ef4dfcfc864f6c8492a643fc21c79048ee8169c5c1562d3cae493e7223a5473b127fef3bda7c7c52795c17d
-  languageName: node
-  linkType: hard
-
-"@playwright/test@npm:1.27.1":
-  version: 1.27.1
-  resolution: "@playwright/test@npm:1.27.1"
-  dependencies:
-    "@types/node": "*"
-    playwright-core: 1.27.1
-  bin:
-    playwright: cli.js
-  checksum: 92f219a78c21da03c6599d92c313c914e73cc374306366130fb3bd4701555179394ec5a3000d9375ce59f5a03c00f20d1ddaae50c85583ce475e17795a622699
-  languageName: node
-  linkType: hard
-
-"@playwright/test@npm:1.28.1, @playwright/test@npm:^1.27.1":
-  version: 1.28.1
-  resolution: "@playwright/test@npm:1.28.1"
-  dependencies:
-    "@types/node": "*"
-    playwright-core: 1.28.1
-  bin:
-    playwright: cli.js
-  checksum: dc39dfdf848171a6c65fc32a9dbc95162684a4a1e3401dd157d7d6822a065d8dcb96b2484fc3b223baea4da774450fddaeaa6d4d21546d17d45f01884fa8d7c5
+  checksum: f248e5851d04183954ec6f3a5f2c8e3b0ea0085a83e0e695068c5c2eb6acd4dddb16829a429829a4eb9fe0a4518f6a5594890cf9bf4259255c9e07a5964be625
   languageName: node
   linkType: hard
 
@@ -5644,6 +5624,7 @@ __metadata:
     "@headlessui/react": 1.7.5
     "@heroicons/react": 2.0.13
     "@mdx-js/react": 2.1.5
+    "@playwright/test": 1.32.3
     "@proofzero/design-system": "workspace:*"
     "@proofzero/platform-clients": "workspace:*"
     "@proofzero/utils": "workspace:*"
@@ -5694,7 +5675,7 @@ __metadata:
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/keccak256": 5.7.0
     "@mdx-js/react": ^1.6.22
-    "@playwright/test": 1.25.2
+    "@playwright/test": 1.32.3
     "@proofzero/design-system": "*"
     "@proofzero/platform-clients": "workspace:*"
     "@proofzero/platform.access": "workspace:*"
@@ -5782,7 +5763,6 @@ __metadata:
     "@headlessui/react": 1.7.4
     "@heroicons/react": 2.0.13
     "@mdx-js/react": 2.1.5
-    "@playwright/test": 1.28.1
     "@proofzero/design-system": "*"
     "@proofzero/errors": "workspace:*"
     "@proofzero/platform-clients": "workspace:*"
@@ -5874,7 +5854,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@proofzero/apps@workspace:apps"
   dependencies:
-    "@playwright/test": ^1.27.1
     graphql: 16.6.0
     npm-run-all: 4.1.5
     typescript: 5.0.4
@@ -6246,7 +6225,6 @@ __metadata:
     "@graphql-codegen/client-preset": 1.1.1
     "@graphql-codegen/typescript-graphql-request": 4.5.7
     "@graphql-codegen/typescript-resolvers": 2.7.5
-    "@playwright/test": 1.27.1
     graphql: 16.6.0
     npm-run-all: 4.1.5
     typescript: 5.0.4
@@ -22268,6 +22246,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fsevents@npm:2.3.2, fsevents@npm:^2.1.2, fsevents@npm:^2.3.2, fsevents@npm:~2.3.2":
+  version: 2.3.2
+  resolution: "fsevents@npm:2.3.2"
+  dependencies:
+    node-gyp: latest
+  checksum: 97ade64e75091afee5265e6956cb72ba34db7819b4c3e94c431d4be2b19b8bb7a2d4116da417950c3425f17c8fe693d25e20212cac583ac1521ad066b77ae31f
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
 "fsevents@npm:^1.2.7":
   version: 1.2.13
   resolution: "fsevents@npm:1.2.13"
@@ -22279,12 +22267,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fsevents@npm:^2.1.2, fsevents@npm:^2.3.2, fsevents@npm:~2.3.2":
+"fsevents@patch:fsevents@2.3.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@^2.1.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@^2.3.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@~2.3.2#~builtin<compat/fsevents>":
   version: 2.3.2
-  resolution: "fsevents@npm:2.3.2"
+  resolution: "fsevents@patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=18f3a7"
   dependencies:
     node-gyp: latest
-  checksum: 97ade64e75091afee5265e6956cb72ba34db7819b4c3e94c431d4be2b19b8bb7a2d4116da417950c3425f17c8fe693d25e20212cac583ac1521ad066b77ae31f
   conditions: os=darwin
   languageName: node
   linkType: hard
@@ -22295,15 +22282,6 @@ __metadata:
   dependencies:
     bindings: ^1.5.0
     nan: ^2.12.1
-  conditions: os=darwin
-  languageName: node
-  linkType: hard
-
-"fsevents@patch:fsevents@^2.1.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@^2.3.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@~2.3.2#~builtin<compat/fsevents>":
-  version: 2.3.2
-  resolution: "fsevents@patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=18f3a7"
-  dependencies:
-    node-gyp: latest
   conditions: os=darwin
   languageName: node
   linkType: hard
@@ -30065,30 +30043,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.25.2":
-  version: 1.25.2
-  resolution: "playwright-core@npm:1.25.2"
+"playwright-core@npm:1.32.3":
+  version: 1.32.3
+  resolution: "playwright-core@npm:1.32.3"
   bin:
     playwright: cli.js
-  checksum: 24ada61e2132bd7278cf0aa0ef711280e1519c437efa0088a99c47ef994202f4c9880521d8c0c51ab854bef08806f372477d754aac1e790ea64f18cd346b5b2f
-  languageName: node
-  linkType: hard
-
-"playwright-core@npm:1.27.1":
-  version: 1.27.1
-  resolution: "playwright-core@npm:1.27.1"
-  bin:
-    playwright: cli.js
-  checksum: fd65d3eb29978e0e7a755158625e8922a66ca9d599b7c24ddf920822b261d81c51a5964ef8e0e5ed9b2b12dc64541c5949b6a898d965e107f43261964e8c29a0
-  languageName: node
-  linkType: hard
-
-"playwright-core@npm:1.28.1":
-  version: 1.28.1
-  resolution: "playwright-core@npm:1.28.1"
-  bin:
-    playwright: cli.js
-  checksum: 8899e0d65de43ee10fadc171e0d48cd514bb574f3505478700094afa8a6e0dcd888a5c87af22acf31ebad455ada1327028909c42e20b8e25908b6255dc143bf0
+  checksum: 7ea091c41a7d1bb97b445bc541a85b123ffcf167bcc00fb7e13e9079f06c92f59fd27caf9d1c1d7e0054f2b5765d1a16d198833c2be7266cebb9dbb916cd90f4
   languageName: node
   linkType: hard
 

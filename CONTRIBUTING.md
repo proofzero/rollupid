@@ -80,6 +80,44 @@ cd <project-directory>
 yarn add <dependency-name>
 ```
 
+## Testing
+
+### Setup
+
+Run `npx playwright install` to install the browsers you want to test with. Also setup the test credentials in the .env.example files in console and passport.
+
+### Apps E2E Testing
+
+In the apps directory of the monorepo, each project is setup with Playwright e2e test framework. To run the tests simply run `yarn playwright test` in the app directory you want to test.
+
+Make sure you are running the apps when running the tests locally.
+
+### Testing Guidelines
+
+Currently we run E2E tests in the Console and Passports apps found in the apps directory. In these directories you will find a single test spec file that runs a sequence of tests in order using a single browser context using a set of authentication credentials (see below). This is to ensure that the tests are run in a clean state and that the tests are not dependent on each other.
+
+In the future we will be able to run tests in parallel using multiple browser contexts and multiple authentication credentials ([see issue](https://github.com/proofzero/rollupid/issues/2123)).
+
+Avoid testing minor UI changes like copy and images and instead focus on flows and functionality.
+
+If tests fail after PR is landed please open an issue and assign it to the author of the PR.
+
+#### Console
+
+In console we use the following accounts to test with:
+
+- Github
+- Microsoft
+
+#### Passport
+
+In passports we use the following accounts to test with:
+
+- Twitter
+- Google
+- Discord
+- Apple
+
 ## Contributing
 
 When working on multiple projects within the monorepo, ensure that you follow the same code style, contribution guidelines, and testing procedures for each project. This will help maintain consistency and quality across the entire codebase.
