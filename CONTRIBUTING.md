@@ -82,6 +82,10 @@ yarn add <dependency-name>
 
 ## Testing
 
+### Setup
+
+Run `npx playwright install` to install the browsers you want to test with.
+
 ### Apps E2E Testing
 
 In the apps directory of the monorepo, each project is setup with Playwright e2e test framework. To run the tests simply run `yarn playwright test` in the app directory you want to test.
