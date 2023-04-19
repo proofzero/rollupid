@@ -14,5 +14,5 @@
 
 - [ ] I have read the [CONTRIBUTING](CONTRIBUTING.md) guidelines
 - [ ] I have tested my code
-- [ ] I have run updated and run automated tests locally
+- [ ] I have updated and run automated tests locally
 - [ ] I have updated the documentation (if necessary)
