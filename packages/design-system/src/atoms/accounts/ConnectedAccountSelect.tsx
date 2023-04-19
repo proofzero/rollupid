@@ -60,7 +60,7 @@ export const ConnectedAccountSelect = ({
 
             {selectedAccounts?.length === 1 && !allConnectedAccountsSelected && (
               <Text size="sm" className="text-gray-800">
-                {truncateAddress(selectedAccounts[0].address)}
+                {truncateAddress(selectedAccounts[0].title)}
               </Text>
             )}
             {selectedAccounts?.length > 1 && !allConnectedAccountsSelected && (
