@@ -68,7 +68,7 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
     }
 
     for (let i = 0; i < edgesResult?.edges.length; i++) {
-      ctx.edgesClient.removeEdge.mutate({
+      await ctx.edgesClient.removeEdge.mutate({
         tag: EDGE_AUTHORIZES,
         src: edgesResult.edges[i].src.baseUrn,
         dst: edgesResult.edges[i].dst.baseUrn,
