@@ -17,11 +17,10 @@ import {
   UnauthorizedError,
 } from '@proofzero/errors'
 import { EmailAddressType, OAuthAddressType } from '@proofzero/types/address'
-import { PersonaData } from '@proofzero/types/application'
-import { SCOPES, SCOPES_JSON } from './scopes'
-import { Scopes } from '@proofzero/platform-middleware/scopes'
-import account from '@proofzero/platform-clients/account'
-import { MakeEdgeParams } from '@proofzero/platform/edges/src/jsonrpc/methods/makeEdge'
+import {
+  AuthorizationControlSelection,
+  PersonaData,
+} from '@proofzero/types/application'
 import { AnyURN } from '@proofzero/urns'
 
 export const EDGE_AUTHORIZES_REF_TO: EdgeURN = EdgeSpace.urn('authorizes/refTo')
@@ -68,7 +67,10 @@ export async function validatePersonaData(
     } else if (scopeName === 'connected_addresses') {
       const authorizedAddressUrns = claimValue
 
-      //Check expected data type in personaData, ie. AddressURN[]
+      //If user selection is ALL, there's nothing further to validate
+      if (claimValue === AuthorizationControlSelection.ALL) continue
+
+      //If user selection is not ALL, check expected data type in personaData, ie. AddressURN[]
       if (
         !(
           authorizedAddressUrns &&
@@ -128,6 +130,8 @@ export async function setPersonaReferences(
       personaData.connected_addresses &&
       personaData.connected_addresses instanceof Array
     ) {
+      //This (correctly) gets skipped when personaData value of
+      //connected_addresses is set to ALL
       personaData.connected_addresses.forEach((addressUrn) =>
         uniqueAuthorizationReferences.add(addressUrn)
       )
@@ -182,6 +186,7 @@ export async function getClaimValues(
   clientId: string,
   scope: string[],
   env: {
+    accountFetcher?: Fetcher
     accessFetcher?: Fetcher
     edgesFetcher: Fetcher
   },
@@ -235,26 +240,50 @@ export async function getClaimValues(
         }
       }
     } else if (scopeValue === 'connected_addresses') {
-      const authorizedAddresses =
-        personaData.connected_addresses as AddressURN[]
-      const edgePromises = authorizedAddresses.map((address) => {
-        return edgesClient.findNode.query({ baseUrn: address })
-      })
-      const edgeResults = await Promise.allSettled(edgePromises)
-
-      //Make typescript gods happy
-      type connectedAddressType = { type: string; alias: string }
-      const isDefined = (
-        optionallyDefined: connectedAddressType | undefined
-      ): optionallyDefined is connectedAddressType => !!optionallyDefined
-
-      const claimResults = edgeResults
-        .map((e) => {
-          if (e.status === 'fulfilled')
-            return { type: e.value.rc.addr_type, alias: e.value.qc.alias }
+      if (
+        personaData.connected_addresses === AuthorizationControlSelection.ALL
+      ) {
+        //Referencable persona submission pointing to all connected addresses
+        //at any point in time
+        if (!env.accountFetcher)
+          throw new InternalServerError({
+            message: 'No account fetcher specified',
+          })
+        const accountClient = createAccountClient(env.accountFetcher, {
+          ...generateTraceContextHeaders(traceSpan),
         })
-        .filter(isDefined)
-      result = { ...result, connected_addresses: claimResults }
+        const accountAddresses =
+          (await accountClient.getAddresses.query({
+            account: accountUrn,
+          })) || []
+
+        const claimResults = accountAddresses.map((a) => {
+          return { type: a.rc.addr_type, alias: a.qc.alias }
+        })
+        result = { ...result, connected_addresses: claimResults }
+      } else {
+        //Static persona submission of addresses
+        const authorizedAddresses =
+          personaData.connected_addresses as AddressURN[]
+        const edgePromises = authorizedAddresses.map((address) => {
+          return edgesClient.findNode.query({ baseUrn: address })
+        })
+        const edgeResults = await Promise.allSettled(edgePromises)
+
+        //Make typescript gods happy
+        type connectedAddressType = { type: string; alias: string }
+        const isDefined = (
+          optionallyDefined: connectedAddressType | undefined
+        ): optionallyDefined is connectedAddressType => !!optionallyDefined
+
+        const claimResults = edgeResults
+          .map((e) => {
+            if (e.status === 'fulfilled')
+              return { type: e.value.rc.addr_type, alias: e.value.qc.alias }
+          })
+          .filter(isDefined)
+        result = { ...result, connected_addresses: claimResults }
+      }
     }
   }
   return result

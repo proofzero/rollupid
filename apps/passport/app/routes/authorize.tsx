@@ -40,7 +40,6 @@ import {
 } from '~/utils/authorize.server'
 import { useEffect, useState } from 'react'
 import { OptionType } from '@proofzero/utils/getNormalisedConnectedEmails'
-import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { Text } from '@proofzero/design-system'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { JsonError } from '@proofzero/utils/errors'

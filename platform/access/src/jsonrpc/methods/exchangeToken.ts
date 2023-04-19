@@ -221,7 +221,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     account,
     clientId,
     scope,
-    { edgesFetcher: ctx.Edges },
+    { edgesFetcher: ctx.Edges, accountFetcher: ctx.Account },
     ctx.traceSpan,
     personaData
   )
