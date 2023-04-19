@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
+import { ADDRESS_APP_REF_TO } from './upsertAppContactAddress'
 
 export const PublishAppInput = z.object({
   clientId: z.string(),
@@ -36,6 +37,17 @@ export const publishApp = async ({
   const hasClientSecret = await appDO.class.hasClientSecret()
   if (!hasClientSecret)
     throw new Error('Client Secret must be set to publish app')
+
+  const { edges } = await ctx.edges.getEdges.query({
+    query: {
+      dst: { baseUrn: appURN },
+      tag: ADDRESS_APP_REF_TO,
+    },
+  })
+
+  if (edges.length === 0) {
+    throw new Error('Contact address must be set to publish app')
+  }
 
   await appDO.class.publish(input.published)
 
