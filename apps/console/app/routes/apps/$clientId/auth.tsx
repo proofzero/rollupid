@@ -36,6 +36,8 @@ import { PreLabeledInput } from '@proofzero/design-system/src/atoms/form/PreLabl
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
+import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
+import { AddressURN } from '@proofzero/urns/address'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -138,9 +140,12 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     ...generateTraceContextHeaders(context.traceSpan),
   })
 
-  const scopeMeta = await (await starbaseClient.getScopes.query()).scopes
+  const scopeMeta = (await starbaseClient.getScopes.query()).scopes
+  const appContactAddress = await starbaseClient.getAppContactAddress.query({
+    clientId: params.clientId,
+  })
 
-  return json({ scopeMeta })
+  return json({ scopeMeta, appContactAddress })
 }
 
 export const action: ActionFunction = async ({ request, params, context }) => {
@@ -235,7 +240,10 @@ export default function AppDetailIndexPage() {
     appDetails: appDetailsProps
     rotationResult: any
   }>()
-  const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
+  const {
+    scopeMeta,
+    appContactAddress,
+  }: { scopeMeta: ScopeMeta; appContactAddress?: AddressURN } = useLoaderData()
 
   const [isFormChanged, setIsFormChanged] = useState(false)
   const [isImgUploading, setIsImgUploading] = useState(false)
@@ -319,6 +327,14 @@ export default function AppDetailIndexPage() {
               closeCallback={() => setRollKeyModalOpen(false)}
             />
 
+            {!appContactAddress && (
+              <ToastWithLink
+                message="Connect email address to enable publishing"
+                linkHref={`/apps/${appDetails.clientId}/team`}
+                linkText="Connect email address"
+              />
+            )}
+
             <div className="flex flex-col md:flex-row space-y-5 lg:space-y-0 lg:space-x-5">
               <div className="flex-1">
                 <Panel title="OAuth Settings">
@@ -397,6 +413,7 @@ export default function AppDetailIndexPage() {
                       name="published"
                       id="published"
                       label="Published"
+                      disabled={!appContactAddress}
                       onToggle={() => {
                         ;(setIsFormChanged as (val: boolean) => {})(true)
                       }}
