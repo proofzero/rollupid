@@ -4,21 +4,21 @@ import { AppClientIdParamSchema } from '../validators/app'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { AddressURN } from '@proofzero/urns/address'
-import { ADDRESS_APP_REF_TO } from './upsertAppContactEmail'
+import { ADDRESS_APP_REF_TO } from './upsertAppContactAddress'
 
-export const GetAppContactEmailInput = AppClientIdParamSchema
-export const GetAppContactEmailOutput = AddressURNInput.optional()
+export const GetAppContactAddressInput = AppClientIdParamSchema
+export const GetAppContactAddressOutput = AddressURNInput.optional()
 
-type GetAppContactEmailParams = z.infer<typeof GetAppContactEmailInput>
-type GetAppContactEmailResult = z.infer<typeof GetAppContactEmailOutput>
+type GetAppContactAddressParams = z.infer<typeof GetAppContactAddressInput>
+type GetAppContactAddressResult = z.infer<typeof GetAppContactAddressOutput>
 
-export const getAppContactEmail = async ({
+export const getAppContactAddress = async ({
   input,
   ctx,
 }: {
-  input: GetAppContactEmailParams
+  input: GetAppContactAddressParams
   ctx: Context
-}): Promise<GetAppContactEmailResult> => {
+}): Promise<GetAppContactAddressResult> => {
   const appURN = ApplicationURNSpace.componentizedUrn(input.clientId)
   if (!ctx.ownAppURNs || !ctx.ownAppURNs.includes(appURN))
     throw new Error(

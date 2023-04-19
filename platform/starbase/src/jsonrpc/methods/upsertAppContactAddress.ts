@@ -6,18 +6,18 @@ import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 
 export const ADDRESS_APP_REF_TO: EdgeURN = EdgeSpace.urn('refTo/app')
 
-export const UpsertAppContactEmailInput = z.object({
+export const UpsertAppContactAddressInput = z.object({
   clientId: z.string(),
   address: AddressURNInput,
 })
 
-type UpsertAppContactEmailParams = z.infer<typeof UpsertAppContactEmailInput>
+type UpsertAppContactAddressParams = z.infer<typeof UpsertAppContactAddressInput>
 
-export const upsertAppContactEmail = async ({
+export const upsertAppContactAddress = async ({
   input,
   ctx,
 }: {
-  input: UpsertAppContactEmailParams
+  input: UpsertAppContactAddressParams
   ctx: Context
 }): Promise<void> => {
   const appURN = ApplicationURNSpace.componentizedUrn(input.clientId)

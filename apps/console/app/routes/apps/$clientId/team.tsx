@@ -59,7 +59,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     ...generateTraceContextHeaders(context.traceSpan),
   })
 
-  const appContactEmail = await starbaseClient.getAppContactEmail.query({
+  const appContactEmail = await starbaseClient.getAppContactAddress.query({
     clientId: params.clientId as string,
   })
 
@@ -89,7 +89,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
         ...generateTraceContextHeaders(context.traceSpan),
       })
 
-      await starbaseClient.upsertAppContactEmail.mutate({
+      await starbaseClient.upsertAppContactAddress.mutate({
         address: addressURN,
         clientId,
       })

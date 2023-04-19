@@ -67,14 +67,14 @@ import {
   GetAuthorizedAccountsMethodOutput,
 } from './methods/getAuthorizedAccounts'
 import {
-  getAppContactEmail,
-  GetAppContactEmailInput,
-  GetAppContactEmailOutput,
-} from './methods/getAppContactEmail'
+  getAppContactAddress,
+  GetAppContactAddressInput,
+  GetAppContactAddressOutput,
+} from './methods/getAppContactAddress'
 import {
-  upsertAppContactEmail,
-  UpsertAppContactEmailInput,
-} from './methods/upsertAppContactEmail'
+  upsertAppContactAddress,
+  UpsertAppContactAddressInput,
+} from './methods/upsertAppContactAddress'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -190,23 +190,23 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(NoInput)
     .query(getScopes),
-  getAppContactEmail: t.procedure
+  getAppContactAddress: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .use(OwnAppsMiddleware)
-    .input(GetAppContactEmailInput)
-    .output(GetAppContactEmailOutput)
-    .query(getAppContactEmail),
-  upsertAppContactEmail: t.procedure
+    .input(GetAppContactAddressInput)
+    .output(GetAppContactAddressOutput)
+    .query(getAppContactAddress),
+  upsertAppContactAddress: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .use(OwnAppsMiddleware)
-    .input(UpsertAppContactEmailInput)
-    .mutation(upsertAppContactEmail),
+    .input(UpsertAppContactAddressInput)
+    .mutation(upsertAppContactAddress),
 })
 
 export type StarbaseRouter = typeof appRouter
