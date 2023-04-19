@@ -45,7 +45,7 @@ export const publishApp = async ({
     },
   })
 
-  if (edges.length === 0) {
+  if (input.published && edges.length === 0) {
     throw new Error('Contact address must be set to publish app')
   }
 
