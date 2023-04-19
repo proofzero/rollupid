@@ -86,6 +86,8 @@ yarn add <dependency-name>
 
 In the apps directory of the monorepo, each project is setup with Playwright e2e test framework. To run the tests simply run `yarn playwright test` in the app directory you want to test.
 
+Make sure you are running the apps when running the tests locally.
+
 ### Testing Guidelines
 
 Currently we run E2E tests in the Console and Passports apps found in the apps directory. In these directories you will find a single test spec file that runs a sequence of tests in order using a single browser context using a set of authentication credentials (see below). This is to ensure that the tests are run in a clean state and that the tests are not dependent on each other.
