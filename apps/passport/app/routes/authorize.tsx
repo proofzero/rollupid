@@ -600,8 +600,10 @@ export default function Authorize() {
                   btnType="primary-alt"
                   disabled={
                     // TODO: make generic!
-                    requestedScope.includes('email') &&
-                    (!connectedEmails?.length || !selectedEmail)
+                    (requestedScope.includes('email') &&
+                      (!connectedEmails?.length || !selectedEmail)) ||
+                    (requestedScope.includes('connected_addresses') &&
+                      !selectedAddresses?.length)
                   }
                   onClick={() => {
                     authorizeCallback(requestedScope)
