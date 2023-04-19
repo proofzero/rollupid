@@ -2,7 +2,7 @@
 name: Passport
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
@@ -81,10 +81,11 @@ jobs:
           SECRET_DISCORD_OAUTH_CLIENT_SECRET: ${{ secrets.SECRET_DISCORD_OAUTH_CLIENT_SECRET_DEV }}
 
       - name: Setup Playwright
+        run: yarn playwright install --with-deps
         with:
           workingDirectory: 'apps/passport'
-        run: yarn playwright install --with-deps
       - name: Run Playwright tests
+        run: yarn playwright test
         with:
           workingDirectory: 'apps/passport'
         env:
@@ -97,7 +98,6 @@ jobs:
           SECRET_APPLE_TEST_USER_PASSWORD: ${{ secrets.SECRET_APPLE_TEST_USER_PASSWORD }}
           INTERNAL_DISCORD_TEST_USERNAME: ${{ secrets.INTERNAL_DISCORD_TEST_USERNAME }}
           SECRET_DISCORD_TEST_USER_PASSWORD: ${{ secrets.SECRET_DISCORD_TEST_USER_PASSWORD }}
-        run: yarn playwright test
       - uses: actions/upload-artifact@v3
         if: always()
         with:

@@ -24,3 +24,6 @@ deploy.edn
 /playwright/.cache/
 
 galaxy.server.ts
+/test-results/
+/playwright-report/
+/playwright/.cache/

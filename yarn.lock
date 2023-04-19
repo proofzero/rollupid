@@ -5763,6 +5763,7 @@ __metadata:
     "@headlessui/react": 1.7.4
     "@heroicons/react": 2.0.13
     "@mdx-js/react": 2.1.5
+    "@playwright/test": 1.32.3
     "@proofzero/design-system": "*"
     "@proofzero/errors": "workspace:*"
     "@proofzero/platform-clients": "workspace:*"
