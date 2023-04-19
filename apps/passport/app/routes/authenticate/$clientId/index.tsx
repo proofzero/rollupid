@@ -14,7 +14,7 @@ import { Authentication, ConnectButton } from '~/components'
 import ConnectOAuthButton from '~/components/connect-oauth-button'
 import { redirect, json } from '@remix-run/cloudflare'
 
-import AuthButton from '~/components/connect-button/AuthButton'
+import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/AuthButton'
 import { getConsoleParams } from '~/session.server'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'

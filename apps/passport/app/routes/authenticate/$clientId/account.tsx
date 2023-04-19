@@ -12,7 +12,7 @@ import {
   useSubmit,
 } from '@remix-run/react'
 import { Authentication } from '~/components'
-import AuthButton from '~/components/connect-button/AuthButton'
+import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/AuthButton'
 import { getAccountClient } from '~/platform.server'
 import { getConsoleParams, getUserSession, parseJwt } from '~/session.server'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'

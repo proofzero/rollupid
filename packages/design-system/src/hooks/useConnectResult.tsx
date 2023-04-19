@@ -1,4 +1,4 @@
-import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
+import { ToastType, toast } from '../atoms/toast'
 import { useEffect } from 'react'
 
 export default (
