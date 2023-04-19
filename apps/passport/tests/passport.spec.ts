@@ -29,8 +29,8 @@ test('login to passport using Twitter', async ({ page }) => {
 
   const currentURL = new URL(page.url())
   if (currentURL.host.includes('twitter.com')) {
-    await page.getByPlaceholder(/.*/).fill('demo@rollup.id')
-    await page.getByRole('button').click()
+    await page.getByPlaceholder('').fill('demo@rollup.id')
+    await page.getByRole('button').filter({ hasText: 'Submit' }).click()
   }
 
   await page.waitForURL(/.*settings\/dashboard/, {
