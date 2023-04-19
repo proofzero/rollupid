@@ -216,8 +216,8 @@ export const appRouter = t.router({
   initSmartContractWallet: t.procedure
     .use(LogUsage)
     .use(parse3RN)
-    .use(checkOAuthNode)
-    .use(setAddressNodeClient)
+    // .use(checkOAuthNode)
+    // .use(setAddressNodeClient)
     .use(initAddressNode)
     .input(InitSmartContractWalletInput)
     .output(InitSmartContractWalletOutput)

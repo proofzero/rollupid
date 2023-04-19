@@ -15,7 +15,7 @@ import { getZeroDevSigner } from '@zerodevapp/sdk'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 export const InitSmartContractWalletInput = z.object({
-  alias: z.string(),
+  nickname: z.string(),
 })
 
 export const InitSmartContractWalletOutput = AddressURNInput
@@ -57,7 +57,7 @@ export const initSmartContractWalletMethod = async ({
       node_type: NodeType.Crypto,
       addr_type: CryptoAddressType.Wallet,
     },
-    { alias: input.alias, hidden: 'true' }
+    { alias: smartContractWalletAddress, hidden: 'true' }
   )
   const baseAddressURN = AddressURNSpace.getBaseURN(addressURN)
   const smartContractWalletNode = initAddressNodeByName(
@@ -72,7 +72,8 @@ export const initSmartContractWalletMethod = async ({
   })
   await Promise.all([
     smartContractWalletNode.storage.put('privateKey', owner.privateKey),
-    smartContractWalletNode.class.setAddress(input.alias),
+    smartContractWalletNode.class.setAddress(smartContractWalletAddress),
+    smartContractWalletNode.class.setNickname(input.nickname),
     smartContractWalletNode.class.setNodeType(NodeType.Crypto),
     smartContractWalletNode.class.setType(CryptoAddressType.Wallet),
     smartContractWalletNode.class.setGradient(gradient),
