@@ -84,7 +84,7 @@ yarn add <dependency-name>
 
 ### Setup
 
-Run `npx playwright install` to install the browsers you want to test with.
+Run `npx playwright install` to install the browsers you want to test with. Also setup the test credentials in the .env.example files in console and passport.
 
 ### Apps E2E Testing
 
