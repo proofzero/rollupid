@@ -21,10 +21,10 @@ test('login to passport using Twitter', async ({ page }) => {
   })
   await page
     .getByPlaceholder('Username or email')
-    .fill(process.env.INTERNAL_TWITTER_USERNAME_TEST)
+    .fill(process.env.INTERNAL_TWITTER_TEST_USERNAME)
   await page
     .getByPlaceholder('Password')
-    .fill(process.env.INTERNAL_TWITTER_PASSWORD_TEST)
+    .fill(process.env.INTERNAL_TWITTER_TEST_PASSWORD)
   await page.getByRole('button').filter({ hasText: 'Sign In' }).click()
   await page.waitForURL(/.*settings\/dashboard/, {
     timeout: 5000,
