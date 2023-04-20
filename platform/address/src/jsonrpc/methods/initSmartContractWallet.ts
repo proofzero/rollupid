@@ -45,7 +45,7 @@ export const initSmartContractWalletMethod = async ({
   const owner = Wallet.createRandom()
 
   const smartContractWallet = await getZeroDevSigner({
-    projectId: ctx.ZERODEV_PROJECT_ID,
+    projectId: ctx.SECRET_ZERODEV_PROJECTID,
     owner,
     skipFetchSetup: true,
   })
@@ -65,6 +65,7 @@ export const initSmartContractWalletMethod = async ({
     baseAddressURN,
     ctx.Address
   )
+
   const imageClient = createImageClient(ctx.Images, {
     headers: generateTraceContextHeaders(ctx.traceSpan),
   })
