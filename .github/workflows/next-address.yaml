@@ -47,7 +47,6 @@ jobs:
           command: publish --env next
           environment: next
           secrets: |
-            TOKEN_NFTAR
             INTERNAL_GOOGLE_OAUTH_CLIENT_ID
             SECRET_GOOGLE_OAUTH_CLIENT_SECRET
             INTERNAL_GITHUB_OAUTH_CLIENT_ID
@@ -61,7 +60,6 @@ jobs:
             INTERNAL_DISCORD_OAUTH_CLIENT_ID
             SECRET_DISCORD_OAUTH_CLIENT_SECRET
         env:
-          TOKEN_NFTAR: ${{ secrets.TOKEN_NFTAR_TEST }}
           INTERNAL_GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.INTERNAL_GOOGLE_OAUTH_CLIENT_ID_TEST }}
           SECRET_GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.SECRET_GOOGLE_OAUTH_CLIENT_SECRET_TEST }}
           INTERNAL_GITHUB_OAUTH_CLIENT_ID: ${{ secrets.INTERNAL_GITHUB_OAUTH_CLIENT_ID_TEST }}
