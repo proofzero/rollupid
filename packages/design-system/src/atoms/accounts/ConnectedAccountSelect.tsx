@@ -14,18 +14,20 @@ type ConnectedAccountSelectListItem = {
 type ConnectedAccountSelectProps = {
   accounts: Array<ConnectedAccountSelectListItem>
   onSelect?: (selected: Array<ConnectedAccountSelectListItem>) => void
+  onSelectAll?: () => void
 }
 
 export const ConnectedAccountSelect = ({
   accounts,
   onSelect,
+  onSelectAll,
 }: ConnectedAccountSelectProps) => {
   const [selectedAccounts, setSelectedAccounts] = useState<
     Array<ConnectedAccountSelectListItem>
   >([])
 
-  const allConnectedAccountsSelected =
-    selectedAccounts.length > 0 && selectedAccounts.length === accounts.length
+  const [allConnectedAccountsSelected, setAllConnectedAccountsSelected] =
+    useState(false)
 
   const truncateAddress = (address: string) =>
     address.length > 17
@@ -37,10 +39,18 @@ export const ConnectedAccountSelect = ({
   }
 
   useEffect(() => {
-    if (onSelect) {
-      onSelect(selectedAccounts)
+    if (allConnectedAccountsSelected) {
+      setSelectedAccounts([])
+
+      if (onSelectAll) {
+        onSelectAll()
+      }
+    } else {
+      if (onSelect) {
+        onSelect(selectedAccounts)
+      }
     }
-  }, [selectedAccounts])
+  }, [selectedAccounts, allConnectedAccountsSelected])
 
   return (
     <Listbox
@@ -52,11 +62,12 @@ export const ConnectedAccountSelect = ({
       {({ open }) => (
         <div className="relative select-none">
           <Listbox.Button className="border shadow-sm rounded-lg w-full transition-transform flex flex-row justify-between items-center py-2 px-3 hover:ring-1 hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white">
-            {(!selectedAccounts || selectedAccounts.length === 0) && (
-              <Text size="sm" className="text-gray-800">
-                No connected account(s)
-              </Text>
-            )}
+            {(!selectedAccounts || selectedAccounts.length === 0) &&
+              !allConnectedAccountsSelected && (
+                <Text size="sm" className="text-gray-800">
+                  No connected account(s)
+                </Text>
+              )}
 
             {selectedAccounts?.length === 1 && !allConnectedAccountsSelected && (
               <Text size="sm" className="text-gray-800">
@@ -92,9 +103,7 @@ export const ConnectedAccountSelect = ({
               <div
                 className="flex flex-row space-x-2 cursor-pointer items-center"
                 onClick={() =>
-                  allConnectedAccountsSelected
-                    ? setSelectedAccounts([])
-                    : setSelectedAccounts(accounts)
+                  setAllConnectedAccountsSelected(!allConnectedAccountsSelected)
                 }
               >
                 <div>

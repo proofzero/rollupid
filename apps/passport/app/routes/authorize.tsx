@@ -47,7 +47,10 @@ import sideGraphics from '~/assets/auth-side-graphics.svg'
 
 import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
-import type { PersonaData } from '@proofzero/types/application'
+import {
+  AuthorizationControlSelection,
+  PersonaData,
+} from '@proofzero/types/application'
 import type { DataForScopes } from '~/utils/authorize.server'
 import {
   EmailSelectListItem,
@@ -379,9 +382,9 @@ export default function Authorize() {
   const [persona] = useState<PersonaData>(personaData)
 
   const [selectedEmail, setSelectedEmail] = useState<EmailSelectListItem>()
-  const [selectedAddresses, setSelectedAddresses] = useState<Array<AddressURN>>(
-    []
-  )
+  const [selectedAddresses, setSelectedAddresses] = useState<
+    Array<AddressURN> | Array<AuthorizationControlSelection>
+  >([])
 
   // Re-render the component every time persona gets updated
   useEffect(() => {}, [persona])
@@ -423,7 +426,11 @@ export default function Authorize() {
       requestedScope.includes('connected_addresses') &&
       selectedAddresses.length > 0
     ) {
-      personaData.connected_addresses = selectedAddresses
+      if (selectedAddresses[0] === AuthorizationControlSelection.ALL) {
+        personaData.connected_addresses = AuthorizationControlSelection.ALL
+      } else {
+        personaData.connected_addresses = selectedAddresses
+      }
     }
 
     // TODO: Everything should be a form field now handled by javascript
@@ -545,6 +552,11 @@ export default function Authorize() {
                                 setSelectedAddresses(
                                   addresses.map((a) => a.addressURN)
                                 )
+                              }}
+                              onSelectAll={() => {
+                                setSelectedAddresses([
+                                  AuthorizationControlSelection.ALL,
+                                ])
                               }}
                             />
                           </div>
