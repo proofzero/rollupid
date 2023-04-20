@@ -65,7 +65,10 @@ jobs:
         with:
           workingDirectory: 'apps/console'
         env:
-          PLAYWRIGHT_BASE_URL: https://console-dev.rollup.id
+          INTERNAL_PLAYWRIGHT_BASE_URL: https://console-dev.rollup.id
+          INTERNAL_PLAYWRIGHT_TEST_URL: ${{ secrets.INTERNAL_PLAYWRIGHT_TEST_URL }}
+          INTERNAL_EMAIL_TEST_USERNAME: ${{ secrets.INTERNAL_EMAIL_TEST_USERNAME}}
+          SECRET_TEST_API_TOKEN: ${{ secrets.SECRET_TEST_API_TEST_TOKEN }}
           INTERNAL_GITHUB_TEST_USERNAME: ${{ secrets.INTERNAL_GITHUB_TEST_USERNAME }}
           SECRET_GITHUB_TEST_USER_PASSWORD: ${{ secrets.SECRET_GITHUB_TEST_USER_PASSWORD }}
           INTERNAL_MICROSOFT_TEST_USERNAME: ${{ secrets.INTERNAL_MICROSOFT_TEST_USERNAME }}
@@ -74,7 +77,6 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: always()
         with:
-          workingDirectory: 'apps/console'
           name: playwright-report
-          path: playwright-report/
+          path: apps/console/playwright-report/
           retention-days: 30

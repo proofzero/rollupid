@@ -44,6 +44,8 @@ export const sendEmailNotificationMethod = async ({
     INTERNAL_DKIM_DOMAIN: ctx.INTERNAL_DKIM_DOMAIN,
     KEY_DKIM_PRIVATEKEY: ctx.KEY_DKIM_PRIVATEKEY,
     INTERNAL_DKIM_SELECTOR: ctx.INTERNAL_DKIM_SELECTOR,
+    SECRET_TEST_API_TEST_TOKEN: ctx.SECRET_TEST_API_TEST_TOKEN,
+    Test: ctx.Test,
   }
 
   const otpEmailTemplate = getOTPEmailContent(input.otpCode)

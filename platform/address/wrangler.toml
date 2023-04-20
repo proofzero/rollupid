@@ -21,8 +21,6 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [vars]
 PASSPORT_URL = "http://localhost:10001"
 MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
-NFTAR_URL = "https://test.nftar.rollup.id/api"
-NFTAR_CHAIN_ID = 5
 TTL_IN_MS = 25_000
 MAX_ATTEMPTS = 5
 DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS = 2_000
@@ -77,8 +75,6 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.dev.vars]
 PASSPORT_URL = "https://passport-dev.rollup.id"
 MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
-NFTAR_URL = "https://test.nftar.rollup.id/api"
-NFTAR_CHAIN_ID = 5
 TTL_IN_MS = 25_000
 MAX_ATTEMPTS = 5
 DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS = 2_000
@@ -106,8 +102,6 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.next.vars]
 PASSPORT_URL = "https://passport-next.rollup.id"
 MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
-NFTAR_URL = "https://test.nftar.rollup.id/api"
-NFTAR_CHAIN_ID = 5
 TTL_IN_MS = 300_000
 MAX_ATTEMPTS = 5
 DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS = 30_000
@@ -134,8 +128,6 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.current.vars]
 PASSPORT_URL = "https://passport.rollup.id"
 MINTPFP_CONTRACT_ADDRESS = "0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
-NFTAR_URL = "https://nftar.rollup.id/api"
-NFTAR_CHAIN_ID = 1
 TTL_IN_MS = 300_000
 MAX_ATTEMPTS = 5
 DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS = 30_000

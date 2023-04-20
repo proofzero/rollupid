@@ -81,14 +81,16 @@ jobs:
           SECRET_DISCORD_OAUTH_CLIENT_SECRET: ${{ secrets.SECRET_DISCORD_OAUTH_CLIENT_SECRET_DEV }}
 
       - name: Setup Playwright
-        with:
-          workingDirectory: 'apps/passport'
         run: yarn playwright install --with-deps
+        working-directory: 'apps/passport'
       - name: Run Playwright tests
-        with:
-          workingDirectory: 'apps/passport'
+        run: yarn playwright test
+        working-directory: 'apps/passport'
         env:
-          PLAYWRIGHT_BASE_URL: https://passport-dev.rollup.id
+          INTERNAL_PLAYWRIGHT_BASE_URL: https://passport-dev.rollup.id
+          INTERNAL_PLAYWRIGHT_TEST_URL: ${{ secrets.INTERNAL_PLAYWRIGHT_TEST_URL }}
+          INTERNAL_EMAIL_TEST_USERNAME: ${{ secrets.INTERNAL_EMAIL_TEST_USERNAME}}
+          SECRET_TEST_API_TOKEN: ${{ secrets.SECRET_TEST_API_TEST_TOKEN }}
           INTERNAL_TWITTER_TEST_USERNAME: ${{ secrets.INTERNAL_TWITTER_TEST_USERNAME }}
           SECRET_TWITTER_TEST_USER_PASSWORD: ${{ secrets.SECRET_TWITTER_TEST_USER_PASSWORD }}
           INTERNAL_GOOGLE_TEST_USERNAME: ${{ secrets.INTERNAL_GOOGLE_TEST_USERNAME }}
@@ -97,11 +99,9 @@ jobs:
           SECRET_APPLE_TEST_USER_PASSWORD: ${{ secrets.SECRET_APPLE_TEST_USER_PASSWORD }}
           INTERNAL_DISCORD_TEST_USERNAME: ${{ secrets.INTERNAL_DISCORD_TEST_USERNAME }}
           SECRET_DISCORD_TEST_USER_PASSWORD: ${{ secrets.SECRET_DISCORD_TEST_USER_PASSWORD }}
-        run: yarn playwright test
       - uses: actions/upload-artifact@v3
         if: always()
         with:
-          workingDirectory: 'apps/passport'
           name: playwright-report
-          path: playwright-report/
+          path: passport/playwright-report/
           retention-days: 30

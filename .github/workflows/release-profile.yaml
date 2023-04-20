@@ -44,14 +44,12 @@ jobs:
           environment: 'current'
           secrets: |
             SECRET_SESSION_SALT
-            TOKEN_NFTAR
             PROFILE_CLIENT_ID
             PROFILE_CLIENT_SECRET
             APIKEY_ALCHEMY_ETH
             APIKEY_ALCHEMY_POLYGON
         env:
           SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_PROD }}
-          TOKEN_NFTAR: ${{ secrets.TOKEN_NFTAR_PROD }}
           PROFILE_CLIENT_ID: ${{ secrets.INTERNAL_PROFILE_OAUTH_CLIENT_ID_CURRENT }}
           PROFILE_CLIENT_SECRET: ${{ secrets.SECRET_PROFILE_OAUTH_CLIENT_SECRET_CURRENT }}
           APIKEY_ALCHEMY_ETH: ${{ secrets.APIKEY_ALCHEMY_GALAXY_MAINNET }}

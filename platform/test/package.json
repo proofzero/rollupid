@@ -1,0 +1,37 @@
+{
+  "name": "@proofzero/test.worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "wrangler publish --dry-run --outdir=dist",
+    "check": "run-s format:check lint:check types:check",
+    "format": "run-s format:src",
+    "format:src": "prettier --write src",
+    "format:check": "run-s format:check:src",
+    "format:check:src": "prettier --check src",
+    "lint": "eslint --fix src test",
+    "lint:check": "run-s lint:check:src",
+    "lint:check:src": "eslint src",
+    "types:check": "tsc --project tsconfig.json",
+    "dev": "wrangler dev --local --persist",
+    "deploy": "wrangler publish",
+    "test": "run-s check"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "4.20221111.1",
+    "@types/node": "18.15.3",
+    "@typescript-eslint/eslint-plugin": "5.42.1",
+    "@typescript-eslint/parser": "5.42.1",
+    "env-cmd": "10.1.0",
+    "eslint": "8.28.0",
+    "eslint-config-prettier": "8.5.0",
+    "npm-run-all": "4.1.5",
+    "prettier": "2.7.1",
+    "typescript": "5.0.4",
+    "wrangler": "2.14.0"
+  },
+  "dependencies": {
+    "itty-router": "3.0.12"
+  }
+}

@@ -1,0 +1,52 @@
+name: Test Worker
+
+on:
+  push:
+    branches:
+      - main
+
+defaults:
+  run:
+    working-directory: platform/test
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: cachix/install-nix-action@v18
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - run: nix-build ../platform.nix
+
+      - name: Cache Dependencies
+        id: cache-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            .yarn
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Test
+        run: yarn run test
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
+          accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: platform/test
+          command: publish --env dev
+          environment: dev
+          secrets: |
+            SECRET_TEST_API_TOKEN
+        env:
+          SECRET_TEST_API_TOKEN: ${{ secrets.SECRET_TEST_API_TEST_TOKEN }}

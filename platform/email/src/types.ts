@@ -4,6 +4,9 @@ export interface Environment {
   KEY_DKIM_PRIVATEKEY: string
   INTERNAL_DKIM_SELECTOR: string
   INTERNAL_DKIM_DOMAIN: string
+
+  Test: Fetcher | undefined
+  SECRET_TEST_API_TEST_TOKEN: string | undefined
 }
 
 /** CF EmailMessage type; not provided in CF types lib */

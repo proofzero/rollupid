@@ -4,3 +4,4 @@ INTERNAL_DKIM_SELECTOR = "realkey"
 
 #This is relevant in CF and local envs; keep as localhost.local locally
 INTERNAL_DKIM_DOMAIN = "localhost.local"
+SECRET_TEST_API_TEST_TOKEN = "testapitoken"

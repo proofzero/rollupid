@@ -63,6 +63,7 @@
     "@babel/core": "7.20.2",
     "@cloudflare/workers-types": "4.20221111.1",
     "@mdx-js/react": "2.1.5",
+    "@playwright/test": "1.32.3",
     "@remix-run/dev": "1.14.0",
     "@remix-run/eslint-config": "1.14.0",
     "@remix-run/serve": "1.14.0",

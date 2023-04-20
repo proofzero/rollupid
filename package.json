@@ -9,7 +9,7 @@
     "services",
     "projects",
     "apps",
-    "smartcontracts"
+    "test"
   ],
   "scripts": {
     "gql": "yarn workspaces foreach -p -v -i run gql",
