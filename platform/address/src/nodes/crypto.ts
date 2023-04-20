@@ -12,7 +12,7 @@ import { AddressNode } from '.'
 import Address from './address'
 import ENSUtils from '@proofzero/platform-clients/ens-utils'
 
-type CryptoAddressProfile = AddressProfile<CryptoAddressType>
+type CryptoAddressProfile = AddressProfile<CryptoAddressType.ETH>
 
 export default class CryptoAddress {
   declare node: AddressNode
@@ -112,12 +112,10 @@ const getCryptoAddressProfile = async (
   const ensClient = new ENSUtils()
   const { avatar, displayName } = await ensClient.getEnsEntry(address)
 
-  const newProfile = {
+  return {
     address: address,
     title: displayName || '',
     icon: avatar || '',
     type: CryptoAddressType.ETH,
   }
-
-  return newProfile
 }
