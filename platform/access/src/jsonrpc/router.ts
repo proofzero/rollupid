@@ -35,6 +35,8 @@ import {
   RevokeTokenMethodOutput,
 } from './methods/revokeToken'
 
+import { getJWKSMethod, GetJWKSMethodOutput } from './methods/getJWKS'
+
 import { LogUsage } from '@proofzero/platform-middleware/log'
 
 import { Analytics } from '@proofzero/platform-middleware/analytics'
@@ -152,4 +154,9 @@ export const appRouter = t.router({
     .input(GetAuthorizedAppScopesMethodInput)
     .output(GetAuthorizedAppScopesMethodOutput)
     .query(getAuthorizedAppScopesMethod),
+  getJWKS: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .output(GetJWKSMethodOutput)
+    .query(getJWKSMethod),
 })
