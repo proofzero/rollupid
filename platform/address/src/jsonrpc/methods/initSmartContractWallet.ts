@@ -52,8 +52,6 @@ export const initSmartContractWalletMethod = async ({
 
   const smartContractWalletAddress = await smartContractWallet.getAddress()
 
-  console.log({ smartContractWalletAddress })
-
   const addressURN = AddressURNSpace.componentizedUrn(
     generateHashedIDRef(CryptoAddressType.Wallet, smartContractWalletAddress),
     {

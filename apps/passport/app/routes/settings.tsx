@@ -75,18 +75,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       })
     ),
     Promise.all(
-      addressTypeUrns.map(async (address) => {
+      addressTypeUrns.map((address) => {
         const addressClient = getAddressClient(
           address.urn,
           context.env,
           context.traceSpan
         )
-        console.log({
-          'Smart Contract Wallet URN':
-            await addressClient.initSmartContractWallet.mutate({
-              nickname: 'vitalya',
-            }),
-        })
         return addressClient.getAddressProfile.query()
       })
     ),
