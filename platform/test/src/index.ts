@@ -1,34 +1,12 @@
-import { Router } from 'itty-router'
+import { RequestLike, Router } from 'itty-router'
+import {
+  fetchRequestHandler,
+  FetchCreateContextFnOptions,
+} from '@trpc/server/adapters/fetch'
 
-/**
- * Welcome to Cloudflare Workers! This is your first worker.
- *
- * - Run `wrangler dev src/index.ts` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run `wrangler publish src/index.ts --name my-worker` to publish your worker
- *
- * Learn more at https://developers.cloudflare.com/workers/
- */
-
-export interface Env {
-  // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
-  // MY_KV_NAMESPACE: KVNamespace;
-  //
-  // Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
-  // MY_DURABLE_OBJECT: DurableObjectNamespace;
-  //
-  // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
-  // MY_BUCKET: R2Bucket;
-  //
-  // Example binding to a Service. Learn more at https://developers.cloudflare.com/workers/runtime-apis/service-bindings/
-  // MY_SERVICE: Fetcher;
-}
+import type { Environment, CloudflareEmailMessage } from './types'
 
 const router = Router() // no "new", as this is not a real class
-
-// a generic error handler
-const errorHandler = (error: { message: any; status: any }) =>
-  new Response(error.message || 'Server Error', { status: error.status || 500 })
 
 // register a route on the "GET" method
 router.get('/otp/:email', (req) => {
@@ -37,16 +15,23 @@ router.get('/otp/:email', (req) => {
   console.log({ params, query })
 })
 
-addEventListener('fetch', (event) =>
-  event.respondWith(router.handle(event.request).catch(errorHandler))
-)
-
+// alternative advanced/manual approach for downstream control
 export default {
-  async fetch(
-    request: Request,
-    env: Env,
-    ctx: ExecutionContext
-  ): Promise<Response> {
-    return new Response('Hello World!')
+  fetch: (request: RequestLike, env: Environment, context: any) =>
+    router
+      .handle(request, env, context)
+      .then((response) => {
+        // can modify response here before final return, e.g. CORS headers
+
+        return response
+      })
+      .catch((err) => {
+        // and do something with the errors here, like logging, error status, etc
+      }),
+
+  async email(message: CloudflareEmailMessage, env: Environment) {
+    //TODO: Implement email masking
+    //This is where you'd receive an email, check destination
+    //address, lookup unmasked address and forward
   },
 }

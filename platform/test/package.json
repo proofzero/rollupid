@@ -14,7 +14,7 @@
     "lint:check": "run-s lint:check:src",
     "lint:check:src": "eslint src",
     "types:check": "tsc --project tsconfig.json",
-    "dev": "env-cmd --file .dev.env wrangler dev --local --persist",
+    "dev": "wrangler dev --local --persist",
     "deploy": "wrangler publish",
     "test": "run-s check"
   },
