@@ -3,8 +3,6 @@ main = "src/index.ts"
 compatibility_date = "2023-04-19"
 workers_dev = true
 
-services = [{ binding = "Address", service = "address" }]
-
 kv_namespaces = [{ binding = "otp_test", id = "9ff83af1378d4a51af8adc2f4d8ac946", preview_id = "a62c4ffaf521437a9137e0d84df8df79"  }]
 
 [dev]
@@ -13,5 +11,4 @@ inspector_port = 21200
 local_protocol = "http"
 
 [env.dev]
-services = [{ binding = "Address", service = "address-dev" }]
 kv_namespaces = [{ binding = "otp_test", id = "9ff83af1378d4a51af8adc2f4d8ac946" }]
