@@ -28,6 +28,7 @@ export const authenticateAddress = async (
   address: AddressURN,
   account: AccountURN,
   appData: AppData,
+  request: Request,
   env: Env,
   traceSpan: TraceSpan,
   existing: boolean = false
@@ -67,6 +68,7 @@ export const authenticateAddress = async (
       grantType,
       code,
       clientId,
+      issuer: new URL(request.url).origin,
     })
 
     await provisionProfile(accessToken, env, traceSpan, address)

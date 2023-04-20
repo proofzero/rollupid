@@ -58,6 +58,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     address,
     accountURN,
     appData,
+    request,
     context.env,
     context.traceSpan,
     existing

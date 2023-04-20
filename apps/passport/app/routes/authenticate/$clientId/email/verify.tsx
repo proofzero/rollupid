@@ -61,6 +61,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
       addressURN,
       accountURN,
       appData,
+      request,
       context.env,
       context.traceSpan,
       existing

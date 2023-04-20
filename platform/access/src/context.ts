@@ -35,7 +35,6 @@ interface CreateInnerContextOptions
   edgesClient?: ReturnType<typeof createEdgesClient>
   // Added by ValidateJWT middleware.
   accountURN?: AccountURN
-  INTERNAL_JWT_ISS: string
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.

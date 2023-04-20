@@ -30,6 +30,7 @@ const AuthenticationCodeInput = z.object({
   grantType: z.literal(GrantType.AuthenticationCode),
   code: z.string(),
   clientId: z.string(),
+  issuer: z.string(),
 })
 
 type AuthenticationCodeInput = z.infer<typeof AuthenticationCodeInput>
@@ -45,6 +46,7 @@ const AuthorizationCodeInput = z.object({
   code: z.string(),
   clientId: z.string(),
   clientSecret: z.string(),
+  issuer: z.string(),
 })
 
 type AuthorizationCodeInput = z.infer<typeof AuthorizationCodeInput>
@@ -62,6 +64,7 @@ const RefreshTokenInput = z.object({
   refreshToken: z.string(),
   clientId: z.string(),
   clientSecret: z.string(),
+  issuer: z.string(),
 })
 
 type RefreshTokenInput = z.infer<typeof RefreshTokenInput>
@@ -120,7 +123,7 @@ const handleAuthenticationCode: ExchangeTokenMethod<
   AuthenticationCodeInput,
   AuthenticationCodeOutput
 > = async ({ ctx, input }) => {
-  const { code, clientId } = input
+  const { code, clientId, issuer } = input
 
   const authorizationNode = await initAuthorizationNodeByName(
     code,
@@ -138,7 +141,6 @@ const handleAuthenticationCode: ExchangeTokenMethod<
   await accessNode.storage.put({ account, clientId: 'rollup' })
 
   const { expirationTime } = AUTHENTICATION_TOKEN_OPTIONS
-  const issuer = ctx.INTERNAL_JWT_ISS
   const scope: Scope = (await authorizationNode.storage.get('scope')) || []
   return {
     accessToken: await accessNode.class.generateAccessToken({
@@ -155,7 +157,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   AuthorizationCodeInput,
   AuthorizationCodeOutput
 > = async ({ ctx, input }) => {
-  const { code, clientId, clientSecret } = input
+  const { code, clientId, clientSecret, issuer } = input
 
   const { valid } = await ctx.starbaseClient.checkAppAuth.query({
     clientId,
@@ -183,7 +185,6 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   const name = `${AccountURNSpace.decode(account)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
-  const issuer = ctx.INTERNAL_JWT_ISS
 
   await accessNode.storage.put({ account, clientId, personaData })
   const access = AccessURNSpace.componentizedUrn(name, { client_id: clientId })
@@ -240,7 +241,7 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
   ctx,
   input,
 }) => {
-  const { refreshToken, clientId, clientSecret } = input
+  const { refreshToken, clientId, clientSecret, issuer } = input
 
   if (!ctx.starbaseClient) {
     throw new Error('missing starbase client')
@@ -265,7 +266,6 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
 
   const scope = payload.scope.split(' ')
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
-  const issuer = ctx.INTERNAL_JWT_ISS
 
   return {
     accessToken: await accessNode.class.generateAccessToken({
