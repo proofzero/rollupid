@@ -82,7 +82,7 @@ export const EmailSelect = ({
             {!selected && (
               <Text
                 size="sm"
-                className="bg-white flex-1 text-left text-gray-400"
+                className="bg-white flex-1 text-left text-gray-400 truncate text-ellipsis"
               >
                 {enableAddNew ? 'Connect new email address' : 'None'}
               </Text>
@@ -90,7 +90,7 @@ export const EmailSelect = ({
             {selected && (
               <Text
                 size="sm"
-                className="bg-white flex-1 text-left text-gray-800"
+                className="bg-white flex-1 text-left text-gray-800 truncate text-ellipsis"
               >
                 {selected?.email}
               </Text>
@@ -122,7 +122,7 @@ export const EmailSelect = ({
                   hover:bg-gray-50"
                   >
                     {({ selected }) => (
-                      <div className="flex flex-row items-center">
+                      <div className="flex flex-row items-center truncate">
                         {iconURL ? (
                           <img src={iconURL} className="w-4 h-4 mr-3" />
                         ) : (
@@ -132,7 +132,7 @@ export const EmailSelect = ({
                         <Text
                           size="sm"
                           weight={selected ? 'semibold' : 'normal'}
-                          className={`${selected ? '' : ''} flex-1`}
+                          className={`truncate text-ellipsis ${selected ? '' : ''} flex-1`}
                         >
                           {item.email}
                         </Text>

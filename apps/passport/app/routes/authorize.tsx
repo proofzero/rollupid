@@ -507,12 +507,16 @@ export default function Authorize() {
                     >
                       <div className="flex flex-row w-full gap-2 items-center">
                         <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
+
                         {scope !== 'email' &&
-                          scope !== 'connected_addresses' &&
-                          scopeMeta.scopes[scope].name}
+                          scope !== 'connected_addresses' && (
+                            <Text className="flex-1">
+                              {scopeMeta.scopes[scope].name}
+                            </Text>
+                          )}
 
                         {scope === 'email' && (
-                          <div className="w-full">
+                          <div className="flex-1 min-w-0">
                             <EmailSelect
                               items={connectedEmails}
                               enableAddNew={true}
@@ -539,7 +543,7 @@ export default function Authorize() {
                         )}
 
                         {scope === 'connected_addresses' && (
-                          <div className="flex-1">
+                          <div className="flex-1 min-w-0">
                             <ConnectedAccountSelect
                               accounts={connectedAddresses.map((ca) => ({
                                 addressURN: ca.id,
@@ -561,30 +565,32 @@ export default function Authorize() {
                             />
                           </div>
                         )}
-                      </div>
 
-                      <Info
-                        name={scopeMeta.scopes[scope].name}
-                        description={scopeMeta.scopes[scope].description}
-                      />
+                        <div>
+                          <Info
+                            name={scopeMeta.scopes[scope].name}
+                            description={scopeMeta.scopes[scope].description}
+                          />
 
-                      <div
-                        data-popover
-                        id={`popover-${scope}`}
-                        role="tooltip"
-                        className="absolute z-10 invisible inline-block
+                          <div
+                            data-popover
+                            id={`popover-${scope}`}
+                            role="tooltip"
+                            className="absolute z-10 invisible inline-block
                     font-[Inter]
                      min-w-64 text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
-                      >
-                        <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-                          <h3 className="font-semibold text-gray-900 dark:text-white">
-                            {scope}
-                          </h3>
+                          >
+                            <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+                              <h3 className="font-semibold text-gray-900 dark:text-white">
+                                {scope}
+                              </h3>
+                            </div>
+                            <div className="px-3 py-2">
+                              <p>{scopeMeta.scopes[scope].description}</p>
+                            </div>
+                            <div data-popper-arrow></div>
+                          </div>
                         </div>
-                        <div className="px-3 py-2">
-                          <p>{scopeMeta.scopes[scope].description}</p>
-                        </div>
-                        <div data-popper-arrow></div>
                       </div>
                     </li>
                   )

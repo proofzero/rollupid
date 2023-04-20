@@ -29,11 +29,6 @@ export const ConnectedAccountSelect = ({
   const [allConnectedAccountsSelected, setAllConnectedAccountsSelected] =
     useState(false)
 
-  const truncateAddress = (address: string) =>
-    address.length > 17
-      ? address.substring(0, 7) + '...' + address.substring(address.length - 7)
-      : address
-
   const capitalizeFirstLetter = (string: string) => {
     return string.charAt(0).toUpperCase() + string.slice(1)
   }
@@ -64,32 +59,35 @@ export const ConnectedAccountSelect = ({
           <Listbox.Button className="border shadow-sm rounded-lg w-full transition-transform flex flex-row justify-between items-center py-2 px-3 hover:ring-1 hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white">
             {(!selectedAccounts || selectedAccounts.length === 0) &&
               !allConnectedAccountsSelected && (
-                <Text size="sm" className="text-gray-800">
+                <Text
+                  size="sm"
+                  className="text-gray-800 truncate text-ellipsis"
+                >
                   No connected account(s)
                 </Text>
               )}
 
             {selectedAccounts?.length === 1 && !allConnectedAccountsSelected && (
-              <Text size="sm" className="text-gray-800">
-                {truncateAddress(selectedAccounts[0].title)}
+              <Text size="sm" className="text-gray-800 truncate text-ellipsis">
+                {selectedAccounts[0].title}
               </Text>
             )}
             {selectedAccounts?.length > 1 && !allConnectedAccountsSelected && (
-              <Text size="sm" className="text-gray-800">
+              <Text size="sm" className="text-gray-800 truncate text-ellipsis">
                 {selectedAccounts.length} accounts selected
               </Text>
             )}
 
             {allConnectedAccountsSelected && (
-              <Text size="sm" className="text-gray-800">
+              <Text size="sm" className="text-gray-800 truncate text-ellipsis">
                 All connected accounts
               </Text>
             )}
 
             {open ? (
-              <ChevronUpIcon className="w-5 h-5" />
+              <ChevronUpIcon className="w-5 h-5 shrink-0" />
             ) : (
-              <ChevronDownIcon className="w-5 h-5" />
+              <ChevronDownIcon className="w-5 h-5 shrink-0" />
             )}
           </Listbox.Button>
 
@@ -114,8 +112,12 @@ export const ConnectedAccountSelect = ({
                     checked={allConnectedAccountsSelected}
                   />
                 </div>
-                <div className="flex-1">
-                  <Text size="sm" weight="medium" className="text-gray-900">
+                <div className="flex-1 truncate">
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="text-gray-900 truncate text-ellipsis"
+                  >
                     All connected accounts
                   </Text>
                 </div>
@@ -143,11 +145,11 @@ export const ConnectedAccountSelect = ({
                       }
                     />
                   </div>
-                  <div className="flex-1 flex flex-col">
+                  <div className="flex-1 flex flex-col truncate">
                     <Text
                       size="sm"
                       weight="medium"
-                      className={`${
+                      className={`truncate text-ellipsis ${
                         allConnectedAccountsSelected
                           ? 'text-gray-400'
                           : 'text-gray-900'
@@ -158,14 +160,14 @@ export const ConnectedAccountSelect = ({
                     <Text
                       size="xs"
                       weight="normal"
-                      className={`${
+                      className={`truncate text-ellipsis ${
                         allConnectedAccountsSelected
                           ? 'text-gray-400'
                           : 'text-gray-500'
                       }`}
                     >
                       {capitalizeFirstLetter(account.provider)} -{' '}
-                      {truncateAddress(account.address)}
+                      {account.address}
                     </Text>
                   </div>
                 </Listbox.Option>
