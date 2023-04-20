@@ -6,7 +6,7 @@ export interface CloudflareEmailMessage<Body = unknown> {
   readonly raw: ReadableStream
   readonly rawSize: number
 
-  setReject(reason: String): void
+  setReject(reason: string): void
   forward(rcptTo: string, headers?: Headers): Promise<void>
 }
 
