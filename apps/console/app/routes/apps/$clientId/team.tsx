@@ -160,11 +160,7 @@ export default () => {
 
         <div className="self-start mb-8 w-80">
           {connectedEmails && connectedEmails.length === 0 && (
-            <Button
-              onClick={redirectToPassport}
-              btnType="secondary-alt"
-              btnSize="xl"
-            >
+            <Button onClick={redirectToPassport} btnType="secondary-alt">
               <div className="flex space-x-3">
                 <HiOutlineMail className="w-6 h-6 text-gray-800" />
                 <Text weight="medium" className="flex-1 text-gray-800">
