@@ -1,4 +1,4 @@
-import { getAccountClient } from '~/platform.server'
+import { getAccountClient, getAddressClient } from '~/platform.server'
 import {
   getNormalisedConnectedEmails,
   getNormalisedSmartContractWallets,
@@ -7,8 +7,8 @@ import {
 import { UnauthorizedError } from '@proofzero/errors'
 import { createConsoleParamsSession } from '~/session.server'
 
-import { GetAddressProfileResult } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressProfile'
-import { AddressURN } from '@proofzero/urns/address'
+import type { GetAddressProfileResult } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressProfile'
+
 import {
   SCOPE_CONNECTED_ADDRESSS,
   SCOPE_EMAIL,
@@ -26,7 +26,8 @@ export type DataForScopes = {
   connectedEmails?: EmailSelectListItem[]
   personaData?: PersonaData
   requestedScope: string[]
-  connectedAccounts: GetAddressProfileResult[]
+  connectedAddresses?: GetAddressProfileResult[]
+  connectedSmartContractWallet?: SCWalletSelectListItem[]
 }
 
 // Deterministically sort scopes so that they are always in the same order
@@ -61,7 +62,7 @@ export const getDataForScopes = async (
 
   let connectedSmartContractWallet: SCWalletSelectListItem[] = []
   let connectedEmails: EmailSelectListItem[] = []
-  let connectedAddresses: AddressURN[] = []
+  let connectedAddresses: GetAddressProfileResult[] = []
 
   const accountClient = getAccountClient(jwt || '', env, traceSpan)
 
@@ -69,16 +70,22 @@ export const getDataForScopes = async (
     account: accountURN,
   })
 
-  if (requestedScope.includes(SCOPE_EMAIL.toString())) {
-    connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
-  }
-  if (requestedScope.includes(SCOPE_CONNECTED_ADDRESSS.toString())) {
-    connectedAddresses =
-      connectedAccounts?.map((a) => a.baseUrn as AddressURN) || []
-  }
-  if (requestedScope.includes(SCOPE_SMART_CONTRACT_WALLET.toString())) {
-    connectedSmartContractWallet =
-      getNormalisedSmartContractWallets(connectedAccounts)
+  if (connectedAccounts && connectedAccounts.length) {
+    if (requestedScope.includes(SCOPE_EMAIL.toString())) {
+      connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
+    }
+    if (requestedScope.includes(SCOPE_CONNECTED_ADDRESSS.toString())) {
+      connectedAddresses = await Promise.all(
+        connectedAccounts.map((ca) => {
+          const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
+          return addressClient.getAddressProfile.query()
+        })
+      )
+    }
+    if (requestedScope.includes(SCOPE_SMART_CONTRACT_WALLET.toString())) {
+      connectedSmartContractWallet =
+        getNormalisedSmartContractWallets(connectedAccounts)
+    }
   }
 
   const personaData: PersonaData = {}
@@ -87,7 +94,8 @@ export const getDataForScopes = async (
     connectedEmails,
     personaData,
     requestedScope: reorderScope(requestedScope),
-    connectedAccounts: connectedAddresses,
+    connectedAddresses,
+    connectedSmartContractWallet,
   }
 }
 
