@@ -47,6 +47,7 @@ export const initSmartContractWalletMethod = async ({
   const smartContractWallet = await getZeroDevSigner({
     projectId: ctx.ZERODEV_PROJECT_ID,
     owner,
+    skipFetchSetup: true,
   })
 
   const smartContractWalletAddress = await smartContractWallet.getAddress()
