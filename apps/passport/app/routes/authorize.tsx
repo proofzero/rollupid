@@ -520,6 +520,7 @@ export default function Authorize() {
                             <EmailSelect
                               items={connectedEmails}
                               enableAddNew={true}
+                              defaultAddress={connectedEmails[0]?.addressURN}
                               onSelect={(selected: EmailSelectListItem) => {
                                 if (selected?.type === OptionType.AddNew) {
                                   const qp = new URLSearchParams()
