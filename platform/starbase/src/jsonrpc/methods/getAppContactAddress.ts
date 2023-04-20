@@ -27,7 +27,7 @@ export const getAppContactAddress = async ({
 
   const { edges } = await ctx.edges.getEdges.query({
     query: {
-      dst: { baseUrn: appURN },
+      src: { baseUrn: appURN },
       tag: EDGE_HAS_REFERENCE_TO,
     },
   })
@@ -40,5 +40,5 @@ export const getAppContactAddress = async ({
     return undefined
   }
 
-  return edges[0].src.baseUrn as AddressURN
+  return edges[0].dst.baseUrn as AddressURN
 }

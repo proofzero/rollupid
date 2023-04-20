@@ -28,7 +28,7 @@ export const upsertAppContactAddress = async ({
 
   const { edges } = await ctx.edges.getEdges.query({
     query: {
-      dst: { baseUrn: appURN },
+      src: { baseUrn: appURN },
       tag: EDGE_HAS_REFERENCE_TO,
     },
   })
@@ -46,8 +46,8 @@ export const upsertAppContactAddress = async ({
   }
 
   await ctx.edges.makeEdge.mutate({
-    src: input.address,
-    dst: appURN,
+    src: appURN,
+    dst: input.address,
     tag: EDGE_HAS_REFERENCE_TO,
   })
 }
