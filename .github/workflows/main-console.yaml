@@ -58,12 +58,10 @@ jobs:
           # CF_ROUTE: https://console-dev.kubelt.com/*
 
       - name: Setup Playwright
-        with:
-          workingDirectory: 'apps/console'
+        working-directory: 'apps/console'
         run: yarn playwright install --with-deps
       - name: Run Playwright tests
-        with:
-          workingDirectory: 'apps/console'
+        working-directory: 'apps/console'
         env:
           INTERNAL_PLAYWRIGHT_BASE_URL: https://console-dev.rollup.id
           INTERNAL_PLAYWRIGHT_TEST_URL: ${{ secrets.INTERNAL_PLAYWRIGHT_TEST_URL }}
