@@ -357,7 +357,7 @@ export const action: ActionFunction = async ({ request, context }) => {
 }
 
 const scopeIcons: Record<string, string> = {
-  connected_addresses: addressClassIcon,
+  connected_accounts: addressClassIcon,
   profile: profileClassIcon,
   email: emailClassIcon,
 }
@@ -376,13 +376,13 @@ export default function Authorize() {
 
   const userProfile = profile as UserProfile
 
-  const { connectedEmails, personaData, requestedScope, connectedAddresses } =
+  const { connectedEmails, personaData, requestedScope, connectedAccounts } =
     dataForScopes
 
   const [persona] = useState<PersonaData>(personaData)
 
   const [selectedEmail, setSelectedEmail] = useState<EmailSelectListItem>()
-  const [selectedConnectedAddresses, setSelectedConnectedAddresses] = useState<
+  const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
     Array<AddressURN> | Array<AuthorizationControlSelection>
   >([])
 
@@ -423,13 +423,13 @@ export default function Authorize() {
     }
 
     if (
-      requestedScope.includes('connected_addresses') &&
-      selectedConnectedAddresses.length > 0
+      requestedScope.includes('connected_accounts') &&
+      selectedConnectedAccounts.length > 0
     ) {
-      if (selectedConnectedAddresses[0] === AuthorizationControlSelection.ALL) {
-        personaData.connected_addresses = AuthorizationControlSelection.ALL
+      if (selectedConnectedAccounts[0] === AuthorizationControlSelection.ALL) {
+        personaData.connected_accounts = AuthorizationControlSelection.ALL
       } else {
-        personaData.connected_addresses = selectedConnectedAddresses
+        personaData.connected_accounts = selectedConnectedAccounts
       }
     }
 
@@ -509,7 +509,7 @@ export default function Authorize() {
                         <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
 
                         {scope !== 'email' &&
-                          scope !== 'connected_addresses' && (
+                          scope !== 'connected_accounts' && (
                             <Text className="flex-1">
                               {scopeMeta.scopes[scope].name}
                             </Text>
@@ -542,10 +542,10 @@ export default function Authorize() {
                           </div>
                         )}
 
-                        {scope === 'connected_addresses' && (
+                        {scope === 'connected_accounts' && (
                           <div className="flex-1 min-w-0">
                             <ConnectedAccountSelect
-                              accounts={connectedAddresses.map((ca) => ({
+                              accounts={connectedAccounts.map((ca) => ({
                                 addressURN: ca.id,
                                 address: ca.address,
                                 title: ca.title,
@@ -553,12 +553,12 @@ export default function Authorize() {
                                   ca.type === 'eth' ? 'metamask' : ca.type,
                               }))}
                               onSelect={(addresses) => {
-                                setSelectedConnectedAddresses(
+                                setSelectedConnectedAccounts(
                                   addresses.map((a) => a.addressURN)
                                 )
                               }}
                               onSelectAll={() => {
-                                setSelectedConnectedAddresses([
+                                setSelectedConnectedAccounts([
                                   AuthorizationControlSelection.ALL,
                                 ])
                               }}
@@ -620,8 +620,8 @@ export default function Authorize() {
                     // TODO: make generic!
                     (requestedScope.includes('email') &&
                       (!connectedEmails?.length || !selectedEmail)) ||
-                    (requestedScope.includes('connected_addresses') &&
-                      !selectedConnectedAddresses?.length)
+                    (requestedScope.includes('connected_accounts') &&
+                      !selectedConnectedAccounts?.length)
                   }
                   onClick={() => {
                     authorizeCallback(requestedScope)

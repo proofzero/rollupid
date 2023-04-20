@@ -4,7 +4,7 @@ import { z } from 'zod'
 export const ClaimName = z.union([
   z.literal('email'),
   z.literal('openid'),
-  z.literal('connected_addresses'),
+  z.literal('connected_accounts'),
 ])
 export type ClaimName = z.infer<typeof ClaimName>
 

@@ -47,7 +47,7 @@ export type { Scope }
  */
 export const SCOPE_ADMIM: Scope = scope('scope://rollup.id/admin.admin')
 
-export const SCOPE_CONNECTED_ADDRESSS: Scope = scope('connected_addresses')
+export const SCOPE_CONNECTED_ACCOUNTS: Scope = scope('connected_accounts')
 
 //Standard OIDC email claim
 export const SCOPE_EMAIL: Scope = scope('email')
@@ -132,9 +132,9 @@ export const SCOPES: ScopeMap = {
     description: `Read your name and picture.`,
     class: 'profile',
   },
-  [SCOPE_CONNECTED_ADDRESSS]: {
-    name: 'Connected addresses',
-    description: `Listing of the types and the identifiers of the account's connected addresses`,
+  [SCOPE_CONNECTED_ACCOUNTS]: {
+    name: 'Connected accounts',
+    description: `Listing of the types and the identifiers of the identity's connected accounts`,
     class: 'address',
   },
   // NOT READY YET

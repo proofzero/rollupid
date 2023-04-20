@@ -64,7 +64,7 @@ export async function validatePersonaData(
         throw new BadRequestError({
           message: 'Address provided is not an email-compatible address',
         })
-    } else if (scopeName === 'connected_addresses') {
+    } else if (scopeName === 'connected_accounts') {
       const authorizedAddressUrns = claimValue
 
       //If user selection is ALL, there's nothing further to validate
@@ -129,13 +129,13 @@ export async function setPersonaReferences(
     if (scopeEntry === 'email' && personaData.email) {
       uniqueAuthorizationReferences.add(personaData.email)
     } else if (
-      scopeEntry === 'connected_addresses' &&
-      personaData.connected_addresses &&
-      personaData.connected_addresses instanceof Array
+      scopeEntry === 'connected_accounts' &&
+      personaData.connected_accounts &&
+      personaData.connected_accounts instanceof Array
     ) {
       //This (correctly) gets skipped when personaData value of
-      //connected_addresses is set to ALL
-      personaData.connected_addresses.forEach((addressUrn) =>
+      //connected_accounts is set to ALL
+      personaData.connected_accounts.forEach((addressUrn) =>
         uniqueAuthorizationReferences.add(addressUrn)
       )
     }
@@ -242,9 +242,9 @@ export async function getClaimValues(
           picture: nodeResult.qc.picture,
         }
       }
-    } else if (scopeValue === 'connected_addresses') {
+    } else if (scopeValue === 'connected_accounts') {
       if (
-        personaData.connected_addresses === AuthorizationControlSelection.ALL
+        personaData.connected_accounts === AuthorizationControlSelection.ALL
       ) {
         //Referencable persona submission pointing to all connected addresses
         //at any point in time
@@ -263,11 +263,11 @@ export async function getClaimValues(
         const claimResults = accountAddresses.map((a) => {
           return { type: a.rc.addr_type, alias: a.qc.alias }
         })
-        result = { ...result, connected_addresses: claimResults }
+        result = { ...result, connected_accounts: claimResults }
       } else {
         //Static persona submission of addresses
         const authorizedAddresses =
-          personaData.connected_addresses as AddressURN[]
+          personaData.connected_accounts as AddressURN[]
         const edgePromises = authorizedAddresses.map((address) => {
           return edgesClient.findNode.query({ baseUrn: address })
         })
@@ -285,7 +285,7 @@ export async function getClaimValues(
               return { type: e.value.rc.addr_type, alias: e.value.qc.alias }
           })
           .filter(isDefined)
-        result = { ...result, connected_addresses: claimResults }
+        result = { ...result, connected_accounts: claimResults }
       }
     }
   }
