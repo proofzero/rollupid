@@ -57,7 +57,7 @@ import {
   OptionType,
 } from '@proofzero/utils/getNormalisedConnectedEmails'
 import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
-import useConnectResult from '~/hooks/useConnectResult'
+import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 
 import { ConnectedAccountSelect } from '@proofzero/design-system/src/atoms/accounts/ConnectedAccountSelect'
 import { AddressURN } from '@proofzero/urns/address'
@@ -520,6 +520,7 @@ export default function Authorize() {
                             <EmailSelect
                               items={connectedEmails}
                               enableAddNew={true}
+                              defaultAddress={connectedEmails[0]?.addressURN}
                               onSelect={(selected: EmailSelectListItem) => {
                                 if (selected?.type === OptionType.AddNew) {
                                   const qp = new URLSearchParams()

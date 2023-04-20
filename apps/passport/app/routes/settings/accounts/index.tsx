@@ -29,7 +29,7 @@ import { getValidatedSessionContext } from '~/session.server'
 import { setNewPrimaryAddress } from '~/utils/authenticate.server'
 import type { AddressURN } from '@proofzero/urns/address'
 import { ERROR_CODES, RollupError } from '@proofzero/errors'
-import useConnectResult from '~/hooks/useConnectResult'
+import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const { jwt } = await getValidatedSessionContext(

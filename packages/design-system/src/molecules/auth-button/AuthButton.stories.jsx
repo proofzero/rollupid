@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { AuthButton } from './AuthButton'
-import tidlogo from './rollup-logo-white.svg'
 
 export default {
   title: 'Molecules/AuthButton',
@@ -13,4 +12,3 @@ export default {
 const Template = (args) => <AuthButton {...args}>Private Login</AuthButton>
 
 export const AuthButtonExample = Template.bind({})
-AuthButtonExample.args = { logo: tidlogo }

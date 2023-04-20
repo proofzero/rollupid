@@ -16,9 +16,11 @@ import appleIcon from '@proofzero/design-system/src/assets/social_icons/apple.sv
 import { OptionType } from '@proofzero/utils/getNormalisedConnectedEmails'
 
 import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
+import { AddressURN } from '@proofzero/urns/address'
 
 type EmailSelectProps = {
   items: EmailSelectListItem[]
+  defaultAddress?: AddressURN
   enableAddNew?: boolean
   enableNone?: boolean
   onSelect?: (selected: EmailSelectListItem) => void
@@ -40,14 +42,23 @@ const getIconUrl = (
 
 export const EmailSelect = ({
   items,
+  defaultAddress,
   enableAddNew = false,
   enableNone = false,
   onSelect,
 }: EmailSelectProps) => {
-  const [selected, setSelected] = useState(items[0])
+  const [selected, setSelected] = useState(() => {
+    if (defaultAddress) {
+      const defaultItem = items.find(
+        (item) => item.addressURN === defaultAddress
+      )
+
+      return defaultItem
+    }
+  })
 
   useEffect(() => {
-    if (onSelect) {
+    if (selected && onSelect) {
       onSelect(selected)
     }
   }, [selected])

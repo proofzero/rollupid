@@ -8,7 +8,7 @@ import { useAccount, useDisconnect, useSignMessage } from 'wagmi'
 import { ConnectKitProvider, ConnectKitButton } from 'connectkit'
 
 import { signMessageTemplate } from '../../routes/connect/$address/sign'
-import AuthButton from './AuthButton'
+import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/AuthButton'
 
 export type ConnectButtonProps = {
   connectCallback: (address: string) => void

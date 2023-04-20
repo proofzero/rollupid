@@ -1,5 +1,5 @@
 import { AnyURN } from '@proofzero/urns'
-import { EdgeURN } from '@proofzero/urns/edge'
+import { EdgeSpace, EdgeURN } from '@proofzero/urns/edge'
 
 export type Permission = string
 
@@ -88,3 +88,5 @@ export interface NodeFilter {
   // Only include edges with all matching r-components.
   rc?: RComponents
 }
+
+export const EDGE_HAS_REFERENCE_TO: EdgeURN = EdgeSpace.urn('has/refTo')
