@@ -40,7 +40,7 @@ export const publishApp = async ({
 
   const { edges } = await ctx.edges.getEdges.query({
     query: {
-      dst: { baseUrn: appURN },
+      src: { baseUrn: appURN },
       tag: EDGE_HAS_REFERENCE_TO,
     },
   })
