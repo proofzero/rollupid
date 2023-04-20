@@ -33,11 +33,6 @@ test('login to passport using Email', async ({ page, request }) => {
     waitUntil: 'networkidle',
   })
 
-  console.log(`${process.env.INTERNAL_PLAYWRIGHT_TEST_URL}/otp/${email}`, {
-    headers: {
-      Authentication: `Bearer ${process.env.SECRET_TEST_API_TOKEN}`,
-    },
-  })
   const otpRes = await request.fetch(
     `${process.env.INTERNAL_PLAYWRIGHT_TEST_URL}/otp/${email}`,
     {

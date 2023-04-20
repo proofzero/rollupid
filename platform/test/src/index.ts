@@ -8,10 +8,6 @@ const withToken = (request: IRequest, env: Environment) => {
   if (!env.SECRET_TEST_API_TOKEN) {
     return new Response('Missing Auth Token', { status: 401 })
   }
-  console.log({
-    token: request.headers.get('Authentication'),
-    headers: JSON.stringify(request.headers),
-  })
   if (
     request.headers.get('Authentication') !==
     `Bearer ${env.SECRET_TEST_API_TOKEN}`
