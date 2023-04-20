@@ -24,7 +24,9 @@ import { EmailSelect } from '@proofzero/design-system/src/atoms/email/EmailSelec
 import { AddressURN } from '@proofzero/urns/address'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
-export const loader: LoaderFunction = async ({ request, context }) => {
+export const loader: LoaderFunction = async ({ request, context, params }) => {
+  const clientId = params.clientId as string
+
   const jwt = await requireJWT(request)
   const payload = checkToken(jwt)
   const accountURN = payload.sub as AccountURN
@@ -38,6 +40,37 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     account: accountURN,
   })
   const connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
+
+  // If we are coming back from a successful connect flow
+  // and we have only one email address, and no appContactAddress set
+  // We can infer the intention of the user and automatically
+  // set their e-mail to the one just connected
+  // All other cases are ambiguous and we should not make assumptions
+  const requestURL = new URL(request.url)
+  const connectResult = requestURL.searchParams.get('connect_result')
+  if (connectResult && connectResult === 'SUCCESS') {
+    if (connectedEmails.length === 1) {
+      const starbaseClient = createStarbaseClient(Starbase, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(context.traceSpan),
+      })
+
+      const appContactAddress = await starbaseClient.getAppContactAddress.query(
+        {
+          clientId,
+        }
+      )
+
+      if (!appContactAddress) {
+        await starbaseClient.upsertAppContactAddress.mutate({
+          address: connectedEmails[0].addressURN!,
+          clientId,
+        })
+
+        return redirect(requestURL.toString())
+      }
+    }
+  }
 
   return {
     connectedEmails,
@@ -64,6 +97,9 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     clientId,
   })
 
+  // Remix preserves route from before
+  // history erasure so searchParams
+  // are regenerated; manual removal
   const requestURL = new URL(request.url)
   const connectResult = requestURL.searchParams.get('connect_result')
   if (connectResult) {

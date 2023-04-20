@@ -87,6 +87,7 @@ export default function CreateNewApp() {
 
                 <form method="post" onSubmit={() => setIsSubmitting(true)}>
                   <Input
+                    autoFocus
                     id="client_name"
                     label="Application Name"
                     placeholder="My application"

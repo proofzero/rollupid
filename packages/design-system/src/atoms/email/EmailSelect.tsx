@@ -53,14 +53,12 @@ export const EmailSelect = ({
         (item) => item.addressURN === defaultAddress
       )
 
-      return defaultItem || items[0]
+      return defaultItem
     }
-
-    return items[0]
   })
 
   useEffect(() => {
-    if (onSelect) {
+    if (selected && onSelect) {
       onSelect(selected)
     }
   }, [selected])
