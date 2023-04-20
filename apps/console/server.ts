@@ -24,7 +24,6 @@ const requestHandler = createRequestHandler({
     const traceSpan = (event as TraceableFetchEvent).traceSpan
     return {
       traceSpan,
-      env: globalThis as unknown,
     }
   },
 })
