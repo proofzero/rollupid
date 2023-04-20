@@ -36,6 +36,7 @@ type TokenState = {
 }
 
 type AccessTokenOptions = {
+  jku: string
   jwk: jose.JWK
   account: AccountURN
   clientId: string
@@ -45,6 +46,7 @@ type AccessTokenOptions = {
 }
 
 type RefreshTokenOptions = {
+  jku: string
   jwk: jose.JWK
   account: AccountURN
   clientId: string
@@ -53,6 +55,7 @@ type RefreshTokenOptions = {
 }
 
 type IdTokenOptions = {
+  jku: string
   jwk: jose.JWK
   account: AccountURN
   clientId: string
@@ -81,13 +84,14 @@ export default class Access extends DOProxy {
   }
 
   async generateAccessToken(options: AccessTokenOptions): Promise<string> {
-    const { jwk, account, clientId, expirationTime, issuer, scope } = options
+    const { jku, jwk, account, clientId, expirationTime, issuer, scope } =
+      options
     const { alg, kid } = jwk
     if (!alg) throw new InternalServerError({ message: 'missing alg in jwk' })
     const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
     //Need to convert scope array to space-delimited string, per spec
     return new jose.SignJWT({ scope: scope.join(' ') })
-      .setProtectedHeader({ alg, kid })
+      .setProtectedHeader({ alg, jku, kid, typ: 'JWT' })
       .setExpirationTime(expirationTime)
       .setAudience([clientId])
       .setIssuedAt()
@@ -98,12 +102,12 @@ export default class Access extends DOProxy {
   }
 
   async generateRefreshToken(options: RefreshTokenOptions): Promise<string> {
-    const { jwk, account, clientId, issuer, scope } = options
+    const { jku, jwk, account, clientId, issuer, scope } = options
     const { alg, kid } = jwk
     if (!alg) throw new InternalServerError({ message: 'missing alg in jwk' })
     const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
     const jwt = await new jose.SignJWT({ scope: scope.join(' ') })
-      .setProtectedHeader({ alg, kid })
+      .setProtectedHeader({ alg, jku, kid, typ: 'JWT' })
       .setAudience([clientId])
       .setIssuedAt()
       .setIssuer(issuer)
@@ -116,12 +120,19 @@ export default class Access extends DOProxy {
   }
 
   async generateIdToken(options: IdTokenOptions): Promise<string> {
-    const { jwk, account, clientId, expirationTime, idTokenClaims, issuer } =
-      options
+    const {
+      jku,
+      jwk,
+      account,
+      clientId,
+      expirationTime,
+      idTokenClaims,
+      issuer,
+    } = options
     const { alg, kid } = jwk
     if (!alg) throw new InternalServerError({ message: 'missing alg in jwk' })
     return new jose.SignJWT(idTokenClaims)
-      .setProtectedHeader({ alg, kid })
+      .setProtectedHeader({ alg, jku, kid, typ: 'JWT' })
       .setExpirationTime(expirationTime)
       .setAudience([clientId])
       .setIssuedAt()

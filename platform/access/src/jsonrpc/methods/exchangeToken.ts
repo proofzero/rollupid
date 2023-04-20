@@ -145,10 +145,12 @@ const handleAuthenticationCode: ExchangeTokenMethod<
   const { expirationTime } = AUTHENTICATION_TOKEN_OPTIONS
   const scope: Scope = (await authorizationNode.storage.get('scope')) || []
 
+  const jku = generateJKU(issuer)
   const jwk = getPrivateJWK(ctx)
 
   return {
     accessToken: await accessNode.class.generateAccessToken({
+      jku,
       jwk,
       account,
       clientId,
@@ -207,9 +209,11 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     ctx.traceSpan
   )
 
+  const jku = generateJKU(issuer)
   const jwk = getPrivateJWK(ctx)
 
   const accessToken = await accessNode.class.generateAccessToken({
+    jku,
     jwk,
     account,
     clientId,
@@ -219,6 +223,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   })
 
   const refreshToken = await accessNode.class.generateRefreshToken({
+    jku,
     jwk,
     account,
     clientId,
@@ -237,6 +242,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     personaData
   )
   const idToken = await accessNode.class.generateIdToken({
+    jku,
     jwk,
     account,
     clientId,
@@ -279,10 +285,12 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
   const scope = payload.scope.split(' ')
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
 
+  const jku = generateJKU(issuer)
   const jwk = getPrivateJWK(ctx)
 
   return {
     accessToken: await accessNode.class.generateAccessToken({
+      jku,
       jwk,
       account,
       clientId,
@@ -291,4 +299,8 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
       scope,
     }),
   }
+}
+
+const generateJKU = (issuer: string) => {
+  return `${issuer}/.well-known/jwks.json`
 }
