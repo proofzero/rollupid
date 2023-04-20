@@ -102,21 +102,15 @@ Avoid testing minor UI changes like copy and images and instead focus on flows a
 
 If tests fail after PR is landed please open an issue and assign it to the author of the PR.
 
-#### Console
+#### Accounts
 
-In console we use the following accounts to test with:
+The current testing strategy in with accounts is to use email. This is because SSO providers have bespoke MFA settings that we can't properly handle with e2e tests (for now).
 
-- Github
-- Microsoft
+To handle email OTPs we use the `platform/test` worker to recive emails and maket them available via API. This test worker is only available locally and in the dev environment and only certain emails are routed to this service. This email is stored as a secret in `INTERNAL_EMAIL_TEST_USERNAME` and tests can increment email addresses the by replacing the number in the email like this: `const email = process.env.INTERNAL_EMAIL_TEST_USERNAME?.replace(/(\d)/, '1')`
 
-#### Passport
+The test worker is also protected by an API Key stored in `SECRET_TEST_API_TOKEN` and the URL for the service is stored in `INTERNAL_PLAYWRIGHT_TEST_URL`
 
-In passports we use the following accounts to test with:
-
-- Twitter
-- Google
-- Discord
-- Apple
+All these env vars can be set in the projects `.env` file.
 
 ## Contributing
 

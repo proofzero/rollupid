@@ -44,7 +44,6 @@ test('login to passport using Email', async ({ page, request }) => {
   )
   expect(otpRes.status()).toBe(200)
   const otp = await otpRes.text()
-  console.debug({ otp })
   const otpSplit = otp.split('')
   await page.locator(`#code_0`).fill(otpSplit[0])
   await page.locator(`#code_1`).fill(otpSplit[1])
