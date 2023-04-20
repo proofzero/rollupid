@@ -39,6 +39,10 @@ import {
   getDataForScopes,
 } from '~/utils/authorize.server'
 import { useEffect, useState } from 'react'
+<<<<<<< HEAD
+=======
+import { OptionType } from '@proofzero/utils/getNormalisedConnectedAccounts'
+>>>>>>> d26d082d (wip)
 import { Text } from '@proofzero/design-system'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { JsonError } from '@proofzero/utils/errors'
@@ -52,10 +56,14 @@ import {
   PersonaData,
 } from '@proofzero/types/application'
 import type { DataForScopes } from '~/utils/authorize.server'
+<<<<<<< HEAD
 import {
   EmailSelectListItem,
   OptionType,
 } from '@proofzero/utils/getNormalisedConnectedEmails'
+=======
+import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
+>>>>>>> d26d082d (wip)
 import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 

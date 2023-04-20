@@ -13,10 +13,10 @@ import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
 import appleIcon from '@proofzero/design-system/src/assets/social_icons/apple.svg'
 
-import { OptionType } from '@proofzero/utils/getNormalisedConnectedEmails'
+import { OptionType } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
-import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
-import { AddressURN } from '@proofzero/urns/address'
+import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
+import type { AddressURN } from '@proofzero/urns/address'
 
 type EmailSelectProps = {
   items: EmailSelectListItem[]

@@ -2,6 +2,7 @@ import {
   NodeType,
   OAuthAddressType,
   EmailAddressType,
+  CryptoAddressType,
 } from '@proofzero/types/address'
 
 import type { Addresses } from '@proofzero/platform.account/src/types'
@@ -18,9 +19,15 @@ export type EmailSelectListItem = {
   addressURN?: AddressURN
 }
 
-export default function (
+export type SCWalletSelectListItem = {
+  address: string
+  type: CryptoAddressType
+  addressURN?: AddressURN
+}
+
+export const getNormalisedConnectedEmails = (
   connectedAddresses?: Addresses | null
-): EmailSelectListItem[] {
+): EmailSelectListItem[] => {
   if (!connectedAddresses) return []
   return connectedAddresses
     .filter((address) => {
@@ -37,6 +44,26 @@ export default function (
       return {
         type: address.rc.addr_type as OAuthAddressType | EmailAddressType,
         email: address.qc.alias,
+        addressURN: address.baseUrn as AddressURN,
+      }
+    })
+}
+
+export const getNormalisedSmartContractWallets = (
+  connectedAddresses?: Addresses | null
+): SCWalletSelectListItem[] => {
+  if (!connectedAddresses) return []
+  return connectedAddresses
+    .filter((address) => {
+      return (
+        address.rc.node_type === NodeType.Crypto &&
+        address.rc.addr_type === CryptoAddressType.Wallet
+      )
+    })
+    .map((address) => {
+      return {
+        address: address.qc.alias,
+        type: address.rc.addr_type as CryptoAddressType.Wallet,
         addressURN: address.baseUrn as AddressURN,
       }
     })

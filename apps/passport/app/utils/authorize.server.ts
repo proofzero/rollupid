@@ -1,9 +1,9 @@
-import { getAccountClient, getAddressClient } from '~/platform.server'
-import getNormalisedConnectedEmails from '@proofzero/utils/getNormalisedConnectedEmails'
+import { getAccountClient } from '~/platform.server'
+import {
+  getNormalisedConnectedEmails,
+  getNormalisedSmartContractWallets,
+} from '@proofzero/utils/getNormalisedConnectedAccounts'
 
-import type { AccountURN } from '@proofzero/urns/account'
-import type { PersonaData } from '@proofzero/types/application'
-import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
 import { UnauthorizedError } from '@proofzero/errors'
 import { createConsoleParamsSession } from '~/session.server'
 
@@ -14,6 +14,13 @@ import {
   SCOPE_EMAIL,
   SCOPE_SMART_CONTRACT_WALLET,
 } from '@proofzero/security/scopes'
+
+import type { AccountURN } from '@proofzero/urns/account'
+import type { PersonaData } from '@proofzero/types/application'
+import type {
+  EmailSelectListItem,
+  SCWalletSelectListItem,
+} from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 export type DataForScopes = {
   connectedEmails?: EmailSelectListItem[]
@@ -52,9 +59,9 @@ export const getDataForScopes = async (
   if (!accountURN)
     throw new UnauthorizedError({ message: 'Account URN is required' })
 
-  let connectedEmails: EmailSelectListItem[]
-  let connectedAddresses: AddressURN[]
-  let connectedSmartContractWallet: AddressURN[]
+  let connectedSmartContractWallet: SCWalletSelectListItem[] = []
+  let connectedEmails: EmailSelectListItem[] = []
+  let connectedAddresses: AddressURN[] = []
 
   const accountClient = getAccountClient(jwt || '', env, traceSpan)
 
@@ -70,7 +77,8 @@ export const getDataForScopes = async (
       connectedAccounts?.map((a) => a.baseUrn as AddressURN) || []
   }
   if (requestedScope.includes(SCOPE_SMART_CONTRACT_WALLET.toString())) {
-    connectedSmartContractWallet = getSmartContractWallets(connectedAccounts)
+    connectedSmartContractWallet =
+      getNormalisedSmartContractWallets(connectedAccounts)
   }
 
   const personaData: PersonaData = {}
