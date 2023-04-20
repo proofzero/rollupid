@@ -1,10 +1,8 @@
 import { z } from 'zod'
 import { Context } from '../context'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
-import { EdgeSpace, EdgeURN } from '@proofzero/urns/edge'
 import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
-
-export const ADDRESS_APP_REF_TO: EdgeURN = EdgeSpace.urn('refTo/app')
+import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 
 export const UpsertAppContactAddressInput = z.object({
   clientId: z.string(),
@@ -31,7 +29,7 @@ export const upsertAppContactAddress = async ({
   const { edges } = await ctx.edges.getEdges.query({
     query: {
       dst: { baseUrn: appURN },
-      tag: ADDRESS_APP_REF_TO,
+      tag: EDGE_HAS_REFERENCE_TO,
     },
   })
 
@@ -41,7 +39,7 @@ export const upsertAppContactAddress = async ({
 
   for (let i = 0; i < edges.length; i++) {
     await ctx.edges.removeEdge.mutate({
-      tag: ADDRESS_APP_REF_TO,
+      tag: EDGE_HAS_REFERENCE_TO,
       src: edges[i].src.baseUrn,
       dst: edges[i].dst.baseUrn,
     })
@@ -50,6 +48,6 @@ export const upsertAppContactAddress = async ({
   await ctx.edges.makeEdge.mutate({
     src: input.address,
     dst: appURN,
-    tag: ADDRESS_APP_REF_TO,
+    tag: EDGE_HAS_REFERENCE_TO,
   })
 }

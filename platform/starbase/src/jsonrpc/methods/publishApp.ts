@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
-import { ADDRESS_APP_REF_TO } from './upsertAppContactAddress'
+import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 
 export const PublishAppInput = z.object({
   clientId: z.string(),
@@ -41,7 +41,7 @@ export const publishApp = async ({
   const { edges } = await ctx.edges.getEdges.query({
     query: {
       dst: { baseUrn: appURN },
-      tag: ADDRESS_APP_REF_TO,
+      tag: EDGE_HAS_REFERENCE_TO,
     },
   })
 

@@ -4,7 +4,7 @@ import { AppClientIdParamSchema } from '../validators/app'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { AddressURN } from '@proofzero/urns/address'
-import { ADDRESS_APP_REF_TO } from './upsertAppContactAddress'
+import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 
 export const GetAppContactAddressInput = AppClientIdParamSchema
 export const GetAppContactAddressOutput = AddressURNInput.optional()
@@ -28,7 +28,7 @@ export const getAppContactAddress = async ({
   const { edges } = await ctx.edges.getEdges.query({
     query: {
       dst: { baseUrn: appURN },
-      tag: ADDRESS_APP_REF_TO,
+      tag: EDGE_HAS_REFERENCE_TO,
     },
   })
 

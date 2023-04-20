@@ -8,7 +8,6 @@ import {
   generateTraceContextHeaders,
   TraceSpan,
 } from '@proofzero/platform-middleware/trace'
-import { EdgeSpace, EdgeURN } from '@proofzero/urns/edge'
 import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 import {
@@ -22,8 +21,7 @@ import {
   PersonaData,
 } from '@proofzero/types/application'
 import { AnyURN } from '@proofzero/urns'
-
-export const EDGE_HAS_REFERENCE_TO: EdgeURN = EdgeSpace.urn('has/refTo')
+import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 
 export async function validatePersonaData(
   accountUrn: AccountURN,
