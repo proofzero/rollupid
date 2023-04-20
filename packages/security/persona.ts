@@ -90,11 +90,14 @@ export async function validatePersonaData(
         account: accountUrn,
       })
 
+      const ownedAddressURNList =
+        accountAddresses?.map((aa) => aa.baseUrn) || []
+
       //Check if authorized address set is fully owned by the account doing the authorization
       if (
         !accountAddresses ||
-        !accountAddresses.every((e) =>
-          authorizedAddressUrns.includes(e.baseUrn as AddressURN)
+        !authorizedAddressUrns.every((addressURN) =>
+          ownedAddressURNList.includes(addressURN)
         )
       ) {
         throw new UnauthorizedError({
