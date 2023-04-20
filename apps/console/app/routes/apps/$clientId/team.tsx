@@ -13,8 +13,7 @@ import createAccountClient from '@proofzero/platform-clients/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
-import type { TraceSpan } from '@proofzero/platform-middleware/trace'
-import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
+import { AccountURN } from '@proofzero/urns/account'
 
 import getNormalisedConnectedEmails, {
   EmailSelectListItem,
@@ -25,49 +24,23 @@ import { EmailSelect } from '@proofzero/design-system/src/atoms/email/EmailSelec
 import { AddressURN } from '@proofzero/urns/address'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
-const getAccountClient = (jwt: string, env: any, traceSpan: TraceSpan) => {
-  return createAccountClient(env.Account, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(traceSpan),
-  })
-}
-
-export const loader: LoaderFunction = async ({ request, context, params }) => {
-  const clientId = params.clientId as string
-
+export const loader: LoaderFunction = async ({ request, context }) => {
   const jwt = await requireJWT(request)
   const payload = checkToken(jwt)
-  const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-  if (
-    !AccountURNSpace.is(payload.sub!) ||
-    !(await accountClient.isValid.query())
-  )
-    throw new Error('Foo')
-
   const accountURN = payload.sub as AccountURN
 
-  const connectedAccounts = await accountClient.getAddresses.query({
-    account: accountURN,
-  })
-
-  if (!connectedAccounts || !connectedAccounts.length) {
-    throw new Error('Bar')
-  }
-
-  const connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
-
-  const starbaseClient = createStarbaseClient(Starbase, {
+  const accountClient = createAccountClient(Account, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...generateTraceContextHeaders(context.traceSpan),
   })
 
-  const appContactAddress = await starbaseClient.getAppContactAddress.query({
-    clientId,
+  const connectedAccounts = await accountClient.getAddresses.query({
+    account: accountURN,
   })
+  const connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
 
   return {
     connectedEmails,
-    appContactAddress,
   }
 }
 
@@ -106,13 +79,13 @@ export default () => {
 
   const submit = useSubmit()
 
-  const { connectedEmails, appContactAddress } = useLoaderData<{
+  const { connectedEmails } = useLoaderData<{
     connectedEmails: EmailSelectListItem[]
-    appContactAddress: AddressURN | undefined
   }>()
 
-  const { PASSPORT_URL } = useOutletContext<{
+  const { PASSPORT_URL, appContactAddress } = useOutletContext<{
     PASSPORT_URL: string
+    appContactAddress?: AddressURN
   }>()
 
   const redirectToPassport = () => {

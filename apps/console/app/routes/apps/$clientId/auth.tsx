@@ -141,11 +141,8 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   })
 
   const scopeMeta = (await starbaseClient.getScopes.query()).scopes
-  const appContactAddress = await starbaseClient.getAppContactAddress.query({
-    clientId: params.clientId,
-  })
 
-  return json({ scopeMeta, appContactAddress })
+  return json({ scopeMeta })
 }
 
 export const action: ActionFunction = async ({ request, params, context }) => {
@@ -239,11 +236,10 @@ export default function AppDetailIndexPage() {
     notificationHandler: notificationHandlerType
     appDetails: appDetailsProps
     rotationResult: any
+    appContactAddress?: AddressURN
   }>()
-  const {
-    scopeMeta,
-    appContactAddress,
-  }: { scopeMeta: ScopeMeta; appContactAddress?: AddressURN } = useLoaderData()
+  const { appContactAddress } = outletContextData
+  const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
 
   const [isFormChanged, setIsFormChanged] = useState(false)
   const [isImgUploading, setIsImgUploading] = useState(false)

@@ -20,10 +20,12 @@ import {
 } from '@proofzero/design-system/src/atoms/toast'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import type { LoaderData as OutletContextData } from '~/root'
+import { AddressURN } from '@proofzero/urns/address'
 
 type LoaderData = {
   appDetails: appDetailsProps
   rotationResult?: RotatedSecrets
+  appContactAddress?: AddressURN
 }
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
@@ -67,9 +69,14 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
       appDetails.secretTimestamp = appDetails.apiKeyTimestamp = Date.now()
     }
 
+    const appContactAddress = await starbaseClient.getAppContactAddress.query({
+      clientId: params.clientId,
+    })
+
     return json<LoaderData>({
       appDetails: appDetails as appDetailsProps,
       rotationResult,
+      appContactAddress,
     })
   } catch (error) {
     console.error('Caught error in loader', { error })
@@ -87,7 +94,7 @@ export default function AppDetailIndexPage() {
 
   const { apps, avatarUrl, PASSPORT_URL, displayName } =
     useOutletContext<OutletContextData>()
-  const { appDetails, rotationResult } = loaderData
+  const { appDetails, rotationResult, appContactAddress } = loaderData
 
   const notify = (success: boolean = true) => {
     if (success) {
@@ -136,6 +143,7 @@ export default function AppDetailIndexPage() {
                   appDetails,
                   rotationResult,
                   PASSPORT_URL,
+                  appContactAddress,
                 }}
               />
             </section>
