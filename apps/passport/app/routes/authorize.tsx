@@ -360,6 +360,7 @@ const scopeIcons: Record<string, string> = {
   connected_accounts: addressClassIcon,
   profile: profileClassIcon,
   email: emailClassIcon,
+  smart_contract_wallet: smartContractWalletClassIcon,
 }
 
 export default function Authorize() {

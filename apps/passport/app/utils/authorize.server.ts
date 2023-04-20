@@ -8,10 +8,16 @@ import { UnauthorizedError } from '@proofzero/errors'
 import { createConsoleParamsSession } from '~/session.server'
 
 import { GetAddressProfileResult } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressProfile'
+import { AddressURN } from '@proofzero/urns/address'
+import {
+  SCOPE_CONNECTED_ADDRESSS,
+  SCOPE_EMAIL,
+  SCOPE_SMART_CONTRACT_WALLET,
+} from '@proofzero/security/scopes'
 
 export type DataForScopes = {
-  connectedEmails: EmailSelectListItem[]
-  personaData: PersonaData
+  connectedEmails?: EmailSelectListItem[]
+  personaData?: PersonaData
   requestedScope: string[]
   connectedAccounts: GetAddressProfileResult[]
 }
@@ -46,22 +52,25 @@ export const getDataForScopes = async (
   if (!accountURN)
     throw new UnauthorizedError({ message: 'Account URN is required' })
 
-  let connectedEmails: EmailSelectListItem[] = []
-  let connectedAddresses: GetAddressProfileResult[] = []
+  let connectedEmails: EmailSelectListItem[]
+  let connectedAddresses: AddressURN[]
+  let connectedSmartContractWallet: AddressURN[]
 
   const accountClient = getAccountClient(jwt || '', env, traceSpan)
 
   const connectedAccounts = await accountClient.getAddresses.query({
     account: accountURN,
   })
-  if (connectedAccounts && connectedAccounts.length) {
+
+  if (requestedScope.includes(SCOPE_EMAIL.toString())) {
     connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
-    connectedAddresses = await Promise.all(
-      connectedAccounts.map((ca) => {
-        const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
-        return addressClient.getAddressProfile.query()
-      })
-    )
+  }
+  if (requestedScope.includes(SCOPE_CONNECTED_ADDRESSS.toString())) {
+    connectedAddresses =
+      connectedAccounts?.map((a) => a.baseUrn as AddressURN) || []
+  }
+  if (requestedScope.includes(SCOPE_SMART_CONTRACT_WALLET.toString())) {
+    connectedSmartContractWallet = getSmartContractWallets(connectedAccounts)
   }
 
   const personaData: PersonaData = {}
