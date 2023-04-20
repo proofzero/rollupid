@@ -95,7 +95,6 @@ export async function validatePersonaData(
 
       //Check if authorized address set is fully owned by the account doing the authorization
       if (
-        ownedAddressURNList.length === 0 ||
         !authorizedAddressUrns.every((addressURN) =>
           ownedAddressURNList.includes(addressURN)
         )
