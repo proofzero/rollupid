@@ -13,7 +13,7 @@ export type DataForScopes = {
   connectedEmails: EmailSelectListItem[]
   personaData: PersonaData
   requestedScope: string[]
-  connectedAddresses: GetAddressProfileResult[]
+  connectedAccounts: GetAddressProfileResult[]
 }
 
 // Deterministically sort scopes so that they are always in the same order
@@ -70,7 +70,7 @@ export const getDataForScopes = async (
     connectedEmails,
     personaData,
     requestedScope: reorderScope(requestedScope),
-    connectedAddresses,
+    connectedAccounts: connectedAddresses,
   }
 }
 

@@ -105,7 +105,7 @@ Call this method to retrieve basic identity information for the user.
     picture: '(URL of some picture here)',
     email: '(email address connected to the account)',
     sub: '(unique identifier of the account aka. accountURN)',
-    connected_addresses: [
+    connected_accounts: [
       {
         type: 'eth',
         alias: '(eth address)'
