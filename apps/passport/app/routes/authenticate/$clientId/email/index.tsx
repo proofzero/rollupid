@@ -3,24 +3,18 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { redirect } from '@remix-run/cloudflare'
-import {
-  Form,
-  useNavigate,
-  useOutletContext,
-  useTransition,
-} from '@remix-run/react'
-import { useState } from 'react'
+import { Form, useNavigate, useOutletContext } from '@remix-run/react'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
 
 export const action: ActionFunction = async ({ request, params }) => {
   const fd = await request.formData()
 
-  const address = fd.get('address')
-  if (!address) throw new Error('No address included in request')
+  const email = fd.get('email')
+  if (!email) throw new Error('No address included in request')
 
   const qp = new URLSearchParams()
-  qp.append('address', address as string)
+  qp.append('email', email as string)
 
   return redirect(
     `/authenticate/${params.clientId}/email/verify?${qp.toString()}`
@@ -32,9 +26,6 @@ export default () => {
     connectFlow: boolean
   }>()
 
-  const [isValidEmail, setIsValidEmail] = useState(false)
-
-  const transition = useTransition()
   const navigate = useNavigate()
 
   return (
@@ -67,15 +58,11 @@ export default () => {
         </section>
         <section className="flex-1">
           <Input
-            type="address"
-            id="address"
+            type="email"
+            id="email"
             label="Enter your email address"
-            pattern="[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
             className="h-12 rounded-lg"
             autoFocus
-            onChange={(e) => {
-              setIsValidEmail(e.target.validity.valid)
-            }}
           />
         </section>
         <section>
@@ -84,7 +71,6 @@ export default () => {
             btnSize="xl"
             btnType="primary-alt"
             className="w-full"
-            disabled={!isValidEmail || transition.state === 'loading'}
           >
             Send Code
           </Button>

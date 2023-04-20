@@ -27,11 +27,11 @@ import { Button, Text } from '@proofzero/design-system'
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const qp = new URL(request.url).searchParams
 
-  const address = qp.get('address')
-  if (!address) throw new Error('No address included in request')
+  const email = qp.get('email')
+  if (!email) throw new Error('No address included in request')
 
   return json({
-    address,
+    email,
     clientId: params.clientId,
   })
 }
@@ -75,7 +75,7 @@ export default () => {
     connectFlow: boolean
   }>()
 
-  const { address, clientId } = useLoaderData()
+  const { email, clientId } = useLoaderData()
   const ad = useActionData()
   const submit = useSubmit()
   const navigate = useNavigate()
@@ -128,7 +128,7 @@ export default () => {
 
       <EmailOTPValidator
         loading={transition.state !== 'idle' || fetcher.state !== 'idle'}
-        email={address}
+        email={email}
         state={state}
         invalid={ad?.error}
         requestRegeneration={async () => {
@@ -137,7 +137,7 @@ export default () => {
         requestVerification={async (email, code, state) => {
           submit(
             {
-              address: email,
+              email,
               code,
               state,
             },

@@ -1,18 +1,41 @@
-import { RequestLike, Router } from 'itty-router'
-import {
-  fetchRequestHandler,
-  FetchCreateContextFnOptions,
-} from '@trpc/server/adapters/fetch'
+import { IRequest, RequestLike, Router } from 'itty-router'
 
 import type { Environment, CloudflareEmailMessage } from './types'
 
 const router = Router() // no "new", as this is not a real class
 
-// register a route on the "GET" method
-router.get('/otp/:email', (req) => {
-  const { params, query } = req
+const withToken = (request: IRequest, env: Environment) => {
+  if (!env.SECRET_TEST_API_TOKEN) {
+    return new Response('Missing Auth Token', { status: 401 })
+  }
+  console.log({
+    token: request.headers.get('Authentication'),
+    headers: JSON.stringify(request.headers),
+  })
+  if (
+    request.headers.get('Authentication') !==
+    `Bearer ${env.SECRET_TEST_API_TOKEN}`
+  ) {
+    return new Response('Unauthorized', { status: 401 })
+  }
+}
 
-  console.log({ params, query })
+router.get('/otp/:email', withToken, async (req, env) => {
+  const { params } = req
+
+  const otp = await env.otp_test.get(params.email, 'text')
+  return new Response(otp)
+})
+
+router.post('/otp/:email', withToken, async (req, env) => {
+  const { params } = req
+  const otpMessage = await req.text()
+  const otp = parseOTPFromMessage(otpMessage)
+
+  console.log({ to: params.email, otp })
+
+  await env.otp_test.put(params.email, otp)
+  return new Response(otp)
 })
 
 // alternative advanced/manual approach for downstream control
@@ -30,8 +53,42 @@ export default {
       }),
 
   async email(message: CloudflareEmailMessage, env: Environment) {
-    //TODO: Implement email masking
     //This is where you'd receive an email, check destination
     //address, lookup unmasked address and forward
+    const rawEmail = await streamToArrayBuffer(message.raw, message.rawSize)
+    const messageBody = new TextDecoder().decode(rawEmail)
+    console.log('Raw: ', messageBody)
+
+    const otp = parseOTPFromMessage(messageBody)
+
+    console.log({ to: message.to, otp })
+    await env.otp_test.put(message.to, otp)
   },
+}
+
+async function streamToArrayBuffer(
+  stream: ReadableStream<any>,
+  streamSize: number
+) {
+  let result = new Uint8Array(streamSize)
+  let bytesRead = 0
+  const reader = stream.getReader()
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) {
+      break
+    }
+    result.set(value, bytesRead)
+    bytesRead += value.length
+  }
+  return result
+}
+
+function parseOTPFromMessage(messageBody: string) {
+  const otpMatch = messageBody.match(/Your Rollup.id verification code is (.+)/)
+  if (!otpMatch) {
+    throw new Error('Could not parse OTP from email')
+  }
+  const otp = otpMatch[1]
+  return otp
 }

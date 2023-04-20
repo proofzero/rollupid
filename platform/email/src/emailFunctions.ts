@@ -34,6 +34,18 @@ export async function send(
   ) {
     //We're running locally, so we don't send the email but only log it's content to console
     console.info('Email:', message)
+    if (env.Test) {
+      await env.Test.fetch(
+        `http://localhost/otp/${message.recipient.address}`,
+        {
+          method: 'POST',
+          headers: {
+            Authentication: `Bearer ${env.SECRET_TEST_API_TEST_TOKEN}`,
+          },
+          body: message.content.body,
+        }
+      )
+    }
     return
   }
 

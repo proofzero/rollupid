@@ -144,6 +144,7 @@ export default function EmailOTPValidator({
                   inputRefs[(i + 1) % inputLen].current.focus()
                   inputRefs[(i + 1) % inputLen].current.select()
                 }
+                updateFullCode()
               }}
               onKeyDown={(ev) => {
                 if (

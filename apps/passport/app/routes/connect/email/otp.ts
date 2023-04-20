@@ -11,13 +11,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   try {
     const qp = new URL(request.url).searchParams
 
-    const address = qp.get('address')
-    if (!address) throw new Error('No address included in request')
+    const email = qp.get('email')
+    if (!email) throw new Error('No address included in request')
 
     const addressURN = AddressURNSpace.componentizedUrn(
-      generateHashedIDRef(EmailAddressType.Email, address),
+      generateHashedIDRef(EmailAddressType.Email, email),
       { node_type: NodeType.Email, addr_type: EmailAddressType.Email },
-      { alias: address, hidden: 'true' }
+      { alias: email, hidden: 'true' }
     )
 
     const addressClient = getAddressClient(
@@ -27,7 +27,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     )
 
     const state = await addressClient.generateEmailOTP.mutate({
-      address,
+      email,
     })
     return json({ state })
   } catch (e) {
@@ -38,13 +38,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
-  const address = formData.get('address') as string
-  if (!address) throw new Error('No address included in request')
+  const email = formData.get('email') as string
+  if (!email) throw new Error('No email address included in request')
 
   const addressURN = AddressURNSpace.componentizedUrn(
-    generateHashedIDRef(EmailAddressType.Email, address),
+    generateHashedIDRef(EmailAddressType.Email, email),
     { node_type: NodeType.Email, addr_type: EmailAddressType.Email },
-    { alias: address, hidden: 'true' }
+    { alias: email, hidden: 'true' }
   )
   const addressClient = getAddressClient(
     addressURN,

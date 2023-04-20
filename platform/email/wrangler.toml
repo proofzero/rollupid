@@ -5,6 +5,10 @@ compatibility_date = "2022-10-05"
 
 workers_dev = false
 
+services = [
+  { binding = "Test", service = "test" },
+]
+
 [dev]
 port = 10105
 inspector_port = 11105

@@ -87,7 +87,9 @@ jobs:
         run: yarn playwright test
         working-directory: 'apps/passport'
         env:
-          PLAYWRIGHT_BASE_URL: https://passport-dev.rollup.id
+          INTERNAL_PLAYWRIGHT_BASE_URL: https://passport-dev.rollup.id
+          INTERNAL_PLAYWRIGHT_TEST_URL: ${{ secrets.INTERNAL_PLAYWRIGHT_TEST_URL }}
+          SECRET_TEST_API_TOKEN: ${{ secrets.SECRET_TEST_API_TEST_TOKEN }}
           INTERNAL_TWITTER_TEST_USERNAME: ${{ secrets.INTERNAL_TWITTER_TEST_USERNAME }}
           SECRET_TWITTER_TEST_USER_PASSWORD: ${{ secrets.SECRET_TWITTER_TEST_USER_PASSWORD }}
           INTERNAL_GOOGLE_TEST_USERNAME: ${{ secrets.INTERNAL_GOOGLE_TEST_USERNAME }}
