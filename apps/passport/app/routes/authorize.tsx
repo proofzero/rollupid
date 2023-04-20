@@ -382,7 +382,7 @@ export default function Authorize() {
   const [persona] = useState<PersonaData>(personaData)
 
   const [selectedEmail, setSelectedEmail] = useState<EmailSelectListItem>()
-  const [selectedAddresses, setSelectedAddresses] = useState<
+  const [selectedConnectedAddresses, setSelectedConnectedAddresses] = useState<
     Array<AddressURN> | Array<AuthorizationControlSelection>
   >([])
 
@@ -424,12 +424,12 @@ export default function Authorize() {
 
     if (
       requestedScope.includes('connected_addresses') &&
-      selectedAddresses.length > 0
+      selectedConnectedAddresses.length > 0
     ) {
-      if (selectedAddresses[0] === AuthorizationControlSelection.ALL) {
+      if (selectedConnectedAddresses[0] === AuthorizationControlSelection.ALL) {
         personaData.connected_addresses = AuthorizationControlSelection.ALL
       } else {
-        personaData.connected_addresses = selectedAddresses
+        personaData.connected_addresses = selectedConnectedAddresses
       }
     }
 
@@ -549,12 +549,12 @@ export default function Authorize() {
                                   ca.type === 'eth' ? 'metamask' : ca.type,
                               }))}
                               onSelect={(addresses) => {
-                                setSelectedAddresses(
+                                setSelectedConnectedAddresses(
                                   addresses.map((a) => a.addressURN)
                                 )
                               }}
                               onSelectAll={() => {
-                                setSelectedAddresses([
+                                setSelectedConnectedAddresses([
                                   AuthorizationControlSelection.ALL,
                                 ])
                               }}
@@ -615,7 +615,7 @@ export default function Authorize() {
                     (requestedScope.includes('email') &&
                       (!connectedEmails?.length || !selectedEmail)) ||
                     (requestedScope.includes('connected_addresses') &&
-                      !selectedAddresses?.length)
+                      !selectedConnectedAddresses?.length)
                   }
                   onClick={() => {
                     authorizeCallback(requestedScope)
