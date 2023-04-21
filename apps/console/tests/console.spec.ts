@@ -13,9 +13,9 @@ test('login to console using Email', async ({ page, request }) => {
   // Expects the URL to contain intro.
   await expect(page).toHaveURL(/.*authenticate\/console/)
 
-  // Login with Twitter
+  // Login with Email
   await page.getByRole('button', { name: 'email' }).click()
-  await page.waitForURL(/.*authenticate\/passport\/email/, {
+  await page.waitForURL(/.*authenticate\/console\/email/, {
     timeout: 5000,
     waitUntil: 'networkidle',
   })
