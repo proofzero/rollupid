@@ -1,12 +1,5 @@
 import { test, expect } from '@playwright/test'
 
-test('has title', async ({ page }) => {
-  await page.goto('/')
-
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Console/)
-})
-
 test('login to console using Email', async ({ page, request }) => {
   await page.goto('/')
 
@@ -58,4 +51,6 @@ test('login to console using Email', async ({ page, request }) => {
     waitUntil: 'networkidle',
   })
   await expect(page).toHaveURL(/.*dashboard/)
+  // Expect a title "to contain" a substring.
+  await expect(page).toHaveTitle(/Console/)
 })
