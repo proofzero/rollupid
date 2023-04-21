@@ -50,8 +50,10 @@ jobs:
             INTERNAL_DKIM_DOMAIN
             INTERNAL_DKIM_SELECTOR
             KEY_DKIM_PRIVATEKEY
+            SECRET_TEST_API_TOKEN
         env:
           NODE_ENV: 'development'
           INTERNAL_DKIM_DOMAIN: ${{ secrets.INTERNAL_DKIM_DOMAIN }}
           INTERNAL_DKIM_SELECTOR: ${{ secrets.INTERNAL_DKIM_SELECTOR }}
           KEY_DKIM_PRIVATEKEY: ${{ secrets.KEY_DKIM_PRIVATEKEY }}
+          SECRET_TEST_API_TOKEN: ${{ secrets.SECRET_TEST_API_TEST_TOKEN }}
