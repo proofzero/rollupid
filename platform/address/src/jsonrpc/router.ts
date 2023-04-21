@@ -50,7 +50,11 @@ import { parse3RN } from './middlewares/parse3RN'
 import { checkCryptoNodes } from './middlewares/checkCryptoNode'
 import { initAddressNode } from './middlewares/initAddressNode'
 import { getAccountMethod, GetAccountOutput } from './methods/getAccount'
-import { InitVaultOutput, initVaultMethod } from './methods/initVault'
+import {
+  InitSmartContractWalletInput,
+  InitSmartContractWalletOutput,
+  initSmartContractWalletMethod,
+} from './methods/initSmartContractWallet'
 import { checkOAuthNode } from './middlewares/checkOAuthNode'
 
 import { Analytics } from '@proofzero/platform-middleware/analytics'
@@ -209,14 +213,13 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(SetOAuthDataInput)
     .mutation(setOAuthDataMethod),
-  initVault: t.procedure
+  initSmartContractWallet: t.procedure
     .use(LogUsage)
     .use(parse3RN)
-    .use(checkOAuthNode)
     .use(setAddressNodeClient)
-    .use(initAddressNode)
-    .output(InitVaultOutput)
-    .mutation(initVaultMethod),
+    .input(InitSmartContractWalletInput)
+    .output(InitSmartContractWalletOutput)
+    .mutation(initSmartContractWalletMethod),
   deleteAddressNode: t.procedure
     .use(LogUsage)
     .use(parse3RN)

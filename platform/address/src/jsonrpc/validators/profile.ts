@@ -12,6 +12,7 @@ export const AddressProfileSchema = z.object({
   icon: z.string().optional(),
   type: z.union([
     z.literal(CryptoAddressType.ETH),
+    z.literal(CryptoAddressType.Wallet),
     z.literal(EmailAddressType.Email),
     z.literal(OAuthAddressType.Apple),
     z.literal(OAuthAddressType.Discord),

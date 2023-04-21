@@ -112,12 +112,10 @@ const getCryptoAddressProfile = async (
   const ensClient = new ENSUtils()
   const { avatar, displayName } = await ensClient.getEnsEntry(address)
 
-  const newProfile = {
+  return {
     address: address,
     title: displayName || '',
     icon: avatar || '',
     type: CryptoAddressType.ETH,
   }
-
-  return newProfile
 }
