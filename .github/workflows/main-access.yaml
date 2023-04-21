@@ -51,5 +51,5 @@ jobs:
             SECRET_JWKS
         env:
           NODE_ENV: 'development'
-          SECRET_JWK_CURRENT_KID: ${{ secrets.SECRET_JWK_CURRENT_KID }}
-          SECRET_JWKS: ${{ secrets.SECRET_JWKS }}
+          SECRET_JWK_CURRENT_KID: ${{ secrets.SECRET_JWK_CURRENT_KID_DEV }}
+          SECRET_JWKS: ${{ secrets.SECRET_JWKS_DEV }}

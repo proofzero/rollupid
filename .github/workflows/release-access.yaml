@@ -49,5 +49,5 @@ jobs:
             SECRET_JWK_CURRENT_KID
             SECRET_JWKS
         env:
-          SECRET_JWK_CURRENT_KID: ${{ secrets.SECRET_JWK_CURRENT_KID }}
-          SECRET_JWKS: ${{ secrets.SECRET_JWKS }}
+          SECRET_JWK_CURRENT_KID: ${{ secrets.SECRET_JWK_CURRENT_KID_PROD }}
+          SECRET_JWKS: ${{ secrets.SECRET_JWKS_PROD }}
