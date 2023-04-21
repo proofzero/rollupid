@@ -11,6 +11,7 @@ import {
 } from '@proofzero/platform-middleware/inputValidators'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { ERROR_CODES, RollupError } from '@proofzero/errors'
+import { getAddressUsage } from './getAddressUsage'
 
 export const UnsetAccountInput = AccountURNInput
 
@@ -48,6 +49,14 @@ export const unsetAccountMethod = async ({
     throw new RollupError({
       code: ERROR_CODES.BAD_REQUEST,
       message: 'Cannot disconnect primary address',
+    })
+  }
+
+  const addressUsage = await getAddressUsage({ ctx })
+  if (addressUsage.length > 0) {
+    throw new RollupError({
+      code: ERROR_CODES.BAD_REQUEST,
+      message: `Cannot disconnect active address (${addressUsage.join(', ')})`,
     })
   }
 
