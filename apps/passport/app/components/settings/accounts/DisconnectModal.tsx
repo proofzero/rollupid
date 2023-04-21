@@ -42,7 +42,7 @@ export default ({
   const localFetcher = useFetcher()
 
   useEffect(() => {
-    if (id === primaryAddressBaseURN) {
+    if (!isOpen || id === primaryAddressBaseURN) {
       return
     }
 
@@ -55,7 +55,7 @@ export default ({
         action: '/settings/accounts/usage',
       }
     )
-  }, [id, primaryAddressBaseURN])
+  }, [id, primaryAddressBaseURN, isOpen])
 
   const canDisconnect =
     id !== primaryAddressBaseURN && localFetcher.data?.length === 0
@@ -134,7 +134,11 @@ export default ({
                       </Text>
 
                       {aum.external && (
-                        <a href={aum.path} target="_blank">
+                        <a
+                          href={aum.path}
+                          target="_blank"
+                          onClick={() => setIsOpen(false)}
+                        >
                           <Text
                             size="sm"
                             weight="medium"
@@ -147,7 +151,7 @@ export default ({
                       )}
 
                       {!aum.external && (
-                        <Link to={aum.path}>
+                        <Link to={aum.path} onClick={() => setIsOpen(false)}>
                           <Text
                             size="sm"
                             weight="medium"
