@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 import { Context } from '../../context'
+import { ApplicationURNSpace } from '@proofzero/urns/application'
+import { AccessURNSpace } from '@proofzero/urns/access'
 
 export enum AddressUsage {
   Authorization = 'authorization',
@@ -27,8 +29,18 @@ export const getAddressUsage = async ({
 
   const usages: AddressUsage[] = []
 
-  if (edges.length >= 1) {
+  const contactEdges = edges.filter((e) =>
+    ApplicationURNSpace.is(e.src.baseUrn)
+  )
+  if (contactEdges.length > 0) {
     usages.push(AddressUsage.Contact)
+  }
+
+  const authorizationEdges = edges.filter((e) =>
+    AccessURNSpace.is(e.src.baseUrn)
+  )
+  if (authorizationEdges.length > 0) {
+    usages.push(AddressUsage.Authorization)
   }
 
   return usages
