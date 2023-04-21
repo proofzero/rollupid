@@ -28,24 +28,16 @@ export async function send(
   message: EmailMessage,
   env: Environment
 ): Promise<void> {
-  if (
-    !env.INTERNAL_DKIM_DOMAIN ||
-    env.INTERNAL_DKIM_DOMAIN === 'localhost.local'
-  ) {
-    //We're running locally, so we don't send the email but only log it's content to console
+  //We're running locally or in dev, so we don't send the email but only log it's content to console
+  if (env.Test) {
     console.info('Email:', message)
-    if (env.Test) {
-      await env.Test.fetch(
-        `http://localhost/otp/${message.recipient.address}`,
-        {
-          method: 'POST',
-          headers: {
-            Authentication: `Bearer ${env.SECRET_TEST_API_TEST_TOKEN}`,
-          },
-          body: message.content.body,
-        }
-      )
-    }
+    await env.Test.fetch(`http://localhost/otp/${message.recipient.address}`, {
+      method: 'POST',
+      headers: {
+        Authentication: `Bearer ${env.SECRET_TEST_API_TEST_TOKEN}`,
+      },
+      body: message.content.body,
+    })
     return
   }
 
