@@ -12,7 +12,7 @@ type JWKS = Array<Pair>
 export const getPrivateJWK = (context: Context): JWK => {
   try {
     const pairs: JWKS = JSON.parse(context.SECRET_JWKS)
-    const currentKid: string = JSON.parse(context.SECRET_JWK_CURRENT_KID)
+    const currentKid: string = context.SECRET_JWK_CURRENT_KID
     for (const pair of pairs) {
       if (pair.privateKey.kid === currentKid) {
         return pair.privateKey
