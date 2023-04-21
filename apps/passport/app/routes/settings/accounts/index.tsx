@@ -27,9 +27,10 @@ import type { AddressListItemProps } from '~/components/addresses/AddressListIte
 import warn from '~/assets/warning.svg'
 import { getValidatedSessionContext } from '~/session.server'
 import { setNewPrimaryAddress } from '~/utils/authenticate.server'
-import type { AddressURN } from '@proofzero/urns/address'
+import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
 import { ERROR_CODES, RollupError } from '@proofzero/errors'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
+import { AddressUsage } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressUsage'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const { jwt } = await getValidatedSessionContext(
@@ -162,37 +163,118 @@ const DisconnectModal = ({
   }
   primaryAddressURN: AddressURN
 }) => {
-  return (
+  const usageDict = {
+    [AddressUsage.Authorization]:
+      'Email is being used for app(s) authorizations.',
+    [AddressUsage.Contact]: 'Email is being used as contact in Console',
+  }
+  const primaryAddressBaseURN = AddressURNSpace.getBaseURN(primaryAddressURN)
+  const localFetcher = useFetcher()
+
+  useEffect(() => {
+    if (id === primaryAddressBaseURN) {
+      return
+    }
+
+    localFetcher.submit(
+      {
+        addressURN: id,
+      },
+      {
+        method: 'post',
+        action: '/settings/accounts/usage',
+      }
+    )
+  }, [id, primaryAddressBaseURN])
+
+  const canDisconnect =
+    id !== primaryAddressBaseURN && localFetcher.data?.length === 0
+
+  return localFetcher.state !== 'idle' ? (
+    <Loader />
+  ) : (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div
-        className={`min-w-[437px] relative transform rounded-lg  bg-white px-4 pt-5 pb-4
-         text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
+        className={`max-w-sm md:max-w-md lg:max-w-md w-[512px] relative transform rounded-lg bg-white text-left shadow-xl transition-all overflow-y-auto`}
       >
-        <div className=" flex items-start space-x-4">
+        <div className="flex flex-row space-x-4 p-6">
           <img src={warn} alt="Not Found" />
 
           <div className="flex-1">
-            <Text size="lg" weight="medium" className="text-gray-900 my-1">
-              Disconnect account
-            </Text>
-            {primaryAddressURN !== id ? (
-              <Text size="sm" weight="normal" className="text-gray-500 my-7">
-                Are you sure you want to disconnect {data.type} account
-                {data.title && (
-                  <>
-                    <span className="text-gray-800"> "{data.title}" </span>
-                  </>
-                )}
-                from Rollup? You might lose access to some functionality.
-              </Text>
-            ) : (
-              <Text size="sm" weight="normal" className="text-gray-500 my-7">
-                It looks like you are trying to disconnect your primary account.
-                You need to set another account as primary to be able to
-                disconnect this one.
+            {canDisconnect && (
+              <Text size="lg" weight="medium" className="text-gray-900">
+                Disconnect account
               </Text>
             )}
-            <fetcher.Form method="post" action="/settings/accounts/disconnect">
+
+            {!canDisconnect && (
+              <>
+                <Text size="lg" weight="medium" className="text-gray-900">
+                  You can't disconnect this account
+                </Text>
+
+                <Text size="sm" weight="normal" className="text-gray-500 mt-2">
+                  You can’t disconnect this account because:
+                </Text>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div>
+          {canDisconnect && (
+            <Text size="sm" weight="normal" className="text-gray-500 px-6">
+              Are you sure you want to disconnect {data.type} account
+              {data.title && (
+                <>
+                  <span className="text-gray-800"> "{data.title}" </span>
+                </>
+              )}
+              from Rollup? You might lose access to some functionality.
+            </Text>
+          )}
+
+          {!canDisconnect && (
+            <ul className="mb-6">
+              {primaryAddressBaseURN === id && (
+                <>
+                  <div className="w-full border-b border-gray-200"></div>
+                  <li className="py-3 px-6">
+                    <Text size="sm" weight="normal" className="text-gray-500">
+                      It looks like you are trying to disconnect your primary
+                      account. You need to set another account as primary to be
+                      able to disconnect this one.
+                    </Text>
+                  </li>
+                </>
+              )}
+
+              {primaryAddressBaseURN !== id &&
+                localFetcher.data?.length > 0 &&
+                localFetcher.data.map((fdi: AddressUsage) => (
+                  <>
+                    <div className="w-full border-b border-gray-200"></div>
+                    <li className="flex flex-row py-3 px-6">
+                      <Text
+                        size="sm"
+                        weight="normal"
+                        className="text-gray-500 flex-1"
+                      >
+                        {usageDict[fdi]}
+                      </Text>
+                    </li>
+                  </>
+                ))}
+              <div className="w-full border-b border-gray-200"></div>
+            </ul>
+          )}
+
+          {canDisconnect && (
+            <fetcher.Form
+              method="post"
+              action="/settings/accounts/disconnect"
+              className="p-6"
+            >
               <input type="hidden" name="id" value={id} />
 
               <div className="flex justify-end items-center space-x-3 mt-7">
@@ -203,14 +285,16 @@ const DisconnectModal = ({
                   Cancel
                 </Button>
 
-                {primaryAddressURN !== id && (
-                  <Button type="submit" btnType="dangerous">
-                    Disconnect
-                  </Button>
-                )}
+                <Button
+                  type="submit"
+                  btnType="dangerous"
+                  disabled={!canDisconnect}
+                >
+                  Disconnect
+                </Button>
               </div>
             </fetcher.Form>
-          </div>
+          )}
         </div>
       </div>
     </Modal>
