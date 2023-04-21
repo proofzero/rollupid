@@ -1,16 +1,11 @@
 import { AddressUsage } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressUsage'
 import type { ActionFunction } from '@remix-run/cloudflare'
+import { AddressUsageDisconnectModel } from '~/components/settings/accounts/DisconnectModal'
 import { getAddressClient } from '~/platform.server'
 import {
   getDefaultConsoleParams,
   getValidatedSessionContext,
 } from '~/session.server'
-
-export type AddressUsageModel = {
-  message: string
-  external: boolean
-  path: string
-}
 
 export const action: ActionFunction = async ({ request, context }) => {
   await getValidatedSessionContext(
@@ -29,24 +24,26 @@ export const action: ActionFunction = async ({ request, context }) => {
   )
 
   const usages = await addressClient.getAddressUsage.query()
-  const mappedUsages: AddressUsageModel[] = usages.map((u: AddressUsage) => {
-    switch (u) {
-      case AddressUsage.Authorization:
-        return {
-          message: 'Address is being used for app(s) authorizations.',
-          external: false,
-          path: '/settings/applications',
-        }
-      case AddressUsage.Contact:
-        return {
-          message: 'Address is being used as contact in Console.',
-          external: true,
-          path: `${context.env.CONSOLE_APP_URL}`,
-        }
-      default:
-        throw new Error(`Unknown address usage: ${u}`)
+  const mappedUsages: AddressUsageDisconnectModel[] = usages.map(
+    (u: AddressUsage) => {
+      switch (u) {
+        case AddressUsage.Authorization:
+          return {
+            message: 'Address is being used for app(s) authorizations.',
+            external: false,
+            path: '/settings/applications',
+          }
+        case AddressUsage.Contact:
+          return {
+            message: 'Address is being used as contact in Console.',
+            external: true,
+            path: `${context.env.CONSOLE_APP_URL}`,
+          }
+        default:
+          throw new Error(`Unknown address usage: ${u}`)
+      }
     }
-  })
+  )
 
   return mappedUsages
 }
