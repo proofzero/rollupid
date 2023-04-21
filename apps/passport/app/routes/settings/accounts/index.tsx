@@ -3,6 +3,7 @@ import {
   useFetcher,
   useNavigate,
   useSubmit,
+  Link,
 } from '@remix-run/react'
 
 import { useState, useEffect } from 'react'
@@ -30,7 +31,9 @@ import { setNewPrimaryAddress } from '~/utils/authenticate.server'
 import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
 import { ERROR_CODES, RollupError } from '@proofzero/errors'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
-import { AddressUsage } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressUsage'
+
+import { FiExternalLink } from 'react-icons/fi'
+import { AddressUsageModel } from './usage'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const { jwt } = await getValidatedSessionContext(
@@ -163,11 +166,6 @@ const DisconnectModal = ({
   }
   primaryAddressURN: AddressURN
 }) => {
-  const usageDict = {
-    [AddressUsage.Authorization]:
-      'Email is being used for app(s) authorizations.',
-    [AddressUsage.Contact]: 'Email is being used as contact in Console',
-  }
   const primaryAddressBaseURN = AddressURNSpace.getBaseURN(primaryAddressURN)
   const localFetcher = useFetcher()
 
@@ -251,7 +249,7 @@ const DisconnectModal = ({
 
               {primaryAddressBaseURN !== id &&
                 localFetcher.data?.length > 0 &&
-                localFetcher.data.map((fdi: AddressUsage) => (
+                localFetcher.data.map((aum: AddressUsageModel) => (
                   <>
                     <div className="w-full border-b border-gray-200"></div>
                     <li className="flex flex-row py-3 px-6">
@@ -260,8 +258,33 @@ const DisconnectModal = ({
                         weight="normal"
                         className="text-gray-500 flex-1"
                       >
-                        {usageDict[fdi]}
+                        {aum.message}
                       </Text>
+
+                      {aum.external && (
+                        <a href={aum.path} target="_blank">
+                          <Text
+                            size="sm"
+                            weight="medium"
+                            className="text-indigo-500 flex flex-row items-center space-x-2"
+                          >
+                            <span>Edit</span>
+                            <FiExternalLink className="text-indigo-500 w-4 h-4" />
+                          </Text>
+                        </a>
+                      )}
+
+                      {!aum.external && (
+                        <Link to={aum.path}>
+                          <Text
+                            size="sm"
+                            weight="medium"
+                            className="text-indigo-500 pr-6"
+                          >
+                            <span>Edit</span>
+                          </Text>
+                        </Link>
+                      )}
                     </li>
                   </>
                 ))}
