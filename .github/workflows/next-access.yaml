@@ -46,3 +46,9 @@ jobs:
           workingDirectory: platform/access
           command: publish --env next
           environment: next
+          secrets: |
+            SECRET_JWK_CURRENT_KID
+            SECRET_JWKS
+        env:
+          SECRET_JWK_CURRENT_KID: ${{ secrets.SECRET_JWK_CURRENT_KID_TEST }}
+          SECRET_JWKS: ${{ secrets.SECRET_JWKS_TEST }}

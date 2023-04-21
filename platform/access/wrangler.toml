@@ -20,9 +20,6 @@ analytics_engine_datasets = [
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
-[vars]
-INTERNAL_JWT_ISS = "http://localhost:10001"
-
 [dev]
 port = 10101
 inspector_port = 11101
@@ -45,9 +42,6 @@ analytics_engine_datasets = [
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
-[env.dev.vars]
-INTERNAL_JWT_ISS = "https://passport-dev.rollup.id"
-
 [env.next]
 durable_objects.bindings = [
   { name = "Access", class_name = "Access" },
@@ -65,9 +59,6 @@ analytics_engine_datasets = [
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
-[env.next.vars]
-INTERNAL_JWT_ISS = "https://passport-next.rollup.id"
-
 [env.current]
 durable_objects.bindings = [
   { name = "Access", class_name = "Access" },
@@ -84,9 +75,6 @@ analytics_engine_datasets = [
 ]
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
-
-[env.current.vars]
-INTERNAL_JWT_ISS = "https://passport.rollup.id"
 
 [[migrations]]
 tag = "v0"

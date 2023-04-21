@@ -1,17 +1,5 @@
-import { KeyLike, JWK } from 'jose'
-
 import { DeploymentMetadata } from '@proofzero/types'
 import { Scope } from '@proofzero/types/access'
-
-export interface KeyPair {
-  publicKey: KeyLike | Uint8Array
-  privateKey: KeyLike | Uint8Array
-}
-
-export interface KeyPairSerialized {
-  publicKey: JWK
-  privateKey: JWK
-}
 
 export interface Environment {
   Access: DurableObjectNamespace
@@ -21,7 +9,8 @@ export interface Environment {
   Edges: Fetcher
   Starbase: Fetcher
   Account: Fetcher
-  INTERNAL_JWT_ISS: string
+  SECRET_JWK_CURRENT_KID: string
+  SECRET_JWKS: string
 }
 
 export type AuthorizationParameters = {

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { decodeJwt } from 'jose'
+import * as jose from 'jose'
 
 import {
   ACCESS_TOKEN_OPTIONS,
@@ -12,6 +12,7 @@ import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 import { AccessJWTPayload, GrantType, Scope } from '@proofzero/types/access'
 
 import { Context } from '../../context'
+import { getJWKS, getPrivateJWK } from '../../jwk'
 import { initAuthorizationNodeByName, initAccessNodeByName } from '../../nodes'
 
 import {
@@ -20,6 +21,7 @@ import {
   MissingSubjectError,
   UnsupportedGrantTypeError,
 } from '../../errors'
+
 import { PersonaData } from '@proofzero/types/application'
 import {
   getClaimValues,
@@ -30,6 +32,7 @@ const AuthenticationCodeInput = z.object({
   grantType: z.literal(GrantType.AuthenticationCode),
   code: z.string(),
   clientId: z.string(),
+  issuer: z.string(),
 })
 
 type AuthenticationCodeInput = z.infer<typeof AuthenticationCodeInput>
@@ -45,6 +48,7 @@ const AuthorizationCodeInput = z.object({
   code: z.string(),
   clientId: z.string(),
   clientSecret: z.string(),
+  issuer: z.string(),
 })
 
 type AuthorizationCodeInput = z.infer<typeof AuthorizationCodeInput>
@@ -62,6 +66,7 @@ const RefreshTokenInput = z.object({
   refreshToken: z.string(),
   clientId: z.string(),
   clientSecret: z.string(),
+  issuer: z.string(),
 })
 
 type RefreshTokenInput = z.infer<typeof RefreshTokenInput>
@@ -120,7 +125,7 @@ const handleAuthenticationCode: ExchangeTokenMethod<
   AuthenticationCodeInput,
   AuthenticationCodeOutput
 > = async ({ ctx, input }) => {
-  const { code, clientId } = input
+  const { code, clientId, issuer } = input
 
   const authorizationNode = await initAuthorizationNodeByName(
     code,
@@ -138,10 +143,13 @@ const handleAuthenticationCode: ExchangeTokenMethod<
   await accessNode.storage.put({ account, clientId: 'rollup' })
 
   const { expirationTime } = AUTHENTICATION_TOKEN_OPTIONS
-  const issuer = ctx.INTERNAL_JWT_ISS
   const scope: Scope = (await authorizationNode.storage.get('scope')) || []
+
+  const jwk = getPrivateJWK(ctx)
+
   return {
     accessToken: await accessNode.class.generateAccessToken({
+      jwk,
       account,
       clientId,
       expirationTime,
@@ -155,7 +163,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   AuthorizationCodeInput,
   AuthorizationCodeOutput
 > = async ({ ctx, input }) => {
-  const { code, clientId, clientSecret } = input
+  const { code, clientId, clientSecret, issuer } = input
 
   const { valid } = await ctx.starbaseClient.checkAppAuth.query({
     clientId,
@@ -183,7 +191,6 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   const name = `${AccountURNSpace.decode(account)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
-  const issuer = ctx.INTERNAL_JWT_ISS
 
   await accessNode.storage.put({ account, clientId, personaData })
   const access = AccessURNSpace.componentizedUrn(name, { client_id: clientId })
@@ -200,7 +207,10 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     ctx.traceSpan
   )
 
+  const jwk = getPrivateJWK(ctx)
+
   const accessToken = await accessNode.class.generateAccessToken({
+    jwk,
     account,
     clientId,
     expirationTime,
@@ -209,6 +219,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   })
 
   const refreshToken = await accessNode.class.generateRefreshToken({
+    jwk,
     account,
     clientId,
     issuer,
@@ -226,6 +237,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     personaData
   )
   const idToken = await accessNode.class.generateIdToken({
+    jwk,
     account,
     clientId,
     expirationTime,
@@ -240,7 +252,7 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
   ctx,
   input,
 }) => {
-  const { refreshToken, clientId, clientSecret } = input
+  const { refreshToken, clientId, clientSecret, issuer } = input
 
   if (!ctx.starbaseClient) {
     throw new Error('missing starbase client')
@@ -253,7 +265,7 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
 
   if (!valid) throw InvalidClientCredentialsError
 
-  const payload = decodeJwt(refreshToken) as AccessJWTPayload
+  const payload = jose.decodeJwt(refreshToken) as AccessJWTPayload
   if (clientId != payload.aud[0]) throw MismatchClientIdError
   if (!payload.sub) throw MissingSubjectError
 
@@ -261,14 +273,17 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
   const name = `${AccountURNSpace.decode(account)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
 
-  await accessNode.class.verify(refreshToken)
+  const jwks = getJWKS(ctx)
+  await accessNode.class.verify(refreshToken, jwks)
 
   const scope = payload.scope.split(' ')
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
-  const issuer = ctx.INTERNAL_JWT_ISS
+
+  const jwk = getPrivateJWK(ctx)
 
   return {
     accessToken: await accessNode.class.generateAccessToken({
+      jwk,
       account,
       clientId,
       expirationTime,

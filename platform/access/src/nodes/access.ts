@@ -5,12 +5,12 @@ import * as jose from 'jose'
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
+import { InternalServerError } from '@proofzero/errors'
+
 import { AccountURN } from '@proofzero/urns/account'
 import type { Scope } from '@proofzero/types/access'
 
 import { JWT_OPTIONS } from '../constants'
-
-import type { KeyPair, KeyPairSerialized } from '../types'
 
 import {
   ExpiredTokenError,
@@ -18,6 +18,7 @@ import {
   TokenClaimValidationFailedError,
   TokenVerificationFailedError,
 } from '../errors'
+
 import { ClaimValueType } from '@proofzero/security/persona'
 
 type TokenStore = DurableObjectStorage | DurableObjectTransaction
@@ -35,6 +36,7 @@ type TokenState = {
 }
 
 type AccessTokenOptions = {
+  jwk: jose.JWK
   account: AccountURN
   clientId: string
   expirationTime: string
@@ -43,6 +45,7 @@ type AccessTokenOptions = {
 }
 
 type RefreshTokenOptions = {
+  jwk: jose.JWK
   account: AccountURN
   clientId: string
   issuer: string
@@ -50,6 +53,7 @@ type RefreshTokenOptions = {
 }
 
 type IdTokenOptions = {
+  jwk: jose.JWK
   account: AccountURN
   clientId: string
   expirationTime: string
@@ -77,52 +81,53 @@ export default class Access extends DOProxy {
   }
 
   async generateAccessToken(options: AccessTokenOptions): Promise<string> {
-    const { account, clientId, expirationTime, issuer, scope } = options
-    const { alg } = JWT_OPTIONS
+    const { jwk, account, clientId, expirationTime, issuer, scope } = options
+    const { alg, kid } = jwk
+    if (!alg) throw new InternalServerError({ message: 'missing alg in jwk' })
     const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
-    const { privateKey: key } = await this.getJWTSigningKeyPair()
     //Need to convert scope array to space-delimited string, per spec
     return new jose.SignJWT({ scope: scope.join(' ') })
-      .setProtectedHeader({ alg })
+      .setProtectedHeader({ alg, kid })
       .setExpirationTime(expirationTime)
       .setAudience([clientId])
       .setIssuedAt()
       .setIssuer(issuer)
       .setJti(jti)
       .setSubject(account)
-      .sign(key)
+      .sign(await jose.importJWK(jwk))
   }
 
   async generateRefreshToken(options: RefreshTokenOptions): Promise<string> {
-    const { account, clientId, issuer, scope } = options
-    const { alg } = JWT_OPTIONS
+    const { jwk, account, clientId, issuer, scope } = options
+    const { alg, kid } = jwk
+    if (!alg) throw new InternalServerError({ message: 'missing alg in jwk' })
     const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
-    const { privateKey: key } = await this.getJWTSigningKeyPair()
     const jwt = await new jose.SignJWT({ scope: scope.join(' ') })
-      .setProtectedHeader({ alg })
+      .setProtectedHeader({ alg, kid })
       .setAudience([clientId])
       .setIssuedAt()
       .setIssuer(issuer)
       .setJti(jti)
       .setSubject(account)
-      .sign(key)
+      .sign(await jose.importJWK(jwk))
 
     await this.store(jti, jwt, scope)
     return jwt
   }
 
   async generateIdToken(options: IdTokenOptions): Promise<string> {
-    const { account, clientId, expirationTime, idTokenClaims, issuer } = options
-    const { alg } = JWT_OPTIONS
-    const { privateKey: key } = await this.getJWTSigningKeyPair()
+    const { jwk, account, clientId, expirationTime, idTokenClaims, issuer } =
+      options
+    const { alg, kid } = jwk
+    if (!alg) throw new InternalServerError({ message: 'missing alg in jwk' })
     return new jose.SignJWT(idTokenClaims)
-      .setProtectedHeader({ alg })
+      .setProtectedHeader({ alg, kid })
       .setExpirationTime(expirationTime)
       .setAudience([clientId])
       .setIssuedAt()
       .setIssuer(issuer)
       .setSubject(account)
-      .sign(key)
+      .sign(await jose.importJWK(jwk))
   }
 
   async store(jti: string, jwt: string, scope: Scope): Promise<void> {
@@ -156,23 +161,50 @@ export default class Access extends DOProxy {
     })
   }
 
-  async verify(token: string): Promise<jose.JWTVerifyResult> {
-    const { alg } = JWT_OPTIONS
-    const { publicKey: key } = await this.getJWTSigningKeyPair()
-    const options = { algorithms: [alg] }
-    try {
-      return await jose.jwtVerify(token, key, options)
-    } catch (error) {
-      if (error instanceof jose.errors.JWTClaimValidationFailed)
-        throw TokenClaimValidationFailedError
-      else if (error instanceof jose.errors.JWTExpired) throw ExpiredTokenError
-      else if (error instanceof jose.errors.JWTInvalid) throw InvalidTokenError
-      else throw TokenVerificationFailedError
+  async verify(
+    jwt: string,
+    jwks: jose.JSONWebKeySet
+  ): Promise<jose.JWTVerifyResult> {
+    const { kid } = jose.decodeProtectedHeader(jwt)
+    if (kid) {
+      try {
+        return await jose.jwtVerify(jwt, jose.createLocalJWKSet(jwks))
+      } catch (error) {
+        if (error instanceof jose.errors.JWTClaimValidationFailed)
+          throw TokenClaimValidationFailedError
+        else if (error instanceof jose.errors.JWTExpired)
+          throw ExpiredTokenError
+        else if (error instanceof jose.errors.JWTInvalid)
+          throw InvalidTokenError
+        else throw TokenVerificationFailedError
+      }
+    } else {
+      // TODO: Initial signing keys didn't have `kid` property.
+      // Tokens signed by these keys won't have `kid` property in the header.
+      // This case will be invalid after 90 days.
+      const local = await this.getJWTPublicKey()
+      if (local) {
+        const { alg } = JWT_OPTIONS
+        const key = await jose.importJWK(local, alg)
+        try {
+          return await jose.jwtVerify(jwt, key)
+        } catch (error) {
+          if (error instanceof jose.errors.JWTClaimValidationFailed)
+            throw TokenClaimValidationFailedError
+          else if (error instanceof jose.errors.JWTExpired)
+            throw ExpiredTokenError
+          else if (error instanceof jose.errors.JWTInvalid)
+            throw InvalidTokenError
+          else throw TokenVerificationFailedError
+        }
+      }
     }
+
+    throw TokenVerificationFailedError
   }
 
-  async revoke(token: string): Promise<void> {
-    const { payload } = await this.verify(token)
+  async revoke(token: string, jwks: jose.JSONWebKeySet): Promise<void> {
+    const { payload } = await this.verify(token, jwks)
     await this.state.storage.transaction(async (txn) => {
       const { jti } = payload
       if (!jti) {
@@ -195,27 +227,13 @@ export default class Access extends DOProxy {
     await this.state.storage.deleteAll()
   }
 
-  async getJWTSigningKeyPair(): Promise<KeyPair> {
+  async getJWTPublicKey(): Promise<jose.JWK | undefined> {
     const { alg } = JWT_OPTIONS
     const { storage } = this.state
 
-    const stored = await storage.get<KeyPairSerialized>('signingKey')
+    const stored = await storage.get<{ publicKey: jose.JWK }>('signingKey')
     if (stored) {
-      return {
-        publicKey: await jose.importJWK(stored.publicKey, alg),
-        privateKey: await jose.importJWK(stored.privateKey, alg),
-      }
+      return { alg, ...stored.publicKey }
     }
-
-    const generated: KeyPair = await jose.generateKeyPair(alg, {
-      extractable: true,
-    })
-
-    await storage.put('signingKey', {
-      publicKey: await jose.exportJWK(generated.publicKey),
-      privateKey: await jose.exportJWK(generated.privateKey),
-    })
-
-    return generated
   }
 }

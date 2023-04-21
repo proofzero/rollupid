@@ -13,7 +13,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   const clientSecret = formData.get('client_secret') as string
   const code = formData.get('code') as string
   const refreshToken = formData.get('refresh_token') as string
-
+  const issuer = new URL(request.url).origin
   const grantType =
     (formData.get('grant_type') as GrantType.AuthorizationCode) ||
     GrantType.RefreshToken
@@ -30,12 +30,14 @@ export const action: ActionFunction = async ({ request, context }) => {
           refreshToken,
           clientId,
           clientSecret,
+          issuer,
         })
       : await accessClient.exchangeToken.mutate({
           grantType: GrantType.AuthorizationCode,
           code,
           clientId,
           clientSecret,
+          issuer,
         })
 
     const result = {
