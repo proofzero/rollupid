@@ -25,6 +25,7 @@ export type appDetailsProps = {
 export type errorsAuthProps = {
   websiteURL?: string
   termsURL?: string
+  privacyURL?: string
   redirectURI?: string
   icon?: string
   name?: string

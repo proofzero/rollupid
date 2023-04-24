@@ -6,6 +6,7 @@ export const AppObjectSchema = z.object({
   redirectURI: z.string().optional(),
   icon: z.string().optional(),
   termsURL: z.string().optional(),
+  privacyURL: z.string().optional(),
   websiteURL: z.string().optional(),
   mirrorURL: z.string().optional(),
   discordUser: z.string().optional(),
@@ -27,6 +28,7 @@ export const AppReadableFieldsSchema = z.object({
   apiKeyTimestamp: z.number().optional(),
   createdTimestamp: z.number().optional(),
   termsURL: z.string().optional(),
+  privacyURL: z.string().optional(),
 })
 
 export const AppInternalFieldSchema = z.object({
@@ -49,6 +51,7 @@ export const AppPublicPropsSchema = z.object({
   scopes: z.array(z.string()),
   redirectURI: z.string().optional(),
   termsURL: z.string().optional(),
+  privacyURL: z.string().optional(),
 })
 
 export type AppPublicProps = z.infer<typeof AppPublicPropsSchema>

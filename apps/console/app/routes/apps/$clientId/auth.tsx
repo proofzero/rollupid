@@ -95,6 +95,12 @@ const updatesSchema = z.object({
       { message: HTTP_MESSAGE }
     )
     .optional(),
+  privacyURL: z.string().refine(
+    (val) => {
+      return URL_VALIDATION({ val, required: true })
+    },
+    { message: HTTP_MESSAGE }
+  ),
   websiteURL: z
     .string()
     .refine(
@@ -188,6 +194,7 @@ export const action: ActionFunction = async ({ request, params, context }) => {
         icon: formData.get('icon') as string | undefined,
         redirectURI: formData.get('redirectURI') as string | undefined,
         termsURL: formData.get('termsURL') as string | undefined,
+        privacyURL: formData.get('privacyURL') as string | undefined,
         websiteURL: formData.get('websiteURL') as string | undefined,
         twitterUser: formData.get('twitterUser') as string | undefined,
         mediumUser: formData.get('mediumUser') as string | undefined,
@@ -519,50 +526,6 @@ export default function AppDetailIndexPage() {
                       <div className="sm:mb-[1.755rem]" />
                     )}
                   </div>
-
-                  <div className="flex-1">
-                    <Input
-                      id="termsURL"
-                      label="Terms of Service URL"
-                      type="url"
-                      error={errors?.['termsURL']}
-                      placeholder="www.example.com"
-                      defaultValue={appDetails.app.termsURL}
-                    />
-                    {errors?.termsURL ? (
-                      <Text
-                        className="mb-1.5 mt-1.5 text-red-500"
-                        size="xs"
-                        weight="normal"
-                      >
-                        {errors.termsURL || ''}
-                      </Text>
-                    ) : (
-                      <div className="sm:mb-[1.755rem]" />
-                    )}
-                  </div>
-
-                  <div className="flex-1">
-                    <Input
-                      id="websiteURL"
-                      label="Website"
-                      error={errors?.['websiteURL']}
-                      type="url"
-                      placeholder="www.example.com"
-                      defaultValue={appDetails.app.websiteURL}
-                    />
-                    {errors?.websiteURL ? (
-                      <Text
-                        className="mb-1.5 mt-1.5 text-red-500"
-                        size="xs"
-                        weight="normal"
-                      >
-                        {errors.websiteURL || ''}
-                      </Text>
-                    ) : (
-                      <div className="sm:mb-[1.755rem]" />
-                    )}
-                  </div>
                 </div>
 
                 <div>
@@ -623,6 +586,77 @@ export default function AppDetailIndexPage() {
                       preLabel="https://mirror.xyz/"
                       defaultValue={appDetails.app.mirrorURL}
                     />
+                  </div>
+                </div>
+
+                <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
+                  <div className="flex-1">
+                    <Input
+                      required
+                      id="termsURL"
+                      label="Terms of Service"
+                      type="url"
+                      error={errors?.['termsURL']}
+                      placeholder="www.example.com"
+                      defaultValue={appDetails.app.termsURL}
+                    />
+                    {errors?.termsURL ? (
+                      <Text
+                        className="mb-1.5 mt-1.5 text-red-500"
+                        size="xs"
+                        weight="normal"
+                      >
+                        {errors.termsURL || ''}
+                      </Text>
+                    ) : (
+                      <div className="sm:mb-[1.755rem]" />
+                    )}
+                  </div>
+
+                  <div className="flex-1">
+                    <Input
+                      required
+                      id="privacyURL"
+                      label="Privacy Policy"
+                      type="url"
+                      error={errors?.['privacyURL']}
+                      placeholder="www.example.com"
+                      defaultValue={appDetails.app.privacyURL}
+                    />
+                    {errors?.privacyURL ? (
+                      <Text
+                        className="mb-1.5 mt-1.5 text-red-500"
+                        size="xs"
+                        weight="normal"
+                      >
+                        {errors.privacyURL || ''}
+                      </Text>
+                    ) : (
+                      <div className="sm:mb-[1.755rem]" />
+                    )}
+                  </div>
+
+                  <div className="flex-1">
+                    <Input
+                      required
+                      id="websiteURL"
+                      label="Website"
+                      error={errors?.['websiteURL']}
+                      type="url"
+                      placeholder="www.example.com"
+                      defaultValue={appDetails.app.websiteURL}
+                    />
+                    {errors?.websiteURL ? (
+                      <Text
+                        className="mb-1.5 mt-1.5 text-red-500"
+                        size="xs"
+                        weight="normal"
+                      >
+                        {errors.websiteURL || ''}
+                      </Text>
+                    ) : (
+                      <div className="sm:mb-[1.755rem]" />
+                    )}
                   </div>
                 </div>
               </div>
