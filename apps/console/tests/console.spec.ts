@@ -14,6 +14,7 @@ test('login to console using Email', async ({ page, request }) => {
   })
 
   const email = process.env.INTERNAL_EMAIL_TEST_USERNAME?.replace(/(\d)/, '1')
+  console.debug({ email })
   if (!email) {
     throw new Error('INTERNAL_EMAIL_TEST_USERNAME is not set')
   }
