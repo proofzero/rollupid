@@ -110,30 +110,6 @@ const updatesSchema = z.object({
       { message: HTTP_MESSAGE }
     )
     .optional(),
-  twitterUser: z
-    .string()
-    .url()
-    .startsWith('https://twitter.com/')
-    .optional()
-    .or(z.string().length(0)),
-  mediumUser: z
-    .string()
-    .url()
-    .startsWith('https://medium.com/@')
-    .optional()
-    .or(z.string().length(0)),
-  mirrorURL: z
-    .string()
-    .url()
-    .startsWith('https://mirror.xyz/')
-    .optional()
-    .or(z.string().length(0)),
-  discordUser: z
-    .string()
-    .url()
-    .startsWith('http://discord.com/')
-    .optional()
-    .or(z.string().length(0)),
 })
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
@@ -196,10 +172,6 @@ export const action: ActionFunction = async ({ request, params, context }) => {
         termsURL: formData.get('termsURL') as string | undefined,
         privacyURL: formData.get('privacyURL') as string | undefined,
         websiteURL: formData.get('websiteURL') as string | undefined,
-        twitterUser: formData.get('twitterUser') as string | undefined,
-        mediumUser: formData.get('mediumUser') as string | undefined,
-        mirrorURL: formData.get('mirrorURL') as string | undefined,
-        discordUser: formData.get('discordUser') as string | undefined,
         scopes: Array.from(scopes),
       }
 
@@ -553,44 +525,6 @@ export default function AppDetailIndexPage() {
               <div className="flex flex-col space-y-8 md:space-y-5 truncate">
                 <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
                   <div className="flex-1">
-                    <PreLabeledInput
-                      id="discordUser"
-                      label="Discord"
-                      preLabel="http://discord.com/"
-                      defaultValue={appDetails.app.discordUser}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <PreLabeledInput
-                      id="twitterUser"
-                      label="Twitter"
-                      preLabel="https://twitter.com/"
-                      defaultValue={appDetails.app.twitterUser}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
-                  <div className="flex-1">
-                    <PreLabeledInput
-                      id="mediumUser"
-                      label="Medium"
-                      preLabel="https://medium.com/@"
-                      defaultValue={appDetails.app.mediumUser}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <PreLabeledInput
-                      id="mirrorURL"
-                      label="Mirror"
-                      preLabel="https://mirror.xyz/"
-                      defaultValue={appDetails.app.mirrorURL}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
-                  <div className="flex-1">
                     <Input
                       required
                       id="termsURL"
@@ -663,17 +597,15 @@ export default function AppDetailIndexPage() {
             </Panel>
 
             <Panel title="Danger Zone">
-              <Text
-                type="span"
-                weight="medium"
-                size="sm"
-                className="text-red-500 cursor-pointer"
+              <Button
+                type="submit"
+                btnType="dangerous-alt"
                 onClick={() => {
                   setDeleteModalOpen(true)
                 }}
               >
-                Delete the App
-              </Text>
+                Delete the Application
+              </Button>
             </Panel>
           </section>
         </fieldset>
