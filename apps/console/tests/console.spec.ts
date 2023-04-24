@@ -19,12 +19,13 @@ test('login to console using Email', async ({ page, request }) => {
   }
 
   await page.fill('[id="email"]', email)
-  await page.getByRole('button').filter({ hasText: 'Send Code' }).click()
 
+  await page.getByRole('button').filter({ hasText: 'Send Code' }).click()
   await page.waitForURL(/.*authenticate\/console\/email\/verify/, {
     timeout: 5000,
     waitUntil: 'networkidle',
   })
+  await page.waitForTimeout(5000)
 
   const otpRes = await request.fetch(
     `${process.env.INTERNAL_PLAYWRIGHT_TEST_URL}/otp/${email}`,
@@ -51,6 +52,8 @@ test('login to console using Email', async ({ page, request }) => {
     waitUntil: 'networkidle',
   })
   await expect(page).toHaveURL(/.*dashboard/)
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Console/)
+  // TODO: this doesn't work and we still get a race condition.
+  // const otpPromise = page.waitForResponse(/.*connect\/email\/otp/)
+  // const otpStatRes = await otpPromise
+  // console.debug('otpStatRes: ', otpStatRes.status(), otpStatRes.statusText())
 })

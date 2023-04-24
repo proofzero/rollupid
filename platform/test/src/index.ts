@@ -19,7 +19,9 @@ const withToken = (request: IRequest, env: Environment) => {
 router.get('/otp/:email', withToken, async (req, env) => {
   const { params } = req
 
-  const otp = await env.otp_test.get(params.email, 'text')
+  const otp = await env.otp_test.get(params.email)
+
+  console.debug('OTP GET: ', params.email, otp)
   return new Response(otp)
 })
 

@@ -33,6 +33,8 @@ test('login to passport using Email', async ({ page, request }) => {
     waitUntil: 'networkidle',
   })
 
+  await page.waitForTimeout(5000)
+
   const otpRes = await request.fetch(
     `${process.env.INTERNAL_PLAYWRIGHT_TEST_URL}/otp/${email}`,
     {
