@@ -3,7 +3,7 @@
 name: Console
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 

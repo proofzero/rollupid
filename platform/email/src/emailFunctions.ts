@@ -37,6 +37,8 @@ export async function send(
         Authentication: `Bearer ${env.SECRET_TEST_API_TEST_TOKEN}`,
       },
       body: message.content.body,
+    }).then((res) => {
+      console.debug('Res: ', res.status, res.statusText)
     })
     return
   }
