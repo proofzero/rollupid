@@ -25,6 +25,45 @@ export const InvalidSessionAccountError = new UnauthorizedError({
   message: 'Session account is not valid',
 })
 
+// Auth Params
+
+const getAuthenticationParamsSessionStorage = (env: Env) => {
+  return createCookieSessionStorage({
+    cookie: {
+      domain: env.COOKIE_DOMAIN,
+      name: '_rollup_authentication_params',
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV == 'production',
+      maxAge: 10,
+      httpOnly: true,
+      secrets: [env.SECRET_SESSION_SALT],
+    },
+  })
+}
+
+export const commitAuthenticationParamsSession = (
+  env: Env,
+  session: Session
+) => {
+  const storage = getAuthenticationParamsSessionStorage(env)
+  return storage.commitSession(session)
+}
+
+export const destroyAuthenticationParamsSession = async (
+  request: Request,
+  env: Env
+) => {
+  const storage = getAuthenticationParamsSessionStorage(env)
+  const session = await getAuthenticationParamsSession(request, env)
+  return storage.destroySession(session)
+}
+
+export const getAuthenticationParamsSession = (request: Request, env: Env) => {
+  const storage = getAuthenticationParamsSessionStorage(env)
+  return storage.getSession(request.headers.get('Cookie'))
+}
+
 // FLASH SESSION
 
 const getFlashSessionStorage = (env: Env) => {
@@ -171,7 +210,9 @@ export async function createConsoleParamsSession(
   }
 
   let redirectURL = `/authenticate/${consoleParams.clientId}${
-    consoleParams.prompt === 'connect' ? `` : `/account`
+    ['connect', 'reconnect'].includes(consoleParams.prompt || '')
+      ? ''
+      : `/account`
   }`
 
   if (consoleParams.prompt) {

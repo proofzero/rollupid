@@ -1,5 +1,9 @@
 import { LoaderFunction, redirect } from '@remix-run/cloudflare'
-import { destroyConsoleParamsSession, getConsoleParams } from '~/session.server'
+import {
+  destroyAuthenticationParamsSession,
+  destroyConsoleParamsSession,
+  getConsoleParams,
+} from '~/session.server'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const cp = await getConsoleParams(request, context.env)
@@ -7,7 +11,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     throw new Error('No console params')
   }
 
-  if (cp.prompt !== 'connect') {
+  if (!['connect', 'reconnect'].includes(cp.prompt)) {
     throw new Error('Not a connect flow')
   }
 
@@ -20,6 +24,11 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   headers.append(
     'Set-Cookie',
     await destroyConsoleParamsSession(request, context.env)
+  )
+
+  headers.append(
+    'Set-Cookie',
+    await destroyAuthenticationParamsSession(request, context.env)
   )
 
   const qp = new URLSearchParams()

@@ -26,7 +26,7 @@ export const loader: LoaderFunction = async ({
   const appData = await getConsoleParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)
-  authenticator.use(getMicrosoftStrategy(context.env))
+  authenticator.use(getMicrosoftStrategy('none', context.env))
 
   const authRes = (await authenticator.authenticate(
     MicrosoftStrategyDefaultName,

@@ -71,6 +71,7 @@ export default function DashboardLayout() {
             <AddressList
               primaryAddressURN={primaryAddressURN}
               addresses={connectedProfiles as AddressListItemProps[]}
+              showReconnectAccount={false}
             />
           </div>
         </div>

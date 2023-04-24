@@ -12,6 +12,7 @@ import {
 } from '~/platform.server'
 import {
   createUserSession,
+  destroyAuthenticationParamsSession,
   getConsoleParamsSession,
   parseJwt,
 } from '~/session.server'
@@ -43,13 +44,18 @@ export const authenticateAddress = async (
         'Could not complete authentication. Please return to application and try again.',
     })
   }
-  if (appData?.prompt === 'connect') {
+
+  if (['connect', 'reconnect'].includes(appData?.prompt)) {
     const redirectURL = getRedirectURL(
       appData,
       existing ? 'ALREADY_CONNECTED' : undefined
     )
 
-    return redirect(redirectURL)
+    return redirect(redirectURL, {
+      headers: {
+        'Set-Cookie': await destroyAuthenticationParamsSession(request, env),
+      },
+    })
   }
 
   try {

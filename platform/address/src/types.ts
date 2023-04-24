@@ -61,6 +61,7 @@ export interface AddressProfile<Type = string> {
   address: string
   title: string
   icon?: string
+  disconnected?: boolean
 }
 
 export type AddressProfiles = AddressProfile[]

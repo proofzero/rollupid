@@ -1,8 +1,8 @@
 import { createCookieSessionStorage } from '@remix-run/cloudflare'
 import { Authenticator } from 'remix-auth'
-import { DiscordStrategy } from 'remix-auth-discord'
+import { DiscordStrategy, DiscordStrategyOptions } from 'remix-auth-discord'
 import { GitHubStrategy } from 'remix-auth-github'
-import { GoogleStrategy } from 'remix-auth-google'
+import { GoogleStrategy, GoogleStrategyOptions } from 'remix-auth-google'
 import { MicrosoftStrategy } from 'remix-auth-microsoft'
 import { TwitterStrategy } from 'remix-auth-twitter'
 
@@ -46,19 +46,20 @@ export const getGithubAuthenticator = (env: Env) => {
   )
 }
 
-export const getGoogleAuthenticator = (env: Env) => {
+export const getGoogleAuthenticator = (prompt: string, env: Env) => {
   return new GoogleStrategy(
     {
       clientID: env.INTERNAL_GOOGLE_OAUTH_CLIENT_ID,
       clientSecret: env.SECRET_GOOGLE_OAUTH_CLIENT_SECRET,
       callbackURL: env.INTERNAL_GOOGLE_OAUTH_CALLBACK_URL,
       accessType: 'offline',
+      prompt: prompt as GoogleStrategyOptions['prompt'],
     },
     async (params) => params
   )
 }
 
-export const getMicrosoftStrategy = (env: Env) => {
+export const getMicrosoftStrategy = (prompt: string, env: Env) => {
   return new MicrosoftStrategy(
     {
       clientId: env.INTERNAL_MICROSOFT_OAUTH_CLIENT_ID,
@@ -66,7 +67,7 @@ export const getMicrosoftStrategy = (env: Env) => {
       clientSecret: env.SECRET_MICROSOFT_OAUTH_CLIENT_SECRET,
       redirectUri: env.INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL,
       scope: 'openid profile email User.Read offline_access',
-      prompt: '',
+      prompt,
     },
     async ({ ...args }) => {
       return { ...args }
@@ -101,12 +102,13 @@ export const getAppleStrategy = (env: Env) => {
   )
 }
 
-export const getDiscordStrategy = (env: Env) => {
+export const getDiscordStrategy = (prompt: string, env: Env) => {
   return new DiscordStrategy(
     {
       clientID: env.INTERNAL_DISCORD_OAUTH_CLIENT_ID,
       clientSecret: env.SECRET_DISCORD_OAUTH_CLIENT_SECRET,
       callbackURL: env.INTERNAL_DISCORD_OAUTH_CALLBACK_URL,
+      prompt: prompt as DiscordStrategyOptions['prompt'],
       scope: ['email', 'identify'],
     },
     async (params) => params

@@ -36,14 +36,21 @@ export default class GithubAddress extends OAuthAddress {
 
   async getProfile(): Promise<GithubAddressProfile> {
     const profile = await super.fetchProfile<GitHubOAuthProfile>()
-    if (!profile) {
-      throw new Error('missing profile')
-    }
-    return {
-      address: profile.login,
-      title: profile.name || profile.login,
-      icon: profile.avatar_url,
-      type: OAuthAddressType.GitHub,
+    if (profile) {
+      return {
+        address: profile.login,
+        title: profile.name || profile.login,
+        icon: profile.avatar_url,
+        type: OAuthAddressType.GitHub,
+      }
+    } else {
+      const address = await this.node.class.getAddress()
+      return {
+        address: address || 'GitHub',
+        title: 'GitHub',
+        disconnected: true,
+        type: OAuthAddressType.GitHub,
+      }
     }
   }
 

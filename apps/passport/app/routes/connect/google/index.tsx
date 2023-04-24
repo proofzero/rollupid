@@ -6,8 +6,9 @@ export const action: ActionFunction = async ({
   request,
   context,
 }: ActionArgs) => {
+  const url = new URL(request.url)
+  const prompt = url.searchParams.get('prompt') || 'none'
   const authenticator = initAuthenticator(context.env)
-  authenticator.use(getGoogleAuthenticator(context.env))
-
+  authenticator.use(getGoogleAuthenticator(prompt, context.env))
   return authenticator.authenticate(GoogleStrategyDefaultName, request)
 }

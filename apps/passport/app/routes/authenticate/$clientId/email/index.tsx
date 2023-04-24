@@ -22,8 +22,8 @@ export const action: ActionFunction = async ({ request, params }) => {
 }
 
 export default () => {
-  const { connectFlow } = useOutletContext<{
-    connectFlow: boolean
+  const { prompt } = useOutletContext<{
+    prompt?: string
   }>()
 
   const navigate = useNavigate()
@@ -77,7 +77,7 @@ export default () => {
         </section>
       </Form>
 
-      {connectFlow && (
+      {prompt && (
         <div className="flex w-full">
           <Button
             btnSize="l"
