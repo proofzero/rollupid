@@ -451,31 +451,32 @@ export default function AppDetailIndexPage() {
                   </div>
                 </div>
 
-                <div className="my-8 md:my-0">
-                  <ReadOnlyInput
-                    id="appDomains"
-                    label="Domain(s)"
-                    className="cursor-no-drop"
-                    value=""
-                    required
-                  />
-                  <Text
-                    type="span"
-                    size="xs"
-                    weight="medium"
-                    className="text-gray-400"
-                  >
-                    <a
-                      className="text-indigo-500"
-                      href="https://discord.gg/rollupid"
-                    >
-                      Contact us
-                    </a>{' '}
-                    to enable this feature
-                  </Text>
-                </div>
+                <div className="flex flex-col md:flex-row space-y-8 my-4 md:space-y-0 md:space-x-8 md:items-end">
+                  <div className="flex-1 mb-1">
+                    <ReadOnlyInput
+                      id="appDomains"
+                      label="Domain(s)"
+                      className="cursor-no-drop"
+                      value=""
+                      required
+                    />
 
-                <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
+                    <Text
+                      type="span"
+                      size="xs"
+                      weight="medium"
+                      className="text-gray-400"
+                    >
+                      <a
+                        className="text-indigo-500"
+                        href="https://discord.gg/rollupid"
+                      >
+                        Contact us
+                      </a>{' '}
+                      to enable this feature
+                    </Text>
+                  </div>
+
                   <div className="flex-1">
                     <Input
                       id="redirectURI"
