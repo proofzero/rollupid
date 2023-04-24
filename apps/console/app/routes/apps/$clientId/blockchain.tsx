@@ -16,8 +16,8 @@ import type { ActionFunction } from '@remix-run/cloudflare'
 import type { appDetailsProps, notificationHandlerType } from '~/types'
 
 const availablePaymasters = [
-  { name: 'Not selected', id: 'not_selected', unavailable: true },
-  { name: 'ZeroDev', id: 'zerodev', unavailable: false },
+  { provider: 'Not selected', id: 'not_selected', unavailable: true },
+  { provider: 'ZeroDev', id: 'zerodev', unavailable: false },
 ]
 
 export const action: ActionFunction = async ({ request, params, context }) => {
@@ -69,7 +69,7 @@ export default () => {
   const [selectedPaymaster, setSelectedPaymaster] = useState(() => {
     if (app?.paymaster?.provider) {
       return availablePaymasters.find(
-        (paymaster) => paymaster.name === app.paymaster.provider
+        (paymaster) => paymaster.provider === app.paymaster.provider
       )
     }
     return availablePaymasters[0]
@@ -133,7 +133,7 @@ export default () => {
                 <div className="relative border rounded bottom-0">
                   <Listbox.Button className="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                     <span className="block truncate text-sm">
-                      {selectedPaymaster.name}
+                      {selectedPaymaster.provider}
                     </span>
                     <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                       <ChevronUpDownIcon
@@ -172,7 +172,7 @@ export default () => {
                                   selected ? 'font-medium' : 'font-normal'
                                 }`}
                               >
-                                {paymaster.name}
+                                {paymaster.provider}
                               </span>
                               {selected ? (
                                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
