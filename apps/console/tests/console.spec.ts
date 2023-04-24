@@ -27,6 +27,8 @@ test('login to console using Email', async ({ page, request }) => {
     waitUntil: 'networkidle',
   })
 
+  await page.waitForResponse(/.*connect\/email\/otp/)
+
   const otpRes = await request.fetch(
     `${process.env.INTERNAL_PLAYWRIGHT_TEST_URL}/otp/${email}`,
     {
