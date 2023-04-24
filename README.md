@@ -1,6 +1,6 @@
 <img src="https://user-images.githubusercontent.com/695698/217101686-88cc3f69-599a-481c-a18e-b9bc220456ba.png" width="450"/>
 
-# User management for the private web
+# Identity management for the private web
 
 ![License](https://img.shields.io/github/license/proofzero/rollupid)
 [![Discord](https://img.shields.io/discord/790660849471062046?label=Discord)](https://discord.gg/UgwAsJf6C5)
