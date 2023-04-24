@@ -4,7 +4,10 @@ import { AddressURNSpace } from '@proofzero/urns/address'
 import { GoogleStrategyDefaultName } from 'remix-auth-google'
 import { initAuthenticator, getGoogleAuthenticator } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
-import { authenticateAddress } from '~/utils/authenticate.server'
+import {
+  authenticateAddress,
+  checkOAuthError,
+} from '~/utils/authenticate.server'
 import type { OAuthData } from '@proofzero/platform.address/src/types'
 import { NodeType, OAuthAddressType } from '@proofzero/types/address'
 import {
@@ -16,6 +19,8 @@ export const loader: LoaderFunction = async ({
   request,
   context,
 }: LoaderArgs) => {
+  await checkOAuthError(request, context.env)
+
   const appData = await getConsoleParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)

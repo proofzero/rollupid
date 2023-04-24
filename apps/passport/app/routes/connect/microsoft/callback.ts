@@ -7,7 +7,10 @@ import { getAddressClient } from '~/platform.server'
 import { NodeType, OAuthAddressType } from '@proofzero/types/address'
 import type { OAuthData } from '@proofzero/platform.address/src/types'
 import { MicrosoftStrategyDefaultName } from 'remix-auth-microsoft'
-import { authenticateAddress } from '~/utils/authenticate.server'
+import {
+  authenticateAddress,
+  checkOAuthError,
+} from '~/utils/authenticate.server'
 import {
   getConsoleParams,
   getJWTConditionallyFromSession,
@@ -18,6 +21,8 @@ export const loader: LoaderFunction = async ({
   request,
   context,
 }: LoaderArgs) => {
+  await checkOAuthError(request, context.env)
+
   const appData = await getConsoleParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)
