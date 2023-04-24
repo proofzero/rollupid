@@ -20,6 +20,8 @@ router.get('/otp/:email', withToken, async (req, env) => {
   const { params } = req
 
   const otp = await env.otp_test.get(params.email, 'text')
+
+  console.debug('OTP GEET: ', params.email, otp)
   return new Response(otp)
 })
 
