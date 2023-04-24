@@ -1,21 +1,79 @@
-import { Form, Link } from '@remix-run/react'
+import { Form, Link, useActionData, useOutletContext } from '@remix-run/react'
 import { Button, Text } from '@proofzero/design-system'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { Panel } from '@proofzero/design-system/src/atoms/panels/Panel'
-import { useState, Fragment } from 'react'
+import { useState, Fragment, useEffect } from 'react'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 
 import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { requireJWT } from '~/utilities/session.server'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
-const paymasters = [
+import type { ActionFunction } from '@remix-run/cloudflare'
+import type { appDetailsProps, notificationHandlerType } from '~/types'
+
+const availablePaymasters = [
   { name: 'Not selected', id: 'not_selected', unavailable: true },
   { name: 'ZeroDev', id: 'zerodev', unavailable: false },
 ]
 
+export const action: ActionFunction = async ({ request, params, context }) => {
+  if (!params.clientId) {
+    throw new Error('Application Client ID is required for the requested route')
+  }
+  const jwt = await requireJWT(request)
+  let errors = {}
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...generateTraceContextHeaders(context.traceSpan),
+  })
+
+  const formData = await request.formData()
+  const apiKey = formData.get('apiKey') as string
+  const app = JSON.parse(formData.get('app') as string)
+  //due to specificity of formData inputs
+  const paymaster = formData.get('paymaster[name]') as string
+
+  const updates = { ...app, paymaster: { provider: paymaster, apiKey } }
+
+  await starbaseClient.updateApp.mutate({
+    clientId: params.clientId,
+    updates,
+  })
+
+  return { errors }
+}
+
 export default () => {
-  const [selectedPaymaster, setSelectedPaymaster] = useState(paymasters[0])
+  const { appDetails, notificationHandler } = useOutletContext<{
+    appDetails: appDetailsProps
+    notificationHandler: notificationHandlerType
+  }>()
+
   const [isFormChanged, setIsFormChanged] = useState(false)
+
+  const actionData = useActionData()
+  const errors = actionData?.errors
+
+  useEffect(() => {
+    if (errors) {
+      notificationHandler(Object.keys(errors).length === 0)
+      setIsFormChanged(!(Object.keys(errors).length === 0))
+    }
+  }, [errors])
+
+  const { app } = appDetails
+  const [selectedPaymaster, setSelectedPaymaster] = useState(() => {
+    if (app?.paymaster?.provider) {
+      return availablePaymasters.find(
+        (paymaster) => paymaster.name === app.paymaster.provider
+      )
+    }
+    return availablePaymasters[0]
+  })
 
   return (
     <Form
@@ -25,6 +83,8 @@ export default () => {
         setIsFormChanged(true)
       }}
     >
+      <input hidden name="app" value={JSON.stringify(appDetails.app)} />
+
       <section className="flex flex-col space-y-5">
         <div className="flex flex-row justify-between space-x-5 max-sm:pl-6">
           <div className="flex flex-row items-center space-x-3">
@@ -35,7 +95,11 @@ export default () => {
               url={'https://docs.rollup.id/platform/console/blockchain'}
             />
           </div>
-          <Button type="submit" btnType="primary-alt" disabled={!isFormChanged}>
+          <Button
+            type="submit"
+            btnType="primary-alt"
+            disabled={!isFormChanged || selectedPaymaster.id === 'not_selected'}
+          >
             Save
           </Button>
         </div>
@@ -60,6 +124,7 @@ export default () => {
                 value={selectedPaymaster}
                 onChange={setSelectedPaymaster}
                 as="div"
+                name="paymaster"
                 className="mt-auto sm:grow-[2] max-sm:mb-2"
               >
                 <Listbox.Label className="block text-sm font-medium text-gray-700 mb-2">
@@ -84,7 +149,7 @@ export default () => {
                     leaveTo="opacity-0"
                   >
                     <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                      {paymasters.map((paymaster, personIdx) => (
+                      {availablePaymasters.map((paymaster, personIdx) => (
                         <Listbox.Option
                           key={personIdx}
                           className={({ active }) =>
@@ -132,9 +197,8 @@ export default () => {
                   label="API Key"
                   type="text"
                   className="shadow-md w-full"
-                  // error={errors?.['termsURL']}
-                  // placeholder="www.example.com"
-                  // defaultValue={appDetails.app.termsURL}
+                  placeholder="Paymaster API Key"
+                  defaultValue={app.paymaster?.apiKey}
                 />
               </div>
             </div>

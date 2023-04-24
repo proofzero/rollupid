@@ -8,6 +8,12 @@ export const AppObjectSchema = z.object({
   termsURL: z.string().optional(),
   privacyURL: z.string().optional(),
   websiteURL: z.string().optional(),
+  paymaster: z
+    .object({
+      provider: z.string(),
+      apiKey: z.string(),
+    })
+    .optional(),
 })
 
 export type AppObject = z.infer<typeof AppObjectSchema>

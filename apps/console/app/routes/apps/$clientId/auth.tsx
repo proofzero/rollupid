@@ -37,15 +37,15 @@ import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
-import { AddressURN } from '@proofzero/urns/address'
+import type { AddressURN } from '@proofzero/urns/address'
+
+import type { notificationHandlerType } from '~/types'
 
 /**
  * @file app/routes/dashboard/index.tsx
  */
 
 // TODO: create a separate helper file for schemas and helper functions
-
-type notificationHandlerType = (val: boolean) => void
 
 const HTTP_MESSAGE = 'HTTP can only be used for localhost'
 
@@ -70,7 +70,7 @@ const URL_VALIDATION = ({
   return !required
 }
 
-const updatesSchema = z.object({
+export const updatesSchema = z.object({
   name: z.string(),
   icon: z.string().url({ message: 'Invalid image upload' }),
   redirectURI: z.string().refine(
