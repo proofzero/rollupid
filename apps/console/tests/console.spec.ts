@@ -13,18 +13,19 @@ test('login to console using Email', async ({ page, request }) => {
     waitUntil: 'networkidle',
   })
 
-  const email = process.env.INTERNAL_EMAIL_TEST_USERNAME?.replace(/(\d)/, '1')
+  const email = process.env.INTERNAL_EMAIL_TEST_USERNAME?.replace(/(\d)/, '6')
   if (!email) {
     throw new Error('INTERNAL_EMAIL_TEST_USERNAME is not set')
   }
 
   await page.fill('[id="email"]', email)
-
   await page.getByRole('button').filter({ hasText: 'Send Code' }).click()
+
   await page.waitForURL(/.*authenticate\/console\/email\/verify/, {
     timeout: 5000,
     waitUntil: 'networkidle',
   })
+
   await page.waitForTimeout(5000)
 
   const otpRes = await request.fetch(
