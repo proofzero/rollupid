@@ -598,6 +598,25 @@ export default function Authorize() {
                 })}
             </ul>
           </div>
+
+          {(appProfile?.termsURL || appProfile?.privacyURL) && (
+            <Text size="sm" className="text-gray-500 mt-7">
+              Before using this app, you can review{' '}
+              {appProfile?.name ?? `Company`}
+              's{' '}
+              <a href={appProfile.privacyURL} className="text-indigo-500">
+                privacy policy
+              </a>
+              {appProfile?.termsURL && appProfile?.privacyURL && (
+                <span> and </span>
+              )}
+              <a href={appProfile.termsURL} className="text-indigo-500">
+                terms of service
+              </a>
+              .
+            </Text>
+          )}
+
           <div
             className={
               'flex flex-row w-full items-end justify-center gap-4 mt-auto'

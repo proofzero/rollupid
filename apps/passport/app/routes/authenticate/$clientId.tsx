@@ -19,6 +19,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       name: 'Rollup ID',
       iconURL: LogoIndigo,
       termsURL: 'https://rollup.id/tos',
+      privacyURL: 'https://rollup.id/privacy-policy',
     }
   }
 
