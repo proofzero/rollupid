@@ -14,13 +14,15 @@ First, visit [https://console.rollup.id](https://passport.rollup.id/) and log in
 
 ### Step 2: Create an App
 
-Once you've logged in, you'll be redirected to the Console dashboard. Here, you can register and configure your Rollup ID application.&#x20;
+Once you've logged in, you'll be redirected to the Console dashboard. Here, you can register and configure your Rollup ID application.
 
 Click on the "Create Application" button in the center of the screen. You'll be prompted to enter a name for your application and then redirected to the application's configuration screen.
 
 <div>
 
 <figure><img src="../.gitbook/assets/DashboardInstruction.png" alt=""><figcaption></figcaption></figure>
+
+ 
 
 <figure><img src="../.gitbook/assets/Create Application.png" alt=""><figcaption></figcaption></figure>
 
@@ -36,7 +38,9 @@ The Client Secret is only shared once so, if you missed it you can click the "ro
 
 <div>
 
-<figure><img src="../.gitbook/assets/Application Detail - Dashboard.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/Application Detail - Dashboard (2).png" alt=""><figcaption></figcaption></figure>
+
+ 
 
 <figure><img src="../.gitbook/assets/Application Detail - Dashboard (1) (1).png" alt=""><figcaption></figcaption></figure>
 
@@ -48,12 +52,12 @@ Next, click the "OAuth" link in the left navigation bar to access the full appli
 
 Fill in the following required fields:
 
-- **Redirect URL**: The address where Rollup will redirect your users to after they have completed the auth flow ([more on next page](auth-flow.md)).
-- **App Icon**: Your application's logo, which will be displayed to users during the auth flow ([see passport for more](../platform/passport.md)).
-- **Terms of Service URL**: A link to your application's TOS
-- **Website**: A link to your application's website
-- **Allowed scope**: The superset of scope values that the application can request
-- **Domains**: \[coming soon]
+* **Redirect URL**: The address where Rollup will redirect your users to after they have completed the auth flow ([more on next page](auth-flow.md)).
+* **App Icon**: Your application's logo, which will be displayed to users during the auth flow ([see passport for more](../platform/passport.md)).
+* **Terms of Service URL**: A link to your application's TOS
+* **Website**: A link to your application's website
+* **Allowed scope**: The superset of scope values that the application can request
+* **Domains**: \[coming soon]
 
 {% hint style="warning" %}
 In most cases, you'll need to set up an app for each environment and provide the appropriate **redirect URL** for each. For instance, you might use a "**localhost**" redirect URL for local development and a "staging" redirect URL for test environments.
