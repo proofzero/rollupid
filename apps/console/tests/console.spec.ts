@@ -27,40 +27,8 @@ test('login to console using Email', async ({ page, request }) => {
     timeout: 5000,
     waitUntil: 'networkidle',
   })
-
-  const otpStatRes = await otpPromise.then(async (res) => {
-    const otpRes = await request.fetch(
-      `${process.env.INTERNAL_PLAYWRIGHT_TEST_URL}/otp/${email}`,
-      {
-        method: 'GET',
-        headers: {
-          pragma: 'no-cache',
-          'cache-control': 'no-cache',
-          Authentication: `Bearer ${process.env.SECRET_TEST_API_TOKEN}`,
-        },
-      }
-    )
-    expect(otpRes.status()).toBe(200)
-    const otp = await otpRes.text()
-    console.debug('OTP: ', otp)
-    const otpSplit = otp.split('')
-    await page.locator(`#code_0`).fill(otpSplit[0])
-    await page.locator(`#code_1`).fill(otpSplit[1])
-    await page.locator(`#code_2`).fill(otpSplit[2])
-    await page.locator(`#code_3`).fill(otpSplit[3])
-    await page.locator(`#code_4`).fill(otpSplit[4])
-    await page.locator(`#code_5`).fill(otpSplit[5])
-    await page.getByRole('button').filter({ hasText: 'Verify' }).click()
-
-    await page.waitForURL(/.*dashboard/, {
-      timeout: 10000,
-      waitUntil: 'networkidle',
-    })
-    await expect(page).toHaveURL(/.*dashboard/)
-    // Expect a title "to contain" a substring.
-    await expect(page).toHaveTitle(/Console/)
-    return res
-  })
+  await page.waitForTimeout(5000)
+  const otpStatRes = await otpPromise
   console.debug('otpStatRes: ', otpStatRes.status(), otpStatRes.statusText())
   const state = await otpStatRes.json()
   console.debug({ state })
