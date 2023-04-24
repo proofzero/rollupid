@@ -32,6 +32,8 @@ test('login to console using Email', async ({ page, request }) => {
     {
       method: 'GET',
       headers: {
+        pragma: 'no-cache',
+        'cache-control': 'no-cache',
         Authentication: `Bearer ${process.env.SECRET_TEST_API_TOKEN}`,
       },
     }
