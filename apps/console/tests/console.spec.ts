@@ -20,6 +20,8 @@ test('login to console using Email', async ({ page, request }) => {
   }
 
   await page.fill('[id="email"]', email)
+
+  const otpPromise = page.waitForResponse(/.*connect\/email\/otp/)
   await page.getByRole('button').filter({ hasText: 'Send Code' }).click()
 
   await page.waitForURL(/.*authenticate\/console\/email\/verify/, {
@@ -27,7 +29,7 @@ test('login to console using Email', async ({ page, request }) => {
     waitUntil: 'networkidle',
   })
 
-  const otpStatRes = await page.waitForResponse(/.*connect\/email\/otp/)
+  const otpStatRes = await otpPromise
   console.debug('otpStatRes: ', otpStatRes.status(), otpStatRes.statusText())
   const state = await otpStatRes.json()
   console.debug({ state })
