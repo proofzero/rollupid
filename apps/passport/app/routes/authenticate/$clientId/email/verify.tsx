@@ -86,32 +86,30 @@ export default () => {
 
   const [errorMessage, setErrorMessage] = useState('')
   const [state, setState] = useState('')
-
-  const asyncFn = async () => {
-    try {
-      const resObj = await fetch('/connect/email/otp' + location.search)
-      const res = await resObj.json()
-
-      if (resObj.status === HTTP_STATUS_CODES[ERROR_CODES.BAD_REQUEST]) {
-        setErrorMessage(res.message)
-      } else if (errorMessage.length) {
-        // In the case error was hit in last call
-        // here we want to reset the error message
-        setErrorMessage('')
-      }
-      if (res.state) {
-        setState(res.state)
-      }
-    } catch (e) {
-      setErrorMessage(e.message ? e.message : e.toString())
-    }
-  }
+  const [lastRegen, setLastRegen] = useState(Date.now())
 
   useEffect(() => {
     ;(async () => {
-      await asyncFn()
+      try {
+        const resObj = await fetch('/connect/email/otp' + location.search)
+        const res = await resObj.json<{
+          message: string
+          state: string
+        }>()
+
+        if (resObj.status === HTTP_STATUS_CODES[ERROR_CODES.BAD_REQUEST]) {
+          setErrorMessage(res.message)
+        } else if (errorMessage.length) {
+          // In the case error was hit in last call
+          // here we want to reset the error message
+          setErrorMessage('')
+        }
+        setState(res.state)
+      } catch (e: any) {
+        setErrorMessage(e.message ? e.message : e.toString())
+      }
     })()
-  }, [])
+  }, [errorMessage.length, lastRegen, location.search])
 
   return (
     <div
@@ -133,7 +131,7 @@ export default () => {
         state={state}
         invalid={ad?.error}
         requestRegeneration={async () => {
-          await asyncFn()
+          setLastRegen(Date.now())
         }}
         requestVerification={async (email, code, state) => {
           submit(
