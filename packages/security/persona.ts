@@ -259,7 +259,7 @@ export async function getClaimValues(
           })) || []
 
         const claimResults = accountAddresses.map((a) => {
-          return { type: a.rc.addr_type, alias: a.qc.alias }
+          return { type: a.rc.addr_type, identifier: a.qc.alias }
         })
         result = { ...result, connected_accounts: claimResults }
       } else {

@@ -108,15 +108,15 @@ Call this method to retrieve basic identity information for the user.
     connected_accounts: [
       {
         type: 'eth',
-        alias: '(eth address)'
+        identifier: '(eth address)'
       },
       {
         type: 'email',
-        alias: '(email address of connected account)'
+        identifier: '(email address of connected account)'
       },
       {
         type: 'github',
-        alias: '(github username)'
+        identifier: '(github username)'
       }
       //other addresses
     ]
