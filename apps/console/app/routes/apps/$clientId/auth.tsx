@@ -70,7 +70,7 @@ const URL_VALIDATION = ({
   return !required
 }
 
-export const updatesSchema = z.object({
+const updatesSchema = z.object({
   name: z.string(),
   icon: z.string().url({ message: 'Invalid image upload' }),
   redirectURI: z.string().refine(
