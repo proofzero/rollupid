@@ -10,7 +10,11 @@ import {
   getAccountClient,
   getAddressClient,
 } from '~/platform.server'
-import { createUserSession, parseJwt } from '~/session.server'
+import {
+  createUserSession,
+  getConsoleParamsSession,
+  parseJwt,
+} from '~/session.server'
 import { generateGradient } from './gradient.server'
 import { redirect } from '@remix-run/cloudflare'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
@@ -170,4 +174,20 @@ export const setNewPrimaryAddress = async (
       },
     })
   }
+}
+
+export const checkOAuthError = async (request: Request, env: Env) => {
+  const { searchParams } = new URL(request.url)
+  const error = searchParams.get('error')
+  if (!error) return
+
+  const uri = searchParams.get('error_uri')
+  const description = searchParams.get('error_description')
+
+  console.error({ error, uri, description })
+
+  const sp = new URLSearchParams({ oauth_error: error })
+  const cp = await getConsoleParamsSession(request, env)
+  const { clientId } = JSON.parse(cp.get('params'))
+  throw redirect(`/authenticate/${clientId}?${sp.toString()}`)
 }

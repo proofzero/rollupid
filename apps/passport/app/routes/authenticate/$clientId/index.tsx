@@ -120,6 +120,17 @@ export default () => {
     }
   }, [transition.state])
 
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    const error = url.searchParams.get('oauth_error')
+    if (!error) return
+    const message = getOAuthErrorMessage(error)
+    toast(ToastType.Error, { message }, { duration: 2000 })
+
+    url.searchParams.delete('oauth_error')
+    history.replaceState(null, '', url.toString())
+  })
+
   return (
     // Maybe suspense here?
     <WagmiConfig client={client}>
@@ -277,4 +288,22 @@ export default () => {
       </Authentication>
     </WagmiConfig>
   )
+}
+
+const getOAuthErrorMessage = (error: string): string => {
+  switch (error) {
+    case 'invalid_request':
+    case 'invalid_client':
+    case 'invalid_grant':
+    case 'unauthorized_client':
+    case 'unsupported_response_type':
+    case 'invalid_scope':
+    case 'server_error':
+      return 'An error was encountered with the provider configuration.'
+    case 'access_denied':
+    case 'temporarily_unavailable':
+      return 'Something went wrong with the provider authorization. Please try again.'
+    default:
+      return 'An unknown error occurred'
+  }
 }

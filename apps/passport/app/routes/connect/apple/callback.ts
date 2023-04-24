@@ -14,7 +14,10 @@ import type { AppleExtraParams } from '~/utils/applestrategy.server'
 
 import { initAuthenticator, getAppleStrategy } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
-import { authenticateAddress } from '~/utils/authenticate.server'
+import {
+  authenticateAddress,
+  checkOAuthError,
+} from '~/utils/authenticate.server'
 import {
   getConsoleParams,
   getJWTConditionallyFromSession,
@@ -41,6 +44,8 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 export const loader: LoaderFunction = async ({ request, context }) => {
+  await checkOAuthError(request, context.env)
+
   const appData = await getConsoleParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)

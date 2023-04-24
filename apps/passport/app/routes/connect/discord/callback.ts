@@ -13,9 +13,14 @@ import {
   getConsoleParams,
   getJWTConditionallyFromSession,
 } from '~/session.server'
-import { authenticateAddress } from '~/utils/authenticate.server'
+import {
+  authenticateAddress,
+  checkOAuthError,
+} from '~/utils/authenticate.server'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
+  await checkOAuthError(request, context.env)
+
   const appData = await getConsoleParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)

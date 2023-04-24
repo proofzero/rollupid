@@ -10,7 +10,10 @@ import { generateHashedIDRef } from '@proofzero/urns/idref'
 
 import { initAuthenticator, getTwitterStrategy } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
-import { authenticateAddress } from '~/utils/authenticate.server'
+import {
+  authenticateAddress,
+  checkOAuthError,
+} from '~/utils/authenticate.server'
 import {
   getConsoleParams,
   getJWTConditionallyFromSession,
@@ -20,6 +23,8 @@ export const loader: LoaderFunction = async ({
   request,
   context,
 }: LoaderArgs) => {
+  await checkOAuthError(request, context.env)
+
   const appData = await getConsoleParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)

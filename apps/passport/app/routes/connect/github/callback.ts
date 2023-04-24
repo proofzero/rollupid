@@ -4,7 +4,11 @@ import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { AddressURNSpace } from '@proofzero/urns/address'
 
 import { initAuthenticator, getGithubAuthenticator } from '~/auth.server'
-import { authenticateAddress } from '~/utils/authenticate.server'
+import {
+  authenticateAddress,
+  checkOAuthError,
+} from '~/utils/authenticate.server'
+
 import { getAddressClient } from '~/platform.server'
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
 import { NodeType, OAuthAddressType } from '@proofzero/types/address'
@@ -18,6 +22,8 @@ export const loader: LoaderFunction = async ({
   request,
   context,
 }: LoaderArgs) => {
+  await checkOAuthError(request, context.env)
+
   const appData = await getConsoleParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)
