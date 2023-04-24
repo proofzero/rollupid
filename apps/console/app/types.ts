@@ -29,10 +29,6 @@ export type errorsAuthProps = {
   redirectURI?: string
   icon?: string
   name?: string
-  discordUser?: string
-  twitterUser?: string
-  mediumUser?: string
-  mirrorURL?: string
 }
 
 export type AuthorizedProfile = AuthorizedUser

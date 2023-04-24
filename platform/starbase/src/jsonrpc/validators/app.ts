@@ -8,10 +8,6 @@ export const AppObjectSchema = z.object({
   termsURL: z.string().optional(),
   privacyURL: z.string().optional(),
   websiteURL: z.string().optional(),
-  mirrorURL: z.string().optional(),
-  discordUser: z.string().optional(),
-  mediumUser: z.string().optional(),
-  twitterUser: z.string().optional(),
 })
 
 export type AppObject = z.infer<typeof AppObjectSchema>
