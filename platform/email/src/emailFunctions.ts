@@ -38,7 +38,12 @@ export async function send(
       },
       body: message.content.body,
     }).then((res) => {
-      console.debug('Res: ', res.status, res.statusText)
+      console.debug(
+        'Res: ',
+        res.status,
+        res.statusText,
+        message.recipient.address
+      )
     })
     return
   }
