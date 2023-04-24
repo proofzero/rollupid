@@ -8,7 +8,7 @@ import {
   useSubmit,
   useTransition,
 } from '@remix-run/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { HiOutlineMail } from 'react-icons/hi'
 import { Authentication, ConnectButton } from '~/components'
 import ConnectOAuthButton from '~/components/connect-oauth-button'
@@ -109,6 +109,11 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 }
 
 export default () => {
+  const oAuthWrapperRef = useRef<HTMLDivElement>(null)
+  const [oAuthWrapperWidth, setOAuthWrapperWidth] = useState<
+    number | undefined
+  >()
+  
   const { appProps, rollup_action } = useOutletContext<{
     appProps?: {
       name: string
@@ -163,6 +168,10 @@ export default () => {
 
     history.replaceState(null, '', url.toString())
   })
+
+  useEffect(() => {
+    setOAuthWrapperWidth(oAuthWrapperRef.current?.offsetWidth)
+  }, [oAuthWrapperRef])
 
   return (
     // Maybe suspense here?
@@ -245,7 +254,10 @@ export default () => {
             />
           )}
 
-          <div className="flex flex-row space-x-3 justify-evenly w-full">
+          <div
+            className="flex flex-row space-x-3 justify-evenly w-full"
+            ref={oAuthWrapperRef}
+          >
             {displayDict.google && (
               <Form
                 className="w-full"
@@ -266,13 +278,19 @@ export default () => {
                 }`}
                 method="post"
               >
-                <ConnectOAuthButton provider="microsoft" />
+                <ConnectOAuthButton
+                  provider="microsoft"
+                  parentWidth={oAuthWrapperWidth}
+                />
               </Form>
             )}
 
             {displayDict.apple && (
               <Form className="w-full" action={`/connect/apple`} method="post">
-                <ConnectOAuthButton provider="apple" />
+                <ConnectOAuthButton
+                  provider="apple"
+                  parentWidth={oAuthWrapperWidth}
+                />
               </Form>
             )}
           </div>
@@ -284,7 +302,10 @@ export default () => {
                 action={`/connect/twitter`}
                 method="post"
               >
-                <ConnectOAuthButton provider="twitter" />
+                <ConnectOAuthButton
+                  provider="twitter"
+                  parentWidth={oAuthWrapperWidth}
+                />
               </Form>
             )}
 
@@ -296,7 +317,10 @@ export default () => {
                 }`}
                 method="post"
               >
-                <ConnectOAuthButton provider="discord" />
+                <ConnectOAuthButton
+                  provider="discord"
+                  parentWidth={oAuthWrapperWidth}
+                />
               </Form>
             )}
 
