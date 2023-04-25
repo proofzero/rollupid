@@ -11,10 +11,8 @@ import { TbCirclePlus } from 'react-icons/tb'
 import { HiCheck } from 'react-icons/hi'
 
 type SmartContractWalletListItem = {
-  addressURN: AddressURN
   title: string
-  provider: string
-  address: string
+  addressURN?: AddressURN
 }
 
 type SmartContractWalletSelectProps = {
