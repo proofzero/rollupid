@@ -6,6 +6,7 @@ import { initAccessNodeByName } from '../../nodes'
 import { EDGE_AUTHORIZES } from '../../constants'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { AccessURNSpace } from '@proofzero/urns/access'
+import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 
 export const RevokeAppAuthorizationMethodInput = z.object({
   clientId: z.string().min(1),
@@ -46,11 +47,11 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
       throw new Error('Expected edgesClient to be present')
     }
 
-    const accessDst = AccessURNSpace.componentizedUrn(name)
+    const accessURN = AccessURNSpace.componentizedUrn(name)
     const edgesResult = await ctx.edgesClient.getEdges.query({
       query: {
         src: { baseUrn: accountURN },
-        dst: { baseUrn: accessDst },
+        dst: { baseUrn: accessURN },
         tag: EDGE_AUTHORIZES,
       },
     })
@@ -72,6 +73,19 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
         tag: EDGE_AUTHORIZES,
         src: edgesResult.edges[i].src.baseUrn,
         dst: edgesResult.edges[i].dst.baseUrn,
+      })
+    }
+
+    const addresses =
+      (await ctx.accountClient.getAddresses.query({
+        account: accountURN,
+      })) ?? []
+
+    for (const address of addresses) {
+      await ctx.edgesClient.removeEdge.mutate({
+        tag: EDGE_HAS_REFERENCE_TO,
+        src: accessURN,
+        dst: address.baseUrn,
       })
     }
 

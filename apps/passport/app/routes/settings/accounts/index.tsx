@@ -24,12 +24,12 @@ import type { ActionFunction } from '@remix-run/cloudflare'
 import type { AddressListProps } from '~/components/addresses/AddressList'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 
-import warn from '~/assets/warning.svg'
 import { getValidatedSessionContext } from '~/session.server'
 import { setNewPrimaryAddress } from '~/utils/authenticate.server'
-import type { AddressURN } from '@proofzero/urns/address'
+import { AddressURN } from '@proofzero/urns/address'
 import { ERROR_CODES, RollupError } from '@proofzero/errors'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
+import AccountDisconnectModal from '~/components/settings/accounts/DisconnectModal'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const { jwt } = await getValidatedSessionContext(
@@ -143,79 +143,6 @@ const RenameModal = ({
     </div>
   </Modal>
 )
-
-const DisconnectModal = ({
-  fetcher,
-  isOpen,
-  setIsOpen,
-  id,
-  data,
-  primaryAddressURN,
-}: {
-  fetcher: FetcherWithComponents<any>
-  isOpen: boolean
-  setIsOpen: (open: boolean) => void
-  id: string
-  data: {
-    title: string
-    type: string
-  }
-  primaryAddressURN: AddressURN
-}) => {
-  return (
-    <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
-      <div
-        className={`min-w-[437px] relative transform rounded-lg  bg-white px-4 pt-5 pb-4
-         text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
-      >
-        <div className=" flex items-start space-x-4">
-          <img src={warn} alt="Not Found" />
-
-          <div className="flex-1">
-            <Text size="lg" weight="medium" className="text-gray-900 my-1">
-              Disconnect account
-            </Text>
-            {primaryAddressURN !== id ? (
-              <Text size="sm" weight="normal" className="text-gray-500 my-7">
-                Are you sure you want to disconnect {data.type} account
-                {data.title && (
-                  <>
-                    <span className="text-gray-800"> "{data.title}" </span>
-                  </>
-                )}
-                from Rollup? You might lose access to some functionality.
-              </Text>
-            ) : (
-              <Text size="sm" weight="normal" className="text-gray-500 my-7">
-                It looks like you are trying to disconnect your primary account.
-                You need to set another account as primary to be able to
-                disconnect this one.
-              </Text>
-            )}
-            <fetcher.Form method="post" action="/settings/accounts/disconnect">
-              <input type="hidden" name="id" value={id} />
-
-              <div className="flex justify-end items-center space-x-3 mt-7">
-                <Button
-                  btnType="secondary-alt"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Cancel
-                </Button>
-
-                {primaryAddressURN !== id && (
-                  <Button type="submit" btnType="dangerous">
-                    Disconnect
-                  </Button>
-                )}
-              </div>
-            </fetcher.Form>
-          </div>
-        </div>
-      </div>
-    </Modal>
-  )
-}
 
 export default function AccountsLayout() {
   const submit = useSubmit()
@@ -345,7 +272,7 @@ export default function AccountsLayout() {
               data={actionProfile}
             />
 
-            <DisconnectModal
+            <AccountDisconnectModal
               fetcher={fetcher}
               isOpen={disconnectModalOpen}
               setIsOpen={setDisconnectModalOpen}
