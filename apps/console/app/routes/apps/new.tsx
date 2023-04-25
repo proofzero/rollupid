@@ -46,9 +46,9 @@ export default function CreateNewApp() {
     useOutletContext<OutletContextData>()
 
   return (
-    <Popover className="min-h-screen relative">
+    <Popover className="min-h-[100dvh] relative">
       {({ open }) => (
-        <div className="flex flex-col relative lg:flex-row min-h-screen bg-gray-50">
+        <div className="flex flex-col relative lg:flex-row min-h-[100dvh] bg-gray-50">
           <SiteMenu
             apps={apps}
             open={open}

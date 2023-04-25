@@ -30,7 +30,7 @@ export default function DashboardIndexPage() {
   const navigate = useNavigate()
 
   return (
-    <Popover className="min-h-screen relative">
+    <Popover className="min-h-[100dvh] relative">
       {({ open }) => (
         <div className="flex lg:flex-row h-full">
           <SiteMenu

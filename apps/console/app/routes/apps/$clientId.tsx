@@ -112,7 +112,7 @@ export default function AppDetailIndexPage() {
   }
 
   return (
-    <Popover className="min-h-screen relative">
+    <Popover className="min-h-[100dvh] relative">
       {({ open }) => (
         <div className="flex flex-col relative lg:flex-row min-h-full bg-gray-50">
           <SiteMenu
