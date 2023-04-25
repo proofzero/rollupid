@@ -29,8 +29,6 @@ export const SmartContractWalletSelect = ({
   const [selectedWallet, setSelectedWallet] =
     useState<SmartContractWalletListItem>()
 
-  if (!wallets) wallets = []
-
   useEffect(() => {
     if (onSelect) {
       onSelect(selectedWallet)
