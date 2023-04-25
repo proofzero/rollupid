@@ -4,18 +4,17 @@ main = "src/index.ts"
 compatibility_date = "2022-10-19"
 node_compat = true
 wrangler_dev = false
+logpush = true
 
 # Services binding for local development
 services = [
   { binding = "Account", service = "account" },
   { binding = "Access", service = "access" },
   { binding = "Address", service = "address" },
-  { binding = "Starbase", service = "starbase"},
+  { binding = "Starbase", service = "starbase" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [dev]
 port = 10401
@@ -23,12 +22,10 @@ inspector_port = 11401
 local_protocol = "http"
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalytics"  },
+  { binding = "Analytics", dataset = "PlatformAnalytics" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 
 [env.dev]
@@ -41,12 +38,10 @@ services = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.next]
 route = { pattern = "galaxy-next.rollup.id", custom_domain = true, zone_name = "rollup.id" }
@@ -58,12 +53,10 @@ services = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.current]
 route = { pattern = "galaxy.rollup.id", custom_domain = true, zone_name = "rollup.id" }
@@ -75,9 +68,7 @@ services = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]

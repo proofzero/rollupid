@@ -4,10 +4,9 @@ main = "src/index.ts"
 compatibility_date = "2022-10-05"
 
 workers_dev = false
+logpush = true
 
-services = [
-  { binding = "Test", service = "test" },
-]
+services = [{ binding = "Test", service = "test" }]
 
 [dev]
 port = 10105

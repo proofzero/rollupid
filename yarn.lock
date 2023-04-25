@@ -6003,6 +6003,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@proofzero/logbridge@workspace:platform/logbridge":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/logbridge@workspace:platform/logbridge"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@types/node": 18.15.3
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
+    env-cmd: 10.1.0
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    npm-run-all: 4.1.5
+    prettier: 2.7.1
+    typescript: 5.0.4
+    wrangler: 2.14.0
+  languageName: unknown
+  linkType: soft
+
 "@proofzero/packages@workspace:packages":
   version: 0.0.0-use.local
   resolution: "@proofzero/packages@workspace:packages"

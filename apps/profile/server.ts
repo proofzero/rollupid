@@ -37,13 +37,15 @@ const handleEvent = async (event: FetchEvent) => {
     //Have to force injection of new field so it is available in the context setup above
     const newEvent = Object.assign(event, { traceSpan: newTraceSpan })
     console.log(
-      `Started HTTP handler for ${reqURL.pathname}/${reqURL.searchParams} span: ${newTraceSpan}`
+      `Started HTTP handler for ${reqURL.pathname}/${reqURL.searchParams}`,
+      newTraceSpan.toString()
     )
     try {
       response = await requestHandler(newEvent)
     } finally {
       console.debug(
-        `Completed HTTP handler for ${reqURL.pathname}/${reqURL.searchParams} span: ${newTraceSpan}`
+        `Completed HTTP handler for ${reqURL.pathname}/${reqURL.searchParams}`,
+        newTraceSpan.toString()
       )
     }
   }

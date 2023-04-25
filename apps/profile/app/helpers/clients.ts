@@ -4,17 +4,19 @@ import { TRACEPARENT_HEADER_NAME } from '@proofzero/platform-middleware/trace'
 import { PlatformHeaders } from '@proofzero/platform-clients/base'
 
 export async function getGalaxyClient(reqHeaders: PlatformHeaders) {
-  const traceparent = reqHeaders ? reqHeaders[TRACEPARENT_HEADER_NAME] : ''
+  const traceparent = JSON.stringify({
+    traceparent: reqHeaders ? reqHeaders[TRACEPARENT_HEADER_NAME] : '',
+  })
   const gqlClient = new GraphQLClient('http://127.0.0.1', {
     // @ts-ignore
     fetch: Galaxy.fetch.bind(Galaxy),
     requestMiddleware: (r) => {
       r.headers = { ...reqHeaders, ...(r.headers as Record<string, string>) }
-      console.debug(`Starting GQL client request. Traceparent: ${traceparent}`)
+      console.debug(`Starting GQL client request.`, traceparent)
       return r
     },
     responseMiddleware(response) {
-      console.debug(`Completed GQL request. Traceparent: ${traceparent}`)
+      console.debug(`Completed GQL request.`, traceparent)
     },
   })
   return getSdk(gqlClient)

@@ -26,13 +26,13 @@ export default {
     ctx: ExecutionContext
   ): Promise<Response> {
     const traceSpan = generateTraceSpan(request.headers)
-    console.debug('Starting GQL handler, trace span: ', traceSpan.toString())
+    console.debug('Starting GQL handler', traceSpan.toString())
     const result = (await yoga.handleRequest(request, {
       env,
       ctx,
       traceSpan,
     })) as Response
-    console.debug('Completed GQL handler, trace span: ', traceSpan.toString())
+    console.debug('Completed GQL handler', traceSpan.toString())
     return result
   },
 }

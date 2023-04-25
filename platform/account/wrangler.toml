@@ -3,6 +3,7 @@ main = "src/index.ts"
 compatibility_date = "2022-10-26"
 node_compat = true
 workers_dev = false
+logpush = true
 
 durable_objects.bindings = [{ name = "Account", class_name = "Account" }]
 services = [{ binding = "Edges", service = "edges" }]
@@ -19,9 +20,7 @@ analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalytics" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [dev]
 port = 10201
@@ -36,9 +35,7 @@ analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsDev" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.next]
 durable_objects.bindings = [{ name = "Account", class_name = "Account" }]
@@ -48,9 +45,7 @@ analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsNext" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.current]
 durable_objects.bindings = [{ name = "Account", class_name = "Account" }]
@@ -60,6 +55,4 @@ analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsCurrent" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]

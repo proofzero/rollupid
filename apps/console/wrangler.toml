@@ -5,13 +5,14 @@ name = "console"
 workers_dev = false
 main = "./build/index.js"
 compatibility_date = "2022-04-05"
-compatibility_flags = [ "streams_enable_constructors" ]
+compatibility_flags = ["streams_enable_constructors"]
+logpush = true
 
 
 services = [
-  { binding = "Starbase", service = "starbase"},
+  { binding = "Starbase", service = "starbase" },
   { binding = "Images", service = "images" },
-  { binding = "Account", service = "account"}
+  { binding = "Account", service = "account" },
 ]
 
 # development
@@ -31,7 +32,7 @@ local_protocol = "http"
 [vars]
 DEPLOY_ENV = "local"
 PASSPORT_URL = "http://localhost:10001"
-STORAGE_NAMESPACE="console"
+STORAGE_NAMESPACE = "console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 PROFILE_APP_URL = "http://localhost:10003"
 COOKIE_DOMAIN = "localhost"
@@ -40,25 +41,24 @@ COOKIE_DOMAIN = "localhost"
 # -----------------------------------------------------------------------------
 
 [site]
-  bucket = "./public"
+bucket = "./public"
 
 # Build
 # -----------------------------------------------------------------------------
 
 [build]
-  command = "yarn build -- --sourcemap"
+command = "yarn build -- --sourcemap"
 
 # Environment: dev
 # -----------------------------------------------------------------------------
 
 
-
 [env.dev]
 
 services = [
-  { binding = "Starbase", service = "starbase-dev"},
+  { binding = "Starbase", service = "starbase-dev" },
   { binding = "Images", service = "images-dev" },
-  { binding = "Account", service = "account-dev"}
+  { binding = "Account", service = "account-dev" },
 ]
 
 
@@ -74,7 +74,7 @@ routes = [
 DEPLOY_ENV = "dev"
 PASSPORT_URL = "https://passport-dev.rollup.id"
 COOKIE_DOMAIN = "rollup.id"
-STORAGE_NAMESPACE="console"
+STORAGE_NAMESPACE = "console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 PROFILE_APP_URL = "https://my-dev.rollup.id"
 
@@ -84,9 +84,9 @@ PROFILE_APP_URL = "https://my-dev.rollup.id"
 [env.next]
 
 services = [
-  { binding = "Starbase", service = "starbase-next"},
+  { binding = "Starbase", service = "starbase-next" },
   { binding = "Images", service = "images-next" },
-  { binding = "Account", service = "account-next"}
+  { binding = "Account", service = "account-next" },
 ]
 
 # kv_namespaces = [
@@ -98,13 +98,13 @@ routes = [
 ]
 
 [env.next.build]
-  command = "yarn build"
+command = "yarn build"
 
 [env.next.vars]
 DEPLOY_ENV = "next"
 PASSPORT_URL = "https://passport-next.rollup.id"
 COOKIE_DOMAIN = "rollup.id"
-STORAGE_NAMESPACE="console"
+STORAGE_NAMESPACE = "console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 PROFILE_APP_URL = "https://my-next.rollup.id"
 
@@ -116,7 +116,7 @@ PROFILE_APP_URL = "https://my-next.rollup.id"
 services = [
   { binding = "Starbase", service = "starbase-current", environment = "production" },
   { binding = "Images", service = "images-current" },
-  { binding = "Account", service = "account-current"}
+  { binding = "Account", service = "account-current" },
 ]
 
 # kv_namespaces = [
@@ -128,13 +128,13 @@ routes = [
 ]
 
 [env.current.build]
-  command = "yarn build"
+command = "yarn build"
 
 
 [env.current.vars]
 DEPLOY_ENV = "current"
 PASSPORT_URL = "https://passport.rollup.id"
 COOKIE_DOMAIN = "rollup.id"
-STORAGE_NAMESPACE="console"
+STORAGE_NAMESPACE = "console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 PROFILE_APP_URL = "https://my.rollup.id"
