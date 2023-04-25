@@ -8,12 +8,6 @@ export const AppObjectSchema = z.object({
   termsURL: z.string().optional(),
   privacyURL: z.string().optional(),
   websiteURL: z.string().optional(),
-  paymaster: z
-    .object({
-      provider: z.string(),
-      apiKey: z.string(),
-    })
-    .optional(),
 })
 
 export type AppObject = z.infer<typeof AppObjectSchema>
@@ -57,3 +51,10 @@ export const AppPublicPropsSchema = z.object({
 })
 
 export type AppPublicProps = z.infer<typeof AppPublicPropsSchema>
+
+export const PaymasterSchema = z.object({
+  provider: z.string(),
+  apiKey: z.string(),
+})
+
+export type PaymasterType = z.infer<typeof PaymasterSchema>

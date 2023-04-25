@@ -13,7 +13,8 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
-import type { appDetailsProps, notificationHandlerType } from '~/types'
+import type { notificationHandlerType } from '~/types'
+import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 
 const availablePaymasters = [
   { provider: 'Not selected', id: 'not_selected', unavailable: true },
@@ -33,23 +34,30 @@ export const action: ActionFunction = async ({ request, params, context }) => {
 
   const formData = await request.formData()
   const apiKey = formData.get('apiKey') as string
-  const app = JSON.parse(formData.get('app') as string)
+  if (!apiKey) {
+    errors['apiKey'] = 'API Key is required'
+  }
   //due to specificity of formData inputs
-  const paymaster = formData.get('paymaster[name]') as string
+  const paymaster = formData.get('paymaster[provider]') as string
+  if (!paymaster) {
+    errors['paymaster'] = 'Paymaster is required'
+  }
 
-  const updates = { ...app, paymaster: { provider: paymaster, apiKey } }
-
-  await starbaseClient.updateApp.mutate({
-    clientId: params.clientId,
-    updates,
-  })
+  try {
+    await starbaseClient.setPaymaster.mutate({
+      clientId: params.clientId,
+      paymaster: { provider: paymaster, apiKey },
+    })
+  } catch (e) {
+    errors['paymaster'] = "Error updating paymaster's API key"
+  }
 
   return { errors }
 }
 
 export default () => {
-  const { appDetails, notificationHandler } = useOutletContext<{
-    appDetails: appDetailsProps
+  const { paymaster, notificationHandler } = useOutletContext<{
+    paymaster: PaymasterType
     notificationHandler: notificationHandlerType
   }>()
 
@@ -65,11 +73,10 @@ export default () => {
     }
   }, [errors])
 
-  const { app } = appDetails
   const [selectedPaymaster, setSelectedPaymaster] = useState(() => {
-    if (app?.paymaster?.provider) {
+    if (paymaster?.provider) {
       return availablePaymasters.find(
-        (paymaster) => paymaster.provider === app.paymaster.provider
+        (avPaymaster) => paymaster.provider === avPaymaster.provider
       )
     }
     return availablePaymasters[0]
@@ -83,8 +90,6 @@ export default () => {
         setIsFormChanged(true)
       }}
     >
-      <input hidden name="app" value={JSON.stringify(appDetails.app)} />
-
       <section className="flex flex-col space-y-5">
         <div className="flex flex-row justify-between space-x-5 max-sm:pl-6">
           <div className="flex flex-row items-center space-x-3">
@@ -98,7 +103,9 @@ export default () => {
           <Button
             type="submit"
             btnType="primary-alt"
-            disabled={!isFormChanged || selectedPaymaster.id === 'not_selected'}
+            disabled={
+              !isFormChanged || selectedPaymaster?.id === 'not_selected'
+            }
           >
             Save
           </Button>
@@ -133,7 +140,7 @@ export default () => {
                 <div className="relative border rounded bottom-0">
                   <Listbox.Button className="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                     <span className="block truncate text-sm">
-                      {selectedPaymaster.provider}
+                      {selectedPaymaster?.provider}
                     </span>
                     <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                       <ChevronUpDownIcon
@@ -193,12 +200,12 @@ export default () => {
               <div className="sm:grow-[5]">
                 <Input
                   id="apiKey"
-                  disabled={selectedPaymaster.id === 'not_selected'}
+                  disabled={selectedPaymaster?.id === 'not_selected'}
                   label="API Key"
                   type="text"
                   className="shadow-md w-full"
                   placeholder="Paymaster API Key"
-                  defaultValue={app.paymaster?.apiKey}
+                  defaultValue={paymaster?.apiKey}
                 />
               </div>
             </div>

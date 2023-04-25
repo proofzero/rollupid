@@ -18,6 +18,7 @@ import type {
   AppReadableFields,
   AppUpdateableFields,
 } from '../types'
+import { PaymasterType } from '../jsonrpc/validators/app'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields
@@ -77,6 +78,15 @@ export default class StarbaseApp extends DOProxy {
     const mergedObject = Object.fromEntries(mergedEntries.entries())
 
     await this.state.storage.put('app', mergedObject)
+  }
+
+  async setPaymaster(paymaster: PaymasterType): Promise<void> {
+    await this.state.storage.put('paymaster', paymaster)
+  }
+
+  async getPaymaster(): Promise<PaymasterType> {
+    const paymaster = await this.state.storage.get('paymaster')
+    return paymaster as PaymasterType
   }
 
   async getDetails(): Promise<AppDetails> {
