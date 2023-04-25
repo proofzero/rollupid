@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, Page, APIRequestContext } from '@playwright/test'
 
 test('login to console using Email', async ({ page, request }) => {
   await page.goto('/')
@@ -57,4 +57,95 @@ test('login to console using Email', async ({ page, request }) => {
   // const otpPromise = page.waitForResponse(/.*connect\/email\/otp/)
   // const otpStatRes = await otpPromise
   // console.debug('otpStatRes: ', otpStatRes.status(), otpStatRes.statusText())
+  // Expect a title "to contain" a substring.
+  await expect(page).toHaveTitle(/Console/)
+
+  await testConsoleAppCreation({ page, request })
 })
+
+const testConsoleAppCreation = async ({
+  page,
+  request,
+}: {
+  page: Page
+  request: APIRequestContext
+}) => {
+  const appName = `test-app-${Date.now()}`
+
+  await page.goto('/dashboard')
+
+  await page.waitForURL(/.*dashboard/, {
+    timeout: 10000,
+    waitUntil: 'networkidle',
+  })
+
+  await page
+    .getByRole('button')
+    .filter({ hasText: 'Create Application' })
+    .click()
+
+  await page.waitForURL(/.*apps\/new/, {
+    timeout: 10000,
+    waitUntil: 'networkidle',
+  })
+
+  await page.waitForSelector('#client_name')
+
+  await page.locator('#client_name').fill(appName)
+
+  await page.getByRole('button').filter({ hasText: 'Create' }).click()
+
+  await page.waitForURL(/.*apps\/.*/, {
+    timeout: 5000,
+    waitUntil: 'networkidle',
+  })
+
+  await page.waitForSelector('#oAuthAppId')
+
+  const appId = await page.locator('#oAuthAppId').getAttribute('value')
+
+  await page.getByRole('button').filter({ hasText: 'Complete Setup' }).click()
+
+  await page.waitForURL(/.*apps\/.*\/auth/, {
+    timeout: 5000,
+    waitUntil: 'networkidle',
+  })
+
+  await page.locator('a', { hasText: 'Connect email address' }).click()
+
+  await page.waitForURL(/.*apps\/.*\/team/, {
+    timeout: 5000,
+    waitUntil: 'networkidle',
+  })
+
+  await page
+    .locator(
+      'button[data-headlessui-state][type="button"][aria-haspopup="true"][aria-expanded="false"]'
+    )
+    .nth(2)
+    .click()
+
+  const emailSelectorVal = await page
+    .locator('[role="option"]')
+    .first()
+    .innerText()
+  await page.locator('[role="option"]').first().click()
+
+  await expect(
+    page
+      .locator(
+        'button[data-headlessui-state][type="button"][aria-haspopup="true"][aria-expanded="false"] p'
+      )
+      .nth(2)
+  ).toHaveText(emailSelectorVal)
+
+  await page.goto(`/apps/${appId}/auth`)
+
+  await page.waitForURL(/.*apps\/.*\/auth/, {
+    timeout: 5000,
+    waitUntil: 'networkidle',
+  })
+
+  expect(page.locator('input[name="termsURL"]')).toBeTruthy()
+  expect(page.locator('input[name="privacyURL"]')).toBeTruthy()
+}

@@ -87,6 +87,7 @@ export default () => {
       name: string
       iconURL: string
       termsURL?: string
+      privacyURL?: string
     }
     connectFlow: boolean
   }>()
@@ -260,11 +261,15 @@ export default () => {
             )}
           </div>
 
-          {appProps?.termsURL && (
+          {(appProps?.termsURL || appProps?.privacyURL) && (
             <Text size="sm" className="text-gray-500 mt-7">
               Before using this app, you can review{' '}
               {appProps?.name ?? `Company`}
               's{' '}
+              <a href={appProps.privacyURL} className="text-indigo-500">
+                privacy policy
+              </a>
+              {appProps?.termsURL && appProps?.privacyURL && <span> and </span>}
               <a href={appProps.termsURL} className="text-indigo-500">
                 terms of service
               </a>

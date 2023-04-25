@@ -95,6 +95,12 @@ const updatesSchema = z.object({
       { message: HTTP_MESSAGE }
     )
     .optional(),
+  privacyURL: z.string().refine(
+    (val) => {
+      return URL_VALIDATION({ val, required: true })
+    },
+    { message: HTTP_MESSAGE }
+  ),
   websiteURL: z
     .string()
     .refine(
@@ -104,30 +110,6 @@ const updatesSchema = z.object({
       { message: HTTP_MESSAGE }
     )
     .optional(),
-  twitterUser: z
-    .string()
-    .url()
-    .startsWith('https://twitter.com/')
-    .optional()
-    .or(z.string().length(0)),
-  mediumUser: z
-    .string()
-    .url()
-    .startsWith('https://medium.com/@')
-    .optional()
-    .or(z.string().length(0)),
-  mirrorURL: z
-    .string()
-    .url()
-    .startsWith('https://mirror.xyz/')
-    .optional()
-    .or(z.string().length(0)),
-  discordUser: z
-    .string()
-    .url()
-    .startsWith('http://discord.com/')
-    .optional()
-    .or(z.string().length(0)),
 })
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
@@ -188,11 +170,8 @@ export const action: ActionFunction = async ({ request, params, context }) => {
         icon: formData.get('icon') as string | undefined,
         redirectURI: formData.get('redirectURI') as string | undefined,
         termsURL: formData.get('termsURL') as string | undefined,
+        privacyURL: formData.get('privacyURL') as string | undefined,
         websiteURL: formData.get('websiteURL') as string | undefined,
-        twitterUser: formData.get('twitterUser') as string | undefined,
-        mediumUser: formData.get('mediumUser') as string | undefined,
-        mirrorURL: formData.get('mirrorURL') as string | undefined,
-        discordUser: formData.get('discordUser') as string | undefined,
         scopes: Array.from(scopes),
       }
 
@@ -472,31 +451,32 @@ export default function AppDetailIndexPage() {
                   </div>
                 </div>
 
-                <div className="my-8 md:my-0">
-                  <ReadOnlyInput
-                    id="appDomains"
-                    label="Domain(s)"
-                    className="cursor-no-drop"
-                    value=""
-                    required
-                  />
-                  <Text
-                    type="span"
-                    size="xs"
-                    weight="medium"
-                    className="text-gray-400"
-                  >
-                    <a
-                      className="text-indigo-500"
-                      href="https://discord.gg/rollupid"
-                    >
-                      Contact us
-                    </a>{' '}
-                    to enable this feature
-                  </Text>
-                </div>
+                <div className="flex flex-col md:flex-row space-y-8 my-4 md:space-y-0 md:space-x-8 md:items-end">
+                  <div className="flex-1 mb-1">
+                    <ReadOnlyInput
+                      id="appDomains"
+                      label="Domain(s)"
+                      className="cursor-no-drop"
+                      value=""
+                      required
+                    />
 
-                <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
+                    <Text
+                      type="span"
+                      size="xs"
+                      weight="medium"
+                      className="text-gray-400"
+                    >
+                      <a
+                        className="text-indigo-500"
+                        href="https://discord.gg/rollupid"
+                      >
+                        Contact us
+                      </a>{' '}
+                      to enable this feature
+                    </Text>
+                  </div>
+
                   <div className="flex-1">
                     <Input
                       id="redirectURI"
@@ -514,50 +494,6 @@ export default function AppDetailIndexPage() {
                         weight="normal"
                       >
                         {errors.redirectURI || ''}
-                      </Text>
-                    ) : (
-                      <div className="sm:mb-[1.755rem]" />
-                    )}
-                  </div>
-
-                  <div className="flex-1">
-                    <Input
-                      id="termsURL"
-                      label="Terms of Service URL"
-                      type="url"
-                      error={errors?.['termsURL']}
-                      placeholder="www.example.com"
-                      defaultValue={appDetails.app.termsURL}
-                    />
-                    {errors?.termsURL ? (
-                      <Text
-                        className="mb-1.5 mt-1.5 text-red-500"
-                        size="xs"
-                        weight="normal"
-                      >
-                        {errors.termsURL || ''}
-                      </Text>
-                    ) : (
-                      <div className="sm:mb-[1.755rem]" />
-                    )}
-                  </div>
-
-                  <div className="flex-1">
-                    <Input
-                      id="websiteURL"
-                      label="Website"
-                      error={errors?.['websiteURL']}
-                      type="url"
-                      placeholder="www.example.com"
-                      defaultValue={appDetails.app.websiteURL}
-                    />
-                    {errors?.websiteURL ? (
-                      <Text
-                        className="mb-1.5 mt-1.5 text-red-500"
-                        size="xs"
-                        weight="normal"
-                      >
-                        {errors.websiteURL || ''}
                       </Text>
                     ) : (
                       <div className="sm:mb-[1.755rem]" />
@@ -590,56 +526,87 @@ export default function AppDetailIndexPage() {
               <div className="flex flex-col space-y-8 md:space-y-5 truncate">
                 <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
                   <div className="flex-1">
-                    <PreLabeledInput
-                      id="discordUser"
-                      label="Discord"
-                      preLabel="http://discord.com/"
-                      defaultValue={appDetails.app.discordUser}
+                    <Input
+                      required
+                      id="termsURL"
+                      label="Terms of Service"
+                      type="url"
+                      error={errors?.['termsURL']}
+                      placeholder="www.example.com"
+                      defaultValue={appDetails.app.termsURL}
                     />
+                    {errors?.termsURL ? (
+                      <Text
+                        className="mb-1.5 mt-1.5 text-red-500"
+                        size="xs"
+                        weight="normal"
+                      >
+                        {errors.termsURL || ''}
+                      </Text>
+                    ) : (
+                      <div className="sm:mb-[1.755rem]" />
+                    )}
                   </div>
-                  <div className="flex-1">
-                    <PreLabeledInput
-                      id="twitterUser"
-                      label="Twitter"
-                      preLabel="https://twitter.com/"
-                      defaultValue={appDetails.app.twitterUser}
-                    />
-                  </div>
-                </div>
 
-                <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
                   <div className="flex-1">
-                    <PreLabeledInput
-                      id="mediumUser"
-                      label="Medium"
-                      preLabel="https://medium.com/@"
-                      defaultValue={appDetails.app.mediumUser}
+                    <Input
+                      required
+                      id="privacyURL"
+                      label="Privacy Policy"
+                      type="url"
+                      error={errors?.['privacyURL']}
+                      placeholder="www.example.com"
+                      defaultValue={appDetails.app.privacyURL}
                     />
+                    {errors?.privacyURL ? (
+                      <Text
+                        className="mb-1.5 mt-1.5 text-red-500"
+                        size="xs"
+                        weight="normal"
+                      >
+                        {errors.privacyURL || ''}
+                      </Text>
+                    ) : (
+                      <div className="sm:mb-[1.755rem]" />
+                    )}
                   </div>
+
                   <div className="flex-1">
-                    <PreLabeledInput
-                      id="mirrorURL"
-                      label="Mirror"
-                      preLabel="https://mirror.xyz/"
-                      defaultValue={appDetails.app.mirrorURL}
+                    <Input
+                      required
+                      id="websiteURL"
+                      label="Website"
+                      error={errors?.['websiteURL']}
+                      type="url"
+                      placeholder="www.example.com"
+                      defaultValue={appDetails.app.websiteURL}
                     />
+                    {errors?.websiteURL ? (
+                      <Text
+                        className="mb-1.5 mt-1.5 text-red-500"
+                        size="xs"
+                        weight="normal"
+                      >
+                        {errors.websiteURL || ''}
+                      </Text>
+                    ) : (
+                      <div className="sm:mb-[1.755rem]" />
+                    )}
                   </div>
                 </div>
               </div>
             </Panel>
 
             <Panel title="Danger Zone">
-              <Text
-                type="span"
-                weight="medium"
-                size="sm"
-                className="text-red-500 cursor-pointer"
+              <Button
+                type="submit"
+                btnType="dangerous-alt"
                 onClick={() => {
                   setDeleteModalOpen(true)
                 }}
               >
-                Delete the App
-              </Text>
+                Delete the Application
+              </Button>
             </Panel>
           </section>
         </fieldset>
