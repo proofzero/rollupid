@@ -53,8 +53,8 @@ export const AppPublicPropsSchema = z.object({
 export type AppPublicProps = z.infer<typeof AppPublicPropsSchema>
 
 export const PaymasterSchema = z.object({
-  provider: z.string(),
-  apiKey: z.string(),
+  provider: z.literal('zerodev'),
+  secret: z.string(),
 })
 
 export type PaymasterType = z.infer<typeof PaymasterSchema>

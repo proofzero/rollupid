@@ -81,12 +81,14 @@ export default class StarbaseApp extends DOProxy {
   }
 
   async setPaymaster(paymaster: PaymasterType): Promise<void> {
-    await this.state.storage.put('paymaster', paymaster)
+    await this.state.storage.put('blockchain', { paymaster })
   }
 
   async getPaymaster(): Promise<PaymasterType> {
-    const paymaster = await this.state.storage.get('paymaster')
-    return paymaster as PaymasterType
+    const blockchain = (await this.state.storage.get('blockchain')) as {
+      paymaster: PaymasterType
+    }
+    return blockchain.paymaster as PaymasterType
   }
 
   async getDetails(): Promise<AppDetails> {

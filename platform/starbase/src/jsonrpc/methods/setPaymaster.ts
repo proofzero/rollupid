@@ -17,7 +17,6 @@ export const setPaymaster = async ({
   ctx: Context
 }): Promise<void> => {
   const appURN = ApplicationURNSpace.componentizedUrn(input.clientId)
-  console.log({ appURN })
   if (!ctx.ownAppURNs || !ctx.ownAppURNs.includes(appURN))
     throw new Error(
       `Request received for clientId ${input.clientId} which is not owned by provided account.`

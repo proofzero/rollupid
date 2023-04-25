@@ -16,9 +16,27 @@ import type { ActionFunction } from '@remix-run/cloudflare'
 import type { notificationHandlerType } from '~/types'
 import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 
-const availablePaymasters = [
-  { provider: 'Not selected', id: 'not_selected', unavailable: true },
-  { provider: 'ZeroDev', id: 'zerodev', unavailable: false },
+type errorsType = {
+  label?: string
+  paymaster?: string
+}
+
+type paymasterType = {
+  provider?: string
+  name?: string
+  secretLabel?: string
+  secretPlaceholder?: string
+  unavailable?: boolean
+}
+
+const availablePaymasters: paymasterType[] = [
+  {
+    name: 'ZeroDev',
+    provider: 'zerodev',
+    secretLabel: 'Project ID',
+    secretPlaceholder: 'ZeroDev project ID',
+    unavailable: false,
+  },
 ]
 
 export const action: ActionFunction = async ({ request, params, context }) => {
@@ -26,30 +44,34 @@ export const action: ActionFunction = async ({ request, params, context }) => {
     throw new Error('Application Client ID is required for the requested route')
   }
   const jwt = await requireJWT(request)
-  let errors = {}
+  let errors: errorsType = {}
   const starbaseClient = createStarbaseClient(Starbase, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...generateTraceContextHeaders(context.traceSpan),
   })
 
   const formData = await request.formData()
-  const apiKey = formData.get('apiKey') as string
-  if (!apiKey) {
-    errors['apiKey'] = 'API Key is required'
-  }
+
   //due to specificity of formData inputs
-  const paymaster = formData.get('paymaster[provider]') as string
+  const paymaster = formData.get(
+    'paymaster[provider]'
+  ) as PaymasterType['provider']
+
   if (!paymaster) {
-    errors['paymaster'] = 'Paymaster is required'
+    errors.paymaster = 'Paymaster is required'
   }
 
+  const secret = formData.get('secret') as string
+  if (!secret) {
+    errors.label = `Provider secret is required`
+  }
   try {
     await starbaseClient.setPaymaster.mutate({
       clientId: params.clientId,
-      paymaster: { provider: paymaster, apiKey },
+      paymaster: { provider: paymaster, secret },
     })
   } catch (e) {
-    errors['paymaster'] = "Error updating paymaster's API key"
+    errors.paymaster = `Error updating paymaster's secret`
   }
 
   return { errors }
@@ -79,7 +101,7 @@ export default () => {
         (avPaymaster) => paymaster.provider === avPaymaster.provider
       )
     }
-    return availablePaymasters[0]
+    return {} as paymasterType
   })
 
   return (
@@ -103,9 +125,7 @@ export default () => {
           <Button
             type="submit"
             btnType="primary-alt"
-            disabled={
-              !isFormChanged || selectedPaymaster?.id === 'not_selected'
-            }
+            disabled={!isFormChanged || !selectedPaymaster?.provider}
           >
             Save
           </Button>
@@ -139,8 +159,13 @@ export default () => {
                 </Listbox.Label>
                 <div className="relative border rounded bottom-0">
                   <Listbox.Button className="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
-                    <span className="block truncate text-sm">
-                      {selectedPaymaster?.provider}
+                    <span
+                      className={`block truncate text-sm ${
+                        selectedPaymaster?.name ? '' : 'text-gray-400'
+                      }`}
+                    >
+                      {selectedPaymaster?.name ||
+                        "Select a paymaster's provider"}
                     </span>
                     <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                       <ChevronUpDownIcon
@@ -164,12 +189,9 @@ export default () => {
                             ${
                               active
                                 ? 'bg-indigo-100 text-indigo-900'
-                                : paymaster.id === 'not_selected'
-                                ? 'bg-gray-50'
                                 : 'text-gray-900'
                             } }`
                           }
-                          disabled={paymaster.id === 'not_selected'}
                           value={paymaster}
                         >
                           {({ selected }) => (
@@ -179,7 +201,7 @@ export default () => {
                                   selected ? 'font-medium' : 'font-normal'
                                 }`}
                               >
-                                {paymaster.provider}
+                                {paymaster.name}
                               </span>
                               {selected ? (
                                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
@@ -199,13 +221,12 @@ export default () => {
               </Listbox>
               <div className="sm:grow-[5]">
                 <Input
-                  id="apiKey"
-                  disabled={selectedPaymaster?.id === 'not_selected'}
-                  label="API Key"
+                  id="secret"
+                  label={selectedPaymaster?.secretLabel || 'API Key'}
                   type="text"
                   className="shadow-md w-full"
-                  placeholder="Paymaster API Key"
-                  defaultValue={paymaster?.apiKey}
+                  placeholder={selectedPaymaster?.secretPlaceholder}
+                  defaultValue={paymaster?.secret}
                 />
               </div>
             </div>
