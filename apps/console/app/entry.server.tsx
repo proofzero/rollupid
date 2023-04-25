@@ -43,6 +43,7 @@ export default function handleRequest(
             SELF,
             '*.google-analytics.com',
             'https://upload.imagedelivery.net',
+            'https://static.ads-twitter.com/uwt.js',
             // Used for Remix WebSocket Live Reaload
             ...(dev ? ['ws://localhost:*/socket'] : []),
           ],
