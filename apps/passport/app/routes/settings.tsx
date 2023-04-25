@@ -121,7 +121,7 @@ export default function SettingsLayout() {
   } = useLoaderData()
 
   return (
-    <Popover className="bg-gray-50 min-h-screen relative">
+    <Popover className="bg-gray-50 min-h-[100dvh] relative">
       {({ open }) => {
         return (
           <div className="flex lg:flex-row h-full">

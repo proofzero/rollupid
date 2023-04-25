@@ -105,7 +105,7 @@ export default function SideMenu({
 
   return (
     <div
-      className="text-center bg-white lg:min-h-screen
+      className="text-center bg-white lg:min-h-[100dvh]
     lg:min-w-[256px] lg:max-w-sm lg:border-r lg:text-left
     flex flex-col"
     >

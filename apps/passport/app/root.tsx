@@ -63,7 +63,7 @@ export const meta: MetaFunction = () => ({
   'twitter:card': 'summary_large_image',
   'twitter:site': '@rollupid_xyz',
   'twitter:creator': '@rollupid_xyz',
-  'theme-color': '#673ab8',
+  'theme-color': '#ffffff',
   'mobile-web-app-capable': 'yes',
   'apple-mobile-web-app-capable': 'yes',
 })

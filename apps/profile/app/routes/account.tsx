@@ -114,7 +114,7 @@ export default function AccountLayout() {
     }>()
 
   return (
-    <Popover className="bg-white h-full min-h-screen overflow-visible">
+    <Popover className="bg-white h-full min-h-[100dvh] overflow-visible">
       {({ open }) => {
         return (
           <>
@@ -159,7 +159,7 @@ export default function AccountLayout() {
                       accountURN={AccountURNSpace.decode(accountURN)}
                     />
                     <div
-                      className="min-h-screen divide-y divide-transparent px-4
+                      className="min-h-[100dvh] divide-y divide-transparent px-4
                     lg:col-start-3
                     lg:max-[1200px]:col-end-11 min-[1200px]:col-end-13
                     lg:p-4 lg:p-8"
