@@ -51,7 +51,7 @@ export const SmartContractWalletSelect = ({
         <div className="relative select-none">
           <Listbox.Button className="border shadow-sm rounded-lg w-full transition-transform flex flex-row justify-between items-center py-2 px-3 hover:ring-1 hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white">
             {(!selectedWallet || selectedWallet.title.length === 0) && (
-              <Text size="sm" className="text-gray-800 truncate text-ellipsis">
+              <Text size="sm" className="text-gray-400 truncate text-ellipsis">
                 Select a Smart Contract Wallet
               </Text>
             )}
