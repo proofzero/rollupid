@@ -6,7 +6,7 @@ import { AccessURNSpace } from '@proofzero/urns/access'
 
 export enum ReferenceType {
   Authorization = 'authorization',
-  Contact = 'contact',
+  DevNotifEmail = 'developerNotificationEmail',
 }
 
 export const GetAddressReferenceTypeOutput = z.array(z.nativeEnum(ReferenceType))
@@ -33,7 +33,7 @@ export const getAddressReferenceTypes = async ({
     ApplicationURNSpace.is(e.src.baseUrn)
   )
   if (contactEdges.length > 0) {
-    usages.push(ReferenceType.Contact)
+    usages.push(ReferenceType.DevNotifEmail)
   }
 
   const authorizationEdges = edges.filter((e) =>
