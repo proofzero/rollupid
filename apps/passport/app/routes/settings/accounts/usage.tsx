@@ -1,5 +1,5 @@
 import { BadRequestError } from '@proofzero/errors'
-import { AddressUsage } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressReferenceTypes'
+import { ReferenceType } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressReferenceTypes'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { AddressUsageDisconnectModel } from '~/components/settings/accounts/DisconnectModal'
 import { getAddressClient } from '~/platform.server'
@@ -26,15 +26,15 @@ export const action: ActionFunction = async ({ request, context }) => {
 
   const usages = await addressClient.getAddressReferenceTypes.query()
   const mappedUsages: AddressUsageDisconnectModel[] = usages.map(
-    (u: AddressUsage) => {
+    (u: ReferenceType) => {
       switch (u) {
-        case AddressUsage.Authorization:
+        case ReferenceType.Authorization:
           return {
             message: 'Address is being used for app(s) authorizations.',
             external: false,
             path: '/settings/applications',
           }
-        case AddressUsage.Contact:
+        case ReferenceType.Contact:
           return {
             message: 'Address is being used as contact in Console.',
             external: true,

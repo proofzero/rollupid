@@ -81,7 +81,7 @@ import {
 
 import {
   getAddressReferenceTypes,
-  GetAddressUsageOutput,
+  GetAddressReferenceTypeOutput,
 } from './methods/getAddressReferenceTypes'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
@@ -238,6 +238,6 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(Analytics)
-    .output(GetAddressUsageOutput)
+    .output(GetAddressReferenceTypeOutput)
     .query(getAddressReferenceTypes),
 })

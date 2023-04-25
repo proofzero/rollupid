@@ -4,20 +4,20 @@ import { Context } from '../../context'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { AccessURNSpace } from '@proofzero/urns/access'
 
-export enum AddressUsage {
+export enum ReferenceType {
   Authorization = 'authorization',
   Contact = 'contact',
 }
 
-export const GetAddressUsageOutput = z.array(z.nativeEnum(AddressUsage))
+export const GetAddressReferenceTypeOutput = z.array(z.nativeEnum(ReferenceType))
 
-type GetAddressUsageResult = z.infer<typeof GetAddressUsageOutput>
+type GetAddressReferenceTypeResult = z.infer<typeof GetAddressReferenceTypeOutput>
 
 export const getAddressReferenceTypes = async ({
   ctx,
 }: {
   ctx: Context
-}): Promise<GetAddressUsageResult> => {
+}): Promise<GetAddressReferenceTypeResult> => {
   const { addressURN } = ctx
 
   const { edges } = await ctx.edges.getEdges.query({
@@ -27,20 +27,20 @@ export const getAddressReferenceTypes = async ({
     },
   })
 
-  const usages: AddressUsage[] = []
+  const usages: ReferenceType[] = []
 
   const contactEdges = edges.filter((e) =>
     ApplicationURNSpace.is(e.src.baseUrn)
   )
   if (contactEdges.length > 0) {
-    usages.push(AddressUsage.Contact)
+    usages.push(ReferenceType.Contact)
   }
 
   const authorizationEdges = edges.filter((e) =>
     AccessURNSpace.is(e.src.baseUrn)
   )
   if (authorizationEdges.length > 0) {
-    usages.push(AddressUsage.Authorization)
+    usages.push(ReferenceType.Authorization)
   }
 
   return usages
