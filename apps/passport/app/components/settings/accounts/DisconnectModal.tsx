@@ -65,7 +65,7 @@ export default ({
   ) : (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div
-        className={`max-w-sm md:max-w-md lg:max-w-md w-[512px] relative transform rounded-lg bg-white text-left shadow-xl transition-all overflow-y-auto`}
+        className={`max-w-full w-[512px] relative transform rounded-lg bg-white text-left shadow-xl transition-all overflow-y-auto`}
       >
         <div className="flex flex-row space-x-4 p-6">
           <img src={warn} alt="Not Found" />
