@@ -508,12 +508,15 @@ export default function Authorize() {
                       <div className="flex flex-row w-full gap-2 items-center">
                         <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
 
-                        {scope !== 'email' &&
-                          scope !== 'connected_accounts' && (
-                            <Text className="flex-1">
-                              {scopeMeta.scopes[scope].name}
-                            </Text>
-                          )}
+                        {scope !== 'email' && scope !== 'connected_accounts' && (
+                          <Text
+                            size="sm"
+                            weight="medium"
+                            className="flex-1 text-gray-500"
+                          >
+                            {scopeMeta.scopes[scope].name}
+                          </Text>
+                        )}
 
                         {scope === 'email' && (
                           <div className="flex-1 min-w-0">
