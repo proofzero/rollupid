@@ -20,7 +20,7 @@ type SmartContractWalletSelectProps = {
   onSelect?: (selected: SmartContractWalletListItem) => void
 }
 
-const newSCWalletTitle = 'New Smart Contract Wallet'
+const NEW_SMART_CONTRACT_WALLET = 'New Smart Contract Wallet'
 
 export const SmartContractWalletSelect = ({
   wallets,
@@ -104,7 +104,7 @@ export const SmartContractWalletSelect = ({
               ))}
               <Listbox.Option
                 value={{
-                  title: 'New Smart Contract Wallet',
+                  title: NEW_SMART_CONTRACT_WALLET,
                 }}
                 className="cursor-pointer cursor-pointer
                   hover:bg-gray-100 rounded-lg w-full bg-white"
@@ -113,7 +113,8 @@ export const SmartContractWalletSelect = ({
                   return (
                     <div
                       className={`${
-                        selected && selectedWallet?.title === newSCWalletTitle
+                        selected &&
+                        selectedWallet?.title === NEW_SMART_CONTRACT_WALLET
                           ? 'bg-gray-100'
                           : ''
                       } w-full flex flex-row
@@ -125,16 +126,17 @@ export const SmartContractWalletSelect = ({
                       <Text
                         size="sm"
                         weight={
-                          selected && selectedWallet?.title === newSCWalletTitle
+                          selected &&
+                          selectedWallet?.title === NEW_SMART_CONTRACT_WALLET
                             ? 'semibold'
                             : 'normal'
                         }
                         className={`flex-1 truncate`}
                       >
-                        {newSCWalletTitle}
+                        {NEW_SMART_CONTRACT_WALLET}
                       </Text>
                       {selected &&
-                        selectedWallet?.title === newSCWalletTitle && (
+                        selectedWallet?.title === NEW_SMART_CONTRACT_WALLET && (
                           <HiCheck className="w-5 h-5 text-indigo-500" />
                         )}
                     </div>
