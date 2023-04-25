@@ -9,9 +9,13 @@ export enum ReferenceType {
   DevNotifEmail = 'developerNotificationEmail',
 }
 
-export const GetAddressReferenceTypeOutput = z.array(z.nativeEnum(ReferenceType))
+export const GetAddressReferenceTypeOutput = z.array(
+  z.nativeEnum(ReferenceType)
+)
 
-type GetAddressReferenceTypeResult = z.infer<typeof GetAddressReferenceTypeOutput>
+type GetAddressReferenceTypeResult = z.infer<
+  typeof GetAddressReferenceTypeOutput
+>
 
 export const getAddressReferenceTypes = async ({
   ctx,
@@ -28,20 +32,13 @@ export const getAddressReferenceTypes = async ({
   })
 
   const references: ReferenceType[] = []
-
-  const contactEdges = edges.filter((e) =>
-    ApplicationURNSpace.is(e.src.baseUrn)
-  )
-  if (contactEdges.length > 0) {
-    references.push(ReferenceType.DevNotifEmail)
-  }
-
-  const authorizationEdges = edges.filter((e) =>
-    AccessURNSpace.is(e.src.baseUrn)
-  )
-  if (authorizationEdges.length > 0) {
-    references.push(ReferenceType.Authorization)
-  }
+  edges.forEach((e) => {
+    if (ApplicationURNSpace.is(e.src.baseUrn)) {
+      references.push(ReferenceType.DevNotifEmail)
+    } else if (AccessURNSpace.is(e.src.baseUrn)) {
+      references.push(ReferenceType.Authorization)
+    }
+  })
 
   return references
 }
