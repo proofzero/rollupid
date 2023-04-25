@@ -71,7 +71,7 @@ export const EmailSelect = ({
       onChange={(selected) => {
         setSelected(selected)
       }}
-      by="email"
+      by="addressURN"
     >
       {({ open }) => (
         <div className="relative bg-white">
@@ -143,7 +143,9 @@ export const EmailSelect = ({
                         <Text
                           size="sm"
                           weight={selected ? 'semibold' : 'normal'}
-                          className={`truncate text-ellipsis ${selected ? '' : ''} flex-1`}
+                          className={`truncate text-ellipsis ${
+                            selected ? '' : ''
+                          } flex-1`}
                         >
                           {item.email}
                         </Text>
