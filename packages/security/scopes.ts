@@ -129,12 +129,12 @@ export const SCOPES: ScopeMap = {
   },
   [SCOPE_PROFILE]: {
     name: 'Profile',
-    description: `Read your name and picture.`,
+    description: `Read your name and picture`,
     class: 'profile',
   },
   [SCOPE_CONNECTED_ACCOUNTS]: {
     name: 'Connected accounts',
-    description: `Listing of the types and the identifiers of the identity's connected accounts`,
+    description: `List your connected accounts and identifiers`,
     class: 'address',
   },
   // NOT READY YET
