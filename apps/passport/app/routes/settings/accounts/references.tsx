@@ -24,8 +24,8 @@ export const action: ActionFunction = async ({ request, context }) => {
     context.traceSpan
   )
 
-  const usages = await addressClient.getAddressReferenceTypes.query()
-  const mappedUsages: AddressUsageDisconnectModel[] = usages.map(
+  const references = await addressClient.getAddressReferenceTypes.query()
+  const mappedReferences: AddressUsageDisconnectModel[] = references.map(
     (u: ReferenceType) => {
       switch (u) {
         case ReferenceType.Authorization:
@@ -42,11 +42,11 @@ export const action: ActionFunction = async ({ request, context }) => {
           }
         default:
           throw new BadRequestError({
-            message: `Unknown address usage: ${u}`,
+            message: `Unknown address reference type: ${u}`,
           })
       }
     }
   )
 
-  return mappedUsages
+  return mappedReferences
 }

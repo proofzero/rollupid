@@ -27,21 +27,21 @@ export const getAddressReferenceTypes = async ({
     },
   })
 
-  const usages: ReferenceType[] = []
+  const references: ReferenceType[] = []
 
   const contactEdges = edges.filter((e) =>
     ApplicationURNSpace.is(e.src.baseUrn)
   )
   if (contactEdges.length > 0) {
-    usages.push(ReferenceType.DevNotifEmail)
+    references.push(ReferenceType.DevNotifEmail)
   }
 
   const authorizationEdges = edges.filter((e) =>
     AccessURNSpace.is(e.src.baseUrn)
   )
   if (authorizationEdges.length > 0) {
-    usages.push(ReferenceType.Authorization)
+    references.push(ReferenceType.Authorization)
   }
 
-  return usages
+  return references
 }

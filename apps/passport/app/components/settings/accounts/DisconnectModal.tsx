@@ -52,7 +52,7 @@ export default ({
       },
       {
         method: 'post',
-        action: '/settings/accounts/usage',
+        action: '/settings/accounts/references',
       }
     )
   }, [id, primaryAddressBaseURN, isOpen])
