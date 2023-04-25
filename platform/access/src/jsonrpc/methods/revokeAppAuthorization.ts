@@ -77,18 +77,16 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
       })
     }
 
-    const { edges: addressEdges } = await ctx.edgesClient.getEdges.query({
-      query: {
-        src: { baseUrn: accountURN },
-        tag: EDGE_ADDRESS,
-      },
-    })
+    const addresses =
+      (await ctx.accountClient.getAddresses.query({
+        account: accountURN,
+      })) ?? []
 
-    for (let i = 0; i < addressEdges.length; i++) {
+    for (let i = 0; i < addresses.length; i++) {
       await ctx.edgesClient.removeEdge.mutate({
         tag: EDGE_HAS_REFERENCE_TO,
         src: accessURN,
-        dst: addressEdges[i].dst.baseUrn,
+        dst: addresses[i].baseUrn,
       })
     }
 
