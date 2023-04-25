@@ -9,15 +9,21 @@ import {
 import { AddressURN } from '@proofzero/urns/address'
 import { TbCirclePlus } from 'react-icons/tb'
 import { HiCheck } from 'react-icons/hi'
+import { CryptoAddressType } from '@proofzero/types/address'
 
 type SmartContractWalletListItem = {
   title: string
+  type: CryptoAddressType | OptionType
   addressURN?: AddressURN
 }
 
 type SmartContractWalletSelectProps = {
   wallets?: Array<SmartContractWalletListItem>
   onSelect?: (selected: SmartContractWalletListItem) => void
+}
+
+export enum OptionType {
+  AddNew,
 }
 
 const NEW_SMART_CONTRACT_WALLET = 'New Smart Contract Wallet'
@@ -105,6 +111,7 @@ export const SmartContractWalletSelect = ({
               <Listbox.Option
                 value={{
                   title: NEW_SMART_CONTRACT_WALLET,
+                  type: OptionType.AddNew,
                 }}
                 className="cursor-pointer cursor-pointer
                   hover:bg-gray-100 rounded-lg w-full bg-white"
@@ -113,8 +120,7 @@ export const SmartContractWalletSelect = ({
                   return (
                     <div
                       className={`${
-                        selected &&
-                        selectedWallet?.title === NEW_SMART_CONTRACT_WALLET
+                        selected && selectedWallet?.type === OptionType.AddNew
                           ? 'bg-gray-100'
                           : ''
                       } w-full flex flex-row
@@ -126,8 +132,7 @@ export const SmartContractWalletSelect = ({
                       <Text
                         size="sm"
                         weight={
-                          selected &&
-                          selectedWallet?.title === NEW_SMART_CONTRACT_WALLET
+                          selected && selectedWallet?.type === OptionType.AddNew
                             ? 'semibold'
                             : 'normal'
                         }
@@ -136,7 +141,7 @@ export const SmartContractWalletSelect = ({
                         {NEW_SMART_CONTRACT_WALLET}
                       </Text>
                       {selected &&
-                        selectedWallet?.title === NEW_SMART_CONTRACT_WALLET && (
+                        selectedWallet?.type === OptionType.AddNew && (
                           <HiCheck className="w-5 h-5 text-indigo-500" />
                         )}
                     </div>

@@ -6,7 +6,7 @@ import { Button } from '../../build'
 
 import { Input } from '../../atoms/form/Input'
 
-export const SmartContractWalletConnection = ({
+export const SmartContractWalletCreationSummary = ({
   completeCallback,
 }: {
   completeCallback: () => void
