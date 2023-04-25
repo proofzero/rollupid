@@ -1,5 +1,5 @@
 import { BadRequestError } from '@proofzero/errors'
-import { AddressUsage } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressUsage'
+import { AddressUsage } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressReferenceTypes'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { AddressUsageDisconnectModel } from '~/components/settings/accounts/DisconnectModal'
 import { getAddressClient } from '~/platform.server'
@@ -24,7 +24,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     context.traceSpan
   )
 
-  const usages = await addressClient.getAddressUsage.query()
+  const usages = await addressClient.getAddressReferenceTypes.query()
   const mappedUsages: AddressUsageDisconnectModel[] = usages.map(
     (u: AddressUsage) => {
       switch (u) {

@@ -11,7 +11,7 @@ import {
 } from '@proofzero/platform-middleware/inputValidators'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { ERROR_CODES, RollupError } from '@proofzero/errors'
-import { getAddressUsage } from './getAddressUsage'
+import { getAddressReferenceTypes } from './getAddressReferenceTypes'
 
 export const UnsetAccountInput = AccountURNInput
 
@@ -52,7 +52,7 @@ export const unsetAccountMethod = async ({
     })
   }
 
-  const addressUsage = await getAddressUsage({ ctx })
+  const addressUsage = await getAddressReferenceTypes({ ctx })
   if (addressUsage.length > 0) {
     throw new RollupError({
       code: ERROR_CODES.BAD_REQUEST,

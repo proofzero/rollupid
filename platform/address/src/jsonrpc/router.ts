@@ -80,9 +80,9 @@ import {
 } from './methods/deleteAddressNode'
 
 import {
-  getAddressUsage,
+  getAddressReferenceTypes,
   GetAddressUsageOutput,
-} from './methods/getAddressUsage'
+} from './methods/getAddressReferenceTypes'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -234,10 +234,10 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(DeleteAddressNodeInput)
     .mutation(deleteAddressNodeMethod),
-  getAddressUsage: t.procedure
+  getAddressReferenceTypes: t.procedure
     .use(LogUsage)
     .use(parse3RN)
     .use(Analytics)
     .output(GetAddressUsageOutput)
-    .query(getAddressUsage),
+    .query(getAddressReferenceTypes),
 })

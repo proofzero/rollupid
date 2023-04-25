@@ -13,7 +13,7 @@ export const GetAddressUsageOutput = z.array(z.nativeEnum(AddressUsage))
 
 type GetAddressUsageResult = z.infer<typeof GetAddressUsageOutput>
 
-export const getAddressUsage = async ({
+export const getAddressReferenceTypes = async ({
   ctx,
 }: {
   ctx: Context
