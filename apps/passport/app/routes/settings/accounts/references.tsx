@@ -34,9 +34,10 @@ export const action: ActionFunction = async ({ request, context }) => {
             external: false,
             path: '/settings/applications',
           }
-        case ReferenceType.DevNotifEmail:
+        case ReferenceType.DevNotificationsEmail:
           return {
-            message: 'Address is being used as contact in Console.',
+            message:
+              'Address is being used as contact in the Developer Console.',
             external: true,
             path: `${context.env.CONSOLE_APP_URL}`,
           }

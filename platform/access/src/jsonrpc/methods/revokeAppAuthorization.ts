@@ -6,7 +6,6 @@ import { initAccessNodeByName } from '../../nodes'
 import { EDGE_AUTHORIZES } from '../../constants'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { AccessURNSpace } from '@proofzero/urns/access'
-import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 
 export const RevokeAppAuthorizationMethodInput = z.object({
@@ -82,11 +81,11 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
         account: accountURN,
       })) ?? []
 
-    for (let i = 0; i < addresses.length; i++) {
+    for (const address of addresses) {
       await ctx.edgesClient.removeEdge.mutate({
         tag: EDGE_HAS_REFERENCE_TO,
         src: accessURN,
-        dst: addresses[i].baseUrn,
+        dst: address.baseUrn,
       })
     }
 
