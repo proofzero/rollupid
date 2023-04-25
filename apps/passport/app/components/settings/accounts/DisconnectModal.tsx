@@ -111,9 +111,8 @@ export default ({
                   <div className="w-full border-b border-gray-200"></div>
                   <li className="py-3 px-6">
                     <Text size="sm" weight="normal" className="text-gray-500">
-                      It looks like you are trying to disconnect your primary
-                      account. You need to set another account as primary to be
-                      able to disconnect this one.
+                      Primary account cannot be disconnected. You need to set
+                      another account as primary before disconnecting this one.
                     </Text>
                   </li>
                 </>
