@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React from 'react'
 import scWalletIcon from '@proofzero/design-system/src/assets/social_icons/sc_wallet.svg'
 
 import { Text } from '../../atoms/text/Text'
