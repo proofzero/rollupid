@@ -18,22 +18,20 @@ type SmartContractWalletListItem = {
 }
 
 type SmartContractWalletSelectProps = {
-  wallets: Array<SmartContractWalletListItem>
+  wallets?: Array<SmartContractWalletListItem>
   onSelect?: (selected: SmartContractWalletListItem) => void
-  onSelectAll?: () => void
 }
+
+const newSCWalletTitle = 'New Smart Contract Wallet'
 
 export const SmartContractWalletSelect = ({
   wallets,
   onSelect,
-  onSelectAll,
 }: SmartContractWalletSelectProps) => {
   const [selectedWallet, setSelectedWallet] =
     useState<SmartContractWalletListItem>()
 
-  const capitalizeFirstLetter = (string: string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1)
-  }
+  if (!wallets) wallets = []
 
   useEffect(() => {
     if (onSelect) {
@@ -84,10 +82,14 @@ export const SmartContractWalletSelect = ({
                   key={wallet.addressURN}
                   value={wallet}
                   className="flex flex-row space-x-2 cursor-pointer hover:bg-gray-100
-                  px-2 py-2 rounded-lg"
+                  rounded-lg"
                 >
                   {({ selected }) => (
-                    <>
+                    <div
+                      className={`${
+                        selected ? 'bg-gray-100' : ''
+                      } w-full h-full rounded-lg py-2 px-2 flex flex-row`}
+                    >
                       <Text
                         size="sm"
                         weight={selected ? 'medium' : 'normal'}
@@ -100,7 +102,7 @@ export const SmartContractWalletSelect = ({
                           <CheckIcon className="h-5 w-5" aria-hidden="true" />
                         </span>
                       ) : null}
-                    </>
+                    </div>
                   )}
                 </Listbox.Option>
               ))}
@@ -108,25 +110,40 @@ export const SmartContractWalletSelect = ({
                 value={{
                   title: 'New Smart Contract Wallet',
                 }}
-                className="py-2 px-3 cursor-pointer
-                  hover:bg-gray-50"
+                className="cursor-pointer cursor-pointer
+                  hover:bg-gray-100 rounded-lg w-full bg-white"
               >
-                {({ selected }) => (
-                  <div className="flex flex-row items-center space-x-3">
-                    <TbCirclePlus className="w-4 h-4" />
-
-                    <Text
-                      size="sm"
-                      weight={selected ? 'semibold' : 'normal'}
-                      className={`${selected ? '' : ''} flex-1 truncate`}
+                {({ selected }) => {
+                  return (
+                    <div
+                      className={`${
+                        selected && selectedWallet?.title === newSCWalletTitle
+                          ? 'bg-gray-100'
+                          : ''
+                      } w-full flex flex-row
+                      rounded-lg py-2 px-2
+                       items-center space-x-3`}
                     >
-                      New Smart Contract Wallet
-                    </Text>
-                    {selected && (
-                      <HiCheck className="w-5 h-5 text-indigo-500" />
-                    )}
-                  </div>
-                )}
+                      <TbCirclePlus className="w-4 h-4" />
+
+                      <Text
+                        size="sm"
+                        weight={
+                          selected && selectedWallet?.title === newSCWalletTitle
+                            ? 'semibold'
+                            : 'normal'
+                        }
+                        className={`flex-1 truncate`}
+                      >
+                        {newSCWalletTitle}
+                      </Text>
+                      {selected &&
+                        selectedWallet?.title === newSCWalletTitle && (
+                          <HiCheck className="w-5 h-5 text-indigo-500" />
+                        )}
+                    </div>
+                  )
+                }}
               </Listbox.Option>
             </Listbox.Options>
           </Transition>
