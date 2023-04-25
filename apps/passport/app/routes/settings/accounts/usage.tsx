@@ -1,3 +1,4 @@
+import { BadRequestError } from '@proofzero/errors'
 import { AddressUsage } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressUsage'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { AddressUsageDisconnectModel } from '~/components/settings/accounts/DisconnectModal'
@@ -40,7 +41,9 @@ export const action: ActionFunction = async ({ request, context }) => {
             path: `${context.env.CONSOLE_APP_URL}`,
           }
         default:
-          throw new Error(`Unknown address usage: ${u}`)
+          throw new BadRequestError({
+            message: `Unknown address usage: ${u}`,
+          })
       }
     }
   )
