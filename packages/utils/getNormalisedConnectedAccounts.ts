@@ -20,8 +20,8 @@ export type EmailSelectListItem = {
 }
 
 export type SCWalletSelectListItem = {
-  address: string
-  type: CryptoAddressType
+  title: string
+  type: CryptoAddressType | OptionType
   addressURN?: AddressURN
 }
 
@@ -62,7 +62,7 @@ export const getNormalisedSmartContractWallets = (
     })
     .map((address) => {
       return {
-        address: address.qc.alias,
+        title: address.qc.alias,
         type: address.rc.addr_type as CryptoAddressType.Wallet,
         addressURN: address.baseUrn as AddressURN,
       }

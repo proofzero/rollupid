@@ -27,6 +27,7 @@ export const generateEmailOTPMethod = async ({
 
   const state = generateRandomString(EMAIL_VERIFICATION_OPTIONS.STATE_LENGTH)
   const code = await emailAddressNode.generateVerificationCode(state)
+
   await ctx.emailClient.sendEmailNotification.mutate({
     emailAddress: email,
     name: email,

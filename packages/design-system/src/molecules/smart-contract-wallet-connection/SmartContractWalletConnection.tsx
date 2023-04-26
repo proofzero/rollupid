@@ -8,8 +8,10 @@ import { Input } from '../../atoms/form/Input'
 
 export const SmartContractWalletCreationSummary = ({
   completeCallback,
+  placeholder,
 }: {
   completeCallback: () => void
+  placeholder: string
 }) => {
   return (
     <div className="flex flex-col items-center w-full h-full">
@@ -32,6 +34,7 @@ export const SmartContractWalletCreationSummary = ({
             label="Name your Wallet"
             id="sc_wallet_name"
             className="h-[50px] rounded border"
+            placeholder={placeholder}
           />
         </div>
       </div>

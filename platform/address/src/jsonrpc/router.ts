@@ -51,7 +51,6 @@ import { checkCryptoNodes } from './middlewares/checkCryptoNode'
 import { initAddressNode } from './middlewares/initAddressNode'
 import { getAccountMethod, GetAccountOutput } from './methods/getAccount'
 import {
-  InitSmartContractWalletInput,
   InitSmartContractWalletOutput,
   initSmartContractWalletMethod,
 } from './methods/initSmartContractWallet'
@@ -222,9 +221,8 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(setAddressNodeClient)
-    .input(InitSmartContractWalletInput)
     .output(InitSmartContractWalletOutput)
-    .mutation(initSmartContractWalletMethod),
+    .query(initSmartContractWalletMethod),
   deleteAddressNode: t.procedure
     .use(LogUsage)
     .use(parse3RN)

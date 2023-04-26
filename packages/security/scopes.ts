@@ -62,7 +62,9 @@ export const SCOPE_ACCOUNT_READ: Scope = scope('scope://rollup.id/account#read')
 /**
  * The scope required to use smart contract wallet object.
  */
-export const SCOPE_SMART_CONTRACT_WALLET: Scope = scope('smart_contract_wallet')
+export const SCOPE_SMART_CONTRACT_WALLETS: Scope = scope(
+  'smart_contract_wallets'
+)
 
 /**
  * The scope required to write to account object.
@@ -143,8 +145,8 @@ export const SCOPES: ScopeMap = {
     description: `List your connected accounts and identifiers`,
     class: 'address',
   },
-  [SCOPE_SMART_CONTRACT_WALLET]: {
-    name: 'Smart Contract Wallet',
+  [SCOPE_SMART_CONTRACT_WALLETS]: {
+    name: 'Smart contract wallets',
     description: `Read your smart contract wallet`,
     class: 'address',
   },

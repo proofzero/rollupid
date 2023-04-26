@@ -10,9 +10,9 @@ import { createConsoleParamsSession } from '~/session.server'
 import type { GetAddressProfileResult } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressProfile'
 
 import {
-  SCOPE_CONNECTED_ADDRESSS,
+  SCOPE_CONNECTED_ACCOUNTS,
   SCOPE_EMAIL,
-  SCOPE_SMART_CONTRACT_WALLET,
+  SCOPE_SMART_CONTRACT_WALLETS,
 } from '@proofzero/security/scopes'
 
 import type { AccountURN } from '@proofzero/urns/account'
@@ -26,7 +26,7 @@ export type DataForScopes = {
   connectedEmails?: EmailSelectListItem[]
   personaData?: PersonaData
   requestedScope: string[]
-  connectedAddresses?: GetAddressProfileResult[]
+  connectedAccounts?: GetAddressProfileResult[]
   connectedSmartContractWallet?: SCWalletSelectListItem[]
 }
 
@@ -74,7 +74,7 @@ export const getDataForScopes = async (
     if (requestedScope.includes(SCOPE_EMAIL.toString())) {
       connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
     }
-    if (requestedScope.includes(SCOPE_CONNECTED_ADDRESSS.toString())) {
+    if (requestedScope.includes(SCOPE_CONNECTED_ACCOUNTS.toString())) {
       connectedAddresses = await Promise.all(
         connectedAccounts.map((ca) => {
           const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
@@ -82,7 +82,7 @@ export const getDataForScopes = async (
         })
       )
     }
-    if (requestedScope.includes(SCOPE_SMART_CONTRACT_WALLET.toString())) {
+    if (requestedScope.includes(SCOPE_SMART_CONTRACT_WALLETS.toString())) {
       connectedSmartContractWallet =
         getNormalisedSmartContractWallets(connectedAccounts)
     }
@@ -94,7 +94,7 @@ export const getDataForScopes = async (
     connectedEmails,
     personaData,
     requestedScope: reorderScope(requestedScope),
-    connectedAddresses,
+    connectedAccounts: connectedAddresses,
     connectedSmartContractWallet,
   }
 }

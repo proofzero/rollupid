@@ -25,6 +25,7 @@ import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import { EmailSelect } from '@proofzero/design-system/src/atoms/email/EmailSelect'
+import { SmartContractWalletSelect } from '@proofzero/design-system/src/atoms/smart_contract_wallets/SmartContractWalletSelect'
 
 import authorizeCheck from '~/assets/authorize-check.svg'
 import Info from '~/components/authorization/Info'
@@ -32,6 +33,7 @@ import Info from '~/components/authorization/Info'
 import profileClassIcon from '~/components/authorization/profile-class-icon.svg'
 import addressClassIcon from '~/components/authorization/connected-addresses-class-icon.svg'
 import emailClassIcon from '~/components/authorization/email-class-icon.svg'
+import smartContractWalletClassIcon from '~/components/authorization/sc-wallet-class-icon.svg'
 
 import {
   authzParamsMatch,
@@ -39,36 +41,25 @@ import {
   getDataForScopes,
 } from '~/utils/authorize.server'
 import { useEffect, useState } from 'react'
-<<<<<<< HEAD
-=======
 import { OptionType } from '@proofzero/utils/getNormalisedConnectedAccounts'
->>>>>>> d26d082d (wip)
 import { Text } from '@proofzero/design-system'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { JsonError } from '@proofzero/utils/errors'
+import { ConnectedAccountSelect } from '@proofzero/design-system/src/atoms/accounts/ConnectedAccountSelect'
+import { AuthorizationControlSelection } from '@proofzero/types/application'
+import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 
 import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
-import {
-  AuthorizationControlSelection,
-  PersonaData,
-} from '@proofzero/types/application'
 import type { DataForScopes } from '~/utils/authorize.server'
-<<<<<<< HEAD
-import {
-  EmailSelectListItem,
-  OptionType,
-} from '@proofzero/utils/getNormalisedConnectedEmails'
-=======
 import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
->>>>>>> d26d082d (wip)
+import type { SCWalletSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
-import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 
-import { ConnectedAccountSelect } from '@proofzero/design-system/src/atoms/accounts/ConnectedAccountSelect'
-import { AddressURN } from '@proofzero/urns/address'
+import type { AddressURN } from '@proofzero/urns/address'
+import type { PersonaData } from '@proofzero/types/application'
 
 export type UserProfile = {
   displayName: string
@@ -368,7 +359,7 @@ const scopeIcons: Record<string, string> = {
   connected_accounts: addressClassIcon,
   profile: profileClassIcon,
   email: emailClassIcon,
-  smart_contract_wallet: smartContractWalletClassIcon,
+  smart_contract_wallets: smartContractWalletClassIcon,
 }
 
 export default function Authorize() {
@@ -388,12 +379,14 @@ export default function Authorize() {
   const { connectedEmails, personaData, requestedScope, connectedAccounts } =
     dataForScopes
 
-  const [persona] = useState<PersonaData>(personaData)
+  const [persona] = useState<PersonaData>(personaData!)
 
   const [selectedEmail, setSelectedEmail] = useState<EmailSelectListItem>()
   const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
     Array<AddressURN> | Array<AuthorizationControlSelection>
   >([])
+  const [selectedSCWallet, setSelectedSCWallet] =
+    useState<SCWalletSelectListItem>()
 
   // Re-render the component every time persona gets updated
   useEffect(() => {}, [persona])
@@ -517,14 +510,39 @@ export default function Authorize() {
                       <div className="flex flex-row w-full gap-2 items-center">
                         <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
 
-                        {scope !== 'email' && scope !== 'connected_accounts' && (
-                          <Text
-                            size="sm"
-                            weight="medium"
-                            className="flex-1 text-gray-500"
-                          >
-                            {scopeMeta.scopes[scope].name}
-                          </Text>
+                        {scope !== 'email' &&
+                          scope !== 'connected_accounts' &&
+                          scope !== 'smart_contract_wallets' && (
+                            <Text
+                              size="sm"
+                              weight="medium"
+                              className="flex-1 text-gray-500"
+                            >
+                              {scopeMeta.scopes[scope].name}
+                            </Text>
+                          )}
+                        {scope === 'smart_contract_wallets' && (
+                          <div className="flex-1 min-w-0">
+                            <SmartContractWalletSelect
+                              wallets={[]}
+                              onSelect={(selected: SCWalletSelectListItem) => {
+                                if (selected?.type === OptionType.AddNew) {
+                                  const qp = new URLSearchParams()
+                                  qp.append('scope', requestedScope.join(' '))
+                                  qp.append('state', state)
+                                  qp.append('client_id', clientId)
+                                  qp.append('redirect_uri', redirectOverride)
+                                  qp.append('prompt', 'connect')
+
+                                  return navigate(
+                                    `/create/wallet?${qp.toString()}`
+                                  )
+                                }
+
+                                setSelectedSCWallet(selected)
+                              }}
+                            />
+                          </div>
                         )}
 
                         {scope === 'email' && (
