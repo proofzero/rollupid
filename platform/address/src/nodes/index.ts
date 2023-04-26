@@ -1,5 +1,5 @@
 import Address from './address'
-
+import ContractAddress from './contract'
 import AppleAddress from './apple'
 import CryptoAddress from './crypto'
 import DiscordAddress from './discord'
@@ -12,6 +12,7 @@ import TwitterAddress from './twitter'
 export {
   AppleAddress,
   CryptoAddress,
+  ContractAddress,
   DiscordAddress,
   EmailAddress,
   GithubAddress,

@@ -27,7 +27,7 @@ export type DataForScopes = {
   personaData?: PersonaData
   requestedScope: string[]
   connectedAccounts?: GetAddressProfileResult[]
-  connectedSmartContractWallet?: SCWalletSelectListItem[]
+  connectedSmartContractWallets?: SCWalletSelectListItem[]
 }
 
 // Deterministically sort scopes so that they are always in the same order
@@ -60,7 +60,7 @@ export const getDataForScopes = async (
   if (!accountURN)
     throw new UnauthorizedError({ message: 'Account URN is required' })
 
-  let connectedSmartContractWallet: SCWalletSelectListItem[] = []
+  let connectedSmartContractWallets: SCWalletSelectListItem[] = []
   let connectedEmails: EmailSelectListItem[] = []
   let connectedAddresses: GetAddressProfileResult[] = []
 
@@ -71,10 +71,10 @@ export const getDataForScopes = async (
   })
 
   if (connectedAccounts && connectedAccounts.length) {
-    if (requestedScope.includes(SCOPE_EMAIL.toString())) {
+    if (requestedScope.includes(Symbol.keyFor(SCOPE_EMAIL)!)) {
       connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
     }
-    if (requestedScope.includes(SCOPE_CONNECTED_ACCOUNTS.toString())) {
+    if (requestedScope.includes(Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!)) {
       connectedAddresses = await Promise.all(
         connectedAccounts.map((ca) => {
           const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
@@ -82,8 +82,8 @@ export const getDataForScopes = async (
         })
       )
     }
-    if (requestedScope.includes(SCOPE_SMART_CONTRACT_WALLETS.toString())) {
-      connectedSmartContractWallet =
+    if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!)) {
+      connectedSmartContractWallets =
         getNormalisedSmartContractWallets(connectedAccounts)
     }
   }
@@ -95,7 +95,7 @@ export const getDataForScopes = async (
     personaData,
     requestedScope: reorderScope(requestedScope),
     connectedAccounts: connectedAddresses,
-    connectedSmartContractWallet,
+    connectedSmartContractWallets,
   }
 }
 

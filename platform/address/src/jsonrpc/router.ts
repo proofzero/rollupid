@@ -82,6 +82,10 @@ import {
   getAddressReferenceTypes,
   GetAddressReferenceTypeOutput,
 } from './methods/getAddressReferenceTypes'
+import {
+  RenameSmartContractWalletInput,
+  renameSmartContractWalletMethod,
+} from './methods/renameSmartContractWallet'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -223,6 +227,12 @@ export const appRouter = t.router({
     .use(setAddressNodeClient)
     .output(InitSmartContractWalletOutput)
     .query(initSmartContractWalletMethod),
+  renameSmartContractWallet: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setAddressNodeClient)
+    .input(RenameSmartContractWalletInput)
+    .mutation(renameSmartContractWalletMethod),
   deleteAddressNode: t.procedure
     .use(LogUsage)
     .use(parse3RN)

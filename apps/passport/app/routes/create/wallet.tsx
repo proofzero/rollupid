@@ -1,25 +1,18 @@
-import { Outlet, useLoaderData } from '@remix-run/react'
-import { LoaderFunction } from '@remix-run/cloudflare'
+import { useLoaderData, useSubmit } from '@remix-run/react'
+import { redirect } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
-import {
-  getAccountClient,
-  getAddressClient,
-  getStarbaseClient,
-} from '~/platform.server'
-import {
-  getConsoleParams,
-  getJWTConditionallyFromSession,
-  getValidatedSessionContext,
-  parseJwt,
-} from '~/session.server'
+import { getAccountClient, getAddressClient } from '~/platform.server'
+import { getJWTConditionallyFromSession, parseJwt } from '~/session.server'
 
 import { SmartContractWalletCreationSummary } from '@proofzero/design-system/src/molecules/smart-contract-wallet-connection/SmartContractWalletConnection'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 import type { AccountURN } from '@proofzero/urns/account'
 import { UnauthorizedError } from '@proofzero/errors'
+import type { AddressURN } from '@proofzero/urns/address'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 
-export const loader: LoaderFunction = async ({ request, context, params }) => {
+export const loader: LoaderFunction = async ({ request, context }) => {
   const jwt = await getJWTConditionallyFromSession(request, context.env)
 
   if (!jwt) {
@@ -41,11 +34,50 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   const SCwallet = await addressClient.initSmartContractWallet.query()
   return json({
     wallet: SCwallet.walletAddress,
+    walletURN: SCwallet.addressURN,
   })
 }
 
+export const action: ActionFunction = async ({ request, context, params }) => {
+  const jwt = await getJWTConditionallyFromSession(request, context.env)
+
+  if (!jwt) {
+    throw new UnauthorizedError({
+      message: 'You need to be logged in to create a wallet',
+    })
+  }
+
+  const account = parseJwt(jwt).sub as AccountURN
+  const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
+  const profile = await accountClient.getProfile.query({ account })
+
+  const addressClient = getAddressClient(
+    profile?.primaryAddressURN!,
+    context.env,
+    context.traceSpan
+  )
+
+  const formData = await request.formData()
+  const walletURN = formData.get('walletURN') as AddressURN
+  const nickname = formData.get('nickname') as string
+
+  await addressClient.renameSmartContractWallet.mutate({
+    addressURN: walletURN,
+    nickname,
+  })
+
+  const qp = request.url.split('?')[1]
+
+  return redirect(`/authorize?${qp}`)
+}
+
 export default () => {
-  const { wallet } = useLoaderData()
+  const { wallet, walletURN } = useLoaderData()
+  const submit = useSubmit()
+
+  const formData = new FormData()
+  formData.set('walletURN', walletURN)
+  formData.set('nickname', wallet)
 
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
@@ -71,7 +103,12 @@ export default () => {
         >
           <SmartContractWalletCreationSummary
             placeholder={wallet}
-            completeCallback={() => {}}
+            onChange={(value) => {
+              formData.set('nickname', value)
+            }}
+            onSubmit={() => {
+              submit(formData, { method: 'post' })
+            }}
           />
         </div>
       </div>

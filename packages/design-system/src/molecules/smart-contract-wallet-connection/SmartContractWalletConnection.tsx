@@ -7,11 +7,13 @@ import { Button } from '../../build'
 import { Input } from '../../atoms/form/Input'
 
 export const SmartContractWalletCreationSummary = ({
-  completeCallback,
   placeholder,
+  onChange,
+  onSubmit,
 }: {
-  completeCallback: () => void
   placeholder: string
+  onChange: (value: string) => void
+  onSubmit: () => void
 }) => {
   return (
     <div className="flex flex-col items-center w-full h-full">
@@ -32,20 +34,20 @@ export const SmartContractWalletCreationSummary = ({
         <div className="w-full py-4">
           <Input
             label="Name your Wallet"
-            id="sc_wallet_name"
+            id="nickname"
             className="h-[50px] rounded border"
             placeholder={placeholder}
+            onChange={(e) => onChange(e.currentTarget.value)}
           />
         </div>
       </div>
 
       <Button
         btnType="primary-alt"
-        onClick={() => {
-          completeCallback()
-        }}
+        type="button"
         className="border w-full rounded-lg h-[50px] p-2 mt-auto
         flex items-center justify-center"
+        onClick={onSubmit}
       >
         <div
           className="flex flex-row px-2 h-[50px]

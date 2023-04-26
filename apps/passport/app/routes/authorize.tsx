@@ -376,8 +376,13 @@ export default function Authorize() {
 
   const userProfile = profile as UserProfile
 
-  const { connectedEmails, personaData, requestedScope, connectedAccounts } =
-    dataForScopes
+  const {
+    connectedEmails,
+    personaData,
+    requestedScope,
+    connectedAccounts,
+    connectedSmartContractWallets,
+  } = dataForScopes
 
   const [persona] = useState<PersonaData>(personaData!)
 
@@ -524,7 +529,7 @@ export default function Authorize() {
                         {scope === 'smart_contract_wallets' && (
                           <div className="flex-1 min-w-0">
                             <SmartContractWalletSelect
-                              wallets={[]}
+                              wallets={connectedSmartContractWallets}
                               onSelect={(selected: SCWalletSelectListItem) => {
                                 if (selected?.type === OptionType.AddNew) {
                                   const qp = new URLSearchParams()
@@ -532,7 +537,6 @@ export default function Authorize() {
                                   qp.append('state', state)
                                   qp.append('client_id', clientId)
                                   qp.append('redirect_uri', redirectOverride)
-                                  qp.append('prompt', 'connect')
 
                                   return navigate(
                                     `/create/wallet?${qp.toString()}`

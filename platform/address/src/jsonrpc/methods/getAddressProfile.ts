@@ -19,6 +19,7 @@ import {
   GoogleAddress,
   MicrosoftAddress,
   TwitterAddress,
+  ContractAddress,
 } from '../../nodes'
 
 import { AddressProfileSchema } from '../validators/profile'
@@ -52,10 +53,14 @@ export const getAddressProfileMethod: GetAddressProfileMethod = async ({
 
   if (!ctx.addressURN) throw new Error('missing addressURN')
 
+  console.log({ urn: ctx.addressURN })
+
   const getProfileNode = () => {
     switch (type) {
       case CryptoAddressType.ETH:
         return new CryptoAddress(nodeClient)
+      case CryptoAddressType.Wallet:
+        return new ContractAddress(nodeClient)
       case EmailAddressType.Email:
         return new EmailAddress(nodeClient, ctx)
       case OAuthAddressType.Apple:

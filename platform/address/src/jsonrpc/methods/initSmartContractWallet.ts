@@ -5,12 +5,13 @@ import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 
-import { appRouter } from '../router'
+import createEdgesClient from '@proofzero/platform-clients/edges'
 import { Context } from '../../context'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import { initAddressNodeByName } from '../../nodes'
 import createImageClient from '@proofzero/platform-clients/image'
 import { getZeroDevSigner } from '@zerodevapp/sdk'
+import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
@@ -74,13 +75,14 @@ export const initSmartContractWalletMethod = async ({
     smartContractWalletNode.class.setGradient(gradient),
   ])
 
-  const caller = appRouter.createCaller({
-    ...ctx,
-    addressURN,
+  const edgesClient = createEdgesClient(ctx.Edges, {
+    ...generateTraceContextHeaders(ctx.traceSpan),
   })
-
-  caller.setAccount(account)
-  caller.getAddressProfile()
+  await edgesClient.makeEdge.mutate({
+    src: account,
+    dst: addressURN,
+    tag: EDGE_ADDRESS,
+  })
 
   return { addressURN, walletAddress: smartContractWalletAddress }
 }
