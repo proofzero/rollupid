@@ -11,7 +11,9 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { HiOutlineMail } from 'react-icons/hi'
 import { Authentication, ConnectButton } from '~/components'
-import ConnectOAuthButton from '~/components/connect-oauth-button'
+import ConnectOAuthButton, {
+  OAuthProvider,
+} from '~/components/connect-oauth-button'
 import { redirect, json } from '@remix-run/cloudflare'
 
 import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/AuthButton'
@@ -40,16 +42,16 @@ const client = createClient(
 export const loader: LoaderFunction = async ({ request, params, context }) => {
   const url = new URL(request.url)
 
-  const displayDict: { [key: string]: boolean } = {
-    wallet: true,
-    email: true,
-    google: true,
-    microsoft: true,
-    apple: true,
-    twitter: true,
-    discord: true,
-    github: true,
-  }
+  let displayKeys = [
+    'wallet',
+    'email',
+    'google',
+    'microsoft',
+    'apple',
+    'twitter',
+    'discord',
+    'github',
+  ]
 
   const authenticationParamsSession = await getAuthenticationParamsSession(
     request,
@@ -64,19 +66,17 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   }
 
   if (loginHint) {
-    const hints = new Set(loginHint.split(' '))
-    for (const key of Object.keys(displayDict)) {
-      if (!hints.has(key)) {
-        displayDict[key] = false
-      }
-    }
+    const hints = loginHint
+      .split(' ')
+      .filter((val, i, arr) => arr.indexOf(val) === i)
+
+    displayKeys = hints
   }
 
   return json(
     {
       clientId: params.clientId,
-      displayDict,
-      loginHint,
+      displayKeys,
     },
     {
       headers: {
@@ -124,7 +124,7 @@ export default () => {
     rollup_action?: string
   }>()
 
-  const { clientId, displayDict, loginHint } = useLoaderData()
+  const { clientId, displayKeys, loginHint } = useLoaderData()
 
   const [signData, setSignData] = useState<{
     nonce: string | undefined
@@ -172,6 +172,97 @@ export default () => {
   useEffect(() => {
     setOAuthWrapperWidth(oAuthWrapperRef.current?.offsetWidth)
   }, [oAuthWrapperRef])
+
+  const displaykeyMapper = (key: string) => {
+    switch (key) {
+      case 'wallet':
+        return (
+          <ConnectButton
+            key={key}
+            signData={signData}
+            isLoading={loading}
+            connectCallback={async (address) => {
+              if (loading) return
+              // fetch nonce and kickoff sign flow
+              setLoading(true)
+              fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
+                .then((res) =>
+                  res.json<{
+                    nonce: string
+                    state: string
+                    address: string
+                  }>()
+                )
+                .then(({ nonce, state, address }) => {
+                  setSignData({
+                    nonce,
+                    state,
+                    address,
+                    signature: undefined,
+                  })
+                })
+                .catch((err) => {
+                  toast(ToastType.Error, {
+                    message:
+                      'Could not fetch nonce for signing authentication message',
+                  })
+                })
+            }}
+            signCallback={(address, signature, nonce, state) => {
+              console.debug('signing complete')
+              setSignData({
+                ...signData,
+                signature,
+              })
+              submit(
+                { signature, nonce, state },
+                {
+                  method: 'post',
+                  action: `/connect/${address}/sign`,
+                }
+              )
+            }}
+            connectErrorCallback={(error) => {
+              console.debug('transition.state: ', transition.state)
+              if (transition.state !== 'idle' || !loading) {
+                return
+              }
+              if (error) {
+                console.error(error)
+                toast(ToastType.Error, {
+                  message:
+                    'Failed to complete signing. Please try again or contact support.',
+                })
+                setLoading(false)
+              }
+            }}
+          />
+        )
+      case 'email':
+        return (
+          <AuthButton
+            key={key}
+            onClick={() => navigate(`/authenticate/${clientId}/email`)}
+            Graphic={<HiOutlineMail className="w-full h-full" />}
+            text={'Connect with Email'}
+          />
+        )
+      default:
+        return (
+          <Form
+            className="w-full"
+            action={`/connect/${key}`}
+            method="post"
+            key={key}
+          >
+            <ConnectOAuthButton
+              provider={key as OAuthProvider}
+              parentWidth={oAuthWrapperWidth}
+            />
+          </Form>
+        )
+    }
+  }
 
   return (
     // Maybe suspense here?

@@ -10,7 +10,7 @@ import twitterIcon from '@proofzero/design-system/src/assets/social_icons/twitte
 import { useEffect, useRef, useState } from 'react'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
-type OAuthProvider =
+export type OAuthProvider =
   | 'apple'
   | 'discord'
   | 'github'

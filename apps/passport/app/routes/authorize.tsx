@@ -489,10 +489,10 @@ export default function Authorize() {
   }
 
   return (
-    <div className={'flex flex-row h-screen justify-center items-center'}>
+    <div className={'flex flex-row h-[100dvh] justify-center items-center'}>
       <div
         className={
-          'basis-2/5 h-screen w-full hidden lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
+          'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
         }
       >
         <img src={sideGraphics} alt="Background graphics" />
