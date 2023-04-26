@@ -53,8 +53,6 @@ export const getAddressProfileMethod: GetAddressProfileMethod = async ({
 
   if (!ctx.addressURN) throw new Error('missing addressURN')
 
-  console.log({ urn: ctx.addressURN })
-
   const getProfileNode = () => {
     switch (type) {
       case CryptoAddressType.ETH:
