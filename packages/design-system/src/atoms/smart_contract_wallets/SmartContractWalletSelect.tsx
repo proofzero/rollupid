@@ -26,8 +26,6 @@ export enum OptionType {
   AddNew,
 }
 
-const NEW_SMART_CONTRACT_WALLET = 'New Smart Contract Wallet'
-
 export const SmartContractWalletSelect = ({
   wallets,
   onSelect,
@@ -110,7 +108,7 @@ export const SmartContractWalletSelect = ({
               ))}
               <Listbox.Option
                 value={{
-                  title: NEW_SMART_CONTRACT_WALLET,
+                  title: 'New Smart Contract Wallet',
                   type: OptionType.AddNew,
                 }}
                 className="cursor-pointer cursor-pointer
@@ -138,7 +136,7 @@ export const SmartContractWalletSelect = ({
                         }
                         className={`flex-1 truncate`}
                       >
-                        {NEW_SMART_CONTRACT_WALLET}
+                        New Smart Contract Wallet
                       </Text>
                       {selected &&
                         selectedWallet?.type === OptionType.AddNew && (
