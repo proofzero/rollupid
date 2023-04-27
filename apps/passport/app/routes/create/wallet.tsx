@@ -57,6 +57,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 export default () => {
   const submit = useSubmit()
   const [nickname, setNickname] = useState('')
+  const [disabled, setDisabled] = useState(false)
 
   const formData = new FormData()
 
@@ -89,8 +90,9 @@ export default () => {
             onSubmit={() => {
               formData.set('nickname', nickname)
               submit(formData, { method: 'post' })
+              setDisabled(true)
             }}
-            disabled={!nickname || nickname.length < 4}
+            disabled={!nickname || nickname.length < 4 || disabled}
           />
           <div className="mt-2 flex justify-center items-center space-x-2">
             <img src={subtractLogo} alt="powered by rollup.id" />

@@ -7,6 +7,7 @@ import {
 
 import type { Addresses } from '@proofzero/platform.account/src/types'
 import { AddressURN } from '@proofzero/urns/address'
+import type { GetAddressProfileResult } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressProfile'
 
 export enum OptionType {
   AddNew,
@@ -22,7 +23,8 @@ export type EmailSelectListItem = {
 export type SCWalletSelectListItem = {
   title: string
   type: CryptoAddressType | OptionType
-  addressURN?: AddressURN
+  addressURN: AddressURN
+  cryptoAddress?: string
 }
 
 export const getNormalisedConnectedEmails = (
@@ -50,21 +52,15 @@ export const getNormalisedConnectedEmails = (
 }
 
 export const getNormalisedSmartContractWallets = (
-  connectedAddresses?: Addresses | null
+  connectedAddresses?: GetAddressProfileResult[] | null
 ): SCWalletSelectListItem[] => {
   if (!connectedAddresses) return []
-  return connectedAddresses
-    .filter((address) => {
-      return (
-        address.rc.node_type === NodeType.Crypto &&
-        address.rc.addr_type === CryptoAddressType.Wallet
-      )
-    })
-    .map((address) => {
-      return {
-        title: address.qc.alias,
-        type: address.rc.addr_type as CryptoAddressType.Wallet,
-        addressURN: address.baseUrn as AddressURN,
-      }
-    })
+  return connectedAddresses.map((address) => {
+    return {
+      title: address.title,
+      type: address.type as CryptoAddressType.Wallet,
+      addressURN: address.id as AddressURN,
+      cryptoAddress: address.address,
+    }
+  })
 }

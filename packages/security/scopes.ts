@@ -63,7 +63,7 @@ export const SCOPE_ACCOUNT_READ: Scope = scope('scope://rollup.id/account#read')
  * The scope required to use smart contract wallet object.
  */
 export const SCOPE_SMART_CONTRACT_WALLETS: Scope = scope(
-  'smart_contract_wallets'
+  'smart_contract_wallet'
 )
 
 /**

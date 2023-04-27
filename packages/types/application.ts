@@ -5,7 +5,7 @@ export const ClaimName = z.union([
   z.literal('email'),
   z.literal('openid'),
   z.literal('connected_accounts'),
-  z.literal('smart_contract_wallets'),
+  z.literal('smart_contract_wallet'),
 ])
 export type ClaimName = z.infer<typeof ClaimName>
 

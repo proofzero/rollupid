@@ -110,6 +110,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   //If no authorization cookie and we're not logging into
   //Passport Settings, then we create authz cookie & authenticate
+
   if (
     !lastCP &&
     !(
@@ -366,7 +367,7 @@ const scopeIcons: Record<string, string> = {
   connected_accounts: addressClassIcon,
   profile: profileClassIcon,
   email: emailClassIcon,
-  smart_contract_wallets: smartContractWalletClassIcon,
+  smart_contract_wallet: smartContractWalletClassIcon,
 }
 
 export default function Authorize() {
@@ -447,6 +448,10 @@ export default function Authorize() {
       }
     }
 
+    if (requestedScope.includes('smart_contract_wallet') && selectedSCWallet) {
+      personaData.smart_contract_wallet = selectedSCWallet.cryptoAddress
+    }
+
     // TODO: Everything should be a form field now handled by javascript
     // This helps keeps things generic has if a form input is not present
     // it doesn't end up being submitted
@@ -524,7 +529,7 @@ export default function Authorize() {
 
                         {scope !== 'email' &&
                           scope !== 'connected_accounts' &&
-                          scope !== 'smart_contract_wallets' && (
+                          scope !== 'smart_contract_wallet' && (
                             <Text
                               size="sm"
                               weight="medium"
@@ -533,7 +538,7 @@ export default function Authorize() {
                               {scopeMeta.scopes[scope].name}
                             </Text>
                           )}
-                        {scope === 'smart_contract_wallets' && (
+                        {scope === 'smart_contract_wallet' && (
                           <div className="flex-1 min-w-0">
                             <SmartContractWalletSelect
                               wallets={connectedSmartContractWallets}

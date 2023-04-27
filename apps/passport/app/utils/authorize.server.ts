@@ -5,10 +5,7 @@ import {
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
-import {
-  createAuthorizationParamsCookieAndAuthenticate,
-  createAuthorizationParamsCookieHeaders,
-} from '~/session.server'
+import { createAuthorizationParamsCookieHeaders } from '~/session.server'
 
 import type { GetAddressProfileResult } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressProfile'
 
@@ -81,15 +78,30 @@ export const getDataForScopes = async (
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!)) {
       connectedAddresses = await Promise.all(
-        connectedAccounts.map((ca) => {
-          const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
-          return addressClient.getAddressProfile.query()
-        })
+        connectedAccounts
+          .filter((ca) => {
+            return ca.rc.addr_type !== CryptoAddressType.Wallet
+          })
+          .map((ca) => {
+            const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
+            return addressClient.getAddressProfile.query()
+          })
       )
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!)) {
+      const scWalletAddresses = await Promise.all(
+        connectedAccounts
+          .filter((ca) => {
+            return ca.rc.addr_type === CryptoAddressType.Wallet
+          })
+          .map((ca) => {
+            const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
+            return addressClient.getAddressProfile.query()
+          })
+      )
+
       connectedSmartContractWallets =
-        getNormalisedSmartContractWallets(connectedAccounts)
+        getNormalisedSmartContractWallets(scWalletAddresses)
     }
   }
 
@@ -99,9 +111,7 @@ export const getDataForScopes = async (
     connectedEmails,
     personaData,
     requestedScope: reorderScope(requestedScope),
-    connectedAccounts: connectedAddresses.filter(
-      (acc) => acc.type !== CryptoAddressType.Wallet
-    ),
+    connectedAccounts: connectedAddresses,
     connectedSmartContractWallets,
   }
 }
