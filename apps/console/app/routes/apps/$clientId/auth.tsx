@@ -484,7 +484,7 @@ export default function AppDetailIndexPage() {
                       type="url"
                       required
                       error={errors?.['redirectURI']}
-                      placeholder="www.example.com"
+                      placeholder="https://www.example.com"
                       defaultValue={appDetails.app.redirectURI}
                     />
                     {errors?.redirectURI ? (
@@ -532,7 +532,7 @@ export default function AppDetailIndexPage() {
                       label="Terms of Service"
                       type="url"
                       error={errors?.['termsURL']}
-                      placeholder="www.example.com"
+                      placeholder="https://www.example.com"
                       defaultValue={appDetails.app.termsURL}
                     />
                     {errors?.termsURL ? (
@@ -555,7 +555,7 @@ export default function AppDetailIndexPage() {
                       label="Privacy Policy"
                       type="url"
                       error={errors?.['privacyURL']}
-                      placeholder="www.example.com"
+                      placeholder="https://www.example.com"
                       defaultValue={appDetails.app.privacyURL}
                     />
                     {errors?.privacyURL ? (
@@ -578,7 +578,7 @@ export default function AppDetailIndexPage() {
                       label="Website"
                       error={errors?.['websiteURL']}
                       type="url"
-                      placeholder="www.example.com"
+                      placeholder="https://www.example.com"
                       defaultValue={appDetails.app.websiteURL}
                     />
                     {errors?.websiteURL ? (

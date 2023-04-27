@@ -7,13 +7,13 @@ import { Button } from '../../build'
 import { Input } from '../../atoms/form/Input'
 
 export const SmartContractWalletCreationSummary = ({
-  placeholder,
   onChange,
   onSubmit,
+  disabled,
 }: {
-  placeholder: string
   onChange: (value: string) => void
   onSubmit: () => void
+  disabled: boolean
 }) => {
   return (
     <div className="flex flex-col items-center w-full h-full">
@@ -27,18 +27,22 @@ export const SmartContractWalletCreationSummary = ({
         <Text size="xl" weight="medium">
           Smart Contract Wallet
         </Text>
-        <Text weight="medium">We created a smart contract wallet for you</Text>
+        <Text weight="medium">We will create a smart wallet for you</Text>
         <Text className="text-gray-500">
-          You can find all wallet details in your profile.
+          You will find all wallet details in your profile.
         </Text>
         <div className="w-full py-4">
           <Input
             label="Name your Wallet"
             id="nickname"
             className="h-[50px] rounded border"
-            placeholder={placeholder}
             onChange={(e) => onChange(e.currentTarget.value)}
           />
+          <label>
+            <Text size="sm" weight="medium" className="text-gray-400 my-2">
+              Name must be at least 4 characters long
+            </Text>
+          </label>
         </div>
       </div>
 
@@ -47,6 +51,7 @@ export const SmartContractWalletCreationSummary = ({
         type="button"
         className="border w-full rounded-lg h-[50px] p-2 mt-auto
         flex items-center justify-center"
+        disabled={disabled}
         onClick={onSubmit}
       >
         <div

@@ -51,6 +51,7 @@ import { checkCryptoNodes } from './middlewares/checkCryptoNode'
 import { initAddressNode } from './middlewares/initAddressNode'
 import { getAccountMethod, GetAccountOutput } from './methods/getAccount'
 import {
+  InitSmartContractWalletInput,
   InitSmartContractWalletOutput,
   initSmartContractWalletMethod,
 } from './methods/initSmartContractWallet'
@@ -82,10 +83,6 @@ import {
   getAddressReferenceTypes,
   GetAddressReferenceTypeOutput,
 } from './methods/getAddressReferenceTypes'
-import {
-  RenameSmartContractWalletInput,
-  renameSmartContractWalletMethod,
-} from './methods/renameSmartContractWallet'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -225,14 +222,9 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(setAddressNodeClient)
+    .input(InitSmartContractWalletInput)
     .output(InitSmartContractWalletOutput)
     .query(initSmartContractWalletMethod),
-  renameSmartContractWallet: t.procedure
-    .use(LogUsage)
-    .use(parse3RN)
-    .use(setAddressNodeClient)
-    .input(RenameSmartContractWalletInput)
-    .mutation(renameSmartContractWalletMethod),
   deleteAddressNode: t.procedure
     .use(LogUsage)
     .use(parse3RN)

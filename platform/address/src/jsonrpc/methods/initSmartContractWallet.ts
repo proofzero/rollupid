@@ -15,6 +15,12 @@ import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
+export const InitSmartContractWalletInput = z.object({
+  nickname: z.string(),
+})
+
+type InitSmartContractWalletInput = z.infer<typeof InitSmartContractWalletInput>
+
 export const InitSmartContractWalletOutput = z.object({
   addressURN: AddressURNInput,
   walletAddress: z.string(),
@@ -25,8 +31,10 @@ type InitSmartContractWalletResult = z.infer<
 >
 
 export const initSmartContractWalletMethod = async ({
+  input,
   ctx,
 }: {
+  input: InitSmartContractWalletInput
   ctx: Context
 }): Promise<InitSmartContractWalletResult> => {
   const nodeClient = ctx.address
@@ -52,7 +60,7 @@ export const initSmartContractWalletMethod = async ({
       node_type: NodeType.Crypto,
       addr_type: CryptoAddressType.Wallet,
     },
-    { alias: smartContractWalletAddress, hidden: 'true' }
+    { alias: input.nickname, hidden: 'true' }
   )
   const baseAddressURN = AddressURNSpace.getBaseURN(addressURN)
   const smartContractWalletNode = initAddressNodeByName(
@@ -69,11 +77,14 @@ export const initSmartContractWalletMethod = async ({
   await Promise.all([
     smartContractWalletNode.storage.put('privateKey', owner.privateKey),
     smartContractWalletNode.class.setAddress(smartContractWalletAddress),
-    smartContractWalletNode.class.setNickname(smartContractWalletAddress),
+    smartContractWalletNode.class.setNickname(input.nickname),
     smartContractWalletNode.class.setNodeType(NodeType.Crypto),
     smartContractWalletNode.class.setType(CryptoAddressType.Wallet),
     smartContractWalletNode.class.setGradient(gradient),
   ])
+
+  // Store the owning account for the address node in the node itself.
+  await smartContractWalletNode.class.setAccount(account)
 
   const edgesClient = createEdgesClient(ctx.Edges, {
     ...generateTraceContextHeaders(ctx.traceSpan),

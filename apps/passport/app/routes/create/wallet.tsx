@@ -1,6 +1,5 @@
-import { useLoaderData, useSubmit } from '@remix-run/react'
+import { useSubmit } from '@remix-run/react'
 import { redirect } from '@remix-run/cloudflare'
-import { json } from '@remix-run/cloudflare'
 import { getAccountClient, getAddressClient } from '~/platform.server'
 import { getJWTConditionallyFromSession, parseJwt } from '~/session.server'
 
@@ -9,34 +8,11 @@ import { SmartContractWalletCreationSummary } from '@proofzero/design-system/src
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 import type { AccountURN } from '@proofzero/urns/account'
 import { UnauthorizedError } from '@proofzero/errors'
-import type { AddressURN } from '@proofzero/urns/address'
-import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import type { ActionFunction } from '@remix-run/cloudflare'
+import { useState } from 'react'
 
-export const loader: LoaderFunction = async ({ request, context }) => {
-  const jwt = await getJWTConditionallyFromSession(request, context.env)
-
-  if (!jwt) {
-    throw new UnauthorizedError({
-      message: 'You need to be logged in to create a wallet',
-    })
-  }
-
-  const account = parseJwt(jwt).sub as AccountURN
-  const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-  const profile = await accountClient.getProfile.query({ account })
-
-  const addressClient = getAddressClient(
-    profile?.primaryAddressURN!,
-    context.env,
-    context.traceSpan
-  )
-
-  const SCwallet = await addressClient.initSmartContractWallet.query()
-  return json({
-    wallet: SCwallet.walletAddress,
-    walletURN: SCwallet.addressURN,
-  })
-}
+import subtractLogo from '../../assets/subtract-logo.svg'
+import { Text } from '@proofzero/design-system'
 
 export const action: ActionFunction = async ({ request, context, params }) => {
   const jwt = await getJWTConditionallyFromSession(request, context.env)
@@ -58,11 +34,9 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   )
 
   const formData = await request.formData()
-  const walletURN = formData.get('walletURN') as AddressURN
   const nickname = formData.get('nickname') as string
 
-  await addressClient.renameSmartContractWallet.mutate({
-    addressURN: walletURN,
+  await addressClient.initSmartContractWallet.query({
     nickname,
   })
 
@@ -72,12 +46,10 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 }
 
 export default () => {
-  const { wallet, walletURN } = useLoaderData()
   const submit = useSubmit()
+  const [nickname, setNickname] = useState('')
 
   const formData = new FormData()
-  formData.set('walletURN', walletURN)
-  formData.set('nickname', wallet)
 
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
@@ -102,14 +74,24 @@ export default () => {
           }}
         >
           <SmartContractWalletCreationSummary
-            placeholder={wallet}
             onChange={(value) => {
-              formData.set('nickname', value)
+              setNickname(value)
             }}
             onSubmit={() => {
+              formData.set('nickname', nickname)
               submit(formData, { method: 'post' })
             }}
+            disabled={!nickname || nickname.length < 4}
           />
+          <div className="mt-2 flex justify-center items-center space-x-2">
+            <img src={subtractLogo} alt="powered by rollup.id" />
+            <Text size="xs" weight="normal" className="text-gray-400">
+              Powered by{' '}
+              <a href="https://rollup.id" className="hover:underline">
+                rollup.id
+              </a>
+            </Text>
+          </div>
         </div>
       </div>
     </div>
