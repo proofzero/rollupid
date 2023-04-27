@@ -16,7 +16,7 @@ body {
   background-color: $rollupid-white;
   margin: 0px;
   padding: 0px;
-  min-height: 100vh;
+  min-height: 100dvh;
   background-color: $rollupid-white;
 }
 
@@ -72,7 +72,7 @@ div[data-testid='flowbite-tooltip'] div {
   .wrapper {
     // margin: auto;
     // display: flex;
-    height: 100vh;
+    height: 100dvh;
   }
 
   nav {

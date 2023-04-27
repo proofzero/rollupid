@@ -151,7 +151,7 @@ export default function SideMenu({
         <Popover.Panel
           className={`
           bg-white border mt-[80px] lg:hidden z-[100]
-          min-h-[416px] h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] w-[280px]
+          min-h-[416px] h-[calc(100dvh-80px)] max-h-[calc(100dvh-80px)] w-[280px]
           `}
           ref={setPopperElement}
           style={{ position: 'absolute', right: '0', top: '0' }}

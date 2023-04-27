@@ -129,7 +129,7 @@ export default function SiteMenu(props: RollupMenuProps) {
           <Popover.Panel
             className={`
         flex flex-col bg-gray-900 mt-[80px] lg:hidden z-50
-        min-h-[706px] h-[calc(100vh-80px)] max-h-[calc(100vh-80px)] w-[280px]
+        min-h-[706px] h-[calc(100dvh-80px)] max-h-[calc(100dvh-80px)] w-[280px]
         overflow-scroll no-scrollbar`}
             ref={setPopperElement}
             style={{ position: 'absolute', right: '0', top: '0' }}

@@ -191,8 +191,8 @@ export default function HeadNav({
           ${open ? 'fixed right-0' : ''}
             lg:hidden col-start-1 col-end-3 bg-gray-50
             border sm:-mt-[60px] max-sm:mt-5 z-[100]
-             max-sm:h-[calc(100vh-80px)] max-sm:min-h-[568px]
-              min-h-[648px] h-[calc(100vh+2px)] w-[240px]`}
+             max-sm:h-[calc(100dvh-80px)] max-sm:min-h-[568px]
+              min-h-[648px] h-[calc(100dvh+2px)] w-[240px]`}
           ref={setPopperElement}
           style={styles.popper}
           {...attributes.popper}
