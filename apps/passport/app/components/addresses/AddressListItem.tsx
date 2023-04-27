@@ -1,6 +1,18 @@
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Pill } from '@proofzero/design-system/src/atoms/pills/Pill'
 import { PrimaryPill } from '@proofzero/design-system/src/atoms/pills/PrimaryPill'
 import { IconPill } from '@proofzero/design-system/src/atoms/pills/IconPill'
+
+import appleIcon from '@proofzero/design-system/src/assets/social_icons/apple.svg'
+import discordIcon from '@proofzero/design-system/src/assets/social_icons/discord.svg'
+import githubIcon from '@proofzero/design-system/src/assets/social_icons/github.svg'
+import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
+import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
+import twitterIcon from '@proofzero/design-system/src/assets/social_icons/twitter.svg'
+
+import { OAuthAddressType } from '@proofzero/types/address'
+
 import {
   HiDotsHorizontal,
   HiOutlineEyeOff,
@@ -15,22 +27,50 @@ import { Fragment } from 'react'
 import { getProfileTypeTitle } from '../../utils/profile'
 
 type AddressListItemIconProps = {
-  iconUrl: string
+  type: string
+  iconUrl?: string
 }
-export const AddressListItemIcon = ({ iconUrl }: AddressListItemIconProps) => (
+
+const getDefaultIconUrl = (type: string) => {
+  switch (type) {
+    case OAuthAddressType.Apple:
+      return appleIcon
+    case OAuthAddressType.Discord:
+      return discordIcon
+    case OAuthAddressType.GitHub:
+      return githubIcon
+    case OAuthAddressType.Google:
+      return googleIcon
+    case OAuthAddressType.Microsoft:
+      return microsoftIcon
+    case OAuthAddressType.Twitter:
+      return twitterIcon
+  }
+}
+
+export const AddressListItemIcon = ({
+  type,
+  iconUrl,
+}: AddressListItemIconProps) => (
   <div className="rounded-full w-8 h-8 flex justify-center items-center bg-gray-200 overflow-hidden">
-    <img src={iconUrl} alt="Not Found" className="object-cover" />
+    <img
+      src={iconUrl || getDefaultIconUrl(type)}
+      alt="Not Found"
+      className="object-cover"
+    />
   </div>
 )
 
 export type AddressListItemProps = {
   id: string
-  icon: string
+  icon?: string
   title: string
   type: string
   address: string
   primary?: boolean
   hidden?: boolean
+  disconnected?: boolean
+  showReconnectAccount: boolean
   onRenameAccount?: (id: string) => void
   onChangeAvatar?: (id: string) => void
   onSetPrimary?: (id: string) => void
@@ -43,8 +83,10 @@ export const AddressListItem = ({
   title,
   type,
   address,
+  disconnected,
   primary = false,
   hidden = false,
+  showReconnectAccount = true,
   onRenameAccount,
   onChangeAvatar,
   onSetPrimary,
@@ -58,10 +100,23 @@ export const AddressListItem = ({
     onSetPrivate ||
     onDisconnect
 
+  const reconnectAccount = (type: string) => {
+    const url = new URL(window.location.href)
+    url.search = ''
+
+    const qp = new URLSearchParams()
+    qp.append('prompt', 'reconnect')
+    qp.append('client_id', 'passport')
+    qp.append('state', 'skip')
+    qp.append('login_hint', type)
+    qp.append('redirect_uri', url.toString())
+    window.location.href = `/authorize?${qp.toString()}`
+  }
+
   return (
     <div className="flex flex-row w-full items-center">
       <section className="mx-3">
-        <AddressListItemIcon iconUrl={icon} />
+        <AddressListItemIcon type={type} iconUrl={icon} />
       </section>
 
       <section className="flex-1 flex flex-col space-y-1.5">
@@ -73,16 +128,40 @@ export const AddressListItem = ({
           {primary && <PrimaryPill text="Primary" />}
 
           {hidden && <IconPill Icon={HiOutlineEyeOff} />}
+
+          {disconnected && (
+            <Pill className="flex flex-row items-center bg-orange-50 rounded-xl">
+              <Text size="xs" weight="medium" className="text-orange-500">
+                No Connection
+              </Text>
+            </Pill>
+          )}
         </div>
 
         <div className="flex flex-row">
           <Text size="xs" weight="normal" className="text-gray-500 break-all">
-            {getProfileTypeTitle(type)} • {address}
+            {disconnected && address}
+            {!disconnected && (
+              <>
+                {getProfileTypeTitle(type)} • {address}
+              </>
+            )}
           </Text>
         </div>
       </section>
 
-      {hasBehavior && (
+      {disconnected && showReconnectAccount && (
+        <section className="flex mx-5">
+          <Button
+            btnType="secondary-alt"
+            onClick={() => reconnectAccount(type)}
+          >
+            Reconnect
+          </Button>
+        </section>
+      )}
+
+      {!disconnected && hasBehavior && (
         <section className="p-1.5 relative">
           {/* Menu could be injected from outside */}
           <Menu>

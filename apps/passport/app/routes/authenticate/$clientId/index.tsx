@@ -15,7 +15,11 @@ import ConnectOAuthButton from '~/components/connect-oauth-button'
 import { redirect, json } from '@remix-run/cloudflare'
 
 import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/AuthButton'
-import { getConsoleParams } from '~/session.server'
+import {
+  commitAuthenticationParamsSession,
+  getConsoleParams,
+  getAuthenticationParamsSession,
+} from '~/session.server'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { createClient, WagmiConfig } from 'wagmi'
@@ -47,7 +51,18 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     github: true,
   }
 
-  const loginHint = url.searchParams.get('login_hint')
+  const authenticationParamsSession = await getAuthenticationParamsSession(
+    request,
+    context.env
+  )
+
+  let loginHint = url.searchParams.get('login_hint')
+  if (loginHint) {
+    authenticationParamsSession.set('login_hint', loginHint)
+  } else {
+    loginHint = authenticationParamsSession.get('login_hint')
+  }
+
   if (loginHint) {
     const hints = new Set(loginHint.split(' '))
     for (const key of Object.keys(displayDict)) {
@@ -57,10 +72,20 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     }
   }
 
-  return json({
-    clientId: params.clientId,
-    displayDict,
-  })
+  return json(
+    {
+      clientId: params.clientId,
+      displayDict,
+    },
+    {
+      headers: {
+        'Set-Cookie': await commitAuthenticationParamsSession(
+          context.env,
+          authenticationParamsSession
+        ),
+      },
+    }
+  )
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
@@ -82,14 +107,14 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 }
 
 export default () => {
-  const { appProps, connectFlow } = useOutletContext<{
+  const { appProps, prompt } = useOutletContext<{
     appProps?: {
       name: string
       iconURL: string
       termsURL?: string
       privacyURL?: string
     }
-    connectFlow: boolean
+    prompt?: string
   }>()
 
   const { clientId, displayDict } = useLoaderData()
@@ -137,7 +162,11 @@ export default () => {
     <WagmiConfig client={client}>
       {transition.state !== 'idle' && <Loader />}
 
-      <Authentication logoURL={iconURL} appName={name} generic={connectFlow}>
+      <Authentication
+        logoURL={iconURL}
+        appName={name}
+        generic={Boolean(prompt)}
+      >
         <>
           {displayDict.wallet && (
             <ConnectButton
@@ -211,7 +240,13 @@ export default () => {
 
           <div className="flex flex-row space-x-3 justify-evenly w-full">
             {displayDict.google && (
-              <Form className="w-full" action={`/connect/google`} method="post">
+              <Form
+                className="w-full"
+                action={`/connect/google${
+                  prompt === 'reconnect' ? '?prompt=consent' : ''
+                }`}
+                method="post"
+              >
                 <ConnectOAuthButton provider="google" />
               </Form>
             )}
@@ -219,7 +254,9 @@ export default () => {
             {displayDict.microsoft && (
               <Form
                 className="w-full"
-                action={`/connect/microsoft`}
+                action={`/connect/microsoft${
+                  prompt === 'reconnect' ? '?prompt=consent' : ''
+                }`}
                 method="post"
               >
                 <ConnectOAuthButton provider="microsoft" />
@@ -247,7 +284,9 @@ export default () => {
             {displayDict.discord && (
               <Form
                 className="w-full"
-                action={`/connect/discord`}
+                action={`/connect/discord${
+                  prompt === 'reconnect' ? '?prompt=consent' : ''
+                }`}
                 method="post"
               >
                 <ConnectOAuthButton provider="discord" />
@@ -255,7 +294,13 @@ export default () => {
             )}
 
             {displayDict.github && (
-              <Form className="w-full" action={`/connect/github`} method="post">
+              <Form
+                className="w-full"
+                action={`/connect/github${
+                  prompt === 'reconnect' ? '?prompt=consent' : ''
+                }`}
+                method="post"
+              >
                 <ConnectOAuthButton provider="github" />
               </Form>
             )}
@@ -277,7 +322,7 @@ export default () => {
             </Text>
           )}
 
-          {connectFlow && (
+          {prompt && (
             <div className="flex flex-1 items-end">
               <Button
                 btnSize="l"

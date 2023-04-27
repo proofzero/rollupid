@@ -24,7 +24,7 @@ export const loader: LoaderFunction = async ({
   const appData = await getConsoleParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)
-  authenticator.use(getGoogleAuthenticator(context.env))
+  authenticator.use(getGoogleAuthenticator('none', context.env))
 
   const authRes = (await authenticator.authenticate(
     GoogleStrategyDefaultName,

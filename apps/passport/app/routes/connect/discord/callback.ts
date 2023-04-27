@@ -24,7 +24,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const appData = await getConsoleParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)
-  authenticator.use(getDiscordStrategy(context.env))
+  authenticator.use(getDiscordStrategy('none', context.env))
 
   const authRes = (await authenticator.authenticate(
     DiscordStrategyDefaultName,

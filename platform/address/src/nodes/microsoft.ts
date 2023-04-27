@@ -67,14 +67,21 @@ export default class MicrosoftAddress extends OAuthAddress {
 
   async getProfile(): Promise<MicrosoftAddressProfile> {
     const profile = await super.fetchProfile<MicrosoftOAuthProfile>()
-    if (!profile) {
-      throw new Error('missing profile')
-    }
-    return {
-      address: profile.email,
-      title: profile.name,
-      icon: `${this.ctx.PASSPORT_URL}/avatars/${this.ctx.hashedIdref}`,
-      type: OAuthAddressType.Microsoft,
+    if (profile) {
+      return {
+        address: profile.email,
+        title: profile.name,
+        icon: `${this.ctx.PASSPORT_URL}/avatars/${this.ctx.hashedIdref}`,
+        type: OAuthAddressType.Microsoft,
+      }
+    } else {
+      const address = await this.node.class.getAddress()
+      return {
+        address: address || 'Microsoft',
+        title: 'Microsoft',
+        disconnected: true,
+        type: OAuthAddressType.Microsoft,
+      }
     }
   }
 

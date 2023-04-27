@@ -10,12 +10,14 @@ import { AddressListItem } from './AddressListItem'
 export type AddressListProps = {
   addresses: AddressListItemProps[]
   primaryAddressURN: AddressURN
+  showReconnectAccount?: boolean
   onSetPrimary?: (id: string) => void
 }
 
 export const AddressList = ({
   addresses,
   primaryAddressURN,
+  showReconnectAccount = true,
   onSetPrimary,
 }: AddressListProps) => {
   return addresses.length ? (
@@ -32,6 +34,7 @@ export const AddressList = ({
           key={item.key}
           {...item.val}
           primary={item.primary}
+          showReconnectAccount={showReconnectAccount}
           onSetPrimary={onSetPrimary}
         />
       )}

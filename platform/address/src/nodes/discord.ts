@@ -48,14 +48,21 @@ export default class DiscordAddress extends OAuthAddress {
 
   async getProfile(): Promise<DiscordAddressProfile> {
     const profile = await super.fetchProfile<DiscordOAuthProfile>()
-    if (!profile) {
-      throw new Error('missing profile')
-    }
-    return {
-      address: `${profile.username}#${profile.discriminator}`,
-      title: profile.username,
-      icon: `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`,
-      type: OAuthAddressType.Discord,
+    if (profile) {
+      return {
+        address: `${profile.username}#${profile.discriminator}`,
+        title: profile.username,
+        icon: `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`,
+        type: OAuthAddressType.Discord,
+      }
+    } else {
+      const address = await this.node.class.getAddress()
+      return {
+        address: address || 'Discord',
+        title: 'Discord',
+        disconnected: true,
+        type: OAuthAddressType.Discord,
+      }
     }
   }
 

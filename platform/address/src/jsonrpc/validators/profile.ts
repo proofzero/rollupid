@@ -10,6 +10,7 @@ export const AddressProfileSchema = z.object({
   address: z.string(),
   title: z.string(),
   icon: z.string().optional(),
+  disconnected: z.boolean().optional(),
   type: z.union([
     z.literal(CryptoAddressType.ETH),
     z.literal(CryptoAddressType.Wallet),

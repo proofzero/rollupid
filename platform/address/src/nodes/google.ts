@@ -34,14 +34,21 @@ export default class GoogleAddress extends OAuthAddress {
 
   async getProfile(): Promise<GoogleAddressProfile> {
     const profile = await super.fetchProfile<GoogleOAuthProfile>()
-    if (!profile) {
-      throw new Error('missing profile')
-    }
-    return {
-      address: profile.email,
-      title: profile.name,
-      icon: profile.picture,
-      type: OAuthAddressType.Google,
+    if (profile) {
+      return {
+        address: profile.email,
+        title: profile.name,
+        icon: profile.picture,
+        type: OAuthAddressType.Google,
+      }
+    } else {
+      const address = await this.node.class.getAddress()
+      return {
+        address: address || 'Google',
+        title: 'Google',
+        disconnected: true,
+        type: OAuthAddressType.Google,
+      }
     }
   }
 

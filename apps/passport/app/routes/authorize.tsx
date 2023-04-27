@@ -103,7 +103,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     }
   }
 
-  if (prompt && !['consent', 'connect'].includes(prompt))
+  if (prompt && !['consent', 'connect', 'reconnect'].includes(prompt))
     throw new BadRequestError({ message: 'only prompt supported is "consent"' })
 
   const lastCP = await getConsoleParams(request, context.env)

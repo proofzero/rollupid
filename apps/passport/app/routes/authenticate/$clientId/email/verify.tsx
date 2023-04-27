@@ -72,8 +72,8 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 }
 
 export default () => {
-  const { connectFlow } = useOutletContext<{
-    connectFlow: boolean
+  const { prompt } = useOutletContext<{
+    prompt?: string
   }>()
 
   const { email, clientId } = useLoaderData()
@@ -158,7 +158,7 @@ export default () => {
         ) : undefined}
       </EmailOTPValidator>
 
-      {connectFlow && (
+      {prompt && (
         <div className="flex flex-1 w-full items-end">
           <Button
             btnSize="l"

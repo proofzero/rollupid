@@ -25,15 +25,20 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
   const cp = await getConsoleParams(request, context.env)
 
+  let prompt
+  if (['connect', 'reconnect'].includes(cp?.prompt)) {
+    prompt = cp?.prompt
+  }
+
   return json({
     clientId: params.clientId,
     appProps,
-    connectFlow: cp?.prompt === 'connect',
+    prompt,
   })
 }
 
 export default () => {
-  const { clientId, appProps, connectFlow } = useLoaderData()
+  const { clientId, appProps, prompt } = useLoaderData()
 
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
@@ -45,7 +50,7 @@ export default () => {
         <img src={sideGraphics} alt="Background graphics" />
       </div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
-        <Outlet context={{ clientId, appProps, connectFlow }} />
+        <Outlet context={{ clientId, appProps, prompt }} />
       </div>
     </div>
   )
