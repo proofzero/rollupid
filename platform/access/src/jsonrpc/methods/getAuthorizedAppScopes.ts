@@ -19,7 +19,7 @@ export const GetAuthorizedAppScopesMethodOutput = z.array(
     scopes: z.array(z.string()),
   })
 )
-type GetAuthorizedAppScopesMethodOutput = z.infer<
+export type GetAuthorizedAppScopesMethodResult = z.infer<
   typeof GetAuthorizedAppScopesMethodOutput
 >
 
@@ -31,7 +31,7 @@ type GetAuthorizedAppScopesParams = {
 interface GetAuthorizedAppScopesMethod {
   (
     params: GetAuthorizedAppScopesParams
-  ): Promise<GetAuthorizedAppScopesMethodOutput>
+  ): Promise<GetAuthorizedAppScopesMethodResult>
 }
 
 export const getAuthorizedAppScopesMethod: GetAuthorizedAppScopesMethod =

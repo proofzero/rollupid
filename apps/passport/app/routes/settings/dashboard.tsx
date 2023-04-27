@@ -11,12 +11,13 @@ import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error
 
 import { useOutletContext } from '@remix-run/react'
 import type { AddressURN } from '@proofzero/urns/address'
+import { AuthorizedAppsModel } from '../settings'
 
 export default function DashboardLayout() {
   const { connectedProfiles, authorizedApps, primaryAddressURN } =
     useOutletContext<{
       connectedProfiles: any[]
-      authorizedApps: any[]
+      authorizedApps: AuthorizedAppsModel[]
       primaryAddressURN: AddressURN
     }>()
 

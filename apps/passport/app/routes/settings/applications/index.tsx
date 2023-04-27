@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react'
 
-import { useFetcher, useLoaderData, useOutletContext } from '@remix-run/react'
+import {
+  useFetcher,
+  useLoaderData,
+  useNavigate,
+  useOutletContext,
+} from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
 import warningImg from '~/assets/warning.svg'
@@ -21,6 +26,7 @@ import {
 
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import type { FetcherWithComponents } from '@remix-run/react'
+import { AuthorizedAppsModel } from '~/routes/settings'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   await getValidatedSessionContext(
@@ -291,7 +297,7 @@ export default function ApplicationsLayout() {
   }>()
 
   const { authorizedApps } = useOutletContext<{
-    authorizedApps: any[]
+    authorizedApps: AuthorizedAppsModel[]
   }>()
 
   const [selectedApp, setSelectedApp] = useState<undefined | App>()
@@ -326,6 +332,13 @@ export default function ApplicationsLayout() {
       }
     }
   }, [tooltipMessage])
+
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (selectedApp) {
+      navigate(`/settings/applications/${selectedApp.clientId}`)
+    }
+  }, [selectedApp])
   return (
     <>
       <Text size="2xl" weight="semibold" className="text-gray-800 mb-6">

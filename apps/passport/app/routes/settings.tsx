@@ -25,6 +25,13 @@ import type { NodeType } from '@proofzero/types/address'
 import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
 import type { LinksFunction } from '@remix-run/cloudflare'
 
+export type AuthorizedAppsModel = {
+  clientId: string
+  icon: string
+  title: string
+  timestamp: number
+}
+
 export const links: LinksFunction = () => [
   { rel: 'apple-touch-icon', href: appleIcon, sizes: '180x180' },
   { rel: 'icon', type: 'image/png', href: icon32, sizes: '32x32' },
@@ -142,7 +149,7 @@ export default function SettingsLayout() {
                     min-h-[416px]'
                     : 'h-full'
                 } px-2 sm:max-md:px-5 md:px-10
-                pb-5 md:pb-10 pt-6`}
+                pb-5 md:pb-10 pt-6 bg-white`}
               >
                 <Outlet
                   context={{
