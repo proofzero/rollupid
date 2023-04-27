@@ -11,11 +11,11 @@ const Template = () => {
     <div className="flex flex-row space-x-9 ">
       <div className="w-[409px] h-[491px] border rounded-lg p-8">
         <SmartContractWalletCreationSummary
-          onChange={(e) => {
-            console.log(e)
+          onChange={() => {
+            1 + 1
           }}
           onSubmit={() => {
-            console.log('test')
+            1 + 1
           }}
           disabled={false}
         />

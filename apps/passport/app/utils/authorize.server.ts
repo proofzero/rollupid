@@ -25,6 +25,7 @@ import type {
   SCWalletSelectListItem,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { redirect } from '@remix-run/cloudflare'
+import { CryptoAddressType } from '@proofzero/types/address'
 
 export type DataForScopes = {
   connectedEmails?: EmailSelectListItem[]
@@ -98,7 +99,9 @@ export const getDataForScopes = async (
     connectedEmails,
     personaData,
     requestedScope: reorderScope(requestedScope),
-    connectedAccounts: connectedAddresses,
+    connectedAccounts: connectedAddresses.filter(
+      (acc) => acc.type !== CryptoAddressType.Wallet
+    ),
     connectedSmartContractWallets,
   }
 }

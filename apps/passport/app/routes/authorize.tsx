@@ -561,7 +561,7 @@ export default function Authorize() {
                             <EmailSelect
                               items={connectedEmails}
                               enableAddNew={true}
-                              defaultAddress={connectedEmails[0]?.addressURN}
+                              defaultAddress={connectedEmails![0]?.addressURN}
                               onSelect={(selected: EmailSelectListItem) => {
                                 if (selected?.type === OptionType.AddNew) {
                                   const qp = new URLSearchParams()
@@ -587,7 +587,7 @@ export default function Authorize() {
                         {scope === 'connected_accounts' && (
                           <div className="flex-1 min-w-0">
                             <ConnectedAccountSelect
-                              accounts={connectedAccounts.map((ca) => ({
+                              accounts={connectedAccounts!.map((ca) => ({
                                 addressURN: ca.id,
                                 address: ca.address,
                                 title: ca.title,
@@ -657,51 +657,50 @@ export default function Authorize() {
               .
             </Text>
           )}
-
-          <div
-            className={
-              'flex flex-row w-full items-end justify-center gap-4 mt-auto'
-            }
-          >
-            {transition.state === 'idle' && (
-              <>
-                <Button
-                  btnSize="xl"
-                  btnType="secondary-alt"
-                  onClick={() => {
-                    cancelCallback()
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  btnSize="xl"
-                  btnType="primary-alt"
-                  disabled={
-                    // TODO: make generic!
-                    (requestedScope.includes('email') &&
-                      (!connectedEmails?.length || !selectedEmail)) ||
-                    (requestedScope.includes('connected_accounts') &&
-                      !selectedConnectedAccounts?.length)
-                  }
-                  onClick={() => {
-                    authorizeCallback(requestedScope)
-                  }}
-                >
-                  Continue
-                </Button>
-              </>
-            )}
-            {transition.state !== 'idle' && <Spinner />}
-          </div>
-          <div className="mt-7 flex justify-center items-center space-x-2">
-            <img src={subtractLogo} alt="powered by rollup.id" />
-            <Text size="xs" weight="normal" className="text-gray-400">
-              Powered by{' '}
-              <a href="https://rollup.id" className="hover:underline">
-                rollup.id
-              </a>
-            </Text>
+          <div className="flex flex-col w-full items-center justify-center mt-auto">
+            <div
+              className={'flex flex-row w-full items-end justify-center gap-4'}
+            >
+              {transition.state === 'idle' && (
+                <>
+                  <Button
+                    btnSize="xl"
+                    btnType="secondary-alt"
+                    onClick={() => {
+                      cancelCallback()
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    btnSize="xl"
+                    btnType="primary-alt"
+                    disabled={
+                      // TODO: make generic!
+                      (requestedScope.includes('email') &&
+                        (!connectedEmails?.length || !selectedEmail)) ||
+                      (requestedScope.includes('connected_accounts') &&
+                        !selectedConnectedAccounts?.length)
+                    }
+                    onClick={() => {
+                      authorizeCallback(requestedScope)
+                    }}
+                  >
+                    Continue
+                  </Button>
+                </>
+              )}
+              {transition.state !== 'idle' && <Spinner />}
+            </div>
+            <div className="mt-5 flex justify-center items-center space-x-2">
+              <img src={subtractLogo} alt="powered by rollup.id" />
+              <Text size="xs" weight="normal" className="text-gray-400">
+                Powered by{' '}
+                <a href="https://rollup.id" className="hover:underline">
+                  rollup.id
+                </a>
+              </Text>
+            </div>
           </div>
         </div>
       </div>

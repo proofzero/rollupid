@@ -1,17 +1,17 @@
+import { useState } from 'react'
+
 import { useSubmit } from '@remix-run/react'
 import { redirect } from '@remix-run/cloudflare'
 import { getAccountClient, getAddressClient } from '~/platform.server'
 import { getConsoleParams, getValidatedSessionContext } from '~/session.server'
 
 import { SmartContractWalletCreationSummary } from '@proofzero/design-system/src/molecules/smart-contract-wallet-connection/SmartContractWalletConnection'
+import { Text } from '@proofzero/design-system'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
-import { UnauthorizedError } from '@proofzero/errors'
-import type { ActionFunction } from '@remix-run/cloudflare'
-import { useState } from 'react'
-
 import subtractLogo from '../../assets/subtract-logo.svg'
-import { Text } from '@proofzero/design-system'
+
+import type { ActionFunction } from '@remix-run/cloudflare'
 
 export const action: ActionFunction = async ({ request, context, params }) => {
   const { jwt, accountUrn } = await getValidatedSessionContext(
@@ -20,12 +20,6 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     context.env,
     context.traceSpan
   )
-
-  if (!jwt) {
-    throw new UnauthorizedError({
-      message: 'You need to be logged in to create a wallet',
-    })
-  }
 
   const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
   const profile = await accountClient.getProfile.query({ account: accountUrn })
