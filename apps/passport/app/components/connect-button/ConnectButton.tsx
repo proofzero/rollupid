@@ -28,6 +28,7 @@ export type ConnectButtonProps = {
   }
   isLoading?: boolean
   className?: string
+  fullSize?: boolean
 } & ButtonProps
 
 export function ConnectButton({
@@ -37,6 +38,7 @@ export function ConnectButton({
   isLoading,
   className,
   signData,
+  fullSize = true,
 }: ConnectButtonProps) {
   const { connector, isConnected, isReconnecting } = useAccount()
   const { disconnect } = useDisconnect()
@@ -100,6 +102,7 @@ export function ConnectButton({
                 onClick={
                   isConnected ? () => address && connectCallback(address) : show
                 }
+                fullSize={fullSize}
                 Graphic={
                   (isSigning || isLoading) && isConnected ? (
                     <Spinner size={16} />

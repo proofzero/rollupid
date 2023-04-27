@@ -8,6 +8,7 @@ type AuthButtonProps = {
   text: string
   disabled?: boolean
   onClick: any
+  fullSize?: boolean
 }
 
 export const AuthButton = ({
@@ -16,17 +17,22 @@ export const AuthButton = ({
   text,
   disabled,
   onClick,
+  fullSize,
 }: AuthButtonProps) => (
   <Button
+    className="button w-full hover:bg-gray-100"
     btnType="secondary-alt"
-    className="button w-full"
     disabled={disabled}
     onClick={onClick}
   >
-    <div className="flex flex-row items-center space-x-3 py-1.5">
+    <div
+      className={`flex ${
+        fullSize ? 'justify-start' : 'justify-center'
+      } items-center w-full py-1.5 space-x-3`}
+    >
       {Graphic && (
         <div
-          className="min-w-6 min-h-6 w-6 h-6
+          className="w-5 h-5
         flex justify-center items-center overflow-hidden
         shrink-0"
         >
@@ -34,9 +40,11 @@ export const AuthButton = ({
         </div>
       )}
 
-      <Text weight="medium" className="text-gray-800 truncate">
-        {text}
-      </Text>
+      {fullSize && (
+        <Text weight="medium" className="text-gray-800 truncate">
+          {text}
+        </Text>
+      )}
 
       {Addon}
     </div>

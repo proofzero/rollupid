@@ -169,18 +169,16 @@ export default () => {
     history.replaceState(null, '', url.toString())
   })
 
-  useEffect(() => {
-    setOAuthWrapperWidth(oAuthWrapperRef.current?.offsetWidth)
-  }, [oAuthWrapperRef])
-
-  const displaykeyMapper = (key: string) => {
+  const displayKeyMapper = (key: string, flex: boolean = false) => {
+    let el
     switch (key) {
       case 'wallet':
-        return (
+        el = (
           <ConnectButton
             key={key}
             signData={signData}
             isLoading={loading}
+            fullSize={flex}
             connectCallback={async (address) => {
               if (loading) return
               // fetch nonce and kickoff sign flow
@@ -238,17 +236,20 @@ export default () => {
             }}
           />
         )
+        break
       case 'email':
-        return (
+        el = (
           <AuthButton
             key={key}
             onClick={() => navigate(`/authenticate/${clientId}/email`)}
             Graphic={<HiOutlineMail className="w-full h-full" />}
             text={'Connect with Email'}
+            fullSize={flex}
           />
         )
+        break
       default:
-        return (
+        el = (
           <Form
             className="w-full"
             action={`/connect/${key}`}
@@ -257,11 +258,61 @@ export default () => {
           >
             <ConnectOAuthButton
               provider={key as OAuthProvider}
-              parentWidth={oAuthWrapperWidth}
+              fullSize={flex}
             />
           </Form>
         )
     }
+
+    return <div className="flex-1 min-w-0">{el}</div>
+  }
+
+  const displayKeyDisplayFn = (displayKeys: string[]): JSX.Element[] => {
+    const rows = []
+
+    if (displayKeys.length === 1) {
+      rows.push(displayKeyMapper(displayKeys[0], true))
+    }
+
+    if (displayKeys.length === 2) {
+      rows.push(displayKeys.map((dk) => displayKeyMapper(dk, true)))
+    }
+
+    if (displayKeys.length === 3) {
+      rows.push(displayKeys.map((dk) => displayKeyMapper(dk)))
+    }
+
+    if (displayKeys.length === 4) {
+      rows.push(displayKeys.slice(0, 2).map((dk) => displayKeyMapper(dk, true)))
+      rows.push(displayKeys.slice(2, 4).map((dk) => displayKeyMapper(dk, true)))
+    }
+
+    if (displayKeys.length === 5) {
+      rows.push(displayKeys.slice(0, 2).map((dk) => displayKeyMapper(dk, true)))
+      rows.push(displayKeys.slice(2, 5).map((dk) => displayKeyMapper(dk)))
+    }
+
+    if (displayKeys.length === 6) {
+      rows.push(displayKeys.slice(0, 3).map((dk) => displayKeyMapper(dk)))
+      rows.push(displayKeys.slice(3, 6).map((dk) => displayKeyMapper(dk)))
+    }
+
+    if (displayKeys.length > 6) {
+      const firstHalf = displayKeys.slice(0, Math.ceil(displayKeys.length / 2))
+      const secondHalf = displayKeys.slice(
+        Math.ceil(displayKeys.length / 2),
+        displayKeys.length
+      )
+
+      return [
+        ...displayKeyDisplayFn(secondHalf),
+        ...displayKeyDisplayFn(firstHalf),
+      ]
+    }
+
+    return rows.map((row) => (
+      <div className="flex flex-row justify-evenly gap-4">{row}</div>
+    ))
   }
 
   return (
