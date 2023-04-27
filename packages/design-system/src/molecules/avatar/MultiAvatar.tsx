@@ -14,7 +14,7 @@ export default ({ avatars, size = 20, cutoff }: MultiAvatarProps) => {
   useEffect(() => {
     if (containerRef.current) {
       const containerWidth = containerRef.current.clientWidth
-      const avatarWidth = size - size / 3
+      const avatarWidth = size + size / 10 - (size + size / 10) / 3
       const maxAvatars = Math.floor(containerWidth / avatarWidth)
       if (maxAvatars < avatars.length) {
         setComputedCutoff(
