@@ -76,6 +76,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     {
       clientId: params.clientId,
       displayDict,
+      loginHint,
     },
     {
       headers: {
@@ -117,7 +118,7 @@ export default () => {
     prompt?: string
   }>()
 
-  const { clientId, displayDict } = useLoaderData()
+  const { clientId, displayDict, loginHint } = useLoaderData()
 
   const [signData, setSignData] = useState<{
     nonce: string | undefined
@@ -148,12 +149,17 @@ export default () => {
 
   useEffect(() => {
     const url = new URL(window.location.href)
-    const error = url.searchParams.get('oauth_error')
-    if (!error) return
-    const message = getOAuthErrorMessage(error)
-    toast(ToastType.Error, { message }, { duration: 2000 })
 
-    url.searchParams.delete('oauth_error')
+    if (prompt) url.searchParams.set('prompt', prompt)
+    if (loginHint) url.searchParams.set('login_hint', loginHint)
+
+    const error = url.searchParams.get('oauth_error')
+    if (error) {
+      const message = getOAuthErrorMessage(error)
+      toast(ToastType.Error, { message }, { duration: 2000 })
+      url.searchParams.delete('oauth_error')
+    }
+
     history.replaceState(null, '', url.toString())
   })
 
