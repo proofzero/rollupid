@@ -15,6 +15,7 @@ export function parseParams(request: Request) {
   const redirectUri = url.searchParams.get('redirect_uri')
   const scope = url.searchParams.get('scope')
   const prompt = url.searchParams.get('prompt')
+  const login_hint = url.searchParams.get('login_hint')
 
   const decodedScope =
     scope &&
@@ -28,6 +29,7 @@ export function parseParams(request: Request) {
     redirectUri,
     scope: decodedScope ? decodedScope.split(' ') : [],
     prompt,
+    login_hint,
   }
 }
 

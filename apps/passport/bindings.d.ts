@@ -51,6 +51,7 @@ declare global {
     scope: string[] | null
     state: string | null
     prompt?: string | null
+    login_hint?: string | null
   }
 }
 declare module '@remix-run/cloudflare' {

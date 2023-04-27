@@ -1,12 +1,11 @@
 import { useSubmit } from '@remix-run/react'
 import { redirect } from '@remix-run/cloudflare'
 import { getAccountClient, getAddressClient } from '~/platform.server'
-import { getJWTConditionallyFromSession, parseJwt } from '~/session.server'
+import { getConsoleParams, getValidatedSessionContext } from '~/session.server'
 
 import { SmartContractWalletCreationSummary } from '@proofzero/design-system/src/molecules/smart-contract-wallet-connection/SmartContractWalletConnection'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
-import type { AccountURN } from '@proofzero/urns/account'
 import { UnauthorizedError } from '@proofzero/errors'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { useState } from 'react'
@@ -15,7 +14,12 @@ import subtractLogo from '../../assets/subtract-logo.svg'
 import { Text } from '@proofzero/design-system'
 
 export const action: ActionFunction = async ({ request, context, params }) => {
-  const jwt = await getJWTConditionallyFromSession(request, context.env)
+  const { jwt, accountUrn } = await getValidatedSessionContext(
+    request,
+    context.consoleParams,
+    context.env,
+    context.traceSpan
+  )
 
   if (!jwt) {
     throw new UnauthorizedError({
@@ -23,9 +27,8 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     })
   }
 
-  const account = parseJwt(jwt).sub as AccountURN
   const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-  const profile = await accountClient.getProfile.query({ account })
+  const profile = await accountClient.getProfile.query({ account: accountUrn })
 
   const addressClient = getAddressClient(
     profile?.primaryAddressURN!,
@@ -40,9 +43,21 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     nickname,
   })
 
-  const qp = request.url.split('?')[1]
+  const consoleParams = await getConsoleParams(
+    request,
+    context.env,
+    params.clientId
+  )
 
-  return redirect(`/authorize?${qp}`)
+  const { redirectUri, state, scope, clientId } = consoleParams
+
+  const qp = new URLSearchParams()
+  qp.append('client_id', clientId)
+  qp.append('redirect_uri', redirectUri)
+  qp.append('state', state)
+  qp.append('scope', scope.join(' '))
+
+  return redirect(`/authorize?${qp.toString()}`)
 }
 
 export default () => {

@@ -4,8 +4,11 @@ import {
   getNormalisedSmartContractWallets,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
-import { UnauthorizedError } from '@proofzero/errors'
-import { createConsoleParamsSession } from '~/session.server'
+import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
+import {
+  createAuthorizationParamsCookieAndAuthenticate,
+  createAuthorizationParamsCookieHeaders,
+} from '~/session.server'
 
 import type { GetAddressProfileResult } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressProfile'
 
@@ -21,6 +24,7 @@ import type {
   EmailSelectListItem,
   SCWalletSelectListItem,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
+import { redirect } from '@remix-run/cloudflare'
 
 export type DataForScopes = {
   connectedEmails?: EmailSelectListItem[]
@@ -99,24 +103,6 @@ export const getDataForScopes = async (
   }
 }
 
-/** Creates an authorization cookie, capturing current authz query params,
- * and redirects to the authentication route
- */
-export async function createAuthzParamCookieAndAuthenticate(
-  request: Request,
-  authzParams: ConsoleParams,
-  env: Env
-) {
-  const qp = new URLSearchParams()
-
-  const url = new URL(request.url)
-  if (url.searchParams.has('login_hint')) {
-    qp.append('login_hint', url.searchParams.get('login_hint')!)
-  }
-
-  throw await createConsoleParamsSession(authzParams, env, qp)
-}
-
 /** Checks whether the authorization cookie parameters match with
  * authorization query parameters. Only the "standard" params get
  * checked.
@@ -147,4 +133,21 @@ export function authzParamsMatch(
       `${authzReqCookieRedirectURL?.origin}${authzReqCookieRedirectURL?.pathname}` &&
     authzCookieParams.state === authzQueryParams.state
   )
+}
+
+export async function createAuthzParamCookieAndCreate(
+  request: Request,
+  authzParams: ConsoleParams,
+  env: Env
+) {
+  let redirectURL
+  const qp = new URLSearchParams(request.url)
+  if (qp.get('create_type') === 'wallet') {
+    redirectURL = `/create/wallet?client_id=${qp.get('client_id')}`
+  } else {
+    throw new BadRequestError({ message: 'Invalid create_type' })
+  }
+  throw redirect(redirectURL, {
+    headers: await createAuthorizationParamsCookieHeaders(authzParams, env),
+  })
 }

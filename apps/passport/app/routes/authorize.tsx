@@ -16,6 +16,7 @@ import {
   getStarbaseClient,
 } from '~/platform.server'
 import {
+  createAuthorizationParamsCookieAndAuthenticate,
   destroyConsoleParamsSession,
   getConsoleParams,
   getValidatedSessionContext,
@@ -37,7 +38,7 @@ import smartContractWalletClassIcon from '~/components/authorization/sc-wallet-c
 
 import {
   authzParamsMatch,
-  createAuthzParamCookieAndAuthenticate,
+  createAuthzParamCookieAndCreate,
   getDataForScopes,
 } from '~/utils/authorize.server'
 import { useEffect, useState } from 'react'
@@ -102,7 +103,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     }
   }
 
-  if (prompt && !['consent', 'connect', 'reconnect'].includes(prompt))
+  if (prompt && !['consent', 'connect', 'create', 'reconnect'].includes(prompt))
     throw new BadRequestError({ message: 'only prompt supported is "consent"' })
 
   const lastCP = await getConsoleParams(request, context.env)
@@ -118,8 +119,15 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     ) &&
     connectResult !== 'CANCEL'
   ) {
-    await createAuthzParamCookieAndAuthenticate(
-      request,
+    if (prompt === 'create') {
+      await createAuthzParamCookieAndCreate(
+        request,
+        context.consoleParams,
+        context.env
+      )
+    }
+
+    await createAuthorizationParamsCookieAndAuthenticate(
       context.consoleParams,
       context.env
     )
@@ -128,8 +136,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const headers = new Headers()
   if (lastCP) {
     if (!authzParamsMatch(lastCP, context.consoleParams)) {
-      await createAuthzParamCookieAndAuthenticate(
-        request,
+      await createAuthorizationParamsCookieAndAuthenticate(
         context.consoleParams,
         context.env
       )
@@ -537,10 +544,10 @@ export default function Authorize() {
                                   qp.append('state', state)
                                   qp.append('client_id', clientId)
                                   qp.append('redirect_uri', redirectOverride)
+                                  qp.append('prompt', 'create')
+                                  qp.append('create_type', 'wallet')
 
-                                  return navigate(
-                                    `/create/wallet?${qp.toString()}`
-                                  )
+                                  return navigate(`/authorize?${qp.toString()}`)
                                 }
 
                                 setSelectedSCWallet(selected)
