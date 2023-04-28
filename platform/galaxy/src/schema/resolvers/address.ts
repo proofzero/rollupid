@@ -22,6 +22,8 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import { ResolverContext } from './common'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { GraphQLError } from 'graphql'
+import { PersonaData } from '@proofzero/types/application'
+import { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -104,10 +106,11 @@ const addressResolvers: Resolvers = {
 
       const clientId = aud![0]
 
-      const [personaData, paymaster] = await Promise.all([
-        accessClient.getPersonaData.query({ clientId, accountUrn }),
-        starbaseClient.getPaymaster.query({ clientId }),
-      ])
+      const [personaData, paymaster]: [PersonaData, PaymasterType] =
+        await Promise.all([
+          accessClient.getPersonaData.query({ clientId, accountUrn }),
+          starbaseClient.getPaymaster.query({ clientId }),
+        ])
 
       if (
         !personaData ||
