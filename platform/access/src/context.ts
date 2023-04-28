@@ -38,6 +38,7 @@ interface CreateInnerContextOptions
   accountURN?: AccountURN
   SECRET_JWK_CURRENT_KID: string
   SECRET_JWKS: string
+  SECRET_JWT_ENCRYPTION_SECRET: string
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.

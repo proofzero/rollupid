@@ -13,6 +13,11 @@ export const JWT_OPTIONS = {
   },
 }
 
+export const JWT_ENC_HEADERS = {
+  alg: 'dir',
+  enc: 'A128CBC-HS256',
+}
+
 export const AUTHENTICATION_TOKEN_OPTIONS = {
   expirationTime: '90 days',
 }

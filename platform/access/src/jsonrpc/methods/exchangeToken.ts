@@ -14,6 +14,7 @@ import { AccessJWTPayload, GrantType, Scope } from '@proofzero/types/access'
 import { Context } from '../../context'
 import { getJWKS, getPrivateJWK } from '../../jwk'
 import { initAuthorizationNodeByName, initAccessNodeByName } from '../../nodes'
+import type { EncryptTokenOption, SignTokenOption } from '../../nodes/access'
 
 import {
   InvalidClientCredentialsError,
@@ -35,6 +36,7 @@ const AuthenticationCodeInput = z.object({
   code: z.string(),
   clientId: z.string(),
   issuer: z.string(),
+  encrypt: z.boolean().optional(),
 })
 
 type AuthenticationCodeInput = z.infer<typeof AuthenticationCodeInput>
@@ -51,6 +53,7 @@ const AuthorizationCodeInput = z.object({
   clientId: z.string(),
   clientSecret: z.string(),
   issuer: z.string(),
+  encrypt: z.boolean().optional(),
 })
 
 type AuthorizationCodeInput = z.infer<typeof AuthorizationCodeInput>
@@ -69,6 +72,7 @@ const RefreshTokenInput = z.object({
   clientId: z.string(),
   clientSecret: z.string(),
   issuer: z.string(),
+  encrypt: z.boolean().optional(),
 })
 
 type RefreshTokenInput = z.infer<typeof RefreshTokenInput>
@@ -127,7 +131,7 @@ const handleAuthenticationCode: ExchangeTokenMethod<
   AuthenticationCodeInput,
   AuthenticationCodeOutput
 > = async ({ ctx, input }) => {
-  const { code, clientId, issuer } = input
+  const { code, clientId, issuer, encrypt } = input
 
   const authorizationNode = await initAuthorizationNodeByName(
     code,
@@ -148,12 +152,15 @@ const handleAuthenticationCode: ExchangeTokenMethod<
   const scope: Scope = (await authorizationNode.storage.get('scope')) || []
 
   const jku = generateJKU(issuer)
-  const jwk = getPrivateJWK(ctx)
+
+  const op = encrypt
+    ? { encrypt: { secret: ctx.SECRET_JWT_ENCRYPTION_SECRET } }
+    : { sign: { jwk: getPrivateJWK(ctx) } }
 
   return {
     accessToken: await accessNode.class.generateAccessToken({
+      ...op,
       jku,
-      jwk,
       account,
       clientId,
       expirationTime,
@@ -167,7 +174,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   AuthorizationCodeInput,
   AuthorizationCodeOutput
 > = async ({ ctx, input }) => {
-  const { code, clientId, clientSecret, issuer } = input
+  const { code, clientId, clientSecret, issuer, encrypt } = input
 
   const { valid } = await ctx.starbaseClient.checkAppAuth.query({
     clientId,
@@ -222,11 +229,20 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   )
 
   const jku = generateJKU(issuer)
-  const jwk = getPrivateJWK(ctx)
+
+  const encryptTokenOption = {
+    encrypt: { secret: ctx.SECRET_JWT_ENCRYPTION_SECRET },
+  }
+
+  const signTokenOption = {
+    sign: { jwk: getPrivateJWK(ctx) },
+  }
+
+  const op = encrypt ? encryptTokenOption : signTokenOption
 
   const accessToken = await accessNode.class.generateAccessToken({
+    ...op,
     jku,
-    jwk,
     account,
     clientId,
     expirationTime,
@@ -235,8 +251,8 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   })
 
   const refreshToken = await accessNode.class.generateRefreshToken({
+    ...op,
     jku,
-    jwk,
     account,
     clientId,
     issuer,
@@ -265,8 +281,8 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   }
 
   const idToken = await accessNode.class.generateIdToken({
+    ...signTokenOption,
     jku,
-    jwk,
     account,
     clientId,
     expirationTime,
@@ -281,7 +297,7 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
   ctx,
   input,
 }) => {
-  const { refreshToken, clientId, clientSecret, issuer } = input
+  const { refreshToken, clientId, clientSecret, issuer, encrypt } = input
 
   if (!ctx.starbaseClient) {
     throw new Error('missing starbase client')
@@ -309,12 +325,15 @@ const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
 
   const jku = generateJKU(issuer)
-  const jwk = getPrivateJWK(ctx)
+
+  const op = encrypt
+    ? { encrypt: { secret: ctx.SECRET_JWT_ENCRYPTION_SECRET } }
+    : { sign: { jwk: getPrivateJWK(ctx) } }
 
   return {
     accessToken: await accessNode.class.generateAccessToken({
+      ...op,
       jku,
-      jwk,
       account,
       clientId,
       expirationTime,

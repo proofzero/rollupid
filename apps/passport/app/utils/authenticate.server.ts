@@ -75,9 +75,10 @@ export const authenticateAddress = async (
       code,
       clientId,
       issuer: new URL(request.url).origin,
+      encrypt: true,
     })
 
-    await provisionProfile(accessToken, env, traceSpan, address)
+    await provisionProfile(account, accessToken, env, traceSpan, address)
 
     return createUserSession(
       accessToken,
@@ -115,15 +116,13 @@ export const getAuthzRedirectURL = (
 }
 
 const provisionProfile = async (
+  account: AccountURN,
   jwt: string,
   env: Env,
   traceSpan: TraceSpan,
   address: AddressURN
 ) => {
   const accountClient = getAccountClient(jwt, env, traceSpan)
-  const parsedJWT = parseJwt(jwt)
-  const account = parsedJWT.sub as AccountURN
-
   const profile = await accountClient.getProfile.query({
     account,
   })

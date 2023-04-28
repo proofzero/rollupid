@@ -10,7 +10,7 @@ import { InternalServerError } from '@proofzero/errors'
 import { AccountURN } from '@proofzero/urns/account'
 import type { Scope } from '@proofzero/types/access'
 
-import { JWT_OPTIONS } from '../constants'
+import { JWT_ENC_HEADERS, JWT_OPTIONS } from '../constants'
 
 import {
   ExpiredTokenError,
@@ -35,32 +35,34 @@ type TokenState = {
   tokenIndex: TokenIndex
 }
 
-type AccessTokenOptions = {
+export interface EncryptTokenOption {
+  encrypt: { secret: string }
+}
+
+export interface SignTokenOption {
+  sign: { jwk: jose.JWK }
+}
+
+export interface CommonTokenOptions
+  extends Partial<EncryptTokenOption>,
+    Partial<SignTokenOption> {
   jku: string
-  jwk: jose.JWK
   account: AccountURN
   clientId: string
-  expirationTime: string
   issuer: string
+}
+
+interface AccessTokenOptions extends CommonTokenOptions {
+  expirationTime: string
   scope: Scope
 }
 
-type RefreshTokenOptions = {
-  jku: string
-  jwk: jose.JWK
-  account: AccountURN
-  clientId: string
-  issuer: string
+interface RefreshTokenOptions extends CommonTokenOptions {
   scope: Scope
 }
 
-type IdTokenOptions = {
-  jku: string
-  jwk: jose.JWK
-  account: AccountURN
-  clientId: string
+interface IdTokenOptions extends CommonTokenOptions {
   expirationTime: string
-  issuer: string
   idTokenClaims: Record<string, ClaimValueType>
 }
 
@@ -84,61 +86,120 @@ export default class Access extends DOProxy {
   }
 
   async generateAccessToken(options: AccessTokenOptions): Promise<string> {
-    const { jku, jwk, account, clientId, expirationTime, issuer, scope } =
-      options
-    const { alg, kid } = jwk
-    if (!alg) throw new InternalServerError({ message: 'missing alg in jwk' })
-    const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
+    const { jku, account, clientId, expirationTime, issuer, scope } = options
+
     //Need to convert scope array to space-delimited string, per spec
-    return new jose.SignJWT({ scope: scope.join(' ') })
-      .setProtectedHeader({ alg, jku, kid, typ: 'JWT' })
-      .setExpirationTime(expirationTime)
-      .setAudience([clientId])
-      .setIssuedAt()
-      .setIssuer(issuer)
-      .setJti(jti)
-      .setSubject(account)
-      .sign(await jose.importJWK(jwk))
+    const payload = { scope: scope.join(' ') }
+
+    const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
+
+    if (options.encrypt) {
+      const secret = jose.base64url.decode(options.encrypt.secret)
+      const header = { ...JWT_ENC_HEADERS, type: 'JWT' }
+      return new jose.EncryptJWT(payload)
+        .setProtectedHeader(header)
+        .setExpirationTime(expirationTime)
+        .setAudience([clientId])
+        .setIssuedAt()
+        .setIssuer(issuer)
+        .setJti(jti)
+        .setSubject(account)
+        .encrypt(secret)
+    } else if (options.sign) {
+      const { jwk } = options.sign
+      const { alg, kid } = jwk
+
+      if (!alg) throw new InternalServerError({ message: 'missing alg in jwk' })
+
+      const key = await jose.importJWK(jwk)
+      const header = { alg, jku, kid, typ: 'JWT' }
+      return new jose.SignJWT(payload)
+        .setProtectedHeader(header)
+        .setExpirationTime(expirationTime)
+        .setAudience([clientId])
+        .setIssuedAt()
+        .setIssuer(issuer)
+        .setJti(jti)
+        .setSubject(account)
+        .sign(key)
+    } else {
+      throw new Error('unknown token operation')
+    }
   }
 
   async generateRefreshToken(options: RefreshTokenOptions): Promise<string> {
-    const { jku, jwk, account, clientId, issuer, scope } = options
-    const { alg, kid } = jwk
-    if (!alg) throw new InternalServerError({ message: 'missing alg in jwk' })
+    const { jku, account, clientId, issuer, scope } = options
     const jti = hexlify(randomBytes(JWT_OPTIONS.jti.length))
-    const jwt = await new jose.SignJWT({ scope: scope.join(' ') })
-      .setProtectedHeader({ alg, jku, kid, typ: 'JWT' })
-      .setAudience([clientId])
-      .setIssuedAt()
-      .setIssuer(issuer)
-      .setJti(jti)
-      .setSubject(account)
-      .sign(await jose.importJWK(jwk))
+
+    const payload = { scope: scope.join(' ') }
+
+    let jwt: string
+
+    if (options.encrypt) {
+      const secret = jose.base64url.decode(options.encrypt.secret)
+      const header = { ...JWT_ENC_HEADERS, type: 'JWT' }
+      jwt = await new jose.EncryptJWT(payload)
+        .setProtectedHeader(header)
+        .setAudience([clientId])
+        .setIssuedAt()
+        .setIssuer(issuer)
+        .setJti(jti)
+        .setSubject(account)
+        .encrypt(secret)
+    } else if (options.sign) {
+      const { jwk } = options.sign
+      const { alg, kid } = jwk
+
+      if (!alg) throw new InternalServerError({ message: 'missing alg in jwk' })
+
+      const key = await jose.importJWK(jwk)
+      const header = { alg, jku, kid, typ: 'JWT' }
+      jwt = await new jose.SignJWT(payload)
+        .setProtectedHeader(header)
+        .setAudience([clientId])
+        .setIssuedAt()
+        .setIssuer(issuer)
+        .setJti(jti)
+        .setSubject(account)
+        .sign(key)
+    } else {
+      throw new Error('unknown token operation')
+    }
 
     await this.store(jti, jwt, scope)
     return jwt
   }
 
   async generateIdToken(options: IdTokenOptions): Promise<string> {
-    const {
-      jku,
-      jwk,
-      account,
-      clientId,
-      expirationTime,
-      idTokenClaims,
-      issuer,
-    } = options
-    const { alg, kid } = jwk
-    if (!alg) throw new InternalServerError({ message: 'missing alg in jwk' })
-    return new jose.SignJWT(idTokenClaims)
-      .setProtectedHeader({ alg, jku, kid, typ: 'JWT' })
-      .setExpirationTime(expirationTime)
-      .setAudience([clientId])
-      .setIssuedAt()
-      .setIssuer(issuer)
-      .setSubject(account)
-      .sign(await jose.importJWK(jwk))
+    const { jku, account, clientId, expirationTime, idTokenClaims, issuer } =
+      options
+
+    if (options.encrypt) {
+      const secret = jose.base64url.decode(options.encrypt.secret)
+      const header = { ...JWT_ENC_HEADERS, type: 'JWT' }
+      return new jose.EncryptJWT(idTokenClaims)
+        .setProtectedHeader(header)
+        .setExpirationTime(expirationTime)
+        .setAudience([clientId])
+        .setIssuedAt()
+        .setIssuer(issuer)
+        .setSubject(account)
+        .encrypt(secret)
+    } else if (options.sign) {
+      const { jwk } = options.sign
+      const { alg, kid } = jwk
+      if (!alg) throw new InternalServerError({ message: 'missing alg in jwk' })
+      return new jose.SignJWT(idTokenClaims)
+        .setProtectedHeader({ alg, jku, kid, typ: 'JWT' })
+        .setExpirationTime(expirationTime)
+        .setAudience([clientId])
+        .setIssuedAt()
+        .setIssuer(issuer)
+        .setSubject(account)
+        .sign(await jose.importJWK(jwk))
+    } else {
+      throw new Error('unknown token operation')
+    }
   }
 
   async store(jti: string, jwt: string, scope: Scope): Promise<void> {
