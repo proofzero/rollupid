@@ -35,7 +35,6 @@ const getAuthenticationParamsSessionStorage = (env: Env) => {
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV == 'production',
-      maxAge: 10,
       httpOnly: true,
       secrets: [env.SECRET_SESSION_SALT],
     },
