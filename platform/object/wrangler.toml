@@ -2,73 +2,58 @@ name = "object"
 main = "src/index.ts"
 compatibility_date = "2022-10-26"
 node_compat = true
+logpush = true
 
-durable_objects.bindings = [
-  { name = "Meta", class_name = "Meta" }
-]
+durable_objects.bindings = [{ name = "Meta", class_name = "Meta" }]
 r2_buckets = [
   { binding = "Bucket", bucket_name = "rollup-dev", preview_bucket_name = "rollup-dev" },
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalytics"  },
+  { binding = "Analytics", dataset = "PlatformAnalytics" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [dev]
 port = 9595
 local_protocol = "http"
 
 [env.dev]
-durable_objects.bindings = [
-  { name = "Meta", class_name = "Meta" }
-]
+durable_objects.bindings = [{ name = "Meta", class_name = "Meta" }]
 r2_buckets = [
   { binding = "Bucket", bucket_name = "rollup-dev", preview_bucket_name = "rollup-dev" },
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.next]
-durable_objects.bindings = [
-  { name = "Meta", class_name = "Meta" }
-]
+durable_objects.bindings = [{ name = "Meta", class_name = "Meta" }]
 r2_buckets = [
   { binding = "Bucket", bucket_name = "rollup-next", preview_bucket_name = "rollup-next" },
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.current]
-durable_objects.bindings = [
-  { name = "Meta", class_name = "Meta" }
-]
+durable_objects.bindings = [{ name = "Meta", class_name = "Meta" }]
 r2_buckets = [
   { binding = "Bucket", bucket_name = "rollup-current", preview_bucket_name = "rollup-current" },
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [[migrations]]
 tag = "v0"

@@ -3,6 +3,7 @@ main = "src/index.ts"
 compatibility_date = "2022-10-26"
 node_compat = true
 workers_dev = false
+logpush = true
 
 durable_objects.bindings = [{ name = "Address", class_name = "Address" }]
 

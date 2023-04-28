@@ -28,8 +28,11 @@ export class TraceSpan {
   }
 
   toString() {
-    const parentSegment = this.parentId ? `, parentId: ${this.parentId}` : ''
-    return `{ traceId: ${this.traceId}, spanId: ${this.spanId}${parentSegment}, duration: ${this.currendDuration} }`
+    const parentSegment = this.parentId ? `-${this.parentId}` : ''
+    return JSON.stringify({
+      tracespan: `${this.traceId}${parentSegment}-${this.spanId}${parentSegment}`,
+      duration: this.currendDuration,
+    })
   }
 }
 

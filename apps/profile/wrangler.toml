@@ -6,6 +6,7 @@ main = "./build/index.js"
 name = "profile"
 
 workers_dev = false
+logpush = true
 
 # The default environment
 # ------------------------------------------------------------------------------
@@ -25,7 +26,7 @@ services = [
 ]
 
 kv_namespaces = [
-  { binding = "ProfileKV", id = "6510b0e703694f0388ced3de37df869d", preview_id = "b827cd51f02e4a569ed7b9ff2c680a75" }
+  { binding = "ProfileKV", id = "6510b0e703694f0388ced3de37df869d", preview_id = "b827cd51f02e4a569ed7b9ff2c680a75" },
 ]
 
 [vars]
@@ -40,8 +41,8 @@ DISCORD_URL = "https://discord.gg/rollupid"
 MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 PROFILE_VERSION = 1
-ALCHEMY_ETH_NETWORK="mainnet"
-ALCHEMY_POLYGON_NETWORK="mainnet"
+ALCHEMY_ETH_NETWORK = "mainnet"
+ALCHEMY_POLYGON_NETWORK = "mainnet"
 
 [site]
 bucket = "./public"
@@ -67,7 +68,7 @@ services = [
 
 ]
 kv_namespaces = [
-  { binding = "ProfileKV", id = "6510b0e703694f0388ced3de37df869d" }
+  { binding = "ProfileKV", id = "6510b0e703694f0388ced3de37df869d" },
 ]
 [env.dev.vars]
 
@@ -83,14 +84,14 @@ DISCORD_URL = "https://discord.gg/rollupid"
 MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 PROFILE_VERSION = 1
-ALCHEMY_ETH_NETWORK="mainnet"
-ALCHEMY_POLYGON_NETWORK="mainnet"
+ALCHEMY_ETH_NETWORK = "mainnet"
+ALCHEMY_POLYGON_NETWORK = "mainnet"
 
 # next (staging)
 # ------------------------------------------------------------------------------
 [env.next]
 routes = [
-    { pattern = "my-next.rollup.id", custom_domain = true, zone_name = "rollup.id" },
+  { pattern = "my-next.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
 services = [
   { binding = "Galaxy", service = "galaxy-next" },
@@ -99,7 +100,7 @@ services = [
 
 ]
 kv_namespaces = [
-  { binding = "ProfileKV", id = "451e189131d74dca87b41701555a839d" }
+  { binding = "ProfileKV", id = "451e189131d74dca87b41701555a839d" },
 ]
 [env.next.build]
 command = "yarn build"
@@ -118,8 +119,8 @@ DISCORD_URL = "https://discord.gg/rollupid"
 MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 PROFILE_VERSION = 1
-ALCHEMY_ETH_NETWORK="mainnet"
-ALCHEMY_POLYGON_NETWORK="mainnet"
+ALCHEMY_ETH_NETWORK = "mainnet"
+ALCHEMY_POLYGON_NETWORK = "mainnet"
 
 # current (production)
 # ------------------------------------------------------------------------------
@@ -133,8 +134,8 @@ services = [
   { binding = "Images", service = "images-current" },
 ]
 kv_namespaces = [
-  { binding = "ProfileKV", id = "3a5214b7dab24414a1cb65733a6143b2" }
-] 
+  { binding = "ProfileKV", id = "3a5214b7dab24414a1cb65733a6143b2" },
+]
 [env.current.build]
 command = "yarn build"
 
@@ -151,5 +152,5 @@ DISCORD_URL = "https://discord.gg/rollupid"
 MINTPFP_CONTRACT_ADDRESS = "0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 PROFILE_VERSION = 1
-ALCHEMY_ETH_NETWORK="mainnet"
-ALCHEMY_POLYGON_NETWORK="mainnet"
+ALCHEMY_ETH_NETWORK = "mainnet"
+ALCHEMY_POLYGON_NETWORK = "mainnet"

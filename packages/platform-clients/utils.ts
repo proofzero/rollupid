@@ -10,17 +10,19 @@ export const trpcClientLoggerGenerator = (
   headers?: Record<string, string>
 ): loggerFunction => {
   return (props) => {
+    const traceparent = JSON.stringify({
+      traceparent: headers ? headers[TRACEPARENT_HEADER_NAME] : '',
+    })
+
     if (props.direction === 'up')
       console.debug(
-        `Starting tRPC client call ${serviceName} ${props.path} call ${
-          props.id
-        } traceparent: ${headers ? headers[TRACEPARENT_HEADER_NAME] : 'None'}`
+        `Starting tRPC client call ${serviceName} ${props.path} call ${props.id}`,
+        traceparent
       )
     else
       console.debug(
-        `Completed tRPC client call ${serviceName} ${props.path} call ${
-          props.id
-        } traceparent ${headers ? headers[TRACEPARENT_HEADER_NAME] : 'None'}`
+        `Completed tRPC client call ${serviceName} ${props.path} call ${props.id}`,
+        traceparent
       )
   }
 }

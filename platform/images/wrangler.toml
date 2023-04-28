@@ -7,7 +7,8 @@ compatibility_date = "2022-10-05"
 
 
 # We'll access these services through their external names.
-workers_dev = false 
+workers_dev = false
+logpush = true
 
 [[rules]]
 globs = ["**/*.wasm"]
@@ -62,4 +63,3 @@ route = { pattern = "images.rollup.id", custom_domain = true, zone_name = "rollu
 # - maximum: 6 hours (21600)
 UPLOAD_WINDOW_SECONDS = 200
 HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID = "VqQy1abBMHYDZwVsTbsSMw"
-

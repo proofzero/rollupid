@@ -1,0 +1,6 @@
+name = "logbridge"
+compatibility_date = "2023-02-24"
+main = "./src/index.ts"
+workers_dev = false
+
+routes = [{ pattern = "logbridge.rollup.id", custom_domain = true }]

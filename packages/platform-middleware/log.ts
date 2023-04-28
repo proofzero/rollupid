@@ -8,11 +8,13 @@ export const LogUsage: BaseMiddlewareFunction<BaseContext> = async ({
   ctx,
 }) => {
   console.debug(
-    `Starting tRPC handler for ${type} ${path} span: ${ctx.traceSpan}`
+    `Starting tRPC handler for ${type} ${path}`,
+    ctx.traceSpan?.toString()
   )
   const result = await next()
   console.debug(
-    `Completed tRPC handler for ${type} ${path} span: ${ctx.traceSpan}`
+    `Completed tRPC handler for ${type} ${path}`,
+    ctx.traceSpan?.toString()
   )
   return result
 }

@@ -41,12 +41,12 @@ export default class OAuthAddress {
         headers: await this.getRequestHeaders(),
       })
       if (!response.ok) {
-        console.error(await response.text())
-        throw new Error('an error occurred')
+        console.warn('Could not fetch upstream profile', await response.text())
+        return
       }
       return response.json()
     } catch (err) {
-      console.error(err)
+      console.error('Error encountered with fetching profile', err)
     }
   }
 

@@ -2,6 +2,7 @@ name = "edges"
 main = "src/index.ts"
 compatibility_date = "2022-11-24"
 node_compat = true
+logpush = true
 
 
 # #############################################################################
@@ -31,9 +32,7 @@ migrations_dir = "migrations"
 # Required secrets:
 # N/A
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 # Environment
 # -----------------------------------------------------------------------------
@@ -50,31 +49,27 @@ inspector_port = 11501
 local_protocol = "http"
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalytics"  },
+  { binding = "Analytics", dataset = "PlatformAnalytics" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 # Environment: dev
 # -----------------------------------------------------------------------------
 
 [env.dev]
 d1_databases = [
-  { binding = "EDGES", database_name = "edges-dev", database_id = "d5dc9f97-0f8e-4af7-90dd-cb84e44309bd", migrations_dir = "migrations" }
+  { binding = "EDGES", database_name = "edges-dev", database_id = "d5dc9f97-0f8e-4af7-90dd-cb84e44309bd", migrations_dir = "migrations" },
 ]
 
 [env.dev.vars]
 ENVIRONMENT = "dev"
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -82,16 +77,14 @@ unsafe.bindings = [
 [env.next]
 
 d1_databases = [
-  { binding = "EDGES", database_name = "edges-next", database_id = "35573801-81b5-4c57-8a79-286343476d98", migrations_dir = "migrations" }
+  { binding = "EDGES", database_name = "edges-next", database_id = "35573801-81b5-4c57-8a79-286343476d98", migrations_dir = "migrations" },
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.next.vars]
 ENVIRONMENT = "next"
@@ -102,16 +95,14 @@ ENVIRONMENT = "next"
 [env.current]
 
 d1_databases = [
-  { binding = "EDGES", database_name = "edges-current", database_id = "27b77920-664e-4e52-84ca-72be96b9a3fd", migrations_dir = "migrations" }
+  { binding = "EDGES", database_name = "edges-current", database_id = "27b77920-664e-4e52-84ca-72be96b9a3fd", migrations_dir = "migrations" },
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent" },
 ]
 
-unsafe.bindings = [
-  { type = "metadata", name = "ServiceDeploymentMetadata" },
-]
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.current.vars]
 ENVIRONMENT = "current"
