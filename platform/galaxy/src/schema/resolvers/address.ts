@@ -1,7 +1,10 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import ENSUtils from '@proofzero/platform-clients/ens-utils'
 import createAddressClient from '@proofzero/platform-clients/address'
+import createAccessClient from '@proofzero/platform-clients/access'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
+import { WhitelistType } from '@proofzero/platform/address/src/jsonrpc/methods/registerSessionKey'
 
 import { Resolvers } from './typedefs'
 import {
@@ -9,6 +12,7 @@ import {
   setupContext,
   isAuthorized,
   requestLogging,
+  parseJwt,
 } from './utils'
 
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
@@ -16,6 +20,7 @@ import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 import { ResolverContext } from './common'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -34,6 +39,7 @@ const addressResolvers: Resolvers = {
 
       return accountURN
     },
+
     addressProfile: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
@@ -65,6 +71,56 @@ const addressResolvers: Resolvers = {
         })
       )
       return profiles
+    },
+
+    registerSessionKeys: async (
+      _parent: any,
+      {
+        sessionPublicKey,
+        smartContractWalletAddress,
+        validUntil,
+        whitelist,
+      }: {
+        sessionPublicKey: string
+        smartContractWalletAddress: string
+        validUntil: number
+        whitelist: WhitelistType
+      },
+      { env, jwt, traceSpan }: ResolverContext
+    ) => {
+      const accessClient = createAccessClient(env.Access, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+      })
+      const starbaseClient = createStarbaseClient(env.Starbase, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+      })
+
+      const { aud } = parseJwt(jwt)
+
+      const clientId = aud![0]
+
+      // const [_, paymaster] = await Promise.allSettled([
+      //   accessClient.getPersonaData.query({ clientId, addressURN }), - need to have addressURN
+      //   starbaseClient.getPaymaster.query({ clientId }),
+      // ]) ??
+
+      const paymaster = await starbaseClient.getPaymaster.query({ clientId })
+
+      const addressClient = createAddressClient(env.Address, {
+        ...generateTraceContextHeaders(traceSpan),
+      })
+
+      const sessionKey = addressClient.registerSessionKey.query({
+        paymaster,
+        smartContractWalletAddress,
+        sessionPublicKey,
+        validUntil,
+        whitelist,
+      })
+
+      return { sessionKey }
     },
   },
   Mutation: {

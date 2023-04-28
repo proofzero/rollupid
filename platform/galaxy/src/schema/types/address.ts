@@ -12,10 +12,21 @@ export default /* GraphQL */ `
     public: Boolean
   }
 
+  type WhitelistInstance {
+    to: String!
+    selectors: [String!]!
+  }
+
   type Query {
     accountFromAlias(provider: String!, alias: String!): URN!
     addressProfile(addressURN: URN!): AddressProfile!
     addressProfiles(addressURNList: [URN!]): [AddressProfile!]!
+    registerSessionKeys(
+      sessionPublicKey: String!
+      smartContractWalletAddress: String!
+      validUntil: Int!
+      whitelist: [WhitelistInstance!]!
+    ): String!
   }
 
   type Mutation {
