@@ -223,7 +223,7 @@ export async function createAuthorizationParamsCookieAndAuthenticate(
 
   redirectURL += `?${qp.toString()}`
 
-  return redirect(redirectURL, {
+  throw redirect(redirectURL, {
     headers: await createAuthorizationParamsCookieHeaders(consoleParams, env),
   })
 }
