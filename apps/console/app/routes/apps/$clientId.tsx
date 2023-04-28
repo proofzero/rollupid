@@ -20,12 +20,14 @@ import {
 } from '@proofzero/design-system/src/atoms/toast'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import type { LoaderData as OutletContextData } from '~/root'
-import { AddressURN } from '@proofzero/urns/address'
+import type { AddressURN } from '@proofzero/urns/address'
+import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 
 type LoaderData = {
   appDetails: appDetailsProps
   rotationResult?: RotatedSecrets
   appContactAddress?: AddressURN
+  paymaster: PaymasterType
 }
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
@@ -44,6 +46,10 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     })
 
     const appDetails = await starbaseClient.getAppDetails.query({
+      clientId: clientId as string,
+    })
+
+    const paymaster = await starbaseClient.getPaymaster.query({
       clientId: clientId as string,
     })
 
@@ -77,6 +83,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
       appDetails: appDetails as appDetailsProps,
       rotationResult,
       appContactAddress,
+      paymaster,
     })
   } catch (error) {
     console.error('Caught error in loader', { error })
@@ -94,7 +101,8 @@ export default function AppDetailIndexPage() {
 
   const { apps, avatarUrl, PASSPORT_URL, displayName } =
     useOutletContext<OutletContextData>()
-  const { appDetails, rotationResult, appContactAddress } = loaderData
+  const { appDetails, rotationResult, appContactAddress, paymaster } =
+    loaderData
 
   const notify = (success: boolean = true) => {
     if (success) {
@@ -114,7 +122,7 @@ export default function AppDetailIndexPage() {
   return (
     <Popover className="min-h-[100dvh] relative">
       {({ open }) => (
-        <div className="flex flex-col relative lg:flex-row min-h-full bg-gray-50">
+        <div className="flex flex-col relative lg:flex-row min-h-screen bg-gray-50">
           <SiteMenu
             apps={apps}
             open={open}
@@ -144,6 +152,7 @@ export default function AppDetailIndexPage() {
                   rotationResult,
                   PASSPORT_URL,
                   appContactAddress,
+                  paymaster,
                 }}
               />
             </section>

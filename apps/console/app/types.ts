@@ -34,3 +34,4 @@ export type errorsAuthProps = {
 export type AuthorizedProfile = AuthorizedUser
 
 export type edgesMetadata = EdgesMetadata
+export type notificationHandlerType = (val: boolean) => void

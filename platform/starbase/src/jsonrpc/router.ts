@@ -75,6 +75,12 @@ import {
   upsertAppContactAddress,
   UpsertAppContactAddressInput,
 } from './methods/upsertAppContactAddress'
+import {
+  getPaymaster,
+  GetPaymasterInput,
+  GetPaymasterOutput,
+} from './methods/getPaymaster'
+import { setPaymaster, SetPaymasterInput } from './methods/setPaymaster'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -103,6 +109,23 @@ export const appRouter = t.router({
     .use(OwnAppsMiddleware)
     .input(UpdateAppInput)
     .mutation(updateApp),
+  setPaymaster: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .use(OwnAppsMiddleware)
+    .input(SetPaymasterInput)
+    .mutation(setPaymaster),
+  getPaymaster: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .use(OwnAppsMiddleware)
+    .input(GetPaymasterInput)
+    .output(GetPaymasterOutput)
+    .query(getPaymaster),
   getAppDetails: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
