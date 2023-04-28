@@ -78,11 +78,15 @@ import {
   deleteAddressNodeMethod,
   DeleteAddressNodeInput,
 } from './methods/deleteAddressNode'
-
 import {
   getAddressReferenceTypes,
   GetAddressReferenceTypeOutput,
 } from './methods/getAddressReferenceTypes'
+import {
+  registerSessionKeyMethod,
+  RegisterSessionKeyInput,
+  RegisterSessionKeyOutput,
+} from './methods/registerSessionKey'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -115,6 +119,12 @@ export const appRouter = t.router({
     .input(GetAccountByAliasInput)
     .output(GetAccountByAliasOutput)
     .query(getAccountByAliasMethod),
+  registerSessionKey: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(RegisterSessionKeyInput)
+    .output(RegisterSessionKeyOutput)
+    .query(registerSessionKeyMethod),
   setAccount: t.procedure
     .use(LogUsage)
     .use(parse3RN)
