@@ -14,7 +14,10 @@ import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
 import type { notificationHandlerType } from '~/types'
-import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
+import type {
+  PaymasterType,
+  PaymasterProviderType,
+} from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 
 type errorsType = {
   label?: string
@@ -53,9 +56,7 @@ export const action: ActionFunction = async ({ request, params, context }) => {
   const formData = await request.formData()
 
   //due to specificity of formData inputs
-  const paymaster = formData.get(
-    'paymaster[provider]'
-  ) as PaymasterType['provider']
+  const paymaster = formData.get('paymaster[provider]') as PaymasterProviderType
 
   if (!paymaster) {
     errors.paymaster = 'Paymaster is required'
