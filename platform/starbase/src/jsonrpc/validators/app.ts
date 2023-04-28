@@ -52,9 +52,11 @@ export const AppPublicPropsSchema = z.object({
 
 export type AppPublicProps = z.infer<typeof AppPublicPropsSchema>
 
-export const PaymasterSchema = z.object({
-  provider: z.literal('zerodev'),
-  secret: z.string(),
-})
+export const PaymasterSchema = z
+  .object({
+    provider: z.literal('zerodev'),
+    secret: z.string(),
+  })
+  .optional()
 
 export type PaymasterType = z.infer<typeof PaymasterSchema>
