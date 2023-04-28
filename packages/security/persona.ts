@@ -243,7 +243,7 @@ export async function getClaimValues(
     } else if (scopeValue === 'smart_contract_wallet') {
       result = {
         ...result,
-        smartContractWalletAddress: personaData.smart_contract_wallet,
+        [scopeValue]: personaData.smart_contract_wallet,
       }
     } else if (scopeValue === 'connected_accounts') {
       if (

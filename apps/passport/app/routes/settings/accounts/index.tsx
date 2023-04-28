@@ -17,19 +17,19 @@ import { TbCrown } from 'react-icons/tb'
 import { AddressList } from '~/components/addresses/AddressList'
 import InputText from '~/components/inputs/InputText'
 
-import { NodeType } from '@proofzero/types/address'
+import { CryptoAddressType, NodeType } from '@proofzero/types/address'
+
+import { getValidatedSessionContext } from '~/session.server'
+import { setNewPrimaryAddress } from '~/utils/authenticate.server'
+import { ERROR_CODES, RollupError } from '@proofzero/errors'
+import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
+import AccountDisconnectModal from '~/components/settings/accounts/DisconnectModal'
 
 import type { FetcherWithComponents } from '@remix-run/react'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import type { AddressListProps } from '~/components/addresses/AddressList'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
-
-import { getValidatedSessionContext } from '~/session.server'
-import { setNewPrimaryAddress } from '~/utils/authenticate.server'
-import { AddressURN } from '@proofzero/urns/address'
-import { ERROR_CODES, RollupError } from '@proofzero/errors'
-import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
-import AccountDisconnectModal from '~/components/settings/accounts/DisconnectModal'
+import type { AddressURN } from '@proofzero/urns/address'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const { jwt } = await getValidatedSessionContext(
@@ -68,11 +68,17 @@ const distinctProfiles = (connectedProfiles: any[]) => {
   // context actions to desired types
   // e.x. rename to crypto profiles
   const cryptoProfiles = {
-    addresses: connectedProfiles.filter((p) => p.nodeType === NodeType.Crypto),
+    addresses: connectedProfiles.filter(
+      (p) =>
+        p.nodeType === NodeType.Crypto && p.type !== CryptoAddressType.Wallet
+    ),
   } as AddressListProps
 
-  const vaultProfiles = {
-    addresses: connectedProfiles.filter((p) => p.nodeType === NodeType.Vault),
+  const smartContractWallets = {
+    addresses: connectedProfiles.filter(
+      (p) =>
+        p.nodeType === NodeType.Crypto && p.type === CryptoAddressType.Wallet
+    ),
   } as AddressListProps
 
   const oAuthProfiles = {
@@ -86,7 +92,7 @@ const distinctProfiles = (connectedProfiles: any[]) => {
   return {
     addressCount: connectedProfiles.length,
     cryptoProfiles,
-    vaultProfiles,
+    smartContractWallets,
     oAuthProfiles,
     emailProfiles,
   }
@@ -154,14 +160,14 @@ export default function AccountsLayout() {
 
   const {
     cryptoProfiles,
-    vaultProfiles,
+    smartContractWallets,
     oAuthProfiles,
     emailProfiles,
     addressCount,
   } = distinctProfiles(connectedProfiles)
 
   const connectedAddresses = cryptoProfiles.addresses
-    .concat(vaultProfiles.addresses)
+    .concat(smartContractWallets.addresses)
     .concat(oAuthProfiles.addresses)
     .concat(emailProfiles.addresses)
 
@@ -331,12 +337,12 @@ export default function AccountsLayout() {
         />
 
         <Text size="sm" weight="normal" className="text-gray-500 my-7">
-          DEDICATED VAULT ACCOUNTS
+          SMART CONTRACT WALLETS
         </Text>
 
         <AddressList
           primaryAddressURN={primaryAddressURN}
-          addresses={vaultProfiles.addresses.map(
+          addresses={smartContractWallets.addresses.map(
             (ap: AddressListItemProps) => ({
               ...ap,
               onRenameAccount: (id: string) => {
