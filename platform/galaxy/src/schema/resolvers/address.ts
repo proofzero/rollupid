@@ -21,6 +21,7 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 
 import { ResolverContext } from './common'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { GraphQLError } from 'graphql'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -76,11 +77,13 @@ const addressResolvers: Resolvers = {
     registerSessionKeys: async (
       _parent: any,
       {
+        accountUrn,
         sessionPublicKey,
         smartContractWalletAddress,
         validUntil,
         whitelist,
       }: {
+        accountUrn: string
         sessionPublicKey: string
         smartContractWalletAddress: string
         validUntil: number
@@ -101,12 +104,17 @@ const addressResolvers: Resolvers = {
 
       const clientId = aud![0]
 
-      // const [_, paymaster] = await Promise.allSettled([
-      //   accessClient.getPersonaData.query({ clientId, addressURN }), - need to have addressURN
-      //   starbaseClient.getPaymaster.query({ clientId }),
-      // ]) ??
+      const [personaData, paymaster] = await Promise.all([
+        accessClient.getPersonaData.query({ clientId, accountUrn }),
+        starbaseClient.getPaymaster.query({ clientId }),
+      ])
 
-      const paymaster = await starbaseClient.getPaymaster.query({ clientId })
+      if (
+        !personaData ||
+        personaData.smart_contract_wallet !== smartContractWalletAddress
+      ) {
+        throw new GraphQLError('Invalid smart contract wallet address.')
+      }
 
       const addressClient = createAddressClient(env.Address, {
         ...generateTraceContextHeaders(traceSpan),
