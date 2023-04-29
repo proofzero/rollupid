@@ -7,7 +7,7 @@ export const action: ActionFunction = async ({
   context,
 }: ActionArgs) => {
   const url = new URL(request.url)
-  const prompt = url.searchParams.get('prompt') || 'none'
+  const prompt = url.searchParams.get('prompt') || 'select_account'
   const authenticator = initAuthenticator(context.env)
   authenticator.use(getMicrosoftStrategy(prompt, context.env))
   return authenticator.authenticate(MicrosoftStrategyDefaultName, request)
