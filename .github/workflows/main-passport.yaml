@@ -49,6 +49,7 @@ jobs:
           command: publish --env dev
           environment: 'dev'
           secrets: |
+            SECRET_SESSION_KEY
             SECRET_SESSION_SALT
             APIKEY_ALCHEMY_PUBLIC
             INTERNAL_GOOGLE_OAUTH_CLIENT_ID
@@ -65,6 +66,7 @@ jobs:
             SECRET_DISCORD_OAUTH_CLIENT_SECRET
         env:
           NODE_ENV: 'development'
+          SECRET_SESSION_KEY: ${{ secrets.SECRET_SESSION_KEY_DEV }}
           SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_DEV }}
           APIKEY_ALCHEMY_PUBLIC: ${{ secrets.APIKEY_ALCHEMY_PUBLIC_GOERLI }}
           INTERNAL_GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.INTERNAL_GOOGLE_OAUTH_CLIENT_ID_DEV }}

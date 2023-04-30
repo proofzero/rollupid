@@ -1,6 +1,6 @@
 import {
+  createCookie,
   createCookieSessionStorage,
-  // createCloudflareKVSessionStorage,
   redirect,
 } from '@remix-run/cloudflare'
 import type { Session } from '@remix-run/cloudflare'
@@ -13,6 +13,9 @@ import {
   ExpiredTokenError,
   InvalidTokenError,
 } from '@proofzero/utils/token'
+
+import { encryptSession, decryptSession } from '@proofzero/utils/session'
+
 import { getAccountClient } from './platform.server'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 import { InternalServerError, UnauthorizedError } from '@proofzero/errors'
@@ -102,77 +105,66 @@ const getUserSessionStorage = (
     cookieName += `_last`
   }
 
-  return createCookieSessionStorage({
-    cookie: {
-      domain: env.COOKIE_DOMAIN,
-      name: cookieName,
-      path: '/',
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV == 'production',
-      maxAge: MAX_AGE,
-      httpOnly: true,
-      secrets: [env.SECRET_SESSION_SALT],
-    },
+  return createCookie(cookieName, {
+    domain: env.COOKIE_DOMAIN,
+    path: '/',
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV == 'production',
+    maxAge: MAX_AGE,
+    httpOnly: true,
   })
 }
 
 export async function createUserSession(
   jwt: string,
   redirectTo: string,
-  defaultProfileUrn: string, // NOTE: storing this temporarily in the session util RPC url remove address
   env: Env,
   clientId?: string
 ) {
-  const userStorage = getUserSessionStorage(env, clientId)
-  const parsedJWT = parseJwt(jwt)
-  const userSession = await userStorage.getSession()
-  userSession.set('core', parsedJWT.iss)
-  userSession.set('jwt', jwt)
-  userSession.set('defaultProfileUrn', defaultProfileUrn)
-
-  const headers = new Headers()
-
-  headers.append('Set-Cookie', await userStorage.commitSession(userSession))
-
+  const cookie = getUserSessionStorage(env, clientId)
   return redirect(redirectTo, {
-    headers,
+    headers: {
+      'Set-Cookie': await cookie.serialize(
+        await encryptSession(env.SECRET_SESSION_KEY, jwt)
+      ),
+    },
   })
 }
 
-// TODO: reset cookie maxAge if valid
-export function getUserSession(request: Request, env: Env, clientId?: string) {
-  const storage = getUserSessionStorage(env, clientId)
-  return storage.getSession(request.headers.get('Cookie'))
+export async function getUserSession(
+  request: Request,
+  env: Env,
+  clientId?: string
+) {
+  const cookie = getUserSessionStorage(env, clientId)
+  const data = await cookie.parse(request.headers.get('Cookie'))
+  if (!data) return ''
+  if (typeof data === 'object' && data.cipher && data.iv)
+    return decryptSession(env.SECRET_SESSION_KEY, data.cipher, data.iv)
+  else return ''
 }
 
 export async function destroyUserSession(
-  requestOrSession: Request | Session,
+  request: Request,
   redirectTo: string,
   env: Env,
   flashMessage: FLASH_MESSAGE,
   clientId?: string
 ) {
-  let session
-  if (requestOrSession instanceof Request) {
-    session = await getUserSession(requestOrSession, env, clientId)
-  } else {
-    session = requestOrSession
-  }
-  const storage = getUserSessionStorage(env, clientId) // set max age to 0 to kill cookie
-
   const headers = new Headers()
-  headers.append('Set-Cookie', await storage.destroySession(session))
+
+  const cookie = await getUserSessionStorage(env, clientId)
+  headers.append(
+    'Set-Cookie',
+    await cookie.serialize('', { expires: new Date(0) })
+  )
 
   const flashStorage = getFlashSessionStorage(env)
   const flashSession = await flashStorage.getSession()
-
   flashSession.flash(FLASH_MESSAGE_KEY, flashMessage)
-
   headers.append('Set-Cookie', await flashStorage.commitSession(flashSession))
 
-  return redirect(redirectTo, {
-    headers,
-  })
+  return redirect(redirectTo, { headers })
 }
 
 const getAuthzCookieParamsSessionStorage = (
@@ -332,12 +324,11 @@ export async function getValidatedSessionContext(
   env: Env,
   traceSpan: TraceSpan
 ): Promise<ValidatedSessionContext> {
-  const session = await getUserSession(
+  const jwt = await getUserSession(
     request,
     env,
     authzParams?.clientId ?? undefined
   )
-  const jwt = session.get('jwt')
 
   try {
     const payload = checkToken(jwt)
@@ -366,7 +357,7 @@ export async function getValidatedSessionContext(
         'Session/token error encountered. Invalidating session and redirecting to login page'
       )
       throw await destroyUserSession(
-        session,
+        request,
         redirectTo,
         env,
         FLASH_MESSAGE.SIGNOUT,
@@ -385,10 +376,7 @@ export async function getJWTConditionallyFromSession(
   env: Env,
   clientId?: string
 ): Promise<string | undefined> {
-  const session = await getUserSession(request, env, clientId)
-  const jwt = session.get('jwt')
-
-  return jwt
+  return getUserSession(request, env, clientId)
 }
 
 export function parseJwt(token: string): JWTPayload {
