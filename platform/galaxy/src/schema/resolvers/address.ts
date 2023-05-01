@@ -4,7 +4,6 @@ import createAddressClient from '@proofzero/platform-clients/address'
 import createAccessClient from '@proofzero/platform-clients/access'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
-import { WhitelistType } from '@proofzero/platform/address/src/jsonrpc/methods/registerSessionKey'
 
 import { Resolvers } from './typedefs'
 import {
@@ -24,6 +23,7 @@ import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { GraphQLError } from 'graphql'
 import { PersonaData } from '@proofzero/types/application'
 import { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
+import { InternalServerError } from '@proofzero/errors'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -82,14 +82,10 @@ const addressResolvers: Resolvers = {
         accountUrn,
         sessionPublicKey,
         smartContractWalletAddress,
-        validUntil,
-        whitelist,
       }: {
         accountUrn: string
         sessionPublicKey: string
         smartContractWalletAddress: string
-        validUntil: number
-        whitelist: WhitelistType
       },
       { env, jwt, traceSpan }: ResolverContext
     ) => {
@@ -123,15 +119,19 @@ const addressResolvers: Resolvers = {
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      const sessionKey = await addressClient.registerSessionKey.query({
-        paymaster,
-        smartContractWalletAddress,
-        sessionPublicKey,
-        validUntil,
-        whitelist,
-      })
+      try {
+        const sessionKey = await addressClient.registerSessionKey.query({
+          paymaster,
+          smartContractWalletAddress,
+          sessionPublicKey,
+        })
 
-      return { sessionKey }
+        return sessionKey
+      } catch (e) {
+        throw new InternalServerError({
+          message: 'Failed to register session key.',
+        })
+      }
     },
   },
   Mutation: {

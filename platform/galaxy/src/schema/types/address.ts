@@ -25,8 +25,6 @@ export default /* GraphQL */ `
       accountUrn: String!
       sessionPublicKey: String!
       smartContractWalletAddress: String!
-      validUntil: Float!
-      whitelist: [WhitelistInstance!]!
     ): String!
   }
 

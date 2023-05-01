@@ -13,23 +13,12 @@ import {
 } from '@zerodevapp/sdk'
 
 import { PaymasterSchema } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
-import { BadRequestError } from '@proofzero/errors'
-
-export const WhitelistSchema = z.array(
-  z.object({
-    to: z.string(),
-    selectors: z.array(z.string()),
-  })
-)
-
-export type WhitelistType = z.infer<typeof WhitelistSchema>
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 
 export const RegisterSessionKeyInput = z.object({
   sessionPublicKey: z.string(),
   smartContractWalletAddress: z.string(),
   paymaster: PaymasterSchema,
-  validUntil: z.number(),
-  whitelist: WhitelistSchema,
 })
 
 export const RegisterSessionKeyOutput = z.string()
@@ -45,13 +34,10 @@ export const registerSessionKeyMethod = async ({
   input: RegisterSessionKeyParams
   ctx: Context
 }): Promise<RegisterSessionKeyResult> => {
-  const {
-    paymaster,
-    smartContractWalletAddress,
-    sessionPublicKey,
-    validUntil,
-    whitelist,
-  } = input
+  // This method is being called only from galaxy
+  // All authorization checks are done in galaxy
+
+  const { paymaster, smartContractWalletAddress, sessionPublicKey } = input
 
   const addressURN = AddressURNSpace.componentizedUrn(
     generateHashedIDRef(CryptoAddressType.Wallet, smartContractWalletAddress),
@@ -85,17 +71,21 @@ export const registerSessionKeyMethod = async ({
       skipFetchSetup: true,
     })
 
+    // We need a 90 days in Unix time from now
+    // 90 days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
     const truncatedValidUntil =
       Math.floor(Date.now() / 1000) + 90 * 24 * 60 * 60 * 1000
-        ? Math.floor(Date.now() / 1000) + 90 * 24 * 60 * 60 * 1000
-        : validUntil
 
-    sessionKey = await createSessionKey(
-      zdSigner,
-      whitelist,
-      truncatedValidUntil,
-      sessionPublicKey
-    )
+    try {
+      sessionKey = await createSessionKey(
+        zdSigner,
+        [],
+        truncatedValidUntil,
+        sessionPublicKey
+      )
+    } catch (e) {
+      throw new InternalServerError({ message: 'Failed to create session key' })
+    }
   }
 
   return sessionKey
