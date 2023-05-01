@@ -3,7 +3,12 @@ import { DurableObjectStubProxy } from 'do-proxy'
 import { OAuthAddressType } from '@proofzero/types/address'
 
 import { Context } from '../context'
-import type { AddressProfile, MicrosoftOAuthProfile } from '../types'
+import type {
+  AddressProfile,
+  MicrosoftOAuthProfile,
+  MicrosoftOAuthProfilePersonal,
+  MicrosoftOAuthProfileWork,
+} from '../types'
 
 import Address from './address'
 import OAuthAddress from './oauth'
@@ -47,7 +52,15 @@ export default class MicrosoftAddress extends OAuthAddress {
       return btoa(data)
     } else {
       console.error(await response.text())
-      throw new Error("couldn't fetch photo")
+
+      const gradientUrl = await this.node.class.getGradient()
+      if (!gradientUrl) return ''
+      const gradient = await fetch(gradientUrl)
+      let data = ''
+      new Uint8Array(await gradient.arrayBuffer()).forEach(
+        (byte) => (data += String.fromCharCode(byte))
+      )
+      return btoa(data)
     }
   }
 
@@ -68,9 +81,15 @@ export default class MicrosoftAddress extends OAuthAddress {
   async getProfile(): Promise<MicrosoftAddressProfile> {
     const profile = await super.fetchProfile<MicrosoftOAuthProfile>()
     if (profile) {
+      let name = 'Microsoft'
+      if (isPersonalProfile(profile)) {
+        name = `${profile.givenname} ${profile.familyname}`
+      } else if (isWorkProfile(profile)) {
+        name = profile.name || `${profile.given_name} ${profile.family_name}`
+      }
       return {
         address: profile.email,
-        title: profile.name,
+        title: name,
         icon: `${this.ctx.PASSPORT_URL}/avatars/${this.ctx.hashedIdref}`,
         type: OAuthAddressType.Microsoft,
       }
@@ -88,6 +107,18 @@ export default class MicrosoftAddress extends OAuthAddress {
   static async alarm(address: Address) {
     console.log({ alarm: 'oauth' })
   }
+}
+
+const isPersonalProfile = (
+  profile: MicrosoftOAuthProfile
+): profile is MicrosoftOAuthProfilePersonal => {
+  return 'givenname' in profile
+}
+
+const isWorkProfile = (
+  profile: MicrosoftOAuthProfile
+): profile is MicrosoftOAuthProfileWork => {
+  return 'name' in profile || 'given_name' in profile
 }
 
 export type OAuthAddressProxyStub = DurableObjectStubProxy<OAuthAddress>
