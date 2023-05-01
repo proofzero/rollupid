@@ -10,6 +10,7 @@ declare global {
     Access: Fetcher
     Starbase: Fetcher
     Images: Fetcher
+    Edges: Fetcher
 
     SECRET_SESSION_KEY: string
     SECRET_SESSION_SALT: string

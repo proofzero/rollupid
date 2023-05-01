@@ -3,19 +3,20 @@ import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'
 import { inputValidators } from '@proofzero/platform-middleware'
 import { AccountURNSpace } from '@proofzero/urns/account'
-import { scope, SCOPES } from '@proofzero/security/scopes'
+import { decodeJwt } from 'jose'
+import { InternalServerError } from '@proofzero/errors'
 
 export const GetAuthorizedAppScopesMethodInput = z.object({
   accountURN: inputValidators.AccountURNInput,
   clientId: z.string().min(1),
 })
-type GetAuthorizedAppScopesMethodInput = z.infer<
+type GetAuthorizedAppScopesMethodParams = z.infer<
   typeof GetAuthorizedAppScopesMethodInput
 >
 
 export const GetAuthorizedAppScopesMethodOutput = z.array(
   z.object({
-    permission: z.string(),
+    timestamp: z.number(),
     scopes: z.array(z.string()),
   })
 )
@@ -23,71 +24,38 @@ export type GetAuthorizedAppScopesMethodResult = z.infer<
   typeof GetAuthorizedAppScopesMethodOutput
 >
 
-type GetAuthorizedAppScopesParams = {
+export const getAuthorizedAppScopesMethod = async ({
+  input,
+  ctx,
+}: {
+  input: GetAuthorizedAppScopesMethodParams
   ctx: Context
-  input: GetAuthorizedAppScopesMethodInput
-}
+}) => {
+  const { accountURN, clientId } = input
 
-interface GetAuthorizedAppScopesMethod {
-  (
-    params: GetAuthorizedAppScopesParams
-  ): Promise<GetAuthorizedAppScopesMethodResult>
-}
+  const name = `${AccountURNSpace.decode(accountURN)}@${clientId}`
+  const accessNode = await initAccessNodeByName(name, ctx.Access)
 
-export const getAuthorizedAppScopesMethod: GetAuthorizedAppScopesMethod =
-  async ({ ctx, input }) => {
-    const { accountURN, clientId } = input
+  const { tokenIndex, tokenMap } = await accessNode.class.getTokenState()
 
-    const name = `${AccountURNSpace.decode(accountURN)}@${clientId}`
-    const accessNode = await initAccessNodeByName(name, ctx.Access)
+  const tokens = tokenIndex.map((t) => tokenMap[t])
+  const dtMappedScopes = await Promise.all(
+    tokens.map(async (t) => {
+      const { iat } = decodeJwt(t.jwt)
+      if (!iat) {
+        throw new InternalServerError({
+          message: 'IAT missing in token',
+        })
+      }
 
-    const { tokenIndex, tokenMap } = await accessNode.class.getTokenState()
+      const scopes = t.scope
 
-    // Get a map of all the scopes
-    // in all authorizations
-    const tokens = tokenIndex.map((t) => tokenMap[t])
-    const scopes = tokens.flatMap((t) => t.scope)
-
-    // Filter for unique scopes
-    const uniqueScopes = Array.from(new Set(scopes))
-
-    // Add implicit openid scope
-    uniqueScopes.push('scope://rollup.id/openid')
-
-    // Generate an array of [{
-    //   permission: 'read' | 'write' | 'root' | ... based on scope structure,
-    //   scope: 'scope'
-    // }]
-    const castScopes = uniqueScopes
-      .filter((s) => Object.getOwnPropertySymbols(SCOPES).includes(scope(s)))
-      .map((s) => ({
-        name: SCOPES[scope(s)].name,
-        permission: s.split('#')[1] ?? 'claims',
-      }))
-
-    // Get a list of unique permissions
-    const uniquePermissions = Array.from(
-      new Set(castScopes.map((cs) => cs.permission))
-    )
-
-    // Generate array with
-    // permission and list of scopes
-    // associated to that permission
-    const mappedTokens: {
-      permission: string
-      scopes: string[]
-    }[] = []
-    for (let i = 0; i < uniquePermissions.length; i++) {
-      const permission = uniquePermissions[i]
-      const scopes = castScopes
-        .filter((cs) => cs.permission === permission)
-        .map((cs) => cs.name)
-
-      mappedTokens.push({
-        permission: permission.replace(/\b\w/g, (c) => c.toUpperCase()),
+      return {
         scopes,
-      })
-    }
+        timestamp: iat,
+      }
+    })
+  )
 
-    return mappedTokens
-  }
+  return dtMappedScopes
+}
