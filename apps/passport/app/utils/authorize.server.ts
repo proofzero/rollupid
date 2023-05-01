@@ -1,19 +1,35 @@
 import { getAccountClient, getAddressClient } from '~/platform.server'
-import getNormalisedConnectedEmails from '@proofzero/utils/getNormalisedConnectedEmails'
+import {
+  getNormalisedConnectedEmails,
+  getNormalisedSmartContractWallets,
+} from '@proofzero/utils/getNormalisedConnectedAccounts'
+
+import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
+import { createAuthorizationParamsCookieHeaders } from '~/session.server'
+
+import type { GetAddressProfileResult } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressProfile'
+
+import {
+  SCOPE_CONNECTED_ACCOUNTS,
+  SCOPE_EMAIL,
+  SCOPE_SMART_CONTRACT_WALLET,
+} from '@proofzero/security/scopes'
 
 import type { AccountURN } from '@proofzero/urns/account'
 import type { PersonaData } from '@proofzero/types/application'
-import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
-import { UnauthorizedError } from '@proofzero/errors'
-import { createConsoleParamsSession } from '~/session.server'
-
-import { GetAddressProfileResult } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressProfile'
+import type {
+  EmailSelectListItem,
+  SCWalletSelectListItem,
+} from '@proofzero/utils/getNormalisedConnectedAccounts'
+import { redirect } from '@remix-run/cloudflare'
+import { CryptoAddressType } from '@proofzero/types/address'
 
 export type DataForScopes = {
-  connectedEmails: EmailSelectListItem[]
-  personaData: PersonaData
+  connectedEmails?: EmailSelectListItem[]
+  personaData?: PersonaData
   requestedScope: string[]
-  connectedAccounts: GetAddressProfileResult[]
+  connectedAccounts?: GetAddressProfileResult[]
+  connectedSmartContractWallets?: SCWalletSelectListItem[]
 }
 
 // Deterministically sort scopes so that they are always in the same order
@@ -46,6 +62,7 @@ export const getDataForScopes = async (
   if (!accountURN)
     throw new UnauthorizedError({ message: 'Account URN is required' })
 
+  let connectedSmartContractWallets: SCWalletSelectListItem[] = []
   let connectedEmails: EmailSelectListItem[] = []
   let connectedAddresses: GetAddressProfileResult[] = []
 
@@ -54,14 +71,38 @@ export const getDataForScopes = async (
   const connectedAccounts = await accountClient.getAddresses.query({
     account: accountURN,
   })
+
   if (connectedAccounts && connectedAccounts.length) {
-    connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
-    connectedAddresses = await Promise.all(
-      connectedAccounts.map((ca) => {
-        const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
-        return addressClient.getAddressProfile.query()
-      })
-    )
+    if (requestedScope.includes(Symbol.keyFor(SCOPE_EMAIL)!)) {
+      connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
+    }
+    if (requestedScope.includes(Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!)) {
+      connectedAddresses = await Promise.all(
+        connectedAccounts
+          .filter((ca) => {
+            return ca.rc.addr_type !== CryptoAddressType.Wallet
+          })
+          .map((ca) => {
+            const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
+            return addressClient.getAddressProfile.query()
+          })
+      )
+    }
+    if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLET)!)) {
+      const scWalletAddresses = await Promise.all(
+        connectedAccounts
+          .filter((ca) => {
+            return ca.rc.addr_type === CryptoAddressType.Wallet
+          })
+          .map((ca) => {
+            const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
+            return addressClient.getAddressProfile.query()
+          })
+      )
+
+      connectedSmartContractWallets =
+        getNormalisedSmartContractWallets(scWalletAddresses)
+    }
   }
 
   const personaData: PersonaData = {}
@@ -71,25 +112,8 @@ export const getDataForScopes = async (
     personaData,
     requestedScope: reorderScope(requestedScope),
     connectedAccounts: connectedAddresses,
+    connectedSmartContractWallets,
   }
-}
-
-/** Creates an authorization cookie, capturing current authz query params,
- * and redirects to the authentication route
- */
-export async function createAuthzParamCookieAndAuthenticate(
-  request: Request,
-  authzParams: ConsoleParams,
-  env: Env
-) {
-  const qp = new URLSearchParams()
-
-  const url = new URL(request.url)
-  if (url.searchParams.has('login_hint')) {
-    qp.append('login_hint', url.searchParams.get('login_hint')!)
-  }
-
-  throw await createConsoleParamsSession(authzParams, env, qp)
 }
 
 /** Checks whether the authorization cookie parameters match with
@@ -122,4 +146,21 @@ export function authzParamsMatch(
       `${authzReqCookieRedirectURL?.origin}${authzReqCookieRedirectURL?.pathname}` &&
     authzCookieParams.state === authzQueryParams.state
   )
+}
+
+export async function createAuthzParamCookieAndCreate(
+  request: Request,
+  authzParams: ConsoleParams,
+  env: Env
+) {
+  let redirectURL
+  const qp = new URLSearchParams(request.url)
+  if (qp.get('create_type') === 'wallet') {
+    redirectURL = `/create/wallet`
+  } else {
+    throw new BadRequestError({ message: 'Invalid create_type' })
+  }
+  throw redirect(redirectURL, {
+    headers: await createAuthorizationParamsCookieHeaders(authzParams, env),
+  })
 }

@@ -11,9 +11,13 @@ const Template = () => {
     <div className="flex flex-row space-x-9 ">
       <div className="w-[409px] h-[491px] border rounded-lg p-8">
         <SmartContractWalletCreationSummary
-          completeCallback={() => {
-            console.log('hello')
+          onChange={() => {
+            1 + 1
           }}
+          onSubmit={() => {
+            1 + 1
+          }}
+          disabled={false}
         />
       </div>
     </div>

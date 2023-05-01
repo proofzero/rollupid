@@ -131,8 +131,7 @@ export default function App() {
             />
           </>
         )}
-        {(transition.state === 'loading' ||
-          transition.state === 'submitting') && <Loader />}
+        {transition.state !== 'idle' && <Loader />}
 
         <Outlet context={{}} />
 

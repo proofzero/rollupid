@@ -5,12 +5,13 @@ import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 
-import { appRouter } from '../router'
+import createEdgesClient from '@proofzero/platform-clients/edges'
 import { Context } from '../../context'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import { initAddressNodeByName } from '../../nodes'
 import createImageClient from '@proofzero/platform-clients/image'
 import { getZeroDevSigner } from '@zerodevapp/sdk'
+import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
@@ -18,11 +19,12 @@ export const InitSmartContractWalletInput = z.object({
   nickname: z.string(),
 })
 
-export const InitSmartContractWalletOutput = AddressURNInput
+type InitSmartContractWalletInput = z.infer<typeof InitSmartContractWalletInput>
 
-type InitSmartContractWalletParams = z.infer<
-  typeof InitSmartContractWalletInput
->
+export const InitSmartContractWalletOutput = z.object({
+  addressURN: AddressURNInput,
+  walletAddress: z.string(),
+})
 
 type InitSmartContractWalletResult = z.infer<
   typeof InitSmartContractWalletOutput
@@ -32,7 +34,7 @@ export const initSmartContractWalletMethod = async ({
   input,
   ctx,
 }: {
-  input: InitSmartContractWalletParams
+  input: InitSmartContractWalletInput
   ctx: Context
 }): Promise<InitSmartContractWalletResult> => {
   const nodeClient = ctx.address
@@ -58,7 +60,7 @@ export const initSmartContractWalletMethod = async ({
       node_type: NodeType.Crypto,
       addr_type: CryptoAddressType.Wallet,
     },
-    { alias: smartContractWalletAddress, hidden: 'true' }
+    { alias: input.nickname, hidden: 'true' }
   )
   const baseAddressURN = AddressURNSpace.getBaseURN(addressURN)
   const smartContractWalletNode = initAddressNodeByName(
@@ -81,13 +83,17 @@ export const initSmartContractWalletMethod = async ({
     smartContractWalletNode.class.setGradient(gradient),
   ])
 
-  const caller = appRouter.createCaller({
-    ...ctx,
-    addressURN,
+  // Store the owning account for the address node in the node itself.
+  await smartContractWalletNode.class.setAccount(account)
+
+  const edgesClient = createEdgesClient(ctx.Edges, {
+    ...generateTraceContextHeaders(ctx.traceSpan),
+  })
+  await edgesClient.makeEdge.mutate({
+    src: account,
+    dst: addressURN,
+    tag: EDGE_ADDRESS,
   })
 
-  caller.setAccount(account)
-  caller.getAddressProfile()
-
-  return addressURN
+  return { addressURN, walletAddress: smartContractWalletAddress }
 }

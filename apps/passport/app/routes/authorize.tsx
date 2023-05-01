@@ -16,6 +16,7 @@ import {
   getStarbaseClient,
 } from '~/platform.server'
 import {
+  createAuthorizationParamsCookieAndAuthenticate,
   destroyConsoleParamsSession,
   getConsoleParams,
   getValidatedSessionContext,
@@ -25,6 +26,7 @@ import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import { EmailSelect } from '@proofzero/design-system/src/atoms/email/EmailSelect'
+import { SmartContractWalletSelect } from '@proofzero/design-system/src/atoms/smart_contract_wallets/SmartContractWalletSelect'
 
 import authorizeCheck from '~/assets/authorize-check.svg'
 import Info from '~/components/authorization/Info'
@@ -32,35 +34,33 @@ import Info from '~/components/authorization/Info'
 import profileClassIcon from '~/components/authorization/profile-class-icon.svg'
 import addressClassIcon from '~/components/authorization/connected-addresses-class-icon.svg'
 import emailClassIcon from '~/components/authorization/email-class-icon.svg'
+import smartContractWalletClassIcon from '~/components/authorization/sc-wallet-class-icon.svg'
 
 import {
   authzParamsMatch,
-  createAuthzParamCookieAndAuthenticate,
+  createAuthzParamCookieAndCreate,
   getDataForScopes,
 } from '~/utils/authorize.server'
 import { useEffect, useState } from 'react'
+import { OptionType } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { Text } from '@proofzero/design-system'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { JsonError } from '@proofzero/utils/errors'
+import { ConnectedAccountSelect } from '@proofzero/design-system/src/atoms/accounts/ConnectedAccountSelect'
+import { AuthorizationControlSelection } from '@proofzero/types/application'
+import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 
 import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
-import {
-  AuthorizationControlSelection,
-  PersonaData,
-} from '@proofzero/types/application'
 import type { DataForScopes } from '~/utils/authorize.server'
-import {
-  EmailSelectListItem,
-  OptionType,
-} from '@proofzero/utils/getNormalisedConnectedEmails'
+import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
+import type { SCWalletSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
-import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 
-import { ConnectedAccountSelect } from '@proofzero/design-system/src/atoms/accounts/ConnectedAccountSelect'
-import { AddressURN } from '@proofzero/urns/address'
+import type { AddressURN } from '@proofzero/urns/address'
+import type { PersonaData } from '@proofzero/types/application'
 
 export type UserProfile = {
   displayName: string
@@ -103,13 +103,14 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     }
   }
 
-  if (prompt && !['consent', 'connect', 'reconnect'].includes(prompt))
+  if (prompt && !['consent', 'connect', 'create', 'reconnect'].includes(prompt))
     throw new BadRequestError({ message: 'only prompt supported is "consent"' })
 
   const lastCP = await getConsoleParams(request, context.env)
 
   //If no authorization cookie and we're not logging into
   //Passport Settings, then we create authz cookie & authenticate
+
   if (
     !lastCP &&
     !(
@@ -119,8 +120,15 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     ) &&
     connectResult !== 'CANCEL'
   ) {
-    await createAuthzParamCookieAndAuthenticate(
-      request,
+    if (prompt === 'create') {
+      await createAuthzParamCookieAndCreate(
+        request,
+        context.consoleParams,
+        context.env
+      )
+    }
+
+    await createAuthorizationParamsCookieAndAuthenticate(
       context.consoleParams,
       context.env
     )
@@ -129,8 +137,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const headers = new Headers()
   if (lastCP) {
     if (!authzParamsMatch(lastCP, context.consoleParams)) {
-      await createAuthzParamCookieAndAuthenticate(
-        request,
+      await createAuthorizationParamsCookieAndAuthenticate(
         context.consoleParams,
         context.env
       )
@@ -360,6 +367,7 @@ const scopeIcons: Record<string, string> = {
   connected_accounts: addressClassIcon,
   profile: profileClassIcon,
   email: emailClassIcon,
+  smart_contract_wallet: smartContractWalletClassIcon,
 }
 
 export default function Authorize() {
@@ -376,15 +384,22 @@ export default function Authorize() {
 
   const userProfile = profile as UserProfile
 
-  const { connectedEmails, personaData, requestedScope, connectedAccounts } =
-    dataForScopes
+  const {
+    connectedEmails,
+    personaData,
+    requestedScope,
+    connectedAccounts,
+    connectedSmartContractWallets,
+  } = dataForScopes
 
-  const [persona] = useState<PersonaData>(personaData)
+  const [persona] = useState<PersonaData>(personaData!)
 
   const [selectedEmail, setSelectedEmail] = useState<EmailSelectListItem>()
   const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
     Array<AddressURN> | Array<AuthorizationControlSelection>
   >([])
+  const [selectedSCWallet, setSelectedSCWallet] =
+    useState<SCWalletSelectListItem>()
 
   // Re-render the component every time persona gets updated
   useEffect(() => {}, [persona])
@@ -431,6 +446,10 @@ export default function Authorize() {
       } else {
         personaData.connected_accounts = selectedConnectedAccounts
       }
+    }
+
+    if (requestedScope.includes('smart_contract_wallet') && selectedSCWallet) {
+      personaData.smart_contract_wallet = selectedSCWallet.cryptoAddress
     }
 
     // TODO: Everything should be a form field now handled by javascript
@@ -508,14 +527,38 @@ export default function Authorize() {
                       <div className="flex flex-row w-full gap-2 items-center">
                         <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
 
-                        {scope !== 'email' && scope !== 'connected_accounts' && (
-                          <Text
-                            size="sm"
-                            weight="medium"
-                            className="flex-1 text-gray-500"
-                          >
-                            {scopeMeta.scopes[scope].name}
-                          </Text>
+                        {scope !== 'email' &&
+                          scope !== 'connected_accounts' &&
+                          scope !== 'smart_contract_wallet' && (
+                            <Text
+                              size="sm"
+                              weight="medium"
+                              className="flex-1 text-gray-500"
+                            >
+                              {scopeMeta.scopes[scope].name}
+                            </Text>
+                          )}
+                        {scope === 'smart_contract_wallet' && (
+                          <div className="flex-1 min-w-0">
+                            <SmartContractWalletSelect
+                              wallets={connectedSmartContractWallets}
+                              onSelect={(selected: SCWalletSelectListItem) => {
+                                if (selected?.type === OptionType.AddNew) {
+                                  const qp = new URLSearchParams()
+                                  qp.append('scope', requestedScope.join(' '))
+                                  qp.append('state', state)
+                                  qp.append('client_id', clientId)
+                                  qp.append('redirect_uri', redirectOverride)
+                                  qp.append('prompt', 'create')
+                                  qp.append('create_type', 'wallet')
+
+                                  return navigate(`/authorize?${qp.toString()}`)
+                                }
+
+                                setSelectedSCWallet(selected)
+                              }}
+                            />
+                          </div>
                         )}
 
                         {scope === 'email' && (
@@ -523,7 +566,7 @@ export default function Authorize() {
                             <EmailSelect
                               items={connectedEmails}
                               enableAddNew={true}
-                              defaultAddress={connectedEmails[0]?.addressURN}
+                              defaultAddress={connectedEmails![0]?.addressURN}
                               onSelect={(selected: EmailSelectListItem) => {
                                 if (selected?.type === OptionType.AddNew) {
                                   const qp = new URLSearchParams()
@@ -549,7 +592,7 @@ export default function Authorize() {
                         {scope === 'connected_accounts' && (
                           <div className="flex-1 min-w-0">
                             <ConnectedAccountSelect
-                              accounts={connectedAccounts.map((ca) => ({
+                              accounts={connectedAccounts!.map((ca) => ({
                                 addressURN: ca.id,
                                 address: ca.address,
                                 title: ca.title,
@@ -619,51 +662,53 @@ export default function Authorize() {
               .
             </Text>
           )}
-
-          <div
-            className={
-              'flex flex-row w-full items-end justify-center gap-4 mt-auto'
-            }
-          >
-            {transition.state === 'idle' && (
-              <>
-                <Button
-                  btnSize="xl"
-                  btnType="secondary-alt"
-                  onClick={() => {
-                    cancelCallback()
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  btnSize="xl"
-                  btnType="primary-alt"
-                  disabled={
-                    // TODO: make generic!
-                    (requestedScope.includes('email') &&
-                      (!connectedEmails?.length || !selectedEmail)) ||
-                    (requestedScope.includes('connected_accounts') &&
-                      !selectedConnectedAccounts?.length)
-                  }
-                  onClick={() => {
-                    authorizeCallback(requestedScope)
-                  }}
-                >
-                  Continue
-                </Button>
-              </>
-            )}
-            {transition.state !== 'idle' && <Spinner />}
-          </div>
-          <div className="mt-7 flex justify-center items-center space-x-2">
-            <img src={subtractLogo} alt="powered by rollup.id" />
-            <Text size="xs" weight="normal" className="text-gray-400">
-              Powered by{' '}
-              <a href="https://rollup.id" className="hover:underline">
-                rollup.id
-              </a>
-            </Text>
+          <div className="flex flex-col w-full items-center justify-center mt-auto">
+            <div
+              className={'flex flex-row w-full items-end justify-center gap-4'}
+            >
+              {transition.state === 'idle' && (
+                <>
+                  <Button
+                    btnSize="xl"
+                    btnType="secondary-alt"
+                    onClick={() => {
+                      cancelCallback()
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    btnSize="xl"
+                    btnType="primary-alt"
+                    disabled={
+                      // TODO: make generic!
+                      (requestedScope.includes('email') &&
+                        (!connectedEmails?.length || !selectedEmail)) ||
+                      (requestedScope.includes('connected_accounts') &&
+                        !selectedConnectedAccounts?.length) ||
+                      (requestedScope.includes('smart_contract_wallet') &&
+                        (typeof selectedSCWallet !== 'object' ||
+                          selectedSCWallet?.cryptoAddress?.length === 0))
+                    }
+                    onClick={() => {
+                      authorizeCallback(requestedScope)
+                    }}
+                  >
+                    Continue
+                  </Button>
+                </>
+              )}
+              {transition.state !== 'idle' && <Spinner />}
+            </div>
+            <div className="mt-5 flex justify-center items-center space-x-2">
+              <img src={subtractLogo} alt="powered by rollup.id" />
+              <Text size="xs" weight="normal" className="text-gray-400">
+                Powered by{' '}
+                <a href="https://rollup.id" className="hover:underline">
+                  rollup.id
+                </a>
+              </Text>
+            </div>
           </div>
         </div>
       </div>

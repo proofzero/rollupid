@@ -1,11 +1,12 @@
 import { Outlet, useLoaderData } from '@remix-run/react'
-import { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import { getStarbaseClient } from '~/platform.server'
 import { getConsoleParams } from '~/session.server'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 import LogoIndigo from '~/assets/PassportLogoIndigo.svg'
+
+import type { LoaderFunction } from '@remix-run/cloudflare'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   let appProps

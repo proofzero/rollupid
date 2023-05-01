@@ -199,15 +199,14 @@ const getConsoleParamsSessionStorage = (
   })
 }
 
-export async function createConsoleParamsSession(
+/** Creates an authorization cookie, capturing current authz query params,
+ * and redirects to the authentication route
+ */
+export async function createAuthorizationParamsCookieAndAuthenticate(
   consoleParams: ConsoleParams,
   env: Env,
   qp: URLSearchParams = new URLSearchParams()
 ) {
-  if (!consoleParams.clientId) {
-    throw new Error('Missing clientId in consoleParams')
-  }
-
   let redirectURL = `/authenticate/${consoleParams.clientId}${
     ['connect', 'reconnect'].includes(consoleParams.prompt || '')
       ? ''
@@ -217,7 +216,25 @@ export async function createConsoleParamsSession(
   if (consoleParams.prompt) {
     qp.append('prompt', consoleParams.prompt)
   }
+
+  if (consoleParams.login_hint) {
+    qp.append('login_hint', consoleParams.login_hint)
+  }
+
   redirectURL += `?${qp.toString()}`
+
+  throw redirect(redirectURL, {
+    headers: await createAuthorizationParamsCookieHeaders(consoleParams, env),
+  })
+}
+
+export async function createAuthorizationParamsCookieHeaders(
+  consoleParams: ConsoleParams,
+  env: Env
+) {
+  if (!consoleParams.clientId) {
+    throw new Error('Missing clientId in consoleParams')
+  }
 
   const headers = new Headers()
   headers.append(
@@ -229,9 +246,7 @@ export async function createConsoleParamsSession(
     await setConsoleParamsSession(consoleParams, env)
   )
 
-  return redirect(redirectURL, {
-    headers,
-  })
+  return headers
 }
 
 export async function setConsoleParamsSession(
@@ -339,7 +354,10 @@ export async function getValidatedSessionContext(
     const redirectTo = `/authenticate/${consoleParams?.clientId}`
     if (error === InvalidTokenError)
       if (consoleParams.clientId)
-        throw await createConsoleParamsSession(consoleParams, env)
+        throw await createAuthorizationParamsCookieAndAuthenticate(
+          consoleParams,
+          env
+        )
       else throw redirect(redirectTo)
     else if (
       error === ExpiredTokenError ||

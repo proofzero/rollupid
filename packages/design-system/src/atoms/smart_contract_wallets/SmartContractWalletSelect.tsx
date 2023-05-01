@@ -6,32 +6,21 @@ import {
   ChevronUpIcon,
   CheckIcon,
 } from '@heroicons/react/20/solid'
-import { AddressURN } from '@proofzero/urns/address'
 import { TbCirclePlus } from 'react-icons/tb'
 import { HiCheck } from 'react-icons/hi'
-import { CryptoAddressType } from '@proofzero/types/address'
+import { OptionType } from '@proofzero/utils/getNormalisedConnectedAccounts'
+import type { SCWalletSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
-type SmartContractWalletListItem = {
-  title: string
-  type: CryptoAddressType | OptionType
-  addressURN?: AddressURN
-}
-
-type SmartContractWalletSelectProps = {
-  wallets?: Array<SmartContractWalletListItem>
-  onSelect?: (selected: SmartContractWalletListItem) => void
-}
-
-export enum OptionType {
-  AddNew,
+export type SmartContractWalletSelectProps = {
+  wallets?: Array<SCWalletSelectListItem>
+  onSelect?: (selected: SCWalletSelectListItem) => void
 }
 
 export const SmartContractWalletSelect = ({
   wallets,
   onSelect,
 }: SmartContractWalletSelectProps) => {
-  const [selectedWallet, setSelectedWallet] =
-    useState<SmartContractWalletListItem>()
+  const [selectedWallet, setSelectedWallet] = useState<SCWalletSelectListItem>()
 
   useEffect(() => {
     if (onSelect) {

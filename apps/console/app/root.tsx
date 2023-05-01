@@ -179,7 +179,7 @@ export default function App() {
             />
           </>
         )}
-        {transition.state === 'loading' ? <Loader /> : null}
+        {transition.state !== 'idle' ? <Loader /> : null}
         <Outlet context={{ apps, avatarUrl, PASSPORT_URL, displayName }} />
         <ScrollRestoration nonce={nonce} />
         <script

@@ -224,7 +224,7 @@ export const appRouter = t.router({
     .use(setAddressNodeClient)
     .input(InitSmartContractWalletInput)
     .output(InitSmartContractWalletOutput)
-    .mutation(initSmartContractWalletMethod),
+    .query(initSmartContractWalletMethod),
   deleteAddressNode: t.procedure
     .use(LogUsage)
     .use(parse3RN)

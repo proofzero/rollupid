@@ -240,6 +240,11 @@ export async function getClaimValues(
           picture: nodeResult.qc.picture,
         }
       }
+    } else if (scopeValue === 'smart_contract_wallet') {
+      result = {
+        ...result,
+        [scopeValue]: personaData.smart_contract_wallet,
+      }
     } else if (scopeValue === 'connected_accounts') {
       if (
         personaData.connected_accounts === AuthorizationControlSelection.ALL

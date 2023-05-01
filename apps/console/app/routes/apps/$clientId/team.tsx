@@ -2,26 +2,27 @@ import { Button, Text } from '@proofzero/design-system'
 import { HiOutlineMail } from 'react-icons/hi'
 import { useLoaderData, useOutletContext, useSubmit } from '@remix-run/react'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
-import { ActionFunction, LoaderFunction, redirect } from '@remix-run/cloudflare'
+import { redirect } from '@remix-run/cloudflare'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 import { requireJWT } from '~/utilities/session.server'
 import { checkToken } from '@proofzero/utils/token'
 
 import createAccountClient from '@proofzero/platform-clients/account'
-
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-
-import { AccountURN } from '@proofzero/urns/account'
-
-import getNormalisedConnectedEmails, {
-  EmailSelectListItem,
-  OptionType,
-} from '@proofzero/utils/getNormalisedConnectedEmails'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
 import { EmailSelect } from '@proofzero/design-system/src/atoms/email/EmailSelect'
-import { AddressURN } from '@proofzero/urns/address'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import {
+  getNormalisedConnectedEmails,
+  OptionType,
+} from '@proofzero/utils/getNormalisedConnectedAccounts'
+
+import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
+
+import type { AddressURN } from '@proofzero/urns/address'
+import type { AccountURN } from '@proofzero/urns/account'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const clientId = params.clientId as string

@@ -53,10 +53,16 @@ export const SCOPE_CONNECTED_ACCOUNTS: Scope = scope('connected_accounts')
 export const SCOPE_EMAIL: Scope = scope('email')
 export const SCOPE_PROFILE: Scope = scope('profile')
 export const SCOPE_OPENID: Scope = scope('openid')
+
 /**
  * The scope required to read account object.
  */
 export const SCOPE_ACCOUNT_READ: Scope = scope('scope://rollup.id/account#read')
+
+/**
+ * The scope required to use smart contract wallet object.
+ */
+export const SCOPE_SMART_CONTRACT_WALLET: Scope = scope('smart_contract_wallet')
 
 /**
  * The scope required to write to account object.
@@ -135,6 +141,11 @@ export const SCOPES: ScopeMap = {
   [SCOPE_CONNECTED_ACCOUNTS]: {
     name: 'Connected accounts',
     description: `List your connected accounts and identifiers`,
+    class: 'address',
+  },
+  [SCOPE_SMART_CONTRACT_WALLET]: {
+    name: 'Smart contract wallet',
+    description: `Read your smart contract address and make transactions on it on your behalf`,
     class: 'address',
   },
   // NOT READY YET
