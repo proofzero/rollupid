@@ -3,7 +3,10 @@ import { Authenticator } from 'remix-auth'
 import { DiscordStrategy, DiscordStrategyOptions } from 'remix-auth-discord'
 import { GitHubStrategy } from 'remix-auth-github'
 import { GoogleStrategy, GoogleStrategyOptions } from 'remix-auth-google'
-import { MicrosoftStrategy } from 'remix-auth-microsoft'
+import {
+  MicrosoftStrategy,
+  MicrosoftStrategyOptions,
+} from 'remix-auth-microsoft'
 import { TwitterStrategy } from 'remix-auth-twitter'
 
 import { AppleStrategy } from '~/utils/applestrategy.server'
@@ -46,20 +49,26 @@ export const getGithubAuthenticator = (env: Env) => {
   )
 }
 
-export const getGoogleAuthenticator = (prompt: string, env: Env) => {
+export const getGoogleAuthenticator = (
+  env: Env,
+  prompt?: GoogleStrategyOptions['prompt']
+) => {
   return new GoogleStrategy(
     {
       clientID: env.INTERNAL_GOOGLE_OAUTH_CLIENT_ID,
       clientSecret: env.SECRET_GOOGLE_OAUTH_CLIENT_SECRET,
       callbackURL: env.INTERNAL_GOOGLE_OAUTH_CALLBACK_URL,
       accessType: 'offline',
-      prompt: prompt as GoogleStrategyOptions['prompt'],
+      prompt,
     },
     async (params) => params
   )
 }
 
-export const getMicrosoftStrategy = (prompt: string, env: Env) => {
+export const getMicrosoftStrategy = (
+  env: Env,
+  prompt?: MicrosoftStrategyOptions['prompt']
+) => {
   return new MicrosoftStrategy(
     {
       clientId: env.INTERNAL_MICROSOFT_OAUTH_CLIENT_ID,
@@ -102,13 +111,16 @@ export const getAppleStrategy = (env: Env) => {
   )
 }
 
-export const getDiscordStrategy = (prompt: string, env: Env) => {
+export const getDiscordStrategy = (
+  env: Env,
+  prompt?: DiscordStrategyOptions['prompt']
+) => {
   return new DiscordStrategy(
     {
       clientID: env.INTERNAL_DISCORD_OAUTH_CLIENT_ID,
       clientSecret: env.SECRET_DISCORD_OAUTH_CLIENT_SECRET,
       callbackURL: env.INTERNAL_DISCORD_OAUTH_CALLBACK_URL,
-      prompt: prompt as DiscordStrategyOptions['prompt'],
+      prompt,
       scope: ['email', 'identify'],
     },
     async (params) => params
