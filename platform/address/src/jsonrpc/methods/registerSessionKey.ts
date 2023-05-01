@@ -78,10 +78,11 @@ export const registerSessionKeyMethod = async ({
 
   let sessionKey = ''
 
-  if (paymaster.provider === 'zerodev') {
+  if (paymaster!.provider === 'zerodev') {
     const zdSigner = await getZeroDevSigner({
-      projectId: paymaster.secret, // dev project id
+      projectId: paymaster!.secret, // dev project id
       owner: getPrivateKeyOwner(ownerPrivateKey), // owner private key
+      skipFetchSetup: true,
     })
 
     const truncatedValidUntil =

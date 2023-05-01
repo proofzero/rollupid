@@ -76,7 +76,7 @@ const addressResolvers: Resolvers = {
       return profiles
     },
 
-    registerSessionKeys: async (
+    registerSessionKey: async (
       _parent: any,
       {
         accountUrn,
@@ -123,7 +123,7 @@ const addressResolvers: Resolvers = {
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      const sessionKey = addressClient.registerSessionKey.query({
+      const sessionKey = await addressClient.registerSessionKey.query({
         paymaster,
         smartContractWalletAddress,
         sessionPublicKey,
@@ -187,6 +187,12 @@ const AddressResolverComposition = {
   'Query.account': [requestLogging(), setupContext(), validateApiKey()],
   'Query.addressProfile': [requestLogging(), setupContext(), validateApiKey()],
   'Query.addressProfiles': [requestLogging(), setupContext(), validateApiKey()],
+  'Query.registerSessionKey': [
+    requestLogging(),
+    setupContext(),
+    validateApiKey(),
+    isAuthorized(),
+  ],
   'Mutation.updateAddressNickname': [
     requestLogging(),
     setupContext(),

@@ -12,7 +12,7 @@ export default /* GraphQL */ `
     public: Boolean
   }
 
-  type WhitelistInstance {
+  input WhitelistInstance {
     to: String!
     selectors: [String!]!
   }
@@ -21,10 +21,11 @@ export default /* GraphQL */ `
     accountFromAlias(provider: String!, alias: String!): URN!
     addressProfile(addressURN: URN!): AddressProfile!
     addressProfiles(addressURNList: [URN!]): [AddressProfile!]!
-    registerSessionKeys(
+    registerSessionKey(
+      accountUrn: String!
       sessionPublicKey: String!
       smartContractWalletAddress: String!
-      validUntil: Int!
+      validUntil: Float!
       whitelist: [WhitelistInstance!]!
     ): String!
   }
