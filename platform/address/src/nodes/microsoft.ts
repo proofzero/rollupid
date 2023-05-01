@@ -52,7 +52,15 @@ export default class MicrosoftAddress extends OAuthAddress {
       return btoa(data)
     } else {
       console.error(await response.text())
-      throw new Error("couldn't fetch photo")
+
+      const gradientUrl = await this.node.class.getGradient()
+      if (!gradientUrl) return ''
+      const gradient = await fetch(gradientUrl)
+      let data = ''
+      new Uint8Array(await gradient.arrayBuffer()).forEach(
+        (byte) => (data += String.fromCharCode(byte))
+      )
+      return btoa(data)
     }
   }
 
