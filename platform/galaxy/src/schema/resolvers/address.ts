@@ -1,5 +1,5 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
-import ENSUtils from '@proofzero/platform-clients/ens-utils'
+
 import createAddressClient from '@proofzero/platform-clients/address'
 import createAccessClient from '@proofzero/platform-clients/access'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
@@ -23,7 +23,6 @@ import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { GraphQLError } from 'graphql'
 import { PersonaData } from '@proofzero/types/application'
 import { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
-import { InternalServerError } from '@proofzero/errors'
 
 const addressResolvers: Resolvers = {
   Query: {
