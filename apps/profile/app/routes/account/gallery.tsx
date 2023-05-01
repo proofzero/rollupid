@@ -257,7 +257,7 @@ const GalleryComponent = () => {
       </Text>
       {cryptoAddresses?.length ? (
         <Form method="post">
-          <fieldset disabled={transition.state === 'loading'}>
+          <fieldset disabled={transition.state !== 'idle'}>
             <PfpNftModal
               nfts={modalFetcher.data?.ownedNfts}
               collection={collection}

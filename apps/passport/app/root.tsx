@@ -182,7 +182,7 @@ export default function App() {
             />
           </>
         )}
-        {transition.state === 'loading' && <Loader />}
+        {transition.state !== 'idle' && <Loader />}
         <Toaster position="top-right" />
         <Outlet />
         <ScrollRestoration nonce={nonce} />
