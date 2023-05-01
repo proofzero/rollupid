@@ -156,7 +156,7 @@ export async function createAuthzParamCookieAndCreate(
   let redirectURL
   const qp = new URLSearchParams(request.url)
   if (qp.get('create_type') === 'wallet') {
-    redirectURL = `/create/wallet?client_id=${qp.get('client_id')}`
+    redirectURL = `/create/wallet`
   } else {
     throw new BadRequestError({ message: 'Invalid create_type' })
   }

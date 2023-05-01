@@ -14,13 +14,13 @@ import subtractLogo from '../../assets/subtract-logo.svg'
 import type { ActionFunction } from '@remix-run/cloudflare'
 
 export const action: ActionFunction = async ({ request, context, params }) => {
+  const consoleParams = await getConsoleParams(request, context.env)
   const { jwt, accountUrn } = await getValidatedSessionContext(
     request,
-    context.consoleParams,
+    consoleParams,
     context.env,
     context.traceSpan
   )
-
   const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
   const profile = await accountClient.getProfile.query({ account: accountUrn })
 
@@ -36,12 +36,6 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   await addressClient.initSmartContractWallet.query({
     nickname,
   })
-
-  const consoleParams = await getConsoleParams(
-    request,
-    context.env,
-    params.clientId
-  )
 
   const { redirectUri, state, scope, clientId } = consoleParams
 
