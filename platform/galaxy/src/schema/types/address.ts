@@ -12,11 +12,6 @@ export default /* GraphQL */ `
     public: Boolean
   }
 
-  input WhitelistInstance {
-    to: String!
-    selectors: [String!]!
-  }
-
   type Query {
     accountFromAlias(provider: String!, alias: String!): URN!
     addressProfile(addressURN: URN!): AddressProfile!

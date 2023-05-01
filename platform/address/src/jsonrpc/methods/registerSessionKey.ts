@@ -73,8 +73,7 @@ export const registerSessionKeyMethod = async ({
 
     // We need a 90 days in Unix time from now
     // 90 days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
-    const truncatedValidUntil =
-      Math.floor(Date.now() / 1000) + 90 * 24 * 60 * 60 * 1000
+    const truncatedValidUntil = Math.floor(Date.now() / 1000) + 7776000000
 
     try {
       sessionKey = await createSessionKey(

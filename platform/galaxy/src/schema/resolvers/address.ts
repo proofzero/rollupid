@@ -128,9 +128,7 @@ const addressResolvers: Resolvers = {
 
         return sessionKey
       } catch (e) {
-        throw new InternalServerError({
-          message: 'Failed to register session key.',
-        })
+        throw new GraphQLError('Failed to register session key.')
       }
     },
   },
