@@ -93,10 +93,25 @@ export interface GoogleOAuthProfile {
   picture: string
 }
 
-export interface MicrosoftOAuthProfile {
+export interface MicrosoftOAuthProfileCommon {
   email: string
-  name: string
 }
+
+export interface MicrosoftOAuthProfilePersonal
+  extends MicrosoftOAuthProfileCommon {
+  givenname: string
+  familyname: string
+}
+
+export interface MicrosoftOAuthProfileWork extends MicrosoftOAuthProfileCommon {
+  name: string
+  given_name: string
+  family_name: string
+}
+
+export type MicrosoftOAuthProfile =
+  | MicrosoftOAuthProfilePersonal
+  | MicrosoftOAuthProfileWork
 
 export interface TwitterOAuthProfile {
   name: string
