@@ -1,12 +1,10 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 
 import { AddressNode } from '.'
-import { AddressProfile, Challenge } from '../types'
+import { AddressProfile } from '../types'
 import { CryptoAddressType } from '@proofzero/types/address'
 
 import ENSUtils from '@proofzero/platform-clients/ens-utils'
-import Address from './address'
-import { NONCE_OPTIONS } from '../constants'
 
 type CryptoAddressProfile = AddressProfile<CryptoAddressType.Wallet>
 
@@ -26,10 +24,12 @@ export default class ContractAddress {
 
     if (!address) throw new Error('address not found')
 
-    const profile = await getCryptoAddressProfile(address)
+    const profile = (await getCryptoAddressProfile(
+      address
+    )) as CryptoAddressProfile
     profile.icon = profile.icon || gradient
 
-    if (profile.title.startsWith('0x') && nickname) {
+    if (profile.title?.startsWith('0x') && nickname) {
       profile.title = nickname
     }
 
@@ -37,29 +37,16 @@ export default class ContractAddress {
 
     return profile
   }
-
-  static async alarm(address: Address) {
-    const challenges: Record<string, Challenge> =
-      (await address.state.storage.get('challenges')) || {}
-    for (const [nonce, challenge] of Object.entries(challenges)) {
-      if (challenge.timestamp + NONCE_OPTIONS.ttl <= Date.now()) {
-        delete challenges[nonce]
-      }
-    }
-    await address.state.storage.put('challenges', challenges)
-  }
 }
 
-const getCryptoAddressProfile = async (
-  address: string
-): Promise<CryptoAddressProfile> => {
+const getCryptoAddressProfile = async (address: string) => {
   const ensClient = new ENSUtils()
   const { avatar, displayName } = await ensClient.getEnsEntry(address)
 
   return {
     address: address,
-    title: displayName || '',
-    icon: avatar || '',
+    title: displayName,
+    icon: avatar,
     type: CryptoAddressType.Wallet,
   }
 }

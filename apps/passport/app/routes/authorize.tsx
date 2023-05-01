@@ -685,7 +685,10 @@ export default function Authorize() {
                       (requestedScope.includes('email') &&
                         (!connectedEmails?.length || !selectedEmail)) ||
                       (requestedScope.includes('connected_accounts') &&
-                        !selectedConnectedAccounts?.length)
+                        !selectedConnectedAccounts?.length) ||
+                      (requestedScope.includes('smart_contract_wallet') &&
+                        (typeof selectedSCWallet !== 'object' ||
+                          selectedSCWallet?.cryptoAddress?.length === 0))
                     }
                     onClick={() => {
                       authorizeCallback(requestedScope)

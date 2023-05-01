@@ -37,6 +37,11 @@ export const SmartContractWalletCreationSummary = ({
             id="nickname"
             className="h-[50px] rounded border"
             onChange={(e) => onChange(e.currentTarget.value)}
+            onKeyUp={(e) => {
+              if (e.key === 'Enter' && !disabled) {
+                onSubmit()
+              }
+            }}
           />
           <label>
             <Text size="sm" weight="medium" className="text-gray-400 my-2">

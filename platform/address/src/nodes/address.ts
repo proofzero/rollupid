@@ -79,8 +79,6 @@ export default class Address extends DOProxy {
         return CryptoAddress.alarm(this)
       case NodeType.OAuth:
         return OAuthAddress.alarm(this)
-      case NodeType.Contract:
-        return ContractAddress.alarm(this)
       case NodeType.Email:
         return EmailAddress.alarm(this)
       default:
