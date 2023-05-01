@@ -1,6 +1,10 @@
 import type { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
 
 import { DiscordStrategyDefaultName } from 'remix-auth-discord'
+import type { DiscordStrategyOptions } from 'remix-auth-discord'
+
+import { RollupError } from '@proofzero/errors'
+
 import { initAuthenticator, getDiscordStrategy } from '~/auth.server'
 
 export const action: ActionFunction = async ({
@@ -8,8 +12,15 @@ export const action: ActionFunction = async ({
   context,
 }: ActionArgs) => {
   const url = new URL(request.url)
-  const prompt = url.searchParams.get('prompt') || 'none'
+  const prompt = url.searchParams.get('prompt')
+  if (!isPromptValid(prompt))
+    throw new RollupError({ message: 'invalid prompt' })
   const authenticator = initAuthenticator(context.env)
-  authenticator.use(getDiscordStrategy(prompt, context.env))
+  authenticator.use(getDiscordStrategy(context.env, prompt))
   return authenticator.authenticate(DiscordStrategyDefaultName, request)
 }
+
+const isPromptValid = (
+  prompt: unknown
+): prompt is DiscordStrategyOptions['prompt'] =>
+  prompt == null || prompt === 'consent' || prompt === 'none'
