@@ -175,8 +175,6 @@ export async function destroyUserSession(
   })
 }
 
-// CONSOLE PARAMS
-
 const getAuthzCookieParamsSessionStorage = (
   env: Env,
   clientId: string = 'last',
@@ -188,7 +186,7 @@ const getAuthzCookieParamsSessionStorage = (
   return createCookieSessionStorage({
     cookie: {
       domain: env.COOKIE_DOMAIN,
-      name: `_rollup_client_params_${clientId}`,
+      name: `_rollup_authz_params_${clientId}`,
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV == 'production',
