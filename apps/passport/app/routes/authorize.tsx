@@ -88,10 +88,6 @@ export type LoaderData = {
 }
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  console.debug(
-    'PASSPORT ****************************',
-    new URL(request.url).searchParams
-  )
   const { clientId, redirectUri, state, prompt, rollup_action } =
     context.authzQueryParams
 
