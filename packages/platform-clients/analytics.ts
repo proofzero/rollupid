@@ -9,7 +9,11 @@ export const WriteAnalyticsDataPoint = (
   customDatapoint?: AnalyticsEngineDataPoint,
   customDataset?: AnalyticsEngineDataset
 ) => {
-  const rayId = ctx.req?.headers.get('cf-ray') || null
+  const cohortId = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    timeZone: 'America/New_York',
+  }) // just the MM/YYYY part
 
   const service = {
     name: ctx.ServiceDeploymentMetadata?.name || 'unknown',
@@ -28,7 +32,7 @@ export const WriteAnalyticsDataPoint = (
   const subAcct = sub ? AccountURNSpace.componentizedParse(sub).decoded : null
 
   // TODO: Move to the types from the types package and parse JWT here for account URN.
-  const raw_key = account || subAcct || rayId || null
+  const raw_key = account || subAcct || null
 
   const customAnalytics =
     customDatapoint ||
@@ -47,7 +51,7 @@ export const WriteAnalyticsDataPoint = (
     ctx?.type ? ctx.type : 'unknown',
     // 'AFTER',
     account,
-    rayId,
+    cohortId,
     ...(customAnalytics.blobs || []),
   ].slice(0, 20) // The maximum allowed number of blobs is 20.
 
