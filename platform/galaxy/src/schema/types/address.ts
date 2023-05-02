@@ -23,5 +23,10 @@ export default /* GraphQL */ `
     updateConnectedAddressesProperties(
       addressURNList: [ConnectedAddressPropertiesUpdateInput!]!
     ): Boolean
+    registerSessionKey(
+      accountUrn: String!
+      sessionPublicKey: String!
+      smartContractWalletAddress: String!
+    ): String!
   }
 `

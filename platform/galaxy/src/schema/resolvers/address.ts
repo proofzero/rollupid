@@ -1,6 +1,8 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
-import ENSUtils from '@proofzero/platform-clients/ens-utils'
+
 import createAddressClient from '@proofzero/platform-clients/address'
+import createAccessClient from '@proofzero/platform-clients/access'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
 
 import { Resolvers } from './typedefs'
@@ -9,6 +11,7 @@ import {
   setupContext,
   isAuthorized,
   requestLogging,
+  parseJwt,
 } from './utils'
 
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
@@ -16,6 +19,10 @@ import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 import { ResolverContext } from './common'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { GraphQLError } from 'graphql'
+import { PersonaData } from '@proofzero/types/application'
+import { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -34,6 +41,7 @@ const addressResolvers: Resolvers = {
 
       return accountURN
     },
+
     addressProfile: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
@@ -108,9 +116,62 @@ const addressResolvers: Resolvers = {
         }
       })
 
-      // const edgesClient = createAddressClient(env.Edges, {
-
       return true
+    },
+    registerSessionKey: async (
+      _parent: any,
+      {
+        accountUrn,
+        sessionPublicKey,
+        smartContractWalletAddress,
+      }: {
+        accountUrn: string
+        sessionPublicKey: string
+        smartContractWalletAddress: string
+      },
+      { env, jwt, traceSpan }: ResolverContext
+    ) => {
+      const accessClient = createAccessClient(env.Access, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+      })
+      const starbaseClient = createStarbaseClient(env.Starbase, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+      })
+
+      const { aud } = parseJwt(jwt)
+
+      const clientId = aud![0]
+
+      const [personaData, paymaster]: [PersonaData, PaymasterType] =
+        await Promise.all([
+          accessClient.getPersonaData.query({ clientId, accountUrn }),
+          starbaseClient.getPaymaster.query({ clientId }),
+        ])
+
+      if (
+        !personaData ||
+        personaData.smart_contract_wallet !== smartContractWalletAddress
+      ) {
+        throw new GraphQLError('Invalid smart contract wallet address.')
+      }
+
+      const addressClient = createAddressClient(env.Address, {
+        ...generateTraceContextHeaders(traceSpan),
+      })
+
+      try {
+        const sessionKey = await addressClient.registerSessionKey.mutate({
+          paymaster,
+          smartContractWalletAddress,
+          sessionPublicKey,
+        })
+
+        return sessionKey
+      } catch (e) {
+        throw new GraphQLError('Failed to register session key.')
+      }
     },
   },
 }
@@ -127,6 +188,12 @@ const AddressResolverComposition = {
     isAuthorized(),
   ],
   'Mutation.updateConnectedAddressesProperties': [
+    requestLogging(),
+    setupContext(),
+    validateApiKey(),
+    isAuthorized(),
+  ],
+  'Mutation.registerSessionKey': [
     requestLogging(),
     setupContext(),
     validateApiKey(),
