@@ -50,11 +50,11 @@ jobs:
           command: publish --env dev
           environment: 'dev'
           secrets: |
-            SECRET_SESSION_SALT
+            SECRET_SESSION_KEY
         env:
           NODE_ENV: 'development'
           # A secret used for session encryption.
-          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_DEV }}
+          SECRET_SESSION_KEY: ${{ secrets.SECRET_SESSION_KEY_DEV }}
           # CF_ROUTE: https://console-dev.kubelt.com/*
 
       - name: Setup Playwright
