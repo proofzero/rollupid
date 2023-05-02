@@ -634,7 +634,7 @@ export default function Authorize() {
                                 address: ca.address,
                                 title: ca.title,
                                 provider:
-                                  ca.type === 'eth' ? 'metamask' : ca.type,
+                                  ca.type === 'eth' ? 'blockchain' : ca.type,
                               }))}
                               onSelect={(addresses) => {
                                 setSelectedConnectedAccounts(
