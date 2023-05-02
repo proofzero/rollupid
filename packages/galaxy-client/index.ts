@@ -49,6 +49,7 @@ export type Edge = {
 export type Mutation = {
   __typename?: 'Mutation';
   disconnectAddress?: Maybe<Scalars['Boolean']>;
+  registerSessionKey: Scalars['String'];
   revokeAppAuthorization?: Maybe<Scalars['Boolean']>;
   updateAddressNickname?: Maybe<Scalars['Boolean']>;
   updateConnectedAddressesProperties?: Maybe<Scalars['Boolean']>;
@@ -57,6 +58,13 @@ export type Mutation = {
 
 export type MutationDisconnectAddressArgs = {
   addressURN: Scalars['URN'];
+};
+
+
+export type MutationRegisterSessionKeyArgs = {
+  accountUrn: Scalars['String'];
+  sessionPublicKey: Scalars['String'];
+  smartContractWalletAddress: Scalars['String'];
 };
 
 
