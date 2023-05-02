@@ -266,7 +266,11 @@ export default () => {
         )
     }
 
-    return <div className="flex-1 min-w-0">{el}</div>
+    return (
+      <div key={key} className={`flex-1 min-w-0 ${flex ? 'relative' : ''}`}>
+        {el}
+      </div>
+    )
   }
 
   const displayKeyDisplayFn = (displayKeys: string[]): JSX.Element[] => {
@@ -312,8 +316,13 @@ export default () => {
       ]
     }
 
-    return rows.map((row) => (
-      <div className="flex flex-row justify-evenly gap-4">{row}</div>
+    return rows.map((row, i) => (
+      <div
+        key={`${displayKeys.join('_')}_${i}`}
+        className="flex flex-row justify-evenly gap-4 relative"
+      >
+        {row}
+      </div>
     ))
   }
 
@@ -327,7 +336,7 @@ export default () => {
         appName={name}
         generic={Boolean(rollup_action)}
       >
-        <div className="flex-1 w-full flex flex-col gap-4">
+        <div className="flex-1 w-full flex flex-col gap-4 relative">
           {displayKeys
             .slice(0, 2)
             .map((dk: OAuthProvider) => displayKeyMapper(dk, true))}

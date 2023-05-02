@@ -8,7 +8,9 @@ import { useAccount, useDisconnect, useSignMessage } from 'wagmi'
 import { ConnectKitProvider, ConnectKitButton } from 'connectkit'
 
 import { signMessageTemplate } from '../../routes/connect/$address/sign'
-import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/AuthButton'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { FaCaretDown } from 'react-icons/fa'
+import { Disclosure } from '@headlessui/react'
 
 export type ConnectButtonProps = {
   connectCallback: (address: string) => void
@@ -96,50 +98,72 @@ export function ConnectButton({
             hide!()
           }
           return (
-            <>
-              <AuthButton
+            <div className="flex flex-row">
+              <button
                 disabled={isConnecting || isSigning || isLoading}
                 onClick={
                   isConnected ? () => address && connectCallback(address) : show
                 }
-                fullSize={fullSize}
-                Graphic={
-                  (isSigning || isLoading) && isConnected ? (
-                    <Spinner size={16} />
-                  ) : (
-                    <>
-                      {!ensName && <img src={walletsSvg} />}
-                      {ensName && <Avatar size={20} name={ensName} />}
-                    </>
-                  )
-                }
-                text={
-                  (isSigning || isLoading) && isConnected
-                    ? isSigning
-                      ? 'Signing... (please check wallet)'
-                      : 'Continuing...'
-                    : isConnected && address
-                    ? `Continue with ${ensName ?? truncatedAddress}`
-                    : !isConnecting
-                    ? 'Connect Wallet'
-                    : 'Connecting'
-                }
-              />
+                className={`py-[calc(0.375rem+9px)] flex-1 button hover:bg-gray-100 flex flex-row items-center space-x-3 px-[17px] rounded-l-md ${
+                  isConnected ? '' : 'rounded-r-md'
+                } ${
+                  fullSize ? 'justify-start' : 'justify-center'
+                } bg-white text-[#1f2937] shadow-sm border border-solid border-[#d1d5db] hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-indigo-500`}
+              >
+                {(isSigning || isLoading) && isConnected ? (
+                  <Spinner size={16} />
+                ) : (
+                  <div>
+                    {!ensName && <img src={walletsSvg} className="w-5 h-5" />}
+                    {ensName && <Avatar size={20} name={ensName} />}
+                  </div>
+                )}
+
+                {fullSize && (
+                  <Text
+                    weight="medium"
+                    className="flex-1 text-start text-gray-800 truncate"
+                  >
+                    {(isSigning || isLoading) && isConnected
+                      ? isSigning
+                        ? 'Signing... (please check wallet)'
+                        : 'Continuing...'
+                      : isConnected && address
+                      ? `Continue with ${ensName ?? truncatedAddress}`
+                      : !isConnecting
+                      ? 'Connect Wallet'
+                      : 'Connecting'}
+                  </Text>
+                )}
+              </button>
 
               {isConnected && (
-                <button
-                  className={
-                    'text-xs text-indigo-400 underline -mt-2 cursor-pointer'
-                  }
-                  onClick={(e) => {
-                    e.preventDefault()
-                    disconnect()
-                  }}
-                >
-                  Disconnect Wallet
-                </button>
+                <Disclosure>
+                  {({ open }) => (
+                    <>
+                      <Disclosure.Button className="px-2 lg:px-3.5 flex justify-center items-center border-t border-r border-b rounded-r-md bg-white text-[#1f2937] shadow-sm border border-solid border-[#d1d5db] hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-indigo-500">
+                        {!open && <FaCaretDown className="w-5 h-5" />}
+                        {open && <FaCaretDown className="w-5 h-5" />}
+                      </Disclosure.Button>
+                      <Disclosure.Panel className="absolute top-16 left-0 right-0 z-10 bg-white rounded-md shadow-md">
+                        <button
+                          className="w-full px-[17px] py-5"
+                          onClick={() => {
+                            disconnect()
+                          }}
+                        >
+                          <Text
+                            size="sm"
+                            weight="normal"
+                            className="text-red-600 text-start"
+                          >{`Disconnect ${ensName ?? truncatedAddress}`}</Text>
+                        </button>
+                      </Disclosure.Panel>
+                    </>
+                  )}
+                </Disclosure>
               )}
-            </>
+            </div>
           )
         }}
       </ConnectKitButton.Custom>
