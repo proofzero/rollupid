@@ -6,7 +6,9 @@ import { getConsoleParams } from '~/session.server'
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 import LogoIndigo from '~/assets/PassportLogoIndigo.svg'
 
-import type { LoaderFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
+
+import social from '~/assets/passport-social.png'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   let appProps
@@ -17,10 +19,13 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     })
   } else {
     appProps = {
-      name: 'Rollup ID',
+      name: `Rollup - ${
+        params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
+      }`,
       iconURL: LogoIndigo,
       termsURL: 'https://rollup.id/tos',
       privacyURL: 'https://rollup.id/privacy-policy',
+      redirectURI: `https://${params.clientId}.rollup.id`,
     }
   }
 
@@ -37,6 +42,23 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     prompt,
   })
 }
+
+// TODO: update with white label settings
+export const meta: MetaFunction = ({
+  data,
+}: {
+  data: ReturnType<typeof loader>
+}) => ({
+  charset: 'utf-8',
+  title: data.appProps.name,
+  viewport: 'width=device-width,initial-scale=1',
+  'og:url': data.appProps.redirectURI,
+  'og:description': 'Identity management for the private web.',
+  'og:image': social,
+  'twitter:card': 'summary_large_image',
+  'twitter:site': '@rollupid_xyz',
+  'twitter:creator': '@rollupid_xyz',
+})
 
 export default () => {
   const { clientId, appProps, prompt } = useLoaderData()

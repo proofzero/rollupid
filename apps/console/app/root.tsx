@@ -47,6 +47,8 @@ import type { AccountURN } from '@proofzero/urns/account'
 
 import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
 
+import social from '~/assets/console-social.png'
+
 export const links: LinksFunction = () => {
   return [
     { rel: 'stylesheet', href: tailwindStylesheetUrl },
@@ -62,6 +64,15 @@ export const meta: MetaFunction = () => ({
   charset: 'utf-8',
   title: 'Console - Rollup',
   viewport: 'width=device-width,initial-scale=1',
+  'og:url': 'https://passport.rollup.id',
+  'og:description': 'Identity management for the private web.',
+  'og:image': social,
+  'twitter:card': 'summary_large_image',
+  'twitter:site': '@rollupid_xyz',
+  'twitter:creator': '@rollupid_xyz',
+  'theme-color': '#ffffff',
+  'mobile-web-app-capable': 'yes',
+  'apple-mobile-web-app-capable': 'yes',
 })
 
 export type LoaderData = {
