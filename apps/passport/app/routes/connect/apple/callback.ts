@@ -4,7 +4,7 @@ import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { decodeJwt } from 'jose'
 
 import { NodeType, OAuthAddressType } from '@proofzero/types/address'
-import type { OAuthAppleProfile } from '@proofzero/platform.address/src/types'
+import type { AppleOAuthProfile } from '@proofzero/platform.address/src/types'
 
 import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
@@ -19,7 +19,7 @@ import {
   checkOAuthError,
 } from '~/utils/authenticate.server'
 import {
-  getConsoleParams,
+  getAuthzCookieParams,
   getJWTConditionallyFromSession,
 } from '~/session.server'
 
@@ -46,7 +46,7 @@ export const action: ActionFunction = async ({ request }) => {
 export const loader: LoaderFunction = async ({ request, context }) => {
   await checkOAuthError(request, context.env)
 
-  const appData = await getConsoleParams(request, context.env)
+  const appData = await getAuthzCookieParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)
   authenticator.use(getAppleStrategy(context.env))
@@ -65,7 +65,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const user = getUser(request)
 
-  const profile: OAuthAppleProfile = {
+  const profile: AppleOAuthProfile & { provider: string; sub: string } = {
     provider: OAuthAddressType.Apple,
     email: token.email as string,
     name: user?.name
@@ -73,7 +73,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       : (token.email as string),
     sub: token.sub,
     picture: '',
-    isApple: true,
   }
 
   const address = AddressURNSpace.componentizedUrn(
@@ -92,7 +91,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       context.env,
       appData?.clientId
     ),
-    force: !appData || appData.prompt !== 'connect',
+    force: !appData || appData.rollup_action !== 'connect',
   })
   const current = await addressClient.getOAuthData.query()
 

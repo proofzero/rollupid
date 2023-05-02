@@ -10,12 +10,15 @@ import * as build from '@remix-run/dev/server-build'
 
 export function parseParams(request: Request) {
   const url = new URL(request.url)
-  const clientId = url.searchParams.get('client_id')
-  const state = url.searchParams.get('state')
-  const redirectUri = url.searchParams.get('redirect_uri')
+  const clientId = url.searchParams.get('client_id') || ''
+  const state = url.searchParams.get('state') || ''
+  const redirectUri = url.searchParams.get('redirect_uri') || ''
   const scope = url.searchParams.get('scope')
-  const prompt = url.searchParams.get('prompt')
-  const login_hint = url.searchParams.get('login_hint')
+  //Optional params get a default value of undefined
+  const prompt = url.searchParams.get('prompt') || undefined
+  const login_hint = url.searchParams.get('login_hint') || undefined
+  const rollup_action = url.searchParams.get('rollup_action') || undefined
+  const rollup_result = url.searchParams.get('rollup_result') || undefined
 
   const decodedScope =
     scope &&
@@ -30,6 +33,8 @@ export function parseParams(request: Request) {
     scope: decodedScope ? decodedScope.split(' ') : [],
     prompt,
     login_hint,
+    rollup_action,
+    rollup_result,
   }
 }
 
@@ -39,7 +44,7 @@ const requestHandler = createRequestHandler({
   getLoadContext: (event) => {
     const traceSpan = (event as TraceableFetchEvent).traceSpan
     return {
-      consoleParams: parseParams(event.request),
+      authzQueryParams: parseParams(event.request),
       env: globalThis as unknown as Env,
       traceSpan,
     }

@@ -34,7 +34,7 @@ import type { AddressURN } from '@proofzero/urns/address'
 export const action: ActionFunction = async ({ request, context }) => {
   const { jwt } = await getValidatedSessionContext(
     request,
-    context.consoleParams,
+    context.authzQueryParams,
     context.env,
     context.traceSpan
   )
@@ -219,7 +219,7 @@ export default function AccountsLayout() {
     }
 
     const qp = new URLSearchParams()
-    qp.append('prompt', 'connect')
+    qp.append('rollup_action', 'connect')
     qp.append('client_id', 'passport')
     qp.append('state', 'skip')
     qp.append('scope', '')

@@ -16,9 +16,9 @@ import {
   getStarbaseClient,
 } from '~/platform.server'
 import {
-  createAuthorizationParamsCookieAndAuthenticate,
-  destroyConsoleParamsSession,
-  getConsoleParams,
+  createAuthzParamsCookieAndAuthenticate,
+  destroyAuthzCookieParamsSession,
+  getAuthzCookieParams,
   getValidatedSessionContext,
 } from '~/session.server'
 import { validatePersonaData } from '@proofzero/security/persona'
@@ -44,7 +44,11 @@ import {
 import { useEffect, useState } from 'react'
 import { OptionType } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { Text } from '@proofzero/design-system'
-import { BadRequestError, InternalServerError } from '@proofzero/errors'
+import {
+  BadRequestError,
+  InternalServerError,
+  RollupError,
+} from '@proofzero/errors'
 import { JsonError } from '@proofzero/utils/errors'
 import { ConnectedAccountSelect } from '@proofzero/design-system/src/atoms/accounts/ConnectedAccountSelect'
 import { AuthorizationControlSelection } from '@proofzero/types/application'
@@ -80,13 +84,19 @@ export type LoaderData = {
   redirectOverride: string
   dataForScopes: DataForScopes
   profile: GetProfileOutputParams
+  prompt?: string
 }
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const { clientId, redirectUri, state, prompt } = context.consoleParams
+  console.debug(
+    'PASSPORT ****************************',
+    new URL(request.url).searchParams
+  )
+  const { clientId, redirectUri, state, prompt, rollup_action } =
+    context.authzQueryParams
 
   const connectResult =
-    new URL(request.url).searchParams.get('connect_result') ?? undefined
+    new URL(request.url).searchParams.get('rollup_result') ?? undefined
 
   //Request parameter pre-checks
   if (!clientId) throw new BadRequestError({ message: 'client_id is required' })
@@ -103,60 +113,75 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     }
   }
 
-  if (prompt && !['consent', 'connect', 'create', 'reconnect'].includes(prompt))
-    throw new BadRequestError({ message: 'only prompt supported is "consent"' })
+  if (prompt && !['consent'].includes(prompt))
+    throw new BadRequestError({
+      message: 'The only prompt supported is "consent"',
+    })
 
-  const lastCP = await getConsoleParams(request, context.env)
+  if (
+    rollup_action &&
+    !['connect', 'create', 'reconnect'].includes(rollup_action)
+  )
+    throw new BadRequestError({
+      message:
+        'only Rollup action supported are connect, create, and reconnect ',
+    })
+
+  const lastCP = await getAuthzCookieParams(request, context.env)
 
   //If no authorization cookie and we're not logging into
-  //Passport Settings, then we create authz cookie & authenticate
+  //Passport Settings, then we create authz cookie & authenticate/create
 
   if (
     !lastCP &&
     !(
-      context.consoleParams.clientId === 'passport' &&
-      context.consoleParams.redirectUri ===
+      context.authzQueryParams.clientId === 'passport' &&
+      context.authzQueryParams.redirectUri ===
         `${new URL(request.url).origin}/settings`
     ) &&
     connectResult !== 'CANCEL'
   ) {
-    if (prompt === 'create') {
+    if (rollup_action === 'create') {
       await createAuthzParamCookieAndCreate(
         request,
-        context.consoleParams,
+        context.authzQueryParams,
         context.env
       )
     }
 
-    await createAuthorizationParamsCookieAndAuthenticate(
-      context.consoleParams,
+    await createAuthzParamsCookieAndAuthenticate(
+      context.authzQueryParams,
       context.env
     )
   }
 
   const headers = new Headers()
   if (lastCP) {
-    if (!authzParamsMatch(lastCP, context.consoleParams)) {
-      await createAuthorizationParamsCookieAndAuthenticate(
-        context.consoleParams,
+    if (!authzParamsMatch(lastCP, context.authzQueryParams)) {
+      await createAuthzParamsCookieAndAuthenticate(
+        context.authzQueryParams,
         context.env
       )
     }
 
     headers.append(
       'Set-Cookie',
-      await destroyConsoleParamsSession(request, context.env, lastCP.clientId)
+      await destroyAuthzCookieParamsSession(
+        request,
+        context.env,
+        lastCP.clientId
+      )
     )
 
     headers.append(
       'Set-Cookie',
-      await destroyConsoleParamsSession(request, context.env)
+      await destroyAuthzCookieParamsSession(request, context.env)
     )
   }
 
   const { jwt, accountUrn } = await getValidatedSessionContext(
     request,
-    context.consoleParams,
+    context.authzQueryParams,
     context.env,
     context.traceSpan
   )
@@ -165,7 +190,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   if (['console', 'passport'].includes(clientId)) {
     const redirectURL = new URL(redirectUri)
     if (connectResult) {
-      redirectURL.searchParams.set('connect_result', connectResult)
+      redirectURL.searchParams.set('rollup_result', connectResult)
     }
 
     return redirect(redirectURL.toString(), {
@@ -183,6 +208,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       }),
     ])
 
+    if (!appPublicProps.redirectURI)
+      throw new BadRequestError({
+        message: 'App requested does not have a configured redirect URL.',
+      })
     const configuredUrl = new URL(appPublicProps.redirectURI)
     const providedUrl = redirectUri ? new URL(redirectUri) : configuredUrl
 
@@ -198,7 +227,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       })
 
     // We need a unique set of scopes to avoid duplicates
-    const scope = [...new Set(context.consoleParams.scope)]
+    const scope = [...new Set(context.authzQueryParams.scope)]
 
     if (!scope || !scope.length)
       throw new BadRequestError({ message: 'No scope requested' })
@@ -216,8 +245,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     //consent through query params
     if (
       !(
-        context.consoleParams.prompt &&
-        context.consoleParams.prompt === 'consent'
+        context.authzQueryParams.prompt &&
+        context.authzQueryParams.prompt === 'consent'
       )
     ) {
       const responseType = ResponseType.Code
@@ -277,6 +306,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         scopeOverride: scope || [],
         dataForScopes,
         profile,
+        prompt,
       },
       {
         headers,
@@ -291,7 +321,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 export const action: ActionFunction = async ({ request, context }) => {
   const { accountUrn } = await getValidatedSessionContext(
     request,
-    context.consoleParams,
+    context.authzQueryParams,
     context.env,
     context.traceSpan
   )
@@ -380,6 +410,7 @@ export default function Authorize() {
     dataForScopes,
     redirectUri,
     profile,
+    prompt,
   } = useLoaderData<LoaderData>()
 
   const userProfile = profile as UserProfile
@@ -549,8 +580,9 @@ export default function Authorize() {
                                   qp.append('state', state)
                                   qp.append('client_id', clientId)
                                   qp.append('redirect_uri', redirectOverride)
-                                  qp.append('prompt', 'create')
+                                  qp.append('rollup_action', 'create')
                                   qp.append('create_type', 'wallet')
+                                  if (prompt) qp.append('prompt', prompt)
 
                                   return navigate(`/authorize?${qp.toString()}`)
                                 }
@@ -564,7 +596,7 @@ export default function Authorize() {
                         {scope === 'email' && (
                           <div className="flex-1 min-w-0">
                             <EmailSelect
-                              items={connectedEmails}
+                              items={connectedEmails || []}
                               enableAddNew={true}
                               defaultAddress={connectedEmails![0]?.addressURN}
                               onSelect={(selected: EmailSelectListItem) => {
@@ -574,11 +606,12 @@ export default function Authorize() {
                                   qp.append('state', state)
                                   qp.append('client_id', clientId)
                                   qp.append('redirect_uri', redirectOverride)
-                                  qp.append('prompt', 'connect')
+                                  qp.append('rollup_action', 'connect')
                                   qp.append(
                                     'login_hint',
                                     'email microsoft google apple'
                                   )
+                                  if (prompt) qp.append('prompt', prompt)
 
                                   return navigate(`/authorize?${qp.toString()}`)
                                 }

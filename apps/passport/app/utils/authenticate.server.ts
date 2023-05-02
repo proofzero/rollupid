@@ -13,7 +13,7 @@ import {
 import {
   createUserSession,
   destroyAuthenticationParamsSession,
-  getConsoleParamsSession,
+  getAuthzCookieParamsSession,
   parseJwt,
 } from '~/session.server'
 import { generateGradient } from './gradient.server'
@@ -21,18 +21,10 @@ import { redirect } from '@remix-run/cloudflare'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 import { InternalServerError } from '@proofzero/errors'
 
-type AppData = {
-  clientId: string
-  redirectUri: string
-  state: string
-  scope: string[]
-  prompt: string
-}
-
 export const authenticateAddress = async (
   address: AddressURN,
   account: AccountURN,
-  appData: AppData,
+  appData: AuthzParams,
   request: Request,
   env: Env,
   traceSpan: TraceSpan,
@@ -45,10 +37,15 @@ export const authenticateAddress = async (
     })
   }
 
-  if (['connect', 'reconnect'].includes(appData?.prompt)) {
+  if (
+    appData.rollup_action &&
+    ['connect', 'reconnect'].includes(appData?.rollup_action)
+  ) {
     const redirectURL = getRedirectURL(
       appData,
-      existing && appData.prompt === 'connect' ? 'ALREADY_CONNECTED' : undefined
+      existing && appData.rollup_action === 'connect'
+        ? 'ALREADY_CONNECTED'
+        : undefined
     )
 
     return redirect(redirectURL, {
@@ -95,7 +92,7 @@ export const authenticateAddress = async (
   }
 }
 
-const getRedirectURL = (appData: AppData, result: string = 'SUCCESS') => {
+const getRedirectURL = (appData: AuthzParams, result: string = 'SUCCESS') => {
   let redirectURL = '/authorize'
   const authAppId = appData.clientId
   const authRedirectUri = appData.redirectUri
@@ -106,8 +103,10 @@ const getRedirectURL = (appData: AppData, result: string = 'SUCCESS') => {
     redirect_uri: authRedirectUri,
     state: authState,
     scope: authScope.join(' '),
-    connect_result: result,
+    rollup_result: result,
   })
+
+  if (appData.prompt) urlParams.append('prompt', appData.prompt)
 
   redirectURL += `?${urlParams}`
 
@@ -193,7 +192,7 @@ export const checkOAuthError = async (request: Request, env: Env) => {
   console.error({ error, uri, description })
 
   const sp = new URLSearchParams({ oauth_error: error })
-  const cp = await getConsoleParamsSession(request, env)
+  const cp = await getAuthzCookieParamsSession(request, env)
   const { clientId } = JSON.parse(cp.get('params'))
   throw redirect(`/authenticate/${clientId}?${sp.toString()}`)
 }

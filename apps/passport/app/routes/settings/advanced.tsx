@@ -28,7 +28,7 @@ import { RollupError, ERROR_CODES } from '@proofzero/errors'
 export const action: ActionFunction = async ({ request, context }) => {
   const { jwt, accountUrn } = await getValidatedSessionContext(
     request,
-    context.consoleParams,
+    context.authzQueryParams,
     context.env,
     context.traceSpan
   )

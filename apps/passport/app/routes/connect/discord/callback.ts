@@ -10,7 +10,7 @@ import type { OAuthData } from '@proofzero/platform.address/src/types'
 import { initAuthenticator, getDiscordStrategy } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import {
-  getConsoleParams,
+  getAuthzCookieParams,
   getJWTConditionallyFromSession,
 } from '~/session.server'
 import {
@@ -21,7 +21,7 @@ import {
 export const loader: LoaderFunction = async ({ request, context }) => {
   await checkOAuthError(request, context.env)
 
-  const appData = await getConsoleParams(request, context.env)
+  const appData = await getAuthzCookieParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)
   authenticator.use(getDiscordStrategy(context.env))
@@ -54,7 +54,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       context.env,
       appData?.clientId
     ),
-    force: !appData || appData.prompt !== 'connect',
+    force: !appData || appData.rollup_action !== 'connect',
   })
 
   await addressClient.setOAuthData.mutate(authRes)

@@ -45,18 +45,23 @@ declare global {
     INTERNAL_DISCORD_OAUTH_CALLBACK_URL: string
   }
 
-  interface ConsoleParams {
-    clientId: string | null
-    redirectUri: string | null
-    scope: string[] | null
-    state: string | null
-    prompt?: string | null
-    login_hint?: string | null
+  interface AuthzParams {
+    clientId: string
+    redirectUri: string
+    scope: string[]
+    state: string
+    prompt?: string
+    login_hint?: string
+    rollup_action?: string
+    rollup_result?: string
   }
+
+  //Same-ish structure, different type name for easier identification
+  type AuthzCookieParams = AuthzParams & { source: 'cookie' }
 }
 declare module '@remix-run/cloudflare' {
   export interface AppLoadContext {
-    consoleParams: ConsoleParams
+    authzQueryParams: AuthzParams
     env: Env
     traceSpan: TraceSpan
   }

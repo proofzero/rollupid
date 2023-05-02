@@ -105,7 +105,7 @@ export const AddressListItem = ({
     url.search = ''
 
     const qp = new URLSearchParams()
-    qp.append('prompt', 'reconnect')
+    qp.append('rollup_action', 'reconnect')
     qp.append('client_id', 'passport')
     qp.append('state', 'skip')
     qp.append('login_hint', type)

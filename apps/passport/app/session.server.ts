@@ -177,7 +177,7 @@ export async function destroyUserSession(
 
 // CONSOLE PARAMS
 
-const getConsoleParamsSessionStorage = (
+const getAuthzCookieParamsSessionStorage = (
   env: Env,
   clientId: string = 'last',
   // https://developer.chrome.com/blog/cookie-max-age-expires/
@@ -202,94 +202,98 @@ const getConsoleParamsSessionStorage = (
 /** Creates an authorization cookie, capturing current authz query params,
  * and redirects to the authentication route
  */
-export async function createAuthorizationParamsCookieAndAuthenticate(
-  consoleParams: ConsoleParams,
+export async function createAuthzParamsCookieAndAuthenticate(
+  authzQueryParams: AuthzParams,
   env: Env,
   qp: URLSearchParams = new URLSearchParams()
 ) {
-  let redirectURL = `/authenticate/${consoleParams.clientId}${
-    ['connect', 'reconnect'].includes(consoleParams.prompt || '')
+  let redirectURL = `/authenticate/${authzQueryParams.clientId}${
+    ['connect', 'reconnect'].includes(authzQueryParams.rollup_action || '')
       ? ''
       : `/account`
   }`
 
-  if (consoleParams.prompt) {
-    qp.append('prompt', consoleParams.prompt)
+  if (authzQueryParams.prompt) {
+    qp.append('prompt', authzQueryParams.prompt)
   }
-
-  if (consoleParams.login_hint) {
-    qp.append('login_hint', consoleParams.login_hint)
+  if (authzQueryParams.login_hint) {
+    qp.append('login_hint', authzQueryParams.login_hint)
   }
+  if (authzQueryParams.rollup_action)
+    qp.append('rollup_action', authzQueryParams.rollup_action)
 
   redirectURL += `?${qp.toString()}`
 
   throw redirect(redirectURL, {
-    headers: await createAuthorizationParamsCookieHeaders(consoleParams, env),
+    headers: await createAuthorizationParamsCookieHeaders(
+      authzQueryParams,
+      env
+    ),
   })
 }
 
 export async function createAuthorizationParamsCookieHeaders(
-  consoleParams: ConsoleParams,
+  authzParams: AuthzParams,
   env: Env
 ) {
-  if (!consoleParams.clientId) {
-    throw new Error('Missing clientId in consoleParams')
+  if (!authzParams.clientId) {
+    throw new Error('Missing clientId in authorization parameters')
   }
 
   const headers = new Headers()
   headers.append(
     'Set-Cookie',
-    await setConsoleParamsSession(consoleParams, env, consoleParams.clientId)
+    await setAuthzCookieParamsSession(authzParams, env, authzParams.clientId)
   )
   headers.append(
     'Set-Cookie',
-    await setConsoleParamsSession(consoleParams, env)
+    await setAuthzCookieParamsSession(authzParams, env)
   )
 
   return headers
 }
 
-export async function setConsoleParamsSession(
-  consoleParams: ConsoleParams,
+export async function setAuthzCookieParamsSession(
+  authzParams: AuthzParams,
   env: Env,
   clientId?: string
 ) {
-  const storage = getConsoleParamsSessionStorage(env, clientId)
+  const storage = getAuthzCookieParamsSessionStorage(env, clientId)
   const session = await storage.getSession()
 
   //Convert string array scope to space-delimited scope before setting cookie value
-  const { scope, ...otherProps } = consoleParams
+  const { scope, ...otherProps } = authzParams
   const externalEncodedCP = { ...otherProps, scope: scope?.join(' ') || '' }
   session.set('params', JSON.stringify(externalEncodedCP))
 
   return storage.commitSession(session)
 }
 
-export async function getConsoleParamsSession(
+export async function getAuthzCookieParamsSession(
   request: Request,
   env: Env,
   clientId?: string
 ) {
-  const storage = getConsoleParamsSessionStorage(env, clientId)
+  const storage = getAuthzCookieParamsSessionStorage(env, clientId)
   return storage.getSession(request.headers.get('Cookie'))
 }
 
-export async function destroyConsoleParamsSession(
+export async function destroyAuthzCookieParamsSession(
   request: Request,
   env: Env,
   clientId?: string
 ) {
-  const gps = await getConsoleParamsSession(request, env, clientId)
-  const storage = getConsoleParamsSessionStorage(env, clientId)
+  const gps = await getAuthzCookieParamsSession(request, env, clientId)
+  const storage = getAuthzCookieParamsSessionStorage(env, clientId)
   return storage.destroySession(gps)
 }
 
-export async function getConsoleParams(
+export async function getAuthzCookieParams(
   request: Request,
   env: Env,
   clientId?: string
-) {
-  return getConsoleParamsSession(request, env, clientId)
+): Promise<AuthzCookieParams> {
+  return getAuthzCookieParamsSession(request, env, clientId)
     .then((session) => {
       const externalEncodedCookie = JSON.parse(session.get('params'))
       //Convert space-delimited scope to string array
@@ -305,7 +309,7 @@ export async function getConsoleParams(
     })
 }
 
-export function getDefaultConsoleParams(request: Request): ConsoleParams {
+export function getDefaultAuthzParams(request: Request): AuthzParams {
   const url = new URL(request.url)
   const { protocol, host } = url
 
@@ -326,14 +330,14 @@ export type ValidatedSessionContext = {
 
 export async function getValidatedSessionContext(
   request: Request,
-  consoleParams: ConsoleParams,
+  authzParams: AuthzParams,
   env: Env,
   traceSpan: TraceSpan
 ): Promise<ValidatedSessionContext> {
   const session = await getUserSession(
     request,
     env,
-    consoleParams?.clientId ?? undefined
+    authzParams?.clientId ?? undefined
   )
   const jwt = session.get('jwt')
 
@@ -351,13 +355,10 @@ export async function getValidatedSessionContext(
     }
   } catch (error) {
     // TODO: Revise this logic
-    const redirectTo = `/authenticate/${consoleParams?.clientId}`
+    const redirectTo = `/authenticate/${authzParams?.clientId}`
     if (error === InvalidTokenError)
-      if (consoleParams.clientId)
-        throw await createAuthorizationParamsCookieAndAuthenticate(
-          consoleParams,
-          env
-        )
+      if (authzParams.clientId)
+        throw await createAuthzParamsCookieAndAuthenticate(authzParams, env)
       else throw redirect(redirectTo)
     else if (
       error === ExpiredTokenError ||
@@ -371,7 +372,7 @@ export async function getValidatedSessionContext(
         redirectTo,
         env,
         FLASH_MESSAGE.SIGNOUT,
-        consoleParams?.clientId ?? undefined
+        authzParams?.clientId ?? undefined
       )
     } else
       throw new InternalServerError({

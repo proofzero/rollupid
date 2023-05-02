@@ -4,7 +4,7 @@ import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
-import { getConsoleParams } from '~/session.server'
+import { getAuthzCookieParams } from '~/session.server'
 
 import { getAddressClient } from '../../../platform.server'
 import { authenticateAddress } from '../../../utils/authenticate.server'
@@ -32,7 +32,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   )
   const accountURN = await addressClient.getAccount.query()
 
-  const appData = await getConsoleParams(request, context.env)
+  const appData = await getAuthzCookieParams(request, context.env)
 
   return authenticateAddress(
     addressURN,

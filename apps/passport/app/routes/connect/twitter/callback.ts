@@ -15,7 +15,7 @@ import {
   checkOAuthError,
 } from '~/utils/authenticate.server'
 import {
-  getConsoleParams,
+  getAuthzCookieParams,
   getJWTConditionallyFromSession,
 } from '~/session.server'
 
@@ -25,7 +25,7 @@ export const loader: LoaderFunction = async ({
 }: LoaderArgs) => {
   await checkOAuthError(request, context.env)
 
-  const appData = await getConsoleParams(request, context.env)
+  const appData = await getAuthzCookieParams(request, context.env)
 
   const authenticator = initAuthenticator(context.env)
   authenticator.use(getTwitterStrategy(context.env))
@@ -52,7 +52,7 @@ export const loader: LoaderFunction = async ({
       context.env,
       appData?.clientId
     ),
-    force: !appData || appData.prompt !== 'connect',
+    force: !appData || appData.rollup_action !== 'connect',
   })
 
   await addressClient.setOAuthData.mutate({
