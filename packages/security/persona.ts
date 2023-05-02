@@ -15,7 +15,11 @@ import {
   InternalServerError,
   UnauthorizedError,
 } from '@proofzero/errors'
-import { EmailAddressType, OAuthAddressType } from '@proofzero/types/address'
+import {
+  CryptoAddressType,
+  EmailAddressType,
+  OAuthAddressType,
+} from '@proofzero/types/address'
 import {
   AuthorizationControlSelection,
   PersonaData,
@@ -259,9 +263,13 @@ export async function getClaimValues(
           ...generateTraceContextHeaders(traceSpan),
         })
         const accountAddresses =
-          (await accountClient.getAddresses.query({
-            account: accountUrn,
-          })) || []
+          (
+            await accountClient.getAddresses.query({
+              account: accountUrn,
+            })
+          )?.filter(
+            (address) => address.rc.addr_type !== CryptoAddressType.Wallet
+          ) || []
 
         const claimResults = accountAddresses.map((a) => {
           return { type: a.rc.addr_type, identifier: a.qc.alias }

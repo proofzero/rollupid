@@ -172,8 +172,6 @@ const addressResolvers: Resolvers = {
         }
       })
 
-      // const edgesClient = createAddressClient(env.Edges, {
-
       return true
     },
   },
