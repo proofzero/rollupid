@@ -16,11 +16,6 @@ export default /* GraphQL */ `
     accountFromAlias(provider: String!, alias: String!): URN!
     addressProfile(addressURN: URN!): AddressProfile!
     addressProfiles(addressURNList: [URN!]): [AddressProfile!]!
-    registerSessionKey(
-      accountUrn: String!
-      sessionPublicKey: String!
-      smartContractWalletAddress: String!
-    ): String!
   }
 
   type Mutation {
@@ -28,5 +23,10 @@ export default /* GraphQL */ `
     updateConnectedAddressesProperties(
       addressURNList: [ConnectedAddressPropertiesUpdateInput!]!
     ): Boolean
+    registerSessionKey(
+      accountUrn: String!
+      sessionPublicKey: String!
+      smartContractWalletAddress: String!
+    ): String!
   }
 `

@@ -74,7 +74,50 @@ const addressResolvers: Resolvers = {
       )
       return profiles
     },
+  },
+  Mutation: {
+    updateAddressNickname: async (
+      _parent: any,
+      { nickname, addressURN },
+      { env, traceSpan }: ResolverContext
+    ) => {
+      const addressClient = createAddressClient(env.Address, {
+        [PlatformAddressURNHeader]: addressURN,
+        ...generateTraceContextHeaders(traceSpan),
+      })
 
+      await addressClient.setNickname.query({
+        nickname,
+      })
+
+      return true
+    },
+    updateConnectedAddressesProperties: async (
+      _parent: any,
+      { addressURNList },
+      { env, jwt, accountURN }: ResolverContext
+    ) => {
+      const addressUrnEdges = addressURNList.map((a, i) => {
+        // use the address urn space to construct a new urn with qcomps
+        const parsed = AddressURNSpace.parse(a.addressURN).decoded
+        const fullAddressURN = AddressURNSpace.componentizedUrn(
+          parsed,
+          undefined,
+          {
+            hidden: new Boolean(!!a.public).toString(),
+            order: i.toString(),
+          }
+        )
+
+        return {
+          src: accountURN,
+          dst: fullAddressURN,
+          tag: EDGE_ADDRESS,
+        }
+      })
+
+      return true
+    },
     registerSessionKey: async (
       _parent: any,
       {
@@ -131,50 +174,6 @@ const addressResolvers: Resolvers = {
       }
     },
   },
-  Mutation: {
-    updateAddressNickname: async (
-      _parent: any,
-      { nickname, addressURN },
-      { env, traceSpan }: ResolverContext
-    ) => {
-      const addressClient = createAddressClient(env.Address, {
-        [PlatformAddressURNHeader]: addressURN,
-        ...generateTraceContextHeaders(traceSpan),
-      })
-
-      await addressClient.setNickname.query({
-        nickname,
-      })
-
-      return true
-    },
-    updateConnectedAddressesProperties: async (
-      _parent: any,
-      { addressURNList },
-      { env, jwt, accountURN }: ResolverContext
-    ) => {
-      const addressUrnEdges = addressURNList.map((a, i) => {
-        // use the address urn space to construct a new urn with qcomps
-        const parsed = AddressURNSpace.parse(a.addressURN).decoded
-        const fullAddressURN = AddressURNSpace.componentizedUrn(
-          parsed,
-          undefined,
-          {
-            hidden: new Boolean(!!a.public).toString(),
-            order: i.toString(),
-          }
-        )
-
-        return {
-          src: accountURN,
-          dst: fullAddressURN,
-          tag: EDGE_ADDRESS,
-        }
-      })
-
-      return true
-    },
-  },
 }
 
 // TODO: add address middleware
@@ -182,12 +181,6 @@ const AddressResolverComposition = {
   'Query.account': [requestLogging(), setupContext(), validateApiKey()],
   'Query.addressProfile': [requestLogging(), setupContext(), validateApiKey()],
   'Query.addressProfiles': [requestLogging(), setupContext(), validateApiKey()],
-  'Query.registerSessionKey': [
-    requestLogging(),
-    setupContext(),
-    validateApiKey(),
-    isAuthorized(),
-  ],
   'Mutation.updateAddressNickname': [
     requestLogging(),
     setupContext(),
@@ -195,6 +188,12 @@ const AddressResolverComposition = {
     isAuthorized(),
   ],
   'Mutation.updateConnectedAddressesProperties': [
+    requestLogging(),
+    setupContext(),
+    validateApiKey(),
+    isAuthorized(),
+  ],
+  'Mutation.registerSessionKey': [
     requestLogging(),
     setupContext(),
     validateApiKey(),
