@@ -19,17 +19,17 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
   const accessClient = getAccessClient(context.env, context.traceSpan)
 
-  const scopeAuthorizations = await accessClient.getAuthorizedAppScopes.query({
+  const scopeSets = await accessClient.getAuthorizedAppScopes.query({
     clientId,
     accountURN: accountUrn,
   })
 
   const mappedScopeAuthorizations = await Promise.all(
-    scopeAuthorizations.map(async (scopeAuthorization) => {
+    scopeSets.map(async (scopes) => {
       const claims = await getClaimValuesFoo(
         accountUrn,
         clientId,
-        scopeAuthorization.scopes,
+        scopes,
         {
           edgesFetcher: context.env.Edges,
           accountFetcher: context.env.Account,
@@ -39,7 +39,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
       )
 
       return {
-        ...scopeAuthorization,
+        scopes,
         claims,
       }
     })
