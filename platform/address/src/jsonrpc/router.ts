@@ -124,7 +124,7 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(RegisterSessionKeyInput)
     .output(RegisterSessionKeyOutput)
-    .query(registerSessionKeyMethod),
+    .mutation(registerSessionKeyMethod),
   setAccount: t.procedure
     .use(LogUsage)
     .use(parse3RN)

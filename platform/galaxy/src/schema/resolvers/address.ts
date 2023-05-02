@@ -162,7 +162,7 @@ const addressResolvers: Resolvers = {
       })
 
       try {
-        const sessionKey = await addressClient.registerSessionKey.query({
+        const sessionKey = await addressClient.registerSessionKey.mutate({
           paymaster,
           smartContractWalletAddress,
           sessionPublicKey,
