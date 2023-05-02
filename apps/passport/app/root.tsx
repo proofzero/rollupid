@@ -58,7 +58,7 @@ export const meta: MetaFunction = () => ({
   title: 'Passport - Rollup',
   viewport: 'width=device-width,initial-scale=1',
   'og:url': 'https://passport.rollup.id',
-  'og:description': 'User identity in your control.',
+  'og:description': 'Identity management for the private web.',
   'og:image': social,
   'twitter:card': 'summary_large_image',
   'twitter:site': '@rollupid_xyz',

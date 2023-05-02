@@ -1,5 +1,5 @@
 ---
-description: The access bridge to your users, everywhere
+description: Identity management for the private web.
 ---
 
 # Introduction to Rollup
