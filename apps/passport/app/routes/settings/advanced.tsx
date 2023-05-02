@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Form } from '@remix-run/react'
+import { Form, NavLink, useOutletContext } from '@remix-run/react'
 
 import { Text } from '@proofzero/design-system'
 import { Button } from '@proofzero/design-system'
@@ -91,9 +91,13 @@ export const action: ActionFunction = async ({ request, context }) => {
 const DeleteRollupIdentityModal = ({
   isOpen,
   setIsOpen,
+  hasOwnedApps,
+  CONSOLE_URL,
 }: {
   isOpen: boolean
   setIsOpen: (val: boolean) => void
+  hasOwnedApps: boolean
+  CONSOLE_URL: string
 }) => {
   const [confirmationString, setConfirmationString] = useState('')
 
@@ -116,39 +120,59 @@ const DeleteRollupIdentityModal = ({
               Delete Rollup Identity
             </Text>
             <Text size="xs" weight="normal">
-              Are you sure you want to delete your Rollup Identity? This action
-              will disconnect all your connected accounts and permanently delete
-              your Rollup Identity.
+              {hasOwnedApps
+                ? 'Identity cannot be deleted as it has applications associated to it.\
+                 Proceed to the Developer Console and delete the applications before\
+                  retrying the deletion of identity.'
+                : 'Are you sure you want to delete your Rollup Identity?\
+                 This action will disconnect all your connected accounts and permanently\
+                  delete your Rollup Identity.'}
             </Text>
           </div>
         </div>
-        <div className="flex flex-col my-7 space-y-2">
-          <InputText
-            onChange={(text: string) => {
-              setConfirmationString(text)
-            }}
-            heading="Type DELETE to confirm*"
-          />
-        </div>
+        {hasOwnedApps ? null : (
+          <div className="flex flex-col my-7 space-y-2">
+            <InputText
+              onChange={(text: string) => {
+                setConfirmationString(text)
+              }}
+              heading="Type DELETE to confirm*"
+            />
+          </div>
+        )}
 
         <div className="flex justify-end items-center space-x-3">
-          <Button
-            btnType="secondary-alt"
-            onClick={() => setIsOpen(false)}
-            className="bg-gray-100"
-          >
-            Cancel
-          </Button>
-
-          <Form method="post">
+          {hasOwnedApps ? (
+            <NavLink to={CONSOLE_URL} target="_blank">
+              <Button
+                btnType="secondary-alt"
+                onClick={() => setIsOpen(false)}
+                className="bg-gray-100"
+              >
+                Developer Console
+              </Button>
+            </NavLink>
+          ) : (
             <Button
-              type="submit"
-              btnType="dangerous-alt"
-              disabled={confirmationString !== 'DELETE'}
+              btnType="secondary-alt"
+              onClick={() => setIsOpen(false)}
+              className="bg-gray-100"
             >
-              Delete Rollup Identity
+              Cancel
             </Button>
-          </Form>
+          )}
+
+          {hasOwnedApps ? null : (
+            <Form method="post">
+              <Button
+                type="submit"
+                btnType="dangerous-alt"
+                disabled={confirmationString !== 'DELETE'}
+              >
+                Delete Rollup Identity
+              </Button>
+            </Form>
+          )}
         </div>
       </div>
     </Modal>
@@ -158,12 +182,22 @@ const DeleteRollupIdentityModal = ({
 export default function AdvancedLayout() {
   const [isOpen, setIsOpen] = useState(false)
 
+  const { ownedApps, CONSOLE_URL } = useOutletContext<{
+    ownedApps: any[]
+    CONSOLE_URL: string
+  }>()
+
   return (
     <>
       <Text weight="semibold" size="2xl" className="pb-6">
         Advanced Settings
       </Text>
-      <DeleteRollupIdentityModal isOpen={isOpen} setIsOpen={setIsOpen} />
+      <DeleteRollupIdentityModal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        hasOwnedApps={ownedApps?.length > 0}
+        CONSOLE_URL={CONSOLE_URL}
+      />
       <article
         className="flex-1 flex flex-col sm:flex-row
       px-5 py-4 space-x-4 rounded-lg border items-end
