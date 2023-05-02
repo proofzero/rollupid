@@ -12,7 +12,7 @@ export const action: ActionFunction = async ({ request, params, context }) => {
 
   const { jwt } = await getValidatedSessionContext(
     request,
-    context.consoleParams,
+    context.authzQueryParams,
     context.env,
     context.traceSpan
   )

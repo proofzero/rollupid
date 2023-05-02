@@ -6,7 +6,7 @@ import { BadRequestError } from '@proofzero/errors'
 export const loader: LoaderFunction = async ({ request, params, context }) => {
   const { accountUrn } = await getValidatedSessionContext(
     request,
-    context.consoleParams,
+    context.authzQueryParams,
     context.env,
     context.traceSpan
   )

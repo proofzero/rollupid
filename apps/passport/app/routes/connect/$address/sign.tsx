@@ -6,7 +6,7 @@ import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import {
-  getConsoleParams,
+  getAuthzCookieParams,
   getJWTConditionallyFromSession,
 } from '../../../session.server'
 
@@ -51,7 +51,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
-  const appData = await getConsoleParams(request, context.env)
+  const appData = await getAuthzCookieParams(request, context.env)
 
   const { address } = params
   if (!address) throw new Error('No address included in request')
@@ -77,11 +77,11 @@ export const action: ActionFunction = async ({ request, context, params }) => {
       context.env,
       appData?.clientId
     ),
-    forceAccountCreation: !appData || appData.prompt !== 'connect',
+    forceAccountCreation: !appData || appData.rollup_action !== 'connect',
   })
 
-  if (appData?.prompt === 'connect' && existing) {
-    return redirect(`${appData.redirectUri}?connect_result=ALREADY_CONNECTED`)
+  if (appData?.rollup_action === 'connect' && existing) {
+    return redirect(`${appData.redirectUri}?rollup_result=ALREADY_CONNECTED`)
   }
 
   // TODO: handle the error case

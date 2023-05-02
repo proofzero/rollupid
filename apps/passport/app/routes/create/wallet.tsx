@@ -3,7 +3,10 @@ import { useState } from 'react'
 import { useSubmit } from '@remix-run/react'
 import { redirect } from '@remix-run/cloudflare'
 import { getAccountClient, getAddressClient } from '~/platform.server'
-import { getConsoleParams, getValidatedSessionContext } from '~/session.server'
+import {
+  getAuthzCookieParams,
+  getValidatedSessionContext,
+} from '~/session.server'
 
 import { SmartContractWalletCreationSummary } from '@proofzero/design-system/src/molecules/smart-contract-wallet-connection/SmartContractWalletConnection'
 import { Text } from '@proofzero/design-system'
@@ -14,10 +17,10 @@ import subtractLogo from '../../assets/subtract-logo.svg'
 import type { ActionFunction } from '@remix-run/cloudflare'
 
 export const action: ActionFunction = async ({ request, context, params }) => {
-  const consoleParams = await getConsoleParams(request, context.env)
+  const authzCookieParams = await getAuthzCookieParams(request, context.env)
   const { jwt, accountUrn } = await getValidatedSessionContext(
     request,
-    consoleParams,
+    authzCookieParams,
     context.env,
     context.traceSpan
   )
@@ -37,13 +40,16 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     nickname,
   })
 
-  const { redirectUri, state, scope, clientId } = consoleParams
+  const { redirectUri, state, scope, clientId, prompt, login_hint } =
+    authzCookieParams
 
   const qp = new URLSearchParams()
   qp.append('client_id', clientId)
   qp.append('redirect_uri', redirectUri)
   qp.append('state', state)
   qp.append('scope', scope.join(' '))
+  if (prompt) qp.append('prompt', prompt)
+  if (login_hint) qp.append('login_hint', login_hint)
 
   return redirect(`/authorize?${qp.toString()}`)
 }

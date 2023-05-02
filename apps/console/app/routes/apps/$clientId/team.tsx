@@ -47,7 +47,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   // set their e-mail to the one just connected
   // All other cases are ambiguous and we should not make assumptions
   const requestURL = new URL(request.url)
-  const connectResult = requestURL.searchParams.get('connect_result')
+  const connectResult = requestURL.searchParams.get('rollup_result')
   if (connectResult && connectResult === 'SUCCESS') {
     if (connectedEmails.length === 1) {
       const starbaseClient = createStarbaseClient(Starbase, {
@@ -101,9 +101,9 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   // history erasure so searchParams
   // are regenerated; manual removal
   const requestURL = new URL(request.url)
-  const connectResult = requestURL.searchParams.get('connect_result')
+  const connectResult = requestURL.searchParams.get('rollup_result')
   if (connectResult) {
-    requestURL.searchParams.delete('connect_result')
+    requestURL.searchParams.delete('rollup_result')
     return redirect(requestURL.toString())
   }
 
@@ -134,7 +134,7 @@ export default () => {
     qp.append('client_id', 'console')
 
     qp.append('redirect_uri', currentURL.toString())
-    qp.append('prompt', 'connect')
+    qp.append('rollup_action', 'connect')
     qp.append('login_hint', 'email microsoft google apple')
 
     window.location.href = `${PASSPORT_URL}/authorize?${qp.toString()}`

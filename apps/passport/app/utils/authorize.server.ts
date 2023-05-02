@@ -121,8 +121,8 @@ export const getDataForScopes = async (
  * checked.
  */
 export function authzParamsMatch(
-  authzCookieParams: ConsoleParams,
-  authzQueryParams: ConsoleParams
+  authzCookieParams: AuthzParams,
+  authzQueryParams: AuthzParams
 ) {
   const scopesMatch = !!(
     authzCookieParams &&
@@ -150,7 +150,7 @@ export function authzParamsMatch(
 
 export async function createAuthzParamCookieAndCreate(
   request: Request,
-  authzParams: ConsoleParams,
+  authzParams: AuthzParams,
   env: Env
 ) {
   let redirectURL

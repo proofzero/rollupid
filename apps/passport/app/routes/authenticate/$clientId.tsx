@@ -1,7 +1,7 @@
 import { Outlet, useLoaderData } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 import { getStarbaseClient } from '~/platform.server'
-import { getConsoleParams } from '~/session.server'
+import { getAuthzCookieParams } from '~/session.server'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 import LogoIndigo from '~/assets/PassportLogoIndigo.svg'
@@ -29,17 +29,20 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     }
   }
 
-  const cp = await getConsoleParams(request, context.env)
+  const cp = await getAuthzCookieParams(request, context.env)
 
-  let prompt
-  if (['connect', 'reconnect'].includes(cp?.prompt)) {
-    prompt = cp?.prompt
+  let rollup_action
+  if (
+    cp.rollup_action &&
+    ['connect', 'reconnect'].includes(cp?.rollup_action)
+  ) {
+    rollup_action = cp?.rollup_action
   }
 
   return json({
     clientId: params.clientId,
     appProps,
-    prompt,
+    rollup_action,
   })
 }
 
@@ -61,7 +64,7 @@ export const meta: MetaFunction = ({
 })
 
 export default () => {
-  const { clientId, appProps, prompt } = useLoaderData()
+  const { clientId, appProps, rollup_action } = useLoaderData()
 
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
@@ -73,7 +76,7 @@ export default () => {
         <img src={sideGraphics} alt="Background graphics" />
       </div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
-        <Outlet context={{ clientId, appProps, prompt }} />
+        <Outlet context={{ clientId, appProps, rollup_action }} />
       </div>
     </div>
   )

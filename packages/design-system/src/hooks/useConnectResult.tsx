@@ -7,7 +7,7 @@ export default (
   useEffect(() => {
     const url = new URL(window.location.href)
 
-    const connectResult = url.searchParams.get('connect_result')
+    const connectResult = url.searchParams.get('rollup_result')
     if (connectResult) {
       if (handledMessageTypes.includes(connectResult)) {
         switch (connectResult) {
@@ -35,7 +35,7 @@ export default (
         }
       }
 
-      url.searchParams.delete('connect_result')
+      url.searchParams.delete('rollup_result')
 
       history.replaceState(null, '', url.toString())
     }

@@ -12,7 +12,7 @@ import {
   useTransition,
 } from '@remix-run/react'
 import {
-  getConsoleParams,
+  getAuthzCookieParams,
   getJWTConditionallyFromSession,
 } from '~/session.server'
 import { getAddressClient } from '~/platform.server'
@@ -41,7 +41,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const { addressURN, successfulVerification } = await actionRes.json()
 
   if (successfulVerification) {
-    const appData = await getConsoleParams(request, context.env)
+    const appData = await getAuthzCookieParams(request, context.env)
     const addressClient = getAddressClient(
       addressURN,
       context.env,
@@ -54,7 +54,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
         context.env,
         appData?.clientId
       ),
-      force: !appData || appData.prompt !== 'connect',
+      force: !appData || appData.rollup_action !== 'connect',
     })
 
     return authenticateAddress(

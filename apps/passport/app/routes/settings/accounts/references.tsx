@@ -4,14 +4,14 @@ import type { ActionFunction } from '@remix-run/cloudflare'
 import { AddressUsageDisconnectModel } from '~/components/settings/accounts/DisconnectModal'
 import { getAddressClient } from '~/platform.server'
 import {
-  getDefaultConsoleParams,
+  getDefaultAuthzParams,
   getValidatedSessionContext,
 } from '~/session.server'
 
 export const action: ActionFunction = async ({ request, context }) => {
   await getValidatedSessionContext(
     request,
-    getDefaultConsoleParams(request),
+    getDefaultAuthzParams(request),
     context.env,
     context.traceSpan
   )

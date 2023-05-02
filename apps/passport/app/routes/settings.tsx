@@ -2,8 +2,8 @@ import { Outlet, useLoaderData } from '@remix-run/react'
 
 import { json } from '@remix-run/cloudflare'
 import {
-  getConsoleParams,
-  getDefaultConsoleParams,
+  getAuthzCookieParams,
+  getDefaultAuthzParams,
   getValidatedSessionContext,
 } from '~/session.server'
 import { Popover } from '@headlessui/react'
@@ -34,7 +34,7 @@ export const links: LinksFunction = () => [
 ]
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const passportDefaultAuthzParams = getDefaultConsoleParams(request)
+  const passportDefaultAuthzParams = getDefaultAuthzParams(request)
 
   const { jwt, accountUrn } = await getValidatedSessionContext(
     request,

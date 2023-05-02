@@ -25,7 +25,7 @@ import type { FetcherWithComponents } from '@remix-run/react'
 export const loader: LoaderFunction = async ({ request, context }) => {
   await getValidatedSessionContext(
     request,
-    context.consoleParams,
+    context.authzQueryParams,
     context.env,
     context.traceSpan
   )

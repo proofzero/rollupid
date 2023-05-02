@@ -14,7 +14,11 @@ import {
 import { Authentication } from '~/components'
 import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/AuthButton'
 import { getAccountClient } from '~/platform.server'
-import { getConsoleParams, getUserSession, parseJwt } from '~/session.server'
+import {
+  getAuthzCookieParams,
+  getUserSession,
+  parseJwt,
+} from '~/session.server'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
@@ -40,13 +44,13 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
-  const consoleParams = await getConsoleParams(
+  const authzCookieParams = await getAuthzCookieParams(
     request,
     context.env,
     params.clientId
   )
 
-  const { redirectUri, state, scope, clientId, prompt } = consoleParams
+  const { redirectUri, state, scope, clientId, prompt } = authzCookieParams
 
   const qp = new URLSearchParams()
   qp.append('client_id', clientId)

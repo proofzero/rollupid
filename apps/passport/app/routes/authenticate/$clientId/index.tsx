@@ -17,7 +17,7 @@ import { redirect, json } from '@remix-run/cloudflare'
 import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/AuthButton'
 import {
   commitAuthenticationParamsSession,
-  getConsoleParams,
+  getAuthzCookieParams,
   getAuthenticationParamsSession,
 } from '~/session.server'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
@@ -90,32 +90,33 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
-  const consoleParams = await getConsoleParams(
+  const authzCookieParams = await getAuthzCookieParams(
     request,
     context.env,
     params.clientId
   )
 
-  const { redirectUri, state, scope, clientId } = consoleParams
+  const { redirectUri, state, scope, clientId, prompt } = authzCookieParams
 
   const qp = new URLSearchParams()
   qp.append('client_id', clientId)
   qp.append('redirect_uri', redirectUri)
   qp.append('state', state)
   qp.append('scope', scope.join(' '))
+  if (prompt) qp.append('prompt', prompt)
 
   return redirect(`/authorize?${qp.toString()}`)
 }
 
 export default () => {
-  const { appProps, prompt } = useOutletContext<{
+  const { appProps, rollup_action } = useOutletContext<{
     appProps?: {
       name: string
       iconURL: string
       termsURL?: string
       privacyURL?: string
     }
-    prompt?: string
+    rollup_action?: string
   }>()
 
   const { clientId, displayDict, loginHint } = useLoaderData()
@@ -150,7 +151,7 @@ export default () => {
   useEffect(() => {
     const url = new URL(window.location.href)
 
-    if (prompt) url.searchParams.set('prompt', prompt)
+    if (rollup_action) url.searchParams.set('rollup_action', rollup_action)
     if (loginHint) url.searchParams.set('login_hint', loginHint)
 
     const error = url.searchParams.get('oauth_error')
@@ -171,7 +172,7 @@ export default () => {
       <Authentication
         logoURL={iconURL}
         appName={name}
-        generic={Boolean(prompt)}
+        generic={Boolean(rollup_action)}
       >
         <>
           {displayDict.wallet && (
@@ -249,7 +250,7 @@ export default () => {
               <Form
                 className="w-full"
                 action={`/connect/google${
-                  prompt === 'reconnect' ? '?prompt=consent' : ''
+                  rollup_action === 'reconnect' ? '?prompt=consent' : ''
                 }`}
                 method="post"
               >
@@ -261,7 +262,7 @@ export default () => {
               <Form
                 className="w-full"
                 action={`/connect/microsoft${
-                  prompt === 'reconnect' ? '?prompt=consent' : ''
+                  rollup_action === 'reconnect' ? '?prompt=consent' : ''
                 }`}
                 method="post"
               >
@@ -291,7 +292,7 @@ export default () => {
               <Form
                 className="w-full"
                 action={`/connect/discord${
-                  prompt === 'reconnect' ? '?prompt=consent' : ''
+                  rollup_action === 'reconnect' ? '?prompt=consent' : ''
                 }`}
                 method="post"
               >
@@ -303,7 +304,7 @@ export default () => {
               <Form
                 className="w-full"
                 action={`/connect/github${
-                  prompt === 'reconnect' ? '?prompt=consent' : ''
+                  rollup_action === 'reconnect' ? '?prompt=consent' : ''
                 }`}
                 method="post"
               >
@@ -328,7 +329,7 @@ export default () => {
             </Text>
           )}
 
-          {prompt && (
+          {rollup_action && (
             <div className="flex flex-1 items-end">
               <Button
                 btnSize="l"
