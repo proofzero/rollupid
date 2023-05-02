@@ -43,12 +43,14 @@ jobs:
           command: publish --env current
           environment: 'current'
           secrets: |
+            SECRET_SESSION_KEY
             SECRET_SESSION_SALT
             PROFILE_CLIENT_ID
             PROFILE_CLIENT_SECRET
             APIKEY_ALCHEMY_ETH
             APIKEY_ALCHEMY_POLYGON
         env:
+          SECRET_SESSION_KEY: ${{ secrets.SECRET_SESSION_KEY_PROD }}
           SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_PROD }}
           PROFILE_CLIENT_ID: ${{ secrets.INTERNAL_PROFILE_OAUTH_CLIENT_ID_CURRENT }}
           PROFILE_CLIENT_SECRET: ${{ secrets.SECRET_PROFILE_OAUTH_CLIENT_SECRET_CURRENT }}

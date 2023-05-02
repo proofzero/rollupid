@@ -49,6 +49,7 @@ jobs:
           command: publish --env dev
           environment: 'dev'
           secrets: |
+            SECRET_SESSION_KEY
             SECRET_SESSION_SALT
             PROFILE_CLIENT_ID
             PROFILE_CLIENT_SECRET
@@ -56,6 +57,7 @@ jobs:
             APIKEY_ALCHEMY_POLYGON
         env:
           NODE_ENV: 'development'
+          SECRET_SESSION_KEY: ${{ secrets.SECRET_SESSION_KEY_DEV }}
           SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_DEV }}
           PROFILE_CLIENT_ID: ${{ secrets.INTERNAL_PROFILE_OAUTH_CLIENT_ID_DEV }}
           PROFILE_CLIENT_SECRET: ${{ secrets.SECRET_PROFILE_OAUTH_CLIENT_SECRET_DEV }}

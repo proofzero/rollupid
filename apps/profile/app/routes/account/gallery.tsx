@@ -40,7 +40,7 @@ import PfpNftModal from '~/components/accounts/PfpNftModal'
 import NoCryptoAddresses from '~/components/accounts/NoCryptoAddresses'
 
 // Other helpers
-import { getProfileSession, parseJwt } from '~/utils/session.server'
+import { getAccessToken, parseJwt } from '~/utils/session.server'
 import type { Node } from '@proofzero/galaxy-client'
 import { getMoreNftsModal } from '~/helpers/nfts'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
@@ -53,10 +53,8 @@ import type { AccountURN } from '@proofzero/urns/account'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
-  const session = await getProfileSession(request)
-  const user = session.get('user')
 
-  const jwt = user.accessToken
+  const jwt = await getAccessToken(request)
   const { sub: accountURN } = parseJwt(jwt)
 
   const updatedGallery = formData.get('gallery') as string
