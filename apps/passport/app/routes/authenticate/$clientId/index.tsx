@@ -269,7 +269,10 @@ export default () => {
     }
 
     return (
-      <div key={key} className={`w-full min-w-0 ${flex ? 'relative' : ''}`}>
+      <div
+        key={key}
+        className={`w-full min-w-0 ${displayContinueWith ? 'relative' : ''}`}
+      >
         {el}
       </div>
     )
