@@ -17,6 +17,7 @@ import passportLogoURL from '~/assets/PassportIcon.svg'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import warningImg from '~/assets/warning.svg'
 import InputText from '~/components/inputs/InputText'
+import { useHydrated } from '@proofzero/design-system/src/hooks/useHydrated'
 
 const ConfirmRevocationModal = ({
   title,
@@ -593,6 +594,8 @@ export default () => {
 
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
 
+  const hydrated = useHydrated()
+
   return (
     <>
       <ConfirmRevocationModal
@@ -622,9 +625,18 @@ export default () => {
             {app.title}
           </Text>
 
-          <Text size="sm" weight="medium" className="text-gray-500">
-            {new Date().toLocaleString()}
-          </Text>
+          {hydrated && (
+            <Text size="sm" weight="medium" className="text-gray-500">
+              {new Date(app.timestamp).toLocaleString('default', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+              })}
+            </Text>
+          )}
         </div>
 
         <Button
