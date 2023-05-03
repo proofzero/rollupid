@@ -47,7 +47,7 @@ export default function DashboardIndexPage() {
                 open
                   ? 'max-lg:opacity-50\
                     max-lg:overflow-hidden\
-                    max-lg:h-[calc(100vh-80px)]\
+                    max-lg:h-[calc(100dvh-80px)]\
                     min-h-[635px]'
                   : 'h-full'
               }} bg-gray-50 p-6 h-[calc(100vh-80px)]`}

@@ -140,7 +140,7 @@ export default function AppDetailIndexPage() {
                 open
                   ? 'max-lg:opacity-50\
                     max-lg:overflow-hidden\
-                    max-lg:h-[calc(100vh-80px)]\
+                    max-lg:h-[calc(100dvh-80px)]\
                     min-h-[636px]'
                   : 'h-full '
               } py-9 sm:mx-11`}

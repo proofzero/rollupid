@@ -24,9 +24,7 @@ export function Authentication({
   return (
     <div className="relative">
       <div
-        className={`relative flex shrink flex-col items-center ${
-          generic ? '' : 'justify-center'
-        } gap-4 mx-auto bg-white p-6 h-[100dvh] lg:h-[675px] lg:max-h-[100dvh] w-full lg:w-[418px] lg:rounded-lg`}
+        className={`relative flex shrink grow-0 flex-col items-center gap-4 mx-auto bg-white p-6 min-h-[100dvh] lg:min-h-[675px] max-h-[100dvh] w-full lg:w-[418px] lg:rounded-lg overflow-auto`}
         style={{
           border: '1px solid #D1D5DB',
           boxSizing: 'border-box',

@@ -265,7 +265,9 @@ export function CatchBoundary() {
       </head>
       <body>
         <div
-          className={'flex flex-col h-screen gap-4 justify-center items-center'}
+          className={
+            'flex flex-col h-[100dvh] gap-4 justify-center items-center'
+          }
         >
           <h1>{status}</h1>
           <p>

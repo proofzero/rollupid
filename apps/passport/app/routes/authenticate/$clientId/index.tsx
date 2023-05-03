@@ -11,7 +11,9 @@ import {
 import { useEffect, useState } from 'react'
 import { HiOutlineMail } from 'react-icons/hi'
 import { Authentication, ConnectButton } from '~/components'
-import ConnectOAuthButton from '~/components/connect-oauth-button'
+import ConnectOAuthButton, {
+  OAuthProvider,
+} from '~/components/connect-oauth-button'
 import { redirect, json } from '@remix-run/cloudflare'
 
 import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/AuthButton'
@@ -40,16 +42,16 @@ const client = createClient(
 export const loader: LoaderFunction = async ({ request, params, context }) => {
   const url = new URL(request.url)
 
-  const displayDict: { [key: string]: boolean } = {
-    wallet: true,
-    email: true,
-    google: true,
-    microsoft: true,
-    apple: true,
-    twitter: true,
-    discord: true,
-    github: true,
-  }
+  let displayKeys = [
+    'wallet',
+    'email',
+    'google',
+    'microsoft',
+    'apple',
+    'twitter',
+    'discord',
+    'github',
+  ]
 
   const authenticationParamsSession = await getAuthenticationParamsSession(
     request,
@@ -64,19 +66,17 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   }
 
   if (loginHint) {
-    const hints = new Set(loginHint.split(' '))
-    for (const key of Object.keys(displayDict)) {
-      if (!hints.has(key)) {
-        displayDict[key] = false
-      }
-    }
+    const hints = loginHint
+      .split(' ')
+      .filter((val, i, arr) => arr.indexOf(val) === i)
+
+    displayKeys = hints
   }
 
   return json(
     {
       clientId: params.clientId,
-      displayDict,
-      loginHint,
+      displayKeys,
     },
     {
       headers: {
@@ -119,7 +119,7 @@ export default () => {
     rollup_action?: string
   }>()
 
-  const { clientId, displayDict, loginHint } = useLoaderData()
+  const { clientId, displayKeys, loginHint } = useLoaderData()
 
   const [signData, setSignData] = useState<{
     nonce: string | undefined
@@ -164,6 +164,173 @@ export default () => {
     history.replaceState(null, '', url.toString())
   })
 
+  const displayKeyMapper = (
+    key: string,
+    flex: boolean = false,
+    displayContinueWith: boolean = false
+  ) => {
+    let el
+    switch (key) {
+      case 'wallet':
+        el = (
+          <ConnectButton
+            key={key}
+            signData={signData}
+            isLoading={loading}
+            fullSize={flex}
+            displayContinueWith={displayContinueWith}
+            connectCallback={async (address) => {
+              if (loading) return
+              // fetch nonce and kickoff sign flow
+              setLoading(true)
+              fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
+                .then((res) =>
+                  res.json<{
+                    nonce: string
+                    state: string
+                    address: string
+                  }>()
+                )
+                .then(({ nonce, state, address }) => {
+                  setSignData({
+                    nonce,
+                    state,
+                    address,
+                    signature: undefined,
+                  })
+                })
+                .catch((err) => {
+                  toast(ToastType.Error, {
+                    message:
+                      'Could not fetch nonce for signing authentication message',
+                  })
+                })
+            }}
+            signCallback={(address, signature, nonce, state) => {
+              console.debug('signing complete')
+              setSignData({
+                ...signData,
+                signature,
+              })
+              submit(
+                { signature, nonce, state },
+                {
+                  method: 'post',
+                  action: `/connect/${address}/sign`,
+                }
+              )
+            }}
+            connectErrorCallback={(error) => {
+              console.debug('transition.state: ', transition.state)
+              if (transition.state !== 'idle' || !loading) {
+                return
+              }
+              if (error) {
+                console.error(error)
+                toast(ToastType.Error, {
+                  message:
+                    'Failed to complete signing. Please try again or contact support.',
+                })
+                setLoading(false)
+              }
+            }}
+          />
+        )
+        break
+      case 'email':
+        el = (
+          <AuthButton
+            key={key}
+            onClick={() => navigate(`/authenticate/${clientId}/email`)}
+            Graphic={<HiOutlineMail className="w-full h-full" />}
+            text={'Email'}
+            fullSize={flex}
+            displayContinueWith={displayContinueWith}
+          />
+        )
+        break
+      default:
+        el = (
+          <Form
+            className="w-full"
+            action={`/connect/${key}${
+              rollup_action === 'reconnect' ? '?prompt=consent' : ''
+            }`}
+            method="post"
+            key={key}
+          >
+            <ConnectOAuthButton
+              provider={key as OAuthProvider}
+              fullSize={flex}
+              displayContinueWith={displayContinueWith}
+            />
+          </Form>
+        )
+    }
+
+    return (
+      <div
+        key={key}
+        className={`w-full min-w-0 ${displayContinueWith ? 'relative' : ''}`}
+      >
+        {el}
+      </div>
+    )
+  }
+
+  const displayKeyDisplayFn = (displayKeys: string[]): JSX.Element[] => {
+    const rows = []
+
+    if (displayKeys.length === 1) {
+      rows.push(displayKeyMapper(displayKeys[0], true))
+    }
+
+    if (displayKeys.length === 2) {
+      rows.push(displayKeys.map((dk) => displayKeyMapper(dk, true)))
+    }
+
+    if (displayKeys.length === 3) {
+      rows.push(displayKeys.map((dk) => displayKeyMapper(dk)))
+    }
+
+    if (displayKeys.length === 4) {
+      rows.push(displayKeys.slice(0, 2).map((dk) => displayKeyMapper(dk, true)))
+      rows.push(displayKeys.slice(2, 4).map((dk) => displayKeyMapper(dk, true)))
+    }
+
+    if (displayKeys.length === 5) {
+      rows.push(displayKeys.slice(0, 2).map((dk) => displayKeyMapper(dk, true)))
+      rows.push(displayKeys.slice(2, 5).map((dk) => displayKeyMapper(dk)))
+    }
+
+    if (displayKeys.length === 6) {
+      rows.push(displayKeys.slice(0, 3).map((dk) => displayKeyMapper(dk)))
+      rows.push(displayKeys.slice(3, 6).map((dk) => displayKeyMapper(dk)))
+    }
+
+    if (displayKeys.length > 6) {
+      const firstHalf = displayKeys.slice(0, Math.ceil(displayKeys.length / 2))
+      const secondHalf = displayKeys.slice(
+        Math.ceil(displayKeys.length / 2),
+        displayKeys.length
+      )
+
+      return [
+        ...displayKeyDisplayFn(firstHalf),
+        ...displayKeyDisplayFn(secondHalf),
+      ]
+    }
+
+    return rows.map((row, i) => (
+      <div
+        key={`${displayKeys.join('_')}_${i}`}
+        className="flex flex-row justify-evenly gap-4 relative"
+      >
+        {row}
+      </div>
+    ))
+  }
+
   return (
     // Maybe suspense here?
     <WagmiConfig client={client}>
@@ -174,144 +341,24 @@ export default () => {
         appName={name}
         generic={Boolean(rollup_action)}
       >
-        <>
-          {displayDict.wallet && (
-            <ConnectButton
-              signData={signData}
-              isLoading={loading}
-              connectCallback={async (address) => {
-                if (loading) return
-                // fetch nonce and kickoff sign flow
-                setLoading(true)
-                fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
-                  .then((res) =>
-                    res.json<{
-                      nonce: string
-                      state: string
-                      address: string
-                    }>()
-                  )
-                  .then(({ nonce, state, address }) => {
-                    setSignData({
-                      nonce,
-                      state,
-                      address,
-                      signature: undefined,
-                    })
-                  })
-                  .catch((err) => {
-                    toast(ToastType.Error, {
-                      message:
-                        'Could not fetch nonce for signing authentication message',
-                    })
-                  })
-              }}
-              signCallback={(address, signature, nonce, state) => {
-                console.debug('signing complete')
-                setSignData({
-                  ...signData,
-                  signature,
-                })
-                submit(
-                  { signature, nonce, state },
-                  {
-                    method: 'post',
-                    action: `/connect/${address}/sign`,
-                  }
-                )
-              }}
-              connectErrorCallback={(error) => {
-                console.debug('transition.state: ', transition.state)
-                if (transition.state !== 'idle' || !loading) {
-                  return
-                }
-                if (error) {
-                  console.error(error)
-                  toast(ToastType.Error, {
-                    message:
-                      'Failed to complete signing. Please try again or contact support.',
-                  })
-                  setLoading(false)
-                }
-              }}
-            />
+        <div className="flex-1 w-full flex flex-col gap-4 relative">
+          {displayKeys
+            .slice(0, 2)
+            .map((dk: OAuthProvider) => displayKeyMapper(dk, true, true))}
+
+          {displayKeys.length > 2 && (
+            <>
+              <div className="flex flex-row items-center">
+                <div className="border-t border-gray-200 flex-1"></div>
+                <Text className="px-3 text-gray-500" weight="medium">
+                  or
+                </Text>
+                <div className="border-t border-gray-200 flex-1"></div>
+              </div>
+
+              {displayKeyDisplayFn(displayKeys.slice(2))}
+            </>
           )}
-
-          {displayDict.email && (
-            <AuthButton
-              onClick={() => navigate(`/authenticate/${clientId}/email`)}
-              Graphic={<HiOutlineMail className="w-full h-full" />}
-              text={'Connect with Email'}
-            />
-          )}
-
-          <div className="flex flex-row space-x-3 justify-evenly w-full">
-            {displayDict.google && (
-              <Form
-                className="w-full"
-                action={`/connect/google${
-                  rollup_action === 'reconnect' ? '?prompt=consent' : ''
-                }`}
-                method="post"
-              >
-                <ConnectOAuthButton provider="google" />
-              </Form>
-            )}
-
-            {displayDict.microsoft && (
-              <Form
-                className="w-full"
-                action={`/connect/microsoft${
-                  rollup_action === 'reconnect' ? '?prompt=consent' : ''
-                }`}
-                method="post"
-              >
-                <ConnectOAuthButton provider="microsoft" />
-              </Form>
-            )}
-
-            {displayDict.apple && (
-              <Form className="w-full" action={`/connect/apple`} method="post">
-                <ConnectOAuthButton provider="apple" />
-              </Form>
-            )}
-          </div>
-
-          <div className="flex flex-row space-x-3 justify-evenly w-full">
-            {displayDict.twitter && (
-              <Form
-                className="w-full"
-                action={`/connect/twitter`}
-                method="post"
-              >
-                <ConnectOAuthButton provider="twitter" />
-              </Form>
-            )}
-
-            {displayDict.discord && (
-              <Form
-                className="w-full"
-                action={`/connect/discord${
-                  rollup_action === 'reconnect' ? '?prompt=consent' : ''
-                }`}
-                method="post"
-              >
-                <ConnectOAuthButton provider="discord" />
-              </Form>
-            )}
-
-            {displayDict.github && (
-              <Form
-                className="w-full"
-                action={`/connect/github${
-                  rollup_action === 'reconnect' ? '?prompt=consent' : ''
-                }`}
-                method="post"
-              >
-                <ConnectOAuthButton provider="github" />
-              </Form>
-            )}
-          </div>
 
           {(appProps?.termsURL || appProps?.privacyURL) && (
             <Text size="sm" className="text-gray-500 mt-7">
@@ -341,7 +388,7 @@ export default () => {
               </Button>
             </div>
           )}
-        </>
+        </div>
       </Authentication>
     </WagmiConfig>
   )

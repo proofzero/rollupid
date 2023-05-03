@@ -7,8 +7,9 @@ import githubIcon from '@proofzero/design-system/src/assets/social_icons/github.
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
 import twitterIcon from '@proofzero/design-system/src/assets/social_icons/twitter.svg'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
-type OAuthProvider =
+export type OAuthProvider =
   | 'apple'
   | 'discord'
   | 'github'
@@ -29,26 +30,41 @@ const providerIconDict: { [key in OAuthProvider]: string } = {
 
 type ConnectOAuthButtonProps = {
   provider: OAuthProvider
+  fullSize?: boolean
+  displayContinueWith?: boolean
 }
 
-const ConnectOAuthButton = ({ provider }: ConnectOAuthButtonProps) => {
+const ConnectOAuthButton = ({
+  provider,
+  fullSize = true,
+  displayContinueWith = false,
+}: ConnectOAuthButtonProps) => {
   return (
-    <>
-      <Button
-        className={'w-full hover:bg-gray-100'}
-        btnType={'secondary-alt'}
-        isSubmit={true}
-        role={provider}
+    <Button
+      className={'button w-full hover:bg-gray-100'}
+      btnType={'secondary-alt'}
+      isSubmit={true}
+      role={provider}
+    >
+      <div
+        className={`flex ${
+          fullSize ? '' : 'justify-center'
+        }  items-center w-full py-1.5 space-x-3`}
       >
-        <div className="flex justify-center items-center w-full py-1.5">
-          <img
-            className="w-5 h-5"
-            src={providerIconDict[provider]}
-            alt={provider}
-          />
-        </div>
-      </Button>
-    </>
+        <img
+          className="w-5 h-5"
+          src={providerIconDict[provider]}
+          alt={provider}
+        />
+
+        {fullSize && (
+          <Text weight="medium" className="truncate text-gray-800">
+            {displayContinueWith ? 'Continue with ' : ''}{' '}
+            {provider.charAt(0).toUpperCase() + provider.slice(1)}
+          </Text>
+        )}
+      </div>
+    </Button>
   )
 }
 
