@@ -149,7 +149,7 @@ export default function SettingsLayout() {
                     min-h-[416px]'
                     : 'h-full'
                 } px-2 sm:max-md:px-5 md:px-10
-                pb-5 md:pb-10 pt-6 bg-white`}
+                pb-5 md:pb-10 pt-6 bg-white lg:bg-gray-50`}
               >
                 <Outlet
                   context={{

@@ -13,7 +13,7 @@ import { Text } from '@proofzero/design-system'
 const Header = ({ pfpUrl }: { pfpUrl: string }) => {
   return (
     <header
-      className="w-full min-h-[80px] h-[80px] border-b bg-white
+      className="w-full min-h-[80px] h-[80px] border-b bg-white lg:b-gray-50
     flex items-center justify-start lg:justify-end
     px-2 sm:max-md:px-5 md:px-10"
     >

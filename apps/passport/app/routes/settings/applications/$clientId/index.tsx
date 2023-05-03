@@ -344,7 +344,7 @@ const ClaimsWideView = ({ claims }: { claims: any[] }) => {
                         weight="semibold"
                         className="text-gray-500"
                       >
-                        Email:
+                        Address:
                       </Text>
                       <Text
                         size="xs"
@@ -502,7 +502,7 @@ export default () => {
               accounts: profiles.map((profile) => ({
                 icon: profile.icon,
                 address: profile.address,
-                type: profile.type,
+                type: profile.type === 'eth' ? 'blockchain' : profile.type,
               })),
             }
           }
@@ -528,12 +528,18 @@ export default () => {
         </Text>
       </nav>
 
-      <section className="bg-white gap-5 flex flex-row items-center my-6">
-        <img src={app.icon} className="w-12 h-12 rounded-lg" />
+      <section className="bg-white gap-5 flex flex-row items-center my-6 lg:py-4 lg:px-5 lg:border lg:shadow lg:rounded-lg">
+        <img src={app.icon} className="w-12 h-12 lg:w-16 lg:h-16 rounded-lg" />
 
-        <Text size="lg" weight="semibold" className="text-gray-900">
-          {app.title}
-        </Text>
+        <div className="flex-1">
+          <Text size="lg" weight="semibold" className="text-gray-900 mb-3">
+            {app.title}
+          </Text>
+
+          <Text size="sm" weight="medium" className="text-gray-500">
+            {new Date().toLocaleString()}
+          </Text>
+        </div>
       </section>
 
       <section>
@@ -544,10 +550,10 @@ export default () => {
         </div>
 
         <div className="hidden lg:block border rounded-lg">
-          <table className="min-w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left">
+          <table className="min-w-full bg-white rounded-lg">
+            <thead className="bg-gray-50 rounded-t-lg">
+              <tr className="rounded-t-lg">
+                <th className="px-6 py-3 text-left rounded-tl-lg">
                   <Text
                     size="xs"
                     weight="medium"
@@ -565,7 +571,7 @@ export default () => {
                     Claim Value
                   </Text>
                 </th>
-                <th className="px-6 py-3 text-left">
+                <th className="px-6 py-3 text-left rounded-tr-lg">
                   <Text
                     size="xs"
                     weight="medium"
