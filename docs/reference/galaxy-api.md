@@ -37,7 +37,7 @@ const query = `query getProfile() {
 const { profile } = fetch("https://galaxy.rollup.id", {
   method: "post",
   headers: {
-    "Authorization": `Bearer: ${jwt}`,
+    "Authorization": `Bearer ${jwt}`,
     "X-GALAXY-KEY": "...",
   },
   body: JSON.stringify({ query }),
@@ -68,7 +68,7 @@ const query = `query getProfile() {
 const { profile } = fetch("https://galaxy.rollup.id", {
   method: "post",
   headers: {
-    "Authorization": "Bearer: ${jwt}",
+    "Authorization": "Bearer ${jwt}",
     "X-GALAXY-KEY": "...",
   },
   body: JSON.stringify({ query }),
@@ -131,7 +131,7 @@ First we setup a client:
 ```typescript
 const client = new GraphQLClient(endpoint, {
   headers: {
-    Authorization: 'Bearer: ${jwt}',
+    Authorization: 'Bearer ${jwt}',
     'X-GALAXY-KEY': '...',
   },
 })
