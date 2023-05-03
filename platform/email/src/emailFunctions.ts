@@ -115,7 +115,210 @@ export const getOTPEmailContent = (passcode: string): EmailContent => {
   return {
     contentType: 'text/plain',
     subject: `Email verification - one-time passcode`,
-    body: `Your Rollup.id verification code is ${passcode}`,
+    body: `<div
+    style="display:flex;
+    flex-direction:column;
+    align-items:start;
+    justify-content:start;
+    width:375px;
+    border:1px solid #E5E7EB;
+    border-radius:8px;
+    padding:40px 24px;"
+  >
+    <img
+      style="width:170px;
+       padding-bottom:37px;"
+      src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/0609d5b5-fa07-4947-d560-a5993d067500/public"
+      alt="rollup logo"
+    />
+    <div
+      style="fontSize:36px;
+        font-weight:600;
+        line-height:44px;
+        padding-bottom:16px;
+        letter-spacing:-0.05em;
+        font-family:Inter;
+        font-style:normal;"
+    >
+      Confirm Your Email Address
+    </div>
+    <p
+      style="font-size:16px;
+        font-weight:500;
+        line-height:24px;
+        color:#6B7280;
+        letter-spacing:-0.02em;
+        font-family:Inter;
+        font-style:normal;"
+    >
+      Please copy and paste the 6-digit code below into the number fields of your
+      verification process.
+    </p>
+    <div
+      style="backgroundColor:#F3F4F6;
+        width:100%;
+        text-align:center;
+        font-size:46px;
+        font-weight:600;
+        border-radius:8px;
+        margin-top:20px;
+        margin-bottom:20px;
+        padding-top:15px;
+        padding-bottom:15px;"
+    >
+      <h1>${passcode}</h1>
+    </div>
+    <p
+      style="font-size:16px;
+        font-weight:500;
+        line-height:24px;
+        color:#6B7280;
+        letter-spacing:-0.02em;
+        font-family:Inter;
+        padding-bottom:24px;
+        font-style:normal;"
+    >
+      Please note: the code will be valid for the next 10 minutes.
+    </p>
+    <p
+      style="font-size:16px;
+        font-weight:500;
+        line-height:24px;
+        color:#6B7280;
+        letter-spacing:-0.02em;
+        font-family:Inter;
+        padding-bottom:40px;
+        font-style:normal;"
+    >
+      If you didn&apos;t request this email, there&apos;s nothing to worry about -
+      you can safely ignore it.
+    </p>
+    <div
+      style="border-bottom:1px solid black;
+      width:100%;
+      border-color:#E5E7EB;"
+    />
+    <div
+      style="margin-top:20px;
+      width:100%;
+      display:flex;
+      flex-direction:row;
+      padding-bottom:24px;"
+    >
+      <div style="marginRight:5%;">
+        <a
+          style="font-size:12px;
+          font-weight:500;
+          line-height:12px;
+          color:#6B7280;
+          letter-spacing:-0.02em;
+          font-family:Inter;
+          font-style:normal;
+          border-bottom:1px solid black;
+          border-color:#6B7280;"
+          href="https://rollup.id/tos"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Terms & conditions
+        </a>
+      </div>
+      <div
+        style="border-left:1px solid black;
+        padding-left:5%;
+        padding-right: '5%';
+        border-color:#6B7280;"
+      >
+        <a
+          style="font-size:12px;
+          font-weight:500;
+          line-height:12px;
+          color:#6B7280;
+          letter-spacing:-0.02em;
+          font-family:Inter;
+          font-style:normal;
+          border-bottom:1px solid black;
+          border-color:#6B7280;"
+          href="https://rollup.id/privacy-policy"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Privacy policy
+        </a>
+      </div>
+      <div
+        style="border-left:1px solid black;
+        padding-left:5%;
+        border-color:#6B7280;"
+      >
+        <a
+          style="font-size:12px;
+          font-weight:500;
+          line-height:12px;
+          color:#6B7280;
+          letter-spacing:-0.02em;
+          font-family:Inter;
+          font-style:normal;
+          border-bottom:1px solid black;
+          border-color:#6B7280;"
+          href="https://discord.com/invite/rollupid"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Contact us
+        </a>
+      </div>
+    </div>
+    <p
+      style="font-size:12px;
+      font-weight:500;
+      line-height:16px;
+      color:#6B7280;
+      letter-spacing:-0.02em;
+      font-family:Inter;
+      font-style:normal;
+      padding-bottom:4px;"
+    >
+      Proof Zero Inc, 4 World Trade Center, 150 Greenwich Street, 62nd Floor, New
+      York, NY 10007, USA
+    </p>
+    <p
+      style="font-size:12px;
+      font-weight:500;
+      line-height:20px;
+      color:#6B7280;
+      letter-spacing:-0.02em;
+      font-family:Inter;
+      font-style:normal;
+      padding-bottom:4px;"
+    >
+      All rights reserved.
+    </p>
+
+    <div
+      style="display:flex;
+      flex-direction:row;
+      gap:5px;"
+    >
+      <img
+        src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/ee4205c5-eccb-4b28-d4c6-6a3e5fe39100/public"
+        alt="rollup logo"
+      />
+      <p
+        style="font-size:12px;
+        font-weight:500;
+        line-height:12px;
+        color:#6B7280;
+        letter-spacing:-0.02em;
+        font-family:Inter;
+        font-style:normal;
+        margin-top:auto;"
+      >
+        Powered by rollup.id
+      </p>
+    </div>
+  </div>
+  `,
   }
 }
 
