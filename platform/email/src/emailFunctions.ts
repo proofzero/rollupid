@@ -177,7 +177,6 @@ export const getOTPEmailContent = (passcode: string): EmailContent => {
         color:#6B7280;
         letter-spacing:-0.02em;
         font-family:Inter;
-        padding-bottom:24px;
         font-style:normal;"
     >
       Please note: the code will be valid for the next 10 minutes.
@@ -189,7 +188,7 @@ export const getOTPEmailContent = (passcode: string): EmailContent => {
         color:#6B7280;
         letter-spacing:-0.02em;
         font-family:Inter;
-        padding-bottom:40px;
+        padding-bottom:24px;
         font-style:normal;"
     >
       If you didn&apos;t request this email, there&apos;s nothing to worry about -
@@ -281,8 +280,8 @@ export const getOTPEmailContent = (passcode: string): EmailContent => {
       font-style:normal;
       padding-bottom:4px;"
     >
-      Proof Zero Inc, 4 World Trade Center, 150 Greenwich Street, 62nd Floor, New
-      York, NY 10007, USA
+      Proof Zero Inc, 4 Collier Street, 2nd Floor, Toronto,
+      ON M4W 2G9, Canada
     </p>
     <p
       style="font-size:12px;
@@ -292,7 +291,7 @@ export const getOTPEmailContent = (passcode: string): EmailContent => {
       letter-spacing:-0.02em;
       font-family:Inter;
       font-style:normal;
-      padding-bottom:4px;"
+      padding-bottom:20px;"
     >
       All rights reserved.
     </p>
