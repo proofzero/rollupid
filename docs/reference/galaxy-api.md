@@ -34,7 +34,7 @@ const query = `query getProfile() {
   }
 }`
 
-const { profile } = fetch("https://galaxy.rollup.id", {
+const { profile } = fetch("https://galaxy.rollup.id/graphql", {
   method: "post",
   headers: {
     "Authorization": `Bearer ${jwt}`,
@@ -65,7 +65,7 @@ const query = `query getProfile() {
   }
 }
 
-const { profile } = fetch("https://galaxy.rollup.id", {
+const { profile } = fetch("https://galaxy.rollup.id/graphql", {
   method: "post",
   headers: {
     "Authorization": "Bearer ${jwt}",
@@ -98,7 +98,7 @@ const query = `query getProfileFromAlias($provider, $alias) {
   }
 }
 
-const { profile } = fetch("https://galaxy.rollup.id", {
+const { profile } = fetch("https://galaxy.rollup.id/graphql", {
   method: "post",
   headers: {
     "X-GALAXY-KEY": "...",
