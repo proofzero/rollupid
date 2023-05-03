@@ -1,6 +1,12 @@
+import { useEffect } from 'react'
 import { Button, Text } from '@proofzero/design-system'
 import { HiOutlineMail } from 'react-icons/hi'
-import { useLoaderData, useOutletContext, useSubmit } from '@remix-run/react'
+import {
+  useActionData,
+  useLoaderData,
+  useOutletContext,
+  useSubmit,
+} from '@remix-run/react'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { redirect } from '@remix-run/cloudflare'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
@@ -23,6 +29,7 @@ import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnecte
 import type { AddressURN } from '@proofzero/urns/address'
 import type { AccountURN } from '@proofzero/urns/account'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import type { errorsTeamProps, notificationHandlerType } from '~/types'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const clientId = params.clientId as string
@@ -87,15 +94,21 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     throw new Error('No addressURN')
   }
 
+  const errors: errorsTeamProps = {}
+
   const starbaseClient = createStarbaseClient(Starbase, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...generateTraceContextHeaders(context.traceSpan),
   })
 
-  await starbaseClient.upsertAppContactAddress.mutate({
-    address: addressURN,
-    clientId,
-  })
+  try {
+    await starbaseClient.upsertAppContactAddress.mutate({
+      address: addressURN,
+      clientId,
+    })
+  } catch (e) {
+    errors.upserteAppContactAddress = "Failed to upsert app's contact address"
+  }
 
   // Remix preserves route from before
   // history erasure so searchParams
@@ -107,7 +120,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     return redirect(requestURL.toString())
   }
 
-  return null
+  return { errors }
 }
 
 export default () => {
@@ -119,10 +132,22 @@ export default () => {
     connectedEmails: EmailSelectListItem[]
   }>()
 
-  const { PASSPORT_URL, appContactAddress } = useOutletContext<{
-    PASSPORT_URL: string
-    appContactAddress?: AddressURN
-  }>()
+  const { PASSPORT_URL, notificationHandler, appContactAddress } =
+    useOutletContext<{
+      PASSPORT_URL: string
+      notificationHandler: notificationHandlerType
+      appContactAddress?: AddressURN
+    }>()
+
+  const actionData = useActionData()
+
+  const errors = actionData?.errors
+
+  useEffect(() => {
+    if (errors) {
+      notificationHandler(Object.keys(errors).length === 0)
+    }
+  }, [errors])
 
   const redirectToPassport = () => {
     const currentURL = new URL(window.location.href)
