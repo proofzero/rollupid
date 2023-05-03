@@ -8,7 +8,7 @@ import {
   useSubmit,
   useTransition,
 } from '@remix-run/react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { HiOutlineMail } from 'react-icons/hi'
 import { Authentication, ConnectButton } from '~/components'
 import ConnectOAuthButton, {
@@ -109,11 +109,6 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 }
 
 export default () => {
-  const oAuthWrapperRef = useRef<HTMLDivElement>(null)
-  const [oAuthWrapperWidth, setOAuthWrapperWidth] = useState<
-    number | undefined
-  >()
-  
   const { appProps, rollup_action } = useOutletContext<{
     appProps?: {
       name: string
@@ -169,7 +164,11 @@ export default () => {
     history.replaceState(null, '', url.toString())
   })
 
-  const displayKeyMapper = (key: string, flex: boolean = false) => {
+  const displayKeyMapper = (
+    key: string,
+    flex: boolean = false,
+    displayContinueWith: boolean = false
+  ) => {
     let el
     switch (key) {
       case 'wallet':
@@ -179,6 +178,7 @@ export default () => {
             signData={signData}
             isLoading={loading}
             fullSize={flex}
+            displayContinueWith={displayContinueWith}
             connectCallback={async (address) => {
               if (loading) return
               // fetch nonce and kickoff sign flow
@@ -243,8 +243,9 @@ export default () => {
             key={key}
             onClick={() => navigate(`/authenticate/${clientId}/email`)}
             Graphic={<HiOutlineMail className="w-full h-full" />}
-            text={'Connect with Email'}
+            text={'Email'}
             fullSize={flex}
+            displayContinueWith={displayContinueWith}
           />
         )
         break
@@ -253,7 +254,7 @@ export default () => {
           <Form
             className="w-full"
             action={`/connect/${key}${
-              prompt === 'reconnect' ? '?prompt=consent' : ''
+              rollup_action === 'reconnect' ? '?prompt=consent' : ''
             }`}
             method="post"
             key={key}
@@ -261,13 +262,14 @@ export default () => {
             <ConnectOAuthButton
               provider={key as OAuthProvider}
               fullSize={flex}
+              displayContinueWith={displayContinueWith}
             />
           </Form>
         )
     }
 
     return (
-      <div key={key} className={`flex-1 min-w-0 ${flex ? 'relative' : ''}`}>
+      <div key={key} className={`w-full min-w-0 ${flex ? 'relative' : ''}`}>
         {el}
       </div>
     )
@@ -339,7 +341,7 @@ export default () => {
         <div className="flex-1 w-full flex flex-col gap-4 relative">
           {displayKeys
             .slice(0, 2)
-            .map((dk: OAuthProvider) => displayKeyMapper(dk, true))}
+            .map((dk: OAuthProvider) => displayKeyMapper(dk, true, true))}
 
           {displayKeys.length > 2 && (
             <>

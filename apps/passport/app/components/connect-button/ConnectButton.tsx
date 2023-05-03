@@ -31,6 +31,7 @@ export type ConnectButtonProps = {
   isLoading?: boolean
   className?: string
   fullSize?: boolean
+  displayContinueWith?: boolean
 } & ButtonProps
 
 export function ConnectButton({
@@ -41,6 +42,7 @@ export function ConnectButton({
   className,
   signData,
   fullSize = true,
+  displayContinueWith = false,
 }: ConnectButtonProps) {
   const { connector, isConnected, isReconnecting } = useAccount()
   const { disconnect } = useDisconnect()
@@ -108,7 +110,7 @@ export function ConnectButton({
                   isConnected ? '' : 'rounded-r-md'
                 } ${
                   fullSize ? 'justify-start' : 'justify-center'
-                } bg-white text-[#1f2937] shadow-sm border border-solid border-[#d1d5db] hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-indigo-500`}
+                } bg-white text-[#1f2937] shadow-sm border border-solid border-[#d1d5db] hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-indigo-500 truncate`}
               >
                 {(isSigning || isLoading) && isConnected ? (
                   <Spinner size={16} />
@@ -129,9 +131,11 @@ export function ConnectButton({
                         ? 'Signing... (please check wallet)'
                         : 'Continuing...'
                       : isConnected && address
-                      ? `Continue with ${ensName ?? truncatedAddress}`
+                      ? `${displayContinueWith ? `Continue with ` : ''}${
+                          ensName ?? truncatedAddress
+                        }`
                       : !isConnecting
-                      ? 'Connect Wallet'
+                      ? `${displayContinueWith ? `Continue with ` : ''}Wallet`
                       : 'Connecting'}
                   </Text>
                 )}

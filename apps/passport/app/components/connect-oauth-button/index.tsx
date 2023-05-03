@@ -31,11 +31,13 @@ const providerIconDict: { [key in OAuthProvider]: string } = {
 type ConnectOAuthButtonProps = {
   provider: OAuthProvider
   fullSize?: boolean
+  displayContinueWith?: boolean
 }
 
 const ConnectOAuthButton = ({
   provider,
   fullSize = true,
+  displayContinueWith = false,
 }: ConnectOAuthButtonProps) => {
   return (
     <Button
@@ -57,6 +59,7 @@ const ConnectOAuthButton = ({
 
         {fullSize && (
           <Text weight="medium" className="truncate text-gray-800">
+            {displayContinueWith ? 'Continue with ' : ''}{' '}
             {provider.charAt(0).toUpperCase() + provider.slice(1)}
           </Text>
         )}

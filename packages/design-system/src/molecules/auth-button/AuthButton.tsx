@@ -9,6 +9,7 @@ type AuthButtonProps = {
   disabled?: boolean
   onClick: any
   fullSize?: boolean
+  displayContinueWith?: boolean
 }
 
 export const AuthButton = ({
@@ -18,6 +19,7 @@ export const AuthButton = ({
   disabled,
   onClick,
   fullSize,
+  displayContinueWith = false,
 }: AuthButtonProps) => (
   <Button
     className="button w-full hover:bg-gray-100"
@@ -42,7 +44,7 @@ export const AuthButton = ({
 
       {fullSize && (
         <Text weight="medium" className="text-gray-800 truncate">
-          {text}
+          {`${displayContinueWith ? 'Continue with ' : ''}${text}`}
         </Text>
       )}
 
