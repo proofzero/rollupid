@@ -306,7 +306,7 @@ export async function getClaimValues(
   return result
 }
 
-export async function getClaimValuesFoo(
+export async function getKeyedClaimValues(
   accountUrn: AccountURN,
   clientId: string,
   scope: string[],

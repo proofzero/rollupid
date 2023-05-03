@@ -2,7 +2,7 @@ import type { LoaderFunction } from '@remix-run/cloudflare'
 import { getValidatedSessionContext } from '~/session.server'
 import { getAccessClient } from '~/platform.server'
 import { BadRequestError } from '@proofzero/errors'
-import { getClaimValuesFoo } from '@proofzero/security/persona'
+import { getKeyedClaimValues } from '@proofzero/security/persona'
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
   const { accountUrn } = await getValidatedSessionContext(
@@ -26,7 +26,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
   const mappedScopeAuthorizations = await Promise.all(
     scopeSets.map(async (scopes) => {
-      const claims = await getClaimValuesFoo(
+      const claims = await getKeyedClaimValues(
         accountUrn,
         clientId,
         scopes,
