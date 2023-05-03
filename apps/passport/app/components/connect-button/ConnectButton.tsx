@@ -10,7 +10,7 @@ import { ConnectKitProvider, ConnectKitButton } from 'connectkit'
 import { signMessageTemplate } from '../../routes/connect/$address/sign'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { FaCaretDown } from 'react-icons/fa'
-import { Disclosure } from '@headlessui/react'
+import { Popover } from '@headlessui/react'
 
 export type ConnectButtonProps = {
   connectCallback: (address: string) => void
@@ -142,14 +142,14 @@ export function ConnectButton({
               </button>
 
               {isConnected && (
-                <Disclosure>
+                <Popover>
                   {({ open }) => (
                     <>
-                      <Disclosure.Button className="px-2 lg:px-3.5 flex justify-center items-center border-t border-r border-b rounded-r-md bg-white text-[#1f2937] shadow-sm border border-solid border-[#d1d5db] hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-indigo-500">
+                      <Popover.Button className="h-full px-2 lg:px-3.5 flex justify-center items-center border-t border-r border-b rounded-r-md bg-white text-[#1f2937] shadow-sm border border-solid border-[#d1d5db] hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-indigo-500">
                         {!open && <FaCaretDown className="w-5 h-5" />}
                         {open && <FaCaretDown className="w-5 h-5" />}
-                      </Disclosure.Button>
-                      <Disclosure.Panel className="absolute top-16 left-0 right-0 z-10 bg-white rounded-md shadow-md">
+                      </Popover.Button>
+                      <Popover.Panel className="absolute top-16 left-0 right-0 z-10 bg-white rounded-md shadow-md">
                         <button
                           className="w-full px-[17px] py-5"
                           onClick={() => {
@@ -162,10 +162,10 @@ export function ConnectButton({
                             className="text-red-600 text-start"
                           >{`Disconnect ${ensName ?? truncatedAddress}`}</Text>
                         </button>
-                      </Disclosure.Panel>
+                      </Popover.Panel>
                     </>
                   )}
-                </Disclosure>
+                </Popover>
               )}
             </div>
           )
