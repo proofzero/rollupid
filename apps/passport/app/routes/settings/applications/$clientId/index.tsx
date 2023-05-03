@@ -1,9 +1,9 @@
 import { LoaderFunction } from '@remix-run/cloudflare'
-import { useLoaderData, useOutletContext } from '@remix-run/react'
+import { useFetcher, useLoaderData, useOutletContext } from '@remix-run/react'
 
 import { loader as scopesLoader } from './scopes'
 import { AuthorizedAppsModel } from '~/routes/settings'
-import { Text } from '@proofzero/design-system'
+import { Button, Text } from '@proofzero/design-system'
 import { FaChevronDown, FaChevronRight } from 'react-icons/fa'
 
 import MultiAvatar from '@proofzero/design-system/src/molecules/avatar/MultiAvatar'
@@ -14,6 +14,83 @@ import { useState } from 'react'
 import { getDefaultIconUrl } from '~/components/addresses/AddressListItem'
 
 import passportLogoURL from '~/assets/PassportIcon.svg'
+import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
+import warningImg from '~/assets/warning.svg'
+import InputText from '~/components/inputs/InputText'
+
+const ConfirmRevocationModal = ({
+  title,
+  clientId,
+  isOpen,
+  setIsOpen,
+}: {
+  title: string
+  clientId: string
+  isOpen: boolean
+  setIsOpen: (val: boolean) => void
+}) => {
+  const [confirmationString, setConfirmationString] = useState('')
+  const fetcher = useFetcher()
+
+  return (
+    <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
+      <div
+        className={`min-w-[260px] sm:min-w-[400px] md:max-w-[512px] lg:max-w-[512px]
+     relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left
+    shadow-xl transition-all sm:p-6 overflow-y-auto`}
+      >
+        <div className="flex flex-row space-x-6 items-center justify-start">
+          <img
+            src={warningImg}
+            className="object-cover w-10 h-10 rounded"
+            alt="Not found"
+          />
+
+          <div className="flex flex-col space-y-2">
+            <Text weight="medium" size="lg" className="text-gray-900">
+              Revoke Access
+            </Text>
+            <Text size="xs" weight="normal">
+              {`Are you sure you want to revoke access to ${title}? This action
+              cannot be undone once confirmed.`}
+            </Text>
+          </div>
+        </div>
+        <div className="flex flex-col my-7 space-y-2">
+          <InputText
+            onChange={(text: string) => {
+              setConfirmationString(text)
+            }}
+            heading="Type REVOKE to confirm*"
+          />
+        </div>
+
+        <div className="flex justify-end items-center space-x-3">
+          <Button
+            btnType="secondary-alt"
+            onClick={() => setIsOpen(false)}
+            className="bg-gray-100"
+          >
+            Cancel
+          </Button>
+
+          <fetcher.Form
+            action={`/settings/applications/${clientId}/revoke`}
+            method="post"
+          >
+            <Button
+              type="submit"
+              btnType="dangerous-alt"
+              disabled={confirmationString !== 'REVOKE'}
+            >
+              Revoke Access
+            </Button>
+          </fetcher.Form>
+        </div>
+      </div>
+    </Modal>
+  )
+}
 
 const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
   const EmailView = ({
@@ -514,8 +591,17 @@ export default () => {
     }
   })
 
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
+
   return (
     <>
+      <ConfirmRevocationModal
+        title={app.title}
+        clientId={app.clientId}
+        isOpen={confirmationModalOpen}
+        setIsOpen={setConfirmationModalOpen}
+      />
+
       <nav className="flex items-center gap-4">
         <Text size="sm" weight="medium" className="text-gray-600">
           Applications
@@ -540,6 +626,17 @@ export default () => {
             {new Date().toLocaleString()}
           </Text>
         </div>
+
+        <Button
+          type="submit"
+          btnType="dangerous-alt"
+          onClick={() => {
+            setConfirmationModalOpen(true)
+          }}
+          className="hidden lg:block"
+        >
+          Revoke Access
+        </Button>
       </section>
 
       <section>
@@ -547,6 +644,17 @@ export default () => {
           {modeledScopes.map((scope) => (
             <ClaimsMobileView {...scope} />
           ))}
+
+          <Button
+            type="submit"
+            btnType="dangerous-alt"
+            onClick={() => {
+              setConfirmationModalOpen(true)
+            }}
+            className="mt-4 w-full"
+          >
+            Revoke Access
+          </Button>
         </div>
 
         <div className="hidden lg:block border rounded-lg">
