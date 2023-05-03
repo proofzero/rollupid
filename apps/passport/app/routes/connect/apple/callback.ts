@@ -18,10 +18,7 @@ import {
   authenticateAddress,
   checkOAuthError,
 } from '~/utils/authenticate.server'
-import {
-  getAuthzCookieParams,
-  getJWTConditionallyFromSession,
-} from '~/session.server'
+import { getAuthzCookieParams, getUserSession } from '~/session.server'
 
 type AppleUser = {
   email: string
@@ -86,11 +83,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     context.traceSpan
   )
   const account = await addressClient.resolveAccount.query({
-    jwt: await getJWTConditionallyFromSession(
-      request,
-      context.env,
-      appData?.clientId
-    ),
+    jwt: await getUserSession(request, context.env, appData?.clientId),
     force: !appData || appData.rollup_action !== 'connect',
   })
   const current = await addressClient.getOAuthData.query()

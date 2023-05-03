@@ -5,10 +5,7 @@ import { getAddressClient } from '../../../platform.server'
 import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
-import {
-  getAuthzCookieParams,
-  getJWTConditionallyFromSession,
-} from '../../../session.server'
+import { getAuthzCookieParams, getUserSession } from '../../../session.server'
 
 export const signMessageTemplate = `Welcome to Rollup!
 
@@ -72,11 +69,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const { existing } = await addressClient.verifyNonce.mutate({
     nonce: formData.get('nonce') as string,
     signature: formData.get('signature') as string,
-    jwt: await getJWTConditionallyFromSession(
-      request,
-      context.env,
-      appData?.clientId
-    ),
+    jwt: await getUserSession(request, context.env, appData?.clientId),
     forceAccountCreation: !appData || appData.rollup_action !== 'connect',
   })
 

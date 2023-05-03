@@ -371,14 +371,6 @@ export async function getValidatedSessionContext(
   }
 }
 
-export async function getJWTConditionallyFromSession(
-  request: Request,
-  env: Env,
-  clientId?: string
-): Promise<string | undefined> {
-  return getUserSession(request, env, clientId)
-}
-
 export function parseJwt(token: string): JWTPayload {
   const payload = jose.decodeJwt(token)
   if (!payload) {
