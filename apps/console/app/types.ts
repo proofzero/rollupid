@@ -31,6 +31,10 @@ export type errorsAuthProps = {
   name?: string
 }
 
+export type errorsTeamProps = {
+  upserteAppContactAddress?: string
+}
+
 export type AuthorizedProfile = AuthorizedUser
 
 export type edgesMetadata = EdgesMetadata
