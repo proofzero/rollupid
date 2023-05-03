@@ -175,9 +175,9 @@ const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
               </div>
 
               <section className="flex flex-row flex-wrap gap-2">
-                {accounts.map((a) => (
+                {accounts.map((a, i) => (
                   <UserPill
-                    key={`${a.address}`}
+                    key={i}
                     size={20}
                     text={a.address}
                     avatarURL={a.icon}
@@ -268,23 +268,18 @@ const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
 
   return (
     <div className="flex flex-col gap-2">
-      {claims.map((claim) => {
+      {claims.map((claim, i) => {
         switch (claim.claim) {
           case 'email':
             return (
               <EmailView
-                key={`${claim.claim}`}
+                key={i}
                 address={claim.address}
                 sourceIcon={claim.sourceIcon}
               />
             )
           case 'connected_accounts':
-            return (
-              <ConnectedAccountsView
-                key={`${claim.claim}`}
-                accounts={claim.accounts}
-              />
-            )
+            return <ConnectedAccountsView key={i} accounts={claim.accounts} />
         }
       })}
     </div>
@@ -387,9 +382,9 @@ const ClaimsWideView = ({ claims }: { claims: any[] }) => {
                 <Text className="mb-2">Connected Accounts</Text>
 
                 <section className="flex flex-row flex-wrap gap-2">
-                  {accounts.map((a) => (
+                  {accounts.map((a, i) => (
                     <UserPill
-                      key={`${a.address}`}
+                      key={i}
                       size={20}
                       text={a.address}
                       avatarURL={a.icon}
@@ -497,23 +492,18 @@ const ClaimsWideView = ({ claims }: { claims: any[] }) => {
 
   return (
     <>
-      {claims.map((claim) => {
+      {claims.map((claim, i) => {
         switch (claim.claim) {
           case 'email':
             return (
               <EmailView
-                key={`${claims.join(' ')}-${claim.claim}`}
+                key={i}
                 address={claim.address}
                 sourceIcon={claim.sourceIcon}
               />
             )
           case 'connected_accounts':
-            return (
-              <ConnectedAccountsView
-                key={`${claims.join(' ')}-${claim.claim}`}
-                accounts={claim.accounts}
-              />
-            )
+            return <ConnectedAccountsView key={i} accounts={claim.accounts} />
         }
       })}
     </>
@@ -621,7 +611,11 @@ export default () => {
         <img src={app.icon} className="w-12 h-12 lg:w-16 lg:h-16 rounded-lg" />
 
         <div className="flex-1">
-          <Text size="lg" weight="semibold" className="text-gray-900 mb-3">
+          <Text
+            size="lg"
+            weight="semibold"
+            className="text-gray-900 mb-1.5 lg:mb-3"
+          >
             {app.title}
           </Text>
 
@@ -653,8 +647,8 @@ export default () => {
 
       <section>
         <div className="lg:hidden">
-          {modeledScopes.map((scope) => (
-            <ClaimsMobileView {...scope} />
+          {modeledScopes.map((scope, i) => (
+            <ClaimsMobileView key={i} {...scope} />
           ))}
 
           <Button
@@ -703,8 +697,8 @@ export default () => {
               </tr>
             </thead>
 
-            {modeledScopes.map((scope) => (
-              <tbody className="border-t border-gray-200">
+            {modeledScopes.map((scope, i) => (
+              <tbody key={i} className="border-t border-gray-200">
                 <ClaimsWideView key={scope.claims.join(' ')} {...scope} />
               </tbody>
             ))}
