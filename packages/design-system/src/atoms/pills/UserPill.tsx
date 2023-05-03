@@ -19,7 +19,7 @@ export default ({
 }: UserPillProps) => (
   <button
     {...buttonProps}
-    className={`w-fit inline-block rounded py-0.5 pr-2.5 bg-white flex flex-row items-center rounded-full gap-2 pl-1 border border-gray-200 hover:border-indigo-500 focus:border-indigo-500 focus:bg-indigo-50 ${className}`}
+    className={`min-w-0 w-fit inline-block rounded py-0.5 pr-2.5 bg-white flex flex-row items-center rounded-full gap-2 pl-1 border border-gray-200 hover:border-indigo-500 focus:border-indigo-500 focus:bg-indigo-50 ${className}`}
   >
     <img
       src={avatarURL}

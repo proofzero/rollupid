@@ -4,7 +4,7 @@ import { useLoaderData, useOutletContext } from '@remix-run/react'
 import { loader as scopesLoader } from './scopes'
 import { AuthorizedAppsModel } from '~/routes/settings'
 import { Text } from '@proofzero/design-system'
-import { FaChevronDown, FaChevronRight, FaChevronUp } from 'react-icons/fa'
+import { FaChevronDown, FaChevronRight } from 'react-icons/fa'
 
 import MultiAvatar from '@proofzero/design-system/src/molecules/avatar/MultiAvatar'
 import UserPill from '@proofzero/design-system/src/atoms/pills/UserPill'
@@ -13,19 +13,9 @@ import { Disclosure } from '@headlessui/react'
 import { useState } from 'react'
 import { getDefaultIconUrl } from '~/components/addresses/AddressListItem'
 
-import { useHydrated } from '@proofzero/design-system/src/hooks/useHydrated'
-
 import passportLogoURL from '~/assets/PassportIcon.svg'
 
-const ClaimsMobileView = ({
-  timestamp,
-  claims,
-}: {
-  timestamp: number
-  claims: any[]
-}) => {
-  const hydrated = useHydrated()
-
+const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
   const EmailView = ({
     address,
     sourceIcon,
@@ -68,8 +58,6 @@ const ClaimsMobileView = ({
       | undefined
     >()
 
-    const hydrated = useHydrated()
-
     return (
       <Disclosure>
         {({ open }) => (
@@ -96,9 +84,9 @@ const ClaimsMobileView = ({
               </section>
               <section>
                 {open ? (
-                  <FaChevronUp className="w-5 h-5 text-indigo-500" />
+                  <FaChevronDown className="w-4 h-4 text-indigo-500" />
                 ) : (
-                  <FaChevronDown className="w-5 h-5 text-indigo-500" />
+                  <FaChevronRight className="w-4 h-4 text-gray-500" />
                 )}
               </section>
             </Disclosure.Button>
@@ -111,7 +99,7 @@ const ClaimsMobileView = ({
               <section className="flex flex-row flex-wrap gap-2">
                 {accounts.map((a) => (
                   <UserPill
-                    key={`${timestamp}-${a.address}`}
+                    key={`${a.address}`}
                     size={20}
                     text={a.address}
                     avatarURL={a.icon}
@@ -140,7 +128,7 @@ const ClaimsMobileView = ({
 
                   <div className="flex flex-row gap-1 items-center">
                     <Text size="xs" weight="semibold" className="text-gray-500">
-                      Email:
+                      Address:
                     </Text>
                     <Text
                       size="xs"
@@ -191,27 +179,6 @@ const ClaimsMobileView = ({
                       Yes
                     </Text>
                   </div>
-
-                  <div className="flex flex-row gap-1 items-center">
-                    <Text size="xs" weight="semibold" className="text-gray-500">
-                      Approved:
-                    </Text>
-                    <Text
-                      size="xs"
-                      weight="medium"
-                      className="text-gray-500 truncate"
-                    >
-                      {hydrated &&
-                        new Date(timestamp * 1000).toLocaleString('default', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit',
-                        })}
-                    </Text>
-                  </div>
                 </div>
               )}
             </Disclosure.Panel>
@@ -223,24 +190,12 @@ const ClaimsMobileView = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <Text size="sm" weight="medium" className="text-gray-500 truncate">
-        {hydrated &&
-          new Date(timestamp * 1000).toLocaleString('default', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-          })}
-      </Text>
-
       {claims.map((claim) => {
         switch (claim.claim) {
           case 'email':
             return (
               <EmailView
-                key={`${timestamp}-${claim.claim}`}
+                key={`${claim.claim}`}
                 address={claim.address}
                 sourceIcon={claim.sourceIcon}
               />
@@ -248,7 +203,7 @@ const ClaimsMobileView = ({
           case 'connected_accounts':
             return (
               <ConnectedAccountsView
-                key={`${timestamp}-${claim.claim}`}
+                key={`${claim.claim}`}
                 accounts={claim.accounts}
               />
             )
@@ -316,7 +271,7 @@ const ClaimsWideView = ({ claims }: { claims: any[] }) => {
               <td className={`px-6 py-3 ${open ? `bg-gray-50` : ''}`}>
                 <Disclosure.Button className="flex flex-row items-center gap-1.5">
                   {open ? (
-                    <FaChevronDown className="w-3 h-3 text-gray-500" />
+                    <FaChevronDown className="w-3 h-3 text-indigo-500" />
                   ) : (
                     <FaChevronRight className="w-3 h-3 text-gray-500" />
                   )}
@@ -582,11 +537,13 @@ export default () => {
       </section>
 
       <section>
-        {/* {modeledScopes.map((scope) => (
-          <ClaimsMobileView {...scope} />
-        ))} */}
+        <div className="lg:hidden">
+          {modeledScopes.map((scope) => (
+            <ClaimsMobileView {...scope} />
+          ))}
+        </div>
 
-        <div className="border rounded-lg">
+        <div className="hidden lg:block border rounded-lg">
           <table className="min-w-full">
             <thead className="bg-gray-50">
               <tr>
