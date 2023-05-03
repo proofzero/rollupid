@@ -84,7 +84,7 @@ async function streamToArrayBuffer(
 }
 
 function parseOTPFromMessage(messageBody: string) {
-  const otpMatch = messageBody.match(/Your Rollup.id verification code is (.+)/)
+  const otpMatch = messageBody.match(/id="passcode">(.+)<\/div>/)
   if (!otpMatch) {
     throw new Error('Could not parse OTP from email')
   }
