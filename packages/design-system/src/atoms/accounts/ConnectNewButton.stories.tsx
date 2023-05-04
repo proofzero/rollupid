@@ -17,4 +17,4 @@ const Template = () => (
   </div>
 )
 
-export const ConnectedAccountSelectExample = Template.bind({}) as any
+export const ConnectNewAccountButtonExample = Template.bind({}) as any
