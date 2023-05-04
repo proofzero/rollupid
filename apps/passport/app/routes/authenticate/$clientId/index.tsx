@@ -173,68 +173,70 @@ export default () => {
     switch (key) {
       case 'wallet':
         el = (
-          <ConnectButton
-            key={key}
-            signData={signData}
-            isLoading={loading}
-            fullSize={flex}
-            displayContinueWith={displayContinueWith}
-            connectCallback={async (address) => {
-              if (loading) return
-              // fetch nonce and kickoff sign flow
-              setLoading(true)
-              fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
-                .then((res) =>
-                  res.json<{
-                    nonce: string
-                    state: string
-                    address: string
-                  }>()
-                )
-                .then(({ nonce, state, address }) => {
-                  setSignData({
-                    nonce,
-                    state,
-                    address,
-                    signature: undefined,
+          <WagmiConfig client={client}>
+            <ConnectButton
+              key={key}
+              signData={signData}
+              isLoading={loading}
+              fullSize={flex}
+              displayContinueWith={displayContinueWith}
+              connectCallback={async (address) => {
+                if (loading) return
+                // fetch nonce and kickoff sign flow
+                setLoading(true)
+                fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
+                  .then((res) =>
+                    res.json<{
+                      nonce: string
+                      state: string
+                      address: string
+                    }>()
+                  )
+                  .then(({ nonce, state, address }) => {
+                    setSignData({
+                      nonce,
+                      state,
+                      address,
+                      signature: undefined,
+                    })
                   })
+                  .catch((err) => {
+                    toast(ToastType.Error, {
+                      message:
+                        'Could not fetch nonce for signing authentication message',
+                    })
+                  })
+              }}
+              signCallback={(address, signature, nonce, state) => {
+                console.debug('signing complete')
+                setSignData({
+                  ...signData,
+                  signature,
                 })
-                .catch((err) => {
+                submit(
+                  { signature, nonce, state },
+                  {
+                    method: 'post',
+                    action: `/connect/${address}/sign`,
+                  }
+                )
+              }}
+              connectErrorCallback={(error) => {
+                console.debug('transition.state: ', transition.state)
+                if (transition.state !== 'idle' || !loading) {
+                  return
+                }
+                if (error) {
+                  console.error(error)
                   toast(ToastType.Error, {
                     message:
-                      'Could not fetch nonce for signing authentication message',
+                      'Failed to complete signing. Please try again or contact support.',
                   })
-                })
-            }}
-            signCallback={(address, signature, nonce, state) => {
-              console.debug('signing complete')
-              setSignData({
-                ...signData,
-                signature,
-              })
-              submit(
-                { signature, nonce, state },
-                {
-                  method: 'post',
-                  action: `/connect/${address}/sign`,
+                  setLoading(false)
                 }
-              )
-            }}
-            connectErrorCallback={(error) => {
-              console.debug('transition.state: ', transition.state)
-              if (transition.state !== 'idle' || !loading) {
-                return
-              }
-              if (error) {
-                console.error(error)
-                toast(ToastType.Error, {
-                  message:
-                    'Failed to complete signing. Please try again or contact support.',
-                })
-                setLoading(false)
-              }
-            }}
-          />
+              }}
+            />
+          </WagmiConfig>
         )
         break
       case 'email':
@@ -332,8 +334,7 @@ export default () => {
   }
 
   return (
-    // Maybe suspense here?
-    <WagmiConfig client={client}>
+    <>
       {transition.state !== 'idle' && <Loader />}
 
       <Authentication
@@ -390,7 +391,7 @@ export default () => {
           )}
         </div>
       </Authentication>
-    </WagmiConfig>
+    </>
   )
 }
 

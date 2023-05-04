@@ -30,7 +30,7 @@ export const AuthButton = ({
     <div
       className={`flex ${
         fullSize ? 'justify-start' : 'justify-center'
-      } items-center w-full py-1.5 space-x-3`}
+      } items-center w-full space-x-3 h-[36px]`}
     >
       {Graphic && (
         <div
