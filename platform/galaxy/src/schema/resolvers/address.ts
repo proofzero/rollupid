@@ -152,7 +152,10 @@ const addressResolvers: Resolvers = {
 
       if (
         !personaData ||
-        personaData.smart_contract_wallet !== smartContractWalletAddress
+        !personaData.erc_4337.some(
+          (scWallet: { nickname: string; address: string }) =>
+            scWallet.address === smartContractWalletAddress
+        )
       ) {
         throw new GraphQLError('Invalid smart contract wallet address.')
       }

@@ -244,10 +244,10 @@ export async function getClaimValues(
           picture: nodeResult.qc.picture,
         }
       }
-    } else if (scopeValue === 'smart_contract_wallet') {
+    } else if (scopeValue === 'erc_4337') {
       result = {
         ...result,
-        [scopeValue]: personaData.smart_contract_wallet,
+        [scopeValue]: personaData.erc_4337,
       }
     } else if (scopeValue === 'connected_accounts') {
       if (

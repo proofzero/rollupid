@@ -393,7 +393,7 @@ const scopeIcons: Record<string, string> = {
   connected_accounts: addressClassIcon,
   profile: profileClassIcon,
   email: emailClassIcon,
-  smart_contract_wallet: smartContractWalletClassIcon,
+  erc_4337: smartContractWalletClassIcon,
 }
 
 export default function Authorize() {
@@ -425,8 +425,9 @@ export default function Authorize() {
   const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
     Array<AddressURN> | Array<AuthorizationControlSelection>
   >([])
-  const [selectedSCWallet, setSelectedSCWallet] =
-    useState<SCWalletSelectListItem>()
+  const [selectedSCWallets, setSelectedSCWallets] = useState<
+    { nickname: string; address?: string }[]
+  >([])
 
   // Re-render the component every time persona gets updated
   useEffect(() => {}, [persona])
@@ -475,8 +476,8 @@ export default function Authorize() {
       }
     }
 
-    if (requestedScope.includes('smart_contract_wallet') && selectedSCWallet) {
-      personaData.smart_contract_wallet = selectedSCWallet.cryptoAddress
+    if (requestedScope.includes('erc_4337') && selectedSCWallets) {
+      personaData.erc_4337 = selectedSCWallets
     }
 
     // TODO: Everything should be a form field now handled by javascript
@@ -556,7 +557,7 @@ export default function Authorize() {
 
                         {scope !== 'email' &&
                           scope !== 'connected_accounts' &&
-                          scope !== 'smart_contract_wallet' && (
+                          scope !== 'erc_4337' && (
                             <Text
                               size="sm"
                               weight="medium"
@@ -565,7 +566,7 @@ export default function Authorize() {
                               {scopeMeta.scopes[scope].name}
                             </Text>
                           )}
-                        {scope === 'smart_contract_wallet' && (
+                        {scope === 'erc_4337' && (
                           <div className="flex-1 min-w-0">
                             <SmartContractWalletSelect
                               wallets={connectedSmartContractWallets}
@@ -583,7 +584,14 @@ export default function Authorize() {
                                   return navigate(`/authorize?${qp.toString()}`)
                                 }
 
-                                setSelectedSCWallet(selected)
+                                if (selected) {
+                                  setSelectedSCWallets([
+                                    {
+                                      nickname: selected.title,
+                                      address: selected.cryptoAddress,
+                                    },
+                                  ])
+                                }
                               }}
                             />
                           </div>
@@ -715,9 +723,8 @@ export default function Authorize() {
                         (!connectedEmails?.length || !selectedEmail)) ||
                       (requestedScope.includes('connected_accounts') &&
                         !selectedConnectedAccounts?.length) ||
-                      (requestedScope.includes('smart_contract_wallet') &&
-                        (typeof selectedSCWallet !== 'object' ||
-                          selectedSCWallet?.cryptoAddress?.length === 0))
+                      (requestedScope.includes('erc_4337') &&
+                        !selectedSCWallets.length)
                     }
                     onClick={() => {
                       authorizeCallback(requestedScope)
