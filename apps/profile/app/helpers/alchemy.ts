@@ -1,4 +1,4 @@
-import { GraphQLYogaError } from '@graphql-yoga/common'
+import { GraphQLError } from 'graphql'
 
 import {
   AlchemyChain,
@@ -167,7 +167,7 @@ export const getContractsForAllChains = async ({
       ownedNfts,
     }
   } catch (ex) {
-    console.error(new GraphQLYogaError(ex as string))
+    console.error(new GraphQLError(ex as string))
     return {
       ownedNfts: [] as NFT[],
     }

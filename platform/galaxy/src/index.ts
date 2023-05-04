@@ -1,4 +1,4 @@
-import { createServer } from '@graphql-yoga/common'
+import { createYoga } from 'graphql-yoga'
 import {
   generateTraceSpan,
   TraceSpan,
@@ -6,18 +6,13 @@ import {
 import Env from './env'
 import schema from './schema'
 
-type GalaxyServerContext = {
+export type GalaxyServerContext = {
   env: Env
   ctx: ExecutionContext
   traceSpan: TraceSpan
 }
 
-const yoga = createServer<GalaxyServerContext>({
-  schema,
-  context: ({ request, extensions, ...rest }) => {
-    return { request, extensions, ...rest }
-  },
-})
+const yoga = createYoga<GalaxyServerContext>({ schema })
 
 export default {
   async fetch(
@@ -27,7 +22,7 @@ export default {
   ): Promise<Response> {
     const traceSpan = generateTraceSpan(request.headers)
     console.debug('Starting GQL handler', traceSpan.toString())
-    const result = (await yoga.handleRequest(request, {
+    const result = (await yoga.fetch(request, {
       env,
       ctx,
       traceSpan,

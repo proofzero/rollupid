@@ -7,7 +7,7 @@ export async function getGalaxyClient(reqHeaders: PlatformHeaders) {
   const traceparent = JSON.stringify({
     traceparent: reqHeaders ? reqHeaders[TRACEPARENT_HEADER_NAME] : '',
   })
-  const gqlClient = new GraphQLClient('http://127.0.0.1', {
+  const gqlClient = new GraphQLClient('http://127.0.0.1/graphql', {
     // @ts-ignore
     fetch: Galaxy.fetch.bind(Galaxy),
     requestMiddleware: (r) => {

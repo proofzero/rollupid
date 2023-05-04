@@ -1,4 +1,4 @@
-import { GraphQLYogaError } from '@graphql-yoga/common'
+import { GraphQLError } from 'graphql'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
@@ -72,7 +72,7 @@ export const temporaryConvertToPublic =
 
 export const isAuthorized = () => (next) => (root, args, context, info) => {
   if (!context.jwt) {
-    throw new GraphQLYogaError('You are not authenticated!', {
+    throw new GraphQLError('You are not authenticated!', {
       extensions: {
         http: {
           status: 401,
@@ -85,7 +85,7 @@ export const isAuthorized = () => (next) => (root, args, context, info) => {
     // TODO: update to check if user is authorized with authorzation header
     // Currently, until write scopes are implemented, this middleware will always
     // return http 403, unless call is coming internally from service binding
-    throw new GraphQLYogaError('You are not authorized!', {
+    throw new GraphQLError('You are not authorized!', {
       extensions: {
         http: {
           status: 403,
@@ -104,7 +104,7 @@ export const validateApiKey =
     if (!isFromCFBinding(context.request)) {
       const apiKey = context.apiKey
       if (!apiKey) {
-        throw new GraphQLYogaError('No API Key provided.', {
+        throw new GraphQLError('No API Key provided.', {
           extensions: {
             http: {
               status: 400,
@@ -125,7 +125,7 @@ export const validateApiKey =
       try {
         apiKeyValidity = await starbaseClient.checkApiKey.query({ apiKey })
       } catch (e) {
-        throw new GraphQLYogaError('Unable to validate given API key.', {
+        throw new GraphQLError('Unable to validate given API key.', {
           extensions: {
             http: {
               status: 401,
@@ -135,7 +135,7 @@ export const validateApiKey =
       }
 
       if (!apiKeyValidity.valid) {
-        throw new GraphQLYogaError('Invalid API key provided.', {
+        throw new GraphQLError('Invalid API key provided.', {
           extensions: {
             http: {
               status: 401,
@@ -153,7 +153,7 @@ export const validateApiKey =
         const clientId = ApplicationURNSpace.parse(jwtSub).decoded
 
         if (!aud.includes(clientId)) {
-          throw new GraphQLYogaError(
+          throw new GraphQLError(
             "Client ID in API key doesn't match with the one in JWT.",
             {
               extensions: {
@@ -173,7 +173,7 @@ export const validateApiKey =
 export async function checkHTTPStatus(response: Response) {
   if (response.status !== 200) {
     const json: { error: string } = await response.json()
-    throw new GraphQLYogaError(
+    throw new GraphQLError(
       `Error: ${response.status} ${response.statusText}: ${json.error}`,
       {
         extensions: {
@@ -193,13 +193,13 @@ export async function getRPCResult(response: Response) {
   } = await response.json()
   if (json.error) {
     // TODO: we should get proper error codes from the RPC
-    let status = parseInt(json.error.code) > 0 ? json.error.code : 400
+    let status = Number(json.error.code) > 0 ? Number(json.error.code) : 400
     switch (json.error.message) {
       case 'cannot authorize':
         status = 401
         break
     }
-    throw new GraphQLYogaError(
+    throw new GraphQLError(
       `Error: ${json.error?.code} ${json.error?.message}`,
       {
         extensions: {
