@@ -215,7 +215,7 @@ const { profile } = await myGeneratedClient.getProfileFromAddress({
 
 #### X-Galaxy-Key Header
 
-This is the API Key that can be found in the dashboard of you [Console](../platform/console/) App and is required to authenticate into the Galaxy API.
+This is the API Key that can be found in the dashboard of your [Console](../platform/console/) App and is required to authenticate into the Galaxy API.
 
 #### Authorization Header
 
