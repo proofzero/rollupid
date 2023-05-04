@@ -139,9 +139,16 @@ export async function getUserSession(
   const cookie = getUserSessionStorage(env, clientId)
   const data = await cookie.parse(request.headers.get('Cookie'))
   if (!data) return ''
-  if (typeof data === 'object' && data.cipher && data.iv)
-    return decryptSession(env.SECRET_SESSION_KEY, data.cipher, data.iv)
-  else return ''
+
+  if (typeof data === 'object' && data.cipher && data.iv) {
+    try {
+      return await decryptSession(env.SECRET_SESSION_KEY, data.cipher, data.iv)
+    } catch (error) {
+      console.error('getUserSession:decryptSession()', error)
+    }
+  }
+
+  return ''
 }
 
 export async function destroyUserSession(
