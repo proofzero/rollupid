@@ -18,7 +18,7 @@ export const AuthButton = ({
   text,
   disabled,
   onClick,
-  fullSize,
+  fullSize = true,
   displayContinueWith = false,
 }: AuthButtonProps) => (
   <Button
