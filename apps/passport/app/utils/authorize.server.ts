@@ -12,7 +12,7 @@ import type { GetAddressProfileResult } from '@proofzero/platform.address/src/js
 import {
   SCOPE_CONNECTED_ACCOUNTS,
   SCOPE_EMAIL,
-  SCOPE_SMART_CONTRACT_WALLET,
+  SCOPE_SMART_CONTRACT_WALLETS,
 } from '@proofzero/security/scopes'
 
 import type { AccountURN } from '@proofzero/urns/account'
@@ -88,7 +88,7 @@ export const getDataForScopes = async (
           })
       )
     }
-    if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLET)!)) {
+    if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!)) {
       const scWalletAddresses = await Promise.all(
         connectedAccounts
           .filter((ca) => {
