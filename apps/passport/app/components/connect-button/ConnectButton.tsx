@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from 'react'
+import { useEffect } from 'react'
 import type { ButtonProps } from '@proofzero/design-system/src/atoms/buttons/Button'
 
 import walletsSvg from './wallets.png'
