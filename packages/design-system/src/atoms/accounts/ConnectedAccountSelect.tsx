@@ -128,7 +128,7 @@ export const ConnectedAccountSelect = ({
 
               <div className="mx-4 w-100 border-b border-gray-200"></div>
 
-              <div className="px-4 pb-3 space-y-3 max-h-[140px] overflow-y-scroll no-scrollbar">
+              <div className="px-4 pb-3 space-y-3 max-h-[140px] overflow-y-scroll thin-scrollbar">
                 {accounts?.map((account) => (
                   <Listbox.Option
                     key={account.addressURN}
