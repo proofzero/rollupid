@@ -1,10 +1,13 @@
-import { createYoga } from 'graphql-yoga'
+import { createYoga, maskError as _maskError } from 'graphql-yoga'
 import { useSofaWithSwaggerUI } from '@graphql-yoga/plugin-sofa'
 
 import {
   generateTraceSpan,
   TraceSpan,
 } from '@proofzero/platform-middleware/trace'
+
+import { formatError } from '@proofzero/utils/yoga'
+
 import Env from './env'
 import schema from './schema'
 
@@ -14,18 +17,24 @@ export type GalaxyServerContext = {
   traceSpan: TraceSpan
 }
 
+const plugins = [
+  useSofaWithSwaggerUI({
+    basePath: '/rest',
+    swaggerUIEndpoint: '/swagger',
+    info: {
+      title: 'Galaxy API',
+      version: '0.0.1',
+    },
+  }),
+]
+
+const maskError = (error: unknown, message: string, isDev?: boolean): Error =>
+  formatError(error) ?? _maskError(error, message, isDev)
+
 const yoga = createYoga<GalaxyServerContext>({
   schema,
-  plugins: [
-    useSofaWithSwaggerUI({
-      basePath: '/rest',
-      swaggerUIEndpoint: '/swagger',
-      info: {
-        title: 'Galaxy API',
-        version: '0.0.1',
-      },
-    }),
-  ],
+  maskedErrors: { maskError },
+  plugins,
 })
 
 export default {
