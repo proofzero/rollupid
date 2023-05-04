@@ -91,7 +91,7 @@ export default () => {
               <>
                 {profile.pfp?.image && (
                   <img
-                    className="w-6 h-6 rounded-full"
+                    className="w-full h-full rounded-full"
                     src={profile.pfp.image}
                     alt="PFP"
                   />
