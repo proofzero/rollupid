@@ -145,7 +145,7 @@ export const SCOPES: ScopeMap = {
   },
   [SCOPE_SMART_CONTRACT_WALLETS]: {
     name: 'Smart contract wallets',
-    description: `Read your smart contract address and make transactions on it on your behalf`,
+    description: `Read your smart contract addresses and make transactions on them on your behalf`,
     class: 'address',
   },
   // NOT READY YET
