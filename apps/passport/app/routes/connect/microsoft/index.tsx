@@ -12,7 +12,10 @@ export const action: ActionFunction = async ({
   context,
 }: ActionArgs) => {
   const url = new URL(request.url)
-  const prompt = url.searchParams.get('prompt')
+  //This needs to be a non-character string value, as falsy values lead to
+  //the authenticator forcing a prompt value of 'none', which breaks login
+  //when user's not already signed into their MS account
+  const prompt = url.searchParams.get('prompt') || ' '
   if (!isPromptValid(prompt))
     throw new RollupError({ message: 'invalid prompt' })
   const authenticator = initAuthenticator(context.env)
@@ -22,5 +25,4 @@ export const action: ActionFunction = async ({
 
 const isPromptValid = (
   prompt: unknown
-): prompt is MicrosoftStrategyOptions['prompt'] =>
-  prompt == null || typeof prompt === 'string'
+): prompt is MicrosoftStrategyOptions['prompt'] => typeof prompt === 'string'
