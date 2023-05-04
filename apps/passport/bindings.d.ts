@@ -11,6 +11,7 @@ declare global {
     Starbase: Fetcher
     Images: Fetcher
 
+    SECRET_SESSION_KEY: string
     SECRET_SESSION_SALT: string
     COOKIE_DOMAIN: string
     PROFILE_APP_URL: string

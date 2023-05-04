@@ -11,6 +11,8 @@ import type { JWTPayload } from 'jose'
 
 import { UnauthorizedError } from '@proofzero/errors'
 
+import { encryptSession, decryptSession } from '@proofzero/utils/session'
+
 import {
   checkToken,
   refreshAccessToken,
@@ -20,7 +22,11 @@ import {
 
 import type { FullProfile, RollupAuth } from '~/types'
 
-// @ts-ignore
+const sessionKey = SECRET_SESSION_KEY
+if (!sessionKey) {
+  throw new Error('SECRET_SESSION_KEY must be set')
+}
+
 const sessionSecret = SECRET_SESSION_SALT
 if (!sessionSecret) {
   throw new Error('SECRET_SESSION_SALT must be set')
@@ -81,7 +87,15 @@ export const getRollupAuthenticator = () => {
         } as FullProfile
         await ProfileKV.put(sub!, JSON.stringify(newProfile))
       }
-      return { accessToken, refreshToken, extraParams }
+      return {
+        accessToken: JSON.stringify(
+          await encryptSession(sessionKey, accessToken)
+        ),
+        refreshToken: JSON.stringify(
+          await encryptSession(sessionKey, refreshToken)
+        ),
+        extraParams,
+      }
     }
   )
   authenticator.use(rollupStrategy, 'rollup')
@@ -97,34 +111,43 @@ export async function requireJWT(request: Request, headers = new Headers()) {
   if (!user) throw redirect('/auth')
 
   try {
-    checkToken(user.accessToken)
-    return user.accessToken
+    const { cipher, iv } = JSON.parse(user.accessToken)
+    if (!cipher || !iv) throw redirect('/auth')
+    const accessToken = await decryptSession(sessionKey, cipher, iv)
+    checkToken(accessToken)
+    return accessToken
   } catch (error) {
-    switch (error) {
-      case InvalidTokenError:
-        throw redirect('/signout')
-    }
-
-    if (error === ExpiredTokenError) {
+    if (error === InvalidTokenError) {
+      throw redirect('/signout')
+    } else if (error === ExpiredTokenError) {
       try {
-        user.accessToken = await refreshAccessToken({
+        const { cipher, iv } = JSON.parse(user.refreshToken)
+        if (!cipher || !iv) throw redirect('/auth')
+        const accessToken = await refreshAccessToken({
           tokenURL: PASSPORT_TOKEN_URL,
-          refreshToken: user.refreshToken,
+          refreshToken: await decryptSession(sessionKey, cipher, iv),
           clientId: PROFILE_CLIENT_ID,
           clientSecret: PROFILE_CLIENT_SECRET,
         })
+        user.accessToken = JSON.stringify(
+          await encryptSession(sessionKey, accessToken)
+        )
+        session.set('user', user)
+        const cookie = await getProfileSessionStorage().commitSession(session)
+        headers.append('Set-Cookie', cookie)
+
+        if (request.method === 'GET') throw redirect(request.url, { headers })
+
+        return accessToken
       } catch (error) {
-        if (error instanceof UnauthorizedError) throw redirect('/signout')
-        else throw error
+        if (error instanceof UnauthorizedError) {
+          console.log('unauthorized refresh token')
+          throw redirect('/signout')
+        } else {
+          console.log('unknown error occurred in refresh token request', error)
+          throw error
+        }
       }
-
-      session.set('user', user)
-      const cookie = await getProfileSessionStorage().commitSession(session)
-      headers.append('Set-Cookie', cookie)
-
-      if (request.method === 'GET') throw redirect(request.url, { headers })
-
-      return user.accessToken
     } else {
       throw redirect('/signout')
     }
@@ -135,7 +158,8 @@ export async function isValidJWT(request: Request): Promise<boolean> {
   const session = await getProfileSession(request)
   const user = session.get('user')
 
-  const jwt = user.accessToken
+  const { cipher, iv } = JSON.parse(user.accessToken)
+  const jwt = await decryptSession(sessionKey, cipher, iv)
 
   if (!jwt || typeof jwt !== 'string') {
     return false
@@ -158,10 +182,7 @@ export function parseJwt(token: string): JWTPayload {
 }
 
 // TODO: reset cookie maxAge if valid
-export async function getProfileSession(
-  request: Request,
-  renew: boolean = true
-) {
+export async function getProfileSession(request: Request) {
   const storage = getProfileSessionStorage()
   return storage.getSession(request.headers.get('Cookie'))
 }
@@ -169,4 +190,10 @@ export async function getProfileSession(
 export async function commitProfileSession(session: Session) {
   const storage = getProfileSessionStorage()
   return storage.commitSession(session)
+}
+
+export const getAccessToken = async (request: Request): Promise<string> => {
+  const session = await getProfileSession(request)
+  const { cipher, iv } = JSON.parse(session.get('user').accessToken)
+  return decryptSession(sessionKey, cipher, iv)
 }

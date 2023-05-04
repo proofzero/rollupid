@@ -15,7 +15,7 @@ import {
   HiOutlineQuestionMarkCircle,
 } from 'react-icons/hi'
 
-import { getProfileSession, parseJwt } from '~/utils/session.server'
+import { getAccessToken, parseJwt } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
 import { ogImageFromProfile } from '~/helpers/ogImage'
 import { getAccountProfile } from '~/helpers/profile'
@@ -54,7 +54,6 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   const galaxyClient = await getGalaxyClient(
     generateTraceContextHeaders(context.traceSpan)
   )
-  const session = await getProfileSession(request)
   if (!address) throw new Error('No address provided in URL')
   if (!type) throw new Error('No provider specified in URL')
 
@@ -82,8 +81,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   // if not handle is this let's assume this is an idref
   let profile, jwt
   try {
-    const user = session.get('user')
-    jwt = user?.accessToken
+    jwt = await getAccessToken(request)
 
     profile = await getAccountProfile({ jwt, accountURN }, context.traceSpan)
 
@@ -207,7 +205,7 @@ const UserAddressLayout = () => {
               </Text>
             )}
             <div
-              className="flex flex-col space-x-0 space-y-5 justify-between w-[70%] 
+              className="flex flex-col space-x-0 space-y-5 justify-between w-[70%]
               lg:justify-center lg:w-full lg:flex-row lg:space-x-10 lg:space-y-0
               items-center text-gray-500 font-size-lg "
             >

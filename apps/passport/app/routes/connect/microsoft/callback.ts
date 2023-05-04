@@ -11,10 +11,7 @@ import {
   authenticateAddress,
   checkOAuthError,
 } from '~/utils/authenticate.server'
-import {
-  getAuthzCookieParams,
-  getJWTConditionallyFromSession,
-} from '~/session.server'
+import { getAuthzCookieParams, getUserSession } from '~/session.server'
 import cacheImageToCF from '~/utils/cacheImageToCF.server'
 
 export const loader: LoaderFunction = async ({
@@ -51,11 +48,7 @@ export const loader: LoaderFunction = async ({
   await addressClient.setOAuthData.mutate(authRes)
 
   const { accountURN, existing } = await addressClient.resolveAccount.query({
-    jwt: await getJWTConditionallyFromSession(
-      request,
-      context.env,
-      appData?.clientId
-    ),
+    jwt: await getUserSession(request, context.env, appData?.clientId),
     force: !appData || appData.rollup_action !== 'connect',
   })
 

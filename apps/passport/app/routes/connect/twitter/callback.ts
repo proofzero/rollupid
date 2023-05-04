@@ -14,10 +14,7 @@ import {
   authenticateAddress,
   checkOAuthError,
 } from '~/utils/authenticate.server'
-import {
-  getAuthzCookieParams,
-  getJWTConditionallyFromSession,
-} from '~/session.server'
+import { getAuthzCookieParams, getUserSession } from '~/session.server'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -47,11 +44,7 @@ export const loader: LoaderFunction = async ({
     context.traceSpan
   )
   const { accountURN, existing } = await addressClient.resolveAccount.query({
-    jwt: await getJWTConditionallyFromSession(
-      request,
-      context.env,
-      appData?.clientId
-    ),
+    jwt: await getUserSession(request, context.env, appData?.clientId),
     force: !appData || appData.rollup_action !== 'connect',
   })
 

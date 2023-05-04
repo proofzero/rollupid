@@ -3,6 +3,7 @@ export const seviceBindings = true
 declare global {
   const NODE_ENV: string
   const COOKIE_DOMAIN: string
+  const SECRET_SESSION_KEY: string
   const SECRET_SESSION_SALT: string
   const PASSPORT_URL: string
   const IMAGES_URL: string

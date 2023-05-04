@@ -83,7 +83,6 @@ export const authenticateAddress = async (
     return createUserSession(
       accessToken,
       getRedirectURL(appData),
-      address,
       env,
       appData?.clientId
     )

@@ -11,10 +11,7 @@ import {
   useSubmit,
   useTransition,
 } from '@remix-run/react'
-import {
-  getAuthzCookieParams,
-  getJWTConditionallyFromSession,
-} from '~/session.server'
+import { getAuthzCookieParams, getUserSession } from '~/session.server'
 import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
@@ -49,11 +46,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     )
 
     const { accountURN, existing } = await addressClient.resolveAccount.query({
-      jwt: await getJWTConditionallyFromSession(
-        request,
-        context.env,
-        appData?.clientId
-      ),
+      jwt: await getUserSession(request, context.env, appData?.clientId),
       force: !appData || appData.rollup_action !== 'connect',
     })
 

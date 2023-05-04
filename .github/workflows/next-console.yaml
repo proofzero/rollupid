@@ -50,7 +50,7 @@ jobs:
           command: publish --env next
           environment: 'next'
           secrets: |
-            SECRET_SESSION_SALT
+            SECRET_SESSION_KEY
         env:
           # A secret used for session encryption.
-          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_TEST }}
+          SECRET_SESSION_KEY: ${{ secrets.SECRET_SESSION_KEY_TEST }}

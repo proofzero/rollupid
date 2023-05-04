@@ -22,9 +22,7 @@ import {
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
-  const session = await getUserSession(request, context.env, params.clientId)
-
-  const jwt = session.get('jwt')
+  const jwt = await getUserSession(request, context.env, params.clientId)
   if (!jwt) {
     const url = new URL(request.url)
     const qpString = url.searchParams.toString()

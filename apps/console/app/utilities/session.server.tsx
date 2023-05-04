@@ -5,7 +5,9 @@
 import invariant from 'tiny-invariant'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
-import { createCookieSessionStorage, redirect } from '@remix-run/cloudflare'
+import { createCookie, redirect } from '@remix-run/cloudflare'
+
+import { decryptSession } from '@proofzero/utils/session'
 
 import {
   checkToken,
@@ -18,28 +20,24 @@ invariant(DEPLOY_ENV, 'DEPLOY_ENV must be set')
 
 // NB: This secret is set using: wrangler secret put.
 // @ts-ignore
-invariant(SECRET_SESSION_SALT, 'SECRET_SESSION_SALT must be set')
+invariant(SECRET_SESSION_KEY, 'SECRET_SESSION_KEY must be set')
 
 // @ts-ignore
 invariant(COOKIE_DOMAIN, 'COOKIE_DOMAIN must be set')
 
-// createCookieSessionStorage
+// createCookie
 // -----------------------------------------------------------------------------
-// TODO load the SECRET_SESSION_SALT from context injected into Loader and
+// TODO load the SECRET_SESSION_KEY from context injected into Loader and
 // use that to construct a Singleton for the session
 
 const getPassportSessionStorage = (MAX_AGE = 7776000 /*60 * 60 * 24 * 90*/) =>
-  createCookieSessionStorage({
-    cookie: {
-      domain: COOKIE_DOMAIN,
-      httpOnly: true,
-      name: '_rollup_session',
-      path: '/',
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: MAX_AGE,
-      secrets: [SECRET_SESSION_SALT],
-    },
+  createCookie('_rollup_session', {
+    domain: COOKIE_DOMAIN,
+    httpOnly: true,
+    path: '/',
+    sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: MAX_AGE,
   })
 
 // getUserSession
@@ -48,9 +46,13 @@ const getPassportSessionStorage = (MAX_AGE = 7776000 /*60 * 60 * 24 * 90*/) =>
 /**
  * @todo reset cookie maxAge if valid
  */
-export function getUserSession(request: Request, renew: boolean = true) {
-  // TODO can headers be optional here?
-  return getPassportSessionStorage().getSession(request?.headers.get('Cookie'))
+export async function getUserSession(request: Request) {
+  const cookie = getPassportSessionStorage()
+  const data = await cookie.parse(request.headers.get('Cookie'))
+  if (!data) return ''
+  if (typeof data === 'object' && data.cipher && data.iv)
+    return decryptSession(SECRET_SESSION_KEY, data.cipher, data.iv)
+  else return ''
 }
 
 // requireJWT
@@ -60,8 +62,7 @@ export function getUserSession(request: Request, renew: boolean = true) {
  * @return an encoded JWT
  */
 export async function requireJWT(request: Request) {
-  const session = await getUserSession(request)
-  const jwt = session.get('jwt')
+  const jwt = await getUserSession(request)
 
   try {
     checkToken(jwt)
@@ -97,13 +98,10 @@ export function parseJwt(token: string): JWTPayload {
 }
 
 export async function destroyUserSession(request: Request, redirectTo: string) {
-  const session = await getUserSession(request)
-  const storage = getPassportSessionStorage()
-
-  const headers = new Headers()
-  headers.append('Set-Cookie', await storage.destroySession(session))
-
+  const cookie = getPassportSessionStorage()
   return redirect(redirectTo, {
-    headers,
+    headers: {
+      'Set-Cookie': await cookie.serialize('', { expires: new Date(0) }),
+    },
   })
 }

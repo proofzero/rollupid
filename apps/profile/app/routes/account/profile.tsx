@@ -8,7 +8,7 @@ import {
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
 import InputText from '~/components/inputs/InputText'
-import { getProfileSession, parseJwt } from '~/utils/session.server'
+import { getAccessToken, parseJwt } from '~/utils/session.server'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
@@ -27,9 +27,7 @@ import { FullProfileSchema } from '~/validation'
 import InputTextarea from '~/components/inputs/InputTextarea'
 
 export const action: ActionFunction = async ({ request, context }) => {
-  const session = await getProfileSession(request)
-  const user = session.get('user')
-  const { sub: accountURN } = parseJwt(user.accessToken)
+  const { sub: accountURN } = parseJwt(await getAccessToken(request))
 
   const formData = await request.formData()
 
@@ -329,9 +327,9 @@ export default function AccountSettingsProfile() {
             </Text>
           )}
 
-          {/* Form where this button is used should have 
+          {/* Form where this button is used should have
           an absolute relative position
-          div below has relative - this way this button sticks to 
+          div below has relative - this way this button sticks to
           bottom right
 
           This div with h-[4rem] prevents everything from overlapping with

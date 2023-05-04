@@ -10,10 +10,7 @@ import {
 } from '~/utils/authenticate.server'
 import type { OAuthData } from '@proofzero/platform.address/src/types'
 import { NodeType, OAuthAddressType } from '@proofzero/types/address'
-import {
-  getAuthzCookieParams,
-  getJWTConditionallyFromSession,
-} from '~/session.server'
+import { getAuthzCookieParams, getUserSession } from '~/session.server'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -48,11 +45,7 @@ export const loader: LoaderFunction = async ({
   )
 
   const { accountURN, existing } = await addressClient.resolveAccount.query({
-    jwt: await getJWTConditionallyFromSession(
-      request,
-      context.env,
-      appData?.clientId
-    ),
+    jwt: await getUserSession(request, context.env, appData?.clientId),
     force: !appData || appData.rollup_action !== 'connect',
   })
 

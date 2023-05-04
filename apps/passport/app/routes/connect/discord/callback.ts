@@ -9,10 +9,7 @@ import type { OAuthData } from '@proofzero/platform.address/src/types'
 
 import { initAuthenticator, getDiscordStrategy } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
-import {
-  getAuthzCookieParams,
-  getJWTConditionallyFromSession,
-} from '~/session.server'
+import { getAuthzCookieParams, getUserSession } from '~/session.server'
 import {
   authenticateAddress,
   checkOAuthError,
@@ -49,11 +46,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     context.traceSpan
   )
   const { accountURN, existing } = await addressClient.resolveAccount.query({
-    jwt: await getJWTConditionallyFromSession(
-      request,
-      context.env,
-      appData?.clientId
-    ),
+    jwt: await getUserSession(request, context.env, appData?.clientId),
     force: !appData || appData.rollup_action !== 'connect',
   })
 

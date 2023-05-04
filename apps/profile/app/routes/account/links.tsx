@@ -8,7 +8,7 @@ import {
   useFetcher,
 } from '@remix-run/react'
 
-import { getProfileSession, parseJwt } from '~/utils/session.server'
+import { getAccessToken, parseJwt } from '~/utils/session.server'
 
 import { HiOutlineTrash } from 'react-icons/hi'
 import { FiEdit } from 'react-icons/fi'
@@ -106,10 +106,7 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
 }
 
 export const action: ActionFunction = async ({ request, context }) => {
-  const session = await getProfileSession(request)
-  const user = session.get('user')
-
-  const { sub: accountURN } = parseJwt(user.accessToken)
+  const { sub: accountURN } = parseJwt(await getAccessToken(request))
 
   const formDataText = await request.text()
   const formData = qs.parse(formDataText) as unknown as { links: Links }
