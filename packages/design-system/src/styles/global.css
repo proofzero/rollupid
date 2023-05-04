@@ -19,3 +19,24 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+/* Chrome, Safari and Opera */
+.thin-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background-color: white;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 999px;
+}
+
+/* IE, Edge and Firefox */
+
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db white;
+}

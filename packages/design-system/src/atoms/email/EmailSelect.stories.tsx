@@ -2,7 +2,7 @@ import React from 'react'
 import { EmailSelect } from './EmailSelect'
 
 import { OAuthAddressType, EmailAddressType } from '@proofzero/types/address'
-import { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedEmails'
+import { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 export default {
   title: 'Atoms/Email/Select',

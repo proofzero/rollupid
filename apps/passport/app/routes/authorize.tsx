@@ -646,6 +646,17 @@ export default function Authorize() {
                                   AuthorizationControlSelection.ALL,
                                 ])
                               }}
+                              onConnectNew={() => {
+                                const qp = new URLSearchParams()
+                                qp.append('scope', requestedScope.join(' '))
+                                qp.append('state', state)
+                                qp.append('client_id', clientId)
+                                qp.append('redirect_uri', redirectOverride)
+                                qp.append('rollup_action', 'connect')
+                                if (prompt) qp.append('prompt', prompt)
+
+                                return navigate(`/authorize?${qp.toString()}`)
+                              }}
                             />
                           </div>
                         )}

@@ -15,7 +15,13 @@ const accounts = Array.from({ length: 10 }, (_, i) => ({
 
 const Template = (args: any) => (
   <div className="w-[262px]">
-    <ConnectedAccountSelect accounts={accounts} {...args} />
+    <ConnectedAccountSelect
+      accounts={accounts}
+      onConnectNew={() => {
+        return null
+      }}
+      {...args}
+    />
   </div>
 )
 
