@@ -121,15 +121,13 @@ const addressResolvers: Resolvers = {
     registerSessionKey: async (
       _parent: any,
       {
-        accountUrn,
         sessionPublicKey,
         smartContractWalletAddress,
       }: {
-        accountUrn: string
         sessionPublicKey: string
         smartContractWalletAddress: string
       },
-      { env, jwt, traceSpan }: ResolverContext
+      { env, jwt, traceSpan, accountURN, clientId }: ResolverContext
     ) => {
       const accessClient = createAccessClient(env.Access, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
@@ -140,13 +138,12 @@ const addressResolvers: Resolvers = {
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      const { aud } = parseJwt(jwt)
-
-      const clientId = aud![0]
-
       const [personaData, paymaster]: [PersonaData, PaymasterType] =
         await Promise.all([
-          accessClient.getPersonaData.query({ clientId, accountUrn }),
+          accessClient.getPersonaData.query({
+            clientId,
+            accountUrn: accountURN,
+          }),
           starbaseClient.getPaymaster.query({ clientId }),
         ])
 
@@ -200,7 +197,6 @@ const AddressResolverComposition = {
     requestLogging(),
     setupContext(),
     validateApiKey(),
-    isAuthorized(),
   ],
 }
 

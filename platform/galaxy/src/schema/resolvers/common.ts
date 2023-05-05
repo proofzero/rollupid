@@ -8,4 +8,5 @@ export type ResolverContext = {
   apiKey: string
   accountURN: AccountURN
   traceSpan: TraceSpan
+  clientId: string
 }
