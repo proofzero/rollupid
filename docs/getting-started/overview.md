@@ -8,7 +8,7 @@ Welcome to the Rollup ID Getting Started Guide! This overview will provide you w
 
 Rollup ID utilizes an OAuth-like authorization scope system, ensuring controlled access to user information. Our implementation extends the standard OAuth protocol to accommodate authorizations specific to user profiles. This allows you to effectively manage user data access and create a secure, customized experience for your users.
 
-You can checkout our [example apps](https://github.com/proofzero/example-apps) to get started quickly with your favorite stack. To learn more what you can do with OAuth authorizations, check out the [Scopes Reference](../reference/scopes.md).
+You can checkout our [example apps](https://github.com/proofzero/example-apps) to get started quickly with your favorite stack. To learn more about what you can do with OAuth authorizations, check out the [Scopes Reference](../reference/scopes.md).
 
 <figure><img src="../.gitbook/assets/Docs_-_Overview_V2.png" alt=""><figcaption></figcaption></figure>
 

@@ -12,18 +12,18 @@ Rollup ID is designed to act as a "logically" or "sufficiently" decentralized us
 
 At the core of the Rollup Platform is the open-source Profile Graph, deployed at the edge on Cloudflare's global infrastructure. The Profile Graph was inspired by the [W3C decentralized identifier specification](https://w3c.github.io/did-use-cases/). Instead of fully adopting the DID specification, Rollup ID utilizes familiar protocols like OAuth to provide a developer-friendly and user-centric platform that respects the goals of the DID spec:
 
-* **Decentralized**: End users should be the issuers
-* **Persistent**: Identifiers should be inherently persistent (and deterministic)
-* **Cryptographically Verifiable**: It should be possible to prove control of the identifier
-* **Resolvable**: It should be possible to discover metadata about the identifier
+- **Decentralized**: End users should be the issuers
+- **Persistent**: Identifiers should be inherently persistent (and deterministic)
+- **Cryptographically Verifiable**: It should be possible to prove control of the identifier
+- **Resolvable**: It should be possible to discover metadata about the identifier
 
 #### Main Features
 
-* Based on the OAuth 2 and OpenID standards, enabling consent-based authorizations to services and data.
-* Authorization tokens are issued by the user, providing full control and transparency into the authorizations.
-* Authorization claims can allow access profile data such as, linked accounts, email addresses, PII/KYC data, smart contract wallets, and more.
-* Protection from "fake accounts" with its identity verification features like passkeys and other MFA features.
-* Designed to support custom claims to third-party services on the platform in the future.
+- Based on the OAuth 2 and OpenID standards, enabling consent-based authorizations to services and data.
+- Authorization tokens are issued by the user, providing full control and transparency into the authorizations.
+- Authorization claims can allow access profile data such as, linked accounts, email addresses, PII/KYC data, smart contract wallets, and more.
+- Protection from "fake accounts" with its identity verification features like passkeys and other MFA features.
+- Designed to support custom claims to third-party services on the platform in the future.
 
 ### Edge-Deployed Profile Graph
 
@@ -31,11 +31,11 @@ Rollup ID is an open-source platform deployed at the edge, designed as a decentr
 
 #### Key Components
 
-* **Nodes:** Nodes represent different types of objects in the graph, including profiles, accounts, linked addresses, storage, smart contract wallets, applications, and authorizations.
-* **Edges:** Edges represent the relationships between nodes and are used to traverse and interact with the graph.
-* **Access Tokens:** Users issue access tokens through claims and scopes to protect traversal of the graph.
-* **Entry Node:** To traverse the graph, an entry node (e.g., subject) is typically required.
-* **Uniform Resource Names (URN):** URNs, as defined in [RFC 8141](https://www.rfc-editor.org/rfc/rfc8141), are used in the profile graph to resolve nodes on the graph.
+- **Nodes:** Nodes represent different types of objects in the graph, including profiles, accounts, linked addresses, storage, smart contract wallets, applications, and authorizations.
+- **Edges:** Edges represent the relationships between nodes and are used to traverse and interact with the graph.
+- **Access Tokens:** Users issue access tokens through claims and scopes to protect traversal of the graph.
+- **Entry Node:** To traverse the graph, an entry node (e.g., subject) is typically required.
+- **Uniform Resource Names (URN):** URNs, as defined in [RFC 8141](https://www.rfc-editor.org/rfc/rfc8141), are used in the profile graph to resolve nodes on the graph.
 
 #### Accessing the Graph
 
@@ -60,4 +60,4 @@ graph TD
 
 With Rollup, users have "passports" they can log in to and manage their identities, issued tokens, and other aspects of their Rollup experience. Passports provide users with full control and transparency over their data and authorizations.
 
-You can lear more about Passports [here](platform/passport.md).
+You can learn more about Passports [here](platform/passport.md).

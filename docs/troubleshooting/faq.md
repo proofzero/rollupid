@@ -8,9 +8,9 @@ description: Frequently Asked Questions
 
 You can get support from the team by joining our [Discord](https://discord.gg/rollupid) or documenting any issues at our [Github](https://github.com/proofzero/rollupid/issues).
 
-## When can will email authentication be supported?
+## When will email authentication be supported?
 
-We take user privacy very seriously. Email login requires more investment then third-party and wallet login services. You can track the work on this [here](https://github.com/proofzero/rollupid/milestone/6).
+We take user privacy very seriously. Email login requires more investment than third-party and wallet login services. You can track the work on this [here](https://github.com/proofzero/rollupid/milestone/6).
 
 ## When will WebAuthn be supported?
 
