@@ -14,7 +14,10 @@ import {
   parseJwt,
 } from './utils'
 
-import { PlatformAddressURNHeader } from '@proofzero/types/headers'
+import {
+  AppAPIKeyHeader,
+  PlatformAddressURNHeader,
+} from '@proofzero/types/headers'
 import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
@@ -127,7 +130,7 @@ const addressResolvers: Resolvers = {
         sessionPublicKey: string
         smartContractWalletAddress: string
       },
-      { env, jwt, traceSpan, accountURN, clientId }: ResolverContext
+      { env, jwt, traceSpan, accountURN, clientId, apiKey }: ResolverContext
     ) => {
       const accessClient = createAccessClient(env.Access, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
@@ -136,6 +139,7 @@ const addressResolvers: Resolvers = {
       const starbaseClient = createStarbaseClient(env.Starbase, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...generateTraceContextHeaders(traceSpan),
+        [AppAPIKeyHeader]: apiKey,
       })
 
       const [personaData, paymaster]: [PersonaData, PaymasterType] =

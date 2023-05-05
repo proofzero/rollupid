@@ -3,6 +3,7 @@ import isFromCFBinding from './isFromCFBinding'
 import gatewayFromIpfs from './gateway-from-ipfs'
 import getAuthzHeaderConditionallyFromToken from './getAuthzHeaderConditionallyFromToken'
 import getAuthzTokenFromReq from './getAuthzTokenFromReq'
+import { parseJwt } from './jwt'
 
 export {
   checkEnv,
@@ -10,4 +11,5 @@ export {
   gatewayFromIpfs,
   getAuthzHeaderConditionallyFromToken,
   getAuthzTokenFromReq,
+  parseJwt,
 }

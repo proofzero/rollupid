@@ -24,6 +24,7 @@ interface CreateInnerContextOptions
   edges?: ReturnType<typeof createEdgesClient>
   accountURN?: AccountURN
   ownAppURNs?: ApplicationURN[]
+  apiKey?: string
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
