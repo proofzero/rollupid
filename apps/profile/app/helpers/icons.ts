@@ -1,18 +1,30 @@
-import { CryptoAddressType, OAuthAddressType } from '@proofzero/types/address'
+import {
+  CryptoAddressType,
+  EmailAddressType,
+  OAuthAddressType,
+} from '@proofzero/types/address'
 
+import ethereumIcon from '@proofzero/design-system/src/assets/social_icons/ethereum.svg'
+import scWalletIcon from '@proofzero/design-system/src/assets/social_icons/sc_wallet.svg'
+import emailIcon from '@proofzero/design-system/src/assets/social_icons/email.svg'
 import appleIcon from '@proofzero/design-system/src/assets/social_icons/apple.svg'
 import discordIcon from '@proofzero/design-system/src/assets/social_icons/discord.svg'
 import githubIcon from '@proofzero/design-system/src/assets/social_icons/github.svg'
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
 import twitterIcon from '@proofzero/design-system/src/assets/social_icons/twitter.svg'
-import ethereumIcon from '@proofzero/design-system/src/assets/social_icons/ethereum.svg'
 
 export const imageFromAddressType = (addressType: string) => {
   let providerIcon = null
   switch (addressType) {
     case CryptoAddressType.ETH:
       providerIcon = ethereumIcon
+      break
+    case CryptoAddressType.Wallet:
+      providerIcon = scWalletIcon
+      break
+    case EmailAddressType.Email:
+      providerIcon = emailIcon
       break
     case OAuthAddressType.Apple:
       providerIcon = appleIcon

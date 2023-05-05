@@ -29,7 +29,11 @@ import SaveButton from '~/components/accounts/SaveButton'
 import type { ActionFunction } from '@remix-run/cloudflare'
 
 import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
-import { CryptoAddressType, OAuthAddressType } from '@proofzero/types/address'
+import {
+  CryptoAddressType,
+  EmailAddressType,
+  OAuthAddressType,
+} from '@proofzero/types/address'
 import { imageFromAddressType } from '~/helpers'
 import type { FullProfile } from '~/types'
 
@@ -49,6 +53,22 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
         title: ap.title,
         icon: imageFromAddressType(CryptoAddressType.ETH),
         provider: CryptoAddressType.ETH,
+      }
+    case CryptoAddressType.Wallet:
+      return {
+        addressURN: ap.urn,
+        address: `https://etherscan.io/address/${ap.address}`,
+        title: ap.title,
+        icon: imageFromAddressType(CryptoAddressType.Wallet),
+        provider: CryptoAddressType.Wallet,
+      }
+    case EmailAddressType.Email:
+      return {
+        addressURN: ap.urn,
+        address: ap.address,
+        title: ap.title,
+        icon: imageFromAddressType(EmailAddressType.Email),
+        provider: EmailAddressType.Email,
       }
     case OAuthAddressType.Apple:
       return {
@@ -264,6 +284,8 @@ export default function AccountSettingsLinks() {
     notify: (success: boolean) => void
     connectedProfiles: any[]
   }>()
+
+  console.log({ connectedProfiles })
 
   const transition = useTransition()
   const actionData = useActionData()
