@@ -17,7 +17,6 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   }
 
   const accessClient = getAccessClient(context.env, context.traceSpan)
-  
   return accessClient.getAuthorizedAppScopes.query({
     clientId,
     accountURN: accountUrn,
