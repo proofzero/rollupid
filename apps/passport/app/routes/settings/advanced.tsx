@@ -65,7 +65,10 @@ export const action: ActionFunction = async ({ request, context }) => {
             context.env,
             context.traceSpan
           )
-          return addressClient.deleteAddressNode.mutate(accountUrn)
+          return addressClient.deleteAddressNode.mutate({
+            accountURN: accountUrn,
+            purge: true,
+          })
         })
       ),
     ])
