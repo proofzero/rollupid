@@ -1,0 +1,16 @@
+name = "worker1"
+compatibility_date = "2023-02-24"
+main = "./src/index.ts"
+workers_dev = false
+
+#Local config
+[dev]
+port = 11119
+[vars]
+FETCH_URL = "http://127.0.0.1:12000"
+
+#Prod config
+[env.prod]
+routes = [{ pattern = "worker1.rollup.id", custom_domain = true }]
+[env.prod.vars]
+FETCH_URL = "https://worker2.rollup.id"

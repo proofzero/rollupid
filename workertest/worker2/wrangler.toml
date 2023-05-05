@@ -1,0 +1,12 @@
+name = "worker2"
+compatibility_date = "2023-02-24"
+main = "./src/index.ts"
+workers_dev = false
+
+#Local config
+[dev]
+port = 12000
+
+#Prod config
+[env.prod]
+routes = [{ pattern = "worker2.rollup.id", custom_domain = true }]
