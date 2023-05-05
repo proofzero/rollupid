@@ -2,7 +2,6 @@ import getEdgesClient from '@proofzero/platform-clients/edges'
 import type { AddressURN } from '@proofzero/urns/address'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { Context } from '../../context'
-import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 import { z } from 'zod'
 
 import {
@@ -13,7 +12,10 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import { ERROR_CODES, RollupError } from '@proofzero/errors'
 import { getAddressReferenceTypes } from './getAddressReferenceTypes'
 
-export const UnsetAccountInput = AccountURNInput
+export const UnsetAccountInput = z.object({
+  accountURN: AccountURNInput,
+  purge: z.boolean().optional(),
+})
 
 export const UnsetAccountOutput = z.object({
   unset: z.object({
@@ -32,6 +34,7 @@ export const unsetAccountMethod = async ({
   input: UnsetAccountParams
   ctx: Context
 }): Promise<UnsetAccountResult> => {
+  const { accountURN, purge } = input
   // TODO replace with usage of InjectEdges middleware
   const edgesClient = getEdgesClient(
     ctx.Edges,
@@ -40,49 +43,61 @@ export const unsetAccountMethod = async ({
   const nodeClient = ctx.address
 
   const accountEdge = await edgesClient.findNode.query({
-    baseUrn: input,
+    baseUrn: accountURN,
   })
 
-  const primaryAddressURN = accountEdge?.qc.primaryAddressURN
+  if (!purge) {
+    const primaryAddressURN = accountEdge?.qc.primaryAddressURN
+    if (primaryAddressURN === ctx.addressURN) {
+      throw new RollupError({
+        code: ERROR_CODES.BAD_REQUEST,
+        message: 'Cannot disconnect primary address',
+      })
+    }
 
-  if (primaryAddressURN === ctx.addressURN) {
-    throw new RollupError({
-      code: ERROR_CODES.BAD_REQUEST,
-      message: 'Cannot disconnect primary address',
-    })
-  }
-
-  const addressUsage = await getAddressReferenceTypes({ ctx })
-  if (addressUsage.length > 0) {
-    throw new RollupError({
-      code: ERROR_CODES.BAD_REQUEST,
-      message: `Cannot disconnect active address (${addressUsage.join(', ')})`,
-    })
+    const addressUsage = await getAddressReferenceTypes({ ctx })
+    if (addressUsage.length > 0) {
+      throw new RollupError({
+        code: ERROR_CODES.BAD_REQUEST,
+        message: `Cannot disconnect active address (${addressUsage.join(
+          ', '
+        )})`,
+      })
+    }
   }
 
   // Get the address associated with the authorization header included in the request.
   const address = ctx.addressURN as AddressURN
 
-  const account = input
-  if (!AccountURNSpace.is(account)) {
+  if (!AccountURNSpace.is(accountURN)) {
     throw new Error('Invalid account URN')
   }
+
+  const { edges: addressEdges } = await edgesClient.getEdges.query({
+    query: {
+      dst: {
+        baseUrn: address,
+      },
+    },
+  })
 
   await Promise.all([
     // Remove the stored account in the node.
     nodeClient?.class.unsetAccount(),
 
-    // Unlink the address and account nodes, removing the "account" edge.
-    edgesClient.removeEdge.mutate({
-      src: account,
-      dst: address,
-      tag: EDGE_ADDRESS,
+    // Remove any edge that references the address node
+    addressEdges.forEach(async (edge) => {
+      edgesClient.removeEdge.mutate({
+        src: edge.src.baseUrn,
+        dst: edge.dst.baseUrn,
+        tag: edge.tag,
+      })
     }),
   ])
 
   return {
     unset: {
-      account: account,
+      account: accountURN,
       address: address,
     },
   }

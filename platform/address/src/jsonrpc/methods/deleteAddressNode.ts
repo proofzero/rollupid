@@ -19,7 +19,10 @@ export const deleteAddressNodeMethod = async ({
   })
 
   // Deletes all address-account associated edges
-  await caller.unsetAccount(input)
+  await caller.unsetAccount({
+    accountURN: input,
+    purge: true,
+  })
 
   return await ctx.address?.storage.deleteAll()
 }

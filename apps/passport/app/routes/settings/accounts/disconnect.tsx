@@ -22,7 +22,9 @@ export const action: ActionFunction = async ({ request, context }) => {
     const addressClient = getAddressClient(id, context.env, context.traceSpan)
     const accountURN = await addressClient.getAccount.query()
 
-    await addressClient.unsetAccount.mutate(accountURN)
+    await addressClient.unsetAccount.mutate({
+      accountURN,
+    })
     return null
   } catch (ex) {
     throw JsonError(ex)
