@@ -46,6 +46,7 @@
     "remix-auth-microsoft": "2.0.0",
     "remix-auth-oauth2": "1.5.0",
     "remix-auth-twitter": "1.0.0",
+    "remix-utils": "6.3.0",
     "wagmi": "0.11.7"
   },
   "devDependencies": {

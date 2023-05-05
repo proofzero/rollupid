@@ -17,7 +17,7 @@ import passportLogoURL from '~/assets/PassportIcon.svg'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import warningImg from '~/assets/warning.svg'
 import InputText from '~/components/inputs/InputText'
-import { useHydrated } from '@proofzero/design-system/src/hooks/useHydrated'
+import { useHydrated } from 'remix-utils'
 
 const ConfirmRevocationModal = ({
   title,
