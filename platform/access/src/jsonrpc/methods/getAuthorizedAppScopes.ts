@@ -97,7 +97,7 @@ export const getAuthorizedAppScopesMethod = async ({
       for (const scope of scopes) {
         if (scope === 'email' && personaData.email) {
           const emailAddressUrn = personaData.email
-          const edgesResults = await ctx.edgesClient.getEdges.query({
+          const edgesResults = await ctx.edgesClient!.getEdges.query({
             query: {
               src: { baseUrn: accessUrn },
               dst: { baseUrn: emailAddressUrn },
