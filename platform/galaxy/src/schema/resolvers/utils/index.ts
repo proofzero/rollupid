@@ -53,10 +53,12 @@ export const setupContext = () => (next) => (root, args, context, info) => {
 
   const accountURN = jwt ? parsedJwt?.sub : undefined
 
+  const clientId = jwt ? parsedJwt?.aud?.[0] : undefined
+
   return next(
     root,
     args,
-    { ...context, jwt, apiKey, accountURN, parsedJwt },
+    { ...context, jwt, apiKey, accountURN, parsedJwt, clientId },
     info
   )
 }
