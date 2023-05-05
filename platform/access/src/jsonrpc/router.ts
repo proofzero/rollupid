@@ -150,6 +150,8 @@ export const appRouter = t.router({
     .query(getPersonaDataMethod),
   getAuthorizedAppScopes: t.procedure
     .use(LogUsage)
+    .use(ValidateJWT)
+    .use(InjectEdges)
     .use(Analytics)
     .input(GetAuthorizedAppScopesMethodInput)
     .output(GetAuthorizedAppScopesMethodOutput)
