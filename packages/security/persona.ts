@@ -285,7 +285,7 @@ export async function getClaimValues(
         const edgeResults = await Promise.allSettled(edgePromises)
 
         //Make typescript gods happy
-        type connectedAddressType = { type: string; alias: string }
+        type connectedAddressType = { type: string; identifier: string }
         const isDefined = (
           optionallyDefined: connectedAddressType | undefined
         ): optionallyDefined is connectedAddressType => !!optionallyDefined
@@ -293,7 +293,10 @@ export async function getClaimValues(
         const claimResults = edgeResults
           .map((e) => {
             if (e.status === 'fulfilled')
-              return { type: e.value.rc.addr_type, alias: e.value.qc.alias }
+              return {
+                type: e.value.rc.addr_type,
+                identifier: e.value.qc.alias,
+              }
           })
           .filter(isDefined)
         result = { ...result, connected_accounts: claimResults }
