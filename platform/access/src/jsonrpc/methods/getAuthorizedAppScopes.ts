@@ -3,11 +3,11 @@ import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'
 import { inputValidators } from '@proofzero/platform-middleware'
 import { AccountURNSpace } from '@proofzero/urns/account'
-import { getPersonaDataMethod } from './getPersonaData'
 import { AuthorizationControlSelection } from '@proofzero/types/application'
 import { AddressURN } from '@proofzero/urns/address'
 import { AccessURNSpace } from '@proofzero/urns/access'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
+import { appRouter } from '../router'
 
 export const GetAuthorizedAppScopesMethodInput = z.object({
   accountURN: inputValidators.AccountURNInput,
@@ -71,6 +71,8 @@ export const getAuthorizedAppScopesMethod = async ({
     }
   })
 
+  const accessCaller = appRouter.createCaller(ctx)
+
   return Promise.all(
     Object.keys(scopeDict).map(async (key) => {
       let claims: {
@@ -85,12 +87,9 @@ export const getAuthorizedAppScopesMethod = async ({
         }[]
       } = {}
 
-      const personaData = await getPersonaDataMethod({
-        input: {
-          accountUrn: accountURN,
-          clientId,
-        },
-        ctx,
+      const personaData = await accessCaller.getPersonaData({
+        accountUrn: accountURN,
+        clientId,
       })
 
       const scopes = scopeDict[key]
