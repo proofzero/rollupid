@@ -1,4 +1,6 @@
 import { createYoga } from 'graphql-yoga'
+import { useSofaWithSwaggerUI } from '@graphql-yoga/plugin-sofa'
+
 import {
   generateTraceSpan,
   TraceSpan,
@@ -12,7 +14,19 @@ export type GalaxyServerContext = {
   traceSpan: TraceSpan
 }
 
-const yoga = createYoga<GalaxyServerContext>({ schema })
+const yoga = createYoga<GalaxyServerContext>({
+  schema,
+  plugins: [
+    useSofaWithSwaggerUI({
+      basePath: '/rest',
+      swaggerUIEndpoint: '/swagger',
+      info: {
+        title: 'Galaxy API',
+        version: '0.0.1',
+      },
+    }),
+  ],
+})
 
 export default {
   async fetch(
