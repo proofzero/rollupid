@@ -2,7 +2,6 @@ import { Outlet, useLoaderData } from '@remix-run/react'
 
 import { json } from '@remix-run/cloudflare'
 import {
-  getAuthzCookieParams,
   getDefaultAuthzParams,
   getValidatedSessionContext,
 } from '~/session.server'
@@ -150,6 +149,7 @@ export default function SettingsLayout() {
                     authorizedApps,
                     connectedProfiles,
                     primaryAddressURN,
+                    CONSOLE_URL,
                   }}
                 />
               </div>
