@@ -67,7 +67,7 @@ export const action: ActionFunction = async ({ request, context }) => {
           )
           return addressClient.deleteAddressNode.mutate({
             accountURN: accountUrn,
-            purge: true,
+            forceDelete: true,
           })
         })
       ),

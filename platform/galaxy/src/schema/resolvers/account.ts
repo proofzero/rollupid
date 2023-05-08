@@ -137,7 +137,7 @@ const accountResolvers: Resolvers = {
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      await addressClient.unsetAccount.mutate({
+      await addressClient.deleteAddressNode.mutate({
         accountURN,
       })
 
