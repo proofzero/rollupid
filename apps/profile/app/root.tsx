@@ -38,6 +38,7 @@ import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import * as gtag from '~/utils/gtags.client'
 
 import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
+import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -75,6 +76,10 @@ export const loader: LoaderFunction = async ({ request }) => {
       INTERNAL_GOOGLE_ANALYTICS_TAG,
       PASSPORT_URL,
       PROFILE_CLIENT_ID,
+      REMIX_DEV_SERVER_WS_PORT:
+        process.env.NODE_ENV === 'development'
+          ? process.env.REMIX_DEV_SERVER_WS_PORT
+          : undefined,
     },
   })
 }
@@ -88,11 +93,15 @@ export default function App() {
       INTERNAL_GOOGLE_ANALYTICS_TAG: string
       PASSPORT_URL: string
       PROFILE_CLIENT_ID: string
+      REMIX_DEV_SERVER_WS_PORT?: number
     }
   }>()
 
   const transition = useTransition()
   const GATag = ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+
+  const remixDevPort = ENV.REMIX_DEV_SERVER_WS_PORT
+  useTreeshakeHack(remixDevPort)
 
   useEffect(() => {
     if (GATag) {
@@ -143,7 +152,7 @@ export default function App() {
             __html: `!window ? null : window.ENV = ${JSON.stringify(ENV)}`,
           }}
         />
-        <LiveReload nonce={nonce} port={8002} />
+        <LiveReload nonce={nonce} port={remixDevPort} />
       </body>
     </html>
   )
