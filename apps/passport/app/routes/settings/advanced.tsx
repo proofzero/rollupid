@@ -13,6 +13,7 @@ import {
   getAccountClient,
   getAccessClient,
   getAddressClient,
+  getStarbaseClient,
 } from '~/platform.server'
 import {
   getValidatedSessionContext,
@@ -36,15 +37,29 @@ export const action: ActionFunction = async ({ request, context }) => {
   try {
     const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
     const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
+    const starbaseClient = getStarbaseClient(
+      jwt,
+      context.env,
+      context.traceSpan
+    )
 
-    const [addresses, apps] = await Promise.all([
+    const [addresses, apps, ownedApps] = await Promise.all([
       accountClient.getAddresses.query({
         account: accountUrn,
       }),
       accountClient.getAuthorizedApps.query({
         account: accountUrn,
       }),
+      starbaseClient.listApps.query(),
     ])
+
+    if (ownedApps.length > 0) {
+      throw new RollupError({
+        message: 'Unable to delete Rollup Identity',
+        code: ERROR_CODES.INTERNAL_SERVER_ERROR,
+        cause: new Error('Rollup Identity owns apps'),
+      })
+    }
 
     const addressURNs = addresses?.map(
       (address) => address.baseUrn
