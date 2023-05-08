@@ -189,12 +189,22 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     'personaData',
   ])
   const scope = (resultMap.get('scope') || []) as string[]
-  const personaData = (resultMap.get('personaData') || {}) as PersonaData
+  const newPersonaData = (resultMap.get('personaData') || {}) as PersonaData
   const name = `${AccountURNSpace.decode(account)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
 
-  await accessNode.storage.put({ account, clientId, personaData })
+  //We take the existing (already-authorized) personaData and update it with
+  //any new data just authorized. This retains previous scope data that could
+  //be needed for previous authorizations, but not the new one.
+  const existingPersonaData =
+    (await accessNode.storage.get<PersonaData>('personaData')) || {}
+  let combinedPersonaData = Object.assign(existingPersonaData, newPersonaData)
+  await accessNode.storage.put({
+    account,
+    clientId,
+    personaData: combinedPersonaData,
+  })
   const access = AccessURNSpace.componentizedUrn(name, { client_id: clientId })
   await ctx.edgesClient!.makeEdge.mutate({
     src: account,
@@ -204,7 +214,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   await setPersonaReferences(
     access,
     scope,
-    personaData,
+    combinedPersonaData,
     { edgesFetcher: ctx.Edges },
     ctx.traceSpan
   )
@@ -239,7 +249,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     scope,
     { edgesFetcher: ctx.Edges, accountFetcher: ctx.Account },
     ctx.traceSpan,
-    personaData
+    combinedPersonaData
   )
   const idToken = await accessNode.class.generateIdToken({
     jku,
