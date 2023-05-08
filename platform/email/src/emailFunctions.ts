@@ -1,3 +1,4 @@
+import { EmailTemplate } from '../emailOtpTemplate'
 import { EmailMessage, EmailNotification } from './types'
 import { CloudflareEmailMessage, EmailContent, Environment } from './types'
 
@@ -30,7 +31,8 @@ export async function send(
 ): Promise<void> {
   //We're running locally or in dev, so we don't send the email but only log it's content to console
   if (env.Test) {
-    console.info('Email:', message)
+    const otpMatch = message.content.body.match(/id="passcode">(.+)<\/div>/)
+    console.info('Code:', otpMatch?.[1])
     await env.Test.fetch(`http://localhost/otp/${message.recipient.address}`, {
       method: 'POST',
       headers: {
@@ -112,11 +114,7 @@ async function forward(message: CloudflareEmailMessage, env: Environment) {
 
 /** OTP email content template with a `code` parameter */
 export const getOTPEmailContent = (passcode: string): EmailContent => {
-  return {
-    contentType: 'text/plain',
-    subject: `Email verification - one-time passcode`,
-    body: `Your Rollup.id verification code is ${passcode}`,
-  }
+  return EmailTemplate(passcode)
 }
 
 /** Magic link email content template */
