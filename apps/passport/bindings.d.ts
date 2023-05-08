@@ -18,6 +18,7 @@ declare global {
     CONSOLE_APP_URL: string
     PASSPORT_REDIRECT_URL: string
     APIKEY_ALCHEMY_PUBLIC: string
+    REMIX_DEV_SERVER_WS_PORT: number
 
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
 

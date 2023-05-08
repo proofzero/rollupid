@@ -52,6 +52,7 @@ import {
 import * as gtag from '~/utils/gtags.client'
 
 import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
+import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -104,6 +105,10 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
         INTERNAL_GOOGLE_ANALYTICS_TAG:
           context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
         APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
+        REMIX_DEV_SERVER_WS_PORT:
+          process.env.NODE_ENV === 'development'
+            ? process.env.REMIX_DEV_SERVER_WS_PORT
+            : undefined,
       },
     },
     {
@@ -122,6 +127,9 @@ export default function App() {
   const browserEnv = useLoaderData()
 
   const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+
+  const remixDevPort = browserEnv.ENV.REMIX_DEV_SERVER_WS_PORT
+  useTreeshakeHack(remixDevPort)
 
   useEffect(() => {
     if (GATag) {
@@ -195,7 +203,7 @@ export default function App() {
             )}`,
           }}
         />
-        <LiveReload nonce={nonce} />
+        <LiveReload nonce={nonce} port={remixDevPort} />
         <script
           async
           nonce={nonce}

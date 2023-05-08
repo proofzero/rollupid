@@ -46,6 +46,9 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import type { AccountURN } from '@proofzero/urns/account'
 
 import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
+import { InternalServerError } from '@proofzero/errors'
+
+import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 
 export const links: LinksFunction = () => {
   return [
@@ -77,6 +80,7 @@ export type LoaderData = {
   displayName: string
   ENV: {
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
+    REMIX_DEV_SERVER_WS_PORT?: number
   }
 }
 
@@ -122,7 +126,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       apps: reshapedApps,
       avatarUrl,
       PASSPORT_URL,
-      ENV: { INTERNAL_GOOGLE_ANALYTICS_TAG },
+      ENV: {
+        INTERNAL_GOOGLE_ANALYTICS_TAG,
+        REMIX_DEV_SERVER_WS_PORT:
+          process.env.NODE_ENV === 'development'
+            ? +process.env.REMIX_DEV_SERVER_WS_PORT!
+            : undefined,
+      },
       displayName,
     })
   } catch (error) {
@@ -139,6 +149,9 @@ export default function App() {
   const loaderData = useLoaderData()
 
   const GATag = loaderData.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+
+  const remixDevPort = loaderData.ENV.REMIX_DEV_SERVER_WS_PORT
+  useTreeshakeHack(remixDevPort)
 
   const { apps, avatarUrl, PASSPORT_URL, displayName } = loaderData
 
@@ -191,7 +204,7 @@ export default function App() {
           }}
         />
         <Scripts nonce={nonce} />
-        <LiveReload nonce={nonce} />
+        <LiveReload nonce={nonce} port={remixDevPort} />
       </body>
     </html>
   )
