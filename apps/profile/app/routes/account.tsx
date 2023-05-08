@@ -4,6 +4,9 @@ import { useLoaderData } from '@remix-run/react'
 
 import { Outlet } from '@remix-run/react'
 
+import { InternalServerError } from '@proofzero/errors'
+import { JsonError } from '@proofzero/utils/errors'
+
 import { parseJwt, requireJWT } from '~/utils/session.server'
 
 import styles from '~/styles/account.css'
@@ -18,7 +21,11 @@ import {
   getAccountProfile,
   getAddressProfiles,
 } from '~/helpers/profile'
-import type { Node, Profile } from '@proofzero/galaxy-client'
+import type {
+  GetAddressProfilesQuery,
+  Node,
+  Profile,
+} from '@proofzero/galaxy-client'
 import type { AddressURN } from '@proofzero/urns/address'
 import type { FullProfile } from '~/types'
 import {
@@ -53,43 +60,54 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const accountURN = parseJwt(jwt).sub as AccountURN
 
-  const [loggedInUserProfile, addresses] = await Promise.all([
-    getAccountProfile({ jwt, accountURN }, context.traceSpan),
-    getAccountAddresses({ jwt, traceSpan: context.traceSpan }),
-  ])
+  try {
+    const [loggedInUserProfile, addresses] = await Promise.all([
+      getAccountProfile({ jwt, accountURN }, context.traceSpan),
+      getAccountAddresses({ jwt, traceSpan: context.traceSpan }),
+    ])
 
-  const addressTypeUrns = addresses.map((a) => ({
-    urn: a.baseUrn,
-    nodeType: a.rc.node_type,
-  }))
+    const addressTypeUrns = addresses.map((a) => ({
+      urn: a.baseUrn,
+      nodeType: a.rc.node_type,
+    }))
 
-  // We get the full profiles
-  const connectedProfiles =
-    (await getAddressProfiles(
-      jwt,
-      addressTypeUrns.map((atu) => atu.urn as AddressURN),
-      context.traceSpan
-    )) ?? []
+    let connectedProfiles: GetAddressProfilesQuery['addressProfiles'] = []
 
-  // This mapps to a new structure that contains urn also;
-  // useful for list keys as well as for address context actions as param
-  const normalizedConnectedProfiles = connectedProfiles.map((p, i) => ({
-    ...addressTypeUrns[i],
-    ...p,
-  }))
+    // We get the full profiles
+    connectedProfiles =
+      (await getAddressProfiles(
+        jwt,
+        addressTypeUrns.map((atu) => atu.urn as AddressURN),
+        context.traceSpan
+      )) ?? []
 
-  const cryptoAddresses =
-    addresses?.filter((e) => {
-      if (!e.rc) return false
-      return e?.rc?.node_type === 'crypto'
-    }) || []
+    // This mapps to a new structure that contains urn also;
+    // useful for list keys as well as for address context actions as param
+    const normalizedConnectedProfiles = connectedProfiles.map((p, i) => ({
+      ...addressTypeUrns[i],
+      ...p,
+    }))
 
-  return json({
-    connectedProfiles: normalizedConnectedProfiles,
-    cryptoAddresses,
-    accountURN,
-    profile: loggedInUserProfile,
-  })
+    const cryptoAddresses =
+      addresses?.filter((e) => {
+        if (!e.rc) return false
+        return e?.rc?.node_type === 'crypto'
+      }) || []
+
+    return json({
+      connectedProfiles: normalizedConnectedProfiles,
+      cryptoAddresses,
+      accountURN,
+      profile: loggedInUserProfile,
+    })
+  } catch (error) {
+    throw JsonError(
+      new InternalServerError({
+        message: 'failed to load profiles',
+        cause: error,
+      })
+    )
+  }
 }
 
 const notify = (success: boolean = true) => {

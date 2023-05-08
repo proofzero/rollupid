@@ -13,6 +13,7 @@ import type { AccountURN } from '@proofzero/urns/account'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getValidGallery } from './alchemy'
+import { GetAddressProfilesQuery } from '@proofzero/galaxy-client'
 
 export const getAccountProfile = async (
   {
@@ -96,7 +97,7 @@ export const getAddressProfiles = async (
   jwt: string,
   addressURNList: AddressURN[],
   traceSpan: TraceSpan
-) => {
+): Promise<GetAddressProfilesQuery['addressProfiles']> => {
   const galaxyClient = await getGalaxyClient(
     generateTraceContextHeaders(traceSpan)
   )

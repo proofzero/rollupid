@@ -143,10 +143,11 @@ export async function requireJWT(request: Request, headers = new Headers()) {
         if (error instanceof UnauthorizedError) {
           console.log('unauthorized refresh token')
           throw redirect('/signout')
-        } else {
+        } else if (error instanceof Error) {
           console.log('unknown error occurred in refresh token request', error)
-          throw error
         }
+
+        throw error
       }
     } else {
       throw redirect('/signout')
