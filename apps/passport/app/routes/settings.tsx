@@ -2,7 +2,6 @@ import { Outlet, useLoaderData } from '@remix-run/react'
 
 import { json } from '@remix-run/cloudflare'
 import {
-  getAuthzCookieParams,
   getDefaultAuthzParams,
   getValidatedSessionContext,
 } from '~/session.server'
@@ -84,12 +83,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         return addressClient.getAddressProfile.query()
       })
     ),
-    starbaseClient.listApps.query(),
   ])
 
   const authorizedApps = awaitedResults[0]
   const addressProfiles = awaitedResults[1]
-  const ownedApps = awaitedResults[2]
 
   const normalizedConnectedProfiles = addressProfiles.map((p, i) => ({
     ...addressTypeUrns[i],
@@ -103,7 +100,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     connectedProfiles: normalizedConnectedProfiles,
     CONSOLE_URL: context.env.CONSOLE_APP_URL,
     primaryAddressURN: accountProfile?.primaryAddressURN,
-    ownedApps,
   })
 }
 
@@ -121,7 +117,6 @@ export default function SettingsLayout() {
     CONSOLE_URL,
     displayName,
     primaryAddressURN,
-    ownedApps,
   } = useLoaderData()
 
   return (
@@ -154,7 +149,6 @@ export default function SettingsLayout() {
                     authorizedApps,
                     connectedProfiles,
                     primaryAddressURN,
-                    ownedApps,
                     CONSOLE_URL,
                   }}
                 />

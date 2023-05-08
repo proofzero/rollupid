@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { Form, NavLink, useOutletContext } from '@remix-run/react'
+import { Form, NavLink, useFetcher, useOutletContext } from '@remix-run/react'
 
 import { Text } from '@proofzero/design-system'
 import { Button } from '@proofzero/design-system'
@@ -106,15 +106,20 @@ export const action: ActionFunction = async ({ request, context }) => {
 const DeleteRollupIdentityModal = ({
   isOpen,
   setIsOpen,
-  hasOwnedApps,
   CONSOLE_URL,
 }: {
   isOpen: boolean
   setIsOpen: (val: boolean) => void
-  hasOwnedApps: boolean
   CONSOLE_URL: string
 }) => {
   const [confirmationString, setConfirmationString] = useState('')
+  const fetcher = useFetcher()
+
+  useEffect(() => {
+    fetcher.load('/owned_app')
+  }, [])
+
+  const hasOwnedApps = fetcher.data?.ownedApps?.length > 0
 
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
@@ -197,8 +202,7 @@ const DeleteRollupIdentityModal = ({
 export default function AdvancedLayout() {
   const [isOpen, setIsOpen] = useState(false)
 
-  const { ownedApps, CONSOLE_URL } = useOutletContext<{
-    ownedApps: any[]
+  const { CONSOLE_URL } = useOutletContext<{
     CONSOLE_URL: string
   }>()
 
@@ -210,7 +214,6 @@ export default function AdvancedLayout() {
       <DeleteRollupIdentityModal
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        hasOwnedApps={ownedApps?.length > 0}
         CONSOLE_URL={CONSOLE_URL}
       />
       <article
