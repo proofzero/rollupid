@@ -15,5 +15,5 @@ export default function <T>(value: T) {
     if (value) {
       console.log(`Prevented ${value} from getting tree shaken`)
     }
-  }, [])
+  }, [value])
 }

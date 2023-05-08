@@ -85,12 +85,6 @@ export type LoaderData = {
 }
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  if (!process.env.REMIX_DEV_SERVER_WS_PORT) {
-    throw new InternalServerError({
-      message: 'REMIX_DEV_SERVER_WS_PORT is not defined',
-    })
-  }
-
   const jwt = await requireJWT(request)
   const traceHeader = generateTraceContextHeaders(context.traceSpan)
   const parsedJwt = parseJwt(jwt)
@@ -136,7 +130,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         INTERNAL_GOOGLE_ANALYTICS_TAG,
         REMIX_DEV_SERVER_WS_PORT:
           process.env.NODE_ENV === 'development'
-            ? +process.env.REMIX_DEV_SERVER_WS_PORT
+            ? +process.env.REMIX_DEV_SERVER_WS_PORT!
             : undefined,
       },
       displayName,
