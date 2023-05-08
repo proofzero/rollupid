@@ -112,10 +112,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
           style="display: inline-block"
         />
         <div class="heading">Confirm Your Email Address</div>
-        <p>
-          Please copy and paste the 6-digit code below into the number fields of
-          your verification process.
-        </p>
+        <p>Please copy the code below into the email verification screen.</p>
         <div id="passcode">${passcode}</div>
         <p>Please note: the code will be valid for the next 10 minutes.</p>
         <p>
@@ -174,7 +171,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
           <img
             src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/71edc886-0478-4584-beca-a6715937f000/public"
             alt=""
-            style="max-width: 15px; margin-right: 3px; display: inline-block"
+            style="max-width: 11px; display: inline-block"
           />
           <p
             style="
