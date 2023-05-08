@@ -203,7 +203,7 @@ export default function AdvancedLayout() {
   const fetcher = useFetcher()
 
   const onDelete = () => {
-    fetcher.load('/owned_apps')
+    fetcher.load('/settings/advanced/owned-apps')
   }
 
   return (
