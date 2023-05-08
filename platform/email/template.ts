@@ -21,6 +21,9 @@ export const EmailTemplate = (passcode: string): EmailContent => {
       style="
         width: 100%;
         display: flex;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: center;
       "
@@ -28,6 +31,9 @@ export const EmailTemplate = (passcode: string): EmailContent => {
       <div
         style="
           display: flex;
+          display: -webkit-flex;
+          display: -ms-flexbox;
+          flex-wrap: wrap;
           flex-direction: column;
           align-items: start;
           justify-content: start;
@@ -126,6 +132,8 @@ export const EmailTemplate = (passcode: string): EmailContent => {
             margin-top: 20px;
             width: 100%;
             display: flex;
+            display: -webkit-flex;
+            display: -ms-flexbox;
             flex-direction: row;
             padding-bottom: 24px;
           "
@@ -142,6 +150,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
                 font-style: normal;
                 border-bottom: 1px solid black;
                 border-color: #6b7280;
+                text-decoration: none;
               "
               href="https://rollup.id/tos"
               target="_blank"
@@ -169,6 +178,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
                 font-style: normal;
                 border-bottom: 1px solid black;
                 border-color: #6b7280;
+                text-decoration: none;
               "
               href="https://rollup.id/privacy-policy"
               target="_blank"
@@ -195,6 +205,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
                 font-style: normal;
                 border-bottom: 1px solid black;
                 border-color: #6b7280;
+                text-decoration: none;
               "
               href="https://discord.com/invite/rollupid"
               target="_blank"
@@ -235,7 +246,14 @@ export const EmailTemplate = (passcode: string): EmailContent => {
         </p>
 
         <div
-          style="display: flex; flex-direction: row; justify-content: center"
+          style="
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            justify-content: center;
+          "
           ;
         >
           <img
@@ -270,6 +288,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
     </div>
   </body>
 </html>
+
 
   `,
   }
