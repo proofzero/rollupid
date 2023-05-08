@@ -43,7 +43,7 @@
 
 ## Reference
 
-* [Galaxy GQL API](reference/galaxy-api.md)
+* [Galaxy API](reference/galaxy-api.md)
 * [Passport API](reference/passport-api.md)
 * [Scopes](reference/scopes.md)
 

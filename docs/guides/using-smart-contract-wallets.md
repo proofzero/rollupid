@@ -24,7 +24,54 @@ With Rollup your can request access to your users smart contract wallets. If the
 
 ### Registering Session Keys
 
+When your users login to your application you will now be presented with an access [token](../advanced/tokens.md) that contains the `erc_4337` claim and a list of smart contract wallet addresses and a nickname. For example:
 
+```json
+{
+  "sub": "<unique did urn>",
+  "aud": "<your app urn>",
+  "erc_4337": [{
+    "nickname": "game wallet",
+    "address": "0x123abc...."
+  }],
+  ...
+}
+```
+
+With this access token you can now make requests to the [galaxy-api.md](../reference/galaxy-api.md "mention") to register your session key.  To register a session key you will always need to generate a ethers wallet and send the public address along with the specified smart contract wallet to register. For example:
+
+````typescript
+import { Wallet } from 'ethers'
+
+// if using more than once we reccomend that you store the private key somewhere safe.
+// you will need the privateSigner to submit transactions using your session key. 
+const privateSigner = Wallet.createRandom() 
+const address = await privateSigner.address()
+
+const sessionDataRes = await fetch("https://galaxy.rollup.id/rest/register-session-key", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${accessToken}`,
+    "X-GALAXY-KEY": process.env.ROLLUP_GALAXY_API_KEY!, // available in console app
+  },
+  body: JSON.stringify({
+      smartContractWalletAddress: session.erc_4337[0].address, //users' smart contract wallet address
+      sessionPublicKey: address, //public key for which to issue session key
+    },
+  }),
+})
+
+const sessionData = await sessionDataRes.json()
+
+```
+````
+
+Once a session key has been registered you should receive session key data that can be used with used directly with your ethers library or account abstraction / paymaster provider SDK.
+
+{% hint style="info" %}
+When registering a session key we will use your configured paymaster provider and their tools to fulfill the registration.&#x20;
+{% endhint %}
 
 ## Accessing Your App's Smart Contract Wallet
 

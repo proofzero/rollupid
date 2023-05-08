@@ -17,7 +17,7 @@ For more information read our guide: [using-smart-contract-wallets.md](../../gui
 ## Preferred Paymasters
 
 {% hint style="warning" %}
-Your paymaster credentials will only be used to sponsor registration of session keys driven by your application.
+Your paymaster credentials will only be used to sponsor registration of session keys driven by and for your application.
 {% endhint %}
 
 ### [ZeroDev](https://zerodev.app)
