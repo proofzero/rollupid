@@ -67,8 +67,8 @@ export const EmailTemplate = (passcode: string): EmailContent => {
       .divider {
         border-bottom: 1px solid #e5e7eb;
         width: 100%;
-        margin-bottom: 20px;
-        margin-top: 20px;
+        margin-bottom: 10px;
+        margin-top: 10px;
       }
       .footer-links {
         font-size: 12px;
@@ -89,16 +89,28 @@ export const EmailTemplate = (passcode: string): EmailContent => {
         color: #9ca3af;
         text-decoration: none;
       }
+      @media (prefers-color-scheme: dark) {
+        .content.apaptive {
+          background-color: #ffffff;
+        }
+        .container.apaptive {
+          background-color: #ffffff;
+        }
+        body.apaptive {
+          background-color: #ffffff;
+        }
+      }
     </style>
     <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
   </head>
-  <body>
-    <div class="container">
-      <div class="content">
+  <body class="adaptive">
+    <div class="container adaptive">
+      <div class="content adaptive">
         <img
           class="logo"
           src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public"
           alt="rollup logo"
+          style="display: inline-block"
         />
         <div class="heading">Confirm Your Email Address</div>
         <p>
@@ -147,7 +159,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
             margin-top: 10px;
           "
         >
-        777 Bay Street, Suite C208B Toronto, Ontario M5G 2C8 Canada
+          777 Bay Street, Suite C208B Toronto, Ontario M5G 2C8 Canada
         </p>
         <p
           style="
@@ -163,11 +175,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
           <img
             src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/71edc886-0478-4584-beca-a6715937f000/public"
             alt="rollup logo"
-            style="
-              max-width: 15px;
-              margin-right: 3px;
-              display: inline-block;
-            "
+            style="max-width: 15px; margin-right: 3px; display: inline-block"
           />
           <p
             style="
