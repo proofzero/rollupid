@@ -1,4 +1,4 @@
-import { EmailTemplate } from '../template'
+import { EmailTemplate } from '../emailOtpTemplate'
 import { EmailMessage, EmailNotification } from './types'
 import { CloudflareEmailMessage, EmailContent, Environment } from './types'
 
