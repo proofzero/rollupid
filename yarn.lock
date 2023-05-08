@@ -4234,7 +4234,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-tools/utils@npm:^9.2.1":
+"@graphql-tools/utils@npm:^9.2.0, @graphql-tools/utils@npm:^9.2.1":
   version: 9.2.1
   resolution: "@graphql-tools/utils@npm:9.2.1"
   dependencies:
@@ -4315,6 +4315,19 @@ __metadata:
   dependencies:
     tslib: ^2.3.1
   checksum: 56de91d03d6c163187bfacbdea4b3317b69d789cc2374f5d1ef3c058a0c98d8540088bd0e4435177f2afd074429e18e45182f3854247e7ec92c769432a74a7d4
+  languageName: node
+  linkType: hard
+
+"@graphql-yoga/plugin-sofa@npm:1.9.1":
+  version: 1.9.1
+  resolution: "@graphql-yoga/plugin-sofa@npm:1.9.1"
+  dependencies:
+    "@graphql-tools/utils": ^9.2.1
+    sofa-api: ^0.16.3
+  peerDependencies:
+    graphql: ^15.2.0 || ^16.0.0
+    graphql-yoga: ^3.9.1
+  checksum: b2e9017517f358e48a59988a727287ccc2981509cdd9e1ae85b50391de40a36b1d00b21dbc2fab0a397b26fd38f4b427d578911dd7d4bf177c1e9538fb61e2ee
   languageName: node
   linkType: hard
 
@@ -6262,6 +6275,7 @@ __metadata:
     "@graphql-tools/resolvers-composition": 6.5.18
     "@graphql-tools/schema": 9.0.19
     "@graphql-tools/stitch": 8.7.49
+    "@graphql-yoga/plugin-sofa": 1.9.1
     concurrently: 7.5.0
     env-cmd: 10.1.0
     graphql: 16.6.0
@@ -13864,7 +13878,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@whatwg-node/events@npm:0.0.2":
+"@whatwg-node/events@npm:0.0.2, @whatwg-node/events@npm:^0.0.2":
   version: 0.0.2
   resolution: "@whatwg-node/events@npm:0.0.2"
   checksum: 6d491801d36967d5d62443cca6ef39d41cf882d575839d2e9d1a5f394722cd24ef84fe9e897bb72c01bd198871fda9ff0e8b1ac5aa6f3f814f87d92b7f28fdcc
@@ -13910,7 +13924,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@whatwg-node/fetch@npm:^0.8.3, @whatwg-node/fetch@npm:^0.8.4":
+"@whatwg-node/fetch@npm:^0.6.6":
+  version: 0.6.9
+  resolution: "@whatwg-node/fetch@npm:0.6.9"
+  dependencies:
+    "@peculiar/webcrypto": ^1.4.0
+    "@whatwg-node/node-fetch": ^0.0.5
+    busboy: ^1.6.0
+    urlpattern-polyfill: ^6.0.2
+    web-streams-polyfill: ^3.2.1
+  checksum: cf5b95ae8f6625e2e96fc143fcc409a7974f90018f1ac2e69f651970ef251fad8de61540714f97ad3b617bd61c8dc90820bdde3da6d1417d9398a7f03b794401
+  languageName: node
+  linkType: hard
+
+"@whatwg-node/fetch@npm:^0.8.0, @whatwg-node/fetch@npm:^0.8.1, @whatwg-node/fetch@npm:^0.8.3, @whatwg-node/fetch@npm:^0.8.4":
   version: 0.8.8
   resolution: "@whatwg-node/fetch@npm:0.8.8"
   dependencies:
@@ -13920,6 +13947,19 @@ __metadata:
     urlpattern-polyfill: ^8.0.0
     web-streams-polyfill: ^3.2.1
   checksum: 891407ba57e32e5af70a3b0a86980c4466dcf2ba8581b6927475c85400280b163085519e98821dd94776da9aa1b0b1e221e718009e2abed9c8a0d4721025b2ab
+  languageName: node
+  linkType: hard
+
+"@whatwg-node/node-fetch@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "@whatwg-node/node-fetch@npm:0.0.5"
+  dependencies:
+    "@whatwg-node/events": ^0.0.2
+    busboy: ^1.6.0
+    tslib: ^2.3.1
+  peerDependencies:
+    "@types/node": ^18.0.6
+  checksum: a8d0cf092d000710485f7ddba67c9ecfce96af2db6ee8241e3598b10779423bb6541e2e595566e238f2bf682d1faad7ad11d4d1644ce1dce9dba58f94ed682e7
   languageName: node
   linkType: hard
 
@@ -13933,6 +13973,27 @@ __metadata:
     fast-url-parser: ^1.1.3
     tslib: ^2.3.1
   checksum: d3d7b0a0242c0511c7b666de66d9096fb24ea251426ce76e3a26a8ca17408de5d4d4f81b5aaec840cc7025f0321fb97e06067c53f377c844a5a9473dd76491ae
+  languageName: node
+  linkType: hard
+
+"@whatwg-node/router@npm:^0.2.0":
+  version: 0.2.7
+  resolution: "@whatwg-node/router@npm:0.2.7"
+  dependencies:
+    "@whatwg-node/fetch": ^0.8.0
+    "@whatwg-node/server": ^0.6.6
+    tslib: ^2.3.1
+  checksum: cd51153a83e8d85c31939664cc8e7ebc96e9df4c06e70b60105729445e67c73ebf15e562f62f6eff4bcd4b239448dbca0ec298ccd65143a934c5e8fd6f473b07
+  languageName: node
+  linkType: hard
+
+"@whatwg-node/server@npm:^0.6.6":
+  version: 0.6.7
+  resolution: "@whatwg-node/server@npm:0.6.7"
+  dependencies:
+    "@whatwg-node/fetch": ^0.8.1
+    tslib: ^2.3.1
+  checksum: bac1f864b3d6ae1c8ee77ad4c94b707c1fae83dc1a589dec358c3f1991e4f249468ede5419a4c5fb45c1eea7f56f29648850f09ba7b9ac722bd0f5dbd0d36089
   languageName: node
   linkType: hard
 
@@ -14360,7 +14421,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ansi-colors@npm:^4.1.1":
+"ansi-colors@npm:^4.1.1, ansi-colors@npm:^4.1.3":
   version: 4.1.3
   resolution: "ansi-colors@npm:4.1.3"
   checksum: a9c2ec842038a1fabc7db9ece7d3177e2fe1c5dc6f0c51ecfbf5f39911427b89c00b5dc6b8bd95f82a26e9b16aaae2e83d45f060e98070ce4d1333038edceb0e
@@ -29592,6 +29653,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"openapi-types@npm:^12.1.0":
+  version: 12.1.0
+  resolution: "openapi-types@npm:12.1.0"
+  checksum: d8f3e2bae519aa6bcf2012f4a5592b7283fe928c06f3bdc182776ce637c7ed8d5f9f342724f68c95c9572aefe21ed5e89b18a0295a703da61af5f97bd2aea9a7
+  languageName: node
+  linkType: hard
+
 "opener@npm:^1.5.1":
   version: 1.5.2
   resolution: "opener@npm:1.5.2"
@@ -34741,6 +34809,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"sofa-api@npm:^0.16.3":
+  version: 0.16.3
+  resolution: "sofa-api@npm:0.16.3"
+  dependencies:
+    "@graphql-tools/utils": ^9.2.0
+    "@whatwg-node/fetch": ^0.6.6
+    "@whatwg-node/router": ^0.2.0
+    ansi-colors: ^4.1.3
+    openapi-types: ^12.1.0
+    param-case: ^3.0.4
+    title-case: ^3.0.3
+    tslib: ^2.5.0
+  peerDependencies:
+    graphql: ^15.0.0 || ^16.0.0
+  checksum: a282c828f98cade4506072e7dbbcbb6ce74d252aea1edd923ceab8777589a257700de4c7d981a66f676adbe6c3cd84f0c54b4f20ab809b045c8509bc765d3bd2
+  languageName: node
+  linkType: hard
+
 "sonic-boom@npm:^2.2.1":
   version: 2.8.0
   resolution: "sonic-boom@npm:2.8.0"
@@ -37732,6 +37818,15 @@ __metadata:
   version: 4.0.3
   resolution: "urlpattern-polyfill@npm:4.0.3"
   checksum: 96ac2aea49a7b17a9ff41b2ccccdaf5e58a18c33c494cf663bea853c1ac2e70fd26a147b33b83ff7c6b77f9e34ee48409d21dbc1f2a2ad5cd9509cf3d5cb148e
+  languageName: node
+  linkType: hard
+
+"urlpattern-polyfill@npm:^6.0.2":
+  version: 6.0.2
+  resolution: "urlpattern-polyfill@npm:6.0.2"
+  dependencies:
+    braces: ^3.0.2
+  checksum: 564fb223761b67ea76d015f11dfec145db98c71cc35641015d1c9ec164da494b1fab614e652a844e14a72cda31236b9c3a59b22fdcca71166c315ab059fab676
   languageName: node
   linkType: hard
 
