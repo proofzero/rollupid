@@ -24,6 +24,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
         display: block;
         width: 100%;
         text-align: center;
+        background-color: #ffffff;
       }
       .content {
         display: inline-block;
@@ -34,6 +35,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
         padding: 40px 24px;
         margin: 0 auto;
         border: #e5e7eb solid 1px;
+        background-color: #ffffff;
       }
       .logo {
         width: 170px;
@@ -160,7 +162,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
         </p>
         <div style="display: inline-block; text-align: center">
           <img
-            src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/ee4205c5-eccb-4b28-d4c6-6a3e5fe39100/public"
+            src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/71edc886-0478-4584-beca-a6715937f000/public"
             alt="rollup logo"
             style="width: 14px; height: 14px; margin-right: 10px"
           />
