@@ -164,7 +164,11 @@ export const EmailTemplate = (passcode: string): EmailContent => {
           <img
             src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/71edc886-0478-4584-beca-a6715937f000/public"
             alt="rollup logo"
-            style="width: 14px; height: 14px; margin-right: 10px"
+            style="
+              max-width: 15px;
+              margin-right: 3px;
+              display: inline;
+            "
           />
           <p
             style="
