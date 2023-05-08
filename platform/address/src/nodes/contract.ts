@@ -1,10 +1,11 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 
+import { InternalServerError } from '@proofzero/errors'
+import { CryptoAddressType } from '@proofzero/types/address'
+import ENSUtils from '@proofzero/platform-clients/ens-utils'
+
 import { AddressNode } from '.'
 import { AddressProfile } from '../types'
-import { CryptoAddressType } from '@proofzero/types/address'
-
-import ENSUtils from '@proofzero/platform-clients/ens-utils'
 
 type CryptoAddressProfile = AddressProfile<CryptoAddressType.Wallet>
 
@@ -22,7 +23,8 @@ export default class ContractAddress {
       this.node.class.getAddress(),
     ])
 
-    if (!address) throw new Error('address not found')
+    if (!address)
+      throw new InternalServerError({ message: 'address not found' })
 
     const profile = (await getCryptoAddressProfile(
       address

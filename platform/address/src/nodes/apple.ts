@@ -1,5 +1,7 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 
+import { InternalServerError } from '@proofzero/errors'
+
 import { OAuthAddressType } from '@proofzero/types/address'
 
 import { Context } from '../context'
@@ -25,7 +27,7 @@ export default class AppleAddress extends OAuthAddress {
 
   async getProfile(): Promise<AppleAddressProfile> {
     const data = await this.getData()
-    if (!data) throw new Error('no data')
+    if (!data) throw new InternalServerError({ message: 'no data' })
     const profile = data.profile as AppleOAuthProfile
     const picture = await this.node.class.getGradient()
     return {

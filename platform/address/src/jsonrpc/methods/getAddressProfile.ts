@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
+
 import {
   CryptoAddressType,
   EmailAddressType,
@@ -23,6 +25,7 @@ import {
 } from '../../nodes'
 
 import { AddressProfileSchema } from '../validators/profile'
+import OAuthAddress from '../../nodes/oauth'
 
 export const GetAddressProfileOutput = AddressProfileSchema.extend({
   id: AddressURNInput,
@@ -42,18 +45,25 @@ export const getAddressProfileMethod: GetAddressProfileMethod = async ({
   ctx,
 }) => {
   const nodeClient = ctx.address
-  if (!nodeClient) throw new Error('missing nodeClient')
+  if (!nodeClient)
+    throw new InternalServerError({ message: 'missing nodeClient' })
 
   const address = await nodeClient?.class.getAddress()
   const type = await nodeClient?.class.getType()
 
   if (!address || !type) {
-    throw new Error('missing address or type')
+    throw new InternalServerError({ message: 'missing address or type' })
   }
 
-  if (!ctx.addressURN) throw new Error('missing addressURN')
+  if (!ctx.addressURN)
+    throw new BadRequestError({ message: 'missing addressURN' })
 
-  const getProfileNode = () => {
+  const getProfileNode = ():
+    | ContractAddress
+    | CryptoAddress
+    | EmailAddress
+    | OAuthAddress
+    | undefined => {
     switch (type) {
       case CryptoAddressType.ETH:
         return new CryptoAddress(nodeClient)
@@ -78,7 +88,10 @@ export const getAddressProfileMethod: GetAddressProfileMethod = async ({
 
   const node = getProfileNode()
   if (!node) {
-    throw new Error('unsupported address type')
+    throw new InternalServerError({
+      message: 'unsupported address type',
+      cause: { type },
+    })
   }
 
   const profile = await node.getProfile()

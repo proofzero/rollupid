@@ -1,5 +1,6 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 
+import { InternalServerError } from '@proofzero/errors'
 import { OAuthAddressType } from '@proofzero/types/address'
 
 import type { AddressProfile, GitHubOAuthProfile } from '../types'
@@ -23,9 +24,8 @@ export default class GithubAddress extends OAuthAddress {
   async getAuthorizationHeader(): Promise<string> {
     const accessToken = await this.getAccessToken()
 
-    if (!accessToken) {
-      throw new Error('missing access token')
-    }
+    if (!accessToken)
+      throw new InternalServerError({ message: 'missing access token' })
 
     return `token ${accessToken}`
   }
