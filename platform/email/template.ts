@@ -146,8 +146,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
             margin-top: 20px;
           "
         >
-          Proof Zero Inc, 4 Collier Street, 2nd Floor, Toronto, ON M4W 2G9,
-          Canada
+        777 Bay Street, Suite C208B Toronto, Ontario M5G 2C8 Canada
         </p>
         <p
           style="
