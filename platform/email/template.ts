@@ -18,7 +18,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
     <style type="text/css">
       body {
         font-family: Inter;
-        background-color: white;
+        background-color: #ffffff;
       }
       .container {
         display: block;
@@ -33,6 +33,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
         border-radius: 8px;
         padding: 40px 24px;
         margin: 0 auto;
+        border: #e5e7eb solid 1px;
       }
       .logo {
         width: 170px;
@@ -187,6 +188,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
     </div>
   </body>
 </html>
+
 
   `,
   }
