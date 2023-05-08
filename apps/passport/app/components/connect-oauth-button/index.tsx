@@ -49,7 +49,7 @@ const ConnectOAuthButton = ({
       <div
         className={`flex ${
           fullSize ? '' : 'justify-center'
-        }  items-center w-full py-1.5 space-x-3`}
+        }  items-center w-full space-x-3 h-[36px]`}
       >
         <img
           className="w-5 h-5"
