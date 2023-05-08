@@ -65,21 +65,24 @@ export const action: ActionFunction = async ({ request, context }) => {
       (address) => address.baseUrn
     ) as AddressURN[]
 
-    await Promise.allSettled([
-      Promise.allSettled(
+    await Promise.all([
+      Promise.all(
+        apps.map((app) => {
+          return accessClient.revokeAppAuthorization.mutate({
+            clientId: app.clientId,
+          })
+        })
+      ),
+      Promise.all(
         addressURNs.map((addressURN) => {
           const addressClient = getAddressClient(
             addressURN,
             context.env,
             context.traceSpan
           )
-          return addressClient.deleteAddressNode.mutate(accountUrn)
-        })
-      ),
-      Promise.allSettled(
-        apps.map((app) => {
-          return accessClient.revokeAppAuthorization.mutate({
-            clientId: app.clientId,
+          return addressClient.deleteAddressNode.mutate({
+            accountURN: accountUrn,
+            forceDelete: true,
           })
         })
       ),
