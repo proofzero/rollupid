@@ -108,7 +108,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
         <img
           class="logo"
           src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public"
-          alt="rollup logo"
+          alt=""
           style="display: inline-block"
         />
         <div class="heading">Confirm Your Email Address</div>
@@ -173,7 +173,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
         <div style="display: inline-block; text-align: center">
           <img
             src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/71edc886-0478-4584-beca-a6715937f000/public"
-            alt="rollup logo"
+            alt=""
             style="max-width: 15px; margin-right: 3px; display: inline-block"
           />
           <p
