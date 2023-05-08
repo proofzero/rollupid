@@ -10,7 +10,7 @@ With Rollup your can request access to your users smart contract wallets. If the
 
 ### Prerequisites
 
-* Setup an application with one of our [preferred paymaster providers](../platform/console/blockchain.md#preferred-paymasters).
+* Setup an application with one of our supported[ paymaster providers](../platform/console/blockchain.md#preferred-paymasters).
 
 ### Setup
 
@@ -67,7 +67,7 @@ const sessionData = await sessionDataRes.json()
 ```
 ````
 
-Once a session key has been registered you should receive session key data that can be used with used directly with your ethers library or account abstraction / paymaster provider SDK.
+Once a session key has been registered you should receive session key data that can be used directly with your ethers library or account abstraction / paymaster provider SDK directly.
 
 {% hint style="info" %}
 When registering a session key we will use your configured paymaster provider and their tools to fulfill the registration.&#x20;
