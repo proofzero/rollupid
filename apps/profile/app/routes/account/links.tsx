@@ -141,8 +141,6 @@ export const action: ActionFunction = async ({ request, context }) => {
   // Schema Validation
   const zodValidation = LinksSchema.safeParse(updatedLinks)
 
-  console.log({ links: JSON.stringify(zodValidation) })
-
   if (!zodValidation.success) {
     return {
       errors: zodValidation.error.issues[0].message,
@@ -284,8 +282,6 @@ export default function AccountSettingsLinks() {
     notify: (success: boolean) => void
     connectedProfiles: any[]
   }>()
-
-  console.log({ connectedProfiles })
 
   const transition = useTransition()
   const actionData = useActionData()
