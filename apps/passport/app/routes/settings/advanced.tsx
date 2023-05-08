@@ -107,19 +107,14 @@ const DeleteRollupIdentityModal = ({
   isOpen,
   setIsOpen,
   CONSOLE_URL,
+  hasOwnedApps,
 }: {
   isOpen: boolean
   setIsOpen: (val: boolean) => void
   CONSOLE_URL: string
+  hasOwnedApps: boolean
 }) => {
   const [confirmationString, setConfirmationString] = useState('')
-  const fetcher = useFetcher()
-
-  useEffect(() => {
-    fetcher.load('/owned_app')
-  }, [])
-
-  const hasOwnedApps = fetcher.data?.ownedApps?.length > 0
 
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
@@ -205,6 +200,11 @@ export default function AdvancedLayout() {
   const { CONSOLE_URL } = useOutletContext<{
     CONSOLE_URL: string
   }>()
+  const fetcher = useFetcher()
+
+  const onDelete = () => {
+    fetcher.load('/owned_apps')
+  }
 
   return (
     <>
@@ -215,6 +215,7 @@ export default function AdvancedLayout() {
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         CONSOLE_URL={CONSOLE_URL}
+        hasOwnedApps={fetcher.data?.ownedApps?.length > 0}
       />
       <article
         className="flex-1 flex flex-col sm:flex-row
@@ -237,6 +238,7 @@ export default function AdvancedLayout() {
             btnType="dangerous-alt"
             className="bg-white"
             onClick={() => {
+              onDelete()
               setIsOpen(true)
             }}
           >
