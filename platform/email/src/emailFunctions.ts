@@ -31,7 +31,8 @@ export async function send(
 ): Promise<void> {
   //We're running locally or in dev, so we don't send the email but only log it's content to console
   if (env.Test) {
-    console.info('Email:', message)
+    const otpMatch = message.content.body.match(/id="passcode">(.+)<\/div>/)
+    console.info('Code:', otpMatch?.[1])
     await env.Test.fetch(`http://localhost/otp/${message.recipient.address}`, {
       method: 'POST',
       headers: {
