@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
@@ -25,6 +25,8 @@ export const ConnectedAccountSelect = ({
   onSelect,
   onSelectAll,
 }: ConnectedAccountSelectProps) => {
+  const isFirstRender = useRef(true)
+
   const [selectedAccounts, setSelectedAccounts] = useState<
     Array<ConnectedAccountSelectListItem>
   >([])
@@ -43,10 +45,17 @@ export const ConnectedAccountSelect = ({
       if (onSelectAll) {
         onSelectAll()
       }
-    } else {
-      if (onSelect) {
-        onSelect(selectedAccounts)
-      }
+    }
+  }, [allConnectedAccountsSelected])
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+
+    if (!allConnectedAccountsSelected && onSelect) {
+      onSelect(selectedAccounts)
     }
   }, [selectedAccounts, allConnectedAccountsSelected])
 

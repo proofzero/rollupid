@@ -195,7 +195,7 @@ export default function App() {
             )}`,
           }}
         />
-        <LiveReload nonce={nonce} />
+        <LiveReload nonce={nonce} port={8002} />
         <script
           async
           nonce={nonce}
