@@ -68,7 +68,6 @@ export const EmailTemplate = (passcode: string): EmailContent => {
         border-bottom: 1px solid #e5e7eb;
         width: 100%;
         margin-bottom: 10px;
-        margin-top: 10px;
       }
       .footer-links {
         font-size: 12px;
