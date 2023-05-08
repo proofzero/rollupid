@@ -81,6 +81,7 @@ import {
   GetPaymasterOutput,
 } from './methods/getPaymaster'
 import { setPaymaster, SetPaymasterInput } from './methods/setPaymaster'
+import { ApiKeyExtractMiddleware } from './apiKeyExtract'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -122,6 +123,7 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
+    .use(ApiKeyExtractMiddleware)
     .use(OwnAppsMiddleware)
     .input(GetPaymasterInput)
     .output(GetPaymasterOutput)
