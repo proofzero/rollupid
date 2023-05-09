@@ -17,6 +17,7 @@ import { ConnectedAccountSelect } from '../../atoms/accounts/ConnectedAccountSel
 import { GetAddressProfileResult } from '@proofzero/platform/address/src/jsonrpc/methods/getAddressProfile'
 import { AuthorizationControlSelection } from '@proofzero/types/application'
 import { AddressURN } from '@proofzero/urns/address'
+import { ScopeDescriptor } from '@proofzero/security/scopes'
 
 type UserProfile = {
   pfpURL: string
@@ -29,12 +30,14 @@ type AppProfile = {
   privacyURL: string
 }
 
+type ScopeMeta = { scopes: Record<string, ScopeDescriptor> }
+
 type AuthorizationProps = {
   userProfile: UserProfile
   appProfile: AppProfile
 
   requestedScope: string[]
-  scopeMeta: any
+  scopeMeta: ScopeMeta
   scopeIcons: Record<string, string>
 
   transitionState: 'idle' | 'submitting' | 'loading'
@@ -144,6 +147,7 @@ export default ({
                           {scopeMeta.scopes[scope].name}
                         </Text>
                       )}
+
                     {scope === 'erc_4337' && (
                       <div className="flex-1 min-w-0">
                         <SmartContractWalletSelect
