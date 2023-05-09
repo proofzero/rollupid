@@ -14,10 +14,9 @@ import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
 import type { notificationHandlerType } from '~/types'
-
 import type {
-  PaymasterProviderType,
   PaymasterType,
+  PaymasterProviderType,
 } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 
 type errorsType = {
