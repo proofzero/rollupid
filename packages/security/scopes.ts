@@ -66,6 +66,11 @@ export const SCOPE_ACCOUNT_READ: Scope = scope('scope://rollup.id/account#read')
 export const SCOPE_SMART_CONTRACT_WALLETS: Scope = scope('erc_4337')
 
 /**
+ * The generic scope where no user data is released other than some system identifiers.
+ */
+export const SCOPE_SYSTEM_IDENTIFIERS: Scope = scope('system_identifiers')
+
+/**
  * The scope required to write to account object.
  */
 export const SCOPE_ACCOUNT_WRITE: Scope = scope(
@@ -158,6 +163,12 @@ export const SCOPES: ScopeMap = {
       'Scope value indicating that a configured smart contract wallets will be included in the ID token as well as the /userinfo endpoint response.',
     class: 'address',
   },
+  [SCOPE_SYSTEM_IDENTIFIERS]: {
+    name: 'System Identifiers',
+    description:
+      "Read account's system identifiers and other non-personally identifiable information",
+    class: 'implied',
+  },
   // NOT READY YET
   // [SCOPE_PROFILE_READ]: {
   //   name: 'Public Profile',
@@ -205,6 +216,12 @@ export const SCOPES_JSON: Record<string, ScopeDescriptor> =
     acc[key] = SCOPES[scope]
     return a
   }, {})
+
+/**
+ * An array from all system identifiers scopes.
+ */
+
+export const SYSTEM_IDENTIFIERS_SCOPES = [SCOPE_OPENID]
 
 // scope()
 // -----------------------------------------------------------------------------

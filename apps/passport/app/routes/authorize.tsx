@@ -34,7 +34,11 @@ import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResul
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 
-import type { ScopeDescriptor } from '@proofzero/security/scopes'
+import {
+  SCOPE_SYSTEM_IDENTIFIERS,
+  SYSTEM_IDENTIFIERS_SCOPES,
+  ScopeDescriptor,
+} from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { DataForScopes } from '~/utils/authorize.server'
 import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
@@ -217,6 +221,17 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         message:
           'Requested scope value not in the configured allowed scope list',
       })
+
+    // Add generic system identifiers scope if any of the system identifiers scopes are requested
+    if (
+      scope.filter((scope) =>
+        SYSTEM_IDENTIFIERS_SCOPES.map((scope) => Symbol.keyFor(scope)).includes(
+          scope
+        )
+      ).length > 0
+    ) {
+      scope.push(Symbol.keyFor(SCOPE_SYSTEM_IDENTIFIERS)!)
+    }
 
     //Go through pre-authorization if not explicitly requested to prompt user for
     //consent through query params
