@@ -28,7 +28,6 @@ type SelectItem = {
   desc: string
   disabled?: boolean
   section?: string
-  url?: string
 }
 export type MultiSelectProps = {
   label: string

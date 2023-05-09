@@ -17,7 +17,6 @@ import { requireJWT } from '~/utilities/session.server'
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
 import { RollType } from '~/types'
-
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
