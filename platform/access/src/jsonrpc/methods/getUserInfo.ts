@@ -9,7 +9,10 @@ import { Context } from '../../context'
 import { getJWKS } from '../../jwk'
 import { initAccessNodeByName } from '../../nodes'
 
-import { getClaimValues } from '@proofzero/security/persona'
+import {
+  claimValuesFormatter,
+  getClaimValues,
+} from '@proofzero/security/persona'
 import { PersonaData } from '@proofzero/types/application'
 
 export const GetUserInfoInput = z.object({
@@ -60,5 +63,5 @@ export const getUserInfoMethod = async ({
     personaData
   )
   //`sub` is a mandatory field in the userinfo result
-  return { ...claimValues, sub: jwt.sub }
+  return { ...claimValuesFormatter(claimValues), sub: jwt.sub }
 }
