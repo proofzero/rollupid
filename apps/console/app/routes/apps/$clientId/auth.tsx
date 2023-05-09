@@ -140,6 +140,12 @@ export const action: ActionFunction = async ({ request, params, context }) => {
     ...generateTraceContextHeaders(context.traceSpan),
   })
 
+  const paymaster = await starbaseClient.getPaymaster.query({
+    clientId: params.clientId as string,
+  })
+
+  console.log({ paymaster })
+
   const formData = await request.formData()
   const op = formData.get('op')
   const published = formData.get('published') === '1'
@@ -165,6 +171,13 @@ export const action: ActionFunction = async ({ request, params, context }) => {
         })
         .map((entry) => entry[1] as string)
 
+      if (
+        scopes.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!) &&
+        (!paymaster || !paymaster?.provider)
+      ) {
+        errors['paymaster'] = 'Paymaster is required for this scope'
+      }
+
       updates = {
         name: formData.get('name')?.toString(),
         icon: formData.get('icon') as string | undefined,
@@ -172,7 +185,7 @@ export const action: ActionFunction = async ({ request, params, context }) => {
         termsURL: formData.get('termsURL') as string | undefined,
         privacyURL: formData.get('privacyURL') as string | undefined,
         websiteURL: formData.get('websiteURL') as string | undefined,
-        scopes: Array.from(scopes),
+        scopes,
       }
 
       const zodErrors = updatesSchema.safeParse(updates)
