@@ -419,12 +419,13 @@ export default function AppDetailIndexPage() {
                       onChange={() => {
                         setIsFormChanged(true)
                       }}
+                      learnMore="https://docs.rollup.id/reference/scopes"
                       fieldName="scopes"
                       items={Object.entries(scopeMeta).map(([key, value]) => {
                         return {
                           id: key,
                           val: value.name,
-                          desc: value.description,
+                          desc: value.devDescription!,
                         }
                       })}
                       selectedItems={appDetails.app.scopes?.map((scope) => {
@@ -432,7 +433,7 @@ export default function AppDetailIndexPage() {
                         return {
                           id: scope,
                           val: meta.name,
-                          desc: meta.description,
+                          desc: meta.devDescription,
                         }
                       })}
                     />

@@ -22,6 +22,14 @@ export type appDetailsProps = {
   apiKeyTimestamp?: number
 }
 
+export type PaymasterType = {
+  provider?: string
+  name?: string
+  secretLabel?: string
+  secretPlaceholder?: string
+  unavailable?: boolean
+}
+
 export type errorsAuthProps = {
   websiteURL?: string
   termsURL?: string

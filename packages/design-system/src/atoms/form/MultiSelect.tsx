@@ -37,6 +37,7 @@ export type MultiSelectProps = {
   selectedItems?: SelectItem[]
   disabled?: boolean
   onChange?: () => void
+  learnMore?: string
 }
 
 export function MultiSelect({
@@ -46,6 +47,7 @@ export function MultiSelect({
   disabled = false,
   selectedItems = [],
   onChange,
+  learnMore,
 }: MultiSelectProps) {
   const [query, setQuery] = useState('')
   const [selectedValues, setSelectedValues] = useState(selectedItems)
@@ -75,9 +77,19 @@ export function MultiSelect({
     >
       {({ open }) => (
         <>
-          <Combobox.Label className="block text-sm font-medium text-gray-700">
-            {label}
-          </Combobox.Label>
+          <div className="flex flex-row justify-between">
+            <Combobox.Label className="block text-sm font-medium text-gray-700">
+              {label}
+            </Combobox.Label>
+            <a
+              className="block text-sm font-medium text-indigo-500"
+              target="_blank"
+              rel="noreferrer"
+              href={learnMore ? learnMore : 'https://docs.rollup.id'}
+            >
+              Learn More
+            </a>
+          </div>
           <div className={`relative mt-1`}>
             <Combobox.Button
               className={`${
@@ -118,26 +130,31 @@ export function MultiSelect({
                       no select
                     </div>
                   )}
-              {(open || query.length > 0) && (
-                <Combobox.Input
-                  className={`${
-                    disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
-                  } truncate w-max py-2 p-0 -m-2 ml-2 rounded-md border-none sm:text-sm focus-none focus:ring-0`}
-                  onChange={(event) => setQuery(event.target.value)}
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    event.preventDefault()
-                  }}
-                  placeholder={'filter scopes'}
-                />
-              )}
-
-              {query.length > 0 && (
-                <div className={`ml-auto flex items-center rounded-r-md pl-3`}>
-                  <IoCloseOutline
-                    className="h-5 w-5 text-gray-400 cursor-pointer"
-                    onClick={() => setQuery('')}
+              {open && (
+                <div className="flex flex-row items-center min-w-full">
+                  <Combobox.Input
+                    className={`${
+                      disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
+                    } truncate w-fit py-2 p-0 -m-2 ml-2 rounded-md border-none sm:text-sm focus-none focus:ring-0`}
+                    onChange={(event) => {
+                      setQuery(event.target.value)
+                    }}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      event.preventDefault()
+                    }}
+                    onKeyUp={(event) => {
+                      event.stopPropagation()
+                      event.preventDefault()
+                    }}
+                    placeholder={'filter scopes'}
                   />
+                  <div className={`ml-auto rounded-r-md pl-3`}>
+                    <IoCloseOutline
+                      className="h-5 w-5 text-gray-400 cursor-pointer"
+                      onClick={() => setQuery('')}
+                    />
+                  </div>
                 </div>
               )}
 

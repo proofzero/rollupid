@@ -14,25 +14,15 @@ import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
 import type { notificationHandlerType } from '~/types'
-import type {
-  PaymasterType,
-  PaymasterProviderType,
-} from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
+import type { PaymasterType } from '../../../types'
+import type { PaymasterProviderType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 
 type errorsType = {
   label?: string
   paymaster?: string
 }
 
-type paymasterType = {
-  provider?: string
-  name?: string
-  secretLabel?: string
-  secretPlaceholder?: string
-  unavailable?: boolean
-}
-
-const availablePaymasters: paymasterType[] = [
+const availablePaymasters: PaymasterType[] = [
   {
     name: 'ZeroDev',
     provider: 'zerodev',
@@ -102,7 +92,7 @@ export default () => {
         (avPaymaster) => paymaster.provider === avPaymaster.provider
       )
     }
-    return {} as paymasterType
+    return {} as PaymasterType
   })
 
   return (
