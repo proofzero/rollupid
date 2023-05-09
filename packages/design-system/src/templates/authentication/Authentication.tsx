@@ -1,7 +1,7 @@
 import React from 'react'
 
 import circleLogo from './circle-logo.svg'
-import subtractLogo from './subtract-logo.svg'
+import subtractLogo from '../../assets/subtract-logo.svg'
 
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/design-system'
