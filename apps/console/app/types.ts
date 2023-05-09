@@ -28,6 +28,7 @@ export type PaymasterType = {
   secretLabel?: string
   secretPlaceholder?: string
   unavailable?: boolean
+  secret?: string
 }
 
 export type errorsAuthProps = {

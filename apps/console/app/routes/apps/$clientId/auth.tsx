@@ -17,6 +17,7 @@ import { requireJWT } from '~/utilities/session.server'
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
 import { RollType } from '~/types'
+import type { PaymasterType } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
@@ -39,6 +40,7 @@ import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWit
 import type { AddressURN } from '@proofzero/urns/address'
 
 import type { notificationHandlerType } from '~/types'
+import { SCOPE_SMART_CONTRACT_WALLETS } from '@proofzero/security/scopes'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -214,9 +216,10 @@ export default function AppDetailIndexPage() {
     notificationHandler: notificationHandlerType
     appDetails: appDetailsProps
     rotationResult: any
+    paymaster: PaymasterType
     appContactAddress?: AddressURN
   }>()
-  const { appContactAddress } = outletContextData
+  const { appContactAddress, paymaster } = outletContextData
   const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
 
   const [isFormChanged, setIsFormChanged] = useState(false)
@@ -422,10 +425,25 @@ export default function AppDetailIndexPage() {
                       learnMore="https://docs.rollup.id/reference/scopes"
                       fieldName="scopes"
                       items={Object.entries(scopeMeta).map(([key, value]) => {
+                        let disabled, section
+                        if (
+                          key === Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)
+                        ) {
+                          if (
+                            !paymaster ||
+                            !paymaster?.provider ||
+                            !paymaster?.secret
+                          ) {
+                            disabled = true
+                            section = 'Blockchain'
+                          }
+                        }
                         return {
                           id: key,
                           val: value.name,
                           desc: value.devDescription!,
+                          disabled,
+                          section,
                         }
                       })}
                       selectedItems={appDetails.app.scopes?.map((scope) => {

@@ -21,6 +21,7 @@ import { IoCloseOutline } from 'react-icons/io5'
 import { Combobox } from '@headlessui/react'
 import classNames from 'classnames'
 import { Text } from '../text/Text'
+import { Pill } from '../pills/Pill'
 
 type SelectItem = {
   id: string
@@ -182,7 +183,7 @@ export function MultiSelect({
                           active ? 'bg-gray-50' : ''
                         )
                       }
-                      // disabled={}
+                      disabled={item.disabled}
                     >
                       {({ selected }) => (
                         <div
@@ -213,6 +214,11 @@ export function MultiSelect({
                             >
                               {item.id}
                             </Text>
+                            {item.disabled && (
+                              <Pill className="bg-gray-100 text-gray-500 rounded-xl ml-2">
+                                Enable in &quot;{item.section}&quot; section
+                              </Pill>
+                            )}
                             <Text size="xs" className="mt-1 text-gray-500">
                               {item.desc}
                             </Text>
