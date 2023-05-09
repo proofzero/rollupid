@@ -111,7 +111,10 @@ export const getAuthorizedAppScopesMethod = async ({
               urn: edgesResults.edges[0].dst.baseUrn,
             },
           }
-        } else if (scope === 'connected_accounts') {
+        } else if (
+          scope === 'connected_accounts' &&
+          personaData.connected_accounts
+        ) {
           if (
             personaData.connected_accounts === AuthorizationControlSelection.ALL
           ) {
