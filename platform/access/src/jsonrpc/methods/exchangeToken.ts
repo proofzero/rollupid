@@ -199,7 +199,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   //be needed for previous authorizations, but not the new one.
   const existingPersonaData =
     (await accessNode.storage.get<PersonaData>('personaData')) || {}
-  let combinedPersonaData = Object.assign(existingPersonaData, newPersonaData)
+  const combinedPersonaData = Object.assign(existingPersonaData, newPersonaData)
   await accessNode.storage.put({
     account,
     clientId,
