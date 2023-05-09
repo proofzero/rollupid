@@ -113,7 +113,7 @@ export const getAuthorizedAppScopesMethod = async ({
           }
         } else if (
           scope === 'connected_accounts' &&
-          personaData.connected_accounts
+          personaData.connected_accounts != undefined
         ) {
           if (
             personaData.connected_accounts === AuthorizationControlSelection.ALL
