@@ -15,6 +15,7 @@ export const ScopeSchema = z.object({
   name: z.string(),
   description: z.string(),
   class: z.string(),
+  devDescription: z.string().optional(),
   /**
    * Some scopes are hidden from the user and are only used internally
    */
@@ -125,27 +126,36 @@ export const SCOPES: ScopeMap = {
   [SCOPE_OPENID]: {
     name: 'OpenID',
     description: 'Read your OpenID profile',
+    devDescription:
+      'Standard scope value indicating the authorization request to be an OIDC request. This provides an ID token as part of the token exchange.',
     class: 'implied',
     hidden: true,
   },
   [SCOPE_EMAIL]: {
     name: 'Email',
     description: 'Read your chosen email address',
+    devDescription:
+      'Standard scope value indicating that configured email address will be included in the ID token as well as the /userinfo endpoint response.',
     class: 'address',
   },
   [SCOPE_PROFILE]: {
     name: 'Profile',
     description: `Read your name and picture`,
+    devDescription: 'This scope currently provides name and picture claims.',
     class: 'profile',
   },
   [SCOPE_CONNECTED_ACCOUNTS]: {
     name: 'Connected accounts',
     description: `List your connected accounts and identifiers`,
+    devDescription:
+      'Scope value that indicates that the type and address of each connected account will be included in the ID token as well as the /userinfo endpoint response.',
     class: 'address',
   },
   [SCOPE_SMART_CONTRACT_WALLETS]: {
     name: 'Smart contract wallets',
     description: `Read your smart contract addresses and make transactions on them on your behalf`,
+    devDescription:
+      'Scope value indicating that a configured smart contract wallets will be included in the ID token as well as the /userinfo endpoint response.',
     class: 'address',
   },
   // NOT READY YET

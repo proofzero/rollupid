@@ -17,17 +17,13 @@ export default {
         return {
           id: key,
           val: value.name,
-          desc: value.description,
+          desc: value.devDescription,
         }
       }),
     },
   },
 }
 
-const Template = (args) => (
-  <div className="max-w-[450px]">
-    <MultiSelect {...args} />
-  </div>
-)
+const Template = (args) => <MultiSelect {...args} />
 
 export const Default = Template.bind({})

@@ -22,7 +22,14 @@ import { Combobox } from '@headlessui/react'
 import classNames from 'classnames'
 import { Text } from '../text/Text'
 
-type SelectItem = { id: string; val: string; desc: string }
+type SelectItem = {
+  id: string
+  val: string
+  desc: string
+  disabled?: boolean
+  section?: string
+  url?: string
+}
 export type MultiSelectProps = {
   label: string
   fieldName: string
@@ -72,23 +79,30 @@ export function MultiSelect({
             {label}
           </Combobox.Label>
           <div className={`relative mt-1`}>
-            <div
+            <Combobox.Button
               className={`${
                 disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
-              } w-full min-h-24 rounded-md border border-gray-300 py-2 pl-3 pr-7
+              } w-full block min-h-24 rounded-md border border-gray-300 py-2 pl-3 pr-7
         shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm
         flex flex-row items-center justify-start flex-wrap gap-y-1`}
+              onClick={() => {
+                setQuery('')
+              }}
             >
               {selectedValues.length > 0
                 ? selectedValues.map((item, key) => (
                     <div
                       key={key}
-                      className="bg-indigo-50 text-indigo-600 p-1 m-1 rounded-md border min-w-max z-100 min-w-max
+                      className="bg-indigo-50 text-indigo-600 p-1 m-1 rounded-md border min-w-max z-998 min-w-max
                       flex flex-row items-center justify-start gap-x-1"
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        event.preventDefault()
+                      }}
                     >
                       {item.val}
                       <IoCloseOutline
-                        className="h-5 w-5 text-gray-400 cursor-pointer"
+                        className="h-5 w-5 text-gray-400 cursor-pointer z-999"
                         onClick={() => {
                           setSelectedValues(
                             selectedValues.filter((v) => v.id !== item.id)
@@ -108,14 +122,18 @@ export function MultiSelect({
                 <Combobox.Input
                   className={`${
                     disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
-                  } w-fit py-2 p-0 -m-2 ml-2 rounded-md border-none sm:text-sm focus-none focus:ring-0`}
+                  } truncate w-max py-2 p-0 -m-2 ml-2 rounded-md border-none sm:text-sm focus-none focus:ring-0`}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder={query.length ? query : 'filter scopes'}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    event.preventDefault()
+                  }}
+                  placeholder={'filter scopes'}
                 />
               )}
 
               {query.length > 0 && (
-                <div className="absolute inset-y-0 right-0 flex items-center rounded-r-md pl-6 pr-8">
+                <div className={`ml-auto flex items-center rounded-r-md pl-3`}>
                   <IoCloseOutline
                     className="h-5 w-5 text-gray-400 cursor-pointer"
                     onClick={() => setQuery('')}
@@ -123,13 +141,13 @@ export function MultiSelect({
                 </div>
               )}
 
-              <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+              <div className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                 <ChevronUpDownIcon
                   className="h-5 w-5 text-gray-400"
                   aria-hidden="true"
                 />
-              </Combobox.Button>
-            </div>
+              </div>
+            </Combobox.Button>
 
             <Combobox.Options
               className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1
@@ -158,7 +176,9 @@ export function MultiSelect({
                           <input
                             type="checkbox"
                             className={`rounded mr-2 mt-1 text-indigo-500
-                            border-gray-300 ${disabled ? 'bg-gray-300' : ''}`}
+                            border-gray-300 ${
+                              item.disabled ? 'bg-gray-300' : ''
+                            }`}
                             checked={selected}
                           ></input>
                           <div>
