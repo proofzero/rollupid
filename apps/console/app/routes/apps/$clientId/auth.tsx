@@ -17,7 +17,7 @@ import { requireJWT } from '~/utilities/session.server'
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
 import { RollType } from '~/types'
-import type { PaymasterType } from '~/types'
+
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
@@ -38,7 +38,7 @@ import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import type { AddressURN } from '@proofzero/urns/address'
-
+import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { notificationHandlerType } from '~/types'
 import { SCOPE_SMART_CONTRACT_WALLETS } from '@proofzero/security/scopes'
 
