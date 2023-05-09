@@ -6,7 +6,7 @@ import { AuthorizedAppsModel } from '~/routes/settings'
 import { Button, Text } from '@proofzero/design-system'
 import { FaChevronRight } from 'react-icons/fa'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { getDefaultIconUrl } from '~/components/addresses/AddressListItem'
 
 import { useHydrated } from 'remix-utils'
@@ -15,10 +15,11 @@ import {
   ClaimsWideView,
   ConfirmRevocationModal,
 } from '~/components/applications/claims'
+import { GetAuthorizedAppScopesMethodResult } from '@proofzero/platform/access/src/jsonrpc/methods/getAuthorizedAppScopes'
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
   const { clientId } = params
-  const mappedScopeSets = await scopesLoader({
+  const scopes = await scopesLoader({
     request,
     params,
     context,
@@ -26,7 +27,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
   return {
     clientId,
-    mappedScopeSets,
+    scopes,
   }
 }
 
@@ -39,54 +40,46 @@ export default () => {
   const { clientId } = useLoaderData()
   const app = authorizedApps.find((app) => app.clientId === clientId)!
 
-  const { mappedScopeSets } = useLoaderData<{
-    mappedScopeSets: {
-      scopes: any[]
-      claims: any
-    }[]
+  const { scopes } = useLoaderData<{
+    scopes: GetAuthorizedAppScopesMethodResult
   }>()
 
-  const modeledScopes = mappedScopeSets.map((scopeSet) => {
-    const claimKeys = Object.keys(scopeSet.claims)
-    const claims = claimKeys
-      .filter((ck) => ['email', 'connected_accounts'].includes(ck))
-      .map((claimKey: string) => {
-        switch (claimKey) {
-          case 'email':
-            const profile = connectedProfiles.find(
-              (profile) => profile.urn === scopeSet.claims[claimKey].urn
-            )
+  const modeledScopes = useMemo(() => {
+    const aggregator = []
 
-            return {
-              claim: 'email',
-              icon: profile.icon,
-              address: profile.address,
-              type: profile.type,
-              sourceIcon: getDefaultIconUrl(profile.type),
-            }
-          case 'connected_accounts': {
-            const profiles = connectedProfiles.filter((profile) =>
-              scopeSet.claims[claimKey]
-                .map((account: any) => account.urn)
-                .includes(profile.urn)
-            )
+    if (scopes.email) {
+      const profile = connectedProfiles.find(
+        (profile) => profile.urn === scopes.email!.urn
+      )
 
-            return {
-              claim: 'connected_accounts',
-              accounts: profiles.map((profile) => ({
-                icon: profile.icon,
-                address: profile.address,
-                type: profile.type === 'eth' ? 'blockchain' : profile.type,
-              })),
-            }
-          }
-        }
+      aggregator.push({
+        claim: 'email',
+        icon: profile.icon,
+        address: profile.address,
+        type: profile.type,
+        sourceIcon: getDefaultIconUrl(profile.type),
       })
-
-    return {
-      claims,
     }
-  })
+
+    if (scopes.connected_accounts) {
+      const profiles = connectedProfiles.filter((profile) =>
+        scopes.connected_accounts
+          ?.map((account: any) => account.urn)
+          .includes(profile.urn)
+      )
+
+      aggregator.push({
+        claim: 'connected_accounts',
+        accounts: profiles.map((profile) => ({
+          icon: profile.icon,
+          address: profile.address,
+          type: profile.type === 'eth' ? 'blockchain' : profile.type,
+        })),
+      })
+    }
+
+    return aggregator
+  }, [scopes])
 
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
 
@@ -153,9 +146,7 @@ export default () => {
 
       <section>
         <div className="lg:hidden">
-          {modeledScopes.map((scope, i) => (
-            <ClaimsMobileView key={i} {...scope} />
-          ))}
+          <ClaimsMobileView claims={modeledScopes} />
 
           <Button
             type="submit"
@@ -170,7 +161,7 @@ export default () => {
         </div>
 
         <div className="hidden lg:block border rounded-lg">
-          <table className="min-w-full bg-white rounded-lg">
+          <table className="min-w-full bg-white rounded-lg overflow-hidden">
             <thead className="bg-gray-50 rounded-t-lg">
               <tr className="rounded-t-lg">
                 <th className="px-6 py-3 text-left rounded-tl-lg">
@@ -203,11 +194,9 @@ export default () => {
               </tr>
             </thead>
 
-            {modeledScopes.map((scope, i) => (
-              <tbody key={i} className="border-t border-gray-200">
-                <ClaimsWideView key={scope.claims.join(' ')} {...scope} />
-              </tbody>
-            ))}
+            <tbody className="border-t border-gray-200">
+              <ClaimsWideView claims={modeledScopes} />
+            </tbody>
           </table>
         </div>
       </section>
