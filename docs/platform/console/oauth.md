@@ -30,7 +30,7 @@ The details panel is where you configure your application name, picture, [author
 
 The name and picture you choose will be displayed to users when logging in.&#x20;
 
-<img src="../../.gitbook/assets/image.png" alt="" data-size="original">
+<img src="../../.gitbook/assets/image (5).png" alt="" data-size="original">
 
 The authorization scopes, "privacy policy" and "terms of services" will be displayed to the user during the authorization step.
 

@@ -16,6 +16,8 @@ For more information read our guide: [using-smart-contract-wallets.md](../../gui
 
 ## Preferred Paymasters
 
+A paymaster is a service that facilitates sponsorship of gas fees for ERC 4337 smart contract wallets. You can read up about it more [here](https://www.stackup.sh/blog/what-are-paymasters).
+
 {% hint style="warning" %}
 Your paymaster credentials will only be used to sponsor registration of session keys driven by and for your application.
 {% endhint %}

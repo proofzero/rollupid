@@ -6,7 +6,7 @@ description: Rollup Account Abstraction Claims and API
 
 ## Accessing You User's Smart Contract Wallets
 
-With Rollup your can request access to your users smart contract wallets. If they don't have a smart contract wallet, no sweat, we will help them create one when they onboard to your application. The following will guide you through setting up this flow.
+With Rollup your can request access to your users [ERC 4337](https://eips.ethereum.org/EIPS/eip-4337) smart contract wallets. If they don't have a smart contract wallet, no sweat, we will help them create one when they onboard to your application. The following will guide you through setting up this flow.
 
 ### Prerequisites
 
@@ -21,6 +21,8 @@ With Rollup your can request access to your users smart contract wallets. If the
 5. Go to the OAuth settings tab
 6. In the scopes dropdown select `erc_4337` scope
 7. Update your application to include the `erc_4337` scope in the [authorization request](../getting-started/auth-flow.md)
+
+<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
 
 ### Registering Session Keys
 
@@ -38,7 +40,9 @@ When your users login to your application you will now be presented with an acce
 }
 ```
 
-With this access token you can now make requests to the [galaxy-api.md](../reference/galaxy-api.md "mention") to register your session key.  To register a session key you will always need to generate a ethers wallet and send the public address along with the specified smart contract wallet to register. For example:
+<figure><img src="../.gitbook/assets/image (4).png" alt=""><figcaption></figcaption></figure>
+
+With this access token you can now make requests to the [galaxy-api.md](../reference/galaxy-api.md "mention") to register your [session key](https://twitter.com/chainlink/status/1636781219848372235).  To register a session key you will always need to generate a ethers wallet and send the public address along with the specified smart contract wallet to register. For example:
 
 ````typescript
 import { Wallet } from 'ethers'
