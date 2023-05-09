@@ -24,6 +24,7 @@ import {
 
 import { PersonaData } from '@proofzero/types/application'
 import {
+  claimValuesFormatter,
   getClaimValues,
   setPersonaReferences,
 } from '@proofzero/security/persona'
@@ -257,7 +258,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     account,
     clientId,
     expirationTime,
-    idTokenClaims: idTokenClaims,
+    idTokenClaims: claimValuesFormatter(idTokenClaims),
     issuer,
   })
 

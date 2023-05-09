@@ -31,7 +31,7 @@ type AddressListItemIconProps = {
   iconUrl?: string
 }
 
-const getDefaultIconUrl = (type: string) => {
+export const getDefaultIconUrl = (type: string) => {
   switch (type) {
     case OAuthAddressType.Apple:
       return appleIcon

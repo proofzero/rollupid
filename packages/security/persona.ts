@@ -232,7 +232,13 @@ export async function getClaimValues(
         },
       })
       const emailAddress = edgesResults.edges[0].dst.qc.alias
-      result = { ...result, email: emailAddress }
+      result = {
+        ...result,
+        email: {
+          address: emailAddress,
+          urn: emailAddressUrn,
+        },
+      }
     } else if (scopeValue === 'profile') {
       const nodeResult = await edgesClient.findNode.query({
         baseUrn: accountUrn,
@@ -240,8 +246,11 @@ export async function getClaimValues(
       if (nodeResult) {
         result = {
           ...result,
-          name: nodeResult.qc.name,
-          picture: nodeResult.qc.picture,
+          profile: {
+            name: nodeResult.qc.name,
+            picture: nodeResult.qc.picture,
+            urn: nodeResult.baseUrn,
+          },
         }
       }
     } else if (scopeValue === 'erc_4337') {
@@ -272,7 +281,11 @@ export async function getClaimValues(
           ) || []
 
         const claimResults = accountAddresses.map((a) => {
-          return { type: a.rc.addr_type, identifier: a.qc.alias }
+          return {
+            type: a.rc.addr_type,
+            identifier: a.qc.alias,
+            urn: a.baseUrn,
+          }
         })
         result = { ...result, connected_accounts: claimResults }
       } else {
@@ -282,7 +295,7 @@ export async function getClaimValues(
         const edgePromises = authorizedAddresses.map((address) => {
           return edgesClient.findNode.query({ baseUrn: address })
         })
-        const edgeResults = await Promise.allSettled(edgePromises)
+        const edgeResults = await Promise.all(edgePromises)
 
         //Make typescript gods happy
         type connectedAddressType = { type: string; identifier: string }
@@ -291,17 +304,70 @@ export async function getClaimValues(
         ): optionallyDefined is connectedAddressType => !!optionallyDefined
 
         const claimResults = edgeResults
-          .map((e) => {
-            if (e.status === 'fulfilled')
-              return {
-                type: e.value.rc.addr_type,
-                identifier: e.value.qc.alias,
-              }
-          })
+          .map((e) => ({
+            type: e.rc.addr_type,
+            identifier: e.qc.alias,
+            urn: e.baseUrn,
+          }))
           .filter(isDefined)
         result = { ...result, connected_accounts: claimResults }
       }
     }
   }
   return result
+}
+
+export enum ClaimValuesFormat {
+  OIDC = 'oidc',
+  Application = 'application',
+}
+export const claimValuesFormatter = (
+  claimValues: Record<string, ClaimValueType>,
+  format: ClaimValuesFormat = ClaimValuesFormat.OIDC
+) => {
+  switch (format) {
+    case ClaimValuesFormat.OIDC:
+      if (claimValues.profile) {
+        const { name, picture } = claimValues.profile as {
+          name: string
+          picture: string
+        }
+        claimValues.name = name
+        claimValues.picture = picture
+        delete claimValues.profile
+      }
+
+      if (claimValues.email) {
+        const { address } = claimValues.email as {
+          address: string
+        }
+        claimValues.email = address
+      }
+
+      const deleteUrn = (obj: any) => {
+        if (obj.urn) {
+          delete obj.urn
+        }
+        Object.keys(obj).forEach((key) => {
+          if (typeof obj[key] === 'object') {
+            deleteUrn(obj[key])
+          }
+        })
+      }
+      deleteUrn(claimValues)
+
+      break
+    case ClaimValuesFormat.Application:
+      Object.keys(claimValues).forEach((key) => {
+        if (key !== 'email' && key !== 'connected_accounts') {
+          delete claimValues[key]
+        }
+      })
+
+      break
+    default:
+      throw new InternalServerError({ message: 'Invalid claim values format' })
+  }
+
+  return claimValues
 }

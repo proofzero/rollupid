@@ -3,91 +3,78 @@ import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'
 import { inputValidators } from '@proofzero/platform-middleware'
 import { AccountURNSpace } from '@proofzero/urns/account'
-import { scope, SCOPES } from '@proofzero/security/scopes'
+import { appRouter } from '../router'
+import {
+  ClaimValuesFormat,
+  claimValuesFormatter,
+  getClaimValues,
+} from '@proofzero/security/persona'
 
 export const GetAuthorizedAppScopesMethodInput = z.object({
   accountURN: inputValidators.AccountURNInput,
   clientId: z.string().min(1),
 })
-type GetAuthorizedAppScopesMethodInput = z.infer<
+type GetAuthorizedAppScopesMethodParams = z.infer<
   typeof GetAuthorizedAppScopesMethodInput
 >
 
-export const GetAuthorizedAppScopesMethodOutput = z.array(
-  z.object({
-    permission: z.string(),
-    scopes: z.array(z.string()),
-  })
-)
-type GetAuthorizedAppScopesMethodOutput = z.infer<
+export const GetAuthorizedAppScopesMethodOutput = z.object({
+  email: z
+    .object({
+      address: z.string(),
+      urn: z.string(),
+    })
+    .optional(),
+  connected_accounts: z
+    .array(
+      z.object({
+        type: z.string(),
+        identifier: z.string(),
+        urn: z.string(),
+      })
+    )
+    .optional(),
+})
+
+export type GetAuthorizedAppScopesMethodResult = z.infer<
   typeof GetAuthorizedAppScopesMethodOutput
 >
 
-type GetAuthorizedAppScopesParams = {
+export const getAuthorizedAppScopesMethod = async ({
+  input,
+  ctx,
+}: {
+  input: GetAuthorizedAppScopesMethodParams
   ctx: Context
-  input: GetAuthorizedAppScopesMethodInput
+}): Promise<GetAuthorizedAppScopesMethodResult> => {
+  const { accountURN, clientId } = input
+
+  const name = `${AccountURNSpace.decode(accountURN)}@${clientId}`
+  const accessNode = await initAccessNodeByName(name, ctx.Access)
+
+  const { tokenIndex, tokenMap } = await accessNode.class.getTokenState()
+
+  const accessCaller = appRouter.createCaller(ctx)
+  const personaData = await accessCaller.getPersonaData({
+    accountUrn: accountURN,
+    clientId,
+  })
+
+  const scopes = Array.from(
+    new Set(tokenIndex.flatMap((t) => tokenMap[t].scope))
+  )
+
+  const claimValues = await getClaimValues(
+    accountURN,
+    clientId,
+    scopes,
+    {
+      edgesFetcher: ctx.Edges,
+      accountFetcher: ctx.Account,
+    },
+    ctx.traceSpan,
+    personaData
+  )
+
+  return claimValuesFormatter(claimValues, ClaimValuesFormat.Application)
 }
-
-interface GetAuthorizedAppScopesMethod {
-  (
-    params: GetAuthorizedAppScopesParams
-  ): Promise<GetAuthorizedAppScopesMethodOutput>
-}
-
-export const getAuthorizedAppScopesMethod: GetAuthorizedAppScopesMethod =
-  async ({ ctx, input }) => {
-    const { accountURN, clientId } = input
-
-    const name = `${AccountURNSpace.decode(accountURN)}@${clientId}`
-    const accessNode = await initAccessNodeByName(name, ctx.Access)
-
-    const { tokenIndex, tokenMap } = await accessNode.class.getTokenState()
-
-    // Get a map of all the scopes
-    // in all authorizations
-    const tokens = tokenIndex.map((t) => tokenMap[t])
-    const scopes = tokens.flatMap((t) => t.scope)
-
-    // Filter for unique scopes
-    const uniqueScopes = Array.from(new Set(scopes))
-
-    // Add implicit openid scope
-    uniqueScopes.push('scope://rollup.id/openid')
-
-    // Generate an array of [{
-    //   permission: 'read' | 'write' | 'root' | ... based on scope structure,
-    //   scope: 'scope'
-    // }]
-    const castScopes = uniqueScopes
-      .filter((s) => Object.getOwnPropertySymbols(SCOPES).includes(scope(s)))
-      .map((s) => ({
-        name: SCOPES[scope(s)].name,
-        permission: s.split('#')[1] ?? 'claims',
-      }))
-
-    // Get a list of unique permissions
-    const uniquePermissions = Array.from(
-      new Set(castScopes.map((cs) => cs.permission))
-    )
-
-    // Generate array with
-    // permission and list of scopes
-    // associated to that permission
-    const mappedTokens: {
-      permission: string
-      scopes: string[]
-    }[] = []
-    for (let i = 0; i < uniquePermissions.length; i++) {
-      const permission = uniquePermissions[i]
-      const scopes = castScopes
-        .filter((cs) => cs.permission === permission)
-        .map((cs) => cs.name)
-
-      mappedTokens.push({
-        permission: permission.replace(/\b\w/g, (c) => c.toUpperCase()),
-        scopes,
-      })
-    }
-
-    return mappedTokens
-  }

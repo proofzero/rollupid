@@ -4,8 +4,9 @@ import { getApplicationNodeByClientId } from '../../nodes/application'
 import { AppClientIdParamSchema, AppPublicPropsSchema } from '../validators/app'
 
 export const GetAppPublicPropsInput = AppClientIdParamSchema
-
 export const GetAppPublicPropsOutput = AppPublicPropsSchema
+
+export type GetAppPublicPropsResult = z.infer<typeof GetAppPublicPropsOutput>
 
 export const getAppPublicProps = async ({
   input,
@@ -13,7 +14,7 @@ export const getAppPublicProps = async ({
 }: {
   input: z.infer<typeof GetAppPublicPropsInput>
   ctx: Context
-}): Promise<z.infer<typeof GetAppPublicPropsOutput>> => {
+}): Promise<GetAppPublicPropsResult> => {
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
     ctx.StarbaseApp

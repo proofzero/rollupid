@@ -17,11 +17,8 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   }
 
   const accessClient = getAccessClient(context.env, context.traceSpan)
-
-  const scopes = await accessClient.getAuthorizedAppScopes.query({
+  return await accessClient.getAuthorizedAppScopes.query({
     clientId,
     accountURN: accountUrn,
   })
-
-  return scopes
 }
