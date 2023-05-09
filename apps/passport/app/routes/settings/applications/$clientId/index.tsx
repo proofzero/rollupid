@@ -18,6 +18,7 @@ import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import warningImg from '~/assets/warning.svg'
 import InputText from '~/components/inputs/InputText'
 import { useHydrated } from 'remix-utils'
+import { startCase } from 'lodash'
 
 const ConfirmRevocationModal = ({
   title,
@@ -226,9 +227,9 @@ const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
                       weight="medium"
                       className="text-gray-500 truncate"
                     >
-                      {`${selectedAccount.type[0].toUpperCase()}${selectedAccount.type.slice(
-                        1
-                      )} - ${selectedAccount.address}`}
+                      {`${startCase(selectedAccount.type)} - ${
+                        selectedAccount.address
+                      }`}
                     </Text>
                   </div>
 
@@ -428,9 +429,9 @@ const ClaimsWideView = ({ claims }: { claims: any[] }) => {
                         weight="medium"
                         className="text-gray-500 truncate"
                       >
-                        {`${selectedAccount.type[0].toUpperCase()}${selectedAccount.type.slice(
-                          1
-                        )} - ${selectedAccount.address}`}
+                        {`${startCase(selectedAccount.type)} - ${
+                          selectedAccount.address
+                        }`}
                       </Text>
                     </div>
 
