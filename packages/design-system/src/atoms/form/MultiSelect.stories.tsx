@@ -24,6 +24,10 @@ export default {
   },
 }
 
-const Template = (args) => <MultiSelect {...args} />
+const Template = (args) => (
+  <div className="max-w-[450px]">
+    <MultiSelect {...args} />
+  </div>
+)
 
 export const Default = Template.bind({})
