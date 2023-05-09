@@ -77,33 +77,45 @@ export function MultiSelect({
                 disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
               } w-full min-h-24 rounded-md border border-gray-300 py-2 pl-3 pr-7
         shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm
-        flex flex-row items-center justify-start flex-wrap gap-y-3`}
+        flex flex-row items-center justify-start flex-wrap gap-y-1`}
             >
               {selectedValues.length > 0
                 ? selectedValues.map((item, key) => (
-                    <div key={key} className="z-100 min-w-max">
-                      <span
-                        className={
-                          'bg-indigo-50 text-indigo-600 p-1 m-1 rounded-md border min-w-max'
-                        }
-                      >
-                        {item.val}
-                      </span>
+                    <div
+                      key={key}
+                      className="bg-indigo-50 text-indigo-600 p-1 m-1 rounded-md border min-w-max z-100 min-w-max
+                      flex flex-row items-center justify-start gap-x-1"
+                    >
+                      {item.val}
+                      <IoCloseOutline
+                        className="h-5 w-5 text-gray-400 cursor-pointer"
+                        onClick={() => {
+                          setSelectedValues(
+                            selectedValues.filter((v) => v.id !== item.id)
+                          )
+                        }}
+                      />
                     </div>
                   ))
-                : !open && <div className="opacity-0">no select</div>}
+                : !open && (
+                    <div
+                      className={`${query.length > 0 ? 'hidden' : 'opacity-0'}`}
+                    >
+                      no select
+                    </div>
+                  )}
               {(open || query.length > 0) && (
                 <Combobox.Input
                   className={`${
                     disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
-                  } w-fit py-2 -m-2 ml-2 rounded-md border-none sm:text-sm focus-none focus:ring-0`}
+                  } w-fit py-2 p-0 -m-2 ml-2 rounded-md border-none sm:text-sm focus-none focus:ring-0`}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder={query.length ? query : 'filter scopes'}
                 />
               )}
 
               {query.length > 0 && (
-                <div className="absolute inset-y-0 right-0 flex items-center rounded-r-md pl-6 pr-10">
+                <div className="absolute inset-y-0 right-0 flex items-center rounded-r-md pl-6 pr-8">
                   <IoCloseOutline
                     className="h-5 w-5 text-gray-400 cursor-pointer"
                     onClick={() => setQuery('')}
@@ -129,13 +141,13 @@ export function MultiSelect({
                     <Combobox.Option
                       key={item.id}
                       value={item}
-                      // as={Fragment}
                       className={({ active }) =>
                         classNames(
                           'relative cursor-default select-none m-2',
                           active ? 'bg-gray-50' : ''
                         )
                       }
+                      // disabled={}
                     >
                       {({ selected }) => (
                         <div
@@ -145,7 +157,8 @@ export function MultiSelect({
                         >
                           <input
                             type="checkbox"
-                            className="rounded mr-2 mt-1 text-indigo-500"
+                            className={`rounded mr-2 mt-1 text-indigo-500
+                            border-gray-300 ${disabled ? 'bg-gray-300' : ''}`}
                             checked={selected}
                           ></input>
                           <div>
@@ -172,7 +185,7 @@ export function MultiSelect({
                     </Combobox.Option>
                   ))
                 ) : (
-                  <div className="p-2 ">No items found</div>
+                  <div className="p-2 px-5 ">No items found</div>
                 )}
               </div>
             </Combobox.Options>
