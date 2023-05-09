@@ -244,19 +244,6 @@ const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
                       {selectedAccount.icon}
                     </Text>
                   </div>
-
-                  <div className="flex flex-row gap-1 items-center">
-                    <Text size="xs" weight="semibold" className="text-gray-500">
-                      Verified:
-                    </Text>
-                    <Text
-                      size="xs"
-                      weight="medium"
-                      className="text-gray-500 truncate"
-                    >
-                      Yes
-                    </Text>
-                  </div>
                 </div>
               )}
             </Disclosure.Panel>
@@ -461,23 +448,6 @@ const ClaimsWideView = ({ claims }: { claims: any[] }) => {
                         className="text-gray-500 truncate"
                       >
                         {selectedAccount.icon}
-                      </Text>
-                    </div>
-
-                    <div className="flex flex-row gap-1 items-center">
-                      <Text
-                        size="xs"
-                        weight="semibold"
-                        className="text-gray-500"
-                      >
-                        Verified:
-                      </Text>
-                      <Text
-                        size="xs"
-                        weight="medium"
-                        className="text-gray-500 truncate"
-                      >
-                        Yes
                       </Text>
                     </div>
                   </div>
