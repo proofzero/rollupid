@@ -144,8 +144,6 @@ export const action: ActionFunction = async ({ request, params, context }) => {
     clientId: params.clientId as string,
   })
 
-  console.log({ paymaster })
-
   const formData = await request.formData()
   const op = formData.get('op')
   const published = formData.get('published') === '1'
