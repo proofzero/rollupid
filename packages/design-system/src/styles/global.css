@@ -1,4 +1,5 @@
 @import url('https://fonts.cdnfonts.com/css/inter');
+@import url('https://fonts.cdnfonts.com/css/ibm-plex-mono');
 
 @tailwind base;
 @tailwind components;
@@ -39,4 +40,8 @@
 .thin-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: #d1d5db white;
+}
+
+.font-ibm-plex-mono {
+  font-family: 'IBM Plex Mono', Courier, monospace;
 }

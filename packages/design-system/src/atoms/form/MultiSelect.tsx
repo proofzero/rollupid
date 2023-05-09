@@ -1,6 +1,6 @@
 /*
   This example requires some changes to your config:
-  
+
   ```
   // tailwind.config.js
   module.exports = {
@@ -19,6 +19,7 @@ import React, { useState } from 'react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox } from '@headlessui/react'
 import classNames from 'classnames'
+import { Text } from '../text/Text'
 
 type SelectItem = { id: string; val: string; desc: string }
 export type MultiSelectProps = {
@@ -71,7 +72,7 @@ export function MultiSelect({
         <div
           className={`${
             disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
-          } w-full min-h-24 rounded-md border border-gray-300 py-2 pl-3 pr-10 
+          } w-full min-h-24 rounded-md border border-gray-300 py-2 pl-3 pr-10
         shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm
           `}
         >
@@ -106,7 +107,7 @@ export function MultiSelect({
             <Combobox.Input
               className={`${
                 disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
-              } w-full min-h-24 rounded-md border border-gray-300 
+              } w-full min-h-24 rounded-md border border-gray-300
               py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none
                focus:ring-1 focus:ring-indigo-500 sm:text-sm`}
               onChange={(event) => setQuery(event.target.value)}
@@ -119,43 +120,42 @@ export function MultiSelect({
                 // as={Fragment}
                 className={({ active }) =>
                   classNames(
-                    'relative cursor-default select-none py-2 pl-3 pr-9',
-                    active ? 'bg-indigo-600 text-white' : 'text-gray-900'
+                    'relative cursor-default select-none m-2',
+                    active ? 'bg-gray-50' : ''
                   )
                 }
               >
-                {({ active, selected }) => (
-                  <>
-                    <div className="flex">
-                      <span
-                        className={classNames(
-                          'truncate',
-                          selected && 'font-semibold'
-                        )}
+                {({ selected }) => (
+                  <div
+                    className={`flex flex-row items-start justify-start rounded-lg p-2 ${
+                      selected ? 'bg-gray-100 w-full' : ''
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      className="rounded mr-2 mt-1 text-indigo-500"
+                      checked={selected}
+                    ></input>
+                    <div>
+                      <Text
+                        size="sm"
+                        weight="medium"
+                        className="font-ibm-plex-mono truncate inline text-gray-900"
+                      >
+                        {item.val} -
+                      </Text>
+                      <Text
+                        size="sm"
+                        weight="medium"
+                        className="font-ibm-plex-mono inline ml-2 truncate text-gray-500"
                       >
                         {item.id}
-                      </span>
-                      <span
-                        className={classNames(
-                          'ml-2 truncate text-gray-500',
-                          active ? 'text-indigo-200' : 'text-gray-500'
-                        )}
-                      >
-                        {item.val}
-                      </span>
+                      </Text>
+                      <Text size="xs" className="mt-1 text-gray-500">
+                        {item.desc}
+                      </Text>
                     </div>
-
-                    {selected && (
-                      <span
-                        className={classNames(
-                          'absolute inset-y-0 right-0 flex items-center pr-4',
-                          active ? 'text-white' : 'text-indigo-600'
-                        )}
-                      >
-                        <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                      </span>
-                    )}
-                  </>
+                  </div>
                 )}
               </Combobox.Option>
             ))}
