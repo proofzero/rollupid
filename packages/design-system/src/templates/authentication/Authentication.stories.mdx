@@ -1,0 +1,38 @@
+import { Canvas, Meta, Story } from '@storybook/addon-docs'
+
+import Authentication, { AuthenticationConstants } from './Authentication'
+import { WagmiConfig, createClient } from 'wagmi'
+import { getDefaultClient } from 'connectkit'
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+
+<Meta title="Components/Authentication" component={Authentication} />
+
+export const Template = (args) => <Authentication {...args}></Authentication>
+
+# Authentication
+
+<Canvas>
+  <Story
+    decorators={[
+      (Story) => {
+        const client = createClient(
+          getDefaultClient({
+            appName: 'Rollup',
+          })
+        )
+        return (
+          <WagmiConfig client={client}>
+            <Story />
+          </WagmiConfig>
+        )
+      },
+    ]}
+    name="Passport Authentication"
+    args={{
+      heading: AuthenticationConstants.defaultHeading,
+      subheading: AuthenticationConstants.defaultSubheading,
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>

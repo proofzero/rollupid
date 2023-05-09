@@ -10,7 +10,7 @@ import {
 } from '@remix-run/react'
 import { useEffect, useState } from 'react'
 import { HiOutlineMail } from 'react-icons/hi'
-import { Authentication, ConnectButton } from '~/components'
+import { ConnectButton } from '~/components'
 import ConnectOAuthButton, {
   OAuthProvider,
 } from '~/components/connect-oauth-button'
@@ -27,6 +27,7 @@ import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { createClient, WagmiConfig } from 'wagmi'
 import { getDefaultClient } from 'connectkit'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import Authentication from '@proofzero/design-system/src/templates/authentication/Authentication'
 
 const client = createClient(
   // @ts-ignore

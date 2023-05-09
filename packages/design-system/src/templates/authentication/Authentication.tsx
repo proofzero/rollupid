@@ -1,26 +1,36 @@
+import React from 'react'
+
 import circleLogo from './circle-logo.svg'
-import subtractLogo from '../../assets/subtract-logo.svg'
+import subtractLogo from './subtract-logo.svg'
 
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/design-system'
-import { HiOutlineArrowLeft } from 'react-icons/hi'
+
+export const AuthenticationConstants = {
+  defaultLogoURL: circleLogo,
+  defaultHeading: 'Welcome to the Private Web',
+  defaultSubheading: 'How would you like to continue?',
+}
 
 export type AuthenticationProps = {
   logoURL?: string
   appName?: string
+  heading?: string
+  subheading?: string
   generic?: boolean
   accountSelect?: boolean
   children: JSX.Element
 }
 
-export function Authentication({
-  logoURL,
+export default ({
+  logoURL = AuthenticationConstants.defaultLogoURL,
   appName,
+  heading = AuthenticationConstants.defaultHeading,
+  subheading = AuthenticationConstants.defaultSubheading,
   generic = false,
   accountSelect = false,
   children,
-}: AuthenticationProps) {
-  const logo = logoURL || circleLogo
+}: AuthenticationProps) => {
   return (
     <div className="relative">
       <div
@@ -44,7 +54,7 @@ export function Authentication({
 
         {accountSelect && (
           <>
-            <Avatar src={logo} size="sm"></Avatar>
+            <Avatar src={logoURL} size="sm"></Avatar>
             <div className={'flex flex-col items-center gap-2'}>
               <Text size="xl" weight="semibold">
                 Choose an account
@@ -62,16 +72,16 @@ export function Authentication({
 
         {!generic && !accountSelect && (
           <>
-            <Avatar src={logo} size="sm"></Avatar>
+            <Avatar src={logoURL} size="sm"></Avatar>
             <div className={'flex flex-col items-center gap-2'}>
               <h1 className={'font-semibold text-xl'}>
-                {appName ? `Login to ${appName}` : 'Welcome to the Private Web'}
+                {appName ? `Login to ${appName}` : heading}
               </h1>
               <h2
                 style={{ color: '#6B7280' }}
                 className={'font-medium text-base'}
               >
-                How would you like to continue?
+                {subheading}
               </h2>
             </div>
           </>

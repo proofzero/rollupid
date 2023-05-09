@@ -11,7 +11,6 @@ import {
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
-import { Authentication } from '~/components'
 import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/AuthButton'
 import { getAccountClient } from '~/platform.server'
 import {
@@ -20,6 +19,7 @@ import {
   parseJwt,
 } from '~/session.server'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import Authentication from '@proofzero/design-system/src/templates/authentication/Authentication'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const jwt = await getUserSession(request, context.env, params.clientId)
