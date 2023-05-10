@@ -34,6 +34,11 @@ import {
   UpdateNodeCompsMethodInput,
   UpdateNodeCompsMethodOutput,
 } from './methods/updateNodeComps'
+import {
+  deleteNodeMethod,
+  DeleteNodeMethodInput,
+  DeleteNodeMethodOutput,
+} from './methods/deleteNode'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -44,6 +49,12 @@ export const appRouter = t.router({
     .input(FindNodeMethodInput)
     .output(FindNodeMethodOutput)
     .query(findNodeMethod),
+  deleteNode: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(DeleteNodeMethodInput)
+    .output(DeleteNodeMethodOutput)
+    .mutation(deleteNodeMethod),
   updateNode: t.procedure
     .use(LogUsage)
     .use(Analytics)

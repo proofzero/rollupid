@@ -9,7 +9,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const redirectTo = params.get('redirect_uri') || '/'
   const clientId = params.get('client_id') ?? undefined
 
-  return destroyUserSession(
+  return await destroyUserSession(
     request,
     redirectTo,
     context.env,

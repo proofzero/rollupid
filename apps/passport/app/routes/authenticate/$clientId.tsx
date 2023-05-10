@@ -34,6 +34,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
   let rollup_action
   if (
+    cp &&
     cp.rollup_action &&
     ['connect', 'reconnect'].includes(cp?.rollup_action)
   ) {
@@ -46,23 +47,6 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     rollup_action,
   })
 }
-
-// TODO: update with white label settings
-export const meta: MetaFunction = ({
-  data,
-}: {
-  data: ReturnType<typeof loader>
-}) => ({
-  charset: 'utf-8',
-  title: data.appProps.name,
-  viewport: 'width=device-width,initial-scale=1',
-  'og:url': data.appProps.redirectURI,
-  'og:description': 'Identity management for the private web.',
-  'og:image': social,
-  'twitter:card': 'summary_large_image',
-  'twitter:site': '@rollupid_xyz',
-  'twitter:creator': '@rollupid_xyz',
-})
 
 export default () => {
   const { clientId, appProps, rollup_action } = useLoaderData()
