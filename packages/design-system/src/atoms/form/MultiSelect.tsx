@@ -102,35 +102,31 @@ export function MultiSelect({
                 setQuery('')
               }}
             >
-              {selectedValues.length > 0
-                ? selectedValues.map((item, key) => (
-                    <div
-                      key={key}
-                      className="bg-indigo-50 text-indigo-600 px-1 py-[3px] m-1 rounded-md border min-w-max z-998 min-w-max
+              {selectedValues.length > 0 ? (
+                selectedValues.map((item, key) => (
+                  <div
+                    key={key}
+                    className="bg-indigo-50 text-indigo-600 px-1 py-[3px] m-1 rounded-md border min-w-max z-998 min-w-max
                       flex flex-row items-center justify-start gap-x-1"
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        event.preventDefault()
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      event.preventDefault()
+                    }}
+                  >
+                    {item.val}
+                    <IoCloseOutline
+                      className="h-5 w-5 text-gray-400 cursor-pointer z-999"
+                      onClick={() => {
+                        setSelectedValues(
+                          selectedValues.filter((v) => v.id !== item.id)
+                        )
                       }}
-                    >
-                      {item.val}
-                      <IoCloseOutline
-                        className="h-5 w-5 text-gray-400 cursor-pointer z-999"
-                        onClick={() => {
-                          setSelectedValues(
-                            selectedValues.filter((v) => v.id !== item.id)
-                          )
-                        }}
-                      />
-                    </div>
-                  ))
-                : !open && (
-                    <div
-                      className={`${query.length > 0 ? 'hidden' : 'opacity-0'}`}
-                    >
-                      no select
-                    </div>
-                  )}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="opacity-0">no select</div>
+              )}
 
               <div className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                 <ChevronUpDownIcon
