@@ -45,7 +45,6 @@ export type AuthenticationProps = {
   subheading?: string
   generic?: boolean
   displayKeys: string[]
-  enableCancel?: boolean
   onCancel?: () => void
   mapperArgs: DisplayKeyMapperArgs
 }
@@ -57,7 +56,6 @@ export default ({
   subheading = AuthenticationConstants.defaultSubheading,
   displayKeys,
   generic = false,
-  enableCancel = false,
   onCancel = () => {},
   mapperArgs,
 }: AuthenticationProps) => {
@@ -144,7 +142,7 @@ export default ({
             </Text>
           )}
 
-          {enableCancel && (
+          {generic && (
             <div className="flex flex-1 items-end">
               <Button
                 btnSize="l"
