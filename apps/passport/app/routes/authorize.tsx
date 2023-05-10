@@ -227,6 +227,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       ).length > 0
     ) {
       scope.push('system_identifiers')
+      scopeMeta.scopes['system_identifiers'] = {
+        name: 'System Identifiers',
+        description:
+          "Read account's system identifiers and other non-personally identifiable information",
+        class: 'implied',
+      }
     }
 
     //Go through pre-authorization if not explicitly requested to prompt user for
@@ -393,13 +399,6 @@ export default function Authorize() {
     profile,
     prompt,
   } = useLoaderData<LoaderData>()
-
-  scopeMeta.scopes['system_identifiers'] = {
-    name: 'System Identifiers',
-    description:
-      "Read account's system identifiers and other non-personally identifiable information",
-    class: 'non-configurable',
-  }
 
   const userProfile = profile as UserProfile
 
