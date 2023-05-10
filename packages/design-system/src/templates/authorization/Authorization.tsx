@@ -75,7 +75,7 @@ type AuthorizationProps = {
   disableAuthorize?: boolean
 }
 
-const Authorization = ({
+export default ({
   userProfile,
   appProfile,
   requestedScope,
@@ -307,5 +307,3 @@ const Authorization = ({
     </div>
   )
 }
-
-export default Authorization

@@ -46,7 +46,7 @@ export type AuthenticationProps = {
   Actions?: JSX.Element
 }
 
-const Authentication = ({
+export default ({
   appProfile,
   displayKeys,
   mapperArgs,
@@ -295,5 +295,3 @@ const displayKeyDisplayFn = (
     </div>
   ))
 }
-
-export default Authentication

@@ -22,14 +22,14 @@ export type AccountSelectProps = {
   onChooseOther: () => void
 }
 
-const AccountSelect = ({
+export default ({
   logoURL = AuthenticationConstants.defaultLogoURL,
   userProfile,
   appProfile,
   onAuth = () => {},
   onSignOut = () => {},
   onChooseOther = () => {},
-}: AccountSelectProps) => {
+}: AccountSelectProps) {
   return (
     <div className="relative">
       <div
@@ -130,5 +130,3 @@ const AccountSelect = ({
     </div>
   )
 }
-
-export default AccountSelect
