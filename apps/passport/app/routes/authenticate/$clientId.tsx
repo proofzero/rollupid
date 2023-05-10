@@ -34,6 +34,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
   let rollup_action
   if (
+    cp &&
     cp.rollup_action &&
     ['connect', 'reconnect'].includes(cp?.rollup_action)
   ) {
@@ -54,9 +55,9 @@ export const meta: MetaFunction = ({
   data: ReturnType<typeof loader>
 }) => ({
   charset: 'utf-8',
-  title: data.appProps.name,
+  title: data?.appProps.name,
   viewport: 'width=device-width,initial-scale=1',
-  'og:url': data.appProps.redirectURI,
+  'og:url': data?.appProps.redirectURI,
   'og:description': 'Identity management for the private web.',
   'og:image': social,
   'twitter:card': 'summary_large_image',

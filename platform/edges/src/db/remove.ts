@@ -24,3 +24,7 @@ export function edge(
     .prepare('DELETE FROM edge WHERE src = ? AND dst = ? AND tag = ?')
     .bind(src, dst, tag)
 }
+
+export function node(g: Graph, urn: AnyURN): D1PreparedStatement {
+  return g.db.prepare('DELETE FROM node WHERE urn = ?').bind(urn)
+}

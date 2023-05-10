@@ -33,6 +33,9 @@ export const deleteApp = async ({
     dst: appURN,
     tag: EDGE_APPLICATION,
   })
+  await ctx.edges.deleteNode.mutate({
+    urn: appURN,
+  })
   await appDO.class.delete()
 
   console.log(`Deleted app ${input.clientId} from account ${ctx.accountURN}`)

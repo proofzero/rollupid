@@ -19,21 +19,26 @@ import {
 } from '~/session.server'
 import AccountSelect from '@proofzero/design-system/src/templates/authentication/AccountSelect'
 
+function redirectToAuthentication(
+  request: Request,
+  clientId: string | undefined
+) {
+  const url = new URL(request.url)
+  const qpString = url.searchParams.toString()
+
+  return redirect(
+    `/authenticate/${clientId}${qpString !== '' ? `?${qpString}` : ''}`
+  )
+}
+
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const jwt = await getUserSession(request, context.env, params.clientId)
-  if (!jwt) {
-    const url = new URL(request.url)
-    const qpString = url.searchParams.toString()
-
-    return redirect(
-      `/authenticate/${params.clientId}${qpString !== '' ? `?${qpString}` : ''}`
-    )
-  }
+  if (!jwt) return redirectToAuthentication(request, params.clientId)
 
   const account = parseJwt(jwt).sub as AccountURN
   const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
   const profile = await accountClient.getProfile.query({ account })
-
+  if (!profile) return redirectToAuthentication(request, params.clientId)
   return json({
     profile,
   })

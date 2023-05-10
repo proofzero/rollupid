@@ -301,7 +301,7 @@ export async function getAuthzCookieParams(
       }
     })
     .catch((err) => {
-      console.log('No console params session found')
+      console.log('No authorization cookie params found')
       return null
     })
 }

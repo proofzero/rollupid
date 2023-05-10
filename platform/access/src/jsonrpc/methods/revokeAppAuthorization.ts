@@ -89,6 +89,10 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
       })
     }
 
+    await ctx.edgesClient.deleteNode.mutate({
+      urn: accessURN,
+    })
+
     const accessNode = await initAccessNodeByName(name, ctx.Access)
     await accessNode.class.deleteAll()
   }

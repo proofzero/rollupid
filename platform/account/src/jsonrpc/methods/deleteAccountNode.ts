@@ -17,6 +17,7 @@ export const deleteAccountNodeMethod = async ({
   ctx: Context
 }) => {
   if (ctx.accountURN === input.account) {
+    await ctx.edges.deleteNode.mutate({ urn: input.account })
     await ctx.account?.storage.deleteAll()
   } else {
     throw new UnauthorizedError()

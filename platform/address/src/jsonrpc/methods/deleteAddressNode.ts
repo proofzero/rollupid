@@ -61,6 +61,9 @@ export const deleteAddressNodeMethod = async ({
     throw new Error('Invalid account URN')
   }
 
+  // Remove the stored account in the node.
+  await nodeClient?.class.unsetAccount()
+
   const { edges: addressEdges } = await edgesClient.getEdges.query({
     query: {
       dst: {
@@ -69,19 +72,18 @@ export const deleteAddressNodeMethod = async ({
     },
   })
 
-  await Promise.all([
-    // Remove the stored account in the node.
-    nodeClient?.class.unsetAccount(),
+  // Remove any edge that references the address node
+  addressEdges.forEach(async (edge) => {
+    await edgesClient.removeEdge.mutate({
+      src: edge.src.baseUrn,
+      dst: edge.dst.baseUrn,
+      tag: edge.tag,
+    })
+  })
 
-    // Remove any edge that references the address node
-    addressEdges.forEach(async (edge) => {
-      edgesClient.removeEdge.mutate({
-        src: edge.src.baseUrn,
-        dst: edge.dst.baseUrn,
-        tag: edge.tag,
-      })
-    }),
-  ])
+  await ctx.edges.deleteNode.mutate({
+    urn: address,
+  })
 
   return ctx.address?.storage.deleteAll()
 }
