@@ -155,7 +155,7 @@ const Authorization = ({
                 <div className="flex flex-row w-full gap-2 items-center">
                   <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
 
-                  {(scope === 'profile' || scope === 'openid') && (
+                  {(scope === 'profile' || scope === 'system_identifiers') && (
                     <Text
                       size="sm"
                       weight="medium"
