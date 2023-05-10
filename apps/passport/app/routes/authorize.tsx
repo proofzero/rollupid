@@ -33,7 +33,6 @@ import { AuthorizationControlSelection } from '@proofzero/types/application'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
-import { SYSTEM_IDENTIFIERS_SCOPES } from '@proofzero/security/scopes'
 import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { DataForScopes } from '~/utils/authorize.server'
