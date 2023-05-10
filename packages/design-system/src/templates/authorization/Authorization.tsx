@@ -23,12 +23,14 @@ import profileClassIcon from './profile-class-icon.svg'
 import addressClassIcon from './connected-addresses-class-icon.svg'
 import emailClassIcon from './email-class-icon.svg'
 import smartContractWalletClassIcon from './sc-wallet-class-icon.svg'
+import systemIdentifiersClassIcon from './system-identifiers-class-icon.svg'
 
 export const scopeIcons: Record<string, string> = {
   connected_accounts: addressClassIcon,
   profile: profileClassIcon,
   email: emailClassIcon,
   erc_4337: smartContractWalletClassIcon,
+  system_identifiers: systemIdentifiersClassIcon,
 }
 
 type UserProfile = {
@@ -73,7 +75,7 @@ type AuthorizationProps = {
   disableAuthorize?: boolean
 }
 
-export default ({
+const Authorization = ({
   userProfile,
   appProfile,
   requestedScope,
@@ -93,6 +95,22 @@ export default ({
   authorizeCallback,
   disableAuthorize = false,
 }: AuthorizationProps) => {
+  const scopesToDisplay = [...requestedScope].filter((scope) => {
+    return scopeMeta.scopes[scope].hidden !== true
+  })
+  if (
+    requestedScope.some((scope) => {
+      return scopeMeta.scopes[scope].hidden === true
+    })
+  ) {
+    scopeMeta.scopes['system_identifiers'] = {
+      name: 'System Identifiers',
+      description:
+        "Read account's system identifiers and other non-personally identifiable information",
+      class: 'implied',
+    }
+    scopesToDisplay.unshift('system_identifiers')
+  }
   return (
     <div
       className={'flex flex-col gap-4 basis-96 m-auto bg-white p-6'}
@@ -131,121 +149,109 @@ export default ({
           style={{ color: '#6B7280' }}
           className={'flex flex-col font-light text-base gap-2 w-full'}
         >
-          {requestedScope
-            .filter((scope) => {
-              if (scopeMeta.scopes[scope])
-                return !scopeMeta.scopes[scope].hidden
-              // If we do not have scope from url in our lookup table -
-              // we can't show it
-              return false
-            })
-            .map((scope: string, i: number) => {
-              return (
-                <li
-                  key={i}
-                  className={'flex flex-row gap-2 items-center w-full'}
-                >
-                  <div className="flex flex-row w-full gap-2 items-center">
-                    <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
+          {scopesToDisplay.map((scope: string, i: number) => {
+            return (
+              <li key={i} className={'flex flex-row gap-2 items-center w-full'}>
+                <div className="flex flex-row w-full gap-2 items-center">
+                  <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
 
-                    {(scope === 'profile' || scope === 'openid') && (
-                      <Text
-                        size="sm"
-                        weight="medium"
-                        className="flex-1 text-gray-500"
-                      >
-                        {scopeMeta.scopes[scope].name}
-                      </Text>
-                    )}
+                  {(scope === 'profile' || scope === 'system_identifiers') && (
+                    <Text
+                      size="sm"
+                      weight="medium"
+                      className="flex-1 text-gray-500"
+                    >
+                      {scopeMeta.scopes[scope].name}
+                    </Text>
+                  )}
 
-                    {scope === 'erc_4337' && (
-                      <div className="flex-1 min-w-0">
-                        <SmartContractWalletSelect
-                          wallets={connectedSmartContractWallets}
-                          onSelect={(selected: SCWalletSelectListItem) => {
-                            if (selected?.type === OptionType.AddNew) {
-                              addNewSmartWalletCallback()
-                            } else if (selected) {
-                              selectSmartWalletCallback(selected)
-                            }
-                          }}
-                        />
-                      </div>
-                    )}
-
-                    {scope === 'email' && (
-                      <div className="flex-1 min-w-0">
-                        <EmailSelect
-                          items={connectedEmails || []}
-                          enableAddNew={true}
-                          defaultAddress={connectedEmails![0]?.addressURN}
-                          onSelect={(selected: EmailSelectListItem) => {
-                            if (selected?.type === OptionType.AddNew) {
-                              addNewEmailCallback()
-                            } else if (selected) {
-                              selectEmailCallback(selected)
-                            }
-                          }}
-                        />
-                      </div>
-                    )}
-
-                    {scope === 'connected_accounts' && (
-                      <div className="flex-1 min-w-0">
-                        <ConnectedAccountSelect
-                          accounts={connectedAccounts.map((ca) => ({
-                            addressURN: ca.id,
-                            address: ca.address,
-                            title: ca.title,
-                            provider:
-                              ca.type === 'eth' ? 'blockchain' : ca.type,
-                          }))}
-                          onSelect={(addresses) => {
-                            selectAccountsCallback(
-                              addresses.map((a) => a.addressURN)
-                            )
-                          }}
-                          onSelectAll={() => {
-                            selectAccountsCallback([
-                              AuthorizationControlSelection.ALL,
-                            ])
-                          }}
-                          onConnectNew={() => {
-                            addNewAccountCallback()
-                          }}
-                        />
-                      </div>
-                    )}
-
-                    <div>
-                      <Info
-                        name={scopeMeta.scopes[scope].name}
-                        description={scopeMeta.scopes[scope].description}
+                  {scope === 'erc_4337' && (
+                    <div className="flex-1 min-w-0">
+                      <SmartContractWalletSelect
+                        wallets={connectedSmartContractWallets}
+                        onSelect={(selected: SCWalletSelectListItem) => {
+                          if (selected?.type === OptionType.AddNew) {
+                            addNewSmartWalletCallback()
+                          } else if (selected) {
+                            selectSmartWalletCallback(selected)
+                          }
+                        }}
                       />
+                    </div>
+                  )}
 
-                      <div
-                        data-popover
-                        id={`popover-${scope}`}
-                        role="tooltip"
-                        className="absolute z-10 invisible inline-block
+                  {scope === 'email' && (
+                    <div className="flex-1 min-w-0">
+                      <EmailSelect
+                        items={connectedEmails || []}
+                        enableAddNew={true}
+                        defaultAddress={connectedEmails![0]?.addressURN}
+                        onSelect={(selected: EmailSelectListItem) => {
+                          if (selected?.type === OptionType.AddNew) {
+                            addNewEmailCallback()
+                          } else if (selected) {
+                            selectEmailCallback(selected)
+                          }
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {scope === 'connected_accounts' && (
+                    <div className="flex-1 min-w-0">
+                      <ConnectedAccountSelect
+                        accounts={connectedAccounts.map((ca) => ({
+                          addressURN: ca.id,
+                          address: ca.address,
+                          title: ca.title,
+                          provider: ca.type === 'eth' ? 'blockchain' : ca.type,
+                        }))}
+                        onSelect={(addresses) => {
+                          selectAccountsCallback(
+                            addresses.map((a) => a.addressURN)
+                          )
+                        }}
+                        onSelectAll={() => {
+                          selectAccountsCallback([
+                            AuthorizationControlSelection.ALL,
+                          ])
+                        }}
+                        onConnectNew={() => {
+                          addNewAccountCallback()
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <Info
+                      name={scopeMeta.scopes[scope].name}
+                      description={scopeMeta.scopes[scope].description}
+                    />
+
+                    <div
+                      data-popover
+                      id={`popover-${scope}`}
+                      role="tooltip"
+                      className="absolute z-10 invisible inline-block
                     font-[Inter]
                      min-w-64 text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
-                      >
-                        <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-                          <h3 className="font-semibold text-gray-900 dark:text-white">
-                            {scope}
-                          </h3>
-                        </div>
-                        <div className="px-3 py-2">
-                          <p>{scopeMeta.scopes[scope].description}</p>
-                        </div>
-                        <div data-popper-arrow></div>
+                    >
+                      <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                          {scope}
+                        </h3>
                       </div>
+                      <div className="px-3 py-2">
+                        <p>{scopeMeta.scopes[scope].description}</p>
+                      </div>
+                      <div data-popper-arrow></div>
                     </div>
                   </div>
-                </li>
-              )
-            })}
+                </div>
+              </li>
+            )
+          })}
         </ul>
       </div>
 
@@ -301,3 +307,5 @@ export default ({
     </div>
   )
 }
+
+export default Authorization

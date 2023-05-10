@@ -37,8 +37,10 @@ export type DataForScopes = {
 // -----------------------------------------------------------------------------
 const orderOfScopes: Record<string, number> = {
   openid: 0,
+  system_identifiers: 0,
   profile: 1,
-  email: 100,
+  email: 2,
+  connected_accounts: 3,
 }
 
 export const reorderScope = (scopes: string[]): string[] => {
