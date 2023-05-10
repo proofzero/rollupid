@@ -167,7 +167,7 @@ export const SCOPES: ScopeMap = {
     name: 'System Identifiers',
     description:
       "Read account's system identifiers and other non-personally identifiable information",
-    class: 'implied',
+    class: 'non-configurable',
   },
   // NOT READY YET
   // [SCOPE_PROFILE_READ]: {
