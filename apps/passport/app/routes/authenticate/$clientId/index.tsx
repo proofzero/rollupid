@@ -102,6 +102,7 @@ export default () => {
   const { appProps, rollup_action } = useOutletContext<{
     appProps?: {
       name: string
+      redirectURI: string
       iconURL: string
       termsURL: string
       privacyURL: string
