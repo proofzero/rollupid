@@ -23,6 +23,10 @@ import Authentication, {
   AuthenticationConstants,
 } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
+import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
+import { Button } from '@proofzero/packages/design-system/src/atoms/buttons/Button'
+
 const client = createClient(
   // @ts-ignore
   getDefaultClient({
@@ -150,6 +154,8 @@ export default () => {
     history.replaceState(null, '', url.toString())
   })
 
+  const generic = Boolean(rollup_action)
+
   return (
     <>
       {transition.state !== 'idle' && <Loader />}
@@ -157,7 +163,59 @@ export default () => {
       <Authentication
         logoURL={iconURL}
         appProfile={appProps}
-        generic={Boolean(rollup_action)}
+        Header={
+          <>
+            {generic && (
+              <>
+                <Text
+                  size="xl"
+                  weight="semibold"
+                  className="text-[#2D333A] mt-6 mb-8"
+                >
+                  Connect Account
+                </Text>
+              </>
+            )}
+
+            {!generic && (
+              <>
+                <Avatar
+                  src={iconURL ?? AuthenticationConstants.defaultLogoURL}
+                  size="sm"
+                ></Avatar>
+                <div className={'flex flex-col items-center gap-2'}>
+                  <h1 className={'font-semibold text-xl'}>
+                    {appProps?.name
+                      ? `Login to ${appProps?.name}`
+                      : AuthenticationConstants.defaultHeading}
+                  </h1>
+                  <h2
+                    style={{ color: '#6B7280' }}
+                    className={'font-medium text-base'}
+                  >
+                    {AuthenticationConstants.defaultSubheading}
+                  </h2>
+                </div>
+              </>
+            )}
+          </>
+        }
+        Actions={
+          generic ? (
+            <>
+              <div className="flex flex-1 items-end">
+                <Button
+                  btnSize="l"
+                  btnType="secondary-alt"
+                  className="w-full hover:bg-gray-100"
+                  onClick={() => navigate('/authenticate/cancel')}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </>
+          ) : undefined
+        }
         displayKeys={displayKeys}
         mapperArgs={{
           clientId,

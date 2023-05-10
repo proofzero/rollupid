@@ -4,8 +4,6 @@ import circleLogo from './circle-logo.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
 
 import { Text } from '../../atoms/text/Text'
-import { Avatar } from '../../atoms/profile/avatar/Avatar'
-import { Button } from '../../atoms/buttons/Button'
 
 import { WagmiConfig, Client } from 'wagmi'
 import ConnectOAuthButton, {
@@ -41,23 +39,18 @@ export type AppProfile = {
 export type AuthenticationProps = {
   logoURL?: string
   appProfile?: AppProfile
-  heading?: string
-  subheading?: string
-  generic?: boolean
   displayKeys: string[]
-  onCancel?: () => void
   mapperArgs: DisplayKeyMapperArgs
+  Header?: JSX.Element
+  Actions?: JSX.Element
 }
 
 export default ({
-  logoURL = AuthenticationConstants.defaultLogoURL,
   appProfile,
-  heading = AuthenticationConstants.defaultHeading,
-  subheading = AuthenticationConstants.defaultSubheading,
   displayKeys,
-  generic = false,
-  onCancel = () => {},
   mapperArgs,
+  Header,
+  Actions,
 }: AuthenticationProps) => {
   displayKeys = displayKeys.filter((key) =>
     AuthenticationConstants.knownKeys.includes(key)
@@ -72,34 +65,7 @@ export default ({
           boxSizing: 'border-box',
         }}
       >
-        {generic && (
-          <>
-            <Text
-              size="xl"
-              weight="semibold"
-              className="text-[#2D333A] mt-6 mb-8"
-            >
-              Connect Account
-            </Text>
-          </>
-        )}
-
-        {!generic && (
-          <>
-            <Avatar src={logoURL} size="sm"></Avatar>
-            <div className={'flex flex-col items-center gap-2'}>
-              <h1 className={'font-semibold text-xl'}>
-                {appProfile?.name ? `Login to ${appProfile?.name}` : heading}
-              </h1>
-              <h2
-                style={{ color: '#6B7280' }}
-                className={'font-medium text-base'}
-              >
-                {subheading}
-              </h2>
-            </div>
-          </>
-        )}
+        {Header}
 
         <div className="flex-1 w-full flex flex-col gap-4 relative">
           {displayKeys.slice(0, 2).map((dk: OAuthProvider) =>
@@ -142,18 +108,7 @@ export default ({
             </Text>
           )}
 
-          {generic && (
-            <div className="flex flex-1 items-end">
-              <Button
-                btnSize="l"
-                btnType="secondary-alt"
-                className="w-full hover:bg-gray-100"
-                onClick={onCancel}
-              >
-                Cancel
-              </Button>
-            </div>
-          )}
+          {Actions && <div className="flex flex-1 items-end">{Actions}</div>}
         </div>
 
         <div className="mt-14 flex justify-center items-center space-x-2">

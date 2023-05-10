@@ -4,6 +4,7 @@ import Authentication, { AuthenticationConstants } from './Authentication'
 import { WagmiConfig, createClient } from 'wagmi'
 import { getDefaultClient } from 'connectkit'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
 
 import subtractLogo from '../../assets/subtract-logo.svg'
 
@@ -28,6 +29,20 @@ export const Template = ({ displayKeys }) => {
         ),
         signData: null,
       }}
+      Header={
+        <>
+          <Avatar src={subtractLogo} size="sm" />
+          <div className={'flex flex-col items-center gap-2'}>
+            <h1 className={'font-semibold text-xl'}>Login to Passport</h1>
+            <h2
+              style={{ color: '#6B7280' }}
+              className={'font-medium text-base'}
+            >
+              {AuthenticationConstants.defaultSubheading}
+            </h2>
+          </div>
+        </>
+      }
     />
   )
 }
