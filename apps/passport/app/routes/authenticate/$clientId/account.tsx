@@ -11,15 +11,13 @@ import {
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
-import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/AuthButton'
 import { getAccountClient } from '~/platform.server'
 import {
   getAuthzCookieParams,
   getUserSession,
   parseJwt,
 } from '~/session.server'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import Authentication from '@proofzero/design-system/src/templates/authentication/Authentication'
+import AccountSelect from '@proofzero/design-system/src/templates/authentication/AccountSelect'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const jwt = await getUserSession(request, context.env, params.clientId)
@@ -69,81 +67,40 @@ export default () => {
   const submit = useSubmit()
 
   return (
-    <Authentication
+    <AccountSelect
       logoURL={appProps?.iconURL}
-      appName={appProps?.name}
-      accountSelect={true}
-    >
-      <>
-        <div className="relative">
-          <AuthButton
-            onClick={() => {
-              submit(
-                {},
-                {
-                  method: 'post',
-                }
-              )
-            }}
-            Graphic={
-              <>
-                {profile.pfp?.image && (
-                  <img
-                    className="w-full h-full rounded-full"
-                    src={profile.pfp.image}
-                    alt="PFP"
-                  />
-                )}
-              </>
-            }
-            text={profile.displayName}
-          />
-
-          <div className="absolute z-10 right-0 top-0 bottom-0 flex flex-row-reverse justify-center items-center px-3">
-            <Text
-              size="xs"
-              className="cursor-pointer text-gray-500"
-              onClick={() => {
-                navigate(
-                  `/signout?redirect_uri=${new URL(
-                    window.location.href
-                  ).toString()}&client_id=${clientId}`
-                )
-              }}
-            >
-              Sign out
-            </Text>
-          </div>
-        </div>
-
-        <div className="my-1 flex flex-row items-center justify-center space-x-3">
-          <hr className="h-px w-16 bg-gray-500" />
-          <Text>or</Text>
-          <hr className="h-px w-16 bg-gray-500" />
-        </div>
-
-        <AuthButton
-          text="Choose other account"
-          onClick={() => {
-            navigate(`/authenticate/${clientId}`)
-          }}
-        />
-
-        {(appProps?.termsURL || appProps?.privacyURL) && (
-          <Text size="sm" className="text-gray-500 mt-7">
-            Before using this app, you can review {appProps?.name ?? `Company`}
-            's{' '}
-            <a href={appProps.privacyURL} className="text-indigo-500">
-              privacy policy
-            </a>
-            {appProps?.termsURL && appProps?.privacyURL && <span> and </span>}
-            <a href={appProps.termsURL} className="text-indigo-500">
-              terms of service
-            </a>
-            .
-          </Text>
-        )}
-      </>
-    </Authentication>
+      appProfile={{
+        iconURL: appProps?.iconURL,
+        name: appProps?.name,
+        termsURL: appProps?.termsURL,
+        privacyURL: appProps?.privacyURL,
+      }}
+      userProfile={{
+        pfpURL: profile?.pfp.image,
+        displayName: profile?.displayName,
+      }}
+      onAuth={() => {
+        submit(
+          {},
+          {
+            method: 'post',
+          }
+        )
+      }}
+      onSignOut={() => {
+        navigate(
+          `/signout?redirect_uri=${new URL(
+            window.location.href
+          ).toString()}&client_id=${clientId}`
+        )
+      }}
+      onChooseOther={() => {
+        navigate(
+          `/signout?redirect_uri=${new URL(
+            window.location.href
+          ).toString()}&client_id=${clientId}`
+        )
+      }}
+    />
   )
 }

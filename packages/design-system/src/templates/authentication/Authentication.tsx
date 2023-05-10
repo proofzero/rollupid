@@ -31,7 +31,7 @@ export const AuthenticationConstants = {
   ],
 }
 
-type AppProfile = {
+export type AppProfile = {
   name: string
   iconURL: string
   termsURL: string
@@ -45,7 +45,6 @@ export type AuthenticationProps = {
   subheading?: string
   generic?: boolean
   displayKeys: string[]
-  accountSelect?: boolean
   enableCancel?: boolean
   onCancel?: () => void
   mapperArgs: DisplayKeyMapperArgs
@@ -58,7 +57,6 @@ export default ({
   subheading = AuthenticationConstants.defaultSubheading,
   displayKeys,
   generic = false,
-  accountSelect = false,
   enableCancel = false,
   onCancel = () => {},
   mapperArgs,
@@ -88,25 +86,7 @@ export default ({
           </>
         )}
 
-        {accountSelect && (
-          <>
-            <Avatar src={logoURL} size="sm"></Avatar>
-            <div className={'flex flex-col items-center gap-2'}>
-              <Text size="xl" weight="semibold">
-                Choose an account
-              </Text>
-
-              {appProfile?.name && (
-                <Text className="text-gray-500">
-                  to continue to "
-                  <span className="text-indigo-500">{appProfile.name}</span>"
-                </Text>
-              )}
-            </div>
-          </>
-        )}
-
-        {!generic && !accountSelect && (
+        {!generic && (
           <>
             <Avatar src={logoURL} size="sm"></Avatar>
             <div className={'flex flex-col items-center gap-2'}>
