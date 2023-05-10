@@ -39,6 +39,12 @@ export const Template = (args) => (
         addressURN:
           'urn:rollupid:address/0xc2b930f1fc2a55ddc1bf89e8844ca0479567ac44f3e2eea58216660e26947686',
       },
+      {
+        email: 'email2@example.com',
+        type: OAuthAddressType.Microsoft,
+        addressURN:
+          'urn:rollupid:address/0xc2b930f1fc2a55ddc1bf99e8844ca0479567ac44f3e2eea58216660e26947686',
+      },
     ]}
     selectEmailCallback={() => {}}
     addNewEmailCallback={() => {}}
@@ -74,7 +80,7 @@ export const Template = (args) => (
     ]}
     selectAccountsCallback={() => {}}
     disableAuthorization={true}
-    {...args}
+    transitionState={'idle'}
   >
     {' '}
   </Authorization>
@@ -83,12 +89,5 @@ export const Template = (args) => (
 # Authorization
 
 <Canvas>
-  <Story
-    name="Passport Authorization"
-    args={{
-      transitionState: 'idle',
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+  <Story name="Passport Authorization">{Template.bind({})}</Story>
 </Canvas>
