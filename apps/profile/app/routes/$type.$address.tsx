@@ -15,7 +15,7 @@ import {
   HiOutlineQuestionMarkCircle,
 } from 'react-icons/hi'
 
-import { getErrorCause } from '@proofzero/utils/errors'
+import { JsonError, getErrorCause } from '@proofzero/utils/errors'
 
 import { getAccessToken, parseJwt } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
