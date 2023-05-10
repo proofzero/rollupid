@@ -34,7 +34,6 @@ export type AppProfile = {
   iconURL: string
   termsURL: string
   privacyURL: string
-  websiteURL: string
 }
 
 export type AuthenticationProps = {
