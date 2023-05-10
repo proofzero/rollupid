@@ -120,6 +120,7 @@ export function MultiSelect({
                         setSelectedValues(
                           selectedValues.filter((v) => v.id !== item.id)
                         )
+                        if (onChange) onChange()
                       }}
                     />
                   </div>
