@@ -11,6 +11,7 @@ import { requireJWT } from '~/utilities/session.server'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import { TbInfoCircle } from 'react-icons/tb'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
 import type { notificationHandlerType } from '~/types'
@@ -186,7 +187,7 @@ export default () => {
                         <Listbox.Option
                           key={personIdx}
                           className={({ active }) =>
-                            `relative cursor-default select-none py-2 pl-10 pr-4
+                            `relative cursor-default select-none py-2 px-3
                             ${
                               active
                                 ? 'bg-indigo-100 text-indigo-900'
@@ -195,25 +196,27 @@ export default () => {
                           }
                           value={paymaster}
                         >
-                          {({ selected }) => (
-                            <>
-                              <span
-                                className={`block truncate text-sm ${
-                                  selected ? 'font-medium' : 'font-normal'
-                                }`}
-                              >
-                                {paymaster.name}
-                              </span>
-                              {selected ? (
-                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
-                                  <CheckIcon
-                                    className="h-5 w-5"
-                                    aria-hidden="true"
-                                  />
+                          {({ selected }) => {
+                            return (
+                              <div className="flex flex-row w-full items-center">
+                                <span
+                                  className={`truncate text-sm ${
+                                    selected ? 'font-medium' : 'font-normal'
+                                  }`}
+                                >
+                                  {paymaster.name}
                                 </span>
-                              ) : null}
-                            </>
-                          )}
+                                {selected ? (
+                                  <span className="ml-auto text-indigo-600">
+                                    <CheckIcon
+                                      className="h-5 w-5"
+                                      aria-hidden="true"
+                                    />
+                                  </span>
+                                ) : null}
+                              </div>
+                            )
+                          }}
                         </Listbox.Option>
                       ))}
                     </Listbox.Options>
@@ -228,8 +231,24 @@ export default () => {
                   className="shadow-md w-full"
                   placeholder={selectedPaymaster?.secretPlaceholder}
                   defaultValue={paymaster?.secret}
+                  docsUrl={
+                    'https://docs.rollup.id/platform/console/blockchain#preferred-paymasters'
+                  }
                 />
               </div>
+            </div>
+            <div
+              className="bg-indigo-50 mt-7 p-4 rounded-lg flex flex-row
+            justify-start items-start space-x-3"
+            >
+              <TbInfoCircle size={20} className="text-indigo-500 shrink-0" />
+              <Text className="text-indigo-700">
+                NOTE: Your paymaster credential will only be used to sponsor
+                fees when registering and revoking session keys with your users
+                smart contract wallets. Please refer to your providers
+                documentation for submitting user operations with your session
+                keys
+              </Text>
             </div>
           </Panel>
         </div>
