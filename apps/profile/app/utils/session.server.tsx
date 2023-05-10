@@ -94,7 +94,7 @@ export const getRollupAuthenticator = () => {
         refreshToken: JSON.stringify(
           await encryptSession(sessionKey, refreshToken)
         ),
-        extraParams,
+        extraParams: {},
       }
     }
   )
