@@ -1,6 +1,9 @@
 import { DurableObjectStubProxy } from 'do-proxy'
+
+import { OAuthAddressType } from '@proofzero/types/address'
+
 import { AddressNode } from '.'
-import { OAuthData } from '../types'
+import { AddressProfile, OAuthData } from '../types'
 import Address from './address'
 
 type RefreshTokenResponse = {
@@ -48,6 +51,10 @@ export default class OAuthAddress {
     } catch (err) {
       console.error('Error encountered with fetching profile', err)
     }
+  }
+
+  async getProfile(): Promise<AddressProfile<OAuthAddressType>> {
+    throw new Error('not implemented')
   }
 
   async getAccessToken(): Promise<string | undefined> {

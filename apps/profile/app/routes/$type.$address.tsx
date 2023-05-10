@@ -15,6 +15,8 @@ import {
   HiOutlineQuestionMarkCircle,
 } from 'react-icons/hi'
 
+import { JsonError, getErrorCause } from '@proofzero/utils/errors'
+
 import { getAccessToken, parseJwt } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
 import { ogImageFromProfile } from '~/helpers/ogImage'
@@ -71,8 +73,8 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
       }
 
       accountURN = accountFromAlias
-    } catch (ex) {
-      throw json({ message: ex }, { status: 500 })
+    } catch (error) {
+      throw JsonError(error)
     }
   } else {
     accountURN = AccountURNSpace.urn(address) as AccountURN
@@ -116,10 +118,11 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
       path,
       isOwner,
     })
-  } catch (e) {
+  } catch (error) {
     console.log(
       `Galaxy did not return a profile for address ${accountURN}. Moving on.`
     )
+    console.error(getErrorCause(error))
     throw new Response('No address found', { status: 404 })
   }
 }

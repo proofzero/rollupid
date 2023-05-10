@@ -6,6 +6,7 @@ import { getAccessToken } from '~/utils/session.server'
 import { getNfts } from '~/helpers/alchemy'
 import { getAccountCryptoAddresses } from '~/helpers/profile'
 import type { AlchemyChain } from '@proofzero/packages/alchemy-client'
+import { JsonError } from '@proofzero/utils/errors'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const srcUrl = new URL(request.url)
@@ -27,18 +28,22 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     throw new Error('Chain is required')
   }
 
-  const addresses = await getAccountCryptoAddresses({
-    jwt,
-    traceSpan: context.traceSpan,
-  })
+  try {
+    const addresses = await getAccountCryptoAddresses({
+      jwt,
+      traceSpan: context.traceSpan,
+    })
 
-  const nftsForAccount = await getNfts({
-    addresses,
-    contractAddresses: [collection],
-    chain,
-  })
+    const nftsForAccount = await getNfts({
+      addresses,
+      contractAddresses: [collection],
+      chain,
+    })
 
-  return json({
-    ownedNfts: nftsForAccount,
-  })
+    return json({
+      ownedNfts: nftsForAccount,
+    })
+  } catch (error) {
+    throw JsonError(error)
+  }
 }

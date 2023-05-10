@@ -1,5 +1,6 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 
+import { InternalServerError } from '@proofzero/errors'
 import { OAuthAddressType } from '@proofzero/types/address'
 
 import type { AddressProfile, TwitterOAuthProfile } from '../types'
@@ -12,7 +13,7 @@ type TwitterAddressProfile = AddressProfile<OAuthAddressType.Twitter>
 export default class TwitterAddress extends OAuthAddress {
   async getProfile(): Promise<TwitterAddressProfile> {
     const data = await this.getData()
-    if (!data) throw new Error('no data')
+    if (!data) throw new InternalServerError({ message: 'no data' })
     const profile = data.profile as TwitterOAuthProfile
     return {
       address: profile.screen_name,

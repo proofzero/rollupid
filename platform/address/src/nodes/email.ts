@@ -1,6 +1,6 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 
-import { BadRequestError } from '@proofzero/errors'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { EmailAddressType, NodeType } from '@proofzero/types/address'
 import generateRandomString from '@proofzero/utils/generateRandomString'
 
@@ -207,7 +207,11 @@ export default class EmailAddress {
       this.node.class.getGradient(),
       this.node.class.getAddress(),
     ])
-    if (!address) throw new Error('Cannot load profile for email address node')
+    if (!address)
+      throw new InternalServerError({
+        message: 'Cannot load profile for email address node',
+        cause: 'missing address',
+      })
     return {
       address,
       title: nickname ?? address,

@@ -2,6 +2,8 @@ import type { AccountURN } from '@proofzero/urns/account'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
+import { JsonError } from '@proofzero/utils/errors'
+
 import { getAccessToken } from '~/utils/session.server'
 import { getContractsForAllChains } from '~/helpers/alchemy'
 import { getAccountCryptoAddresses } from '~/helpers/profile'
@@ -16,17 +18,21 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     throw new Error('Owner is required')
   }
 
-  const addresses = await getAccountCryptoAddresses({
-    jwt,
-    traceSpan: context.traceSpan,
-  })
+  try {
+    const addresses = await getAccountCryptoAddresses({
+      jwt,
+      traceSpan: context.traceSpan,
+    })
 
-  const nftsForAccount = await getContractsForAllChains({
-    addresses,
-    excludeFilters: ['SPAM'],
-  })
+    const nftsForAccount = await getContractsForAllChains({
+      addresses,
+      excludeFilters: ['SPAM'],
+    })
 
-  return json({
-    ...nftsForAccount,
-  })
+    return json({
+      ...nftsForAccount,
+    })
+  } catch (error) {
+    throw JsonError(error)
+  }
 }

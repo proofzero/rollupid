@@ -39,6 +39,7 @@ import * as gtag from '~/utils/gtags.client'
 
 import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
+import { getErrorCause } from '@proofzero/utils/errors'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -163,7 +164,8 @@ export default function App() {
 export function ErrorBoundary({ error }) {
   const nonce = useContext(NonceContext)
 
-  console.error('ErrorBoundary', error)
+  const cause = getErrorCause(error)
+  console.error('ErrorBoundary', cause)
   return (
     <html lang="en">
       <head>
@@ -181,8 +183,8 @@ export function ErrorBoundary({ error }) {
             <ErrorPage
               code="500"
               message="Something went terribly wrong!"
-              trace={error?.stack}
-              error={error}
+              trace={cause?.stack}
+              error={cause}
             />
           </div>
         </div>
