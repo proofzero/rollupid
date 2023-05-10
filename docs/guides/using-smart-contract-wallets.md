@@ -73,8 +73,8 @@ const sessionData = await sessionDataRes.json()
 
 Once a session key has been registered you should receive session key data that can be used directly with your ethers library or account abstraction / paymaster provider SDK directly.
 
-{% hint style="info" %}
-When registering a session key we will use your configured paymaster provider and their tools to fulfill the registration.&#x20;
+{% hint style="warning" %}
+When registering a session key we will use your configured paymaster provider and their tools to fulfill the registration. **Please ensure the API keys saved in your paymaster settings are the same you use in your application's transactions.**
 {% endhint %}
 
 ## Accessing Your App's Smart Contract Wallet
