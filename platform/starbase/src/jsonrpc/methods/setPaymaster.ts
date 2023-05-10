@@ -26,5 +26,5 @@ export const setPaymaster = async ({
     input.clientId,
     ctx.StarbaseApp
   )
-  appDO.class.setPaymaster(input.paymaster)
+  await appDO.class.setPaymaster(input.paymaster)
 }
