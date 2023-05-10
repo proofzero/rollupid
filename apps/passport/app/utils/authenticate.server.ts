@@ -91,7 +91,10 @@ export const authenticateAddress = async (
   }
 }
 
-const getRedirectURL = (appData: AuthzParams, result: string = 'SUCCESS') => {
+export const getRedirectURL = (
+  appData: AuthzParams,
+  result: string = 'SUCCESS'
+) => {
   let redirectURL = '/authorize'
   const authAppId = appData.clientId
   const authRedirectUri = appData.redirectUri
