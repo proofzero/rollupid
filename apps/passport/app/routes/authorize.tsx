@@ -217,21 +217,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
           'Requested scope value not in the configured allowed scope list',
       })
 
-    // Add generic system identifiers scope if any of the system identifiers scopes are requested
-    if (
-      scope.some((scope) => {
-        return scopeMeta.scopes[scope].hidden === true
-      })
-    ) {
-      scope.push('system_identifiers')
-      scopeMeta.scopes['system_identifiers'] = {
-        name: 'System Identifiers',
-        description:
-          "Read account's system identifiers and other non-personally identifiable information",
-        class: 'implied',
-      }
-    }
-
     //Go through pre-authorization if not explicitly requested to prompt user for
     //consent through query params
     if (

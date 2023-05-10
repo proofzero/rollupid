@@ -45,39 +45,19 @@ export const preauthorizeMethod = async ({
 
   const { account, clientId, scope: requestedScope } = input
 
-  //If all scope values are system (ie. hidden) scope values, then we preauthorize
-  if (
-    requestedScope.every((scopeVal) => {
-      return (
-        SCOPES[scopeSymbol(scopeVal)] && SCOPES[scopeSymbol(scopeVal)].hidden
-      )
-    })
-  ) {
-    console.log(
-      'Pre-authorizing based on scope containing only hidden scope values',
-      { requestedScope }
-    )
-    preauthorized = true
-  }
-
-  //If requested scope is a subset of existing authorized scopes, we preauthorize
-  if (!preauthorized) {
-    const name = `${AccountURNSpace.decode(account)}@${clientId}`
-    const accessNode = await initAccessNodeByName(name, ctx.Access)
-    existingPersonaData = await accessNode.storage.get('personaData')
-    const { tokenMap } = await accessNode.class.getTokenState()
-    for (const [k, v] of Object.entries(tokenMap)) {
-      const existingScopeValSet = new Set(v.scope)
-      if (
-        requestedScope.every((scopeVal) => existingScopeValSet.has(scopeVal))
-      ) {
-        console.log('Pre-authorizing based on matching scope subset:', {
-          requestedScope,
-          matchingExistingScopeSet: v.scope,
-        })
-        preauthorized = true
-        break
-      }
+  const name = `${AccountURNSpace.decode(account)}@${clientId}`
+  const accessNode = await initAccessNodeByName(name, ctx.Access)
+  existingPersonaData = await accessNode.storage.get('personaData')
+  const { tokenMap } = await accessNode.class.getTokenState()
+  for (const [k, v] of Object.entries(tokenMap)) {
+    const existingScopeValSet = new Set(v.scope)
+    if (requestedScope.every((scopeVal) => existingScopeValSet.has(scopeVal))) {
+      console.log('Pre-authorizing based on matching scope subset:', {
+        requestedScope,
+        matchingExistingScopeSet: v.scope,
+      })
+      preauthorized = true
+      break
     }
   }
 
