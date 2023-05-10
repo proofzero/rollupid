@@ -462,6 +462,23 @@ export default function Authorize() {
     submit(form, { method: 'post' })
   }
 
+  let showedScopes = [...requestedScope].filter((scope) => {
+    return scopeMeta.scopes[scope].hidden !== true
+  })
+  if (
+    requestedScope.some((scope) => {
+      return scopeMeta.scopes[scope].hidden === true
+    })
+  ) {
+    scopeMeta.scopes['system_identifiers'] = {
+      name: 'System Identifiers',
+      description:
+        "Read account's system identifiers and other non-personally identifiable information",
+      class: 'implied',
+    }
+    showedScopes.unshift('system_identifiers')
+  }
+
   return (
     <div className={'flex flex-row h-[100dvh] justify-center items-center'}>
       <div
