@@ -29,7 +29,7 @@ export default ({
   onAuth = () => {},
   onSignOut = () => {},
   onChooseOther = () => {},
-}: AccountSelectProps) {
+}: AccountSelectProps) => {
   return (
     <div className="relative">
       <div
