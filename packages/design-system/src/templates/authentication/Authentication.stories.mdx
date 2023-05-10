@@ -5,32 +5,40 @@ import { WagmiConfig, createClient } from 'wagmi'
 import { getDefaultClient } from 'connectkit'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
+import subtractLogo from '../../assets/subtract-logo.svg'
+
 <Meta title="Templates/Authentication" component={Authentication} />
 
-export const Template = (args) => <Authentication {...args}></Authentication>
+export const Template = ({ displayKeys }) => {
+  return (
+    <Authentication
+      appProfile={{
+        name: 'Passport',
+        iconURL: subtractLogo,
+        privacyURL: 'foo',
+        termsURL: 'bar',
+      }}
+      displayKeys={displayKeys}
+      mapperArgs={{
+        clientId: 'Foo',
+        wagmiClient: createClient(
+          getDefaultClient({
+            appName: 'Rollup',
+          })
+        ),
+        signData: null,
+      }}
+    />
+  )
+}
 
 # Authentication
 
 <Canvas>
   <Story
-    decorators={[
-      (Story) => {
-        const client = createClient(
-          getDefaultClient({
-            appName: 'Rollup',
-          })
-        )
-        return (
-          <WagmiConfig client={client}>
-            <Story />
-          </WagmiConfig>
-        )
-      },
-    ]}
     name="Passport Authentication"
     args={{
-      heading: AuthenticationConstants.defaultHeading,
-      subheading: AuthenticationConstants.defaultSubheading,
+      displayKeys: ['email'],
     }}
   >
     {Template.bind({})}

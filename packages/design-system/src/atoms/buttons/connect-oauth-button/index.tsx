@@ -1,13 +1,12 @@
-// import { Form } from '@remix-run/react'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
-
-import appleIcon from '@proofzero/design-system/src/assets/social_icons/apple.svg'
-import discordIcon from '@proofzero/design-system/src/assets/social_icons/discord.svg'
-import githubIcon from '@proofzero/design-system/src/assets/social_icons/github.svg'
-import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
-import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
-import twitterIcon from '@proofzero/design-system/src/assets/social_icons/twitter.svg'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import React from 'react'
+import appleIcon from '../../../assets/social_icons/apple.svg'
+import discordIcon from '../../../assets/social_icons/discord.svg'
+import githubIcon from '../../../assets/social_icons/github.svg'
+import googleIcon from '../../../assets/social_icons/google.svg'
+import microsoftIcon from '../../../assets/social_icons/microsoft.svg'
+import twitterIcon from '../../../assets/social_icons/twitter.svg'
+import { Button } from '../Button'
+import { Text } from '../../text/Text'
 
 export type OAuthProvider =
   | 'apple'

@@ -1,3 +1,5 @@
+import React from 'react'
+
 import { useEffect } from 'react'
 import type { ButtonProps } from '@proofzero/design-system/src/atoms/buttons/Button'
 
@@ -7,10 +9,18 @@ import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import { useAccount, useDisconnect, useSignMessage } from 'wagmi'
 import { ConnectKitProvider, ConnectKitButton } from 'connectkit'
 
-import { signMessageTemplate } from '../../routes/connect/$address/sign'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Popover } from '@headlessui/react'
 import { HiChevronDown, HiChevronUp } from 'react-icons/hi'
+
+export const signMessageTemplate = `Welcome to Rollup!
+
+Sign this message to accept the Rollup Terms of Service (https://rollup.id/tos), no password needed!
+
+This will not trigger a blockchain transaction or cost any gas fees.
+
+{{nonce}}
+`
 
 export type ConnectButtonProps = {
   connectCallback: (address: string) => void

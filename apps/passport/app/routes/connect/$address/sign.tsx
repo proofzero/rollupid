@@ -7,14 +7,7 @@ import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import { getAuthzCookieParams, getUserSession } from '../../../session.server'
 
-export const signMessageTemplate = `Welcome to Rollup!
-
-Sign this message to accept the Rollup Terms of Service (https://rollup.id/tos), no password needed!
-
-This will not trigger a blockchain transaction or cost any gas fees.
-
-{{nonce}}
-`
+import { signMessageTemplate } from '@proofzero/design-system/src/atoms/buttons/connect-button/ConnectButton'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const { address } = params
