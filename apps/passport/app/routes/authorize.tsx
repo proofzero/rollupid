@@ -250,7 +250,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         return redirect(redirectURL.toString(), {
           headers,
         })
-      } //else we present the authz screen below
+      } // else we present the authz screen below
     }
     const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
     const profile = await accountClient.getProfile.query({
