@@ -93,9 +93,11 @@ export function MultiSelect({
             <Combobox.Button
               className={`${
                 disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
-              } w-full block min-h-24 rounded-md border border-gray-300 py-2 pl-3 pr-7
+              } w-full block min-h-24 rounded shadow border border-gray-300 ${
+                selectedValues.length ? '' : 'py-2'
+              } pl-3 pr-7
         shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm
-        flex flex-row items-center justify-start flex-wrap gap-y-1`}
+        flex flex-row items-center justify-start flex-wrap`}
               onClick={() => {
                 setQuery('')
               }}
@@ -104,7 +106,7 @@ export function MultiSelect({
                 ? selectedValues.map((item, key) => (
                     <div
                       key={key}
-                      className="bg-indigo-50 text-indigo-600 p-1 m-1 rounded-md border min-w-max z-998 min-w-max
+                      className="bg-indigo-50 text-indigo-600 px-1 py-[3px] m-1 rounded-md border min-w-max z-998 min-w-max
                       flex flex-row items-center justify-start gap-x-1"
                       onClick={(event) => {
                         event.stopPropagation()
@@ -129,12 +131,25 @@ export function MultiSelect({
                       no select
                     </div>
                   )}
-              {open && (
+
+              <div className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+                <ChevronUpDownIcon
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+              </div>
+            </Combobox.Button>
+
+            <Combobox.Options
+              className="absolute z-10 mt-1 max-h-60 w-full overflow-auto thin-scrollbar rounded-md bg-white py-1
+         text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+            >
+              <div>
                 <div className="flex flex-row items-center min-w-full">
                   <Combobox.Input
                     className={`${
                       disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
-                    } truncate w-fit py-2 p-0 -m-2 ml-2 rounded-md border-none sm:text-sm focus-none focus:ring-0`}
+                    } truncate w-full pl-3 py-2 rounded-md border-none sm:text-sm focus-none focus:ring-0`}
                     onChange={(event) => {
                       setQuery(event.target.value)
                     }}
@@ -146,30 +161,16 @@ export function MultiSelect({
                       event.stopPropagation()
                       event.preventDefault()
                     }}
+                    value={query}
                     placeholder={'filter scopes'}
                   />
-                  <div className={`ml-auto rounded-r-md pl-3`}>
+                  <div className={`ml-auto rounded-r-md px-3`}>
                     <IoCloseOutline
                       className="h-5 w-5 text-gray-400 cursor-pointer"
                       onClick={() => setQuery('')}
                     />
                   </div>
                 </div>
-              )}
-
-              <div className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
-                <ChevronUpDownIcon
-                  className="h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-              </div>
-            </Combobox.Button>
-
-            <Combobox.Options
-              className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1
-         text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
-            >
-              <div>
                 {filterItems.length ? (
                   filterItems.map((item) => (
                     <Combobox.Option
@@ -201,7 +202,7 @@ export function MultiSelect({
                             <Text
                               size="sm"
                               weight="medium"
-                              className="font-ibm-plex-mono truncate inline text-gray-900"
+                              className="truncate inline text-gray-900"
                             >
                               {item.val} -
                             </Text>
