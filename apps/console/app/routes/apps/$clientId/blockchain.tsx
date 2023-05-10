@@ -12,6 +12,7 @@ import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { TbInfoCircle } from 'react-icons/tb'
+import zerodevIcon from '~/assets/paymasters/zerodev.svg'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
 import type { notificationHandlerType } from '~/types'
@@ -27,6 +28,7 @@ type errorsType = {
 
 type paymasterType = {
   provider?: string
+  icon?: string
   name?: string
   secretLabel?: string
   secretPlaceholder?: string
@@ -36,6 +38,7 @@ type paymasterType = {
 const availablePaymasters: paymasterType[] = [
   {
     name: 'ZeroDev',
+    icon: zerodevIcon,
     provider: 'zerodev',
     secretLabel: 'Project ID',
     secretPlaceholder: 'ZeroDev project ID',
@@ -199,6 +202,11 @@ export default () => {
                           {({ selected }) => {
                             return (
                               <div className="flex flex-row w-full items-center">
+                                <img
+                                  src={paymaster.icon}
+                                  alt="icon"
+                                  className="w-6 h-6 mr-3"
+                                />
                                 <span
                                   className={`truncate text-sm ${
                                     selected ? 'font-medium' : 'font-normal'
