@@ -62,7 +62,6 @@ export type MutationDisconnectAddressArgs = {
 
 
 export type MutationRegisterSessionKeyArgs = {
-  accountUrn: Scalars['String'];
   sessionPublicKey: Scalars['String'];
   smartContractWalletAddress: Scalars['String'];
 };
