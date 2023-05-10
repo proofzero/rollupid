@@ -462,7 +462,7 @@ export default function Authorize() {
     submit(form, { method: 'post' })
   }
 
-  let showedScopes = [...requestedScope].filter((scope) => {
+  const scopesToDisplay = [...requestedScope].filter((scope) => {
     return scopeMeta.scopes[scope].hidden !== true
   })
   if (
@@ -476,7 +476,7 @@ export default function Authorize() {
         "Read account's system identifiers and other non-personally identifiable information",
       class: 'implied',
     }
-    showedScopes.unshift('system_identifiers')
+    scopesToDisplay.unshift('system_identifiers')
   }
 
   return (
