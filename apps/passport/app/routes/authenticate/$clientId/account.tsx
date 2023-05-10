@@ -74,6 +74,7 @@ export default () => {
         name: appProps?.name,
         termsURL: appProps?.termsURL,
         privacyURL: appProps?.privacyURL,
+        websiteURL: appProps?.websiteURL,
       }}
       userProfile={{
         pfpURL: profile?.pfp.image,

@@ -30,6 +30,7 @@ export const getAppPublicProps = async ({
       scopes: Array.from(appDetails.app.scopes || []),
       termsURL: appDetails.app.termsURL,
       privacyURL: appDetails.app.privacyURL,
+      websiteURL: appDetails.app.websiteURL,
     }
   } else {
     throw new Error(

@@ -48,6 +48,7 @@ export const AppPublicPropsSchema = z.object({
   redirectURI: z.string().optional(),
   termsURL: z.string().optional(),
   privacyURL: z.string().optional(),
+  websiteURL: z.string().optional(),
 })
 
 export type AppPublicProps = z.infer<typeof AppPublicPropsSchema>

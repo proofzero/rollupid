@@ -26,6 +26,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       termsURL: 'https://rollup.id/tos',
       privacyURL: 'https://rollup.id/privacy-policy',
       redirectURI: `https://${params.clientId}.rollup.id`,
+      websiteURL: 'https://rollup.id',
     }
   }
 

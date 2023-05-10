@@ -47,8 +47,16 @@ export default ({
 
           {appProfile?.name && (
             <Text className="text-gray-500">
-              to continue to "
-              <span className="text-indigo-500">{appProfile.name}</span>"
+              to continue to &quot;
+              <a
+                href={appProfile.websiteURL}
+                target="_blank"
+                rel="noreferrer"
+                className="text-indigo-500"
+              >
+                {appProfile.name}
+              </a>
+              &quot;
             </Text>
           )}
         </div>
@@ -94,7 +102,7 @@ export default ({
             <Text size="sm" className="text-gray-500 mt-7">
               Before using this app, you can review{' '}
               {appProfile?.name ?? `Company`}
-              's{' '}
+              &apos;s{' '}
               <a href={appProfile.privacyURL} className="text-indigo-500">
                 privacy policy
               </a>
