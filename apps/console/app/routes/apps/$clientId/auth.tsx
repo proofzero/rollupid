@@ -434,32 +434,28 @@ export default function AppDetailIndexPage() {
                       }}
                       learnMore="https://docs.rollup.id/reference/scopes"
                       fieldName="scopes"
-                      items={Object.entries(scopeMeta)
-                        .filter(([key, value]) => {
-                          return value.class !== 'non-configurable'
-                        })
-                        .map(([key, value]) => {
-                          let disabled, section
+                      items={Object.entries(scopeMeta).map(([key, value]) => {
+                        let disabled, section
+                        if (
+                          key === Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)
+                        ) {
                           if (
-                            key === Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)
+                            !paymaster ||
+                            !paymaster?.provider ||
+                            !paymaster?.secret
                           ) {
-                            if (
-                              !paymaster ||
-                              !paymaster?.provider ||
-                              !paymaster?.secret
-                            ) {
-                              disabled = true
-                              section = 'Blockchain'
-                            }
+                            disabled = true
+                            section = 'Blockchain'
                           }
-                          return {
-                            id: key,
-                            val: value.name,
-                            desc: value.devDescription!,
-                            disabled,
-                            section,
-                          }
-                        })}
+                        }
+                        return {
+                          id: key,
+                          val: value.name,
+                          desc: value.devDescription!,
+                          disabled,
+                          section,
+                        }
+                      })}
                       selectedItems={appDetails.app.scopes?.map((scope) => {
                         const meta = scopeMeta[scope]
                         return {

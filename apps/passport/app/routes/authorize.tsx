@@ -33,12 +33,8 @@ import { AuthorizationControlSelection } from '@proofzero/types/application'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
-
-import {
-  SCOPE_SYSTEM_IDENTIFIERS,
-  SYSTEM_IDENTIFIERS_SCOPES,
-  ScopeDescriptor,
-} from '@proofzero/security/scopes'
+import { SYSTEM_IDENTIFIERS_SCOPES } from '@proofzero/security/scopes'
+import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { DataForScopes } from '~/utils/authorize.server'
 import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
@@ -230,7 +226,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         )
       ).length > 0
     ) {
-      scope.push(Symbol.keyFor(SCOPE_SYSTEM_IDENTIFIERS)!)
+      scope.push('system_identifiers')
     }
 
     //Go through pre-authorization if not explicitly requested to prompt user for
@@ -397,6 +393,13 @@ export default function Authorize() {
     profile,
     prompt,
   } = useLoaderData<LoaderData>()
+
+  scopeMeta.scopes['system_identifiers'] = {
+    name: 'System Identifiers',
+    description:
+      "Read account's system identifiers and other non-personally identifiable information",
+    class: 'non-configurable',
+  }
 
   const userProfile = profile as UserProfile
 
