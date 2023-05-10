@@ -220,11 +220,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
     // Add generic system identifiers scope if any of the system identifiers scopes are requested
     if (
-      scope.filter((scope) =>
-        SYSTEM_IDENTIFIERS_SCOPES.map((scope) => Symbol.keyFor(scope)).includes(
-          scope
-        )
-      ).length > 0
+      scope.some((scope) => {
+        return scopeMeta.scopes[scope].hidden === true
+      })
     ) {
       scope.push('system_identifiers')
       scopeMeta.scopes['system_identifiers'] = {

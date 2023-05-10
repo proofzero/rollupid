@@ -206,12 +206,6 @@ export const SCOPES_JSON: Record<string, ScopeDescriptor> =
     return a
   }, {})
 
-/**
- * An array from all system identifiers scopes.
- */
-
-export const SYSTEM_IDENTIFIERS_SCOPES = [SCOPE_OPENID]
-
 // scope()
 // -----------------------------------------------------------------------------
 
