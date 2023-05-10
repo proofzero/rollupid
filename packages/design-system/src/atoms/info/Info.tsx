@@ -1,4 +1,5 @@
-import iIcon from '../../assets/i.svg'
+import React from 'react'
+import iIcon from './i.svg'
 import { Tooltip } from 'flowbite-react'
 
 export default function Info({

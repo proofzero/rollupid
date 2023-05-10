@@ -7,8 +7,6 @@ import {
   useTransition,
 } from '@remix-run/react'
 
-import subtractLogo from '~/assets/subtract-logo.svg'
-
 import { ResponseType } from '@proofzero/types/access'
 import {
   getAccessClient,
@@ -22,19 +20,6 @@ import {
   getValidatedSessionContext,
 } from '~/session.server'
 import { validatePersonaData } from '@proofzero/security/persona'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
-import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
-import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
-import { EmailSelect } from '@proofzero/design-system/src/atoms/email/EmailSelect'
-import { SmartContractWalletSelect } from '@proofzero/design-system/src/atoms/smart_contract_wallets/SmartContractWalletSelect'
-
-import authorizeCheck from '~/assets/authorize-check.svg'
-import Info from '~/components/authorization/Info'
-
-import profileClassIcon from '~/components/authorization/profile-class-icon.svg'
-import addressClassIcon from '~/components/authorization/connected-addresses-class-icon.svg'
-import emailClassIcon from '~/components/authorization/email-class-icon.svg'
-import smartContractWalletClassIcon from '~/components/authorization/sc-wallet-class-icon.svg'
 
 import {
   authzParamsMatch,
@@ -42,15 +27,8 @@ import {
   getDataForScopes,
 } from '~/utils/authorize.server'
 import { useEffect, useState } from 'react'
-import { OptionType } from '@proofzero/utils/getNormalisedConnectedAccounts'
-import { Text } from '@proofzero/design-system'
-import {
-  BadRequestError,
-  InternalServerError,
-  RollupError,
-} from '@proofzero/errors'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { JsonError } from '@proofzero/utils/errors'
-import { ConnectedAccountSelect } from '@proofzero/design-system/src/atoms/accounts/ConnectedAccountSelect'
 import { AuthorizationControlSelection } from '@proofzero/types/application'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 
@@ -60,11 +38,14 @@ import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { DataForScopes } from '~/utils/authorize.server'
 import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
-import type { SCWalletSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
 
 import type { AddressURN } from '@proofzero/urns/address'
 import type { PersonaData } from '@proofzero/types/application'
+
+import Authorization, {
+  scopeIcons,
+} from '@proofzero/design-system/src/templates/authorization/Authorization'
 
 export type UserProfile = {
   displayName: string
@@ -389,13 +370,6 @@ export const action: ActionFunction = async ({ request, context }) => {
   return redirect(redirectUrl.toString())
 }
 
-const scopeIcons: Record<string, string> = {
-  connected_accounts: addressClassIcon,
-  profile: profileClassIcon,
-  email: emailClassIcon,
-  erc_4337: smartContractWalletClassIcon,
-}
-
 export default function Authorize() {
   const {
     clientId,
@@ -499,265 +473,79 @@ export default function Authorize() {
         <img src={sideGraphics} alt="Background graphics" />
       </div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
-        <div
-          className={'flex flex-col gap-4 basis-96 m-auto bg-white p-6'}
-          style={{
-            width: 418,
-            height: 598,
-            border: '1px solid #D1D5DB',
-            boxSizing: 'border-box',
-            borderRadius: 8,
+        <Authorization
+          userProfile={{
+            pfpURL: userProfile.pfp.image,
           }}
-        >
-          <div className={'flex flex-row items-center justify-center'}>
-            <Avatar
-              src={userProfile.pfp?.image as string}
-              hex={false}
-              size={'sm'}
-              // alt="User Profile"
-            />
-            <img src={authorizeCheck} alt="Authorize Check" />
-            <Avatar src={appProfile.iconURL} size={'sm'} />
-          </div>
-          <div className={'flex flex-col items-center justify-center gap-2'}>
-            <h1 className={'font-semibold text-xl'}>{appProfile.name}</h1>
-            <p style={{ color: '#6B7280' }} className={'font-light text-base'}>
-              would like access to the following information
-            </p>
-          </div>
-          <div
-            className={'flex flex-col gap-4 items-start justify-start w-full'}
-          >
-            <p
-              style={{ color: '#6B7280' }}
-              className={'mb-2 font-extralight text-xs'}
-            >
-              REQUESTED
-            </p>
-            <ul
-              style={{ color: '#6B7280' }}
-              className={'flex flex-col font-light text-base gap-2 w-full'}
-            >
-              {requestedScope
-                .filter((scope: string) => {
-                  if (scopeMeta.scopes[scope])
-                    return !scopeMeta.scopes[scope].hidden
-                  // If we do not have scope from url in our lookup table -
-                  // we can't show it
-                  return false
-                })
-                .map((scope: string, i: number) => {
-                  return (
-                    <li
-                      key={i}
-                      className={'flex flex-row gap-2 items-center w-full'}
-                    >
-                      <div className="flex flex-row w-full gap-2 items-center">
-                        <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
+          appProfile={{
+            name: appProfile.name,
+            iconURL: appProfile.iconURL,
+            privacyURL: appProfile.privacyURL!,
+            termsURL: appProfile.termsURL!,
+          }}
+          requestedScope={requestedScope}
+          scopeMeta={scopeMeta}
+          scopeIcons={scopeIcons}
+          transitionState={transition.state}
+          connectedSmartContractWallets={connectedSmartContractWallets ?? []}
+          addNewSmartWalletCallback={() => {
+            const qp = new URLSearchParams()
+            qp.append('scope', requestedScope.join(' '))
+            qp.append('state', state)
+            qp.append('client_id', clientId)
+            qp.append('redirect_uri', redirectOverride)
+            qp.append('rollup_action', 'create')
+            qp.append('create_type', 'wallet')
+            if (prompt) qp.append('prompt', prompt)
 
-                        {scope !== 'email' &&
-                          scope !== 'connected_accounts' &&
-                          scope !== 'erc_4337' && (
-                            <Text
-                              size="sm"
-                              weight="medium"
-                              className="flex-1 text-gray-500"
-                            >
-                              {scopeMeta.scopes[scope].name}
-                            </Text>
-                          )}
-                        {scope === 'erc_4337' && (
-                          <div className="flex-1 min-w-0">
-                            <SmartContractWalletSelect
-                              wallets={connectedSmartContractWallets}
-                              onSelect={(selected: SCWalletSelectListItem) => {
-                                if (selected?.type === OptionType.AddNew) {
-                                  const qp = new URLSearchParams()
-                                  qp.append('scope', requestedScope.join(' '))
-                                  qp.append('state', state)
-                                  qp.append('client_id', clientId)
-                                  qp.append('redirect_uri', redirectOverride)
-                                  qp.append('rollup_action', 'create')
-                                  qp.append('create_type', 'wallet')
-                                  if (prompt) qp.append('prompt', prompt)
+            return navigate(`/authorize?${qp.toString()}`)
+          }}
+          selectSmartWalletCallback={(wallet) => {
+            setSelectedSCWallets([
+              {
+                nickname: wallet.title,
+                address: wallet.cryptoAddress,
+              },
+            ])
+          }}
+          connectedEmails={connectedEmails ?? []}
+          addNewEmailCallback={() => {
+            const qp = new URLSearchParams()
+            qp.append('scope', requestedScope.join(' '))
+            qp.append('state', state)
+            qp.append('client_id', clientId)
+            qp.append('redirect_uri', redirectOverride)
+            qp.append('rollup_action', 'connect')
+            qp.append('login_hint', 'email microsoft google apple')
+            if (prompt) qp.append('prompt', prompt)
 
-                                  return navigate(`/authorize?${qp.toString()}`)
-                                }
+            return navigate(`/authorize?${qp.toString()}`)
+          }}
+          selectEmailCallback={setSelectedEmail}
+          connectedAccounts={connectedAccounts ?? []}
+          addNewAccountCallback={() => {
+            const qp = new URLSearchParams()
+            qp.append('scope', requestedScope.join(' '))
+            qp.append('state', state)
+            qp.append('client_id', clientId)
+            qp.append('redirect_uri', redirectOverride)
+            qp.append('rollup_action', 'connect')
+            if (prompt) qp.append('prompt', prompt)
 
-                                if (selected) {
-                                  setSelectedSCWallets([
-                                    {
-                                      nickname: selected.title,
-                                      address: selected.cryptoAddress,
-                                    },
-                                  ])
-                                }
-                              }}
-                            />
-                          </div>
-                        )}
-
-                        {scope === 'email' && (
-                          <div className="flex-1 min-w-0">
-                            <EmailSelect
-                              items={connectedEmails || []}
-                              enableAddNew={true}
-                              defaultAddress={connectedEmails![0]?.addressURN}
-                              onSelect={(selected: EmailSelectListItem) => {
-                                if (selected?.type === OptionType.AddNew) {
-                                  const qp = new URLSearchParams()
-                                  qp.append('scope', requestedScope.join(' '))
-                                  qp.append('state', state)
-                                  qp.append('client_id', clientId)
-                                  qp.append('redirect_uri', redirectOverride)
-                                  qp.append('rollup_action', 'connect')
-                                  qp.append(
-                                    'login_hint',
-                                    'email microsoft google apple'
-                                  )
-                                  if (prompt) qp.append('prompt', prompt)
-
-                                  return navigate(`/authorize?${qp.toString()}`)
-                                }
-
-                                setSelectedEmail(selected)
-                              }}
-                            />
-                          </div>
-                        )}
-
-                        {scope === 'connected_accounts' && (
-                          <div className="flex-1 min-w-0">
-                            <ConnectedAccountSelect
-                              accounts={connectedAccounts!.map((ca) => ({
-                                addressURN: ca.id,
-                                address: ca.address,
-                                title: ca.title,
-                                provider:
-                                  ca.type === 'eth' ? 'blockchain' : ca.type,
-                              }))}
-                              onSelect={(addresses) => {
-                                setSelectedConnectedAccounts(
-                                  addresses.map((a) => a.addressURN)
-                                )
-                              }}
-                              onSelectAll={() => {
-                                setSelectedConnectedAccounts([
-                                  AuthorizationControlSelection.ALL,
-                                ])
-                              }}
-                              onConnectNew={() => {
-                                const qp = new URLSearchParams()
-                                qp.append('scope', requestedScope.join(' '))
-                                qp.append('state', state)
-                                qp.append('client_id', clientId)
-                                qp.append('redirect_uri', redirectOverride)
-                                qp.append('rollup_action', 'connect')
-                                if (prompt) qp.append('prompt', prompt)
-
-                                return navigate(`/authorize?${qp.toString()}`)
-                              }}
-                            />
-                          </div>
-                        )}
-
-                        <div>
-                          <Info
-                            name={scopeMeta.scopes[scope].name}
-                            description={scopeMeta.scopes[scope].description}
-                          />
-
-                          <div
-                            data-popover
-                            id={`popover-${scope}`}
-                            role="tooltip"
-                            className="absolute z-10 invisible inline-block
-                    font-[Inter]
-                     min-w-64 text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
-                          >
-                            <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-                              <h3 className="font-semibold text-gray-900 dark:text-white">
-                                {scope}
-                              </h3>
-                            </div>
-                            <div className="px-3 py-2">
-                              <p>{scopeMeta.scopes[scope].description}</p>
-                            </div>
-                            <div data-popper-arrow></div>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  )
-                })}
-            </ul>
-          </div>
-
-          {(appProfile?.termsURL || appProfile?.privacyURL) && (
-            <Text size="sm" className="text-gray-500 mt-7">
-              Before using this app, you can review{' '}
-              {appProfile?.name ?? `Company`}
-              's{' '}
-              <a href={appProfile.privacyURL} className="text-indigo-500">
-                privacy policy
-              </a>
-              {appProfile?.termsURL && appProfile?.privacyURL && (
-                <span> and </span>
-              )}
-              <a href={appProfile.termsURL} className="text-indigo-500">
-                terms of service
-              </a>
-              .
-            </Text>
-          )}
-          <div className="flex flex-col w-full items-center justify-center mt-auto">
-            <div
-              className={'flex flex-row w-full items-end justify-center gap-4'}
-            >
-              {transition.state === 'idle' && (
-                <>
-                  <Button
-                    btnSize="xl"
-                    btnType="secondary-alt"
-                    onClick={() => {
-                      cancelCallback()
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    btnSize="xl"
-                    btnType="primary-alt"
-                    disabled={
-                      // TODO: make generic!
-                      (requestedScope.includes('email') &&
-                        (!connectedEmails?.length || !selectedEmail)) ||
-                      (requestedScope.includes('connected_accounts') &&
-                        !selectedConnectedAccounts?.length) ||
-                      (requestedScope.includes('erc_4337') &&
-                        !selectedSCWallets.length)
-                    }
-                    onClick={() => {
-                      authorizeCallback(requestedScope)
-                    }}
-                  >
-                    Continue
-                  </Button>
-                </>
-              )}
-              {transition.state !== 'idle' && <Spinner />}
-            </div>
-            <div className="mt-5 flex justify-center items-center space-x-2">
-              <img src={subtractLogo} alt="powered by rollup.id" />
-              <Text size="xs" weight="normal" className="text-gray-400">
-                Powered by{' '}
-                <a href="https://rollup.id" className="hover:underline">
-                  rollup.id
-                </a>
-              </Text>
-            </div>
-          </div>
-        </div>
+            return navigate(`/authorize?${qp.toString()}`)
+          }}
+          selectAccountsCallback={setSelectedConnectedAccounts}
+          cancelCallback={cancelCallback}
+          authorizeCallback={authorizeCallback}
+          disableAuthorize={
+            // TODO: make generic!
+            (requestedScope.includes('email') &&
+              (!connectedEmails?.length || !selectedEmail)) ||
+            (requestedScope.includes('connected_accounts') &&
+              !selectedConnectedAccounts?.length) ||
+            (requestedScope.includes('erc_4337') && !selectedSCWallets.length)
+          }
+        />
       </div>
     </div>
   )
