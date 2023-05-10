@@ -148,17 +148,15 @@ export default ({
                   <div className="flex flex-row w-full gap-2 items-center">
                     <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
 
-                    {scope !== 'email' &&
-                      scope !== 'connected_accounts' &&
-                      scope !== 'erc_4337' && (
-                        <Text
-                          size="sm"
-                          weight="medium"
-                          className="flex-1 text-gray-500"
-                        >
-                          {scopeMeta.scopes[scope].name}
-                        </Text>
-                      )}
+                    {(scope === 'profile' || scope === 'openid') && (
+                      <Text
+                        size="sm"
+                        weight="medium"
+                        className="flex-1 text-gray-500"
+                      >
+                        {scopeMeta.scopes[scope].name}
+                      </Text>
+                    )}
 
                     {scope === 'erc_4337' && (
                       <div className="flex-1 min-w-0">
