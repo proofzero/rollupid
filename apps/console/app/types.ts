@@ -29,6 +29,7 @@ export type errorsAuthProps = {
   redirectURI?: string
   icon?: string
   name?: string
+  paymaster?: string
 }
 
 export type errorsTeamProps = {

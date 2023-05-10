@@ -17,7 +17,7 @@ export default {
         return {
           id: key,
           val: value.name,
-          desc: value.description,
+          desc: value.devDescription,
         }
       }),
     },

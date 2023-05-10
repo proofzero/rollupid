@@ -32,14 +32,14 @@ import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyI
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
 import { MultiSelect } from '@proofzero/design-system/src/atoms/form/MultiSelect'
-import { PreLabeledInput } from '@proofzero/design-system/src/atoms/form/PreLabledInput'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import type { AddressURN } from '@proofzero/urns/address'
-
+import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { notificationHandlerType } from '~/types'
+import { SCOPE_SMART_CONTRACT_WALLETS } from '@proofzero/security/scopes'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -140,6 +140,10 @@ export const action: ActionFunction = async ({ request, params, context }) => {
     ...generateTraceContextHeaders(context.traceSpan),
   })
 
+  const paymaster = await starbaseClient.getPaymaster.query({
+    clientId: params.clientId as string,
+  })
+
   const formData = await request.formData()
   const op = formData.get('op')
   const published = formData.get('published') === '1'
@@ -165,6 +169,13 @@ export const action: ActionFunction = async ({ request, params, context }) => {
         })
         .map((entry) => entry[1] as string)
 
+      if (
+        scopes.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!) &&
+        (!paymaster || !paymaster?.provider)
+      ) {
+        errors['paymaster'] = 'Paymaster is required for this scope'
+      }
+
       updates = {
         name: formData.get('name')?.toString(),
         icon: formData.get('icon') as string | undefined,
@@ -172,7 +183,7 @@ export const action: ActionFunction = async ({ request, params, context }) => {
         termsURL: formData.get('termsURL') as string | undefined,
         privacyURL: formData.get('privacyURL') as string | undefined,
         websiteURL: formData.get('websiteURL') as string | undefined,
-        scopes: Array.from(scopes),
+        scopes,
       }
 
       const zodErrors = updatesSchema.safeParse(updates)
@@ -215,9 +226,10 @@ export default function AppDetailIndexPage() {
     notificationHandler: notificationHandlerType
     appDetails: appDetailsProps
     rotationResult: any
+    paymaster: PaymasterType
     appContactAddress?: AddressURN
   }>()
-  const { appContactAddress } = outletContextData
+  const { appContactAddress, paymaster } = outletContextData
   const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
 
   const [isFormChanged, setIsFormChanged] = useState(false)
@@ -420,12 +432,28 @@ export default function AppDetailIndexPage() {
                       onChange={() => {
                         setIsFormChanged(true)
                       }}
+                      learnMore="https://docs.rollup.id/reference/scopes"
                       fieldName="scopes"
                       items={Object.entries(scopeMeta).map(([key, value]) => {
+                        let disabled, section
+                        if (
+                          key === Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)
+                        ) {
+                          if (
+                            !paymaster ||
+                            !paymaster?.provider ||
+                            !paymaster?.secret
+                          ) {
+                            disabled = true
+                            section = 'Blockchain'
+                          }
+                        }
                         return {
                           id: key,
                           val: value.name,
-                          desc: value.description,
+                          desc: value.devDescription!,
+                          disabled,
+                          section,
                         }
                       })}
                       selectedItems={appDetails.app.scopes?.map((scope) => {
@@ -433,7 +461,7 @@ export default function AppDetailIndexPage() {
                         return {
                           id: scope,
                           val: meta.name,
-                          desc: meta.description,
+                          desc: meta.devDescription,
                         }
                       })}
                     />
