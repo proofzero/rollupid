@@ -102,7 +102,7 @@ const AccountSelect = ({
             <Text size="sm" className="text-gray-500 mt-7">
               Before using this app, you can review{' '}
               {appProfile?.name ?? `Company`}
-              's{' '}
+              &apos;s{' '}
               <a href={appProfile.privacyURL} className="text-indigo-500">
                 privacy policy
               </a>
