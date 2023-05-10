@@ -19,6 +19,18 @@ import { AuthorizationControlSelection } from '@proofzero/types/application'
 import { AddressURN } from '@proofzero/urns/address'
 import { ScopeDescriptor } from '@proofzero/security/scopes'
 
+import profileClassIcon from './profile-class-icon.svg'
+import addressClassIcon from './connected-addresses-class-icon.svg'
+import emailClassIcon from './email-class-icon.svg'
+import smartContractWalletClassIcon from './sc-wallet-class-icon.svg'
+
+export const scopeIcons: Record<string, string> = {
+  connected_accounts: addressClassIcon,
+  profile: profileClassIcon,
+  email: emailClassIcon,
+  erc_4337: smartContractWalletClassIcon,
+}
+
 type UserProfile = {
   pfpURL: string
 }
@@ -187,7 +199,8 @@ export default ({
                             addressURN: ca.id,
                             address: ca.address,
                             title: ca.title,
-                            provider: ca.type === 'eth' ? 'blockchain' : ca.type,
+                            provider:
+                              ca.type === 'eth' ? 'blockchain' : ca.type,
                           }))}
                           onSelect={(addresses) => {
                             selectAccountsCallback(

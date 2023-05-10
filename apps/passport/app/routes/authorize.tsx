@@ -21,11 +21,6 @@ import {
 } from '~/session.server'
 import { validatePersonaData } from '@proofzero/security/persona'
 
-import profileClassIcon from '~/components/authorization/profile-class-icon.svg'
-import addressClassIcon from '~/components/authorization/connected-addresses-class-icon.svg'
-import emailClassIcon from '~/components/authorization/email-class-icon.svg'
-import smartContractWalletClassIcon from '~/components/authorization/sc-wallet-class-icon.svg'
-
 import {
   authzParamsMatch,
   createAuthzParamCookieAndCreate,
@@ -48,7 +43,9 @@ import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jso
 import type { AddressURN } from '@proofzero/urns/address'
 import type { PersonaData } from '@proofzero/types/application'
 
-import Authorization from '@proofzero/design-system/src/templates/authorization/Authorization'
+import Authorization, {
+  scopeIcons,
+} from '@proofzero/design-system/src/templates/authorization/Authorization'
 
 export type UserProfile = {
   displayName: string
@@ -371,13 +368,6 @@ export const action: ActionFunction = async ({ request, context }) => {
   }
 
   return redirect(redirectUrl.toString())
-}
-
-const scopeIcons: Record<string, string> = {
-  connected_accounts: addressClassIcon,
-  profile: profileClassIcon,
-  email: emailClassIcon,
-  erc_4337: smartContractWalletClassIcon,
 }
 
 export default function Authorize() {
