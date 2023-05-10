@@ -34,6 +34,7 @@ export type AppProfile = {
   iconURL: string
   termsURL: string
   privacyURL: string
+  websiteURL: string
 }
 
 export type AuthenticationProps = {
@@ -45,7 +46,7 @@ export type AuthenticationProps = {
   Actions?: JSX.Element
 }
 
-export default ({
+const Authentication = ({
   appProfile,
   displayKeys,
   mapperArgs,
@@ -294,3 +295,5 @@ const displayKeyDisplayFn = (
     </div>
   ))
 }
+
+export default Authentication

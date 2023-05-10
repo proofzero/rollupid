@@ -22,7 +22,7 @@ export type AccountSelectProps = {
   onChooseOther: () => void
 }
 
-export default ({
+const AccountSelect = ({
   logoURL = AuthenticationConstants.defaultLogoURL,
   userProfile,
   appProfile,
@@ -47,8 +47,16 @@ export default ({
 
           {appProfile?.name && (
             <Text className="text-gray-500">
-              to continue to "
-              <span className="text-indigo-500">{appProfile.name}</span>"
+              to continue to &quot;
+              <a
+                href={appProfile.websiteURL}
+                target="_blank"
+                rel="noreferrer"
+                className="text-indigo-500"
+              >
+                {appProfile.name}
+              </a>
+              &quot;
             </Text>
           )}
         </div>
@@ -122,3 +130,5 @@ export default ({
     </div>
   )
 }
+
+export default AccountSelect
