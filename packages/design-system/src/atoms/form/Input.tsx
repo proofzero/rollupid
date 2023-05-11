@@ -4,7 +4,7 @@ import { Text } from '../text/Text'
 
 export type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   id: string
-  label: string
+  label?: string
   error?: string
   docsUrl?: string
 }
@@ -22,25 +22,27 @@ export const Input = ({
 
   return (
     <div className="flex flex-col">
-      <label
-        htmlFor={id}
-        className="w-full flex flex-row items-center justify-between"
-      >
-        <Text size="sm" weight="medium" className="text-gray-700 mb-2">
-          {label}
-          {rest.required ? '*' : ''}
-        </Text>
-        {docsUrl && (
-          <a
-            href={docsUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="text-indigo-500 mb-2 text-sm"
-          >
-            Learn More
-          </a>
-        )}
-      </label>
+      {label && (
+        <label
+          htmlFor={id}
+          className="w-full flex flex-row items-center justify-between"
+        >
+          <Text size="sm" weight="medium" className="text-gray-700 mb-2">
+            {label}
+            {rest.required ? '*' : ''}
+          </Text>
+          {docsUrl && (
+            <a
+              href={docsUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-indigo-500 mb-2 text-sm"
+            >
+              Learn More
+            </a>
+          )}
+        </label>
+      )}
 
       <input
         className={`w-full form-input rounded border
