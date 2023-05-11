@@ -221,7 +221,7 @@ export function MultiSelect({
                                 {item.id}
                               </Text>
                               {item.disabled && (
-                                <Pill className="bg-gray-200 text-gray-500 rounded-xl ml-2">
+                                <Pill className="bg-gray-100 text-gray-500 rounded-xl ml-2">
                                   Enable in &quot;{item.section}&quot; section
                                 </Pill>
                               )}
