@@ -107,7 +107,7 @@ export default function SideMenu({
     <div
       className="text-center bg-white lg:min-h-[100dvh]
     lg:min-w-[256px] lg:max-w-sm lg:border-r lg:text-left
-    flex flex-col"
+    flex flex-col lg:sticky lg:top-0 max-h-[100dvh]"
     >
       {/* Desktop Menu */}
       <div className="hidden lg:block h-full">
