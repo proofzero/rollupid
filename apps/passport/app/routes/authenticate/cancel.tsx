@@ -1,7 +1,6 @@
 import { InternalServerError } from '@proofzero/errors'
 import { LoaderFunction, redirect } from '@remix-run/cloudflare'
 import {
-  destroyAuthenticationParamsSession,
   destroyAuthzCookieParamsSession,
   getAuthzCookieParams,
 } from '~/session.server'
@@ -32,11 +31,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   headers.append(
     'Set-Cookie',
     await destroyAuthzCookieParamsSession(request, context.env)
-  )
-
-  headers.append(
-    'Set-Cookie',
-    await destroyAuthenticationParamsSession(request, context.env)
   )
 
   const qp = new URLSearchParams()

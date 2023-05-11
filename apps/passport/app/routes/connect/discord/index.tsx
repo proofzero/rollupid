@@ -5,22 +5,31 @@ import type { DiscordStrategyOptions } from 'remix-auth-discord'
 
 import { RollupError } from '@proofzero/errors'
 
-import { initAuthenticator, getDiscordStrategy } from '~/auth.server'
+import {
+  getDiscordStrategy,
+  createAuthenticatorSessionStorage,
+  injectAuthnParamsIntoSession,
+} from '~/auth.server'
+import { Authenticator } from 'remix-auth'
 
 export const action: ActionFunction = async ({
   request,
   context,
 }: ActionArgs) => {
-  const url = new URL(request.url)
-  const prompt = url.searchParams.get('prompt')
-  if (!isPromptValid(prompt))
-    throw new RollupError({ message: 'invalid prompt' })
-  const authenticator = initAuthenticator(context.env)
-  authenticator.use(getDiscordStrategy(context.env, prompt))
-  return authenticator.authenticate(DiscordStrategyDefaultName, request)
-}
+  const authnParams = new URL(request.url).searchParams
+  const authenticatorInputs = await injectAuthnParamsIntoSession(
+    authnParams.toString(),
+    request,
+    context.env
+  )
+  const rollup_action = authnParams.get('rollup_action')
+  const prompt =
+    rollup_action && rollup_action === 'reconnect' ? 'consent' : undefined
 
-const isPromptValid = (
-  prompt: unknown
-): prompt is DiscordStrategyOptions['prompt'] =>
-  prompt == null || prompt === 'consent' || prompt === 'none'
+  const authenticator = new Authenticator(authenticatorInputs.sessionStorage)
+  authenticator.use(getDiscordStrategy(context.env, prompt))
+  return authenticator.authenticate(
+    DiscordStrategyDefaultName,
+    authenticatorInputs.newRequest
+  )
+}

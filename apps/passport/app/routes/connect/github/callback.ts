@@ -3,7 +3,10 @@ import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { AddressURNSpace } from '@proofzero/urns/address'
 
-import { initAuthenticator, getGithubAuthenticator } from '~/auth.server'
+import {
+  getGithubAuthenticator,
+  createAuthenticatorSessionStorage,
+} from '~/auth.server'
 import {
   authenticateAddress,
   checkOAuthError,
@@ -14,6 +17,7 @@ import { GitHubStrategyDefaultName } from 'remix-auth-github'
 import { NodeType, OAuthAddressType } from '@proofzero/types/address'
 import type { OAuthData } from '@proofzero/platform.address/src/types'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
+import { Authenticator } from 'remix-auth'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -23,7 +27,8 @@ export const loader: LoaderFunction = async ({
 
   const appData = await getAuthzCookieParams(request, context.env)
 
-  const authenticator = initAuthenticator(context.env)
+  const authenticatorSession = createAuthenticatorSessionStorage(context.env)
+  const authenticator = new Authenticator(authenticatorSession)
   authenticator.use(getGithubAuthenticator(context.env))
 
   const authRes = (await authenticator.authenticate(

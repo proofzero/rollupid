@@ -7,20 +7,25 @@ import { NodeType, OAuthAddressType } from '@proofzero/types/address'
 
 import type { OAuthData } from '@proofzero/platform.address/src/types'
 
-import { initAuthenticator, getDiscordStrategy } from '~/auth.server'
+import {
+  createAuthenticatorSessionStorage,
+  getDiscordStrategy,
+} from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
 import {
   authenticateAddress,
   checkOAuthError,
 } from '~/utils/authenticate.server'
+import { Authenticator } from 'remix-auth'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   await checkOAuthError(request, context.env)
 
   const appData = await getAuthzCookieParams(request, context.env)
 
-  const authenticator = initAuthenticator(context.env)
+  const authenticatorStorage = createAuthenticatorSessionStorage(context.env)
+  const authenticator = new Authenticator(authenticatorStorage)
   authenticator.use(getDiscordStrategy(context.env))
 
   const authRes = (await authenticator.authenticate(

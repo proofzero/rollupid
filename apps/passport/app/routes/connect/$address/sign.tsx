@@ -6,7 +6,7 @@ import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import { getAuthzCookieParams, getUserSession } from '../../../session.server'
-import { getRedirectURL } from '../../../utils/authenticate.server'
+import { getAuthzRedirectURL } from '../../../utils/authenticate.server'
 
 import { signMessageTemplate } from '@proofzero/design-system/src/atoms/buttons/connect-button/ConnectButton'
 
@@ -68,7 +68,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   })
 
   if (appData?.rollup_action === 'connect' && existing) {
-    return redirect(getRedirectURL(appData, 'ALREADY_CONNECTED'))
+    return redirect(getAuthzRedirectURL(appData, 'ALREADY_CONNECTED'))
   }
 
   // TODO: handle the error case

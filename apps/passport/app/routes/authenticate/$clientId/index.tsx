@@ -11,15 +11,12 @@ import {
 import { useEffect, useState } from 'react'
 import { redirect, json } from '@remix-run/cloudflare'
 
-import {
-  commitAuthenticationParamsSession,
-  getAuthzCookieParams,
-  getAuthenticationParamsSession,
-} from '~/session.server'
+import { getAuthzCookieParams } from '~/session.server'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { createClient } from 'wagmi'
 import { getDefaultClient } from 'connectkit'
 import Authentication, {
+  AppProfile,
   AuthenticationConstants,
 } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
@@ -38,22 +35,12 @@ const client = createClient(
   })
 )
 
-export const loader: LoaderFunction = async ({ request, params, context }) => {
+export const loader: LoaderFunction = async ({ request, params }) => {
   const url = new URL(request.url)
 
   let displayKeys = AuthenticationConstants.knownKeys
 
-  const authenticationParamsSession = await getAuthenticationParamsSession(
-    request,
-    context.env
-  )
-
   let loginHint = url.searchParams.get('login_hint')
-  if (loginHint) {
-    authenticationParamsSession.set('login_hint', loginHint)
-  } else {
-    loginHint = authenticationParamsSession.get('login_hint')
-  }
 
   if (loginHint) {
     const hints = loginHint
@@ -63,20 +50,11 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     displayKeys = hints
   }
 
-  return json(
-    {
-      clientId: params.clientId,
-      displayKeys,
-    },
-    {
-      headers: {
-        'Set-Cookie': await commitAuthenticationParamsSession(
-          context.env,
-          authenticationParamsSession
-        ),
-      },
-    }
-  )
+  return json({
+    clientId: params.clientId,
+    displayKeys,
+    authnQueryParams: new URL(request.url).searchParams.toString(),
+  })
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
@@ -100,16 +78,11 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 
 export default () => {
   const { appProps, rollup_action } = useOutletContext<{
-    appProps?: {
-      name: string
-      iconURL: string
-      termsURL: string
-      privacyURL: string
-    }
+    appProps?: AppProfile
     rollup_action?: string
   }>()
 
-  const { clientId, displayKeys, loginHint } = useLoaderData()
+  const { clientId, displayKeys, authnQueryParams } = useLoaderData()
 
   const [signData, setSignData] = useState<{
     nonce: string | undefined
@@ -124,7 +97,6 @@ export default () => {
   })
   const [loading, setLoading] = useState(false)
 
-  const name = appProps?.name
   const iconURL = appProps?.iconURL
 
   const transition = useTransition()
@@ -140,9 +112,6 @@ export default () => {
 
   useEffect(() => {
     const url = new URL(window.location.href)
-
-    if (rollup_action) url.searchParams.set('rollup_action', rollup_action)
-    if (loginHint) url.searchParams.set('login_hint', loginHint)
 
     const error = url.searchParams.get('oauth_error')
     if (error) {
@@ -225,9 +194,7 @@ export default () => {
           FormWrapperEl: ({ children, provider }) => (
             <Form
               className="w-full"
-              action={`/connect/${provider}${
-                rollup_action === 'reconnect' ? '?prompt=consent' : ''
-              }`}
+              action={`/connect/${provider}?${authnQueryParams}`}
               method="post"
               key={provider}
             >
@@ -255,7 +222,7 @@ export default () => {
                   signature: undefined,
                 })
               })
-              .catch((err) => {
+              .catch(() => {
                 toast(ToastType.Error, {
                   message:
                     'Could not fetch nonce for signing authentication message',
