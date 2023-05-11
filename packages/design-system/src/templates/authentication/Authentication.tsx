@@ -45,6 +45,7 @@ export type AuthenticationProps = {
   mapperArgs: DisplayKeyMapperArgs
   Header?: JSX.Element
   Actions?: JSX.Element
+  radius?: string
 }
 
 export default ({
@@ -53,6 +54,7 @@ export default ({
   mapperArgs,
   Header,
   Actions,
+  radius = 'lg',
 }: AuthenticationProps) => {
   displayKeys = displayKeys.filter((key) =>
     AuthenticationConstants.knownKeys.includes(key)
@@ -63,7 +65,7 @@ export default ({
       <div
         className={`flex grow-0 flex-col items-center
          gap-4 mx-auto bg-white p-6 min-h-[100dvh] lg:min-h-[675px]
-          max-h-[100dvh] w-full lg:w-[418px] lg:rounded-lg
+          max-h-[100dvh] w-full lg:w-[418px] lg:rounded-${radius}
           mt-auto`}
         style={{
           border: '1px solid #D1D5DB',
@@ -155,10 +157,10 @@ const displayKeyMapper = (
     clientId,
     wagmiClient,
     signData,
-    walletConnectCallback = () => { },
-    walletSignCallback = () => { },
-    walletConnectErrorCallback = () => { },
-    navigate = () => { },
+    walletConnectCallback = () => {},
+    walletSignCallback = () => {},
+    walletConnectErrorCallback = () => {},
+    navigate = () => {},
     FormWrapperEl = ({ children }) => <>{children}</>,
     loading = false,
     flex = false,

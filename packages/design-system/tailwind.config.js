@@ -22,5 +22,8 @@ module.exports = {
     'text-gray-500',
     'mt-8',
     'mt-2',
+    'lg:rounded-sm',
+    'lg:rounded-md',
+    'lg:rounded-lg',
   ],
 }

@@ -1,7 +1,7 @@
 import { Tab } from '@headlessui/react'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Form } from '@remix-run/react'
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { IconType } from 'react-icons'
 import { HiOutlineCog, HiOutlineMail } from 'react-icons/hi'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
@@ -64,9 +64,73 @@ const DesignerTab = ({
   </div>
 )
 
+const FormElement = ({
+  label,
+  children,
+}: {
+  label: string
+  children: ReactNode
+}) => {
+  return (
+    <div className="flex flex-row items-center justify-between px-8 py-4">
+      <Text size="sm" weight="medium" className="text-gray-900">
+        {label}
+      </Text>
+
+      {children}
+    </div>
+  )
+}
+
+const RadiusButton = ({
+  radius,
+  selectedRadius,
+  setRadius,
+}: {
+  radius: Radius
+  selectedRadius: Radius | undefined
+  setRadius: React.Dispatch<React.SetStateAction<Radius>>
+}) => {
+  let label
+  switch (radius) {
+    case Radius.Large:
+      label = 'Large'
+      break
+    case Radius.Small:
+      label = 'Small'
+      break
+    case Radius.Medium:
+      label = 'Medium'
+      break
+    default:
+      throw new Error('Invalid radius')
+  }
+
+  const selected = selectedRadius === radius
+
+  return (
+    <button
+      className={`py-1.5 px-2.5 rounded-md ${selected ? 'bg-indigo-500' : ''}`}
+      onClick={(e) => {
+        e.preventDefault()
+        setRadius(radius)
+      }}
+    >
+      <Text
+        size="xs"
+        weight="medium"
+        className={`${selected ? 'text-white' : 'text-gray-500'}`}
+      >
+        {label}
+      </Text>
+    </button>
+  )
+}
+
 export default () => {
   const [theme, setTheme] = useState<Theme>(Theme.Light)
   const [heading, setHeading] = useState<string>()
+  const [radius, setRadius] = useState<Radius>(Radius.Medium)
 
   return (
     <Form>
@@ -122,11 +186,7 @@ export default () => {
                 Login Settings
               </Text>
 
-              <div className="flex flex-row items-center justify-between px-8 py-4 border-b">
-                <Text size="sm" weight="medium" className="text-gray-900">
-                  Theme
-                </Text>
-
+              <FormElement label="Theme">
                 <input id="theme" name="theme" type="hidden" value={theme} />
 
                 <div className="flex flex-row gap-4 items-center">
@@ -153,13 +213,9 @@ export default () => {
                     <img src={darkIcon} />
                   </button>
                 </div>
-              </div>
+              </FormElement>
 
-              <div className="flex flex-row items-center justify-between px-8 py-4">
-                <Text size="sm" weight="medium" className="text-gray-900">
-                  Heading
-                </Text>
-
+              <FormElement label="Heading">
                 <Input
                   id={'heading'}
                   label={''}
@@ -169,10 +225,32 @@ export default () => {
                     setHeading(e.target.value)
                   }}
                 />
-              </div>
+              </FormElement>
+
+              <FormElement label="Radius">
+                <input id="radius" name="radius" type="hidden" value={radius} />
+
+                <div className="p-1 border shadow-sm rounded">
+                  <RadiusButton
+                    radius={Radius.Large}
+                    setRadius={setRadius}
+                    selectedRadius={radius}
+                  />
+                  <RadiusButton
+                    radius={Radius.Medium}
+                    setRadius={setRadius}
+                    selectedRadius={radius}
+                  />
+                  <RadiusButton
+                    radius={Radius.Small}
+                    setRadius={setRadius}
+                    selectedRadius={radius}
+                  />
+                </div>
+              </FormElement>
             </section>
 
-            <section className="flex-1 bg-white border rounded-lg pointer-events-none">
+            <section className="flex-1 bg-white border rounded-lg pointer-events-none pb-3">
               <Text
                 size="lg"
                 weight="semibold"
@@ -208,6 +286,7 @@ export default () => {
                   wagmiClient: client,
                   signData: null,
                 }}
+                radius={radius}
               />
             </section>
           </Tab.Panel>
