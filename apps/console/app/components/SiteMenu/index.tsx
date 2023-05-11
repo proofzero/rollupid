@@ -83,8 +83,8 @@ export default function SiteMenu(props: RollupMenuProps) {
   return (
     <div
       className="text-center bg-gray-900 lg:min-h-[100dvh]
-    lg:min-w-[256px] lg:max-w-sm lg:text-left
-    flex flex-col lg:min-h-[100dvh] lg:sticky lg:top-0 max-h-[100dvh]"
+    lg:min-w-[256px] lg:text-left
+    flex flex-col"
     >
       {/* Desktop menu */}
       <div className="hidden lg:block object-left">

@@ -50,7 +50,7 @@ export default function DashboardIndexPage() {
                     max-lg:h-[calc(100dvh-80px)]\
                     min-h-[635px]'
                   : 'h-full'
-              }} bg-gray-50 p-6 h-[calc(100vh-80px)]`}
+              } bg-gray-50 p-6`}
             >
               <div className="mb-11">
                 <InfoPanelDashboard />
