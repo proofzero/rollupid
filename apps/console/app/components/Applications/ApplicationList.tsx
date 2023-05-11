@@ -13,11 +13,13 @@ import type { ApplicationListItemProps } from './ApplicationListItem'
 type ApplicationListProps = {
   applications: ApplicationListItemProps[]
   onCreate: () => void
+  navigate: (clientId: string) => void
 }
 
 export const ApplicationList = ({
   applications,
   onCreate,
+  navigate,
 }: ApplicationListProps) => {
   const [actionApp, setActionApp] = useState<
     | {
@@ -71,6 +73,7 @@ export const ApplicationList = ({
         {applications.map((ali) => (
           <ApplicationListItem
             key={ali.id}
+            navigate={navigate}
             {...ali}
             onDeleteApplication={(clientId, appName) => {
               setActionApp({

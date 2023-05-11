@@ -63,6 +63,9 @@ export default function DashboardIndexPage() {
                     onCreate={() => {
                       navigate('/apps/new')
                     }}
+                    navigate={(clientId: string) =>
+                      navigate(`/apps/${clientId}`)
+                    }
                     apps={apps}
                   />
                 </>

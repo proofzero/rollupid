@@ -1,5 +1,6 @@
 import { Menu, Transition } from '@headlessui/react'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Link } from '@remix-run/react'
 import { Fragment } from 'react'
 import { HiDotsVertical, HiOutlineCog } from 'react-icons/hi'
 import { HiOutlineTrash } from 'react-icons/hi2'
@@ -39,6 +40,7 @@ export type ApplicationListItemProps = {
   createdTimestamp?: number
   icon?: string
   published?: boolean
+  navigate?: (clientId: string) => void
   onDeleteApplication?: (clientId: string, appName: string) => void
 }
 export const ApplicationListItem = ({
@@ -48,6 +50,7 @@ export const ApplicationListItem = ({
   icon,
   published,
   onDeleteApplication,
+  navigate,
 }: ApplicationListItemProps) => (
   <article className="flex justify-center items-center border border-gray-200 shadow-sm rounded bg-white">
     <section>
@@ -57,9 +60,14 @@ export const ApplicationListItem = ({
     <section className="px-4 flex-1">
       <div className="flex flex-row space-x-2 items-center">
         <Text size="sm" weight="medium" className="text-gray-900">
-          <a href={`/apps/${id}`} className="hover:underline">
+          <div
+            onClick={() => {
+              if (navigate) navigate(id)
+            }}
+            className="hover:underline cursor-pointer"
+          >
             {name}
-          </a>
+          </div>
         </Text>
         <ApplicationListItemPublishedState published={published} />
       </div>
@@ -91,12 +99,17 @@ export const ApplicationListItem = ({
           leaveTo="transform opacity-0 scale-95"
         >
           <Menu.Items
-            className="absolute z-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 
+            className="absolute z-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100
           rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y
            divide-gray-100"
           >
             <div className="p-1 ">
-              <a href={`/apps/${id}`}>
+              <div
+                onClick={() => {
+                  if (navigate) navigate(id)
+                }}
+                className="cursor-pointer"
+              >
                 <Menu.Item
                   as="div"
                   className="py-2 px-4 flex items-center space-x-3 cursor-pointer
@@ -107,14 +120,14 @@ export const ApplicationListItem = ({
                     Settings
                   </Text>
                 </Menu.Item>
-              </a>
+              </div>
             </div>
 
             <div className="p-1">
               <Menu.Item
                 as="div"
                 className="py-2 px-4 flex items-center space-x-3 cursor-pointer
-                hover:rounded-[6px] hover:bg-gray-100"
+                hover:rounded-[6px] hover:bg-gray-100 "
                 onClick={() => {
                   if (onDeleteApplication) {
                     onDeleteApplication(id, name ?? '')
