@@ -227,7 +227,9 @@ export function MultiSelect({
                               )}
                               {!item.disabled && item.experimental && (
                                 <ExperimentalFeaturePill
-                                  className="bg-gray-200"
+                                  className={`${
+                                    selected ? 'bg-gray-200' : 'bg-gray-100'
+                                  }`}
                                   text="Experimental Feature"
                                 />
                               )}
