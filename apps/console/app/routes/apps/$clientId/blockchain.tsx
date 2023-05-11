@@ -11,6 +11,8 @@ import { requireJWT } from '~/utilities/session.server'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import { TbInfoCircle } from 'react-icons/tb'
+import zerodevIcon from '~/assets/paymasters/zerodev.svg'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
 import type { notificationHandlerType } from '~/types'
@@ -26,6 +28,7 @@ type errorsType = {
 
 type paymasterType = {
   provider?: string
+  icon?: string
   name?: string
   secretLabel?: string
   secretPlaceholder?: string
@@ -35,6 +38,7 @@ type paymasterType = {
 const availablePaymasters: paymasterType[] = [
   {
     name: 'ZeroDev',
+    icon: zerodevIcon,
     provider: 'zerodev',
     secretLabel: 'Project ID',
     secretPlaceholder: 'ZeroDev project ID',
@@ -133,7 +137,7 @@ export default () => {
         </div>
 
         <div className="flex flex-col sm:flex-row space-y-5 lg:space-y-0 lg:space-x-5">
-          <Panel title="Account Abstraction">
+          <Panel title="Account Abstraction" experimental={true}>
             <Text size="sm" className="text-gray-500 pb-3">
               Account Abstraction simplifies the process of handling
               cryptocurrency payments by facilitating the sponsorship or
@@ -160,14 +164,22 @@ export default () => {
                 </Listbox.Label>
                 <div className="relative border rounded bottom-0">
                   <Listbox.Button className="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
-                    <span
-                      className={`block truncate text-sm ${
-                        selectedPaymaster?.name ? '' : 'text-gray-400'
-                      }`}
-                    >
-                      {selectedPaymaster?.name ||
-                        "Select a paymaster's provider"}
-                    </span>
+                    <div className={`block truncate text-sm text-gray-400`}>
+                      {selectedPaymaster?.provider ? (
+                        <div className="flex flex-row w-full items-center">
+                          <img
+                            src={selectedPaymaster.icon}
+                            alt="icon"
+                            className="w-6 h-6 mr-3"
+                          />
+                          <span className={`truncate text-sm`}>
+                            {selectedPaymaster.name}
+                          </span>
+                        </div>
+                      ) : (
+                        "Select a paymaster's provider"
+                      )}
+                    </div>
                     <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                       <ChevronUpDownIcon
                         className="h-5 w-5 text-gray-400"
@@ -186,7 +198,7 @@ export default () => {
                         <Listbox.Option
                           key={personIdx}
                           className={({ active }) =>
-                            `relative cursor-default select-none py-2 pl-10 pr-4
+                            `relative cursor-default select-none py-2 px-3
                             ${
                               active
                                 ? 'bg-indigo-100 text-indigo-900'
@@ -195,25 +207,32 @@ export default () => {
                           }
                           value={paymaster}
                         >
-                          {({ selected }) => (
-                            <>
-                              <span
-                                className={`block truncate text-sm ${
-                                  selected ? 'font-medium' : 'font-normal'
-                                }`}
-                              >
-                                {paymaster.name}
-                              </span>
-                              {selected ? (
-                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
-                                  <CheckIcon
-                                    className="h-5 w-5"
-                                    aria-hidden="true"
-                                  />
+                          {({ selected }) => {
+                            return (
+                              <div className="flex flex-row w-full items-center">
+                                <img
+                                  src={paymaster.icon}
+                                  alt="icon"
+                                  className="w-6 h-6 mr-3"
+                                />
+                                <span
+                                  className={`truncate text-sm ${
+                                    selected ? 'font-medium' : 'font-normal'
+                                  }`}
+                                >
+                                  {paymaster.name}
                                 </span>
-                              ) : null}
-                            </>
-                          )}
+                                {selected ? (
+                                  <span className="ml-auto text-indigo-600">
+                                    <CheckIcon
+                                      className="h-5 w-5"
+                                      aria-hidden="true"
+                                    />
+                                  </span>
+                                ) : null}
+                              </div>
+                            )
+                          }}
                         </Listbox.Option>
                       ))}
                     </Listbox.Options>
@@ -228,8 +247,24 @@ export default () => {
                   className="shadow-md w-full"
                   placeholder={selectedPaymaster?.secretPlaceholder}
                   defaultValue={paymaster?.secret}
+                  docsUrl={
+                    'https://docs.rollup.id/platform/console/blockchain#preferred-paymasters'
+                  }
                 />
               </div>
+            </div>
+            <div
+              className="bg-gray-50 mt-7 p-4 rounded-lg flex flex-row
+            justify-start items-start space-x-3"
+            >
+              <TbInfoCircle size={20} className="text-gray-500 shrink-0" />
+              <Text className="text-gray-500">
+                NOTE: Your paymaster credential will only be used to sponsor
+                fees when registering and revoking session keys with your users
+                smart contract wallets. Please refer to your providers
+                documentation for submitting user operations with your session
+                keys
+              </Text>
             </div>
           </Panel>
         </div>

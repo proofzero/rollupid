@@ -21,6 +21,7 @@ import { Combobox } from '@headlessui/react'
 import classNames from 'classnames'
 import { Text } from '../text/Text'
 import { Pill } from '../pills/Pill'
+import { ExperimentalFeaturePill } from '../pills/ExperimentalFeaturePill'
 
 type SelectItem = {
   id: string
@@ -28,6 +29,7 @@ type SelectItem = {
   desc: string
   disabled?: boolean
   section?: string
+  experimental?: boolean
 }
 export type MultiSelectProps = {
   label: string
@@ -196,25 +198,42 @@ export function MultiSelect({
                             checked={selected}
                           ></input>
                           <div>
-                            <Text
-                              size="sm"
-                              weight="medium"
-                              className="truncate inline text-gray-900"
-                            >
-                              {item.val} -
-                            </Text>
-                            <Text
-                              size="sm"
-                              weight="medium"
-                              className="font-ibm-plex-mono inline ml-2 truncate text-gray-500"
-                            >
-                              {item.id}
-                            </Text>
-                            {item.disabled && (
-                              <Pill className="bg-gray-100 text-gray-500 rounded-xl ml-2">
-                                Enable in &quot;{item.section}&quot; section
-                              </Pill>
-                            )}
+                            <div className="flex flex-row flex-wrap space-x-2">
+                              <Text
+                                size="sm"
+                                weight="medium"
+                                className="truncate inline text-gray-900"
+                              >
+                                {item.val}
+                              </Text>
+                              <Text
+                                size="sm"
+                                weight="medium"
+                                className="truncate inline text-gray-900"
+                              >
+                                -
+                              </Text>
+                              <Text
+                                size="sm"
+                                weight="medium"
+                                className="font-ibm-plex-mono inline ml-2 truncate text-gray-500"
+                              >
+                                {item.id}
+                              </Text>
+                              {item.disabled && (
+                                <Pill className="bg-gray-100 text-gray-500 rounded-xl ml-2">
+                                  Enable in &quot;{item.section}&quot; section
+                                </Pill>
+                              )}
+                              {!item.disabled && item.experimental && (
+                                <ExperimentalFeaturePill
+                                  className={`${
+                                    selected ? 'bg-gray-200' : 'bg-gray-100'
+                                  }`}
+                                  text="Experimental Feature"
+                                />
+                              )}
+                            </div>
                             <Text size="xs" className="mt-1 text-gray-500">
                               {item.desc}
                             </Text>
