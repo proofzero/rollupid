@@ -12,7 +12,7 @@ import { Popover } from '@headlessui/react'
 import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
-import { useOutletContext } from '@remix-run/react'
+import { Form, useOutletContext } from '@remix-run/react'
 
 import type { LoaderData as OutletContextData } from '~/root'
 import type { ActionFunction } from '@remix-run/cloudflare'
@@ -85,7 +85,7 @@ export default function CreateNewApp() {
                   Create Application
                 </Text>
 
-                <form method="post" onSubmit={() => setIsSubmitting(true)}>
+                <Form method="post" onSubmit={() => setIsSubmitting(true)}>
                   <Input
                     autoFocus
                     id="client_name"
@@ -112,7 +112,7 @@ export default function CreateNewApp() {
                       Create
                     </Button>
                   </div>
-                </form>
+                </Form>
               </div>
             </section>
           </main>
