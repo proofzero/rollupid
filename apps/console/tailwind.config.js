@@ -12,4 +12,5 @@ module.exports = {
     },
   },
   plugins: [require('@tailwindcss/forms')],
+  safelist: ['lg:rounded-sm', 'lg:rounded-md', 'lg:rounded-lg'],
 }
