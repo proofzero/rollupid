@@ -454,6 +454,7 @@ export default function AppDetailIndexPage() {
                           desc: value.devDescription!,
                           disabled,
                           section,
+                          experimental: value.experimental,
                         }
                       })}
                       selectedItems={appDetails.app.scopes?.map((scope) => {

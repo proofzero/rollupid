@@ -20,6 +20,7 @@ export const ScopeSchema = z.object({
    * Some scopes are hidden from the user and are only used internally
    */
   hidden: z.boolean().optional(),
+  experimental: z.boolean().optional(),
 })
 
 export const ScopeMeta = z.record(z.string(), ScopeSchema)
@@ -157,6 +158,7 @@ export const SCOPES: ScopeMap = {
     devDescription:
       'Scope value indicating that a configured smart contract wallets will be included in the ID token as well as the /userinfo endpoint response.',
     class: 'address',
+    experimental: true,
   },
   // NOT READY YET
   // [SCOPE_PROFILE_READ]: {
