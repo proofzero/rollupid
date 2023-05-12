@@ -81,12 +81,16 @@ const FormElement = ({
   children: ReactNode
 }) => {
   return (
-    <div className="flex flex-row items-center px-8 py-4">
-      <Text size="sm" weight="medium" className="text-gray-900 flex-1">
+    <div className="flex flex-col lg:flex-row lg:items-center px-8 py-4">
+      <Text
+        size="sm"
+        weight="medium"
+        className="text-gray-900 flex-1 mb-2 lg:mb-0"
+      >
         {label}
       </Text>
 
-      <div className="flex-1">{children}</div>
+      <div className="flex-1 w-full">{children}</div>
     </div>
   )
 }
@@ -162,7 +166,7 @@ const ProviderModal = ({
 
   return (
     <Modal isOpen={isOpen} fixed handleClose={() => handleClose(false)}>
-      <div className="bg-white px-6 py-8 max-w-full w-[543px] mx-auto border shadow rounded-lg">
+      <div className="bg-white px-6 py-8 max-w-full lg:w-[543px] lg:mx-auto border shadow rounded-lg">
         <Text weight="semibold" className="text-left text-gray-800 mb-4">
           Login Provider Configuration
         </Text>
@@ -314,7 +318,7 @@ export default () => {
                 <FormElement label="Theme">
                   <input id="theme" name="theme" type="hidden" value={theme} />
 
-                  <div className="flex flex-row gap-4 items-center justify-end">
+                  <div className="flex flex-row gap-4 items-center lg:justify-end">
                     <button
                       className={`border rounded-full ${
                         theme === Theme.Light
