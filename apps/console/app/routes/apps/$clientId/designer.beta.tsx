@@ -17,6 +17,8 @@ import Authentication, {
 import { createClient } from 'wagmi'
 import { getDefaultClient } from 'connectkit'
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
+import IconPicker from '~/components/IconPicker'
+import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 
 const client = createClient(
   // @ts-ignore
@@ -131,168 +133,224 @@ export default () => {
   const [theme, setTheme] = useState<Theme>(Theme.Light)
   const [heading, setHeading] = useState<string>()
   const [radius, setRadius] = useState<Radius>(Radius.Medium)
+  const [color, setColor] = useState<string>('#6366F1')
+  const [graphicURL] = useState<string>()
+
+  const [loading, setLoading] = useState<boolean>(false)
 
   return (
-    <Form>
-      <section className="flex flex-row items-center justify-between mb-11">
-        <div className="flex flex-row items-center space-x-3">
-          <Text
-            size="2xl"
-            weight="semibold"
-            className="text-gray-900 ml-2 lg:ml-0 "
-          >
-            Designer
-          </Text>
+    <>
+      {loading && <Loader />}
+      <Form>
+        <section className="flex flex-row items-center justify-between mb-11">
+          <div className="flex flex-row items-center space-x-3">
+            <Text
+              size="2xl"
+              weight="semibold"
+              className="text-gray-900 ml-2 lg:ml-0 "
+            >
+              Designer
+            </Text>
 
-          <DocumentationBadge url="https://docs.rollup.id/platform/console/designer" />
-        </div>
+            <DocumentationBadge url="https://docs.rollup.id/platform/console/designer" />
+          </div>
 
-        <div>
-          <button type="submit">SAVE</button>
-        </div>
-      </section>
+          <div>
+            <button type="submit">SAVE</button>
+          </div>
+        </section>
 
-      <Tab.Group>
-        <Tab.List className="flex flex-row items-center border-b mb-6">
-          <Tab className="outline-0">
-            {({ selected }) => (
-              <DesignerTab
-                Icon={HiOutlineCog}
-                text="Login"
-                selected={selected}
-              />
-            )}
-          </Tab>
-
-          <Tab className="outline-0" disabled>
-            {({ selected }) => (
-              <DesignerTab
-                Icon={HiOutlineMail}
-                text="OTP Email"
-                selected={selected}
-              />
-            )}
-          </Tab>
-        </Tab.List>
-
-        <Tab.Panels>
-          <Tab.Panel className="flex flex-row gap-7">
-            <section className="flex-1 bg-white border rounded-lg">
-              <Text
-                size="lg"
-                weight="semibold"
-                className="mx-8 my-4 text-gray-900"
-              >
-                Login Settings
-              </Text>
-
-              <FormElement label="Theme">
-                <input id="theme" name="theme" type="hidden" value={theme} />
-
-                <div className="flex flex-row gap-4 items-center">
-                  <button
-                    className={`border rounded-full ${
-                      theme === Theme.Light ? 'outline outline-indigo-500' : ''
-                    } w-7 h-7 overflow-hidden`}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setTheme(Theme.Light)
-                    }}
-                  >
-                    <img src={lightIcon} />
-                  </button>
-                  <button
-                    className={`border rounded-full ${
-                      theme === Theme.Dark ? 'outline outline-indigo-500' : ''
-                    } w-7 h-7 overflow-hidden`}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setTheme(Theme.Dark)
-                    }}
-                  >
-                    <img src={darkIcon} />
-                  </button>
-                </div>
-              </FormElement>
-
-              <FormElement label="Heading">
-                <Input
-                  id={'heading'}
-                  label={''}
-                  placeholder={AuthenticationConstants.defaultHeading}
-                  className="w-80"
-                  onChange={(e) => {
-                    setHeading(e.target.value)
-                  }}
+        <Tab.Group>
+          <Tab.List className="flex flex-row items-center border-b mb-6">
+            <Tab className="outline-0">
+              {({ selected }) => (
+                <DesignerTab
+                  Icon={HiOutlineCog}
+                  text="Login"
+                  selected={selected}
                 />
-              </FormElement>
+              )}
+            </Tab>
 
-              <FormElement label="Radius">
-                <input id="radius" name="radius" type="hidden" value={radius} />
+            <Tab className="outline-0" disabled>
+              {({ selected }) => (
+                <DesignerTab
+                  Icon={HiOutlineMail}
+                  text="OTP Email"
+                  selected={selected}
+                />
+              )}
+            </Tab>
+          </Tab.List>
 
-                <div className="p-1 border shadow-sm rounded">
-                  <RadiusButton
-                    radius={Radius.Large}
-                    setRadius={setRadius}
-                    selectedRadius={radius}
+          <Tab.Panels>
+            <Tab.Panel className="flex flex-row gap-7">
+              <section className="flex-1 bg-white border rounded-lg">
+                <Text
+                  size="lg"
+                  weight="semibold"
+                  className="mx-8 my-4 text-gray-900"
+                >
+                  Login Settings
+                </Text>
+
+                <FormElement label="Theme">
+                  <input id="theme" name="theme" type="hidden" value={theme} />
+
+                  <div className="flex flex-row gap-4 items-center">
+                    <button
+                      className={`border rounded-full ${
+                        theme === Theme.Light
+                          ? 'outline outline-indigo-500'
+                          : ''
+                      } w-7 h-7 overflow-hidden`}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setTheme(Theme.Light)
+                      }}
+                    >
+                      <img src={lightIcon} />
+                    </button>
+                    <button
+                      className={`border rounded-full ${
+                        theme === Theme.Dark ? 'outline outline-indigo-500' : ''
+                      } w-7 h-7 overflow-hidden`}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setTheme(Theme.Dark)
+                      }}
+                    >
+                      <img src={darkIcon} />
+                    </button>
+                  </div>
+                </FormElement>
+
+                <FormElement label="Heading">
+                  <Input
+                    id={'heading'}
+                    label={''}
+                    placeholder={AuthenticationConstants.defaultHeading}
+                    className="w-80"
+                    onChange={(e) => {
+                      setHeading(e.target.value)
+                    }}
                   />
-                  <RadiusButton
-                    radius={Radius.Medium}
-                    setRadius={setRadius}
-                    selectedRadius={radius}
+                </FormElement>
+
+                <FormElement label="Radius">
+                  <input
+                    id="radius"
+                    name="radius"
+                    type="hidden"
+                    value={radius}
                   />
-                  <RadiusButton
-                    radius={Radius.Small}
-                    setRadius={setRadius}
-                    selectedRadius={radius}
+
+                  <div className="p-1 border shadow-sm rounded">
+                    <RadiusButton
+                      radius={Radius.Large}
+                      setRadius={setRadius}
+                      selectedRadius={radius}
+                    />
+                    <RadiusButton
+                      radius={Radius.Medium}
+                      setRadius={setRadius}
+                      selectedRadius={radius}
+                    />
+                    <RadiusButton
+                      radius={Radius.Small}
+                      setRadius={setRadius}
+                      selectedRadius={radius}
+                    />
+                  </div>
+                </FormElement>
+
+                <FormElement label="Primary Color">
+                  <Input
+                    id="color"
+                    name="color"
+                    type="text"
+                    defaultValue={color}
+                    onChange={(e) => setColor(e.target.value)}
                   />
-                </div>
-              </FormElement>
-            </section>
+                </FormElement>
 
-            <section className="flex-1 bg-white border rounded-lg pointer-events-none pb-3">
-              <Text
-                size="lg"
-                weight="semibold"
-                className="mx-8 my-4 text-gray-900"
-              >
-                Preview
-              </Text>
+                <FormElement label="Login Screen Side Image">
+                  <div className="flex flex-row items-center">
+                    {/* <div className="w-[44px] h-[66px] bg-[#F3F4F6] rounded flex justify-center items-center mr-4">
+                    <HiOutlineCamera className="h-6 w-6 text-gray-300" />
+                  </div> */}
 
-              <Authentication
-                Header={
-                  <>
-                    <Avatar
-                      src={AuthenticationConstants.defaultLogoURL}
-                      size="sm"
-                    ></Avatar>
-                    <div className={'flex flex-col items-center gap-2'}>
-                      <h1 className={'font-semibold text-xl'}>
-                        {heading ?? AuthenticationConstants.defaultHeading}
-                      </h1>
+                    <IconPicker
+                      maxSize={2097152}
+                      ar={{
+                        w: 2,
+                        h: 3,
+                      }}
+                      minW={720}
+                      minH={1080}
+                      id="image"
+                      setIsFormChanged={(val) => {}}
+                      setIsImgUploading={(val) => {
+                        setLoading(val)
+                      }}
+                      url={graphicURL}
+                    />
 
-                      <h2
-                        style={{ color: '#6B7280' }}
-                        className={'font-medium text-base'}
-                      >
-                        {AuthenticationConstants.defaultSubheading}
-                      </h2>
-                    </div>
-                  </>
-                }
-                displayKeys={AuthenticationConstants.knownKeys}
-                mapperArgs={{
-                  clientId: 'Foo',
-                  wagmiClient: client,
-                  signData: null,
-                }}
-                radius={radius}
-              />
-            </section>
-          </Tab.Panel>
-          <Tab.Panel>Content 2</Tab.Panel>
-        </Tab.Panels>
-      </Tab.Group>
-    </Form>
+                    {/* <button className="border rounded bg-white mr-1.5 px-2.5 py-1.5">
+                      <Text>Upload</Text>
+                    </button>
+
+                    <button className="px-2.5 py-1.5">
+                      <Text>Remove</Text>
+                    </button> */}
+                  </div>
+                </FormElement>
+              </section>
+
+              <section className="flex-1 bg-white border rounded-lg pointer-events-none pb-3">
+                <Text
+                  size="lg"
+                  weight="semibold"
+                  className="mx-8 my-4 text-gray-900"
+                >
+                  Preview
+                </Text>
+
+                <Authentication
+                  Header={
+                    <>
+                      <Avatar
+                        src={AuthenticationConstants.defaultLogoURL}
+                        size="sm"
+                      ></Avatar>
+                      <div className={'flex flex-col items-center gap-2'}>
+                        <h1 className={'font-semibold text-xl'}>
+                          {heading ?? AuthenticationConstants.defaultHeading}
+                        </h1>
+
+                        <h2
+                          style={{ color: '#6B7280' }}
+                          className={'font-medium text-base'}
+                        >
+                          {AuthenticationConstants.defaultSubheading}
+                        </h2>
+                      </div>
+                    </>
+                  }
+                  displayKeys={AuthenticationConstants.knownKeys}
+                  mapperArgs={{
+                    clientId: 'Foo',
+                    wagmiClient: client,
+                    signData: null,
+                  }}
+                  radius={radius}
+                />
+              </section>
+            </Tab.Panel>
+            <Tab.Panel>Content 2</Tab.Panel>
+          </Tab.Panels>
+        </Tab.Group>
+      </Form>
+    </>
   )
 }
