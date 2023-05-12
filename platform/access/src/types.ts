@@ -9,6 +9,7 @@ export interface Environment {
   Edges: Fetcher
   Starbase: Fetcher
   Account: Fetcher
+  Address: Fetcher
   SECRET_JWK_CURRENT_KID: string
   SECRET_JWKS: string
 }

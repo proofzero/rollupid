@@ -1,7 +1,11 @@
 import { z } from 'zod'
 import { decodeJwt } from 'jose'
 
-import { BadRequestError } from '@proofzero/errors'
+import {
+  BadRequestError,
+  InternalServerError,
+  UnauthorizedError,
+} from '@proofzero/errors'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { AccessJWTPayload } from '@proofzero/types/access'
 
@@ -10,8 +14,8 @@ import { getJWKS } from '../../jwk'
 import { initAccessNodeByName } from '../../nodes'
 
 import {
-  claimValuesFormatter,
   getClaimValues,
+  userClaimsFormatter,
 } from '@proofzero/security/persona'
 import { PersonaData } from '@proofzero/types/application'
 
@@ -58,10 +62,18 @@ export const getUserInfoMethod = async ({
     {
       edgesFetcher: ctx.Edges,
       accountFetcher: ctx.Account,
+      addressFetcher: ctx.Address,
     },
     ctx.traceSpan,
     personaData
   )
+
+  for (const [_, scopeClaimResponse] of Object.entries(claimValues)) {
+    if (!scopeClaimResponse.meta.valid)
+      throw new UnauthorizedError({
+        message: 'Authorized data error. Re-authorization by user required',
+      })
+  }
   //`sub` is a mandatory field in the userinfo result
-  return { ...claimValuesFormatter(claimValues), sub: jwt.sub }
+  return { ...userClaimsFormatter(claimValues), sub: jwt.sub }
 }

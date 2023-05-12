@@ -13,6 +13,7 @@ services = [
   { binding = "Edges", service = "edges" },
   { binding = "Starbase", service = "starbase" },
   { binding = "Account", service = "account" },
+  { binding = "Address", service = "address" },
 ]
 
 analytics_engine_datasets = [
@@ -35,6 +36,7 @@ services = [
   { binding = "Edges", service = "edges-dev" },
   { binding = "Starbase", service = "starbase-dev" },
   { binding = "Account", service = "account-dev" },
+  { binding = "Address", service = "address-dev" },
 ]
 
 analytics_engine_datasets = [
@@ -52,6 +54,7 @@ services = [
   { binding = "Edges", service = "edges-next" },
   { binding = "Starbase", service = "starbase-next" },
   { binding = "Account", service = "account-next" },
+  { binding = "Address", service = "address-next" },
 ]
 
 analytics_engine_datasets = [
@@ -69,6 +72,7 @@ services = [
   { binding = "Edges", service = "edges-current" },
   { binding = "Starbase", service = "starbase-current" },
   { binding = "Account", service = "account-current" },
+  { binding = "Address", service = "address-current" },
 ]
 
 analytics_engine_datasets = [

@@ -24,10 +24,11 @@ import {
 
 import { PersonaData } from '@proofzero/types/application'
 import {
-  claimValuesFormatter,
   getClaimValues,
   setPersonaReferences,
+  userClaimsFormatter,
 } from '@proofzero/security/persona'
+import { UnauthorizedError } from '@proofzero/errors'
 
 const AuthenticationCodeInput = z.object({
   grantType: z.literal(GrantType.AuthenticationCode),
@@ -248,17 +249,28 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     account,
     clientId,
     scope,
-    { edgesFetcher: ctx.Edges, accountFetcher: ctx.Account },
+    {
+      edgesFetcher: ctx.Edges,
+      accountFetcher: ctx.Account,
+      addressFetcher: ctx.Address,
+    },
     ctx.traceSpan,
     combinedPersonaData
   )
+  for (const [_, scopeClaimResponse] of Object.entries(idTokenClaims)) {
+    if (!scopeClaimResponse.meta.valid)
+      throw new UnauthorizedError({
+        message: 'Authorized data error. Re-authorization by user required',
+      })
+  }
+
   const idToken = await accessNode.class.generateIdToken({
     jku,
     jwk,
     account,
     clientId,
     expirationTime,
-    idTokenClaims: claimValuesFormatter(idTokenClaims),
+    idTokenClaims: userClaimsFormatter(idTokenClaims, ['profile']),
     issuer,
   })
 
