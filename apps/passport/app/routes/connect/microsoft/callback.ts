@@ -2,7 +2,10 @@ import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { AddressURNSpace } from '@proofzero/urns/address'
-import { initAuthenticator, getMicrosoftStrategy } from '~/auth.server'
+import {
+  createAuthenticatorSessionStorage,
+  getMicrosoftStrategy,
+} from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import { NodeType, OAuthAddressType } from '@proofzero/types/address'
 import type { OAuthData } from '@proofzero/platform.address/src/types'
@@ -12,7 +15,7 @@ import {
   checkOAuthError,
 } from '~/utils/authenticate.server'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
-import cacheImageToCF from '~/utils/cacheImageToCF.server'
+import { Authenticator } from 'remix-auth'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -22,7 +25,8 @@ export const loader: LoaderFunction = async ({
 
   const appData = await getAuthzCookieParams(request, context.env)
 
-  const authenticator = initAuthenticator(context.env)
+  const authenticatorStorage = createAuthenticatorSessionStorage(context.env)
+  const authenticator = new Authenticator(authenticatorStorage)
   authenticator.use(getMicrosoftStrategy(context.env))
 
   const authRes = (await authenticator.authenticate(

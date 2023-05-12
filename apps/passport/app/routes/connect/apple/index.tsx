@@ -1,13 +1,28 @@
 import type { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
+import { Authenticator } from 'remix-auth'
 
-import { initAuthenticator, getAppleStrategy } from '~/auth.server'
+import {
+  createAuthenticatorSessionStorage,
+  getAppleStrategy,
+  injectAuthnParamsIntoSession,
+} from '~/auth.server'
 import { AppleStrategyDefaultName } from '~/utils/applestrategy.server'
 
 export const action: ActionFunction = async ({
   request,
   context,
 }: ActionArgs) => {
-  const authenticator = initAuthenticator(context.env)
+  const authnParams = new URL(request.url).searchParams
+  const authenticatorInputs = await injectAuthnParamsIntoSession(
+    authnParams.toString(),
+    request,
+    context.env
+  )
+  const authenticator = new Authenticator(authenticatorInputs.sessionStorage)
+
   authenticator.use(getAppleStrategy(context.env))
-  return authenticator.authenticate(AppleStrategyDefaultName, request)
+  return authenticator.authenticate(
+    AppleStrategyDefaultName,
+    authenticatorInputs.newRequest
+  )
 }

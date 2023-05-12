@@ -2,7 +2,10 @@ import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { AddressURNSpace } from '@proofzero/urns/address'
 import { GoogleStrategyDefaultName } from 'remix-auth-google'
-import { initAuthenticator, getGoogleAuthenticator } from '~/auth.server'
+import {
+  createAuthenticatorSessionStorage,
+  getGoogleAuthenticator,
+} from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import {
   authenticateAddress,
@@ -11,6 +14,7 @@ import {
 import type { OAuthData } from '@proofzero/platform.address/src/types'
 import { NodeType, OAuthAddressType } from '@proofzero/types/address'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
+import { Authenticator } from 'remix-auth'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -20,7 +24,8 @@ export const loader: LoaderFunction = async ({
 
   const appData = await getAuthzCookieParams(request, context.env)
 
-  const authenticator = initAuthenticator(context.env)
+  const authenticatorStorage = createAuthenticatorSessionStorage(context.env)
+  const authenticator = new Authenticator(authenticatorStorage)
   authenticator.use(getGoogleAuthenticator(context.env))
 
   const authRes = (await authenticator.authenticate(

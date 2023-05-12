@@ -12,13 +12,17 @@ import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { AppleStrategyDefaultName } from '~/utils/applestrategy.server'
 import type { AppleExtraParams } from '~/utils/applestrategy.server'
 
-import { initAuthenticator, getAppleStrategy } from '~/auth.server'
+import {
+  createAuthenticatorSessionStorage,
+  getAppleStrategy,
+} from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import {
   authenticateAddress,
   checkOAuthError,
 } from '~/utils/authenticate.server'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
+import { Authenticator } from 'remix-auth'
 
 type AppleUser = {
   email: string
@@ -45,7 +49,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const appData = await getAuthzCookieParams(request, context.env)
 
-  const authenticator = initAuthenticator(context.env)
+  const authenticatorStorage = createAuthenticatorSessionStorage(context.env)
+  const authenticator = new Authenticator(authenticatorStorage)
   authenticator.use(getAppleStrategy(context.env))
 
   const { accessToken, refreshToken, extraParams } =

@@ -8,13 +8,17 @@ import { NodeType, OAuthAddressType } from '@proofzero/types/address'
 import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 
-import { initAuthenticator, getTwitterStrategy } from '~/auth.server'
+import {
+  createAuthenticatorSessionStorage,
+  getTwitterStrategy,
+} from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import {
   authenticateAddress,
   checkOAuthError,
 } from '~/utils/authenticate.server'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
+import { Authenticator } from 'remix-auth'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -24,7 +28,8 @@ export const loader: LoaderFunction = async ({
 
   const appData = await getAuthzCookieParams(request, context.env)
 
-  const authenticator = initAuthenticator(context.env)
+  const authenticatorStorage = createAuthenticatorSessionStorage(context.env)
+  const authenticator = new Authenticator(authenticatorStorage)
   authenticator.use(getTwitterStrategy(context.env))
 
   const { accessToken, accessTokenSecret, profile } =

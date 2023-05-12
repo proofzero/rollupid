@@ -1,29 +1,31 @@
 import type { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
 
 import { GoogleStrategyDefaultName } from 'remix-auth-google'
-import type { GoogleStrategyOptions } from 'remix-auth-google'
 
-import { RollupError } from '@proofzero/errors'
-
-import { initAuthenticator, getGoogleAuthenticator } from '~/auth.server'
+import {
+  getGoogleAuthenticator,
+  injectAuthnParamsIntoSession,
+} from '~/auth.server'
+import { Authenticator } from 'remix-auth'
 
 export const action: ActionFunction = async ({
   request,
   context,
 }: ActionArgs) => {
-  const url = new URL(request.url)
-  const prompt = url.searchParams.get('prompt')
-  if (!isPromptValid(prompt))
-    throw new RollupError({ message: 'invalid prompt' })
-  const authenticator = initAuthenticator(context.env)
-  authenticator.use(getGoogleAuthenticator(context.env, prompt))
-  return authenticator.authenticate(GoogleStrategyDefaultName, request)
-}
+  const authnParams = new URL(request.url).searchParams
+  const authenticatorInputs = await injectAuthnParamsIntoSession(
+    authnParams.toString(),
+    request,
+    context.env
+  )
+  const rollup_action = authnParams.get('rollup_action')
+  const prompt =
+    rollup_action && rollup_action === 'reconnect' ? 'consent' : undefined
 
-const isPromptValid = (
-  prompt: unknown
-): prompt is GoogleStrategyOptions['prompt'] =>
-  prompt == null ||
-  prompt === 'consent' ||
-  prompt === 'none' ||
-  prompt === 'select_account'
+  const authenticator = new Authenticator(authenticatorInputs.sessionStorage)
+  authenticator.use(getGoogleAuthenticator(context.env, prompt))
+  return authenticator.authenticate(
+    GoogleStrategyDefaultName,
+    authenticatorInputs.newRequest
+  )
+}

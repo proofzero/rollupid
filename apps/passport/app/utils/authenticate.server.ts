@@ -12,7 +12,6 @@ import {
 } from '~/platform.server'
 import {
   createUserSession,
-  destroyAuthenticationParamsSession,
   getAuthzCookieParamsSession,
   parseJwt,
 } from '~/session.server'
@@ -20,6 +19,10 @@ import { generateGradient } from './gradient.server'
 import { redirect } from '@remix-run/cloudflare'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 import { InternalServerError } from '@proofzero/errors'
+import {
+  AUTHN_PARAMS_SESSION_KEY,
+  createAuthenticatorSessionStorage,
+} from '~/auth.server'
 
 export const authenticateAddress = async (
   address: AddressURN,
@@ -41,18 +44,14 @@ export const authenticateAddress = async (
     appData.rollup_action &&
     ['connect', 'reconnect'].includes(appData?.rollup_action)
   ) {
-    const redirectURL = getRedirectURL(
+    const redirectURL = getAuthzRedirectURL(
       appData,
       existing && appData.rollup_action === 'connect'
         ? 'ALREADY_CONNECTED'
         : undefined
     )
 
-    return redirect(redirectURL, {
-      headers: {
-        'Set-Cookie': await destroyAuthenticationParamsSession(request, env),
-      },
-    })
+    return redirect(redirectURL)
   }
 
   try {
@@ -82,7 +81,7 @@ export const authenticateAddress = async (
 
     return createUserSession(
       accessToken,
-      getRedirectURL(appData),
+      getAuthzRedirectURL(appData),
       env,
       appData?.clientId
     )
@@ -91,7 +90,7 @@ export const authenticateAddress = async (
   }
 }
 
-export const getRedirectURL = (
+export const getAuthzRedirectURL = (
   appData: AuthzParams,
   result: string = 'SUCCESS'
 ) => {
@@ -193,8 +192,14 @@ export const checkOAuthError = async (request: Request, env: Env) => {
 
   console.error({ error, uri, description })
 
-  const sp = new URLSearchParams({ oauth_error: error })
-  const cp = await getAuthzCookieParamsSession(request, env)
-  const { clientId } = JSON.parse(cp.get('params'))
-  throw redirect(`/authenticate/${clientId}?${sp.toString()}`)
+  const authzParams = await getAuthzCookieParamsSession(request, env)
+  const authenticatorStorage = await createAuthenticatorSessionStorage(env)
+  const session = await authenticatorStorage.getSession(
+    request.headers.get('Cookie')
+  )
+  const authnParams = session.get(AUTHN_PARAMS_SESSION_KEY)
+  const redirectQueryParams = new URLSearchParams(authnParams)
+  redirectQueryParams.append('oauth_error', error)
+  const { clientId } = JSON.parse(authzParams.get('params'))
+  throw redirect(`/authenticate/${clientId}?${redirectQueryParams.toString()}`)
 }

@@ -13,14 +13,12 @@ import { AppleStrategy } from '~/utils/applestrategy.server'
 
 // OAuth state
 
-export const initAuthenticator = (env: Env) => {
-  if (!env.SECRET_SESSION_SALT)
-    throw new Error('SECRET_SESSION_SALT is required')
-  const oauthStorage = createCookieSessionStorage({
+export const createAuthenticatorSessionStorage = (env: Env) => {
+  return createCookieSessionStorage({
     cookie: {
       domain: env.COOKIE_DOMAIN,
       httpOnly: true,
-      name: 'oauth',
+      name: 'external_oauth_login',
       path: '/',
       //Needs to be lax to allow cookie reads on callback from third-party providers
       sameSite: 'lax',
@@ -29,8 +27,35 @@ export const initAuthenticator = (env: Env) => {
       secrets: [env.SECRET_SESSION_SALT],
     },
   })
+}
 
-  return new Authenticator(oauthStorage)
+export const AUTHN_PARAMS_SESSION_KEY = 'authnParams'
+/**
+ * Returns a custom Request and authenticator SessionStorage. Needed to hook into response
+ * lifecycle that authenticator fully controls, to set custom data needed after external
+ * OAuth authentication returns.
+ */
+export const injectAuthnParamsIntoSession = async (
+  authnParams: string,
+  request: Request,
+  env: Env
+) => {
+  const authenticatorStorage = createAuthenticatorSessionStorage(env)
+  const session = await authenticatorStorage.getSession(
+    request.headers.get('Cookie')
+  )
+  session.set(AUTHN_PARAMS_SESSION_KEY, authnParams)
+
+  const clonedReq = new Request(request.url, {
+    headers: {
+      ...request.headers,
+      cookie: await authenticatorStorage.commitSession(session),
+    },
+  })
+  return {
+    sessionStorage: authenticatorStorage,
+    newRequest: clonedReq,
+  }
 }
 
 export const getGithubAuthenticator = (env: Env) => {
