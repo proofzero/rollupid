@@ -276,10 +276,6 @@ export default () => {
 
                 <FormElement label="Login Screen Side Image">
                   <div className="flex flex-row items-center">
-                    {/* <div className="w-[44px] h-[66px] bg-[#F3F4F6] rounded flex justify-center items-center mr-4">
-                    <HiOutlineCamera className="h-6 w-6 text-gray-300" />
-                  </div> */}
-
                     <IconPicker
                       maxSize={2097152}
                       ar={{
@@ -295,14 +291,6 @@ export default () => {
                       }}
                       url={graphicURL}
                     />
-
-                    {/* <button className="border rounded bg-white mr-1.5 px-2.5 py-1.5">
-                      <Text>Upload</Text>
-                    </button>
-
-                    <button className="px-2.5 py-1.5">
-                      <Text>Remove</Text>
-                    </button> */}
                   </div>
                 </FormElement>
               </section>
