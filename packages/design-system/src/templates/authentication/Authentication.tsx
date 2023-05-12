@@ -46,6 +46,7 @@ export type AuthenticationProps = {
   Header?: JSX.Element
   Actions?: JSX.Element
   radius?: string
+  darkMode?: boolean
 }
 
 export default ({
@@ -55,16 +56,17 @@ export default ({
   Header,
   Actions,
   radius = 'lg',
+  darkMode = false,
 }: AuthenticationProps) => {
   displayKeys = displayKeys.filter((key) =>
     AuthenticationConstants.knownKeys.includes(key)
   )
 
   return (
-    <div className="relative">
+    <div className={`relative ${darkMode ? 'dark' : ''}`}>
       <div
         className={`flex grow-0 flex-col items-center
-         gap-4 mx-auto bg-white p-6 min-h-[100dvh] lg:min-h-[675px]
+         gap-4 mx-auto bg-white dark:bg-[#1F2937] p-6 min-h-[100dvh] lg:min-h-[675px]
           max-h-[100dvh] w-full lg:w-[418px] lg:rounded-${radius}
           mt-auto`}
         style={{
@@ -190,7 +192,7 @@ const displayKeyMapper = (
         <AuthButton
           key={key}
           onClick={() => navigate(`/authenticate/${clientId}/email`)}
-          Graphic={<HiOutlineMail className="w-full h-full" />}
+          Graphic={<HiOutlineMail className="w-full h-full dark:text-white" />}
           text={'Email'}
           fullSize={flex}
           displayContinueWith={displayContinueWith}

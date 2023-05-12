@@ -40,7 +40,7 @@ const ConnectOAuthButton = ({
 }: ConnectOAuthButtonProps) => {
   return (
     <Button
-      className={'button w-full hover:bg-gray-100'}
+      className={'button w-full dark:bg-[#374151] dark:border-gray-600 hover:bg-gray-100'}
       btnType={'secondary-alt'}
       isSubmit={true}
       role={provider}
@@ -57,7 +57,7 @@ const ConnectOAuthButton = ({
         />
 
         {fullSize && (
-          <Text weight="medium" className="truncate text-gray-800">
+          <Text weight="medium" className="truncate text-gray-800 dark:text-white">
             {displayContinueWith ? 'Continue with ' : ''}{' '}
             {provider.charAt(0).toUpperCase() + provider.slice(1)}
           </Text>

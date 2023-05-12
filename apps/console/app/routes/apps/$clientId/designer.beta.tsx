@@ -468,7 +468,7 @@ export default () => {
                         size="sm"
                       ></Avatar>
                       <div className={'flex flex-col items-center gap-2'}>
-                        <h1 className={'font-semibold text-xl'}>
+                        <h1 className={'font-semibold text-xl dark:text-white'}>
                           {heading ?? AuthenticationConstants.defaultHeading}
                         </h1>
 
@@ -490,6 +490,7 @@ export default () => {
                     signData: null,
                   }}
                   radius={radius}
+                  darkMode={theme === Theme.Dark}
                 />
               </section>
             </Tab.Panel>

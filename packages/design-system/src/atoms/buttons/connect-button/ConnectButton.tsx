@@ -95,7 +95,7 @@ export function ConnectButton({
 
   return (
     <div
-      className={`box-border rounded-md shadow-sm border border-solid border-[#d1d5db] bg-white h-[56px]`}
+      className={`box-border rounded-md shadow-sm border border-solid border-[#d1d5db] bg-white dark:bg-[#374151] dark:border-gray-600 h-[56px]`}
     >
       <ConnectKitProvider>
         <ConnectKitButton.Custom>
@@ -124,7 +124,7 @@ export function ConnectButton({
                     isConnected ? '' : 'rounded-r-md'
                   } ${
                     fullSize ? 'justify-start' : 'justify-center'
-                  } bg-white text-[#1f2937] hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-indigo-500 truncate`}
+                  } bg-white dark:bg-[#374151] dark:border-gray-600 text-[#1f2937] hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-indigo-500 truncate`}
                 >
                   {(isSigning || isLoading) && isConnected ? (
                     <Spinner size={16} />
@@ -138,7 +138,7 @@ export function ConnectButton({
                   {fullSize && (
                     <Text
                       weight="medium"
-                      className="flex-1 text-start text-gray-800 truncate"
+                      className="flex-1 text-start text-gray-800 dark:text-white truncate"
                     >
                       {(isSigning || isLoading) && isConnected
                         ? isSigning
@@ -159,13 +159,13 @@ export function ConnectButton({
                   <Popover>
                     {({ open }) => (
                       <>
-                        <Popover.Button className="h-full px-2 lg:px-3.5 flex justify-center items-center rounded-r-md bg-white text-[#1f2937] shadow-sm border-l hover:bg-gray-100  focus:bg-white focus:ring-inset focus:ring-2 focus:ring-indigo-500">
+                        <Popover.Button className="h-full px-2 lg:px-3.5 flex justify-center items-center rounded-r-md bg-white dark:bg-[#374151] dark:border-gray-600 text-[#1f2937] shadow-sm border-l hover:bg-gray-100  focus:bg-white focus:ring-inset focus:ring-2 focus:ring-indigo-500">
                           {!open && <HiChevronDown className="w-5 h-5" />}
                           {open && (
                             <HiChevronUp className="w-5 h-5 text-indigo-500" />
                           )}
                         </Popover.Button>
-                        <Popover.Panel className="absolute top-16 left-0 right-0 z-10 bg-white rounded-md shadow-md">
+                        <Popover.Panel className="absolute top-16 left-0 right-0 z-10 bg-white dark:bg-[#374151] dark:border-gray-600 rounded-md shadow-md">
                           <button
                             className="w-full px-[17px] py-5"
                             onClick={() => {
