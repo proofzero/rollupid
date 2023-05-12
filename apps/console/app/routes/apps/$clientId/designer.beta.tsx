@@ -123,7 +123,9 @@ const RadiusButton = ({
 
   return (
     <button
-      className={`py-1.5 px-2.5 rounded-md ${selected ? 'bg-indigo-500' : ''}`}
+      className={`w-full py-1.5 px-2.5 rounded-md ${
+        selected ? 'bg-indigo-500' : ''
+      }`}
       onClick={(e) => {
         e.preventDefault()
         setRadius(radius)
