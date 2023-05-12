@@ -3,7 +3,7 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Form } from '@remix-run/react'
 import { ReactNode, useState } from 'react'
 import { IconType } from 'react-icons'
-import { HiOutlineCog, HiOutlineMail } from 'react-icons/hi'
+import { HiCog, HiOutlineCog, HiOutlineMail } from 'react-icons/hi'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 
 import darkIcon from '~/assets/designer/dark.svg'
@@ -19,6 +19,12 @@ import { getDefaultClient } from 'connectkit'
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
 import IconPicker from '~/components/IconPicker'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
+import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
+import { SortableList } from '@proofzero/design-system/src/atoms/lists/SortableList'
+import _ from 'lodash'
+import getProviderIcons from '@proofzero/design-system/src/helpers/get-provider-icons'
+import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
 
 const client = createClient(
   // @ts-ignore
@@ -129,6 +135,95 @@ const RadiusButton = ({
   )
 }
 
+const ProviderModal = ({
+  providers,
+  isOpen,
+  handleClose,
+  saveCallback,
+}: {
+  providers: {
+    key: string
+    enabled: boolean
+  }[]
+  isOpen: boolean
+  handleClose: (val: boolean) => void
+  saveCallback: (providers: { key: string; enabled: boolean }[]) => void
+}) => {
+  const [selectedProviders, setSelectedProviders] = useState(() => {
+    return providers.map((p) => {
+      return {
+        key: p.key,
+        val: _.startCase(p.key),
+        enabled: p.enabled,
+      }
+    })
+  })
+
+  return (
+    <Modal isOpen={isOpen} fixed handleClose={() => handleClose(false)}>
+      <div className="bg-white px-6 py-8 max-w-full w-[543px] mx-auto border shadow rounded-lg">
+        <Text weight="semibold" className="text-left text-gray-800 mb-4">
+          Login Provider Configuration
+        </Text>
+
+        <section>
+          <SortableList
+            items={selectedProviders}
+            itemRenderer={(item) => (
+              <div className="flex flex-row gap-5 w-full items-center">
+                <img
+                  className="h-8 w-8"
+                  src={getProviderIcons(item.key) ?? undefined}
+                />
+
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="flex-1 text-left text-gray-700"
+                >
+                  {item.val}
+                </Text>
+
+                <InputToggle
+                  label={''}
+                  id={`enable-${item.key}`}
+                  checked={item.enabled}
+                  onToggle={(val) => {
+                    setSelectedProviders((prev) => {
+                      const newProviders = [...prev]
+                      const index = newProviders.findIndex(
+                        (p) => p.key === item.key
+                      )
+                      newProviders[index].enabled = val
+                      return newProviders
+                    })
+                  }}
+                />
+              </div>
+            )}
+            onItemsReordered={setSelectedProviders}
+          />
+        </section>
+
+        <section className="flex flex-row-reverse gap-4 mt-4">
+          <Button
+            btnType="primary-alt"
+            onClick={() => {
+              saveCallback(selectedProviders)
+              handleClose(true)
+            }}
+          >
+            Save
+          </Button>
+          <Button btnType="secondary-alt" onClick={() => handleClose(true)}>
+            Cancel
+          </Button>
+        </section>
+      </div>
+    </Modal>
+  )
+}
+
 export default () => {
   const [theme, setTheme] = useState<Theme>(Theme.Light)
   const [heading, setHeading] = useState<string>()
@@ -138,9 +233,30 @@ export default () => {
 
   const [loading, setLoading] = useState<boolean>(false)
 
+  const [providers, setProviders] = useState<
+    {
+      key: string
+      enabled: boolean
+    }[]
+  >(
+    AuthenticationConstants.knownKeys.map((k) => ({
+      key: k,
+      enabled: true,
+    }))
+  )
+  const [providerModalOpen, setProviderModalOpen] = useState<boolean>(false)
+
   return (
     <>
       {loading && <Loader />}
+
+      <ProviderModal
+        providers={providers}
+        isOpen={providerModalOpen}
+        handleClose={() => setProviderModalOpen(false)}
+        saveCallback={setProviders}
+      />
+
       <Form>
         <section className="flex flex-row items-center justify-between mb-11">
           <div className="flex flex-row items-center space-x-3">
@@ -293,6 +409,20 @@ export default () => {
                     />
                   </div>
                 </FormElement>
+
+                <FormElement label="Login Provider Configuration">
+                  <Button
+                    btnType="secondary-alt"
+                    className="flex flex-row items-center gap-2.5"
+                    onClick={() => setProviderModalOpen(true)}
+                  >
+                    <HiCog className="w-4 h-4" />
+
+                    <Text size="sm" weight="medium" className="text-gray-500">
+                      Configure
+                    </Text>
+                  </Button>
+                </FormElement>
               </section>
 
               <section className="flex-1 bg-white border rounded-lg pointer-events-none pb-3">
@@ -325,7 +455,9 @@ export default () => {
                       </div>
                     </>
                   }
-                  displayKeys={AuthenticationConstants.knownKeys}
+                  displayKeys={providers
+                    .filter((p) => p.enabled)
+                    .map((p) => p.key)}
                   mapperArgs={{
                     clientId: 'Foo',
                     wagmiClient: client,

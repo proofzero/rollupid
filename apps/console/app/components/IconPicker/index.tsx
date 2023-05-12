@@ -193,11 +193,9 @@ export default function IconPicker({
     let height: number
 
     if (aspectRatioWidth > aspectRatioHeight) {
-      // Constrained by width
       width = maxSize
       height = (aspectRatioHeight / aspectRatioWidth) * maxSize
     } else {
-      // Constrained by height
       height = maxSize
       width = (aspectRatioWidth / aspectRatioHeight) * maxSize
     }
