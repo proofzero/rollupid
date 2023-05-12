@@ -1,4 +1,4 @@
-import { Tab } from '@headlessui/react'
+import { Popover, Tab } from '@headlessui/react'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Form } from '@remix-run/react'
 import { ReactNode, useState } from 'react'
@@ -25,6 +25,7 @@ import { SortableList } from '@proofzero/design-system/src/atoms/lists/SortableL
 import _ from 'lodash'
 import getProviderIcons from '@proofzero/design-system/src/helpers/get-provider-icons'
 import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
+import { HexColorPicker } from 'react-colorful'
 
 const client = createClient(
   // @ts-ignore
@@ -80,12 +81,12 @@ const FormElement = ({
   children: ReactNode
 }) => {
   return (
-    <div className="flex flex-row items-center justify-between px-8 py-4">
-      <Text size="sm" weight="medium" className="text-gray-900">
+    <div className="flex flex-row items-center px-8 py-4">
+      <Text size="sm" weight="medium" className="text-gray-900 flex-1">
         {label}
       </Text>
 
-      {children}
+      <div className="flex-1">{children}</div>
     </div>
   )
 }
@@ -313,7 +314,7 @@ export default () => {
                 <FormElement label="Theme">
                   <input id="theme" name="theme" type="hidden" value={theme} />
 
-                  <div className="flex flex-row gap-4 items-center">
+                  <div className="flex flex-row gap-4 items-center justify-end">
                     <button
                       className={`border rounded-full ${
                         theme === Theme.Light
@@ -346,7 +347,6 @@ export default () => {
                     id={'heading'}
                     label={''}
                     placeholder={AuthenticationConstants.defaultHeading}
-                    className="w-80"
                     onChange={(e) => {
                       setHeading(e.target.value)
                     }}
@@ -361,7 +361,7 @@ export default () => {
                     value={radius}
                   />
 
-                  <div className="p-1 border shadow-sm rounded">
+                  <div className="p-1 border border-gray-300 shadow-sm rounded flex justify-evenly">
                     <RadiusButton
                       radius={Radius.Large}
                       setRadius={setRadius}
@@ -380,14 +380,36 @@ export default () => {
                   </div>
                 </FormElement>
 
-                <FormElement label="Primary Color">
-                  <Input
-                    id="color"
-                    name="color"
-                    type="text"
-                    defaultValue={color}
-                    onChange={(e) => setColor(e.target.value)}
-                  />
+                <FormElement label="Primary">
+                  <Popover className="relative">
+                    <div className="absolute left-0 top-0 bottom-0 flex justify-center items-center">
+                      <Popover.Button
+                        className="w-4 h-4 ml-3 rounded"
+                        style={{
+                          backgroundColor: color,
+                        }}
+                      ></Popover.Button>
+                    </div>
+
+                    <input
+                      id="color"
+                      name="color"
+                      value={color}
+                      onChange={(e) => {
+                        let val = e.target.value
+                        if (!val.startsWith('#')) {
+                          val = '#' + val
+                        }
+
+                        setColor(val)
+                      }}
+                      className="pl-9 pr-3 py-2 border border-gray-300 shadow-sm rounded text-sm font-normal text-gray-500 w-full"
+                    />
+
+                    <Popover.Panel className="absolute">
+                      <HexColorPicker color={color} onChange={setColor} />
+                    </Popover.Panel>
+                  </Popover>
                 </FormElement>
 
                 <FormElement label="Login Screen Side Image">
