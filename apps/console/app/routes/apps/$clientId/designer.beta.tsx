@@ -123,6 +123,7 @@ const RadiusButton = ({
 
   return (
     <button
+      type="button"
       className={`w-full py-1.5 px-2.5 rounded-md ${
         selected ? 'bg-indigo-500' : ''
       }`}
@@ -236,7 +237,7 @@ export default () => {
   const [heading, setHeading] = useState<string>()
   const [radius, setRadius] = useState<Radius>(Radius.Medium)
   const [color, setColor] = useState<string>('#6366F1')
-  const [graphicURL] = useState<string>()
+  const [graphicURL, setGraphicURL] = useState<string>()
 
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -322,6 +323,7 @@ export default () => {
 
                   <div className="flex flex-row gap-4 items-center lg:justify-end">
                     <button
+                      type="button"
                       className={`border rounded-full ${
                         theme === Theme.Light
                           ? 'outline outline-indigo-500'
@@ -335,6 +337,7 @@ export default () => {
                       <img src={lightIcon} />
                     </button>
                     <button
+                      type="button"
                       className={`border rounded-full ${
                         theme === Theme.Dark ? 'outline outline-indigo-500' : ''
                       } w-7 h-7 overflow-hidden`}
@@ -419,7 +422,7 @@ export default () => {
                 </FormElement>
 
                 <FormElement label="Login Screen Side Image">
-                  <div className="flex flex-row items-center">
+                  <div className="flex flex-row items-center gap-2">
                     <IconPicker
                       maxSize={2097152}
                       ar={{
@@ -433,8 +436,27 @@ export default () => {
                       setIsImgUploading={(val) => {
                         setLoading(val)
                       }}
+                      imageUploadCallback={setGraphicURL}
                       url={graphicURL}
                     />
+
+                    {graphicURL && (
+                      <button
+                        type="button"
+                        className="flex justify-center items-center py-2 px-4"
+                        onClick={() => {
+                          setGraphicURL(undefined)
+                        }}
+                      >
+                        <Text
+                          size="xs"
+                          weight="medium"
+                          className="text-gray-200"
+                        >
+                          Remove
+                        </Text>
+                      </button>
+                    )}
                   </div>
                 </FormElement>
 

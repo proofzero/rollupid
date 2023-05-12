@@ -2,7 +2,7 @@
  * @file app/shared/components/IconPicker/index.tsx
  */
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Text } from '@proofzero/design-system'
 
 import { CameraIcon } from '@heroicons/react/24/outline'
@@ -118,6 +118,7 @@ type IconPickerProps = {
   errorMessage?: string
   setIsFormChanged: (val: boolean) => void
   setIsImgUploading: (val: boolean) => void
+  imageUploadCallback?: (url: string) => void
 }
 
 export default function IconPicker({
@@ -132,19 +133,35 @@ export default function IconPicker({
   errorMessage,
   setIsFormChanged,
   setIsImgUploading,
+  imageUploadCallback = () => {},
 }: IconPickerProps) {
-  const [icon, setIcon] = useState(url !== undefined ? url : '')
-  const [iconUrl, setIconUrl] = useState(url !== undefined ? url : '')
+  const [icon, setIcon] = useState<string>('')
+  const [iconUrl, setIconUrl] = useState<string>('')
   const [invalidState, setInvalidState] = useState(invalid)
   const [errorMessageState, setErrorMessageState] = useState(errorMessage)
 
-  const handleDrop = async (e) => {
+  useEffect(() => {
+    setIconUrl(url !== undefined ? url : '')
+    setIcon(url !== undefined ? url : '')
+    setInvalidState(undefined)
+    setErrorMessageState(undefined)
+  }, [url])
+
+  useEffect(() => {
+    if (!iconUrl) return
+
+    imageUploadCallback(iconUrl)
+  }, [iconUrl])
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     e.stopPropagation()
 
     const files = [...e.dataTransfer.files]
     if (files && files.length > 0) {
       const file = files.pop()
+      if (!file) return
+
       // Ignore dropped files that aren't images.
       if (!file.type.startsWith('image/')) {
         return
@@ -152,8 +169,9 @@ export default function IconPicker({
 
       const reader = new FileReader()
       reader.onload = (e) => {
+        if (!e.target) return
         // Set the data URL as the <img src="..."/> value.
-        setIcon(e.target.result)
+        setIcon(e.target.result as string)
       }
       // Read file as data URL, triggering onload handler.
       reader.readAsDataURL(file)
@@ -162,17 +180,17 @@ export default function IconPicker({
     }
   }
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     e.stopPropagation()
   }
 
-  const handleDragEnter = (e) => {
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     e.stopPropagation()
   }
 
-  const handleDragLeave = (e) => {
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     e.stopPropagation()
   }
@@ -213,7 +231,7 @@ export default function IconPicker({
         <label className="text-sm font-medium text-gray-700">{label}</label>
       )}
       {id && <input type="hidden" name={id} value={iconUrl} />}
-      <div className="flex flex-col md:flex-row md:gap-4 items-center mt-2">
+      <div className="flex flex-col md:flex-row md:gap-4 items-center">
         <div className="flex flex-row gap-4">
           <div
             className={`grid place-items-center bg-[#F3F4F6] rounded`}
@@ -237,7 +255,9 @@ export default function IconPicker({
                focus:bg-indigo-400 hover:cursor-pointer
                 ${invalid ? 'border-red-400' : 'border-gray-300'}`}
             >
-              <span>Upload</span>
+              <Text type="span" size="xs">
+                Upload
+              </Text>
               <input
                 type="file"
                 id="icon-upload"
