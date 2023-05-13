@@ -163,12 +163,14 @@ export function MultiSelect({
                     value={query}
                     placeholder={'filter scopes'}
                   />
-                  <div className={`ml-auto rounded-r-md px-3`}>
-                    <IoCloseOutline
-                      className="h-5 w-5 text-gray-400 cursor-pointer"
-                      onClick={() => setQuery('')}
-                    />
-                  </div>
+                  {query.length ? (
+                    <div className={`ml-auto rounded-r-md px-3`}>
+                      <IoCloseOutline
+                        className="h-5 w-5 text-gray-400 cursor-pointer"
+                        onClick={() => setQuery('')}
+                      />
+                    </div>
+                  ) : null}
                 </div>
                 {filterItems.length ? (
                   filterItems.map((item) => (
