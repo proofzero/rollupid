@@ -32,7 +32,7 @@ export const typeToColorsDict = {
   dangerous:
     'bg-red-500 text-white shadow-sm hover:bg-red-400 focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
   'dangerous-alt':
-    'bg-white text-red-500 border border-solid border-red-500 shadow-sm hover:bg-red-400 focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
+    'bg-white text-red-500 border border-solid border-red-500 shadow-sm hover:bg-red-50 focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
 }
 
 export const disabledColorClasses = 'bg-[#f3f4f6] text-[#d1d5db]'

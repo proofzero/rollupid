@@ -136,18 +136,17 @@ rounded-lg border shadow"
               })
             })
 
-            const orderOfResults = `Showing ${
-              authorizedProfiles.metadata.offset + 1
-            } to ${Math.min(
-              authorizedProfiles.metadata.offset + PAGE_LIMIT,
-              authorizedProfiles.metadata.edgesReturned
-            )} of ${authorizedProfiles.metadata.edgesReturned} results`
+            const orderOfResults = `Showing ${authorizedProfiles.metadata.offset + 1
+              } to ${Math.min(
+                authorizedProfiles.metadata.offset + PAGE_LIMIT,
+                authorizedProfiles.metadata.edgesReturned
+              )} of ${authorizedProfiles.metadata.edgesReturned} results`
             return (
               <>
                 {!Users.size ? (
                   <div
                     className="flex flex-col bg-white
-        shadow rounded-lg border justify-center items-center min-h-[360px] h-full"
+        shadow rounded-lg border justify-center items-center min-h-[360px] h-[90%]"
                   >
                     {noLoginsSvg}
 

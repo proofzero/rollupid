@@ -156,8 +156,8 @@ export default function IconPicker({
             <label
               htmlFor="icon-upload"
               className={`rounded bg-transparent text-sm border
-                 py-2 px-4 hover:bg-indigo-500
-                hover:text-white focus:bg-indigo-400 hover:cursor-pointer
+                 py-2 px-4 hover:bg-gray-100
+               focus:bg-indigo-400 hover:cursor-pointer
                 ${invalid ? 'border-red-400' : 'border-gray-300'}`}
             >
               <span>Upload</span>
