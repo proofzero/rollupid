@@ -58,7 +58,7 @@ type AuthorizationProps = {
 
   connectedSmartContractWallets: SCWalletSelectListItem[]
   addNewSmartWalletCallback: () => void
-  selectSmartWalletCallback: (selected: SCWalletSelectListItem) => void
+  selectSmartWalletCallback: (selected: AddressURN[]) => void
 
   connectedEmails: EmailSelectListItem[]
   addNewEmailCallback: () => void
@@ -173,7 +173,7 @@ export default ({
                           if (selected?.type === OptionType.AddNew) {
                             addNewSmartWalletCallback()
                           } else if (selected) {
-                            selectSmartWalletCallback(selected)
+                            selectSmartWalletCallback([selected.addressURN])
                           }
                         }}
                       />

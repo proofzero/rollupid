@@ -13,6 +13,7 @@ import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 import {
   BadRequestError,
   InternalServerError,
+  RollupError,
   UnauthorizedError,
 } from '@proofzero/errors'
 import {
@@ -66,7 +67,7 @@ export async function validatePersonaData(
         throw new BadRequestError({
           message: 'Address provided is not an email-compatible address',
         })
-    } else if (scopeName === 'connected_accounts') {
+    } else if (['connected_accounts', 'erc_4337'].includes(scopeName)) {
       const authorizedAddressUrns = claimValue
 
       //If user selection is ALL, there's nothing further to validate
@@ -140,6 +141,14 @@ export async function setPersonaReferences(
       personaData.connected_accounts.forEach((addressUrn) =>
         uniqueAuthorizationReferences.add(addressUrn)
       )
+    } else if (
+      scopeEntry === 'erc_4337' &&
+      personaData.erc_4337 &&
+      personaData.erc_4337 instanceof Array
+    ) {
+      personaData.erc_4337.forEach((addressUrn) =>
+        uniqueAuthorizationReferences.add(addressUrn)
+      )
     }
   }
 
@@ -186,19 +195,263 @@ export type ClaimValueType =
     }
   | ClaimValueType[]
 
+export type ClaimName = string
+export type ScopeValueName = string
+export type ClaimValuePairs = Record<ClaimName, ClaimValueType>
+
+export type ScopeClaimsResponse = {
+  claims: ClaimValuePairs
+  meta: {
+    urns: AnyURN[]
+    valid: boolean
+  }
+}
+
+export type ClaimData = {
+  [s: ScopeValueName]: ScopeClaimsResponse
+}
+
+export type Fetchers = {
+  accountFetcher?: Fetcher
+  accessFetcher?: Fetcher
+  addressFetcher?: Fetcher
+  edgesFetcher: Fetcher
+}
+export type ScopeClaimRetrieverFunction = (
+  scopeEntry: ScopeValueName,
+  accountUrn: AccountURN,
+  clientId: string,
+  accessUrn: AccessURN,
+  fetchers: Fetchers,
+  personaData: PersonaData,
+  traceSpan: TraceSpan
+) => Promise<ClaimData>
+
+function createInvalidClaimDataObject(scopeEntry: ScopeValueName): ClaimData {
+  return {
+    [scopeEntry]: {
+      claims: {},
+      meta: {
+        urns: [],
+        valid: false,
+      },
+    },
+  }
+}
+
+class InvalidPersonaDataError extends RollupError {
+  constructor() {
+    super({ message: 'Invalid persona data' })
+  }
+}
+
+//These retriever functions will be moved elsewhere as part of ticket #2013
+async function emailClaimRetriever(
+  scopeEntry: ScopeValueName,
+  accountUrn: AccountURN,
+  clientId: string,
+  accessUrn: AccessURN,
+  fetchers: Fetchers,
+  personaData: PersonaData,
+  traceSpan: TraceSpan
+): Promise<ClaimData> {
+  const edgesClient = createEdgesClient(
+    fetchers.edgesFetcher,
+    generateTraceContextHeaders(traceSpan)
+  )
+
+  if (personaData.email) {
+    const emailAddressUrn = personaData.email
+    const edgesResults = await edgesClient.getEdges.query({
+      query: {
+        src: { baseUrn: accessUrn },
+        dst: { baseUrn: emailAddressUrn },
+        tag: EDGE_HAS_REFERENCE_TO,
+      },
+    })
+    const emailAddress = edgesResults.edges[0].dst.qc.alias
+    const claimData: ClaimData = {
+      [scopeEntry]: {
+        claims: {
+          email: emailAddress,
+        },
+        meta: {
+          urns: [emailAddressUrn],
+          valid: true,
+        },
+      },
+    }
+    return claimData
+  }
+  throw new InvalidPersonaDataError()
+}
+
+async function profileClaimsRetriever(
+  scopeEntry: ScopeValueName,
+  accountUrn: AccountURN,
+  clientId: string,
+  accessUrn: AccessURN,
+  fetchers: Fetchers,
+  personaData: PersonaData,
+  traceSpan: TraceSpan
+): Promise<ClaimData> {
+  const edgesClient = createEdgesClient(
+    fetchers.edgesFetcher,
+    generateTraceContextHeaders(traceSpan)
+  )
+  const nodeResult = await edgesClient.findNode.query({
+    baseUrn: accountUrn,
+  })
+  if (nodeResult && nodeResult.baseUrn) {
+    return {
+      [scopeEntry]: {
+        claims: {
+          name: nodeResult.qc.name,
+          picture: nodeResult.qc.picture,
+        },
+        meta: {
+          urns: [nodeResult.baseUrn],
+          valid: true,
+        },
+      },
+    }
+  } else throw new InvalidPersonaDataError()
+}
+
+async function erc4337ClaimsRetriever(
+  scopeEntry: ScopeValueName,
+  accountUrn: AccountURN,
+  clientId: string,
+  accessUrn: AccessURN,
+  fetchers: Fetchers,
+  personaData: PersonaData,
+  traceSpan: TraceSpan
+): Promise<ClaimData> {
+  if (!fetchers.addressFetcher)
+    throw new InternalServerError({
+      message: 'Address fetcher not specified',
+    })
+  const walletAddressUrns = personaData.erc_4337 as AddressURN[]
+  const result = {
+    erc_4337: {
+      claims: {
+        erc_4337: new Array(),
+      },
+      meta: {
+        urns: new Array(),
+        valid: true,
+      },
+    },
+  } as const
+
+  for (const addressUrn of walletAddressUrns) {
+    const addressClient = createAddressClient(fetchers.addressFetcher!, {
+      ...generateTraceContextHeaders(traceSpan),
+      [PlatformAddressURNHeader]: addressUrn,
+    })
+    const profile = await addressClient.getAddressProfile.query()
+    result.erc_4337.claims.erc_4337.push({
+      nickname: profile.title,
+      address: profile.address,
+    })
+    result.erc_4337.meta.urns.push(addressUrn)
+  }
+  return result
+}
+
+async function connectedAccountsClaimsRetriever(
+  scopeEntry: ScopeValueName,
+  accountUrn: AccountURN,
+  clientId: string,
+  accessUrn: AccessURN,
+  fetchers: Fetchers,
+  personaData: PersonaData,
+  traceSpan: TraceSpan
+): Promise<ClaimData> {
+  const result = {
+    connected_accounts: {
+      claims: {
+        connected_accounts: new Array(),
+      },
+      meta: {
+        urns: new Array(),
+        valid: true,
+      },
+    },
+  }
+
+  if (personaData.connected_accounts === AuthorizationControlSelection.ALL) {
+    //Referencable persona submission pointing to all connected addresses
+    //at any point in time
+    if (!fetchers.accountFetcher)
+      throw new InternalServerError({
+        message: 'No account fetcher specified',
+      })
+    const accountClient = createAccountClient(fetchers.accountFetcher, {
+      ...generateTraceContextHeaders(traceSpan),
+    })
+    const accountAddresses =
+      (
+        await accountClient.getAddresses.query({
+          account: accountUrn,
+        })
+      )?.filter(
+        (address) => address.rc.addr_type !== CryptoAddressType.Wallet
+      ) || []
+
+    for (const addressNode of accountAddresses) {
+      result.connected_accounts.claims.connected_accounts.push({
+        type: addressNode.rc.addr_type,
+        identifier: addressNode.qc.alias,
+      })
+      result.connected_accounts.meta.urns.push(addressNode.baseUrn)
+    }
+  } else {
+    //Static persona submission of addresses
+    const authorizedAddresses = personaData.connected_accounts as AddressURN[]
+    const edgesClient = createEdgesClient(
+      fetchers.edgesFetcher,
+      generateTraceContextHeaders(traceSpan)
+    )
+
+    const edgePromises = authorizedAddresses.map((address) => {
+      return edgesClient.findNode.query({ baseUrn: address })
+    })
+    const edgeResults = await Promise.all(edgePromises)
+
+    //Make typescript gods happy
+    type connectedAddressType = { type: string; identifier: string }
+
+    for (const addressNode of edgeResults) {
+      result.connected_accounts.claims.connected_accounts.push({
+        type: addressNode.rc.addr_type,
+        identifier: addressNode.qc.alias,
+      })
+      result.connected_accounts.meta.urns.push(addressNode.baseUrn)
+    }
+  }
+  return result
+}
+
+export const scopeClaimRetrievers: Record<
+  ScopeValueName,
+  ScopeClaimRetrieverFunction
+> = {
+  profile: profileClaimsRetriever,
+  email: emailClaimRetriever,
+  erc_4337: erc4337ClaimsRetriever,
+  connected_accounts: connectedAccountsClaimsRetriever,
+}
+
 export async function getClaimValues(
   accountUrn: AccountURN,
   clientId: string,
   scope: string[],
-  env: {
-    accountFetcher?: Fetcher
-    accessFetcher?: Fetcher
-    edgesFetcher: Fetcher
-  },
+  env: Fetchers,
   traceSpan: TraceSpan,
   preFetchedPersonaData?: PersonaData
-): Promise<Record<string, ClaimValueType>> {
-  let result: Record<string, ClaimValueType> = {}
+): Promise<ClaimData> {
+  let result: ClaimData = {}
 
   let personaData = preFetchedPersonaData
   if (!personaData) {
@@ -217,157 +470,42 @@ export async function getClaimValues(
   const accessId = `${AccountURNSpace.decode(accountUrn)}@${clientId}`
   const accessUrn = AccessURNSpace.componentizedUrn(accessId)
 
-  const edgesClient = createEdgesClient(
-    env.edgesFetcher,
-    generateTraceContextHeaders(traceSpan)
-  )
   for (const scopeValue of scope) {
-    if (scopeValue === 'email' && personaData.email) {
-      const emailAddressUrn = personaData.email
-      const edgesResults = await edgesClient.getEdges.query({
-        query: {
-          src: { baseUrn: accessUrn },
-          dst: { baseUrn: emailAddressUrn },
-          tag: EDGE_HAS_REFERENCE_TO,
-        },
-      })
-      const emailAddress = edgesResults.edges[0].dst.qc.alias
-      result = {
-        ...result,
-        email: {
-          address: emailAddress,
-          urn: emailAddressUrn,
-        },
-      }
-    } else if (scopeValue === 'profile') {
-      const nodeResult = await edgesClient.findNode.query({
-        baseUrn: accountUrn,
-      })
-      if (nodeResult) {
-        result = {
-          ...result,
-          profile: {
-            name: nodeResult.qc.name,
-            picture: nodeResult.qc.picture,
-            urn: nodeResult.baseUrn,
-          },
-        }
-      }
-    } else if (scopeValue === 'erc_4337') {
-      result = {
-        ...result,
-        [scopeValue]: personaData.erc_4337,
-      }
-    } else if (scopeValue === 'connected_accounts') {
-      if (
-        personaData.connected_accounts === AuthorizationControlSelection.ALL
-      ) {
-        //Referencable persona submission pointing to all connected addresses
-        //at any point in time
-        if (!env.accountFetcher)
-          throw new InternalServerError({
-            message: 'No account fetcher specified',
-          })
-        const accountClient = createAccountClient(env.accountFetcher, {
-          ...generateTraceContextHeaders(traceSpan),
-        })
-        const accountAddresses =
-          (
-            await accountClient.getAddresses.query({
-              account: accountUrn,
-            })
-          )?.filter(
-            (address) => address.rc.addr_type !== CryptoAddressType.Wallet
-          ) || []
-
-        const claimResults = accountAddresses.map((a) => {
-          return {
-            type: a.rc.addr_type,
-            identifier: a.qc.alias,
-            urn: a.baseUrn,
-          }
-        })
-        result = { ...result, connected_accounts: claimResults }
-      } else {
-        //Static persona submission of addresses
-        const authorizedAddresses =
-          personaData.connected_accounts as AddressURN[]
-        const edgePromises = authorizedAddresses.map((address) => {
-          return edgesClient.findNode.query({ baseUrn: address })
-        })
-        const edgeResults = await Promise.all(edgePromises)
-
-        //Make typescript gods happy
-        type connectedAddressType = { type: string; identifier: string }
-        const isDefined = (
-          optionallyDefined: connectedAddressType | undefined
-        ): optionallyDefined is connectedAddressType => !!optionallyDefined
-
-        const claimResults = edgeResults
-          .map((e) => ({
-            type: e.rc.addr_type,
-            identifier: e.qc.alias,
-            urn: e.baseUrn,
-          }))
-          .filter(isDefined)
-        result = { ...result, connected_accounts: claimResults }
-      }
+    const retrieverFunction = scopeClaimRetrievers[scopeValue]
+    if (!retrieverFunction) continue
+    try {
+      const claimData = await retrieverFunction(
+        scopeValue,
+        accountUrn,
+        clientId,
+        accessUrn,
+        env,
+        personaData,
+        traceSpan
+      )
+      result = { ...result, ...claimData }
+    } catch (e) {
+      //In cases of errors in retriever, we don't retrun any claims and we mark the object
+      //as invalid. It's the responsibility of caller to handle that upstream.
+      result = { ...result, ...createInvalidClaimDataObject(scopeValue) }
     }
   }
   return result
 }
 
-export enum ClaimValuesFormat {
-  OIDC = 'oidc',
-  Application = 'application',
-}
-export const claimValuesFormatter = (
-  claimValues: Record<string, ClaimValueType>,
-  format: ClaimValuesFormat = ClaimValuesFormat.OIDC
-) => {
-  switch (format) {
-    case ClaimValuesFormat.OIDC:
-      if (claimValues.profile) {
-        const { name, picture } = claimValues.profile as {
-          name: string
-          picture: string
-        }
-        claimValues.name = name
-        claimValues.picture = picture
-        delete claimValues.profile
-      }
-
-      if (claimValues.email) {
-        const { address } = claimValues.email as {
-          address: string
-        }
-        claimValues.email = address
-      }
-
-      const deleteUrn = (obj: any) => {
-        if (obj.urn) {
-          delete obj.urn
-        }
-        Object.keys(obj).forEach((key) => {
-          if (typeof obj[key] === 'object') {
-            deleteUrn(obj[key])
-          }
-        })
-      }
-      deleteUrn(claimValues)
-
-      break
-    case ClaimValuesFormat.Application:
-      Object.keys(claimValues).forEach((key) => {
-        if (key !== 'email' && key !== 'connected_accounts') {
-          delete claimValues[key]
-        }
-      })
-
-      break
-    default:
-      throw new InternalServerError({ message: 'Invalid claim values format' })
+export const userClaimsFormatter = (
+  claimData: ClaimData,
+  includeScopeValues?: string[]
+): ClaimValuePairs => {
+  let result: ClaimValuePairs = {}
+  for (const scopeEntry of Object.keys(claimData)) {
+    if (includeScopeValues) {
+      if (includeScopeValues.includes(scopeEntry))
+        result = { ...result, ...claimData[scopeEntry].claims }
+      else continue
+    } else {
+      result = { ...result, ...claimData[scopeEntry].claims }
+    }
   }
-
-  return claimValues
+  return result
 }

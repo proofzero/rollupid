@@ -398,9 +398,9 @@ export default function Authorize() {
   const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
     Array<AddressURN> | Array<AuthorizationControlSelection>
   >([])
-  const [selectedSCWallets, setSelectedSCWallets] = useState<
-    { nickname: string; address?: string }[]
-  >([])
+  const [selectedSCWallets, setSelectedSCWallets] = useState<Array<AddressURN>>(
+    []
+  )
 
   // Re-render the component every time persona gets updated
   useEffect(() => {}, [persona])
@@ -516,14 +516,7 @@ export default function Authorize() {
 
             return navigate(`/authorize?${qp.toString()}`)
           }}
-          selectSmartWalletCallback={(wallet) => {
-            setSelectedSCWallets([
-              {
-                nickname: wallet.title,
-                address: wallet.cryptoAddress,
-              },
-            ])
-          }}
+          selectSmartWalletCallback={setSelectedSCWallets}
           connectedEmails={connectedEmails ?? []}
           addNewEmailCallback={() => {
             const qp = new URLSearchParams()

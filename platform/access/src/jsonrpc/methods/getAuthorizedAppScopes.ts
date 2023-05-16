@@ -4,11 +4,7 @@ import { initAccessNodeByName } from '../../nodes'
 import { inputValidators } from '@proofzero/platform-middleware'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { appRouter } from '../router'
-import {
-  ClaimValuesFormat,
-  claimValuesFormatter,
-  getClaimValues,
-} from '@proofzero/security/persona'
+import { getClaimValues } from '@proofzero/security/persona'
 
 export const GetAuthorizedAppScopesMethodInput = z.object({
   accountURN: inputValidators.AccountURNInput,
@@ -18,23 +14,16 @@ type GetAuthorizedAppScopesMethodParams = z.infer<
   typeof GetAuthorizedAppScopesMethodInput
 >
 
-export const GetAuthorizedAppScopesMethodOutput = z.object({
-  email: z
-    .object({
-      address: z.string(),
-      urn: z.string(),
-    })
-    .optional(),
-  connected_accounts: z
-    .array(
-      z.object({
-        type: z.string(),
-        identifier: z.string(),
-        urn: z.string(),
-      })
-    )
-    .optional(),
-})
+export const GetAuthorizedAppScopesMethodOutput = z.record(
+  z.string(),
+  z.object({
+    claims: z.record(z.string(), z.any()),
+    meta: z.object({
+      urns: z.array(z.string()),
+      valid: z.boolean(),
+    }),
+  })
+)
 
 export type GetAuthorizedAppScopesMethodResult = z.infer<
   typeof GetAuthorizedAppScopesMethodOutput
@@ -71,10 +60,11 @@ export const getAuthorizedAppScopesMethod = async ({
     {
       edgesFetcher: ctx.Edges,
       accountFetcher: ctx.Account,
+      addressFetcher: ctx.Address,
     },
     ctx.traceSpan,
     personaData
   )
 
-  return claimValuesFormatter(claimValues, ClaimValuesFormat.Application)
+  return claimValues
 }

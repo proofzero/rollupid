@@ -11,6 +11,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const accessClient = createAccessClient(context.env.Access, {
     ...generateTraceContextHeaders(context.traceSpan),
   })
-  const result = accessClient.getUserInfo.query({ access_token })
+  const result = await accessClient.getUserInfo.query({ access_token })
   return result
 }

@@ -47,35 +47,34 @@ export default () => {
   const modeledScopes = useMemo(() => {
     const aggregator = []
 
-    if (scopes.email) {
-      const profile = connectedProfiles.find(
-        (profile) => profile.urn === scopes.email!.urn
-      )
+    for (const scopeValue of Object.keys(scopes)) {
+      if (scopeValue === 'email') {
+        const profile = connectedProfiles.find(
+          //There should be only one address urn provided for email
+          (profile) => profile.urn === scopes[scopeValue].meta.urns[0]
+        )
 
-      aggregator.push({
-        claim: 'email',
-        icon: profile.icon,
-        address: profile.address,
-        type: profile.type,
-        sourceIcon: getDefaultIconUrl(profile.type),
-      })
-    }
-
-    if (scopes.connected_accounts) {
-      const profiles = connectedProfiles.filter((profile) =>
-        scopes.connected_accounts
-          ?.map((account: any) => account.urn)
-          .includes(profile.urn)
-      )
-
-      aggregator.push({
-        claim: 'connected_accounts',
-        accounts: profiles.map((profile) => ({
+        aggregator.push({
+          claim: 'email',
           icon: profile.icon,
           address: profile.address,
-          type: profile.type === 'eth' ? 'blockchain' : profile.type,
-        })),
-      })
+          type: profile.type,
+          sourceIcon: getDefaultIconUrl(profile.type),
+        })
+      } else if (scopeValue === 'connected_accounts') {
+        const profiles = connectedProfiles.filter((profile) =>
+          scopes[scopeValue].meta.urns.includes(profile.urn)
+        )
+
+        aggregator.push({
+          claim: 'connected_accounts',
+          accounts: profiles.map((profile) => ({
+            icon: profile.icon,
+            address: profile.address,
+            type: profile.type === 'eth' ? 'blockchain' : profile.type,
+          })),
+        })
+      }
     }
 
     return aggregator
