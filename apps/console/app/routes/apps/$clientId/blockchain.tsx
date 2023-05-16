@@ -157,13 +157,15 @@ export default () => {
                 onChange={setSelectedPaymaster}
                 as="div"
                 name="paymaster"
-                className="mt-auto sm:grow-[2] max-sm:mb-2"
+                className="mt-auto sm:grow-[1] max-sm:mb-2 "
               >
                 <Listbox.Label className="block text-sm font-medium text-gray-700 mb-2">
                   Paymaster Provider
                 </Listbox.Label>
-                <div className="relative border rounded bottom-0">
-                  <Listbox.Button className="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                <div className="relative bottom-0">
+                  <Listbox.Button className="relative w-full cursor-default rounded
+                   bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none sm:text-sm
+                   border-gray-300 border focus:ring-1 focus:border-indigo-500 ring-indigo-500">
                     <div className={`block truncate text-sm text-gray-400`}>
                       {selectedPaymaster?.provider ? (
                         <div className="flex flex-row w-full items-center">
@@ -193,16 +195,16 @@ export default () => {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                   >
-                    <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                    <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-sm
+                     ring-1 ring-black ring-opacity-5  sm:text-sm">
                       {availablePaymasters.map((paymaster, personIdx) => (
                         <Listbox.Option
                           key={personIdx}
                           className={({ active }) =>
                             `relative cursor-default select-none py-2 px-3
-                            ${
-                              active
-                                ? 'bg-indigo-100 text-indigo-900'
-                                : 'text-gray-900'
+                            ${active
+                              ? 'bg-gray-50 text-indigo-900'
+                              : 'text-gray-900'
                             } }`
                           }
                           value={paymaster}
@@ -216,9 +218,8 @@ export default () => {
                                   className="w-6 h-6 mr-3"
                                 />
                                 <span
-                                  className={`truncate text-sm ${
-                                    selected ? 'font-medium' : 'font-normal'
-                                  }`}
+                                  className={`truncate text-sm ${selected ? 'font-medium' : 'font-normal'
+                                    }`}
                                 >
                                   {paymaster.name}
                                 </span>
@@ -239,12 +240,12 @@ export default () => {
                   </Transition>
                 </div>
               </Listbox>
-              <div className="sm:grow-[5]">
+              <div className="sm:grow-[3]">
                 <Input
                   id="secret"
                   label={selectedPaymaster?.secretLabel || 'API Key'}
                   type="text"
-                  className="shadow-md w-full"
+                  className="shadow-sm w-full"
                   placeholder={selectedPaymaster?.secretPlaceholder}
                   defaultValue={paymaster?.secret}
                   docsUrl={
