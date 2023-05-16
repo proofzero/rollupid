@@ -203,24 +203,12 @@ export default class StarbaseApp extends DOProxy {
     return (storedSecret && storedSecret.length > 0) || false
   }
 
-  async getThemes(): Promise<{ [key: string]: AppTheme }> {
-    const themes = (await this.state.storage.get('themes')) as {
-      [key: string]: AppTheme
-    }
-    return themes
+  async getTheme(): Promise<AppTheme | undefined> {
+    return this.state.storage.get<AppTheme>('theme')
   }
 
-  async setTheme(key: string, theme: AppTheme): Promise<void> {
-    let themes = (await this.state.storage.get('themes')) as {
-      [key: string]: AppTheme
-    }
-    if (!themes) {
-      themes = {}
-    }
-
-    themes[key] = theme
-
-    await this.state.storage.put('themes', themes)
+  async setTheme(theme: AppTheme): Promise<void> {
+    return this.state.storage.put('theme', theme)
   }
 }
 

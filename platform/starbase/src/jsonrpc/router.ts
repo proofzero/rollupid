@@ -84,8 +84,9 @@ import { setPaymaster, SetPaymasterInput } from './methods/setPaymaster'
 import { ApiKeyExtractMiddleware } from './apiKeyExtract'
 
 import { AppClientIdParamSchema } from './validators/app'
-import { getAppThemes, GetAppThemesOutput } from './methods/getAppThemes'
-import { setAppTheme, SetAppThemeInput } from './methods/setAppThemes'
+
+import { getAppTheme, GetAppThemeOutput } from './methods/getAppTheme'
+import { SetAppThemeInput, setAppTheme } from './methods/setAppTheme'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -239,8 +240,8 @@ export const appRouter = t.router({
   getAppThemes: t.procedure
     .use(Analytics)
     .input(AppClientIdParamSchema)
-    .output(GetAppThemesOutput)
-    .query(getAppThemes),
+    .output(GetAppThemeOutput)
+    .query(getAppTheme),
   setAppTheme: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)

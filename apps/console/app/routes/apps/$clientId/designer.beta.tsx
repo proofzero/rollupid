@@ -32,8 +32,7 @@ import { requireJWT } from '~/utilities/session.server'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import { GetAppThemesResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppThemes'
-import { BadRequestError } from '@proofzero/errors'
+import { GetAppThemeResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppTheme'
 import Authorization, {
   scopeIcons,
 } from '@proofzero/design-system/src/templates/authorization/Authorization'
@@ -252,12 +251,12 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     ...traceHeader,
   })
 
-  const appThemes = await starbaseClient.getAppThemes.query({
+  const appTheme = await starbaseClient.getAppThemes.query({
     clientId,
   })
 
   return json({
-    appThemes,
+    appTheme,
   })
 }
 
@@ -276,56 +275,52 @@ export const action: ActionFunction = async ({ request, params, context }) => {
   })
 
   const fd = await request.formData()
-  const targetTheme = fd.get('theme')
-  if (!targetTheme) {
-    throw new BadRequestError({
-      message: 'Theme is required',
-    })
-  }
 
   const heading = fd.get('heading') as string
   const radius = fd.get('radius') as string
   const color = fd.get('color') as string
+  const colorDark = fd.get('color-dark') as string
   const graphicURL = fd.get('image') as string
 
-  const themeData: AppTheme = {
+  const theme: AppTheme = {
     heading,
     radius,
-    color,
+    color: {
+      light: color,
+      dark: colorDark,
+    },
     graphicURL,
   }
 
   await starbaseClient.setAppTheme.mutate({
-    clientId: clientId,
-    theme: {
-      key: targetTheme as string,
-      data: themeData,
-    },
+    clientId,
+    theme,
   })
 
   return null
 }
 
 export default () => {
-  const { appThemes } = useLoaderData<{
-    appThemes: GetAppThemesResult
+  const { appTheme } = useLoaderData<{
+    appTheme: GetAppThemeResult
   }>()
 
   const [theme, setTheme] = useState<string>('light')
-  const [heading, setHeading] = useState<string>(
-    appThemes && appThemes['light'].heading ? appThemes['light'].heading : ''
-  )
-  const [radius, setRadius] = useState<string>(
-    appThemes && appThemes['light'].radius ? appThemes['light'].radius : 'md'
+  const [heading, setHeading] = useState<string>(appTheme?.heading ?? '')
+  const [radius, setRadius] = useState<string>(appTheme?.radius ?? 'md')
+
+  const [color, setColor] = useState<{
+    light: string
+    dark: string
+  }>(
+    appTheme?.color ?? {
+      light: '#6366F1',
+      dark: '#C6C7FF',
+    }
   )
 
-  const [color, setColor] = useState<string>(
-    appThemes && appThemes['light'].color ? appThemes['light'].color : '#6366F1'
-  )
   const [graphicURL, setGraphicURL] = useState<string | undefined>(
-    appThemes && appThemes['light'].graphicURL
-      ? appThemes['light'].graphicURL
-      : undefined
+    appTheme?.graphicURL
   )
 
   const [loading, setLoading] = useState<boolean>(false)
@@ -336,7 +331,7 @@ export default () => {
       enabled: boolean
     }[]
   >(
-    appThemes?.light?.providers ??
+    appTheme?.providers ??
       AuthenticationConstants.knownKeys.map((k) => ({
         key: k,
         enabled: true,
@@ -478,13 +473,13 @@ export default () => {
                   </div>
                 </FormElement>
 
-                <FormElement label="Primary">
+                <FormElement label="Primary Color">
                   <Popover className="relative">
                     <div className="absolute left-0 top-0 bottom-0 flex justify-center items-center">
                       <Popover.Button
                         className="w-4 h-4 ml-3 rounded"
                         style={{
-                          backgroundColor: color,
+                          backgroundColor: color.light,
                         }}
                       ></Popover.Button>
                     </div>
@@ -492,20 +487,74 @@ export default () => {
                     <input
                       id="color"
                       name="color"
-                      value={color}
+                      value={color.light}
                       onChange={(e) => {
                         let val = e.target.value
                         if (!val.startsWith('#')) {
                           val = '#' + val
                         }
 
-                        setColor(val)
+                        setColor({
+                          dark: color.dark,
+                          light: val,
+                        })
                       }}
                       className="pl-9 pr-3 py-2 border border-gray-300 shadow-sm rounded text-sm font-normal text-gray-500 w-full"
                     />
 
-                    <Popover.Panel className="absolute">
-                      <HexColorPicker color={color} onChange={setColor} />
+                    <Popover.Panel className="absolute z-10">
+                      <HexColorPicker
+                        color={color.light}
+                        onChange={(val) => {
+                          setColor({
+                            dark: color.dark,
+                            light: val,
+                          })
+                        }}
+                      />
+                    </Popover.Panel>
+                  </Popover>
+                </FormElement>
+
+                <FormElement label="Primary Color - Darkmode">
+                  <Popover className="relative">
+                    <div className="absolute left-0 top-0 bottom-0 flex justify-center items-center">
+                      <Popover.Button
+                        className="w-4 h-4 ml-3 rounded"
+                        style={{
+                          backgroundColor: color.dark,
+                        }}
+                      ></Popover.Button>
+                    </div>
+
+                    <input
+                      id="color-dark"
+                      name="color-dark"
+                      value={color.dark}
+                      onChange={(e) => {
+                        let val = e.target.value
+                        if (!val.startsWith('#')) {
+                          val = '#' + val
+                        }
+
+                        setColor({
+                          light: color.light,
+                          dark: val,
+                        })
+                      }}
+                      className="pl-9 pr-3 py-2 border border-gray-300 shadow-sm rounded text-sm font-normal text-gray-500 w-full"
+                    />
+
+                    <Popover.Panel className="absolute z-10">
+                      <HexColorPicker
+                        color={color.dark}
+                        onChange={(val) => {
+                          setColor({
+                            light: color.light,
+                            dark: val,
+                          })
+                        }}
+                      />
                     </Popover.Panel>
                   </Popover>
                 </FormElement>
@@ -705,7 +754,7 @@ export default () => {
                         <div
                           className={`w-2 h-2 rounded-full`}
                           style={{
-                            backgroundColor: selected ? color : '#E5E7EB',
+                            backgroundColor: selected ? color.light : '#E5E7EB',
                           }}
                         ></div>
                       )}
@@ -716,7 +765,7 @@ export default () => {
                         <div
                           className={`w-2 h-2 rounded-full`}
                           style={{
-                            backgroundColor: selected ? color : '#E5E7EB',
+                            backgroundColor: selected ? color.dark : '#E5E7EB',
                           }}
                         ></div>
                       )}

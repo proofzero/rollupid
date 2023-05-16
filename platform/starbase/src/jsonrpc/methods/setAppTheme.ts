@@ -5,10 +5,7 @@ import { AppClientIdParamSchema, AppThemeSchema } from '../validators/app'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 
 export const SetAppThemeInput = AppClientIdParamSchema.extend({
-  theme: z.object({
-    key: z.string(),
-    data: AppThemeSchema,
-  }),
+  theme: AppThemeSchema,
 })
 type SetAppThemeParams = z.infer<typeof SetAppThemeInput>
 
@@ -30,5 +27,5 @@ export const setAppTheme = async ({
     input.clientId,
     ctx.StarbaseApp
   )
-  return appDO.class.setTheme(theme.key, theme.data)
+  return appDO.class.setTheme(theme)
 }
