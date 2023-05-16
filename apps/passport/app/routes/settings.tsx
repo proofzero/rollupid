@@ -13,6 +13,7 @@ import appleIcon from '~/assets/apple-touch-icon.png'
 import icon32 from '~/assets/favicon-32x32.png'
 import icon16 from '~/assets/favicon-16x16.png'
 import faviconSvg from '~/assets/favicon.svg'
+import warningImg from '~/assets/warning.svg'
 
 import {
   getAccountClient,
@@ -68,15 +69,26 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const awaitedResults = await Promise.all([
     Promise.all(
       apps.map(async (a) => {
-        const { name, iconURL } = await starbaseClient.getAppPublicProps.query({
-          clientId: a.clientId,
-        })
-
-        return {
-          clientId: a.clientId,
-          icon: iconURL,
-          title: name,
-          timestamp: a.timestamp,
+        try {
+          const { name, iconURL } =
+            await starbaseClient.getAppPublicProps.query({
+              clientId: a.clientId,
+            })
+          return {
+            clientId: a.clientId,
+            icon: iconURL,
+            title: name,
+            timestamp: a.timestamp,
+          }
+        } catch (e) {
+          //We swallow the error and move on to next app
+          console.error(e)
+          return {
+            clientId: a.clientId,
+            icon: warningImg,
+            title: 'Application data error',
+            timestamp: a.timestamp,
+          }
         }
       })
     ),
