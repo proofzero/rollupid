@@ -12,6 +12,7 @@ import ConnectOAuthButton, {
 import { ConnectButton } from '../../atoms/buttons/connect-button/ConnectButton'
 import { AuthButton } from '../../molecules/auth-button/AuthButton'
 import { HiOutlineMail } from 'react-icons/hi'
+import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 
 export const AuthenticationConstants = {
   defaultLogoURL: circleLogo,
@@ -120,6 +121,7 @@ export default ({
               rollup.id
             </a>
           </Text>
+          <TosAndPPol />
         </div>
       </div>
     </div>
@@ -150,10 +152,10 @@ const displayKeyMapper = (
     clientId,
     wagmiClient,
     signData,
-    walletConnectCallback = () => {},
-    walletSignCallback = () => {},
-    walletConnectErrorCallback = () => {},
-    navigate = () => {},
+    walletConnectCallback = () => { },
+    walletSignCallback = () => { },
+    walletConnectErrorCallback = () => { },
+    navigate = () => { },
     FormWrapperEl = ({ children }) => <>{children}</>,
     loading = false,
     flex = false,

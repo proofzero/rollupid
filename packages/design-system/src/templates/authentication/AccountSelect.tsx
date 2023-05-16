@@ -7,6 +7,7 @@ import { Avatar } from '../../atoms/profile/avatar/Avatar'
 
 import { AuthButton } from '../../molecules/auth-button/AuthButton'
 import { AppProfile, AuthenticationConstants } from './Authentication'
+import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 
 type UserProfile = {
   pfpURL: string
@@ -125,6 +126,7 @@ export default ({
               rollup.id
             </a>
           </Text>
+          <TosAndPPol />
         </div>
       </div>
     </div>
