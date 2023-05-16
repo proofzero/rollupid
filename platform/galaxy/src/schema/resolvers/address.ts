@@ -142,18 +142,15 @@ const addressResolvers: Resolvers = {
         [AppAPIKeyHeader]: apiKey,
       })
 
-      const [personaData, paymaster]: [PersonaData, PaymasterType] =
+      const [userInfo, paymaster]: [PersonaData, PaymasterType] =
         await Promise.all([
-          accessClient.getPersonaData.query({
-            clientId,
-            accountUrn: accountURN,
-          }),
+          accessClient.getUserInfo.query({ access_token: jwt }),
           starbaseClient.getPaymaster.query({ clientId }),
         ])
 
       if (
-        !personaData ||
-        !personaData.erc_4337.some(
+        !userInfo ||
+        !userInfo.erc_4337.some(
           (scWallet: { nickname: string; address: string }) =>
             scWallet.address === smartContractWalletAddress
         )
