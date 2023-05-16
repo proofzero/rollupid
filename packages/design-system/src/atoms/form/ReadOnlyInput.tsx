@@ -6,7 +6,7 @@ import { Text } from '../text/Text'
 export type ReadOnlyInputProps = InputHTMLAttributes<HTMLInputElement> & {
   id: string
   value: string
-  label: string
+  label?: string
   hidden?: boolean
   copyable?: boolean
   onCopy?: (value: string) => void
@@ -28,12 +28,13 @@ export const ReadOnlyInput = ({
   return (
     <div className="flex flex-col">
       <div className="flex flex-row justify-between">
-        <label htmlFor={id}>
-          <Text size="sm" weight="medium" className="text-gray-700 mb-2">
-            {label}
-          </Text>
-        </label>
-
+        {label && (
+          <label htmlFor={id}>
+            <Text size="sm" weight="medium" className="text-gray-700 mb-2">
+              {label}
+            </Text>
+          </label>
+        )}
         {copyable && <Copier value={value} onCopy={onCopy} />}
       </div>
 

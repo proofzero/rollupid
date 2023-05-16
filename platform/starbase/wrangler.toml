@@ -99,6 +99,7 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.dev.vars]
 ENVIRONMENT = "dev"
+INTERNAL_PASSPORT_SERVICE_NAME = "passport-dev"
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -119,6 +120,7 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.next.vars]
 ENVIRONMENT = "next"
+INTERNAL_PASSPORT_SERVICE_NAME = "passport-next"
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -139,3 +141,4 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.current.vars]
 ENVIRONMENT = "current"
+INTERNAL_PASSPORT_SERVICE_NAME = "passport-current"
