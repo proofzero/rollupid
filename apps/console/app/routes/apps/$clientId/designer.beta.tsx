@@ -1,6 +1,6 @@
 import { Popover, Tab } from '@headlessui/react'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { Form } from '@remix-run/react'
+import { Form, useLoaderData } from '@remix-run/react'
 import { ReactNode, useState } from 'react'
 import { IconType } from 'react-icons'
 import { HiCog, HiOutlineCog, HiOutlineMail } from 'react-icons/hi'
@@ -26,6 +26,14 @@ import _ from 'lodash'
 import getProviderIcons from '@proofzero/design-system/src/helpers/get-provider-icons'
 import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
 import { HexColorPicker } from 'react-colorful'
+import { AppTheme } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
+import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
+import { requireJWT } from '~/utilities/session.server'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { GetAppThemesResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppThemes'
+import { BadRequestError } from '@proofzero/errors'
 
 const client = createClient(
   // @ts-ignore
@@ -33,17 +41,6 @@ const client = createClient(
     appName: 'Rollup',
   })
 )
-
-enum Theme {
-  Light = 'light',
-  Dark = 'dark',
-}
-
-enum Radius {
-  Large = 'lg',
-  Medium = 'md',
-  Small = 'sm',
-}
 
 const DesignerTab = ({
   Icon,
@@ -100,19 +97,19 @@ const RadiusButton = ({
   selectedRadius,
   setRadius,
 }: {
-  radius: Radius
-  selectedRadius: Radius | undefined
-  setRadius: React.Dispatch<React.SetStateAction<Radius>>
+  radius: string
+  selectedRadius: string | undefined
+  setRadius: React.Dispatch<React.SetStateAction<string>>
 }) => {
   let label
   switch (radius) {
-    case Radius.Large:
+    case 'lg':
       label = 'Large'
       break
-    case Radius.Small:
+    case 'sm':
       label = 'Small'
       break
-    case Radius.Medium:
+    case 'md':
       label = 'Medium'
       break
     default:
@@ -232,12 +229,103 @@ const ProviderModal = ({
   )
 }
 
+export const loader: LoaderFunction = async ({ request, params, context }) => {
+  if (!params.clientId) {
+    throw new Error('Client ID is required for the requested route')
+  }
+
+  const jwt = await requireJWT(request)
+  const traceHeader = generateTraceContextHeaders(context.traceSpan)
+  const clientId = params?.clientId
+
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...traceHeader,
+  })
+
+  const appThemes = await starbaseClient.getAppThemes.query({
+    clientId,
+  })
+
+  return json({
+    appThemes,
+  })
+}
+
+export const action: ActionFunction = async ({ request, params, context }) => {
+  if (!params.clientId) {
+    throw new Error('Client ID is required for the requested route')
+  }
+
+  const jwt = await requireJWT(request)
+  const traceHeader = generateTraceContextHeaders(context.traceSpan)
+  const clientId = params?.clientId
+
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...traceHeader,
+  })
+
+  const fd = await request.formData()
+  const targetTheme = fd.get('theme')
+  if (!targetTheme) {
+    throw new BadRequestError({
+      message: 'Theme is required',
+    })
+  }
+
+  const heading = fd.get('heading') as string
+  const radius = fd.get('radius') as string
+  const color = fd.get('color') as string
+  const graphicURL = fd.get('image') as string
+
+  const themeData: AppTheme = {
+    heading,
+    radius,
+    color,
+    graphicURL,
+  }
+
+  console.log({
+    themeData,
+  })
+
+  await starbaseClient.setAppTheme.mutate({
+    clientId: clientId,
+    theme: {
+      key: targetTheme as string,
+      data: themeData,
+    },
+  })
+
+  return null
+}
+
 export default () => {
-  const [theme, setTheme] = useState<Theme>(Theme.Light)
-  const [heading, setHeading] = useState<string>()
-  const [radius, setRadius] = useState<Radius>(Radius.Medium)
-  const [color, setColor] = useState<string>('#6366F1')
-  const [graphicURL, setGraphicURL] = useState<string>()
+  const { appThemes } = useLoaderData<{
+    appThemes: GetAppThemesResult
+  }>()
+
+  console.log({
+    appThemes,
+  })
+
+  const [theme, setTheme] = useState<string>('light')
+  const [heading, setHeading] = useState<string>(
+    appThemes && appThemes['light'].heading ? appThemes['light'].heading : ''
+  )
+  const [radius, setRadius] = useState<string>(
+    appThemes && appThemes['light'].radius ? appThemes['light'].radius : 'md'
+  )
+
+  const [color, setColor] = useState<string>(
+    appThemes && appThemes['light'].color ? appThemes['light'].color : '#6366F1'
+  )
+  const [graphicURL, setGraphicURL] = useState<string | undefined>(
+    appThemes && appThemes['light'].graphicURL
+      ? appThemes['light'].graphicURL
+      : undefined
+  )
 
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -247,10 +335,11 @@ export default () => {
       enabled: boolean
     }[]
   >(
-    AuthenticationConstants.knownKeys.map((k) => ({
-      key: k,
-      enabled: true,
-    }))
+    appThemes?.light?.providers ??
+      AuthenticationConstants.knownKeys.map((k) => ({
+        key: k,
+        enabled: true,
+      }))
   )
   const [providerModalOpen, setProviderModalOpen] = useState<boolean>(false)
 
@@ -265,7 +354,7 @@ export default () => {
         saveCallback={setProviders}
       />
 
-      <Form>
+      <Form method="post">
         <section className="flex flex-row items-center justify-between mb-11">
           <div className="flex flex-row items-center space-x-3">
             <Text
@@ -325,13 +414,11 @@ export default () => {
                     <button
                       type="button"
                       className={`border rounded-full ${
-                        theme === Theme.Light
-                          ? 'outline outline-indigo-500'
-                          : ''
+                        theme === 'light' ? 'outline outline-indigo-500' : ''
                       } w-7 h-7 overflow-hidden`}
                       onClick={(e) => {
                         e.preventDefault()
-                        setTheme(Theme.Light)
+                        setTheme('light')
                       }}
                     >
                       <img src={lightIcon} />
@@ -339,11 +426,11 @@ export default () => {
                     <button
                       type="button"
                       className={`border rounded-full ${
-                        theme === Theme.Dark ? 'outline outline-indigo-500' : ''
+                        theme === 'dark' ? 'outline outline-indigo-500' : ''
                       } w-7 h-7 overflow-hidden`}
                       onClick={(e) => {
                         e.preventDefault()
-                        setTheme(Theme.Dark)
+                        setTheme('dark')
                       }}
                     >
                       <img src={darkIcon} />
@@ -359,6 +446,7 @@ export default () => {
                     onChange={(e) => {
                       setHeading(e.target.value)
                     }}
+                    value={heading}
                   />
                 </FormElement>
 
@@ -372,17 +460,17 @@ export default () => {
 
                   <div className="p-1 border border-gray-300 shadow-sm rounded flex justify-evenly">
                     <RadiusButton
-                      radius={Radius.Large}
+                      radius={'lg'}
                       setRadius={setRadius}
                       selectedRadius={radius}
                     />
                     <RadiusButton
-                      radius={Radius.Medium}
+                      radius={'md'}
                       setRadius={setRadius}
                       selectedRadius={radius}
                     />
                     <RadiusButton
-                      radius={Radius.Small}
+                      radius={'sm'}
                       setRadius={setRadius}
                       selectedRadius={radius}
                     />
@@ -514,7 +602,7 @@ export default () => {
                     signData: null,
                   }}
                   radius={radius}
-                  darkMode={theme === Theme.Dark}
+                  darkMode={theme === 'dark'}
                 />
               </section>
             </Tab.Panel>

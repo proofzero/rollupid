@@ -18,7 +18,7 @@ import type {
   AppReadableFields,
   AppUpdateableFields,
 } from '../types'
-import { PaymasterType } from '../jsonrpc/validators/app'
+import { AppTheme, PaymasterType } from '../jsonrpc/validators/app'
 import { InternalServerError } from '@proofzero/errors'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
@@ -201,6 +201,26 @@ export default class StarbaseApp extends DOProxy {
   async hasClientSecret(): Promise<boolean> {
     const storedSecret = await this.state.storage.get<string>('clientSecret')
     return (storedSecret && storedSecret.length > 0) || false
+  }
+
+  async getThemes(): Promise<{ [key: string]: AppTheme }> {
+    const themes = (await this.state.storage.get('themes')) as {
+      [key: string]: AppTheme
+    }
+    return themes
+  }
+
+  async setTheme(key: string, theme: AppTheme): Promise<void> {
+    let themes = (await this.state.storage.get('themes')) as {
+      [key: string]: AppTheme
+    }
+    if (!themes) {
+      themes = {}
+    }
+
+    themes[key] = theme
+
+    await this.state.storage.put('themes', themes)
   }
 }
 

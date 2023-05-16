@@ -20,6 +20,7 @@ export const getAppPublicProps = async ({
     ctx.StarbaseApp
   )
   const appDetails = await appDO.class.getDetails()
+  const appThemes = await appDO.class.getThemes()
 
   if (appDetails && appDetails.app && appDetails.published) {
     return {
@@ -31,6 +32,7 @@ export const getAppPublicProps = async ({
       termsURL: appDetails.app.termsURL,
       privacyURL: appDetails.app.privacyURL,
       websiteURL: appDetails.app.websiteURL,
+      appThemes,
     }
   } else {
     throw new Error(
