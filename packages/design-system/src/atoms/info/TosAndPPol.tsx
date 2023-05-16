@@ -4,21 +4,20 @@ import { Popover, Transition } from '@headlessui/react'
 import { Text } from '../text/Text'
 import { usePopper } from 'react-popper'
 
+
 export const TosAndPPol = () => {
-    let [referenceElement, setReferenceElement] = useState()
-    let [popperElement, setPopperElement] = useState()
+    let [referenceElement, setReferenceElement] = useState(null)
+    let [popperElement, setPopperElement] = useState(null)
     let { styles, attributes } = usePopper(referenceElement, popperElement)
 
 
     return (
-        <Popover className="relative ring-white">
-            <Popover.Button className="bg-white text-black absolute z-5 w-max ring-white"
-                ref={setReferenceElement}
-                style={styles.arrow}>
-                <img src={iIcon} alt={`${name} info`} />
+        <Popover className="ring-white h-4 w-4 flex items-center">
+            <Popover.Button className="bg-white text-black z-999 w-max ring-white"
+                ref={setReferenceElement}>
+                <img src={iIcon} alt="info" />
             </Popover.Button>
-            <div id="arrow" style={styles.arrow} data-popper-arrow></div>
-
+            <div data-popper-arrow></div>
             <Transition
                 as={Fragment}
                 enter="transition ease-out duration-200"
@@ -32,9 +31,9 @@ export const TosAndPPol = () => {
                     ref={setPopperElement}
                     style={styles.popper}
                     {...attributes.popper}
-                    className="absolute z-10 border border-gray-300 rounded-lg
-                    px-3.5 py-4 max-w-[360px] max-h-[182px] shadow">
-                    <Text size='md' weight='medium' className='mt-3'>
+                    className="z-999 border border-gray-300 rounded-lg bg-white
+                    px-3.5 py-4 mb-2 max-w-[360px] max-h-[182px] shadow">
+                    <Text size="base" weight='medium' className='mt-3'>
                         What is Rollup ID?
                     </Text>
                     <Text size="sm" className='text-gray-500 mt-2 mb-4'>
