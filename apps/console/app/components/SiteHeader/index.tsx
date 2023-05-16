@@ -29,7 +29,7 @@ export default function RollupHeader(props: RollupHeaderProps) {
   return (
     <header
       className="w-full min-h-[80px] h-[80px] bg-gray-900
-      lg:bg-white lg:border-b lg:shadow-lg
+      lg:bg-white lg:border-b lg:shadow
       flex items-center justify-start lg:justify-end
       px-2 sm:max-md:px-5 md:px-10"
     >

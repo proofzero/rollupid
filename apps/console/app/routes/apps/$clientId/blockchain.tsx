@@ -157,13 +157,13 @@ export default () => {
                 onChange={setSelectedPaymaster}
                 as="div"
                 name="paymaster"
-                className="mt-auto sm:grow-[2] max-sm:mb-2 "
+                className="mt-auto sm:grow-[1] max-sm:mb-2 "
               >
                 <Listbox.Label className="block text-sm font-medium text-gray-700 mb-2">
                   Paymaster Provider
                 </Listbox.Label>
                 <div className="relative border rounded bottom-0 border-gray-300">
-                  <Listbox.Button className="relative w-full cursor-default rounded-lg focus:ring 
+                  <Listbox.Button className="relative w-full cursor-default rounded-lg focus:ring ring-indigo-500
                    bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none focus-visible:border-indigo-500
                     focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2
                      focus-visible:ring-offset-orange-300 sm:text-sm">
@@ -241,7 +241,7 @@ export default () => {
                   </Transition>
                 </div>
               </Listbox>
-              <div className="sm:grow-[5]">
+              <div className="sm:grow-[3]">
                 <Input
                   id="secret"
                   label={selectedPaymaster?.secretLabel || 'API Key'}

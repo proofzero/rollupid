@@ -57,11 +57,11 @@ export function MultiSelect({
     query === ''
       ? items
       : items.filter((item) => {
-          return (
-            item.val.toLowerCase().includes(query.toLowerCase()) ||
-            item.id.toLowerCase().includes(query.toLowerCase())
-          )
-        })
+        return (
+          item.val.toLowerCase().includes(query.toLowerCase()) ||
+          item.id.toLowerCase().includes(query.toLowerCase())
+        )
+      })
 
   return (
     <Combobox
@@ -95,9 +95,9 @@ export function MultiSelect({
             <Combobox.Button
               className={`${
                 disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
-              } w-full block min-h-24 rounded shadow border border-gray-300 ${
-                selectedValues.length ? '' : 'py-2'
-              } pl-3 pr-7
+                } w-full block min-h-24 rounded shadow-sm border border-gray-300 ${
+                  selectedValues.length ? '' : 'py-2'
+                } pl-3 pr-7
         shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm
         flex flex-row items-center justify-start flex-wrap`}
               onClick={() => {
@@ -108,8 +108,8 @@ export function MultiSelect({
                 selectedValues.map((item, key) => (
                   <div
                     key={key}
-                    className="bg-indigo-50 text-indigo-600 px-1 py-[3px] m-1 rounded-md border min-w-max z-998 min-w-max
-                      flex flex-row items-center justify-start gap-x-1"
+                    className="bg-indigo-50 text-gray-800 px-1 py-[3px] m-1 rounded-md border border-indigo-300
+                     min-w-max z-998 min-w-max flex flex-row items-center justify-start gap-x-1"
                     onClick={(event) => {
                       event.stopPropagation()
                       event.preventDefault()
@@ -117,7 +117,7 @@ export function MultiSelect({
                   >
                     {item.val}
                     <IoCloseOutline
-                      className="h-5 w-5 text-gray-400 cursor-pointer z-999"
+                      className="h-5 w-5 text-gray-800 cursor-pointer z-999"
                       onClick={() => {
                         setSelectedValues(
                           selectedValues.filter((v) => v.id !== item.id)
@@ -148,7 +148,7 @@ export function MultiSelect({
                   <Combobox.Input
                     className={`${
                       disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
-                    } truncate w-full pl-3 py-2 rounded-md border-none sm:text-sm focus-none focus:ring-0`}
+                      } truncate w-full pl-3 py-2 rounded-md border-none sm:text-sm focus-none focus:ring-0`}
                     onChange={(event) => {
                       setQuery(event.target.value)
                     }}
@@ -189,14 +189,14 @@ export function MultiSelect({
                         <div
                           className={`flex flex-row items-start justify-start rounded-lg p-2 ${
                             selected ? 'bg-gray-100 w-full' : ''
-                          }`}
+                            }`}
                         >
                           <input
                             type="checkbox"
                             className={`rounded mr-2 mt-1 text-indigo-500
                             border-gray-300 ${
                               item.disabled ? 'bg-gray-300' : ''
-                            }`}
+                              }`}
                             checked={selected}
                           ></input>
                           <div>
@@ -231,7 +231,7 @@ export function MultiSelect({
                                 <ExperimentalFeaturePill
                                   className={`${
                                     selected ? 'bg-gray-200' : 'bg-gray-100'
-                                  }`}
+                                    }`}
                                   text="Experimental Feature"
                                 />
                               )}

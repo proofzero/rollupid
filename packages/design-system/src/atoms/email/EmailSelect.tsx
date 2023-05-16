@@ -5,7 +5,7 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { HiCheck } from 'react-icons/hi'
 import { TbCircleOff, TbCirclePlus } from 'react-icons/tb'
-import { MdOutlineAlternateEmail } from 'react-icons/md'
+import { HiOutlineEnvelope } from 'react-icons/hi2'
 
 import { EmailAddressType, OAuthAddressType } from '@proofzero/types/address'
 
@@ -33,10 +33,10 @@ const getIconUrl = (
     ? type === OAuthAddressType.Microsoft
       ? microsoftIcon
       : type === OAuthAddressType.Apple
-      ? appleIcon
-      : type === OAuthAddressType.Google
-      ? googleIcon
-      : null
+        ? appleIcon
+        : type === OAuthAddressType.Google
+          ? googleIcon
+          : null
     : null
 }
 
@@ -77,18 +77,12 @@ export const EmailSelect = ({
         <div className="relative bg-white">
           <Listbox.Button
             className={`border shadow-sm rounded-lg w-full transition-transform
-            flex flex-row space-between items-center py-2 px-3 ${
-              items.length === 0
+            flex flex-row space-between items-center py-2 px-3 ${items.length === 0
                 ? ''
                 : 'hover:ring-1\
             hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500'
-            } bg-white`}
+              } bg-white`}
           >
-            {selectedIconURL ? (
-              <img src={selectedIconURL} className="w-4 h-4 mr-3" />
-            ) : (
-              <MdOutlineAlternateEmail className="w-4 h-4 mr-3" />
-            )}
 
             {!selected && (
               <Text
@@ -137,15 +131,14 @@ export const EmailSelect = ({
                         {iconURL ? (
                           <img src={iconURL} className="w-4 h-4 mr-3" />
                         ) : (
-                          <MdOutlineAlternateEmail className="w-4 h-4 mr-3" />
+                          <HiOutlineEnvelope className="w-4 h-4 mr-3" />
                         )}
 
                         <Text
                           size="sm"
                           weight={selected ? 'semibold' : 'normal'}
-                          className={`truncate text-ellipsis ${
-                            selected ? '' : ''
-                          } flex-1`}
+                          className={`truncate text-ellipsis ${selected ? '' : ''
+                            } flex-1`}
                         >
                           {item.email}
                         </Text>

@@ -24,7 +24,7 @@ export const typeToColorsDict = {
   primary:
     'bg-[#1f2937] text-white shadow-sm hover:bg-[#374151] focus:bg-[#1f2937] focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
   'primary-alt':
-    'bg-[#3e29df] text-white shadow-sm hover:bg-[#6366f1] focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
+    'bg-indigo-500 text-white shadow-sm hover:bg-indigo-600 focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
   secondary:
     'bg-[#f3f4f6] text-[#5d4aec] shadow-sm border border-solid border-[#dfdcff] hover:bg-[#e5e7eb] focus:bg-[#f3f4f6] focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
   'secondary-alt':

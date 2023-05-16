@@ -46,13 +46,13 @@ export const Input = ({
         className={`w-full form-input rounded border
          shadow-sm text-sm font-normal py-2 px-3 ${className}
          ${error ? ' border-red-500' : 'border-gray-300'}
-         ${error ? 'focus:border-red-500' : 'focus:border-indigo-500'}${
-          error ? 'focus:ring-red-500' : 'focus:ring-indigo-500'
+         ${
+          error ? 'focus:border-red-500' : 'focus:border-indigo-500'
         } disabled:cursor-not-allowed ${
           error ? 'disabled:border-red-200' : 'disabled:border-gray-200'
-        } ${
-          error ? 'disabled:bg-red-50' : 'disabled:bg-gray-50'
-        } placeholder-gray-400 text-gray-900`}
+          } ${
+            error ? 'disabled:bg-red-50' : 'disabled:bg-gray-50'
+          } placeholder-gray-400 text-gray-900`}
         id={id}
         name={computedName}
         {...rest}
