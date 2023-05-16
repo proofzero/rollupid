@@ -19,6 +19,7 @@ import type {
   AppUpdateableFields,
 } from '../types'
 import { PaymasterType } from '../jsonrpc/validators/app'
+import { InternalServerError } from '@proofzero/errors'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields
@@ -69,14 +70,14 @@ export default class StarbaseApp extends DOProxy {
   }
 
   async update(updates: Partial<AppObject>): Promise<void> {
-    //Merge values in app object
-    const storedValues = this.state.storage.get('app')
-    const mergedEntries = new Map(Object.entries(storedValues))
-    Object.entries(updates).forEach(([k, v]) => {
-      mergedEntries.set(k, v)
-    })
-    const mergedObject = Object.fromEntries(mergedEntries.entries())
+    const storedValues = await this.state.storage.get<AppObject>('app')
+    if (!storedValues)
+      throw new InternalServerError({ message: 'missing app object' })
 
+    //Merge values in app object
+    const mergedEntries = new Map(Object.entries(storedValues))
+    Object.entries(updates).forEach(([k, v]) => mergedEntries.set(k, v))
+    const mergedObject = Object.fromEntries(mergedEntries.entries())
     await this.state.storage.put('app', mergedObject)
   }
 
