@@ -162,11 +162,10 @@ export default () => {
                 <Listbox.Label className="block text-sm font-medium text-gray-700 mb-2">
                   Paymaster Provider
                 </Listbox.Label>
-                <div className="relative border rounded bottom-0 border-gray-300">
-                  <Listbox.Button className="relative w-full cursor-default rounded-lg focus:ring ring-indigo-500
-                   bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none focus-visible:border-indigo-500
-                    focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2
-                     focus-visible:ring-offset-orange-300 sm:text-sm">
+                <div className="relative bottom-0">
+                  <Listbox.Button className="relative w-full cursor-default rounded
+                   bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none sm:text-sm
+                   border-gray-300 border focus:ring-1 focus:border-indigo-500 ring-indigo-500">
                     <div className={`block truncate text-sm text-gray-400`}>
                       {selectedPaymaster?.provider ? (
                         <div className="flex flex-row w-full items-center">
