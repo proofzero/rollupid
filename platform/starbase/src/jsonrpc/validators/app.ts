@@ -43,11 +43,13 @@ export const AppClientIdParamSchema = z.object({
 
 export const AppThemeSchema = z.object({
   heading: z.string().optional(),
-  radius: z.string(),
-  color: z.object({
-    light: z.string(),
-    dark: z.string(),
-  }),
+  radius: z.string().optional(),
+  color: z
+    .object({
+      light: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+      dark: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+    })
+    .optional(),
   graphicURL: z.string().url().optional(),
   providers: z
     .array(

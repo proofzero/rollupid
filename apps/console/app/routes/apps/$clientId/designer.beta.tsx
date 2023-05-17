@@ -1,7 +1,12 @@
 import { Popover, Tab } from '@headlessui/react'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { Form, useLoaderData, useOutletContext } from '@remix-run/react'
-import { ReactNode, useState } from 'react'
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useOutletContext,
+} from '@remix-run/react'
+import { ReactNode, useEffect, useState } from 'react'
 import { IconType } from 'react-icons'
 import { HiCog, HiOutlineCog, HiOutlineMail } from 'react-icons/hi'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
@@ -23,7 +28,10 @@ import _ from 'lodash'
 import getProviderIcons from '@proofzero/design-system/src/helpers/get-provider-icons'
 import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
 import { HexColorPicker } from 'react-colorful'
-import { AppTheme } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
+import {
+  AppTheme,
+  AppThemeSchema,
+} from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
@@ -42,6 +50,7 @@ import {
 import { TbMoon, TbSunHigh } from 'react-icons/tb'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 import { Helmet } from 'react-helmet'
+import { notificationHandlerType } from '~/types'
 
 const client = createClient(
   // @ts-ignore
@@ -279,29 +288,43 @@ export const action: ActionFunction = async ({ request, params, context }) => {
   const heading = fd.get('heading') as string
   const radius = fd.get('radius') as string
   const color = fd.get('color') as string
-  const colorDark = fd.get('color-dark') as string
+  const colorDark = fd.get('colordark') as string
   const graphicURL = fd.get('image') as string
 
   const providersJSON = fd.get('providers') as string
   const providers = JSON.parse(providersJSON)
 
   const theme: AppTheme = {
-    heading,
+    heading: heading !== '' ? heading : undefined,
     radius,
     color: {
       light: color,
       dark: colorDark,
     },
-    graphicURL,
+    graphicURL: graphicURL !== '' ? graphicURL : undefined,
     providers,
   }
 
-  await starbaseClient.setAppTheme.mutate({
-    clientId,
-    theme,
-  })
+  const errors: {
+    [key: string]: string
+  } = {}
 
-  return null
+  const zodErrors = await AppThemeSchema.spa(theme)
+  if (!zodErrors.success) {
+    const { fieldErrors } = zodErrors.error.flatten()
+    Object.keys(fieldErrors).forEach((key) => {
+      errors[key] = (fieldErrors as { [key: string]: string })[key][0]
+    })
+  } else {
+    await starbaseClient.setAppTheme.mutate({
+      clientId,
+      theme,
+    })
+  }
+
+  return json({
+    errors,
+  })
 }
 
 export default () => {
@@ -309,8 +332,18 @@ export default () => {
     appTheme: GetAppThemeResult
   }>()
 
-  const { avatarUrl } = useOutletContext<{
+  const actionData = useActionData()
+  const errors = actionData?.errors
+
+  useEffect(() => {
+    if (errors) {
+      notificationHandler(Object.keys(errors).length === 0)
+    }
+  }, [errors])
+
+  const { avatarUrl, notificationHandler } = useOutletContext<{
     avatarUrl: string
+    notificationHandler: notificationHandlerType
   }>()
 
   const [heading, setHeading] = useState<string>(appTheme?.heading ?? '')
@@ -390,8 +423,19 @@ export default () => {
             <DocumentationBadge url="https://docs.rollup.id/platform/console/designer" />
           </div>
 
-          <div>
-            <button type="submit">SAVE</button>
+          <div className="flex flex-row items-center gap-2">
+            <Button
+              btnType="secondary-alt"
+              type="button"
+              onClick={() => {
+                window.location.reload()
+              }}
+            >
+              Discard
+            </Button>
+            <Button btnType="primary-alt" type="submit">
+              Save
+            </Button>
           </div>
         </section>
 
@@ -438,7 +482,18 @@ export default () => {
                       setHeading(e.target.value)
                     }}
                     value={heading}
+                    error={errors?.heading}
                   />
+
+                  {errors?.heading && (
+                    <Text
+                      className="mb-1.5 mt-1.5 text-red-500"
+                      size="xs"
+                      weight="normal"
+                    >
+                      {errors.heading || ''}
+                    </Text>
+                  )}
                 </FormElement>
 
                 <FormElement label="Radius">
@@ -466,6 +521,16 @@ export default () => {
                       selectedRadius={radius}
                     />
                   </div>
+
+                  {errors?.radius && (
+                    <Text
+                      className="mb-1.5 mt-1.5 text-red-500"
+                      size="xs"
+                      weight="normal"
+                    >
+                      {errors.radius || ''}
+                    </Text>
+                  )}
                 </FormElement>
 
                 <FormElement label="Primary Color">
@@ -483,6 +548,7 @@ export default () => {
                       id="color"
                       name="color"
                       value={color.light}
+                      pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
                       onChange={(e) => {
                         let val = e.target.value
                         if (!val.startsWith('#')) {
@@ -509,6 +575,16 @@ export default () => {
                       />
                     </Popover.Panel>
                   </Popover>
+
+                  {errors?.color && (
+                    <Text
+                      className="mb-1.5 mt-1.5 text-red-500"
+                      size="xs"
+                      weight="normal"
+                    >
+                      {errors.color || ''}
+                    </Text>
+                  )}
                 </FormElement>
 
                 <FormElement label="Primary Color - Darkmode">
@@ -523,9 +599,10 @@ export default () => {
                     </div>
 
                     <input
-                      id="color-dark"
-                      name="color-dark"
+                      id="colordark"
+                      name="colordark"
                       value={color.dark}
+                      pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
                       onChange={(e) => {
                         let val = e.target.value
                         if (!val.startsWith('#')) {
@@ -552,6 +629,16 @@ export default () => {
                       />
                     </Popover.Panel>
                   </Popover>
+
+                  {errors?.color && (
+                    <Text
+                      className="mb-1.5 mt-1.5 text-red-500"
+                      size="xs"
+                      weight="normal"
+                    >
+                      {errors?.color || ''}
+                    </Text>
+                  )}
                 </FormElement>
 
                 <FormElement label="Login Screen Side Image">
@@ -571,6 +658,8 @@ export default () => {
                       }}
                       imageUploadCallback={setGraphicURL}
                       url={graphicURL}
+                      invalid={errors?.graphicURL}
+                      errorMessage={errors?.graphicURL}
                     />
 
                     {graphicURL && (
@@ -591,6 +680,16 @@ export default () => {
                       </button>
                     )}
                   </div>
+
+                  {errors?.graphicURL && (
+                    <Text
+                      className="mb-1.5 mt-1.5 text-red-500"
+                      size="xs"
+                      weight="normal"
+                    >
+                      {errors?.graphicURL || ''}
+                    </Text>
+                  )}
                 </FormElement>
 
                 <FormElement label="Login Provider Configuration">
