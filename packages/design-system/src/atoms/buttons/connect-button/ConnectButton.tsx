@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import { useEffect } from 'react'
 import type { ButtonProps } from '@proofzero/design-system/src/atoms/buttons/Button'
@@ -12,6 +12,7 @@ import { ConnectKitProvider, ConnectKitButton } from 'connectkit'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Popover } from '@headlessui/react'
 import { HiChevronDown, HiChevronUp } from 'react-icons/hi'
+import { ThemeContext } from '../../../contexts/theme'
 
 export const signMessageTemplate = `Welcome to Rollup!
 
@@ -93,6 +94,8 @@ export function ConnectButton({
     }
   }, [signData, isReconnecting, isConnected, connector, signMessage])
 
+  const { theme, dark } = useContext(ThemeContext)
+
   return (
     <div
       className={`box-border rounded-md shadow-sm border border-solid border-[#d1d5db] bg-white dark:bg-[#374151] dark:border-gray-600 h-[56px]`}
@@ -124,7 +127,14 @@ export function ConnectButton({
                     isConnected ? '' : 'rounded-r-md'
                   } ${
                     fullSize ? 'justify-start' : 'justify-center'
-                  } bg-white dark:bg-[#374151] dark:border-gray-600 text-[#1f2937] hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-indigo-500 truncate`}
+                  } bg-white dark:bg-[#374151] dark:border-gray-600 hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-current truncate`}
+                  style={{
+                    color: theme?.color
+                      ? dark
+                        ? theme.color.dark
+                        : theme.color.light
+                      : '#6366F1',
+                  }}
                 >
                   {(isSigning || isLoading) && isConnected ? (
                     <Spinner size={16} />

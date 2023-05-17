@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import circleLogo from './circle-logo.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
@@ -13,6 +13,8 @@ import { ConnectButton } from '../../atoms/buttons/connect-button/ConnectButton'
 import { AuthButton } from '../../molecules/auth-button/AuthButton'
 import { HiOutlineMail } from 'react-icons/hi'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
+import { ThemeContext } from '../../contexts/theme'
+import { AppTheme } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 
 export const AuthenticationConstants = {
   defaultLogoURL: circleLogo,
@@ -46,7 +48,6 @@ export type AuthenticationProps = {
   Header?: JSX.Element
   Actions?: JSX.Element
   radius?: string
-  darkMode?: boolean
 }
 
 export default ({
@@ -56,14 +57,15 @@ export default ({
   Header,
   Actions,
   radius = 'lg',
-  darkMode = false,
 }: AuthenticationProps) => {
   displayKeys = displayKeys.filter((key) =>
     AuthenticationConstants.knownKeys.includes(key)
   )
 
+  const { dark } = useContext(ThemeContext)
+
   return (
-    <div className={`relative ${darkMode ? 'dark' : ''}`}>
+    <div className={`relative ${dark ? 'dark' : ''}`}>
       <div
         className={`flex grow-0 flex-col items-center
          gap-4 mx-auto bg-white dark:bg-[#1F2937] p-6 min-h-[100dvh] lg:min-h-[675px]
@@ -167,7 +169,8 @@ const displayKeyMapper = (
     loading = false,
     flex = false,
     displayContinueWith = false,
-  }: DisplayKeyMapperArgs
+  }: DisplayKeyMapperArgs,
+  theme?: AppTheme
 ) => {
   let el
   switch (key) {
@@ -223,7 +226,8 @@ const displayKeyMapper = (
 
 const displayKeyDisplayFn = (
   displayKeys: string[],
-  mapperArgs: DisplayKeyMapperArgs
+  mapperArgs: DisplayKeyMapperArgs,
+  theme?: AppTheme
 ): JSX.Element[] => {
   const rows = []
 

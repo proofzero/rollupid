@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Avatar } from '../../atoms/profile/avatar/Avatar'
 import { Text } from '../../atoms/text/Text'
 import authorizeCheck from './authorize-check.svg'
@@ -25,6 +25,7 @@ import emailClassIcon from './email-class-icon.svg'
 import smartContractWalletClassIcon from './sc-wallet-class-icon.svg'
 import systemIdentifiersClassIcon from './system-identifiers-class-icon.svg'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
+import { ThemeContext } from '../../contexts/theme'
 
 export const scopeIcons: Record<string, string> = {
   connected_accounts: addressClassIcon,
@@ -74,9 +75,7 @@ type AuthorizationProps = {
   cancelCallback: () => void
   authorizeCallback: (scopes: string[]) => void
   disableAuthorize?: boolean
-
   radius?: string
-  darkMode?: boolean
 }
 
 export default ({
@@ -99,7 +98,6 @@ export default ({
   authorizeCallback,
   disableAuthorize = false,
   radius = 'lg',
-  darkMode = false,
 }: AuthorizationProps) => {
   const scopesToDisplay = [...requestedScope].filter((scope) => {
     return scopeMeta.scopes[scope].hidden !== true
@@ -117,8 +115,11 @@ export default ({
     }
     scopesToDisplay.unshift('system_identifiers')
   }
+
+  const { dark, theme } = useContext(ThemeContext)
+
   return (
-    <div className={`${darkMode ? 'dark' : ''}`}>
+    <div className={`${dark ? 'dark' : ''}`}>
       <div
         className={
           'flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6 lg:rounded-${radius} min-h-[100dvh] lg:min-h-[675px] max-h-[100dvh]'
