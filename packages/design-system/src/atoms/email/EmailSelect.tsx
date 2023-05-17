@@ -81,7 +81,7 @@ export const EmailSelect = ({
               items.length === 0
                 ? ''
                 : 'hover:ring-1\
-            hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500'
+            hover:ring-skin-primary focus:ring-1 focus:ring-skin-primary'
             } bg-white dark:bg-gray-800`}
           >
             {!selected && (
@@ -144,7 +144,7 @@ export const EmailSelect = ({
                           {item.email}
                         </Text>
                         {selected && (
-                          <HiCheck className="w-5 h-5 text-indigo-500" />
+                          <HiCheck className="w-5 h-5 text-skin-primary" />
                         )}
                       </div>
                     )}
@@ -175,7 +175,7 @@ export const EmailSelect = ({
                         None
                       </Text>
                       {selected && (
-                        <HiCheck className="w-5 h-5 text-indigo-500" />
+                        <HiCheck className="w-5 h-5 text-skin-primary" />
                       )}
                     </div>
                   )}
@@ -205,7 +205,7 @@ export const EmailSelect = ({
                         Connect new email address
                       </Text>
                       {selected && (
-                        <HiCheck className="w-5 h-5 text-indigo-500" />
+                        <HiCheck className="w-5 h-5 text-skin-primary" />
                       )}
                     </div>
                   )}
