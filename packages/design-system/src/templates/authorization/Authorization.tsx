@@ -24,6 +24,7 @@ import addressClassIcon from './connected-addresses-class-icon.svg'
 import emailClassIcon from './email-class-icon.svg'
 import smartContractWalletClassIcon from './sc-wallet-class-icon.svg'
 import systemIdentifiersClassIcon from './system-identifiers-class-icon.svg'
+import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 
 export const scopeIcons: Record<string, string> = {
   connected_accounts: addressClassIcon,
@@ -116,7 +117,7 @@ export default ({
       className={'flex flex-col gap-4 basis-96 m-auto bg-white p-6'}
       style={{
         width: 418,
-        height: 598,
+        height: 675,
         border: '1px solid #D1D5DB',
         boxSizing: 'border-box',
         borderRadius: 8,
@@ -127,7 +128,7 @@ export default ({
           src={userProfile.pfpURL}
           hex={false}
           size={'sm'}
-          // alt="User Profile"
+        // alt="User Profile"
         />
         <img src={authorizeCheck} alt="Authorize Check" />
         <Avatar src={appProfile.iconURL} size={'sm'} />
@@ -302,6 +303,7 @@ export default ({
               rollup.id
             </a>
           </Text>
+          <TosAndPPol />
         </div>
       </div>
     </div>

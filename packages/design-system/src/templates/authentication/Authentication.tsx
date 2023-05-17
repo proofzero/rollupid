@@ -12,6 +12,7 @@ import ConnectOAuthButton, {
 import { ConnectButton } from '../../atoms/buttons/connect-button/ConnectButton'
 import { AuthButton } from '../../molecules/auth-button/AuthButton'
 import { HiOutlineMail } from 'react-icons/hi'
+import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 
 export const AuthenticationConstants = {
   defaultLogoURL: circleLogo,
@@ -60,7 +61,10 @@ export default ({
   return (
     <div className="relative">
       <div
-        className={`relative flex shrink grow-0 flex-col items-center gap-4 mx-auto bg-white p-6 min-h-[100dvh] lg:min-h-[675px] max-h-[100dvh] w-full lg:w-[418px] lg:rounded-lg overflow-auto`}
+        className={`flex grow-0 flex-col items-center
+         gap-4 mx-auto bg-white p-6 min-h-[100dvh] lg:min-h-[675px]
+          max-h-[100dvh] w-full lg:w-[418px] lg:rounded-lg
+          mt-auto`}
         style={{
           border: '1px solid #D1D5DB',
           boxSizing: 'border-box',
@@ -120,6 +124,7 @@ export default ({
               rollup.id
             </a>
           </Text>
+          <TosAndPPol />
         </div>
       </div>
     </div>
@@ -150,10 +155,10 @@ const displayKeyMapper = (
     clientId,
     wagmiClient,
     signData,
-    walletConnectCallback = () => {},
-    walletSignCallback = () => {},
-    walletConnectErrorCallback = () => {},
-    navigate = () => {},
+    walletConnectCallback = () => { },
+    walletSignCallback = () => { },
+    walletConnectErrorCallback = () => { },
+    navigate = () => { },
     FormWrapperEl = ({ children }) => <>{children}</>,
     loading = false,
     flex = false,

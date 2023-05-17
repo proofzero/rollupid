@@ -10,6 +10,7 @@ import {
 
 import { SmartContractWalletCreationSummary } from '@proofzero/design-system/src/molecules/smart-contract-wallet-connection/SmartContractWalletConnection'
 import { Text } from '@proofzero/design-system'
+import { TosAndPPol } from "@proofzero/design-system/src/atoms/info/TosAndPPol"
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
@@ -102,6 +103,7 @@ export default () => {
                 rollup.id
               </a>
             </Text>
+            <TosAndPPol />
           </div>
         </div>
       </div>
