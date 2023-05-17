@@ -8,16 +8,26 @@ import { usePopper } from 'react-popper'
 export const TosAndPPol = () => {
     let [referenceElement, setReferenceElement] = useState(null)
     let [popperElement, setPopperElement] = useState(null)
-    let { styles, attributes } = usePopper(referenceElement, popperElement)
+    let [arrowElement, setArrowElement] = useState<HTMLElement | null>(null);
+    let { styles, attributes } = usePopper(referenceElement, popperElement,
+        {
+            modifiers: [
+                {
+                    name: 'arrow',
+                    options: {
+                        element: arrowElement,
+                    },
+                },
+            ]
+        })
 
 
     return (
         <Popover className="ring-white h-4 w-4 flex items-center">
-            <Popover.Button className="bg-white text-black z-999 w-max ring-white"
-                ref={setReferenceElement}>
+            < Popover.Button className="bg-white text-black z-999 w-max ring-white"
+                ref={setReferenceElement} >
                 <img src={iIcon} alt="info" />
-            </Popover.Button>
-            <div data-popper-arrow></div>
+            </Popover.Button >
             <Transition
                 as={Fragment}
                 enter="transition ease-out duration-200"
@@ -28,6 +38,7 @@ export const TosAndPPol = () => {
                 leaveTo="opacity-0 translate-y-1"
             >
                 <Popover.Panel
+                    id="popover"
                     ref={setPopperElement}
                     style={styles.popper}
                     {...attributes.popper}
@@ -36,7 +47,7 @@ export const TosAndPPol = () => {
                     <Text size="base" weight='medium' className='mt-3'>
                         What is Rollup ID?
                     </Text>
-                    <div id="arrow" style={styles.arrow} data-popper-arrow></div>
+                    <div id="arrow" style={styles.arrow} ref={setArrowElement} data-popper-arrow></div>
                     <Text size="sm" className='text-gray-500 mt-2 mb-4'>
                         Rollup ID is a user management platform designed to
                         <strong className='font-semibold'> prioritize privacy, security, and ease of use</strong>.

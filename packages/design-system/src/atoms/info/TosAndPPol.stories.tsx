@@ -8,7 +8,7 @@ export default {
 
 const Template = (args) => (
     <>
-        <div className='' />
+        <div className='pb-64' />
         <TosAndPPol {...args} />
     </>
 
