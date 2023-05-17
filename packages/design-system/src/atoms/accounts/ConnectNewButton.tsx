@@ -15,7 +15,7 @@ export const ConnectNewAccountButton = ({
     <Button
       btnType="secondary-alt"
       onClick={onConnectNew}
-      className={`w-full flex flex-row items-center gap-3 justify-center p-2 ${className}`}
+      className={`w-full flex flex-row items-center gap-3 justify-center p-2 ${className} dark:text-white`}
     >
       <TbCirclePlus size={18} />
       {phrase}

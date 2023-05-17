@@ -165,7 +165,11 @@ export default ({
                   className={'flex flex-row gap-2 items-center w-full'}
                 >
                   <div className="flex flex-row w-full gap-2 items-center">
-                    <img src={scopeIcons[scope]} alt={`${scope} Icon`} />
+                    <img
+                      src={scopeIcons[scope]}
+                      alt={`${scope} Icon`}
+                      className="text-white"
+                    />
 
                     {(scope === 'profile' ||
                       scope === 'system_identifiers') && (
@@ -257,7 +261,9 @@ export default ({
                           </h3>
                         </div>
                         <div className="px-3 py-2">
-                          <p>{scopeMeta.scopes[scope].description}</p>
+                          <p className="dark:text-white">
+                            {scopeMeta.scopes[scope].description}
+                          </p>
                         </div>
                         <div data-popper-arrow></div>
                       </div>
@@ -293,13 +299,14 @@ export default ({
                   btnSize="xl"
                   btnType="primary-alt"
                   disabled={disableAuthorize}
+                  className="dark:bg-gray-800 dark:border dark:border-gray-700"
                   onClick={() => {
                     authorizeCallback(requestedScope)
                   }}
                 >
                   <Text
                     weight="medium"
-                    className="truncate text-gray-800 dark:text-white"
+                    className="truncate text-gray-800 dark:text-gray-600"
                   >
                     Continue
                   </Text>

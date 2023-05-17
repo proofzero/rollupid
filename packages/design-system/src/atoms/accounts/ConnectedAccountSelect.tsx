@@ -68,38 +68,47 @@ export const ConnectedAccountSelect = ({
     >
       {({ open }) => (
         <div className="relative select-none">
-          <Listbox.Button className="border shadow-sm rounded-lg w-full transition-transform flex flex-row justify-between items-center py-2 px-3 hover:ring-1 hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white">
+          <Listbox.Button className="border dark:border-gray-600 shadow-sm rounded-lg w-full transition-transform flex flex-row justify-between items-center py-2 px-3 hover:ring-1 hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-gray-800">
             {(!selectedAccounts || selectedAccounts.length === 0) &&
               !allConnectedAccountsSelected && (
                 <Text
                   size="sm"
-                  className="text-gray-800 truncate text-ellipsis"
+                  className="text-gray-800 dark:text-white truncate text-ellipsis"
                 >
                   No connected account(s)
                 </Text>
               )}
 
             {selectedAccounts?.length === 1 && !allConnectedAccountsSelected && (
-              <Text size="sm" className="text-gray-800 truncate text-ellipsis">
+              <Text
+                size="sm"
+                className="text-gray-800 dark:text-white truncate text-ellipsis"
+              >
                 {selectedAccounts[0].title}
               </Text>
             )}
             {selectedAccounts?.length > 1 && !allConnectedAccountsSelected && (
-              <Text size="sm" className="text-gray-800 truncate text-ellipsis">
+              <Text
+                size="sm"
+                className="text-gray-800 dark:text-white truncate text-ellipsis"
+              >
                 {selectedAccounts.length} accounts selected
               </Text>
             )}
 
             {allConnectedAccountsSelected && (
-              <Text size="sm" className="text-gray-800 truncate text-ellipsis">
+              <Text
+                size="sm"
+                className="text-gray-800 dark:text-white truncate text-ellipsis"
+              >
                 All connected accounts
               </Text>
             )}
 
             {open ? (
-              <ChevronUpIcon className="w-5 h-5 shrink-0" />
+              <ChevronUpIcon className="w-5 h-5 shrink-0 dark:text-white" />
             ) : (
-              <ChevronDownIcon className="w-5 h-5 shrink-0" />
+              <ChevronDownIcon className="w-5 h-5 shrink-0 dark:text-white" />
             )}
           </Listbox.Button>
 
@@ -109,7 +118,7 @@ export const ConnectedAccountSelect = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="border shadow-lg rounded-lg absolute w-full mt-1 bg-white space-y-3 z-10">
+            <Listbox.Options className="border dark:border-gray-600 shadow-lg rounded-lg absolute w-full mt-1 bg-white dark:bg-gray-800 space-y-3 z-10">
               <div
                 className="flex flex-row space-x-2 cursor-pointer items-center px-4 pt-3"
                 onClick={() =>
@@ -128,7 +137,7 @@ export const ConnectedAccountSelect = ({
                   <Text
                     size="sm"
                     weight="medium"
-                    className="text-gray-900 truncate text-ellipsis"
+                    className="text-gray-900 dark:text-white truncate text-ellipsis"
                   >
                     All connected accounts
                   </Text>
@@ -166,7 +175,7 @@ export const ConnectedAccountSelect = ({
                           allConnectedAccountsSelected
                             ? 'text-gray-400'
                             : 'text-gray-900'
-                        }`}
+                        } dark:text-white`}
                       >
                         {account.title}
                       </Text>
