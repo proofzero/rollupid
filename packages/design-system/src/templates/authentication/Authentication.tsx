@@ -59,7 +59,7 @@ export default ({
   )
 
   return (
-    <div className="">
+    <div className="relative">
       <div
         className={`flex grow-0 flex-col items-center
          gap-4 mx-auto bg-white p-6 min-h-[100dvh] lg:min-h-[675px]
