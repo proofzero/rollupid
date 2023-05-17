@@ -36,6 +36,7 @@ export const TosAndPPol = () => {
                     <Text size="base" weight='medium' className='mt-3'>
                         What is Rollup ID?
                     </Text>
+                    <div id="arrow" style={styles.arrow} data-popper-arrow></div>
                     <Text size="sm" className='text-gray-500 mt-2 mb-4'>
                         Rollup ID is a user management platform designed to
                         <strong className='font-semibold'> prioritize privacy, security, and ease of use</strong>.
