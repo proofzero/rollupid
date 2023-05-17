@@ -149,6 +149,7 @@ export default function AppDetailIndexPage() {
                 context={{
                   notificationHandler: notify,
                   appDetails,
+                  avatarUrl,
                   rotationResult,
                   PASSPORT_URL,
                   appContactAddress,
