@@ -282,6 +282,9 @@ export const action: ActionFunction = async ({ request, params, context }) => {
   const colorDark = fd.get('color-dark') as string
   const graphicURL = fd.get('image') as string
 
+  const providersJSON = fd.get('providers') as string
+  const providers = JSON.parse(providersJSON)
+
   const theme: AppTheme = {
     heading,
     radius,
@@ -290,6 +293,7 @@ export const action: ActionFunction = async ({ request, params, context }) => {
       dark: colorDark,
     },
     graphicURL,
+    providers,
   }
 
   await starbaseClient.setAppTheme.mutate({
@@ -599,6 +603,12 @@ export default () => {
                 </FormElement>
 
                 <FormElement label="Login Provider Configuration">
+                  <input
+                    type="hidden"
+                    name="providers"
+                    value={JSON.stringify(providers)}
+                  />
+
                   <Button
                     btnType="secondary-alt"
                     className="flex flex-row items-center gap-2.5"
@@ -754,7 +764,11 @@ export default () => {
                         <div
                           className={`w-2 h-2 rounded-full`}
                           style={{
-                            backgroundColor: selected ? color.light : '#E5E7EB',
+                            backgroundColor: selected
+                              ? theme === 'light'
+                                ? color.light
+                                : color.dark
+                              : '#E5E7EB',
                           }}
                         ></div>
                       )}
@@ -765,7 +779,11 @@ export default () => {
                         <div
                           className={`w-2 h-2 rounded-full`}
                           style={{
-                            backgroundColor: selected ? color.dark : '#E5E7EB',
+                            backgroundColor: selected
+                              ? theme === 'light'
+                                ? color.light
+                                : color.dark
+                              : '#E5E7EB',
                           }}
                         ></div>
                       )}
