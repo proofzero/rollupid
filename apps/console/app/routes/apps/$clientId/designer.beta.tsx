@@ -41,6 +41,7 @@ import {
 } from '@proofzero/types/address'
 import { TbMoon, TbSunHigh } from 'react-icons/tb'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
+import { Helmet } from 'react-helmet'
 
 const client = createClient(
   // @ts-ignore
@@ -348,17 +349,33 @@ export default () => {
   const [dark, setDark] = useState<boolean>(false)
   const toggleDark = () => setDark(!dark)
 
+  const getRGBColor = (hex: string, type: string) => {
+    let color = hex.replace(/#/g, '')
+    // rgb values
+    var r = parseInt(color.substr(0, 2), 16)
+    var g = parseInt(color.substr(2, 2), 16)
+    var b = parseInt(color.substr(4, 2), 16)
+
+    return `--color-${type}: ${r}, ${g}, ${b};`
+  }
+
   return (
     <>
-      {loading && <Loader />}
+      <Helmet>
+        <style type="text/css">{`
+            :root {
+                ${getRGBColor(dark ? color.dark : color.light, 'primary')}   
+             {
+         `}</style>
+      </Helmet>
 
+      {loading && <Loader />}
       <ProviderModal
         providers={providers}
         isOpen={providerModalOpen}
         handleClose={() => setProviderModalOpen(false)}
         saveCallback={setProviders}
       />
-
       <Form method="post">
         <section className="flex flex-row items-center justify-between mb-11">
           <div className="flex flex-row items-center space-x-3">

@@ -24,8 +24,6 @@ export function Button({
   children,
   ...rest
 }: ButtonProps) {
-  const { theme, dark } = useContext(ThemeContext)
-
   const sizeClasses: string = sizeToSizesDict[btnSize]
   const colorClasses: string = typeToColorsDict[btnType]
 
@@ -38,13 +36,6 @@ export function Button({
         disabled ? disabledColorClasses : colorClasses,
         className
       )}
-      style={{
-        color: theme?.color
-          ? dark
-            ? theme.color.dark
-            : theme.color.light
-          : '#6366F1',
-      }}
       {...rest}
     >
       {children}

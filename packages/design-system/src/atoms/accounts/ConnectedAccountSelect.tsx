@@ -68,7 +68,7 @@ export const ConnectedAccountSelect = ({
     >
       {({ open }) => (
         <div className="relative select-none">
-          <Listbox.Button className="border dark:border-gray-600 shadow-sm rounded-lg w-full transition-transform flex flex-row justify-between items-center py-2 px-3 hover:ring-1 hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-gray-800">
+          <Listbox.Button className="border dark:border-gray-600 shadow-sm rounded-lg w-full transition-transform flex flex-row justify-between items-center py-2 px-3 hover:ring-1 hover:ring-skin-primary focus:ring-1 focus:ring-skin-primary bg-white dark:bg-gray-800">
             {(!selectedAccounts || selectedAccounts.length === 0) &&
               !allConnectedAccountsSelected && (
                 <Text
@@ -129,7 +129,7 @@ export const ConnectedAccountSelect = ({
                   <input
                     readOnly
                     type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 bg-gray-50 text-indigo-500 focus:ring-indigo-500"
+                    className="h-4 w-4 rounded border-gray-300 bg-gray-50 text-skin-primary focus:ring-skin-primary"
                     checked={allConnectedAccountsSelected}
                   />
                 </div>
@@ -158,7 +158,7 @@ export const ConnectedAccountSelect = ({
                       <input
                         readOnly
                         type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 bg-gray-50 text-indigo-500 focus:ring-indigo-500"
+                        className="h-4 w-4 rounded border-gray-300 bg-gray-50 text-skin-primary focus:ring-skin-primary"
                         checked={
                           !allConnectedAccountsSelected &&
                           selectedAccounts

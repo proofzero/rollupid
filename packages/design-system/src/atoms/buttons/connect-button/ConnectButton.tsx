@@ -127,14 +127,7 @@ export function ConnectButton({
                     isConnected ? '' : 'rounded-r-md'
                   } ${
                     fullSize ? 'justify-start' : 'justify-center'
-                  } bg-white dark:bg-[#374151] dark:border-gray-600 hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-current truncate`}
-                  style={{
-                    color: theme?.color
-                      ? dark
-                        ? theme.color.dark
-                        : theme.color.light
-                      : '#6366F1',
-                  }}
+                  } bg-white dark:bg-[#374151] dark:border-gray-600 hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-skin-primary truncate`}
                 >
                   {(isSigning || isLoading) && isConnected ? (
                     <Spinner size={16} />
