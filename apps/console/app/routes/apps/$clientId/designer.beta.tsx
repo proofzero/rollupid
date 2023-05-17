@@ -620,7 +620,7 @@ export default () => {
                 </div>
 
                 <Tab.Group>
-                  <Tab.Panels className="pointer-events-none">
+                  <Tab.Panels className="pointer-events-auto">
                     <Tab.Panel>
                       <Authentication
                         Header={
@@ -672,12 +672,7 @@ export default () => {
                           privacyURL: 'foo',
                           termsURL: 'bar',
                         }}
-                        requestedScope={[
-                          'openid',
-                          'profile',
-                          'connected_accounts',
-                          'email',
-                        ]}
+                        requestedScope={['email', 'connected_accounts']}
                         scopeMeta={{
                           scopes: SCOPES_JSON,
                         }}
