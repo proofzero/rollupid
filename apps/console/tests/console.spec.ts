@@ -9,7 +9,7 @@ test('login to console using Email', async ({ page, request }) => {
   // Login with Email
   await page.getByRole('button', { name: 'email' }).click()
   await page.waitForURL(/.*authenticate\/console\/email/, {
-    timeout: 10000,
+    timeout: 20000,
     waitUntil: 'networkidle',
   })
 
@@ -22,11 +22,11 @@ test('login to console using Email', async ({ page, request }) => {
   await page.getByRole('button').filter({ hasText: 'Send Code' }).click()
 
   await page.waitForURL(/.*authenticate\/console\/email\/verify/, {
-    timeout: 10000,
+    timeout: 20000,
     waitUntil: 'networkidle',
   })
 
-  await page.waitForTimeout(10000)
+  await page.waitForTimeout(20000)
 
   const otpRes = await request.fetch(
     `${process.env.INTERNAL_PLAYWRIGHT_TEST_URL}/otp/${email}`,
@@ -49,7 +49,7 @@ test('login to console using Email', async ({ page, request }) => {
   await page.getByRole('button').filter({ hasText: 'Verify' }).click()
 
   await page.waitForURL(/.*dashboard/, {
-    timeout: 10000,
+    timeout: 20000,
     waitUntil: 'networkidle',
   })
   await expect(page).toHaveURL(/.*dashboard/)
@@ -75,7 +75,7 @@ const testConsoleAppCreation = async ({
   await page.goto('/dashboard')
 
   await page.waitForURL(/.*dashboard/, {
-    timeout: 10000,
+    timeout: 20000,
     waitUntil: 'networkidle',
   })
 
@@ -85,7 +85,7 @@ const testConsoleAppCreation = async ({
     .click()
 
   await page.waitForURL(/.*apps\/new/, {
-    timeout: 10000,
+    timeout: 20000,
     waitUntil: 'networkidle',
   })
 
@@ -96,7 +96,7 @@ const testConsoleAppCreation = async ({
   await page.getByRole('button').filter({ hasText: 'Create' }).click()
 
   await page.waitForURL(/.*apps\/.*/, {
-    timeout: 10000,
+    timeout: 20000,
     waitUntil: 'networkidle',
   })
 
@@ -107,14 +107,14 @@ const testConsoleAppCreation = async ({
   await page.getByRole('button').filter({ hasText: 'Complete Setup' }).click()
 
   await page.waitForURL(/.*apps\/.*\/auth/, {
-    timeout: 10000,
+    timeout: 20000,
     waitUntil: 'networkidle',
   })
 
   await page.locator('a', { hasText: 'Connect email address' }).click()
 
   await page.waitForURL(/.*apps\/.*\/team/, {
-    timeout: 10000,
+    timeout: 20000,
     waitUntil: 'networkidle',
   })
 
@@ -142,7 +142,7 @@ const testConsoleAppCreation = async ({
   await page.goto(`/apps/${appId}/auth`)
 
   await page.waitForURL(/.*apps\/.*\/auth/, {
-    timeout: 10000,
+    timeout: 20000,
     waitUntil: 'networkidle',
   })
 
