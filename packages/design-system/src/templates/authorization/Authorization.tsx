@@ -117,7 +117,7 @@ export default ({
       className={'flex flex-col gap-4 basis-96 m-auto bg-white p-6'}
       style={{
         width: 418,
-        height: 598,
+        height: 675,
         border: '1px solid #D1D5DB',
         boxSizing: 'border-box',
         borderRadius: 8,
