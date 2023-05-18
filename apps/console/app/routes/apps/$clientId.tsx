@@ -143,7 +143,7 @@ export default function AppDetailIndexPage() {
                     max-lg:h-[calc(100dvh-80px)]\
                     min-h-[636px]'
                   : 'h-full '
-              } py-9 sm:mx-11`}
+              } py-9 sm:mx-11 max-w-[1636px]`}
             >
               <Outlet
                 context={{
