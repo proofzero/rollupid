@@ -28,7 +28,7 @@ const plugins = [
           name: 'X-GALAXY-API-KEY',
           description: 'Galaxy API Key',
         },
-        bearerAuthorization: {
+        Authorization: {
           type: 'http',
           scheme: 'bearer',
         },
@@ -38,7 +38,7 @@ const plugins = [
     swaggerUIEndpoint: '/swagger',
     info: {
       title: 'Galaxy API',
-      version: '0.0.1',
+      version: '0.1',
     },
   }),
 ]
