@@ -10,6 +10,7 @@ import { formatError } from '@proofzero/utils/yoga'
 
 import Env from './env'
 import schema from './schema'
+import { AppAPIKeyHeader } from '@proofzero/types/headers'
 
 export type GalaxyServerContext = {
   env: Env
@@ -20,6 +21,21 @@ export type GalaxyServerContext = {
 const plugins = [
   useSofaWithSwaggerUI({
     servers: [{ url: 'https://galaxy.rollup.id', description: 'Production' }],
+    components: {
+      securitySchemes: {
+        galaxyApiKey: {
+          type: 'apiKey',
+          in: 'header',
+          name: 'X-GALAXY-API-KEY',
+        },
+        bearerAuthorization: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          name: 'Authorization',
+        },
+      },
+    },
     basePath: '/rest',
     swaggerUIEndpoint: '/swagger',
     info: {
