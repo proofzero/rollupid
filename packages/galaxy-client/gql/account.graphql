@@ -1,4 +1,4 @@
-query getProfile($targetAccountURN: URN) {
+query getProfile($targetAccountURN: String) {
   profile(targetAccountURN: $targetAccountURN) {
     pfp {
       ... on StandardPFP {
@@ -13,7 +13,7 @@ query getProfile($targetAccountURN: URN) {
   }
 }
 
-query getConnectedAddresses($targetAccountURN: URN) {
+query getConnectedAddresses($targetAccountURN: String) {
   addresses: connectedAddresses(targetAccountURN: $targetAccountURN) {
     baseUrn
     qc
@@ -30,6 +30,6 @@ query getAuthorizedApps {
   }
 }
 
-mutation disconnectAddress($addressURN: URN!) {
+mutation disconnectAddress($addressURN: String!) {
   disconnectAddress(addressURN: $addressURN)
 }
