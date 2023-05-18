@@ -1,7 +1,7 @@
 ---
 title: Create an application
 excerpt: Step-by-step guide to creating a Rollup application.
-category: 64663981b01e1915fdf2a26e
+category: 646678658d8a8b006dffd000
 ---
 
 # Create an application

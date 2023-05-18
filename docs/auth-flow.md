@@ -1,7 +1,7 @@
 ---
 title: Auth Flow
 excerpt: Authenticating and authorizing users into your application.
-category: 64663981b01e1915fdf2a26e
+category: 646678658d8a8b006dffd000
 ---
 
 # Logging in Users
