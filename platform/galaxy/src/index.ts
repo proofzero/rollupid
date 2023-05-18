@@ -30,6 +30,7 @@ const plugins = [
         bearerAuthorization: {
           type: 'http',
           scheme: 'bearer',
+          in: 'header',
           bearerFormat: 'JWT',
           name: 'Authorization',
         },
