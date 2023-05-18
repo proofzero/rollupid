@@ -19,6 +19,7 @@ export type GalaxyServerContext = {
 
 const plugins = [
   useSofaWithSwaggerUI({
+    servers: [{ url: 'https://galaxy.rollup.id', description: 'Production' }],
     basePath: '/rest',
     swaggerUIEndpoint: '/swagger',
     info: {
