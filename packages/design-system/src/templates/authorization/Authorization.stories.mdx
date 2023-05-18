@@ -1,6 +1,6 @@
 import { Canvas, Meta, Story } from '@storybook/addon-docs'
 
-import Authorization, { scopeIcons } from './Authorization'
+import Authorization from './Authorization'
 
 import subtractLogo from '../../assets/subtract-logo.svg'
 
@@ -31,7 +31,6 @@ export const Template = (args) => (
     scopeMeta={{
       scopes: SCOPES_JSON,
     }}
-    scopeIcons={scopeIcons}
     connectedEmails={[
       {
         email: 'email@example.com',

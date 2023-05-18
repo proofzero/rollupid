@@ -38,9 +38,7 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { GetAppThemeResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppTheme'
-import Authorization, {
-  scopeIcons,
-} from '@proofzero/design-system/src/templates/authorization/Authorization'
+import Authorization from '@proofzero/design-system/src/templates/authorization/Authorization'
 import { SCOPES_JSON } from '@proofzero/security/scopes'
 import {
   CryptoAddressType,
@@ -796,7 +794,6 @@ export default () => {
                           scopeMeta={{
                             scopes: SCOPES_JSON,
                           }}
-                          scopeIcons={scopeIcons}
                           connectedEmails={[
                             {
                               email: 'email@example.com',

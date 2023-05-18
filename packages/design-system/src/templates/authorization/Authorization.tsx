@@ -18,22 +18,9 @@ import { GetAddressProfileResult } from '@proofzero/platform/address/src/jsonrpc
 import { AuthorizationControlSelection } from '@proofzero/types/application'
 import { AddressURN } from '@proofzero/urns/address'
 import { ScopeDescriptor } from '@proofzero/security/scopes'
-
-import profileClassIcon from './profile-class-icon.svg'
-import addressClassIcon from './connected-addresses-class-icon.svg'
-import emailClassIcon from './email-class-icon.svg'
-import smartContractWalletClassIcon from './sc-wallet-class-icon.svg'
-import systemIdentifiersClassIcon from './system-identifiers-class-icon.svg'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import { ThemeContext } from '../../contexts/theme'
-
-export const scopeIcons: Record<string, string> = {
-  connected_accounts: addressClassIcon,
-  profile: profileClassIcon,
-  email: emailClassIcon,
-  erc_4337: smartContractWalletClassIcon,
-  system_identifiers: systemIdentifiersClassIcon,
-}
+import ScopeIcon from './ScopeIcon'
 
 type UserProfile = {
   pfpURL: string
@@ -54,7 +41,6 @@ type AuthorizationProps = {
 
   requestedScope: string[]
   scopeMeta: ScopeMeta
-  scopeIcons: Record<string, string>
 
   transitionState: 'idle' | 'submitting' | 'loading'
 
@@ -83,7 +69,6 @@ export default ({
   appProfile,
   requestedScope,
   scopeMeta,
-  scopeIcons,
   transitionState,
   connectedSmartContractWallets,
   addNewSmartWalletCallback,
@@ -166,11 +151,7 @@ export default ({
                   className={'flex flex-row gap-2 items-center w-full'}
                 >
                   <div className="flex flex-row w-full gap-2 items-center">
-                    <img
-                      src={scopeIcons[scope]}
-                      alt={`${scope} Icon`}
-                      className="text-white"
-                    />
+                    <ScopeIcon scope={scope} />
 
                     {(scope === 'profile' ||
                       scope === 'system_identifiers') && (
