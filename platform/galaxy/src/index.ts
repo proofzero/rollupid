@@ -10,7 +10,6 @@ import { formatError } from '@proofzero/utils/yoga'
 
 import Env from './env'
 import schema from './schema'
-import { AppAPIKeyHeader } from '@proofzero/types/headers'
 
 export type GalaxyServerContext = {
   env: Env
