@@ -1,5 +1,7 @@
 ---
-description: Using Galaxy to access the user profile graph.
+title: Accessing the profile API
+excerpt: Using Galaxy to access the user profile graph.
+category: 64663981b01e1915fdf2a26e
 ---
 
 # Accessing Profile API

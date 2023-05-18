@@ -1,5 +1,5 @@
 ---
-title: Syncing Docs via CLI / GitHub
+title: How it works
 excerpt: Concepts Overview of the Rollup Identity Graph
 category: 64663981b01e1915fdf2a26e
 ---

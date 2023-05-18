@@ -1,5 +1,7 @@
 ---
-description: Authenticating and authorizing users into your application.
+title: Auth Flow
+excerpt: Authenticating and authorizing users into your application.
+category: 64663981b01e1915fdf2a26e
 ---
 
 # Logging in Users
@@ -42,9 +44,9 @@ Your Redirect URL should be ready to accept an exchange token and state paramete
 // https://<redirect_url>?code=<exchange code>&state=<state>
 ```
 
-* **Code**: the exchange code needed request an access token
-* **State:** this state should match the state you created for the user/client in Step 1. _Typically your chosen OAuth library will manage this for you._
-* **Redirect URL**: the redirect url set in your app in the [previous step](create-an-application.md). _For development, "localhost" is an accepted redirect url host._
+- **Code**: the exchange code needed request an access token
+- **State:** this state should match the state you created for the user/client in Step 1. _Typically your chosen OAuth library will manage this for you._
+- **Redirect URL**: the redirect url set in your app in the [previous step](create-an-application.md). _For development, "localhost" is an accepted redirect url host._
 
 Ensure the state parameter matches the state you sent when initiating the auth flow in Step 1. This security measure helps prevent replay attacks. Send the exchange code along with the Client Secret and **grant type** to Passport's token endpoint (see below) to receive the access token, refresh token, and minimal user profile (encoded in an ID token) as base64-encoded signed JWTs, completing the flow.
 
@@ -68,12 +70,13 @@ Appication client secret
 {% endswagger-parameter %}
 
 {% swagger-parameter in="body" name="grant_type" type="String" required="true" %}
-"authorization\_code" or
+"authorization_code" or
 
-"refresh\_token"
+"refresh_token"
 {% endswagger-parameter %}
 
 {% swagger-response status="201: Created" description="" %}
+
 ```javascript
 {
     access_token: "ey....",
@@ -82,12 +85,13 @@ Appication client secret
     id_token: "ey....",
 }
 ```
+
 {% endswagger-response %}
 {% endswagger %}
 
 #### Access Token
 
-Access tokens are valid for 1 hour, with the expiry time stored in the "exp" property in the JWT. Refresh tokens, on the other hand, are valid for 90 days and can be used to request another access token using the same exchange code endpoint with the "refresh\_token" grant type.
+Access tokens are valid for 1 hour, with the expiry time stored in the "exp" property in the JWT. Refresh tokens, on the other hand, are valid for 90 days and can be used to request another access token using the same exchange code endpoint with the "refresh_token" grant type.
 
 {% hint style="info" %}
 There are multiple ways to manage this refresh flow, [here](../../apps/profile/app/utils/session.server.tsx#L52) is our reference implementation. In summary, we store the tokens encrypted in a user cookie that is valid for 90 days and refresh when needed.\
