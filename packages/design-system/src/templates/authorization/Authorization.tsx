@@ -257,7 +257,23 @@ export default ({
           </ul>
         </div>
 
-        <TosAndPPol />
+        {(appProfile?.termsURL || appProfile?.privacyURL) && (
+          <Text size="sm" className="text-gray-500 mt-7">
+            Before using this app, you can review{' '}
+            {appProfile?.name ?? `Company`}
+            's{' '}
+            <a href={appProfile.privacyURL} className="text-skin-primary">
+              privacy policy
+            </a>
+            {appProfile?.termsURL && appProfile?.privacyURL && (
+              <span> and </span>
+            )}
+            <a href={appProfile.termsURL} className="text-skin-primary">
+              terms of service
+            </a>
+            .
+          </Text>
+        )}
 
         <div className="flex flex-col w-full items-center justify-center mt-auto">
           <div
@@ -305,6 +321,7 @@ export default ({
                 rollup.id
               </a>
             </Text>
+            <TosAndPPol />
           </div>
         </div>
       </div>
