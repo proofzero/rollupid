@@ -1,6 +1,6 @@
 export default /* GraphQL */ `
   type AddressProfile {
-    id: URN!
+    id: String!
     type: String
     address: String
     title: String
@@ -8,18 +8,18 @@ export default /* GraphQL */ `
   }
 
   input ConnectedAddressPropertiesUpdateInput {
-    addressURN: URN!
+    addressURN: String!
     public: Boolean
   }
 
   type Query {
-    accountFromAlias(provider: String!, alias: String!): URN!
-    addressProfile(addressURN: URN!): AddressProfile!
-    addressProfiles(addressURNList: [URN!]): [AddressProfile!]!
+    accountFromAlias(provider: String!, alias: String!): String!
+    addressProfile(addressURN: String!): AddressProfile!
+    addressProfiles(addressURNList: [String!]): [AddressProfile!]!
   }
 
   type Mutation {
-    updateAddressNickname(addressURN: URN!, nickname: String!): Boolean
+    updateAddressNickname(addressURN: String!, nickname: String!): Boolean
     updateConnectedAddressesProperties(
       addressURNList: [ConnectedAddressPropertiesUpdateInput!]!
     ): Boolean

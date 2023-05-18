@@ -33,12 +33,12 @@ export default /* GraphQL */ `
   }
 
   type Query {
-    profile(targetAccountURN: URN): Profile
-    connectedAddresses(targetAccountURN: URN): [Node!]
+    profile(targetAccountURN: String): Profile
+    connectedAddresses(targetAccountURN: String): [Node!]
     authorizedApps: [App]
   }
 
   type Mutation {
-    disconnectAddress(addressURN: URN!): Boolean
+    disconnectAddress(addressURN: String!): Boolean
   }
 `

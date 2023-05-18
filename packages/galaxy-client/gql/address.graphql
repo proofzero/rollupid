@@ -1,4 +1,4 @@
-query getAddressProfile($addressURN: URN!) {
+query getAddressProfile($addressURN: String!) {
   addressProfile(addressURN: $addressURN) {
     id
     type
@@ -8,7 +8,7 @@ query getAddressProfile($addressURN: URN!) {
   }
 }
 
-query getAddressProfiles($addressURNList: [URN!]) {
+query getAddressProfiles($addressURNList: [String!]) {
   addressProfiles(addressURNList: $addressURNList) {
     id
     type
@@ -22,7 +22,7 @@ query getAccountUrnFromAlias($provider: String!, $alias: String!) {
   accountFromAlias(provider: $provider, alias: $alias)
 }
 
-mutation updateAddressNickname($addressURN: URN!, $nickname: String!) {
+mutation updateAddressNickname($addressURN: String!, $nickname: String!) {
   updateAddressNickname(addressURN: $addressURN, nickname: $nickname)
 }
 

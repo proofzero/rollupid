@@ -14,14 +14,13 @@ export type Scalars = {
   Int: number;
   Float: number;
   JSON: any;
-  URN: any;
 };
 
 export type AddressProfile = {
   __typename?: 'AddressProfile';
   address?: Maybe<Scalars['String']>;
   icon?: Maybe<Scalars['String']>;
-  id: Scalars['URN'];
+  id: Scalars['String'];
   title?: Maybe<Scalars['String']>;
   type?: Maybe<Scalars['String']>;
 };
@@ -35,7 +34,7 @@ export type App = {
 };
 
 export type ConnectedAddressPropertiesUpdateInput = {
-  addressURN: Scalars['URN'];
+  addressURN: Scalars['String'];
   public?: InputMaybe<Scalars['Boolean']>;
 };
 
@@ -57,7 +56,7 @@ export type Mutation = {
 
 
 export type MutationDisconnectAddressArgs = {
-  addressURN: Scalars['URN'];
+  addressURN: Scalars['String'];
 };
 
 
@@ -73,7 +72,7 @@ export type MutationRevokeAppAuthorizationArgs = {
 
 
 export type MutationUpdateAddressNicknameArgs = {
-  addressURN: Scalars['URN'];
+  addressURN: Scalars['String'];
   nickname: Scalars['String'];
 };
 
@@ -121,7 +120,7 @@ export type ProfileInput = {
 
 export type Query = {
   __typename?: 'Query';
-  accountFromAlias: Scalars['URN'];
+  accountFromAlias: Scalars['String'];
   addressProfile: AddressProfile;
   addressProfiles: Array<AddressProfile>;
   authorizedApps?: Maybe<Array<Maybe<App>>>;
@@ -138,22 +137,22 @@ export type QueryAccountFromAliasArgs = {
 
 
 export type QueryAddressProfileArgs = {
-  addressURN: Scalars['URN'];
+  addressURN: Scalars['String'];
 };
 
 
 export type QueryAddressProfilesArgs = {
-  addressURNList?: InputMaybe<Array<Scalars['URN']>>;
+  addressURNList?: InputMaybe<Array<Scalars['String']>>;
 };
 
 
 export type QueryConnectedAddressesArgs = {
-  targetAccountURN?: InputMaybe<Scalars['URN']>;
+  targetAccountURN?: InputMaybe<Scalars['String']>;
 };
 
 
 export type QueryProfileArgs = {
-  targetAccountURN?: InputMaybe<Scalars['URN']>;
+  targetAccountURN?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -173,14 +172,14 @@ export type StandardPfp = {
 };
 
 export type GetProfileQueryVariables = Exact<{
-  targetAccountURN?: InputMaybe<Scalars['URN']>;
+  targetAccountURN?: InputMaybe<Scalars['String']>;
 }>;
 
 
 export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null };
 
 export type GetConnectedAddressesQueryVariables = Exact<{
-  targetAccountURN?: InputMaybe<Scalars['URN']>;
+  targetAccountURN?: InputMaybe<Scalars['String']>;
 }>;
 
 
@@ -192,25 +191,25 @@ export type GetAuthorizedAppsQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetAuthorizedAppsQuery = { __typename?: 'Query', authorizedApps?: Array<{ __typename?: 'App', clientId: string, icon: string, title: string, timestamp: number } | null> | null };
 
 export type DisconnectAddressMutationVariables = Exact<{
-  addressURN: Scalars['URN'];
+  addressURN: Scalars['String'];
 }>;
 
 
 export type DisconnectAddressMutation = { __typename?: 'Mutation', disconnectAddress?: boolean | null };
 
 export type GetAddressProfileQueryVariables = Exact<{
-  addressURN: Scalars['URN'];
+  addressURN: Scalars['String'];
 }>;
 
 
-export type GetAddressProfileQuery = { __typename?: 'Query', addressProfile: { __typename?: 'AddressProfile', id: any, type?: string | null, address?: string | null, title?: string | null, icon?: string | null } };
+export type GetAddressProfileQuery = { __typename?: 'Query', addressProfile: { __typename?: 'AddressProfile', id: string, type?: string | null, address?: string | null, title?: string | null, icon?: string | null } };
 
 export type GetAddressProfilesQueryVariables = Exact<{
-  addressURNList?: InputMaybe<Array<Scalars['URN']> | Scalars['URN']>;
+  addressURNList?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
 }>;
 
 
-export type GetAddressProfilesQuery = { __typename?: 'Query', addressProfiles: Array<{ __typename?: 'AddressProfile', id: any, type?: string | null, address?: string | null, title?: string | null, icon?: string | null }> };
+export type GetAddressProfilesQuery = { __typename?: 'Query', addressProfiles: Array<{ __typename?: 'AddressProfile', id: string, type?: string | null, address?: string | null, title?: string | null, icon?: string | null }> };
 
 export type GetAccountUrnFromAliasQueryVariables = Exact<{
   provider: Scalars['String'];
@@ -218,10 +217,10 @@ export type GetAccountUrnFromAliasQueryVariables = Exact<{
 }>;
 
 
-export type GetAccountUrnFromAliasQuery = { __typename?: 'Query', accountFromAlias: any };
+export type GetAccountUrnFromAliasQuery = { __typename?: 'Query', accountFromAlias: string };
 
 export type UpdateAddressNicknameMutationVariables = Exact<{
-  addressURN: Scalars['URN'];
+  addressURN: Scalars['String'];
   nickname: Scalars['String'];
 }>;
 
@@ -251,7 +250,7 @@ export type RevokeAppAuthorizationMutation = { __typename?: 'Mutation', revokeAp
 
 
 export const GetProfileDocument = gql`
-    query getProfile($targetAccountURN: URN) {
+    query getProfile($targetAccountURN: String) {
   profile(targetAccountURN: $targetAccountURN) {
     pfp {
       ... on StandardPFP {
@@ -267,7 +266,7 @@ export const GetProfileDocument = gql`
 }
     `;
 export const GetConnectedAddressesDocument = gql`
-    query getConnectedAddresses($targetAccountURN: URN) {
+    query getConnectedAddresses($targetAccountURN: String) {
   addresses: connectedAddresses(targetAccountURN: $targetAccountURN) {
     baseUrn
     qc
@@ -286,12 +285,12 @@ export const GetAuthorizedAppsDocument = gql`
 }
     `;
 export const DisconnectAddressDocument = gql`
-    mutation disconnectAddress($addressURN: URN!) {
+    mutation disconnectAddress($addressURN: String!) {
   disconnectAddress(addressURN: $addressURN)
 }
     `;
 export const GetAddressProfileDocument = gql`
-    query getAddressProfile($addressURN: URN!) {
+    query getAddressProfile($addressURN: String!) {
   addressProfile(addressURN: $addressURN) {
     id
     type
@@ -302,7 +301,7 @@ export const GetAddressProfileDocument = gql`
 }
     `;
 export const GetAddressProfilesDocument = gql`
-    query getAddressProfiles($addressURNList: [URN!]) {
+    query getAddressProfiles($addressURNList: [String!]) {
   addressProfiles(addressURNList: $addressURNList) {
     id
     type
@@ -318,7 +317,7 @@ export const GetAccountUrnFromAliasDocument = gql`
 }
     `;
 export const UpdateAddressNicknameDocument = gql`
-    mutation updateAddressNickname($addressURN: URN!, $nickname: String!) {
+    mutation updateAddressNickname($addressURN: String!, $nickname: String!) {
   updateAddressNickname(addressURN: $addressURN, nickname: $nickname)
 }
     `;
