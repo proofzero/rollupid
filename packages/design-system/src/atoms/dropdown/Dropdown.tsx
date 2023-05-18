@@ -35,9 +35,8 @@ export const Dropdown = ({
     multiple = false,
     onSelectAll,
     defaultIdentifier,
-    titleAllValues,
+    allSelectedValuesTitle,
     identifierAllValues,
-    className,
     label,
 }: {
     values: SelectListItem[],
@@ -48,9 +47,8 @@ export const Dropdown = ({
     ConnectButtonCallback: () => void,
     onSelectAll?: () => void,
     defaultIdentifier?: string
-    titleAllValues?: string
+    allSelectedValuesTitle?: string
     identifierAllValues?: string
-    className?: string
     label?: string
 }) => {
     /**
@@ -74,7 +72,6 @@ export const Dropdown = ({
     const [allValuesSelected, setAllValuesSelected] =
         useState(false)
 
-
     return (
         <Listbox
             value={multiple ? selectedValues : selectedValue}
@@ -89,8 +86,6 @@ export const Dropdown = ({
                     onSelect(input)
                 }
             }}
-            as={className?.length ? "div" : Fragment}
-            className={className}
             multiple={multiple}
         >
 
@@ -110,7 +105,7 @@ export const Dropdown = ({
                                     flex flex-row justify-between items-center py-2 px-3 hover:ring-1
                                     hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white"
                         >
-                            {(!selectedValue || selectedValue.title.length === 0) && (
+                            {!selectedValue && !selectedValues.length && !allValuesSelected && (
                                 <Text size="sm" className="text-gray-400 truncate text-ellipsis">
                                     {placeholder}
                                 </Text>
@@ -119,6 +114,24 @@ export const Dropdown = ({
                             {selectedValue?.title?.length && (
                                 <Text size="sm" className="text-gray-800 truncate text-ellipsis">
                                     {selectedValue.title}
+                                </Text>
+                            )}
+
+                            {selectedValues.length > 1 && !allValuesSelected && (
+                                <Text size="sm" className="text-gray-800 truncate text-ellipsis">
+                                    {selectedValues.length} items selected
+                                </Text>
+                            )}
+
+                            {selectedValues.length === 1 && !allValuesSelected && (
+                                <Text size="sm" className="text-gray-800 truncate text-ellipsis">
+                                    {selectedValues[0].title} selected
+                                </Text>
+                            )}
+
+                            {allValuesSelected && (
+                                <Text size="sm" className="text-gray-800 truncate text-ellipsis">
+                                    {allSelectedValuesTitle}
                                 </Text>
                             )}
 
@@ -173,7 +186,7 @@ export const Dropdown = ({
                                                         weight="medium"
                                                         className="text-gray-900 truncate text-ellipsis"
                                                     >
-                                                        {titleAllValues}
+                                                        {allSelectedValuesTitle}
                                                     </Text>
                                                     <Text
                                                         size="xs"

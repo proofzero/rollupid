@@ -25,7 +25,7 @@ const Template = () => (
             ConnectButtonPhrase="New Smart Contract Wallet"
             ConnectButtonCallback={() => { console.log('New Smart Contract Wallet') }}
             multiple={true}
-            titleAllValues='All Smart Contract Wallets'
+            allSelectedValuesTitle='All Smart Contract Wallets'
             identifierAllValues='All current and future SC Wallets'
         />
     </div>

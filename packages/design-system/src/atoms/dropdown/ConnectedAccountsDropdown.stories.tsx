@@ -33,7 +33,7 @@ const Template = () => (
             ConnectButtonPhrase="Connect New Account"
             ConnectButtonCallback={() => { console.log('Connect New Account') }}
             multiple={true}
-            titleAllValues='All Connected Accounts'
+            allSelectedValuesTitle='All Connected Accounts'
             identifierAllValues='All current and future accounts'
         />
     </div>
