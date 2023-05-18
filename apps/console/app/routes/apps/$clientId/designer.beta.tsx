@@ -87,20 +87,26 @@ const DesignerTab = ({
 
 const FormElement = ({
   label,
+  sublabel,
   children,
 }: {
   label: string
+  sublabel?: string
   children: ReactNode
 }) => {
   return (
     <div className="flex flex-col lg:flex-row lg:items-center px-8 py-4">
-      <Text
-        size="sm"
-        weight="medium"
-        className="text-gray-900 flex-1 mb-2 lg:mb-0"
-      >
-        {label}
-      </Text>
+      <div className="flex-1 mb-2 lg:mb-0">
+        <Text size="sm" weight="medium" className="text-gray-900">
+          {label}
+        </Text>
+
+        {sublabel && (
+          <Text size="xs" weight="normal" className="text-gray-500">
+            {sublabel}
+          </Text>
+        )}
+      </div>
 
       <div className="flex-1 w-full">{children}</div>
     </div>
@@ -408,7 +414,7 @@ export default () => {
         saveCallback={setProviders}
       />
       <Form method="post">
-        <section className="flex flex-row items-center justify-between mb-11">
+        <section className="flex flex-col lg:flex-row items-center justify-between mb-11">
           <div className="flex flex-row items-center space-x-3">
             <Text
               size="2xl"
@@ -421,7 +427,7 @@ export default () => {
             <DocumentationBadge url="https://docs.rollup.id/platform/console/designer" />
           </div>
 
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex flex-row justify-end items-center gap-2 mt-2 lg:mt-0">
             <Button
               btnType="secondary-alt"
               type="button"
@@ -494,6 +500,8 @@ export default () => {
                   )}
                 </FormElement>
 
+                <div className="w-full border-b border-gray-200"></div>
+
                 <FormElement label="Radius">
                   <input
                     id="radius"
@@ -531,7 +539,9 @@ export default () => {
                   )}
                 </FormElement>
 
-                <FormElement label="Primary Color">
+                <div className="w-full border-b border-gray-200"></div>
+
+                <FormElement label="Primary Color" sublabel="Buttons & Links">
                   <Popover className="relative">
                     <div className="absolute left-0 top-0 bottom-0 flex justify-center items-center">
                       <Popover.Button
@@ -585,7 +595,12 @@ export default () => {
                   )}
                 </FormElement>
 
-                <FormElement label="Primary Color - Darkmode">
+                <div className="w-full border-b border-gray-200"></div>
+
+                <FormElement
+                  label="Primary Color - Darkmode"
+                  sublabel="Buttons & Links"
+                >
                   <Popover className="relative">
                     <div className="absolute left-0 top-0 bottom-0 flex justify-center items-center">
                       <Popover.Button
@@ -639,7 +654,12 @@ export default () => {
                   )}
                 </FormElement>
 
-                <FormElement label="Login Screen Side Image">
+                <div className="w-full border-b border-gray-200"></div>
+
+                <FormElement
+                  label="Login Screen Side Image"
+                  sublabel="2:3 ratio (at least 720x1080px), images can't be larger than 2mB"
+                >
                   <div className="flex flex-row items-center gap-2">
                     <IconPicker
                       maxSize={2097152}
@@ -690,6 +710,8 @@ export default () => {
                   )}
                 </FormElement>
 
+                <div className="w-full border-b border-gray-200"></div>
+
                 <FormElement label="Login Provider Configuration">
                   <input
                     type="hidden"
@@ -709,6 +731,8 @@ export default () => {
                     </Text>
                   </Button>
                 </FormElement>
+
+                <div className="w-full border-b border-gray-200"></div>
               </section>
 
               <section className="bg-white border rounded-lg pb-3 px-6">
