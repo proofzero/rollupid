@@ -14,7 +14,6 @@ import { AuthButton } from '../../molecules/auth-button/AuthButton'
 import { HiOutlineMail } from 'react-icons/hi'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import { ThemeContext } from '../../contexts/theme'
-import { AppTheme } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 
 export const AuthenticationConstants = {
   defaultLogoURL: circleLogo,
@@ -169,8 +168,7 @@ const displayKeyMapper = (
     loading = false,
     flex = false,
     displayContinueWith = false,
-  }: DisplayKeyMapperArgs,
-  theme?: AppTheme
+  }: DisplayKeyMapperArgs
 ) => {
   let el
   switch (key) {
@@ -226,8 +224,7 @@ const displayKeyMapper = (
 
 const displayKeyDisplayFn = (
   displayKeys: string[],
-  mapperArgs: DisplayKeyMapperArgs,
-  theme?: AppTheme
+  mapperArgs: DisplayKeyMapperArgs
 ): JSX.Element[] => {
   const rows = []
 
