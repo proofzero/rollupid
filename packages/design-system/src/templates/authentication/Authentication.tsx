@@ -153,6 +153,7 @@ type DisplayKeyMapperArgs = {
   loading?: boolean
   flex?: boolean
   displayContinueWith?: boolean
+  enableOAuthSubmit?: boolean
 }
 const displayKeyMapper = (
   key: string,
@@ -168,6 +169,7 @@ const displayKeyMapper = (
     loading = false,
     flex = false,
     displayContinueWith = false,
+    enableOAuthSubmit = false,
   }: DisplayKeyMapperArgs
 ) => {
   let el
@@ -207,6 +209,7 @@ const displayKeyMapper = (
             provider={key as OAuthProvider}
             fullSize={flex}
             displayContinueWith={displayContinueWith}
+            submit={enableOAuthSubmit}
           />
         </FormWrapperEl>
       )

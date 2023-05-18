@@ -201,6 +201,7 @@ export default () => {
               {children}
             </Form>
           ),
+          enableOAuthSubmit: true,
           loading,
           walletConnectCallback: async (address) => {
             if (loading) return

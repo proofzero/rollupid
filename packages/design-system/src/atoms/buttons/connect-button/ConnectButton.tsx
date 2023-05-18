@@ -117,6 +117,7 @@ export function ConnectButton({
             return (
               <div className="flex flex-row h-full">
                 <button
+                  type="button"
                   disabled={isConnecting || isSigning || isLoading}
                   onClick={
                     isConnected

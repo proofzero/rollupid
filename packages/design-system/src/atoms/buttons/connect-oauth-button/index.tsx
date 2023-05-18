@@ -34,12 +34,14 @@ type ConnectOAuthButtonProps = {
   provider: OAuthProvider
   fullSize?: boolean
   displayContinueWith?: boolean
+  submit?: boolean
 }
 
 const ConnectOAuthButton = ({
   provider,
   fullSize = true,
   displayContinueWith = false,
+  submit = false,
 }: ConnectOAuthButtonProps) => {
   return (
     <Button
@@ -47,7 +49,7 @@ const ConnectOAuthButton = ({
         'button w-full dark:bg-[#374151] dark:border-gray-600 hover:bg-gray-100'
       }
       btnType={'secondary-alt'}
-      isSubmit={true}
+      isSubmit={submit}
       role={provider}
     >
       <div
