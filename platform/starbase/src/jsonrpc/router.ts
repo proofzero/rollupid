@@ -237,7 +237,7 @@ export const appRouter = t.router({
     .use(OwnAppsMiddleware)
     .input(UpsertAppContactAddressInput)
     .mutation(upsertAppContactAddress),
-  getAppThemes: t.procedure
+  getAppTheme: t.procedure
     .use(Analytics)
     .input(AppClientIdParamSchema)
     .output(GetAppThemeOutput)

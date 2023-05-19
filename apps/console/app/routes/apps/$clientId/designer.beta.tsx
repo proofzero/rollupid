@@ -264,7 +264,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     ...traceHeader,
   })
 
-  const appTheme = await starbaseClient.getAppThemes.query({
+  const appTheme = await starbaseClient.getAppTheme.query({
     clientId,
   })
 
