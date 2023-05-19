@@ -1,6 +1,11 @@
 import { EmailContent } from './src/types'
 
-export const EmailTemplate = (passcode: string): EmailContent => {
+export const EmailTemplate = (
+  imgURL: string,
+  address: string,
+  contact: string,
+  passcode: string
+): EmailContent => {
   return {
     contentType: 'text/html',
     subject: `Your Rollup ID one-time passcode`,
@@ -48,6 +53,10 @@ export const EmailTemplate = (passcode: string): EmailContent => {
             font-size: 36px;
             font-weight: bold;
             line-height: 44px;
+          }
+          .heading-logo .logo {
+            width: 32px;
+            height: 32px;
           }
           p {
             font-size: 16px;
@@ -111,7 +120,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
             <div class="heading-logo">
               <img
                 class="logo"
-                src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public"
+                src="${imgURL}"
                 alt=""
                 style="display: block"
               />
@@ -144,7 +153,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
               <div class="vl"></div>
               <a
                 class="footer-links"
-                href="https://discord.com/invite/rollupid"
+                href="${contact}"
                 target="_blank"
                 rel="noreferrer"
                 >Contact Us</a
@@ -160,7 +169,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
                 margin-top: 10px;
               "
             >
-              777 Bay Street, Suite C208B Toronto, Ontario M5G 2C8 Canada
+              ${address}
             </p>
             <p
               style="

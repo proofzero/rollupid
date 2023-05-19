@@ -6,7 +6,7 @@ import {
   useLoaderData,
   useOutletContext,
 } from '@remix-run/react'
-import { ReactNode, useContext, useEffect, useState } from 'react'
+import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import { IconType } from 'react-icons'
 import { HiCog, HiOutlineCog, HiOutlineMail } from 'react-icons/hi'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
@@ -49,6 +49,10 @@ import { TbMoon, TbSunHigh } from 'react-icons/tb'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 import { Helmet } from 'react-helmet'
 import { notificationHandlerType } from '~/types'
+import InputTextarea from '@proofzero/design-system/src/atoms/form/InputTextarea'
+import { PreLabeledInput } from '@proofzero/design-system/src/atoms/form/PreLabledInput'
+import { EmailTemplate } from '@proofzero/platform/email/emailOtpTemplate'
+import subtractLogo from '@proofzero/design-system/src/assets/subtract-logo.svg'
 
 const client = createClient(
   // @ts-ignore
@@ -413,6 +417,10 @@ export default () => {
   const [dark, setDark] = useState<boolean>(false)
   const toggleDark = () => setDark(!dark)
 
+  const [logoURL, setLogoURL] = useState<string | undefined>()
+  const [address, setAddress] = useState<string | undefined>()
+  const [contact, setContact] = useState<string | undefined>()
+
   return (
     <>
       <Helmet>
@@ -474,7 +482,7 @@ export default () => {
               )}
             </Tab>
 
-            <Tab className="outline-0" disabled>
+            <Tab className="outline-0">
               {({ selected }) => (
                 <DesignerTab
                   Icon={HiOutlineMail}
@@ -915,7 +923,121 @@ export default () => {
                 </ThemeContext.Provider>
               </section>
             </Tab.Panel>
-            <Tab.Panel>Content 2</Tab.Panel>
+
+            <Tab.Panel className="flex flex-col lg:flex-row gap-7">
+              <section className="flex-1 bg-white border rounded-lg">
+                <Text
+                  size="lg"
+                  weight="semibold"
+                  className="mx-8 my-4 text-gray-900"
+                >
+                  OTP Email Settings
+                </Text>
+
+                <FormElement
+                  label="Logo"
+                  sublabel="Images can't be larger than 2mB"
+                >
+                  <div className="flex flex-row items-center gap-2">
+                    <IconPicker
+                      maxSize={2097152}
+                      ar={{
+                        w: 1,
+                        h: 1,
+                      }}
+                      id="logo"
+                      setIsFormChanged={(val) => {}}
+                      setIsImgUploading={(val) => {
+                        setLoading(val)
+                      }}
+                      imageUploadCallback={setLogoURL}
+                      url={logoURL}
+                      invalid={errors?.logoURL}
+                      errorMessage={errors?.logoURL}
+                    />
+
+                    {logoURL && (
+                      <button
+                        type="button"
+                        className="flex justify-center items-center py-2 px-4"
+                        onClick={() => {
+                          setLogoURL(undefined)
+                        }}
+                      >
+                        <Text
+                          size="xs"
+                          weight="medium"
+                          className="text-gray-200"
+                        >
+                          Remove
+                        </Text>
+                      </button>
+                    )}
+                  </div>
+
+                  {errors?.graphicURL && (
+                    <Text
+                      className="mb-1.5 mt-1.5 text-red-500"
+                      size="xs"
+                      weight="normal"
+                    >
+                      {errors?.graphicURL || ''}
+                    </Text>
+                  )}
+                </FormElement>
+
+                <FormElement label="Business Address">
+                  <InputTextarea
+                    id="address"
+                    heading=""
+                    defaultValue={address}
+                    onChange={setAddress}
+                  />
+                </FormElement>
+
+                <FormElement label="Contact us">
+                  <PreLabeledInput
+                    id="contact"
+                    preLabel={'https://'}
+                    label=""
+                    defaultValue={contact}
+                    onChange={(e) => setContact(e.target.value)}
+                  />
+                </FormElement>
+              </section>
+
+              <section className="bg-white border rounded-lg pb-3 px-6 min-w-[468px] h-[781px] overflow-scroll">
+                <div className="flex flex-row items-center justify-between my-4">
+                  <Text size="lg" weight="semibold" className="text-gray-900">
+                    Preview
+                  </Text>
+                </div>
+
+                <iframe
+                  className="w-full border rounded-lg"
+                  srcDoc={
+                    EmailTemplate(
+                      logoURL ?? subtractLogo,
+                      address ?? '',
+                      contact ?? '',
+                      'XXXXXX'
+                    ).body
+                  }
+                  onLoad={(ev) => {
+                    const iFrame = ev.target as HTMLIFrameElement
+                    const iFrameDoc = iFrame.contentDocument
+
+                    const height = iFrameDoc?.body.clientHeight
+                    if (!height) {
+                      console.warn('No height detected for iFrame')
+                      return
+                    }
+
+                    iFrame.style.height = height + 0.05 * height + 'px'
+                  }}
+                ></iframe>
+              </section>
+            </Tab.Panel>
           </Tab.Panels>
         </Tab.Group>
       </Form>

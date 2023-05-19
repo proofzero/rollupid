@@ -114,7 +114,12 @@ async function forward(message: CloudflareEmailMessage, env: Environment) {
 
 /** OTP email content template with a `code` parameter */
 export const getOTPEmailContent = (passcode: string): EmailContent => {
-  return EmailTemplate(passcode)
+  return EmailTemplate(
+    'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public',
+    '777 Bay Street, Suite C208B Toronto, Ontario M5G 2C8 Canada',
+    'https://discord.com/invite/rollupid',
+    passcode
+  )
 }
 
 /** Magic link email content template */
