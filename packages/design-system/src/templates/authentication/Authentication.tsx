@@ -67,7 +67,7 @@ export default ({
     <div className={`relative ${dark ? 'dark' : ''}`}>
       <div
         className={`flex grow-0 flex-col items-center
-         gap-4 mx-auto bg-white dark:bg-[#1F2937] p-6 min-h-[100dvh] lg:min-h-[675px]
+         gap-4 mx-auto bg-white dark:bg-[#1F2937] p-6 min-h-[100dvh] lg:min-h-[580px]
           max-h-[100dvh] w-full lg:w-[418px] lg:rounded-${radius}
           mt-auto`}
         style={{
@@ -100,28 +100,10 @@ export default ({
             </>
           )}
 
-          {(appProfile?.termsURL || appProfile?.privacyURL) && (
-            <Text size="sm" className="text-gray-500 mt-7">
-              Before using this app, you can review{' '}
-              {appProfile?.name ?? `Company`}
-              's{' '}
-              <a href={appProfile.privacyURL} className="text-indigo-500">
-                privacy policy
-              </a>
-              {appProfile?.termsURL && appProfile?.privacyURL && (
-                <span> and </span>
-              )}
-              <a href={appProfile.termsURL} className="text-indigo-500">
-                terms of service
-              </a>
-              .
-            </Text>
-          )}
-
           {Actions && <div className="flex flex-1 items-end">{Actions}</div>}
         </div>
 
-        <div className="mt-14 flex justify-center items-center space-x-2">
+        <div className="flex justify-center items-center space-x-2">
           <img src={subtractLogo} alt="powered by rollup.id" />
           <Text size="xs" weight="normal" className="text-gray-400">
             Powered by{' '}

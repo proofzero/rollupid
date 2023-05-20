@@ -200,25 +200,31 @@ export const Dropdown = ({
 
                                             <div className="mx-4 w-100 border-b border-gray-200"></div>
 
-                                            <div className="px-4 pb-3 space-y-3 max-h-[140px] overflow-y-scroll thin-scrollbar">
-                                                {values?.map((value) => (
-                                                    <Listbox.Option
+                                            <div className="max-h-[140px] overflow-y-scroll thin-scrollbar">
+                                                {values?.map((value) => {
+
+                                                    const checked = !allValuesSelected &&
+                                                        selectedValues
+                                                            .map((sa) => sa.identifier)
+                                                            .includes(value.identifier)
+
+                                                    return <Listbox.Option
                                                         key={value.identifier}
                                                         value={value}
-                                                        className="flex flex-row space-x-2 cursor-pointer"
+                                                        className={` rounded 
+                                                        flex flex-row space-x-2 cursor-pointer py-1.5 px-4
+                                                        ${checked ? "bg-gray-100" : "hover:bg-gray-50"}`}
                                                         disabled={allValuesSelected}
                                                     >
                                                         <div>
                                                             <input
                                                                 readOnly
                                                                 type="checkbox"
-                                                                className="h-4 w-4 rounded border-gray-300 bg-gray-50
-                                                                 text-indigo-500 focus:ring-indigo-500"
+                                                                className={`
+                                                                 h-4 w-4 rounded border-gray-300 bg-gray-50
+                                                                 text-indigo-500 focus:ring-indigo-500`}
                                                                 checked={
-                                                                    !allValuesSelected &&
-                                                                    selectedValues
-                                                                        .map((sa) => sa.identifier)
-                                                                        .includes(value.identifier)
+                                                                    checked
                                                                 }
                                                             />
                                                         </div>
@@ -246,24 +252,25 @@ export const Dropdown = ({
                                                             </Text>
                                                         </div>
                                                     </Listbox.Option>
-                                                ))}
+                                                })}
                                             </div>
                                         </>
                                         /**
-                                         * Single select
-                                         */
+                        * Single select
+                        */
                                         : <div className="px-1 space-y-1 max-h-[140px]
                              overflow-y-scroll thin-scrollbar">
                                             {values.map((value) => (
                                                 <Listbox.Option
-                                                    className="flex flex-row space-x-2 cursor-pointer hover:bg-gray-100
+                                                    className="flex flex-row space-x-2 cursor-pointer hover:bg-gray-50
                                     rounded-lg  w-full "
                                                     key={value.identifier}
                                                     value={value}
                                                 >{({ selected }) => (
                                                     <div
-                                                        className="w-full h-full rounded-lg py-2 px-2 flex flex-row
-                                                items-center justify-between"
+                                                        className={`${selected ? 'bg-gray-100' : ""}
+                                                         w-full h-full rounded-lg py-2 px-2 flex flex-row
+                                                items-center justify-between`}
                                                     >
                                                         <div className="flex flex-row truncate items-center">
                                                             {

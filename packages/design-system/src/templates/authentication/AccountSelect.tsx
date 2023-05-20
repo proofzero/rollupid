@@ -27,14 +27,16 @@ export default ({
   logoURL = AuthenticationScreenDefaults.defaultLogoURL,
   userProfile,
   appProfile,
-  onAuth = () => {},
-  onSignOut = () => {},
-  onChooseOther = () => {},
+  onAuth = () => { },
+  onSignOut = () => { },
+  onChooseOther = () => { },
 }: AccountSelectProps) => {
   return (
     <div className="relative">
       <div
-        className={`relative flex shrink grow-0 flex-col items-center gap-4 mx-auto bg-white p-6 min-h-[100dvh] lg:min-h-[675px] max-h-[100dvh] w-full lg:w-[418px] lg:rounded-lg overflow-auto`}
+        className={`relative flex shrink grow-0 flex-col items-center gap-4
+        mx-auto bg-white p-6 min-h-[100dvh] lg:min-h-[580px] max-h-[100dvh]
+        w-full lg:w-[418px] lg:rounded-lg overflow-auto`}
         style={{
           border: '1px solid #D1D5DB',
           boxSizing: 'border-box',
@@ -100,23 +102,6 @@ export default ({
 
           <AuthButton text="Choose other account" onClick={onChooseOther} />
 
-          {(appProfile?.termsURL || appProfile?.privacyURL) && (
-            <Text size="sm" className="text-gray-500 mt-7">
-              Before using this app, you can review{' '}
-              {appProfile?.name ?? `Company`}
-              &apos;s{' '}
-              <a href={appProfile.privacyURL} className="text-indigo-500">
-                privacy policy
-              </a>
-              {appProfile?.termsURL && appProfile?.privacyURL && (
-                <span> and </span>
-              )}
-              <a href={appProfile.termsURL} className="text-indigo-500">
-                terms of service
-              </a>
-              .
-            </Text>
-          )}
         </div>
 
         <div className="mt-14 flex justify-center items-center space-x-2">

@@ -107,7 +107,8 @@ export default ({
     <div className={`${dark ? 'dark' : ''}`}>
       <div
         className={
-          'flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6 lg:rounded-${radius} min-h-[100dvh] lg:min-h-[675px] max-h-[100dvh]'
+          'flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6\
+           lg:rounded-${radius} min-h-[100dvh] lg:min-h-[580px] max-h-[100dvh]'
         }
         style={{
           width: 418,
@@ -120,7 +121,7 @@ export default ({
             src={userProfile.pfpURL}
             hex={false}
             size={'sm'}
-            // alt="User Profile"
+          // alt="User Profile"
           />
           <img src={authorizeCheck} alt="Authorize Check" />
           <Avatar src={appProfile.iconURL} size={'sm'} />
@@ -155,14 +156,14 @@ export default ({
 
                     {(scope === 'profile' ||
                       scope === 'system_identifiers') && (
-                      <Text
-                        size="sm"
-                        weight="medium"
-                        className="flex-1 text-gray-500"
-                      >
-                        {scopeMeta.scopes[scope].name}
-                      </Text>
-                    )}
+                        <Text
+                          size="sm"
+                          weight="medium"
+                          className="flex-1 text-gray-500"
+                        >
+                          {scopeMeta.scopes[scope].name}
+                        </Text>
+                      )}
 
                     {scope === 'erc_4337' && (
                       <div className="flex-1 min-w-0">
