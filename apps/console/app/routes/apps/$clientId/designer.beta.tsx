@@ -6,7 +6,7 @@ import {
   useLoaderData,
   useOutletContext,
 } from '@remix-run/react'
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useContext, useEffect, useState } from 'react'
 import { IconType } from 'react-icons'
 import { HiCog, HiOutlineCog, HiOutlineMail } from 'react-icons/hi'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
@@ -57,6 +57,16 @@ const client = createClient(
   })
 )
 
+const getRGBColor = (hex: string, type: string) => {
+  let color = hex.replace(/#/g, '')
+  // rgb values
+  var r = parseInt(color.substr(0, 2), 16)
+  var g = parseInt(color.substr(2, 2), 16)
+  var b = parseInt(color.substr(4, 2), 16)
+
+  return `--color-${type}: ${r}, ${g}, ${b};`
+}
+
 const DesignerTab = ({
   Icon,
   text,
@@ -84,6 +94,23 @@ const DesignerTab = ({
     </Text>
   </div>
 )
+
+const AuthCompTab = ({ selected }: { selected: boolean }) => {
+  const { dark, theme } = useContext(ThemeContext)
+
+  return (
+    <div
+      className={`w-2 h-2 rounded-full`}
+      style={{
+        backgroundColor: selected
+          ? !dark
+            ? theme?.color?.light
+            : theme?.color?.dark
+          : '#E5E7EB',
+      }}
+    ></div>
+  )
+}
 
 const FormElement = ({
   label,
@@ -386,16 +413,6 @@ export default () => {
   const [dark, setDark] = useState<boolean>(false)
   const toggleDark = () => setDark(!dark)
 
-  const getRGBColor = (hex: string, type: string) => {
-    let color = hex.replace(/#/g, '')
-    // rgb values
-    var r = parseInt(color.substr(0, 2), 16)
-    var g = parseInt(color.substr(2, 2), 16)
-    var b = parseInt(color.substr(4, 2), 16)
-
-    return `--color-${type}: ${r}, ${g}, ${b};`
-  }
-
   return (
     <>
       <Helmet>
@@ -407,12 +424,14 @@ export default () => {
       </Helmet>
 
       {loading && <Loader />}
+
       <ProviderModal
         providers={providers}
         isOpen={providerModalOpen}
         handleClose={() => setProviderModalOpen(false)}
         saveCallback={setProviders}
       />
+
       <Form method="post">
         <section className="flex flex-col lg:flex-row items-center justify-between mb-11">
           <div className="flex flex-row items-center space-x-3">
@@ -881,33 +900,11 @@ export default () => {
 
                     <Tab.List className="flex flex-row justify-center items-center items-center mt-6 gap-1.5">
                       <Tab className="outline-0">
-                        {({ selected }) => (
-                          <div
-                            className={`w-2 h-2 rounded-full`}
-                            style={{
-                              backgroundColor: selected
-                                ? !dark
-                                  ? color.light
-                                  : color.dark
-                                : '#E5E7EB',
-                            }}
-                          ></div>
-                        )}
+                        {({ selected }) => <AuthCompTab selected={selected} />}
                       </Tab>
 
                       <Tab className="outline-0">
-                        {({ selected }) => (
-                          <div
-                            className={`w-2 h-2 rounded-full`}
-                            style={{
-                              backgroundColor: selected
-                                ? !dark
-                                  ? color.light
-                                  : color.dark
-                                : '#E5E7EB',
-                            }}
-                          ></div>
-                        )}
+                        {({ selected }) => <AuthCompTab selected={selected} />}
                       </Tab>
                     </Tab.List>
                   </Tab.Group>
