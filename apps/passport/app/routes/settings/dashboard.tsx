@@ -9,7 +9,7 @@ import dashboardChart from '~/assets/dashboard_chart.svg'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
 
-import { Warning } from "@proofzero/design-system/src/molecules/cta/Warning"
+import { Warning } from "@proofzero/design-system/src/molecules/cta/warning"
 
 import { useOutletContext } from '@remix-run/react'
 import type { AddressURN } from '@proofzero/urns/address'
