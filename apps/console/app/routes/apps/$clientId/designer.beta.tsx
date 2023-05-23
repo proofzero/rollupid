@@ -362,16 +362,16 @@ const AuthPanel = ({
                 setHeading(e.target.value)
               }}
               value={heading}
-              error={errors?.heading}
+              error={errors && errors['heading']}
             />
 
-            {errors?.heading && (
+            {errors && errors['heading'] && (
               <Text
                 className="mb-1.5 mt-1.5 text-red-500"
                 size="xs"
                 weight="normal"
               >
-                {errors.heading || ''}
+                {errors['heading']}
               </Text>
             )}
           </FormElement>
@@ -399,13 +399,13 @@ const AuthPanel = ({
               />
             </div>
 
-            {errors?.radius && (
+            {errors && errors['radius'] && (
               <Text
                 className="mb-1.5 mt-1.5 text-red-500"
                 size="xs"
                 weight="normal"
               >
-                {errors.radius || ''}
+                {errors && errors['radius']}
               </Text>
             )}
           </FormElement>
@@ -455,13 +455,13 @@ const AuthPanel = ({
               </Popover.Panel>
             </Popover>
 
-            {errors?.color && (
+            {errors && errors['color.light'] && (
               <Text
                 className="mb-1.5 mt-1.5 text-red-500"
                 size="xs"
                 weight="normal"
               >
-                {errors.color || ''}
+                {errors['color.light']}
               </Text>
             )}
           </FormElement>
@@ -514,13 +514,13 @@ const AuthPanel = ({
               </Popover.Panel>
             </Popover>
 
-            {errors?.color && (
+            {errors && errors['color.dark'] && (
               <Text
                 className="mb-1.5 mt-1.5 text-red-500"
                 size="xs"
                 weight="normal"
               >
-                {errors?.color || ''}
+                {errors['color.light']}
               </Text>
             )}
           </FormElement>
@@ -543,15 +543,14 @@ const AuthPanel = ({
                 id="image"
                 setIsFormChanged={(val) => {}}
                 setIsImgUploading={(val) => {
-                  console.log({
-                    val,
-                  })
                   setLoading(val)
                 }}
                 imageUploadCallback={setGraphicURL}
                 url={graphicURL}
-                invalid={errors?.graphicURL ? true : false}
-                errorMessage={errors?.graphicURL}
+                invalid={errors && errors['graphicURL'] ? true : false}
+                errorMessage={
+                  errors && errors['graphicURL'] ? errors['graphicURL'] : ''
+                }
               />
 
               {graphicURL && (
@@ -568,16 +567,6 @@ const AuthPanel = ({
                 </button>
               )}
             </div>
-
-            {errors?.graphicURL && (
-              <Text
-                className="mb-1.5 mt-1.5 text-red-500"
-                size="xs"
-                weight="normal"
-              >
-                {errors?.graphicURL || ''}
-              </Text>
-            )}
           </FormElement>
 
           <div className="w-full border-b border-gray-200"></div>
@@ -806,8 +795,10 @@ const EmailPanel = ({
               }}
               imageUploadCallback={setLogoURL}
               url={logoURL}
-              invalid={errors?.logoURL ? true : false}
-              errorMessage={errors?.logoURL}
+              invalid={errors && errors['email.logoURL'] ? true : false}
+              errorMessage={
+                errors && errors['email.logoURL'] ? errors['email.logoURL'] : ''
+              }
             />
 
             {logoURL && (
@@ -824,16 +815,6 @@ const EmailPanel = ({
               </button>
             )}
           </div>
-
-          {errors?.graphicURL && (
-            <Text
-              className="mb-1.5 mt-1.5 text-red-500"
-              size="xs"
-              weight="normal"
-            >
-              {errors?.graphicURL || ''}
-            </Text>
-          )}
         </FormElement>
 
         <FormElement label="Business Address">
@@ -842,17 +823,40 @@ const EmailPanel = ({
             heading=""
             defaultValue={address}
             onChange={setAddress}
+            error={errors && errors['email.address'] ? true : false}
           />
+
+          {errors && errors['email.address'] && (
+            <Text
+              className="mb-1.5 mt-1.5 text-red-500"
+              size="xs"
+              weight="normal"
+            >
+              {errors['email.address']}
+            </Text>
+          )}
         </FormElement>
 
         <FormElement label="Contact us">
-          <PreLabeledInput
-            id="contact"
-            preLabel={'https://'}
-            label=""
-            defaultValue={contact}
-            onChange={(e) => setContact(e.target.value)}
+          <Input
+            id={'contact'}
+            label={''}
+            onChange={(e) => {
+              setContact(e.target.value)
+            }}
+            value={contact}
+            error={errors && errors['email.contact']}
           />
+
+          {errors && errors['email.contact'] && (
+            <Text
+              className="mb-1.5 mt-1.5 text-red-500"
+              size="xs"
+              weight="normal"
+            >
+              {errors['email.contact']}
+            </Text>
+          )}
         </FormElement>
       </section>
 
@@ -1006,27 +1010,23 @@ export const action: ActionFunction = async ({ request, params, context }) => {
       })
   }
 
-  console.log({
-    theme,
-  })
-
   const zodErrors = await AppThemeSchema.spa(theme)
   if (!zodErrors.success) {
-    console.log(JSON.stringify(zodErrors.error, null, 2))
-    const { fieldErrors } = zodErrors.error.flatten()
-    Object.keys(fieldErrors).forEach((key) => {
-      errors[key] = (fieldErrors as { [key: string]: string })[key][0]
-    })
+    const mappedIssues = zodErrors.error.issues.map((issue) => ({
+      path: issue.path.join('.'),
+      message: issue.message,
+    }))
+
+    errors = mappedIssues.reduce((acc, curr) => {
+      acc[curr.path] = curr.message
+      return acc
+    }, {} as { [key: string]: string })
   } else {
     await starbaseClient.setAppTheme.mutate({
       clientId,
       theme,
     })
   }
-
-  console.log({
-    errors
-  })
 
   return json({
     errors,
