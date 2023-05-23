@@ -762,17 +762,25 @@ const AuthPanel = ({
 }
 
 const EmailPanel = ({
+  appTheme,
   setLoading,
   errors,
 }: {
+  appTheme?: AppTheme
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
   errors?: {
     [key: string]: string
   }
 }) => {
-  const [logoURL, setLogoURL] = useState<string | undefined>()
-  const [address, setAddress] = useState<string | undefined>()
-  const [contact, setContact] = useState<string | undefined>()
+  const [logoURL, setLogoURL] = useState<string | undefined>(
+    appTheme?.email?.logoURL
+  )
+  const [address, setAddress] = useState<string | undefined>(
+    appTheme?.email?.address
+  )
+  const [contact, setContact] = useState<string | undefined>(
+    appTheme?.email?.contact
+  )
 
   return (
     <Tab.Panel className="flex flex-col lg:flex-row gap-7">
@@ -928,7 +936,7 @@ export const action: ActionFunction = async ({ request, params, context }) => {
     clientId,
   })
 
-  const updateAuth = async (fd: FormData, theme: AppTheme) => {
+  const updateAuth = (fd: FormData, theme: AppTheme) => {
     const heading = fd.get('heading') as string | undefined
     const radius = fd.get('radius') as string | undefined
     const color = fd.get('color') as string | undefined
@@ -956,10 +964,30 @@ export const action: ActionFunction = async ({ request, params, context }) => {
     return theme
   }
 
-  const updateEmail = async (fd: FormData, theme: AppTheme) => {
-    const logoURL = fd.get('logoURL') as string | undefined
-    const address = fd.get('address') as string | undefined
-    const contact = fd.get('contact') as string | undefined
+  const updateEmail = (fd: FormData, theme: AppTheme) => {
+    let logoURL = fd.get('logoURL') as string | undefined
+    if (!logoURL || logoURL === '') logoURL = undefined
+
+    let address = fd.get('address') as string | undefined
+    if (!address || address === '') address = undefined
+
+    let contact = fd.get('contact') as string | undefined
+    if (!contact || contact === '') contact = undefined
+
+    theme = {
+      ...theme,
+      email: theme.email
+        ? {
+            logoURL: logoURL ?? theme.email.logoURL,
+            address: address ?? theme.email.address,
+            contact: contact ?? theme.email.contact,
+          }
+        : {
+            logoURL: logoURL,
+            address: address,
+            contact: contact,
+          },
+    }
 
     return theme
   }
@@ -967,10 +995,10 @@ export const action: ActionFunction = async ({ request, params, context }) => {
   const fd = await request.formData()
   switch (fd.get('target')) {
     case 'auth':
-      updateAuth(fd, theme)
+      theme = updateAuth(fd, theme)
       break
     case 'email':
-      updateEmail(fd, theme)
+      theme = updateEmail(fd, theme)
       break
     default:
       throw new BadRequestError({
@@ -978,8 +1006,13 @@ export const action: ActionFunction = async ({ request, params, context }) => {
       })
   }
 
+  console.log({
+    theme,
+  })
+
   const zodErrors = await AppThemeSchema.spa(theme)
   if (!zodErrors.success) {
+    console.log(JSON.stringify(zodErrors.error, null, 2))
     const { fieldErrors } = zodErrors.error.flatten()
     Object.keys(fieldErrors).forEach((key) => {
       errors[key] = (fieldErrors as { [key: string]: string })[key][0]
@@ -990,6 +1023,10 @@ export const action: ActionFunction = async ({ request, params, context }) => {
       theme,
     })
   }
+
+  console.log({
+    errors
+  })
 
   return json({
     errors,
@@ -1082,7 +1119,11 @@ export default () => {
               errors={errors}
             />
 
-            <EmailPanel setLoading={setLoading} errors={errors} />
+            <EmailPanel
+              appTheme={appTheme}
+              setLoading={setLoading}
+              errors={errors}
+            />
           </Tab.Panels>
         </Tab.Group>
       </Form>
