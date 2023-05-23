@@ -15,7 +15,7 @@ import { HiOutlineMail } from 'react-icons/hi'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import { ThemeContext } from '../../contexts/theme'
 
-export const AuthenticationConstants = {
+export const AuthenticationScreenDefaults = {
   defaultLogoURL: circleLogo,
   defaultHeading: 'Welcome to the Private Web',
   defaultSubheading: 'How would you like to continue?',
@@ -58,7 +58,7 @@ export default ({
   radius = 'lg',
 }: AuthenticationProps) => {
   displayKeys = displayKeys.filter((key) =>
-    AuthenticationConstants.knownKeys.includes(key)
+    AuthenticationScreenDefaults.knownKeys.includes(key)
   )
 
   const { dark } = useContext(ThemeContext)

@@ -13,7 +13,7 @@ import { DocumentationBadge } from '~/components/DocumentationBadge'
 
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import Authentication, {
-  AuthenticationConstants,
+  AuthenticationScreenDefaults,
 } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
 import { createClient } from 'wagmi'
@@ -403,7 +403,7 @@ export default () => {
     }[]
   >(
     appTheme?.providers ??
-      AuthenticationConstants.knownKeys.map((k) => ({
+      AuthenticationScreenDefaults.knownKeys.map((k) => ({
         key: k,
         enabled: true,
       }))
@@ -500,7 +500,7 @@ export default () => {
                   <Input
                     id={'heading'}
                     label={''}
-                    placeholder={AuthenticationConstants.defaultHeading}
+                    placeholder={AuthenticationScreenDefaults.defaultHeading}
                     onChange={(e) => {
                       setHeading(e.target.value)
                     }}
@@ -786,7 +786,9 @@ export default () => {
                           Header={
                             <>
                               <Avatar
-                                src={AuthenticationConstants.defaultLogoURL}
+                                src={
+                                  AuthenticationScreenDefaults.defaultLogoURL
+                                }
                                 size="sm"
                               ></Avatar>
                               <div
@@ -798,14 +800,16 @@ export default () => {
                                   }
                                 >
                                   {heading ??
-                                    AuthenticationConstants.defaultHeading}
+                                    AuthenticationScreenDefaults.defaultHeading}
                                 </h1>
 
                                 <h2
                                   style={{ color: '#6B7280' }}
                                   className={'font-medium text-base'}
                                 >
-                                  {AuthenticationConstants.defaultSubheading}
+                                  {
+                                    AuthenticationScreenDefaults.defaultSubheading
+                                  }
                                 </h2>
                               </div>
                             </>
