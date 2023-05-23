@@ -796,7 +796,7 @@ export default () => {
                               >
                                 <h1
                                   className={
-                                    'font-semibold text-xl dark:text-white'
+                                    'font-semibold text-xl dark:text-white text-center'
                                   }
                                 >
                                   {heading ??
