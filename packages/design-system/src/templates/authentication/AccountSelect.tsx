@@ -77,6 +77,7 @@ export default ({
                   )}
                 </>
               }
+              Addon={<div className="w-14"></div>}
               text={userProfile.displayName}
             />
 
