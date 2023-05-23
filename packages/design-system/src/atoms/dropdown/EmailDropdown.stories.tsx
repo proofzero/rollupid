@@ -7,7 +7,7 @@ import { HiOutlineEnvelope } from 'react-icons/hi2'
 
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
-import appleIcon from '@proofzero/design-system/src/assets/social_icons/apple.svg'
+import appleIcon from '@proofzero/design-system/src/atoms/providers/Apple'
 
 export default {
     title: 'Atoms/Dropdown/Email',
@@ -47,6 +47,14 @@ const listItems: SelectListItem[] = [
         icon: getIcon(OAuthAddressType.Microsoft),
         details: {
             type: OAuthAddressType.Microsoft,
+        }
+    },
+    {
+        title: 'perez@apple.com',
+        label: 'urn:rollupid:address/5',
+        icon: getIcon(OAuthAddressType.Apple),
+        details: {
+            type: OAuthAddressType.Apple,
         }
     },
     {
