@@ -788,7 +788,7 @@ const EmailPanel = ({
                 width: 1,
                 height: 1,
               }}
-              id="logo"
+              id="logoURL"
               setIsFormChanged={(val) => {}}
               setIsImgUploading={(val) => {
                 setLoading(val)
@@ -972,6 +972,10 @@ export const action: ActionFunction = async ({ request, params, context }) => {
     let logoURL = fd.get('logoURL') as string | undefined
     if (!logoURL || logoURL === '') logoURL = undefined
 
+    console.log({
+      logoURL,
+    })
+
     let address = fd.get('address') as string | undefined
     if (!address || address === '') address = undefined
 
@@ -1009,6 +1013,10 @@ export const action: ActionFunction = async ({ request, params, context }) => {
         message: 'Invalid target',
       })
   }
+
+  console.log({
+    theme,
+  })
 
   const zodErrors = await AppThemeSchema.spa(theme)
   if (!zodErrors.success) {
