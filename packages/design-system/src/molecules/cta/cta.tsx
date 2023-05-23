@@ -73,7 +73,8 @@ rounded-lg border shadow my-4 p-4"
       onClick={() => {
         clickHandler()
       }}
-      className='flex flex-row items-center cursor-pointer w-fit'
+      className='flex flex-row items-center cursor-pointer w-fit
+       space-x-2'
     >
       <Text weight="normal" size="sm" className="text-orange-700">
         {btnText}

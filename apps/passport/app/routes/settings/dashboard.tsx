@@ -25,6 +25,8 @@ export default function DashboardLayout() {
 
   const navigate = useNavigate()
 
+  const appErrorExists = authorizedApps.some((app) => app.appDataError)
+
   return (
     <div className="w-full h-full flex flex-col">
       <div className="pb-6">
@@ -32,11 +34,13 @@ export default function DashboardLayout() {
           Dashboard
         </Text>
       </div>
-      <Warning
-        description='We detected a data error in your application(s).
+      {appErrorExists
+        ? <Warning
+          description='We detected a data error in your application(s).
       Please revoke the authorization and re-authorize again in the affected application.'
-        btnText='Applications'
-        clickHandler={() => { navigate("/settings/applications") }} />
+          btnText='Applications'
+          clickHandler={() => { navigate("/settings/applications") }} />
+        : null}
       <div
         className="dashboard flex flex-col md:flex-row
     items-center md:items-start md:space-x-4
@@ -112,7 +116,7 @@ export default function DashboardLayout() {
 
               <div className="flex flex-1 flex-col">
                 {authorizedApps.map(
-                  (a: { icon: string; title: string; timestamp: number }) => (
+                  (a) => (
                     <article
                       key={a.title}
                       className="flex items-center py-5 px-8"
@@ -121,16 +125,27 @@ export default function DashboardLayout() {
                         <img
                           src={a.icon}
                           alt="app icon"
-                          className="object-cover w-6 h-6 rounded"
+                          className={`object-cover w-6 h-6 ${a.appDataError ? "" : "rounded"}`}
                         />
 
-                        <Text
-                          size="sm"
-                          weight="medium"
-                          className="text-gray-500 flex-1"
-                        >
-                          {a.title}
-                        </Text>
+                        <div className='flex-1 flex flex-row space-x-2'>
+                          {a.title ? <Text
+                            size="sm"
+                            weight="medium"
+                            className="text-gray-500 w-fit py-[2px]">
+                            {a.title}
+                          </Text> : null}
+                          {a.appDataError
+                            ? <Text
+                              size="sm"
+                              weight="normal"
+                              className="text-gray-500 w-fit py-[2px] px-2 
+                            text-[#EA580C] bg-orange-50 rounded-xl"
+                            >
+                              Data Error
+                            </Text>
+                            : null}
+                        </div>
                       </div>
 
                       <Text
