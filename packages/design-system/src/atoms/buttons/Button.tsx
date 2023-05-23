@@ -1,4 +1,4 @@
-import React, { ButtonHTMLAttributes } from 'react'
+import React, { ButtonHTMLAttributes, useContext } from 'react'
 import classNames from 'classnames'
 import {
   ButtonSize,
@@ -7,6 +7,7 @@ import {
   sizeToSizesDict,
   typeToColorsDict,
 } from './common'
+import { ThemeContext } from '../../contexts/theme'
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   btnSize?: ButtonSize

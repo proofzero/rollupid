@@ -11,7 +11,7 @@ import { EmailAddressType, OAuthAddressType } from '@proofzero/types/address'
 
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
-import appleIcon from '@proofzero/design-system/src/assets/social_icons/apple.svg'
+import appleIcon from '@proofzero/design-system/src/atoms/providers/Apple'
 
 import { OptionType } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
@@ -33,10 +33,10 @@ const getIconUrl = (
     ? type === OAuthAddressType.Microsoft
       ? microsoftIcon
       : type === OAuthAddressType.Apple
-        ? appleIcon
-        : type === OAuthAddressType.Google
-          ? googleIcon
-          : null
+      ? appleIcon
+      : type === OAuthAddressType.Google
+      ? googleIcon
+      : null
     : null
 }
 
@@ -74,20 +74,20 @@ export const EmailSelect = ({
       by="addressURN"
     >
       {({ open }) => (
-        <div className="relative bg-white">
+        <div className="relative rounded-lg w-full bg-white dark:bg-gray-800">
           <Listbox.Button
-            className={`border shadow-sm rounded-lg w-full transition-transform
-            flex flex-row space-between items-center py-2 px-3 ${items.length === 0
+            className={`border dark:border-gray-600 shadow-sm rounded-lg w-full transition-transform
+            flex flex-row space-between items-center py-2 px-3 ${
+              items.length === 0
                 ? ''
                 : 'hover:ring-1\
-            hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500'
-              } bg-white`}
+            hover:ring-skin-primary focus:ring-1 focus:ring-skin-primary'
+            } bg-white dark:bg-gray-800`}
           >
-
             {!selected && (
               <Text
                 size="sm"
-                className="bg-white flex-1 text-left text-gray-400 truncate text-ellipsis"
+                className="bg-white dark:bg-gray-800 flex-1 text-left text-gray-400 dark:text-white truncate text-ellipsis"
               >
                 {enableAddNew ? 'Connect new email address' : 'None'}
               </Text>
@@ -95,15 +95,15 @@ export const EmailSelect = ({
             {selected && (
               <Text
                 size="sm"
-                className="bg-white flex-1 text-left text-gray-800 truncate text-ellipsis"
+                className="bg-white dark:bg-gray-800 flex-1 text-left text-gray-800 dark:text-white truncate text-ellipsis"
               >
                 {selected?.email}
               </Text>
             )}
             {open ? (
-              <ChevronDownIcon className="w-5 h-5 rotate-180" />
+              <ChevronDownIcon className="w-5 h-5 rotate-180 dark:text-white" />
             ) : (
-              <ChevronDownIcon className="w-5 h-5" />
+              <ChevronDownIcon className="w-5 h-5 dark:text-white" />
             )}
           </Listbox.Button>
 
@@ -114,8 +114,8 @@ export const EmailSelect = ({
             leaveTo="opacity-0"
           >
             <Listbox.Options
-              className="border shadow-lg rounded-lg
-             absolute w-full mt-1 bg-white z-10"
+              className="border dark:border-gray-600 shadow-lg rounded-lg
+             absolute w-full mt-1 bg-white dark:bg-gray-800 z-10"
             >
               {items.map((item, i) => {
                 const iconURL = getIconUrl(item.type)
@@ -124,7 +124,7 @@ export const EmailSelect = ({
                     key={i}
                     value={item}
                     className="py-2 px-3 cursor-pointer
-                  hover:bg-gray-50"
+                  hover:bg-gray-50 dark:hover:bg-gray-600"
                   >
                     {({ selected }) => (
                       <div className="flex flex-row items-center truncate">
@@ -137,13 +137,14 @@ export const EmailSelect = ({
                         <Text
                           size="sm"
                           weight={selected ? 'semibold' : 'normal'}
-                          className={`truncate text-ellipsis ${selected ? '' : ''
-                            } flex-1`}
+                          className={`truncate text-ellipsis ${
+                            selected ? '' : ''
+                          } flex-1 dark:text-white`}
                         >
                           {item.email}
                         </Text>
                         {selected && (
-                          <HiCheck className="w-5 h-5 text-indigo-500" />
+                          <HiCheck className="w-5 h-5 text-skin-primary" />
                         )}
                       </div>
                     )}
@@ -158,7 +159,7 @@ export const EmailSelect = ({
                     email: 'None',
                   }}
                   className="py-2 px-3 cursor-pointer
-                  hover:bg-gray-50"
+                  hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
                   {({ selected }) => (
                     <div className="flex flex-row items-center space-x-3">
@@ -167,12 +168,14 @@ export const EmailSelect = ({
                       <Text
                         size="sm"
                         weight={selected ? 'semibold' : 'normal'}
-                        className={`${selected ? '' : ''} flex-1 truncate`}
+                        className={`${
+                          selected ? '' : ''
+                        } flex-1 truncate dark:text-white`}
                       >
                         None
                       </Text>
                       {selected && (
-                        <HiCheck className="w-5 h-5 text-indigo-500" />
+                        <HiCheck className="w-5 h-5 text-skin-primary" />
                       )}
                     </div>
                   )}
@@ -186,7 +189,7 @@ export const EmailSelect = ({
                     email: 'Connect new email address',
                   }}
                   className="py-2 px-3 cursor-pointer
-                  hover:bg-gray-50"
+                  hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
                   {({ selected }) => (
                     <div className="flex flex-row items-center space-x-3">
@@ -195,12 +198,14 @@ export const EmailSelect = ({
                       <Text
                         size="sm"
                         weight={selected ? 'semibold' : 'normal'}
-                        className={`${selected ? '' : ''} flex-1 truncate`}
+                        className={`${
+                          selected ? '' : ''
+                        } flex-1 truncate dark:text-white`}
                       >
                         Connect new email address
                       </Text>
                       {selected && (
-                        <HiCheck className="w-5 h-5 text-indigo-500" />
+                        <HiCheck className="w-5 h-5 text-skin-primary" />
                       )}
                     </div>
                   )}

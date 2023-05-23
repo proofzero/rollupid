@@ -22,7 +22,7 @@ export const AuthButton = ({
   displayContinueWith = false,
 }: AuthButtonProps) => (
   <Button
-    className="button w-full hover:bg-gray-100"
+    className="button w-full hover:bg-gray-100 dark:bg-[#374151] dark:border-gray-600"
     btnType="secondary-alt"
     disabled={disabled}
     onClick={onClick}
@@ -43,7 +43,10 @@ export const AuthButton = ({
       )}
 
       {fullSize && (
-        <Text weight="medium" className="text-gray-800 truncate">
+        <Text
+          weight="medium"
+          className="text-gray-800 dark:text-white truncate"
+        >
           {`${displayContinueWith ? 'Continue with ' : ''}${text}`}
         </Text>
       )}

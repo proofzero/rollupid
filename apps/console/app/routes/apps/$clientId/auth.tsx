@@ -532,6 +532,14 @@ export default function AppDetailIndexPage() {
 
                 <div>
                   <IconPicker
+                    label="Upload Icon* (256x256)"
+                    ar={{
+                      w: 1,
+                      h: 1,
+                    }}
+                    minW={256}
+                    minH={256}
+                    maxSize={1048576}
                     id="icon"
                     errorMessage={errors?.['icon']}
                     invalid={

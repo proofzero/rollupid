@@ -28,7 +28,11 @@ export const InputToggle = ({
   const computedName = name ?? id
 
   return (
-    <div className="flex flex-row items-center space-x-8">
+    <div
+      className={`flex flex-row items-center ${
+        label && label !== '' ? 'space-x-8' : ''
+      }`}
+    >
       <Text size="sm" weight="medium" className="text-gray-800">
         {label}
       </Text>

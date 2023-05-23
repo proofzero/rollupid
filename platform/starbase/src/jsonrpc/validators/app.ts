@@ -41,6 +41,28 @@ export const AppClientIdParamSchema = z.object({
   clientId: z.string(),
 })
 
+export const AppThemeSchema = z.object({
+  heading: z.string().optional(),
+  radius: z.string().optional(),
+  color: z
+    .object({
+      light: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+      dark: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+    })
+    .optional(),
+  graphicURL: z.string().url().optional(),
+  providers: z
+    .array(
+      z.object({
+        key: z.string(),
+        enabled: z.boolean(),
+      })
+    )
+    .optional(),
+})
+
+export type AppTheme = z.infer<typeof AppThemeSchema>
+
 export const AppPublicPropsSchema = z.object({
   name: z.string(),
   iconURL: z.string(),
@@ -49,6 +71,7 @@ export const AppPublicPropsSchema = z.object({
   termsURL: z.string().optional(),
   privacyURL: z.string().optional(),
   websiteURL: z.string().optional(),
+  appTheme: AppThemeSchema.optional(),
 })
 
 export type AppPublicProps = z.infer<typeof AppPublicPropsSchema>

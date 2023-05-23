@@ -1,12 +1,13 @@
 import React from 'react'
-import appleIcon from '../../../assets/social_icons/apple.svg'
 import discordIcon from '../../../assets/social_icons/discord.svg'
-import githubIcon from '../../../assets/social_icons/github.svg'
 import googleIcon from '../../../assets/social_icons/google.svg'
 import microsoftIcon from '../../../assets/social_icons/microsoft.svg'
 import twitterIcon from '../../../assets/social_icons/twitter.svg'
 import { Button } from '../Button'
 import { Text } from '../../text/Text'
+
+import { WrappedSVG as AppleSVG } from '../../providers/Apple'
+import { WrappedSVG as GitHubSVG } from '../../providers/Github'
 
 export type OAuthProvider =
   | 'apple'
@@ -16,33 +17,39 @@ export type OAuthProvider =
   | 'microsoft'
   | 'twitter'
 
-// Can possibly be replaced with
-// react-icons
-const providerIconDict: { [key in OAuthProvider]: string } = {
-  apple: appleIcon,
-  discord: discordIcon,
-  github: githubIcon,
-  google: googleIcon,
-  microsoft: microsoftIcon,
-  twitter: twitterIcon,
+const providerImgBuildHelper = (provider: string, iconSrc: string) => (
+  <img className="w-5 h-5" src={iconSrc} alt={provider} />
+)
+
+const providerIconDict: { [key in OAuthProvider]: JSX.Element } = {
+  apple: AppleSVG,
+  discord: providerImgBuildHelper('discord', discordIcon),
+  github: GitHubSVG,
+  google: providerImgBuildHelper('google', googleIcon),
+  microsoft: providerImgBuildHelper('microsoft', microsoftIcon),
+  twitter: providerImgBuildHelper('twitter', twitterIcon),
 }
 
 type ConnectOAuthButtonProps = {
   provider: OAuthProvider
   fullSize?: boolean
   displayContinueWith?: boolean
+  submit?: boolean
 }
 
 const ConnectOAuthButton = ({
   provider,
   fullSize = true,
   displayContinueWith = false,
+  submit = false,
 }: ConnectOAuthButtonProps) => {
   return (
     <Button
-      className={'button w-full hover:bg-gray-100'}
+      className={
+        'button w-full dark:bg-[#374151] dark:border-gray-600 hover:bg-gray-100'
+      }
       btnType={'secondary-alt'}
-      isSubmit={true}
+      isSubmit={submit}
       role={provider}
     >
       <div
@@ -50,14 +57,13 @@ const ConnectOAuthButton = ({
           fullSize ? '' : 'justify-center'
         }  items-center w-full space-x-3 h-[36px]`}
       >
-        <img
-          className="w-5 h-5"
-          src={providerIconDict[provider]}
-          alt={provider}
-        />
+        {providerIconDict[provider]}
 
         {fullSize && (
-          <Text weight="medium" className="truncate text-gray-800">
+          <Text
+            weight="medium"
+            className="truncate text-gray-800 dark:text-white"
+          >
             {displayContinueWith ? 'Continue with ' : ''}{' '}
             {provider.charAt(0).toUpperCase() + provider.slice(1)}
           </Text>

@@ -83,6 +83,11 @@ import {
 import { setPaymaster, SetPaymasterInput } from './methods/setPaymaster'
 import { ApiKeyExtractMiddleware } from './apiKeyExtract'
 
+import { AppClientIdParamSchema } from './validators/app'
+
+import { getAppTheme, GetAppThemeOutput } from './methods/getAppTheme'
+import { SetAppThemeInput, setAppTheme } from './methods/setAppTheme'
+
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
 export const appRouter = t.router({
@@ -232,6 +237,19 @@ export const appRouter = t.router({
     .use(OwnAppsMiddleware)
     .input(UpsertAppContactAddressInput)
     .mutation(upsertAppContactAddress),
+  getAppTheme: t.procedure
+    .use(Analytics)
+    .input(AppClientIdParamSchema)
+    .output(GetAppThemeOutput)
+    .query(getAppTheme),
+  setAppTheme: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .use(OwnAppsMiddleware)
+    .input(SetAppThemeInput)
+    .mutation(setAppTheme),
 })
 
 export type StarbaseRouter = typeof appRouter

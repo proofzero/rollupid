@@ -17,7 +17,7 @@ import { createClient } from 'wagmi'
 import { getDefaultClient } from 'connectkit'
 import Authentication, {
   AppProfile,
-  AuthenticationConstants,
+  AuthenticationScreenDefaults,
 } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
@@ -38,7 +38,7 @@ const client = createClient(
 export const loader: LoaderFunction = async ({ request, params }) => {
   const url = new URL(request.url)
 
-  let displayKeys = AuthenticationConstants.knownKeys
+  let displayKeys = AuthenticationScreenDefaults.knownKeys
 
   let loginHint = url.searchParams.get('login_hint')
 
@@ -149,20 +149,20 @@ export default () => {
             {!generic && (
               <>
                 <Avatar
-                  src={iconURL ?? AuthenticationConstants.defaultLogoURL}
+                  src={iconURL ?? AuthenticationScreenDefaults.defaultLogoURL}
                   size="sm"
                 ></Avatar>
                 <div className={'flex flex-col items-center gap-2'}>
                   <h1 className={'font-semibold text-xl'}>
                     {appProps?.name
                       ? `Login to ${appProps?.name}`
-                      : AuthenticationConstants.defaultHeading}
+                      : AuthenticationScreenDefaults.defaultHeading}
                   </h1>
                   <h2
                     style={{ color: '#6B7280' }}
                     className={'font-medium text-base'}
                   >
-                    {AuthenticationConstants.defaultSubheading}
+                    {AuthenticationScreenDefaults.defaultSubheading}
                   </h2>
                 </div>
               </>
@@ -201,6 +201,7 @@ export default () => {
               {children}
             </Form>
           ),
+          enableOAuthSubmit: true,
           loading,
           walletConnectCallback: async (address) => {
             if (loading) return

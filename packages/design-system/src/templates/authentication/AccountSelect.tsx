@@ -6,7 +6,7 @@ import { Text } from '../../atoms/text/Text'
 import { Avatar } from '../../atoms/profile/avatar/Avatar'
 
 import { AuthButton } from '../../molecules/auth-button/AuthButton'
-import { AppProfile, AuthenticationConstants } from './Authentication'
+import { AppProfile, AuthenticationScreenDefaults } from './Authentication'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 
 type UserProfile = {
@@ -24,7 +24,7 @@ export type AccountSelectProps = {
 }
 
 export default ({
-  logoURL = AuthenticationConstants.defaultLogoURL,
+  logoURL = AuthenticationScreenDefaults.defaultLogoURL,
   userProfile,
   appProfile,
   onAuth = () => {},

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import circleLogo from './circle-logo.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
@@ -13,8 +13,9 @@ import { ConnectButton } from '../../atoms/buttons/connect-button/ConnectButton'
 import { AuthButton } from '../../molecules/auth-button/AuthButton'
 import { HiOutlineMail } from 'react-icons/hi'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
+import { ThemeContext } from '../../contexts/theme'
 
-export const AuthenticationConstants = {
+export const AuthenticationScreenDefaults = {
   defaultLogoURL: circleLogo,
   defaultHeading: 'Welcome to the Private Web',
   defaultSubheading: 'How would you like to continue?',
@@ -45,6 +46,7 @@ export type AuthenticationProps = {
   mapperArgs: DisplayKeyMapperArgs
   Header?: JSX.Element
   Actions?: JSX.Element
+  radius?: string
 }
 
 export default ({
@@ -53,17 +55,20 @@ export default ({
   mapperArgs,
   Header,
   Actions,
+  radius = 'lg',
 }: AuthenticationProps) => {
   displayKeys = displayKeys.filter((key) =>
-    AuthenticationConstants.knownKeys.includes(key)
+    AuthenticationScreenDefaults.knownKeys.includes(key)
   )
 
+  const { dark } = useContext(ThemeContext)
+
   return (
-    <div className="relative">
+    <div className={`relative ${dark ? 'dark' : ''}`}>
       <div
         className={`flex grow-0 flex-col items-center
-         gap-4 mx-auto bg-white p-6 min-h-[100dvh] lg:min-h-[675px]
-          max-h-[100dvh] w-full lg:w-[418px] lg:rounded-lg
+         gap-4 mx-auto bg-white dark:bg-[#1F2937] p-6 min-h-[100dvh] lg:min-h-[675px]
+          max-h-[100dvh] w-full lg:w-[418px] lg:rounded-${radius}
           mt-auto`}
         style={{
           border: '1px solid #D1D5DB',
@@ -148,6 +153,7 @@ type DisplayKeyMapperArgs = {
   loading?: boolean
   flex?: boolean
   displayContinueWith?: boolean
+  enableOAuthSubmit?: boolean
 }
 const displayKeyMapper = (
   key: string,
@@ -155,14 +161,15 @@ const displayKeyMapper = (
     clientId,
     wagmiClient,
     signData,
-    walletConnectCallback = () => { },
-    walletSignCallback = () => { },
-    walletConnectErrorCallback = () => { },
-    navigate = () => { },
+    walletConnectCallback = () => {},
+    walletSignCallback = () => {},
+    walletConnectErrorCallback = () => {},
+    navigate = () => {},
     FormWrapperEl = ({ children }) => <>{children}</>,
     loading = false,
     flex = false,
     displayContinueWith = false,
+    enableOAuthSubmit = false,
   }: DisplayKeyMapperArgs
 ) => {
   let el
@@ -188,7 +195,7 @@ const displayKeyMapper = (
         <AuthButton
           key={key}
           onClick={() => navigate(`/authenticate/${clientId}/email`)}
-          Graphic={<HiOutlineMail className="w-full h-full" />}
+          Graphic={<HiOutlineMail className="w-full h-full dark:text-white" />}
           text={'Email'}
           fullSize={flex}
           displayContinueWith={displayContinueWith}
@@ -202,6 +209,7 @@ const displayKeyMapper = (
             provider={key as OAuthProvider}
             fullSize={flex}
             displayContinueWith={displayContinueWith}
+            submit={enableOAuthSubmit}
           />
         </FormWrapperEl>
       )

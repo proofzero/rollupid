@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
 import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
-import appleIcon from '@proofzero/design-system/src/assets/social_icons/apple.svg'
+import appleIcon from '@proofzero/design-system/src/atoms/providers/Apple'
 
 import { MdOutlineEmail } from 'react-icons/md'
 import { Text } from '../../atoms/text/Text'

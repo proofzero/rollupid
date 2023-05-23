@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: ['./src/**/*.{html,js,jsx,tsx,ts}'],
   theme: {
     extend: {},
@@ -22,5 +23,8 @@ module.exports = {
     'text-gray-500',
     'mt-8',
     'mt-2',
+    'lg:rounded-sm',
+    'lg:rounded-md',
+    'lg:rounded-lg',
   ],
 }

@@ -42,9 +42,7 @@ import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jso
 import type { AddressURN } from '@proofzero/urns/address'
 import type { PersonaData } from '@proofzero/types/application'
 
-import Authorization, {
-  scopeIcons,
-} from '@proofzero/design-system/src/templates/authorization/Authorization'
+import Authorization from '@proofzero/design-system/src/templates/authorization/Authorization'
 
 export type UserProfile = {
   displayName: string
@@ -501,7 +499,6 @@ export default function Authorize() {
           }}
           requestedScope={requestedScope}
           scopeMeta={scopeMeta}
-          scopeIcons={scopeIcons}
           transitionState={transition.state}
           connectedSmartContractWallets={connectedSmartContractWallets ?? []}
           addNewSmartWalletCallback={() => {
