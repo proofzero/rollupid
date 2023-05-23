@@ -6,17 +6,16 @@ import {
     ChevronUpIcon,
     CheckIcon,
 } from '@heroicons/react/20/solid'
-import { DropdownConnectButton } from "./DropdownConnectButton"
-import { CryptoAddressType, EmailAddressType, OAuthAddressType } from "@proofzero/types/address"
-import { OptionType } from "@proofzero/utils/getNormalisedConnectedAccounts"
+import { CryptoAddressType } from "@proofzero/types/address"
+import { Button } from "../buttons/Button"
+import { TbCirclePlus } from "react-icons/tb"
 
 
 export type SelectListItem = {
     title: string
-    type?: OAuthAddressType | EmailAddressType | OptionType | CryptoAddressType
-    address?: string
-    identifier?: string
+    label?: string
     icon?: JSX.Element
+    details?: Record<string, any>
 }
 
 const modifyType = (string: string) => {
@@ -34,9 +33,8 @@ export const Dropdown = ({
     onSelect,
     multiple = false,
     onSelectAll,
-    defaultIdentifier,
-    allSelectedValuesTitle,
-    identifierAllValues,
+    selectAllCheckboxTitle,
+    selectAllCheckboxDescription,
     label,
 }: {
     values: SelectListItem[],
@@ -46,21 +44,18 @@ export const Dropdown = ({
     ConnectButtonPhrase: string,
     ConnectButtonCallback: () => void,
     onSelectAll?: () => void,
-    defaultIdentifier?: string
-    allSelectedValuesTitle?: string
-    identifierAllValues?: string
+    selectAllCheckboxTitle?: string
+    selectAllCheckboxDescription?: string
     label?: string
 }) => {
     /**
      * For single select
      */
     const [selectedValue, setSelectedValue] = useState<SelectListItem>(() => {
-        if (defaultIdentifier) {
-            const defaultItem = values.find(
-                (item) => item.identifier === defaultIdentifier
-            ) || values[0]
-            return defaultItem
-        }
+        const defaultItem = values.find(
+            (item) => item.details?.default
+        )
+        return defaultItem
     })
 
     /**
@@ -131,7 +126,7 @@ export const Dropdown = ({
 
                             {allValuesSelected && (
                                 <Text size="sm" className="text-gray-800 truncate text-ellipsis">
-                                    {allSelectedValuesTitle}
+                                    {selectAllCheckboxTitle}
                                 </Text>
                             )}
 
@@ -186,14 +181,14 @@ export const Dropdown = ({
                                                         weight="medium"
                                                         className="text-gray-900 truncate text-ellipsis"
                                                     >
-                                                        {allSelectedValuesTitle}
+                                                        {selectAllCheckboxTitle}
                                                     </Text>
                                                     <Text
                                                         size="xs"
                                                         weight='normal'
                                                         className={`truncate w-full text-gray-500`}
                                                     >
-                                                        {identifierAllValues}
+                                                        {selectAllCheckboxDescription}
                                                     </Text>
                                                 </div>
                                             </div>
@@ -205,11 +200,11 @@ export const Dropdown = ({
 
                                                     const checked = !allValuesSelected &&
                                                         selectedValues
-                                                            .map((sa) => sa.identifier)
-                                                            .includes(value.identifier)
+                                                            .map((sa) => sa.label)
+                                                            .includes(value.label)
 
                                                     return <Listbox.Option
-                                                        key={value.identifier}
+                                                        key={value.label}
                                                         value={value}
                                                         className={` rounded 
                                                         flex flex-row space-x-2 cursor-pointer py-1.5 px-4
@@ -242,13 +237,13 @@ export const Dropdown = ({
                                                             <Text
                                                                 size="xs"
                                                                 weight="normal"
-                                                                className={`truncate text-ellipsis ${allValuesSelected
+                                                                className={`truncate w-full text-ellipsis ${allValuesSelected
                                                                     ? 'text-gray-400'
                                                                     : 'text-gray-500'
                                                                     }`}
                                                             >
-                                                                {modifyType(value.type as string)} -{' '}
-                                                                {value.address}
+                                                                {modifyType(value.details.type as string)} -{' '}
+                                                                {value.details.address}
                                                             </Text>
                                                         </div>
                                                     </Listbox.Option>
@@ -264,7 +259,7 @@ export const Dropdown = ({
                                                 <Listbox.Option
                                                     className="flex flex-row space-x-2 cursor-pointer hover:bg-gray-50
                                     rounded-lg  w-full "
-                                                    key={value.identifier}
+                                                    key={value.label}
                                                     value={value}
                                                 >{({ selected }) => (
                                                     <div
@@ -286,13 +281,13 @@ export const Dropdown = ({
                                                                 >
                                                                     {value.title}
                                                                 </Text>
-                                                                {value.address ? <Text
+                                                                {value.details.address ? <Text
                                                                     size="xs"
                                                                     weight='normal'
                                                                     className={`truncate w-full text-gray-500`}
                                                                 >
-                                                                    {modifyType(value.type as string)} -{' '}
-                                                                    {value.address}
+                                                                    {modifyType(value.details.type as string)} -{' '}
+                                                                    {value.details.address}
                                                                 </Text> : null}
                                                             </div>
                                                         </div>
@@ -311,10 +306,15 @@ export const Dropdown = ({
                                     : null
                                 }
                                 <div className="px-3 pb-3">
-                                    <DropdownConnectButton
-                                        ConnectButtonPhrase={ConnectButtonPhrase}
-                                        ConnectButtonCallback={ConnectButtonCallback}
-                                    />
+                                    <Button
+                                        btnType="secondary-alt"
+                                        onClick={ConnectButtonCallback}
+                                        className={`w-full min-w-[238px] flex flex-row items-center gap-1 justify-center
+                                         px-[12px]`}
+                                    >
+                                        <TbCirclePlus size={18} />
+                                        <Text size="sm">{ConnectButtonPhrase}</Text>
+                                    </Button>
                                 </div>
                             </Listbox.Options>
                         </Transition>

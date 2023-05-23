@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dropdown, SelectListItem } from './Dropdown'
+import { Dropdown, SelectListItem } from './DropdownSelectList'
 
 import { OAuthAddressType, EmailAddressType, CryptoAddressType } from '@proofzero/types/address'
 import { OptionType } from '@proofzero/utils/getNormalisedConnectedAccounts'
@@ -34,28 +34,37 @@ const getIcon = (
 
 const listItems: SelectListItem[] = [
     {
-        type: OAuthAddressType.Google,
         title: 'email@gmail.com',
-        identifier: 'urn:rollupid:address/1',
+        label: 'urn:rollupid:address/1',
         icon: getIcon(OAuthAddressType.Google),
+        details: {
+            type: OAuthAddressType.Google,
+        }
     },
     {
-        type: OAuthAddressType.Microsoft,
         title: 'email@microsoft.com',
-        identifier: 'urn:rollupid:address/2',
+        label: 'urn:rollupid:address/2',
         icon: getIcon(OAuthAddressType.Microsoft),
+        details: {
+            type: OAuthAddressType.Microsoft,
+        }
     },
     {
-        type: EmailAddressType.Email,
         title: 'email@yahoo.com',
-        identifier: 'urn:rollupid:address/3',
+        label: 'urn:rollupid:address/3',
         icon: getIcon(EmailAddressType.Email),
+        details: {
+            type: EmailAddressType.Email,
+            default: true,
+        }
     },
     {
-        type: EmailAddressType.Email,
         title: 'email@gmail.com',
-        identifier: 'urn:rollupid:address/4',
+        label: 'urn:rollupid:address/4',
         icon: getIcon(EmailAddressType.Email),
+        details: {
+            type: EmailAddressType.Email,
+        }
     },
 ]
 
@@ -64,7 +73,6 @@ const Template = () => (
         <Dropdown
             values={listItems}
             onSelect={(val) => { console.log({ val }) }}
-            defaultIdentifier={listItems[1].identifier}
             placeholder='Select an Email Address'
             ConnectButtonPhrase="Connect New Email Address"
             ConnectButtonCallback={() => { console.log('Connect New Email Address') }}

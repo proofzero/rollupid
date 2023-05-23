@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dropdown, SelectListItem } from './Dropdown'
+import { Dropdown, SelectListItem } from './DropdownSelectList'
 
 import { CryptoAddressType } from '@proofzero/types/address'
 
@@ -10,10 +10,12 @@ export default {
 
 
 const accounts: SelectListItem[] = Array.from({ length: 10 }, (_, i) => ({
-    identifier: `urn:proofzero:address:${i}`,
+    label: `urn:proofzero:address:${i}`,
     title: `Smart Contract Wallet ${i}`,
-    type: CryptoAddressType.Wallet,
-    address: `SC Wallet: ${i}`,
+    details: {
+        type: CryptoAddressType.Wallet,
+        address: `SC Wallet: ${i}`,
+    }
 }))
 
 const Template = () => (
@@ -25,8 +27,8 @@ const Template = () => (
             ConnectButtonPhrase="New Smart Contract Wallet"
             ConnectButtonCallback={() => { console.log('New Smart Contract Wallet') }}
             multiple={true}
-            allSelectedValuesTitle='All Smart Contract Wallets'
-            identifierAllValues='All current and future SC Wallets'
+            selectAllCheckboxTitle='All Smart Contract Wallets'
+            selectAllCheckboxDescription='All current and future SC Wallets'
         />
     </div>
 )

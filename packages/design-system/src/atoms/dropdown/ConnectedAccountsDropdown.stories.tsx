@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dropdown, SelectListItem } from './Dropdown'
+import { Dropdown, SelectListItem } from './DropdownSelectList'
 
 import { OAuthAddressType, EmailAddressType, CryptoAddressType } from '@proofzero/types/address'
 
@@ -18,10 +18,12 @@ const pickRandomType = (i: number) => {
 }
 
 const accounts: SelectListItem[] = Array.from({ length: 10 }, (_, i) => ({
-    identifier: `urn:proofzero:address:${i}`,
+    label: `urn:proofzero:address:${i}`,
     title: `Account ${i}`,
-    type: pickRandomType(i),
-    address: `Address ${i}`,
+    details: {
+        type: pickRandomType(i),
+        address: `Address ${i}`,
+    }
 }))
 
 const Template = () => (
@@ -33,8 +35,8 @@ const Template = () => (
             ConnectButtonPhrase="Connect New Account"
             ConnectButtonCallback={() => { console.log('Connect New Account') }}
             multiple={true}
-            allSelectedValuesTitle='All Connected Accounts'
-            identifierAllValues='All current and future accounts'
+            selectAllCheckboxTitle='All Connected Accounts'
+            selectAllCheckboxDescription='All current and future accounts'
         />
     </div>
 )
