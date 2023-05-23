@@ -6,8 +6,8 @@ import twitterIcon from '../../../assets/social_icons/twitter.svg'
 import { Button } from '../Button'
 import { Text } from '../../text/Text'
 
-import Apple from '../../providers/Apple'
-import Github from '../../providers/Github'
+import { WrappedSVG as AppleSVG } from '../../providers/Apple'
+import { WrappedSVG as GitHubSVG } from '../../providers/Github'
 
 export type OAuthProvider =
   | 'apple'
@@ -22,9 +22,9 @@ const providerImgBuildHelper = (provider: string, iconSrc: string) => (
 )
 
 const providerIconDict: { [key in OAuthProvider]: JSX.Element } = {
-  apple: Apple,
+  apple: AppleSVG,
   discord: providerImgBuildHelper('discord', discordIcon),
-  github: Github,
+  github: GitHubSVG,
   google: providerImgBuildHelper('google', googleIcon),
   microsoft: providerImgBuildHelper('microsoft', microsoftIcon),
   twitter: providerImgBuildHelper('twitter', twitterIcon),
