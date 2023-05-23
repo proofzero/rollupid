@@ -151,16 +151,22 @@ export const EmailTemplate = (
                 >Privacy Policy</a
               >
               <div class="vl"></div>
-              <a
+              ${
+                contact !== ''
+                  ? `<a
                 class="footer-links"
                 href="${contact}"
                 target="_blank"
                 rel="noreferrer"
                 >Contact Us</a
-              >
+              >`
+                  : ''
+              }
             </div>
 
-            <p
+            ${
+              address !== ''
+                ? `<pre
               style="
                 font-size: 12px;
                 line-height: 16px;
@@ -168,9 +174,9 @@ export const EmailTemplate = (
                 margin-bottom: 4px;
                 margin-top: 10px;
               "
-            >
-              ${address}
-            </p>
+            >${address}</pre>`
+                : ''
+            }
             <p
               style="
                 font-size: 12px;
