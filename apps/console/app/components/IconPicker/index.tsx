@@ -27,6 +27,10 @@ function pickIcon(
       const files = e.target.files
       const errors: any = {}
 
+      if (!files || files.length === 0) {
+        ok(errors)
+      }
+
       if (files[0].size >= maxImgSize) {
         errors['imgSize'] = `Image size limit is ${Math.floor(
           maxImgSize / 1024 / 1024
