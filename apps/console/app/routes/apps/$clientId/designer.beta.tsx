@@ -53,6 +53,7 @@ import InputTextarea from '@proofzero/design-system/src/atoms/form/InputTextarea
 import { PreLabeledInput } from '@proofzero/design-system/src/atoms/form/PreLabledInput'
 import { EmailTemplate } from '@proofzero/platform/email/emailOtpTemplate'
 import subtractLogo from '@proofzero/design-system/src/assets/subtract-logo.svg'
+import { BadRequestError } from '@proofzero/errors'
 
 const client = createClient(
   // @ts-ignore
@@ -281,87 +282,6 @@ const ProviderModal = ({
   )
 }
 
-export const loader: LoaderFunction = async ({ request, params, context }) => {
-  if (!params.clientId) {
-    throw new Error('Client ID is required for the requested route')
-  }
-
-  const jwt = await requireJWT(request)
-  const traceHeader = generateTraceContextHeaders(context.traceSpan)
-  const clientId = params?.clientId
-
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...traceHeader,
-  })
-
-  const appTheme = await starbaseClient.getAppTheme.query({
-    clientId,
-  })
-
-  return json({
-    appTheme,
-  })
-}
-
-export const action: ActionFunction = async ({ request, params, context }) => {
-  if (!params.clientId) {
-    throw new Error('Client ID is required for the requested route')
-  }
-
-  const jwt = await requireJWT(request)
-  const traceHeader = generateTraceContextHeaders(context.traceSpan)
-  const clientId = params?.clientId
-
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...traceHeader,
-  })
-
-  const fd = await request.formData()
-
-  const heading = fd.get('heading') as string
-  const radius = fd.get('radius') as string
-  const color = fd.get('color') as string
-  const colorDark = fd.get('colordark') as string
-  const graphicURL = fd.get('image') as string
-
-  const providersJSON = fd.get('providers') as string
-  const providers = JSON.parse(providersJSON)
-
-  const theme: AppTheme = {
-    heading: heading !== '' ? heading : undefined,
-    radius,
-    color: {
-      light: color,
-      dark: colorDark,
-    },
-    graphicURL: graphicURL !== '' ? graphicURL : undefined,
-    providers,
-  }
-
-  const errors: {
-    [key: string]: string
-  } = {}
-
-  const zodErrors = await AppThemeSchema.spa(theme)
-  if (!zodErrors.success) {
-    const { fieldErrors } = zodErrors.error.flatten()
-    Object.keys(fieldErrors).forEach((key) => {
-      errors[key] = (fieldErrors as { [key: string]: string })[key][0]
-    })
-  } else {
-    await starbaseClient.setAppTheme.mutate({
-      clientId,
-      theme,
-    })
-  }
-
-  return json({
-    errors,
-  })
-}
-
 const AuthPanel = ({
   appTheme,
   avatarURL,
@@ -426,6 +346,8 @@ const AuthPanel = ({
         saveCallback={setProviders}
       />
       <Tab.Panel className="flex flex-col lg:flex-row gap-7">
+        <input type="hidden" name="target" value="auth" />
+
         <section className="flex-1 bg-white border rounded-lg">
           <Text size="lg" weight="semibold" className="mx-8 my-4 text-gray-900">
             Login Settings
@@ -839,6 +761,241 @@ const AuthPanel = ({
   )
 }
 
+const EmailPanel = ({
+  setLoading,
+  errors,
+}: {
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>
+  errors?: {
+    [key: string]: string
+  }
+}) => {
+  const [logoURL, setLogoURL] = useState<string | undefined>()
+  const [address, setAddress] = useState<string | undefined>()
+  const [contact, setContact] = useState<string | undefined>()
+
+  return (
+    <Tab.Panel className="flex flex-col lg:flex-row gap-7">
+      <input type="hidden" name="target" value="email" />
+
+      <section className="flex-1 bg-white border rounded-lg">
+        <Text size="lg" weight="semibold" className="mx-8 my-4 text-gray-900">
+          OTP Email Settings
+        </Text>
+
+        <FormElement label="Logo" sublabel="Images can't be larger than 2mB">
+          <div className="flex flex-row items-center gap-2">
+            <IconPicker
+              maxSize={2097152}
+              aspectRatio={{
+                width: 1,
+                height: 1,
+              }}
+              id="logo"
+              setIsFormChanged={(val) => {}}
+              setIsImgUploading={(val) => {
+                setLoading(val)
+              }}
+              imageUploadCallback={setLogoURL}
+              url={logoURL}
+              invalid={errors?.logoURL ? true : false}
+              errorMessage={errors?.logoURL}
+            />
+
+            {logoURL && (
+              <button
+                type="button"
+                className="flex justify-center items-center py-2 px-4"
+                onClick={() => {
+                  setLogoURL(undefined)
+                }}
+              >
+                <Text size="xs" weight="medium" className="text-gray-200">
+                  Remove
+                </Text>
+              </button>
+            )}
+          </div>
+
+          {errors?.graphicURL && (
+            <Text
+              className="mb-1.5 mt-1.5 text-red-500"
+              size="xs"
+              weight="normal"
+            >
+              {errors?.graphicURL || ''}
+            </Text>
+          )}
+        </FormElement>
+
+        <FormElement label="Business Address">
+          <InputTextarea
+            id="address"
+            heading=""
+            defaultValue={address}
+            onChange={setAddress}
+          />
+        </FormElement>
+
+        <FormElement label="Contact us">
+          <PreLabeledInput
+            id="contact"
+            preLabel={'https://'}
+            label=""
+            defaultValue={contact}
+            onChange={(e) => setContact(e.target.value)}
+          />
+        </FormElement>
+      </section>
+
+      <section className="bg-white border rounded-lg pb-3 px-6 min-w-[468px] h-[781px] overflow-scroll">
+        <div className="flex flex-row items-center justify-between my-4">
+          <Text size="lg" weight="semibold" className="text-gray-900">
+            Preview
+          </Text>
+        </div>
+
+        <iframe
+          className="w-full border rounded-lg"
+          srcDoc={
+            EmailTemplate(
+              logoURL ?? subtractLogo,
+              address ?? '',
+              contact ?? '',
+              'XXXXXX'
+            ).body
+          }
+          onLoad={(ev) => {
+            const iFrame = ev.target as HTMLIFrameElement
+            const iFrameDoc = iFrame.contentDocument
+
+            const height = iFrameDoc?.body.clientHeight
+            if (!height) {
+              console.warn('No height detected for iFrame')
+              return
+            }
+
+            iFrame.style.height = height + 0.05 * height + 'px'
+          }}
+        ></iframe>
+      </section>
+    </Tab.Panel>
+  )
+}
+
+export const loader: LoaderFunction = async ({ request, params, context }) => {
+  if (!params.clientId) {
+    throw new Error('Client ID is required for the requested route')
+  }
+
+  const jwt = await requireJWT(request)
+  const traceHeader = generateTraceContextHeaders(context.traceSpan)
+  const clientId = params?.clientId
+
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...traceHeader,
+  })
+
+  const appTheme = await starbaseClient.getAppTheme.query({
+    clientId,
+  })
+
+  return json({
+    appTheme,
+  })
+}
+
+export const action: ActionFunction = async ({ request, params, context }) => {
+  if (!params.clientId) {
+    throw new Error('Client ID is required for the requested route')
+  }
+
+  const jwt = await requireJWT(request)
+  const traceHeader = generateTraceContextHeaders(context.traceSpan)
+  const clientId = params?.clientId
+
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...traceHeader,
+  })
+
+  let errors: {
+    [key: string]: string
+  } = {}
+
+  let theme = await starbaseClient.getAppTheme.query({
+    clientId,
+  })
+
+  const updateAuth = async (fd: FormData, theme: AppTheme) => {
+    const heading = fd.get('heading') as string | undefined
+    const radius = fd.get('radius') as string | undefined
+    const color = fd.get('color') as string | undefined
+    const colorDark = fd.get('colordark') as string | undefined
+    const graphicURL = fd.get('image') as string | undefined
+
+    const providersJSON = fd.get('providers') as string | undefined
+    const providers = providersJSON ? JSON.parse(providersJSON) : undefined
+
+    theme = {
+      ...theme,
+      heading: heading ?? theme.heading,
+      radius: radius ?? theme.radius,
+      color:
+        color && colorDark
+          ? {
+              light: color,
+              dark: colorDark,
+            }
+          : theme.color,
+      graphicURL: graphicURL ?? theme.graphicURL,
+      providers: providers ?? theme.providers,
+    }
+
+    return theme
+  }
+
+  const updateEmail = async (fd: FormData, theme: AppTheme) => {
+    const logoURL = fd.get('logoURL') as string | undefined
+    const address = fd.get('address') as string | undefined
+    const contact = fd.get('contact') as string | undefined
+
+    return theme
+  }
+
+  const fd = await request.formData()
+  switch (fd.get('target')) {
+    case 'auth':
+      updateAuth(fd, theme)
+      break
+    case 'email':
+      updateEmail(fd, theme)
+      break
+    default:
+      throw new BadRequestError({
+        message: 'Invalid target',
+      })
+  }
+
+  const zodErrors = await AppThemeSchema.spa(theme)
+  if (!zodErrors.success) {
+    const { fieldErrors } = zodErrors.error.flatten()
+    Object.keys(fieldErrors).forEach((key) => {
+      errors[key] = (fieldErrors as { [key: string]: string })[key][0]
+    })
+  } else {
+    await starbaseClient.setAppTheme.mutate({
+      clientId,
+      theme,
+    })
+  }
+
+  return json({
+    errors,
+  })
+}
+
 export default () => {
   const { appTheme } = useLoaderData<{
     appTheme: GetAppThemeResult
@@ -859,10 +1016,6 @@ export default () => {
   }>()
 
   const [loading, setLoading] = useState<boolean>(false)
-
-  const [logoURL, setLogoURL] = useState<string | undefined>()
-  const [address, setAddress] = useState<string | undefined>()
-  const [contact, setContact] = useState<string | undefined>()
 
   return (
     <>
@@ -928,120 +1081,8 @@ export default () => {
               setLoading={setLoading}
               errors={errors}
             />
-            <Tab.Panel className="flex flex-col lg:flex-row gap-7">
-              <section className="flex-1 bg-white border rounded-lg">
-                <Text
-                  size="lg"
-                  weight="semibold"
-                  className="mx-8 my-4 text-gray-900"
-                >
-                  OTP Email Settings
-                </Text>
 
-                <FormElement
-                  label="Logo"
-                  sublabel="Images can't be larger than 2mB"
-                >
-                  <div className="flex flex-row items-center gap-2">
-                    <IconPicker
-                      maxSize={2097152}
-                      aspectRatio={{
-                        width: 1,
-                        height: 1,
-                      }}
-                      id="logo"
-                      setIsFormChanged={(val) => {}}
-                      setIsImgUploading={(val) => {
-                        setLoading(val)
-                      }}
-                      imageUploadCallback={setLogoURL}
-                      url={logoURL}
-                      invalid={errors?.logoURL}
-                      errorMessage={errors?.logoURL}
-                    />
-
-                    {logoURL && (
-                      <button
-                        type="button"
-                        className="flex justify-center items-center py-2 px-4"
-                        onClick={() => {
-                          setLogoURL(undefined)
-                        }}
-                      >
-                        <Text
-                          size="xs"
-                          weight="medium"
-                          className="text-gray-200"
-                        >
-                          Remove
-                        </Text>
-                      </button>
-                    )}
-                  </div>
-
-                  {errors?.graphicURL && (
-                    <Text
-                      className="mb-1.5 mt-1.5 text-red-500"
-                      size="xs"
-                      weight="normal"
-                    >
-                      {errors?.graphicURL || ''}
-                    </Text>
-                  )}
-                </FormElement>
-
-                <FormElement label="Business Address">
-                  <InputTextarea
-                    id="address"
-                    heading=""
-                    defaultValue={address}
-                    onChange={setAddress}
-                  />
-                </FormElement>
-
-                <FormElement label="Contact us">
-                  <PreLabeledInput
-                    id="contact"
-                    preLabel={'https://'}
-                    label=""
-                    defaultValue={contact}
-                    onChange={(e) => setContact(e.target.value)}
-                  />
-                </FormElement>
-              </section>
-
-              <section className="bg-white border rounded-lg pb-3 px-6 min-w-[468px] h-[781px] overflow-scroll">
-                <div className="flex flex-row items-center justify-between my-4">
-                  <Text size="lg" weight="semibold" className="text-gray-900">
-                    Preview
-                  </Text>
-                </div>
-
-                <iframe
-                  className="w-full border rounded-lg"
-                  srcDoc={
-                    EmailTemplate(
-                      logoURL ?? subtractLogo,
-                      address ?? '',
-                      contact ?? '',
-                      'XXXXXX'
-                    ).body
-                  }
-                  onLoad={(ev) => {
-                    const iFrame = ev.target as HTMLIFrameElement
-                    const iFrameDoc = iFrame.contentDocument
-
-                    const height = iFrameDoc?.body.clientHeight
-                    if (!height) {
-                      console.warn('No height detected for iFrame')
-                      return
-                    }
-
-                    iFrame.style.height = height + 0.05 * height + 'px'
-                  }}
-                ></iframe>
-              </section>
-            </Tab.Panel>
+            <EmailPanel setLoading={setLoading} errors={errors} />
           </Tab.Panels>
         </Tab.Group>
       </Form>
