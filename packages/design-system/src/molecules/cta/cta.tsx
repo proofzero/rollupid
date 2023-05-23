@@ -2,11 +2,13 @@ import React from 'react'
 import { Text } from '../../atoms/text/Text'
 import { BsGear } from 'react-icons/bs'
 import { Button } from '../../atoms/buttons/Button'
+import warningIcon from "../../assets/warning.svg"
+import { HiOutlineArrowRight } from 'react-icons/hi'
 
 export type CTAProps = {
-  header: string
   description: string
   btnText: string
+  header?: string
   clickHandler?: () => void
 }
 
@@ -53,3 +55,30 @@ rounded-lg border shadow"
     </Button>
   </div>
 )
+
+export const Warning = ({ description,
+  clickHandler,
+  btnText, }: CTAProps) => {
+  return <div
+    className="w-full bg-orange-50 flex items-center justify-between
+rounded-lg border shadow my-4 p-4"
+  >
+    <div className="flex flex-row items-center w-full">
+      <img src={warningIcon} className='w-9 h-9 mr-1.5' />
+      <Text weight="normal" size="sm" className="text-orange-700">
+        {description}
+      </Text>
+    </div>
+    <div
+      onClick={() => {
+        clickHandler()
+      }}
+      className='flex flex-row items-center cursor-pointer w-fit'
+    >
+      <Text weight="normal" size="sm" className="text-orange-700">
+        {btnText}
+      </Text>
+      <HiOutlineArrowRight size={16} className='text-orange-700' />
+    </div>
+  </div>
+}

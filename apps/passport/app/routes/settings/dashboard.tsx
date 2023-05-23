@@ -3,11 +3,13 @@ import { Text } from '@proofzero/design-system'
 import SectionTitle from '~/components/typography/sectionTitle'
 import { AddressList } from '~/components/addresses/AddressList'
 
-import { Link } from '@remix-run/react'
+import { Link, useNavigate } from '@remix-run/react'
 
 import dashboardChart from '~/assets/dashboard_chart.svg'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
+
+import { Warning } from "@proofzero/design-system/src/molecules/cta/CTA"
 
 import { useOutletContext } from '@remix-run/react'
 import type { AddressURN } from '@proofzero/urns/address'
@@ -21,6 +23,8 @@ export default function DashboardLayout() {
       primaryAddressURN: AddressURN
     }>()
 
+  const navigate = useNavigate()
+
   return (
     <div className="w-full h-full flex flex-col">
       <div className="pb-6">
@@ -28,7 +32,11 @@ export default function DashboardLayout() {
           Dashboard
         </Text>
       </div>
-
+      <Warning
+        description='We detected a data error in your application(s).
+      Please revoke the authorization and re-authorize again in the affected application.'
+        btnText='Applications'
+        clickHandler={() => { navigate("/settings/applications") }} />
       <div
         className="dashboard flex flex-col md:flex-row
     items-center md:items-start md:space-x-4
