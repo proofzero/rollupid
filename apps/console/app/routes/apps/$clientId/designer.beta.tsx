@@ -191,7 +191,7 @@ const RadiusButton = ({
 const ProviderModal = ({
   providers,
   isOpen,
-  handleClose,
+  onClose,
   saveCallback,
 }: {
   providers: {
@@ -199,7 +199,7 @@ const ProviderModal = ({
     enabled: boolean
   }[]
   isOpen: boolean
-  handleClose: (val: boolean) => void
+  onClose: (val: boolean) => void
   saveCallback: (providers: { key: string; enabled: boolean }[]) => void
 }) => {
   const [selectedProviders, setSelectedProviders] = useState(() => {
@@ -213,7 +213,7 @@ const ProviderModal = ({
   })
 
   return (
-    <Modal isOpen={isOpen} fixed handleClose={() => handleClose(false)}>
+    <Modal isOpen={isOpen} fixed handleClose={() => onClose(false)}>
       <div className="bg-white px-6 py-8 max-w-full lg:w-[543px] lg:mx-auto border shadow rounded-lg">
         <Text weight="semibold" className="text-left text-gray-800 mb-4">
           Login Provider Configuration
@@ -263,12 +263,12 @@ const ProviderModal = ({
             btnType="primary-alt"
             onClick={() => {
               saveCallback(selectedProviders)
-              handleClose(true)
+              onClose(true)
             }}
           >
             Save
           </Button>
-          <Button btnType="secondary-alt" onClick={() => handleClose(true)}>
+          <Button btnType="secondary-alt" onClick={() => onClose(true)}>
             Cancel
           </Button>
         </section>
@@ -428,7 +428,7 @@ export default () => {
       <ProviderModal
         providers={providers}
         isOpen={providerModalOpen}
-        handleClose={() => setProviderModalOpen(false)}
+        onClose={() => setProviderModalOpen(false)}
         saveCallback={setProviders}
       />
 
