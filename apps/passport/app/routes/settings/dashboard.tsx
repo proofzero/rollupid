@@ -119,39 +119,38 @@ export default function DashboardLayout() {
                   (a) => (
                     <article
                       key={a.title}
-                      className="flex items-center py-5 px-8"
+                      className="flex flex-row space-x-4 items-center py-5 px-8"
                     >
-                      <div className="flex-1 flex flex-row items-center space-x-4">
+                      <div className="flex-1 w-min flex flex-row items-center space-x-2">
                         <img
                           src={a.icon}
                           alt="app icon"
                           className={`object-cover w-6 h-6 ${a.appDataError ? "" : "rounded"}`}
                         />
-
-                        <div className='flex-1 flex flex-row space-x-2'>
-                          {a.title ? <Text
+                        {a.title
+                          ? <Text
                             size="sm"
                             weight="medium"
                             className="text-gray-500 w-fit py-[2px]">
                             {a.title}
-                          </Text> : null}
-                          {a.appDataError
-                            ? <Text
-                              size="sm"
-                              weight="normal"
-                              className="text-gray-500 w-fit py-[2px] px-2 
+                          </Text>
+                          : null}
+                        {a.appDataError
+                          ? <Text
+                            size="sm"
+                            weight="normal"
+                            className="text-gray-500 w-max py-[2px] px-2 
                             text-[#EA580C] bg-orange-50 rounded-xl"
-                            >
-                              Data Error
-                            </Text>
-                            : null}
-                        </div>
+                          >
+                            Data Error
+                          </Text>
+                          : null}
                       </div>
 
                       <Text
                         size="sm"
                         weight="medium"
-                        className="text-gray-500 flex-1"
+                        className="text-gray-500 flex-1 text-ellipsis"
                       >
                         {new Date(a.timestamp).toLocaleString('default', {
                           day: '2-digit',
