@@ -14,12 +14,12 @@ function pickIcon(
   setIcon: React.Dispatch<React.SetStateAction<string>>,
   setIconUrl: React.Dispatch<React.SetStateAction<string>>,
   maxImgSize = 1048576,
-  ar?: {
-    w: number
-    h: number
+  aspectRatio?: {
+    width: number
+    height: number
   },
-  minW?: number,
-  minH?: number
+  minWidth?: number,
+  minHeight?: number
 ) {
   return (e: any) =>
     new Promise<any>(async (ok) => {
@@ -37,16 +37,21 @@ function pickIcon(
       const img = new Image()
       img.src = URL.createObjectURL(files[0])
       img.onload = async () => {
-        if (ar && img.width / img.height !== ar.w / ar.h) {
-          errors['imgAR'] = `Image aspect ratio must be ${ar.w}:${ar.h}`
+        if (
+          aspectRatio &&
+          img.width / img.height !== aspectRatio.width / aspectRatio.height
+        ) {
+          errors[
+            'imgAR'
+          ] = `Image aspect ratio must be ${aspectRatio.width}:${aspectRatio.height}`
         }
 
-        if (minW && img.width < minW) {
-          errors['imgMinW'] = `Image width must be at least ${minW}px`
+        if (minWidth && img.width < minWidth) {
+          errors['imgMinW'] = `Image width must be at least ${minWidth}px`
         }
 
-        if (minH && img.height < minH) {
-          errors['imgMinH'] = `Image height must be at least ${minH}px`
+        if (minHeight && img.height < minHeight) {
+          errors['imgMinH'] = `Image height must be at least ${minHeight}px`
         }
 
         if (files && files.length > 0 && !Object.keys(errors).length) {
@@ -103,12 +108,12 @@ type IconPickerProps = {
   /**
    * Aspect ratio of the image.
    */
-  ar?: {
-    w: number
-    h: number
+  aspectRatio?: {
+    width: number
+    height: number
   }
-  minW?: number
-  minH?: number
+  minWidth?: number
+  minHeight?: number
   id?: string
   // URL of an existing icon.
   url?: string
@@ -124,9 +129,9 @@ type IconPickerProps = {
 export default function IconPicker({
   label,
   maxSize,
-  ar,
-  minW,
-  minH,
+  aspectRatio,
+  minWidth,
+  minHeight,
   id,
   url,
   invalid,
@@ -221,8 +226,8 @@ export default function IconPicker({
     return { width, height }
   }
 
-  const { width, height } = ar
-    ? calculateDimensions(ar.w, ar.h, 64)
+  const { width, height } = aspectRatio
+    ? calculateDimensions(aspectRatio.width, aspectRatio.height, 64)
     : { width: 64, height: 64 }
 
   return (
@@ -272,9 +277,9 @@ export default function IconPicker({
                     setIcon,
                     setIconUrl,
                     maxSize,
-                    ar,
-                    minW,
-                    minH
+                    aspectRatio,
+                    minWidth,
+                    minHeight
                   )(event)
                   if (Object.keys(errors).length) {
                     setInvalidState(true)

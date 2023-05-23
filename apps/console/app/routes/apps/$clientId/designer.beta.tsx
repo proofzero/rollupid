@@ -682,12 +682,12 @@ export default () => {
                   <div className="flex flex-row items-center gap-2">
                     <IconPicker
                       maxSize={2097152}
-                      ar={{
-                        w: 2,
-                        h: 3,
+                      aspectRatio={{
+                        width: 2,
+                        height: 3,
                       }}
-                      minW={720}
-                      minH={1080}
+                      minWidth={720}
+                      minHeight={1080}
                       id="image"
                       setIsFormChanged={(val) => {}}
                       setIsImgUploading={(val) => {
