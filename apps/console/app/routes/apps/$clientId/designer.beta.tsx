@@ -872,12 +872,15 @@ const EmailPanel = ({
         <iframe
           className="w-full border rounded-lg"
           srcDoc={
-            EmailTemplate(
-              logoURL ?? subtractLogo,
-              address ?? '',
-              contact ?? '',
-              'XXXXXX'
-            ).body
+            EmailTemplate('XXXXXX', {
+              logoURL:
+                logoURL ??
+                'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public',
+              privacyURL: '#',
+              termsURL: '#',
+              contactURL: contact,
+              address: address,
+            }).body
           }
           onLoad={(ev) => {
             const iFrame = ev.target as HTMLIFrameElement
