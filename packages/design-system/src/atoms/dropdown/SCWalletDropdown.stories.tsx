@@ -8,20 +8,23 @@ export default {
     component: Dropdown,
 }
 
+const modifyType = (string: string) => {
+    if (string === CryptoAddressType.Wallet) {
+        return "SC Wallet"
+    }
+    return string.charAt(0).toUpperCase() + string.slice(1)
+}
 
 const accounts: SelectListItem[] = Array.from({ length: 10 }, (_, i) => ({
-    label: `urn:proofzero:address:${i}`,
+    value: `urn:proofzero:address:${i}`,
     title: `Smart Contract Wallet ${i}`,
-    details: {
-        type: CryptoAddressType.Wallet,
-        address: `SC Wallet: ${i}`,
-    }
+    subtitle: `${modifyType(CryptoAddressType.Wallet as string)} - SC Wallet: ${i}`
 }))
 
 const Template = () => (
     <div className="w-[280px]">
         <Dropdown
-            values={accounts}
+            items={accounts}
             onSelect={(val) => { console.log({ val }) }}
             placeholder='Select a Smart Contract Wallet'
             ConnectButtonPhrase="New Smart Contract Wallet"

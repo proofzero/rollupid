@@ -17,19 +17,24 @@ const pickRandomType = (i: number) => {
     return types[i % types.length]
 }
 
-const accounts: SelectListItem[] = Array.from({ length: 10 }, (_, i) => ({
-    label: `urn:proofzero:address:${i}`,
-    title: `Account ${i}`,
-    details: {
-        type: pickRandomType(i),
-        address: `Address ${i}`,
+const modifyType = (string: string) => {
+    if (string === CryptoAddressType.Wallet) {
+        return "SC Wallet"
     }
+    return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+const accounts: SelectListItem[] = Array.from({ length: 10 }, (_, i) => ({
+    value: `urn:proofzero:address:${i}`,
+    title: `Account ${i}`,
+    subtitle: `${modifyType(pickRandomType(i) as string)} - Address ${i}`
+
 }))
 
 const Template = () => (
     <div className="w-[280px]">
         <Dropdown
-            values={accounts}
+            items={accounts}
             onSelect={(val) => { console.log({ val }) }}
             placeholder='No connected account(s)'
             ConnectButtonPhrase="Connect New Account"

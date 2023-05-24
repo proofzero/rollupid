@@ -35,51 +35,41 @@ const getIcon = (
 const listItems: SelectListItem[] = [
     {
         title: 'email@gmail.com',
-        label: 'urn:rollupid:address/1',
+        value: 'urn:rollupid:address/1',
         icon: getIcon(OAuthAddressType.Google),
-        details: {
-            type: OAuthAddressType.Google,
-        }
+
     },
     {
         title: 'email@microsoft.com',
-        label: 'urn:rollupid:address/2',
+        value: 'urn:rollupid:address/2',
         icon: getIcon(OAuthAddressType.Microsoft),
-        details: {
-            type: OAuthAddressType.Microsoft,
-        }
+
     },
     {
         title: 'perez@apple.com',
-        label: 'urn:rollupid:address/5',
+        value: 'urn:rollupid:address/5',
         icon: getIcon(OAuthAddressType.Apple),
-        details: {
-            type: OAuthAddressType.Apple,
-        }
+
     },
     {
         title: 'email@yahoo.com',
-        label: 'urn:rollupid:address/3',
+        value: 'urn:rollupid:address/3',
         icon: getIcon(EmailAddressType.Email),
-        details: {
-            type: EmailAddressType.Email,
-            default: true,
-        }
+        selected: true,
+
     },
     {
         title: 'email@gmail.com',
-        label: 'urn:rollupid:address/4',
+        value: 'urn:rollupid:address/4',
         icon: getIcon(EmailAddressType.Email),
-        details: {
-            type: EmailAddressType.Email,
-        }
+
     },
 ]
 
 const Template = () => (
     <div className="w-[280px]">
         <Dropdown
-            values={listItems}
+            items={listItems}
             onSelect={(val) => { console.log({ val }) }}
             placeholder='Select an Email Address'
             ConnectButtonPhrase="Connect New Email Address"

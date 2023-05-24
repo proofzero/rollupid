@@ -6,27 +6,21 @@ import {
     ChevronUpIcon,
     CheckIcon,
 } from '@heroicons/react/20/solid'
-import { CryptoAddressType } from "@proofzero/types/address"
 import { Button } from "../buttons/Button"
 import { TbCirclePlus } from "react-icons/tb"
+import { BadRequestError } from "@proofzero/errors"
 
 
 export type SelectListItem = {
     title: string
-    label?: string
+    value?: string
     icon?: JSX.Element
-    details?: Record<string, any>
-}
-
-const modifyType = (string: string) => {
-    if (string === CryptoAddressType.Wallet) {
-        return "SC Wallet"
-    }
-    return string.charAt(0).toUpperCase() + string.slice(1)
+    selected?: boolean
+    subtitle?: string
 }
 
 export const Dropdown = ({
-    values,
+    items,
     placeholder,
     ConnectButtonPhrase,
     ConnectButtonCallback,
@@ -36,7 +30,7 @@ export const Dropdown = ({
     selectAllCheckboxTitle,
     selectAllCheckboxDescription,
 }: {
-    values: SelectListItem[],
+    items: SelectListItem[],
     placeholder: string,
     onSelect: (selected: Array<SelectListItem> | SelectListItem) => void,
     multiple?: boolean
@@ -46,36 +40,45 @@ export const Dropdown = ({
     selectAllCheckboxTitle?: string
     selectAllCheckboxDescription?: string
 }) => {
+
+    const defaultItems = items.filter(
+        (item) => item.selected
+    )
+
+    if (defaultItems.length > 1 && !multiple) {
+        throw new BadRequestError(
+            { message: "You can't have multiple items selected in a single select dropdown" }
+        )
+    }
+
     /**
      * For single select
      */
-    const [selectedValue, setSelectedValue] = useState<SelectListItem>(() => {
-        const defaultItem = values.find(
-            (item) => item.details?.default
-        )
-        return defaultItem
+    const [selectedItem, setSelectedItem] = useState<SelectListItem>(() => {
+        return multiple ? null : defaultItems[0]
     })
 
     /**
      * For multi select
      */
-    const [selectedValues, setSelectedValues] = useState<
+    const [selectedItems, setSelectedItems] = useState<
         Array<SelectListItem>
-    >([])
-    const [allValuesSelected, setAllValuesSelected] =
+    >(() => { return multiple ? defaultItems : [] })
+
+    const [allItemsSelected, setAllItemsSelected] =
         useState(false)
 
     return (
         <Listbox
-            value={multiple ? selectedValues : selectedValue}
+            value={multiple ? selectedItems : selectedItem}
             onChange={(input) => {
                 if (multiple) {
-                    setSelectedValues(input as SelectListItem[])
-                    if (!allValuesSelected) {
+                    setSelectedItems(input as SelectListItem[])
+                    if (!allItemsSelected) {
                         onSelect(input)
                     }
                 } else {
-                    setSelectedValue(input as SelectListItem)
+                    setSelectedItem(input as SelectListItem)
                     onSelect(input)
                 }
             }}
@@ -89,31 +92,31 @@ export const Dropdown = ({
                                     flex flex-row justify-between items-center py-2 px-3 hover:ring-1
                                     hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white"
                     >
-                        {!selectedValue && !selectedValues.length && !allValuesSelected && (
+                        {!selectedItem && !selectedItems.length && !allItemsSelected && (
                             <Text size="sm" className="text-gray-400 truncate text-ellipsis">
                                 {placeholder}
                             </Text>
                         )}
 
-                        {selectedValue?.title?.length && (
+                        {selectedItem?.title?.length && (
                             <Text size="sm" className="text-gray-800 truncate text-ellipsis">
-                                {selectedValue.title}
+                                {selectedItem.title}
                             </Text>
                         )}
 
-                        {selectedValues.length > 1 && !allValuesSelected && (
+                        {selectedItems.length > 1 && !allItemsSelected && (
                             <Text size="sm" className="text-gray-800 truncate text-ellipsis">
-                                {selectedValues.length} items selected
+                                {selectedItems.length} items selected
                             </Text>
                         )}
 
-                        {selectedValues.length === 1 && !allValuesSelected && (
+                        {selectedItems.length === 1 && !allItemsSelected && (
                             <Text size="sm" className="text-gray-800 truncate text-ellipsis">
-                                {selectedValues[0].title} selected
+                                {selectedItems[0].title} selected
                             </Text>
                         )}
 
-                        {allValuesSelected && (
+                        {allItemsSelected && (
                             <Text size="sm" className="text-gray-800 truncate text-ellipsis">
                                 {selectAllCheckboxTitle}
                             </Text>
@@ -134,7 +137,7 @@ export const Dropdown = ({
                         <Listbox.Options
                             className="border shadow-lg rounded-lg absolute w-full mt-1 bg-white
                             pt-3 space-y-3 z-10">
-                            {values?.length
+                            {items?.length
                                 ? multiple
                                     /** 
                                      * Multi select
@@ -145,14 +148,14 @@ export const Dropdown = ({
                                             onClick={() => {
                                                 // We check if the value falsy because by default it's false
                                                 // in this method we flip it to true
-                                                if (!allValuesSelected) {
-                                                    setSelectedValues([])
+                                                if (!allItemsSelected) {
+                                                    setSelectedItems([])
 
                                                     if (onSelectAll) {
                                                         onSelectAll()
                                                     }
                                                 }
-                                                setAllValuesSelected(!allValuesSelected)
+                                                setAllItemsSelected(!allItemsSelected)
                                             }}
                                         >
                                             <div>
@@ -161,7 +164,7 @@ export const Dropdown = ({
                                                     type="checkbox"
                                                     className="h-4 w-4 rounded border-gray-300 bg-gray-50 
                                                     text-indigo-500 focus:ring-indigo-500"
-                                                    checked={allValuesSelected}
+                                                    checked={allItemsSelected}
                                                 />
                                             </div>
                                             <div className="flex-1 flex flex-col truncate">
@@ -185,20 +188,20 @@ export const Dropdown = ({
                                         <div className="mx-4 w-100 border-b border-gray-200"></div>
 
                                         <div className="max-h-[140px] overflow-y-scroll thin-scrollbar">
-                                            {values?.map((value) => {
+                                            {items?.map((item) => {
 
-                                                const checked = !allValuesSelected &&
-                                                    selectedValues
-                                                        .map((sa) => sa.label)
-                                                        .includes(value.label)
+                                                const checked = !allItemsSelected &&
+                                                    selectedItems
+                                                        .map((si) => si.value)
+                                                        .includes(item.value)
 
                                                 return <Listbox.Option
-                                                    key={value.label}
-                                                    value={value}
+                                                    key={item.value}
+                                                    value={item}
                                                     className={` rounded 
                                                         flex flex-row space-x-2 cursor-pointer py-1.5 px-4
                                                         ${checked ? "bg-gray-100" : "hover:bg-gray-50"}`}
-                                                    disabled={allValuesSelected}
+                                                    disabled={allItemsSelected}
                                                 >
                                                     <div>
                                                         <input
@@ -216,40 +219,41 @@ export const Dropdown = ({
                                                         <Text
                                                             size="sm"
                                                             weight="medium"
-                                                            className={`truncate text-ellipsis ${allValuesSelected
+                                                            className={`truncate text-ellipsis ${allItemsSelected
                                                                 ? 'text-gray-400'
                                                                 : 'text-gray-900'
                                                                 }`}
                                                         >
-                                                            {value.title}
+                                                            {item.title}
                                                         </Text>
-                                                        <Text
-                                                            size="xs"
-                                                            weight="normal"
-                                                            className={`truncate w-full text-ellipsis ${allValuesSelected
-                                                                ? 'text-gray-400'
-                                                                : 'text-gray-500'
-                                                                }`}
-                                                        >
-                                                            {modifyType(value.details.type as string)} -{' '}
-                                                            {value.details.address}
-                                                        </Text>
+                                                        {item.subtitle
+                                                            ? <Text
+                                                                size="xs"
+                                                                weight="normal"
+                                                                className={`truncate w-full text-ellipsis ${allItemsSelected
+                                                                    ? 'text-gray-400'
+                                                                    : 'text-gray-500'
+                                                                    }`}
+                                                            >
+                                                                {item.subtitle}
+                                                            </Text>
+                                                            : null}
                                                     </div>
                                                 </Listbox.Option>
                                             })}
                                         </div>
                                     </>
                                     /**
-                    * Single select
-                    */
+                                    * Single select
+                                    */
                                     : <div className="px-1 space-y-1 max-h-[140px]
                              overflow-y-scroll thin-scrollbar">
-                                        {values.map((value) => (
+                                        {items.map((item) => (
                                             <Listbox.Option
                                                 className="flex flex-row space-x-2 cursor-pointer hover:bg-gray-50
                                     rounded-lg  w-full "
-                                                key={value.label}
-                                                value={value}
+                                                key={item.value}
+                                                value={item}
                                             >{({ selected }) => (
                                                 <div
                                                     className={`${selected ? 'bg-gray-100' : ""}
@@ -258,8 +262,8 @@ export const Dropdown = ({
                                                 >
                                                     <div className="flex flex-row truncate items-center">
                                                         {
-                                                            value.icon ?
-                                                                value.icon
+                                                            item.icon ?
+                                                                item.icon
                                                                 : null
                                                         }
                                                         <div className="flex flex-col truncate">
@@ -268,16 +272,19 @@ export const Dropdown = ({
                                                                 weight={selected ? 'medium' : 'normal'}
                                                                 className={`truncate w-full`}
                                                             >
-                                                                {value.title}
+                                                                {item.title}
                                                             </Text>
-                                                            {value.details.address ? <Text
-                                                                size="xs"
-                                                                weight='normal'
-                                                                className={`truncate w-full text-gray-500`}
-                                                            >
-                                                                {modifyType(value.details.type as string)} -{' '}
-                                                                {value.details.address}
-                                                            </Text> : null}
+                                                            {
+                                                                item.subtitle
+                                                                    ? (<Text
+                                                                        size="xs"
+                                                                        weight='normal'
+                                                                        className={`truncate w-full text-gray-500`}
+                                                                    >
+                                                                        {item.subtitle}
+                                                                    </Text>)
+                                                                    : null
+                                                            }
                                                         </div>
                                                     </div>
                                                     {selected ? (
@@ -290,7 +297,7 @@ export const Dropdown = ({
                                             </Listbox.Option>
                                         ))}
                                     </div> : null}
-                            {values?.length
+                            {items?.length
                                 ? <div className="mx-4 w-100 border-b border-gray-200"></div>
                                 : null
                             }
