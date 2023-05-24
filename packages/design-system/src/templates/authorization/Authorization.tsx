@@ -21,6 +21,7 @@ import { ScopeDescriptor } from '@proofzero/security/scopes'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import { ThemeContext } from '../../contexts/theme'
 import ScopeIcon from './ScopeIcon'
+import { Dropdown, DropdownSelectListItem } from '../../atoms/dropdown/DropdownSelectList'
 
 type UserProfile = {
   pfpURL: string
@@ -44,18 +45,18 @@ type AuthorizationProps = {
 
   transitionState: 'idle' | 'submitting' | 'loading'
 
-  connectedSmartContractWallets: SCWalletSelectListItem[]
+  connectedSmartContractWallets: DropdownSelectListItem[]
   addNewSmartWalletCallback: () => void
-  selectSmartWalletCallback: (selected: AddressURN[]) => void
+  selectSmartWalletCallback: (selected: Array<DropdownSelectListItem>) => void
 
-  connectedEmails: EmailSelectListItem[]
+  connectedEmails: DropdownSelectListItem[]
   addNewEmailCallback: () => void
-  selectEmailCallback: (selected: EmailSelectListItem) => void
+  selectEmailCallback: (selected: DropdownSelectListItem) => void
 
-  connectedAccounts: GetAddressProfileResult[]
+  connectedAccounts: DropdownSelectListItem[]
   addNewAccountCallback: () => void
   selectAccountsCallback: (
-    selected: AddressURN[] | AuthorizationControlSelection[]
+    selected: Array<DropdownSelectListItem>
   ) => void
 
   cancelCallback: () => void
@@ -167,59 +168,58 @@ export default ({
 
                     {scope === 'erc_4337' && (
                       <div className="flex-1 min-w-0">
-                        <SmartContractWalletSelect
-                          wallets={connectedSmartContractWallets}
-                          onSelect={(selected: SCWalletSelectListItem) => {
-                            if (selected?.type === OptionType.AddNew) {
-                              addNewSmartWalletCallback()
-                            } else if (selected) {
-                              selectSmartWalletCallback([selected.addressURN])
-                            }
+                        <Dropdown
+                          items={connectedSmartContractWallets}
+                          placeholder='Select a Smart Contract Wallet'
+                          multiple={true}
+                          onSelect={(selectedItems: Array<DropdownSelectListItem>) => {
+                            selectSmartWalletCallback(selectedItems)
                           }}
+                          onSelectAll={() => {
+                            selectSmartWalletCallback(
+                              connectedSmartContractWallets
+                            )
+                          }}
+                          ConnectButtonPhrase="New Smart Contract Wallet"
+                          ConnectButtonCallback={addNewSmartWalletCallback}
+                          selectAllCheckboxTitle='All Smart Contract Wallets'
+                          selectAllCheckboxDescription='All current and future SC Wallets'
                         />
                       </div>
                     )}
 
                     {scope === 'email' && (
                       <div className="flex-1 min-w-0">
-                        <EmailSelect
-                          items={connectedEmails || []}
-                          enableAddNew={true}
-                          defaultAddress={connectedEmails![0]?.addressURN}
-                          onSelect={(selected: EmailSelectListItem) => {
-                            if (selected?.type === OptionType.AddNew) {
-                              addNewEmailCallback()
-                            } else if (selected) {
-                              selectEmailCallback(selected)
-                            }
+                        <Dropdown
+                          items={connectedEmails}
+                          placeholder='Select an Email Address'
+                          onSelect={(selectedItem: DropdownSelectListItem) => {
+                            selectEmailCallback(selectedItem)
                           }}
+                          ConnectButtonPhrase="Connect New Email Address"
+                          ConnectButtonCallback={addNewEmailCallback}
                         />
                       </div>
                     )}
 
                     {scope === 'connected_accounts' && (
                       <div className="flex-1 min-w-0">
-                        <ConnectedAccountSelect
-                          accounts={connectedAccounts.map((ca) => ({
-                            addressURN: ca.id,
-                            address: ca.address,
-                            title: ca.title,
-                            provider:
-                              ca.type === 'eth' ? 'blockchain' : ca.type,
-                          }))}
-                          onSelect={(addresses) => {
-                            selectAccountsCallback(
-                              addresses.map((a) => a.addressURN)
-                            )
+                        <Dropdown
+                          items={connectedAccounts}
+                          onSelect={(selectedItems: Array<DropdownSelectListItem>) => {
+                            selectAccountsCallback(selectedItems)
                           }}
                           onSelectAll={() => {
-                            selectAccountsCallback([
-                              AuthorizationControlSelection.ALL,
-                            ])
+                            selectAccountsCallback(
+                              connectedAccounts
+                            )
                           }}
-                          onConnectNew={() => {
-                            addNewAccountCallback()
-                          }}
+                          placeholder='No connected account(s)'
+                          ConnectButtonPhrase="Connect New Account"
+                          ConnectButtonCallback={addNewAccountCallback}
+                          multiple={true}
+                          selectAllCheckboxTitle='All Connected Accounts'
+                          selectAllCheckboxDescription='All current and future accounts'
                         />
                       </div>
                     )}

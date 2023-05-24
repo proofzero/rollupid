@@ -11,7 +11,7 @@ import { TbCirclePlus } from "react-icons/tb"
 import { BadRequestError } from "@proofzero/errors"
 
 
-export type SelectListItem = {
+export type DropdownSelectListItem = {
     title: string
     value?: string
     icon?: JSX.Element
@@ -30,9 +30,9 @@ export const Dropdown = ({
     selectAllCheckboxTitle,
     selectAllCheckboxDescription,
 }: {
-    items: SelectListItem[],
+    items: Array<DropdownSelectListItem>,
     placeholder: string,
-    onSelect: (selected: Array<SelectListItem> | SelectListItem) => void,
+    onSelect: (selected: Array<DropdownSelectListItem> | DropdownSelectListItem) => void,
     multiple?: boolean
     ConnectButtonPhrase: string,
     ConnectButtonCallback: () => void,
@@ -54,7 +54,7 @@ export const Dropdown = ({
     /**
      * For single select
      */
-    const [selectedItem, setSelectedItem] = useState<SelectListItem>(() => {
+    const [selectedItem, setSelectedItem] = useState<DropdownSelectListItem>(() => {
         return multiple ? null : defaultItems[0]
     })
 
@@ -62,7 +62,7 @@ export const Dropdown = ({
      * For multi select
      */
     const [selectedItems, setSelectedItems] = useState<
-        Array<SelectListItem>
+        Array<DropdownSelectListItem>
     >(() => { return multiple ? defaultItems : [] })
 
     const [allItemsSelected, setAllItemsSelected] =
@@ -73,12 +73,12 @@ export const Dropdown = ({
             value={multiple ? selectedItems : selectedItem}
             onChange={(input) => {
                 if (multiple) {
-                    setSelectedItems(input as SelectListItem[])
+                    setSelectedItems(input as DropdownSelectListItem[])
                     if (!allItemsSelected) {
                         onSelect(input)
                     }
                 } else {
-                    setSelectedItem(input as SelectListItem)
+                    setSelectedItem(input as DropdownSelectListItem)
                     onSelect(input)
                 }
             }}
