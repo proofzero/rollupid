@@ -4,7 +4,7 @@ import { CTAProps } from "./cta"
 import { Text } from '../../atoms/text/Text'
 import { HiOutlineArrowRight } from "react-icons/hi"
 
-export const Warning = ({ description,
+export const WarningCTA = ({ description,
     clickHandler,
     btnText, }: CTAProps) => {
     return <div

@@ -74,6 +74,7 @@ const AppListItem = ({
       className="flex-1 flex flex-row px-5 py-4 space-x-4 rounded-lg
     border shadow-sm items-center bg-white"
     >
+      {/* App icon is changed only when there is an error with data, not scopes */}
       {app.appDataError
         ? <div
           className='w-16 h-16 flex items-center justify-center bg-[#F3F4F6]
@@ -101,7 +102,7 @@ const AppListItem = ({
               {app.title}
             </Text>
             : null}
-          {app.appDataError
+          {app.appDataError || app.appScopeError
             ? <Text
               size="sm"
               className="text-[#EA580C] bg-orange-50 rounded-xl w-fit px-2 py-[2px]">

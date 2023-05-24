@@ -1,9 +1,9 @@
 import React from 'react'
-import { Warning } from './warning'
+import { WarningCTA } from './warning'
 
 export default {
   title: 'Molecules/Warning',
-  component: Warning,
+  component: WarningCTA,
   argTypes: {
 
     description: {
@@ -20,7 +20,7 @@ export default {
 const Template = (args) => {
   console.log(args)
   return (
-    <Warning
+    <WarningCTA
       description={args.description}
       btnText={args.btnText}
       clickHandler={() => {

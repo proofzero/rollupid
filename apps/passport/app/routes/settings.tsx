@@ -16,6 +16,7 @@ import faviconSvg from '~/assets/favicon.svg'
 import noImg from '~/assets/noImg.svg'
 
 import {
+  getAccessClient,
   getAccountClient,
   getAddressClient,
   getStarbaseClient,
@@ -32,6 +33,7 @@ export type AuthorizedAppsModel = {
   timestamp: number
   title?: string
   appDataError?: boolean
+  appScopeError?: boolean
 }
 
 export const links: LinksFunction = () => [
@@ -53,6 +55,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
   const starbaseClient = getStarbaseClient(jwt, context.env, context.traceSpan)
+  const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
 
   const accountProfile = await accountClient.getProfile.query({
     account: accountUrn,
@@ -71,14 +74,33 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     Promise.all(
       apps.map(async (a) => {
         try {
-          const { name, iconURL } =
-            await starbaseClient.getAppPublicProps.query({
-              clientId: a.clientId,
-            })
+          const [appPublicProps, appAuthorizedScopes] =
+            await Promise.all([
+              starbaseClient.getAppPublicProps.query({
+                clientId: a.clientId,
+              }),
+              accessClient.getAuthorizedAppScopes.query({
+                clientId: a.clientId,
+                accountURN: accountUrn,
+              })
+            ])
+
+          Object.entries(appAuthorizedScopes).forEach(([_, value]) => {
+            if (!value.meta.valid) {
+              return {
+                clientId: a.clientId,
+                icon: appPublicProps.iconURL,
+                title: appPublicProps.name,
+                timestamp: a.timestamp,
+                appScopeError: true,
+              }
+            }
+          })
+
           return {
             clientId: a.clientId,
-            icon: iconURL,
-            title: name,
+            icon: appPublicProps.iconURL,
+            title: appPublicProps.name,
             timestamp: a.timestamp,
           }
         } catch (e) {

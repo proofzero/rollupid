@@ -9,7 +9,7 @@ import dashboardChart from '~/assets/dashboard_chart.svg'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
 
-import { Warning } from "@proofzero/design-system/src/molecules/cta/warning"
+import { WarningCTA } from "@proofzero/design-system/src/molecules/cta/warning"
 
 import { useOutletContext } from '@remix-run/react'
 import type { AddressURN } from '@proofzero/urns/address'
@@ -25,7 +25,7 @@ export default function DashboardLayout() {
 
   const navigate = useNavigate()
 
-  const appErrorExists = authorizedApps.some((app) => app.appDataError)
+  const appErrorExists = authorizedApps.some((app) => app.appDataError || app.appScopeError)
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -34,13 +34,15 @@ export default function DashboardLayout() {
           Dashboard
         </Text>
       </div>
-      {appErrorExists
-        ? <Warning
-          description='We detected a data error in your application(s).
+      {
+        appErrorExists
+          ? <WarningCTA
+            description='We detected a data error in your application(s).
       Please revoke the authorization and re-authorize again in the affected application.'
-          btnText='Applications'
-          clickHandler={() => { navigate("/settings/applications") }} />
-        : null}
+            btnText='Applications'
+            clickHandler={() => { navigate("/settings/applications") }} />
+          : null
+      }
       <div
         className="dashboard flex flex-col md:flex-row
     items-center md:items-start md:space-x-4
@@ -125,7 +127,7 @@ export default function DashboardLayout() {
                         <img
                           src={a.icon}
                           alt="app icon"
-                          className={`object-cover w-6 h-6 ${a.appDataError ? "" : "rounded"}`}
+                          className={`object-cover w-6 h-6 ${a.appDataError || a.appScopeError ? "" : "rounded"}`}
                         />
                         {a.title
                           ? <Text
@@ -135,7 +137,7 @@ export default function DashboardLayout() {
                             {a.title}
                           </Text>
                           : null}
-                        {a.appDataError
+                        {a.appDataError || a.appScopeError
                           ? <Text
                             size="sm"
                             weight="normal"
