@@ -1,11 +1,19 @@
 import { EmailContent } from './src/types'
 
+export type EmailTemplateParams = {
+  logoURL: string
+  address?: string
+  contactURL?: string
+  termsURL: string
+  privacyURL: string
+}
+
 export const EmailTemplate = (
-  imgURL: string,
-  address: string,
-  contact: string,
-  passcode: string
+  passcode: string,
+  params: EmailTemplateParams
 ): EmailContent => {
+  const { logoURL, address, contactURL, termsURL, privacyURL } = params
+
   return {
     contentType: 'text/html',
     subject: `Your Rollup ID one-time passcode`,
@@ -120,7 +128,7 @@ export const EmailTemplate = (
             <div class="heading-logo">
               <img
                 class="logo"
-                src="${imgURL}"
+                src="${logoURL}"
                 alt=""
                 style="display: block"
               />
@@ -137,7 +145,7 @@ export const EmailTemplate = (
             <div style="width: 100%">
               <a
                 class="footer-links"
-                href="https://rollup.id/tos"
+                href="${termsURL}"
                 target="_blank"
                 rel="noreferrer"
                 >Terms & Conditions</a
@@ -145,17 +153,16 @@ export const EmailTemplate = (
               <div class="vl"></div>
               <a
                 class="footer-links"
-                href="https://rollup.id/privacy-policy"
+                href="${privacyURL}"
                 target="_blank"
                 rel="noreferrer"
                 >Privacy Policy</a
               >
-              <div class="vl"></div>
               ${
-                contact !== ''
-                  ? `<a
+                contactURL !== ''
+                  ? `<div class="vl"></div><a
                 class="footer-links"
-                href="${contact}"
+                href="${contactURL}"
                 target="_blank"
                 rel="noreferrer"
                 >Contact Us</a

@@ -3,9 +3,14 @@ import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { JsonError } from '@proofzero/utils/errors'
 import { json } from '@remix-run/cloudflare'
-import { getAddressClient } from '~/platform.server'
+import { getAddressClient, getStarbaseClient } from '~/platform.server'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import {
+  getAuthzCookieParams,
+  getDefaultAuthzParams,
+  getValidatedSessionContext,
+} from '~/session.server'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   try {
@@ -26,8 +31,37 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       context.traceSpan
     )
 
+    const { clientId } = await getAuthzCookieParams(request, context.env)
+
+    const starbaseClient = getStarbaseClient(
+      undefined,
+      context.env,
+      context.traceSpan
+    )
+
+    let appProps, emailTheme
+    if (clientId !== 'console' && clientId !== 'passport') {
+      ;[appProps, emailTheme] = await Promise.all([
+        starbaseClient.getAppPublicProps.query({
+          clientId,
+        }),
+        starbaseClient.getEmailOTPTheme.query({
+          clientId,
+        }),
+      ])
+    }
+
     const state = await addressClient.generateEmailOTP.mutate({
       email,
+      themeProps: appProps
+        ? {
+            privacyURL: appProps.privacyURL as string,
+            termsURL: appProps.termsURL as string,
+            logoURL: emailTheme?.logoURL,
+            contactURL: emailTheme?.contact,
+            address: emailTheme?.address,
+          }
+        : undefined,
     })
     return json({ state })
   } catch (e) {

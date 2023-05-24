@@ -1,4 +1,4 @@
-import { EmailTemplate } from '../emailOtpTemplate'
+import { EmailTemplate, EmailTemplateParams } from '../emailOtpTemplate'
 import { EmailMessage, EmailNotification } from './types'
 import { CloudflareEmailMessage, EmailContent, Environment } from './types'
 
@@ -113,13 +113,25 @@ async function forward(message: CloudflareEmailMessage, env: Environment) {
 }
 
 /** OTP email content template with a `code` parameter */
-export const getOTPEmailContent = (passcode: string): EmailContent => {
-  return EmailTemplate(
-    'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public',
-    '777 Bay Street, Suite C208B Toronto, Ontario M5G 2C8 Canada',
-    'https://discord.com/invite/rollupid',
-    passcode
-  )
+export const getOTPEmailContent = (
+  passcode: string,
+  params?: Partial<EmailTemplateParams>
+): EmailContent => {
+  if (!params) {
+    params = {
+      address: '777 Bay Street, Suite C208B Toronto, Ontario M5G 2C8 Canada',
+      contactURL: 'https://discord.com/invite/rollupid',
+      termsURL: 'https://rollup.id/tos',
+      privacyURL: 'https://rollup.id/privacy-policy',
+    }
+  }
+
+  if (!params.logoURL) {
+    params.logoURL =
+      'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public'
+  }
+
+  return EmailTemplate(passcode, params as EmailTemplateParams)
 }
 
 /** Magic link email content template */

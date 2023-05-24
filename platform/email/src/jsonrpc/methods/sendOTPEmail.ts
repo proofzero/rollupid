@@ -4,10 +4,19 @@ import { sendNotification, getOTPEmailContent } from '../../emailFunctions'
 import { EmailNotification } from '../../types'
 import { Environment } from '../../types'
 
+export const SendOTPEmailThemePropsSchema = z.object({
+  privacyURL: z.string().url(),
+  termsURL: z.string().url(),
+  contactURL: z.string().url().optional(),
+  address: z.string().optional(),
+  logoURL: z.string().url().optional(),
+})
+
 export const sendOTPEmailMethodInput = z.object({
   name: z.string(),
   emailAddress: z.string(),
   otpCode: z.string(),
+  themeProps: SendOTPEmailThemePropsSchema.optional(),
 })
 
 export type sendOTPEmailMethodParams = z.infer<typeof sendOTPEmailMethodInput>
@@ -48,7 +57,7 @@ export const sendEmailNotificationMethod = async ({
     Test: ctx.Test,
   }
 
-  const otpEmailTemplate = getOTPEmailContent(input.otpCode)
+  const otpEmailTemplate = getOTPEmailContent(input.otpCode, input.themeProps)
   const notification: EmailNotification = {
     content: otpEmailTemplate,
     recipient: {

@@ -9,7 +9,11 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 
-export function getStarbaseClient(jwt: string, env: Env, traceSpan: TraceSpan) {
+export function getStarbaseClient(
+  jwt: string | undefined,
+  env: Env,
+  traceSpan: TraceSpan
+) {
   return createStarbaseClient(env.Starbase, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...generateTraceContextHeaders(traceSpan),
