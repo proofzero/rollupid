@@ -10,7 +10,6 @@ import {
   validateApiKey,
   logAnalytics,
   getConnectedAddresses,
-  temporaryConvertToPublic,
   requestLogging,
 } from './utils'
 
@@ -21,10 +20,7 @@ import { ResolverContext } from './common'
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import type { AccountURN } from '@proofzero/urns/account'
-import {
-  generateTraceContextHeaders,
-  TraceSpan,
-} from '@proofzero/packages/platform-middleware/trace'
+import { generateTraceContextHeaders } from '@proofzero/packages/platform-middleware/trace'
 
 const accountResolvers: Resolvers = {
   Query: {
@@ -158,28 +154,15 @@ const ProfileResolverComposition = {
   'Query.profile': [
     requestLogging(),
     setupContext(),
-    validateApiKey(),
-    logAnalytics(),
-  ],
-  'Query.authorizedApps': [
-    requestLogging(),
-    setupContext(),
+    isAuthorized('profile'),
     validateApiKey(),
     logAnalytics(),
   ],
   'Query.connectedAddresses': [
     requestLogging(),
     setupContext(),
+    // isAuthorized('connected_accounts'),
     validateApiKey(),
-    logAnalytics(),
-    temporaryConvertToPublic(),
-  ],
-
-  'Mutation.disconnectAddress': [
-    requestLogging(),
-    setupContext(),
-    validateApiKey(),
-    isAuthorized(),
     logAnalytics(),
   ],
 }

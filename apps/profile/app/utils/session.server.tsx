@@ -14,7 +14,7 @@ import { UnauthorizedError } from '@proofzero/errors'
 import { encryptSession, decryptSession } from '@proofzero/utils/session'
 
 import {
-  checkToken,
+  verifyToken,
   refreshAccessToken,
   ExpiredTokenError,
   InvalidTokenError,
@@ -114,7 +114,7 @@ export async function requireJWT(request: Request, headers = new Headers()) {
     const { cipher, iv } = JSON.parse(user.accessToken)
     if (!cipher || !iv) throw redirect('/auth')
     const accessToken = await decryptSession(sessionKey, cipher, iv)
-    checkToken(accessToken)
+    await verifyToken(accessToken, JWKS_INTERNAL_URL_BASE)
     return accessToken
   } catch (error) {
     if (error === InvalidTokenError) {
@@ -193,8 +193,14 @@ export async function commitProfileSession(session: Session) {
   return storage.commitSession(session)
 }
 
-export const getAccessToken = async (request: Request): Promise<string> => {
+export const getAccessToken = async (
+  request: Request
+): Promise<string | undefined> => {
   const session = await getProfileSession(request)
-  const { cipher, iv } = JSON.parse(session.get('user').accessToken)
+  const userCookie = session.get('user')
+  if (!userCookie) return undefined
+  const accessToken = userCookie.accessToken
+  if (!accessToken) return undefined
+  const { cipher, iv } = JSON.parse(accessToken)
   return decryptSession(sessionKey, cipher, iv)
 }

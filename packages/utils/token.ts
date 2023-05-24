@@ -12,17 +12,46 @@ export const ExpiredTokenError = new UnauthorizedError({
   message: 'expired token',
 })
 
-interface CheckTokenFunction {
-  (token: string): jose.JWTPayload
+interface VerifyTokenFunction {
+  (token: string, jwksInternalUrlBase: string): Promise<jose.JWTPayload>
 }
 
-export const checkToken: CheckTokenFunction = (token) => {
+export const verifyToken: VerifyTokenFunction = async (
+  token: string,
+  jwksInternalUrlBase: string
+) => {
   try {
-    const payload = jose.decodeJwt(token)
-    if (payload.exp) {
-      const expirationTime = payload.exp * 1000
-      if (expirationTime < Date.now()) throw ExpiredTokenError
+    let cache = caches.default
+    const jwtHeader = jose.decodeProtectedHeader(token)
+    const jwtPayload = jose.decodeJwt(token)
+    if (!jwtPayload.iss || !jwtHeader.kid) throw InvalidTokenError
+    const issuerHostname = new URL(jwtPayload.iss).host
+    const jwksLookupUrl = new URL(jwksInternalUrlBase)
+    jwksLookupUrl.searchParams.append('issuer_hostname', issuerHostname)
+
+    let jwks: jose.JSONWebKeySet
+    const cacheMatch = await cache.match(jwksLookupUrl)
+    if (cacheMatch) {
+      jwks = await cacheMatch.json()
+      //TODO: Remove after validating it after deployment
+      console.debug('matched cache')
+    } else {
+      const jwksResponse = await fetch(jwksLookupUrl)
+      if (!jwksResponse.ok) {
+        console.error(`Could not retrieve the JWKS from ${jwtHeader.jku}`)
+        throw InvalidTokenError
+      }
+      //Don't need to await as it's an optimistic put
+      cache.put(jwksLookupUrl, jwksResponse.clone())
+      jwks = await jwksResponse.json()
     }
+
+    const verificationKey = await jose.createLocalJWKSet(jwks)
+    const { protectedHeader, payload } = await jose.jwtVerify(
+      token,
+      verificationKey,
+      {}
+    )
     return payload
   } catch (error) {
     if (error instanceof RollupError) throw error

@@ -179,24 +179,29 @@ const addressResolvers: Resolvers = {
 
 // TODO: add address middleware
 const AddressResolverComposition = {
-  'Query.account': [requestLogging(), setupContext(), validateApiKey()],
-  'Query.addressProfile': [requestLogging(), setupContext(), validateApiKey()],
-  'Query.addressProfiles': [requestLogging(), setupContext(), validateApiKey()],
-  'Mutation.updateAddressNickname': [
+  'Query.account': [
     requestLogging(),
     setupContext(),
+    isAuthorized('profile'),
     validateApiKey(),
-    isAuthorized(),
   ],
-  'Mutation.updateConnectedAddressesProperties': [
+
+  'Query.addressProfile': [
     requestLogging(),
     setupContext(),
+    isAuthorized('profile'),
     validateApiKey(),
-    isAuthorized(),
+  ],
+  'Query.addressProfiles': [
+    requestLogging(),
+    setupContext(),
+    isAuthorized('connected_accounts'),
+    validateApiKey(),
   ],
   'Mutation.registerSessionKey': [
     requestLogging(),
     setupContext(),
+    isAuthorized('erc_4337'),
     validateApiKey(),
   ],
 }

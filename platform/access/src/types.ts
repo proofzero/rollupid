@@ -12,6 +12,7 @@ export interface Environment {
   Address: Fetcher
   SECRET_JWK_CURRENT_KID: string
   SECRET_JWKS: string
+  JWKS_INTERNAL_URL_BASE: string
 }
 
 export type AuthorizationParameters = {

@@ -15,13 +15,14 @@ import {
 
 import { WriteAnalyticsDataPoint } from '@proofzero/packages/platform-clients/analytics'
 
-import { NodeType } from '@proofzero/types/address'
 import {
   generateTraceContextHeaders,
   TraceSpan,
 } from '@proofzero/platform-middleware/trace'
 import type { ApplicationURN } from '@proofzero/urns/application'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
+import { UnauthorizedError } from '@proofzero/errors'
+import { verifyToken } from '@proofzero/utils/token'
 
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {
@@ -48,7 +49,6 @@ export const requestLogging =
 export const setupContext = () => (next) => (root, args, context, info) => {
   const jwt = getAuthzTokenFromReq(context.request)
   const apiKey = context.request.headers.get('X-GALAXY-KEY')
-
   const parsedJwt = jwt && parseJwt(jwt)
 
   const accountURN = jwt ? parsedJwt?.sub : undefined
@@ -72,32 +72,36 @@ export const temporaryConvertToPublic =
     return next(root, args, context, info)
   }
 
-export const isAuthorized = () => (next) => (root, args, context, info) => {
-  if (!context.jwt) {
-    throw new GraphQLError('You are not authenticated!', {
-      extensions: {
-        http: {
-          status: 401,
+export const isAuthorized =
+  (scopeVal?: string) => (next) => async (root, args, context, info) => {
+    if (!context.jwt) {
+      throw new GraphQLError('You are not authenticated!', {
+        extensions: {
+          http: {
+            status: 401,
+          },
         },
-      },
-    })
-  }
+      })
+    }
 
-  if (!isFromCFBinding(context.request)) {
-    // TODO: update to check if user is authorized with authorzation header
-    // Currently, until write scopes are implemented, this middleware will always
-    // return http 403, unless call is coming internally from service binding
-    throw new GraphQLError('You are not authorized!', {
-      extensions: {
-        http: {
-          status: 403,
-        },
-      },
-    })
-  }
+    const jwtPayload = await verifyToken(
+      context.jwt,
+      context.env.JWKS_INTERNAL_URL_BASE
+    )
+    if (scopeVal) {
+      if (!jwtPayload.scope)
+        throw new UnauthorizedError({
+          message: 'No scope found in token',
+        })
+      const scopeArray = (jwtPayload.scope as string).split(' ')
+      if (!scopeArray.includes(scopeVal))
+        throw new UnauthorizedError({
+          message: `Required scope value (${scopeVal}) not found in provided token`,
+        })
+    }
 
-  return next(root, args, context, info)
-}
+    return next(root, args, context, info)
+  }
 
 export const validateApiKey =
   () => (next) => async (root, args, context, info) => {
