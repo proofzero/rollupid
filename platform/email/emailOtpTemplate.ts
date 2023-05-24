@@ -159,7 +159,7 @@ export const EmailTemplate = (
                 >Privacy Policy</a
               >
               ${
-                contactURL !== ''
+                contactURL && contactURL !== ''
                   ? `<div class="vl"></div><a
                 class="footer-links"
                 href="${contactURL}"
@@ -172,7 +172,7 @@ export const EmailTemplate = (
             </div>
 
             ${
-              address !== ''
+              address && address !== ''
                 ? `<pre
               style="
                 font-size: 12px;
