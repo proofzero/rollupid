@@ -81,6 +81,23 @@ import {
   GetPaymasterOutput,
 } from './methods/getPaymaster'
 import { setPaymaster, SetPaymasterInput } from './methods/setPaymaster'
+
+import {
+  createCustomDomain,
+  CreateCustomDomainInput,
+  CreateCustomDomainOutput,
+} from './methods/createCustomDomain'
+import {
+  deleteCustomDomain,
+  DeleteCustomDomainInput,
+  DeleteCustomDomainOutput,
+} from './methods/deleteCustomDomain'
+import {
+  getCustomDomain,
+  GetCustomDomainInput,
+  GetCustomDomainOutput,
+} from './methods/getCustomDomain'
+
 import { ApiKeyExtractMiddleware } from './apiKeyExtract'
 
 import { AppClientIdParamSchema } from './validators/app'
@@ -250,6 +267,30 @@ export const appRouter = t.router({
     .use(OwnAppsMiddleware)
     .input(SetAppThemeInput)
     .mutation(setAppTheme),
+  createCustomDomain: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .input(CreateCustomDomainInput)
+    .output(CreateCustomDomainOutput)
+    .mutation(createCustomDomain),
+  deleteCustomDomain: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .input(DeleteCustomDomainInput)
+    .output(DeleteCustomDomainOutput)
+    .mutation(deleteCustomDomain),
+  getCustomDomain: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetCustomDomainInput)
+    .output(GetCustomDomainOutput)
+    .query(getCustomDomain),
 })
 
 export type StarbaseRouter = typeof appRouter

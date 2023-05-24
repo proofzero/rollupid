@@ -88,3 +88,28 @@ export const PaymasterSchema = z
 export type PaymasterType = z.infer<typeof PaymasterSchema>
 
 export type PaymasterProviderType = z.infer<typeof PaymasterProviderSchema>
+
+export const CustomDomainSchema = z.object({
+  id: z.string(),
+  hostname: z.string(),
+  ownership_verification: z
+    .object({
+      name: z.string(),
+      type: z.string(),
+      value: z.string(),
+    })
+    .optional(),
+  ssl: z.object({
+    status: z.string(),
+    validation_records: z
+      .array(
+        z.object({
+          status: z.string(),
+          txt_name: z.string(),
+          txt_value: z.string(),
+        })
+      )
+      .optional(),
+  }),
+  status: z.string(),
+})

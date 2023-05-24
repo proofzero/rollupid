@@ -51,6 +51,7 @@
     "@cloudflare/workers-types": "4.20221111.1",
     "@mdx-js/react": "2.1.5",
     "@playwright/test": "1.32.3",
+    "@proofzero/platform.starbase": "workspace:*",
     "@remix-run/dev": "1.14.0",
     "@remix-run/eslint-config": "1.14.0",
     "@storybook/addon-actions": "6.5.15",

@@ -5783,6 +5783,7 @@ __metadata:
     "@playwright/test": 1.32.3
     "@proofzero/design-system": "workspace:*"
     "@proofzero/platform-clients": "workspace:*"
+    "@proofzero/platform.starbase": "workspace:*"
     "@proofzero/utils": "workspace:*"
     "@remix-run/cloudflare": 1.14.0
     "@remix-run/cloudflare-workers": 1.14.0

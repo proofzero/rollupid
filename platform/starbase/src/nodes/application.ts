@@ -11,15 +11,23 @@ import {
   KeyLike,
   SignJWT,
 } from 'jose'
-import { STARBASE_API_KEY_ISSUER } from '../constants'
+import {
+  CUSTOM_DOMAIN_CHECK_INTERVAL,
+  CUSTOM_DOMAIN_CHECK_PERIOD,
+  STARBASE_API_KEY_ISSUER,
+} from '../constants'
 import type {
   AppAllFields,
   AppObject,
   AppReadableFields,
   AppUpdateableFields,
+  Environment,
 } from '../types'
 import { AppTheme, PaymasterType } from '../jsonrpc/validators/app'
 import { InternalServerError } from '@proofzero/errors'
+
+import type { CustomDomain } from '../types'
+import { getCloudflareFetcher, getCustomHostname } from '../utils/cloudflare'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields
@@ -34,6 +42,14 @@ interface KeyPairSerialized {
   privateKey: JWK
 }
 
+type Alarms = {
+  customDomain?: {
+    start: number
+    current: number
+    finish: number
+  }
+}
+
 const JWT_OPTIONS = {
   alg: 'ES256',
   jti: {
@@ -43,9 +59,11 @@ const JWT_OPTIONS = {
 
 export default class StarbaseApp extends DOProxy {
   declare state: DurableObjectState
+  declare env: Environment
 
-  constructor(state: DurableObjectState) {
+  constructor(state: DurableObjectState, env: Environment) {
     super(state)
+    this.env = env
     this.state = state
   }
 
@@ -209,6 +227,68 @@ export default class StarbaseApp extends DOProxy {
 
   async setTheme(theme: AppTheme): Promise<void> {
     return this.state.storage.put('theme', theme)
+  }
+
+  async setCustomDomainAlarm() {
+    const start = Date.now()
+    const current = start + 10000
+    const finish = start + CUSTOM_DOMAIN_CHECK_PERIOD
+
+    const alarms: Alarms = await this.getAlarms()
+    alarms.customDomain = { start, current, finish }
+    await this.state.storage.put({ alarms })
+    await this.state.storage.setAlarm(current)
+  }
+
+  async unsetCustomDomainAlarm() {
+    const alarms: Alarms = await this.getAlarms()
+    delete alarms.customDomain
+    await this.state.storage.put({ alarms })
+  }
+
+  async handleCustomDomainAlarm(alarms: Alarms) {
+    if (!alarms.customDomain) return
+
+    const now = Date.now()
+    const { start, current, finish } = alarms.customDomain
+    if (Math.abs(now - current) > 1000) return
+
+    if (now < start || now >= finish) return
+
+    const { storage } = this.state
+    const stored = await storage.get<CustomDomain>('customDomain')
+    if (!stored) return
+
+    const fetcher = getCloudflareFetcher(this.env.TOKEN_CLOUDFLARE_API)
+    const customDomain = await getCustomHostname(
+      fetcher,
+      this.env.INTERNAL_CLOUDFLARE_ZONE_ID,
+      stored.id
+    )
+
+    customDomain.ownership_verification = stored.ownership_verification
+    customDomain.ssl.validation_records = stored.ssl.validation_records
+    await storage.put({ customDomain })
+
+    if (
+      customDomain.status === 'active' &&
+      customDomain.ssl.status === 'active'
+    )
+      return this.unsetCustomDomainAlarm()
+
+    const next = now + CUSTOM_DOMAIN_CHECK_INTERVAL
+    alarms.customDomain.current = next
+    await storage.put({ alarms })
+    await storage.setAlarm(next)
+  }
+
+  async getAlarms(): Promise<Alarms> {
+    return (await this.state.storage.get<Alarms>('alarms')) || {}
+  }
+
+  async alarm() {
+    const alarms: Alarms = await this.getAlarms()
+    if (alarms.customDomain) await this.handleCustomDomainAlarm(alarms)
   }
 }
 

@@ -10,4 +10,9 @@ declare global {
   const STORAGE_NAMESPACE: string
   const INTERNAL_GOOGLE_ANALYTICS_TAG: string
   const PROFILE_APP_URL: string
+
+  const INTERNAL_PASSPORT_SERVICE_NAME: string
+
+  const INTERNAL_CLOUDFLARE_ZONE_ID: string
+  const TOKEN_CLOUDFLARE_API: string
 }

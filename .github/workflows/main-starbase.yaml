@@ -48,5 +48,10 @@ jobs:
           workingDirectory: 'platform/starbase'
           command: publish --env dev
           environment: 'dev'
+          secrets: |
+            INTERNAL_CLOUDFLARE_ZONE_ID
+            TOKEN_CLOUDFLARE_API
         env:
           NODE_ENV: 'development'
+          INTERNAL_CLOUDFLARE_ZONE_ID: ${{ secrets.INTERNAL_CLOUDFLARE_ZONE_ID }}
+          TOKEN_CLOUDFLARE_API: ${{ secrets.TOKEN_CLOUDFLARE_API }}

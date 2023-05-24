@@ -7,6 +7,7 @@ import {
   AppObjectSchema,
   AppReadableFieldsSchema,
   AppUpdateableFieldsSchema,
+  CustomDomainSchema,
 } from './jsonrpc/validators/app'
 
 import {
@@ -22,6 +23,9 @@ export interface Environment {
   ServiceDeploymentMetadata: DeploymentMetadata
   StarbaseApp: DurableObjectNamespace
   Edges: Fetcher
+  INTERNAL_PASSPORT_SERVICE_NAME: string
+  INTERNAL_CLOUDFLARE_ZONE_ID: string
+  TOKEN_CLOUDFLARE_API: string
 }
 
 export const EDGE_APPLICATION: EdgeURN = EdgeSpace.urn('owns/app')
@@ -41,3 +45,5 @@ export type AuthorizedAccountsOutput = z.infer<
 >
 export type AuthorizedUser = z.infer<typeof AuthorizedUser>
 export type EdgesMetadata = z.infer<typeof EdgesMetadata>
+
+export type CustomDomain = z.infer<typeof CustomDomainSchema>
