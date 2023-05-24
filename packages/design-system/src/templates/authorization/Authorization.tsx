@@ -107,7 +107,8 @@ export default ({
     <div className={`${dark ? 'dark' : ''}`}>
       <div
         className={
-          'flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6 lg:rounded-${radius} min-h-[100dvh] lg:min-h-[675px] max-h-[100dvh]'
+          'flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6\
+           lg:rounded-${radius} min-h-[100dvh] lg:min-h-[580px] max-h-[100dvh]'
         }
         style={{
           width: 418,
@@ -120,7 +121,7 @@ export default ({
             src={userProfile.pfpURL}
             hex={false}
             size={'sm'}
-            // alt="User Profile"
+          // alt="User Profile"
           />
           <img src={authorizeCheck} alt="Authorize Check" />
           <Avatar src={appProfile.iconURL} size={'sm'} />
@@ -155,14 +156,14 @@ export default ({
 
                     {(scope === 'profile' ||
                       scope === 'system_identifiers') && (
-                      <Text
-                        size="sm"
-                        weight="medium"
-                        className="flex-1 text-gray-500"
-                      >
-                        {scopeMeta.scopes[scope].name}
-                      </Text>
-                    )}
+                        <Text
+                          size="sm"
+                          weight="medium"
+                          className="flex-1 text-gray-500"
+                        >
+                          {scopeMeta.scopes[scope].name}
+                        </Text>
+                      )}
 
                     {scope === 'erc_4337' && (
                       <div className="flex-1 min-w-0">
@@ -258,21 +259,25 @@ export default ({
         </div>
 
         {(appProfile?.termsURL || appProfile?.privacyURL) && (
-          <Text size="sm" className="text-gray-500 mt-7">
-            Before using this app, you can review{' '}
-            {appProfile?.name ?? `Company`}
-            's{' '}
-            <a href={appProfile.privacyURL} className="text-skin-primary">
-              privacy policy
-            </a>
-            {appProfile?.termsURL && appProfile?.privacyURL && (
-              <span> and </span>
-            )}
-            <a href={appProfile.termsURL} className="text-skin-primary">
-              terms of service
-            </a>
-            .
-          </Text>
+          <div className="mt-auto">
+            <Text size="sm" className="text-gray-500">
+              Before using this app, you can review{' '}
+              {appProfile?.name ?? `Company`}
+              's{' '}
+              <a href={appProfile.privacyURL} className="text-skin-primary
+               text-indigo-500">
+                privacy policy
+              </a>
+              {appProfile?.termsURL && appProfile?.privacyURL && (
+                <span> and </span>
+              )}
+              <a href={appProfile.termsURL} className="text-skin-primary 
+              text-indigo-500">
+                terms of service
+              </a>
+              .
+            </Text>
+          </div>
         )}
 
         <div className="flex flex-col w-full items-center justify-center mt-auto">

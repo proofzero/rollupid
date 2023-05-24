@@ -76,7 +76,7 @@ export default () => {
           className={
             'flex shrink flex-col items-center\
          justify-center gap-4 mx-auto bg-white p-6 h-[100dvh]\
-          lg:h-[675px] lg:max-h-[100dvh] w-full lg:w-[418px]\
+          lg:h-[580px] lg:max-h-[100dvh] w-full lg:w-[418px]\
           lg:rounded-lg'
           }
           style={{
