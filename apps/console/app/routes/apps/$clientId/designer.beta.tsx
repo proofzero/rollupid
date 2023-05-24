@@ -773,6 +773,40 @@ const EmailPanel = ({
     emailTheme?.contact
   )
 
+  const iFrameRef = useRef<HTMLIFrameElement>(null)
+  const [dark, setDark] = useState<boolean>(false)
+
+  useEffect(() => {
+    const darkMode = window.matchMedia('(prefers-color-scheme: dark)')
+    setDark(darkMode.matches)
+  }, [])
+
+  useEffect(() => {
+    if (!iFrameRef) return
+
+    var iframeStyle =
+      iFrameRef.current?.contentWindow?.document.documentElement.style
+    if (!iframeStyle) return
+
+    if (dark) {
+      // If it's currently light, switch to dark
+      iframeStyle.setProperty('--background-color', '#1A202C')
+      iframeStyle.setProperty('--text-color', '#E2E8F0')
+      iframeStyle.setProperty('--divider-color', '#4A5568')
+      iframeStyle.setProperty('--input-color', '#2D3748')
+    } else {
+      // If it's currently dark, switch to light
+      iframeStyle.setProperty('--background-color', '#ffffff')
+      iframeStyle.setProperty('--text-color', '#6b7280')
+      iframeStyle.setProperty('--divider-color', '#e5e7eb')
+      iframeStyle.setProperty('--input-color', '#f3f4f6')
+    }
+  }, [dark])
+
+  const toggleTheme = () => {
+    setDark(!dark)
+  }
+
   return (
     <Tab.Panel className="flex flex-col lg:flex-row gap-7">
       <input type="hidden" name="target" value="email" />
@@ -867,9 +901,21 @@ const EmailPanel = ({
           <Text size="lg" weight="semibold" className="text-gray-900">
             Preview
           </Text>
+
+          <div className="flex flex-row gap-2 items-center">
+            <TbSunHigh />
+            <InputToggle
+              id="otp-theme"
+              label=""
+              onToggle={toggleTheme}
+              checked={dark}
+            />
+            <TbMoon />
+          </div>
         </div>
 
         <iframe
+          ref={iFrameRef}
           className="w-full border rounded-lg"
           srcDoc={
             EmailTemplate('XXXXXX', {
