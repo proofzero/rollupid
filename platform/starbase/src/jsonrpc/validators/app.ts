@@ -59,16 +59,17 @@ export const AppThemeSchema = z.object({
       })
     )
     .optional(),
-  email: z
-    .object({
-      logoURL: z.string().url().optional(),
-      address: z.string().optional(),
-      contact: z.string().url().optional(),
-    })
-    .optional(),
 })
 
 export type AppTheme = z.infer<typeof AppThemeSchema>
+
+export const EmailOTPThemeSchema = z.object({
+  logoURL: z.string().url().optional(),
+  address: z.string().optional(),
+  contact: z.string().url().optional(),
+})
+
+export type EmailOTPTheme = z.infer<typeof EmailOTPThemeSchema>
 
 export const AppPublicPropsSchema = z.object({
   name: z.string(),

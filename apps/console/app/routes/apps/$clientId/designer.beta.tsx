@@ -31,6 +31,8 @@ import { HexColorPicker } from 'react-colorful'
 import {
   AppTheme,
   AppThemeSchema,
+  EmailOTPTheme,
+  EmailOTPThemeSchema,
 } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
@@ -50,10 +52,10 @@ import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 import { Helmet } from 'react-helmet'
 import { notificationHandlerType } from '~/types'
 import InputTextarea from '@proofzero/design-system/src/atoms/form/InputTextarea'
-import { PreLabeledInput } from '@proofzero/design-system/src/atoms/form/PreLabledInput'
 import { EmailTemplate } from '@proofzero/platform/email/emailOtpTemplate'
 import subtractLogo from '@proofzero/design-system/src/assets/subtract-logo.svg'
 import { BadRequestError } from '@proofzero/errors'
+import { GetEmailOTPThemeResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getEmailOTPTheme'
 
 const client = createClient(
   // @ts-ignore
@@ -751,24 +753,24 @@ const AuthPanel = ({
 }
 
 const EmailPanel = ({
-  appTheme,
+  emailTheme,
   setLoading,
   errors,
 }: {
-  appTheme?: AppTheme
+  emailTheme?: EmailOTPTheme
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
   errors?: {
     [key: string]: string
   }
 }) => {
   const [logoURL, setLogoURL] = useState<string | undefined>(
-    appTheme?.email?.logoURL
+    emailTheme?.logoURL
   )
   const [address, setAddress] = useState<string | undefined>(
-    appTheme?.email?.address
+    emailTheme?.address
   )
   const [contact, setContact] = useState<string | undefined>(
-    appTheme?.email?.contact
+    emailTheme?.contact
   )
 
   return (
@@ -913,8 +915,13 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     clientId,
   })
 
+  const emailTheme = await starbaseClient.getEmailOTPTheme.query({
+    clientId,
+  })
+
   return json({
     appTheme,
+    emailTheme,
   })
 }
 
@@ -940,7 +947,11 @@ export const action: ActionFunction = async ({ request, params, context }) => {
     clientId,
   })
 
-  const updateAuth = (fd: FormData, theme: AppTheme) => {
+  let emailTheme = await starbaseClient.getEmailOTPTheme.query({
+    clientId,
+  })
+
+  const updateAuth = async (fd: FormData, theme: AppTheme) => {
     const heading = fd.get('heading') as string | undefined
     const radius = fd.get('radius') as string | undefined
     const color = fd.get('color') as string | undefined
@@ -965,16 +976,32 @@ export const action: ActionFunction = async ({ request, params, context }) => {
       providers: providers ?? theme.providers,
     }
 
-    return theme
+    const zodErrors = await AppThemeSchema.spa(theme)
+    if (!zodErrors.success) {
+      const mappedIssues = zodErrors.error.issues.map((issue) => ({
+        path: issue.path.join('.'),
+        message: issue.message,
+      }))
+
+      errors = mappedIssues.reduce((acc, curr) => {
+        acc[curr.path] = curr.message
+        return acc
+      }, {} as { [key: string]: string })
+    } else {
+      await starbaseClient.setAppTheme.mutate({
+        clientId,
+        theme,
+      })
+    }
+
+    return json({
+      errors,
+    })
   }
 
-  const updateEmail = (fd: FormData, theme: AppTheme) => {
+  const updateEmail = async (fd: FormData, theme: EmailOTPTheme) => {
     let logoURL = fd.get('logoURL') as string | undefined
     if (!logoURL || logoURL === '') logoURL = undefined
-
-    console.log({
-      logoURL,
-    })
 
     let address = fd.get('address') as string | undefined
     if (!address || address === '') address = undefined
@@ -984,66 +1011,51 @@ export const action: ActionFunction = async ({ request, params, context }) => {
 
     theme = {
       ...theme,
-      email: theme.email
-        ? {
-            logoURL: logoURL ?? theme.email.logoURL,
-            address: address ?? theme.email.address,
-            contact: contact ?? theme.email.contact,
-          }
-        : {
-            logoURL: logoURL,
-            address: address,
-            contact: contact,
-          },
+      logoURL: logoURL ?? theme.logoURL,
+      address: address ?? theme.address,
+      contact: contact ?? theme.contact,
     }
 
-    return theme
+    const zodErrors = await EmailOTPThemeSchema.spa(theme)
+    if (!zodErrors.success) {
+      const mappedIssues = zodErrors.error.issues.map((issue) => ({
+        path: `email.${issue.path.join('.')}`,
+        message: issue.message,
+      }))
+
+      errors = mappedIssues.reduce((acc, curr) => {
+        acc[curr.path] = curr.message
+        return acc
+      }, {} as { [key: string]: string })
+    } else {
+      await starbaseClient.setEmailOTPTheme.mutate({
+        clientId,
+        theme,
+      })
+    }
+
+    return json({
+      errors,
+    })
   }
 
   const fd = await request.formData()
   switch (fd.get('target')) {
     case 'auth':
-      theme = updateAuth(fd, theme)
-      break
+      return updateAuth(fd, theme)
     case 'email':
-      theme = updateEmail(fd, theme)
-      break
+      return updateEmail(fd, emailTheme)
     default:
       throw new BadRequestError({
         message: 'Invalid target',
       })
   }
-
-  console.log({
-    theme,
-  })
-
-  const zodErrors = await AppThemeSchema.spa(theme)
-  if (!zodErrors.success) {
-    const mappedIssues = zodErrors.error.issues.map((issue) => ({
-      path: issue.path.join('.'),
-      message: issue.message,
-    }))
-
-    errors = mappedIssues.reduce((acc, curr) => {
-      acc[curr.path] = curr.message
-      return acc
-    }, {} as { [key: string]: string })
-  } else {
-    await starbaseClient.setAppTheme.mutate({
-      clientId,
-      theme,
-    })
-  }
-
-  return json({
-    errors,
-  })
 }
 
 export default () => {
-  const { appTheme } = useLoaderData<{
+  const { appTheme, emailTheme } = useLoaderData<{
     appTheme: GetAppThemeResult
+    emailTheme: GetEmailOTPThemeResult
   }>()
 
   const actionData = useActionData()
@@ -1128,7 +1140,7 @@ export default () => {
             />
 
             <EmailPanel
-              appTheme={appTheme}
+              emailTheme={emailTheme}
               setLoading={setLoading}
               errors={errors}
             />
