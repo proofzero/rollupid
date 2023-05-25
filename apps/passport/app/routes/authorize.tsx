@@ -393,12 +393,14 @@ export default function Authorize() {
   const [persona] = useState<PersonaData>(personaData!)
 
   const [selectedEmail, setSelectedEmail] = useState<DropdownSelectListItem>()
-  const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<Array<DropdownSelectListItem>>(
-    []
-  )
-  const [selectedSCWallets, setSelectedSCWallets] = useState<Array<DropdownSelectListItem>>(
-    []
-  )
+  const [selectedConnectedAccounts, setSelectedConnectedAccounts] =
+    useState<Array<DropdownSelectListItem | AuthorizationControlSelection>>(
+      []
+    )
+  const [selectedSCWallets, setSelectedSCWallets] =
+    useState<Array<DropdownSelectListItem | AuthorizationControlSelection>>(
+      []
+    )
 
   // Re-render the component every time persona gets updated
   useEffect(() => { }, [persona])
@@ -433,7 +435,7 @@ export default function Authorize() {
     }
 
     if (requestedScope.includes('email') && selectedEmail) {
-      personaData.email = selectedEmail.title
+      personaData.email = selectedEmail
     }
 
     if (
@@ -447,8 +449,12 @@ export default function Authorize() {
       }
     }
 
-    if (requestedScope.includes('erc_4337') && selectedSCWallets) {
-      personaData.erc_4337 = selectedSCWallets
+    if (requestedScope.includes('erc_4337') && selectedSCWallets.length > 0) {
+      if (selectedSCWallets[0] === AuthorizationControlSelection.ALL) {
+        personaData.erc_4337 = AuthorizationControlSelection.ALL
+      } else {
+        personaData.erc_4337 = selectedSCWallets
+      }
     }
 
     // TODO: Everything should be a form field now handled by javascript
@@ -513,7 +519,11 @@ export default function Authorize() {
 
             return navigate(`/authorize?${qp.toString()}`)
           }}
-          selectSmartWalletCallback={setSelectedSCWallets}
+          selectSmartWalletsCallback={setSelectedSCWallets}
+          selectAllSmartWalletsCallback={() => {
+            setSelectedSCWallets([AuthorizationControlSelection.ALL])
+          }}
+
           connectedEmails={connectedEmails ?? []}
           addNewEmailCallback={() => {
             const qp = new URLSearchParams()
@@ -541,6 +551,9 @@ export default function Authorize() {
             return navigate(`/authorize?${qp.toString()}`)
           }}
           selectAccountsCallback={setSelectedConnectedAccounts}
+          selectAllAccountsCallback={() => {
+            setSelectedConnectedAccounts([AuthorizationControlSelection.ALL])
+          }}
           cancelCallback={cancelCallback}
           authorizeCallback={authorizeCallback}
           disableAuthorize={

@@ -48,7 +48,8 @@ type AuthorizationProps = {
 
   connectedSmartContractWallets?: DropdownSelectListItem[]
   addNewSmartWalletCallback: () => void
-  selectSmartWalletCallback: (selected: Array<DropdownSelectListItem>) => void
+  selectSmartWalletsCallback: (selected: Array<DropdownSelectListItem>) => void
+  selectAllSmartWalletsCallback: () => void
 
   connectedEmails?: Array<DropdownSelectListItem>
   addNewEmailCallback: () => void
@@ -59,6 +60,7 @@ type AuthorizationProps = {
   selectAccountsCallback: (
     selected: Array<DropdownSelectListItem>
   ) => void
+  selectAllAccountsCallback: () => void
 
   cancelCallback: () => void
   authorizeCallback: (scopes: string[]) => void
@@ -74,13 +76,15 @@ export default ({
   transitionState,
   connectedSmartContractWallets,
   addNewSmartWalletCallback,
-  selectSmartWalletCallback,
+  selectSmartWalletsCallback,
+  selectAllSmartWalletsCallback,
   connectedEmails,
   addNewEmailCallback,
   selectEmailCallback,
   connectedAccounts,
   addNewAccountCallback,
   selectAccountsCallback,
+  selectAllAccountsCallback,
   cancelCallback,
   authorizeCallback,
   disableAuthorize = false,
@@ -182,13 +186,11 @@ export default ({
                           placeholder='Select a Smart Contract Wallet'
                           multiple={true}
                           onSelect={(selectedItems: Array<DropdownSelectListItem>) => {
-                            selectSmartWalletCallback(selectedItems)
+                            selectSmartWalletsCallback(selectedItems)
                           }}
-                          onSelectAll={() => {
-                            selectSmartWalletCallback(
-                              connectedSmartContractWallets
-                            )
-                          }}
+                          onSelectAll={
+                            selectAllSmartWalletsCallback
+                          }
                           ConnectButtonPhrase="New Smart Contract Wallet"
                           ConnectButtonCallback={addNewSmartWalletCallback}
                           selectAllCheckboxTitle='All Smart Contract Wallets'
@@ -218,11 +220,9 @@ export default ({
                           onSelect={(selectedItems: Array<DropdownSelectListItem>) => {
                             selectAccountsCallback(selectedItems)
                           }}
-                          onSelectAll={() => {
-                            selectAccountsCallback(
-                              connectedAccounts
-                            )
-                          }}
+                          onSelectAll={
+                            selectAllAccountsCallback
+                          }
                           placeholder='No connected account(s)'
                           ConnectButtonPhrase="Connect New Account"
                           ConnectButtonCallback={addNewAccountCallback}
