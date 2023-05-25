@@ -1060,9 +1060,9 @@ export const action: ActionFunction = async ({ request, params, context }) => {
 
     theme = {
       ...theme,
-      logoURL: logoURL ?? theme.logoURL,
-      address: address ?? theme.address,
-      contact: contact ?? theme.contact,
+      logoURL: logoURL ?? theme?.logoURL,
+      address: address ?? theme?.address,
+      contact: contact ?? theme?.contact,
     }
 
     const zodErrors = await EmailOTPThemeSchema.spa(theme)
