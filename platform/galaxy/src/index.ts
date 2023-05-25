@@ -31,6 +31,8 @@ const plugins = [
         Authorization: {
           type: 'http',
           scheme: 'bearer',
+          description: 'Please insert JWT token into field',
+          bearerFormat: 'JWT',
         },
       },
     },
