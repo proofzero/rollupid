@@ -21,6 +21,7 @@ import {
 
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { AuthorizedAppsModel } from '~/routes/settings'
+import { WarningCTA } from '@proofzero/design-system/src/molecules/cta/warning'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   await getValidatedSessionContext(
@@ -48,18 +49,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   )
 }
 
-type App = {
-  clientId: string
-  icon: string
-  title: string
-  timestamp: number
-}
 const AppListItem = ({
   app,
   setSelectedApp,
 }: {
-  app: App
-  setSelectedApp: (app: App) => void
+  app: AuthorizedAppsModel
+  setSelectedApp: (app: AuthorizedAppsModel) => void
 }) => {
   const [approvedDateTime, setApprovedDateTime] = useState<undefined | string>()
 
@@ -80,16 +75,42 @@ const AppListItem = ({
       className="flex-1 flex flex-row px-5 py-4 space-x-4 rounded-lg
     border shadow-sm items-center bg-white"
     >
-      <img
-        src={app.icon}
-        alt="Not found"
-        className="object-cover w-16 h-16 rounded"
-      />
+      {/* App icon is changed only when there is an error with data, not scopes */}
+      {app.appDataError
+        ? <div
+          className='w-16 h-16 flex items-center justify-center bg-[#F3F4F6]
+         rounded-lg'>
+          <img
+            src={app.icon}
+            alt="Not found"
+            className="object-cover w-8 h-8 rounded"
+          />
+        </div>
+        : <img
+          src={app.icon}
+          alt="Not found"
+          className="object-cover w-16 h-16 rounded"
+        />
+      }
 
       <div className="flex-1 flex flex-col space-y-2">
-        <Text weight="semibold" className="text-gray-900">
-          {app.title}
-        </Text>
+        <div className='flex-1 flex flex-row space-x-2 items-center'>
+          {app.title
+            ? <Text
+              weight="semibold"
+              size="base"
+              className="text-gray-900 w-fit py-[2px]">
+              {app.title}
+            </Text>
+            : null}
+          {app.appDataError || app.appScopeError
+            ? <Text
+              size="sm"
+              className="text-[#EA580C] bg-orange-50 rounded-xl w-fit px-2 py-[2px]">
+              Data Error
+            </Text>
+            : null}
+        </div>
 
         <Text size="xs" weight="normal" className="text-gray-500">
           Approved: {approvedDateTime}
@@ -123,7 +144,7 @@ export default function ApplicationsLayout() {
     authorizedApps: AuthorizedAppsModel[]
   }>()
 
-  const [selectedApp, setSelectedApp] = useState<undefined | App>()
+  const [selectedApp, setSelectedApp] = useState<undefined | AuthorizedAppsModel>()
 
   const fetcher = useFetcher()
 
@@ -158,11 +179,21 @@ export default function ApplicationsLayout() {
       navigate(`/settings/applications/${selectedApp.clientId}`)
     }
   }, [selectedApp])
+
+  const appErrorExists = authorizedApps.some((app) => app.appDataError || app.appScopeError)
+
   return (
     <>
       <Text size="2xl" weight="semibold" className="text-gray-800 mb-6">
         Applications
       </Text>
+      {
+        appErrorExists
+          ? <WarningCTA
+            description='We detected a data error in your application(s).
+      Please revoke the authorization and re-authorize again in the affected application.'/>
+          : null
+      }
 
       {authorizedApps.length === 0 ? (
         <section className="h-[512px] sm:h-[256px]">

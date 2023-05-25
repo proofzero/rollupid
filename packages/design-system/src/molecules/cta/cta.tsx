@@ -4,9 +4,9 @@ import { BsGear } from 'react-icons/bs'
 import { Button } from '../../atoms/buttons/Button'
 
 export type CTAProps = {
-  header: string
   description: string
-  btnText: string
+  btnText?: string
+  header?: string
   clickHandler?: () => void
 }
 

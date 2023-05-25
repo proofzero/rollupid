@@ -13,9 +13,10 @@ import appleIcon from '~/assets/apple-touch-icon.png'
 import icon32 from '~/assets/favicon-32x32.png'
 import icon16 from '~/assets/favicon-16x16.png'
 import faviconSvg from '~/assets/favicon.svg'
-import warningImg from '~/assets/warning.svg'
+import noImg from '~/assets/noImg.svg'
 
 import {
+  getAccessClient,
   getAccountClient,
   getAddressClient,
   getStarbaseClient,
@@ -29,8 +30,10 @@ import type { LinksFunction } from '@remix-run/cloudflare'
 export type AuthorizedAppsModel = {
   clientId: string
   icon: string
-  title: string
   timestamp: number
+  title?: string
+  appDataError?: boolean
+  appScopeError?: boolean
 }
 
 export const links: LinksFunction = () => [
@@ -52,6 +55,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
   const starbaseClient = getStarbaseClient(jwt, context.env, context.traceSpan)
+  const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
 
   const accountProfile = await accountClient.getProfile.query({
     account: accountUrn,
@@ -70,24 +74,33 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     Promise.all(
       apps.map(async (a) => {
         try {
-          const { name, iconURL } =
-            await starbaseClient.getAppPublicProps.query({
-              clientId: a.clientId,
-            })
+          const [appPublicProps, appAuthorizedScopes] =
+            await Promise.all([
+              starbaseClient.getAppPublicProps.query({
+                clientId: a.clientId,
+              }),
+              accessClient.getAuthorizedAppScopes.query({
+                clientId: a.clientId,
+                accountURN: accountUrn,
+              })
+            ])
+
           return {
             clientId: a.clientId,
-            icon: iconURL,
-            title: name,
+            icon: appPublicProps.iconURL,
+            title: appPublicProps.name,
             timestamp: a.timestamp,
+            appScopeError: (Object.entries(appAuthorizedScopes)
+              .some(([_, value]) => !value.meta.valid)),
           }
         } catch (e) {
           //We swallow the error and move on to next app
           console.error(e)
           return {
             clientId: a.clientId,
-            icon: warningImg,
-            title: 'Application data error',
+            icon: noImg,
             timestamp: a.timestamp,
+            appDataError: true,
           }
         }
       })
@@ -160,7 +173,7 @@ export default function SettingsLayout() {
                     max-lg:h-[calc(100dvh-80px)]\
                     min-h-[416px]'
                     : 'h-full'
-                } px-2 sm:max-md:px-5 md:px-10
+                  } px-2 sm:max-md:px-5 md:px-10
                 pb-5 md:pb-10 pt-6 bg-white lg:bg-gray-50`}
               >
                 <Outlet

@@ -253,7 +253,7 @@ export default function AccountsLayout() {
       <div className="flex flex-col mb-6">
         <div className="flex flex-row justify-start">
           <div className="bg-gray-100 h-[16px] px-2 mx-2 rounded-xl">
-            <TbCrown className="text-yellow-500" />
+            <TbCrown className="text-[#F59E0B]" />
           </div>
           <Text size="sm" weight="normal" className="text-gray-500">
             Primary account drives which name and picture is shared with
