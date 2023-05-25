@@ -23,7 +23,11 @@ import type {
   AppUpdateableFields,
   Environment,
 } from '../types'
-import { AppTheme, PaymasterType } from '../jsonrpc/validators/app'
+import {
+  AppTheme,
+  EmailOTPTheme,
+  PaymasterType,
+} from '../jsonrpc/validators/app'
 import { InternalServerError } from '@proofzero/errors'
 
 import type { CustomDomain } from '../types'
@@ -289,6 +293,14 @@ export default class StarbaseApp extends DOProxy {
   async alarm() {
     const alarms: Alarms = await this.getAlarms()
     if (alarms.customDomain) await this.handleCustomDomainAlarm(alarms)
+  }
+
+  async getEmailOTPTheme(): Promise<EmailOTPTheme | undefined> {
+    return this.state.storage.get<EmailOTPTheme>('emailOTPTheme')
+  }
+
+  async setEmailOTPTheme(theme: EmailOTPTheme): Promise<void> {
+    return this.state.storage.put('emailOTPTheme', theme)
   }
 }
 

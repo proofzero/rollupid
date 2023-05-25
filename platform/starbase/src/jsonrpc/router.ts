@@ -104,6 +104,14 @@ import { AppClientIdParamSchema } from './validators/app'
 
 import { getAppTheme, GetAppThemeOutput } from './methods/getAppTheme'
 import { SetAppThemeInput, setAppTheme } from './methods/setAppTheme'
+import {
+  getEmailOTPTheme,
+  GetEmailOTPThemeOutput,
+} from './methods/getEmailOTPTheme'
+import {
+  setEmailOTPTheme,
+  SetEmailOTPThemeInput,
+} from './methods/setEmailOTPTheme'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -291,6 +299,19 @@ export const appRouter = t.router({
     .input(GetCustomDomainInput)
     .output(GetCustomDomainOutput)
     .query(getCustomDomain),
+  getEmailOTPTheme: t.procedure
+    .use(Analytics)
+    .input(AppClientIdParamSchema)
+    .output(GetEmailOTPThemeOutput)
+    .query(getEmailOTPTheme),
+  setEmailOTPTheme: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .use(OwnAppsMiddleware)
+    .input(SetEmailOTPThemeInput)
+    .mutation(setEmailOTPTheme),
 })
 
 export type StarbaseRouter = typeof appRouter

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Text } from '../text/Text'
+import React from 'react'
 
 export type InputTextareaProps = {
   id?: string

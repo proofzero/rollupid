@@ -1,13 +1,32 @@
 import { z } from 'zod'
 import { Context } from '../../context'
-import { sendNotification, getOTPEmailContent } from '../../emailFunctions'
+import {
+  sendNotification,
+  getOTPEmailContent,
+  NotificationSender,
+} from '../../emailFunctions'
 import { EmailNotification } from '../../types'
 import { Environment } from '../../types'
+
+export const SendOTPEmailThemePropsSchema = z.object({
+  privacyURL: z.string().url(),
+  termsURL: z.string().url(),
+  contactURL: z.string().url().optional(),
+  address: z.string().optional(),
+  logoURL: z.string().url().optional(),
+  appName: z.string(),
+  hostname: z.string().optional(),
+})
+
+export type SendOTPEmailThemeProps = z.infer<
+  typeof SendOTPEmailThemePropsSchema
+>
 
 export const sendOTPEmailMethodInput = z.object({
   name: z.string(),
   emailAddress: z.string(),
   otpCode: z.string(),
+  themeProps: SendOTPEmailThemePropsSchema.optional(),
 })
 
 export type sendOTPEmailMethodParams = z.infer<typeof sendOTPEmailMethodInput>
@@ -48,7 +67,7 @@ export const sendEmailNotificationMethod = async ({
     Test: ctx.Test,
   }
 
-  const otpEmailTemplate = getOTPEmailContent(input.otpCode)
+  const otpEmailTemplate = getOTPEmailContent(input.otpCode, input.themeProps)
   const notification: EmailNotification = {
     content: otpEmailTemplate,
     recipient: {
@@ -57,5 +76,13 @@ export const sendEmailNotificationMethod = async ({
     },
   }
 
-  await sendNotification(notification, env)
+  let customSender: NotificationSender
+  if (input.themeProps?.hostname) {
+    customSender = {
+      address: `no-reply@${input.themeProps.hostname}`,
+      name: input.themeProps.appName,
+    }
+  }
+
+  await sendNotification(notification, env, customSender)
 }

@@ -1,11 +1,69 @@
 import { EmailContent } from './src/types'
 
-export const EmailTemplate = (passcode: string): EmailContent => {
+export const darkModeStyles = `
+    body {
+        background-color: #1A202C;
+        color: #E2E8F0;
+    }
+    .content, .container {
+        background-color: #1A202C;
+    }
+    .divider {
+        border-bottom-color: #4A5568;
+    }
+    #passcode {
+        background-color: #2D3748;
+    }
+    .footer-links {
+        color: #E2E8F0;
+        border-bottom-color: #E2E8F0;
+    }
+    .vl {
+        border-color: #E2E8F0;
+    }
+`
+
+export const lightModeStyles = `
+    body {
+        background-color: #ffffff;
+        color: #6b7280;
+    }
+    .content, .container {
+        background-color: #ffffff;
+    }
+    .divider {
+        border-bottom-color: #e5e7eb;
+    }
+    #passcode {
+        background-color: #f3f4f6;
+    }
+    .footer-links {
+        color: #6b7280;
+        border-bottom-color: #6b7280;
+    }
+    .vl {
+        border-color: #6b7280;
+    }
+`
+
+export type EmailTemplateParams = {
+  logoURL: string
+  address?: string
+  contactURL?: string
+  termsURL: string
+  privacyURL: string
+}
+
+export const EmailTemplate = (
+  passcode: string,
+  params: EmailTemplateParams
+): EmailContent => {
+  const { logoURL, address, contactURL, termsURL, privacyURL } = params
+
   return {
     contentType: 'text/html',
     subject: `Your Rollup ID one-time passcode`,
-    body: `
-    <!DOCTYPE html>
+    body: `<!DOCTYPE html>
     <html>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -16,48 +74,47 @@ export const EmailTemplate = (passcode: string): EmailContent => {
         />
         <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
         <style type="text/css">
-          body {
-            font-family: Inter;
-            background-color: #ffffff;
+          body,
+          .container,
+          .content {
+            font-family: "Inter", sans-serif;
           }
+    
           .container {
             display: block;
             width: 98%;
             text-align: center;
-            background-color: #ffffff;
           }
+    
           .content {
             display: inline-block;
             vertical-align: top;
             text-align: left;
             max-width: 375px;
             border-radius: 8px;
-            background-color: #ffffff;
           }
+    
           .logo {
             width: 170px;
             margin-bottom: 37px;
           }
-          .heading {
-            font-size: 36px;
-            font-weight: bold;
-            line-height: 44px;
-            margin-bottom: 16px;
-          }
+    
+          .heading,
           .heading-logo {
             font-size: 36px;
             font-weight: bold;
             line-height: 44px;
+            margin-bottom: 16px;
           }
+    
           p {
             font-size: 16px;
             font-weight: normal;
             line-height: 24px;
-            color: #6b7280;
             margin-bottom: 16px;
           }
+    
           #passcode {
-            background-color: #f3f4f6;
             width: 100%;
             text-align: center;
             font-size: 46px;
@@ -67,54 +124,48 @@ export const EmailTemplate = (passcode: string): EmailContent => {
             margin-bottom: 20px;
             padding: 15px 0;
           }
+    
           .divider {
             border-bottom: 1px solid #e5e7eb;
             width: 100%;
             margin-bottom: 10px;
           }
+    
           .footer-links {
             font-size: 12px;
-            color: #6b7280;
             text-decoration: none;
             border-bottom: 1px solid #6b7280;
             margin-right: 10px;
             width: auto;
           }
+    
           .vl {
-            border: 0.5px solid black;
+            border: 0.5px solid #6b7280;
             display: inline;
             margin-right: 15px;
           }
+    
           .powered-by {
             font-size: 12px;
-
-            color: #9ca3af;
             text-decoration: none;
           }
+        </style>
+    
+        <style type="text/css" id="injected-styles">
+          ${lightModeStyles}
+    
           @media (prefers-color-scheme: dark) {
-            .content.apaptive {
-              background-color: #ffffff;
-            }
-            .container.apaptive {
-              background-color: #ffffff;
-            }
-            body.apaptive {
-              background-color: #ffffff;
-            }
+              ${darkModeStyles}
           }
         </style>
         <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
       </head>
+    
       <body class="adaptive">
         <div class="container adaptive">
           <div class="content adaptive">
             <div class="heading-logo">
-              <img
-                class="logo"
-                src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public"
-                alt=""
-                style="display: block"
-              />
+              <img class="logo" src="${logoURL}" alt="" style="display: block" />
             </div>
             <div class="heading">Confirm Your Email Address</div>
             <p>Please copy the code below into the email verification screen.</p>
@@ -128,7 +179,7 @@ export const EmailTemplate = (passcode: string): EmailContent => {
             <div style="width: 100%">
               <a
                 class="footer-links"
-                href="https://rollup.id/tos"
+                href="${termsURL}"
                 target="_blank"
                 rel="noreferrer"
                 >Terms & Conditions</a
@@ -136,22 +187,24 @@ export const EmailTemplate = (passcode: string): EmailContent => {
               <div class="vl"></div>
               <a
                 class="footer-links"
-                href="https://rollup.id/privacy-policy"
+                href="${privacyURL}"
                 target="_blank"
                 rel="noreferrer"
                 >Privacy Policy</a
               >
+              ${ contactURL && contactURL !== '' ? `
               <div class="vl"></div>
               <a
                 class="footer-links"
-                href="https://discord.com/invite/rollupid"
+                href="${contactURL}"
                 target="_blank"
                 rel="noreferrer"
                 >Contact Us</a
-              >
+              >` : '' }
             </div>
-
-            <p
+    
+            ${ address && address !== '' ? `
+            <pre
               style="
                 font-size: 12px;
                 line-height: 16px;
@@ -160,8 +213,9 @@ export const EmailTemplate = (passcode: string): EmailContent => {
                 margin-top: 10px;
               "
             >
-              777 Bay Street, Suite C208B Toronto, Ontario M5G 2C8 Canada
-            </p>
+    ${address}</pre
+            >
+            ` : '' }
             <p
               style="
                 font-size: 12px;
@@ -200,7 +254,6 @@ export const EmailTemplate = (passcode: string): EmailContent => {
           </div>
         </div>
       </body>
-    </html>
-  `,
+    </html>`,
   }
 }

@@ -24,7 +24,7 @@ import { getMoreNftsModal } from '~/helpers/nfts'
 
 import type { FullProfile, NFT } from '~/types'
 import { FullProfileSchema } from '~/validation'
-import InputTextarea from '~/components/inputs/InputTextarea'
+import InputTextarea from '@proofzero/design-system/src/atoms/form/InputTextarea'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const { sub: accountURN } = parseJwt(await getAccessToken(request))
