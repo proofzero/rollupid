@@ -5,7 +5,7 @@ import { Button } from '../../atoms/buttons/Button'
 
 export type CTAProps = {
   description: string
-  btnText: string
+  btnText?: string
   header?: string
   clickHandler?: () => void
 }

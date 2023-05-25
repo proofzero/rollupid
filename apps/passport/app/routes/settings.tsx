@@ -85,23 +85,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
               })
             ])
 
-          Object.entries(appAuthorizedScopes).forEach(([_, value]) => {
-            if (!value.meta.valid) {
-              return {
-                clientId: a.clientId,
-                icon: appPublicProps.iconURL,
-                title: appPublicProps.name,
-                timestamp: a.timestamp,
-                appScopeError: true,
-              }
-            }
-          })
-
           return {
             clientId: a.clientId,
             icon: appPublicProps.iconURL,
             title: appPublicProps.name,
             timestamp: a.timestamp,
+            appScopeError: (Object.entries(appAuthorizedScopes)
+              .some(([_, value]) => !value.meta.valid)),
           }
         } catch (e) {
           //We swallow the error and move on to next app

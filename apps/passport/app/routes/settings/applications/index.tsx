@@ -21,6 +21,7 @@ import {
 
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { AuthorizedAppsModel } from '~/routes/settings'
+import { WarningCTA } from '@proofzero/design-system/src/molecules/cta/warning'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   await getValidatedSessionContext(
@@ -143,7 +144,7 @@ export default function ApplicationsLayout() {
     authorizedApps: AuthorizedAppsModel[]
   }>()
 
-  const [selectedApp, setSelectedApp] = useState<undefined | App>()
+  const [selectedApp, setSelectedApp] = useState<undefined | AuthorizedAppsModel>()
 
   const fetcher = useFetcher()
 
@@ -178,11 +179,21 @@ export default function ApplicationsLayout() {
       navigate(`/settings/applications/${selectedApp.clientId}`)
     }
   }, [selectedApp])
+
+  const appErrorExists = authorizedApps.some((app) => app.appDataError || app.appScopeError)
+
   return (
     <>
       <Text size="2xl" weight="semibold" className="text-gray-800 mb-6">
         Applications
       </Text>
+      {
+        appErrorExists
+          ? <WarningCTA
+            description='We detected a data error in your application(s).
+      Please revoke the authorization and re-authorize again in the affected application.'/>
+          : null
+      }
 
       {authorizedApps.length === 0 ? (
         <section className="h-[512px] sm:h-[256px]">

@@ -17,17 +17,19 @@ export const WarningCTA = ({ description,
                 {description}
             </Text>
         </div>
-        <div
-            onClick={() => {
-                clickHandler()
-            }}
-            className='flex flex-row items-center cursor-pointer w-fit
+        {btnText
+            ? <div
+                onClick={() => {
+                    clickHandler()
+                }}
+                className='flex flex-row items-center cursor-pointer w-fit
          space-x-2'
-        >
-            <Text weight="normal" size="sm" className="text-orange-700">
-                {btnText}
-            </Text>
-            <HiOutlineArrowRight size={16} className='text-orange-700' />
-        </div>
+            >
+                <Text weight="normal" size="sm" className="text-orange-700">
+                    {btnText}
+                </Text>
+                <HiOutlineArrowRight size={16} className='text-orange-700' />
+            </div>
+            : null}
     </div>
 }
