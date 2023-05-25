@@ -56,6 +56,7 @@ export const createCustomDomain: CreateCustomDomainMethod = async ({
     await node.class.setCustomDomainAlarm()
     return customDomain
   } catch (cause) {
+    console.error(cause)
     throw new InternalServerError({
       message: "couldn't create custom domain",
       cause,
