@@ -92,18 +92,36 @@ export async function send(
   return
 }
 
+export type NotificationSender =
+  | {
+      name: string
+      address: string
+    }
+  | undefined
+
 export async function sendNotification(
   notification: EmailNotification,
-  env: Environment
+  env: Environment,
+  customSender?: NotificationSender
 ) {
+  let from: NotificationSender = {
+    name: env.NotificationFromName,
+    address: `${env.NotificationFromUser}@${env.INTERNAL_DKIM_DOMAIN}`,
+  }
+
+  if (customSender) {
+    from = {
+      name: customSender.name,
+      address: customSender.address,
+    }
+  }
+
   //Uses default sender info
   const message: EmailMessage = {
     ...notification,
-    from: {
-      name: env.NotificationFromName,
-      address: `${env.NotificationFromUser}@${env.INTERNAL_DKIM_DOMAIN}`,
-    },
+    from,
   }
+
   await send(message, env)
 }
 

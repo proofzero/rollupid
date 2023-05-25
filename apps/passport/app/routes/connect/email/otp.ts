@@ -6,11 +6,8 @@ import { json } from '@remix-run/cloudflare'
 import { getAddressClient, getStarbaseClient } from '~/platform.server'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import {
-  getAuthzCookieParams,
-  getDefaultAuthzParams,
-  getValidatedSessionContext,
-} from '~/session.server'
+import { getAuthzCookieParams } from '~/session.server'
+import { SendOTPEmailThemeProps } from '@proofzero/platform/email/src/jsonrpc/methods/sendOTPEmail'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   try {
@@ -39,29 +36,40 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       context.traceSpan
     )
 
-    let appProps, emailTheme
+    let appProps, emailTheme, customDomain
     if (clientId !== 'console' && clientId !== 'passport') {
-      ;[appProps, emailTheme] = await Promise.all([
+      ;[appProps, emailTheme, customDomain] = await Promise.all([
         starbaseClient.getAppPublicProps.query({
           clientId,
         }),
         starbaseClient.getEmailOTPTheme.query({
           clientId,
         }),
+        starbaseClient.getCustomDomain.query({
+          clientId,
+        }),
       ])
+    }
+
+    let themeProps: SendOTPEmailThemeProps | undefined
+    if (appProps) {
+      themeProps = {
+        privacyURL: appProps.privacyURL as string,
+        termsURL: appProps.termsURL as string,
+        logoURL: emailTheme?.logoURL,
+        contactURL: emailTheme?.contact,
+        address: emailTheme?.address,
+        appName: appProps.name,
+      }
+
+      if (customDomain) {
+        themeProps.hostname = customDomain.hostname
+      }
     }
 
     const state = await addressClient.generateEmailOTP.mutate({
       email,
-      themeProps: appProps
-        ? {
-            privacyURL: appProps.privacyURL as string,
-            termsURL: appProps.termsURL as string,
-            logoURL: emailTheme?.logoURL,
-            contactURL: emailTheme?.contact,
-            address: emailTheme?.address,
-          }
-        : undefined,
+      themeProps,
     })
     return json({ state })
   } catch (e) {
