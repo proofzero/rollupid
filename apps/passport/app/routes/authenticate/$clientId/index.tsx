@@ -13,8 +13,8 @@ import { redirect, json } from '@remix-run/cloudflare'
 
 import { getAuthzCookieParams } from '~/session.server'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { createClient } from 'wagmi'
-import { getDefaultClient } from 'connectkit'
+import { createConfig } from 'wagmi'
+import { getDefaultConfig } from 'connectkit'
 import Authentication, {
   AppProfile,
   AuthenticationScreenDefaults,
@@ -25,11 +25,13 @@ import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avat
 import { Button } from '@proofzero/packages/design-system/src/atoms/buttons/Button'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-const client = createClient(
-  // @ts-ignore
-  getDefaultClient({
+const config = createConfig(
+  getDefaultConfig({
     appName: 'Rollup',
     autoConnect: true,
+    walletConnectProjectId:
+      // @ts-ignore
+      typeof window !== 'undefined' && window.ENV.WALLET_CONNECT_PROJECT_ID,
     alchemyId:
       // @ts-ignore
       typeof window !== 'undefined' && window.ENV.APIKEY_ALCHEMY_PUBLIC,
@@ -193,7 +195,7 @@ export default () => {
         displayKeys={displayKeys}
         mapperArgs={{
           clientId,
-          wagmiClient: client,
+          wagmiConfig: config,
           signData,
           navigate,
           FormWrapperEl: ({ children, provider }) => (

@@ -106,6 +106,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         flashes,
         ENV: {
           PROFILE_APP_URL: context.env.PROFILE_APP_URL,
+          WALLET_CONNECT_PROJECT_ID: context.env.WALLET_CONNECT_PROJECT_ID,
           INTERNAL_GOOGLE_ANALYTICS_TAG:
             context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
           APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
