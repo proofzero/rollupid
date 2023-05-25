@@ -11,6 +11,7 @@ import {
   EmailSelectListItem,
   OptionType,
   SCWalletSelectListItem,
+  getEmailIcon,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { EmailSelect } from '../../atoms/email/EmailSelect'
 import { ConnectedAccountSelect } from '../../atoms/accounts/ConnectedAccountSelect'
@@ -101,6 +102,14 @@ export default ({
     }
     scopesToDisplay.unshift('system_identifiers')
   }
+
+  // Substituting subtitle with icon
+  // on the client side
+  connectedEmails = connectedEmails.map(email => ({
+    title: email.title,
+    value: email.value,
+    icon: getEmailIcon(email.subtitle)
+  }))
 
   const { dark, theme } = useContext(ThemeContext)
 

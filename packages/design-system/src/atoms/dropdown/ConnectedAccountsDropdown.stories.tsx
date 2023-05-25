@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dropdown, SelectListItem } from './DropdownSelectList'
+import { Dropdown, DropdownSelectListItem } from './DropdownSelectList'
 
 import { OAuthAddressType, EmailAddressType, CryptoAddressType } from '@proofzero/types/address'
 
@@ -24,7 +24,7 @@ const modifyType = (string: string) => {
     return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-const accounts: SelectListItem[] = Array.from({ length: 10 }, (_, i) => ({
+const accounts: DropdownSelectListItem[] = Array.from({ length: 10 }, (_, i) => ({
     value: `urn:proofzero:address:${i}`,
     title: `Account ${i}`,
     subtitle: `${modifyType(pickRandomType(i) as string)} - Address ${i}`

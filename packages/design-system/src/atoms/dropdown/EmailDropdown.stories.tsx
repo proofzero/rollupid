@@ -17,7 +17,7 @@ export default {
 
 
 const getIcon = (
-    type?: OAuthAddressType | EmailAddressType | OptionType | CryptoAddressType
+    type?: OAuthAddressType | EmailAddressType | CryptoAddressType
 ): JSX.Element => {
     return type
         ? type === OAuthAddressType.Microsoft

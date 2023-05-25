@@ -37,9 +37,9 @@ export type SCWalletSelectListItem = {
   cryptoAddress?: string
 }
 
-const getEmailIcon = (
-  type: OAuthAddressType | EmailAddressType | OptionType | CryptoAddressType
-): JSX.Element | undefined => {
+export const getEmailIcon = (
+  type: string
+): JSX.Element => {
   return type === OAuthAddressType.Microsoft
     ? <img src={microsoftIcon} className="w-4 h-4 mr-3" />
     : type === OAuthAddressType.Apple
@@ -75,7 +75,11 @@ export const getNormalisedConnectedEmails = (
     })
     .map((address) => {
       return {
-        icon: getEmailIcon(address.rc.addr_type as OAuthAddressType | EmailAddressType),
+        // There's a problem when passing icon down to client (since icon is a JSX.Element)
+        // My guess is that it should be rendered on the client side only.
+        // that's why I'm passing type (as subtitle) instead of icon and then substitute it
+        // with icon on the client side
+        subtitle: address.rc.addr_type as OAuthAddressType | EmailAddressType | CryptoAddressType,
         title: address.qc.alias,
         value: address.baseUrn as AddressURN,
       }
