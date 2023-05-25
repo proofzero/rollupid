@@ -28,7 +28,6 @@ const accounts: SelectListItem[] = Array.from({ length: 10 }, (_, i) => ({
     value: `urn:proofzero:address:${i}`,
     title: `Account ${i}`,
     subtitle: `${modifyType(pickRandomType(i) as string)} - Address ${i}`
-
 }))
 
 const Template = () => (

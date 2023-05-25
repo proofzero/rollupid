@@ -44,6 +44,7 @@ import type { PersonaData } from '@proofzero/types/application'
 
 import Authorization from '@proofzero/design-system/src/templates/authorization/Authorization'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 
 export type UserProfile = {
   displayName: string
@@ -387,20 +388,20 @@ export default function Authorize() {
     requestedScope,
     connectedAccounts,
     connectedSmartContractWallets,
-  } = dataForScopes
+  } = dataForScopes as DataForScopes
 
   const [persona] = useState<PersonaData>(personaData!)
 
-  const [selectedEmail, setSelectedEmail] = useState<EmailSelectListItem>()
-  const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
-    Array<AddressURN> | Array<AuthorizationControlSelection>
-  >([])
-  const [selectedSCWallets, setSelectedSCWallets] = useState<Array<AddressURN>>(
+  const [selectedEmail, setSelectedEmail] = useState<DropdownSelectListItem>()
+  const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<Array<DropdownSelectListItem>>(
+    []
+  )
+  const [selectedSCWallets, setSelectedSCWallets] = useState<Array<DropdownSelectListItem>>(
     []
   )
 
   // Re-render the component every time persona gets updated
-  useEffect(() => {}, [persona])
+  useEffect(() => { }, [persona])
 
   const submit = useSubmit()
   const navigate = useNavigate()
@@ -432,7 +433,7 @@ export default function Authorize() {
     }
 
     if (requestedScope.includes('email') && selectedEmail) {
-      personaData.email = selectedEmail.addressURN
+      personaData.email = selectedEmail.title
     }
 
     if (

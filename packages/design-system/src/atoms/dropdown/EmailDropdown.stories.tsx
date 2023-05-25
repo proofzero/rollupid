@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dropdown, SelectListItem } from './DropdownSelectList'
+import { Dropdown, DropdownSelectListItem } from './DropdownSelectList'
 
 import { OAuthAddressType, EmailAddressType, CryptoAddressType } from '@proofzero/types/address'
 import { OptionType } from '@proofzero/utils/getNormalisedConnectedAccounts'
@@ -32,7 +32,7 @@ const getIcon = (
         : null
 }
 
-const listItems: SelectListItem[] = [
+const listItems: Array<DropdownSelectListItem> = [
     {
         title: 'email@gmail.com',
         value: 'urn:rollupid:address/1',

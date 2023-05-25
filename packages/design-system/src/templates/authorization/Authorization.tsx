@@ -45,15 +45,15 @@ type AuthorizationProps = {
 
   transitionState: 'idle' | 'submitting' | 'loading'
 
-  connectedSmartContractWallets: DropdownSelectListItem[]
+  connectedSmartContractWallets?: DropdownSelectListItem[]
   addNewSmartWalletCallback: () => void
   selectSmartWalletCallback: (selected: Array<DropdownSelectListItem>) => void
 
-  connectedEmails: DropdownSelectListItem[]
+  connectedEmails?: Array<DropdownSelectListItem>
   addNewEmailCallback: () => void
   selectEmailCallback: (selected: DropdownSelectListItem) => void
 
-  connectedAccounts: DropdownSelectListItem[]
+  connectedAccounts?: DropdownSelectListItem[]
   addNewAccountCallback: () => void
   selectAccountsCallback: (
     selected: Array<DropdownSelectListItem>

@@ -2,6 +2,7 @@ import { getAccountClient, getAddressClient } from '~/platform.server'
 import {
   getNormalisedConnectedEmails,
   getNormalisedSmartContractWallets,
+  modifyType,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
@@ -23,13 +24,14 @@ import type {
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { redirect } from '@remix-run/cloudflare'
 import { CryptoAddressType } from '@proofzero/types/address'
+import { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 
 export type DataForScopes = {
-  connectedEmails?: EmailSelectListItem[]
-  personaData?: PersonaData
+  connectedEmails: DropdownSelectListItem[]
+  personaData: PersonaData
   requestedScope: string[]
-  connectedAccounts?: GetAddressProfileResult[]
-  connectedSmartContractWallets?: SCWalletSelectListItem[]
+  connectedAccounts: DropdownSelectListItem[]
+  connectedSmartContractWallets: DropdownSelectListItem[]
 }
 
 // Deterministically sort scopes so that they are always in the same order
@@ -54,6 +56,7 @@ export const reorderScope = (scopes: string[]): string[] => {
 }
 // -----------------------------------------------------------------------------
 
+
 export const getDataForScopes = async (
   requestedScope: string[],
   accountURN: AccountURN,
@@ -64,9 +67,9 @@ export const getDataForScopes = async (
   if (!accountURN)
     throw new UnauthorizedError({ message: 'Account URN is required' })
 
-  let connectedSmartContractWallets: SCWalletSelectListItem[] = []
-  let connectedEmails: EmailSelectListItem[] = []
-  let connectedAddresses: GetAddressProfileResult[] = []
+  let connectedSmartContractWallets: Array<DropdownSelectListItem> = []
+  let connectedEmails: Array<DropdownSelectListItem> = []
+  let connectedAddresses: Array<DropdownSelectListItem> = []
 
   const accountClient = getAccountClient(jwt || '', env, traceSpan)
 
@@ -79,7 +82,7 @@ export const getDataForScopes = async (
       connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!)) {
-      connectedAddresses = await Promise.all(
+      connectedAddresses = (await Promise.all(
         connectedAccounts
           .filter((ca) => {
             return ca.rc.addr_type !== CryptoAddressType.Wallet
@@ -88,7 +91,11 @@ export const getDataForScopes = async (
             const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
             return addressClient.getAddressProfile.query()
           })
-      )
+      )).map(address => ({
+        title: address.title,
+        subtitle: `${modifyType(address.type as string)} - ${address.address}`,
+        value: address.id,
+      }))
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!)) {
       const scWalletAddresses = await Promise.all(
@@ -145,7 +152,7 @@ export function authzParamsMatch(
     scopesMatch &&
     authzCookieParams.clientId === authzQueryParams.clientId &&
     `${authzReqRedirectURL?.origin}${authzReqRedirectURL?.pathname}` ===
-      `${authzReqCookieRedirectURL?.origin}${authzReqCookieRedirectURL?.pathname}` &&
+    `${authzReqCookieRedirectURL?.origin}${authzReqCookieRedirectURL?.pathname}` &&
     authzCookieParams.state === authzQueryParams.state
   )
 }
