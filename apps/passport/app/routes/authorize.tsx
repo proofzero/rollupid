@@ -127,6 +127,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       }
 
       await createAuthzParamsCookieAndAuthenticate(
+        request,
         context.authzQueryParams,
         context.env
       )
@@ -136,6 +137,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     if (lastCP) {
       if (!authzParamsMatch(lastCP, context.authzQueryParams)) {
         await createAuthzParamsCookieAndAuthenticate(
+          request,
           context.authzQueryParams,
           context.env
         )

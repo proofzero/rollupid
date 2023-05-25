@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { AppClientIdParamSchema, AppPublicPropsSchema } from '../validators/app'
+import type { CustomDomain } from '../../types'
 
 export const GetAppPublicPropsInput = AppClientIdParamSchema
 export const GetAppPublicPropsOutput = AppPublicPropsSchema
@@ -21,6 +22,7 @@ export const getAppPublicProps = async ({
   )
   const appDetails = await appDO.class.getDetails()
   const appTheme = await appDO.class.getTheme()
+  const customDomain = await appDO.storage.get<CustomDomain>('customDomain')
 
   if (appDetails && appDetails.app && appDetails.published) {
     return {
@@ -33,6 +35,13 @@ export const getAppPublicProps = async ({
       privacyURL: appDetails.app.privacyURL,
       websiteURL: appDetails.app.websiteURL,
       appTheme,
+      customDomain: {
+        hostname: customDomain?.hostname ?? '',
+        isActive:
+          Boolean(customDomain?.hostname) &&
+          customDomain?.status === 'active' &&
+          customDomain?.ssl.status === 'active',
+      },
     }
   } else {
     throw new Error(

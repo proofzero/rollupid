@@ -1,5 +1,6 @@
 # https://developers.cloudflare.com/workers/platform/compatibility-dates
 compatibility_date = "2022-04-05"
+compatibility_flags = ["no_minimal_subrequests"]
 
 main = "./build/index.js"
 
@@ -75,7 +76,7 @@ kv_namespaces = [
 PASSPORT_URL = "https://passport-dev.rollup.id"
 PASSPORT_AUTH_URL = "https://passport-dev.rollup.id/authorize"
 IMAGES_URL = "https://images-dev.rollup.id/trpc"
-PASSPORT_TOKEN_URL = "https://passport-dev.pz3r0.com/token"
+PASSPORT_TOKEN_URL = "https://passport-dev.rollup.id/token"
 CLIENT_ID = "<console client id>"
 REDIRECT_URI = "https://my-dev.rollup.id/auth/callback"
 COOKIE_DOMAIN = "rollup.id"
@@ -110,7 +111,7 @@ command = "yarn build"
 PASSPORT_URL = "https://passport-next.rollup.id"
 PASSPORT_AUTH_URL = "https://passport-next.rollup.id/authorize"
 IMAGES_URL = "https://images-next.rollup.id/trpc"
-PASSPORT_TOKEN_URL = "https://passport-next.pz3r0.com/token"
+PASSPORT_TOKEN_URL = "https://passport-next.rollup.id/token"
 CLIENT_ID = "<console client id>"
 REDIRECT_URI = "https://my-next.rollup.id/auth/callback"
 COOKIE_DOMAIN = "rollup.id"
@@ -143,7 +144,7 @@ command = "yarn build"
 PASSPORT_URL = "https://passport.rollup.id"
 PASSPORT_AUTH_URL = "https://passport.rollup.id/authorize"
 IMAGES_URL = "https://images.rollup.id/trpc"
-PASSPORT_TOKEN_URL = "https://passport.pz3r0.com/token"
+PASSPORT_TOKEN_URL = "https://passport.rollup.id/token"
 CLIENT_ID = "<console client id>"
 REDIRECT_URI = "https://my.rollup.id/auth/callback"
 COOKIE_DOMAIN = "rollup.id"

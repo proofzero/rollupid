@@ -163,6 +163,10 @@ export async function createAuthzParamCookieAndCreate(
     throw new BadRequestError({ message: 'Invalid create_type' })
   }
   throw redirect(redirectURL, {
-    headers: await createAuthorizationParamsCookieHeaders(authzParams, env),
+    headers: await createAuthorizationParamsCookieHeaders(
+      request,
+      authzParams,
+      env
+    ),
   })
 }

@@ -80,6 +80,12 @@ export const AppPublicPropsSchema = z.object({
   privacyURL: z.string().optional(),
   websiteURL: z.string().optional(),
   appTheme: AppThemeSchema.optional(),
+  customDomain: z
+    .object({
+      hostname: z.string(),
+      isActive: z.boolean(),
+    })
+    .optional(),
 })
 
 export type AppPublicProps = z.infer<typeof AppPublicPropsSchema>

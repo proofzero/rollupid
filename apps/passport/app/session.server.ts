@@ -23,6 +23,7 @@ import { AccountURNSpace } from '@proofzero/urns/account'
 import type { AccountURN } from '@proofzero/urns/account'
 
 import { FLASH_MESSAGE, FLASH_MESSAGE_KEY } from './utils/flashMessage.server'
+import { getCookieDomain } from './utils/cookie'
 
 export const InvalidSessionAccountError = new UnauthorizedError({
   message: 'Session account is not valid',
@@ -30,10 +31,10 @@ export const InvalidSessionAccountError = new UnauthorizedError({
 
 // FLASH SESSION
 
-const getFlashSessionStorage = (env: Env) => {
+const getFlashSessionStorage = (request: Request, env: Env) => {
   return createCookieSessionStorage({
     cookie: {
-      domain: env.COOKIE_DOMAIN,
+      domain: getCookieDomain(request, env),
       name: '_rollup_flash',
       path: '/',
       sameSite: 'lax',
@@ -46,18 +47,23 @@ const getFlashSessionStorage = (env: Env) => {
 }
 
 export function getFlashSession(request: Request, env: Env) {
-  const storage = getFlashSessionStorage(env)
+  const storage = getFlashSessionStorage(request, env)
   return storage.getSession(request.headers.get('Cookie'))
 }
 
-export function commitFlashSession(env: Env, session: Session) {
-  const storage = getFlashSessionStorage(env)
+export function commitFlashSession(
+  request: Request,
+  env: Env,
+  session: Session
+) {
+  const storage = getFlashSessionStorage(request, env)
   return storage.commitSession(session)
 }
 
 // USER PARAMS
 
 const getUserSessionStorage = (
+  request: Request,
   env: Env,
   clientId?: string,
   MAX_AGE = 7776000 /*60 * 60 * 24 * 90*/
@@ -68,7 +74,7 @@ const getUserSessionStorage = (
   }
 
   return createCookie(cookieName, {
-    domain: env.COOKIE_DOMAIN,
+    domain: getCookieDomain(request, env),
     path: '/',
     sameSite: 'lax',
     secure: process.env.NODE_ENV == 'production',
@@ -78,12 +84,13 @@ const getUserSessionStorage = (
 }
 
 export async function createUserSession(
+  request: Request,
   jwt: string,
   redirectTo: string,
   env: Env,
   clientId?: string
 ) {
-  const cookie = getUserSessionStorage(env, clientId)
+  const cookie = getUserSessionStorage(request, env, clientId)
   return redirect(redirectTo, {
     headers: {
       'Set-Cookie': await cookie.serialize(
@@ -98,7 +105,7 @@ export async function getUserSession(
   env: Env,
   clientId?: string
 ) {
-  const cookie = getUserSessionStorage(env, clientId)
+  const cookie = getUserSessionStorage(request, env, clientId)
   const data = await cookie.parse(request.headers.get('Cookie'))
   if (!data) return ''
 
@@ -122,13 +129,13 @@ export async function destroyUserSession(
 ) {
   const headers = new Headers()
 
-  const cookie = await getUserSessionStorage(env, clientId)
+  const cookie = await getUserSessionStorage(request, env, clientId)
   headers.append(
     'Set-Cookie',
     await cookie.serialize('', { expires: new Date(0) })
   )
 
-  const flashStorage = getFlashSessionStorage(env)
+  const flashStorage = getFlashSessionStorage(request, env)
   const flashSession = await flashStorage.getSession()
   flashSession.flash(FLASH_MESSAGE_KEY, flashMessage)
   headers.append('Set-Cookie', await flashStorage.commitSession(flashSession))
@@ -137,6 +144,7 @@ export async function destroyUserSession(
 }
 
 const getAuthzCookieParamsSessionStorage = (
+  request: Request,
   env: Env,
   clientId: string = 'last',
   // https://developer.chrome.com/blog/cookie-max-age-expires/
@@ -146,7 +154,7 @@ const getAuthzCookieParamsSessionStorage = (
 ) => {
   return createCookieSessionStorage({
     cookie: {
-      domain: env.COOKIE_DOMAIN,
+      domain: getCookieDomain(request, env),
       name: `_rollup_authz_params_${clientId}`,
       path: '/',
       sameSite: 'lax',
@@ -162,6 +170,7 @@ const getAuthzCookieParamsSessionStorage = (
  * and redirects to the authentication route
  */
 export async function createAuthzParamsCookieAndAuthenticate(
+  request: Request,
   authzQueryParams: AuthzParams,
   env: Env,
   qp: URLSearchParams = new URLSearchParams()
@@ -185,6 +194,7 @@ export async function createAuthzParamsCookieAndAuthenticate(
 
   throw redirect(redirectURL, {
     headers: await createAuthorizationParamsCookieHeaders(
+      request,
       authzQueryParams,
       env
     ),
@@ -192,6 +202,7 @@ export async function createAuthzParamsCookieAndAuthenticate(
 }
 
 export async function createAuthorizationParamsCookieHeaders(
+  request: Request,
   authzParams: AuthzParams,
   env: Env
 ) {
@@ -204,22 +215,28 @@ export async function createAuthorizationParamsCookieHeaders(
   const headers = new Headers()
   headers.append(
     'Set-Cookie',
-    await setAuthzCookieParamsSession(authzParams, env, authzParams.clientId)
+    await setAuthzCookieParamsSession(
+      request,
+      authzParams,
+      env,
+      authzParams.clientId
+    )
   )
   headers.append(
     'Set-Cookie',
-    await setAuthzCookieParamsSession(authzParams, env)
+    await setAuthzCookieParamsSession(request, authzParams, env)
   )
 
   return headers
 }
 
 export async function setAuthzCookieParamsSession(
+  request: Request,
   authzParams: AuthzParams,
   env: Env,
   clientId?: string
 ) {
-  const storage = getAuthzCookieParamsSessionStorage(env, clientId)
+  const storage = getAuthzCookieParamsSessionStorage(request, env, clientId)
   const session = await storage.getSession()
 
   //Convert string array scope to space-delimited scope before setting cookie value
@@ -235,7 +252,7 @@ export async function getAuthzCookieParamsSession(
   env: Env,
   clientId?: string
 ) {
-  const storage = getAuthzCookieParamsSessionStorage(env, clientId)
+  const storage = getAuthzCookieParamsSessionStorage(request, env, clientId)
   return storage.getSession(request.headers.get('Cookie'))
 }
 
@@ -245,7 +262,7 @@ export async function destroyAuthzCookieParamsSession(
   clientId?: string
 ) {
   const gps = await getAuthzCookieParamsSession(request, env, clientId)
-  const storage = getAuthzCookieParamsSessionStorage(env, clientId)
+  const storage = getAuthzCookieParamsSessionStorage(request, env, clientId)
   return storage.destroySession(gps)
 }
 
@@ -318,7 +335,11 @@ export async function getValidatedSessionContext(
     const redirectTo = `/authenticate/${authzParams?.clientId}`
     if (error === InvalidTokenError)
       if (authzParams.clientId)
-        throw await createAuthzParamsCookieAndAuthenticate(authzParams, env)
+        throw await createAuthzParamsCookieAndAuthenticate(
+          request,
+          authzParams,
+          env
+        )
       else throw redirect(redirectTo)
     else if (
       error === ExpiredTokenError ||

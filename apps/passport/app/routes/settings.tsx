@@ -1,6 +1,6 @@
 import { Outlet, useLoaderData } from '@remix-run/react'
 
-import { json } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
 import {
   getDefaultAuthzParams,
   getValidatedSessionContext,
@@ -46,6 +46,11 @@ export const links: LinksFunction = () => [
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
+    const host = request.headers.get('host') as string
+    if (!context.env.DEFAULT_HOSTS.includes(host)) {
+      throw redirect('/not-found')
+    }
+
     const passportDefaultAuthzParams = getDefaultAuthzParams(request)
 
     const { jwt, accountUrn } = await getValidatedSessionContext(
