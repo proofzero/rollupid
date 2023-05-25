@@ -62,9 +62,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         appName: appProps.name,
       }
 
-      if (customDomain) {
-        themeProps.hostname = customDomain.hostname
-      }
+      // Commented out because
+      // we need to figure out DKIM
+      // for custom domains
+      // https://github.com/proofzero/rollupid/issues/2326
+      // if (customDomain) {
+      //   themeProps.hostname = customDomain.hostname
+      // }
     }
 
     const state = await addressClient.generateEmailOTP.mutate({
