@@ -50,6 +50,7 @@ export const getCloudflareFetcher = (token: string): CloudflareFetcher => {
     if (response.ok) {
       return responseBody.result
     } else {
+      console.error(responseBody.errors[0])
       throw new InternalServerError({
         message: 'Cloudflare API Error',
         cause: responseBody.errors[0],
