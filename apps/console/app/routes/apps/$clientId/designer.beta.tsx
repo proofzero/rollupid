@@ -52,7 +52,11 @@ import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 import { Helmet } from 'react-helmet'
 import { notificationHandlerType } from '~/types'
 import InputTextarea from '@proofzero/design-system/src/atoms/form/InputTextarea'
-import { EmailTemplate } from '@proofzero/platform/email/emailOtpTemplate'
+import {
+  EmailTemplate,
+  darkModeStyles,
+  lightModeStyles,
+} from '@proofzero/platform/email/emailOtpTemplate'
 import subtractLogo from '@proofzero/design-system/src/assets/subtract-logo.svg'
 import { BadRequestError } from '@proofzero/errors'
 import { GetEmailOTPThemeResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getEmailOTPTheme'
@@ -784,23 +788,19 @@ const EmailPanel = ({
   useEffect(() => {
     if (!iFrameRef) return
 
-    var iframeStyle =
-      iFrameRef.current?.contentWindow?.document.documentElement.style
-    if (!iframeStyle) return
+    var iframeDoc = iFrameRef.current?.contentWindow?.document
+    console.log({ iframeDoc })
+    if (!iframeDoc) return
 
-    if (dark) {
-      // If it's currently light, switch to dark
-      iframeStyle.setProperty('--background-color', '#1A202C')
-      iframeStyle.setProperty('--text-color', '#E2E8F0')
-      iframeStyle.setProperty('--divider-color', '#4A5568')
-      iframeStyle.setProperty('--input-color', '#2D3748')
-    } else {
-      // If it's currently dark, switch to light
-      iframeStyle.setProperty('--background-color', '#ffffff')
-      iframeStyle.setProperty('--text-color', '#6b7280')
-      iframeStyle.setProperty('--divider-color', '#e5e7eb')
-      iframeStyle.setProperty('--input-color', '#f3f4f6')
-    }
+    const styleId = 'injected-styles'
+
+    var newStyle = document.createElement('style')
+    newStyle.id = styleId
+    newStyle.innerHTML = dark ? darkModeStyles : lightModeStyles
+
+    iframeDoc.getElementById(styleId)?.remove()
+
+    iframeDoc.head.appendChild(newStyle)
   }, [dark])
 
   const toggleTheme = () => {
