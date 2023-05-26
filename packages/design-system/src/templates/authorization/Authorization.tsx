@@ -109,11 +109,14 @@ export default ({
 
   // Substituting subtitle with icon
   // on the client side
-  connectedEmails = connectedEmails.map(email => ({
-    title: email.title,
-    value: email.value,
-    icon: getEmailIcon(email.subtitle)
-  }))
+  connectedEmails = connectedEmails.map(email =>
+  (email.subtitle && !email.icon
+    ? {
+      title: email.title,
+      value: email.value,
+      icon: getEmailIcon(email.subtitle)
+    }
+    : email))
 
   const { dark, theme } = useContext(ThemeContext)
 
