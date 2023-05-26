@@ -55,7 +55,9 @@ export const Dropdown = ({
      * For single select
      */
     const [selectedItem, setSelectedItem] = useState<DropdownSelectListItem>(() => {
-        return multiple ? null : defaultItems[0]
+        return multiple
+            ? {} as DropdownSelectListItem
+            : defaultItems[0]
     })
 
     /**
@@ -63,7 +65,11 @@ export const Dropdown = ({
      */
     const [selectedItems, setSelectedItems] = useState<
         Array<DropdownSelectListItem>
-    >(() => { return multiple ? defaultItems : [] })
+    >(() => {
+        return multiple
+            ? defaultItems
+            : [] as Array<DropdownSelectListItem>
+    })
 
     const [allItemsSelected, setAllItemsSelected] =
         useState(false)
