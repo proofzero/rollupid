@@ -6106,6 +6106,7 @@ __metadata:
     eslint-plugin-promise: 6.1.1
     eslint-plugin-react: 7.31.10
     eslint-plugin-standard: 5.0.0
+    https: 1.0.0
     microbundle: 0.15.1
     npm-run-all: 4.1.5
     postcss: latest
@@ -24100,6 +24101,13 @@ __metadata:
     agent-base: 6
     debug: 4
   checksum: 571fccdf38184f05943e12d37d6ce38197becdd69e58d03f43637f7fa1269cf303a7d228aa27e5b27bbd3af8f09fd938e1c91dcfefff2df7ba77c20ed8dfc765
+  languageName: node
+  linkType: hard
+
+"https@npm:1.0.0":
+  version: 1.0.0
+  resolution: "https@npm:1.0.0"
+  checksum: ccea8a8363a018d4b241db7748cff3a85c9f5b71bf80639e9c37dc6823f590f35dda098b80b726930e9f945387c8bfd6b1461df25cab5bf65a31903d81875b5d
   languageName: node
   linkType: hard
 
