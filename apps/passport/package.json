@@ -47,7 +47,7 @@
     "remix-auth-twitter": "1.0.0",
     "remix-utils": "6.3.0",
     "viem": "0.3.36",
-    "wagmi": "1.0.6"
+    "wagmi": "1.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",
