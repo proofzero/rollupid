@@ -36,10 +36,9 @@ export default () => {
         'flex shrink flex-col items-center\
          justify-center gap-4 mx-auto bg-white p-6 h-[100dvh]\
           lg:h-[580px] lg:max-h-[100dvh] w-full lg:w-[418px]\
-          lg:rounded-lg'
+          lg:rounded-lg dark:bg-gray-800 border border-[#D1D5DB] dark:border-gray-600'
       }
       style={{
-        border: '1px solid #D1D5DB',
         boxSizing: 'border-box',
       }}
     >
@@ -50,11 +49,15 @@ export default () => {
         >
           <HiOutlineArrowLeft
             className="absolute left-0 lg:left-0 lg:top-[0.15rem] w-6 h-6
-            text-gray-600 cursor-pointer"
+            text-gray-600 dark:text-white cursor-pointer"
             onClick={() => history.back()}
           />
 
-          <Text size="xl" weight="semibold" className="text-[#2D333A]">
+          <Text
+            size="xl"
+            weight="semibold"
+            className="text-[#2D333A] dark:text-white"
+          >
             Your Email Address
           </Text>
         </section>

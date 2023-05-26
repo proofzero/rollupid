@@ -6,14 +6,14 @@ import subtractLogo from '../../assets/subtract-logo.svg'
 import { Spinner } from '../../atoms/spinner/Spinner'
 import { Button } from '../../atoms/buttons/Button'
 import Info from '../../atoms/info/Info'
-import {
-  getEmailIcon,
-} from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { ScopeDescriptor } from '@proofzero/security/scopes'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import { ThemeContext } from '../../contexts/theme'
 import ScopeIcon from './ScopeIcon'
-import { Dropdown, DropdownSelectListItem } from '../../atoms/dropdown/DropdownSelectList'
+import {
+  Dropdown,
+  DropdownSelectListItem,
+} from '../../atoms/dropdown/DropdownSelectList'
 
 type UserProfile = {
   pfpURL: string
@@ -48,9 +48,7 @@ type AuthorizationProps = {
 
   connectedAccounts?: Array<DropdownSelectListItem>
   addNewAccountCallback: () => void
-  selectAccountsCallback: (
-    selected: Array<DropdownSelectListItem>
-  ) => void
+  selectAccountsCallback: (selected: Array<DropdownSelectListItem>) => void
   selectAllAccountsCallback: () => void
 
   cancelCallback: () => void
@@ -104,11 +102,10 @@ export default ({
       <div
         className={
           'flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6\
-           lg:rounded-${radius} min-h-[100dvh] lg:min-h-[580px] max-h-[100dvh]'
+           lg:rounded-${radius} min-h-[100dvh] lg:min-h-[580px] max-h-[100dvh] border border-[#D1D5DB] dark:border-gray-600'
         }
         style={{
           width: 418,
-          border: '1px solid #D1D5DB',
           boxSizing: 'border-box',
         }}
       >
@@ -117,7 +114,7 @@ export default ({
             src={userProfile.pfpURL}
             hex={false}
             size={'sm'}
-          // alt="User Profile"
+            // alt="User Profile"
           />
           <img src={authorizeCheck} alt="Authorize Check" />
           <Avatar src={appProfile.iconURL} size={'sm'} />
@@ -152,31 +149,31 @@ export default ({
 
                     {(scope === 'profile' ||
                       scope === 'system_identifiers') && (
-                        <Text
-                          size="sm"
-                          weight="medium"
-                          className="flex-1 text-gray-500"
-                        >
-                          {scopeMeta.scopes[scope].name}
-                        </Text>
-                      )}
+                      <Text
+                        size="sm"
+                        weight="medium"
+                        className="flex-1 text-gray-500"
+                      >
+                        {scopeMeta.scopes[scope].name}
+                      </Text>
+                    )}
 
                     {scope === 'erc_4337' && (
                       <div className="flex-1 min-w-0">
                         <Dropdown
                           items={connectedSmartContractWallets}
-                          placeholder='Select a Smart Contract Wallet'
+                          placeholder="Select a Smart Contract Wallet"
                           multiple={true}
-                          onSelect={(selectedItems: Array<DropdownSelectListItem>) => {
+                          onSelect={(
+                            selectedItems: Array<DropdownSelectListItem>
+                          ) => {
                             selectSmartWalletsCallback(selectedItems)
                           }}
-                          onSelectAll={
-                            selectAllSmartWalletsCallback
-                          }
+                          onSelectAll={selectAllSmartWalletsCallback}
                           ConnectButtonPhrase="New Smart Contract Wallet"
                           ConnectButtonCallback={addNewSmartWalletCallback}
-                          selectAllCheckboxTitle='All Smart Contract Wallets'
-                          selectAllCheckboxDescription='All current and future SC Wallets'
+                          selectAllCheckboxTitle="All Smart Contract Wallets"
+                          selectAllCheckboxDescription="All current and future SC Wallets"
                         />
                       </div>
                     )}
@@ -185,7 +182,7 @@ export default ({
                       <div className="flex-1 min-w-0">
                         <Dropdown
                           items={connectedEmails}
-                          placeholder='Select an Email Address'
+                          placeholder="Select an Email Address"
                           onSelect={(selectedItem: DropdownSelectListItem) => {
                             selectEmailCallback(selectedItem)
                           }}
@@ -199,18 +196,18 @@ export default ({
                       <div className="flex-1 min-w-0">
                         <Dropdown
                           items={connectedAccounts}
-                          onSelect={(selectedItems: Array<DropdownSelectListItem>) => {
+                          onSelect={(
+                            selectedItems: Array<DropdownSelectListItem>
+                          ) => {
                             selectAccountsCallback(selectedItems)
                           }}
-                          onSelectAll={
-                            selectAllAccountsCallback
-                          }
-                          placeholder='No connected account(s)'
+                          onSelectAll={selectAllAccountsCallback}
+                          placeholder="No connected account(s)"
                           ConnectButtonPhrase="Connect New Account"
                           ConnectButtonCallback={addNewAccountCallback}
                           multiple={true}
-                          selectAllCheckboxTitle='All Connected Accounts'
-                          selectAllCheckboxDescription='All current and future accounts'
+                          selectAllCheckboxTitle="All Connected Accounts"
+                          selectAllCheckboxDescription="All current and future accounts"
                         />
                       </div>
                     )}
@@ -255,15 +252,13 @@ export default ({
               Before using this app, you can review{' '}
               {appProfile?.name ?? `Company`}
               's{' '}
-              <a href={appProfile.privacyURL} className="text-skin-primary
-               text-indigo-500">
+              <a href={appProfile.privacyURL} className="text-skin-primary">
                 privacy policy
               </a>
               {appProfile?.termsURL && appProfile?.privacyURL && (
                 <span> and </span>
               )}
-              <a href={appProfile.termsURL} className="text-skin-primary 
-              text-indigo-500">
+              <a href={appProfile.termsURL} className="text-skin-primary">
                 terms of service
               </a>
               .
@@ -293,17 +288,11 @@ export default ({
                   btnSize="xl"
                   btnType="primary-alt"
                   disabled={disableAuthorize}
-                  className="dark:bg-gray-800 dark:border dark:border-gray-700"
                   onClick={() => {
                     authorizeCallback(requestedScope)
                   }}
                 >
-                  <Text
-                    weight="medium"
-                    className="truncate text-gray-800 dark:text-gray-600"
-                  >
-                    Continue
-                  </Text>
+                  Continue
                 </Button>
               </>
             )}

@@ -175,7 +175,7 @@ export default function App() {
 
         <Links />
       </head>
-      <body style={{ backgroundColor: '#F9FAFB' }}>
+      <body className={`bg-[#F9FAFB] dark:bg-gray-900`}>
         {!GATag ? null : (
           <>
             <script

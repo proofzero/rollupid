@@ -6,7 +6,15 @@ import {
   useLoaderData,
   useOutletContext,
 } from '@remix-run/react'
-import { ReactNode, Suspense, lazy, useContext, useEffect, useRef, useState } from 'react'
+import {
+  ReactNode,
+  Suspense,
+  lazy,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { IconType } from 'react-icons'
 import { HiCog, HiOutlineCog, HiOutlineMail } from 'react-icons/hi'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
@@ -23,7 +31,10 @@ import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { SortableList } from '@proofzero/design-system/src/atoms/lists/SortableList'
 import _ from 'lodash'
-import getProviderIcons from '@proofzero/design-system/src/helpers/get-provider-icons'
+import {
+  getProviderIcons,
+  getRGBColor,
+} from '@proofzero/design-system/src/helpers'
 import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
 import { HexColorPicker } from 'react-colorful'
 import {
@@ -55,27 +66,20 @@ import {
   darkModeStyles,
   lightModeStyles,
 } from '@proofzero/platform/email/emailOtpTemplate'
-import subtractLogo from '@proofzero/design-system/src/assets/subtract-logo.svg'
 import { BadRequestError } from '@proofzero/errors'
 import { GetEmailOTPThemeResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getEmailOTPTheme'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { getEmailIcon, adjustAddressTypeToDisplay } from '@proofzero/utils/getNormalisedConnectedAccounts'
+import {
+  getEmailIcon,
+  adjustAddressTypeToDisplay,
+} from '@proofzero/utils/getNormalisedConnectedAccounts'
+import type { appDetailsProps } from '~/types'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
     default: module.LazyAuth,
   }))
 )
-
-const getRGBColor = (hex: string, type: string) => {
-  let color = hex.replace(/#/g, '')
-  // rgb values
-  var r = parseInt(color.substr(0, 2), 16)
-  var g = parseInt(color.substr(2, 2), 16)
-  var b = parseInt(color.substr(4, 2), 16)
-
-  return `--color-${type}: ${r}, ${g}, ${b};`
-}
 
 const DesignerTab = ({
   Icon,
@@ -87,8 +91,9 @@ const DesignerTab = ({
   selected: boolean
 }) => (
   <div
-    className={`box-border -mb-0.5 mr-8 pb-4 px-1 flex flex-row items-center gap-2 border-b-2 ${selected ? 'border-indigo-600' : 'border-transparent'
-      }`}
+    className={`box-border -mb-0.5 mr-8 pb-4 px-1 flex flex-row items-center gap-2 border-b-2 ${
+      selected ? 'border-indigo-600' : 'border-transparent'
+    }`}
   >
     <Icon
       className={`w-5 h-5 ${selected ? 'text-indigo-600' : 'text-gray-500'}`}
@@ -178,8 +183,9 @@ const RadiusButton = ({
   return (
     <button
       type="button"
-      className={`w-full py-1.5 px-2.5 rounded-md ${selected ? 'bg-indigo-500' : ''
-        }`}
+      className={`w-full py-1.5 px-2.5 rounded-md ${
+        selected ? 'bg-indigo-500' : ''
+      }`}
       onClick={(e) => {
         e.preventDefault()
         setRadius(radius)
@@ -288,11 +294,13 @@ const ProviderModal = ({
 const AuthPanel = ({
   appTheme,
   avatarURL,
+  appIconURL,
   setLoading,
   errors,
 }: {
   appTheme?: AppTheme
   avatarURL: string
+  appIconURL?: string
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
   errors?: {
     [key: string]: string
@@ -302,17 +310,14 @@ const AuthPanel = ({
   const toggleDark = () => setDark(!dark)
 
   const [heading, setHeading] = useState<string>(appTheme?.heading ?? '')
-  const [radius, setRadius] = useState<string>(appTheme?.radius ?? 'md')
+  const [radius, setRadius] = useState<string>(
+    appTheme?.radius ?? AuthenticationScreenDefaults.radius
+  )
 
   const [color, setColor] = useState<{
     light: string
     dark: string
-  }>(
-    appTheme?.color ?? {
-      light: '#6366F1',
-      dark: '#C6C7FF',
-    }
-  )
+  }>(appTheme?.color ?? AuthenticationScreenDefaults.color)
 
   const [graphicURL, setGraphicURL] = useState<string | undefined>(
     appTheme?.graphicURL
@@ -325,10 +330,10 @@ const AuthPanel = ({
     }[]
   >(
     appTheme?.providers ??
-    AuthenticationScreenDefaults.knownKeys.map((k) => ({
-      key: k,
-      enabled: true,
-    }))
+      AuthenticationScreenDefaults.knownKeys.map((k) => ({
+        key: k,
+        enabled: true,
+      }))
   )
   const [providerModalOpen, setProviderModalOpen] = useState<boolean>(false)
 
@@ -544,7 +549,7 @@ const AuthPanel = ({
                 minWidth={720}
                 minHeight={1080}
                 id="image"
-                setIsFormChanged={(val) => { }}
+                setIsFormChanged={(val) => {}}
                 setIsImgUploading={(val) => {
                   setLoading(val)
                 }}
@@ -630,12 +635,17 @@ const AuthPanel = ({
                       Header={
                         <>
                           <Avatar
-                            src={AuthenticationScreenDefaults.defaultLogoURL}
+                            src={
+                              appIconURL ??
+                              AuthenticationScreenDefaults.defaultLogoURL
+                            }
                             size="sm"
                           ></Avatar>
                           <div className={'flex flex-col items-center gap-2'}>
                             <h1
-                              className={'font-semibold text-xl dark:text-white'}
+                              className={
+                                'font-semibold text-xl dark:text-white text-center'
+                              }
                             >
                               {heading ??
                                 AuthenticationScreenDefaults.defaultHeading}
@@ -657,7 +667,6 @@ const AuthPanel = ({
                         clientId: 'Foo',
                         signData: null,
                       }}
-                      radius={radius}
                     />
                   </LazyAuth>
                 </Tab.Panel>
@@ -669,7 +678,8 @@ const AuthPanel = ({
                     appProfile={{
                       name: 'Passport',
                       iconURL:
-                        'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA3IiBoZWlnaHQ9IjEwNyIgdmlld0JveD0iMCAwIDEwNyAxMDciIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDciIGhlaWdodD0iMTA3IiByeD0iMTcuODMwOCIgZmlsbD0idXJsKCNwYWludDBfbGluZWFyXzgxMDNfMjEwMTApIi8+CjxwYXRoIGQ9Ik02Ny44NjYzIDg2LjgyNDZDODAuMjMwMiA4MS4xMjgzIDg4LjgxMjUgNjguNjI3IDg4LjgxMjUgNTQuMTIxMUM4OC44MTI1IDM0LjI0NTMgNzIuNyAxOC4xMzI4IDUyLjgyNDIgMTguMTMyOEMzMi45NDg0IDE4LjEzMjggMTYuODM1OSAzNC4yNDUzIDE2LjgzNTkgNTQuMTIxMUMxNi44MzU5IDY3LjIyMDkgMjMuODM1MSA3OC42ODU5IDM0LjI5NzcgODQuOTgwN1Y1My45MDgxTDM0LjI5ODkgNTMuOTA5M0MzNC40MTI0IDQzLjc3NSA0Mi42NjMgMzUuNTk0NiA1Mi44MjQyIDM1LjU5NDZDNjMuMDU2MSAzNS41OTQ2IDcxLjM1MDcgNDMuODg5MiA3MS4zNTA3IDU0LjEyMTFDNzEuMzUwNyA2NC4zNTE4IDYzLjA1ODEgNzIuNjQ1NiA1Mi44Mjc5IDcyLjY0NzZMNjcuODY2MyA4Ni44MjQ2WiIgZmlsbD0id2hpdGUiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQwX2xpbmVhcl84MTAzXzIxMDEwIiB4MT0iNTMuNSIgeTE9IjAiIHgyPSI1My41IiB5Mj0iMTA3IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM2MzY2RjEiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMzk0NkQwIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==',
+                        appIconURL ??
+                        AuthenticationScreenDefaults.defaultLogoURL,
                       privacyURL: 'foo',
                       termsURL: 'bar',
                     }}
@@ -691,41 +701,53 @@ const AuthPanel = ({
                           'urn:rollupid:address/0xc2b930f1fc2a55ddc1bf99e8844ca0479567ac44f3e2eea58216660e26947686',
                       },
                     ]}
-                    selectEmailCallback={() => { }}
-                    addNewEmailCallback={() => { }}
+                    selectEmailCallback={() => {}}
+                    addNewEmailCallback={() => {}}
                     connectedAccounts={[
                       {
                         title: 'email@example.com',
-                        subtitle: `${adjustAddressTypeToDisplay(EmailAddressType.Email)} - email@example.com`,
-                        value: 'urn:rollupid:address/0x98f8b8473269c7e4444756d5ecef7dce5457a5d58df4100b46478402f59de57c',
+                        subtitle: `${adjustAddressTypeToDisplay(
+                          EmailAddressType.Email
+                        )} - email@example.com`,
+                        value:
+                          'urn:rollupid:address/0x98f8b8473269c7e4444756d5ecef7dce5457a5d58df4100b46478402f59de57c',
                       },
                       {
                         title: 'MS Email',
-                        subtitle: `${adjustAddressTypeToDisplay(OAuthAddressType.Microsoft)} - email2@example.com`,
-                        value: 'urn:rollupid:address/0x3c7d7e3fef81c03333ed63d4ac83d2a1840356122163985deb1615e6ecfc25be',
+                        subtitle: `${adjustAddressTypeToDisplay(
+                          OAuthAddressType.Microsoft
+                        )} - email2@example.com`,
+                        value:
+                          'urn:rollupid:address/0x3c7d7e3fef81c03333ed63d4ac83d2a1840356122163985deb1615e6ecfc25be',
                       },
                       {
                         title: 'Github',
-                        subtitle: `${adjustAddressTypeToDisplay(OAuthAddressType.GitHub)} - Github-Account`,
-                        value: 'urn:rollupid:address/0xa69240d7b361e122d22aa68ff97b9530c7c85953fba9dac392ca8dbfb88e17cc',
+                        subtitle: `${adjustAddressTypeToDisplay(
+                          OAuthAddressType.GitHub
+                        )} - Github-Account`,
+                        value:
+                          'urn:rollupid:address/0xa69240d7b361e122d22aa68ff97b9530c7c85953fba9dac392ca8dbfb88e17cc',
                       },
                       {
                         title: 'ens.eth',
-                        subtitle: `${adjustAddressTypeToDisplay(CryptoAddressType.ETH)} - 0x6c60Da9471181Aa54C648c6e203663A5501363F3`,
-                        value: 'urn:rollupid:address/0x4416ad52d0d65d4b8852b8041039822e92ff4aa301af1b3ab987bd930f6fb4c8',
+                        subtitle: `${adjustAddressTypeToDisplay(
+                          CryptoAddressType.ETH
+                        )} - 0x6c60Da9471181Aa54C648c6e203663A5501363F3`,
+                        value:
+                          'urn:rollupid:address/0x4416ad52d0d65d4b8852b8041039822e92ff4aa301af1b3ab987bd930f6fb4c8',
                       },
                     ]}
                     connectedSmartContractWallets={[]}
-                    addNewAccountCallback={() => { }}
-                    addNewSmartWalletCallback={() => { }}
-                    selectSmartWalletsCallback={() => { }}
-                    selectAccountsCallback={() => { }}
-                    selectAllAccountsCallback={() => { }}
-                    selectAllSmartWalletsCallback={() => { }}
+                    addNewAccountCallback={() => {}}
+                    addNewSmartWalletCallback={() => {}}
+                    selectSmartWalletsCallback={() => {}}
+                    selectAccountsCallback={() => {}}
+                    selectAllAccountsCallback={() => {}}
+                    selectAllSmartWalletsCallback={() => {}}
                     // disableAuthorize={true}
                     transitionState={'idle'}
-                    cancelCallback={() => { }}
-                    authorizeCallback={() => { }}
+                    cancelCallback={() => {}}
+                    authorizeCallback={() => {}}
                     radius={radius}
                   />
                 </Tab.Panel>
@@ -781,7 +803,6 @@ const EmailPanel = ({
     if (!iFrameRef) return
 
     var iframeDoc = iFrameRef.current?.contentWindow?.document
-    console.log({ iframeDoc })
     if (!iframeDoc) return
 
     const styleId = 'injected-styles'
@@ -817,7 +838,7 @@ const EmailPanel = ({
                 height: 1,
               }}
               id="logoURL"
-              setIsFormChanged={(val) => { }}
+              setIsFormChanged={(val) => {}}
               setIsImgUploading={(val) => {
                 setLoading(val)
               }}
@@ -1027,9 +1048,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         color:
           color && colorDark
             ? {
-              light: color,
-              dark: colorDark,
-            }
+                light: color,
+                dark: colorDark,
+              }
             : theme?.color,
         graphicURL: graphicURL ?? theme?.graphicURL,
         providers: providers ?? theme?.providers,
@@ -1118,6 +1139,10 @@ export default () => {
     emailTheme: GetEmailOTPThemeResult
   }>()
 
+  const { appDetails } = useOutletContext<{
+    appDetails: appDetailsProps
+  }>()
+
   const actionData = useActionData()
   const errors = actionData?.errors
 
@@ -1195,6 +1220,7 @@ export default () => {
             <AuthPanel
               appTheme={appTheme}
               avatarURL={avatarUrl}
+              appIconURL={appDetails.app.icon}
               setLoading={setLoading}
               errors={errors}
             />

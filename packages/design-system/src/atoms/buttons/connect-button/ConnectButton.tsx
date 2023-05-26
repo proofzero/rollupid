@@ -6,7 +6,7 @@ import walletsSvg from './wallets.png'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import { Avatar, ConnectKitButton } from 'connectkit'
 
-import { useDisconnect, useSignMessage } from "wagmi"
+import { useDisconnect, useSignMessage } from 'wagmi'
 
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Popover } from '@headlessui/react'
@@ -47,25 +47,15 @@ export function ConnectButton({
   displayContinueWith = false,
 }: ConnectButtonProps) {
   const { disconnect } = useDisconnect()
-  const {
-    isLoading: isSigning,
-    signMessage,
-  } = useSignMessage({
+  const { isLoading: isSigning, signMessage } = useSignMessage({
     onSuccess(data) {
       console.debug('message signed')
-      if (!signData?.nonce ||
-        !signData?.state ||
-        !signData?.address) {
+      if (!signData?.nonce || !signData?.state || !signData?.address) {
         connectErrorCallback(new Error('No signature data present.'))
         return
       }
       console.debug('sign callback')
-      signCallback(
-        signData.address,
-        data,
-        signData.nonce,
-        signData.state
-      )
+      signCallback(signData.address, data, signData.nonce, signData.state)
     },
     onError(error) {
       console.debug('should sign?', { error, isSigning })
@@ -88,13 +78,11 @@ export function ConnectButton({
     }
   }, [signData])
 
-
   const { theme, dark } = useContext(ThemeContext)
 
   return (
-    < div
-      className={`box-border rounded-md shadow-sm border border-solid border-[#d1d5db] bg-white dark:bg-[#374151] dark:border-gray-600 h-[56px]`
-      }
+    <div
+      className={`box-border rounded-md shadow-sm border border-solid border-[#d1d5db] bg-white dark:bg-[#374151] dark:border-gray-600 h-[56px]`}
     >
       <ConnectKitButton.Custom>
         {({
@@ -117,13 +105,15 @@ export function ConnectButton({
                 onClick={
                   isConnected
                     ? () => {
-                      return address && connectCallback(address)
-                    }
+                        return address && connectCallback(address)
+                      }
                     : show
                 }
-                className={`flex-1 button hover:bg-gray-100 flex flex-row items-center space-x-3 px-[17px] rounded-l-md ${isConnected ? '' : 'rounded-r-md'
-                  } ${fullSize ? 'justify-start' : 'justify-center'
-                  } bg-white dark:bg-[#374151] dark:border-gray-600 hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-skin-primary truncate`}
+                className={`flex-1 button hover:bg-gray-100 flex flex-row items-center space-x-3 px-[17px] rounded-l-md ${
+                  isConnected ? '' : 'rounded-r-md'
+                } ${
+                  fullSize ? 'justify-start' : 'justify-center'
+                } bg-white dark:bg-[#374151] dark:border-gray-600 dark:hover:bg-gray-600 focus:bg-white dark:focus:bg-gray-600 focus:ring-inset focus:ring-2 focus:ring-skin-primary truncate`}
               >
                 {(isSigning || isLoading) && isConnected ? (
                   <Spinner size={16} />
@@ -144,11 +134,12 @@ export function ConnectButton({
                         ? 'Signing... (please check wallet)'
                         : 'Continuing...'
                       : isConnected && address
-                        ? `${displayContinueWith ? `Continue with ` : ''}${ensName ?? truncatedAddress
+                      ? `${displayContinueWith ? `Continue with ` : ''}${
+                          ensName ?? truncatedAddress
                         }`
-                        : !isConnecting
-                          ? `${displayContinueWith ? `Continue with ` : ''}Wallet`
-                          : 'Connecting'}
+                      : !isConnecting
+                      ? `${displayContinueWith ? `Continue with ` : ''}Wallet`
+                      : 'Connecting'}
                   </Text>
                 )}
               </button>
@@ -174,8 +165,7 @@ export function ConnectButton({
                             size="sm"
                             weight="normal"
                             className="text-red-600 text-start"
-                          >{`Disconnect ${ensName ?? truncatedAddress
-                            }`}</Text>
+                          >{`Disconnect ${ensName ?? truncatedAddress}`}</Text>
                         </button>
                       </Popover.Panel>
                     </>

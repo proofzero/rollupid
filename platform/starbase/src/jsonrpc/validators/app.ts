@@ -74,7 +74,7 @@ export type EmailOTPTheme = z.infer<typeof EmailOTPThemeSchema>
 export const AppPublicPropsSchema = z.object({
   name: z.string(),
   iconURL: z.string(),
-  scopes: z.array(z.string()),
+  scopes: z.array(z.string()).optional(),
   redirectURI: z.string().optional(),
   termsURL: z.string().optional(),
   privacyURL: z.string().optional(),

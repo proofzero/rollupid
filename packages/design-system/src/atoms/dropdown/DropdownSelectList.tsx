@@ -96,34 +96,35 @@ export const Dropdown = ({
                     <Listbox.Button
                         className="border shadow-sm rounded-lg w-full transition-transform
                                     flex flex-row justify-between items-center py-2 px-3 hover:ring-1
-                                    hover:ring-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white"
+                                    hover:ring-skin-primary focus:ring-1 focus:ring-skin-primary bg-white
+                                    dark:bg-[#1F2937] dark:border-gray-600"
                     >
                         {!selectedItem && !selectedItems.length && !allItemsSelected && (
-                            <Text size="sm" className="text-gray-400 truncate text-ellipsis">
+                            <Text size="sm" className="text-gray-400 dark:text-white truncate text-ellipsis">
                                 {placeholder}
                             </Text>
                         )}
 
                         {selectedItem?.title?.length && (
-                            <Text size="sm" className="text-gray-800 truncate text-ellipsis">
+                            <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
                                 {selectedItem.title}
                             </Text>
                         )}
 
                         {selectedItems.length > 1 && !allItemsSelected && (
-                            <Text size="sm" className="text-gray-800 truncate text-ellipsis">
+                            <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
                                 {selectedItems.length} items selected
                             </Text>
                         )}
 
                         {selectedItems.length === 1 && !allItemsSelected && (
-                            <Text size="sm" className="text-gray-800 truncate text-ellipsis">
+                            <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
                                 {selectedItems[0].title} selected
                             </Text>
                         )}
 
                         {allItemsSelected && (
-                            <Text size="sm" className="text-gray-800 truncate text-ellipsis">
+                            <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
                                 {selectAllCheckboxTitle}
                             </Text>
                         )}
@@ -142,7 +143,7 @@ export const Dropdown = ({
                     >
                         <Listbox.Options
                             className="border shadow-lg rounded-lg absolute w-full mt-1 bg-white
-                            pt-3 space-y-3 z-10">
+                            pt-3 space-y-3 z-10 dark:bg-[#1F2937] dark:border-gray-600">
                             {items?.length
                                 ? multiple
                                     /** 
@@ -169,7 +170,7 @@ export const Dropdown = ({
                                                     readOnly
                                                     type="checkbox"
                                                     className="h-4 w-4 rounded border-gray-300 bg-gray-50 
-                                                    text-indigo-500 focus:ring-indigo-500"
+                                                    text-skin-primary focus:ring-skin-primary"
                                                     checked={allItemsSelected}
                                                 />
                                             </div>
@@ -177,21 +178,21 @@ export const Dropdown = ({
                                                 <Text
                                                     size="sm"
                                                     weight="medium"
-                                                    className="text-gray-900 truncate text-ellipsis"
+                                                    className="text-gray-900 dark:text-white truncate text-ellipsis"
                                                 >
                                                     {selectAllCheckboxTitle}
                                                 </Text>
                                                 <Text
                                                     size="xs"
                                                     weight='normal'
-                                                    className={`truncate w-full text-gray-500`}
+                                                    className={`truncate w-full text-gray-500 dark:text-gray-400`}
                                                 >
                                                     {selectAllCheckboxDescription}
                                                 </Text>
                                             </div>
                                         </div>
 
-                                        <div className="mx-4 w-100 border-b border-gray-200"></div>
+                                        <div className="mx-4 w-100 border-b border-gray-200 dark:border-gray-600"></div>
 
                                         <div className="max-h-[140px] overflow-y-scroll thin-scrollbar">
                                             {items?.map((item) => {
@@ -206,7 +207,7 @@ export const Dropdown = ({
                                                     value={item}
                                                     className={` rounded 
                                                         flex flex-row space-x-2 cursor-pointer py-1.5 px-4
-                                                        ${checked ? "bg-gray-100" : "hover:bg-gray-50"}`}
+                                                        ${checked ? "bg-gray-100 dark:bg-[#1F2937]" : "hover:bg-gray-50 dark:hover:bg-gray-600"}`}
                                                     disabled={allItemsSelected}
                                                 >
                                                     <div>
@@ -215,7 +216,7 @@ export const Dropdown = ({
                                                             type="checkbox"
                                                             className={`
                                                                  h-4 w-4 rounded border-gray-300 bg-gray-50
-                                                                 text-indigo-500 focus:ring-indigo-500`}
+                                                                 text-skin-primary focus:ring-skin-primary`}
                                                             checked={
                                                                 checked
                                                             }
@@ -226,8 +227,8 @@ export const Dropdown = ({
                                                             size="sm"
                                                             weight="medium"
                                                             className={`truncate text-ellipsis ${allItemsSelected
-                                                                ? 'text-gray-400'
-                                                                : 'text-gray-900'
+                                                                ? 'text-gray-400 dark:text-gray-500'
+                                                                : 'text-gray-900 dark:text-gray-100'
                                                                 }`}
                                                         >
                                                             {item.title}
@@ -237,7 +238,7 @@ export const Dropdown = ({
                                                                 size="xs"
                                                                 weight="normal"
                                                                 className={`truncate w-full text-ellipsis ${allItemsSelected
-                                                                    ? 'text-gray-400'
+                                                                    ? 'text-gray-400 dark:text-gray-500'
                                                                     : 'text-gray-500'
                                                                     }`}
                                                             >
@@ -258,12 +259,12 @@ export const Dropdown = ({
                                             const preselected = selectedItem?.value === item.value
                                             return (<Listbox.Option
                                                 className="flex flex-row space-x-2 cursor-pointer hover:bg-gray-50
-                                    rounded-lg  w-full "
+                                    rounded-lg w-full dark:hover:bg-gray-600"
                                                 key={item.value}
                                                 value={item}
                                             >{({ selected }) => (
                                                 <div
-                                                    className={`${selected || preselected ? 'bg-gray-100' : ""}
+                                                    className={`${selected || preselected ? 'bg-gray-100 dark:bg-gray-700' : ""}
                                                          w-full h-full rounded-lg py-2 px-2 flex flex-row
                                                 items-center justify-between`}
                                                 >
@@ -277,7 +278,7 @@ export const Dropdown = ({
                                                             <Text
                                                                 size="sm"
                                                                 weight={selected || preselected ? 'medium' : 'normal'}
-                                                                className={`truncate w-full`}
+                                                                className={`truncate w-full dark:text-white`}
                                                             >
                                                                 {item.title}
                                                             </Text>
@@ -286,7 +287,7 @@ export const Dropdown = ({
                                                                     ? (<Text
                                                                         size="xs"
                                                                         weight='normal'
-                                                                        className={`truncate w-full text-gray-500`}
+                                                                        className={`truncate w-full text-gray-500 dark:text-gray-400`}
                                                                     >
                                                                         {item.subtitle}
                                                                     </Text>)
@@ -295,7 +296,7 @@ export const Dropdown = ({
                                                         </div>
                                                     </div>
                                                     {selected || preselected ? (
-                                                        <span className="flex items-center pl-3 text-indigo-600">
+                                                        <span className="flex items-center pl-3 text-skin-primary">
                                                             <CheckIcon className="h-5 w-5" aria-hidden="true" />
                                                         </span>
                                                     ) : null}
@@ -315,8 +316,8 @@ export const Dropdown = ({
                                     className={`w-full min-w-[238px] flex flex-row items-center gap-1 justify-center
                                          px-[12px]`}
                                 >
-                                    <TbCirclePlus size={18} />
-                                    <Text size="sm">{ConnectButtonPhrase}</Text>
+                                    <TbCirclePlus size={18} className="dark:text-white" />
+                                    <Text size="sm" className="dark:text-white">{ConnectButtonPhrase}</Text>
                                 </Button>
                             </div>
                         </Listbox.Options>
