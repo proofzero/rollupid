@@ -18,13 +18,13 @@ export const Template = (args) => <ConnectButton {...args} />
   <Story
     decorators={[
       (Story) => {
-        const client = createConfig(
+        const config = createConfig(
           getDefaultConfig({
             appName: 'Rollup',
           })
         )
         return (
-          <WagmiConfig client={client}>
+          <WagmiConfig config={config}>
             <Story />
           </WagmiConfig>
         )
