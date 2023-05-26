@@ -54,7 +54,7 @@ export const Dropdown = ({
     /**
      * For single select
      */
-    const [selectedItem, setSelectedItem] = useState<DropdownSelectListItem>(() => {
+    const [selectedItem, setSelectedItem] = useState<DropdownSelectListItem | undefined>(() => {
         if (!multiple) return defaultItems[0]
     })
 
