@@ -1,11 +1,11 @@
 import React from 'react'
 import discordIcon from '../../../assets/social_icons/discord.svg'
-import googleIcon from '../../../assets/social_icons/google.svg'
-import microsoftIcon from '../../../assets/social_icons/microsoft.svg'
 import twitterIcon from '../../../assets/social_icons/twitter.svg'
 import { Button } from '../Button'
 import { Text } from '../../text/Text'
 
+import { WrappedSVG as GoogleSVG } from '../../providers/Google'
+import { WrappedSVG as MicrosoftSVG } from '../../providers/Microsoft'
 import { WrappedSVG as AppleSVG } from '../../providers/Apple'
 import { WrappedSVG as GitHubSVG } from '../../providers/Github'
 
@@ -25,8 +25,8 @@ const providerIconDict: { [key in OAuthProvider]: JSX.Element } = {
   apple: AppleSVG,
   discord: providerImgBuildHelper('discord', discordIcon),
   github: GitHubSVG,
-  google: providerImgBuildHelper('google', googleIcon),
-  microsoft: providerImgBuildHelper('microsoft', microsoftIcon),
+  google: GoogleSVG,
+  microsoft: MicrosoftSVG,
   twitter: providerImgBuildHelper('twitter', twitterIcon),
 }
 

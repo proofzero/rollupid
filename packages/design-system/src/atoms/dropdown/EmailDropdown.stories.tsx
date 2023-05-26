@@ -4,8 +4,8 @@ import { Dropdown, DropdownSelectListItem } from './DropdownSelectList'
 import { OAuthAddressType, EmailAddressType, CryptoAddressType } from '@proofzero/types/address'
 import { HiOutlineEnvelope } from 'react-icons/hi2'
 
-import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
-import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
+import googleIcon from '@proofzero/design-system/src/atoms/providers/Google'
+import microsoftIcon from '@proofzero/design-system/src/atoms/providers/Microsoft'
 import appleIcon from '@proofzero/design-system/src/atoms/providers/Apple'
 
 export default {
