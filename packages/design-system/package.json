@@ -15,6 +15,7 @@
     "react-icons": "4.8.0",
     "react-json-pretty": "2.2.0",
     "react-scripts": "5.0.1",
+    "stream": "0.0.2",
     "styled-components": "5.3.6"
   },
   "scripts": {
