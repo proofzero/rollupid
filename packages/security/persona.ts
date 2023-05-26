@@ -146,6 +146,8 @@ export async function setPersonaReferences(
       personaData.erc_4337 &&
       personaData.erc_4337 instanceof Array
     ) {
+      //This (correctly) gets skipped when personaData value of
+      //erc_4337 is set to ALL
       personaData.erc_4337.forEach((addressUrn) =>
         uniqueAuthorizationReferences.add(addressUrn)
       )
