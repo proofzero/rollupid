@@ -2,7 +2,6 @@ import React from 'react'
 import { Dropdown, DropdownSelectListItem } from './DropdownSelectList'
 
 import { OAuthAddressType, EmailAddressType, CryptoAddressType } from '@proofzero/types/address'
-import { OptionType } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { HiOutlineEnvelope } from 'react-icons/hi2'
 
 import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'

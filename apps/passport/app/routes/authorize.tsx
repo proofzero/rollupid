@@ -36,15 +36,14 @@ import sideGraphics from '~/assets/auth-side-graphics.svg'
 import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { DataForScopes } from '~/utils/authorize.server'
-import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
 
-import type { AddressURN } from '@proofzero/urns/address'
 import type { PersonaData } from '@proofzero/types/application'
 
 import Authorization from '@proofzero/design-system/src/templates/authorization/Authorization'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import { getEmailIcon } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 export type UserProfile = {
   displayName: string
@@ -524,7 +523,16 @@ export default function Authorize() {
             setSelectedSCWallets([AuthorizationControlSelection.ALL])
           }}
 
-          connectedEmails={connectedEmails ?? []}
+          connectedEmails={connectedEmails.map(email => {
+            // Substituting subtitle with icon
+            // on the client side
+            return {
+              icon: getEmailIcon(email.subtitle!),
+              title: email.title,
+              selected: email.selected,
+              value: email.value
+            }
+          }) ?? []}
           addNewEmailCallback={() => {
             const qp = new URLSearchParams()
             qp.append('scope', requestedScope.join(' '))

@@ -18,13 +18,11 @@ import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
-import { EmailSelect } from '@proofzero/design-system/src/atoms/email/EmailSelect'
 import {
+  getEmailIcon,
   getNormalisedConnectedEmails,
-  OptionType,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
-import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 import type { AddressURN } from '@proofzero/urns/address'
 import type { AccountURN } from '@proofzero/urns/account'
@@ -32,6 +30,7 @@ import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import type { errorsTeamProps, notificationHandlerType } from '~/types'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { Dropdown, DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -72,7 +71,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
         if (!appContactAddress) {
           await starbaseClient.upsertAppContactAddress.mutate({
-            address: connectedEmails[0].addressURN!,
+            address: connectedEmails[0].value as AddressURN,
             clientId,
           })
 
@@ -133,9 +132,8 @@ export default () => {
 
   const submit = useSubmit()
 
-  const { connectedEmails } = useLoaderData<{
-    connectedEmails: EmailSelectListItem[]
-  }>()
+  let { connectedEmails } = useLoaderData() as { connectedEmails: Array<DropdownSelectListItem> }
+
 
   const { PASSPORT_URL, notificationHandler, appContactAddress } =
     useOutletContext<{
@@ -208,33 +206,46 @@ export default () => {
                 Email
               </Text>
 
-              <EmailSelect
-                items={connectedEmails}
-                enableAddNew={true}
-                defaultAddress={appContactAddress}
-                onSelect={(selected: EmailSelectListItem) => {
-                  if (selected?.type === OptionType.AddNew) {
-                    return redirectToPassport()
+              <Dropdown
+                items={connectedEmails.map((email: DropdownSelectListItem) => {
+                  email.value === appContactAddress
+                    ? email.selected = true
+                    : email.selected = false;
+                  // Substituting subtitle with icon
+                  // on the client side
+                  email.subtitle && !email.icon
+                    ? email.icon = getEmailIcon(email.subtitle)
+                    : null
+                  return {
+                    value: email.value,
+                    selected: email.selected,
+                    icon: email.icon,
+                    title: email.title,
                   }
-
-                  if (selected.addressURN === appContactAddress) {
-                    return
-                  }
-
-                  if (!selected.addressURN) {
-                    console.error('No addressURN')
-                    return
-                  }
-
-                  submit(
-                    {
-                      addressURN: selected.addressURN,
-                    },
-                    {
-                      method: 'post',
+                })}
+                placeholder='Select an Email Address'
+                onSelect={(selected) => {
+                  // type casting to DropdownSelectListItem instead of array
+                  if (!Array.isArray(selected)) {
+                    if (selected.value === appContactAddress) {
+                      return
                     }
-                  )
+                    if (!selected.value) {
+                      console.error('No addressURN')
+                      return
+                    }
+                    submit(
+                      {
+                        addressURN: selected.value,
+                      },
+                      {
+                        method: 'post',
+                      }
+                    )
+                  }
                 }}
+                ConnectButtonCallback={redirectToPassport}
+                ConnectButtonPhrase='Connect New Email Address'
               />
             </>
           )}

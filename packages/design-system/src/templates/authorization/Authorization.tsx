@@ -2,22 +2,13 @@ import React, { useContext } from 'react'
 import { Avatar } from '../../atoms/profile/avatar/Avatar'
 import { Text } from '../../atoms/text/Text'
 import authorizeCheck from './authorize-check.svg'
-import { SmartContractWalletSelect } from '../../atoms/smart_contract_wallets/SmartContractWalletSelect'
 import subtractLogo from '../../assets/subtract-logo.svg'
 import { Spinner } from '../../atoms/spinner/Spinner'
 import { Button } from '../../atoms/buttons/Button'
 import Info from '../../atoms/info/Info'
 import {
-  EmailSelectListItem,
-  OptionType,
-  SCWalletSelectListItem,
   getEmailIcon,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
-import { EmailSelect } from '../../atoms/email/EmailSelect'
-import { ConnectedAccountSelect } from '../../atoms/accounts/ConnectedAccountSelect'
-import { GetAddressProfileResult } from '@proofzero/platform/address/src/jsonrpc/methods/getAddressProfile'
-import { AuthorizationControlSelection } from '@proofzero/types/application'
-import { AddressURN } from '@proofzero/urns/address'
 import { ScopeDescriptor } from '@proofzero/security/scopes'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import { ThemeContext } from '../../contexts/theme'
@@ -46,7 +37,7 @@ type AuthorizationProps = {
 
   transitionState: 'idle' | 'submitting' | 'loading'
 
-  connectedSmartContractWallets?: DropdownSelectListItem[]
+  connectedSmartContractWallets?: Array<DropdownSelectListItem>
   addNewSmartWalletCallback: () => void
   selectSmartWalletsCallback: (selected: Array<DropdownSelectListItem>) => void
   selectAllSmartWalletsCallback: () => void
@@ -55,7 +46,7 @@ type AuthorizationProps = {
   addNewEmailCallback: () => void
   selectEmailCallback: (selected: DropdownSelectListItem) => void
 
-  connectedAccounts?: DropdownSelectListItem[]
+  connectedAccounts?: Array<DropdownSelectListItem>
   addNewAccountCallback: () => void
   selectAccountsCallback: (
     selected: Array<DropdownSelectListItem>
@@ -106,18 +97,6 @@ export default ({
     }
     scopesToDisplay.unshift('system_identifiers')
   }
-
-  // Substituting subtitle with icon
-  // on the client side
-  connectedEmails = connectedEmails.map(email =>
-  (email.subtitle && !email.icon
-    ? {
-      title: email.title,
-      value: email.value,
-      icon: getEmailIcon(email.subtitle)
-    }
-    : email))
-
   const { dark, theme } = useContext(ThemeContext)
 
   return (

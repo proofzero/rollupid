@@ -8,8 +8,6 @@ import {
 import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
 import { createAuthorizationParamsCookieHeaders } from '~/session.server'
 
-import type { GetAddressProfileResult } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressProfile'
-
 import {
   SCOPE_CONNECTED_ACCOUNTS,
   SCOPE_EMAIL,
@@ -18,10 +16,6 @@ import {
 
 import type { AccountURN } from '@proofzero/urns/account'
 import type { PersonaData } from '@proofzero/types/application'
-import type {
-  EmailSelectListItem,
-  SCWalletSelectListItem,
-} from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { redirect } from '@remix-run/cloudflare'
 import { CryptoAddressType } from '@proofzero/types/address'
 import { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
