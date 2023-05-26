@@ -2,7 +2,7 @@ import { Canvas, Meta, Story } from '@storybook/addon-docs'
 
 import Authentication, { AuthenticationScreenDefaults } from './Authentication'
 import { WagmiConfig, createClient } from 'wagmi'
-import { getDefaultClient } from 'connectkit'
+import { getDefaultConfig } from 'connectkit'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
 
@@ -23,7 +23,7 @@ export const Template = ({ displayKeys }) => {
       mapperArgs={{
         clientId: 'Foo',
         wagmiClient: createClient(
-          getDefaultClient({
+          getDefaultConfig({
             appName: 'Rollup',
           })
         ),
