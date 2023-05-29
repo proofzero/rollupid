@@ -42,6 +42,9 @@ export function getRollupReqFunctionErrorWrapper(
       const result = await reqFunction(args)
       return result
     } catch (e) {
+      //Needed for when we throw redirects
+      if (e instanceof Response) return e as Response
+
       const error = getErrorCause(e) as Error
       const { stack, ...otherProps } = error
       const traceparent = context.traceSpan
