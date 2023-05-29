@@ -6,47 +6,48 @@ import { getAuthzCookieParams } from '~/session.server'
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 import LogoIndigo from '~/assets/PassportLogoIndigo.svg'
 
-import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-import social from '~/assets/passport-social.png'
-
-export const loader: LoaderFunction = async ({ request, context, params }) => {
-  let appProps
-  if (params.clientId !== 'console' && params.clientId !== 'passport') {
-    const sbClient = getStarbaseClient('', context.env, context.traceSpan)
-    appProps = await sbClient.getAppPublicProps.query({
-      clientId: params.clientId as string,
-    })
-  } else {
-    appProps = {
-      name: `Rollup - ${
-        params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
-      }`,
-      iconURL: LogoIndigo,
-      termsURL: 'https://rollup.id/tos',
-      privacyURL: 'https://rollup.id/privacy-policy',
-      redirectURI: `https://${params.clientId}.rollup.id`,
-      websiteURL: 'https://rollup.id',
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context, params }) => {
+    let appProps
+    if (params.clientId !== 'console' && params.clientId !== 'passport') {
+      const sbClient = getStarbaseClient('', context.env, context.traceSpan)
+      appProps = await sbClient.getAppPublicProps.query({
+        clientId: params.clientId as string,
+      })
+    } else {
+      appProps = {
+        name: `Rollup - ${
+          params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
+        }`,
+        iconURL: LogoIndigo,
+        termsURL: 'https://rollup.id/tos',
+        privacyURL: 'https://rollup.id/privacy-policy',
+        redirectURI: `https://${params.clientId}.rollup.id`,
+        websiteURL: 'https://rollup.id',
+      }
     }
+
+    const cp = await getAuthzCookieParams(request, context.env)
+
+    let rollup_action
+    if (
+      cp &&
+      cp.rollup_action &&
+      ['connect', 'reconnect'].includes(cp?.rollup_action)
+    ) {
+      rollup_action = cp?.rollup_action
+    }
+
+    return json({
+      clientId: params.clientId,
+      appProps,
+      rollup_action,
+    })
   }
-
-  const cp = await getAuthzCookieParams(request, context.env)
-
-  let rollup_action
-  if (
-    cp &&
-    cp.rollup_action &&
-    ['connect', 'reconnect'].includes(cp?.rollup_action)
-  ) {
-    rollup_action = cp?.rollup_action
-  }
-
-  return json({
-    clientId: params.clientId,
-    appProps,
-    rollup_action,
-  })
-}
+)
 
 export default () => {
   const { clientId, appProps, rollup_action } = useLoaderData()

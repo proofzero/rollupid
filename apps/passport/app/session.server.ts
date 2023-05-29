@@ -196,7 +196,9 @@ export async function createAuthorizationParamsCookieHeaders(
   env: Env
 ) {
   if (!authzParams.clientId) {
-    throw new Error('Missing clientId in authorization parameters')
+    throw new InternalServerError({
+      message: 'Missing clientId in authorization parameters',
+    })
   }
 
   const headers = new Headers()
@@ -343,7 +345,7 @@ export async function getValidatedSessionContext(
 export function parseJwt(token: string): JWTPayload {
   const payload = jose.decodeJwt(token)
   if (!payload) {
-    throw new Error('Invalid JWT')
+    throw InvalidTokenError
   }
   return payload
 }

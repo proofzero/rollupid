@@ -39,6 +39,8 @@ import { loader as usersLoader } from './users'
 import type { AuthorizedAccountsOutput } from '@proofzero/platform/starbase/src/types'
 import type { UsersLoaderData } from './users'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
+import { BadRequestError } from '@proofzero/errors'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -52,59 +54,67 @@ type LoaderData = {
   edgesResult: Promise<AuthorizedAccountsOutput>
 }
 
-export const loader: LoaderFunction = async ({ request, params, context }) => {
-  const { clientId } = params
-  const { data }: { data: UsersLoaderData } = await usersLoader({
-    request,
-    params,
-    context,
-  })
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    const { clientId } = params
+    const { data }: { data: UsersLoaderData } = await usersLoader({
+      request,
+      params,
+      context,
+    })
 
-  if (!clientId) {
-    throw new Error('clientId is required')
+    if (!clientId) {
+      throw new BadRequestError({ message: 'clientId is required' })
+    }
+
+    return defer<LoaderData>({
+      edgesResult: data.edgesResult!,
+    })
   }
+)
 
-  return defer<LoaderData>({
-    edgesResult: data.edgesResult!,
-  })
-}
-
-export const action: ActionFunction = async ({ request, params, context }) => {
-  if (!params.clientId) {
-    throw new Error('Application Client ID is required for the requested route')
-  }
-
-  const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
-
-  const formData = await request.formData()
-  const op = formData.get('op')
-  invariant(op && typeof op === 'string', 'Operation should be a string')
-
-  switch (op) {
-    case RollType.RollAPIKey:
-      const rotatedApiKey = (
-        await starbaseClient.rotateApiKey.mutate({ clientId: params.clientId })
-      ).apiKey
-      return json({
-        rotatedSecrets: { rotatedApiKey },
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    if (!params.clientId) {
+      throw new BadRequestError({
+        message: 'Application Client ID is required for the requested route',
       })
-    case RollType.RollClientSecret:
-      const rotatedClientSecret = (
-        await starbaseClient.rotateClientSecret.mutate({
-          clientId: params.clientId,
+    }
+
+    const jwt = await requireJWT(request)
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...generateTraceContextHeaders(context.traceSpan),
+    })
+
+    const formData = await request.formData()
+    const op = formData.get('op')
+    invariant(op && typeof op === 'string', 'Operation should be a string')
+
+    switch (op) {
+      case RollType.RollAPIKey:
+        const rotatedApiKey = (
+          await starbaseClient.rotateApiKey.mutate({
+            clientId: params.clientId,
+          })
+        ).apiKey
+        return json({
+          rotatedSecrets: { rotatedApiKey },
         })
-      ).secret
-      return json({
-        rotatedSecrets: { rotatedClientSecret },
-      })
-    default:
-      throw new Error('Invalid operation')
+      case RollType.RollClientSecret:
+        const rotatedClientSecret = (
+          await starbaseClient.rotateClientSecret.mutate({
+            clientId: params.clientId,
+          })
+        ).secret
+        return json({
+          rotatedSecrets: { rotatedClientSecret },
+        })
+      default:
+        throw new BadRequestError({ message: 'Invalid operation' })
+    }
   }
-}
+)
 
 // Component
 // -----------------------------------------------------------------------------

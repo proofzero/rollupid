@@ -3,26 +3,32 @@ import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { InternalServerError } from '@proofzero/errors'
 
-export const action: ActionFunction = async ({ request, context }) => {
-  const formData = await request.formData()
-  const clientId = formData.get('clientId')?.toString()
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    const formData = await request.formData()
+    const clientId = formData.get('clientId')?.toString()
 
-  if (!clientId) throw 'Client ID is required'
+    if (!clientId) throw 'Client ID is required'
 
-  const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request)
 
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
-  try {
-    await starbaseClient.deleteApp.mutate({
-      clientId,
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...generateTraceContextHeaders(context.traceSpan),
     })
-    return redirect(`/`)
-  } catch (error) {
-    console.error({ error })
-    return json({ error }, { status: 500 })
+    try {
+      await starbaseClient.deleteApp.mutate({
+        clientId,
+      })
+      return redirect(`/`)
+    } catch (error) {
+      console.error({ error })
+      return new InternalServerError({
+        message: 'Could not delete application',
+      })
+    }
   }
-}
+)

@@ -30,98 +30,103 @@ import type { AddressURN } from '@proofzero/urns/address'
 import type { AccountURN } from '@proofzero/urns/account'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import type { errorsTeamProps, notificationHandlerType } from '~/types'
+import { BadRequestError } from '@proofzero/errors'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const loader: LoaderFunction = async ({ request, context, params }) => {
-  const clientId = params.clientId as string
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context, params }) => {
+    const clientId = params.clientId as string
 
-  const jwt = await requireJWT(request)
-  const payload = checkToken(jwt)
-  const accountURN = payload.sub as AccountURN
+    const jwt = await requireJWT(request)
+    const payload = checkToken(jwt)
+    const accountURN = payload.sub as AccountURN
 
-  const accountClient = createAccountClient(Account, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
+    const accountClient = createAccountClient(Account, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...generateTraceContextHeaders(context.traceSpan),
+    })
 
-  const connectedAccounts = await accountClient.getAddresses.query({
-    account: accountURN,
-  })
-  const connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
+    const connectedAccounts = await accountClient.getAddresses.query({
+      account: accountURN,
+    })
+    const connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
 
-  // If we are coming back from a successful connect flow
-  // and we have only one email address, and no appContactAddress set
-  // We can infer the intention of the user and automatically
-  // set their e-mail to the one just connected
-  // All other cases are ambiguous and we should not make assumptions
-  const requestURL = new URL(request.url)
-  const connectResult = requestURL.searchParams.get('rollup_result')
-  if (connectResult && connectResult === 'SUCCESS') {
-    if (connectedEmails.length === 1) {
-      const starbaseClient = createStarbaseClient(Starbase, {
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...generateTraceContextHeaders(context.traceSpan),
-      })
-
-      const appContactAddress = await starbaseClient.getAppContactAddress.query(
-        {
-          clientId,
-        }
-      )
-
-      if (!appContactAddress) {
-        await starbaseClient.upsertAppContactAddress.mutate({
-          address: connectedEmails[0].addressURN!,
-          clientId,
+    // If we are coming back from a successful connect flow
+    // and we have only one email address, and no appContactAddress set
+    // We can infer the intention of the user and automatically
+    // set their e-mail to the one just connected
+    // All other cases are ambiguous and we should not make assumptions
+    const requestURL = new URL(request.url)
+    const connectResult = requestURL.searchParams.get('rollup_result')
+    if (connectResult && connectResult === 'SUCCESS') {
+      if (connectedEmails.length === 1) {
+        const starbaseClient = createStarbaseClient(Starbase, {
+          ...getAuthzHeaderConditionallyFromToken(jwt),
+          ...generateTraceContextHeaders(context.traceSpan),
         })
 
-        return redirect(requestURL.toString())
+        const appContactAddress =
+          await starbaseClient.getAppContactAddress.query({
+            clientId,
+          })
+
+        if (!appContactAddress) {
+          await starbaseClient.upsertAppContactAddress.mutate({
+            address: connectedEmails[0].addressURN!,
+            clientId,
+          })
+
+          return redirect(requestURL.toString())
+        }
       }
     }
+
+    return {
+      connectedEmails,
+    }
   }
+)
 
-  return {
-    connectedEmails,
-  }
-}
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context, params }) => {
+    const clientId = params.clientId as string
+    const jwt = await requireJWT(request)
 
-export const action: ActionFunction = async ({ request, context, params }) => {
-  const clientId = params.clientId as string
-  const jwt = await requireJWT(request)
+    const fd = await request.formData()
+    const addressURN = fd.get('addressURN') as AddressURN
+    if (!addressURN) {
+      throw new BadRequestError({ message: 'No addressURN' })
+    }
 
-  const fd = await request.formData()
-  const addressURN = fd.get('addressURN') as AddressURN
-  if (!addressURN) {
-    throw new Error('No addressURN')
-  }
+    const errors: errorsTeamProps = {}
 
-  const errors: errorsTeamProps = {}
-
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
-
-  try {
-    await starbaseClient.upsertAppContactAddress.mutate({
-      address: addressURN,
-      clientId,
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...generateTraceContextHeaders(context.traceSpan),
     })
-  } catch (e) {
-    errors.upserteAppContactAddress = "Failed to upsert app's contact address"
-  }
 
-  // Remix preserves route from before
-  // history erasure so searchParams
-  // are regenerated; manual removal
-  const requestURL = new URL(request.url)
-  const connectResult = requestURL.searchParams.get('rollup_result')
-  if (connectResult) {
-    requestURL.searchParams.delete('rollup_result')
-    return redirect(requestURL.toString())
-  }
+    try {
+      await starbaseClient.upsertAppContactAddress.mutate({
+        address: addressURN,
+        clientId,
+      })
+    } catch (e) {
+      errors.upserteAppContactAddress = "Failed to upsert app's contact address"
+    }
 
-  return { errors }
-}
+    // Remix preserves route from before
+    // history erasure so searchParams
+    // are regenerated; manual removal
+    const requestURL = new URL(request.url)
+    const connectResult = requestURL.searchParams.get('rollup_result')
+    if (connectResult) {
+      requestURL.searchParams.delete('rollup_result')
+      return redirect(requestURL.toString())
+    }
+
+    return { errors }
+  }
+)
 
 export default () => {
   useConnectResult(['SUCCESS', 'ALREADY_CONNECTED', 'CANCEL'])

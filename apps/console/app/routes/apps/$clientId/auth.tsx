@@ -40,6 +40,8 @@ import type { AddressURN } from '@proofzero/urns/address'
 import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { notificationHandlerType } from '~/types'
 import { SCOPE_SMART_CONTRACT_WALLETS } from '@proofzero/security/scopes'
+import { BadRequestError } from '@proofzero/errors'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -112,109 +114,117 @@ const updatesSchema = z.object({
     .optional(),
 })
 
-export const loader: LoaderFunction = async ({ request, params, context }) => {
-  if (!params.clientId) {
-    throw new Error('Application Client ID is required for the requested route')
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    if (!params.clientId) {
+      throw new BadRequestError({
+        message: 'Application Client ID is required for the requested route',
+      })
+    }
+    const jwt = await requireJWT(request)
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...generateTraceContextHeaders(context.traceSpan),
+    })
+
+    const scopeMeta = (await starbaseClient.getScopes.query()).scopes
+
+    return json({ scopeMeta })
   }
-  const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
+)
 
-  const scopeMeta = (await starbaseClient.getScopes.query()).scopes
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    if (!params.clientId) {
+      throw new BadRequestError({
+        message: 'Application Client ID is required for the requested route',
+      })
+    }
 
-  return json({ scopeMeta })
-}
+    let rotatedSecret, updates
 
-export const action: ActionFunction = async ({ request, params, context }) => {
-  if (!params.clientId) {
-    throw new Error('Application Client ID is required for the requested route')
-  }
+    const jwt = await requireJWT(request)
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...generateTraceContextHeaders(context.traceSpan),
+    })
 
-  let rotatedSecret, updates
+    const paymaster = await starbaseClient.getPaymaster.query({
+      clientId: params.clientId as string,
+    })
 
-  const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
+    const formData = await request.formData()
+    const op = formData.get('op')
+    const published = formData.get('published') === '1'
+    const errors: errorsAuthProps = {}
 
-  const paymaster = await starbaseClient.getPaymaster.query({
-    clientId: params.clientId as string,
-  })
-
-  const formData = await request.formData()
-  const op = formData.get('op')
-  const published = formData.get('published') === '1'
-  const errors: errorsAuthProps = {}
-
-  // As part of the rolling operation
-  // we only need to remove the keys
-  // because the loader gets called again
-  // populating the values if empty
-  switch (op) {
-    case RollType.RollClientSecret:
-      rotatedSecret = (
-        await starbaseClient.rotateClientSecret.mutate({
-          clientId: params.clientId,
-        })
-      ).secret
-      break
-    case 'update_app':
-      const entries = formData.entries()
-      const scopes = Array.from(entries)
-        .filter((entry) => {
-          return entry[0].endsWith('][id]')
-        })
-        .map((entry) => entry[1] as string)
-
-      if (
-        scopes.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!) &&
-        (!paymaster || !paymaster?.provider)
-      ) {
-        errors['paymaster'] = 'Paymaster is required for this scope'
-      }
-
-      updates = {
-        name: formData.get('name')?.toString(),
-        icon: formData.get('icon') as string | undefined,
-        redirectURI: formData.get('redirectURI') as string | undefined,
-        termsURL: formData.get('termsURL') as string | undefined,
-        privacyURL: formData.get('privacyURL') as string | undefined,
-        websiteURL: formData.get('websiteURL') as string | undefined,
-        scopes,
-      }
-
-      const zodErrors = updatesSchema.safeParse(updates)
-      if (!zodErrors.success) {
-        zodErrors.error.errors.forEach((er: any) => {
-          errors[`${er.path[0]}`] = er.message
-        })
-      }
-
-      if (Object.keys(errors).length === 0) {
-        await Promise.all([
-          starbaseClient.updateApp.mutate({
+    // As part of the rolling operation
+    // we only need to remove the keys
+    // because the loader gets called again
+    // populating the values if empty
+    switch (op) {
+      case RollType.RollClientSecret:
+        rotatedSecret = (
+          await starbaseClient.rotateClientSecret.mutate({
             clientId: params.clientId,
-            updates,
-          }),
-          starbaseClient.publishApp.mutate({
-            clientId: params.clientId,
-            published: published,
-          }),
-        ])
-      }
-      break
-  }
-  console.debug('ERRORS', errors)
+          })
+        ).secret
+        break
+      case 'update_app':
+        const entries = formData.entries()
+        const scopes = Array.from(entries)
+          .filter((entry) => {
+            return entry[0].endsWith('][id]')
+          })
+          .map((entry) => entry[1] as string)
 
-  return json({
-    rotatedSecret,
-    updatedApp: { published, app: { ...updates } },
-    errors,
-  })
-}
+        if (
+          scopes.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!) &&
+          (!paymaster || !paymaster?.provider)
+        ) {
+          errors['paymaster'] = 'Paymaster is required for this scope'
+        }
+
+        updates = {
+          name: formData.get('name')?.toString(),
+          icon: formData.get('icon') as string | undefined,
+          redirectURI: formData.get('redirectURI') as string | undefined,
+          termsURL: formData.get('termsURL') as string | undefined,
+          privacyURL: formData.get('privacyURL') as string | undefined,
+          websiteURL: formData.get('websiteURL') as string | undefined,
+          scopes,
+        }
+
+        const zodErrors = updatesSchema.safeParse(updates)
+        if (!zodErrors.success) {
+          zodErrors.error.errors.forEach((er: any) => {
+            errors[`${er.path[0]}`] = er.message
+          })
+        }
+
+        if (Object.keys(errors).length === 0) {
+          await Promise.all([
+            starbaseClient.updateApp.mutate({
+              clientId: params.clientId,
+              updates,
+            }),
+            starbaseClient.publishApp.mutate({
+              clientId: params.clientId,
+              published: published,
+            }),
+          ])
+        }
+        break
+    }
+    console.debug('ERRORS', errors)
+
+    return json({
+      rotatedSecret,
+      updatedApp: { published, app: { ...updates } },
+      errors,
+    })
+  }
+)
 
 // Component
 // -----------------------------------------------------------------------------

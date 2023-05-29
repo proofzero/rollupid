@@ -1,4 +1,9 @@
-import { json } from '@remix-run/cloudflare'
+import {
+  json,
+  DataFunctionArgs,
+  ActionFunction,
+  LoaderFunction,
+} from '@remix-run/cloudflare'
 import { TRPCClientError } from '@trpc/client'
 
 import {
@@ -10,6 +15,44 @@ import {
   ERROR_CODES,
   HTTP_STATUS_CODES,
 } from '@proofzero/errors'
+import { TraceSpan } from '@proofzero/platform-middleware/trace'
+
+export type RemixRequestFunctionWrapper<
+  T extends LoaderFunction | ActionFunction
+> = (func: T) => T extends LoaderFunction ? LoaderFunction : ActionFunction
+
+/** Returns `LoaderFunction` or `ActionFunction` passed in, with the Rollup's
+ * standard error handling where a thrown error is concisely logged to error console
+ * and is re-thrown as a `JsonError` with the trace context inlcluded
+ */
+//Overloads necessary to get 1-to-1 mapping from arg to return type
+export function getRollupReqFunctionErrorWrapper(
+  reqFunction: LoaderFunction
+): LoaderFunction
+export function getRollupReqFunctionErrorWrapper(
+  reqFunction: ActionFunction
+): ActionFunction
+export function getRollupReqFunctionErrorWrapper(
+  reqFunction: LoaderFunction | ActionFunction
+): LoaderFunction | ActionFunction {
+  return async (args: DataFunctionArgs) => {
+    const { context } = args
+
+    try {
+      const result = await reqFunction(args)
+      return result
+    } catch (e) {
+      const error = getErrorCause(e) as Error
+      const { stack, ...otherProps } = error
+      const traceparent = context.traceSpan
+        ? (context.traceSpan as TraceSpan).getTraceParent()
+        : 'No trace information'
+      const result = { ...otherProps, message: error.message, traceparent }
+      console.error(result)
+      throw JsonError(e, traceparent)
+    }
+  }
+}
 
 export const ROLLUP_ERROR_CLASS_BY_CODE = {
   [ERROR_CODES.INTERNAL_SERVER_ERROR]: RollupError,
@@ -69,7 +112,7 @@ const getErrorFromObject = (error: object): Error => {
   return new Error('unknown error', { cause: error })
 }
 
-export const JsonError = (error: unknown) => {
+export const JsonError = (error: unknown, traceparent: string) => {
   let cause
 
   try {
@@ -84,7 +127,7 @@ export const JsonError = (error: unknown) => {
       500
     )
   }
-  const body = { ...cause, message: cause.message }
+  const body = { ...cause, message: cause.message, traceparent }
   if (cause instanceof RollupError) {
     const status = HTTP_STATUS_CODES[cause.code]
     return json(body, status)

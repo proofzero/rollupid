@@ -20,6 +20,8 @@ import type {
   PaymasterType,
   PaymasterProviderType,
 } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
+import { BadRequestError } from '@proofzero/errors'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 type errorsType = {
   label?: string
@@ -46,41 +48,47 @@ const availablePaymasters: paymasterType[] = [
   },
 ]
 
-export const action: ActionFunction = async ({ request, params, context }) => {
-  if (!params.clientId) {
-    throw new Error('Application Client ID is required for the requested route')
-  }
-  const jwt = await requireJWT(request)
-  let errors: errorsType = {}
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
-
-  const formData = await request.formData()
-
-  //due to specificity of formData inputs
-  const paymaster = formData.get('paymaster[provider]') as PaymasterProviderType
-
-  if (!paymaster) {
-    errors.paymaster = 'Paymaster is required'
-  }
-
-  const secret = formData.get('secret') as string
-  if (!secret) {
-    errors.label = `Provider secret is required`
-  }
-  try {
-    await starbaseClient.setPaymaster.mutate({
-      clientId: params.clientId,
-      paymaster: { provider: paymaster, secret },
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    if (!params.clientId) {
+      throw new BadRequestError({
+        message: 'Application Client ID is required for the requested route',
+      })
+    }
+    const jwt = await requireJWT(request)
+    let errors: errorsType = {}
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...generateTraceContextHeaders(context.traceSpan),
     })
-  } catch (e) {
-    errors.paymaster = `Error updating paymaster's secret`
-  }
 
-  return { errors }
-}
+    const formData = await request.formData()
+
+    //due to specificity of formData inputs
+    const paymaster = formData.get(
+      'paymaster[provider]'
+    ) as PaymasterProviderType
+
+    if (!paymaster) {
+      errors.paymaster = 'Paymaster is required'
+    }
+
+    const secret = formData.get('secret') as string
+    if (!secret) {
+      errors.label = `Provider secret is required`
+    }
+    try {
+      await starbaseClient.setPaymaster.mutate({
+        clientId: params.clientId,
+        paymaster: { provider: paymaster, secret },
+      })
+    } catch (e) {
+      errors.paymaster = `Error updating paymaster's secret`
+    }
+
+    return { errors }
+  }
+)
 
 export default () => {
   const { paymaster, notificationHandler } = useOutletContext<{
@@ -163,9 +171,11 @@ export default () => {
                   Paymaster Provider
                 </Listbox.Label>
                 <div className="relative bottom-0">
-                  <Listbox.Button className="relative w-full cursor-default rounded
+                  <Listbox.Button
+                    className="relative w-full cursor-default rounded
                    bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none sm:text-sm
-                   border-gray-300 border focus:ring-1 focus:border-indigo-500 ring-indigo-500">
+                   border-gray-300 border focus:ring-1 focus:border-indigo-500 ring-indigo-500"
+                  >
                     <div className={`block truncate text-sm text-gray-400`}>
                       {selectedPaymaster?.provider ? (
                         <div className="flex flex-row w-full items-center">
@@ -195,16 +205,19 @@ export default () => {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                   >
-                    <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-sm
-                     ring-1 ring-black ring-opacity-5  sm:text-sm">
+                    <Listbox.Options
+                      className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-sm
+                     ring-1 ring-black ring-opacity-5  sm:text-sm"
+                    >
                       {availablePaymasters.map((paymaster, personIdx) => (
                         <Listbox.Option
                           key={personIdx}
                           className={({ active }) =>
                             `relative cursor-default select-none py-2 px-3
-                            ${active
-                              ? 'bg-gray-50 text-indigo-900'
-                              : 'text-gray-900'
+                            ${
+                              active
+                                ? 'bg-gray-50 text-indigo-900'
+                                : 'text-gray-900'
                             } }`
                           }
                           value={paymaster}
@@ -218,8 +231,9 @@ export default () => {
                                   className="w-6 h-6 mr-3"
                                 />
                                 <span
-                                  className={`truncate text-sm ${selected ? 'font-medium' : 'font-normal'
-                                    }`}
+                                  className={`truncate text-sm ${
+                                    selected ? 'font-medium' : 'font-normal'
+                                  }`}
                                 >
                                   {paymaster.name}
                                 </span>

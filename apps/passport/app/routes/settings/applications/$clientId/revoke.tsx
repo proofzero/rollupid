@@ -6,50 +6,53 @@ import { getAccessClient } from '~/platform.server'
 
 import { getFlashSession, commitFlashSession } from '~/session.server'
 import { BadRequestError } from '@proofzero/errors'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const action: ActionFunction = async ({ request, params, context }) => {
-  const session = await getFlashSession(request, context.env)
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    const session = await getFlashSession(request, context.env)
 
-  const { jwt } = await getValidatedSessionContext(
-    request,
-    context.authzQueryParams,
-    context.env,
-    context.traceSpan
-  )
-
-  const { clientId } = params
-
-  if (!clientId) {
-    throw new BadRequestError({ message: 'Client ID is required for query' })
-  }
-
-  try {
-    const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
-
-    await accessClient.revokeAppAuthorization.mutate({ clientId })
-
-    session.flash(
-      'tooltipMessage',
-      JSON.stringify({
-        type: 'success',
-        message: 'Access Removed',
-      })
+    const { jwt } = await getValidatedSessionContext(
+      request,
+      context.authzQueryParams,
+      context.env,
+      context.traceSpan
     )
-  } catch (ex) {
-    console.error(ex)
 
-    session.flash(
-      'tooltipMessage',
-      JSON.stringify({
-        type: 'error',
-        message: 'Error Removing Access',
-      })
-    )
+    const { clientId } = params
+
+    if (!clientId) {
+      throw new BadRequestError({ message: 'Client ID is required for query' })
+    }
+
+    try {
+      const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
+
+      await accessClient.revokeAppAuthorization.mutate({ clientId })
+
+      session.flash(
+        'tooltipMessage',
+        JSON.stringify({
+          type: 'success',
+          message: 'Access Removed',
+        })
+      )
+    } catch (ex) {
+      console.error(ex)
+
+      session.flash(
+        'tooltipMessage',
+        JSON.stringify({
+          type: 'error',
+          message: 'Error Removing Access',
+        })
+      )
+    }
+
+    return redirect('/settings/applications', {
+      headers: {
+        'Set-Cookie': await commitFlashSession(context.env, session),
+      },
+    })
   }
-
-  return redirect('/settings/applications', {
-    headers: {
-      'Set-Cookie': await commitFlashSession(context.env, session),
-    },
-  })
-}
+)

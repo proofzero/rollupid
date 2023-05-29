@@ -6,18 +6,25 @@ import {
 } from '~/session.server'
 
 import type { LoaderFunction } from '@remix-run/cloudflare'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const loader: LoaderFunction = async ({ request, context }) => {
-  const passportDefaultAuthzParams = getDefaultAuthzParams(request)
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    const passportDefaultAuthzParams = getDefaultAuthzParams(request)
 
-  const { jwt } = await getValidatedSessionContext(
-    request,
-    passportDefaultAuthzParams,
-    context.env,
-    context.traceSpan
-  )
-  const starbaseClient = getStarbaseClient(jwt, context.env, context.traceSpan)
+    const { jwt } = await getValidatedSessionContext(
+      request,
+      passportDefaultAuthzParams,
+      context.env,
+      context.traceSpan
+    )
+    const starbaseClient = getStarbaseClient(
+      jwt,
+      context.env,
+      context.traceSpan
+    )
 
-  const ownedApps = await starbaseClient.listApps.query()
-  return json({ ownedApps })
-}
+    const ownedApps = await starbaseClient.listApps.query()
+    return json({ ownedApps })
+  }
+)

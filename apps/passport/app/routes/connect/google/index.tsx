@@ -7,25 +7,25 @@ import {
   injectAuthnParamsIntoSession,
 } from '~/auth.server'
 import { Authenticator } from 'remix-auth'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const action: ActionFunction = async ({
-  request,
-  context,
-}: ActionArgs) => {
-  const authnParams = new URL(request.url).searchParams
-  const authenticatorInputs = await injectAuthnParamsIntoSession(
-    authnParams.toString(),
-    request,
-    context.env
-  )
-  const rollup_action = authnParams.get('rollup_action')
-  const prompt =
-    rollup_action && rollup_action === 'reconnect' ? 'consent' : undefined
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }: ActionArgs) => {
+    const authnParams = new URL(request.url).searchParams
+    const authenticatorInputs = await injectAuthnParamsIntoSession(
+      authnParams.toString(),
+      request,
+      context.env
+    )
+    const rollup_action = authnParams.get('rollup_action')
+    const prompt =
+      rollup_action && rollup_action === 'reconnect' ? 'consent' : undefined
 
-  const authenticator = new Authenticator(authenticatorInputs.sessionStorage)
-  authenticator.use(getGoogleAuthenticator(context.env, prompt))
-  return authenticator.authenticate(
-    GoogleStrategyDefaultName,
-    authenticatorInputs.newRequest
-  )
-}
+    const authenticator = new Authenticator(authenticatorInputs.sessionStorage)
+    authenticator.use(getGoogleAuthenticator(context.env, prompt))
+    return authenticator.authenticate(
+      GoogleStrategyDefaultName,
+      authenticatorInputs.newRequest
+    )
+  }
+)

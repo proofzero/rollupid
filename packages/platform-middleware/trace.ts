@@ -34,6 +34,10 @@ export class TraceSpan {
       duration: this.currendDuration,
     })
   }
+
+  getTraceParent() {
+    return getTraceParentForSpan(this)
+  }
 }
 
 /** Generates a span from parsing the `traceparent` trace context header, if available

@@ -21,7 +21,7 @@ import trashIcon from '@proofzero/design-system/src/assets/trash.svg'
 import reloadIcon from '@proofzero/design-system/src/assets/reload.svg'
 
 import { BadRequestError } from '@proofzero/errors'
-import { JsonError } from '@proofzero/utils/errors'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -36,67 +36,64 @@ import dangerVector from '~/images/danger.svg'
 
 type AppData = { customDomain?: CustomDomain; hostname: string }
 
-export const loader: LoaderFunction = async ({ request, params, context }) => {
-  const { clientId } = params
-  if (!clientId)
-    throw JsonError(new BadRequestError({ message: 'Missing Client ID' }))
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    const { clientId } = params
+    if (!clientId) throw new BadRequestError({ message: 'Missing Client ID' })
 
-  const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
+    const jwt = await requireJWT(request)
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...generateTraceContextHeaders(context.traceSpan),
+    })
 
-  try {
     const customDomain = await starbaseClient.getCustomDomain.query({
       clientId,
     })
     const { hostname } = new URL(PASSPORT_URL)
     return json({ customDomain, hostname })
-  } catch (error) {
-    throw JsonError(error)
   }
-}
+)
 
-export const action: ActionFunction = async ({ request, params, context }) => {
-  const { clientId } = params
-  if (!clientId)
-    throw JsonError(new BadRequestError({ message: 'Missing Client ID' }))
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    const { clientId } = params
+    if (!clientId) throw new BadRequestError({ message: 'Missing Client ID' })
 
-  const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
-
-  const { hostname } = new URL(PASSPORT_URL)
-
-  if (request.method === 'PUT') {
-    const formData = await request.formData()
-
-    const hostname = formData.get('hostname')
-    if (typeof hostname !== 'string')
-      throw JsonError(new BadRequestError({ message: 'Invalid Hostname' }))
-    if (!hostname)
-      throw JsonError(new BadRequestError({ message: 'Missing Hostname' }))
-
-    const customDomain = await starbaseClient.createCustomDomain.mutate({
-      clientId,
-      hostname,
+    const jwt = await requireJWT(request)
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    return json({ customDomain, hostname })
-  } else if (request.method === 'POST') {
-    const customDomain = await starbaseClient.getCustomDomain.query({
-      clientId,
-      refresh: true,
-    })
-    return json({ customDomain, hostname })
-  } else if (request.method === 'DELETE') {
-    await starbaseClient.deleteCustomDomain.mutate({ clientId })
-    return json({ customDomain: null, hostname })
+    const { hostname } = new URL(PASSPORT_URL)
+
+    if (request.method === 'PUT') {
+      const formData = await request.formData()
+
+      const hostname = formData.get('hostname')
+      if (typeof hostname !== 'string')
+        throw new BadRequestError({ message: 'Invalid Hostname' })
+      if (!hostname) throw new BadRequestError({ message: 'Missing Hostname' })
+
+      const customDomain = await starbaseClient.createCustomDomain.mutate({
+        clientId,
+        hostname,
+      })
+
+      return json({ customDomain, hostname })
+    } else if (request.method === 'POST') {
+      const customDomain = await starbaseClient.getCustomDomain.query({
+        clientId,
+        refresh: true,
+      })
+      return json({ customDomain, hostname })
+    } else if (request.method === 'DELETE') {
+      await starbaseClient.deleteCustomDomain.mutate({ clientId })
+      return json({ customDomain: null, hostname })
+    }
   }
-}
+)
 
 export default () => {
   const fetcher = useFetcher()

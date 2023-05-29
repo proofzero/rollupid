@@ -33,6 +33,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       ...nftsForAccount,
     })
   } catch (error) {
-    throw JsonError(error)
+    throw JsonError(error, context.traceSpan.getTraceParent())
   }
 }

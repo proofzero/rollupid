@@ -54,40 +54,36 @@ export const authenticateAddress = async (
     return redirect(redirectURL)
   }
 
-  try {
-    const accessClient = getAccessClient(env, traceSpan)
-    const clientId = AddressURNSpace.decode(address)
-    const redirectUri = env.PASSPORT_REDIRECT_URL
-    const scope = ['admin']
-    const state = ''
-    const { code } = await accessClient.authorize.mutate({
-      account,
-      responseType: ResponseType.Code,
-      clientId,
-      redirectUri,
-      scope,
-      state,
-    })
+  const accessClient = getAccessClient(env, traceSpan)
+  const clientId = AddressURNSpace.decode(address)
+  const redirectUri = env.PASSPORT_REDIRECT_URL
+  const scope = ['admin']
+  const state = ''
+  const { code } = await accessClient.authorize.mutate({
+    account,
+    responseType: ResponseType.Code,
+    clientId,
+    redirectUri,
+    scope,
+    state,
+  })
 
-    const grantType = GrantType.AuthenticationCode
-    const { accessToken } = await accessClient.exchangeToken.mutate({
-      grantType,
-      code,
-      clientId,
-      issuer: new URL(request.url).origin,
-    })
+  const grantType = GrantType.AuthenticationCode
+  const { accessToken } = await accessClient.exchangeToken.mutate({
+    grantType,
+    code,
+    clientId,
+    issuer: new URL(request.url).origin,
+  })
 
-    await provisionProfile(accessToken, env, traceSpan, address)
+  await provisionProfile(accessToken, env, traceSpan, address)
 
-    return createUserSession(
-      accessToken,
-      getAuthzRedirectURL(appData),
-      env,
-      appData?.clientId
-    )
-  } catch (error) {
-    throw JsonError(error)
-  }
+  return createUserSession(
+    accessToken,
+    getAuthzRedirectURL(appData),
+    env,
+    appData?.clientId
+  )
 }
 
 export const getAuthzRedirectURL = (

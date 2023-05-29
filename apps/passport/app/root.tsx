@@ -53,6 +53,7 @@ import * as gtag from '~/utils/gtags.client'
 
 import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -74,50 +75,54 @@ export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: globalStyles },
 ]
 
-export const loader: LoaderFunction = async ({ request, context, params }) => {
-  const url = new URL(request.url)
-  /**
-   * We use the same technique in profile for `$type/$address` route.
-   * This redirect here prevents us from calling this loader multiple times.
-   * In this case it's essential since flashSessions gets wiped out without
-   * displaying toast messages.
-   */
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context, params }) => {
+    const url = new URL(request.url)
+    /**
+     * We use the same technique in profile for `$type/$address` route.
+     * This redirect here prevents us from calling this loader multiple times.
+     * In this case it's essential since flashSessions gets wiped out without
+     * displaying toast messages.
+     */
 
-  if (url.pathname === `/`) {
-    return redirect(`/authenticate`)
-  }
-
-  const flashes = []
-  const flashSession = await getFlashSession(request, context.env)
-  const flashMessageType = flashSession.get(FLASH_MESSAGE_KEY) as FLASH_MESSAGE
-  if (flashMessageType) {
-    flashes.push({
-      type: ToastType.Info,
-      message: FLASH_MESSAGE_VALUES[flashMessageType],
-    })
-  }
-
-  return json(
-    {
-      flashes,
-      ENV: {
-        PROFILE_APP_URL: context.env.PROFILE_APP_URL,
-        INTERNAL_GOOGLE_ANALYTICS_TAG:
-          context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
-        APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
-        REMIX_DEV_SERVER_WS_PORT:
-          process.env.NODE_ENV === 'development'
-            ? process.env.REMIX_DEV_SERVER_WS_PORT
-            : undefined,
-      },
-    },
-    {
-      headers: {
-        'Set-Cookie': await commitFlashSession(context.env, flashSession),
-      },
+    if (url.pathname === `/`) {
+      return redirect(`/authenticate`)
     }
-  )
-}
+
+    const flashes = []
+    const flashSession = await getFlashSession(request, context.env)
+    const flashMessageType = flashSession.get(
+      FLASH_MESSAGE_KEY
+    ) as FLASH_MESSAGE
+    if (flashMessageType) {
+      flashes.push({
+        type: ToastType.Info,
+        message: FLASH_MESSAGE_VALUES[flashMessageType],
+      })
+    }
+
+    return json(
+      {
+        flashes,
+        ENV: {
+          PROFILE_APP_URL: context.env.PROFILE_APP_URL,
+          INTERNAL_GOOGLE_ANALYTICS_TAG:
+            context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
+          APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
+          REMIX_DEV_SERVER_WS_PORT:
+            process.env.NODE_ENV === 'development'
+              ? process.env.REMIX_DEV_SERVER_WS_PORT
+              : undefined,
+        },
+      },
+      {
+        headers: {
+          'Set-Cookie': await commitFlashSession(context.env, flashSession),
+        },
+      }
+    )
+  }
+)
 
 export default function App() {
   const nonce = useContext(NonceContext)
@@ -282,6 +287,7 @@ export function CatchBoundary() {
             {secondary}
             {caught.data?.message && `: ${caught.data?.message}`}
           </p>
+          <p>({caught.data?.traceparent && `${caught.data?.traceparent}`})</p>
           {caught.data?.isAuthenticated && (
             <RollupIdButton
               text={'Continue to Rollup'}

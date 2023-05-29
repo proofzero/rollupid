@@ -16,28 +16,35 @@ import { Form, useOutletContext } from '@remix-run/react'
 
 import type { LoaderData as OutletContextData } from '~/root'
 import type { ActionFunction } from '@remix-run/cloudflare'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 
-export const action: ActionFunction = async ({ request, context }) => {
-  const formData = await request.formData()
-  const clientName = formData.get('client_name') as string
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    const formData = await request.formData()
+    const clientName = formData.get('client_name') as string
 
-  if (!clientName) throw 'App name is required'
+    if (!clientName)
+      throw new BadRequestError({ message: 'App name is required' })
 
-  const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request)
 
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(context.traceSpan),
-  })
-  try {
-    const { clientId } = await starbaseClient.createApp.mutate({ clientName })
-    console.log({ clientId })
-    return redirect(`/apps/${clientId}`)
-  } catch (error) {
-    console.error({ error })
-    return json({ error }, { status: 500 })
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...generateTraceContextHeaders(context.traceSpan),
+    })
+    try {
+      const { clientId } = await starbaseClient.createApp.mutate({ clientName })
+      console.log({ clientId })
+      return redirect(`/apps/${clientId}`)
+    } catch (error) {
+      console.error({ error })
+      return new InternalServerError({
+        message: 'Could not create the application',
+      })
+    }
   }
-}
+)
 
 export default function CreateNewApp() {
   const [isSubmitting, setIsSubmitting] = useState(false)
