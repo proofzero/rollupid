@@ -1,8 +1,7 @@
 import { getAccountClient, getAddressClient } from '~/platform.server'
 import {
   getNormalisedConnectedEmails,
-  getNormalisedSmartContractWallets,
-  modifyType,
+  getNormalisedAddressProfiles,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
@@ -17,7 +16,7 @@ import {
 import type { AccountURN } from '@proofzero/urns/account'
 import type { PersonaData } from '@proofzero/types/application'
 import { redirect } from '@remix-run/cloudflare'
-import { CryptoAddressType } from '@proofzero/types/address'
+import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 
 export type DataForScopes = {
@@ -76,23 +75,22 @@ export const getDataForScopes = async (
       connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!)) {
-      connectedAddresses = (await Promise.all(
+      const addresses = (await Promise.all(
         connectedAccounts
           .filter((ca) => {
-            return ca.rc.addr_type !== CryptoAddressType.Wallet
+            return (ca.rc.node_type === NodeType.OAuth ||
+              ca.rc.node_type === NodeType.Crypto) &&
+              ca.rc.addr_type !== CryptoAddressType.Wallet
           })
           .map((ca) => {
             const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
             return addressClient.getAddressProfile.query()
           })
-      )).map(address => ({
-        title: address.title,
-        subtitle: `${modifyType(address.type as string)} - ${address.address}`,
-        value: address.id,
-      }))
+      ))
+      connectedAddresses = getNormalisedAddressProfiles(addresses)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!)) {
-      const scWalletAddresses = await Promise.all(
+      const addresses = await Promise.all(
         connectedAccounts
           .filter((ca) => {
             return ca.rc.addr_type === CryptoAddressType.Wallet
@@ -102,9 +100,7 @@ export const getDataForScopes = async (
             return addressClient.getAddressProfile.query()
           })
       )
-
-      connectedSmartContractWallets =
-        getNormalisedSmartContractWallets(scWalletAddresses)
+      connectedSmartContractWallets = getNormalisedAddressProfiles(addresses)
     }
   }
 
