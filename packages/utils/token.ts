@@ -21,7 +21,7 @@ export const verifyToken: VerifyTokenFunction = async (
   jwksInternalUrlBase: string
 ) => {
   try {
-    let cache = caches.default
+    const cache = caches.default
     const jwtHeader = jose.decodeProtectedHeader(token)
     const jwtPayload = jose.decodeJwt(token)
     if (!jwtPayload.iss || !jwtHeader.kid) throw InvalidTokenError
