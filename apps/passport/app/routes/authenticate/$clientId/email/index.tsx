@@ -6,12 +6,14 @@ import { redirect } from '@remix-run/cloudflare'
 import { Form, useNavigate, useOutletContext } from '@remix-run/react'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
+import { BadRequestError } from '@proofzero/errors'
 
 export const action: ActionFunction = async ({ request, params }) => {
   const fd = await request.formData()
 
   const email = fd.get('email')
-  if (!email) throw new Error('No address included in request')
+  if (!email)
+    throw new BadRequestError({ message: 'No address included in request' })
 
   const qp = new URLSearchParams()
   qp.append('email', email as string)

@@ -44,6 +44,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       ownedNfts: nftsForAccount,
     })
   } catch (error) {
-    throw JsonError(error)
+    throw JsonError(error, context.traceSpan.getTraceParent())
   }
 }

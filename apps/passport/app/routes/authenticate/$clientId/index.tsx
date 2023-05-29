@@ -23,6 +23,7 @@ import Authentication, {
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
 import { Button } from '@proofzero/packages/design-system/src/atoms/buttons/Button'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 const client = createClient(
   // @ts-ignore
@@ -35,46 +36,50 @@ const client = createClient(
   })
 )
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-  const url = new URL(request.url)
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params }) => {
+    const url = new URL(request.url)
 
-  let displayKeys = AuthenticationScreenDefaults.knownKeys
+    let displayKeys = AuthenticationScreenDefaults.knownKeys
 
-  let loginHint = url.searchParams.get('login_hint')
+    let loginHint = url.searchParams.get('login_hint')
 
-  if (loginHint) {
-    const hints = loginHint
-      .split(' ')
-      .filter((val, i, arr) => arr.indexOf(val) === i)
+    if (loginHint) {
+      const hints = loginHint
+        .split(' ')
+        .filter((val, i, arr) => arr.indexOf(val) === i)
 
-    displayKeys = hints
+      displayKeys = hints
+    }
+
+    return json({
+      clientId: params.clientId,
+      displayKeys,
+      authnQueryParams: new URL(request.url).searchParams.toString(),
+    })
   }
+)
 
-  return json({
-    clientId: params.clientId,
-    displayKeys,
-    authnQueryParams: new URL(request.url).searchParams.toString(),
-  })
-}
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context, params }) => {
+    const authzCookieParams = await getAuthzCookieParams(
+      request,
+      context.env,
+      params.clientId
+    )
 
-export const action: ActionFunction = async ({ request, context, params }) => {
-  const authzCookieParams = await getAuthzCookieParams(
-    request,
-    context.env,
-    params.clientId
-  )
+    const { redirectUri, state, scope, clientId, prompt } = authzCookieParams
 
-  const { redirectUri, state, scope, clientId, prompt } = authzCookieParams
+    const qp = new URLSearchParams()
+    qp.append('client_id', clientId)
+    qp.append('redirect_uri', redirectUri)
+    qp.append('state', state)
+    qp.append('scope', scope.join(' '))
+    if (prompt) qp.append('prompt', prompt)
 
-  const qp = new URLSearchParams()
-  qp.append('client_id', clientId)
-  qp.append('redirect_uri', redirectUri)
-  qp.append('state', state)
-  qp.append('scope', scope.join(' '))
-  if (prompt) qp.append('prompt', prompt)
-
-  return redirect(`/authorize?${qp.toString()}`)
-}
+    return redirect(`/authorize?${qp.toString()}`)
+  }
+)
 
 export default () => {
   const { appProps, rollup_action } = useOutletContext<{

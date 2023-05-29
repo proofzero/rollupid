@@ -70,7 +70,11 @@ const handleEvent = async (event: FetchEvent) => {
       response = await requestHandler(newEvent)
     } finally {
       console.debug(
-        `Completed HTTP handler for ${reqURL.pathname}/${reqURL.searchParams}`,
+        `Completed HTTP handler ${
+          response?.status && response?.status >= 400 && response?.status <= 599
+            ? 'with errors '
+            : ''
+        }for ${reqURL.pathname}/${reqURL.searchParams}`,
         newTraceSpan.toString()
       )
     }

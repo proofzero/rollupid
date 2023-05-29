@@ -18,6 +18,7 @@ import {
   parseJwt,
 } from '~/session.server'
 import AccountSelect from '@proofzero/design-system/src/templates/authentication/AccountSelect'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 function redirectToAuthentication(
   request: Request,
@@ -31,18 +32,20 @@ function redirectToAuthentication(
   )
 }
 
-export const loader: LoaderFunction = async ({ request, context, params }) => {
-  const jwt = await getUserSession(request, context.env, params.clientId)
-  if (!jwt) return redirectToAuthentication(request, params.clientId)
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context, params }) => {
+    const jwt = await getUserSession(request, context.env, params.clientId)
+    if (!jwt) return redirectToAuthentication(request, params.clientId)
 
-  const account = parseJwt(jwt).sub as AccountURN
-  const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-  const profile = await accountClient.getProfile.query({ account })
-  if (!profile) return redirectToAuthentication(request, params.clientId)
-  return json({
-    profile,
-  })
-}
+    const account = parseJwt(jwt).sub as AccountURN
+    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
+    const profile = await accountClient.getProfile.query({ account })
+    if (!profile) return redirectToAuthentication(request, params.clientId)
+    return json({
+      profile,
+    })
+  }
+)
 
 export const action: ActionFunction = async ({ request, context, params }) => {
   const authzCookieParams = await getAuthzCookieParams(

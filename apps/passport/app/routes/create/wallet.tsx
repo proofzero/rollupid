@@ -10,50 +10,55 @@ import {
 
 import { SmartContractWalletCreationSummary } from '@proofzero/design-system/src/molecules/smart-contract-wallet-connection/SmartContractWalletConnection'
 import { Text } from '@proofzero/design-system'
-import { TosAndPPol } from "@proofzero/design-system/src/atoms/info/TosAndPPol"
+import { TosAndPPol } from '@proofzero/design-system/src/atoms/info/TosAndPPol'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const action: ActionFunction = async ({ request, context, params }) => {
-  const authzCookieParams = await getAuthzCookieParams(request, context.env)
-  const { jwt, accountUrn } = await getValidatedSessionContext(
-    request,
-    authzCookieParams,
-    context.env,
-    context.traceSpan
-  )
-  const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-  const profile = await accountClient.getProfile.query({ account: accountUrn })
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context, params }) => {
+    const authzCookieParams = await getAuthzCookieParams(request, context.env)
+    const { jwt, accountUrn } = await getValidatedSessionContext(
+      request,
+      authzCookieParams,
+      context.env,
+      context.traceSpan
+    )
+    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
+    const profile = await accountClient.getProfile.query({
+      account: accountUrn,
+    })
 
-  const addressClient = getAddressClient(
-    profile?.primaryAddressURN!,
-    context.env,
-    context.traceSpan
-  )
+    const addressClient = getAddressClient(
+      profile?.primaryAddressURN!,
+      context.env,
+      context.traceSpan
+    )
 
-  const formData = await request.formData()
-  const nickname = formData.get('nickname') as string
+    const formData = await request.formData()
+    const nickname = formData.get('nickname') as string
 
-  await addressClient.initSmartContractWallet.query({
-    nickname,
-  })
+    await addressClient.initSmartContractWallet.query({
+      nickname,
+    })
 
-  const { redirectUri, state, scope, clientId, prompt, login_hint } =
-    authzCookieParams
+    const { redirectUri, state, scope, clientId, prompt, login_hint } =
+      authzCookieParams
 
-  const qp = new URLSearchParams()
-  qp.append('client_id', clientId)
-  qp.append('redirect_uri', redirectUri)
-  qp.append('state', state)
-  qp.append('scope', scope.join(' '))
-  if (prompt) qp.append('prompt', prompt)
-  if (login_hint) qp.append('login_hint', login_hint)
+    const qp = new URLSearchParams()
+    qp.append('client_id', clientId)
+    qp.append('redirect_uri', redirectUri)
+    qp.append('state', state)
+    qp.append('scope', scope.join(' '))
+    if (prompt) qp.append('prompt', prompt)
+    if (login_hint) qp.append('login_hint', login_hint)
 
-  return redirect(`/authorize?${qp.toString()}`)
-}
+    return redirect(`/authorize?${qp.toString()}`)
+  }
+)
 
 export default () => {
   const submit = useSubmit()

@@ -18,51 +18,63 @@ import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { useEffect, useState } from 'react'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { ERROR_CODES, HTTP_STATUS_CODES } from '@proofzero/errors'
+import {
+  BadRequestError,
+  ERROR_CODES,
+  HTTP_STATUS_CODES,
+} from '@proofzero/errors'
 import { Button, Text } from '@proofzero/design-system'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const loader: LoaderFunction = async ({ request, context, params }) => {
-  const qp = new URL(request.url).searchParams
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context, params }) => {
+    const qp = new URL(request.url).searchParams
 
-  const email = qp.get('email')
-  if (!email) throw new Error('No address included in request')
+    const email = qp.get('email')
+    if (!email)
+      throw new BadRequestError({ message: 'No address included in request' })
 
-  return json({
-    email,
-    clientId: params.clientId,
-  })
-}
-
-export const action: ActionFunction = async ({ request, context, params }) => {
-  const actionRes = await otpAction({ request, context, params })
-  const { addressURN, successfulVerification } = await actionRes.json()
-
-  if (successfulVerification) {
-    const appData = await getAuthzCookieParams(request, context.env)
-    const addressClient = getAddressClient(
-      addressURN,
-      context.env,
-      context.traceSpan
-    )
-
-    const { accountURN, existing } = await addressClient.resolveAccount.query({
-      jwt: await getUserSession(request, context.env, appData?.clientId),
-      force: !appData || appData.rollup_action !== 'connect',
+    return json({
+      email,
+      clientId: params.clientId,
     })
-
-    return authenticateAddress(
-      addressURN,
-      accountURN,
-      appData,
-      request,
-      context.env,
-      context.traceSpan,
-      existing
-    )
   }
+)
 
-  return json({ error: true })
-}
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context, params }) => {
+    const actionRes = await otpAction({ request, context, params })
+    const { addressURN, successfulVerification } = await actionRes.json()
+
+    if (successfulVerification) {
+      const appData = await getAuthzCookieParams(request, context.env)
+      const addressClient = getAddressClient(
+        addressURN,
+        context.env,
+        context.traceSpan
+      )
+
+      const { accountURN, existing } = await addressClient.resolveAccount.query(
+        {
+          jwt: await getUserSession(request, context.env, appData?.clientId),
+          force: !appData || appData.rollup_action !== 'connect',
+        }
+      )
+
+      return authenticateAddress(
+        addressURN,
+        accountURN,
+        appData,
+        request,
+        context.env,
+        context.traceSpan,
+        existing
+      )
+    }
+
+    return json({ error: true })
+  }
+)
 
 export default () => {
   const { prompt } = useOutletContext<{

@@ -49,6 +49,7 @@ import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-
 import { InternalServerError } from '@proofzero/errors'
 
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 export const links: LinksFunction = () => {
   return [
@@ -84,62 +85,64 @@ export type LoaderData = {
   }
 }
 
-export const loader: LoaderFunction = async ({ request, context }) => {
-  const jwt = await requireJWT(request)
-  const traceHeader = generateTraceContextHeaders(context.traceSpan)
-  const parsedJwt = parseJwt(jwt)
-  const accountURN = parsedJwt.sub as AccountURN
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    const jwt = await requireJWT(request)
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+    const parsedJwt = parseJwt(jwt)
+    const accountURN = parsedJwt.sub as AccountURN
 
-  try {
-    const accountClient = createAccountClient(Account, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-    const starbaseClient = createStarbaseClient(Starbase, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-    const apps = await starbaseClient.listApps.query()
-    const reshapedApps = apps.map((a) => {
-      return {
-        clientId: a.clientId,
-        name: a.app?.name,
-        icon: a.app?.icon,
-        published: a.published,
-        createdTimestamp: a.createdTimestamp,
-      }
-    })
-
-    let avatarUrl = ''
-    let displayName = ''
     try {
-      const profile = await accountClient.getProfile.query({
-        account: accountURN,
+      const accountClient = createAccountClient(Account, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...traceHeader,
       })
-      avatarUrl = profile?.pfp?.image || ''
-      displayName = profile?.displayName || ''
-    } catch (e) {
-      console.error('Could not retrieve profile image.', e)
-    }
+      const starbaseClient = createStarbaseClient(Starbase, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...traceHeader,
+      })
+      const apps = await starbaseClient.listApps.query()
+      const reshapedApps = apps.map((a) => {
+        return {
+          clientId: a.clientId,
+          name: a.app?.name,
+          icon: a.app?.icon,
+          published: a.published,
+          createdTimestamp: a.createdTimestamp,
+        }
+      })
 
-    return json<LoaderData>({
-      apps: reshapedApps,
-      avatarUrl,
-      PASSPORT_URL,
-      ENV: {
-        INTERNAL_GOOGLE_ANALYTICS_TAG,
-        REMIX_DEV_SERVER_WS_PORT:
-          process.env.NODE_ENV === 'development'
-            ? +process.env.REMIX_DEV_SERVER_WS_PORT!
-            : undefined,
-      },
-      displayName,
-    })
-  } catch (error) {
-    console.error({ error })
-    return json({ error }, { status: 500 })
+      let avatarUrl = ''
+      let displayName = ''
+      try {
+        const profile = await accountClient.getProfile.query({
+          account: accountURN,
+        })
+        avatarUrl = profile?.pfp?.image || ''
+        displayName = profile?.displayName || ''
+      } catch (e) {
+        console.error('Could not retrieve profile image.', e)
+      }
+
+      return json<LoaderData>({
+        apps: reshapedApps,
+        avatarUrl,
+        PASSPORT_URL,
+        ENV: {
+          INTERNAL_GOOGLE_ANALYTICS_TAG,
+          REMIX_DEV_SERVER_WS_PORT:
+            process.env.NODE_ENV === 'development'
+              ? +process.env.REMIX_DEV_SERVER_WS_PORT!
+              : undefined,
+        },
+        displayName,
+      })
+    } catch (error) {
+      console.error({ error })
+      return json({ error }, { status: 500 })
+    }
   }
-}
+)
 
 export default function App() {
   const nonce = useContext(NonceContext)

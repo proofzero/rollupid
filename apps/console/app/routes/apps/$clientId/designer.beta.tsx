@@ -60,6 +60,7 @@ import {
 import subtractLogo from '@proofzero/design-system/src/assets/subtract-logo.svg'
 import { BadRequestError } from '@proofzero/errors'
 import { GetEmailOTPThemeResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getEmailOTPTheme'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 const client = createClient(
   // @ts-ignore
@@ -172,7 +173,7 @@ const RadiusButton = ({
       label = 'Medium'
       break
     default:
-      throw new Error('Invalid radius')
+      throw new BadRequestError({ message: 'Invalid radius' })
   }
 
   const selected = selectedRadius === radius
@@ -946,160 +947,168 @@ const EmailPanel = ({
   )
 }
 
-export const loader: LoaderFunction = async ({ request, params, context }) => {
-  if (!params.clientId) {
-    throw new Error('Client ID is required for the requested route')
-  }
-
-  const jwt = await requireJWT(request)
-  const traceHeader = generateTraceContextHeaders(context.traceSpan)
-  const clientId = params?.clientId
-
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...traceHeader,
-  })
-
-  const appTheme = await starbaseClient.getAppTheme.query({
-    clientId,
-  })
-
-  const emailTheme = await starbaseClient.getEmailOTPTheme.query({
-    clientId,
-  })
-
-  return json({
-    appTheme,
-    emailTheme,
-  })
-}
-
-export const action: ActionFunction = async ({ request, params, context }) => {
-  if (!params.clientId) {
-    throw new Error('Client ID is required for the requested route')
-  }
-
-  const jwt = await requireJWT(request)
-  const traceHeader = generateTraceContextHeaders(context.traceSpan)
-  const clientId = params?.clientId
-
-  const starbaseClient = createStarbaseClient(Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...traceHeader,
-  })
-
-  let errors: {
-    [key: string]: string
-  } = {}
-
-  let theme = await starbaseClient.getAppTheme.query({
-    clientId,
-  })
-
-  let emailTheme = await starbaseClient.getEmailOTPTheme.query({
-    clientId,
-  })
-
-  const updateAuth = async (fd: FormData, theme: AppTheme) => {
-    const heading = fd.get('heading') as string | undefined
-    const radius = fd.get('radius') as string | undefined
-    const color = fd.get('color') as string | undefined
-    const colorDark = fd.get('colordark') as string | undefined
-    const graphicURL = fd.get('image') as string | undefined
-
-    const providersJSON = fd.get('providers') as string | undefined
-    const providers = providersJSON ? JSON.parse(providersJSON) : undefined
-
-    theme = {
-      ...theme,
-      heading: heading ?? theme.heading,
-      radius: radius ?? theme.radius,
-      color:
-        color && colorDark
-          ? {
-              light: color,
-              dark: colorDark,
-            }
-          : theme.color,
-      graphicURL: graphicURL ?? theme.graphicURL,
-      providers: providers ?? theme.providers,
-    }
-
-    const zodErrors = await AppThemeSchema.spa(theme)
-    if (!zodErrors.success) {
-      const mappedIssues = zodErrors.error.issues.map((issue) => ({
-        path: issue.path.join('.'),
-        message: issue.message,
-      }))
-
-      errors = mappedIssues.reduce((acc, curr) => {
-        acc[curr.path] = curr.message
-        return acc
-      }, {} as { [key: string]: string })
-    } else {
-      await starbaseClient.setAppTheme.mutate({
-        clientId,
-        theme,
-      })
-    }
-
-    return json({
-      errors,
-    })
-  }
-
-  const updateEmail = async (fd: FormData, theme: EmailOTPTheme) => {
-    let logoURL = fd.get('logoURL') as string | undefined
-    if (!logoURL || logoURL === '') logoURL = undefined
-
-    let address = fd.get('address') as string | undefined
-    if (!address || address === '') address = undefined
-
-    let contact = fd.get('contact') as string | undefined
-    if (!contact || contact === '') contact = undefined
-
-    theme = {
-      ...theme,
-      logoURL: logoURL ?? theme?.logoURL,
-      address: address ?? theme?.address,
-      contact: contact ?? theme?.contact,
-    }
-
-    const zodErrors = await EmailOTPThemeSchema.spa(theme)
-    if (!zodErrors.success) {
-      const mappedIssues = zodErrors.error.issues.map((issue) => ({
-        path: `email.${issue.path.join('.')}`,
-        message: issue.message,
-      }))
-
-      errors = mappedIssues.reduce((acc, curr) => {
-        acc[curr.path] = curr.message
-        return acc
-      }, {} as { [key: string]: string })
-    } else {
-      await starbaseClient.setEmailOTPTheme.mutate({
-        clientId,
-        theme,
-      })
-    }
-
-    return json({
-      errors,
-    })
-  }
-
-  const fd = await request.formData()
-  switch (fd.get('target')) {
-    case 'auth':
-      return updateAuth(fd, theme)
-    case 'email':
-      return updateEmail(fd, emailTheme)
-    default:
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    if (!params.clientId) {
       throw new BadRequestError({
-        message: 'Invalid target',
+        message: 'Client ID is required for the requested route',
       })
+    }
+
+    const jwt = await requireJWT(request)
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+    const clientId = params?.clientId
+
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
+    const appTheme = await starbaseClient.getAppTheme.query({
+      clientId,
+    })
+
+    const emailTheme = await starbaseClient.getEmailOTPTheme.query({
+      clientId,
+    })
+
+    return json({
+      appTheme,
+      emailTheme,
+    })
   }
-}
+)
+
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    if (!params.clientId) {
+      throw new BadRequestError({
+        message: 'Client ID is required for the requested route',
+      })
+    }
+
+    const jwt = await requireJWT(request)
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+    const clientId = params?.clientId
+
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
+    let errors: {
+      [key: string]: string
+    } = {}
+
+    let theme = await starbaseClient.getAppTheme.query({
+      clientId,
+    })
+
+    let emailTheme = await starbaseClient.getEmailOTPTheme.query({
+      clientId,
+    })
+
+    const updateAuth = async (fd: FormData, theme: AppTheme) => {
+      const heading = fd.get('heading') as string | undefined
+      const radius = fd.get('radius') as string | undefined
+      const color = fd.get('color') as string | undefined
+      const colorDark = fd.get('colordark') as string | undefined
+      const graphicURL = fd.get('image') as string | undefined
+
+      const providersJSON = fd.get('providers') as string | undefined
+      const providers = providersJSON ? JSON.parse(providersJSON) : undefined
+
+      theme = {
+        ...theme,
+        heading: heading ?? theme.heading,
+        radius: radius ?? theme.radius,
+        color:
+          color && colorDark
+            ? {
+                light: color,
+                dark: colorDark,
+              }
+            : theme.color,
+        graphicURL: graphicURL ?? theme.graphicURL,
+        providers: providers ?? theme.providers,
+      }
+
+      const zodErrors = await AppThemeSchema.spa(theme)
+      if (!zodErrors.success) {
+        const mappedIssues = zodErrors.error.issues.map((issue) => ({
+          path: issue.path.join('.'),
+          message: issue.message,
+        }))
+
+        errors = mappedIssues.reduce((acc, curr) => {
+          acc[curr.path] = curr.message
+          return acc
+        }, {} as { [key: string]: string })
+      } else {
+        await starbaseClient.setAppTheme.mutate({
+          clientId,
+          theme,
+        })
+      }
+
+      return json({
+        errors,
+      })
+    }
+
+    const updateEmail = async (fd: FormData, theme: EmailOTPTheme) => {
+      let logoURL = fd.get('logoURL') as string | undefined
+      if (!logoURL || logoURL === '') logoURL = undefined
+
+      let address = fd.get('address') as string | undefined
+      if (!address || address === '') address = undefined
+
+      let contact = fd.get('contact') as string | undefined
+      if (!contact || contact === '') contact = undefined
+
+      theme = {
+        ...theme,
+        logoURL: logoURL ?? theme?.logoURL,
+        address: address ?? theme?.address,
+        contact: contact ?? theme?.contact,
+      }
+
+      const zodErrors = await EmailOTPThemeSchema.spa(theme)
+      if (!zodErrors.success) {
+        const mappedIssues = zodErrors.error.issues.map((issue) => ({
+          path: `email.${issue.path.join('.')}`,
+          message: issue.message,
+        }))
+
+        errors = mappedIssues.reduce((acc, curr) => {
+          acc[curr.path] = curr.message
+          return acc
+        }, {} as { [key: string]: string })
+      } else {
+        await starbaseClient.setEmailOTPTheme.mutate({
+          clientId,
+          theme,
+        })
+      }
+
+      return json({
+        errors,
+      })
+    }
+
+    const fd = await request.formData()
+    switch (fd.get('target')) {
+      case 'auth':
+        return updateAuth(fd, theme)
+      case 'email':
+        return updateEmail(fd, emailTheme)
+      default:
+        throw new BadRequestError({
+          message: 'Invalid target',
+        })
+    }
+  }
+)
 
 export default () => {
   const { appTheme, emailTheme } = useLoaderData<{

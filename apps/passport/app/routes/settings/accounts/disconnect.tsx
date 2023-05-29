@@ -6,9 +6,10 @@ import {
   getValidatedSessionContext,
   getDefaultAuthzParams,
 } from '~/session.server'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const action: ActionFunction = async ({ request, context }) => {
-  try {
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
     await getValidatedSessionContext(
       request,
       getDefaultAuthzParams(request),
@@ -27,7 +28,5 @@ export const action: ActionFunction = async ({ request, context }) => {
     })
 
     return null
-  } catch (ex) {
-    throw JsonError(ex)
   }
-}
+)

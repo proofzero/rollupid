@@ -16,20 +16,23 @@ import {
   ConfirmRevocationModal,
 } from '~/components/applications/claims'
 import { GetAuthorizedAppScopesMethodResult } from '@proofzero/platform/access/src/jsonrpc/methods/getAuthorizedAppScopes'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const loader: LoaderFunction = async ({ request, params, context }) => {
-  const { clientId } = params
-  const scopes = await scopesLoader({
-    request,
-    params,
-    context,
-  })
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    const { clientId } = params
+    const scopes = await scopesLoader({
+      request,
+      params,
+      context,
+    })
 
-  return {
-    clientId,
-    scopes,
+    return {
+      clientId,
+      scopes,
+    }
   }
-}
+)
 
 export default () => {
   const { authorizedApps, connectedProfiles } = useOutletContext<{

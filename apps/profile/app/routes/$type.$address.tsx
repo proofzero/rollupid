@@ -74,7 +74,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
 
       accountURN = accountFromAlias
     } catch (error) {
-      throw JsonError(error)
+      throw JsonError(error, context.traceSpan.getTraceParent())
     }
   } else {
     accountURN = AccountURNSpace.urn(address) as AccountURN

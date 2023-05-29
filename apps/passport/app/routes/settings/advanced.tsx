@@ -24,87 +24,93 @@ import { FLASH_MESSAGE } from '~/utils/flashMessage.server'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
 import type { AddressURN } from '@proofzero/urns/address'
-import { RollupError, ERROR_CODES } from '@proofzero/errors'
+import { RollupError, ERROR_CODES, BadRequestError } from '@proofzero/errors'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const action: ActionFunction = async ({ request, context }) => {
-  const { jwt, accountUrn } = await getValidatedSessionContext(
-    request,
-    context.authzQueryParams,
-    context.env,
-    context.traceSpan
-  )
-
-  try {
-    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-    const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
-    const starbaseClient = getStarbaseClient(
-      jwt,
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    const { jwt, accountUrn } = await getValidatedSessionContext(
+      request,
+      context.authzQueryParams,
       context.env,
       context.traceSpan
     )
 
-    const [addresses, apps, ownedApps] = await Promise.all([
-      accountClient.getAddresses.query({
-        account: accountUrn,
-      }),
-      accountClient.getAuthorizedApps.query({
-        account: accountUrn,
-      }),
-      starbaseClient.listApps.query(),
-    ])
+    try {
+      const accountClient = getAccountClient(
+        jwt,
+        context.env,
+        context.traceSpan
+      )
+      const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
+      const starbaseClient = getStarbaseClient(
+        jwt,
+        context.env,
+        context.traceSpan
+      )
 
-    if (ownedApps.length > 0) {
+      const [addresses, apps, ownedApps] = await Promise.all([
+        accountClient.getAddresses.query({
+          account: accountUrn,
+        }),
+        accountClient.getAuthorizedApps.query({
+          account: accountUrn,
+        }),
+        starbaseClient.listApps.query(),
+      ])
+
+      if (ownedApps.length > 0) {
+        throw new BadRequestError({
+          message:
+            'Unable to delete Rollup identity as identity is an owner of applications',
+        })
+      }
+
+      const addressURNs = addresses?.map(
+        (address) => address.baseUrn
+      ) as AddressURN[]
+
+      await Promise.all([
+        Promise.all(
+          apps.map((app) => {
+            return accessClient.revokeAppAuthorization.mutate({
+              clientId: app.clientId,
+            })
+          })
+        ),
+        Promise.all(
+          addressURNs.map((addressURN) => {
+            const addressClient = getAddressClient(
+              addressURN,
+              context.env,
+              context.traceSpan
+            )
+            return addressClient.deleteAddressNode.mutate({
+              accountURN: accountUrn,
+              forceDelete: true,
+            })
+          })
+        ),
+      ])
+
+      await accountClient.deleteAccountNode.mutate({ account: accountUrn })
+    } catch (ex) {
+      console.error(ex)
       throw new RollupError({
         message: 'Unable to delete Rollup Identity',
         code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-        cause: new Error('Rollup Identity owns apps'),
+        cause: ex,
       })
     }
 
-    const addressURNs = addresses?.map(
-      (address) => address.baseUrn
-    ) as AddressURN[]
-
-    await Promise.all([
-      Promise.all(
-        apps.map((app) => {
-          return accessClient.revokeAppAuthorization.mutate({
-            clientId: app.clientId,
-          })
-        })
-      ),
-      Promise.all(
-        addressURNs.map((addressURN) => {
-          const addressClient = getAddressClient(
-            addressURN,
-            context.env,
-            context.traceSpan
-          )
-          return addressClient.deleteAddressNode.mutate({
-            accountURN: accountUrn,
-            forceDelete: true,
-          })
-        })
-      ),
-    ])
-
-    await accountClient.deleteAccountNode.mutate({ account: accountUrn })
-  } catch (ex) {
-    console.error(ex)
-    throw new RollupError({
-      message: 'Unable to delete Rollup Identity',
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      cause: ex,
-    })
+    return await destroyUserSession(
+      request,
+      '/',
+      context.env,
+      FLASH_MESSAGE.DELETE
+    )
   }
-
-  return await destroyUserSession(
-    request,
-    '/',
-    context.env,
-    FLASH_MESSAGE.DELETE
-  )
-}
+)
 
 const DeleteRollupIdentityModal = ({
   isOpen,

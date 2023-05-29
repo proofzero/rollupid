@@ -21,7 +21,7 @@ import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 
 import { getValidatedSessionContext } from '~/session.server'
 import { setNewPrimaryAddress } from '~/utils/authenticate.server'
-import { ERROR_CODES, RollupError } from '@proofzero/errors'
+import { InternalServerError } from '@proofzero/errors'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 import AccountDisconnectModal from '~/components/settings/accounts/DisconnectModal'
 
@@ -30,38 +30,42 @@ import type { ActionFunction } from '@remix-run/cloudflare'
 import type { AddressListProps } from '~/components/addresses/AddressList'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 import type { AddressURN } from '@proofzero/urns/address'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const action: ActionFunction = async ({ request, context }) => {
-  const { jwt } = await getValidatedSessionContext(
-    request,
-    context.authzQueryParams,
-    context.env,
-    context.traceSpan
-  )
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    const { jwt } = await getValidatedSessionContext(
+      request,
+      context.authzQueryParams,
+      context.env,
+      context.traceSpan
+    )
 
-  try {
-    const formData = await request.formData()
-    const primaryAddress = JSON.parse(formData.get('primaryAddress') as string)
-
-    if (primaryAddress) {
-      await setNewPrimaryAddress(
-        jwt,
-        context.env,
-        context.traceSpan,
-        primaryAddress.id,
-        primaryAddress.icon,
-        primaryAddress.title
+    try {
+      const formData = await request.formData()
+      const primaryAddress = JSON.parse(
+        formData.get('primaryAddress') as string
       )
-    }
 
-    return null
-  } catch (e) {
-    throw new RollupError({
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      message: 'Failed to set new primary address',
-    })
+      if (primaryAddress) {
+        await setNewPrimaryAddress(
+          jwt,
+          context.env,
+          context.traceSpan,
+          primaryAddress.id,
+          primaryAddress.icon,
+          primaryAddress.title
+        )
+      }
+
+      return null
+    } catch (e) {
+      throw new InternalServerError({
+        message: 'Failed to set new primary address',
+      })
+    }
   }
-}
+)
 
 const distinctProfiles = (connectedProfiles: any[]) => {
   // Keeping the distinctions to only append

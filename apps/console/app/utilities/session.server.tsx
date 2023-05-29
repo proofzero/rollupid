@@ -99,7 +99,7 @@ export async function requireJWT(request: Request) {
 export function parseJwt(token: string): JWTPayload {
   const payload = jose.decodeJwt(token)
   if (!payload) {
-    throw new Error('Invalid JWT')
+    throw InvalidTokenError
   }
   return payload
 }

@@ -4,29 +4,28 @@ import {
   getDefaultAuthzParams,
   getValidatedSessionContext,
 } from '~/session.server'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const action: ActionFunction = async ({ request, context }) => {
-  await getValidatedSessionContext(
-    request,
-    getDefaultAuthzParams(request),
-    context.env,
-    context.traceSpan
-  )
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    await getValidatedSessionContext(
+      request,
+      getDefaultAuthzParams(request),
+      context.env,
+      context.traceSpan
+    )
 
-  const formData = await request.formData()
+    const formData = await request.formData()
 
-  const id = formData.get('id') as string
-  const name = formData.get('name') as string
+    const id = formData.get('id') as string
+    const name = formData.get('name') as string
 
-  const addressClient = getAddressClient(id, context.env, context.traceSpan)
+    const addressClient = getAddressClient(id, context.env, context.traceSpan)
 
-  try {
     await addressClient.setNickname.query({
       nickname: name,
     })
-  } catch (ex) {
-    console.error(ex)
-  }
 
-  return null
-}
+    return null
+  }
+)

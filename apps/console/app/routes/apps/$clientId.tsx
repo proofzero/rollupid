@@ -22,6 +22,8 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import type { LoaderData as OutletContextData } from '~/root'
 import type { AddressURN } from '@proofzero/urns/address'
 import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
+import { BadRequestError } from '@proofzero/errors'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 type LoaderData = {
   appDetails: appDetailsProps
@@ -30,68 +32,74 @@ type LoaderData = {
   paymaster: PaymasterType
 }
 
-export const loader: LoaderFunction = async ({ request, params, context }) => {
-  if (!params.clientId) {
-    throw new Error('Client ID is required for the requested route')
-  }
-
-  const jwt = await requireJWT(request)
-  const traceHeader = generateTraceContextHeaders(context.traceSpan)
-  const clientId = params?.clientId
-
-  try {
-    const starbaseClient = createStarbaseClient(Starbase, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-
-    const appDetails = await starbaseClient.getAppDetails.query({
-      clientId: clientId as string,
-    })
-
-    const paymaster = await starbaseClient.getPaymaster.query({
-      clientId: clientId as string,
-    })
-
-    let rotationResult
-    //If there's no timestamps, then the secrets have never been set, signifying the app
-    //has just been created; we rotate both secrets and set the timestamps
-    if (!appDetails.secretTimestamp && !appDetails.apiKeyTimestamp) {
-      const [apiKeyRes, secretRes] = await Promise.all([
-        starbaseClient.rotateApiKey.mutate({ clientId }),
-        starbaseClient.rotateClientSecret.mutate({
-          clientId,
-        }),
-      ])
-
-      rotationResult = {
-        rotatedApiKey: apiKeyRes.apiKey,
-        rotatedClientSecret: secretRes.secret,
-      }
-
-      // This is a client 'hack' as the date
-      // is populated from the graph
-      // on subsequent requests
-      appDetails.secretTimestamp = appDetails.apiKeyTimestamp = Date.now()
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    if (!params.clientId) {
+      throw new BadRequestError({
+        message: 'Client ID is required for the requested route',
+      })
     }
 
-    const appContactAddress = await starbaseClient.getAppContactAddress.query({
-      clientId: params.clientId,
-    })
+    const jwt = await requireJWT(request)
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+    const clientId = params?.clientId
 
-    return json<LoaderData>({
-      appDetails: appDetails as appDetailsProps,
-      rotationResult,
-      appContactAddress,
-      paymaster,
-    })
-  } catch (error) {
-    console.error('Caught error in loader', { error })
-    if (error instanceof Response) {
-      throw error
-    } else throw json({ error }, { status: 500 })
+    try {
+      const starbaseClient = createStarbaseClient(Starbase, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...traceHeader,
+      })
+
+      const appDetails = await starbaseClient.getAppDetails.query({
+        clientId: clientId as string,
+      })
+
+      const paymaster = await starbaseClient.getPaymaster.query({
+        clientId: clientId as string,
+      })
+
+      let rotationResult
+      //If there's no timestamps, then the secrets have never been set, signifying the app
+      //has just been created; we rotate both secrets and set the timestamps
+      if (!appDetails.secretTimestamp && !appDetails.apiKeyTimestamp) {
+        const [apiKeyRes, secretRes] = await Promise.all([
+          starbaseClient.rotateApiKey.mutate({ clientId }),
+          starbaseClient.rotateClientSecret.mutate({
+            clientId,
+          }),
+        ])
+
+        rotationResult = {
+          rotatedApiKey: apiKeyRes.apiKey,
+          rotatedClientSecret: secretRes.secret,
+        }
+
+        // This is a client 'hack' as the date
+        // is populated from the graph
+        // on subsequent requests
+        appDetails.secretTimestamp = appDetails.apiKeyTimestamp = Date.now()
+      }
+
+      const appContactAddress = await starbaseClient.getAppContactAddress.query(
+        {
+          clientId: params.clientId,
+        }
+      )
+
+      return json<LoaderData>({
+        appDetails: appDetails as appDetailsProps,
+        rotationResult,
+        appContactAddress,
+        paymaster,
+      })
+    } catch (error) {
+      console.error('Caught error in loader', { error })
+      if (error instanceof Response) {
+        throw error
+      } else throw json({ error }, { status: 500 })
+    }
   }
-}
+)
 
 // Component
 // -----------------------------------------------------------------------------

@@ -20,6 +20,8 @@ import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import { Button, Text } from '@proofzero/design-system'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
+import { BadRequestError } from '@proofzero/errors'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 // don't change this constant unless it's necessary
 // this constant also affects /$clientId root route
@@ -31,41 +33,47 @@ export type UsersLoaderData = {
   error: any
 }
 
-export const loader: LoaderFunction = async ({ request, params, context }) => {
-  const jwt = await requireJWT(request)
-  const srcUrl = new URL(request.url)
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    const jwt = await requireJWT(request)
+    const srcUrl = new URL(request.url)
 
-  try {
-    const client = params.clientId
-    const page = srcUrl.searchParams.get('page')
+    try {
+      const client = params.clientId
+      const page = srcUrl.searchParams.get('page')
 
-    // because offset is shown as an integer page number I convert it here
-    // to the actual offset for the database. (page starts with 1, not 0)
-    const offset = page ? (parseInt(page) - 1) * PAGE_LIMIT : 0
+      // because offset is shown as an integer page number I convert it here
+      // to the actual offset for the database. (page starts with 1, not 0)
+      const offset = page ? (parseInt(page) - 1) * PAGE_LIMIT : 0
 
-    if (!client) {
-      throw new Error('clientId is required')
+      if (!client) {
+        throw new BadRequestError({ message: 'clientId is required' })
+      }
+
+      const starbaseClient = createStarbaseClient(Starbase, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(context.traceSpan),
+      })
+
+      const edgesResult = starbaseClient.getAuthorizedAccounts.query({
+        client,
+        opt: {
+          offset,
+          limit: PAGE_LIMIT,
+        },
+      })
+
+      return defer<UsersLoaderData>({
+        edgesResult,
+        PROFILE_APP_URL,
+        error: null,
+      })
+    } catch (ex: any) {
+      console.error(ex)
+      return json<UsersLoaderData>({ error: ex })
     }
-
-    const starbaseClient = createStarbaseClient(Starbase, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...generateTraceContextHeaders(context.traceSpan),
-    })
-
-    const edgesResult = starbaseClient.getAuthorizedAccounts.query({
-      client,
-      opt: {
-        offset,
-        limit: PAGE_LIMIT,
-      },
-    })
-
-    return defer<UsersLoaderData>({ edgesResult, PROFILE_APP_URL, error: null })
-  } catch (ex: any) {
-    console.error(ex)
-    return json<UsersLoaderData>({ error: ex })
   }
-}
+)
 
 const Users = () => {
   const navigate = useNavigate()
@@ -136,11 +144,12 @@ rounded-lg border shadow"
               })
             })
 
-            const orderOfResults = `Showing ${authorizedProfiles.metadata.offset + 1
-              } to ${Math.min(
-                authorizedProfiles.metadata.offset + PAGE_LIMIT,
-                authorizedProfiles.metadata.edgesReturned
-              )} of ${authorizedProfiles.metadata.edgesReturned} results`
+            const orderOfResults = `Showing ${
+              authorizedProfiles.metadata.offset + 1
+            } to ${Math.min(
+              authorizedProfiles.metadata.offset + PAGE_LIMIT,
+              authorizedProfiles.metadata.edgesReturned
+            )} of ${authorizedProfiles.metadata.edgesReturned} results`
             return (
               <>
                 {!Users.size ? (

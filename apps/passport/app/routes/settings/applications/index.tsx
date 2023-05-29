@@ -22,32 +22,35 @@ import {
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { AuthorizedAppsModel } from '~/routes/settings'
 import { WarningCTA } from '@proofzero/design-system/src/molecules/cta/warning'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const loader: LoaderFunction = async ({ request, context }) => {
-  await getValidatedSessionContext(
-    request,
-    context.authzQueryParams,
-    context.env,
-    context.traceSpan
-  )
-  const session = await getFlashSession(request, context.env)
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    await getValidatedSessionContext(
+      request,
+      context.authzQueryParams,
+      context.env,
+      context.traceSpan
+    )
+    const session = await getFlashSession(request, context.env)
 
-  const sessionTooltipMessage = session.get('tooltipMessage')
-  const tooltipMessage = sessionTooltipMessage
-    ? JSON.parse(sessionTooltipMessage)
-    : undefined
+    const sessionTooltipMessage = session.get('tooltipMessage')
+    const tooltipMessage = sessionTooltipMessage
+      ? JSON.parse(sessionTooltipMessage)
+      : undefined
 
-  return json(
-    {
-      tooltipMessage,
-    },
-    {
-      headers: {
-        'Set-Cookie': await commitFlashSession(context.env, session),
+    return json(
+      {
+        tooltipMessage,
       },
-    }
-  )
-}
+      {
+        headers: {
+          'Set-Cookie': await commitFlashSession(context.env, session),
+        },
+      }
+    )
+  }
+)
 
 const AppListItem = ({
   app,
@@ -76,40 +79,44 @@ const AppListItem = ({
     border shadow-sm items-center bg-white"
     >
       {/* App icon is changed only when there is an error with data, not scopes */}
-      {app.appDataError
-        ? <div
-          className='w-16 h-16 flex items-center justify-center bg-[#F3F4F6]
-         rounded-lg'>
+      {app.appDataError ? (
+        <div
+          className="w-16 h-16 flex items-center justify-center bg-[#F3F4F6]
+         rounded-lg"
+        >
           <img
             src={app.icon}
             alt="Not found"
             className="object-cover w-8 h-8 rounded"
           />
         </div>
-        : <img
+      ) : (
+        <img
           src={app.icon}
           alt="Not found"
           className="object-cover w-16 h-16 rounded"
         />
-      }
+      )}
 
       <div className="flex-1 flex flex-col space-y-2">
-        <div className='flex-1 flex flex-row space-x-2 items-center'>
-          {app.title
-            ? <Text
+        <div className="flex-1 flex flex-row space-x-2 items-center">
+          {app.title ? (
+            <Text
               weight="semibold"
               size="base"
-              className="text-gray-900 w-fit py-[2px]">
+              className="text-gray-900 w-fit py-[2px]"
+            >
               {app.title}
             </Text>
-            : null}
-          {app.appDataError || app.appScopeError
-            ? <Text
+          ) : null}
+          {app.appDataError || app.appScopeError ? (
+            <Text
               size="sm"
-              className="text-[#EA580C] bg-orange-50 rounded-xl w-fit px-2 py-[2px]">
+              className="text-[#EA580C] bg-orange-50 rounded-xl w-fit px-2 py-[2px]"
+            >
               Data Error
             </Text>
-            : null}
+          ) : null}
         </div>
 
         <Text size="xs" weight="normal" className="text-gray-500">
@@ -144,7 +151,9 @@ export default function ApplicationsLayout() {
     authorizedApps: AuthorizedAppsModel[]
   }>()
 
-  const [selectedApp, setSelectedApp] = useState<undefined | AuthorizedAppsModel>()
+  const [selectedApp, setSelectedApp] = useState<
+    undefined | AuthorizedAppsModel
+  >()
 
   const fetcher = useFetcher()
 
@@ -180,20 +189,21 @@ export default function ApplicationsLayout() {
     }
   }, [selectedApp])
 
-  const appErrorExists = authorizedApps.some((app) => app.appDataError || app.appScopeError)
+  const appErrorExists = authorizedApps.some(
+    (app) => app.appDataError || app.appScopeError
+  )
 
   return (
     <>
       <Text size="2xl" weight="semibold" className="text-gray-800 mb-6">
         Applications
       </Text>
-      {
-        appErrorExists
-          ? <WarningCTA
-            description='We detected a data error in your application(s).
-      Please revoke the authorization and re-authorize again in the affected application.'/>
-          : null
-      }
+      {appErrorExists ? (
+        <WarningCTA
+          description="We detected a data error in your application(s).
+      Please revoke the authorization and re-authorize again in the affected application."
+        />
+      ) : null}
 
       {authorizedApps.length === 0 ? (
         <section className="h-[512px] sm:h-[256px]">

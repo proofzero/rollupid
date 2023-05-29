@@ -43,6 +43,7 @@ import type { AddressURN } from '@proofzero/urns/address'
 import type { PersonaData } from '@proofzero/types/application'
 
 import Authorization from '@proofzero/design-system/src/templates/authorization/Authorization'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 export type UserProfile = {
   displayName: string
@@ -65,115 +66,116 @@ export type LoaderData = {
   prompt?: string
 }
 
-export const loader: LoaderFunction = async ({ request, context }) => {
-  const { clientId, redirectUri, state, prompt, rollup_action } =
-    context.authzQueryParams
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    const { clientId, redirectUri, state, prompt, rollup_action } =
+      context.authzQueryParams
 
-  const connectResult =
-    new URL(request.url).searchParams.get('rollup_result') ?? undefined
+    const connectResult =
+      new URL(request.url).searchParams.get('rollup_result') ?? undefined
 
-  //Request parameter pre-checks
-  if (!clientId) throw new BadRequestError({ message: 'client_id is required' })
-  if (!state) throw new BadRequestError({ message: 'state is required' })
-  if (!redirectUri)
-    throw new BadRequestError({ message: 'redirect_uri is required' })
-  else {
-    try {
-      new URL(redirectUri)
-    } catch {
+    //Request parameter pre-checks
+    if (!clientId)
+      throw new BadRequestError({ message: 'client_id is required' })
+    if (!state) throw new BadRequestError({ message: 'state is required' })
+    if (!redirectUri)
+      throw new BadRequestError({ message: 'redirect_uri is required' })
+    else {
+      try {
+        new URL(redirectUri)
+      } catch {
+        throw new BadRequestError({
+          message: 'valid URI is required in redirect_uri param',
+        })
+      }
+    }
+
+    if (prompt && !['consent'].includes(prompt))
       throw new BadRequestError({
-        message: 'valid URI is required in redirect_uri param',
+        message: 'The only prompt supported is "consent"',
       })
-    }
-  }
 
-  if (prompt && !['consent'].includes(prompt))
-    throw new BadRequestError({
-      message: 'The only prompt supported is "consent"',
-    })
-
-  if (
-    rollup_action &&
-    !['connect', 'create', 'reconnect'].includes(rollup_action)
-  )
-    throw new BadRequestError({
-      message:
-        'only Rollup action supported are connect, create, and reconnect ',
-    })
-
-  const lastCP = await getAuthzCookieParams(request, context.env)
-
-  //If no authorization cookie and we're not logging into
-  //Passport Settings, then we create authz cookie & authenticate/create
-
-  if (
-    !lastCP &&
-    !(
-      context.authzQueryParams.clientId === 'passport' &&
-      context.authzQueryParams.redirectUri ===
-        `${new URL(request.url).origin}/settings`
-    ) &&
-    connectResult !== 'CANCEL'
-  ) {
-    if (rollup_action === 'create') {
-      await createAuthzParamCookieAndCreate(
-        request,
-        context.authzQueryParams,
-        context.env
-      )
-    }
-
-    await createAuthzParamsCookieAndAuthenticate(
-      context.authzQueryParams,
-      context.env
+    if (
+      rollup_action &&
+      !['connect', 'create', 'reconnect'].includes(rollup_action)
     )
-  }
+      throw new BadRequestError({
+        message:
+          'only Rollup action supported are connect, create, and reconnect ',
+      })
 
-  const headers = new Headers()
-  if (lastCP) {
-    if (!authzParamsMatch(lastCP, context.authzQueryParams)) {
+    const lastCP = await getAuthzCookieParams(request, context.env)
+
+    //If no authorization cookie and we're not logging into
+    //Passport Settings, then we create authz cookie & authenticate/create
+
+    if (
+      !lastCP &&
+      !(
+        context.authzQueryParams.clientId === 'passport' &&
+        context.authzQueryParams.redirectUri ===
+          `${new URL(request.url).origin}/settings`
+      ) &&
+      connectResult !== 'CANCEL'
+    ) {
+      if (rollup_action === 'create') {
+        await createAuthzParamCookieAndCreate(
+          request,
+          context.authzQueryParams,
+          context.env
+        )
+      }
+
       await createAuthzParamsCookieAndAuthenticate(
         context.authzQueryParams,
         context.env
       )
     }
 
-    headers.append(
-      'Set-Cookie',
-      await destroyAuthzCookieParamsSession(
-        request,
-        context.env,
-        lastCP.clientId
+    const headers = new Headers()
+    if (lastCP) {
+      if (!authzParamsMatch(lastCP, context.authzQueryParams)) {
+        await createAuthzParamsCookieAndAuthenticate(
+          context.authzQueryParams,
+          context.env
+        )
+      }
+
+      headers.append(
+        'Set-Cookie',
+        await destroyAuthzCookieParamsSession(
+          request,
+          context.env,
+          lastCP.clientId
+        )
       )
-    )
 
-    headers.append(
-      'Set-Cookie',
-      await destroyAuthzCookieParamsSession(request, context.env)
-    )
-  }
-
-  const { jwt, accountUrn } = await getValidatedSessionContext(
-    request,
-    context.authzQueryParams,
-    context.env,
-    context.traceSpan
-  )
-
-  //Special case for console and passport - we just redirect
-  if (['console', 'passport'].includes(clientId)) {
-    const redirectURL = new URL(redirectUri)
-    if (connectResult) {
-      redirectURL.searchParams.set('rollup_result', connectResult)
+      headers.append(
+        'Set-Cookie',
+        await destroyAuthzCookieParamsSession(request, context.env)
+      )
     }
 
-    return redirect(redirectURL.toString(), {
-      headers,
-    })
-  }
+    const { jwt, accountUrn } = await getValidatedSessionContext(
+      request,
+      context.authzQueryParams,
+      context.env,
+      context.traceSpan
+    )
 
-  //Scope validation
-  try {
+    //Special case for console and passport - we just redirect
+    if (['console', 'passport'].includes(clientId)) {
+      const redirectURL = new URL(redirectUri)
+      if (connectResult) {
+        redirectURL.searchParams.set('rollup_result', connectResult)
+      }
+
+      return redirect(redirectURL.toString(), {
+        headers,
+      })
+    }
+
+    //Scope validation
     const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
     const [scopeMeta, appPublicProps] = await Promise.all([
       sbClient.getScopes.query(),
@@ -286,11 +288,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         headers,
       }
     )
-  } catch (e) {
-    console.error(e)
-    throw JsonError(e)
   }
-}
+)
 
 export const action: ActionFunction = async ({ request, context }) => {
   const { accountUrn } = await getValidatedSessionContext(

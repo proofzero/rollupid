@@ -26,6 +26,7 @@ import type { AddressURN } from '@proofzero/urns/address'
 import type { NodeType } from '@proofzero/types/address'
 import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
 import type { LinksFunction } from '@remix-run/cloudflare'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 export type AuthorizedAppsModel = {
   clientId: string
@@ -43,97 +44,103 @@ export const links: LinksFunction = () => [
   { rel: 'shortcut icon', type: 'image/svg+xml', href: faviconSvg },
 ]
 
-export const loader: LoaderFunction = async ({ request, context }) => {
-  const passportDefaultAuthzParams = getDefaultAuthzParams(request)
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    const passportDefaultAuthzParams = getDefaultAuthzParams(request)
 
-  const { jwt, accountUrn } = await getValidatedSessionContext(
-    request,
-    passportDefaultAuthzParams,
-    context.env,
-    context.traceSpan
-  )
+    const { jwt, accountUrn } = await getValidatedSessionContext(
+      request,
+      passportDefaultAuthzParams,
+      context.env,
+      context.traceSpan
+    )
 
-  const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-  const starbaseClient = getStarbaseClient(jwt, context.env, context.traceSpan)
-  const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
+    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
+    const starbaseClient = getStarbaseClient(
+      jwt,
+      context.env,
+      context.traceSpan
+    )
+    const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
 
-  const accountProfile = await accountClient.getProfile.query({
-    account: accountUrn,
-  })
+    const accountProfile = await accountClient.getProfile.query({
+      account: accountUrn,
+    })
 
-  const addressTypeUrns = accountProfile?.addresses.map((a) => ({
-    urn: a.baseUrn,
-    nodeType: a.rc.node_type,
-  })) as { urn: AddressURN; nodeType: NodeType }[]
+    const addressTypeUrns = accountProfile?.addresses.map((a) => ({
+      urn: a.baseUrn,
+      nodeType: a.rc.node_type,
+    })) as { urn: AddressURN; nodeType: NodeType }[]
 
-  const apps = await accountClient.getAuthorizedApps.query({
-    account: accountUrn,
-  })
+    const apps = await accountClient.getAuthorizedApps.query({
+      account: accountUrn,
+    })
 
-  const awaitedResults = await Promise.all([
-    Promise.all(
-      apps.map(async (a) => {
-        try {
-          const [appPublicProps, appAuthorizedScopes] =
-            await Promise.all([
+    const awaitedResults = await Promise.all([
+      Promise.all(
+        apps.map(async (a) => {
+          try {
+            const [appPublicProps, appAuthorizedScopes] = await Promise.all([
               starbaseClient.getAppPublicProps.query({
                 clientId: a.clientId,
               }),
               accessClient.getAuthorizedAppScopes.query({
                 clientId: a.clientId,
                 accountURN: accountUrn,
-              })
+              }),
             ])
 
-          return {
-            clientId: a.clientId,
-            icon: appPublicProps.iconURL,
-            title: appPublicProps.name,
-            timestamp: a.timestamp,
-            appScopeError: (Object.entries(appAuthorizedScopes)
-              .some(([_, value]) => !value.meta.valid)),
+            return {
+              clientId: a.clientId,
+              icon: appPublicProps.iconURL,
+              title: appPublicProps.name,
+              timestamp: a.timestamp,
+              appScopeError: Object.entries(appAuthorizedScopes).some(
+                ([_, value]) => !value.meta.valid
+              ),
+            }
+          } catch (e) {
+            //We swallow the error and move on to next app
+            console.error(e)
+            return {
+              clientId: a.clientId,
+              icon: noImg,
+              timestamp: a.timestamp,
+              appDataError: true,
+            }
           }
-        } catch (e) {
-          //We swallow the error and move on to next app
-          console.error(e)
-          return {
-            clientId: a.clientId,
-            icon: noImg,
-            timestamp: a.timestamp,
-            appDataError: true,
-          }
-        }
-      })
-    ),
-    Promise.all(
-      addressTypeUrns.map((address) => {
-        const addressClient = getAddressClient(
-          address.urn,
-          context.env,
-          context.traceSpan
-        )
-        return addressClient.getAddressProfile.query()
-      })
-    ),
-  ])
+        })
+      ),
+      Promise.all(
+        addressTypeUrns.map((address) => {
+          const addressClient = getAddressClient(
+            address.urn,
+            context.env,
+            context.traceSpan
+          )
+          return addressClient.getAddressProfile.query()
+        })
+      ),
+    ])
 
-  const authorizedApps = awaitedResults[0]
-  const addressProfiles = awaitedResults[1]
+    const authorizedApps = awaitedResults[0]
+    const addressProfiles = awaitedResults[1]
 
-  const normalizedConnectedProfiles = addressProfiles.map((p, i) => ({
-    ...addressTypeUrns[i],
-    ...p,
-  }))
+    const normalizedConnectedProfiles = addressProfiles.map((p, i) => ({
+      ...addressTypeUrns[i],
+      ...p,
+    }))
 
-  return json({
-    pfpUrl: accountProfile?.pfp?.image,
-    displayName: accountProfile?.displayName,
-    authorizedApps: authorizedApps,
-    connectedProfiles: normalizedConnectedProfiles,
-    CONSOLE_URL: context.env.CONSOLE_APP_URL,
-    primaryAddressURN: accountProfile?.primaryAddressURN,
-  })
-}
+    return json({
+      pfpUrl: accountProfile?.pfp?.image,
+      displayName: accountProfile?.displayName,
+      authorizedApps: authorizedApps,
+      connectedProfiles: normalizedConnectedProfiles,
+      CONSOLE_URL: context.env.CONSOLE_APP_URL,
+      primaryAddressURN: accountProfile?.primaryAddressURN,
+    })
+  }
+)
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -173,7 +180,7 @@ export default function SettingsLayout() {
                     max-lg:h-[calc(100dvh-80px)]\
                     min-h-[416px]'
                     : 'h-full'
-                  } px-2 sm:max-md:px-5 md:px-10
+                } px-2 sm:max-md:px-5 md:px-10
                 pb-5 md:pb-10 pt-6 bg-white lg:bg-gray-50`}
               >
                 <Outlet

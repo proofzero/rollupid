@@ -105,7 +105,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       new InternalServerError({
         message: 'failed to load profiles',
         cause: error,
-      })
+      }),
+      context.traceSpan.getTraceParent()
     )
   }
 }
