@@ -33,8 +33,8 @@ export const ConfirmRevocationModal = ({
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div
         className={`min-w-[260px] sm:min-w-[400px] md:max-w-[512px] lg:max-w-[512px]
-       relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left
-      shadow-xl transition-all sm:p-6 overflow-y-auto`}
+       relative transform rounded-lg bg-white px-4 pb-4 text-left
+      transition-all sm:px-6 sm:pb-6 overflow-y-auto`}
       >
         <div className="flex flex-row space-x-6 items-center justify-start">
           <img

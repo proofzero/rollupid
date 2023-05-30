@@ -120,8 +120,8 @@ const RenameModal = ({
 }) => (
   <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
     <div
-      className={`min-w-[300px] sm:min-w-[437px] relative transform rounded-lg
-      bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
+      className={`min-w-[300px] sm:min-w-[437px] relative transform
+      bg-white px-4 pb-4 text-left rounded-lg transition-all sm:px-6 sm:pb-6 overflow-y-auto`}
     >
       <Text size="lg" weight="semibold" className="text-gray-900 mb-4">
         Name Your Account
