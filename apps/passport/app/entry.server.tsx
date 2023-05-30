@@ -39,6 +39,7 @@ export default function handleRequest(
           'connect-src': [
             SELF,
             'wss://*.bridge.walletconnect.org',
+            'wss://relay.walletconnect.com',
             '*.alchemyapi.io',
             '*.google-analytics.com',
             // Used for Remix WebSocket Live Reaload

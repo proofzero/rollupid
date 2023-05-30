@@ -42,6 +42,7 @@ export default function handleRequest(
           'connect-src': [
             SELF,
             '*.google-analytics.com',
+            'wss://relay.walletconnect.com',
             'https://upload.imagedelivery.net',
             // Used for Remix WebSocket Live Reaload
             ...(dev ? ['ws://localhost:*/socket'] : []),
