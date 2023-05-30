@@ -39,7 +39,7 @@ INTERNAL_APPLE_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/apple/callba
 INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/discord/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 JWKS_INTERNAL_URL_BASE = "http://127.0.0.1:10001/.well-known/jwks.json"
-
+WALLET_CONNECT_PROJECT_ID = "36efbf71d7586e254d72041a15a42078"
 
 [env.dev]
 routes = [
@@ -68,6 +68,7 @@ INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/connect/
 INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/connect/discord/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 JWKS_INTERNAL_URL_BASE = "https://passport-dev.pz3r0.com/.well-known/jwks.json"
+WALLET_CONNECT_PROJECT_ID = "249578b973e49826abb32d2ad263e2a3"
 
 [env.next]
 routes = [
@@ -95,6 +96,7 @@ INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect
 INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/discord/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 JWKS_INTERNAL_URL_BASE = "https://passport-next.pz3r0.com/.well-known/jwks.json"
+WALLET_CONNECT_PROJECT_ID = "7bce942e261433eb70c2a72d555dd61f"
 
 [env.next.build]
 command = "yarn build"
@@ -125,6 +127,7 @@ INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "https://passport.rollup.id/connect/micr
 INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "https://passport.rollup.id/connect/discord/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 JWKS_INTERNAL_URL_BASE = "https://passport.pz3r0.com/.well-known/jwks.json"
+WALLET_CONNECT_PROJECT_ID = "6f2ebc8aa6a1d5c4d4ac1e700294e35f"
 
 [env.current.build]
 command = "yarn build"
