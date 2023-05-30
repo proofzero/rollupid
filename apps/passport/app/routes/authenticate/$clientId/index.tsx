@@ -119,18 +119,19 @@ export default () => {
 
   const generic = Boolean(rollup_action)
 
-  const config = createConfig(
-    getDefaultConfig({
-      appName: 'Rollup',
-      autoConnect: true,
-      walletConnectProjectId:
-        // @ts-ignore
-        typeof window !== 'undefined' && window.ENV.WALLET_CONNECT_PROJECT_ID,
-      alchemyId:
-        // @ts-ignore
-        typeof window !== 'undefined' && window.ENV.APIKEY_ALCHEMY_PUBLIC,
-    })
-  )
+  let config
+  if (typeof window !== 'undefined') {
+    config = createConfig(
+      getDefaultConfig({
+        appName: 'Rollup',
+        autoConnect: true,
+        walletConnectProjectId:
+          window.ENV.WALLET_CONNECT_PROJECT_ID,
+        alchemyId:
+          window.ENV.APIKEY_ALCHEMY_PUBLIC,
+      })
+    )
+  }
 
   return (
     <>
