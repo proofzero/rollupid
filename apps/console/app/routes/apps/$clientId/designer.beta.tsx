@@ -1111,6 +1111,7 @@ export default () => {
   const { appTheme, emailTheme, WALLET_CONNECT_PROJECT_ID } = useLoaderData<{
     appTheme: GetAppThemeResult
     emailTheme: GetEmailOTPThemeResult
+    WALLET_CONNECT_PROJECT_ID: string
   }>()
 
   const actionData = useActionData()
@@ -1192,7 +1193,7 @@ export default () => {
               avatarURL={avatarUrl}
               setLoading={setLoading}
               errors={errors}
-              WALLET_CONNECT_PROJECT_ID={WALLET_CONNECT_PROJECT_ID,}
+              WALLET_CONNECT_PROJECT_ID={WALLET_CONNECT_PROJECT_ID}
             />
 
             <EmailPanel
