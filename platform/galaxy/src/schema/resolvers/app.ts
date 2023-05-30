@@ -53,20 +53,8 @@ const appResolvers: Resolvers = {
 }
 
 const AppResolverComposition = {
-  'Query.scopes': [
-    requestLogging(),
-    setupContext(),
-    validateApiKey(),
-    isAuthorized(),
-    logAnalytics(),
-  ],
-  'Mutation.revokeAppAuthorization': [
-    requestLogging(),
-    setupContext(),
-    validateApiKey(),
-    isAuthorized(),
-    logAnalytics(),
-  ],
+  //Leaving this here in case we want to (securely) expose these resolvers
+  //through a scope later
 }
 
 export default composeResolvers(appResolvers, AppResolverComposition)

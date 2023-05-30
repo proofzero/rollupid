@@ -26,6 +26,7 @@ export interface Environment {
   INTERNAL_PASSPORT_SERVICE_NAME: string
   INTERNAL_CLOUDFLARE_ZONE_ID: string
   TOKEN_CLOUDFLARE_API: string
+  JWKS_INTERNAL_URL_BASE: string
 }
 
 export const EDGE_APPLICATION: EdgeURN = EdgeSpace.urn('owns/app')

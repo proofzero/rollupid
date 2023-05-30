@@ -36,6 +36,7 @@ STORAGE_NAMESPACE = "console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 PROFILE_APP_URL = "http://localhost:10003"
 COOKIE_DOMAIN = "localhost"
+JWKS_INTERNAL_URL_BASE = "http://127.0.0.1:10001/.well-known/jwks.json"
 
 # Site
 # -----------------------------------------------------------------------------
@@ -77,6 +78,8 @@ COOKIE_DOMAIN = "rollup.id"
 STORAGE_NAMESPACE = "console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 PROFILE_APP_URL = "https://my-dev.rollup.id"
+JWKS_INTERNAL_URL_BASE = "https://passport-dev.pz3r0.com/.well-known/jwks.json"
+
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -107,6 +110,8 @@ COOKIE_DOMAIN = "rollup.id"
 STORAGE_NAMESPACE = "console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 PROFILE_APP_URL = "https://my-next.rollup.id"
+JWKS_INTERNAL_URL_BASE = "https://passport-next.pz3r0.com/.well-known/jwks.json"
+
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -138,3 +143,4 @@ COOKIE_DOMAIN = "rollup.id"
 STORAGE_NAMESPACE = "console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 PROFILE_APP_URL = "https://my.rollup.id"
+JWKS_INTERNAL_URL_BASE = "https://passport.pz3r0.com/.well-known/jwks.json"

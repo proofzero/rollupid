@@ -16,6 +16,9 @@ services = [
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
+[vars]
+JWKS_INTERNAL_URL_BASE = 'http://127.0.0.1:10001/.well-known/jwks.json'
+
 [dev]
 port = 10401
 inspector_port = 11401
@@ -27,6 +30,8 @@ analytics_engine_datasets = [
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
+[env.dev.vars]
+JWKS_INTERNAL_URL_BASE = "https://passport-dev.pz3r0.com/.well-known/jwks.json"
 
 [env.dev]
 route = { pattern = "galaxy-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" }
@@ -43,6 +48,9 @@ analytics_engine_datasets = [
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
+[env.next.vars]
+JWKS_INTERNAL_URL_BASE = "https://passport-next.pz3r0.com/.well-known/jwks.json"
+
 [env.next]
 route = { pattern = "galaxy-next.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 services = [
@@ -57,6 +65,9 @@ analytics_engine_datasets = [
 ]
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
+
+[env.current.vars]
+JWKS_INTERNAL_URL_BASE = "https://passport.pz3r0.com/.well-known/jwks.json"
 
 [env.current]
 route = { pattern = "galaxy.rollup.id", custom_domain = true, zone_name = "rollup.id" }

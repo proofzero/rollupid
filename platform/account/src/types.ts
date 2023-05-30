@@ -9,6 +9,7 @@ export interface Environment {
   Edges: Fetcher
   Analytics: AnalyticsEngineDataset
   ServiceDeploymentMetadata: DeploymentMetadata
+  JWKS_INTERNAL_URL_BASE: string
 }
 
 // TODO: move to types packages
