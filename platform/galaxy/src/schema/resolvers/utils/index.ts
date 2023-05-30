@@ -82,6 +82,7 @@ export const isAuthorized = () => (next) => (root, args, context, info) => {
       },
     })
   }
+
   if (!isFromCFBinding(context.request)) {
     // TODO: update to check if user is authorized with authorzation header
     // Currently, until write scopes are implemented, this middleware will always

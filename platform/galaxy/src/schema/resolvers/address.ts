@@ -188,7 +188,6 @@ const AddressResolverComposition = {
     validateApiKey(),
     isAuthorized(),
   ],
-
   'Mutation.updateConnectedAddressesProperties': [
     requestLogging(),
     setupContext(),
