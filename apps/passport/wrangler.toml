@@ -13,6 +13,7 @@ services = [
   { binding = "Address", service = "address" },
   { binding = "Starbase", service = "starbase" },
   { binding = "Images", service = "images" },
+  { binding = "Passport", service = "passport" },
 ]
 
 [site]
@@ -53,6 +54,7 @@ services = [
   { binding = "Address", service = "address-dev" },
   { binding = "Starbase", service = "starbase-dev" },
   { binding = "Images", service = "images-dev" },
+  { binding = "Passport", service = "passport-dev" },
 ]
 
 [env.dev.vars]
@@ -80,6 +82,8 @@ services = [
   { binding = "Address", service = "address-next" },
   { binding = "Starbase", service = "starbase-next" },
   { binding = "Images", service = "images-next" },
+  { binding = "Passport", service = "passport-next" },
+
 ]
 
 [env.next.vars]
@@ -110,6 +114,8 @@ services = [
   { binding = "Address", service = "address-current" },
   { binding = "Starbase", service = "starbase-current" },
   { binding = "Images", service = "images-current" },
+  { binding = "Passport", service = "passport-current" },
+
 ]
 
 [env.current.vars]

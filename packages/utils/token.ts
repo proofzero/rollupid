@@ -13,22 +13,47 @@ export const ExpiredTokenError = new UnauthorizedError({
 })
 
 interface VerifyTokenFunction {
-  (token: string, jwksInternalUrlBase: string): Promise<jose.JWTPayload>
+  (
+    token: string,
+    jwksInternalUrlBase: string,
+    request: Request
+  ): Promise<jose.JWTPayload>
 }
 
 export const verifyToken: VerifyTokenFunction = async (
   token: string,
-  jwksInternalUrlBase: string
+  jwksInternalUrlBase: string,
+  request: Request
 ) => {
   try {
     const cache = caches.default
     const jwtHeader = jose.decodeProtectedHeader(token)
     const jwtPayload = jose.decodeJwt(token)
     if (!jwtPayload.iss || !jwtHeader.kid) throw InvalidTokenError
+    const reqUrl = new URL(request.url)
     const issuerHostname = new URL(jwtPayload.iss).host
-    const jwksLookupUrl = new URL(jwksInternalUrlBase)
-    jwksLookupUrl.searchParams.append('issuer_hostname', issuerHostname)
+    //@ts-ignore
+    let passportFetcher = globalThis.Passport as Fetcher
+    console.debug('\n\nPassport fetcher', passportFetcher)
+    let jwksLookupUrl =
+      reqUrl.host === issuerHostname
+        ? 'http://localhost:10001/.well-known/jwks.json'
+        : jwksInternalUrlBase
+    //jwksLookupUrl.searchParams.append('issuer_hostname', issuerHostname)
+    jwksLookupUrl += `?issuer_hostname=${issuerHostname}`
+    let lookupFetcher =
+      reqUrl.host === issuerHostname && passportFetcher
+        ? passportFetcher.fetch.bind(passportFetcher)
+        : fetch
 
+    console.debug(
+      '\n\n\nURL:',
+      reqUrl.host,
+      issuerHostname,
+      jwksLookupUrl,
+      passportFetcher,
+      lookupFetcher
+    )
     let jwks: jose.JSONWebKeySet
     const cacheMatch = await cache.match(jwksLookupUrl)
     if (cacheMatch) {
@@ -36,9 +61,14 @@ export const verifyToken: VerifyTokenFunction = async (
       //TODO: Remove after validating it after deployment
       console.debug('matched cache')
     } else {
-      const jwksResponse = await fetch(jwksLookupUrl)
+      const jwksResponse = await lookupFetcher(jwksLookupUrl)
       if (!jwksResponse.ok) {
-        console.error(`Could not retrieve the JWKS from ${jwtHeader.jku}`)
+        console.error(
+          `Error from fetch`,
+          jwksResponse.status,
+          jwksResponse.statusText
+        )
+        console.error(`Could not retrieve the JWKS from ${jwksLookupUrl}`)
         throw InvalidTokenError
       }
       //Don't need to await as it's an optimistic put

@@ -42,6 +42,7 @@ export function getRollupReqFunctionErrorWrapper(
       const result = await reqFunction(args)
       return result
     } catch (e) {
+      console.debug('\n\n\nEEEE', e)
       //Needed for when we throw redirects
       if (e instanceof Response) return e as Response
 

@@ -1,6 +1,7 @@
 name = "starbase"
 main = "src/index.ts"
 compatibility_date = "2022-10-26"
+compatibility_flags = ["no_minimal_subrequests"]
 node_compat = true
 logpush = true
 

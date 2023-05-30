@@ -19,6 +19,7 @@ import {
 } from '@proofzero/security/persona'
 import { PersonaData } from '@proofzero/types/application'
 import { verifyToken } from '@proofzero/utils/token'
+import { request } from 'http'
 
 export const GetUserInfoInput = z.object({
   access_token: z.string(),
@@ -36,7 +37,8 @@ export const getUserInfoMethod = async ({
   const token = input.access_token
   const jwt = (await verifyToken(
     token,
-    ctx.JWKS_INTERNAL_URL_BASE
+    ctx.JWKS_INTERNAL_URL_BASE,
+    ctx.req!
   )) as AccessJWTPayload
   const account = jwt.sub
   const [clientId] = jwt.aud

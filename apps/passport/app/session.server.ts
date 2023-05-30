@@ -302,7 +302,7 @@ export async function getValidatedSessionContext(
   )
 
   try {
-    const payload = await verifyToken(jwt, env.JWKS_INTERNAL_URL_BASE)
+    const payload = await verifyToken(jwt, env.JWKS_INTERNAL_URL_BASE, request)
     const accountClient = getAccountClient(jwt, env, traceSpan)
     if (
       !AccountURNSpace.is(payload.sub!) ||

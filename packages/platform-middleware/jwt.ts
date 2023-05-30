@@ -21,12 +21,14 @@ export const AuthorizationTokenFromHeader: BaseMiddlewareFunction<{
 export const ValidateJWT: BaseMiddlewareFunction<{
   token?: string
   JWKS_INTERNAL_URL_BASE: string
+  req?: Request
 }> = async ({ ctx, next }) => {
   if (ctx.token) {
     try {
       const { sub: subject } = await verifyToken(
         ctx.token,
-        ctx.JWKS_INTERNAL_URL_BASE
+        ctx.JWKS_INTERNAL_URL_BASE,
+        ctx.req!
       )
       if (subject && AccountURNSpace.is(subject)) {
         return next({

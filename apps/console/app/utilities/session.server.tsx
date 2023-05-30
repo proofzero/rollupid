@@ -72,7 +72,7 @@ export async function requireJWT(request: Request) {
   const jwt = await getUserSession(request)
 
   try {
-    await verifyToken(jwt, JWKS_INTERNAL_URL_BASE)
+    await verifyToken(jwt, JWKS_INTERNAL_URL_BASE, request)
     return jwt
   } catch (error) {
     switch (error) {

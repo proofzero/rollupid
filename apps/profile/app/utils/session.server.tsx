@@ -114,7 +114,7 @@ export async function requireJWT(request: Request, headers = new Headers()) {
     const { cipher, iv } = JSON.parse(user.accessToken)
     if (!cipher || !iv) throw redirect('/auth')
     const accessToken = await decryptSession(sessionKey, cipher, iv)
-    await verifyToken(accessToken, JWKS_INTERNAL_URL_BASE)
+    await verifyToken(accessToken, JWKS_INTERNAL_URL_BASE, request)
     return accessToken
   } catch (error) {
     if (error === InvalidTokenError) {
