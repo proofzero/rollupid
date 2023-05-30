@@ -25,17 +25,6 @@ import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avat
 import { Button } from '@proofzero/packages/design-system/src/atoms/buttons/Button'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-const client = createClient(
-  // @ts-ignore
-  getDefaultClient({
-    appName: 'Rollup',
-    autoConnect: true,
-    alchemyId:
-      // @ts-ignore
-      typeof window !== 'undefined' && window.ENV.APIKEY_ALCHEMY_PUBLIC,
-  })
-)
-
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params }) => {
     const url = new URL(request.url)
@@ -129,6 +118,19 @@ export default () => {
   })
 
   const generic = Boolean(rollup_action)
+
+  const config = createConfig(
+    getDefaultConfig({
+      appName: 'Rollup',
+      autoConnect: true,
+      walletConnectProjectId:
+        // @ts-ignore
+        typeof window !== 'undefined' && window.ENV.WALLET_CONNECT_PROJECT_ID,
+      alchemyId:
+        // @ts-ignore
+        typeof window !== 'undefined' && window.ENV.APIKEY_ALCHEMY_PUBLIC,
+    })
+  )
 
   return (
     <>

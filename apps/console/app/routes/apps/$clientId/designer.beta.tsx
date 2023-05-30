@@ -16,8 +16,6 @@ import Authentication, {
   AuthenticationScreenDefaults,
 } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
-import { createClient } from 'wagmi'
-import { getDefaultClient } from 'connectkit'
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
 import IconPicker from '~/components/IconPicker'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
@@ -62,13 +60,6 @@ import { BadRequestError } from '@proofzero/errors'
 import { GetEmailOTPThemeResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getEmailOTPTheme'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { getEmailIcon, adjustAddressTypeToDisplay } from '@proofzero/utils/getNormalisedConnectedAccounts'
-
-const client = createClient(
-  // @ts-ignore
-  getDefaultClient({
-    appName: 'Rollup',
-  })
-)
 
 const getRGBColor = (hex: string, type: string) => {
   let color = hex.replace(/#/g, '')
@@ -659,7 +650,6 @@ const AuthPanel = ({
                       .map((p) => p.key)}
                     mapperArgs={{
                       clientId: 'Foo',
-                      wagmiClient: client,
                       signData: null,
                     }}
                     radius={radius}
