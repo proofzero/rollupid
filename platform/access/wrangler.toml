@@ -22,16 +22,10 @@ analytics_engine_datasets = [
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
-[vars]
-JWKS_INTERNAL_URL_BASE = 'http://127.0.0.1:10001/.well-known/jwks.json'
-
 [dev]
 port = 10101
 inspector_port = 11101
 local_protocol = "http"
-
-[env.dev.vars]
-JWKS_INTERNAL_URL_BASE = "https://passport-dev.pz3r0.com/.well-known/jwks.json"
 
 [env.dev]
 durable_objects.bindings = [
@@ -51,9 +45,6 @@ analytics_engine_datasets = [
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
-[env.next.vars]
-JWKS_INTERNAL_URL_BASE = "https://passport-next.pz3r0.com/.well-known/jwks.json"
-
 [env.next]
 durable_objects.bindings = [
   { name = "Access", class_name = "Access" },
@@ -71,9 +62,6 @@ analytics_engine_datasets = [
 ]
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
-
-[env.current.vars]
-JWKS_INTERNAL_URL_BASE = "https://passport.pz3r0.com/.well-known/jwks.json"
 
 [env.current]
 durable_objects.bindings = [

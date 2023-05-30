@@ -122,7 +122,6 @@ PROFILE_VERSION = 1
 ALCHEMY_ETH_NETWORK = "mainnet"
 ALCHEMY_POLYGON_NETWORK = "mainnet"
 
-
 # current (production)
 # ------------------------------------------------------------------------------
 [env.current]

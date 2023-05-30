@@ -2,7 +2,7 @@ import { RollupError } from '@proofzero/errors'
 import type { AccountURN } from '@proofzero/urns/account'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { getAuthzTokenFromReq } from '@proofzero/utils'
-import { verifyToken } from '@proofzero/utils/token'
+import { checkToken } from '@proofzero/utils/token'
 
 import { BaseMiddlewareFunction } from './types'
 
@@ -20,14 +20,10 @@ export const AuthorizationTokenFromHeader: BaseMiddlewareFunction<{
 
 export const ValidateJWT: BaseMiddlewareFunction<{
   token?: string
-  JWKS_INTERNAL_URL_BASE: string
-}> = async ({ ctx, next }) => {
+}> = ({ ctx, next }) => {
   if (ctx.token) {
     try {
-      const { sub: subject } = await verifyToken(
-        ctx.token,
-        ctx.JWKS_INTERNAL_URL_BASE
-      )
+      const { sub: subject } = checkToken(ctx.token)
       if (subject && AccountURNSpace.is(subject)) {
         return next({
           ctx: {

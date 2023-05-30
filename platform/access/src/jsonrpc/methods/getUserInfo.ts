@@ -18,7 +18,6 @@ import {
   userClaimsFormatter,
 } from '@proofzero/security/persona'
 import { PersonaData } from '@proofzero/types/application'
-import { verifyToken } from '@proofzero/utils/token'
 
 export const GetUserInfoInput = z.object({
   access_token: z.string(),
@@ -34,10 +33,7 @@ export const getUserInfoMethod = async ({
   ctx: Context
 }): Promise<z.infer<typeof GetUserInfoOutput>> => {
   const token = input.access_token
-  const jwt = (await verifyToken(
-    token,
-    ctx.JWKS_INTERNAL_URL_BASE
-  )) as AccessJWTPayload
+  const jwt = decodeJwt(token) as AccessJWTPayload
   const account = jwt.sub
   const [clientId] = jwt.aud
   const scope = jwt.scope.split(' ')
