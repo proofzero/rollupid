@@ -27,6 +27,7 @@ analytics_engine_datasets = [
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
+
 [env.dev]
 route = { pattern = "galaxy-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 services = [
