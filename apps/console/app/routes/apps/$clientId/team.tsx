@@ -11,7 +11,7 @@ import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { redirect } from '@remix-run/cloudflare'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 import { requireJWT } from '~/utilities/session.server'
-import { verifyToken } from '@proofzero/utils/token'
+import { checkToken } from '@proofzero/utils/token'
 
 import createAccountClient from '@proofzero/platform-clients/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -38,7 +38,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const clientId = params.clientId as string
 
     const jwt = await requireJWT(request)
-    const payload = await verifyToken(jwt, JWKS_INTERNAL_URL_BASE)
+    const payload = await checkToken(jwt)
     const accountURN = payload.sub as AccountURN
     const accountClient = createAccountClient(Account, {
       ...getAuthzHeaderConditionallyFromToken(jwt),

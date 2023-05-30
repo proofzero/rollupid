@@ -1009,13 +1009,23 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const updateAuth = async (fd: FormData, theme: AppTheme) => {
-      const heading = fd.get('heading') as string | undefined
-      const radius = fd.get('radius') as string | undefined
-      const color = fd.get('color') as string | undefined
-      const colorDark = fd.get('colordark') as string | undefined
-      const graphicURL = fd.get('image') as string | undefined
+      let heading = fd.get('heading') as string | undefined
+      if (!heading || heading === '') heading = undefined
 
-      const providersJSON = fd.get('providers') as string | undefined
+      let radius = fd.get('radius') as string | undefined
+      if (!radius || radius === '') radius = undefined
+
+      let color = fd.get('color') as string | undefined
+      if (!color || color === '') color = undefined
+
+      let colorDark = fd.get('colordark') as string | undefined
+      if (!colorDark || colorDark === '') colorDark = undefined
+
+      let graphicURL = fd.get('image') as string | undefined
+      if (!graphicURL || graphicURL === '') graphicURL = undefined
+
+      let providersJSON = fd.get('providers') as string | undefined
+      if (!providersJSON || providersJSON === '') providersJSON = undefined
       const providers = providersJSON ? JSON.parse(providersJSON) : undefined
 
       theme = {
@@ -1028,9 +1038,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
               light: color,
               dark: colorDark,
             }
-            : theme.color,
-        graphicURL: graphicURL ?? theme.graphicURL,
-        providers: providers ?? theme.providers,
+          : theme?.color,
+      graphicURL: graphicURL ?? theme?.graphicURL,
+      providers: providers ?? theme?.providers,
       }
 
       const zodErrors = await AppThemeSchema.spa(theme)

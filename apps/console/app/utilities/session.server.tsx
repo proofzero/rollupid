@@ -10,7 +10,7 @@ import { createCookie, redirect } from '@remix-run/cloudflare'
 import { decryptSession } from '@proofzero/utils/session'
 
 import {
-  verifyToken,
+  checkToken,
   ExpiredTokenError,
   InvalidTokenError,
 } from '@proofzero/utils/token'
@@ -72,7 +72,7 @@ export async function requireJWT(request: Request) {
   const jwt = await getUserSession(request)
 
   try {
-    await verifyToken(jwt, JWKS_INTERNAL_URL_BASE)
+    checkToken(jwt)
     return jwt
   } catch (error) {
     switch (error) {
@@ -89,8 +89,6 @@ export async function requireJWT(request: Request) {
         qp.append('state', 'skip')
 
         throw redirect(`${PASSPORT_URL}/authorize?${qp.toString()}`)
-      default:
-        throw error
     }
   }
 }

@@ -9,9 +9,9 @@ import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
 import {
+  checkToken,
   ExpiredTokenError,
   InvalidTokenError,
-  verifyToken,
 } from '@proofzero/utils/token'
 
 import { encryptSession, decryptSession } from '@proofzero/utils/session'
@@ -166,11 +166,10 @@ export async function createAuthzParamsCookieAndAuthenticate(
   env: Env,
   qp: URLSearchParams = new URLSearchParams()
 ) {
-  let redirectURL = `/authenticate/${authzQueryParams.clientId}${
-    ['connect', 'reconnect'].includes(authzQueryParams.rollup_action || '')
+  let redirectURL = `/authenticate/${authzQueryParams.clientId}${['connect', 'reconnect'].includes(authzQueryParams.rollup_action || '')
       ? ''
       : `/account`
-  }`
+    }`
 
   if (authzQueryParams.prompt) {
     qp.append('prompt', authzQueryParams.prompt)
@@ -302,7 +301,7 @@ export async function getValidatedSessionContext(
   )
 
   try {
-    const payload = await verifyToken(jwt, env.JWKS_INTERNAL_URL_BASE)
+    const payload = await checkToken(jwt)
     const accountClient = getAccountClient(jwt, env, traceSpan)
     if (
       !AccountURNSpace.is(payload.sub!) ||
