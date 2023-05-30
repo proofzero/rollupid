@@ -26,7 +26,7 @@ import { Button } from '@proofzero/packages/design-system/src/atoms/buttons/Butt
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, params }) => {
+  async ({ request, params, context }) => {
     const url = new URL(request.url)
 
     let displayKeys = AuthenticationScreenDefaults.knownKeys
@@ -45,6 +45,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       clientId: params.clientId,
       displayKeys,
       authnQueryParams: new URL(request.url).searchParams.toString(),
+      APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
+      ALLET_CONNECT_PROJECT_ID: context.env.WALLET_CONNECT_PROJECT_ID,
+      WALLET_CONNECT_PROJECT_ID: context.env.WALLET_CONNECT_PROJECT_ID,
     })
   }
 )
@@ -76,7 +79,13 @@ export default () => {
     rollup_action?: string
   }>()
 
-  const { clientId, displayKeys, authnQueryParams } = useLoaderData()
+  const {
+    clientId,
+    displayKeys,
+    authnQueryParams,
+    APIKEY_ALCHEMY_PUBLIC,
+    WALLET_CONNECT_PROJECT_ID
+  } = useLoaderData()
 
   const [signData, setSignData] = useState<{
     nonce: string | undefined
@@ -119,19 +128,18 @@ export default () => {
 
   const generic = Boolean(rollup_action)
 
-  let config
-  if (typeof window !== 'undefined') {
-    config = createConfig(
-      getDefaultConfig({
-        appName: 'Rollup',
-        autoConnect: true,
-        walletConnectProjectId:
-          window.ENV.WALLET_CONNECT_PROJECT_ID,
-        alchemyId:
-          window.ENV.APIKEY_ALCHEMY_PUBLIC,
-      })
-    )
-  }
+
+  const config = createConfig(
+    getDefaultConfig({
+      appName: 'Rollup',
+      autoConnect: true,
+      walletConnectProjectId:
+        WALLET_CONNECT_PROJECT_ID,
+      alchemyId:
+        APIKEY_ALCHEMY_PUBLIC,
+    })
+  )
+
 
   return (
     <>

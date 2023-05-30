@@ -284,6 +284,7 @@ const AuthPanel = ({
   avatarURL,
   setLoading,
   errors,
+  WALLET_CONNECT_PROJECT_ID,
 }: {
   appTheme?: AppTheme
   avatarURL: string
@@ -291,6 +292,7 @@ const AuthPanel = ({
   errors?: {
     [key: string]: string
   }
+  WALLET_CONNECT_PROJECT_ID: string
 }) => {
   const [dark, setDark] = useState<boolean>(false)
   const toggleDark = () => setDark(!dark)
@@ -958,6 +960,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     return json({
       appTheme,
       emailTheme,
+      WALLET_CONNECT_PROJECT_ID
     })
   }
 )
@@ -1105,7 +1108,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { appTheme, emailTheme } = useLoaderData<{
+  const { appTheme, emailTheme, WALLET_CONNECT_PROJECT_ID } = useLoaderData<{
     appTheme: GetAppThemeResult
     emailTheme: GetEmailOTPThemeResult
   }>()
@@ -1189,6 +1192,7 @@ export default () => {
               avatarURL={avatarUrl}
               setLoading={setLoading}
               errors={errors}
+              WALLET_CONNECT_PROJECT_ID={WALLET_CONNECT_PROJECT_ID,}
             />
 
             <EmailPanel

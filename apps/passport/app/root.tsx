@@ -108,7 +108,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           PROFILE_APP_URL: context.env.PROFILE_APP_URL,
           INTERNAL_GOOGLE_ANALYTICS_TAG:
             context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
-          APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
           REMIX_DEV_SERVER_WS_PORT:
             process.env.NODE_ENV === 'development'
               ? process.env.REMIX_DEV_SERVER_WS_PORT
