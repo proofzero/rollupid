@@ -22,20 +22,21 @@ const plugins = [
     servers: [{ url: 'https://galaxy.rollup.id', description: 'Production' }],
     components: {
       securitySchemes: {
-        galaxyApiKey: {
+        GalaxyApiKey: {
           type: 'apiKey',
           in: 'header',
           name: 'X-GALAXY-API-KEY',
           description: 'Galaxy API Key',
         },
-        Authorization: {
+        BearerAuth: {
           type: 'http',
           scheme: 'bearer',
-          description: 'Please insert JWT token into field',
           bearerFormat: 'JWT',
+          description: 'Access Token issued by the user',
         },
       },
     },
+    security: [{ BearerAuth: [], GalaxyApiKey: [] }],
     basePath: '/rest',
     swaggerUIEndpoint: '/swagger',
     info: {
