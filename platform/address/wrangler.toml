@@ -27,7 +27,6 @@ MAX_ATTEMPTS = 5
 DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS = 2_000
 REGENERATION_COOLDOWN_PERIOD_IN_MS = 30_000
 MAX_ATTEMPTS_TIME_PERIOD_IN_MS = 300_000
-JWKS_INTERNAL_URL_BASE = "http://127.0.0.1:10001/.well-known/jwks.json"
 
 [dev]
 port = 10102
@@ -81,7 +80,6 @@ MAX_ATTEMPTS = 5
 DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS = 2_000
 REGENERATION_COOLDOWN_PERIOD_IN_MS = 30_000
 MAX_ATTEMPTS_TIME_PERIOD_IN_MS = 300_000
-JWKS_INTERNAL_URL_BASE = "https://passport-dev.pz3r0.com/.well-known/jwks.json"
 
 [env.next]
 durable_objects.bindings = [{ name = "Address", class_name = "Address" }]
@@ -109,7 +107,6 @@ MAX_ATTEMPTS = 5
 DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS = 30_000
 REGENERATION_COOLDOWN_PERIOD_IN_MS = 600_000
 MAX_ATTEMPTS_TIME_PERIOD_IN_MS = 300_000
-JWKS_INTERNAL_URL_BASE = "https://passport-next.pz3r0.com/.well-known/jwks.json"
 
 [env.current]
 durable_objects.bindings = [{ name = "Address", class_name = "Address" }]
@@ -136,4 +133,3 @@ MAX_ATTEMPTS = 5
 DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS = 30_000
 REGENERATION_COOLDOWN_PERIOD_IN_MS = 600_000
 MAX_ATTEMPTS_TIME_PERIOD_IN_MS = 300_000
-JWKS_INTERNAL_URL_BASE = "https://passport.pz3r0.com/.well-known/jwks.json"

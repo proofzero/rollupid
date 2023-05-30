@@ -15,7 +15,6 @@ export default interface Env {
   Address: Fetcher
   Starbase: Fetcher
   Access: Fetcher
-  JWKS_INTERNAL_URL_BASE: string
 }
 
 export const required = ['Account', 'Address', 'Starbase', 'Access']
