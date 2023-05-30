@@ -16,8 +16,8 @@ import Authentication, {
   AuthenticationScreenDefaults,
 } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
-import { createClient } from 'wagmi'
-import { getDefaultClient } from 'connectkit'
+import { createConfig } from 'wagmi'
+import { getDefaultConfig } from 'connectkit'
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
 import IconPicker from '~/components/IconPicker'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
@@ -62,10 +62,12 @@ import { BadRequestError } from '@proofzero/errors'
 import { GetEmailOTPThemeResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getEmailOTPTheme'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-const client = createClient(
-  // @ts-ignore
-  getDefaultClient({
+const config = createConfig(
+  getDefaultConfig({
     appName: 'Rollup',
+    walletConnectProjectId:
+      //@ts-ignore
+      typeof window !== 'undefined' && window.ENV.WALLET_CONNECT_PROJECT_ID,
   })
 )
 
@@ -89,9 +91,8 @@ const DesignerTab = ({
   selected: boolean
 }) => (
   <div
-    className={`box-border -mb-0.5 mr-8 pb-4 px-1 flex flex-row items-center gap-2 border-b-2 ${
-      selected ? 'border-indigo-600' : 'border-transparent'
-    }`}
+    className={`box-border -mb-0.5 mr-8 pb-4 px-1 flex flex-row items-center gap-2 border-b-2 ${selected ? 'border-indigo-600' : 'border-transparent'
+      }`}
   >
     <Icon
       className={`w-5 h-5 ${selected ? 'text-indigo-600' : 'text-gray-500'}`}
@@ -181,9 +182,8 @@ const RadiusButton = ({
   return (
     <button
       type="button"
-      className={`w-full py-1.5 px-2.5 rounded-md ${
-        selected ? 'bg-indigo-500' : ''
-      }`}
+      className={`w-full py-1.5 px-2.5 rounded-md ${selected ? 'bg-indigo-500' : ''
+        }`}
       onClick={(e) => {
         e.preventDefault()
         setRadius(radius)
@@ -329,10 +329,10 @@ const AuthPanel = ({
     }[]
   >(
     appTheme?.providers ??
-      AuthenticationScreenDefaults.knownKeys.map((k) => ({
-        key: k,
-        enabled: true,
-      }))
+    AuthenticationScreenDefaults.knownKeys.map((k) => ({
+      key: k,
+      enabled: true,
+    }))
   )
   const [providerModalOpen, setProviderModalOpen] = useState<boolean>(false)
 
@@ -548,7 +548,7 @@ const AuthPanel = ({
                 minWidth={720}
                 minHeight={1080}
                 id="image"
-                setIsFormChanged={(val) => {}}
+                setIsFormChanged={(val) => { }}
                 setIsImgUploading={(val) => {
                   setLoading(val)
                 }}
@@ -658,7 +658,7 @@ const AuthPanel = ({
                       .map((p) => p.key)}
                     mapperArgs={{
                       clientId: 'Foo',
-                      wagmiClient: client,
+                      wagmiConfig: config,
                       signData: null,
                     }}
                     radius={radius}
@@ -694,8 +694,8 @@ const AuthPanel = ({
                           'urn:rollupid:address/0xc2b930f1fc2a55ddc1bf99e8844ca0479567ac44f3e2eea58216660e26947686',
                       },
                     ]}
-                    selectEmailCallback={() => {}}
-                    addNewEmailCallback={() => {}}
+                    selectEmailCallback={() => { }}
+                    addNewEmailCallback={() => { }}
                     connectedAccounts={[
                       {
                         address: 'email@example.com',
@@ -727,14 +727,14 @@ const AuthPanel = ({
                       },
                     ]}
                     connectedSmartContractWallets={[]}
-                    addNewAccountCallback={() => {}}
-                    addNewSmartWalletCallback={() => {}}
-                    selectSmartWalletCallback={() => {}}
-                    selectAccountsCallback={() => {}}
+                    addNewAccountCallback={() => { }}
+                    addNewSmartWalletCallback={() => { }}
+                    selectSmartWalletCallback={() => { }}
+                    selectAccountsCallback={() => { }}
                     // disableAuthorize={true}
                     transitionState={'idle'}
-                    cancelCallback={() => {}}
-                    authorizeCallback={() => {}}
+                    cancelCallback={() => { }}
+                    authorizeCallback={() => { }}
                     radius={radius}
                   />
                 </Tab.Panel>
@@ -826,7 +826,7 @@ const EmailPanel = ({
                 height: 1,
               }}
               id="logoURL"
-              setIsFormChanged={(val) => {}}
+              setIsFormChanged={(val) => { }}
               setIsImgUploading={(val) => {
                 setLoading(val)
               }}
@@ -1026,7 +1026,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
       let providersJSON = fd.get('providers') as string | undefined
       if (!providersJSON || providersJSON === '') providersJSON = undefined
-
       const providers = providersJSON ? JSON.parse(providersJSON) : undefined
 
       theme = {
@@ -1036,12 +1035,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         color:
           color && colorDark
             ? {
-                light: color,
-                dark: colorDark,
-              }
-            : theme?.color,
-        graphicURL: graphicURL ?? theme?.graphicURL,
-        providers: providers ?? theme?.providers,
+              light: color,
+              dark: colorDark,
+            }
+          : theme?.color,
+      graphicURL: graphicURL ?? theme?.graphicURL,
+      providers: providers ?? theme?.providers,
       }
 
       const zodErrors = await AppThemeSchema.spa(theme)

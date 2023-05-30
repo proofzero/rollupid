@@ -42,12 +42,8 @@ import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import createAccountClient from '@proofzero/platform-clients/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-
 import type { AccountURN } from '@proofzero/urns/account'
-
 import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
-import { InternalServerError } from '@proofzero/errors'
-
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
@@ -82,6 +78,7 @@ export type LoaderData = {
   ENV: {
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
     REMIX_DEV_SERVER_WS_PORT?: number
+    WALLET_CONNECT_PROJECT_ID: string
   }
 }
 
@@ -129,6 +126,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         avatarUrl,
         PASSPORT_URL,
         ENV: {
+          WALLET_CONNECT_PROJECT_ID,
           INTERNAL_GOOGLE_ANALYTICS_TAG,
           REMIX_DEV_SERVER_WS_PORT:
             process.env.NODE_ENV === 'development'

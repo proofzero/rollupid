@@ -51,6 +51,24 @@ module.exports = {
       })
     )
 
+    config.resolve.fallback = {
+      crypto: require.resolve('crypto-browserify'),
+      stream: require.resolve('stream-browserify'),
+      buffer: require.resolve('buffer/'),
+      http: require.resolve('stream-http'),
+      https: require.resolve('https-browserify'),
+      os: require.resolve('os-browserify/browser'),
+      path: require.resolve('path-browserify'),
+      vm: require.resolve('vm-browserify'),
+      zlib: require.resolve('browserify-zlib'),
+      assert: require.resolve('assert/'),
+      _stream_transform: require.resolve("readable-stream/transform"),
+      fs: false,
+      net: false,
+      tls: false,
+      child_process: false,
+
+    }
     // Return the altered config
     return config
   },
