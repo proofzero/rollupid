@@ -7,6 +7,7 @@ declare global {
   const SECRET_SESSION_KEY: string
   const COOKIE_DOMAIN: string
   const PASSPORT_URL: string
+  const JWKS_INTERNAL_URL_BASE: string
   const STORAGE_NAMESPACE: string
   const INTERNAL_GOOGLE_ANALYTICS_TAG: string
   const PROFILE_APP_URL: string

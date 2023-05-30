@@ -55,6 +55,7 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [vars]
 ENVIRONMENT = "local"
+JWKS_INTERNAL_URL_BASE = "http://127.0.0.1:10001/.well-known/jwks.json"
 
 # Dev
 # -----------------------------------------------------------------------------
@@ -100,6 +101,8 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.dev.vars]
 ENVIRONMENT = "dev"
 INTERNAL_PASSPORT_SERVICE_NAME = "passport-dev"
+JWKS_INTERNAL_URL_BASE = "https://passport-dev.pz3r0.com/.well-known/jwks.json"
+
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -121,6 +124,7 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.next.vars]
 ENVIRONMENT = "next"
 INTERNAL_PASSPORT_SERVICE_NAME = "passport-next"
+JWKS_INTERNAL_URL_BASE = "https://passport-next.pz3r0.com/.well-known/jwks.json"
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -142,3 +146,4 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.current.vars]
 ENVIRONMENT = "current"
 INTERNAL_PASSPORT_SERVICE_NAME = "passport-current"
+JWKS_INTERNAL_URL_BASE = "https://passport.pz3r0.com/.well-known/jwks.json"

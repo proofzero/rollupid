@@ -85,7 +85,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   try {
     jwt = await getAccessToken(request)
 
-    profile = await getAccountProfile({ jwt, accountURN }, context.traceSpan)
+    profile = await getAccountProfile({ accountURN }, context.traceSpan)
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })

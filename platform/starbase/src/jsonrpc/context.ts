@@ -28,6 +28,7 @@ interface CreateInnerContextOptions
   INTERNAL_PASSPORT_SERVICE_NAME: string
   INTERNAL_CLOUDFLARE_ZONE_ID: string
   TOKEN_CLOUDFLARE_API: string
+  JWKS_INTERNAL_URL_BASE: string
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.

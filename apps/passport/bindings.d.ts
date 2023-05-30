@@ -19,6 +19,7 @@ declare global {
     PASSPORT_REDIRECT_URL: string
     APIKEY_ALCHEMY_PUBLIC: string
     REMIX_DEV_SERVER_WS_PORT: number
+    JWKS_INTERNAL_URL_BASE: string
 
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
 

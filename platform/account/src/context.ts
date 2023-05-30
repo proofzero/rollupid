@@ -21,6 +21,8 @@ interface CreateInnerContextOptions
   Analytics: AnalyticsEngineDataset
   ServiceDeploymentMetadata: DeploymentMetadata
   account?: DurableObjectStubProxy<Account>
+  JWKS_INTERNAL_URL_BASE: string
+
   // accountURN?: AccountURN
 }
 /**

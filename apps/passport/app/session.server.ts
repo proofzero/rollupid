@@ -9,9 +9,9 @@ import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
 import {
-  checkToken,
   ExpiredTokenError,
   InvalidTokenError,
+  verifyToken,
 } from '@proofzero/utils/token'
 
 import { encryptSession, decryptSession } from '@proofzero/utils/session'
@@ -302,7 +302,7 @@ export async function getValidatedSessionContext(
   )
 
   try {
-    const payload = checkToken(jwt)
+    const payload = await verifyToken(jwt, env.JWKS_INTERNAL_URL_BASE)
     const accountClient = getAccountClient(jwt, env, traceSpan)
     if (
       !AccountURNSpace.is(payload.sub!) ||
