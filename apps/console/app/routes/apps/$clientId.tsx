@@ -22,7 +22,7 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import type { LoaderData as OutletContextData } from '~/root'
 import type { AddressURN } from '@proofzero/urns/address'
 import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
-import { BadRequestError } from '@proofzero/errors'
+import { BadRequestError, NotFoundError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 type LoaderData = {
@@ -96,7 +96,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       console.error('Caught error in loader', { error })
       if (error instanceof Response) {
         throw error
-      } else throw json({ error }, { status: 500 })
+      } else throw new NotFoundError({
+        message: `Request received for clientId ${clientId} which is not owned by provided account`
+      })
     }
   }
 )
@@ -144,14 +146,13 @@ export default function AppDetailIndexPage() {
             <Toaster position="top-right" reverseOrder={false} />
 
             <section
-              className={`${
-                open
-                  ? 'max-lg:opacity-50\
+              className={`${open
+                ? 'max-lg:opacity-50\
                     max-lg:overflow-hidden\
                     max-lg:h-[calc(100dvh-80px)]\
                     min-h-[636px]'
-                  : 'h-full '
-              } py-9 sm:mx-11 max-w-[1636px]`}
+                : 'h-full '
+                } py-9 sm:mx-11 max-w-[1636px]`}
             >
               <Outlet
                 context={{

@@ -5,6 +5,9 @@ import { Pepe } from '../../atoms/pepe/Pepe'
 import { ButtonAnchor } from '../../atoms/buttons/ButtonAnchor'
 import { Button } from '../../atoms/buttons/Button'
 
+import img404 from '../../assets/404.svg'
+import img500 from "../../assets/500.svg"
+
 import { FaDiscord } from 'react-icons/fa'
 import JSONPretty from 'react-json-pretty'
 
@@ -45,9 +48,12 @@ export function ErrorPage({
       )}
 
       <section className="flex flex-col justify-center items-center">
-        <Text size="6xl" weight="extrabold" className="text-gray-800 mb-3">
-          {code}
-        </Text>
+        {code === "404" ? <img src={img404} alt="Not Found Error" />
+          : code === "500" ? <img src={img500} alt="Not Found Error" />
+            : <Text size="6xl" weight="extrabold" className="text-gray-800 mb-3">
+              {code}
+            </Text>
+        }
         <Text size="lg" className="text-gray-800">
           {message}
         </Text>

@@ -8,6 +8,7 @@ import {
 } from '../validators/app'
 import createEdgesClient from '@proofzero/platform-clients/edges'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
+import { NotFoundError } from '@proofzero/errors'
 
 export const GetAppDetailsInput = AppClientIdParamSchema
 
@@ -24,9 +25,9 @@ export const getAppDetails = async ({
 }): Promise<z.infer<typeof GetAppDetailsOutput>> => {
   const appURN = ApplicationURNSpace.componentizedUrn(input.clientId)
   if (!ctx.ownAppURNs || !ctx.ownAppURNs.includes(appURN))
-    throw new Error(
-      `Request received for clientId ${input.clientId} which is not owned by provided account.`
-    )
+    throw new NotFoundError({
+      message: `Request received for clientId ${input.clientId} which is not owned by provided account.`
+    })
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
     ctx.StarbaseApp
