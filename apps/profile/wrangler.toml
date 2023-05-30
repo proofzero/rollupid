@@ -32,7 +32,7 @@ kv_namespaces = [
 [vars]
 PASSPORT_URL = "http://localhost:10001"
 PASSPORT_AUTH_URL = "http://localhost:10001/authorize"
-PASSPORT_TOKEN_URL = "http://127.0.0.1:10001/token"
+PASSPORT_TOKEN_URL = "http://localhost:10001/token"
 IMAGES_URL = "http://localhost/trpc"
 REDIRECT_URI = "http://localhost:10003/auth/callback"
 COOKIE_DOMAIN = "localhost"
@@ -43,7 +43,7 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 PROFILE_VERSION = 1
 ALCHEMY_ETH_NETWORK = "mainnet"
 ALCHEMY_POLYGON_NETWORK = "mainnet"
-JWKS_INTERNAL_URL_BASE = "http://127.0.0.1:10001/.well-known/jwks.json"
+JWKS_INTERNAL_URL_BASE = "http://localhost:10001/.well-known/jwks.json"
 
 [site]
 bucket = "./public"

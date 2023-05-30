@@ -23,7 +23,7 @@ analytics_engine_datasets = [
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [vars]
-JWKS_INTERNAL_URL_BASE = 'http://127.0.0.1:10001/.well-known/jwks.json'
+JWKS_INTERNAL_URL_BASE = 'http://localhost:10001/.well-known/jwks.json'
 
 [dev]
 port = 10201

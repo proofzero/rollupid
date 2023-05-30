@@ -55,7 +55,7 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [vars]
 ENVIRONMENT = "local"
-JWKS_INTERNAL_URL_BASE = "http://127.0.0.1:10001/.well-known/jwks.json"
+JWKS_INTERNAL_URL_BASE = "http://localhost:10001/.well-known/jwks.json"
 
 # Dev
 # -----------------------------------------------------------------------------
