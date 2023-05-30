@@ -38,8 +38,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const clientId = params.clientId as string
 
     const jwt = await requireJWT(request)
-    const payload = await checkToken(jwt)
+    const payload = checkToken(jwt)
     const accountURN = payload.sub as AccountURN
+    
     const accountClient = createAccountClient(Account, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),

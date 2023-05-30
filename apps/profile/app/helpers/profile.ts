@@ -7,6 +7,7 @@ import {
 import type { AddressURN } from '@proofzero/urns/address'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { getGalaxyClient } from './clients'
+import { imageFromAddressType } from './icons'
 import type { FullProfile } from '../types'
 import type { AccountURN } from '@proofzero/urns/account'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
@@ -17,11 +18,15 @@ import { GetAddressProfilesQuery } from '@proofzero/galaxy-client'
 export const getAccountProfile = async (
   {
     accountURN,
+    jwt,
   }: {
     accountURN: AccountURN
+    jwt?: string
   },
   traceSpan: TraceSpan
 ) => {
+  // note: jwt is only important for setting profile in profile account settings
+
   const profile = await ProfileKV.get<FullProfile>(accountURN, 'json')
 
   if (profile && profile.gallery)

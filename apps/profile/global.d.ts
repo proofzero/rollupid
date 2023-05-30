@@ -10,8 +10,7 @@ declare global {
   const PASSPORT_AUTH_URL: string
   const PASSPORT_TOKEN_URL: string
   const INTERNAL_GOOGLE_ANALYTICS_TAG: string
-  const JWKS_INTERNAL_URL_BASE: string
-
+  
   const PROFILE_CLIENT_ID: string
   const PROFILE_CLIENT_SECRET: string
   const REDIRECT_URI: string

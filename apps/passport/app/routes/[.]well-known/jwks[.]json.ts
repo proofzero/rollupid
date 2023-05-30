@@ -1,5 +1,7 @@
-import { BadRequestError } from '@proofzero/errors'
-import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import {
+  JsonError,
+  getRollupReqFunctionErrorWrapper,
+} from '@proofzero/utils/errors'
 import { json } from '@remix-run/cloudflare'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 
