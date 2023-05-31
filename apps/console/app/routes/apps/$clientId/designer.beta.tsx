@@ -61,7 +61,7 @@ import subtractLogo from '@proofzero/design-system/src/assets/subtract-logo.svg'
 import { BadRequestError } from '@proofzero/errors'
 import { GetEmailOTPThemeResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getEmailOTPTheme'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { getEmailIcon, adjustTypeToDisplay } from '@proofzero/utils/getNormalisedConnectedAccounts'
+import { getEmailIcon, adjustAddressTypeToDisplay } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 const client = createClient(
   // @ts-ignore
@@ -700,22 +700,22 @@ const AuthPanel = ({
                     connectedAccounts={[
                       {
                         title: 'email@example.com',
-                        subtitle: `${adjustTypeToDisplay(EmailAddressType.Email as string)} - email@example.com`,
+                        subtitle: `${adjustAddressTypeToDisplay(EmailAddressType.Email)} - email@example.com`,
                         value: 'urn:rollupid:address/0x98f8b8473269c7e4444756d5ecef7dce5457a5d58df4100b46478402f59de57c',
                       },
                       {
                         title: 'MS Email',
-                        subtitle: `${adjustTypeToDisplay(OAuthAddressType.Microsoft as string)} - email2@example.com`,
+                        subtitle: `${adjustAddressTypeToDisplay(OAuthAddressType.Microsoft)} - email2@example.com`,
                         value: 'urn:rollupid:address/0x3c7d7e3fef81c03333ed63d4ac83d2a1840356122163985deb1615e6ecfc25be',
                       },
                       {
                         title: 'Github',
-                        subtitle: `${adjustTypeToDisplay(OAuthAddressType.GitHub as string)} - Github-Account`,
+                        subtitle: `${adjustAddressTypeToDisplay(OAuthAddressType.GitHub)} - Github-Account`,
                         value: 'urn:rollupid:address/0xa69240d7b361e122d22aa68ff97b9530c7c85953fba9dac392ca8dbfb88e17cc',
                       },
                       {
                         title: 'ens.eth',
-                        subtitle: `${adjustTypeToDisplay(CryptoAddressType.ETH as string)} - 0x6c60Da9471181Aa54C648c6e203663A5501363F3`,
+                        subtitle: `${adjustAddressTypeToDisplay(CryptoAddressType.ETH)} - 0x6c60Da9471181Aa54C648c6e203663A5501363F3`,
                         value: 'urn:rollupid:address/0x4416ad52d0d65d4b8852b8041039822e92ff4aa301af1b3ab987bd930f6fb4c8',
                       },
                     ]}

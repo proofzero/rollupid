@@ -20,7 +20,7 @@ import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
 import {
   getEmailIcon,
-  getNormalisedConnectedEmails,
+  getEmailDropdownItems,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 
@@ -48,7 +48,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const connectedAccounts = await accountClient.getAddresses.query({
       account: accountURN,
     })
-    const connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
+    const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
     // If we are coming back from a successful connect flow
     // and we have only one email address, and no appContactAddress set

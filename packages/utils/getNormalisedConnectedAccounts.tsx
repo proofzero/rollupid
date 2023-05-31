@@ -50,15 +50,17 @@ export const getEmailIcon = (
 
 }
 
-export const adjustTypeToDisplay = (string: string) => {
-  if (string === CryptoAddressType.Wallet) {
+export const adjustAddressTypeToDisplay = (addressType:
+  OAuthAddressType |
+  EmailAddressType |
+  CryptoAddressType) => {
+  if (addressType === CryptoAddressType.Wallet) {
     return "SC Wallet"
   }
-  return string.charAt(0).toUpperCase() + string.slice(1)
+  return addressType.charAt(0).toUpperCase() + addressType.slice(1)
 }
 
-
-export const getNormalisedConnectedEmails = (
+export const getEmailDropdownItems = (
   connectedAddresses?: Addresses | null
 ): Array<DropdownSelectListItem> => {
   if (!connectedAddresses) return []
@@ -86,16 +88,17 @@ export const getNormalisedConnectedEmails = (
     })
 }
 
-export const getNormalisedAddressProfiles = (
+//addressDropdownItems
+export const getAddressDropdownItems = (
   addressProfiles?: Array<GetAddressProfileResult> | null
-) => {
+): Array<DropdownSelectListItem> => {
   if (!addressProfiles) return []
   return addressProfiles
     .map((address) => {
       return {
         title: address.title,
         value: address.id as AddressURN,
-        subtitle: `${adjustTypeToDisplay(address.type as string)} - ${address.address}`,
+        subtitle: `${adjustAddressTypeToDisplay(address.type)} - ${address.address}`,
       }
     })
 }

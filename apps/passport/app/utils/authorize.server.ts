@@ -1,7 +1,7 @@
 import { getAccountClient, getAddressClient } from '~/platform.server'
 import {
-  getNormalisedConnectedEmails,
-  getNormalisedAddressProfiles,
+  getEmailDropdownItems,
+  getAddressDropdownItems,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
@@ -72,7 +72,7 @@ export const getDataForScopes = async (
 
   if (connectedAccounts && connectedAccounts.length) {
     if (requestedScope.includes(Symbol.keyFor(SCOPE_EMAIL)!)) {
-      connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
+      connectedEmails = getEmailDropdownItems(connectedAccounts)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!)) {
       const addresses = (await Promise.all(
@@ -87,7 +87,7 @@ export const getDataForScopes = async (
             return addressClient.getAddressProfile.query()
           })
       ))
-      connectedAddresses = getNormalisedAddressProfiles(addresses)
+      connectedAddresses = getAddressDropdownItems(addresses)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!)) {
       const addresses = await Promise.all(
@@ -100,7 +100,7 @@ export const getDataForScopes = async (
             return addressClient.getAddressProfile.query()
           })
       )
-      connectedSmartContractWallets = getNormalisedAddressProfiles(addresses)
+      connectedSmartContractWallets = getAddressDropdownItems(addresses)
     }
   }
 
