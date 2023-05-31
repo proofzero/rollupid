@@ -1,8 +1,8 @@
 import { Canvas, Meta, Story } from '@storybook/addon-docs'
 
 import { ConnectButton } from './ConnectButton'
-import { WagmiConfig, createConfig } from 'wagmi'
-import { getDefaultConfig } from 'connectkit'
+import { WagmiConfig, createClient, configureChains } from 'wagmi'
+import { getDefaultClient } from 'connectkit'
 
 import { publicProvider } from 'wagmi/providers/public'
 import { InjectedConnector } from 'wagmi/connectors/injected'
@@ -18,13 +18,13 @@ export const Template = (args) => <ConnectButton {...args} />
   <Story
     decorators={[
       (Story) => {
-        const config = createConfig(
-          getDefaultConfig({
+        const client = createClient(
+          getDefaultClient({
             appName: 'Rollup',
           })
         )
         return (
-          <WagmiConfig config={config}>
+          <WagmiConfig client={client}>
             <Story />
           </WagmiConfig>
         )
