@@ -13,9 +13,10 @@ import { Popover } from '@headlessui/react'
 import { HiChevronDown, HiChevronUp } from 'react-icons/hi'
 import { ThemeContext } from '../../../contexts/theme'
 
-import { signMessageTemplate } from '@proofzero/packages/utils'
+import { AuthenticationScreenDefaults } from '../../../templates/authentication/Authentication'
 
 export type ConnectButtonProps = {
+  signMessageTemplate?: string
   connectCallback: (address: string) => void
   signCallback: (
     address: string,
@@ -38,6 +39,7 @@ export type ConnectButtonProps = {
 } & ButtonProps
 
 export function ConnectButton({
+  signMessageTemplate = AuthenticationScreenDefaults.defaultSignMessage,
   connectCallback,
   connectErrorCallback,
   signCallback,
@@ -67,10 +69,11 @@ export function ConnectButton({
   useEffect(() => {
     if (!signData?.signature && signData?.nonce) {
       console.debug('signing...')
-      const nonceMessage = signMessageTemplate().replace(
-        '{{nonce}}',
-        signData.nonce
-      )
+      const nonceMessage =
+        AuthenticationScreenDefaults.defaultSignMessage.replace(
+          '{{nonce}}',
+          signData.nonce
+        )
       // sign message
       signMessage({ message: nonceMessage })
     } else {

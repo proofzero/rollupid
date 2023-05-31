@@ -311,6 +311,11 @@ const AuthPanel = ({
   const toggleDark = () => setDark(!dark)
 
   const [heading, setHeading] = useState<string>(appTheme?.heading ?? '')
+
+  const [signMessage, setSignMessage] = useState<string>(
+    AuthenticationScreenDefaults.defaultSignMessage
+  )
+
   const [radius, setRadius] = useState<string>(
     appTheme?.radius ?? AuthenticationScreenDefaults.radius
   )
@@ -386,6 +391,26 @@ const AuthPanel = ({
           </FormElement>
 
           <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement label="Wallet Signature Request Sign Message">
+            <InputTextarea
+              id="address"
+              heading=""
+              defaultValue={address}
+              onChange={setAddress}
+              error={errors && errors['email.address'] ? true : false}
+            />
+
+            {errors && errors['email.address'] && (
+              <Text
+                className="mb-1.5 mt-1.5 text-red-500"
+                size="xs"
+                weight="normal"
+              >
+                {errors['email.address']}
+              </Text>
+            )}
+          </FormElement>
 
           <FormElement label="Radius">
             <input id="radius" name="radius" type="hidden" value={radius} />

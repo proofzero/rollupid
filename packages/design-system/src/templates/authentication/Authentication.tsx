@@ -22,6 +22,14 @@ const ConnectButton = lazy(() =>
 export const AuthenticationScreenDefaults = {
   defaultLogoURL: circleLogo,
   defaultHeading: 'Welcome to the Private Web',
+  defaultSignMessage: `Welcome to Rollup!
+
+  Sign this message to accept the Rollup Terms of Service (https://rollup.id/tos), no password needed!
+  
+  This will not trigger a blockchain transaction or cost any gas fees.
+  
+  {{nonce}}
+  `,
   defaultSubheading: 'How would you like to continue?',
   knownKeys: [
     'wallet',
