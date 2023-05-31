@@ -59,7 +59,7 @@ export async function send(
             name: message.recipient.name,
           },
         ],
-        dkim_domain: env.INTERNAL_DKIM_DOMAIN,
+        dkim_domain: message.customHostname ?? env.INTERNAL_DKIM_DOMAIN,
         dkim_selector: env.INTERNAL_DKIM_SELECTOR,
         dkim_private_key: env.KEY_DKIM_PRIVATEKEY,
       },
@@ -94,6 +94,7 @@ export async function send(
 
 export type NotificationSender =
   | {
+      hostname: string
       name: string
       address: string
     }
@@ -105,12 +106,14 @@ export async function sendNotification(
   customSender?: NotificationSender
 ) {
   let from: NotificationSender = {
+    hostname: env.INTERNAL_DKIM_DOMAIN,
     name: env.NotificationFromName,
     address: `${env.NotificationFromUser}@${env.INTERNAL_DKIM_DOMAIN}`,
   }
 
   if (customSender) {
     from = {
+      hostname: customSender.hostname,
       name: customSender.name,
       address: customSender.address,
     }
