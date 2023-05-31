@@ -1,20 +1,24 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, lazy } from 'react'
 
 import circleLogo from './circle-logo.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
 
 import { Text } from '../../atoms/text/Text'
 
-import { WagmiConfig, Config } from 'wagmi'
-import { ConnectKitProvider } from 'connectkit'
 import ConnectOAuthButton, {
   OAuthProvider,
 } from '../../atoms/buttons/connect-oauth-button'
-import { ConnectButton } from '../../atoms/buttons/connect-button/ConnectButton'
 import { AuthButton } from '../../molecules/auth-button/AuthButton'
 import { HiOutlineMail } from 'react-icons/hi'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import { ThemeContext } from '../../contexts/theme'
+// import { ConnectButton } from '../../atoms/buttons/connect-button/ConnectButton'
+
+const ConnectButton = lazy(() =>
+  import('../../atoms/buttons/connect-button/ConnectButton').then((module) => ({
+    default: module.ConnectButton,
+  }))
+)
 
 export const AuthenticationScreenDefaults = {
   defaultLogoURL: circleLogo,
@@ -125,7 +129,6 @@ export default ({
 type DisplayKeyMapperArgs = {
   clientId: string
   signData: any
-  wagmiConfig: Config
   walletConnectCallback?: (address: string) => void
   walletSignCallback?: (
     address: string,
@@ -155,27 +158,22 @@ const displayKeyMapper = (
     flex = false,
     displayContinueWith = false,
     enableOAuthSubmit = false,
-    wagmiConfig
   }: DisplayKeyMapperArgs
 ) => {
   let el
   switch (key) {
     case 'wallet':
       el = (
-        <WagmiConfig config={wagmiConfig} >
-          <ConnectKitProvider>
-            <ConnectButton
-              key={key}
-              signData={signData}
-              isLoading={loading}
-              fullSize={flex}
-              displayContinueWith={displayContinueWith}
-              connectCallback={walletConnectCallback}
-              connectErrorCallback={walletConnectErrorCallback}
-              signCallback={walletSignCallback}
-            />
-          </ConnectKitProvider>
-        </WagmiConfig >
+        <ConnectButton
+          key={key}
+          signData={signData}
+          isLoading={loading}
+          fullSize={flex}
+          displayContinueWith={displayContinueWith}
+          connectCallback={walletConnectCallback}
+          connectErrorCallback={walletConnectErrorCallback}
+          signCallback={walletSignCallback}
+        />
       )
       break
     case 'email':

@@ -13,14 +13,7 @@ import { Popover } from '@headlessui/react'
 import { HiChevronDown, HiChevronUp } from 'react-icons/hi'
 import { ThemeContext } from '../../../contexts/theme'
 
-export const signMessageTemplate = `Welcome to Rollup!
-
-Sign this message to accept the Rollup Terms of Service (https://rollup.id/tos), no password needed!
-
-This will not trigger a blockchain transaction or cost any gas fees.
-
-{{nonce}}
-`
+import { strings } from '@proofzero/packages/utils'
 
 export type ConnectButtonProps = {
   connectCallback: (address: string) => void
@@ -84,7 +77,7 @@ export function ConnectButton({
   useEffect(() => {
     if (!signData?.signature && signData?.nonce) {
       console.debug('signing...')
-      const nonceMessage = signMessageTemplate.replace(
+      const nonceMessage = strings.signMessageTemplate().replace(
         '{{nonce}}',
         signData.nonce
       )

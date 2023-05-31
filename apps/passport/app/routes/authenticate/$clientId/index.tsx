@@ -8,12 +8,11 @@ import {
   useSubmit,
   useTransition,
 } from '@remix-run/react'
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { redirect, json } from '@remix-run/cloudflare'
 
 import { getAuthzCookieParams } from '~/session.server'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { getDefaultConfig } from 'connectkit'
 import Authentication, {
   AppProfile,
   AuthenticationScreenDefaults,
@@ -23,8 +22,13 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
 import { Button } from '@proofzero/packages/design-system/src/atoms/buttons/Button'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { useHydrated } from 'remix-utils'
-import { createConfig } from 'wagmi'
+// import { LazyAuth } from '~/web3/lazyAuth'
+
+const LazyAuth = lazy(() =>
+  import('../../../web3/lazyAuth').then((module) => ({
+    default: module.LazyAuth,
+  }))
+)
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
@@ -47,7 +51,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       displayKeys,
       authnQueryParams: new URL(request.url).searchParams.toString(),
       APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
-      ALLET_CONNECT_PROJECT_ID: context.env.WALLET_CONNECT_PROJECT_ID,
       WALLET_CONNECT_PROJECT_ID: context.env.WALLET_CONNECT_PROJECT_ID,
     })
   }
@@ -81,7 +84,6 @@ const InnerComponent = ({
   displayKeys,
   clientId,
   authnQueryParams,
-  wagmiConfig
 }: {
   transitionState: string,
   appProps?: AppProfile,
@@ -89,7 +91,6 @@ const InnerComponent = ({
   displayKeys?: any
   clientId: string,
   authnQueryParams: string,
-  wagmiConfig: any
 }) => {
   const [signData, setSignData] = useState<{
     nonce: string | undefined
@@ -194,7 +195,6 @@ const InnerComponent = ({
         clientId,
         signData,
         navigate,
-        wagmiConfig: wagmiConfig,
         FormWrapperEl: ({ children, provider }) => (
           <Form
             className="w-full"
@@ -286,6 +286,7 @@ const getOAuthErrorMessage = (error: string): string => {
   }
 }
 
+
 export default () => {
   const { appProps, rollup_action } = useOutletContext<{
     appProps?: AppProfile
@@ -296,35 +297,16 @@ export default () => {
     clientId,
     displayKeys,
     authnQueryParams,
-    APIKEY_ALCHEMY_PUBLIC,
-    WALLET_CONNECT_PROJECT_ID
   } = useLoaderData()
 
   const transition = useTransition()
 
-  let config;
-  const hydrated = useHydrated()
-
-  if (hydrated) {
-    config = createConfig(
-      getDefaultConfig({
-        appName: 'Rollup',
-        autoConnect: true,
-        walletConnectProjectId:
-          WALLET_CONNECT_PROJECT_ID,
-        alchemyId:
-          APIKEY_ALCHEMY_PUBLIC,
-      })
-    )
-  }
 
   return <>
     {transition.state !== 'idle' && <Loader />}
-
-    {
-      hydrated ?
+    <Suspense fallback="">
+      <LazyAuth autoConnect={true}>
         <InnerComponent
-          wagmiConfig={config}
           transitionState={transition.state}
           appProps={appProps!}
           rollup_action={rollup_action!}
@@ -332,8 +314,7 @@ export default () => {
           clientId={clientId}
           authnQueryParams={authnQueryParams}
         />
-        : null
-    }
+      </LazyAuth>
+    </Suspense>
   </>
-
 }
