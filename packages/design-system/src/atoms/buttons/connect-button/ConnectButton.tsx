@@ -6,6 +6,8 @@ import walletsSvg from './wallets.png'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import { Avatar, ConnectKitButton } from 'connectkit'
 
+import { useDisconnect, useSignMessage } from "wagmi"
+
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Popover } from '@headlessui/react'
 import { HiChevronDown, HiChevronUp } from 'react-icons/hi'
@@ -22,6 +24,13 @@ This will not trigger a blockchain transaction or cost any gas fees.
 
 export type ConnectButtonProps = {
   connectCallback: (address: string) => void
+  signCallback: (
+    address: string,
+    signature: string,
+    nonce: string,
+    state: string
+  ) => void
+  connectErrorCallback: (error: Error) => void
   disabled?: boolean
   signData?: {
     nonce: string | undefined
@@ -29,9 +38,6 @@ export type ConnectButtonProps = {
     address: string | undefined
     signature: string | undefined
   }
-  signMessage: (args: any) => void
-  disconnect: any
-  isSigning: boolean
   isLoading?: boolean
   className?: string
   fullSize?: boolean
@@ -40,16 +46,41 @@ export type ConnectButtonProps = {
 
 export function ConnectButton({
   connectCallback,
+  connectErrorCallback,
+  signCallback,
   isLoading,
   signData,
-  signMessage,
-  disconnect,
-  isSigning,
   fullSize = true,
   displayContinueWith = false,
 }: ConnectButtonProps) {
-
-
+  const { disconnect } = useDisconnect()
+  const {
+    isLoading: isSigning,
+    signMessage,
+  } = useSignMessage({
+    onSuccess(data) {
+      console.debug('message signed')
+      if (!signData?.nonce ||
+        !signData?.state ||
+        !signData?.address) {
+        connectErrorCallback(new Error('No signature data present.'))
+        return
+      }
+      console.debug('sign callback')
+      signCallback(
+        signData.address,
+        data,
+        signData.nonce,
+        signData.state
+      )
+    },
+    onError(error) {
+      console.debug('should sign?', { error, isSigning })
+      if (error && !isSigning) {
+        connectErrorCallback(error)
+      }
+    },
+  })
   useEffect(() => {
     if (!signData?.signature && signData?.nonce) {
       console.debug('signing...')

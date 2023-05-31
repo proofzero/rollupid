@@ -13,8 +13,7 @@ import { redirect, json } from '@remix-run/cloudflare'
 
 import { getAuthzCookieParams } from '~/session.server'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { createConfig, WagmiConfig } from 'wagmi'
-import { ConnectKitProvider, getDefaultConfig } from 'connectkit'
+import { getDefaultConfig } from 'connectkit'
 import Authentication, {
   AppProfile,
   AuthenticationScreenDefaults,
@@ -25,6 +24,7 @@ import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avat
 import { Button } from '@proofzero/packages/design-system/src/atoms/buttons/Button'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { useHydrated } from 'remix-utils'
+import { createConfig } from 'wagmi'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
@@ -80,7 +80,8 @@ const InnerComponent = ({
   rollup_action,
   displayKeys,
   clientId,
-  authnQueryParams
+  authnQueryParams,
+  wagmiConfig
 }: {
   transitionState: string,
   appProps?: AppProfile,
@@ -88,6 +89,7 @@ const InnerComponent = ({
   displayKeys?: any
   clientId: string,
   authnQueryParams: string,
+  wagmiConfig: any
 }) => {
   const [signData, setSignData] = useState<{
     nonce: string | undefined
@@ -131,7 +133,6 @@ const InnerComponent = ({
 
 
   return (
-
     <Authentication
       logoURL={iconURL}
       appProfile={appProps}
@@ -193,6 +194,7 @@ const InnerComponent = ({
         clientId,
         signData,
         navigate,
+        wagmiConfig: wagmiConfig,
         FormWrapperEl: ({ children, provider }) => (
           <Form
             className="w-full"
@@ -301,8 +303,6 @@ export default () => {
   const transition = useTransition()
 
   let config;
-
-
   const hydrated = useHydrated()
 
   if (hydrated) {
@@ -317,23 +317,22 @@ export default () => {
       })
     )
   }
+
   return <>
     {transition.state !== 'idle' && <Loader />}
 
     {
-      hydrated &&
-      <WagmiConfig config={config!}>
-        <ConnectKitProvider>
-          <InnerComponent
-            transitionState={transition.state}
-            appProps={appProps!}
-            rollup_action={rollup_action!}
-            displayKeys={displayKeys}
-            clientId={clientId}
-            authnQueryParams={authnQueryParams}
-          />
-        </ConnectKitProvider>
-      </WagmiConfig >
+      hydrated ?
+        <InnerComponent
+          wagmiConfig={config}
+          transitionState={transition.state}
+          appProps={appProps!}
+          rollup_action={rollup_action!}
+          displayKeys={displayKeys}
+          clientId={clientId}
+          authnQueryParams={authnQueryParams}
+        />
+        : null
     }
   </>
 

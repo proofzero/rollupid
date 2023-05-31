@@ -5,7 +5,8 @@ import subtractLogo from '../../assets/subtract-logo.svg'
 
 import { Text } from '../../atoms/text/Text'
 
-import { useDisconnect, useSignMessage } from 'wagmi'
+import { WagmiConfig, Config } from 'wagmi'
+import { ConnectKitProvider } from 'connectkit'
 import ConnectOAuthButton, {
   OAuthProvider,
 } from '../../atoms/buttons/connect-oauth-button'
@@ -63,36 +64,8 @@ export default ({
 
   const { dark } = useContext(ThemeContext)
 
-  const { disconnect } = useDisconnect()
-  const {
-    isLoading: isSigning,
-    signMessage,
-  } = useSignMessage({
-    onSuccess(data) {
-      console.debug('message signed')
-      if (!mapperArgs.signData?.nonce ||
-        !mapperArgs.signData?.state ||
-        !mapperArgs.signData?.address) {
-        mapperArgs.walletConnectErrorCallback(new Error('No signature data present.'))
-        return
-      }
-      console.debug('sign callback')
-      mapperArgs.walletSignCallback(
-        mapperArgs.signData.address,
-        data,
-        mapperArgs.signData.nonce,
-        mapperArgs.signData.state
-      )
-    },
-    onError(error) {
-      console.debug('should sign?', { error, isSigning })
-      if (error && !isSigning) {
-        mapperArgs.walletConnectErrorCallback(error)
-      }
-    },
-  })
-
   return (
+
     <div className={`relative ${dark ? 'dark' : ''}`}>
       <div
         className={`flex grow-0 flex-col items-center
@@ -112,9 +85,6 @@ export default ({
               flex: true,
               displayContinueWith: true,
               ...mapperArgs,
-              disconnect,
-              signMessage,
-              isSigning
             })
           )}
 
@@ -129,9 +99,6 @@ export default ({
               </div>
               {displayKeyDisplayFn(displayKeys.slice(2), {
                 ...mapperArgs,
-                disconnect,
-                signMessage,
-                isSigning
               })}
             </>
           )}
@@ -151,12 +118,14 @@ export default ({
         </div>
       </div>
     </div>
+
   )
 }
 
 type DisplayKeyMapperArgs = {
   clientId: string
   signData: any
+  wagmiConfig: Config
   walletConnectCallback?: (address: string) => void
   walletSignCallback?: (
     address: string,
@@ -171,9 +140,6 @@ type DisplayKeyMapperArgs = {
   flex?: boolean
   displayContinueWith?: boolean
   enableOAuthSubmit?: boolean
-  signMessage?: (args: any) => void
-  disconnect?: any
-  isSigning?: boolean
 }
 const displayKeyMapper = (
   key: string,
@@ -181,32 +147,35 @@ const displayKeyMapper = (
     clientId,
     signData,
     walletConnectCallback = () => { },
-    signMessage,
-    disconnect,
-    isSigning,
+    walletSignCallback = () => { },
+    walletConnectErrorCallback = () => { },
     navigate = () => { },
     FormWrapperEl = ({ children }) => <>{children}</>,
     loading = false,
     flex = false,
     displayContinueWith = false,
     enableOAuthSubmit = false,
+    wagmiConfig
   }: DisplayKeyMapperArgs
 ) => {
   let el
   switch (key) {
     case 'wallet':
       el = (
-        <ConnectButton
-          key={key}
-          signData={signData}
-          isLoading={loading}
-          fullSize={flex}
-          displayContinueWith={displayContinueWith}
-          connectCallback={walletConnectCallback}
-          disconnect={disconnect}
-          signMessage={signMessage}
-          isSigning={isSigning}
-        />
+        <WagmiConfig config={wagmiConfig} >
+          <ConnectKitProvider>
+            <ConnectButton
+              key={key}
+              signData={signData}
+              isLoading={loading}
+              fullSize={flex}
+              displayContinueWith={displayContinueWith}
+              connectCallback={walletConnectCallback}
+              connectErrorCallback={walletConnectErrorCallback}
+              signCallback={walletSignCallback}
+            />
+          </ConnectKitProvider>
+        </WagmiConfig >
       )
       break
     case 'email':
