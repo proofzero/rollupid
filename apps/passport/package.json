@@ -21,6 +21,7 @@
     "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook"
   },
   "dependencies": {
+    "@ethersproject/keccak256": "5.7.0",
     "@proofzero/design-system": "*",
     "@proofzero/platform-clients": "workspace:*",
     "@proofzero/platform.access": "workspace:*",
@@ -29,7 +30,7 @@
     "@remix-run/cloudflare-workers": "1.14.0",
     "@remix-run/react": "1.14.0",
     "@tailwindcss/forms": "0.5.3",
-    "connectkit": "1.4.0",
+    "connectkit": "1.2.0",
     "csp-header": "5.1.0",
     "flowbite": "1.6.5",
     "flowbite-react": "0.4.3",
@@ -46,8 +47,7 @@
     "remix-auth-oauth2": "1.5.0",
     "remix-auth-twitter": "1.0.0",
     "remix-utils": "6.3.0",
-    "viem": "0.3.39",
-    "wagmi": "1.0.9"
+    "wagmi": "0.11.7"
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",

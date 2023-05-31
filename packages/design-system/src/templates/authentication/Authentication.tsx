@@ -5,7 +5,7 @@ import subtractLogo from '../../assets/subtract-logo.svg'
 
 import { Text } from '../../atoms/text/Text'
 
-import { WagmiConfig, Config } from 'wagmi'
+import { WagmiConfig, Client } from 'wagmi'
 import ConnectOAuthButton, {
   OAuthProvider,
 } from '../../atoms/buttons/connect-oauth-button'
@@ -120,7 +120,7 @@ export default ({
 
 type DisplayKeyMapperArgs = {
   clientId: string
-  wagmiConfig: Config
+  wagmiClient: Client
   signData: any
   walletConnectCallback?: (address: string) => void
   walletSignCallback?: (
@@ -141,7 +141,7 @@ const displayKeyMapper = (
   key: string,
   {
     clientId,
-    wagmiConfig,
+    wagmiClient,
     signData,
     walletConnectCallback = () => {},
     walletSignCallback = () => {},
@@ -158,7 +158,7 @@ const displayKeyMapper = (
   switch (key) {
     case 'wallet':
       el = (
-        <WagmiConfig config={wagmiConfig}>
+        <WagmiConfig client={wagmiClient}>
           <ConnectButton
             key={key}
             signData={signData}
