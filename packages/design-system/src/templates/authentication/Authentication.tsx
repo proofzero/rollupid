@@ -5,7 +5,7 @@ import subtractLogo from '../../assets/subtract-logo.svg'
 
 import { Text } from '../../atoms/text/Text'
 
-import { WagmiConfig, Client } from 'wagmi'
+import { useAccount, useDisconnect, useSignMessage } from 'wagmi'
 import ConnectOAuthButton, {
   OAuthProvider,
 } from '../../atoms/buttons/connect-oauth-button'
@@ -63,6 +63,39 @@ export default ({
 
   const { dark } = useContext(ThemeContext)
 
+  const { connector, isConnected, isReconnecting } = useAccount()
+  const { disconnect } = useDisconnect()
+  const {
+    isLoading: isSigning,
+    error,
+    status,
+    signMessage,
+    reset,
+  } = useSignMessage({
+    onSuccess(data, variables) {
+      console.debug('message signed')
+      if (!mapperArgs.signData?.nonce ||
+        !mapperArgs.signData?.state ||
+        !mapperArgs.signData?.address) {
+        mapperArgs.walletConnectErrorCallback(new Error('No signature data present.'))
+        return
+      }
+      console.debug('sign callback')
+      mapperArgs.walletSignCallback(
+        mapperArgs.signData.address,
+        data,
+        mapperArgs.signData.nonce,
+        mapperArgs.signData.state
+      )
+    },
+    onError(error) {
+      console.debug('should sign?', { error, isSigning })
+      if (error && !isSigning) {
+        mapperArgs.walletConnectErrorCallback(error)
+      }
+    },
+  })
+
   return (
     <div className={`relative ${dark ? 'dark' : ''}`}>
       <div
@@ -83,6 +116,12 @@ export default ({
               flex: true,
               displayContinueWith: true,
               ...mapperArgs,
+              connector,
+              isConnected,
+              isReconnecting,
+              disconnect,
+              signMessage,
+              isSigning
             })
           )}
 
@@ -95,8 +134,15 @@ export default ({
                 </Text>
                 <div className="border-t border-gray-200 flex-1"></div>
               </div>
-
-              {displayKeyDisplayFn(displayKeys.slice(2), mapperArgs)}
+              {displayKeyDisplayFn(displayKeys.slice(2), {
+                ...mapperArgs,
+                connector,
+                isConnected,
+                isReconnecting,
+                disconnect,
+                signMessage,
+                isSigning
+              })}
             </>
           )}
 
@@ -120,7 +166,6 @@ export default ({
 
 type DisplayKeyMapperArgs = {
   clientId: string
-  wagmiClient: Client
   signData: any
   walletConnectCallback?: (address: string) => void
   walletSignCallback?: (
@@ -136,17 +181,26 @@ type DisplayKeyMapperArgs = {
   flex?: boolean
   displayContinueWith?: boolean
   enableOAuthSubmit?: boolean
+  connector?: any
+  signMessage?: (args: any) => void
+  disconnect?: any
+  isSigning?: boolean
+  isReconnecting?: boolean
+  isConnected?: boolean
 }
 const displayKeyMapper = (
   key: string,
   {
     clientId,
-    wagmiClient,
     signData,
-    walletConnectCallback = () => {},
-    walletSignCallback = () => {},
-    walletConnectErrorCallback = () => {},
-    navigate = () => {},
+    walletConnectCallback = () => { },
+    connector,
+    signMessage,
+    disconnect,
+    isSigning,
+    isReconnecting,
+    isConnected,
+    navigate = () => { },
     FormWrapperEl = ({ children }) => <>{children}</>,
     loading = false,
     flex = false,
@@ -158,18 +212,20 @@ const displayKeyMapper = (
   switch (key) {
     case 'wallet':
       el = (
-        <WagmiConfig client={wagmiClient}>
-          <ConnectButton
-            key={key}
-            signData={signData}
-            isLoading={loading}
-            fullSize={flex}
-            displayContinueWith={displayContinueWith}
-            connectCallback={walletConnectCallback}
-            signCallback={walletSignCallback}
-            connectErrorCallback={walletConnectErrorCallback}
-          />
-        </WagmiConfig>
+        <ConnectButton
+          key={key}
+          signData={signData}
+          isLoading={loading}
+          fullSize={flex}
+          displayContinueWith={displayContinueWith}
+          connectCallback={walletConnectCallback}
+          connector={connector}
+          isConnected={isConnected}
+          isReconnecting={isReconnecting}
+          disconnect={disconnect}
+          signMessage={signMessage}
+          isSigning={isSigning}
+        />
       )
       break
     case 'email':
@@ -274,7 +330,6 @@ const displayKeyDisplayFn = (
       Math.ceil(displayKeys.length / 2),
       displayKeys.length
     )
-
     return [
       ...displayKeyDisplayFn(firstHalf, mapperArgs),
       ...displayKeyDisplayFn(secondHalf, mapperArgs),

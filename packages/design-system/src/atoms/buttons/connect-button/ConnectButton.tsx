@@ -4,10 +4,8 @@ import { useEffect } from 'react'
 import type { ButtonProps } from '@proofzero/design-system/src/atoms/buttons/Button'
 
 import walletsSvg from './wallets.png'
-import { Avatar } from 'connectkit'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
-import { useAccount, useDisconnect, useSignMessage } from 'wagmi'
-import { ConnectKitProvider, ConnectKitButton } from 'connectkit'
+import { Avatar, ConnectKitProvider, ConnectKitButton } from 'connectkit'
 
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Popover } from '@headlessui/react'
@@ -25,13 +23,6 @@ This will not trigger a blockchain transaction or cost any gas fees.
 
 export type ConnectButtonProps = {
   connectCallback: (address: string) => void
-  signCallback: (
-    address: string,
-    signature: string,
-    nonce: string,
-    state: string
-  ) => void
-  connectErrorCallback: (error: Error) => void
   disabled?: boolean
   signData?: {
     nonce: string | undefined
@@ -39,6 +30,12 @@ export type ConnectButtonProps = {
     address: string | undefined
     signature: string | undefined
   }
+  connector: any
+  signMessage: (args: any) => void
+  disconnect: any
+  isSigning: boolean
+  isReconnecting: boolean
+  isConnected: boolean
   isLoading?: boolean
   className?: string
   fullSize?: boolean
@@ -47,38 +44,19 @@ export type ConnectButtonProps = {
 
 export function ConnectButton({
   connectCallback,
-  connectErrorCallback,
-  signCallback,
   isLoading,
   signData,
+  connector,
+  signMessage,
+  disconnect,
+  isSigning,
+  isReconnecting,
+  isConnected,
   fullSize = true,
   displayContinueWith = false,
 }: ConnectButtonProps) {
-  const { connector, isConnected, isReconnecting } = useAccount()
-  const { disconnect } = useDisconnect()
-  const {
-    isLoading: isSigning,
-    error,
-    status,
-    signMessage,
-    reset,
-  } = useSignMessage({
-    onSuccess(data, variables) {
-      console.debug('message signed')
-      if (!signData?.nonce || !signData?.state || !signData?.address) {
-        connectErrorCallback(new Error('No signature data present.'))
-        return
-      }
-      console.debug('sign callback')
-      signCallback(signData.address, data, signData.nonce, signData.state)
-    },
-    onError(error) {
-      console.debug('should sign?', { error, isSigning })
-      if (error && !isSigning) {
-        connectErrorCallback(error)
-      }
-    },
-  })
+
+  console.log({ signData, isReconnecting, isConnected, connector, signMessage })
 
   useEffect(() => {
     if (!signData?.signature && signData?.nonce) {
@@ -97,8 +75,9 @@ export function ConnectButton({
   const { theme, dark } = useContext(ThemeContext)
 
   return (
-    <div
-      className={`box-border rounded-md shadow-sm border border-solid border-[#d1d5db] bg-white dark:bg-[#374151] dark:border-gray-600 h-[56px]`}
+    < div
+      className={`box-border rounded-md shadow-sm border border-solid border-[#d1d5db] bg-white dark:bg-[#374151] dark:border-gray-600 h-[56px]`
+      }
     >
       <ConnectKitProvider>
         <ConnectKitButton.Custom>
@@ -121,14 +100,14 @@ export function ConnectButton({
                   disabled={isConnecting || isSigning || isLoading}
                   onClick={
                     isConnected
-                      ? () => address && connectCallback(address)
+                      ? () => {
+                        return address && connectCallback(address)
+                      }
                       : show
                   }
-                  className={`flex-1 button hover:bg-gray-100 flex flex-row items-center space-x-3 px-[17px] rounded-l-md ${
-                    isConnected ? '' : 'rounded-r-md'
-                  } ${
-                    fullSize ? 'justify-start' : 'justify-center'
-                  } bg-white dark:bg-[#374151] dark:border-gray-600 hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-skin-primary truncate`}
+                  className={`flex-1 button hover:bg-gray-100 flex flex-row items-center space-x-3 px-[17px] rounded-l-md ${isConnected ? '' : 'rounded-r-md'
+                    } ${fullSize ? 'justify-start' : 'justify-center'
+                    } bg-white dark:bg-[#374151] dark:border-gray-600 hover:bg-gray-100 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-skin-primary truncate`}
                 >
                   {(isSigning || isLoading) && isConnected ? (
                     <Spinner size={16} />
@@ -149,12 +128,11 @@ export function ConnectButton({
                           ? 'Signing... (please check wallet)'
                           : 'Continuing...'
                         : isConnected && address
-                        ? `${displayContinueWith ? `Continue with ` : ''}${
-                            ensName ?? truncatedAddress
+                          ? `${displayContinueWith ? `Continue with ` : ''}${ensName ?? truncatedAddress
                           }`
-                        : !isConnecting
-                        ? `${displayContinueWith ? `Continue with ` : ''}Wallet`
-                        : 'Connecting'}
+                          : !isConnecting
+                            ? `${displayContinueWith ? `Continue with ` : ''}Wallet`
+                            : 'Connecting'}
                     </Text>
                   )}
                 </button>
@@ -180,9 +158,8 @@ export function ConnectButton({
                               size="sm"
                               weight="normal"
                               className="text-red-600 text-start"
-                            >{`Disconnect ${
-                              ensName ?? truncatedAddress
-                            }`}</Text>
+                            >{`Disconnect ${ensName ?? truncatedAddress
+                              }`}</Text>
                           </button>
                         </Popover.Panel>
                       </>

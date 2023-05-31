@@ -37,7 +37,7 @@ export default function handleRequest(
         directives: {
           'default-src': [
             SELF,
-            'https://verify.walletconnect.com'
+            'https://verify.walletconnect.com',
           ],
           'connect-src': [
             SELF,

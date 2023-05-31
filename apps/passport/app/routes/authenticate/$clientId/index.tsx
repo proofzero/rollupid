@@ -13,8 +13,8 @@ import { redirect, json } from '@remix-run/cloudflare'
 
 import { getAuthzCookieParams } from '~/session.server'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { createClient } from 'wagmi'
-import { getDefaultClient } from 'connectkit'
+import { createConfig, WagmiConfig } from 'wagmi'
+import { getDefaultConfig } from 'connectkit'
 import Authentication, {
   AppProfile,
   AuthenticationScreenDefaults,
@@ -24,6 +24,7 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
 import { Button } from '@proofzero/packages/design-system/src/atoms/buttons/Button'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { useHydrated } from 'remix-utils'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
@@ -128,154 +129,161 @@ export default () => {
 
   const generic = Boolean(rollup_action)
 
+  let config;
 
-  const config = createConfig(
-    getDefaultConfig({
-      appName: 'Rollup',
-      autoConnect: true,
-      walletConnectProjectId:
-        WALLET_CONNECT_PROJECT_ID,
-      alchemyId:
-        APIKEY_ALCHEMY_PUBLIC,
-    })
-  )
+  const hydrated = useHydrated()
 
+  if (hydrated) {
+    config = createConfig(
+      getDefaultConfig({
+        appName: 'Rollup',
+        autoConnect: true,
+        walletConnectProjectId:
+          WALLET_CONNECT_PROJECT_ID,
+        alchemyId:
+          APIKEY_ALCHEMY_PUBLIC,
+      })
+    )
+  }
 
   return (
     <>
       {transition.state !== 'idle' && <Loader />}
 
-      <Authentication
-        logoURL={iconURL}
-        appProfile={appProps}
-        Header={
-          <>
-            {generic && (
+      {hydrated &&
+        <WagmiConfig config={config!}>
+          <Authentication
+            logoURL={iconURL}
+            appProfile={appProps}
+            Header={
               <>
-                <Text
-                  size="xl"
-                  weight="semibold"
-                  className="text-[#2D333A] mt-6 mb-8"
-                >
-                  Connect Account
-                </Text>
-              </>
-            )}
+                {generic && (
+                  <>
+                    <Text
+                      size="xl"
+                      weight="semibold"
+                      className="text-[#2D333A] mt-6 mb-8"
+                    >
+                      Connect Account
+                    </Text>
+                  </>
+                )}
 
-            {!generic && (
-              <>
-                <Avatar
-                  src={iconURL ?? AuthenticationScreenDefaults.defaultLogoURL}
-                  size="sm"
-                ></Avatar>
-                <div className={'flex flex-col items-center gap-2'}>
-                  <h1 className={'font-semibold text-xl'}>
-                    {appProps?.name
-                      ? `Login to ${appProps?.name}`
-                      : AuthenticationScreenDefaults.defaultHeading}
-                  </h1>
-                  <h2
-                    style={{ color: '#6B7280' }}
-                    className={'font-medium text-base'}
-                  >
-                    {AuthenticationScreenDefaults.defaultSubheading}
-                  </h2>
-                </div>
+                {!generic && (
+                  <>
+                    <Avatar
+                      src={iconURL ?? AuthenticationScreenDefaults.defaultLogoURL}
+                      size="sm"
+                    ></Avatar>
+                    <div className={'flex flex-col items-center gap-2'}>
+                      <h1 className={'font-semibold text-xl'}>
+                        {appProps?.name
+                          ? `Login to ${appProps?.name}`
+                          : AuthenticationScreenDefaults.defaultHeading}
+                      </h1>
+                      <h2
+                        style={{ color: '#6B7280' }}
+                        className={'font-medium text-base'}
+                      >
+                        {AuthenticationScreenDefaults.defaultSubheading}
+                      </h2>
+                    </div>
+                  </>
+                )}
               </>
-            )}
-          </>
-        }
-        Actions={
-          generic ? (
-            <>
-              <div className="flex flex-1 items-end">
-                <Button
-                  btnSize="l"
-                  btnType="secondary-alt"
-                  className="w-full hover:bg-gray-100"
-                  onClick={() => navigate('/authenticate/cancel')}
+            }
+            Actions={
+              generic ? (
+                <>
+                  <div className="flex flex-1 items-end">
+                    <Button
+                      btnSize="l"
+                      btnType="secondary-alt"
+                      className="w-full hover:bg-gray-100"
+                      onClick={() => navigate('/authenticate/cancel')}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </>
+              ) : undefined
+            }
+            displayKeys={displayKeys}
+            mapperArgs={{
+              clientId,
+              signData,
+              navigate,
+              FormWrapperEl: ({ children, provider }) => (
+                <Form
+                  className="w-full"
+                  action={`/connect/${provider}?${authnQueryParams}`}
+                  method="post"
+                  key={provider}
                 >
-                  Cancel
-                </Button>
-              </div>
-            </>
-          ) : undefined
-        }
-        displayKeys={displayKeys}
-        mapperArgs={{
-          clientId,
-          wagmiClient: client,
-          signData,
-          navigate,
-          FormWrapperEl: ({ children, provider }) => (
-            <Form
-              className="w-full"
-              action={`/connect/${provider}?${authnQueryParams}`}
-              method="post"
-              key={provider}
-            >
-              {children}
-            </Form>
-          ),
-          enableOAuthSubmit: true,
-          loading,
-          walletConnectCallback: async (address) => {
-            if (loading) return
-            // fetch nonce and kickoff sign flow
-            setLoading(true)
-            fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
-              .then((res) =>
-                res.json<{
-                  nonce: string
-                  state: string
-                  address: string
-                }>()
-              )
-              .then(({ nonce, state, address }) => {
+                  {children}
+                </Form>
+              ),
+              enableOAuthSubmit: true,
+              loading,
+              walletConnectCallback: async (address) => {
+                if (loading) return
+                // fetch nonce and kickoff sign flow
+                setLoading(true)
+                fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
+                  .then((res) =>
+                    res.json<{
+                      nonce: string
+                      state: string
+                      address: string
+                    }>()
+                  )
+                  .then(({ nonce, state, address }) => {
+                    setSignData({
+                      nonce,
+                      state,
+                      address,
+                      signature: undefined,
+                    })
+                  })
+                  .catch(() => {
+                    toast(ToastType.Error, {
+                      message:
+                        'Could not fetch nonce for signing authentication message',
+                    })
+                  })
+              },
+              walletSignCallback: (address, signature, nonce, state) => {
+                console.debug('signing complete')
                 setSignData({
-                  nonce,
-                  state,
-                  address,
-                  signature: undefined,
+                  ...signData,
+                  signature,
                 })
-              })
-              .catch(() => {
-                toast(ToastType.Error, {
-                  message:
-                    'Could not fetch nonce for signing authentication message',
-                })
-              })
-          },
-          walletSignCallback: (address, signature, nonce, state) => {
-            console.debug('signing complete')
-            setSignData({
-              ...signData,
-              signature,
-            })
-            submit(
-              { signature, nonce, state },
-              {
-                method: 'post',
-                action: `/connect/${address}/sign`,
-              }
-            )
-          },
-          walletConnectErrorCallback: (error) => {
-            console.debug('transition.state: ', transition.state)
-            if (transition.state !== 'idle' || !loading) {
-              return
-            }
-            if (error) {
-              console.error(error)
-              toast(ToastType.Error, {
-                message:
-                  'Failed to complete signing. Please try again or contact support.',
-              })
-              setLoading(false)
-            }
-          },
-        }}
-      />
+                submit(
+                  { signature, nonce, state },
+                  {
+                    method: 'post',
+                    action: `/connect/${address}/sign`,
+                  }
+                )
+              },
+              walletConnectErrorCallback: (error) => {
+                console.debug('transition.state: ', transition.state)
+                if (transition.state !== 'idle' || !loading) {
+                  return
+                }
+                if (error) {
+                  console.error(error)
+                  toast(ToastType.Error, {
+                    message:
+                      'Failed to complete signing. Please try again or contact support.',
+                  })
+                  setLoading(false)
+                }
+              },
+            }}
+          />
+        </WagmiConfig>
+      }
     </>
   )
 }
