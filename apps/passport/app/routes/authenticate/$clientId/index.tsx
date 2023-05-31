@@ -14,7 +14,7 @@ import { redirect, json } from '@remix-run/cloudflare'
 import { getAuthzCookieParams } from '~/session.server'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { createConfig, WagmiConfig } from 'wagmi'
-import { getDefaultConfig } from 'connectkit'
+import { ConnectKitProvider, getDefaultConfig } from 'connectkit'
 import Authentication, {
   AppProfile,
   AuthenticationScreenDefaults,
@@ -74,20 +74,21 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
-export default () => {
-  const { appProps, rollup_action } = useOutletContext<{
-    appProps?: AppProfile
-    rollup_action?: string
-  }>()
-
-  const {
-    clientId,
-    displayKeys,
-    authnQueryParams,
-    APIKEY_ALCHEMY_PUBLIC,
-    WALLET_CONNECT_PROJECT_ID
-  } = useLoaderData()
-
+const InnerComponent = ({
+  transitionState,
+  appProps,
+  rollup_action,
+  displayKeys,
+  clientId,
+  authnQueryParams
+}: {
+  transitionState: string,
+  appProps?: AppProfile,
+  rollup_action?: string
+  displayKeys?: any
+  clientId: string,
+  authnQueryParams: string,
+}) => {
   const [signData, setSignData] = useState<{
     nonce: string | undefined
     state: string | undefined
@@ -103,16 +104,15 @@ export default () => {
 
   const iconURL = appProps?.iconURL
 
-  const transition = useTransition()
   const submit = useSubmit()
 
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (transition.state === 'idle') {
+    if (transitionState === 'idle') {
       setLoading(false)
     }
-  }, [transition.state])
+  }, [transitionState])
 
   useEffect(() => {
     const url = new URL(window.location.href)
@@ -129,162 +129,140 @@ export default () => {
 
   const generic = Boolean(rollup_action)
 
-  let config;
-
-  const hydrated = useHydrated()
-
-  if (hydrated) {
-    config = createConfig(
-      getDefaultConfig({
-        appName: 'Rollup',
-        autoConnect: true,
-        walletConnectProjectId:
-          WALLET_CONNECT_PROJECT_ID,
-        alchemyId:
-          APIKEY_ALCHEMY_PUBLIC,
-      })
-    )
-  }
 
   return (
-    <>
-      {transition.state !== 'idle' && <Loader />}
 
-      {hydrated &&
-        <WagmiConfig config={config!}>
-          <Authentication
-            logoURL={iconURL}
-            appProfile={appProps}
-            Header={
-              <>
-                {generic && (
-                  <>
-                    <Text
-                      size="xl"
-                      weight="semibold"
-                      className="text-[#2D333A] mt-6 mb-8"
-                    >
-                      Connect Account
-                    </Text>
-                  </>
-                )}
+    <Authentication
+      logoURL={iconURL}
+      appProfile={appProps}
+      Header={
+        <>
+          {generic && (
+            <>
+              <Text
+                size="xl"
+                weight="semibold"
+                className="text-[#2D333A] mt-6 mb-8"
+              >
+                Connect Account
+              </Text>
+            </>
+          )}
 
-                {!generic && (
-                  <>
-                    <Avatar
-                      src={iconURL ?? AuthenticationScreenDefaults.defaultLogoURL}
-                      size="sm"
-                    ></Avatar>
-                    <div className={'flex flex-col items-center gap-2'}>
-                      <h1 className={'font-semibold text-xl'}>
-                        {appProps?.name
-                          ? `Login to ${appProps?.name}`
-                          : AuthenticationScreenDefaults.defaultHeading}
-                      </h1>
-                      <h2
-                        style={{ color: '#6B7280' }}
-                        className={'font-medium text-base'}
-                      >
-                        {AuthenticationScreenDefaults.defaultSubheading}
-                      </h2>
-                    </div>
-                  </>
-                )}
-              </>
-            }
-            Actions={
-              generic ? (
-                <>
-                  <div className="flex flex-1 items-end">
-                    <Button
-                      btnSize="l"
-                      btnType="secondary-alt"
-                      className="w-full hover:bg-gray-100"
-                      onClick={() => navigate('/authenticate/cancel')}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </>
-              ) : undefined
-            }
-            displayKeys={displayKeys}
-            mapperArgs={{
-              clientId,
-              signData,
-              navigate,
-              FormWrapperEl: ({ children, provider }) => (
-                <Form
-                  className="w-full"
-                  action={`/connect/${provider}?${authnQueryParams}`}
-                  method="post"
-                  key={provider}
+          {!generic && (
+            <>
+              <Avatar
+                src={iconURL ?? AuthenticationScreenDefaults.defaultLogoURL}
+                size="sm"
+              ></Avatar>
+              <div className={'flex flex-col items-center gap-2'}>
+                <h1 className={'font-semibold text-xl'}>
+                  {appProps?.name
+                    ? `Login to ${appProps?.name}`
+                    : AuthenticationScreenDefaults.defaultHeading}
+                </h1>
+                <h2
+                  style={{ color: '#6B7280' }}
+                  className={'font-medium text-base'}
                 >
-                  {children}
-                </Form>
-              ),
-              enableOAuthSubmit: true,
-              loading,
-              walletConnectCallback: async (address) => {
-                if (loading) return
-                // fetch nonce and kickoff sign flow
-                setLoading(true)
-                fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
-                  .then((res) =>
-                    res.json<{
-                      nonce: string
-                      state: string
-                      address: string
-                    }>()
-                  )
-                  .then(({ nonce, state, address }) => {
-                    setSignData({
-                      nonce,
-                      state,
-                      address,
-                      signature: undefined,
-                    })
-                  })
-                  .catch(() => {
-                    toast(ToastType.Error, {
-                      message:
-                        'Could not fetch nonce for signing authentication message',
-                    })
-                  })
-              },
-              walletSignCallback: (address, signature, nonce, state) => {
-                console.debug('signing complete')
-                setSignData({
-                  ...signData,
-                  signature,
-                })
-                submit(
-                  { signature, nonce, state },
-                  {
-                    method: 'post',
-                    action: `/connect/${address}/sign`,
-                  }
-                )
-              },
-              walletConnectErrorCallback: (error) => {
-                console.debug('transition.state: ', transition.state)
-                if (transition.state !== 'idle' || !loading) {
-                  return
-                }
-                if (error) {
-                  console.error(error)
-                  toast(ToastType.Error, {
-                    message:
-                      'Failed to complete signing. Please try again or contact support.',
-                  })
-                  setLoading(false)
-                }
-              },
-            }}
-          />
-        </WagmiConfig>
+                  {AuthenticationScreenDefaults.defaultSubheading}
+                </h2>
+              </div>
+            </>
+          )}
+        </>
       }
-    </>
+      Actions={
+        generic ? (
+          <>
+            <div className="flex flex-1 items-end">
+              <Button
+                btnSize="l"
+                btnType="secondary-alt"
+                className="w-full hover:bg-gray-100"
+                onClick={() => navigate('/authenticate/cancel')}
+              >
+                Cancel
+              </Button>
+            </div>
+          </>
+        ) : undefined
+      }
+      displayKeys={displayKeys}
+      mapperArgs={{
+        clientId,
+        signData,
+        navigate,
+        FormWrapperEl: ({ children, provider }) => (
+          <Form
+            className="w-full"
+            action={`/connect/${provider}?${authnQueryParams}`}
+            method="post"
+            key={provider}
+          >
+            {children}
+          </Form>
+        ),
+        enableOAuthSubmit: true,
+        loading,
+        walletConnectCallback: async (address) => {
+          if (loading) return
+          // fetch nonce and kickoff sign flow
+          setLoading(true)
+          fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
+            .then((res) =>
+              res.json<{
+                nonce: string
+                state: string
+                address: string
+              }>()
+            )
+            .then(({ nonce, state, address }) => {
+              setSignData({
+                nonce,
+                state,
+                address,
+                signature: undefined,
+              })
+            })
+            .catch(() => {
+              toast(ToastType.Error, {
+                message:
+                  'Could not fetch nonce for signing authentication message',
+              })
+            })
+        },
+        walletSignCallback: (address, signature, nonce, state) => {
+          console.debug('signing complete')
+          setSignData({
+            ...signData,
+            signature,
+          })
+          submit(
+            { signature, nonce, state },
+            {
+              method: 'post',
+              action: `/connect/${address}/sign`,
+            }
+          )
+        },
+        walletConnectErrorCallback: (error) => {
+          console.debug('transition.state: ', transitionState)
+          if (transitionState !== 'idle' || !loading) {
+            return
+          }
+          if (error) {
+            console.error(error)
+            toast(ToastType.Error, {
+              message:
+                'Failed to complete signing. Please try again or contact support.',
+            })
+            setLoading(false)
+          }
+        },
+      }}
+    />
+
   )
 }
 
@@ -304,4 +282,59 @@ const getOAuthErrorMessage = (error: string): string => {
     default:
       return 'An unknown error occurred'
   }
+}
+
+export default () => {
+  const { appProps, rollup_action } = useOutletContext<{
+    appProps?: AppProfile
+    rollup_action?: string
+  }>()
+
+  const {
+    clientId,
+    displayKeys,
+    authnQueryParams,
+    APIKEY_ALCHEMY_PUBLIC,
+    WALLET_CONNECT_PROJECT_ID
+  } = useLoaderData()
+
+  const transition = useTransition()
+
+  let config;
+
+
+  const hydrated = useHydrated()
+
+  if (hydrated) {
+    config = createConfig(
+      getDefaultConfig({
+        appName: 'Rollup',
+        autoConnect: true,
+        walletConnectProjectId:
+          WALLET_CONNECT_PROJECT_ID,
+        alchemyId:
+          APIKEY_ALCHEMY_PUBLIC,
+      })
+    )
+  }
+  return <>
+    {transition.state !== 'idle' && <Loader />}
+
+    {
+      hydrated &&
+      <WagmiConfig config={config!}>
+        <ConnectKitProvider>
+          <InnerComponent
+            transitionState={transition.state}
+            appProps={appProps!}
+            rollup_action={rollup_action!}
+            displayKeys={displayKeys}
+            clientId={clientId}
+            authnQueryParams={authnQueryParams}
+          />
+        </ConnectKitProvider>
+      </WagmiConfig >
+    }
+  </>
+
 }

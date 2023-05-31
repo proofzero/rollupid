@@ -1,11 +1,11 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 
 import circleLogo from './circle-logo.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
 
 import { Text } from '../../atoms/text/Text'
 
-import { useAccount, useDisconnect, useSignMessage } from 'wagmi'
+import { useDisconnect, useSignMessage } from 'wagmi'
 import ConnectOAuthButton, {
   OAuthProvider,
 } from '../../atoms/buttons/connect-oauth-button'
@@ -63,16 +63,12 @@ export default ({
 
   const { dark } = useContext(ThemeContext)
 
-  const { connector, isConnected, isReconnecting } = useAccount()
   const { disconnect } = useDisconnect()
   const {
     isLoading: isSigning,
-    error,
-    status,
     signMessage,
-    reset,
   } = useSignMessage({
-    onSuccess(data, variables) {
+    onSuccess(data) {
       console.debug('message signed')
       if (!mapperArgs.signData?.nonce ||
         !mapperArgs.signData?.state ||
@@ -116,9 +112,6 @@ export default ({
               flex: true,
               displayContinueWith: true,
               ...mapperArgs,
-              connector,
-              isConnected,
-              isReconnecting,
               disconnect,
               signMessage,
               isSigning
@@ -136,9 +129,6 @@ export default ({
               </div>
               {displayKeyDisplayFn(displayKeys.slice(2), {
                 ...mapperArgs,
-                connector,
-                isConnected,
-                isReconnecting,
                 disconnect,
                 signMessage,
                 isSigning
@@ -181,12 +171,9 @@ type DisplayKeyMapperArgs = {
   flex?: boolean
   displayContinueWith?: boolean
   enableOAuthSubmit?: boolean
-  connector?: any
   signMessage?: (args: any) => void
   disconnect?: any
   isSigning?: boolean
-  isReconnecting?: boolean
-  isConnected?: boolean
 }
 const displayKeyMapper = (
   key: string,
@@ -194,12 +181,9 @@ const displayKeyMapper = (
     clientId,
     signData,
     walletConnectCallback = () => { },
-    connector,
     signMessage,
     disconnect,
     isSigning,
-    isReconnecting,
-    isConnected,
     navigate = () => { },
     FormWrapperEl = ({ children }) => <>{children}</>,
     loading = false,
@@ -219,9 +203,6 @@ const displayKeyMapper = (
           fullSize={flex}
           displayContinueWith={displayContinueWith}
           connectCallback={walletConnectCallback}
-          connector={connector}
-          isConnected={isConnected}
-          isReconnecting={isReconnecting}
           disconnect={disconnect}
           signMessage={signMessage}
           isSigning={isSigning}
