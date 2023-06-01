@@ -12,6 +12,6 @@ export {
   gatewayFromIpfs,
   getAuthzHeaderConditionallyFromToken,
   getAuthzTokenFromReq,
-  signMessageTemplate
+  signMessageTemplate,
   parseJwt,
 }
