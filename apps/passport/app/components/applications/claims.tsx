@@ -89,6 +89,74 @@ export const ConfirmRevocationModal = ({
   )
 }
 
+const AccountExpandedView = ({ account, wallet = false }: {
+  account: {
+    icon: string
+    address: string
+    type: string
+    title?: string
+  }
+  wallet?: boolean
+}) => {
+  return <div className="flex flex-col gap-2 p-2.5 bg-white rounded-lg">
+    <section className="flex flex-row gap-2 items-center">
+      <img
+        src={account.icon}
+        className="rounded-full w-5 h-5"
+      />
+
+      <Text
+        size="sm"
+        weight="semibold"
+        className="text-gray-800 truncate"
+      >
+        {account.address}
+      </Text>
+    </section>
+    {
+      wallet &&
+      <div className="flex flex-row gap-1 items-center">
+        <Text size="xs" weight="semibold" className="text-gray-500">
+          Wallet Name:
+        </Text>
+        <Text
+          size="xs"
+          weight="medium"
+          className="text-gray-500 truncate"
+        >
+          {account.title}
+        </Text>
+      </div>
+    }
+    <div className="flex flex-row gap-1 items-center">
+      <Text size="xs" weight="semibold" className="text-gray-500">
+        {wallet ? "Wallet ID:" : "Address:"}
+      </Text>
+      <Text
+        size="xs"
+        weight="medium"
+        className="text-gray-500 truncate"
+      >
+        {account.address}
+      </Text>
+    </div>
+
+    <div className="flex flex-row gap-1 items-center">
+      <Text size="xs" weight="semibold" className="text-gray-500">
+        Source:
+      </Text>
+      <Text
+        size="xs"
+        weight="medium"
+        className="text-gray-500 truncate"
+      >
+        {wallet ? "Smart Contract Wallet" : `${startCase(account.type)} - ${account.address
+          }`}
+      </Text>
+    </div>
+  </div>
+}
+
 export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
   const EmailView = ({
     address,
@@ -125,10 +193,10 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
   }) => {
     const [selectedAccount, setSelectedAccount] = useState<
       | {
-          icon: string
-          address: string
-          type: string
-        }
+        icon: string
+        address: string
+        type: string
+      }
       | undefined
     >()
 
@@ -184,63 +252,7 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
               </section>
 
               {selectedAccount && (
-                <div className="flex flex-col gap-2 p-2.5 bg-white rounded-lg">
-                  <section className="flex flex-row gap-2 items-center">
-                    <img
-                      src={selectedAccount.icon}
-                      className="rounded-full w-5 h-5"
-                    />
-
-                    <Text
-                      size="sm"
-                      weight="semibold"
-                      className="text-gray-800 truncate"
-                    >
-                      {selectedAccount.address}
-                    </Text>
-                  </section>
-
-                  <div className="flex flex-row gap-1 items-center">
-                    <Text size="xs" weight="semibold" className="text-gray-500">
-                      Address:
-                    </Text>
-                    <Text
-                      size="xs"
-                      weight="medium"
-                      className="text-gray-500 truncate"
-                    >
-                      {selectedAccount.address}
-                    </Text>
-                  </div>
-
-                  <div className="flex flex-row gap-1 items-center">
-                    <Text size="xs" weight="semibold" className="text-gray-500">
-                      Source:
-                    </Text>
-                    <Text
-                      size="xs"
-                      weight="medium"
-                      className="text-gray-500 truncate"
-                    >
-                      {`${startCase(selectedAccount.type)} - ${
-                        selectedAccount.address
-                      }`}
-                    </Text>
-                  </div>
-
-                  <div className="flex flex-row gap-1 items-center">
-                    <Text size="xs" weight="semibold" className="text-gray-500">
-                      Picture:
-                    </Text>
-                    <Text
-                      size="xs"
-                      weight="medium"
-                      className="text-gray-500 truncate"
-                    >
-                      {selectedAccount.icon}
-                    </Text>
-                  </div>
-                </div>
+                <AccountExpandedView account={selectedAccount} />
               )}
             </Disclosure.Panel>
           </div>
@@ -262,6 +274,8 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
               />
             )
           case 'connected_accounts':
+            return <ConnectedAccountsView key={i} accounts={claim.accounts} />
+          case 'erc_4337':
             return <ConnectedAccountsView key={i} accounts={claim.accounts} />
         }
       })}
@@ -301,6 +315,56 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
     )
   }
 
+  const ClaimColumnView = ({
+    open,
+    title,
+    avatars,
+    wallets = false
+  }: {
+    open: boolean
+    title: string
+    avatars?: Array<string>
+    wallets?: boolean
+  }) => {
+    return <tr>
+      <td className={`px-6 py-3 ${open ? `bg-gray-50` : ''}`}>
+        <Disclosure.Button className="flex flex-row items-center gap-1.5">
+          {open ? (
+            <FaChevronDown className="w-3 h-3 text-indigo-500" />
+          ) : (
+            <FaChevronRight className="w-3 h-3 text-gray-500" />
+          )}
+
+          <Text
+            size="sm"
+            weight="medium"
+            className="text-gray-500 truncate"
+          >
+            {title}
+          </Text>
+        </Disclosure.Button>
+      </td>
+      <td className="px-6 py-3">
+        {wallets
+          ? <Text size="sm" weight="medium" className="text-gray-500 truncate">
+            {avatars!.length} Smart Contract Wallet(s)
+          </Text>
+          : <MultiAvatar avatars={avatars!} />}
+      </td>
+      <td className="px-6 py-3 flex flex-row items-center gap-2.5">
+        <img src={passportLogoURL} className="w-5 h-5" />
+
+        <Text
+          size="sm"
+          weight="medium"
+          className="text-gray-500 truncate"
+        >
+          Rollup Identity
+        </Text>
+      </td>
+    </tr>
+  }
+
   const ConnectedAccountsView = ({
     accounts,
   }: {
@@ -312,10 +376,10 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
   }) => {
     const [selectedAccount, setSelectedAccount] = useState<
       | {
-          icon: string
-          address: string
-          type: string
-        }
+        icon: string
+        address: string
+        type: string
+      }
       | undefined
     >()
 
@@ -323,40 +387,11 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
       <Disclosure>
         {({ open }) => (
           <>
-            <tr>
-              <td className={`px-6 py-3 ${open ? `bg-gray-50` : ''}`}>
-                <Disclosure.Button className="flex flex-row items-center gap-1.5">
-                  {open ? (
-                    <FaChevronDown className="w-3 h-3 text-indigo-500" />
-                  ) : (
-                    <FaChevronRight className="w-3 h-3 text-gray-500" />
-                  )}
-
-                  <Text
-                    size="sm"
-                    weight="medium"
-                    className="text-gray-500 truncate"
-                  >
-                    Connected Accounts
-                  </Text>
-                </Disclosure.Button>
-              </td>
-              <td className="px-6 py-3">
-                <MultiAvatar avatars={accounts.map((a) => a.icon)} />
-              </td>
-              <td className="px-6 py-3 flex flex-row items-center gap-2.5">
-                <img src={passportLogoURL} className="w-5 h-5" />
-
-                <Text
-                  size="sm"
-                  weight="medium"
-                  className="text-gray-500 truncate"
-                >
-                  Rollup Identity
-                </Text>
-              </td>
-            </tr>
-
+            <ClaimColumnView
+              avatars={accounts.map((a) => a.icon)}
+              open={open}
+              title="Connected Accounts"
+            />
             <Disclosure.Panel as="tr">
               <td
                 colSpan={4}
@@ -378,75 +413,68 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
                 </section>
 
                 {selectedAccount && (
-                  <div className="flex flex-col gap-2 p-2.5 bg-white rounded-lg mt-2">
-                    <section className="flex flex-row gap-2 items-center">
-                      <img
-                        src={selectedAccount.icon}
-                        className="rounded-full w-5 h-5"
-                      />
+                  <AccountExpandedView account={selectedAccount} />
+                )}
+              </td>
+            </Disclosure.Panel>
+          </>
+        )}
+      </Disclosure>
+    )
+  }
 
-                      <Text
-                        size="sm"
-                        weight="semibold"
-                        className="text-gray-800 truncate"
-                      >
-                        {selectedAccount.address}
-                      </Text>
-                    </section>
+  const SCWalletsView = ({
+    accounts,
+  }: {
+    accounts: {
+      icon: string
+      address: string
+      type: string
+      title: string
+    }[]
+  }) => {
+    const [selectedAccount, setSelectedAccount] = useState<
+      | {
+        icon: string
+        address: string
+        type: string
+        title: string
+      }
+      | undefined
+    >()
 
-                    <div className="flex flex-row gap-1 items-center">
-                      <Text
-                        size="xs"
-                        weight="semibold"
-                        className="text-gray-500"
-                      >
-                        Address:
-                      </Text>
-                      <Text
-                        size="xs"
-                        weight="medium"
-                        className="text-gray-500 truncate"
-                      >
-                        {selectedAccount.address}
-                      </Text>
-                    </div>
+    return (
+      <Disclosure>
+        {({ open }) => (
+          <>
+            <ClaimColumnView
+              avatars={accounts.map((a) => a.icon)}
+              open={open}
+              title="Smart Contract Wallets"
+              wallets={true}
+            />
+            <Disclosure.Panel as="tr">
+              <td
+                colSpan={4}
+                className="py-3.5 px-6 bg-gray-50 border shadow-inner"
+              >
+                <Text className="mb-2">Smart Contract Wallet</Text>
 
-                    <div className="flex flex-row gap-1 items-center">
-                      <Text
-                        size="xs"
-                        weight="semibold"
-                        className="text-gray-500"
-                      >
-                        Source:
-                      </Text>
-                      <Text
-                        size="xs"
-                        weight="medium"
-                        className="text-gray-500 truncate"
-                      >
-                        {`${startCase(selectedAccount.type)} - ${
-                          selectedAccount.address
-                        }`}
-                      </Text>
-                    </div>
+                <section className="flex flex-row flex-wrap gap-2">
+                  {accounts.map((a, i) => (
+                    <UserPill
+                      key={i}
+                      size={20}
+                      text={a.title}
+                      avatarURL={a.icon}
+                      onClick={() => setSelectedAccount(a)}
+                      className={'pointer-events-auto'}
+                    />
+                  ))}
+                </section>
 
-                    <div className="flex flex-row gap-1 items-center">
-                      <Text
-                        size="xs"
-                        weight="semibold"
-                        className="text-gray-500"
-                      >
-                        Picture:
-                      </Text>
-                      <Text
-                        size="xs"
-                        weight="medium"
-                        className="text-gray-500 truncate"
-                      >
-                        {selectedAccount.icon}
-                      </Text>
-                    </div>
-                  </div>
+                {selectedAccount && (
+                  <AccountExpandedView account={selectedAccount} wallet={true} />
                 )}
               </td>
             </Disclosure.Panel>
@@ -470,6 +498,8 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
             )
           case 'connected_accounts':
             return <ConnectedAccountsView key={i} accounts={claim.accounts} />
+          case 'erc_4337':
+            return <SCWalletsView key={i} accounts={claim.accounts} />
         }
       })}
     </>

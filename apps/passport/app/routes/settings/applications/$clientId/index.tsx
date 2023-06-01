@@ -77,6 +77,19 @@ export default () => {
             type: profile.type === 'eth' ? 'blockchain' : profile.type,
           })),
         })
+      } else if (scopeValue === 'erc_4337') {
+        const profiles = connectedProfiles.filter((profile) =>
+          scopes[scopeValue].meta.urns.includes(profile.urn)
+        )
+        aggregator.push({
+          claim: 'erc_4337',
+          accounts: profiles.map((profile) => ({
+            icon: profile.icon,
+            address: profile.address,
+            title: profile.title,
+            type: 'blockchain',
+          })),
+        })
       }
     }
 
@@ -172,7 +185,7 @@ export default () => {
                     weight="medium"
                     className="uppercase text-gray-500"
                   >
-                    Claim Name
+                    App Asked For
                   </Text>
                 </th>
                 <th className="px-6 py-3 text-left">
@@ -181,7 +194,7 @@ export default () => {
                     weight="medium"
                     className="uppercase text-gray-500"
                   >
-                    Claim Value
+                    What’s being shared
                   </Text>
                 </th>
                 <th className="px-6 py-3 text-left rounded-tr-lg">
@@ -190,7 +203,7 @@ export default () => {
                     weight="medium"
                     className="uppercase text-gray-500"
                   >
-                    Source
+                    SOURCE of DATA
                   </Text>
                 </th>
               </tr>
