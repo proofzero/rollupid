@@ -10,13 +10,17 @@ import {
 import { TwitterStrategy } from 'remix-auth-twitter'
 
 import { AppleStrategy } from '~/utils/applestrategy.server'
+import { getCookieDomain } from './utils/cookie'
 
 // OAuth state
 
-export const createAuthenticatorSessionStorage = (env: Env) => {
+export const createAuthenticatorSessionStorage = (
+  request: Request,
+  env: Env
+) => {
   return createCookieSessionStorage({
     cookie: {
-      domain: env.COOKIE_DOMAIN,
+      domain: getCookieDomain(request, env),
       httpOnly: true,
       name: 'external_oauth_login',
       path: '/',
@@ -40,7 +44,7 @@ export const injectAuthnParamsIntoSession = async (
   request: Request,
   env: Env
 ) => {
-  const authenticatorStorage = createAuthenticatorSessionStorage(env)
+  const authenticatorStorage = createAuthenticatorSessionStorage(request, env)
   const session = await authenticatorStorage.getSession(
     request.headers.get('Cookie')
   )

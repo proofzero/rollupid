@@ -51,7 +51,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     return redirect('/settings/applications', {
       headers: {
-        'Set-Cookie': await commitFlashSession(context.env, session),
+        'Set-Cookie': await commitFlashSession(request, context.env, session),
       },
     })
   }

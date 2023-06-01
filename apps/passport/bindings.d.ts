@@ -11,9 +11,10 @@ declare global {
     Starbase: Fetcher
     Images: Fetcher
 
+    DEFAULT_HOSTS: string[]
+    COOKIE_DOMAIN: string
     SECRET_SESSION_KEY: string
     SECRET_SESSION_SALT: string
-    COOKIE_DOMAIN: string
     PROFILE_APP_URL: string
     CONSOLE_APP_URL: string
     PASSPORT_REDIRECT_URL: string

@@ -1,12 +1,20 @@
-import {
-  generateTraceSpan,
-  TraceableFetchEvent,
-} from '@proofzero/platform-middleware/trace'
+import type { Request as CfRequest } from '@cloudflare/workers-types'
 import {
   createRequestHandler,
   handleAsset,
 } from '@remix-run/cloudflare-workers'
 import * as build from '@remix-run/dev/server-build'
+
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import {
+  generateTraceContextHeaders,
+  generateTraceSpan,
+} from '@proofzero/platform-middleware/trace'
+import type { TraceableFetchEvent } from '@proofzero/platform-middleware/trace'
+
+type CfHostMetadata = {
+  clientId: string
+}
 
 export function parseParams(request: Request) {
   const url = new URL(request.url)
@@ -42,10 +50,12 @@ const requestHandler = createRequestHandler({
   build,
   mode: process.env.NODE_ENV,
   getLoadContext: (event) => {
+    const authzQueryParams = parseParams(event.request)
+    const env = globalThis as unknown as Env
     const traceSpan = (event as TraceableFetchEvent).traceSpan
     return {
-      authzQueryParams: parseParams(event.request),
-      env: globalThis as unknown as Env,
+      authzQueryParams,
+      env,
       traceSpan,
     }
   },
@@ -53,31 +63,53 @@ const requestHandler = createRequestHandler({
 
 const handleEvent = async (event: FetchEvent) => {
   let response = await handleAsset(event, build)
+  if (response) return response
 
-  if (!response) {
-    //Create a new trace span with no parent
-    const newTraceSpan = generateTraceSpan()
+  //Create a new trace span with no parent
+  const newTraceSpan = generateTraceSpan()
 
-    const reqURL = new URL(event.request.url)
-    //Have to force injection of new field so it is available in the context setup above
-    const newEvent = Object.assign(event, { traceSpan: newTraceSpan })
+  const reqURL = new URL(event.request.url)
+  //Have to force injection of new field so it is available in the context setup above
+  const newEvent = Object.assign(event, { traceSpan: newTraceSpan })
 
+  console.debug(
+    `Started HTTP handler for ${reqURL.pathname}/${reqURL.searchParams}`,
+    newTraceSpan.toString()
+  )
+
+  const env = globalThis as unknown as Env
+  const request = event.request as unknown as CfRequest<CfHostMetadata>
+  const host = request.headers.get('host') as string
+  if (!env.DEFAULT_HOSTS.includes(host)) {
+    const clientId = request.cf?.hostMetadata?.clientId
+    if (!clientId) return new Response(null, { status: 404 })
+    const starbaseClient = createStarbaseClient(
+      env.Starbase,
+      generateTraceContextHeaders(newTraceSpan)
+    )
+
+    try {
+      const app = await starbaseClient.getAppPublicProps.query({ clientId })
+      const { customDomain } = app
+      if (!customDomain) return new Response(null, { status: 404 })
+      if (!customDomain.isActive || host !== customDomain?.hostname)
+        return new Response(null, { status: 404 })
+    } catch (error) {
+      return new Response(null, { status: 500 })
+    }
+  }
+
+  try {
+    response = await requestHandler(newEvent)
+  } finally {
     console.debug(
-      `Started HTTP handler for ${reqURL.pathname}/${reqURL.searchParams}`,
+      `Completed HTTP handler ${
+        response?.status && response?.status >= 400 && response?.status <= 599
+          ? 'with errors '
+          : ''
+      }for ${reqURL.pathname}/${reqURL.searchParams}`,
       newTraceSpan.toString()
     )
-    try {
-      response = await requestHandler(newEvent)
-    } finally {
-      console.debug(
-        `Completed HTTP handler ${
-          response?.status && response?.status >= 400 && response?.status <= 599
-            ? 'with errors '
-            : ''
-        }for ${reqURL.pathname}/${reqURL.searchParams}`,
-        newTraceSpan.toString()
-      )
-    }
   }
 
   return response

@@ -79,6 +79,7 @@ export const authenticateAddress = async (
   await provisionProfile(accessToken, env, traceSpan, address)
 
   return createUserSession(
+    request,
     accessToken,
     getAuthzRedirectURL(appData),
     env,
@@ -189,7 +190,10 @@ export const checkOAuthError = async (request: Request, env: Env) => {
   console.error({ error, uri, description })
 
   const authzParams = await getAuthzCookieParamsSession(request, env)
-  const authenticatorStorage = await createAuthenticatorSessionStorage(env)
+  const authenticatorStorage = await createAuthenticatorSessionStorage(
+    request,
+    env
+  )
   const session = await authenticatorStorage.getSession(
     request.headers.get('Cookie')
   )

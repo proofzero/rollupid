@@ -27,7 +27,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const appData = await getAuthzCookieParams(request, context.env)
 
-    const authenticatorSession = createAuthenticatorSessionStorage(context.env)
+    const authenticatorSession = createAuthenticatorSessionStorage(
+      request,
+      context.env
+    )
     const authenticator = new Authenticator(authenticatorSession)
     authenticator.use(getGithubAuthenticator(context.env))
 

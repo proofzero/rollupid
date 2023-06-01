@@ -45,7 +45,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       },
       {
         headers: {
-          'Set-Cookie': await commitFlashSession(context.env, session),
+          'Set-Cookie': await commitFlashSession(request, context.env, session),
         },
       }
     )

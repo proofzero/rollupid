@@ -27,10 +27,11 @@ inspector_port = 11001
 local_protocol = "http"
 
 [vars]
+DEFAULT_HOSTS = ["localhost:10001"]
+COOKIE_DOMAIN = "localhost"
 PROFILE_APP_URL = "http://localhost:10003"
 CONSOLE_APP_URL = "http://localhost:10002"
 PASSPORT_REDIRECT_URL = "http://localhost:10001/connect/token"
-COOKIE_DOMAIN = "localhost"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/google/callback"
 INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/github/callback"
 INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/twitter/callback"
@@ -54,10 +55,11 @@ services = [
 ]
 
 [env.dev.vars]
+DEFAULT_HOSTS = ["passport-dev.rollup.id", "passport-dev.pz3r0.com"]
+COOKIE_DOMAIN = "rollup.id"
 PROFILE_APP_URL = "https://my-dev.rollup.id"
 CONSOLE_APP_URL = "https://console-dev.rollup.id"
 PASSPORT_REDIRECT_URL = "https://passport-dev.rollup.id/connect/token"
-COOKIE_DOMAIN = "rollup.id"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/connect/google/callback"
 INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/connect/github/callback"
 INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/connect/twitter/callback"
@@ -80,10 +82,11 @@ services = [
 ]
 
 [env.next.vars]
+DEFAULT_HOSTS = ["passport-next.rollup.id", "passport-next.pz3r0.com"]
+COOKIE_DOMAIN = "rollup.id"
 PROFILE_APP_URL = "https://my-next.rollup.id"
 CONSOLE_APP_URL = "https://console-next.rollup.id"
 PASSPORT_REDIRECT_URL = "https://passport-next.rollup.id/connect/token"
-COOKIE_DOMAIN = "rollup.id"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/google/callback"
 INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/github/callback"
 INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/twitter/callback"
@@ -109,10 +112,11 @@ services = [
 ]
 
 [env.current.vars]
+DEFAULT_HOSTS = ["passport.rollup.id", "passport.pz3r0.com"]
+COOKIE_DOMAIN = "rollup.id"
 PROFILE_APP_URL = "https://my.rollup.id"
 CONSOLE_APP_URL = "https://console.rollup.id"
 PASSPORT_REDIRECT_URL = "https://passport.rollup.id/connect/token"
-COOKIE_DOMAIN = "rollup.id"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "https://passport.rollup.id/connect/google/callback"
 INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "https://passport.rollup.id/connect/github/callback"
 INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport.rollup.id/connect/twitter/callback"

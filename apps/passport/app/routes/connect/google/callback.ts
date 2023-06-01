@@ -24,7 +24,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const appData = await getAuthzCookieParams(request, context.env)
 
-    const authenticatorStorage = createAuthenticatorSessionStorage(context.env)
+    const authenticatorStorage = createAuthenticatorSessionStorage(
+      request,
+      context.env
+    )
     const authenticator = new Authenticator(authenticatorStorage)
     authenticator.use(getGoogleAuthenticator(context.env))
 
