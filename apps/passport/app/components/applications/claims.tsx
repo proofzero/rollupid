@@ -14,6 +14,7 @@ import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import warningImg from '~/assets/warning.svg'
 import InputText from '~/components/inputs/InputText'
 import { startCase } from 'lodash'
+import { HiOutlineExternalLink } from 'react-icons/hi'
 
 export const ConfirmRevocationModal = ({
   title,
@@ -89,49 +90,57 @@ export const ConfirmRevocationModal = ({
   )
 }
 
-const AccountExpandedView = ({ account, source, wallet = false }: {
+const AccountExpandedView = ({
+  account,
+  source,
+  titleFieldName,
+  titleFieldValue,
+  addressFieldName,
+  connectedAccounts = false
+}: {
   account: {
     icon: string
     address: string
     type?: string
     title?: string
   }
+  titleFieldName?: string
+  titleFieldValue?: JSX.Element
+  addressFieldName?: string
   source?: string
-  wallet?: boolean
+  connectedAccounts?: boolean
 }) => {
   return <div className="flex flex-col gap-2 p-2.5 bg-white rounded-lg">
-    <section className="flex flex-row gap-2 items-center">
-      <img
-        src={account.icon}
-        className="rounded-full w-5 h-5"
-      />
-
-      <Text
-        size="sm"
-        weight="semibold"
-        className="text-gray-800 truncate"
-      >
-        {account.address}
-      </Text>
-    </section>
     {
-      wallet &&
+      connectedAccounts &&
+      <section className="flex flex-row gap-2 items-center">
+        <img
+          src={account.icon}
+          className="rounded-full w-5 h-5"
+        />
+
+        <Text
+          size="sm"
+          weight="semibold"
+          className="text-gray-800 truncate"
+        >
+          {account.address}
+        </Text>
+      </section>}
+
+    {
+      titleFieldName &&
       <div className="flex flex-row gap-1 items-center">
         <Text size="xs" weight="semibold" className="text-gray-500">
-          Wallet Name:
+          {titleFieldName}:
         </Text>
-        <Text
-          size="xs"
-          weight="medium"
-          className="text-gray-500 truncate"
-        >
-          {account.title}
-        </Text>
+        {titleFieldValue}
       </div>
     }
+
     <div className="flex flex-row gap-1 items-center">
       <Text size="xs" weight="semibold" className="text-gray-500">
-        {wallet ? "Wallet ID:" : "Address:"}
+        {addressFieldName}:
       </Text>
       <Text
         size="xs"
@@ -156,7 +165,7 @@ const AccountExpandedView = ({ account, source, wallet = false }: {
     </div>
   </div>
 }
-
+// ------------------------------------------------------------------- MOBILE //
 export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
   const EmailView = ({
     address,
@@ -254,6 +263,8 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
               {selectedAccount && (
                 <AccountExpandedView
                   account={selectedAccount}
+                  connectedAccounts={true}
+                  addressFieldName='Address'
                   source={`${startCase(selectedAccount.type)} - ${selectedAccount.address}`}
                 />
               )}
@@ -285,43 +296,23 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
     </div>
   )
 }
-
+// ----------------------------------------------------------------------- PC //
 export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
-  const EmailView = ({
-    address,
-    sourceIcon,
-  }: {
-    address: string
-    sourceIcon: string
-  }) => {
-    return (
-      <>
-        <tr>
-          <td className="px-6 py-3">
-            <Text size="sm" weight="medium" className="text-gray-500 truncate">
-              Email
-            </Text>
-          </td>
-          <td className="px-6 py-3">
-            <Text size="sm" weight="medium" className="text-gray-500 truncate">
-              {address}
-            </Text>
-          </td>
-          <td className="px-6 py-3 flex flex-row items-center gap-1.5">
-            {sourceIcon && <img src={sourceIcon} className="w-5 h-5" />}{' '}
-            <Text size="sm" weight="medium" className="text-gray-500 truncate">
-              {address}
-            </Text>
-          </td>
-        </tr>
-      </>
-    )
-  }
 
-  const ProfileView = ({
+  const SingleRowView = ({
     account,
+    appAskedFor,
+    whatsBeingShared,
+    sourceOfData,
+    surceOfDataIcon,
+    dropdown = true
   }: {
-    account: {
+    appAskedFor: string
+    sourceOfData: string
+    surceOfDataIcon: string
+    dropdown?: boolean
+    whatsBeingShared?: string
+    account?: {
       address: string,
       icon: string
     }
@@ -331,85 +322,88 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
         <>
           <tr>
             <td className={`px-6 py-3 ${open ? `bg-gray-50` : ''}`}>
-              <Disclosure.Button className="flex flex-row items-center gap-1.5">
-                {open ? (
-                  <FaChevronDown className="w-3 h-3 text-indigo-500" />
-                ) : (
-                  <FaChevronRight className="w-3 h-3 text-gray-500" />
-                )}
+              {dropdown ?
+                <Disclosure.Button className="flex flex-row items-center gap-1.5">
+                  {open ? (
+                    <FaChevronDown className="w-3 h-3 text-indigo-500" />
+                  ) : (
+                    <FaChevronRight className="w-3 h-3 text-gray-500" />
+                  )}
 
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="text-gray-500 truncate"
+                  >
+                    {appAskedFor}
+                  </Text>
+                </Disclosure.Button>
+                :
                 <Text
                   size="sm"
                   weight="medium"
                   className="text-gray-500 truncate"
                 >
-                  Profile
-                </Text>
-              </Disclosure.Button>
+                  {appAskedFor}
+                </Text>}
             </td>
             <td className="px-6 py-3">
-              <Text size="sm" weight="medium" className="text-gray-500 truncate">
-                Picture, Name
-              </Text>
+              {
+                whatsBeingShared &&
+                <Text size="sm" weight="medium" className="text-gray-500 truncate">
+                  {whatsBeingShared}
+                </Text>
+              }
             </td>
             <td className="px-6 py-3 flex flex-row items-center gap-2.5">
-              <img src={passportLogoURL} className="w-5 h-5" />
+              <img src={surceOfDataIcon} className="w-5 h-5" />
 
               <Text
                 size="sm"
                 weight="medium"
                 className="text-gray-500 truncate"
               >
-                Primary Account
+                {sourceOfData}
               </Text>
             </td>
           </tr>
-          <Disclosure.Panel as="tr">
-            <td
-              colSpan={4}
-              className="py-3.5 px-6 bg-gray-50 border shadow-inner"
-            >
-              <Text className="mb-2">Profile</Text>
-              <AccountExpandedView
-                account={account}
-                source={"Primary Account"}
-              />
-            </td>
-          </Disclosure.Panel>
+          {dropdown &&
+            <Disclosure.Panel as="tr">
+              <td
+                colSpan={4}
+                className="py-3.5 px-6 bg-gray-50 border shadow-inner"
+              >
+                <Text className="mb-2">Profile</Text>
+                <AccountExpandedView
+                  account={account!}
+                  titleFieldName='Picture'
+                  titleFieldValue={
+                    <div className='flex flex-row items-center'>
+                      <img src={account!.icon} className='w-5 h-5 mr-2 rounded-full' />
+                      <a href={account!.icon} className='text-sm
+                       weight-medium text-indigo-500 
+                       cursor-pointer flex flex-row items-center gap-1.5 hover:underline'
+                        target='_blank'
+                        rel='noreferrer' >
+                        <Text size='sm' weight="medium" className='max-w-[200px] truncate'>
+                          {account!.icon}
+                        </Text>
+                        <HiOutlineExternalLink />
+                      </a>
+                    </div>
+                  }
+                  addressFieldName='Name'
+                  source={"Primary Account"}
+                />
+              </td>
+            </Disclosure.Panel>
+          }
         </>
       )}
     </Disclosure>
   }
 
-
-  const OpenidColumnView = () => {
-    return <tr>
-      <td className={`px-6 py-3 `}>
-        <div className="flex flex-row items-center gap-1.5">
-          <Text
-            size="sm"
-            weight="medium"
-            className="text-gray-500 truncate"
-          >
-            System Identifiers
-          </Text>
-        </div>
-      </td>
-      <td />
-      <td className="px-6 py-3 flex flex-row items-center gap-2.5">
-        <img src={passportLogoURL} className="w-5 h-5" />
-        <Text
-          size="sm"
-          weight="medium"
-          className="text-gray-500 truncate"
-        >
-          Rollup Identity
-        </Text>
-      </td>
-    </tr>
-  }
-
-  const ClaimColumnView = ({
+  const SingleRowMultipleAccountsView = ({
     open,
     title,
     avatars,
@@ -481,7 +475,7 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
       <Disclosure>
         {({ open }) => (
           <>
-            <ClaimColumnView
+            <SingleRowMultipleAccountsView
               avatars={accounts.map((a) => a.icon)}
               open={open}
               title="Connected Accounts"
@@ -509,6 +503,8 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
                 {selectedAccount && (
                   <AccountExpandedView
                     account={selectedAccount}
+                    connectedAccounts={true}
+                    addressFieldName='Address'
                     source={`${startCase(selectedAccount.type)} - ${selectedAccount.address}`}
                   />
                 )}
@@ -544,7 +540,7 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
       <Disclosure>
         {({ open }) => (
           <>
-            <ClaimColumnView
+            <SingleRowMultipleAccountsView
               avatars={accounts.map((a) => a.icon)}
               open={open}
               title="Smart Contract Wallets"
@@ -574,7 +570,17 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
                   <AccountExpandedView
                     account={selectedAccount}
                     source='Smart Contract Wallet'
-                    wallet={true}
+                    titleFieldName='Wallet Name'
+                    titleFieldValue={
+                      <Text
+                        size="xs"
+                        weight="medium"
+                        className="text-gray-500 truncate"
+                      >
+                        {selectedAccount.title}
+                      </Text>
+                    }
+                    addressFieldName='Wallet ID'
                   />
                 )}
               </td>
@@ -590,19 +596,33 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
       {claims.map((claim, i) => {
         switch (claim.claim) {
           case 'email':
-            return (
-              <EmailView
-                key={i}
-                address={claim.address}
-                sourceIcon={claim.sourceIcon}
-              />
-            )
+            return <SingleRowView
+              key={i}
+              appAskedFor='Email'
+              whatsBeingShared={claim.address}
+              sourceOfData={claim.address}
+              surceOfDataIcon={claim.sourceIcon}
+              dropdown={false}
+            />
           case 'connected_accounts':
             return <ConnectedAccountsView key={i} accounts={claim.accounts} />
           case 'openid':
-            return <OpenidColumnView key={i} />
+            return <SingleRowView
+              appAskedFor='System Identifiers'
+              sourceOfData='Rollup Identity'
+              surceOfDataIcon={passportLogoURL}
+              key={i}
+              dropdown={false}
+            />
           case 'profile':
-            return <ProfileView key={i} account={claim.account} />
+            return <SingleRowView
+              appAskedFor='Profile'
+              whatsBeingShared='Picture, Name'
+              sourceOfData='Primary Account'
+              surceOfDataIcon={passportLogoURL}
+              key={i}
+              account={claim.account}
+            />
           case 'erc_4337':
             return <SCWalletsView key={i} accounts={claim.accounts} />
         }
