@@ -1,7 +1,10 @@
-export default () => `Welcome to Rollup! 
+export default function () {
 
-Sign this message to accept the Rollup Terms of Service (https://rollup.id/tos), no password needed!
+    return `Welcome to Rollup! 
 
-This will not trigger a blockchain transaction or cost any gas fees.
+    Sign this message to accept the Rollup Terms of Service (https://rollup.id/tos), no password needed!
 
-{{nonce}}`
+    This will not trigger a blockchain transaction or cost any gas fees.
+
+    {{nonce}}`
+}
