@@ -64,16 +64,17 @@ export const Modal = ({
                     }`}
                 >
                   <div className="flex flex-row justify-end px-3">
-                    <div
-                      className={`bg-white p-2 rounded-lg m-2 text-xl cursor-pointer
-                      ${!closable ? 'bg-[#f3f4f6] text-gray-500' : ''}
+                    {
+                      closable && <div
+                        className={`bg-white p-2 rounded-lg m-2 text-xl cursor-pointer
                       hover:bg-[#F3F4F6]`}
-                      onClick={() => {
-                        if (handleClose && closable) handleClose(false)
-                      }}
-                    >
-                      <HiOutlineX />
-                    </div>
+                        onClick={() => {
+                          if (handleClose) handleClose(false)
+                        }}
+                      >
+                        <HiOutlineX />
+                      </div>
+                    }
                   </div>
                   {children}
                 </div>
