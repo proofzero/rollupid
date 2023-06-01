@@ -56,7 +56,6 @@ export default () => {
           //There should be only one address urn provided for email
           (profile) => profile.urn === scopes[scopeValue].meta.urns[0]
         )
-
         aggregator.push({
           claim: 'email',
           icon: profile.icon,
@@ -77,7 +76,21 @@ export default () => {
             type: profile.type === 'eth' ? 'blockchain' : profile.type,
           })),
         })
-      } else if (scopeValue === 'erc_4337') {
+      } else if (scopeValue === "openid") {
+        aggregator.push({
+          claim: 'openid',
+          name: {}
+        })
+      } else if (scopeValue === "profile") {
+        aggregator.push({
+          claim: 'profile',
+          account: {
+            address: scopes[scopeValue].claims.name,
+            icon: scopes[scopeValue].claims.picture
+          }
+        })
+      }
+      else if (scopeValue === 'erc_4337') {
         const profiles = connectedProfiles.filter((profile) =>
           scopes[scopeValue].meta.urns.includes(profile.urn)
         )

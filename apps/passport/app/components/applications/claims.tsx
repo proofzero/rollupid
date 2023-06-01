@@ -89,13 +89,14 @@ export const ConfirmRevocationModal = ({
   )
 }
 
-const AccountExpandedView = ({ account, wallet = false }: {
+const AccountExpandedView = ({ account, source, wallet = false }: {
   account: {
     icon: string
     address: string
-    type: string
+    type?: string
     title?: string
   }
+  source?: string
   wallet?: boolean
 }) => {
   return <div className="flex flex-col gap-2 p-2.5 bg-white rounded-lg">
@@ -150,8 +151,7 @@ const AccountExpandedView = ({ account, wallet = false }: {
         weight="medium"
         className="text-gray-500 truncate"
       >
-        {wallet ? "Smart Contract Wallet" : `${startCase(account.type)} - ${account.address
-          }`}
+        {source}
       </Text>
     </div>
   </div>
@@ -252,7 +252,10 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
               </section>
 
               {selectedAccount && (
-                <AccountExpandedView account={selectedAccount} />
+                <AccountExpandedView
+                  account={selectedAccount}
+                  source={`${startCase(selectedAccount.type)} - ${selectedAccount.address}`}
+                />
               )}
             </Disclosure.Panel>
           </div>
@@ -313,6 +316,97 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
         </tr>
       </>
     )
+  }
+
+  const ProfileView = ({
+    account,
+  }: {
+    account: {
+      address: string,
+      icon: string
+    }
+  }) => {
+    return <Disclosure>
+      {({ open }) => (
+        <>
+          <tr>
+            <td className={`px-6 py-3 ${open ? `bg-gray-50` : ''}`}>
+              <Disclosure.Button className="flex flex-row items-center gap-1.5">
+                {open ? (
+                  <FaChevronDown className="w-3 h-3 text-indigo-500" />
+                ) : (
+                  <FaChevronRight className="w-3 h-3 text-gray-500" />
+                )}
+
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="text-gray-500 truncate"
+                >
+                  Profile
+                </Text>
+              </Disclosure.Button>
+            </td>
+            <td className="px-6 py-3">
+              <Text size="sm" weight="medium" className="text-gray-500 truncate">
+                Picture, Name
+              </Text>
+            </td>
+            <td className="px-6 py-3 flex flex-row items-center gap-2.5">
+              <img src={passportLogoURL} className="w-5 h-5" />
+
+              <Text
+                size="sm"
+                weight="medium"
+                className="text-gray-500 truncate"
+              >
+                Primary Account
+              </Text>
+            </td>
+          </tr>
+          <Disclosure.Panel as="tr">
+            <td
+              colSpan={4}
+              className="py-3.5 px-6 bg-gray-50 border shadow-inner"
+            >
+              <Text className="mb-2">Profile</Text>
+              <AccountExpandedView
+                account={account}
+                source={"Primary Account"}
+              />
+            </td>
+          </Disclosure.Panel>
+        </>
+      )}
+    </Disclosure>
+  }
+
+
+  const OpenidColumnView = () => {
+    return <tr>
+      <td className={`px-6 py-3 `}>
+        <div className="flex flex-row items-center gap-1.5">
+          <Text
+            size="sm"
+            weight="medium"
+            className="text-gray-500 truncate"
+          >
+            System Identifiers
+          </Text>
+        </div>
+      </td>
+      <td />
+      <td className="px-6 py-3 flex flex-row items-center gap-2.5">
+        <img src={passportLogoURL} className="w-5 h-5" />
+        <Text
+          size="sm"
+          weight="medium"
+          className="text-gray-500 truncate"
+        >
+          Rollup Identity
+        </Text>
+      </td>
+    </tr>
   }
 
   const ClaimColumnView = ({
@@ -413,7 +507,10 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
                 </section>
 
                 {selectedAccount && (
-                  <AccountExpandedView account={selectedAccount} />
+                  <AccountExpandedView
+                    account={selectedAccount}
+                    source={`${startCase(selectedAccount.type)} - ${selectedAccount.address}`}
+                  />
                 )}
               </td>
             </Disclosure.Panel>
@@ -474,7 +571,11 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
                 </section>
 
                 {selectedAccount && (
-                  <AccountExpandedView account={selectedAccount} wallet={true} />
+                  <AccountExpandedView
+                    account={selectedAccount}
+                    source='Smart Contract Wallet'
+                    wallet={true}
+                  />
                 )}
               </td>
             </Disclosure.Panel>
@@ -498,6 +599,10 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
             )
           case 'connected_accounts':
             return <ConnectedAccountsView key={i} accounts={claim.accounts} />
+          case 'openid':
+            return <OpenidColumnView key={i} />
+          case 'profile':
+            return <ProfileView key={i} account={claim.account} />
           case 'erc_4337':
             return <SCWalletsView key={i} accounts={claim.accounts} />
         }
