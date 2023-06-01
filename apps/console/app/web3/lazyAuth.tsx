@@ -1,4 +1,5 @@
 import { getDefaultConfig, ConnectKitProvider } from 'connectkit'
+import { Suspense } from 'react'
 import { useHydrated } from 'remix-utils'
 import { createConfig, WagmiConfig } from 'wagmi'
 
@@ -22,10 +23,12 @@ export function LazyAuth({
         })
     )
     return (
-        <WagmiConfig config={config}>
-            <ConnectKitProvider>
-                {children}
-            </ConnectKitProvider>
-        </WagmiConfig>
+        <Suspense fallback="">
+            <WagmiConfig config={config}>
+                <ConnectKitProvider>
+                    {children}
+                </ConnectKitProvider>
+            </WagmiConfig>
+        </Suspense>
     )
 }

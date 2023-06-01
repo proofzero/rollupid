@@ -113,6 +113,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
               ? process.env.REMIX_DEV_SERVER_WS_PORT
               : undefined,
           WALLET_CONNECT_PROJECT_ID: context.env.WALLET_CONNECT_PROJECT_ID,
+          APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
         },
       },
       {

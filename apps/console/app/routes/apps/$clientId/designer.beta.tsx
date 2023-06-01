@@ -6,7 +6,7 @@ import {
   useLoaderData,
   useOutletContext,
 } from '@remix-run/react'
-import { ReactNode, lazy, useContext, useEffect, useRef, useState } from 'react'
+import { ReactNode, Suspense, lazy, useContext, useEffect, useRef, useState } from 'react'
 import { IconType } from 'react-icons'
 import { HiCog, HiOutlineCog, HiOutlineMail } from 'react-icons/hi'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
@@ -1135,7 +1135,7 @@ export default () => {
   const [loading, setLoading] = useState<boolean>(false)
 
   return (
-    <>
+    <Suspense fallback={<Loader />}>
       {loading && <Loader />}
 
       <Form method="post">
@@ -1207,6 +1207,6 @@ export default () => {
           </Tab.Panels>
         </Tab.Group>
       </Form>
-    </>
+    </Suspense>
   )
 }

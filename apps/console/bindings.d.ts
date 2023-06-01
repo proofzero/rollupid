@@ -15,4 +15,5 @@ declare global {
 
   const INTERNAL_CLOUDFLARE_ZONE_ID: string
   const TOKEN_CLOUDFLARE_API: string
+  const WALLET_CONNECT_PROJECT_ID: string
 }

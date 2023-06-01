@@ -18,8 +18,8 @@ export const Template = (args) => <ConnectButton {...args} />
   <Story
     decorators={[
       (Story) => {
-        const client = createClient(
-          getDefaultClient({
+        const config = createConfig(
+          getDefaultConfig({
             appName: 'Rollup',
             walletConnectProjectId: "foo",
           })

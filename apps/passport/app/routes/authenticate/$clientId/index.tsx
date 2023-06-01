@@ -50,8 +50,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       clientId: params.clientId,
       displayKeys,
       authnQueryParams: new URL(request.url).searchParams.toString(),
-      APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
-      WALLET_CONNECT_PROJECT_ID: context.env.WALLET_CONNECT_PROJECT_ID,
     })
   }
 )
