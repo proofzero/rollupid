@@ -82,6 +82,7 @@ export type LoaderData = {
   ENV: {
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
     REMIX_DEV_SERVER_WS_PORT?: number
+    WALLET_CONNECT_PROJECT_ID: string,
   }
 }
 
@@ -134,6 +135,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
             process.env.NODE_ENV === 'development'
               ? +process.env.REMIX_DEV_SERVER_WS_PORT!
               : undefined,
+          WALLET_CONNECT_PROJECT_ID,
         },
         displayName,
       })

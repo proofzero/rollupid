@@ -6,7 +6,7 @@ import {
   useLoaderData,
   useOutletContext,
 } from '@remix-run/react'
-import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
+import { ReactNode, lazy, useContext, useEffect, useRef, useState } from 'react'
 import { IconType } from 'react-icons'
 import { HiCog, HiOutlineCog, HiOutlineMail } from 'react-icons/hi'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
@@ -60,6 +60,12 @@ import { BadRequestError } from '@proofzero/errors'
 import { GetEmailOTPThemeResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getEmailOTPTheme'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { getEmailIcon, adjustAddressTypeToDisplay } from '@proofzero/utils/getNormalisedConnectedAccounts'
+
+const LazyAuth = lazy(() =>
+  import('../../../web3/lazyAuth').then((module) => ({
+    default: module.LazyAuth,
+  }))
+)
 
 const getRGBColor = (hex: string, type: string) => {
   let color = hex.replace(/#/g, '')
@@ -284,7 +290,6 @@ const AuthPanel = ({
   avatarURL,
   setLoading,
   errors,
-  WALLET_CONNECT_PROJECT_ID,
 }: {
   appTheme?: AppTheme
   avatarURL: string
@@ -292,7 +297,6 @@ const AuthPanel = ({
   errors?: {
     [key: string]: string
   }
-  WALLET_CONNECT_PROJECT_ID: string
 }) => {
   const [dark, setDark] = useState<boolean>(false)
   const toggleDark = () => setDark(!dark)
@@ -621,39 +625,41 @@ const AuthPanel = ({
             <Tab.Group>
               <Tab.Panels className="pointer-events-auto">
                 <Tab.Panel>
-                  <Authentication
-                    Header={
-                      <>
-                        <Avatar
-                          src={AuthenticationScreenDefaults.defaultLogoURL}
-                          size="sm"
-                        ></Avatar>
-                        <div className={'flex flex-col items-center gap-2'}>
-                          <h1
-                            className={'font-semibold text-xl dark:text-white'}
-                          >
-                            {heading ??
-                              AuthenticationScreenDefaults.defaultHeading}
-                          </h1>
+                  <LazyAuth>
+                    <Authentication
+                      Header={
+                        <>
+                          <Avatar
+                            src={AuthenticationScreenDefaults.defaultLogoURL}
+                            size="sm"
+                          ></Avatar>
+                          <div className={'flex flex-col items-center gap-2'}>
+                            <h1
+                              className={'font-semibold text-xl dark:text-white'}
+                            >
+                              {heading ??
+                                AuthenticationScreenDefaults.defaultHeading}
+                            </h1>
 
-                          <h2
-                            style={{ color: '#6B7280' }}
-                            className={'font-medium text-base'}
-                          >
-                            {AuthenticationScreenDefaults.defaultSubheading}
-                          </h2>
-                        </div>
-                      </>
-                    }
-                    displayKeys={providers
-                      .filter((p) => p.enabled)
-                      .map((p) => p.key)}
-                    mapperArgs={{
-                      clientId: 'Foo',
-                      signData: null,
-                    }}
-                    radius={radius}
-                  />
+                            <h2
+                              style={{ color: '#6B7280' }}
+                              className={'font-medium text-base'}
+                            >
+                              {AuthenticationScreenDefaults.defaultSubheading}
+                            </h2>
+                          </div>
+                        </>
+                      }
+                      displayKeys={providers
+                        .filter((p) => p.enabled)
+                        .map((p) => p.key)}
+                      mapperArgs={{
+                        clientId: 'Foo',
+                        signData: null,
+                      }}
+                      radius={radius}
+                    />
+                  </LazyAuth>
                 </Tab.Panel>
                 <Tab.Panel>
                   <Authorization
@@ -960,7 +966,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     return json({
       appTheme,
       emailTheme,
-      WALLET_CONNECT_PROJECT_ID
     })
   }
 )
@@ -1108,10 +1113,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { appTheme, emailTheme, WALLET_CONNECT_PROJECT_ID } = useLoaderData<{
+  const { appTheme, emailTheme } = useLoaderData<{
     appTheme: GetAppThemeResult
     emailTheme: GetEmailOTPThemeResult
-    WALLET_CONNECT_PROJECT_ID: string
   }>()
 
   const actionData = useActionData()
@@ -1193,7 +1197,6 @@ export default () => {
               avatarURL={avatarUrl}
               setLoading={setLoading}
               errors={errors}
-              WALLET_CONNECT_PROJECT_ID={WALLET_CONNECT_PROJECT_ID}
             />
 
             <EmailPanel

@@ -17,8 +17,6 @@ export function LazyAuth({
         getDefaultConfig({
             appName: 'Rollup',
             autoConnect,
-            alchemyId:
-                window.ENV.APIKEY_ALCHEMY_PUBLIC,
             walletConnectProjectId:
                 window.ENV.WALLET_CONNECT_PROJECT_ID,
         })
