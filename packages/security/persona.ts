@@ -193,8 +193,8 @@ export async function setPersonaReferences(
 export type ClaimValueType =
   | string
   | {
-      [K: string]: ClaimValueType
-    }
+    [K: string]: ClaimValueType
+  }
   | ClaimValueType[]
 
 export type ClaimName = string
@@ -318,6 +318,28 @@ async function profileClaimsRetriever(
       },
     }
   } else throw new InvalidPersonaDataError()
+}
+
+async function openidClaimsRetriever(
+  scopeEntry: ScopeValueName,
+  accountUrn: AccountURN,
+  clientId: string,
+  accessUrn: AccessURN,
+  fetchers: Fetchers,
+  personaData: PersonaData,
+  traceSpan: TraceSpan
+) {
+  return {
+    [scopeEntry]: {
+      claims: {
+        claimed: "true"
+      },
+      meta: {
+        valid: true,
+        urns: [accountUrn]
+      },
+    },
+  }
 }
 
 async function erc4337ClaimsRetriever(
@@ -471,6 +493,7 @@ export const scopeClaimRetrievers: Record<
   email: emailClaimRetriever,
   erc_4337: erc4337ClaimsRetriever,
   connected_accounts: connectedAccountsClaimsRetriever,
+  openid: openidClaimsRetriever,
 }
 
 export async function getClaimValues(

@@ -6,6 +6,7 @@ export const ClaimName = z.union([
   z.literal('openid'),
   z.literal('connected_accounts'),
   z.literal('erc_4337'),
+  z.literal('openid'),
 ])
 export type ClaimName = z.infer<typeof ClaimName>
 
