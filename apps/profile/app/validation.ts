@@ -54,7 +54,7 @@ export const NFTDetailSchema = z.object({
 export const NFTPropertySchema = z.object({
   display: z.string(),
   name: z.string(),
-  value: z.string(),
+  value: z.string().or(z.number()),
 })
 
 export const NFTSchema = z.object({

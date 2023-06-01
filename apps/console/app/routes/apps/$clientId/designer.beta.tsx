@@ -228,8 +228,8 @@ const ProviderModal = ({
 
   return (
     <Modal isOpen={isOpen} fixed handleClose={() => onClose(false)}>
-      <div className="bg-white rounded-lg px-6 pb-6 max-w-full lg:w-[543px]
-      lg:m-auto">
+      <div className="bg-white rounded-lg px-6 pb-6 min-w-full lg:w-[543px]
+      lg:m-auto overflow-y-auto">
         <Text weight="semibold" className="text-left text-gray-800 mb-4">
           Login Provider Configuration
         </Text>

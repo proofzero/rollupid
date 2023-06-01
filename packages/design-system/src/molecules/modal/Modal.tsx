@@ -56,7 +56,7 @@ export const Modal = ({
               <Dialog.Panel className={`${fixed ? "pb-10" : ""}`}>
                 <div
                   className={`flex flex-col
-                  border bg-white rounded-lg shadow-xl 
+                  border bg-white rounded-lg shadow-xl overflow-auto thin-scrollbar
                   ${fixed
                       ? `h-max w-max min-[480px]:w-[96vw] lg:w-[62vw] h-[96vh] lg:h-[76vh]`
                       : `h-max w-max min-h-max max-w-[96vw] lg:w-full max-h-[89vh] lg:h-full

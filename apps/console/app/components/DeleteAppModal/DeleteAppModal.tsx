@@ -26,7 +26,6 @@ export const DeleteAppModal = ({
   return (
     <Modal
       isOpen={isOpen}
-      fixed
       closable={!isSubmitting}
       handleClose={() => deleteAppCallback(false)}
     >
