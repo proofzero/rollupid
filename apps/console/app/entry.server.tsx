@@ -38,10 +38,15 @@ export default function handleRequest(
     (nonce, dev) =>
       getCSP({
         directives: {
-          'default-src': [SELF],
+          'default-src': [
+            SELF,
+            'https://verify.walletconnect.com'
+          ],
           'connect-src': [
             SELF,
             '*.google-analytics.com',
+            'wss://relay.walletconnect.com',
+            'https://*.g.alchemy.com',
             'https://upload.imagedelivery.net',
             // Used for Remix WebSocket Live Reaload
             ...(dev ? ['ws://localhost:*/socket'] : []),

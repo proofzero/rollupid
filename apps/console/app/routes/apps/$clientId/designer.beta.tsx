@@ -6,7 +6,7 @@ import {
   useLoaderData,
   useOutletContext,
 } from '@remix-run/react'
-import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
+import { ReactNode, Suspense, lazy, useContext, useEffect, useRef, useState } from 'react'
 import { IconType } from 'react-icons'
 import { HiCog, HiOutlineCog, HiOutlineMail } from 'react-icons/hi'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
@@ -16,8 +16,6 @@ import Authentication, {
   AuthenticationScreenDefaults,
 } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
-import { createClient } from 'wagmi'
-import { getDefaultClient } from 'connectkit'
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
 import IconPicker from '~/components/IconPicker'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
@@ -63,11 +61,10 @@ import { GetEmailOTPThemeResult } from '@proofzero/platform/starbase/src/jsonrpc
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { getEmailIcon, adjustAddressTypeToDisplay } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
-const client = createClient(
-  // @ts-ignore
-  getDefaultClient({
-    appName: 'Rollup',
-  })
+const LazyAuth = lazy(() =>
+  import('../../../web3/lazyAuth').then((module) => ({
+    default: module.LazyAuth,
+  }))
 )
 
 const getRGBColor = (hex: string, type: string) => {
@@ -90,9 +87,8 @@ const DesignerTab = ({
   selected: boolean
 }) => (
   <div
-    className={`box-border -mb-0.5 mr-8 pb-4 px-1 flex flex-row items-center gap-2 border-b-2 ${
-      selected ? 'border-indigo-600' : 'border-transparent'
-    }`}
+    className={`box-border -mb-0.5 mr-8 pb-4 px-1 flex flex-row items-center gap-2 border-b-2 ${selected ? 'border-indigo-600' : 'border-transparent'
+      }`}
   >
     <Icon
       className={`w-5 h-5 ${selected ? 'text-indigo-600' : 'text-gray-500'}`}
@@ -182,9 +178,8 @@ const RadiusButton = ({
   return (
     <button
       type="button"
-      className={`w-full py-1.5 px-2.5 rounded-md ${
-        selected ? 'bg-indigo-500' : ''
-      }`}
+      className={`w-full py-1.5 px-2.5 rounded-md ${selected ? 'bg-indigo-500' : ''
+        }`}
       onClick={(e) => {
         e.preventDefault()
         setRadius(radius)
@@ -330,10 +325,10 @@ const AuthPanel = ({
     }[]
   >(
     appTheme?.providers ??
-      AuthenticationScreenDefaults.knownKeys.map((k) => ({
-        key: k,
-        enabled: true,
-      }))
+    AuthenticationScreenDefaults.knownKeys.map((k) => ({
+      key: k,
+      enabled: true,
+    }))
   )
   const [providerModalOpen, setProviderModalOpen] = useState<boolean>(false)
 
@@ -549,7 +544,7 @@ const AuthPanel = ({
                 minWidth={720}
                 minHeight={1080}
                 id="image"
-                setIsFormChanged={(val) => {}}
+                setIsFormChanged={(val) => { }}
                 setIsImgUploading={(val) => {
                   setLoading(val)
                 }}
@@ -630,40 +625,41 @@ const AuthPanel = ({
             <Tab.Group>
               <Tab.Panels className="pointer-events-auto">
                 <Tab.Panel>
-                  <Authentication
-                    Header={
-                      <>
-                        <Avatar
-                          src={AuthenticationScreenDefaults.defaultLogoURL}
-                          size="sm"
-                        ></Avatar>
-                        <div className={'flex flex-col items-center gap-2'}>
-                          <h1
-                            className={'font-semibold text-xl dark:text-white'}
-                          >
-                            {heading ??
-                              AuthenticationScreenDefaults.defaultHeading}
-                          </h1>
+                  <LazyAuth>
+                    <Authentication
+                      Header={
+                        <>
+                          <Avatar
+                            src={AuthenticationScreenDefaults.defaultLogoURL}
+                            size="sm"
+                          ></Avatar>
+                          <div className={'flex flex-col items-center gap-2'}>
+                            <h1
+                              className={'font-semibold text-xl dark:text-white'}
+                            >
+                              {heading ??
+                                AuthenticationScreenDefaults.defaultHeading}
+                            </h1>
 
-                          <h2
-                            style={{ color: '#6B7280' }}
-                            className={'font-medium text-base'}
-                          >
-                            {AuthenticationScreenDefaults.defaultSubheading}
-                          </h2>
-                        </div>
-                      </>
-                    }
-                    displayKeys={providers
-                      .filter((p) => p.enabled)
-                      .map((p) => p.key)}
-                    mapperArgs={{
-                      clientId: 'Foo',
-                      wagmiClient: client,
-                      signData: null,
-                    }}
-                    radius={radius}
-                  />
+                            <h2
+                              style={{ color: '#6B7280' }}
+                              className={'font-medium text-base'}
+                            >
+                              {AuthenticationScreenDefaults.defaultSubheading}
+                            </h2>
+                          </div>
+                        </>
+                      }
+                      displayKeys={providers
+                        .filter((p) => p.enabled)
+                        .map((p) => p.key)}
+                      mapperArgs={{
+                        clientId: 'Foo',
+                        signData: null,
+                      }}
+                      radius={radius}
+                    />
+                  </LazyAuth>
                 </Tab.Panel>
                 <Tab.Panel>
                   <Authorization
@@ -695,8 +691,8 @@ const AuthPanel = ({
                           'urn:rollupid:address/0xc2b930f1fc2a55ddc1bf99e8844ca0479567ac44f3e2eea58216660e26947686',
                       },
                     ]}
-                    selectEmailCallback={() => {}}
-                    addNewEmailCallback={() => {}}
+                    selectEmailCallback={() => { }}
+                    addNewEmailCallback={() => { }}
                     connectedAccounts={[
                       {
                         title: 'email@example.com',
@@ -728,8 +724,8 @@ const AuthPanel = ({
                     selectAllSmartWalletsCallback={() => { }}
                     // disableAuthorize={true}
                     transitionState={'idle'}
-                    cancelCallback={() => {}}
-                    authorizeCallback={() => {}}
+                    cancelCallback={() => { }}
+                    authorizeCallback={() => { }}
                     radius={radius}
                   />
                 </Tab.Panel>
@@ -821,7 +817,7 @@ const EmailPanel = ({
                 height: 1,
               }}
               id="logoURL"
-              setIsFormChanged={(val) => {}}
+              setIsFormChanged={(val) => { }}
               setIsImgUploading={(val) => {
                 setLoading(val)
               }}
@@ -1031,9 +1027,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         color:
           color && colorDark
             ? {
-                light: color,
-                dark: colorDark,
-              }
+              light: color,
+              dark: colorDark,
+            }
             : theme?.color,
         graphicURL: graphicURL ?? theme?.graphicURL,
         providers: providers ?? theme?.providers,
@@ -1139,7 +1135,7 @@ export default () => {
   const [loading, setLoading] = useState<boolean>(false)
 
   return (
-    <>
+    <Suspense fallback={<Loader />}>
       {loading && <Loader />}
 
       <Form method="post">
@@ -1211,6 +1207,6 @@ export default () => {
           </Tab.Panels>
         </Tab.Group>
       </Form>
-    </>
+    </Suspense>
   )
 }

@@ -1,8 +1,8 @@
 import { Canvas, Meta, Story } from '@storybook/addon-docs'
 
 import { ConnectButton } from './ConnectButton'
-import { WagmiConfig, createClient, configureChains } from 'wagmi'
-import { getDefaultClient } from 'connectkit'
+import { WagmiConfig, createConfig } from 'wagmi'
+import { getDefaultConfig, ConnectKitProvider } from 'connectkit'
 
 import { publicProvider } from 'wagmi/providers/public'
 import { InjectedConnector } from 'wagmi/connectors/injected'
@@ -14,18 +14,21 @@ export const Template = (args) => <ConnectButton {...args} />
 
 # Connect Button
 
-<Canvas>
+  < Canvas >
   <Story
     decorators={[
       (Story) => {
-        const client = createClient(
-          getDefaultClient({
+        const config = createConfig(
+          getDefaultConfig({
             appName: 'Rollup',
+            walletConnectProjectId: "foo",
           })
         )
         return (
-          <WagmiConfig client={client}>
-            <Story />
+          <WagmiConfig config={config}>
+            <ConnectKitProvider>
+              <Story />
+            </ConnectKitProvider>
           </WagmiConfig>
         )
       },
@@ -43,4 +46,4 @@ export const Template = (args) => <ConnectButton {...args} />
   >
     {Template.bind({})}
   </Story>
-</Canvas>
+</Canvas >

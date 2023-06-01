@@ -1,19 +1,23 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, lazy } from 'react'
 
 import circleLogo from './circle-logo.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
 
 import { Text } from '../../atoms/text/Text'
 
-import { WagmiConfig, Client } from 'wagmi'
 import ConnectOAuthButton, {
   OAuthProvider,
 } from '../../atoms/buttons/connect-oauth-button'
-import { ConnectButton } from '../../atoms/buttons/connect-button/ConnectButton'
 import { AuthButton } from '../../molecules/auth-button/AuthButton'
 import { HiOutlineMail } from 'react-icons/hi'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import { ThemeContext } from '../../contexts/theme'
+
+const ConnectButton = lazy(() =>
+  import('../../atoms/buttons/connect-button/ConnectButton').then((module) => ({
+    default: module.ConnectButton,
+  }))
+)
 
 export const AuthenticationScreenDefaults = {
   defaultLogoURL: circleLogo,
@@ -64,6 +68,7 @@ export default ({
   const { dark } = useContext(ThemeContext)
 
   return (
+
     <div className={`relative ${dark ? 'dark' : ''}`}>
       <div
         className={`flex grow-0 flex-col items-center
@@ -95,8 +100,9 @@ export default ({
                 </Text>
                 <div className="border-t border-gray-200 flex-1"></div>
               </div>
-
-              {displayKeyDisplayFn(displayKeys.slice(2), mapperArgs)}
+              {displayKeyDisplayFn(displayKeys.slice(2), {
+                ...mapperArgs,
+              })}
             </>
           )}
 
@@ -115,12 +121,12 @@ export default ({
         </div>
       </div>
     </div>
+
   )
 }
 
 type DisplayKeyMapperArgs = {
   clientId: string
-  wagmiClient: Client
   signData: any
   walletConnectCallback?: (address: string) => void
   walletSignCallback?: (
@@ -141,12 +147,11 @@ const displayKeyMapper = (
   key: string,
   {
     clientId,
-    wagmiClient,
     signData,
-    walletConnectCallback = () => {},
-    walletSignCallback = () => {},
-    walletConnectErrorCallback = () => {},
-    navigate = () => {},
+    walletConnectCallback = () => { },
+    walletSignCallback = () => { },
+    walletConnectErrorCallback = () => { },
+    navigate = () => { },
     FormWrapperEl = ({ children }) => <>{children}</>,
     loading = false,
     flex = false,
@@ -158,18 +163,16 @@ const displayKeyMapper = (
   switch (key) {
     case 'wallet':
       el = (
-        <WagmiConfig client={wagmiClient}>
-          <ConnectButton
-            key={key}
-            signData={signData}
-            isLoading={loading}
-            fullSize={flex}
-            displayContinueWith={displayContinueWith}
-            connectCallback={walletConnectCallback}
-            signCallback={walletSignCallback}
-            connectErrorCallback={walletConnectErrorCallback}
-          />
-        </WagmiConfig>
+        <ConnectButton
+          key={key}
+          signData={signData}
+          isLoading={loading}
+          fullSize={flex}
+          displayContinueWith={displayContinueWith}
+          connectCallback={walletConnectCallback}
+          connectErrorCallback={walletConnectErrorCallback}
+          signCallback={walletSignCallback}
+        />
       )
       break
     case 'email':
@@ -274,7 +277,6 @@ const displayKeyDisplayFn = (
       Math.ceil(displayKeys.length / 2),
       displayKeys.length
     )
-
     return [
       ...displayKeyDisplayFn(firstHalf, mapperArgs),
       ...displayKeyDisplayFn(secondHalf, mapperArgs),

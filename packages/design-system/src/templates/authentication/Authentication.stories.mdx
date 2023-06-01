@@ -1,8 +1,8 @@
 import { Canvas, Meta, Story } from '@storybook/addon-docs'
 
 import Authentication, { AuthenticationScreenDefaults } from './Authentication'
-import { WagmiConfig, createClient } from 'wagmi'
-import { getDefaultClient } from 'connectkit'
+import { createConfig, WagmiConfig } from 'wagmi'
+import { getDefaultConfig, ConnectKitProvider } from 'connectkit'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
 
@@ -12,44 +12,47 @@ import subtractLogo from '../../assets/subtract-logo.svg'
 
 export const Template = ({ displayKeys }) => {
   return (
-    <Authentication
-      appProfile={{
-        name: 'Passport',
-        iconURL: subtractLogo,
-        privacyURL: 'foo',
-        termsURL: 'bar',
-      }}
-      displayKeys={displayKeys}
-      mapperArgs={{
-        clientId: 'Foo',
-        wagmiClient: createClient(
-          getDefaultClient({
-            appName: 'Rollup',
-          })
-        ),
-        signData: null,
-      }}
-      Header={
-        <>
-          <Avatar src={subtractLogo} size="sm" />
-          <div className={'flex flex-col items-center gap-2'}>
-            <h1 className={'font-semibold text-xl'}>Login to Passport</h1>
-            <h2
-              style={{ color: '#6B7280' }}
-              className={'font-medium text-base'}
-            >
-              {AuthenticationScreenDefaults.defaultSubheading}
-            </h2>
-          </div>
-        </>
-      }
-    />
+    <WagmiConfig config={createConfig(
+      getDefaultConfig({
+        appName: 'Rollup',
+        walletConnectProjectId: 'foo',
+      }))}>
+      <ConnectKitProvider>
+        <Authentication
+          appProfile={{
+            name: 'Passport',
+            iconURL: subtractLogo,
+            privacyURL: 'foo',
+            termsURL: 'bar',
+          }}
+          displayKeys={displayKeys}
+          mapperArgs={{
+            clientId: 'Foo',
+            signData: null,
+          }}
+          Header={
+            <>
+              <Avatar src={subtractLogo} size="sm" />
+              <div className={'flex flex-col items-center gap-2'}>
+                <h1 className={'font-semibold text-xl'}>Login to Passport</h1>
+                <h2
+                  style={{ color: '#6B7280' }}
+                  className={'font-medium text-base'}
+                >
+                  {AuthenticationScreenDefaults.defaultSubheading}
+                </h2>
+              </div>
+            </>
+          }
+        />
+      </ConnectKitProvider>
+    </WagmiConfig>
   )
 }
 
 # Authentication
 
-<Canvas>
+  < Canvas >
   <Story
     name="Passport Authentication"
     args={{
@@ -58,4 +61,4 @@ export const Template = ({ displayKeys }) => {
   >
     {Template.bind({})}
   </Story>
-</Canvas>
+</Canvas >
