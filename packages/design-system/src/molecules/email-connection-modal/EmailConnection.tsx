@@ -1,6 +1,6 @@
-import React, { FC } from 'react'
-import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
-import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
+import React from 'react'
+import googleIcon from '@proofzero/design-system/src/atoms/providers/Google'
+import microsoftIcon from '@proofzero/design-system/src/atoms/providers/Microsoft'
 import appleIcon from '@proofzero/design-system/src/atoms/providers/Apple'
 
 import { MdOutlineEmail } from 'react-icons/md'

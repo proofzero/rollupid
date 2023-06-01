@@ -1,14 +1,15 @@
 import React from 'react'
-import { Dropdown, SelectListItem } from './DropdownSelectList'
+import { Dropdown, DropdownSelectListItem } from './DropdownSelectList'
 
 import { OAuthAddressType, EmailAddressType, CryptoAddressType } from '@proofzero/types/address'
 
+import { adjustAddressTypeToDisplay } from '@proofzero/utils/getNormalisedConnectedAccounts'
 export default {
     title: 'Atoms/Dropdown/ConnectedAccounts',
     component: Dropdown,
 }
 
-const pickRandomType = (i: number) => {
+const pickRandomAddressType = (i: number) => {
     const types = [OAuthAddressType.Google,
     OAuthAddressType.Microsoft,
     EmailAddressType.Email,
@@ -17,18 +18,10 @@ const pickRandomType = (i: number) => {
     return types[i % types.length]
 }
 
-const modifyType = (string: string) => {
-    if (string === CryptoAddressType.Wallet) {
-        return "SC Wallet"
-    }
-    return string.charAt(0).toUpperCase() + string.slice(1)
-}
-
-const accounts: SelectListItem[] = Array.from({ length: 10 }, (_, i) => ({
+const accounts: DropdownSelectListItem[] = Array.from({ length: 10 }, (_, i) => ({
     value: `urn:proofzero:address:${i}`,
     title: `Account ${i}`,
-    subtitle: `${modifyType(pickRandomType(i) as string)} - Address ${i}`
-
+    subtitle: `${adjustAddressTypeToDisplay(pickRandomAddressType(i))} - Address ${i}`
 }))
 
 const Template = () => (

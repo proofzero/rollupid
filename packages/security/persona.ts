@@ -146,6 +146,8 @@ export async function setPersonaReferences(
       personaData.erc_4337 &&
       personaData.erc_4337 instanceof Array
     ) {
+      //This (correctly) gets skipped when personaData value of
+      //erc_4337 is set to ALL
       personaData.erc_4337.forEach((addressUrn) =>
         uniqueAuthorizationReferences.add(addressUrn)
       )
@@ -331,7 +333,6 @@ async function erc4337ClaimsRetriever(
     throw new InternalServerError({
       message: 'Address fetcher not specified',
     })
-  const walletAddressUrns = personaData.erc_4337 as AddressURN[]
   const result = {
     erc_4337: {
       claims: {
@@ -344,17 +345,46 @@ async function erc4337ClaimsRetriever(
     },
   } as const
 
-  for (const addressUrn of walletAddressUrns) {
-    const addressClient = createAddressClient(fetchers.addressFetcher!, {
+  if (personaData.erc_4337 === AuthorizationControlSelection.ALL) {
+    //Referencable persona submission pointing to all connected sc wallets
+    //at any point in time
+    if (!fetchers.accountFetcher)
+      throw new InternalServerError({
+        message: 'No account fetcher specified',
+      })
+    const accountClient = createAccountClient(fetchers.accountFetcher, {
       ...generateTraceContextHeaders(traceSpan),
-      [PlatformAddressURNHeader]: addressUrn,
     })
-    const profile = await addressClient.getAddressProfile.query()
-    result.erc_4337.claims.erc_4337.push({
-      nickname: profile.title,
-      address: profile.address,
-    })
-    result.erc_4337.meta.urns.push(addressUrn)
+    const accountAddresses =
+      (
+        await accountClient.getAddresses.query({
+          account: accountUrn,
+        })
+      )?.filter(
+        (address) => address.rc.addr_type === CryptoAddressType.Wallet
+      ) || []
+
+    for (const addressNode of accountAddresses) {
+      result.erc_4337.claims.erc_4337.push({
+        type: addressNode.rc.addr_type,
+        identifier: addressNode.qc.alias,
+      })
+      result.erc_4337.meta.urns.push(addressNode.baseUrn)
+    }
+  } else {
+    const walletAddressUrns = personaData.erc_4337 as AddressURN[]
+    for (const addressUrn of walletAddressUrns) {
+      const addressClient = createAddressClient(fetchers.addressFetcher!, {
+        ...generateTraceContextHeaders(traceSpan),
+        [PlatformAddressURNHeader]: addressUrn,
+      })
+      const profile = await addressClient.getAddressProfile.query()
+      result.erc_4337.claims.erc_4337.push({
+        nickname: profile.title,
+        address: profile.address,
+      })
+      result.erc_4337.meta.urns.push(addressUrn)
+    }
   }
   return result
 }

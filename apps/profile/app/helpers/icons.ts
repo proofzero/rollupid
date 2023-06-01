@@ -10,8 +10,8 @@ import emailIcon from '@proofzero/design-system/src/assets/social_icons/email.sv
 import appleIcon from '@proofzero/design-system/src/atoms/providers/Apple'
 import discordIcon from '@proofzero/design-system/src/assets/social_icons/discord.svg'
 import githubIcon from '@proofzero/design-system/src/atoms/providers/Github'
-import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
-import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
+import googleIcon from '@proofzero/design-system/src/atoms/providers/Google'
+import microsoftIcon from '@proofzero/design-system/src/atoms/providers/Microsoft'
 import twitterIcon from '@proofzero/design-system/src/assets/social_icons/twitter.svg'
 
 export const imageFromAddressType = (addressType: string) => {

@@ -1,12 +1,11 @@
 import React from 'react'
-import { Dropdown, SelectListItem } from './DropdownSelectList'
+import { Dropdown, DropdownSelectListItem } from './DropdownSelectList'
 
 import { OAuthAddressType, EmailAddressType, CryptoAddressType } from '@proofzero/types/address'
-import { OptionType } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { HiOutlineEnvelope } from 'react-icons/hi2'
 
-import googleIcon from '@proofzero/design-system/src/assets/social_icons/google.svg'
-import microsoftIcon from '@proofzero/design-system/src/assets/social_icons/microsoft.svg'
+import googleIcon from '@proofzero/design-system/src/atoms/providers/Google'
+import microsoftIcon from '@proofzero/design-system/src/atoms/providers/Microsoft'
 import appleIcon from '@proofzero/design-system/src/atoms/providers/Apple'
 
 export default {
@@ -17,7 +16,7 @@ export default {
 
 
 const getIcon = (
-    type?: OAuthAddressType | EmailAddressType | OptionType | CryptoAddressType
+    type?: OAuthAddressType | EmailAddressType | CryptoAddressType
 ): JSX.Element => {
     return type
         ? type === OAuthAddressType.Microsoft
@@ -32,7 +31,7 @@ const getIcon = (
         : null
 }
 
-const listItems: SelectListItem[] = [
+const listItems: Array<DropdownSelectListItem> = [
     {
         title: 'email@gmail.com',
         value: 'urn:rollupid:address/1',

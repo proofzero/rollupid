@@ -1,13 +1,11 @@
 import { getAccountClient, getAddressClient } from '~/platform.server'
 import {
-  getNormalisedConnectedEmails,
-  getNormalisedSmartContractWallets,
+  getEmailDropdownItems,
+  getAddressDropdownItems,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
 import { createAuthorizationParamsCookieHeaders } from '~/session.server'
-
-import type { GetAddressProfileResult } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressProfile'
 
 import {
   SCOPE_CONNECTED_ACCOUNTS,
@@ -17,19 +15,16 @@ import {
 
 import type { AccountURN } from '@proofzero/urns/account'
 import type { PersonaData } from '@proofzero/types/application'
-import type {
-  EmailSelectListItem,
-  SCWalletSelectListItem,
-} from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { redirect } from '@remix-run/cloudflare'
-import { CryptoAddressType } from '@proofzero/types/address'
+import { CryptoAddressType, NodeType } from '@proofzero/types/address'
+import { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 
 export type DataForScopes = {
-  connectedEmails?: EmailSelectListItem[]
-  personaData?: PersonaData
+  connectedEmails: DropdownSelectListItem[]
+  personaData: PersonaData
   requestedScope: string[]
-  connectedAccounts?: GetAddressProfileResult[]
-  connectedSmartContractWallets?: SCWalletSelectListItem[]
+  connectedAccounts: DropdownSelectListItem[]
+  connectedSmartContractWallets: DropdownSelectListItem[]
 }
 
 // Deterministically sort scopes so that they are always in the same order
@@ -54,6 +49,7 @@ export const reorderScope = (scopes: string[]): string[] => {
 }
 // -----------------------------------------------------------------------------
 
+
 export const getDataForScopes = async (
   requestedScope: string[],
   accountURN: AccountURN,
@@ -64,9 +60,9 @@ export const getDataForScopes = async (
   if (!accountURN)
     throw new UnauthorizedError({ message: 'Account URN is required' })
 
-  let connectedSmartContractWallets: SCWalletSelectListItem[] = []
-  let connectedEmails: EmailSelectListItem[] = []
-  let connectedAddresses: GetAddressProfileResult[] = []
+  let connectedSmartContractWallets: Array<DropdownSelectListItem> = []
+  let connectedEmails: Array<DropdownSelectListItem> = []
+  let connectedAddresses: Array<DropdownSelectListItem> = []
 
   const accountClient = getAccountClient(jwt || '', env, traceSpan)
 
@@ -76,22 +72,25 @@ export const getDataForScopes = async (
 
   if (connectedAccounts && connectedAccounts.length) {
     if (requestedScope.includes(Symbol.keyFor(SCOPE_EMAIL)!)) {
-      connectedEmails = getNormalisedConnectedEmails(connectedAccounts)
+      connectedEmails = getEmailDropdownItems(connectedAccounts)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!)) {
-      connectedAddresses = await Promise.all(
+      const addresses = (await Promise.all(
         connectedAccounts
           .filter((ca) => {
-            return ca.rc.addr_type !== CryptoAddressType.Wallet
+            return (ca.rc.node_type === NodeType.OAuth ||
+              ca.rc.node_type === NodeType.Crypto) &&
+              ca.rc.addr_type !== CryptoAddressType.Wallet
           })
           .map((ca) => {
             const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
             return addressClient.getAddressProfile.query()
           })
-      )
+      ))
+      connectedAddresses = getAddressDropdownItems(addresses)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!)) {
-      const scWalletAddresses = await Promise.all(
+      const addresses = await Promise.all(
         connectedAccounts
           .filter((ca) => {
             return ca.rc.addr_type === CryptoAddressType.Wallet
@@ -101,9 +100,7 @@ export const getDataForScopes = async (
             return addressClient.getAddressProfile.query()
           })
       )
-
-      connectedSmartContractWallets =
-        getNormalisedSmartContractWallets(scWalletAddresses)
+      connectedSmartContractWallets = getAddressDropdownItems(addresses)
     }
   }
 
@@ -145,7 +142,7 @@ export function authzParamsMatch(
     scopesMatch &&
     authzCookieParams.clientId === authzQueryParams.clientId &&
     `${authzReqRedirectURL?.origin}${authzReqRedirectURL?.pathname}` ===
-      `${authzReqCookieRedirectURL?.origin}${authzReqCookieRedirectURL?.pathname}` &&
+    `${authzReqCookieRedirectURL?.origin}${authzReqCookieRedirectURL?.pathname}` &&
     authzCookieParams.state === authzQueryParams.state
   )
 }

@@ -11,7 +11,7 @@ import { TbCirclePlus } from "react-icons/tb"
 import { BadRequestError } from "@proofzero/errors"
 
 
-export type SelectListItem = {
+export type DropdownSelectListItem = {
     title: string
     value?: string
     icon?: JSX.Element
@@ -30,9 +30,9 @@ export const Dropdown = ({
     selectAllCheckboxTitle,
     selectAllCheckboxDescription,
 }: {
-    items: SelectListItem[],
+    items: Array<DropdownSelectListItem>,
     placeholder: string,
-    onSelect: (selected: Array<SelectListItem> | SelectListItem) => void,
+    onSelect: (selected: Array<DropdownSelectListItem> | DropdownSelectListItem) => void,
     multiple?: boolean
     ConnectButtonPhrase: string,
     ConnectButtonCallback: () => void,
@@ -54,16 +54,20 @@ export const Dropdown = ({
     /**
      * For single select
      */
-    const [selectedItem, setSelectedItem] = useState<SelectListItem>(() => {
-        return multiple ? null : defaultItems[0]
+    const [selectedItem, setSelectedItem] = useState<DropdownSelectListItem | undefined>(() => {
+        if (!multiple) return defaultItems[0]
     })
 
     /**
      * For multi select
      */
     const [selectedItems, setSelectedItems] = useState<
-        Array<SelectListItem>
-    >(() => { return multiple ? defaultItems : [] })
+        Array<DropdownSelectListItem>
+    >(() => {
+        return multiple
+            ? defaultItems
+            : [] as Array<DropdownSelectListItem>
+    })
 
     const [allItemsSelected, setAllItemsSelected] =
         useState(false)
@@ -73,13 +77,15 @@ export const Dropdown = ({
             value={multiple ? selectedItems : selectedItem}
             onChange={(input) => {
                 if (multiple) {
-                    setSelectedItems(input as SelectListItem[])
+                    setSelectedItems(input as DropdownSelectListItem[])
                     if (!allItemsSelected) {
-                        onSelect(input)
+                        //@ts-ignore
+                        onSelect(input.map((i) => i.value))
                     }
                 } else {
-                    setSelectedItem(input as SelectListItem)
-                    onSelect(input)
+                    setSelectedItem(input as DropdownSelectListItem)
+                    //@ts-ignore
+                    onSelect(input.value)
                 }
             }}
             multiple={multiple}
@@ -248,15 +254,16 @@ export const Dropdown = ({
                                     */
                                     : <div className="px-1 space-y-1 max-h-[140px]
                              overflow-y-scroll thin-scrollbar">
-                                        {items.map((item) => (
-                                            <Listbox.Option
+                                        {items.map((item) => {
+                                            const preselected = selectedItem?.value === item.value
+                                            return (<Listbox.Option
                                                 className="flex flex-row space-x-2 cursor-pointer hover:bg-gray-50
                                     rounded-lg  w-full "
                                                 key={item.value}
                                                 value={item}
                                             >{({ selected }) => (
                                                 <div
-                                                    className={`${selected ? 'bg-gray-100' : ""}
+                                                    className={`${selected || preselected ? 'bg-gray-100' : ""}
                                                          w-full h-full rounded-lg py-2 px-2 flex flex-row
                                                 items-center justify-between`}
                                                 >
@@ -269,7 +276,7 @@ export const Dropdown = ({
                                                         <div className="flex flex-col truncate">
                                                             <Text
                                                                 size="sm"
-                                                                weight={selected ? 'medium' : 'normal'}
+                                                                weight={selected || preselected ? 'medium' : 'normal'}
                                                                 className={`truncate w-full`}
                                                             >
                                                                 {item.title}
@@ -287,15 +294,15 @@ export const Dropdown = ({
                                                             }
                                                         </div>
                                                     </div>
-                                                    {selected ? (
+                                                    {selected || preselected ? (
                                                         <span className="flex items-center pl-3 text-indigo-600">
                                                             <CheckIcon className="h-5 w-5" aria-hidden="true" />
                                                         </span>
                                                     ) : null}
                                                 </div>
                                             )}
-                                            </Listbox.Option>
-                                        ))}
+                                            </Listbox.Option>)
+                                        })}
                                     </div> : null}
                             {items?.length
                                 ? <div className="mx-4 w-100 border-b border-gray-200"></div>

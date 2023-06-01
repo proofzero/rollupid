@@ -2,25 +2,18 @@ import React, { useContext } from 'react'
 import { Avatar } from '../../atoms/profile/avatar/Avatar'
 import { Text } from '../../atoms/text/Text'
 import authorizeCheck from './authorize-check.svg'
-import { SmartContractWalletSelect } from '../../atoms/smart_contract_wallets/SmartContractWalletSelect'
 import subtractLogo from '../../assets/subtract-logo.svg'
 import { Spinner } from '../../atoms/spinner/Spinner'
 import { Button } from '../../atoms/buttons/Button'
 import Info from '../../atoms/info/Info'
 import {
-  EmailSelectListItem,
-  OptionType,
-  SCWalletSelectListItem,
+  getEmailIcon,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
-import { EmailSelect } from '../../atoms/email/EmailSelect'
-import { ConnectedAccountSelect } from '../../atoms/accounts/ConnectedAccountSelect'
-import { GetAddressProfileResult } from '@proofzero/platform/address/src/jsonrpc/methods/getAddressProfile'
-import { AuthorizationControlSelection } from '@proofzero/types/application'
-import { AddressURN } from '@proofzero/urns/address'
 import { ScopeDescriptor } from '@proofzero/security/scopes'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import { ThemeContext } from '../../contexts/theme'
 import ScopeIcon from './ScopeIcon'
+import { Dropdown, DropdownSelectListItem } from '../../atoms/dropdown/DropdownSelectList'
 
 type UserProfile = {
   pfpURL: string
@@ -44,19 +37,21 @@ type AuthorizationProps = {
 
   transitionState: 'idle' | 'submitting' | 'loading'
 
-  connectedSmartContractWallets: SCWalletSelectListItem[]
+  connectedSmartContractWallets?: Array<DropdownSelectListItem>
   addNewSmartWalletCallback: () => void
-  selectSmartWalletCallback: (selected: AddressURN[]) => void
+  selectSmartWalletsCallback: (selected: Array<DropdownSelectListItem>) => void
+  selectAllSmartWalletsCallback: () => void
 
-  connectedEmails: EmailSelectListItem[]
+  connectedEmails?: Array<DropdownSelectListItem>
   addNewEmailCallback: () => void
-  selectEmailCallback: (selected: EmailSelectListItem) => void
+  selectEmailCallback: (selected: DropdownSelectListItem) => void
 
-  connectedAccounts: GetAddressProfileResult[]
+  connectedAccounts?: Array<DropdownSelectListItem>
   addNewAccountCallback: () => void
   selectAccountsCallback: (
-    selected: AddressURN[] | AuthorizationControlSelection[]
+    selected: Array<DropdownSelectListItem>
   ) => void
+  selectAllAccountsCallback: () => void
 
   cancelCallback: () => void
   authorizeCallback: (scopes: string[]) => void
@@ -72,13 +67,15 @@ export default ({
   transitionState,
   connectedSmartContractWallets,
   addNewSmartWalletCallback,
-  selectSmartWalletCallback,
+  selectSmartWalletsCallback,
+  selectAllSmartWalletsCallback,
   connectedEmails,
   addNewEmailCallback,
   selectEmailCallback,
   connectedAccounts,
   addNewAccountCallback,
   selectAccountsCallback,
+  selectAllAccountsCallback,
   cancelCallback,
   authorizeCallback,
   disableAuthorize = false,
@@ -100,7 +97,6 @@ export default ({
     }
     scopesToDisplay.unshift('system_identifiers')
   }
-
   const { dark, theme } = useContext(ThemeContext)
 
   return (
@@ -167,59 +163,54 @@ export default ({
 
                     {scope === 'erc_4337' && (
                       <div className="flex-1 min-w-0">
-                        <SmartContractWalletSelect
-                          wallets={connectedSmartContractWallets}
-                          onSelect={(selected: SCWalletSelectListItem) => {
-                            if (selected?.type === OptionType.AddNew) {
-                              addNewSmartWalletCallback()
-                            } else if (selected) {
-                              selectSmartWalletCallback([selected.addressURN])
-                            }
+                        <Dropdown
+                          items={connectedSmartContractWallets}
+                          placeholder='Select a Smart Contract Wallet'
+                          multiple={true}
+                          onSelect={(selectedItems: Array<DropdownSelectListItem>) => {
+                            selectSmartWalletsCallback(selectedItems)
                           }}
+                          onSelectAll={
+                            selectAllSmartWalletsCallback
+                          }
+                          ConnectButtonPhrase="New Smart Contract Wallet"
+                          ConnectButtonCallback={addNewSmartWalletCallback}
+                          selectAllCheckboxTitle='All Smart Contract Wallets'
+                          selectAllCheckboxDescription='All current and future SC Wallets'
                         />
                       </div>
                     )}
 
                     {scope === 'email' && (
                       <div className="flex-1 min-w-0">
-                        <EmailSelect
-                          items={connectedEmails || []}
-                          enableAddNew={true}
-                          defaultAddress={connectedEmails![0]?.addressURN}
-                          onSelect={(selected: EmailSelectListItem) => {
-                            if (selected?.type === OptionType.AddNew) {
-                              addNewEmailCallback()
-                            } else if (selected) {
-                              selectEmailCallback(selected)
-                            }
+                        <Dropdown
+                          items={connectedEmails}
+                          placeholder='Select an Email Address'
+                          onSelect={(selectedItem: DropdownSelectListItem) => {
+                            selectEmailCallback(selectedItem)
                           }}
+                          ConnectButtonPhrase="Connect New Email Address"
+                          ConnectButtonCallback={addNewEmailCallback}
                         />
                       </div>
                     )}
 
                     {scope === 'connected_accounts' && (
                       <div className="flex-1 min-w-0">
-                        <ConnectedAccountSelect
-                          accounts={connectedAccounts.map((ca) => ({
-                            addressURN: ca.id,
-                            address: ca.address,
-                            title: ca.title,
-                            provider:
-                              ca.type === 'eth' ? 'blockchain' : ca.type,
-                          }))}
-                          onSelect={(addresses) => {
-                            selectAccountsCallback(
-                              addresses.map((a) => a.addressURN)
-                            )
+                        <Dropdown
+                          items={connectedAccounts}
+                          onSelect={(selectedItems: Array<DropdownSelectListItem>) => {
+                            selectAccountsCallback(selectedItems)
                           }}
-                          onSelectAll={() => {
-                            selectAccountsCallback([
-                              AuthorizationControlSelection.ALL,
-                            ])
-                          }}
-                          onConnectNew={() => {
-                            addNewAccountCallback()
-                          }}
+                          onSelectAll={
+                            selectAllAccountsCallback
+                          }
+                          placeholder='No connected account(s)'
+                          ConnectButtonPhrase="Connect New Account"
+                          ConnectButtonCallback={addNewAccountCallback}
+                          multiple={true}
+                          selectAllCheckboxTitle='All Connected Accounts'
+                          selectAllCheckboxDescription='All current and future accounts'
                         />
                       </div>
                     )}

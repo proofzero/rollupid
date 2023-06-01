@@ -36,14 +36,14 @@ import sideGraphics from '~/assets/auth-side-graphics.svg'
 import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { DataForScopes } from '~/utils/authorize.server'
-import type { EmailSelectListItem } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
 
-import type { AddressURN } from '@proofzero/urns/address'
 import type { PersonaData } from '@proofzero/types/application'
 
 import Authorization from '@proofzero/design-system/src/templates/authorization/Authorization'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import { getEmailIcon } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 export type UserProfile = {
   displayName: string
@@ -389,20 +389,22 @@ export default function Authorize() {
     requestedScope,
     connectedAccounts,
     connectedSmartContractWallets,
-  } = dataForScopes
+  } = dataForScopes as DataForScopes
 
   const [persona] = useState<PersonaData>(personaData!)
 
-  const [selectedEmail, setSelectedEmail] = useState<EmailSelectListItem>()
-  const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
-    Array<AddressURN> | Array<AuthorizationControlSelection>
-  >([])
-  const [selectedSCWallets, setSelectedSCWallets] = useState<Array<AddressURN>>(
-    []
-  )
+  const [selectedEmail, setSelectedEmail] = useState<DropdownSelectListItem>()
+  const [selectedConnectedAccounts, setSelectedConnectedAccounts] =
+    useState<Array<DropdownSelectListItem | AuthorizationControlSelection>>(
+      []
+    )
+  const [selectedSCWallets, setSelectedSCWallets] =
+    useState<Array<DropdownSelectListItem | AuthorizationControlSelection>>(
+      []
+    )
 
   // Re-render the component every time persona gets updated
-  useEffect(() => {}, [persona])
+  useEffect(() => { }, [persona])
 
   const submit = useSubmit()
   const navigate = useNavigate()
@@ -434,7 +436,7 @@ export default function Authorize() {
     }
 
     if (requestedScope.includes('email') && selectedEmail) {
-      personaData.email = selectedEmail.addressURN
+      personaData.email = selectedEmail
     }
 
     if (
@@ -448,8 +450,12 @@ export default function Authorize() {
       }
     }
 
-    if (requestedScope.includes('erc_4337') && selectedSCWallets) {
-      personaData.erc_4337 = selectedSCWallets
+    if (requestedScope.includes('erc_4337') && selectedSCWallets.length > 0) {
+      if (selectedSCWallets[0] === AuthorizationControlSelection.ALL) {
+        personaData.erc_4337 = AuthorizationControlSelection.ALL
+      } else {
+        personaData.erc_4337 = selectedSCWallets
+      }
     }
 
     // TODO: Everything should be a form field now handled by javascript
@@ -514,8 +520,21 @@ export default function Authorize() {
 
             return navigate(`/authorize?${qp.toString()}`)
           }}
-          selectSmartWalletCallback={setSelectedSCWallets}
-          connectedEmails={connectedEmails ?? []}
+          selectSmartWalletsCallback={setSelectedSCWallets}
+          selectAllSmartWalletsCallback={() => {
+            setSelectedSCWallets([AuthorizationControlSelection.ALL])
+          }}
+
+          connectedEmails={connectedEmails.map(email => {
+            // Substituting subtitle with icon
+            // on the client side
+            return {
+              icon: getEmailIcon(email.subtitle!),
+              title: email.title,
+              selected: email.selected,
+              value: email.value
+            }
+          }) ?? []}
           addNewEmailCallback={() => {
             const qp = new URLSearchParams()
             qp.append('scope', requestedScope.join(' '))
@@ -542,6 +561,9 @@ export default function Authorize() {
             return navigate(`/authorize?${qp.toString()}`)
           }}
           selectAccountsCallback={setSelectedConnectedAccounts}
+          selectAllAccountsCallback={() => {
+            setSelectedConnectedAccounts([AuthorizationControlSelection.ALL])
+          }}
           cancelCallback={cancelCallback}
           authorizeCallback={authorizeCallback}
           disableAuthorize={
