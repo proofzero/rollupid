@@ -4,7 +4,7 @@ import gatewayFromIpfs from './gateway-from-ipfs'
 import getAuthzHeaderConditionallyFromToken from './getAuthzHeaderConditionallyFromToken'
 import getAuthzTokenFromReq from './getAuthzTokenFromReq'
 import { parseJwt } from './jwt'
-import * as strings from './strings'
+import signMessageTemplate from './signMessageTemplate'
 
 export {
   checkEnv,
@@ -13,5 +13,5 @@ export {
   getAuthzHeaderConditionallyFromToken,
   getAuthzTokenFromReq,
   parseJwt,
-  strings
+  signMessageTemplate
 }

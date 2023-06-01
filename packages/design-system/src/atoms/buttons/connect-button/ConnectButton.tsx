@@ -13,7 +13,7 @@ import { Popover } from '@headlessui/react'
 import { HiChevronDown, HiChevronUp } from 'react-icons/hi'
 import { ThemeContext } from '../../../contexts/theme'
 
-import { strings } from '@proofzero/packages/utils'
+import { signMessageTemplate } from '@proofzero/packages/utils'
 
 export type ConnectButtonProps = {
   connectCallback: (address: string) => void
@@ -77,7 +77,7 @@ export function ConnectButton({
   useEffect(() => {
     if (!signData?.signature && signData?.nonce) {
       console.debug('signing...')
-      const nonceMessage = strings.signMessageTemplate().replace(
+      const nonceMessage = signMessageTemplate().replace(
         '{{nonce}}',
         signData.nonce
       )
