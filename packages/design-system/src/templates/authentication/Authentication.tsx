@@ -12,7 +12,6 @@ import { AuthButton } from '../../molecules/auth-button/AuthButton'
 import { HiOutlineMail } from 'react-icons/hi'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import { ThemeContext } from '../../contexts/theme'
-// import { ConnectButton } from '../../atoms/buttons/connect-button/ConnectButton'
 
 const ConnectButton = lazy(() =>
   import('../../atoms/buttons/connect-button/ConnectButton').then((module) => ({

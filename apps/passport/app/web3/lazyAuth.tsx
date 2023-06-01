@@ -16,19 +16,19 @@ export function LazyAuth({
     const hydrated = useHydrated()
     if (!hydrated) return <>Loading...</>
 
-    const client = createConfig(
+    const config = createConfig(
         getDefaultConfig({
             appName: 'Rollup',
             autoConnect,
             alchemyId:
-                typeof window !== 'undefined' && window.ENV.APIKEY_ALCHEMY_PUBLIC,
+                window.ENV.APIKEY_ALCHEMY_PUBLIC,
             walletConnectProjectId:
-                typeof window !== 'undefined' && window.ENV.WALLET_CONNECT_PROJECT_ID,
+                window.ENV.WALLET_CONNECT_PROJECT_ID,
         })
     )
     return (
         <Suspense fallback={''}>
-            <WagmiConfig config={client}>
+            <WagmiConfig config={config}>
                 <ConnectKitProvider>
                     {children}
                 </ConnectKitProvider>
