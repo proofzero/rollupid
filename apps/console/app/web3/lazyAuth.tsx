@@ -23,12 +23,10 @@ export function LazyAuth({
         })
     )
     return (
-        <Suspense fallback="">
-            <WagmiConfig config={config}>
-                <ConnectKitProvider>
-                    {children}
-                </ConnectKitProvider>
-            </WagmiConfig>
-        </Suspense>
+        <WagmiConfig config={config}>
+            <ConnectKitProvider>
+                {children}
+            </ConnectKitProvider>
+        </WagmiConfig>
     )
 }
