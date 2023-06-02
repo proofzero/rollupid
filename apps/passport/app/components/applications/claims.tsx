@@ -276,20 +276,34 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
     </Disclosure >
   }
 
-  const ConnectedAccountsView = ({
+  const ExpandableRowView = ({
     accounts,
+    title,
+    source,
+    titleFieldName,
+    addressFieldName,
+    connectedAccounts = false,
+    scWallets = false
   }: {
-    accounts: {
+    accounts: Array<{
       icon: string
       address: string
       type: string
-    }[]
+      title?: string
+    }>
+    title: string
+    source?: string
+    titleFieldName?: string,
+    addressFieldName?: string
+    connectedAccounts?: boolean
+    scWallets?: boolean
   }) => {
     const [selectedAccount, setSelectedAccount] = useState<
       | {
         icon: string
         address: string
         type: string
+        title?: string
       }
       | undefined
     >()
@@ -310,13 +324,18 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
                   weight="bold"
                   className="text-gray-800 text-start"
                 >
-                  Connected Addresses
+                  {title}
                 </Text>
-                <MultiAvatar
-                  cutoff={7}
-                  avatars={accounts.map((a) => a.icon)}
-                  size={16}
-                />
+                {
+                  scWallets
+                    ? <Text
+                      size="sm"
+                      weight="medium"
+                      className="text-start text-gray-500 truncate">
+                      {accounts.map((a) => a.icon)!.length} Smart Contract Wallet(s)
+                    </Text>
+                    : <MultiAvatar avatars={accounts.map((a) => a.icon)!} />
+                }
               </section>
               <section>
                 {open ? (
@@ -337,7 +356,7 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
                   <UserPill
                     key={i}
                     size={20}
-                    text={a.address}
+                    text={scWallets ? a.title! : a.address}
                     avatarURL={a.icon}
                     onClick={() => setSelectedAccount(a)}
                     className={'pointer-events-auto'}
@@ -345,14 +364,30 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
                 ))}
               </section>
 
-              {selectedAccount && (
-                <AccountExpandedView
-                  account={selectedAccount}
-                  connectedAccounts={true}
-                  addressFieldName='Address'
-                  source={`${startCase(selectedAccount.type)} - ${selectedAccount.address}`}
-                />
-              )}
+              {
+                selectedAccount && (
+                  <AccountExpandedView
+                    account={selectedAccount}
+                    source={
+                      source
+                        ? source
+                        : `${startCase(selectedAccount.type)} - ${selectedAccount.address}`
+                    }
+                    titleFieldName={titleFieldName}
+                    titleFieldValue={scWallets
+                      ? <Text
+                        size="xs"
+                        weight="medium"
+                        className="text-gray-500 truncate"
+                      >
+                        {selectedAccount.title}
+                      </Text>
+                      : undefined}
+                    addressFieldName={addressFieldName}
+                    connectedAccounts={connectedAccounts}
+                  />
+                )
+              }
             </Disclosure.Panel>
           </div>
         )}
@@ -365,22 +400,24 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
       {claims.map((claim, i) => {
         switch (claim.claim) {
           case 'email':
-            return (
-              <RowView
-                key={i}
-                appAskedFor='Email'
-                whatsBeingShared={claim.address}
-                sourceOfData='Rollup Identity'
-                sourceOfDataIcon={
-                  <img src={claim.icon} className="w-[22px] h-[22px] rounded-full" />
-                }
-                dropdown={false}
-              />
-            )
+            return <RowView
+              key={i}
+              appAskedFor='Email'
+              whatsBeingShared={claim.address}
+              sourceOfData={claim.address}
+              sourceOfDataIcon={
+                <img src={claim.icon} className="w-5 h-5 rounded-full" />
+              }
+              dropdown={false}
+            />
           case 'connected_accounts':
-            return <ConnectedAccountsView key={i} accounts={claim.accounts} />
-          case 'erc_4337':
-            return <ConnectedAccountsView key={i} accounts={claim.accounts} />
+            return <ExpandableRowView
+              key={i}
+              title={"Connected Accounts"}
+              addressFieldName={"Address"}
+              accounts={claim.accounts}
+              connectedAccounts={true}
+            />
           case 'openid':
             return <RowView
               appAskedFor='System Identifiers'
@@ -402,6 +439,16 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
               key={i}
               account={claim.account}
             />
+          case 'erc_4337':
+            return <ExpandableRowView
+              key={i}
+              title="Smart Contract Wallet"
+              accounts={claim.accounts}
+              source='Smart Contract Wallet'
+              titleFieldName='Wallet Name'
+              addressFieldName='Wallet ID'
+              scWallets={true}
+            />
         }
       })}
     </div>
@@ -409,7 +456,6 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
 }
 // ----------------------------------------------------------------------- PC //
 export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
-
   const RowView = ({
     account,
     appAskedFor,
@@ -609,7 +655,7 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
                     <UserPill
                       key={i}
                       size={20}
-                      text={a.address}
+                      text={scWallets ? a.title! : a.address}
                       avatarURL={a.icon}
                       onClick={() => setSelectedAccount(a)}
                       className={'pointer-events-auto'}
@@ -697,7 +743,6 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
               key={i}
               title="Smart Contract Wallet"
               accounts={claim.accounts}
-              connectedAccounts={true}
               source='Smart Contract Wallet'
               titleFieldName='Wallet Name'
               addressFieldName='Wallet ID'
