@@ -227,9 +227,7 @@ export default () => {
                 onSelect={(selected) => {
                   // type casting to DropdownSelectListItem instead of array
                   if (!Array.isArray(selected)) {
-                    //TODO: Temp fix. To be removed with full fix of typing issue
-                    //@ts-ignore
-                    if (selected === appContactAddress) {
+                    if (selected.value === appContactAddress) {
                       return
                     }
                     if (!selected) {
@@ -240,7 +238,7 @@ export default () => {
                       {
                         //TODO: temp fix. To be removed with full fix of typing issue
                         //@ts-ignore
-                        addressURN: selected,
+                        addressURN: selected.value,
                       },
                       {
                         method: 'post',

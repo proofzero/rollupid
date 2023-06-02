@@ -79,13 +79,11 @@ export const Dropdown = ({
                 if (multiple) {
                     setSelectedItems(input as DropdownSelectListItem[])
                     if (!allItemsSelected) {
-                        //@ts-ignore
-                        onSelect(input.map((i) => i.value))
+                        onSelect(input)
                     }
                 } else {
                     setSelectedItem(input as DropdownSelectListItem)
-                    //@ts-ignore
-                    onSelect(input.value)
+                    onSelect(input)
                 }
             }}
             multiple={multiple}
