@@ -227,16 +227,20 @@ export default () => {
                 onSelect={(selected) => {
                   // type casting to DropdownSelectListItem instead of array
                   if (!Array.isArray(selected)) {
-                    if (selected.value === appContactAddress) {
+                    //TODO: Temp fix. To be removed with full fix of typing issue
+                    //@ts-ignore
+                    if (selected === appContactAddress) {
                       return
                     }
-                    if (!selected.value) {
+                    if (!selected) {
                       console.error('No addressURN')
                       return
                     }
                     submit(
                       {
-                        addressURN: selected.value,
+                        //TODO: temp fix. To be removed with full fix of typing issue
+                        //@ts-ignore
+                        addressURN: selected,
                       },
                       {
                         method: 'post',
