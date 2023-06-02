@@ -107,19 +107,27 @@ export default function EmailOTPValidator({
       >
         {goBack && (
           <HiOutlineArrowLeft
-            className="absolute left-0 lg:left-0 lg:top-[0.15rem] w-6 h-6 cursor-pointer"
+            className="absolute left-0 lg:left-0 lg:top-[0.15rem] w-6 h-6 cursor-pointer dark:text-white"
             onClick={goBack}
           />
         )}
-        <Text size="xl" weight="semibold" className="text-[#2D333A]">
+        <Text
+          size="xl"
+          weight="semibold"
+          className="text-[#2D333A] dark:text-white"
+        >
           Please check your email
         </Text>
       </section>
 
       <section className="flex-1">
         <div className="flex flex-col items-center mt-4 mb-8">
-          <Text className="text-gray-500">We've sent a code to</Text>
-          <Text className="text-gray-500 font-medium">{email}</Text>
+          <Text className="text-gray-500 dark:text-gray-400">
+            We've sent a code to
+          </Text>
+          <Text className="text-gray-500 dark:text-gray-400 font-medium">
+            {email}
+          </Text>
         </div>
 
         <div className="grid grid-cols-6 gap-2.5">
@@ -186,8 +194,8 @@ export default function EmailOTPValidator({
 
                 inputRefs[i].current?.select()
               }}
-              className={`flex text-base lg:text-2xl py-7 px-3.5 h-20 justify-center items-center text-gray-600 border rounded-lg text-center ${
-                isInvalid ? 'border-red-500' : ''
+              className={`flex text-base lg:text-2xl py-7 px-3.5 h-20 justify-center items-center text-gray-600 dark:text-white dark:bg-gray-800 border rounded-lg text-center ${
+                isInvalid ? 'border-red-500' : 'dark:border-gray-600'
               }`}
             />
           ))}

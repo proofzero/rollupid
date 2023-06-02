@@ -44,6 +44,10 @@ import Authorization from '@proofzero/design-system/src/templates/authorization/
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import { getEmailIcon } from '@proofzero/utils/getNormalisedConnectedAccounts'
+import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
+import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
+import { Helmet } from 'react-helmet'
+import { getRGBColor } from '@proofzero/design-system/src/helpers'
 
 export type UserProfile = {
   displayName: string
@@ -394,17 +398,21 @@ export default function Authorize() {
   const [persona] = useState<PersonaData>(personaData!)
 
   const [selectedEmail, setSelectedEmail] = useState<DropdownSelectListItem>()
-  const [selectedConnectedAccounts, setSelectedConnectedAccounts] =
-    useState<Array<DropdownSelectListItem | AuthorizationControlSelection>>(
-      []
-    )
-  const [selectedSCWallets, setSelectedSCWallets] =
-    useState<Array<DropdownSelectListItem | AuthorizationControlSelection>>(
-      []
-    )
+  const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
+    Array<DropdownSelectListItem | AuthorizationControlSelection>
+  >([])
+  const [selectedSCWallets, setSelectedSCWallets] = useState<
+    Array<DropdownSelectListItem | AuthorizationControlSelection>
+  >([])
 
   // Re-render the component every time persona gets updated
-  useEffect(() => { }, [persona])
+  useEffect(() => {}, [persona])
+
+  const [dark, setDark] = useState<boolean>(false)
+  useEffect(() => {
+    const darkMode = window.matchMedia('(prefers-color-scheme: dark)')
+    setDark(darkMode.matches)
+  }, [])
 
   const submit = useSubmit()
   const navigate = useNavigate()
@@ -485,97 +493,140 @@ export default function Authorize() {
   }
 
   return (
-    <div className={'flex flex-row h-[100dvh] justify-center items-center'}>
-      <div
-        className={
-          'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
-        }
-      >
-        <img src={sideGraphics} alt="Background graphics" />
-      </div>
-      <div className={'basis-full basis-full lg:basis-3/5'}>
-        <Authorization
-          userProfile={{
-            pfpURL: userProfile.pfp.image,
-          }}
-          appProfile={{
-            name: appProfile.name,
-            iconURL: appProfile.iconURL,
-            privacyURL: appProfile.privacyURL!,
-            termsURL: appProfile.termsURL!,
-          }}
-          requestedScope={requestedScope}
-          scopeMeta={scopeMeta}
-          transitionState={transition.state}
-          connectedSmartContractWallets={connectedSmartContractWallets ?? []}
-          addNewSmartWalletCallback={() => {
-            const qp = new URLSearchParams()
-            qp.append('scope', requestedScope.join(' '))
-            qp.append('state', state)
-            qp.append('client_id', clientId)
-            qp.append('redirect_uri', redirectOverride)
-            qp.append('rollup_action', 'create')
-            qp.append('create_type', 'wallet')
-            if (prompt) qp.append('prompt', prompt)
+    <>
+      <Helmet>
+        <style type="text/css">{`
+            :root {
+                ${getRGBColor(
+                  dark
+                    ? appProfile?.appTheme?.color?.dark ??
+                        AuthenticationScreenDefaults.color.dark
+                    : appProfile?.appTheme?.color?.light ??
+                        AuthenticationScreenDefaults.color.light,
+                  'primary'
+                )}   
+             {
+         `}</style>
+      </Helmet>
 
-            return navigate(`/authorize?${qp.toString()}`)
-          }}
-          selectSmartWalletsCallback={setSelectedSCWallets}
-          selectAllSmartWalletsCallback={() => {
-            setSelectedSCWallets([AuthorizationControlSelection.ALL])
-          }}
-
-          connectedEmails={connectedEmails.map(email => {
-            // Substituting subtitle with icon
-            // on the client side
-            return {
-              icon: getEmailIcon(email.subtitle!),
-              title: email.title,
-              selected: email.selected,
-              value: email.value
-            }
-          }) ?? []}
-          addNewEmailCallback={() => {
-            const qp = new URLSearchParams()
-            qp.append('scope', requestedScope.join(' '))
-            qp.append('state', state)
-            qp.append('client_id', clientId)
-            qp.append('redirect_uri', redirectOverride)
-            qp.append('rollup_action', 'connect')
-            qp.append('login_hint', 'email microsoft google apple')
-            if (prompt) qp.append('prompt', prompt)
-
-            return navigate(`/authorize?${qp.toString()}`)
-          }}
-          selectEmailCallback={setSelectedEmail}
-          connectedAccounts={connectedAccounts ?? []}
-          addNewAccountCallback={() => {
-            const qp = new URLSearchParams()
-            qp.append('scope', requestedScope.join(' '))
-            qp.append('state', state)
-            qp.append('client_id', clientId)
-            qp.append('redirect_uri', redirectOverride)
-            qp.append('rollup_action', 'connect')
-            if (prompt) qp.append('prompt', prompt)
-
-            return navigate(`/authorize?${qp.toString()}`)
-          }}
-          selectAccountsCallback={setSelectedConnectedAccounts}
-          selectAllAccountsCallback={() => {
-            setSelectedConnectedAccounts([AuthorizationControlSelection.ALL])
-          }}
-          cancelCallback={cancelCallback}
-          authorizeCallback={authorizeCallback}
-          disableAuthorize={
-            // TODO: make generic!
-            (requestedScope.includes('email') &&
-              (!connectedEmails?.length || !selectedEmail)) ||
-            (requestedScope.includes('connected_accounts') &&
-              !selectedConnectedAccounts?.length) ||
-            (requestedScope.includes('erc_4337') && !selectedSCWallets.length)
+      <div className={'flex flex-row h-[100dvh] justify-center items-center'}>
+        <div
+          className={
+            'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
           }
-        />
+          style={{
+            background: `url(${
+              appProfile?.appTheme?.graphicURL ?? sideGraphics
+            })`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        ></div>
+        <div className={'basis-full basis-full lg:basis-3/5'}>
+          <ThemeContext.Provider
+            value={{
+              dark,
+              theme: {
+                color:
+                  appProfile.appTheme?.color ??
+                  AuthenticationScreenDefaults.color,
+                radius:
+                  appProfile.appTheme?.radius ??
+                  AuthenticationScreenDefaults.radius,
+              },
+            }}
+          >
+            <Authorization
+              userProfile={{
+                pfpURL: userProfile.pfp.image,
+              }}
+              appProfile={{
+                name: appProfile.name,
+                iconURL: appProfile.iconURL,
+                privacyURL: appProfile.privacyURL!,
+                termsURL: appProfile.termsURL!,
+              }}
+              requestedScope={requestedScope}
+              scopeMeta={scopeMeta}
+              transitionState={transition.state}
+              connectedSmartContractWallets={
+                connectedSmartContractWallets ?? []
+              }
+              addNewSmartWalletCallback={() => {
+                const qp = new URLSearchParams()
+                qp.append('scope', requestedScope.join(' '))
+                qp.append('state', state)
+                qp.append('client_id', clientId)
+                qp.append('redirect_uri', redirectOverride)
+                qp.append('rollup_action', 'create')
+                qp.append('create_type', 'wallet')
+                if (prompt) qp.append('prompt', prompt)
+
+                return navigate(`/authorize?${qp.toString()}`)
+              }}
+              selectSmartWalletsCallback={setSelectedSCWallets}
+              selectAllSmartWalletsCallback={() => {
+                setSelectedSCWallets([AuthorizationControlSelection.ALL])
+              }}
+              connectedEmails={
+                connectedEmails.map((email) => {
+                  // Substituting subtitle with icon
+                  // on the client side
+                  return {
+                    icon: getEmailIcon(email.subtitle!),
+                    title: email.title,
+                    selected: email.selected,
+                    value: email.value,
+                  }
+                }) ?? []
+              }
+              addNewEmailCallback={() => {
+                const qp = new URLSearchParams()
+                qp.append('scope', requestedScope.join(' '))
+                qp.append('state', state)
+                qp.append('client_id', clientId)
+                qp.append('redirect_uri', redirectOverride)
+                qp.append('rollup_action', 'connect')
+                qp.append('login_hint', 'email microsoft google apple')
+                if (prompt) qp.append('prompt', prompt)
+
+                return navigate(`/authorize?${qp.toString()}`)
+              }}
+              selectEmailCallback={setSelectedEmail}
+              connectedAccounts={connectedAccounts ?? []}
+              addNewAccountCallback={() => {
+                const qp = new URLSearchParams()
+                qp.append('scope', requestedScope.join(' '))
+                qp.append('state', state)
+                qp.append('client_id', clientId)
+                qp.append('redirect_uri', redirectOverride)
+                qp.append('rollup_action', 'connect')
+                if (prompt) qp.append('prompt', prompt)
+
+                return navigate(`/authorize?${qp.toString()}`)
+              }}
+              selectAccountsCallback={setSelectedConnectedAccounts}
+              selectAllAccountsCallback={() => {
+                setSelectedConnectedAccounts([
+                  AuthorizationControlSelection.ALL,
+                ])
+              }}
+              cancelCallback={cancelCallback}
+              authorizeCallback={authorizeCallback}
+              disableAuthorize={
+                // TODO: make generic!
+                (requestedScope.includes('email') &&
+                  (!connectedEmails?.length || !selectedEmail)) ||
+                (requestedScope.includes('connected_accounts') &&
+                  !selectedConnectedAccounts?.length) ||
+                (requestedScope.includes('erc_4337') &&
+                  !selectedSCWallets.length)
+              }
+            />
+          </ThemeContext.Provider>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

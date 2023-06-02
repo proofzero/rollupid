@@ -14,7 +14,6 @@ import { redirect, json } from '@remix-run/cloudflare'
 import { getAuthzCookieParams } from '~/session.server'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import Authentication, {
-  AppProfile,
   AuthenticationScreenDefaults,
 } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
@@ -22,7 +21,7 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
 import { Button } from '@proofzero/packages/design-system/src/atoms/buttons/Button'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-// import { LazyAuth } from '~/web3/lazyAuth'
+import { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -83,12 +82,12 @@ const InnerComponent = ({
   clientId,
   authnQueryParams,
 }: {
-  transitionState: string,
-  appProps?: AppProfile,
+  transitionState: string
+  appProps?: GetAppPublicPropsResult
   rollup_action?: string
   displayKeys?: any
-  clientId: string,
-  authnQueryParams: string,
+  clientId: string
+  authnQueryParams: string
 }) => {
   const [signData, setSignData] = useState<{
     nonce: string | undefined
@@ -126,15 +125,13 @@ const InnerComponent = ({
     }
 
     history.replaceState(null, '', url.toString())
-  })
+  }, [])
 
   const generic = Boolean(rollup_action)
-
 
   return (
     <Authentication
       logoURL={iconURL}
-      appProfile={appProps}
       Header={
         <>
           {generic && (
@@ -142,7 +139,7 @@ const InnerComponent = ({
               <Text
                 size="xl"
                 weight="semibold"
-                className="text-[#2D333A] mt-6 mb-8"
+                className="text-[#2D333A] dark:text-white mt-6 mb-8"
               >
                 Connect Account
               </Text>
@@ -156,8 +153,14 @@ const InnerComponent = ({
                 size="sm"
               ></Avatar>
               <div className={'flex flex-col items-center gap-2'}>
-                <h1 className={'font-semibold text-xl'}>
-                  {appProps?.name
+                <h1
+                  className={
+                    'font-semibold text-xl dark:text-white text-center'
+                  }
+                >
+                  {appProps?.appTheme?.heading
+                    ? appProps.appTheme.heading
+                    : appProps?.name
                     ? `Login to ${appProps?.name}`
                     : AuthenticationScreenDefaults.defaultHeading}
                 </h1>
@@ -179,16 +182,21 @@ const InnerComponent = ({
               <Button
                 btnSize="l"
                 btnType="secondary-alt"
-                className="w-full hover:bg-gray-100"
+                className="w-full"
                 onClick={() => navigate('/authenticate/cancel')}
               >
-                Cancel
+                <Text className="dark:text-white">Cancel</Text>
               </Button>
             </div>
           </>
         ) : undefined
       }
-      displayKeys={displayKeys}
+      displayKeys={
+        appProps?.appTheme?.providers
+          ?.filter((p) => p.enabled)
+          ?.filter((p) => displayKeys.includes(p.key))
+          .map((p) => p.key) ?? displayKeys
+      }
       mapperArgs={{
         clientId,
         signData,
@@ -262,7 +270,6 @@ const InnerComponent = ({
         },
       }}
     />
-
   )
 }
 
@@ -284,35 +291,31 @@ const getOAuthErrorMessage = (error: string): string => {
   }
 }
 
-
 export default () => {
   const { appProps, rollup_action } = useOutletContext<{
-    appProps?: AppProfile
+    appProps: GetAppPublicPropsResult
     rollup_action?: string
   }>()
 
-  const {
-    clientId,
-    displayKeys,
-    authnQueryParams,
-  } = useLoaderData()
+  const { clientId, displayKeys, authnQueryParams } = useLoaderData()
 
   const transition = useTransition()
 
-
-  return <>
-    {transition.state !== 'idle' && <Loader />}
-    <Suspense fallback="">
-      <LazyAuth autoConnect={true}>
-        <InnerComponent
-          transitionState={transition.state}
-          appProps={appProps!}
-          rollup_action={rollup_action!}
-          displayKeys={displayKeys}
-          clientId={clientId}
-          authnQueryParams={authnQueryParams}
-        />
-      </LazyAuth>
-    </Suspense>
-  </>
+  return (
+    <>
+      {transition.state !== 'idle' && <Loader />}
+      <Suspense fallback="">
+        <LazyAuth autoConnect={true}>
+          <InnerComponent
+            transitionState={transition.state}
+            appProps={appProps!}
+            rollup_action={rollup_action!}
+            displayKeys={displayKeys}
+            clientId={clientId}
+            authnQueryParams={authnQueryParams}
+          />
+        </LazyAuth>
+      </Suspense>
+    </>
+  )
 }

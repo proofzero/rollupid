@@ -27,7 +27,11 @@ export const Input = ({
           htmlFor={id}
           className="w-full flex flex-row items-center justify-between"
         >
-          <Text size="sm" weight="medium" className="text-gray-700 mb-2">
+          <Text
+            size="sm"
+            weight="medium"
+            className="text-gray-700 dark:text-gray-400 mb-2"
+          >
             {label}
             {rest.required ? '*' : ''}
           </Text>
@@ -49,12 +53,12 @@ export const Input = ({
          shadow-sm text-sm font-normal py-2 px-3 ${className}
          ${error ? ' border-red-500' : 'border-gray-300'}
          ${
-          error ? 'focus:border-red-500' : 'focus:border-indigo-500'
-        } disabled:cursor-not-allowed ${
+           error ? 'focus:border-red-500' : 'focus:border-indigo-500'
+         } disabled:cursor-not-allowed ${
           error ? 'disabled:border-red-200' : 'disabled:border-gray-200'
-          } ${
-            error ? 'disabled:bg-red-50' : 'disabled:bg-gray-50'
-          } placeholder-gray-400 text-gray-900`}
+        } ${
+          error ? 'disabled:bg-red-50' : 'disabled:bg-gray-50'
+        } placeholder-gray-400 text-gray-900 dark:text-gray-50 dark:bg-gray-800`}
         id={id}
         name={computedName}
         {...rest}

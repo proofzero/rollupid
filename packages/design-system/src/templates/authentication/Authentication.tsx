@@ -33,39 +33,32 @@ export const AuthenticationScreenDefaults = {
     'discord',
     'github',
   ],
-}
-
-export type AppProfile = {
-  name: string
-  iconURL: string
-  termsURL: string
-  privacyURL: string
-  websiteURL: string
+  color: {
+    light: '#6366F1',
+    dark: '#C6C7FF',
+  },
+  radius: 'md',
 }
 
 export type AuthenticationProps = {
   logoURL?: string
-  appProfile?: AppProfile
   displayKeys: string[]
   mapperArgs: DisplayKeyMapperArgs
   Header?: JSX.Element
   Actions?: JSX.Element
-  radius?: string
 }
 
 export default ({
-  appProfile,
   displayKeys,
   mapperArgs,
   Header,
   Actions,
-  radius = 'lg',
 }: AuthenticationProps) => {
   displayKeys = displayKeys.filter((key) =>
     AuthenticationScreenDefaults.knownKeys.includes(key)
   )
 
-  const { dark } = useContext(ThemeContext)
+  const { dark, theme } = useContext(ThemeContext)
 
   return (
 
@@ -73,10 +66,11 @@ export default ({
       <div
         className={`flex grow-0 flex-col items-center
          gap-4 mx-auto bg-white dark:bg-[#1F2937] p-6 min-h-[100dvh] lg:min-h-[580px]
-          max-h-[100dvh] w-full lg:w-[418px] lg:rounded-${radius}
-          mt-auto`}
+          max-h-[100dvh] w-full lg:w-[418px] lg:rounded-${
+            theme?.radius ?? AuthenticationScreenDefaults.radius
+          }
+          mt-auto border border-[#D1D5DB] dark:border-gray-600`}
         style={{
-          border: '1px solid #D1D5DB',
           boxSizing: 'border-box',
         }}
       >
@@ -94,11 +88,11 @@ export default ({
           {displayKeys.length > 2 && (
             <>
               <div className="flex flex-row items-center">
-                <div className="border-t border-gray-200 flex-1"></div>
+                <div className="border-t border-gray-200 dark:border-gray-600 flex-1"></div>
                 <Text className="px-3 text-gray-500" weight="medium">
                   or
                 </Text>
-                <div className="border-t border-gray-200 flex-1"></div>
+                <div className="border-t border-gray-200 dark:border-gray-600 flex-1"></div>
               </div>
               {displayKeyDisplayFn(displayKeys.slice(2), {
                 ...mapperArgs,

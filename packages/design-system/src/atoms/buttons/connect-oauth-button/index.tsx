@@ -46,7 +46,7 @@ const ConnectOAuthButton = ({
   return (
     <Button
       className={
-        'button w-full dark:bg-[#374151] dark:border-gray-600 hover:bg-gray-100'
+        'button w-full dark:bg-[#374151] dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
       }
       btnType={'secondary-alt'}
       isSubmit={submit}
