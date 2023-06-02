@@ -1,5 +1,4 @@
 import { getDefaultConfig, ConnectKitProvider } from 'connectkit'
-import { Suspense } from 'react'
 import { useHydrated } from 'remix-utils'
 import { createConfig, WagmiConfig } from 'wagmi'
 

@@ -10,6 +10,7 @@ import { Disclosure } from '@headlessui/react'
 import { useState } from 'react'
 
 import passportLogoURL from '~/assets/PassportIcon.svg'
+import primaryLogoIcon from "~/assets/PrimaryAccLogoIcon.svg"
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import warningImg from '~/assets/warning.svg'
 import InputText from '~/components/inputs/InputText'
@@ -284,7 +285,7 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
               <EmailView
                 key={i}
                 address={claim.address}
-                sourceIcon={claim.sourceIcon}
+                sourceIcon={claim.icon}
               />
             )
           case 'connected_accounts':
@@ -299,17 +300,17 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
 // ----------------------------------------------------------------------- PC //
 export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
 
-  const SingleRowView = ({
+  const RowView = ({
     account,
     appAskedFor,
     whatsBeingShared,
     sourceOfData,
-    surceOfDataIcon,
+    sourceOfDataIcon,
     dropdown = true
   }: {
     appAskedFor: string
     sourceOfData: string
-    surceOfDataIcon: string
+    sourceOfDataIcon: JSX.Element
     dropdown?: boolean
     whatsBeingShared?: string
     account?: {
@@ -356,7 +357,7 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
               }
             </td>
             <td className="px-6 py-3 flex flex-row items-center gap-2.5">
-              <img src={surceOfDataIcon} className="w-5 h-5" />
+              {sourceOfDataIcon}
 
               <Text
                 size="sm"
@@ -403,16 +404,16 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
     </Disclosure>
   }
 
-  const SingleRowMultipleAccountsView = ({
+  const ExpandableRowInternals = ({
     open,
     title,
     avatars,
-    wallets = false
+    scWallets = false
   }: {
     open: boolean
     title: string
     avatars?: Array<string>
-    wallets?: boolean
+    scWallets?: boolean
   }) => {
     return <tr>
       <td className={`px-6 py-3 ${open ? `bg-gray-50` : ''}`}>
@@ -433,11 +434,13 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
         </Disclosure.Button>
       </td>
       <td className="px-6 py-3">
-        {wallets
-          ? <Text size="sm" weight="medium" className="text-gray-500 truncate">
-            {avatars!.length} Smart Contract Wallet(s)
-          </Text>
-          : <MultiAvatar avatars={avatars!} />}
+        {
+          scWallets
+            ? <Text size="sm" weight="medium" className="text-gray-500 truncate">
+              {avatars!.length} Smart Contract Wallet(s)
+            </Text>
+            : <MultiAvatar avatars={avatars!} />
+        }
       </td>
       <td className="px-6 py-3 flex flex-row items-center gap-2.5">
         <img src={passportLogoURL} className="w-5 h-5" />
@@ -453,20 +456,34 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
     </tr>
   }
 
-  const ConnectedAccountsView = ({
+  const ExpandableRowView = ({
     accounts,
+    title,
+    source,
+    titleFieldName,
+    addressFieldName,
+    connectedAccounts = false,
+    scWallets = false
   }: {
-    accounts: {
+    accounts: Array<{
       icon: string
       address: string
       type: string
-    }[]
+      title?: string
+    }>
+    title: string
+    source?: string
+    titleFieldName?: string,
+    addressFieldName?: string
+    connectedAccounts?: boolean
+    scWallets?: boolean
   }) => {
     const [selectedAccount, setSelectedAccount] = useState<
       | {
         icon: string
         address: string
         type: string
+        title?: string
       }
       | undefined
     >()
@@ -475,17 +492,18 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
       <Disclosure>
         {({ open }) => (
           <>
-            <SingleRowMultipleAccountsView
+            <ExpandableRowInternals
               avatars={accounts.map((a) => a.icon)}
               open={open}
-              title="Connected Accounts"
+              title={title}
+              scWallets={scWallets}
             />
             <Disclosure.Panel as="tr">
               <td
                 colSpan={4}
                 className="py-3.5 px-6 bg-gray-50 border shadow-inner"
               >
-                <Text className="mb-2">Connected Accounts</Text>
+                <Text className="mb-2">{title}</Text>
 
                 <section className="flex flex-row flex-wrap gap-2">
                   {accounts.map((a, i) => (
@@ -499,95 +517,35 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
                     />
                   ))}
                 </section>
-
-                {selectedAccount && (
-                  <AccountExpandedView
-                    account={selectedAccount}
-                    connectedAccounts={true}
-                    addressFieldName='Address'
-                    source={`${startCase(selectedAccount.type)} - ${selectedAccount.address}`}
-                  />
-                )}
-              </td>
-            </Disclosure.Panel>
-          </>
-        )}
-      </Disclosure>
-    )
-  }
-
-  const SCWalletsView = ({
-    accounts,
-  }: {
-    accounts: {
-      icon: string
-      address: string
-      type: string
-      title: string
-    }[]
-  }) => {
-    const [selectedAccount, setSelectedAccount] = useState<
-      | {
-        icon: string
-        address: string
-        type: string
-        title: string
-      }
-      | undefined
-    >()
-
-    return (
-      <Disclosure>
-        {({ open }) => (
-          <>
-            <SingleRowMultipleAccountsView
-              avatars={accounts.map((a) => a.icon)}
-              open={open}
-              title="Smart Contract Wallets"
-              wallets={true}
-            />
-            <Disclosure.Panel as="tr">
-              <td
-                colSpan={4}
-                className="py-3.5 px-6 bg-gray-50 border shadow-inner"
-              >
-                <Text className="mb-2">Smart Contract Wallet</Text>
-
-                <section className="flex flex-row flex-wrap gap-2">
-                  {accounts.map((a, i) => (
-                    <UserPill
-                      key={i}
-                      size={20}
-                      text={a.title}
-                      avatarURL={a.icon}
-                      onClick={() => setSelectedAccount(a)}
-                      className={'pointer-events-auto'}
+                {
+                  selectedAccount && (
+                    <AccountExpandedView
+                      account={selectedAccount}
+                      source={
+                        source
+                          ? source
+                          : `${startCase(selectedAccount.type)} - ${selectedAccount.address}`
+                      }
+                      titleFieldName={titleFieldName}
+                      titleFieldValue={scWallets
+                        ? <Text
+                          size="xs"
+                          weight="medium"
+                          className="text-gray-500 truncate"
+                        >
+                          {selectedAccount.title}
+                        </Text>
+                        : undefined}
+                      addressFieldName={addressFieldName}
+                      connectedAccounts={connectedAccounts}
                     />
-                  ))}
-                </section>
-
-                {selectedAccount && (
-                  <AccountExpandedView
-                    account={selectedAccount}
-                    source='Smart Contract Wallet'
-                    titleFieldName='Wallet Name'
-                    titleFieldValue={
-                      <Text
-                        size="xs"
-                        weight="medium"
-                        className="text-gray-500 truncate"
-                      >
-                        {selectedAccount.title}
-                      </Text>
-                    }
-                    addressFieldName='Wallet ID'
-                  />
-                )}
+                  )
+                }
               </td>
             </Disclosure.Panel>
           </>
         )}
-      </Disclosure>
+      </Disclosure >
     )
   }
 
@@ -596,35 +554,56 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
       {claims.map((claim, i) => {
         switch (claim.claim) {
           case 'email':
-            return <SingleRowView
+            return <RowView
               key={i}
               appAskedFor='Email'
               whatsBeingShared={claim.address}
               sourceOfData={claim.address}
-              surceOfDataIcon={claim.sourceIcon}
+              sourceOfDataIcon={
+                <img src={claim.icon} className="w-5 h-5 rounded-full" />
+              }
               dropdown={false}
             />
           case 'connected_accounts':
-            return <ConnectedAccountsView key={i} accounts={claim.accounts} />
+            return <ExpandableRowView
+              key={i}
+              title={"Connected Accounts"}
+              addressFieldName={"Address"}
+              accounts={claim.accounts}
+              connectedAccounts={true}
+            />
           case 'openid':
-            return <SingleRowView
+            return <RowView
               appAskedFor='System Identifiers'
               sourceOfData='Rollup Identity'
-              surceOfDataIcon={passportLogoURL}
+              sourceOfDataIcon={
+                <img src={passportLogoURL} className="w-5 h-5" />
+              }
               key={i}
               dropdown={false}
             />
           case 'profile':
-            return <SingleRowView
+            return <RowView
               appAskedFor='Profile'
               whatsBeingShared='Picture, Name'
               sourceOfData='Primary Account'
-              surceOfDataIcon={passportLogoURL}
+              sourceOfDataIcon={
+                <img src={primaryLogoIcon} className="w-5 h-5 rounded-full" />
+              }
               key={i}
               account={claim.account}
             />
           case 'erc_4337':
-            return <SCWalletsView key={i} accounts={claim.accounts} />
+            return <ExpandableRowView
+              key={i}
+              title="Smart Contract Wallet"
+              accounts={claim.accounts}
+              connectedAccounts={true}
+              source='Smart Contract Wallet'
+              titleFieldName='Wallet Name'
+              addressFieldName='Wallet ID'
+              scWallets={true}
+            />
         }
       })}
     </>
