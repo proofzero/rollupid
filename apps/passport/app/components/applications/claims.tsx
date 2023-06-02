@@ -374,7 +374,11 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
                 colSpan={4}
                 className="py-3.5 px-6 bg-gray-50 border shadow-inner"
               >
-                <Text className="mb-2">Profile</Text>
+                <Text
+                  className="mb-2"
+                  size="sm"
+                  weight="medium"
+                >{appAskedFor}</Text>
                 <AccountExpandedView
                   account={account!}
                   titleFieldName='Picture'
@@ -394,7 +398,7 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
                     </div>
                   }
                   addressFieldName='Name'
-                  source={"Primary Account"}
+                  source={sourceOfData}
                 />
               </td>
             </Disclosure.Panel>
@@ -402,58 +406,6 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
         </>
       )}
     </Disclosure>
-  }
-
-  const ExpandableRowInternals = ({
-    open,
-    title,
-    avatars,
-    scWallets = false
-  }: {
-    open: boolean
-    title: string
-    avatars?: Array<string>
-    scWallets?: boolean
-  }) => {
-    return <tr>
-      <td className={`px-6 py-3 ${open ? `bg-gray-50` : ''}`}>
-        <Disclosure.Button className="flex flex-row items-center gap-1.5">
-          {open ? (
-            <FaChevronDown className="w-3 h-3 text-indigo-500" />
-          ) : (
-            <FaChevronRight className="w-3 h-3 text-gray-500" />
-          )}
-
-          <Text
-            size="sm"
-            weight="medium"
-            className="text-gray-500 truncate"
-          >
-            {title}
-          </Text>
-        </Disclosure.Button>
-      </td>
-      <td className="px-6 py-3">
-        {
-          scWallets
-            ? <Text size="sm" weight="medium" className="text-gray-500 truncate">
-              {avatars!.length} Smart Contract Wallet(s)
-            </Text>
-            : <MultiAvatar avatars={avatars!} />
-        }
-      </td>
-      <td className="px-6 py-3 flex flex-row items-center gap-2.5">
-        <img src={passportLogoURL} className="w-5 h-5" />
-
-        <Text
-          size="sm"
-          weight="medium"
-          className="text-gray-500 truncate"
-        >
-          Rollup Identity
-        </Text>
-      </td>
-    </tr>
   }
 
   const ExpandableRowView = ({
@@ -492,18 +444,55 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
       <Disclosure>
         {({ open }) => (
           <>
-            <ExpandableRowInternals
-              avatars={accounts.map((a) => a.icon)}
-              open={open}
-              title={title}
-              scWallets={scWallets}
-            />
+            <tr>
+              <td className={`px-6 py-3 ${open ? `bg-gray-50` : ''}`}>
+                <Disclosure.Button className="flex flex-row items-center gap-1.5">
+                  {open ? (
+                    <FaChevronDown className="w-3 h-3 text-indigo-500" />
+                  ) : (
+                    <FaChevronRight className="w-3 h-3 text-gray-500" />
+                  )}
+
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="text-gray-500 truncate"
+                  >
+                    {title}
+                  </Text>
+                </Disclosure.Button>
+              </td>
+              <td className="px-6 py-3">
+                {
+                  scWallets
+                    ? <Text size="sm" weight="medium" className="text-gray-500 truncate">
+                      {accounts.map((a) => a.icon)!.length} Smart Contract Wallet(s)
+                    </Text>
+                    : <MultiAvatar avatars={accounts.map((a) => a.icon)!} />
+                }
+              </td>
+              <td className="px-6 py-3 flex flex-row items-center gap-2.5">
+                <img src={passportLogoURL} className="w-5 h-5" />
+
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="text-gray-500 truncate"
+                >
+                  Rollup Identity
+                </Text>
+              </td>
+            </tr>
             <Disclosure.Panel as="tr">
               <td
                 colSpan={4}
                 className="py-3.5 px-6 bg-gray-50 border shadow-inner"
               >
-                <Text className="mb-2">{title}</Text>
+                <Text
+                  className="mb-2"
+                  weight='medium'
+                  size='sm'
+                >{title}</Text>
 
                 <section className="flex flex-row flex-wrap gap-2">
                   {accounts.map((a, i) => (
