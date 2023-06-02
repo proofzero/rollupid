@@ -13,6 +13,7 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   btnSize?: ButtonSize
   btnType?: ButtonType
   isSubmit?: boolean
+  onClick?: () => unknown
 }
 
 export function Button({
@@ -21,6 +22,7 @@ export function Button({
   btnType = 'primary',
   isSubmit,
   className,
+  onClick,
   children,
   ...rest
 }: ButtonProps) {
@@ -31,6 +33,7 @@ export function Button({
     <button
       type={isSubmit ? 'submit' : 'button'}
       disabled={disabled}
+      onClick={onClick}
       className={classNames(
         sizeClasses,
         disabled ? disabledColorClasses : colorClasses,

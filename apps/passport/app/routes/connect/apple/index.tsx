@@ -1,16 +1,13 @@
-import type { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
 import { Authenticator } from 'remix-auth'
 
-import {
-  createAuthenticatorSessionStorage,
-  getAppleStrategy,
-  injectAuthnParamsIntoSession,
-} from '~/auth.server'
-import { AppleStrategyDefaultName } from '~/utils/applestrategy.server'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, context }: ActionArgs) => {
+import { getAppleStrategy, injectAuthnParamsIntoSession } from '~/auth.server'
+import { AppleStrategyDefaultName } from '~/utils/applestrategy.server'
+
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
     const authnParams = new URL(request.url).searchParams
     const authenticatorInputs = await injectAuthnParamsIntoSession(
       authnParams.toString(),

@@ -1,16 +1,16 @@
-import type { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
-
+import type { LoaderFunction } from '@remix-run/cloudflare'
+import { Authenticator } from 'remix-auth'
 import { GoogleStrategyDefaultName } from 'remix-auth-google'
+
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 import {
   getGoogleAuthenticator,
   injectAuthnParamsIntoSession,
 } from '~/auth.server'
-import { Authenticator } from 'remix-auth'
-import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, context }: ActionArgs) => {
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
     const authnParams = new URL(request.url).searchParams
     const authenticatorInputs = await injectAuthnParamsIntoSession(
       authnParams.toString(),

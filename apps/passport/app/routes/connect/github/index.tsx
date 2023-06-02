@@ -1,18 +1,19 @@
-import type { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
 import { Authenticator } from 'remix-auth'
-
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
+
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+
 import {
   getGithubAuthenticator,
   injectAuthnParamsIntoSession,
 } from '~/auth.server'
-import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, context }: ActionArgs) => {
-    const authnParams = new URL(request.url).searchParams.toString()
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    const authnParams = new URL(request.url).searchParams
     const authenticatorInputs = await injectAuthnParamsIntoSession(
-      authnParams,
+      authnParams.toString(),
       request,
       context.env
     )

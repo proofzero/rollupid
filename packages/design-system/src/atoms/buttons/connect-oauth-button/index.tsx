@@ -35,10 +35,12 @@ type ConnectOAuthButtonProps = {
   fullSize?: boolean
   displayContinueWith?: boolean
   submit?: boolean
+  onClick?: () => unknown
 }
 
 const ConnectOAuthButton = ({
   provider,
+  onClick,
   fullSize = true,
   displayContinueWith = false,
   submit = false,
@@ -51,6 +53,7 @@ const ConnectOAuthButton = ({
       btnType={'secondary-alt'}
       isSubmit={submit}
       role={provider}
+      onClick={onClick}
     >
       <div
         className={`flex ${
