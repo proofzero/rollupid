@@ -5,6 +5,7 @@ import getAuthzHeaderConditionallyFromToken from './getAuthzHeaderConditionallyF
 import getAuthzTokenFromReq from './getAuthzTokenFromReq'
 import signMessageTemplate from './signMessageTemplate'
 import { parseJwt } from './jwt'
+import getDNSRecordValue from './getDNSRecordValue'
 
 export {
   checkEnv,
@@ -14,4 +15,5 @@ export {
   getAuthzTokenFromReq,
   signMessageTemplate,
   parseJwt,
+  getDNSRecordValue,
 }

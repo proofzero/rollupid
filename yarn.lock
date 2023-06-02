@@ -2432,6 +2432,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@dnsquery/dns-packet@npm:6.1.1":
+  version: 6.1.1
+  resolution: "@dnsquery/dns-packet@npm:6.1.1"
+  dependencies:
+    "@leichtgewicht/ip-codec": ^2.0.4
+    utf8-codec: ^1.0.0
+  checksum: f9aaabd6620f29136b60377c200196bb8560508a334338b7962071035f5e5f014cd2a5d8a3f3e9f0d80ed1f6f7b065fe4ae1f5a170ff12e42e6efb708359b66f
+  languageName: node
+  linkType: hard
+
 "@emotion/hash@npm:^0.9.0":
   version: 0.9.0
   resolution: "@emotion/hash@npm:0.9.0"
@@ -4896,7 +4906,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@leichtgewicht/ip-codec@npm:^2.0.1":
+"@leichtgewicht/ip-codec@npm:^2.0.1, @leichtgewicht/ip-codec@npm:^2.0.4":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"
   checksum: 468de1f04d33de6d300892683d7c8aecbf96d1e2c5fe084f95f816e50a054d45b7c1ebfb141a1447d844b86a948733f6eebd92234da8581c84a1ad4de2946a2d
@@ -6575,6 +6585,7 @@ __metadata:
   resolution: "@proofzero/utils@workspace:packages/utils"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
+    "@dnsquery/dns-packet": 6.1.1
     "@proofzero/errors": "workspace:*"
     "@proofzero/platform.account": "workspace:*"
     "@proofzero/platform.address": "workspace:*"
@@ -37895,6 +37906,13 @@ __metadata:
     node-gyp: latest
     node-gyp-build: ^4.3.0
   checksum: 5579350a023c66a2326752b6c8804cc7b39dcd251bb088241da38db994b8d78352e388dcc24ad398ab98385ba3c5ffcadb6b5b14b2637e43f767869055e46ba6
+  languageName: node
+  linkType: hard
+
+"utf8-codec@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "utf8-codec@npm:1.0.0"
+  checksum: 864e9b840eabd23ce12c10faa9c386c3354361cad0955c1d9ad1196113f55847f6b5421636f733bf8d0ca0054f8c7074684b0d6ddfea6953e89170cf59ad9782
   languageName: node
   linkType: hard
 

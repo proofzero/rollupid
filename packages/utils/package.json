@@ -37,6 +37,7 @@
     "jose": "*"
   },
   "dependencies": {
+    "@dnsquery/dns-packet": "6.1.1",
     "@proofzero/errors": "workspace:*"
   }
 }

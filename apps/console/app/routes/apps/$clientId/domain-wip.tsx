@@ -24,7 +24,10 @@ import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import {
+  getAuthzHeaderConditionallyFromToken,
+  getDNSRecordValue,
+} from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 import type { CustomDomain } from '@proofzero/platform.starbase/src/types'
@@ -33,8 +36,7 @@ import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { requireJWT } from '~/utilities/session.server'
 
 import dangerVector from '~/images/danger.svg'
-
-type AppData = { customDomain?: CustomDomain; hostname: string }
+type AppData = { customDomain?: CustomDomain; hostname: string; cname: string }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
@@ -50,8 +52,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const customDomain = await starbaseClient.getCustomDomain.query({
       clientId,
     })
+    const cname = customDomain?.hostname
+      ? await getDNSRecordValue(customDomain.hostname, 'CNAME')
+      : null
+
     const { hostname } = new URL(PASSPORT_URL)
-    return json({ customDomain, hostname })
+    return json({ customDomain, hostname, cname })
   }
 )
 
@@ -80,17 +86,23 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         clientId,
         hostname,
       })
+      const cname = customDomain?.hostname
+        ? await getDNSRecordValue(customDomain.hostname, 'CNAME')
+        : null
 
-      return json({ customDomain, hostname })
+      return json({ customDomain, hostname, cname })
     } else if (request.method === 'POST') {
       const customDomain = await starbaseClient.getCustomDomain.query({
         clientId,
         refresh: true,
       })
-      return json({ customDomain, hostname })
+      const cname = customDomain?.hostname
+        ? await getDNSRecordValue(customDomain.hostname, 'CNAME')
+        : null
+      return json({ customDomain, hostname, cname })
     } else if (request.method === 'DELETE') {
       await starbaseClient.deleteCustomDomain.mutate({ clientId })
-      return json({ customDomain: null, hostname })
+      return json({ customDomain: null, hostname, cname: null })
     }
   }
 )
@@ -99,7 +111,8 @@ export default () => {
   const fetcher = useFetcher()
   const actionData = useActionData<AppData>()
   const loaderData = useLoaderData<AppData>()
-  const { customDomain, hostname } = fetcher.data || actionData || loaderData
+  const { customDomain, hostname, cname } =
+    fetcher.data || actionData || loaderData
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>()
 
   useEffect(() => {
@@ -127,6 +140,7 @@ export default () => {
           fetcher={fetcher}
           customDomain={customDomain}
           hostname={hostname}
+          cname={cname}
         />
       )}
     </section>
@@ -169,12 +183,14 @@ type HostnameStatusProps = {
   fetcher: FetcherWithComponents<AppData>
   customDomain: CustomDomain
   hostname: string
+  cname: string
 }
 
 const HostnameStatus = ({
   fetcher,
   customDomain,
   hostname,
+  cname,
 }: HostnameStatusProps) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const isValidated =
@@ -228,13 +244,10 @@ const HostnameStatus = ({
                   </Text>
                 </div>
               )}
-            <TXTRecord
+            <DNSRecord
               title="Certificate validation"
-              statusColor={
-                customDomain.ssl.status === 'active'
-                  ? 'bg-green-600'
-                  : 'bg-orange-500'
-              }
+              validated={customDomain.ssl.status === 'active'}
+              type="TXT"
               name={
                 customDomain.ssl.validation_records?.[0].txt_name ||
                 'Setting up...'
@@ -244,13 +257,10 @@ const HostnameStatus = ({
                 'Setting up...'
               }
             />
-            <TXTRecord
+            <DNSRecord
               title="Hostname pre-validation"
-              statusColor={
-                customDomain.status === 'active'
-                  ? 'bg-green-600'
-                  : 'bg-orange-500'
-              }
+              validated={customDomain.status === 'active'}
+              type="TXT"
               name={
                 customDomain.ownership_verification?.name || 'Setting up...'
               }
@@ -259,91 +269,100 @@ const HostnameStatus = ({
               }
             />
           </div>
+
           <Text size="sm" weight="medium" className="text-gray-700">
             Step 2: CNAME Record
           </Text>
-          {isValidated && <CNAMEForm hostname={hostname} />}
-          {!isValidated && (
-            <div className="flex flex-row p-4 space-x-4 bg-gray-50">
-              <TbInfoCircle size={20} className="text-gray-500 shrink-0" />
-              <Text type="span" size="sm" className="text-gray-500">
-                NOTE: This step can be done only after Step 1 has fully
-                succeeded. <br />
-                It may take up to a few hours for DNS changes to take effect.
-              </Text>
-            </div>
-          )}
+          <div className="flex flex-col p-4 space-y-5 box-border border rounded-lg">
+            {isValidated && (
+              <DNSRecord
+                title=""
+                type="CNAME"
+                value={hostname}
+                validated={hostname === cname}
+              />
+            )}
+            {!isValidated && (
+              <div className="flex flex-row p-4 space-x-4 bg-gray-50">
+                <TbInfoCircle size={20} className="text-gray-500 shrink-0" />
+                <Text type="span" size="sm" className="text-gray-500">
+                  NOTE: This step can be done only after Step 1 has fully
+                  succeeded. <br />
+                  It may take up to a few hours for DNS changes to take effect.
+                </Text>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>
   )
 }
 
-type CNAMEProps = {
-  hostname: string
-}
-
-const CNAMEForm = ({ hostname }: CNAMEProps) => {
-  return (
-    <div className="p-5 border rounded-lg">
-      <div className="w-80 space-y-1">
-        <Text size="sm" weight="medium" className="text-gray-700">
-          CNAME Record
-        </Text>
-        <div className="flex flex-row justify-between items-center px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm cursor-no-drop">
-          <Text type="span" size="sm" className="text-gray-500">
-            {hostname}
-          </Text>
-          <Copier
-            value={hostname}
-            color="text-gray-500"
-            onCopy={() =>
-              toast(
-                ToastType.Success,
-                { message: 'CNAME value copied to clipboard!' },
-                { duration: 2000 }
-              )
-            }
-          />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-type TXTRecordProps = {
+type DNSRecordProps = {
   title: string
-  statusColor: string
-  name: string
+  validated: boolean
+  name?: string
   value: string
+  type: 'TXT' | 'CNAME'
 }
 
-const TXTRecord = ({ title, statusColor, name, value }: TXTRecordProps) => (
-  <>
-    <div className="flex flex-row space-x-8">
+const DNSRecord = ({ title, validated, name, value, type }: DNSRecordProps) => {
+  const statusColor = validated ? 'bg-green-600' : 'bg-orange-500'
+  return (
+    <div className="flex flex-row flex-wrap space-x-4">
+      <span
+        className={`flex-none rounded-full w-2 h-2 relative top-[38px] ${statusColor}`}
+      ></span>
+      {name && (
+        <div className="flex space-x-4">
+          <div className="w-80 space-y-1">
+            <Text size="sm" weight="medium" className="text-gray-700">
+              {title} {type} Name
+            </Text>
+            <div className="flex-1 flex flex-row justify-between items-center px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm cursor-no-drop">
+              <Text
+                type="span"
+                size="sm"
+                className="text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap"
+              >
+                {name}
+              </Text>
+              <Copier
+                value={name}
+                color="text-gray-500"
+                onCopy={() =>
+                  toast(
+                    ToastType.Success,
+                    { message: `${title} ${type} name copied to clipboard!` },
+                    { duration: 2000 }
+                  )
+                }
+              />
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex space-x-4">
-        <span
-          className={`w-2 h-2 relative top-[38px] rounded-full ${statusColor}`}
-        ></span>
         <div className="w-80 space-y-1">
           <Text size="sm" weight="medium" className="text-gray-700">
-            {title} TXT Name
+            {title} {type} Value
           </Text>
-          <div className="flex-1 flex flex-row justify-between items-center px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm cursor-no-drop">
+          <div className="flex flex-row justify-between items-center px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm cursor-no-drop">
             <Text
               type="span"
               size="sm"
               className="text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap"
             >
-              {name}
+              {value}
             </Text>
             <Copier
-              value={name}
+              value={value}
               color="text-gray-500"
               onCopy={() =>
                 toast(
                   ToastType.Success,
-                  { message: `${title} TXT name copied to clipboard!` },
+                  { message: `${title} ${type} value copied to clipboard!` },
                   { duration: 2000 }
                 )
               }
@@ -351,34 +370,9 @@ const TXTRecord = ({ title, statusColor, name, value }: TXTRecordProps) => (
           </div>
         </div>
       </div>
-      <div className="w-96 space-y-1">
-        <Text size="sm" weight="medium" className="text-gray-700">
-          {title} TXT Value
-        </Text>
-        <div className="flex flex-row justify-between items-center px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm cursor-no-drop">
-          <Text
-            type="span"
-            size="sm"
-            className="text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap"
-          >
-            {value}
-          </Text>
-          <Copier
-            value={value}
-            color="text-gray-500"
-            onCopy={() =>
-              toast(
-                ToastType.Success,
-                { message: `${title} TXT value copied to clipboard!` },
-                { duration: 2000 }
-              )
-            }
-          />
-        </div>
-      </div>
     </div>
-  </>
-)
+  )
+}
 
 type DeleteModalProps = {
   fetcher: FetcherWithComponents<AppData>
