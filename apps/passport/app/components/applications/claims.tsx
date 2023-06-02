@@ -168,28 +168,112 @@ const AccountExpandedView = ({
 }
 // ------------------------------------------------------------------- MOBILE //
 export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
-  const EmailView = ({
-    address,
-    sourceIcon,
+  const RowView = ({
+    account,
+    appAskedFor,
+    whatsBeingShared,
+    sourceOfData,
+    sourceOfDataIcon,
+    dropdown = true
   }: {
-    address: string
-    sourceIcon: string
+    appAskedFor: string
+    sourceOfData: string
+    sourceOfDataIcon: JSX.Element
+    dropdown?: boolean
+    whatsBeingShared?: string
+    account?: {
+      address: string,
+      icon: string
+    }
   }) => {
-    return (
-      <div className="border border-gray-200 rounded-lg flex flex-row items-center px-3.5 py-2">
-        <div className="flex-1 flex flex-col gap-2.5">
-          <Text size="sm" weight="bold" className="text-gray-800">
-            Email
-          </Text>
+    return <Disclosure as="div" className="focus-within:bg-gray-50">
+      {({ open }) => (
+        <div className="border border-gray-200 rounded-lg flex flex-col focus-within:bg-gray-50 w-full">
+          {
+            dropdown
+              ? <Disclosure.Button as="button"
+                className="flex flex-row items-center px-3.5 py-2">
+                <section className="flex-1 flex flex-col gap-2.5">
+                  <Text
+                    size="sm"
+                    weight="bold"
+                    className="text-gray-800 text-start truncate"
+                  >
+                    {appAskedFor}
+                  </Text>
+                  {
+                    whatsBeingShared &&
+                    <Text size="sm"
+                      weight="medium"
+                      className="text-gray-500 text-start truncate">
+                      {whatsBeingShared}
+                    </Text>
+                  }
+                </section>
+                {open ? (
+                  <FaChevronDown className="w-[22px] h-[22px] text-indigo-500" />
+                ) : (
+                  <FaChevronRight className="w-[22px] h-[22px] text-gray-500" />
+                )}
+              </Disclosure.Button>
+              : <div className="flex flex-row items-center px-3.5 py-2">
+                <section className="flex-1 flex flex-col gap-2.5">
+                  <Text
+                    size="sm"
+                    weight="bold"
+                    className="text-gray-800 text-start truncate"
+                  >
+                    {appAskedFor}
+                  </Text>
+                  {
+                    whatsBeingShared &&
+                    <Text size="sm"
+                      weight="medium"
+                      className="text-start text-gray-500 truncate">
+                      {whatsBeingShared}
+                    </Text>
+                  }
+                </section>
+                {sourceOfDataIcon}
+              </div>
+          }
 
-          <Text size="xs" weight="medium" className="text-gray-500 truncate">
-            {address}
-          </Text>
+          {dropdown &&
+            <Disclosure.Panel>
+              <div
+                className="py-3.5 px-6 border shadow-inner">
+                <Text
+                  className="mb-2"
+                  size="sm"
+                  weight="medium"
+                >{appAskedFor}</Text>
+                <AccountExpandedView
+                  account={account!}
+                  titleFieldName='Picture'
+                  titleFieldValue={
+                    <div className='flex flex-row items-center'>
+                      <img src={account!.icon} className='w-[22px] h-[22px] mr-2 rounded-full' />
+                      <a href={account!.icon} className='text-sm
+                       weight-medium text-indigo-500 
+                       cursor-pointer flex flex-row items-center gap-1.5 hover:underline'
+                        target='_blank'
+                        rel='noreferrer' >
+                        <Text size='sm' weight="medium" className='max-w-[200px] truncate'>
+                          {account!.icon}
+                        </Text>
+                        <HiOutlineExternalLink />
+                      </a>
+                    </div>
+                  }
+                  addressFieldName='Name'
+                  source={sourceOfData}
+                />
+              </div>
+            </Disclosure.Panel>
+          }
         </div>
-
-        {sourceIcon && <img src={sourceIcon} className="w-5 h-5" />}
-      </div>
-    )
+      )}
+    </Disclosure >
   }
 
   const ConnectedAccountsView = ({
@@ -236,9 +320,9 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
               </section>
               <section>
                 {open ? (
-                  <FaChevronDown className="w-4 h-4 text-indigo-500" />
+                  <FaChevronDown className="w-[22px] h-[22px] text-indigo-500" />
                 ) : (
-                  <FaChevronRight className="w-4 h-4 text-gray-500" />
+                  <FaChevronRight className="w-[22px] h-[22px] text-gray-500" />
                 )}
               </section>
             </Disclosure.Button>
@@ -282,16 +366,42 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
         switch (claim.claim) {
           case 'email':
             return (
-              <EmailView
+              <RowView
                 key={i}
-                address={claim.address}
-                sourceIcon={claim.icon}
+                appAskedFor='Email'
+                whatsBeingShared={claim.address}
+                sourceOfData='Rollup Identity'
+                sourceOfDataIcon={
+                  <img src={claim.icon} className="w-[22px] h-[22px] rounded-full" />
+                }
+                dropdown={false}
               />
             )
           case 'connected_accounts':
             return <ConnectedAccountsView key={i} accounts={claim.accounts} />
           case 'erc_4337':
             return <ConnectedAccountsView key={i} accounts={claim.accounts} />
+          case 'openid':
+            return <RowView
+              appAskedFor='System Identifiers'
+              sourceOfData='Rollup Identity'
+              sourceOfDataIcon={
+                <img src={passportLogoURL} className="w-5 h-5" />
+              }
+              key={i}
+              dropdown={false}
+            />
+          case 'profile':
+            return <RowView
+              appAskedFor='Profile'
+              whatsBeingShared='Picture, Name'
+              sourceOfData='Primary Account'
+              sourceOfDataIcon={
+                <img src={primaryLogoIcon} className="w-5 h-5 rounded-full" />
+              }
+              key={i}
+              account={claim.account}
+            />
         }
       })}
     </div>
