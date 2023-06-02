@@ -148,13 +148,15 @@ export function ConnectButton({
                 <Popover>
                   {({ open }) => (
                     <>
-                      <Popover.Button className="h-full px-2 lg:px-3.5 flex justify-center items-center rounded-r-md bg-white dark:bg-[#374151] dark:border-gray-600 text-[#1f2937] shadow-sm border-l hover:bg-gray-100  focus:bg-white focus:ring-inset focus:ring-2 focus:ring-indigo-500">
-                        {!open && <HiChevronDown className="w-5 h-5" />}
+                      <Popover.Button className="h-full px-2 lg:px-3.5 flex justify-center items-center rounded-r-md bg-white dark:bg-[#374151] dark:border-gray-600 dark:hover:bg-gray-600 text-[#1f2937] shadow-sm border-l hover:bg-gray-100 dark:focus:bg-gray-600 focus:bg-white focus:ring-inset focus:ring-2 focus:ring-skin-primary">
+                        {!open && (
+                          <HiChevronDown className="w-5 h-5 text-skin-primary" />
+                        )}
                         {open && (
-                          <HiChevronUp className="w-5 h-5 text-indigo-500" />
+                          <HiChevronUp className="w-5 h-5 text-skin-primary" />
                         )}
                       </Popover.Button>
-                      <Popover.Panel className="absolute top-16 left-0 right-0 z-10 bg-white dark:bg-[#374151] dark:border-gray-600 rounded-md shadow-md">
+                      <Popover.Panel className="absolute top-16 left-0 right-0 z-10 bg-white dark:bg-[#374151] dark:border-gray-600 dark:hover:bg-gray-600 rounded-md shadow-md">
                         <button
                           className="w-full px-[17px] py-5"
                           onClick={() => {
@@ -164,7 +166,7 @@ export function ConnectButton({
                           <Text
                             size="sm"
                             weight="normal"
-                            className="text-red-600 text-start"
+                            className="text-red-600 dark:text-red-400 text-start"
                           >{`Disconnect ${ensName ?? truncatedAddress}`}</Text>
                         </button>
                       </Popover.Panel>
