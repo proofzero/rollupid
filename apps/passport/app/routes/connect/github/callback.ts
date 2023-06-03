@@ -1,3 +1,4 @@
+import { redirect } from '@remix-run/cloudflare'
 import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 
 import { generateHashedIDRef } from '@proofzero/urns/idref'
@@ -11,6 +12,7 @@ import {
   authenticateAddress,
   checkOAuthError,
 } from '~/utils/authenticate.server'
+import { redirectToCustomDomainHost } from '~/utils/connect-proxy'
 
 import { getAddressClient } from '~/platform.server'
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
@@ -24,6 +26,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }: LoaderArgs) => {
     await checkOAuthError(request, context.env)
+    await redirectToCustomDomainHost(request, context)
 
     const appData = await getAuthzCookieParams(request, context.env)
 

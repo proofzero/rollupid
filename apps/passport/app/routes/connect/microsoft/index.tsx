@@ -8,10 +8,16 @@ import {
   getMicrosoftStrategy,
   injectAuthnParamsIntoSession,
 } from '~/auth.server'
+import {
+  redirectToDefaultHost,
+  setCustomDomainOrigin,
+} from '~/utils/connect-proxy'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const authnParams = new URL(request.url).searchParams
+    setCustomDomainOrigin(request, context, authnParams)
+
     const authenticatorInputs = await injectAuthnParamsIntoSession(
       authnParams.toString(),
       request,
@@ -24,11 +30,24 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const prompt =
       rollup_action && rollup_action === 'reconnect' ? 'consent' : ' '
 
+    const strategy = getMicrosoftStrategy(context.env, prompt)
+    if (authnParams.get('state'))
+      // @ts-ignore
+      strategy.generateState = () => authnParams.get('state')
+
     const authenticator = new Authenticator(authenticatorInputs.sessionStorage)
-    authenticator.use(getMicrosoftStrategy(context.env, prompt))
-    return authenticator.authenticate(
-      MicrosoftStrategyDefaultName,
-      authenticatorInputs.newRequest
-    )
+    authenticator.use(strategy)
+
+    try {
+      const response = await authenticator.authenticate(
+        MicrosoftStrategyDefaultName,
+        authenticatorInputs.newRequest
+      )
+      return response
+    } catch (error) {
+      if (!(error instanceof Response)) throw error
+      const response = error
+      redirectToDefaultHost(request, response, context)
+    }
   }
 )
