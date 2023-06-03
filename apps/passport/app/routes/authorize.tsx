@@ -28,7 +28,6 @@ import {
 } from '~/utils/authorize.server'
 import { useEffect, useState } from 'react'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
-import { JsonError } from '@proofzero/utils/errors'
 import { AuthorizationControlSelection } from '@proofzero/types/application'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 
@@ -418,7 +417,7 @@ export default function Authorize() {
   const navigate = useNavigate()
   const transition = useTransition()
 
-  useConnectResult(['ALREADY_CONNECTED', 'CANCEL'])
+  useConnectResult(['ACCOUNT_CONNECT_ERROR', 'CANCEL', 'ALREADY_CONNECTED_ERROR'])
 
   const cancelCallback = () => {
     const redirectURL = new URL(redirectUri)

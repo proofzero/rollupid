@@ -47,7 +47,7 @@ export const authenticateAddress = async (
     const redirectURL = getAuthzRedirectURL(
       appData,
       existing && appData.rollup_action === 'connect'
-        ? 'ALREADY_CONNECTED'
+        ? 'ACCOUNT_CONNECT_ERROR'
         : undefined
     )
 
@@ -107,6 +107,13 @@ export const getAuthzRedirectURL = (
   if (appData.prompt) urlParams.append('prompt', appData.prompt)
 
   redirectURL += `?${urlParams}`
+
+  console.log({ redirectURL })
+  console.log({ redirectURL })
+  console.log({ redirectURL })
+  console.log({ redirectURL })
+  console.log({ redirectURL })
+
 
   return redirectURL
 }

@@ -8,9 +8,10 @@ import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import { getAuthzCookieParams, getUserSession } from '../../../session.server'
 import { getAuthzRedirectURL } from '../../../utils/authenticate.server'
 
-import { signMessageTemplate } from '@proofzero/packages/utils'
+import { parseJwt, signMessageTemplate } from '@proofzero/packages/utils'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import type { AccountURN } from '@proofzero/urns/account'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -49,6 +50,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const appData = await getAuthzCookieParams(request, context.env)
+    const jwt = await getUserSession(request, context.env, params.clientId)
+    const accountURN = parseJwt(jwt).sub! as AccountURN
 
     const { address } = params
     if (!address)
@@ -74,8 +77,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       forceAccountCreation: !appData || appData.rollup_action !== 'connect',
     })
 
+    const accountURNFromAddress = await addressClient.getAccount.query()
+
+
     if (appData?.rollup_action === 'connect' && existing) {
-      return redirect(getAuthzRedirectURL(appData, 'ALREADY_CONNECTED'))
+      if (accountURN === accountURNFromAddress) {
+        console.log({SOMETHIN: "WENT TERRIBLY WRONG"})
+        return redirect(getAuthzRedirectURL(appData, 'ALREADY_CONNECTED_ERROR'))
+      }
+      return redirect(getAuthzRedirectURL(appData, 'ACCOUNT_CONNECT_ERROR'))
     }
 
     // TODO: handle the error case
