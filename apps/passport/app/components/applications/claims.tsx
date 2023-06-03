@@ -10,7 +10,7 @@ import { Disclosure } from '@headlessui/react'
 import { useState } from 'react'
 
 import passportLogoURL from '~/assets/PassportIcon.svg'
-import primaryLogoIcon from "~/assets/PrimaryAccLogoIcon.svg"
+import { TbCrown } from 'react-icons/tb'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import warningImg from '~/assets/warning.svg'
 import InputText from '~/components/inputs/InputText'
@@ -434,7 +434,10 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
               whatsBeingShared='Picture, Name'
               sourceOfData='Primary Account'
               sourceOfDataIcon={
-                <img src={primaryLogoIcon} className="w-5 h-5 rounded-full" />
+                <div className='flex items-center justify-center
+                      w-5 h-5 bg-gray-50 rounded-full'>
+                  <TbCrown className="text-[#F59E0B]" />
+                </div>
               }
               key={i}
               account={claim.account}
@@ -733,7 +736,10 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
               whatsBeingShared='Picture, Name'
               sourceOfData='Primary Account'
               sourceOfDataIcon={
-                <img src={primaryLogoIcon} className="w-5 h-5 rounded-full" />
+                <div className='flex items-center justify-center
+                      w-5 h-5 bg-gray-50 rounded-full'>
+                  <TbCrown className="text-[#F59E0B]" />
+                </div>
               }
               key={i}
               account={claim.account}
