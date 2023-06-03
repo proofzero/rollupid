@@ -20,7 +20,7 @@ export const RotateCredsModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={() => closeCallback()}>
       <div
-        className={`w-[62vw] rounded-lg  transform bg-white px-4 pb-4 
+        className={`w-[62vw] rounded-lg  bg-white px-4 pb-4 
          text-left transition-all sm:px-6 sm:pb-6 overflow-y-auto flex items-start space-x-4`}
       >
         <img src={dangerVector} />

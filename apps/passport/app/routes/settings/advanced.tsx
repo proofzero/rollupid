@@ -129,7 +129,7 @@ const DeleteRollupIdentityModal = ({
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div
         className={`min-w-[260px] sm:min-w-[400px] md:max-w-[512px] lg:max-w-[512px]
-     relative transform bg-white px-4 pb-4 text-left
+     relative bg-white px-4 pb-4 text-left
     transition-all sm:px-6 rounded-lg sm:pb-6 overflow-y-auto`}
       >
         <div className="flex flex-row space-x-6 items-center justify-start">

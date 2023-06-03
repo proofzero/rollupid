@@ -398,7 +398,7 @@ const DeleteModal = ({
     <Modal isOpen={isOpen} closable={!isSubmitting} handleClose={onClose}>
       <div
         className={`flex w-[512px] rounded-lg  items-start space-x-4 px-4 pb-4 text-left overflow-y-auto bg-white
-         transform transition-all`}
+         transition-all`}
       >
         <img src={dangerVector} alt="Danger" />
 

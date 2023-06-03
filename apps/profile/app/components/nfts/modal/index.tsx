@@ -41,7 +41,7 @@ const NftModal = ({
           scrollbarColor: '#D1D5DB white',
         }}
         className={`flex-1 relative h-max w-full sm:min-w-[37rem] sm:max-h-[35rem] sm:max-w-[58rem] h-[86vh] sm:w-[62vw]
-          transform bg-white rounded-lg px-4 pb-4 
+           bg-white rounded-lg px-4 pb-4 
          text-left transition-all sm:px-6 sm:pb-6 overflow-y-auto`}
       >
         <div className="flex flex-col justify-between lg:flex-row max-w-full ">
