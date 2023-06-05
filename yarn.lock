@@ -5874,6 +5874,7 @@ __metadata:
     react-icons: 4.8.0
     tailwindcss: 3.2.4
     tiny-invariant: 1.3.1
+    tldts: 6.0.5
     typescript: 5.0.4
     viem: 0.3.41
     wagmi: 1.0.9
@@ -36552,6 +36553,24 @@ __metadata:
   dependencies:
     tslib: ^2.0.3
   checksum: e8b7ea006b53cf3208d278455d9f1e22c409459d7f9878da324fa3b18cc0aef8560924c19c744e870394a5d9cddfdbe029ebae9875909ee7f4fc562e7cbfc53e
+  languageName: node
+  linkType: hard
+
+"tldts-core@npm:^6.0.5":
+  version: 6.0.5
+  resolution: "tldts-core@npm:6.0.5"
+  checksum: 8f63ff15f04898525749009551fc87afa21d87268fce548bc0062256d71ccbb68145aa4be965de8ce7669466be88b8c87c3a710df0956e75e38cfdc216458679
+  languageName: node
+  linkType: hard
+
+"tldts@npm:6.0.5":
+  version: 6.0.5
+  resolution: "tldts@npm:6.0.5"
+  dependencies:
+    tldts-core: ^6.0.5
+  bin:
+    tldts: bin/cli.js
+  checksum: 79661c4139bedcff48fe42b8229471d0ee94cf8ec6a332954e9b3fd40d1d8e194dfcdbd2267cd09ba1c5c604227af9f17594a4341ccf42f5df30567fe5951bf7
   languageName: node
   linkType: hard
 

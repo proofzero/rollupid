@@ -37,6 +37,12 @@ import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { requireJWT } from '~/utilities/session.server'
 
 import dangerVector from '~/images/danger.svg'
+
+import createEmailClient from '@proofzero/platform-clients/email'
+import { GetDNSSecurityValuesResult } from '@proofzero/platform/email/src/jsonrpc/methods/getDNSSecurityValues'
+
+import { parse } from 'tldts'
+
 type AppData = { customDomain?: CustomDomain; hostname: string; cname: string }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -55,7 +61,16 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const { hostname } = new URL(PASSPORT_URL)
-    return json({ customDomain, hostname })
+
+    const emailClient = createEmailClient(
+      Email,
+      generateTraceContextHeaders(context.traceSpan)
+    )
+
+    const emailDNSSecurityValues =
+      await emailClient.getDNSSecurityValues.query()
+
+    return json({ customDomain, hostname, emailDNSSecurityValues })
   }
 )
 
@@ -104,7 +119,8 @@ export default () => {
   const fetcher = useFetcher()
   const actionData = useActionData<AppData>()
   const loaderData = useLoaderData<AppData>()
-  const { customDomain, hostname } = fetcher.data || actionData || loaderData
+  const { customDomain, hostname, emailDNSSecurityValues } =
+    fetcher.data || actionData || loaderData
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>()
 
   useEffect(() => {
@@ -133,6 +149,7 @@ export default () => {
           fetcher={fetcher}
           customDomain={customDomain}
           hostname={hostname}
+          emailDNSSecurityValues={emailDNSSecurityValues}
         />
       )}
     </section>
@@ -175,17 +192,21 @@ type HostnameStatusProps = {
   fetcher: FetcherWithComponents<AppData>
   customDomain: CustomDomain
   hostname: string
+  emailDNSSecurityValues: GetDNSSecurityValuesResult
 }
 
 const HostnameStatus = ({
   fetcher,
   customDomain,
   hostname,
+  emailDNSSecurityValues,
 }: HostnameStatusProps) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const isPreValidated =
     customDomain.status === 'active' && customDomain.ssl.status === 'active'
-  const isValidated = isPreValidated && customDomain.dns_records.every(r => r.value === r.expected_value)
+  const isValidated =
+    isPreValidated &&
+    customDomain.dns_records.every((r) => r.value === r.expected_value)
   const bgStatusColor = isValidated ? 'bg-green-600' : 'bg-orange-500'
   const textStatusColor = isValidated ? 'text-green-600' : 'text-orange-500'
   const statusText = isValidated ? 'Validated' : 'Not Validated'
@@ -265,15 +286,43 @@ const HostnameStatus = ({
             Step 2: CNAME Record
           </Text>
           <div className="flex flex-col p-4 space-y-5 box-border border rounded-lg">
-            {isPreValidated && Array.from(customDomain.dns_records || []).map((r) => (
-              <DNSRecord
-                title={r.record_type === 'CNAME' ? '' : r.name}
-                type={r.record_type}
-                validated={r.value === r.expected_value}
-                value={r.expected_value}
-                key={r.expected_value}
-              />
-            ))}
+            {/* <TXTRecord
+                  title="SPF"
+                  name={`${customDomain.hostname}`}
+                  value={`v=spf1 include:${emailDNSSecurityValues.spfHost} ~all`}
+                  statusColor="bg-orange-500"
+                />
+
+                <TXTRecord
+                  title="DKIM"
+                  name={`${emailDNSSecurityValues.dkimSelector}._domainkey.${customDomain.hostname}`}
+                  value={`v=DKIM1; p=${emailDNSSecurityValues.dkimPublicKey}`}
+                  statusColor="bg-orange-500"
+                />
+
+                <TXTRecord
+                  title="DMARC"
+                  name={`_dmarc.${customDomain.hostname}`}
+                  value={`v=DMARC1; p=quarantine; rua=mailto:${emailDNSSecurityValues.dmarcEmail}`}
+                  statusColor="bg-orange-500"
+                />
+
+                <TXTRecord
+                  title="DMARC"
+                  name={`_dmarc.${parse(customDomain.hostname).domain}`}
+                  value={`v=DMARC1; p=quarantine; sp=quarantine; rua=mailto:${emailDNSSecurityValues.dmarcEmail}`}
+                  statusColor="bg-orange-500"
+                /> */}
+            {isPreValidated &&
+              Array.from(customDomain.dns_records || []).map((r) => (
+                <DNSRecord
+                  title={r.record_type === 'CNAME' ? '' : r.name}
+                  type={r.record_type}
+                  validated={r.value === r.expected_value}
+                  value={r.expected_value}
+                  key={r.expected_value}
+                />
+              ))}
             {!isPreValidated && (
               <div className="flex flex-row p-4 space-x-4 bg-gray-50">
                 <TbInfoCircle size={20} className="text-gray-500 shrink-0" />
