@@ -102,9 +102,6 @@ export const getDataForScopes = async (
           })
       )
       connectedSmartContractWallets = getAddressDropdownItems(addresses)
-      if (connectedSmartContractWallets?.length) {
-        connectedSmartContractWallets[0].selected = true
-      }
     }
   }
 
