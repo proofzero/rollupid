@@ -417,7 +417,7 @@ export default function Authorize() {
   const navigate = useNavigate()
   const transition = useTransition()
 
-  useConnectResult(['ACCOUNT_CONNECT_ERROR', 'CANCEL', 'ALREADY_CONNECTED_ERROR'])
+  useConnectResult()
 
   const cancelCallback = () => {
     const redirectURL = new URL(redirectUri)

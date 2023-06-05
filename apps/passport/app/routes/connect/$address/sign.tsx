@@ -51,7 +51,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const appData = await getAuthzCookieParams(request, context.env)
     const jwt = await getUserSession(request, context.env, params.clientId)
-    const accountURN = parseJwt(jwt).sub! as AccountURN
 
     const { address } = params
     if (!address)
@@ -81,8 +80,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
 
     if (appData?.rollup_action === 'connect' && existing) {
+      const accountURN = parseJwt(jwt).sub! as AccountURN
       if (accountURN === accountURNFromAddress) {
-        console.log({SOMETHIN: "WENT TERRIBLY WRONG"})
         return redirect(getAuthzRedirectURL(appData, 'ALREADY_CONNECTED_ERROR'))
       }
       return redirect(getAuthzRedirectURL(appData, 'ACCOUNT_CONNECT_ERROR'))
