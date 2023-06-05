@@ -8,12 +8,15 @@ import { Button } from '../../atoms/buttons/Button'
 import Info from '../../atoms/info/Info'
 import { ScopeDescriptor } from '@proofzero/security/scopes'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
-import { ThemeContext } from '../../contexts/theme'
+import type { ThemeContext } from '../../contexts/theme'
 import ScopeIcon from './ScopeIcon'
 import {
   Dropdown,
+  DropdownListboxButtonType,
   DropdownSelectListItem,
 } from '../../atoms/dropdown/DropdownSelectList'
+
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
 
 type UserProfile = {
   pfpURL: string
@@ -57,6 +60,7 @@ type AuthorizationProps = {
   radius?: string
 }
 
+// eslint-disable-next-line react/display-name
 export default ({
   userProfile,
   appProfile,
@@ -97,10 +101,8 @@ export default ({
   }
   return (
     <div
-      className={
-        `flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6\
-           lg:rounded-${radius} min-h-[100dvh] lg:min-h-[580px] max-h-[100dvh] border border-[#D1D5DB] dark:border-gray-600`
-      }
+      className={`flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6\
+           lg:rounded-${radius} min-h-fit lg:min-h-[580px] max-h-[100dvh] border border-[#D1D5DB] dark:border-gray-600`}
       style={{
         width: 418,
         boxSizing: 'border-box',
@@ -111,7 +113,7 @@ export default ({
           src={userProfile.pfpURL}
           hex={false}
           size={'sm'}
-        // alt="User Profile"
+          // alt="User Profile"
         />
         <img src={authorizeCheck} alt="Authorize Check" />
         <Avatar src={appProfile.iconURL} size={'sm'} />
@@ -129,31 +131,27 @@ export default ({
           style={{ color: '#6B7280' }}
           className={'mb-2 font-extralight text-xs'}
         >
-          REQUESTED
+          APP ASKS FOR
         </p>
         <ul
           style={{ color: '#6B7280' }}
-          className={'flex flex-col font-light text-base gap-2 w-full'}
+          className={'flex flex-col font-light text-base w-full'}
         >
           {scopesToDisplay.map((scope: string, i: number) => {
             return (
-              <li
-                key={i}
-                className={'flex flex-row gap-2 items-center w-full'}
-              >
+              <li key={i} className={'flex flex-row gap-2 items-center w-full'}>
                 <div className="flex flex-row w-full gap-2 items-center">
                   <ScopeIcon scope={scope} />
 
-                  {(scope === 'profile' ||
-                    scope === 'system_identifiers') && (
-                      <Text
-                        size="sm"
-                        weight="medium"
-                        className="flex-1 text-gray-500"
-                      >
-                        {scopeMeta.scopes[scope].name}
-                      </Text>
-                    )}
+                  {(scope === 'profile' || scope === 'system_identifiers') && (
+                    <Text
+                      size="sm"
+                      weight="medium"
+                      className="flex-1 text-gray-500"
+                    >
+                      {scopeMeta.scopes[scope].name}
+                    </Text>
+                  )}
 
                   {scope === 'erc_4337' && (
                     <div className="flex-1 min-w-0">
@@ -248,7 +246,7 @@ export default ({
           <Text size="sm" className="text-gray-500">
             Before using this app, you can review{' '}
             {appProfile?.name ?? `Company`}
-            's{' '}
+            `&apos;`s{' '}
             <a href={appProfile.privacyURL} className="text-skin-primary">
               privacy policy
             </a>
@@ -264,9 +262,7 @@ export default ({
       )}
 
       <div className="flex flex-col w-full items-center justify-center mt-auto">
-        <div
-          className={'flex flex-row w-full items-end justify-center gap-4'}
-        >
+        <div className={'flex flex-row w-full items-end justify-center gap-4'}>
           {transitionState === 'idle' && (
             <>
               <Button

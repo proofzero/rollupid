@@ -79,6 +79,7 @@ export const getDataForScopes = async (
         connectedAccounts
           .filter((ca) => {
             return (ca.rc.node_type === NodeType.OAuth ||
+              ca.rc.node_type === NodeType.Email ||
               ca.rc.node_type === NodeType.Crypto) &&
               ca.rc.addr_type !== CryptoAddressType.Wallet
           })
