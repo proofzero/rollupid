@@ -41,8 +41,8 @@ const NftModal = ({
           scrollbarColor: '#D1D5DB white',
         }}
         className={`flex-1 relative h-max w-full sm:min-w-[37rem] sm:max-h-[35rem] sm:max-w-[58rem] h-[86vh] sm:w-[62vw]
-          transform rounded-lg  bg-white px-4 pt-5 pb-4 
-         text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
+           bg-white rounded-lg px-4 pb-4 
+         text-left transition-all sm:px-6 sm:pb-6 overflow-y-auto`}
       >
         <div className="flex flex-col justify-between lg:flex-row max-w-full ">
           <div>
@@ -52,11 +52,10 @@ const NftModal = ({
               )}
 
               <img
-                className={`object-fill rounded-lg shrink-0 ${
-                  imgLoaded
-                    ? 'visible w-screen'
-                    : 'invisible absolute w-2.5 h-2.5'
-                }`}
+                className={`object-fill rounded-lg shrink-0 ${imgLoaded
+                  ? 'visible w-screen'
+                  : 'invisible absolute w-2.5 h-2.5'
+                  }`}
                 src={gatewayFromIpfs(nft?.url)}
                 onLoad={() => setImgLoaded(true)}
                 alt=""
@@ -176,15 +175,15 @@ const NftModal = ({
                                   </button>
                                 </div>
                               )) || (
-                                <Text
-                                  size="xs"
-                                  weight="semibold"
-                                  className="text-gray-700 pb-2 max-w-[12rem] md:max-w-[16rem] lg:max-w-[18rem] 
+                                  <Text
+                                    size="xs"
+                                    weight="semibold"
+                                    className="text-gray-700 pb-2 max-w-[12rem] md:max-w-[16rem] lg:max-w-[18rem] 
                             truncate"
-                                >
-                                  {d.value}
-                                </Text>
-                              )}
+                                  >
+                                    {d.value}
+                                  </Text>
+                                )}
                             </div>
                           )
                         }

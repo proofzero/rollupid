@@ -8,8 +8,8 @@ import warn from '../../assets/warning.svg'
 const UnsavedChangesModal = ({ isOpen, handleClose }) => {
   return (
     <Modal isOpen={isOpen} handleClose={handleClose}>
-      <div className="relative bg-white lg:w-[32rem] rounded-xl pb-3 pr-6">
-        <div className="relative bg-white rounded-xl pl-6 pt-6">
+      <div className="relative rounded-lg bg-white lg:w-[32rem] pb-3 pr-6">
+        <div className="relative bg-white pl-6">
           <div className="mb-[53px] flex flex-row items-start">
             <img src={warn} alt="warning" className="mr-4" />
             <div className="flex flex-col items-start">

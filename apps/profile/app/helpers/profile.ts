@@ -86,9 +86,16 @@ export const getAccountCryptoAddresses = async ({
   // TODO: need to type qc and rc
   const cryptoAddresses =
     addresses
-      .filter((e) => [NodeType.Crypto, NodeType.Vault].includes(e.rc.node_type))
-      .map((address) => address.qc.alias.toLowerCase() as string) ||
-    ([] as string[])
+      .filter((e) => {
+        return [NodeType.Crypto, NodeType.Vault].includes(e.rc.node_type) &&
+          e.rc.addr_type === CryptoAddressType.ETH
+      })
+      .map((address) => {
+        return address.qc.alias.toLowerCase() as string
+      })
+    || ([] as string[])
+
+
 
   return cryptoAddresses
 }
