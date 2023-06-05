@@ -92,7 +92,6 @@ const getErrorFromTRPCClientError = (error: any): Error => {
     }
   } else if (error.data && 'zodError' in error.data) {
     const cause = (error.data as { zodError: object }).zodError
-    console.debug('ZOD', cause)
     return new Error('data error', { cause })
   }
 
