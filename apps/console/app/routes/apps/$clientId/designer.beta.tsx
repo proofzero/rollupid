@@ -394,20 +394,20 @@ const AuthPanel = ({
 
           <FormElement label="Wallet Signature Request Sign Message">
             <InputTextarea
-              id="address"
+              id="signMessage"
               heading=""
-              defaultValue={address}
-              onChange={setAddress}
-              error={errors && errors['email.address'] ? true : false}
+              defaultValue={signMessage}
+              onChange={setSignMessage}
+              error={errors && errors['signMessage'] ? true : false}
             />
 
-            {errors && errors['email.address'] && (
+            {errors && errors['signMessage'] && (
               <Text
                 className="mb-1.5 mt-1.5 text-red-500"
                 size="xs"
                 weight="normal"
               >
-                {errors['email.address']}
+                {errors['signMessage']}
               </Text>
             )}
           </FormElement>

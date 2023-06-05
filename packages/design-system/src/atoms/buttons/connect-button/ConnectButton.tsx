@@ -69,11 +69,10 @@ export function ConnectButton({
   useEffect(() => {
     if (!signData?.signature && signData?.nonce) {
       console.debug('signing...')
-      const nonceMessage =
-        AuthenticationScreenDefaults.defaultSignMessage.replace(
-          '{{nonce}}',
-          signData.nonce
-        )
+      const nonceMessage = signMessageTemplate.replace(
+        '{{nonce}}',
+        signData.nonce
+      )
       // sign message
       signMessage({ message: nonceMessage })
     } else {

@@ -28,8 +28,7 @@ export const AuthenticationScreenDefaults = {
   
   This will not trigger a blockchain transaction or cost any gas fees.
   
-  {{nonce}}
-  `,
+  {{nonce}}`,
   defaultSubheading: 'How would you like to continue?',
   knownKeys: [
     'wallet',

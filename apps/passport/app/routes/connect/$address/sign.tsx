@@ -8,10 +8,11 @@ import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import { getAuthzCookieParams, getUserSession } from '../../../session.server'
 import { getAuthzRedirectURL } from '../../../utils/authenticate.server'
 
-import { parseJwt, signMessageTemplate } from '@proofzero/packages/utils'
+import { parseJwt } from '@proofzero/packages/utils'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import type { AccountURN } from '@proofzero/urns/account'
+import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -34,7 +35,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     try {
       const nonce = await addressClient.getNonce.query({
         address: address as string,
-        template: signMessageTemplate(),
+        template: AuthenticationScreenDefaults.defaultSignMessage,
         state,
         redirectUri: context.env.PASSPORT_REDIRECT_URL,
         scope: ['admin'],
