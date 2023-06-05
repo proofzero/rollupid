@@ -55,5 +55,8 @@ export const getOwnAddressesMethod = async ({
   // nodes, filtered by address type if provided.
   const { edges } = await ctx.edges.getEdges.query({ query })
 
-  return edges.map((e) => e.dst)
+  return edges.map((e) => ({
+    ...e.dst,
+    createdTimestamp: e.createdTimestamp
+  }))
 }

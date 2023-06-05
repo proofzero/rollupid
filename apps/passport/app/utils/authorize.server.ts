@@ -72,10 +72,7 @@ export const getDataForScopes = async (
 
   if (connectedAccounts && connectedAccounts.length) {
     if (requestedScope.includes(Symbol.keyFor(SCOPE_EMAIL)!)) {
-      connectedEmails = getEmailDropdownItems(connectedAccounts)
-      if (connectedEmails?.length) {
-        connectedEmails[0].selected = true
-      }
+      connectedEmails = getEmailDropdownItems(connectedAccounts, true)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!)) {
       const addresses = (await Promise.all(

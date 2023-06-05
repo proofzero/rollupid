@@ -61,11 +61,14 @@ export const adjustAddressTypeToDisplay = (addressType:
 }
 
 export const getEmailDropdownItems = (
-  connectedAddresses?: Addresses | null
+  connectedAddresses?: Addresses | null,
+  preselected?: boolean,
 ): Array<DropdownSelectListItem> => {
   if (!connectedAddresses) return []
-  return connectedAddresses
-    .filter((address) => {
+
+
+  const filteredEmailsFromConnectedAddresses =
+    connectedAddresses.filter((address) => {
       return (
         (address.rc.node_type === NodeType.OAuth &&
           (address.rc.addr_type === OAuthAddressType.Google ||
@@ -75,17 +78,31 @@ export const getEmailDropdownItems = (
           address.rc.addr_type === EmailAddressType.Email)
       )
     })
-    .map((address) => {
-      return {
-        // There's a problem when passing icon down to client (since icon is a JSX.Element)
-        // My guess is that it should be rendered on the client side only.
-        // that's why I'm passing type (as subtitle) instead of icon and then substitute it
-        // with icon on the client side
-        subtitle: address.rc.addr_type as OAuthAddressType | EmailAddressType | CryptoAddressType,
-        title: address.qc.alias,
-        value: address.baseUrn as AddressURN,
+
+  if (!filteredEmailsFromConnectedAddresses?.length) return []
+
+  let minDate = filteredEmailsFromConnectedAddresses[0].createdTimestamp!
+
+  if (preselected) {
+    filteredEmailsFromConnectedAddresses.forEach((address) => {
+      if (new Date(address.createdTimestamp!) < new Date(minDate)) {
+        minDate = address.createdTimestamp!
       }
     })
+  }
+
+  return filteredEmailsFromConnectedAddresses.map((address) => {
+    return {
+      // There's a problem when passing icon down to client (since icon is a JSX.Element)
+      // My guess is that it should be rendered on the client side only.
+      // that's why I'm passing type (as subtitle) instead of icon and then substitute it
+      // with icon on the client side
+      subtitle: address.rc.addr_type as OAuthAddressType | EmailAddressType | CryptoAddressType,
+      title: address.qc.alias,
+      value: address.baseUrn as AddressURN,
+      selected: preselected ? address.createdTimestamp === minDate : undefined,
+    }
+  })
 }
 
 //addressDropdownItems

@@ -331,7 +331,8 @@ export const Dropdown = ({
                                                     </div>
                                                     {selected || preselected ? (
                                                         <span className="flex items-center pl-3 text-skin-primary">
-                                                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                                                            <CheckIcon className="h-5 w-5 text-indigo-600"
+                                                                aria-hidden="true" />
                                                         </span>
                                                     ) : null}
                                                 </div>
