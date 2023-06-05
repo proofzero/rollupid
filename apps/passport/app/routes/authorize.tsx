@@ -444,7 +444,7 @@ export default function Authorize() {
     }
 
     if (requestedScope.includes('email') && selectedEmail) {
-      personaData.email = selectedEmail
+      personaData.email = selectedEmail.value
     }
 
     if (
@@ -455,6 +455,7 @@ export default function Authorize() {
         personaData.connected_accounts = AuthorizationControlSelection.ALL
       } else {
         personaData.connected_accounts = selectedConnectedAccounts
+          .map((account) => (account as DropdownSelectListItem).value)
       }
     }
 
@@ -463,6 +464,7 @@ export default function Authorize() {
         personaData.erc_4337 = AuthorizationControlSelection.ALL
       } else {
         personaData.erc_4337 = selectedSCWallets
+          .map((wallet) => (wallet as DropdownSelectListItem).value)
       }
     }
 
