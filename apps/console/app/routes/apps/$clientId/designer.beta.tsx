@@ -346,6 +346,20 @@ const AuthPanel = ({
   )
   const [providerModalOpen, setProviderModalOpen] = useState<boolean>(false)
 
+  const resetToDefaults = () => {
+    setHeading(AuthenticationScreenDefaults.defaultHeading)
+    setSignMessage(AuthenticationScreenDefaults.defaultSignMessage)
+    setRadius(AuthenticationScreenDefaults.radius)
+    setColor(AuthenticationScreenDefaults.color)
+    setGraphicURL(undefined)
+    setProviders(
+      AuthenticationScreenDefaults.knownKeys.map((k) => ({
+        key: k,
+        enabled: true,
+      }))
+    )
+  }
+
   return (
     <>
       <Helmet>
@@ -396,12 +410,12 @@ const AuthPanel = ({
           <div className="w-full border-b border-gray-200"></div>
 
           <FormElement label="Wallet Signature Request Sign Message">
+            {/* <textarea name="signMessage" id="signMessage" value={signMessage} /> */}
             <InputTextarea
-              id="signMessage"
+              id={'signMessage'}
               heading=""
-              defaultValue={signMessage}
-              onChange={setSignMessage}
-              error={errors && errors['signMessage'] ? true : false}
+              value={signMessage}
+              onChange={(val) => setSignMessage(val)}
             />
 
             {errors && errors['signMessage'] && (
@@ -608,6 +622,21 @@ const AuthPanel = ({
 
           <div className="w-full border-b border-gray-200"></div>
 
+          <FormElement label="Default Style Settings">
+            <button
+              type="button"
+              onClick={() => {
+                resetToDefaults()
+              }}
+            >
+              <Text size="sm" weight="normal" className="text-skin-primary">
+                Reset to default
+              </Text>
+            </button>
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
           <FormElement label="Login Provider Configuration">
             <input
               type="hidden"
@@ -693,6 +722,7 @@ const AuthPanel = ({
                         .filter((p) => p.enabled)
                         .map((p) => p.key)}
                       mapperArgs={{
+                        signMessageTemplate: signMessage,
                         clientId: 'Foo',
                         signData: null,
                       }}
@@ -899,7 +929,7 @@ const EmailPanel = ({
           <InputTextarea
             id="address"
             heading=""
-            defaultValue={address}
+            value={address ?? ''}
             onChange={setAddress}
             error={errors && errors['email.address'] ? true : false}
           />
@@ -1076,18 +1106,18 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
       theme = {
         ...theme,
-        heading: heading ?? theme?.heading,
-        signMessageTemplate: signMessageTemplate ?? theme?.signMessageTemplate,
-        radius: radius ?? theme?.radius,
+        heading: heading,
+        signMessageTemplate: signMessageTemplate,
+        radius: radius,
         color:
           color && colorDark
             ? {
                 light: color,
                 dark: colorDark,
               }
-            : theme?.color,
-        graphicURL: graphicURL ?? theme?.graphicURL,
-        providers: providers ?? theme?.providers,
+            : undefined,
+        graphicURL: graphicURL,
+        providers: providers,
       }
 
       const zodErrors = await AppThemeSchema.spa(theme)

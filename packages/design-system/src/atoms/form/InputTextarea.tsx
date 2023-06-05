@@ -10,10 +10,10 @@ export type InputTextareaProps = {
   charLimit?: number
   name?: string
   placeholder?: string
-  defaultValue?: string
   disabled?: boolean
   error?: boolean
   required?: boolean
+  value: string
 }
 
 const InputTextarea = ({
@@ -24,23 +24,22 @@ const InputTextarea = ({
   charLimit,
   name,
   placeholder,
-  defaultValue,
   disabled,
   error,
   required,
+  value,
 }: InputTextareaProps) => {
   const computedName = name ?? id
 
-  const [val, setVal] = useState<undefined | string>(defaultValue)
   const [computedError, setComputedError] = useState<undefined | boolean>()
 
   useEffect(() => {
-    if (error || (val && charLimit && val.length > charLimit)) {
+    if (error || (value && charLimit && value.length > charLimit)) {
       setComputedError(true)
     } else {
       setComputedError(false)
     }
-  }, [error, val])
+  }, [error, value])
 
   return (
     <div>
@@ -51,7 +50,7 @@ const InputTextarea = ({
 
         {charLimit && (
           <Text size="sm" weight="medium" className="text-gray-400">
-            {val?.length || 0}/{charLimit}
+            {value?.length || 0}/{charLimit}
           </Text>
         )}
       </label>
@@ -66,12 +65,10 @@ const InputTextarea = ({
             name={computedName}
             id={id}
             onChange={(e) => {
-              setVal(e.target.value)
-
               if (onChange) onChange(e.target.value)
             }}
             rows={rows}
-            defaultValue={defaultValue}
+            value={value}
             disabled={disabled ?? false}
             className={`${
               computedError ? 'border-red-500' : 'border-gray-300'

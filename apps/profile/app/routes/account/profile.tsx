@@ -74,6 +74,8 @@ export default function AccountSettingsProfile() {
 
   const { displayName, pfp, bio, job, location } = profile
 
+  const [bioInput, setBioInput] = useState(bio || '')
+
   const [pfpUrl, setPfpUrl] = useState(pfp?.image || undefined)
   const [isToken, setIsToken] = useState<boolean>(false)
 
@@ -317,7 +319,8 @@ export default function AccountSettingsProfile() {
             heading="Bio"
             charLimit={256}
             rows={3}
-            defaultValue={bio || ''}
+            value={bioInput}
+            onChange={setBioInput}
             error={actionData?.errors.bio}
           />
 
