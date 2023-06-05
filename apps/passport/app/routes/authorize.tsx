@@ -437,7 +437,7 @@ export default function Authorize() {
     }
 
     if (requestedScope.includes('email') && selectedEmail) {
-      personaData.email = selectedEmail.value
+      personaData.email = selectedEmail
     }
 
     if (
@@ -448,7 +448,6 @@ export default function Authorize() {
         personaData.connected_accounts = AuthorizationControlSelection.ALL
       } else {
         personaData.connected_accounts = selectedConnectedAccounts
-          .map((account) => (account as DropdownSelectListItem).value)
       }
     }
 
