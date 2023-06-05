@@ -227,17 +227,15 @@ export default () => {
                 onSelect={(selected) => {
                   // type casting to DropdownSelectListItem instead of array
                   if (!Array.isArray(selected)) {
-                    if (selected.value === appContactAddress) {
+                    if (!selected || !selected.value) {
+                      console.error('Error selecting email, try again')
                       return
                     }
-                    if (!selected) {
-                      console.error('No addressURN')
+                    if (selected.value === appContactAddress) {
                       return
                     }
                     submit(
                       {
-                        //TODO: temp fix. To be removed with full fix of typing issue
-                        //@ts-ignore
                         addressURN: selected.value,
                       },
                       {
