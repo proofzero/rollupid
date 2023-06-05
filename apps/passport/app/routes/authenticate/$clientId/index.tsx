@@ -198,6 +198,9 @@ const InnerComponent = ({
           .map((p) => p.key) ?? displayKeys
       }
       mapperArgs={{
+        signMessageTemplate:
+          appProps?.appTheme?.signMessageTemplate ??
+          AuthenticationScreenDefaults.defaultSignMessage,
         clientId,
         signData,
         navigate,

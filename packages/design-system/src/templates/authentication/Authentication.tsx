@@ -138,6 +138,8 @@ type DisplayKeyMapperArgs = {
   loading?: boolean
   flex?: boolean
   displayContinueWith?: boolean
+  enableOAuthSubmit?: boolean
+  signMessageTemplate: string
 }
 const displayKeyMapper = (
   key: string,
@@ -152,6 +154,8 @@ const displayKeyMapper = (
     loading = false,
     flex = false,
     displayContinueWith = false,
+    enableOAuthSubmit = false,
+    signMessageTemplate,
   }: DisplayKeyMapperArgs
 ) => {
   let el
@@ -167,6 +171,7 @@ const displayKeyMapper = (
           connectCallback={walletConnectCallback}
           connectErrorCallback={walletConnectErrorCallback}
           signCallback={walletSignCallback}
+          signMessageTemplate={signMessageTemplate}
         />
       )
       break

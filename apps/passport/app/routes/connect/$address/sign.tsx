@@ -14,6 +14,8 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import type { AccountURN } from '@proofzero/urns/account'
 import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
+import { getStarbaseClient } from '~/platform.server'
+
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const { address } = params
@@ -32,10 +34,24 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       context.env,
       context.traceSpan
     )
+
+    let signTemplate = AuthenticationScreenDefaults.defaultSignMessage
+
+    const { clientId } = await getAuthzCookieParams(request, context.env)
+    if (clientId !== 'console' && clientId !== 'passport') {
+      const sbClient = getStarbaseClient('', context.env, context.traceSpan)
+      const appProps = await sbClient.getAppPublicProps.query({
+        clientId,
+      })
+      if (appProps.appTheme?.signMessageTemplate) {
+        signTemplate = appProps.appTheme.signMessageTemplate
+      }
+    }
+
     try {
       const nonce = await addressClient.getNonce.query({
         address: address as string,
-        template: AuthenticationScreenDefaults.defaultSignMessage,
+        template: signTemplate,
         state,
         redirectUri: context.env.PASSPORT_REDIRECT_URL,
         scope: ['admin'],

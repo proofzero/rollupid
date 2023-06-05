@@ -310,10 +310,13 @@ const AuthPanel = ({
   const [dark, setDark] = useState<boolean>(false)
   const toggleDark = () => setDark(!dark)
 
-  const [heading, setHeading] = useState<string>(appTheme?.heading ?? '')
+  const [heading, setHeading] = useState<string>(
+    appTheme?.heading ?? AuthenticationScreenDefaults.defaultHeading
+  )
 
   const [signMessage, setSignMessage] = useState<string>(
-    AuthenticationScreenDefaults.defaultSignMessage
+    appTheme?.signMessageTemplate ??
+      AuthenticationScreenDefaults.defaultSignMessage
   )
 
   const [radius, setRadius] = useState<string>(
@@ -1050,6 +1053,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       let heading = fd.get('heading') as string | undefined
       if (!heading || heading === '') heading = undefined
 
+      let signMessageTemplate = fd.get('signMessage') as string | undefined
+      if (!signMessageTemplate || signMessageTemplate === '')
+        signMessageTemplate = undefined
+
       let radius = fd.get('radius') as string | undefined
       if (!radius || radius === '') radius = undefined
 
@@ -1070,6 +1077,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       theme = {
         ...theme,
         heading: heading ?? theme?.heading,
+        signMessageTemplate: signMessageTemplate ?? theme?.signMessageTemplate,
         radius: radius ?? theme?.radius,
         color:
           color && colorDark

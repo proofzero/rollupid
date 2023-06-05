@@ -43,6 +43,7 @@ export const AppClientIdParamSchema = z.object({
 
 export const AppThemeSchema = z.object({
   heading: z.string().optional(),
+  signMessageTemplate: z.string().optional(),
   radius: z.string().optional(),
   color: z
     .object({
