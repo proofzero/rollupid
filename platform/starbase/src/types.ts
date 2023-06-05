@@ -7,6 +7,7 @@ import {
   AppObjectSchema,
   AppReadableFieldsSchema,
   AppUpdateableFieldsSchema,
+  CustomDomainDNSRecordsSchema,
   CustomDomainSchema,
 } from './jsonrpc/validators/app'
 
@@ -47,3 +48,6 @@ export type AuthorizedUser = z.infer<typeof AuthorizedUser>
 export type EdgesMetadata = z.infer<typeof EdgesMetadata>
 
 export type CustomDomain = z.infer<typeof CustomDomainSchema>
+export type CustomDomainDNSRecords = z.infer<
+  typeof CustomDomainDNSRecordsSchema
+>

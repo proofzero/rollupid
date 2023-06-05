@@ -103,6 +103,15 @@ export type PaymasterType = z.infer<typeof PaymasterSchema>
 
 export type PaymasterProviderType = z.infer<typeof PaymasterProviderSchema>
 
+export const CustomDomainDNSRecordsSchema = z.array(
+  z.object({
+    name: z.string(),
+    record_type: z.union([z.literal('TXT'), z.literal('CNAME')]),
+    expected_value: z.string(),
+    value: z.string().optional().nullable(),
+  })
+)
+
 export const CustomDomainSchema = z.object({
   id: z.string(),
   hostname: z.string(),
@@ -125,5 +134,6 @@ export const CustomDomainSchema = z.object({
       )
       .optional(),
   }),
+  dns_records: CustomDomainDNSRecordsSchema,
   status: z.string(),
 })

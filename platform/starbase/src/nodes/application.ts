@@ -32,6 +32,7 @@ import { InternalServerError } from '@proofzero/errors'
 
 import type { CustomDomain } from '../types'
 import { getCloudflareFetcher, getCustomHostname } from '../utils/cloudflare'
+import { getDNSRecordValue } from '@proofzero/utils'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields
@@ -270,13 +271,19 @@ export default class StarbaseApp extends DOProxy {
       stored.id
     )
 
+    for (const dnsRec of stored.dns_records) {
+      dnsRec.value = await getDNSRecordValue(dnsRec.name, dnsRec.record_type)
+    }
+    customDomain.dns_records = stored.dns_records
     customDomain.ownership_verification = stored.ownership_verification
     customDomain.ssl.validation_records = stored.ssl.validation_records
+
     await storage.put({ customDomain })
 
     if (
       customDomain.status === 'active' &&
-      customDomain.ssl.status === 'active'
+      customDomain.ssl.status === 'active' &&
+      stored.dns_records.every((rec) => rec.value === rec.expected_value)
     )
       return this.unsetCustomDomainAlarm()
 

@@ -9,11 +9,14 @@ import {
   createCustomHostname,
   createWorkerRoute,
   getCloudflareFetcher,
+  getExpectedCustomDomainDNSRecords,
 } from '../../utils/cloudflare'
+import { CustomDomain } from '../../types'
 
 export const CreateCustomDomainInput = z.object({
   clientId: z.string(),
   hostname: z.string(),
+  passportHostname: z.string(),
 })
 
 export const CreateCustomDomainOutput = CustomDomainSchema
@@ -38,7 +41,7 @@ export const createCustomDomain: CreateCustomDomainMethod = async ({
   const fetcher = getCloudflareFetcher(ctx.TOKEN_CLOUDFLARE_API)
 
   try {
-    const customDomain = await createCustomHostname(
+    const customHostname = await createCustomHostname(
       fetcher,
       clientId,
       ctx.INTERNAL_CLOUDFLARE_ZONE_ID,
@@ -50,7 +53,13 @@ export const createCustomDomain: CreateCustomDomainMethod = async ({
       hostname,
       ctx.INTERNAL_PASSPORT_SERVICE_NAME
     )
-
+    const customDomain: CustomDomain = {
+      ...customHostname,
+      dns_records: getExpectedCustomDomainDNSRecords(
+        customHostname.hostname,
+        input.passportHostname
+      ),
+    }
     const node = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
     await node.storage.put({ customDomain, workerRouteId })
     await node.class.setCustomDomainAlarm()

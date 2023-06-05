@@ -52,12 +52,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const customDomain = await starbaseClient.getCustomDomain.query({
       clientId,
     })
-    const cname = customDomain?.hostname
-      ? await getDNSRecordValue(customDomain.hostname, 'CNAME')
-      : null
 
     const { hostname } = new URL(PASSPORT_URL)
-    return json({ customDomain, hostname, cname })
+    return json({ customDomain, hostname })
   }
 )
 
@@ -72,7 +69,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const { hostname } = new URL(PASSPORT_URL)
+    const passportUrl = new URL(PASSPORT_URL)
+    const { hostname } = passportUrl
 
     if (request.method === 'PUT') {
       const formData = await request.formData()
@@ -81,28 +79,22 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       if (typeof hostname !== 'string')
         throw new BadRequestError({ message: 'Invalid Hostname' })
       if (!hostname) throw new BadRequestError({ message: 'Missing Hostname' })
-
       const customDomain = await starbaseClient.createCustomDomain.mutate({
         clientId,
         hostname,
+        passportHostname: passportUrl.hostname,
       })
-      const cname = customDomain?.hostname
-        ? await getDNSRecordValue(customDomain.hostname, 'CNAME')
-        : null
 
-      return json({ customDomain, hostname, cname })
+      return json({ customDomain, hostname })
     } else if (request.method === 'POST') {
       const customDomain = await starbaseClient.getCustomDomain.query({
         clientId,
         refresh: true,
       })
-      const cname = customDomain?.hostname
-        ? await getDNSRecordValue(customDomain.hostname, 'CNAME')
-        : null
-      return json({ customDomain, hostname, cname })
+      return json({ customDomain, hostname })
     } else if (request.method === 'DELETE') {
       await starbaseClient.deleteCustomDomain.mutate({ clientId })
-      return json({ customDomain: null, hostname, cname: null })
+      return json({ customDomain: null, hostname })
     }
   }
 )
@@ -111,7 +103,7 @@ export default () => {
   const fetcher = useFetcher()
   const actionData = useActionData<AppData>()
   const loaderData = useLoaderData<AppData>()
-  const { customDomain, hostname, cname } =
+  const { customDomain, hostname } =
     fetcher.data || actionData || loaderData
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>()
 
@@ -140,7 +132,6 @@ export default () => {
           fetcher={fetcher}
           customDomain={customDomain}
           hostname={hostname}
-          cname={cname}
         />
       )}
     </section>
@@ -183,18 +174,17 @@ type HostnameStatusProps = {
   fetcher: FetcherWithComponents<AppData>
   customDomain: CustomDomain
   hostname: string
-  cname: string
 }
 
 const HostnameStatus = ({
   fetcher,
   customDomain,
   hostname,
-  cname,
 }: HostnameStatusProps) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const isValidated =
+  const isPreValidated =
     customDomain.status === 'active' && customDomain.ssl.status === 'active'
+  const isValidated = isPreValidated && customDomain.dns_records.every(r => r.value === r.expected_value)
   const bgStatusColor = isValidated ? 'bg-green-600' : 'bg-orange-500'
   const textStatusColor = isValidated ? 'text-green-600' : 'text-orange-500'
   const statusText = isValidated ? 'Validated' : 'Not Validated'
@@ -274,15 +264,16 @@ const HostnameStatus = ({
             Step 2: CNAME Record
           </Text>
           <div className="flex flex-col p-4 space-y-5 box-border border rounded-lg">
-            {isValidated && (
+            {isPreValidated && Array.from(customDomain.dns_records || []).map((r) => (
               <DNSRecord
-                title=""
-                type="CNAME"
-                value={hostname}
-                validated={hostname === cname}
+                title={r.record_type === 'CNAME' ? '' : r.name}
+                type={r.record_type}
+                validated={r.value === r.expected_value}
+                value={r.expected_value}
+                key={r.expected_value}
               />
-            )}
-            {!isValidated && (
+            ))}
+            {!isPreValidated && (
               <div className="flex flex-row p-4 space-x-4 bg-gray-50">
                 <TbInfoCircle size={20} className="text-gray-500 shrink-0" />
                 <Text type="span" size="sm" className="text-gray-500">
