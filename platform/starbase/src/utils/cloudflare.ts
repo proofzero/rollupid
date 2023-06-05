@@ -1,4 +1,5 @@
 import { InternalServerError } from '@proofzero/errors'
+import { CustomDomain, CustomDomainDNSRecords } from '../types'
 
 const API_URL = 'https://api.cloudflare.com/client/v4'
 
@@ -104,7 +105,7 @@ export const deleteCustomHostname = async (
   )
 }
 
-type GetCustomHostnameResult = CustomHostname
+type GetCustomHostnameResult = CustomDomain
 
 export const getCustomHostname = async (
   fetcher: CloudflareFetcher,
@@ -147,4 +148,19 @@ export const deleteWorkerRoute = async (
     `zones/${zoneId}/workers/routes/${id}`,
     { method: 'DELETE' }
   )
+}
+
+export const getExpectedCustomDomainDNSRecords = (
+  customHostname: string,
+  passportUrl: string
+): CustomDomainDNSRecords => {
+  const result: CustomDomainDNSRecords = []
+
+  //Add other expected DNS records here, eg. DMARC, SPF, DKIM, etc
+  result.push({
+    name: customHostname,
+    record_type: 'CNAME',
+    expected_value: passportUrl,
+  })
+  return result
 }
