@@ -415,7 +415,6 @@ const AuthPanel = ({
           <div className="w-full border-b border-gray-200"></div>
 
           <FormElement label="Wallet Signature Request Sign Message">
-            {/* <textarea name="signMessage" id="signMessage" value={signMessage} /> */}
             <InputTextarea
               id={'signMessage'}
               heading=""
@@ -423,13 +422,13 @@ const AuthPanel = ({
               onChange={(val) => setSignMessage(val)}
             />
 
-            {errors && errors['signMessage'] && (
+            {errors && errors['signMessageTemplate'] && (
               <Text
                 className="mb-1.5 mt-1.5 text-red-500"
                 size="xs"
                 weight="normal"
               >
-                {errors['signMessage']}
+                {errors['signMessageTemplate']}
               </Text>
             )}
           </FormElement>
