@@ -5,4 +5,5 @@ export const Node = z.object({
   baseUrn: AnyURNInput,
   qc: z.record(z.string()),
   rc: z.record(z.string()),
+  createdTimestamp: z.string().optional().nullable(),
 })
