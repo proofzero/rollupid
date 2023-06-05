@@ -19,6 +19,65 @@ export type DropdownSelectListItem = {
     subtitle?: string
 }
 
+export type DropdownListboxButtonType = {
+    selectedItem?: DropdownSelectListItem,
+    selectedItems?: Array<DropdownSelectListItem>,
+    allItemsSelected?: boolean,
+    placeholder?: string,
+    selectAllCheckboxTitle?: string
+    open: boolean
+}
+
+const DropdownListboxButtonDefault = ({
+    selectedItem,
+    selectedItems,
+    allItemsSelected,
+    placeholder,
+    selectAllCheckboxTitle,
+    open
+}: DropdownListboxButtonType) => {
+    return <div className="border shadow-sm rounded-lg w-full transition-transform
+                                    flex flex-row justify-between items-center py-2 px-3 hover:ring-1
+                                    hover:ring-skin-primary focus:ring-1 focus:ring-skin-primary bg-white
+                                    dark:bg-[#1F2937] dark:border-gray-600">
+        {!selectedItem && !selectedItems.length && !allItemsSelected && (
+            <Text size="sm" className="text-gray-400 dark:text-white truncate text-ellipsis">
+                {placeholder}
+            </Text>
+        )}
+
+        {selectedItem?.title?.length && (
+            <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
+                {selectedItem.title}
+            </Text>
+        )}
+
+        {selectedItems.length > 1 && !allItemsSelected && (
+            <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
+                {selectedItems.length} items selected
+            </Text>
+        )}
+
+        {selectedItems.length === 1 && !allItemsSelected && (
+            <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
+                {selectedItems[0].title} selected
+            </Text>
+        )}
+
+        {allItemsSelected && (
+            <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
+                {selectAllCheckboxTitle}
+            </Text>
+        )}
+
+        {open ? (
+            <ChevronUpIcon className="w-5 h-5 shrink-0" />
+        ) : (
+            <ChevronDownIcon className="w-5 h-5 shrink-0" />
+        )}
+    </div>
+}
+
 export const Dropdown = ({
     items,
     placeholder,
@@ -29,6 +88,7 @@ export const Dropdown = ({
     onSelectAll,
     selectAllCheckboxTitle,
     selectAllCheckboxDescription,
+    DropdownListboxButton = DropdownListboxButtonDefault
 }: {
     items: Array<DropdownSelectListItem>,
     placeholder: string,
@@ -39,6 +99,14 @@ export const Dropdown = ({
     onSelectAll?: () => void,
     selectAllCheckboxTitle?: string
     selectAllCheckboxDescription?: string
+    DropdownListboxButton?: ({
+        selectedItem,
+        selectedItems,
+        allItemsSelected,
+        placeholder,
+        selectAllCheckboxTitle,
+        open
+    }: DropdownListboxButtonType) => JSX.Element
 }) => {
 
     const defaultItems = items.filter(
@@ -91,47 +159,15 @@ export const Dropdown = ({
 
             {({ open }) => (
                 <div className="relative select-none">
-                    <Listbox.Button
-                        className="border shadow-sm rounded-lg w-full transition-transform
-                                    flex flex-row justify-between items-center py-2 px-3 hover:ring-1
-                                    hover:ring-skin-primary focus:ring-1 focus:ring-skin-primary bg-white
-                                    dark:bg-[#1F2937] dark:border-gray-600"
-                    >
-                        {!selectedItem && !selectedItems.length && !allItemsSelected && (
-                            <Text size="sm" className="text-gray-400 dark:text-white truncate text-ellipsis">
-                                {placeholder}
-                            </Text>
-                        )}
-
-                        {selectedItem?.title?.length && (
-                            <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
-                                {selectedItem.title}
-                            </Text>
-                        )}
-
-                        {selectedItems.length > 1 && !allItemsSelected && (
-                            <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
-                                {selectedItems.length} items selected
-                            </Text>
-                        )}
-
-                        {selectedItems.length === 1 && !allItemsSelected && (
-                            <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
-                                {selectedItems[0].title} selected
-                            </Text>
-                        )}
-
-                        {allItemsSelected && (
-                            <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
-                                {selectAllCheckboxTitle}
-                            </Text>
-                        )}
-
-                        {open ? (
-                            <ChevronUpIcon className="w-5 h-5 shrink-0" />
-                        ) : (
-                            <ChevronDownIcon className="w-5 h-5 shrink-0" />
-                        )}
+                    <Listbox.Button className="w-full">
+                        <DropdownListboxButton
+                            selectedItem={selectedItem}
+                            selectedItems={selectedItems}
+                            allItemsSelected={allItemsSelected}
+                            placeholder={placeholder}
+                            selectAllCheckboxTitle={selectAllCheckboxTitle}
+                            open={open}
+                        />
                     </Listbox.Button>
                     <Transition
                         as={Fragment}
