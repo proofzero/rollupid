@@ -40,7 +40,7 @@ const DropdownListboxButtonDefault = ({
                                     flex flex-row justify-between items-center py-2 px-3 hover:ring-1
                                     hover:ring-skin-primary focus:ring-1 focus:ring-skin-primary bg-white
                                     dark:bg-[#1F2937] dark:border-gray-600">
-        {!selectedItem && !selectedItems.length && !allItemsSelected && (
+        {!selectedItem && !selectedItems?.length && !allItemsSelected && (
             <Text size="sm" className="text-gray-400 dark:text-white truncate text-ellipsis">
                 {placeholder}
             </Text>
@@ -52,15 +52,15 @@ const DropdownListboxButtonDefault = ({
             </Text>
         )}
 
-        {selectedItems.length > 1 && !allItemsSelected && (
+        {selectedItems?.length > 1 && !allItemsSelected && (
             <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
-                {selectedItems.length} items selected
+                {selectedItems?.length} items selected
             </Text>
         )}
 
-        {selectedItems.length === 1 && !allItemsSelected && (
+        {selectedItems?.length === 1 && !allItemsSelected && (
             <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
-                {selectedItems[0].title} selected
+                {selectedItems?.[0].title} selected
             </Text>
         )}
 
