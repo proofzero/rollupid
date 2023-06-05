@@ -52,13 +52,13 @@ const DropdownListboxButtonDefault = ({
             </Text>
         )}
 
-        {selectedItems?.length > 1 && !allItemsSelected && (
+        {selectedItems && selectedItems?.length > 1 && !allItemsSelected && (
             <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
                 {selectedItems?.length} items selected
             </Text>
         )}
 
-        {selectedItems?.length === 1 && !allItemsSelected && (
+        {selectedItems && selectedItems?.length === 1 && !allItemsSelected && (
             <Text size="sm" className="text-gray-800 dark:text-white truncate text-ellipsis">
                 {selectedItems?.[0].title} selected
             </Text>
