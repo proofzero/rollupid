@@ -9,6 +9,7 @@ import {
 import { Button } from "../buttons/Button"
 import { TbCirclePlus } from "react-icons/tb"
 import { BadRequestError } from "@proofzero/errors"
+import type { AddressURN } from "@proofzero/urns/address"
 
 
 export type DropdownSelectListItem = {
@@ -92,7 +93,7 @@ export const Dropdown = ({
 }: {
     items: Array<DropdownSelectListItem>,
     placeholder: string,
-    onSelect: (selected: Array<DropdownSelectListItem> | DropdownSelectListItem) => void,
+    onSelect: (selected: Array<AddressURN> | AddressURN) => void,
     multiple?: boolean
     ConnectButtonPhrase: string,
     ConnectButtonCallback: () => void,
@@ -147,11 +148,13 @@ export const Dropdown = ({
                 if (multiple) {
                     setSelectedItems(input as DropdownSelectListItem[])
                     if (!allItemsSelected) {
-                        onSelect(input)
+                        //@ts-ignore
+                        onSelect(input.map((i) => i.value as AddressURN))
                     }
                 } else {
                     setSelectedItem(input as DropdownSelectListItem)
-                    onSelect(input)
+                    //@ts-ignore
+                    onSelect(input.value as AddressURN)
                 }
             }}
             multiple={multiple}
