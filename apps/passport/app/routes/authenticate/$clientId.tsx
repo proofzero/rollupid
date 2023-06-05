@@ -9,7 +9,7 @@ import LogoIndigo from '~/assets/PassportLogoIndigo.svg'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 import { Helmet } from 'react-helmet'
-import { getRGBColor } from '@proofzero/design-system/src/helpers'
+import { getRGBColor, getTextColor } from '@proofzero/design-system/src/helpers'
 import { useEffect, useState } from 'react'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
@@ -79,7 +79,17 @@ export default () => {
                     : appProps?.appTheme?.color?.light ??
                         AuthenticationScreenDefaults.color.light,
                   'primary'
-                )}   
+                )}
+                ${getRGBColor(
+                  getTextColor(
+                    dark
+                      ? appProps?.appTheme?.color?.dark ??
+                          AuthenticationScreenDefaults.color.dark
+                      : appProps?.appTheme?.color?.light ??
+                          AuthenticationScreenDefaults.color.light
+                  ),
+                  'primary-contrast-text'
+                )}
              {
          `}</style>
       </Helmet>

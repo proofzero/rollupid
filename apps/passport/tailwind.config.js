@@ -24,6 +24,7 @@ module.exports = {
       textColor: {
         skin: {
           primary: withOpacity('--color-primary'),
+          text: withOpacity('--color-primary-contrast-text'),
         },
       },
       backgroundColor: {
@@ -37,6 +38,11 @@ module.exports = {
         },
       },
       borderColor: {
+        skin: {
+          primary: withOpacity('--color-primary'),
+        },
+      },
+      boxShadowColor: {
         skin: {
           primary: withOpacity('--color-primary'),
         },

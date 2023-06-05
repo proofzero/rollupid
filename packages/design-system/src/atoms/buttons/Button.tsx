@@ -7,7 +7,6 @@ import {
   sizeToSizesDict,
   typeToColorsDict,
 } from './common'
-import { ThemeContext } from '../../contexts/theme'
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   btnSize?: ButtonSize

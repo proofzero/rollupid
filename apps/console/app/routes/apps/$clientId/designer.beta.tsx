@@ -34,6 +34,7 @@ import _ from 'lodash'
 import {
   getProviderIcons,
   getRGBColor,
+  getTextColor,
 } from '@proofzero/design-system/src/helpers'
 import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
 import { HexColorPicker } from 'react-colorful'
@@ -365,7 +366,11 @@ const AuthPanel = ({
       <Helmet>
         <style type="text/css">{`
             :root {
-                ${getRGBColor(dark ? color.dark : color.light, 'primary')}   
+                ${getRGBColor(dark ? color.dark : color.light, 'primary')}
+                ${getRGBColor(
+                  getTextColor(dark ? color.dark : color.light),
+                  'primary-contrast-text'
+                )}
              {
          `}</style>
       </Helmet>
