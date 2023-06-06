@@ -41,7 +41,11 @@ export const getAppPublicProps = async ({
           Boolean(customDomain?.hostname) &&
           customDomain?.status === 'active' &&
           customDomain?.ssl.status === 'active' &&
-          customDomain.dns_records.every((r) => r.expected_value === r.value),
+          Boolean(
+            customDomain?.dns_records?.every(
+              (r) => r.expected_value === r.value
+            )
+          ),
       },
     }
   } else {
