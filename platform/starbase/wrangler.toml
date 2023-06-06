@@ -58,6 +58,9 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [vars]
 ENVIRONMENT = "local"
+SPF_HOST = "notifications.rollup.id"
+DKIM_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqWMyGD0TLgDEb4S+J24oa1YDfcBZ7mOH8SuZnyl+I0W4AtDSI7mx+UdLP6BECOrmVe0g1D+33b3towMwlO5ndVwKv9HMLPeQKlWQOhE0CH/FTn3udYG5AkbgtYVyBq+sLZo9/sdh4OYlHudsWFl5wOLP0QLbzWlRCjYOUZrFHxjw+0Nj17Bu4h7i89t9yzqK79Xo2av/Dil1PzemIrOEZGlA5GHmQfI/hgVa0Q6QShPN/tsBSJuID1Uq9Ip2/PkxKFBXKuDW6VNqs5ax3eJ/20mlv1HISPfd2Cklg1rLbNWqr6fhUOHdIQCI1n9v7/X3fYss7wQldS0lnP7PheakswIDAQAB"
+DMARC_EMAIL = "cb88450cda584587bed23a9c2a2a91ea@dmarc-reports.cloudflare.net"
 
 # Dev
 # -----------------------------------------------------------------------------
@@ -106,6 +109,9 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.dev.vars]
 ENVIRONMENT = "dev"
 INTERNAL_PASSPORT_SERVICE_NAME = "passport-dev"
+SPF_HOST = "notifications.rollup.id"
+DKIM_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqWMyGD0TLgDEb4S+J24oa1YDfcBZ7mOH8SuZnyl+I0W4AtDSI7mx+UdLP6BECOrmVe0g1D+33b3towMwlO5ndVwKv9HMLPeQKlWQOhE0CH/FTn3udYG5AkbgtYVyBq+sLZo9/sdh4OYlHudsWFl5wOLP0QLbzWlRCjYOUZrFHxjw+0Nj17Bu4h7i89t9yzqK79Xo2av/Dil1PzemIrOEZGlA5GHmQfI/hgVa0Q6QShPN/tsBSJuID1Uq9Ip2/PkxKFBXKuDW6VNqs5ax3eJ/20mlv1HISPfd2Cklg1rLbNWqr6fhUOHdIQCI1n9v7/X3fYss7wQldS0lnP7PheakswIDAQAB"
+DMARC_EMAIL = "cb88450cda584587bed23a9c2a2a91ea@dmarc-reports.cloudflare.net"
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -130,6 +136,9 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.next.vars]
 ENVIRONMENT = "next"
 INTERNAL_PASSPORT_SERVICE_NAME = "passport-next"
+SPF_HOST = "notifications.rollup.id"
+DKIM_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqWMyGD0TLgDEb4S+J24oa1YDfcBZ7mOH8SuZnyl+I0W4AtDSI7mx+UdLP6BECOrmVe0g1D+33b3towMwlO5ndVwKv9HMLPeQKlWQOhE0CH/FTn3udYG5AkbgtYVyBq+sLZo9/sdh4OYlHudsWFl5wOLP0QLbzWlRCjYOUZrFHxjw+0Nj17Bu4h7i89t9yzqK79Xo2av/Dil1PzemIrOEZGlA5GHmQfI/hgVa0Q6QShPN/tsBSJuID1Uq9Ip2/PkxKFBXKuDW6VNqs5ax3eJ/20mlv1HISPfd2Cklg1rLbNWqr6fhUOHdIQCI1n9v7/X3fYss7wQldS0lnP7PheakswIDAQAB"
+DMARC_EMAIL = "cb88450cda584587bed23a9c2a2a91ea@dmarc-reports.cloudflare.net"
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -154,3 +163,6 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.current.vars]
 ENVIRONMENT = "current"
 INTERNAL_PASSPORT_SERVICE_NAME = "passport-current"
+SPF_HOST = "notifications.rollup.id"
+DKIM_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqWMyGD0TLgDEb4S+J24oa1YDfcBZ7mOH8SuZnyl+I0W4AtDSI7mx+UdLP6BECOrmVe0g1D+33b3towMwlO5ndVwKv9HMLPeQKlWQOhE0CH/FTn3udYG5AkbgtYVyBq+sLZo9/sdh4OYlHudsWFl5wOLP0QLbzWlRCjYOUZrFHxjw+0Nj17Bu4h7i89t9yzqK79Xo2av/Dil1PzemIrOEZGlA5GHmQfI/hgVa0Q6QShPN/tsBSJuID1Uq9Ip2/PkxKFBXKuDW6VNqs5ax3eJ/20mlv1HISPfd2Cklg1rLbNWqr6fhUOHdIQCI1n9v7/X3fYss7wQldS0lnP7PheakswIDAQAB"
+DMARC_EMAIL = "cb88450cda584587bed23a9c2a2a91ea@dmarc-reports.cloudflare.net"
