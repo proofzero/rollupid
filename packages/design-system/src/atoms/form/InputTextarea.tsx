@@ -82,7 +82,7 @@ const InputTextarea = ({
                 : 'disabled:border-gray-200'
             } ${computedError ? 'disabled:bg-red-50' : 'disabled:bg-gray-50'} ${
               computedError ? 'placeholder-red-400' : 'placeholder-gray-400'
-            } w-full rounded-md`}
+            } w-full rounded-md text-sm`}
             placeholder={placeholder}
             required={required}
           />

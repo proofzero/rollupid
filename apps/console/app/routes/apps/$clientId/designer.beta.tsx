@@ -420,6 +420,7 @@ const AuthPanel = ({
               heading=""
               value={signMessage}
               onChange={(val) => setSignMessage(val)}
+              rows={5}
             />
 
             {errors && errors['signMessageTemplate'] && (
@@ -432,6 +433,8 @@ const AuthPanel = ({
               </Text>
             )}
           </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
 
           <FormElement label="Radius">
             <input id="radius" name="radius" type="hidden" value={radius} />
