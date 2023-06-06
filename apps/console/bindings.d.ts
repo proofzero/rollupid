@@ -3,7 +3,6 @@ declare global {
   const Starbase: Fetcher
   const Images: Fetcher
   const Account: Fetcher
-  const Email: Fetcher
 
   const SECRET_SESSION_KEY: string
   const COOKIE_DOMAIN: string
