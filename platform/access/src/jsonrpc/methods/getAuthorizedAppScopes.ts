@@ -25,7 +25,7 @@ export const GetAuthorizedAppScopesMethodOutput = z.object({
         valid: z.boolean(),
       }),
     })
-  )
+  ),
 })
 
 export type GetAuthorizedAppScopesMethodResult = z.infer<
