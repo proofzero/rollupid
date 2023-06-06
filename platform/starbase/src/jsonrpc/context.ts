@@ -27,7 +27,6 @@ interface CreateInnerContextOptions
   INTERNAL_PASSPORT_SERVICE_NAME: string
   INTERNAL_CLOUDFLARE_ZONE_ID: string
   TOKEN_CLOUDFLARE_API: string
-  INTERNAL_DKIM_DOMAIN: string
   INTERNAL_DKIM_SELECTOR: string
   SPF_HOST: string
   DKIM_PUBLIC_KEY: string
