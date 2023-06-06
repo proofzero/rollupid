@@ -298,12 +298,9 @@ export default function AppDetailIndexPage() {
     <>
       {isImgUploading ? <Loader /> : null}
       <DeleteAppModal
-        clientId={appDetails.clientId as string}
-        appName={appDetails.app.name}
-        deleteAppCallback={() => {
-          setDeleteModalOpen(false)
-        }}
+        appDetails={appDetails}
         isOpen={deleteModalOpen}
+        deleteAppCallback={() => setDeleteModalOpen(false)}
       />
 
       <Form
