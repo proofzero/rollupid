@@ -646,7 +646,7 @@ export default function AppDetailIndexPage() {
 
             <Panel title="Danger Zone">
               <Button
-                type="submit"
+                type="button"
                 btnType="dangerous-alt"
                 onClick={() => {
                   setDeleteModalOpen(true)
