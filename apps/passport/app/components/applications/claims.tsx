@@ -167,7 +167,7 @@ const AccountExpandedView = ({
   </div>
 }
 // ------------------------------------------------------------------- MOBILE //
-export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
+export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
   const RowView = ({
     account,
     appAskedFor,
@@ -397,16 +397,16 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
 
   return (
     <div className="flex flex-col gap-2">
-      {claims.map((claim, i) => {
-        switch (claim.claim) {
+      {scopes.map((scope, i) => {
+        switch (scope.claim) {
           case 'email':
             return <RowView
               key={i}
               appAskedFor='Email'
-              whatsBeingShared={claim.address}
-              sourceOfData={claim.address}
+              whatsBeingShared={scope.address}
+              sourceOfData={scope.address}
               sourceOfDataIcon={
-                <img src={claim.icon} className="w-5 h-5 rounded-full" />
+                <img src={scope.icon} className="w-5 h-5 rounded-full" />
               }
               dropdown={false}
             />
@@ -415,10 +415,10 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
               key={i}
               title={"Connected Accounts"}
               addressFieldName={"Address"}
-              accounts={claim.accounts}
+              accounts={scope.accounts}
               connectedAccounts={true}
             />
-          case 'openid':
+          case 'system_identifiers':
             return <RowView
               appAskedFor='System Identifiers'
               sourceOfData='Rollup Identity'
@@ -440,13 +440,13 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
                 </div>
               }
               key={i}
-              account={claim.account}
+              account={scope.account}
             />
           case 'erc_4337':
             return <ExpandableRowView
               key={i}
               title="Smart Contract Wallet"
-              accounts={claim.accounts}
+              accounts={scope.accounts}
               source='Smart Contract Wallet'
               titleFieldName='Wallet Name'
               addressFieldName='Wallet ID'
@@ -458,7 +458,7 @@ export const ClaimsMobileView = ({ claims }: { claims: any[] }) => {
   )
 }
 // ----------------------------------------------------------------------- PC //
-export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
+export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
   const RowView = ({
     account,
     appAskedFor,
@@ -699,16 +699,16 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
 
   return (
     <>
-      {claims.map((claim, i) => {
-        switch (claim.claim) {
+      {scopes.map((scope, i) => {
+        switch (scope.claim) {
           case 'email':
             return <RowView
               key={i}
               appAskedFor='Email'
-              whatsBeingShared={claim.address}
-              sourceOfData={claim.address}
+              whatsBeingShared={scope.address}
+              sourceOfData={scope.address}
               sourceOfDataIcon={
-                <img src={claim.icon} className="w-5 h-5 rounded-full" />
+                <img src={scope.icon} className="w-5 h-5 rounded-full" />
               }
               dropdown={false}
             />
@@ -717,10 +717,10 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
               key={i}
               title={"Connected Accounts"}
               addressFieldName={"Address"}
-              accounts={claim.accounts}
+              accounts={scope.accounts}
               connectedAccounts={true}
             />
-          case 'openid':
+          case 'system_identifiers':
             return <RowView
               appAskedFor='System Identifiers'
               sourceOfData='Rollup Identity'
@@ -742,13 +742,13 @@ export const ClaimsWideView = ({ claims }: { claims: any[] }) => {
                 </div>
               }
               key={i}
-              account={claim.account}
+              account={scope.account}
             />
           case 'erc_4337':
             return <ExpandableRowView
               key={i}
               title="Smart Contract Wallet"
-              accounts={claim.accounts}
+              accounts={scope.accounts}
               source='Smart Contract Wallet'
               titleFieldName='Wallet Name'
               addressFieldName='Wallet ID'

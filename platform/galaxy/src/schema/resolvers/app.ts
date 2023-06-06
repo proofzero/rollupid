@@ -29,7 +29,7 @@ const appResolvers: Resolvers = {
         clientId,
       })
 
-      return scopes
+      return scopes.claimValues
     },
   },
   Mutation: {
