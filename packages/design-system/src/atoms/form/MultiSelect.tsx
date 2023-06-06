@@ -53,15 +53,25 @@ export function MultiSelect({
   const [query, setQuery] = useState('')
   const [selectedValues, setSelectedValues] = useState(selectedItems)
 
+  const sortFn = (a, b) => {
+    return selectedValues.find((val) => val.id === a.id)
+      ? selectedValues.find((val) => val.id === b.id)
+        ? 0
+        : -1
+      : 1
+  }
+
   const filterItems =
     query === ''
-      ? items
-      : items.filter((item) => {
-        return (
-          item.val.toLowerCase().includes(query.toLowerCase()) ||
-          item.id.toLowerCase().includes(query.toLowerCase())
-        )
-      })
+      ? items.sort(sortFn)
+      : items
+          .filter((item) => {
+            return (
+              item.val.toLowerCase().includes(query.toLowerCase()) ||
+              item.id.toLowerCase().includes(query.toLowerCase())
+            )
+          })
+          .sort(sortFn)
 
   return (
     <Combobox
