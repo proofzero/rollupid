@@ -20,7 +20,6 @@ workers_dev = false
 
 services = [
   { binding = "Edges", service = "edges" },
-  { binding = "Email", service = "email" },
 ]
 
 # Durable Objects
@@ -93,7 +92,6 @@ deleted_classes = ["StarbaseContract", "StarbaseUser"]
 
 services = [
   { binding = "Edges", service = "edges-dev" },
-  { binding = "Email", service = "email-dev" },
 ]
 
 durable_objects.bindings = [
@@ -120,7 +118,6 @@ DMARC_EMAIL = "cb88450cda584587bed23a9c2a2a91ea@dmarc-reports.cloudflare.net"
 
 services = [
   { binding = "Edges", service = "edges-next" },
-  { binding = "Email", service = "email-next" },
 ]
 
 durable_objects.bindings = [
@@ -147,7 +144,6 @@ DMARC_EMAIL = "cb88450cda584587bed23a9c2a2a91ea@dmarc-reports.cloudflare.net"
 
 services = [
   { binding = "Edges", service = "edges-current" },
-  { binding = "Email", service = "email-current" },
 ]
 
 durable_objects.bindings = [

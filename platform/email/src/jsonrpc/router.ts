@@ -10,10 +10,6 @@ import {
   sendOTPEmailMethodInput,
 } from './methods/sendOTPEmail'
 import { Context } from '../context'
-import {
-  GetDNSSecurityValuesSchema,
-  getDNSSecurityValues,
-} from './methods/getDNSSecurityValues'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -24,9 +20,4 @@ export const appRouter = t.router({
     .input(sendOTPEmailMethodInput)
     .output(sendOTPEmailMethodOutput)
     .mutation(sendEmailNotificationMethod),
-  getDNSSecurityValues: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .output(GetDNSSecurityValuesSchema)
-    .query(getDNSSecurityValues),
 })

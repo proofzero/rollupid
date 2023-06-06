@@ -157,7 +157,6 @@ export const getExpectedCustomDomainDNSRecords = async (
   passportUrl: string,
   ctx: Context
 ): Promise<CustomDomainDNSRecords> => {
-  const emailDNSSecurityValues = await ctx.email.getDNSSecurityValues.query()
   const parsedHostname = parse(customHostname)
   const result: CustomDomainDNSRecords = []
 
@@ -170,26 +169,26 @@ export const getExpectedCustomDomainDNSRecords = async (
   result.push({
     record_type: 'TXT',
     name: customHostname,
-    expected_value: `v=spf1 include:${emailDNSSecurityValues.spfHost} ~all`,
+    expected_value: `v=spf1 include:${ctx.SPF_HOST} ~all`,
   })
 
   result.push({
     record_type: 'TXT',
-    name: `${emailDNSSecurityValues.dkimSelector}._domainkey.${customHostname}`,
-    expected_value: `v=DKIM1; p=${emailDNSSecurityValues.dkimPublicKey}`,
+    name: `${ctx.INTERNAL_DKIM_SELECTOR}._domainkey.${customHostname}`,
+    expected_value: `v=DKIM1; p=${ctx.DKIM_PUBLIC_KEY}`,
   })
 
   result.push({
     record_type: 'TXT',
     name: `_dmarc.${parsedHostname.domain}`,
-    expected_value: `v=DMARC1; p=quarantine; sp=quarantine; rua=mailto:${emailDNSSecurityValues.dmarcEmail}`,
+    expected_value: `v=DMARC1; p=quarantine; sp=quarantine; rua=mailto:${ctx.DMARC_EMAIL}`,
   })
 
   if (parsedHostname.subdomain) {
     result.push({
       record_type: 'TXT',
       name: `_dmarc.${customHostname}`,
-      expected_value: `v=DMARC1; p=quarantine; rua=mailto:${emailDNSSecurityValues.dmarcEmail}`,
+      expected_value: `v=DMARC1; p=quarantine; rua=mailto:${ctx.DMARC_EMAIL}`,
     })
   }
 
