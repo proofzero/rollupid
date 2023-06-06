@@ -467,10 +467,6 @@ export default function Authorize() {
       }
     }
 
-    if (requestedScope.includes("openid")) {
-      personaData.openid = true
-    }
-
     // TODO: Everything should be a form field now handled by javascript
     // This helps keeps things generic has if a form input is not present
     // it doesn't end up being submitted
