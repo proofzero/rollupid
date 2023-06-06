@@ -2,13 +2,13 @@ import { BaseContext, DeploymentMetadata } from '@proofzero/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { Environment } from '../types'
 import createEdgesClient from '@proofzero/platform-clients/edges'
+import createEmailClient from '@proofzero/platform-clients/email'
 import { AccountURN } from '@proofzero/urns/account'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import { ApplicationURN } from '@proofzero/urns/application'
 import {
   generateTraceContextHeaders,
   generateTraceSpan,
-  TraceSpan,
 } from '@proofzero/platform-middleware/trace'
 
 /**
@@ -22,6 +22,8 @@ interface CreateInnerContextOptions
   StarbaseApp: DurableObjectNamespace
   Edges: Fetcher
   edges?: ReturnType<typeof createEdgesClient>
+  Email: Fetcher
+  email?: ReturnType<typeof createEmailClient>
   accountURN?: AccountURN
   ownAppURNs?: ApplicationURN[]
   apiKey?: string
@@ -44,9 +46,14 @@ export async function createContextInner(opts: CreateInnerContextOptions) {
     opts.Edges,
     generateTraceContextHeaders(traceSpan)
   )
+  const email = createEmailClient(
+    opts.Email,
+    generateTraceContextHeaders(traceSpan)
+  )
   return {
     ...opts,
     edges,
+    email,
     traceSpan,
   }
 }

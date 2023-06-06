@@ -13,7 +13,6 @@ services = [
   { binding = "Starbase", service = "starbase" },
   { binding = "Images", service = "images" },
   { binding = "Account", service = "account" },
-  { binding = "Email", service = "email" },
 ]
 
 # development
@@ -61,7 +60,6 @@ services = [
   { binding = "Starbase", service = "starbase-dev" },
   { binding = "Images", service = "images-dev" },
   { binding = "Account", service = "account-dev" },
-  { binding = "Email", service = "email-dev" },
 ]
 
 
@@ -91,7 +89,6 @@ services = [
   { binding = "Starbase", service = "starbase-next" },
   { binding = "Images", service = "images-next" },
   { binding = "Account", service = "account-next" },
-  { binding = "Email", service = "email-next" },
 ]
 
 # kv_namespaces = [
@@ -123,7 +120,6 @@ services = [
   { binding = "Starbase", service = "starbase-current", environment = "production" },
   { binding = "Images", service = "images-current" },
   { binding = "Account", service = "account-current" },
-  { binding = "Email", service = "email-current" },
 ]
 
 # kv_namespaces = [

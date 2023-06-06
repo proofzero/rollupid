@@ -108,7 +108,7 @@ export const CustomDomainDNSRecordsSchema = z.array(
     name: z.string(),
     record_type: z.union([z.literal('TXT'), z.literal('CNAME')]),
     expected_value: z.string(),
-    value: z.string().optional().nullable(),
+    value: z.array(z.string()).optional(),
   })
 )
 

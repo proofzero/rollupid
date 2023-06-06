@@ -283,7 +283,7 @@ export default class StarbaseApp extends DOProxy {
     if (
       customDomain.status === 'active' &&
       customDomain.ssl.status === 'active' &&
-      stored.dns_records.every((rec) => rec.value === rec.expected_value)
+      stored.dns_records.every((rec) => rec.value?.includes(rec.expected_value))
     )
       return this.unsetCustomDomainAlarm()
 

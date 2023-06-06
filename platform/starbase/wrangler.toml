@@ -18,7 +18,10 @@ workers_dev = false
 # -----------------------------------------------------------------------------
 # A list of other Clouflare services bound to this service.
 
-services = [{ binding = "Edges", service = "edges" }]
+services = [
+  { binding = "Edges", service = "edges" },
+  { binding = "Email", service = "email" },
+]
 
 # Durable Objects
 # -----------------------------------------------------------------------------
@@ -85,7 +88,10 @@ deleted_classes = ["StarbaseContract", "StarbaseUser"]
 
 [env.dev]
 
-services = [{ binding = "Edges", service = "edges-dev" }]
+services = [
+  { binding = "Edges", service = "edges-dev" },
+  { binding = "Email", service = "email-dev" },
+]
 
 durable_objects.bindings = [
   { name = "StarbaseApp", class_name = "StarbaseApplication" },
@@ -106,7 +112,10 @@ INTERNAL_PASSPORT_SERVICE_NAME = "passport-dev"
 
 [env.next]
 
-services = [{ binding = "Edges", service = "edges-next" }]
+services = [
+  { binding = "Edges", service = "edges-next" },
+  { binding = "Email", service = "email-next" },
+]
 
 durable_objects.bindings = [
   { name = "StarbaseApp", class_name = "StarbaseApplication" },
@@ -127,7 +136,10 @@ INTERNAL_PASSPORT_SERVICE_NAME = "passport-next"
 
 [env.current]
 
-services = [{ binding = "Edges", service = "edges-current" }]
+services = [
+  { binding = "Edges", service = "edges-current" },
+  { binding = "Email", service = "email-current" },
+]
 
 durable_objects.bindings = [
   { name = "StarbaseApp", class_name = "StarbaseApplication" },

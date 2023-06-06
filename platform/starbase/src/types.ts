@@ -24,6 +24,7 @@ export interface Environment {
   ServiceDeploymentMetadata: DeploymentMetadata
   StarbaseApp: DurableObjectNamespace
   Edges: Fetcher
+  Email: Fetcher
   INTERNAL_PASSPORT_SERVICE_NAME: string
   INTERNAL_CLOUDFLARE_ZONE_ID: string
   TOKEN_CLOUDFLARE_API: string

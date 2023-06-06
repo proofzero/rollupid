@@ -1,5 +1,7 @@
 import { InternalServerError } from '@proofzero/errors'
 import { CustomDomain, CustomDomainDNSRecords } from '../types'
+import { Context } from '../jsonrpc/context'
+import { parse } from 'tldts'
 
 const API_URL = 'https://api.cloudflare.com/client/v4'
 
@@ -150,17 +152,46 @@ export const deleteWorkerRoute = async (
   )
 }
 
-export const getExpectedCustomDomainDNSRecords = (
+export const getExpectedCustomDomainDNSRecords = async (
   customHostname: string,
-  passportUrl: string
-): CustomDomainDNSRecords => {
+  passportUrl: string,
+  ctx: Context
+): Promise<CustomDomainDNSRecords> => {
+  const emailDNSSecurityValues = await ctx.email.getDNSSecurityValues.query()
+  const parsedHostname = parse(customHostname)
   const result: CustomDomainDNSRecords = []
 
-  //Add other expected DNS records here, eg. DMARC, SPF, DKIM, etc
   result.push({
     name: customHostname,
     record_type: 'CNAME',
     expected_value: passportUrl,
   })
+
+  result.push({
+    record_type: 'TXT',
+    name: customHostname,
+    expected_value: `v=spf1 include:${emailDNSSecurityValues.spfHost} ~all`,
+  })
+
+  result.push({
+    record_type: 'TXT',
+    name: `${emailDNSSecurityValues.dkimSelector}._domainkey.${customHostname}`,
+    expected_value: `v=DKIM1; p=${emailDNSSecurityValues.dkimPublicKey}`,
+  })
+
+  result.push({
+    record_type: 'TXT',
+    name: `_dmarc.${parsedHostname.domain}`,
+    expected_value: `v=DMARC1; p=quarantine; sp=quarantine; rua=mailto:${emailDNSSecurityValues.dmarcEmail}`,
+  })
+
+  if (parsedHostname.subdomain) {
+    result.push({
+      record_type: 'TXT',
+      name: `_dmarc.${customHostname}`,
+      expected_value: `v=DMARC1; p=quarantine; rua=mailto:${emailDNSSecurityValues.dmarcEmail}`,
+    })
+  }
+
   return result
 }
