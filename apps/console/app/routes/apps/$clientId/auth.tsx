@@ -435,7 +435,7 @@ export default function AppDetailIndexPage() {
                     <div className="sm:mb-[1.755rem]" />
                   </div>
 
-                  <div className="flex-1">
+                  <div className="flex-1 lg:max-w-[50vw] max-w-full">
                     <MultiSelect
                       label="Allowed scope*"
                       disabled={false}
@@ -467,7 +467,7 @@ export default function AppDetailIndexPage() {
                           experimental: value.experimental,
                         }
                       })}
-                      selectedItems={appDetails.app.scopes?.map((scope) => {
+                      preselectedItems={appDetails.app.scopes?.map((scope) => {
                         const meta = scopeMeta[scope]
                         return {
                           id: scope,

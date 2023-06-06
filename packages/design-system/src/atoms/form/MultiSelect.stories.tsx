@@ -25,7 +25,7 @@ export default {
 }
 
 const Template = (args) => (
-  <div className='w-[465px]'>
+  <div className='w-[500px]'>
     <MultiSelect {...args} />
   </div>
 )
