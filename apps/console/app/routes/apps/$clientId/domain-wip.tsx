@@ -319,17 +319,19 @@ const DNSRecord = ({ title, validated, name, value, type }: DNSRecordProps) => {
               >
                 {name}
               </Text>
-              <Copier
-                value={name}
-                color="text-gray-500"
-                onCopy={() =>
-                  toast(
-                    ToastType.Success,
-                    { message: `${title} ${type} name copied to clipboard!` },
-                    { duration: 2000 }
-                  )
-                }
-              />
+              <div>
+                <Copier
+                  value={name}
+                  color="text-gray-500"
+                  onCopy={() =>
+                    toast(
+                      ToastType.Success,
+                      { message: `${title} ${type} name copied to clipboard!` },
+                      { duration: 2000 }
+                    )
+                  }
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -347,17 +349,19 @@ const DNSRecord = ({ title, validated, name, value, type }: DNSRecordProps) => {
             >
               {value}
             </Text>
-            <Copier
-              value={value}
-              color="text-gray-500"
-              onCopy={() =>
-                toast(
-                  ToastType.Success,
-                  { message: `${title} ${type} value copied to clipboard!` },
-                  { duration: 2000 }
-                )
-              }
-            />
+            <div>
+              <Copier
+                value={value}
+                color="text-gray-500"
+                onCopy={() =>
+                  toast(
+                    ToastType.Success,
+                    { message: `${title} ${type} value copied to clipboard!` },
+                    { duration: 2000 }
+                  )
+                }
+              />
+            </div>
           </div>
         </div>
       </div>
