@@ -2,7 +2,6 @@ import { AddressURNSpace } from '@proofzero/urns/address'
 import type { AddressURN } from '@proofzero/urns/address'
 import type { AccountURN } from '@proofzero/urns/account'
 
-import { JsonError } from '@proofzero/utils/errors'
 import { GrantType, ResponseType } from '@proofzero/types/access'
 
 import {
@@ -13,6 +12,7 @@ import {
 import {
   createUserSession,
   getAuthzCookieParamsSession,
+  getUserSession,
   parseJwt,
 } from '~/session.server'
 import { generateGradient } from './gradient.server'
@@ -40,15 +40,25 @@ export const authenticateAddress = async (
     })
   }
 
+  const jwt = await getUserSession(request, env, appData?.clientId)
   if (
     appData.rollup_action &&
     ['connect', 'reconnect'].includes(appData?.rollup_action)
   ) {
+    let result = undefined
+
+    if (existing && appData.rollup_action === 'connect') {
+      const loggedInAccount = parseJwt(jwt).sub
+      if (account !== loggedInAccount) {
+        result = 'ACCOUNT_CONNECT_ERROR'
+      } else {
+        result = 'ALREADY_CONNECTED_ERROR'
+      }
+    }
+
     const redirectURL = getAuthzRedirectURL(
       appData,
-      existing && appData.rollup_action === 'connect'
-        ? 'ALREADY_CONNECTED'
-        : undefined
+      result
     )
 
     return redirect(redirectURL)

@@ -128,7 +128,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  useConnectResult(['SUCCESS', 'ALREADY_CONNECTED', 'CANCEL'])
+  useConnectResult()
 
   const submit = useSubmit()
 
