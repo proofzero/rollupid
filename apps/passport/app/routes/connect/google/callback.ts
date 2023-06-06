@@ -11,6 +11,8 @@ import {
   authenticateAddress,
   checkOAuthError,
 } from '~/utils/authenticate.server'
+import { redirectToCustomDomainHost } from '~/utils/connect-proxy'
+
 import type { OAuthData } from '@proofzero/platform.address/src/types'
 import { NodeType, OAuthAddressType } from '@proofzero/types/address'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
@@ -21,6 +23,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }: LoaderArgs) => {
     await checkOAuthError(request, context.env)
+    await redirectToCustomDomainHost(request, context)
 
     const appData = await getAuthzCookieParams(request, context.env)
 

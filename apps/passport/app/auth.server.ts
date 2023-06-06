@@ -34,6 +34,18 @@ export const createAuthenticatorSessionStorage = (
 }
 
 export const AUTHN_PARAMS_SESSION_KEY = 'authnParams'
+
+export const getAuthnParams = async (
+  request: Request,
+  env: Env
+): Promise<URLSearchParams> => {
+  const authenticatorStorage = createAuthenticatorSessionStorage(request, env)
+  const session = await authenticatorStorage.getSession(
+    request.headers.get('Cookie')
+  )
+  return new URLSearchParams(session.get(AUTHN_PARAMS_SESSION_KEY))
+}
+
 /**
  * Returns a custom Request and authenticator SessionStorage. Needed to hook into response
  * lifecycle that authenticator fully controls, to set custom data needed after external

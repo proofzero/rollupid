@@ -21,6 +21,8 @@ import {
   authenticateAddress,
   checkOAuthError,
 } from '~/utils/authenticate.server'
+import { redirectToCustomDomainHost } from '~/utils/connect-proxy'
+
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
 import { Authenticator } from 'remix-auth'
 import { InternalServerError } from '@proofzero/errors'
@@ -51,6 +53,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     await checkOAuthError(request, context.env)
+    await redirectToCustomDomainHost(request, context)
 
     const appData = await getAuthzCookieParams(request, context.env)
 

@@ -48,12 +48,12 @@ export type AuthenticationProps = {
   Actions?: JSX.Element
 }
 
-export default ({
+export default function Authentication({
   displayKeys,
   mapperArgs,
   Header,
   Actions,
-}: AuthenticationProps) => {
+}: AuthenticationProps) {
   displayKeys = displayKeys.filter((key) =>
     AuthenticationScreenDefaults.knownKeys.includes(key)
   )
@@ -61,7 +61,6 @@ export default ({
   const { dark, theme } = useContext(ThemeContext)
 
   return (
-
     <div className={`relative ${dark ? 'dark' : ''}`}>
       <div
         className={`flex grow-0 flex-col items-center
@@ -94,9 +93,7 @@ export default ({
                 </Text>
                 <div className="border-t border-gray-200 dark:border-gray-600 flex-1"></div>
               </div>
-              {displayKeyDisplayFn(displayKeys.slice(2), {
-                ...mapperArgs,
-              })}
+              {displayKeyDisplayFn(displayKeys.slice(2), mapperArgs)}
             </>
           )}
 
@@ -115,7 +112,6 @@ export default ({
         </div>
       </div>
     </div>
-
   )
 }
 
@@ -131,26 +127,24 @@ type DisplayKeyMapperArgs = {
   ) => void
   walletConnectErrorCallback?: (error: Error) => void
   navigate?: (URL: string) => void
-  FormWrapperEl?: ({ children, provider }) => JSX.Element
+  authnQueryParams: string
   loading?: boolean
   flex?: boolean
   displayContinueWith?: boolean
-  enableOAuthSubmit?: boolean
 }
 const displayKeyMapper = (
   key: string,
   {
     clientId,
     signData,
-    walletConnectCallback = () => { },
-    walletSignCallback = () => { },
-    walletConnectErrorCallback = () => { },
-    navigate = () => { },
-    FormWrapperEl = ({ children }) => <>{children}</>,
+    walletConnectCallback = () => {},
+    walletSignCallback = () => {},
+    walletConnectErrorCallback = () => {},
+    navigate = () => {},
+    authnQueryParams,
     loading = false,
     flex = false,
     displayContinueWith = false,
-    enableOAuthSubmit = false,
   }: DisplayKeyMapperArgs
 ) => {
   let el
@@ -183,14 +177,15 @@ const displayKeyMapper = (
       break
     default:
       el = (
-        <FormWrapperEl provider={key}>
-          <ConnectOAuthButton
-            provider={key as OAuthProvider}
-            fullSize={flex}
-            displayContinueWith={displayContinueWith}
-            submit={enableOAuthSubmit}
-          />
-        </FormWrapperEl>
+        <ConnectOAuthButton
+          provider={key as OAuthProvider}
+          fullSize={flex}
+          displayContinueWith={displayContinueWith}
+          onClick={() => {
+            const search = authnQueryParams ? `?${authnQueryParams}` : ''
+            window.location.href = `/connect/${key}${search}`
+          }}
+        />
       )
   }
 

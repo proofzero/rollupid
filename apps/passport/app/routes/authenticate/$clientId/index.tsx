@@ -201,17 +201,7 @@ const InnerComponent = ({
         clientId,
         signData,
         navigate,
-        FormWrapperEl: ({ children, provider }) => (
-          <Form
-            className="w-full"
-            action={`/connect/${provider}?${authnQueryParams}`}
-            method="post"
-            key={provider}
-          >
-            {children}
-          </Form>
-        ),
-        enableOAuthSubmit: true,
+        authnQueryParams,
         loading,
         walletConnectCallback: async (address) => {
           if (loading) return
