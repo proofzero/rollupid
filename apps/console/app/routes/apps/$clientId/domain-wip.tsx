@@ -13,6 +13,7 @@ import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { Copier } from '@proofzero/design-system/src/atoms/copier/Copier'
+import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 
@@ -103,8 +104,7 @@ export default () => {
   const fetcher = useFetcher()
   const actionData = useActionData<AppData>()
   const loaderData = useLoaderData<AppData>()
-  const { customDomain, hostname } =
-    fetcher.data || actionData || loaderData
+  const { customDomain, hostname } = fetcher.data || actionData || loaderData
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>()
 
   useEffect(() => {
@@ -116,6 +116,7 @@ export default () => {
 
   return (
     <section className="flex flex-col space-y-5">
+      {fetcher.state === 'submitting' && <Loader />}
       <div className="flex flex-row">
         <div className="flex flex-row items-center space-x-3">
           <Text size="2xl" weight="semibold" className="text-gray-900">
