@@ -28,9 +28,6 @@ interface CreateInnerContextOptions
   INTERNAL_CLOUDFLARE_ZONE_ID: string
   TOKEN_CLOUDFLARE_API: string
   INTERNAL_DKIM_SELECTOR: string
-  SPF_HOST: string
-  DKIM_PUBLIC_KEY: string
-  DMARC_EMAIL: string
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
