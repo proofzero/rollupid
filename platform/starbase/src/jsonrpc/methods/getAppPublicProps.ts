@@ -42,8 +42,8 @@ export const getAppPublicProps = async ({
           customDomain?.status === 'active' &&
           customDomain?.ssl.status === 'active' &&
           Boolean(
-            customDomain?.dns_records?.every(
-              (r) => r.expected_value === r.value
+            customDomain?.dns_records?.every((r) =>
+              r.value?.includes(r.expected_value)
             )
           ),
       },

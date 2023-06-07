@@ -25,10 +25,7 @@ import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
-import {
-  getAuthzHeaderConditionallyFromToken,
-  getDNSRecordValue,
-} from '@proofzero/utils'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 import type { CustomDomain } from '@proofzero/platform.starbase/src/types'
@@ -37,6 +34,7 @@ import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { requireJWT } from '~/utilities/session.server'
 
 import dangerVector from '~/images/danger.svg'
+
 type AppData = { customDomain?: CustomDomain; hostname: string; cname: string }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -55,6 +53,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const { hostname } = new URL(PASSPORT_URL)
+
     return json({ customDomain, hostname })
   }
 )
@@ -185,7 +184,9 @@ const HostnameStatus = ({
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const isPreValidated =
     customDomain.status === 'active' && customDomain.ssl.status === 'active'
-  const isValidated = isPreValidated && customDomain.dns_records.every(r => r.value === r.expected_value)
+  const isValidated =
+    isPreValidated &&
+    customDomain.dns_records.every((r) => r.value?.includes(r.expected_value))
   const bgStatusColor = isValidated ? 'bg-green-600' : 'bg-orange-500'
   const textStatusColor = isValidated ? 'text-green-600' : 'text-orange-500'
   const statusText = isValidated ? 'Validated' : 'Not Validated'
@@ -247,6 +248,7 @@ const HostnameStatus = ({
                 customDomain.ssl.validation_records?.[0].txt_value ||
                 'Setting up...'
               }
+              disableCopier={customDomain.ssl.status === 'active'}
             />
             <DNSRecord
               title="Hostname pre-validation"
@@ -258,6 +260,7 @@ const HostnameStatus = ({
               value={
                 customDomain.ownership_verification?.value || 'Setting up...'
               }
+              disableCopier={customDomain.status === 'active'}
             />
           </div>
 
@@ -265,15 +268,17 @@ const HostnameStatus = ({
             Step 2: CNAME Record
           </Text>
           <div className="flex flex-col p-4 space-y-5 box-border border rounded-lg">
-            {isPreValidated && Array.from(customDomain.dns_records || []).map((r) => (
-              <DNSRecord
-                title={r.record_type === 'CNAME' ? '' : r.name}
-                type={r.record_type}
-                validated={r.value === r.expected_value}
-                value={r.expected_value}
-                key={r.expected_value}
-              />
-            ))}
+            {isPreValidated &&
+              Array.from(customDomain.dns_records || []).map((r) => (
+                <DNSRecord
+                  name={r.name}
+                  title={''}
+                  type={r.record_type}
+                  validated={r.value?.includes(r.expected_value) ?? false}
+                  value={r.expected_value}
+                  key={r.expected_value}
+                />
+              ))}
             {!isPreValidated && (
               <div className="flex flex-row p-4 space-x-4 bg-gray-50">
                 <TbInfoCircle size={20} className="text-gray-500 shrink-0" />
@@ -297,9 +302,10 @@ type DNSRecordProps = {
   name?: string
   value: string
   type: 'TXT' | 'CNAME'
+  disableCopier?: boolean
 }
 
-const DNSRecord = ({ title, validated, name, value, type }: DNSRecordProps) => {
+const DNSRecord = ({ title, validated, name, value, type, disableCopier = false }: DNSRecordProps) => {
   const statusColor = validated ? 'bg-green-600' : 'bg-orange-500'
   return (
     <div className="flex flex-row flex-wrap space-x-4">
@@ -320,7 +326,7 @@ const DNSRecord = ({ title, validated, name, value, type }: DNSRecordProps) => {
               >
                 {name}
               </Text>
-              <div>
+              {!disableCopier && <div>
                 <Copier
                   value={name}
                   color="text-gray-500"
@@ -332,7 +338,7 @@ const DNSRecord = ({ title, validated, name, value, type }: DNSRecordProps) => {
                     )
                   }
                 />
-              </div>
+              </div>}
             </div>
           </div>
         </div>
@@ -350,7 +356,7 @@ const DNSRecord = ({ title, validated, name, value, type }: DNSRecordProps) => {
             >
               {value}
             </Text>
-            <div>
+            {!disableCopier && <div>
               <Copier
                 value={value}
                 color="text-gray-500"
@@ -362,7 +368,7 @@ const DNSRecord = ({ title, validated, name, value, type }: DNSRecordProps) => {
                   )
                 }
               />
-            </div>
+            </div>}
           </div>
         </div>
       </div>

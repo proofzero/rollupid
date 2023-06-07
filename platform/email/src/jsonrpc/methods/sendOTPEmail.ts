@@ -79,6 +79,7 @@ export const sendEmailNotificationMethod = async ({
   let customSender: NotificationSender
   if (input.themeProps?.hostname) {
     customSender = {
+      hostname: input.themeProps.hostname,
       address: `no-reply@${input.themeProps.hostname}`,
       name: input.themeProps.appName,
     }

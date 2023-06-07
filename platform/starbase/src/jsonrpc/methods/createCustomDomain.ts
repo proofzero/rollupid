@@ -55,9 +55,10 @@ export const createCustomDomain: CreateCustomDomainMethod = async ({
     )
     const customDomain: CustomDomain = {
       ...customHostname,
-      dns_records: getExpectedCustomDomainDNSRecords(
+      dns_records: await getExpectedCustomDomainDNSRecords(
         customHostname.hostname,
-        input.passportHostname
+        input.passportHostname,
+        ctx
       ),
     }
     const node = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)

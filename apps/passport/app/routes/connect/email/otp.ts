@@ -66,13 +66,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           appName: appProps.name,
         }
 
-        // Commented out because
-        // we need to figure out DKIM
-        // for custom domains
-        // https://github.com/proofzero/rollupid/issues/2326
-        // if (customDomain) {
-        //   themeProps.hostname = customDomain.hostname
-        // }
+        if (customDomain) {
+          themeProps.hostname = customDomain.hostname
+        }
       }
 
       const state = await addressClient.generateEmailOTP.mutate({

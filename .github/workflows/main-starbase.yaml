@@ -51,7 +51,9 @@ jobs:
           secrets: |
             INTERNAL_CLOUDFLARE_ZONE_ID
             TOKEN_CLOUDFLARE_API
+            INTERNAL_DKIM_SELECTOR
         env:
           NODE_ENV: 'development'
           INTERNAL_CLOUDFLARE_ZONE_ID: ${{ secrets.INTERNAL_CLOUDFLARE_ZONE_ID }}
           TOKEN_CLOUDFLARE_API: ${{ secrets.TOKEN_CLOUDFLARE_API }}
+          INTERNAL_DKIM_SELECTOR: ${{ secrets.INTERNAL_DKIM_SELECTOR }}

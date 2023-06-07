@@ -8,7 +8,6 @@ import { ApplicationURN } from '@proofzero/urns/application'
 import {
   generateTraceContextHeaders,
   generateTraceSpan,
-  TraceSpan,
 } from '@proofzero/platform-middleware/trace'
 
 /**
@@ -28,6 +27,7 @@ interface CreateInnerContextOptions
   INTERNAL_PASSPORT_SERVICE_NAME: string
   INTERNAL_CLOUDFLARE_ZONE_ID: string
   TOKEN_CLOUDFLARE_API: string
+  INTERNAL_DKIM_SELECTOR: string
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.

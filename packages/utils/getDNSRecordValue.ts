@@ -3,7 +3,7 @@ import * as dnsPacket from '@dnsquery/dns-packet'
 export default async function (
   domain: string,
   recordType: 'TXT' | 'CNAME'
-): Promise<string | null> {
+): Promise<string[] | undefined> {
   function getRandomInt(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min
   }
@@ -32,14 +32,21 @@ export default async function (
 
   const responseBuffer = new Uint8Array(await dnsQuery.arrayBuffer())
   const packet = dnsPacket.decode(responseBuffer)
-  if (!packet.answers || !packet.answers.length) return null
+  if (!packet.answers || !packet.answers.length) return undefined
 
-  //We take only the first answer as if we're being specific enough with the
-  //domain, there should only be one
-  const response = packet.answers[0]
-  const recValue =
-    response.type === 'TXT'
-      ? new TextDecoder().decode((response.data as Buffer[])[0])
-      : (response.data as string)
-  return recValue
+  const td = new TextDecoder()
+  const values = packet.answers.map((a) => {
+    if (a.type === 'TXT') {
+      const strParts = []
+      for (const data of a.data) {
+        strParts.push(td.decode(data as Buffer))
+      }
+
+      return strParts.join('')
+    }
+
+    return a.data as string
+  })
+
+  return values
 }

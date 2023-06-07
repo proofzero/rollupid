@@ -1,5 +1,6 @@
 import { InternalServerError } from '@proofzero/errors'
 import { CustomDomain, CustomDomainDNSRecords } from '../types'
+import { Context } from '../jsonrpc/context'
 
 const API_URL = 'https://api.cloudflare.com/client/v4'
 
@@ -150,17 +151,30 @@ export const deleteWorkerRoute = async (
   )
 }
 
-export const getExpectedCustomDomainDNSRecords = (
+export const getExpectedCustomDomainDNSRecords = async (
   customHostname: string,
-  passportUrl: string
-): CustomDomainDNSRecords => {
+  passportUrl: string,
+  ctx: Context
+): Promise<CustomDomainDNSRecords> => {
   const result: CustomDomainDNSRecords = []
 
-  //Add other expected DNS records here, eg. DMARC, SPF, DKIM, etc
   result.push({
     name: customHostname,
     record_type: 'CNAME',
     expected_value: passportUrl,
   })
+
+  result.push({
+    record_type: 'CNAME',
+    name: `${ctx.INTERNAL_DKIM_SELECTOR}._domainkey.${customHostname}`,
+    expected_value: `${ctx.INTERNAL_DKIM_SELECTOR}._domainkey.notifications.rollup.id`,
+  })
+
+  result.push({
+    record_type: 'CNAME',
+    name: `_dmarc.${customHostname}`,
+    expected_value: `_dmarc.notifications.rollup.id`,
+  })
+
   return result
 }
