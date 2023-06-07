@@ -248,6 +248,7 @@ const HostnameStatus = ({
                 customDomain.ssl.validation_records?.[0].txt_value ||
                 'Setting up...'
               }
+              disableCopier={customDomain.ssl.status === 'active'}
             />
             <DNSRecord
               title="Hostname pre-validation"
@@ -259,6 +260,7 @@ const HostnameStatus = ({
               value={
                 customDomain.ownership_verification?.value || 'Setting up...'
               }
+              disableCopier={customDomain.status === 'active'}
             />
           </div>
 
@@ -269,7 +271,7 @@ const HostnameStatus = ({
             {isPreValidated &&
               Array.from(customDomain.dns_records || []).map((r) => (
                 <DNSRecord
-                  name={r.record_type !== 'CNAME' ? r.name : undefined}
+                  name={r.name}
                   title={''}
                   type={r.record_type}
                   validated={r.value?.includes(r.expected_value) ?? false}
@@ -300,9 +302,10 @@ type DNSRecordProps = {
   name?: string
   value: string
   type: 'TXT' | 'CNAME'
+  disableCopier?: boolean
 }
 
-const DNSRecord = ({ title, validated, name, value, type }: DNSRecordProps) => {
+const DNSRecord = ({ title, validated, name, value, type, disableCopier = false }: DNSRecordProps) => {
   const statusColor = validated ? 'bg-green-600' : 'bg-orange-500'
   return (
     <div className="flex flex-row flex-wrap space-x-4">
@@ -323,7 +326,7 @@ const DNSRecord = ({ title, validated, name, value, type }: DNSRecordProps) => {
               >
                 {name}
               </Text>
-              <div>
+              {!disableCopier && <div>
                 <Copier
                   value={name}
                   color="text-gray-500"
@@ -335,7 +338,7 @@ const DNSRecord = ({ title, validated, name, value, type }: DNSRecordProps) => {
                     )
                   }
                 />
-              </div>
+              </div>}
             </div>
           </div>
         </div>
@@ -353,7 +356,7 @@ const DNSRecord = ({ title, validated, name, value, type }: DNSRecordProps) => {
             >
               {value}
             </Text>
-            <div>
+            {!disableCopier && <div>
               <Copier
                 value={value}
                 color="text-gray-500"
@@ -365,7 +368,7 @@ const DNSRecord = ({ title, validated, name, value, type }: DNSRecordProps) => {
                   )
                 }
               />
-            </div>
+            </div>}
           </div>
         </div>
       </div>
