@@ -45,16 +45,14 @@ export type MultiSelectProps = {
 const ComboboxItem = ({ item, selected }) => {
   return (
     <div
-      className={`flex flex-row items-start justify-start rounded-lg p-2 ${
-        selected ? 'bg-gray-100 w-full' : ''
-      }`}
+      className={`flex flex-row items-start justify-start rounded-lg p-2 ${selected ? 'bg-gray-100 w-full' : ''
+        }`}
     >
       <input
         type="checkbox"
         className={`rounded mr-2 mt-1 text-indigo-500
-                            border-gray-300 ${
-                              item.disabled ? 'bg-gray-300' : ''
-                            }`}
+                            border-gray-300 ${item.disabled ? 'bg-gray-300' : ''
+          }`}
         checked={selected}
       ></input>
       <div>
@@ -155,11 +153,11 @@ export function MultiSelect({
     query === ''
       ? items
       : items.filter((item) => {
-          return (
-            item.val.toLowerCase().includes(query.toLowerCase()) ||
-            item.id.toLowerCase().includes(query.toLowerCase())
-          )
-        })
+        return (
+          item.val.toLowerCase().includes(query.toLowerCase()) ||
+          item.id.toLowerCase().includes(query.toLowerCase())
+        )
+      })
 
   const [selectedFilteredItems, notSelectedFilteredItems] = filterItems.reduce(
     ([selected, notSelected], item) => {
@@ -202,11 +200,9 @@ export function MultiSelect({
           <div className={`relative mt-1`}>
             <Combobox.Button
               ref={ref}
-              className={`${
-                disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
-              } w-full block min-h-24 rounded shadow-sm border border-gray-300 ${
-                selectedItems.length ? '' : 'py-2'
-              } pl-3 pr-7
+              className={`${disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
+                } w-full block min-h-24 rounded shadow-sm border border-gray-300 ${selectedItems.length ? '' : 'py-2'
+                } pl-3 pr-7
         shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm
         flex flex-row items-center justify-start`}
               onClick={() => {
@@ -231,9 +227,8 @@ export function MultiSelect({
                           ) : null}
                           <div
                             className={`bg-indigo-50 text-gray-800 px-2 py-[3px] 
-                          ${
-                            +item.val > 1 ? '-m-6' : 'm-1'
-                          } rounded-md border border-indigo-300
+                          ${+item.val > 1 ? '-m-6' : 'm-1'
+                              } rounded-md border border-indigo-300
                           z-998 flex flex-row items-center
                           justify-start gap-x-1`}
                           >
@@ -286,9 +281,8 @@ export function MultiSelect({
               <div>
                 <div className="flex flex-row items-center min-w-full">
                   <Combobox.Input
-                    className={`${
-                      disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
-                    } truncate w-full pl-3 py-2 rounded-md border-none sm:text-sm focus-none focus:ring-0`}
+                    className={`${disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
+                      } truncate w-full pl-3 py-2 rounded-md border-none sm:text-sm focus-none focus:ring-0`}
                     onChange={(event) => {
                       setQuery(event.target.value)
                     }}
@@ -312,10 +306,11 @@ export function MultiSelect({
                     </div>
                   ) : null}
                 </div>
-                {filterItems ? (
-                  <>
-                    {selectedFilteredItems.length
-                      ? selectedFilteredItems.map((item) => (
+                {
+                  filterItems ? (
+                    <>
+                      {selectedFilteredItems.length
+                        ? selectedFilteredItems.map((item) => (
                           <Combobox.Option
                             key={item.id}
                             value={item}
@@ -332,10 +327,10 @@ export function MultiSelect({
                             )}
                           </Combobox.Option>
                         ))
-                      : null}
+                        : null}
 
-                    {notSelectedFilteredItems.length
-                      ? notSelectedFilteredItems.map((item) => (
+                      {notSelectedFilteredItems.length
+                        ? notSelectedFilteredItems.map((item) => (
                           <Combobox.Option
                             key={item.id}
                             value={item}
@@ -352,16 +347,18 @@ export function MultiSelect({
                             )}
                           </Combobox.Option>
                         ))
-                      : null}
-                  </>
-                ) : (
-                  <div className="p-2 px-5 ">No items found</div>
-                )}
-              </div>
-            </Combobox.Options>
-          </div>
+                        : null}
+                    </>
+                  ) : (
+                    <div className="p-2 px-5 ">No items found</div>
+                  )
+                }
+              </div >
+            </Combobox.Options >
+          </div >
         </>
-      )}
-    </Combobox>
+      )
+      }
+    </Combobox >
   )
 }

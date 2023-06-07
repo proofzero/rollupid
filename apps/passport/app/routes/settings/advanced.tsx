@@ -171,7 +171,7 @@ const DeleteRollupIdentityModal = ({
               <Button
                 btnType="secondary-alt"
                 onClick={() => setIsOpen(false)}
-                className="bg-gray-100"
+                className="bg-gray-100 hover:bg-gray-200"
               >
                 Developer Console
               </Button>
@@ -180,7 +180,7 @@ const DeleteRollupIdentityModal = ({
             <Button
               btnType="secondary-alt"
               onClick={() => setIsOpen(false)}
-              className="bg-gray-100"
+              className="bg-gray-100 hover:bg-gray-200"
             >
               Cancel
             </Button>

@@ -39,4 +39,4 @@ export const typeToColorsDict = {
 }
 
 export const disabledColorClasses =
-  'bg-[#f3f4f6] text-[#d1d5db] dark:text-gray-600 dark:bg-gray-800 dark:border-gray-700 border'
+  'bg-[#f3f4f6] text-[#d1d5db] dark:text-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 border'
