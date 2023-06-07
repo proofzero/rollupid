@@ -52,17 +52,18 @@ export type EmailTemplateParams = {
   contactURL?: string
   termsURL: string
   privacyURL: string
+  appName: string
 }
 
 export const EmailTemplate = (
   passcode: string,
   params: EmailTemplateParams
 ): EmailContent => {
-  const { logoURL, address, contactURL, termsURL, privacyURL } = params
+  const { logoURL, address, contactURL, termsURL, privacyURL, appName } = params
 
   return {
     contentType: 'text/html',
-    subject: `Your Rollup ID one-time passcode`,
+    subject: `Your ${appName ?? `Rollup ID`} one-time passcode`,
     body: `<!DOCTYPE html>
     <html>
       <head>
@@ -192,9 +193,8 @@ export const EmailTemplate = (
                 rel="noreferrer"
                 >Privacy Policy</a
               >
-              ${
-                contactURL && contactURL !== ''
-                  ? `
+              ${contactURL && contactURL !== ''
+        ? `
               <div class="vl"></div>
               <a
                 class="footer-links"
@@ -203,13 +203,12 @@ export const EmailTemplate = (
                 rel="noreferrer"
                 >Contact Us</a
               >`
-                  : ''
-              }
+        : ''
+      }
             </div>
     
-            ${
-              address && address !== ''
-                ? `
+            ${address && address !== ''
+        ? `
             <pre
               style="
                 font-size: 12px;
@@ -219,8 +218,8 @@ export const EmailTemplate = (
                 margin-top: 10px;
               "
             >${address}</pre>`
-                : ''
-            }
+        : ''
+      }
             <p
               style="
                 font-size: 12px;
