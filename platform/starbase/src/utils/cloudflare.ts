@@ -167,30 +167,16 @@ export const getExpectedCustomDomainDNSRecords = async (
   })
 
   result.push({
-    record_type: 'TXT',
-    name: customHostname,
-    expected_value: `v=spf1 include:${ctx.SPF_HOST} ~all`,
-  })
-
-  result.push({
-    record_type: 'TXT',
+    record_type: 'CNAME',
     name: `${ctx.INTERNAL_DKIM_SELECTOR}._domainkey.${customHostname}`,
-    expected_value: `v=DKIM1; p=${ctx.DKIM_PUBLIC_KEY}`,
+    expected_value: `${ctx.INTERNAL_DKIM_SELECTOR}._domainkey.notifications.rollup.id`,
   })
 
   result.push({
-    record_type: 'TXT',
-    name: `_dmarc.${parsedHostname.domain}`,
-    expected_value: `v=DMARC1; p=quarantine; sp=quarantine; rua=mailto:${ctx.DMARC_EMAIL}`,
+    record_type: 'CNAME',
+    name: `_dmarc.${customHostname}`,
+    expected_value: `_dmarc.notifications.rollup.id`,
   })
-
-  if (parsedHostname.subdomain) {
-    result.push({
-      record_type: 'TXT',
-      name: `_dmarc.${customHostname}`,
-      expected_value: `v=DMARC1; p=quarantine; rua=mailto:${ctx.DMARC_EMAIL}`,
-    })
-  }
 
   return result
 }
