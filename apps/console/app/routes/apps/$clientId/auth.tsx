@@ -675,9 +675,7 @@ export default function AppDetailIndexPage() {
               <Button
                 type="button"
                 btnType="dangerous-alt"
-                onClick={() => {
-                  setDeleteModalOpen(true)
-                }}
+                onClick={() => setDeleteModalOpen(true)}
               >
                 Delete the Application
               </Button>
