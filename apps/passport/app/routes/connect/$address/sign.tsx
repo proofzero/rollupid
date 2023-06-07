@@ -12,7 +12,7 @@ import { parseJwt } from '@proofzero/packages/utils'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import type { AccountURN } from '@proofzero/urns/account'
-import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
+import { AuthenticationScreenDefaults, appendNonceTemplate } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
 import { getStarbaseClient } from '~/platform.server'
 
@@ -51,7 +51,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     try {
       const nonce = await addressClient.getNonce.query({
         address: address as string,
-        template: signTemplate,
+        template: appendNonceTemplate(signTemplate),
         state,
         redirectUri: context.env.PASSPORT_REDIRECT_URL,
         scope: ['admin'],
