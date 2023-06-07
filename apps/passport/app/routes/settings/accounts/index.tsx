@@ -249,7 +249,7 @@ export default function AccountsLayout() {
           onClick={() => {
             requestConnectAccount()
           }}
-          btnType="primary-alt-skin"
+          btnType="primary-alt"
         >
           Connect Account
         </Button>
