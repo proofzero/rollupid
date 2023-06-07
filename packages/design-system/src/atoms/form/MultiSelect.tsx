@@ -26,7 +26,7 @@ import { ExperimentalFeaturePill } from '../pills/ExperimentalFeaturePill'
 type SelectItem = {
   id: string
   val: string
-  desc: string
+  desc?: string
   disabled?: boolean
   section?: string
   experimental?: boolean
@@ -35,6 +35,7 @@ export type MultiSelectProps = {
   label: string
   fieldName: string
   items: SelectItem[]
+  width: number
   preselectedItems?: SelectItem[]
   disabled?: boolean
   onChange?: () => void
@@ -108,10 +109,10 @@ const computeItemsToDisplay = (selectedItems, width) => {
     .forEach((item) => {
       if (
         // additional item + items left to display
-        artificialWidth + item.val.length * 10.5 + 10 + 40 <
+        artificialWidth + item.val.length * 10.5 + 10 + 42 <
         width
       ) {
-        artificialWidth += item.val.length * 10.5 + 10
+        artificialWidth += item.val.length * 10.5 + 42
         items.push(item)
       } else {
         itemsLeft += 1
@@ -135,19 +136,15 @@ export function MultiSelect({
   disabled = false,
   preselectedItems = [],
   onChange,
+  width,
   learnMore,
 }: MultiSelectProps) {
   const [query, setQuery] = useState('')
-  const [width, setWidth] = useState(0)
   const ref = useRef(null)
   const [selectedItems, setSelectedItems] = useState(preselectedItems)
   const [itemsToDisplay, setItemsToDisplay] = useState(() => {
     return computeItemsToDisplay(preselectedItems, width)
   })
-
-  useEffect(() => {
-    setWidth(ref.current.clientWidth)
-  }, [ref])
 
   useEffect(() => {
     const items = computeItemsToDisplay(selectedItems, width)
@@ -226,7 +223,7 @@ export function MultiSelect({
                             <div
                               className="bg-indigo-50 text-gray-800 px-2
                             py-[3px] m-1 rounded-md border border-indigo-300
-                            min-w-max z-998 min-w-max flex flex-row 
+                            z-998 flex flex-row 
                             items-center justify-start gap-x-1"
                             >
                               +
@@ -237,7 +234,7 @@ export function MultiSelect({
                           ${
                             +item.val > 1 ? '-m-6' : 'm-1'
                           } rounded-md border border-indigo-300
-                          min-w-max z-998 min-w-max flex flex-row items-center
+                          z-998 flex flex-row items-center
                           justify-start gap-x-1`}
                           >
                             +{item.val}
@@ -245,8 +242,10 @@ export function MultiSelect({
                         </div>
                       ) : (
                         <div
-                          className="bg-indigo-50 text-gray-800 px-1 py-[3px] m-1 rounded-md border border-indigo-300
-                     min-w-max z-998 min-w-max flex flex-row items-center justify-start gap-x-1"
+                          className="bg-indigo-50 text-gray-800 px-1
+                              py-[3px] m-1 rounded-md border 
+                              z-998 flex flex-row items-center
+                              justify-start gap-x-1 border-indigo-300"
                           onClick={(event) => {
                             event.stopPropagation()
                             event.preventDefault()
