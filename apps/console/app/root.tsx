@@ -224,24 +224,19 @@ export default function App() {
   )
 }
 
-export const ErrorBoundary = ({
-  error,
-}: {
-  error?: {
-    stack: any
-    message: string
-  }
-}) => {
+// https://remix.run/docs/en/v1/guides/errors
+// @ts-ignore
+export function ErrorBoundary({ error }) {
   const nonce = useContext(NonceContext)
 
   console.error('ErrorBoundary', error)
+
   return (
     <html lang="en">
       <head>
         <Meta />
         <Links />
       </head>
-
       <body className="min-h-[100dvh] flex justify-center items-center">
         <div className="w-full">
           <ErrorPage
@@ -249,11 +244,14 @@ export const ErrorBoundary = ({
             message="Something went terribly wrong!"
             trace={error?.stack}
             error={error}
+            pepe={false}
+            backBtn={false}
           />
         </div>
 
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
+        <LiveReload port={8002} nonce={nonce} />
       </body>
     </html>
   )
@@ -261,10 +259,12 @@ export const ErrorBoundary = ({
 
 export function CatchBoundary() {
   const caught = useCatch()
-  console.error('CatchBoundary', { caught })
+  console.error('CaughtBoundary', caught)
+
+  const { status } = caught
 
   let secondary = 'Something went wrong'
-  switch (caught.status) {
+  switch (status) {
     case 404:
       secondary = 'Page not found'
       break
@@ -281,14 +281,22 @@ export function CatchBoundary() {
         <Meta />
         <Links />
       </head>
-
-      <body className="min-h-[100dvh] flex justify-center items-center">
-        <div className="w-full">
-          <ErrorPage code={caught.status.toString()} message={secondary} />
+      <body>
+        <div
+          className={
+            'flex flex-col h-[100dvh] gap-4 justify-center items-center'
+          }
+        >
+          <h1>{status}</h1>
+          <p>
+            {secondary}
+            {caught.data?.message && `: ${caught.data?.message}`}
+          </p>
+          <p>({caught.data?.traceparent && `${caught.data?.traceparent}`})</p>
         </div>
-
         <ScrollRestoration />
         <Scripts />
+        <LiveReload port={8002} />
       </body>
     </html>
   )

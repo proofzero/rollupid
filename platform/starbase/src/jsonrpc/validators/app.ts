@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { CustomDomainSchema } from './customdomain'
 
 export const AppObjectSchema = z.object({
   name: z.string(),
@@ -8,6 +9,7 @@ export const AppObjectSchema = z.object({
   termsURL: z.string().optional(),
   privacyURL: z.string().optional(),
   websiteURL: z.string().optional(),
+  customDomain: CustomDomainSchema.optional(),
 })
 
 export type AppObject = z.infer<typeof AppObjectSchema>
@@ -25,6 +27,7 @@ export const AppReadableFieldsSchema = z.object({
   createdTimestamp: z.number().optional(),
   termsURL: z.string().optional(),
   privacyURL: z.string().optional(),
+  customDomain: CustomDomainSchema.optional(),
 })
 
 export const AppInternalFieldSchema = z.object({
