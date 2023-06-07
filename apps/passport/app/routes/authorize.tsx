@@ -476,23 +476,6 @@ export default function Authorize() {
     submit(form, { method: 'post' })
   }
 
-  const scopesToDisplay = [...requestedScope].filter((scope) => {
-    return scopeMeta.scopes[scope].hidden !== true
-  })
-  if (
-    requestedScope.some((scope) => {
-      return scopeMeta.scopes[scope].hidden === true
-    })
-  ) {
-    scopeMeta.scopes['system_identifiers'] = {
-      name: 'System Identifiers',
-      description:
-        "Read account's system identifiers and other non-personally identifiable information",
-      class: 'implied',
-    }
-    scopesToDisplay.unshift('system_identifiers')
-  }
-
   return (
     <>
       <Helmet>

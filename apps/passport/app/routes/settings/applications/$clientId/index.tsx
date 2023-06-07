@@ -17,19 +17,33 @@ import {
 } from '~/components/applications/claims'
 import { GetAuthorizedAppScopesMethodResult } from '@proofzero/platform/access/src/jsonrpc/methods/getAuthorizedAppScopes'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { getStarbaseClient } from '~/platform.server'
+import { getValidatedSessionContext } from '~/session.server'
+import { ScopeMeta } from '@proofzero/security/scopes'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
+    const { jwt } = await getValidatedSessionContext(
+      request,
+      context.authzQueryParams,
+      context.env,
+      context.traceSpan
+    )
     const { clientId } = params
-    const scopes = await scopesLoader({
+    const scopeValues = await scopesLoader({
       request,
       params,
       context,
     })
 
+    const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
+
+    const { scopes: scopeMeta } = await sbClient.getScopes.query()
+
     return {
       clientId,
-      scopes,
+      scopeValues,
+      scopeMeta
     }
   }
 )
@@ -43,20 +57,20 @@ export default () => {
   const { clientId } = useLoaderData()
   const app = authorizedApps.find((app) => app.clientId === clientId)!
 
-  const { scopes } = useLoaderData<{
-    scopes: GetAuthorizedAppScopesMethodResult
+  const { scopeValues, scopeMeta } = useLoaderData<{
+    scopeValues: GetAuthorizedAppScopesMethodResult
+    scopeMeta: ScopeMeta
   }>()
 
   const modeledScopes = useMemo(() => {
     const aggregator = []
 
-    for (const scopeValue of Object.keys(scopes)) {
+    for (const scopeValue of scopeValues.scopes) {
       if (scopeValue === 'email') {
         const profile = connectedProfiles.find(
           //There should be only one address urn provided for email
-          (profile) => profile.urn === scopes[scopeValue].meta.urns[0]
+          (profile) => profile.urn === scopeValues.claimValues[scopeValue].meta.urns[0]
         )
-
         aggregator.push({
           claim: 'email',
           icon: profile.icon,
@@ -66,7 +80,7 @@ export default () => {
         })
       } else if (scopeValue === 'connected_accounts') {
         const profiles = connectedProfiles.filter((profile) =>
-          scopes[scopeValue].meta.urns.includes(profile.urn)
+          scopeValues.claimValues[scopeValue].meta.urns.includes(profile.urn)
         )
 
         aggregator.push({
@@ -77,11 +91,37 @@ export default () => {
             type: profile.type === 'eth' ? 'blockchain' : profile.type,
           })),
         })
+      } else if (scopeValue === "profile") {
+        aggregator.push({
+          claim: 'profile',
+          account: {
+            address: scopeValues.claimValues[scopeValue].claims.name,
+            icon: scopeValues.claimValues[scopeValue].claims.picture
+          }
+        })
+      }
+      else if (scopeValue === 'erc_4337') {
+        const profiles = connectedProfiles.filter((profile) =>
+          scopeValues.claimValues[scopeValue].meta.urns.includes(profile.urn)
+        )
+        aggregator.push({
+          claim: 'erc_4337',
+          accounts: profiles.map((profile) => ({
+            icon: profile.icon,
+            address: profile.address,
+            title: profile.title,
+            type: 'blockchain',
+          })),
+        }) 
+      } else if (scopeMeta[scopeValue].hidden) {
+        aggregator.push({
+          claim: 'system_identifiers',
+        })
       }
     }
 
     return aggregator
-  }, [scopes])
+  }, [scopeValues])
 
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
 
@@ -148,7 +188,7 @@ export default () => {
 
       <section>
         <div className="lg:hidden">
-          <ClaimsMobileView claims={modeledScopes} />
+          <ClaimsMobileView scopes={modeledScopes} />
 
           <Button
             type="submit"
@@ -172,7 +212,7 @@ export default () => {
                     weight="medium"
                     className="uppercase text-gray-500"
                   >
-                    Claim Name
+                    App Asked For
                   </Text>
                 </th>
                 <th className="px-6 py-3 text-left">
@@ -181,7 +221,7 @@ export default () => {
                     weight="medium"
                     className="uppercase text-gray-500"
                   >
-                    Claim Value
+                    What’s being shared
                   </Text>
                 </th>
                 <th className="px-6 py-3 text-left rounded-tr-lg">
@@ -190,14 +230,14 @@ export default () => {
                     weight="medium"
                     className="uppercase text-gray-500"
                   >
-                    Source
+                    SOURCE of DATA
                   </Text>
                 </th>
               </tr>
             </thead>
 
             <tbody className="border-t border-gray-200">
-              <ClaimsWideView claims={modeledScopes} />
+              <ClaimsWideView scopes={modeledScopes} />
             </tbody>
           </table>
         </div>

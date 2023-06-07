@@ -14,16 +14,19 @@ type GetAuthorizedAppScopesMethodParams = z.infer<
   typeof GetAuthorizedAppScopesMethodInput
 >
 
-export const GetAuthorizedAppScopesMethodOutput = z.record(
-  z.string(),
-  z.object({
-    claims: z.record(z.string(), z.any()),
-    meta: z.object({
-      urns: z.array(z.string()),
-      valid: z.boolean(),
-    }),
-  })
-)
+export const GetAuthorizedAppScopesMethodOutput = z.object({
+  scopes: z.array(z.string()),
+  claimValues: z.record(
+    z.string(),
+    z.object({
+      claims: z.record(z.string(), z.any()),
+      meta: z.object({
+        urns: z.array(z.string()),
+        valid: z.boolean(),
+      }),
+    })
+  ),
+})
 
 export type GetAuthorizedAppScopesMethodResult = z.infer<
   typeof GetAuthorizedAppScopesMethodOutput
@@ -66,5 +69,5 @@ export const getAuthorizedAppScopesMethod = async ({
     personaData
   )
 
-  return claimValues
+  return { scopes, claimValues }
 }

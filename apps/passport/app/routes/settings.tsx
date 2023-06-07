@@ -100,7 +100,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
               icon: appPublicProps.iconURL,
               title: appPublicProps.name,
               timestamp: a.timestamp,
-              appScopeError: Object.entries(appAuthorizedScopes).some(
+              appScopeError: Object.entries(appAuthorizedScopes.claimValues).some(
                 ([_, value]) => !value.meta.valid
               ),
             }
