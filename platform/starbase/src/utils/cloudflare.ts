@@ -1,7 +1,6 @@
 import { InternalServerError } from '@proofzero/errors'
 import { CustomDomain, CustomDomainDNSRecords } from '../types'
 import { Context } from '../jsonrpc/context'
-import { parse } from 'tldts'
 
 const API_URL = 'https://api.cloudflare.com/client/v4'
 
@@ -157,7 +156,6 @@ export const getExpectedCustomDomainDNSRecords = async (
   passportUrl: string,
   ctx: Context
 ): Promise<CustomDomainDNSRecords> => {
-  const parsedHostname = parse(customHostname)
   const result: CustomDomainDNSRecords = []
 
   result.push({
