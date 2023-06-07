@@ -17,6 +17,7 @@ export const VerifyTokenMethodInput = z.object({
   token: z.string(),
   clientId: z.string(),
   clientSecret: z.string(),
+  issuer: z.string(),
 })
 type VerifyTokenMethodInput = z.infer<typeof VerifyTokenMethodInput>
 
@@ -33,7 +34,7 @@ interface VerifyTokenMethod {
 }
 
 export const verifyTokenMethod: VerifyTokenMethod = async ({ ctx, input }) => {
-  const { token, clientId, clientSecret } = input
+  const { token, clientId, clientSecret, issuer } = input
 
   if (!ctx.starbaseClient) {
     throw new Error('missing starbase client')
@@ -55,5 +56,5 @@ export const verifyTokenMethod: VerifyTokenMethod = async ({ ctx, input }) => {
   const accessNode = await initAccessNodeByName(name, ctx.Access)
 
   const jwks = getJWKS(ctx)
-  await accessNode.class.verify(token, jwks)
+  await accessNode.class.verify(token, jwks, { issuer })
 }

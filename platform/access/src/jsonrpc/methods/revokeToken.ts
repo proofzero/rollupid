@@ -17,6 +17,7 @@ export const RevokeTokenMethodInput = z.object({
   token: z.string(),
   clientId: z.string(),
   clientSecret: z.string(),
+  issuer: z.string(),
 })
 type RevokeTokenMethodInput = z.infer<typeof RevokeTokenMethodInput>
 
@@ -33,7 +34,7 @@ interface RevokeTokenMethod {
 }
 
 export const revokeTokenMethod: RevokeTokenMethod = async ({ ctx, input }) => {
-  const { token, clientId, clientSecret } = input
+  const { token, clientId, clientSecret, issuer } = input
 
   if (!ctx.starbaseClient) {
     throw new Error('missing starbase client')
@@ -55,5 +56,5 @@ export const revokeTokenMethod: RevokeTokenMethod = async ({ ctx, input }) => {
   const accessNode = await initAccessNodeByName(name, ctx.Access)
 
   const jwks = getJWKS(ctx)
-  await accessNode.class.revoke(token, jwks)
+  await accessNode.class.revoke(token, jwks, { issuer })
 }

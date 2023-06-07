@@ -21,6 +21,7 @@ import { PersonaData } from '@proofzero/types/application'
 
 export const GetUserInfoInput = z.object({
   access_token: z.string(),
+  issuer: z.string().optional(),
 })
 
 export const GetUserInfoOutput = z.record(z.any())
@@ -52,7 +53,7 @@ export const getUserInfoMethod = async ({
   const accessNode = await initAccessNodeByName(name, ctx.Access)
 
   const jwks = getJWKS(ctx)
-  await accessNode.class.verify(token, jwks)
+  await accessNode.class.verify(token, jwks, { issuer: input.issuer })
 
   const personaData = await accessNode.storage.get<PersonaData>('personaData')
   const claimValues = await getClaimValues(

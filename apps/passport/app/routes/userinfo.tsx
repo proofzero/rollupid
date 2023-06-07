@@ -11,10 +11,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     if (!access_token)
       throw new UnauthorizedError({ message: 'No access token provided' })
 
+    const { origin: issuer } = new URL(request.url)
+
     const accessClient = createAccessClient(context.env.Access, {
       ...generateTraceContextHeaders(context.traceSpan),
     })
-    const result = await accessClient.getUserInfo.query({ access_token })
+    const result = await accessClient.getUserInfo.query({
+      access_token,
+      issuer,
+    })
     return result
   }
 )
