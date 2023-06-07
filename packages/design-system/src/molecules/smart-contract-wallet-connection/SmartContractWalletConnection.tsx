@@ -17,7 +17,7 @@ export const SmartContractWalletCreationSummary = ({
 }) => {
   return (
     <div className="flex flex-col items-center w-full h-full">
-      <div className="flex flex-col  items-center w-full h-full space-y-2">
+      <div className="flex flex-col dark:text-white items-center w-full h-full space-y-2">
         <img
           src={scWalletIcon}
           alt="sc_wallet"
