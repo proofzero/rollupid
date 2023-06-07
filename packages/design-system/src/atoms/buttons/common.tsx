@@ -4,6 +4,7 @@ export type ButtonSize = 'xs' | 'sm' | 'base' | 'l' | 'xl' | 'xxl'
 export type ButtonType =
   | 'primary'
   | 'primary-alt'
+  | 'primary-alt-skin'
   | 'secondary'
   | 'secondary-alt'
   | 'dangerous'
@@ -24,6 +25,8 @@ export const typeToColorsDict = {
   primary:
     'bg-[#1f2937] text-white shadow-sm hover:bg-[#374151] focus:bg-[#1f2937] focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-[#1F2937] focus:ring-skin-primary',
   'primary-alt':
+    'bg-indigo-500 text-white shadow-sm hover:bg-indigo-600 focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-[#1F2937] focus:ring-skin-primary dark:border-gray-700 border',
+  'primary-alt-skin':
     'bg-skin-primary text-skin-text shadow-sm hover:shadow hover:border hover:shadow-skin-primary focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-[#1F2937] focus:ring-skin-primary dark:border-gray-700 border',
   secondary:
     'bg-[#f3f4f6] text-[#5d4aec] shadow-sm border border-solid border-[#dfdcff] hover:bg-[#e5e7eb] focus:bg-[#f3f4f6] focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-[#1F2937] focus:ring-skin-primary',

@@ -114,7 +114,7 @@ export default ({
             src={userProfile.pfpURL}
             hex={false}
             size={'sm'}
-            // alt="User Profile"
+          // alt="User Profile"
           />
           <img src={authorizeCheck} alt="Authorize Check" />
           <Avatar src={appProfile.iconURL} size={'sm'} />
@@ -149,14 +149,14 @@ export default ({
 
                     {(scope === 'profile' ||
                       scope === 'system_identifiers') && (
-                      <Text
-                        size="sm"
-                        weight="medium"
-                        className="flex-1 text-gray-500"
-                      >
-                        {scopeMeta.scopes[scope].name}
-                      </Text>
-                    )}
+                        <Text
+                          size="sm"
+                          weight="medium"
+                          className="flex-1 text-gray-500"
+                        >
+                          {scopeMeta.scopes[scope].name}
+                        </Text>
+                      )}
 
                     {scope === 'erc_4337' && (
                       <div className="flex-1 min-w-0">
@@ -286,7 +286,7 @@ export default ({
                 </Button>
                 <Button
                   btnSize="xl"
-                  btnType="primary-alt"
+                  btnType="primary-alt-skin"
                   disabled={disableAuthorize}
                   onClick={() => {
                     authorizeCallback(requestedScope)

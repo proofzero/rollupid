@@ -249,7 +249,7 @@ export default function AccountsLayout() {
           onClick={() => {
             requestConnectAccount()
           }}
-          btnType="primary-alt"
+          btnType="primary-alt-skin"
         >
           Connect Account
         </Button>
@@ -309,9 +309,9 @@ export default function AccountsLayout() {
               onRenameAccount: ap.title.endsWith('.eth')
                 ? undefined
                 : (id: string) => {
-                    setActionId(id)
-                    setRenameModalOpen(true)
-                  },
+                  setActionId(id)
+                  setRenameModalOpen(true)
+                },
             }))
             .concat(
               oAuthProfiles.addresses.map((ap) => ({
@@ -334,9 +334,9 @@ export default function AccountsLayout() {
                 addressCount === 1
                   ? undefined
                   : (id: string) => {
-                      setActionId(id)
-                      setDisconnectModalOpen(true)
-                    },
+                    setActionId(id)
+                    setDisconnectModalOpen(true)
+                  },
             }))}
         />
 
