@@ -37,9 +37,9 @@ export default async function (
   const td = new TextDecoder()
   const values = packet.answers.map((a) => {
     if (a.type === 'TXT') {
-      const strParts = new Array(a.data.length)
-      for (let i = 0; i < a.data.length; i++) {
-        strParts.push(td.decode(a.data[i] as Buffer))
+      const strParts = []
+      for (const data of a.data) {
+        strParts.push(td.decode(data as Buffer))
       }
 
       return strParts.join('')
