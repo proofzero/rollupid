@@ -101,6 +101,7 @@ const InnerComponent = ({
     signature: undefined,
   })
   const [loading, setLoading] = useState(false)
+
   const iconURL = appProps?.iconURL
 
   const submit = useSubmit()
@@ -200,9 +201,9 @@ const InnerComponent = ({
         authnQueryParams,
         loading,
         walletConnectCallback: async (address) => {
-          if (loading || transitionState !== 'idle') return
-          setLoading(true)
+          if (loading) return
           // fetch nonce and kickoff sign flow
+          setLoading(true)
           await fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
             .then((res) =>
               res.json<{
@@ -243,7 +244,7 @@ const InnerComponent = ({
         },
         walletConnectErrorCallback: (error) => {
           console.debug('transition.state: ', transitionState)
-          if (loading) {
+          if (transitionState !== 'idle' || !loading) {
             return
           }
           if (error) {
@@ -252,6 +253,7 @@ const InnerComponent = ({
               message:
                 'Failed to complete signing. Please try again or contact support.',
             })
+            setLoading(false)
           }
         },
       }}
