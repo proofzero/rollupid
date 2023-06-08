@@ -71,7 +71,8 @@ export default () => {
     <div className={'flex flex-row h-screen justify-center items-center'}>
       <div
         className={
-          'basis-2/5 h-screen w-full hidden lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
+          'basis-2/5 h-screen w-full hidden\
+          lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
         }
       >
         <img src={sideGraphics} alt="Background graphics" />
@@ -82,10 +83,9 @@ export default () => {
             'flex shrink flex-col items-center\
          justify-center gap-4 mx-auto bg-white p-6 h-[100dvh]\
           lg:h-[580px] lg:max-h-[100dvh] w-full lg:w-[418px]\
-          lg:rounded-lg'
+          lg:rounded-lg border dark:bg-gray-800 dark:border-gray-600'
           }
           style={{
-            border: '1px solid #D1D5DB',
             boxSizing: 'border-box',
           }}
         >
