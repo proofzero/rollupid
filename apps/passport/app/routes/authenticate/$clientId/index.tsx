@@ -100,8 +100,7 @@ const InnerComponent = ({
     address: undefined,
     signature: undefined,
   })
-  const loading = transitionState !== 'idle'
-
+  const [loading, setLoading] = useState(false)
   const iconURL = appProps?.iconURL
 
   const submit = useSubmit()
@@ -201,7 +200,8 @@ const InnerComponent = ({
         authnQueryParams,
         loading,
         walletConnectCallback: async (address) => {
-          if (loading) return
+          if (loading || transitionState !== 'idle') return
+          setLoading(true)
           // fetch nonce and kickoff sign flow
           await fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
             .then((res) =>
@@ -225,6 +225,7 @@ const InnerComponent = ({
                   'Could not fetch nonce for signing authentication message',
               })
             })
+          setLoading(false)
         },
         walletSignCallback: (address, signature, nonce, state) => {
           console.debug('signing complete')
