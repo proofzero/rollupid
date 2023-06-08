@@ -14,7 +14,7 @@ import {
 } from '@remix-run/react'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
 import { RollType } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -242,6 +242,33 @@ export default function AppDetailIndexPage() {
   const { appContactAddress, paymaster } = outletContextData
   const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
 
+  const ref = useRef(null)
+  const [multiselectComponentWidth, setMultiselectComponentWidth] = useState(0)
+
+  useEffect(() => {
+    if (!ref || !ref.current) {
+      return
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
+    const resizeObserver = new ResizeObserver(() => {
+      if (ref?.current) {
+        if (ref.current.offsetWidth !== multiselectComponentWidth) {
+          setMultiselectComponentWidth(ref.current.offsetWidth)
+        }
+      }
+    })
+
+    resizeObserver.observe(ref.current)
+
+    // if useEffect returns a function, it is called right before the
+    // component unmounts, so it is the right place to stop observing
+    // the div
+    return function cleanup() {
+      resizeObserver.disconnect()
+    }
+  }, [ref.current])
+
   const [isFormChanged, setIsFormChanged] = useState(false)
   const [isImgUploading, setIsImgUploading] = useState(false)
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
@@ -435,13 +462,14 @@ export default function AppDetailIndexPage() {
                     <div className="sm:mb-[1.755rem]" />
                   </div>
 
-                  <div className="flex-1">
+                  <div ref={ref} className="flex-1">
                     <MultiSelect
                       label="Allowed scope*"
                       disabled={false}
                       onChange={() => {
                         setIsFormChanged(true)
                       }}
+                      width={multiselectComponentWidth}
                       learnMore="https://docs.rollup.id/reference/scopes"
                       fieldName="scopes"
                       items={Object.entries(scopeMeta).map(([key, value]) => {
@@ -467,7 +495,9 @@ export default function AppDetailIndexPage() {
                           experimental: value.experimental,
                         }
                       })}
-                      selectedItems={appDetails.app.scopes?.map((scope) => {
+                      preselectedItems={(
+                        appDetails.app.scopes as Array<string>
+                      ).map((scope) => {
                         const meta = scopeMeta[scope]
                         return {
                           id: scope,
@@ -646,7 +676,7 @@ export default function AppDetailIndexPage() {
 
             <Panel title="Danger Zone">
               <Button
-                type="submit"
+                type="button"
                 btnType="dangerous-alt"
                 onClick={() => {
                   setDeleteModalOpen(true)
