@@ -309,7 +309,7 @@ export const Dropdown = ({
                             }
                             <div className="px-3 pb-3">
                                 <Button
-                                    btnType="secondary-alt"
+                                    btnType="secondary-alt-skin"
                                     onClick={ConnectButtonCallback}
                                     className={`w-full min-w-[238px] flex flex-row items-center gap-1 justify-center
                                          px-[12px]`}

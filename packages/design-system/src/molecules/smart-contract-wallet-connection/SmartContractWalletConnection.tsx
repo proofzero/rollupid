@@ -52,7 +52,7 @@ export const SmartContractWalletCreationSummary = ({
       </div>
 
       <Button
-        btnType="primary-alt"
+        btnType="primary-alt-skin"
         type="button"
         className="border w-full rounded-lg h-[50px] p-2 mt-auto
         flex items-center justify-center"

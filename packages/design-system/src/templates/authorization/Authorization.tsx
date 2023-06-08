@@ -271,7 +271,7 @@ export default ({
             <>
               <Button
                 btnSize="xl"
-                btnType="secondary-alt"
+                btnType="secondary-alt-skin"
                 onClick={cancelCallback}
               >
                 <Text
