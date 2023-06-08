@@ -100,19 +100,13 @@ const InnerComponent = ({
     address: undefined,
     signature: undefined,
   })
-  const [loading, setLoading] = useState(false)
+  const loading = transitionState !== 'idle'
 
   const iconURL = appProps?.iconURL
 
   const submit = useSubmit()
 
   const navigate = useNavigate()
-
-  useEffect(() => {
-    if (transitionState === 'idle') {
-      setLoading(false)
-    }
-  }, [transitionState])
 
   useEffect(() => {
     const url = new URL(window.location.href)
@@ -161,8 +155,8 @@ const InnerComponent = ({
                   {appProps?.appTheme?.heading
                     ? appProps.appTheme.heading
                     : appProps?.name
-                      ? `Login to ${appProps?.name}`
-                      : AuthenticationScreenDefaults.defaultHeading}
+                    ? `Login to ${appProps?.name}`
+                    : AuthenticationScreenDefaults.defaultHeading}
                 </h1>
                 <h2
                   style={{ color: '#6B7280' }}
@@ -209,8 +203,7 @@ const InnerComponent = ({
         walletConnectCallback: async (address) => {
           if (loading) return
           // fetch nonce and kickoff sign flow
-          setLoading(true)
-          fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
+          await fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
             .then((res) =>
               res.json<{
                 nonce: string
@@ -249,7 +242,7 @@ const InnerComponent = ({
         },
         walletConnectErrorCallback: (error) => {
           console.debug('transition.state: ', transitionState)
-          if (transitionState !== 'idle' || !loading) {
+          if (loading) {
             return
           }
           if (error) {
@@ -258,7 +251,6 @@ const InnerComponent = ({
               message:
                 'Failed to complete signing. Please try again or contact support.',
             })
-            setLoading(false)
           }
         },
       }}

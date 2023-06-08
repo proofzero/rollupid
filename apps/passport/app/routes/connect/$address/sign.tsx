@@ -12,7 +12,10 @@ import { parseJwt } from '@proofzero/packages/utils'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import type { AccountURN } from '@proofzero/urns/account'
-import { AuthenticationScreenDefaults, appendNonceTemplate } from '@proofzero/design-system/src/templates/authentication/Authentication'
+import {
+  AuthenticationScreenDefaults,
+  appendNonceTemplate,
+} from '@proofzero/design-system/src/templates/authentication/Authentication'
 
 import { getStarbaseClient } from '~/platform.server'
 
@@ -94,7 +97,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const accountURNFromAddress = await addressClient.getAccount.query()
-
 
     if (appData?.rollup_action === 'connect' && existing) {
       const accountURN = parseJwt(jwt).sub! as AccountURN
