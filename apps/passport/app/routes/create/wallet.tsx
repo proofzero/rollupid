@@ -135,12 +135,16 @@ export default () => {
         <div className={`flex flex-row h-screen justify-center items-center bg-[#F9FAFB] dark:bg-gray-900`}>
           <div
             className={
-              'basis-2/5 h-screen w-full hidden\
-          lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
+              'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 dark:bg-[#1F2937] overflow-hidden'
             }
-          >
-            <img src={sideGraphics} alt="Background graphics" />
-          </div>
+            style={{
+              backgroundImage: `url(${appProps?.appTheme?.graphicURL ?? sideGraphics
+                })`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          ></div>
           <div className={'basis-full basis-full lg:basis-3/5'}>
             <div
               className={
