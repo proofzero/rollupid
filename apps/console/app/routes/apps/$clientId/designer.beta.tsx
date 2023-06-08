@@ -3,6 +3,7 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import {
   Form,
   useActionData,
+  useFetcher,
   useLoaderData,
   useOutletContext,
 } from '@remix-run/react'
@@ -75,6 +76,8 @@ import {
   adjustAddressTypeToDisplay,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import type { appDetailsProps } from '~/types'
+import { CountdownCircleTimer } from 'react-countdown-circle-timer'
+import { AddressURN } from '@proofzero/urns/address'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -838,10 +841,14 @@ const AuthPanel = ({
 }
 
 const EmailPanel = ({
+  clientId,
+  addressURN,
   emailTheme,
   setLoading,
   errors,
 }: {
+  clientId: string
+  addressURN: AddressURN | undefined
   emailTheme?: EmailOTPTheme
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
   errors?: {
@@ -887,153 +894,187 @@ const EmailPanel = ({
     setDark(!dark)
   }
 
+  const previewEmailFetcher = useFetcher()
+
   return (
-    <Tab.Panel className="flex flex-col lg:flex-row gap-7">
-      <input type="hidden" name="target" value="email" />
+    <>
+      {previewEmailFetcher.state !== 'idle' && <Loader />}
 
-      <section className="flex-1 bg-white border rounded-lg">
-        <Text size="lg" weight="semibold" className="mx-8 my-4 text-gray-900">
-          OTP Email Settings
-        </Text>
+      <Tab.Panel className="flex flex-col lg:flex-row gap-7">
+        <input type="hidden" name="target" value="email" />
 
-        <FormElement label="Logo" sublabel="Images can't be larger than 2mB">
-          <div className="flex flex-row items-center gap-2">
-            <IconPicker
-              maxSize={2097152}
-              aspectRatio={{
-                width: 1,
-                height: 1,
-              }}
-              id="logoURL"
-              setIsFormChanged={(val) => { }}
-              setIsImgUploading={(val) => {
-                setLoading(val)
-              }}
-              imageUploadCallback={setLogoURL}
-              url={logoURL}
-              invalid={errors && errors['email.logoURL'] ? true : false}
-              errorMessage={
-                errors && errors['email.logoURL'] ? errors['email.logoURL'] : ''
-              }
-            />
-
-            {logoURL && (
-              <button
-                type="button"
-                className="flex justify-center items-center py-2 px-4"
-                onClick={() => {
-                  setLogoURL(undefined)
-                }}
-              >
-                <Text size="xs" weight="medium" className="text-gray-200">
-                  Remove
-                </Text>
-              </button>
-            )}
-          </div>
-        </FormElement>
-
-        <div className="w-full border-b border-gray-200"></div>
-
-        <FormElement label="Business Address">
-          <InputTextarea
-            id="address"
-            heading=""
-            value={address ?? ''}
-            onChange={setAddress}
-            error={errors && errors['email.address'] ? true : false}
-          />
-
-          {errors && errors['email.address'] && (
-            <Text
-              className="mb-1.5 mt-1.5 text-red-500"
-              size="xs"
-              weight="normal"
-            >
-              {errors['email.address']}
-            </Text>
-          )}
-        </FormElement>
-
-        <div className="w-full border-b border-gray-200"></div>
-
-        <FormElement label="Contact us">
-          <Input
-            id={'contact'}
-            label={''}
-            onChange={(e) => {
-              setContact(e.target.value)
-            }}
-            value={contact}
-            error={errors && errors['email.contact']}
-          />
-
-          {errors && errors['email.contact'] && (
-            <Text
-              className="mb-1.5 mt-1.5 text-red-500"
-              size="xs"
-              weight="normal"
-            >
-              {errors['email.contact']}
-            </Text>
-          )}
-        </FormElement>
-
-        <div className="w-full border-b border-gray-200"></div>
-
-        <FormElement label="OTP Preview">
-          <Button type="button" btnType='secondary-alt' btnSize='sm'>Send Preview</Button>
-        </FormElement>
-      </section>
-
-      <section className="bg-white border rounded-lg pb-3 px-6 min-w-[468px] h-[781px] overflow-scroll">
-        <div className="flex flex-row items-center justify-between my-4">
-          <Text size="lg" weight="semibold" className="text-gray-900">
-            Preview
+        <section className="flex-1 bg-white border rounded-lg">
+          <Text size="lg" weight="semibold" className="mx-8 my-4 text-gray-900">
+            OTP Email Settings
           </Text>
 
-          <div className="flex flex-row gap-2 items-center">
-            <TbSunHigh />
-            <InputToggle
-              id="otp-theme"
-              label=""
-              onToggle={toggleTheme}
-              checked={dark}
+          <FormElement label="Logo" sublabel="Images can't be larger than 2mB">
+            <div className="flex flex-row items-center gap-2">
+              <IconPicker
+                maxSize={2097152}
+                aspectRatio={{
+                  width: 1,
+                  height: 1,
+                }}
+                id="logoURL"
+                setIsFormChanged={(val) => { }}
+                setIsImgUploading={(val) => {
+                  setLoading(val)
+                }}
+                imageUploadCallback={setLogoURL}
+                url={logoURL}
+                invalid={errors && errors['email.logoURL'] ? true : false}
+                errorMessage={
+                  errors && errors['email.logoURL'] ? errors['email.logoURL'] : ''
+                }
+              />
+
+              {logoURL && (
+                <button
+                  type="button"
+                  className="flex justify-center items-center py-2 px-4"
+                  onClick={() => {
+                    setLogoURL(undefined)
+                  }}
+                >
+                  <Text size="xs" weight="medium" className="text-gray-200">
+                    Remove
+                  </Text>
+                </button>
+              )}
+            </div>
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement label="Business Address">
+            <InputTextarea
+              id="address"
+              heading=""
+              value={address ?? ''}
+              onChange={setAddress}
+              error={errors && errors['email.address'] ? true : false}
             />
-            <TbMoon />
+
+            {errors && errors['email.address'] && (
+              <Text
+                className="mb-1.5 mt-1.5 text-red-500"
+                size="xs"
+                weight="normal"
+              >
+                {errors['email.address']}
+              </Text>
+            )}
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement label="Contact us">
+            <Input
+              id={'contact'}
+              label={''}
+              onChange={(e) => {
+                setContact(e.target.value)
+              }}
+              value={contact}
+              error={errors && errors['email.contact']}
+            />
+
+            {errors && errors['email.contact'] && (
+              <Text
+                className="mb-1.5 mt-1.5 text-red-500"
+                size="xs"
+                weight="normal"
+              >
+                {errors['email.contact']}
+              </Text>
+            )}
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement label="OTP Preview">
+            <div className="flex flex-row items-center gap-4">
+              <CountdownCircleTimer
+                size={16}
+                strokeWidth={2}
+                isPlaying
+                duration={15}
+                rotation={'counterclockwise'}
+                colors={'#6366f1'}
+                isGrowing={true}
+                onComplete={() => {
+
+                }}
+              />
+              <Button type="button" btnType='secondary-alt' btnSize='xs' onClick={() => {
+                let previewTheme: EmailOTPTheme = {
+                  logoURL: logoURL ?? 'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public',
+                  address: address,
+                  contact: contact,
+                }
+
+                previewEmailFetcher.submit({
+                  addressURN: addressURN!,
+                  theme: JSON.stringify(previewTheme),
+                }, {
+                  method: 'post',
+                  action: `/apps/${clientId}/designer/otp/preview`,
+                })
+              }}>Send Preview</Button>
+            </div>
+          </FormElement>
+        </section>
+
+        <section className="bg-white border rounded-lg pb-3 px-6 min-w-[468px] h-[781px] overflow-scroll">
+          <div className="flex flex-row items-center justify-between my-4">
+            <Text size="lg" weight="semibold" className="text-gray-900">
+              Preview
+            </Text>
+
+            <div className="flex flex-row gap-2 items-center">
+              <TbSunHigh />
+              <InputToggle
+                id="otp-theme"
+                label=""
+                onToggle={toggleTheme}
+                checked={dark}
+              />
+              <TbMoon />
+            </div>
           </div>
-        </div>
 
-        <iframe
-          ref={iFrameRef}
-          className="w-full border rounded-lg"
-          srcDoc={
-            EmailTemplate('XXXXXX', {
-              appName: 'Designer',
-              logoURL:
-                logoURL ??
-                'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public',
-              privacyURL: '#',
-              termsURL: '#',
-              contactURL: contact,
-              address: address,
-            }).body
-          }
-          onLoad={(ev) => {
-            const iFrame = ev.target as HTMLIFrameElement
-            const iFrameDoc = iFrame.contentDocument
-
-            const height = iFrameDoc?.body.clientHeight
-            if (!height) {
-              console.warn('No height detected for iFrame')
-              return
+          <iframe
+            ref={iFrameRef}
+            className="w-full border rounded-lg"
+            srcDoc={
+              EmailTemplate('XXXXXX', {
+                appName: 'Designer',
+                logoURL:
+                  logoURL ??
+                  'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public',
+                privacyURL: '#',
+                termsURL: '#',
+                contactURL: contact,
+                address: address,
+              }).body
             }
+            onLoad={(ev) => {
+              const iFrame = ev.target as HTMLIFrameElement
+              const iFrameDoc = iFrame.contentDocument
 
-            iFrame.style.height = height + 0.05 * height + 'px'
-          }}
-        ></iframe>
-      </section>
-    </Tab.Panel>
+              const height = iFrameDoc?.body.clientHeight
+              if (!height) {
+                console.warn('No height detected for iFrame')
+                return
+              }
+
+              iFrame.style.height = height + 0.05 * height + 'px'
+            }}
+          ></iframe>
+        </section>
+      </Tab.Panel>
+    </>
   )
 }
 
@@ -1064,7 +1105,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     return json({
       appTheme,
-      emailTheme,
+      emailTheme
     })
   }
 )
@@ -1222,8 +1263,9 @@ export default () => {
     emailTheme: GetEmailOTPThemeResult
   }>()
 
-  const { appDetails } = useOutletContext<{
-    appDetails: appDetailsProps
+  const { appDetails, appContactAddress } = useOutletContext<{
+    appDetails: appDetailsProps,
+    appContactAddress?: AddressURN
   }>()
 
   const actionData = useActionData()
@@ -1310,6 +1352,8 @@ export default () => {
             />
 
             <EmailPanel
+              clientId={appDetails.clientId!}
+              addressURN={appContactAddress}
               emailTheme={emailTheme}
               setLoading={setLoading}
               errors={errors}
