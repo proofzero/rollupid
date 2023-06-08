@@ -933,6 +933,8 @@ const EmailPanel = ({
           </div>
         </FormElement>
 
+        <div className="w-full border-b border-gray-200"></div>
+
         <FormElement label="Business Address">
           <InputTextarea
             id="address"
@@ -952,6 +954,8 @@ const EmailPanel = ({
             </Text>
           )}
         </FormElement>
+
+        <div className="w-full border-b border-gray-200"></div>
 
         <FormElement label="Contact us">
           <Input
@@ -973,6 +977,12 @@ const EmailPanel = ({
               {errors['email.contact']}
             </Text>
           )}
+        </FormElement>
+
+        <div className="w-full border-b border-gray-200"></div>
+
+        <FormElement label="OTP Preview">
+          <Button type="button" btnType='secondary-alt' btnSize='sm'>Send Preview</Button>
         </FormElement>
       </section>
 
@@ -999,6 +1009,7 @@ const EmailPanel = ({
           className="w-full border rounded-lg"
           srcDoc={
             EmailTemplate('XXXXXX', {
+              appName: 'Designer',
               logoURL:
                 logoURL ??
                 'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public',
