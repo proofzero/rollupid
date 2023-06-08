@@ -1,4 +1,4 @@
-import { Outlet, useLoaderData } from '@remix-run/react'
+import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 import { getStarbaseClient } from '~/platform.server'
 import { getAuthzCookieParams } from '~/session.server'
@@ -10,9 +10,10 @@ import type { LoaderFunction } from '@remix-run/cloudflare'
 import { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 import { Helmet } from 'react-helmet'
 import { getRGBColor, getTextColor } from '@proofzero/design-system/src/helpers'
-import { useEffect, useState } from 'react'
+import { useContext } from 'react'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
+import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -24,9 +25,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
     } else {
       appProps = {
-        name: `Rollup - ${
-          params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
-        }`,
+        name: `Rollup - ${params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
+          }`,
         iconURL: LogoIndigo,
         termsURL: 'https://rollup.id/tos',
         privacyURL: 'https://rollup.id/privacy-policy',
@@ -61,11 +61,7 @@ export default () => {
     rollup_action?: string
   }>()
 
-  const [dark, setDark] = useState<boolean>(false)
-  useEffect(() => {
-    const darkMode = window.matchMedia('(prefers-color-scheme: dark)')
-    setDark(darkMode.matches)
-  }, [])
+  const { dark } = useContext(ThemeContext)
 
   return (
     <>
@@ -73,47 +69,48 @@ export default () => {
         <style type="text/css">{`
             :root {
                 ${getRGBColor(
-                  dark
-                    ? appProps?.appTheme?.color?.dark ??
-                        AuthenticationScreenDefaults.color.dark
-                    : appProps?.appTheme?.color?.light ??
-                        AuthenticationScreenDefaults.color.light,
-                  'primary'
-                )}
+          dark
+            ? appProps?.appTheme?.color?.dark ??
+            AuthenticationScreenDefaults.color.dark
+            : appProps?.appTheme?.color?.light ??
+            AuthenticationScreenDefaults.color.light,
+          'primary'
+        )}
                 ${getRGBColor(
-                  getTextColor(
-                    dark
-                      ? appProps?.appTheme?.color?.dark ??
-                          AuthenticationScreenDefaults.color.dark
-                      : appProps?.appTheme?.color?.light ??
-                          AuthenticationScreenDefaults.color.light
-                  ),
-                  'primary-contrast-text'
-                )}
+          getTextColor(
+            dark
+              ? appProps?.appTheme?.color?.dark ??
+              AuthenticationScreenDefaults.color.dark
+              : appProps?.appTheme?.color?.light ??
+              AuthenticationScreenDefaults.color.light
+          ),
+          'primary-contrast-text'
+        )}
              {
          `}</style>
       </Helmet>
 
-      <div className={'flex flex-row h-[100dvh] justify-center items-center'}>
-        <div
-          className={
-            'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
-          }
-          style={{
-            background: `url(${
-              appProps?.appTheme?.graphicURL ?? sideGraphics
-            })`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }}
-        ></div>
-        <div
-          className={
-            'basis-full basis-full lg:basis-3/5 bg-[#F9FAFB] dark:bg-gray-900'
-          }
-        >
-          <Outlet context={{ clientId, appProps, rollup_action, dark }} />
+      <div className={`${dark ? 'dark' : ''}`}>
+        <div className={`flex flex-row h-[100dvh] justify-center items-center bg-[#F9FAFB] dark:bg-gray-900`}>
+          <div
+            className={
+              'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 dark:bg-[#1F2937] overflow-hidden'
+            }
+            style={{
+              backgroundImage: `url(${appProps?.appTheme?.graphicURL ?? sideGraphics
+                })`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          ></div>
+          <div
+            className={
+              'basis-full basis-full lg:basis-3/5'
+            }
+          >
+            <Outlet context={{ clientId, appProps, rollup_action, dark }} />
+          </div>
         </div>
       </div>
     </>
