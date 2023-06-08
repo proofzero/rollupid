@@ -46,7 +46,7 @@ import { getEmailIcon } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
 import { Helmet } from 'react-helmet'
-import { getRGBColor } from '@proofzero/design-system/src/helpers'
+import { getRGBColor, getTextColor } from '@proofzero/design-system/src/helpers'
 
 export type UserProfile = {
   displayName: string
@@ -488,7 +488,17 @@ export default function Authorize() {
                     : appProfile?.appTheme?.color?.light ??
                         AuthenticationScreenDefaults.color.light,
                   'primary'
-                )}   
+                )}
+                ${getRGBColor(
+                  getTextColor(
+                    dark
+                      ? appProfile?.appTheme?.color?.dark ??
+                          AuthenticationScreenDefaults.color.dark
+                      : appProfile?.appTheme?.color?.light ??
+                          AuthenticationScreenDefaults.color.light
+                  ),
+                  'primary-contrast-text'
+                )}
              {
          `}</style>
       </Helmet>

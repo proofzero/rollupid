@@ -194,9 +194,8 @@ export default function EmailOTPValidator({
 
                 inputRefs[i].current?.select()
               }}
-              className={`flex text-base lg:text-2xl py-7 px-3.5 h-20 justify-center items-center text-gray-600 dark:text-white dark:bg-gray-800 border rounded-lg text-center ${
-                isInvalid ? 'border-red-500' : 'dark:border-gray-600'
-              }`}
+              className={`flex text-base lg:text-2xl py-7 px-3.5 h-20 justify-center items-center text-gray-600 dark:text-white dark:bg-gray-800 border rounded-lg text-center ${isInvalid ? 'border-red-500' : 'dark:border-gray-600'
+                }`}
             />
           ))}
         </div>
@@ -218,9 +217,8 @@ export default function EmailOTPValidator({
           <Text
             type="span"
             size="sm"
-            className={`${
-              regenerationRequested ? 'text-gray-300' : 'text-indigo-500'
-            } cursor-pointer relative`}
+            className={`${regenerationRequested ? 'text-gray-300' : 'text-indigo-500'
+              } cursor-pointer relative`}
             onClick={() => {
               if (regenerationRequested) return
 
@@ -260,13 +258,13 @@ export default function EmailOTPValidator({
             btnType="secondary-alt"
             className="flex-1 w-full"
             onClick={onCancel}
-          >
+          >Ș
             Cancel
           </Button>
         )}
         <Button
           btnSize="xl"
-          btnType="primary-alt"
+          btnType="primary-alt-skin"
           className="flex-1 w-full"
           disabled={fullCode.length !== inputLen || loading || isInvalid}
           onClick={async () => {

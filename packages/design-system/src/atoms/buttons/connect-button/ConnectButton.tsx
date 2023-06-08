@@ -13,9 +13,10 @@ import { Popover } from '@headlessui/react'
 import { HiChevronDown, HiChevronUp } from 'react-icons/hi'
 import { ThemeContext } from '../../../contexts/theme'
 
-import { signMessageTemplate } from '@proofzero/packages/utils'
+import { AuthenticationScreenDefaults, appendNonceTemplate } from '../../../templates/authentication/Authentication'
 
 export type ConnectButtonProps = {
+  signMessageTemplate?: string
   connectCallback: (address: string) => void
   signCallback: (
     address: string,
@@ -38,6 +39,7 @@ export type ConnectButtonProps = {
 } & ButtonProps
 
 export function ConnectButton({
+  signMessageTemplate = AuthenticationScreenDefaults.defaultSignMessage,
   connectCallback,
   connectErrorCallback,
   signCallback,
@@ -67,7 +69,7 @@ export function ConnectButton({
   useEffect(() => {
     if (!signData?.signature && signData?.nonce) {
       console.debug('signing...')
-      const nonceMessage = signMessageTemplate().replace(
+      const nonceMessage = appendNonceTemplate(signMessageTemplate).replace(
         '{{nonce}}',
         signData.nonce
       )
@@ -105,15 +107,13 @@ export function ConnectButton({
                 onClick={
                   isConnected
                     ? () => {
-                        return address && connectCallback(address)
-                      }
+                      return address && connectCallback(address)
+                    }
                     : show
                 }
-                className={`flex-1 button hover:bg-gray-100 flex flex-row items-center space-x-3 px-[17px] rounded-l-md ${
-                  isConnected ? '' : 'rounded-r-md'
-                } ${
-                  fullSize ? 'justify-start' : 'justify-center'
-                } bg-white dark:bg-[#374151] dark:border-gray-600 dark:hover:bg-gray-600 focus:bg-white dark:focus:bg-gray-600 focus:ring-inset focus:ring-2 focus:ring-skin-primary truncate`}
+                className={`flex-1 button hover:bg-gray-100 flex flex-row items-center space-x-3 px-[17px] rounded-l-md ${isConnected ? '' : 'rounded-r-md'
+                  } ${fullSize ? 'justify-start' : 'justify-center'
+                  } bg-white dark:bg-[#374151] dark:border-gray-600 dark:hover:bg-gray-600 focus:bg-white dark:focus:bg-gray-600 focus:ring-inset focus:ring-2 focus:ring-skin-primary truncate`}
               >
                 {(isSigning || isLoading) && isConnected ? (
                   <Spinner size={16} />
@@ -134,12 +134,11 @@ export function ConnectButton({
                         ? 'Signing... (please check wallet)'
                         : 'Continuing...'
                       : isConnected && address
-                      ? `${displayContinueWith ? `Continue with ` : ''}${
-                          ensName ?? truncatedAddress
+                        ? `${displayContinueWith ? `Continue with ` : ''}${ensName ?? truncatedAddress
                         }`
-                      : !isConnecting
-                      ? `${displayContinueWith ? `Continue with ` : ''}Wallet`
-                      : 'Connecting'}
+                        : !isConnecting
+                          ? `${displayContinueWith ? `Continue with ` : ''}Wallet`
+                          : 'Connecting'}
                   </Text>
                 )}
               </button>

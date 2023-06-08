@@ -22,6 +22,11 @@ const ConnectButton = lazy(() =>
 export const AuthenticationScreenDefaults = {
   defaultLogoURL: circleLogo,
   defaultHeading: 'Welcome to the Private Web',
+  defaultSignMessage: `Welcome to Rollup!
+
+Sign this message to accept the Rollup Terms of Service (https://rollup.id/tos), no password needed!
+
+This will not trigger a blockchain transaction or cost any gas fees.`,
   defaultSubheading: 'How would you like to continue?',
   knownKeys: [
     'wallet',
@@ -39,6 +44,8 @@ export const AuthenticationScreenDefaults = {
   },
   radius: 'md',
 }
+
+export const appendNonceTemplate = (signMessage: string) => `${signMessage}${signMessage.endsWith('\n') ? '' : '\n'}\n{{nonce}}`
 
 export type AuthenticationProps = {
   logoURL?: string
@@ -65,8 +72,7 @@ export default function Authentication({
       <div
         className={`flex grow-0 flex-col items-center
          gap-4 mx-auto bg-white dark:bg-[#1F2937] p-6 min-h-[100dvh] lg:min-h-[580px]
-          max-h-[100dvh] w-full lg:w-[418px] lg:rounded-${
-            theme?.radius ?? AuthenticationScreenDefaults.radius
+          max-h-[100dvh] w-full lg:w-[418px] lg:rounded-${theme?.radius ?? AuthenticationScreenDefaults.radius
           }
           mt-auto border border-[#D1D5DB] dark:border-gray-600`}
         style={{
@@ -131,20 +137,24 @@ type DisplayKeyMapperArgs = {
   loading?: boolean
   flex?: boolean
   displayContinueWith?: boolean
+  enableOAuthSubmit?: boolean
+  signMessageTemplate: string
 }
 const displayKeyMapper = (
   key: string,
   {
     clientId,
     signData,
-    walletConnectCallback = () => {},
-    walletSignCallback = () => {},
-    walletConnectErrorCallback = () => {},
-    navigate = () => {},
+    walletConnectCallback = () => { },
+    walletSignCallback = () => { },
+    walletConnectErrorCallback = () => { },
+    navigate = () => { },
     authnQueryParams,
     loading = false,
     flex = false,
     displayContinueWith = false,
+    enableOAuthSubmit = false,
+    signMessageTemplate,
   }: DisplayKeyMapperArgs
 ) => {
   let el
@@ -160,6 +170,7 @@ const displayKeyMapper = (
           connectCallback={walletConnectCallback}
           connectErrorCallback={walletConnectErrorCallback}
           signCallback={walletSignCallback}
+          signMessageTemplate={signMessageTemplate}
         />
       )
       break

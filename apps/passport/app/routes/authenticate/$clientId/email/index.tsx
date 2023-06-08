@@ -74,7 +74,7 @@ export default () => {
           <Button
             type="submit"
             btnSize="xl"
-            btnType="primary-alt"
+            btnType="primary-alt-skin"
             className="w-full"
           >
             Send Code
