@@ -636,7 +636,7 @@ const AuthPanel = ({
                 resetToDefaults()
               }}
             >
-              <Text size="sm" weight="normal" className="text-skin-primary">
+              <Text size="sm" weight="normal" className="text-indigo-600">
                 Reset to default
               </Text>
             </button>
