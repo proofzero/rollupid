@@ -45,7 +45,7 @@ const PartnerUrl = ({ title, description, imgSrc, url }: PartnerUrlProps) => {
       </div>
 
       <span className="mx-5 my-4">
-        <ButtonAnchor href={url} className="bg-gray-100 border-none">
+        <ButtonAnchor href={url} className="bg-gray-100 hover:bg-gray-200 border-none">
           Visit website
         </ButtonAnchor>
       </span>

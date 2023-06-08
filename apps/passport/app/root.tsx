@@ -6,7 +6,7 @@ import type {
 
 import { json, redirect } from '@remix-run/cloudflare'
 
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import {
   Links,
@@ -54,6 +54,7 @@ import * as gtag from '~/utils/gtags.client'
 import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -157,6 +158,15 @@ export default function App() {
     )
   }, [browserEnv.flashes])
 
+  const [dark, setDark] = useState<boolean>(false)
+  const [ueComplete, setUEComplete] = useState(false)
+  useEffect(() => {
+    const darkMode = window.matchMedia('(prefers-color-scheme: dark)')
+    setDark(darkMode.matches)
+
+    setUEComplete(true)
+  }, [])
+
   return (
     <html lang="en">
       <head>
@@ -175,7 +185,7 @@ export default function App() {
 
         <Links />
       </head>
-      <body className={`bg-[#F9FAFB] dark:bg-gray-900`}>
+      <body>
         {!GATag ? null : (
           <>
             <script
@@ -202,7 +212,11 @@ export default function App() {
         )}
         {transition.state !== 'idle' && <Loader />}
         <Toaster position="top-right" />
-        <Outlet />
+        {ueComplete && <ThemeContext.Provider value={{
+          dark,
+          theme: undefined
+        }}> <Outlet />
+        </ThemeContext.Provider>}
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
         <script

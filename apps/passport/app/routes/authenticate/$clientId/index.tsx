@@ -161,8 +161,8 @@ const InnerComponent = ({
                   {appProps?.appTheme?.heading
                     ? appProps.appTheme.heading
                     : appProps?.name
-                    ? `Login to ${appProps?.name}`
-                    : AuthenticationScreenDefaults.defaultHeading}
+                      ? `Login to ${appProps?.name}`
+                      : AuthenticationScreenDefaults.defaultHeading}
                 </h1>
                 <h2
                   style={{ color: '#6B7280' }}
@@ -181,7 +181,7 @@ const InnerComponent = ({
             <div className="flex flex-1 items-end">
               <Button
                 btnSize="l"
-                btnType="secondary-alt"
+                btnType="secondary-alt-skin"
                 className="w-full"
                 onClick={() => navigate('/authenticate/cancel')}
               >

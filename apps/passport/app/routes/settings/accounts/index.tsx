@@ -145,7 +145,7 @@ const RenameModal = ({
             Cancel
           </Button>
 
-          <Button type="submit" btnType="primary">
+          <Button type="submit" btnType="primary-alt">
             Save
           </Button>
         </div>

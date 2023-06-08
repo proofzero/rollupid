@@ -255,7 +255,7 @@ export default function EmailOTPValidator({
         {onCancel && (
           <Button
             btnSize="xl"
-            btnType="secondary-alt"
+            btnType="secondary-alt-skin"
             className="flex-1 w-full"
             onClick={onCancel}
           >Ș

@@ -26,7 +26,7 @@ import {
   createAuthzParamCookieAndCreate,
   getDataForScopes,
 } from '~/utils/authorize.server'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { AuthorizationControlSelection } from '@proofzero/types/application'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
@@ -117,7 +117,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       !(
         context.authzQueryParams.clientId === 'passport' &&
         context.authzQueryParams.redirectUri ===
-          `${new URL(request.url).origin}/settings`
+        `${new URL(request.url).origin}/settings`
       ) &&
       connectResult !== 'CANCEL'
     ) {
@@ -405,13 +405,7 @@ export default function Authorize() {
   >([])
 
   // Re-render the component every time persona gets updated
-  useEffect(() => {}, [persona])
-
-  const [dark, setDark] = useState<boolean>(false)
-  useEffect(() => {
-    const darkMode = window.matchMedia('(prefers-color-scheme: dark)')
-    setDark(darkMode.matches)
-  }, [])
+  useEffect(() => { }, [persona])
 
   const submit = useSubmit()
   const navigate = useNavigate()
@@ -476,61 +470,50 @@ export default function Authorize() {
     submit(form, { method: 'post' })
   }
 
+  const { dark } = useContext(ThemeContext)
+
   return (
     <>
       <Helmet>
         <style type="text/css">{`
             :root {
                 ${getRGBColor(
-                  dark
-                    ? appProfile?.appTheme?.color?.dark ??
-                        AuthenticationScreenDefaults.color.dark
-                    : appProfile?.appTheme?.color?.light ??
-                        AuthenticationScreenDefaults.color.light,
-                  'primary'
-                )}
+          dark
+            ? appProfile?.appTheme?.color?.dark ??
+            AuthenticationScreenDefaults.color.dark
+            : appProfile?.appTheme?.color?.light ??
+            AuthenticationScreenDefaults.color.light,
+          'primary'
+        )}
                 ${getRGBColor(
-                  getTextColor(
-                    dark
-                      ? appProfile?.appTheme?.color?.dark ??
-                          AuthenticationScreenDefaults.color.dark
-                      : appProfile?.appTheme?.color?.light ??
-                          AuthenticationScreenDefaults.color.light
-                  ),
-                  'primary-contrast-text'
-                )}
+          getTextColor(
+            dark
+              ? appProfile?.appTheme?.color?.dark ??
+              AuthenticationScreenDefaults.color.dark
+              : appProfile?.appTheme?.color?.light ??
+              AuthenticationScreenDefaults.color.light
+          ),
+          'primary-contrast-text'
+        )}
              {
          `}</style>
       </Helmet>
 
-      <div className={'flex flex-row h-[100dvh] justify-center items-center'}>
-        <div
-          className={
-            'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 overflow-hidden'
-          }
-          style={{
-            background: `url(${
-              appProfile?.appTheme?.graphicURL ?? sideGraphics
-            })`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }}
-        ></div>
-        <div className={'basis-full basis-full lg:basis-3/5'}>
-          <ThemeContext.Provider
-            value={{
-              dark,
-              theme: {
-                color:
-                  appProfile.appTheme?.color ??
-                  AuthenticationScreenDefaults.color,
-                radius:
-                  appProfile.appTheme?.radius ??
-                  AuthenticationScreenDefaults.radius,
-              },
+      <div className={`${dark ? 'dark' : ''}`}>
+        <div className={'flex flex-row h-[100dvh] justify-center items-center bg-[#F9FAFB] dark:bg-gray-900'}>
+          <div
+            className={
+              'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 dark:bg-[#1F2937] overflow-hidden'
+            }
+            style={{
+              backgroundImage: `url(${appProfile?.appTheme?.graphicURL ?? sideGraphics
+                })`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
             }}
-          >
+          ></div>
+          <div className={'basis-full basis-full lg:basis-3/5'}>
             <Authorization
               userProfile={{
                 pfpURL: userProfile.pfp.image,
@@ -617,8 +600,9 @@ export default function Authorize() {
                 (requestedScope.includes('erc_4337') &&
                   !selectedSCWallets.length)
               }
+              radius={appProfile.appTheme?.radius}
             />
-          </ThemeContext.Provider>
+          </div>
         </div>
       </div>
     </>

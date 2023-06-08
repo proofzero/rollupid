@@ -50,15 +50,14 @@ const ConnectOAuthButton = ({
       className={
         'button w-full dark:bg-[#374151] dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
       }
-      btnType={'secondary-alt'}
+      btnType={'secondary-alt-skin'}
       isSubmit={submit}
       role={provider}
       onClick={onClick}
     >
       <div
-        className={`flex ${
-          fullSize ? '' : 'justify-center'
-        }  items-center w-full space-x-3 h-[36px]`}
+        className={`flex ${fullSize ? '' : 'justify-center'
+          }  items-center w-full space-x-3 h-[36px]`}
       >
         {providerIconDict[provider]}
 

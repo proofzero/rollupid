@@ -14,10 +14,10 @@ type NonEmptyArray<T> = [T, ...T[]]
 
 export type EmailConnectionProp = {
   addr_type:
-    | EmailAddressType.Email
-    | OAuthAddressType.Google
-    | OAuthAddressType.Microsoft
-    | OAuthAddressType.Apple
+  | EmailAddressType.Email
+  | OAuthAddressType.Google
+  | OAuthAddressType.Microsoft
+  | OAuthAddressType.Apple
   callback: () => void
 }
 
@@ -61,7 +61,7 @@ export const EmailConnection = ({
       </Text>
       {genericEmailProvider.length ? (
         <Button
-          btnType="secondary-alt"
+          btnType="secondary-alt-skin"
           className="border rounded-lg flex items-center px-2 h-[50px]
       w-full"
           onClick={genericEmailProvider[0].callback}
@@ -96,7 +96,7 @@ export const EmailConnection = ({
               return (
                 <Button
                   key={provider.addr_type}
-                  btnType="secondary-alt"
+                  btnType="secondary-alt-skin"
                   onClick={provider.callback}
                   className="flex justify-center items-center
                   border rounded-lg w-full h-[50px]"
@@ -109,7 +109,7 @@ export const EmailConnection = ({
         </div>
       ) : null}
       <Button
-        btnType="secondary-alt"
+        btnType="secondary-alt-skin"
         onClick={() => {
           cancelCallback()
         }}

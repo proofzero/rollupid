@@ -68,7 +68,7 @@ export const ConfirmRevocationModal = ({
           <Button
             btnType="secondary-alt"
             onClick={() => setIsOpen(false)}
-            className="bg-gray-100"
+            className="bg-gray-100 hover:bg-gray-200"
           >
             Cancel
           </Button>

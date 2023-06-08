@@ -10,7 +10,7 @@ function withOpacity(variableName) {
 }
 
 module.exports = {
-  darkMode: 'media',
+  darkMode: 'class',
   content: [
     './app/**/*.{ts,tsx,jsx,js,mdx}',
     './node_modules/flowbite/**/*.js',

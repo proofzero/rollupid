@@ -11,7 +11,7 @@ export function LazyAuth({
     children: JSX.Element,
 }) {
     const hydrated = useHydrated()
-    if (!hydrated) return <>Loading...</>
+    if (!hydrated) return null
 
     const config = createConfig(
         getDefaultConfig({

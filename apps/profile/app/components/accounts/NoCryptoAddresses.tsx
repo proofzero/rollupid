@@ -16,7 +16,7 @@ const NoCryptoAddresses = ({
       </Text>
       <Button
         btnType="secondary-alt"
-        className="bg-gray-100 border-none"
+        className="bg-gray-100 hover:bg-gray-200 border-none"
         btnSize="l"
         onClick={() => {
           redirectHandler()

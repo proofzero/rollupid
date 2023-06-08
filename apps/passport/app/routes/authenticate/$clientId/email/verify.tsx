@@ -94,7 +94,7 @@ export default () => {
   const [lastRegen, setLastRegen] = useState(Date.now())
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       try {
         const resObj = await fetch('/connect/email/otp' + location.search)
         const res = await resObj.json<{
@@ -166,7 +166,7 @@ export default () => {
         <div className="flex flex-1 w-full items-end">
           <Button
             btnSize="l"
-            btnType="secondary-alt"
+            btnType="secondary-alt-skin"
             className="w-full hover:bg-gray-100"
             onClick={() => navigate('/authenticate/cancel')}
           >
