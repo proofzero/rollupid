@@ -2,6 +2,7 @@ import { Popover, Tab } from '@headlessui/react'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import {
   Form,
+  Link,
   useActionData,
   useFetcher,
   useLoaderData,
@@ -78,6 +79,7 @@ import {
 import type { appDetailsProps } from '~/types'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { AddressURN } from '@proofzero/urns/address'
+import danger from '~/images/danger.svg'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -230,8 +232,10 @@ const ProviderModal = ({
 
   return (
     <Modal isOpen={isOpen} fixed handleClose={() => onClose(false)}>
-      <div className="bg-white rounded-lg px-6 pb-6 min-w-full lg:w-[543px]
-      lg:m-auto overflow-y-auto">
+      <div
+        className="bg-white rounded-lg px-6 pb-6 min-w-full lg:w-[543px]
+      lg:m-auto overflow-y-auto"
+      >
         <Text weight="semibold" className="text-left text-gray-800 mb-4">
           Login Provider Configuration
         </Text>
@@ -735,7 +739,7 @@ const AuthPanel = ({
                         signMessageTemplate: signMessage,
                         clientId: 'Foo',
                         signData: null,
-                        authnQueryParams: ''
+                        authnQueryParams: '',
                       }}
                     />
                   </LazyAuth>
@@ -843,12 +847,14 @@ const AuthPanel = ({
 const EmailPanel = ({
   clientId,
   addressURN,
+  appContactEmail,
   emailTheme,
   setLoading,
   errors,
 }: {
   clientId: string
-  addressURN: AddressURN | undefined
+  addressURN?: AddressURN
+  appContactEmail?: string
   emailTheme?: EmailOTPTheme
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
   errors?: {
@@ -925,7 +931,9 @@ const EmailPanel = ({
                 url={logoURL}
                 invalid={errors && errors['email.logoURL'] ? true : false}
                 errorMessage={
-                  errors && errors['email.logoURL'] ? errors['email.logoURL'] : ''
+                  errors && errors['email.logoURL']
+                    ? errors['email.logoURL']
+                    : ''
                 }
               />
 
@@ -993,37 +1001,81 @@ const EmailPanel = ({
 
           <div className="w-full border-b border-gray-200"></div>
 
-          <FormElement label="OTP Preview">
-            <div className="flex flex-row items-center gap-4">
-              <CountdownCircleTimer
-                size={16}
-                strokeWidth={2}
-                isPlaying
-                duration={15}
-                rotation={'counterclockwise'}
-                colors={'#6366f1'}
-                isGrowing={true}
-                onComplete={() => {
+          <div className="flex flex-col lg:flex-row lg:items-center px-8 py-4">
+            <div className="flex-1 mb-2 lg:mb-0 flex flex-row items-center gap-4">
+              {!appContactEmail && (
+                <img className="w-4 h-4" src={danger} />
+              )}
 
-                }}
-              />
-              <Button type="button" btnType='secondary-alt' btnSize='xs' onClick={() => {
-                let previewTheme: EmailOTPTheme = {
-                  logoURL: logoURL ?? 'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public',
-                  address: address,
-                  contact: contact,
-                }
+              <div>
+                <Text size="sm" weight="medium" className="text-gray-900">
+                  OTP Preview
+                </Text>
 
-                previewEmailFetcher.submit({
-                  addressURN: addressURN!,
-                  theme: JSON.stringify(previewTheme),
-                }, {
-                  method: 'post',
-                  action: `/apps/${clientId}/designer/otp/preview`,
-                })
-              }}>Send Preview</Button>
+                <div className="flex-1">
+                  <Text size="xs" weight="normal" className="text-gray-500">
+                    {appContactEmail && (
+                      <Text
+                        size="xs"
+                        weight="normal"
+                        className="text-gray-500"
+                      >{`Sends email to "${appContactEmail}"`}</Text>
+                    )}
+                    {!appContactEmail && (
+                      <Text size="xs" weight="normal" className="text-gray-500">
+                        Please connect email in{' '}
+                        <Link to={`/apps/${clientId}/team`}>
+                          <Text type="span" size="xs" weight="normal" className="text-indigo-500">Team & Contact</Text>
+                        </Link>
+                      </Text>
+                    )}
+                  </Text>
+                </div>
+              </div>
             </div>
-          </FormElement>
+
+            <div className="flex-1 w-full">
+              <div className="flex flex-row items-center gap-4">
+                <CountdownCircleTimer
+                  size={16}
+                  strokeWidth={2}
+                  isPlaying
+                  duration={15}
+                  rotation={'counterclockwise'}
+                  colors={'#6366f1'}
+                  isGrowing={true}
+                  onComplete={() => { }}
+                />
+                <Button
+                  type="button"
+                  btnType="secondary-alt"
+                  btnSize="xs"
+                  onClick={() => {
+                    let previewTheme: EmailOTPTheme = {
+                      logoURL:
+                        logoURL ??
+                        'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public',
+                      address: address,
+                      contact: contact,
+                    }
+
+                    previewEmailFetcher.submit(
+                      {
+                        addressURN: addressURN!,
+                        theme: JSON.stringify(previewTheme),
+                      },
+                      {
+                        method: 'post',
+                        action: `/apps/${clientId}/designer/otp/preview`,
+                      }
+                    )
+                  }}
+                >
+                  Send Preview
+                </Button>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section className="bg-white border rounded-lg pb-3 px-6 min-w-[468px] h-[781px] overflow-scroll">
@@ -1105,7 +1157,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     return json({
       appTheme,
-      emailTheme
+      emailTheme,
     })
   }
 )
@@ -1263,9 +1315,10 @@ export default () => {
     emailTheme: GetEmailOTPThemeResult
   }>()
 
-  const { appDetails, appContactAddress } = useOutletContext<{
-    appDetails: appDetailsProps,
+  const { appDetails, appContactAddress, appContactEmail } = useOutletContext<{
+    appDetails: appDetailsProps
     appContactAddress?: AddressURN
+    appContactEmail?: string
   }>()
 
   const actionData = useActionData()
@@ -1354,6 +1407,7 @@ export default () => {
             <EmailPanel
               clientId={appDetails.clientId!}
               addressURN={appContactAddress}
+              appContactEmail={appContactEmail}
               emailTheme={emailTheme}
               setLoading={setLoading}
               errors={errors}

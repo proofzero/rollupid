@@ -13,6 +13,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const jwt = await requireJWT(request)
 
   const formData = await request.formData()
+  const theme: EmailOTPTheme = JSON.parse(formData.get('theme') as string)
   const addressURN = formData.get('addressURN') as string
 
   const addressClient = createAddressClient(Address, {
@@ -23,7 +24,6 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 
   const { address: email } = await addressClient.getAddressProfile.query()
 
-  const theme: EmailOTPTheme = JSON.parse(formData.get('theme') as string)
   const starbaseClient = createStarbaseClient(
     Starbase,
     {

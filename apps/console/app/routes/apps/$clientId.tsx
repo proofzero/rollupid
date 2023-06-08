@@ -8,6 +8,7 @@ import SiteHeader from '~/components/SiteHeader'
 
 import { requireJWT } from '~/utilities/session.server'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createAddressClient from '@proofzero/platform-clients/address'
 import type { appDetailsProps } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { Popover } from '@headlessui/react'
@@ -24,11 +25,13 @@ import type { AddressURN } from '@proofzero/urns/address'
 import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import { BadRequestError, NotFoundError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 
 type LoaderData = {
   appDetails: appDetailsProps
   rotationResult?: RotatedSecrets
   appContactAddress?: AddressURN
+  appContactEmail?: string
   paymaster: PaymasterType
 }
 
@@ -86,10 +89,23 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         }
       )
 
+      let appContactEmail
+      if (appContactAddress) {
+        const addressClient = createAddressClient(Address, {
+          [PlatformAddressURNHeader]: appContactAddress,
+          ...getAuthzHeaderConditionallyFromToken(jwt),
+          ...generateTraceContextHeaders(context.traceSpan),
+        })
+
+        const { address } = await addressClient.getAddressProfile.query()
+        appContactEmail = address
+      }
+
       return json<LoaderData>({
         appDetails: appDetails as appDetailsProps,
         rotationResult,
         appContactAddress,
+        appContactEmail,
         paymaster,
       })
     } catch (error) {
@@ -112,7 +128,7 @@ export default function AppDetailIndexPage() {
 
   const { apps, avatarUrl, PASSPORT_URL, displayName } =
     useOutletContext<OutletContextData>()
-  const { appDetails, rotationResult, appContactAddress, paymaster } =
+  const { appDetails, rotationResult, appContactAddress, appContactEmail, paymaster } =
     loaderData
 
   const notify = (success: boolean = true) => {
@@ -147,14 +163,13 @@ export default function AppDetailIndexPage() {
             <Toaster position="top-right" reverseOrder={false} />
 
             <section
-              className={`${
-                open
-                  ? 'max-lg:opacity-50\
+              className={`${open
+                ? 'max-lg:opacity-50\
                     max-lg:overflow-hidden\
                     max-lg:h-[calc(100dvh-80px)]\
                     min-h-[636px]'
-                  : 'h-full '
-              } py-9 sm:mx-11 max-w-[1636px]`}
+                : 'h-full '
+                } py-9 sm:mx-11 max-w-[1636px]`}
             >
               <Outlet
                 context={{
@@ -164,6 +179,7 @@ export default function AppDetailIndexPage() {
                   rotationResult,
                   PASSPORT_URL,
                   appContactAddress,
+                  appContactEmail,
                   paymaster,
                 }}
               />
