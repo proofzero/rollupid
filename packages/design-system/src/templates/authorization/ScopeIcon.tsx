@@ -18,24 +18,6 @@ const connectedAccountsSVG = (
   </svg>
 )
 
-const profileSVG = (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M6 21V19C6 17.9391 6.42143 16.9217 7.17157 16.1716C7.92172 15.4214 8.93913 15 10 15H14C15.0609 15 16.0783 15.4214 16.8284 16.1716C17.5786 16.9217 18 17.9391 18 19V21M8 7C8 8.06087 8.42143 9.07828 9.17157 9.82843C9.92172 10.5786 10.9391 11 12 11C13.0609 11 14.0783 10.5786 14.8284 9.82843C15.5786 9.07828 16 8.06087 16 7C16 5.93913 15.5786 4.92172 14.8284 4.17157C14.0783 3.42143 13.0609 3 12 3C10.9391 3 9.92172 3.42143 9.17157 4.17157C8.42143 4.92172 8 5.93913 8 7Z"
-      stroke="CurrentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-  </svg>
-)
-
 const emailSVG = (
   <svg
     width="24"
@@ -75,41 +57,17 @@ const smartContractsSVG = (
   </svg>
 )
 
-const systemIdentifiersSVG = (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M21 12C21 10.2192 20.4717 8.4785 19.482 6.99809C18.4924 5.51768 17.0857 4.36414 15.4402 3.68346C13.7947 3.00277 11.9842 2.82554 10.2379 3.17418C8.49164 3.52283 6.88802 4.38169 5.63003 5.64206C4.37204 6.90244 3.51621 8.50767 3.17087 10.2546C2.82552 12.0016 3.00618 13.8117 3.68998 15.4559C4.37377 17.1002 5.52997 18.5046 7.01225 19.4915C8.49453 20.4784 10.2363 21.0034 12.017 21M18.001 20C17.4706 20 16.9619 19.7893 16.5868 19.4142C16.2117 19.0391 16.001 18.5304 16.001 18C16.001 17.4696 16.2117 16.9608 16.5868 16.5858C16.9619 16.2107 17.4706 16 18.001 16M18.001 20C18.5314 20 19.0401 19.7893 19.4152 19.4142C19.7903 19.0391 20.001 18.5304 20.001 18C20.001 17.4696 19.7903 16.9608 19.4152 16.5858C19.0401 16.2107 18.5314 16 18.001 16M18.001 20V21.5M18.001 16V14.5M21.032 16.25L19.733 17M16.27 19L14.97 19.75M14.97 16.25L16.27 17M19.733 19L21.033 19.75M9 9.99999H9.01M15 9.99999H15.01M9.5 15C10.158 15.64 11.06 16 12 16"
-      stroke="CurrentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-  </svg>
-)
-
 export default ({ scope }: { scope: string }) => {
   let svg
   switch (scope) {
     case 'connected_accounts':
       svg = connectedAccountsSVG
       break
-    case 'profile':
-      svg = profileSVG
-      break
     case 'email':
       svg = emailSVG
       break
     case 'erc_4337':
       svg = smartContractsSVG
-      break
-    case 'system_identifiers':
-      svg = systemIdentifiersSVG
       break
   }
   return (
