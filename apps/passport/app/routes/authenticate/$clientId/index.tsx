@@ -109,12 +109,6 @@ const InnerComponent = ({
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (transitionState === 'idle') {
-      setLoading(false)
-    }
-  }, [transitionState])
-
-  useEffect(() => {
     const url = new URL(window.location.href)
 
     const error = url.searchParams.get('oauth_error')
@@ -161,8 +155,8 @@ const InnerComponent = ({
                   {appProps?.appTheme?.heading
                     ? appProps.appTheme.heading
                     : appProps?.name
-                      ? `Login to ${appProps?.name}`
-                      : AuthenticationScreenDefaults.defaultHeading}
+                    ? `Login to ${appProps?.name}`
+                    : AuthenticationScreenDefaults.defaultHeading}
                 </h1>
                 <h2
                   style={{ color: '#6B7280' }}
@@ -210,7 +204,7 @@ const InnerComponent = ({
           if (loading) return
           // fetch nonce and kickoff sign flow
           setLoading(true)
-          fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
+          await fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
             .then((res) =>
               res.json<{
                 nonce: string
@@ -232,6 +226,7 @@ const InnerComponent = ({
                   'Could not fetch nonce for signing authentication message',
               })
             })
+          setLoading(false)
         },
         walletSignCallback: (address, signature, nonce, state) => {
           console.debug('signing complete')
