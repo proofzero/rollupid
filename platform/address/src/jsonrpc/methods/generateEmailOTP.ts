@@ -28,9 +28,9 @@ export const generateEmailOTPMethod = async ({
   const { email, themeProps, preview } = input
   const emailAddressNode = new EmailAddress(ctx.address as AddressNode, ctx)
 
-  let delayMiliseconds = preview ? 15000 : undefined
-
   const state = generateRandomString(EMAIL_VERIFICATION_OPTIONS.STATE_LENGTH)
+
+  const delayMiliseconds = preview ? 15000 : undefined
   const code = await emailAddressNode.generateVerificationCode(
     state,
     delayMiliseconds
