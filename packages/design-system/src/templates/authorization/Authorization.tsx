@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { Avatar } from '../../atoms/profile/avatar/Avatar'
 import { Text } from '../../atoms/text/Text'
 import authorizeCheck from './authorize-check.svg'
@@ -8,7 +8,6 @@ import { Button } from '../../atoms/buttons/Button'
 import Info from '../../atoms/info/Info'
 import { ScopeDescriptor } from '@proofzero/security/scopes'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
-import { ThemeContext } from '../../contexts/theme'
 import ScopeIcon from './ScopeIcon'
 import {
   Dropdown,
@@ -102,7 +101,7 @@ export default ({
   return (
     <div
       className={`flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6\
-           lg:rounded-${radius} min-h-fit lg:min-h-[580px] max-h-[100dvh] border border-[#D1D5DB] dark:border-gray-600`}
+           lg:rounded-${radius} min-h-fit lg:min-h-[580px] max-h-fit border border-[#D1D5DB] dark:border-gray-600`}
       style={{
         width: 418,
         boxSizing: 'border-box',
@@ -118,7 +117,7 @@ export default ({
         <img src={authorizeCheck} alt="Authorize Check" />
         <Avatar src={appProfile.iconURL} size={'sm'} />
       </div>
-      <div className={'flex flex-col items-center justify-center gap-2'}>
+      <div className={'flex flex-col items-center justify-center'}>
         <h1 className={'font-semibold text-xl text-xl dark:text-white'}>
           {appProfile.name}
         </h1>
