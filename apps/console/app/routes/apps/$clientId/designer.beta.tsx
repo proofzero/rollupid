@@ -851,6 +851,7 @@ const EmailPanel = ({
   clientId,
   addressURN,
   appContactEmail,
+  appPublished = false,
   emailTheme,
   setLoading,
   errors,
@@ -858,6 +859,7 @@ const EmailPanel = ({
   clientId: string
   addressURN?: AddressURN
   appContactEmail?: string
+  appPublished: boolean
   emailTheme?: EmailOTPTheme
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
   errors?: {
@@ -1032,7 +1034,9 @@ const EmailPanel = ({
 
           <div className="flex flex-col lg:flex-row lg:items-center px-8 py-4">
             <div className="flex-1 mb-2 lg:mb-0 flex flex-row items-center gap-4">
-              {!appContactEmail && <img className="w-4 h-4" src={danger} />}
+              {(!appContactEmail || !appPublished) && (
+                <img className="w-4 h-4" src={danger} />
+              )}
 
               <div>
                 <Text size="sm" weight="medium" className="text-gray-900">
@@ -1041,7 +1045,7 @@ const EmailPanel = ({
 
                 <div className="flex-1">
                   <Text size="xs" weight="normal" className="text-gray-500">
-                    {appContactEmail && (
+                    {appContactEmail && appPublished && (
                       <Text
                         size="xs"
                         weight="normal"
@@ -1059,6 +1063,25 @@ const EmailPanel = ({
                             className="text-indigo-500"
                           >
                             Team & Contact
+                          </Text>
+                        </Link>
+                      </Text>
+                    )}
+                    {!appPublished && (
+                      <Text
+                        size="xs"
+                        weight="normal"
+                        className="text-gray-500"
+                      >
+                        Please publish app in{' '}
+                        <Link to={`/apps/${clientId}/auth`}>
+                          <Text
+                            type="span"
+                            size="xs"
+                            weight="normal"
+                            className="text-indigo-500"
+                          >
+                            OAuth
                           </Text>
                         </Link>
                       </Text>
@@ -1109,7 +1132,7 @@ const EmailPanel = ({
 
                     setShowTimer(true)
                   }}
-                  disabled={showTimer || !appContactEmail}
+                  disabled={showTimer || !appContactEmail || !appPublished}
                 >
                   <div className="flex flex-row items-center gap-2">
                     <HiOutlineMail className="w-3.5 h-3.5" />{' '}
@@ -1457,6 +1480,7 @@ export default () => {
               clientId={appDetails.clientId!}
               addressURN={appContactAddress}
               appContactEmail={appContactEmail}
+              appPublished={appDetails.published}
               emailTheme={emailTheme}
               setLoading={setLoading}
               errors={errors}
