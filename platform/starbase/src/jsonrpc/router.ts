@@ -58,6 +58,9 @@ import { Analytics } from '@proofzero/platform-middleware/analytics'
 import { OwnAppsMiddleware } from './ownAppsMiddleware'
 import {
   getAppPublicProps,
+  getAppPublicPropsBatch,
+  GetAppPublicPropsBatchInput,
+  GetAppPublicPropsBatchOutput,
   GetAppPublicPropsInput,
   GetAppPublicPropsOutput,
 } from './methods/getAppPublicProps'
@@ -224,6 +227,12 @@ export const appRouter = t.router({
     .input(GetAppPublicPropsInput)
     .output(GetAppPublicPropsOutput)
     .query(getAppPublicProps),
+  getAppPublicPropsBatch: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAppPublicPropsBatchInput)
+    .output(GetAppPublicPropsBatchOutput)
+    .query(getAppPublicPropsBatch),
   publishApp: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
