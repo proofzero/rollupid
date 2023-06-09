@@ -20,7 +20,7 @@ import {
 } from '~/session.server'
 
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import { AuthorizedAppsModel } from '~/routes/settings'
+import type { AuthorizedAppsModel } from '~/routes/settings'
 import { WarningCTA } from '@proofzero/design-system/src/molecules/cta/warning'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 

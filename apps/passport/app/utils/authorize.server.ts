@@ -17,7 +17,8 @@ import type { AccountURN } from '@proofzero/urns/account'
 import type { PersonaData } from '@proofzero/types/application'
 import { redirect } from '@remix-run/cloudflare'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
-import { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import type { GetAuthorizedAppScopesMethodResult } from '@proofzero/platform.access/src/jsonrpc/methods/getAuthorizedAppScopes'
 
 export type DataForScopes = {
   connectedEmails: DropdownSelectListItem[]
@@ -49,13 +50,13 @@ export const reorderScope = (scopes: string[]): string[] => {
 }
 // -----------------------------------------------------------------------------
 
-
 export const getDataForScopes = async (
   requestedScope: string[],
   accountURN: AccountURN,
   jwt?: string,
   env?: any,
-  traceSpan?: any
+  traceSpan?: any,
+  preauthorisedScopes?: GetAuthorizedAppScopesMethodResult
 ): Promise<DataForScopes> => {
   if (!accountURN)
     throw new UnauthorizedError({ message: 'Account URN is required' })
@@ -72,23 +73,42 @@ export const getDataForScopes = async (
 
   if (connectedAccounts && connectedAccounts.length) {
     if (requestedScope.includes(Symbol.keyFor(SCOPE_EMAIL)!)) {
-      connectedEmails = getEmailDropdownItems(connectedAccounts, true)
+      connectedEmails = getEmailDropdownItems(
+        connectedAccounts,
+        true,
+        preauthorisedScopes &&
+          Object.keys(preauthorisedScopes).includes(Symbol.keyFor(SCOPE_EMAIL)!)
+          ? preauthorisedScopes[Symbol.keyFor(SCOPE_EMAIL)!].meta
+              .urns[0]
+          : undefined
+      )
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!)) {
-      const addresses = (await Promise.all(
+      const addresses = await Promise.all(
         connectedAccounts
           .filter((ca) => {
-            return (ca.rc.node_type === NodeType.OAuth ||
-              ca.rc.node_type === NodeType.Email ||
-              ca.rc.node_type === NodeType.Crypto) &&
+            return (
+              (ca.rc.node_type === NodeType.OAuth ||
+                ca.rc.node_type === NodeType.Email ||
+                ca.rc.node_type === NodeType.Crypto) &&
               ca.rc.addr_type !== CryptoAddressType.Wallet
+            )
           })
           .map((ca) => {
             const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
             return addressClient.getAddressProfile.query()
           })
-      ))
-      connectedAddresses = getAddressDropdownItems(addresses)
+      )
+      connectedAddresses = getAddressDropdownItems(
+        addresses,
+        preauthorisedScopes &&
+          Object.keys(preauthorisedScopes).includes(
+            Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!
+          )
+          ? preauthorisedScopes[Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!].meta
+              .urns
+          : undefined
+      )
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!)) {
       const addresses = await Promise.all(
@@ -101,7 +121,16 @@ export const getDataForScopes = async (
             return addressClient.getAddressProfile.query()
           })
       )
-      connectedSmartContractWallets = getAddressDropdownItems(addresses)
+      connectedSmartContractWallets = getAddressDropdownItems(
+        addresses,
+        preauthorisedScopes &&
+          Object.keys(preauthorisedScopes).includes(
+            Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!
+          )
+          ? preauthorisedScopes[Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!]
+              .meta.urns
+          : undefined
+      )
     }
   }
 
@@ -143,7 +172,7 @@ export function authzParamsMatch(
     scopesMatch &&
     authzCookieParams.clientId === authzQueryParams.clientId &&
     `${authzReqRedirectURL?.origin}${authzReqRedirectURL?.pathname}` ===
-    `${authzReqCookieRedirectURL?.origin}${authzReqCookieRedirectURL?.pathname}` &&
+      `${authzReqCookieRedirectURL?.origin}${authzReqCookieRedirectURL?.pathname}` &&
     authzCookieParams.state === authzQueryParams.state
   )
 }
