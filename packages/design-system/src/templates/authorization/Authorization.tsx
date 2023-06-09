@@ -12,8 +12,11 @@ import { ThemeContext } from '../../contexts/theme'
 import ScopeIcon from './ScopeIcon'
 import {
   Dropdown,
+  DropdownListboxButtonType,
   DropdownSelectListItem,
 } from '../../atoms/dropdown/DropdownSelectList'
+
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
 
 type UserProfile = {
   pfpURL: string
@@ -57,6 +60,7 @@ type AuthorizationProps = {
   radius?: string
 }
 
+//eslint-disable-next-line react/display-name
 export default ({
   userProfile,
   appProfile,
@@ -97,10 +101,8 @@ export default ({
   }
   return (
     <div
-      className={
-        `flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6\
-           lg:rounded-${radius} min-h-[100dvh] lg:min-h-[580px] max-h-[100dvh] border border-[#D1D5DB] dark:border-gray-600`
-      }
+      className={`flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6\
+           lg:rounded-${radius} min-h-fit lg:min-h-[580px] max-h-[100dvh] border border-[#D1D5DB] dark:border-gray-600`}
       style={{
         width: 418,
         boxSizing: 'border-box',
@@ -111,7 +113,7 @@ export default ({
           src={userProfile.pfpURL}
           hex={false}
           size={'sm'}
-        // alt="User Profile"
+          // alt="User Profile"
         />
         <img src={authorizeCheck} alt="Authorize Check" />
         <Avatar src={appProfile.iconURL} size={'sm'} />
@@ -129,23 +131,65 @@ export default ({
           style={{ color: '#6B7280' }}
           className={'mb-2 font-extralight text-xs'}
         >
-          REQUESTED
+          APP ASKS FOR
         </p>
         <ul
           style={{ color: '#6B7280' }}
           className={'flex flex-col font-light text-base gap-2 w-full'}
         >
           {scopesToDisplay.map((scope: string, i: number) => {
-            return (
-              <li
-                key={i}
-                className={'flex flex-row gap-2 items-center w-full'}
-              >
-                <div className="flex flex-row w-full gap-2 items-center">
-                  <ScopeIcon scope={scope} />
+            const DropdownListboxButton = ({
+              selectedItem,
+              selectedItems,
+              allItemsSelected,
+              placeholder,
+              selectAllCheckboxTitle,
+              open,
+            }: DropdownListboxButtonType) => {
+              return (
+                <div
+                  className={`
+          border-b w-full transition-transform flex-row 
+          flex justify-between items-center px-3 bg-white 
+          dark:bg-[#1F2937] dark:border-gray-600 py-2
+          ${open ? 'bg-gray-50 shadow-sm rounded-lg' : ''}`}
+                >
+                  <div className="flex flex-row items-center gap-2 ">
+                    <Info
+                      name={scopeMeta.scopes[scope].name}
+                      description={scopeMeta.scopes[scope].description}
+                    />
 
-                  {(scope === 'profile' ||
-                    scope === 'system_identifiers') && (
+                    <div
+                      data-popover
+                      id={`popover-${scope}`}
+                      role="tooltip"
+                      className="absolute z-10 invisible inline-block
+                    font-[Inter] rounded-lg text-gray-500 
+                    min-w-64 text-sm font-light bg-white 
+                    transition-opacity duration-300 border
+                    dark:bg-[#1F2937] border-gray-200
+                    shadow-sm opacity-0 dark:text-gray-400 
+                    dark:border-gray-600 dark:bg-gray-800"
+                    >
+                      <div
+                        className="px-3 py-2 bg-gray-100
+        border-b border-gray-200 rounded-t-lg
+        dark:border-gray-600 dark:bg-gray-700"
+                      >
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                          {scope}
+                        </h3>
+                      </div>
+                      <div className="px-3 py-2">
+                        <p className="dark:text-white">
+                          {scopeMeta.scopes[scope].description}
+                        </p>
+                      </div>
+                    </div>
+                    <ScopeIcon scope={scope} />
+
+                    <div className="flex flex-col items-start w-max">
                       <Text
                         size="sm"
                         weight="medium"
@@ -153,63 +197,79 @@ export default ({
                       >
                         {scopeMeta.scopes[scope].name}
                       </Text>
-                    )}
+                      {!selectedItem &&
+                        !selectedItems.length &&
+                        !allItemsSelected && (
+                          <Text
+                            size="sm"
+                            className={`
+          ${
+            scopeMeta.scopes[scope].name === 'Smart contract wallets'
+              ? ''
+              : 'text-orange-500'
+          }
+          dark:text-white truncate text-ellipsis
+          `}
+                          >
+                            {placeholder}
+                          </Text>
+                        )}
 
-                  {scope === 'erc_4337' && (
-                    <div className="flex-1 min-w-0">
-                      <Dropdown
-                        items={connectedSmartContractWallets}
-                        placeholder="Select a Smart Contract Wallet"
-                        multiple={true}
-                        onSelect={(
-                          selectedItems: Array<DropdownSelectListItem>
-                        ) => {
-                          selectSmartWalletsCallback(selectedItems)
-                        }}
-                        onSelectAll={selectAllSmartWalletsCallback}
-                        ConnectButtonPhrase="New Smart Contract Wallet"
-                        ConnectButtonCallback={addNewSmartWalletCallback}
-                        selectAllCheckboxTitle="All Smart Contract Wallets"
-                        selectAllCheckboxDescription="All current and future SC Wallets"
-                      />
+                      {selectedItem?.title?.length && (
+                        <Text
+                          size="sm"
+                          className="text-gray-500 dark:text-white truncate text-ellipsis"
+                        >
+                          {selectedItem.title}
+                        </Text>
+                      )}
+
+                      {selectedItems.length > 1 && !allItemsSelected && (
+                        <Text
+                          size="sm"
+                          className="text-gray-500 dark:text-white truncate text-ellipsis"
+                        >
+                          {selectedItems.length} items selected
+                        </Text>
+                      )}
+
+                      {selectedItems.length === 1 && !allItemsSelected && (
+                        <Text
+                          size="sm"
+                          className="text-gray-500 dark:text-white truncate text-ellipsis"
+                        >
+                          {selectedItems[0].title} selected
+                        </Text>
+                      )}
+
+                      {allItemsSelected && (
+                        <Text
+                          size="sm"
+                          className="text-gray-500 dark:text-white truncate text-ellipsis"
+                        >
+                          {selectAllCheckboxTitle}
+                        </Text>
+                      )}
                     </div>
-                  )}
+                  </div>
 
-                  {scope === 'email' && (
-                    <div className="flex-1 min-w-0">
-                      <Dropdown
-                        items={connectedEmails}
-                        placeholder="Select an Email Address"
-                        onSelect={(selectedItem: DropdownSelectListItem) => {
-                          selectEmailCallback(selectedItem)
-                        }}
-                        ConnectButtonPhrase="Connect New Email Address"
-                        ConnectButtonCallback={addNewEmailCallback}
-                      />
-                    </div>
+                  {open ? (
+                    <ChevronUpIcon className="w-5 h-5 shrink-0 text-indigo-500" />
+                  ) : (
+                    <ChevronDownIcon className="w-5 h-5 shrink-0" />
                   )}
+                </div>
+              )
+            }
 
-                  {scope === 'connected_accounts' && (
-                    <div className="flex-1 min-w-0">
-                      <Dropdown
-                        items={connectedAccounts}
-                        onSelect={(
-                          selectedItems: Array<DropdownSelectListItem>
-                        ) => {
-                          selectAccountsCallback(selectedItems)
-                        }}
-                        onSelectAll={selectAllAccountsCallback}
-                        placeholder="No connected account(s)"
-                        ConnectButtonPhrase="Connect New Account"
-                        ConnectButtonCallback={addNewAccountCallback}
-                        multiple={true}
-                        selectAllCheckboxTitle="All Connected Accounts"
-                        selectAllCheckboxDescription="All current and future accounts"
-                      />
-                    </div>
-                  )}
-
-                  <div>
+            return (
+              <li key={i} className={'flex flex-row gap-2 items-center w-full'}>
+                {(scope === 'profile' || scope === 'system_identifiers') && (
+                  <div
+                    className="w-full transition-transform flex flex-row
+                      justify-between items-center px-3 bg-white 
+                      dark:bg-[#1F2937] dark:border-gray-600 gap-2 py-2 border-b"
+                  >
                     <Info
                       name={scopeMeta.scopes[scope].name}
                       description={scopeMeta.scopes[scope].description}
@@ -235,8 +295,73 @@ export default ({
                       </div>
                       <div data-popper-arrow></div>
                     </div>
+
+                    <Text
+                      size="sm"
+                      weight="medium"
+                      className="flex-1 text-gray-500"
+                    >
+                      {scopeMeta.scopes[scope].name}
+                    </Text>
                   </div>
-                </div>
+                )}
+
+                {scope === 'erc_4337' && (
+                  <div className="flex-1 min-w-0">
+                    <Dropdown
+                      items={connectedSmartContractWallets}
+                      placeholder="Create New Wallet"
+                      multiple={true}
+                      onSelect={(
+                        selectedItems: Array<DropdownSelectListItem>
+                      ) => {
+                        selectSmartWalletsCallback(selectedItems)
+                      }}
+                      onSelectAll={selectAllSmartWalletsCallback}
+                      ConnectButtonPhrase="New Smart Contract Wallet"
+                      ConnectButtonCallback={addNewSmartWalletCallback}
+                      selectAllCheckboxTitle="All Smart Contract Wallets"
+                      selectAllCheckboxDescription="All current and future SC Wallets"
+                      DropdownListboxButton={DropdownListboxButton}
+                    />
+                  </div>
+                )}
+
+                {scope === 'email' && (
+                  <div className="flex-1 min-w-0">
+                    <Dropdown
+                      items={connectedEmails}
+                      placeholder="Select an Email Address"
+                      onSelect={(selectedItem: DropdownSelectListItem) => {
+                        selectEmailCallback(selectedItem)
+                      }}
+                      ConnectButtonPhrase="Connect New Email Address"
+                      ConnectButtonCallback={addNewEmailCallback}
+                      DropdownListboxButton={DropdownListboxButton}
+                    />
+                  </div>
+                )}
+
+                {scope === 'connected_accounts' && (
+                  <div className="flex-1 min-w-0">
+                    <Dropdown
+                      items={connectedAccounts}
+                      onSelect={(
+                        selectedItems: Array<DropdownSelectListItem>
+                      ) => {
+                        selectAccountsCallback(selectedItems)
+                      }}
+                      onSelectAll={selectAllAccountsCallback}
+                      placeholder="Select at least one"
+                      ConnectButtonPhrase="Connect New Account"
+                      ConnectButtonCallback={addNewAccountCallback}
+                      multiple={true}
+                      selectAllCheckboxTitle="All Connected Accounts"
+                      selectAllCheckboxDescription="All current and future accounts"
+                      DropdownListboxButton={DropdownListboxButton}
+                    />
+                  </div>
+                )}
               </li>
             )
           })}
@@ -248,7 +373,7 @@ export default ({
           <Text size="sm" className="text-gray-500">
             Before using this app, you can review{' '}
             {appProfile?.name ?? `Company`}
-            's{' '}
+            `&apos;`s{' '}
             <a href={appProfile.privacyURL} className="text-skin-primary">
               privacy policy
             </a>
@@ -264,9 +389,7 @@ export default ({
       )}
 
       <div className="flex flex-col w-full items-center justify-center mt-auto">
-        <div
-          className={'flex flex-row w-full items-end justify-center gap-4'}
-        >
+        <div className={'flex flex-row w-full items-end justify-center gap-4'}>
           {transitionState === 'idle' && (
             <>
               <Button

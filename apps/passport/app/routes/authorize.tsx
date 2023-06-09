@@ -11,6 +11,7 @@ import { ResponseType } from '@proofzero/types/access'
 import {
   getAccessClient,
   getAccountClient,
+  getAddressClient,
   getStarbaseClient,
 } from '~/platform.server'
 import {
@@ -41,12 +42,16 @@ import type { PersonaData } from '@proofzero/types/application'
 
 import Authorization from '@proofzero/design-system/src/templates/authorization/Authorization'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import { getEmailIcon } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
 import { Helmet } from 'react-helmet'
 import { getRGBColor, getTextColor } from '@proofzero/design-system/src/helpers'
+import { AddressURNSpace } from '@proofzero/urns/address'
+import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+
+import { loader as scopesLoader } from './settings/applications/$clientId/scopes'
+import type { GetAuthorizedAppScopesMethodResult } from '@proofzero/platform.access/src/jsonrpc/methods/getAuthorizedAppScopes'
 
 export type UserProfile = {
   displayName: string
@@ -117,7 +122,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       !(
         context.authzQueryParams.clientId === 'passport' &&
         context.authzQueryParams.redirectUri ===
-        `${new URL(request.url).origin}/settings`
+          `${new URL(request.url).origin}/settings`
       ) &&
       connectResult !== 'CANCEL'
     ) {
@@ -262,12 +267,22 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       account: accountUrn,
     })
 
+    const preauthorizedScopes: GetAuthorizedAppScopesMethodResult =
+      await scopesLoader({
+        request,
+        params: { clientId },
+        context,
+      })
+
     const dataForScopes = await getDataForScopes(
       scope,
       accountUrn,
       jwt,
       context.env,
-      context.traceSpan
+      context.traceSpan,
+      Object.keys(preauthorizedScopes?.claimValues).length
+        ? preauthorizedScopes.claimValues
+        : undefined
     )
 
     if (!profile) {
@@ -297,7 +312,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export const action: ActionFunction = async ({ request, context }) => {
-  const { accountUrn } = await getValidatedSessionContext(
+  const { jwt, accountUrn } = await getValidatedSessionContext(
     request,
     context.authzQueryParams,
     context.env,
@@ -331,6 +346,27 @@ export const action: ActionFunction = async ({ request, context }) => {
     !personaData
   ) {
     throw json({ message: 'Missing required fields' }, 400)
+  }
+
+  const createSCWallet = form.get('createSCWallet') as string
+
+  if (createSCWallet?.length) {
+    const nickname = JSON.parse(createSCWallet).nickname
+    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
+    const profile = await accountClient.getProfile.query({
+      account: accountUrn,
+    })
+
+    const addressClient = getAddressClient(
+      profile?.primaryAddressURN!,
+      context.env,
+      context.traceSpan
+    )
+
+    const { addressURN } = await addressClient.initSmartContractWallet.query({
+      nickname,
+    })
+    personaData.erc_4337 = [AddressURNSpace.getBaseURN(addressURN)]
   }
 
   await validatePersonaData(
@@ -396,16 +432,31 @@ export default function Authorize() {
 
   const [persona] = useState<PersonaData>(personaData!)
 
-  const [selectedEmail, setSelectedEmail] = useState<DropdownSelectListItem>()
+  const [selectedEmail, setSelectedEmail] = useState<
+    DropdownSelectListItem | undefined
+  >(() => {
+    let selected
+    if (connectedEmails && connectedEmails.length)
+      selected = connectedEmails.find((email) => email.selected)
+    return selected
+  })
   const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
     Array<DropdownSelectListItem | AuthorizationControlSelection>
-  >([])
+  >(
+    connectedAccounts?.length
+      ? connectedAccounts.filter((acc) => acc.selected)
+      : []
+  )
   const [selectedSCWallets, setSelectedSCWallets] = useState<
     Array<DropdownSelectListItem | AuthorizationControlSelection>
-  >([])
+  >(
+    connectedSmartContractWallets?.length
+      ? connectedSmartContractWallets.filter((acc) => acc.selected)
+      : []
+  )
 
   // Re-render the component every time persona gets updated
-  useEffect(() => { }, [persona])
+  useEffect(() => {}, [persona])
 
   const submit = useSubmit()
   const navigate = useNavigate()
@@ -447,17 +498,29 @@ export default function Authorize() {
       if (selectedConnectedAccounts[0] === AuthorizationControlSelection.ALL) {
         personaData.connected_accounts = AuthorizationControlSelection.ALL
       } else {
-        personaData.connected_accounts = selectedConnectedAccounts
-          .map((account) => (account as DropdownSelectListItem).value)
+        personaData.connected_accounts = selectedConnectedAccounts.map(
+          (account) => (account as DropdownSelectListItem).value
+        )
       }
     }
 
-    if (requestedScope.includes('erc_4337') && selectedSCWallets.length > 0) {
-      if (selectedSCWallets[0] === AuthorizationControlSelection.ALL) {
-        personaData.erc_4337 = AuthorizationControlSelection.ALL
+    if (requestedScope.includes('erc_4337')) {
+      if (selectedSCWallets?.length > 0) {
+        if (selectedSCWallets[0] === AuthorizationControlSelection.ALL) {
+          personaData.erc_4337 = AuthorizationControlSelection.ALL
+        } else {
+          personaData.erc_4337 = selectedSCWallets.map(
+            (wallet) => (wallet as DropdownSelectListItem).value
+          )
+        }
       } else {
-        personaData.erc_4337 = selectedSCWallets
-          .map((wallet) => (wallet as DropdownSelectListItem).value)
+        form.append(
+          'createSCWallet',
+          JSON.stringify({
+            check: true,
+            nickname: appProfile.name,
+          })
+        )
       }
     }
 
@@ -478,36 +541,41 @@ export default function Authorize() {
         <style type="text/css">{`
             :root {
                 ${getRGBColor(
-          dark
-            ? appProfile?.appTheme?.color?.dark ??
-            AuthenticationScreenDefaults.color.dark
-            : appProfile?.appTheme?.color?.light ??
-            AuthenticationScreenDefaults.color.light,
-          'primary'
-        )}
+                  dark
+                    ? appProfile?.appTheme?.color?.dark ??
+                        AuthenticationScreenDefaults.color.dark
+                    : appProfile?.appTheme?.color?.light ??
+                        AuthenticationScreenDefaults.color.light,
+                  'primary'
+                )}
                 ${getRGBColor(
-          getTextColor(
-            dark
-              ? appProfile?.appTheme?.color?.dark ??
-              AuthenticationScreenDefaults.color.dark
-              : appProfile?.appTheme?.color?.light ??
-              AuthenticationScreenDefaults.color.light
-          ),
-          'primary-contrast-text'
-        )}
+                  getTextColor(
+                    dark
+                      ? appProfile?.appTheme?.color?.dark ??
+                          AuthenticationScreenDefaults.color.dark
+                      : appProfile?.appTheme?.color?.light ??
+                          AuthenticationScreenDefaults.color.light
+                  ),
+                  'primary-contrast-text'
+                )}
              {
          `}</style>
       </Helmet>
 
       <div className={`${dark ? 'dark' : ''}`}>
-        <div className={'flex flex-row h-[100dvh] justify-center items-center bg-[#F9FAFB] dark:bg-gray-900'}>
+        <div
+          className={
+            'flex flex-row h-[100dvh] justify-center items-center bg-[#F9FAFB] dark:bg-gray-900'
+          }
+        >
           <div
             className={
               'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 dark:bg-[#1F2937] overflow-hidden'
             }
             style={{
-              backgroundImage: `url(${appProfile?.appTheme?.graphicURL ?? sideGraphics
-                })`,
+              backgroundImage: `url(${
+                appProfile?.appTheme?.graphicURL ?? sideGraphics
+              })`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
@@ -594,11 +662,9 @@ export default function Authorize() {
               disableAuthorize={
                 // TODO: make generic!
                 (requestedScope.includes('email') &&
-                  (!connectedEmails?.length || !selectedEmail)) ||
+                  (!connectedEmails?.length || !selectedEmail?.value)) ||
                 (requestedScope.includes('connected_accounts') &&
-                  !selectedConnectedAccounts?.length) ||
-                (requestedScope.includes('erc_4337') &&
-                  !selectedSCWallets.length)
+                  !selectedConnectedAccounts?.length)
               }
               radius={appProfile.appTheme?.radius}
             />
