@@ -1,311 +1,610 @@
-import React, { useContext } from 'react'
-import { Avatar } from '../../atoms/profile/avatar/Avatar'
-import { Text } from '../../atoms/text/Text'
-import authorizeCheck from './authorize-check.svg'
-import subtractLogo from '../../assets/subtract-logo.svg'
-import { Spinner } from '../../atoms/spinner/Spinner'
-import { Button } from '../../atoms/buttons/Button'
-import Info from '../../atoms/info/Info'
-import { ScopeDescriptor } from '@proofzero/security/scopes'
-import { TosAndPPol } from '../../atoms/info/TosAndPPol'
-import { ThemeContext } from '../../contexts/theme'
-import ScopeIcon from './ScopeIcon'
+import { json, redirect } from '@remix-run/cloudflare'
+import type { LoaderFunction, ActionFunction } from '@remix-run/cloudflare'
 import {
-  Dropdown,
-  DropdownSelectListItem,
-} from '../../atoms/dropdown/DropdownSelectList'
+  useLoaderData,
+  useNavigate,
+  useSubmit,
+  useTransition,
+} from '@remix-run/react'
 
-type UserProfile = {
-  pfpURL: string
-}
+import { ResponseType } from '@proofzero/types/access'
+import {
+  getAccessClient,
+  getAccountClient,
+  getStarbaseClient,
+} from '~/platform.server'
+import {
+  createAuthzParamsCookieAndAuthenticate,
+  destroyAuthzCookieParamsSession,
+  getAuthzCookieParams,
+  getValidatedSessionContext,
+} from '~/session.server'
+import { validatePersonaData } from '@proofzero/security/persona'
 
-type AppProfile = {
-  name: string
-  iconURL: string
-  termsURL: string
-  privacyURL: string
-}
+import {
+  authzParamsMatch,
+  createAuthzParamCookieAndCreate,
+  getDataForScopes,
+} from '~/utils/authorize.server'
+import { useContext, useEffect, useState } from 'react'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
+import { AuthorizationControlSelection } from '@proofzero/types/application'
+import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 
-type ScopeMeta = { scopes: Record<string, ScopeDescriptor> }
+import sideGraphics from '~/assets/auth-side-graphics.svg'
+import type { ScopeDescriptor } from '@proofzero/security/scopes'
+import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
+import type { DataForScopes } from '~/utils/authorize.server'
+import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
 
-type AuthorizationProps = {
-  userProfile: UserProfile
-  appProfile: AppProfile
+import type { PersonaData } from '@proofzero/types/application'
 
-  requestedScope: string[]
-  scopeMeta: ScopeMeta
+import Authorization from '@proofzero/design-system/src/templates/authorization/Authorization'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import { getEmailIcon } from '@proofzero/utils/getNormalisedConnectedAccounts'
+import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
+import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
+import { Helmet } from 'react-helmet'
+import { getRGBColor, getTextColor } from '@proofzero/design-system/src/helpers'
 
-  transitionState: 'idle' | 'submitting' | 'loading'
-
-  connectedSmartContractWallets?: Array<DropdownSelectListItem>
-  addNewSmartWalletCallback: () => void
-  selectSmartWalletsCallback: (selected: Array<DropdownSelectListItem>) => void
-  selectAllSmartWalletsCallback: () => void
-
-  connectedEmails?: Array<DropdownSelectListItem>
-  addNewEmailCallback: () => void
-  selectEmailCallback: (selected: DropdownSelectListItem) => void
-
-  connectedAccounts?: Array<DropdownSelectListItem>
-  addNewAccountCallback: () => void
-  selectAccountsCallback: (selected: Array<DropdownSelectListItem>) => void
-  selectAllAccountsCallback: () => void
-
-  cancelCallback: () => void
-  authorizeCallback: (scopes: string[]) => void
-  disableAuthorize?: boolean
-  radius?: string
-}
-
-export default ({
-  userProfile,
-  appProfile,
-  requestedScope,
-  scopeMeta,
-  transitionState,
-  connectedSmartContractWallets,
-  addNewSmartWalletCallback,
-  selectSmartWalletsCallback,
-  selectAllSmartWalletsCallback,
-  connectedEmails,
-  addNewEmailCallback,
-  selectEmailCallback,
-  connectedAccounts,
-  addNewAccountCallback,
-  selectAccountsCallback,
-  selectAllAccountsCallback,
-  cancelCallback,
-  authorizeCallback,
-  disableAuthorize = false,
-  radius = 'lg',
-}: AuthorizationProps) => {
-  const scopesToDisplay = [...requestedScope].filter((scope) => {
-    return scopeMeta.scopes[scope].hidden !== true
-  })
-  if (
-    requestedScope.some((scope) => {
-      return scopeMeta.scopes[scope].hidden === true
-    })
-  ) {
-    scopeMeta.scopes['system_identifiers'] = {
-      name: 'System Identifiers',
-      description:
-        "Read account's system identifiers and other non-personally identifiable information",
-      class: 'implied',
-    }
-    scopesToDisplay.unshift('system_identifiers')
+export type UserProfile = {
+  displayName: string
+  pfp: {
+    image: string
+    isToken: boolean
   }
-  return (
-    <div
-      className={
-        `flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6\
-           lg:rounded-${radius} min-h-[100dvh] lg:min-h-[580px] max-h-[100dvh] border border-[#D1D5DB] dark:border-gray-600`
+}
+
+export type LoaderData = {
+  redirectUri: string
+  appProfile: AppPublicProps
+  scopeMeta: { scopes: Record<string, ScopeDescriptor> }
+  state: string
+  clientId: string
+  scopeOverride: string[]
+  redirectOverride: string
+  dataForScopes: DataForScopes
+  profile: GetProfileOutputParams
+  prompt?: string
+}
+
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    const { clientId, redirectUri, state, prompt, rollup_action } =
+      context.authzQueryParams
+
+    const connectResult =
+      new URL(request.url).searchParams.get('rollup_result') ?? undefined
+
+    //Request parameter pre-checks
+    if (!clientId)
+      throw new BadRequestError({ message: 'client_id is required' })
+    if (!state) throw new BadRequestError({ message: 'state is required' })
+    if (!redirectUri)
+      throw new BadRequestError({ message: 'redirect_uri is required' })
+    else {
+      try {
+        new URL(redirectUri)
+      } catch {
+        throw new BadRequestError({
+          message: 'valid URI is required in redirect_uri param',
+        })
       }
-      style={{
-        width: 418,
-        boxSizing: 'border-box',
-      }}
-    >
-      <div className={'flex flex-row items-center justify-center'}>
-        <Avatar
-          src={userProfile.pfpURL}
-          hex={false}
-          size={'sm'}
-        // alt="User Profile"
-        />
-        <img src={authorizeCheck} alt="Authorize Check" />
-        <Avatar src={appProfile.iconURL} size={'sm'} />
-      </div>
-      <div className={'flex flex-col items-center justify-center gap-2'}>
-        <h1 className={'font-semibold text-xl text-xl dark:text-white'}>
-          {appProfile.name}
-        </h1>
-        <p style={{ color: '#6B7280' }} className={'font-light text-base'}>
-          would like access to the following information
-        </p>
-      </div>
-      <div className={'flex flex-col gap-4 items-start justify-start w-full'}>
-        <p
-          style={{ color: '#6B7280' }}
-          className={'mb-2 font-extralight text-xs'}
-        >
-          REQUESTED
-        </p>
-        <ul
-          style={{ color: '#6B7280' }}
-          className={'flex flex-col font-light text-base gap-2 w-full'}
-        >
-          {scopesToDisplay.map((scope: string, i: number) => {
-            return (
-              <li
-                key={i}
-                className={'flex flex-row gap-2 items-center w-full'}
-              >
-                <div className="flex flex-row w-full gap-2 items-center">
-                  <ScopeIcon scope={scope} />
+    }
 
-                  {(scope === 'profile' ||
-                    scope === 'system_identifiers') && (
-                      <Text
-                        size="sm"
-                        weight="medium"
-                        className="flex-1 text-gray-500"
-                      >
-                        {scopeMeta.scopes[scope].name}
-                      </Text>
-                    )}
+    if (prompt && !['consent'].includes(prompt))
+      throw new BadRequestError({
+        message: 'The only prompt supported is "consent"',
+      })
 
-                  {scope === 'erc_4337' && (
-                    <div className="flex-1 min-w-0">
-                      <Dropdown
-                        items={connectedSmartContractWallets}
-                        placeholder="Select a Smart Contract Wallet"
-                        multiple={true}
-                        onSelect={(
-                          selectedItems: Array<DropdownSelectListItem>
-                        ) => {
-                          selectSmartWalletsCallback(selectedItems)
-                        }}
-                        onSelectAll={selectAllSmartWalletsCallback}
-                        ConnectButtonPhrase="New Smart Contract Wallet"
-                        ConnectButtonCallback={addNewSmartWalletCallback}
-                        selectAllCheckboxTitle="All Smart Contract Wallets"
-                        selectAllCheckboxDescription="All current and future SC Wallets"
-                      />
-                    </div>
-                  )}
+    if (
+      rollup_action &&
+      !['connect', 'create', 'reconnect'].includes(rollup_action)
+    )
+      throw new BadRequestError({
+        message:
+          'only Rollup action supported are connect, create, and reconnect ',
+      })
 
-                  {scope === 'email' && (
-                    <div className="flex-1 min-w-0">
-                      <Dropdown
-                        items={connectedEmails}
-                        placeholder="Select an Email Address"
-                        onSelect={(selectedItem: DropdownSelectListItem) => {
-                          selectEmailCallback(selectedItem)
-                        }}
-                        ConnectButtonPhrase="Connect New Email Address"
-                        ConnectButtonCallback={addNewEmailCallback}
-                      />
-                    </div>
-                  )}
+    const lastCP = await getAuthzCookieParams(request, context.env)
 
-                  {scope === 'connected_accounts' && (
-                    <div className="flex-1 min-w-0">
-                      <Dropdown
-                        items={connectedAccounts}
-                        onSelect={(
-                          selectedItems: Array<DropdownSelectListItem>
-                        ) => {
-                          selectAccountsCallback(selectedItems)
-                        }}
-                        onSelectAll={selectAllAccountsCallback}
-                        placeholder="No connected account(s)"
-                        ConnectButtonPhrase="Connect New Account"
-                        ConnectButtonCallback={addNewAccountCallback}
-                        multiple={true}
-                        selectAllCheckboxTitle="All Connected Accounts"
-                        selectAllCheckboxDescription="All current and future accounts"
-                      />
-                    </div>
-                  )}
+    //If no authorization cookie and we're not logging into
+    //Passport Settings, then we create authz cookie & authenticate/create
 
-                  <div>
-                    <Info
-                      name={scopeMeta.scopes[scope].name}
-                      description={scopeMeta.scopes[scope].description}
-                    />
+    if (
+      !lastCP &&
+      !(
+        context.authzQueryParams.clientId === 'passport' &&
+        context.authzQueryParams.redirectUri ===
+        `${new URL(request.url).origin}/settings`
+      ) &&
+      connectResult !== 'CANCEL'
+    ) {
+      if (rollup_action === 'create') {
+        await createAuthzParamCookieAndCreate(
+          request,
+          context.authzQueryParams,
+          context.env
+        )
+      }
 
-                    <div
-                      data-popover
-                      id={`popover-${scope}`}
-                      role="tooltip"
-                      className="absolute z-10 invisible inline-block
-                    font-[Inter]
-                     min-w-64 text-sm font-light text-gray-500 transition-opacity duration-300 bg-white dark:bg-[#1F2937] border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
-                    >
-                      <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {scope}
-                        </h3>
-                      </div>
-                      <div className="px-3 py-2">
-                        <p className="dark:text-white">
-                          {scopeMeta.scopes[scope].description}
-                        </p>
-                      </div>
-                      <div data-popper-arrow></div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            )
-          })}
-        </ul>
-      </div>
+      await createAuthzParamsCookieAndAuthenticate(
+        request,
+        context.authzQueryParams,
+        context.env
+      )
+    }
 
-      {(appProfile?.termsURL || appProfile?.privacyURL) && (
-        <div className="mt-auto">
-          <Text size="sm" className="text-gray-500">
-            Before using this app, you can review{' '}
-            {appProfile?.name ?? `Company`}
-            's{' '}
-            <a href={appProfile.privacyURL} className="text-skin-primary">
-              privacy policy
-            </a>
-            {appProfile?.termsURL && appProfile?.privacyURL && (
-              <span> and </span>
-            )}
-            <a href={appProfile.termsURL} className="text-skin-primary">
-              terms of service
-            </a>
-            .
-          </Text>
+    const headers = new Headers()
+    if (lastCP) {
+      if (!authzParamsMatch(lastCP, context.authzQueryParams)) {
+        await createAuthzParamsCookieAndAuthenticate(
+          request,
+          context.authzQueryParams,
+          context.env
+        )
+      }
+
+      headers.append(
+        'Set-Cookie',
+        await destroyAuthzCookieParamsSession(
+          request,
+          context.env,
+          lastCP.clientId
+        )
+      )
+
+      headers.append(
+        'Set-Cookie',
+        await destroyAuthzCookieParamsSession(request, context.env)
+      )
+    }
+
+    const { jwt, accountUrn } = await getValidatedSessionContext(
+      request,
+      context.authzQueryParams,
+      context.env,
+      context.traceSpan
+    )
+
+    //Special case for console and passport - we just redirect
+    if (['console', 'passport'].includes(clientId)) {
+      const redirectURL = new URL(redirectUri)
+      if (connectResult) {
+        redirectURL.searchParams.set('rollup_result', connectResult)
+      }
+
+      return redirect(redirectURL.toString(), {
+        headers,
+      })
+    }
+
+    //Scope validation
+    const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
+    const [scopeMeta, appPublicProps] = await Promise.all([
+      sbClient.getScopes.query(),
+      sbClient.getAppPublicProps.query({
+        clientId: clientId as string,
+      }),
+    ])
+
+    if (!appPublicProps.redirectURI)
+      throw new BadRequestError({
+        message: 'App requested does not have a configured redirect URL.',
+      })
+    const configuredUrl = new URL(appPublicProps.redirectURI)
+    const providedUrl = redirectUri ? new URL(redirectUri) : configuredUrl
+
+    if (!appPublicProps.scopes || !appPublicProps.scopes.length)
+      throw new BadRequestError({
+        message: 'No allowed scope was configured for the app',
+      })
+
+    if (providedUrl.origin !== configuredUrl.origin)
+      throw new BadRequestError({
+        message:
+          'Provided redirect URI did not match with configured redirect URI',
+      })
+
+    // We need a unique set of scopes to avoid duplicates
+    const scope = [...new Set(context.authzQueryParams.scope)]
+
+    if (!scope || !scope.length)
+      throw new BadRequestError({ message: 'No scope requested' })
+
+    //If requested scope values are a subset of allowed scope values
+    if (
+      !scope.every((scopeValue) => appPublicProps.scopes.includes(scopeValue))
+    )
+      throw new BadRequestError({
+        message:
+          'Requested scope value not in the configured allowed scope list',
+      })
+
+    //Go through pre-authorization if not explicitly requested to prompt user for
+    //consent through query params
+    if (
+      !(
+        context.authzQueryParams.prompt &&
+        context.authzQueryParams.prompt === 'consent'
+      )
+    ) {
+      const responseType = ResponseType.Code
+      const accessClient = getAccessClient(context.env, context.traceSpan)
+      const preauthorizeRes = await accessClient.preauthorize.mutate({
+        account: accountUrn,
+        responseType,
+        clientId,
+        redirectUri,
+        scope: scope,
+        state,
+      })
+
+      if (preauthorizeRes.preauthorized) {
+        const redirectParams = new URLSearchParams({
+          code: preauthorizeRes.code,
+          state: preauthorizeRes.state,
+        })
+
+        const redirectURL = new URL(redirectUri)
+        for (const [key, value] of redirectParams) {
+          redirectURL.searchParams.append(key, value)
+        }
+
+        return redirect(redirectURL.toString(), {
+          headers,
+        })
+      } //else we present the authz screen below
+    }
+    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
+    const profile = await accountClient.getProfile.query({
+      account: accountUrn,
+    })
+
+    const dataForScopes = await getDataForScopes(
+      scope,
+      accountUrn,
+      jwt,
+      context.env,
+      context.traceSpan
+    )
+
+    if (!profile) {
+      throw new InternalServerError({
+        message: 'No profile found for this account',
+      })
+    }
+
+    return json<LoaderData>(
+      {
+        redirectUri,
+        clientId,
+        appProfile: appPublicProps,
+        scopeMeta: scopeMeta,
+        state,
+        redirectOverride: redirectUri,
+        scopeOverride: scope || [],
+        dataForScopes,
+        profile,
+        prompt,
+      },
+      {
+        headers,
+      }
+    )
+  }
+)
+
+export const action: ActionFunction = async ({ request, context }) => {
+  const { accountUrn } = await getValidatedSessionContext(
+    request,
+    context.authzQueryParams,
+    context.env,
+    context.traceSpan
+  )
+
+  const form = await request.formData()
+  const cancel = form.get('cancel') as string
+
+  if (cancel) {
+    return redirect(cancel)
+  }
+
+  const responseType = ResponseType.Code
+  const redirectUri = form.get('redirect_uri') as string
+  const scope = (form.get('scopes') as string).split(' ')
+  /* This stores the selection made from the user in the authorization
+  screen; gets validated and stored for later retrieval at token generation stage */
+  const personaData = JSON.parse(
+    form.get('personaData') as string
+  ) as PersonaData
+
+  const state = form.get('state') as string
+  const clientId = form.get('client_id') as string
+  if (
+    !accountUrn ||
+    !responseType ||
+    !redirectUri ||
+    !scope ||
+    !state ||
+    !personaData
+  ) {
+    throw json({ message: 'Missing required fields' }, 400)
+  }
+
+  await validatePersonaData(
+    accountUrn,
+    personaData,
+    {
+      addressFetcher: context.env.Address,
+      accountFetcher: context.env.Account,
+    },
+    context.traceSpan
+  )
+
+  const accessClient = getAccessClient(context.env, context.traceSpan)
+  const authorizeRes = await accessClient.authorize.mutate({
+    account: accountUrn,
+    responseType,
+    clientId,
+    redirectUri,
+    scope,
+    personaData,
+    state,
+  })
+
+  if (!authorizeRes) {
+    throw json({ message: 'Failed to authorize' }, 400)
+  }
+
+  const redirectParams = new URLSearchParams({
+    code: authorizeRes.code,
+    state: authorizeRes.state,
+  })
+
+  const redirectUrl = new URL(redirectUri)
+  for (const [key, value] of redirectParams) {
+    redirectUrl.searchParams.set(key, value)
+  }
+
+  return redirect(redirectUrl.toString())
+}
+
+export default function Authorize() {
+  const {
+    clientId,
+    appProfile,
+    scopeMeta,
+    state,
+    redirectOverride,
+    dataForScopes,
+    redirectUri,
+    profile,
+    prompt,
+  } = useLoaderData<LoaderData>()
+
+  const userProfile = profile as UserProfile
+
+  const {
+    connectedEmails,
+    personaData,
+    requestedScope,
+    connectedAccounts,
+    connectedSmartContractWallets,
+  } = dataForScopes as DataForScopes
+
+  const [persona] = useState<PersonaData>(personaData!)
+
+  const [selectedEmail, setSelectedEmail] = useState<DropdownSelectListItem>()
+  const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
+    Array<DropdownSelectListItem | AuthorizationControlSelection>
+  >([])
+  const [selectedSCWallets, setSelectedSCWallets] = useState<
+    Array<DropdownSelectListItem | AuthorizationControlSelection>
+  >([])
+
+  // Re-render the component every time persona gets updated
+  useEffect(() => { }, [persona])
+
+  const submit = useSubmit()
+  const navigate = useNavigate()
+  const transition = useTransition()
+
+  useConnectResult()
+
+  const cancelCallback = () => {
+    const redirectURL = new URL(redirectUri)
+    redirectURL.search = `?error=access_denied&state=${state}`
+
+    submit(
+      {
+        cancel: redirectURL.toString(),
+      },
+      { method: 'post' }
+    )
+  }
+
+  const authorizeCallback = async (scopes: string[]) => {
+    const form = new FormData()
+    form.append('scopes', scopes.join(' '))
+    form.append('state', state)
+    form.append('client_id', clientId)
+    form.append('redirect_uri', redirectOverride)
+
+    const personaData: any = {
+      ...persona,
+    }
+
+    if (requestedScope.includes('email') && selectedEmail) {
+      personaData.email = selectedEmail.value
+    }
+
+    if (
+      requestedScope.includes('connected_accounts') &&
+      selectedConnectedAccounts.length > 0
+    ) {
+      if (selectedConnectedAccounts[0] === AuthorizationControlSelection.ALL) {
+        personaData.connected_accounts = AuthorizationControlSelection.ALL
+      } else {
+        personaData.connected_accounts = selectedConnectedAccounts
+          .map((account) => (account as DropdownSelectListItem).value)
+      }
+    }
+
+    if (requestedScope.includes('erc_4337') && selectedSCWallets.length > 0) {
+      if (selectedSCWallets[0] === AuthorizationControlSelection.ALL) {
+        personaData.erc_4337 = AuthorizationControlSelection.ALL
+      } else {
+        personaData.erc_4337 = selectedSCWallets
+          .map((wallet) => (wallet as DropdownSelectListItem).value)
+      }
+    }
+
+    // TODO: Everything should be a form field now handled by javascript
+    // This helps keeps things generic has if a form input is not present
+    // it doesn't end up being submitted
+
+    form.append('personaData', JSON.stringify(personaData))
+
+    submit(form, { method: 'post' })
+  }
+
+  const { dark } = useContext(ThemeContext)
+
+  return (
+    <>
+      <Helmet>
+        <style type="text/css">{`
+            :root {
+                ${getRGBColor(
+          dark
+            ? appProfile?.appTheme?.color?.dark ??
+            AuthenticationScreenDefaults.color.dark
+            : appProfile?.appTheme?.color?.light ??
+            AuthenticationScreenDefaults.color.light,
+          'primary'
+        )}
+                ${getRGBColor(
+          getTextColor(
+            dark
+              ? appProfile?.appTheme?.color?.dark ??
+              AuthenticationScreenDefaults.color.dark
+              : appProfile?.appTheme?.color?.light ??
+              AuthenticationScreenDefaults.color.light
+          ),
+          'primary-contrast-text'
+        )}
+             {
+         `}</style>
+      </Helmet>
+
+      <div className={`${dark ? 'dark' : ''}`}>
+        <div className={'flex flex-row h-[100dvh] justify-center items-center bg-[#F9FAFB] dark:bg-gray-900'}>
+          <div
+            className={
+              'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 dark:bg-[#1F2937] overflow-hidden'
+            }
+            style={{
+              backgroundImage: `url(${appProfile?.appTheme?.graphicURL ?? sideGraphics
+                })`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          ></div>
+          <div className={'basis-full basis-full lg:basis-3/5'}>
+            <Authorization
+              userProfile={{
+                pfpURL: userProfile.pfp.image,
+              }}
+              appProfile={{
+                name: appProfile.name,
+                iconURL: appProfile.iconURL,
+                privacyURL: appProfile.privacyURL!,
+                termsURL: appProfile.termsURL!,
+              }}
+              requestedScope={requestedScope}
+              scopeMeta={scopeMeta}
+              transitionState={transition.state}
+              connectedSmartContractWallets={
+                connectedSmartContractWallets ?? []
+              }
+              addNewSmartWalletCallback={() => {
+                const qp = new URLSearchParams()
+                qp.append('scope', requestedScope.join(' '))
+                qp.append('state', state)
+                qp.append('client_id', clientId)
+                qp.append('redirect_uri', redirectOverride)
+                qp.append('rollup_action', 'create')
+                qp.append('create_type', 'wallet')
+                if (prompt) qp.append('prompt', prompt)
+
+                return navigate(`/authorize?${qp.toString()}`)
+              }}
+              selectSmartWalletsCallback={setSelectedSCWallets}
+              selectAllSmartWalletsCallback={() => {
+                setSelectedSCWallets([AuthorizationControlSelection.ALL])
+              }}
+              connectedEmails={
+                connectedEmails.map((email) => {
+                  // Substituting subtitle with icon
+                  // on the client side
+                  return {
+                    icon: getEmailIcon(email.subtitle!),
+                    title: email.title,
+                    selected: email.selected,
+                    value: email.value,
+                  }
+                }) ?? []
+              }
+              addNewEmailCallback={() => {
+                const qp = new URLSearchParams()
+                qp.append('scope', requestedScope.join(' '))
+                qp.append('state', state)
+                qp.append('client_id', clientId)
+                qp.append('redirect_uri', redirectOverride)
+                qp.append('rollup_action', 'connect')
+                qp.append('login_hint', 'email microsoft google apple')
+                if (prompt) qp.append('prompt', prompt)
+
+                return navigate(`/authorize?${qp.toString()}`)
+              }}
+              selectEmailCallback={setSelectedEmail}
+              connectedAccounts={connectedAccounts ?? []}
+              addNewAccountCallback={() => {
+                const qp = new URLSearchParams()
+                qp.append('scope', requestedScope.join(' '))
+                qp.append('state', state)
+                qp.append('client_id', clientId)
+                qp.append('redirect_uri', redirectOverride)
+                qp.append('rollup_action', 'connect')
+                if (prompt) qp.append('prompt', prompt)
+
+                return navigate(`/authorize?${qp.toString()}`)
+              }}
+              selectAccountsCallback={setSelectedConnectedAccounts}
+              selectAllAccountsCallback={() => {
+                setSelectedConnectedAccounts([
+                  AuthorizationControlSelection.ALL,
+                ])
+              }}
+              cancelCallback={cancelCallback}
+              authorizeCallback={authorizeCallback}
+              disableAuthorize={
+                // TODO: make generic!
+                (requestedScope.includes('email') &&
+                  (!connectedEmails?.length || !selectedEmail)) ||
+                (requestedScope.includes('connected_accounts') &&
+                  !selectedConnectedAccounts?.length) ||
+                (requestedScope.includes('erc_4337') &&
+                  !selectedSCWallets.length)
+              }
+              radius={appProfile.appTheme?.radius}
+            />
+          </div>
         </div>
-      )}
-
-      <div className="flex flex-col w-full items-center justify-center mt-auto">
-        <div
-          className={'flex flex-row w-full items-end justify-center gap-4'}
-        >
-          {transitionState === 'idle' && (
-            <>
-              <Button
-                btnSize="xl"
-                btnType="secondary-alt-skin"
-                onClick={cancelCallback}
-              >
-                <Text
-                  weight="medium"
-                  className="truncate text-gray-800 dark:text-white"
-                >
-                  Cancel
-                </Text>
-              </Button>
-              <Button
-                btnSize="xl"
-                btnType="primary-alt-skin"
-                disabled={disableAuthorize}
-                onClick={() => {
-                  authorizeCallback(requestedScope)
-                }}
-              >
-                Continue
-              </Button>
-            </>
-          )}
-          {transitionState !== 'idle' && <Spinner />}
-        </div>
-        <div className="mt-5 flex justify-center items-center space-x-2">
-          <img src={subtractLogo} alt="powered by rollup.id" />
-          <Text size="xs" weight="normal" className="text-gray-400">
-            Powered by{' '}
-            <a href="https://rollup.id" className="hover:underline">
-              rollup.id
-            </a>
-          </Text>
-          <TosAndPPol />
-        </div>
       </div>
-    </div>
+    </>
   )
 }

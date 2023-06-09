@@ -1,8 +1,8 @@
-import { LoaderFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
 import { useLoaderData, useOutletContext } from '@remix-run/react'
 
 import { loader as scopesLoader } from './scopes'
-import { AuthorizedAppsModel } from '~/routes/settings'
+import type { AuthorizedAppsModel } from '~/routes/settings'
 import { Button, Text } from '@proofzero/design-system'
 import { FaChevronRight } from 'react-icons/fa'
 
@@ -15,7 +15,7 @@ import {
   ClaimsWideView,
   ConfirmRevocationModal,
 } from '~/components/applications/claims'
-import { GetAuthorizedAppScopesMethodResult } from '@proofzero/platform/access/src/jsonrpc/methods/getAuthorizedAppScopes'
+import type { GetAuthorizedAppScopesMethodResult } from '@proofzero/platform/access/src/jsonrpc/methods/getAuthorizedAppScopes'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { getStarbaseClient } from '~/platform.server'
 import { getValidatedSessionContext } from '~/session.server'
@@ -130,7 +130,7 @@ export default () => {
   return (
     <>
       <ConfirmRevocationModal
-        title={app.title}
+        title={app.title!}
         clientId={app.clientId}
         isOpen={confirmationModalOpen}
         setIsOpen={setConfirmationModalOpen}
@@ -149,7 +149,11 @@ export default () => {
       </nav>
 
       <section className="bg-white gap-5 flex flex-row items-center my-6 lg:py-4 lg:px-5 lg:border lg:shadow lg:rounded-lg">
-        <img src={app.icon} className="w-12 h-12 lg:w-16 lg:h-16 rounded-lg" />
+        <img
+          src={app.icon}
+          className="w-12 h-12 lg:w-16 lg:h-16 rounded-lg"
+          alt="app icon"
+        />
 
         <div className="flex-1">
           <Text
