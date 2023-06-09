@@ -11,6 +11,7 @@ import { SendOTPEmailThemePropsSchema } from '../../../../email/src/jsonrpc/meth
 export const GenerateEmailOTPInput = z.object({
   email: z.string(),
   themeProps: SendOTPEmailThemePropsSchema.optional(),
+  preview: z.boolean().optional(),
 })
 
 export const GenerateEmailOTPOutput = z.string()
@@ -24,11 +25,16 @@ export const generateEmailOTPMethod = async ({
   input: GenerateEmailOTPParams
   ctx: Context
 }): Promise<string> => {
-  const { email, themeProps } = input
+  const { email, themeProps, preview } = input
   const emailAddressNode = new EmailAddress(ctx.address as AddressNode, ctx)
 
+  let delayMiliseconds = preview ? 15000 : undefined
+
   const state = generateRandomString(EMAIL_VERIFICATION_OPTIONS.STATE_LENGTH)
-  const code = await emailAddressNode.generateVerificationCode(state)
+  const code = await emailAddressNode.generateVerificationCode(
+    state,
+    delayMiliseconds
+  )
 
   await ctx.emailClient.sendEmailNotification.mutate({
     emailAddress: email,

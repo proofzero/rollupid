@@ -17,6 +17,7 @@ type EmailAddressProfile = AddressProfile<EmailAddressType.Email>
 type VerificationPayload = {
   state: string
   creationTimestamp: number
+  delayMiliseconds: number
   numberOfAttempts: number
   firstAttemptTimestamp: number
   code: string
@@ -40,6 +41,7 @@ export default class EmailAddress {
     numberOfAttempts,
     firstAttemptTimestamp,
     code,
+    delayMiliseconds,
   }: VerificationPayload) => {
     if (
       firstAttemptTimestamp + this.ctx.MAX_ATTEMPTS_TIME_PERIOD_IN_MS <=
@@ -55,12 +57,20 @@ export default class EmailAddress {
       numberOfAttempts,
       firstAttemptTimestamp,
       code,
+      delayMiliseconds,
     }
 
     await this.node.storage.put(OTP_KEY_NAME, payload)
   }
 
-  async generateVerificationCode(state: string): Promise<string> {
+  async generateVerificationCode(
+    state: string,
+    delayMiliseconds?: number
+  ): Promise<string> {
+    if (!delayMiliseconds) {
+      delayMiliseconds = this.ctx.DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS
+    }
+
     const verificationPayload =
       await this.node.storage.get<VerificationPayload>(OTP_KEY_NAME)
 
@@ -74,8 +84,12 @@ export default class EmailAddress {
     ).toUpperCase()
 
     if (verificationPayload) {
-      const { numberOfAttempts, creationTimestamp, firstAttemptTimestamp } =
-        verificationPayload
+      const {
+        numberOfAttempts,
+        creationTimestamp,
+        firstAttemptTimestamp,
+        delayMiliseconds,
+      } = verificationPayload
 
       // Extracted common calculations and constants for better readability
       const isAboveMaxAttempts = numberOfAttempts + 1 > this.ctx.MAX_ATTEMPTS
@@ -83,8 +97,7 @@ export default class EmailAddress {
         creationTimestamp + this.ctx.REGENERATION_COOLDOWN_PERIOD_IN_MS >
         currentTime
       const isRegenDelayActive =
-        creationTimestamp + this.ctx.DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS >
-        currentTime
+        creationTimestamp + delayMiliseconds > currentTime
       const isMaxAttemptsReachedWithinTimePeriod =
         firstAttemptTimestamp + this.ctx.MAX_ATTEMPTS_TIME_PERIOD_IN_MS >
         currentTime
@@ -110,7 +123,7 @@ export default class EmailAddress {
       if (isRegenDelayActive) {
         throw new BadRequestError({
           message: `Cannot generate new code for the address. You can only generate a new code once every ${
-            this.ctx.DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS / 1000
+            delayMiliseconds / 1000
           } seconds`,
         })
       }
@@ -134,6 +147,7 @@ export default class EmailAddress {
       await this.createCode({
         state,
         creationTimestamp: currentTime,
+        delayMiliseconds,
         numberOfAttempts: numberOfAttempts + 1,
         firstAttemptTimestamp: firstAttemptTimestamp,
         code,
@@ -146,6 +160,7 @@ export default class EmailAddress {
     await this.createCode({
       state,
       creationTimestamp: currentTime,
+      delayMiliseconds,
       numberOfAttempts: 1,
       firstAttemptTimestamp: currentTime,
       code,
