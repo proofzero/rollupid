@@ -80,6 +80,7 @@ import type { appDetailsProps } from '~/types'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { AddressURN } from '@proofzero/urns/address'
 import danger from '~/images/danger.svg'
+import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -917,6 +918,16 @@ const EmailPanel = ({
       }, 15000)
     } else {
       setPreviewEmailErrorMessage(undefined)
+
+      if (previewEmailFetcher.type === 'done') {
+        toast(
+          ToastType.Success,
+          { message: 'Email Sent! Please check your inbox.' },
+          {
+            duration: 2000,
+          }
+        )
+      }
     }
   }, [previewEmailFetcher])
 
@@ -1058,7 +1069,7 @@ const EmailPanel = ({
             </div>
 
             <div className="flex-1 w-full">
-              <div className="flex flex-row items-center gap-4">
+              <div className="flex flex-row items-center gap-4 justify-end">
                 {showTimer && (
                   <CountdownCircleTimer
                     size={16}
@@ -1098,9 +1109,12 @@ const EmailPanel = ({
 
                     setShowTimer(true)
                   }}
-                  disabled={showTimer}
+                  disabled={showTimer || !appContactEmail}
                 >
-                  Send Preview
+                  <div className="flex flex-row items-center gap-2">
+                    <HiOutlineMail className="w-3.5 h-3.5" />{' '}
+                    <Text size="sm">Send Preview</Text>
+                  </div>
                 </Button>
               </div>
             </div>
