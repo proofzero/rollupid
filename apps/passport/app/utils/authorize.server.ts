@@ -56,7 +56,7 @@ export const getDataForScopes = async (
   jwt?: string,
   env?: any,
   traceSpan?: any,
-  preauthorisedScopes?: GetAuthorizedAppScopesMethodResult
+  preauthorizedScopes?: GetAuthorizedAppScopesMethodResult['claimValues']
 ): Promise<DataForScopes> => {
   if (!accountURN)
     throw new UnauthorizedError({ message: 'Account URN is required' })
@@ -76,10 +76,9 @@ export const getDataForScopes = async (
       connectedEmails = getEmailDropdownItems(
         connectedAccounts,
         true,
-        preauthorisedScopes &&
-          Object.keys(preauthorisedScopes).includes(Symbol.keyFor(SCOPE_EMAIL)!)
-          ? preauthorisedScopes[Symbol.keyFor(SCOPE_EMAIL)!].meta
-              .urns[0]
+        preauthorizedScopes &&
+          Object.keys(preauthorizedScopes).includes(Symbol.keyFor(SCOPE_EMAIL)!)
+          ? preauthorizedScopes[Symbol.keyFor(SCOPE_EMAIL)!].meta.urns[0]
           : undefined
       )
     }
@@ -101,11 +100,11 @@ export const getDataForScopes = async (
       )
       connectedAddresses = getAddressDropdownItems(
         addresses,
-        preauthorisedScopes &&
-          Object.keys(preauthorisedScopes).includes(
+        preauthorizedScopes &&
+          Object.keys(preauthorizedScopes).includes(
             Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!
           )
-          ? preauthorisedScopes[Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!].meta
+          ? preauthorizedScopes[Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!].meta
               .urns
           : undefined
       )
@@ -123,11 +122,11 @@ export const getDataForScopes = async (
       )
       connectedSmartContractWallets = getAddressDropdownItems(
         addresses,
-        preauthorisedScopes &&
-          Object.keys(preauthorisedScopes).includes(
+        preauthorizedScopes &&
+          Object.keys(preauthorizedScopes).includes(
             Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!
           )
-          ? preauthorisedScopes[Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!]
+          ? preauthorizedScopes[Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!]
               .meta.urns
           : undefined
       )
