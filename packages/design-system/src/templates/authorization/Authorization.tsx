@@ -101,7 +101,7 @@ export default ({
   return (
     <div
       className={`flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6\
-           lg:rounded-${radius} min-h-fit lg:min-h-[580px] max-h-fit border border-[#D1D5DB] dark:border-gray-600`}
+           lg:rounded-${radius} min-h-fit lg:min-h-[580px] border border-[#D1D5DB] dark:border-gray-600`}
       style={{
         width: 418,
         boxSizing: 'border-box',
@@ -134,7 +134,7 @@ export default ({
         </p>
         <ul
           style={{ color: '#6B7280' }}
-          className={'flex flex-col font-light text-base gap-2 w-full'}
+          className={'flex flex-col font-light text-base w-full'}
         >
           {scopesToDisplay.map((scope: string, i: number) => {
             const DropdownListboxButton = ({
