@@ -111,13 +111,13 @@ export const Dropdown = ({
   DropdownListboxButton = DropdownListboxButtonDefault,
 }: {
   items: Array<DropdownSelectListItem>
-  defaultItems:
-    | Array<DropdownSelectListItem>
-    | Array<AuthorizationControlSelection>
   placeholder: string
   onSelect: (
     selected: Array<DropdownSelectListItem> | DropdownSelectListItem
   ) => void
+  defaultItems?:
+    | Array<DropdownSelectListItem>
+    | Array<AuthorizationControlSelection>
   multiple?: boolean
   ConnectButtonPhrase: string
   ConnectButtonCallback: () => void
@@ -133,7 +133,7 @@ export const Dropdown = ({
     open,
   }: DropdownListboxButtonType) => JSX.Element
 }) => {
-  if (defaultItems.length > 1 && !multiple) {
+  if (defaultItems?.length > 1 && !multiple) {
     throw new BadRequestError({
       message:
         "You can't have multiple items selected in a single select dropdown",
