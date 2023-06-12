@@ -2,7 +2,9 @@ import { Popover, Tab } from '@headlessui/react'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import {
   Form,
+  Link,
   useActionData,
+  useFetcher,
   useLoaderData,
   useOutletContext,
 } from '@remix-run/react'
@@ -75,6 +77,10 @@ import {
   adjustAddressTypeToDisplay,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import type { appDetailsProps } from '~/types'
+import { CountdownCircleTimer } from 'react-countdown-circle-timer'
+import { AddressURN } from '@proofzero/urns/address'
+import danger from '~/images/danger.svg'
+import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -92,8 +98,9 @@ const DesignerTab = ({
   selected: boolean
 }) => (
   <div
-    className={`box-border -mb-0.5 mr-8 pb-4 px-1 flex flex-row items-center gap-2 border-b-2 ${selected ? 'border-indigo-600' : 'border-transparent'
-      }`}
+    className={`box-border -mb-0.5 mr-8 pb-4 px-1 flex flex-row items-center gap-2 border-b-2 ${
+      selected ? 'border-indigo-600' : 'border-transparent'
+    }`}
   >
     <Icon
       className={`w-5 h-5 ${selected ? 'text-indigo-600' : 'text-gray-500'}`}
@@ -183,8 +190,9 @@ const RadiusButton = ({
   return (
     <button
       type="button"
-      className={`w-full py-1.5 px-2.5 rounded-md ${selected ? 'bg-indigo-500' : ''
-        }`}
+      className={`w-full py-1.5 px-2.5 rounded-md ${
+        selected ? 'bg-indigo-500' : ''
+      }`}
       onClick={(e) => {
         e.preventDefault()
         setRadius(radius)
@@ -227,8 +235,10 @@ const ProviderModal = ({
 
   return (
     <Modal isOpen={isOpen} fixed handleClose={() => onClose(false)}>
-      <div className="bg-white rounded-lg px-6 pb-6 min-w-full lg:w-[543px]
-      lg:m-auto overflow-y-auto">
+      <div
+        className="bg-white rounded-lg px-6 pb-6 min-w-full lg:w-[543px]
+      lg:m-auto overflow-y-auto"
+      >
         <Text weight="semibold" className="text-left text-gray-800 mb-4">
           Login Provider Configuration
         </Text>
@@ -317,7 +327,7 @@ const AuthPanel = ({
 
   const [signMessage, setSignMessage] = useState<string>(
     appTheme?.signMessageTemplate ??
-    AuthenticationScreenDefaults.defaultSignMessage
+      AuthenticationScreenDefaults.defaultSignMessage
   )
 
   const [radius, setRadius] = useState<string>(
@@ -340,10 +350,10 @@ const AuthPanel = ({
     }[]
   >(
     appTheme?.providers ??
-    AuthenticationScreenDefaults.knownKeys.map((k) => ({
-      key: k,
-      enabled: true,
-    }))
+      AuthenticationScreenDefaults.knownKeys.map((k) => ({
+        key: k,
+        enabled: true,
+      }))
   )
   const [providerModalOpen, setProviderModalOpen] = useState<boolean>(false)
 
@@ -368,9 +378,9 @@ const AuthPanel = ({
             :root {
                 ${getRGBColor(dark ? color.dark : color.light, 'primary')}
                 ${getRGBColor(
-          getTextColor(dark ? color.dark : color.light),
-          'primary-contrast-text'
-        )}
+                  getTextColor(dark ? color.dark : color.light),
+                  'primary-contrast-text'
+                )}
              {
          `}</style>
       </Helmet>
@@ -599,7 +609,7 @@ const AuthPanel = ({
                 minWidth={720}
                 minHeight={1080}
                 id="image"
-                setIsFormChanged={(val) => { }}
+                setIsFormChanged={(val) => {}}
                 setIsImgUploading={(val) => {
                   setLoading(val)
                 }}
@@ -732,7 +742,7 @@ const AuthPanel = ({
                         signMessageTemplate: signMessage,
                         clientId: 'Foo',
                         signData: null,
-                        authnQueryParams: ''
+                        authnQueryParams: '',
                       }}
                     />
                   </LazyAuth>
@@ -768,8 +778,8 @@ const AuthPanel = ({
                           'urn:rollupid:address/0xc2b930f1fc2a55ddc1bf99e8844ca0479567ac44f3e2eea58216660e26947686',
                       },
                     ]}
-                    selectEmailCallback={() => { }}
-                    addNewEmailCallback={() => { }}
+                    selectEmailCallback={() => {}}
+                    addNewEmailCallback={() => {}}
                     connectedAccounts={[
                       {
                         title: 'email@example.com',
@@ -805,16 +815,16 @@ const AuthPanel = ({
                       },
                     ]}
                     connectedSmartContractWallets={[]}
-                    addNewAccountCallback={() => { }}
-                    addNewSmartWalletCallback={() => { }}
-                    selectSmartWalletsCallback={() => { }}
-                    selectAccountsCallback={() => { }}
-                    selectAllAccountsCallback={() => { }}
-                    selectAllSmartWalletsCallback={() => { }}
+                    addNewAccountCallback={() => {}}
+                    addNewSmartWalletCallback={() => {}}
+                    selectSmartWalletsCallback={() => {}}
+                    selectAccountsCallback={() => {}}
+                    selectAllAccountsCallback={() => {}}
+                    selectAllSmartWalletsCallback={() => {}}
                     // disableAuthorize={true}
                     transitionState={'idle'}
-                    cancelCallback={() => { }}
-                    authorizeCallback={() => { }}
+                    cancelCallback={() => {}}
+                    authorizeCallback={() => {}}
                     radius={radius}
                   />
                 </Tab.Panel>
@@ -838,10 +848,18 @@ const AuthPanel = ({
 }
 
 const EmailPanel = ({
+  clientId,
+  addressURN,
+  appContactEmail,
+  appPublished = false,
   emailTheme,
   setLoading,
   errors,
 }: {
+  clientId: string
+  addressURN?: AddressURN
+  appContactEmail?: string
+  appPublished: boolean
   emailTheme?: EmailOTPTheme
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
   errors?: {
@@ -858,6 +876,10 @@ const EmailPanel = ({
     emailTheme?.contact
   )
 
+  const [localErrors, setLocalErrors] = useState<{
+    [key: string]: string
+  }>()
+
   const iFrameRef = useRef<HTMLIFrameElement>(null)
   const [dark, setDark] = useState<boolean>(false)
 
@@ -865,6 +887,10 @@ const EmailPanel = ({
     const darkMode = window.matchMedia('(prefers-color-scheme: dark)')
     setDark(darkMode.matches)
   }, [])
+
+  useEffect(() => {
+    setLocalErrors(errors)
+  }, [errors])
 
   useEffect(() => {
     if (!iFrameRef) return
@@ -887,142 +913,306 @@ const EmailPanel = ({
     setDark(!dark)
   }
 
+  const [previewEmailErrorMessage, setPreviewEmailErrorMessage] = useState<
+    string | undefined
+  >(undefined)
+  const [showTimer, setShowTimer] = useState<boolean>(false)
+
+  const previewEmailFetcher = useFetcher()
+  useEffect(() => {
+    setLocalErrors(undefined)
+
+    if (previewEmailFetcher.data?.code === 'BAD_REQUEST') {
+      setPreviewEmailErrorMessage(previewEmailFetcher.data?.message)
+      setShowTimer(true)
+
+      setTimeout(() => {
+        setPreviewEmailErrorMessage(undefined)
+      }, 15000)
+    } else {
+      if (previewEmailFetcher.data?.errors) {
+        setLocalErrors(previewEmailFetcher.data?.errors)
+      } else if (previewEmailFetcher.type === 'done') {
+        toast(
+          ToastType.Success,
+          { message: 'Email Sent! Please check your inbox.' },
+          {
+            duration: 2000,
+          }
+        )
+      }
+    }
+  }, [previewEmailFetcher])
+
   return (
-    <Tab.Panel className="flex flex-col lg:flex-row gap-7">
-      <input type="hidden" name="target" value="email" />
+    <>
+      {previewEmailFetcher.state !== 'idle' && <Loader />}
 
-      <section className="flex-1 bg-white border rounded-lg">
-        <Text size="lg" weight="semibold" className="mx-8 my-4 text-gray-900">
-          OTP Email Settings
-        </Text>
+      <Tab.Panel className="flex flex-col lg:flex-row gap-7">
+        <input type="hidden" name="target" value="email" />
 
-        <FormElement label="Logo" sublabel="Images can't be larger than 2mB">
-          <div className="flex flex-row items-center gap-2">
-            <IconPicker
-              maxSize={2097152}
-              aspectRatio={{
-                width: 1,
-                height: 1,
-              }}
-              id="logoURL"
-              setIsFormChanged={(val) => { }}
-              setIsImgUploading={(val) => {
-                setLoading(val)
-              }}
-              imageUploadCallback={setLogoURL}
-              url={logoURL}
-              invalid={errors && errors['email.logoURL'] ? true : false}
-              errorMessage={
-                errors && errors['email.logoURL'] ? errors['email.logoURL'] : ''
-              }
-            />
-
-            {logoURL && (
-              <button
-                type="button"
-                className="flex justify-center items-center py-2 px-4"
-                onClick={() => {
-                  setLogoURL(undefined)
-                }}
-              >
-                <Text size="xs" weight="medium" className="text-gray-200">
-                  Remove
-                </Text>
-              </button>
-            )}
-          </div>
-        </FormElement>
-
-        <FormElement label="Business Address">
-          <InputTextarea
-            id="address"
-            heading=""
-            value={address ?? ''}
-            onChange={setAddress}
-            error={errors && errors['email.address'] ? true : false}
-          />
-
-          {errors && errors['email.address'] && (
-            <Text
-              className="mb-1.5 mt-1.5 text-red-500"
-              size="xs"
-              weight="normal"
-            >
-              {errors['email.address']}
-            </Text>
-          )}
-        </FormElement>
-
-        <FormElement label="Contact us">
-          <Input
-            id={'contact'}
-            label={''}
-            onChange={(e) => {
-              setContact(e.target.value)
-            }}
-            value={contact}
-            error={errors && errors['email.contact']}
-          />
-
-          {errors && errors['email.contact'] && (
-            <Text
-              className="mb-1.5 mt-1.5 text-red-500"
-              size="xs"
-              weight="normal"
-            >
-              {errors['email.contact']}
-            </Text>
-          )}
-        </FormElement>
-      </section>
-
-      <section className="bg-white border rounded-lg pb-3 px-6 min-w-[468px] h-[781px] overflow-scroll">
-        <div className="flex flex-row items-center justify-between my-4">
-          <Text size="lg" weight="semibold" className="text-gray-900">
-            Preview
+        <section className="flex-1 bg-white border rounded-lg">
+          <Text size="lg" weight="semibold" className="mx-8 my-4 text-gray-900">
+            OTP Email Settings
           </Text>
 
-          <div className="flex flex-row gap-2 items-center">
-            <TbSunHigh />
-            <InputToggle
-              id="otp-theme"
-              label=""
-              onToggle={toggleTheme}
-              checked={dark}
+          <FormElement label="Logo" sublabel="Images can't be larger than 2mB">
+            <div className="flex flex-row items-center gap-2">
+              <IconPicker
+                maxSize={2097152}
+                aspectRatio={{
+                  width: 1,
+                  height: 1,
+                }}
+                id="logoURL"
+                setIsFormChanged={(val) => {}}
+                setIsImgUploading={(val) => {
+                  setLoading(val)
+                }}
+                imageUploadCallback={setLogoURL}
+                url={logoURL}
+                invalid={
+                  localErrors && localErrors['email.logoURL'] ? true : false
+                }
+                errorMessage={
+                  localErrors && localErrors['email.logoURL']
+                    ? localErrors['email.logoURL']
+                    : ''
+                }
+              />
+
+              {logoURL && (
+                <button
+                  type="button"
+                  className="flex justify-center items-center py-2 px-4"
+                  onClick={() => {
+                    setLogoURL(undefined)
+                  }}
+                >
+                  <Text size="xs" weight="medium" className="text-gray-200">
+                    Remove
+                  </Text>
+                </button>
+              )}
+            </div>
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement label="Business Address">
+            <InputTextarea
+              id="address"
+              heading=""
+              value={address ?? ''}
+              onChange={setAddress}
+              error={localErrors && localErrors['email.address'] ? true : false}
             />
-            <TbMoon />
+
+            {localErrors && localErrors['email.address'] && (
+              <Text
+                className="mb-1.5 mt-1.5 text-red-500"
+                size="xs"
+                weight="normal"
+              >
+                {localErrors['email.address']}
+              </Text>
+            )}
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement label="Contact us">
+            <Input
+              id={'contact'}
+              label={''}
+              onChange={(e) => {
+                setContact(e.target.value)
+              }}
+              value={contact}
+              error={localErrors && localErrors['email.contact']}
+            />
+
+            {localErrors && localErrors['email.contact'] && (
+              <Text
+                className="mb-1.5 mt-1.5 text-red-500"
+                size="xs"
+                weight="normal"
+              >
+                {localErrors['email.contact']}
+              </Text>
+            )}
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <div className="flex flex-col lg:flex-row lg:items-center px-8 py-4">
+            <div className="flex-1 mb-2 lg:mb-0 flex flex-row items-center gap-4">
+              {(!appContactEmail || !appPublished) && (
+                <img className="w-4 h-4" src={danger} />
+              )}
+
+              <div>
+                <Text size="sm" weight="medium" className="text-gray-900">
+                  OTP Preview
+                </Text>
+
+                <div className="flex-1">
+                  <Text size="xs" weight="normal" className="text-gray-500">
+                    {appContactEmail && appPublished && (
+                      <Text
+                        size="xs"
+                        weight="normal"
+                        className="text-gray-500"
+                      >{`Sends email to "${appContactEmail}"`}</Text>
+                    )}
+                    {!appContactEmail && (
+                      <Text size="xs" weight="normal" className="text-gray-500">
+                        Please connect email in{' '}
+                        <Link to={`/apps/${clientId}/team`}>
+                          <Text
+                            type="span"
+                            size="xs"
+                            weight="normal"
+                            className="text-indigo-500"
+                          >
+                            Team & Contact
+                          </Text>
+                        </Link>
+                      </Text>
+                    )}
+                    {!appPublished && (
+                      <Text size="xs" weight="normal" className="text-gray-500">
+                        Please publish app in{' '}
+                        <Link to={`/apps/${clientId}/auth`}>
+                          <Text
+                            type="span"
+                            size="xs"
+                            weight="normal"
+                            className="text-indigo-500"
+                          >
+                            OAuth
+                          </Text>
+                        </Link>
+                      </Text>
+                    )}
+                  </Text>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 w-full">
+              <div className="flex flex-row items-center gap-4 justify-end">
+                {showTimer && (
+                  <CountdownCircleTimer
+                    size={16}
+                    strokeWidth={2}
+                    isPlaying
+                    duration={15}
+                    rotation={'counterclockwise'}
+                    colors={'#6366f1'}
+                    isGrowing={true}
+                    onComplete={() => {
+                      setShowTimer(false)
+                      setPreviewEmailErrorMessage(undefined)
+                      setLocalErrors(undefined)
+                    }}
+                  />
+                )}
+
+                <Button
+                  type="button"
+                  btnType="secondary-alt"
+                  btnSize="xs"
+                  onClick={() => {
+                    setPreviewEmailErrorMessage(undefined)
+                    setLocalErrors(undefined)
+
+                    let previewTheme: EmailOTPTheme = {
+                      logoURL:
+                        logoURL ??
+                        'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public',
+                      address: address,
+                      contact: contact,
+                    }
+
+                    previewEmailFetcher.submit(
+                      {
+                        addressURN: addressURN!,
+                        theme: JSON.stringify(previewTheme),
+                      },
+                      {
+                        method: 'post',
+                        action: `/apps/${clientId}/designer/otp/preview`,
+                      }
+                    )
+                  }}
+                  disabled={showTimer || !appContactEmail || !appPublished}
+                >
+                  <div className="flex flex-row items-center gap-2">
+                    <HiOutlineMail className="w-3.5 h-3.5" />{' '}
+                    <Text size="sm">Send Preview</Text>
+                  </div>
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <iframe
-          ref={iFrameRef}
-          className="w-full border rounded-lg"
-          srcDoc={
-            EmailTemplate('XXXXXX', {
-              logoURL:
-                logoURL ??
-                'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public',
-              privacyURL: '#',
-              termsURL: '#',
-              contactURL: contact,
-              address: address,
-            }).body
-          }
-          onLoad={(ev) => {
-            const iFrame = ev.target as HTMLIFrameElement
-            const iFrameDoc = iFrame.contentDocument
+          {previewEmailErrorMessage && (
+            <Text size="xs" className="text-red-500 px-8">
+              {previewEmailErrorMessage}
+            </Text>
+          )}
+        </section>
 
-            const height = iFrameDoc?.body.clientHeight
-            if (!height) {
-              console.warn('No height detected for iFrame')
-              return
+        <section className="bg-white border rounded-lg pb-3 px-6 min-w-[468px] h-[781px] overflow-scroll">
+          <div className="flex flex-row items-center justify-between my-4">
+            <Text size="lg" weight="semibold" className="text-gray-900">
+              Preview
+            </Text>
+
+            <div className="flex flex-row gap-2 items-center">
+              <TbSunHigh />
+              <InputToggle
+                id="otp-theme"
+                label=""
+                onToggle={toggleTheme}
+                checked={dark}
+              />
+              <TbMoon />
+            </div>
+          </div>
+
+          <iframe
+            ref={iFrameRef}
+            className="w-full border rounded-lg"
+            srcDoc={
+              EmailTemplate('XXXXXX', {
+                appName: 'Designer',
+                logoURL:
+                  logoURL ??
+                  'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public',
+                privacyURL: '#',
+                termsURL: '#',
+                contactURL: contact,
+                address: address,
+              }).body
             }
+            onLoad={(ev) => {
+              const iFrame = ev.target as HTMLIFrameElement
+              const iFrameDoc = iFrame.contentDocument
 
-            iFrame.style.height = height + 0.05 * height + 'px'
-          }}
-        ></iframe>
-      </section>
-    </Tab.Panel>
+              const height = iFrameDoc?.body.clientHeight
+              if (!height) {
+                console.warn('No height detected for iFrame')
+                return
+              }
+
+              iFrame.style.height = height + 0.05 * height + 'px'
+            }}
+          ></iframe>
+        </section>
+      </Tab.Panel>
+    </>
   )
 }
 
@@ -1120,9 +1310,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         color:
           color && colorDark
             ? {
-              light: color,
-              dark: colorDark,
-            }
+                light: color,
+                dark: colorDark,
+              }
             : undefined,
         graphicURL: graphicURL,
         providers: providers,
@@ -1211,8 +1401,10 @@ export default () => {
     emailTheme: GetEmailOTPThemeResult
   }>()
 
-  const { appDetails } = useOutletContext<{
+  const { appDetails, appContactAddress, appContactEmail } = useOutletContext<{
     appDetails: appDetailsProps
+    appContactAddress?: AddressURN
+    appContactEmail?: string
   }>()
 
   const actionData = useActionData()
@@ -1299,6 +1491,10 @@ export default () => {
             />
 
             <EmailPanel
+              clientId={appDetails.clientId!}
+              addressURN={appContactAddress}
+              appContactEmail={appContactEmail}
+              appPublished={appDetails.published ?? false}
               emailTheme={emailTheme}
               setLoading={setLoading}
               errors={errors}
