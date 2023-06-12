@@ -133,7 +133,7 @@ export const Dropdown = ({
     open,
   }: DropdownListboxButtonType) => JSX.Element
 }) => {
-  if (defaultItems?.length > 1 && !multiple) {
+  if (defaultItems?.length && defaultItems?.length > 1 && !multiple) {
     throw new BadRequestError({
       message:
         "You can't have multiple items selected in a single select dropdown",
