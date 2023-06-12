@@ -196,7 +196,7 @@ const displayKeyMapper = (
           displayContinueWith={displayContinueWith}
           onClick={() => {
             const search = authnQueryParams ? `?${authnQueryParams}` : ''
-            window.location.href = `/connect/${key}${search}`
+            navigate(`/connect/${key}${search}`)
           }}
         />
       )
