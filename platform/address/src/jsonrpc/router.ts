@@ -42,6 +42,7 @@ import {
   GetAccountByAliasInput,
   GetAccountByAliasOutput,
 } from './methods/getAccountByAlias'
+import { testSessionKeyMethod } from './methods/testSessionKey'
 
 import { LogUsage } from '@proofzero/platform-middleware/log'
 import { parse3RN } from './middlewares/parse3RN'
@@ -84,7 +85,11 @@ import {
   registerSessionKeyMethod,
   RegisterSessionKeyInput,
   RegisterSessionKeyOutput,
-} from './methods/registerSessionKey'
+} from './methods/registerWalletSessionKey'
+import {
+  revokeWalletSessionKeyMethod,
+  RevokeWalletSessionKeyInput,
+} from './methods/revokeWalletSessionKey'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -248,4 +253,10 @@ export const appRouter = t.router({
     .use(Analytics)
     .output(GetAddressReferenceTypeOutput)
     .query(getAddressReferenceTypes),
+  revokeWalletSessionKey: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(Analytics)
+    .input(RevokeWalletSessionKeyInput)
+    .mutation(revokeWalletSessionKeyMethod),
 })

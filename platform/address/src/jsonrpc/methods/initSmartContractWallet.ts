@@ -4,6 +4,7 @@ import { Wallet } from '@ethersproject/wallet'
 import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { JsonRpcProvider } from '@ethersproject/providers'
 
 import createEdgesClient from '@proofzero/platform-clients/edges'
 import { Context } from '../../context'
@@ -47,9 +48,13 @@ export const initSmartContractWalletMethod = async ({
   const owner = Wallet.createRandom()
 
   const smartContractWallet = await getZeroDevSigner({
+    skipFetchSetup: true,
+    rpcProvider: new JsonRpcProvider({
+      url: ctx.MUMBAI_PROVIDER_URL,
+      skipFetchSetup: true,
+    }),
     projectId: ctx.SECRET_ZERODEV_PROJECTID,
     owner,
-    skipFetchSetup: true,
   })
 
   const smartContractWalletAddress = await smartContractWallet.getAddress()
