@@ -121,7 +121,7 @@ export const Dropdown = ({
   multiple?: boolean
   ConnectButtonPhrase: string
   ConnectButtonCallback: () => void
-  onSelectAll?: () => void
+  onSelectAll?: (val: Array<AuthorizationControlSelection>) => void
   selectAllCheckboxTitle?: string
   selectAllCheckboxDescription?: string
   DropdownListboxButton?: ({
@@ -222,10 +222,11 @@ export const Dropdown = ({
                         // in this method we flip it to true
                         if (!allItemsSelected) {
                           setSelectedItems([])
-
                           if (onSelectAll) {
-                            onSelectAll()
+                            onSelectAll([AuthorizationControlSelection.ALL])
                           }
+                        } else {
+                          onSelectAll([])
                         }
                         setAllItemsSelected(!allItemsSelected)
                       }}

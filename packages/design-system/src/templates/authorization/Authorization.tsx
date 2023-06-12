@@ -43,7 +43,9 @@ type AuthorizationProps = {
   connectedSmartContractWallets?: Array<DropdownSelectListItem>
   addNewSmartWalletCallback: () => void
   selectSmartWalletsCallback: (selected: Array<DropdownSelectListItem>) => void
-  selectAllSmartWalletsCallback: () => void
+  selectAllSmartWalletsCallback: (
+    val: Array<AuthorizationControlSelection>
+  ) => void
   selectedSCWallets:
     | Array<DropdownSelectListItem>
     | Array<AuthorizationControlSelection>
@@ -56,7 +58,7 @@ type AuthorizationProps = {
   connectedAccounts?: Array<DropdownSelectListItem>
   addNewAccountCallback: () => void
   selectAccountsCallback: (selected: Array<DropdownSelectListItem>) => void
-  selectAllAccountsCallback: () => void
+  selectAllAccountsCallback: (val: Array<AuthorizationControlSelection>) => void
   selectedConnectedAccounts:
     | Array<DropdownSelectListItem>
     | Array<AuthorizationControlSelection>

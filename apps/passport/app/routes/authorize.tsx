@@ -617,9 +617,7 @@ export default function Authorize() {
                 return navigate(`/authorize?${qp.toString()}`)
               }}
               selectSmartWalletsCallback={setSelectedSCWallets}
-              selectAllSmartWalletsCallback={() => {
-                setSelectedSCWallets([AuthorizationControlSelection.ALL])
-              }}
+              selectAllSmartWalletsCallback={setSelectedSCWallets}
               connectedEmails={
                 connectedEmails.map((email) => {
                   // Substituting subtitle with icon
@@ -660,11 +658,7 @@ export default function Authorize() {
                 return navigate(`/authorize?${qp.toString()}`)
               }}
               selectAccountsCallback={setSelectedConnectedAccounts}
-              selectAllAccountsCallback={() => {
-                setSelectedConnectedAccounts([
-                  AuthorizationControlSelection.ALL,
-                ])
-              }}
+              selectAllAccountsCallback={setSelectedConnectedAccounts}
               cancelCallback={cancelCallback}
               authorizeCallback={authorizeCallback}
               disableAuthorize={
