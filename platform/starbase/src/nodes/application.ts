@@ -126,6 +126,7 @@ export default class StarbaseApp extends DOProxy {
       'createdTimestamp',
       'termsURL',
       'privacyURL',
+      'customDomain',
     ]
     const appObj = await this.state.storage.get(keysWeWant)
     const result = Object.fromEntries(appObj) as AppDetails

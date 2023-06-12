@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { InternalServerError } from '@proofzero/errors'
 
 import { Context } from '../context'
-import { CustomDomainSchema } from '../validators/app'
+import { CustomDomainSchema } from '../validators/customdomain'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import {
   createCustomHostname,

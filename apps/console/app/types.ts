@@ -2,6 +2,7 @@ import type {
   AuthorizedUser,
   AppObject,
   EdgesMetadata,
+  CustomDomain,
 } from '@proofzero/platform/starbase/src/types'
 
 export enum RollType {
@@ -20,6 +21,7 @@ export type appDetailsProps = {
   clientId?: string
   secretTimestamp?: number
   apiKeyTimestamp?: number
+  customDomain?: CustomDomain
 }
 
 export type errorsAuthProps = {

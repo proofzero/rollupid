@@ -1,4 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { Link, useFetcher } from '@remix-run/react'
+import type { FetcherWithComponents } from '@remix-run/react'
 
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
@@ -8,29 +10,30 @@ import dangerVector from '../../images/danger.svg'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { RiLoader5Fill } from 'react-icons/ri'
 
+import type { appDetailsProps } from '~/types'
+
 export type DeleteAppModalProps = {
-  clientId: string
-  appName: string
+  appDetails: appDetailsProps
   isOpen: boolean
-  deleteAppCallback: (app: any) => void
+  deleteAppCallback: (state: boolean) => unknown
 }
 
 export const DeleteAppModal = ({
-  clientId,
-  appName,
+  appDetails,
   isOpen,
   deleteAppCallback,
 }: DeleteAppModalProps) => {
-  const [isAppNameMatches, setAppNameMatches] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const fetcher = useFetcher()
+  const [hasCustomDomain] = useState(!Boolean(appDetails.customDomain))
+
   return (
     <Modal
       isOpen={isOpen}
-      closable={!isSubmitting}
+      closable={fetcher.state !== 'submitting'}
       handleClose={() => deleteAppCallback(false)}
     >
       <div
-        className={`w-[62vw] rounded-lg bg-white px-4 pb-4 
+        className={`w-[48vw] rounded-lg bg-white px-4 pb-4
          text-left  transition-all sm:px-6 sm:pb-6 overflow-y-auto flex items-start space-x-4`}
       >
         <img src={dangerVector} />
@@ -40,62 +43,98 @@ export const DeleteAppModal = ({
             Delete Application
           </Text>
 
-          <form
-            method="post"
-            action="/apps/delete"
-            onSubmit={() => {
-              setIsSubmitting(true)
-            }}
-          >
-            <section className="mb-4">
-              <Text size="sm" weight="normal" className="text-gray-500 my-3">
-                Are you sure you want to delete <b>{appName}</b> app? This
-                action cannot be undone once confirmed.
-              </Text>
-              <Text size="sm" weight="normal" className="text-gray-500 my-3">
-                Confirm you want to delete this application by typing its name
-                below.
-              </Text>
-              <Input
-                id="client_name"
-                label="Application Name"
-                placeholder="My application"
-                required
-                className="mb-12"
-                onChange={(e) => {
-                  setAppNameMatches(appName === e?.target?.value)
-                }}
-              />
-            </section>
-            <input type="hidden" name="clientId" value={clientId} />
-
-            <div className="flex justify-end items-center space-x-3">
-              <Button
-                btnType="secondary-alt"
-                disabled={isSubmitting}
-                onClick={() => deleteAppCallback(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                disabled={!isAppNameMatches || isSubmitting}
-                type="submit"
-                btnType="dangerous"
-                className={
-                  isSubmitting
-                    ? 'flex items-center justify-between transition'
-                    : ''
-                }
-              >
-                {isSubmitting && (
-                  <RiLoader5Fill className="animate-spin" size={22} />
-                )}
-                Delete
-              </Button>
-            </div>
-          </form>
+          {hasCustomDomain && (
+            <HasCustomDomain appDetails={appDetails}></HasCustomDomain>
+          )}
+          {!hasCustomDomain && (
+            <DeleteModalAppForm
+              fetcher={fetcher}
+              appDetails={appDetails}
+              callback={deleteAppCallback}
+            />
+          )}
         </div>
       </div>
     </Modal>
   )
 }
+
+type DeleteModalAppFormProps = {
+  fetcher: FetcherWithComponents<any>
+  appDetails: appDetailsProps
+  callback: (state: boolean) => unknown
+}
+
+const DeleteModalAppForm = ({
+  fetcher,
+  appDetails,
+  callback,
+}: DeleteModalAppFormProps) => {
+  const [isAppNameMatches, setAppNameMatches] = useState(false)
+  return (
+    <fetcher.Form method="post" action="/apps/delete" reloadDocument={true}>
+      <section className="mb-4">
+        <Text size="sm" weight="normal" className="text-gray-500 my-3">
+          Are you sure you want to delete <b>{appDetails.app.name}</b> app? This
+          action cannot be undone once confirmed.
+        </Text>
+        <Text size="sm" weight="normal" className="text-gray-500 my-3">
+          Confirm you want to delete this application by typing its name below.
+        </Text>
+        <Input
+          id="client_name"
+          label="Application Name"
+          placeholder="My application"
+          required
+          className="mb-12"
+          onChange={(e) =>
+            setAppNameMatches(appDetails.app.name === e?.target?.value)
+          }
+        />
+      </section>
+      <input type="hidden" name="clientId" value={appDetails.clientId} />
+
+      <div className="flex justify-end items-center space-x-3">
+        <Button
+          btnType="secondary-alt"
+          disabled={fetcher.state === 'submitting'}
+          onClick={() => callback(false)}
+        >
+          Cancel
+        </Button>
+        <Button
+          disabled={!isAppNameMatches || fetcher.state === 'submitting'}
+          type="submit"
+          btnType="dangerous"
+          className={
+            fetcher.state === 'submitting'
+              ? 'flex items-center justify-between transition'
+              : ''
+          }
+        >
+          {fetcher.state === 'submitting' && (
+            <RiLoader5Fill className="animate-spin" size={22} />
+          )}
+          Delete
+        </Button>
+      </div>
+    </fetcher.Form>
+  )
+}
+
+type HasCustomDomainProps = {
+  appDetails: appDetailsProps
+}
+
+const HasCustomDomain = ({ appDetails }: HasCustomDomainProps) => (
+  <section className="flex flex-col mb-4">
+    <Text size="sm" weight="normal" className="text-gray-500 my-3">
+      This application has a custom domain configured. You need to delete it
+      before you can delete the application.
+    </Text>
+
+    <Link to={`/apps/${appDetails.clientId}/domain-wip`} className="self-end">
+      <Button btnType="secondary-alt">Go to Custom Domain</Button>
+    </Link>
+  </section>
+)
