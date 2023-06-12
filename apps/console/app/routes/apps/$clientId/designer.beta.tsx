@@ -876,6 +876,10 @@ const EmailPanel = ({
     emailTheme?.contact
   )
 
+  const [localErrors, setLocalErrors] = useState<{
+    [key: string]: string
+  }>()
+
   const iFrameRef = useRef<HTMLIFrameElement>(null)
   const [dark, setDark] = useState<boolean>(false)
 
@@ -883,6 +887,10 @@ const EmailPanel = ({
     const darkMode = window.matchMedia('(prefers-color-scheme: dark)')
     setDark(darkMode.matches)
   }, [])
+
+  useEffect(() => {
+    setLocalErrors(errors)
+  }, [errors])
 
   useEffect(() => {
     if (!iFrameRef) return
@@ -912,16 +920,19 @@ const EmailPanel = ({
 
   const previewEmailFetcher = useFetcher()
   useEffect(() => {
+    setLocalErrors(undefined)
+
     if (previewEmailFetcher.data?.code === 'BAD_REQUEST') {
       setPreviewEmailErrorMessage(previewEmailFetcher.data?.message)
+      setShowTimer(true)
 
       setTimeout(() => {
         setPreviewEmailErrorMessage(undefined)
       }, 15000)
     } else {
-      setPreviewEmailErrorMessage(undefined)
-
-      if (previewEmailFetcher.type === 'done') {
+      if (previewEmailFetcher.data?.errors) {
+        setLocalErrors(previewEmailFetcher.data?.errors)
+      } else if (previewEmailFetcher.type === 'done') {
         toast(
           ToastType.Success,
           { message: 'Email Sent! Please check your inbox.' },
@@ -960,10 +971,12 @@ const EmailPanel = ({
                 }}
                 imageUploadCallback={setLogoURL}
                 url={logoURL}
-                invalid={errors && errors['email.logoURL'] ? true : false}
+                invalid={
+                  localErrors && localErrors['email.logoURL'] ? true : false
+                }
                 errorMessage={
-                  errors && errors['email.logoURL']
-                    ? errors['email.logoURL']
+                  localErrors && localErrors['email.logoURL']
+                    ? localErrors['email.logoURL']
                     : ''
                 }
               />
@@ -992,16 +1005,16 @@ const EmailPanel = ({
               heading=""
               value={address ?? ''}
               onChange={setAddress}
-              error={errors && errors['email.address'] ? true : false}
+              error={localErrors && localErrors['email.address'] ? true : false}
             />
 
-            {errors && errors['email.address'] && (
+            {localErrors && localErrors['email.address'] && (
               <Text
                 className="mb-1.5 mt-1.5 text-red-500"
                 size="xs"
                 weight="normal"
               >
-                {errors['email.address']}
+                {localErrors['email.address']}
               </Text>
             )}
           </FormElement>
@@ -1016,16 +1029,16 @@ const EmailPanel = ({
                 setContact(e.target.value)
               }}
               value={contact}
-              error={errors && errors['email.contact']}
+              error={localErrors && localErrors['email.contact']}
             />
 
-            {errors && errors['email.contact'] && (
+            {localErrors && localErrors['email.contact'] && (
               <Text
                 className="mb-1.5 mt-1.5 text-red-500"
                 size="xs"
                 weight="normal"
               >
-                {errors['email.contact']}
+                {localErrors['email.contact']}
               </Text>
             )}
           </FormElement>
@@ -1068,11 +1081,7 @@ const EmailPanel = ({
                       </Text>
                     )}
                     {!appPublished && (
-                      <Text
-                        size="xs"
-                        weight="normal"
-                        className="text-gray-500"
-                      >
+                      <Text size="xs" weight="normal" className="text-gray-500">
                         Please publish app in{' '}
                         <Link to={`/apps/${clientId}/auth`}>
                           <Text
@@ -1102,7 +1111,11 @@ const EmailPanel = ({
                     rotation={'counterclockwise'}
                     colors={'#6366f1'}
                     isGrowing={true}
-                    onComplete={() => setShowTimer(false)}
+                    onComplete={() => {
+                      setShowTimer(false)
+                      setPreviewEmailErrorMessage(undefined)
+                      setLocalErrors(undefined)
+                    }}
                   />
                 )}
 
@@ -1111,6 +1124,9 @@ const EmailPanel = ({
                   btnType="secondary-alt"
                   btnSize="xs"
                   onClick={() => {
+                    setPreviewEmailErrorMessage(undefined)
+                    setLocalErrors(undefined)
+
                     let previewTheme: EmailOTPTheme = {
                       logoURL:
                         logoURL ??
@@ -1129,8 +1145,6 @@ const EmailPanel = ({
                         action: `/apps/${clientId}/designer/otp/preview`,
                       }
                     )
-
-                    setShowTimer(true)
                   }}
                   disabled={showTimer || !appContactEmail || !appPublished}
                 >
@@ -1480,7 +1494,7 @@ export default () => {
               clientId={appDetails.clientId!}
               addressURN={appContactAddress}
               appContactEmail={appContactEmail}
-              appPublished={appDetails.published}
+              appPublished={appDetails.published ?? false}
               emailTheme={emailTheme}
               setLoading={setLoading}
               errors={errors}

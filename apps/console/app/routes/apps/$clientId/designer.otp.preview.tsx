@@ -1,11 +1,14 @@
-import { ActionFunction } from '@remix-run/cloudflare'
+import { ActionFunction, json } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import createAddressClient from '@proofzero/platform-clients/address'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
-import { EmailOTPTheme } from '@proofzero/platform.starbase/src/jsonrpc/validators/app'
+import {
+  EmailOTPTheme,
+  EmailOTPThemeSchema,
+} from '@proofzero/platform.starbase/src/jsonrpc/validators/app'
 import {
   JsonError,
   getRollupReqFunctionErrorWrapper,
@@ -19,6 +22,29 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const formData = await request.formData()
     const theme: EmailOTPTheme = JSON.parse(formData.get('theme') as string)
+
+    if (!theme.logoURL || theme.logoURL === '') theme.logoURL = undefined
+    if (!theme.address || theme.address === '') theme.address = undefined
+    if (!theme.contact || theme.contact === '') theme.contact = undefined
+
+    let errors
+    const zodErrors = await EmailOTPThemeSchema.spa(theme)
+    if (!zodErrors.success) {
+      const mappedIssues = zodErrors.error.issues.map((issue) => ({
+        path: `email.${issue.path.join('.')}`,
+        message: issue.message,
+      }))
+
+      errors = mappedIssues.reduce((acc, curr) => {
+        acc[curr.path] = curr.message
+        return acc
+      }, {} as { [key: string]: string })
+
+      return json({
+        errors,
+      })
+    }
+
     const addressURN = formData.get('addressURN') as string
 
     const addressClient = createAddressClient(Address, {
@@ -58,6 +84,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         preview: true,
       })
     } catch (e) {
+      // We're returning the json error instead of basing on the thrown
+      // error by the handler so that it doesn't get caught by the catch boundary
+      // and we can use the response to display client side errors without
+      // navigating away
       return JsonError(e, context.traceSpan.getTraceParent())
     }
 
