@@ -17,7 +17,8 @@ import type { AccountURN } from '@proofzero/urns/account'
 import type { PersonaData } from '@proofzero/types/application'
 import { redirect } from '@remix-run/cloudflare'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
-import { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import type { AddressURN } from '@proofzero/urns/address'
 
 export type DataForScopes = {
   connectedEmails: DropdownSelectListItem[]
@@ -49,7 +50,6 @@ export const reorderScope = (scopes: string[]): string[] => {
 }
 // -----------------------------------------------------------------------------
 
-
 export const getDataForScopes = async (
   requestedScope: string[],
   accountURN: AccountURN,
@@ -75,18 +75,21 @@ export const getDataForScopes = async (
       connectedEmails = getEmailDropdownItems(connectedAccounts)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!)) {
-      const addresses = (await Promise.all(
+      const addresses = await Promise.all(
         connectedAccounts
           .filter((ca) => {
-            return (ca.rc.node_type === NodeType.OAuth ||
-              ca.rc.node_type === NodeType.Crypto) &&
+            return (
+              (ca.rc.node_type === NodeType.OAuth ||
+                ca.rc.node_type === NodeType.Email ||
+                ca.rc.node_type === NodeType.Crypto) &&
               ca.rc.addr_type !== CryptoAddressType.Wallet
+            )
           })
           .map((ca) => {
             const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
             return addressClient.getAddressProfile.query()
           })
-      ))
+      )
       connectedAddresses = getAddressDropdownItems(addresses)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!)) {
@@ -142,7 +145,7 @@ export function authzParamsMatch(
     scopesMatch &&
     authzCookieParams.clientId === authzQueryParams.clientId &&
     `${authzReqRedirectURL?.origin}${authzReqRedirectURL?.pathname}` ===
-    `${authzReqCookieRedirectURL?.origin}${authzReqCookieRedirectURL?.pathname}` &&
+      `${authzReqCookieRedirectURL?.origin}${authzReqCookieRedirectURL?.pathname}` &&
     authzCookieParams.state === authzQueryParams.state
   )
 }
@@ -166,4 +169,22 @@ export async function createAuthzParamCookieAndCreate(
       env
     ),
   })
+}
+
+export async function createNewSCWallet({
+  nickname,
+  primaryAddressURN,
+  env,
+  traceSpan,
+}: {
+  nickname: string
+  primaryAddressURN: AddressURN
+  env: Env
+  traceSpan?: any
+}) {
+  const addressClient = getAddressClient(primaryAddressURN, env, traceSpan)
+  const { addressURN } = await addressClient.initSmartContractWallet.query({
+    nickname,
+  })
+  return { addressURN }
 }

@@ -2,7 +2,7 @@ import { useContext, useState } from 'react'
 
 import { useLoaderData, useSubmit } from '@remix-run/react'
 import { redirect } from '@remix-run/cloudflare'
-import { getAccountClient, getAddressClient, getStarbaseClient } from '~/platform.server'
+import { getAccountClient, getStarbaseClient } from '~/platform.server'
 import {
   getAuthzCookieParams,
   getValidatedSessionContext,
@@ -19,9 +19,10 @@ import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 import { Helmet } from 'react-helmet'
-import { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
+import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 import { getRGBColor, getTextColor } from '@proofzero/design-system/src/helpers'
 import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
+import { createNewSCWallet } from '~/utils/authorize.server'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -37,17 +38,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       account: accountUrn,
     })
 
-    const addressClient = getAddressClient(
-      profile?.primaryAddressURN!,
-      context.env,
-      context.traceSpan
-    )
-
     const formData = await request.formData()
     const nickname = formData.get('nickname') as string
 
-    await addressClient.initSmartContractWallet.query({
+    await createNewSCWallet({
       nickname,
+      primaryAddressURN: profile?.primaryAddressURN!,
+      env: context.env,
+      traceSpan: context.traceSpan,
     })
 
     const { redirectUri, state, scope, clientId, prompt, login_hint } =
@@ -86,7 +84,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     return {
-      appProps
+      appProps,
     }
   }
 )
@@ -110,36 +108,39 @@ export default () => {
         <style type="text/css">{`
             :root {
                 ${getRGBColor(
-          dark
-            ? appProps?.appTheme?.color?.dark ??
-            AuthenticationScreenDefaults.color.dark
-            : appProps?.appTheme?.color?.light ??
-            AuthenticationScreenDefaults.color.light,
-          'primary'
-        )}
+                  dark
+                    ? appProps?.appTheme?.color?.dark ??
+                        AuthenticationScreenDefaults.color.dark
+                    : appProps?.appTheme?.color?.light ??
+                        AuthenticationScreenDefaults.color.light,
+                  'primary'
+                )}
                 ${getRGBColor(
-          getTextColor(
-            dark
-              ? appProps?.appTheme?.color?.dark ??
-              AuthenticationScreenDefaults.color.dark
-              : appProps?.appTheme?.color?.light ??
-              AuthenticationScreenDefaults.color.light
-          ),
-          'primary-contrast-text'
-        )}
+                  getTextColor(
+                    dark
+                      ? appProps?.appTheme?.color?.dark ??
+                          AuthenticationScreenDefaults.color.dark
+                      : appProps?.appTheme?.color?.light ??
+                          AuthenticationScreenDefaults.color.light
+                  ),
+                  'primary-contrast-text'
+                )}
              {
          `}</style>
       </Helmet>
 
       <div className={`${dark ? 'dark' : ''}`}>
-        <div className={`flex flex-row h-screen justify-center items-center bg-[#F9FAFB] dark:bg-gray-900`}>
+        <div
+          className={`flex flex-row h-screen justify-center items-center bg-[#F9FAFB] dark:bg-gray-900`}
+        >
           <div
             className={
               'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 dark:bg-[#1F2937] overflow-hidden'
             }
             style={{
-              backgroundImage: `url(${appProps?.appTheme?.graphicURL ?? sideGraphics
-                })`,
+              backgroundImage: `url(${
+                appProps?.appTheme?.graphicURL ?? sideGraphics
+              })`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
