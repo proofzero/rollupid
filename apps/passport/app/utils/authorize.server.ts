@@ -18,7 +18,6 @@ import type { PersonaData } from '@proofzero/types/application'
 import { redirect } from '@remix-run/cloudflare'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
-import type { GetAuthorizedAppScopesMethodResult } from '@proofzero/platform.access/src/jsonrpc/methods/getAuthorizedAppScopes'
 
 export type DataForScopes = {
   connectedEmails: DropdownSelectListItem[]
@@ -55,8 +54,7 @@ export const getDataForScopes = async (
   accountURN: AccountURN,
   jwt?: string,
   env?: any,
-  traceSpan?: any,
-  preauthorizedScopes?: GetAuthorizedAppScopesMethodResult['claimValues']
+  traceSpan?: any
 ): Promise<DataForScopes> => {
   if (!accountURN)
     throw new UnauthorizedError({ message: 'Account URN is required' })
@@ -73,14 +71,7 @@ export const getDataForScopes = async (
 
   if (connectedAccounts && connectedAccounts.length) {
     if (requestedScope.includes(Symbol.keyFor(SCOPE_EMAIL)!)) {
-      connectedEmails = getEmailDropdownItems(
-        connectedAccounts,
-        true,
-        preauthorizedScopes &&
-          Object.keys(preauthorizedScopes).includes(Symbol.keyFor(SCOPE_EMAIL)!)
-          ? preauthorizedScopes[Symbol.keyFor(SCOPE_EMAIL)!].meta.urns[0]
-          : undefined
-      )
+      connectedEmails = getEmailDropdownItems(connectedAccounts)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!)) {
       const addresses = await Promise.all(
@@ -98,16 +89,7 @@ export const getDataForScopes = async (
             return addressClient.getAddressProfile.query()
           })
       )
-      connectedAddresses = getAddressDropdownItems(
-        addresses,
-        preauthorizedScopes &&
-          Object.keys(preauthorizedScopes).includes(
-            Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!
-          )
-          ? preauthorizedScopes[Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!].meta
-              .urns
-          : undefined
-      )
+      connectedAddresses = getAddressDropdownItems(addresses)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!)) {
       const addresses = await Promise.all(
@@ -120,16 +102,7 @@ export const getDataForScopes = async (
             return addressClient.getAddressProfile.query()
           })
       )
-      connectedSmartContractWallets = getAddressDropdownItems(
-        addresses,
-        preauthorizedScopes &&
-          Object.keys(preauthorizedScopes).includes(
-            Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!
-          )
-          ? preauthorizedScopes[Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!]
-              .meta.urns
-          : undefined
-      )
+      connectedSmartContractWallets = getAddressDropdownItems(addresses)
     }
   }
 

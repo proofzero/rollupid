@@ -58,9 +58,7 @@ export const adjustAddressTypeToDisplay = (
 }
 
 export const getEmailDropdownItems = (
-  connectedAddresses?: Addresses | null,
-  preselected = false,
-  preauthorizedEmail?: string
+  connectedAddresses?: Addresses | null
 ): Array<DropdownSelectListItem> => {
   if (!connectedAddresses) return []
 
@@ -89,19 +87,13 @@ export const getEmailDropdownItems = (
         | CryptoAddressType,
       title: address.qc.alias,
       value: address.baseUrn as AddressURN,
-      selected: preauthorizedEmail
-        ? address.baseUrn === preauthorizedEmail
-        : preselected
-        ? i === filteredEmailsFromConnectedAddresses.length - 1
-        : undefined,
     }
   })
 }
 
 //addressDropdownItems
 export const getAddressDropdownItems = (
-  addressProfiles?: Array<GetAddressProfileResult> | null,
-  preselectedItems: Array<string> = []
+  addressProfiles?: Array<GetAddressProfileResult> | null
 ): Array<DropdownSelectListItem> => {
   if (!addressProfiles) return []
   return addressProfiles.map((address) => {
@@ -111,7 +103,6 @@ export const getAddressDropdownItems = (
       subtitle: `${adjustAddressTypeToDisplay(address.type)} - ${
         address.address
       }`,
-      selected: preselectedItems.includes(address.id),
     }
   })
 }

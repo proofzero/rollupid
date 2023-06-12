@@ -50,9 +50,6 @@ import { getRGBColor, getTextColor } from '@proofzero/design-system/src/helpers'
 import { AddressURNSpace } from '@proofzero/urns/address'
 import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 
-import { loader as scopesLoader } from './settings/applications/$clientId/scopes'
-import type { GetAuthorizedAppScopesMethodResult } from '@proofzero/platform.access/src/jsonrpc/methods/getAuthorizedAppScopes'
-
 export type UserProfile = {
   displayName: string
   pfp: {
@@ -263,32 +260,17 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       } //else we present the authz screen below
     }
     const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-    const profile = await accountClient.getProfile.query({
-      account: accountUrn,
-    })
 
-    const preauthorizedScopes: GetAuthorizedAppScopesMethodResult =
-      await scopesLoader({
-        request,
-        params: { clientId },
-        context,
-      })
-
-    const personaData = await accessClient.getPersonaData.query({
-      accountUrn,
-      clientId,
-    })
-
-    const dataForScopes = await getDataForScopes(
-      scope,
-      accountUrn,
-      jwt,
-      context.env,
-      context.traceSpan,
-      Object.keys(preauthorizedScopes?.claimValues).length
-        ? preauthorizedScopes.claimValues
-        : undefined
-    )
+    const [profile, personaData, dataForScopes] = await Promise.all([
+      accountClient.getProfile.query({
+        account: accountUrn,
+      }),
+      accessClient.getPersonaData.query({
+        accountUrn,
+        clientId,
+      }),
+      getDataForScopes(scope, accountUrn, jwt, context.env, context.traceSpan),
+    ])
 
     if (personaData) {
       dataForScopes.personaData = personaData
@@ -445,29 +427,37 @@ export default function Authorize() {
     DropdownSelectListItem | undefined
   >(() => {
     let selected
-    if (connectedEmails && connectedEmails.length)
-      selected = connectedEmails.find((email) => email.selected)
+    if (connectedEmails && connectedEmails.length && persona?.email) {
+      selected = connectedEmails.find((email) => email.value === persona.email)
+    } else {
+      // sorted in edges in  by date descending order
+      selected = connectedEmails?.[connectedEmails.length - 1]
+    }
     return selected
   })
   const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
     Array<DropdownSelectListItem> | Array<AuthorizationControlSelection>
   >(() => {
-    if (personaData?.connected_accounts === AuthorizationControlSelection.ALL) {
+    if (persona.connected_accounts === AuthorizationControlSelection.ALL) {
       return [AuthorizationControlSelection.ALL]
     } else {
       return connectedAccounts?.length
-        ? connectedAccounts.filter((acc) => acc.selected)
+        ? connectedAccounts.filter((acc) =>
+            persona.connected_accounts?.includes(acc.value)
+          )
         : []
     }
   })
   const [selectedSCWallets, setSelectedSCWallets] = useState<
     Array<DropdownSelectListItem> | Array<AuthorizationControlSelection>
   >(() => {
-    if (personaData?.erc_4337 === AuthorizationControlSelection.ALL) {
+    if (persona.erc_4337 === AuthorizationControlSelection.ALL) {
       return [AuthorizationControlSelection.ALL]
     } else {
       return connectedSmartContractWallets?.length
-        ? connectedSmartContractWallets.filter((acc) => acc.selected)
+        ? connectedSmartContractWallets.filter((acc) =>
+            persona.erc_4337?.includes(acc.value)
+          )
         : []
     }
   })
