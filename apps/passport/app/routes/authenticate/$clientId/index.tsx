@@ -199,7 +199,7 @@ const InnerComponent = ({
         signData,
         navigate,
         authnQueryParams,
-        loading,
+        loading: loading || transitionState !== 'idle',
         walletConnectCallback: async (address) => {
           if (loading) return
           // fetch nonce and kickoff sign flow
