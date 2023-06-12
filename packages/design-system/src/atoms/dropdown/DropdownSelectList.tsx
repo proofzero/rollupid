@@ -226,7 +226,9 @@ export const Dropdown = ({
                             onSelectAll([AuthorizationControlSelection.ALL])
                           }
                         } else {
-                          onSelectAll([])
+                          if (onSelectAll) {
+                            onSelectAll([])
+                          }
                         }
                         setAllItemsSelected(!allItemsSelected)
                       }}
