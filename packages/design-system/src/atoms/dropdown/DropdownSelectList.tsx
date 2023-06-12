@@ -160,10 +160,9 @@ export const Dropdown = ({
         return defaultItems[0] !== AuthorizationControlSelection.ALL
           ? (defaultItems as Array<DropdownSelectListItem>)
           : ([] as Array<DropdownSelectListItem>)
-      } else {
-        return [] as Array<DropdownSelectListItem>
       }
     }
+    return [] as Array<DropdownSelectListItem>
   })
 
   const [allItemsSelected, setAllItemsSelected] = useState(() => {
