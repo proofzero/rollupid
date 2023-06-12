@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { CustomDomainSchema } from './customdomain'
 
 export const AppObjectSchema = z.object({
   name: z.string(),
@@ -8,6 +9,7 @@ export const AppObjectSchema = z.object({
   termsURL: z.string().optional(),
   privacyURL: z.string().optional(),
   websiteURL: z.string().optional(),
+  customDomain: CustomDomainSchema.optional(),
 })
 
 export type AppObject = z.infer<typeof AppObjectSchema>
@@ -25,6 +27,7 @@ export const AppReadableFieldsSchema = z.object({
   createdTimestamp: z.number().optional(),
   termsURL: z.string().optional(),
   privacyURL: z.string().optional(),
+  customDomain: CustomDomainSchema.optional(),
 })
 
 export const AppInternalFieldSchema = z.object({
@@ -103,38 +106,3 @@ export const PaymasterSchema = z
 export type PaymasterType = z.infer<typeof PaymasterSchema>
 
 export type PaymasterProviderType = z.infer<typeof PaymasterProviderSchema>
-
-export const CustomDomainDNSRecordsSchema = z.array(
-  z.object({
-    name: z.string(),
-    record_type: z.union([z.literal('TXT'), z.literal('CNAME')]),
-    expected_value: z.string(),
-    value: z.array(z.string()).optional(),
-  })
-)
-
-export const CustomDomainSchema = z.object({
-  id: z.string(),
-  hostname: z.string(),
-  ownership_verification: z
-    .object({
-      name: z.string(),
-      type: z.string(),
-      value: z.string(),
-    })
-    .optional(),
-  ssl: z.object({
-    status: z.string(),
-    validation_records: z
-      .array(
-        z.object({
-          status: z.string(),
-          txt_name: z.string(),
-          txt_value: z.string(),
-        })
-      )
-      .optional(),
-  }),
-  dns_records: CustomDomainDNSRecordsSchema,
-  status: z.string(),
-})

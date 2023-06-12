@@ -7,9 +7,12 @@ import {
   AppObjectSchema,
   AppReadableFieldsSchema,
   AppUpdateableFieldsSchema,
+} from './jsonrpc/validators/app'
+
+import {
   CustomDomainDNSRecordsSchema,
   CustomDomainSchema,
-} from './jsonrpc/validators/app'
+} from './jsonrpc/validators/customdomain'
 
 import {
   GetAuthorizedAccountsMethodInput,

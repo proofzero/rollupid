@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
+import { BadRequestError } from '@proofzero/errors'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import createEdgesClient from '@proofzero/platform-clients/edges'
 import { AppClientIdParamSchema } from '../validators/app'
@@ -27,6 +28,11 @@ export const deleteApp = async ({
     input.clientId,
     ctx.StarbaseApp
   )
+
+  if (await appDO.storage.get('customDomain'))
+    throw new BadRequestError({
+      message: 'The application has a custom domain configuration',
+    })
 
   await ctx.edges.removeEdge.mutate({
     src: ctx.accountURN,
