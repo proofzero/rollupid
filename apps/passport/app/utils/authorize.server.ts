@@ -18,6 +18,7 @@ import type { PersonaData } from '@proofzero/types/application'
 import { redirect } from '@remix-run/cloudflare'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import type { AddressURN } from '@proofzero/urns/address'
 
 export type DataForScopes = {
   connectedEmails: DropdownSelectListItem[]
@@ -168,4 +169,22 @@ export async function createAuthzParamCookieAndCreate(
       env
     ),
   })
+}
+
+export async function createNewSCWallet({
+  nickname,
+  primaryAddressURN,
+  env,
+  traceSpan,
+}: {
+  nickname: string
+  primaryAddressURN: AddressURN
+  env: Env
+  traceSpan?: any
+}) {
+  const addressClient = getAddressClient(primaryAddressURN, env, traceSpan)
+  const { addressURN } = await addressClient.initSmartContractWallet.query({
+    nickname,
+  })
+  return { addressURN }
 }

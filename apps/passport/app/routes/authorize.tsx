@@ -11,7 +11,6 @@ import { ResponseType } from '@proofzero/types/access'
 import {
   getAccessClient,
   getAccountClient,
-  getAddressClient,
   getStarbaseClient,
 } from '~/platform.server'
 import {
@@ -25,6 +24,7 @@ import { validatePersonaData } from '@proofzero/security/persona'
 import {
   authzParamsMatch,
   createAuthzParamCookieAndCreate,
+  createNewSCWallet,
   getDataForScopes,
 } from '~/utils/authorize.server'
 import { useContext, useEffect, useState } from 'react'
@@ -348,15 +348,13 @@ export const action: ActionFunction = async ({ request, context }) => {
       account: accountUrn,
     })
 
-    const addressClient = getAddressClient(
-      profile?.primaryAddressURN!,
-      context.env,
-      context.traceSpan
-    )
-
-    const { addressURN } = await addressClient.initSmartContractWallet.query({
+    const { addressURN } = await createNewSCWallet({
       nickname,
+      primaryAddressURN: profile?.primaryAddressURN!,
+      env: context.env,
+      traceSpan: context.traceSpan,
     })
+
     personaData.erc_4337 = [AddressURNSpace.getBaseURN(addressURN)]
   }
 
