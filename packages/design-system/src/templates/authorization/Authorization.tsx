@@ -7,6 +7,7 @@ import { Spinner } from '../../atoms/spinner/Spinner'
 import { Button } from '../../atoms/buttons/Button'
 import Info from '../../atoms/info/Info'
 import { ScopeDescriptor } from '@proofzero/security/scopes'
+import { AuthorizationControlSelection } from '@proofzero/types/application'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import ScopeIcon from './ScopeIcon'
 import {
@@ -43,15 +44,22 @@ type AuthorizationProps = {
   addNewSmartWalletCallback: () => void
   selectSmartWalletsCallback: (selected: Array<DropdownSelectListItem>) => void
   selectAllSmartWalletsCallback: () => void
+  selectedSCWallets:
+    | Array<DropdownSelectListItem>
+    | Array<AuthorizationControlSelection>
 
   connectedEmails?: Array<DropdownSelectListItem>
   addNewEmailCallback: () => void
   selectEmailCallback: (selected: DropdownSelectListItem) => void
+  selectedEmail?: DropdownSelectListItem
 
   connectedAccounts?: Array<DropdownSelectListItem>
   addNewAccountCallback: () => void
   selectAccountsCallback: (selected: Array<DropdownSelectListItem>) => void
   selectAllAccountsCallback: () => void
+  selectedConnectedAccounts:
+    | Array<DropdownSelectListItem>
+    | Array<AuthorizationControlSelection>
 
   cancelCallback: () => void
   authorizeCallback: (scopes: string[]) => void
@@ -70,13 +78,16 @@ export default ({
   addNewSmartWalletCallback,
   selectSmartWalletsCallback,
   selectAllSmartWalletsCallback,
+  selectedSCWallets,
   connectedEmails,
   addNewEmailCallback,
   selectEmailCallback,
+  selectedEmail,
   connectedAccounts,
   addNewAccountCallback,
   selectAccountsCallback,
   selectAllAccountsCallback,
+  selectedConnectedAccounts,
   cancelCallback,
   authorizeCallback,
   disableAuthorize = false,
@@ -197,7 +208,7 @@ export default ({
                         {scopeMeta.scopes[scope].name}
                       </Text>
                       {!selectedItem &&
-                        !selectedItems.length &&
+                        !selectedItems?.length &&
                         !allItemsSelected && (
                           <Text
                             size="sm"
@@ -223,21 +234,21 @@ export default ({
                         </Text>
                       )}
 
-                      {selectedItems.length > 1 && !allItemsSelected && (
+                      {selectedItems?.length > 1 && !allItemsSelected && (
                         <Text
                           size="sm"
                           className="text-gray-500 dark:text-white truncate text-ellipsis"
                         >
-                          {selectedItems.length} items selected
+                          {selectedItems?.length} items selected
                         </Text>
                       )}
 
-                      {selectedItems.length === 1 && !allItemsSelected && (
+                      {selectedItems?.length === 1 && !allItemsSelected && (
                         <Text
                           size="sm"
                           className="text-gray-500 dark:text-white truncate text-ellipsis"
                         >
-                          {selectedItems[0].title} selected
+                          {selectedItems?.[0].title} selected
                         </Text>
                       )}
 
@@ -309,6 +320,7 @@ export default ({
                   <div className="flex-1 min-w-0">
                     <Dropdown
                       items={connectedSmartContractWallets}
+                      defaultItems={selectedSCWallets}
                       placeholder="Create New Wallet"
                       multiple={true}
                       onSelect={(
@@ -330,6 +342,7 @@ export default ({
                   <div className="flex-1 min-w-0">
                     <Dropdown
                       items={connectedEmails}
+                      defaultItems={[selectedEmail]}
                       placeholder="Select an Email Address"
                       onSelect={(selectedItem: DropdownSelectListItem) => {
                         selectEmailCallback(selectedItem)
@@ -345,6 +358,7 @@ export default ({
                   <div className="flex-1 min-w-0">
                     <Dropdown
                       items={connectedAccounts}
+                      defaultItems={selectedConnectedAccounts}
                       onSelect={(
                         selectedItems: Array<DropdownSelectListItem>
                       ) => {

@@ -172,6 +172,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       context.env,
       context.traceSpan
     )
+    const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
 
     //Special case for console and passport - we just redirect
     if (['console', 'passport'].includes(clientId)) {
@@ -236,7 +237,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       )
     ) {
       const responseType = ResponseType.Code
-      const accessClient = getAccessClient(context.env, context.traceSpan)
       const preauthorizeRes = await accessClient.preauthorize.mutate({
         account: accountUrn,
         responseType,
@@ -274,6 +274,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         context,
       })
 
+    const personaData = await accessClient.getPersonaData.query({
+      accountUrn,
+      clientId,
+    })
+
     const dataForScopes = await getDataForScopes(
       scope,
       accountUrn,
@@ -284,6 +289,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         ? preauthorizedScopes.claimValues
         : undefined
     )
+
+    if (personaData) {
+      dataForScopes.personaData = personaData
+    }
 
     if (!profile) {
       throw new InternalServerError({
@@ -441,19 +450,27 @@ export default function Authorize() {
     return selected
   })
   const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
-    Array<DropdownSelectListItem | AuthorizationControlSelection>
-  >(
-    connectedAccounts?.length
-      ? connectedAccounts.filter((acc) => acc.selected)
-      : []
-  )
+    Array<DropdownSelectListItem> | Array<AuthorizationControlSelection>
+  >(() => {
+    if (personaData?.connected_accounts === AuthorizationControlSelection.ALL) {
+      return [AuthorizationControlSelection.ALL]
+    } else {
+      return connectedAccounts?.length
+        ? connectedAccounts.filter((acc) => acc.selected)
+        : []
+    }
+  })
   const [selectedSCWallets, setSelectedSCWallets] = useState<
-    Array<DropdownSelectListItem | AuthorizationControlSelection>
-  >(
-    connectedSmartContractWallets?.length
-      ? connectedSmartContractWallets.filter((acc) => acc.selected)
-      : []
-  )
+    Array<DropdownSelectListItem> | Array<AuthorizationControlSelection>
+  >(() => {
+    if (personaData?.erc_4337 === AuthorizationControlSelection.ALL) {
+      return [AuthorizationControlSelection.ALL]
+    } else {
+      return connectedSmartContractWallets?.length
+        ? connectedSmartContractWallets.filter((acc) => acc.selected)
+        : []
+    }
+  })
 
   // Re-render the component every time persona gets updated
   useEffect(() => {}, [persona])
@@ -598,6 +615,7 @@ export default function Authorize() {
               connectedSmartContractWallets={
                 connectedSmartContractWallets ?? []
               }
+              selectedSCWallets={selectedSCWallets}
               addNewSmartWalletCallback={() => {
                 const qp = new URLSearchParams()
                 qp.append('scope', requestedScope.join(' '))
@@ -639,7 +657,9 @@ export default function Authorize() {
                 return navigate(`/authorize?${qp.toString()}`)
               }}
               selectEmailCallback={setSelectedEmail}
+              selectedEmail={selectedEmail}
               connectedAccounts={connectedAccounts ?? []}
+              selectedConnectedAccounts={selectedConnectedAccounts}
               addNewAccountCallback={() => {
                 const qp = new URLSearchParams()
                 qp.append('scope', requestedScope.join(' '))
