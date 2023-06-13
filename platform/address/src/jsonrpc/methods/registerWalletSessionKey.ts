@@ -1,10 +1,6 @@
 import { z } from 'zod'
 
-import { AddressURNSpace } from '@proofzero/urns/address'
-import { generateHashedIDRef } from '@proofzero/urns/idref'
-
 import { Context } from '../../context'
-import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import { initAddressNodeByName } from '../../nodes'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import {
@@ -61,14 +57,14 @@ export const registerSessionKeyMethod = async ({
 
   let sessionKey = ''
 
-  if (paymaster!.provider === 'zerodev') {
+  if (paymaster && paymaster.provider === 'zerodev') {
     const zdSigner = await getZeroDevSigner({
-      projectId: paymaster!.secret, // dev project id
+      projectId: paymaster.secret,
+      owner: getPrivateKeyOwner(ownerPrivateKey),
       rpcProvider: new JsonRpcProvider({
         url: ctx.MUMBAI_PROVIDER_URL,
         skipFetchSetup: true,
       }),
-      owner: getPrivateKeyOwner(ownerPrivateKey), // owner private key
       skipFetchSetup: true,
     })
 
