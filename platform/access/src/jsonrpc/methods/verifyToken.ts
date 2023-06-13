@@ -15,13 +15,18 @@ import {
 
 export const VerifyTokenMethodInput = z.object({
   token: z.string(),
-  clientId: z.string(),
-  clientSecret: z.string(),
-  issuer: z.string(),
+  clientId: z.string().optional(),
+  clientSecret: z.string().optional(),
+  issuer: z.string().optional(),
 })
 type VerifyTokenMethodInput = z.infer<typeof VerifyTokenMethodInput>
 
-export const VerifyTokenMethodOutput = z.void()
+export const VerifyTokenMethodOutput = z.object({
+  payload: z.object({
+    aud: z.union([z.string(), z.array(z.string()), z.undefined()]),
+    iss: z.string().optional(),
+  }),
+})
 type VerifyTokenMethodOutput = z.infer<typeof VerifyTokenMethodOutput>
 
 type VerifyTokenParams = {
@@ -40,15 +45,16 @@ export const verifyTokenMethod: VerifyTokenMethod = async ({ ctx, input }) => {
     throw new Error('missing starbase client')
   }
 
-  const { valid } = await ctx.starbaseClient.checkAppAuth.query({
-    clientId,
-    clientSecret,
-  })
-
-  if (!valid) throw InvalidClientCredentialsError
+  if (clientId && clientSecret) {
+    const { valid } = await ctx.starbaseClient.checkAppAuth.query({
+      clientId,
+      clientSecret,
+    })
+    if (!valid) throw InvalidClientCredentialsError
+  }
 
   const payload = decodeJwt(token) as AccessJWTPayload
-  if (clientId != payload.aud[0]) throw MismatchClientIdError
+  if (clientId && clientId != payload.aud[0]) throw MismatchClientIdError
   if (!payload.sub) throw MissingSubjectError
 
   const account = payload.sub
@@ -56,5 +62,7 @@ export const verifyTokenMethod: VerifyTokenMethod = async ({ ctx, input }) => {
   const accessNode = await initAccessNodeByName(name, ctx.Access)
 
   const jwks = getJWKS(ctx)
-  await accessNode.class.verify(token, jwks, { issuer })
+  return accessNode.class.verify(token, jwks, {
+    issuer,
+  })
 }
