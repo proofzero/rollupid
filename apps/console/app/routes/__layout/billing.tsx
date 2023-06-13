@@ -54,22 +54,42 @@ const PlanCard = ({
 
 const PlanFeatures = ({
   features,
-  colorClass,
 }: {
-  features: string[]
-  colorClass: string
+  features: {
+    title: string
+    colorClass: string
+  }[]
 }) => {
+  const COLUMN_MAX = 4
+
+  const columns = []
+  for (let i = 0; i < features.length; i += COLUMN_MAX) {
+    columns.push(features.slice(i, i + COLUMN_MAX))
+  }
+
   return (
-    <ul className="flex flex-col gap-3.5">
-      {features.map((feature) => (
-        <li key={feature} className="flex flex-row items-center gap-3">
-          <FaCheck className={colorClass} />
-          <Text size="sm" weight="medium" className="text-[#6B7280]">
-            {feature}
-          </Text>
-        </li>
+    <div className="flex flex-row lg:gap-4">
+      {columns.map((columnFeatures, i) => (
+        <ul key={i} className="flex flex-col gap-3.5">
+          {columnFeatures.map((feature) => (
+            <li
+              key={feature.title}
+              className={`flex flex-row items-center gap-3 ${
+                feature.colorClass !== 'text-green-500' ? 'hidden lg:flex' : ''
+              }`}
+            >
+              <div className="w-3.5 h-3.5 flex justify-center items-center">
+                <FaCheck className={`${feature.colorClass}`} />
+              </div>
+
+              <Text size="sm" weight="medium" className="text-[#6B7280]">
+                {feature.title}
+              </Text>
+            </li>
+          ))}
+        </ul>
       ))}
-    </ul>
+    </div>
   )
 }
 
@@ -191,8 +211,7 @@ export default () => {
       <section className="flex flex-col gap-4">
         <PlanCard
           title="Pro Plan"
-          subtitle="Everything in free & custom domain configuration, advanced
-                support, whitelabeling and much more."
+          subtitle="Everything in free, custom domain configuration & more."
           action={
             entitlements.pro.length === 0 ? (
               <Button btnType="secondary-alt" btnSize="xs">
@@ -209,7 +228,7 @@ export default () => {
                 {({ open }) => (
                   <>
                     <Menu.Button
-                      className={`py-2 px-3 border rounded flex flex-row gap-2 items-center ${
+                      className={`py-2 px-3 border rounded flex flex-row justify-between lg:justify-start gap-2 items-center ${
                         open ? 'border-indigo-500' : ''
                       }`}
                     >
@@ -263,18 +282,48 @@ export default () => {
             <>
               <div className="flex flex-row gap-7 p-4">
                 <PlanFeatures
-                  colorClass="text-indigo-500"
                   features={[
-                    'Unlimited MAUs',
-                    'Custom Branding',
-                    'Wallet Login',
-                    'Social Logins',
+                    {
+                      title: 'Unlimited MAUs',
+                      colorClass: 'text-indigo-500',
+                    },
+                    {
+                      title: 'Custom Branding',
+                      colorClass: 'text-indigo-500',
+                    },
+                    {
+                      title: 'Wallet Login',
+                      colorClass: 'text-indigo-500',
+                    },
+                    {
+                      title: 'Email Login',
+                      colorClass: 'text-indigo-500',
+                    },
+                    {
+                      title: 'Social Logins',
+                      colorClass: 'text-indigo-500',
+                    },
+                    {
+                      title: 'Passkeys',
+                      colorClass: 'text-indigo-500',
+                    },
+                    {
+                      title: 'Profile API',
+                      colorClass: 'text-indigo-500',
+                    },
+                    {
+                      title: 'Community Support',
+                      colorClass: 'text-indigo-500',
+                    },
+                    {
+                      title: 'Custom Domains',
+                      colorClass: 'text-green-500',
+                    },
+                    {
+                      title: 'Custom OAuth Credentials',
+                      colorClass: 'text-green-500',
+                    },
                   ]}
-                />
-
-                <PlanFeatures
-                  colorClass="text-green-500"
-                  features={['Profile API', 'Community Support']}
                 />
               </div>
 
@@ -319,59 +368,19 @@ export default () => {
           footer={
             entitlements.pro.length === 0 ? (
               <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
-                <FaShoppingCart /> <Text>Purchase Entitlement(s)</Text>
+                <FaShoppingCart className="w-3.5 h-3.5" />
+                <Text size="sm" weight="medium">
+                  Purchase Entitlement(s)
+                </Text>
               </div>
             ) : (
               <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
-                <FaTrash /> <Text>Remove Unused Entitlements</Text>
+                <FaTrash className="w-3.5 h-3.5" />
+                <Text size="sm" weight="medium">
+                  Remove Unused Entitlements
+                </Text>
               </div>
             )
-          }
-        />
-
-        <PlanCard
-          title="Business Plan"
-          subtitle="Everything in Pro & ..."
-          main={
-            <div className="flex flex-row gap-7 p-4">
-              <PlanFeatures
-                colorClass="text-indigo-500"
-                features={[
-                  'Unlimited MAUs',
-                  'Custom Branding',
-                  'Wallet Login',
-                  'Social Logins',
-                ]}
-              />
-
-              <PlanFeatures
-                colorClass="text-green-500"
-                features={['Profile API', 'Community Support']}
-              />
-            </div>
-          }
-        />
-
-        <PlanCard
-          title="Enterprise Plan"
-          subtitle="Everything in Business & ..."
-          main={
-            <div className="flex flex-row gap-7 p-4">
-              <PlanFeatures
-                colorClass="text-indigo-500"
-                features={[
-                  'Unlimited MAUs',
-                  'Custom Branding',
-                  'Wallet Login',
-                  'Social Logins',
-                ]}
-              />
-
-              <PlanFeatures
-                colorClass="text-green-500"
-                features={['Profile API', 'Community Support']}
-              />
-            </div>
           }
         />
 
