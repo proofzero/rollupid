@@ -1,7 +1,18 @@
 import { Button } from '@proofzero/design-system'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { FaCheck, FaShoppingCart } from 'react-icons/fa'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { LoaderFunction } from '@remix-run/cloudflare'
+import { FaCheck, FaShoppingCart, FaTrash } from 'react-icons/fa'
 import { HiOutlineExternalLink } from 'react-icons/hi'
+import { requireJWT } from '~/utilities/session.server'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { useLoaderData, useOutletContext } from '@remix-run/react'
+import type { LoaderData as OutletContextData } from '~/root'
+import { Menu } from '@headlessui/react'
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
+import { HiOutlineMinusCircle } from 'react-icons/hi'
 
 const PlanCard = ({
   title,
@@ -18,7 +29,7 @@ const PlanCard = ({
 }) => {
   return (
     <article className="bg-white rounded border">
-      <header className="flex flex-col lg:flex-row justify-between lg:items-center pt-2.5 pb-4 pl-6 pr-4">
+      <header className="flex flex-col lg:flex-row justify-between lg:items-center pt-2.5 pb-4 pl-6 pr-4 relative">
         <div>
           <Text size="lg" weight="semibold" className="text-gray-900">
             {title}
@@ -109,7 +120,48 @@ const EntitlementsCard = ({
   )
 }
 
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    const jwt = await requireJWT(request)
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+    const apps = await starbaseClient.listApps.query()
+    const reshapedApps = apps.map((a) => {
+      return {
+        clientId: a.clientId,
+        name: a.app?.name,
+        icon: a.app?.icon,
+        published: a.published,
+        createdTimestamp: a.createdTimestamp,
+      }
+    })
+
+    const proApps = reshapedApps.slice(0, 2)
+    let freeApps: any[] = []
+
+    if (reshapedApps.length > 2) {
+      freeApps = reshapedApps.slice(2)
+    }
+
+    const entitlements = {
+      pro: proApps.map((pa) => pa.clientId),
+      free: freeApps.map((fa) => fa.clientId),
+    }
+
+    return {
+      entitlements,
+    }
+  }
+)
+
 export default () => {
+  const { entitlements } = useLoaderData()
+  const { apps } = useOutletContext<OutletContextData>()
+
   return (
     <>
       <section className="flex flex-col lg:flex-row items-center justify-between mb-11">
@@ -142,15 +194,70 @@ export default () => {
           subtitle="Everything in free & custom domain configuration, advanced
                 support, whitelabeling and much more."
           action={
-            <Button btnType="secondary-alt" btnSize="xs">
-              <div className="flex flex-row items-center gap-3">
-                <FaShoppingCart className="text-gray-500" />
+            entitlements.pro.length === 0 ? (
+              <Button btnType="secondary-alt" btnSize="xs">
+                <div className="flex flex-row items-center gap-3">
+                  <FaShoppingCart className="text-gray-500" />
 
-                <Text size="sm" weight="medium" className="text-gray-700">
-                  Purchase
-                </Text>
-              </div>
-            </Button>
+                  <Text size="sm" weight="medium" className="text-gray-700">
+                    Purchase
+                  </Text>
+                </div>
+              </Button>
+            ) : (
+              <Menu>
+                {({ open }) => (
+                  <>
+                    <Menu.Button
+                      className={`py-2 px-3 border rounded flex flex-row gap-2 items-center ${
+                        open ? 'border-indigo-500' : ''
+                      }`}
+                    >
+                      <Text size="sm" weight="medium" className="text-gray-700">
+                        Edit
+                      </Text>
+                      {open ? (
+                        <ChevronUpIcon className="w-4 h-4 text-indigo-500" />
+                      ) : (
+                        <ChevronDownIcon className="w-4 h-4 text-indigo-500" />
+                      )}
+                    </Menu.Button>
+
+                    <Menu.Items className="absolute right-4 top-16 bg-white rounded-lg border shadow">
+                      <Menu.Item>
+                        <div className="flex flex-row items-center gap-3 py-3 px-4 cursor-pointer hover:bg-gray-50 rounded-t-lg">
+                          <FaShoppingCart className="text-gray-500" />
+
+                          <Text
+                            size="sm"
+                            weight="medium"
+                            className="text-gray-700"
+                          >
+                            Purchase Entitlement(s)
+                          </Text>
+                        </div>
+                      </Menu.Item>
+
+                      <div className="border-b border-gray-200 w-3/4 mx-auto"></div>
+
+                      <Menu.Item>
+                        <div className="flex flex-row items-center gap-3 py-3 px-4 cursor-pointer hover:bg-gray-50 rounded-b-lg">
+                          <HiOutlineMinusCircle className="text-red-600" />
+
+                          <Text
+                            size="sm"
+                            weight="medium"
+                            className="text-red-600"
+                          >
+                            Remove Entitlement(s)
+                          </Text>
+                        </div>
+                      </Menu.Item>
+                    </Menu.Items>
+                  </>
+                )}
+              </Menu>
+            )
           }
           main={
             <>
@@ -171,9 +278,15 @@ export default () => {
             </>
           }
           footer={
-            <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
-              <FaShoppingCart /> <Text>Purchase Entitlement(s)</Text>
-            </div>
+            entitlements.pro.length === 0 ? (
+              <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
+                <FaShoppingCart /> <Text>Purchase Entitlement(s)</Text>
+              </div>
+            ) : (
+              <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
+                <FaTrash /> <Text>Remove Unused Entitlements</Text>
+              </div>
+            )
           }
         />
 
@@ -224,20 +337,12 @@ export default () => {
         />
 
         <EntitlementsCard
-          entitlements={[
-            {
-              title: 'App 1',
-              subtitle: 'Pro Plan $29/month',
-            },
-            {
-              title: 'App 2',
-              subtitle: 'Pro Plan $29/month',
-            },
-            {
-              title: 'App 3',
-              subtitle: 'Free',
-            },
-          ]}
+          entitlements={apps.map((a) => ({
+            title: a.name!,
+            subtitle: entitlements.pro.includes(a.clientId)
+              ? 'Pro Plan $29/month'
+              : 'Free',
+          }))}
         />
       </section>
     </>
