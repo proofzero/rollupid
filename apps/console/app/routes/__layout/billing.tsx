@@ -18,7 +18,7 @@ const PlanCard = ({
 }) => {
   return (
     <article className="bg-white rounded border">
-      <header className="flex flex-row justify-between items-center pt-2.5 pb-4 pl-6 pr-4">
+      <header className="flex flex-col lg:flex-row justify-between lg:items-center pt-2.5 pb-4 pl-6 pr-4">
         <div>
           <Text size="lg" weight="semibold" className="text-gray-900">
             {title}
