@@ -15,6 +15,7 @@ import { getZeroDevSigner } from '@zerodevapp/sdk'
 import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import { generateSmartWalletAddressUrn } from '@proofzero/platform.address/src/utils'
 
 export const InitSmartContractWalletInput = z.object({
   nickname: z.string(),
@@ -59,15 +60,11 @@ export const initSmartContractWalletMethod = async ({
 
   const smartContractWalletAddress = await smartContractWallet.getAddress()
 
-  const addressURN = AddressURNSpace.componentizedUrn(
-    generateHashedIDRef(CryptoAddressType.Wallet, smartContractWalletAddress),
-    {
-      node_type: NodeType.Crypto,
-      addr_type: CryptoAddressType.Wallet,
-    },
-    { alias: input.nickname, hidden: 'true' }
+  const { addressURN, baseAddressURN } = generateSmartWalletAddressUrn(
+    smartContractWalletAddress,
+    input.nickname
   )
-  const baseAddressURN = AddressURNSpace.getBaseURN(addressURN)
+
   const smartContractWalletNode = initAddressNodeByName(
     baseAddressURN,
     ctx.Address

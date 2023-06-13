@@ -169,6 +169,24 @@ const addressResolvers: Resolvers = {
           sessionPublicKey,
         })
 
+        const appData = await accessClient.getAppData.query({
+          clientId,
+        })
+
+        const smartWalletSessionKeys = appData?.smartWalletSessionKeys || []
+
+        smartWalletSessionKeys.push({
+          smartContractWalletAddress,
+          devEthereumAddress: sessionPublicKey,
+        })
+
+        await accessClient.setAppData.mutate({
+          clientId,
+          appData: {
+            smartWalletSessionKeys,
+          },
+        })
+
         return sessionKey
       } catch (e) {
         throw new GraphQLError('Failed to register session key.')

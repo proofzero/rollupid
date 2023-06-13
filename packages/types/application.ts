@@ -23,3 +23,16 @@ export enum AuthorizationControlSelection {
 export const AuthorizationControlSelectionEnum = z.nativeEnum(
   AuthorizationControlSelection
 )
+
+export const AppData = z.object({
+  smartWalletSessionKeys: z
+    .array(
+      z.object({
+        smartContractWalletAddress: z.string(),
+        devEthereumAddress: z.string(),
+      })
+    )
+    .optional(),
+})
+
+export type AppDataType = z.infer<typeof AppData>

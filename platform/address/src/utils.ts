@@ -9,6 +9,8 @@ import {
   NodeType,
   OAuthAddressType,
 } from '@proofzero/types/address'
+import { AddressURNSpace } from '@proofzero/urns/address'
+import { generateHashedIDRef } from '@proofzero/urns/idref'
 
 export const isNodeType = (type: string): type is NodeType => {
   switch (type) {
@@ -82,4 +84,20 @@ export const recoverEthereumAddress = (
   const bytes = encoder.encode(`${prefix}${message}`)
   const digest = keccak256(bytes)
   return computeAddress(recoverPublicKey(digest, signature))
+}
+
+export const generateSmartWalletAddressUrn = (
+  address: string,
+  nickname: string
+) => {
+  const addressURN = AddressURNSpace.componentizedUrn(
+    generateHashedIDRef(CryptoAddressType.Wallet, address),
+    {
+      node_type: NodeType.Crypto,
+      addr_type: CryptoAddressType.Wallet,
+    },
+    { alias: nickname, hidden: 'true' }
+  )
+  const baseAddressURN = AddressURNSpace.getBaseURN(addressURN)
+  return { addressURN, baseAddressURN }
 }

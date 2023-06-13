@@ -15,6 +15,7 @@ import {
 
 import { PaymasterSchema } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
+import { generateSmartWalletAddressUrn } from '../../utils'
 
 export const RegisterSessionKeyInput = z.object({
   sessionPublicKey: z.string(),
@@ -40,16 +41,11 @@ export const registerSessionKeyMethod = async ({
 
   const { paymaster, smartContractWalletAddress, sessionPublicKey } = input
 
-  const addressURN = AddressURNSpace.componentizedUrn(
-    generateHashedIDRef(CryptoAddressType.Wallet, smartContractWalletAddress),
-    {
-      node_type: NodeType.Crypto,
-      addr_type: CryptoAddressType.Wallet,
-    },
-    { alias: smartContractWalletAddress, hidden: 'true' }
+  const { baseAddressURN } = await generateSmartWalletAddressUrn(
+    smartContractWalletAddress,
+    '' // empty string because we only care about base urn
   )
 
-  const baseAddressURN = AddressURNSpace.getBaseURN(addressURN)
   const smartContractWalletNode = initAddressNodeByName(
     baseAddressURN,
     ctx.Address
