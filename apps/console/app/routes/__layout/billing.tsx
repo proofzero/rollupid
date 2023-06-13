@@ -29,7 +29,7 @@ const PlanCard = ({
 }) => {
   return (
     <article className="bg-white rounded border">
-      <header className="flex flex-col lg:flex-row justify-between lg:items-center pt-2.5 pb-4 pl-6 pr-4 relative">
+      <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
         <div>
           <Text size="lg" weight="semibold" className="text-gray-900">
             {title}
@@ -44,7 +44,7 @@ const PlanCard = ({
         {action}
       </header>
       <div className="w-full border-b border-gray-200"></div>
-      <main className="flex flex-row pt-4 pb-6 pl-6 pr-4 gap-7">{main}</main>
+      <main>{main}</main>
       {footer && (
         <footer className="bg-gray-50 rounded-b py-4 px-6">{footer}</footer>
       )}
@@ -83,7 +83,7 @@ const EntitlementsCard = ({
 }) => {
   return (
     <article className="bg-white rounded border">
-      <header className="flex flex-row justify-between items-center pt-2.5 pb-4 pl-6 pr-4">
+      <header className="flex flex-row justify-between items-center p-4">
         <div>
           <Text size="lg" weight="semibold" className="text-gray-900">
             Assigned Entitlements
@@ -95,7 +95,7 @@ const EntitlementsCard = ({
         <div className="w-full">
           {entitlements.map((entitlement, i) => (
             <div key={entitlement.title}>
-              <div className="flex flex-row justify-between items-center w-full py-2.5 pl-6 pr-4">
+              <div className="flex flex-row justify-between items-center w-full p-4">
                 <div className="flex-1">
                   <Text size="sm" weight="medium" className="text-gray-900">
                     {entitlement.title}
@@ -261,20 +261,59 @@ export default () => {
           }
           main={
             <>
-              <PlanFeatures
-                colorClass="text-indigo-500"
-                features={[
-                  'Unlimited MAUs',
-                  'Custom Branding',
-                  'Wallet Login',
-                  'Social Logins',
-                ]}
-              />
+              <div className="flex flex-row gap-7 p-4">
+                <PlanFeatures
+                  colorClass="text-indigo-500"
+                  features={[
+                    'Unlimited MAUs',
+                    'Custom Branding',
+                    'Wallet Login',
+                    'Social Logins',
+                  ]}
+                />
 
-              <PlanFeatures
-                colorClass="text-green-500"
-                features={['Profile API', 'Community Support']}
-              />
+                <PlanFeatures
+                  colorClass="text-green-500"
+                  features={['Profile API', 'Community Support']}
+                />
+              </div>
+
+              <div className="border-b border-gray-200"></div>
+
+              {entitlements.pro.length > 0 && (
+                <div className="p-4">
+                  <Text size="sm" weight="medium" className="text-gray-900">
+                    Entitlements
+                  </Text>
+
+                  <div className="flex flex-row items-center gap-6">
+                    <div className="flex-1 bg-gray-200 rounded-full h-2.5 my-2">
+                      <div
+                        className="bg-blue-600 h-2.5 rounded-full"
+                        style={{
+                          width: `${(entitlements.pro.length / 3) * 100}%`,
+                        }}
+                      ></div>
+                    </div>
+
+                    <div className="flex flex-row items-center gap-2">
+                      <Text
+                        size="lg"
+                        weight="semibold"
+                        className="text-gray-900"
+                      >
+                        ${entitlements.pro.length * 29}
+                      </Text>
+                      <Text size="sm" className="text-gray-500">
+                        per month
+                      </Text>
+                    </div>
+                  </div>
+                  <Text size="sm" weight="medium" className="text-[#6B7280]">
+                    {entitlements.pro.length} out of 3 Entitlements used
+                  </Text>
+                </div>
+              )}
             </>
           }
           footer={
@@ -294,7 +333,7 @@ export default () => {
           title="Business Plan"
           subtitle="Everything in Pro & ..."
           main={
-            <>
+            <div className="flex flex-row gap-7 p-4">
               <PlanFeatures
                 colorClass="text-indigo-500"
                 features={[
@@ -309,7 +348,7 @@ export default () => {
                 colorClass="text-green-500"
                 features={['Profile API', 'Community Support']}
               />
-            </>
+            </div>
           }
         />
 
@@ -317,7 +356,7 @@ export default () => {
           title="Enterprise Plan"
           subtitle="Everything in Business & ..."
           main={
-            <>
+            <div className="flex flex-row gap-7 p-4">
               <PlanFeatures
                 colorClass="text-indigo-500"
                 features={[
@@ -332,7 +371,7 @@ export default () => {
                 colorClass="text-green-500"
                 features={['Profile API', 'Community Support']}
               />
-            </>
+            </div>
           }
         />
 
