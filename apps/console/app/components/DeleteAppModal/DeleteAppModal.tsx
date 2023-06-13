@@ -24,7 +24,7 @@ export const DeleteAppModal = ({
   deleteAppCallback,
 }: DeleteAppModalProps) => {
   const fetcher = useFetcher()
-  const [hasCustomDomain] = useState(!Boolean(appDetails.customDomain))
+  const [hasCustomDomain] = useState(Boolean(appDetails.customDomain))
 
   return (
     <Modal
