@@ -42,8 +42,6 @@ import {
   GetAccountByAliasInput,
   GetAccountByAliasOutput,
 } from './methods/getAccountByAlias'
-import { testSessionKeyMethod } from './methods/testSessionKey'
-
 import { LogUsage } from '@proofzero/platform-middleware/log'
 import { parse3RN } from './middlewares/parse3RN'
 import { checkCryptoNodes } from './middlewares/checkCryptoNode'
