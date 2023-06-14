@@ -12,7 +12,7 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   btnSize?: ButtonSize
   btnType?: ButtonType
   isSubmit?: boolean
-  onClick?: () => unknown
+  onClick?: (e?: any) => unknown
 }
 
 export function Button({
