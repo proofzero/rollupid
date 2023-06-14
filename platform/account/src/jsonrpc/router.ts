@@ -147,7 +147,7 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(Analytics)
     .output(GetEntitlementsOutputSchema)
-    .mutation(getEntitlements),
+    .query(getEntitlements),
   updateEntitlements: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)

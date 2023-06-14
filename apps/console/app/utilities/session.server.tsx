@@ -5,7 +5,11 @@
 import invariant from 'tiny-invariant'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
-import { createCookie, redirect } from '@remix-run/cloudflare'
+import {
+  createCookie,
+  redirect,
+  createCookieSessionStorage,
+} from '@remix-run/cloudflare'
 
 import { decryptSession } from '@proofzero/utils/session'
 
@@ -112,3 +116,16 @@ export async function destroyUserSession(request: Request, redirectTo: string) {
     },
   })
 }
+
+export const {
+  getSession: getFlashSession,
+  commitSession: commitFlashSession,
+  destroySession: destroyFlashSession,
+} = createCookieSessionStorage({
+  // a Cookie from `createCookie` or the same CookieOptions to create one
+  cookie: {
+    name: '__flashes',
+    secrets: ['r3m1xr0ck5'],
+    sameSite: 'lax',
+  },
+})

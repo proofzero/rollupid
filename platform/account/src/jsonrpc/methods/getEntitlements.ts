@@ -15,7 +15,7 @@ export const getEntitlements = async ({
 }: {
   ctx: Context
 }): Promise<GetEntitlementsOutput> => {
-  const result = []
+  const result: GetEntitlementsOutput = []
 
   const servicePlans = await ctx.account?.class.getServicePlans()
   if (!servicePlans) {
@@ -24,12 +24,7 @@ export const getEntitlements = async ({
 
   if (servicePlans.plans) {
     for (let [key, value] of Object.entries(servicePlans.plans)) {
-      const type = ServicePlanType[key as keyof typeof ServicePlanType]
-      if (type !== undefined) {
-        result.push({ planType: type, entitlements: value.entitlements })
-      } else {
-        console.warn(`Unknown plan type: ${key}`)
-      }
+      result.push({ planType: +key, entitlements: value.entitlements })
     }
   }
 
