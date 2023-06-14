@@ -218,7 +218,7 @@ export default ({
           ${
             scopeMeta.scopes[scope].name === 'Smart contract wallets'
               ? ''
-              : 'text-orange-500'
+              : 'text-orange-500 dark:text-orange-500'
           }
           dark:text-white truncate text-ellipsis
           `}
