@@ -13,6 +13,8 @@ import type { LoaderData as OutletContextData } from '~/root'
 import { Menu } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
 import { HiOutlineMinusCircle } from 'react-icons/hi'
+import { IconType } from 'react-icons'
+import { TbHourglassHigh } from 'react-icons/tb'
 
 const PlanCard = ({
   title,
@@ -57,7 +59,8 @@ const PlanFeatures = ({
 }: {
   features: {
     title: string
-    colorClass: string
+    Icon: IconType
+    colorClass?: string
   }[]
 }) => {
   const COLUMN_MAX = 4
@@ -74,15 +77,15 @@ const PlanFeatures = ({
           {columnFeatures.map((feature) => (
             <li
               key={feature.title}
-              className={`flex flex-row items-center gap-3 ${
+              className={`flex flex-row items-center gap-3 text-[#6B7280] ${
                 feature.colorClass !== 'text-green-500' ? 'hidden lg:flex' : ''
               }`}
             >
               <div className="w-3.5 h-3.5 flex justify-center items-center">
-                <FaCheck className={`${feature.colorClass}`} />
+                <feature.Icon className={`${feature.colorClass ?? ''}`} />
               </div>
 
-              <Text size="sm" weight="medium" className="text-[#6B7280]">
+              <Text size="sm" weight="medium">
                 {feature.title}
               </Text>
             </li>
@@ -280,44 +283,31 @@ export default () => {
                 <PlanFeatures
                   features={[
                     {
-                      title: 'Unlimited MAUs',
-                      colorClass: 'text-indigo-500',
-                    },
-                    {
                       title: 'Custom Branding',
-                      colorClass: 'text-indigo-500',
+                      Icon: FaCheck,
+                      colorClass: 'text-green-500',
                     },
                     {
-                      title: 'Wallet Login',
-                      colorClass: 'text-indigo-500',
-                    },
-                    {
-                      title: 'Email Login',
-                      colorClass: 'text-indigo-500',
-                    },
-                    {
-                      title: 'Social Logins',
-                      colorClass: 'text-indigo-500',
-                    },
-                    {
-                      title: 'Passkeys',
-                      colorClass: 'text-indigo-500',
-                    },
-                    {
-                      title: 'Profile API',
-                      colorClass: 'text-indigo-500',
-                    },
-                    {
-                      title: 'Community Support',
-                      colorClass: 'text-indigo-500',
-                    },
-                    {
-                      title: 'Custom Domains',
+                      title: 'Custom Domain',
+                      Icon: FaCheck,
                       colorClass: 'text-green-500',
                     },
                     {
                       title: 'Custom OAuth Credentials',
+                      Icon: FaCheck,
                       colorClass: 'text-green-500',
+                    },
+                    {
+                      title: 'Object Storage',
+                      Icon: TbHourglassHigh,
+                    },
+                    {
+                      title: '4337 App Wallet',
+                      Icon: TbHourglassHigh,
+                    },
+                    {
+                      title: 'Groups',
+                      Icon: TbHourglassHigh,
                     },
                   ]}
                 />
