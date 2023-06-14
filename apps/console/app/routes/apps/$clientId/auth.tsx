@@ -278,10 +278,7 @@ export default function AppDetailIndexPage() {
     outletContextData?.rotationResult?.rotatedClientSecret ||
     actionData?.rotatedSecret
 
-  if (actionData?.updatedApp) {
-    appDetails.app = actionData.updatedApp.app
-    appDetails.published = actionData.updatedApp.published
-  }
+  if (actionData?.updatedApp) Object.assign(appDetails, actionData.updatedapp)
 
   const errors = actionData?.errors
 
