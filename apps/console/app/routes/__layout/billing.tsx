@@ -15,6 +15,7 @@ import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
 import { HiOutlineMinusCircle } from 'react-icons/hi'
 import { IconType } from 'react-icons'
 import { TbHourglassHigh } from 'react-icons/tb'
+import classnames from 'classnames'
 
 const PlanCard = ({
   title,
@@ -260,14 +261,17 @@ export default () => {
                     <div className="border-b border-gray-200 w-3/4 mx-auto"></div>
 
                     <Menu.Item disabled={entitlements.pro.allotance === 0}>
-                      <div className="flex flex-row items-center gap-3 py-3 px-4 cursor-pointer hover:bg-gray-50 rounded-b-lg">
-                        <HiOutlineMinusCircle className="text-red-600" />
+                      <div
+                        className={classnames(
+                          'flex flex-row items-center gap-3 py-3 px-4 rounded-b-lg',
+                          entitlements.pro.allotance !== 0
+                            ? 'cursor-pointer hover:bg-gray-50 text-red-600'
+                            : 'cursor-default text-red-300'
+                        )}
+                      >
+                        <HiOutlineMinusCircle />
 
-                        <Text
-                          size="sm"
-                          weight="medium"
-                          className="text-red-600"
-                        >
+                        <Text size="sm" weight="medium">
                           Remove Entitlement(s)
                         </Text>
                       </div>
