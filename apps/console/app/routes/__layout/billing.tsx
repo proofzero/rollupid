@@ -230,15 +230,16 @@ export default () => {
         </div>
 
         <div className="flex flex-row justify-end items-center gap-2 mt-2 lg:mt-0">
-          <Button btnType="secondary-alt" btnSize="sm">
-            <div className="flex flex-row items-center gap-3">
-              <Text size="sm" weight="medium" className="text-gray-700">
-                Compare plans
-              </Text>
-
-              <HiOutlineExternalLink className="text-gray-500" />
-            </div>
-          </Button>
+          <a href="https://rollup.id/pricing" target="_blank">
+            <Button btnType="secondary-alt" btnSize="sm">
+              <div className="flex flex-row items-center gap-3">
+                <Text size="sm" weight="medium" className="text-gray-700">
+                  Compare plans
+                </Text>
+                <HiOutlineExternalLink className="text-gray-500" />
+              </div>
+            </Button>
+          </a>
         </div>
       </section>
 
