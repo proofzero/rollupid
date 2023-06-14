@@ -55,6 +55,33 @@ const PlanCard = ({
   )
 }
 
+const PlanFeaturesColumnItems = ({
+  features,
+}: {
+  features: {
+    title: string
+    Icon: IconType
+    colorClass?: string
+  }[]
+}) => (
+  <>
+    {features.map((feature) => (
+      <li
+        key={feature.title}
+        className={`flex flex-row items-center gap-3 text-[#6B7280]`}
+      >
+        <div className="w-3.5 h-3.5 flex justify-center items-center">
+          <feature.Icon className={`${feature.colorClass ?? ''}`} />
+        </div>
+
+        <Text size="sm" weight="medium">
+          {feature.title}
+        </Text>
+      </li>
+    ))}
+  </>
+)
+
 const PlanFeatures = ({
   features,
 }: {
@@ -72,28 +99,23 @@ const PlanFeatures = ({
   }
 
   return (
-    <div className="flex flex-row lg:gap-4">
-      {columns.map((columnFeatures, i) => (
-        <ul key={i} className="flex flex-col gap-3.5">
-          {columnFeatures.map((feature) => (
-            <li
-              key={feature.title}
-              className={`flex flex-row items-center gap-3 text-[#6B7280] ${
-                feature.colorClass !== 'text-green-500' ? 'hidden lg:flex' : ''
-              }`}
-            >
-              <div className="w-3.5 h-3.5 flex justify-center items-center">
-                <feature.Icon className={`${feature.colorClass ?? ''}`} />
-              </div>
+    <>
+      <div className="hidden lg:flex lg:flex-row lg:gap-4">
+        {columns.map((columnFeatures, i) => (
+          <ul key={i} className="flex flex-col gap-3.5">
+            <PlanFeaturesColumnItems features={columnFeatures} />
+          </ul>
+        ))}
+      </div>
 
-              <Text size="sm" weight="medium">
-                {feature.title}
-              </Text>
-            </li>
-          ))}
+      <div className="block lg:hidden">
+        <ul className="flex flex-col gap-3.5">
+          <PlanFeaturesColumnItems
+            features={columns.reduce((acc, curr) => [...acc, ...curr], [])}
+          />
         </ul>
-      ))}
-    </div>
+      </div>
+    </>
   )
 }
 
