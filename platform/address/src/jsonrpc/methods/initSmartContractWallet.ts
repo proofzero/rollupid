@@ -1,8 +1,6 @@
 import { z } from 'zod'
 import { Wallet } from '@ethersproject/wallet'
 
-import { AddressURNSpace } from '@proofzero/urns/address'
-import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { JsonRpcProvider } from '@ethersproject/providers'
 

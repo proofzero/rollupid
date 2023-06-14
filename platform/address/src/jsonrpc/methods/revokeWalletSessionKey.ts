@@ -1,13 +1,12 @@
 import { z } from 'zod'
 
-import { getPrivateKeyOwner, getZeroDevSigner } from '@zerodevapp/sdk'
 import { arrayify } from '@ethersproject/bytes'
-import { JsonRpcProvider } from '@ethersproject/providers'
 import { Context } from '../../context'
 import { initAddressNodeByName } from '../../nodes'
 import { BadRequestError } from '@proofzero/errors'
 
 import type { AddressURN } from '@proofzero/urns/address'
+import { Wallet } from '@ethersproject/wallet'
 
 export const RevokeWalletSessionKeyInput = z.object({
   publicSessionKey: z.string(),
@@ -35,28 +34,24 @@ export const revokeWalletSessionKeyMethod = async ({
     ctx.Address
   )
 
-  const owner = await smartContractWalletNode.storage.get('privateKey')
+  const owner = (await smartContractWalletNode.storage.get(
+    'privateKey'
+  )) as string
 
   if (!owner) {
     throw new BadRequestError({ message: 'missing private key for the user' })
   }
 
-  const zdSigner = await getZeroDevSigner({
-    projectId: input.projectId,
-    owner: getPrivateKeyOwner(owner as string),
-    skipFetchSetup: true,
-    rpcProvider: new JsonRpcProvider({
-      url: ctx.MUMBAI_PROVIDER_URL,
-      skipFetchSetup: true,
-    }),
-  })
+  const signer = new Wallet(owner)
+
+  const address = await signer.getAddress()
 
   const createRevokeSessionKeyUserOpResponse = await fetch(
     'https://zerodev-api.zobeir.workers.dev/create-revoke-session-key-user-op',
     {
       ...requestInit,
       body: JSON.stringify({
-        address: input.publicSessionKey,
+        address,
         projectId: input.projectId,
         publicSessionKey: input.publicSessionKey,
       }),
@@ -67,7 +62,7 @@ export const revokeWalletSessionKeyMethod = async ({
   const { userOp, userOpHash } =
     await createRevokeSessionKeyUserOpResponse.json()
 
-  const signedMessage = await zdSigner.signMessage(arrayify(userOpHash))
+  const signedMessage = await signer.signMessage(arrayify(userOpHash))
 
   await fetch('https://zerodev-api.zobeir.workers.dev/send-userop', {
     ...requestInit,

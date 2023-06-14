@@ -149,7 +149,7 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
               ...generateTraceContextHeaders(ctx.traceSpan),
             })
 
-            addressClient.revokeWalletSessionKey.mutate({
+            await addressClient.revokeWalletSessionKey.mutate({
               projectId: paymaster.secret,
               publicSessionKey: sessionKeyAddresses.devEthereumAddress,
             })
