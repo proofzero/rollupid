@@ -14,7 +14,6 @@ export const RevokeWalletSessionKeyInput = z.object({
 })
 
 type RevokeWalletSessionKeyParams = z.infer<typeof RevokeWalletSessionKeyInput>
-//
 const requestInit = {
   method: 'post',
   headers: {
