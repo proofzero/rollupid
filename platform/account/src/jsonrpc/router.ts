@@ -39,6 +39,14 @@ import {
   deleteAccountNodeMethod,
 } from './methods/deleteAccountNode'
 import { UnauthorizedError } from '@proofzero/errors'
+import {
+  UpdateEntitlementsInputSchema,
+  updateEntitlements,
+} from './methods/updateEntitlements'
+import {
+  GetEntitlementsOutputSchema,
+  getEntitlements,
+} from './methods/getEntitlements'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -132,4 +140,20 @@ export const appRouter = t.router({
     .use(LogUsage)
     .input(DeleteAccountNodeInput)
     .mutation(deleteAccountNodeMethod),
+  getEntitlements: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(injectAccountNode)
+    .use(LogUsage)
+    .use(Analytics)
+    .output(GetEntitlementsOutputSchema)
+    .mutation(getEntitlements),
+  updateEntitlements: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(injectAccountNode)
+    .use(LogUsage)
+    .use(Analytics)
+    .input(UpdateEntitlementsInputSchema)
+    .mutation(updateEntitlements),
 })
