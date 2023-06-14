@@ -305,7 +305,6 @@ export default ({
                           {scopeMeta.scopes[scope].description}
                         </p>
                       </div>
-                      <div data-popper-arrow></div>
                     </div>
 
                     <Text
