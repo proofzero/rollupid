@@ -160,16 +160,23 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       }
     })
 
-    const proApps = reshapedApps.slice(0, 2)
-    let freeApps: any[] = []
+    const proAllotance = 3
 
-    if (reshapedApps.length > 2) {
-      freeApps = reshapedApps.slice(2)
+    const proApps = reshapedApps.slice(0, proAllotance)
+
+    let freeApps: any[] = []
+    if (reshapedApps.length > proAllotance) {
+      freeApps = reshapedApps.slice(proAllotance)
     }
 
     const entitlements = {
-      pro: proApps.map((pa) => pa.clientId),
-      free: freeApps.map((fa) => fa.clientId),
+      pro: {
+        allotance: proAllotance,
+        assigned: proApps.map((pa) => pa.clientId),
+      },
+      free: {
+        assigned: freeApps.map((fa) => fa.clientId),
+      },
     }
 
     return {
@@ -213,70 +220,58 @@ export default () => {
           title="Pro Plan"
           subtitle="Everything in free, custom domain configuration & more."
           action={
-            entitlements.pro.length === 0 ? (
-              <Button btnType="secondary-alt" btnSize="xs">
-                <div className="flex flex-row items-center gap-3">
-                  <FaShoppingCart className="text-gray-500" />
+            <Menu>
+              {({ open }) => (
+                <>
+                  <Menu.Button
+                    className={`py-2 px-3 border rounded flex flex-row justify-between lg:justify-start gap-2 items-center ${
+                      open ? 'border-indigo-500' : ''
+                    }`}
+                  >
+                    <Text size="sm" weight="medium" className="text-gray-700">
+                      Edit
+                    </Text>
+                    {open ? (
+                      <ChevronUpIcon className="w-4 h-4 text-indigo-500" />
+                    ) : (
+                      <ChevronDownIcon className="w-4 h-4 text-indigo-500" />
+                    )}
+                  </Menu.Button>
 
-                  <Text size="sm" weight="medium" className="text-gray-700">
-                    Purchase
-                  </Text>
-                </div>
-              </Button>
-            ) : (
-              <Menu>
-                {({ open }) => (
-                  <>
-                    <Menu.Button
-                      className={`py-2 px-3 border rounded flex flex-row justify-between lg:justify-start gap-2 items-center ${
-                        open ? 'border-indigo-500' : ''
-                      }`}
-                    >
-                      <Text size="sm" weight="medium" className="text-gray-700">
-                        Edit
-                      </Text>
-                      {open ? (
-                        <ChevronUpIcon className="w-4 h-4 text-indigo-500" />
-                      ) : (
-                        <ChevronDownIcon className="w-4 h-4 text-indigo-500" />
-                      )}
-                    </Menu.Button>
+                  <Menu.Items className="absolute right-4 top-16 bg-white rounded-lg border shadow">
+                    <Menu.Item>
+                      <div className="flex flex-row items-center gap-3 py-3 px-4 cursor-pointer hover:bg-gray-50 rounded-t-lg">
+                        <FaShoppingCart className="text-gray-500" />
 
-                    <Menu.Items className="absolute right-4 top-16 bg-white rounded-lg border shadow">
-                      <Menu.Item>
-                        <div className="flex flex-row items-center gap-3 py-3 px-4 cursor-pointer hover:bg-gray-50 rounded-t-lg">
-                          <FaShoppingCart className="text-gray-500" />
+                        <Text
+                          size="sm"
+                          weight="medium"
+                          className="text-gray-700"
+                        >
+                          Purchase Entitlement(s)
+                        </Text>
+                      </div>
+                    </Menu.Item>
 
-                          <Text
-                            size="sm"
-                            weight="medium"
-                            className="text-gray-700"
-                          >
-                            Purchase Entitlement(s)
-                          </Text>
-                        </div>
-                      </Menu.Item>
+                    <div className="border-b border-gray-200 w-3/4 mx-auto"></div>
 
-                      <div className="border-b border-gray-200 w-3/4 mx-auto"></div>
+                    <Menu.Item disabled={entitlements.pro.allotance === 0}>
+                      <div className="flex flex-row items-center gap-3 py-3 px-4 cursor-pointer hover:bg-gray-50 rounded-b-lg">
+                        <HiOutlineMinusCircle className="text-red-600" />
 
-                      <Menu.Item>
-                        <div className="flex flex-row items-center gap-3 py-3 px-4 cursor-pointer hover:bg-gray-50 rounded-b-lg">
-                          <HiOutlineMinusCircle className="text-red-600" />
-
-                          <Text
-                            size="sm"
-                            weight="medium"
-                            className="text-red-600"
-                          >
-                            Remove Entitlement(s)
-                          </Text>
-                        </div>
-                      </Menu.Item>
-                    </Menu.Items>
-                  </>
-                )}
-              </Menu>
-            )
+                        <Text
+                          size="sm"
+                          weight="medium"
+                          className="text-red-600"
+                        >
+                          Remove Entitlement(s)
+                        </Text>
+                      </div>
+                    </Menu.Item>
+                  </Menu.Items>
+                </>
+              )}
+            </Menu>
           }
           main={
             <>
@@ -329,7 +324,7 @@ export default () => {
 
               <div className="border-b border-gray-200"></div>
 
-              {entitlements.pro.length > 0 && (
+              {entitlements.pro.assigned.length > 0 && (
                 <div className="p-4">
                   <Text size="sm" weight="medium" className="text-gray-900">
                     Entitlements
@@ -340,7 +335,11 @@ export default () => {
                       <div
                         className="bg-blue-600 h-2.5 rounded-full"
                         style={{
-                          width: `${(entitlements.pro.length / 3) * 100}%`,
+                          width: `${
+                            (entitlements.pro.assigned.length /
+                              entitlements.pro.allotance) *
+                            100
+                          }%`,
                         }}
                       ></div>
                     </div>
@@ -351,7 +350,7 @@ export default () => {
                         weight="semibold"
                         className="text-gray-900"
                       >
-                        ${entitlements.pro.length * 29}
+                        ${entitlements.pro.assigned.length * 29}
                       </Text>
                       <Text size="sm" className="text-gray-500">
                         per month
@@ -359,35 +358,39 @@ export default () => {
                     </div>
                   </div>
                   <Text size="sm" weight="medium" className="text-[#6B7280]">
-                    {entitlements.pro.length} out of 3 Entitlements used
+                    {`${entitlements.pro.assigned.length} out of ${entitlements.pro.allotance} Entitlements used`}
                   </Text>
                 </div>
               )}
             </>
           }
           footer={
-            entitlements.pro.length === 0 ? (
-              <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
-                <FaShoppingCart className="w-3.5 h-3.5" />
-                <Text size="sm" weight="medium">
-                  Purchase Entitlement(s)
-                </Text>
-              </div>
-            ) : (
-              <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
-                <FaTrash className="w-3.5 h-3.5" />
-                <Text size="sm" weight="medium">
-                  Remove Unused Entitlements
-                </Text>
-              </div>
-            )
+            <>
+              {entitlements.pro.allotance === 0 && (
+                <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
+                  <FaShoppingCart className="w-3.5 h-3.5" />
+                  <Text size="sm" weight="medium">
+                    Purchase Entitlement(s)
+                  </Text>
+                </div>
+              )}
+              {entitlements.pro.allotance >
+                entitlements.pro.assigned.length && (
+                <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
+                  <FaTrash className="w-3.5 h-3.5" />
+                  <Text size="sm" weight="medium">
+                    Remove Unused Entitlements
+                  </Text>
+                </div>
+              )}
+            </>
           }
         />
 
         <EntitlementsCard
           entitlements={apps.map((a) => ({
             title: a.name!,
-            subtitle: entitlements.pro.includes(a.clientId)
+            subtitle: entitlements.pro.assigned.includes(a.clientId)
               ? 'Pro Plan $29/month'
               : 'Free',
           }))}
