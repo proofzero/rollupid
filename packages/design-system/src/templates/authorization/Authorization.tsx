@@ -387,7 +387,7 @@ export default ({
           <Text size="sm" className="text-gray-500">
             Before using this app, you can review{' '}
             {appProfile?.name ?? `Company`}
-            `&apos;`s{' '}
+            &apos;s{' '}
             <a href={appProfile.privacyURL} className="text-skin-primary">
               privacy policy
             </a>
