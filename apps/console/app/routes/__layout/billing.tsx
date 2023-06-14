@@ -161,12 +161,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const proAllotance = 3
+    const proUsage = 2
 
-    const proApps = reshapedApps.slice(0, proAllotance)
+    const proApps = reshapedApps.slice(0, proUsage)
 
     let freeApps: any[] = []
-    if (reshapedApps.length > proAllotance) {
-      freeApps = reshapedApps.slice(proAllotance)
+    if (reshapedApps.length > proUsage) {
+      freeApps = reshapedApps.slice(proUsage)
     }
 
     const entitlements = {
@@ -365,25 +366,28 @@ export default () => {
             </>
           }
           footer={
-            <>
-              {entitlements.pro.allotance === 0 && (
-                <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
-                  <FaShoppingCart className="w-3.5 h-3.5" />
-                  <Text size="sm" weight="medium">
-                    Purchase Entitlement(s)
-                  </Text>
-                </div>
-              )}
-              {entitlements.pro.allotance >
-                entitlements.pro.assigned.length && (
-                <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
-                  <FaTrash className="w-3.5 h-3.5" />
-                  <Text size="sm" weight="medium">
-                    Remove Unused Entitlements
-                  </Text>
-                </div>
-              )}
-            </>
+            entitlements.pro.allotance === 0 ||
+            entitlements.pro.assigned.length < entitlements.pro.allotance ? (
+              <>
+                {entitlements.pro.allotance === 0 && (
+                  <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
+                    <FaShoppingCart className="w-3.5 h-3.5" />
+                    <Text size="sm" weight="medium">
+                      Purchase Entitlement(s)
+                    </Text>
+                  </div>
+                )}
+                {entitlements.pro.allotance >
+                  entitlements.pro.assigned.length && (
+                  <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
+                    <FaTrash className="w-3.5 h-3.5" />
+                    <Text size="sm" weight="medium">
+                      Remove Unused Entitlements
+                    </Text>
+                  </div>
+                )}
+              </>
+            ) : undefined
           }
         />
 
