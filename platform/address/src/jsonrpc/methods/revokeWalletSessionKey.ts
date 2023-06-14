@@ -58,9 +58,11 @@ export const revokeWalletSessionKeyMethod = async ({
     }
   )
 
-  //@ts-ignore
   const { userOp, userOpHash } =
-    await createRevokeSessionKeyUserOpResponse.json()
+    (await createRevokeSessionKeyUserOpResponse.json()) as {
+      userOp: any
+      userOpHash: string
+    }
 
   const signedMessage = await signer.signMessage(arrayify(userOpHash))
 
