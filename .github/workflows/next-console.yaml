@@ -51,6 +51,8 @@ jobs:
           environment: 'next'
           secrets: |
             SECRET_SESSION_KEY
+            SECRET_SESSION_SALT
         env:
           # A secret used for session encryption.
           SECRET_SESSION_KEY: ${{ secrets.SECRET_SESSION_KEY_TEST }}
+          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_TEST }}

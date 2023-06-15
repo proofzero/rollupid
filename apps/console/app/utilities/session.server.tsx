@@ -27,6 +27,9 @@ invariant(DEPLOY_ENV, 'DEPLOY_ENV must be set')
 invariant(SECRET_SESSION_KEY, 'SECRET_SESSION_KEY must be set')
 
 // @ts-ignore
+invariant(SECRET_SESSION_SALT, 'SECRET_SESSION_SALT must be set')
+
+// @ts-ignore
 invariant(COOKIE_DOMAIN, 'COOKIE_DOMAIN must be set')
 
 // createCookie
@@ -125,7 +128,7 @@ export const {
   // a Cookie from `createCookie` or the same CookieOptions to create one
   cookie: {
     name: '__flashes',
-    secrets: ['r3m1xr0ck5'],
+    secrets: [SECRET_SESSION_SALT],
     sameSite: 'lax',
   },
 })
