@@ -7,8 +7,8 @@ export type AccountProfile = {
 }
 
 export enum ServicePlanType {
-  UNDEFINED,
-  PRO,
+  UNDEFINED = 'UNDEFINED',
+  PRO = 'PRO',
 }
 
 export type ServicePlans = {

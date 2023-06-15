@@ -63,7 +63,7 @@ const PlanCard = ({
   )
 }
 
-const PlanFeaturesColumnItems = ({
+const PlanFeaturesListItems = ({
   features,
 }: {
   features: {
@@ -99,30 +99,15 @@ const PlanFeatures = ({
     colorClass?: string
   }[]
 }) => {
-  const COLUMN_MAX = 4
-
-  const columns = []
-  for (let i = 0; i < features.length; i += COLUMN_MAX) {
-    columns.push(features.slice(i, i + COLUMN_MAX))
-  }
-
   return (
     <>
-      <div className="hidden lg:flex lg:flex-row lg:gap-4">
-        {columns.map((columnFeatures, i) => (
-          <ul key={i} className="flex flex-col gap-3.5">
-            <PlanFeaturesColumnItems features={columnFeatures} />
-          </ul>
-        ))}
-      </div>
+      <ul className="hidden lg:grid grid-rows-4 grid-flow-col gap-4">
+        <PlanFeaturesListItems features={features} />
+      </ul>
 
-      <div className="block lg:hidden">
-        <ul className="flex flex-col gap-3.5">
-          <PlanFeaturesColumnItems
-            features={columns.reduce((acc, curr) => [...acc, ...curr], [])}
-          />
-        </ul>
-      </div>
+      <ul className="grid lg:hidden grid-cols-1 grid-flow-row gap-4">
+        <PlanFeaturesListItems features={features} />
+      </ul>
     </>
   )
 }

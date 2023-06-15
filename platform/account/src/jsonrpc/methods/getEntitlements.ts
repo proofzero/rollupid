@@ -2,9 +2,11 @@ import { ServicePlanType } from '@proofzero/types/account'
 import { z } from 'zod'
 import { Context } from '../../context'
 
+const PlanTypeEnum = z.nativeEnum(ServicePlanType)
+
 export const GetEntitlementsOutputSchema = z.array(
   z.object({
-    planType: z.nativeEnum(ServicePlanType),
+    planType: PlanTypeEnum,
     entitlements: z.number(),
   })
 )
@@ -24,7 +26,10 @@ export const getEntitlements = async ({
 
   if (servicePlans.plans) {
     for (const [key, value] of Object.entries(servicePlans.plans)) {
-      result.push({ planType: +key, entitlements: value.entitlements })
+      result.push({
+        planType: PlanTypeEnum.parse(key),
+        entitlements: value.entitlements,
+      })
     }
   }
 
