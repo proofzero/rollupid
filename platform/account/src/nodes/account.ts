@@ -60,7 +60,7 @@ export default class Account extends DOProxy {
   }
 
   async setCustomerID(customerID: string): Promise<void> {
-    let servicePlans = await this.state.storage.get<ServicePlans>(
+    const servicePlans = await this.state.storage.get<ServicePlans>(
       'servicePlans'
     )
 
