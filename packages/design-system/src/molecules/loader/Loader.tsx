@@ -2,8 +2,6 @@ import React from 'react'
 import styled, { keyframes } from 'styled-components'
 
 export const Loader = ({ mainColor }: { mainColor?: string }) => {
-  console.log({ mainColor })
-
   const loaderBackgroundAnimation = keyframes`
   0%, 24.9% {
       background-color: #e5e7eb;
