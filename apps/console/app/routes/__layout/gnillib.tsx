@@ -187,20 +187,24 @@ const PurchaseEntitlementsModal = ({
 
   return (
     <Modal isOpen={isOpen} fixed handleClose={() => onClose(false)}>
-      <Text size="lg" weight="semibold" className="text-left text-gray-800 m-5">
+      <Text
+        size="lg"
+        weight="semibold"
+        className="text-left text-gray-800 mx-5"
+      >
         Purchase Entitlement(s)
       </Text>
 
       <section className="m-5 border rounded-lg">
         <div className="p-6">
-          <Text size="lg" weight="semibold" className="font-gray-900 text-left">
+          <Text size="lg" weight="semibold" className="text-gray-900 text-left">
             Pro Plan
           </Text>
 
           <Text
             size="sm"
             weight="medium"
-            className="font-[#6B7280] text-left mb-6"
+            className="text-[#6B7280] text-left mb-6"
           >
             Everything in free & custom domain configuration, advanced support,
             whitelabeling and much more.
@@ -243,13 +247,13 @@ const PurchaseEntitlementsModal = ({
 
         <div className="p-6 flex justify-between items-center">
           <div>
-            <Text size="sm" weight="medium" className="font-gray-800 text-left">
+            <Text size="sm" weight="medium" className="text-gray-800 text-left">
               Number of Entitlements
             </Text>
             <Text
               size="sm"
               weight="medium"
-              className="font-[#6B7280] text-left"
+              className="text-[#6B7280] text-left"
             >
               {entitlementDelta} x $29/month
             </Text>
@@ -270,7 +274,7 @@ const PurchaseEntitlementsModal = ({
 
             <input
               type="text"
-              className="border border-x-0 text-center w-[100px] border-gray-300 focus:ring-0 focus:outline-0 focus:border-gray-300"
+              className="border border-x-0 text-center w-[4rem] border-gray-300 focus:ring-0 focus:outline-0 focus:border-gray-300"
               readOnly
               value={entitlementDelta}
             />
@@ -290,11 +294,18 @@ const PurchaseEntitlementsModal = ({
         <div className="border-b border-gray-200"></div>
 
         <div className="p-6 flex justify-between items-center">
-          <Text size="sm" weight="medium" className="font-gray-800 text-left">
+          <Text size="sm" weight="medium" className="text-gray-800 text-left">
             Changes to your subscription
           </Text>
 
-          <Text>{`+$${29 * entitlementDelta} per month`}</Text>
+          <div className="flex flex-row gap-2 items-center">
+            <Text size="lg" weight="semibold" className="text-gray-900">{`+$${
+              29 * entitlementDelta
+            }`}</Text>
+            <Text size="sm" weight="medium" className="text-gray-500">
+              per month
+            </Text>
+          </div>
         </div>
       </section>
 
