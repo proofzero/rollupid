@@ -8,6 +8,7 @@ import {
   importJWK,
   JWK,
   jwtVerify,
+  JWTVerifyResult,
   KeyLike,
   SignJWT,
 } from 'jose'
@@ -33,6 +34,7 @@ import { InternalServerError } from '@proofzero/errors'
 import type { CustomDomain } from '../types'
 import { getCloudflareFetcher, getCustomHostname } from '../utils/cloudflare'
 import { getDNSRecordValue } from '@proofzero/utils'
+import { ResolveAccountInput } from '@proofzero/platform.address/src/jsonrpc/methods/resolveAccount'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields
@@ -179,16 +181,14 @@ export default class StarbaseApp extends DOProxy {
     return apiKey
   }
 
-  async verify(apiKey: string): Promise<boolean> {
+  async verify(apiKey: string): Promise<JWTVerifyResult | undefined> {
     const { alg } = JWT_OPTIONS
     const { publicKey: key } = await this.getJWTSigningKeyPair()
     const options = { algorithms: [alg] }
     try {
-      await jwtVerify(apiKey, key, options)
-      return true
+      return jwtVerify(apiKey, key, options)
     } catch (e) {
       console.error('Error verifying API key validity.', e)
-      return false
     }
   }
 
@@ -217,9 +217,8 @@ export default class StarbaseApp extends DOProxy {
   }
 
   async validateApiKey(apiKey: string): Promise<boolean> {
-    const validJWTForClient = await this.verify(apiKey)
     const storedKey = await this.state.storage.get('apiKey')
-    return validJWTForClient && apiKey === storedKey
+    return apiKey === storedKey
   }
 
   async hasClientSecret(): Promise<boolean> {

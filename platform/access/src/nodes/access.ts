@@ -174,12 +174,13 @@ export default class Access extends DOProxy {
 
   async verify(
     jwt: string,
-    jwks: jose.JSONWebKeySet
+    jwks: jose.JSONWebKeySet,
+    options: jose.JWTVerifyOptions = {}
   ): Promise<jose.JWTVerifyResult> {
     const { kid } = jose.decodeProtectedHeader(jwt)
     if (kid) {
       try {
-        return await jose.jwtVerify(jwt, jose.createLocalJWKSet(jwks))
+        return await jose.jwtVerify(jwt, jose.createLocalJWKSet(jwks), options)
       } catch (error) {
         if (error instanceof jose.errors.JWTClaimValidationFailed)
           throw TokenClaimValidationFailedError
@@ -198,7 +199,7 @@ export default class Access extends DOProxy {
         const { alg } = JWT_OPTIONS
         const key = await jose.importJWK(local, alg)
         try {
-          return await jose.jwtVerify(jwt, key)
+          return await jose.jwtVerify(jwt, key, options)
         } catch (error) {
           if (error instanceof jose.errors.JWTClaimValidationFailed)
             throw TokenClaimValidationFailedError
@@ -214,8 +215,12 @@ export default class Access extends DOProxy {
     throw TokenVerificationFailedError
   }
 
-  async revoke(token: string, jwks: jose.JSONWebKeySet): Promise<void> {
-    const { payload } = await this.verify(token, jwks)
+  async revoke(
+    token: string,
+    jwks: jose.JSONWebKeySet,
+    options: jose.JWTVerifyOptions = {}
+  ): Promise<void> {
+    const { payload } = await this.verify(token, jwks, options)
     await this.state.storage.transaction(async (txn) => {
       const { jti } = payload
       if (!jti) {

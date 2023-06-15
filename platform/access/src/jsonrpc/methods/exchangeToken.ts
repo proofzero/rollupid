@@ -277,10 +277,10 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   return { accessToken, refreshToken, idToken }
 }
 
-const handleRefreshToken: ExchangeTokenMethod<RefreshTokenInput> = async ({
-  ctx,
-  input,
-}) => {
+const handleRefreshToken: ExchangeTokenMethod<
+  RefreshTokenInput,
+  RefreshTokenOutput
+> = async ({ ctx, input }) => {
   const { refreshToken, clientId, clientSecret, issuer } = input
 
   if (!ctx.starbaseClient) {
