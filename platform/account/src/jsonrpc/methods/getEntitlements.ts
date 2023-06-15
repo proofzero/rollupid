@@ -20,22 +20,37 @@ export const getEntitlements = async ({
 }): Promise<GetEntitlementsOutput> => {
   const result: GetEntitlementsOutput = {}
 
-  const servicePlans = (await ctx.account?.class.getServicePlans()) ?? {}
-  const servicePlanOrders =
-    (await ctx.account?.class.getServicePlanOrders()) ?? {}
+  const servicePlans = await ctx.account?.class.getServicePlans()
+
+  const servicePlanOrders = await ctx.account?.class.getServicePlanOrders()
+  const servicePlanOrdersByType = servicePlanOrders
+    ? Object.keys(servicePlanOrders || {})
+        .map((k) => servicePlanOrders[k])
+        .reduce((acc, v) => {
+          if (!acc[v.type]) {
+            acc[v.type] = 0
+          }
+          acc[v.type] += v.quantity
+          return acc
+        }, {} as Record<ServicePlanType, number>)
+    : undefined
 
   for (const key of Object.keys(ServicePlanType)) {
     const enumKey = PlanTypeEnum.parse(key)
-    const entitlements = servicePlans.plans?.[enumKey]?.entitlements || 0
-    const pendingEntitlements = Object.keys(servicePlanOrders)
-      .map((key) => servicePlanOrders[key])
-      .filter((o) => o.type === enumKey)
-      .reduce((acc, o) => acc + o.quantity, 0)
-
-    result[enumKey] = {
-      entitlements,
-      pendingEntitlements,
+    const resEntry = {
+      entitlements: 0,
+      pendingEntitlements: 0,
     }
+
+    if (servicePlans?.plans?.[enumKey]) {
+      resEntry.entitlements = servicePlans.plans[enumKey].entitlements
+    }
+
+    if (servicePlanOrdersByType && servicePlanOrdersByType[enumKey]) {
+      resEntry.pendingEntitlements = servicePlanOrdersByType[enumKey]
+    }
+
+    result[enumKey] = resEntry
   }
 
   return result

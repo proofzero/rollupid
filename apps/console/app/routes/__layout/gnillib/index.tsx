@@ -176,8 +176,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const entitlements = await accountClient.getEntitlements.query()
 
-    const proAllotance = entitlements.PRO?.entitlements ?? 0
-    const proPendingAllotance = entitlements.PRO?.pendingEntitlements ?? 0
+    const proAllotance = entitlements?.[ServicePlanType.PRO]?.entitlements ?? 0
+    const proPendingAllotance =
+      entitlements?.[ServicePlanType.PRO]?.pendingEntitlements ?? 0
 
     const proUsage = Math.min(2, proAllotance)
     const proApps = reshapedApps.slice(0, proUsage)
@@ -189,12 +190,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     return {
       entitlements: {
-        pro: {
+        [ServicePlanType.PRO]: {
           allotance: proAllotance,
           pendingAllotance: proPendingAllotance,
           assigned: proApps.map((pa) => pa.clientId),
         },
-        free: {
+        FREE: {
           assigned: freeApps.map((fa) => fa.clientId),
         },
       },
@@ -432,11 +433,15 @@ export default () => {
 
                     <div className="border-b border-gray-200 w-3/4 mx-auto"></div>
 
-                    <Menu.Item disabled={entitlements.pro.allotance === 0}>
+                    <Menu.Item
+                      disabled={
+                        entitlements[ServicePlanType.PRO].allotance === 0
+                      }
+                    >
                       <div
                         className={classnames(
                           'flex flex-row items-center gap-3 py-3 px-4 rounded-b-lg',
-                          entitlements.pro.allotance !== 0
+                          entitlements[ServicePlanType.PRO].allotance !== 0
                             ? 'cursor-pointer hover:bg-gray-50 text-red-600'
                             : 'cursor-default text-red-300'
                         )}
@@ -461,7 +466,7 @@ export default () => {
 
             <div className="border-b border-gray-200"></div>
 
-            {entitlements.pro.assigned.length > 0 && (
+            {entitlements[ServicePlanType.PRO].assigned.length > 0 && (
               <div className="p-4">
                 <Text size="sm" weight="medium" className="text-gray-900">
                   Entitlements
@@ -473,8 +478,8 @@ export default () => {
                       className="bg-blue-600 h-2.5 rounded-full"
                       style={{
                         width: `${
-                          (entitlements.pro.assigned.length /
-                            entitlements.pro.allotance) *
+                          (entitlements[ServicePlanType.PRO].assigned.length /
+                            entitlements[ServicePlanType.PRO].allotance) *
                           100
                         }%`,
                       }}
@@ -483,7 +488,9 @@ export default () => {
 
                   <div className="flex flex-row items-center gap-2">
                     <Text size="lg" weight="semibold" className="text-gray-900">
-                      ${entitlements.pro.assigned.length * plans.PRO.price}
+                      $
+                      {entitlements[ServicePlanType.PRO].assigned.length *
+                        plans.PRO.price}
                     </Text>
                     <Text size="sm" className="text-gray-500">
                       per month
@@ -491,13 +498,19 @@ export default () => {
                   </div>
                 </div>
                 <Text size="sm" weight="medium" className="text-[#6B7280]">
-                  {`${entitlements.pro.assigned.length} out of ${entitlements.pro.allotance} Entitlements used (${entitlements.pro.pendingAllotance} pending)`}
+                  {`${
+                    entitlements[ServicePlanType.PRO].assigned.length
+                  } out of ${
+                    entitlements[ServicePlanType.PRO].allotance
+                  } Entitlements used (${
+                    entitlements[ServicePlanType.PRO].pendingAllotance
+                  } pending)`}
                 </Text>
               </div>
             )}
           </main>
           <footer className="bg-gray-50 rounded-b py-4 px-6">
-            {entitlements.pro.allotance === 0 && (
+            {entitlements[ServicePlanType.PRO].allotance === 0 && (
               <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
                 <FaShoppingCart className="w-3.5 h-3.5" />
                 <Text size="sm" weight="medium">
@@ -505,7 +518,8 @@ export default () => {
                 </Text>
               </div>
             )}
-            {entitlements.pro.allotance > entitlements.pro.assigned.length && (
+            {entitlements[ServicePlanType.PRO].allotance >
+              entitlements[ServicePlanType.PRO].assigned.length && (
               <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
                 <FaTrash className="w-3.5 h-3.5" />
                 <Text size="sm" weight="medium">
@@ -519,7 +533,9 @@ export default () => {
         <EntitlementsCard
           entitlements={apps.map((a) => ({
             title: a.name!,
-            subtitle: entitlements.pro.assigned.includes(a.clientId)
+            subtitle: entitlements[ServicePlanType.PRO].assigned.includes(
+              a.clientId
+            )
               ? `Pro Plan ${plans.PRO.price}/month`
               : 'Free',
           }))}
