@@ -32,7 +32,7 @@ const plans = {
 
 const ProPlanFeatures = () => {
   return (
-    <ul className="grid grid-cols-1 grid-rows-6 lg:grid-cols-2 lg:grid-rows-4 grid-flow-col gap-4">
+    <ul className="grid lg:grid-rows-4 grid-flow-row lg:grid-flow-col gap-4">
       <li className={`flex flex-row items-center gap-3 text-[#6B7280]`}>
         <div className="w-3.5 h-3.5 flex justify-center items-center">
           <FaCheck className={`text-green-500`} />
@@ -90,6 +90,16 @@ const ProPlanFeatures = () => {
 
         <Text size="sm" weight="medium">
           Groups
+        </Text>
+      </li>
+
+      <li className={`flex flex-row items-center gap-3 text-[#6B7280]`}>
+        <div className="w-3.5 h-3.5 flex justify-center items-center">
+          <TbHourglassHigh />
+        </div>
+
+        <Text size="sm" weight="medium">
+          Managed Sessions
         </Text>
       </li>
     </ul>
