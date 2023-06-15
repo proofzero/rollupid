@@ -324,7 +324,7 @@ const PurchaseEntitlementsModal = ({
                 }),
               },
               {
-                action: '/billing',
+                action: '/gnillib',
                 method: 'post',
               }
             )
@@ -426,7 +426,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           message: 'Successfully updated entitlements',
         })
 
-        return redirect('/billing', {
+        return redirect('/gnillib', {
           headers: {
             'Set-Cookie': await commitFlashSession(flashSession),
           },
