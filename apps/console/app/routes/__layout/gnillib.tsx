@@ -26,9 +26,6 @@ import { ServicePlanType } from '@proofzero/types/account'
 
 const plans = {
   [ServicePlanType.PRO]: {
-    name: 'Pro Plan',
-    description:
-      'Everything in free & custom domain configuration, advanced support, whitelabeling and much more.',
     price: 29,
   },
 }
@@ -275,7 +272,7 @@ export default () => {
               weight="semibold"
               className="text-gray-900 text-left"
             >
-              {plans.PRO.name}
+              Pro Plan
             </Text>
 
             <Text
@@ -283,7 +280,8 @@ export default () => {
               weight="medium"
               className="text-[#6B7280] text-left mb-6"
             >
-              {plans.PRO.description}
+              Everything in free & custom domain configuration, advanced
+              support, whitelabeling and much more.
             </Text>
 
             <ProPlanFeatures />
@@ -423,10 +421,11 @@ export default () => {
           <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
             <div>
               <Text size="lg" weight="semibold" className="text-gray-900">
-                {plans.PRO.name}
+                Pro Plan
               </Text>
               <Text size="sm" weight="medium" className="text-[#6B7280]">
-                {plans.PRO.description}
+                Everything in free & custom domain configuration, advanced
+                support, whitelabeling and much more.
               </Text>
             </div>
 
@@ -536,28 +535,22 @@ export default () => {
             )}
           </main>
           <footer className="bg-gray-50 rounded-b py-4 px-6">
-            {entitlements.pro.allotance === 0 ||
-            entitlements.pro.assigned.length < entitlements.pro.allotance ? (
-              <>
-                {entitlements.pro.allotance === 0 && (
-                  <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
-                    <FaShoppingCart className="w-3.5 h-3.5" />
-                    <Text size="sm" weight="medium">
-                      Purchase Entitlement(s)
-                    </Text>
-                  </div>
-                )}
-                {entitlements.pro.allotance >
-                  entitlements.pro.assigned.length && (
-                  <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
-                    <FaTrash className="w-3.5 h-3.5" />
-                    <Text size="sm" weight="medium">
-                      Remove Unused Entitlements
-                    </Text>
-                  </div>
-                )}
-              </>
-            ) : undefined}
+            {entitlements.pro.allotance === 0 && (
+              <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
+                <FaShoppingCart className="w-3.5 h-3.5" />
+                <Text size="sm" weight="medium">
+                  Purchase Entitlement(s)
+                </Text>
+              </div>
+            )}
+            {entitlements.pro.allotance > entitlements.pro.assigned.length && (
+              <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
+                <FaTrash className="w-3.5 h-3.5" />
+                <Text size="sm" weight="medium">
+                  Remove Unused Entitlements
+                </Text>
+              </div>
+            )}
           </footer>
         </article>
 
@@ -565,7 +558,7 @@ export default () => {
           entitlements={apps.map((a) => ({
             title: a.name!,
             subtitle: entitlements.pro.assigned.includes(a.clientId)
-              ? `${plans.PRO.name} ${plans.PRO.price}/month`
+              ? `Pro Plan ${plans.PRO.price}/month`
               : 'Free',
           }))}
         />
