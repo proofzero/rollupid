@@ -23,7 +23,7 @@ export const getEntitlements = async ({
   }
 
   if (servicePlans.plans) {
-    for (let [key, value] of Object.entries(servicePlans.plans)) {
+    for (const [key, value] of Object.entries(servicePlans.plans)) {
       result.push({ planType: +key, entitlements: value.entitlements })
     }
   }
