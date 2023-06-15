@@ -1,4 +1,4 @@
-import { Form } from '@remix-run/react'
+import { Form, useTransition } from '@remix-run/react'
 
 import { Button, Text } from '@proofzero/design-system'
 import { FaChevronDown, FaChevronRight } from 'react-icons/fa'
@@ -29,6 +29,7 @@ export const ConfirmRevocationModal = ({
   setIsOpen: (val: boolean) => void
 }) => {
   const [confirmationString, setConfirmationString] = useState('')
+  const transition = useTransition()
 
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
@@ -68,6 +69,7 @@ export const ConfirmRevocationModal = ({
             btnType="secondary-alt"
             onClick={() => setIsOpen(false)}
             className="bg-gray-100 hover:bg-gray-200"
+            disabled={transition.state !== 'idle'}
           >
             Cancel
           </Button>
@@ -79,7 +81,9 @@ export const ConfirmRevocationModal = ({
             <Button
               type="submit"
               btnType="dangerous-alt"
-              disabled={confirmationString !== 'REVOKE'}
+              disabled={
+                confirmationString !== 'REVOKE' || transition.state !== 'idle'
+              }
             >
               Revoke Access
             </Button>
