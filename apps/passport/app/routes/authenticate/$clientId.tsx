@@ -40,7 +40,6 @@ export default () => {
   }>()
 
   const { appProps } = useOutletContext<{ appProps: GetAppPublicPropsResult }>()
-  console.log({ appProps })
 
   const { dark } = useContext(ThemeContext)
 

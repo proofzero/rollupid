@@ -14,7 +14,6 @@ import {
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
 import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
-import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { useEffect, useState } from 'react'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
@@ -125,8 +124,6 @@ export default () => {
         boxSizing: 'border-box',
       }}
     >
-      {transition.state !== 'idle' && <Loader />}
-
       <EmailOTPValidator
         loading={transition.state !== 'idle' || fetcher.state !== 'idle'}
         email={email}

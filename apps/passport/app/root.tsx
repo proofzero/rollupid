@@ -169,12 +169,31 @@ export default function App() {
     )
   }, [browserEnv.flashes])
 
+  const loaderColorHandler = (isDark: boolean): string | undefined => {
+    if (browserEnv?.appProps?.appTheme?.color) {
+      return isDark
+        ? browserEnv?.appProps?.appTheme?.color.dark
+        : browserEnv.appProps.appTheme.color.light
+    }
+  }
+
   const [dark, setDark] = useState<boolean>(false)
+  const [loaderColor, setLoaderColor] = useState<string | undefined>(
+    browserEnv?.appProps?.appTheme?.color?.light
+  )
+
   const [ueComplete, setUEComplete] = useState(false)
   useEffect(() => {
     const darkMode = window.matchMedia('(prefers-color-scheme: dark)')
     setDark(darkMode.matches)
+    setLoaderColor(loaderColorHandler(darkMode.matches))
 
+    window
+      .matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', (event) => {
+        setDark(event.matches)
+        setLoaderColor(loaderColorHandler(event.matches))
+      })
     setUEComplete(true)
   }, [])
 
@@ -228,7 +247,7 @@ export default function App() {
             />
           </>
         )}
-        {transition.state !== 'idle' && <Loader />}
+        {transition.state !== 'idle' && <Loader mainColor={loaderColor} />}
         <Toaster position="top-right" />
         {ueComplete && (
           <ThemeContext.Provider
