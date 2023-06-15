@@ -40,13 +40,13 @@ import {
 } from './methods/deleteAccountNode'
 import { UnauthorizedError } from '@proofzero/errors'
 import {
-  UpdateEntitlementsInputSchema,
-  updateEntitlements,
-} from './methods/updateEntitlements'
-import {
   GetEntitlementsOutputSchema,
   getEntitlements,
 } from './methods/getEntitlements'
+import {
+  RegisterServicePlanOrderInputSchema,
+  registerServicePlanOrder,
+} from './methods/registerServicePlanOrder'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -140,6 +140,14 @@ export const appRouter = t.router({
     .use(LogUsage)
     .input(DeleteAccountNodeInput)
     .mutation(deleteAccountNodeMethod),
+  registerServicePlanOrder: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(injectAccountNode)
+    .use(LogUsage)
+    .use(Analytics)
+    .input(RegisterServicePlanOrderInputSchema)
+    .mutation(registerServicePlanOrder),
   getEntitlements: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
@@ -148,12 +156,4 @@ export const appRouter = t.router({
     .use(Analytics)
     .output(GetEntitlementsOutputSchema)
     .query(getEntitlements),
-  updateEntitlements: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(injectAccountNode)
-    .use(LogUsage)
-    .use(Analytics)
-    .input(UpdateEntitlementsInputSchema)
-    .mutation(updateEntitlements),
 })

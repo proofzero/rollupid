@@ -2,14 +2,10 @@ import { Button } from '@proofzero/design-system'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction, LoaderFunction, redirect } from '@remix-run/cloudflare'
+import { LoaderFunction } from '@remix-run/cloudflare'
 import { FaCheck, FaShoppingCart, FaTrash } from 'react-icons/fa'
 import { HiMinus, HiOutlineExternalLink, HiPlus } from 'react-icons/hi'
-import {
-  commitFlashSession,
-  getFlashSession,
-  requireJWT,
-} from '~/utilities/session.server'
+import { requireJWT } from '~/utilities/session.server'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import createAccountClient from '@proofzero/platform-clients/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -178,11 +174,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const entitlementz = await accountClient.getEntitlements.query()
+    const entitlements = await accountClient.getEntitlements.query()
 
-    const proAllotance =
-      entitlementz.find((e) => e.planType === ServicePlanType.PRO)
-        ?.entitlements ?? 0
+    const proAllotance = entitlements.PRO?.entitlements ?? 0
+    const proPendingAllotance = entitlements.PRO?.pendingEntitlements ?? 0
 
     const proUsage = Math.min(2, proAllotance)
     const proApps = reshapedApps.slice(0, proUsage)
@@ -192,62 +187,18 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       freeApps = reshapedApps.slice(proUsage)
     }
 
-    const entitlements = {
-      pro: {
-        allotance: proAllotance,
-        assigned: proApps.map((pa) => pa.clientId),
-      },
-      free: {
-        assigned: freeApps.map((fa) => fa.clientId),
-      },
-    }
-
     return {
-      entitlements,
+      entitlements: {
+        pro: {
+          allotance: proAllotance,
+          pendingAllotance: proPendingAllotance,
+          assigned: proApps.map((pa) => pa.clientId),
+        },
+        free: {
+          assigned: freeApps.map((fa) => fa.clientId),
+        },
+      },
     }
-  }
-)
-
-export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, params, context }) => {
-    const jwt = await requireJWT(request)
-    const traceHeader = generateTraceContextHeaders(context.traceSpan)
-
-    const accountClient = createAccountClient(Account, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-
-    const fd = await request.formData()
-    const action = fd.get('action')
-    switch (action) {
-      case 'purchase': {
-        const payload: {
-          entitlementsDelta: number
-        } = JSON.parse(fd.get('payload') as string)
-
-        await accountClient.updateEntitlements.mutate({
-          planType: ServicePlanType.PRO,
-          delta: payload.entitlementsDelta,
-        })
-
-        const flashSession = await getFlashSession(
-          request.headers.get('Cookie')
-        )
-        flashSession.flash('toast', {
-          type: 'success',
-          message: 'Successfully updated entitlements',
-        })
-
-        return redirect('/gnillib', {
-          headers: {
-            'Set-Cookie': await commitFlashSession(flashSession),
-          },
-        })
-      }
-    }
-
-    return null
   }
 )
 
@@ -380,11 +331,12 @@ export default () => {
                 {
                   action: 'purchase',
                   payload: JSON.stringify({
-                    entitlementsDelta: proEntitlementDelta,
+                    planType: ServicePlanType.PRO,
+                    quantity: proEntitlementDelta,
                   }),
                 },
                 {
-                  action: '/gnillib',
+                  action: '/gnillib/checkout',
                   method: 'post',
                 }
               )
@@ -539,7 +491,7 @@ export default () => {
                   </div>
                 </div>
                 <Text size="sm" weight="medium" className="text-[#6B7280]">
-                  {`${entitlements.pro.assigned.length} out of ${entitlements.pro.allotance} Entitlements used`}
+                  {`${entitlements.pro.assigned.length} out of ${entitlements.pro.allotance} Entitlements used (${entitlements.pro.pendingAllotance} pending)`}
                 </Text>
               </div>
             )}

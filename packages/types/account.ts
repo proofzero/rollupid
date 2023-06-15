@@ -7,8 +7,14 @@ export type AccountProfile = {
 }
 
 export enum ServicePlanType {
-  UNDEFINED = 'UNDEFINED',
   PRO = 'PRO',
+}
+
+export type PendingServicePlans = {
+  [key: string]: {
+    type: ServicePlanType
+    quantity: number
+  }
 }
 
 export type ServicePlans = {

@@ -4,32 +4,37 @@ import { Context } from '../../context'
 
 const PlanTypeEnum = z.nativeEnum(ServicePlanType)
 
-export const GetEntitlementsOutputSchema = z.array(
+export const GetEntitlementsOutputSchema = z.record(
+  PlanTypeEnum,
   z.object({
-    planType: PlanTypeEnum,
     entitlements: z.number(),
+    pendingEntitlements: z.number(),
   })
 )
-export type GetEntitlementsOutput = z.infer<typeof GetEntitlementsOutputSchema>
+type GetEntitlementsOutput = z.infer<typeof GetEntitlementsOutputSchema>
 
 export const getEntitlements = async ({
   ctx,
 }: {
   ctx: Context
 }): Promise<GetEntitlementsOutput> => {
-  const result: GetEntitlementsOutput = []
+  const result: GetEntitlementsOutput = {}
 
-  const servicePlans = await ctx.account?.class.getServicePlans()
-  if (!servicePlans) {
-    return []
-  }
+  const servicePlans = (await ctx.account?.class.getServicePlans()) ?? {}
+  const servicePlanOrders =
+    (await ctx.account?.class.getServicePlanOrders()) ?? {}
 
-  if (servicePlans.plans) {
-    for (const [key, value] of Object.entries(servicePlans.plans)) {
-      result.push({
-        planType: PlanTypeEnum.parse(key),
-        entitlements: value.entitlements,
-      })
+  for (const key of Object.keys(ServicePlanType)) {
+    const enumKey = PlanTypeEnum.parse(key)
+    const entitlements = servicePlans.plans?.[enumKey]?.entitlements || 0
+    const pendingEntitlements = Object.keys(servicePlanOrders)
+      .map((key) => servicePlanOrders[key])
+      .filter((o) => o.type === enumKey)
+      .reduce((acc, o) => acc + o.quantity, 0)
+
+    result[enumKey] = {
+      entitlements,
+      pendingEntitlements,
     }
   }
 

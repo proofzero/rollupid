@@ -1,6 +1,11 @@
 import { DOProxy } from 'do-proxy'
 import type { Profile, AddressList } from '../types'
-import { ServicePlanType, ServicePlans } from '@proofzero/types/account'
+import {
+  PendingServicePlans,
+  ServicePlanType,
+  ServicePlans,
+} from '@proofzero/types/account'
+import { RollupError } from '@proofzero/errors'
 
 export default class Account extends DOProxy {
   declare state: DurableObjectState
@@ -22,6 +27,54 @@ export default class Account extends DOProxy {
   async getAddresses(): Promise<AddressList | null> {
     const stored = await this.state.storage.get<AddressList>('addresses')
     return stored || null
+  }
+
+  async getServicePlanOrders(): Promise<PendingServicePlans | undefined> {
+    return this.state.storage.get<PendingServicePlans>('pendingServicePlans')
+  }
+
+  async registerServicePlanOrder(
+    type: ServicePlanType,
+    quantity: number,
+    nonce: string
+  ): Promise<void> {
+    let psp = await this.state.storage.get<PendingServicePlans>(
+      'pendingServicePlans'
+    )
+
+    if (!psp) {
+      psp = {}
+    }
+    psp[nonce] = {
+      type,
+      quantity,
+    }
+
+    await this.state.storage.put('pendingServicePlans', psp)
+  }
+
+  async fullfillServicePlanOrder(nonce: string): Promise<void> {
+    const psp = await this.state.storage.get<PendingServicePlans>(
+      'pendingServicePlans'
+    )
+    if (!psp) {
+      throw new RollupError({
+        message: 'No pending service plans found',
+      })
+    }
+
+    const order = psp[nonce]
+    if (!order) {
+      throw new RollupError({
+        message: 'No order found for nonce',
+      })
+    }
+
+    await this.updateEntitlements(order.type, order.quantity)
+
+    delete psp[nonce]
+
+    await this.state.storage.put('pendingServicePlans', psp)
   }
 
   async getServicePlans(): Promise<ServicePlans | undefined> {
