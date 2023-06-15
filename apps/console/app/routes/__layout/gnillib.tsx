@@ -18,97 +18,84 @@ import type { LoaderData as OutletContextData } from '~/root'
 import { Menu } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
 import { HiOutlineMinusCircle } from 'react-icons/hi'
-import { IconType } from 'react-icons'
 import { TbHourglassHigh } from 'react-icons/tb'
 import classnames from 'classnames'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { useState } from 'react'
 import { ServicePlanType } from '@proofzero/types/account'
 
-const PlanCard = ({
-  title,
-  subtitle,
-  action,
-  main,
-  footer,
-}: {
-  title: string
-  subtitle?: string
-  action?: React.ReactNode
-  main?: React.ReactNode
-  footer?: React.ReactNode
-}) => {
-  return (
-    <article className="bg-white rounded border">
-      <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
-        <div>
-          <Text size="lg" weight="semibold" className="text-gray-900">
-            {title}
-          </Text>
-          {subtitle && (
-            <Text size="sm" weight="medium" className="text-[#6B7280]">
-              {subtitle}
-            </Text>
-          )}
-        </div>
-
-        {action}
-      </header>
-      <div className="w-full border-b border-gray-200"></div>
-      <main>{main}</main>
-      {footer && (
-        <footer className="bg-gray-50 rounded-b py-4 px-6">{footer}</footer>
-      )}
-    </article>
-  )
+const plans = {
+  [ServicePlanType.PRO]: {
+    name: 'Pro Plan',
+    description:
+      'Everything in free & custom domain configuration, advanced support, whitelabeling and much more.',
+    price: 29,
+  },
 }
 
-const PlanFeaturesListItems = ({
-  features,
-}: {
-  features: {
-    title: string
-    Icon: IconType
-    colorClass?: string
-  }[]
-}) => (
-  <>
-    {features.map((feature) => (
-      <li
-        key={feature.title}
-        className={`flex flex-row items-center gap-3 text-[#6B7280]`}
-      >
+const ProPlanFeatures = () => {
+  return (
+    <ul className="grid grid-cols-1 grid-rows-6 lg:grid-cols-2 lg:grid-rows-4 grid-flow-col gap-4">
+      <li className={`flex flex-row items-center gap-3 text-[#6B7280]`}>
         <div className="w-3.5 h-3.5 flex justify-center items-center">
-          <feature.Icon className={`${feature.colorClass ?? ''}`} />
+          <FaCheck className={`text-green-500`} />
         </div>
 
         <Text size="sm" weight="medium">
-          {feature.title}
+          Custom Branding
         </Text>
       </li>
-    ))}
-  </>
-)
 
-const PlanFeatures = ({
-  features,
-}: {
-  features: {
-    title: string
-    Icon: IconType
-    colorClass?: string
-  }[]
-}) => {
-  return (
-    <>
-      <ul className="hidden lg:grid grid-rows-4 grid-flow-col gap-4">
-        <PlanFeaturesListItems features={features} />
-      </ul>
+      <li className={`flex flex-row items-center gap-3 text-[#6B7280]`}>
+        <div className="w-3.5 h-3.5 flex justify-center items-center">
+          <FaCheck className={`text-green-500`} />
+        </div>
 
-      <ul className="grid lg:hidden grid-cols-1 grid-flow-row gap-4">
-        <PlanFeaturesListItems features={features} />
-      </ul>
-    </>
+        <Text size="sm" weight="medium">
+          Custom Domain
+        </Text>
+      </li>
+
+      <li className={`flex flex-row items-center gap-3 text-[#6B7280]`}>
+        <div className="w-3.5 h-3.5 flex justify-center items-center">
+          <FaCheck className={`text-green-500`} />
+        </div>
+
+        <Text size="sm" weight="medium">
+          Custom OAuth Credentials
+        </Text>
+      </li>
+
+      <li className={`flex flex-row items-center gap-3 text-[#6B7280]`}>
+        <div className="w-3.5 h-3.5 flex justify-center items-center">
+          <TbHourglassHigh />
+        </div>
+
+        <Text size="sm" weight="medium">
+          Object Storage
+        </Text>
+      </li>
+
+      <li className={`flex flex-row items-center gap-3 text-[#6B7280]`}>
+        <div className="w-3.5 h-3.5 flex justify-center items-center">
+          <TbHourglassHigh />
+        </div>
+
+        <Text size="sm" weight="medium">
+          4337 App Wallet
+        </Text>
+      </li>
+
+      <li className={`flex flex-row items-center gap-3 text-[#6B7280]`}>
+        <div className="w-3.5 h-3.5 flex justify-center items-center">
+          <TbHourglassHigh />
+        </div>
+
+        <Text size="sm" weight="medium">
+          Groups
+        </Text>
+      </li>
+    </ul>
   )
 }
 
@@ -156,172 +143,6 @@ const EntitlementsCard = ({
         </div>
       </main>
     </article>
-  )
-}
-
-const PurchaseEntitlementsModal = ({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean
-  onClose: (val: boolean) => void
-}) => {
-  const [entitlementDelta, setEntitlementDelta] = useState(1)
-
-  const submit = useSubmit()
-
-  return (
-    <Modal isOpen={isOpen} fixed handleClose={() => onClose(false)}>
-      <Text
-        size="lg"
-        weight="semibold"
-        className="text-left text-gray-800 mx-5"
-      >
-        Purchase Entitlement(s)
-      </Text>
-
-      <section className="m-5 border rounded-lg">
-        <div className="p-6">
-          <Text size="lg" weight="semibold" className="text-gray-900 text-left">
-            Pro Plan
-          </Text>
-
-          <Text
-            size="sm"
-            weight="medium"
-            className="text-[#6B7280] text-left mb-6"
-          >
-            Everything in free & custom domain configuration, advanced support,
-            whitelabeling and much more.
-          </Text>
-
-          <PlanFeatures
-            features={[
-              {
-                title: 'Custom Branding',
-                Icon: FaCheck,
-                colorClass: 'text-green-500',
-              },
-              {
-                title: 'Custom Domain',
-                Icon: FaCheck,
-                colorClass: 'text-green-500',
-              },
-              {
-                title: 'Custom OAuth Credentials',
-                Icon: FaCheck,
-                colorClass: 'text-green-500',
-              },
-              {
-                title: 'Object Storage',
-                Icon: TbHourglassHigh,
-              },
-              {
-                title: '4337 App Wallet',
-                Icon: TbHourglassHigh,
-              },
-              {
-                title: 'Groups',
-                Icon: TbHourglassHigh,
-              },
-            ]}
-          />
-        </div>
-
-        <div className="border-b border-gray-200"></div>
-
-        <div className="p-6 flex justify-between items-center">
-          <div>
-            <Text size="sm" weight="medium" className="text-gray-800 text-left">
-              Number of Entitlements
-            </Text>
-            <Text
-              size="sm"
-              weight="medium"
-              className="text-[#6B7280] text-left"
-            >
-              {entitlementDelta} x $29/month
-            </Text>
-          </div>
-
-          <div className="flex flex-row">
-            <button
-              type="button"
-              className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-l-lg px-4"
-              onClick={() => {
-                if (entitlementDelta > 1) {
-                  setEntitlementDelta((prev) => prev - 1)
-                }
-              }}
-            >
-              <HiMinus />
-            </button>
-
-            <input
-              type="text"
-              className="border border-x-0 text-center w-[4rem] border-gray-300 focus:ring-0 focus:outline-0 focus:border-gray-300"
-              readOnly
-              value={entitlementDelta}
-            />
-
-            <button
-              type="button"
-              className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-r-lg px-4"
-              onClick={() => {
-                setEntitlementDelta((prev) => prev + 1)
-              }}
-            >
-              <HiPlus />
-            </button>
-          </div>
-        </div>
-
-        <div className="border-b border-gray-200"></div>
-
-        <div className="p-6 flex justify-between items-center">
-          <Text size="sm" weight="medium" className="text-gray-800 text-left">
-            Changes to your subscription
-          </Text>
-
-          <div className="flex flex-row gap-2 items-center">
-            <Text size="lg" weight="semibold" className="text-gray-900">{`+$${
-              29 * entitlementDelta
-            }`}</Text>
-            <Text size="sm" weight="medium" className="text-gray-500">
-              per month
-            </Text>
-          </div>
-        </div>
-      </section>
-
-      <div className="flex-1"></div>
-
-      <section className="flex flex-row-reverse gap-4 m-5">
-        <Button
-          btnType="primary-alt"
-          onClick={() => {
-            onClose(true)
-            submit(
-              {
-                action: 'purchase',
-                payload: JSON.stringify({
-                  entitlementsDelta: entitlementDelta,
-                }),
-              },
-              {
-                action: '/gnillib',
-                method: 'post',
-              }
-            )
-          }}
-        >
-          Save
-        </Button>
-        <Button btnType="secondary-alt" onClick={() => onClose(true)}>
-          Cancel
-        </Button>
-      </section>
-    </Modal>
   )
 }
 
@@ -427,16 +248,150 @@ export default () => {
   const { entitlements } = useLoaderData()
   const { apps } = useOutletContext<OutletContextData>()
 
-  const [purchaseModalOpen, setPurchaseModalOpen] = useState(false)
+  const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
+  const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
+
+  const submit = useSubmit()
 
   return (
     <>
-      <PurchaseEntitlementsModal
-        isOpen={purchaseModalOpen}
-        onClose={() => {
-          setPurchaseModalOpen(false)
-        }}
-      />
+      <Modal
+        isOpen={purchaseProModalOpen}
+        fixed
+        handleClose={() => setPurchaseProModalOpen(false)}
+      >
+        <Text
+          size="lg"
+          weight="semibold"
+          className="text-left text-gray-800 mx-5"
+        >
+          Purchase Entitlement(s)
+        </Text>
+
+        <section className="m-5 border rounded-lg">
+          <div className="p-6">
+            <Text
+              size="lg"
+              weight="semibold"
+              className="text-gray-900 text-left"
+            >
+              {plans.PRO.name}
+            </Text>
+
+            <Text
+              size="sm"
+              weight="medium"
+              className="text-[#6B7280] text-left mb-6"
+            >
+              {plans.PRO.description}
+            </Text>
+
+            <ProPlanFeatures />
+          </div>
+
+          <div className="border-b border-gray-200"></div>
+
+          <div className="p-6 flex justify-between items-center">
+            <div>
+              <Text
+                size="sm"
+                weight="medium"
+                className="text-gray-800 text-left"
+              >
+                Number of Entitlements
+              </Text>
+              <Text
+                size="sm"
+                weight="medium"
+                className="text-[#6B7280] text-left"
+              >
+                {proEntitlementDelta} x ${plans.PRO.price}/month
+              </Text>
+            </div>
+
+            <div className="flex flex-row">
+              <button
+                type="button"
+                className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-l-lg px-4"
+                onClick={() => {
+                  if (proEntitlementDelta > 1) {
+                    setProEntitlementDelta((prev) => prev - 1)
+                  }
+                }}
+              >
+                <HiMinus />
+              </button>
+
+              <input
+                type="text"
+                className="border border-x-0 text-center w-[4rem] border-gray-300 focus:ring-0 focus:outline-0 focus:border-gray-300"
+                readOnly
+                value={proEntitlementDelta}
+              />
+
+              <button
+                type="button"
+                className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-r-lg px-4"
+                onClick={() => {
+                  setProEntitlementDelta((prev) => prev + 1)
+                }}
+              >
+                <HiPlus />
+              </button>
+            </div>
+          </div>
+
+          <div className="border-b border-gray-200"></div>
+
+          <div className="p-6 flex justify-between items-center">
+            <Text size="sm" weight="medium" className="text-gray-800 text-left">
+              Changes to your subscription
+            </Text>
+
+            <div className="flex flex-row gap-2 items-center">
+              <Text size="lg" weight="semibold" className="text-gray-900">{`+$${
+                plans.PRO.price * proEntitlementDelta
+              }`}</Text>
+              <Text size="sm" weight="medium" className="text-gray-500">
+                per month
+              </Text>
+            </div>
+          </div>
+        </section>
+
+        <div className="flex-1"></div>
+
+        <section className="flex flex-row-reverse gap-4 m-5">
+          <Button
+            btnType="primary-alt"
+            onClick={() => {
+              setPurchaseProModalOpen(false)
+              setProEntitlementDelta(1)
+
+              submit(
+                {
+                  action: 'purchase',
+                  payload: JSON.stringify({
+                    entitlementsDelta: proEntitlementDelta,
+                  }),
+                },
+                {
+                  action: '/gnillib',
+                  method: 'post',
+                }
+              )
+            }}
+          >
+            Save
+          </Button>
+          <Button
+            btnType="secondary-alt"
+            onClick={() => setPurchaseProModalOpen(false)}
+          >
+            Cancel
+          </Button>
+        </section>
+      </Modal>
 
       <section className="flex flex-col lg:flex-row items-center justify-between mb-11">
         <div className="flex flex-row items-center space-x-3">
@@ -464,10 +419,17 @@ export default () => {
       </section>
 
       <section className="flex flex-col gap-4">
-        <PlanCard
-          title="Pro Plan"
-          subtitle="Everything in free, custom domain configuration & more."
-          action={
+        <article className="bg-white rounded border">
+          <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
+            <div>
+              <Text size="lg" weight="semibold" className="text-gray-900">
+                {plans.PRO.name}
+              </Text>
+              <Text size="sm" weight="medium" className="text-[#6B7280]">
+                {plans.PRO.description}
+              </Text>
+            </div>
+
             <Menu>
               {({ open }) => (
                 <>
@@ -492,7 +454,7 @@ export default () => {
                         type="button"
                         className="flex flex-row items-center gap-3 py-3 px-4 cursor-pointer hover:bg-gray-50 rounded-t-lg"
                         onClick={() => {
-                          setPurchaseModalOpen(true)
+                          setPurchaseProModalOpen(true)
                         }}
                       >
                         <FaShoppingCart className="text-gray-500" />
@@ -529,87 +491,52 @@ export default () => {
                 </>
               )}
             </Menu>
-          }
-          main={
-            <>
-              <div className="flex flex-row gap-7 p-4">
-                <PlanFeatures
-                  features={[
-                    {
-                      title: 'Custom Branding',
-                      Icon: FaCheck,
-                      colorClass: 'text-green-500',
-                    },
-                    {
-                      title: 'Custom Domain',
-                      Icon: FaCheck,
-                      colorClass: 'text-green-500',
-                    },
-                    {
-                      title: 'Custom OAuth Credentials',
-                      Icon: FaCheck,
-                      colorClass: 'text-green-500',
-                    },
-                    {
-                      title: 'Object Storage',
-                      Icon: TbHourglassHigh,
-                    },
-                    {
-                      title: '4337 App Wallet',
-                      Icon: TbHourglassHigh,
-                    },
-                    {
-                      title: 'Groups',
-                      Icon: TbHourglassHigh,
-                    },
-                  ]}
-                />
-              </div>
+          </header>
+          <div className="w-full border-b border-gray-200"></div>
+          <main>
+            <div className="flex flex-row gap-7 p-4">
+              <ProPlanFeatures />
+            </div>
 
-              <div className="border-b border-gray-200"></div>
+            <div className="border-b border-gray-200"></div>
 
-              {entitlements.pro.assigned.length > 0 && (
-                <div className="p-4">
-                  <Text size="sm" weight="medium" className="text-gray-900">
-                    Entitlements
-                  </Text>
+            {entitlements.pro.assigned.length > 0 && (
+              <div className="p-4">
+                <Text size="sm" weight="medium" className="text-gray-900">
+                  Entitlements
+                </Text>
 
-                  <div className="flex flex-row items-center gap-6">
-                    <div className="flex-1 bg-gray-200 rounded-full h-2.5 my-2">
-                      <div
-                        className="bg-blue-600 h-2.5 rounded-full"
-                        style={{
-                          width: `${
-                            (entitlements.pro.assigned.length /
-                              entitlements.pro.allotance) *
-                            100
-                          }%`,
-                        }}
-                      ></div>
-                    </div>
-
-                    <div className="flex flex-row items-center gap-2">
-                      <Text
-                        size="lg"
-                        weight="semibold"
-                        className="text-gray-900"
-                      >
-                        ${entitlements.pro.assigned.length * 29}
-                      </Text>
-                      <Text size="sm" className="text-gray-500">
-                        per month
-                      </Text>
-                    </div>
+                <div className="flex flex-row items-center gap-6">
+                  <div className="flex-1 bg-gray-200 rounded-full h-2.5 my-2">
+                    <div
+                      className="bg-blue-600 h-2.5 rounded-full"
+                      style={{
+                        width: `${
+                          (entitlements.pro.assigned.length /
+                            entitlements.pro.allotance) *
+                          100
+                        }%`,
+                      }}
+                    ></div>
                   </div>
-                  <Text size="sm" weight="medium" className="text-[#6B7280]">
-                    {`${entitlements.pro.assigned.length} out of ${entitlements.pro.allotance} Entitlements used`}
-                  </Text>
+
+                  <div className="flex flex-row items-center gap-2">
+                    <Text size="lg" weight="semibold" className="text-gray-900">
+                      ${entitlements.pro.assigned.length * plans.PRO.price}
+                    </Text>
+                    <Text size="sm" className="text-gray-500">
+                      per month
+                    </Text>
+                  </div>
                 </div>
-              )}
-            </>
-          }
-          footer={
-            entitlements.pro.allotance === 0 ||
+                <Text size="sm" weight="medium" className="text-[#6B7280]">
+                  {`${entitlements.pro.assigned.length} out of ${entitlements.pro.allotance} Entitlements used`}
+                </Text>
+              </div>
+            )}
+          </main>
+          <footer className="bg-gray-50 rounded-b py-4 px-6">
+            {entitlements.pro.allotance === 0 ||
             entitlements.pro.assigned.length < entitlements.pro.allotance ? (
               <>
                 {entitlements.pro.allotance === 0 && (
@@ -630,15 +557,15 @@ export default () => {
                   </div>
                 )}
               </>
-            ) : undefined
-          }
-        />
+            ) : undefined}
+          </footer>
+        </article>
 
         <EntitlementsCard
           entitlements={apps.map((a) => ({
             title: a.name!,
             subtitle: entitlements.pro.assigned.includes(a.clientId)
-              ? 'Pro Plan $29/month'
+              ? `${plans.PRO.name} ${plans.PRO.price}/month`
               : 'Free',
           }))}
         />
