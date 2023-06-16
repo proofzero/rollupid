@@ -60,7 +60,7 @@ export default class Account extends DOProxy {
   // This alarm is temporary, should be removed
   // after we add the stripe flow
   async alarm() {
-    let psps = await this.state.storage.get<PendingServicePlans>(
+    const psps = await this.state.storage.get<PendingServicePlans>(
       'pendingServicePlans'
     )
 
