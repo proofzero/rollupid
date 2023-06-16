@@ -126,13 +126,9 @@ export const {
   destroySession: destroyFlashSession,
 } = createCookieSessionStorage({
   cookie: {
-    domain: COOKIE_DOMAIN,
-    httpOnly: true,
-    path: '/',
     name: '_flashes',
     secrets: [SECRET_SESSION_SALT],
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
     maxAge: 10,
   },
 })
