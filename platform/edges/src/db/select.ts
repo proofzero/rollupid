@@ -126,13 +126,57 @@ export async function rc(g: GraphDB, nodeId: AnyURN): Promise<RComponents> {
   } else return {}
 }
 
-// node()
-// -----------------------------------------------------------------------------
+export async function nodeBatch(
+  g: GraphDB,
+  filters: NodeFilter[]
+): Promise<(Node | undefined)[]> {
+  const prepStatements = filters.map((f) => getPrepStatementForNodeFilter(g, f))
+  const batchResults = await g.db.batch(prepStatements)
+  const results = batchResults.map((r) => getNodeFromResultSet(r))
+  return results
+}
 
 export async function node(
   g: GraphDB,
   filter: NodeFilter
 ): Promise<Node | undefined> {
+  const prepStatement = getPrepStatementForNodeFilter(g, filter)
+  const resultSet = await prepStatement.all()
+  const node = getNodeFromResultSet(resultSet)
+  return node
+}
+
+function getNodeFromResultSet(resultSet: D1Result): Node | undefined {
+  type resultRec = {
+    urn: AnyURN
+    compType: compType
+    k: string
+    v: string
+  }
+
+  let node: Node | undefined = undefined
+  for (const result of (resultSet.results as resultRec[]) || []) {
+    if (!node) node = { baseUrn: result.urn, qc: {}, rc: {} }
+    if (node.baseUrn !== result.urn)
+      throw new Error('More than one node found for given criteria.')
+
+    if (result.compType === compType.SRCQ) {
+      const compRec = { [result.k]: result.v }
+      Object.assign(node.qc, compRec)
+    }
+    if (result.compType === compType.SRCR) {
+      const compRec = { [result.k]: result.v }
+      Object.assign(node.rc, compRec)
+    }
+  }
+
+  return node
+}
+
+function getPrepStatementForNodeFilter(
+  g: GraphDB,
+  filter: NodeFilter
+): D1PreparedStatement {
   const sqlBase = `
    with normalizer as (
      select n.*, 'SRCQ' as compType, qc.key as k, qc.value as v
@@ -199,37 +243,8 @@ export async function node(
 
   const finalSqlStatement = sqlBase + conditionsStatement + sqlSuffix
 
-  const resultSet = await g.db
-    .prepare(finalSqlStatement)
-    .bind(...prepBindParams)
-    .all()
-
-  type resultRec = {
-    urn: AnyURN
-    compType: compType
-    k: string
-    v: string
-  }
-
-  let node: Node | undefined = undefined
-  for (const result of (resultSet.results as resultRec[]) || []) {
-    if (!node) node = { baseUrn: result.urn, qc: {}, rc: {} }
-    if (node.baseUrn !== result.urn)
-      throw new Error('More than one node found for given criteria.')
-
-    if (result.compType === compType.SRCQ) {
-      const compRec = { [result.k]: result.v }
-      Object.assign(node.qc, compRec)
-    }
-    if (result.compType === compType.SRCR) {
-      const compRec = { [result.k]: result.v }
-      Object.assign(node.rc, compRec)
-    }
-  }
-
-  //Keep this debug until we're satisfied with the results
-  console.debug('RETURNED NODE', JSON.stringify(node))
-  return node
+  const statement = g.db.prepare(finalSqlStatement).bind(...prepBindParams)
+  return statement
 }
 
 // edges()

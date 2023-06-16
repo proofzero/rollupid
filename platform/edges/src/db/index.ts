@@ -50,9 +50,6 @@ export function init(db: D1Database): Graph {
   }
 }
 
-// node()
-// -----------------------------------------------------------------------------
-
 /**
  * Lookup a single node in the database and return it as an object.
  */
@@ -61,6 +58,16 @@ export async function node(
   filter: NodeFilter
 ): Promise<Node | undefined> {
   return select.node(g, filter)
+}
+
+/**
+ * Lookup a multiple node in the database and return them as objects.
+ */
+export async function nodeBatch(
+  g: Graph,
+  filters: NodeFilter[]
+): Promise<(Node | undefined)[]> {
+  return select.nodeBatch(g, filters)
 }
 
 // edges()

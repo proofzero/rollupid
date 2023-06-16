@@ -6,6 +6,9 @@ import { errorFormatter } from '@proofzero/utils/trpc'
 import { Context } from '../context'
 
 import {
+  findNodeBatchMethod,
+  FindNodeBatchMethodInput,
+  FindNodeBatchMethodOutput,
   findNodeMethod,
   FindNodeMethodInput,
   FindNodeMethodOutput,
@@ -49,6 +52,12 @@ export const appRouter = t.router({
     .input(FindNodeMethodInput)
     .output(FindNodeMethodOutput)
     .query(findNodeMethod),
+  findNodeBatch: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(FindNodeBatchMethodInput)
+    .output(FindNodeBatchMethodOutput)
+    .query(findNodeBatchMethod),
   deleteNode: t.procedure
     .use(LogUsage)
     .use(Analytics)
