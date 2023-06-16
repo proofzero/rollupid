@@ -444,21 +444,22 @@ async function connectedAccountsClaimsRetriever(
       generateTraceContextHeaders(traceSpan)
     )
 
-    const edgePromises = authorizedAddresses.map((address) => {
-      return edgesClient.findNode.query({ baseUrn: address })
-    })
-    const edgeResults = await Promise.all(edgePromises)
+    const nodeQueries = authorizedAddresses.map((address) => ({
+      baseUrn: address,
+    }))
+    const nodeResults = await edgesClient.findNodeBatch.query(nodeQueries)
 
-    //Make typescript gods happy
-    type connectedAddressType = { type: string; identifier: string }
-
-    for (const addressNode of edgeResults) {
+    nodeResults.forEach((addressNode, i) => {
+      if (!addressNode)
+        throw new InternalServerError({
+          message: `Did not find result for node ${authorizedAddresses[i]}`,
+        })
       result.connected_accounts.claims.connected_accounts.push({
         type: addressNode.rc.addr_type,
         identifier: addressNode.qc.alias,
       })
       result.connected_accounts.meta.urns.push(addressNode.baseUrn)
-    }
+    })
   }
   return result
 }

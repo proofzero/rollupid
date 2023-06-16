@@ -31,7 +31,7 @@ export default class ContractAddress {
     )) as CryptoAddressProfile
     profile.icon = profile.icon || gradient
 
-    if (profile.title?.startsWith('0x') && nickname) {
+    if (nickname) {
       profile.title = nickname
     }
 
@@ -42,13 +42,8 @@ export default class ContractAddress {
 }
 
 const getCryptoAddressProfile = async (address: string) => {
-  const ensClient = new ENSUtils()
-  const { avatar, displayName } = await ensClient.getEnsEntry(address)
-
   return {
     address: address,
-    title: displayName,
-    icon: avatar,
     type: CryptoAddressType.Wallet,
   }
 }
