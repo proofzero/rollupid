@@ -9,7 +9,12 @@ import { requireJWT } from '~/utilities/session.server'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import createAccountClient from '@proofzero/platform-clients/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import { useLoaderData, useOutletContext, useSubmit } from '@remix-run/react'
+import {
+  useLoaderData,
+  useOutletContext,
+  useRevalidator,
+  useSubmit,
+} from '@remix-run/react'
 import type { LoaderData as OutletContextData } from '~/root'
 import { Menu } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
@@ -17,7 +22,7 @@ import { HiOutlineMinusCircle } from 'react-icons/hi'
 import { TbHourglassHigh } from 'react-icons/tb'
 import classnames from 'classnames'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ServicePlanType } from '@proofzero/types/account'
 
 const plans = {
@@ -211,6 +216,15 @@ export default () => {
   const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
 
   const submit = useSubmit()
+
+  const revalidator = useRevalidator()
+  useEffect(() => {
+    if (entitlements?.[ServicePlanType.PRO].pendingAllotance > 0) {
+      setTimeout(() => {
+        revalidator.revalidate()
+      }, 1000)
+    }
+  }, [entitlements])
 
   return (
     <>
