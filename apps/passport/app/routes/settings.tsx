@@ -78,13 +78,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       nodeType: a.rc.node_type,
     })) as { urn: AddressURN; nodeType: NodeType }[]
 
-    const addresses = addressTypeUrns.map(atu => atu.urn)
+    const addresses = addressTypeUrns.map((atu) => atu.urn)
     const addressClient = getAddressClient(
       NO_OP_ADDRESS_PLACEHOLDER,
       context.env,
       context.traceSpan
     )
-
 
     const apps = await accountClient.getAuthorizedApps.query({
       account: accountUrn,
@@ -93,43 +92,39 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const awaitedResults = await Promise.all([
       Promise.all(
         apps.map(async (a) => {
-          try {
-            const [appPublicProps, appAuthorizedScopes] = await Promise.all([
-              starbaseClient.getAppPublicProps.query({
-                clientId: a.clientId,
-              }),
-              accessClient.getAuthorizedAppScopes.query({
-                clientId: a.clientId,
-                accountURN: accountUrn,
-              }),
-            ])
+          const appAuthorizedScopes =
+            await accessClient.getAuthorizedAppScopes.query({
+              clientId: a.clientId,
+              accountURN: accountUrn,
+            })
 
-            return {
-              clientId: a.clientId,
-              icon: appPublicProps.iconURL,
-              title: appPublicProps.name,
-              timestamp: a.timestamp,
-              appScopeError: Object.entries(appAuthorizedScopes.claimValues).some(
-                ([_, value]) => !value.meta.valid
-              ),
-            }
-          } catch (e) {
-            //We swallow the error and move on to next app
-            console.error(e)
-            return {
-              clientId: a.clientId,
-              icon: noImg,
-              timestamp: a.timestamp,
-              appDataError: true,
-            }
+          return {
+            clientId: a.clientId,
+            timestamp: a.timestamp,
+            appScopeError: Object.entries(
+              appAuthorizedScopes.claimValues
+            ).some(([_, value]) => !value.meta.valid),
           }
         })
       ),
-      addressClient.getAddressProfileBatch.query(addresses)
+      starbaseClient.getAppPublicPropsBatch.query({
+        apps: apps.map((a) => ({ clientId: a.clientId })),
+        silenceErrors: true,
+      }),
+      addressClient.getAddressProfileBatch.query(addresses),
     ])
 
-    const authorizedApps = awaitedResults[0]
-    const addressProfiles = awaitedResults[1]
+    const [authorizedApps, appsPublicProps, addressProfiles] = awaitedResults
+
+    const authzAppResults: AuthorizedAppsModel[] = []
+    authorizedApps.forEach((authzApp, index) => {
+      //Merging props from authorizedApps and appsPublicProps
+      const appPublicProps = appsPublicProps[index]
+      if (appPublicProps)
+        authzAppResults.push({ ...authzApp, icon: appPublicProps.iconURL, title: appPublicProps.name })
+      else
+        authzAppResults.push({ ...authzApp, icon: noImg, appDataError: true })
+    })
 
     const normalizedConnectedProfiles = addressProfiles.map((p, i) => ({
       ...addressTypeUrns[i],
@@ -139,7 +134,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     return json({
       pfpUrl: accountProfile?.pfp?.image,
       displayName: accountProfile?.displayName,
-      authorizedApps: authorizedApps,
+      authorizedApps: authzAppResults,
       connectedProfiles: normalizedConnectedProfiles,
       CONSOLE_URL: context.env.CONSOLE_APP_URL,
       primaryAddressURN: accountProfile?.primaryAddressURN,

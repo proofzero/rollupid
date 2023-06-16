@@ -514,7 +514,8 @@ export async function getClaimValues(
         personaData,
         traceSpan
       )
-      result = { ...result, ...claimData }
+      // result = { ...result, ...claimData }
+      result = { ...result, ...createInvalidClaimDataObject(scopeValue) }
     } catch (e) {
       //In cases of errors in retriever, we don't retrun any claims and we mark the object
       //as invalid. It's the responsibility of caller to handle that upstream.

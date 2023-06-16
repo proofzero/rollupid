@@ -10,10 +10,12 @@ import type { CustomDomain } from '../../types'
 
 export const GetAppPublicPropsInput = AppClientIdParamSchema
 export const GetAppPublicPropsOutput = AppPublicPropsSchema
-export const GetAppPublicPropsBatchInput = z.array(GetAppPublicPropsInput)
-export const GetAppPublicPropsBatchOutput = z.map(
-  z.string(),
-  AppPublicPropsSchema
+export const GetAppPublicPropsBatchInput = z.object({
+  apps: z.array(GetAppPublicPropsInput),
+  silenceErrors: z.boolean().default(false),
+})
+export const GetAppPublicPropsBatchOutput = z.array(
+  AppPublicPropsSchema.optional()
 )
 
 export type GetAppPublicPropsResult = z.infer<typeof GetAppPublicPropsOutput>
@@ -35,9 +37,17 @@ export const getAppPublicPropsBatch = async ({
   input: z.infer<typeof GetAppPublicPropsBatchInput>
   ctx: Context
 }): Promise<z.infer<typeof GetAppPublicPropsBatchOutput>> => {
-  const resultMap: Map<string, AppPublicProps> = new Map()
-  for (const { clientId } of input) {
-    resultMap.set(clientId, await getPublicPropsForApp(clientId, ctx))
+  const { apps, silenceErrors } = input
+  const resultMap: (AppPublicProps | undefined)[] = []
+  for (const { clientId } of apps) {
+    let appResult
+    try {
+      appResult = await getPublicPropsForApp(clientId, ctx)
+    } catch (e) {
+      if (silenceErrors) appResult = undefined
+      else throw e
+    }
+    resultMap.push(appResult)
   }
   return resultMap
 }
