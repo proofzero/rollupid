@@ -163,6 +163,20 @@ const EntitlementsCard = ({
   )
 }
 
+type LoaderData = {
+  entitlements: {
+    [ServicePlanType.PRO]: {
+      alloted: number
+      pending: number
+      allotedClientIds: string[]
+    }
+    FREE: {
+      appClientIds: string[]
+    }
+  }
+  billingToast?: string
+}
+
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
     const jwt = await requireJWT(request)
@@ -173,15 +187,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
     const apps = await starbaseClient.listApps.query()
-    const reshapedApps = apps.map((a) => {
-      return {
-        clientId: a.clientId,
-        name: a.app?.name,
-        icon: a.app?.icon,
-        published: a.published,
-        createdTimestamp: a.createdTimestamp,
-      }
-    })
+    const appClientIds = apps.map((a) => a.clientId)
 
     const accountClient = createAccountClient(Account, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
@@ -190,31 +196,35 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const entitlements = await accountClient.getEntitlements.query()
 
-    const proAllotance = entitlements?.[ServicePlanType.PRO]?.entitlements ?? 0
-    const proPendingAllotance =
+    const proAllotedEntitlements =
+      entitlements?.[ServicePlanType.PRO]?.entitlements ?? 0
+    const proPendingEntitlements =
       entitlements?.[ServicePlanType.PRO]?.pendingEntitlements ?? 0
 
-    const proUsage = Math.min(2, proAllotance)
-    const proApps = reshapedApps.slice(0, proUsage)
+    // Capping this to 2 for demo purposes
+    const proUsage = Math.min(2, proAllotedEntitlements)
+    // Setting first two apps to pro for demo purposes
+    const proAppClientIds = appClientIds.slice(0, proUsage)
 
-    let freeApps: any[] = []
-    if (reshapedApps.length > proUsage) {
-      freeApps = reshapedApps.slice(proUsage)
+    // Rest become free apps for demo purposes...
+    let freeAppClientIds: any[] = []
+    if (appClientIds.length > proUsage) {
+      freeAppClientIds = appClientIds.slice(proUsage)
     }
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
     const billingToast = flashSession.get('billing_toast')
 
-    return json(
+    return json<LoaderData>(
       {
         entitlements: {
           [ServicePlanType.PRO]: {
-            allotance: proAllotance,
-            pendingAllotance: proPendingAllotance,
-            assigned: proApps.map((pa) => pa.clientId),
+            alloted: proAllotedEntitlements,
+            pending: proPendingEntitlements,
+            allotedClientIds: proAppClientIds,
           },
           FREE: {
-            assigned: freeApps.map((fa) => fa.clientId),
+            appClientIds: freeAppClientIds,
           },
         },
         billingToast,
@@ -229,13 +239,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { entitlements, billingToast } = useLoaderData()
+  const { entitlements, billingToast } = useLoaderData<LoaderData>()
+
   const { apps } = useOutletContext<OutletContextData>()
 
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
 
-  const [prevProPendingEntitlements, setPrevProPendingEntitlements] =
-    useState(undefined)
+  const [prevProPendingEntitlements, setPrevProPendingEntitlements] = useState<
+    number | undefined
+  >(undefined)
   const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
 
   const submit = useSubmit()
@@ -243,12 +255,10 @@ export default () => {
   const revalidator = useRevalidator()
   useEffect(() => {
     if (!prevProPendingEntitlements) {
-      setPrevProPendingEntitlements(
-        entitlements?.[ServicePlanType.PRO]?.pendingAllotance
-      )
+      setPrevProPendingEntitlements(entitlements[ServicePlanType.PRO].pending)
     } else if (
       prevProPendingEntitlements !== 0 &&
-      entitlements?.[ServicePlanType.PRO]?.pendingAllotance === 0
+      entitlements[ServicePlanType.PRO].pending === 0
     ) {
       toast(ToastType.Success, {
         message: 'Successfully purchased entitlements',
@@ -256,7 +266,7 @@ export default () => {
       setPrevProPendingEntitlements(undefined)
     }
 
-    if (entitlements?.[ServicePlanType.PRO].pendingAllotance > 0) {
+    if (entitlements[ServicePlanType.PRO].pending > 0) {
       setTimeout(() => {
         revalidator.revalidate()
       }, 1000)
@@ -497,14 +507,12 @@ export default () => {
                     <div className="border-b border-gray-200 w-3/4 mx-auto"></div>
 
                     <Menu.Item
-                      disabled={
-                        entitlements[ServicePlanType.PRO].allotance === 0
-                      }
+                      disabled={entitlements[ServicePlanType.PRO].alloted === 0}
                     >
                       <div
                         className={classnames(
                           'flex flex-row items-center gap-3 py-3 px-4 rounded-b-lg',
-                          entitlements[ServicePlanType.PRO].allotance !== 0
+                          entitlements[ServicePlanType.PRO].alloted !== 0
                             ? 'cursor-pointer hover:bg-gray-50 text-red-600'
                             : 'cursor-default text-red-300'
                         )}
@@ -529,7 +537,7 @@ export default () => {
 
             <div className="border-b border-gray-200"></div>
 
-            {entitlements[ServicePlanType.PRO].assigned.length > 0 && (
+            {entitlements[ServicePlanType.PRO].allotedClientIds.length > 0 && (
               <div className="p-4">
                 <Text size="sm" weight="medium" className="text-gray-900">
                   Entitlements
@@ -541,8 +549,9 @@ export default () => {
                       className="bg-blue-600 h-2.5 rounded-full"
                       style={{
                         width: `${
-                          (entitlements[ServicePlanType.PRO].assigned.length /
-                            entitlements[ServicePlanType.PRO].allotance) *
+                          (entitlements[ServicePlanType.PRO].allotedClientIds
+                            .length /
+                            entitlements[ServicePlanType.PRO].alloted) *
                           100
                         }%`,
                       }}
@@ -552,8 +561,8 @@ export default () => {
                   <div className="flex flex-row items-center gap-2">
                     <Text size="lg" weight="semibold" className="text-gray-900">
                       $
-                      {entitlements[ServicePlanType.PRO].assigned.length *
-                        plans.PRO.price}
+                      {entitlements[ServicePlanType.PRO].allotedClientIds
+                        .length * plans.PRO.price}
                     </Text>
                     <Text size="sm" className="text-gray-500">
                       per month
@@ -562,14 +571,12 @@ export default () => {
                 </div>
                 <Text size="sm" weight="medium" className="text-[#6B7280]">
                   {`${
-                    entitlements[ServicePlanType.PRO].assigned.length
+                    entitlements[ServicePlanType.PRO].allotedClientIds.length
                   } out of ${
-                    entitlements[ServicePlanType.PRO].allotance
+                    entitlements[ServicePlanType.PRO].alloted
                   } Entitlements used ${
-                    entitlements[ServicePlanType.PRO].pendingAllotance !== 0
-                      ? `(${
-                          entitlements[ServicePlanType.PRO].pendingAllotance
-                        } pending)`
+                    entitlements[ServicePlanType.PRO].pending !== 0
+                      ? `(${entitlements[ServicePlanType.PRO].pending} pending)`
                       : ''
                   }`}
                 </Text>
@@ -577,7 +584,7 @@ export default () => {
             )}
           </main>
           <footer className="bg-gray-50 rounded-b py-4 px-6">
-            {entitlements[ServicePlanType.PRO].allotance === 0 && (
+            {entitlements[ServicePlanType.PRO].alloted === 0 && (
               <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
                 <FaShoppingCart className="w-3.5 h-3.5" />
                 <Text size="sm" weight="medium">
@@ -585,8 +592,8 @@ export default () => {
                 </Text>
               </div>
             )}
-            {entitlements[ServicePlanType.PRO].allotance >
-              entitlements[ServicePlanType.PRO].assigned.length && (
+            {entitlements[ServicePlanType.PRO].alloted >
+              entitlements[ServicePlanType.PRO].allotedClientIds.length && (
               <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
                 <FaTrash className="w-3.5 h-3.5" />
                 <Text size="sm" weight="medium">
@@ -600,9 +607,9 @@ export default () => {
         <EntitlementsCard
           entitlements={apps.map((a) => ({
             title: a.name!,
-            subtitle: entitlements[ServicePlanType.PRO].assigned.includes(
-              a.clientId
-            )
+            subtitle: entitlements[
+              ServicePlanType.PRO
+            ].allotedClientIds.includes(a.clientId)
               ? `Pro Plan ${plans.PRO.price}/month`
               : 'Free',
           }))}
