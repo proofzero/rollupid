@@ -780,6 +780,7 @@ const AuthPanel = ({
                     ]}
                     selectEmailCallback={() => {}}
                     addNewEmailCallback={() => {}}
+                    selectedConnectedAccounts={[]}
                     connectedAccounts={[
                       {
                         title: 'email@example.com',
@@ -814,6 +815,7 @@ const AuthPanel = ({
                           'urn:rollupid:address/0x4416ad52d0d65d4b8852b8041039822e92ff4aa301af1b3ab987bd930f6fb4c8',
                       },
                     ]}
+                    selectedSCWallets={[]}
                     connectedSmartContractWallets={[]}
                     addNewAccountCallback={() => {}}
                     addNewSmartWalletCallback={() => {}}
