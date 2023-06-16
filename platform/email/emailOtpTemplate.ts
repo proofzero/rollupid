@@ -96,7 +96,7 @@ export const EmailTemplate = (
           }
     
           .logo {
-            width: 170px;
+            max-width: 375px;
             margin-bottom: 37px;
           }
     
@@ -193,8 +193,9 @@ export const EmailTemplate = (
                 rel="noreferrer"
                 >Privacy Policy</a
               >
-              ${contactURL && contactURL !== ''
-        ? `
+              ${
+                contactURL && contactURL !== ''
+                  ? `
               <div class="vl"></div>
               <a
                 class="footer-links"
@@ -203,12 +204,13 @@ export const EmailTemplate = (
                 rel="noreferrer"
                 >Contact Us</a
               >`
-        : ''
-      }
+                  : ''
+              }
             </div>
     
-            ${address && address !== ''
-        ? `
+            ${
+              address && address !== ''
+                ? `
             <pre
               style="
                 font-size: 12px;
@@ -218,8 +220,8 @@ export const EmailTemplate = (
                 margin-top: 10px;
               "
             >${address}</pre>`
-        : ''
-      }
+                : ''
+            }
             <p
               style="
                 font-size: 12px;
