@@ -46,6 +46,7 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import type { AccountURN } from '@proofzero/urns/account'
 
 import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
+import { InternalServerError } from '@proofzero/errors'
 
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
@@ -81,7 +82,7 @@ export type LoaderData = {
   ENV: {
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
     REMIX_DEV_SERVER_WS_PORT?: number
-    WALLET_CONNECT_PROJECT_ID: string
+    WALLET_CONNECT_PROJECT_ID: string,
   }
 }
 
@@ -89,7 +90,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const jwt = await requireJWT(request)
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
-    const parsedJwt = parseJwt(jwt!)
+    const parsedJwt = parseJwt(jwt)
     const accountURN = parsedJwt.sub as AccountURN
 
     try {
@@ -124,6 +125,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         console.error('Could not retrieve profile image.', e)
       }
 
+      console.log({
+        INTERNAL_GOOGLE_ANALYTICS_TAG,
+        REMIX_DEV_SERVER_WS_PORT:
+          process.env.NODE_ENV === 'development'
+            ? +process.env.REMIX_DEV_SERVER_WS_PORT!
+            : undefined,
+        WALLET_CONNECT_PROJECT_ID,
+      })
+
       return json<LoaderData>({
         apps: reshapedApps,
         avatarUrl,
@@ -140,12 +150,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
     } catch (error) {
       console.error({ error })
-      return json(
-        { error },
-        {
-          status: 500,
-        }
-      )
+      return json({ error }, { status: 500 })
     }
   }
 )
