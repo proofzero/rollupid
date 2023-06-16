@@ -283,9 +283,7 @@ export async function getAuthzCookieParams(
     })
     .catch((err) => {
       console.log('No authorization cookie params found')
-      throw new InternalServerError({
-        message: 'No authorization cookie params found',
-      })
+      return null
     })
 }
 

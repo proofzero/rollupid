@@ -43,6 +43,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     let clientId: string = ''
     try {
       const res = await getAuthzCookieParams(request, context.env)
+      if (res === null) {
+        throw new Error()
+      }
       clientId = res.clientId
     } catch (ex) {
       throw redirect('/')
