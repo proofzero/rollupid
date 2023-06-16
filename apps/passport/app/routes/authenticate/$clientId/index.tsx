@@ -225,6 +225,7 @@ const InnerComponent = ({
                 message:
                   'Could not fetch nonce for signing authentication message',
               })
+              navigate('/')
             })
           setLoading(false)
         },

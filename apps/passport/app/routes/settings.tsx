@@ -101,9 +101,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           return {
             clientId: a.clientId,
             timestamp: a.timestamp,
-            appScopeError: Object.entries(
-              appAuthorizedScopes.claimValues
-            ).some(([_, value]) => !value.meta.valid),
+            appScopeError: Object.entries(appAuthorizedScopes.claimValues).some(
+              ([_, value]) => !value.meta.valid
+            ),
           }
         })
       ),
@@ -121,7 +121,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       //Merging props from authorizedApps and appsPublicProps
       const appPublicProps = appsPublicProps[index]
       if (appPublicProps)
-        authzAppResults.push({ ...authzApp, icon: appPublicProps.iconURL, title: appPublicProps.name })
+        authzAppResults.push({
+          ...authzApp,
+          icon: appPublicProps.iconURL,
+          title: appPublicProps.name,
+        })
       else
         authzAppResults.push({ ...authzApp, icon: noImg, appDataError: true })
     })
@@ -173,13 +177,14 @@ export default function SettingsLayout() {
             <div className={`flex flex-col w-full`}>
               <Header pfpUrl={pfpUrl} />
               <div
-                className={`${open
-                  ? 'max-lg:opacity-50\
+                className={`${
+                  open
+                    ? 'max-lg:opacity-50\
                     max-lg:overflow-hidden\
                     max-lg:h-[calc(100dvh-80px)]\
                     min-h-[416px]'
-                  : 'h-full'
-                  } px-2 sm:max-md:px-5 md:px-10
+                    : 'h-full'
+                } px-2 sm:max-md:px-5 md:px-10
                 pb-5 md:pb-10 pt-6 bg-white lg:bg-gray-50`}
               >
                 <Outlet
