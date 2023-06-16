@@ -53,7 +53,6 @@ export default class Account extends DOProxy {
     await this.state.storage.put('pendingServicePlans', psp)
   }
 
-
   async fullfillServicePlanOrder(nonce: string): Promise<void> {
     const psp = await this.state.storage.get<PendingServicePlans>(
       'pendingServicePlans'
