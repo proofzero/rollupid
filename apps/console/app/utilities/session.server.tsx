@@ -125,10 +125,14 @@ export const {
   commitSession: commitFlashSession,
   destroySession: destroyFlashSession,
 } = createCookieSessionStorage({
-  // a Cookie from `createCookie` or the same CookieOptions to create one
   cookie: {
-    name: '__flashes',
+    domain: COOKIE_DOMAIN,
+    httpOnly: true,
+    path: '/',
+    name: '_flashes',
     secrets: [SECRET_SESSION_SALT],
-    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 10,
   },
 })
