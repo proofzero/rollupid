@@ -40,7 +40,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     let signTemplate = AuthenticationScreenDefaults.defaultSignMessage
 
-    const { clientId } = await getAuthzCookieParams(request, context.env)
+    let clientId: string = ''
+    try {
+      const res = await getAuthzCookieParams(request, context.env)
+      clientId = res.clientId
+    } catch (ex) {
+      throw redirect('/')
+    }
     if (clientId !== 'console' && clientId !== 'passport') {
       const sbClient = getStarbaseClient('', context.env, context.traceSpan)
       const appProps = await sbClient.getAppPublicProps.query({
