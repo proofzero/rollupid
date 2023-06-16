@@ -15,9 +15,15 @@ import { beginCheckout } from '~/services/billing/stripe'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request }) => {
-    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    const params = new URL(request.url).searchParams
+    const status = params.get('status')
 
-    flashSession.flash('billing_toast', `Order successfully submitted`)
+    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    if (status === 'success') {
+      flashSession.flash('billing_toast', 'Order successfully submitted')
+    } else if (status === 'canceled') {
+      flashSession.flash('billing_toast', 'Order canceled')
+    }
 
     return redirect('/gnillib', {
       headers: {
