@@ -1,5 +1,6 @@
 import { InternalServerError } from '@proofzero/errors'
 import { ServicePlanType } from '@proofzero/types/account'
+import { AccountURN } from '@proofzero/urns/account'
 import { redirect } from '@remix-run/cloudflare'
 import Stripe from 'stripe'
 
@@ -9,13 +10,13 @@ type CheckoutParams = {
   quantity: number
   nonce: string
   customerID?: string
+  accountURN: AccountURN
 }
 
 export const beginCheckout = async (
   params: CheckoutParams
 ): Promise<Response> => {
-  const apiKey = STRIPE_API_SECRET
-  const stripeClient = new Stripe(apiKey, {
+  const stripeClient = new Stripe(STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
   })
 
@@ -32,11 +33,7 @@ export const beginCheckout = async (
     cancel_url: `http://localhost:10002/gnillib/checkout?status=canceled`,
     metadata: {
       nonce: params.nonce,
-    },
-    subscription_data: {
-      metadata: {
-        nonce: params.nonce,
-      },
+      accountURN: params.accountURN,
     },
   })
 

@@ -51,24 +51,8 @@ export default class Account extends DOProxy {
     }
 
     await this.state.storage.put('pendingServicePlans', psp)
-
-    // This alarm is temporary, should be removed
-    // after we add the stripe flow
-    this.state.storage.setAlarm(Date.now() + 4000)
   }
 
-  // This alarm is temporary, should be removed
-  // after we add the stripe flow
-  async alarm() {
-    const psps = await this.state.storage.get<PendingServicePlans>(
-      'pendingServicePlans'
-    )
-
-    // PSP key is nonce
-    for (const pspKey in psps) {
-      await this.fullfillServicePlanOrder(pspKey)
-    }
-  }
 
   async fullfillServicePlanOrder(nonce: string): Promise<void> {
     const psp = await this.state.storage.get<PendingServicePlans>(

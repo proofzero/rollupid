@@ -1,12 +1,22 @@
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { ActionFunction } from '@remix-run/cloudflare'
 
 import Stripe from 'stripe'
+import createAccountClient from '@proofzero/platform-clients/account'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import { AccountURN } from '@proofzero/urns/account'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    const apiKey = STRIPE_API_SECRET
-    const stripeClient = new Stripe(apiKey, {
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+
+    const accountClient = createAccountClient(Account, {
+      ...getAuthzHeaderConditionallyFromToken(undefined),
+      ...traceHeader,
+    })
+
+    const stripeClient = new Stripe(STRIPE_API_SECRET, {
       apiVersion: '2022-11-15',
     })
 
@@ -23,17 +33,16 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
-      const { nonce } = (
+      const { nonce, accountURN } = (
         event.data.object as {
           metadata: Record<string, string>
         }
       ).metadata as {
         nonce: string
+        accountURN: AccountURN
       }
 
-      console.log({
-        nonce,
-      })
+      await accountClient.fullfillServicePlanOrder.mutate({ nonce, accountURN })
     }
 
     return null

@@ -47,6 +47,10 @@ import {
   RegisterServicePlanOrderInputSchema,
   registerServicePlanOrder,
 } from './methods/registerServicePlanOrder'
+import {
+  FulfillServicePlanOrderInputSchema,
+  fulfillServicePlanOrder,
+} from './methods/fulfillServicePlanOrder'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -148,6 +152,14 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(RegisterServicePlanOrderInputSchema)
     .mutation(registerServicePlanOrder),
+  fullfillServicePlanOrder: t.procedure
+    // .use(AuthorizationTokenFromHeader)
+    // .use(ValidateJWT)
+    // .use(injectAccountNode)
+    // .use(LogUsage)
+    // .use(Analytics)
+    .input(FulfillServicePlanOrderInputSchema)
+    .mutation(fulfillServicePlanOrder),
   getEntitlements: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
