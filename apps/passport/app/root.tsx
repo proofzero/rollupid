@@ -82,21 +82,24 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     let appProps: GetAppPublicPropsResult
-    if (params.clientId !== 'console' && params.clientId !== 'passport') {
-      const sbClient = getStarbaseClient('', context.env, context.traceSpan)
-      appProps = await sbClient.getAppPublicProps.query({
-        clientId: params.clientId as string,
-      })
-    } else {
-      appProps = {
-        name: `Rollup - ${
-          params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
-        }`,
-        iconURL: LogoIndigo,
-        termsURL: 'https://rollup.id/tos',
-        privacyURL: 'https://rollup.id/privacy-policy',
-        redirectURI: `https://${params.clientId}.rollup.id`,
-        websiteURL: 'https://rollup.id',
+
+    if (params?.clientId) {
+      if (params.clientId !== 'console' && params.clientId !== 'passport') {
+        const sbClient = getStarbaseClient('', context.env, context.traceSpan)
+        appProps = await sbClient.getAppPublicProps.query({
+          clientId: params.clientId as string,
+        })
+      } else {
+        appProps = {
+          name: `Rollup - ${
+            params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
+          }`,
+          iconURL: LogoIndigo,
+          termsURL: 'https://rollup.id/tos',
+          privacyURL: 'https://rollup.id/privacy-policy',
+          redirectURI: `https://${params.clientId}.rollup.id`,
+          websiteURL: 'https://rollup.id',
+        }
       }
     }
 
@@ -202,7 +205,7 @@ export default function App() {
       <head>
         <Meta />
 
-        {browserEnv.appProps.iconURL ? (
+        {browserEnv.appProps?.iconURL ? (
           <>
             <link rel="icon" type="image" href={browserEnv.appProps.iconURL} />
             <link
