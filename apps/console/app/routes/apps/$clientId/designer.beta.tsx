@@ -597,17 +597,11 @@ const AuthPanel = ({
 
           <FormElement
             label="Login Screen Side Image"
-            sublabel="2:3 ratio (at least 720x1080px), images can't be larger than 2mB"
+            sublabel="2:3 ratio is recommended (at least 720x1080px). Max image size is 2mB"
           >
             <div className="flex flex-row items-center gap-2">
               <IconPicker
                 maxSize={2097152}
-                aspectRatio={{
-                  width: 2,
-                  height: 3,
-                }}
-                minWidth={720}
-                minHeight={1080}
                 id="image"
                 setIsFormChanged={(val) => {}}
                 setIsImgUploading={(val) => {
@@ -962,10 +956,6 @@ const EmailPanel = ({
             <div className="flex flex-row items-center gap-2">
               <IconPicker
                 maxSize={2097152}
-                aspectRatio={{
-                  width: 1,
-                  height: 1,
-                }}
                 id="logoURL"
                 setIsFormChanged={(val) => {}}
                 setIsImgUploading={(val) => {
