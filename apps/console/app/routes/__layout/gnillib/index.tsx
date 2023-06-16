@@ -537,7 +537,8 @@ export default () => {
 
             <div className="border-b border-gray-200"></div>
 
-            {entitlements[ServicePlanType.PRO].allotedClientIds.length > 0 && (
+            {(entitlements[ServicePlanType.PRO].allotedClientIds.length > 0 ||
+              entitlements[ServicePlanType.PRO].pending > 0) && (
               <div className="p-4">
                 <Text size="sm" weight="medium" className="text-gray-900">
                   Entitlements
@@ -583,23 +584,24 @@ export default () => {
               </div>
             )}
           </main>
-          <footer className="bg-gray-50 rounded-b py-4 px-6">
-            {entitlements[ServicePlanType.PRO].alloted === 0 && (
-              <div
-                className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer"
-                onClick={() => {
-                  setPurchaseProModalOpen(true)
-                }}
-              >
-                <FaShoppingCart className="w-3.5 h-3.5" />
-                <Text size="sm" weight="medium">
-                  Purchase Entitlement(s)
-                </Text>
-              </div>
-            )}
+          <footer>
+            {entitlements[ServicePlanType.PRO].alloted === 0 &&
+              entitlements[ServicePlanType.PRO].pending === 0 && (
+                <div
+                  className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer bg-gray-50 rounded-b py-4 px-6"
+                  onClick={() => {
+                    setPurchaseProModalOpen(true)
+                  }}
+                >
+                  <FaShoppingCart className="w-3.5 h-3.5" />
+                  <Text size="sm" weight="medium">
+                    Purchase Entitlement(s)
+                  </Text>
+                </div>
+              )}
             {entitlements[ServicePlanType.PRO].alloted >
               entitlements[ServicePlanType.PRO].allotedClientIds.length && (
-              <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer">
+              <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer bg-gray-50 rounded-b py-4 px-6">
                 <FaTrash className="w-3.5 h-3.5" />
                 <Text size="sm" weight="medium">
                   Remove Unused Entitlements
