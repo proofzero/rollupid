@@ -22,7 +22,7 @@
     "lint:check:src": "eslint *.ts",
     "test": "tap --ts test/",
     "types:check": "tsc --project tsconfig.json --noEmit",
-    "wrangler:local": "wrangler dev --local --persist"
+    "wrangler:local": "wrangler dev "
   },
   "tap": {
     "check-coverage": false
@@ -41,7 +41,7 @@
     "prettier": "2.7.1",
     "tap": "16.3.2",
     "typescript": "5.0.4",
-    "wrangler": "2.14.0",
+    "wrangler": "3.1.0",
     "yarn-run-all": "3.1.1"
   },
   "dependencies": {
