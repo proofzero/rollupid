@@ -13,7 +13,7 @@
     "dev:css": "npx tailwindcss -o ./app/styles/tailwind.css --watch",
     "dev:sass": "sass --watch app/:app/",
     "dev:remix": "remix watch",
-    "dev:wrangler": "wrangler dev --local --persist",
+    "dev:wrangler": "wrangler dev ",
     "dev": "echo \"No dev for profile. Please use start.\"",
     "start": "env-cmd --file .dev.env run-p 'dev:*'",
     "e2e": "cross-env NODE_ENV=test npx playwright test",
@@ -112,7 +112,7 @@
     "tailwindcss": "3.2.4",
     "typescript": "5.0.4",
     "webpack": "5.75.0",
-    "wrangler": "2.14.0"
+    "wrangler": "3.1.0"
   },
   "engines": {
     "node": ">=16.13"
