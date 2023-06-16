@@ -42,6 +42,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         accountURN: AccountURN
       }
 
+      await new Promise((ok) => setTimeout(ok, 5000))
+
       await accountClient.fullfillServicePlanOrder.mutate({ nonce, accountURN })
     }
 
