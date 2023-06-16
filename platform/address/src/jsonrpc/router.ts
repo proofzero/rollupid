@@ -19,6 +19,9 @@ import {
   GetAddressAvatarOutput,
 } from './methods/getAddressAvatar'
 import {
+  GetAddressProfileBatchInput,
+  getAddressProfileBatchMethod,
+  GetAddressProfileBatchOutput,
   getAddressProfileMethod,
   GetAddressProfileOutput,
 } from './methods/getAddressProfile'
@@ -151,6 +154,17 @@ export const appRouter = t.router({
     .use(Analytics)
     .output(GetAddressProfileOutput)
     .query(getAddressProfileMethod),
+  getAddressProfileBatch: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(checkOAuthNode)
+    .use(setAddressNodeClient)
+    .use(initAddressNode)
+    .use(Analytics)
+    .input(GetAddressProfileBatchInput)
+    .output(GetAddressProfileBatchOutput)
+    .query(getAddressProfileBatchMethod),
   setNickname: t.procedure
     .use(LogUsage)
     .use(parse3RN)

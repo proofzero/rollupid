@@ -19,6 +19,8 @@ import { redirect } from '@remix-run/cloudflare'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import type { AddressURN } from '@proofzero/urns/address'
+import { Address } from 'viem'
+import { NO_OP_ADDRESS_PLACEHOLDER } from '@proofzero/platform.address/src/constants'
 
 export type DataForScopes = {
   connectedEmails: DropdownSelectListItem[]
@@ -75,35 +77,47 @@ export const getDataForScopes = async (
       connectedEmails = getEmailDropdownItems(connectedAccounts)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!)) {
-      const addresses = await Promise.all(
-        connectedAccounts
-          .filter((ca) => {
-            return (
-              (ca.rc.node_type === NodeType.OAuth ||
-                ca.rc.node_type === NodeType.Email ||
-                ca.rc.node_type === NodeType.Crypto) &&
-              ca.rc.addr_type !== CryptoAddressType.Wallet
-            )
-          })
-          .map((ca) => {
-            const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
-            return addressClient.getAddressProfile.query()
-          })
+      const addresses = connectedAccounts
+        .filter((ca) => {
+          return (
+            (ca.rc.node_type === NodeType.OAuth ||
+              ca.rc.node_type === NodeType.Email ||
+              ca.rc.node_type === NodeType.Crypto) &&
+            ca.rc.addr_type !== CryptoAddressType.Wallet
+          )
+        })
+        .map((ca) => {
+          return ca.baseUrn as AddressURN
+        })
+
+      const addressClient = getAddressClient(
+        NO_OP_ADDRESS_PLACEHOLDER,
+        env,
+        traceSpan
       )
-      connectedAddresses = getAddressDropdownItems(addresses)
+
+      const addressProfiles = await addressClient.getAddressProfileBatch.query(
+        addresses
+      )
+      connectedAddresses = getAddressDropdownItems(addressProfiles)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!)) {
-      const addresses = await Promise.all(
-        connectedAccounts
-          .filter((ca) => {
-            return ca.rc.addr_type === CryptoAddressType.Wallet
-          })
-          .map((ca) => {
-            const addressClient = getAddressClient(ca.baseUrn, env, traceSpan)
-            return addressClient.getAddressProfile.query()
-          })
+      const addresses = connectedAccounts
+        .filter((ca) => {
+          return ca.rc.addr_type === CryptoAddressType.Wallet
+        })
+        .map((ca) => {
+          return ca.baseUrn as AddressURN
+        })
+      const addressClient = getAddressClient(
+        NO_OP_ADDRESS_PLACEHOLDER,
+        env,
+        traceSpan
       )
-      connectedSmartContractWallets = getAddressDropdownItems(addresses)
+      const addressProfiles = await addressClient.getAddressProfileBatch.query(
+        addresses
+      )
+      connectedSmartContractWallets = getAddressDropdownItems(addressProfiles)
     }
   }
 

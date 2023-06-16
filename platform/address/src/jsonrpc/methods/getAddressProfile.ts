@@ -22,14 +22,20 @@ import {
   MicrosoftAddress,
   TwitterAddress,
   ContractAddress,
+  initAddressNodeByName,
 } from '../../nodes'
 
 import { AddressProfileSchema } from '../validators/profile'
 import OAuthAddress from '../../nodes/oauth'
+import Address from '../../nodes/address'
+import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
 
 export const GetAddressProfileOutput = AddressProfileSchema.extend({
   id: AddressURNInput,
 })
+
+export const GetAddressProfileBatchInput = z.array(AddressURNInput)
+export const GetAddressProfileBatchOutput = z.array(GetAddressProfileOutput)
 
 type GetAddressProfileParams = {
   ctx: Context
@@ -48,9 +54,34 @@ export const getAddressProfileMethod: GetAddressProfileMethod = async ({
   if (!nodeClient)
     throw new InternalServerError({ message: 'missing nodeClient' })
 
+  return await getProfile(ctx, nodeClient, ctx.addressURN!)
+}
+
+export const getAddressProfileBatchMethod = async ({
+  input,
+  ctx,
+}: {
+  input: z.infer<typeof GetAddressProfileBatchInput>
+  ctx: Context
+}) => {
+  //In case of batch lookups, we don't care about the address in the context,
+  //and setup address DOs ourselves for each addressURN in the input array
+  const resultPromises = []
+  for (const addressURN of input) {
+    const baseURN = AddressURNSpace.getBaseURN(addressURN)
+    const nodeClient = initAddressNodeByName(baseURN, ctx.Address)
+    resultPromises.push(getProfile(ctx, nodeClient, addressURN))
+  }
+  return await Promise.all(resultPromises)
+}
+
+async function getProfile(
+  ctx: Context,
+  nodeClient: ReturnType<typeof initAddressNodeByName>,
+  addressURN: AddressURN
+) {
   const address = await nodeClient?.class.getAddress()
   const type = await nodeClient?.class.getType()
-
   if (!address || !type) {
     throw new InternalServerError({ message: 'missing address or type' })
   }
@@ -97,7 +128,7 @@ export const getAddressProfileMethod: GetAddressProfileMethod = async ({
   const profile = await node.getProfile()
 
   return {
-    id: ctx.addressURN,
+    id: addressURN,
     ...profile,
   }
 }

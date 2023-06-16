@@ -25,17 +25,22 @@ import {
 } from '@proofzero/errors'
 import { Button, Text } from '@proofzero/design-system'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { generateEmailOTP } from '~/utils/emailOTP'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const qp = new URL(request.url).searchParams
 
     const email = qp.get('email')
+    const state = qp.get('state')
     if (!email)
       throw new BadRequestError({ message: 'No address included in request' })
+    if (!state)
+      throw new BadRequestError({ message: 'No state included in request' })
 
     return json({
       email,
+      initialState: state,
       clientId: params.clientId,
     })
   }
@@ -81,40 +86,33 @@ export default () => {
     prompt?: string
   }>()
 
-  const { email, clientId } = useLoaderData()
+  const { email, initialState } = useLoaderData()
   const ad = useActionData()
   const submit = useSubmit()
   const navigate = useNavigate()
   const transition = useTransition()
-  const location = useLocation()
   const fetcher = useFetcher()
 
   const [errorMessage, setErrorMessage] = useState('')
-  const [state, setState] = useState('')
-  const [lastRegen, setLastRegen] = useState(Date.now())
+  const [state, setState] = useState(initialState)
 
-  useEffect(() => {
-    ; (async () => {
-      try {
-        const resObj = await fetch('/connect/email/otp' + location.search)
-        const res = await resObj.json<{
-          message: string
-          state: string
-        }>()
-
-        if (resObj.status === HTTP_STATUS_CODES[ERROR_CODES.BAD_REQUEST]) {
-          setErrorMessage(res.message)
-        } else if (errorMessage.length) {
-          // In the case error was hit in last call
-          // here we want to reset the error message
-          setErrorMessage('')
-        }
-        setState(res.state)
-      } catch (e: any) {
-        setErrorMessage(e.message ? e.message : e.toString())
+  const generateAndValidateEmailOTP = async () => {
+    try {
+      const result = await generateEmailOTP(email)
+      if (result?.status === HTTP_STATUS_CODES[ERROR_CODES.BAD_REQUEST]) {
+        setErrorMessage(result.message)
+      } else if (errorMessage.length) {
+        // In the case error was hit in last call
+        // here we want to reset the error message
+        setErrorMessage('')
       }
-    })()
-  }, [errorMessage.length, lastRegen, location.search])
+      if (result?.state) {
+        setState(result.state)
+      }
+    } catch (e: any) {
+      setErrorMessage(e.message ? e.message : e.toString())
+    }
+  }
 
   return (
     <div
@@ -135,7 +133,7 @@ export default () => {
         state={state}
         invalid={ad?.error}
         requestRegeneration={async () => {
-          setLastRegen(Date.now())
+          await generateAndValidateEmailOTP()
         }}
         requestVerification={async (email, code, state) => {
           submit(

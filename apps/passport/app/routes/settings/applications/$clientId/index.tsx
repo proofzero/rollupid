@@ -66,6 +66,7 @@ export default () => {
     const aggregator = []
 
     for (const scopeValue of scopeValues.scopes) {
+      if (!scopeValues.claimValues[scopeValue].meta.valid) continue
       if (scopeValue === 'email') {
         const profile = connectedProfiles.find(
           //There should be only one address urn provided for email
@@ -112,7 +113,7 @@ export default () => {
             title: profile.title,
             type: 'blockchain',
           })),
-        }) 
+        })
       } else if (scopeMeta[scopeValue].hidden) {
         aggregator.push({
           claim: 'system_identifiers',
