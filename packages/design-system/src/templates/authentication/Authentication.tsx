@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, lazy } from 'react'
+import React, { useContext, lazy } from 'react'
 
 import circleLogo from './circle-logo.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
