@@ -37,12 +37,7 @@ import icon32 from './images/favicon-32x32.png'
 import icon16 from './images/favicon-16x16.png'
 
 import * as gtag from '~/utils/gtags.client'
-import {
-  commitFlashSession,
-  getFlashSession,
-  parseJwt,
-  requireJWT,
-} from './utilities/session.server'
+import { parseJwt, requireJWT } from './utilities/session.server'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import createAccountClient from '@proofzero/platform-clients/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -54,11 +49,6 @@ import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-
 
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import {
-  ToastType,
-  Toaster,
-  toast,
-} from '@proofzero/design-system/src/atoms/toast'
 
 export const links: LinksFunction = () => {
   return [
@@ -93,10 +83,6 @@ export type LoaderData = {
     REMIX_DEV_SERVER_WS_PORT?: number
     WALLET_CONNECT_PROJECT_ID: string
   }
-  flashToast: {
-    type: string
-    message: string
-  }
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -105,9 +91,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
     const parsedJwt = parseJwt(jwt!)
     const accountURN = parsedJwt.sub as AccountURN
-
-    const flashSession = await getFlashSession(request.headers.get('Cookie'))
-    const flashToast = flashSession.get('toast')
 
     try {
       const accountClient = createAccountClient(Account, {
@@ -141,37 +124,26 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         console.error('Could not retrieve profile image.', e)
       }
 
-      return json<LoaderData>(
-        {
-          apps: reshapedApps,
-          avatarUrl,
-          PASSPORT_URL,
-          ENV: {
-            INTERNAL_GOOGLE_ANALYTICS_TAG,
-            REMIX_DEV_SERVER_WS_PORT:
-              process.env.NODE_ENV === 'development'
-                ? +process.env.REMIX_DEV_SERVER_WS_PORT!
-                : undefined,
-            WALLET_CONNECT_PROJECT_ID,
-          },
-          displayName,
-          flashToast,
+      return json<LoaderData>({
+        apps: reshapedApps,
+        avatarUrl,
+        PASSPORT_URL,
+        ENV: {
+          INTERNAL_GOOGLE_ANALYTICS_TAG,
+          REMIX_DEV_SERVER_WS_PORT:
+            process.env.NODE_ENV === 'development'
+              ? +process.env.REMIX_DEV_SERVER_WS_PORT!
+              : undefined,
+          WALLET_CONNECT_PROJECT_ID,
         },
-        {
-          headers: {
-            'Set-Cookie': await commitFlashSession(flashSession),
-          },
-        }
-      )
+        displayName,
+      })
     } catch (error) {
       console.error({ error })
       return json(
-        { error, flashToast },
+        { error },
         {
           status: 500,
-          headers: {
-            'Set-Cookie': await commitFlashSession(flashSession),
-          },
         }
       )
     }
@@ -190,34 +162,13 @@ export default function App() {
   const remixDevPort = loaderData.ENV.REMIX_DEV_SERVER_WS_PORT
   useTreeshakeHack(remixDevPort)
 
-  const { apps, avatarUrl, PASSPORT_URL, displayName, flashToast } = loaderData
+  const { apps, avatarUrl, PASSPORT_URL, displayName } = loaderData
 
   useEffect(() => {
     if (GATag) {
       gtag.pageview(location.pathname, GATag)
     }
   }, [location, GATag])
-
-  useEffect(() => {
-    if (flashToast) {
-      switch (flashToast.type) {
-        case 'success':
-          toast(ToastType.Success, {
-            message: flashToast.message,
-          })
-          break
-        case 'error':
-          toast(ToastType.Error, {
-            message: flashToast.message,
-          })
-          break
-        default:
-          toast(ToastType.Info, {
-            message: flashToast.message,
-          })
-      }
-    }
-  }, [flashToast])
 
   return (
     <html lang="en" className="h-full">
@@ -251,7 +202,6 @@ export default function App() {
           </>
         )}
         {transition.state !== 'idle' ? <Loader /> : null}
-        <Toaster position="top-right" reverseOrder={false} />
         <Outlet context={{ apps, avatarUrl, PASSPORT_URL, displayName }} />
         <ScrollRestoration nonce={nonce} />
         <script

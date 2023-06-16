@@ -1,6 +1,6 @@
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction, redirect } from '@remix-run/cloudflare'
+import { ActionFunction, LoaderFunction, redirect } from '@remix-run/cloudflare'
 import {
   commitFlashSession,
   getFlashSession,
@@ -12,6 +12,20 @@ import { ServicePlanType } from '@proofzero/types/account'
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 import { beginCheckout } from '~/services/billing/stripe'
+
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request }) => {
+    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+
+    flashSession.flash('billing_toast', `Order successfully submitted`)
+
+    return redirect('/gnillib', {
+      headers: {
+        'Set-Cookie': await commitFlashSession(flashSession),
+      },
+    })
+  }
+)
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {

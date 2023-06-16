@@ -10,9 +10,10 @@ type CheckoutParams = {
 }
 
 export const beginCheckout = (params: CheckoutParams): Response => {
-  return redirect('/gnillib')
-}
+  // TODO: Create Stripe Session
+  // TODO: Append params to stripe session
+  // TODO: Redirect to Stripe Checkout
 
-const handleCallback = (): Response => {
-  return redirect('/gnillib')
+  // This simulated a succesful Stripe checkout
+  return redirect('/gnillib/checkout')
 }

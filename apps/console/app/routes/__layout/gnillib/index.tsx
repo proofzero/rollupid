@@ -2,10 +2,14 @@ import { Button } from '@proofzero/design-system'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { LoaderFunction } from '@remix-run/cloudflare'
+import { LoaderFunction, json } from '@remix-run/cloudflare'
 import { FaCheck, FaShoppingCart, FaTrash } from 'react-icons/fa'
 import { HiMinus, HiOutlineExternalLink, HiPlus } from 'react-icons/hi'
-import { requireJWT } from '~/utilities/session.server'
+import {
+  commitFlashSession,
+  getFlashSession,
+  requireJWT,
+} from '~/utilities/session.server'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import createAccountClient from '@proofzero/platform-clients/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -24,6 +28,11 @@ import classnames from 'classnames'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import { ServicePlanType } from '@proofzero/types/account'
+import {
+  ToastType,
+  Toaster,
+  toast,
+} from '@proofzero/design-system/src/atoms/toast'
 
 const plans = {
   [ServicePlanType.PRO]: {
@@ -193,32 +202,60 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       freeApps = reshapedApps.slice(proUsage)
     }
 
-    return {
-      entitlements: {
-        [ServicePlanType.PRO]: {
-          allotance: proAllotance,
-          pendingAllotance: proPendingAllotance,
-          assigned: proApps.map((pa) => pa.clientId),
+    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    const billingToast = flashSession.get('billing_toast')
+
+    return json(
+      {
+        entitlements: {
+          [ServicePlanType.PRO]: {
+            allotance: proAllotance,
+            pendingAllotance: proPendingAllotance,
+            assigned: proApps.map((pa) => pa.clientId),
+          },
+          FREE: {
+            assigned: freeApps.map((fa) => fa.clientId),
+          },
         },
-        FREE: {
-          assigned: freeApps.map((fa) => fa.clientId),
-        },
+        billingToast,
       },
-    }
+      {
+        headers: {
+          'Set-Cookie': await commitFlashSession(flashSession),
+        },
+      }
+    )
   }
 )
 
 export default () => {
-  const { entitlements } = useLoaderData()
+  const { entitlements, billingToast } = useLoaderData()
   const { apps } = useOutletContext<OutletContextData>()
 
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
+
+  const [prevProPendingEntitlements, setPrevProPendingEntitlements] =
+    useState(undefined)
   const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
 
   const submit = useSubmit()
 
   const revalidator = useRevalidator()
   useEffect(() => {
+    if (!prevProPendingEntitlements) {
+      setPrevProPendingEntitlements(
+        entitlements?.[ServicePlanType.PRO]?.pendingAllotance
+      )
+    } else if (
+      prevProPendingEntitlements !== 0 &&
+      entitlements?.[ServicePlanType.PRO]?.pendingAllotance === 0
+    ) {
+      toast(ToastType.Success, {
+        message: 'Successfully purchased entitlements',
+      })
+      setPrevProPendingEntitlements(undefined)
+    }
+
     if (entitlements?.[ServicePlanType.PRO].pendingAllotance > 0) {
       setTimeout(() => {
         revalidator.revalidate()
@@ -226,8 +263,20 @@ export default () => {
     }
   }, [entitlements])
 
+  useEffect(() => {
+    if (!billingToast) {
+      return
+    }
+
+    toast(ToastType.Info, {
+      message: billingToast,
+    })
+  }, [billingToast])
+
   return (
     <>
+      <Toaster position="top-right" reverseOrder={false} />
+
       <Modal
         isOpen={purchaseProModalOpen}
         fixed
@@ -516,9 +565,13 @@ export default () => {
                     entitlements[ServicePlanType.PRO].assigned.length
                   } out of ${
                     entitlements[ServicePlanType.PRO].allotance
-                  } Entitlements used (${
-                    entitlements[ServicePlanType.PRO].pendingAllotance
-                  } pending)`}
+                  } Entitlements used ${
+                    entitlements[ServicePlanType.PRO].pendingAllotance !== 0
+                      ? `(${
+                          entitlements[ServicePlanType.PRO].pendingAllotance
+                        } pending)`
+                      : ''
+                  }`}
                 </Text>
               </div>
             )}
