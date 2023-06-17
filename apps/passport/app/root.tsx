@@ -86,10 +86,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     if (context.appProps) {
       appProps = context.appProps
     } else {
+      const name = params.clientId
+        ? params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
+        : 'Passport'
       appProps = {
-        name: `Rollup - ${
-          params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
-        }`,
+        name: `Rollup - ${name}`,
         iconURL: LogoIndigo,
         termsURL: 'https://rollup.id/tos',
         privacyURL: 'https://rollup.id/privacy-policy',
