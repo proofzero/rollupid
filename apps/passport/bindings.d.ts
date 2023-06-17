@@ -1,4 +1,5 @@
-import { TraceSpan } from '@proofzero/platform-middleware/trace'
+import type { TraceSpan } from '@proofzero/platform-middleware/trace'
+import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 
 export const seviceBindings = true
 
@@ -58,6 +59,7 @@ declare global {
     login_hint?: string
     rollup_action?: string
     rollup_result?: string
+    app_props?: GetAppPublicPropsResult
   }
 
   //Same-ish structure, different type name for easier identification

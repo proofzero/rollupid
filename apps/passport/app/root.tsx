@@ -83,22 +83,26 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     let appProps: GetAppPublicPropsResult
 
-    if (params?.clientId) {
-      if (params.clientId !== 'console' && params.clientId !== 'passport') {
-        const sbClient = getStarbaseClient('', context.env, context.traceSpan)
-        appProps = await sbClient.getAppPublicProps.query({
-          clientId: params.clientId as string,
-        })
-      } else {
-        appProps = {
-          name: `Rollup - ${
-            params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
-          }`,
-          iconURL: LogoIndigo,
-          termsURL: 'https://rollup.id/tos',
-          privacyURL: 'https://rollup.id/privacy-policy',
-          redirectURI: `https://${params.clientId}.rollup.id`,
-          websiteURL: 'https://rollup.id',
+    if (context?.authzQueryParams?.app_props) {
+      appProps = context?.authzQueryParams?.app_props
+    } else {
+      if (params?.clientId) {
+        if (params.clientId !== 'console' && params.clientId !== 'passport') {
+          const sbClient = getStarbaseClient('', context.env, context.traceSpan)
+          appProps = await sbClient.getAppPublicProps.query({
+            clientId: params.clientId as string,
+          })
+        } else {
+          appProps = {
+            name: `Rollup - ${
+              params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
+            }`,
+            iconURL: LogoIndigo,
+            termsURL: 'https://rollup.id/tos',
+            privacyURL: 'https://rollup.id/privacy-policy',
+            redirectURI: `https://${params.clientId}.rollup.id`,
+            websiteURL: 'https://rollup.id',
+          }
         }
       }
     }

@@ -1,4 +1,5 @@
 import generateRandomString from '@proofzero/packages/utils/generateRandomString'
+import { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 
 type TraceId = string
 type TraceParentId = string
@@ -7,6 +8,7 @@ export const TRACEPARENT_HEADER_NAME = 'traceparent' as const
 type TRACEPARENT_HEADER_NAME = typeof TRACEPARENT_HEADER_NAME
 export type TraceableFetchEvent = {
   traceSpan: TraceSpan
+  readonly request: Request & { app_props?: GetAppPublicPropsResult }
 } & FetchEvent
 
 export class TraceSpan {
