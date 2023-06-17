@@ -11,15 +11,12 @@ import {
   generateTraceSpan,
 } from '@proofzero/platform-middleware/trace'
 import type { TraceableFetchEvent } from '@proofzero/platform-middleware/trace'
-import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 
 type CfHostMetadata = {
   clientId: string
 }
 
-export function parseParams(
-  request: Request & { app_props?: GetAppPublicPropsResult }
-) {
+export function parseParams(request: Request) {
   const url = new URL(request.url)
   const clientId = url.searchParams.get('client_id') || ''
   const state = url.searchParams.get('state') || ''
@@ -30,7 +27,6 @@ export function parseParams(
   const login_hint = url.searchParams.get('login_hint') || undefined
   const rollup_action = url.searchParams.get('rollup_action') || undefined
   const rollup_result = url.searchParams.get('rollup_result') || undefined
-  const app_props = request.app_props || undefined
 
   const decodedScope =
     scope &&
@@ -47,7 +43,6 @@ export function parseParams(
     login_hint,
     rollup_action,
     rollup_result,
-    app_props: app_props,
   }
 }
 
@@ -60,6 +55,7 @@ const requestHandler = createRequestHandler({
     const traceSpan = (event as TraceableFetchEvent).traceSpan
     return {
       authzQueryParams,
+      appProps: event.request.app_props,
       env,
       traceSpan,
     }
