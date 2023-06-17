@@ -59,7 +59,6 @@ declare global {
     login_hint?: string
     rollup_action?: string
     rollup_result?: string
-    app_props?: GetAppPublicPropsResult
   }
 
   //Same-ish structure, different type name for easier identification

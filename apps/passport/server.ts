@@ -11,9 +11,14 @@ import {
   generateTraceSpan,
 } from '@proofzero/platform-middleware/trace'
 import type { TraceableFetchEvent } from '@proofzero/platform-middleware/trace'
+import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 
 type CfHostMetadata = {
   clientId: string
+}
+
+type CustomDomainRequest = Request & {
+  app_props: GetAppPublicPropsResult
 }
 
 export function parseParams(request: Request) {
@@ -55,7 +60,7 @@ const requestHandler = createRequestHandler({
     const traceSpan = (event as TraceableFetchEvent).traceSpan
     return {
       authzQueryParams,
-      appProps: event.request.app_props,
+      appProps: (event.request as CustomDomainRequest).app_props,
       env,
       traceSpan,
     }
