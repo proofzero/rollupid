@@ -31,6 +31,7 @@ import icon32 from '~/assets/root-favicon-32x32.png'
 import icon16 from '~/assets/root-favicon-16x16.png'
 import faviconSvg from '~/assets/root-favicon.svg'
 import social from '~/assets/passport-social.png'
+import LogoIndigo from '~/assets/PassportLogoIndigo.svg'
 
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
@@ -55,6 +56,8 @@ import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
+import { getStarbaseClient } from './platform.server'
+import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -78,6 +81,23 @@ export const links: LinksFunction = () => [
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
+    let appProps
+
+    if (context.appProps) {
+      appProps = context.appProps
+    } else {
+      appProps = {
+        name: `Rollup - ${
+          params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
+        }`,
+        iconURL: LogoIndigo,
+        termsURL: 'https://rollup.id/tos',
+        privacyURL: 'https://rollup.id/privacy-policy',
+        redirectURI: `https://${params.clientId}.rollup.id`,
+        websiteURL: 'https://rollup.id',
+      }
+    }
+
     const flashes = []
     const flashSession = await getFlashSession(request, context.env)
     const flashMessageType = flashSession.get(
@@ -92,6 +112,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     return json(
       {
+        appProps,
         flashes,
         ENV: {
           PROFILE_APP_URL: context.env.PROFILE_APP_URL,
@@ -146,12 +167,31 @@ export default function App() {
     )
   }, [browserEnv.flashes])
 
+  const loaderColorHandler = (isDark: boolean): string | undefined => {
+    if (browserEnv?.appProps?.appTheme?.color) {
+      return isDark
+        ? browserEnv?.appProps?.appTheme?.color.dark
+        : browserEnv.appProps.appTheme.color.light
+    }
+  }
+
   const [dark, setDark] = useState<boolean>(false)
+  const [loaderColor, setLoaderColor] = useState<string | undefined>(
+    browserEnv?.appProps?.appTheme?.color?.light
+  )
+
   const [ueComplete, setUEComplete] = useState(false)
   useEffect(() => {
     const darkMode = window.matchMedia('(prefers-color-scheme: dark)')
     setDark(darkMode.matches)
+    setLoaderColor(loaderColorHandler(darkMode.matches))
 
+    window
+      .matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', (event) => {
+        setDark(event.matches)
+        setLoaderColor(loaderColorHandler(event.matches))
+      })
     setUEComplete(true)
   }, [])
 
@@ -159,9 +199,16 @@ export default function App() {
     <html lang="en">
       <head>
         <Meta />
-
-        {browserEnv.appProps ? (
-          <link rel="icon" type="image" href={browserEnv.appProps.iconURL} />
+        // TODO: switch to V2_MetaFunction
+        {browserEnv.appProps?.iconURL ? (
+          <>
+            <link rel="icon" type="image" href={browserEnv.appProps.iconURL} />
+            <link
+              rel="shortcut icon"
+              type="image"
+              href={browserEnv.appProps.iconURL}
+            />
+          </>
         ) : (
           <>
             <link rel="apple-touch-icon" href={appleIcon} sizes="180x180" />
@@ -170,7 +217,6 @@ export default function App() {
             <link rel="icon" type="image/png" href={icon16} sizes="16x16" />
           </>
         )}
-
         <Links />
       </head>
       <body>
@@ -198,13 +244,18 @@ export default function App() {
             />
           </>
         )}
-        {transition.state !== 'idle' && <Loader />}
+        {transition.state !== 'idle' && <Loader mainColor={loaderColor} />}
         <Toaster position="top-right" />
-        {ueComplete && <ThemeContext.Provider value={{
-          dark,
-          theme: undefined
-        }}> <Outlet />
-        </ThemeContext.Provider>}
+        {ueComplete && (
+          <ThemeContext.Provider
+            value={{
+              dark,
+              theme: undefined,
+            }}
+          >
+            <Outlet context={{ appProps: browserEnv.appProps }} />
+          </ThemeContext.Provider>
+        )}
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
         <script

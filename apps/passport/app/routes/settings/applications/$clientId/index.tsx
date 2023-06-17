@@ -43,7 +43,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     return {
       clientId,
       scopeValues,
-      scopeMeta
+      scopeMeta,
     }
   }
 )
@@ -66,11 +66,16 @@ export default () => {
     const aggregator = []
 
     for (const scopeValue of scopeValues.scopes) {
-      if (!scopeValues.claimValues[scopeValue].meta.valid) continue
+      if (
+        Object.keys(scopeValues.claimValues).includes(scopeValue) &&
+        !scopeValues.claimValues[scopeValue].meta.valid
+      )
+        continue
       if (scopeValue === 'email') {
         const profile = connectedProfiles.find(
           //There should be only one address urn provided for email
-          (profile) => profile.urn === scopeValues.claimValues[scopeValue].meta.urns[0]
+          (profile) =>
+            profile.urn === scopeValues.claimValues[scopeValue].meta.urns[0]
         )
         aggregator.push({
           claim: 'email',
@@ -92,16 +97,15 @@ export default () => {
             type: profile.type === 'eth' ? 'blockchain' : profile.type,
           })),
         })
-      } else if (scopeValue === "profile") {
+      } else if (scopeValue === 'profile') {
         aggregator.push({
           claim: 'profile',
           account: {
             address: scopeValues.claimValues[scopeValue].claims.name,
-            icon: scopeValues.claimValues[scopeValue].claims.picture
-          }
+            icon: scopeValues.claimValues[scopeValue].claims.picture,
+          },
         })
-      }
-      else if (scopeValue === 'erc_4337') {
+      } else if (scopeValue === 'erc_4337') {
         const profiles = connectedProfiles.filter((profile) =>
           scopeValues.claimValues[scopeValue].meta.urns.includes(profile.urn)
         )

@@ -283,7 +283,7 @@ export async function getAuthzCookieParams(
     })
     .catch((err) => {
       console.log('No authorization cookie params found')
-      throw redirect('/')
+      return null
     })
 }
 

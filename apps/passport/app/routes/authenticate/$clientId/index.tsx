@@ -1,5 +1,4 @@
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
-import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import {
   Form,
   useLoaderData,
@@ -292,7 +291,6 @@ export default () => {
 
   return (
     <>
-      {transition.state !== 'idle' && <Loader />}
       <Suspense fallback="">
         <LazyAuth autoConnect={true}>
           <InnerComponent

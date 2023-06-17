@@ -1,4 +1,5 @@
-import { TraceSpan } from '@proofzero/platform-middleware/trace'
+import type { TraceSpan } from '@proofzero/platform-middleware/trace'
+import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 
 export const seviceBindings = true
 
