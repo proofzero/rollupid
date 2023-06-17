@@ -81,10 +81,10 @@ export const links: LinksFunction = () => [
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
-    let appProps: GetAppPublicPropsResult
+    let appProps
 
     if (context.appProps) {
-      appProps = context.appProps as GetAppPublicPropsResult
+      appProps = context.appProps
     } else {
       appProps = {
         name: `Rollup - ${
