@@ -200,7 +200,6 @@ export default function App() {
     <html lang="en">
       <head>
         <Meta />
-        // TODO: switch to V2_MetaFunction
         {browserEnv.appProps?.iconURL ? (
           <>
             <link rel="icon" type="image" href={browserEnv.appProps.iconURL} />
