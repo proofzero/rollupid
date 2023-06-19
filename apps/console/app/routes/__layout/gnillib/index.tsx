@@ -33,7 +33,6 @@ import {
   Toaster,
   toast,
 } from '@proofzero/design-system/src/atoms/toast'
-
 import plans, { PlanDetails } from './plans'
 
 type EntitlementDetails = {
@@ -192,9 +191,11 @@ const EntitlementsCard = ({
 const PlanCard = ({
   plan,
   entitlements,
+  customerID,
 }: {
   plan: PlanDetails
   entitlements: EntitlementDetails
+  customerID?: string
 }) => {
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
   const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
@@ -559,6 +560,7 @@ export default () => {
         <PlanCard
           plan={plans[ServicePlanType.PRO]}
           entitlements={entitlements[ServicePlanType.PRO]}
+          customerID={customerID}
         />
 
         <EntitlementsCard
