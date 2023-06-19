@@ -46,10 +46,37 @@ export const initSmartContractWalletMethod = async ({
 
   const owner = Wallet.createRandom()
 
+  const projectInfoRes = await fetch(
+    `https://prod-api.zerodev.app/projects/${ctx.SECRET_ZERODEV_PROJECTID}`,
+    { headers: { accept: 'application/json' } }
+  )
+
+  const projectInfo = (await projectInfoRes.json()) as {
+    id: string
+    name: string
+    chainId: string
+  }
+
+  let ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_MUMBAI_PROVIDER_URL // by default
+
+  switch (projectInfo.chainId) {
+    case '1':
+      ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_ETH_PROVIDER_URL
+      break
+    case '5':
+      ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_GOERLI_PROVIDER_URL
+      break
+    case '137':
+      ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_POLYGON_PROVIDER_URL
+      break
+    case '80001':
+      ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_MUMBAI_PROVIDER_URL
+  }
+
   const smartContractWallet = await getZeroDevSigner({
     skipFetchSetup: true,
     rpcProvider: new JsonRpcProvider({
-      url: ctx.ALCHEMY_PROVIDER_URL,
+      url: ALCHEMY_PROVIDER_URL,
       skipFetchSetup: true,
     }),
     projectId: ctx.SECRET_ZERODEV_PROJECTID,

@@ -8,6 +8,8 @@ description: Rollup Account Abstraction Claims and API
 
 With Rollup your can request access to your users [ERC 4337](https://eips.ethereum.org/EIPS/eip-4337) smart contract wallets. If they don't have a smart contract wallet, no sweat, we will help them create one when they onboard to your application. The following will guide you through setting up this flow.
 
+##### Currently for this feature we only support ethereum and polygon with their testnets. [Contact us](https://discord.com/invite/rollupid) if you'd like to add something else.
+
 ### Prerequisites
 
 - Setup an application with one of our supported[ paymaster providers](../platform/console/blockchain.md#preferred-paymasters).
