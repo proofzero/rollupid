@@ -40,6 +40,81 @@ const plans = {
   },
 }
 
+type LoaderData = {
+  entitlements: {
+    [ServicePlanType.PRO]: {
+      alloted: number
+      pending: number
+      allotedClientIds: string[]
+    }
+    FREE: {
+      appClientIds: string[]
+    }
+  }
+  billingToast?: string
+}
+
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    const jwt = await requireJWT(request)
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+    const apps = await starbaseClient.listApps.query()
+    const appClientIds = apps.map((a) => a.clientId)
+
+    const accountClient = createAccountClient(Account, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
+    const entitlements = await accountClient.getEntitlements.query()
+
+    const proAllotedEntitlements =
+      entitlements?.[ServicePlanType.PRO]?.entitlements ?? 0
+    const proPendingEntitlements =
+      entitlements?.[ServicePlanType.PRO]?.pendingEntitlements ?? 0
+
+    // Capping this to 2 for demo purposes
+    const proUsage = Math.min(2, proAllotedEntitlements)
+    // Setting first two apps to pro for demo purposes
+    const proAppClientIds = appClientIds.slice(0, proUsage)
+
+    // Rest become free apps for demo purposes...
+    let freeAppClientIds: any[] = []
+    if (appClientIds.length > proUsage) {
+      freeAppClientIds = appClientIds.slice(proUsage)
+    }
+
+    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    const billingToast = flashSession.get('billing_toast')
+
+    return json<LoaderData>(
+      {
+        entitlements: {
+          [ServicePlanType.PRO]: {
+            alloted: proAllotedEntitlements,
+            pending: proPendingEntitlements,
+            allotedClientIds: proAppClientIds,
+          },
+          FREE: {
+            appClientIds: freeAppClientIds,
+          },
+        },
+        billingToast,
+      },
+      {
+        headers: {
+          'Set-Cookie': await commitFlashSession(flashSession),
+        },
+      }
+    )
+  }
+)
+
 const ProPlanFeatures = () => {
   return (
     <ul className="grid lg:grid-rows-4 grid-flow-row lg:grid-flow-col gap-4">
@@ -162,81 +237,6 @@ const EntitlementsCard = ({
     </article>
   )
 }
-
-type LoaderData = {
-  entitlements: {
-    [ServicePlanType.PRO]: {
-      alloted: number
-      pending: number
-      allotedClientIds: string[]
-    }
-    FREE: {
-      appClientIds: string[]
-    }
-  }
-  billingToast?: string
-}
-
-export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, params, context }) => {
-    const jwt = await requireJWT(request)
-    const traceHeader = generateTraceContextHeaders(context.traceSpan)
-
-    const starbaseClient = createStarbaseClient(Starbase, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-    const apps = await starbaseClient.listApps.query()
-    const appClientIds = apps.map((a) => a.clientId)
-
-    const accountClient = createAccountClient(Account, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-
-    const entitlements = await accountClient.getEntitlements.query()
-
-    const proAllotedEntitlements =
-      entitlements?.[ServicePlanType.PRO]?.entitlements ?? 0
-    const proPendingEntitlements =
-      entitlements?.[ServicePlanType.PRO]?.pendingEntitlements ?? 0
-
-    // Capping this to 2 for demo purposes
-    const proUsage = Math.min(2, proAllotedEntitlements)
-    // Setting first two apps to pro for demo purposes
-    const proAppClientIds = appClientIds.slice(0, proUsage)
-
-    // Rest become free apps for demo purposes...
-    let freeAppClientIds: any[] = []
-    if (appClientIds.length > proUsage) {
-      freeAppClientIds = appClientIds.slice(proUsage)
-    }
-
-    const flashSession = await getFlashSession(request.headers.get('Cookie'))
-    const billingToast = flashSession.get('billing_toast')
-
-    return json<LoaderData>(
-      {
-        entitlements: {
-          [ServicePlanType.PRO]: {
-            alloted: proAllotedEntitlements,
-            pending: proPendingEntitlements,
-            allotedClientIds: proAppClientIds,
-          },
-          FREE: {
-            appClientIds: freeAppClientIds,
-          },
-        },
-        billingToast,
-      },
-      {
-        headers: {
-          'Set-Cookie': await commitFlashSession(flashSession),
-        },
-      }
-    )
-  }
-)
 
 export default () => {
   const { entitlements, billingToast } = useLoaderData<LoaderData>()
