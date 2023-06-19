@@ -133,29 +133,23 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
       clientId,
     })
 
-    if (appData?.smartWalletSessionKeys?.length) {
-      await Promise.all(
-        appData.smartWalletSessionKeys.map(
-          async (sessionKeyAddresses: {
-            smartContractWalletAddress: string
-            devEthereumAddress: string
-          }) => {
-            const { baseAddressURN } = generateSmartWalletAddressUrn(
-              sessionKeyAddresses.smartContractWalletAddress,
-              '' // empty string because we only need a base urn
-            )
-            const addressClient = createAddressClient(ctx.Address, {
-              [PlatformAddressURNHeader]: baseAddressURN,
-              ...generateTraceContextHeaders(ctx.traceSpan),
-            })
+    if (
+      appData?.smartWalletSessionKeys &&
+      appData.smartWalletSessionKeys.length
+    ) {
+      const addressClient = createAddressClient(ctx.Address, {
+        ...generateTraceContextHeaders(ctx.traceSpan),
+      })
 
-            await addressClient.revokeWalletSessionKey.mutate({
-              projectId: paymaster.secret,
-              publicSessionKey: sessionKeyAddresses.devEthereumAddress,
-            })
-          }
-        )
-      )
+      await addressClient.revokeWalletSessionKeyBatch.mutate({
+        projectId: paymaster.secret,
+        smartWalletSessionKeys: appData.smartWalletSessionKeys,
+      })
+
+      await caller.setAppData({
+        clientId,
+        appData: { smartWalletSessionKeys: [] },
+      })
     }
 
     await accessNode.class.deleteAll()

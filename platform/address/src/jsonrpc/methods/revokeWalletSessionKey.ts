@@ -5,15 +5,30 @@ import { Context } from '../../context'
 import { initAddressNodeByName } from '../../nodes'
 import { BadRequestError } from '@proofzero/errors'
 
-import type { AddressURN } from '@proofzero/urns/address'
+import { AddressURNSpace, type AddressURN } from '@proofzero/urns/address'
 import { Wallet } from '@ethersproject/wallet'
+import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 
 export const RevokeWalletSessionKeyInput = z.object({
   publicSessionKey: z.string(),
   projectId: z.string(),
 })
 
+export const RevokeWalletSessionKeyBatchInput = z.object({
+  projectId: z.string(),
+  smartWalletSessionKeys: z.array(
+    z.object({
+      urn: AddressURNInput,
+      publicSessionKey: z.string(),
+    })
+  ),
+})
+
 type RevokeWalletSessionKeyParams = z.infer<typeof RevokeWalletSessionKeyInput>
+type RevokeWalletSessionKeyBatchParams = z.infer<
+  typeof RevokeWalletSessionKeyBatchInput
+>
+
 const requestInit = {
   method: 'post',
   headers: {
@@ -33,6 +48,48 @@ export const revokeWalletSessionKeyMethod = async ({
     ctx.Address
   )
 
+  await revokeWalletSessionKey({
+    ctx,
+    smartContractWalletNode,
+    projectId: input.projectId,
+    publicSessionKey: input.publicSessionKey,
+  })
+}
+
+export const revokeWalletSessionKeyBatchMethod = async ({
+  input,
+  ctx,
+}: {
+  input: RevokeWalletSessionKeyBatchParams
+  ctx: Context
+}) => {
+  const resultPromises = []
+  for (const smartWalletSessionKey of input.smartWalletSessionKeys) {
+    const baseURN = AddressURNSpace.getBaseURN(smartWalletSessionKey.urn)
+    const smartContractWalletNode = initAddressNodeByName(baseURN, ctx.Address)
+    resultPromises.push(
+      revokeWalletSessionKey({
+        ctx,
+        smartContractWalletNode,
+        projectId: input.projectId,
+        publicSessionKey: smartWalletSessionKey.publicSessionKey,
+      })
+    )
+  }
+  return await Promise.all(resultPromises)
+}
+
+const revokeWalletSessionKey = async ({
+  ctx,
+  smartContractWalletNode,
+  projectId,
+  publicSessionKey,
+}: {
+  ctx: Context
+  smartContractWalletNode: any
+  projectId: string
+  publicSessionKey: string
+}) => {
   const owner = (await smartContractWalletNode.storage.get(
     'privateKey'
   )) as string
@@ -51,8 +108,8 @@ export const revokeWalletSessionKeyMethod = async ({
       ...requestInit,
       body: JSON.stringify({
         address,
-        projectId: input.projectId,
-        publicSessionKey: input.publicSessionKey,
+        projectId,
+        publicSessionKey,
       }),
     }
   )
@@ -69,7 +126,7 @@ export const revokeWalletSessionKeyMethod = async ({
     ...requestInit,
     body: JSON.stringify({
       userOp: { ...userOp, signature: signedMessage },
-      projectId: input.projectId,
+      projectId,
     }),
   })
 }

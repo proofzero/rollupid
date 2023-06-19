@@ -85,8 +85,10 @@ import {
   RegisterSessionKeyOutput,
 } from './methods/registerWalletSessionKey'
 import {
-  revokeWalletSessionKeyMethod,
   RevokeWalletSessionKeyInput,
+  RevokeWalletSessionKeyBatchInput,
+  revokeWalletSessionKeyMethod,
+  revokeWalletSessionKeyBatchMethod,
 } from './methods/revokeWalletSessionKey'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
@@ -257,4 +259,9 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(RevokeWalletSessionKeyInput)
     .mutation(revokeWalletSessionKeyMethod),
+  revokeWalletSessionKeyBatch: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(RevokeWalletSessionKeyBatchInput)
+    .mutation(revokeWalletSessionKeyBatchMethod),
 })
