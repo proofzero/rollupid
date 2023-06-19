@@ -33,18 +33,24 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
-      const { nonce, accountURN } = (
-        event.data.object as {
-          metadata: Record<string, string>
-        }
-      ).metadata as {
+      const obj = event.data.object as {
+        customer: string
+        metadata: Record<string, string>
+      }
+
+      const { customer: customerID } = obj
+      const { nonce, accountURN } = obj.metadata as {
         nonce: string
         accountURN: AccountURN
       }
 
       await new Promise((ok) => setTimeout(ok, 5000))
 
-      await accountClient.fullfillServicePlanOrder.mutate({ nonce, accountURN })
+      await accountClient.fullfillServicePlanOrder.mutate({
+        nonce,
+        accountURN,
+        customerID,
+      })
     }
 
     return null

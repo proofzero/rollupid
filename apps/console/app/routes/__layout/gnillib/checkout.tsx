@@ -51,35 +51,31 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const fd = await request.formData()
-    const action = fd.get('action')
-    switch (action) {
-      case 'purchase': {
-        const {
-          planType,
-          quantity,
-        }: {
-          planType: ServicePlanType
-          quantity: number
-        } = JSON.parse(fd.get('payload') as string)
+    const {
+      planType,
+      quantity,
+      customerID,
+    }: {
+      planType: ServicePlanType
+      quantity: number
+      customerID: string | undefined
+    } = JSON.parse(fd.get('payload') as string)
 
-        const nonce = hexlify(randomBytes(8))
+    const nonce = hexlify(randomBytes(8))
 
-        await accountClient.registerServicePlanOrder.mutate({
-          planType: planType,
-          quantity: quantity,
-          nonce,
-        })
+    await accountClient.registerServicePlanOrder.mutate({
+      planType: planType,
+      quantity: quantity,
+      nonce,
+    })
 
-        return beginCheckout({
-          planId: '42',
-          planType,
-          quantity,
-          nonce,
-          accountURN,
-        })
-      }
-    }
-
-    return null
+    return beginCheckout({
+      planId: '42',
+      planType,
+      quantity,
+      nonce,
+      accountURN,
+      customerID,
+    })
   }
 )

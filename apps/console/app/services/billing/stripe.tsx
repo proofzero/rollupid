@@ -35,6 +35,7 @@ export const beginCheckout = async (
       nonce: params.nonce,
       accountURN: params.accountURN,
     },
+    customer: params.customerID,
   })
 
   // TODO: Redirect to Stripe Checkout

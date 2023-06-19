@@ -43,6 +43,7 @@ type EntitlementDetails = {
 }
 
 type LoaderData = {
+  customerID?: string
   entitlements: {
     [ServicePlanType.PRO]: EntitlementDetails
     FREE: {
@@ -69,12 +70,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const entitlements = await accountClient.getEntitlements.query()
+    const { customerID, plans } = await accountClient.getEntitlements.query()
 
     const proAllotedEntitlements =
-      entitlements?.[ServicePlanType.PRO]?.entitlements ?? 0
+      plans?.[ServicePlanType.PRO]?.entitlements ?? 0
     const proPendingEntitlements =
-      entitlements?.[ServicePlanType.PRO]?.pendingEntitlements ?? 0
+      plans?.[ServicePlanType.PRO]?.pendingEntitlements ?? 0
 
     // Capping this to 2 for demo purposes
     const proUsage = Math.min(2, proAllotedEntitlements)
@@ -92,6 +93,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     return json<LoaderData>(
       {
+        customerID,
         entitlements: {
           [ServicePlanType.PRO]: {
             alloted: proAllotedEntitlements,
@@ -316,10 +318,10 @@ const PlanCard = ({
 
               submit(
                 {
-                  action: 'purchase',
                   payload: JSON.stringify({
                     planType: ServicePlanType.PRO,
                     quantity: proEntitlementDelta,
+                    customerID,
                   }),
                 },
                 {
@@ -487,7 +489,7 @@ const PlanCard = ({
 }
 
 export default () => {
-  const { entitlements, billingToast } = useLoaderData<LoaderData>()
+  const { entitlements, billingToast, customerID } = useLoaderData<LoaderData>()
 
   const { apps } = useOutletContext<OutletContextData>()
 

@@ -53,7 +53,10 @@ export default class Account extends DOProxy {
     await this.state.storage.put('pendingServicePlans', psp)
   }
 
-  async fullfillServicePlanOrder(nonce: string): Promise<void> {
+  async fullfillServicePlanOrder(
+    nonce: string,
+    customerID: string
+  ): Promise<void> {
     const psp = await this.state.storage.get<PendingServicePlans>(
       'pendingServicePlans'
     )
@@ -70,7 +73,7 @@ export default class Account extends DOProxy {
       })
     }
 
-    await this.updateEntitlements(order.type, order.quantity)
+    await this.updateEntitlements(order.type, order.quantity, customerID)
 
     delete psp[nonce]
 
@@ -83,7 +86,8 @@ export default class Account extends DOProxy {
 
   async updateEntitlements(
     type: ServicePlanType,
-    delta: number
+    delta: number,
+    customerID: string
   ): Promise<void> {
     let servicePlans = await this.state.storage.get<ServicePlans>(
       'servicePlans'
@@ -91,6 +95,17 @@ export default class Account extends DOProxy {
     if (!servicePlans) {
       servicePlans = {}
     }
+
+    if (!servicePlans.customerID) {
+      servicePlans.customerID = customerID
+    } else {
+      if (servicePlans.customerID !== customerID) {
+        throw new RollupError({
+          message: 'Customer ID mismatch',
+        })
+      }
+    }
+
     if (!servicePlans.plans) {
       servicePlans.plans = {}
     }
@@ -110,18 +125,5 @@ export default class Account extends DOProxy {
     }
 
     await this.state.storage.put('servicePlans', servicePlans)
-  }
-
-  async setCustomerID(customerID: string): Promise<void> {
-    const servicePlans = await this.state.storage.get<ServicePlans>(
-      'servicePlans'
-    )
-
-    if (!servicePlans) {
-      await this.state.storage.put('servicePlans', { customerID })
-    } else {
-      servicePlans.customerID = customerID
-      await this.state.storage.put('servicePlans', servicePlans)
-    }
   }
 }

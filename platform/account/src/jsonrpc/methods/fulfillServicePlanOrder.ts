@@ -6,6 +6,7 @@ import { initAccountNodeByName } from '../../nodes'
 export const FulfillServicePlanOrderInputSchema = z.object({
   nonce: z.string(),
   accountURN: AccountURNInput,
+  customerID: z.string(),
 })
 export type FulfillServicePlanOrderInput = z.infer<
   typeof FulfillServicePlanOrderInputSchema
@@ -18,8 +19,8 @@ export const fulfillServicePlanOrder = async ({
   input: FulfillServicePlanOrderInput
   ctx: Context
 }): Promise<void> => {
-  const { nonce, accountURN } = input
+  const { nonce, accountURN, customerID } = input
 
   const account = await initAccountNodeByName(accountURN, ctx.Account)
-  await account.class.fullfillServicePlanOrder(nonce)
+  await account.class.fullfillServicePlanOrder(nonce, customerID)
 }
