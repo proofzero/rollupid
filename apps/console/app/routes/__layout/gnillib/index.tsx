@@ -274,13 +274,11 @@ export default () => {
   }, [entitlements])
 
   useEffect(() => {
-    if (!billingToast) {
-      return
+    if (billingToast) {
+      toast(ToastType.Info, {
+        message: billingToast,
+      })
     }
-
-    toast(ToastType.Info, {
-      message: billingToast,
-    })
   }, [billingToast])
 
   return (
