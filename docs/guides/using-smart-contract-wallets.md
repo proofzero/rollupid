@@ -90,9 +90,9 @@ Here's how to do that:
 3. Select app for which to revoke session key and hit `Edit Access` button
 4. Then push `Revoke Access` button
 
-This action will revoke all scopes user authorized app to use, including the revokation of session keys for all authorized smart contract wallets.
+This action will revoke all scopes user authorized app to use, including the revocation of session keys for all authorized smart contract wallets.
 
-{% hint style="warning" %} Revokation of Smart Contract wallets results in a blockchain transaction. Be aware that any revokation of smart contract wallet will cost gas fees. {% endhint %}
+{% hint style="warning" %} Revocation of Smart Contract wallets results in a blockchain transaction. Be aware that any revocation of smart contract wallet will cost gas fees. {% endhint %}
 
 ## Accessing Your App's Smart Contract Wallet
 
