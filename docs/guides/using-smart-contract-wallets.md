@@ -8,9 +8,11 @@ description: Rollup Account Abstraction Claims and API
 
 With Rollup your can request access to your users [ERC 4337](https://eips.ethereum.org/EIPS/eip-4337) smart contract wallets. If they don't have a smart contract wallet, no sweat, we will help them create one when they onboard to your application. The following will guide you through setting up this flow.
 
+##### Currently for this feature we only support ethereum and polygon with their testnets. [Contact us](https://discord.com/invite/rollupid) if you'd like to add something else.
+
 ### Prerequisites
 
-* Setup an application with one of our supported[ paymaster providers](../platform/console/blockchain.md#preferred-paymasters).
+- Setup an application with one of our supported[ paymaster providers](../platform/console/blockchain.md#preferred-paymasters).
 
 ### Setup
 
@@ -42,14 +44,14 @@ When your users login to your application you will now be presented with an acce
 
 <figure><img src="../.gitbook/assets/image (4).png" alt=""><figcaption></figcaption></figure>
 
-With this access token you can now make requests to the [galaxy-api.md](../reference/galaxy-api.md "mention") to register your [session key](https://twitter.com/chainlink/status/1636781219848372235).  To register a session key you will always need to generate a ethers wallet and send the public address along with the specified smart contract wallet to register. For example:
+With this access token you can now make requests to the [galaxy-api.md](../reference/galaxy-api.md 'mention') to register your [session key](https://twitter.com/chainlink/status/1636781219848372235). To register a session key you will always need to generate a ethers wallet and send the public address along with the specified smart contract wallet to register. For example:
 
 ````typescript
 import { Wallet } from 'ethers'
 
-// if using more than once we reccomend that you store the private key somewhere safe.
-// you will need the privateSigner to submit transactions using your session key. 
-const privateSigner = Wallet.createRandom() 
+// if using more than once we recommend that you store the private key somewhere safe.
+// you will need the privateSigner to submit transactions using your session key.
+const privateSigner = Wallet.createRandom()
 const address = await privateSigner.address()
 
 const sessionDataRes = await fetch("https://galaxy.rollup.id/rest/register-session-key", {
@@ -61,7 +63,7 @@ const sessionDataRes = await fetch("https://galaxy.rollup.id/rest/register-sessi
   },
   body: JSON.stringify({
       smartContractWalletAddress: session.erc_4337[0].address, //users' smart contract wallet address
-      sessionPublicKey: address, //public key for which to issue session key
+      sessionPublicKey: address, //ethereum address for which to issue session key
     },
   }),
 })
@@ -76,6 +78,21 @@ Once a session key has been registered you should receive session key data that 
 {% hint style="warning" %}
 When registering a session key we will use your configured paymaster provider and their tools to fulfill the registration. **Please ensure the API keys saved in your paymaster settings are the same you use in your application's transactions.**
 {% endhint %}
+
+### Revocation of Session Key
+
+Once user authorized app to create a session key for provided wallet, user easily can revoke this session key at any time.
+
+Here's how to do that:
+
+1. Go to [Passport](https://passport.rollup.id)
+2. Navigate to `Applications` tab in side-menu
+3. Select app for which to revoke session key and hit `Edit Access` button
+4. Then push `Revoke Access` button
+
+This action will revoke all scopes user authorized app to use, including the revocation of session keys for all authorized smart contract wallets.
+
+{% hint style="warning" %} Revocation of Smart Contract wallets results in a blockchain transaction. Be aware that any revocation of smart contract wallet will cost gas fees. {% endhint %}
 
 ## Accessing Your App's Smart Contract Wallet
 

@@ -26,6 +26,7 @@ import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { GraphQLError } from 'graphql'
 import { PersonaData } from '@proofzero/types/application'
 import { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
+import { generateSmartWalletAddressUrn } from '@proofzero/platform.address/src/utils'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -167,6 +168,28 @@ const addressResolvers: Resolvers = {
           paymaster,
           smartContractWalletAddress,
           sessionPublicKey,
+        })
+
+        const appData = await accessClient.getAppData.query({
+          clientId,
+        })
+
+        const smartWalletSessionKeys = appData?.smartWalletSessionKeys || []
+        const { baseAddressURN } = generateSmartWalletAddressUrn(
+          smartContractWalletAddress,
+          '' // empty string because we only need a base urn
+        )
+
+        smartWalletSessionKeys.push({
+          urn: baseAddressURN,
+          publicSessionKey: sessionPublicKey,
+        })
+
+        await accessClient.setAppData.mutate({
+          clientId,
+          appData: {
+            smartWalletSessionKeys,
+          },
         })
 
         return sessionKey

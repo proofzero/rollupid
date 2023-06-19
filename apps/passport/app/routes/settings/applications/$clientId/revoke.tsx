@@ -28,7 +28,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     try {
       const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
 
-      await accessClient.revokeAppAuthorization.mutate({ clientId })
+      await accessClient.revokeAppAuthorization.mutate({
+        clientId,
+        issuer: new URL(request.url).origin,
+      })
 
       session.flash(
         'tooltipMessage',

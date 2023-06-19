@@ -1,9 +1,8 @@
 import { z } from 'zod'
 import { Wallet } from '@ethersproject/wallet'
 
-import { AddressURNSpace } from '@proofzero/urns/address'
-import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { JsonRpcProvider } from '@ethersproject/providers'
 
 import createEdgesClient from '@proofzero/platform-clients/edges'
 import { Context } from '../../context'
@@ -14,6 +13,7 @@ import { getZeroDevSigner } from '@zerodevapp/sdk'
 import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import { generateSmartWalletAddressUrn } from '@proofzero/platform.address/src/utils'
 
 export const InitSmartContractWalletInput = z.object({
   nickname: z.string(),
@@ -46,23 +46,50 @@ export const initSmartContractWalletMethod = async ({
 
   const owner = Wallet.createRandom()
 
+  const projectInfoRes = await fetch(
+    `https://prod-api.zerodev.app/projects/${ctx.SECRET_ZERODEV_PROJECTID}`,
+    { headers: { accept: 'application/json' } }
+  )
+
+  const projectInfo = (await projectInfoRes.json()) as {
+    id: string
+    name: string
+    chainId: string
+  }
+
+  let ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_MUMBAI_PROVIDER_URL // by default
+
+  switch (projectInfo.chainId) {
+    case '1':
+      ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_ETH_PROVIDER_URL
+      break
+    case '5':
+      ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_GOERLI_PROVIDER_URL
+      break
+    case '137':
+      ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_POLYGON_PROVIDER_URL
+      break
+    case '80001':
+      ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_MUMBAI_PROVIDER_URL
+  }
+
   const smartContractWallet = await getZeroDevSigner({
+    skipFetchSetup: true,
+    rpcProvider: new JsonRpcProvider({
+      url: ALCHEMY_PROVIDER_URL,
+      skipFetchSetup: true,
+    }),
     projectId: ctx.SECRET_ZERODEV_PROJECTID,
     owner,
-    skipFetchSetup: true,
   })
 
   const smartContractWalletAddress = await smartContractWallet.getAddress()
 
-  const addressURN = AddressURNSpace.componentizedUrn(
-    generateHashedIDRef(CryptoAddressType.Wallet, smartContractWalletAddress),
-    {
-      node_type: NodeType.Crypto,
-      addr_type: CryptoAddressType.Wallet,
-    },
-    { alias: input.nickname, hidden: 'true' }
+  const { addressURN, baseAddressURN } = generateSmartWalletAddressUrn(
+    smartContractWalletAddress,
+    input.nickname
   )
-  const baseAddressURN = AddressURNSpace.getBaseURN(addressURN)
+
   const smartContractWalletNode = initAddressNodeByName(
     baseAddressURN,
     ctx.Address

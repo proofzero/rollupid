@@ -19,7 +19,7 @@ import type { GetAuthorizedAppScopesMethodResult } from '@proofzero/platform/acc
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { getStarbaseClient } from '~/platform.server'
 import { getValidatedSessionContext } from '~/session.server'
-import { ScopeMeta } from '@proofzero/security/scopes'
+import type { ScopeMeta } from '@proofzero/security/scopes'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {

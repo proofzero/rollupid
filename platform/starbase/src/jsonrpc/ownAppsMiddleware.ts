@@ -8,11 +8,27 @@ import { Context } from './context'
 
 import { parseJwt } from '@proofzero/utils'
 import { BadRequestError } from '@proofzero/errors'
+import { ROLLUP_INTERNAL_ACCESS_TOKEN_URN } from '@proofzero/platform.access/src/constants'
 
 export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({
   ctx,
   next,
 }) => {
+  if (ctx.token) {
+    const parsedToken = parseJwt(ctx.token)
+    if (parsedToken.sub === ROLLUP_INTERNAL_ACCESS_TOKEN_URN) {
+      const clientId = parsedToken.aud?.[0] as string
+      const appUrn = ApplicationURNSpace.urn(clientId)
+      const ownAppURNs = [appUrn]
+      return next({
+        ctx: {
+          ...ctx,
+          ownAppURNs,
+        },
+      })
+    }
+  }
+
   if (ctx.apiKey) {
     const parsedJwt = parseJwt(ctx.apiKey)
     const appUrn = parsedJwt.sub as ApplicationURN

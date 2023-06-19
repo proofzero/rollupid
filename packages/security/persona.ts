@@ -77,7 +77,7 @@ export async function validatePersonaData(
       if (
         !(
           authorizedAddressUrns &&
-          authorizedAddressUrns instanceof Array &&
+          Array.isArray(authorizedAddressUrns) &&
           authorizedAddressUrns.every((e) => AddressURNSpace.is(e))
         )
       ) {
@@ -134,7 +134,7 @@ export async function setPersonaReferences(
     } else if (
       scopeEntry === 'connected_accounts' &&
       personaData.connected_accounts &&
-      personaData.connected_accounts instanceof Array
+      Array.isArray(personaData.connected_accounts)
     ) {
       //This (correctly) gets skipped when personaData value of
       //connected_accounts is set to ALL
@@ -144,7 +144,7 @@ export async function setPersonaReferences(
     } else if (
       scopeEntry === 'erc_4337' &&
       personaData.erc_4337 &&
-      personaData.erc_4337 instanceof Array
+      Array.isArray(personaData.erc_4337)
     ) {
       //This (correctly) gets skipped when personaData value of
       //erc_4337 is set to ALL

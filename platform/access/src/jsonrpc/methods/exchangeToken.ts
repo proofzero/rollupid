@@ -12,7 +12,7 @@ import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 import { AccessJWTPayload, GrantType, Scope } from '@proofzero/types/access'
 
 import { Context } from '../../context'
-import { getJWKS, getPrivateJWK } from '../../jwk'
+import { generateJKU, getJWKS, getPrivateJWK } from '../../jwk'
 import { initAuthorizationNodeByName, initAccessNodeByName } from '../../nodes'
 
 import {
@@ -322,8 +322,4 @@ const handleRefreshToken: ExchangeTokenMethod<
       scope,
     }),
   }
-}
-
-const generateJKU = (issuer: string) => {
-  return `${issuer}/.well-known/jwks.json`
 }

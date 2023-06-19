@@ -1,3 +1,4 @@
+import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 import { EdgeSpace } from '@proofzero/urns/edge'
 import type { EdgeURN } from '@proofzero/urns/edge'
 
@@ -26,3 +27,12 @@ export const ACCESS_TOKEN_OPTIONS = {
  * client session node for that account.
  */
 export const EDGE_AUTHORIZES: EdgeURN = EdgeSpace.urn('authorizes/access')
+
+/**
+ * Internal access token URN to be used for internal service-to-service
+ * communication. (e.g. between access and starbase)
+ */
+
+export const ROLLUP_INTERNAL_ACCESS_TOKEN_URN = AccountURNSpace.urn(
+  'rollup_internal_access_token_urn'
+) as AccountURN

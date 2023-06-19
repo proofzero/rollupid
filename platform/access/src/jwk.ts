@@ -39,3 +39,7 @@ export const getJWKS = (context: Context): JSONWebKeySet => {
     throw error
   }
 }
+
+export const generateJKU = (issuer: string) => {
+  return `${issuer}/.well-known/jwks.json`
+}

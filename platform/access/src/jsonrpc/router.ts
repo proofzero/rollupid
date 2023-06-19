@@ -67,6 +67,12 @@ import {
   PreAuthorizeMethodInput,
   PreAuthorizeMethodOutput,
 } from './methods/preauthorize'
+import { SetAppDataInput, setAppDataMethod } from './methods/setAppData'
+import {
+  GetAppDataInput,
+  getAppDataMethod,
+  GetAppDataOutput,
+} from './methods/getAppData'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -161,4 +167,19 @@ export const appRouter = t.router({
     .use(Analytics)
     .output(GetJWKSMethodOutput)
     .query(getJWKSMethod),
+  getAppData: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAppDataInput)
+    .output(GetAppDataOutput)
+    .query(getAppDataMethod),
+  setAppData: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .input(SetAppDataInput)
+    .mutation(setAppDataMethod),
 })
