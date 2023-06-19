@@ -49,7 +49,7 @@ export const initSmartContractWalletMethod = async ({
   const smartContractWallet = await getZeroDevSigner({
     skipFetchSetup: true,
     rpcProvider: new JsonRpcProvider({
-      url: ctx.MUMBAI_PROVIDER_URL,
+      url: ctx.ALCHEMY_PROVIDER_URL,
       skipFetchSetup: true,
     }),
     projectId: ctx.SECRET_ZERODEV_PROJECTID,

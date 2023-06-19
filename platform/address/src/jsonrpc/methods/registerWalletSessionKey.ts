@@ -62,7 +62,7 @@ export const registerSessionKeyMethod = async ({
       projectId: paymaster.secret,
       owner: getPrivateKeyOwner(ownerPrivateKey),
       rpcProvider: new JsonRpcProvider({
-        url: ctx.MUMBAI_PROVIDER_URL,
+        url: ctx.ALCHEMY_PROVIDER_URL,
         skipFetchSetup: true,
       }),
       skipFetchSetup: true,
