@@ -6,6 +6,7 @@ declare global {
   const Address: Fetcher
 
   const SECRET_SESSION_KEY: string
+  const SECRET_SESSION_SALT: string
   const COOKIE_DOMAIN: string
   const PASSPORT_URL: string
   const STORAGE_NAMESPACE: string

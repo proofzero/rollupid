@@ -22,6 +22,8 @@
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint ."
   },
   "dependencies": {
+    "@ethersproject/bytes": "5.7.0",
+    "@ethersproject/random": "5.7.0",
     "@headlessui/react": "1.7.5",
     "@heroicons/react": "2.0.13",
     "@proofzero/design-system": "workspace:*",

@@ -5,3 +5,23 @@ export type AccountProfile = {
     isToken?: boolean
   }
 }
+
+export enum ServicePlanType {
+  PRO = 'PRO',
+}
+
+export type PendingServicePlans = {
+  [key: string]: {
+    type: ServicePlanType
+    quantity: number
+  }
+}
+
+export type ServicePlans = {
+  customerID?: string
+  plans?: Partial<{
+    [key in ServicePlanType]: {
+      entitlements: number
+    }
+  }>
+}

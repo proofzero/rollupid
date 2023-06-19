@@ -5663,6 +5663,8 @@ __metadata:
   dependencies:
     "@babel/core": 7.20.2
     "@cloudflare/workers-types": 4.20221111.1
+    "@ethersproject/bytes": 5.7.0
+    "@ethersproject/random": 5.7.0
     "@headlessui/react": 1.7.5
     "@heroicons/react": 2.0.13
     "@mdx-js/react": 2.1.5

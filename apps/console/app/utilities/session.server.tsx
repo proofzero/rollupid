@@ -5,7 +5,11 @@
 import invariant from 'tiny-invariant'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
-import { createCookie, redirect } from '@remix-run/cloudflare'
+import {
+  createCookie,
+  redirect,
+  createCookieSessionStorage,
+} from '@remix-run/cloudflare'
 
 import { decryptSession } from '@proofzero/utils/session'
 
@@ -21,6 +25,9 @@ invariant(DEPLOY_ENV, 'DEPLOY_ENV must be set')
 // NB: This secret is set using: wrangler secret put.
 // @ts-ignore
 invariant(SECRET_SESSION_KEY, 'SECRET_SESSION_KEY must be set')
+
+// @ts-ignore
+invariant(SECRET_SESSION_SALT, 'SECRET_SESSION_SALT must be set')
 
 // @ts-ignore
 invariant(COOKIE_DOMAIN, 'COOKIE_DOMAIN must be set')
@@ -112,3 +119,16 @@ export async function destroyUserSession(request: Request, redirectTo: string) {
     },
   })
 }
+
+export const {
+  getSession: getFlashSession,
+  commitSession: commitFlashSession,
+  destroySession: destroyFlashSession,
+} = createCookieSessionStorage({
+  cookie: {
+    name: '_flashes',
+    secrets: [SECRET_SESSION_SALT],
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 10,
+  },
+})
