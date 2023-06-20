@@ -83,7 +83,7 @@ export default class Account extends DOProxy {
   async getServicePlans(): Promise<ServicePlans | undefined> {
     // await this.state.storage.delete('servicePlans')
     // await this.state.storage.delete('pendingServicePlans')
-    // await this.state.storage.delete('customerID')
+    // await this.state.storage.delete('stripeCustomerID')
 
     return this.state.storage.get<ServicePlans>('servicePlans')
   }
@@ -131,25 +131,25 @@ export default class Account extends DOProxy {
     await this.state.storage.put('servicePlans', servicePlans)
   }
 
-  async getCustomerID(): Promise<string | undefined> {
-    return this.state.storage.get<string | undefined>('customerID')
+  async getStripeCustomerID(): Promise<string | undefined> {
+    return this.state.storage.get<string | undefined>('stripeCustomerID')
   }
 
-  async setCustomerID(customerID: string): Promise<void> {
+  async setStripeCustomerID(stripeCustomerID: string): Promise<void> {
     const stored = await this.state.storage.get<string | undefined>(
-      'customerID'
+      'stripeCustomerID'
     )
 
-    if (stored && stored !== customerID) {
+    if (stored && stored !== stripeCustomerID) {
       throw new RollupError({
         message: 'Customer ID already set',
       })
     }
 
-    if (stored && stored === customerID) {
+    if (stored && stored === stripeCustomerID) {
       return
     }
 
-    await this.state.storage.put('customerID', customerID)
+    await this.state.storage.put('stripeCustomerID', stripeCustomerID)
   }
 }

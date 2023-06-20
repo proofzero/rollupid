@@ -17,7 +17,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const customerID = await accountClient.getCustomerID.query()
+    const customerID = await accountClient.getStripeCustomerID.query()
 
     return updatePaymentMethod({ customerID })
   }
