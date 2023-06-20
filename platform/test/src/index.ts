@@ -5,7 +5,6 @@ import type { Environment, CloudflareEmailMessage } from './types'
 const router = Router() // no "new", as this is not a real class
 
 const withToken = (request: IRequest, env: Environment) => {
-  console.debug({ ...env })
   if (!env.SECRET_TEST_API_TOKEN) {
     return new Response('Missing Auth Token', { status: 401 })
   }

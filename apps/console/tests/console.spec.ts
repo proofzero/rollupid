@@ -100,9 +100,9 @@ const testConsoleAppCreation = async ({
     waitUntil: 'networkidle',
   })
 
-  const appId = await page.$eval('#oAuthAppId', (el) => el.value)
-
   await page.getByRole('button').filter({ hasText: 'Complete Setup' }).click()
+
+  const appId = await page.$eval('#oAuthAppId', (el) => el.value)
 
   await page.waitForURL(/.*apps\/.*\/auth/, {
     timeout: 5000,
