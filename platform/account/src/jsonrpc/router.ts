@@ -44,19 +44,15 @@ import {
   getEntitlements,
 } from './methods/getEntitlements'
 import {
-  RegisterServicePlanOrderInputSchema,
-  registerServicePlanOrder,
-} from './methods/registerServicePlanOrder'
-import {
-  FulfillServicePlanOrderInputSchema,
-  fulfillServicePlanOrder,
-} from './methods/fulfillServicePlanOrder'
-import {
   GetStripeCustomerIDOutputSchema,
   SetStripeCustomerIDInputSchema,
   getStripeCustomerID,
   setStripeCustomerID,
 } from './methods/stripeCustomerID'
+import {
+  UpdateEntitlementsInputSchema,
+  updateEntitlements,
+} from './methods/updateEntitlements'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -150,22 +146,6 @@ export const appRouter = t.router({
     .use(LogUsage)
     .input(DeleteAccountNodeInput)
     .mutation(deleteAccountNodeMethod),
-  registerServicePlanOrder: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(injectAccountNode)
-    .use(LogUsage)
-    .use(Analytics)
-    .input(RegisterServicePlanOrderInputSchema)
-    .mutation(registerServicePlanOrder),
-  fullfillServicePlanOrder: t.procedure
-    // .use(AuthorizationTokenFromHeader)
-    // .use(ValidateJWT)
-    // .use(injectAccountNode)
-    // .use(LogUsage)
-    // .use(Analytics)
-    .input(FulfillServicePlanOrderInputSchema)
-    .mutation(fulfillServicePlanOrder),
   getEntitlements: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
@@ -174,6 +154,14 @@ export const appRouter = t.router({
     .use(Analytics)
     .output(GetEntitlementsOutputSchema)
     .query(getEntitlements),
+  updateEntitlements: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(injectAccountNode)
+    .use(LogUsage)
+    .use(Analytics)
+    .input(UpdateEntitlementsInputSchema)
+    .mutation(updateEntitlements),
   getStripeCustomerID: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)

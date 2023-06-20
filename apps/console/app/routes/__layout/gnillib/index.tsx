@@ -2,7 +2,7 @@ import { Button } from '@proofzero/design-system'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { LoaderFunction, json } from '@remix-run/cloudflare'
+import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
 import { FaCheck, FaShoppingCart, FaTrash } from 'react-icons/fa'
 import { HiMinus, HiOutlineExternalLink, HiPlus } from 'react-icons/hi'
 import {
@@ -12,13 +12,11 @@ import {
 } from '~/utilities/session.server'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import createAccountClient from '@proofzero/platform-clients/account'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import {
-  useLoaderData,
-  useOutletContext,
-  useRevalidator,
-  useSubmit,
-} from '@remix-run/react'
+  getAuthzHeaderConditionallyFromToken,
+  parseJwt,
+} from '@proofzero/utils'
+import { useLoaderData, useOutletContext, useSubmit } from '@remix-run/react'
 import type { LoaderData as OutletContextData } from '~/root'
 import { Menu } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
@@ -34,10 +32,15 @@ import {
   toast,
 } from '@proofzero/design-system/src/atoms/toast'
 import plans, { PlanDetails } from './plans'
+import {
+  createCustomer,
+  createSubscription,
+  updateSubscription,
+} from '~/services/billing/stripe'
+import { AccountURN } from '@proofzero/urns/account'
 
 type EntitlementDetails = {
   alloted: number
-  pending: number
   allotedClientIds: string[]
 }
 
@@ -55,6 +58,9 @@ type LoaderData = {
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
     const jwt = await requireJWT(request)
+    const parsedJwt = parseJwt(jwt!)
+    const accountURN = parsedJwt.sub as AccountURN
+
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
     const starbaseClient = createStarbaseClient(Starbase, {
@@ -69,12 +75,22 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const { customerID, plans } = await accountClient.getEntitlements.query()
+    const { plans } = await accountClient.getEntitlements.query()
+
+    let customerID = await accountClient.getStripeCustomerID.query()
+    if (!customerID) {
+      const customer = await createCustomer({
+        email: '',
+        name: '',
+        accountURN,
+      })
+
+      await accountClient.setStripeCustomerID.mutate(customer.id)
+      customerID = customer.id
+    }
 
     const proAllotedEntitlements =
       plans?.[ServicePlanType.PRO]?.entitlements ?? 0
-    const proPendingEntitlements =
-      plans?.[ServicePlanType.PRO]?.pendingEntitlements ?? 0
 
     // Capping this to 2 for demo purposes
     const proUsage = Math.min(2, proAllotedEntitlements)
@@ -96,7 +112,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         entitlements: {
           [ServicePlanType.PRO]: {
             alloted: proAllotedEntitlements,
-            pending: proPendingEntitlements,
             allotedClientIds: proAppClientIds,
           },
           FREE: {
@@ -111,6 +126,55 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         },
       }
     )
+  }
+)
+
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    const jwt = await requireJWT(request)
+    const parsedJwt = parseJwt(jwt!)
+    const accountURN = parsedJwt.sub as AccountURN
+
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+
+    const accountClient = createAccountClient(Account, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
+    const fd = await request.formData()
+    const { customerID, quantity } = JSON.parse(
+      fd.get('payload') as string
+    ) as {
+      customerID: string
+      quantity: number
+    }
+
+    const entitlements = await accountClient.getEntitlements.query()
+
+    let sub
+    if (!entitlements.subscriptionID) {
+      sub = await createSubscription({
+        customerID: customerID,
+        planID: 'price_1NJaDgFEfyl69U7XQBHZDiDM',
+        quantity: +quantity,
+      })
+    } else {
+      sub = await updateSubscription({
+        subscriptionID: entitlements.subscriptionID,
+        planID: 'price_1NJaDgFEfyl69U7XQBHZDiDM',
+        quantity: +quantity,
+      })
+    }
+
+    await accountClient.updateEntitlements.mutate({
+      quantity: +quantity,
+      type: ServicePlanType.PRO,
+      subscriptionID: sub.id,
+      accountURN,
+    })
+
+    return null
   }
 )
 
@@ -419,8 +483,7 @@ const PlanCard = ({
 
           <div className="border-b border-gray-200"></div>
 
-          {(entitlements.allotedClientIds.length > 0 ||
-            entitlements.pending > 0) && (
+          {entitlements.allotedClientIds.length > 0 && (
             <div className="p-4">
               <Text size="sm" weight="medium" className="text-gray-900">
                 Entitlements
@@ -450,19 +513,13 @@ const PlanCard = ({
                 </div>
               </div>
               <Text size="sm" weight="medium" className="text-[#6B7280]">
-                {`${entitlements.allotedClientIds.length} out of ${
-                  entitlements.alloted
-                } Entitlements used ${
-                  entitlements.pending !== 0
-                    ? `(${entitlements.pending} pending)`
-                    : ''
-                }`}
+                {`${entitlements.allotedClientIds.length} out of ${entitlements.alloted} Entitlements used`}
               </Text>
             </div>
           )}
         </main>
         <footer>
-          {entitlements.alloted === 0 && entitlements.pending === 0 && (
+          {entitlements.alloted === 0 && (
             <div
               className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer bg-gray-50 rounded-b py-4 px-6"
               onClick={() => {
@@ -494,31 +551,6 @@ export default () => {
 
   const { apps } = useOutletContext<OutletContextData>()
 
-  const [prevProPendingEntitlements, setPrevProPendingEntitlements] = useState<
-    number | undefined
-  >(undefined)
-
-  const revalidator = useRevalidator()
-  useEffect(() => {
-    if (!prevProPendingEntitlements) {
-      setPrevProPendingEntitlements(entitlements[ServicePlanType.PRO].pending)
-    } else if (
-      prevProPendingEntitlements !== 0 &&
-      entitlements[ServicePlanType.PRO].pending === 0
-    ) {
-      toast(ToastType.Success, {
-        message: 'Successfully purchased entitlements',
-      })
-      setPrevProPendingEntitlements(undefined)
-    }
-
-    if (entitlements[ServicePlanType.PRO].pending > 0) {
-      setTimeout(() => {
-        revalidator.revalidate()
-      }, 1000)
-    }
-  }, [entitlements])
-
   useEffect(() => {
     if (billingToast) {
       toast(ToastType.Info, {
@@ -526,6 +558,8 @@ export default () => {
       })
     }
   }, [billingToast])
+
+  const submit = useSubmit()
 
   return (
     <>
@@ -543,16 +577,42 @@ export default () => {
         </div>
 
         <div className="flex flex-row justify-end items-center gap-2 mt-2 lg:mt-0">
-          <a href="https://rollup.id/pricing" target="_blank">
-            <Button btnType="secondary-alt" btnSize="sm">
-              <div className="flex flex-row items-center gap-3">
-                <Text size="sm" weight="medium" className="text-gray-700">
-                  Compare plans
-                </Text>
-                <HiOutlineExternalLink className="text-gray-500" />
-              </div>
-            </Button>
-          </a>
+          <Button
+            btnType="secondary-alt"
+            btnSize="sm"
+            onClick={() => {
+              submit(
+                {},
+                {
+                  action: '/gnillib/payment',
+                  method: 'post',
+                }
+              )
+            }}
+          >
+            Updated payment methods
+          </Button>
+
+          <Button
+            btnType="secondary-alt"
+            btnSize="sm"
+            onClick={() => {
+              submit(
+                {
+                  payload: JSON.stringify({
+                    customerID: customerID as string,
+                    quantity: 7,
+                  }),
+                },
+                {
+                  action: '/gnillib',
+                  method: 'post',
+                }
+              )
+            }}
+          >
+            Get new sub
+          </Button>
         </div>
       </section>
 

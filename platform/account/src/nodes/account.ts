@@ -29,57 +29,6 @@ export default class Account extends DOProxy {
     return stored || null
   }
 
-  async getServicePlanOrders(): Promise<PendingServicePlans | undefined> {
-    return this.state.storage.get<PendingServicePlans>('pendingServicePlans')
-  }
-
-  async registerServicePlanOrder(
-    type: ServicePlanType,
-    quantity: number,
-    nonce: string
-  ): Promise<void> {
-    let psp = await this.state.storage.get<PendingServicePlans>(
-      'pendingServicePlans'
-    )
-
-    if (!psp) {
-      psp = {}
-    }
-    psp[nonce] = {
-      type,
-      quantity,
-    }
-
-    await this.state.storage.put('pendingServicePlans', psp)
-  }
-
-  async fullfillServicePlanOrder(
-    nonce: string,
-    subscriptionID: string
-  ): Promise<void> {
-    const psp = await this.state.storage.get<PendingServicePlans>(
-      'pendingServicePlans'
-    )
-    if (!psp) {
-      throw new RollupError({
-        message: 'No pending service plans found',
-      })
-    }
-
-    const order = psp[nonce]
-    if (!order) {
-      throw new RollupError({
-        message: 'No order found for nonce',
-      })
-    }
-
-    await this.updateEntitlements(order.type, order.quantity, subscriptionID)
-
-    delete psp[nonce]
-
-    await this.state.storage.put('pendingServicePlans', psp)
-  }
-
   async getServicePlans(): Promise<ServicePlans | undefined> {
     // await this.state.storage.delete('servicePlans')
     // await this.state.storage.delete('pendingServicePlans')
@@ -90,7 +39,7 @@ export default class Account extends DOProxy {
 
   async updateEntitlements(
     type: ServicePlanType,
-    delta: number,
+    quantity: number,
     subscriptionID: string
   ): Promise<void> {
     let servicePlans = await this.state.storage.get<ServicePlans>(
@@ -120,13 +69,7 @@ export default class Account extends DOProxy {
 
     // Non-null assertion operator is used
     // because of checks in previous lines
-    servicePlans.plans[type]!.entitlements += delta
-
-    // Fix negative entitlements
-    if (servicePlans.plans[type]!.entitlements < 0) {
-      console.warn('Negative entitlements detected, resetting to 0')
-      servicePlans.plans[type]!.entitlements = 0
-    }
+    servicePlans.plans[type]!.entitlements = quantity
 
     await this.state.storage.put('servicePlans', servicePlans)
   }
