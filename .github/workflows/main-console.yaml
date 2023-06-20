@@ -5,7 +5,7 @@ name: Console
 on:
   push:
     branches:
-      - main
+      - '*'
 
 defaults:
   run:
