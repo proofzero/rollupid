@@ -100,9 +100,7 @@ const testConsoleAppCreation = async ({
     waitUntil: 'networkidle',
   })
 
-  await page.waitForSelector('#oAuthAppId')
-
-  const appId = await page.locator('#oAuthAppId').getAttribute('value')
+  const appId = await page.$eval('#oAuthAppId', (el) => el.value)
 
   await page.getByRole('button').filter({ hasText: 'Complete Setup' }).click()
 
