@@ -14,7 +14,7 @@ import {
 import { ServicePlanType } from '@proofzero/types/account'
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
-import { beginCheckout } from '~/services/billing/stripe'
+import { checkout } from '~/services/billing/stripe'
 import { AccountURN } from '@proofzero/urns/account'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -69,8 +69,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       nonce,
     })
 
-    return beginCheckout({
-      planId: '42',
+    return checkout({
+      planID: '42',
       planType,
       quantity,
       nonce,

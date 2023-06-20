@@ -5,7 +5,7 @@ import { Context } from '../../context'
 const PlanTypeEnum = z.nativeEnum(ServicePlanType)
 
 export const GetEntitlementsOutputSchema = z.object({
-  customerID: z.string().optional(),
+  subscriptionID: z.string().optional(),
   plans: z.record(
     PlanTypeEnum,
     z.object({
@@ -26,7 +26,7 @@ export const getEntitlements = async ({
   }
 
   const servicePlans = await ctx.account?.class.getServicePlans()
-  result.customerID = servicePlans?.customerID
+  result.subscriptionID = servicePlans?.subscriptionID
 
   const servicePlanOrders = await ctx.account?.class.getServicePlanOrders()
   const servicePlanOrdersByType = servicePlanOrders

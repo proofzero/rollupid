@@ -55,7 +55,7 @@ export default class Account extends DOProxy {
 
   async fullfillServicePlanOrder(
     nonce: string,
-    customerID: string
+    subscriptionID: string
   ): Promise<void> {
     const psp = await this.state.storage.get<PendingServicePlans>(
       'pendingServicePlans'
@@ -73,7 +73,7 @@ export default class Account extends DOProxy {
       })
     }
 
-    await this.updateEntitlements(order.type, order.quantity, customerID)
+    await this.updateEntitlements(order.type, order.quantity, subscriptionID)
 
     delete psp[nonce]
 
@@ -81,13 +81,17 @@ export default class Account extends DOProxy {
   }
 
   async getServicePlans(): Promise<ServicePlans | undefined> {
+    // await this.state.storage.delete('servicePlans')
+    // await this.state.storage.delete('pendingServicePlans')
+    // await this.state.storage.delete('customerID')
+
     return this.state.storage.get<ServicePlans>('servicePlans')
   }
 
   async updateEntitlements(
     type: ServicePlanType,
     delta: number,
-    customerID: string
+    subscriptionID: string
   ): Promise<void> {
     let servicePlans = await this.state.storage.get<ServicePlans>(
       'servicePlans'
@@ -96,12 +100,12 @@ export default class Account extends DOProxy {
       servicePlans = {}
     }
 
-    if (!servicePlans.customerID) {
-      servicePlans.customerID = customerID
+    if (!servicePlans.subscriptionID) {
+      servicePlans.subscriptionID = subscriptionID
     } else {
-      if (servicePlans.customerID !== customerID) {
+      if (servicePlans.subscriptionID !== subscriptionID) {
         throw new RollupError({
-          message: 'Customer ID mismatch',
+          message: 'Subscription ID mismatch',
         })
       }
     }
@@ -125,5 +129,27 @@ export default class Account extends DOProxy {
     }
 
     await this.state.storage.put('servicePlans', servicePlans)
+  }
+
+  async getCustomerID(): Promise<string | undefined> {
+    return this.state.storage.get<string | undefined>('customerID')
+  }
+
+  async setCustomerID(customerID: string): Promise<void> {
+    const stored = await this.state.storage.get<string | undefined>(
+      'customerID'
+    )
+
+    if (stored && stored !== customerID) {
+      throw new RollupError({
+        message: 'Customer ID already set',
+      })
+    }
+
+    if (stored && stored === customerID) {
+      return
+    }
+
+    await this.state.storage.put('customerID', customerID)
   }
 }

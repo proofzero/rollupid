@@ -18,7 +18,7 @@ export type PendingServicePlans = {
 }
 
 export type ServicePlans = {
-  customerID?: string
+  subscriptionID?: string
   plans?: Partial<{
     [key in ServicePlanType]: {
       entitlements: number

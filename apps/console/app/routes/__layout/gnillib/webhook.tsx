@@ -38,7 +38,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         metadata: Record<string, string>
       }
 
-      const { customer: customerID } = obj
       const { nonce, accountURN } = obj.metadata as {
         nonce: string
         accountURN: AccountURN
@@ -46,11 +45,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
       await new Promise((ok) => setTimeout(ok, 5000))
 
-      await accountClient.fullfillServicePlanOrder.mutate({
-        nonce,
-        accountURN,
-        customerID,
-      })
+      // await accountClient.fullfillServicePlanOrder.mutate({
+      //   nonce,
+      //   accountURN,
+      // })
     }
 
     return null

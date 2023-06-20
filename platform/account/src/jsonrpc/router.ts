@@ -51,6 +51,12 @@ import {
   FulfillServicePlanOrderInputSchema,
   fulfillServicePlanOrder,
 } from './methods/fulfillServicePlanOrder'
+import {
+  GetCustomerIDOutputSchema,
+  SetCustomerIDInputSchema,
+  getCustomerID,
+  setCustomerID,
+} from './methods/customerID'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -168,4 +174,20 @@ export const appRouter = t.router({
     .use(Analytics)
     .output(GetEntitlementsOutputSchema)
     .query(getEntitlements),
+  getCustomerID: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(injectAccountNode)
+    .use(LogUsage)
+    .use(Analytics)
+    .output(GetCustomerIDOutputSchema)
+    .query(getCustomerID),
+  setCustomerID: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(injectAccountNode)
+    .use(LogUsage)
+    .use(Analytics)
+    .input(SetCustomerIDInputSchema)
+    .mutation(setCustomerID),
 })
