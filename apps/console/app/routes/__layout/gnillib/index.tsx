@@ -351,7 +351,7 @@ const PlanCard = ({
                 {
                   payload: JSON.stringify({
                     planType: ServicePlanType.PRO,
-                    quantity: proEntitlementDelta,
+                    quantity: entitlements.alloted + proEntitlementDelta,
                     customerID: paymentData.customerID,
                   }),
                 },
@@ -471,7 +471,7 @@ const PlanCard = ({
 
                 <div className="flex flex-row items-center gap-2">
                   <Text size="lg" weight="semibold" className="text-gray-900">
-                    ${entitlements.allotedClientIds.length * plans.PRO.price}
+                    ${entitlements.alloted * plans.PRO.price}
                   </Text>
                   <Text size="sm" className="text-gray-500">
                     per month
