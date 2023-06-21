@@ -100,7 +100,7 @@ const testConsoleAppCreation = async ({
     waitUntil: 'networkidle',
   })
 
-  await page.locator('button', { hasText: 'Complete Setup' }).click()
+  await page.locator('#cta-button').click()
 
   const appId = await page.$eval('#oAuthAppId', (el) => el.value)
 
