@@ -18,6 +18,7 @@ type CreateSubscriptionParams = {
   customerID: string
   planID: string
   quantity: number
+  accountURN: AccountURN
 }
 
 type UpdateSubscriptionParams = {
@@ -77,6 +78,7 @@ export const createSubscription = async ({
   customerID,
   planID,
   quantity,
+  accountURN,
 }: CreateSubscriptionParams) => {
   const stripeClient = new Stripe(STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
@@ -90,6 +92,9 @@ export const createSubscription = async ({
         quantity,
       },
     ],
+    metadata: {
+      accountURN,
+    },
   })
 
   return subscription

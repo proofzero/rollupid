@@ -23,8 +23,8 @@ export const updateEntitlements = async ({
 }): Promise<void> => {
   const { type, quantity, subscriptionID, accountURN } = input
 
-  // const account = await initAccountNodeByName(accountURN, ctx.Account)
-  // await account.class.updateEntitlements(type, quantity, subscriptionID)
+  const account = await initAccountNodeByName(accountURN, ctx.Account)
+  await account.class.updateEntitlements(type, quantity, subscriptionID)
 
-  await ctx.account?.class.updateEntitlements(type, quantity, subscriptionID)
+  // await ctx.account?.class.updateEntitlements(type, quantity, subscriptionID)
 }

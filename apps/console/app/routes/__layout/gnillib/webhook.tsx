@@ -6,6 +6,7 @@ import Stripe from 'stripe'
 import createAccountClient from '@proofzero/platform-clients/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { AccountURN } from '@proofzero/urns/account'
+import { ServicePlanType } from '@proofzero/types/account'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -31,24 +32,23 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       whSecret
     )
 
-    // Handle the checkout.session.completed event
-    if (event.type === 'checkout.session.completed') {
-      const obj = event.data.object as {
-        customer: string
+    if (event.type === 'customer.subscription.updated') {
+      const { id, quantity, metadata } = event.data.object as {
+        id: string
+        quantity: number
         metadata: Record<string, string>
       }
 
-      const { nonce, accountURN } = obj.metadata as {
-        nonce: string
+      const { accountURN } = metadata as {
         accountURN: AccountURN
       }
 
-      await new Promise((ok) => setTimeout(ok, 5000))
-
-      // await accountClient.fullfillServicePlanOrder.mutate({
-      //   nonce,
-      //   accountURN,
-      // })
+      await accountClient.updateEntitlements.mutate({
+        accountURN,
+        subscriptionID: id,
+        quantity,
+        type: ServicePlanType.PRO,
+      })
     }
 
     return null

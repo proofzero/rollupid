@@ -158,6 +158,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         customerID: customerID,
         planID: 'price_1NJaDgFEfyl69U7XQBHZDiDM',
         quantity: +quantity,
+        accountURN,
       })
     } else {
       sub = await updateSubscription({
@@ -166,13 +167,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         quantity: +quantity,
       })
     }
-
-    await accountClient.updateEntitlements.mutate({
-      quantity: +quantity,
-      type: ServicePlanType.PRO,
-      subscriptionID: sub.id,
-      accountURN,
-    })
 
     return null
   }
