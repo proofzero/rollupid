@@ -27,6 +27,7 @@ import {
 } from '@proofzero/types/application'
 import { AnyURN } from '@proofzero/urns'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
+import { NO_OP_ADDRESS_PLACEHOLDER } from '@proofzero/platform.address/src/constants'
 
 export async function validatePersonaData(
   accountUrn: AccountURN,
@@ -373,18 +374,22 @@ async function erc4337ClaimsRetriever(
     }
   } else {
     const walletAddressUrns = personaData.erc_4337 as AddressURN[]
-    for (const addressUrn of walletAddressUrns) {
-      const addressClient = createAddressClient(fetchers.addressFetcher!, {
-        ...generateTraceContextHeaders(traceSpan),
-        [PlatformAddressURNHeader]: addressUrn,
-      })
-      const profile = await addressClient.getAddressProfile.query()
+
+    const addressClient = createAddressClient(fetchers.addressFetcher!, {
+      ...generateTraceContextHeaders(traceSpan),
+      [PlatformAddressURNHeader]: NO_OP_ADDRESS_PLACEHOLDER,
+    })
+    const addressProfiles = await addressClient.getAddressProfileBatch.query(
+      walletAddressUrns
+    )
+
+    addressProfiles.forEach((profile, idx) => {
       result.erc_4337.claims.erc_4337.push({
         nickname: profile.title,
         address: profile.address,
       })
-      result.erc_4337.meta.urns.push(addressUrn)
-    }
+      result.erc_4337.meta.urns.push(walletAddressUrns[idx])
+    })
   }
   return result
 }
