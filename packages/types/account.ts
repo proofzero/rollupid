@@ -10,13 +10,6 @@ export enum ServicePlanType {
   PRO = 'PRO',
 }
 
-export type PendingServicePlans = {
-  [key: string]: {
-    type: ServicePlanType
-    quantity: number
-  }
-}
-
 export type ServicePlans = {
   subscriptionID?: string
   plans?: Partial<{
@@ -24,4 +17,9 @@ export type ServicePlans = {
       entitlements: number
     }
   }>
+}
+
+export type PaymentData = {
+  customerID: string
+  paymentMethodID?: string
 }

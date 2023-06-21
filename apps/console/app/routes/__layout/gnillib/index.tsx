@@ -25,7 +25,7 @@ import { TbHourglassHigh } from 'react-icons/tb'
 import classnames from 'classnames'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
-import { ServicePlanType } from '@proofzero/types/account'
+import { PaymentData, ServicePlanType } from '@proofzero/types/account'
 import {
   ToastType,
   Toaster,
@@ -38,6 +38,7 @@ import {
   updateSubscription,
 } from '~/services/billing/stripe'
 import { AccountURN } from '@proofzero/urns/account'
+import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 
 type EntitlementDetails = {
   alloted: number
@@ -45,7 +46,7 @@ type EntitlementDetails = {
 }
 
 type LoaderData = {
-  customerID?: string
+  paymentData: PaymentData
   entitlements: {
     [ServicePlanType.PRO]: EntitlementDetails
     FREE: {
@@ -77,16 +78,23 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const { plans } = await accountClient.getEntitlements.query()
 
-    let customerID = await accountClient.getStripeCustomerID.query()
-    if (!customerID) {
+    let spd = await accountClient.getStripePaymentData.query()
+    if (!spd?.customerID) {
       const customer = await createCustomer({
         email: '',
         name: '',
         accountURN,
       })
 
-      await accountClient.setStripeCustomerID.mutate(customer.id)
-      customerID = customer.id
+      spd = {
+        ...spd,
+        customerID: customer.id,
+      }
+
+      await accountClient.setStripePaymentData.mutate({
+        ...spd,
+        accountURN,
+      })
     }
 
     const proAllotedEntitlements =
@@ -108,7 +116,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     return json<LoaderData>(
       {
-        customerID,
+        paymentData: spd,
         entitlements: {
           [ServicePlanType.PRO]: {
             alloted: proAllotedEntitlements,
@@ -541,7 +549,8 @@ const PlanCard = ({
 }
 
 export default () => {
-  const { entitlements, billingToast, customerID } = useLoaderData<LoaderData>()
+  const { entitlements, billingToast, paymentData } =
+    useLoaderData<LoaderData>()
 
   const { apps } = useOutletContext<OutletContextData>()
 
@@ -559,6 +568,16 @@ export default () => {
     <>
       <Toaster position="top-right" reverseOrder={false} />
 
+      {!paymentData.paymentMethodID && (
+        <section className="mb-3.5">
+          <ToastWithLink
+            message="Update your Payment Information to enable purchasing"
+            linkHref={`/gnillib/payment`}
+            linkText="Update payment information"
+          />
+        </section>
+      )}
+
       <section className="flex flex-col lg:flex-row items-center justify-between mb-11">
         <div className="flex flex-row items-center space-x-3">
           <Text
@@ -570,7 +589,7 @@ export default () => {
           </Text>
         </div>
 
-        <div className="flex flex-row justify-end items-center gap-2 mt-2 lg:mt-0">
+        {/* <div className="flex flex-row justify-end items-center gap-2 mt-2 lg:mt-0">
           <Button
             btnType="secondary-alt"
             btnSize="sm"
@@ -607,14 +626,14 @@ export default () => {
           >
             Get new sub
           </Button>
-        </div>
+        </div> */}
       </section>
 
       <section className="flex flex-col gap-4">
         <PlanCard
           plan={plans[ServicePlanType.PRO]}
           entitlements={entitlements[ServicePlanType.PRO]}
-          customerID={customerID}
+          customerID={paymentData.customerID}
         />
 
         <EntitlementsCard

@@ -1,12 +1,12 @@
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction } from '@remix-run/cloudflare'
+import { LoaderFunction } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import createAccountClient from '@proofzero/platform-clients/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { updatePaymentMethod } from '~/services/billing/stripe'
 
-export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const jwt = await requireJWT(request)
 
@@ -17,7 +17,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const customerID = await accountClient.getStripeCustomerID.query()
+    const { customerID } = await accountClient.getStripePaymentData.query()
 
     return updatePaymentMethod({ customerID })
   }

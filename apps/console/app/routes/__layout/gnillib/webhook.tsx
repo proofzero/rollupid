@@ -32,23 +32,53 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       whSecret
     )
 
-    if (event.type === 'customer.subscription.updated') {
-      const { id, quantity, metadata } = event.data.object as {
-        id: string
-        quantity: number
-        metadata: Record<string, string>
-      }
+    switch (event.type) {
+      case 'customer.subscription.updated':
+        const {
+          id,
+          quantity,
+          metadata: subMeta,
+        } = event.data.object as {
+          id: string
+          quantity: number
+          metadata: {
+            accountURN: AccountURN
+          }
+        }
 
-      const { accountURN } = metadata as {
-        accountURN: AccountURN
-      }
+        await accountClient.updateEntitlements.mutate({
+          accountURN: subMeta.accountURN,
+          subscriptionID: id,
+          quantity,
+          type: ServicePlanType.PRO,
+        })
 
-      await accountClient.updateEntitlements.mutate({
-        accountURN,
-        subscriptionID: id,
-        quantity,
-        type: ServicePlanType.PRO,
-      })
+        break
+
+      case 'customer.updated':
+        const {
+          id: cusId,
+          invoice_settings,
+          metadata: cusMeta,
+        } = event.data.object as {
+          id: string
+          invoice_settings?: {
+            default_payment_method: string
+          }
+          metadata: {
+            accountURN: AccountURN
+          }
+        }
+
+        if (invoice_settings?.default_payment_method) {
+          await accountClient.setStripePaymentData.mutate({
+            accountURN: cusMeta.accountURN,
+            paymentMethodID: invoice_settings.default_payment_method,
+            customerID: cusId,
+          })
+        }
+
+        break
     }
 
     return null

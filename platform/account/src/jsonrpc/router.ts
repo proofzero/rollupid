@@ -44,15 +44,15 @@ import {
   getEntitlements,
 } from './methods/getEntitlements'
 import {
-  GetStripeCustomerIDOutputSchema,
-  SetStripeCustomerIDInputSchema,
-  getStripeCustomerID,
-  setStripeCustomerID,
-} from './methods/stripeCustomerID'
-import {
   UpdateEntitlementsInputSchema,
   updateEntitlements,
 } from './methods/updateEntitlements'
+import {
+  GetStripePaymentDataOutputSchema,
+  SetStripePaymentDataInputSchema,
+  getStripePaymentData,
+  setStripePaymentData,
+} from './methods/stripePaymentData'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -162,20 +162,20 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(UpdateEntitlementsInputSchema)
     .mutation(updateEntitlements),
-  getStripeCustomerID: t.procedure
+  getStripePaymentData: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(injectAccountNode)
     .use(LogUsage)
     .use(Analytics)
-    .output(GetStripeCustomerIDOutputSchema)
-    .query(getStripeCustomerID),
-  setStripeCustomerID: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(injectAccountNode)
+    .output(GetStripePaymentDataOutputSchema)
+    .query(getStripePaymentData),
+  setStripePaymentData: t.procedure
+    // .use(AuthorizationTokenFromHeader)
+    // .use(ValidateJWT)
+    // .use(injectAccountNode)
     .use(LogUsage)
     .use(Analytics)
-    .input(SetStripeCustomerIDInputSchema)
-    .mutation(setStripeCustomerID),
+    .input(SetStripePaymentDataInputSchema)
+    .mutation(setStripePaymentData),
 })

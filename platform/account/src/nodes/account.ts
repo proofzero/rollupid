@@ -1,7 +1,7 @@
 import { DOProxy } from 'do-proxy'
 import type { Profile, AddressList } from '../types'
 import {
-  PendingServicePlans,
+  PaymentData,
   ServicePlanType,
   ServicePlans,
 } from '@proofzero/types/account'
@@ -74,25 +74,21 @@ export default class Account extends DOProxy {
     await this.state.storage.put('servicePlans', servicePlans)
   }
 
-  async getStripeCustomerID(): Promise<string | undefined> {
-    return this.state.storage.get<string | undefined>('stripeCustomerID')
+  async getStripePaymentData(): Promise<PaymentData | undefined> {
+    return this.state.storage.get<PaymentData>('stripePaymentData')
   }
 
-  async setStripeCustomerID(stripeCustomerID: string): Promise<void> {
-    const stored = await this.state.storage.get<string | undefined>(
-      'stripeCustomerID'
+  async setStripePaymentData(paymentData: PaymentData): Promise<void> {
+    const stored = await this.state.storage.get<PaymentData | undefined>(
+      'stripePaymentData'
     )
 
-    if (stored && stored !== stripeCustomerID) {
+    if (stored && stored.customerID !== paymentData.customerID) {
       throw new RollupError({
         message: 'Customer ID already set',
       })
     }
 
-    if (stored && stored === stripeCustomerID) {
-      return
-    }
-
-    await this.state.storage.put('stripeCustomerID', stripeCustomerID)
+    await this.state.storage.put('stripePaymentData', paymentData)
   }
 }
