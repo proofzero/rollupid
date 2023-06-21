@@ -42,7 +42,6 @@ rounded-lg border shadow"
       </div>
     </div>
     <Button
-      id="cta-button"
       type="button"
       btnType="primary-alt"
       className="m-7"
