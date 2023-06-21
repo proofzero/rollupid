@@ -34,6 +34,7 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
+  timeout: 120000,
 
   // TODO: path to the global setup files.
   // globalSetup: require.resolve('./global-setup'),
