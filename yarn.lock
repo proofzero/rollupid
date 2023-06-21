@@ -5668,19 +5668,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:1.32.3":
-  version: 1.32.3
-  resolution: "@playwright/test@npm:1.32.3"
+"@playwright/test@npm:1.35.1":
+  version: 1.35.1
+  resolution: "@playwright/test@npm:1.35.1"
   dependencies:
     "@types/node": "*"
     fsevents: 2.3.2
-    playwright-core: 1.32.3
+    playwright-core: 1.35.1
   dependenciesMeta:
     fsevents:
       optional: true
   bin:
     playwright: cli.js
-  checksum: f248e5851d04183954ec6f3a5f2c8e3b0ea0085a83e0e695068c5c2eb6acd4dddb16829a429829a4eb9fe0a4518f6a5594890cf9bf4259255c9e07a5964be625
+  checksum: 3509d2f2c7397f9b0d4f49088cab8625f17d186f7e9b3389ddebf7c52ee8aae6407eab48f66b300b7bf6a33f6e3533fd5951e72bfdb001b68838af98596d5a53
   languageName: node
   linkType: hard
 
@@ -5751,7 +5751,7 @@ __metadata:
     "@headlessui/react": 1.7.5
     "@heroicons/react": 2.0.13
     "@mdx-js/react": 2.1.5
-    "@playwright/test": 1.32.3
+    "@playwright/test": 1.35.1
     "@proofzero/design-system": "workspace:*"
     "@proofzero/platform-clients": "workspace:*"
     "@proofzero/platform.starbase": "workspace:*"
@@ -5809,7 +5809,7 @@ __metadata:
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/keccak256": 5.7.0
     "@mdx-js/react": ^1.6.22
-    "@playwright/test": 1.32.3
+    "@playwright/test": 1.35.1
     "@proofzero/design-system": "*"
     "@proofzero/platform-clients": "workspace:*"
     "@proofzero/platform.access": "workspace:*"
@@ -5900,7 +5900,7 @@ __metadata:
     "@headlessui/react": 1.7.4
     "@heroicons/react": 2.0.13
     "@mdx-js/react": 2.1.5
-    "@playwright/test": 1.32.3
+    "@playwright/test": 1.35.1
     "@proofzero/design-system": "*"
     "@proofzero/errors": "workspace:*"
     "@proofzero/platform-clients": "workspace:*"
@@ -30416,12 +30416,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.32.3":
-  version: 1.32.3
-  resolution: "playwright-core@npm:1.32.3"
+"playwright-core@npm:1.35.1":
+  version: 1.35.1
+  resolution: "playwright-core@npm:1.35.1"
   bin:
-    playwright: cli.js
-  checksum: 7ea091c41a7d1bb97b445bc541a85b123ffcf167bcc00fb7e13e9079f06c92f59fd27caf9d1c1d7e0054f2b5765d1a16d198833c2be7266cebb9dbb916cd90f4
+    playwright-core: cli.js
+  checksum: 179abc0051f00474e528935b507fa8cedc986b2803b020d7679878ba28cdd7036ad5a779792aad2ad281f8dc625eb1d2fb77663cb8de0d20c7ffbda7c18febdd
   languageName: node
   linkType: hard
 

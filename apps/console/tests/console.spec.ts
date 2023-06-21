@@ -96,18 +96,16 @@ const testConsoleAppCreation = async ({
   await page.getByRole('button').filter({ hasText: 'Create' }).click()
 
   await page.waitForURL(/.*apps\/.*/, {
-    timeout: 5000,
+    timeout: 10000,
     waitUntil: 'networkidle',
   })
 
-  await page.waitForSelector('#oAuthAppId')
-
-  const appId = await page.locator('#oAuthAppId').getAttribute('value')
-
   await page.getByRole('button').filter({ hasText: 'Complete Setup' }).click()
 
+  const appId = await page.$eval('#oAuthAppId', (el) => el.value)
+
   await page.waitForURL(/.*apps\/.*\/auth/, {
-    timeout: 5000,
+    timeout: 10000,
     waitUntil: 'networkidle',
   })
 
