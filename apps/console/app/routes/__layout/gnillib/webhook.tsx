@@ -76,10 +76,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         }
 
         if (invoice_settings?.default_payment_method) {
-          await accountClient.setStripePaymentData.mutate({
+          const paymentData = await accountClient.getStripePaymentData.query({
             accountURN: cusMeta.accountURN,
-            paymentMethodID: invoice_settings.default_payment_method,
-            customerID: cusId,
+          })
+          paymentData.paymentMethodID = invoice_settings.default_payment_method
+          await accountClient.setStripePaymentData.mutate({
+            ...paymentData,
+            accountURN: cusMeta.accountURN,
           })
         }
 

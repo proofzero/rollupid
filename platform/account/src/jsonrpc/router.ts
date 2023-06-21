@@ -48,6 +48,7 @@ import {
   updateEntitlements,
 } from './methods/updateEntitlements'
 import {
+  GetStripPaymentDataInputSchema,
   GetStripePaymentDataOutputSchema,
   SetStripePaymentDataInputSchema,
   getStripePaymentData,
@@ -163,11 +164,12 @@ export const appRouter = t.router({
     .input(UpdateEntitlementsInputSchema)
     .mutation(updateEntitlements),
   getStripePaymentData: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(injectAccountNode)
+    // .use(AuthorizationTokenFromHeader)
+    // .use(ValidateJWT)
+    // .use(injectAccountNode)
     .use(LogUsage)
     .use(Analytics)
+    .input(GetStripPaymentDataInputSchema)
     .output(GetStripePaymentDataOutputSchema)
     .query(getStripePaymentData),
   setStripePaymentData: t.procedure

@@ -2,9 +2,14 @@ import { Button } from '@proofzero/design-system'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { LoaderFunction, json } from '@remix-run/cloudflare'
+import {
+  ActionFunction,
+  LoaderFunction,
+  json,
+  redirect,
+} from '@remix-run/cloudflare'
 import { FaCheck, FaShoppingCart, FaTrash } from 'react-icons/fa'
-import { HiMinus, HiPlus } from 'react-icons/hi'
+import { HiMinus, HiOutlineMail, HiPlus } from 'react-icons/hi'
 import {
   commitFlashSession,
   getFlashSession,
@@ -35,6 +40,17 @@ import plans, { PlanDetails } from './plans'
 import { createCustomer } from '~/services/billing/stripe'
 import { AccountURN } from '@proofzero/urns/account'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
+import { Input } from '@proofzero/design-system/src/atoms/form/Input'
+import {
+  getEmailDropdownItems,
+  getEmailIcon,
+} from '@proofzero/utils/getNormalisedConnectedAccounts'
+import {
+  Dropdown,
+  DropdownSelectListItem,
+} from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
+import { ToastInfo } from '@proofzero/design-system/src/atoms/toast/ToastInfo'
 
 type EntitlementDetails = {
   alloted: number
@@ -42,7 +58,7 @@ type EntitlementDetails = {
 }
 
 type LoaderData = {
-  paymentData: PaymentData
+  paymentData?: PaymentData
   entitlements: {
     [ServicePlanType.PRO]: EntitlementDetails
     FREE: {
@@ -50,6 +66,7 @@ type LoaderData = {
     }
   }
   billingSuccess?: string
+  connectedEmails: DropdownSelectListItem[]
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -74,25 +91,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const { plans } = await accountClient.getEntitlements.query()
 
-    let spd = await accountClient.getStripePaymentData.query()
-    if (!spd?.customerID) {
-      const customer = await createCustomer({
-        email: '',
-        name: '',
-        accountURN,
-      })
-
-      spd = {
-        ...spd,
-        customerID: customer.id,
-      }
-
-      await accountClient.setStripePaymentData.mutate({
-        ...spd,
-        accountURN,
-      })
-    }
-
     const proAllotedEntitlements =
       plans?.[ServicePlanType.PRO]?.entitlements ?? 0
 
@@ -110,6 +108,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
     const billingSuccess = flashSession.get('billing_success')
 
+    const connectedAccounts = await accountClient.getAddresses.query({
+      account: accountURN,
+    })
+    const connectedEmails = getEmailDropdownItems(connectedAccounts)
+
+    const spd = await accountClient.getStripePaymentData.query({
+      accountURN,
+    })
+
     return json<LoaderData>(
       {
         paymentData: spd,
@@ -123,6 +130,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           },
         },
         billingSuccess,
+        connectedEmails,
       },
       {
         headers: {
@@ -214,7 +222,7 @@ const PlanCard = ({
 }: {
   plan: PlanDetails
   entitlements: EntitlementDetails
-  paymentData: PaymentData
+  paymentData?: PaymentData
 }) => {
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
   const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
@@ -236,7 +244,7 @@ const PlanCard = ({
           Purchase Entitlement(s)
         </Text>
 
-        {!paymentData.paymentMethodID && (
+        {!paymentData?.paymentMethodID && (
           <section className="mt-3.5 mx-5">
             <ToastWithLink
               message="Update your Payment Information to enable purchasing"
@@ -342,7 +350,7 @@ const PlanCard = ({
         <section className="flex flex-row-reverse gap-4 m-5">
           <Button
             btnType="primary-alt"
-            disabled={!paymentData.paymentMethodID}
+            disabled={!paymentData?.paymentMethodID}
             onClick={() => {
               setPurchaseProModalOpen(false)
               setProEntitlementDelta(1)
@@ -352,7 +360,7 @@ const PlanCard = ({
                   payload: JSON.stringify({
                     planType: ServicePlanType.PRO,
                     quantity: entitlements.alloted + proEntitlementDelta,
-                    customerID: paymentData.customerID,
+                    customerID: paymentData?.customerID,
                   }),
                 },
                 {
@@ -513,10 +521,10 @@ const PlanCard = ({
 }
 
 export default () => {
-  const { entitlements, billingSuccess, paymentData } =
+  const { entitlements, billingSuccess, paymentData, connectedEmails } =
     useLoaderData<LoaderData>()
 
-  const { apps } = useOutletContext<OutletContextData>()
+  const { apps, PASSPORT_URL } = useOutletContext<OutletContextData>()
 
   useEffect(() => {
     if (billingSuccess) {
@@ -526,19 +534,36 @@ export default () => {
     }
   }, [billingSuccess])
 
+  const redirectToPassport = () => {
+    const currentURL = new URL(window.location.href)
+    currentURL.search = ''
+
+    const qp = new URLSearchParams()
+    qp.append('scope', '')
+    qp.append('state', 'skip')
+    qp.append('client_id', 'console')
+
+    qp.append('redirect_uri', currentURL.toString())
+    qp.append('rollup_action', 'connect')
+    qp.append('login_hint', 'email microsoft google apple')
+
+    window.location.href = `${PASSPORT_URL}/authorize?${qp.toString()}`
+  }
+
+  useConnectResult()
+
+  const [selectedEmail, setSelectedEmail] = useState<string | undefined>()
+  const [selectedEmailURN, setSelectedEmailURN] = useState<string | undefined>()
+
+  const [fullName, setFullName] = useState<string | undefined>(
+    paymentData?.name
+  )
+
+  const submit = useSubmit()
+
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
-
-      {!paymentData.paymentMethodID && (
-        <section className="mb-3.5">
-          <ToastWithLink
-            message="Update your Payment Information to enable purchasing"
-            linkHref={`/gnillib/payment`}
-            linkText="Update payment information"
-          />
-        </section>
-      )}
 
       <section className="flex flex-col lg:flex-row items-center justify-between mb-11">
         <div className="flex flex-row items-center space-x-3">
@@ -591,7 +616,139 @@ export default () => {
         </div> */}
       </section>
 
+      <section>
+        {paymentData && !paymentData.paymentMethodID && (
+          <article className="mb-3.5">
+            <ToastWithLink
+              message="Update your Payment Information to enable purchasing"
+              linkHref={`/gnillib/payment`}
+              linkText="Update payment information"
+            />
+          </article>
+        )}
+
+        {!paymentData && (
+          <article className="mb-3.5">
+            <ToastInfo message="Please fill Billing Contact Section" />
+          </article>
+        )}
+      </section>
+
       <section className="flex flex-col gap-4">
+        <article className="bg-white rounded border">
+          <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
+            <div>
+              <Text size="lg" weight="semibold" className="text-gray-900">
+                Billing Contact
+              </Text>
+              <Text size="sm" weight="medium" className="text-[#6B7280]">
+                This will be used to create a custumer ID and for notifications
+                about your billing
+              </Text>
+            </div>
+
+            <Button
+              btnType="primary-alt"
+              disabled={!fullName || !selectedEmail}
+              onClick={() => {
+                submit(
+                  {
+                    payload: JSON.stringify({
+                      name: fullName,
+                      email: selectedEmail,
+                      emailURN: selectedEmailURN,
+                    }),
+                  },
+                  {
+                    action: '/gnillib/details',
+                    method: 'post',
+                  }
+                )
+              }}
+            >
+              Submit
+            </Button>
+          </header>
+          <main className="p-4 flex flex-row gap-4 items-center">
+            <div className="w-52">
+              <Input
+                id="full_name"
+                label="Full Name"
+                required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+              />
+            </div>
+
+            <div className="self-start w-80">
+              {connectedEmails && connectedEmails.length === 0 && (
+                <Button onClick={redirectToPassport} btnType="secondary-alt">
+                  <div className="flex space-x-3">
+                    <HiOutlineMail className="w-6 h-6 text-gray-800" />
+                    <Text weight="medium" className="flex-1 text-gray-800">
+                      Connect Email Address
+                    </Text>
+                  </div>
+                </Button>
+              )}
+
+              {connectedEmails && connectedEmails.length > 0 && (
+                <>
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="text-gray-700 mb-2"
+                  >
+                    <sup>*</sup>
+                    Email
+                  </Text>
+
+                  <Dropdown
+                    items={(connectedEmails as DropdownSelectListItem[]).map(
+                      (email) => {
+                        email.value === ''
+                          ? (email.selected = true)
+                          : (email.selected = false)
+                        // Substituting subtitle with icon
+                        // on the client side
+                        email.subtitle && !email.icon
+                          ? (email.icon = getEmailIcon(email.subtitle))
+                          : null
+                        return {
+                          value: email.value,
+                          selected: email.selected,
+                          icon: email.icon,
+                          title: email.title,
+                        }
+                      }
+                    )}
+                    placeholder="Select an Email Address"
+                    onSelect={(selected) => {
+                      // type casting to DropdownSelectListItem instead of array
+                      if (!Array.isArray(selected)) {
+                        if (!selected || !selected.value) {
+                          console.error('Error selecting email, try again')
+                          return
+                        }
+
+                        setSelectedEmail(selected.title)
+                        setSelectedEmailURN(selected.value)
+                      }
+                    }}
+                    ConnectButtonCallback={redirectToPassport}
+                    ConnectButtonPhrase="Connect New Email Address"
+                    defaultItems={
+                      connectedEmails.filter(
+                        (ce) => ce.title === paymentData?.email
+                      ) as DropdownSelectListItem[]
+                    }
+                  />
+                </>
+              )}
+            </div>
+          </main>
+        </article>
+
         <PlanCard
           plan={plans[ServicePlanType.PRO]}
           entitlements={entitlements[ServicePlanType.PRO]}

@@ -46,8 +46,8 @@ export const createCustomer = async ({
   })
 
   const customer = await stripeClient.customers.create({
-    // email,
-    // name,
+    email,
+    name,
     metadata: {
       accountURN,
     },
