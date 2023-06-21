@@ -2,9 +2,9 @@ import { Button } from '@proofzero/design-system'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
+import { LoaderFunction, json } from '@remix-run/cloudflare'
 import { FaCheck, FaShoppingCart, FaTrash } from 'react-icons/fa'
-import { HiMinus, HiOutlineExternalLink, HiPlus } from 'react-icons/hi'
+import { HiMinus, HiPlus } from 'react-icons/hi'
 import {
   commitFlashSession,
   getFlashSession,
@@ -32,11 +32,7 @@ import {
   toast,
 } from '@proofzero/design-system/src/atoms/toast'
 import plans, { PlanDetails } from './plans'
-import {
-  createCustomer,
-  createSubscription,
-  updateSubscription,
-} from '~/services/billing/stripe'
+import { createCustomer } from '~/services/billing/stripe'
 import { AccountURN } from '@proofzero/urns/account'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 
@@ -137,49 +133,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
-export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, params, context }) => {
-    const jwt = await requireJWT(request)
-    const parsedJwt = parseJwt(jwt!)
-    const accountURN = parsedJwt.sub as AccountURN
-
-    const traceHeader = generateTraceContextHeaders(context.traceSpan)
-
-    const accountClient = createAccountClient(Account, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-
-    const fd = await request.formData()
-    const { customerID, quantity } = JSON.parse(
-      fd.get('payload') as string
-    ) as {
-      customerID: string
-      quantity: number
-    }
-
-    const entitlements = await accountClient.getEntitlements.query()
-
-    let sub
-    if (!entitlements.subscriptionID) {
-      sub = await createSubscription({
-        customerID: customerID,
-        planID: 'price_1NJaDgFEfyl69U7XQBHZDiDM',
-        quantity: +quantity,
-        accountURN,
-      })
-    } else {
-      sub = await updateSubscription({
-        subscriptionID: entitlements.subscriptionID,
-        planID: 'price_1NJaDgFEfyl69U7XQBHZDiDM',
-        quantity: +quantity,
-      })
-    }
-
-    return null
-  }
-)
-
 const PlanFeatures = ({ plan }: { plan: PlanDetails }) => {
   return (
     <ul className="grid lg:grid-rows-4 grid-flow-row lg:grid-flow-col gap-4">
@@ -257,11 +210,11 @@ const EntitlementsCard = ({
 const PlanCard = ({
   plan,
   entitlements,
-  customerID,
+  paymentData,
 }: {
   plan: PlanDetails
   entitlements: EntitlementDetails
-  customerID?: string
+  paymentData: PaymentData
 }) => {
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
   const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
@@ -282,6 +235,16 @@ const PlanCard = ({
         >
           Purchase Entitlement(s)
         </Text>
+
+        {!paymentData.paymentMethodID && (
+          <section className="mt-3.5 mx-5">
+            <ToastWithLink
+              message="Update your Payment Information to enable purchasing"
+              linkHref={`/gnillib/payment`}
+              linkText="Update payment information"
+            />
+          </section>
+        )}
 
         <section className="m-5 border rounded-lg">
           <div className="p-6">
@@ -379,6 +342,7 @@ const PlanCard = ({
         <section className="flex flex-row-reverse gap-4 m-5">
           <Button
             btnType="primary-alt"
+            disabled={!paymentData.paymentMethodID}
             onClick={() => {
               setPurchaseProModalOpen(false)
               setProEntitlementDelta(1)
@@ -388,7 +352,7 @@ const PlanCard = ({
                   payload: JSON.stringify({
                     planType: ServicePlanType.PRO,
                     quantity: proEntitlementDelta,
-                    customerID,
+                    customerID: paymentData.customerID,
                   }),
                 },
                 {
@@ -398,7 +362,7 @@ const PlanCard = ({
               )
             }}
           >
-            Save
+            Checkout
           </Button>
           <Button
             btnType="secondary-alt"
@@ -633,7 +597,7 @@ export default () => {
         <PlanCard
           plan={plans[ServicePlanType.PRO]}
           entitlements={entitlements[ServicePlanType.PRO]}
-          customerID={paymentData.customerID}
+          paymentData={paymentData}
         />
 
         <EntitlementsCard

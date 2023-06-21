@@ -33,6 +33,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     )
 
     switch (event.type) {
+      case 'customer.subscription.created':
       case 'customer.subscription.updated':
         const {
           id,
