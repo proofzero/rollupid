@@ -49,7 +49,7 @@ type LoaderData = {
       appClientIds: string[]
     }
   }
-  billingToast?: string
+  billingSuccess?: string
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -108,7 +108,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
-    const billingToast = flashSession.get('billing_toast')
+    const billingSuccess = flashSession.get('billing_success')
 
     return json<LoaderData>(
       {
@@ -122,7 +122,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
             appClientIds: freeAppClientIds,
           },
         },
-        billingToast,
+        billingSuccess,
       },
       {
         headers: {
@@ -513,20 +513,18 @@ const PlanCard = ({
 }
 
 export default () => {
-  const { entitlements, billingToast, paymentData } =
+  const { entitlements, billingSuccess, paymentData } =
     useLoaderData<LoaderData>()
 
   const { apps } = useOutletContext<OutletContextData>()
 
   useEffect(() => {
-    if (billingToast) {
-      toast(ToastType.Info, {
-        message: billingToast,
+    if (billingSuccess) {
+      toast(ToastType.Success, {
+        message: billingSuccess,
       })
     }
-  }, [billingToast])
-
-  const submit = useSubmit()
+  }, [billingSuccess])
 
   return (
     <>

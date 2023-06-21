@@ -14,6 +14,7 @@ import {
   createSubscription,
   updateSubscription,
 } from '~/services/billing/stripe'
+import { ServicePlanType } from '@proofzero/types/account'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -54,8 +55,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
+    await accountClient.updateEntitlements.mutate({
+      accountURN,
+      subscriptionID: sub.id,
+      quantity: +quantity,
+      type: ServicePlanType.PRO,
+    })
+
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
-    flashSession.flash('billing_toast', 'Order successfully submitted')
+    flashSession.flash('billing_success', 'Order successfully submitted')
 
     return redirect('/gnillib', {
       headers: {

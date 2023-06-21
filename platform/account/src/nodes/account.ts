@@ -32,7 +32,7 @@ export default class Account extends DOProxy {
   async getServicePlans(): Promise<ServicePlans | undefined> {
     // await this.state.storage.delete('servicePlans')
     // await this.state.storage.delete('pendingServicePlans')
-    // await this.state.storage.delete('stripeCustomerID')
+    // await this.state.storage.delete('stripePaymentData')
 
     return this.state.storage.get<ServicePlans>('servicePlans')
   }
