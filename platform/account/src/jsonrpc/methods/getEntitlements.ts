@@ -4,13 +4,15 @@ import { Context } from '../../context'
 
 const PlanTypeEnum = z.nativeEnum(ServicePlanType)
 
-export const GetEntitlementsOutputSchema = z.record(
-  PlanTypeEnum,
-  z.object({
-    entitlements: z.number(),
-    pendingEntitlements: z.number(),
-  })
-)
+export const GetEntitlementsOutputSchema = z.object({
+  subscriptionID: z.string().optional(),
+  plans: z.record(
+    PlanTypeEnum,
+    z.object({
+      entitlements: z.number(),
+    })
+  ),
+})
 type GetEntitlementsOutput = z.infer<typeof GetEntitlementsOutputSchema>
 
 export const getEntitlements = async ({
@@ -18,22 +20,12 @@ export const getEntitlements = async ({
 }: {
   ctx: Context
 }): Promise<GetEntitlementsOutput> => {
-  const result: GetEntitlementsOutput = {}
+  const result: GetEntitlementsOutput = {
+    plans: {},
+  }
 
   const servicePlans = await ctx.account?.class.getServicePlans()
-
-  const servicePlanOrders = await ctx.account?.class.getServicePlanOrders()
-  const servicePlanOrdersByType = servicePlanOrders
-    ? Object.keys(servicePlanOrders || {})
-        .map((k) => servicePlanOrders[k])
-        .reduce((acc, v) => {
-          if (!acc[v.type]) {
-            acc[v.type] = 0
-          }
-          acc[v.type] += v.quantity
-          return acc
-        }, {} as Record<ServicePlanType, number>)
-    : undefined
+  result.subscriptionID = servicePlans?.subscriptionID
 
   for (const key of Object.keys(ServicePlanType)) {
     const enumKey = PlanTypeEnum.parse(key)
@@ -46,11 +38,7 @@ export const getEntitlements = async ({
       resEntry.entitlements = servicePlans.plans[enumKey].entitlements
     }
 
-    if (servicePlanOrdersByType && servicePlanOrdersByType[enumKey]) {
-      resEntry.pendingEntitlements = servicePlanOrdersByType[enumKey]
-    }
-
-    result[enumKey] = resEntry
+    result.plans[enumKey] = resEntry
   }
 
   return result

@@ -52,12 +52,18 @@ jobs:
           secrets: |
             SECRET_SESSION_KEY
             SECRET_SESSION_SALT
+            STRIPE_API_SECRET
+            STRIPE_WEBHOOK_SECRET
+            STRIPE_PRO_PLAN_ID
         env:
           NODE_ENV: 'development'
           # A secret used for session encryption.
           SECRET_SESSION_KEY: ${{ secrets.SECRET_SESSION_KEY_DEV }}
           SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_DEV }}
           # CF_ROUTE: https://console-dev.kubelt.com/*
+          STRIPE_API_SECRET: ${{ secrets.STRIPE_API_SECRET_DEV }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET_DEV }}
+          STRIPE_PRO_PLAN_ID: ${{ secrets.STRIPE_PRO_PLAN_ID_DEV }}
 
       - name: Setup Playwright
         working-directory: 'apps/console'

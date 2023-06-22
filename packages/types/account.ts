@@ -1,3 +1,5 @@
+import { AddressURN } from '@proofzero/urns/address'
+
 export type AccountProfile = {
   displayName: string
   pfp: {
@@ -10,18 +12,18 @@ export enum ServicePlanType {
   PRO = 'PRO',
 }
 
-export type PendingServicePlans = {
-  [key: string]: {
-    type: ServicePlanType
-    quantity: number
-  }
-}
-
 export type ServicePlans = {
-  customerID?: string
+  subscriptionID?: string
   plans?: Partial<{
     [key in ServicePlanType]: {
       entitlements: number
     }
   }>
+}
+
+export type PaymentData = {
+  customerID: string
+  email: string
+  name: string
+  paymentMethodID?: string
 }

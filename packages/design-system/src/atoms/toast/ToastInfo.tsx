@@ -9,7 +9,7 @@ type ToastInfoProps = {
 export const ToastInfo = ({
   message,
   remove,
-}: ToastInfoProps & { remove: () => void }) => (
+}: ToastInfoProps & { remove?: () => void }) => (
   <Toast
     remove={remove}
     message={message}

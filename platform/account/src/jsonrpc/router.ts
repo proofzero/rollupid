@@ -44,9 +44,16 @@ import {
   getEntitlements,
 } from './methods/getEntitlements'
 import {
-  RegisterServicePlanOrderInputSchema,
-  registerServicePlanOrder,
-} from './methods/registerServicePlanOrder'
+  UpdateEntitlementsInputSchema,
+  updateEntitlements,
+} from './methods/updateEntitlements'
+import {
+  GetStripPaymentDataInputSchema,
+  GetStripePaymentDataOutputSchema,
+  SetStripePaymentDataInputSchema,
+  getStripePaymentData,
+  setStripePaymentData,
+} from './methods/stripePaymentData'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -140,14 +147,6 @@ export const appRouter = t.router({
     .use(LogUsage)
     .input(DeleteAccountNodeInput)
     .mutation(deleteAccountNodeMethod),
-  registerServicePlanOrder: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(injectAccountNode)
-    .use(LogUsage)
-    .use(Analytics)
-    .input(RegisterServicePlanOrderInputSchema)
-    .mutation(registerServicePlanOrder),
   getEntitlements: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
@@ -156,4 +155,20 @@ export const appRouter = t.router({
     .use(Analytics)
     .output(GetEntitlementsOutputSchema)
     .query(getEntitlements),
+  updateEntitlements: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(UpdateEntitlementsInputSchema)
+    .mutation(updateEntitlements),
+  getStripePaymentData: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetStripPaymentDataInputSchema)
+    .output(GetStripePaymentDataOutputSchema)
+    .query(getStripePaymentData),
+  setStripePaymentData: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(SetStripePaymentDataInputSchema)
+    .mutation(setStripePaymentData),
 })

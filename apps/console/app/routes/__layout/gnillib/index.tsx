@@ -2,9 +2,14 @@ import { Button } from '@proofzero/design-system'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { LoaderFunction, json } from '@remix-run/cloudflare'
+import {
+  ActionFunction,
+  LoaderFunction,
+  json,
+  redirect,
+} from '@remix-run/cloudflare'
 import { FaCheck, FaShoppingCart, FaTrash } from 'react-icons/fa'
-import { HiMinus, HiOutlineExternalLink, HiPlus } from 'react-icons/hi'
+import { HiMinus, HiOutlineMail, HiPlus } from 'react-icons/hi'
 import {
   commitFlashSession,
   getFlashSession,
@@ -12,11 +17,14 @@ import {
 } from '~/utilities/session.server'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import createAccountClient from '@proofzero/platform-clients/account'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import {
+  getAuthzHeaderConditionallyFromToken,
+  parseJwt,
+} from '@proofzero/utils'
+import {
+  useActionData,
   useLoaderData,
   useOutletContext,
-  useRevalidator,
   useSubmit,
 } from '@remix-run/react'
 import type { LoaderData as OutletContextData } from '~/root'
@@ -27,34 +35,55 @@ import { TbHourglassHigh } from 'react-icons/tb'
 import classnames from 'classnames'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
-import { ServicePlanType } from '@proofzero/types/account'
+import { PaymentData, ServicePlanType } from '@proofzero/types/account'
 import {
   ToastType,
   Toaster,
   toast,
 } from '@proofzero/design-system/src/atoms/toast'
-
 import plans, { PlanDetails } from './plans'
+import { AccountURN } from '@proofzero/urns/account'
+import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
+import { Input } from '@proofzero/design-system/src/atoms/form/Input'
+import {
+  getEmailDropdownItems,
+  getEmailIcon,
+} from '@proofzero/utils/getNormalisedConnectedAccounts'
+import {
+  Dropdown,
+  DropdownSelectListItem,
+} from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
+import { ToastInfo } from '@proofzero/design-system/src/atoms/toast/ToastInfo'
+import { DangerPill } from '@proofzero/design-system/src/atoms/pills/DangerPill'
+import {
+  createSubscription,
+  updateSubscription,
+} from '~/services/billing/stripe'
 
 type EntitlementDetails = {
   alloted: number
-  pending: number
   allotedClientIds: string[]
 }
 
 type LoaderData = {
+  paymentData?: PaymentData
   entitlements: {
     [ServicePlanType.PRO]: EntitlementDetails
     FREE: {
       appClientIds: string[]
     }
   }
-  billingToast?: string
+  successToast?: string
+  connectedEmails: DropdownSelectListItem[]
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
     const jwt = await requireJWT(request)
+    const parsedJwt = parseJwt(jwt!)
+    const accountURN = parsedJwt.sub as AccountURN
+
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
     const starbaseClient = createStarbaseClient(Starbase, {
@@ -69,12 +98,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const entitlements = await accountClient.getEntitlements.query()
+    const { plans } = await accountClient.getEntitlements.query()
 
     const proAllotedEntitlements =
-      entitlements?.[ServicePlanType.PRO]?.entitlements ?? 0
-    const proPendingEntitlements =
-      entitlements?.[ServicePlanType.PRO]?.pendingEntitlements ?? 0
+      plans?.[ServicePlanType.PRO]?.entitlements ?? 0
 
     // Capping this to 2 for demo purposes
     const proUsage = Math.min(2, proAllotedEntitlements)
@@ -88,21 +115,86 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
-    const billingToast = flashSession.get('billing_toast')
+    const successToast = flashSession.get('success_toast')
+
+    const connectedAccounts = await accountClient.getAddresses.query({
+      account: accountURN,
+    })
+    const connectedEmails = getEmailDropdownItems(connectedAccounts)
+
+    const spd = await accountClient.getStripePaymentData.query({
+      accountURN,
+    })
 
     return json<LoaderData>(
       {
+        paymentData: spd,
         entitlements: {
           [ServicePlanType.PRO]: {
             alloted: proAllotedEntitlements,
-            pending: proPendingEntitlements,
             allotedClientIds: proAppClientIds,
           },
           FREE: {
             appClientIds: freeAppClientIds,
           },
         },
-        billingToast,
+        successToast,
+        connectedEmails,
+      },
+      {
+        headers: {
+          'Set-Cookie': await commitFlashSession(flashSession),
+        },
+      }
+    )
+  }
+)
+
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    const jwt = await requireJWT(request)
+    const parsedJwt = parseJwt(jwt!)
+    const accountURN = parsedJwt.sub as AccountURN
+
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+
+    const accountClient = createAccountClient(Account, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
+    const fd = await request.formData()
+    const { customerID, quantity } = JSON.parse(
+      fd.get('payload') as string
+    ) as {
+      customerID: string
+      quantity: number
+    }
+
+    const entitlements = await accountClient.getEntitlements.query()
+
+    let sub
+    if (!entitlements.subscriptionID) {
+      sub = await createSubscription({
+        customerID: customerID,
+        planID: STRIPE_PRO_PLAN_ID,
+        quantity: +quantity,
+        accountURN,
+      })
+    } else {
+      sub = await updateSubscription({
+        subscriptionID: entitlements.subscriptionID,
+        planID: STRIPE_PRO_PLAN_ID,
+        quantity: +quantity,
+      })
+    }
+
+    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    flashSession.flash('success_toast', 'Entitlements successfully bought')
+
+    return json(
+      {
+        updatedProEntitlements: quantity,
       },
       {
         headers: {
@@ -190,9 +282,11 @@ const EntitlementsCard = ({
 const PlanCard = ({
   plan,
   entitlements,
+  paymentData,
 }: {
   plan: PlanDetails
   entitlements: EntitlementDetails
+  paymentData?: PaymentData
 }) => {
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
   const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
@@ -213,6 +307,16 @@ const PlanCard = ({
         >
           Purchase Entitlement(s)
         </Text>
+
+        {!paymentData?.paymentMethodID && (
+          <section className="mt-3.5 mx-5">
+            <ToastWithLink
+              message="Update your Payment Information to enable purchasing"
+              linkHref={`/gnillib/payment`}
+              linkText="Update payment information"
+            />
+          </section>
+        )}
 
         <section className="m-5 border rounded-lg">
           <div className="p-6">
@@ -310,26 +414,26 @@ const PlanCard = ({
         <section className="flex flex-row-reverse gap-4 m-5">
           <Button
             btnType="primary-alt"
+            disabled={!paymentData?.paymentMethodID}
             onClick={() => {
               setPurchaseProModalOpen(false)
               setProEntitlementDelta(1)
 
               submit(
                 {
-                  action: 'purchase',
                   payload: JSON.stringify({
                     planType: ServicePlanType.PRO,
-                    quantity: proEntitlementDelta,
+                    quantity: entitlements.alloted + proEntitlementDelta,
+                    customerID: paymentData?.customerID,
                   }),
                 },
                 {
-                  action: '/gnillib/checkout',
                   method: 'post',
                 }
               )
             }}
           >
-            Save
+            Checkout
           </Button>
           <Button
             btnType="secondary-alt"
@@ -356,9 +460,10 @@ const PlanCard = ({
                 <Menu.Button
                   className={`py-2 px-3 border rounded flex flex-row justify-between lg:justify-start gap-2 items-center ${
                     open ? 'border-indigo-500' : ''
-                  }`}
+                  } disabled:bg-gray-50 text-gray-700 disabled:text-gray-400`}
+                  disabled={paymentData == undefined}
                 >
-                  <Text size="sm" weight="medium" className="text-gray-700">
+                  <Text size="sm" weight="medium">
                     Edit
                   </Text>
                   {open ? (
@@ -416,8 +521,7 @@ const PlanCard = ({
 
           <div className="border-b border-gray-200"></div>
 
-          {(entitlements.allotedClientIds.length > 0 ||
-            entitlements.pending > 0) && (
+          {entitlements.allotedClientIds.length > 0 && (
             <div className="p-4">
               <Text size="sm" weight="medium" className="text-gray-900">
                 Entitlements
@@ -439,7 +543,7 @@ const PlanCard = ({
 
                 <div className="flex flex-row items-center gap-2">
                   <Text size="lg" weight="semibold" className="text-gray-900">
-                    ${entitlements.allotedClientIds.length * plans.PRO.price}
+                    ${entitlements.alloted * plans.PRO.price}
                   </Text>
                   <Text size="sm" className="text-gray-500">
                     per month
@@ -447,29 +551,27 @@ const PlanCard = ({
                 </div>
               </div>
               <Text size="sm" weight="medium" className="text-[#6B7280]">
-                {`${entitlements.allotedClientIds.length} out of ${
-                  entitlements.alloted
-                } Entitlements used ${
-                  entitlements.pending !== 0
-                    ? `(${entitlements.pending} pending)`
-                    : ''
-                }`}
+                {`${entitlements.allotedClientIds.length} out of ${entitlements.alloted} Entitlements used`}
               </Text>
             </div>
           )}
         </main>
         <footer>
-          {entitlements.alloted === 0 && entitlements.pending === 0 && (
-            <div
-              className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer bg-gray-50 rounded-b py-4 px-6"
-              onClick={() => {
-                setPurchaseProModalOpen(true)
-              }}
-            >
-              <FaShoppingCart className="w-3.5 h-3.5" />
-              <Text size="sm" weight="medium">
-                Purchase Entitlement(s)
-              </Text>
+          {entitlements.alloted === 0 && (
+            <div className="bg-gray-50 rounded-b py-4 px-6">
+              <button
+                disabled={paymentData == undefined}
+                type="button"
+                className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b disabled:text-indigo-300"
+                onClick={() => {
+                  setPurchaseProModalOpen(true)
+                }}
+              >
+                <FaShoppingCart className="w-3.5 h-3.5" />
+                <Text size="sm" weight="medium">
+                  Purchase Entitlement(s)
+                </Text>
+              </button>
             </div>
           )}
           {entitlements.alloted > entitlements.allotedClientIds.length && (
@@ -487,42 +589,56 @@ const PlanCard = ({
 }
 
 export default () => {
-  const { entitlements, billingToast } = useLoaderData<LoaderData>()
+  const {
+    entitlements: {
+      PRO: { alloted, allotedClientIds },
+    },
+    successToast,
+    paymentData,
+    connectedEmails,
+  } = useLoaderData<LoaderData>()
 
-  const { apps } = useOutletContext<OutletContextData>()
+  const ld = useActionData<{
+    updatedProEntitlements: number
+  }>()
 
-  const [prevProPendingEntitlements, setPrevProPendingEntitlements] = useState<
-    number | undefined
-  >(undefined)
+  const { apps, PASSPORT_URL } = useOutletContext<OutletContextData>()
 
-  const revalidator = useRevalidator()
   useEffect(() => {
-    if (!prevProPendingEntitlements) {
-      setPrevProPendingEntitlements(entitlements[ServicePlanType.PRO].pending)
-    } else if (
-      prevProPendingEntitlements !== 0 &&
-      entitlements[ServicePlanType.PRO].pending === 0
-    ) {
+    if (successToast) {
       toast(ToastType.Success, {
-        message: 'Successfully purchased entitlements',
-      })
-      setPrevProPendingEntitlements(undefined)
-    }
-
-    if (entitlements[ServicePlanType.PRO].pending > 0) {
-      setTimeout(() => {
-        revalidator.revalidate()
-      }, 1000)
-    }
-  }, [entitlements])
-
-  useEffect(() => {
-    if (billingToast) {
-      toast(ToastType.Info, {
-        message: billingToast,
+        message: successToast,
       })
     }
-  }, [billingToast])
+  }, [successToast])
+
+  const redirectToPassport = () => {
+    const currentURL = new URL(window.location.href)
+    currentURL.search = ''
+
+    const qp = new URLSearchParams()
+    qp.append('scope', '')
+    qp.append('state', 'skip')
+    qp.append('client_id', 'console')
+
+    qp.append('redirect_uri', currentURL.toString())
+    qp.append('rollup_action', 'connect')
+    qp.append('login_hint', 'email microsoft google apple')
+
+    window.location.href = `${PASSPORT_URL}/authorize?${qp.toString()}`
+  }
+
+  useConnectResult()
+
+  const [selectedEmail, setSelectedEmail] = useState<string | undefined>(
+    paymentData?.email
+  )
+  const [selectedEmailURN, setSelectedEmailURN] = useState<string | undefined>()
+  const [fullName, setFullName] = useState<string | undefined>(
+    paymentData?.name
+  )
+
+  const submit = useSubmit()
 
   return (
     <>
@@ -538,33 +654,161 @@ export default () => {
             Billing & Invoicing
           </Text>
         </div>
+      </section>
 
-        <div className="flex flex-row justify-end items-center gap-2 mt-2 lg:mt-0">
-          <a href="https://rollup.id/pricing" target="_blank">
-            <Button btnType="secondary-alt" btnSize="sm">
-              <div className="flex flex-row items-center gap-3">
-                <Text size="sm" weight="medium" className="text-gray-700">
-                  Compare plans
-                </Text>
-                <HiOutlineExternalLink className="text-gray-500" />
-              </div>
-            </Button>
-          </a>
-        </div>
+      <section>
+        {paymentData && !paymentData.paymentMethodID && (
+          <article className="mb-3.5">
+            <ToastWithLink
+              message="Update your Payment Information to enable purchasing"
+              linkHref={`/gnillib/payment`}
+              linkText="Update payment information"
+            />
+          </article>
+        )}
+
+        {!paymentData && (
+          <article className="mb-3.5">
+            <ToastInfo message="Please fill Billing Contact Section" />
+          </article>
+        )}
       </section>
 
       <section className="flex flex-col gap-4">
+        <article className="bg-white rounded border">
+          <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
+            <div>
+              <div className="flex flex-row gap-4 items-center">
+                <Text size="lg" weight="semibold" className="text-gray-900">
+                  Billing Contact
+                </Text>
+
+                {!paymentData && <DangerPill text="Not Configured" />}
+              </div>
+              <Text size="sm" weight="medium" className="text-[#6B7280]">
+                This will be used to create a custumer ID and for notifications
+                about your billing
+              </Text>
+            </div>
+
+            <Button
+              btnType="primary-alt"
+              btnSize="sm"
+              disabled={!fullName || !selectedEmail}
+              onClick={() => {
+                submit(
+                  {
+                    payload: JSON.stringify({
+                      name: fullName,
+                      email: selectedEmail,
+                      emailURN: selectedEmailURN,
+                    }),
+                  },
+                  {
+                    action: '/gnillib/details',
+                    method: 'post',
+                  }
+                )
+              }}
+            >
+              Submit
+            </Button>
+          </header>
+          <main className="p-4 flex flex-row gap-4 items-center">
+            <div className="w-52">
+              <Input
+                id="full_name"
+                label="Full Name"
+                required
+                value={fullName}
+                onChange={(e) => {
+                  setFullName(e.target.value)
+                }}
+              />
+            </div>
+
+            <div className="self-start w-80">
+              {connectedEmails && connectedEmails.length === 0 && (
+                <Button onClick={redirectToPassport} btnType="secondary-alt">
+                  <div className="flex space-x-3">
+                    <HiOutlineMail className="w-6 h-6 text-gray-800" />
+                    <Text weight="medium" className="flex-1 text-gray-800">
+                      Connect Email Address
+                    </Text>
+                  </div>
+                </Button>
+              )}
+
+              {connectedEmails && connectedEmails.length > 0 && (
+                <>
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="text-gray-700 mb-2"
+                  >
+                    <sup>*</sup>
+                    Email
+                  </Text>
+
+                  <Dropdown
+                    items={(connectedEmails as DropdownSelectListItem[]).map(
+                      (email) => {
+                        email.value === ''
+                          ? (email.selected = true)
+                          : (email.selected = false)
+                        // Substituting subtitle with icon
+                        // on the client side
+                        email.subtitle && !email.icon
+                          ? (email.icon = getEmailIcon(email.subtitle))
+                          : null
+                        return {
+                          value: email.value,
+                          selected: email.selected,
+                          icon: email.icon,
+                          title: email.title,
+                        }
+                      }
+                    )}
+                    placeholder="Select an Email Address"
+                    onSelect={(selected) => {
+                      // type casting to DropdownSelectListItem instead of array
+                      if (!Array.isArray(selected)) {
+                        if (!selected || !selected.value) {
+                          console.error('Error selecting email, try again')
+                          return
+                        }
+
+                        setSelectedEmail(selected.title)
+                        setSelectedEmailURN(selected.value)
+                      }
+                    }}
+                    ConnectButtonCallback={redirectToPassport}
+                    ConnectButtonPhrase="Connect New Email Address"
+                    defaultItems={
+                      connectedEmails.filter(
+                        (ce) => ce.title === paymentData?.email
+                      ) as DropdownSelectListItem[]
+                    }
+                  />
+                </>
+              )}
+            </div>
+          </main>
+        </article>
+
         <PlanCard
           plan={plans[ServicePlanType.PRO]}
-          entitlements={entitlements[ServicePlanType.PRO]}
+          entitlements={{
+            alloted: ld?.updatedProEntitlements ?? alloted,
+            allotedClientIds: allotedClientIds,
+          }}
+          paymentData={paymentData}
         />
 
         <EntitlementsCard
           entitlements={apps.map((a) => ({
             title: a.name!,
-            subtitle: entitlements[
-              ServicePlanType.PRO
-            ].allotedClientIds.includes(a.clientId)
+            subtitle: allotedClientIds.includes(a.clientId)
               ? `Pro Plan ${plans.PRO.price}/month`
               : 'Free',
           }))}

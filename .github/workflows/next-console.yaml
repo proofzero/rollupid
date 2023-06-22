@@ -52,7 +52,13 @@ jobs:
           secrets: |
             SECRET_SESSION_KEY
             SECRET_SESSION_SALT
+            STRIPE_API_SECRET
+            STRIPE_WEBHOOK_SECRET
+            STRIPE_PRO_PLAN_ID
         env:
           # A secret used for session encryption.
           SECRET_SESSION_KEY: ${{ secrets.SECRET_SESSION_KEY_TEST }}
           SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_TEST }}
+          STRIPE_API_SECRET: ${{ secrets.STRIPE_API_SECRET_TEST }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET_TEST }}
+          STRIPE_PRO_PLAN_ID: ${{ secrets.STRIPE_PRO_PLAN_ID_TEST }}

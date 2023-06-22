@@ -46,6 +46,7 @@
     "react-dom": "18.2.0",
     "react-helmet": "6.1.0",
     "react-icons": "4.8.0",
+    "stripe": "12.9.0",
     "tiny-invariant": "1.3.1",
     "viem": "1.0.0",
     "wagmi": "1.1.1"
