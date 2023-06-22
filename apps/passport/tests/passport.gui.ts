@@ -1,6 +1,7 @@
-import { test, expect } from '@playwright/test'
+import { test } from '@guardianui/test'
+import { expect } from '@playwright/test'
 
-test('has title', async ({ page }) => {
+test('has title', async ({ page, gui }) => {
   await page.goto('/')
 
   // Expect a title "to contain" a substring.
@@ -60,4 +61,23 @@ test('login to passport using Email', async ({ page, request }) => {
     waitUntil: 'networkidle',
   })
   await expect(page).toHaveURL(/.*settings\/dashboard/)
+})
+
+test('login to passport using crypto account', async ({ page, gui }) => {
+  // same as above but using crypto wallet as metamask using GuardianUI
+  await gui.initializeChain(1)
+
+  await page.goto('/')
+
+  console.log({ HEY: 'THERE' })
+
+  // await gui.setEthBalance('100000000000000000000000')
+
+  // await page.waitForSelector('text=Connect Wallet')
+  // await page.locator('text=Connect Wallet').first().click()
+  // await page.waitForSelector('text=Connect Wallet')
+  // await page.locator('text=Connect Wallet').first().click()
+  // await page.locator('text=Metamask').first().click()
+
+  // Login with Metamask
 })

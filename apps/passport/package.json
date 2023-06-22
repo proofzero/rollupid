@@ -18,7 +18,8 @@
     "storybook:css": "npx tailwindcss -o ./app/styles/tailwind.css --watch",
     "storybook:start": "start-storybook -p 6009",
     "storybook": "run-p 'storybook:*'",
-    "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook"
+    "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook",
+    "test:gui": "npx playwright test --project=chromium --headed"
   },
   "dependencies": {
     "@ethersproject/keccak256": "5.7.0",
@@ -54,8 +55,8 @@
   "devDependencies": {
     "@babel/core": "^7.20.2",
     "@cloudflare/workers-types": "4.20221111.1",
+    "@guardianui/test": "1.0.4",
     "@mdx-js/react": "^1.6.22",
-    "@playwright/test": "1.35.1",
     "@remix-run/dev": "1.14.0",
     "@remix-run/eslint-config": "1.14.0",
     "@remix-run/serve": "1.14.0",

@@ -19,7 +19,8 @@
     "dev": "echo \"No dev for console. Please use start.\"",
     "start": "env-cmd --file .dev.env run-p 'dev:*'",
     "generate:css": "tailwindcss -o ./app/styles/tailwind.css",
-    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint ."
+    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
+    "test:gui": "npx playwright test --project=chromium --headed"
   },
   "dependencies": {
     "@ethersproject/bytes": "5.7.0",
@@ -55,7 +56,6 @@
     "@babel/core": "7.20.2",
     "@cloudflare/workers-types": "4.20221111.1",
     "@mdx-js/react": "2.1.5",
-    "@playwright/test": "1.35.1",
     "@proofzero/platform.starbase": "workspace:*",
     "@remix-run/dev": "1.14.0",
     "@remix-run/eslint-config": "1.14.0",

@@ -4491,6 +4491,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@guardianui/test@npm:1.0.4":
+  version: 1.0.4
+  resolution: "@guardianui/test@npm:1.0.4"
+  dependencies:
+    "@playwright/test": ~1.33.0
+    dotenv: ^16.0.3
+    ethers: 5.7.2
+  checksum: 4e6b3ff40c77c353c70348456686401290deec7f6557b716d24b26eb4d4b032b27b9da1583744d1f2050f9123fa1337590b0d54d3d0611b91a04544579042657
+  languageName: node
+  linkType: hard
+
 "@headlessui/react@npm:1.7.4":
   version: 1.7.4
   resolution: "@headlessui/react@npm:1.7.4"
@@ -5668,19 +5679,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:1.35.1":
-  version: 1.35.1
-  resolution: "@playwright/test@npm:1.35.1"
+"@playwright/test@npm:~1.33.0":
+  version: 1.33.0
+  resolution: "@playwright/test@npm:1.33.0"
   dependencies:
     "@types/node": "*"
     fsevents: 2.3.2
-    playwright-core: 1.35.1
+    playwright-core: 1.33.0
   dependenciesMeta:
     fsevents:
       optional: true
   bin:
     playwright: cli.js
-  checksum: 3509d2f2c7397f9b0d4f49088cab8625f17d186f7e9b3389ddebf7c52ee8aae6407eab48f66b300b7bf6a33f6e3533fd5951e72bfdb001b68838af98596d5a53
+  checksum: cec3215fc92c1cb9f5bfba357ea1cbe97b54979ab82f9d34a2287b1687cda5e0966b8ea7290dcd35416e18668e56d5781b6b8c4cec64baf12f3ae8dde0f68f5e
   languageName: node
   linkType: hard
 
@@ -5751,7 +5762,6 @@ __metadata:
     "@headlessui/react": 1.7.5
     "@heroicons/react": 2.0.13
     "@mdx-js/react": 2.1.5
-    "@playwright/test": 1.35.1
     "@proofzero/design-system": "workspace:*"
     "@proofzero/platform-clients": "workspace:*"
     "@proofzero/platform.starbase": "workspace:*"
@@ -5809,8 +5819,8 @@ __metadata:
     "@babel/core": ^7.20.2
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/keccak256": 5.7.0
+    "@guardianui/test": 1.0.4
     "@mdx-js/react": ^1.6.22
-    "@playwright/test": 1.35.1
     "@proofzero/design-system": "*"
     "@proofzero/platform-clients": "workspace:*"
     "@proofzero/platform.access": "workspace:*"
@@ -5901,7 +5911,6 @@ __metadata:
     "@headlessui/react": 1.7.4
     "@heroicons/react": 2.0.13
     "@mdx-js/react": 2.1.5
-    "@playwright/test": 1.35.1
     "@proofzero/design-system": "*"
     "@proofzero/errors": "workspace:*"
     "@proofzero/platform-clients": "workspace:*"
@@ -30424,12 +30433,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.35.1":
-  version: 1.35.1
-  resolution: "playwright-core@npm:1.35.1"
+"playwright-core@npm:1.33.0":
+  version: 1.33.0
+  resolution: "playwright-core@npm:1.33.0"
   bin:
-    playwright-core: cli.js
-  checksum: 179abc0051f00474e528935b507fa8cedc986b2803b020d7679878ba28cdd7036ad5a779792aad2ad281f8dc625eb1d2fb77663cb8de0d20c7ffbda7c18febdd
+    playwright: cli.js
+  checksum: 5fb7bda06a8b73b56b85b5a0b8f711211dde57a375d9379289e22239b2de879c6d93c8fdc9ba44b932bf100914ab1ca1a55697ad88440fdd0a39101fc020b77f
   languageName: node
   linkType: hard
 

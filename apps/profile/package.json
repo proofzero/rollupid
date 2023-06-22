@@ -18,7 +18,8 @@
     "start": "env-cmd --file .dev.env run-p 'dev:*'",
     "e2e": "cross-env NODE_ENV=test npx playwright test",
     "storybook": "start-storybook -p 6007",
-    "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook"
+    "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook",
+    "test:gui": "npx playwright test --project=chromium --headed"
   },
   "dependencies": {
     "@headlessui/react": "1.7.4",
@@ -63,7 +64,6 @@
     "@babel/core": "7.20.2",
     "@cloudflare/workers-types": "4.20221111.1",
     "@mdx-js/react": "2.1.5",
-    "@playwright/test": "1.35.1",
     "@remix-run/dev": "1.14.0",
     "@remix-run/eslint-config": "1.14.0",
     "@remix-run/serve": "1.14.0",
