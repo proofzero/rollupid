@@ -177,14 +177,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     if (!entitlements.subscriptionID) {
       sub = await createSubscription({
         customerID: customerID,
-        planID: 'price_1NJaDgFEfyl69U7XQBHZDiDM',
+        planID: STRIPE_PRO_PLAN_ID,
         quantity: +quantity,
         accountURN,
       })
     } else {
       sub = await updateSubscription({
         subscriptionID: entitlements.subscriptionID,
-        planID: 'price_1NJaDgFEfyl69U7XQBHZDiDM',
+        planID: STRIPE_PRO_PLAN_ID,
         quantity: +quantity,
       })
     }

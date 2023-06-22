@@ -21,4 +21,5 @@ declare global {
 
   const STRIPE_API_SECRET: string
   const STRIPE_WEBHOOK_SECRET: string
+  const STRIPE_PRO_PLAN_ID: string
 }
