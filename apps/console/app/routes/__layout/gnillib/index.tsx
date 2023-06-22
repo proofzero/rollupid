@@ -397,9 +397,10 @@ const PlanCard = ({
                 <Menu.Button
                   className={`py-2 px-3 border rounded flex flex-row justify-between lg:justify-start gap-2 items-center ${
                     open ? 'border-indigo-500' : ''
-                  }`}
+                  } disabled:bg-gray-50 text-gray-700 disabled:text-gray-400`}
+                  disabled={paymentData == undefined}
                 >
-                  <Text size="sm" weight="medium" className="text-gray-700">
+                  <Text size="sm" weight="medium">
                     Edit
                   </Text>
                   {open ? (
@@ -494,16 +495,20 @@ const PlanCard = ({
         </main>
         <footer>
           {entitlements.alloted === 0 && (
-            <div
-              className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer bg-gray-50 rounded-b py-4 px-6"
-              onClick={() => {
-                setPurchaseProModalOpen(true)
-              }}
-            >
-              <FaShoppingCart className="w-3.5 h-3.5" />
-              <Text size="sm" weight="medium">
-                Purchase Entitlement(s)
-              </Text>
+            <div className="bg-gray-50 rounded-b py-4 px-6">
+              <button
+                disabled={paymentData == undefined}
+                type="button"
+                className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b disabled:text-indigo-300"
+                onClick={() => {
+                  setPurchaseProModalOpen(true)
+                }}
+              >
+                <FaShoppingCart className="w-3.5 h-3.5" />
+                <Text size="sm" weight="medium">
+                  Purchase Entitlement(s)
+                </Text>
+              </button>
             </div>
           )}
           {entitlements.alloted > entitlements.allotedClientIds.length && (
