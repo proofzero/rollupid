@@ -156,26 +156,17 @@ export const appRouter = t.router({
     .output(GetEntitlementsOutputSchema)
     .query(getEntitlements),
   updateEntitlements: t.procedure
-    // .use(AuthorizationTokenFromHeader)
-    // .use(ValidateJWT)
-    // .use(injectAccountNode)
     .use(LogUsage)
     .use(Analytics)
     .input(UpdateEntitlementsInputSchema)
     .mutation(updateEntitlements),
   getStripePaymentData: t.procedure
-    // .use(AuthorizationTokenFromHeader)
-    // .use(ValidateJWT)
-    // .use(injectAccountNode)
     .use(LogUsage)
     .use(Analytics)
     .input(GetStripPaymentDataInputSchema)
     .output(GetStripePaymentDataOutputSchema)
     .query(getStripePaymentData),
   setStripePaymentData: t.procedure
-    // .use(AuthorizationTokenFromHeader)
-    // .use(ValidateJWT)
-    // .use(injectAccountNode)
     .use(LogUsage)
     .use(Analytics)
     .input(SetStripePaymentDataInputSchema)
