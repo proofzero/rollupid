@@ -65,19 +65,22 @@ test('login to passport using Email', async ({ page, request }) => {
 
 test('login to passport using crypto account', async ({ page, gui }) => {
   // same as above but using crypto wallet as metamask using GuardianUI
+
+  // Initialize a fork of Ethereum mainnet (chain ID 1)
   await gui.initializeChain(1)
 
   await page.goto('/')
 
-  console.log({ HEY: 'THERE' })
-
-  // await gui.setEthBalance('100000000000000000000000')
-
-  // await page.waitForSelector('text=Connect Wallet')
-  // await page.locator('text=Connect Wallet').first().click()
-  // await page.waitForSelector('text=Connect Wallet')
-  // await page.locator('text=Connect Wallet').first().click()
-  // await page.locator('text=Metamask').first().click()
-
   // Login with Metamask
+  await page.locator('#connect-button').click()
+  await page.locator('text=MetaMask').first().click()
+
+  // Select account to continue with
+  await page.locator('#connect-button').click()
+
+  await page.waitForURL(/.*settings\/dashboard/, {
+    timeout: 10000,
+  })
+
+  await expect(page).toHaveURL(/.*settings\/dashboard/)
 })
