@@ -7,7 +7,7 @@ import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
 } from '@proofzero/utils'
-import { createCustomer, updatePaymentMethod } from '~/services/billing/stripe'
+import { createCustomer } from '~/services/billing/stripe'
 import { AccountURN } from '@proofzero/urns/account'
 import { AddressURN } from '@proofzero/urns/address'
 

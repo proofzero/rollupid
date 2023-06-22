@@ -21,7 +21,12 @@ import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
 } from '@proofzero/utils'
-import { useLoaderData, useOutletContext, useSubmit } from '@remix-run/react'
+import {
+  useActionData,
+  useLoaderData,
+  useOutletContext,
+  useSubmit,
+} from '@remix-run/react'
 import type { LoaderData as OutletContextData } from '~/root'
 import { Menu } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
@@ -51,6 +56,10 @@ import {
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 import { ToastInfo } from '@proofzero/design-system/src/atoms/toast/ToastInfo'
 import { DangerPill } from '@proofzero/design-system/src/atoms/pills/DangerPill'
+import {
+  createSubscription,
+  updateSubscription,
+} from '~/services/billing/stripe'
 
 type EntitlementDetails = {
   alloted: number
@@ -131,6 +140,61 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         },
         billingSuccess,
         connectedEmails,
+      },
+      {
+        headers: {
+          'Set-Cookie': await commitFlashSession(flashSession),
+        },
+      }
+    )
+  }
+)
+
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    const jwt = await requireJWT(request)
+    const parsedJwt = parseJwt(jwt!)
+    const accountURN = parsedJwt.sub as AccountURN
+
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+
+    const accountClient = createAccountClient(Account, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
+    const fd = await request.formData()
+    const { customerID, quantity } = JSON.parse(
+      fd.get('payload') as string
+    ) as {
+      customerID: string
+      quantity: number
+    }
+
+    const entitlements = await accountClient.getEntitlements.query()
+
+    let sub
+    if (!entitlements.subscriptionID) {
+      sub = await createSubscription({
+        customerID: customerID,
+        planID: 'price_1NJaDgFEfyl69U7XQBHZDiDM',
+        quantity: +quantity,
+        accountURN,
+      })
+    } else {
+      sub = await updateSubscription({
+        subscriptionID: entitlements.subscriptionID,
+        planID: 'price_1NJaDgFEfyl69U7XQBHZDiDM',
+        quantity: +quantity,
+      })
+    }
+
+    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    flashSession.flash('billing_success', 'Order successfully submitted')
+
+    return json(
+      {
+        updatedProEntitlements: quantity,
       },
       {
         headers: {
@@ -364,7 +428,6 @@ const PlanCard = ({
                   }),
                 },
                 {
-                  action: '/gnillib/checkout',
                   method: 'post',
                 }
               )
@@ -526,8 +589,18 @@ const PlanCard = ({
 }
 
 export default () => {
-  const { entitlements, billingSuccess, paymentData, connectedEmails } =
-    useLoaderData<LoaderData>()
+  const {
+    entitlements: {
+      PRO: { alloted, allotedClientIds },
+    },
+    billingSuccess,
+    paymentData,
+    connectedEmails,
+  } = useLoaderData<LoaderData>()
+
+  const ld = useActionData<{
+    updatedProEntitlements: number
+  }>()
 
   const { apps, PASSPORT_URL } = useOutletContext<OutletContextData>()
 
@@ -581,45 +654,6 @@ export default () => {
             Billing & Invoicing
           </Text>
         </div>
-
-        {/* <div className="flex flex-row justify-end items-center gap-2 mt-2 lg:mt-0">
-          <Button
-            btnType="secondary-alt"
-            btnSize="sm"
-            onClick={() => {
-              submit(
-                {},
-                {
-                  action: '/gnillib/payment',
-                  method: 'post',
-                }
-              )
-            }}
-          >
-            Updated payment methods
-          </Button>
-
-          <Button
-            btnType="secondary-alt"
-            btnSize="sm"
-            onClick={() => {
-              submit(
-                {
-                  payload: JSON.stringify({
-                    customerID: customerID as string,
-                    quantity: 7,
-                  }),
-                },
-                {
-                  action: '/gnillib',
-                  method: 'post',
-                }
-              )
-            }}
-          >
-            Get new sub
-          </Button>
-        </div> */}
       </section>
 
       <section>
@@ -766,16 +800,17 @@ export default () => {
 
         <PlanCard
           plan={plans[ServicePlanType.PRO]}
-          entitlements={entitlements[ServicePlanType.PRO]}
+          entitlements={{
+            alloted: ld?.updatedProEntitlements ?? alloted,
+            allotedClientIds: allotedClientIds,
+          }}
           paymentData={paymentData}
         />
 
         <EntitlementsCard
           entitlements={apps.map((a) => ({
             title: a.name!,
-            subtitle: entitlements[
-              ServicePlanType.PRO
-            ].allotedClientIds.includes(a.clientId)
+            subtitle: allotedClientIds.includes(a.clientId)
               ? `Pro Plan ${plans.PRO.price}/month`
               : 'Free',
           }))}

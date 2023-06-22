@@ -47,16 +47,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           }
         }
 
-        // Need to figure out how to isolate
-        // operations if they're self service
-        // or from stripe dashboard
-
-        // await accountClient.updateEntitlements.mutate({
-        //   accountURN: subMeta.accountURN,
-        //   subscriptionID: id,
-        //   quantity,
-        //   type: ServicePlanType.PRO,
-        // })
+        await accountClient.updateEntitlements.mutate({
+          accountURN: subMeta.accountURN,
+          subscriptionID: id,
+          quantity,
+          type: ServicePlanType.PRO,
+        })
 
         break
 
