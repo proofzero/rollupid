@@ -1,13 +1,20 @@
+import { getErrorCause } from '@proofzero/utils/errors'
+
 export const generateEmailOTP = async (
   email: string
 ): Promise<{ message: string; state: string; status: number } | undefined> => {
   const reqUrl = `/connect/email/otp?email=${encodeURIComponent(email)}`
 
-  const resObj = await fetch(reqUrl)
-  const res = await resObj.json<{
+  const res = await fetch(reqUrl)
+
+  const resObj = await res.json<{
     message: string
     state: string
   }>()
 
-  return { message: res.message, state: res.state, status: resObj.status }
+  if (!res.ok) {
+    throw getErrorCause(resObj)
+  }
+
+  return { message: resObj.message, state: resObj.state, status: res.status }
 }
