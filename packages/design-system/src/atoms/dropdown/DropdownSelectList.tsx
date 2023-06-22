@@ -26,7 +26,6 @@ export type DropdownListboxButtonType = {
   placeholder?: string
   selectAllCheckboxTitle?: string
   open: boolean
-  disabled?: boolean
 }
 
 const DropdownListboxButtonDefault = ({
@@ -36,16 +35,13 @@ const DropdownListboxButtonDefault = ({
   placeholder,
   selectAllCheckboxTitle,
   open,
-  disabled,
 }: DropdownListboxButtonType) => {
   return (
-    <button
-      disabled={disabled}
-      type="button"
+    <div
       className="border shadow-sm rounded-lg w-full transition-transform
                                     flex flex-row justify-between items-center py-2 px-3 hover:ring-1
                                     hover:ring-skin-primary focus:ring-1 focus:ring-skin-primary bg-white
-                                    dark:bg-[#1F2937] dark:border-gray-600 disabled:bg-gray-50 disabled:cursor-not-allowed"
+                                    dark:bg-[#1F2937] dark:border-gray-600"
     >
       {!selectedItem && !selectedItems?.length && !allItemsSelected && (
         <Text
@@ -97,7 +93,7 @@ const DropdownListboxButtonDefault = ({
       ) : (
         <ChevronDownIcon className="w-5 h-5 shrink-0" />
       )}
-    </button>
+    </div>
   )
 }
 
@@ -113,7 +109,6 @@ export const Dropdown = ({
   selectAllCheckboxTitle,
   selectAllCheckboxDescription,
   DropdownListboxButton = DropdownListboxButtonDefault,
-  disabled = false,
 }: {
   items: Array<DropdownSelectListItem>
   placeholder: string
@@ -137,7 +132,6 @@ export const Dropdown = ({
     selectAllCheckboxTitle,
     open,
   }: DropdownListboxButtonType) => JSX.Element
-  disabled?: boolean
 }) => {
   if (defaultItems?.length && defaultItems?.length > 1 && !multiple) {
     throw new BadRequestError({
@@ -179,7 +173,6 @@ export const Dropdown = ({
 
   return (
     <Listbox
-      disabled={disabled}
       value={multiple ? selectedItems : selectedItem}
       onChange={(input) => {
         if (multiple) {
@@ -198,7 +191,6 @@ export const Dropdown = ({
         <div className="relative select-none">
           <Listbox.Button className="w-full">
             <DropdownListboxButton
-              disabled={disabled}
               selectedItem={selectedItem}
               selectedItems={selectedItems}
               allItemsSelected={allItemsSelected}

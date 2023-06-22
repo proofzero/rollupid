@@ -1,5 +1,4 @@
 import { InternalServerError } from '@proofzero/errors'
-import { ServicePlanType } from '@proofzero/types/account'
 import { AccountURN } from '@proofzero/urns/account'
 import { redirect } from '@remix-run/cloudflare'
 import Stripe from 'stripe'
