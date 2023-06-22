@@ -69,13 +69,12 @@ jobs:
           STRIPE_PRO_PLAN_ID: ${{ secrets.STRIPE_PRO_PLAN_ID_DEV }}
 
       - name: Setup Playwright
-        working-directory: 'apps/console'
         run: yarn playwright install --with-deps
+        working-directory: 'apps/console'
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         working-directory: 'apps/console'
       - name: Run GuardianUI tests
-        run: yarn test:gui
         working-directory: 'apps/console'
         env:
           INTERNAL_PLAYWRIGHT_BASE_URL: https://console-dev.rollup.id
@@ -86,7 +85,7 @@ jobs:
           SECRET_GITHUB_TEST_USER_PASSWORD: ${{ secrets.SECRET_GITHUB_TEST_USER_PASSWORD }}
           INTERNAL_MICROSOFT_TEST_USERNAME: ${{ secrets.INTERNAL_MICROSOFT_TEST_USERNAME }}
           SECRET_MICROSOFT_TEST_USER_PASSWORD: ${{ secrets.SECRET_MICROSOFT_TEST_USER_PASSWORD }}
-        run: yarn playwright test
+        run: yarn test:gui
       - uses: actions/upload-artifact@v3
         if: always()
         with:
