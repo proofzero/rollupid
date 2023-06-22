@@ -109,6 +109,7 @@ export const Dropdown = ({
   selectAllCheckboxTitle,
   selectAllCheckboxDescription,
   DropdownListboxButton = DropdownListboxButtonDefault,
+  disabled = false,
 }: {
   items: Array<DropdownSelectListItem>
   placeholder: string
@@ -132,6 +133,7 @@ export const Dropdown = ({
     selectAllCheckboxTitle,
     open,
   }: DropdownListboxButtonType) => JSX.Element
+  disabled?: boolean
 }) => {
   if (defaultItems?.length && defaultItems?.length > 1 && !multiple) {
     throw new BadRequestError({
@@ -173,6 +175,7 @@ export const Dropdown = ({
 
   return (
     <Listbox
+      disabled={disabled}
       value={multiple ? selectedItems : selectedItem}
       onChange={(input) => {
         if (multiple) {

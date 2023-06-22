@@ -37,7 +37,6 @@ import {
   toast,
 } from '@proofzero/design-system/src/atoms/toast'
 import plans, { PlanDetails } from './plans'
-import { createCustomer } from '~/services/billing/stripe'
 import { AccountURN } from '@proofzero/urns/account'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
@@ -51,6 +50,7 @@ import {
 } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 import { ToastInfo } from '@proofzero/design-system/src/atoms/toast/ToastInfo'
+import { DangerPill } from '@proofzero/design-system/src/atoms/pills/DangerPill'
 
 type EntitlementDetails = {
   alloted: number
@@ -552,9 +552,10 @@ export default () => {
 
   useConnectResult()
 
-  const [selectedEmail, setSelectedEmail] = useState<string | undefined>()
+  const [selectedEmail, setSelectedEmail] = useState<string | undefined>(
+    paymentData?.email
+  )
   const [selectedEmailURN, setSelectedEmailURN] = useState<string | undefined>()
-
   const [fullName, setFullName] = useState<string | undefined>(
     paymentData?.name
   )
@@ -638,9 +639,13 @@ export default () => {
         <article className="bg-white rounded border">
           <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
             <div>
-              <Text size="lg" weight="semibold" className="text-gray-900">
-                Billing Contact
-              </Text>
+              <div className="flex flex-row gap-4 items-center">
+                <Text size="lg" weight="semibold" className="text-gray-900">
+                  Billing Contact
+                </Text>
+
+                {!paymentData && <DangerPill text="Not Configured" />}
+              </div>
               <Text size="sm" weight="medium" className="text-[#6B7280]">
                 This will be used to create a custumer ID and for notifications
                 about your billing
@@ -649,7 +654,8 @@ export default () => {
 
             <Button
               btnType="primary-alt"
-              disabled={!fullName || !selectedEmail}
+              btnSize="sm"
+              disabled={!fullName || !selectedEmail || paymentData != undefined}
               onClick={() => {
                 submit(
                   {
@@ -676,7 +682,10 @@ export default () => {
                 label="Full Name"
                 required
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                onChange={(e) => {
+                  setFullName(e.target.value)
+                }}
+                disabled={paymentData != undefined}
               />
             </div>
 
@@ -704,6 +713,7 @@ export default () => {
                   </Text>
 
                   <Dropdown
+                    disabled={paymentData != undefined}
                     items={(connectedEmails as DropdownSelectListItem[]).map(
                       (email) => {
                         email.value === ''
