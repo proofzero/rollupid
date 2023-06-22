@@ -19,8 +19,11 @@ import Authentication, {
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
 import { Button } from '@proofzero/packages/design-system/src/atoms/buttons/Button'
-import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
+import {
+  getErrorCause,
+  getRollupReqFunctionErrorWrapper,
+} from '@proofzero/utils/errors'
+import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -204,13 +207,17 @@ const InnerComponent = ({
           // fetch nonce and kickoff sign flow
           setLoading(true)
           await fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
-            .then((res) =>
-              res.json<{
+            .then(async (res) => {
+              const resJson = await res.json<{
                 nonce: string
                 state: string
                 address: string
               }>()
-            )
+              if (!res.ok) {
+                throw getErrorCause(resJson)
+              }
+              return resJson
+            })
             .then(({ nonce, state, address }) => {
               setSignData({
                 nonce,
@@ -219,12 +226,11 @@ const InnerComponent = ({
                 signature: undefined,
               })
             })
-            .catch(() => {
+            .catch((ex) => {
               toast(ToastType.Error, {
                 message:
-                  'Could not fetch nonce for signing authentication message',
+                  'Could not complete authentication. Please return to application and try again.',
               })
-              navigate('/')
             })
           setLoading(false)
         },

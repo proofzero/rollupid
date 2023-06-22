@@ -1,14 +1,13 @@
 import { EmailAddressType, NodeType } from '@proofzero/types/address'
 import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
-import { JsonError } from '@proofzero/utils/errors'
 import { json } from '@remix-run/cloudflare'
 import { getAddressClient, getStarbaseClient } from '~/platform.server'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { getAuthzCookieParams } from '~/session.server'
-import { SendOTPEmailThemeProps } from '@proofzero/platform/email/src/jsonrpc/methods/sendOTPEmail'
-import { BadRequestError } from '@proofzero/errors'
+import type { SendOTPEmailThemeProps } from '@proofzero/platform/email/src/jsonrpc/methods/sendOTPEmail'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -32,8 +31,16 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         context.traceSpan
       )
 
-      const { clientId } = await getAuthzCookieParams(request, context.env)
-
+      let clientId: string = ''
+      try {
+        const res = await getAuthzCookieParams(request, context.env)
+        clientId = res.clientId
+      } catch (ex) {
+        throw new InternalServerError({
+          message:
+            'Could not complete authentication. Please return to application and try again.',
+        })
+      }
       const starbaseClient = getStarbaseClient(
         undefined,
         context.env,

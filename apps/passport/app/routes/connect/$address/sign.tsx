@@ -10,7 +10,10 @@ import { getAuthzRedirectURL } from '../../../utils/authenticate.server'
 
 import { parseJwt } from '@proofzero/packages/utils'
 import { BadRequestError } from '@proofzero/errors'
-import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import {
+  JsonError,
+  getRollupReqFunctionErrorWrapper,
+} from '@proofzero/utils/errors'
 import type { AccountURN } from '@proofzero/urns/account'
 import {
   AuthenticationScreenDefaults,
@@ -43,12 +46,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     let clientId: string = ''
     try {
       const res = await getAuthzCookieParams(request, context.env)
-      if (res === null) {
-        throw new Error()
-      }
       clientId = res.clientId
     } catch (ex) {
-      throw redirect('/')
+      const traceparent = context.traceSpan.getTraceParent()
+      return JsonError(ex, traceparent)
     }
     if (clientId !== 'console' && clientId !== 'passport') {
       const sbClient = getStarbaseClient('', context.env, context.traceSpan)
