@@ -2,7 +2,6 @@ import { z } from 'zod'
 
 import { Context } from '../../context'
 import { initAddressNodeByName } from '../../nodes'
-import { JsonRpcProvider } from '@ethersproject/providers'
 import {
   createSessionKey,
   getZeroDevSigner,
@@ -58,40 +57,9 @@ export const registerSessionKeyMethod = async ({
   let sessionKey = ''
 
   if (paymaster && paymaster.provider === 'zerodev') {
-    const projectInfoRes = await fetch(
-      `https://prod-api.zerodev.app/projects/${paymaster.secret}`,
-      { headers: { accept: 'application/json' } }
-    )
-
-    const projectInfo = (await projectInfoRes.json()) as {
-      id: string
-      name: string
-      chainId: string
-    }
-
-    let ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_MUMBAI_PROVIDER_URL // by default
-
-    switch (projectInfo.chainId) {
-      case '1':
-        ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_ETH_PROVIDER_URL
-        break
-      case '5':
-        ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_GOERLI_PROVIDER_URL
-        break
-      case '137':
-        ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_POLYGON_PROVIDER_URL
-        break
-      case '80001':
-        ALCHEMY_PROVIDER_URL = ctx.ALCHEMY_MUMBAI_PROVIDER_URL
-    }
-
     const zdSigner = await getZeroDevSigner({
       projectId: paymaster.secret,
       owner: getPrivateKeyOwner(ownerPrivateKey),
-      rpcProvider: new JsonRpcProvider({
-        url: ALCHEMY_PROVIDER_URL,
-        skipFetchSetup: true,
-      }),
       skipFetchSetup: true,
     })
 

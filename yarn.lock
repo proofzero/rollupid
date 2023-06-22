@@ -6236,7 +6236,7 @@ __metadata:
     "@types/node": 18.15.3
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
-    "@zerodevapp/sdk": 3.1.37
+    "@zerodevapp/sdk": 3.1.39
     do-proxy: 1.3.3
     env-cmd: 10.1.0
     eslint: 8.28.0
@@ -14206,9 +14206,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@zerodevapp/sdk@npm:3.1.37":
-  version: 3.1.37
-  resolution: "@zerodevapp/sdk@npm:3.1.37"
+"@zerodevapp/sdk@npm:3.1.39":
+  version: 3.1.39
+  resolution: "@zerodevapp/sdk@npm:3.1.39"
   dependencies:
     "@account-abstraction/contracts": ^0.6.0
     "@account-abstraction/utils": ^0.4.0
@@ -14230,7 +14230,7 @@ __metadata:
     merkletreejs: ^0.3.9
   peerDependencies:
     ethers: ^5.7.0
-  checksum: 58f0bc2ff408e04d0a7d41bedff7fbcaab1aaca769307e1a44de6b2b02188575f358ce672348571e40e324d8525230aca300cc9d5c7d3ba6c49c34b42f05ae93
+  checksum: 1274cd5eac1c68bec37ba35312fee0efaeb3cbd14b131dd04f621717c0432be838f3e8634ef91f8d5181e31d6b872b38a3185aba60369afd6923ed91aad747cc
   languageName: node
   linkType: hard
 
