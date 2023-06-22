@@ -6,6 +6,11 @@ on:
     branches:
       - main
 
+on:
+  pull_request:
+    branches:
+      - main
+
 defaults:
   run:
     working-directory: ./apps
@@ -85,8 +90,11 @@ jobs:
       - name: Setup Playwright
         run: yarn playwright install --with-deps
         working-directory: 'apps/passport'
-      - name: Run Playwright tests
-        run: yarn playwright test
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        working-directory: 'apps/passport'
+      - name: Run GuardianUI tests
+        run: yarn test:gui
         working-directory: 'apps/passport'
         env:
           INTERNAL_PLAYWRIGHT_BASE_URL: https://passport-dev.rollup.id

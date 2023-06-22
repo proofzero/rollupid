@@ -7,6 +7,11 @@ on:
     branches:
       - main
 
+on:
+  pull_request:
+    branches:
+      - main
+
 defaults:
   run:
     working-directory: ./apps
@@ -68,7 +73,11 @@ jobs:
       - name: Setup Playwright
         working-directory: 'apps/console'
         run: yarn playwright install --with-deps
-      - name: Run Playwright tests
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        working-directory: 'apps/console'
+      - name: Run GuardianUI tests
+        run: yarn test:gui
         working-directory: 'apps/console'
         env:
           INTERNAL_PLAYWRIGHT_BASE_URL: https://console-dev.rollup.id
