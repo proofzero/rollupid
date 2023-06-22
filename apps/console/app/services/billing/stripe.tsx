@@ -10,6 +10,12 @@ type CreateCustomerParams = {
   accountURN: string
 }
 
+type UpdateCustomerParams = {
+  customerID: string
+  email: string
+  name: string
+}
+
 type UpdatePaymentMethodParams = {
   customerID: string
 }
@@ -27,15 +33,6 @@ type UpdateSubscriptionParams = {
   quantity: number
 }
 
-type CheckoutParams = {
-  planID: string
-  planType: ServicePlanType
-  quantity: number
-  nonce: string
-  customerID?: string
-  accountURN: AccountURN
-}
-
 export const createCustomer = async ({
   email,
   name,
@@ -51,6 +48,23 @@ export const createCustomer = async ({
     metadata: {
       accountURN,
     },
+  })
+
+  return customer
+}
+
+export const updateCustomer = async ({
+  customerID,
+  email,
+  name,
+}: UpdateCustomerParams) => {
+  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+    apiVersion: '2022-11-15',
+  })
+
+  const customer = await stripeClient.customers.update(customerID, {
+    email,
+    name,
   })
 
   return customer

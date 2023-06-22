@@ -74,7 +74,7 @@ type LoaderData = {
       appClientIds: string[]
     }
   }
-  billingSuccess?: string
+  successToast?: string
   connectedEmails: DropdownSelectListItem[]
 }
 
@@ -115,7 +115,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
-    const billingSuccess = flashSession.get('billing_success')
+    const successToast = flashSession.get('success_toast')
 
     const connectedAccounts = await accountClient.getAddresses.query({
       account: accountURN,
@@ -138,7 +138,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
             appClientIds: freeAppClientIds,
           },
         },
-        billingSuccess,
+        successToast,
         connectedEmails,
       },
       {
@@ -190,7 +190,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
-    flashSession.flash('billing_success', 'Order successfully submitted')
+    flashSession.flash('success_toast', 'Entitlements successfully bought')
 
     return json(
       {
@@ -593,7 +593,7 @@ export default () => {
     entitlements: {
       PRO: { alloted, allotedClientIds },
     },
-    billingSuccess,
+    successToast,
     paymentData,
     connectedEmails,
   } = useLoaderData<LoaderData>()
@@ -605,12 +605,12 @@ export default () => {
   const { apps, PASSPORT_URL } = useOutletContext<OutletContextData>()
 
   useEffect(() => {
-    if (billingSuccess) {
+    if (successToast) {
       toast(ToastType.Success, {
-        message: billingSuccess,
+        message: successToast,
       })
     }
-  }, [billingSuccess])
+  }, [successToast])
 
   const redirectToPassport = () => {
     const currentURL = new URL(window.location.href)
@@ -694,7 +694,7 @@ export default () => {
             <Button
               btnType="primary-alt"
               btnSize="sm"
-              disabled={!fullName || !selectedEmail || paymentData != undefined}
+              disabled={!fullName || !selectedEmail}
               onClick={() => {
                 submit(
                   {
@@ -724,7 +724,6 @@ export default () => {
                 onChange={(e) => {
                   setFullName(e.target.value)
                 }}
-                disabled={paymentData != undefined}
               />
             </div>
 
@@ -752,7 +751,6 @@ export default () => {
                   </Text>
 
                   <Dropdown
-                    disabled={paymentData != undefined}
                     items={(connectedEmails as DropdownSelectListItem[]).map(
                       (email) => {
                         email.value === ''

@@ -1,13 +1,17 @@
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction, LoaderFunction, redirect } from '@remix-run/cloudflare'
-import { requireJWT } from '~/utilities/session.server'
+import { ActionFunction, redirect } from '@remix-run/cloudflare'
+import {
+  commitFlashSession,
+  getFlashSession,
+  requireJWT,
+} from '~/utilities/session.server'
 import createAccountClient from '@proofzero/platform-clients/account'
 import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
 } from '@proofzero/utils'
-import { createCustomer } from '~/services/billing/stripe'
+import { createCustomer, updateCustomer } from '~/services/billing/stripe'
 import { AccountURN } from '@proofzero/urns/account'
 import { AddressURN } from '@proofzero/urns/address'
 
@@ -54,6 +58,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         email,
         name,
       }
+
+      await updateCustomer({
+        customerID: paymentData.customerID,
+        email,
+        name,
+      })
     }
 
     await accountClient.setStripePaymentData.mutate({
@@ -61,6 +71,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
 
-    return redirect('/gnillib')
+    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    flashSession.flash('success_toast', 'Payment data updated')
+
+    return redirect('/gnillib', {
+      headers: {
+        'Set-Cookie': await commitFlashSession(flashSession),
+      },
+    })
   }
 )
