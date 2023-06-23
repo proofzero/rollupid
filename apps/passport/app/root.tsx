@@ -86,16 +86,34 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     if (context.appProps) {
       appProps = context.appProps
     } else {
-      const name = params.clientId
-        ? params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
-        : 'Passport'
-      appProps = {
-        name: `Rollup - ${name}`,
-        iconURL: LogoIndigo,
-        termsURL: 'https://rollup.id/tos',
-        privacyURL: 'https://rollup.id/privacy-policy',
-        redirectURI: `https://${params.clientId}.rollup.id`,
-        websiteURL: 'https://rollup.id',
+      if (!params.clientId) {
+        const name = 'Passport'
+        appProps = {
+          name: `Rollup - ${name}`,
+          iconURL: LogoIndigo,
+          termsURL: 'https://rollup.id/tos',
+          privacyURL: 'https://rollup.id/privacy-policy',
+          redirectURI: `https://passport.rollup.id`,
+          websiteURL: 'https://rollup.id',
+        }
+      } else {
+        if (['console', 'passport'].includes(params.clientId!)) {
+          const name =
+            params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
+          appProps = {
+            name: `Rollup - ${name}`,
+            iconURL: LogoIndigo,
+            termsURL: 'https://rollup.id/tos',
+            privacyURL: 'https://rollup.id/privacy-policy',
+            redirectURI: `https://${params.clientId}.rollup.id`,
+            websiteURL: 'https://rollup.id',
+          }
+        } else {
+          const sbClient = getStarbaseClient('', context.env, context.traceSpan)
+          appProps = await sbClient.getAppPublicProps.query({
+            clientId: params.clientId!,
+          })
+        }
       }
     }
 
