@@ -43,6 +43,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
               external: true,
               path: `${context.env.CONSOLE_APP_URL}`,
             }
+          case ReferenceType.BillingEmail:
+            return {
+              message: 'Address is being used as billing email.',
+              external: true,
+              path: `${context.env.CONSOLE_APP_URL}/gnillib`,
+            }
           default:
             throw new BadRequestError({
               message: `Unknown address reference type: ${u}`,

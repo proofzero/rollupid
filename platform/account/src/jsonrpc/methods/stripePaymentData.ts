@@ -1,7 +1,11 @@
 import { z } from 'zod'
 import { Context } from '../../context'
-import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
+import {
+  AccountURNInput,
+  AddressURNInput,
+} from '@proofzero/platform-middleware/inputValidators'
 import { initAccountNodeByName } from '../../nodes'
+import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 
 export const GetStripPaymentDataInputSchema = z.object({
   accountURN: AccountURNInput,
@@ -36,8 +40,9 @@ export const SetStripePaymentDataInputSchema = z.object({
   customerID: z.string(),
   paymentMethodID: z.string().optional(),
   accountURN: AccountURNInput,
-  email: z.string(),
   name: z.string(),
+  email: z.string(),
+  addressURN: AddressURNInput.optional(),
 })
 type SetStripePaymentDataInput = z.infer<typeof SetStripePaymentDataInputSchema>
 
@@ -50,11 +55,40 @@ export const setStripePaymentData = async ({
 }): Promise<void> => {
   const account = await initAccountNodeByName(input.accountURN, ctx.Account)
 
-  const { customerID, paymentMethodID, email, name } = input
+  const { customerID, paymentMethodID, email, name, accountURN, addressURN } =
+    input
+
   await account.class.setStripePaymentData({
     customerID,
     paymentMethodID,
     email,
     name,
   })
+
+  if (addressURN) {
+    const { edges } = await ctx.edges.getEdges.query({
+      query: {
+        src: { baseUrn: accountURN },
+        tag: EDGE_HAS_REFERENCE_TO,
+      },
+    })
+
+    if (edges.length > 1) {
+      console.warn(`More than one edge found for ${accountURN} -> address`)
+    }
+
+    for (const edge of edges) {
+      await ctx.edges.removeEdge.mutate({
+        tag: EDGE_HAS_REFERENCE_TO,
+        src: edge.src.baseUrn,
+        dst: edge.dst.baseUrn,
+      })
+    }
+
+    await ctx.edges.makeEdge.mutate({
+      src: accountURN,
+      dst: addressURN,
+      tag: EDGE_HAS_REFERENCE_TO,
+    })
+  }
 }
