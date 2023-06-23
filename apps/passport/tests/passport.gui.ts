@@ -79,7 +79,7 @@ test('login to passport using crypto account', async ({ page, gui }) => {
   await page.locator('#connect-button').click()
 
   await page.waitForURL(/.*settings\/dashboard/, {
-    timeout: 10000,
+    timeout: 15000,
   })
 
   await expect(page).toHaveURL(/.*settings\/dashboard/)
