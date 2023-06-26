@@ -506,32 +506,31 @@ export async function getClaimValues(
   const accessId = `${AccountURNSpace.decode(accountUrn)}@${clientId}`
   const accessUrn = AccessURNSpace.componentizedUrn(accessId)
 
-  const retrieverPromises = []
-  for (const scopeValue of scope) {
+  const retrieverPromises = scope.map((scopeValue) => {
     const retrieverFunction = scopeClaimRetrievers[scopeValue]
-    if (!retrieverFunction) continue
-    retrieverPromises.push(
-      retrieverFunction(
+    if (!retrieverFunction) return
+    else
+      return retrieverFunction(
         scopeValue,
         accountUrn,
         clientId,
         accessUrn,
         env,
-        personaData,
+        personaData || {},
         traceSpan
       )
+  })
+
+  const retrieverResults = await Promise.allSettled(retrieverPromises)
+  retrieverResults
+    .map((r, idx) =>
+      //In cases of errors in retriever, we don't retrun any claims and we mark the object
+      //as invalid. It's the responsibility of caller to handle that upstream.
+      r.status === 'fulfilled'
+        ? r.value
+        : createInvalidClaimDataObject(scope[idx])
     )
-    const retrieverResults = await Promise.allSettled(retrieverPromises)
-    retrieverResults
-      .map((r) =>
-        //In cases of errors in retriever, we don't retrun any claims and we mark the object
-        //as invalid. It's the responsibility of caller to handle that upstream.
-        r.status === 'fulfilled'
-          ? r.value
-          : createInvalidClaimDataObject(scopeValue)
-      )
-      .forEach((claimData) => (result = { ...result, ...claimData }))
-  }
+    .forEach((claimData) => (result = { ...result, ...claimData }))
   return result
 }
 
