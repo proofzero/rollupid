@@ -44,13 +44,15 @@ export const getAuthorizedAppScopesMethod = async ({
   const name = `${AccountURNSpace.decode(accountURN)}@${clientId}`
   const accessNode = await initAccessNodeByName(name, ctx.Access)
 
-  const { tokenIndex, tokenMap } = await accessNode.class.getTokenState()
-
   const accessCaller = appRouter.createCaller(ctx)
-  const personaData = await accessCaller.getPersonaData({
-    accountUrn: accountURN,
-    clientId,
-  })
+  const [tokenState, personaData] = await Promise.all([
+    accessNode.class.getTokenState(),
+    accessCaller.getPersonaData({
+      accountUrn: accountURN,
+      clientId,
+    }),
+  ])
+  const { tokenIndex, tokenMap } = tokenState
 
   const scopes = Array.from(
     new Set(tokenIndex.flatMap((t) => tokenMap[t].scope))
