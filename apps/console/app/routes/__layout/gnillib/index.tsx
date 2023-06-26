@@ -171,11 +171,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const fd = await request.formData()
-    const { customerID, quantity } = JSON.parse(
+    const { customerID, quantity, txType } = JSON.parse(
       fd.get('payload') as string
     ) as {
       customerID: string
       quantity: number
+      txType: 'buy' | 'remove'
     }
 
     const entitlements = await accountClient.getEntitlements.query()
@@ -197,7 +198,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
-    flashSession.flash('success_toast', 'Entitlements successfully bought')
+    if (txType === 'buy') {
+      flashSession.flash('success_toast', 'Entitlement(s) successfully bought')
+    }
+    if (txType === 'remove') {
+      flashSession.flash('success_toast', 'Entitlement(s) successfully removed')
+    }
 
     return json(
       {
@@ -423,6 +429,7 @@ const PurchaseProModal = ({
                   planType: ServicePlanType.PRO,
                   quantity: entitlements.alloted + proEntitlementDelta,
                   customerID: paymentData?.customerID,
+                  txType: 'buy',
                 }),
               },
               {
@@ -599,6 +606,7 @@ const RemoveEntitelmentModal = ({
                   planType: ServicePlanType.PRO,
                   quantity: proEntitlementNew,
                   customerID: paymentData?.customerID,
+                  txType: 'remove',
                 }),
               },
               {
@@ -621,15 +629,16 @@ const PlanCard = ({
   plan,
   entitlements,
   paymentData,
+  submit,
 }: {
   plan: PlanDetails
   entitlements: EntitlementDetails
   paymentData?: PaymentData
+  submit: (data: any, options: any) => void
 }) => {
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
   const [removeEntitlementModalOpen, setRemoveEntitlementModalOpen] =
     useState(false)
-  const submit = useSubmit()
   return (
     <>
       <PurchaseProModal
@@ -1021,6 +1030,7 @@ export default () => {
             allotedClientIds: allotedClientIds,
           }}
           paymentData={paymentData}
+          submit={submit}
         />
 
         <EntitlementsCard
