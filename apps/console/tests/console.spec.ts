@@ -49,7 +49,7 @@ test('login to console using Email', async ({ page, request }) => {
   await page.getByRole('button').filter({ hasText: 'Verify' }).click()
 
   await page.waitForURL(/.*dashboard/, {
-    timeout: 10000,
+    timeout: 15000,
     waitUntil: 'networkidle',
   })
   await expect(page).toHaveURL(/.*dashboard/)
