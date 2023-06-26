@@ -498,7 +498,7 @@ const RemoveEntitelmentModal = ({
                 onClick={() => {
                   setProEntitlementNew((prev) => prev - 1)
                 }}
-                disabled={proEntitlementNew === 1}
+                disabled={proEntitlementNew < 1}
               >
                 <HiMinus />
               </button>
@@ -518,7 +518,7 @@ const RemoveEntitelmentModal = ({
                 onClick={() => {
                   setProEntitlementNew((prev) => prev + 1)
                 }}
-                disabled={proEntitlementNew === entitlements.alloted - 1}
+                disabled={proEntitlementNew >= entitlements.alloted}
               >
                 <HiPlus />
               </button>
