@@ -3,10 +3,9 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import {
-  ActionFunction,
-  LoaderFunction,
+  type ActionFunction,
+  type LoaderFunction,
   json,
-  redirect,
 } from '@remix-run/cloudflare'
 import { FaCheck, FaShoppingCart, FaTrash } from 'react-icons/fa'
 import { HiMinus, HiOutlineMail, HiPlus } from 'react-icons/hi'
@@ -35,23 +34,24 @@ import { TbHourglassHigh } from 'react-icons/tb'
 import classnames from 'classnames'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
-import { PaymentData, ServicePlanType } from '@proofzero/types/account'
+import { type PaymentData, ServicePlanType } from '@proofzero/types/account'
 import {
   ToastType,
   Toaster,
   toast,
 } from '@proofzero/design-system/src/atoms/toast'
-import plans, { PlanDetails } from './plans'
-import { AccountURN } from '@proofzero/urns/account'
+import plans, { type PlanDetails } from './plans'
+import { type AccountURN } from '@proofzero/urns/account'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
+import { HiArrowNarrowRight } from 'react-icons/hi'
 import {
   getEmailDropdownItems,
   getEmailIcon,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import {
   Dropdown,
-  DropdownSelectListItem,
+  type DropdownSelectListItem,
 } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 import { ToastInfo } from '@proofzero/design-system/src/atoms/toast/ToastInfo'
@@ -285,15 +285,17 @@ const PurchaseProModal = ({
   plan,
   entitlements,
   paymentData,
+  submit,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   plan: PlanDetails
   entitlements: EntitlementDetails
   paymentData?: PaymentData
+  submit: (data: any, options: any) => void
 }) => {
   const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
-  const submit = useSubmit()
+
   return (
     <Modal isOpen={isOpen} fixed handleClose={() => setIsOpen(false)}>
       <Text
@@ -350,12 +352,13 @@ const PurchaseProModal = ({
           <div className="flex flex-row">
             <button
               type="button"
-              className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-l-lg px-4"
+              className="flex justify-center items-center border
+              disabled:cursor-not-allowed
+              border-gray-300 bg-gray-50 rounded-l-lg px-4"
               onClick={() => {
-                if (proEntitlementDelta > 1) {
-                  setProEntitlementDelta((prev) => prev - 1)
-                }
+                setProEntitlementDelta((prev) => prev - 1)
               }}
+              disabled={proEntitlementDelta < 1}
             >
               <HiMinus />
             </button>
@@ -399,7 +402,7 @@ const PurchaseProModal = ({
 
       <div className="flex-1"></div>
 
-      <section className="flex flex-row-reverse gap-4 m-5">
+      <section className="flex flex-row-reverse gap-4 m-5 mt-auto">
         <Button
           btnType="primary-alt"
           disabled={!paymentData?.paymentMethodID}
@@ -436,13 +439,19 @@ const RemoveEntitelmentModal = ({
   setIsOpen,
   plan,
   entitlements,
+  paymentData,
+  submit,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   plan: PlanDetails
   entitlements: EntitlementDetails
+  paymentData?: PaymentData
+  submit: (data: any, options: any) => void
 }) => {
-  const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
+  const [proEntitlementNew, setProEntitlementNew] = useState(
+    entitlements.allotedClientIds.length
+  )
 
   return (
     <Modal isOpen={isOpen} fixed handleClose={() => setIsOpen(false)}>
@@ -458,70 +467,108 @@ const RemoveEntitelmentModal = ({
           <Text size="lg" weight="semibold" className="text-gray-900 text-left">
             {plan.title}
           </Text>
-
-          <Text
-            size="sm"
-            weight="medium"
-            className="text-[#6B7280] text-left mb-6"
-          >
-            You are currently using {entitlements.allotedClientIds.length}/
-            {entitlements.alloted} {plan.title} entitlements
-          </Text>
-          <Text
-            size="sm"
-            weight="medium"
-            className="text-[#6B7280] text-left mb-6"
-          >
-            You can downgrade some of your applications if you'd like to pay for
-            fewer Entitlements.
-          </Text>
+          <ul className="pl-4">
+            <li className="list-disc text-sm font-medium text-[#6B7280] text-left">
+              You are currently using {entitlements.allotedClientIds.length}/
+              {entitlements.alloted} {plan.title} entitlements
+            </li>
+            <li className="list-disc text-sm font-medium text-[#6B7280] text-left">
+              You can downgrade some of your applications if you'd like to pay
+              for fewer Entitlements.
+            </li>
+          </ul>
         </div>
         <div className="border-b border-gray-200"></div>
         <div className="p-6 flex justify-between items-center">
-          <div>
-            <Text size="sm" weight="medium" className="text-gray-800 text-left">
-              Number of Entitlements
-            </Text>
-            <Text
-              size="sm"
-              weight="medium"
-              className="text-[#6B7280] text-left"
-            >
-              {proEntitlementDelta} x ${plan.price}/month
-            </Text>
-          </div>
+          <Text size="sm" weight="medium" className="text-gray-800 text-left">
+            Number of Entitlements
+          </Text>
+          <div className="flex flex-row text-[#6B7280] space-x-4">
+            <div className="flex flex-row items-center space-x-2">
+              <Text size="sm">{entitlements.alloted} Entitlements</Text>
+              <HiArrowNarrowRight />
+            </div>
 
-          <div className="flex flex-row">
-            <button
-              type="button"
-              className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-l-lg px-4"
-              onClick={() => {
-                if (proEntitlementDelta > 1) {
-                  setProEntitlementDelta((prev) => prev - 1)
-                }
-              }}
-            >
-              <HiMinus />
-            </button>
+            <div className="flex flex-row">
+              <button
+                type="button"
+                className="flex justify-center items-center border
+                disabled:cursor-not-allowed
+                border-gray-300 bg-gray-50 rounded-l-lg px-4"
+                onClick={() => {
+                  setProEntitlementNew((prev) => prev - 1)
+                }}
+                disabled={proEntitlementNew === 1}
+              >
+                <HiMinus />
+              </button>
 
-            <input
-              type="text"
-              className="border border-x-0 text-center w-[4rem] border-gray-300 focus:ring-0 focus:outline-0 focus:border-gray-300"
-              readOnly
-              value={proEntitlementDelta}
-            />
+              <input
+                type="text"
+                className="border border-x-0 text-center w-[4rem] border-gray-300 focus:ring-0 focus:outline-0 focus:border-gray-300"
+                readOnly
+                value={proEntitlementNew}
+              />
 
-            <button
-              type="button"
-              className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-r-lg px-4"
-              onClick={() => {
-                setProEntitlementDelta((prev) => prev + 1)
-              }}
-            >
-              <HiPlus />
-            </button>
+              <button
+                type="button"
+                className="flex justify-center items-center border
+                disabled:cursor-not-allowed
+                border-gray-300 bg-gray-50 rounded-r-lg px-4"
+                onClick={() => {
+                  setProEntitlementNew((prev) => prev + 1)
+                }}
+                disabled={proEntitlementNew === entitlements.alloted - 1}
+              >
+                <HiPlus />
+              </button>
+            </div>
           </div>
         </div>
+        <div className="border-b border-gray-200"></div>
+
+        <div className="p-6 flex justify-between items-center">
+          <Text size="sm" weight="medium" className="text-gray-800 text-left">
+            Changes to your subscription
+          </Text>
+
+          <div className="flex flex-row gap-2 items-center">
+            <Text size="lg" weight="semibold" className="text-gray-900">{`-$${
+              plan.price * (entitlements.alloted - proEntitlementNew)
+            }`}</Text>
+            <Text size="sm" weight="medium" className="text-gray-500">
+              per month
+            </Text>
+          </div>
+        </div>
+      </section>
+      <section className="flex flex-row-reverse gap-4 mt-auto m-5">
+        <Button
+          btnType="primary-alt"
+          disabled={!paymentData?.paymentMethodID}
+          onClick={() => {
+            setIsOpen(false)
+            setProEntitlementNew(1)
+
+            submit(
+              {
+                payload: JSON.stringify({
+                  planType: ServicePlanType.PRO,
+                  quantity: proEntitlementNew,
+                  customerID: paymentData?.customerID,
+                }),
+              },
+              {
+                method: 'post',
+              }
+            )
+          }}
+        >
+          Checkout
+        </Button>
+        <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
+          Cancel
+        </Button>
       </section>
     </Modal>
   )
@@ -539,7 +586,7 @@ const PlanCard = ({
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
   const [removeEntitlementModalOpen, setRemoveEntitlementModalOpen] =
     useState(false)
-
+  const submit = useSubmit()
   return (
     <>
       <PurchaseProModal
@@ -548,12 +595,15 @@ const PlanCard = ({
         plan={plan}
         entitlements={entitlements}
         paymentData={paymentData}
+        submit={submit}
       />
       <RemoveEntitelmentModal
-        plan={plan}
-        entitlements={entitlements}
         isOpen={removeEntitlementModalOpen}
         setIsOpen={setRemoveEntitlementModalOpen}
+        plan={plan}
+        entitlements={entitlements}
+        paymentData={paymentData}
+        submit={submit}
       />
       <article className="bg-white rounded border">
         <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
