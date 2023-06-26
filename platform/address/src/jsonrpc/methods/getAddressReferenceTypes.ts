@@ -3,10 +3,12 @@ import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 import { Context } from '../../context'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { AccessURNSpace } from '@proofzero/urns/access'
+import { AccountURNSpace } from '@proofzero/urns/account'
 
 export enum ReferenceType {
   Authorization = 'authorization',
   DevNotificationsEmail = 'developerNotificationsEmail',
+  BillingEmail = 'billingEmail',
 }
 
 export const GetAddressReferenceTypeOutput = z.array(
@@ -37,6 +39,8 @@ export const getAddressReferenceTypes = async ({
       references.push(ReferenceType.DevNotificationsEmail)
     } else if (AccessURNSpace.is(e.src.baseUrn)) {
       references.push(ReferenceType.Authorization)
+    } else if (AccountURNSpace.is(e.src.baseUrn)) {
+      references.push(ReferenceType.BillingEmail)
     }
   })
 

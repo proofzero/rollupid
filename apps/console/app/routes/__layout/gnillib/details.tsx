@@ -69,6 +69,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     await accountClient.setStripePaymentData.mutate({
       ...paymentData,
       accountURN,
+      addressURN: emailURN,
     })
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
