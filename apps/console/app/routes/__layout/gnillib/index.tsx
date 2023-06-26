@@ -279,6 +279,254 @@ const EntitlementsCard = ({
   )
 }
 
+const PurchaseProModal = ({
+  isOpen,
+  setIsOpen,
+  plan,
+  entitlements,
+  paymentData,
+}: {
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+  plan: PlanDetails
+  entitlements: EntitlementDetails
+  paymentData?: PaymentData
+}) => {
+  const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
+  const submit = useSubmit()
+  return (
+    <Modal isOpen={isOpen} fixed handleClose={() => setIsOpen(false)}>
+      <Text
+        size="lg"
+        weight="semibold"
+        className="text-left text-gray-800 mx-5"
+      >
+        Purchase Entitlement(s)
+      </Text>
+
+      {!paymentData?.paymentMethodID && (
+        <section className="mt-3.5 mx-5">
+          <ToastWithLink
+            message="Update your Payment Information to enable purchasing"
+            linkHref={`/gnillib/payment`}
+            linkText="Update payment information"
+          />
+        </section>
+      )}
+
+      <section className="m-5 border rounded-lg">
+        <div className="p-6">
+          <Text size="lg" weight="semibold" className="text-gray-900 text-left">
+            {plan.title}
+          </Text>
+
+          <Text
+            size="sm"
+            weight="medium"
+            className="text-[#6B7280] text-left mb-6"
+          >
+            {plan.description}
+          </Text>
+
+          <PlanFeatures plan={plan} />
+        </div>
+
+        <div className="border-b border-gray-200"></div>
+
+        <div className="p-6 flex justify-between items-center">
+          <div>
+            <Text size="sm" weight="medium" className="text-gray-800 text-left">
+              Number of Entitlements
+            </Text>
+            <Text
+              size="sm"
+              weight="medium"
+              className="text-[#6B7280] text-left"
+            >
+              {proEntitlementDelta} x ${plan.price}/month
+            </Text>
+          </div>
+
+          <div className="flex flex-row">
+            <button
+              type="button"
+              className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-l-lg px-4"
+              onClick={() => {
+                if (proEntitlementDelta > 1) {
+                  setProEntitlementDelta((prev) => prev - 1)
+                }
+              }}
+            >
+              <HiMinus />
+            </button>
+
+            <input
+              type="text"
+              className="border border-x-0 text-center w-[4rem] border-gray-300 focus:ring-0 focus:outline-0 focus:border-gray-300"
+              readOnly
+              value={proEntitlementDelta}
+            />
+
+            <button
+              type="button"
+              className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-r-lg px-4"
+              onClick={() => {
+                setProEntitlementDelta((prev) => prev + 1)
+              }}
+            >
+              <HiPlus />
+            </button>
+          </div>
+        </div>
+
+        <div className="border-b border-gray-200"></div>
+
+        <div className="p-6 flex justify-between items-center">
+          <Text size="sm" weight="medium" className="text-gray-800 text-left">
+            Changes to your subscription
+          </Text>
+
+          <div className="flex flex-row gap-2 items-center">
+            <Text size="lg" weight="semibold" className="text-gray-900">{`+$${
+              plan.price * proEntitlementDelta
+            }`}</Text>
+            <Text size="sm" weight="medium" className="text-gray-500">
+              per month
+            </Text>
+          </div>
+        </div>
+      </section>
+
+      <div className="flex-1"></div>
+
+      <section className="flex flex-row-reverse gap-4 m-5">
+        <Button
+          btnType="primary-alt"
+          disabled={!paymentData?.paymentMethodID}
+          onClick={() => {
+            setIsOpen(false)
+            setProEntitlementDelta(1)
+
+            submit(
+              {
+                payload: JSON.stringify({
+                  planType: ServicePlanType.PRO,
+                  quantity: entitlements.alloted + proEntitlementDelta,
+                  customerID: paymentData?.customerID,
+                }),
+              },
+              {
+                method: 'post',
+              }
+            )
+          }}
+        >
+          Checkout
+        </Button>
+        <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
+          Cancel
+        </Button>
+      </section>
+    </Modal>
+  )
+}
+
+const RemoveEntitelmentModal = ({
+  isOpen,
+  setIsOpen,
+  plan,
+  entitlements,
+}: {
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+  plan: PlanDetails
+  entitlements: EntitlementDetails
+}) => {
+  const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
+
+  return (
+    <Modal isOpen={isOpen} fixed handleClose={() => setIsOpen(false)}>
+      <Text
+        size="lg"
+        weight="semibold"
+        className="text-left text-gray-800 mx-5"
+      >
+        Purchase Entitlement(s)
+      </Text>
+      <section className="m-5 border rounded-lg">
+        <div className="p-6">
+          <Text size="lg" weight="semibold" className="text-gray-900 text-left">
+            {plan.title}
+          </Text>
+
+          <Text
+            size="sm"
+            weight="medium"
+            className="text-[#6B7280] text-left mb-6"
+          >
+            You are currently using {entitlements.allotedClientIds.length}/
+            {entitlements.alloted} {plan.title} entitlements
+          </Text>
+          <Text
+            size="sm"
+            weight="medium"
+            className="text-[#6B7280] text-left mb-6"
+          >
+            You can downgrade some of your applications if you'd like to pay for
+            fewer Entitlements.
+          </Text>
+        </div>
+        <div className="border-b border-gray-200"></div>
+        <div className="p-6 flex justify-between items-center">
+          <div>
+            <Text size="sm" weight="medium" className="text-gray-800 text-left">
+              Number of Entitlements
+            </Text>
+            <Text
+              size="sm"
+              weight="medium"
+              className="text-[#6B7280] text-left"
+            >
+              {proEntitlementDelta} x ${plan.price}/month
+            </Text>
+          </div>
+
+          <div className="flex flex-row">
+            <button
+              type="button"
+              className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-l-lg px-4"
+              onClick={() => {
+                if (proEntitlementDelta > 1) {
+                  setProEntitlementDelta((prev) => prev - 1)
+                }
+              }}
+            >
+              <HiMinus />
+            </button>
+
+            <input
+              type="text"
+              className="border border-x-0 text-center w-[4rem] border-gray-300 focus:ring-0 focus:outline-0 focus:border-gray-300"
+              readOnly
+              value={proEntitlementDelta}
+            />
+
+            <button
+              type="button"
+              className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-r-lg px-4"
+              onClick={() => {
+                setProEntitlementDelta((prev) => prev + 1)
+              }}
+            >
+              <HiPlus />
+            </button>
+          </div>
+        </div>
+      </section>
+    </Modal>
+  )
+}
+
 const PlanCard = ({
   plan,
   entitlements,
@@ -289,160 +537,24 @@ const PlanCard = ({
   paymentData?: PaymentData
 }) => {
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
-  const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
-
-  const submit = useSubmit()
+  const [removeEntitlementModalOpen, setRemoveEntitlementModalOpen] =
+    useState(false)
 
   return (
     <>
-      <Modal
+      <PurchaseProModal
         isOpen={purchaseProModalOpen}
-        fixed
-        handleClose={() => setPurchaseProModalOpen(false)}
-      >
-        <Text
-          size="lg"
-          weight="semibold"
-          className="text-left text-gray-800 mx-5"
-        >
-          Purchase Entitlement(s)
-        </Text>
-
-        {!paymentData?.paymentMethodID && (
-          <section className="mt-3.5 mx-5">
-            <ToastWithLink
-              message="Update your Payment Information to enable purchasing"
-              linkHref={`/gnillib/payment`}
-              linkText="Update payment information"
-            />
-          </section>
-        )}
-
-        <section className="m-5 border rounded-lg">
-          <div className="p-6">
-            <Text
-              size="lg"
-              weight="semibold"
-              className="text-gray-900 text-left"
-            >
-              {plan.title}
-            </Text>
-
-            <Text
-              size="sm"
-              weight="medium"
-              className="text-[#6B7280] text-left mb-6"
-            >
-              {plan.description}
-            </Text>
-
-            <PlanFeatures plan={plan} />
-          </div>
-
-          <div className="border-b border-gray-200"></div>
-
-          <div className="p-6 flex justify-between items-center">
-            <div>
-              <Text
-                size="sm"
-                weight="medium"
-                className="text-gray-800 text-left"
-              >
-                Number of Entitlements
-              </Text>
-              <Text
-                size="sm"
-                weight="medium"
-                className="text-[#6B7280] text-left"
-              >
-                {proEntitlementDelta} x ${plan.price}/month
-              </Text>
-            </div>
-
-            <div className="flex flex-row">
-              <button
-                type="button"
-                className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-l-lg px-4"
-                onClick={() => {
-                  if (proEntitlementDelta > 1) {
-                    setProEntitlementDelta((prev) => prev - 1)
-                  }
-                }}
-              >
-                <HiMinus />
-              </button>
-
-              <input
-                type="text"
-                className="border border-x-0 text-center w-[4rem] border-gray-300 focus:ring-0 focus:outline-0 focus:border-gray-300"
-                readOnly
-                value={proEntitlementDelta}
-              />
-
-              <button
-                type="button"
-                className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-r-lg px-4"
-                onClick={() => {
-                  setProEntitlementDelta((prev) => prev + 1)
-                }}
-              >
-                <HiPlus />
-              </button>
-            </div>
-          </div>
-
-          <div className="border-b border-gray-200"></div>
-
-          <div className="p-6 flex justify-between items-center">
-            <Text size="sm" weight="medium" className="text-gray-800 text-left">
-              Changes to your subscription
-            </Text>
-
-            <div className="flex flex-row gap-2 items-center">
-              <Text size="lg" weight="semibold" className="text-gray-900">{`+$${
-                plan.price * proEntitlementDelta
-              }`}</Text>
-              <Text size="sm" weight="medium" className="text-gray-500">
-                per month
-              </Text>
-            </div>
-          </div>
-        </section>
-
-        <div className="flex-1"></div>
-
-        <section className="flex flex-row-reverse gap-4 m-5">
-          <Button
-            btnType="primary-alt"
-            disabled={!paymentData?.paymentMethodID}
-            onClick={() => {
-              setPurchaseProModalOpen(false)
-              setProEntitlementDelta(1)
-
-              submit(
-                {
-                  payload: JSON.stringify({
-                    planType: ServicePlanType.PRO,
-                    quantity: entitlements.alloted + proEntitlementDelta,
-                    customerID: paymentData?.customerID,
-                  }),
-                },
-                {
-                  method: 'post',
-                }
-              )
-            }}
-          >
-            Checkout
-          </Button>
-          <Button
-            btnType="secondary-alt"
-            onClick={() => setPurchaseProModalOpen(false)}
-          >
-            Cancel
-          </Button>
-        </section>
-      </Modal>
+        setIsOpen={setPurchaseProModalOpen}
+        plan={plan}
+        entitlements={entitlements}
+        paymentData={paymentData}
+      />
+      <RemoveEntitelmentModal
+        plan={plan}
+        entitlements={entitlements}
+        isOpen={removeEntitlementModalOpen}
+        setIsOpen={setRemoveEntitlementModalOpen}
+      />
       <article className="bg-white rounded border">
         <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
           <div>
@@ -493,7 +605,11 @@ const PlanCard = ({
                   <div className="border-b border-gray-200 w-3/4 mx-auto"></div>
 
                   <Menu.Item disabled={entitlements.alloted === 0}>
-                    <div
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRemoveEntitlementModalOpen(true)
+                      }}
                       className={classnames(
                         'flex flex-row items-center gap-3 py-3 px-4 rounded-b-lg',
                         entitlements.alloted !== 0
@@ -506,7 +622,7 @@ const PlanCard = ({
                       <Text size="sm" weight="medium">
                         Remove Entitlement(s)
                       </Text>
-                    </div>
+                    </button>
                   </Menu.Item>
                 </Menu.Items>
               </>
@@ -576,10 +692,19 @@ const PlanCard = ({
           )}
           {entitlements.alloted > entitlements.allotedClientIds.length && (
             <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer bg-gray-50 rounded-b py-4 px-6">
-              <FaTrash className="w-3.5 h-3.5" />
-              <Text size="sm" weight="medium">
-                Remove Unused Entitlements
-              </Text>
+              <button
+                disabled={paymentData == undefined}
+                type="button"
+                className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b disabled:text-indigo-300"
+                onClick={() => {
+                  setRemoveEntitlementModalOpen(true)
+                }}
+              >
+                <FaTrash className="w-3.5 h-3.5" />
+                <Text size="sm" weight="medium">
+                  Remove Unused Entitlements
+                </Text>
+              </button>
             </div>
           )}
         </footer>
