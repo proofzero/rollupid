@@ -8,7 +8,13 @@ import {
   json,
 } from '@remix-run/cloudflare'
 import { FaCheck, FaShoppingCart, FaTrash } from 'react-icons/fa'
-import { HiMinus, HiOutlineMail, HiPlus } from 'react-icons/hi'
+import {
+  HiChevronDown,
+  HiChevronUp,
+  HiMinus,
+  HiOutlineMail,
+  HiPlus,
+} from 'react-icons/hi'
 import {
   commitFlashSession,
   getFlashSession,
@@ -27,7 +33,8 @@ import {
   useSubmit,
 } from '@remix-run/react'
 import type { LoaderData as OutletContextData } from '~/root'
-import { Menu } from '@headlessui/react'
+import { Menu, Transition } from '@headlessui/react'
+import { Listbox } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
 import { HiOutlineMinusCircle } from 'react-icons/hi'
 import { TbHourglassHigh } from 'react-icons/tb'
@@ -490,38 +497,74 @@ const RemoveEntitelmentModal = ({
             </div>
 
             <div className="flex flex-row">
-              <button
-                type="button"
-                className="flex justify-center items-center border
-                disabled:cursor-not-allowed
-                border-gray-300 bg-gray-50 rounded-l-lg px-4"
-                onClick={() => {
-                  setProEntitlementNew((prev) => prev - 1)
-                }}
-                disabled={proEntitlementNew < 1}
-              >
-                <HiMinus />
-              </button>
-
-              <input
-                type="text"
-                className="border border-x-0 text-center w-[4rem] border-gray-300 focus:ring-0 focus:outline-0 focus:border-gray-300"
-                readOnly
+              <Listbox
                 value={proEntitlementNew}
-              />
-
-              <button
-                type="button"
-                className="flex justify-center items-center border
-                disabled:cursor-not-allowed
-                border-gray-300 bg-gray-50 rounded-r-lg px-4"
-                onClick={() => {
-                  setProEntitlementNew((prev) => prev + 1)
-                }}
-                disabled={proEntitlementNew >= entitlements.alloted}
+                onChange={setProEntitlementNew}
               >
-                <HiPlus />
-              </button>
+                {({ open }) => {
+                  return (
+                    <div className="relative">
+                      <Listbox.Button
+                        className="relative w-full cursor-default border
+                  py-1.5 px-4 text-left shadow-sm sm:text-sm rounded-lg
+                  focus:border-indigo-500 focus:outline-none focus:ring-1
+                  flex flex-row space-x-3 items-center"
+                      >
+                        <Text size="sm">{proEntitlementNew}</Text>
+                        {open ? (
+                          <HiChevronUp className="text-right" />
+                        ) : (
+                          <HiChevronDown className="text-right" />
+                        )}
+                      </Listbox.Button>
+                      <Transition
+                        show={open}
+                        as="div"
+                        leave="transition ease-in duration-100"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                        className="bg-gray-800"
+                      >
+                        <Listbox.Options
+                          className="absolute no-scrollbar w-full bg-white
+                        rounded-lg border max-h-[200px] overflow-auto"
+                        >
+                          {Array.apply(
+                            null,
+                            Array(entitlements.alloted + 1)
+                          ).map((_, i) => {
+                            console.log(i)
+                            return (
+                              <Listbox.Option
+                                key={i}
+                                value={i}
+                                className="flex items-center
+                                cursor-pointer hover:bg-gray-100
+                                rounded-lg m-1"
+                              >
+                                {({ selected }) => {
+                                  return (
+                                    <div
+                                      className={`w-full h-full px-4 py-1.5
+                                      rounded-lg ${
+                                        selected
+                                          ? 'bg-gray-100  font-medium'
+                                          : ''
+                                      }`}
+                                    >
+                                      {i}
+                                    </div>
+                                  )
+                                }}
+                              </Listbox.Option>
+                            )
+                          })}
+                        </Listbox.Options>
+                      </Transition>
+                    </div>
+                  )
+                }}
+              </Listbox>
             </div>
           </div>
         </div>
@@ -544,7 +587,7 @@ const RemoveEntitelmentModal = ({
       </section>
       <section className="flex flex-row-reverse gap-4 mt-auto m-5">
         <Button
-          btnType="primary-alt"
+          btnType="dangerous-alt"
           disabled={!paymentData?.paymentMethodID}
           onClick={() => {
             setIsOpen(false)
@@ -564,7 +607,7 @@ const RemoveEntitelmentModal = ({
             )
           }}
         >
-          Checkout
+          Remove Entitelment(s)
         </Button>
         <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
           Cancel
