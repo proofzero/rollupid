@@ -1,11 +1,11 @@
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction } from '@remix-run/cloudflare'
+import { type ActionFunction } from '@remix-run/cloudflare'
 
 import Stripe from 'stripe'
 import createAccountClient from '@proofzero/platform-clients/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import { AccountURN } from '@proofzero/urns/account'
+import { type AccountURN } from '@proofzero/urns/account'
 import { ServicePlanType } from '@proofzero/types/account'
 import { updateSubscriptionMetadata } from '~/services/billing/stripe'
 
@@ -120,6 +120,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           })
         }
 
+        break
+      case 'customer.source.expiring':
+        const { id: sourceId, customer } = event.data.object as {
+          id: string
+          customer: string
+        }
+        console.log(
+          `Card ${sourceId} for customer ${customer} is about to expire.`
+        )
         break
     }
 
