@@ -1,5 +1,3 @@
-import { AddressURN } from '@proofzero/urns/address'
-
 export type AccountProfile = {
   displayName: string
   pfp: {
@@ -9,6 +7,7 @@ export type AccountProfile = {
 }
 
 export enum ServicePlanType {
+  FREE = 'FREE',
   PRO = 'PRO',
 }
 

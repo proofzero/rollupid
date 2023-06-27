@@ -13,7 +13,7 @@ export const GetEntitlementsOutputSchema = z.object({
     })
   ),
 })
-type GetEntitlementsOutput = z.infer<typeof GetEntitlementsOutputSchema>
+export type GetEntitlementsOutput = z.infer<typeof GetEntitlementsOutputSchema>
 
 export const getEntitlements = async ({
   ctx,
@@ -35,7 +35,7 @@ export const getEntitlements = async ({
     }
 
     if (servicePlans?.plans?.[enumKey]) {
-      resEntry.entitlements = servicePlans.plans[enumKey].entitlements
+      resEntry.entitlements = servicePlans.plans[enumKey]?.entitlements ?? 0
     }
 
     result.plans[enumKey] = resEntry

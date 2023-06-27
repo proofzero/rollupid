@@ -6026,6 +6026,7 @@ __metadata:
     "@typescript-eslint/parser": 5.42.1
     autoprefixer: latest
     chromatic: 6.11.4
+    classnames: 2.3.2
     cra-template-typescript: 1.2.0
     cross-env: 7.0.3
     css-loader: 6.7.1

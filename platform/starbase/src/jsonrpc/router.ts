@@ -115,6 +115,7 @@ import {
   setEmailOTPTheme,
   SetEmailOTPThemeInput,
 } from './methods/setEmailOTPTheme'
+import { setAppPlan, SetAppPlanInput } from './methods/setAppPlan'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -321,6 +322,14 @@ export const appRouter = t.router({
     .use(OwnAppsMiddleware)
     .input(SetEmailOTPThemeInput)
     .mutation(setEmailOTPTheme),
+  setAppPlan: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .use(OwnAppsMiddleware)
+    .input(SetAppPlanInput)
+    .mutation(setAppPlan),
 })
 
 export type StarbaseRouter = typeof appRouter

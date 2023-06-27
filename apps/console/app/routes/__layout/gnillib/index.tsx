@@ -218,7 +218,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
-const PlanFeatures = ({ plan }: { plan: PlanDetails }) => {
+export const PlanFeatures = ({ plan }: { plan: PlanDetails }) => {
   return (
     <ul className="grid lg:grid-rows-4 grid-flow-row lg:grid-flow-col gap-4">
       {plan.features.map((feature) => (
@@ -242,53 +242,6 @@ const PlanFeatures = ({ plan }: { plan: PlanDetails }) => {
         </li>
       ))}
     </ul>
-  )
-}
-
-const EntitlementsCard = ({
-  entitlements,
-}: {
-  entitlements: {
-    title: string
-    subtitle: string
-  }[]
-}) => {
-  return (
-    <article className="bg-white rounded border">
-      <header className="flex flex-row justify-between items-center p-4">
-        <div>
-          <Text size="lg" weight="semibold" className="text-gray-900">
-            Assigned Entitlements
-          </Text>
-        </div>
-      </header>
-      <div className="w-full border-b border-gray-200"></div>
-      <main>
-        <div className="w-full">
-          {entitlements.map((entitlement, i) => (
-            <div key={entitlement.title}>
-              <div className="flex flex-row justify-between items-center w-full p-4">
-                <div className="flex-1">
-                  <Text size="sm" weight="medium" className="text-gray-900">
-                    {entitlement.title}
-                  </Text>
-                  <Text size="sm" weight="medium" className="text-gray-500">
-                    {entitlement.subtitle}
-                  </Text>
-                </div>
-
-                <Button btnType="secondary-alt" btnSize="xs">
-                  Manage
-                </Button>
-              </div>
-              {i < entitlements.length - 1 && (
-                <div className="w-full border-b border-gray-200"></div>
-              )}
-            </div>
-          ))}
-        </div>
-      </main>
-    </article>
   )
 }
 
@@ -1031,15 +984,6 @@ export default () => {
           }}
           paymentData={paymentData}
           submit={submit}
-        />
-
-        <EntitlementsCard
-          entitlements={apps.map((a) => ({
-            title: a.name!,
-            subtitle: allotedClientIds.includes(a.clientId)
-              ? `Pro Plan ${plans.PRO.price}/month`
-              : 'Free',
-          }))}
         />
       </section>
     </>
