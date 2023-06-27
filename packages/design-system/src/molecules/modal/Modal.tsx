@@ -53,19 +53,20 @@ export const Modal = ({
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className={`${fixed ? "pb-10" : ""}`}>
+              <Dialog.Panel className={`${fixed ? 'pb-10' : ''}`}>
                 <div
                   className={`flex flex-col
                   border bg-white rounded-lg shadow-xl overflow-auto thin-scrollbar
-                  ${fixed
+                  ${
+                    fixed
                       ? `h-max w-max min-[480px]:w-[96vw] lg:w-[62vw] h-[96vh] lg:h-[76vh]`
                       : `h-max w-max min-h-max max-w-[96vw] lg:w-full max-h-[89vh] lg:h-full
                       `
-                    }`}
+                  }`}
                 >
                   <div className="flex flex-row justify-end px-3">
-                    {
-                      closable && <div
+                    {closable && (
+                      <div
                         className={`bg-white p-2 rounded-lg m-2 text-xl cursor-pointer
                       hover:bg-[#F3F4F6]`}
                         onClick={() => {
@@ -74,7 +75,7 @@ export const Modal = ({
                       >
                         <HiOutlineX />
                       </div>
-                    }
+                    )}
                   </div>
                   {children}
                 </div>
