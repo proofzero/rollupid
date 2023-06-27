@@ -36,6 +36,16 @@ router.post('/otp/:email', withToken, async (req, env) => {
   return new Response(otp)
 })
 
+router.post('/norification/:email', withToken, async (req, env) => {
+  const { params } = req
+  const message = await req.text()
+
+  console.log({ to: params.email })
+  console.log({ message })
+
+  return new Response(message)
+})
+
 // alternative advanced/manual approach for downstream control
 export default {
   fetch: (request: RequestLike, env: Environment, context: any) =>

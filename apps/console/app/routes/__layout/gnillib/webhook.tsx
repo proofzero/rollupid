@@ -4,6 +4,7 @@ import { type ActionFunction } from '@remix-run/cloudflare'
 
 import Stripe from 'stripe'
 import createAccountClient from '@proofzero/platform-clients/account'
+import createEmailClient from '@proofzero/platform-clients/email'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { type AccountURN } from '@proofzero/urns/account'
 import { ServicePlanType } from '@proofzero/types/account'
@@ -14,6 +15,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
     const accountClient = createAccountClient(Account, {
+      ...getAuthzHeaderConditionallyFromToken(undefined),
+      ...traceHeader,
+    })
+
+    const emailClient = createEmailClient(Email, {
       ...getAuthzHeaderConditionallyFromToken(undefined),
       ...traceHeader,
     })
@@ -122,13 +128,18 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         break
       case 'customer.source.expiring':
-        const { id: sourceId, customer } = event.data.object as {
-          id: string
+        const { customer } = event.data.object as {
           customer: string
         }
-        console.log(
-          `Card ${sourceId} for customer ${customer} is about to expire.`
-        )
+        const customerData = await stripeClient.customers.retrieve(customer)
+        if (!customerData.deleted && customerData.email) {
+          const { email, name } = customerData
+          await emailClient.sendBillingNotification.mutate({
+            emailAddress: email,
+            name: name || 'Client',
+          })
+        }
+
         break
     }
 

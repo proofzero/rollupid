@@ -4,6 +4,7 @@ declare global {
   const Images: Fetcher
   const Account: Fetcher
   const Address: Fetcher
+  const Email: Fetcher
 
   const SECRET_SESSION_KEY: string
   const SECRET_SESSION_SALT: string

@@ -14,6 +14,7 @@ services = [
   { binding = "Images", service = "images" },
   { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
+  { binding = "Email", service = "email" },
 ]
 
 # development
@@ -62,6 +63,7 @@ services = [
   { binding = "Images", service = "images-dev" },
   { binding = "Account", service = "account-dev" },
   { binding = "Address", service = "address-dev" },
+  { binding = "Email", service = "email-dev" },
 ]
 
 
@@ -92,6 +94,7 @@ services = [
   { binding = "Images", service = "images-next" },
   { binding = "Account", service = "account-next" },
   { binding = "Address", service = "address-next" },
+  { binding = "Email", service = "email-next" },
 ]
 
 # kv_namespaces = [
@@ -124,6 +127,7 @@ services = [
   { binding = "Images", service = "images-current" },
   { binding = "Account", service = "account-current" },
   { binding = "Address", service = "address-current" },
+  { binding = "Email", service = "email-current" },
 ]
 
 # kv_namespaces = [

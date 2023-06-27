@@ -33,13 +33,18 @@ export async function send(
   if (env.Test) {
     const otpMatch = message.content.body.match(/id="passcode">(.+)<\/div>/)
     console.info('Code:', otpMatch?.[1])
-    await env.Test.fetch(`http://localhost/otp/${message.recipient.address}`, {
-      method: 'POST',
-      headers: {
-        Authentication: `Bearer ${env.SECRET_TEST_API_TEST_TOKEN}`,
-      },
-      body: message.content.body,
-    }).then((res) => {
+    await env.Test.fetch(
+      `http://localhost/${otpMatch?.[1] ? 'otp' : 'norification'}/${
+        message.recipient.address
+      }`,
+      {
+        method: 'POST',
+        headers: {
+          Authentication: `Bearer ${env.SECRET_TEST_API_TEST_TOKEN}`,
+        },
+        body: message.content.body,
+      }
+    ).then((res) => {
       console.debug(
         'Res: ',
         res.status,
