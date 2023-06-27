@@ -68,18 +68,10 @@ import {
   updateSubscription,
 } from '~/services/billing/stripe'
 
-type EntitlementDetails = {
-  alloted: number
-  allotedClientIds: string[]
-}
-
 type LoaderData = {
   paymentData?: PaymentData
   entitlements: {
-    [ServicePlanType.PRO]: EntitlementDetails
-    FREE: {
-      appClientIds: string[]
-    }
+    [ServicePlanType.PRO]: number
   }
   successToast?: string
   connectedEmails: DropdownSelectListItem[]
@@ -93,33 +85,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-    const starbaseClient = createStarbaseClient(Starbase, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-    const apps = await starbaseClient.listApps.query()
-    const appClientIds = apps.map((a) => a.clientId)
-
     const accountClient = createAccountClient(Account, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
 
     const { plans } = await accountClient.getEntitlements.query()
-
-    const proAllotedEntitlements =
-      plans?.[ServicePlanType.PRO]?.entitlements ?? 0
-
-    // Capping this to 2 for demo purposes
-    const proUsage = Math.min(2, proAllotedEntitlements)
-    // Setting first two apps to pro for demo purposes
-    const proAppClientIds = appClientIds.slice(0, proUsage)
-
-    // Rest become free apps for demo purposes...
-    let freeAppClientIds: any[] = []
-    if (appClientIds.length > proUsage) {
-      freeAppClientIds = appClientIds.slice(proUsage)
-    }
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
     const successToast = flashSession.get('success_toast')
@@ -137,13 +108,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       {
         paymentData: spd,
         entitlements: {
-          [ServicePlanType.PRO]: {
-            alloted: proAllotedEntitlements,
-            allotedClientIds: proAppClientIds,
-          },
-          FREE: {
-            appClientIds: freeAppClientIds,
-          },
+          [ServicePlanType.PRO]:
+            plans?.[ServicePlanType.PRO]?.entitlements ?? 0,
         },
         successToast,
         connectedEmails,
@@ -256,7 +222,7 @@ const PurchaseProModal = ({
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   plan: PlanDetails
-  entitlements: EntitlementDetails
+  entitlements: number
   paymentData?: PaymentData
   submit: (data: any, options: any) => void
 }) => {
@@ -380,7 +346,7 @@ const PurchaseProModal = ({
               {
                 payload: JSON.stringify({
                   planType: ServicePlanType.PRO,
-                  quantity: entitlements.alloted + proEntitlementDelta,
+                  quantity: entitlements + proEntitlementDelta,
                   customerID: paymentData?.customerID,
                   txType: 'buy',
                 }),
@@ -406,19 +372,19 @@ const RemoveEntitelmentModal = ({
   setIsOpen,
   plan,
   entitlements,
+  entitlementUsage,
   paymentData,
   submit,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   plan: PlanDetails
-  entitlements: EntitlementDetails
+  entitlements: number
+  entitlementUsage: number
   paymentData?: PaymentData
   submit: (data: any, options: any) => void
 }) => {
-  const [proEntitlementNew, setProEntitlementNew] = useState(
-    entitlements.allotedClientIds.length
-  )
+  const [proEntitlementNew, setProEntitlementNew] = useState(entitlementUsage)
 
   return (
     <Modal isOpen={isOpen} fixed handleClose={() => setIsOpen(false)}>
@@ -436,8 +402,8 @@ const RemoveEntitelmentModal = ({
           </Text>
           <ul className="pl-4">
             <li className="list-disc text-sm font-medium text-[#6B7280] text-left">
-              You are currently using {entitlements.allotedClientIds.length}/
-              {entitlements.alloted} {plan.title} entitlements
+              You are currently using {entitlementUsage}/{entitlements}{' '}
+              {plan.title} entitlements
             </li>
             <li className="list-disc text-sm font-medium text-[#6B7280] text-left">
               You can downgrade some of your applications if you'd like to pay
@@ -452,7 +418,7 @@ const RemoveEntitelmentModal = ({
           </Text>
           <div className="flex flex-row text-[#6B7280] space-x-4">
             <div className="flex flex-row items-center space-x-2">
-              <Text size="sm">{entitlements.alloted} Entitlements</Text>
+              <Text size="sm">{entitlements} Entitlements</Text>
               <HiArrowNarrowRight />
             </div>
 
@@ -489,36 +455,35 @@ const RemoveEntitelmentModal = ({
                           className="absolute no-scrollbar w-full bg-white
                         rounded-lg border max-h-[200px] overflow-auto"
                         >
-                          {Array.apply(
-                            null,
-                            Array(entitlements.alloted + 1)
-                          ).map((_, i) => {
-                            console.log(i)
-                            return (
-                              <Listbox.Option
-                                key={i}
-                                value={i}
-                                className="flex items-center
+                          {Array.apply(null, Array(entitlements + 1)).map(
+                            (_, i) => {
+                              console.log(i)
+                              return (
+                                <Listbox.Option
+                                  key={i}
+                                  value={i}
+                                  className="flex items-center
                                 cursor-pointer hover:bg-gray-100
                                 rounded-lg m-1"
-                              >
-                                {({ selected }) => {
-                                  return (
-                                    <div
-                                      className={`w-full h-full px-4 py-1.5
+                                >
+                                  {({ selected }) => {
+                                    return (
+                                      <div
+                                        className={`w-full h-full px-4 py-1.5
                                       rounded-lg ${
                                         selected
                                           ? 'bg-gray-100  font-medium'
                                           : ''
                                       }`}
-                                    >
-                                      {i}
-                                    </div>
-                                  )
-                                }}
-                              </Listbox.Option>
-                            )
-                          })}
+                                      >
+                                        {i}
+                                      </div>
+                                    )
+                                  }}
+                                </Listbox.Option>
+                              )
+                            }
+                          )}
                         </Listbox.Options>
                       </Transition>
                     </div>
@@ -537,7 +502,7 @@ const RemoveEntitelmentModal = ({
 
           <div className="flex flex-row gap-2 items-center">
             <Text size="lg" weight="semibold" className="text-gray-900">{`-$${
-              plan.price * (entitlements.alloted - proEntitlementNew)
+              plan.price * (entitlements - proEntitlementNew)
             }`}</Text>
             <Text size="sm" weight="medium" className="text-gray-500">
               per month
@@ -581,11 +546,13 @@ const RemoveEntitelmentModal = ({
 const PlanCard = ({
   plan,
   entitlements,
+  entitlementUsage,
   paymentData,
   submit,
 }: {
   plan: PlanDetails
-  entitlements: EntitlementDetails
+  entitlements: number
+  entitlementUsage: number
   paymentData?: PaymentData
   submit: (data: any, options: any) => void
 }) => {
@@ -607,6 +574,7 @@ const PlanCard = ({
         setIsOpen={setRemoveEntitlementModalOpen}
         plan={plan}
         entitlements={entitlements}
+        entitlementUsage={entitlementUsage}
         paymentData={paymentData}
         submit={submit}
       />
@@ -659,7 +627,7 @@ const PlanCard = ({
 
                   <div className="border-b border-gray-200 w-3/4 mx-auto"></div>
 
-                  <Menu.Item disabled={entitlements.alloted === 0}>
+                  <Menu.Item disabled={entitlements === 0}>
                     <button
                       type="button"
                       onClick={() => {
@@ -667,7 +635,7 @@ const PlanCard = ({
                       }}
                       className={classnames(
                         'flex flex-row items-center gap-3 py-3 px-4 rounded-b-lg',
-                        entitlements.alloted !== 0
+                        entitlements !== 0
                           ? 'cursor-pointer hover:bg-gray-50 text-red-600'
                           : 'cursor-default text-red-300'
                       )}
@@ -692,7 +660,7 @@ const PlanCard = ({
 
           <div className="border-b border-gray-200"></div>
 
-          {entitlements.allotedClientIds.length > 0 && (
+          {entitlementUsage > 0 && (
             <div className="p-4">
               <Text size="sm" weight="medium" className="text-gray-900">
                 Entitlements
@@ -703,18 +671,14 @@ const PlanCard = ({
                   <div
                     className="bg-blue-600 h-2.5 rounded-full"
                     style={{
-                      width: `${
-                        (entitlements.allotedClientIds.length /
-                          entitlements.alloted) *
-                        100
-                      }%`,
+                      width: `${(entitlementUsage / entitlements) * 100}%`,
                     }}
                   ></div>
                 </div>
 
                 <div className="flex flex-row items-center gap-2">
                   <Text size="lg" weight="semibold" className="text-gray-900">
-                    ${entitlements.alloted * plans.PRO.price}
+                    ${entitlements * plans.PRO.price}
                   </Text>
                   <Text size="sm" className="text-gray-500">
                     per month
@@ -722,13 +686,13 @@ const PlanCard = ({
                 </div>
               </div>
               <Text size="sm" weight="medium" className="text-[#6B7280]">
-                {`${entitlements.allotedClientIds.length} out of ${entitlements.alloted} Entitlements used`}
+                {`${entitlementUsage} out of ${entitlements} Entitlements used`}
               </Text>
             </div>
           )}
         </main>
         <footer>
-          {entitlements.alloted === 0 && (
+          {entitlements === 0 && (
             <div className="bg-gray-50 rounded-b py-4 px-6">
               <button
                 disabled={paymentData == undefined}
@@ -745,7 +709,7 @@ const PlanCard = ({
               </button>
             </div>
           )}
-          {entitlements.alloted > entitlements.allotedClientIds.length && (
+          {entitlements > entitlementUsage && (
             <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer bg-gray-50 rounded-b py-4 px-6">
               <button
                 disabled={paymentData == undefined}
@@ -769,14 +733,8 @@ const PlanCard = ({
 }
 
 export default () => {
-  const {
-    entitlements: {
-      PRO: { alloted, allotedClientIds },
-    },
-    successToast,
-    paymentData,
-    connectedEmails,
-  } = useLoaderData<LoaderData>()
+  const { entitlements, successToast, paymentData, connectedEmails } =
+    useLoaderData<LoaderData>()
 
   const ld = useActionData<{
     updatedProEntitlements: number
@@ -978,10 +936,12 @@ export default () => {
 
         <PlanCard
           plan={plans[ServicePlanType.PRO]}
-          entitlements={{
-            alloted: ld?.updatedProEntitlements ?? alloted,
-            allotedClientIds: allotedClientIds,
-          }}
+          entitlements={
+            ld?.updatedProEntitlements ?? entitlements[ServicePlanType.PRO]
+          }
+          entitlementUsage={
+            apps.filter((a) => a.appPlan === ServicePlanType.PRO).length
+          }
           paymentData={paymentData}
           submit={submit}
         />

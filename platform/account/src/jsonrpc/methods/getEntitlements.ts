@@ -31,7 +31,6 @@ export const getEntitlements = async ({
     const enumKey = PlanTypeEnum.parse(key)
     const resEntry = {
       entitlements: 0,
-      pendingEntitlements: 0,
     }
 
     if (servicePlans?.plans?.[enumKey]) {

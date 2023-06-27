@@ -19,6 +19,7 @@ import { GetEntitlementsOutput } from '@proofzero/platform/account/src/jsonrpc/m
 import { AccountURN } from '@proofzero/urns/account'
 import { BadRequestError } from '@proofzero/errors'
 import type { appDetailsProps } from '~/types'
+import { AppLoaderData } from '~/root'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -190,14 +191,10 @@ export default () => {
     entitlements: GetEntitlementsOutput
   }>()
 
-  const { appDetails } = useOutletContext<{
+  const { apps, appDetails } = useOutletContext<{
+    apps: AppLoaderData[]
     appDetails: appDetailsProps
   }>()
-
-  console.log({
-    entitlements,
-    appDetails,
-  })
 
   return (
     <>
@@ -215,7 +212,10 @@ export default () => {
             },
             {
               planType: ServicePlanType.PRO,
-              subtitle: '1 available',
+              subtitle: `${
+                (entitlements[ServicePlanType.PRO]?.entitlements ?? 0) -
+                apps.filter((a) => a.appPlan === ServicePlanType.PRO).length
+              } available`,
             },
           ]}
         />

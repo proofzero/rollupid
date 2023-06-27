@@ -128,8 +128,13 @@ export default function AppDetailIndexPage() {
 
   const { apps, avatarUrl, PASSPORT_URL, displayName } =
     useOutletContext<OutletContextData>()
-  const { appDetails, rotationResult, appContactAddress, appContactEmail, paymaster } =
-    loaderData
+  const {
+    appDetails,
+    rotationResult,
+    appContactAddress,
+    appContactEmail,
+    paymaster,
+  } = loaderData
 
   const notify = (success: boolean = true) => {
     if (success) {
@@ -163,16 +168,18 @@ export default function AppDetailIndexPage() {
             <Toaster position="top-right" reverseOrder={false} />
 
             <section
-              className={`${open
-                ? 'max-lg:opacity-50\
+              className={`${
+                open
+                  ? 'max-lg:opacity-50\
                     max-lg:overflow-hidden\
                     max-lg:h-[calc(100dvh-80px)]\
                     min-h-[636px]'
-                : 'h-full '
-                } py-9 sm:mx-11 max-w-[1636px]`}
+                  : 'h-full '
+              } py-9 sm:mx-11 max-w-[1636px]`}
             >
               <Outlet
                 context={{
+                  apps,
                   notificationHandler: notify,
                   appDetails,
                   avatarUrl,
