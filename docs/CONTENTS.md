@@ -18,6 +18,7 @@
 * [Requesting Email](guides/requesting-email.md)
 * [Connected Accounts](guides/connected-accounts.md)
 * [Using Smart Contract Wallets](guides/using-smart-contract-wallets.md)
+* [Using NextAuth.js](guides/using-nextauth.js.md)
 
 ## Platform
 

@@ -8,7 +8,7 @@ This guide will walk you through how to request email addresses from your user u
 
 ### Step 1
 
-In your application OAuth configuration make sure that email is selected in the "allowed scopes" dropdown. Make sure to save this configuration before moving to step 2.
+In your application OAuth configuration make sure that the "email" scope is selected in the "allowed scopes" dropdown. Make sure to save this configuration before moving to step 2.
 
 <figure><img src="../.gitbook/assets/CleanShot 2023-06-28 at 13.30.13.png" alt=""><figcaption><p>Email Scope Dropdown</p></figcaption></figure>
 
