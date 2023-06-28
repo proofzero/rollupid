@@ -20,6 +20,10 @@ import { AccountURN } from '@proofzero/urns/account'
 import { BadRequestError } from '@proofzero/errors'
 import type { appDetailsProps } from '~/types'
 import { AppLoaderData } from '~/root'
+import {
+  createSubscription,
+  updateSubscription,
+} from '~/services/billing/stripe'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -54,19 +58,95 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
+    const accountClient = createAccountClient(Account, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
+    const entitlements = await accountClient.getEntitlements.query()
+
     const fd = await request.formData()
-    const op = fd.get('op') as 'update'
-    const payload = JSON.parse(fd.get('payload') as string) as {
-      plan: ServicePlanType
-    }
+    const op = fd.get('op') as 'update' | 'purchase'
 
     switch (op) {
       case 'update': {
+        const { plan } = JSON.parse(fd.get('payload') as string) as {
+          plan: ServicePlanType
+        }
+
+        const apps = await starbaseClient.listApps.query()
+        const allotedApps = apps.filter((a) => a.appPlan === plan).length
+
+        if (allotedApps >= (entitlements.plans[plan]?.entitlements ?? 0)) {
+          throw new BadRequestError({
+            message: `You have reached the maximum number of apps for this plan`,
+          })
+        }
+
         await starbaseClient.setAppPlan.mutate({
           accountURN,
           clientId,
-          plan: payload.plan,
+          plan,
         })
+
+        break
+      }
+
+      case 'purchase': {
+        const { plan } = JSON.parse(fd.get('payload') as string) as {
+          plan: ServicePlanType
+        }
+
+        const paymentData = await accountClient.getStripePaymentData.query({
+          accountURN,
+        })
+        if (!paymentData || !paymentData.customerID) {
+          throw new BadRequestError({
+            message: `You must add a payment method before purchasing a plan`,
+          })
+        }
+
+        const entitlements = await accountClient.getEntitlements.query()
+        const { customerID } = paymentData
+
+        let sub
+        let quantity
+        if (!entitlements.subscriptionID) {
+          quantity = 1
+
+          sub = await createSubscription({
+            customerID: customerID,
+            planID: STRIPE_PRO_PLAN_ID,
+            quantity,
+            accountURN,
+            handled: true,
+          })
+        } else {
+          quantity = entitlements.plans[plan]?.entitlements
+            ? entitlements.plans[plan]?.entitlements! + 1
+            : 1
+
+          sub = await updateSubscription({
+            subscriptionID: entitlements.subscriptionID,
+            planID: STRIPE_PRO_PLAN_ID,
+            quantity,
+            handled: true,
+          })
+        }
+
+        await accountClient.updateEntitlements.mutate({
+          accountURN: accountURN,
+          subscriptionID: sub.id,
+          quantity: quantity,
+          type: plan,
+        })
+
+        await starbaseClient.setAppPlan.mutate({
+          accountURN,
+          clientId,
+          plan,
+        })
+
         break
       }
     }
@@ -118,10 +198,39 @@ const EntitlementsCard = ({
   currentPlan: ServicePlanType
   entitlements: {
     planType: ServicePlanType
-    subtitle: string
+    totalEntitlements?: number
+    usedEntitlements?: number
   }[]
 }) => {
   const submit = useSubmit()
+
+  const getAvailableEntitlements = (entitlement: {
+    planType: ServicePlanType
+    totalEntitlements?: number
+    usedEntitlements?: number
+  }) =>
+    (entitlement.totalEntitlements ?? 0) - (entitlement.usedEntitlements ?? 0)
+
+  const getOperation = (
+    planType: ServicePlanType,
+    currentPlanType: ServicePlanType
+  ) => {
+    if (
+      currentPlanType !== ServicePlanType.FREE &&
+      planType === ServicePlanType.FREE
+    ) {
+      return 'Downgrade'
+    }
+
+    if (
+      currentPlanType === ServicePlanType.FREE &&
+      planType !== ServicePlanType.FREE
+    ) {
+      return 'Upgrade'
+    }
+
+    throw new Error('Invalid operation')
+  }
 
   return (
     <article className="bg-white rounded border">
@@ -144,7 +253,11 @@ const EntitlementsCard = ({
                       {plans[entitlement.planType].title}
                     </Text>
                     <Text size="sm" weight="medium" className="text-gray-500">
-                      {entitlement.subtitle}
+                      {entitlement.planType === ServicePlanType.FREE &&
+                        'unlimited'}
+
+                      {entitlement.planType !== ServicePlanType.FREE &&
+                        `${getAvailableEntitlements(entitlement)} available`}
                     </Text>
                   </div>
 
@@ -153,25 +266,39 @@ const EntitlementsCard = ({
                   )}
                 </div>
 
-                <Button
-                  btnType="secondary-alt"
-                  btnSize="xs"
-                  onClick={() => {
-                    submit(
-                      {
-                        op: 'update',
-                        payload: JSON.stringify({
-                          plan: entitlement.planType,
-                        }),
-                      },
-                      {
-                        method: 'post',
-                      }
-                    )
-                  }}
-                >
-                  Upgrade
-                </Button>
+                {entitlement.planType !== currentPlan && (
+                  <Button
+                    btnType="secondary-alt"
+                    btnSize="xs"
+                    onClick={() => {
+                      submit(
+                        {
+                          op:
+                            entitlement.planType === ServicePlanType.FREE ||
+                            getAvailableEntitlements(entitlement) > 0
+                              ? 'update'
+                              : 'purchase',
+                          payload: JSON.stringify({
+                            plan: entitlement.planType,
+                          }),
+                        },
+                        {
+                          method: 'post',
+                        }
+                      )
+                    }}
+                  >
+                    {entitlement.planType === ServicePlanType.FREE ||
+                    getAvailableEntitlements(entitlement) > 0
+                      ? `${getOperation(
+                          entitlement.planType,
+                          currentPlan
+                        )} to ${
+                          plans[entitlement.planType].title.split(' ')[0]
+                        }`
+                      : 'Purchase'}
+                  </Button>
+                )}
               </div>
               {i < entitlements.length - 1 && (
                 <div className="w-full border-b border-gray-200"></div>
@@ -208,14 +335,14 @@ export default () => {
           entitlements={[
             {
               planType: ServicePlanType.FREE,
-              subtitle: 'unlimited',
             },
             {
               planType: ServicePlanType.PRO,
-              subtitle: `${
-                (entitlements[ServicePlanType.PRO]?.entitlements ?? 0) -
-                apps.filter((a) => a.appPlan === ServicePlanType.PRO).length
-              } available`,
+              totalEntitlements:
+                entitlements[ServicePlanType.PRO]?.entitlements,
+              usedEntitlements: apps.filter(
+                (a) => a.appPlan === ServicePlanType.PRO
+              ).length,
             },
           ]}
         />
