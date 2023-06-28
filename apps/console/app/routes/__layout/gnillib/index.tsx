@@ -154,14 +154,23 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         planID: STRIPE_PRO_PLAN_ID,
         quantity: +quantity,
         accountURN,
+        handled: true,
       })
     } else {
       sub = await updateSubscription({
         subscriptionID: entitlements.subscriptionID,
         planID: STRIPE_PRO_PLAN_ID,
         quantity: +quantity,
+        handled: true,
       })
     }
+
+    await accountClient.updateEntitlements.mutate({
+      accountURN: accountURN,
+      subscriptionID: sub.id,
+      quantity: +quantity,
+      type: ServicePlanType.PRO,
+    })
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
     if (txType === 'buy') {
@@ -171,16 +180,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       flashSession.flash('success_toast', 'Entitlement(s) successfully removed')
     }
 
-    return json(
-      {
-        updatedProEntitlements: quantity,
+    return new Response(null, {
+      headers: {
+        'Set-Cookie': await commitFlashSession(flashSession),
       },
-      {
-        headers: {
-          'Set-Cookie': await commitFlashSession(flashSession),
-        },
-      }
-    )
+    })
   }
 )
 
@@ -736,10 +740,6 @@ export default () => {
   const { entitlements, successToast, paymentData, connectedEmails } =
     useLoaderData<LoaderData>()
 
-  const ld = useActionData<{
-    updatedProEntitlements: number
-  }>()
-
   const { apps, PASSPORT_URL } = useOutletContext<OutletContextData>()
 
   useEffect(() => {
@@ -936,9 +936,7 @@ export default () => {
 
         <PlanCard
           plan={plans[ServicePlanType.PRO]}
-          entitlements={
-            ld?.updatedProEntitlements ?? entitlements[ServicePlanType.PRO]
-          }
+          entitlements={entitlements[ServicePlanType.PRO]}
           entitlementUsage={
             apps.filter((a) => a.appPlan === ServicePlanType.PRO).length
           }
