@@ -15,6 +15,8 @@
 * [Adding Users to your Database](guides/connecting-to-your-database.md)
 * [Authenticating Users in your App](guides/authenticating-users-in-your-app.md)
 * [Setup with Supabase](guides/setup-with-supabase.md)
+* [Requesting Email](guides/requesting-email.md)
+* [Connected Accounts](guides/connected-accounts.md)
 * [Using Smart Contract Wallets](guides/using-smart-contract-wallets.md)
 
 ## Platform
