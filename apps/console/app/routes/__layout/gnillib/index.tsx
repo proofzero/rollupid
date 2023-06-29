@@ -20,19 +20,18 @@ import {
   getFlashSession,
   requireJWT,
 } from '~/utilities/session.server'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import createAccountClient from '@proofzero/platform-clients/account'
 import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
 } from '@proofzero/utils'
 import {
-  useActionData,
+  NavLink,
   useLoaderData,
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
-import type { LoaderData as OutletContextData } from '~/root'
+import type { AppLoaderData, LoaderData as OutletContextData } from '~/root'
 import { Menu, Transition } from '@headlessui/react'
 import { Listbox } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
@@ -549,22 +548,78 @@ const RemoveEntitelmentModal = ({
   )
 }
 
+const AssignedAppModal = ({
+  apps,
+  isOpen,
+  setIsOpen,
+}: {
+  apps: AppLoaderData[]
+  isOpen: boolean
+  setIsOpen: (isOpen: boolean) => void
+}) => {
+  return (
+    <Modal isOpen={isOpen} fixed handleClose={() => setIsOpen(false)}>
+      <Text
+        size="lg"
+        weight="semibold"
+        className="text-left text-gray-800 mx-5 mb-7"
+      >
+        Assigned Application(s)
+      </Text>
+
+      <section>
+        <ul>
+          {apps.map((app) => (
+            <li
+              key={app.clientId}
+              className="flex flex-row items-center justify-between
+            p-5 border-t border-gray-200"
+            >
+              <div className="flex flex-col">
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="text-gray-900 text-left"
+                >
+                  {app.name}
+                </Text>
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="text-gray-500 text-left"
+                >
+                  {plans[app.appPlan].title}
+                </Text>
+              </div>
+
+              <NavLink to={`/apps/${app.clientId}/gnillib`}>
+                <Button btnType="secondary-alt">Manage</Button>
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </Modal>
+  )
+}
+
 const PlanCard = ({
   plan,
   entitlements,
-  entitlementUsage,
+  apps,
   paymentData,
   submit,
 }: {
   plan: PlanDetails
   entitlements: number
-  entitlementUsage: number
+  apps: AppLoaderData[]
   paymentData?: PaymentData
   submit: (data: any, options: any) => void
 }) => {
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
   const [removeEntitlementModalOpen, setRemoveEntitlementModalOpen] =
     useState(false)
+  const [assignedAppModalOpen, setAssignedAppModalOpen] = useState(false)
   return (
     <>
       <PurchaseProModal
@@ -580,9 +635,14 @@ const PlanCard = ({
         setIsOpen={setRemoveEntitlementModalOpen}
         plan={plan}
         entitlements={entitlements}
-        entitlementUsage={entitlementUsage}
+        entitlementUsage={apps.length}
         paymentData={paymentData}
         submit={submit}
+      />
+      <AssignedAppModal
+        isOpen={assignedAppModalOpen}
+        setIsOpen={setAssignedAppModalOpen}
+        apps={apps}
       />
       <article className="bg-white rounded border">
         <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
@@ -666,20 +726,41 @@ const PlanCard = ({
 
           <div className="border-b border-gray-200"></div>
 
-          {entitlementUsage > 0 && (
+          {apps.length > 0 && (
             <div className="p-4">
-              <Text size="sm" weight="medium" className="text-gray-900">
-                Entitlements
-              </Text>
-
               <div className="flex flex-row items-center gap-6">
-                <div className="flex-1 bg-gray-200 rounded-full h-2.5 my-2">
-                  <div
-                    className="bg-blue-600 h-2.5 rounded-full"
-                    style={{
-                      width: `${(entitlementUsage / entitlements) * 100}%`,
-                    }}
-                  ></div>
+                <div className="flex-1">
+                  <Text size="sm" weight="medium" className="text-gray-900">
+                    Entitlements
+                  </Text>
+
+                  <div className="flex-1 bg-gray-200 rounded-full h-2.5 my-2">
+                    <div
+                      className="bg-blue-600 h-2.5 rounded-full"
+                      style={{
+                        width: `${(apps.length / entitlements) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
+
+                  <div className="flex flex-row items-center">
+                    <div className="flex-1">
+                      <button
+                        type="button"
+                        className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b disabled:text-indigo-300"
+                        onClick={() => {
+                          setAssignedAppModalOpen(true)
+                        }}
+                      >
+                        <Text size="sm" weight="medium">
+                          View Assigned Apps
+                        </Text>
+                      </button>
+                    </div>
+                    <Text size="sm" weight="medium" className="text-[#6B7280]">
+                      {`${apps.length} out of ${entitlements} Entitlements used`}
+                    </Text>
+                  </div>
                 </div>
 
                 <div className="flex flex-row items-center gap-2">
@@ -691,9 +772,6 @@ const PlanCard = ({
                   </Text>
                 </div>
               </div>
-              <Text size="sm" weight="medium" className="text-[#6B7280]">
-                {`${entitlementUsage} out of ${entitlements} Entitlements used`}
-              </Text>
             </div>
           )}
         </main>
@@ -715,7 +793,7 @@ const PlanCard = ({
               </button>
             </div>
           )}
-          {entitlements > entitlementUsage && (
+          {entitlements > apps.length && (
             <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer bg-gray-50 rounded-b py-4 px-6">
               <button
                 disabled={paymentData == undefined}
@@ -939,11 +1017,9 @@ export default () => {
         <PlanCard
           plan={plans[ServicePlanType.PRO]}
           entitlements={entitlements[ServicePlanType.PRO]}
-          entitlementUsage={
-            apps.filter((a) => a.appPlan === ServicePlanType.PRO).length
-          }
           paymentData={paymentData}
           submit={submit}
+          apps={apps.filter((a) => a.appPlan === ServicePlanType.PRO)}
         />
       </section>
     </>
