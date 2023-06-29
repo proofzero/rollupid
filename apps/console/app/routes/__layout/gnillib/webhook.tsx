@@ -136,9 +136,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         break
       case 'customer.subscription.deleted':
       case 'customer.deleted':
-      case 'customer.source.deleted':
-        const { customer } = event.data.object as {
+        const { customer, metadata: delMeta } = event.data.object as {
           customer: string
+          metadata: {
+            accountURN: AccountURN
+          }
         }
 
         const customerData = await stripeClient.customers.retrieve(customer)
@@ -146,34 +148,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         if (!customerData.deleted && customerData.email) {
           const { email, name } = customerData
 
-          const accountURN = (
-            await Promise.all([
-              addressClient.getAccountByAlias.query({
-                provider: EmailAddressType.Email,
-                alias: email,
-              }),
-              addressClient.getAccountByAlias.query({
-                provider: OAuthAddressType.Apple,
-                alias: email,
-              }),
-              addressClient.getAccountByAlias.query({
-                provider: OAuthAddressType.Microsoft,
-                alias: email,
-              }),
-              addressClient.getAccountByAlias.query({
-                provider: OAuthAddressType.Google,
-                alias: email,
-              }),
-            ])
-          ).filter((x) => x)[0]
-
           await Promise.all([
             emailClient.sendBillingNotification.mutate({
               emailAddress: email,
               name: name || 'Client',
             }),
             accountClient.cancelServicePlans.mutate({
-              account: accountURN,
+              account: delMeta.accountURN,
             }),
           ])
         }
