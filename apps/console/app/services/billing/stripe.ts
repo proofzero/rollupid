@@ -17,6 +17,7 @@ type UpdateCustomerParams = {
 
 type UpdatePaymentMethodParams = {
   customerID: string
+  returnURL: string
 }
 
 type CreateSubscriptionParams = {
@@ -78,6 +79,7 @@ export const updateCustomer = async ({
 
 export const updatePaymentMethod = async ({
   customerID,
+  returnURL,
 }: UpdatePaymentMethodParams) => {
   const stripeClient = new Stripe(STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
@@ -85,7 +87,7 @@ export const updatePaymentMethod = async ({
 
   const session = await stripeClient.billingPortal.sessions.create({
     customer: customerID,
-    return_url: 'http://localhost:10002/gnillib',
+    return_url: returnURL,
     flow_data: {
       type: 'payment_method_update',
     },

@@ -27,6 +27,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
 
-    return updatePaymentMethod({ customerID })
+    const headers = request.headers
+    const returnURL = headers.get('Referer') as string
+
+    return updatePaymentMethod({
+      customerID,
+      returnURL,
+    })
   }
 )

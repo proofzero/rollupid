@@ -198,12 +198,14 @@ export const PlanFeatures = ({ plan }: { plan: PlanDetails }) => {
         >
           <div className="w-3.5 h-3.5 flex justify-center items-center">
             {feature.type === 'base' && (
-              <FaCheck className={`text-green-500`} />
-            )}
-            {feature.type === 'addon' && (
               <FaCheck className={`text-indigo-500`} />
             )}
-            {feature.type === 'future' && <TbHourglassHigh />}
+            {feature.type === 'addon' && (
+              <FaCheck className={`text-gray-500`} />
+            )}
+            {feature.type === 'future' && (
+              <TbHourglassHigh className="text-gray-500" />
+            )}
           </div>
 
           <Text size="sm" weight="medium">
@@ -361,7 +363,7 @@ const PurchaseProModal = ({
             )
           }}
         >
-          Checkout
+          Purchase
         </Button>
         <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
           Cancel
@@ -824,7 +826,7 @@ export default () => {
                 {!paymentData && <DangerPill text="Not Configured" />}
               </div>
               <Text size="sm" weight="medium" className="text-[#6B7280]">
-                This will be used to create a custumer ID and for notifications
+                This will be used to create a customer ID and for notifications
                 about your billing
               </Text>
             </div>
