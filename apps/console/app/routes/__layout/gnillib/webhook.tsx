@@ -5,7 +5,6 @@ import { type ActionFunction } from '@remix-run/cloudflare'
 import Stripe from 'stripe'
 import createAccountClient from '@proofzero/platform-clients/account'
 import createEmailClient from '@proofzero/platform-clients/email'
-import createAddressClient from '@proofzero/platform-clients/address'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { type AccountURN } from '@proofzero/urns/account'
 import { ServicePlanType } from '@proofzero/types/account'
@@ -22,11 +21,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const emailClient = createEmailClient(Email, {
-      ...getAuthzHeaderConditionallyFromToken(undefined),
-      ...traceHeader,
-    })
-
-    const addressClient = createAddressClient(Address, {
       ...getAuthzHeaderConditionallyFromToken(undefined),
       ...traceHeader,
     })
@@ -136,8 +130,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         break
       case 'customer.subscription.deleted':
       case 'customer.deleted':
-        const { customer, metadata: delMeta } = event.data.object as {
+        const {
+          customer,
+          id: subId,
+          metadata: delMeta,
+        } = event.data.object as {
           customer: string
+          id: string
           metadata: {
             accountURN: AccountURN
           }
@@ -155,6 +154,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             }),
             accountClient.cancelServicePlans.mutate({
               account: delMeta.accountURN,
+              subscriptionID: subId,
             }),
           ])
         }
