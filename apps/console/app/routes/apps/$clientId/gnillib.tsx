@@ -215,21 +215,15 @@ const EntitlementsCard = ({
     planType: ServicePlanType,
     currentPlanType: ServicePlanType
   ) => {
+    const typeImportance = [ServicePlanType.FREE, ServicePlanType.PRO]
     if (
-      currentPlanType !== ServicePlanType.FREE &&
-      planType === ServicePlanType.FREE
+      typeImportance.findIndex((ty) => ty === planType) <
+      typeImportance.findIndex((ty) => ty === currentPlanType)
     ) {
       return 'Downgrade'
-    }
-
-    if (
-      currentPlanType === ServicePlanType.FREE &&
-      planType !== ServicePlanType.FREE
-    ) {
+    } else {
       return 'Upgrade'
     }
-
-    throw new Error('Invalid operation')
   }
 
   return (
