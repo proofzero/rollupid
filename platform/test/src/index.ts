@@ -36,7 +36,7 @@ router.post('/otp/:email', withToken, async (req, env) => {
   return new Response(otp)
 })
 
-router.post('/norification/:email', withToken, async (req, env) => {
+router.post('/notification/:email', withToken, async (req, env) => {
   const { params } = req
   const message = await req.text()
 

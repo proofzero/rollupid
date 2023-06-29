@@ -3,20 +3,6 @@ import { Context } from '../../context'
 import { sendNotification, NotificationSender } from '../../emailFunctions'
 import { Environment, EmailNotification, EmailContentType } from '../../types'
 
-export const SendBillingEmailThemePropsSchema = z.object({
-  privacyURL: z.string().url(),
-  termsURL: z.string().url(),
-  contactURL: z.string().url().optional(),
-  address: z.string().optional(),
-  logoURL: z.string().url().optional(),
-  appName: z.string(),
-  hostname: z.string().optional(),
-})
-
-export type SendBillingEmailThemeProps = z.infer<
-  typeof SendBillingEmailThemePropsSchema
->
-
 export const sendBillingEmailMethodInput = z.object({
   name: z.string(),
   emailAddress: z.string(),

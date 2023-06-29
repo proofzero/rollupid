@@ -1,3 +1,4 @@
+import { InternalServerError } from '@proofzero/errors'
 import { EmailTemplate, EmailTemplateParams } from '../emailOtpTemplate'
 import { EmailMessage, EmailNotification } from './types'
 import { CloudflareEmailMessage, EmailContent, Environment } from './types'
@@ -34,7 +35,7 @@ export async function send(
     const otpMatch = message.content.body.match(/id="passcode">(.+)<\/div>/)
     console.info('Code:', otpMatch?.[1])
     await env.Test.fetch(
-      `http://localhost/${otpMatch?.[1] ? 'otp' : 'norification'}/${
+      `http://localhost/${otpMatch?.[1] ? 'otp' : 'notification'}/${
         message.recipient.address
       }`,
       {
@@ -135,7 +136,7 @@ export async function sendNotification(
 
 async function forward(message: CloudflareEmailMessage, env: Environment) {
   //TODO: Implement for masked email
-  throw new Error('Not implemented yet')
+  throw new InternalServerError({ message: 'Not implemented yet' })
 }
 
 /** OTP email content template with a `code` parameter */

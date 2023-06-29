@@ -5,10 +5,12 @@ import { type ActionFunction } from '@remix-run/cloudflare'
 import Stripe from 'stripe'
 import createAccountClient from '@proofzero/platform-clients/account'
 import createEmailClient from '@proofzero/platform-clients/email'
+import createAddressClient from '@proofzero/platform-clients/address'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { type AccountURN } from '@proofzero/urns/account'
 import { ServicePlanType } from '@proofzero/types/account'
 import { updateSubscriptionMetadata } from '~/services/billing/stripe'
+import { EmailAddressType, OAuthAddressType } from '@proofzero/types/address'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -20,6 +22,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const emailClient = createEmailClient(Email, {
+      ...getAuthzHeaderConditionallyFromToken(undefined),
+      ...traceHeader,
+    })
+
+    const addressClient = createAddressClient(Address, {
       ...getAuthzHeaderConditionallyFromToken(undefined),
       ...traceHeader,
     })
@@ -127,17 +134,48 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         }
 
         break
-      case 'customer.source.expiring':
+      case 'customer.subscription.deleted':
+      case 'customer.deleted':
+      case 'customer.source.deleted':
         const { customer } = event.data.object as {
           customer: string
         }
+
         const customerData = await stripeClient.customers.retrieve(customer)
+
         if (!customerData.deleted && customerData.email) {
           const { email, name } = customerData
-          await emailClient.sendBillingNotification.mutate({
-            emailAddress: email,
-            name: name || 'Client',
-          })
+
+          const accountURN = (
+            await Promise.all([
+              addressClient.getAccountByAlias.query({
+                provider: EmailAddressType.Email,
+                alias: email,
+              }),
+              addressClient.getAccountByAlias.query({
+                provider: OAuthAddressType.Apple,
+                alias: email,
+              }),
+              addressClient.getAccountByAlias.query({
+                provider: OAuthAddressType.Microsoft,
+                alias: email,
+              }),
+              addressClient.getAccountByAlias.query({
+                provider: OAuthAddressType.Google,
+                alias: email,
+              }),
+            ])
+          ).filter((x) => x)[0]
+
+          await Promise.all([
+            emailClient.sendBillingNotification.mutate({
+              emailAddress: email,
+              name: name || 'Client',
+            }),
+            accountClient.cancelServicePlans.mutate({
+              account: accountURN,
+            }),
+          ])
         }
 
         break
