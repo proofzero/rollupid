@@ -18,12 +18,7 @@ import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
 } from '@proofzero/utils'
-import {
-  useLoaderData,
-  useOutletContext,
-  useRevalidator,
-  useSubmit,
-} from '@remix-run/react'
+import { useLoaderData, useOutletContext, useSubmit } from '@remix-run/react'
 import { GetEntitlementsOutput } from '@proofzero/platform/account/src/jsonrpc/methods/getEntitlements'
 import { AccountURN } from '@proofzero/urns/account'
 import { BadRequestError } from '@proofzero/errors'
@@ -574,15 +569,11 @@ export default () => {
     appDetails: appDetailsProps
   }>()
 
-  const revalidator = useRevalidator()
-
   useEffect(() => {
     if (successToast) {
       toast(ToastType.Success, {
         message: successToast,
       })
-
-      revalidator.revalidate()
     }
   }, [successToast])
 
@@ -592,8 +583,6 @@ export default () => {
         message: errorToast,
       })
     }
-
-    revalidator.revalidate()
   }, [errorToast])
 
   return (
