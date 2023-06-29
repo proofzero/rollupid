@@ -86,7 +86,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         const apps = await starbaseClient.listApps.query()
         const allotedApps = apps.filter((a) => a.appPlan === plan).length
 
-        if (allotedApps >= (entitlements.plans[plan]?.entitlements ?? 0)) {
+        if (
+          plan !== ServicePlanType.FREE &&
+          allotedApps >= (entitlements.plans[plan]?.entitlements ?? 0)
+        ) {
           throw new BadRequestError({
             message: `You have reached the maximum number of apps for this plan`,
           })
