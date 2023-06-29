@@ -4,9 +4,13 @@ import { PlanFeatures } from '~/routes/__layout/gnillib'
 import { PaymentData, ServicePlanType } from '@proofzero/types/account'
 import { Button } from '@proofzero/design-system'
 import { StatusPill } from '@proofzero/design-system/src/atoms/pills/StatusPill'
-import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { requireJWT } from '~/utilities/session.server'
+import {
+  commitFlashSession,
+  getFlashSession,
+  requireJWT,
+} from '~/utilities/session.server'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import createAccountClient from '@proofzero/platform-clients/account'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
@@ -14,7 +18,12 @@ import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
 } from '@proofzero/utils'
-import { useLoaderData, useOutletContext, useSubmit } from '@remix-run/react'
+import {
+  useLoaderData,
+  useOutletContext,
+  useRevalidator,
+  useSubmit,
+} from '@remix-run/react'
 import { GetEntitlementsOutput } from '@proofzero/platform/account/src/jsonrpc/methods/getEntitlements'
 import { AccountURN } from '@proofzero/urns/account'
 import { BadRequestError } from '@proofzero/errors'
@@ -26,12 +35,17 @@ import {
 } from '~/services/billing/stripe'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   HiArrowUp,
   HiOutlineExternalLink,
   HiOutlineShoppingCart,
 } from 'react-icons/hi'
+import {
+  ToastType,
+  Toaster,
+  toast,
+} from '@proofzero/design-system/src/atoms/toast'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -50,10 +64,23 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
 
-    return {
-      entitlements,
-      paymentData,
-    }
+    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    const successToast = flashSession.get('success_toast')
+    const errorToast = flashSession.get('error_toast')
+
+    return json(
+      {
+        entitlements,
+        paymentData,
+        successToast,
+        errorToast,
+      },
+      {
+        headers: {
+          'Set-Cookie': await commitFlashSession(flashSession),
+        },
+      }
+    )
   }
 )
 
@@ -82,6 +109,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const fd = await request.formData()
     const op = fd.get('op') as 'update' | 'purchase'
 
+    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+
     switch (op) {
       case 'update': {
         const { plan } = JSON.parse(fd.get('payload') as string) as {
@@ -106,6 +135,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           plan,
         })
 
+        flashSession.flash('success_toast', `${plans[plan].title} assigned.`)
         break
       }
 
@@ -128,26 +158,39 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         let sub
         let quantity
-        if (!entitlements.subscriptionID) {
-          quantity = 1
+        try {
+          if (!entitlements.subscriptionID) {
+            quantity = 1
 
-          sub = await createSubscription({
-            customerID: customerID,
-            planID: STRIPE_PRO_PLAN_ID,
-            quantity,
-            accountURN,
-            handled: true,
-          })
-        } else {
-          quantity = entitlements.plans[plan]?.entitlements
-            ? entitlements.plans[plan]?.entitlements! + 1
-            : 1
+            sub = await createSubscription({
+              customerID: customerID,
+              planID: STRIPE_PRO_PLAN_ID,
+              quantity,
+              accountURN,
+              handled: true,
+            })
+          } else {
+            quantity = entitlements.plans[plan]?.entitlements
+              ? entitlements.plans[plan]?.entitlements! + 1
+              : 1
 
-          sub = await updateSubscription({
-            subscriptionID: entitlements.subscriptionID,
-            planID: STRIPE_PRO_PLAN_ID,
-            quantity,
-            handled: true,
+            sub = await updateSubscription({
+              subscriptionID: entitlements.subscriptionID,
+              planID: STRIPE_PRO_PLAN_ID,
+              quantity,
+              handled: true,
+            })
+          }
+        } catch (e) {
+          flashSession.flash(
+            'error_toast',
+            'Transaction failed. You were not charged.'
+          )
+
+          return new Response(null, {
+            headers: {
+              'Set-Cookie': await commitFlashSession(flashSession),
+            },
           })
         }
 
@@ -164,11 +207,18 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           plan,
         })
 
-        break
+        flashSession.flash(
+          'success_toast',
+          `${plans[plan].title} purchased and assigned.`
+        )
       }
     }
 
-    return null
+    return new Response(null, {
+      headers: {
+        'Set-Cookie': await commitFlashSession(flashSession),
+      },
+    })
   }
 )
 
@@ -510,9 +560,13 @@ export default () => {
   const {
     entitlements: { plans: entitlements },
     paymentData,
+    successToast,
+    errorToast,
   } = useLoaderData<{
     entitlements: GetEntitlementsOutput
     paymentData: PaymentData
+    successToast: string
+    errorToast: string
   }>()
 
   const { apps, appDetails } = useOutletContext<{
@@ -520,8 +574,32 @@ export default () => {
     appDetails: appDetailsProps
   }>()
 
+  const revalidator = useRevalidator()
+
+  useEffect(() => {
+    if (successToast) {
+      toast(ToastType.Success, {
+        message: successToast,
+      })
+
+      revalidator.revalidate()
+    }
+  }, [successToast])
+
+  useEffect(() => {
+    if (errorToast) {
+      toast(ToastType.Error, {
+        message: errorToast,
+      })
+    }
+
+    revalidator.revalidate()
+  }, [errorToast])
+
   return (
     <>
+      <Toaster position="top-right" reverseOrder={false} />
+
       <section className="flex flex-col gap-4">
         <PlanCard
           active={appDetails.appPlan === ServicePlanType.PRO}
