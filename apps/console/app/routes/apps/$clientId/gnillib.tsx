@@ -27,7 +27,11 @@ import {
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { useState } from 'react'
-import { HiOutlineExternalLink } from 'react-icons/hi'
+import {
+  HiArrowUp,
+  HiOutlineExternalLink,
+  HiOutlineShoppingCart,
+} from 'react-icons/hi'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -377,9 +381,13 @@ const EntitlementsCardButton = ({
       typeImportance.findIndex((ty) => ty === planType) <
       typeImportance.findIndex((ty) => ty === currentPlanType)
     ) {
-      return 'Downgrade'
+      return <>Downgrade</>
     } else {
-      return 'Upgrade'
+      return (
+        <span className="flex flex-row gap-2 items-center">
+          <HiArrowUp /> Upgrade to {plans[planType].title.split(' ')[0]}
+        </span>
+      )
     }
   }
 
@@ -420,11 +428,13 @@ const EntitlementsCardButton = ({
           }
         }}
       >
-        {op === 'update'
-          ? `${getOperation(entitlement.planType, currentPlan)} to ${
-              plans[entitlement.planType].title.split(' ')[0]
-            }`
-          : 'Purchase'}
+        {op === 'update' ? (
+          getOperation(entitlement.planType, currentPlan)
+        ) : (
+          <span className="flex flex-row gap-2 items-center">
+            <HiOutlineShoppingCart className="w-4 h-4" /> Purchase
+          </span>
+        )}
       </Button>
     </>
   )
