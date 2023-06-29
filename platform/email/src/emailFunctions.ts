@@ -1,5 +1,9 @@
 import { InternalServerError } from '@proofzero/errors'
-import { EmailTemplate, EmailTemplateParams } from '../emailOtpTemplate'
+import {
+  EmailTemplateBilling,
+  EmailTemplateOTP,
+  EmailTemplateParams,
+} from '../emailTemplate'
 import { EmailMessage, EmailNotification } from './types'
 import { CloudflareEmailMessage, EmailContent, Environment } from './types'
 
@@ -158,7 +162,28 @@ export const getOTPEmailContent = (
       'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public'
   }
 
-  return EmailTemplate(passcode, params as EmailTemplateParams)
+  return EmailTemplateOTP(passcode, params as EmailTemplateParams)
+}
+
+/** Subscription Cancellation email content template */
+export const getSubscriptionEmailContent = (
+  params?: Partial<EmailTemplateParams>
+): EmailContent => {
+  if (!params) {
+    params = {
+      address: '777 Bay Street, Suite C208B Toronto, Ontario M5G 2C8 Canada',
+      contactURL: 'https://discord.com/invite/rollupid',
+      termsURL: 'https://rollup.id/tos',
+      privacyURL: 'https://rollup.id/privacy-policy',
+    }
+  }
+
+  if (!params.logoURL) {
+    params.logoURL =
+      'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public'
+  }
+
+  return EmailTemplateBilling(params as EmailTemplateParams)
 }
 
 /** Magic link email content template */
