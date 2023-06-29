@@ -6,7 +6,7 @@ import { errorFormatter } from '@proofzero/utils/trpc'
 
 import {
   sendOTPEmailMethodOutput,
-  sendEmailNotificationMethod,
+  sendOTPMethod,
   sendOTPEmailMethodInput,
 } from './methods/sendOTPEmail'
 
@@ -21,13 +21,13 @@ import { Context } from '../context'
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
 export const appRouter = t.router({
-  sendEmailNotification: t.procedure
+  sendOTP: t.procedure
     .use(LogUsage)
     .use(Analytics)
     .input(sendOTPEmailMethodInput)
     .output(sendOTPEmailMethodOutput)
-    .mutation(sendEmailNotificationMethod),
-  sendBillingNotification: t.procedure
+    .mutation(sendOTPMethod),
+  sendExpiredBillingNotification: t.procedure
     .use(LogUsage)
     .use(Analytics)
     .input(sendBillingEmailMethodInput)

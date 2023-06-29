@@ -37,7 +37,7 @@ export type sendOTPEmailMethodOutputParams = z.infer<
   typeof sendOTPEmailMethodOutput
 >
 
-export const sendEmailNotificationMethod = async ({
+export const sendOTPMethod = async ({
   input,
   ctx,
 }: {

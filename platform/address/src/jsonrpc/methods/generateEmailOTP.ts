@@ -36,7 +36,7 @@ export const generateEmailOTPMethod = async ({
     delayMiliseconds
   )
 
-  await ctx.emailClient.sendEmailNotification.mutate({
+  await ctx.emailClient.sendOTP.mutate({
     emailAddress: email,
     name: email,
     otpCode: code,

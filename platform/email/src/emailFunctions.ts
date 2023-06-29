@@ -1,6 +1,6 @@
 import { InternalServerError } from '@proofzero/errors'
 import {
-  EmailTemplateBilling,
+  EmailTemplateExpiredSubscription,
   EmailTemplateOTP,
   EmailTemplateParams,
 } from '../emailTemplate'
@@ -183,7 +183,7 @@ export const getSubscriptionEmailContent = (
       'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public'
   }
 
-  return EmailTemplateBilling(params as EmailTemplateParams)
+  return EmailTemplateExpiredSubscription(params as EmailTemplateParams)
 }
 
 /** Magic link email content template */
