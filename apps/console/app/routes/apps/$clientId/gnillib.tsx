@@ -27,6 +27,7 @@ import {
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { useState } from 'react'
+import { HiOutlineExternalLink } from 'react-icons/hi'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -192,7 +193,21 @@ const PlanCard = ({ plan, active }: { plan: PlanDetails; active: boolean }) => {
             </Text>
           </div>
 
-          <Button btnType="secondary-alt">Compare Plans</Button>
+          <a
+            className="flex-1 flex justify-end"
+            href="https://rollup.id/pricing"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button
+              btnType="secondary-alt"
+              className="right-0 flex md:flex-row flex-col max-w-max
+text-xs leading-4 items-center md:space-x-2"
+            >
+              Compare Plans
+              <HiOutlineExternalLink className="ml-2" />
+            </Button>
+          </a>
         </header>
         <div className="w-full border-b border-gray-200"></div>
         <main>
