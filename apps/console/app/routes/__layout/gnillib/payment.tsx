@@ -9,6 +9,7 @@ import {
 } from '@proofzero/utils'
 import { updatePaymentMethod } from '~/services/billing/stripe'
 import { AccountURN } from '@proofzero/urns/account'
+import { BadRequestError } from '@proofzero/errors'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -28,7 +29,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const headers = request.headers
-    const returnURL = headers.get('Referer') as string
+    let returnURL = headers.get('Referer')
+    if (!returnURL) {
+      throw new BadRequestError({
+        message: 'No Referer found in request.',
+      })
+    }
 
     return updatePaymentMethod({
       customerID,
