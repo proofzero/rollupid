@@ -27,7 +27,7 @@ export const appRouter = t.router({
     .input(sendOTPEmailMethodInput)
     .output(sendOTPEmailMethodOutput)
     .mutation(sendOTPMethod),
-  sendExpiredBillingNotification: t.procedure
+  sendBillingNotification: t.procedure
     .use(LogUsage)
     .use(Analytics)
     .input(sendBillingEmailMethodInput)
