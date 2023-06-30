@@ -932,7 +932,7 @@ export default () => {
               Submit
             </Button>
           </header>
-          <main className="p-4 flex flex-row gap-4 items-center">
+          <main className="p-4 flex flex-row gap-4">
             <div className="w-52">
               <Input
                 id="full_name"
@@ -945,9 +945,13 @@ export default () => {
               />
             </div>
 
-            <div className="self-start w-80">
+            <div className="w-80 flex flex-col justify-end">
               {connectedEmails && connectedEmails.length === 0 && (
-                <Button onClick={redirectToPassport} btnType="secondary-alt">
+                <Button
+                  onClick={redirectToPassport}
+                  btnType="secondary-alt"
+                  className="py-[6px]"
+                >
                   <div className="flex space-x-3">
                     <HiOutlineMail className="w-6 h-6 text-gray-800" />
                     <Text weight="medium" className="flex-1 text-gray-800">
@@ -964,8 +968,8 @@ export default () => {
                     weight="medium"
                     className="text-gray-700 mb-2"
                   >
-                    <sup>*</sup>
                     Email
+                    <sup>*</sup>
                   </Text>
 
                   <Dropdown
