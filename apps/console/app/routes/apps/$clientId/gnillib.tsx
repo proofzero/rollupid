@@ -4,7 +4,13 @@ import { PlanFeatures } from '~/routes/__layout/gnillib'
 import { PaymentData, ServicePlanType } from '@proofzero/types/account'
 import { Button } from '@proofzero/design-system'
 import { StatusPill } from '@proofzero/design-system/src/atoms/pills/StatusPill'
-import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
+import {
+  ActionFunction,
+  LoaderFunction,
+  Session,
+  SessionData,
+  json,
+} from '@remix-run/cloudflare'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import {
   commitFlashSession,
@@ -79,133 +85,168 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
+const processUpdateOp = async (
+  jwt: string,
+  plan: ServicePlanType,
+  clientId: string,
+  flashSession: Session<SessionData, SessionData>,
+  traceHeader: Record<'traceparent', string>
+) => {
+  const parsedJwt = parseJwt(jwt)
+  const accountURN = parsedJwt.sub as AccountURN
+
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...traceHeader,
+  })
+
+  const accountClient = createAccountClient(Account, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...traceHeader,
+  })
+
+  const entitlements = await accountClient.getEntitlements.query()
+
+  const apps = await starbaseClient.listApps.query()
+  const allotedApps = apps.filter((a) => a.appPlan === plan).length
+
+  if (
+    plan !== ServicePlanType.FREE &&
+    allotedApps >= (entitlements.plans[plan]?.entitlements ?? 0)
+  ) {
+    throw new BadRequestError({
+      message: `You have reached the maximum number of apps for this plan`,
+    })
+  }
+
+  await starbaseClient.setAppPlan.mutate({
+    accountURN,
+    clientId,
+    plan,
+  })
+
+  flashSession.flash('success_toast', `${plans[plan].title} assigned.`)
+}
+
+const processPurchaseOp = async (
+  jwt: string,
+  plan: ServicePlanType,
+  clientId: string,
+  flashSession: any,
+  traceHeader: Record<'traceparent', string>
+) => {
+  const parsedJwt = parseJwt(jwt)
+  const accountURN = parsedJwt.sub as AccountURN
+
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...traceHeader,
+  })
+
+  const accountClient = createAccountClient(Account, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...traceHeader,
+  })
+
+  const entitlements = await accountClient.getEntitlements.query()
+
+  const paymentData = await accountClient.getStripePaymentData.query({
+    accountURN,
+  })
+  if (!paymentData || !paymentData.customerID) {
+    throw new BadRequestError({
+      message: `You must add a payment method before purchasing a plan`,
+    })
+  }
+
+  const { customerID } = paymentData
+  let sub
+  let quantity
+  try {
+    if (!entitlements.subscriptionID) {
+      quantity = 1
+      sub = await createSubscription({
+        customerID: customerID,
+        planID: STRIPE_PRO_PLAN_ID,
+        quantity,
+        accountURN,
+        handled: true,
+      })
+    } else {
+      quantity = entitlements.plans[plan]?.entitlements
+        ? entitlements.plans[plan]?.entitlements! + 1
+        : 1
+
+      sub = await updateSubscription({
+        subscriptionID: entitlements.subscriptionID,
+        planID: STRIPE_PRO_PLAN_ID,
+        quantity,
+        handled: true,
+      })
+    }
+  } catch (e) {
+    flashSession.flash(
+      'error_toast',
+      'Transaction failed. You were not charged.'
+    )
+
+    return new Response(null, {
+      headers: {
+        'Set-Cookie': await commitFlashSession(flashSession),
+      },
+    })
+  }
+
+  await accountClient.updateEntitlements.mutate({
+    accountURN: accountURN,
+    subscriptionID: sub.id,
+    quantity: quantity,
+    type: plan,
+  })
+
+  await starbaseClient.setAppPlan.mutate({
+    accountURN,
+    clientId,
+    plan,
+  })
+
+  flashSession.flash(
+    'success_toast',
+    `${plans[plan].title} purchased and assigned.`
+  )
+}
+
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
     const jwt = await requireJWT(request)
-    const parsedJwt = parseJwt(jwt!)
-    const accountURN = parsedJwt.sub as AccountURN
+    if (!jwt) {
+      throw new BadRequestError({
+        message: 'Missing JWT',
+      })
+    }
 
     const { clientId } = params
     if (!clientId) throw new BadRequestError({ message: 'Missing Client ID' })
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
-    const starbaseClient = createStarbaseClient(Starbase, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-
-    const accountClient = createAccountClient(Account, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-
-    const entitlements = await accountClient.getEntitlements.query()
 
     const fd = await request.formData()
     const op = fd.get('op') as 'update' | 'purchase'
+    const { plan } = JSON.parse(fd.get('payload') as string) as {
+      plan: ServicePlanType
+    }
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
 
     switch (op) {
       case 'update': {
-        const { plan } = JSON.parse(fd.get('payload') as string) as {
-          plan: ServicePlanType
-        }
-
-        const apps = await starbaseClient.listApps.query()
-        const allotedApps = apps.filter((a) => a.appPlan === plan).length
-
-        if (
-          plan !== ServicePlanType.FREE &&
-          allotedApps >= (entitlements.plans[plan]?.entitlements ?? 0)
-        ) {
-          throw new BadRequestError({
-            message: `You have reached the maximum number of apps for this plan`,
-          })
-        }
-
-        await starbaseClient.setAppPlan.mutate({
-          accountURN,
-          clientId,
-          plan,
-        })
-
-        flashSession.flash('success_toast', `${plans[plan].title} assigned.`)
+        await processUpdateOp(jwt, plan, clientId, flashSession, traceHeader)
         break
       }
 
       case 'purchase': {
-        const { plan } = JSON.parse(fd.get('payload') as string) as {
-          plan: ServicePlanType
-        }
-
-        const paymentData = await accountClient.getStripePaymentData.query({
-          accountURN,
-        })
-        if (!paymentData || !paymentData.customerID) {
-          throw new BadRequestError({
-            message: `You must add a payment method before purchasing a plan`,
-          })
-        }
-
-        const entitlements = await accountClient.getEntitlements.query()
-        const { customerID } = paymentData
-
-        let sub
-        let quantity
-        try {
-          if (!entitlements.subscriptionID) {
-            quantity = 1
-
-            sub = await createSubscription({
-              customerID: customerID,
-              planID: STRIPE_PRO_PLAN_ID,
-              quantity,
-              accountURN,
-              handled: true,
-            })
-          } else {
-            quantity = entitlements.plans[plan]?.entitlements
-              ? entitlements.plans[plan]?.entitlements! + 1
-              : 1
-
-            sub = await updateSubscription({
-              subscriptionID: entitlements.subscriptionID,
-              planID: STRIPE_PRO_PLAN_ID,
-              quantity,
-              handled: true,
-            })
-          }
-        } catch (e) {
-          flashSession.flash(
-            'error_toast',
-            'Transaction failed. You were not charged.'
-          )
-
-          return new Response(null, {
-            headers: {
-              'Set-Cookie': await commitFlashSession(flashSession),
-            },
-          })
-        }
-
-        await accountClient.updateEntitlements.mutate({
-          accountURN: accountURN,
-          subscriptionID: sub.id,
-          quantity: quantity,
-          type: plan,
-        })
-
-        await starbaseClient.setAppPlan.mutate({
-          accountURN,
-          clientId,
-          plan,
-        })
-
-        flashSession.flash(
-          'success_toast',
-          `${plans[plan].title} purchased and assigned.`
-        )
+        await processPurchaseOp(jwt, plan, clientId, flashSession, traceHeader)
+        break
       }
     }
 
