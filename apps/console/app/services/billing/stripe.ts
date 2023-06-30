@@ -40,6 +40,11 @@ type SubscriptionMetadata = Partial<{
   handled: string | null
 }>
 
+type GetInvoicesParams = {
+  customerID: string
+  subscriptionID: string
+}
+
 export const createCustomer = async ({
   email,
   name,
@@ -180,4 +185,27 @@ export const updateSubscriptionMetadata = async ({
   )
 
   return updatedSubscription
+}
+
+export const getInvoices = async ({
+  customerID,
+  subscriptionID,
+}: GetInvoicesParams) => {
+  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+    apiVersion: '2022-11-15',
+  })
+
+  const invoices = await stripeClient.invoices.list({
+    customer: customerID,
+  })
+
+  const upcomingInvoices = await stripeClient.invoices.retrieveUpcoming({
+    customer: customerID,
+    subscription: subscriptionID,
+  })
+
+  return {
+    invoices,
+    upcomingInvoices,
+  }
 }

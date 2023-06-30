@@ -64,8 +64,11 @@ import { ToastInfo } from '@proofzero/design-system/src/atoms/toast/ToastInfo'
 import { DangerPill } from '@proofzero/design-system/src/atoms/pills/DangerPill'
 import {
   createSubscription,
+  getInvoices,
   updateSubscription,
 } from '~/services/billing/stripe'
+import { useHydrated } from 'remix-utils'
+import _ from 'lodash'
 
 type LoaderData = {
   paymentData?: PaymentData
@@ -74,6 +77,12 @@ type LoaderData = {
   }
   successToast?: string
   connectedEmails: DropdownSelectListItem[]
+  invoices: {
+    amount: number
+    timestamp: number
+    status: string | null
+    url?: string
+  }[]
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -89,7 +98,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const { plans } = await accountClient.getEntitlements.query()
+    const { plans, subscriptionID } =
+      await accountClient.getEntitlements.query()
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
     const successToast = flashSession.get('success_toast')
@@ -103,6 +113,34 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
 
+    let invoices: {
+      amount: number
+      timestamp: number
+      status: string | null
+      url?: string
+    }[] = []
+    if (subscriptionID) {
+      const stripeInvoices = await getInvoices({
+        customerID: spd.customerID,
+        subscriptionID,
+      })
+
+      console.log(JSON.stringify(stripeInvoices.invoices, null, 2))
+
+      invoices = stripeInvoices.invoices.data.map((i) => ({
+        amount: i.total / 100,
+        timestamp: i.created * 1000,
+        status: i.status,
+        url: i.hosted_invoice_url ?? undefined,
+      }))
+      invoices = invoices.concat({
+        amount: stripeInvoices.upcomingInvoices.lines.data[0].amount / 100,
+        timestamp:
+          stripeInvoices.upcomingInvoices.lines.data[0].period.start * 1000,
+        status: 'scheduled',
+      })
+    }
+
     return json<LoaderData>(
       {
         paymentData: spd,
@@ -112,6 +150,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         },
         successToast,
         connectedEmails,
+        invoices,
       },
       {
         headers: {
@@ -817,7 +856,7 @@ const PlanCard = ({
 }
 
 export default () => {
-  const { entitlements, successToast, paymentData, connectedEmails } =
+  const { entitlements, successToast, paymentData, connectedEmails, invoices } =
     useLoaderData<LoaderData>()
 
   const { apps, PASSPORT_URL } = useOutletContext<OutletContextData>()
@@ -857,6 +896,7 @@ export default () => {
   )
 
   const submit = useSubmit()
+  const hydrated = useHydrated()
 
   return (
     <>
@@ -1025,6 +1065,97 @@ export default () => {
           submit={submit}
           apps={apps.filter((a) => a.appPlan === ServicePlanType.PRO)}
         />
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <article className="">
+          <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
+            <div>
+              <div className="flex flex-row gap-4 items-center">
+                <Text size="lg" weight="semibold" className="text-gray-900">
+                  Invoices
+                </Text>
+              </div>
+            </div>
+          </header>
+          <main className="p-4 flex flex-row gap-4 items-center">
+            <table className="min-w-full bg-white rounded-lg border">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left">
+                    <Text
+                      size="xs"
+                      weight="medium"
+                      className="uppercase text-gray-500"
+                    >
+                      Date
+                    </Text>
+                  </th>
+                  <th className="px-6 py-3 text-left">
+                    <Text
+                      size="xs"
+                      weight="medium"
+                      className="uppercase text-gray-500"
+                    >
+                      Invoice total
+                    </Text>
+                  </th>
+                  <th className="px-6 py-3 text-left">
+                    <Text
+                      size="xs"
+                      weight="medium"
+                      className="uppercase text-gray-500"
+                    >
+                      Status
+                    </Text>
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody className="border-t border-gray-200">
+                {invoices
+                  .sort((a, b) => b.timestamp - a.timestamp)
+                  .map((invoice) => (
+                    <tr className="border-b border-gray-200">
+                      <td className="px-6 py-3">
+                        {hydrated && (
+                          <Text size="sm" className="gray-500">
+                            {new Date(invoice.timestamp).toLocaleString(
+                              'default',
+                              {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                              }
+                            )}
+                          </Text>
+                        )}
+                      </td>
+
+                      <td className="px-6 py-3">
+                        <Text size="sm" className="gray-500">
+                          {invoice.amount.toFixed(2)}
+                        </Text>
+                      </td>
+
+                      <td className="px-6 py-3">
+                        <Text size="xs" className="test-gray-500">
+                          {invoice.status && _.startCase(invoice.status)}
+                        </Text>
+                        {invoice.status === 'paid' && (
+                          <a href={invoice.url} target="_blank">
+                            <Text size="xs" className="text-indigo-500">
+                              View Invoice
+                            </Text>
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </main>
+        </article>
       </section>
     </>
   )
