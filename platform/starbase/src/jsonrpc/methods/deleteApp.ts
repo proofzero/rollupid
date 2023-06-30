@@ -3,7 +3,6 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { BadRequestError } from '@proofzero/errors'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
-import createEdgesClient from '@proofzero/platform-clients/edges'
 import { AppClientIdParamSchema } from '../validators/app'
 import { EDGE_APPLICATION } from '../../types'
 

@@ -5,11 +5,11 @@ import { type ActionFunction } from '@remix-run/cloudflare'
 import Stripe from 'stripe'
 import createAccountClient from '@proofzero/platform-clients/account'
 import createEmailClient from '@proofzero/platform-clients/email'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { type AccountURN } from '@proofzero/urns/account'
 import { ServicePlanType } from '@proofzero/types/account'
 import { updateSubscriptionMetadata } from '~/services/billing/stripe'
-import { EmailAddressType, OAuthAddressType } from '@proofzero/types/address'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -21,6 +21,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const emailClient = createEmailClient(Email, {
+      ...getAuthzHeaderConditionallyFromToken(undefined),
+      ...traceHeader,
+    })
+    const starbaseClient = createStarbaseClient(Starbase, {
       ...getAuthzHeaderConditionallyFromToken(undefined),
       ...traceHeader,
     })
@@ -128,12 +132,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         }
 
         break
-      case 'customer.subscription.deleted':
       case 'customer.deleted':
         const {
-          customer,
-          id: subId,
-          metadata: delMeta,
+          customer: customerDel,
+          id: subIdDel,
+          metadata: metaDel,
         } = event.data.object as {
           customer: string
           id: string
@@ -142,10 +145,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           }
         }
 
-        const customerData = await stripeClient.customers.retrieve(customer)
-
-        if (!customerData.deleted && customerData.email) {
-          const { email, name } = customerData
+        const customerDataDel = await stripeClient.customers.retrieve(
+          customerDel
+        )
+        if (!customerDataDel.deleted && customerDataDel.email) {
+          const { email, name } = customerDataDel
 
           await Promise.all([
             emailClient.sendBillingNotification.mutate({
@@ -153,8 +157,48 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
               name: name || 'Client',
             }),
             accountClient.cancelServicePlans.mutate({
-              account: delMeta.accountURN,
-              subscriptionID: subId,
+              account: metaDel.accountURN,
+              subscriptionID: subIdDel,
+              deletePaymentData: true,
+            }),
+            starbaseClient.deleteSubscriptionPlans.mutate({
+              accountURN: metaDel.accountURN,
+            }),
+          ])
+        }
+
+        break
+      case 'customer.subscription.deleted':
+        const {
+          customer: custmoerSubDel,
+          id: subIdSubDel,
+          metadata: metaSubDel,
+        } = event.data.object as {
+          customer: string
+          id: string
+          metadata: {
+            accountURN: AccountURN
+          }
+        }
+
+        const customerDataSubDel = await stripeClient.customers.retrieve(
+          custmoerSubDel
+        )
+
+        if (!customerDataSubDel.deleted && customerDataSubDel.email) {
+          const { email, name } = customerDataSubDel
+
+          await Promise.all([
+            emailClient.sendBillingNotification.mutate({
+              emailAddress: email,
+              name: name || 'Client',
+            }),
+            accountClient.cancelServicePlans.mutate({
+              account: metaSubDel.accountURN,
+              subscriptionID: subIdSubDel,
+            }),
+            starbaseClient.deleteSubscriptionPlans.mutate({
+              accountURN: metaSubDel.accountURN,
             }),
           ])
         }

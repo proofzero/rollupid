@@ -314,6 +314,10 @@ export default class StarbaseApp extends DOProxy {
   async setAppPlan(planType: ServicePlanType | undefined): Promise<void> {
     return this.state.storage.put('appPlan', planType)
   }
+
+  async deleteAppPlan(): Promise<boolean> {
+    return this.state.storage.delete('appPlan')
+  }
 }
 
 export const getApplicationNodeByClientId = async (
