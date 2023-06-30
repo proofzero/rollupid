@@ -17,6 +17,7 @@ type UpdateCustomerParams = {
 
 type UpdatePaymentMethodParams = {
   customerID: string
+  returnURL: string
 }
 
 type CreateSubscriptionParams = {
@@ -24,13 +25,20 @@ type CreateSubscriptionParams = {
   planID: string
   quantity: number
   accountURN: AccountURN
+  handled?: boolean
 }
 
 type UpdateSubscriptionParams = {
   subscriptionID: string
   planID: string
   quantity: number
+  handled?: boolean
 }
+
+type SubscriptionMetadata = Partial<{
+  accountURN: AccountURN
+  handled: string | null
+}>
 
 export const createCustomer = async ({
   email,
@@ -71,6 +79,7 @@ export const updateCustomer = async ({
 
 export const updatePaymentMethod = async ({
   customerID,
+  returnURL,
 }: UpdatePaymentMethodParams) => {
   const stripeClient = new Stripe(STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
@@ -78,7 +87,7 @@ export const updatePaymentMethod = async ({
 
   const session = await stripeClient.billingPortal.sessions.create({
     customer: customerID,
-    return_url: 'http://localhost:10002/gnillib',
+    return_url: returnURL,
     flow_data: {
       type: 'payment_method_update',
     },
@@ -92,10 +101,16 @@ export const createSubscription = async ({
   planID,
   quantity,
   accountURN,
+  handled = false,
 }: CreateSubscriptionParams) => {
   const stripeClient = new Stripe(STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
   })
+
+  const metadata: SubscriptionMetadata = {}
+  metadata.accountURN = accountURN
+
+  if (handled) metadata.handled = handled.toString()
 
   const subscription = await stripeClient.subscriptions.create({
     customer: customerID,
@@ -105,9 +120,7 @@ export const createSubscription = async ({
         quantity,
       },
     ],
-    metadata: {
-      accountURN,
-    },
+    metadata,
   })
 
   return subscription
@@ -117,10 +130,14 @@ export const updateSubscription = async ({
   subscriptionID,
   planID,
   quantity,
+  handled = false,
 }: UpdateSubscriptionParams) => {
   const stripeClient = new Stripe(STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
   })
+
+  let metadata: SubscriptionMetadata = {}
+  if (handled) metadata.handled = handled.toString()
 
   let subscription = await stripeClient.subscriptions.retrieve(subscriptionID)
   const planItem = subscription.items.data.find((i) => i.price.id === planID)
@@ -137,7 +154,30 @@ export const updateSubscription = async ({
         quantity,
       },
     ],
+    metadata,
   })
 
   return subscription
+}
+
+export const updateSubscriptionMetadata = async ({
+  id,
+  metadata,
+}: {
+  id: string
+  metadata: SubscriptionMetadata
+}) => {
+  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+    apiVersion: '2022-11-15',
+  })
+
+  const subscription = await stripeClient.subscriptions.retrieve(id)
+  const updatedSubscription = await stripeClient.subscriptions.update(
+    subscription.id,
+    {
+      metadata,
+    }
+  )
+
+  return updatedSubscription
 }

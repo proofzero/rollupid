@@ -4,6 +4,7 @@ import type {
   EdgesMetadata,
   CustomDomain,
 } from '@proofzero/platform/starbase/src/types'
+import { ServicePlanType } from '@proofzero/types/account'
 
 export enum RollType {
   RollAPIKey = 'roll_api_key',
@@ -22,6 +23,7 @@ export type appDetailsProps = {
   secretTimestamp?: number
   apiKeyTimestamp?: number
   customDomain?: CustomDomain
+  appPlan: ServicePlanType
 }
 
 export type errorsAuthProps = {

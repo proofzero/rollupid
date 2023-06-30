@@ -20,19 +20,18 @@ import {
   getFlashSession,
   requireJWT,
 } from '~/utilities/session.server'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import createAccountClient from '@proofzero/platform-clients/account'
 import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
 } from '@proofzero/utils'
 import {
-  useActionData,
+  NavLink,
   useLoaderData,
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
-import type { LoaderData as OutletContextData } from '~/root'
+import type { AppLoaderData, LoaderData as OutletContextData } from '~/root'
 import { Menu, Transition } from '@headlessui/react'
 import { Listbox } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
@@ -68,18 +67,10 @@ import {
   updateSubscription,
 } from '~/services/billing/stripe'
 
-type EntitlementDetails = {
-  alloted: number
-  allotedClientIds: string[]
-}
-
 type LoaderData = {
   paymentData?: PaymentData
   entitlements: {
-    [ServicePlanType.PRO]: EntitlementDetails
-    FREE: {
-      appClientIds: string[]
-    }
+    [ServicePlanType.PRO]: number
   }
   successToast?: string
   connectedEmails: DropdownSelectListItem[]
@@ -93,33 +84,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-    const starbaseClient = createStarbaseClient(Starbase, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-    const apps = await starbaseClient.listApps.query()
-    const appClientIds = apps.map((a) => a.clientId)
-
     const accountClient = createAccountClient(Account, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
 
     const { plans } = await accountClient.getEntitlements.query()
-
-    const proAllotedEntitlements =
-      plans?.[ServicePlanType.PRO]?.entitlements ?? 0
-
-    // Capping this to 2 for demo purposes
-    const proUsage = Math.min(2, proAllotedEntitlements)
-    // Setting first two apps to pro for demo purposes
-    const proAppClientIds = appClientIds.slice(0, proUsage)
-
-    // Rest become free apps for demo purposes...
-    let freeAppClientIds: any[] = []
-    if (appClientIds.length > proUsage) {
-      freeAppClientIds = appClientIds.slice(proUsage)
-    }
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
     const successToast = flashSession.get('success_toast')
@@ -137,13 +107,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       {
         paymentData: spd,
         entitlements: {
-          [ServicePlanType.PRO]: {
-            alloted: proAllotedEntitlements,
-            allotedClientIds: proAppClientIds,
-          },
-          FREE: {
-            appClientIds: freeAppClientIds,
-          },
+          [ServicePlanType.PRO]:
+            plans?.[ServicePlanType.PRO]?.entitlements ?? 0,
         },
         successToast,
         connectedEmails,
@@ -188,14 +153,23 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         planID: STRIPE_PRO_PLAN_ID,
         quantity: +quantity,
         accountURN,
+        handled: true,
       })
     } else {
       sub = await updateSubscription({
         subscriptionID: entitlements.subscriptionID,
         planID: STRIPE_PRO_PLAN_ID,
         quantity: +quantity,
+        handled: true,
       })
     }
+
+    await accountClient.updateEntitlements.mutate({
+      accountURN: accountURN,
+      subscriptionID: sub.id,
+      quantity: +quantity,
+      type: ServicePlanType.PRO,
+    })
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
     if (txType === 'buy') {
@@ -205,20 +179,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       flashSession.flash('success_toast', 'Entitlement(s) successfully removed')
     }
 
-    return json(
-      {
-        updatedProEntitlements: quantity,
+    return new Response(null, {
+      headers: {
+        'Set-Cookie': await commitFlashSession(flashSession),
       },
-      {
-        headers: {
-          'Set-Cookie': await commitFlashSession(flashSession),
-        },
-      }
-    )
+    })
   }
 )
 
-const PlanFeatures = ({ plan }: { plan: PlanDetails }) => {
+export const PlanFeatures = ({ plan }: { plan: PlanDetails }) => {
   return (
     <ul className="grid lg:grid-rows-4 grid-flow-row lg:grid-flow-col gap-4">
       {plan.features.map((feature) => (
@@ -228,12 +197,14 @@ const PlanFeatures = ({ plan }: { plan: PlanDetails }) => {
         >
           <div className="w-3.5 h-3.5 flex justify-center items-center">
             {feature.type === 'base' && (
-              <FaCheck className={`text-green-500`} />
-            )}
-            {feature.type === 'addon' && (
               <FaCheck className={`text-indigo-500`} />
             )}
-            {feature.type === 'future' && <TbHourglassHigh />}
+            {feature.type === 'addon' && (
+              <FaCheck className={`text-gray-500`} />
+            )}
+            {feature.type === 'future' && (
+              <TbHourglassHigh className="text-gray-500" />
+            )}
           </div>
 
           <Text size="sm" weight="medium">
@@ -242,53 +213,6 @@ const PlanFeatures = ({ plan }: { plan: PlanDetails }) => {
         </li>
       ))}
     </ul>
-  )
-}
-
-const EntitlementsCard = ({
-  entitlements,
-}: {
-  entitlements: {
-    title: string
-    subtitle: string
-  }[]
-}) => {
-  return (
-    <article className="bg-white rounded border">
-      <header className="flex flex-row justify-between items-center p-4">
-        <div>
-          <Text size="lg" weight="semibold" className="text-gray-900">
-            Assigned Entitlements
-          </Text>
-        </div>
-      </header>
-      <div className="w-full border-b border-gray-200"></div>
-      <main>
-        <div className="w-full">
-          {entitlements.map((entitlement, i) => (
-            <div key={entitlement.title}>
-              <div className="flex flex-row justify-between items-center w-full p-4">
-                <div className="flex-1">
-                  <Text size="sm" weight="medium" className="text-gray-900">
-                    {entitlement.title}
-                  </Text>
-                  <Text size="sm" weight="medium" className="text-gray-500">
-                    {entitlement.subtitle}
-                  </Text>
-                </div>
-
-                <Button btnType="secondary-alt" btnSize="xs">
-                  Manage
-                </Button>
-              </div>
-              {i < entitlements.length - 1 && (
-                <div className="w-full border-b border-gray-200"></div>
-              )}
-            </div>
-          ))}
-        </div>
-      </main>
-    </article>
   )
 }
 
@@ -303,7 +227,7 @@ const PurchaseProModal = ({
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   plan: PlanDetails
-  entitlements: EntitlementDetails
+  entitlements: number
   paymentData?: PaymentData
   submit: (data: any, options: any) => void
 }) => {
@@ -427,7 +351,7 @@ const PurchaseProModal = ({
               {
                 payload: JSON.stringify({
                   planType: ServicePlanType.PRO,
-                  quantity: entitlements.alloted + proEntitlementDelta,
+                  quantity: entitlements + proEntitlementDelta,
                   customerID: paymentData?.customerID,
                   txType: 'buy',
                 }),
@@ -438,7 +362,7 @@ const PurchaseProModal = ({
             )
           }}
         >
-          Checkout
+          Purchase
         </Button>
         <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
           Cancel
@@ -453,19 +377,19 @@ const RemoveEntitelmentModal = ({
   setIsOpen,
   plan,
   entitlements,
+  entitlementUsage,
   paymentData,
   submit,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   plan: PlanDetails
-  entitlements: EntitlementDetails
+  entitlements: number
+  entitlementUsage: number
   paymentData?: PaymentData
   submit: (data: any, options: any) => void
 }) => {
-  const [proEntitlementNew, setProEntitlementNew] = useState(
-    entitlements.allotedClientIds.length
-  )
+  const [proEntitlementNew, setProEntitlementNew] = useState(entitlementUsage)
 
   return (
     <Modal isOpen={isOpen} fixed handleClose={() => setIsOpen(false)}>
@@ -483,8 +407,8 @@ const RemoveEntitelmentModal = ({
           </Text>
           <ul className="pl-4">
             <li className="list-disc text-sm font-medium text-[#6B7280] text-left">
-              You are currently using {entitlements.allotedClientIds.length}/
-              {entitlements.alloted} {plan.title} entitlements
+              You are currently using {entitlementUsage}/{entitlements}{' '}
+              {plan.title} entitlements
             </li>
             <li className="list-disc text-sm font-medium text-[#6B7280] text-left">
               You can downgrade some of your applications if you'd like to pay
@@ -499,7 +423,7 @@ const RemoveEntitelmentModal = ({
           </Text>
           <div className="flex flex-row text-[#6B7280] space-x-4">
             <div className="flex flex-row items-center space-x-2">
-              <Text size="sm">{entitlements.alloted} Entitlements</Text>
+              <Text size="sm">{entitlements} Entitlements</Text>
               <HiArrowNarrowRight />
             </div>
 
@@ -536,36 +460,35 @@ const RemoveEntitelmentModal = ({
                           className="absolute no-scrollbar w-full bg-white
                         rounded-lg border max-h-[200px] overflow-auto"
                         >
-                          {Array.apply(
-                            null,
-                            Array(entitlements.alloted + 1)
-                          ).map((_, i) => {
-                            console.log(i)
-                            return (
-                              <Listbox.Option
-                                key={i}
-                                value={i}
-                                className="flex items-center
+                          {Array.apply(null, Array(entitlements + 1)).map(
+                            (_, i) => {
+                              console.log(i)
+                              return (
+                                <Listbox.Option
+                                  key={i}
+                                  value={i}
+                                  className="flex items-center
                                 cursor-pointer hover:bg-gray-100
                                 rounded-lg m-1"
-                              >
-                                {({ selected }) => {
-                                  return (
-                                    <div
-                                      className={`w-full h-full px-4 py-1.5
+                                >
+                                  {({ selected }) => {
+                                    return (
+                                      <div
+                                        className={`w-full h-full px-4 py-1.5
                                       rounded-lg ${
                                         selected
                                           ? 'bg-gray-100  font-medium'
                                           : ''
                                       }`}
-                                    >
-                                      {i}
-                                    </div>
-                                  )
-                                }}
-                              </Listbox.Option>
-                            )
-                          })}
+                                      >
+                                        {i}
+                                      </div>
+                                    )
+                                  }}
+                                </Listbox.Option>
+                              )
+                            }
+                          )}
                         </Listbox.Options>
                       </Transition>
                     </div>
@@ -584,7 +507,7 @@ const RemoveEntitelmentModal = ({
 
           <div className="flex flex-row gap-2 items-center">
             <Text size="lg" weight="semibold" className="text-gray-900">{`-$${
-              plan.price * (entitlements.alloted - proEntitlementNew)
+              plan.price * (entitlements - proEntitlementNew)
             }`}</Text>
             <Text size="sm" weight="medium" className="text-gray-500">
               per month
@@ -625,20 +548,78 @@ const RemoveEntitelmentModal = ({
   )
 }
 
+const AssignedAppModal = ({
+  apps,
+  isOpen,
+  setIsOpen,
+}: {
+  apps: AppLoaderData[]
+  isOpen: boolean
+  setIsOpen: (isOpen: boolean) => void
+}) => {
+  return (
+    <Modal isOpen={isOpen} fixed handleClose={() => setIsOpen(false)}>
+      <Text
+        size="lg"
+        weight="semibold"
+        className="text-left text-gray-800 mx-5 mb-7"
+      >
+        Assigned Application(s)
+      </Text>
+
+      <section>
+        <ul>
+          {apps.map((app) => (
+            <li
+              key={app.clientId}
+              className="flex flex-row items-center justify-between
+            p-5 border-t border-gray-200"
+            >
+              <div className="flex flex-col">
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="text-gray-900 text-left"
+                >
+                  {app.name}
+                </Text>
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="text-gray-500 text-left"
+                >
+                  {plans[app.appPlan].title}
+                </Text>
+              </div>
+
+              <NavLink to={`/apps/${app.clientId}/gnillib`}>
+                <Button btnType="secondary-alt">Manage</Button>
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </Modal>
+  )
+}
+
 const PlanCard = ({
   plan,
   entitlements,
+  apps,
   paymentData,
   submit,
 }: {
   plan: PlanDetails
-  entitlements: EntitlementDetails
+  entitlements: number
+  apps: AppLoaderData[]
   paymentData?: PaymentData
   submit: (data: any, options: any) => void
 }) => {
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
   const [removeEntitlementModalOpen, setRemoveEntitlementModalOpen] =
     useState(false)
+  const [assignedAppModalOpen, setAssignedAppModalOpen] = useState(false)
   return (
     <>
       <PurchaseProModal
@@ -654,8 +635,14 @@ const PlanCard = ({
         setIsOpen={setRemoveEntitlementModalOpen}
         plan={plan}
         entitlements={entitlements}
+        entitlementUsage={apps.length}
         paymentData={paymentData}
         submit={submit}
+      />
+      <AssignedAppModal
+        isOpen={assignedAppModalOpen}
+        setIsOpen={setAssignedAppModalOpen}
+        apps={apps}
       />
       <article className="bg-white rounded border">
         <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
@@ -706,7 +693,7 @@ const PlanCard = ({
 
                   <div className="border-b border-gray-200 w-3/4 mx-auto"></div>
 
-                  <Menu.Item disabled={entitlements.alloted === 0}>
+                  <Menu.Item disabled={entitlements === 0}>
                     <button
                       type="button"
                       onClick={() => {
@@ -714,7 +701,7 @@ const PlanCard = ({
                       }}
                       className={classnames(
                         'flex flex-row items-center gap-3 py-3 px-4 rounded-b-lg',
-                        entitlements.alloted !== 0
+                        entitlements !== 0
                           ? 'cursor-pointer hover:bg-gray-50 text-red-600'
                           : 'cursor-default text-red-300'
                       )}
@@ -739,43 +726,57 @@ const PlanCard = ({
 
           <div className="border-b border-gray-200"></div>
 
-          {entitlements.allotedClientIds.length > 0 && (
+          {apps.length > 0 && (
             <div className="p-4">
-              <Text size="sm" weight="medium" className="text-gray-900">
-                Entitlements
-              </Text>
-
               <div className="flex flex-row items-center gap-6">
-                <div className="flex-1 bg-gray-200 rounded-full h-2.5 my-2">
-                  <div
-                    className="bg-blue-600 h-2.5 rounded-full"
-                    style={{
-                      width: `${
-                        (entitlements.allotedClientIds.length /
-                          entitlements.alloted) *
-                        100
-                      }%`,
-                    }}
-                  ></div>
+                <div className="flex-1">
+                  <Text size="sm" weight="medium" className="text-gray-900">
+                    Entitlements
+                  </Text>
+
+                  <div className="flex-1 bg-gray-200 rounded-full h-2.5 my-2">
+                    <div
+                      className="bg-blue-600 h-2.5 rounded-full"
+                      style={{
+                        width: `${(apps.length / entitlements) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
+
+                  <div className="flex flex-row items-center">
+                    <div className="flex-1">
+                      <button
+                        type="button"
+                        className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b disabled:text-indigo-300"
+                        onClick={() => {
+                          setAssignedAppModalOpen(true)
+                        }}
+                      >
+                        <Text size="sm" weight="medium">
+                          View Assigned Apps
+                        </Text>
+                      </button>
+                    </div>
+                    <Text size="sm" weight="medium" className="text-[#6B7280]">
+                      {`${apps.length} out of ${entitlements} Entitlements used`}
+                    </Text>
+                  </div>
                 </div>
 
                 <div className="flex flex-row items-center gap-2">
                   <Text size="lg" weight="semibold" className="text-gray-900">
-                    ${entitlements.alloted * plans.PRO.price}
+                    ${entitlements * plans.PRO.price}
                   </Text>
                   <Text size="sm" className="text-gray-500">
                     per month
                   </Text>
                 </div>
               </div>
-              <Text size="sm" weight="medium" className="text-[#6B7280]">
-                {`${entitlements.allotedClientIds.length} out of ${entitlements.alloted} Entitlements used`}
-              </Text>
             </div>
           )}
         </main>
         <footer>
-          {entitlements.alloted === 0 && (
+          {entitlements === 0 && (
             <div className="bg-gray-50 rounded-b py-4 px-6">
               <button
                 disabled={paymentData == undefined}
@@ -792,7 +793,7 @@ const PlanCard = ({
               </button>
             </div>
           )}
-          {entitlements.alloted > entitlements.allotedClientIds.length && (
+          {entitlements > apps.length && (
             <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer bg-gray-50 rounded-b py-4 px-6">
               <button
                 disabled={paymentData == undefined}
@@ -816,18 +817,8 @@ const PlanCard = ({
 }
 
 export default () => {
-  const {
-    entitlements: {
-      PRO: { alloted, allotedClientIds },
-    },
-    successToast,
-    paymentData,
-    connectedEmails,
-  } = useLoaderData<LoaderData>()
-
-  const ld = useActionData<{
-    updatedProEntitlements: number
-  }>()
+  const { entitlements, successToast, paymentData, connectedEmails } =
+    useLoaderData<LoaderData>()
 
   const { apps, PASSPORT_URL } = useOutletContext<OutletContextData>()
 
@@ -913,7 +904,7 @@ export default () => {
                 {!paymentData && <DangerPill text="Not Configured" />}
               </div>
               <Text size="sm" weight="medium" className="text-[#6B7280]">
-                This will be used to create a custumer ID and for notifications
+                This will be used to create a customer ID and for notifications
                 about your billing
               </Text>
             </div>
@@ -941,7 +932,7 @@ export default () => {
               Submit
             </Button>
           </header>
-          <main className="p-4 flex flex-row gap-4 items-center">
+          <main className="p-4 flex flex-row gap-4">
             <div className="w-52">
               <Input
                 id="full_name"
@@ -954,9 +945,13 @@ export default () => {
               />
             </div>
 
-            <div className="self-start w-80">
+            <div className="w-80 flex flex-col justify-end">
               {connectedEmails && connectedEmails.length === 0 && (
-                <Button onClick={redirectToPassport} btnType="secondary-alt">
+                <Button
+                  onClick={redirectToPassport}
+                  btnType="secondary-alt"
+                  className="py-[6px]"
+                >
                   <div className="flex space-x-3">
                     <HiOutlineMail className="w-6 h-6 text-gray-800" />
                     <Text weight="medium" className="flex-1 text-gray-800">
@@ -973,8 +968,8 @@ export default () => {
                     weight="medium"
                     className="text-gray-700 mb-2"
                   >
-                    <sup>*</sup>
                     Email
+                    <sup>*</sup>
                   </Text>
 
                   <Dropdown
@@ -1025,21 +1020,10 @@ export default () => {
 
         <PlanCard
           plan={plans[ServicePlanType.PRO]}
-          entitlements={{
-            alloted: ld?.updatedProEntitlements ?? alloted,
-            allotedClientIds: allotedClientIds,
-          }}
+          entitlements={entitlements[ServicePlanType.PRO]}
           paymentData={paymentData}
           submit={submit}
-        />
-
-        <EntitlementsCard
-          entitlements={apps.map((a) => ({
-            title: a.name!,
-            subtitle: allotedClientIds.includes(a.clientId)
-              ? `Pro Plan ${plans.PRO.price}/month`
-              : 'Free',
-          }))}
+          apps={apps.filter((a) => a.appPlan === ServicePlanType.PRO)}
         />
       </section>
     </>

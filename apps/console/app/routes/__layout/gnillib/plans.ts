@@ -75,13 +75,22 @@ export type PlanDetails = {
   features: PlanFeature[]
 }
 
+const freePlan: PlanDetails = {
+  title: 'Free Plan',
+  description: 'Everything you need to get started.',
+  price: 0,
+  features: baseFeatures,
+}
+
 const proPlan: PlanDetails = {
   title: 'Pro Plan',
-  description: 'Unlimited Proof of Proofs',
+  description:
+    'Everything in free & Custom Domain Configuration, Custom OAuth Credentials and more.',
   price: 29,
   features: proFeatures,
 }
 
 export default {
+  [ServicePlanType.FREE]: freePlan,
   [ServicePlanType.PRO]: proPlan,
 }

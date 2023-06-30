@@ -27,7 +27,7 @@ export const Toast = ({
     }`}
   >
     {PreMessage && <div>{PreMessage}</div>}
-    <Text className="flex-1">{message}</Text>{' '}
+    <Text className="flex-1 text-left">{message}</Text>{' '}
     {PostMessage && <div>{PostMessage}</div>}
     {remove && (
       <button

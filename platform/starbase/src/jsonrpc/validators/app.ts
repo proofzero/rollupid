@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { CustomDomainSchema } from './customdomain'
+import { ServicePlanType } from '@proofzero/types/account'
 
 export const AppObjectSchema = z.object({
   name: z.string(),
@@ -28,6 +29,7 @@ export const AppReadableFieldsSchema = z.object({
   termsURL: z.string().optional(),
   privacyURL: z.string().optional(),
   customDomain: CustomDomainSchema.optional(),
+  appPlan: z.nativeEnum(ServicePlanType).default(ServicePlanType.FREE),
 })
 
 export const AppInternalFieldSchema = z.object({

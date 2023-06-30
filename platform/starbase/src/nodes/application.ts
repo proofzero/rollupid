@@ -34,7 +34,7 @@ import { InternalServerError } from '@proofzero/errors'
 import type { CustomDomain } from '../types'
 import { getCloudflareFetcher, getCustomHostname } from '../utils/cloudflare'
 import { getDNSRecordValue } from '@proofzero/utils'
-import { ResolveAccountInput } from '@proofzero/platform.address/src/jsonrpc/methods/resolveAccount'
+import { ServicePlanType } from '@proofzero/types/account'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields
@@ -129,6 +129,7 @@ export default class StarbaseApp extends DOProxy {
       'termsURL',
       'privacyURL',
       'customDomain',
+      'appPlan',
     ]
     const appObj = await this.state.storage.get(keysWeWant)
     const result = Object.fromEntries(appObj) as AppDetails
@@ -308,6 +309,10 @@ export default class StarbaseApp extends DOProxy {
 
   async setEmailOTPTheme(theme: EmailOTPTheme): Promise<void> {
     return this.state.storage.put('emailOTPTheme', theme)
+  }
+
+  async setAppPlan(planType: ServicePlanType | undefined): Promise<void> {
+    return this.state.storage.put('appPlan', planType)
   }
 }
 

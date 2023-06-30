@@ -7,6 +7,7 @@ import createAccountClient from '@proofzero/platform-clients/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { AccountURN } from '@proofzero/urns/account'
 import { ServicePlanType } from '@proofzero/types/account'
+import { updateSubscriptionMetadata } from '~/services/billing/stripe'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -44,7 +45,48 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           quantity: number
           metadata: {
             accountURN: AccountURN
+            handled?: string | null
           }
+        }
+
+        if (event.data.previous_attributes) {
+          let metadataUpdateEvent = false
+
+          const { metadata } = event.data.previous_attributes as {
+            metadata?: {
+              handled?: string
+            }
+          }
+
+          if (
+            !subMeta.handled &&
+            metadata?.handled &&
+            JSON.parse(metadata.handled)
+          ) {
+            console.info(
+              `Cleared Subscription ${id} - ${event.type} handled flag`
+            )
+            metadataUpdateEvent = true
+          }
+
+          if (metadataUpdateEvent) {
+            return null
+          }
+        }
+
+        if (subMeta.handled) {
+          console.info(
+            `Subscription ${id} - ${event.type} already handled synchronously`
+          )
+
+          subMeta.handled = null
+
+          await updateSubscriptionMetadata({
+            id,
+            metadata: subMeta,
+          })
+
+          return null
         }
 
         await accountClient.updateEntitlements.mutate({
@@ -57,11 +99,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         break
 
       case 'customer.updated':
-        const {
-          id: cusId,
-          invoice_settings,
-          metadata: cusMeta,
-        } = event.data.object as {
+        const { invoice_settings, metadata: cusMeta } = event.data.object as {
           id: string
           invoice_settings?: {
             default_payment_method: string

@@ -90,3 +90,4 @@ export interface NodeFilter {
 }
 
 export const EDGE_HAS_REFERENCE_TO: EdgeURN = EdgeSpace.urn('has/refTo')
+export const EDGE_PAYS_APP: EdgeURN = EdgeSpace.urn('pays/app')

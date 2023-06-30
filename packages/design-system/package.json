@@ -8,6 +8,7 @@
   "dependencies": {
     "@headlessui/react": "1.7.5",
     "@radix-ui/react-popover": "1.0.5",
+    "classnames": "2.3.2",
     "cra-template-typescript": "1.2.0",
     "react": "18.2.0",
     "react-countdown-circle-timer": "3.2.1",

@@ -46,10 +46,11 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import type { AccountURN } from '@proofzero/urns/account'
 
 import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
-import { InternalServerError } from '@proofzero/errors'
 
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { ServicePlanType } from '@proofzero/types/account'
+import { BadRequestError } from '@proofzero/errors'
 
 export const links: LinksFunction = () => {
   return [
@@ -68,27 +69,35 @@ export const meta: MetaFunction = () => ({
   viewport: 'width=device-width,initial-scale=1',
 })
 
+export type AppLoaderData = {
+  clientId: string
+  name?: string
+  icon?: string
+  published?: boolean
+  createdTimestamp?: number
+  appPlan: ServicePlanType
+}
+
 export type LoaderData = {
-  apps: {
-    clientId: string
-    name?: string
-    icon?: string
-    published?: boolean
-    createdTimestamp?: number
-  }[]
+  apps: AppLoaderData[]
   avatarUrl: string
   PASSPORT_URL: string
   displayName: string
   ENV: {
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
     REMIX_DEV_SERVER_WS_PORT?: number
-    WALLET_CONNECT_PROJECT_ID: string,
+    WALLET_CONNECT_PROJECT_ID: string
   }
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const jwt = await requireJWT(request)
+    if (!jwt) {
+      throw new BadRequestError({
+        message: 'No JWT found in request.',
+      })
+    }
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
     const parsedJwt = parseJwt(jwt)
     const accountURN = parsedJwt.sub as AccountURN
@@ -110,6 +119,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           icon: a.app?.icon,
           published: a.published,
           createdTimestamp: a.createdTimestamp,
+          appPlan: a.appPlan,
         }
       })
 
