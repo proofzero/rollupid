@@ -560,10 +560,12 @@ const EntitlementsCard = ({
                       {plans[entitlement.planType].title}
                     </Text>
                     <Text size="sm" weight="medium" className="text-gray-500">
-                      {entitlement.planType === ServicePlanType.FREE &&
+                      {entitlement.planType !== currentPlan &&
+                        entitlement.planType === ServicePlanType.FREE &&
                         'unlimited'}
 
-                      {entitlement.planType !== ServicePlanType.FREE &&
+                      {entitlement.planType !== currentPlan &&
+                        entitlement.planType !== ServicePlanType.FREE &&
                         `${getAvailableEntitlements(entitlement)} available`}
                     </Text>
                   </div>
