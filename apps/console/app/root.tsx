@@ -50,6 +50,7 @@ import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { ServicePlanType } from '@proofzero/types/account'
+import { BadRequestError } from '@proofzero/errors'
 
 export const links: LinksFunction = () => {
   return [
@@ -92,8 +93,13 @@ export type LoaderData = {
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const jwt = await requireJWT(request)
+    if (!jwt) {
+      throw new BadRequestError({
+        message: 'No JWT found in request.',
+      })
+    }
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
-    const parsedJwt = parseJwt(jwt!)
+    const parsedJwt = parseJwt(jwt)
     const accountURN = parsedJwt.sub as AccountURN
 
     try {
