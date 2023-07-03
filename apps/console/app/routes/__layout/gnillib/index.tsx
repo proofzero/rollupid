@@ -12,6 +12,7 @@ import {
   HiChevronDown,
   HiChevronUp,
   HiMinus,
+  HiOutlineCreditCard,
   HiOutlineMail,
   HiPlus,
 } from 'react-icons/hi'
@@ -26,6 +27,7 @@ import {
   parseJwt,
 } from '@proofzero/utils'
 import {
+  Link,
   NavLink,
   useLoaderData,
   useOutletContext,
@@ -1067,22 +1069,29 @@ export default () => {
         />
       </section>
 
-      <section className="flex flex-col gap-4">
+      <section className="mt-10">
         <article className="">
-          <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
-            <div>
-              <div className="flex flex-row gap-4 items-center">
-                <Text size="lg" weight="semibold" className="text-gray-900">
-                  Invoices
-                </Text>
-              </div>
-            </div>
+          <header className="flex flex-col lg:flex-row justify-between lg:items-center relative mb-6">
+            <Text size="lg" weight="semibold" className="text-gray-900">
+              Invoices & Payments
+            </Text>
+
+            <Link to="/gnillib/portal">
+              <Button
+                btnType="secondary-alt"
+                className="flex flex-row items-center gap-2"
+              >
+                <HiOutlineCreditCard />
+                Update payment information
+              </Button>
+            </Link>
           </header>
-          <main className="p-4 flex flex-row gap-4 items-center">
-            <table className="min-w-full bg-white rounded-lg border">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left">
+
+          <main className="flex flex-row gap-4 items-center border rounded-lg">
+            <table className="min-w-full bg-white rounded-lg overflow-hidden">
+              <thead className="bg-gray-50 rounded-t-lg">
+                <tr className="rounded-t-lg">
+                  <th className="px-6 py-3 text-left rounded-tl-lg">
                     <Text
                       size="xs"
                       weight="medium"
@@ -1100,7 +1109,7 @@ export default () => {
                       Invoice total
                     </Text>
                   </th>
-                  <th className="px-6 py-3 text-left">
+                  <th className="px-6 py-3 text-left rounded-tr-lg">
                     <Text
                       size="xs"
                       weight="medium"
@@ -1134,7 +1143,7 @@ export default () => {
 
                       <td className="px-6 py-3">
                         <Text size="sm" className="gray-500">
-                          {invoice.amount.toFixed(2)}
+                          ${invoice.amount.toFixed(2)}
                         </Text>
                       </td>
 

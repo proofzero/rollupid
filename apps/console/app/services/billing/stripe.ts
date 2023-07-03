@@ -15,7 +15,7 @@ type UpdateCustomerParams = {
   name: string
 }
 
-type UpdatePaymentMethodParams = {
+type CustomerPortalParams = {
   customerID: string
   returnURL: string
 }
@@ -82,10 +82,26 @@ export const updateCustomer = async ({
   return customer
 }
 
+export const accessCustomerPortal = async ({
+  customerID,
+  returnURL,
+}: CustomerPortalParams) => {
+  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+    apiVersion: '2022-11-15',
+  })
+
+  const session = await stripeClient.billingPortal.sessions.create({
+    customer: customerID,
+    return_url: returnURL,
+  })
+
+  return redirect(session.url)
+}
+
 export const updatePaymentMethod = async ({
   customerID,
   returnURL,
-}: UpdatePaymentMethodParams) => {
+}: CustomerPortalParams) => {
   const stripeClient = new Stripe(STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
   })
