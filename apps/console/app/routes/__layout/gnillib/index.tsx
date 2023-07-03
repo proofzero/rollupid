@@ -900,6 +900,8 @@ export default () => {
   const submit = useSubmit()
   const hydrated = useHydrated()
 
+  const [invoiceSort, setInvoiceSort] = useState<'asc' | 'desc'>('desc')
+
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
@@ -1092,13 +1094,35 @@ export default () => {
               <thead className="bg-gray-50 rounded-t-lg">
                 <tr className="rounded-t-lg">
                   <th className="px-6 py-3 text-left rounded-tl-lg">
-                    <Text
-                      size="xs"
-                      weight="medium"
-                      className="uppercase text-gray-500"
+                    <button
+                      className="flex flex-row gap-2"
+                      onClick={() => {
+                        setInvoiceSort(invoiceSort === 'desc' ? 'asc' : 'desc')
+                      }}
                     >
-                      Date
-                    </Text>
+                      <Text
+                        size="xs"
+                        weight="medium"
+                        className="uppercase text-gray-500"
+                      >
+                        Date
+                      </Text>
+
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                          d="M8.00005 2.40002C8.21222 2.40002 8.41571 2.48431 8.56573 2.63434L10.9657 5.03434C11.2782 5.34676 11.2782 5.85329 10.9657 6.16571C10.6533 6.47813 10.1468 6.47813 9.83436 6.16571L8.00005 4.3314L6.16573 6.16571C5.85331 6.47813 5.34678 6.47813 5.03436 6.16571C4.72194 5.85329 4.72194 5.34676 5.03436 5.03434L7.43436 2.63434C7.58439 2.48431 7.78788 2.40002 8.00005 2.40002ZM5.03436 9.83434C5.34678 9.52192 5.85331 9.52192 6.16573 9.83434L8.00005 11.6687L9.83436 9.83434C10.1468 9.52192 10.6533 9.52192 10.9657 9.83434C11.2782 10.1468 11.2782 10.6533 10.9657 10.9657L8.56573 13.3657C8.25331 13.6781 7.74678 13.6781 7.43436 13.3657L5.03436 10.9657C4.72194 10.6533 4.72194 10.1468 5.03436 9.83434Z"
+                          fill="#9CA3AF"
+                        />
+                      </svg>
+                    </button>
                   </th>
                   <th className="px-6 py-3 text-left">
                     <Text
@@ -1123,7 +1147,11 @@ export default () => {
 
               <tbody className="border-t border-gray-200">
                 {invoices
-                  .sort((a, b) => b.timestamp - a.timestamp)
+                  .sort((a, b) =>
+                    invoiceSort === 'desc'
+                      ? b.timestamp - a.timestamp
+                      : a.timestamp - b.timestamp
+                  )
                   .map((invoice) => (
                     <tr className="border-b border-gray-200">
                       <td className="px-6 py-3">
@@ -1143,7 +1171,10 @@ export default () => {
 
                       <td className="px-6 py-3">
                         <Text size="sm" className="gray-500">
-                          ${invoice.amount.toFixed(2)}
+                          {invoice.amount < 0 ? '-' : ''}$
+                          {invoice.amount < 0
+                            ? (invoice.amount * -1).toFixed(2)
+                            : invoice.amount.toFixed(2)}
                         </Text>
                       </td>
 
