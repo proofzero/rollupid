@@ -90,6 +90,10 @@ import {
   revokeWalletSessionKeyMethod,
   revokeWalletSessionKeyBatchMethod,
 } from './methods/revokeWalletSessionKey'
+import {
+  SendBillingNotificationInput,
+  sendBillingNotificationMethod,
+} from './methods/sendBillingNotification'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -264,4 +268,9 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(RevokeWalletSessionKeyBatchInput)
     .mutation(revokeWalletSessionKeyBatchMethod),
+  sendBillingNotification: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(SendBillingNotificationInput)
+    .mutation(sendBillingNotificationMethod),
 })

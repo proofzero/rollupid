@@ -4,8 +4,8 @@ import { type ActionFunction } from '@remix-run/cloudflare'
 
 import Stripe from 'stripe'
 import createAccountClient from '@proofzero/platform-clients/account'
-import createEmailClient from '@proofzero/platform-clients/email'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createAddressClient from '@proofzero/platform-clients/address'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { type AccountURN } from '@proofzero/urns/account'
 import { ServicePlanType } from '@proofzero/types/account'
@@ -20,11 +20,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const emailClient = createEmailClient(Email, {
+    const starbaseClient = createStarbaseClient(Starbase, {
       ...getAuthzHeaderConditionallyFromToken(undefined),
       ...traceHeader,
     })
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const addressClient = createAddressClient(Address, {
       ...getAuthzHeaderConditionallyFromToken(undefined),
       ...traceHeader,
     })
@@ -135,7 +135,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       case 'customer.deleted':
       case 'customer.subscription.deleted':
         const {
-          customer: custmoerDel,
+          customer: customerDel,
           id: subIdDel,
           metadata: metaDel,
         } = event.data.object as {
@@ -146,14 +146,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           }
         }
         const customerDataDel = await stripeClient.customers.retrieve(
-          custmoerDel
+          customerDel
         )
         if (!customerDataDel.deleted && customerDataDel.email) {
           const { email, name } = customerDataDel
 
           await Promise.all([
-            emailClient.sendBillingNotification.mutate({
-              emailAddress: email,
+            addressClient.sendBillingNotification.mutate({
+              email,
               name: name || 'Client',
             }),
             accountClient.cancelServicePlans.mutate({
