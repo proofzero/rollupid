@@ -143,11 +143,7 @@ async function forward(message: CloudflareEmailMessage, env: Environment) {
   throw new InternalServerError({ message: 'Not implemented yet' })
 }
 
-/** OTP email content template with a `code` parameter */
-export const getOTPEmailContent = (
-  passcode: string,
-  params?: Partial<EmailTemplateParams>
-): EmailContent => {
+const adjustEmailParams = (params?: Partial<EmailTemplateParams>) => {
   if (!params) {
     params = {
       address: '777 Bay Street, Suite C208B Toronto, Ontario M5G 2C8 Canada',
@@ -161,6 +157,16 @@ export const getOTPEmailContent = (
     params.logoURL =
       'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public'
   }
+
+  return params
+}
+
+/** OTP email content template with a `code` parameter */
+export const getOTPEmailContent = (
+  passcode: string,
+  params?: Partial<EmailTemplateParams>
+): EmailContent => {
+  params = adjustEmailParams(params)
 
   return EmailTemplateOTP(passcode, params as EmailTemplateParams)
 }
@@ -169,19 +175,7 @@ export const getOTPEmailContent = (
 export const getSubscriptionEmailContent = (
   params?: Partial<EmailTemplateParams>
 ): EmailContent => {
-  if (!params) {
-    params = {
-      address: '777 Bay Street, Suite C208B Toronto, Ontario M5G 2C8 Canada',
-      contactURL: 'https://discord.com/invite/rollupid',
-      termsURL: 'https://rollup.id/tos',
-      privacyURL: 'https://rollup.id/privacy-policy',
-    }
-  }
-
-  if (!params.logoURL) {
-    params.logoURL =
-      'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public'
-  }
+  params = adjustEmailParams(params)
 
   return EmailTemplateExpiredSubscription(params as EmailTemplateParams)
 }
