@@ -4,7 +4,7 @@ import type {
   LoaderFunction,
 } from '@remix-run/cloudflare'
 
-import { json, redirect } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 
 import { useContext, useEffect, useState } from 'react'
 
@@ -44,6 +44,8 @@ import type { FLASH_MESSAGE } from './utils/flashMessage.server'
 
 import { getFlashSession, commitFlashSession } from './session.server'
 
+import { PostHogProvider } from 'posthog-js/react'
+
 import {
   toast,
   Toaster,
@@ -57,8 +59,6 @@ import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHac
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 import { getStarbaseClient } from './platform.server'
-import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
-
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
   title: 'Passport - Rollup',
@@ -134,6 +134,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         appProps,
         flashes,
         ENV: {
+          REACT_APP_PUBLIC_POSTHOG_KEY:
+            context.env.REACT_APP_PUBLIC_POSTHOG_KEY,
+          REACT_APP_PUBLIC_POSTHOG_HOST:
+            context.env.REACT_APP_PUBLIC_POSTHOG_HOST,
           PROFILE_APP_URL: context.env.PROFILE_APP_URL,
           INTERNAL_GOOGLE_ANALYTICS_TAG:
             context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
@@ -166,6 +170,10 @@ export default function App() {
   const browserEnv = useLoaderData()
 
   const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+
+  const options = {
+    api_host: browserEnv.ENV.REACT_APP_PUBLIC_POSTHOG_HOST,
+  }
 
   const remixDevPort = browserEnv.ENV.REMIX_DEV_SERVER_WS_PORT
   useTreeshakeHack(remixDevPort)
@@ -271,7 +279,16 @@ export default function App() {
               theme: undefined,
             }}
           >
-            <Outlet context={{ appProps: browserEnv.appProps }} />
+            {typeof window !== 'undefined' ? (
+              <PostHogProvider
+                apiKey={browserEnv.ENV.REACT_APP_PUBLIC_POSTHOG_KEY}
+                options={options}
+              >
+                <Outlet context={{ appProps: browserEnv.appProps }} />
+              </PostHogProvider>
+            ) : (
+              <Outlet context={{ appProps: browserEnv.appProps }} />
+            )}
           </ThemeContext.Provider>
         )}
         <ScrollRestoration nonce={nonce} />

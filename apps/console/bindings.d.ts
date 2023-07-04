@@ -22,4 +22,7 @@ declare global {
   const STRIPE_API_SECRET: string
   const STRIPE_WEBHOOK_SECRET: string
   const STRIPE_PRO_PLAN_ID: string
+
+  const REACT_APP_PUBLIC_POSTHOG_KEY: string
+  const REACT_APP_PUBLIC_POSTHOG_HOST: string
 }

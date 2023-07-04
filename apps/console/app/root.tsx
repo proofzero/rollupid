@@ -49,8 +49,9 @@ import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-
 
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ServicePlanType } from '@proofzero/types/account'
+import { type ServicePlanType } from '@proofzero/types/account'
 import { BadRequestError } from '@proofzero/errors'
+import { PostHogProvider } from 'posthog-js/react'
 
 export const links: LinksFunction = () => {
   return [
@@ -84,6 +85,8 @@ export type LoaderData = {
   PASSPORT_URL: string
   displayName: string
   ENV: {
+    REACT_APP_PUBLIC_POSTHOG_KEY: string
+    REACT_APP_PUBLIC_POSTHOG_HOST: string
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
     REMIX_DEV_SERVER_WS_PORT?: number
     WALLET_CONNECT_PROJECT_ID: string
@@ -149,6 +152,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         avatarUrl,
         PASSPORT_URL,
         ENV: {
+          REACT_APP_PUBLIC_POSTHOG_KEY,
+          REACT_APP_PUBLIC_POSTHOG_HOST,
           INTERNAL_GOOGLE_ANALYTICS_TAG,
           REMIX_DEV_SERVER_WS_PORT:
             process.env.NODE_ENV === 'development'
@@ -176,6 +181,10 @@ export default function App() {
 
   const remixDevPort = loaderData.ENV.REMIX_DEV_SERVER_WS_PORT
   useTreeshakeHack(remixDevPort)
+
+  const options = {
+    api_host: loaderData.ENV.REACT_APP_PUBLIC_POSTHOG_HOST,
+  }
 
   const { apps, avatarUrl, PASSPORT_URL, displayName } = loaderData
 
@@ -217,7 +226,16 @@ export default function App() {
           </>
         )}
         {transition.state !== 'idle' ? <Loader /> : null}
-        <Outlet context={{ apps, avatarUrl, PASSPORT_URL, displayName }} />
+        {typeof window !== 'undefined' ? (
+          <PostHogProvider
+            apiKey={loaderData.ENV.REACT_APP_PUBLIC_POSTHOG_KEY}
+            options={options}
+          >
+            <Outlet context={{ apps, avatarUrl, PASSPORT_URL, displayName }} />
+          </PostHogProvider>
+        ) : (
+          <Outlet context={{ apps, avatarUrl, PASSPORT_URL, displayName }} />
+        )}
         <ScrollRestoration nonce={nonce} />
         <script
           nonce={nonce}
