@@ -81,6 +81,7 @@ import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { AddressURN } from '@proofzero/urns/address'
 import danger from '~/images/danger.svg'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
+import classNames from 'classnames'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -741,7 +742,7 @@ const AuthPanel = ({
                     />
                   </LazyAuth>
                 </Tab.Panel>
-                <Tab.Panel>
+                <Tab.Panel className={classNames({ dark })}>
                   <Authorization
                     userProfile={{
                       pfpURL: avatarURL,
