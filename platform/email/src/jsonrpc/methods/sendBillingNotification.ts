@@ -2,15 +2,15 @@ import { z } from 'zod'
 import { Context } from '../../context'
 import {
   sendNotification,
-  NotificationSender,
   getSubscriptionEmailContent,
+  getEmailContent,
 } from '../../emailFunctions'
-import { Environment, EmailNotification, EmailContentType } from '../../types'
-import { InternalServerError } from '@proofzero/errors'
+import { EmailThemePropsSchema } from '../../emailFunctions'
 
 export const sendBillingEmailMethodInput = z.object({
   name: z.string(),
   emailAddress: z.string(),
+  themeProps: EmailThemePropsSchema.optional(),
 })
 
 export type sendBillingEmailMethodParams = z.infer<
@@ -30,41 +30,17 @@ export const sendBillingNotificationMethod = async ({
   input: sendBillingEmailMethodParams
   ctx: Context
 }): Promise<sendBillingEmailMethodOutputParams> => {
-  if (
-    !(
-      ctx.NotificationFromUser &&
-      ctx.NotificationFromName &&
-      ctx.INTERNAL_DKIM_DOMAIN &&
-      ctx.KEY_DKIM_PRIVATEKEY &&
-      ctx.INTERNAL_DKIM_SELECTOR
-    )
+  const subscriptionEmailTemplate = getSubscriptionEmailContent(
+    input.themeProps
   )
-    throw new InternalServerError({
-      message:
-        'Environment variables not set correctly to be able to send emails.',
-    })
 
-  const env: Environment = {
-    NotificationFromUser: ctx.NotificationFromUser,
-    NotificationFromName: ctx.NotificationFromName,
-    INTERNAL_DKIM_DOMAIN: ctx.INTERNAL_DKIM_DOMAIN,
-    KEY_DKIM_PRIVATEKEY: ctx.KEY_DKIM_PRIVATEKEY,
-    INTERNAL_DKIM_SELECTOR: ctx.INTERNAL_DKIM_SELECTOR,
-    SECRET_TEST_API_TEST_TOKEN: ctx.SECRET_TEST_API_TEST_TOKEN,
-    Test: ctx.Test,
-  }
-
-  const subscriptionEmailTemplate = getSubscriptionEmailContent()
-
-  const notification: EmailNotification = {
-    content: subscriptionEmailTemplate,
-    recipient: {
-      name: input.name,
-      address: input.emailAddress,
-    },
-  }
-
-  let customSender: NotificationSender
+  const { env, notification, customSender } = getEmailContent({
+    ctx,
+    address: input.emailAddress,
+    name: input.name,
+    emailContent: subscriptionEmailTemplate,
+    themeProps: input.themeProps,
+  })
 
   await sendNotification(notification, env, customSender)
 }

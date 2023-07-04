@@ -116,6 +116,10 @@ import {
   SetEmailOTPThemeInput,
 } from './methods/setEmailOTPTheme'
 import { setAppPlan, SetAppPlanInput } from './methods/setAppPlan'
+import {
+  DeleteSubscriptionPlansInput,
+  deleteSubscriptionPlans,
+} from './methods/deleteSubscriptionPlans'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -330,6 +334,11 @@ export const appRouter = t.router({
     .use(OwnAppsMiddleware)
     .input(SetAppPlanInput)
     .mutation(setAppPlan),
+  deleteSubscriptionPlans: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(DeleteSubscriptionPlansInput)
+    .mutation(deleteSubscriptionPlans),
 })
 
 export type StarbaseRouter = typeof appRouter

@@ -6,6 +6,21 @@ import {
 } from '../emailTemplate'
 import { EmailMessage, EmailNotification } from './types'
 import { CloudflareEmailMessage, EmailContent, Environment } from './types'
+import { Context } from './context'
+import email from '@proofzero/platform-clients/email'
+import { z } from 'zod'
+
+export const EmailThemePropsSchema = z.object({
+  privacyURL: z.string().url(),
+  termsURL: z.string().url(),
+  contactURL: z.string().url().optional(),
+  address: z.string().optional(),
+  logoURL: z.string().url().optional(),
+  appName: z.string(),
+  hostname: z.string().optional(),
+})
+
+export type EmailThemeProps = z.infer<typeof EmailThemePropsSchema>
 
 /** Shape of structure MailChannel API expects */
 type MailChannelEmailBody = {
@@ -188,5 +203,64 @@ export const getMagicLinkEmailContent = (
     contentType: 'text/html',
     subject: `Rollup email login link`,
     body: `Your email login link to rollup.id is <a href="${magicLinkUrl}">. For security reasons, this link is only valid for 1 minute.`,
+  }
+}
+
+export const getEmailContent = ({
+  ctx,
+  emailContent,
+  name,
+  address,
+  themeProps,
+}: {
+  ctx: Context
+  emailContent: EmailContent
+  name: string
+  address: string
+  themeProps?: EmailThemeProps
+}) => {
+  if (
+    !(
+      ctx.NotificationFromUser &&
+      ctx.NotificationFromName &&
+      ctx.INTERNAL_DKIM_DOMAIN &&
+      ctx.KEY_DKIM_PRIVATEKEY &&
+      ctx.INTERNAL_DKIM_SELECTOR
+    )
+  )
+    throw new Error(
+      'Environment variables not set correctly to be able to send emails.'
+    )
+
+  const env: Environment = {
+    NotificationFromUser: ctx.NotificationFromUser,
+    NotificationFromName: ctx.NotificationFromName,
+    INTERNAL_DKIM_DOMAIN: ctx.INTERNAL_DKIM_DOMAIN,
+    KEY_DKIM_PRIVATEKEY: ctx.KEY_DKIM_PRIVATEKEY,
+    INTERNAL_DKIM_SELECTOR: ctx.INTERNAL_DKIM_SELECTOR,
+    SECRET_TEST_API_TEST_TOKEN: ctx.SECRET_TEST_API_TEST_TOKEN,
+    Test: ctx.Test,
+  }
+
+  const notification: EmailNotification = {
+    content: emailContent,
+    recipient: {
+      name,
+      address,
+    },
+  }
+  let customSender: NotificationSender
+  if (themeProps?.hostname) {
+    customSender = {
+      hostname: themeProps.hostname,
+      address: `no-reply@${themeProps.hostname}`,
+      name: themeProps.appName,
+    }
+  }
+
+  return {
+    env,
+    notification,
+    customSender,
   }
 }
