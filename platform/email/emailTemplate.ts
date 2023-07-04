@@ -1,4 +1,4 @@
-import { EmailContent } from './src/types'
+import { EmailContent, EmailContentType } from './src/types'
 
 export const darkModeStyles = `
     body {
@@ -55,14 +55,10 @@ export type EmailTemplateParams = {
   appName: string
 }
 
-export const EmailTemplate = (
-  passcode: string,
-  params: EmailTemplateParams
-): EmailContent => {
+const EmailTemplateBase = (params: EmailTemplateParams, content: string) => {
   const { logoURL, address, contactURL, termsURL, privacyURL, appName } = params
-
   return {
-    contentType: 'text/html',
+    contentType: 'text/html' as EmailContentType,
     subject: `Your ${appName ?? `Rollup ID`} one-time passcode`,
     body: `<!DOCTYPE html>
     <html>
@@ -80,13 +76,13 @@ export const EmailTemplate = (
           .content {
             font-family: "Inter", sans-serif;
           }
-    
+
           .container {
             display: block;
             width: 98%;
             text-align: center;
           }
-    
+
           .content {
             display: inline-block;
             vertical-align: top;
@@ -94,12 +90,12 @@ export const EmailTemplate = (
             max-width: 375px;
             border-radius: 8px;
           }
-    
+
           .logo {
             max-width: 375px;
             margin-bottom: 37px;
           }
-    
+
           .heading,
           .heading-logo {
             font-size: 36px;
@@ -107,14 +103,14 @@ export const EmailTemplate = (
             line-height: 44px;
             margin-bottom: 16px;
           }
-    
+
           p {
             font-size: 16px;
             font-weight: normal;
             line-height: 24px;
             margin-bottom: 16px;
           }
-    
+
           #passcode {
             width: 100%;
             text-align: center;
@@ -125,13 +121,13 @@ export const EmailTemplate = (
             margin-bottom: 20px;
             padding: 15px 0;
           }
-    
+
           .divider {
             border-bottom: 1px solid #e5e7eb;
             width: 100%;
             margin-bottom: 10px;
           }
-    
+
           .footer-links {
             font-size: 12px;
             text-decoration: none;
@@ -139,43 +135,36 @@ export const EmailTemplate = (
             margin-right: 10px;
             width: auto;
           }
-    
+
           .vl {
             border: 0.5px solid #6b7280;
             display: inline;
             margin-right: 15px;
           }
-    
+
           .powered-by {
             font-size: 12px;
             text-decoration: none;
           }
         </style>
-    
+
         <style type="text/css" id="injected-styles">
           ${lightModeStyles}
-    
+
           @media (prefers-color-scheme: dark) {
               ${darkModeStyles}
           }
         </style>
         <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
       </head>
-    
+
       <body class="adaptive">
         <div class="container adaptive">
           <div class="content adaptive">
             <div class="heading-logo">
               <img class="logo" src="${logoURL}" alt="" style="display: block" />
             </div>
-            <div class="heading">Confirm Your Email Address</div>
-            <p>Please copy the code below into the email verification screen.</p>
-            <div id="passcode">${passcode}</div>
-            <p>Please note: the code will be valid for the next 10 minutes.</p>
-            <p>
-              If you didn&apos;t request this email, there&apos;s nothing to worry
-              about - you can safely ignore it.
-            </p>
+            ${content}
             <div class="divider"></div>
             <div style="width: 100%">
               <a
@@ -207,7 +196,7 @@ export const EmailTemplate = (
                   : ''
               }
             </div>
-    
+
             ${
               address && address !== ''
                 ? `
@@ -262,4 +251,37 @@ export const EmailTemplate = (
       </body>
     </html>`,
   }
+}
+
+export const EmailTemplateOTP = (
+  passcode: string,
+  params: EmailTemplateParams
+): EmailContent => {
+  const content = `
+            <div class="heading">Confirm Your Email Address</div>
+            <p>Please copy the code below into the email verification screen.</p>
+            <div id="passcode">${passcode}</div>
+            <p>Please note: the code will be valid for the next 10 minutes.</p>
+            <p>
+              If you didn&apos;t request this email, there&apos;s nothing to worry
+              about - you can safely ignore it.
+            </p>
+            `
+  return EmailTemplateBase(params, content)
+}
+
+export const EmailTemplateExpiredSubscription = (
+  params: EmailTemplateParams
+): EmailContent => {
+  const content = `<div class="heading">RollupId subscription has been cancelled</div>
+  <p>
+    Your subscription has been cancelled due to unsuccessful payment
+    attempts.
+  </p>
+  <p>
+    Please update your payment details to reactivate your subscription.
+  </p>
+  `
+
+  return EmailTemplateBase(params, content)
 }

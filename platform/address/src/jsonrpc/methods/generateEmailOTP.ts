@@ -6,11 +6,11 @@ import { AddressNode } from '../../nodes'
 import EmailAddress from '../../nodes/email'
 
 import { EMAIL_VERIFICATION_OPTIONS } from '../../constants'
-import { SendOTPEmailThemePropsSchema } from '../../../../email/src/jsonrpc/methods/sendOTPEmail'
+import { EmailThemePropsSchema } from '../../../../email/src/emailFunctions'
 
 export const GenerateEmailOTPInput = z.object({
   email: z.string(),
-  themeProps: SendOTPEmailThemePropsSchema.optional(),
+  themeProps: EmailThemePropsSchema.optional(),
   preview: z.boolean().optional(),
 })
 
@@ -36,7 +36,7 @@ export const generateEmailOTPMethod = async ({
     delayMiliseconds
   )
 
-  await ctx.emailClient.sendEmailNotification.mutate({
+  await ctx.emailClient.sendOTP.mutate({
     emailAddress: email,
     name: email,
     otpCode: code,

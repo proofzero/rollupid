@@ -65,10 +65,10 @@ import { Helmet } from 'react-helmet'
 import { notificationHandlerType } from '~/types'
 import InputTextarea from '@proofzero/design-system/src/atoms/form/InputTextarea'
 import {
-  EmailTemplate,
+  EmailTemplateOTP,
   darkModeStyles,
   lightModeStyles,
-} from '@proofzero/platform/email/emailOtpTemplate'
+} from '@proofzero/platform/email/emailTemplate'
 import { BadRequestError } from '@proofzero/errors'
 import { GetEmailOTPThemeResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getEmailOTPTheme'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
@@ -1178,7 +1178,7 @@ const EmailPanel = ({
             ref={iFrameRef}
             className="w-full border rounded-lg"
             srcDoc={
-              EmailTemplate('XXXXXX', {
+              EmailTemplateOTP('XXXXXX', {
                 appName: 'Designer',
                 logoURL:
                   logoURL ??

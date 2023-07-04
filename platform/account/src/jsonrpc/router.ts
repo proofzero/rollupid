@@ -54,6 +54,10 @@ import {
   getStripePaymentData,
   setStripePaymentData,
 } from './methods/stripePaymentData'
+import {
+  CancelServicePlansInput,
+  cancelServicePlans,
+} from './methods/cancelServicePlans'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -171,4 +175,9 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(SetStripePaymentDataInputSchema)
     .mutation(setStripePaymentData),
+  cancelServicePlans: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(CancelServicePlansInput)
+    .mutation(cancelServicePlans),
 })
