@@ -133,8 +133,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         break
       case 'customer.deleted':
+      case 'customer.subscription.deleted':
         const {
-          customer: customerDel,
+          customer: custmoerDel,
           id: subIdDel,
           metadata: metaDel,
         } = event.data.object as {
@@ -144,9 +145,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             accountURN: AccountURN
           }
         }
-
         const customerDataDel = await stripeClient.customers.retrieve(
-          customerDel
+          custmoerDel
         )
         if (!customerDataDel.deleted && customerDataDel.email) {
           const { email, name } = customerDataDel
@@ -159,46 +159,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             accountClient.cancelServicePlans.mutate({
               account: metaDel.accountURN,
               subscriptionID: subIdDel,
-              deletePaymentData: true,
+              deletePaymentData: event.type === 'customer.deleted',
             }),
             starbaseClient.deleteSubscriptionPlans.mutate({
               accountURN: metaDel.accountURN,
-            }),
-          ])
-        }
-
-        break
-      case 'customer.subscription.deleted':
-        const {
-          customer: custmoerSubDel,
-          id: subIdSubDel,
-          metadata: metaSubDel,
-        } = event.data.object as {
-          customer: string
-          id: string
-          metadata: {
-            accountURN: AccountURN
-          }
-        }
-
-        const customerDataSubDel = await stripeClient.customers.retrieve(
-          custmoerSubDel
-        )
-
-        if (!customerDataSubDel.deleted && customerDataSubDel.email) {
-          const { email, name } = customerDataSubDel
-
-          await Promise.all([
-            emailClient.sendBillingNotification.mutate({
-              emailAddress: email,
-              name: name || 'Client',
-            }),
-            accountClient.cancelServicePlans.mutate({
-              account: metaSubDel.accountURN,
-              subscriptionID: subIdSubDel,
-            }),
-            starbaseClient.deleteSubscriptionPlans.mutate({
-              accountURN: metaSubDel.accountURN,
             }),
           ])
         }
