@@ -6,7 +6,7 @@ import { getAddressClient, getStarbaseClient } from '~/platform.server'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { getAuthzCookieParams } from '~/session.server'
-import type { SendOTPEmailThemeProps } from '@proofzero/platform/email/src/jsonrpc/methods/sendOTPEmail'
+import type { EmailThemeProps } from '@proofzero/platform/email/src/emailFunctions'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
@@ -62,7 +62,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         ])
       }
 
-      let themeProps: SendOTPEmailThemeProps | undefined
+      let themeProps: EmailThemeProps | undefined
       if (appProps) {
         themeProps = {
           privacyURL: appProps.privacyURL as string,
