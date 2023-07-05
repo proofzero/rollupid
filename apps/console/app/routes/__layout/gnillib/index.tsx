@@ -23,6 +23,7 @@ import {
 } from '~/utilities/session.server'
 import createAccountClient from '@proofzero/platform-clients/account'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createAddressClient from '@proofzero/platform-clients/address'
 import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
@@ -68,11 +69,11 @@ import { DangerPill } from '@proofzero/design-system/src/atoms/pills/DangerPill'
 import {
   createSubscription,
   getInvoices,
+  reconcileAppSubscriptions,
   updateSubscription,
 } from '~/services/billing/stripe'
 import { useHydrated } from 'remix-utils'
 import _ from 'lodash'
-import Stripe from 'stripe'
 
 type LoaderData = {
   paymentData?: PaymentData
@@ -186,6 +187,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
+    const addressClient = createAddressClient(Address, {
+      ...getAuthzHeaderConditionallyFromToken(undefined),
+      ...traceHeader,
+    })
+
     const fd = await request.formData()
     const { customerID, quantity, txType } = JSON.parse(
       fd.get('payload') as string
@@ -217,37 +223,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    const stripeClient = new Stripe(STRIPE_API_SECRET, {
-      apiVersion: '2022-11-15',
+    await reconcileAppSubscriptions({
+      subscriptionID: sub.id,
+      accountURN,
+      accountClient,
+      starbaseClient,
+      addressClient,
     })
-
-    const subItems = await stripeClient.subscriptionItems.list({
-      subscription: sub.id,
-    })
-
-    const planQuantities = subItems.data.map((si) => ({
-      priceID: si.price.id,
-      quantity: si.quantity,
-    }))
-
-    const priceIdToPlanTypeDict = {
-      [STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
-    }
-
-    for (const pq of planQuantities) {
-      await starbaseClient.reconcileAppSubscriptions.mutate({
-        accountURN: accountURN,
-        count: pq.quantity!,
-        plan: priceIdToPlanTypeDict[pq.priceID],
-      })
-
-      await accountClient.updateEntitlements.mutate({
-        accountURN: accountURN,
-        subscriptionID: sub.id,
-        quantity: +quantity,
-        type: ServicePlanType.PRO,
-      })
-    }
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
     if (txType === 'buy') {

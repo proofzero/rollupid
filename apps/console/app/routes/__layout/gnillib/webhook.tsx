@@ -7,10 +7,12 @@ import createAccountClient from '@proofzero/platform-clients/account'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import createAddressClient from '@proofzero/platform-clients/address'
 import { type AccountURN } from '@proofzero/urns/account'
-import { ServicePlanType } from '@proofzero/types/account'
 
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import { updateSubscriptionMetadata } from '~/services/billing/stripe'
+import {
+  reconcileAppSubscriptions,
+  updateSubscriptionMetadata,
+} from '~/services/billing/stripe'
 import { RollupError } from '@proofzero/errors'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
@@ -45,10 +47,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       sig,
       whSecret
     )
-
-    const priceIdToPlanTypeDict = {
-      [STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
-    }
 
     switch (event.type) {
       case 'customer.subscription.created':
@@ -110,29 +108,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           })
         }
 
-        const subItems = await stripeClient.subscriptionItems.list({
-          subscription: id,
+        await reconcileAppSubscriptions({
+          subscriptionID: id,
+          accountURN: subMeta.accountURN,
+          accountClient,
+          starbaseClient,
+          addressClient,
         })
-
-        const planQuantities = subItems.data.map((si) => ({
-          priceID: si.price.id,
-          quantity: si.quantity,
-        }))
-
-        for (const pq of planQuantities) {
-          await starbaseClient.reconcileAppSubscriptions.mutate({
-            accountURN: subMeta.accountURN,
-            count: pq.quantity!,
-            plan: priceIdToPlanTypeDict[pq.priceID],
-          })
-
-          await accountClient.updateEntitlements.mutate({
-            accountURN: subMeta.accountURN,
-            subscriptionID: id,
-            quantity: pq.quantity!,
-            type: priceIdToPlanTypeDict[pq.priceID],
-          })
-        }
 
         break
       case 'customer.updated':

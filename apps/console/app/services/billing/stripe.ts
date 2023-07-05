@@ -1,4 +1,6 @@
 import { InternalServerError } from '@proofzero/errors'
+import { ReconcileAppsSubscriptionsOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/reconcileAppSubscriptions'
+import { ServicePlanType } from '@proofzero/types/account'
 import { AccountURN } from '@proofzero/urns/account'
 import { redirect } from '@remix-run/cloudflare'
 import Stripe from 'stripe'
@@ -218,5 +220,72 @@ export const getInvoices = async ({ customerID }: GetInvoicesParams) => {
   return {
     invoices,
     upcomingInvoices,
+  }
+}
+
+export const reconcileAppSubscriptions = async ({
+  subscriptionID,
+  accountURN,
+  starbaseClient,
+  accountClient,
+  addressClient,
+}: {
+  subscriptionID: string
+  accountURN: AccountURN
+  starbaseClient: any
+  accountClient: any
+  addressClient: any
+}) => {
+  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+    apiVersion: '2022-11-15',
+  })
+
+  const subItems = await stripeClient.subscriptionItems.list({
+    subscription: subscriptionID,
+  })
+
+  const planQuantities = subItems.data
+    .map((si) => ({
+      priceID: si.price.id,
+      quantity: si.quantity,
+    }))
+    .filter((pq) => pq.quantity != null)
+
+  const priceIdToPlanTypeDict = {
+    [STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
+  }
+
+  const { email: billingEmail } =
+    await accountClient.getStripePaymentData.query({
+      accountURN,
+    })
+
+  let reconciliations: ReconcileAppsSubscriptionsOutput = []
+  for (const pq of planQuantities) {
+    const planReconciliations =
+      await starbaseClient.reconcileAppSubscriptions.mutate({
+        accountURN: accountURN,
+        count: pq.quantity,
+        plan: priceIdToPlanTypeDict[pq.priceID],
+      })
+
+    reconciliations = reconciliations.concat(planReconciliations)
+
+    await accountClient.updateEntitlements.mutate({
+      accountURN: accountURN,
+      subscriptionID: subscriptionID,
+      quantity: pq.quantity,
+      type: ServicePlanType.PRO,
+    })
+  }
+
+  if (reconciliations.length > 0) {
+    await addressClient.sendReconciliationNotification.query({
+      billingEmail,
+      apps: reconciliations.map((app) => ({
+        devEmail: app.devEmail,
+        plan: app.plan,
+      })),
+    })
   }
 }

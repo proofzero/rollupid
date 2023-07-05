@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { Context } from '../context'
 import { ServicePlanType } from '@proofzero/types/account'
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
-import { EDGE_PAYS_APP } from '@proofzero/types/graph'
+import { EDGE_HAS_REFERENCE_TO, EDGE_PAYS_APP } from '@proofzero/types/graph'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 
@@ -15,13 +15,25 @@ type ReconcileAppSubscriptionsInput = z.infer<
   typeof ReconcileAppSubscriptionsInputSchema
 >
 
+export const ReconcileAppsSubscriptionsOutputSchema = z.array(
+  z.object({
+    appURN: z.string(),
+    clientID: z.string(),
+    plan: z.nativeEnum(ServicePlanType),
+    devEmail: z.string().optional(),
+  })
+)
+export type ReconcileAppsSubscriptionsOutput = z.infer<
+  typeof ReconcileAppsSubscriptionsOutputSchema
+>
+
 export const reconcileAppSubscriptions = async ({
   input,
   ctx,
 }: {
   input: ReconcileAppSubscriptionsInput
   ctx: Context
-}): Promise<void> => {
+}): Promise<ReconcileAppsSubscriptionsOutput> => {
   const { accountURN, plan, count } = input
 
   const { edges } = await ctx.edges.getEdges.query({
@@ -31,6 +43,7 @@ export const reconcileAppSubscriptions = async ({
     },
   })
 
+  const reconciledApps = []
   const apps = []
   for (const edge of edges) {
     const clientID = ApplicationURNSpace.decode(edge.dst.baseUrn)
@@ -38,9 +51,22 @@ export const reconcileAppSubscriptions = async ({
 
     const appDetails = await appDO.class.getDetails()
     if (appDetails.createdTimestamp != null) {
+      const { edges: contactEdges } = await ctx.edges.getEdges.query({
+        query: {
+          src: { baseUrn: edge.dst.baseUrn },
+          tag: EDGE_HAS_REFERENCE_TO,
+        },
+      })
+
+      let devEmail
+      if (contactEdges[0]) {
+        devEmail = contactEdges[0].dst.qc.alias
+      }
+
       apps.push({
         ...appDetails,
         appURN: edge.dst.baseUrn,
+        devEmail,
       })
     }
   }
@@ -53,6 +79,8 @@ export const reconcileAppSubscriptions = async ({
       .map((app) => ({
         appURN: app.appURN,
         clientID: app.clientId,
+        devEmail: app.devEmail,
+        plan,
       }))
 
     for (const app of targetApps) {
@@ -67,6 +95,10 @@ export const reconcileAppSubscriptions = async ({
         ctx.StarbaseApp
       )
       await appDO.class.deleteAppPlan()
+
+      reconciledApps.push(app)
     }
   }
+
+  return reconciledApps
 }

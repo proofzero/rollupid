@@ -294,3 +294,33 @@ export const EmailTemplateExpiredSubscription = (
 
   return EmailTemplateBase(params, content, subject)
 }
+
+export const EmailTemplateBillingReconciledEntitlements = (
+  params: EmailTemplateParams
+): EmailContent => {
+  const content = `<div class="heading">RollupId subscription has been reconciled</div>
+  <p>
+    Something something darkside happens
+  </p>
+  <p>
+    Have you ever heard the story of Darh Plagueis the wise?
+  </p>
+  `
+
+  return EmailTemplateBase(params, content)
+}
+
+export const EmailTemplateDevReconciledEntitlements = (
+  params: EmailTemplateParams
+): EmailContent => {
+  const content = `<div class="heading">RollupId subscription has been reconciled</div>
+  <p>
+    Something something darkside happens
+  </p>
+  <p>
+    Have you ever heard the story of Darh Plagueis the wise?
+  </p>
+  `
+
+  return EmailTemplateBase(params, content)
+}
