@@ -129,7 +129,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     if (subscriptionID) {
       const stripeInvoices = await getInvoices({
         customerID: spd.customerID,
-        subscriptionID,
       })
 
       invoices = stripeInvoices.invoices.data.map((i) => ({
@@ -138,12 +137,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         status: i.status,
         url: i.hosted_invoice_url ?? undefined,
       }))
-      invoices = invoices.concat({
-        amount: stripeInvoices.upcomingInvoices.lines.data[0].amount / 100,
-        timestamp:
-          stripeInvoices.upcomingInvoices.lines.data[0].period.start * 1000,
-        status: 'scheduled',
-      })
+
+      if (stripeInvoices.upcomingInvoices) {
+        invoices = invoices.concat({
+          amount: stripeInvoices.upcomingInvoices.lines.data[0].amount / 100,
+          timestamp:
+            stripeInvoices.upcomingInvoices.lines.data[0].period.start * 1000,
+          status: 'scheduled',
+        })
+      }
     }
 
     return json<LoaderData>(

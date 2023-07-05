@@ -66,7 +66,7 @@ export const reconcileAppSubscriptions = async ({
         app.clientID,
         ctx.StarbaseApp
       )
-      await appDO.class.setAppPlan(ServicePlanType.FREE)
+      await appDO.class.deleteAppPlan()
     }
   }
 }

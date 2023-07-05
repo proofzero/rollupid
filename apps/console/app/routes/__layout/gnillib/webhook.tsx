@@ -110,10 +110,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           })
         }
 
-        const stripeClient = new Stripe(STRIPE_API_SECRET, {
-          apiVersion: '2022-11-15',
-        })
-
         const subItems = await stripeClient.subscriptionItems.list({
           subscription: id,
         })
