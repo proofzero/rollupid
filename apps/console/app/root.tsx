@@ -91,6 +91,7 @@ export type LoaderData = {
     REMIX_DEV_SERVER_WS_PORT?: number
     WALLET_CONNECT_PROJECT_ID: string
   }
+  accountURN: AccountURN
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -162,6 +163,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           WALLET_CONNECT_PROJECT_ID,
         },
         displayName,
+        accountURN,
       })
     } catch (error) {
       console.error({ error })
@@ -186,7 +188,7 @@ export default function App() {
     api_host: loaderData.ENV.POSTHOG_HOST,
   }
 
-  const { apps, avatarUrl, PASSPORT_URL, displayName } = loaderData
+  const { apps, avatarUrl, PASSPORT_URL, displayName, accountURN } = loaderData
 
   useEffect(() => {
     if (GATag) {
@@ -231,10 +233,26 @@ export default function App() {
             apiKey={loaderData.ENV.POSTHOG_PUBLIC_KEY}
             options={options}
           >
-            <Outlet context={{ apps, avatarUrl, PASSPORT_URL, displayName }} />
+            <Outlet
+              context={{
+                apps,
+                avatarUrl,
+                PASSPORT_URL,
+                displayName,
+                accountURN,
+              }}
+            />
           </PostHogProvider>
         ) : (
-          <Outlet context={{ apps, avatarUrl, PASSPORT_URL, displayName }} />
+          <Outlet
+            context={{
+              apps,
+              avatarUrl,
+              PASSPORT_URL,
+              displayName,
+              accountURN,
+            }}
+          />
         )}
         <ScrollRestoration nonce={nonce} />
         <script

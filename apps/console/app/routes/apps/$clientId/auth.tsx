@@ -42,6 +42,8 @@ import type { notificationHandlerType } from '~/types'
 import { SCOPE_SMART_CONTRACT_WALLETS } from '@proofzero/security/scopes'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { usePostHog } from 'posthog-js/react'
+import { type AccountURN } from '@proofzero/urns/account'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -233,14 +235,22 @@ export default function AppDetailIndexPage() {
   const submit = useSubmit()
   const actionData = useActionData()
   const outletContextData = useOutletContext<{
+    accountURN: AccountURN
     notificationHandler: notificationHandlerType
     appDetails: appDetailsProps
     rotationResult: any
     paymaster: PaymasterType
     appContactAddress?: AddressURN
   }>()
-  const { appContactAddress, paymaster } = outletContextData
+  const {
+    appContactAddress,
+    paymaster,
+    accountURN,
+    notificationHandler,
+    appDetails,
+  } = outletContextData
   const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
+  const posthog = usePostHog()
 
   const ref = useRef(null)
   const [multiselectComponentWidth, setMultiselectComponentWidth] = useState(0)
@@ -273,7 +283,6 @@ export default function AppDetailIndexPage() {
   const [isImgUploading, setIsImgUploading] = useState(false)
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
 
-  const { notificationHandler, appDetails } = outletContextData
   const rotatedSecret =
     outletContextData?.rotationResult?.rotatedClientSecret ||
     actionData?.rotatedSecret
@@ -324,6 +333,14 @@ export default function AppDetailIndexPage() {
                 type="submit"
                 btnType="primary-alt"
                 disabled={!isFormChanged}
+                onClick={() => {
+                  if (appDetails.published) {
+                    posthog?.capture('app_published', {
+                      accountURN,
+                      clientId: appDetails.clientId,
+                    })
+                  }
+                }}
               >
                 Save
               </Button>

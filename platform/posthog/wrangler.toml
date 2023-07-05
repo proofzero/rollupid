@@ -1,0 +1,29 @@
+name = "posthog"
+main = "src/index.ts"
+compatibility_date = "2023-05-18"
+workers_dev = false
+node_compat = true
+
+[dev]
+port = 20210
+inspector_port = 21210
+local_protocol = "http"
+
+
+[env.dev]
+durable_objects.bindings = [
+]
+services = [
+]
+
+[env.next]
+durable_objects.bindings = [
+]
+services = [
+]
+
+[env.current]
+durable_objects.bindings = [
+]
+services = [
+]
