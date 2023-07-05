@@ -60,7 +60,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const entitlements = await accountClient.getEntitlements.query()
+    const entitlements = await accountClient.getEntitlements.query({
+      accountURN,
+    })
     const paymentData = await accountClient.getStripePaymentData.query({
       accountURN,
     })
@@ -105,7 +107,9 @@ const processUpdateOp = async (
     ...traceHeader,
   })
 
-  const entitlements = await accountClient.getEntitlements.query()
+  const entitlements = await accountClient.getEntitlements.query({
+    accountURN,
+  })
 
   const apps = await starbaseClient.listApps.query()
   const allotedApps = apps.filter((a) => a.appPlan === plan).length
@@ -148,7 +152,9 @@ const processPurchaseOp = async (
     ...traceHeader,
   })
 
-  const entitlements = await accountClient.getEntitlements.query()
+  const entitlements = await accountClient.getEntitlements.query({
+    accountURN,
+  })
 
   const paymentData = await accountClient.getStripePaymentData.query({
     accountURN,

@@ -6,10 +6,12 @@ import Stripe from 'stripe'
 import createAccountClient from '@proofzero/platform-clients/account'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import createAddressClient from '@proofzero/platform-clients/address'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { type AccountURN } from '@proofzero/urns/account'
 import { ServicePlanType } from '@proofzero/types/account'
+
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { updateSubscriptionMetadata } from '~/services/billing/stripe'
+import { RollupError } from '@proofzero/errors'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -44,16 +46,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       whSecret
     )
 
+    const priceIdToPlanTypeDict = {
+      [STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
+    }
+
     switch (event.type) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
-        const {
-          id,
-          quantity,
-          metadata: subMeta,
-        } = event.data.object as {
+        const { id, metadata: subMeta } = event.data.object as {
           id: string
-          quantity: number
           metadata: {
             accountURN: AccountURN
             handled?: string | null
@@ -100,15 +101,44 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           return null
         }
 
-        await accountClient.updateEntitlements.mutate({
+        const entitlements = await accountClient.getEntitlements.query({
           accountURN: subMeta.accountURN,
-          subscriptionID: id,
-          quantity,
-          type: ServicePlanType.PRO,
+        })
+        if (entitlements?.subscriptionID !== id) {
+          throw new RollupError({
+            message: `Subscription ID ${id} does not match entitlements subscription ID ${entitlements?.subscriptionID}`,
+          })
+        }
+
+        const stripeClient = new Stripe(STRIPE_API_SECRET, {
+          apiVersion: '2022-11-15',
         })
 
-        break
+        const subItems = await stripeClient.subscriptionItems.list({
+          subscription: id,
+        })
 
+        const planQuantities = subItems.data.map((si) => ({
+          priceID: si.price.id,
+          quantity: si.quantity,
+        }))
+
+        for (const pq of planQuantities) {
+          await starbaseClient.reconcileAppSubscriptions.mutate({
+            accountURN: subMeta.accountURN,
+            count: pq.quantity!,
+            plan: priceIdToPlanTypeDict[pq.priceID],
+          })
+
+          await accountClient.updateEntitlements.mutate({
+            accountURN: subMeta.accountURN,
+            subscriptionID: id,
+            quantity: pq.quantity!,
+            type: priceIdToPlanTypeDict[pq.priceID],
+          })
+        }
+
+        break
       case 'customer.updated':
         const { invoice_settings, metadata: cusMeta } = event.data.object as {
           id: string

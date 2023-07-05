@@ -22,6 +22,7 @@ import {
   requireJWT,
 } from '~/utilities/session.server'
 import createAccountClient from '@proofzero/platform-clients/account'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
@@ -71,6 +72,7 @@ import {
 } from '~/services/billing/stripe'
 import { useHydrated } from 'remix-utils'
 import _ from 'lodash'
+import Stripe from 'stripe'
 
 type LoaderData = {
   paymentData?: PaymentData
@@ -100,8 +102,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const { plans, subscriptionID } =
-      await accountClient.getEntitlements.query()
+    const { plans, subscriptionID } = await accountClient.getEntitlements.query(
+      {
+        accountURN,
+      }
+    )
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
     const successToast = flashSession.get('success_toast')
@@ -126,8 +131,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         customerID: spd.customerID,
         subscriptionID,
       })
-
-      console.log(JSON.stringify(stripeInvoices.invoices, null, 2))
 
       invoices = stripeInvoices.invoices.data.map((i) => ({
         amount: i.total / 100,
@@ -176,6 +179,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
+    const starbaseClient = createStarbaseClient(Starbase, {
+      ...getAuthzHeaderConditionallyFromToken(undefined),
+      ...traceHeader,
+    })
+
     const fd = await request.formData()
     const { customerID, quantity, txType } = JSON.parse(
       fd.get('payload') as string
@@ -185,7 +193,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       txType: 'buy' | 'remove'
     }
 
-    const entitlements = await accountClient.getEntitlements.query()
+    const entitlements = await accountClient.getEntitlements.query({
+      accountURN,
+    })
 
     let sub
     if (!entitlements.subscriptionID) {
@@ -205,12 +215,37 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    await accountClient.updateEntitlements.mutate({
-      accountURN: accountURN,
-      subscriptionID: sub.id,
-      quantity: +quantity,
-      type: ServicePlanType.PRO,
+    const stripeClient = new Stripe(STRIPE_API_SECRET, {
+      apiVersion: '2022-11-15',
     })
+
+    const subItems = await stripeClient.subscriptionItems.list({
+      subscription: sub.id,
+    })
+
+    const planQuantities = subItems.data.map((si) => ({
+      priceID: si.price.id,
+      quantity: si.quantity,
+    }))
+
+    const priceIdToPlanTypeDict = {
+      [STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
+    }
+
+    for (const pq of planQuantities) {
+      await starbaseClient.reconcileAppSubscriptions.mutate({
+        accountURN: accountURN,
+        count: pq.quantity!,
+        plan: priceIdToPlanTypeDict[pq.priceID],
+      })
+
+      await accountClient.updateEntitlements.mutate({
+        accountURN: accountURN,
+        subscriptionID: sub.id,
+        quantity: +quantity,
+        type: ServicePlanType.PRO,
+      })
+    }
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
     if (txType === 'buy') {
@@ -503,7 +538,6 @@ const RemoveEntitelmentModal = ({
                         >
                           {Array.apply(null, Array(entitlements + 1)).map(
                             (_, i) => {
-                              console.log(i)
                               return (
                                 <Listbox.Option
                                   key={i}

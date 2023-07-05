@@ -120,6 +120,10 @@ import {
   DeleteSubscriptionPlansInput,
   deleteSubscriptionPlans,
 } from './methods/deleteSubscriptionPlans'
+import {
+  reconcileAppSubscriptions,
+  ReconcileAppSubscriptionsInputSchema,
+} from './methods/reconcileAppSubscriptions'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -339,6 +343,11 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(DeleteSubscriptionPlansInput)
     .mutation(deleteSubscriptionPlans),
+  reconcileAppSubscriptions: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(ReconcileAppSubscriptionsInputSchema)
+    .mutation(reconcileAppSubscriptions),
 })
 
 export type StarbaseRouter = typeof appRouter

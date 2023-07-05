@@ -311,7 +311,7 @@ export default class StarbaseApp extends DOProxy {
     return this.state.storage.put('emailOTPTheme', theme)
   }
 
-  async setAppPlan(planType: ServicePlanType | undefined): Promise<void> {
+  async setAppPlan(planType: ServicePlanType): Promise<void> {
     return this.state.storage.put('appPlan', planType)
   }
 
