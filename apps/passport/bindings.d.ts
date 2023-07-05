@@ -49,8 +49,8 @@ declare global {
     SECRET_DISCORD_OAUTH_CLIENT_SECRET: string
     INTERNAL_DISCORD_OAUTH_CALLBACK_URL: string
 
-    REACT_APP_PUBLIC_POSTHOG_KEY: string
-    REACT_APP_PUBLIC_POSTHOG_HOST: string
+    POSTHOG_PUBLIC_KEY: string
+    POSTHOG_HOST: string
   }
 
   interface AuthzParams {

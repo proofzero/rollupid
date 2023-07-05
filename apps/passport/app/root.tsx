@@ -134,10 +134,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         appProps,
         flashes,
         ENV: {
-          REACT_APP_PUBLIC_POSTHOG_KEY:
-            context.env.REACT_APP_PUBLIC_POSTHOG_KEY,
-          REACT_APP_PUBLIC_POSTHOG_HOST:
-            context.env.REACT_APP_PUBLIC_POSTHOG_HOST,
+          POSTHOG_PUBLIC_KEY: context.env.POSTHOG_PUBLIC_KEY,
+          POSTHOG_HOST: context.env.POSTHOG_HOST,
           PROFILE_APP_URL: context.env.PROFILE_APP_URL,
           INTERNAL_GOOGLE_ANALYTICS_TAG:
             context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
@@ -172,7 +170,7 @@ export default function App() {
   const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
 
   const options = {
-    api_host: browserEnv.ENV.REACT_APP_PUBLIC_POSTHOG_HOST,
+    api_host: browserEnv.ENV.POSTHOG_HOST,
   }
 
   const remixDevPort = browserEnv.ENV.REMIX_DEV_SERVER_WS_PORT
@@ -281,7 +279,7 @@ export default function App() {
           >
             {typeof window !== 'undefined' ? (
               <PostHogProvider
-                apiKey={browserEnv.ENV.REACT_APP_PUBLIC_POSTHOG_KEY}
+                apiKey={browserEnv.ENV.POSTHOG_PUBLIC_KEY}
                 options={options}
               >
                 <Outlet context={{ appProps: browserEnv.appProps }} />

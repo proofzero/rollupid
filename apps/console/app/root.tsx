@@ -85,8 +85,8 @@ export type LoaderData = {
   PASSPORT_URL: string
   displayName: string
   ENV: {
-    REACT_APP_PUBLIC_POSTHOG_KEY: string
-    REACT_APP_PUBLIC_POSTHOG_HOST: string
+    POSTHOG_PUBLIC_KEY: string
+    POSTHOG_HOST: string
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
     REMIX_DEV_SERVER_WS_PORT?: number
     WALLET_CONNECT_PROJECT_ID: string
@@ -152,8 +152,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         avatarUrl,
         PASSPORT_URL,
         ENV: {
-          REACT_APP_PUBLIC_POSTHOG_KEY,
-          REACT_APP_PUBLIC_POSTHOG_HOST,
+          POSTHOG_PUBLIC_KEY,
+          POSTHOG_HOST,
           INTERNAL_GOOGLE_ANALYTICS_TAG,
           REMIX_DEV_SERVER_WS_PORT:
             process.env.NODE_ENV === 'development'
@@ -183,7 +183,7 @@ export default function App() {
   useTreeshakeHack(remixDevPort)
 
   const options = {
-    api_host: loaderData.ENV.REACT_APP_PUBLIC_POSTHOG_HOST,
+    api_host: loaderData.ENV.POSTHOG_HOST,
   }
 
   const { apps, avatarUrl, PASSPORT_URL, displayName } = loaderData
@@ -228,7 +228,7 @@ export default function App() {
         {transition.state !== 'idle' ? <Loader /> : null}
         {typeof window !== 'undefined' ? (
           <PostHogProvider
-            apiKey={loaderData.ENV.REACT_APP_PUBLIC_POSTHOG_KEY}
+            apiKey={loaderData.ENV.POSTHOG_PUBLIC_KEY}
             options={options}
           >
             <Outlet context={{ apps, avatarUrl, PASSPORT_URL, displayName }} />
