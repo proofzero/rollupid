@@ -307,7 +307,7 @@ export const EmailTemplateBillingReconciledEntitlements = (
   </p>
   `
 
-  return EmailTemplateBase(params, content)
+  return EmailTemplateBase(params, content, '')
 }
 
 export const EmailTemplateDevReconciledEntitlements = (
@@ -322,5 +322,5 @@ export const EmailTemplateDevReconciledEntitlements = (
   </p>
   `
 
-  return EmailTemplateBase(params, content)
+  return EmailTemplateBase(params, content, '')
 }
