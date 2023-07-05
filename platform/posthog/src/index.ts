@@ -24,9 +24,12 @@ async function retrieveStatic(
     'Access-Control-Allow-Origin',
     event.request.headers.get('Origin') as string
   )
+  response.headers.set(
+    'Access-Control-Allow-Origin',
+    event.request.headers.get('Origin') as string
+  )
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type')
-  response.headers.set('Access-Control-Allow-Credentials', 'true')
   response.headers.set('Access-Control-Allow-Credentials', 'true')
   return response
 }
@@ -40,6 +43,10 @@ async function forwardRequest(
   let response = await fetch(`https://${API_HOST}${pathname}`, request)
 
   response = new Response(response.body, response)
+  response.headers.set(
+    'Access-Control-Allow-Origin',
+    request.headers.get('Origin') as string
+  )
   response.headers.set(
     'Access-Control-Allow-Origin',
     request.headers.get('Origin') as string
