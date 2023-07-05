@@ -55,11 +55,15 @@ export type EmailTemplateParams = {
   appName: string
 }
 
-const EmailTemplateBase = (params: EmailTemplateParams, content: string) => {
+const EmailTemplateBase = (
+  params: EmailTemplateParams,
+  content: string,
+  subject: string
+) => {
   const { logoURL, address, contactURL, termsURL, privacyURL, appName } = params
   return {
     contentType: 'text/html' as EmailContentType,
-    subject: `Your ${appName ?? `Rollup ID`} one-time passcode`,
+    subject,
     body: `<!DOCTYPE html>
     <html>
       <head>
@@ -267,7 +271,10 @@ export const EmailTemplateOTP = (
               about - you can safely ignore it.
             </p>
             `
-  return EmailTemplateBase(params, content)
+
+  const subject = `Your ${params.appName ?? `Rollup ID`} one-time passcode`
+
+  return EmailTemplateBase(params, content, subject)
 }
 
 export const EmailTemplateExpiredSubscription = (
@@ -283,5 +290,7 @@ export const EmailTemplateExpiredSubscription = (
   </p>
   `
 
-  return EmailTemplateBase(params, content)
+  const subject = `Your Rollup ID subscription has been cancelled`
+
+  return EmailTemplateBase(params, content, subject)
 }
