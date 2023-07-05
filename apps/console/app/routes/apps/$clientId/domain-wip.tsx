@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 
+import { HiOutlineCog } from 'react-icons/hi'
 import { RiLoader5Fill } from 'react-icons/ri'
 import { TbInfoCircle } from 'react-icons/tb'
 
@@ -17,11 +18,19 @@ import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 
+import appleIcon from '@proofzero/design-system/src/atoms/providers/Apple'
+import discordIcon from '@proofzero/design-system/src/assets/social_icons/discord.svg'
+import githubIcon from '@proofzero/design-system/src/atoms/providers/Github'
+import googleIcon from '@proofzero/design-system/src/atoms/providers/Google'
+import microsoftIcon from '@proofzero/design-system/src/atoms/providers/Microsoft'
+import twitterIcon from '@proofzero/design-system/src/assets/social_icons/twitter.svg'
+
 import wwwIcon from '@proofzero/design-system/src/assets/www.svg'
 import trashIcon from '@proofzero/design-system/src/assets/trash.svg'
 import reloadIcon from '@proofzero/design-system/src/assets/reload.svg'
 
 import { BadRequestError } from '@proofzero/errors'
+import { OAuthAddressType } from '@proofzero/types/address'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
@@ -134,6 +143,7 @@ export default () => {
           hostname={hostname}
         />
       )}
+      <LoginProviders />
     </section>
   )
 }
@@ -443,4 +453,95 @@ const DeleteModal = ({
       </div>
     </Modal>
   )
+}
+
+type LoginProvidersProps = {}
+
+const LoginProviders = (props: LoginProvidersProps = {}) => (
+  <div>
+    <div className="py-4 space-x-3">
+      <Text size="lg" weight="semibold" className="text-gray-800">
+        Login Providers
+      </Text>
+    </div>
+    <div className="space-y-2">
+      <LoginProvider type={OAuthAddressType.GitHub} />
+      <LoginProvider type={OAuthAddressType.Twitter} />
+      <LoginProvider type={OAuthAddressType.Google} />
+      <LoginProvider type={OAuthAddressType.Apple} />
+      <LoginProvider type={OAuthAddressType.Discord} />
+    </div>
+  </div>
+)
+
+type LoginProviderProps = {
+  type: OAuthAddressType
+}
+
+const LoginProvider = ({ type }: LoginProviderProps) => (
+  <div className="flex justify-between bg-white box-border border rounded-lg border-gray-200">
+    <div className="flex flex-row">
+      <div className="w-16 h-16 flex justify-center items-center">
+        <img
+          className="w-8 h-8"
+          src={getLoginProviderIconUrl(type)}
+          alt="Login Provider"
+        />
+      </div>
+      <div className="flex flex-col justify-evenly py-2">
+        <Text size="sm" weight="medium" className="text-gray-700">
+          {getLoginProviderTitle(type)}
+        </Text>
+        <Text size="xs" className="text-orange-500">
+          Not Configured
+        </Text>
+      </div>
+    </div>
+    <div className="p-4">
+      <Button
+        type="submit"
+        btnSize="sm"
+        btnType="secondary-alt"
+        disabled={false}
+        className="flex justify-around align-middle w-[124px] h-[38px]"
+      >
+        <HiOutlineCog className="inline-block text-xl font-normal text-gray-400" />
+        <span>Configure</span>
+      </Button>
+    </div>
+  </div>
+)
+
+export const getLoginProviderTitle = (type: OAuthAddressType) => {
+  switch (type) {
+    case OAuthAddressType.Apple:
+      return 'Apple'
+    case OAuthAddressType.Discord:
+      return 'Discord'
+    case OAuthAddressType.GitHub:
+      return 'GitHub'
+    case OAuthAddressType.Google:
+      return 'Google'
+    case OAuthAddressType.Microsoft:
+      return 'Microsoft'
+    case OAuthAddressType.Twitter:
+      return 'Twitter'
+  }
+}
+
+export const getLoginProviderIconUrl = (type: OAuthAddressType) => {
+  switch (type) {
+    case OAuthAddressType.Apple:
+      return appleIcon
+    case OAuthAddressType.Discord:
+      return discordIcon
+    case OAuthAddressType.GitHub:
+      return githubIcon
+    case OAuthAddressType.Google:
+      return googleIcon
+    case OAuthAddressType.Microsoft:
+      return microsoftIcon
+    case OAuthAddressType.Twitter:
+      return twitterIcon
+  }
 }
