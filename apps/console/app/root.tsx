@@ -184,10 +184,6 @@ export default function App() {
   const remixDevPort = loaderData.ENV.REMIX_DEV_SERVER_WS_PORT
   useTreeshakeHack(remixDevPort)
 
-  const options = {
-    api_host: loaderData.ENV.POSTHOG_HOST,
-  }
-
   const { apps, avatarUrl, PASSPORT_URL, displayName, accountURN } = loaderData
 
   useEffect(() => {
