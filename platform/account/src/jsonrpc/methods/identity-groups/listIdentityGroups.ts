@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { Context } from '../../../context'
 import {
   AccountURNInput,
+  AddressURNInput,
   IdentityGroupURNValidator,
 } from '@proofzero/platform-middleware/inputValidators'
 import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
@@ -19,6 +20,12 @@ export const ListIdentityGroupsOutputSchema = z.array(
   z.object({
     URN: IdentityGroupURNValidator,
     name: z.string(),
+    members: z.array(
+      z.object({
+        URN: AddressURNInput,
+        joinTimestamp: z.number().nullable(),
+      })
+    ),
   })
 )
 export type ListIdentityGroupsOutput = z.infer<
@@ -53,27 +60,53 @@ export const listIdentityGroups = async ({
       tag: EDGE_ADDRESS,
     },
   })
+
   const addressURNList = addressEdges
     .map((edge) => edge.dst.baseUrn)
     .concat(primaryAddressURN)
 
-  const identityGroupEdges = []
-  for (const addressURN of addressURNList) {
-    const { edges: groupEdges } = await ctx.edges.getEdges.query({
-      query: {
-        src: {
-          baseUrn: addressURN,
+  const identityGroupResults = await Promise.all(
+    addressURNList.map((addressURN) =>
+      ctx.edges.getEdges.query({
+        query: {
+          src: {
+            baseUrn: addressURN,
+          },
+          tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
         },
-        tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
-      },
-    })
-    identityGroupEdges.push(...groupEdges)
-  }
+      })
+    )
+  )
+  const identityGroupEdges = identityGroupResults.flatMap(
+    (result) => result.edges
+  )
 
-  const identityGroups: ListIdentityGroupsOutput = identityGroupEdges.map(
-    (edge) => ({
-      URN: edge.dst.baseUrn as IdentityGroupURN,
-      name: edge.dst.qc.name,
+  const identityGroups: ListIdentityGroupsOutput = await Promise.all(
+    identityGroupEdges.map(async (edge) => {
+      const URN = edge.dst.baseUrn as IdentityGroupURN
+      const name = edge.dst.qc.name
+
+      const { edges: groupMemberEdges } = await ctx.edges.getEdges.query({
+        query: {
+          tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
+          dst: {
+            baseUrn: URN,
+          },
+        },
+      })
+
+      const mappedMembers = groupMemberEdges.map((edge) => ({
+        URN: edge.src.baseUrn as AddressURN,
+        joinTimestamp: edge.createdTimestamp
+          ? new Date((edge.createdTimestamp as string) + ' UTC').getTime()
+          : null,
+      }))
+
+      return {
+        URN,
+        name,
+        members: mappedMembers,
+      }
     })
   )
 
