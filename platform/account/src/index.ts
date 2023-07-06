@@ -8,6 +8,7 @@ import { serverOnError as onError } from '@proofzero/utils/trpc'
 import { createContext } from './context'
 import { appRouter } from './jsonrpc/router'
 import Account from './nodes/account'
+import IdentityGroup from './nodes/identity-group'
 import type { Environment } from './types'
 
 export default {
@@ -22,4 +23,4 @@ export default {
     })
   },
 }
-export { Account }
+export { Account, IdentityGroup }

@@ -17,6 +17,7 @@ import {
 interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
   Account: DurableObjectNamespace
+  IdentityGroup: DurableObjectNamespace
   Edges: Fetcher
   Analytics: AnalyticsEngineDataset
   ServiceDeploymentMetadata: DeploymentMetadata

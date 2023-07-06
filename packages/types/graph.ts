@@ -91,3 +91,6 @@ export interface NodeFilter {
 
 export const EDGE_HAS_REFERENCE_TO: EdgeURN = EdgeSpace.urn('has/refTo')
 export const EDGE_PAYS_APP: EdgeURN = EdgeSpace.urn('pays/app')
+export const EDGE_MEMBER_OF_IDENTITY_GROUP: EdgeURN = EdgeSpace.urn(
+  'memberOf/identity-group'
+)

@@ -5,7 +5,10 @@ node_compat = true
 workers_dev = false
 logpush = true
 
-durable_objects.bindings = [{ name = "Account", class_name = "Account" }]
+durable_objects.bindings = [
+  { name = "Account", class_name = "Account" },
+  { name = "IdentityGroup", class_name = "IdentityGroup" }
+]
 services = [{ binding = "Edges", service = "edges" }]
 
 [[migrations]]
@@ -28,7 +31,10 @@ inspector_port = 11201
 local_protocol = "http"
 
 [env.dev]
-durable_objects.bindings = [{ name = "Account", class_name = "Account" }]
+durable_objects.bindings = [
+  { name = "Account", class_name = "Account" },
+  { name = "IdentityGroup", class_name = "IdentityGroup" }
+]
 services = [{ binding = "Edges", service = "edges-dev" }]
 
 analytics_engine_datasets = [
@@ -38,7 +44,10 @@ analytics_engine_datasets = [
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.next]
-durable_objects.bindings = [{ name = "Account", class_name = "Account" }]
+durable_objects.bindings = [
+  { name = "Account", class_name = "Account" },
+  { name = "IdentityGroup", class_name = "IdentityGroup" }
+]
 services = [{ binding = "Edges", service = "edges-next" }]
 
 analytics_engine_datasets = [
@@ -48,7 +57,10 @@ analytics_engine_datasets = [
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.current]
-durable_objects.bindings = [{ name = "Account", class_name = "Account" }]
+durable_objects.bindings = [
+  { name = "Account", class_name = "Account" },
+  { name = "IdentityGroup", class_name = "IdentityGroup" }
+]
 services = [{ binding = "Edges", service = "edges-current" }]
 
 analytics_engine_datasets = [

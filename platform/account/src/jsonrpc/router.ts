@@ -59,6 +59,15 @@ import {
   CancelServicePlansInput,
   cancelServicePlans,
 } from './methods/cancelServicePlans'
+import {
+  CreateIdentityGroupInputSchema,
+  createIdentityGroup,
+} from './methods/identity-groups/createIdentityGroup'
+import {
+  ListIdentityGroupsInputSchema,
+  ListIdentityGroupsOutputSchema,
+  listIdentityGroups,
+} from './methods/identity-groups/listIdentityGroups'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -179,4 +188,15 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(CancelServicePlansInput)
     .mutation(cancelServicePlans),
+  createIdentityGroup: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(CreateIdentityGroupInputSchema)
+    .mutation(createIdentityGroup),
+  listIdentityGroups: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(ListIdentityGroupsInputSchema)
+    .output(ListIdentityGroupsOutputSchema)
+    .query(listIdentityGroups),
 })
