@@ -224,6 +224,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       rotatedSecret,
       updatedApp: { published, app: { ...updates } },
       errors,
+      published,
     })
   }
 )
@@ -242,13 +243,8 @@ export default function AppDetailIndexPage() {
     paymaster: PaymasterType
     appContactAddress?: AddressURN
   }>()
-  const {
-    appContactAddress,
-    paymaster,
-    accountURN,
-    notificationHandler,
-    appDetails,
-  } = outletContextData
+  const { appContactAddress, paymaster, notificationHandler, appDetails } =
+    outletContextData
   const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
   const posthog = usePostHog()
 
@@ -282,13 +278,19 @@ export default function AppDetailIndexPage() {
   const [isFormChanged, setIsFormChanged] = useState(false)
   const [isImgUploading, setIsImgUploading] = useState(false)
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
-  const [appToPublish, setAppToPublish] = useState(false)
 
   const rotatedSecret =
     outletContextData?.rotationResult?.rotatedClientSecret ||
     actionData?.rotatedSecret
 
-  if (actionData?.updatedApp) Object.assign(appDetails, actionData.updatedapp)
+  useEffect(() => {
+    if (actionData?.updatedApp) Object.assign(appDetails, actionData.updatedapp)
+    if (actionData?.published) {
+      posthog?.capture('app_published', {
+        client_id: appDetails.clientId,
+      })
+    }
+  }, [actionData])
 
   const errors = actionData?.errors
 
@@ -334,13 +336,6 @@ export default function AppDetailIndexPage() {
                 type="submit"
                 btnType="primary-alt"
                 disabled={!isFormChanged}
-                onClick={() => {
-                  if (appToPublish) {
-                    posthog?.capture('app_published', {
-                      client_id: appDetails.clientId,
-                    })
-                  }
-                }}
               >
                 Save
               </Button>
@@ -451,7 +446,6 @@ export default function AppDetailIndexPage() {
                       disabled={!appContactAddress}
                       onToggle={() => {
                         ;(setIsFormChanged as (val: boolean) => {})(true)
-                        setAppToPublish(true)
                       }}
                       checked={appDetails.published}
                     />

@@ -8,22 +8,3 @@ node_compat = true
 port = 20210
 inspector_port = 21210
 local_protocol = "http"
-
-
-[env.dev]
-durable_objects.bindings = [
-]
-services = [
-]
-
-[env.next]
-durable_objects.bindings = [
-]
-services = [
-]
-
-[env.current]
-durable_objects.bindings = [
-]
-services = [
-]

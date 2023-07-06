@@ -48,10 +48,7 @@ const Header = ({ pfpUrl }: { pfpUrl: string }) => {
                   return (
                     <NavLink
                       to="/signout"
-                      onClick={() => {
-                        // https://posthog.com/docs/data/identify
-                        posthog.reset()
-                      }}
+                      onClick={() => posthog?.reset()}
                       className={`${active ? 'bg-gray-100' : ''} block px-4 py-2
                        text-sm  hover:bg-gray-100' w-full text-left
                        flex flex-row items-center text-red-500`}

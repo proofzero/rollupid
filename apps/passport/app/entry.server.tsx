@@ -43,8 +43,7 @@ export default function handleRequest(
             'https://*.g.alchemy.com',
             '*.alchemyapi.io',
             '*.google-analytics.com',
-            // Posthog proxy url
-            '*.workers.dev',
+            'https://posthog.rollup.id',
             // Used for Remix WebSocket Live Reaload
             ...(dev ? ['ws://localhost:*/socket'] : []),
           ],

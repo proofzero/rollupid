@@ -2145,10 +2145,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cloudflare/workers-types@npm:^4.20230419.0":
-  version: 4.20230518.0
-  resolution: "@cloudflare/workers-types@npm:4.20230518.0"
-  checksum: 69c861437f1064b860b2a52129ed973f670090a8d2de9f4b205f86f8a2f40caec48b8c7614533c6531875d1fa254fc7d9da3ab52d7a6fff46be0f64079b394dc
+"@cloudflare/workers-types@npm:4.20230628.0":
+  version: 4.20230628.0
+  resolution: "@cloudflare/workers-types@npm:4.20230628.0"
+  checksum: cee386fe7d55dfb658bc623ed8812b0ce1b4ba5f0fb56a4f604285f6c6f2c21fbbffa96475c39bd4f4789db4e3eba2c4aef63fb52603ac682aa67eec77693700
   languageName: node
   linkType: hard
 
@@ -6466,7 +6466,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@proofzero/services.posthog@workspace:platform/posthog"
   dependencies:
-    "@cloudflare/workers-types": ^4.20230419.0
+    "@cloudflare/workers-types": 4.20230628.0
     "@types/node": 18.15.3
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1

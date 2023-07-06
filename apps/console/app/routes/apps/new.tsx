@@ -113,9 +113,7 @@ export default function CreateNewApp() {
                           ? 'flex items-center justify-between transition'
                           : ''
                       }
-                      onClick={() => {
-                        posthog?.capture('new_app_created')
-                      }}
+                      onClick={() => posthog?.capture('new_app_created')}
                       disabled={isSubmitting}
                     >
                       {isSubmitting && (

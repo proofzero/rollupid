@@ -45,8 +45,7 @@ export default function handleRequest(
             'wss://relay.walletconnect.com',
             'https://*.g.alchemy.com',
             'https://upload.imagedelivery.net',
-            // Posthog proxy url
-            '*.workers.dev',
+            'https://posthog.rollup.id',
             // Used for Remix WebSocket Live Reaload
             ...(dev ? ['ws://localhost:*/socket'] : []),
           ],
