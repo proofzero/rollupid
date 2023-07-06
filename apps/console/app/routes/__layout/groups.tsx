@@ -54,35 +54,36 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
 
-    const mappedGroups = []
-    for (const group of groups) {
-      const memberMap = group.members
-        .filter((m) => m.joinTimestamp != null)
-        .reduce(
-          (acc, curr) => ({ ...acc, [curr.URN]: curr }),
-          {} as Record<AddressURN, { URN: AddressURN; joinTimestamp: number }>
+    const mappedGroups = await Promise.all(
+      groups.map(async (group) => {
+        const memberMap = group.members
+          .filter((m) => m.joinTimestamp != null)
+          .reduce(
+            (acc, curr) => ({ ...acc, [curr.URN]: curr }),
+            {} as Record<AddressURN, { URN: AddressURN; joinTimestamp: number }>
+          )
+
+        const memberProfiles = await addressClient.getAddressProfileBatch.query(
+          group.members.map((m) => m.URN)
         )
 
-      const memberProfiles = await addressClient.getAddressProfileBatch.query(
-        group.members.map((m) => m.URN)
-      )
+        const memberModels: GroupMemberModel[] = memberProfiles.map(
+          (profile) => ({
+            URN: profile.id,
+            iconURL: profile.icon!,
+            title: profile.title,
+            address: profile.address,
+            joinTimestamp: memberMap[profile.id].joinTimestamp,
+          })
+        )
 
-      const memberModels: GroupMemberModel[] = memberProfiles.map(
-        (profile) => ({
-          URN: profile.id,
-          iconURL: profile.icon!,
-          title: profile.title,
-          address: profile.address,
-          joinTimestamp: memberMap[profile.id].joinTimestamp,
-        })
-      )
-
-      mappedGroups.push({
-        URN: group.URN,
-        name: group.name,
-        members: memberModels,
+        return {
+          URN: group.URN,
+          name: group.name,
+          members: memberModels,
+        }
       })
-    }
+    )
 
     return json<GroupRootLoaderData>({
       groups: mappedGroups,
