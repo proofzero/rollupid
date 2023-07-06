@@ -30,6 +30,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { NO_OP_ADDRESS_PLACEHOLDER } from '@proofzero/platform.address/src/constants'
 
 import { usePostHog } from 'posthog-js/react'
+import { AccountURNSpace } from '@proofzero/urns/account'
 
 export type AuthorizedAppsModel = {
   clientId: string
@@ -167,7 +168,9 @@ export default function SettingsLayout() {
   } = useLoaderData()
 
   const posthog = usePostHog()
-  posthog?.identify(accountUrn)
+  // need to identify only once
+  if (!AccountURNSpace.is(posthog?.get_distinct_id()))
+    posthog?.identify(accountUrn)
 
   return (
     <Popover className="bg-white lg:bg-gray-50 min-h-[100dvh] relative">
