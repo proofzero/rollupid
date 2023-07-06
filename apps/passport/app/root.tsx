@@ -45,8 +45,8 @@ import type { FLASH_MESSAGE } from './utils/flashMessage.server'
 
 import { getFlashSession, commitFlashSession } from './session.server'
 
-import { PostHogProvider } from 'posthog-js/react'
 import posthog from 'posthog-js'
+import { PostHogProvider } from 'posthog-js/react'
 
 import {
   toast,

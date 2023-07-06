@@ -4,7 +4,6 @@ compatibility_date = "2023-05-18"
 workers_dev = false
 node_compat = true
 
-[dev]
 port = 20210
 inspector_port = 21210
 local_protocol = "http"

@@ -52,8 +52,9 @@ import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHac
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { type ServicePlanType } from '@proofzero/types/account'
 import { BadRequestError } from '@proofzero/errors'
-import { PostHogProvider } from 'posthog-js/react'
 import posthog from 'posthog-js'
+import { PostHogProvider } from 'posthog-js/react'
+
 export const links: LinksFunction = () => {
   return [
     { rel: 'stylesheet', href: tailwindStylesheetUrl },
