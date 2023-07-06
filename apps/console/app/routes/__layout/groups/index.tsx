@@ -6,7 +6,7 @@ import { parseJwt, requireJWT } from '~/utilities/session.server'
 import createAccountClient from '@proofzero/platform-clients/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { ListIdentityGroupsOutput } from '@proofzero/platform/account/src/jsonrpc/methods/identity-groups/listIdentityGroups'
-import { Form, useLoaderData } from '@remix-run/react'
+import { Form, NavLink, useLoaderData } from '@remix-run/react'
 import { BadRequestError } from '@proofzero/errors'
 
 type LoaderData = {
@@ -28,10 +28,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const groups = await accountClient.listIdentityGroups.query({
       accountURN,
-    })
-
-    console.log({
-      groups,
     })
 
     return json<LoaderData>({
@@ -85,7 +81,11 @@ export default () => {
       <section>
         <ul>
           {groups.map((group) => (
-            <li key={group.URN}>{group.name}</li>
+            <li key={group.URN}>
+              <NavLink to={`/groups/${group.URN.split('/')[1]}`}>
+                {group.name}
+              </NavLink>
+            </li>
           ))}
         </ul>
       </section>

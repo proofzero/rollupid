@@ -68,6 +68,11 @@ import {
   ListIdentityGroupsOutputSchema,
   listIdentityGroups,
 } from './methods/identity-groups/listIdentityGroups'
+import {
+  GetIdentityGroupInputSchema,
+  GetIdentityGroupOutputSchema,
+  getIdentityGroup,
+} from './methods/identity-groups/getIdentityGroup'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -199,4 +204,10 @@ export const appRouter = t.router({
     .input(ListIdentityGroupsInputSchema)
     .output(ListIdentityGroupsOutputSchema)
     .query(listIdentityGroups),
+  getIdentityGroup: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetIdentityGroupInputSchema)
+    .output(GetIdentityGroupOutputSchema)
+    .query(getIdentityGroup),
 })
