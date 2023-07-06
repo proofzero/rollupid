@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { Context } from '../../context'
 import { ServicePlanType } from '@proofzero/types/account'
-import { ReconciliationNotificationType } from '../../../../email/src/jsonrpc/methods/sendReconciliationNotification'
+import { ReconciliationNotificationType } from '@proofzero/types/email'
 
 export const SendReconciliationNotificationInput = z.object({
   billingEmail: z.string(),

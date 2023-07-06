@@ -7,11 +7,7 @@ import {
   getDevReconciliationEmailContent,
 } from '../../emailFunctions'
 import { RollupError } from '@proofzero/errors'
-
-export enum ReconciliationNotificationType {
-  Billing = 'BILLING',
-  Dev = 'DEV',
-}
+import { ReconciliationNotificationType } from '@proofzero/types/email'
 
 export const SendReconciliationNotificationMethodInputSchema = z.object({
   email: z.string(),
