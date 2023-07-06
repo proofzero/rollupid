@@ -36,6 +36,8 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import type { IconType } from 'react-icons'
 import { Avatar } from '@proofzero/design-system'
 
+import { usePostHog } from 'posthog-js/react'
+
 // RollupLogo
 // -----------------------------------------------------------------------------
 export const ConsoleLogo = () => {
@@ -77,6 +79,7 @@ export default function SiteMenu(props: RollupMenuProps) {
   let [referenceElement, setReferenceElement] = useState()
   let [popperElement, setPopperElement] = useState()
   let { attributes } = usePopper(referenceElement, popperElement)
+  const posthog = usePostHog()
 
   const submit = useSubmit()
 
@@ -152,6 +155,7 @@ export default function SiteMenu(props: RollupMenuProps) {
                   <button
                     onClick={() => {
                       close()
+                      posthog?.reset()
                       submit(null, { method: 'post', action: 'signout' })
                     }}
                     className={`w-full flex self-center justify-between w-full

@@ -29,6 +29,8 @@ import type { LinksFunction } from '@remix-run/cloudflare'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { NO_OP_ADDRESS_PLACEHOLDER } from '@proofzero/platform.address/src/constants'
 
+import { usePostHog } from 'posthog-js/react'
+
 export type AuthorizedAppsModel = {
   clientId: string
   icon: string
@@ -142,6 +144,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       connectedProfiles: normalizedConnectedProfiles,
       CONSOLE_URL: context.env.CONSOLE_APP_URL,
       primaryAddressURN: accountProfile?.primaryAddressURN,
+      accountUrn,
     })
   }
 )
@@ -160,7 +163,11 @@ export default function SettingsLayout() {
     CONSOLE_URL,
     displayName,
     primaryAddressURN,
+    accountUrn,
   } = useLoaderData()
+
+  const posthog = usePostHog()
+  posthog?.identify(accountUrn)
 
   return (
     <Popover className="bg-white lg:bg-gray-50 min-h-[100dvh] relative">

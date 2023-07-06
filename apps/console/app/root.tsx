@@ -52,7 +52,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { type ServicePlanType } from '@proofzero/types/account'
 import { BadRequestError } from '@proofzero/errors'
 import { PostHogProvider } from 'posthog-js/react'
-
+import posthog from 'posthog-js'
 export const links: LinksFunction = () => {
   return [
     { rel: 'stylesheet', href: tailwindStylesheetUrl },
@@ -85,7 +85,7 @@ export type LoaderData = {
   PASSPORT_URL: string
   displayName: string
   ENV: {
-    POSTHOG_PUBLIC_KEY: string
+    POSTHOG_API_KEY: string
     POSTHOG_HOST: string
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
     REMIX_DEV_SERVER_WS_PORT?: number
@@ -153,7 +153,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         avatarUrl,
         PASSPORT_URL,
         ENV: {
-          POSTHOG_PUBLIC_KEY,
+          POSTHOG_API_KEY,
           POSTHOG_HOST,
           INTERNAL_GOOGLE_ANALYTICS_TAG,
           REMIX_DEV_SERVER_WS_PORT:
@@ -196,6 +196,15 @@ export default function App() {
     }
   }, [location, GATag])
 
+  // https://posthog.com/docs/libraries/react#posthog-provider
+  if (typeof window !== 'undefined') {
+    posthog.init(loaderData.ENV.POSTHOG_API_KEY, {
+      api_host: loaderData.ENV.POSTHOG_HOST,
+    })
+
+    posthog?.identify(accountURN)
+  }
+
   return (
     <html lang="en" className="h-full">
       <head>
@@ -229,10 +238,7 @@ export default function App() {
         )}
         {transition.state !== 'idle' ? <Loader /> : null}
         {typeof window !== 'undefined' ? (
-          <PostHogProvider
-            apiKey={loaderData.ENV.POSTHOG_PUBLIC_KEY}
-            options={options}
-          >
+          <PostHogProvider client={posthog}>
             <Outlet
               context={{
                 apps,

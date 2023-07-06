@@ -13,6 +13,8 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 
+import { usePostHog } from 'posthog-js/react'
+
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const cp = await getAuthzCookieParams(request, context.env)
@@ -42,6 +44,8 @@ export default () => {
   const { appProps } = useOutletContext<{ appProps: GetAppPublicPropsResult }>()
 
   const { dark } = useContext(ThemeContext)
+
+  const posthog = usePostHog()
 
   return (
     <>

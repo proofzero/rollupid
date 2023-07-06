@@ -67,6 +67,24 @@ export const resolveAccountMethod = async ({
     blobs: [ctx.alias, resultURN, eventName],
   } as AnalyticsEngineDataPoint)
 
+  // POSTHOG analytics
+  const url = `${ctx.POSTHOG_HOST}/e/`
+  const body = JSON.stringify({
+    api_key: ctx.POSTHOG_API_KEY,
+    event: eventName,
+    distinct_id: resultURN,
+    properties: {},
+  })
+  const init = {
+    body: body,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }
+
+  await fetch(url, init)
+
   return {
     accountURN: resultURN,
     existing: false,

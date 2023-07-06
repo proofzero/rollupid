@@ -282,6 +282,7 @@ export default function AppDetailIndexPage() {
   const [isFormChanged, setIsFormChanged] = useState(false)
   const [isImgUploading, setIsImgUploading] = useState(false)
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
+  const [appToPublish, setAppToPublish] = useState(false)
 
   const rotatedSecret =
     outletContextData?.rotationResult?.rotatedClientSecret ||
@@ -334,10 +335,9 @@ export default function AppDetailIndexPage() {
                 btnType="primary-alt"
                 disabled={!isFormChanged}
                 onClick={() => {
-                  if (appDetails.published) {
+                  if (appToPublish) {
                     posthog?.capture('app_published', {
-                      accountURN,
-                      clientId: appDetails.clientId,
+                      client_id: appDetails.clientId,
                     })
                   }
                 }}
@@ -451,6 +451,7 @@ export default function AppDetailIndexPage() {
                       disabled={!appContactAddress}
                       onToggle={() => {
                         ;(setIsFormChanged as (val: boolean) => {})(true)
+                        setAppToPublish(true)
                       }}
                       checked={appDetails.published}
                     />

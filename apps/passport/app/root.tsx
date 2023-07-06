@@ -134,7 +134,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         appProps,
         flashes,
         ENV: {
-          POSTHOG_PUBLIC_KEY: context.env.POSTHOG_PUBLIC_KEY,
+          POSTHOG_API_KEY: context.env.POSTHOG_API_KEY,
           POSTHOG_HOST: context.env.POSTHOG_HOST,
           PROFILE_APP_URL: context.env.PROFILE_APP_URL,
           INTERNAL_GOOGLE_ANALYTICS_TAG:
@@ -279,7 +279,7 @@ export default function App() {
           >
             {typeof window !== 'undefined' ? (
               <PostHogProvider
-                apiKey={browserEnv.ENV.POSTHOG_PUBLIC_KEY}
+                apiKey={browserEnv.ENV.POSTHOG_API_KEY}
                 options={options}
               >
                 <Outlet context={{ appProps: browserEnv.appProps }} />

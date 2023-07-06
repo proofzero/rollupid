@@ -114,9 +114,7 @@ export default function CreateNewApp() {
                           : ''
                       }
                       onClick={() => {
-                        posthog?.capture('new_app_created', {
-                          accountURN,
-                        })
+                        posthog?.capture('new_app_created')
                       }}
                       disabled={isSubmitting}
                     >
