@@ -75,6 +75,13 @@ import {
 import { useHydrated } from 'remix-utils'
 import _ from 'lodash'
 
+type StripeInvoice = {
+  amount: number
+  timestamp: number
+  status: string | null
+  url?: string
+}
+
 type LoaderData = {
   paymentData?: PaymentData
   entitlements: {
@@ -82,12 +89,7 @@ type LoaderData = {
   }
   successToast?: string
   connectedEmails: DropdownSelectListItem[]
-  invoices: {
-    amount: number
-    timestamp: number
-    status: string | null
-    url?: string
-  }[]
+  invoices: StripeInvoice[]
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -121,12 +123,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
 
-    let invoices: {
-      amount: number
-      timestamp: number
-      status: string | null
-      url?: string
-    }[] = []
+    let invoices: StripeInvoice[] = []
     if (subscriptionID) {
       const stripeInvoices = await getInvoices({
         customerID: spd.customerID,
