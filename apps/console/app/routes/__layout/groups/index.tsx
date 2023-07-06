@@ -4,13 +4,65 @@ import { Button, Text } from '@proofzero/design-system'
 import { HiDotsVertical, HiUserGroup } from 'react-icons/hi'
 import { List } from '@proofzero/design-system/src/atoms/lists/List'
 import MultiAvatar from '@proofzero/design-system/src/molecules/avatar/MultiAvatar'
+import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
+import { useState } from 'react'
+import { Input } from '@proofzero/design-system/src/atoms/form/Input'
+
+const CreateGroupModal = ({
+  isOpen,
+  handleClose,
+}: {
+  isOpen: boolean
+  handleClose: () => void
+}) => {
+  return (
+    <Modal isOpen={isOpen} handleClose={handleClose}>
+      <div className="p-6">
+        <Text size="lg" weight="semibold" className="mb-4 text-left">
+          Create Group
+        </Text>
+
+        <Form
+          method="post"
+          action="/groups/create"
+          className="flex flex-col gap-4"
+          onSubmit={handleClose}
+        >
+          <Input
+            id="name"
+            label="Group Name"
+            required
+            placeholder="My Group"
+            className="min-w-[464px]"
+          />
+
+          <section className="flex flex-row items-center justify-end gap-3">
+            <Button type="button" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button type="submit" btnType="primary-alt">
+              Create Group
+            </Button>
+          </section>
+        </Form>
+      </div>
+    </Modal>
+  )
+}
 
 export default () => {
   const { groups } = useOutletContext<GroupRootContextData>()
   const navigate = useNavigate()
 
+  const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false)
+
   return (
     <>
+      <CreateGroupModal
+        isOpen={isCreateGroupModalOpen}
+        handleClose={() => setIsCreateGroupModalOpen(false)}
+      />
+
       <section className="flex flex-row items-center justify-between mb-5">
         <Text size="2xl" weight="semibold">
           Groups
@@ -19,6 +71,7 @@ export default () => {
         <Button
           btnType="primary-alt"
           className="flex flex-row items-center gap-2"
+          onClick={() => setIsCreateGroupModalOpen(true)}
         >
           <HiUserGroup />
           Create Group
@@ -34,7 +87,7 @@ export default () => {
           itemRenderer={(item) => (
             <article
               key={item.key}
-              className="flex flex-row items-center justify-between w-full hover:bg-gray-50"
+              className="flex flex-row items-center justify-between w-full"
             >
               <div>
                 <Text size="base" weight="semibold" className="text-gray-800">
@@ -67,24 +120,6 @@ export default () => {
             navigate(`/groups/${item.val.URN.split('/')[1]}`)
           }}
         ></List>
-      </section>
-      <section>
-        <Form method="post" action="/groups/create">
-          <input type="text" name="name" />
-          <button type="submit">Create Group</button>
-        </Form>
-      </section>
-
-      <section>
-        <ul>
-          {groups.map((group) => (
-            <li key={group.URN}>
-              <NavLink to={`/groups/${group.URN.split('/')[1]}`}>
-                {group.name}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
       </section>
     </>
   )

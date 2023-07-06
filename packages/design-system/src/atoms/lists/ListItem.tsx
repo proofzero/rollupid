@@ -24,7 +24,7 @@ export const ListItem = ({
                 shadow-sm px-4`,
         {
           'bg-gray-100': disabled === true,
-          'cursor-pointer hover:bg-gray-50': onClick != null,
+          'cursor-pointer hover:bg-[#F3F4F6]': onClick != null,
         }
       )}
       onClick={() => onClick && onClick(id)}
