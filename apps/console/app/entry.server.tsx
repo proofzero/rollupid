@@ -46,7 +46,7 @@ export default function handleRequest(
             'https://*.g.alchemy.com',
             'https://upload.imagedelivery.net',
             // Posthog proxy url
-            'https://posthog-dev.admin1337.workers.dev',
+            '*.workers.dev',
             // Used for Remix WebSocket Live Reaload
             ...(dev ? ['ws://localhost:*/socket'] : []),
           ],

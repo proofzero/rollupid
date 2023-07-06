@@ -35,10 +35,7 @@ export default function handleRequest(
     (nonce, dev) =>
       getCSP({
         directives: {
-          'default-src': [
-            SELF,
-            'https://verify.walletconnect.com',
-          ],
+          'default-src': [SELF, 'https://verify.walletconnect.com'],
           'connect-src': [
             SELF,
             'wss://*.bridge.walletconnect.org',
@@ -46,6 +43,8 @@ export default function handleRequest(
             'https://*.g.alchemy.com',
             '*.alchemyapi.io',
             '*.google-analytics.com',
+            // Posthog proxy url
+            '*.workers.dev',
             // Used for Remix WebSocket Live Reaload
             ...(dev ? ['ws://localhost:*/socket'] : []),
           ],

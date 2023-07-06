@@ -45,6 +45,7 @@ import type { FLASH_MESSAGE } from './utils/flashMessage.server'
 import { getFlashSession, commitFlashSession } from './session.server'
 
 import { PostHogProvider } from 'posthog-js/react'
+import posthog from 'posthog-js'
 
 import {
   toast,
@@ -220,6 +221,15 @@ export default function App() {
     setUEComplete(true)
   }, [])
 
+  // https://posthog.com/docs/libraries/react#posthog-provider
+  if (typeof window !== 'undefined') {
+    posthog.init(browserEnv.ENV.POSTHOG_API_KEY, {
+      api_host: browserEnv.ENV.POSTHOG_HOST,
+    })
+
+    posthog?.reset()
+  }
+
   return (
     <html lang="en">
       <head>
@@ -278,10 +288,7 @@ export default function App() {
             }}
           >
             {typeof window !== 'undefined' ? (
-              <PostHogProvider
-                apiKey={browserEnv.ENV.POSTHOG_API_KEY}
-                options={options}
-              >
+              <PostHogProvider client={posthog}>
                 <Outlet context={{ appProps: browserEnv.appProps }} />
               </PostHogProvider>
             ) : (
