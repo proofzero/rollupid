@@ -24,5 +24,4 @@ declare global {
   const STRIPE_PRO_PLAN_ID: string
 
   const POSTHOG_API_KEY: string
-  const POSTHOG_HOST: string
 }

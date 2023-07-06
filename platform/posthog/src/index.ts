@@ -1,3 +1,5 @@
+import { setCORSHeaders } from '../utils'
+
 const API_HOST = 'app.posthog.com'
 
 type ExtendableEventWithRequest = ExtendableEvent & { request: Request }
@@ -20,13 +22,7 @@ async function retrieveStatic(
     response = await fetch(`https://${API_HOST}${pathname}`)
     event.waitUntil(caches.default.put(event.request, response.clone()))
   }
-  response.headers.set(
-    'Access-Control-Allow-Origin',
-    event.request.headers.get('Origin') as string
-  )
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type')
-  response.headers.set('Access-Control-Allow-Credentials', 'true')
+  setCORSHeaders(response, event.request.headers.get('Origin') as string)
   return response
 }
 
@@ -39,13 +35,7 @@ async function forwardRequest(
   let response = await fetch(`https://${API_HOST}${pathname}`, request)
 
   response = new Response(response.body, response)
-  response.headers.set(
-    'Access-Control-Allow-Origin',
-    request.headers.get('Origin') as string
-  )
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type')
-  response.headers.set('Access-Control-Allow-Credentials', 'true')
+  setCORSHeaders(response, request.headers.get('Origin') as string)
 
   return response
 }

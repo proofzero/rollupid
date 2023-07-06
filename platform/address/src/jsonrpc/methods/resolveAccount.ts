@@ -10,6 +10,7 @@ import { Context } from '../../context'
 import { appRouter } from '../router'
 
 import { WriteAnalyticsDataPoint } from '@proofzero/platform-clients/analytics'
+import { posthogCall } from '@proofzero/packages/utils/posthog'
 
 import * as jose from 'jose'
 
@@ -68,22 +69,11 @@ export const resolveAccountMethod = async ({
   } as AnalyticsEngineDataPoint)
 
   // POSTHOG analytics
-  const url = `${ctx.POSTHOG_HOST}/e/`
-  const body = JSON.stringify({
-    api_key: ctx.POSTHOG_API_KEY,
-    event: eventName,
-    distinct_id: resultURN,
-    properties: {},
+  await posthogCall({
+    apiKey: ctx.POSTHOG_API_KEY,
+    eventName,
+    distinctId: resultURN,
   })
-  const init = {
-    body: body,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }
-
-  await fetch(url, init)
 
   return {
     accountURN: resultURN,

@@ -50,7 +50,6 @@ declare global {
     INTERNAL_DISCORD_OAUTH_CALLBACK_URL: string
 
     POSTHOG_API_KEY: string
-    POSTHOG_HOST: string
   }
 
   interface AuthzParams {

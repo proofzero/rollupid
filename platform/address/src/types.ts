@@ -47,7 +47,6 @@ export interface Environment {
   SECRET_TWITTER_OAUTH_CLIENT_SECRET: string
 
   POSTHOG_API_KEY: string
-  POSTHOG_HOST: string
 }
 
 export interface Challenge {
