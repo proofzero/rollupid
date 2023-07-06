@@ -50,6 +50,7 @@ jobs:
             STRIPE_API_SECRET
             STRIPE_WEBHOOK_SECRET
             STRIPE_PRO_PLAN_ID
+            POSTHOG_API_KEY
         env:
           # A secret used for session encryption.
           SECRET_SESSION_KEY: ${{ secrets.SECRET_SESSION_KEY_PROD }}
@@ -57,3 +58,4 @@ jobs:
           STRIPE_API_SECRET: ${{ secrets.STRIPE_API_SECRET_PROD }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET_PROD }}
           STRIPE_PRO_PLAN_ID: ${{ secrets.STRIPE_PRO_PLAN_ID_PROD }}
+          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY_PROD }}

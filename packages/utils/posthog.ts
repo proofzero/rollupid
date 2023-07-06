@@ -26,5 +26,5 @@ export const posthogCall = async ({
     },
   }
 
-  await fetch(POSTHOG_PROXY_HOST, init)
+  await fetch(`${POSTHOG_PROXY_HOST}/e/`, init)
 }
