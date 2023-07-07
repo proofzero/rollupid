@@ -13,6 +13,7 @@ import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { json } from '@remix-run/cloudflare'
 
 import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
+import { POSTHOG_PROXY_HOST } from '@proofzero/utils/posthog'
 
 import {
   Links,
@@ -49,8 +50,10 @@ import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-
 
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ServicePlanType } from '@proofzero/types/account'
+import { type ServicePlanType } from '@proofzero/types/account'
 import { BadRequestError } from '@proofzero/errors'
+import posthog from 'posthog-js'
+import { PostHogProvider } from 'posthog-js/react'
 
 export const links: LinksFunction = () => {
   return [
@@ -84,10 +87,12 @@ export type LoaderData = {
   PASSPORT_URL: string
   displayName: string
   ENV: {
+    POSTHOG_API_KEY: string
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
     REMIX_DEV_SERVER_WS_PORT?: number
     WALLET_CONNECT_PROJECT_ID: string
   }
+  accountURN: AccountURN
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -149,6 +154,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         avatarUrl,
         PASSPORT_URL,
         ENV: {
+          POSTHOG_API_KEY,
           INTERNAL_GOOGLE_ANALYTICS_TAG,
           REMIX_DEV_SERVER_WS_PORT:
             process.env.NODE_ENV === 'development'
@@ -157,6 +163,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           WALLET_CONNECT_PROJECT_ID,
         },
         displayName,
+        accountURN,
       })
     } catch (error) {
       console.error({ error })
@@ -177,13 +184,22 @@ export default function App() {
   const remixDevPort = loaderData.ENV.REMIX_DEV_SERVER_WS_PORT
   useTreeshakeHack(remixDevPort)
 
-  const { apps, avatarUrl, PASSPORT_URL, displayName } = loaderData
+  const { apps, avatarUrl, PASSPORT_URL, displayName, accountURN } = loaderData
 
   useEffect(() => {
     if (GATag) {
       gtag.pageview(location.pathname, GATag)
     }
   }, [location, GATag])
+
+  // https://posthog.com/docs/libraries/react#posthog-provider
+  if (typeof window !== 'undefined') {
+    posthog.init(loaderData.ENV.POSTHOG_API_KEY, {
+      api_host: POSTHOG_PROXY_HOST,
+    })
+
+    posthog?.identify(accountURN)
+  }
 
   return (
     <html lang="en" className="h-full">
@@ -217,7 +233,29 @@ export default function App() {
           </>
         )}
         {transition.state !== 'idle' ? <Loader /> : null}
-        <Outlet context={{ apps, avatarUrl, PASSPORT_URL, displayName }} />
+        {typeof window !== 'undefined' ? (
+          <PostHogProvider client={posthog}>
+            <Outlet
+              context={{
+                apps,
+                avatarUrl,
+                PASSPORT_URL,
+                displayName,
+                accountURN,
+              }}
+            />
+          </PostHogProvider>
+        ) : (
+          <Outlet
+            context={{
+              apps,
+              avatarUrl,
+              PASSPORT_URL,
+              displayName,
+              accountURN,
+            }}
+          />
+        )}
         <ScrollRestoration nonce={nonce} />
         <script
           nonce={nonce}

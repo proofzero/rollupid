@@ -4,7 +4,7 @@ import type {
   LoaderFunction,
 } from '@remix-run/cloudflare'
 
-import { json, redirect } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 
 import { useContext, useEffect, useState } from 'react'
 
@@ -24,6 +24,7 @@ import {
 import { RollupIdButton } from '~/components'
 
 import globalStyles from '@proofzero/design-system/src/styles/global.css'
+import { POSTHOG_PROXY_HOST } from '@proofzero/utils/posthog'
 import styles from './styles/tailwind.css'
 
 import appleIcon from '~/assets/root-apple-touch-icon.png'
@@ -44,6 +45,9 @@ import type { FLASH_MESSAGE } from './utils/flashMessage.server'
 
 import { getFlashSession, commitFlashSession } from './session.server'
 
+import posthog from 'posthog-js'
+import { PostHogProvider } from 'posthog-js/react'
+
 import {
   toast,
   Toaster,
@@ -57,8 +61,6 @@ import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHac
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 import { getStarbaseClient } from './platform.server'
-import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
-
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
   title: 'Passport - Rollup',
@@ -134,6 +136,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         appProps,
         flashes,
         ENV: {
+          POSTHOG_API_KEY: context.env.POSTHOG_API_KEY,
           PROFILE_APP_URL: context.env.PROFILE_APP_URL,
           INTERNAL_GOOGLE_ANALYTICS_TAG:
             context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
@@ -214,6 +217,15 @@ export default function App() {
     setUEComplete(true)
   }, [])
 
+  // https://posthog.com/docs/libraries/react#posthog-provider
+  if (typeof window !== 'undefined') {
+    posthog.init(browserEnv.ENV.POSTHOG_API_KEY, {
+      api_host: POSTHOG_PROXY_HOST,
+    })
+
+    posthog?.reset()
+  }
+
   return (
     <html lang="en">
       <head>
@@ -271,7 +283,13 @@ export default function App() {
               theme: undefined,
             }}
           >
-            <Outlet context={{ appProps: browserEnv.appProps }} />
+            {typeof window !== 'undefined' ? (
+              <PostHogProvider client={posthog}>
+                <Outlet context={{ appProps: browserEnv.appProps }} />
+              </PostHogProvider>
+            ) : (
+              <Outlet context={{ appProps: browserEnv.appProps }} />
+            )}
           </ThemeContext.Provider>
         )}
         <ScrollRestoration nonce={nonce} />

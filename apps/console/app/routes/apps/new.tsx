@@ -1,4 +1,4 @@
-import { json, redirect } from '@remix-run/cloudflare'
+import { redirect } from '@remix-run/cloudflare'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -18,6 +18,7 @@ import type { LoaderData as OutletContextData } from '~/root'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
+import { usePostHog } from 'posthog-js/react'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -48,8 +49,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
 export default function CreateNewApp() {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const posthog = usePostHog()
 
-  const { apps, avatarUrl, PASSPORT_URL, displayName } =
+  const { apps, avatarUrl, PASSPORT_URL, displayName, accountURN } =
     useOutletContext<OutletContextData>()
 
   return (
@@ -111,6 +113,7 @@ export default function CreateNewApp() {
                           ? 'flex items-center justify-between transition'
                           : ''
                       }
+                      onClick={() => posthog?.capture('new_app_created')}
                       disabled={isSubmitting}
                     >
                       {isSubmitting && (

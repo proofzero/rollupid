@@ -48,6 +48,8 @@ declare global {
     INTERNAL_DISCORD_OAUTH_CLIENT_ID: string
     SECRET_DISCORD_OAUTH_CLIENT_SECRET: string
     INTERNAL_DISCORD_OAUTH_CALLBACK_URL: string
+
+    POSTHOG_API_KEY: string
   }
 
   interface AuthzParams {

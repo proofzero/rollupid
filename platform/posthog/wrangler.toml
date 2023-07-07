@@ -1,0 +1,9 @@
+name = "posthog"
+main = "src/index.ts"
+compatibility_date = "2023-05-18"
+workers_dev = false
+node_compat = true
+
+port = 20210
+inspector_port = 21210
+local_protocol = "http"

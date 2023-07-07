@@ -126,7 +126,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 export default function AppDetailIndexPage() {
   const loaderData = useLoaderData<LoaderData>()
 
-  const { apps, avatarUrl, PASSPORT_URL, displayName } =
+  const { apps, avatarUrl, PASSPORT_URL, displayName, accountURN } =
     useOutletContext<OutletContextData>()
   const {
     appDetails,
@@ -188,6 +188,7 @@ export default function AppDetailIndexPage() {
                   appContactAddress,
                   appContactEmail,
                   paymaster,
+                  accountURN,
                 }}
               />
             </section>

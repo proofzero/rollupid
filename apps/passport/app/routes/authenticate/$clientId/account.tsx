@@ -1,7 +1,7 @@
-import { AccountURN } from '@proofzero/urns/account'
+import { type AccountURN } from '@proofzero/urns/account'
 import {
-  ActionFunction,
-  LoaderFunction,
+  type ActionFunction,
+  type LoaderFunction,
   json,
   redirect,
 } from '@remix-run/cloudflare'

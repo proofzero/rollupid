@@ -10,7 +10,11 @@ import { PassportLogo } from '../SideMenu'
 import { HiOutlineLogout } from 'react-icons/hi'
 import { Text } from '@proofzero/design-system'
 
+import { usePostHog } from 'posthog-js/react'
+
 const Header = ({ pfpUrl }: { pfpUrl: string }) => {
+  const posthog = usePostHog()
+
   return (
     <header
       className="w-full min-h-[80px] h-[80px] border-b bg-white lg:b-gray-50
@@ -44,6 +48,7 @@ const Header = ({ pfpUrl }: { pfpUrl: string }) => {
                   return (
                     <NavLink
                       to="/signout"
+                      onClick={() => posthog?.reset()}
                       className={`${active ? 'bg-gray-100' : ''} block px-4 py-2
                        text-sm  hover:bg-gray-100' w-full text-left
                        flex flex-row items-center text-red-500`}

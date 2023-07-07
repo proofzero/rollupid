@@ -42,6 +42,8 @@ import type { notificationHandlerType } from '~/types'
 import { SCOPE_SMART_CONTRACT_WALLETS } from '@proofzero/security/scopes'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { usePostHog } from 'posthog-js/react'
+import { type AccountURN } from '@proofzero/urns/account'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -222,6 +224,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       rotatedSecret,
       updatedApp: { published, app: { ...updates } },
       errors,
+      published,
     })
   }
 )
@@ -233,14 +236,17 @@ export default function AppDetailIndexPage() {
   const submit = useSubmit()
   const actionData = useActionData()
   const outletContextData = useOutletContext<{
+    accountURN: AccountURN
     notificationHandler: notificationHandlerType
     appDetails: appDetailsProps
     rotationResult: any
     paymaster: PaymasterType
     appContactAddress?: AddressURN
   }>()
-  const { appContactAddress, paymaster } = outletContextData
+  const { appContactAddress, paymaster, notificationHandler, appDetails } =
+    outletContextData
   const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
+  const posthog = usePostHog()
 
   const ref = useRef(null)
   const [multiselectComponentWidth, setMultiselectComponentWidth] = useState(0)
@@ -273,12 +279,18 @@ export default function AppDetailIndexPage() {
   const [isImgUploading, setIsImgUploading] = useState(false)
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
 
-  const { notificationHandler, appDetails } = outletContextData
   const rotatedSecret =
     outletContextData?.rotationResult?.rotatedClientSecret ||
     actionData?.rotatedSecret
 
-  if (actionData?.updatedApp) Object.assign(appDetails, actionData.updatedapp)
+  useEffect(() => {
+    if (actionData?.updatedApp) Object.assign(appDetails, actionData.updatedapp)
+    if (actionData?.published) {
+      posthog?.capture('app_published', {
+        client_id: appDetails.clientId,
+      })
+    }
+  }, [actionData])
 
   const errors = actionData?.errors
 

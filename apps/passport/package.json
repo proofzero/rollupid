@@ -36,6 +36,7 @@
     "flowbite-react": "0.4.3",
     "graphql-request": "5.0.0",
     "jose": "4.11.0",
+    "posthog-js": "1.68.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-helmet": "6.1.0",
