@@ -26,10 +26,10 @@ export const List = <T extends ListItem>({
           key={item.key}
           id={item.key}
           disabled={item.disabled}
-          onClick={(key) =>
-            onItemClick
-              ? onItemClick(items.find((i) => i.key === key))
-              : undefined
+          onClick={
+            onItemClick != null
+              ? (key) => onItemClick(items.find((i) => i.key === key))
+              : null
           }
         >
           {itemRenderer(item)}

@@ -21,7 +21,7 @@ export const ListItem = ({
         `border border-gray-300 rounded-md
                 py-2 mb-3 bg-white
                 flex flex-row items-center justify-between
-                shadow-sm px-4`,
+                shadow-sm px-4 truncate`,
         {
           'bg-gray-100': disabled === true,
           'cursor-pointer hover:bg-[#F3F4F6]': onClick != null,
@@ -29,7 +29,7 @@ export const ListItem = ({
       )}
       onClick={() => onClick && onClick(id)}
     >
-      <div className="flex flex-1">{children}</div>
+      <div className="flex flex-1 truncate">{children}</div>
     </div>
   )
 }
