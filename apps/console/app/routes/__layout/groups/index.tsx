@@ -1,4 +1,4 @@
-import { Form, NavLink, useNavigate, useOutletContext } from '@remix-run/react'
+import { Form, useNavigate, useOutletContext } from '@remix-run/react'
 import { GroupRootContextData } from '../groups'
 import { Button, Text } from '@proofzero/design-system'
 import { HiDotsVertical, HiUserGroup } from 'react-icons/hi'

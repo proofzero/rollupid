@@ -353,8 +353,8 @@ function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
           </div>
         </NavLink>
       </div>
-      <div className="px-2 p-2 hover:bg-gray-800">
-        {/* <NavLink
+      {/* <div className="px-2 p-2 hover:bg-gray-800">
+        <NavLink
           to={'/billing'}
           className={({ isActive }) => `${menuItemClass(isActive, false)} `}
         >
@@ -364,8 +364,8 @@ function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
               Billing & Invoicing
             </Text>
           </div>
-        </NavLink> */}
-      </div>
+        </NavLink>
+      </div> */}
       <div className="px-2 p-2 hover:bg-gray-800">
         <NavLink
           to={PASSPORT_URL}

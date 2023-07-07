@@ -6,7 +6,7 @@ import {
 } from '@proofzero/urns/identity-group'
 import { Form, Link, useLoaderData, useOutletContext } from '@remix-run/react'
 import { GroupRootContextData } from '../../groups'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import {
   CryptoAddressType,
   EmailAddressType,
@@ -30,6 +30,8 @@ import {
   HiOutlineClipboardCopy,
   HiOutlineTrash,
 } from 'react-icons/hi'
+import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
+import { getProviderIcons } from '@proofzero/design-system/src/helpers'
 
 type InvitationModel = {
   identifier: string
@@ -114,11 +116,15 @@ export const ActionCard = ({
   )
 }
 
-export default () => {
-  const { groups } = useOutletContext<GroupRootContextData>()
-  const { URN, groupID, invitations } = useLoaderData<LoaderData>()
-
-  const group = useRef(groups.find((group) => group.URN === URN))
+const InviteMemberModal = ({
+  groupID,
+  isOpen,
+  handleClose,
+}: {
+  groupID: string
+  isOpen: boolean
+  handleClose: () => void
+}) => {
   const addressTypes = useRef(() => {
     const emailTypes = Object.values(EmailAddressType)
     const oauthTypes = Object.values(OAuthAddressType)
@@ -127,10 +133,69 @@ export default () => {
     return [...emailTypes, ...oauthTypes, ...cryptoTypes]
   })
 
+  return (
+    <Modal isOpen={isOpen} handleClose={handleClose}>
+      <div className="p-6">
+        <section className="mb-4">
+          <Text size="lg" weight="semibold" className="text-left">
+            Add Group Member
+          </Text>
+          <Text size="sm" weight="normal" className="text-left text-gray-500">
+            Each member has to be invited with unique link that expires in 24h
+          </Text>
+        </section>
+
+        <Form
+          method="post"
+          action={`/groups/${groupID}/invite`}
+          className="flex flex-row gap-2"
+          onSubmit={() => {
+            handleClose()
+          }}
+        >
+          <div className="flex flex-row">
+            <select name="addressType">
+              {addressTypes.current().map((addressType) => (
+                <option key={addressType} value={addressType}>
+                  <img
+                    className="w-5 h-5"
+                    src={getProviderIcons(addressType) ?? undefined}
+                  />
+                  {_.upperFirst(addressType)}
+                </option>
+              ))}
+            </select>
+
+            <input type="text" name="identifier" className="flex-1" />
+          </div>
+
+          <Button btnType="primary-alt" type="submit">
+            Generate Invite Link
+          </Button>
+        </Form>
+      </div>
+    </Modal>
+  )
+}
+
+export default () => {
+  const { groups } = useOutletContext<GroupRootContextData>()
+  const { URN, groupID, invitations } = useLoaderData<LoaderData>()
+
+  const group = useRef(groups.find((group) => group.URN === URN))
+
+  const [inviteModalOpen, setInviteModalOpen] = useState(false)
+
   const hydrated = useHydrated()
 
   return (
     <>
+      <InviteMemberModal
+        groupID={groupID}
+        isOpen={inviteModalOpen}
+        handleClose={() => setInviteModalOpen(false)}
+      />
+
       {group.current && (
         <section className="-mt-4">
           <Breadcrumbs
@@ -159,7 +224,7 @@ export default () => {
           Icon={TbUserPlus}
           title="Add Group Member"
           subtitle="Invite Members to the Group"
-          onClick={() => {}}
+          onClick={() => setInviteModalOpen(true)}
         />
 
         <ActionCard
@@ -444,22 +509,6 @@ export default () => {
           </div>
         </section>
       )}
-
-      <section>
-        <Form method="post" action={`/groups/${groupID}/invite`}>
-          <select name="addressType">
-            {addressTypes.current().map((addressType) => (
-              <option key={addressType} value={addressType}>
-                {_.upperFirst(addressType)}
-              </option>
-            ))}
-          </select>
-
-          <input type="text" name="identifier" />
-
-          <button type="submit">Invite</button>
-        </Form>
-      </section>
     </>
   )
 }
