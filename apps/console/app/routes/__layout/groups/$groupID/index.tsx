@@ -32,6 +32,18 @@ import {
 } from 'react-icons/hi'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { getProviderIcons } from '@proofzero/design-system/src/helpers'
+import { Listbox, Transition } from '@headlessui/react'
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from '@heroicons/react/20/solid'
+
+const addressTypes = [
+  ...Object.values(EmailAddressType),
+  ...Object.values(OAuthAddressType),
+  ...Object.values(CryptoAddressType),
+]
 
 type InvitationModel = {
   identifier: string
@@ -125,16 +137,12 @@ const InviteMemberModal = ({
   isOpen: boolean
   handleClose: () => void
 }) => {
-  const addressTypes = useRef(() => {
-    const emailTypes = Object.values(EmailAddressType)
-    const oauthTypes = Object.values(OAuthAddressType)
-    const cryptoTypes = Object.values(CryptoAddressType)
-
-    return [...emailTypes, ...oauthTypes, ...cryptoTypes]
-  })
+  const [selectedProvider, setSelectedProvider] = useState<string>(
+    EmailAddressType.Email
+  )
 
   return (
-    <Modal isOpen={isOpen} handleClose={handleClose}>
+    <Modal isOpen={isOpen} handleClose={handleClose} overflow="visible">
       <div className="p-6">
         <section className="mb-4">
           <Text size="lg" weight="semibold" className="text-left">
@@ -153,20 +161,93 @@ const InviteMemberModal = ({
             handleClose()
           }}
         >
-          <div className="flex flex-row">
-            <select name="addressType">
-              {addressTypes.current().map((addressType) => (
-                <option key={addressType} value={addressType}>
-                  <img
-                    className="w-5 h-5"
-                    src={getProviderIcons(addressType) ?? undefined}
-                  />
-                  {_.upperFirst(addressType)}
-                </option>
-              ))}
-            </select>
+          <div className="grid grid-cols-5 relative">
+            <Listbox
+              value={selectedProvider}
+              onChange={setSelectedProvider}
+              name="addressType"
+            >
+              {({ open }) => (
+                <div className="flex flex-col col-span-2">
+                  <Listbox.Button className="relative border rounded-l p-2 flex flex-row justify-between items-center flex-1 focus-visible:outline-none focus:border-indigo-500">
+                    <div className="flex flex-row items-center gap-2">
+                      <img
+                        className="w-5 h-5"
+                        src={getProviderIcons(selectedProvider) ?? undefined}
+                      />
+                      <Text size="sm" weight="normal" className="text-gray-800">
+                        {_.upperFirst(selectedProvider)}
+                      </Text>
+                    </div>
 
-            <input type="text" name="identifier" className="flex-1" />
+                    {open ? (
+                      <ChevronDownIcon className="w-5 h-5 text-gray-500 shrink-0" />
+                    ) : (
+                      <ChevronUpIcon className="w-5 h-5 text-gray-500 shrink-0" />
+                    )}
+                  </Listbox.Button>
+
+                  <Transition
+                    show={open}
+                    enter="transition duration-100 ease-out"
+                    enterFrom="transform scale-95 opacity-0"
+                    enterTo="transform scale-100 opacity-100"
+                    leave="transition duration-75 ease-out"
+                    leaveFrom="transform scale-100 opacity-100"
+                    leaveTo="transform scale-95 opacity-0"
+                  >
+                    <Listbox.Options
+                      className="absolute bg-white p-2 flex flex-col gap-2 mt-1 focus-visible:ring-0 focus-visible:outline-none border shadow"
+                      static
+                    >
+                      {addressTypes.map((provider) => (
+                        <Listbox.Option
+                          key={provider}
+                          value={provider}
+                          className={({ active }) =>
+                            classNames(
+                              'flex flex-row items-center gap-2 hover:bg-gray-100 py-2 px-4 rounded-lg cursor-pointer',
+                              {
+                                'bg-gray-100': active,
+                              }
+                            )
+                          }
+                        >
+                          {({ selected }) => (
+                            <>
+                              <img
+                                className="w-5 h-5"
+                                src={getProviderIcons(provider) ?? undefined}
+                              />
+                              <Text
+                                size="sm"
+                                weight="normal"
+                                className="text-gray-800"
+                              >
+                                {_.upperFirst(provider)}
+                              </Text>
+                              {selected && (
+                                <CheckIcon
+                                  className="h-5 w-5 text-indigo-600"
+                                  aria-hidden="true"
+                                />
+                              )}
+                            </>
+                          )}
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </Transition>
+                </div>
+              )}
+            </Listbox>
+
+            <input
+              required
+              type="text"
+              name="identifier"
+              className="border rounded-r border-gray-200 col-span-3 focus:ring-0 focus-visible:ring-0 focus:outline-none focus-visible:outline-none"
+            />
           </div>
 
           <Button btnType="primary-alt" type="submit">
