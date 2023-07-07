@@ -25,7 +25,11 @@ import { TbApps, TbReceipt2, TbUserPlus } from 'react-icons/tb'
 import { Pill } from '@proofzero/design-system/src/atoms/pills/Pill'
 import { List } from '@proofzero/design-system/src/atoms/lists/List'
 import { useHydrated } from 'remix-utils'
-import { HiDotsVertical } from 'react-icons/hi'
+import {
+  HiDotsVertical,
+  HiOutlineClipboardCopy,
+  HiOutlineTrash,
+} from 'react-icons/hi'
 
 type InvitationModel = {
   identifier: string
@@ -179,7 +183,11 @@ export default () => {
                 Applications
               </Text>
 
-              <Pill>0</Pill>
+              <Pill className="bg-gray-200 rounded-lg !pr-2">
+                <Text size="xs" weight="medium" className="text-gray-800">
+                  0
+                </Text>
+              </Pill>
             </div>
 
             <div className="bg-white border border-gray-300 rounded-lg p-9 flex flex-col justify-center items-center">
@@ -252,7 +260,11 @@ export default () => {
                 Members
               </Text>
 
-              <Pill>{group.current.members.length}</Pill>
+              <Pill className="bg-gray-200 rounded-lg !pr-2">
+                <Text size="xs" weight="medium" className="text-gray-800">
+                  {group.current.members.length}
+                </Text>
+              </Pill>
             </div>
 
             <div>
@@ -278,7 +290,7 @@ export default () => {
                           {item.val.title}
                         </Text>
 
-                        <Pill className="bg-indigo-50 rounded-lg pr-2">
+                        <Pill className="bg-indigo-50 rounded-lg !pr-2">
                           <Text
                             size="xs"
                             weight="semibold"
@@ -322,15 +334,117 @@ export default () => {
                   </article>
                 )}
               />
+
+              <List
+                items={invitations.map((i, idx) => ({
+                  key: idx,
+                  val: i,
+                }))}
+                itemRenderer={(item) => (
+                  <article className="w-full flex flex-row items-center truncate">
+                    <div className="w-8 h-8 bg-gray-100 rounded-full flex justify-center items-center mr-6">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="22"
+                        height="22"
+                        viewBox="0 0 22 22"
+                        fill="none"
+                      >
+                        <g clipPath="url(#clip0_12945_40098)">
+                          <path
+                            d="M7.44531 6.55556C7.44531 7.49855 7.81991 8.40292 8.48671 9.06971C9.15351 9.73651 10.0579 10.1111 11.0009 10.1111C11.9439 10.1111 12.8482 9.73651 13.515 9.06971C14.1818 8.40292 14.5564 7.49855 14.5564 6.55556C14.5564 5.61256 14.1818 4.70819 13.515 4.0414C12.8482 3.3746 11.9439 3 11.0009 3C10.0579 3 9.15351 3.3746 8.48671 4.0414C7.81991 4.70819 7.44531 5.61256 7.44531 6.55556Z"
+                            stroke="#6B7280"
+                            strokeWidth="1.77778"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M5.66797 19.0003V17.2225C5.66797 16.2796 6.04257 15.3752 6.70937 14.7084C7.37616 14.0416 8.28053 13.667 9.22352 13.667H12.3346"
+                            stroke="#6B7280"
+                            strokeWidth="1.77778"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M17.2227 19.8896V19.8996"
+                            stroke="#6B7280"
+                            strokeWidth="1.77778"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M17.224 17.2223C17.6224 17.2211 18.009 17.0861 18.3217 16.8392C18.6344 16.5922 18.8553 16.2475 18.9489 15.8601C19.0425 15.4728 19.0035 15.0653 18.838 14.7027C18.6726 14.3402 18.3903 14.0437 18.0364 13.8606C17.6828 13.6794 17.2783 13.6232 16.8887 13.7012C16.4991 13.7792 16.1473 13.9866 15.8906 14.2899"
+                            stroke="#6B7280"
+                            strokeWidth="1.77778"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </g>
+                        <defs>
+                          <clipPath id="clip0_12945_40098">
+                            <rect
+                              width="21.3333"
+                              height="21.3333"
+                              fill="white"
+                              transform="translate(0.333984 0.333008)"
+                            />
+                          </clipPath>
+                        </defs>
+                      </svg>
+                    </div>
+
+                    <div className="flex-1 truncate">
+                      <div className="flex flex-row items-center gap-2">
+                        <Text
+                          size="sm"
+                          weight="semibold"
+                          className="text-gray-800"
+                        >
+                          {item.val.identifier}
+                        </Text>
+
+                        <Pill className="bg-gray-100 rounded-lg !pr-2">
+                          <Text
+                            size="xs"
+                            weight="semibold"
+                            className="text-gray-500 text-[10px]"
+                          >
+                            Pending
+                          </Text>
+                        </Pill>
+                      </div>
+
+                      <div className="flex flex-row items-center gap-1 text-gray-500 truncate">
+                        <Text size="xs" weight="normal" className="truncate">
+                          {item.val.identifier}
+                        </Text>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-row items-center gap-4">
+                      <button className="p-2" disabled>
+                        <HiOutlineTrash className="w-4 h-4 text-gray-500" />
+                      </button>
+
+                      <Button
+                        btnType="secondary-alt"
+                        className="flex flex-row items-center gap-2"
+                        disabled
+                        btnSize="xs"
+                      >
+                        <HiOutlineClipboardCopy className="w-4 h-4 text-gray-500" />
+
+                        <span>Copy Link</span>
+                      </Button>
+                    </div>
+                  </article>
+                )}
+              />
             </div>
           </div>
         </section>
       )}
 
-      <section>
-        <pre>{JSON.stringify(group.current, null, 2)}</pre>
-        <pre>{JSON.stringify(invitations, null, 2)}</pre>
-      </section>
       <section>
         <Form method="post" action={`/groups/${groupID}/invite`}>
           <select name="addressType">
