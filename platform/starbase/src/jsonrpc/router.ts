@@ -101,6 +101,17 @@ import {
   GetCustomDomainOutput,
 } from './methods/getCustomDomain'
 
+import {
+  getCustomDomainLoginProvider,
+  GetCustomDomainLoginProviderInput,
+  GetCustomDomainLoginProviderOutput,
+} from './methods/getCustomDomainLoginProvider'
+import {
+  setCustomDomainLoginProvider,
+  SetCustomDomainLoginProviderInput,
+  SetCustomDomainLoginProviderOutput,
+} from './methods/setCustomDomainLoginProvider'
+
 import { ApiKeyExtractMiddleware } from './apiKeyExtract'
 
 import { AppClientIdParamSchema } from './validators/app'
@@ -317,6 +328,22 @@ export const appRouter = t.router({
     .input(GetCustomDomainInput)
     .output(GetCustomDomainOutput)
     .query(getCustomDomain),
+  getCustomDomainLoginProvider: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetCustomDomainLoginProviderInput)
+    .output(GetCustomDomainLoginProviderOutput)
+    .query(getCustomDomainLoginProvider),
+  setCustomDomainLoginProvider: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .input(SetCustomDomainLoginProviderInput)
+    .output(SetCustomDomainLoginProviderOutput)
+    .mutation(setCustomDomainLoginProvider),
   getEmailOTPTheme: t.procedure
     .use(Analytics)
     .input(AppClientIdParamSchema)
