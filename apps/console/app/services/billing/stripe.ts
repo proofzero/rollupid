@@ -4,6 +4,7 @@ import { ServicePlanType } from '@proofzero/types/account'
 import { AccountURN } from '@proofzero/urns/account'
 import { redirect } from '@remix-run/cloudflare'
 import Stripe from 'stripe'
+import plans from '~/routes/__layout/gnillib/plans'
 
 type CreateCustomerParams = {
   email: string
@@ -229,12 +230,16 @@ export const reconcileAppSubscriptions = async ({
   starbaseClient,
   accountClient,
   addressClient,
+  billingURL,
+  settingsURL,
 }: {
   subscriptionID: string
   accountURN: AccountURN
   starbaseClient: any
   accountClient: any
   addressClient: any
+  billingURL: string
+  settingsURL: string
 }) => {
   const stripeClient = new Stripe(STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
@@ -275,17 +280,22 @@ export const reconcileAppSubscriptions = async ({
       accountURN: accountURN,
       subscriptionID: subscriptionID,
       quantity: pq.quantity,
-      type: ServicePlanType.PRO,
+      type: priceIdToPlanTypeDict[pq.priceID],
     })
   }
 
   if (reconciliations.length > 0) {
     await addressClient.sendReconciliationNotification.query({
+      planType: plans[reconciliations[0].plan].title, // Only pro for now
+      count: reconciliations.length,
       billingEmail,
       apps: reconciliations.map((app) => ({
+        appName: app.appName,
         devEmail: app.devEmail,
         plan: app.plan,
       })),
+      billingURL,
+      settingsURL,
     })
   }
 }

@@ -226,6 +226,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       accountClient,
       starbaseClient,
       addressClient,
+      billingURL: `${CONSOLE_URL}/gnillib`,
+      settingsURL: `${CONSOLE_URL}`,
     })
 
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
@@ -1170,8 +1172,8 @@ export default () => {
                         ? b.timestamp - a.timestamp
                         : a.timestamp - b.timestamp
                     )
-                    .map((invoice) => (
-                      <tr className="border-b border-gray-200">
+                    .map((invoice, idx) => (
+                      <tr key={idx} className="border-b border-gray-200">
                         <td className="px-6 py-3">
                           {hydrated && (
                             <Text size="sm" className="gray-500">

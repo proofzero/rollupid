@@ -21,6 +21,7 @@ export const ReconcileAppsSubscriptionsOutputSchema = z.array(
     clientID: z.string(),
     plan: z.nativeEnum(ServicePlanType),
     devEmail: z.string().optional(),
+    appName: z.string(),
   })
 )
 export type ReconcileAppsSubscriptionsOutput = z.infer<
@@ -80,6 +81,7 @@ export const reconcileAppSubscriptions = async ({
         appURN: app.appURN,
         clientID: app.clientId,
         devEmail: app.devEmail,
+        appName: app.app?.name ?? 'Undefined',
         plan,
       }))
 

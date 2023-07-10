@@ -196,14 +196,33 @@ export const getSubscriptionEmailContent = (
   return EmailTemplateExpiredSubscription(params as EmailTemplateParams)
 }
 
-export const getBillingReconciliationEmailContent = () =>
+export const getBillingReconciliationEmailContent = (
+  reconciledEntitlements: {
+    type: string
+    count: number
+  }[],
+  billingURL: string
+) =>
   EmailTemplateBillingReconciledEntitlements(
-    adjustEmailParams(undefined) as EmailTemplateParams
+    adjustEmailParams(undefined) as EmailTemplateParams,
+    {
+      reconciledEntitlements,
+      billingURL,
+    }
   )
 
-export const getDevReconciliationEmailContent = () =>
+export const getDevReconciliationEmailContent = (
+  appName: string,
+  planType: string,
+  settingsURL: string
+) =>
   EmailTemplateDevReconciledEntitlements(
-    adjustEmailParams(undefined) as EmailTemplateParams
+    adjustEmailParams(undefined) as EmailTemplateParams,
+    {
+      appName,
+      planType,
+      settingsURL,
+    }
   )
 
 /** Magic link email content template */

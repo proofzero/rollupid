@@ -296,31 +296,61 @@ export const EmailTemplateExpiredSubscription = (
 }
 
 export const EmailTemplateBillingReconciledEntitlements = (
-  params: EmailTemplateParams
+  params: EmailTemplateParams,
+  {
+    reconciledEntitlements,
+    billingURL,
+  }: {
+    reconciledEntitlements: { type: string; count: number }[]
+    billingURL: string
+  }
 ): EmailContent => {
-  const content = `<div class="heading">RollupId subscription has been reconciled</div>
+  const content = `<div class="heading">Entitlement(s) Removed 🗑️</div>
+  <p>Following changes have been made to your account:</p>
+  <ul>
+    ${reconciledEntitlements
+      .map(
+        (entitlement) =>
+          `<li>${entitlement.count} x ${entitlement.type} Entitlement(s) removed</li>`
+      )
+      .join('')}
+  </ul>
+  <p>For more information you can visit the <a href=${billingURL}>Billing & Invoicing section.</p>
+
   <p>
-    Something something darkside happens
-  </p>
-  <p>
-    Have you ever heard the story of Darh Plagueis the wise?
-  </p>
-  `
+  Thank You for using Rollup <br />
+  - The Rollup Team
+  </p>`
 
   return EmailTemplateBase(params, content, '')
 }
 
 export const EmailTemplateDevReconciledEntitlements = (
-  params: EmailTemplateParams
+  params: EmailTemplateParams,
+  {
+    appName,
+    planType,
+    settingsURL,
+  }: {
+    appName: string
+    planType: string
+    settingsURL: string
+  }
 ): EmailContent => {
-  const content = `<div class="heading">RollupId subscription has been reconciled</div>
+  const content = `<div class="heading">Application Plan Downgraded ⬇️</div>
+  
   <p>
-    Something something darkside happens
+    Rollup application <b>"${appName}"</b> was downgraded to <b>${planType}</b> plan.
   </p>
+
   <p>
-    Have you ever heard the story of Darh Plagueis the wise?
+    To review your account and all applications <a href=${settingsURL}>click here</a>.
   </p>
-  `
+
+  <p>
+  Thank You for using Rollup <br />
+  - The Rollup Team
+  </p>`
 
   return EmailTemplateBase(params, content, '')
 }

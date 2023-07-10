@@ -12,6 +12,11 @@ import { ReconciliationNotificationType } from '@proofzero/types/email'
 export const SendReconciliationNotificationMethodInputSchema = z.object({
   email: z.string(),
   type: z.nativeEnum(ReconciliationNotificationType),
+  planType: z.string().optional(),
+  count: z.number().optional(),
+  billingURL: z.string(),
+  settingsURL: z.string(),
+  appName: z.string().optional(),
 })
 export type SendReconciliationNotificationMethodInput = z.infer<
   typeof SendReconciliationNotificationMethodInputSchema
@@ -29,10 +34,33 @@ export const sendReconciliationNotificationMethod = async ({
   let emailContent
   switch (type) {
     case ReconciliationNotificationType.Billing:
-      emailContent = getBillingReconciliationEmailContent()
+      if (!input.planType || !input.count)
+        throw new RollupError({
+          message: `Invalid input: ${JSON.stringify(input)}`,
+        })
+
+      emailContent = getBillingReconciliationEmailContent(
+        [
+          {
+            type: input.planType,
+            count: input.count,
+          },
+        ],
+        input.billingURL
+      )
       break
     case ReconciliationNotificationType.Dev:
-      emailContent = getDevReconciliationEmailContent()
+      if (!input.appName) {
+        throw new RollupError({
+          message: `Invalid input: ${JSON.stringify(input)}`,
+        })
+      }
+
+      emailContent = getDevReconciliationEmailContent(
+        input.appName,
+        'Free Plan',
+        input.settingsURL
+      )
       break
     default:
       throw new RollupError({
@@ -40,12 +68,12 @@ export const sendReconciliationNotificationMethod = async ({
       })
   }
 
-  const { env, notification, customSender } = getEmailContent({
+  const { env, notification } = getEmailContent({
     ctx,
     address: email,
-    name: 'Foo',
+    name: email,
     emailContent,
   })
 
-  await sendNotification(notification, env, customSender)
+  await sendNotification(notification, env)
 }
