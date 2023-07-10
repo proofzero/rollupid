@@ -18,13 +18,13 @@ NotificationFromName = "Rollup Local - Notification"
 NotificationFromUser = "noreplylocal"
 
 [env.dev.vars]
-NotificationFromName = "Rollup Dev - Notifcation"
+NotificationFromName = "Rollup Dev - Notification"
 NotificationFromUser = 'noreply-dev'
 
 [env.next.vars]
-NotificationFromName = "Rollup Next - Notifcation"
+NotificationFromName = "Rollup Next - Notification"
 NotificationFromUser = 'noreply-next'
 
 [env.current.vars]
-NotificationFromName = "Rollup - Notifcation"
+NotificationFromName = "Rollup - Notification"
 NotificationFromUser = 'noreply'
