@@ -1,5 +1,7 @@
 import { InternalServerError } from '@proofzero/errors'
 import {
+  EmailTemplateBillingReconciledEntitlements,
+  EmailTemplateDevReconciledEntitlements,
   EmailTemplateExpiredSubscription,
   EmailTemplateOTP,
   EmailTemplateParams,
@@ -7,7 +9,6 @@ import {
 import { EmailMessage, EmailNotification } from './types'
 import { CloudflareEmailMessage, EmailContent, Environment } from './types'
 import { Context } from './context'
-import email from '@proofzero/platform-clients/email'
 import { z } from 'zod'
 
 export const EmailThemePropsSchema = z.object({
@@ -194,6 +195,35 @@ export const getSubscriptionEmailContent = (
 
   return EmailTemplateExpiredSubscription(params as EmailTemplateParams)
 }
+
+export const getBillingReconciliationEmailContent = (
+  reconciledEntitlements: {
+    type: string
+    count: number
+  }[],
+  billingURL: string
+) =>
+  EmailTemplateBillingReconciledEntitlements(
+    adjustEmailParams(undefined) as EmailTemplateParams,
+    {
+      reconciledEntitlements,
+      billingURL,
+    }
+  )
+
+export const getDevReconciliationEmailContent = (
+  appName: string,
+  planType: string,
+  settingsURL: string
+) =>
+  EmailTemplateDevReconciledEntitlements(
+    adjustEmailParams(undefined) as EmailTemplateParams,
+    {
+      appName,
+      planType,
+      settingsURL,
+    }
+  )
 
 /** Magic link email content template */
 export const getMagicLinkEmailContent = (

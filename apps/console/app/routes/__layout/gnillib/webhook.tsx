@@ -6,10 +6,14 @@ import Stripe from 'stripe'
 import createAccountClient from '@proofzero/platform-clients/account'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import createAddressClient from '@proofzero/platform-clients/address'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { type AccountURN } from '@proofzero/urns/account'
-import { ServicePlanType } from '@proofzero/types/account'
-import { updateSubscriptionMetadata } from '~/services/billing/stripe'
+
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import {
+  reconcileAppSubscriptions,
+  updateSubscriptionMetadata,
+} from '~/services/billing/stripe'
+import { RollupError } from '@proofzero/errors'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -47,13 +51,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     switch (event.type) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
-        const {
-          id,
-          quantity,
-          metadata: subMeta,
-        } = event.data.object as {
+        const { id, metadata: subMeta } = event.data.object as {
           id: string
-          quantity: number
           metadata: {
             accountURN: AccountURN
             handled?: string | null
@@ -100,15 +99,26 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           return null
         }
 
-        await accountClient.updateEntitlements.mutate({
+        const entitlements = await accountClient.getEntitlements.query({
           accountURN: subMeta.accountURN,
+        })
+        if (entitlements?.subscriptionID !== id) {
+          throw new RollupError({
+            message: `Subscription ID ${id} does not match entitlements subscription ID ${entitlements?.subscriptionID}`,
+          })
+        }
+
+        await reconcileAppSubscriptions({
           subscriptionID: id,
-          quantity,
-          type: ServicePlanType.PRO,
+          accountURN: subMeta.accountURN,
+          accountClient,
+          starbaseClient,
+          addressClient,
+          billingURL: `${CONSOLE_URL}/gnillib`,
+          settingsURL: `${CONSOLE_URL}`,
         })
 
         break
-
       case 'customer.updated':
         const { invoice_settings, metadata: cusMeta } = event.data.object as {
           id: string

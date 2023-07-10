@@ -9,7 +9,7 @@ import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 
 export const SetAppPlanInput = AppClientIdParamSchema.extend({
   accountURN: AccountURNInput,
-  plan: z.nativeEnum(ServicePlanType).optional(),
+  plan: z.nativeEnum(ServicePlanType),
 })
 type SetAppPlanParams = z.infer<typeof SetAppPlanInput>
 

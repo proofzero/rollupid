@@ -1,7 +1,10 @@
 import { InternalServerError } from '@proofzero/errors'
+import { ReconcileAppsSubscriptionsOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/reconcileAppSubscriptions'
+import { ServicePlanType } from '@proofzero/types/account'
 import { AccountURN } from '@proofzero/urns/account'
 import { redirect } from '@remix-run/cloudflare'
 import Stripe from 'stripe'
+import plans from '~/routes/__layout/gnillib/plans'
 
 type CreateCustomerParams = {
   email: string
@@ -15,7 +18,7 @@ type UpdateCustomerParams = {
   name: string
 }
 
-type UpdatePaymentMethodParams = {
+type CustomerPortalParams = {
   customerID: string
   returnURL: string
 }
@@ -39,6 +42,10 @@ type SubscriptionMetadata = Partial<{
   accountURN: AccountURN
   handled: string | null
 }>
+
+type GetInvoicesParams = {
+  customerID: string
+}
 
 export const createCustomer = async ({
   email,
@@ -77,10 +84,26 @@ export const updateCustomer = async ({
   return customer
 }
 
+export const accessCustomerPortal = async ({
+  customerID,
+  returnURL,
+}: CustomerPortalParams) => {
+  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+    apiVersion: '2022-11-15',
+  })
+
+  const session = await stripeClient.billingPortal.sessions.create({
+    customer: customerID,
+    return_url: returnURL,
+  })
+
+  return redirect(session.url)
+}
+
 export const updatePaymentMethod = async ({
   customerID,
   returnURL,
-}: UpdatePaymentMethodParams) => {
+}: CustomerPortalParams) => {
   const stripeClient = new Stripe(STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
   })
@@ -180,4 +203,99 @@ export const updateSubscriptionMetadata = async ({
   )
 
   return updatedSubscription
+}
+
+export const getInvoices = async ({ customerID }: GetInvoicesParams) => {
+  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+    apiVersion: '2022-11-15',
+  })
+
+  const invoices = await stripeClient.invoices.list({
+    customer: customerID,
+  })
+
+  const upcomingInvoices = await stripeClient.invoices.retrieveUpcoming({
+    customer: customerID,
+  })
+
+  return {
+    invoices,
+    upcomingInvoices,
+  }
+}
+
+export const reconcileAppSubscriptions = async ({
+  subscriptionID,
+  accountURN,
+  starbaseClient,
+  accountClient,
+  addressClient,
+  billingURL,
+  settingsURL,
+}: {
+  subscriptionID: string
+  accountURN: AccountURN
+  starbaseClient: any
+  accountClient: any
+  addressClient: any
+  billingURL: string
+  settingsURL: string
+}) => {
+  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+    apiVersion: '2022-11-15',
+  })
+
+  const subItems = await stripeClient.subscriptionItems.list({
+    subscription: subscriptionID,
+  })
+
+  const planQuantities = subItems.data
+    .map((si) => ({
+      priceID: si.price.id,
+      quantity: si.quantity,
+    }))
+    .filter((pq) => pq.quantity != null)
+
+  const priceIdToPlanTypeDict = {
+    [STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
+  }
+
+  const { email: billingEmail } =
+    await accountClient.getStripePaymentData.query({
+      accountURN,
+    })
+
+  let reconciliations: ReconcileAppsSubscriptionsOutput = []
+  for (const pq of planQuantities) {
+    const planReconciliations =
+      await starbaseClient.reconcileAppSubscriptions.mutate({
+        accountURN: accountURN,
+        count: pq.quantity,
+        plan: priceIdToPlanTypeDict[pq.priceID],
+      })
+
+    reconciliations = reconciliations.concat(planReconciliations)
+
+    await accountClient.updateEntitlements.mutate({
+      accountURN: accountURN,
+      subscriptionID: subscriptionID,
+      quantity: pq.quantity,
+      type: priceIdToPlanTypeDict[pq.priceID],
+    })
+  }
+
+  if (reconciliations.length > 0) {
+    await addressClient.sendReconciliationNotification.query({
+      planType: plans[reconciliations[0].plan].title, // Only pro for now
+      count: reconciliations.length,
+      billingEmail,
+      apps: reconciliations.map((app) => ({
+        appName: app.appName,
+        devEmail: app.devEmail,
+        plan: app.plan,
+      })),
+      billingURL,
+      settingsURL,
+    })
+  }
 }

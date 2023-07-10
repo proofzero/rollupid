@@ -40,6 +40,7 @@ import {
 } from './methods/deleteAccountNode'
 import { UnauthorizedError } from '@proofzero/errors'
 import {
+  GetEntitlementsInputSchema,
   GetEntitlementsOutputSchema,
   getEntitlements,
 } from './methods/getEntitlements'
@@ -152,11 +153,9 @@ export const appRouter = t.router({
     .input(DeleteAccountNodeInput)
     .mutation(deleteAccountNodeMethod),
   getEntitlements: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(injectAccountNode)
     .use(LogUsage)
     .use(Analytics)
+    .input(GetEntitlementsInputSchema)
     .output(GetEntitlementsOutputSchema)
     .query(getEntitlements),
   updateEntitlements: t.procedure
