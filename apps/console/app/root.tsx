@@ -54,6 +54,7 @@ import { type ServicePlanType } from '@proofzero/types/account'
 import { BadRequestError } from '@proofzero/errors'
 import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
+import { useHydrated } from 'remix-utils'
 
 export const links: LinksFunction = () => {
   return [
@@ -192,14 +193,21 @@ export default function App() {
     }
   }, [location, GATag])
 
-  // https://posthog.com/docs/libraries/react#posthog-provider
-  if (typeof window !== 'undefined') {
-    posthog.init(loaderData.ENV.POSTHOG_API_KEY, {
-      api_host: POSTHOG_PROXY_HOST,
-    })
+  const hydrated = useHydrated()
+  useEffect(() => {
+    // https://posthog.com/docs/libraries/react#posthog-provider
+    if (hydrated) {
+      try {
+        posthog.init(loaderData.ENV.POSTHOG_API_KEY, {
+          api_host: POSTHOG_PROXY_HOST,
+        })
 
-    posthog?.identify(accountURN)
-  }
+        posthog?.identify(accountURN)
+      } catch (ex) {
+        console.error(ex)
+      }
+    }
+  }, [hydrated])
 
   return (
     <html lang="en" className="h-full">
