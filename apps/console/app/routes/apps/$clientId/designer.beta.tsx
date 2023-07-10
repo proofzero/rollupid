@@ -249,10 +249,7 @@ const ProviderModal = ({
             items={selectedProviders}
             itemRenderer={(item) => (
               <div className="flex flex-row gap-5 w-full items-center">
-                <img
-                  className="h-8 w-8"
-                  src={getProviderIcons(item.key) ?? undefined}
-                />
+                <img className="h-8 w-8" src={getProviderIcons(item.key)} />
 
                 <Text
                   size="sm"

@@ -32,6 +32,6 @@ export default (provider: string) => {
     case 'wallet':
       return wallets
     default:
-      return null
+      return undefined
   }
 }

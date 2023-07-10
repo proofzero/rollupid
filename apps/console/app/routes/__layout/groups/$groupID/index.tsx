@@ -173,7 +173,7 @@ const InviteMemberModal = ({
                     <div className="flex flex-row items-center gap-2">
                       <img
                         className="w-5 h-5"
-                        src={getProviderIcons(selectedProvider) ?? undefined}
+                        src={getProviderIcons(selectedProvider)}
                       />
                       <Text size="sm" weight="normal" className="text-gray-800">
                         {_.upperFirst(selectedProvider)}
@@ -217,7 +217,7 @@ const InviteMemberModal = ({
                             <>
                               <img
                                 className="w-5 h-5"
-                                src={getProviderIcons(provider) ?? undefined}
+                                src={getProviderIcons(provider)}
                               />
                               <Text
                                 size="sm"
