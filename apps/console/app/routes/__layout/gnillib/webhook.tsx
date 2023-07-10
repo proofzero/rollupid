@@ -114,6 +114,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           accountClient,
           starbaseClient,
           addressClient,
+          billingURL: `${CONSOLE_URL}/gnillib`,
+          settingsURL: `${CONSOLE_URL}`,
         })
 
         break
