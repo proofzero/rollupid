@@ -23,6 +23,10 @@ renamed_classes = [{ from = "Core", to = "Account" }]
 tag = "v2"
 new_classes = ["IdentityGroup"]
 
+[[migrations]]
+tag = "v3"
+new_classes = ["IdentityGroup"]
+
 analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalytics" },
 ]
