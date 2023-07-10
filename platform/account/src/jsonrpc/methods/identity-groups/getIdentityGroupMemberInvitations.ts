@@ -2,12 +2,12 @@ import { z } from 'zod'
 import { Context } from '../../../context'
 import { RollupError } from '@proofzero/errors'
 import { IdentityGroupURNValidator } from '@proofzero/platform-middleware/inputValidators'
-import IdentityGroup from '../../../nodes/identity-group'
 import {
   EmailAddressType,
   OAuthAddressType,
   CryptoAddressType,
 } from '@proofzero/types/address'
+import { initIdentityGroupNodeByName } from '../../../nodes'
 
 export const GetIdentityGroupMemberInvitationsInputSchema = z.object({
   identityGroupURN: IdentityGroupURNValidator,
@@ -39,8 +39,10 @@ export const getIdentityGroupMemberInvitations = async ({
 }): Promise<GetIdentityGroupMemberInvitationsOutput> => {
   const { identityGroupURN } = input
 
-  const DOBinding = IdentityGroup.wrap(ctx.IdentityGroup)
-  const node = DOBinding.getByName(identityGroupURN)
+  const node = await initIdentityGroupNodeByName(
+    identityGroupURN,
+    ctx.IdentityGroup
+  )
   if (!node) {
     throw new RollupError({
       message: 'Identity group DO not found',
