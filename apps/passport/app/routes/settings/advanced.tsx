@@ -26,6 +26,7 @@ import type { ActionFunction } from '@remix-run/cloudflare'
 import type { AddressURN } from '@proofzero/urns/address'
 import { RollupError, ERROR_CODES, BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { posthogCall } from '@proofzero/utils/posthog'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -102,6 +103,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         cause: ex,
       })
     }
+
+    await posthogCall({
+      apiKey: context.env.POSTHOG_API_KEY,
+      eventName: 'delete_rollup_identity',
+      distinctId: accountUrn,
+    })
 
     return await destroyUserSession(
       request,

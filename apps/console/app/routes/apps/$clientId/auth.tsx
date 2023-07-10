@@ -243,8 +243,13 @@ export default function AppDetailIndexPage() {
     paymaster: PaymasterType
     appContactAddress?: AddressURN
   }>()
-  const { appContactAddress, paymaster, notificationHandler, appDetails } =
-    outletContextData
+  const {
+    appContactAddress,
+    paymaster,
+    notificationHandler,
+    appDetails,
+    accountURN,
+  } = outletContextData
   const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
   const posthog = usePostHog()
 
@@ -287,7 +292,8 @@ export default function AppDetailIndexPage() {
     if (actionData?.updatedApp) Object.assign(appDetails, actionData.updatedapp)
     if (actionData?.published) {
       posthog?.capture('app_published', {
-        client_id: appDetails.clientId,
+        distinct_id: appDetails.clientId,
+        account_urn: accountURN,
       })
     }
   }, [actionData])
