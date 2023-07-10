@@ -7,9 +7,10 @@ import { serverOnError as onError } from '@proofzero/utils/trpc'
 
 import { createContext } from './context'
 import { appRouter } from './jsonrpc/router'
-import Account from './nodes/account'
-import IdentityGroup from './nodes/identity-group'
 import type { Environment } from './types'
+
+export { default as Account } from './nodes/account'
+export { default as IdentityGroup } from './nodes/account'
 
 export default {
   async fetch(request: Request, env: Environment): Promise<Response> {
@@ -23,4 +24,3 @@ export default {
     })
   },
 }
-export { Account, IdentityGroup }
