@@ -6,6 +6,7 @@ import { AddressesSchema } from './jsonrpc/validators/profile'
 
 export interface Environment {
   Account: DurableObjectNamespace
+  IdentityGroup: DurableObjectNamespace
   Edges: Fetcher
   Analytics: AnalyticsEngineDataset
   ServiceDeploymentMetadata: DeploymentMetadata

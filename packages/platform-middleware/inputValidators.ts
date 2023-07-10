@@ -5,6 +5,10 @@ import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 import { AnyURN, parseURN } from '@proofzero/urns'
 import { EdgeURN } from '@proofzero/urns/edge'
 import { CryptoAddressType } from '@proofzero/types/address'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
 
 export const NoInput = z.undefined()
 
@@ -35,6 +39,13 @@ export const AccountURNInput = z.custom<AccountURN>((input) => {
     throw new Error('Invalid AccountURN entry')
   }
   return input as AccountURN
+})
+
+export const IdentityGroupURNValidator = z.custom<IdentityGroupURN>((input) => {
+  if (!IdentityGroupURNSpace.is(input as IdentityGroupURN)) {
+    throw new Error('Invalid IdentityGroupURN entry')
+  }
+  return input as IdentityGroupURN
 })
 
 export const CryptoAddressTypeInput = z.custom<CryptoAddressType>((input) => {

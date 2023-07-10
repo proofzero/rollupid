@@ -32,6 +32,8 @@
   },
   "dependencies": {
     "@ethersproject/address": "5.7.0",
+    "@ethersproject/bytes": "5.7.0",
+    "@ethersproject/random": "5.7.0",
     "@proofzero/platform-middleware": "workspace:*",
     "@proofzero/platform.access": "workspace:*",
     "@proofzero/types": "workspace:*",

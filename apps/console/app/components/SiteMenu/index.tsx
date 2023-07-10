@@ -20,6 +20,7 @@ import {
   HiOutlineBookOpen,
   HiOutlineExternalLink,
   HiOutlineLogout,
+  HiUserGroup,
 } from 'react-icons/hi'
 import {
   TbScan,
@@ -340,18 +341,33 @@ function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
   return (
     <div className="mt-2 border-t border-gray-700">
       <div className="px-2 p-2 hover:bg-gray-800">
-        {/* <NavLink
-          to={'/billing'}
+        <NavLink
+          to={'/groups'}
           className={({ isActive }) => `${menuItemClass(isActive, false)} `}
         >
-          <TbReceipt2 size={24} className="mr-2" />
+          <HiUserGroup size={24} className="mr-2" />
           <div className="flex flex-row w-full items-center justify-between">
             <Text size="sm" weight="medium">
-              Billing & Invoicing
+              Groups
             </Text>
           </div>
-        </NavLink> */}
+        </NavLink>
       </div>
+      {false && (
+        <div className="px-2 p-2 hover:bg-gray-800">
+          <NavLink
+            to={'/billing'}
+            className={({ isActive }) => `${menuItemClass(isActive, false)} `}
+          >
+            <TbReceipt2 size={24} className="mr-2" />
+            <div className="flex flex-row w-full items-center justify-between">
+              <Text size="sm" weight="medium">
+                Billing & Invoicing
+              </Text>
+            </div>
+          </NavLink>
+        </div>
+      )}
       <div className="px-2 p-2 hover:bg-gray-800">
         <NavLink
           to={PASSPORT_URL}
