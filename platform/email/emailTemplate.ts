@@ -322,7 +322,7 @@ export const EmailTemplateBillingReconciledEntitlements = (
   - The Rollup Team
   </p>`
 
-  return EmailTemplateBase(params, content, '')
+  return EmailTemplateBase(params, content, 'Entitlement(s) Removed')
 }
 
 export const EmailTemplateDevReconciledEntitlements = (
@@ -352,5 +352,5 @@ export const EmailTemplateDevReconciledEntitlements = (
   - The Rollup Team
   </p>`
 
-  return EmailTemplateBase(params, content, '')
+  return EmailTemplateBase(params, content, 'App Downgraded')
 }
