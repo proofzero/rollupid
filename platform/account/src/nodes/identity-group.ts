@@ -27,9 +27,7 @@ export default class IdentityGroup extends DOProxy {
     addressType,
   }: InviteMemberInput): Promise<void> {
     const invitations =
-      (await this.state.storage.get<undefined | MemberInvitation[]>(
-        'invitations'
-      )) || []
+      (await this.state.storage.get<MemberInvitation[]>('invitations')) || []
 
     invitations.push({
       identifier,
@@ -42,9 +40,7 @@ export default class IdentityGroup extends DOProxy {
 
   async getInvitations(): Promise<MemberInvitation[]> {
     return (
-      (await this.state.storage.get<undefined | MemberInvitation[]>(
-        'invitations'
-      )) || []
+      (await this.state.storage.get<MemberInvitation[]>('invitations')) || []
     )
   }
 }
