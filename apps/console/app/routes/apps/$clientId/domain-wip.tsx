@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react'
 
+import { HiOutlineCog } from 'react-icons/hi'
 import { RiLoader5Fill } from 'react-icons/ri'
 import { TbInfoCircle } from 'react-icons/tb'
 
 import { json } from '@remix-run/cloudflare'
-import { useFetcher, useActionData, useLoaderData } from '@remix-run/react'
+import {
+  useFetcher,
+  useActionData,
+  useLoaderData,
+  Link,
+} from '@remix-run/react'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import type { FetcherWithComponents } from '@remix-run/react'
 
@@ -17,11 +23,19 @@ import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 
+import appleIcon from '@proofzero/design-system/src/atoms/providers/Apple'
+import discordIcon from '@proofzero/design-system/src/assets/social_icons/discord.svg'
+import githubIcon from '@proofzero/design-system/src/atoms/providers/Github'
+import googleIcon from '@proofzero/design-system/src/atoms/providers/Google'
+import microsoftIcon from '@proofzero/design-system/src/atoms/providers/Microsoft'
+import twitterIcon from '@proofzero/design-system/src/assets/social_icons/twitter.svg'
+
 import wwwIcon from '@proofzero/design-system/src/assets/www.svg'
 import trashIcon from '@proofzero/design-system/src/assets/trash.svg'
 import reloadIcon from '@proofzero/design-system/src/assets/reload.svg'
 
 import { BadRequestError } from '@proofzero/errors'
+import { OAuthAddressType } from '@proofzero/types/address'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
@@ -35,7 +49,12 @@ import { requireJWT } from '~/utilities/session.server'
 
 import dangerVector from '~/images/danger.svg'
 
-type AppData = { customDomain?: CustomDomain; hostname: string; cname: string }
+type AppData = {
+  clientId: string
+  customDomain?: CustomDomain
+  hostname: string
+  cname: string
+}
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
@@ -54,7 +73,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const { hostname } = new URL(PASSPORT_URL)
 
-    return json({ customDomain, hostname })
+    return json({ clientId, customDomain, hostname })
   }
 )
 
@@ -103,7 +122,8 @@ export default () => {
   const fetcher = useFetcher()
   const actionData = useActionData<AppData>()
   const loaderData = useLoaderData<AppData>()
-  const { customDomain, hostname } = fetcher.data || actionData || loaderData
+  const { clientId, customDomain, hostname } =
+    fetcher.data || actionData || loaderData
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>()
 
   useEffect(() => {
@@ -134,6 +154,7 @@ export default () => {
           hostname={hostname}
         />
       )}
+      <LoginProviders clientId={clientId} customDomain={customDomain} />
     </section>
   )
 }
@@ -305,7 +326,14 @@ type DNSRecordProps = {
   disableCopier?: boolean
 }
 
-const DNSRecord = ({ title, validated, name, value, type, disableCopier = false }: DNSRecordProps) => {
+const DNSRecord = ({
+  title,
+  validated,
+  name,
+  value,
+  type,
+  disableCopier = false,
+}: DNSRecordProps) => {
   const statusColor = validated ? 'bg-green-600' : 'bg-orange-500'
   return (
     <div className="flex flex-row flex-wrap space-x-4">
@@ -326,19 +354,23 @@ const DNSRecord = ({ title, validated, name, value, type, disableCopier = false 
               >
                 {name}
               </Text>
-              {!disableCopier && <div>
-                <Copier
-                  value={name}
-                  color="text-gray-500"
-                  onCopy={() =>
-                    toast(
-                      ToastType.Success,
-                      { message: `${title} ${type} name copied to clipboard!` },
-                      { duration: 2000 }
-                    )
-                  }
-                />
-              </div>}
+              {!disableCopier && (
+                <div>
+                  <Copier
+                    value={name}
+                    color="text-gray-500"
+                    onCopy={() =>
+                      toast(
+                        ToastType.Success,
+                        {
+                          message: `${title} ${type} name copied to clipboard!`,
+                        },
+                        { duration: 2000 }
+                      )
+                    }
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -356,19 +388,23 @@ const DNSRecord = ({ title, validated, name, value, type, disableCopier = false 
             >
               {value}
             </Text>
-            {!disableCopier && <div>
-              <Copier
-                value={value}
-                color="text-gray-500"
-                onCopy={() =>
-                  toast(
-                    ToastType.Success,
-                    { message: `${title} ${type} value copied to clipboard!` },
-                    { duration: 2000 }
-                  )
-                }
-              />
-            </div>}
+            {!disableCopier && (
+              <div>
+                <Copier
+                  value={value}
+                  color="text-gray-500"
+                  onCopy={() =>
+                    toast(
+                      ToastType.Success,
+                      {
+                        message: `${title} ${type} value copied to clipboard!`,
+                      },
+                      { duration: 2000 }
+                    )
+                  }
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -443,4 +479,229 @@ const DeleteModal = ({
       </div>
     </Modal>
   )
+}
+
+type LoginProvidersProps = {
+  clientId: string
+  customDomain?: CustomDomain
+}
+
+const LoginProviders = ({ clientId, customDomain }: LoginProvidersProps) => (
+  <div>
+    <div className="flex flex-row justify-between py-4 space-x-3">
+      <Text type="span" size="lg" weight="semibold" className="text-gray-800">
+        Login Providers
+      </Text>
+      <Text type="span" size="sm" className="self-center text-gray-500">
+        Login providers can be ordered in{' '}
+        <Link to={`/apps/${clientId}/designer`} className="text-indigo-500">
+          Designer
+        </Link>
+      </Text>
+    </div>
+    <div className="space-y-2">
+      {[
+        OAuthAddressType.GitHub,
+        OAuthAddressType.Twitter,
+        OAuthAddressType.Google,
+        OAuthAddressType.Apple,
+        OAuthAddressType.Discord,
+      ].map((type) => (
+        <LoginProvider
+          key={type}
+          type={type}
+          clientId={clientId}
+          customDomain={customDomain}
+        />
+      ))}
+    </div>
+  </div>
+)
+
+type LoginProviderProps = {
+  type: OAuthAddressType
+  clientId: string
+  customDomain?: CustomDomain
+}
+
+const LoginProvider = ({
+  type,
+  clientId,
+  customDomain,
+}: LoginProviderProps) => {
+  const [configModalOpen, setConfigModalOpen] = useState(false)
+
+  return (
+    <>
+      <LoginProviderConfigurationModal
+        type={type}
+        clientId={clientId}
+        isOpen={configModalOpen}
+        onClose={() => setConfigModalOpen(false)}
+      />
+      <div className="flex justify-between bg-white box-border border rounded-lg border-gray-200">
+        <div className="flex flex-row">
+          <div className="w-16 h-16 flex justify-center items-center">
+            <img
+              className="w-8 h-8"
+              src={getLoginProviderIconUrl(type)}
+              alt="Login Provider"
+            />
+          </div>
+          <div className="flex flex-col justify-evenly py-2">
+            <Text size="sm" weight="medium" className="text-gray-700">
+              {getLoginProviderTitle(type)}
+            </Text>
+            <Text size="xs" className="text-orange-500">
+              Not Configured
+            </Text>
+          </div>
+        </div>
+        <div className="p-4">
+          <Button
+            type="submit"
+            btnSize="sm"
+            btnType="secondary-alt"
+            disabled={!customDomain}
+            className="flex justify-around align-middle w-[124px] h-[38px]"
+            onClick={() => setConfigModalOpen(true)}
+          >
+            <HiOutlineCog className="inline-block text-xl font-normal text-gray-400" />
+            <span>Configure</span>
+          </Button>
+        </div>
+      </div>
+    </>
+  )
+}
+
+type LoginProviderConfiguration = {
+  clientId: string
+  clientSecret: string
+  redirectUri: string
+}
+
+type LoginProviderConfigurationModalProps = {
+  type: OAuthAddressType
+  clientId: string
+  isOpen: boolean
+  onClose: (value: boolean) => void
+}
+
+const LoginProviderConfigurationModal = ({
+  type,
+  clientId,
+  isOpen,
+  onClose,
+}: LoginProviderConfigurationModalProps) => {
+  const fetcher = useFetcher()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  return (
+    <Modal isOpen={isOpen} closable={false}>
+      <div className="flex flex-col w-[770px] p-6 space-y-4 rounded-lg">
+        <Text
+          size="lg"
+          weight="medium"
+          className="mb-2 text-gray-900 text-left"
+        >
+          Login Provider Configuration
+        </Text>
+
+        <div className="flex space-x-4">
+          <img
+            className="w-8 h-8"
+            src={getLoginProviderIconUrl(type)}
+            alt="Login Provider"
+          />
+          <Text weight="medium" className="self-center leading-6 text-gray-700">
+            {getLoginProviderTitle(type)}
+          </Text>
+        </div>
+
+        <fetcher.Form
+          action={`/apps/${clientId}/domain/login-providers`}
+          method="post"
+          onSubmit={() => setIsSubmitting(true)}
+        >
+          <div className="flex flex-col space-y-4">
+            <Input id="redirectURI" label="Redirect URL" type="url" required />
+
+            <div className="flex space-x-4">
+              <div className="flex-1">
+                <Input id="clientId" label="Client ID" type="text" required />
+              </div>
+              <div className="flex-1">
+                <Input
+                  id="clientSecret"
+                  label="Client Secret"
+                  type="text"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <Button
+                btnType="secondary-alt"
+                disabled={isSubmitting}
+                onClick={() => onClose(false)}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                disabled={isSubmitting}
+                type="submit"
+                btnType="primary-alt"
+                className={
+                  isSubmitting
+                    ? 'flex justify-between items-center transition'
+                    : ''
+                }
+              >
+                {isSubmitting && (
+                  <RiLoader5Fill className="animate-spin" size={22} />
+                )}
+                Save
+              </Button>
+            </div>
+          </div>
+        </fetcher.Form>
+      </div>
+    </Modal>
+  )
+}
+
+export const getLoginProviderTitle = (type: OAuthAddressType) => {
+  switch (type) {
+    case OAuthAddressType.Apple:
+      return 'Apple'
+    case OAuthAddressType.Discord:
+      return 'Discord'
+    case OAuthAddressType.GitHub:
+      return 'GitHub'
+    case OAuthAddressType.Google:
+      return 'Google'
+    case OAuthAddressType.Microsoft:
+      return 'Microsoft'
+    case OAuthAddressType.Twitter:
+      return 'Twitter'
+  }
+}
+
+export const getLoginProviderIconUrl = (type: OAuthAddressType) => {
+  switch (type) {
+    case OAuthAddressType.Apple:
+      return appleIcon
+    case OAuthAddressType.Discord:
+      return discordIcon
+    case OAuthAddressType.GitHub:
+      return githubIcon
+    case OAuthAddressType.Google:
+      return googleIcon
+    case OAuthAddressType.Microsoft:
+      return microsoftIcon
+    case OAuthAddressType.Twitter:
+      return twitterIcon
+  }
 }

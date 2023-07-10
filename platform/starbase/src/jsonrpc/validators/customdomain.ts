@@ -1,5 +1,18 @@
 import { z } from 'zod'
 
+export const CustomDomainLoginProviderConfigSchema = z
+  .object({
+    clientId: z.string(),
+    clientSecret: z.string(),
+    redirectUri: z.string(),
+  })
+  .nullable()
+  .default(null)
+
+export type CustomDomainLoginProviderConfigSchema = z.infer<
+  typeof CustomDomainLoginProviderConfigSchema
+>
+
 export const CustomDomainDNSRecordsSchema = z.array(
   z.object({
     name: z.string(),
@@ -33,4 +46,26 @@ export const CustomDomainSchema = z.object({
   }),
   dns_records: CustomDomainDNSRecordsSchema,
   status: z.string(),
+  loginProviders: z
+    .object({
+      apple: CustomDomainLoginProviderConfigSchema,
+      discord: CustomDomainLoginProviderConfigSchema,
+      github: CustomDomainLoginProviderConfigSchema,
+      google: CustomDomainLoginProviderConfigSchema,
+      twitter: CustomDomainLoginProviderConfigSchema,
+    })
+    .partial()
+    .optional(),
 })
+
+export const CustomDomainLoginProviders = z.union([
+  z.literal('apple'),
+  z.literal('discord'),
+  z.literal('github'),
+  z.literal('google'),
+  z.literal('twitter'),
+])
+
+export type CustomDomainLoginProviders = z.infer<
+  typeof CustomDomainLoginProviders
+>
