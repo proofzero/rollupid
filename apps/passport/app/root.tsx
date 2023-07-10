@@ -61,6 +61,7 @@ import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHac
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 import { getStarbaseClient } from './platform.server'
+import { useHydrated } from 'remix-utils'
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
   title: 'Passport - Rollup',
@@ -168,6 +169,8 @@ export default function App() {
   const transition = useTransition()
   const browserEnv = useLoaderData()
 
+  const hydrated = useHydrated()
+
   const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
 
   const remixDevPort = browserEnv.ENV.REMIX_DEV_SERVER_WS_PORT
@@ -217,14 +220,19 @@ export default function App() {
     setUEComplete(true)
   }, [])
 
-  // https://posthog.com/docs/libraries/react#posthog-provider
-  if (typeof window !== 'undefined') {
-    posthog.init(browserEnv.ENV.POSTHOG_API_KEY, {
-      api_host: POSTHOG_PROXY_HOST,
-    })
-
-    posthog?.reset()
-  }
+  useEffect(() => {
+    // https://posthog.com/docs/libraries/react#posthog-provider
+    if (hydrated) {
+      try {
+        posthog.init(browserEnv.ENV.POSTHOG_API_KEY, {
+          api_host: POSTHOG_PROXY_HOST,
+        })
+        posthog?.reset()
+      } catch (ex) {
+        console.error(ex)
+      }
+    }
+  }, [hydrated])
 
   return (
     <html lang="en">
