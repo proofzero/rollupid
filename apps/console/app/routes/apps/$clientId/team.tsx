@@ -23,14 +23,16 @@ import {
   getEmailDropdownItems,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
-
 import type { AddressURN } from '@proofzero/urns/address'
 import type { AccountURN } from '@proofzero/urns/account'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import type { errorsTeamProps, notificationHandlerType } from '~/types'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { Dropdown, DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import {
+  Dropdown,
+  DropdownSelectListItem,
+} from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -132,8 +134,9 @@ export default () => {
 
   const submit = useSubmit()
 
-  let { connectedEmails } = useLoaderData() as { connectedEmails: Array<DropdownSelectListItem> }
-
+  let { connectedEmails } = useLoaderData() as {
+    connectedEmails: Array<DropdownSelectListItem>
+  }
 
   const { PASSPORT_URL, notificationHandler, appContactAddress } =
     useOutletContext<{
@@ -209,12 +212,12 @@ export default () => {
               <Dropdown
                 items={connectedEmails.map((email: DropdownSelectListItem) => {
                   email.value === appContactAddress
-                    ? email.selected = true
-                    : email.selected = false;
+                    ? (email.selected = true)
+                    : (email.selected = false)
                   // Substituting subtitle with icon
                   // on the client side
                   email.subtitle && !email.icon
-                    ? email.icon = getEmailIcon(email.subtitle)
+                    ? (email.icon = getEmailIcon(email.subtitle))
                     : null
                   return {
                     value: email.value,
@@ -223,7 +226,7 @@ export default () => {
                     title: email.title,
                   }
                 })}
-                placeholder='Select an Email Address'
+                placeholder="Select an Email Address"
                 onSelect={(selected) => {
                   // type casting to DropdownSelectListItem instead of array
                   if (!Array.isArray(selected)) {
@@ -245,7 +248,15 @@ export default () => {
                   }
                 }}
                 ConnectButtonCallback={redirectToPassport}
-                ConnectButtonPhrase='Connect New Email Address'
+                ConnectButtonPhrase="Connect New Email Address"
+                defaultItems={connectedEmails
+                  .filter((el) => el.value === appContactAddress)
+                  .map((email: DropdownSelectListItem) => ({
+                    value: email.value,
+                    selected: email.selected,
+                    icon: email.icon,
+                    title: email.title,
+                  }))}
               />
             </>
           )}

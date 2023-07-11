@@ -20,7 +20,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         throw new BadRequestError({ message: 'No address included in request' })
 
       const addressURN = AddressURNSpace.componentizedUrn(
-        generateHashedIDRef(EmailAddressType.Email, email),
+        generateHashedIDRef(EmailAddressType.Email, email.toLowerCase()),
         { node_type: NodeType.Email, addr_type: EmailAddressType.Email },
         { alias: email, hidden: 'true' }
       )
@@ -100,7 +100,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
 
     const addressURN = AddressURNSpace.componentizedUrn(
-      generateHashedIDRef(EmailAddressType.Email, email),
+      generateHashedIDRef(EmailAddressType.Email, email.toLowerCase()),
       { node_type: NodeType.Email, addr_type: EmailAddressType.Email },
       { alias: email, hidden: 'true' }
     )
