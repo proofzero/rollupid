@@ -3,6 +3,7 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
 import { redirect } from '@remix-run/cloudflare'
+import { useTransition } from '@remix-run/react'
 import {
   Form,
   useNavigate,
@@ -48,6 +49,7 @@ export default () => {
 
   const navigate = useNavigate()
   const submit = useSubmit()
+  const transition = useTransition()
 
   return (
     <div
@@ -124,6 +126,7 @@ export default () => {
                 setErrorMessage(e.message ? e.message : e.toString())
               }
             }}
+            disabled={transition.state !== 'idle'}
             btnType="primary-alt-skin"
             className="w-full"
           >
