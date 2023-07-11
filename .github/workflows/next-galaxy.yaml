@@ -12,6 +12,7 @@ defaults:
 jobs:
   build-publish-test-galaxy-next:
     runs-on: ubuntu-latest
+    environment: next
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2

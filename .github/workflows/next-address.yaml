@@ -12,6 +12,7 @@ defaults:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: next
     steps:
       - uses: actions/checkout@v3
 

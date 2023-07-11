@@ -14,6 +14,7 @@ defaults:
 jobs:
   build-publish-test-console-next:
     runs-on: ubuntu-latest
+    environment: next
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
