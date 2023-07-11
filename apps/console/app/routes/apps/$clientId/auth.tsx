@@ -17,7 +17,10 @@ import { requireJWT } from '~/utilities/session.server'
 import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
 import { RollType } from '~/types'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import {
+  getAuthzHeaderConditionallyFromToken,
+  parseJwt,
+} from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
@@ -44,6 +47,7 @@ import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { usePostHog } from 'posthog-js/react'
 import { type AccountURN } from '@proofzero/urns/account'
+import { posthogCall } from '@proofzero/utils/posthog'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -146,6 +150,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     let rotatedSecret, updates
 
     const jwt = await requireJWT(request)
+    const parsedJwt = parseJwt(jwt as string)
+    const accountURN = parsedJwt?.sub as AccountURN
+
     const starbaseClient = createStarbaseClient(Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
@@ -158,6 +165,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const formData = await request.formData()
     const op = formData.get('op')
     const published = formData.get('published') === '1'
+    const previously_published = formData.get('previously_published') === '1'
     const errors: errorsAuthProps = {}
 
     // As part of the rolling operation
@@ -220,6 +228,17 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
     console.debug('ERRORS', errors)
 
+    if (published === false && previously_published === true) {
+      await posthogCall({
+        eventName: 'app_unpublished',
+        apiKey: POSTHOG_API_KEY,
+        distinctId: accountURN,
+        properties: {
+          clientId: params.clientId,
+        },
+      })
+    }
+
     return json({
       rotatedSecret,
       updatedApp: { published, app: { ...updates } },
@@ -236,20 +255,14 @@ export default function AppDetailIndexPage() {
   const submit = useSubmit()
   const actionData = useActionData()
   const outletContextData = useOutletContext<{
-    accountURN: AccountURN
     notificationHandler: notificationHandlerType
     appDetails: appDetailsProps
     rotationResult: any
     paymaster: PaymasterType
     appContactAddress?: AddressURN
   }>()
-  const {
-    appContactAddress,
-    paymaster,
-    notificationHandler,
-    appDetails,
-    accountURN,
-  } = outletContextData
+  const { appContactAddress, paymaster, notificationHandler, appDetails } =
+    outletContextData
   const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
   const posthog = usePostHog()
 
@@ -292,8 +305,7 @@ export default function AppDetailIndexPage() {
     if (actionData?.updatedApp) Object.assign(appDetails, actionData.updatedapp)
     if (actionData?.published) {
       posthog?.capture('app_published', {
-        distinct_id: appDetails.clientId,
-        account_urn: accountURN,
+        client_id: appDetails.clientId,
       })
     }
   }, [actionData])
@@ -327,6 +339,11 @@ export default function AppDetailIndexPage() {
       >
         <fieldset disabled={isImgUploading}>
           <input type="hidden" name="op" value="update_app" />
+          <input
+            type="hidden"
+            name="previously_published"
+            value={appDetails.published ? '1' : '0'}
+          />
 
           <section className="flex flex-col space-y-5">
             <div className="flex flex-row justify-between space-x-5 max-sm:pl-6">
