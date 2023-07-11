@@ -10,7 +10,7 @@ import { appRouter } from './jsonrpc/router'
 import type { Environment } from './types'
 
 export { default as Account } from './nodes/account'
-export { default as IdentityGroup } from './nodes/account'
+export { default as IdentityGroup } from './nodes/identity-group'
 
 export default {
   async fetch(request: Request, env: Environment): Promise<Response> {

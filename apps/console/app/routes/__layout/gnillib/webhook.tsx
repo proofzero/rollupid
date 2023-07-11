@@ -68,6 +68,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             }
           }
 
+          // If previous attributes had a handled flag and the current
+          // event does not, then the webhook is handling only the
+          // handled removal so we shouldn't move further
           if (
             !subMeta.handled &&
             metadata?.handled &&
@@ -84,6 +87,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           }
         }
 
+        // When synchronously handling subscription update effects
+        // a flag is set to prevent the webhook from handling it again
+        // when it is received asynchronously
+        // This call clears the flag
         if (subMeta.handled) {
           console.info(
             `Subscription ${id} - ${event.type} already handled synchronously`
