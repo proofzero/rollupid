@@ -81,10 +81,18 @@ export const listIdentityGroups = async ({
     (result) => result.edges
   )
 
+  const uniqueIdentityGroupEdges = [
+    ...new Set(identityGroupEdges.map((edge) => edge.dst.baseUrn)),
+  ]
+    .map((baseUrn) =>
+      identityGroupEdges.find((edge) => edge.dst.baseUrn === baseUrn)
+    )
+    .filter((edge) => edge != null)
+
   const identityGroups: ListIdentityGroupsOutput = await Promise.all(
-    identityGroupEdges.map(async (edge) => {
-      const URN = edge.dst.baseUrn as IdentityGroupURN
-      const name = edge.dst.qc.name
+    uniqueIdentityGroupEdges.map(async (edge) => {
+      const URN = edge!.dst.baseUrn as IdentityGroupURN
+      const name = edge!.dst.qc.name
 
       const { edges: groupMemberEdges } = await ctx.edges.getEdges.query({
         query: {
