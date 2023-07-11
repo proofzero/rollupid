@@ -13,6 +13,7 @@ defaults:
 jobs:
   build-publish-test-profile-dev:
     runs-on: ubuntu-latest
+    environment: dev
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
