@@ -231,7 +231,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     if (published === false && previously_published === true) {
       await posthogCall({
         eventName: 'app_unpublished',
-        apiKey: POSTHOG_API_KEY,
+        apiKey: SECRET_POSTHOG_API_KEY,
         distinctId: accountURN,
         properties: {
           clientId: params.clientId,

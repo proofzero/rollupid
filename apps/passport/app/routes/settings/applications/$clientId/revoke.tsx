@@ -7,12 +7,13 @@ import { getAccessClient } from '~/platform.server'
 import { getFlashSession, commitFlashSession } from '~/session.server'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { posthogCall } from '@proofzero/utils/posthog'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
     const session = await getFlashSession(request, context.env)
 
-    const { jwt } = await getValidatedSessionContext(
+    const { jwt, accountUrn } = await getValidatedSessionContext(
       request,
       context.authzQueryParams,
       context.env,
@@ -31,6 +32,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       await accessClient.revokeAppAuthorization.mutate({
         clientId,
         issuer: new URL(request.url).origin,
+      })
+
+      await posthogCall({
+        apiKey: context.env.SECRET_POSTHOG_API_KEY,
+        distinctId: accountUrn,
+        eventName: 'app_authorization_revoked',
+        properties: {
+          clientId,
+        },
       })
 
       session.flash(

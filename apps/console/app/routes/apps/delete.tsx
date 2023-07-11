@@ -36,7 +36,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     try {
       await starbaseClient.deleteApp.mutate({ clientId })
       await posthogCall({
-        apiKey: POSTHOG_API_KEY,
+        apiKey: SECRET_POSTHOG_API_KEY,
         eventName: 'app_deleted',
         distinctId: accountURN,
         properties: {

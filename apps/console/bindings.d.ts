@@ -23,7 +23,7 @@ declare global {
   const STRIPE_WEBHOOK_SECRET: string
   const STRIPE_PRO_PLAN_ID: string
 
-  const POSTHOG_API_KEY: string
+  const SECRET_POSTHOG_API_KEY: string
 
   const CONSOLE_URL: string
 }
