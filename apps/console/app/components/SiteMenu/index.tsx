@@ -341,17 +341,19 @@ function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
   return (
     <div className="mt-2 border-t border-gray-700">
       <div className="px-2 p-2 hover:bg-gray-800">
-        <NavLink
-          to={'/groups'}
-          className={({ isActive }) => `${menuItemClass(isActive, false)} `}
-        >
-          <HiUserGroup size={24} className="mr-2" />
-          <div className="flex flex-row w-full items-center justify-between">
-            <Text size="sm" weight="medium">
-              Groups
-            </Text>
-          </div>
-        </NavLink>
+        {false && (
+          <NavLink
+            to={'/groups'}
+            className={({ isActive }) => `${menuItemClass(isActive, false)} `}
+          >
+            <HiUserGroup size={24} className="mr-2" />
+            <div className="flex flex-row w-full items-center justify-between">
+              <Text size="sm" weight="medium">
+                Groups
+              </Text>
+            </div>
+          </NavLink>
+        )}
       </div>
       {false && (
         <div className="px-2 p-2 hover:bg-gray-800">
