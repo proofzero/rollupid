@@ -7,7 +7,7 @@ logpush = true
 
 durable_objects.bindings = [
   { name = "Account", class_name = "Account" },
-  { name = "IdentityGroup", class_name = "IdentityGroup" }
+  { name = "IdentityGroup", class_name = "IdentityGroup" },
 ]
 services = [{ binding = "Edges", service = "edges" }]
 
@@ -18,10 +18,7 @@ new_classes = ["Core"]
 [[migrations]]
 tag = "v1"
 renamed_classes = [{ from = "Core", to = "Account" }]
-
-[[migrations]]
-tag = "v2"
-new_classes = ["IdentityGroup"]
+# v2 migration has been removed from history as it wasn't a working migration
 
 [[migrations]]
 tag = "v3"
@@ -41,7 +38,7 @@ local_protocol = "http"
 [env.dev]
 durable_objects.bindings = [
   { name = "Account", class_name = "Account" },
-  { name = "IdentityGroup", class_name = "IdentityGroup" }
+  { name = "IdentityGroup", class_name = "IdentityGroup" },
 ]
 services = [{ binding = "Edges", service = "edges-dev" }]
 
@@ -54,7 +51,7 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.next]
 durable_objects.bindings = [
   { name = "Account", class_name = "Account" },
-  { name = "IdentityGroup", class_name = "IdentityGroup" }
+  { name = "IdentityGroup", class_name = "IdentityGroup" },
 ]
 services = [{ binding = "Edges", service = "edges-next" }]
 
@@ -67,7 +64,7 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.current]
 durable_objects.bindings = [
   { name = "Account", class_name = "Account" },
-  { name = "IdentityGroup", class_name = "IdentityGroup" }
+  { name = "IdentityGroup", class_name = "IdentityGroup" },
 ]
 services = [{ binding = "Edges", service = "edges-current" }]
 
