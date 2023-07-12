@@ -5,10 +5,11 @@ import {
   getValidatedSessionContext,
 } from '~/session.server'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { posthogCall } from '@proofzero/utils/posthog'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    await getValidatedSessionContext(
+    const { accountUrn } = await getValidatedSessionContext(
       request,
       getDefaultAuthzParams(request),
       context.env,
@@ -24,6 +25,16 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     await addressClient.setNickname.query({
       nickname: name,
+    })
+
+    await posthogCall({
+      apiKey: context.env.SECRET_POSTHOG_API_KEY,
+      distinctId: accountUrn,
+      eventName: 'address_renamed',
+      properties: {
+        addressId: id,
+        nickname: name,
+      },
     })
 
     return null

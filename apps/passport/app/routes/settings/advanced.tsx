@@ -105,7 +105,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
 
     await posthogCall({
-      apiKey: context.env.POSTHOG_API_KEY,
+      apiKey: context.env.SECRET_POSTHOG_API_KEY,
       eventName: 'delete_rollup_identity',
       distinctId: accountUrn,
     })

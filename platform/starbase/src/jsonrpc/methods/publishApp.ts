@@ -3,6 +3,7 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
+import { posthogCall } from '@proofzero/utils/posthog'
 
 export const PublishAppInput = z.object({
   clientId: z.string(),
@@ -50,6 +51,25 @@ export const publishApp = async ({
   }
 
   await appDO.class.publish(input.published)
+
+  let eventName = undefined
+
+  if (!appDetails.published && input.published) {
+    eventName = 'app_published'
+  } else if (appDetails.published && !input.published) {
+    /**
+     * We can unpublish an app only if it was published before.
+     */
+    eventName = 'app_unpublished'
+  }
+
+  if (eventName)
+    await posthogCall({
+      distinctId: ctx.accountURN as string,
+      eventName,
+      apiKey: ctx.SECRET_POSTHOG_API_KEY,
+      properties: { client_id: input.clientId },
+    })
 
   return {
     published: true,

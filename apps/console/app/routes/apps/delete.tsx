@@ -2,7 +2,10 @@ import { redirect } from '@remix-run/cloudflare'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import {
+  getAuthzHeaderConditionallyFromToken,
+  parseJwt,
+} from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import {
   JsonError,
@@ -10,6 +13,8 @@ import {
   getRollupReqFunctionErrorWrapper,
 } from '@proofzero/utils/errors'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
+import { posthogCall } from '@proofzero/utils/posthog'
+import { type AccountURN } from '@proofzero/urns/account'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -20,6 +25,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       throw new BadRequestError({ message: 'Client ID is required' })
 
     const jwt = await requireJWT(request)
+    const parsedJwt = parseJwt(jwt as string)
+    const accountURN = parsedJwt.sub as AccountURN
 
     const starbaseClient = createStarbaseClient(Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
@@ -27,6 +34,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
     try {
       await starbaseClient.deleteApp.mutate({ clientId })
+      await posthogCall({
+        apiKey: SECRET_POSTHOG_API_KEY,
+        eventName: 'app_deleted',
+        distinctId: accountURN,
+        properties: {
+          client_id: clientId,
+        },
+      })
       return redirect('/')
     } catch (error) {
       const cause = getErrorCause(error)
