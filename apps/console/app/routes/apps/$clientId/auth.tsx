@@ -148,7 +148,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     let rotatedSecret, updates
 
     const jwt = await requireJWT(request)
-
     const starbaseClient = createStarbaseClient(Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
@@ -293,6 +292,10 @@ export default function AppDetailIndexPage() {
         client_id: appDetails.clientId,
       })
     } else if (typeof prevPublished !== 'undefined') {
+      /**
+       * If the app was previously published and now it is unpublished
+       * we capture the event, otherwise we don't
+       */
       posthog?.capture('app_unpublished', {
         client_id: appDetails.clientId,
       })
