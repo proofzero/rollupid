@@ -340,8 +340,8 @@ type ExternalLinksProps = {
 function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
   return (
     <div className="mt-2 border-t border-gray-700">
-      <div className="px-2 p-2 hover:bg-gray-800">
-        {false && (
+      {false && (
+        <div className="px-2 p-2 hover:bg-gray-800">
           <NavLink
             to={'/groups'}
             className={({ isActive }) => `${menuItemClass(isActive, false)} `}
@@ -353,8 +353,8 @@ function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
               </Text>
             </div>
           </NavLink>
-        )}
-      </div>
+        </div>
+      )}
       {false && (
         <div className="px-2 p-2 hover:bg-gray-800">
           <NavLink
