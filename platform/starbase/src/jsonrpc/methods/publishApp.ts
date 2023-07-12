@@ -52,9 +52,9 @@ export const publishApp = async ({
 
   await appDO.class.publish(input.published)
 
-  let eventName = ''
+  let eventName = undefined
 
-  if (input.published) {
+  if (!appDetails.published && input.published) {
     eventName = 'app_published'
   } else if (appDetails.published) {
     /**
@@ -63,12 +63,13 @@ export const publishApp = async ({
     eventName = 'app_unpublished'
   }
 
-  await posthogCall({
-    distinctId: ctx.accountURN as string,
-    eventName,
-    apiKey: ctx.SECRET_POSTHOG_API_KEY,
-    properties: { client_id: input.clientId },
-  })
+  if (eventName)
+    await posthogCall({
+      distinctId: ctx.accountURN as string,
+      eventName,
+      apiKey: ctx.SECRET_POSTHOG_API_KEY,
+      properties: { client_id: input.clientId },
+    })
 
   return {
     published: true,
