@@ -23,6 +23,8 @@ function getContrast(f, b) {
 }
 
 export default function getTextColor(bgColor: string) {
+  if (bgColor === '#6366F1') return '#ffffff'
+
   const whiteContrast = getContrast(bgColor, '#ffffff')
   const blackContrast = getContrast(bgColor, '#000000')
 
