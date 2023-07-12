@@ -32,7 +32,6 @@ export const publishApp = async ({
     ctx.StarbaseApp
   )
   const appDetails = await appDO.class.getDetails()
-  const prevPublished = appDetails.published
   if (appDetails.clientName?.length === 0 || false)
     throw new Error('Client name is required to publish the app')
 
@@ -60,7 +59,7 @@ export const publishApp = async ({
       apiKey: ctx.SECRET_POSTHOG_API_KEY,
       properties: { client_id: input.clientId },
     })
-  } else if (typeof prevPublished !== 'undefined') {
+  } else if (typeof appDetails.published !== 'undefined') {
     /**
      * If the app was previously published and now it is unpublished
      * we capture the event, otherwise we don't
