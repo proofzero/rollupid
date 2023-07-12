@@ -52,25 +52,24 @@ export const publishApp = async ({
 
   await appDO.class.publish(input.published)
 
+  let eventName = ''
+
   if (input.published) {
-    await posthogCall({
-      distinctId: ctx.accountURN as string,
-      eventName: 'app_published',
-      apiKey: ctx.SECRET_POSTHOG_API_KEY,
-      properties: { client_id: input.clientId },
-    })
+    eventName = 'app_published'
   } else if (typeof appDetails.published !== 'undefined') {
     /**
      * If the app was previously published and now it is unpublished
      * we capture the event, otherwise we don't
      */
-    await posthogCall({
-      distinctId: ctx.accountURN as string,
-      eventName: 'app_unpublished',
-      apiKey: ctx.SECRET_POSTHOG_API_KEY,
-      properties: { client_id: input.clientId },
-    })
+    eventName = 'app_unpublished'
   }
+
+  await posthogCall({
+    distinctId: ctx.accountURN as string,
+    eventName,
+    apiKey: ctx.SECRET_POSTHOG_API_KEY,
+    properties: { client_id: input.clientId },
+  })
 
   return {
     published: true,
