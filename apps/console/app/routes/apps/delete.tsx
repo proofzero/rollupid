@@ -20,7 +20,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const formData = await request.formData()
     const clientId = formData.get('clientId')?.toString()
-    const published = formData.get('published')?.toString() === '1'
 
     if (!clientId)
       throw new BadRequestError({ message: 'Client ID is required' })
@@ -40,8 +39,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         eventName: 'app_deleted',
         distinctId: accountURN,
         properties: {
-          clientId,
-          published,
+          client_id: clientId,
         },
       })
       return redirect('/')

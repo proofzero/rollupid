@@ -93,11 +93,6 @@ const DeleteModalAppForm = ({
         />
       </section>
       <input type="hidden" name="clientId" value={appDetails.clientId} />
-      <input
-        type="hidden"
-        name="published"
-        value={appDetails.published ? '1' : '0'}
-      />
 
       <div className="flex justify-end items-center space-x-3">
         <Button

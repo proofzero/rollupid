@@ -46,8 +46,6 @@ import { SCOPE_SMART_CONTRACT_WALLETS } from '@proofzero/security/scopes'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { usePostHog } from 'posthog-js/react'
-import { type AccountURN } from '@proofzero/urns/account'
-import { posthogCall } from '@proofzero/utils/posthog'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -150,8 +148,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     let rotatedSecret, updates
 
     const jwt = await requireJWT(request)
-    const parsedJwt = parseJwt(jwt as string)
-    const accountURN = parsedJwt?.sub as AccountURN
 
     const starbaseClient = createStarbaseClient(Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
@@ -165,7 +161,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const formData = await request.formData()
     const op = formData.get('op')
     const published = formData.get('published') === '1'
-    const previously_published = formData.get('previously_published') === '1'
     const errors: errorsAuthProps = {}
 
     // As part of the rolling operation
@@ -227,17 +222,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         break
     }
     console.debug('ERRORS', errors)
-
-    if (published === false && previously_published === true) {
-      await posthogCall({
-        eventName: 'app_unpublished',
-        apiKey: SECRET_POSTHOG_API_KEY,
-        distinctId: accountURN,
-        properties: {
-          clientId: params.clientId,
-        },
-      })
-    }
 
     return json({
       rotatedSecret,
@@ -302,9 +286,14 @@ export default function AppDetailIndexPage() {
     actionData?.rotatedSecret
 
   useEffect(() => {
+    const prevPublished = appDetails?.published
     if (actionData?.updatedApp) Object.assign(appDetails, actionData.updatedapp)
     if (actionData?.published) {
       posthog?.capture('app_published', {
+        client_id: appDetails.clientId,
+      })
+    } else if (typeof prevPublished !== 'undefined') {
+      posthog?.capture('app_unpublished', {
         client_id: appDetails.clientId,
       })
     }
@@ -339,11 +328,6 @@ export default function AppDetailIndexPage() {
       >
         <fieldset disabled={isImgUploading}>
           <input type="hidden" name="op" value="update_app" />
-          <input
-            type="hidden"
-            name="previously_published"
-            value={appDetails.published ? '1' : '0'}
-          />
 
           <section className="flex flex-col space-y-5">
             <div className="flex flex-row justify-between space-x-5 max-sm:pl-6">
