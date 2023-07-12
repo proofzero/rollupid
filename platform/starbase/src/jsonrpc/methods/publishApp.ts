@@ -56,7 +56,9 @@ export const publishApp = async ({
 
   if (!appDetails.published && input.published) {
     eventName = 'app_published'
-  } else if (appDetails.published && !input.published) {
+  }
+
+  if (appDetails.published && !input.published) {
     /**
      * We can unpublish an app only if it was published before.
      */
