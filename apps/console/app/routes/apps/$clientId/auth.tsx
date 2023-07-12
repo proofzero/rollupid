@@ -17,10 +17,7 @@ import { requireJWT } from '~/utilities/session.server'
 import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
 import { RollType } from '~/types'
-import {
-  getAuthzHeaderConditionallyFromToken,
-  parseJwt,
-} from '@proofzero/utils'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
@@ -45,7 +42,6 @@ import type { notificationHandlerType } from '~/types'
 import { SCOPE_SMART_CONTRACT_WALLETS } from '@proofzero/security/scopes'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { usePostHog } from 'posthog-js/react'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -247,7 +243,6 @@ export default function AppDetailIndexPage() {
   const { appContactAddress, paymaster, notificationHandler, appDetails } =
     outletContextData
   const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
-  const posthog = usePostHog()
 
   const ref = useRef(null)
   const [multiselectComponentWidth, setMultiselectComponentWidth] = useState(0)
@@ -285,21 +280,7 @@ export default function AppDetailIndexPage() {
     actionData?.rotatedSecret
 
   useEffect(() => {
-    const prevPublished = appDetails?.published
     if (actionData?.updatedApp) Object.assign(appDetails, actionData.updatedapp)
-    if (actionData?.published) {
-      posthog?.capture('app_published', {
-        client_id: appDetails.clientId,
-      })
-    } else if (typeof prevPublished !== 'undefined') {
-      /**
-       * If the app was previously published and now it is unpublished
-       * we capture the event, otherwise we don't
-       */
-      posthog?.capture('app_unpublished', {
-        client_id: appDetails.clientId,
-      })
-    }
   }, [actionData])
 
   const errors = actionData?.errors
