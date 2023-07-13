@@ -4,7 +4,12 @@ import { RiLoader5Fill } from 'react-icons/ri'
 import { TbInfoCircle } from 'react-icons/tb'
 
 import { json } from '@remix-run/cloudflare'
-import { useFetcher, useActionData, useLoaderData } from '@remix-run/react'
+import {
+  useFetcher,
+  useActionData,
+  useLoaderData,
+  useOutletContext,
+} from '@remix-run/react'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import type { FetcherWithComponents } from '@remix-run/react'
 
@@ -34,6 +39,11 @@ import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { requireJWT } from '~/utilities/session.server'
 
 import dangerVector from '~/images/danger.svg'
+import { planGuardWithToastException } from '~/utils/planGate.server'
+import { ServicePlanType } from '@proofzero/types/account'
+import { appDetailsProps } from '~/types'
+import { ToastWarning } from '@proofzero/design-system/src/atoms/toast/ToastWarning'
+import plans from '~/routes/__layout/billing/plans'
 
 type AppData = { customDomain?: CustomDomain; hostname: string; cname: string }
 
@@ -68,6 +78,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
+
+    const { appPlan } = await starbaseClient.getAppDetails.query({
+      clientId,
+    })
+    await planGuardWithToastException(appPlan, ServicePlanType.PRO, request)
 
     const passportUrl = new URL(PASSPORT_URL)
     const { hostname } = passportUrl
@@ -105,6 +120,9 @@ export default () => {
   const loaderData = useLoaderData<AppData>()
   const { customDomain, hostname } = fetcher.data || actionData || loaderData
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>()
+  const { appDetails } = useOutletContext<{
+    appDetails: appDetailsProps
+  }>()
 
   useEffect(() => {
     if (timeoutId) return
@@ -116,6 +134,19 @@ export default () => {
   return (
     <section className="flex flex-col space-y-5">
       {fetcher.state === 'submitting' && <Loader />}
+
+      {appDetails.appPlan === ServicePlanType.FREE && (
+        <section className="mb-4">
+          <ToastWarning
+            message={`This is a ${
+              plans[ServicePlanType.PRO].title
+            } feature and the current app is on ${
+              plans[appDetails.appPlan].title
+            }.`}
+          />
+        </section>
+      )}
+
       <div className="flex flex-row">
         <div className="flex flex-row items-center space-x-3">
           <Text size="2xl" weight="semibold" className="text-gray-900">
@@ -305,7 +336,14 @@ type DNSRecordProps = {
   disableCopier?: boolean
 }
 
-const DNSRecord = ({ title, validated, name, value, type, disableCopier = false }: DNSRecordProps) => {
+const DNSRecord = ({
+  title,
+  validated,
+  name,
+  value,
+  type,
+  disableCopier = false,
+}: DNSRecordProps) => {
   const statusColor = validated ? 'bg-green-600' : 'bg-orange-500'
   return (
     <div className="flex flex-row flex-wrap space-x-4">
@@ -326,19 +364,23 @@ const DNSRecord = ({ title, validated, name, value, type, disableCopier = false 
               >
                 {name}
               </Text>
-              {!disableCopier && <div>
-                <Copier
-                  value={name}
-                  color="text-gray-500"
-                  onCopy={() =>
-                    toast(
-                      ToastType.Success,
-                      { message: `${title} ${type} name copied to clipboard!` },
-                      { duration: 2000 }
-                    )
-                  }
-                />
-              </div>}
+              {!disableCopier && (
+                <div>
+                  <Copier
+                    value={name}
+                    color="text-gray-500"
+                    onCopy={() =>
+                      toast(
+                        ToastType.Success,
+                        {
+                          message: `${title} ${type} name copied to clipboard!`,
+                        },
+                        { duration: 2000 }
+                      )
+                    }
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -356,19 +398,23 @@ const DNSRecord = ({ title, validated, name, value, type, disableCopier = false 
             >
               {value}
             </Text>
-            {!disableCopier && <div>
-              <Copier
-                value={value}
-                color="text-gray-500"
-                onCopy={() =>
-                  toast(
-                    ToastType.Success,
-                    { message: `${title} ${type} value copied to clipboard!` },
-                    { duration: 2000 }
-                  )
-                }
-              />
-            </div>}
+            {!disableCopier && (
+              <div>
+                <Copier
+                  value={value}
+                  color="text-gray-500"
+                  onCopy={() =>
+                    toast(
+                      ToastType.Success,
+                      {
+                        message: `${title} ${type} value copied to clipboard!`,
+                      },
+                      { duration: 2000 }
+                    )
+                  }
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
