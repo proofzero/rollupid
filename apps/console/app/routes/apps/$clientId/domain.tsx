@@ -42,8 +42,9 @@ import dangerVector from '~/images/danger.svg'
 import { planGuardWithToastException } from '~/utils/planGate.server'
 import { ServicePlanType } from '@proofzero/types/account'
 import { appDetailsProps } from '~/types'
-import { ToastWarning } from '@proofzero/design-system/src/atoms/toast/ToastWarning'
-import plans from '~/routes/__layout/billing/plans'
+
+import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
+import domainSVG from '~/assets/early/domain.svg'
 
 type AppData = { customDomain?: CustomDomain; hostname: string; cname: string }
 
@@ -131,21 +132,21 @@ export default () => {
     setTimeoutId(setTimeout(submit, 2000))
   }, [fetcher, timeoutId, customDomain?.ssl.status])
 
+  if (appDetails.appPlan === ServicePlanType.FREE) {
+    return (
+      <EarlyAccessPanel
+        title="Custom Domain"
+        subtitle="Configure Custom Domain"
+        copy="A custom domain feature in an authentication tool allows an organization to use its own domain name instead of the tool's default domain. This provides a more seamless user experience, improves brand consistency, and enhances the security of the authentication process by reducing the risk of phishing scams."
+        imgSrc={domainSVG}
+        url={'https://docs.rollup.id/platform/console/custom-domain'}
+      />
+    )
+  }
+
   return (
     <section className="flex flex-col space-y-5">
       {fetcher.state === 'submitting' && <Loader />}
-
-      {appDetails.appPlan === ServicePlanType.FREE && (
-        <section className="mb-4">
-          <ToastWarning
-            message={`This is a ${
-              plans[ServicePlanType.PRO].title
-            } feature and the current app is on ${
-              plans[appDetails.appPlan].title
-            }.`}
-          />
-        </section>
-      )}
 
       <div className="flex flex-row">
         <div className="flex flex-row items-center space-x-3">

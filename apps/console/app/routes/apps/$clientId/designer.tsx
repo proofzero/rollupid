@@ -86,10 +86,10 @@ import {
   toast,
 } from '@proofzero/design-system/src/atoms/toast'
 import classNames from 'classnames'
-import { ToastWarning } from '@proofzero/design-system/src/atoms/toast/ToastWarning'
 import { ServicePlanType } from '@proofzero/types/account'
-import plans from '~/routes/__layout/billing/plans'
 import { planGuardWithToastException } from '~/utils/planGate.server'
+import designerSVG from '~/assets/early/designer.webp'
+import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -1435,23 +1435,22 @@ export default () => {
 
   const [loading, setLoading] = useState<boolean>(false)
 
+  if (appDetails.appPlan === ServicePlanType.FREE) {
+    return (
+      <EarlyAccessPanel
+        title="Designer"
+        subtitle="Customize your Login Experience"
+        copy="With a white label feature in your authentication tool, you can customize the user interface to match your brand, giving a seamless experience to your users. This not only enhances brand consistency but also establishes trust with users, making it an essential security measure for protecting sensitive data."
+        imgSrc={designerSVG}
+        imgClassName="w-[363px]"
+        url={'https://docs.rollup.id/platform/console/designer'}
+      />
+    )
+  }
+
   return (
     <Suspense fallback={<Loader />}>
       {loading && <Loader />}
-
-      <Toaster position="top-right" reverseOrder={false} />
-
-      {appDetails.appPlan === ServicePlanType.FREE && (
-        <section className="mb-4">
-          <ToastWarning
-            message={`This is a ${
-              plans[ServicePlanType.PRO].title
-            } feature and the current app is on ${
-              plans[appDetails.appPlan].title
-            }.`}
-          />
-        </section>
-      )}
 
       <Form method="post">
         <section className="flex flex-col lg:flex-row items-center justify-between mb-11">
