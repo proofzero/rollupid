@@ -9,6 +9,7 @@ import { getAuthzCookieParams } from '~/session.server'
 import type { EmailThemeProps } from '@proofzero/platform/email/src/emailFunctions'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { ServicePlanType } from '@proofzero/types/account'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -47,10 +48,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         context.traceSpan
       )
 
-      let appProps, emailTheme, customDomain
+      let appDetails, emailTheme, customDomain
       if (clientId !== 'console' && clientId !== 'passport') {
-        ;[appProps, emailTheme, customDomain] = await Promise.all([
-          starbaseClient.getAppPublicProps.query({
+        ;[appDetails, emailTheme, customDomain] = await Promise.all([
+          starbaseClient.getAppDetails.query({
             clientId,
           }),
           starbaseClient.getEmailOTPTheme.query({
@@ -62,15 +63,19 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         ])
       }
 
+      if (appDetails?.appPlan === ServicePlanType.FREE) {
+        emailTheme = undefined
+      }
+
       let themeProps: EmailThemeProps | undefined
-      if (appProps) {
+      if (appDetails && appDetails.app) {
         themeProps = {
-          privacyURL: appProps.privacyURL as string,
-          termsURL: appProps.termsURL as string,
+          privacyURL: appDetails.privacyURL as string,
+          termsURL: appDetails.termsURL as string,
           logoURL: emailTheme?.logoURL,
           contactURL: emailTheme?.contact,
           address: emailTheme?.address,
-          appName: appProps.name,
+          appName: appDetails.app.name,
         }
 
         if (customDomain) {
