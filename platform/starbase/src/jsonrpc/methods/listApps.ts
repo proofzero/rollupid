@@ -5,7 +5,6 @@ import {
   ApplicationURN,
   ApplicationURNSpace,
 } from '@proofzero/urns/application'
-import createEdgesClient from '@proofzero/platform-clients/edges'
 import {
   AppReadableFieldsSchema,
   AppUpdateableFieldsSchema,
@@ -30,6 +29,7 @@ export const listApps = async ({
   //app edge
   const result = []
   for (const appURN of ctx.ownAppURNs || []) {
+    if (!ApplicationURNSpace.is(appURN)) continue
     const clientId = ApplicationURNSpace.decode(appURN)
     try {
       const appDO = await getApplicationNodeByClientId(

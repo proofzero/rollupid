@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
@@ -21,7 +22,9 @@ export const deleteSubscriptionPlans = async ({
 }): Promise<void> => {
   const { accountURN } = input
 
-  const { edges } = await ctx.edges.getEdges.query({
+  const caller = router.createCaller(ctx)
+
+  const { edges } = await caller.edges.getEdges({
     query: {
       src: { baseUrn: accountURN },
       tag: EDGE_PAYS_APP,
@@ -36,7 +39,7 @@ export const deleteSubscriptionPlans = async ({
       // This is a way to delete all edges associated with payments
       Promise.all(
         appURNs.map((appURN) =>
-          ctx.edges.removeEdge.mutate({
+          caller.edges.removeEdge({
             src: accountURN,
             tag: EDGE_PAYS_APP,
             dst: appURN,

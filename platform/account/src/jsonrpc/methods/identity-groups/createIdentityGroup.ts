@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { Context } from '../../../context'
+import { router } from '@proofzero/platform.core'
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
@@ -8,6 +8,8 @@ import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 import { RollupError } from '@proofzero/errors'
 import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
+
+import { Context } from '../../../context'
 
 export const CreateIdentityGroupInputSchema = z.object({
   accountURN: AccountURNInput,
@@ -29,7 +31,9 @@ export const createIdentityGroup = async ({
   })
   const baseGroupURN = IdentityGroupURNSpace.getBaseURN(groupURN)
 
-  const accountNode = await ctx.edges.findNode.query({
+  const caller = router.createCaller(ctx)
+
+  const accountNode = await caller.edges.findNode({
     baseUrn: input.accountURN,
   })
   if (!accountNode) {
@@ -38,14 +42,14 @@ export const createIdentityGroup = async ({
     })
   }
 
-  await ctx.edges.updateNode.mutate({
+  await caller.edges.updateNode({
     urnOfNode: groupURN,
   })
 
   const primaryAddressURN = AddressURNSpace.getBaseURN(
     accountNode.qc.primaryAddressURN as AddressURN
   )
-  await ctx.edges.makeEdge.mutate({
+  await caller.edges.makeEdge({
     src: primaryAddressURN,
     tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
     dst: baseGroupURN,

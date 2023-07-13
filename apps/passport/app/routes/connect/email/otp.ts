@@ -2,7 +2,7 @@ import { EmailAddressType, NodeType } from '@proofzero/types/address'
 import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { json } from '@remix-run/cloudflare'
-import { getAddressClient, getStarbaseClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { getAuthzCookieParams } from '~/session.server'
@@ -26,11 +26,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         { alias: email, hidden: 'true' }
       )
 
-      const addressClient = getAddressClient(
-        addressURN,
-        context.env,
-        context.traceSpan
-      )
+      const coreClient = getCoreClient({ context, addressURN })
 
       let clientId: string = ''
       try {
@@ -42,25 +38,20 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
             'Could not complete authentication. Please return to application and try again.',
         })
       }
-      const starbaseClient = getStarbaseClient(
-        undefined,
-        context.env,
-        context.traceSpan
-      )
 
       let appPlan, appProps, emailTheme, customDomain
       if (clientId !== 'console' && clientId !== 'passport') {
         ;[appPlan, appProps, emailTheme, customDomain] = await Promise.all([
-          starbaseClient.getAppPlan.query({
+          coreClient.starbase.getAppPlan.query({
             clientId,
           }),
-          starbaseClient.getAppPublicProps.query({
+          coreClient.starbase.getAppPublicProps.query({
             clientId,
           }),
-          starbaseClient.getEmailOTPTheme.query({
+          coreClient.starbase.getEmailOTPTheme.query({
             clientId,
           }),
-          starbaseClient.getCustomDomain.query({
+          coreClient.starbase.getCustomDomain.query({
             clientId,
           }),
         ])
@@ -85,7 +76,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         }
       }
 
-      const state = await addressClient.generateEmailOTP.mutate({
+      const state = await coreClient.address.generateEmailOTP.mutate({
         email,
         themeProps,
       })
@@ -111,16 +102,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       { node_type: NodeType.Email, addr_type: EmailAddressType.Email },
       { alias: email, hidden: 'true' }
     )
-    const addressClient = getAddressClient(
-      addressURN,
-      context.env,
-      context.traceSpan
-    )
-
-    const successfulVerification = await addressClient.verifyEmailOTP.mutate({
-      code: formData.get('code') as string,
-      state: formData.get('state') as string,
-    })
+    const coreClient = getCoreClient({ context, addressURN })
+    const successfulVerification =
+      await coreClient.address.verifyEmailOTP.mutate({
+        code: formData.get('code') as string,
+        state: formData.get('state') as string,
+      })
 
     return json({ addressURN, successfulVerification })
   }

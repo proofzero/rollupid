@@ -62,11 +62,7 @@ export const getAuthorizedAppScopesMethod = async ({
     accountURN,
     clientId,
     scopes,
-    {
-      edgesFetcher: ctx.Edges,
-      accountFetcher: ctx.Account,
-      addressFetcher: ctx.Address,
-    },
+    ctx.Core,
     ctx.traceSpan,
     personaData
   )

@@ -1,3 +1,4 @@
+import coreRouter from '@proofzero/platform/core/src/router'
 import { appRouter as accountRouter } from '@proofzero/platform/account/src/jsonrpc/router'
 import { appRouter as accessRouter } from '@proofzero/platform/access/src/jsonrpc/router'
 import { appRouter as addressRouter } from '@proofzero/platform/address/src/jsonrpc/router'
@@ -7,6 +8,8 @@ import { appRouter as objectRouter } from '@proofzero/platform/object/src/jsonrp
 import { appRouter as starbaseRouter } from '@proofzero/platform/starbase/src/jsonrpc/router'
 import { appRouter as imageRouter } from '@proofzero/platform/images/src/jsonrpc/router'
 import { appRouter as emailRouter } from '@proofzero/platform/email/src/jsonrpc/router'
+
+export type CoreRouter = typeof coreRouter
 
 export type AccountRouter = typeof accountRouter
 

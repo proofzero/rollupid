@@ -1,9 +1,13 @@
-import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
-import { Context } from '../../context'
-import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 import { z } from 'zod'
+
+import { router } from '@proofzero/platform.core'
+import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
+import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
+
 import { AccountURN } from '@proofzero/urns/account'
 import ENSUtils from '@proofzero/platform-clients/ens-utils'
+
+import { Context } from '../../context'
 
 export const GetAccountByAliasInput = z.object({
   provider: z.string(),
@@ -27,7 +31,8 @@ export const getAccountByAliasMethod = async ({
     alias = (await new ENSUtils().getEnsEntry(input.alias)).address
   }
 
-  const { edges } = await ctx.edges.getEdges.query({
+  const caller = router.createCaller(ctx)
+  const { edges } = await caller.edges.getEdges({
     query: {
       tag: EDGE_ADDRESS,
       dst: {

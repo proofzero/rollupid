@@ -3,7 +3,7 @@ import { AccountURN } from '@proofzero/urns/account'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { ActionFunction, redirect } from '@remix-run/cloudflare'
 import { parseJwt, requireJWT } from '~/utilities/session.server'
-import createAccountClient from '@proofzero/platform-clients/account'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { BadRequestError } from '@proofzero/errors'
 
@@ -15,7 +15,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-    const accountClient = createAccountClient(context.env.Account, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
@@ -28,7 +28,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    await accountClient.createIdentityGroup.mutate({
+    await coreClient.account.createIdentityGroup.mutate({
       accountURN,
       name: name as string,
     })

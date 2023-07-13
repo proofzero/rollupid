@@ -1,13 +1,14 @@
 import { z } from 'zod'
 
 import { arrayify } from '@ethersproject/bytes'
-import { Context } from '../../context'
-import { initAddressNodeByName } from '../../nodes'
 import { BadRequestError } from '@proofzero/errors'
 
 import { AddressURNSpace, type AddressURN } from '@proofzero/urns/address'
 import { Wallet } from '@ethersproject/wallet'
 import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
+
+import type { Context } from '../../context'
+import { initAddressNodeByName } from '../../nodes'
 
 export const RevokeWalletSessionKeyInput = z.object({
   publicSessionKey: z.string(),
@@ -49,7 +50,6 @@ export const revokeWalletSessionKeyMethod = async ({
   )
 
   await revokeWalletSessionKey({
-    ctx,
     smartContractWalletNode,
     projectId: input.projectId,
     publicSessionKey: input.publicSessionKey,
@@ -69,7 +69,6 @@ export const revokeWalletSessionKeyBatchMethod = async ({
     const smartContractWalletNode = initAddressNodeByName(baseURN, ctx.Address)
     resultPromises.push(
       revokeWalletSessionKey({
-        ctx,
         smartContractWalletNode,
         projectId: input.projectId,
         publicSessionKey: smartWalletSessionKey.publicSessionKey,
@@ -80,12 +79,10 @@ export const revokeWalletSessionKeyBatchMethod = async ({
 }
 
 const revokeWalletSessionKey = async ({
-  ctx,
   smartContractWalletNode,
   projectId,
   publicSessionKey,
 }: {
-  ctx: Context
   smartContractWalletNode: any
   projectId: string
   publicSessionKey: string

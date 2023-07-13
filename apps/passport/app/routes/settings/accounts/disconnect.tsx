@@ -1,7 +1,7 @@
 import { AddressURN } from '@proofzero/urns/address'
 import { JsonError } from '@proofzero/utils/errors'
 import type { ActionFunction } from '@remix-run/cloudflare'
-import { getAddressClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import {
   getValidatedSessionContext,
   getDefaultAuthzParams,
@@ -18,14 +18,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     )
 
     const formData = await request.formData()
-    const id = formData.get('id') as AddressURN
+    const addressURN = formData.get('id') as AddressURN
 
-    const addressClient = getAddressClient(id, context.env, context.traceSpan)
-    const accountURN = await addressClient.getAccount.query()
+    const coreClient = getCoreClient({ context, addressURN })
+    const accountURN = await coreClient.address.getAccount.query()
 
-    await addressClient.deleteAddressNode.mutate({
-      accountURN,
-    })
+    await coreClient.address.deleteAddressNode.mutate({ accountURN })
 
     return null
   }

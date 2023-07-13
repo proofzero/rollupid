@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import * as jose from 'jose'
 
+import { router } from '@proofzero/platform.core'
+
 import {
   ACCESS_TOKEN_OPTIONS,
   AUTHENTICATION_TOKEN_OPTIONS,
@@ -169,7 +171,8 @@ const handleAuthorizationCode: ExchangeTokenMethod<
 > = async ({ ctx, input }) => {
   const { code, clientId, clientSecret, issuer } = input
 
-  const { valid } = await ctx.starbaseClient.checkAppAuth.query({
+  const caller = router.createCaller(ctx)
+  const { valid } = await caller.starbase.checkAppAuth({
     clientId,
     clientSecret,
   })
@@ -208,7 +211,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     personaData: combinedPersonaData,
   })
   const access = AccessURNSpace.componentizedUrn(name, { client_id: clientId })
-  await ctx.edgesClient!.makeEdge.mutate({
+  await caller.edges.makeEdge({
     src: account,
     dst: access,
     tag: EDGE_AUTHORIZES,
@@ -217,7 +220,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     access,
     scope,
     combinedPersonaData,
-    { edgesFetcher: ctx.Edges },
+    ctx.Core,
     ctx.traceSpan
   )
 
@@ -249,11 +252,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     account,
     clientId,
     scope,
-    {
-      edgesFetcher: ctx.Edges,
-      accountFetcher: ctx.Account,
-      addressFetcher: ctx.Address,
-    },
+    ctx.Core,
     ctx.traceSpan,
     combinedPersonaData
   )
@@ -283,11 +282,8 @@ const handleRefreshToken: ExchangeTokenMethod<
 > = async ({ ctx, input }) => {
   const { refreshToken, clientId, clientSecret, issuer } = input
 
-  if (!ctx.starbaseClient) {
-    throw new Error('missing starbase client')
-  }
-
-  const { valid } = await ctx.starbaseClient.checkAppAuth.query({
+  const caller = router.createCaller(ctx)
+  const { valid } = await caller.starbase.checkAppAuth({
     clientId,
     clientSecret,
   })

@@ -29,7 +29,7 @@ import reloadIcon from '@proofzero/design-system/src/assets/reload.svg'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
@@ -55,12 +55,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     if (!clientId) throw new BadRequestError({ message: 'Missing Client ID' })
 
     const jwt = await requireJWT(request, context.env)
-    const starbaseClient = createStarbaseClient(context.env.Starbase, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const customDomain = await starbaseClient.getCustomDomain.query({
+    const customDomain = await coreClient.starbase.getCustomDomain.query({
       clientId,
     })
 
@@ -76,12 +76,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     if (!clientId) throw new BadRequestError({ message: 'Missing Client ID' })
 
     const jwt = await requireJWT(request, context.env)
-    const starbaseClient = createStarbaseClient(context.env.Starbase, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const { appPlan } = await starbaseClient.getAppDetails.query({
+    const { appPlan } = await coreClient.starbase.getAppDetails.query({
       clientId,
     })
     await planGuardWithToastException(
@@ -101,7 +101,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       if (typeof hostname !== 'string')
         throw new BadRequestError({ message: 'Invalid Hostname' })
       if (!hostname) throw new BadRequestError({ message: 'Missing Hostname' })
-      const customDomain = await starbaseClient.createCustomDomain.mutate({
+      const customDomain = await coreClient.starbase.createCustomDomain.mutate({
         clientId,
         hostname,
         passportHostname: passportUrl.hostname,
@@ -109,13 +109,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
       return json({ customDomain, hostname })
     } else if (request.method === 'POST') {
-      const customDomain = await starbaseClient.getCustomDomain.query({
+      const customDomain = await coreClient.starbase.getCustomDomain.query({
         clientId,
         refresh: true,
       })
       return json({ customDomain, hostname })
     } else if (request.method === 'DELETE') {
-      await starbaseClient.deleteCustomDomain.mutate({ clientId })
+      await coreClient.starbase.deleteCustomDomain.mutate({ clientId })
       return json({ customDomain: null, hostname })
     }
   }

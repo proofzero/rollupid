@@ -21,9 +21,7 @@ import {
   getFlashSession,
   requireJWT,
 } from '~/utilities/session.server'
-import createAccountClient from '@proofzero/platform-clients/account'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
-import createAddressClient from '@proofzero/platform-clients/address'
+import createCoreClient from '@proofzero/platform-clients/core'
 import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
@@ -104,21 +102,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-    const accountClient = createAccountClient(context.env.Account, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
 
-    const addressClient = createAddressClient(context.env.Address, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-
-    const { plans, subscriptionID } = await accountClient.getEntitlements.query(
-      {
+    const { plans, subscriptionID } =
+      await coreClient.account.getEntitlements.query({
         accountURN,
-      }
-    )
+      })
 
     const flashSession = await getFlashSession(request, context.env)
 
@@ -128,16 +120,16 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       toastNotification = JSON.parse(toastStr)
     }
 
-    const connectedAccounts = await accountClient.getAddresses.query({
+    const connectedAccounts = await coreClient.account.getAddresses.query({
       account: accountURN,
     })
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
-    const spd = await accountClient.getStripePaymentData.query({
+    const spd = await coreClient.account.getStripePaymentData.query({
       accountURN,
     })
     if (spd && !spd.addressURN) {
-      const targetAddressURN = await addressClient.getAddressURNForEmail.query(
+      const targetAddressURN = await coreClient.address.getAddressURNForEmail.query(
         spd.email.toLowerCase()
       )
 
@@ -147,7 +139,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         })
       }
 
-      await accountClient.setStripePaymentData.mutate({
+      await coreClient.account.setStripePaymentData.mutate({
         ...spd,
         addressURN: targetAddressURN,
         accountURN,
@@ -210,17 +202,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-    const accountClient = createAccountClient(context.env.Account, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-
-    const starbaseClient = createStarbaseClient(context.env.Starbase, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-
-    const addressClient = createAddressClient(context.env.Address, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
@@ -234,7 +216,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       txType: 'buy' | 'remove'
     }
 
-    const apps = await starbaseClient.listApps.query()
+    const apps = await coreClient.starbase.listApps.query()
     const assignedEntitlementCount = apps.filter(
       (a) => a.appPlan === ServicePlanType.PRO
     ).length
@@ -246,7 +228,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    const entitlements = await accountClient.getEntitlements.query({
+    const entitlements = await coreClient.account.getEntitlements.query({
       accountURN,
     })
 
@@ -283,9 +265,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         {
           subscriptionID: sub.id,
           accountURN,
-          accountClient,
-          starbaseClient,
-          addressClient,
+          coreClient,
           billingURL: `${context.env.CONSOLE_URL}/billing`,
           settingsURL: `${context.env.CONSOLE_URL}`,
         },

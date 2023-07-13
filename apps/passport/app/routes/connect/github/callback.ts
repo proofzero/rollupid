@@ -14,7 +14,7 @@ import {
 } from '~/utils/authenticate.server'
 import { redirectToCustomDomainHost } from '~/utils/connect-proxy'
 
-import { getAddressClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
 import { NodeType, OAuthAddressType } from '@proofzero/types/address'
 import type { OAuthData } from '@proofzero/platform.address/src/types'
@@ -54,26 +54,22 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         message: 'Could not get Github login info.',
       })
 
-    const address = AddressURNSpace.componentizedUrn(
+    const addressURN = AddressURNSpace.componentizedUrn(
       generateHashedIDRef(OAuthAddressType.GitHub, profile.id),
       { node_type: NodeType.OAuth, addr_type: OAuthAddressType.GitHub },
       { alias: profile._json.login, hidden: 'true' }
     )
-    const addressClient = getAddressClient(
-      address,
-      context.env,
-      context.traceSpan
-    )
+    const coreClient = getCoreClient({ context, addressURN })
+    const { accountURN, existing } =
+      await coreClient.address.resolveAccount.query({
+        jwt: await getUserSession(request, context.env, appData?.clientId),
+        force: !appData || appData.rollup_action !== 'connect',
+      })
 
-    const { accountURN, existing } = await addressClient.resolveAccount.query({
-      jwt: await getUserSession(request, context.env, appData?.clientId),
-      force: !appData || appData.rollup_action !== 'connect',
-    })
-
-    await addressClient.setOAuthData.mutate(authRes)
+    await coreClient.address.setOAuthData.mutate(authRes)
 
     return authenticateAddress(
-      address,
+      addressURN,
       accountURN,
       appData,
       request,

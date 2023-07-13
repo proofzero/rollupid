@@ -2,7 +2,7 @@ import { useContext, useState } from 'react'
 
 import { useLoaderData, useSubmit } from '@remix-run/react'
 import { redirect } from '@remix-run/cloudflare'
-import { getAccountClient, getStarbaseClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import {
   getAuthzCookieParams,
   getValidatedSessionContext,
@@ -33,8 +33,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       context.env,
       context.traceSpan
     )
-    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-    const profile = await accountClient.getProfile.query({
+    const coreClient = getCoreClient({ context, jwt })
+    const profile = await coreClient.account.getProfile.query({
       account: accountUrn,
     })
 
@@ -77,8 +77,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     let appProps: GetAppPublicPropsResult | undefined
     if (clientId !== 'console' && clientId !== 'passport') {
-      const sbClient = getStarbaseClient('', context.env, context.traceSpan)
-      appProps = await sbClient.getAppPublicProps.query({
+      const coreClient = getCoreClient({ context })
+      appProps = await coreClient.starbase.getAppPublicProps.query({
         clientId: clientId as string,
       })
     }

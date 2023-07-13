@@ -6,7 +6,7 @@ import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import { getAuthzCookieParams } from '~/session.server'
 
-import { getAddressClient } from '../../../platform.server'
+import { getCoreClient } from '../../../platform.server'
 import { authenticateAddress } from '../../../utils/authenticate.server'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
@@ -27,12 +27,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       { alias: address, hidden: 'false' }
     )
 
-    const addressClient = getAddressClient(
-      addressURN,
-      context.env,
-      context.traceSpan
-    )
-    const accountURN = await addressClient.getAccount.query()
+    const coreClient = getCoreClient({ context, addressURN })
+    const accountURN = await coreClient.address.getAccount.query()
 
     const appData = await getAuthzCookieParams(request, context.env)
 

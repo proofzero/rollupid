@@ -1,4 +1,6 @@
 import { z } from 'zod'
+
+import { router } from '@proofzero/platform.core'
 import { inputValidators } from '@proofzero/platform-middleware'
 import { Context } from '../../context'
 import { ProfileSchema } from '../validators/profile'
@@ -19,7 +21,7 @@ export const setProfileMethod = async ({
   // if user is calling this method with the same accountURN in jwt
   // TODO: validate JWT in "ValidateJWT" middleware
   if (ctx.accountURN === input.name) {
-    await ctx.account?.class.setProfile(input.profile)
+    await ctx.accountNode?.class.setProfile(input.profile)
   }
 
   const qcomps = {
@@ -34,8 +36,8 @@ export const setProfileMethod = async ({
       qcomps
     )
 
-    const edge = ctx.edges
-    await edge.updateNode.mutate({ urnOfNode: enhancedUrn })
+    const caller = router.createCaller(ctx)
+    await caller.edges.updateNode({ urnOfNode: enhancedUrn })
   }
   return
 }

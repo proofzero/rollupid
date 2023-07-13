@@ -1,7 +1,6 @@
 import { ActionFunction, json } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
-import createAddressClient from '@proofzero/platform-clients/address'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
@@ -47,30 +46,26 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const addressURN = formData.get('addressURN') as string
 
-    const addressClient = createAddressClient(context.env.Address, {
+    const coreClient = createCoreClient(context.env.Core, {
       [PlatformAddressURNHeader]: addressURN,
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const { address: email } = await addressClient.getAddressProfile.query()
-
-    const starbaseClient = createStarbaseClient(context.env.Starbase, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...generateTraceContextHeaders(context.traceSpan),
-    })
+    const { address: email } =
+      await coreClient.address.getAddressProfile.query()
 
     let [appProps, customDomain] = await Promise.all([
-      starbaseClient.getAppPublicProps.query({
+      coreClient.starbase.getAppPublicProps.query({
         clientId,
       }),
-      starbaseClient.getCustomDomain.query({
+      coreClient.starbase.getCustomDomain.query({
         clientId,
       }),
     ])
 
     try {
-      await addressClient.generateEmailOTP.mutate({
+      await coreClient.address.generateEmailOTP.mutate({
         email,
         themeProps: {
           privacyURL: appProps.privacyURL as string,

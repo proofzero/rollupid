@@ -1,0 +1,41 @@
+name = "profile-current"
+main = "./build/index.js"
+compatibility_date = "2022-04-05"
+compatibility_flags = ["no_minimal_subrequests"]
+workers_dev = false
+logpush = true
+
+kv_namespaces = [
+  { binding = "ProfileKV", id = "3a5214b7dab24414a1cb65733a6143b2" },
+]
+
+routes = [
+  { pattern = "my.rollup.id", custom_domain = true, zone_name = "rollup.id" },
+]
+
+services = [
+  { binding = "Galaxy", service = "galaxy-current" },
+  { binding = "Images", service = "images-current" },
+]
+
+[build]
+command = "yarn build"
+
+[site]
+bucket = "./public"
+
+[vars]
+PASSPORT_URL = "https://passport.rollup.id"
+PASSPORT_AUTH_URL = "https://passport.rollup.id/authorize"
+IMAGES_URL = "https://images.rollup.id/trpc"
+PASSPORT_TOKEN_URL = "https://passport.rollup.id/token"
+CLIENT_ID = "<console client id>"
+REDIRECT_URI = "https://my.rollup.id/auth/callback"
+COOKIE_DOMAIN = "rollup.id"
+TWITTER_URL = "https://twitter.com/rollupid"
+DISCORD_URL = "https://discord.gg/rollupid"
+MINTPFP_CONTRACT_ADDRESS = "0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
+PROFILE_VERSION = 1
+ALCHEMY_ETH_NETWORK = "mainnet"
+ALCHEMY_POLYGON_NETWORK = "mainnet"

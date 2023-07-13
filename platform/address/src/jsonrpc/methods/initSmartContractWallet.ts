@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import { Wallet } from '@ethersproject/wallet'
 
+import { router } from '@proofzero/platform.core'
 import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 
-import createEdgesClient from '@proofzero/platform-clients/edges'
 import { Context } from '../../context'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
 import { initAddressNodeByName } from '../../nodes'
@@ -81,10 +81,8 @@ export const initSmartContractWalletMethod = async ({
   // Store the owning account for the address node in the node itself.
   await smartContractWalletNode.class.setAccount(account)
 
-  const edgesClient = createEdgesClient(ctx.Edges, {
-    ...generateTraceContextHeaders(ctx.traceSpan),
-  })
-  await edgesClient.makeEdge.mutate({
+  const caller = router.createCaller(ctx)
+  await caller.edges.makeEdge({
     src: account,
     dst: addressURN,
     tag: EDGE_ADDRESS,

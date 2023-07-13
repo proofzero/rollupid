@@ -41,8 +41,7 @@ jobs:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'apps/profile'
-          command: publish --env current
-          environment: 'current'
+          command: publish --config wrangler.current.toml
           secrets: |
             SECRET_SESSION_KEY
             SECRET_SESSION_SALT

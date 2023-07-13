@@ -6,7 +6,7 @@ import {
   getFlashSession,
   requireJWT,
 } from '~/utilities/session.server'
-import createAccountClient from '@proofzero/platform-clients/account'
+import createCoreClient from '@proofzero/platform-clients/core'
 import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
@@ -23,7 +23,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-    const accountClient = createAccountClient(context.env.Account, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
@@ -37,7 +37,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       name: string
     }
 
-    let paymentData = await accountClient.getStripePaymentData.query({
+    let paymentData = await coreClient.account.getStripePaymentData.query({
       accountURN,
     })
     if (!paymentData) {
@@ -74,7 +74,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       )
     }
 
-    await accountClient.setStripePaymentData.mutate({
+    await coreClient.account.setStripePaymentData.mutate({
       ...paymentData,
       accountURN,
       addressURN,

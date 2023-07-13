@@ -1,19 +1,26 @@
 import { z } from 'zod'
+
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
+
 import { Context } from '../../context'
 import { isHandleAddressType } from '../../utils'
 
-export const GetAccountOutput = AccountURNInput.optional()
+export const GetAccountInput = z.void()
+type GetAccountInput = z.infer<typeof GetAccountInput>
 
+export const GetAccountOutput = AccountURNInput.optional()
 type GetAccountResult = z.infer<typeof GetAccountOutput>
 
-export const getAccountMethod = async ({
-  input,
-  ctx,
-}: {
-  input: unknown
+type GetAccountParams = {
+  input: GetAccountInput
   ctx: Context
-}): Promise<GetAccountResult> => {
+}
+
+interface GetAccountMethod {
+  (params: GetAccountParams): Promise<GetAccountResult>
+}
+
+export const getAccountMethod: GetAccountMethod = async ({ input, ctx }) => {
   if (isHandleAddressType(ctx.addrType as string)) {
     throw new Error('Not implemented')
   }

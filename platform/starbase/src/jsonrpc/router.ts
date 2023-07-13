@@ -2,7 +2,7 @@ import { initTRPC } from '@trpc/server'
 
 import { errorFormatter } from '@proofzero/utils/trpc'
 
-import { Context } from './context'
+import type { Context } from './context'
 import { LogUsage } from '@proofzero/platform-middleware/log'
 import {
   createApp,

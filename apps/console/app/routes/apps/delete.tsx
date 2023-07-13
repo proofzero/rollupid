@@ -1,6 +1,6 @@
 import { redirect } from '@remix-run/cloudflare'
 import type { ActionFunction } from '@remix-run/cloudflare'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { requireJWT } from '~/utilities/session.server'
 import {
   getAuthzHeaderConditionallyFromToken,
@@ -28,12 +28,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const parsedJwt = parseJwt(jwt as string)
     const accountURN = parsedJwt.sub as AccountURN
 
-    const starbaseClient = createStarbaseClient(context.env.Starbase, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
     try {
-      await starbaseClient.deleteApp.mutate({ clientId })
+      await coreClient.starbase.deleteApp.mutate({ clientId })
       await createAnalyticsEvent({
         apiKey: context.env.POSTHOG_API_KEY,
         eventName: 'app_deleted',

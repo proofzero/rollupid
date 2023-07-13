@@ -1,15 +1,11 @@
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
-import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 
 export const seviceBindings = true
 
 declare global {
   interface Env {
-    Address: Fetcher
-    Account: Fetcher
+    Core: Fetcher
     Galaxy: Fetcher
-    Access: Fetcher
-    Starbase: Fetcher
     Images: Fetcher
 
     DEFAULT_HOSTS: string[]

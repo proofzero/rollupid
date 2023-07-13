@@ -5,7 +5,7 @@ import {
 } from '@remix-run/cloudflare-workers'
 import * as build from '@remix-run/dev/server-build'
 
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import {
   generateTraceContextHeaders,
   generateTraceSpan,
@@ -13,6 +13,7 @@ import {
 import type { TraceableFetchEvent } from '@proofzero/platform-middleware/trace'
 import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 import manifestJSON from '__STATIC_CONTENT_MANIFEST'
+import { getCoreClient } from '~/platform.server'
 let manifest = JSON.parse(manifestJSON)
 
 type CfHostMetadata = {
@@ -77,13 +78,15 @@ const handleEvent = async (event: FetchEvent, env: Env) => {
   if (!env.DEFAULT_HOSTS.includes(host)) {
     const clientId = request.cf?.hostMetadata?.clientId
     if (!clientId) return new Response(null, { status: 404 })
-    const starbaseClient = createStarbaseClient(
-      env.Starbase,
+    const coreClient = createCoreClient(
+      env.Core,
       generateTraceContextHeaders(newTraceSpan)
     )
 
     try {
-      const app = await starbaseClient.getAppPublicProps.query({ clientId })
+      const app = await coreClient.starbase.getAppPublicProps.query({
+        clientId,
+      })
       newEvent.request.app_props = app
       const { customDomain } = app
       if (!customDomain) return new Response(null, { status: 404 })

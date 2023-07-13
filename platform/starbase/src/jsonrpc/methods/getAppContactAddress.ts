@@ -1,10 +1,13 @@
 import { z } from 'zod'
-import { Context } from '../context'
-import { AppClientIdParamSchema } from '../validators/app'
+
+import { router } from '@proofzero/platform.core'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { AddressURN } from '@proofzero/urns/address'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
+
+import { Context } from '../context'
+import { AppClientIdParamSchema } from '../validators/app'
 
 export const GetAppContactAddressInput = AppClientIdParamSchema
 export const GetAppContactAddressOutput = AddressURNInput.optional()
@@ -25,7 +28,8 @@ export const getAppContactAddress = async ({
       `Request received for clientId ${input.clientId} which is not owned by provided account.`
     )
 
-  const { edges } = await ctx.edges.getEdges.query({
+  const caller = router.createCaller(ctx)
+  const { edges } = await caller.edges.getEdges({
     query: {
       src: { baseUrn: appURN },
       tag: EDGE_HAS_REFERENCE_TO,

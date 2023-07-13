@@ -13,7 +13,7 @@ import {
   OAuthAddressType,
 } from '@proofzero/types/address'
 import _ from 'lodash'
-import createAccountClient from '@proofzero/platform-clients/account'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { requireJWT } from '~/utilities/session.server'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -68,13 +68,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const jwt = await requireJWT(request, context.env)
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
-    const accountClient = createAccountClient(context.env.Account, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
 
     const invitations =
-      await accountClient.getIdentityGroupMemberInvitations.query({
+      await coreClient.account.getIdentityGroupMemberInvitations.query({
         identityGroupURN: groupURN,
       })
 

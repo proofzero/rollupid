@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
 import { ServicePlanType } from '@proofzero/types/account'
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
@@ -36,8 +37,8 @@ export const reconcileAppSubscriptions = async ({
   ctx: Context
 }): Promise<ReconcileAppsSubscriptionsOutput> => {
   const { accountURN, plan, count } = input
-
-  const { edges } = await ctx.edges.getEdges.query({
+  const caller = router.createCaller(ctx)
+  const { edges } = await caller.edges.getEdges({
     query: {
       src: { baseUrn: accountURN },
       tag: EDGE_PAYS_APP,
@@ -52,7 +53,7 @@ export const reconcileAppSubscriptions = async ({
 
     const appDetails = await appDO.class.getDetails()
     if (appDetails.createdTimestamp != null) {
-      const { edges: contactEdges } = await ctx.edges.getEdges.query({
+      const { edges: contactEdges } = await caller.edges.getEdges({
         query: {
           src: { baseUrn: edge.dst.baseUrn },
           tag: EDGE_HAS_REFERENCE_TO,
@@ -86,7 +87,7 @@ export const reconcileAppSubscriptions = async ({
       }))
 
     for (const app of targetApps) {
-      await ctx.edges.removeEdge.mutate({
+      await caller.edges.removeEdge({
         src: accountURN,
         tag: EDGE_PAYS_APP,
         dst: app.appURN,

@@ -1,5 +1,6 @@
-import generateRandomString from '@proofzero/utils/generateRandomString'
 import { z } from 'zod'
+
+import generateRandomString from '@proofzero/utils/generateRandomString'
 
 import { Context } from '../../context'
 import { AddressNode } from '../../nodes'

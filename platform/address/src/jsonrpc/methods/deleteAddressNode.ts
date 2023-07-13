@@ -1,12 +1,14 @@
 import { z } from 'zod'
+
+import { router } from '@proofzero/platform.core'
+
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
-import { Context } from '../../context'
 import { RollupError, ERROR_CODES } from '@proofzero/errors'
-import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { AddressURN } from '@proofzero/urns/address'
+
+import type { Context } from '../../context'
 import { getAddressReferenceTypes } from './getAddressReferenceTypes'
-import getEdgesClient from '@proofzero/platform-clients/edges'
 
 export const DeleteAddressNodeInput = z.object({
   accountURN: AccountURNInput,
@@ -24,13 +26,10 @@ export const deleteAddressNodeMethod = async ({
 }) => {
   const { accountURN, forceDelete } = input
 
-  const edgesClient = getEdgesClient(
-    ctx.Edges,
-    generateTraceContextHeaders(ctx.traceSpan)
-  )
   const nodeClient = ctx.address
 
-  const accountEdge = await edgesClient.findNode.query({
+  const caller = router.createCaller(ctx)
+  const accountEdge = await caller.edges.findNode({
     baseUrn: accountURN,
   })
 
@@ -64,7 +63,7 @@ export const deleteAddressNodeMethod = async ({
   // Remove the stored account in the node.
   await nodeClient?.class.unsetAccount()
 
-  const { edges: addressEdges } = await edgesClient.getEdges.query({
+  const { edges: addressEdges } = await caller.edges.getEdges({
     query: {
       dst: {
         baseUrn: address,
@@ -74,14 +73,14 @@ export const deleteAddressNodeMethod = async ({
 
   // Remove any edge that references the address node
   addressEdges.forEach(async (edge) => {
-    await edgesClient.removeEdge.mutate({
+    await caller.edges.removeEdge({
       src: edge.src.baseUrn,
       dst: edge.dst.baseUrn,
       tag: edge.tag,
     })
   })
 
-  await ctx.edges.deleteNode.mutate({
+  await caller.edges.deleteNode({
     urn: address,
   })
 

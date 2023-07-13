@@ -11,7 +11,7 @@ import {
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
-import { getAccountClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import {
   getAuthzCookieParams,
   getUserSession,
@@ -38,8 +38,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     if (!jwt) return redirectToAuthentication(request, params.clientId)
 
     const account = parseJwt(jwt).sub as AccountURN
-    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-    const profile = await accountClient.getProfile.query({ account })
+    const coreClient = getCoreClient({ context, jwt })
+    const profile = await coreClient.account.getProfile.query({ account })
     if (!profile) return redirectToAuthentication(request, params.clientId)
     return json({
       profile,

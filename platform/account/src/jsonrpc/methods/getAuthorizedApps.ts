@@ -1,12 +1,11 @@
+import { z } from 'zod'
+
 import { UnauthorizedError } from '@proofzero/errors'
-import createEdgesClient from '@proofzero/platform-clients/edges'
 import type { AccessRComp } from '@proofzero/urns/access'
 
-import { Context } from '../../context'
+import { router, type Context } from '@proofzero/platform.core'
 import { EDGE_AUTHORIZES } from '@proofzero/platform.access/src/constants'
 import { inputValidators } from '@proofzero/platform-middleware'
-import { z } from 'zod'
-import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 // Input
 // -----------------------------------------------------------------------------
@@ -29,6 +28,10 @@ export const GetAuthorizedAppsMethodOutput = z.array(
   })
 )
 
+export type GetAuthorizedAppsMethodOutput = z.infer<
+  typeof GetAuthorizedAppsMethodOutput
+>
+
 // Method
 // -----------------------------------------------------------------------------
 
@@ -38,15 +41,12 @@ export const getAuthorizedAppsMethod = async ({
 }: {
   input: GetAuthorizedAppsParams
   ctx: Context
-}) => {
+}): Promise<GetAuthorizedAppsMethodOutput> => {
   if (!ctx.accountURN)
     throw new UnauthorizedError({ message: 'account not found' })
 
-  const edgesClient = createEdgesClient(ctx.Edges, {
-    ...generateTraceContextHeaders(ctx.traceSpan),
-  })
-
-  const edgesResult = await edgesClient.getEdges.query({
+  const caller = router.createCaller(ctx)
+  const edgesResult = await caller.edges.getEdges({
     query: {
       // We only want edges that start at the provided account node.
       src: { baseUrn: input.account },

@@ -15,12 +15,7 @@ import icon16 from '~/assets/favicon-16x16.png'
 import faviconSvg from '~/assets/favicon.svg'
 import noImg from '~/assets/noImg.svg'
 
-import {
-  getAccessClient,
-  getAccountClient,
-  getAddressClient,
-  getStarbaseClient,
-} from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 
 import type { AddressURN } from '@proofzero/urns/address'
 import type { NodeType } from '@proofzero/types/address'
@@ -64,15 +59,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       context.traceSpan
     )
 
-    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-    const starbaseClient = getStarbaseClient(
-      jwt,
-      context.env,
-      context.traceSpan
-    )
-    const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
+    const coreClient = getCoreClient({ context, jwt })
 
-    const accountProfile = await accountClient.getProfile.query({
+    const accountProfile = await coreClient.account.getProfile.query({
       account: accountUrn,
     })
 
@@ -82,13 +71,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })) as { urn: AddressURN; nodeType: NodeType }[]
 
     const addresses = addressTypeUrns.map((atu) => atu.urn)
-    const addressClient = getAddressClient(
-      NO_OP_ADDRESS_PLACEHOLDER,
-      context.env,
-      context.traceSpan
-    )
 
-    const apps = await accountClient.getAuthorizedApps.query({
+    const apps = await coreClient.account.getAuthorizedApps.query({
       account: accountUrn,
     })
 
@@ -96,7 +80,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       Promise.all(
         apps.map(async (a) => {
           const appAuthorizedScopes =
-            await accessClient.getAuthorizedAppScopes.query({
+            await coreClient.access.getAuthorizedAppScopes.query({
               clientId: a.clientId,
               accountURN: accountUrn,
             })
@@ -110,11 +94,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           }
         })
       ),
-      starbaseClient.getAppPublicPropsBatch.query({
+      coreClient.starbase.getAppPublicPropsBatch.query({
         apps: apps.map((a) => ({ clientId: a.clientId })),
         silenceErrors: true,
       }),
-      addressClient.getAddressProfileBatch.query(addresses),
+      coreClient.address.getAddressProfileBatch.query(addresses),
     ])
 
     const [authorizedApps, appsPublicProps, addressProfiles] = awaitedResults

@@ -8,9 +8,10 @@ import {
   requestLogging,
   setupContext,
 } from './utils'
-import createAccessClient from '@proofzero/platform-clients/access'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import core from '@proofzero/platform-clients/core'
 
 const appResolvers: Resolvers = {
   Query: {
@@ -19,12 +20,12 @@ const appResolvers: Resolvers = {
       { clientId },
       { env, accountURN, traceSpan }: ResolverContext
     ) => {
-      const accessClient = createAccessClient(
-        env.Access,
+      const coreClient = createCoreClient(
+        env.Core,
         generateTraceContextHeaders(traceSpan)
       )
 
-      const scopes = await accessClient.getAuthorizedAppScopes.query({
+      const scopes = await coreClient.access.getAuthorizedAppScopes.query({
         accountURN,
         clientId,
       })
@@ -38,12 +39,12 @@ const appResolvers: Resolvers = {
       { clientId },
       { env, jwt, traceSpan }: ResolverContext
     ) => {
-      const accessClient = createAccessClient(env.Access, {
+      const coreClient = createCoreClient(env.Core, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      await accessClient.revokeAppAuthorization.mutate({
+      await coreClient.access.revokeAppAuthorization.mutate({
         clientId,
       })
 

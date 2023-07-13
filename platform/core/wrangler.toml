@@ -1,0 +1,46 @@
+name = "core"
+main = "src/index.ts"
+compatibility_date = "2023-03-14"
+compatibility_flags = ["no_minimal_subrequests"]
+logpush = true
+node_compat = true
+workers_dev = false
+
+durable_objects.bindings = [
+  { name = "Access", class_name = "Authorization" },
+  { name = "Account", class_name = "Identity" },
+  { name = "Address", class_name = "Account" },
+  { name = "Authorization", class_name = "ExchangeCode" },
+  { name = "IdentityGroup", class_name = "IdentityGroup" },
+  { name = "StarbaseApp", class_name = "StarbaseApplication" },
+]
+
+services = [
+  { binding = "Core", service = "core" },
+  { binding = "Email", service = "email" },
+  { binding = "Images", service = "images" },
+]
+
+[dev]
+port = 10101
+inspector_port = 11101
+local_protocol = "http"
+
+[[d1_databases]]
+binding = "EDGES"
+database_name = "edges-v2"
+database_id = "local"
+migrations_dir = "../edges/migrations"
+
+[vars]
+ENVIRONMENT = "local"
+
+PASSPORT_URL = "http://localhost:10001"
+MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
+TTL_IN_MS = 25_000
+MAX_ATTEMPTS = 5
+DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS = 2_000
+REGENERATION_COOLDOWN_PERIOD_IN_MS = 30_000
+MAX_ATTEMPTS_TIME_PERIOD_IN_MS = 300_000
+
+POSTHOG_API_KEY = "phc_f7q7V62YWsS0FKyIRxO36xyUMFYJ8oahurHPBAXkGe5"

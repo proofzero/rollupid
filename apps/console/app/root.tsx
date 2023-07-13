@@ -38,8 +38,7 @@ import icon16 from './images/favicon-16x16.png'
 
 import * as gtag from '~/utils/gtags.client'
 import { parseJwt, requireJWT } from './utilities/session.server'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
-import createAccountClient from '@proofzero/platform-clients/account'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
@@ -109,15 +108,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const accountURN = parsedJwt.sub as AccountURN
 
     try {
-      const accountClient = createAccountClient(context.env.Account, {
+      const coreClient = createCoreClient(context.env.Core, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...traceHeader,
       })
-      const starbaseClient = createStarbaseClient(context.env.Starbase, {
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...traceHeader,
-      })
-      const apps = await starbaseClient.listApps.query()
+      const apps = await coreClient.starbase.listApps.query()
       const reshapedApps = apps.map((a) => {
         return {
           clientId: a.clientId,
@@ -132,7 +127,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       let avatarUrl = ''
       let displayName = ''
       try {
-        const profile = await accountClient.getProfile.query({
+        const profile = await coreClient.account.getProfile.query({
           account: accountURN,
         })
         avatarUrl = profile?.pfp?.image || ''

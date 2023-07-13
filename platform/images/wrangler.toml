@@ -1,14 +1,8 @@
-# cfw/icons/wrangler.toml
-
 name = "images"
-
 main = "src/index.ts"
 compatibility_date = "2022-10-05"
-
-
-# We'll access these services through their external names.
-workers_dev = false
 logpush = true
+workers_dev = false
 
 [[rules]]
 globs = ["**/*.wasm"]
@@ -22,44 +16,7 @@ type = "Data"
 UPLOAD_WINDOW_SECONDS = 200
 HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID = "VqQy1abBMHYDZwVsTbsSMw"
 
-# Secrets are set via the dashboard, or using the wrangler CLI:
-# $ wrangler secret put <KEY> [--env]
-#
-# Required secrets:
-# - CLOUDFLARE_ACCOUNT_ID: the CF account ID of the uploaded image owner
-# - CLOUDFLARE_IMAGES_KEY: an API token with Images permissions
 [dev]
 port = 10502
 inspector_port = 11502
 local_protocol = "http"
-
-[env.dev]
-route = { pattern = "images-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" }
-
-[env.dev.vars]
-# The duration in seconds that returned upload URL is good for.
-# - minimum: 2 minutes (120)
-# - maximum: 6 hours (21600)
-UPLOAD_WINDOW_SECONDS = 200
-HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID = "VqQy1abBMHYDZwVsTbsSMw"
-
-[env.next]
-route = { pattern = "images-next.rollup.id", custom_domain = true, zone_name = "rollup.id" }
-
-[env.next.vars]
-# The duration in seconds that returned upload URL is good for.
-# - minimum: 2 minutes (120)
-# - maximum: 6 hours (21600)
-UPLOAD_WINDOW_SECONDS = 200
-HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID = "VqQy1abBMHYDZwVsTbsSMw"
-
-
-[env.current]
-route = { pattern = "images.rollup.id", custom_domain = true, zone_name = "rollup.id" }
-
-[env.current.vars]
-# The duration in seconds that returned upload URL is good for.
-# - minimum: 2 minutes (120)
-# - maximum: 6 hours (21600)
-UPLOAD_WINDOW_SECONDS = 200
-HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID = "VqQy1abBMHYDZwVsTbsSMw"

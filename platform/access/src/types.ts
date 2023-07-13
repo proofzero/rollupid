@@ -1,18 +1,4 @@
-import { DeploymentMetadata } from '@proofzero/types'
 import { Scope } from '@proofzero/types/access'
-
-export interface Environment {
-  Access: DurableObjectNamespace
-  Authorization: DurableObjectNamespace
-  Analytics: AnalyticsEngineDataset
-  ServiceDeploymentMetadata: DeploymentMetadata
-  Edges: Fetcher
-  Starbase: Fetcher
-  Account: Fetcher
-  Address: Fetcher
-  SECRET_JWK_CURRENT_KID: string
-  SECRET_JWKS: string
-}
 
 export type AuthorizationParameters = {
   redirectUri: string

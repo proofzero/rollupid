@@ -14,7 +14,7 @@
     // Specify what module code is generated.
     "module": "es2022",
     "moduleResolution": "node",
-    // Emit additional JavaScript to ease support for importing CommonJS
+    "types": ["@cloudflare/workers-types", "node"]       /* Specify type package names to be included without being referenced in a source file. */,    // Emit additional JavaScript to ease support for importing CommonJS
     // modules. This enables 'allowSyntheticDefaultImports' for type
     // compatibility.
     "esModuleInterop": true,

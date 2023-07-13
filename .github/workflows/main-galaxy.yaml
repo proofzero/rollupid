@@ -50,7 +50,6 @@ jobs:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'platform/galaxy'
-          command: publish --env dev
-          environment: 'dev'
+          command: publish --config wrangler.dev.toml
         env:
           NODE_ENV: 'development'

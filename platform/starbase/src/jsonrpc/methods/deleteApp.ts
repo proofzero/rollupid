@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { BadRequestError } from '@proofzero/errors'
@@ -33,12 +34,14 @@ export const deleteApp = async ({
       message: 'The application has a custom domain configuration',
     })
 
-  await ctx.edges.removeEdge.mutate({
+  const caller = router.createCaller(ctx)
+
+  await caller.edges.removeEdge({
     src: ctx.accountURN,
     dst: appURN,
     tag: EDGE_APPLICATION,
   })
-  await ctx.edges.deleteNode.mutate({
+  await caller.edges.deleteNode({
     urn: appURN,
   })
   await appDO.class.delete()

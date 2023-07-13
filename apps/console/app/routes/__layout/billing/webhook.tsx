@@ -3,9 +3,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { type ActionFunction } from '@remix-run/cloudflare'
 
 import Stripe from 'stripe'
-import createAccountClient from '@proofzero/platform-clients/account'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
-import createAddressClient from '@proofzero/platform-clients/address'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { type AccountURN } from '@proofzero/urns/account'
 
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -31,16 +29,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-    const accountClient = createAccountClient(context.env.Account, {
-      ...getAuthzHeaderConditionallyFromToken(undefined),
-      ...traceHeader,
-    })
-
-    const starbaseClient = createStarbaseClient(context.env.Starbase, {
-      ...getAuthzHeaderConditionallyFromToken(undefined),
-      ...traceHeader,
-    })
-    const addressClient = createAddressClient(context.env.Address, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(undefined),
       ...traceHeader,
     })
@@ -120,7 +109,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           return null
         }
 
-        const entitlements = await accountClient.getEntitlements.query({
+        const entitlements = await coreClient.account.getEntitlements.query({
           accountURN: subMeta.accountURN,
         })
         if (entitlements?.subscriptionID !== id) {
@@ -133,9 +122,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           {
             subscriptionID: id,
             accountURN: subMeta.accountURN,
-            accountClient,
-            starbaseClient,
-            addressClient,
+            coreClient,
             billingURL: `${context.env.CONSOLE_URL}/billing`,
             settingsURL: `${context.env.CONSOLE_URL}`,
           },
@@ -160,9 +147,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         }
 
         if (invoice_settings?.default_payment_method) {
-          const paymentData = await accountClient.getStripePaymentData.query({
-            accountURN: cusMeta.accountURN,
-          })
+          const paymentData =
+            await coreClient.account.getStripePaymentData.query({
+              accountURN: cusMeta.accountURN,
+            })
           paymentData.paymentMethodID = invoice_settings.default_payment_method
 
           // This needs to happen because
@@ -186,7 +174,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           const addressURN =
             paymentData.addressURN ?? (inferredAddressURN as AddressURN)
 
-          await accountClient.setStripePaymentData.mutate({
+          await coreClient.account.setStripePaymentData.mutate({
             ...paymentData,
             addressURN,
             accountURN: cusMeta.accountURN,
@@ -246,7 +234,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             })
           )
 
-          await addressClient.sendSuccessfulPaymentNotification.mutate({
+          await coreClient.address.sendSuccessfulPaymentNotification.mutate({
             email,
             name: name || 'Client',
             plans: purchasedItems.map((item) => ({
@@ -267,7 +255,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         if (!customerDataFail.deleted && customerDataFail.email) {
           const { email, name } = customerDataFail
 
-          await addressClient.sendFailedPaymentNotification.mutate({
+          await coreClient.address.sendFailedPaymentNotification.mutate({
             email,
             name: name || 'Client',
           })
@@ -293,16 +281,16 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           const { email, name } = customerDataDel
 
           await Promise.all([
-            addressClient.sendBillingNotification.mutate({
+            coreClient.address.sendBillingNotification.mutate({
               email,
               name: name || 'Client',
             }),
-            accountClient.cancelServicePlans.mutate({
+            coreClient.account.cancelServicePlans.mutate({
               account: metaDel.accountURN,
               subscriptionID: subIdDel,
               deletePaymentData: event.type === 'customer.deleted',
             }),
-            starbaseClient.deleteSubscriptionPlans.mutate({
+            coreClient.starbase.deleteSubscriptionPlans.mutate({
               accountURN: metaDel.accountURN,
             }),
           ])

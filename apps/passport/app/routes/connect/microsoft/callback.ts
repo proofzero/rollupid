@@ -6,7 +6,7 @@ import {
   createAuthenticatorSessionStorage,
   getMicrosoftStrategy,
 } from '~/auth.server'
-import { getAddressClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import { NodeType, OAuthAddressType } from '@proofzero/types/address'
 import type { OAuthData } from '@proofzero/platform.address/src/types'
 import { MicrosoftStrategyDefaultName } from 'remix-auth-microsoft'
@@ -46,26 +46,23 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         message: 'Unsupported provider returned in Microsoft callback.',
       })
 
-    const address = AddressURNSpace.componentizedUrn(
+    const addressURN = AddressURNSpace.componentizedUrn(
       generateHashedIDRef(OAuthAddressType.Microsoft, profile.id),
       { addr_type: OAuthAddressType.Microsoft, node_type: NodeType.OAuth },
       { alias: profile.emails[0]?.value || profile._json.email, hidden: 'true' }
     )
 
-    const addressClient = getAddressClient(
-      address,
-      context.env,
-      context.traceSpan
-    )
-    await addressClient.setOAuthData.mutate(authRes)
+    const coreClient = getCoreClient({ context, addressURN })
+    await coreClient.address.setOAuthData.mutate(authRes)
 
-    const { accountURN, existing } = await addressClient.resolveAccount.query({
-      jwt: await getUserSession(request, context.env, appData?.clientId),
-      force: !appData || appData.rollup_action !== 'connect',
-    })
+    const { accountURN, existing } =
+      await coreClient.address.resolveAccount.query({
+        jwt: await getUserSession(request, context.env, appData?.clientId),
+        force: !appData || appData.rollup_action !== 'connect',
+      })
 
     return authenticateAddress(
-      address,
+      addressURN,
       accountURN,
       appData,
       request,

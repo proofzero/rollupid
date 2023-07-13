@@ -1,7 +1,11 @@
 import { z } from 'zod'
-import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
-import { Context } from '../../context'
+
 import { AddressURN } from '@proofzero/urns/address'
+
+import { router } from '@proofzero/platform.core'
+import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
+
+import { Context } from '../../context'
 
 export const GetAddressURNForEmailInputSchema = z.string().email()
 type GetAddressURNForEmailParams = z.infer<
@@ -20,14 +24,16 @@ export const getAddressURNForEmailMethod = async ({
   ctx: Context
   input: GetAddressURNForEmailParams
 }): Promise<GetAddressURNForEmailResult> => {
-  let node = await ctx.edges.findNode.query({
+  const caller = router.createCaller(ctx)
+
+  let node = await caller.edges.findNode({
     qc: {
       alias: input,
     },
   })
 
   if (!node) {
-    node = await ctx.edges.findNode.query({
+    node = await caller.edges.findNode({
       qc: {
         alias: input.toLowerCase(),
       },

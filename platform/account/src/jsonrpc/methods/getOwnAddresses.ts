@@ -1,8 +1,10 @@
 import { z } from 'zod'
+
+import { router } from '@proofzero/platform.core'
 import { inputValidators } from '@proofzero/platform-middleware'
-import { Context } from '../../context'
 
 import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
+import { Context } from '../../context'
 import { Node } from '../../../../edges/src/jsonrpc/validators/node'
 
 export const GetAddressesInput = z.object({
@@ -53,7 +55,8 @@ export const getOwnAddressesMethod = async ({
 
   // Return the list of edges between the account node and any address
   // nodes, filtered by address type if provided.
-  const { edges } = await ctx.edges.getEdges.query({ query })
+  const caller = router.createCaller(ctx)
+  const { edges } = await caller.edges.getEdges({ query })
 
   return edges.map((e) => e.dst)
 }

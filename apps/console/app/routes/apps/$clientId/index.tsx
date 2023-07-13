@@ -28,7 +28,7 @@ import { LoginsPanel } from '~/components/Applications/LoginsPanel/LoginsPanel'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
 import type { appDetailsProps } from '~/types'
 
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { requireJWT } from '~/utilities/session.server'
 
 import { RollType } from '~/types'
@@ -82,7 +82,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const jwt = await requireJWT(request, context.env)
-    const starbaseClient = createStarbaseClient(context.env.Starbase, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
@@ -94,7 +94,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     switch (op) {
       case RollType.RollAPIKey:
         const rotatedApiKey = (
-          await starbaseClient.rotateApiKey.mutate({
+          await coreClient.starbase.rotateApiKey.mutate({
             clientId: params.clientId,
           })
         ).apiKey
@@ -103,7 +103,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         })
       case RollType.RollClientSecret:
         const rotatedClientSecret = (
-          await starbaseClient.rotateClientSecret.mutate({
+          await coreClient.starbase.rotateClientSecret.mutate({
             clientId: params.clientId,
           })
         ).secret

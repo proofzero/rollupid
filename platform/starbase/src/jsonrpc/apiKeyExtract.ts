@@ -1,6 +1,6 @@
 import { BaseMiddlewareFunction } from '@proofzero/platform-middleware/types'
 
-import { Context } from './context'
+import type { Context } from './context'
 import { AppAPIKeyHeader } from '@proofzero/types/headers'
 
 export const ApiKeyExtractMiddleware: BaseMiddlewareFunction<Context> = async ({

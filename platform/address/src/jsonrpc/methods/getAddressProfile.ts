@@ -10,7 +10,7 @@ import {
 
 import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
 
-import { Context } from '../../context'
+import type { Context } from '../../context'
 
 import {
   AppleAddress,
@@ -27,7 +27,6 @@ import {
 
 import { AddressProfileSchema } from '../validators/profile'
 import OAuthAddress from '../../nodes/oauth'
-import Address from '../../nodes/address'
 import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
 
 export const GetAddressProfileOutput = AddressProfileSchema.extend({
@@ -86,8 +85,7 @@ async function getProfile(
     throw new InternalServerError({ message: 'missing address or type' })
   }
 
-  if (!ctx.addressURN)
-    throw new BadRequestError({ message: 'missing addressURN' })
+  if (!addressURN) throw new BadRequestError({ message: 'missing addressURN' })
 
   const getProfileNode = ():
     | ContractAddress

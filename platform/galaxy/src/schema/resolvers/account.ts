@@ -1,8 +1,6 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 
-import createAccountClient from '@proofzero/platform-clients/account'
-import createAddressClient from '@proofzero/platform-clients/address'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 
 import {
   setupContext,
@@ -25,6 +23,7 @@ import {
   generateTraceContextHeaders,
   TraceSpan,
 } from '@proofzero/packages/platform-middleware/trace'
+import core from '@proofzero/platform-clients/core'
 
 const accountResolvers: Resolvers = {
   Query: {
@@ -37,12 +36,12 @@ const accountResolvers: Resolvers = {
 
       const finalAccountURN = targetAccountURN || accountURN
 
-      const accountClient = createAccountClient(env.Account, {
+      const coreClient = createCoreClient(env.Core, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      let accountProfile = await accountClient.getProfile.query({
+      let accountProfile = await coreClient.account.getProfile.query({
         account: finalAccountURN,
       })
 
@@ -54,24 +53,19 @@ const accountResolvers: Resolvers = {
       {},
       { env, accountURN, jwt, traceSpan }: ResolverContext
     ) => {
-      const accountClient = createAccountClient(env.Account, {
+      const coreClient = createCoreClient(env.Core, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      const apps = await accountClient.getAuthorizedApps.query({
+      const apps = await coreClient.account.getAuthorizedApps.query({
         account: accountURN,
-      })
-
-      const starbaseClient = createStarbaseClient(env.Starbase, {
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...generateTraceContextHeaders(traceSpan),
       })
 
       const mappedApps = await Promise.all(
         apps.map(async (a) => {
           const { name, iconURL } =
-            await starbaseClient.getAppPublicProps.query({
+            await coreClient.starbase.getAppPublicProps.query({
               clientId: a.clientId,
             })
 
@@ -96,7 +90,7 @@ const accountResolvers: Resolvers = {
 
       const addresses = await getConnectedAddresses({
         accountURN: finalAccountURN,
-        Account: env.Account,
+        Core: env.Core,
         jwt,
         traceSpan,
       })
@@ -118,7 +112,7 @@ const accountResolvers: Resolvers = {
 
       const addresses = await getConnectedAddresses({
         accountURN,
-        Account: env.Account,
+        Core: env.Core,
         jwt,
         traceSpan,
       })
@@ -132,12 +126,12 @@ const accountResolvers: Resolvers = {
         throw new GraphQLError('Cannot disconnect last address')
       }
 
-      const addressClient = createAddressClient(env.Address, {
+      const coreClient = createCoreClient(env.Core, {
         [PlatformAddressURNHeader]: addressURN,
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      await addressClient.deleteAddressNode.mutate({
+      await coreClient.address.deleteAddressNode.mutate({
         accountURN,
       })
 

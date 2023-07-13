@@ -2,12 +2,12 @@ import { z } from 'zod'
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
+import { router } from '@proofzero/platform.core'
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 
+import type { Context } from '../../context'
 import { ACCOUNT_OPTIONS } from '../../constants'
-import { Context } from '../../context'
-import { appRouter } from '../router'
 
 import { WriteAnalyticsDataPoint } from '@proofzero/platform-clients/analytics'
 import { createAnalyticsEvent } from '@proofzero/packages/utils/analytics'
@@ -57,8 +57,8 @@ export const resolveAccountMethod = async ({
       urn = AccountURNSpace.componentizedUrn(name)
       eventName = 'account-created'
     }
-    const caller = appRouter.createCaller(ctx)
-    await caller.setAccount(urn) // this will lazy create an account node when account worker is called
+    const caller = router.createCaller(ctx)
+    await caller.address.setAccount(urn) // this will lazy create an account node when account worker is called
 
     resultURN = urn
   }

@@ -1,9 +1,5 @@
 import { AccessURN, AccessURNSpace } from '@proofzero/urns/access'
 import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
-import createEdgesClient from '@proofzero/platform-clients/edges'
-import createAddressClient from '@proofzero/platform-clients/address'
-import createAccessClient from '@proofzero/platform-clients/access'
-import createAccountClient from '@proofzero/platform-clients/account'
 import {
   generateTraceContextHeaders,
   TraceSpan,
@@ -28,11 +24,12 @@ import {
 import { AnyURN } from '@proofzero/urns'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 import { NO_OP_ADDRESS_PLACEHOLDER } from '@proofzero/platform.address/src/constants'
+import createCoreClient from '@proofzero/platform-clients/core'
 
 export async function validatePersonaData(
   accountUrn: AccountURN,
   personaData: PersonaData,
-  env: { addressFetcher: Fetcher; accountFetcher: Fetcher },
+  coreFetcher: Fetcher,
   traceSpan: TraceSpan
 ): Promise<void> {
   //If there's nothing to validate, return right away
@@ -47,18 +44,18 @@ export async function validatePersonaData(
           message: 'Bad data received for address identifier',
         })
 
-      const addressClient = createAddressClient(env.addressFetcher, {
+      const coreClient = createCoreClient(coreFetcher, {
         [PlatformAddressURNHeader]: addressUrnForEmail,
         ...generateTraceContextHeaders(traceSpan),
       })
-      const retrievedAccountUrn = await addressClient.getAccount.query()
+      const retrievedAccountUrn = await coreClient.address.getAccount.query()
 
       if (retrievedAccountUrn !== accountUrn)
         throw new BadRequestError({
           message: 'Address provided does not belong to authenticated account',
         })
 
-      const addressProfile = await addressClient.getAddressProfile.query()
+      const addressProfile = await coreClient.address.getAddressProfile.query()
       if (
         addressProfile.type !== OAuthAddressType.Google &&
         addressProfile.type !== OAuthAddressType.Microsoft &&
@@ -87,10 +84,10 @@ export async function validatePersonaData(
         })
       }
 
-      const accountClient = createAccountClient(env.accountFetcher, {
+      const coreClient = createCoreClient(coreFetcher, {
         ...generateTraceContextHeaders(traceSpan),
       })
-      const accountAddresses = await accountClient.getAddresses.query({
+      const accountAddresses = await coreClient.account.getAddresses.query({
         account: accountUrn,
       })
 
@@ -119,9 +116,7 @@ export async function setPersonaReferences(
   accessNode: AccessURN,
   scope: string[],
   personaData: PersonaData,
-  env: {
-    edgesFetcher: Fetcher
-  },
+  coreFetcher: Fetcher,
   traceSpan: TraceSpan
 ) {
   //We could have multiple nodes being referenced across multiple scope values
@@ -155,8 +150,8 @@ export async function setPersonaReferences(
     }
   }
 
-  const edgesClient = createEdgesClient(
-    env.edgesFetcher,
+  const coreClient = createCoreClient(
+    coreFetcher,
     generateTraceContextHeaders(traceSpan)
   )
 
@@ -164,14 +159,14 @@ export async function setPersonaReferences(
   //SQL transaction
 
   //Get existing references
-  const edgesToDelete = await edgesClient.getEdges.query({
+  const edgesToDelete = await coreClient.edges.getEdges.query({
     query: { tag: EDGE_HAS_REFERENCE_TO, src: { baseUrn: accessNode } },
   })
 
   //Delete existing references
   edgesToDelete.edges.forEach(
     async (edge) =>
-      await edgesClient.removeEdge.mutate({
+      await coreClient.edges.removeEdge.mutate({
         tag: edge.tag,
         dst: edge.dst.baseUrn,
         src: edge.src.baseUrn,
@@ -182,7 +177,7 @@ export async function setPersonaReferences(
   const edges = await Promise.allSettled(
     [...uniqueAuthorizationReferences].map((refUrn) => {
       //This returns promises that get awaited collectively above
-      return edgesClient.makeEdge.mutate({
+      return coreClient.edges.makeEdge.mutate({
         src: accessNode,
         tag: EDGE_HAS_REFERENCE_TO,
         dst: refUrn,
@@ -214,18 +209,12 @@ export type ClaimData = {
   [s: ScopeValueName]: ScopeClaimsResponse
 }
 
-export type Fetchers = {
-  accountFetcher?: Fetcher
-  accessFetcher?: Fetcher
-  addressFetcher?: Fetcher
-  edgesFetcher: Fetcher
-}
 export type ScopeClaimRetrieverFunction = (
   scopeEntry: ScopeValueName,
   accountUrn: AccountURN,
   clientId: string,
   accessUrn: AccessURN,
-  fetchers: Fetchers,
+  coreFetcher: Fetcher,
   personaData: PersonaData,
   traceSpan: TraceSpan
 ) => Promise<ClaimData>
@@ -254,18 +243,18 @@ async function emailClaimRetriever(
   accountUrn: AccountURN,
   clientId: string,
   accessUrn: AccessURN,
-  fetchers: Fetchers,
+  coreFetcher: Fetcher,
   personaData: PersonaData,
   traceSpan: TraceSpan
 ): Promise<ClaimData> {
-  const edgesClient = createEdgesClient(
-    fetchers.edgesFetcher,
+  const coreClient = createCoreClient(
+    coreFetcher,
     generateTraceContextHeaders(traceSpan)
   )
 
   if (personaData.email) {
     const emailAddressUrn = personaData.email
-    const edgesResults = await edgesClient.getEdges.query({
+    const edgesResults = await coreClient.edges.getEdges.query({
       query: {
         src: { baseUrn: accessUrn },
         dst: { baseUrn: emailAddressUrn },
@@ -294,15 +283,15 @@ async function profileClaimsRetriever(
   accountUrn: AccountURN,
   clientId: string,
   accessUrn: AccessURN,
-  fetchers: Fetchers,
+  coreFetcher: Fetcher,
   personaData: PersonaData,
   traceSpan: TraceSpan
 ): Promise<ClaimData> {
-  const edgesClient = createEdgesClient(
-    fetchers.edgesFetcher,
+  const coreClient = createCoreClient(
+    coreFetcher,
     generateTraceContextHeaders(traceSpan)
   )
-  const nodeResult = await edgesClient.findNode.query({
+  const nodeResult = await coreClient.edges.findNode.query({
     baseUrn: accountUrn,
   })
   if (nodeResult && nodeResult.baseUrn) {
@@ -326,14 +315,10 @@ async function erc4337ClaimsRetriever(
   accountUrn: AccountURN,
   clientId: string,
   accessUrn: AccessURN,
-  fetchers: Fetchers,
+  coreFetcher: Fetcher,
   personaData: PersonaData,
   traceSpan: TraceSpan
 ): Promise<ClaimData> {
-  if (!fetchers.addressFetcher)
-    throw new InternalServerError({
-      message: 'Address fetcher not specified',
-    })
   const result = {
     erc_4337: {
       claims: {
@@ -346,19 +331,17 @@ async function erc4337ClaimsRetriever(
     },
   } as const
 
+  const coreClient = createCoreClient(
+    coreFetcher,
+    generateTraceContextHeaders(traceSpan)
+  )
+
   if (personaData.erc_4337 === AuthorizationControlSelection.ALL) {
     //Referencable persona submission pointing to all connected sc wallets
     //at any point in time
-    if (!fetchers.accountFetcher)
-      throw new InternalServerError({
-        message: 'No account fetcher specified',
-      })
-    const accountClient = createAccountClient(fetchers.accountFetcher, {
-      ...generateTraceContextHeaders(traceSpan),
-    })
     const accountAddresses =
       (
-        await accountClient.getAddresses.query({
+        await coreClient.account.getAddresses.query({
           account: accountUrn,
         })
       )?.filter(
@@ -375,13 +358,12 @@ async function erc4337ClaimsRetriever(
   } else {
     const walletAddressUrns = personaData.erc_4337 as AddressURN[]
 
-    const addressClient = createAddressClient(fetchers.addressFetcher!, {
-      ...generateTraceContextHeaders(traceSpan),
-      [PlatformAddressURNHeader]: NO_OP_ADDRESS_PLACEHOLDER,
-    })
-    const addressProfiles = await addressClient.getAddressProfileBatch.query(
-      walletAddressUrns
+    const coreClient = createCoreClient(
+      coreFetcher,
+      generateTraceContextHeaders(traceSpan)
     )
+    const addressProfiles =
+      await coreClient.address.getAddressProfileBatch.query(walletAddressUrns)
 
     addressProfiles.forEach((profile, idx) => {
       result.erc_4337.claims.erc_4337.push({
@@ -399,7 +381,7 @@ async function connectedAccountsClaimsRetriever(
   accountUrn: AccountURN,
   clientId: string,
   accessUrn: AccessURN,
-  fetchers: Fetchers,
+  coreFetcher: Fetcher,
   personaData: PersonaData,
   traceSpan: TraceSpan
 ): Promise<ClaimData> {
@@ -415,19 +397,17 @@ async function connectedAccountsClaimsRetriever(
     },
   }
 
+  const coreClient = createCoreClient(
+    coreFetcher,
+    generateTraceContextHeaders(traceSpan)
+  )
+
   if (personaData.connected_accounts === AuthorizationControlSelection.ALL) {
     //Referencable persona submission pointing to all connected addresses
     //at any point in time
-    if (!fetchers.accountFetcher)
-      throw new InternalServerError({
-        message: 'No account fetcher specified',
-      })
-    const accountClient = createAccountClient(fetchers.accountFetcher, {
-      ...generateTraceContextHeaders(traceSpan),
-    })
     const accountAddresses =
       (
-        await accountClient.getAddresses.query({
+        await coreClient.account.getAddresses.query({
           account: accountUrn,
         })
       )?.filter(
@@ -444,15 +424,11 @@ async function connectedAccountsClaimsRetriever(
   } else {
     //Static persona submission of addresses
     const authorizedAddresses = personaData.connected_accounts as AddressURN[]
-    const edgesClient = createEdgesClient(
-      fetchers.edgesFetcher,
-      generateTraceContextHeaders(traceSpan)
-    )
 
     const nodeQueries = authorizedAddresses.map((address) => ({
       baseUrn: address,
     }))
-    const nodeResults = await edgesClient.findNodeBatch.query(nodeQueries)
+    const nodeResults = await coreClient.edges.findNodeBatch.query(nodeQueries)
 
     nodeResults.forEach((addressNode, i) => {
       if (!addressNode)
@@ -483,7 +459,7 @@ export async function getClaimValues(
   accountUrn: AccountURN,
   clientId: string,
   scope: string[],
-  env: Fetchers,
+  coreFetcher: Fetcher,
   traceSpan: TraceSpan,
   preFetchedPersonaData?: PersonaData
 ): Promise<ClaimData> {
@@ -491,13 +467,11 @@ export async function getClaimValues(
 
   let personaData = preFetchedPersonaData
   if (!personaData) {
-    if (!env.accessFetcher)
-      throw new InternalServerError({ message: 'No access fetcher specified' })
-    const accessClient = createAccessClient(
-      env.accessFetcher,
+    const coreClient = createCoreClient(
+      coreFetcher,
       generateTraceContextHeaders(traceSpan)
     )
-    personaData = await accessClient.getPersonaData.query({
+    personaData = await coreClient.access.getPersonaData.query({
       accountUrn,
       clientId,
     })
@@ -515,7 +489,7 @@ export async function getClaimValues(
         accountUrn,
         clientId,
         accessUrn,
-        env,
+        coreFetcher,
         personaData || {},
         traceSpan
       )

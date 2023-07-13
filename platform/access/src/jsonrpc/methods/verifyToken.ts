@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { decodeJwt } from 'jose'
 
+import { router } from '@proofzero/platform.core'
 import type { AccessJWTPayload } from '@proofzero/types/access'
 
 import { Context } from '../../context'
@@ -41,12 +42,9 @@ interface VerifyTokenMethod {
 export const verifyTokenMethod: VerifyTokenMethod = async ({ ctx, input }) => {
   const { token, clientId, clientSecret, issuer } = input
 
-  if (!ctx.starbaseClient) {
-    throw new Error('missing starbase client')
-  }
-
   if (clientId && clientSecret) {
-    const { valid } = await ctx.starbaseClient.checkAppAuth.query({
+    const caller = router.createCaller(ctx)
+    const { valid } = await caller.starbase.checkAppAuth({
       clientId,
       clientSecret,
     })

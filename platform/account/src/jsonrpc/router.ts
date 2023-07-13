@@ -2,7 +2,7 @@ import { initTRPC } from '@trpc/server'
 
 import { errorFormatter } from '@proofzero/utils/trpc'
 
-import { Context } from '../context'
+import type { Context } from '../context'
 
 import {
   getProfileMethod,
@@ -14,7 +14,11 @@ import {
   getOwnAddressesMethod,
   GetAddressesInput,
 } from './methods/getOwnAddresses'
-import { hasAddressesMethod, HasAddressesInput } from './methods/hasAddresses'
+import {
+  hasAddressesMethod,
+  HasAddressesInput,
+  HasAddressesOutput,
+} from './methods/hasAddresses'
 
 import { getAddressesMethod } from './methods/getAddresses'
 
@@ -86,11 +90,11 @@ export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
   if (!accountURN)
     throw new UnauthorizedError({ message: 'No accountURN in context' })
 
-  const account = await initAccountNodeByName(accountURN, ctx.Account)
+  const accountNode = await initAccountNodeByName(accountURN, ctx.Account)
 
   return next({
     ctx: {
-      account,
+      accountNode,
       ...ctx,
     },
   })
@@ -154,6 +158,7 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(Analytics)
     .input(HasAddressesInput)
+    .output(HasAddressesOutput)
     .mutation(hasAddressesMethod),
   getAuthorizedApps: t.procedure
     .use(AuthorizationTokenFromHeader)

@@ -1,11 +1,15 @@
 import { z } from 'zod'
-import { Context } from '../../context'
+
+import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
+
+import { router } from '@proofzero/platform.core'
 import {
   AccountURNInput,
   AddressURNInput,
 } from '@proofzero/platform-middleware/inputValidators'
+
+import { Context } from '../../context'
 import { initAccountNodeByName } from '../../nodes'
-import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 
 export const GetStripPaymentDataInputSchema = z.object({
   accountURN: AccountURNInput,
@@ -67,8 +71,10 @@ export const setStripePaymentData = async ({
     name,
   })
 
+  const caller = router.createCaller(ctx)
+
   if (addressURN) {
-    const { edges } = await ctx.edges.getEdges.query({
+    const { edges } = await caller.edges.getEdges({
       query: {
         src: { baseUrn: accountURN },
         tag: EDGE_HAS_REFERENCE_TO,
@@ -80,14 +86,14 @@ export const setStripePaymentData = async ({
     }
 
     for (const edge of edges) {
-      await ctx.edges.removeEdge.mutate({
+      await caller.edges.removeEdge({
         tag: EDGE_HAS_REFERENCE_TO,
         src: edge.src.baseUrn,
         dst: edge.dst.baseUrn,
       })
     }
 
-    await ctx.edges.makeEdge.mutate({
+    await caller.edges.makeEdge({
       src: accountURN,
       dst: addressURN,
       tag: EDGE_HAS_REFERENCE_TO,

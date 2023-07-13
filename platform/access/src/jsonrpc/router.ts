@@ -2,9 +2,7 @@ import { initTRPC } from '@trpc/server'
 
 import { errorFormatter } from '@proofzero/utils/trpc'
 
-import { Context } from '../context'
-
-import { InjectEdges } from '@proofzero/platform-middleware/edges'
+import type { Context } from '../context'
 
 import {
   ValidateJWT,
@@ -112,7 +110,6 @@ export const appRouter = t.router({
         meta,
       })
     })
-    .use(InjectEdges)
     .input(ExchangeTokenMethodInput)
     .output(ExchangeTokenMethodOutput)
     .mutation(exchangeTokenMethod),
@@ -126,7 +123,6 @@ export const appRouter = t.router({
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(RequireAccount)
-    .use(InjectEdges)
     .use(setAccessNode)
     .use(LogUsage)
     .use(Analytics)
@@ -136,7 +132,6 @@ export const appRouter = t.router({
   revokeAppAuthorization: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
-    .use(InjectEdges)
     .use(LogUsage)
     .use(Analytics)
     .input(RevokeAppAuthorizationMethodInput)
@@ -157,7 +152,6 @@ export const appRouter = t.router({
   getAuthorizedAppScopes: t.procedure
     .use(LogUsage)
     .use(ValidateJWT)
-    .use(InjectEdges)
     .use(Analytics)
     .input(GetAuthorizedAppScopesMethodInput)
     .output(GetAuthorizedAppScopesMethodOutput)

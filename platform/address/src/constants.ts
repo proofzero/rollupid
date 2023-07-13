@@ -1,9 +1,5 @@
-import {
-  CryptoAddressType,
-  EmailAddressType,
-  NodeType,
-} from '@proofzero/types/address'
-import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
+import { EmailAddressType, NodeType } from '@proofzero/types/address'
+import { AddressURNSpace } from '@proofzero/urns/address'
 import { EdgeSpace, EdgeURN } from '@proofzero/urns/edge'
 
 export const ACCOUNT_OPTIONS = {

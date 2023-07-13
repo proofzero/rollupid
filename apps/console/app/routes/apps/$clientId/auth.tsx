@@ -12,7 +12,7 @@ import {
   useOutletContext,
   useLoaderData,
 } from '@remix-run/react'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { requireJWT } from '~/utilities/session.server'
 import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
@@ -122,12 +122,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
     }
     const jwt = await requireJWT(request, context.env)
-    const starbaseClient = createStarbaseClient(context.env.Starbase, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const scopeMeta = (await starbaseClient.getScopes.query()).scopes
+    const scopeMeta = (await coreClient.starbase.getScopes.query()).scopes
 
     return json({ scopeMeta })
   }
@@ -144,12 +144,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     let rotatedSecret, updates
 
     const jwt = await requireJWT(request, context.env)
-    const starbaseClient = createStarbaseClient(context.env.Starbase, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const paymaster = await starbaseClient.getPaymaster.query({
+    const paymaster = await coreClient.starbase.getPaymaster.query({
       clientId: params.clientId as string,
     })
 
@@ -165,7 +165,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     switch (op) {
       case RollType.RollClientSecret:
         rotatedSecret = (
-          await starbaseClient.rotateClientSecret.mutate({
+          await coreClient.starbase.rotateClientSecret.mutate({
             clientId: params.clientId,
           })
         ).secret
@@ -204,11 +204,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         if (Object.keys(errors).length === 0) {
           await Promise.all([
-            starbaseClient.updateApp.mutate({
+            coreClient.starbase.updateApp.mutate({
               clientId: params.clientId,
               updates,
             }),
-            starbaseClient.publishApp.mutate({
+            coreClient.starbase.publishApp.mutate({
               clientId: params.clientId,
               published: published,
             }),

@@ -1,46 +1,31 @@
-import createAccessClient from '@proofzero/platform-clients/access'
-import createAddressClient from '@proofzero/platform-clients/address'
-import createAccountClient from '@proofzero/platform-clients/account'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import type { PlatformHeaders } from '@proofzero/platform-clients/base'
+import createCoreClient from '@proofzero/platform-clients/core'
 
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 
-export function getStarbaseClient(
-  jwt: string | undefined,
-  env: Env,
-  traceSpan: TraceSpan
-) {
-  return createStarbaseClient(env.Starbase, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(traceSpan),
-  })
+interface CoreClientOptions {
+  context: {
+    env: {
+      Core: Fetcher
+    }
+    traceSpan: TraceSpan
+  }
+  jwt?: string
+  addressURN?: string
 }
 
-export function getAccessClient(env: Env, traceSpan: TraceSpan, jwt?: string) {
-  return createAccessClient(env.Access, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(traceSpan),
-  })
-}
+export const getCoreClient = (options: CoreClientOptions) => {
+  const {
+    env: { Core },
+    traceSpan,
+  } = options.context
+  const headers: PlatformHeaders = generateTraceContextHeaders(traceSpan)
 
-export function getAddressClient(
-  addressUrn: string,
-  env: Env,
-  traceSpan: TraceSpan
-) {
-  return createAddressClient(env.Address, {
-    [PlatformAddressURNHeader]: addressUrn,
-    ...generateTraceContextHeaders(traceSpan),
-  })
-}
+  if (options.jwt) headers.Authorization = `Bearer ${options.jwt}`
+  if (options.addressURN) headers[PlatformAddressURNHeader] = options.addressURN
 
-export function getAccountClient(jwt: string, env: Env, traceSpan: TraceSpan) {
-  return createAccountClient(env.Account, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...generateTraceContextHeaders(traceSpan),
-  })
+  return createCoreClient(Core, headers)
 }

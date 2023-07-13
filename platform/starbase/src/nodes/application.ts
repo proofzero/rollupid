@@ -12,6 +12,9 @@ import {
   KeyLike,
   SignJWT,
 } from 'jose'
+
+import type { Environment } from '@proofzero/platform.core'
+
 import {
   CUSTOM_DOMAIN_CHECK_INTERVAL,
   CUSTOM_DOMAIN_CHECK_PERIOD,
@@ -22,7 +25,6 @@ import type {
   AppObject,
   AppReadableFields,
   AppUpdateableFields,
-  Environment,
 } from '../types'
 import {
   AppTheme,
@@ -64,7 +66,7 @@ const JWT_OPTIONS = {
   },
 }
 
-export default class StarbaseApp extends DOProxy {
+export default class StarbaseApplication extends DOProxy {
   declare state: DurableObjectState
   declare env: Environment
 
@@ -328,7 +330,7 @@ export const getApplicationNodeByClientId = async (
   clientId: string,
   durableObject: DurableObjectNamespace
 ) => {
-  const proxy = StarbaseApp.wrap(durableObject)
+  const proxy = StarbaseApplication.wrap(durableObject)
   const appDO = proxy.getByName(clientId)
   return appDO
 }

@@ -1,9 +1,9 @@
 {
   "name": "@proofzero/platform.account",
   "version": "0.0.0",
+  "main": "src/index.ts",
   "private": true,
   "scripts": {
-    "build": "wrangler publish --dry-run --outdir=dist",
     "check": "run-s format:check lint:check types:check",
     "format": "run-s format:src",
     "format:src": "prettier --write src",
@@ -13,8 +13,6 @@
     "lint:check": "run-s lint:check:src",
     "lint:check:src": "eslint src",
     "types:check": "tsc --project tsconfig.json",
-    "dev": "env-cmd --file .dev.env wrangler dev ",
-    "deploy": "wrangler publish",
     "test": "run-s check"
   },
   "devDependencies": {
@@ -22,20 +20,18 @@
     "@types/node": "18.15.3",
     "@typescript-eslint/eslint-plugin": "5.42.1",
     "@typescript-eslint/parser": "5.42.1",
-    "env-cmd": "10.1.0",
     "eslint": "8.28.0",
     "eslint-config-prettier": "8.5.0",
     "npm-run-all": "4.1.5",
     "prettier": "2.7.1",
-    "typescript": "5.0.4",
-    "wrangler": "3.2.0"
+    "typescript": "5.0.4"
   },
   "dependencies": {
     "@ethersproject/address": "5.7.0",
     "@ethersproject/bytes": "5.7.0",
     "@ethersproject/random": "5.7.0",
     "@proofzero/platform-middleware": "workspace:*",
-    "@proofzero/platform.access": "workspace:*",
+    "@proofzero/platform.core": "workspace:*",
     "@proofzero/types": "workspace:*",
     "@proofzero/utils": "workspace:*",
     "@trpc/server": "10.8.1",

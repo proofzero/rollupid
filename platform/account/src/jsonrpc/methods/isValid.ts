@@ -20,8 +20,8 @@ export const isValidMethod = async ({
   ctx: Context
 }): Promise<IsValidOutput> => {
   //Relies on injectAccountNode middleware
-  const profile = ctx.account?.class.getProfile()
-  const addresses = ctx.account?.class.getAddresses()
+  const profile = ctx.accountNode?.class.getProfile()
+  const addresses = ctx.accountNode?.class.getAddresses()
 
   const result = await Promise.all([profile, addresses])
   //Return true if either of the calls above aren't falsy
