@@ -133,7 +133,7 @@ const HasCustomDomain = ({ appDetails }: HasCustomDomainProps) => (
       before you can delete the application.
     </Text>
 
-    <Link to={`/apps/${appDetails.clientId}/domain-wip`} className="self-end">
+    <Link to={`/apps/${appDetails.clientId}/domain`} className="self-end">
       <Button btnType="secondary-alt">Go to Custom Domain</Button>
     </Link>
   </section>
