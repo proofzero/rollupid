@@ -7,6 +7,7 @@ import {
   AppPublicPropsSchema,
 } from '../validators/app'
 import type { CustomDomain } from '../../types'
+import { ServicePlanType } from '@proofzero/types/account'
 
 export const GetAppPublicPropsInput = AppClientIdParamSchema
 export const GetAppPublicPropsOutput = AppPublicPropsSchema
@@ -55,8 +56,17 @@ export const getAppPublicPropsBatch = async ({
 async function getPublicPropsForApp(clientId: string, ctx: Context) {
   const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
   const appDetails = await appDO.class.getDetails()
-  const appTheme = await appDO.class.getTheme()
-  const customDomain = await appDO.storage.get<CustomDomain>('customDomain')
+  const { appPlan } = appDetails
+
+  let appTheme = await appDO.class.getTheme()
+  if (!appPlan || appPlan === ServicePlanType.FREE) {
+    appTheme = undefined
+  }
+
+  let customDomain = await appDO.storage.get<CustomDomain>('customDomain')
+  if (!appPlan || appPlan === ServicePlanType.FREE) {
+    customDomain = undefined
+  }
 
   if (appDetails && appDetails.app && appDetails.published) {
     return {

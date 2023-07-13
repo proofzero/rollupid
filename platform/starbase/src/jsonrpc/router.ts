@@ -124,6 +124,11 @@ import {
   reconcileAppSubscriptions,
   ReconcileAppSubscriptionsInputSchema,
 } from './methods/reconcileAppSubscriptions'
+import {
+  getAppPlan,
+  GetAppPlanInputSchema,
+  GetAppPlanOutputSchema,
+} from './methods/getAppPlan'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -338,6 +343,12 @@ export const appRouter = t.router({
     .use(OwnAppsMiddleware)
     .input(SetAppPlanInput)
     .mutation(setAppPlan),
+  getAppPlan: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAppPlanInputSchema)
+    .output(GetAppPlanOutputSchema)
+    .query(getAppPlan),
   deleteSubscriptionPlans: t.procedure
     .use(LogUsage)
     .use(Analytics)
