@@ -20,16 +20,7 @@ export const getAppPlan = async ({
 }): Promise<GetAppPlanOutput> => {
   const { clientId } = input
 
-  const appURN = ApplicationURNSpace.componentizedUrn(clientId)
-  if (!ctx.ownAppURNs || !ctx.ownAppURNs.includes(appURN))
-    throw new Error(
-      `Request received for clientId ${clientId} which is not owned by provided account.`
-    )
-
-  const appDO = await getApplicationNodeByClientId(
-    input.clientId,
-    ctx.StarbaseApp
-  )
+  const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
   const appPlan = await appDO.class.getAppPlan()
 
   return appPlan ?? ServicePlanType.FREE
