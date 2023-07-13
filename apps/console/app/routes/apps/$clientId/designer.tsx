@@ -93,11 +93,8 @@ import classNames from 'classnames'
 import { ToastWarning } from '@proofzero/design-system/src/atoms/toast/ToastWarning'
 import { ServicePlanType } from '@proofzero/types/account'
 import plans from '~/routes/__layout/billing/plans'
-import planGate from '~/utils/planGate.server'
-import {
-  appendToastToFlashSession,
-  getToastsAndFlashSession,
-} from '~/utils/toast.server'
+import { getToastsAndFlashSession } from '~/utils/toast.server'
+import { planGuardWithToastException } from '~/utils/planGate.server'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -1285,20 +1282,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       clientId,
     })
 
-    if (await planGate(appDetails.appPlan, ServicePlanType.PRO)) {
-      const toastSession = await appendToastToFlashSession(request, {
-        message: `This feature is not available for ${
-          plans[appDetails.appPlan].title
-        }`,
-        type: ToastType.Error,
-      })
-
-      return new Response(null, {
-        headers: {
-          'Set-Cookie': await commitFlashSession(toastSession),
-        },
-      })
-    }
+    await planGuardWithToastException(
+      appDetails.appPlan,
+      ServicePlanType.PRO,
+      request
+    )
 
     let errors: {
       [key: string]: string
