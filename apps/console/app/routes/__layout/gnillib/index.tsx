@@ -312,7 +312,7 @@ const PurchaseProModal = ({
         </section>
       )}
 
-      <section className="m-5 border rounded-lg">
+      <section className="m-5 border rounded-lg overflow-auto thin-scrollbar">
         <div className="p-6">
           <Text size="lg" weight="semibold" className="text-gray-900 text-left">
             {plan.title}
@@ -459,7 +459,7 @@ const RemoveEntitelmentModal = ({
       >
         Purchase Entitlement(s)
       </Text>
-      <section className="m-5 border rounded-lg">
+      <section className="m-5 border rounded-lg overflow-auto thin-scrollbar">
         <div className="p-6">
           <Text size="lg" weight="semibold" className="text-gray-900 text-left">
             {plan.title}
