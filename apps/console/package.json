@@ -41,7 +41,7 @@
     "flowbite": "1.6.5",
     "flowbite-react": "0.4.3",
     "lodash": "4.17.21",
-    "posthog-js": "1.68.5",
+    "posthog-js": "1.71.0",
     "react": "18.2.0",
     "react-colorful": "5.6.1",
     "react-countdown-circle-timer": "3.2.1",

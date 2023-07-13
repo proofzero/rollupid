@@ -5794,7 +5794,7 @@ __metadata:
     flowbite-react: 0.4.3
     lodash: 4.17.21
     npm-run-all: 4.1.5
-    posthog-js: 1.68.5
+    posthog-js: 1.71.0
     react: 18.2.0
     react-colorful: 5.6.1
     react-countdown-circle-timer: 3.2.1
@@ -5874,7 +5874,7 @@ __metadata:
     jose: 4.11.0
     npm-run-all: 4.1.5
     postcss: 8.4.19
-    posthog-js: 1.68.5
+    posthog-js: 1.71.0
     prettier: 2.7.1
     prop-types: 15.8.1
     react: 18.2.0
@@ -31519,12 +31519,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"posthog-js@npm:1.68.5":
-  version: 1.68.5
-  resolution: "posthog-js@npm:1.68.5"
+"posthog-js@npm:1.71.0":
+  version: 1.71.0
+  resolution: "posthog-js@npm:1.71.0"
   dependencies:
     fflate: ^0.4.1
-  checksum: 34815624029ede9b1cb8e2be9ab7569f5aaa103f6fc68f1f47c20763170a5650d2f0119b7c40e163352f57e927dfb1bb4d4924fbe8be87d554a508ba872cf6d3
+  checksum: bd809c0811438f995e851fd208ac7227f51d3129c6762539eeb18f0a392b6a3afafaf2638babfaa90009ffa82f85fd3398a5c382535268ea3a06404fc5de4920
   languageName: node
   linkType: hard
 
