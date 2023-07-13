@@ -9,7 +9,7 @@ type ToastWarningProps = {
 export const ToastWarning = ({
   message,
   remove,
-}: ToastWarningProps & { remove: () => void }) => (
+}: ToastWarningProps & { remove?: () => void }) => (
   <Toast
     remove={remove}
     message={message}

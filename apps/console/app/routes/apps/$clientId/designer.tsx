@@ -47,7 +47,11 @@ import {
   EmailOTPThemeSchema,
 } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
-import { requireJWT } from '~/utilities/session.server'
+import {
+  commitFlashSession,
+  getFlashSession,
+  requireJWT,
+} from '~/utilities/session.server'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -80,8 +84,16 @@ import type { appDetailsProps } from '~/types'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { AddressURN } from '@proofzero/urns/address'
 import danger from '~/images/danger.svg'
-import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
+import {
+  ToastType,
+  Toaster,
+  toast,
+} from '@proofzero/design-system/src/atoms/toast'
 import classNames from 'classnames'
+import { ToastWarning } from '@proofzero/design-system/src/atoms/toast/ToastWarning'
+import { ServicePlanType } from '@proofzero/types/account'
+import plans from '~/routes/__layout/billing/plans'
+import planGate from '~/utils/planGate'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -1231,10 +1243,23 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       clientId,
     })
 
-    return json({
-      appTheme,
-      emailTheme,
-    })
+    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    const errorToastMessage = flashSession.get('error_toast')
+
+    return json(
+      {
+        appTheme,
+        emailTheme,
+        errorToast: errorToastMessage && {
+          message: errorToastMessage,
+        },
+      },
+      {
+        headers: {
+          'Set-Cookie': await commitFlashSession(flashSession),
+        },
+      }
+    )
   }
 )
 
@@ -1254,6 +1279,23 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
+
+    const appDetails = await starbaseClient.getAppDetails.query({
+      clientId,
+    })
+
+    if (await planGate(appDetails.appPlan, ServicePlanType.PRO)) {
+      const flashSession = await getFlashSession(request.headers.get('Cookie'))
+      flashSession.flash(
+        'error_toast',
+        `This feature is not available for ${plans[appDetails.appPlan].title}`
+      )
+      return new Response(null, {
+        headers: {
+          'Set-Cookie': await commitFlashSession(flashSession),
+        },
+      })
+    }
 
     let errors: {
       [key: string]: string
@@ -1386,9 +1428,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { appTheme, emailTheme } = useLoaderData<{
+  const { appTheme, emailTheme, errorToast } = useLoaderData<{
     appTheme: GetAppThemeResult
     emailTheme: GetEmailOTPThemeResult
+    errorToast?: {
+      message: string
+    }
   }>()
 
   const { appDetails, appContactAddress, appContactEmail } = useOutletContext<{
@@ -1406,6 +1451,14 @@ export default () => {
     }
   }, [errors])
 
+  useEffect(() => {
+    if (errorToast) {
+      toast(ToastType.Error, {
+        message: errorToast.message,
+      })
+    }
+  }, [errorToast])
+
   const { avatarUrl, notificationHandler } = useOutletContext<{
     avatarUrl: string
     notificationHandler: notificationHandlerType
@@ -1416,6 +1469,20 @@ export default () => {
   return (
     <Suspense fallback={<Loader />}>
       {loading && <Loader />}
+
+      <Toaster position="top-right" reverseOrder={false} />
+
+      {appDetails.appPlan === ServicePlanType.FREE && (
+        <section className="mb-4">
+          <ToastWarning
+            message={`This is a ${
+              plans[ServicePlanType.PRO].title
+            } feature and the current app is on ${
+              plans[appDetails.appPlan].title
+            }.`}
+          />
+        </section>
+      )}
 
       <Form method="post">
         <section className="flex flex-col lg:flex-row items-center justify-between mb-11">
