@@ -24,7 +24,7 @@ interface Env {
   SECRET_STRIPE_WEBHOOK_KEY: string
   SECRET_STRIPE_PRO_PLAN_ID: string
 
-  SECRET_POSTHOG_API_KEY: string
+  POSTHOG_API_KEY: string
 
   CONSOLE_URL: string
   //Needed to make Remix work with Cloudflare module workers

@@ -88,7 +88,7 @@ export type LoaderData = {
   PASSPORT_URL: string
   displayName: string
   ENV: {
-    SECRET_POSTHOG_API_KEY: string
+    POSTHOG_API_KEY: string
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
     REMIX_DEV_SERVER_WS_PORT?: number
     WALLET_CONNECT_PROJECT_ID: string
@@ -153,7 +153,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         avatarUrl,
         PASSPORT_URL,
         ENV: {
-          SECRET_POSTHOG_API_KEY,
+          POSTHOG_API_KEY,
           INTERNAL_GOOGLE_ANALYTICS_TAG,
           REMIX_DEV_SERVER_WS_PORT:
             process.env.NODE_ENV === 'development'

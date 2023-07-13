@@ -56,7 +56,6 @@ jobs:
             SECRET_STRIPE_API_KEY
             SECRET_STRIPE_WEBHOOK_KEY
             SECRET_STRIPE_PRO_PLAN_ID
-            SECRET_POSTHOG_API_KEY
         env:
           NODE_ENV: 'development'
           # A secret used for session encryption.
@@ -66,7 +65,6 @@ jobs:
           SECRET_STRIPE_API_KEY: ${{ secrets.SECRET_STRIPE_API_KEY_DEV }}
           SECRET_STRIPE_WEBHOOK_KEY: ${{ secrets.SECRET_STRIPE_WEBHOOK_KEY_DEV }}
           SECRET_STRIPE_PRO_PLAN_ID: ${{ secrets.SECRET_STRIPE_PRO_PLAN_ID_DEV }}
-          SECRET_POSTHOG_API_KEY: ${{ secrets.SECRET_POSTHOG_API_KEY_DEV }}
 
       - name: Setup Playwright
         working-directory: 'apps/console'

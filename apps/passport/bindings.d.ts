@@ -49,7 +49,7 @@ declare global {
     SECRET_DISCORD_OAUTH_CLIENT_SECRET: string
     INTERNAL_DISCORD_OAUTH_CALLBACK_URL: string
 
-    SECRET_POSTHOG_API_KEY: string
+    POSTHOG_API_KEY: string
     //Needed to make Remix work with Cloudflare module workers
     __STATIC_CONTENT: string
   }

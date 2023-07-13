@@ -65,7 +65,6 @@ jobs:
             SECRET_APPLE_OAUTH_CLIENT_SECRET
             INTERNAL_DISCORD_OAUTH_CLIENT_ID
             SECRET_DISCORD_OAUTH_CLIENT_SECRET
-            SECRET_POSTHOG_API_KEY
         env:
           NODE_ENV: 'development'
           SECRET_SESSION_KEY: ${{ secrets.SECRET_SESSION_KEY_DEV }}
@@ -83,7 +82,6 @@ jobs:
           SECRET_APPLE_OAUTH_CLIENT_SECRET: ${{ secrets.SECRET_APPLE_OAUTH_CLIENT_SECRET_DEV }}
           INTERNAL_DISCORD_OAUTH_CLIENT_ID: ${{ vars.INTERNAL_DISCORD_OAUTH_CLIENT_ID_DEV }}
           SECRET_DISCORD_OAUTH_CLIENT_SECRET: ${{ secrets.SECRET_DISCORD_OAUTH_CLIENT_SECRET_DEV }}
-          SECRET_POSTHOG_API_KEY: ${{ secrets.SECRET_POSTHOG_API_KEY_DEV }}
 
       - name: Setup Playwright
         run: yarn playwright install --with-deps

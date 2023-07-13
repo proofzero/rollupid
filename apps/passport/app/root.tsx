@@ -137,7 +137,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         appProps,
         flashes,
         ENV: {
-          SECRET_POSTHOG_API_KEY: context.env.SECRET_POSTHOG_API_KEY,
+          POSTHOG_API_KEY: context.env.POSTHOG_API_KEY,
           PROFILE_APP_URL: context.env.PROFILE_APP_URL,
           INTERNAL_GOOGLE_ANALYTICS_TAG:
             context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,

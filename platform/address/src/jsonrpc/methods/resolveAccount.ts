@@ -70,7 +70,7 @@ export const resolveAccountMethod = async ({
 
   // POSTHOG analytics
   await posthogCall({
-    apiKey: ctx.SECRET_POSTHOG_API_KEY,
+    apiKey: ctx.POSTHOG_API_KEY,
     eventName,
     distinctId: resultURN,
   })

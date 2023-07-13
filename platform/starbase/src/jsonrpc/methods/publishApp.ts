@@ -67,7 +67,7 @@ export const publishApp = async ({
     await posthogCall({
       distinctId: ctx.accountURN as string,
       eventName,
-      apiKey: ctx.SECRET_POSTHOG_API_KEY,
+      apiKey: ctx.POSTHOG_API_KEY,
       properties: { client_id: input.clientId },
     })
 

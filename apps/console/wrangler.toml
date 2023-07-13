@@ -38,6 +38,7 @@ PROFILE_APP_URL = "http://localhost:10003"
 COOKIE_DOMAIN = "localhost"
 WALLET_CONNECT_PROJECT_ID = "36efbf71d7586e254d72041a15a42078"
 CONSOLE_URL = "http://localhost:10002"
+POSTHOG_API_KEY = phc_f7q7V62YWsS0FKyIRxO36xyUMFYJ8oahurHPBAXkGe5
 
 # Site
 # -----------------------------------------------------------------------------
@@ -81,6 +82,7 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 PROFILE_APP_URL = "https://my-dev.rollup.id"
 WALLET_CONNECT_PROJECT_ID = "249578b973e49826abb32d2ad263e2a3"
 CONSOLE_URL = "https://console-dev.rollup.id"
+POSTHOG_API_KEY = phc_f7q7V62YWsS0FKyIRxO36xyUMFYJ8oahurHPBAXkGe5
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -113,6 +115,7 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 PROFILE_APP_URL = "https://my-next.rollup.id"
 WALLET_CONNECT_PROJECT_ID = "7bce942e261433eb70c2a72d555dd61f"
 CONSOLE_URL = "https://console-next.rollup.id"
+POSTHOG_API_KEY = phc_JsZaA3PKO8jNF6gJ7HusRN3C7yzp56JakJJZfNRI9n7
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -146,3 +149,4 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 PROFILE_APP_URL = "https://my.rollup.id"
 WALLET_CONNECT_PROJECT_ID = "6f2ebc8aa6a1d5c4d4ac1e700294e35f"
 CONSOLE_URL = "https://console.rollup.id"
+POSTHOG_API_KEY = phc_QGmYrKfXcyIAUBBTX3NBDJjNg2MX24ijFemeUuykzWr
