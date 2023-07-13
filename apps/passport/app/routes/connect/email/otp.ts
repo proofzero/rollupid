@@ -48,10 +48,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         context.traceSpan
       )
 
-      let appDetails, emailTheme, customDomain
+      let appPlan, appProps, emailTheme, customDomain
       if (clientId !== 'console' && clientId !== 'passport') {
-        ;[appDetails, emailTheme, customDomain] = await Promise.all([
-          starbaseClient.getAppDetails.query({
+        ;[appPlan, appProps, emailTheme, customDomain] = await Promise.all([
+          starbaseClient.getAppPlan.query({
+            clientId,
+          }),
+          starbaseClient.getAppPublicProps.query({
             clientId,
           }),
           starbaseClient.getEmailOTPTheme.query({
@@ -63,19 +66,18 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         ])
       }
 
-      if (appDetails?.appPlan === ServicePlanType.FREE) {
-        emailTheme = undefined
-      }
-
       let themeProps: EmailThemeProps | undefined
-      if (appDetails && appDetails.app) {
+      if (appProps) {
         themeProps = {
-          privacyURL: appDetails.privacyURL as string,
-          termsURL: appDetails.termsURL as string,
-          logoURL: emailTheme?.logoURL,
-          contactURL: emailTheme?.contact,
-          address: emailTheme?.address,
-          appName: appDetails.app.name,
+          privacyURL: appProps.privacyURL as string,
+          termsURL: appProps.termsURL as string,
+          logoURL:
+            appPlan !== ServicePlanType.FREE ? emailTheme?.logoURL : undefined,
+          contactURL:
+            appPlan !== ServicePlanType.FREE ? emailTheme?.contact : undefined,
+          address:
+            appPlan !== ServicePlanType.FREE ? emailTheme?.address : undefined,
+          appName: appProps.name,
         }
 
         if (customDomain) {
