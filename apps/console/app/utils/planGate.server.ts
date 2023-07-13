@@ -4,10 +4,7 @@ import plans from '~/routes/__layout/billing/plans'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { commitFlashSession } from '~/utilities/session.server'
 
-const isPlanGuarded = async (
-  appPlan: ServicePlanType,
-  gatePlan: ServicePlanType
-) => {
+const isPlanGuarded = (appPlan: ServicePlanType, gatePlan: ServicePlanType) => {
   const typeImportance = [ServicePlanType.FREE, ServicePlanType.PRO]
 
   if (
@@ -25,7 +22,7 @@ export const planGuardWithToastException = async (
   gatePlan: ServicePlanType,
   request: Request
 ) => {
-  if (await isPlanGuarded(appPlan, gatePlan)) {
+  if (isPlanGuarded(appPlan, gatePlan)) {
     const toastSession = await appendToastToFlashSession(request, {
       message: `This feature is not available for ${plans[appPlan].title}`,
       type: ToastType.Error,
