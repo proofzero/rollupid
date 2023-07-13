@@ -47,11 +47,7 @@ import {
   EmailOTPThemeSchema,
 } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
-import {
-  commitFlashSession,
-  getFlashSession,
-  requireJWT,
-} from '~/utilities/session.server'
+import { requireJWT } from '~/utilities/session.server'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -93,7 +89,6 @@ import classNames from 'classnames'
 import { ToastWarning } from '@proofzero/design-system/src/atoms/toast/ToastWarning'
 import { ServicePlanType } from '@proofzero/types/account'
 import plans from '~/routes/__layout/billing/plans'
-import { getToastsAndFlashSession } from '~/utils/toast.server'
 import { planGuardWithToastException } from '~/utils/planGate.server'
 
 const LazyAuth = lazy(() =>
@@ -1244,20 +1239,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       clientId,
     })
 
-    const { flashSession, toasts } = await getToastsAndFlashSession(request)
-
-    return json(
-      {
-        appTheme,
-        emailTheme,
-        toasts,
-      },
-      {
-        headers: {
-          'Set-Cookie': await commitFlashSession(flashSession),
-        },
-      }
-    )
+    return json({
+      appTheme,
+      emailTheme,
+    })
   }
 )
 
@@ -1419,7 +1404,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { appTheme, emailTheme, toasts } = useLoaderData<{
+  const { appTheme, emailTheme } = useLoaderData<{
     appTheme: GetAppThemeResult
     emailTheme: GetEmailOTPThemeResult
     toasts: {
@@ -1442,14 +1427,6 @@ export default () => {
       notificationHandler(Object.keys(errors).length === 0)
     }
   }, [errors])
-
-  useEffect(() => {
-    for (const { type, message } of toasts) {
-      toast(type, {
-        message: message,
-      })
-    }
-  }, [toasts])
 
   const { avatarUrl, notificationHandler } = useOutletContext<{
     avatarUrl: string

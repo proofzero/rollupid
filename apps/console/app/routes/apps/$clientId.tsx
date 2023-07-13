@@ -6,7 +6,7 @@ import { json } from '@remix-run/cloudflare'
 import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
-import { requireJWT } from '~/utilities/session.server'
+import { commitFlashSession, requireJWT } from '~/utilities/session.server'
 import createStarbaseClient from '@proofzero/platform-clients/starbase'
 import createAddressClient from '@proofzero/platform-clients/address'
 import type { appDetailsProps } from '~/types'
@@ -26,6 +26,8 @@ import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/val
 import { BadRequestError, NotFoundError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
+import { getToastsAndFlashSession } from '~/utils/toast.server'
+import { useEffect } from 'react'
 
 type LoaderData = {
   appDetails: appDetailsProps
@@ -33,6 +35,10 @@ type LoaderData = {
   appContactAddress?: AddressURN
   appContactEmail?: string
   paymaster: PaymasterType
+  toasts: {
+    message: string
+    type: ToastType
+  }[]
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -101,13 +107,23 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         appContactEmail = address
       }
 
-      return json<LoaderData>({
-        appDetails: appDetails as appDetailsProps,
-        rotationResult,
-        appContactAddress,
-        appContactEmail,
-        paymaster,
-      })
+      const { flashSession, toasts } = await getToastsAndFlashSession(request)
+
+      return json<LoaderData>(
+        {
+          appDetails: appDetails as appDetailsProps,
+          rotationResult,
+          appContactAddress,
+          appContactEmail,
+          paymaster,
+          toasts,
+        },
+        {
+          headers: {
+            'Set-Cookie': await commitFlashSession(flashSession),
+          },
+        }
+      )
     } catch (error) {
       console.error('Caught error in loader', { error })
       if (error instanceof Response) {
@@ -134,6 +150,7 @@ export default function AppDetailIndexPage() {
     appContactAddress,
     appContactEmail,
     paymaster,
+    toasts,
   } = loaderData
 
   const notify = (success: boolean = true) => {
@@ -150,6 +167,16 @@ export default function AppDetailIndexPage() {
       )
     }
   }
+
+  useEffect(() => {
+    if (!toasts || !toasts.length) return
+
+    for (const { type, message } of toasts) {
+      toast(type, {
+        message: message,
+      })
+    }
+  }, [toasts])
 
   return (
     <Popover className="min-h-[100dvh] relative">
