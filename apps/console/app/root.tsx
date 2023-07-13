@@ -198,8 +198,9 @@ export default function App() {
     // https://posthog.com/docs/libraries/react#posthog-provider
     if (hydrated) {
       try {
-        posthog.init(loaderData.ENV.SECRET_POSTHOG_API_KEY, {
+        posthog?.init(loaderData.ENV.SECRET_POSTHOG_API_KEY, {
           api_host: POSTHOG_PROXY_HOST,
+          autocapture: false,
         })
 
         posthog?.identify(accountURN)
