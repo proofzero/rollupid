@@ -80,7 +80,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           appName: appProps.name,
         }
 
-        if (customDomain) {
+        if (appPlan !== ServicePlanType.FREE && customDomain) {
           themeProps.hostname = customDomain.hostname
         }
       }
