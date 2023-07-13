@@ -29,6 +29,7 @@ import {
   TbReceipt2,
   TbUsers,
   TbWorld,
+  TbRocket,
 } from 'react-icons/tb'
 import { BsGear } from 'react-icons/bs'
 import { Popover, Transition } from '@headlessui/react'
@@ -278,8 +279,8 @@ const appSubmenuStruct: {
         subroute: '/team',
       },
       {
-        title: 'Billing',
-        icon: TbReceipt2,
+        title: 'Service Plan',
+        icon: TbRocket,
         subroute: '/billing',
       },
     ],
@@ -355,21 +356,19 @@ function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
           </NavLink>
         </div>
       )}
-      {false && (
-        <div className="px-2 p-2 hover:bg-gray-800">
-          <NavLink
-            to={'/billing'}
-            className={({ isActive }) => `${menuItemClass(isActive, false)} `}
-          >
-            <TbReceipt2 size={24} className="mr-2" />
-            <div className="flex flex-row w-full items-center justify-between">
-              <Text size="sm" weight="medium">
-                Billing & Invoicing
-              </Text>
-            </div>
-          </NavLink>
-        </div>
-      )}
+      <div className="px-2 p-2 hover:bg-gray-800">
+        <NavLink
+          to={'/billing'}
+          className={({ isActive }) => `${menuItemClass(isActive, false)} `}
+        >
+          <TbReceipt2 size={24} className="mr-2" />
+          <div className="flex flex-row w-full items-center justify-between">
+            <Text size="sm" weight="medium">
+              Billing & Invoicing
+            </Text>
+          </div>
+        </NavLink>
+      </div>
       <div className="px-2 p-2 hover:bg-gray-800">
         <NavLink
           to={PASSPORT_URL}

@@ -1,328 +1,664 @@
-import { ButtonAnchor } from '@proofzero/design-system/src/atoms/buttons/ButtonAnchor'
-import type { LinksFunction } from '@remix-run/cloudflare'
-import { FaDiscord, FaGithub, FaTwitter } from 'react-icons/fa'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import plans, { PlanDetails } from '~/routes/__layout/billing/plans'
+import { PlanFeatures } from '~/routes/__layout/billing'
+import { PaymentData, ServicePlanType } from '@proofzero/types/account'
+import { Button } from '@proofzero/design-system'
+import { StatusPill } from '@proofzero/design-system/src/atoms/pills/StatusPill'
+import {
+  ActionFunction,
+  LoaderFunction,
+  Session,
+  SessionData,
+  json,
+} from '@remix-run/cloudflare'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import {
+  commitFlashSession,
+  getFlashSession,
+  requireJWT,
+} from '~/utilities/session.server'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import createAccountClient from '@proofzero/platform-clients/account'
+import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import {
+  getAuthzHeaderConditionallyFromToken,
+  parseJwt,
+} from '@proofzero/utils'
+import { useLoaderData, useOutletContext, useSubmit } from '@remix-run/react'
+import { GetEntitlementsOutput } from '@proofzero/platform/account/src/jsonrpc/methods/getEntitlements'
+import { AccountURN } from '@proofzero/urns/account'
+import { BadRequestError } from '@proofzero/errors'
+import type { appDetailsProps } from '~/types'
+import { AppLoaderData } from '~/root'
+import {
+  createSubscription,
+  updateSubscription,
+} from '~/services/billing/stripe'
+import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
+import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
+import { useEffect, useState } from 'react'
+import {
+  HiArrowUp,
+  HiOutlineExternalLink,
+  HiOutlineShoppingCart,
+} from 'react-icons/hi'
+import {
+  ToastType,
+  Toaster,
+  toast,
+} from '@proofzero/design-system/src/atoms/toast'
 
-import billingCSS from '~/assets/early/billing.css'
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    const jwt = await requireJWT(request)
+    const parsedJwt = parseJwt(jwt!)
+    const accountURN = parsedJwt.sub as AccountURN
 
-export const links: LinksFunction = () => {
-  return [
-    {
-      rel: 'stylesheet',
-      href: billingCSS,
-    },
-  ]
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+    const accountClient = createAccountClient(Account, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
+    const entitlements = await accountClient.getEntitlements.query({
+      accountURN,
+    })
+    const paymentData = await accountClient.getStripePaymentData.query({
+      accountURN,
+    })
+
+    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    const successToast = flashSession.get('success_toast')
+    const errorToast = flashSession.get('error_toast')
+
+    return json(
+      {
+        entitlements,
+        paymentData,
+        successToast,
+        errorToast,
+      },
+      {
+        headers: {
+          'Set-Cookie': await commitFlashSession(flashSession),
+        },
+      }
+    )
+  }
+)
+
+const processUpdateOp = async (
+  jwt: string,
+  plan: ServicePlanType,
+  clientId: string,
+  flashSession: Session<SessionData, SessionData>,
+  traceHeader: Record<'traceparent', string>
+) => {
+  const parsedJwt = parseJwt(jwt)
+  const accountURN = parsedJwt.sub as AccountURN
+
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...traceHeader,
+  })
+
+  const accountClient = createAccountClient(Account, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...traceHeader,
+  })
+
+  const entitlements = await accountClient.getEntitlements.query({
+    accountURN,
+  })
+
+  const apps = await starbaseClient.listApps.query()
+  const allotedApps = apps.filter((a) => a.appPlan === plan).length
+
+  if (
+    plan !== ServicePlanType.FREE &&
+    allotedApps >= (entitlements.plans[plan]?.entitlements ?? 0)
+  ) {
+    throw new BadRequestError({
+      message: `You have reached the maximum number of apps for this plan`,
+    })
+  }
+
+  await starbaseClient.setAppPlan.mutate({
+    accountURN,
+    clientId,
+    plan,
+  })
+
+  flashSession.flash('success_toast', `${plans[plan].title} assigned.`)
 }
 
-export default () => (
-  <div className="pricing-wrap">
-    <div className="pricing-column">
-      <div className="pricing-card">
-        <div className="pricing-wrapper">
-          <h3 className="pricing-h3">Free</h3>
-          <div className="pricing-details-wrap">
-            <div className="pricing">$0</div>
+const processPurchaseOp = async (
+  jwt: string,
+  plan: ServicePlanType,
+  clientId: string,
+  flashSession: any,
+  traceHeader: Record<'traceparent', string>
+) => {
+  const parsedJwt = parseJwt(jwt)
+  const accountURN = parsedJwt.sub as AccountURN
+
+  const starbaseClient = createStarbaseClient(Starbase, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...traceHeader,
+  })
+
+  const accountClient = createAccountClient(Account, {
+    ...getAuthzHeaderConditionallyFromToken(jwt),
+    ...traceHeader,
+  })
+
+  const entitlements = await accountClient.getEntitlements.query({
+    accountURN,
+  })
+
+  const paymentData = await accountClient.getStripePaymentData.query({
+    accountURN,
+  })
+  if (!paymentData || !paymentData.customerID) {
+    throw new BadRequestError({
+      message: `You must add a payment method before purchasing a plan`,
+    })
+  }
+
+  const { customerID } = paymentData
+  let sub
+  let quantity
+  try {
+    if (!entitlements.subscriptionID) {
+      quantity = 1
+      sub = await createSubscription({
+        customerID: customerID,
+        planID: STRIPE_PRO_PLAN_ID,
+        quantity,
+        accountURN,
+        handled: true,
+      })
+    } else {
+      quantity = entitlements.plans[plan]?.entitlements
+        ? entitlements.plans[plan]?.entitlements! + 1
+        : 1
+
+      sub = await updateSubscription({
+        subscriptionID: entitlements.subscriptionID,
+        planID: STRIPE_PRO_PLAN_ID,
+        quantity,
+        handled: true,
+      })
+    }
+  } catch (e) {
+    flashSession.flash(
+      'error_toast',
+      'Transaction failed. You were not charged.'
+    )
+
+    return new Response(null, {
+      headers: {
+        'Set-Cookie': await commitFlashSession(flashSession),
+      },
+    })
+  }
+
+  await accountClient.updateEntitlements.mutate({
+    accountURN: accountURN,
+    subscriptionID: sub.id,
+    quantity: quantity,
+    type: plan,
+  })
+
+  await starbaseClient.setAppPlan.mutate({
+    accountURN,
+    clientId,
+    plan,
+  })
+
+  flashSession.flash(
+    'success_toast',
+    `${plans[plan].title} purchased and assigned.`
+  )
+}
+
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    const jwt = await requireJWT(request)
+    if (!jwt) {
+      throw new BadRequestError({
+        message: 'Missing JWT',
+      })
+    }
+
+    const { clientId } = params
+    if (!clientId) throw new BadRequestError({ message: 'Missing Client ID' })
+
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+
+    const fd = await request.formData()
+    const op = fd.get('op') as 'update' | 'purchase'
+    const { plan } = JSON.parse(fd.get('payload') as string) as {
+      plan: ServicePlanType
+    }
+
+    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+
+    switch (op) {
+      case 'update': {
+        await processUpdateOp(jwt, plan, clientId, flashSession, traceHeader)
+        break
+      }
+
+      case 'purchase': {
+        await processPurchaseOp(jwt, plan, clientId, flashSession, traceHeader)
+        break
+      }
+    }
+
+    return new Response(null, {
+      headers: {
+        'Set-Cookie': await commitFlashSession(flashSession),
+      },
+    })
+  }
+)
+
+const getAvailableEntitlements = (entitlement: {
+  planType: ServicePlanType
+  totalEntitlements?: number
+  usedEntitlements?: number
+}) => (entitlement.totalEntitlements ?? 0) - (entitlement.usedEntitlements ?? 0)
+
+const PlanCard = ({ plan, active }: { plan: PlanDetails; active: boolean }) => {
+  return (
+    <>
+      <article className="bg-white rounded border">
+        <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4">
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-row gap-2">
+              <Text size="lg" weight="semibold" className="text-gray-900">
+                {plan.title}
+              </Text>
+
+              {active && <StatusPill status="success" text="Active" />}
+            </div>
+
+            <Text size="sm" weight="medium" className="text-[#6B7280]">
+              {plan.description}
+            </Text>
           </div>
-          <div className="pricing-check-wrap">
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text">Unlimited MAUs</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text">Custom Branding</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text">Wallet Login</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text">Social Logins</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text">Profile API</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text">Community Support</p>
-            </div>
-            <div className="separator dark"></div>
-            <div className="pricing-check soon white">
-              <div className="div-block-40 mr-4">
-                <img
-                  src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                  alt=""
-                  className="check-2"
-                />
-                <p className="pricing-text">Email Login</p>
-              </div>
-              <div className="tag dark pricing">
-                <p className="pricing-text white small dark">COMING SOON</p>
-              </div>
-            </div>
-            <div className="pricing-check soon white">
-              <div className="div-block-40 mr-4">
-                <img
-                  src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                  alt=""
-                  className="check-2"
-                />
-                <p className="pricing-text">WebAuthn</p>
-              </div>
-              <div className="tag dark pricing">
-                <p className="pricing-text white small dark">COMING SOON</p>
-              </div>
-            </div>
-            <div className="pricing-check space">
-              <p className="pricing-text">... and more</p>
-            </div>
+
+          <a
+            className="flex-1 flex justify-end"
+            href="https://rollup.id/pricing"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button
+              btnType="secondary-alt"
+              className="right-0 flex md:flex-row flex-col max-w-max
+text-xs leading-4 items-center md:space-x-2"
+            >
+              Compare Plans
+              <HiOutlineExternalLink className="ml-2" />
+            </Button>
+          </a>
+        </header>
+        <div className="w-full border-b border-gray-200"></div>
+        <main>
+          <div className="flex flex-row gap-7 p-4">
+            <PlanFeatures plan={plan} />
           </div>
-        </div>
-      </div>
-    </div>
-    <div className="pricing-column">
-      <div className="pricing-card purple">
-        <div className="pricing-wrapper">
-          <div className="heading-wrap">
-            <h3 className="pricing-h3 white">PRO </h3>
-            <div className="tag small dark pricing">
-              <p className="pricing-text white small dark">BETA</p>
-            </div>
-          </div>
-          <div className="pricing-details-wrap">
-            <div className="pricing white">Early Access </div>
-          </div>
-          <div className="pricing-check-wrap">
-            <div className="pricing-check spacing">
-              <p className="pricing-text white">Everything in FREE and</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text white">White Labeling</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text white">Custom Domain</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text white">Expert Support</p>
-            </div>
-            <div className="separator"></div>
-            <div className="pricing-check soon">
-              <div className="div-block-40">
-                <img
-                  src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                  alt=""
-                  className="check-2"
-                />
-                <p className="pricing-text white">Vaults</p>
-              </div>
-              <div className="tag">
-                <p className="pricing-text white small">COMING SOON</p>
-              </div>
-            </div>
-            <div className="pricing-check soon">
-              <div className="div-block-40">
-                <img
-                  src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                  alt=""
-                  className="check-2"
-                />
-                <p className="pricing-text white">CRM</p>
-              </div>
-              <div className="tag">
-                <p className="pricing-text white small">COMING SOON</p>
-              </div>
-            </div>
-            <div className="pricing-check soon">
-              <div className="div-block-40">
-                <img
-                  src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                  alt=""
-                  className="check-2"
-                />
-                <p className="pricing-text white">Smart Contracts</p>
-              </div>
-              <div className="tag">
-                <p className="pricing-text white small">COMING SOON</p>
-              </div>
-            </div>
-            <div className="pricing-check soon">
-              <div className="div-block-40">
-                <img
-                  src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                  alt=""
-                  className="check-2"
-                />
-                <p className="pricing-text white">Teams</p>
-              </div>
-              <div className="tag">
-                <p className="pricing-text white small">COMING SOON</p>
-              </div>
-            </div>
-            <div className="pricing-check soon">
-              <div className="div-block-40">
-                <img
-                  src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                  alt=""
-                  className="check-2"
-                />
-                <p className="pricing-text white">Analytics</p>
-              </div>
-              <div className="tag">
-                <p className="pricing-text white small">COMING SOON</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div className="pricing-column">
-      <div className="pricing-card">
-        <div className="pricing-wrapper">
-          <div className="heading-wrap">
-            <h3 className="pricing-h3">ENTERPRISE </h3>
-            <div className="tag small dark pricing">
-              <p className="pricing-text white small dark">BETA</p>
-            </div>
-          </div>
-          <div className="pricing-details-wrap">
-            <div className="pricing">Contact Us</div>
-          </div>
-          <div className="pricing-check-wrap">
-            <div className="pricing-check spacing">
-              <p className="pricing-text">Everything in PRO and</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text">Organizations</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text">Custom Authorizations</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text">SOC2</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text">SSO/SAML</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text">Custom Migration</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text">Custom Invoicing</p>
-            </div>
-            <div className="pricing-check">
-              <img
-                src="https://uploads-ssl.webflow.com/5aa5deb2f3d89b000123c7dd/5cd24ca168db6560f9e01747_check.svg"
-                alt=""
-                className="check-2"
-              />
-              <p className="pricing-text">Enterprise Support</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div className="flex flex-col lg:flex-row lg:space-x-28 space-y-4 lg:space-y-0 m-2">
-      <section className="flex-1">
-        <div>
-          <Text size="sm" weight="medium" className="mb-3 text-gray-700">
-            Follow us for updates
+        </main>
+        <div className="w-full border-t border-gray-200"></div>
+        <footer className="p-4">
+          <Text>${plan.price} per month</Text>
+        </footer>
+      </article>
+    </>
+  )
+}
+
+const PurchaseConfirmationModal = ({
+  isOpen,
+  setIsOpen,
+  plan,
+  paymentData,
+}: {
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+  plan: PlanDetails
+  paymentData?: PaymentData
+}) => {
+  const submit = useSubmit()
+
+  return (
+    <Modal isOpen={isOpen} fixed handleClose={() => setIsOpen(false)}>
+      <Text
+        size="lg"
+        weight="semibold"
+        className="text-left text-gray-800 mx-5"
+      >
+        Purchase Entitlement(s)
+      </Text>
+
+      {!paymentData?.customerID && (
+        <section className="mt-3.5 mx-5">
+          <ToastWithLink
+            message="Please add Billing Information in Billing & Invoicing section"
+            linkHref={`/billing/`}
+            linkText="Add Billing Information"
+          />
+        </section>
+      )}
+
+      {paymentData?.customerID && !paymentData.paymentMethodID && (
+        <section className="mt-3.5 mx-5">
+          <ToastWithLink
+            message="Update your Payment Information to enable purchasing"
+            linkHref={`/billing/payment`}
+            linkText="Update payment information"
+          />
+        </section>
+      )}
+
+      <section className="m-5 border rounded-lg">
+        <div className="p-6">
+          <Text size="lg" weight="semibold" className="text-gray-900 text-left">
+            {plan.title}
           </Text>
 
-          <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-2">
-            <ButtonAnchor key="twitter" href="https://twitter.com/rollupid">
-              <FaTwitter className="text-base text-[#1D9BF0]" />
+          <Text
+            size="sm"
+            weight="medium"
+            className="text-[#6B7280] text-left mb-6"
+          >
+            {plan.description}
+          </Text>
 
-              <Text>Twitter</Text>
-            </ButtonAnchor>
+          <PlanFeatures plan={plan} />
+        </div>
 
-            <ButtonAnchor key="discord" href="https://discord.gg/rollupid">
-              <FaDiscord className="text-base text-[#5865F2]" />
+        <div className="border-b border-gray-200"></div>
 
-              <Text>Discord</Text>
-            </ButtonAnchor>
-
-            <ButtonAnchor
-              key="github"
-              href="https://github.com/proofzero/rollupid"
+        <div className="p-6 flex justify-between items-center">
+          <div>
+            <Text size="sm" weight="medium" className="text-gray-800 text-left">
+              Number of Entitlements
+            </Text>
+            <Text
+              size="sm"
+              weight="medium"
+              className="text-[#6B7280] text-left"
             >
-              <FaGithub className="text-base" />
+              1 x ${plan.price}/month
+            </Text>
+          </div>
+        </div>
 
-              <Text>GitHub</Text>
-            </ButtonAnchor>
+        <div className="border-b border-gray-200"></div>
+
+        <div className="p-6 flex justify-between items-center">
+          <Text size="sm" weight="medium" className="text-gray-800 text-left">
+            Changes to your subscription
+          </Text>
+
+          <div className="flex flex-row gap-2 items-center">
+            <Text
+              size="lg"
+              weight="semibold"
+              className="text-gray-900"
+            >{`+$${plan.price}`}</Text>
+            <Text size="sm" weight="medium" className="text-gray-500">
+              per month
+            </Text>
           </div>
         </div>
       </section>
-    </div>
-  </div>
-)
+
+      <div className="flex-1"></div>
+
+      <section className="flex flex-row-reverse gap-4 m-5 mt-auto">
+        <Button
+          btnType="primary-alt"
+          disabled={!paymentData?.paymentMethodID}
+          onClick={() => {
+            setIsOpen(false)
+
+            submit(
+              {
+                op: 'purchase',
+                payload: JSON.stringify({
+                  plan: ServicePlanType.PRO,
+                }),
+              },
+              {
+                method: 'post',
+              }
+            )
+          }}
+        >
+          Purchase
+        </Button>
+        <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
+          Cancel
+        </Button>
+      </section>
+    </Modal>
+  )
+}
+
+const EntitlementsCardButton = ({
+  currentPlan,
+  entitlement,
+  paymentData,
+}: {
+  currentPlan: ServicePlanType
+  entitlement: {
+    planType: ServicePlanType
+    totalEntitlements?: number
+    usedEntitlements?: number
+  }
+  paymentData: PaymentData
+}) => {
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false)
+
+  const getOperation = (
+    planType: ServicePlanType,
+    currentPlanType: ServicePlanType
+  ) => {
+    const typeImportance = [ServicePlanType.FREE, ServicePlanType.PRO]
+    if (
+      typeImportance.findIndex((ty) => ty === planType) <
+      typeImportance.findIndex((ty) => ty === currentPlanType)
+    ) {
+      return <>Downgrade</>
+    } else {
+      return (
+        <span className="flex flex-row gap-2 items-center">
+          <HiArrowUp /> Upgrade to {plans[planType].title.split(' ')[0]}
+        </span>
+      )
+    }
+  }
+
+  const op =
+    entitlement.planType === ServicePlanType.FREE ||
+    getAvailableEntitlements(entitlement) > 0
+      ? 'update'
+      : 'purchase'
+
+  const submit = useSubmit()
+
+  return (
+    <>
+      <PurchaseConfirmationModal
+        isOpen={showPurchaseModal}
+        setIsOpen={setShowPurchaseModal}
+        plan={plans[entitlement.planType]}
+        paymentData={paymentData}
+      />
+      <Button
+        btnType="secondary-alt"
+        btnSize="xs"
+        onClick={() => {
+          if (op === 'update') {
+            submit(
+              {
+                op: 'update',
+                payload: JSON.stringify({
+                  plan: entitlement.planType,
+                }),
+              },
+              {
+                method: 'post',
+              }
+            )
+          } else {
+            setShowPurchaseModal(true)
+          }
+        }}
+      >
+        {op === 'update' ? (
+          getOperation(entitlement.planType, currentPlan)
+        ) : (
+          <span className="flex flex-row gap-2 items-center">
+            <HiOutlineShoppingCart className="w-4 h-4" /> Purchase
+          </span>
+        )}
+      </Button>
+    </>
+  )
+}
+
+const EntitlementsCard = ({
+  currentPlan,
+  entitlements,
+  paymentData,
+}: {
+  currentPlan: ServicePlanType
+  entitlements: {
+    planType: ServicePlanType
+    totalEntitlements?: number
+    usedEntitlements?: number
+  }[]
+  paymentData: PaymentData
+}) => {
+  return (
+    <article className="bg-white rounded border">
+      <header className="flex flex-row justify-between items-center p-4">
+        <div>
+          <Text size="lg" weight="semibold" className="text-gray-900">
+            Assigned Entitlements
+          </Text>
+        </div>
+      </header>
+      <div className="w-full border-b border-gray-200"></div>
+      <main>
+        <div className="w-full">
+          {entitlements.map((entitlement, i) => (
+            <div key={plans[entitlement.planType].title}>
+              <div className="flex flex-row justify-between items-center w-full p-4">
+                <div className="flex-1 flex flex-row gap-4 items-center">
+                  <div>
+                    <Text size="sm" weight="medium" className="text-gray-900">
+                      {plans[entitlement.planType].title}
+                    </Text>
+                    <Text size="sm" weight="medium" className="text-gray-500">
+                      {entitlement.planType !== currentPlan &&
+                        entitlement.planType !== ServicePlanType.FREE &&
+                        `${getAvailableEntitlements(
+                          entitlement
+                        )} Entitlement(s) available`}
+                    </Text>
+                  </div>
+
+                  {currentPlan === entitlement.planType && (
+                    <StatusPill status="success" text="Active" />
+                  )}
+                </div>
+
+                {entitlement.planType !== currentPlan && (
+                  <EntitlementsCardButton
+                    currentPlan={currentPlan}
+                    entitlement={entitlement}
+                    paymentData={paymentData}
+                  />
+                )}
+              </div>
+              {i < entitlements.length - 1 && (
+                <div className="w-full border-b border-gray-200"></div>
+              )}
+            </div>
+          ))}
+        </div>
+      </main>
+    </article>
+  )
+}
+
+export default () => {
+  const {
+    entitlements: { plans: entitlements },
+    paymentData,
+    successToast,
+    errorToast,
+  } = useLoaderData<{
+    entitlements: GetEntitlementsOutput
+    paymentData: PaymentData
+    successToast: string
+    errorToast: string
+  }>()
+
+  const { apps, appDetails } = useOutletContext<{
+    apps: AppLoaderData[]
+    appDetails: appDetailsProps
+  }>()
+
+  useEffect(() => {
+    if (successToast) {
+      toast(ToastType.Success, {
+        message: successToast,
+      })
+    }
+  }, [successToast])
+
+  useEffect(() => {
+    if (errorToast) {
+      toast(ToastType.Error, {
+        message: errorToast,
+      })
+    }
+  }, [errorToast])
+
+  return (
+    <>
+      <Toaster position="top-right" reverseOrder={false} />
+
+      <section className="flex flex-col gap-4">
+        <PlanCard
+          active={appDetails.appPlan === ServicePlanType.PRO}
+          plan={plans[ServicePlanType.PRO]}
+        />
+        <EntitlementsCard
+          currentPlan={appDetails.appPlan}
+          entitlements={[
+            {
+              planType: ServicePlanType.FREE,
+            },
+            {
+              planType: ServicePlanType.PRO,
+              totalEntitlements:
+                entitlements[ServicePlanType.PRO]?.entitlements,
+              usedEntitlements: apps.filter(
+                (a) => a.appPlan === ServicePlanType.PRO
+              ).length,
+            },
+          ]}
+          paymentData={paymentData}
+        />
+      </section>
+    </>
+  )
+}

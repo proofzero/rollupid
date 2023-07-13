@@ -4,7 +4,7 @@ import { ServicePlanType } from '@proofzero/types/account'
 import { AccountURN } from '@proofzero/urns/account'
 import { redirect } from '@remix-run/cloudflare'
 import Stripe from 'stripe'
-import plans from '~/routes/__layout/gnillib/plans'
+import plans from '~/routes/__layout/billing/plans'
 
 type CreateCustomerParams = {
   email: string

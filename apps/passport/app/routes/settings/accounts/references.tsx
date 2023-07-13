@@ -47,7 +47,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             return {
               message: 'Address is being used as billing email.',
               external: true,
-              path: `${context.env.CONSOLE_APP_URL}/gnillib`,
+              path: `${context.env.CONSOLE_APP_URL}/billing`,
             }
           default:
             throw new BadRequestError({

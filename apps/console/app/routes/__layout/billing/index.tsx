@@ -226,7 +226,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       accountClient,
       starbaseClient,
       addressClient,
-      billingURL: `${CONSOLE_URL}/gnillib`,
+      billingURL: `${CONSOLE_URL}/billing`,
       settingsURL: `${CONSOLE_URL}`,
     })
 
@@ -306,7 +306,7 @@ const PurchaseProModal = ({
         <section className="mt-3.5 mx-5">
           <ToastWithLink
             message="Update your Payment Information to enable purchasing"
-            linkHref={`/gnillib/payment`}
+            linkHref={`/billing/payment`}
             linkText="Update payment information"
           />
         </section>
@@ -650,7 +650,7 @@ const AssignedAppModal = ({
                 </Text>
               </div>
 
-              <NavLink to={`/apps/${app.clientId}/gnillib`}>
+              <NavLink to={`/apps/${app.clientId}/billing`}>
                 <Button btnType="secondary-alt">Manage</Button>
               </NavLink>
             </li>
@@ -940,7 +940,7 @@ export default () => {
           <article className="mb-3.5">
             <ToastWithLink
               message="Update your Payment Information to enable purchasing"
-              linkHref={`/gnillib/payment`}
+              linkHref={`/billing/payment`}
               linkText="Update payment information"
             />
           </article>
@@ -984,7 +984,7 @@ export default () => {
                     }),
                   },
                   {
-                    action: '/gnillib/details',
+                    action: '/billing/details',
                     method: 'post',
                   }
                 )
@@ -1095,7 +1095,7 @@ export default () => {
               Invoices & Payments
             </Text>
 
-            <Link to="/gnillib/portal">
+            <Link to="/billing/portal">
               <Button
                 btnType="secondary-alt"
                 className="flex flex-row items-center gap-2"

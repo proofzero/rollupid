@@ -75,7 +75,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const flashSession = await getFlashSession(request.headers.get('Cookie'))
     flashSession.flash('success_toast', 'Payment data updated')
 
-    return redirect('/gnillib', {
+    return redirect('/billing', {
       headers: {
         'Set-Cookie': await commitFlashSession(flashSession),
       },
