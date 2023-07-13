@@ -93,7 +93,11 @@ import classNames from 'classnames'
 import { ToastWarning } from '@proofzero/design-system/src/atoms/toast/ToastWarning'
 import { ServicePlanType } from '@proofzero/types/account'
 import plans from '~/routes/__layout/billing/plans'
-import planGate from '~/utils/planGate'
+import planGate from '~/utils/planGate.server'
+import {
+  appendToastToFlashSession,
+  getToastsAndFlashSession,
+} from '~/utils/toast.server'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -1243,16 +1247,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       clientId,
     })
 
-    const flashSession = await getFlashSession(request.headers.get('Cookie'))
-    const errorToastMessage = flashSession.get('error_toast')
+    const { flashSession, toasts } = await getToastsAndFlashSession(request)
 
     return json(
       {
         appTheme,
         emailTheme,
-        errorToast: errorToastMessage && {
-          message: errorToastMessage,
-        },
+        toasts,
       },
       {
         headers: {
@@ -1285,14 +1286,16 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     if (await planGate(appDetails.appPlan, ServicePlanType.PRO)) {
-      const flashSession = await getFlashSession(request.headers.get('Cookie'))
-      flashSession.flash(
-        'error_toast',
-        `This feature is not available for ${plans[appDetails.appPlan].title}`
-      )
+      const toastSession = await appendToastToFlashSession(request, {
+        message: `This feature is not available for ${
+          plans[appDetails.appPlan].title
+        }`,
+        type: ToastType.Error,
+      })
+
       return new Response(null, {
         headers: {
-          'Set-Cookie': await commitFlashSession(flashSession),
+          'Set-Cookie': await commitFlashSession(toastSession),
         },
       })
     }
@@ -1428,12 +1431,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { appTheme, emailTheme, errorToast } = useLoaderData<{
+  const { appTheme, emailTheme, toasts } = useLoaderData<{
     appTheme: GetAppThemeResult
     emailTheme: GetEmailOTPThemeResult
-    errorToast?: {
+    toasts: {
       message: string
-    }
+      type: ToastType
+    }[]
   }>()
 
   const { appDetails, appContactAddress, appContactEmail } = useOutletContext<{
@@ -1452,12 +1456,12 @@ export default () => {
   }, [errors])
 
   useEffect(() => {
-    if (errorToast) {
-      toast(ToastType.Error, {
-        message: errorToast.message,
+    for (const { type, message } of toasts) {
+      toast(type, {
+        message: message,
       })
     }
-  }, [errorToast])
+  }, [toasts])
 
   const { avatarUrl, notificationHandler } = useOutletContext<{
     avatarUrl: string
