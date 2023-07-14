@@ -51,7 +51,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   if (url.pathname === '/account') {
     return redirect('/account/dashboard')
   }
-  console.debug("before JWT")
   const jwt = await requireJWT(request, context.env)
 
   // We go through this because
@@ -59,11 +58,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   // but don't have the profiles
   // and it's complex to send them to a loader / action
 
-  console.debug("before parse")
   const accountURN = parseJwt(jwt).sub as AccountURN
 
   try {
-    console.debug("before promise all")
     const [loggedInUserProfile, addresses] = await Promise.all([
       getAccountProfile({ jwt, accountURN }, context.env, context.traceSpan),
       getAccountAddresses({ jwt }, context.env, context.traceSpan),
@@ -76,7 +73,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
     let connectedProfiles: GetAddressProfilesQuery['addressProfiles'] = []
 
-    console.debug("before getAddressProfiles")
     // We get the full profiles
     connectedProfiles =
       (await getAddressProfiles(
@@ -93,8 +89,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       ...p,
     }))
 
-    console.debug("before address filter")
-
     const cryptoAddresses =
       addresses?.filter((e) => {
         if (!e.rc) return false
@@ -108,7 +102,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       profile: loggedInUserProfile,
     })
   } catch (error) {
-    console.debug("Error", error)
     throw JsonError(
       new InternalServerError({
         message: 'failed to load profiles',

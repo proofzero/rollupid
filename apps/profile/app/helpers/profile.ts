@@ -27,10 +27,8 @@ export const getAccountProfile = async (
   traceSpan: TraceSpan
 ) => {
   // note: jwt is only important for setting profile in profile account settings
-  console.debug('before getAccountProfile KV get')
   const profile = await env.ProfileKV.get<FullProfile>(accountURN, 'json')
 
-  console.debug('before getAccountProfile getValidGallery')
   if (profile && profile.gallery)
     profile.gallery = await getValidGallery(
       {
@@ -78,7 +76,6 @@ export const getAccountAddresses = async (
     env
   )
 
-  console.debug('before getConnectedAddresses')
   const addressesRes = await galaxyClient.getConnectedAddresses(
     { targetAccountURN: accountURN },
     getAuthzHeaderConditionallyFromToken(jwt)
