@@ -796,7 +796,7 @@ const PlanCard = ({
 
           <div className="border-b border-gray-200"></div>
 
-          {apps.length > 0 && (
+          {entitlements > 0 && (
             <div className="p-4">
               <div className="flex flex-row items-center gap-6">
                 <div className="flex-1">
@@ -815,17 +815,19 @@ const PlanCard = ({
 
                   <div className="flex flex-row items-center">
                     <div className="flex-1">
-                      <button
-                        type="button"
-                        className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b disabled:text-indigo-300"
-                        onClick={() => {
-                          setAssignedAppModalOpen(true)
-                        }}
-                      >
-                        <Text size="sm" weight="medium">
-                          View Assigned Apps
-                        </Text>
-                      </button>
+                      {apps.length > 0 && (
+                        <button
+                          type="button"
+                          className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b disabled:text-indigo-300"
+                          onClick={() => {
+                            setAssignedAppModalOpen(true)
+                          }}
+                        >
+                          <Text size="sm" weight="medium">
+                            View Assigned Apps
+                          </Text>
+                        </button>
+                      )}
                     </div>
                     <Text size="sm" weight="medium" className="text-[#6B7280]">
                       {`${apps.length} out of ${entitlements} Entitlements used`}
