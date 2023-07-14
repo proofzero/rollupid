@@ -36,7 +36,7 @@ import {
 } from '~/services/billing/stripe'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   HiArrowUp,
   HiOutlineExternalLink,
@@ -273,7 +273,30 @@ const getAvailableEntitlements = (entitlement: {
   usedEntitlements?: number
 }) => (entitlement.totalEntitlements ?? 0) - (entitlement.usedEntitlements ?? 0)
 
-const PlanCard = ({ plan, active }: { plan: PlanDetails; active: boolean }) => {
+const PlanCard = ({
+  planType,
+  currentPlan,
+  totalEntitlements,
+  usedEntitlements,
+  paymentData,
+}: {
+  planType: ServicePlanType
+  currentPlan: ServicePlanType
+  totalEntitlements?: number
+  usedEntitlements?: number
+  paymentData: PaymentData
+}) => {
+  const plan = plans[planType]
+  const active = planType === currentPlan
+
+  const availableEntitlements = useMemo(() => {
+    return getAvailableEntitlements({
+      planType,
+      totalEntitlements,
+      usedEntitlements,
+    })
+  }, [planType, totalEntitlements, usedEntitlements])
+
   return (
     <>
       <article className="bg-white rounded border">
@@ -292,21 +315,17 @@ const PlanCard = ({ plan, active }: { plan: PlanDetails; active: boolean }) => {
             </Text>
           </div>
 
-          <a
-            className="flex-1 flex justify-end"
-            href="https://rollup.id/pricing"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button
-              btnType="secondary-alt"
-              className="right-0 flex md:flex-row flex-col max-w-max
-text-xs leading-4 items-center md:space-x-2"
-            >
-              Compare Plans
-              <HiOutlineExternalLink className="ml-2" />
-            </Button>
-          </a>
+          {!active && (
+            <EntitlementsCardButton
+              currentPlan={currentPlan}
+              entitlement={{
+                planType,
+                totalEntitlements,
+                usedEntitlements,
+              }}
+              paymentData={paymentData}
+            />
+          )}
         </header>
         <div className="w-full border-b border-gray-200"></div>
         <main>
@@ -315,8 +334,14 @@ text-xs leading-4 items-center md:space-x-2"
           </div>
         </main>
         <div className="w-full border-t border-gray-200"></div>
-        <footer className="p-4">
+        <footer className="p-4 flex flex-row items-center justify-between">
           <Text>${plan.price} per month</Text>
+          <Text size="sm" weight="medium" className="text-gray-500">
+            {!active &&
+              planType !== ServicePlanType.FREE &&
+              availableEntitlements !== 0 &&
+              `${availableEntitlements} Entitlement(s) available`}
+          </Text>
         </footer>
       </article>
     </>
@@ -467,25 +492,18 @@ const EntitlementsCardButton = ({
 }) => {
   const [showPurchaseModal, setShowPurchaseModal] = useState(false)
 
-  const getOperation = (
+  const isUpgrade = (
     planType: ServicePlanType,
     currentPlanType: ServicePlanType
   ) => {
     const typeImportance = [ServicePlanType.FREE, ServicePlanType.PRO]
-    if (
+    return !(
       typeImportance.findIndex((ty) => ty === planType) <
       typeImportance.findIndex((ty) => ty === currentPlanType)
-    ) {
-      return <>Downgrade</>
-    } else {
-      return (
-        <span className="flex flex-row gap-2 items-center">
-          <HiArrowUp /> Upgrade to {plans[planType].title.split(' ')[0]}
-        </span>
-      )
-    }
+    )
   }
 
+  const upgrade = isUpgrade(entitlement.planType, currentPlan)
   const op =
     entitlement.planType === ServicePlanType.FREE ||
       getAvailableEntitlements(entitlement) > 0
@@ -503,8 +521,7 @@ const EntitlementsCardButton = ({
         paymentData={paymentData}
       />
       <Button
-        btnType="secondary-alt"
-        btnSize="xs"
+        btnType={upgrade ? 'primary-alt' : 'secondary-alt'}
         onClick={() => {
           if (op === 'update') {
             submit(
@@ -524,7 +541,18 @@ const EntitlementsCardButton = ({
         }}
       >
         {op === 'update' ? (
-          getOperation(entitlement.planType, currentPlan)
+          <>
+            {upgrade ? (
+              <span className="flex flex-row gap-2 items-center">
+                <HiArrowUp /> Upgrade to{' '}
+                {plans[entitlement.planType].title.split(' ')[0]}
+              </span>
+            ) : (
+              <>
+                Downgrade to {plans[entitlement.planType].title.split(' ')[0]}
+              </>
+            )}
+          </>
         ) : (
           <span className="flex flex-row gap-2 items-center">
             <HiOutlineShoppingCart className="w-4 h-4" /> Purchase
@@ -532,72 +560,6 @@ const EntitlementsCardButton = ({
         )}
       </Button>
     </>
-  )
-}
-
-const EntitlementsCard = ({
-  currentPlan,
-  entitlements,
-  paymentData,
-}: {
-  currentPlan: ServicePlanType
-  entitlements: {
-    planType: ServicePlanType
-    totalEntitlements?: number
-    usedEntitlements?: number
-  }[]
-  paymentData: PaymentData
-}) => {
-  return (
-    <article className="bg-white rounded border">
-      <header className="flex flex-row justify-between items-center p-4">
-        <div>
-          <Text size="lg" weight="semibold" className="text-gray-900">
-            Assigned Entitlements
-          </Text>
-        </div>
-      </header>
-      <div className="w-full border-b border-gray-200"></div>
-      <main>
-        <div className="w-full">
-          {entitlements.map((entitlement, i) => (
-            <div key={plans[entitlement.planType].title}>
-              <div className="flex flex-row justify-between items-center w-full p-4">
-                <div className="flex-1 flex flex-row gap-4 items-center">
-                  <div>
-                    <Text size="sm" weight="medium" className="text-gray-900">
-                      {plans[entitlement.planType].title}
-                    </Text>
-                    <Text size="sm" weight="medium" className="text-gray-500">
-                      {entitlement.planType !== currentPlan &&
-                        entitlement.planType !== ServicePlanType.FREE &&
-                        `${getAvailableEntitlements(
-                          entitlement
-                        )} Entitlement(s) available`}
-                    </Text>
-                  </div>
-
-                  {currentPlan === entitlement.planType && (
-                    <StatusPill status="success" text="Active" />
-                  )}
-                </div>
-
-                {entitlement.planType !== currentPlan && (
-                  <EntitlementsCardButton
-                    currentPlan={currentPlan}
-                    entitlement={entitlement}
-                    paymentData={paymentData}
-                  />
-                )}
-              </div>
-              {i < entitlements.length - 1 && (
-                <div className="w-full border-b border-gray-200"></div>
-              )}
-            </div>
-          ))}
-        </div>
-      </main>
-    </article>
   )
 }
 
@@ -641,24 +603,17 @@ export default () => {
 
       <section className="flex flex-col gap-4">
         <PlanCard
-          active={appDetails.appPlan === ServicePlanType.PRO}
-          plan={plans[ServicePlanType.PRO]}
-        />
-        <EntitlementsCard
           currentPlan={appDetails.appPlan}
-          entitlements={[
-            {
-              planType: ServicePlanType.FREE,
-            },
-            {
-              planType: ServicePlanType.PRO,
-              totalEntitlements:
-                entitlements[ServicePlanType.PRO]?.entitlements,
-              usedEntitlements: apps.filter(
-                (a) => a.appPlan === ServicePlanType.PRO
-              ).length,
-            },
-          ]}
+          planType={ServicePlanType.FREE}
+          paymentData={paymentData}
+        />
+        <PlanCard
+          currentPlan={appDetails.appPlan}
+          planType={ServicePlanType.PRO}
+          totalEntitlements={entitlements[ServicePlanType.PRO]?.entitlements}
+          usedEntitlements={
+            apps.filter((a) => a.appPlan === ServicePlanType.PRO).length
+          }
           paymentData={paymentData}
         />
       </section>
