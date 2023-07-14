@@ -74,6 +74,7 @@ import {
 } from '~/services/billing/stripe'
 import { useHydrated } from 'remix-utils'
 import _ from 'lodash'
+import { EmailAddressType } from '@proofzero/types/address'
 
 type StripeInvoice = {
   amount: number
@@ -117,7 +118,20 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const connectedAccounts = await accountClient.getAddresses.query({
       account: accountURN,
     })
-    const connectedEmails = getEmailDropdownItems(connectedAccounts, true)
+
+    // We are only concerned with e-mails in the billing screen
+    // because we send them to Stripe
+    // so we can ignore the addressURN
+    // and apply deduplication logic
+    const connectedEmails = getEmailDropdownItems(connectedAccounts)
+      .filter(
+        (item, index, self) =>
+          index === self.findIndex((t) => t.title === item.title)
+      )
+      .map((item) => ({
+        ...item,
+        subtitle: EmailAddressType.Email,
+      }))
 
     const spd = await accountClient.getStripePaymentData.query({
       accountURN,

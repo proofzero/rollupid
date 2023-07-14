@@ -58,12 +58,11 @@ export const adjustAddressTypeToDisplay = (
 }
 
 export const getEmailDropdownItems = (
-  connectedAddresses?: Addresses | null,
-  excludeDuplicates: boolean = false
+  connectedAddresses?: Addresses | null
 ): Array<DropdownSelectListItem> => {
   if (!connectedAddresses) return []
 
-  let filteredEmailsFromConnectedAddresses = connectedAddresses.filter(
+  const filteredEmailsFromConnectedAddresses = connectedAddresses.filter(
     (address) => {
       return (
         (address.rc.node_type === NodeType.OAuth &&
@@ -75,24 +74,6 @@ export const getEmailDropdownItems = (
       )
     }
   )
-
-  if (excludeDuplicates) {
-    filteredEmailsFromConnectedAddresses.sort((a, b) =>
-      a.rc.node_type === b.rc.node_type
-        ? 0
-        : a.rc.node_type === 'email'
-        ? -1
-        : 1
-    )
-
-    filteredEmailsFromConnectedAddresses =
-      filteredEmailsFromConnectedAddresses.filter((address, index, self) => {
-        const firstIndex = self.findIndex(
-          (t) => t.qc.alias === address.qc.alias
-        )
-        return firstIndex === index
-      })
-  }
 
   return filteredEmailsFromConnectedAddresses.map((address, i) => {
     return {
