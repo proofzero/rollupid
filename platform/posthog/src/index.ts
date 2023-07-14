@@ -2,9 +2,12 @@ import { setCORSHeaders } from '../utils'
 
 const API_HOST = 'app.posthog.com'
 
-type ExtendableEventWithRequest = ExtendableEvent & { request: Request }
+type MinimalEvent = {
+  request: Request
+  waitUntil: ExecutionContext['waitUntil']
+}
 
-async function handleRequest(event: ExtendableEventWithRequest) {
+async function handleRequest(event: MinimalEvent) {
   const pathname = new URL(event.request.url).pathname
   if (pathname.startsWith('/static/')) {
     return retrieveStatic(event, pathname)
@@ -13,10 +16,7 @@ async function handleRequest(event: ExtendableEventWithRequest) {
   }
 }
 
-async function retrieveStatic(
-  event: ExtendableEventWithRequest,
-  pathname: string
-) {
+async function retrieveStatic(event: MinimalEvent, pathname: string) {
   let response = await caches.default.match(event.request)
   if (!response) {
     response = await fetch(`https://${API_HOST}${pathname}`)
@@ -26,10 +26,7 @@ async function retrieveStatic(
   return response
 }
 
-async function forwardRequest(
-  event: ExtendableEventWithRequest,
-  pathname: string
-) {
+async function forwardRequest(event: MinimalEvent, pathname: string) {
   const request = new Request(event.request)
   request.headers.delete('cookie')
   let response = await fetch(`https://${API_HOST}${pathname}`, request)
@@ -40,7 +37,12 @@ async function forwardRequest(
   return response
 }
 
-addEventListener('fetch', (event) => {
-  event.passThroughOnException()
-  event.respondWith(handleRequest(event))
-})
+export default {
+  async fetch(req: Request, env: unknown, ctx: ExecutionContext) {
+    const event: MinimalEvent = {
+      request: req,
+      waitUntil: ctx.waitUntil.bind(ctx),
+    }
+    return await handleRequest(event)
+  },
+}
