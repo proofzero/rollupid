@@ -31,7 +31,6 @@ local_protocol = "http"
 # independently for each environment.
 
 [vars]
-DEPLOY_ENV = "local"
 PASSPORT_URL = "http://localhost:10001"
 STORAGE_NAMESPACE = "console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
@@ -75,7 +74,6 @@ routes = [
 ]
 
 [env.dev.vars]
-DEPLOY_ENV = "dev"
 PASSPORT_URL = "https://passport-dev.rollup.id"
 COOKIE_DOMAIN = "rollup.id"
 STORAGE_NAMESPACE = "console"
@@ -108,7 +106,6 @@ routes = [
 command = "yarn build"
 
 [env.next.vars]
-DEPLOY_ENV = "next"
 PASSPORT_URL = "https://passport-next.rollup.id"
 COOKIE_DOMAIN = "rollup.id"
 STORAGE_NAMESPACE = "console"
@@ -142,7 +139,6 @@ command = "yarn build"
 
 
 [env.current.vars]
-DEPLOY_ENV = "current"
 PASSPORT_URL = "https://passport.rollup.id"
 COOKIE_DOMAIN = "rollup.id"
 STORAGE_NAMESPACE = "console"

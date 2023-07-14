@@ -12,6 +12,8 @@ import {
 } from '@proofzero/platform-middleware/trace'
 import type { TraceableFetchEvent } from '@proofzero/platform-middleware/trace'
 import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
+import manifestJSON from '__STATIC_CONTENT_MANIFEST'
+let manifest = JSON.parse(manifestJSON)
 
 type CfHostMetadata = {
   clientId: string
@@ -51,24 +53,11 @@ export function parseParams(request: Request) {
   }
 }
 
-const requestHandler = createRequestHandler({
-  build,
-  mode: process.env.NODE_ENV,
-  getLoadContext: (event) => {
-    const authzQueryParams = parseParams(event.request)
-    const env = globalThis as unknown as Env
-    const traceSpan = (event as TraceableFetchEvent).traceSpan
-    return {
-      authzQueryParams,
-      appProps: (event.request as CustomDomainRequest).app_props,
-      env,
-      traceSpan,
-    }
-  },
-})
-
-const handleEvent = async (event: FetchEvent) => {
-  let response = await handleAsset(event, build)
+const handleEvent = async (event: FetchEvent, env: Env) => {
+  let response = await handleAsset(event, build, {
+    ASSET_NAMESPACE: env.__STATIC_CONTENT,
+    ASSET_MANIFEST: manifest,
+  })
   if (response) return response
 
   //Create a new trace span with no parent
@@ -83,7 +72,6 @@ const handleEvent = async (event: FetchEvent) => {
     newTraceSpan.toString()
   )
 
-  const env = globalThis as unknown as Env
   const request = event.request as unknown as CfRequest<CfHostMetadata>
   const host = request.headers.get('host') as string
   if (!env.DEFAULT_HOSTS.includes(host)) {
@@ -106,6 +94,21 @@ const handleEvent = async (event: FetchEvent) => {
     }
   }
 
+  const requestHandler = createRequestHandler({
+    build,
+    mode: process.env.NODE_ENV,
+    getLoadContext: (event) => {
+      const authzQueryParams = parseParams(event.request)
+      const traceSpan = (event as TraceableFetchEvent).traceSpan
+      return {
+        authzQueryParams,
+        appProps: (event.request as CustomDomainRequest).app_props,
+        env,
+        traceSpan,
+      }
+    },
+  })
+
   try {
     response = await requestHandler(newEvent)
   } finally {
@@ -122,6 +125,13 @@ const handleEvent = async (event: FetchEvent) => {
   return response
 }
 
-addEventListener('fetch', async (event: FetchEvent) => {
-  event.respondWith(handleEvent(event))
-})
+export default {
+  async fetch(req: Request, env: Env, ctx: ExecutionContext) {
+    //This is the smallest set of event props Remix needs to handle assets correctly
+    const event = {
+      request: req,
+      waitUntil: ctx.waitUntil.bind(ctx),
+    } as FetchEvent
+    return await handleEvent(event, env)
+  },
+}

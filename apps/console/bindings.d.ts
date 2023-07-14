@@ -1,29 +1,33 @@
 export const seviceBindings = true
-declare global {
-  const Starbase: Fetcher
-  const Images: Fetcher
-  const Account: Fetcher
-  const Address: Fetcher
 
-  const SECRET_SESSION_KEY: string
-  const SECRET_SESSION_SALT: string
-  const COOKIE_DOMAIN: string
-  const PASSPORT_URL: string
-  const STORAGE_NAMESPACE: string
-  const INTERNAL_GOOGLE_ANALYTICS_TAG: string
-  const PROFILE_APP_URL: string
+interface Env {
+  Starbase: Fetcher
+  Images: Fetcher
+  Account: Fetcher
+  Address: Fetcher
 
-  const INTERNAL_PASSPORT_SERVICE_NAME: string
+  SECRET_SESSION_KEY: string
+  SECRET_SESSION_SALT: string
+  COOKIE_DOMAIN: string
+  PASSPORT_URL: string
+  STORAGE_NAMESPACE: string
+  INTERNAL_GOOGLE_ANALYTICS_TAG: string
+  PROFILE_APP_URL: string
 
-  const INTERNAL_CLOUDFLARE_ZONE_ID: string
-  const TOKEN_CLOUDFLARE_API: string
-  const WALLET_CONNECT_PROJECT_ID: string
+  INTERNAL_PASSPORT_SERVICE_NAME: string
 
-  const STRIPE_API_SECRET: string
-  const STRIPE_WEBHOOK_SECRET: string
-  const STRIPE_PRO_PLAN_ID: string
+  INTERNAL_CLOUDFLARE_ZONE_ID: string
+  TOKEN_CLOUDFLARE_API: string
+  WALLET_CONNECT_PROJECT_ID: string
 
-  const SECRET_POSTHOG_API_KEY: string
+  STRIPE_API_SECRET: string
+  STRIPE_WEBHOOK_SECRET: string
+  STRIPE_PRO_PLAN_ID: string
 
-  const CONSOLE_URL: string
+  SECRET_POSTHOG_API_KEY: string
+
+  CONSOLE_URL: string
+  //Needed to make Remix work with Cloudflare module workers
+  __STATIC_CONTENT: string
 }
+declare global {}

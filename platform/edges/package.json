@@ -41,7 +41,7 @@
     "prettier": "2.7.1",
     "tap": "16.3.2",
     "typescript": "5.0.4",
-    "wrangler": "3.1.0",
+    "wrangler": "3.2.0",
     "yarn-run-all": "3.1.1"
   },
   "dependencies": {

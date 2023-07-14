@@ -19,9 +19,6 @@ import {
   InvalidTokenError,
 } from '@proofzero/utils/token'
 
-// @ts-ignore
-invariant(DEPLOY_ENV, 'DEPLOY_ENV must be set')
-
 // NB: This secret is set using: wrangler secret put.
 // @ts-ignore
 invariant(SECRET_SESSION_KEY, 'SECRET_SESSION_KEY must be set')
