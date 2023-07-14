@@ -137,7 +137,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         appProps,
         flashes,
         ENV: {
-          SECRET_POSTHOG_API_KEY: context.env.SECRET_POSTHOG_API_KEY,
+          POSTHOG_API_KEY: context.env.POSTHOG_API_KEY,
           PROFILE_APP_URL: context.env.PROFILE_APP_URL,
           INTERNAL_GOOGLE_ANALYTICS_TAG:
             context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
@@ -224,7 +224,7 @@ export default function App() {
     // https://posthog.com/docs/libraries/react#posthog-provider
     if (hydrated) {
       try {
-        posthog?.init(browserEnv.ENV.SECRET_POSTHOG_API_KEY, {
+        posthog?.init(browserEnv.ENV.POSTHOG_API_KEY, {
           api_host: POSTHOG_PROXY_HOST,
           autocapture: false,
         })

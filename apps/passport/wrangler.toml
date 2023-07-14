@@ -40,6 +40,7 @@ INTERNAL_APPLE_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/apple/callba
 INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "http://localhost:10001/connect/discord/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 WALLET_CONNECT_PROJECT_ID = "36efbf71d7586e254d72041a15a42078"
+POSTHOG_API_KEY = "phc_f7q7V62YWsS0FKyIRxO36xyUMFYJ8oahurHPBAXkGe5"
 
 [env.dev]
 routes = [
@@ -69,6 +70,7 @@ INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/connect/
 INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "https://passport-dev.rollup.id/connect/discord/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 WALLET_CONNECT_PROJECT_ID = "249578b973e49826abb32d2ad263e2a3"
+POSTHOG_API_KEY = "phc_f7q7V62YWsS0FKyIRxO36xyUMFYJ8oahurHPBAXkGe5"
 
 [env.next]
 routes = [
@@ -97,6 +99,7 @@ INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect
 INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "https://passport-next.rollup.id/connect/discord/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 WALLET_CONNECT_PROJECT_ID = "7bce942e261433eb70c2a72d555dd61f"
+POSTHOG_API_KEY = "phc_JsZaA3PKO8jNF6gJ7HusRN3C7yzp56JakJJZfNRI9n7"
 
 [env.next.build]
 command = "yarn build"
@@ -128,6 +131,7 @@ INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "https://passport.rollup.id/connect/micr
 INTERNAL_DISCORD_OAUTH_CALLBACK_URL = "https://passport.rollup.id/connect/discord/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 WALLET_CONNECT_PROJECT_ID = "6f2ebc8aa6a1d5c4d4ac1e700294e35f"
+POSTHOG_API_KEY = "phc_QGmYrKfXcyIAUBBTX3NBDJjNg2MX24ijFemeUuykzWr"
 
 [env.current.build]
 command = "yarn build"

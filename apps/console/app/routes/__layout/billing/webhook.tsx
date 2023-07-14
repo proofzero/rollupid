@@ -33,12 +33,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const stripeClient = new Stripe(context.env.STRIPE_API_SECRET, {
+    const stripeClient = new Stripe(context.env.SECRET_STRIPE_API_KEY, {
       apiVersion: '2022-11-15',
     })
 
-    const whSecret = context.env.STRIPE_WEBHOOK_SECRET
-
+    const whSecret = context.env.SECRET_STRIPE_WEBHOOK_SECRET
     const payload = await request.text()
     const sig = request.headers.get('stripe-signature') as string
 
@@ -98,10 +97,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
           subMeta.handled = null
 
-          await updateSubscriptionMetadata({
-            id,
-            metadata: subMeta,
-          }, context.env)
+          await updateSubscriptionMetadata(
+            {
+              id,
+              metadata: subMeta,
+            },
+            context.env
+          )
 
           return null
         }
@@ -115,15 +117,18 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           })
         }
 
-        await reconcileAppSubscriptions({
-          subscriptionID: id,
-          accountURN: subMeta.accountURN,
-          accountClient,
-          starbaseClient,
-          addressClient,
-          billingURL: `${context.env.CONSOLE_URL}/billing`,
-          settingsURL: `${context.env.CONSOLE_URL}`,
-        }, context.env)
+        await reconcileAppSubscriptions(
+          {
+            subscriptionID: id,
+            accountURN: subMeta.accountURN,
+            accountClient,
+            starbaseClient,
+            addressClient,
+            billingURL: `${context.env.CONSOLE_URL}/billing`,
+            settingsURL: `${context.env.CONSOLE_URL}`,
+          },
+          context.env
+        )
 
         break
       case 'customer.updated':

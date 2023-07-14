@@ -20,11 +20,11 @@ interface Env {
   TOKEN_CLOUDFLARE_API: string
   WALLET_CONNECT_PROJECT_ID: string
 
-  STRIPE_API_SECRET: string
-  STRIPE_WEBHOOK_SECRET: string
-  STRIPE_PRO_PLAN_ID: string
+  SECRET_STRIPE_API_KEY: string
+  SECRET_STRIPE_WEBHOOK_SECRET: string
+  SECRET_STRIPE_PRO_PLAN_ID: string
 
-  SECRET_POSTHOG_API_KEY: string
+  POSTHOG_API_KEY: string
 
   CONSOLE_URL: string
   //Needed to make Remix work with Cloudflare module workers

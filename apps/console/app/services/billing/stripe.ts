@@ -52,7 +52,7 @@ export const createCustomer = async (
   { email, name, accountURN }: CreateCustomerParams,
   env: Env
 ) => {
-  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
+  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -71,7 +71,7 @@ export const updateCustomer = async (
   { customerID, email, name }: UpdateCustomerParams,
   env: Env
 ) => {
-  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
+  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -87,7 +87,7 @@ export const accessCustomerPortal = async (
   { customerID, returnURL }: CustomerPortalParams,
   env: Env
 ) => {
-  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
+  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -103,7 +103,7 @@ export const updatePaymentMethod = async (
   { customerID, returnURL }: CustomerPortalParams,
   env: Env
 ) => {
-  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
+  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -128,7 +128,7 @@ export const createSubscription = async (
   }: CreateSubscriptionParams,
   env: Env
 ) => {
-  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
+  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -160,7 +160,7 @@ export const updateSubscription = async (
   }: UpdateSubscriptionParams,
   env: Env
 ) => {
-  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
+  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -198,7 +198,7 @@ export const updateSubscriptionMetadata = async (
   },
   env: Env
 ) => {
-  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
+  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -217,7 +217,7 @@ export const getInvoices = async (
   { customerID }: GetInvoicesParams,
   env: Env
 ) => {
-  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
+  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -255,7 +255,7 @@ export const reconcileAppSubscriptions = async (
   },
   env: Env
 ) => {
-  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
+  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -271,7 +271,7 @@ export const reconcileAppSubscriptions = async (
     .filter((pq) => pq.quantity != null)
 
   const priceIdToPlanTypeDict = {
-    [env.STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
+    [env.SECRET_STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
   }
 
   const { email: billingEmail } =

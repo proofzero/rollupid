@@ -31,7 +31,7 @@ export interface Environment {
   INTERNAL_CLOUDFLARE_ZONE_ID: string
   TOKEN_CLOUDFLARE_API: string
   INTERNAL_DKIM_SELECTOR: string
-  SECRET_POSTHOG_API_KEY: string
+  POSTHOG_API_KEY: string
 }
 
 export const EDGE_APPLICATION: EdgeURN = EdgeSpace.urn('owns/app')

@@ -35,7 +35,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
 
       await posthogCall({
-        apiKey: context.env.SECRET_POSTHOG_API_KEY,
+        apiKey: context.env.POSTHOG_API_KEY,
         distinctId: accountUrn,
         eventName: 'app_authorization_revoked',
         properties: {

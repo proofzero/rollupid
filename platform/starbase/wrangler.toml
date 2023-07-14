@@ -55,6 +55,7 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [vars]
 ENVIRONMENT = "local"
+POSTHOG_API_KEY = "phc_f7q7V62YWsS0FKyIRxO36xyUMFYJ8oahurHPBAXkGe5"
 
 # Dev
 # -----------------------------------------------------------------------------
@@ -100,6 +101,7 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.dev.vars]
 ENVIRONMENT = "dev"
 INTERNAL_PASSPORT_SERVICE_NAME = "passport-dev"
+POSTHOG_API_KEY = "phc_f7q7V62YWsS0FKyIRxO36xyUMFYJ8oahurHPBAXkGe5"
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -121,6 +123,7 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.next.vars]
 ENVIRONMENT = "next"
 INTERNAL_PASSPORT_SERVICE_NAME = "passport-next"
+POSTHOG_API_KEY = "phc_JsZaA3PKO8jNF6gJ7HusRN3C7yzp56JakJJZfNRI9n7"
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -142,3 +145,4 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.current.vars]
 ENVIRONMENT = "current"
 INTERNAL_PASSPORT_SERVICE_NAME = "passport-current"
+POSTHOG_API_KEY = "phc_QGmYrKfXcyIAUBBTX3NBDJjNg2MX24ijFemeUuykzWr"

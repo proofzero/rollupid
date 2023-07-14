@@ -174,24 +174,30 @@ const processPurchaseOp = async (
   try {
     if (!entitlements.subscriptionID) {
       quantity = 1
-      sub = await createSubscription({
-        customerID: customerID,
-        planID: env.STRIPE_PRO_PLAN_ID,
-        quantity,
-        accountURN,
-        handled: true,
-      }, env)
+      sub = await createSubscription(
+        {
+          customerID: customerID,
+          planID: env.SECRET_STRIPE_PRO_PLAN_ID,
+          quantity,
+          accountURN,
+          handled: true,
+        },
+        env
+      )
     } else {
       quantity = entitlements.plans[plan]?.entitlements
         ? entitlements.plans[plan]?.entitlements! + 1
         : 1
 
-      sub = await updateSubscription({
-        subscriptionID: entitlements.subscriptionID,
-        planID: env.STRIPE_PRO_PLAN_ID,
-        quantity,
-        handled: true,
-      }, env)
+      sub = await updateSubscription(
+        {
+          subscriptionID: entitlements.subscriptionID,
+          planID: env.SECRET_STRIPE_PRO_PLAN_ID,
+          quantity,
+          handled: true,
+        },
+        env
+      )
     }
   } catch (e) {
     flashSession.flash(
@@ -249,12 +255,26 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     switch (op) {
       case 'update': {
-        await processUpdateOp(jwt, plan, clientId, flashSession, context.env, traceHeader)
+        await processUpdateOp(
+          jwt,
+          plan,
+          clientId,
+          flashSession,
+          context.env,
+          traceHeader
+        )
         break
       }
 
       case 'purchase': {
-        await processPurchaseOp(jwt, plan, clientId, flashSession, context.env, traceHeader)
+        await processPurchaseOp(
+          jwt,
+          plan,
+          clientId,
+          flashSession,
+          context.env,
+          traceHeader
+        )
         break
       }
     }
@@ -506,7 +526,7 @@ const EntitlementsCardButton = ({
   const upgrade = isUpgrade(entitlement.planType, currentPlan)
   const op =
     entitlement.planType === ServicePlanType.FREE ||
-      getAvailableEntitlements(entitlement) > 0
+    getAvailableEntitlements(entitlement) > 0
       ? 'update'
       : 'purchase'
 
