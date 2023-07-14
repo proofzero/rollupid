@@ -9,6 +9,7 @@ import type {
 } from '@proofzero/platform-middleware/trace'
 import { generateTraceSpan } from '@proofzero/platform-middleware/trace'
 import manifestJSON from '__STATIC_CONTENT_MANIFEST'
+import { Env } from 'bindings'
 let manifest = JSON.parse(manifestJSON)
 
 //Extending the remix untyped AppLoadContext with the type
@@ -16,19 +17,9 @@ let manifest = JSON.parse(manifestJSON)
 declare module '@remix-run/server-runtime' {
   interface AppLoadContext {
     traceSpan: TraceSpan
+    env: Env
   }
 }
-
-const requestHandler = createRequestHandler({
-  build,
-  mode: process.env.NODE_ENV,
-  getLoadContext: (event) => {
-    const traceSpan = (event as TraceableFetchEvent).traceSpan
-    return {
-      traceSpan,
-    }
-  },
-})
 
 const handleEvent = async (event: FetchEvent, env: Env) => {
   let response = await handleAsset(event as FetchEvent, build, {
@@ -48,6 +39,19 @@ const handleEvent = async (event: FetchEvent, env: Env) => {
       `Started HTTP handler for ${reqURL.pathname}/${reqURL.searchParams}`,
       newTraceSpan.toString()
     )
+
+    const requestHandler = createRequestHandler({
+      build,
+      mode: process.env.NODE_ENV,
+      getLoadContext: (event) => {
+        const traceSpan = (event as TraceableFetchEvent).traceSpan
+        return {
+          env,
+          traceSpan,
+        }
+      },
+    })
+
     try {
       response = await requestHandler(newEvent)
     } finally {

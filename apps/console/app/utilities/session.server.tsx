@@ -19,21 +19,6 @@ import {
   InvalidTokenError,
 } from '@proofzero/utils/token'
 
-// NB: This secret is set using: wrangler secret put.
-// @ts-ignore
-invariant(SECRET_SESSION_KEY, 'SECRET_SESSION_KEY must be set')
-
-// @ts-ignore
-invariant(SECRET_SESSION_SALT, 'SECRET_SESSION_SALT must be set')
-
-// @ts-ignore
-invariant(COOKIE_DOMAIN, 'COOKIE_DOMAIN must be set')
-
-// createCookie
-// -----------------------------------------------------------------------------
-// TODO load the SECRET_SESSION_KEY from context injected into Loader and
-// use that to construct a Singleton for the session
-
 const getPassportSessionStorage = (MAX_AGE = 7776000 /*60 * 60 * 24 * 90*/) =>
   createCookie('_rollup_session', {
     domain: COOKIE_DOMAIN,
