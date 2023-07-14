@@ -117,7 +117,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const connectedAccounts = await accountClient.getAddresses.query({
       account: accountURN,
     })
-    const connectedEmails = getEmailDropdownItems(connectedAccounts)
+    const connectedEmails = getEmailDropdownItems(connectedAccounts, true)
 
     const spd = await accountClient.getStripePaymentData.query({
       accountURN,
