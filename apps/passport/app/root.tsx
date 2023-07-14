@@ -224,7 +224,7 @@ export default function App() {
     // https://posthog.com/docs/libraries/react#posthog-provider
     if (hydrated) {
       try {
-        posthog?.init(browserEnv.ENV.SECRET_POSTHOG_API_KEY, {
+        posthog?.init(browserEnv.ENV.POSTHOG_API_KEY, {
           api_host: POSTHOG_PROXY_HOST,
           autocapture: false,
         })

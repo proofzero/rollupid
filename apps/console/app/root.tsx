@@ -143,7 +143,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
       const {
         PASSPORT_URL,
-        SECRET_POSTHOG_API_KEY,
+        POSTHOG_API_KEY,
         INTERNAL_GOOGLE_ANALYTICS_TAG,
         WALLET_CONNECT_PROJECT_ID,
       } = context.env
@@ -196,7 +196,7 @@ export default function App() {
     // https://posthog.com/docs/libraries/react#posthog-provider
     if (hydrated) {
       try {
-        posthog?.init(loaderData.ENV.SECRET_POSTHOG_API_KEY, {
+        posthog?.init(loaderData.ENV.POSTHOG_API_KEY, {
           api_host: POSTHOG_PROXY_HOST,
           autocapture: false,
         })
