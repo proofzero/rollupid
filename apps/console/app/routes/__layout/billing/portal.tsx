@@ -13,13 +13,13 @@ import { BadRequestError } from '@proofzero/errors'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
     const accountURN = parsedJwt.sub as AccountURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-    const accountClient = createAccountClient(Account, {
+    const accountClient = createAccountClient(context.env.Account, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
@@ -39,6 +39,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     return accessCustomerPortal({
       customerID,
       returnURL,
-    })
+    }, context.env)
   }
 )

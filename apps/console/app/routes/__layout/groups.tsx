@@ -33,18 +33,18 @@ export type GroupRootContextData = GroupRootLoaderData
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
     const accountURN = parsedJwt.sub as AccountURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-    const accountClient = createAccountClient(Account, {
+    const accountClient = createAccountClient(context.env.Account, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
 
-    const addressClient = createAddressClient(Address, {
+    const addressClient = createAddressClient(context.env.Address, {
       [PlatformAddressURNHeader]: NO_OP_ADDRESS_PLACEHOLDER,
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,

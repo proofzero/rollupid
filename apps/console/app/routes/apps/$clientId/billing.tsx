@@ -47,15 +47,16 @@ import {
   Toaster,
   toast,
 } from '@proofzero/design-system/src/atoms/toast'
+import { Env } from 'bindings'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
     const accountURN = parsedJwt.sub as AccountURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
-    const accountClient = createAccountClient(Account, {
+    const accountClient = createAccountClient(context.env.Account, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
@@ -67,7 +68,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
 
-    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    const flashSession = await getFlashSession(request, context.env)
     const successToast = flashSession.get('success_toast')
     const errorToast = flashSession.get('error_toast')
 
@@ -80,7 +81,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       },
       {
         headers: {
-          'Set-Cookie': await commitFlashSession(flashSession),
+          'Set-Cookie': await commitFlashSession(flashSession, context.env),
         },
       }
     )
@@ -92,17 +93,18 @@ const processUpdateOp = async (
   plan: ServicePlanType,
   clientId: string,
   flashSession: Session<SessionData, SessionData>,
+  env: Env,
   traceHeader: Record<'traceparent', string>
 ) => {
   const parsedJwt = parseJwt(jwt)
   const accountURN = parsedJwt.sub as AccountURN
 
-  const starbaseClient = createStarbaseClient(Starbase, {
+  const starbaseClient = createStarbaseClient(env.Starbase, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...traceHeader,
   })
 
-  const accountClient = createAccountClient(Account, {
+  const accountClient = createAccountClient(env.Account, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...traceHeader,
   })
@@ -137,17 +139,18 @@ const processPurchaseOp = async (
   plan: ServicePlanType,
   clientId: string,
   flashSession: any,
+  env: Env,
   traceHeader: Record<'traceparent', string>
 ) => {
   const parsedJwt = parseJwt(jwt)
   const accountURN = parsedJwt.sub as AccountURN
 
-  const starbaseClient = createStarbaseClient(Starbase, {
+  const starbaseClient = createStarbaseClient(env.Starbase, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...traceHeader,
   })
 
-  const accountClient = createAccountClient(Account, {
+  const accountClient = createAccountClient(env.Account, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...traceHeader,
   })
@@ -173,11 +176,11 @@ const processPurchaseOp = async (
       quantity = 1
       sub = await createSubscription({
         customerID: customerID,
-        planID: STRIPE_PRO_PLAN_ID,
+        planID: env.STRIPE_PRO_PLAN_ID,
         quantity,
         accountURN,
         handled: true,
-      })
+      }, env)
     } else {
       quantity = entitlements.plans[plan]?.entitlements
         ? entitlements.plans[plan]?.entitlements! + 1
@@ -185,10 +188,10 @@ const processPurchaseOp = async (
 
       sub = await updateSubscription({
         subscriptionID: entitlements.subscriptionID,
-        planID: STRIPE_PRO_PLAN_ID,
+        planID: env.STRIPE_PRO_PLAN_ID,
         quantity,
         handled: true,
-      })
+      }, env)
     }
   } catch (e) {
     flashSession.flash(
@@ -198,7 +201,7 @@ const processPurchaseOp = async (
 
     return new Response(null, {
       headers: {
-        'Set-Cookie': await commitFlashSession(flashSession),
+        'Set-Cookie': await commitFlashSession(flashSession, env),
       },
     })
   }
@@ -224,7 +227,7 @@ const processPurchaseOp = async (
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     if (!jwt) {
       throw new BadRequestError({
         message: 'Missing JWT',
@@ -242,23 +245,23 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       plan: ServicePlanType
     }
 
-    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    const flashSession = await getFlashSession(request, context.env)
 
     switch (op) {
       case 'update': {
-        await processUpdateOp(jwt, plan, clientId, flashSession, traceHeader)
+        await processUpdateOp(jwt, plan, clientId, flashSession, context.env, traceHeader)
         break
       }
 
       case 'purchase': {
-        await processPurchaseOp(jwt, plan, clientId, flashSession, traceHeader)
+        await processPurchaseOp(jwt, plan, clientId, flashSession, context.env, traceHeader)
         break
       }
     }
 
     return new Response(null, {
       headers: {
-        'Set-Cookie': await commitFlashSession(flashSession),
+        'Set-Cookie': await commitFlashSession(flashSession, context.env),
       },
     })
   }
@@ -485,7 +488,7 @@ const EntitlementsCardButton = ({
 
   const op =
     entitlement.planType === ServicePlanType.FREE ||
-    getAvailableEntitlements(entitlement) > 0
+      getAvailableEntitlements(entitlement) > 0
       ? 'update'
       : 'purchase'
 

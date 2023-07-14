@@ -98,7 +98,7 @@ export type LoaderData = {
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     if (!jwt) {
       throw new BadRequestError({
         message: 'No JWT found in request.',
@@ -109,11 +109,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const accountURN = parsedJwt.sub as AccountURN
 
     try {
-      const accountClient = createAccountClient(Account, {
+      const accountClient = createAccountClient(context.env.Account, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...traceHeader,
       })
-      const starbaseClient = createStarbaseClient(Starbase, {
+      const starbaseClient = createStarbaseClient(context.env.Starbase, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...traceHeader,
       })
@@ -141,14 +141,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         console.error('Could not retrieve profile image.', e)
       }
 
-      console.log({
+      const {
+        PASSPORT_URL,
+        SECRET_POSTHOG_API_KEY,
         INTERNAL_GOOGLE_ANALYTICS_TAG,
-        REMIX_DEV_SERVER_WS_PORT:
-          process.env.NODE_ENV === 'development'
-            ? +process.env.REMIX_DEV_SERVER_WS_PORT!
-            : undefined,
         WALLET_CONNECT_PROJECT_ID,
-      })
+      } = context.env
 
       return json<LoaderData>({
         apps: reshapedApps,

@@ -24,18 +24,18 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     if (!clientId)
       throw new BadRequestError({ message: 'Client ID is required' })
 
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt as string)
     const accountURN = parsedJwt.sub as AccountURN
 
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const starbaseClient = createStarbaseClient(context.env.Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
     try {
       await starbaseClient.deleteApp.mutate({ clientId })
       await posthogCall({
-        apiKey: SECRET_POSTHOG_API_KEY,
+        apiKey: context.env.SECRET_POSTHOG_API_KEY,
         eventName: 'app_deleted',
         distinctId: accountURN,
         properties: {
@@ -62,4 +62,4 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
-export default () => {}
+export default () => { }

@@ -38,11 +38,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const clientId = params.clientId as string
 
-    const jwt = await requireJWT(request)
-    const payload = checkToken(jwt)
+    const jwt = await requireJWT(request, context.env)
+    const payload = checkToken(jwt!)
     const accountURN = payload.sub as AccountURN
 
-    const accountClient = createAccountClient(Account, {
+    const accountClient = createAccountClient(context.env.Account, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
@@ -61,7 +61,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const connectResult = requestURL.searchParams.get('rollup_result')
     if (connectResult && connectResult === 'SUCCESS') {
       if (connectedEmails.length === 1) {
-        const starbaseClient = createStarbaseClient(Starbase, {
+        const starbaseClient = createStarbaseClient(context.env.Starbase, {
           ...getAuthzHeaderConditionallyFromToken(jwt),
           ...generateTraceContextHeaders(context.traceSpan),
         })
@@ -91,7 +91,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const clientId = params.clientId as string
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
 
     const fd = await request.formData()
     const addressURN = fd.get('addressURN') as AddressURN
@@ -101,7 +101,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const errors: errorsTeamProps = {}
 
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const starbaseClient = createStarbaseClient(context.env.Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })

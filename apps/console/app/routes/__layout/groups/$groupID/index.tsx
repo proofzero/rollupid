@@ -66,9 +66,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       throw new Error('Invalid group ID')
     }
 
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
-    const accountClient = createAccountClient(Account, {
+    const accountClient = createAccountClient(context.env.Account, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })

@@ -51,7 +51,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   if (url.pathname === '/account') {
     return redirect('/account/dashboard')
   }
-  const jwt = await requireJWT(request)
+  const jwt = await requireJWT(request, context.env)
 
   // We go through this because
   // the context had connected addresses
@@ -62,8 +62,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   try {
     const [loggedInUserProfile, addresses] = await Promise.all([
-      getAccountProfile({ jwt, accountURN }, context.traceSpan),
-      getAccountAddresses({ jwt, traceSpan: context.traceSpan }),
+      getAccountProfile({ jwt, accountURN }, context.env, context.traceSpan),
+      getAccountAddresses({ jwt }, context.env, context.traceSpan),
     ])
 
     const addressTypeUrns = addresses.map((a) => ({
@@ -78,6 +78,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       (await getAddressProfiles(
         jwt,
         addressTypeUrns.map((atu) => atu.urn as AddressURN),
+        context.env,
         context.traceSpan
       )) ?? []
 
@@ -138,9 +139,8 @@ export default function AccountLayout() {
         return (
           <>
             <div
-              className={`lg:px-4 transition-colors lg:pb-72 lg:bg-[#192030] ${
-                open ? 'max-sm:bg-[#192030]' : 'bg-[#192030] sm:max-lg:pb-72'
-              }`}
+              className={`lg:px-4 transition-colors lg:pb-72 lg:bg-[#192030] ${open ? 'max-sm:bg-[#192030]' : 'bg-[#192030] sm:max-lg:pb-72'
+                }`}
             >
               <HeadNav
                 loggedIn={!!profile}
@@ -152,14 +152,13 @@ export default function AccountLayout() {
             </div>
 
             <main
-              className={`transition-opacity transition-colors ${
-                open
-                  ? 'max-lg:bg-[#192030] max-lg:opacity-50  \
+              className={`transition-opacity transition-colors ${open
+                ? 'max-lg:bg-[#192030] max-lg:opacity-50  \
                   h-[calc(100dvh-80px)] min-h-[568px] \
                   sm:max-lg:pt-72 sm:max-lg:h-[calc(100dvh+208px)] sm:max-lg:min-h-[856px]\
                   overflow-hidden'
-                  : 'opacity-100'
-              } sm:-mt-72  lg:pb-12`}
+                : 'opacity-100'
+                } sm:-mt-72  lg:pb-12`}
             >
               <div
                 className="mx-auto max-w-screen-xl lg:px-4

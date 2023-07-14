@@ -19,25 +19,25 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-    const accountClient = createAccountClient(Account, {
+    const accountClient = createAccountClient(context.env.Account, {
       ...getAuthzHeaderConditionallyFromToken(undefined),
       ...traceHeader,
     })
 
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const starbaseClient = createStarbaseClient(context.env.Starbase, {
       ...getAuthzHeaderConditionallyFromToken(undefined),
       ...traceHeader,
     })
-    const addressClient = createAddressClient(Address, {
+    const addressClient = createAddressClient(context.env.Address, {
       ...getAuthzHeaderConditionallyFromToken(undefined),
       ...traceHeader,
     })
 
-    const stripeClient = new Stripe(STRIPE_API_SECRET, {
+    const stripeClient = new Stripe(context.env.STRIPE_API_SECRET, {
       apiVersion: '2022-11-15',
     })
 
-    const whSecret = STRIPE_WEBHOOK_SECRET
+    const whSecret = context.env.STRIPE_WEBHOOK_SECRET
 
     const payload = await request.text()
     const sig = request.headers.get('stripe-signature') as string
@@ -101,7 +101,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           await updateSubscriptionMetadata({
             id,
             metadata: subMeta,
-          })
+          }, context.env)
 
           return null
         }
@@ -121,9 +121,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           accountClient,
           starbaseClient,
           addressClient,
-          billingURL: `${CONSOLE_URL}/billing`,
-          settingsURL: `${CONSOLE_URL}`,
-        })
+          billingURL: `${context.env.CONSOLE_URL}/billing`,
+          settingsURL: `${context.env.CONSOLE_URL}`,
+        }, context.env)
 
         break
       case 'customer.updated':

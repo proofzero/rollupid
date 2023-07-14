@@ -8,26 +8,21 @@ import {
   handleAsset,
 } from '@remix-run/cloudflare-workers'
 import * as build from '@remix-run/dev/server-build'
+import manifestJSON from '__STATIC_CONTENT_MANIFEST'
+let manifest = JSON.parse(manifestJSON)
 
 declare module '@remix-run/server-runtime' {
   interface AppLoadContext {
     traceSpan: TraceSpan
+    env: Env
   }
 }
 
-const requestHandler = createRequestHandler({
-  build,
-  mode: process.env.NODE_ENV,
-  getLoadContext: (event) => {
-    const traceSpan = (event as TraceableFetchEvent).traceSpan
-    return {
-      traceSpan,
-    }
-  },
-})
-
-const handleEvent = async (event: FetchEvent) => {
-  let response = await handleAsset(event, build)
+const handleEvent = async (event: FetchEvent, env: Env) => {
+  let response = await handleAsset(event, build, {
+    ASSET_NAMESPACE: env.__STATIC_CONTENT,
+    ASSET_MANIFEST: manifest,
+  })
 
   if (!response) {
     //Create a new trace span with no parent
@@ -40,6 +35,19 @@ const handleEvent = async (event: FetchEvent) => {
       `Started HTTP handler for ${reqURL.pathname}/${reqURL.searchParams}`,
       newTraceSpan.toString()
     )
+
+    const requestHandler = createRequestHandler({
+      build,
+      mode: process.env.NODE_ENV,
+      getLoadContext: (event) => {
+        const traceSpan = (event as TraceableFetchEvent).traceSpan
+        return {
+          traceSpan,
+          env,
+        }
+      },
+    })
+
     try {
       response = await requestHandler(newEvent)
     } finally {
@@ -53,6 +61,13 @@ const handleEvent = async (event: FetchEvent) => {
   return response
 }
 
-addEventListener('fetch', async (event: FetchEvent) => {
-  event.respondWith(handleEvent(event))
-})
+export default {
+  async fetch(req: Request, env: Env, ctx: ExecutionContext) {
+    //This is the smallest set of event props Remix needs to handle assets correctly
+    const event = {
+      request: req,
+      waitUntil: ctx.waitUntil.bind(ctx),
+    } as FetchEvent
+    return await handleEvent(event, env)
+  },
+}

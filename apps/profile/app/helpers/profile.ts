@@ -23,25 +23,33 @@ export const getAccountProfile = async (
     accountURN: AccountURN
     jwt?: string
   },
+  env: Env,
   traceSpan: TraceSpan
 ) => {
   // note: jwt is only important for setting profile in profile account settings
-
-  const profile = await ProfileKV.get<FullProfile>(accountURN, 'json')
+  const profile = await env.ProfileKV.get<FullProfile>(accountURN, 'json')
 
   if (profile && profile.gallery)
-    profile.gallery = await getValidGallery({
-      gallery: profile.gallery,
-      accountURN,
-      traceSpan,
-    })
+    profile.gallery = await getValidGallery(
+      {
+        gallery: profile.gallery,
+        accountURN,
+      },
+      env,
+      traceSpan
+    )
 
   return profile
 }
 
-export const getAuthorizedApps = async (jwt: string, traceSpan: TraceSpan) => {
+export const getAuthorizedApps = async (
+  jwt: string,
+  env: Env,
+  traceSpan: TraceSpan
+) => {
   const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(traceSpan)
+    generateTraceContextHeaders(traceSpan),
+    env
   )
 
   const { authorizedApps } = await galaxyClient.getAuthorizedApps(
@@ -52,18 +60,22 @@ export const getAuthorizedApps = async (jwt: string, traceSpan: TraceSpan) => {
   return authorizedApps
 }
 
-export const getAccountAddresses = async ({
-  jwt,
-  accountURN,
-  traceSpan,
-}: {
-  jwt?: string
-  accountURN?: AccountURN
+export const getAccountAddresses = async (
+  {
+    jwt,
+    accountURN,
+  }: {
+    jwt?: string
+    accountURN?: AccountURN
+  },
+  env: Env,
   traceSpan: TraceSpan
-}) => {
+) => {
   const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(traceSpan!)
+    generateTraceContextHeaders(traceSpan!),
+    env
   )
+
   const addressesRes = await galaxyClient.getConnectedAddresses(
     { targetAccountURN: accountURN },
     getAuthzHeaderConditionallyFromToken(jwt)
@@ -72,30 +84,35 @@ export const getAccountAddresses = async ({
   return addressesRes.addresses || []
 }
 
-export const getAccountCryptoAddresses = async ({
-  jwt,
-  accountURN,
-  traceSpan,
-}: {
-  jwt?: string
-  accountURN?: AccountURN
+export const getAccountCryptoAddresses = async (
+  {
+    jwt,
+    accountURN,
+  }: {
+    jwt?: string
+    accountURN?: AccountURN
+  },
+  env: Env,
   traceSpan: TraceSpan
-}) => {
-  const addresses = await getAccountAddresses({ jwt, accountURN, traceSpan })
+) => {
+  const addresses = await getAccountAddresses(
+    { jwt, accountURN },
+    env,
+    traceSpan
+  )
 
   // TODO: need to type qc and rc
   const cryptoAddresses =
     addresses
       .filter((e) => {
-        return [NodeType.Crypto, NodeType.Vault].includes(e.rc.node_type) &&
+        return (
+          [NodeType.Crypto, NodeType.Vault].includes(e.rc.node_type) &&
           e.rc.addr_type === CryptoAddressType.ETH
+        )
       })
       .map((address) => {
         return address.qc.alias.toLowerCase() as string
-      })
-    || ([] as string[])
-
-
+      }) || ([] as string[])
 
   return cryptoAddresses
 }
@@ -103,10 +120,12 @@ export const getAccountCryptoAddresses = async ({
 export const getAddressProfiles = async (
   jwt: string,
   addressURNList: AddressURN[],
+  env: Env,
   traceSpan: TraceSpan
 ): Promise<GetAddressProfilesQuery['addressProfiles']> => {
   const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(traceSpan)
+    generateTraceContextHeaders(traceSpan),
+    env
   )
   const addressProfilesRes = await galaxyClient.getAddressProfiles(
     {

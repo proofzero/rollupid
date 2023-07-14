@@ -49,12 +49,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
     const clientId = params?.clientId
 
     try {
-      const starbaseClient = createStarbaseClient(Starbase, {
+      const starbaseClient = createStarbaseClient(context.env.Starbase, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...traceHeader,
       })
@@ -97,7 +97,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
       let appContactEmail
       if (appContactAddress) {
-        const addressClient = createAddressClient(Address, {
+        const addressClient = createAddressClient(context.env.Address, {
           [PlatformAddressURNHeader]: appContactAddress,
           ...getAuthzHeaderConditionallyFromToken(jwt),
           ...generateTraceContextHeaders(context.traceSpan),
@@ -107,7 +107,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         appContactEmail = address
       }
 
-      const { flashSession, toasts } = await getToastsAndFlashSession(request)
+      const { flashSession, toasts } = await getToastsAndFlashSession(request, context.env)
 
       return json<LoaderData>(
         {
@@ -120,7 +120,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         },
         {
           headers: {
-            'Set-Cookie': await commitFlashSession(flashSession),
+            'Set-Cookie': await commitFlashSession(flashSession, context.env),
           },
         }
       )
@@ -195,14 +195,13 @@ export default function AppDetailIndexPage() {
             <Toaster position="top-right" reverseOrder={false} />
 
             <section
-              className={`${
-                open
+              className={`${open
                   ? 'max-lg:opacity-50\
                     max-lg:overflow-hidden\
                     max-lg:h-[calc(100dvh-80px)]\
                     min-h-[636px]'
                   : 'h-full '
-              } py-9 sm:mx-11 max-w-[1636px]`}
+                } py-9 sm:mx-11 max-w-[1636px]`}
             >
               <Outlet
                 context={{

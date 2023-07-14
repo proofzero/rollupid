@@ -25,7 +25,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       throw new Error('Invalid group ID')
     }
 
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
 
     const fd = await request.formData()
     const addressType = fd.get('addressType') as
@@ -45,7 +45,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
-    const accountClient = createAccountClient(Account, {
+    const accountClient = createAccountClient(context.env.Account, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })

@@ -94,13 +94,13 @@ type LoaderData = {
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
     const accountURN = parsedJwt.sub as AccountURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-    const accountClient = createAccountClient(Account, {
+    const accountClient = createAccountClient(context.env.Account, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
@@ -111,7 +111,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       }
     )
 
-    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    const flashSession = await getFlashSession(request, context.env)
     const successToast = flashSession.get('success_toast')
 
     const connectedAccounts = await accountClient.getAddresses.query({
@@ -127,7 +127,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     if (subscriptionID) {
       const stripeInvoices = await getInvoices({
         customerID: spd.customerID,
-      })
+      }, context.env)
 
       invoices = stripeInvoices.invoices.data.map((i) => ({
         amount: i.total / 100,
@@ -159,7 +159,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       },
       {
         headers: {
-          'Set-Cookie': await commitFlashSession(flashSession),
+          'Set-Cookie': await commitFlashSession(flashSession, context.env),
         },
       }
     )
@@ -168,23 +168,23 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
     const accountURN = parsedJwt.sub as AccountURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-    const accountClient = createAccountClient(Account, {
+    const accountClient = createAccountClient(context.env.Account, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
 
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const starbaseClient = createStarbaseClient(context.env.Starbase, {
       ...getAuthzHeaderConditionallyFromToken(undefined),
       ...traceHeader,
     })
 
-    const addressClient = createAddressClient(Address, {
+    const addressClient = createAddressClient(context.env.Address, {
       ...getAuthzHeaderConditionallyFromToken(undefined),
       ...traceHeader,
     })
@@ -206,18 +206,18 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     if (!entitlements.subscriptionID) {
       sub = await createSubscription({
         customerID: customerID,
-        planID: STRIPE_PRO_PLAN_ID,
+        planID: context.env.STRIPE_PRO_PLAN_ID,
         quantity: +quantity,
         accountURN,
         handled: true,
-      })
+      }, context.env)
     } else {
       sub = await updateSubscription({
         subscriptionID: entitlements.subscriptionID,
-        planID: STRIPE_PRO_PLAN_ID,
+        planID: context.env.STRIPE_PRO_PLAN_ID,
         quantity: +quantity,
         handled: true,
-      })
+      }, context.env)
     }
 
     await reconcileAppSubscriptions({
@@ -226,11 +226,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       accountClient,
       starbaseClient,
       addressClient,
-      billingURL: `${CONSOLE_URL}/billing`,
-      settingsURL: `${CONSOLE_URL}`,
-    })
+      billingURL: `${context.env.CONSOLE_URL}/billing`,
+      settingsURL: `${context.env.CONSOLE_URL}`,
+    }, context.env)
 
-    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    const flashSession = await getFlashSession(request, context.env)
     if (txType === 'buy') {
       flashSession.flash('success_toast', 'Entitlement(s) successfully bought')
     }
@@ -240,7 +240,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     return new Response(null, {
       headers: {
-        'Set-Cookie': await commitFlashSession(flashSession),
+        'Set-Cookie': await commitFlashSession(flashSession, context.env),
       },
     })
   }
@@ -386,9 +386,8 @@ const PurchaseProModal = ({
           </Text>
 
           <div className="flex flex-row gap-2 items-center">
-            <Text size="lg" weight="semibold" className="text-gray-900">{`+$${
-              plan.price * proEntitlementDelta
-            }`}</Text>
+            <Text size="lg" weight="semibold" className="text-gray-900">{`+$${plan.price * proEntitlementDelta
+              }`}</Text>
             <Text size="sm" weight="medium" className="text-gray-500">
               per month
             </Text>
@@ -533,11 +532,10 @@ const RemoveEntitelmentModal = ({
                                     return (
                                       <div
                                         className={`w-full h-full px-4 py-1.5
-                                      rounded-lg ${
-                                        selected
-                                          ? 'bg-gray-100  font-medium'
-                                          : ''
-                                      }`}
+                                      rounded-lg ${selected
+                                            ? 'bg-gray-100  font-medium'
+                                            : ''
+                                          }`}
                                       >
                                         {i}
                                       </div>
@@ -564,9 +562,8 @@ const RemoveEntitelmentModal = ({
           </Text>
 
           <div className="flex flex-row gap-2 items-center">
-            <Text size="lg" weight="semibold" className="text-gray-900">{`-$${
-              plan.price * (entitlements - proEntitlementNew)
-            }`}</Text>
+            <Text size="lg" weight="semibold" className="text-gray-900">{`-$${plan.price * (entitlements - proEntitlementNew)
+              }`}</Text>
             <Text size="sm" weight="medium" className="text-gray-500">
               per month
             </Text>
@@ -717,9 +714,8 @@ const PlanCard = ({
             {({ open }) => (
               <>
                 <Menu.Button
-                  className={`py-2 px-3 border rounded flex flex-row justify-between lg:justify-start gap-2 items-center ${
-                    open ? 'border-indigo-500' : ''
-                  } disabled:bg-gray-50 text-gray-700 disabled:text-gray-400`}
+                  className={`py-2 px-3 border rounded flex flex-row justify-between lg:justify-start gap-2 items-center ${open ? 'border-indigo-500' : ''
+                    } disabled:bg-gray-50 text-gray-700 disabled:text-gray-400`}
                   disabled={paymentData == undefined}
                 >
                   <Text size="sm" weight="medium">

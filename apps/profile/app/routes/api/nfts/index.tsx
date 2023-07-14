@@ -11,7 +11,7 @@ import { getAccountCryptoAddresses } from '~/helpers/profile'
 export const loader: LoaderFunction = async ({ request, context }) => {
   const srcUrl = new URL(request.url)
 
-  const jwt = await getAccessToken(request)
+  const jwt = await getAccessToken(request, context.env)
 
   const owner = srcUrl.searchParams.get('owner') as AccountURN
   if (!owner) {
@@ -21,13 +21,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   try {
     const addresses = await getAccountCryptoAddresses({
       jwt,
-      traceSpan: context.traceSpan,
-    })
+    }, context.env, context.traceSpan)
 
     const nftsForAccount = await getContractsForAllChains({
       addresses,
       excludeFilters: ['SPAM'],
-    })
+    }, context.env)
 
     return json({
       ...nftsForAccount,

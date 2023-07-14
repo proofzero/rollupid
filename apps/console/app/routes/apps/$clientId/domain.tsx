@@ -53,8 +53,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const { clientId } = params
     if (!clientId) throw new BadRequestError({ message: 'Missing Client ID' })
 
-    const jwt = await requireJWT(request)
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const jwt = await requireJWT(request, context.env)
+    const starbaseClient = createStarbaseClient(context.env.Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
@@ -63,7 +63,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       clientId,
     })
 
-    const { hostname } = new URL(PASSPORT_URL)
+    const { hostname } = new URL(context.env.PASSPORT_URL)
 
     return json({ customDomain, hostname })
   }
@@ -74,8 +74,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const { clientId } = params
     if (!clientId) throw new BadRequestError({ message: 'Missing Client ID' })
 
-    const jwt = await requireJWT(request)
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const jwt = await requireJWT(request, context.env)
+    const starbaseClient = createStarbaseClient(context.env.Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
@@ -83,9 +83,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const { appPlan } = await starbaseClient.getAppDetails.query({
       clientId,
     })
-    await planGuardWithToastException(appPlan, ServicePlanType.PRO, request)
+    await planGuardWithToastException(appPlan, ServicePlanType.PRO, request, context.env)
 
-    const passportUrl = new URL(PASSPORT_URL)
+    const passportUrl = new URL(context.env.PASSPORT_URL)
     const { hostname } = passportUrl
 
     if (request.method === 'PUT') {

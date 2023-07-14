@@ -28,9 +28,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     if (!clientName)
       throw new BadRequestError({ message: 'App name is required' })
 
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
 
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const starbaseClient = createStarbaseClient(context.env.Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
@@ -73,14 +73,13 @@ export default function CreateNewApp() {
             <SiteHeader avatarUrl={avatarUrl} />
 
             <section
-              className={`${
-                open
+              className={`${open
                   ? 'max-lg:opacity-50\
                     max-lg:overflow-hidden\
                     max-lg:h-[calc(100dvh-80px)]\
                     min-h-[636px]'
                   : 'h-full '
-              } py-9 sm:mx-11 lg:flex lg:justify-center`}
+                } py-9 sm:mx-11 lg:flex lg:justify-center`}
             >
               <div
                 className={`lg:w-[60%] relative rounded-lg px-4 pt-5 pb-4
