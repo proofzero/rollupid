@@ -3,6 +3,7 @@ import { ReconcileAppsSubscriptionsOutput } from '@proofzero/platform/starbase/s
 import { ServicePlanType } from '@proofzero/types/account'
 import { AccountURN } from '@proofzero/urns/account'
 import { redirect } from '@remix-run/cloudflare'
+import { Env } from 'bindings'
 import Stripe from 'stripe'
 import plans from '~/routes/__layout/billing/plans'
 
@@ -47,12 +48,11 @@ type GetInvoicesParams = {
   customerID: string
 }
 
-export const createCustomer = async ({
-  email,
-  name,
-  accountURN,
-}: CreateCustomerParams) => {
-  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+export const createCustomer = async (
+  { email, name, accountURN }: CreateCustomerParams,
+  env: Env
+) => {
+  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
   })
 
@@ -67,12 +67,11 @@ export const createCustomer = async ({
   return customer
 }
 
-export const updateCustomer = async ({
-  customerID,
-  email,
-  name,
-}: UpdateCustomerParams) => {
-  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+export const updateCustomer = async (
+  { customerID, email, name }: UpdateCustomerParams,
+  env: Env
+) => {
+  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
   })
 
@@ -84,11 +83,11 @@ export const updateCustomer = async ({
   return customer
 }
 
-export const accessCustomerPortal = async ({
-  customerID,
-  returnURL,
-}: CustomerPortalParams) => {
-  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+export const accessCustomerPortal = async (
+  { customerID, returnURL }: CustomerPortalParams,
+  env: Env
+) => {
+  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
   })
 
@@ -100,11 +99,11 @@ export const accessCustomerPortal = async ({
   return redirect(session.url)
 }
 
-export const updatePaymentMethod = async ({
-  customerID,
-  returnURL,
-}: CustomerPortalParams) => {
-  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+export const updatePaymentMethod = async (
+  { customerID, returnURL }: CustomerPortalParams,
+  env: Env
+) => {
+  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
   })
 
@@ -119,14 +118,17 @@ export const updatePaymentMethod = async ({
   return redirect(session.url)
 }
 
-export const createSubscription = async ({
-  customerID,
-  planID,
-  quantity,
-  accountURN,
-  handled = false,
-}: CreateSubscriptionParams) => {
-  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+export const createSubscription = async (
+  {
+    customerID,
+    planID,
+    quantity,
+    accountURN,
+    handled = false,
+  }: CreateSubscriptionParams,
+  env: Env
+) => {
+  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
   })
 
@@ -149,13 +151,16 @@ export const createSubscription = async ({
   return subscription
 }
 
-export const updateSubscription = async ({
-  subscriptionID,
-  planID,
-  quantity,
-  handled = false,
-}: UpdateSubscriptionParams) => {
-  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+export const updateSubscription = async (
+  {
+    subscriptionID,
+    planID,
+    quantity,
+    handled = false,
+  }: UpdateSubscriptionParams,
+  env: Env
+) => {
+  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
   })
 
@@ -183,14 +188,17 @@ export const updateSubscription = async ({
   return subscription
 }
 
-export const updateSubscriptionMetadata = async ({
-  id,
-  metadata,
-}: {
-  id: string
-  metadata: SubscriptionMetadata
-}) => {
-  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+export const updateSubscriptionMetadata = async (
+  {
+    id,
+    metadata,
+  }: {
+    id: string
+    metadata: SubscriptionMetadata
+  },
+  env: Env
+) => {
+  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
   })
 
@@ -205,8 +213,11 @@ export const updateSubscriptionMetadata = async ({
   return updatedSubscription
 }
 
-export const getInvoices = async ({ customerID }: GetInvoicesParams) => {
-  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+export const getInvoices = async (
+  { customerID }: GetInvoicesParams,
+  env: Env
+) => {
+  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
   })
 
@@ -224,24 +235,27 @@ export const getInvoices = async ({ customerID }: GetInvoicesParams) => {
   }
 }
 
-export const reconcileAppSubscriptions = async ({
-  subscriptionID,
-  accountURN,
-  starbaseClient,
-  accountClient,
-  addressClient,
-  billingURL,
-  settingsURL,
-}: {
-  subscriptionID: string
-  accountURN: AccountURN
-  starbaseClient: any
-  accountClient: any
-  addressClient: any
-  billingURL: string
-  settingsURL: string
-}) => {
-  const stripeClient = new Stripe(STRIPE_API_SECRET, {
+export const reconcileAppSubscriptions = async (
+  {
+    subscriptionID,
+    accountURN,
+    starbaseClient,
+    accountClient,
+    addressClient,
+    billingURL,
+    settingsURL,
+  }: {
+    subscriptionID: string
+    accountURN: AccountURN
+    starbaseClient: any
+    accountClient: any
+    addressClient: any
+    billingURL: string
+    settingsURL: string
+  },
+  env: Env
+) => {
+  const stripeClient = new Stripe(env.STRIPE_API_SECRET, {
     apiVersion: '2022-11-15',
   })
 
@@ -257,7 +271,7 @@ export const reconcileAppSubscriptions = async ({
     .filter((pq) => pq.quantity != null)
 
   const priceIdToPlanTypeDict = {
-    [STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
+    [env.STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
   }
 
   const { email: billingEmail } =

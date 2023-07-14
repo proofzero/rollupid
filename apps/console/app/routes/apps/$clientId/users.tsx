@@ -35,7 +35,7 @@ export type UsersLoaderData = {
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     const srcUrl = new URL(request.url)
 
     try {
@@ -50,7 +50,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         throw new BadRequestError({ message: 'clientId is required' })
       }
 
-      const starbaseClient = createStarbaseClient(Starbase, {
+      const starbaseClient = createStarbaseClient(context.env.Starbase, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...generateTraceContextHeaders(context.traceSpan),
       })
@@ -65,7 +65,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
       return defer<UsersLoaderData>({
         edgesResult,
-        PROFILE_APP_URL,
+        PROFILE_APP_URL: context.env.PROFILE_APP_URL,
         error: null,
       })
     } catch (ex: any) {
@@ -144,12 +144,11 @@ rounded-lg border shadow"
               })
             })
 
-            const orderOfResults = `Showing ${
-              authorizedProfiles.metadata.offset + 1
-            } to ${Math.min(
-              authorizedProfiles.metadata.offset + PAGE_LIMIT,
-              authorizedProfiles.metadata.edgesReturned
-            )} of ${authorizedProfiles.metadata.edgesReturned} results`
+            const orderOfResults = `Showing ${authorizedProfiles.metadata.offset + 1
+              } to ${Math.min(
+                authorizedProfiles.metadata.offset + PAGE_LIMIT,
+                authorizedProfiles.metadata.edgesReturned
+              )} of ${authorizedProfiles.metadata.edgesReturned} results`
             return (
               <>
                 {!Users.size ? (

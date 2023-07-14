@@ -9,6 +9,7 @@ import {
   createCookie,
   redirect,
   createCookieSessionStorage,
+  Session,
 } from '@remix-run/cloudflare'
 
 import { decryptSession } from '@proofzero/utils/session'
@@ -18,10 +19,11 @@ import {
   ExpiredTokenError,
   InvalidTokenError,
 } from '@proofzero/utils/token'
+import { Env } from 'bindings'
 
-const getPassportSessionStorage = (MAX_AGE = 7776000 /*60 * 60 * 24 * 90*/) =>
+const getPassportSessionStorage = (env: Env, MAX_AGE = 7776000, /*60 * 60 * 24 * 90*/) =>
   createCookie('_rollup_session', {
-    domain: COOKIE_DOMAIN,
+    domain: env.COOKIE_DOMAIN,
     httpOnly: true,
     path: '/',
     sameSite: 'strict',
@@ -35,14 +37,14 @@ const getPassportSessionStorage = (MAX_AGE = 7776000 /*60 * 60 * 24 * 90*/) =>
 /**
  * @todo reset cookie maxAge if valid
  */
-export async function getUserSession(request: Request) {
-  const cookie = getPassportSessionStorage()
+export async function getUserSession(request: Request, env: Env) {
+  const cookie = getPassportSessionStorage(env)
   const data = await cookie.parse(request.headers.get('Cookie'))
   if (!data) return ''
 
   if (typeof data === 'object' && data.cipher && data.iv) {
     try {
-      return await decryptSession(SECRET_SESSION_KEY, data.cipher, data.iv)
+      return await decryptSession(env.SECRET_SESSION_KEY, data.cipher, data.iv)
     } catch (error) {
       console.error('getUserSession:decryptSession()', error)
     }
@@ -57,8 +59,8 @@ export async function getUserSession(request: Request) {
 /**
  * @return an encoded JWT
  */
-export async function requireJWT(request: Request) {
-  const jwt = await getUserSession(request)
+export async function requireJWT(request: Request, env: Env) {
+  const jwt = await getUserSession(request, env)
 
   try {
     checkToken(jwt)
@@ -77,7 +79,7 @@ export async function requireJWT(request: Request) {
         qp.append('scope', '')
         qp.append('state', 'skip')
 
-        throw redirect(`${PASSPORT_URL}/authorize?${qp.toString()}`)
+        throw redirect(`${env.PASSPORT_URL}/authorize?${qp.toString()}`)
     }
   }
 }
@@ -93,8 +95,8 @@ export function parseJwt(token: string): JWTPayload {
   return payload
 }
 
-export async function destroyUserSession(request: Request, redirectTo: string) {
-  const cookie = getPassportSessionStorage()
+export async function destroyUserSession(request: Request, redirectTo: string, env: Env) {
+  const cookie = getPassportSessionStorage(env)
   return redirect(redirectTo, {
     headers: {
       'Set-Cookie': await cookie.serialize('', { expires: new Date(0) }),
@@ -102,15 +104,28 @@ export async function destroyUserSession(request: Request, redirectTo: string) {
   })
 }
 
-export const {
-  getSession: getFlashSession,
-  commitSession: commitFlashSession,
-  destroySession: destroyFlashSession,
-} = createCookieSessionStorage({
-  cookie: {
-    name: '_flashes',
-    secrets: [SECRET_SESSION_SALT],
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 10,
-  },
-})
+
+export function getFlashSessionStorage(env: Env) {
+  const result = createCookieSessionStorage({
+    cookie: {
+      name: '_flashes',
+      secrets: [env.SECRET_SESSION_SALT],
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 10,
+    },
+  })
+  return result
+}
+
+export function getFlashSession(request: Request, env: Env) {
+  const storage = getFlashSessionStorage(env)
+  return storage.getSession(request.headers.get('Cookie'))
+}
+
+export function commitFlashSession(
+  session: Session,
+  env: Env,
+) {
+  const storage = getFlashSessionStorage(env)
+  return storage.commitSession(session)
+}

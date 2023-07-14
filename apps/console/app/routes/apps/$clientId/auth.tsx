@@ -121,8 +121,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         message: 'Application Client ID is required for the requested route',
       })
     }
-    const jwt = await requireJWT(request)
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const jwt = await requireJWT(request, context.env)
+    const starbaseClient = createStarbaseClient(context.env.Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
@@ -143,8 +143,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     let rotatedSecret, updates
 
-    const jwt = await requireJWT(request)
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const jwt = await requireJWT(request, context.env)
+    const starbaseClient = createStarbaseClient(context.env.Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
@@ -436,7 +436,7 @@ export default function AppDetailIndexPage() {
                       label="Published"
                       disabled={!appContactAddress}
                       onToggle={() => {
-                        ;(setIsFormChanged as (val: boolean) => {})(true)
+                        ; (setIsFormChanged as (val: boolean) => {})(true)
                       }}
                       checked={appDetails.published}
                     />

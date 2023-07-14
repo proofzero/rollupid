@@ -18,7 +18,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const clientId = params.clientId as string
 
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
 
     const formData = await request.formData()
     const theme: EmailOTPTheme = JSON.parse(formData.get('theme') as string)
@@ -47,7 +47,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const addressURN = formData.get('addressURN') as string
 
-    const addressClient = createAddressClient(Address, {
+    const addressClient = createAddressClient(context.env.Address, {
       [PlatformAddressURNHeader]: addressURN,
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
@@ -55,7 +55,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const { address: email } = await addressClient.getAddressProfile.query()
 
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const starbaseClient = createStarbaseClient(context.env.Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })

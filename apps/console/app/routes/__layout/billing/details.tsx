@@ -17,13 +17,13 @@ import { AddressURN } from '@proofzero/urns/address'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
     const accountURN = parsedJwt.sub as AccountURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-    const accountClient = createAccountClient(Account, {
+    const accountClient = createAccountClient(context.env.Account, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
@@ -45,7 +45,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         email,
         name,
         accountURN,
-      })
+      }, context.env)
 
       paymentData = {
         customerID: customer.id,
@@ -63,7 +63,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         customerID: paymentData.customerID,
         email,
         name,
-      })
+      }, context.env)
     }
 
     await accountClient.setStripePaymentData.mutate({
@@ -72,12 +72,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       addressURN: emailURN,
     })
 
-    const flashSession = await getFlashSession(request.headers.get('Cookie'))
+    const flashSession = await getFlashSession(request, context.env)
     flashSession.flash('success_toast', 'Payment data updated')
 
     return redirect('/billing', {
       headers: {
-        'Set-Cookie': await commitFlashSession(flashSession),
+        'Set-Cookie': await commitFlashSession(flashSession, context.env),
       },
     })
   }

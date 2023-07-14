@@ -81,8 +81,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    const jwt = await requireJWT(request)
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const jwt = await requireJWT(request, context.env)
+    const starbaseClient = createStarbaseClient(context.env.Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
@@ -138,10 +138,10 @@ export default function AppDetailIndexPage() {
 
   const { rotatedClientSecret, rotatedApiKey } =
     outletContext?.rotationResult ||
-      actionData?.rotatedSecrets || {
-        rotatedClientSecret: null,
-        rotatedApiKey: null,
-      }
+    actionData?.rotatedSecrets || {
+      rotatedClientSecret: null,
+      rotatedApiKey: null,
+    }
 
   return (
     <section>

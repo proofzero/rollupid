@@ -55,9 +55,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         message: 'Application Client ID is required for the requested route',
       })
     }
-    const jwt = await requireJWT(request)
+    const jwt = await requireJWT(request, context.env)
     let errors: errorsType = {}
-    const starbaseClient = createStarbaseClient(Starbase, {
+    const starbaseClient = createStarbaseClient(context.env.Starbase, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
@@ -214,10 +214,9 @@ export default () => {
                           key={personIdx}
                           className={({ active }) =>
                             `relative cursor-default select-none py-2 px-3
-                            ${
-                              active
-                                ? 'bg-gray-50 text-indigo-900'
-                                : 'text-gray-900'
+                            ${active
+                              ? 'bg-gray-50 text-indigo-900'
+                              : 'text-gray-900'
                             } }`
                           }
                           value={paymaster}
@@ -231,9 +230,8 @@ export default () => {
                                   className="w-6 h-6 mr-3"
                                 />
                                 <span
-                                  className={`truncate text-sm ${
-                                    selected ? 'font-medium' : 'font-normal'
-                                  }`}
+                                  className={`truncate text-sm ${selected ? 'font-medium' : 'font-normal'
+                                    }`}
                                 >
                                   {paymaster.name}
                                 </span>
