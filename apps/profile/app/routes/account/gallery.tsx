@@ -54,7 +54,7 @@ import type { AccountURN } from '@proofzero/urns/account'
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
 
-  const jwt = await getAccessToken(request)
+  const jwt = await getAccessToken(request, context.env)
   const { sub: accountURN } = parseJwt(jwt)
 
   const updatedGallery = formData.get('gallery') as string
@@ -72,19 +72,25 @@ export const action: ActionFunction = async ({ request, context }) => {
     }
   }
 
-  const currentProfile = await ProfileKV.get<FullProfile>(accountURN!, 'json')
+  const currentProfile = await context.env.ProfileKV.get<FullProfile>(
+    accountURN!,
+    'json'
+  )
   const updatedProfile = Object.assign(currentProfile || {}, {
     gallery: zodValidation.data,
   })
 
   //Ownership Validation
-  updatedProfile.gallery = await getValidGallery({
-    gallery: updatedProfile.gallery,
-    accountURN: accountURN as AccountURN,
-    traceSpan: context.traceSpan,
-  })
+  updatedProfile.gallery = await getValidGallery(
+    {
+      gallery: updatedProfile.gallery,
+      accountURN: accountURN as AccountURN,
+    },
+    context.env,
+    context.traceSpan
+  )
 
-  await ProfileKV.put(accountURN!, JSON.stringify(updatedProfile))
+  await context.env.ProfileKV.put(accountURN!, JSON.stringify(updatedProfile))
 
   return true
 }
@@ -237,8 +243,8 @@ const GalleryComponent = () => {
     const chain =
       collection !== ''
         ? modalFetcher.data?.ownedNfts.filter(
-            (nft: NFT) => nft.contract.address === collection
-          )[0].chain.chain
+          (nft: NFT) => nft.contract.address === collection
+        )[0].chain.chain
         : null
 
     getMoreNftsModal(modalFetcher, accountURN, collection, chain)
@@ -346,9 +352,8 @@ const GalleryComponent = () => {
                     type="button"
                     className={`w-full h-full
               bg-gray-50 hover:bg-gray-100 transition-colors
-              rounded-lg transition-opacity ${
-                activeId ? 'opacity-0' : 'opacity-100'
-              }`}
+              rounded-lg transition-opacity ${activeId ? 'opacity-0' : 'opacity-100'
+                      }`}
                     disabled={!cryptoAddresses?.length}
                     onClick={() => setIsOpen(!!cryptoAddresses?.length)}
                   >

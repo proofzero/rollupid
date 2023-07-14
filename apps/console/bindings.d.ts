@@ -30,4 +30,3 @@ interface Env {
   //Needed to make Remix work with Cloudflare module workers
   __STATIC_CONTENT: string
 }
-declare global {}

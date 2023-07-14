@@ -54,7 +54,8 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   }
 
   const galaxyClient = await getGalaxyClient(
-    generateTraceContextHeaders(context.traceSpan)
+    generateTraceContextHeaders(context.traceSpan),
+    context.env
   )
   if (!address) throw new Error('No address provided in URL')
   if (!type) throw new Error('No provider specified in URL')
@@ -83,9 +84,9 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   // if not handle is this let's assume this is an idref
   let profile, jwt
   try {
-    jwt = await getAccessToken(request)
+    jwt = await getAccessToken(request, context.env)
 
-    profile = await getAccountProfile({ jwt, accountURN }, context.traceSpan)
+    profile = await getAccountProfile({ jwt, accountURN }, context.env, context.traceSpan)
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })
@@ -95,6 +96,7 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
     if (request.cf.botManagement.score < 30) {
       ogImage = await ogImageFromProfile(
         profile.pfp?.image as string,
+        context.env,
         context.traceSpan
       )
     } else {

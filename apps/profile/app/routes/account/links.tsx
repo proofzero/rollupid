@@ -126,7 +126,9 @@ const normalizeAddressProfile = (ap: AddressProfile) => {
 }
 
 export const action: ActionFunction = async ({ request, context }) => {
-  const { sub: accountURN } = parseJwt(await getAccessToken(request))
+  const { sub: accountURN } = parseJwt(
+    await getAccessToken(request, context.env)
+  )
 
   const formDataText = await request.text()
   const formData = qs.parse(formDataText) as unknown as { links: Links }
@@ -147,11 +149,14 @@ export const action: ActionFunction = async ({ request, context }) => {
     }
   }
 
-  const currentProfile = await ProfileKV.get<FullProfile>(accountURN!, 'json')
+  const currentProfile = await context.env.ProfileKV.get<FullProfile>(
+    accountURN!,
+    'json'
+  )
   const updatedProfile = Object.assign(currentProfile || {}, {
     links: zodValidation.data,
   })
-  await ProfileKV.put(accountURN!, JSON.stringify(updatedProfile))
+  await context.env.ProfileKV.put(accountURN!, JSON.stringify(updatedProfile))
 
   return { updatedLinks: updatedLinks || [] }
 }
@@ -299,13 +304,13 @@ export default function AccountSettingsLinks() {
   const [connectedLinks, setConnectedLinks] = useState<
     (
       | {
-          addressURN?: string
-          public?: boolean
-          address?: string | null
-          title?: string | null
-          icon?: string | null
-          provider?: string
-        }
+        addressURN?: string
+        public?: boolean
+        address?: string | null
+        title?: string | null
+        icon?: string | null
+        provider?: string
+      }
       | undefined
     )[]
   >(normalizedAddressProfiles)
@@ -454,9 +459,8 @@ export default function AccountSettingsLinks() {
               itemRenderer={(item) => {
                 return (
                   <SortableLink
-                    key={`${item.val.name || 'My Website'}-${
-                      item.val.url || 'https://mywebsite.com'
-                    }-${item.key}`}
+                    key={`${item.val.name || 'My Website'}-${item.val.url || 'https://mywebsite.com'
+                      }-${item.key}`}
                     id={`${item.key}`}
                     link={item.val}
                     setFormChanged={setFormChanged}
@@ -501,7 +505,7 @@ export default function AccountSettingsLinks() {
           div with absolute position below  */}
         <div className="h-[4rem]" />
         <div className="absolute bottom-0 right-0">
-          <SaveButton isFormChanged={isFormChanged} discardFn={() => {}} />
+          <SaveButton isFormChanged={isFormChanged} discardFn={() => { }} />
         </div>
       </Form>
     </div>

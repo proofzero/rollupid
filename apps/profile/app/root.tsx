@@ -71,7 +71,9 @@ export const links: LinksFunction = () => [
   { rel: 'shortcut icon', type: 'image/svg+xml', href: faviconSvg },
 ]
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, context }) => {
+  const { INTERNAL_GOOGLE_ANALYTICS_TAG, PASSPORT_URL, PROFILE_CLIENT_ID } =
+    context.env
   return json({
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG,
