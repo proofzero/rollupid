@@ -37,7 +37,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       apiVersion: '2022-11-15',
     })
 
-    const whSecret = context.env.SECRET_STRIPE_WEBHOOK
+    const whSecret = context.env.SECRET_STRIPE_WEBHOOK_SECRET
     const payload = await request.text()
     const sig = request.headers.get('stripe-signature') as string
 

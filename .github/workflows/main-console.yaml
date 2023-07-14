@@ -54,7 +54,7 @@ jobs:
             SECRET_SESSION_KEY
             SECRET_SESSION_SALT
             SECRET_STRIPE_API_KEY
-            SECRET_STRIPE_WEBHOOK
+            SECRET_STRIPE_WEBHOOK_SECRET
             SECRET_STRIPE_PRO_PLAN_ID
         env:
           NODE_ENV: 'development'
@@ -63,7 +63,7 @@ jobs:
           SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_DEV }}
           # CF_ROUTE: https://console-dev.kubelt.com/*
           SECRET_STRIPE_API_KEY: ${{ secrets.SECRET_STRIPE_API_KEY_DEV }}
-          SECRET_STRIPE_WEBHOOK: ${{ secrets.SECRET_STRIPE_WEBHOOK_DEV }}
+          SECRET_STRIPE_WEBHOOK_SECRET: ${{ secrets.SECRET_STRIPE_WEBHOOK_SECRET_DEV }}
           SECRET_STRIPE_PRO_PLAN_ID: ${{ secrets.SECRET_STRIPE_PRO_PLAN_ID_DEV }}
 
       - name: Setup Playwright
