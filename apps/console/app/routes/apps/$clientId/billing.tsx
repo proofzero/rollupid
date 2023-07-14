@@ -494,7 +494,7 @@ const EntitlementsCardButton = ({
     currentPlanType: ServicePlanType
   ) => {
     const typeImportance = [ServicePlanType.FREE, ServicePlanType.PRO]
-    return (
+    return !(
       typeImportance.findIndex((ty) => ty === planType) <
       typeImportance.findIndex((ty) => ty === currentPlanType)
     )
