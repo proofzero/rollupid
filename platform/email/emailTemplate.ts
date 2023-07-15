@@ -338,7 +338,7 @@ export const EmailTemplateDevReconciledEntitlements = (
   }
 ): EmailContent => {
   const content = `<div class="heading">Application Plan Downgraded ⬇️</div>
-  
+
   <p>
     Rollup application <b>"${appName}"</b> was downgraded to <b>${planType}</b> plan.
   </p>
@@ -353,4 +353,25 @@ export const EmailTemplateDevReconciledEntitlements = (
   </p>`
 
   return EmailTemplateBase(params, content, 'App Downgraded')
+}
+
+export const EmailTemplateFailedPayment = (
+  params: EmailTemplateParams
+): EmailContent => {
+  const content = `<div class="heading">Payment Issue Detected</div>
+
+  <p>
+    Your payment for the Rollup ID has failed.
+  </p>
+
+  <p>
+    Please update your payment details on the <a href=${'https://console.rollup.id/billing'}>billing page</a>.
+  </p>
+
+  <p>
+  Thank You for using Rollup <br />
+    - The Rollup Team
+  </p>`
+
+  return EmailTemplateBase(params, content, 'Action Required for Rollup ID')
 }

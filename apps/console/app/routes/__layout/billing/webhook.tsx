@@ -154,6 +154,22 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         }
 
         break
+      case 'invoice.payment_failed':
+        const { customer: customerFail } = event.data.object as {
+          customer: string
+        }
+        const customerDataFail = await stripeClient.customers.retrieve(
+          customerFail
+        )
+        if (!customerDataFail.deleted && customerDataFail.email) {
+          const { email, name } = customerDataFail
+
+          await addressClient.sendFailedPaymentNotification.mutate({
+            email,
+            name: name || 'Client',
+          })
+        }
+        break
       case 'customer.deleted':
       case 'customer.subscription.deleted':
         const {

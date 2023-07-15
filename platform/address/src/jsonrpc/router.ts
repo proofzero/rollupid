@@ -98,6 +98,10 @@ import {
   SendReconciliationNotificationInput,
   sendReconciliationNotificationMethod,
 } from './methods/sendReconciliationNotificationMethod'
+import {
+  SendFailedPaymentNotificationInput,
+  sendFailedPaymentNotificationMethod,
+} from './methods/sendFailedPaymentNotification'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -282,4 +286,9 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(SendReconciliationNotificationInput)
     .query(sendReconciliationNotificationMethod),
+  sendFailedPaymentNotification: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(SendFailedPaymentNotificationInput)
+    .mutation(sendFailedPaymentNotificationMethod),
 })

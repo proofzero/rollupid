@@ -3,6 +3,7 @@ import {
   EmailTemplateBillingReconciledEntitlements,
   EmailTemplateDevReconciledEntitlements,
   EmailTemplateExpiredSubscription,
+  EmailTemplateFailedPayment,
   EmailTemplateOTP,
   EmailTemplateParams,
 } from '../emailTemplate'
@@ -234,6 +235,14 @@ export const getMagicLinkEmailContent = (
     subject: `Rollup email login link`,
     body: `Your email login link to rollup.id is <a href="${magicLinkUrl}">. For security reasons, this link is only valid for 1 minute.`,
   }
+}
+
+export const getFailedPaymentEmailContent = (
+  params?: Partial<EmailTemplateParams>
+): EmailContent => {
+  params = adjustEmailParams(params)
+
+  return EmailTemplateFailedPayment(params as EmailTemplateParams)
 }
 
 export const getEmailContent = ({
