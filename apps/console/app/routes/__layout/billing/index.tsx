@@ -530,7 +530,7 @@ const RemoveEntitelmentModal = ({
               >
                 {({ open }) => {
                   return (
-                    <div className="">
+                    <div>
                       <Listbox.Button
                         className="relative w-full cursor-default border
                   py-1.5 px-4 text-left shadow-sm sm:text-sm rounded-lg
@@ -1133,7 +1133,7 @@ export default () => {
       </section>
 
       <section className="mt-10">
-        <article className="">
+        <article>
           <header className="flex flex-col lg:flex-row justify-between lg:items-center relative mb-6">
             <Text size="lg" weight="semibold" className="text-gray-900">
               Invoices & Payments
