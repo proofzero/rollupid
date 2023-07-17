@@ -19,7 +19,7 @@ workers_dev = false
 
 [[d1_databases]]
 binding = "EDGES"
-database_name = "edges"
+database_name = "edges-v2"
 database_id = "d5dc9f97-0f8e-4af7-90dd-cb84e44309bd"
 migrations_dir = "migrations"
 
@@ -59,7 +59,7 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
 [env.dev]
 d1_databases = [
-  { binding = "EDGES", database_name = "edges-dev", database_id = "d5dc9f97-0f8e-4af7-90dd-cb84e44309bd", migrations_dir = "migrations" },
+  { binding = "EDGES", database_name = "edges-v2-dev", database_id = "bd11ba92-bfcf-4d37-8224-d57467cced48", migrations_dir = "migrations" },
 ]
 
 [env.dev.vars]
@@ -77,7 +77,7 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 [env.next]
 
 d1_databases = [
-  { binding = "EDGES", database_name = "edges-next", database_id = "35573801-81b5-4c57-8a79-286343476d98", migrations_dir = "migrations" },
+  { binding = "EDGES", database_name = "edges-v2-next", database_id = "058ddc84-7734-47ca-a84b-7f325c5336f7", migrations_dir = "migrations" },
 ]
 
 analytics_engine_datasets = [
@@ -95,7 +95,7 @@ ENVIRONMENT = "next"
 [env.current]
 
 d1_databases = [
-  { binding = "EDGES", database_name = "edges-current", database_id = "27b77920-664e-4e52-84ca-72be96b9a3fd", migrations_dir = "migrations" },
+  { binding = "EDGES", database_name = "edges-v2-current", database_id = "825ee9f1-8de8-4f73-a0e0-1998feea3d7f", migrations_dir = "migrations" },
 ]
 
 analytics_engine_datasets = [
