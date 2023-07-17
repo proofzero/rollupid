@@ -1,3 +1,5 @@
+import { AddressURN } from '@proofzero/urns/address'
+
 export type AccountProfile = {
   displayName: string
   pfp: {
@@ -25,4 +27,5 @@ export type PaymentData = {
   email: string
   name: string
   paymentMethodID?: string
+  addressURN?: AddressURN
 }

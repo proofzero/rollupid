@@ -29,11 +29,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const fd = await request.formData()
-    const { email, emailURN, name } = JSON.parse(
+    const { email, addressURN, name } = JSON.parse(
       fd.get('payload') as string
     ) as {
       email: string
-      emailURN: AddressURN
+      addressURN: AddressURN
       name: string
     }
 
@@ -41,35 +41,43 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
     if (!paymentData) {
-      const customer = await createCustomer({
-        email,
-        name,
-        accountURN,
-      }, context.env)
+      const customer = await createCustomer(
+        {
+          email,
+          name,
+          accountURN,
+        },
+        context.env
+      )
 
       paymentData = {
         customerID: customer.id,
         email,
         name,
+        addressURN,
       }
     } else {
       paymentData = {
         ...paymentData,
         email,
         name,
+        addressURN,
       }
 
-      await updateCustomer({
-        customerID: paymentData.customerID,
-        email,
-        name,
-      }, context.env)
+      await updateCustomer(
+        {
+          customerID: paymentData.customerID,
+          email,
+          name,
+        },
+        context.env
+      )
     }
 
     await accountClient.setStripePaymentData.mutate({
       ...paymentData,
       accountURN,
-      addressURN: emailURN,
+      addressURN,
     })
 
     const flashSession = await getFlashSession(request, context.env)

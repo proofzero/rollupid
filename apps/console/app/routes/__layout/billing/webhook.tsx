@@ -14,6 +14,7 @@ import {
   updateSubscriptionMetadata,
 } from '~/services/billing/stripe'
 import { RollupError } from '@proofzero/errors'
+import { AddressURN } from '@proofzero/urns/address'
 
 type StripeInvoicePayload = {
   customer: string
@@ -143,8 +144,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         break
       case 'customer.updated':
-        const { invoice_settings, metadata: cusMeta } = event.data.object as {
+        const {
+          email,
+          invoice_settings,
+          metadata: cusMeta,
+        } = event.data.object as {
           id: string
+          email: string
           invoice_settings?: {
             default_payment_method: string
           }
@@ -158,8 +164,37 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             accountURN: cusMeta.accountURN,
           })
           paymentData.paymentMethodID = invoice_settings.default_payment_method
+
+          // This needs to happen because
+          // we already have paymentData
+          // in production without
+          // addressURN
+          let inferredAddressURN
+          if (!paymentData.addressURN) {
+            const addresses = await accountClient.getAddresses.query({
+              account: cusMeta.accountURN,
+            })
+
+            const targetAddress = addresses?.find(
+              (address) =>
+                address.qc.alias.toLowerCase() === email.toLowerCase()
+            )
+
+            inferredAddressURN = targetAddress?.baseUrn as AddressURN
+
+            if (!inferredAddressURN) {
+              throw new RollupError({
+                message: `Could not find address for email ${email}`,
+              })
+            }
+          }
+
+          const addressURN =
+            paymentData.addressURN ?? (inferredAddressURN as AddressURN)
+
           await accountClient.setStripePaymentData.mutate({
             ...paymentData,
+            addressURN,
             accountURN: cusMeta.accountURN,
           })
         }
