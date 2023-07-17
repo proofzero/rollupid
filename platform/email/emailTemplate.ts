@@ -1,4 +1,6 @@
 import { EmailContent, EmailContentType } from './src/types'
+import { PlansSchema } from '@proofzero/platform/account/src/jsonrpc/methods/getEntitlements'
+import { ServicePlanType } from '@proofzero/packages/types/account'
 
 export const darkModeStyles = `
     body {
@@ -374,4 +376,40 @@ export const EmailTemplateFailedPayment = (
   </p>`
 
   return EmailTemplateBase(params, content, 'Action Required for Rollup ID')
+}
+
+export const EmailTemplateSuccessfulPayment = ({
+  params,
+  plans,
+}: {
+  params: EmailTemplateParams
+  plans: typeof PlansSchema
+}): EmailContent => {
+  const filteredPlans = Object.entries(plans).filter(([key, value]) => {
+    return value.entitlements
+  })
+  const content = `<div class="heading">Payment Successful</div>
+  <p>
+    Your payment for the <b>Rollup ID</b> has been processed successfully.
+  </p>
+
+  <p>
+    Thank you for your continued support. Enjoy using <b>Rollup ID</b>!
+  </p>
+
+  <p> Here's the list of your current products: </p>
+  <ul>
+  ${filteredPlans.map(([key, value]) => {
+    return value.entitlements
+      ? `<li>${value.entitlements} entitlement(s) of <b>${key}</b> plan</li>`
+      : ``
+  })}
+  </ul>
+
+  <p>
+    Best, <br />
+    - The Rollup Team
+  </p>`
+
+  return EmailTemplateBase(params, content, 'Payment Successful')
 }

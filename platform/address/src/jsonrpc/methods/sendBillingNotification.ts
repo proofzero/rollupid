@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { Context } from '../../context'
 
-import { EmailThemePropsSchema } from '../../../../email/src/emailFunctions'
+import { EmailThemePropsSchema } from '@proofzero/platform/email/src/emailFunctions'
 
 export const SendBillingNotificationInput = z.object({
   email: z.string(),

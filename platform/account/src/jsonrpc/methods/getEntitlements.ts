@@ -12,14 +12,16 @@ type GetEntitlementsInput = z.infer<typeof GetEntitlementsInputSchema>
 
 const PlanTypeEnum = z.nativeEnum(ServicePlanType)
 
+export const PlansSchema = z.record(
+  PlanTypeEnum,
+  z.object({
+    entitlements: z.number(),
+  })
+)
+
 export const GetEntitlementsOutputSchema = z.object({
   subscriptionID: z.string().optional(),
-  plans: z.record(
-    PlanTypeEnum,
-    z.object({
-      entitlements: z.number(),
-    })
-  ),
+  plans: PlansSchema,
 })
 export type GetEntitlementsOutput = z.infer<typeof GetEntitlementsOutputSchema>
 

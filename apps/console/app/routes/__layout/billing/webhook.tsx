@@ -154,6 +154,30 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         }
 
         break
+      case 'invoice.payment_succeeded':
+        const { customer: customerSuccess } = event.data.object as {
+          customer: string
+        }
+
+        const customerDataSuccess = await stripeClient.customers.retrieve(
+          customerSuccess
+        )
+
+        if (!customerDataSuccess.deleted && customerDataSuccess.email) {
+          const { email, name, metadata } = customerDataSuccess
+
+          const entitlements = await accountClient.getEntitlements.query({
+            accountURN: metadata.accountURN as AccountURN,
+          })
+
+          await addressClient.sendSuccessfulPaymentNotification.mutate({
+            email,
+            name: name || 'Client',
+            plans: entitlements?.plans,
+          })
+        }
+
+        break
       case 'invoice.payment_failed':
         const { customer: customerFail } = event.data.object as {
           customer: string

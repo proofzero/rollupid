@@ -1,6 +1,6 @@
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { LoaderFunction } from '@remix-run/cloudflare'
+import { type LoaderFunction } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import createAccountClient from '@proofzero/platform-clients/account'
 import {
@@ -8,7 +8,7 @@ import {
   parseJwt,
 } from '@proofzero/utils'
 import { updatePaymentMethod } from '~/services/billing/stripe'
-import { AccountURN } from '@proofzero/urns/account'
+import { type AccountURN } from '@proofzero/urns/account'
 import { BadRequestError } from '@proofzero/errors'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -36,9 +36,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    return updatePaymentMethod({
-      customerID,
-      returnURL,
-    }, context.env)
+    return updatePaymentMethod(
+      {
+        customerID,
+        returnURL,
+      },
+      context.env
+    )
   }
 )

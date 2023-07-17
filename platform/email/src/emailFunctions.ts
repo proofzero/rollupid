@@ -6,11 +6,13 @@ import {
   EmailTemplateFailedPayment,
   EmailTemplateOTP,
   EmailTemplateParams,
+  EmailTemplateSuccessfulPayment,
 } from '../emailTemplate'
 import { EmailMessage, EmailNotification } from './types'
 import { CloudflareEmailMessage, EmailContent, Environment } from './types'
 import { Context } from './context'
 import { z } from 'zod'
+import { PlansSchema } from '@proofzero/platform/account/src/jsonrpc/methods/getEntitlements'
 
 export const EmailThemePropsSchema = z.object({
   privacyURL: z.string().url(),
@@ -243,6 +245,21 @@ export const getFailedPaymentEmailContent = (
   params = adjustEmailParams(params)
 
   return EmailTemplateFailedPayment(params as EmailTemplateParams)
+}
+
+export const getSuccessfulPaymentEmailContent = ({
+  params,
+  plans,
+}: {
+  params?: Partial<EmailTemplateParams>
+  plans: typeof PlansSchema
+}): EmailContent => {
+  params = adjustEmailParams(params)
+
+  return EmailTemplateSuccessfulPayment({
+    params: params as EmailTemplateParams,
+    plans,
+  })
 }
 
 export const getEmailContent = ({
