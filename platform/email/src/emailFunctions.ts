@@ -12,7 +12,7 @@ import { EmailMessage, EmailNotification } from './types'
 import { CloudflareEmailMessage, EmailContent, Environment } from './types'
 import { Context } from './context'
 import { z } from 'zod'
-import { PlansSchema } from '@proofzero/platform/account/src/jsonrpc/methods/getEntitlements'
+import { type EmailPlans } from './jsonrpc/methods/sendSuccesfullPaymentNotification'
 
 export const EmailThemePropsSchema = z.object({
   privacyURL: z.string().url(),
@@ -252,7 +252,7 @@ export const getSuccessfulPaymentEmailContent = ({
   plans,
 }: {
   params?: Partial<EmailTemplateParams>
-  plans: typeof PlansSchema
+  plans: EmailPlans
 }): EmailContent => {
   params = adjustEmailParams(params)
 

@@ -1,6 +1,5 @@
 import { EmailContent, EmailContentType } from './src/types'
-import { PlansSchema } from '@proofzero/platform/account/src/jsonrpc/methods/getEntitlements'
-import { ServicePlanType } from '@proofzero/packages/types/account'
+import { type EmailPlans } from './src/jsonrpc/methods/sendSuccesfullPaymentNotification'
 
 export const darkModeStyles = `
     body {
@@ -383,11 +382,8 @@ export const EmailTemplateSuccessfulPayment = ({
   plans,
 }: {
   params: EmailTemplateParams
-  plans: typeof PlansSchema
+  plans: EmailPlans
 }): EmailContent => {
-  const filteredPlans = Object.entries(plans).filter(([key, value]) => {
-    return value.entitlements
-  })
   const content = `<div class="heading">Payment Successful</div>
   <p>
     Your payment for the <b>Rollup ID</b> has been processed successfully.
@@ -397,12 +393,10 @@ export const EmailTemplateSuccessfulPayment = ({
     Thank you for your continued support. Enjoy using <b>Rollup ID</b>!
   </p>
 
-  <p> Here's the list of your current products: </p>
+  <p> Here's the list of your purchases: </p>
   <ul>
-  ${filteredPlans.map(([key, value]) => {
-    return value.entitlements
-      ? `<li>${value.entitlements} entitlement(s) of <b>${key}</b> plan</li>`
-      : ``
+  ${plans.map((plan) => {
+    return `<li>${plan.quantity} entitlement(s) of <b>${plan.name}</b></li>`
   })}
   </ul>
 

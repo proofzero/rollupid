@@ -8,11 +8,20 @@ import {
 import { EmailThemePropsSchema } from '../../emailFunctions'
 import { PlansSchema } from '@proofzero/platform/account/src/jsonrpc/methods/getEntitlements'
 
+export const EmailPlansSchema = z.array(
+  z.object({
+    name: z.string(),
+    quantity: z.number(),
+  })
+)
+
+export type EmailPlans = z.infer<typeof EmailPlansSchema>
+
 export const sendSuccesfullPaymentNotificationMethodInput = z.object({
   name: z.string(),
   email: z.string(),
   themeProps: EmailThemePropsSchema.optional(),
-  plans: PlansSchema,
+  plans: EmailPlansSchema,
 })
 
 export type sendSuccesfullPaymentNotificationMethodParams = z.infer<
@@ -33,7 +42,7 @@ export const sendSuccesfullPaymentNotificationMethod = async ({
   ctx: Context
 }): Promise<sendSuccesfullPaymentNotificationMethodOutputParams> => {
   const subscriptionEmailTemplate = getSuccessfulPaymentEmailContent({
-    plans: input.plans as typeof PlansSchema,
+    plans: input.plans,
     params: input.themeProps,
   })
 

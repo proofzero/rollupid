@@ -155,25 +155,77 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         break
       case 'invoice.payment_succeeded':
-        const { customer: customerSuccess } = event.data.object as {
+        const { customer: customerSuccess, lines: linesSuccess } = event.data
+          .object as {
           customer: string
+          lines: {
+            data: any
+          }
         }
 
         const customerDataSuccess = await stripeClient.customers.retrieve(
           customerSuccess
         )
 
-        if (!customerDataSuccess.deleted && customerDataSuccess.email) {
-          const { email, name, metadata } = customerDataSuccess
+        const updatedItems = {} as {
+          [key: string]: { amount: number; quantity: number }
+        }
 
-          const entitlements = await accountClient.getEntitlements.query({
-            accountURN: metadata.accountURN as AccountURN,
+        linesSuccess.data.forEach(
+          (line: {
+            price: { product: string }
+            amount: number
+            quantity: number
+          }) => {
+            if (updatedItems[line.price.product]) {
+              updatedItems[line.price.product] = {
+                amount: updatedItems[line.price.product].amount + line.amount,
+                quantity:
+                  updatedItems[line.price.product].quantity + line.quantity,
+              }
+            } else {
+              updatedItems[line.price.product] = {
+                // this amount is negative when we cancel pr update subsription,
+                // but this event is being fired anyway
+                amount: line.amount,
+                quantity: line.amount > 0 ? line.quantity : -line.quantity,
+              }
+            }
+          }
+        )
+
+        const purchasedItems = Object.keys(updatedItems)
+          .filter((key) => {
+            // we don't count cancelled subscriptions
+            return updatedItems[key].amount > 0
           })
+          .map((key) => {
+            return {
+              productID: key,
+              amount: updatedItems[key].amount,
+              quantity: updatedItems[key].quantity,
+            }
+          })
+        if (
+          !customerDataSuccess.deleted &&
+          customerDataSuccess.email &&
+          purchasedItems?.length
+        ) {
+          const { email, name } = customerDataSuccess
+          const products = await Promise.all(
+            purchasedItems.map((item) => {
+              if (item) return stripeClient.products.retrieve(item.productID)
+            })
+          )
 
           await addressClient.sendSuccessfulPaymentNotification.mutate({
             email,
             name: name || 'Client',
-            plans: entitlements?.plans,
+            plans: purchasedItems.map((item) => ({
+              quantity: item.quantity,
+              name: products.find((product) => product?.id === item?.productID)!
+                .name,
+            })),
           })
         }
 

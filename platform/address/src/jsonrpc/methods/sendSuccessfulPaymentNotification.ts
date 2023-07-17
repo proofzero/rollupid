@@ -3,13 +3,13 @@ import { z } from 'zod'
 import { Context } from '../../context'
 
 import { EmailThemePropsSchema } from '@proofzero/platform/email/src/emailFunctions'
-import { PlansSchema } from '@proofzero/platform/account/src/jsonrpc/methods/getEntitlements'
+import { EmailPlansSchema } from '@proofzero/platform/email/src/jsonrpc/methods/sendSuccesfullPaymentNotification'
 
 export const SendSuccessfulPaymentNotificationInput = z.object({
   email: z.string(),
   name: z.string(),
   themeProps: EmailThemePropsSchema.optional(),
-  plans: PlansSchema,
+  plans: EmailPlansSchema,
 })
 
 type SendSuccessfulPaymentNotificationParams = z.infer<
