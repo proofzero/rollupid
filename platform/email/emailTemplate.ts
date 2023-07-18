@@ -374,7 +374,11 @@ export const EmailTemplateFailedPayment = (
     - The Rollup Team
   </p>`
 
-  return EmailTemplateBase(params, content, 'Action Required for Rollup ID')
+  return EmailTemplateBase(
+    params,
+    content,
+    'Payment Failed - Action Required for Rollup ID'
+  )
 }
 
 export const EmailTemplateSuccessfulPayment = ({

@@ -15,6 +15,12 @@ import {
 } from '~/services/billing/stripe'
 import { RollupError } from '@proofzero/errors'
 
+type LineType = {
+  price: { product: string }
+  amount: number
+  quantity: number
+}
+
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
@@ -171,28 +177,22 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           [key: string]: { amount: number; quantity: number }
         }
 
-        linesSuccess.data.forEach(
-          (line: {
-            price: { product: string }
-            amount: number
-            quantity: number
-          }) => {
-            if (updatedItems[line.price.product]) {
-              updatedItems[line.price.product] = {
-                amount: updatedItems[line.price.product].amount + line.amount,
-                quantity:
-                  updatedItems[line.price.product].quantity + line.quantity,
-              }
-            } else {
-              updatedItems[line.price.product] = {
-                // this amount is negative when we cancel pr update subsription,
-                // but this event is being fired anyway
-                amount: line.amount,
-                quantity: line.amount > 0 ? line.quantity : -line.quantity,
-              }
+        linesSuccess.data.forEach((line: LineType) => {
+          if (updatedItems[line.price.product]) {
+            updatedItems[line.price.product] = {
+              amount: updatedItems[line.price.product].amount + line.amount,
+              quantity:
+                updatedItems[line.price.product].quantity + line.quantity,
+            }
+          } else {
+            updatedItems[line.price.product] = {
+              // this amount is negative when we cancel or update subsription,
+              // but this event is being fired anyway
+              amount: line.amount,
+              quantity: line.amount > 0 ? line.quantity : -line.quantity,
             }
           }
-        )
+        })
 
         const purchasedItems = Object.keys(updatedItems)
           .filter((key) => {
