@@ -5778,6 +5778,7 @@ __metadata:
     "@storybook/react": v6.5.17-alpha.0
     "@storybook/testing-library": 0.0.13
     "@tailwindcss/forms": 0.5.3
+    "@typeform/embed-react": 2.27.0
     "@types/react": 18.0.27
     "@types/react-dom": 18.0.10
     "@types/react-helmet": 6.1.6
@@ -11646,6 +11647,25 @@ __metadata:
   version: 1.0.3
   resolution: "@tsconfig/node16@npm:1.0.3"
   checksum: 3a8b657dd047495b7ad23437d6afd20297ce90380ff0bdee93fc7d39a900dbd8d9e26e53ff6b465e7967ce2adf0b218782590ce9013285121e6a5928fbd6819f
+  languageName: node
+  linkType: hard
+
+"@typeform/embed-react@npm:2.27.0":
+  version: 2.27.0
+  resolution: "@typeform/embed-react@npm:2.27.0"
+  dependencies:
+    "@typeform/embed": 2.14.0
+    fast-deep-equal: ^3.1.3
+  peerDependencies:
+    react: ">=16.8.0"
+  checksum: d6077a133942a8735c704a4e7dbf7eb296137ce110dea30c200beb76643308de317b4471ac5e3faa5a59227ddcd8206bae1f9bcdbb4488ee89e5c7d4c1b6c640
+  languageName: node
+  linkType: hard
+
+"@typeform/embed@npm:2.14.0":
+  version: 2.14.0
+  resolution: "@typeform/embed@npm:2.14.0"
+  checksum: 903fa40a8381991b4f35bc103c16cde6f560e00cba5cd9177397f1be723bdb96a533398d501d79b7771dd3267c0a13a872fddf450c9ae89e75da9e7ffb8a6c93
   languageName: node
   linkType: hard
 

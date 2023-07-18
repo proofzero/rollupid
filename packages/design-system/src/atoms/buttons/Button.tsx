@@ -8,7 +8,10 @@ import {
   typeToColorsDict,
 } from './common'
 
-export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+export type ButtonProps = React.DetailedHTMLProps<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  HTMLButtonElement
+> & {
   btnSize?: ButtonSize
   btnType?: ButtonType
   isSubmit?: boolean
