@@ -318,7 +318,7 @@ const PurchaseProModal = ({
   const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
 
   return (
-    <Modal isOpen={isOpen} fixed handleClose={() => setIsOpen(false)}>
+    <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <Text
         size="lg"
         weight="semibold"
@@ -476,7 +476,7 @@ const RemoveEntitelmentModal = ({
   const [proEntitlementNew, setProEntitlementNew] = useState(entitlementUsage)
 
   return (
-    <Modal isOpen={isOpen} fixed handleClose={() => setIsOpen(false)}>
+    <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <Text
         size="lg"
         weight="semibold"
@@ -526,10 +526,11 @@ const RemoveEntitelmentModal = ({
                 value={proEntitlementNew}
                 onChange={setProEntitlementNew}
                 disabled={entitlementUsage === entitlements}
+                as="div"
               >
                 {({ open }) => {
                   return (
-                    <div className="relative">
+                    <div>
                       <Listbox.Button
                         className="relative w-full cursor-default border
                   py-1.5 px-4 text-left shadow-sm sm:text-sm rounded-lg
@@ -553,7 +554,7 @@ const RemoveEntitelmentModal = ({
                       >
                         <Listbox.Options
                           className="absolute no-scrollbar w-full bg-white
-                        rounded-lg border max-h-[200px] overflow-auto"
+                        rounded-lg border max-h-[200px] max-w-[66.1833px] overflow-auto"
                         >
                           {Array.apply(null, Array(entitlements + 1)).map(
                             (_, i) => {
@@ -1132,7 +1133,7 @@ export default () => {
       </section>
 
       <section className="mt-10">
-        <article className="">
+        <article>
           <header className="flex flex-col lg:flex-row justify-between lg:items-center relative mb-6">
             <Text size="lg" weight="semibold" className="text-gray-900">
               Invoices & Payments
