@@ -15,8 +15,15 @@ import {
 } from '~/services/billing/stripe'
 import { RollupError } from '@proofzero/errors'
 
-type InvoiceLinesType = {
-  data: Array<{ price: { product: string }; amount: number; quantity: number }>
+type StripeInvoicePayload = {
+  customer: string
+  lines: {
+    data: Array<{
+      price: { product: string }
+      amount: number
+      quantity: number
+    }>
+  }
 }
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
@@ -160,11 +167,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         break
       case 'invoice.payment_succeeded':
         const { customer: customerSuccess, lines: linesSuccess } = event.data
-          .object as {
-          customer: string
-          lines: InvoiceLinesType
-        }
-
+          .object as StripeInvoicePayload
         const customerDataSuccess = await stripeClient.customers.retrieve(
           customerSuccess
         )
@@ -227,9 +230,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         break
       case 'invoice.payment_failed':
-        const { customer: customerFail } = event.data.object as {
-          customer: string
-        }
+        const { customer: customerFail } = event.data
+          .object as StripeInvoicePayload
         const customerDataFail = await stripeClient.customers.retrieve(
           customerFail
         )
