@@ -39,12 +39,13 @@ import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { requireJWT } from '~/utilities/session.server'
 
 import dangerVector from '~/images/danger.svg'
-import { planGuardWithToastException } from '~/utils/planGate.server'
+import { planGuardWithToastException } from '~/utils/planGate'
 import { ServicePlanType } from '@proofzero/types/account'
 import { appDetailsProps } from '~/types'
 
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 import domainSVG from '~/assets/early/domain.svg'
+import { AccountURN } from '@proofzero/urns/account'
 
 type AppData = { customDomain?: CustomDomain; hostname: string; cname: string }
 
@@ -83,7 +84,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const { appPlan } = await starbaseClient.getAppDetails.query({
       clientId,
     })
-    await planGuardWithToastException(appPlan, ServicePlanType.PRO, request, context.env)
+    await planGuardWithToastException(
+      appPlan,
+      ServicePlanType.PRO,
+      request,
+      context.env
+    )
 
     const passportUrl = new URL(context.env.PASSPORT_URL)
     const { hostname } = passportUrl
@@ -121,8 +127,9 @@ export default () => {
   const loaderData = useLoaderData<AppData>()
   const { customDomain, hostname } = fetcher.data || actionData || loaderData
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>()
-  const { appDetails } = useOutletContext<{
+  const { appDetails, accountURN } = useOutletContext<{
     appDetails: appDetailsProps
+    accountURN: AccountURN
   }>()
 
   useEffect(() => {
@@ -140,6 +147,10 @@ export default () => {
         copy="A custom domain feature in an authentication tool allows an organization to use its own domain name instead of the tool's default domain. This provides a more seamless user experience, improves brand consistency, and enhances the security of the authentication process by reducing the risk of phishing scams."
         imgSrc={domainSVG}
         url={'https://docs.rollup.id/platform/console/custom-domain'}
+        earlyAccess={false}
+        currentPlan={appDetails.appPlan}
+        featurePlan={ServicePlanType.PRO}
+        accountURN={accountURN}
       />
     )
   }

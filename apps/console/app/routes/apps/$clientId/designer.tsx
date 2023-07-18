@@ -80,16 +80,13 @@ import type { appDetailsProps } from '~/types'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { AddressURN } from '@proofzero/urns/address'
 import danger from '~/images/danger.svg'
-import {
-  ToastType,
-  Toaster,
-  toast,
-} from '@proofzero/design-system/src/atoms/toast'
+import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import classNames from 'classnames'
 import { ServicePlanType } from '@proofzero/types/account'
-import { planGuardWithToastException } from '~/utils/planGate.server'
+import { planGuardWithToastException } from '~/utils/planGate'
 import designerSVG from '~/assets/early/designer.webp'
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
+import { AccountURN } from '@proofzero/urns/account'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -107,8 +104,9 @@ const DesignerTab = ({
   selected: boolean
 }) => (
   <div
-    className={`box-border -mb-0.5 mr-8 pb-4 px-1 flex flex-row items-center gap-2 border-b-2 ${selected ? 'border-indigo-600' : 'border-transparent'
-      }`}
+    className={`box-border -mb-0.5 mr-8 pb-4 px-1 flex flex-row items-center gap-2 border-b-2 ${
+      selected ? 'border-indigo-600' : 'border-transparent'
+    }`}
   >
     <Icon
       className={`w-5 h-5 ${selected ? 'text-indigo-600' : 'text-gray-500'}`}
@@ -198,8 +196,9 @@ const RadiusButton = ({
   return (
     <button
       type="button"
-      className={`w-full py-1.5 px-2.5 rounded-md ${selected ? 'bg-indigo-500' : ''
-        }`}
+      className={`w-full py-1.5 px-2.5 rounded-md ${
+        selected ? 'bg-indigo-500' : ''
+      }`}
       onClick={(e) => {
         e.preventDefault()
         setRadius(radius)
@@ -331,7 +330,7 @@ const AuthPanel = ({
 
   const [signMessage, setSignMessage] = useState<string>(
     appTheme?.signMessageTemplate ??
-    AuthenticationScreenDefaults.defaultSignMessage
+      AuthenticationScreenDefaults.defaultSignMessage
   )
 
   const [radius, setRadius] = useState<string>(
@@ -354,10 +353,10 @@ const AuthPanel = ({
     }[]
   >(
     appTheme?.providers ??
-    AuthenticationScreenDefaults.knownKeys.map((k) => ({
-      key: k,
-      enabled: true,
-    }))
+      AuthenticationScreenDefaults.knownKeys.map((k) => ({
+        key: k,
+        enabled: true,
+      }))
   )
   const [providerModalOpen, setProviderModalOpen] = useState<boolean>(false)
 
@@ -382,9 +381,9 @@ const AuthPanel = ({
             :root {
                 ${getRGBColor(dark ? color.dark : color.light, 'primary')}
                 ${getRGBColor(
-          getTextColor(dark ? color.dark : color.light),
-          'primary-contrast-text'
-        )}
+                  getTextColor(dark ? color.dark : color.light),
+                  'primary-contrast-text'
+                )}
              {
          `}</style>
       </Helmet>
@@ -607,7 +606,7 @@ const AuthPanel = ({
               <IconPicker
                 maxSize={2097152}
                 id="image"
-                setIsFormChanged={(val) => { }}
+                setIsFormChanged={(val) => {}}
                 setIsImgUploading={(val) => {
                   setLoading(val)
                 }}
@@ -776,8 +775,8 @@ const AuthPanel = ({
                           'urn:rollupid:address/0xc2b930f1fc2a55ddc1bf99e8844ca0479567ac44f3e2eea58216660e26947686',
                       },
                     ]}
-                    selectEmailCallback={() => { }}
-                    addNewEmailCallback={() => { }}
+                    selectEmailCallback={() => {}}
+                    addNewEmailCallback={() => {}}
                     selectedConnectedAccounts={[]}
                     connectedAccounts={[
                       {
@@ -815,16 +814,16 @@ const AuthPanel = ({
                     ]}
                     selectedSCWallets={[]}
                     connectedSmartContractWallets={[]}
-                    addNewAccountCallback={() => { }}
-                    addNewSmartWalletCallback={() => { }}
-                    selectSmartWalletsCallback={() => { }}
-                    selectAccountsCallback={() => { }}
-                    selectAllAccountsCallback={() => { }}
-                    selectAllSmartWalletsCallback={() => { }}
+                    addNewAccountCallback={() => {}}
+                    addNewSmartWalletCallback={() => {}}
+                    selectSmartWalletsCallback={() => {}}
+                    selectAccountsCallback={() => {}}
+                    selectAllAccountsCallback={() => {}}
+                    selectAllSmartWalletsCallback={() => {}}
                     // disableAuthorize={true}
                     transitionState={'idle'}
-                    cancelCallback={() => { }}
-                    authorizeCallback={() => { }}
+                    cancelCallback={() => {}}
+                    authorizeCallback={() => {}}
                     radius={radius}
                   />
                 </Tab.Panel>
@@ -961,7 +960,7 @@ const EmailPanel = ({
               <IconPicker
                 maxSize={2097152}
                 id="logoURL"
-                setIsFormChanged={(val) => { }}
+                setIsFormChanged={(val) => {}}
                 setIsImgUploading={(val) => {
                   setLoading(val)
                 }}
@@ -1317,9 +1316,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         color:
           color && colorDark
             ? {
-              light: color,
-              dark: colorDark,
-            }
+                light: color,
+                dark: colorDark,
+              }
             : undefined,
         graphicURL: graphicURL,
         providers: providers,
@@ -1412,11 +1411,13 @@ export default () => {
     }[]
   }>()
 
-  const { appDetails, appContactAddress, appContactEmail } = useOutletContext<{
-    appDetails: appDetailsProps
-    appContactAddress?: AddressURN
-    appContactEmail?: string
-  }>()
+  const { appDetails, appContactAddress, appContactEmail, accountURN } =
+    useOutletContext<{
+      appDetails: appDetailsProps
+      appContactAddress?: AddressURN
+      appContactEmail?: string
+      accountURN: AccountURN
+    }>()
 
   const actionData = useActionData()
   const errors = actionData?.errors
@@ -1437,12 +1438,17 @@ export default () => {
   if (appDetails.appPlan === ServicePlanType.FREE) {
     return (
       <EarlyAccessPanel
+        clientID={appDetails.clientId as string}
         title="Designer"
         subtitle="Customize your Login Experience"
         copy="With a white label feature in your authentication tool, you can customize the user interface to match your brand, giving a seamless experience to your users. This not only enhances brand consistency but also establishes trust with users, making it an essential security measure for protecting sensitive data."
         imgSrc={designerSVG}
         imgClassName="w-[363px]"
         url={'https://docs.rollup.id/platform/console/designer'}
+        earlyAccess={false}
+        currentPlan={appDetails.appPlan}
+        featurePlan={ServicePlanType.PRO}
+        accountURN={accountURN}
       />
     )
   }

@@ -38,7 +38,11 @@ export default function handleRequest(
     (nonce, dev) =>
       getCSP({
         directives: {
-          'default-src': [SELF, 'https://verify.walletconnect.com'],
+          'default-src': [
+            SELF,
+            'https://verify.walletconnect.com',
+            'form.typeform.com',
+          ],
           'connect-src': [
             SELF,
             '*.google-analytics.com',

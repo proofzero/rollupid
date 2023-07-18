@@ -5,7 +5,10 @@ import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { commitFlashSession } from '~/utilities/session.server'
 import { Env } from 'bindings'
 
-const isPlanGuarded = (appPlan: ServicePlanType, gatePlan: ServicePlanType) => {
+export const isPlanGuarded = (
+  appPlan: ServicePlanType,
+  gatePlan: ServicePlanType
+) => {
   const typeImportance = [ServicePlanType.FREE, ServicePlanType.PRO]
 
   if (
