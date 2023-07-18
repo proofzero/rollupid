@@ -47,7 +47,7 @@ jobs:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'platform/edges'
-          command: d1 migrations apply edges-current --env current
+          command: d1 migrations apply edges-v2-current --env current
           environment: 'current'
 
       - name: Deploy edges current Worker
