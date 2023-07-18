@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
@@ -18,7 +19,6 @@ import {
   HTTP_STATUS_CODES,
 } from '@proofzero/errors'
 import { generateEmailOTP } from '~/utils/emailOTP'
-import { useState } from 'react'
 
 export const action: ActionFunction = async ({ request, params }) => {
   const fd = await request.formData()
@@ -44,6 +44,7 @@ export default () => {
     prompt?: string
   }>()
 
+  const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string>('')
 
@@ -108,6 +109,7 @@ export default () => {
             onClick={async (e: any) => {
               e.preventDefault()
               e.stopPropagation()
+              setLoading(true)
               try {
                 const result = await generateEmailOTP(email)
                 if (result?.state && result.state.length) {
@@ -125,8 +127,9 @@ export default () => {
               } catch (e: any) {
                 setErrorMessage(e.message ? e.message : e.toString())
               }
+              setLoading(false)
             }}
-            disabled={transition.state !== 'idle'}
+            disabled={transition.state !== 'idle' || loading}
             btnType="primary-alt-skin"
             className="w-full"
           >
