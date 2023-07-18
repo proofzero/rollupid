@@ -74,6 +74,7 @@ import {
 } from '~/services/billing/stripe'
 import { useHydrated } from 'remix-utils'
 import _ from 'lodash'
+import { BadRequestError } from '@proofzero/errors'
 
 type StripeInvoice = {
   amount: number
@@ -183,12 +184,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const starbaseClient = createStarbaseClient(context.env.Starbase, {
-      ...getAuthzHeaderConditionallyFromToken(undefined),
+      ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
 
     const addressClient = createAddressClient(context.env.Address, {
-      ...getAuthzHeaderConditionallyFromToken(undefined),
+      ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
 
@@ -199,6 +200,18 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       customerID: string
       quantity: number
       txType: 'buy' | 'remove'
+    }
+
+    const apps = await starbaseClient.listApps.query()
+    const assignedEntitlementCount = apps.filter(
+      (a) => a.appPlan === ServicePlanType.PRO
+    ).length
+    if (assignedEntitlementCount > quantity) {
+      throw new BadRequestError({
+        message: `Invalid quantity. Change ${
+          quantity - assignedEntitlementCount
+        } of the ${assignedEntitlementCount} apps to a different plan first.`,
+      })
     }
 
     const entitlements = await accountClient.getEntitlements.query({
@@ -469,7 +482,7 @@ const RemoveEntitelmentModal = ({
         weight="semibold"
         className="text-left text-gray-800 mx-5"
       >
-        Purchase Entitlement(s)
+        Remove Entitlement(s)
       </Text>
       <section className="m-5 border rounded-lg overflow-auto thin-scrollbar">
         <div className="p-6">
@@ -489,9 +502,19 @@ const RemoveEntitelmentModal = ({
         </div>
         <div className="border-b border-gray-200"></div>
         <div className="p-6 flex justify-between items-center">
-          <Text size="sm" weight="medium" className="text-gray-800 text-left">
-            Number of Entitlements
-          </Text>
+          <div>
+            <Text size="sm" weight="medium" className="text-gray-800 text-left">
+              Number of Entitlements
+            </Text>
+            <Text
+              size="sm"
+              weight="medium"
+              className="text-[#6B7280] text-left"
+            >{`${entitlementUsage} x ${
+              plans[ServicePlanType.PRO].price
+            }/month`}</Text>
+          </div>
+
           <div className="flex flex-row text-[#6B7280] space-x-4">
             <div className="flex flex-row items-center space-x-2">
               <Text size="sm">{entitlements} Entitlements</Text>
@@ -502,6 +525,7 @@ const RemoveEntitelmentModal = ({
               <Listbox
                 value={proEntitlementNew}
                 onChange={setProEntitlementNew}
+                disabled={entitlementUsage === entitlements}
               >
                 {({ open }) => {
                   return (
@@ -576,9 +600,9 @@ const RemoveEntitelmentModal = ({
           </Text>
 
           <div className="flex flex-row gap-2 items-center">
-            <Text size="lg" weight="semibold" className="text-gray-900">{`-$${
-              plan.price * (entitlements - proEntitlementNew)
-            }`}</Text>
+            <Text size="lg" weight="semibold" className="text-gray-900">{`${
+              plan.price * (entitlements - proEntitlementNew) !== 0 ? '-' : ''
+            }$${plan.price * (entitlements - proEntitlementNew)}`}</Text>
             <Text size="sm" weight="medium" className="text-gray-500">
               per month
             </Text>
@@ -588,7 +612,12 @@ const RemoveEntitelmentModal = ({
       <section className="flex flex-row-reverse gap-4 mt-auto m-5">
         <Button
           btnType="dangerous-alt"
-          disabled={!paymentData?.paymentMethodID}
+          disabled={
+            !paymentData?.paymentMethodID ||
+            entitlementUsage === entitlements ||
+            proEntitlementNew < entitlementUsage ||
+            proEntitlementNew === entitlements
+          }
           onClick={() => {
             setIsOpen(false)
             setProEntitlementNew(1)
@@ -608,7 +637,7 @@ const RemoveEntitelmentModal = ({
             )
           }}
         >
-          Remove Entitelment(s)
+          Remove Entitlement(s)
         </Button>
         <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
           Cancel
