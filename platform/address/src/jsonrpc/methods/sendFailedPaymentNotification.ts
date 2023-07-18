@@ -4,27 +4,27 @@ import { Context } from '../../context'
 
 import { EmailThemePropsSchema } from '@proofzero/platform/email/src/emailFunctions'
 
-export const SendBillingNotificationInput = z.object({
+export const SendFailedPaymentNotificationInput = z.object({
   email: z.string(),
   name: z.string(),
   themeProps: EmailThemePropsSchema.optional(),
 })
 
-type SendBillingNotificationParams = z.infer<
-  typeof SendBillingNotificationInput
+type SendFailedPaymentNotificationParams = z.infer<
+  typeof SendFailedPaymentNotificationInput
 >
 
-export const sendBillingNotificationMethod = async ({
+export const sendFailedPaymentNotificationMethod = async ({
   input,
   ctx,
 }: {
-  input: SendBillingNotificationParams
+  input: SendFailedPaymentNotificationParams
   ctx: Context
 }) => {
   const { email, name, themeProps } = input
 
-  await ctx.emailClient.sendBillingNotification.mutate({
-    emailAddress: email,
+  await ctx.emailClient.sendFailedPaymentNotification.mutate({
+    email: email,
     name: name,
     themeProps,
   })

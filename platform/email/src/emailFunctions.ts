@@ -3,13 +3,16 @@ import {
   EmailTemplateBillingReconciledEntitlements,
   EmailTemplateDevReconciledEntitlements,
   EmailTemplateExpiredSubscription,
+  EmailTemplateFailedPayment,
   EmailTemplateOTP,
   EmailTemplateParams,
+  EmailTemplateSuccessfulPayment,
 } from '../emailTemplate'
 import { EmailMessage, EmailNotification } from './types'
 import { CloudflareEmailMessage, EmailContent, Environment } from './types'
 import { Context } from './context'
 import { z } from 'zod'
+import { type EmailPlans } from './jsonrpc/methods/sendSuccesfullPaymentNotification'
 
 export const EmailThemePropsSchema = z.object({
   privacyURL: z.string().url(),
@@ -234,6 +237,29 @@ export const getMagicLinkEmailContent = (
     subject: `Rollup email login link`,
     body: `Your email login link to rollup.id is <a href="${magicLinkUrl}">. For security reasons, this link is only valid for 1 minute.`,
   }
+}
+
+export const getFailedPaymentEmailContent = (
+  params?: Partial<EmailTemplateParams>
+): EmailContent => {
+  params = adjustEmailParams(params)
+
+  return EmailTemplateFailedPayment(params as EmailTemplateParams)
+}
+
+export const getSuccessfulPaymentEmailContent = ({
+  params,
+  plans,
+}: {
+  params?: Partial<EmailTemplateParams>
+  plans: EmailPlans
+}): EmailContent => {
+  params = adjustEmailParams(params)
+
+  return EmailTemplateSuccessfulPayment({
+    params: params as EmailTemplateParams,
+    plans,
+  })
 }
 
 export const getEmailContent = ({

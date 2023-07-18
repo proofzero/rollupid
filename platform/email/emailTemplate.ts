@@ -1,4 +1,5 @@
 import { EmailContent, EmailContentType } from './src/types'
+import { type EmailPlans } from './src/jsonrpc/methods/sendSuccesfullPaymentNotification'
 
 export const darkModeStyles = `
     body {
@@ -338,7 +339,7 @@ export const EmailTemplateDevReconciledEntitlements = (
   }
 ): EmailContent => {
   const content = `<div class="heading">Application Plan Downgraded ⬇️</div>
-  
+
   <p>
     Rollup application <b>"${appName}"</b> was downgraded to <b>${planType}</b> plan.
   </p>
@@ -353,4 +354,60 @@ export const EmailTemplateDevReconciledEntitlements = (
   </p>`
 
   return EmailTemplateBase(params, content, 'App Downgraded')
+}
+
+export const EmailTemplateFailedPayment = (
+  params: EmailTemplateParams
+): EmailContent => {
+  const content = `<div class="heading">Payment Issue Detected</div>
+
+  <p>
+    Your payment for the Rollup ID has failed.
+  </p>
+
+  <p>
+    Please update your payment details on the <a href=${'https://console.rollup.id/billing'}>billing page</a>.
+  </p>
+
+  <p>
+  Thank You for using Rollup <br />
+    - The Rollup Team
+  </p>`
+
+  return EmailTemplateBase(
+    params,
+    content,
+    'Payment Failed - Action Required for Rollup ID'
+  )
+}
+
+export const EmailTemplateSuccessfulPayment = ({
+  params,
+  plans,
+}: {
+  params: EmailTemplateParams
+  plans: EmailPlans
+}): EmailContent => {
+  const content = `<div class="heading">Payment Successful</div>
+  <p>
+    Your payment for the <b>Rollup ID</b> has been processed successfully.
+  </p>
+
+  <p>
+    Thank you for your continued support. Enjoy using <b>Rollup ID</b>!
+  </p>
+
+  <p> Here's the list of your purchases: </p>
+  <ul>
+  ${plans.map((plan) => {
+    return `<li>${plan.quantity} entitlement(s) of <b>${plan.name}</b></li>`
+  })}
+  </ul>
+
+  <p>
+    Best, <br />
+    - The Rollup Team
+  </p>`
+
+  return EmailTemplateBase(params, content, 'Payment Successful')
 }
