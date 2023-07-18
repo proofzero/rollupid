@@ -1,25 +1,42 @@
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { FeaturePill } from '@proofzero/design-system/src/atoms/pills/FeaturePill'
-import { ButtonAnchor } from '@proofzero/design-system/src/atoms/buttons/ButtonAnchor'
-import { FaDiscord, FaGithub, FaTwitter } from 'react-icons/fa'
 import { DocumentationBadge } from '../DocumentationBadge'
+import { AccountURN } from '@proofzero/urns/account'
+import ContactUs from '../ContactUs'
+import { ServicePlanType } from '@proofzero/types/account'
+import { isPlanGuarded } from '~/utils/planGate'
+import plans from '~/routes/__layout/billing/plans'
+import _ from 'lodash'
+import { TbLock } from 'react-icons/tb'
+import { Button } from '@proofzero/design-system'
+import { NavLink } from '@remix-run/react'
 
 type EarlyAccessPanelProps = {
+  clientID: string
   title: string
   subtitle: string
   copy: string
   imgSrc: string
   url: string
   imgClassName?: string
+  currentPlan: ServicePlanType
+  featurePlan?: ServicePlanType
+  accountURN: AccountURN
+  earlyAccess: boolean
 }
 
 const EarlyAccessPanel = ({
+  clientID,
   title,
   subtitle,
   copy,
   imgSrc,
   url,
   imgClassName,
+  currentPlan,
+  featurePlan,
+  accountURN,
+  earlyAccess,
 }: EarlyAccessPanelProps) => {
   return (
     <>
@@ -36,48 +53,43 @@ const EarlyAccessPanel = ({
 
       <div className="bg-white p-10 rounded-lg shadow flex flex-col lg:flex-row lg:space-x-28 space-y-4 lg:space-y-0">
         <section className="flex-1">
-          <div className="mb-4">
-            <FeaturePill text="Early Access" />
+          <div className="mb-4 flex flex-row items-center gap-2">
+            {featurePlan && (
+              <FeaturePill
+                Icon={TbLock}
+                text={`${_.toUpper(
+                  plans[featurePlan].title.split(' ')[0]
+                )} feature`}
+              />
+            )}
+            {earlyAccess && <FeaturePill text="Early Access" />}
           </div>
-
           <Text size="2xl" weight="semibold" className="text-gray-900 mb-2">
             {subtitle}
           </Text>
-
           <Text weight="normal" className="text-gray-500">
             {copy}
           </Text>
-
           <div className="w-full border-t border-gray-200 mt-8 mb-4" />
 
-          <div>
-            <Text size="sm" weight="medium" className="mb-3 text-gray-700">
-              Follow us for updates
-            </Text>
+          {featurePlan && isPlanGuarded(currentPlan, featurePlan) && (
+            <NavLink to={`/apps/${clientID}/billing`}>
+              <Button btnType="primary-alt" className="mb-4">
+                Upgrade Plan
+              </Button>
+            </NavLink>
+          )}
 
-            <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-2">
-              <ButtonAnchor key="twitter" href="https://twitter.com/rollupid">
-                <FaTwitter className="text-base text-[#1D9BF0]" />
-
-                <Text>Twitter</Text>
-              </ButtonAnchor>
-
-              <ButtonAnchor key="discord" href="https://discord.gg/rollupid">
-                <FaDiscord className="text-base text-[#5865F2]" />
-
-                <Text>Discord</Text>
-              </ButtonAnchor>
-
-              <ButtonAnchor
-                key="github"
-                href="https://github.com/proofzero/rollupid"
-              >
-                <FaGithub className="text-base" />
-
-                <Text>GitHub</Text>
-              </ButtonAnchor>
-            </div>
-          </div>
+          <ContactUs
+            urn={accountURN}
+            type={
+              featurePlan
+                ? isPlanGuarded(currentPlan, featurePlan)
+                  ? 'text'
+                  : 'btn'
+                : 'btn'
+            }
+          />
         </section>
 
         <section className="hidden lg:block">
