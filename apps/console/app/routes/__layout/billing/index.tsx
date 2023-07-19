@@ -74,7 +74,7 @@ import {
 } from '~/services/billing/stripe'
 import { useHydrated } from 'remix-utils'
 import _ from 'lodash'
-import { BadRequestError } from '@proofzero/errors'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 
 type StripeInvoice = {
   amount: number
@@ -106,6 +106,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
+    const addressClient = createAddressClient(context.env.Address, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
     const { plans, subscriptionID } = await accountClient.getEntitlements.query(
       {
         accountURN,
@@ -123,6 +128,25 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const spd = await accountClient.getStripePaymentData.query({
       accountURN,
     })
+    if (spd && !spd.addressURN) {
+      const targetAddressURN = await addressClient.getAddressURNForEmail.query(
+        spd.email.toLowerCase()
+      )
+
+      if (!targetAddressURN) {
+        throw new InternalServerError({
+          message: 'No address found for email',
+        })
+      }
+
+      await accountClient.setStripePaymentData.mutate({
+        ...spd,
+        addressURN: targetAddressURN,
+        accountURN,
+      })
+
+      spd.addressURN = targetAddressURN
+    }
 
     let invoices: StripeInvoice[] = []
     if (subscriptionID) {
@@ -953,7 +977,9 @@ export default () => {
   const [selectedEmail, setSelectedEmail] = useState<string | undefined>(
     paymentData?.email
   )
-  const [selectedEmailURN, setSelectedEmailURN] = useState<string | undefined>()
+  const [selectedEmailURN, setSelectedEmailURN] = useState<string | undefined>(
+    paymentData?.addressURN
+  )
   const [fullName, setFullName] = useState<string | undefined>(
     paymentData?.name
   )
@@ -1024,7 +1050,7 @@ export default () => {
                     payload: JSON.stringify({
                       name: fullName,
                       email: selectedEmail,
-                      emailURN: selectedEmailURN,
+                      addressURN: selectedEmailURN,
                     }),
                   },
                   {
@@ -1113,7 +1139,7 @@ export default () => {
                     ConnectButtonPhrase="Connect New Email Address"
                     defaultItems={
                       connectedEmails.filter(
-                        (ce) => ce.title === paymentData?.email
+                        (ce) => ce.value === paymentData?.addressURN
                       ) as DropdownSelectListItem[]
                     }
                   />

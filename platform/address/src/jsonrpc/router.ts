@@ -106,6 +106,11 @@ import {
   sendSuccessfulPaymentNotificationMethod,
   SendSuccessfulPaymentNotificationInput,
 } from './methods/sendSuccessfulPaymentNotification'
+import {
+  GetAddressURNForEmailInputSchema,
+  getAddressURNForEmailMethod,
+  GetAddressURNForEmailOutputSchema,
+} from './methods/getAddressURNForEmail'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -300,4 +305,10 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(SendSuccessfulPaymentNotificationInput)
     .mutation(sendSuccessfulPaymentNotificationMethod),
+  getAddressURNForEmail: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAddressURNForEmailInputSchema)
+    .output(GetAddressURNForEmailOutputSchema)
+    .query(getAddressURNForEmailMethod),
 })

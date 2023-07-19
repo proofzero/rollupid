@@ -18,6 +18,7 @@ export const GetStripePaymentDataOutputSchema = z
     email: z.string(),
     name: z.string(),
     paymentMethodID: z.string().optional(),
+    addressURN: AddressURNInput.optional(),
   })
   .optional()
 type GetStripePaymentDataOutput = z.infer<
@@ -42,7 +43,7 @@ export const SetStripePaymentDataInputSchema = z.object({
   accountURN: AccountURNInput,
   name: z.string(),
   email: z.string(),
-  addressURN: AddressURNInput.optional(),
+  addressURN: AddressURNInput,
 })
 type SetStripePaymentDataInput = z.infer<typeof SetStripePaymentDataInputSchema>
 
@@ -62,6 +63,7 @@ export const setStripePaymentData = async ({
     customerID,
     paymentMethodID,
     email,
+    addressURN,
     name,
   })
 
