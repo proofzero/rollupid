@@ -7,7 +7,8 @@ const alg = 'ES256'
 
 const teamId = process.argv[2] || process.env.TEAM_ID
 const clientId = process.argv[3] || process.env.CLIENT_ID
-const keyFile = process.argv[4]
+const kid = process.argv[4] || process.env.KID
+const keyFile = process.argv[5]
 
 const privateKey = keyFile
   ? readFileSync(keyFile, 'utf8')
@@ -19,7 +20,7 @@ if (!privateKey) {
 
 jose.importPKCS8(privateKey, alg).then((privateKey) => {
   new jose.SignJWT({})
-    .setProtectedHeader({ alg })
+    .setProtectedHeader({ alg, kid })
     .setAudience('https://appleid.apple.com')
     .setExpirationTime('180 days')
     .setIssuedAt()
