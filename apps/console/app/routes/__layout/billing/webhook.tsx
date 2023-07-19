@@ -170,7 +170,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           // in production without
           // addressURN
           let inferredAddressURN
-          if (!paymentData.addressURN) {
+          if (paymentData && !paymentData.addressURN) {
             inferredAddressURN =
               await addressClient.getAddressURNForEmail.query(
                 email.toLowerCase()

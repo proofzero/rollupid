@@ -128,7 +128,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const spd = await accountClient.getStripePaymentData.query({
       accountURN,
     })
-    if (!spd.addressURN) {
+    if (spd && !spd.addressURN) {
       const targetAddressURN = await addressClient.getAddressURNForEmail.query(
         spd.email.toLowerCase()
       )
