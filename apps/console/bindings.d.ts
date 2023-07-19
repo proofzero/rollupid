@@ -25,6 +25,7 @@ interface Env {
   SECRET_STRIPE_PRO_PLAN_ID: string
 
   POSTHOG_API_KEY: string
+  POSTHOG_PROXY_HOST: string
 
   CONSOLE_URL: string
   //Needed to make Remix work with Cloudflare module workers

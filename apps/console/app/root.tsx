@@ -13,7 +13,6 @@ import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { json } from '@remix-run/cloudflare'
 
 import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
-import { POSTHOG_PROXY_HOST } from '@proofzero/utils/posthog'
 
 import {
   Links,
@@ -89,6 +88,7 @@ export type LoaderData = {
   displayName: string
   ENV: {
     POSTHOG_API_KEY: string
+    POSTHOG_PROXY_HOST: string
     INTERNAL_GOOGLE_ANALYTICS_TAG: string
     REMIX_DEV_SERVER_WS_PORT?: number
     WALLET_CONNECT_PROJECT_ID: string
@@ -143,6 +143,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
       const {
         PASSPORT_URL,
+        POSTHOG_PROXY_HOST,
         POSTHOG_API_KEY,
         INTERNAL_GOOGLE_ANALYTICS_TAG,
         WALLET_CONNECT_PROJECT_ID,
@@ -154,6 +155,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         PASSPORT_URL,
         ENV: {
           POSTHOG_API_KEY,
+          POSTHOG_PROXY_HOST,
           INTERNAL_GOOGLE_ANALYTICS_TAG,
           REMIX_DEV_SERVER_WS_PORT:
             process.env.NODE_ENV === 'development'
@@ -197,7 +199,7 @@ export default function App() {
     if (hydrated) {
       try {
         posthog?.init(loaderData.ENV.POSTHOG_API_KEY, {
-          api_host: POSTHOG_PROXY_HOST,
+          api_host: loaderData.ENV.POSTHOG_PROXY_HOST,
           autocapture: false,
         })
 

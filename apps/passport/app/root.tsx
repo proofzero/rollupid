@@ -24,7 +24,6 @@ import {
 import { RollupIdButton } from '~/components'
 
 import globalStyles from '@proofzero/design-system/src/styles/global.css'
-import { POSTHOG_PROXY_HOST } from '@proofzero/utils/posthog'
 import styles from './styles/tailwind.css'
 
 import appleIcon from '~/assets/root-apple-touch-icon.png'
@@ -139,6 +138,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         ENV: {
           POSTHOG_API_KEY: context.env.POSTHOG_API_KEY,
           PROFILE_APP_URL: context.env.PROFILE_APP_URL,
+          POSTHOG_PROXY_HOST: context.env.POSTHOG_PROXY_HOST,
           INTERNAL_GOOGLE_ANALYTICS_TAG:
             context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
           REMIX_DEV_SERVER_WS_PORT:
@@ -225,7 +225,7 @@ export default function App() {
     if (hydrated) {
       try {
         posthog?.init(browserEnv.ENV.POSTHOG_API_KEY, {
-          api_host: POSTHOG_PROXY_HOST,
+          api_host: browserEnv.ENV.POSTHOG_PROXY_HOST,
           autocapture: false,
         })
         posthog?.reset()

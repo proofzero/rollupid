@@ -49,7 +49,7 @@ export default function handleRequest(
             'wss://relay.walletconnect.com',
             'https://*.g.alchemy.com',
             'https://upload.imagedelivery.net',
-            'https://posthog.rollup.id',
+            'https://analytics.rollup.id',
             // Used for Remix WebSocket Live Reaload
             ...(dev ? ['ws://localhost:*/socket'] : []),
           ],

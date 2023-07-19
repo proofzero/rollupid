@@ -13,7 +13,7 @@ import {
   getRollupReqFunctionErrorWrapper,
 } from '@proofzero/utils/errors'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
-import { posthogCall } from '@proofzero/utils/posthog'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { type AccountURN } from '@proofzero/urns/account'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
@@ -34,7 +34,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
     try {
       await starbaseClient.deleteApp.mutate({ clientId })
-      await posthogCall({
+      await createAnalyticsEvent({
         apiKey: context.env.POSTHOG_API_KEY,
         eventName: 'app_deleted',
         distinctId: accountURN,

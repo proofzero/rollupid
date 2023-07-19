@@ -43,7 +43,7 @@ export default function handleRequest(
             'https://*.g.alchemy.com',
             '*.alchemyapi.io',
             '*.google-analytics.com',
-            'https://posthog.rollup.id',
+            'https://analytics.rollup.id',
             // Used for Remix WebSocket Live Reaload
             ...(dev ? ['ws://localhost:*/socket'] : []),
           ],

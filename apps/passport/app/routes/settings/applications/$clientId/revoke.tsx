@@ -7,7 +7,7 @@ import { getAccessClient } from '~/platform.server'
 import { getFlashSession, commitFlashSession } from '~/session.server'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { posthogCall } from '@proofzero/utils/posthog'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
@@ -34,7 +34,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         issuer: new URL(request.url).origin,
       })
 
-      await posthogCall({
+      await createAnalyticsEvent({
         apiKey: context.env.POSTHOG_API_KEY,
         distinctId: accountUrn,
         eventName: 'app_authorization_revoked',

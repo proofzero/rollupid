@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { Form, NavLink, useFetcher, useOutletContext } from '@remix-run/react'
 
@@ -26,7 +26,7 @@ import type { ActionFunction } from '@remix-run/cloudflare'
 import type { AddressURN } from '@proofzero/urns/address'
 import { RollupError, ERROR_CODES, BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { posthogCall } from '@proofzero/utils/posthog'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -76,6 +76,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           apps.map((app) => {
             return accessClient.revokeAppAuthorization.mutate({
               clientId: app.clientId,
+              issuer: new URL(request.url).origin,
             })
           })
         ),
@@ -104,7 +105,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    await posthogCall({
+    await createAnalyticsEvent({
       apiKey: context.env.POSTHOG_API_KEY,
       eventName: 'delete_rollup_identity',
       distinctId: accountUrn,

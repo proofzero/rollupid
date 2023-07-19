@@ -5,7 +5,7 @@ import {
   getValidatedSessionContext,
 } from '~/session.server'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { posthogCall } from '@proofzero/utils/posthog'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -27,7 +27,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       nickname: name,
     })
 
-    await posthogCall({
+    await createAnalyticsEvent({
       apiKey: context.env.POSTHOG_API_KEY,
       distinctId: accountUrn,
       eventName: 'address_renamed',
