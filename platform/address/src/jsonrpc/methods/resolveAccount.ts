@@ -10,7 +10,7 @@ import { Context } from '../../context'
 import { appRouter } from '../router'
 
 import { WriteAnalyticsDataPoint } from '@proofzero/platform-clients/analytics'
-import { createAnalyticsEvent } from '@proofzero/packages/utils/posthog'
+import { createAnalyticsEvent } from '@proofzero/packages/utils/analytics'
 
 import * as jose from 'jose'
 

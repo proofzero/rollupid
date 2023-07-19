@@ -13,7 +13,7 @@ import {
   getRollupReqFunctionErrorWrapper,
 } from '@proofzero/utils/errors'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
-import { createAnalyticsEvent } from '@proofzero/utils/posthog'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { type AccountURN } from '@proofzero/urns/account'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(

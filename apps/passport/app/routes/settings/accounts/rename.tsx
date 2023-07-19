@@ -5,7 +5,7 @@ import {
   getValidatedSessionContext,
 } from '~/session.server'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { createAnalyticsEvent } from '@proofzero/utils/posthog'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {

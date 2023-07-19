@@ -7,7 +7,7 @@ import { getAccessClient } from '~/platform.server'
 import { getFlashSession, commitFlashSession } from '~/session.server'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { createAnalyticsEvent } from '@proofzero/utils/posthog'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {

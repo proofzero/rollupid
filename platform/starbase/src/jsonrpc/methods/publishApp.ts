@@ -3,7 +3,7 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
-import { createAnalyticsEvent } from '@proofzero/utils/posthog'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const PublishAppInput = z.object({
   clientId: z.string(),
