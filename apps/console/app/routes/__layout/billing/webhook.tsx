@@ -171,16 +171,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           // addressURN
           let inferredAddressURN
           if (!paymentData.addressURN) {
-            const addresses = await accountClient.getAddresses.query({
-              account: cusMeta.accountURN,
-            })
-
-            const targetAddress = addresses?.find(
-              (address) =>
-                address.qc.alias.toLowerCase() === email.toLowerCase()
-            )
-
-            inferredAddressURN = targetAddress?.baseUrn as AddressURN
+            inferredAddressURN =
+              await addressClient.getAddressURNForEmail.query(
+                email.toLowerCase()
+              )
 
             if (!inferredAddressURN) {
               throw new InternalServerError({

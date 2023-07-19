@@ -75,7 +75,6 @@ import {
 import { useHydrated } from 'remix-utils'
 import _ from 'lodash'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
-import { AddressURN } from '@proofzero/urns/address'
 
 type StripeInvoice = {
   amount: number
@@ -107,6 +106,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
+    const addressClient = createAddressClient(context.env.Address, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
     const { plans, subscriptionID } = await accountClient.getEntitlements.query(
       {
         accountURN,
@@ -125,23 +129,23 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
     if (!spd.addressURN) {
-      const targetAddress = connectedAccounts?.find(
-        (address) => address.qc.alias.toLowerCase() === spd.email.toLowerCase()
+      const targetAddressURN = await addressClient.getAddressURNForEmail.query(
+        spd.email.toLowerCase()
       )
 
-      if (!targetAddress) {
+      if (!targetAddressURN) {
         throw new InternalServerError({
           message: 'No address found for email',
         })
       }
 
-      spd.addressURN = targetAddress.baseUrn as AddressURN
-
       await accountClient.setStripePaymentData.mutate({
         ...spd,
-        addressURN: targetAddress.baseUrn as AddressURN, // Typescript appeasement
+        addressURN: targetAddressURN,
         accountURN,
       })
+
+      spd.addressURN = targetAddressURN
     }
 
     let invoices: StripeInvoice[] = []
@@ -973,7 +977,9 @@ export default () => {
   const [selectedEmail, setSelectedEmail] = useState<string | undefined>(
     paymentData?.email
   )
-  const [selectedEmailURN, setSelectedEmailURN] = useState<string | undefined>()
+  const [selectedEmailURN, setSelectedEmailURN] = useState<string | undefined>(
+    paymentData?.addressURN
+  )
   const [fullName, setFullName] = useState<string | undefined>(
     paymentData?.name
   )
