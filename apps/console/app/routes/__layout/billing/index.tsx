@@ -88,7 +88,10 @@ type LoaderData = {
   entitlements: {
     [ServicePlanType.PRO]: number
   }
-  successToast?: string
+  toastNotification?: {
+    message: string
+    type: ToastType
+  }
   connectedEmails: DropdownSelectListItem[]
   invoices: StripeInvoice[]
 }
@@ -118,7 +121,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     )
 
     const flashSession = await getFlashSession(request, context.env)
-    const successToast = flashSession.get('success_toast')
+
+    let toastNotification = undefined
+    const toastStr = flashSession.get('toastNotification')
+    if (toastStr) {
+      toastNotification = JSON.parse(toastStr)
+    }
 
     const connectedAccounts = await accountClient.getAddresses.query({
       account: accountURN,
@@ -181,9 +189,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           [ServicePlanType.PRO]:
             plans?.[ServicePlanType.PRO]?.entitlements ?? 0,
         },
-        successToast,
         connectedEmails,
         invoices,
+        toastNotification,
       },
       {
         headers: {
@@ -266,25 +274,54 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       )
     }
 
-    await reconcileAppSubscriptions(
-      {
-        subscriptionID: sub.id,
-        accountURN,
-        accountClient,
-        starbaseClient,
-        addressClient,
-        billingURL: `${context.env.CONSOLE_URL}/billing`,
-        settingsURL: `${context.env.CONSOLE_URL}`,
-      },
-      context.env
-    )
+    if (
+      (txType === 'buy' &&
+        (sub.status === 'active' || sub.status === 'trialing')) ||
+      txType !== 'buy'
+    ) {
+      await reconcileAppSubscriptions(
+        {
+          subscriptionID: sub.id,
+          accountURN,
+          accountClient,
+          starbaseClient,
+          addressClient,
+          billingURL: `${context.env.CONSOLE_URL}/billing`,
+          settingsURL: `${context.env.CONSOLE_URL}`,
+        },
+        context.env
+      )
+    }
 
     const flashSession = await getFlashSession(request, context.env)
     if (txType === 'buy') {
-      flashSession.flash('success_toast', 'Entitlement(s) successfully bought')
+      // https://stripe.com/docs/billing/subscriptions/overview#subscription-statuses
+      if (sub.status === 'active' || sub.status === 'trialing') {
+        flashSession.flash(
+          'toastNotification',
+          JSON.stringify({
+            type: ToastType.Success,
+            message: 'Entitlement(s) successfully bought',
+          })
+        )
+      } else {
+        flashSession.flash(
+          'toastNotification',
+          JSON.stringify({
+            type: ToastType.Error,
+            message: 'Payment failed - check your card details',
+          })
+        )
+      }
     }
     if (txType === 'remove') {
-      flashSession.flash('success_toast', 'Entitlement(s) successfully removed')
+      flashSession.flash(
+        'toastNotification',
+        JSON.stringify({
+          type: ToastType.Success,
+          message: 'Entitlement(s) successfully removed',
+        })
+      )
     }
 
     return new Response(null, {
@@ -943,18 +980,30 @@ const PlanCard = ({
 }
 
 export default () => {
-  const { entitlements, successToast, paymentData, connectedEmails, invoices } =
-    useLoaderData<LoaderData>()
+  const {
+    entitlements,
+    toastNotification,
+    paymentData,
+    connectedEmails,
+    invoices,
+  } = useLoaderData<LoaderData>()
 
   const { apps, PASSPORT_URL } = useOutletContext<OutletContextData>()
 
   useEffect(() => {
-    if (successToast) {
-      toast(ToastType.Success, {
-        message: successToast,
-      })
+    if (toastNotification) {
+      if (toastNotification.type === ToastType.Success) {
+        toast(ToastType.Success, {
+          message: toastNotification.message,
+        })
+      }
+      if (toastNotification.type === ToastType.Error) {
+        toast(ToastType.Error, {
+          message: toastNotification.message,
+        })
+      }
     }
-  }, [successToast])
+  }, [toastNotification])
 
   const redirectToPassport = () => {
     const currentURL = new URL(window.location.href)
