@@ -13,7 +13,7 @@ import {
   reconcileAppSubscriptions,
   updateSubscriptionMetadata,
 } from '~/services/billing/stripe'
-import { RollupError } from '@proofzero/errors'
+import { InternalServerError, RollupError } from '@proofzero/errors'
 import { AddressURN } from '@proofzero/urns/address'
 
 type StripeInvoicePayload = {
@@ -183,7 +183,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             inferredAddressURN = targetAddress?.baseUrn as AddressURN
 
             if (!inferredAddressURN) {
-              throw new RollupError({
+              throw new InternalServerError({
                 message: `Could not find address for email ${email}`,
               })
             }

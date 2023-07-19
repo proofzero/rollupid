@@ -74,9 +74,8 @@ import {
 } from '~/services/billing/stripe'
 import { useHydrated } from 'remix-utils'
 import _ from 'lodash'
-import { BadRequestError } from '@proofzero/errors'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { AddressURN } from '@proofzero/urns/address'
-import { RollupError } from '@proofzero/errors'
 
 type StripeInvoice = {
   amount: number
@@ -131,7 +130,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       )
 
       if (!targetAddress) {
-        throw new RollupError({
+        throw new InternalServerError({
           message: 'No address found for email',
         })
       }
