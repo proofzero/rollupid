@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { Form, NavLink, useFetcher, useOutletContext } from '@remix-run/react'
 
@@ -76,6 +76,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           apps.map((app) => {
             return accessClient.revokeAppAuthorization.mutate({
               clientId: app.clientId,
+              issuer: new URL(request.url).origin,
             })
           })
         ),

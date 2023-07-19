@@ -6465,9 +6465,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@proofzero/services.posthog@workspace:platform/posthog":
+"@proofzero/services.posthog@workspace:platform/analytics":
   version: 0.0.0-use.local
-  resolution: "@proofzero/services.posthog@workspace:platform/posthog"
+  resolution: "@proofzero/services.posthog@workspace:platform/analytics"
   dependencies:
     "@cloudflare/workers-types": 4.20230628.0
     "@types/node": 18.15.3

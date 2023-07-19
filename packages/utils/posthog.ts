@@ -1,5 +1,3 @@
-export const POSTHOG_PROXY_HOST = 'https://posthog.rollup.id'
-
 export const posthogCall = async ({
   eventName,
   apiKey,
@@ -26,5 +24,5 @@ export const posthogCall = async ({
     },
   }
 
-  await fetch(`${POSTHOG_PROXY_HOST}/e/`, init)
+  await fetch(`https://app.posthog.com/e/`, init)
 }

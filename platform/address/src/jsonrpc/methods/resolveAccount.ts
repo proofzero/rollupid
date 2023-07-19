@@ -68,7 +68,6 @@ export const resolveAccountMethod = async ({
     blobs: [ctx.alias, resultURN, eventName],
   } as AnalyticsEngineDataPoint)
 
-  // POSTHOG analytics
   await posthogCall({
     apiKey: ctx.POSTHOG_API_KEY,
     eventName,
