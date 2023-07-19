@@ -1,4 +1,4 @@
-name = "posthog"
+name = "analytics"
 main = "src/index.ts"
 compatibility_date = "2023-05-18"
 workers_dev = false
