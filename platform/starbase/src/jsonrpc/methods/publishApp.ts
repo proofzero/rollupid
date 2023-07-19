@@ -3,7 +3,7 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
-import { posthogCall } from '@proofzero/utils/posthog'
+import { createAnalyticsEvent } from '@proofzero/utils/posthog'
 
 export const PublishAppInput = z.object({
   clientId: z.string(),
@@ -64,7 +64,7 @@ export const publishApp = async ({
   }
 
   if (eventName)
-    await posthogCall({
+    await createAnalyticsEvent({
       distinctId: ctx.accountURN as string,
       eventName,
       apiKey: ctx.POSTHOG_API_KEY,
