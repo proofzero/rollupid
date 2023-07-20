@@ -30,8 +30,6 @@ import {
   TbUsers,
   TbWorld,
   TbRocket,
-  TbHourglassHigh,
-  TbLock,
 } from 'react-icons/tb'
 import { BsGear } from 'react-icons/bs'
 import { Popover, Transition } from '@headlessui/react'
@@ -42,7 +40,6 @@ import { Avatar } from '@proofzero/design-system'
 
 import { usePostHog } from 'posthog-js/react'
 import { ServicePlanType } from '@proofzero/types/account'
-import plans from '~/routes/__layout/billing/plans'
 import _ from 'lodash'
 import { isPlanGuarded } from '~/utils/planGate'
 
@@ -216,7 +213,6 @@ const appSubmenuStruct: {
     subroute?: string
     disabled?: boolean
     plan?: ServicePlanType
-    earlyAccess?: boolean
   }[]
 }[] = [
   {
@@ -268,19 +264,16 @@ const appSubmenuStruct: {
         title: 'KYC',
         icon: TbScan,
         subroute: '/kyc',
-        earlyAccess: true,
       },
       {
         title: 'Messaging',
         icon: TbMessage,
         subroute: '/messaging',
-        earlyAccess: true,
       },
       {
         title: 'Audience Builder',
         icon: TbCrosshair,
         subroute: '/audience',
-        earlyAccess: true,
       },
     ],
   },
@@ -303,10 +296,14 @@ const appSubmenuStruct: {
 
 const AppSubmenu = (
   appSubroute: string,
-  appPlanType: ServicePlanType,
+  appPlanType?: ServicePlanType,
   close?: () => void
-) =>
-  appSubmenuStruct.map((ass) => (
+) => {
+  if (!appPlanType) {
+    throw new Error('App plan type is undefined')
+  }
+
+  return appSubmenuStruct.map((ass) => (
     <div key={ass.title} className="mt-6">
       <Text size="xs" weight="medium" className="uppercase text-gray-500">
         {ass.title}
@@ -331,23 +328,13 @@ const AppSubmenu = (
               <Text size="sm" weight="medium" className="text-left">
                 {al.title}
               </Text>
-
-              {al.plan && isPlanGuarded(appPlanType, al.plan) && (
-                <Text size="xs" className="text-gray-500 text-left">
-                  {`Upgrade to
-                  ${_.upperCase(plans[al.plan].title.split(' ')[0])}`}
-                </Text>
-              )}
             </div>
 
             {al.plan && isPlanGuarded(appPlanType, al.plan) && (
               <div className="py-0.5 px-2 rounded-lg bg-gray-800">
-                <TbLock className="text-gray-400" />
-              </div>
-            )}
-            {al.earlyAccess && (
-              <div className="py-0.5 px-2 rounded-lg bg-gray-800">
-                <TbHourglassHigh className="text-gray-400" />
+                <Text size="xs" className="text-gray-400">
+                  PRO
+                </Text>
               </div>
             )}
           </NavLink>
@@ -355,12 +342,10 @@ const AppSubmenu = (
       </section>
     </div>
   ))
+}
 
 function AppMenu({ props, close }: AppMenuProps) {
   const appPlan = props.apps.find((a) => a.clientId === props.selected)?.appPlan
-  if (!appPlan) {
-    throw new Error('App plan not found')
-  }
 
   return (
     <div>
