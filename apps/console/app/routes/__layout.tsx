@@ -10,13 +10,15 @@ import SiteHeader from '~/components/SiteHeader'
 import { Popover } from '@headlessui/react'
 
 import type { LoaderData as OutletContextData } from '~/root'
+import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 
 // Component
 // -----------------------------------------------------------------------------
 
 export default function DashboardIndexPage() {
   const context = useOutletContext<OutletContextData>()
-  const { apps, avatarUrl, displayName, PASSPORT_URL } = context
+  const { apps, avatarUrl, displayName, PASSPORT_URL, hasUnpaidInvoices } =
+    context
 
   return (
     <Popover className="min-h-[100dvh] relative">
@@ -31,6 +33,14 @@ export default function DashboardIndexPage() {
           />
           <main className="flex flex-col flex-initial min-h-full w-full bg-white">
             <SiteHeader avatarUrl={avatarUrl} />
+            {hasUnpaidInvoices && (
+              <ToastWithLink
+                message="We couldn't process payment for your account"
+                linkHref={`/billing/portal`}
+                linkText="Update payment information"
+                type={'urgent'}
+              />
+            )}
             <div
               className={`${
                 open

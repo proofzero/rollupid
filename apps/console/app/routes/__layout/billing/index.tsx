@@ -66,7 +66,6 @@ import { ToastInfo } from '@proofzero/design-system/src/atoms/toast/ToastInfo'
 import { DangerPill } from '@proofzero/design-system/src/atoms/pills/DangerPill'
 import {
   createSubscription,
-  getInvoices,
   reconcileAppSubscriptions,
   updateSubscription,
 } from '~/services/billing/stripe'
@@ -74,13 +73,11 @@ import { useHydrated } from 'remix-utils'
 import _ from 'lodash'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import iSvg from '@proofzero/design-system/src/atoms/info/i.svg'
-
-type StripeInvoice = {
-  amount: number
-  timestamp: number
-  status: string | null
-  url?: string
-}
+import {
+  getCurrentAndUpcomingInvoices,
+  type StripeInvoice,
+} from '~/utils/stripe'
+import { IoWarningOutline } from 'react-icons/io5'
 
 type LoaderData = {
   paymentData?: PaymentData
@@ -108,10 +105,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const { plans, subscriptionID } =
-      await coreClient.account.getEntitlements.query({
-        accountURN,
-      })
+    const { plans } = await coreClient.account.getEntitlements.query({
+      accountURN,
+    })
 
     const flashSession = await getFlashSession(request, context.env)
 
@@ -150,31 +146,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       spd.addressURN = targetAddressURN
     }
 
-    let invoices: StripeInvoice[] = []
-    if (subscriptionID) {
-      const stripeInvoices = await getInvoices(
-        {
-          customerID: spd.customerID,
-        },
-        context.env
-      )
-
-      invoices = stripeInvoices.invoices.data.map((i) => ({
-        amount: i.total / 100,
-        timestamp: i.created * 1000,
-        status: i.status,
-        url: i.hosted_invoice_url ?? undefined,
-      }))
-
-      if (stripeInvoices.upcomingInvoices) {
-        invoices = invoices.concat({
-          amount: stripeInvoices.upcomingInvoices.lines.data[0].amount / 100,
-          timestamp:
-            stripeInvoices.upcomingInvoices.lines.data[0].period.start * 1000,
-          status: 'scheduled',
-        })
-      }
-    }
+    const invoices = await getCurrentAndUpcomingInvoices(
+      spd,
+      context.env.SECRET_STRIPE_API_KEY
+    )
 
     return json<LoaderData>(
       {
@@ -208,6 +183,38 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
+
+    const spd = await accountClient.getStripePaymentData.query({
+      accountURN,
+    })
+
+    const invoices = await getCurrentAndUpcomingInvoices(
+      spd,
+      context.env.SECRET_STRIPE_API_KEY
+    )
+
+    const hasUnpaidInvoices = invoices.some((invoice) => {
+      if (invoice.status)
+        return ['uncollectible', 'open'].includes(invoice.status)
+      return false
+    })
+
+    const flashSession = await getFlashSession(request, context.env)
+
+    if (hasUnpaidInvoices) {
+      flashSession.flash(
+        'toastNotification',
+        JSON.stringify({
+          type: ToastType.Error,
+          message: 'Payment failed - check your card details',
+        })
+      )
+      return new Response(null, {
+        headers: {
+          'Set-Cookie': await commitFlashSession(flashSession, context.env),
+        },
+      })
+    }
 
     const fd = await request.formData()
     const { customerID, quantity, txType } = JSON.parse(
@@ -275,7 +282,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       )
     }
 
-    const flashSession = await getFlashSession(request, context.env)
     if (txType === 'buy') {
       // https://stripe.com/docs/billing/subscriptions/overview#subscription-statuses
       if (sub.status === 'active' || sub.status === 'trialing') {
@@ -789,11 +795,13 @@ const PlanCard = ({
   apps,
   paymentData,
   submit,
+  hasUnpaidInvoices = false,
 }: {
   plan: PlanDetails
   entitlements: number
   apps: AppLoaderData[]
   paymentData?: PaymentData
+  hasUnpaidInvoices: boolean
   submit: (data: any, options: any) => void
 }) => {
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
@@ -855,43 +863,49 @@ const PlanCard = ({
                 </Menu.Button>
 
                 <Menu.Items className="absolute right-4 top-16 bg-white rounded-lg border shadow">
-                  <Menu.Item>
-                    <button
-                      type="button"
-                      className="flex flex-row items-center gap-3 py-3 px-4 cursor-pointer hover:bg-gray-50 rounded-t-lg"
-                      onClick={() => {
-                        setPurchaseProModalOpen(true)
-                      }}
-                    >
-                      <FaShoppingCart className="text-gray-500" />
+                  <Menu.Item
+                    as="button"
+                    className={classnames(
+                      'flex flex-row items-center \
+                       gap-3 py-3 px-4  rounded-t-lg',
+                      hasUnpaidInvoices
+                        ? 'cursor-not-allowed text-gray-300'
+                        : 'cursor-pointer hover:bg-gray-50 text-gray-700'
+                    )}
+                    onClick={() => {
+                      setPurchaseProModalOpen(true)
+                    }}
+                    disabled={hasUnpaidInvoices}
+                    type="button"
+                  >
+                    <FaShoppingCart />
 
-                      <Text size="sm" weight="medium" className="text-gray-700">
-                        Purchase Entitlement(s)
-                      </Text>
-                    </button>
+                    <Text size="sm" weight="medium">
+                      Purchase Entitlement(s)
+                    </Text>
                   </Menu.Item>
 
                   <div className="border-b border-gray-200 w-3/4 mx-auto"></div>
 
-                  <Menu.Item disabled={entitlements === 0}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setRemoveEntitlementModalOpen(true)
-                      }}
-                      className={classnames(
-                        'flex flex-row items-center gap-3 py-3 px-4 rounded-b-lg',
-                        entitlements !== 0
-                          ? 'cursor-pointer hover:bg-gray-50 text-red-600'
-                          : 'cursor-default text-red-300'
-                      )}
-                    >
-                      <HiOutlineMinusCircle />
+                  <Menu.Item
+                    as="button"
+                    disabled={entitlements === 0 || hasUnpaidInvoices}
+                    type="button"
+                    onClick={() => {
+                      setRemoveEntitlementModalOpen(true)
+                    }}
+                    className={classnames(
+                      'flex flex-row items-center gap-3 py-3 px-4 rounded-b-lg',
+                      entitlements !== 0 && !hasUnpaidInvoices
+                        ? 'cursor-pointer hover:bg-gray-50 text-red-600'
+                        : 'cursor-not-allowed text-red-300'
+                    )}
+                  >
+                    <HiOutlineMinusCircle />
 
-                      <Text size="sm" weight="medium">
-                        Remove Entitlement(s)
-                      </Text>
-                    </button>
+                    <Text size="sm" weight="medium">
+                      Remove Entitlement(s)
+                    </Text>
                   </Menu.Item>
                 </Menu.Items>
               </>
@@ -1007,7 +1021,8 @@ export default () => {
     invoices,
   } = useLoaderData<LoaderData>()
 
-  const { apps, PASSPORT_URL } = useOutletContext<OutletContextData>()
+  const { apps, PASSPORT_URL, hasUnpaidInvoices } =
+    useOutletContext<OutletContextData>()
 
   useEffect(() => {
     if (toastNotification) {
@@ -1223,6 +1238,7 @@ export default () => {
           paymentData={paymentData}
           submit={submit}
           apps={apps.filter((a) => a.appPlan === ServicePlanType.PRO)}
+          hasUnpaidInvoices={hasUnpaidInvoices}
         />
       </section>
 
@@ -1314,16 +1330,31 @@ export default () => {
                       <tr key={idx} className="border-b border-gray-200">
                         <td className="px-6 py-3">
                           {hydrated && (
-                            <Text size="sm" className="gray-500">
-                              {new Date(invoice.timestamp).toLocaleString(
-                                'default',
-                                {
-                                  day: '2-digit',
-                                  month: 'short',
-                                  year: 'numeric',
-                                }
+                            <div className="flex flex-row items-center space-x-3">
+                              <Text size="sm" className="gray-500">
+                                {new Date(invoice.timestamp).toLocaleString(
+                                  'default',
+                                  {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric',
+                                  }
+                                )}
+                              </Text>
+
+                              {(invoice.status === 'open' ||
+                                invoice.status === 'uncollectible') && (
+                                <div
+                                  className="rounded-xl bg-yellow-200 flex
+                                flex-row items-center space-x-1 p-1"
+                                >
+                                  <IoWarningOutline className="text-black w-4 h-4" />
+                                  <Text size="xs" className="text-black">
+                                    Payment Error
+                                  </Text>
+                                </div>
                               )}
-                            </Text>
+                            </div>
                           )}
                         </td>
 
@@ -1341,11 +1372,47 @@ export default () => {
                             {invoice.status && _.startCase(invoice.status)}
                           </Text>
                           {invoice.status === 'paid' && (
-                            <a href={invoice.url} target="_blank">
+                            <a
+                              href={invoice.url}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
                               <Text size="xs" className="text-indigo-500">
                                 View Invoice
                               </Text>
                             </a>
+                          )}
+                          {(invoice.status === 'open' ||
+                            invoice.status === 'uncollectible') && (
+                            <div className="flex flex-row space-x-2">
+                              <a
+                                href={invoice.url}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                <Text size="xs" className="text-indigo-500">
+                                  Update Payment
+                                </Text>
+                              </a>
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  submit(
+                                    {
+                                      invoiceId: invoice.id,
+                                    },
+                                    {
+                                      method: 'post',
+                                      action: 'billing/cancel',
+                                    }
+                                  )
+                                }}
+                              >
+                                <Text size="xs" className="text-red-500">
+                                  Cancel Invoice
+                                </Text>
+                              </button>
+                            </div>
                           )}
                         </td>
                       </tr>

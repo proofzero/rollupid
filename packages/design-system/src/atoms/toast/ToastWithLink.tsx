@@ -1,5 +1,6 @@
 import React from 'react'
 import { HiInformationCircle } from 'react-icons/hi'
+import { IoWarning } from 'react-icons/io5'
 import { Text } from '../text/Text'
 import { Toast } from './Toast'
 
@@ -7,8 +8,19 @@ export type ToastWithLinkProps = {
   message: string
   linkHref: string
   linkText: string
+  type?: 'urgent' | 'deffered'
 
   remove?: () => void
+}
+
+const ToastIcon = {
+  urgent: <IoWarning className="text-black w-5 h-5" />,
+  deffered: <HiInformationCircle className="text-indigo-400 w-5 h-5" />,
+}
+
+const ToastStyle = {
+  urgent: 'bg-yellow-200 text-black w-full px-6',
+  deffered: 'bg-indigo-50 text-indigo-700 w-full',
 }
 
 export const ToastWithLink = ({
@@ -16,11 +28,12 @@ export const ToastWithLink = ({
   remove,
   linkHref,
   linkText,
+  type = 'deffered',
 }: ToastWithLinkProps) => (
   <Toast
     message={message}
     remove={remove}
-    PreMessage={<HiInformationCircle className="text-indigo-400 w-5 h-5" />}
+    PreMessage={ToastIcon[type]}
     PostMessage={
       <a href={linkHref}>
         <Text size="sm" weight="medium">
@@ -28,6 +41,6 @@ export const ToastWithLink = ({
         </Text>
       </a>
     }
-    className="bg-indigo-50 text-indigo-700 w-full"
+    className={ToastStyle[type]}
   />
 )

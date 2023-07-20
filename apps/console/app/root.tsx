@@ -53,6 +53,7 @@ import { BadRequestError } from '@proofzero/errors'
 import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
 import { useHydrated } from 'remix-utils'
+import { getCurrentAndUpcomingInvoices } from './utils/stripe'
 
 export const links: LinksFunction = () => {
   return [
@@ -85,6 +86,7 @@ export type LoaderData = {
   avatarUrl: string
   PASSPORT_URL: string
   displayName: string
+  hasUnpaidInvoices: boolean
   ENV: {
     POSTHOG_API_KEY: string
     POSTHOG_PROXY_HOST: string
@@ -144,9 +146,27 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         WALLET_CONNECT_PROJECT_ID,
       } = context.env
 
+      const spd = await accountClient.getStripePaymentData.query({
+        accountURN,
+      })
+
+      // might be quite heavy object
+      // for that reason I don't put it in outlet context
+      const invoices = await getCurrentAndUpcomingInvoices(
+        spd,
+        context.env.SECRET_STRIPE_API_KEY
+      )
+
+      const hasUnpaidInvoices = invoices.some((invoice) => {
+        if (invoice.status)
+          return ['uncollectible', 'open'].includes(invoice.status)
+        return false
+      })
+
       return json<LoaderData>({
         apps: reshapedApps,
         avatarUrl,
+        hasUnpaidInvoices,
         PASSPORT_URL,
         ENV: {
           POSTHOG_API_KEY,
@@ -180,7 +200,14 @@ export default function App() {
   const remixDevPort = loaderData.ENV.REMIX_DEV_SERVER_WS_PORT
   useTreeshakeHack(remixDevPort)
 
-  const { apps, avatarUrl, PASSPORT_URL, displayName, accountURN } = loaderData
+  const {
+    apps,
+    avatarUrl,
+    PASSPORT_URL,
+    displayName,
+    accountURN,
+    hasUnpaidInvoices,
+  } = loaderData
 
   useEffect(() => {
     if (GATag) {
@@ -246,6 +273,7 @@ export default function App() {
                 PASSPORT_URL,
                 displayName,
                 accountURN,
+                hasUnpaidInvoices,
               }}
             />
           </PostHogProvider>
@@ -257,6 +285,7 @@ export default function App() {
               PASSPORT_URL,
               displayName,
               accountURN,
+              hasUnpaidInvoices,
             }}
           />
         )}
