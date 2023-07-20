@@ -35,12 +35,8 @@ import {
 } from '~/services/billing/stripe'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  HiArrowUp,
-  HiOutlineExternalLink,
-  HiOutlineShoppingCart,
-} from 'react-icons/hi'
+import { useEffect, useMemo, useState } from 'react'
+import { HiArrowUp, HiOutlineShoppingCart } from 'react-icons/hi'
 import {
   ToastType,
   Toaster,
@@ -124,6 +120,21 @@ const processUpdateOp = async (
     clientId,
     plan,
   })
+
+  if (plan === ServicePlanType.FREE) {
+    const appDetails = apps.find((a) => a.clientId === clientId)
+    if (!appDetails) {
+      throw new BadRequestError({
+        message: `App not found`,
+      })
+    }
+
+    if (appDetails.customDomain) {
+      await starbaseClient.deleteCustomDomain.mutate({
+        clientId,
+      })
+    }
+  }
 
   flashSession.flash('success_toast', `${plans[plan].title} assigned.`)
 }

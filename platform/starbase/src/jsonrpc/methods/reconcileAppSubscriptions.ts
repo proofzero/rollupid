@@ -23,6 +23,7 @@ export const ReconcileAppsSubscriptionsOutputSchema = z.array(
     plan: z.nativeEnum(ServicePlanType),
     devEmail: z.string().optional(),
     appName: z.string(),
+    customDomain: z.boolean(),
   })
 )
 export type ReconcileAppsSubscriptionsOutput = z.infer<
@@ -84,6 +85,7 @@ export const reconcileAppSubscriptions = async ({
         devEmail: app.devEmail,
         appName: app.app?.name ?? 'Undefined',
         plan,
+        customDomain: app.customDomain ? true : false,
       }))
 
     for (const app of targetApps) {
