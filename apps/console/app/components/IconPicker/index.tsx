@@ -86,12 +86,12 @@ function pickIcon(
             body: formData,
           }).then((res) => res.json())
 
-          const publicVariantUrls = cfUploadRes.result.variants.filter((v) =>
-            v.endsWith('public')
+          const variantUrls = cfUploadRes.result.variants.filter((v) =>
+            v.endsWith('PassportAppCover')
           )
 
-          if (publicVariantUrls.length) {
-            setIconUrl(publicVariantUrls[0])
+          if (variantUrls.length) {
+            setIconUrl(variantUrls[0])
           }
         }
 
