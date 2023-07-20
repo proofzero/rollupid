@@ -19,7 +19,8 @@ function pickIcon(
     height: number
   },
   minWidth?: number,
-  minHeight?: number
+  minHeight?: number,
+  variant: string = 'public'
 ) {
   return (e: any) =>
     new Promise<any>(async (ok) => {
@@ -87,7 +88,7 @@ function pickIcon(
           }).then((res) => res.json())
 
           const variantUrls = cfUploadRes.result.variants.filter((v) =>
-            v.endsWith('PassportAppCover')
+            v.endsWith(variant)
           )
 
           if (variantUrls.length) {
@@ -128,6 +129,7 @@ type IconPickerProps = {
   setIsFormChanged: (val: boolean) => void
   setIsImgUploading: (val: boolean) => void
   imageUploadCallback?: (url: string) => void
+  variant?: string
 }
 
 export default function IconPicker({
@@ -143,6 +145,7 @@ export default function IconPicker({
   setIsFormChanged,
   setIsImgUploading,
   imageUploadCallback = () => {},
+  variant,
 }: IconPickerProps) {
   const [icon, setIcon] = useState<string>('')
   const [iconUrl, setIconUrl] = useState<string>('')
@@ -283,7 +286,8 @@ export default function IconPicker({
                     maxSize,
                     aspectRatio,
                     minWidth,
-                    minHeight
+                    minHeight,
+                    variant
                   )(event)
                   if (Object.keys(errors).length) {
                     setInvalidState(true)
