@@ -516,7 +516,6 @@ const PurchaseProModal = ({
           onClick={() => {
             setIsOpen(false)
             setProEntitlementDelta(1)
-
             submit(
               {
                 payload: JSON.stringify({
