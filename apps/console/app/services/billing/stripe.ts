@@ -145,6 +145,7 @@ export const createSubscription = async (
         quantity,
       },
     ],
+    expand: ['latest_invoice.payment_intent'],
     metadata,
   })
 
@@ -182,6 +183,7 @@ export const updateSubscription = async (
         quantity,
       },
     ],
+    expand: ['latest_invoice.payment_intent'],
     metadata,
   })
 

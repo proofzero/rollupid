@@ -26,6 +26,7 @@ WALLET_CONNECT_PROJECT_ID = "36efbf71d7586e254d72041a15a42078"
 CONSOLE_URL = "http://localhost:10002"
 POSTHOG_API_KEY = "phc_f7q7V62YWsS0FKyIRxO36xyUMFYJ8oahurHPBAXkGe5"
 POSTHOG_PROXY_HOST = "https://analytics.rollup.id"
+STRIPE_PUBLISHABLE_KEY = "pk_test_51NFemUKJnr9qdtTa8eIGrDR1QtpUTAwewEejO13AAnugHFAAhOWbSWKah4l66gGKs2BO6ITlax5lftx337yedqMb00aWdwi16G"
 
 [site]
 bucket = "./public"

@@ -7,6 +7,11 @@ export type StripeInvoice = {
   timestamp: number
   status: string | null
   url?: string
+  payment_intent?: {
+    status: string
+    client_secret: string
+    payment_method: string
+  }
 }
 
 export const getCurrentAndUpcomingInvoices = async (

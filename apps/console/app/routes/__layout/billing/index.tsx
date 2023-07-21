@@ -29,7 +29,9 @@ import {
 import {
   Link,
   NavLink,
+  useActionData,
   useLoaderData,
+  useNavigate,
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
@@ -78,8 +80,10 @@ import {
   type StripeInvoice,
 } from '~/utils/stripe'
 import { IoWarningOutline } from 'react-icons/io5'
+import { loadStripe } from '@stripe/stripe-js'
 
 type LoaderData = {
+  STRIPE_PUBLISHABLE_KEY: string
   paymentData?: PaymentData
   entitlements: {
     [ServicePlanType.PRO]: number
@@ -153,6 +157,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     return json<LoaderData>(
       {
+        STRIPE_PUBLISHABLE_KEY: context.env.STRIPE_PUBLISHABLE_KEY,
         paymentData: spd,
         entitlements: {
           [ServicePlanType.PRO]:
@@ -201,6 +206,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const flashSession = await getFlashSession(request, context.env)
 
+    // We are not creating and/or updating subscriptions
+    // until we resolve our unpaid invoices
     if (hasUnpaidInvoices) {
       flashSession.flash(
         'toastNotification',
@@ -312,11 +319,16 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       )
     }
 
-    return new Response(null, {
-      headers: {
-        'Set-Cookie': await commitFlashSession(flashSession, context.env),
-      },
-    })
+    return new Response(
+      JSON.stringify({
+        status: (sub.latest_invoice as unknown as StripeInvoice).payment_intent!
+          .status,
+        client_secret: (sub.latest_invoice as unknown as StripeInvoice)
+          .payment_intent!.client_secret,
+        payment_method: (sub.latest_invoice as unknown as StripeInvoice)
+          .payment_intent!.payment_method,
+      })
+    )
   }
 )
 
@@ -1013,6 +1025,7 @@ const PlanCard = ({
 
 export default () => {
   const {
+    STRIPE_PUBLISHABLE_KEY,
     entitlements,
     toastNotification,
     paymentData,
@@ -1023,7 +1036,26 @@ export default () => {
   const { apps, PASSPORT_URL, hasUnpaidInvoices } =
     useOutletContext<OutletContextData>()
 
+  const actionData = useActionData()
+  const navigate = useNavigate()
+
   useEffect(() => {
+    if (actionData) {
+      ;(async () => {
+        const stripeClient = await loadStripe(STRIPE_PUBLISHABLE_KEY)
+        const { status, client_secret, payment_method } = JSON.parse(actionData)
+        if (status === 'requires_action') {
+          await stripeClient?.confirmCardPayment(client_secret, {
+            payment_method: payment_method,
+          })
+          // Approximately enough for webhook to be called and update entitlements
+          setTimeout(() => {
+            navigate('.', { replace: true })
+          }, 2000)
+        }
+      })()
+    }
+
     if (toastNotification) {
       if (toastNotification.type === ToastType.Success) {
         toast(ToastType.Success, {
@@ -1036,7 +1068,7 @@ export default () => {
         })
       }
     }
-  }, [toastNotification])
+  }, [toastNotification, actionData])
 
   const redirectToPassport = () => {
     const currentURL = new URL(window.location.href)

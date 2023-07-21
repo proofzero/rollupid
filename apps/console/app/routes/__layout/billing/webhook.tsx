@@ -11,11 +11,12 @@ import {
   reconcileAppSubscriptions,
   updateSubscriptionMetadata,
 } from '~/services/billing/stripe'
-import { InternalServerError, RollupError } from '@proofzero/errors'
-import { AddressURN } from '@proofzero/urns/address'
+import { InternalServerError } from '@proofzero/errors'
+import { type AddressURN } from '@proofzero/urns/address'
 
 type StripeInvoicePayload = {
   customer: string
+  payment_intent: string
   lines: {
     data: Array<{
       price: { product: string }
@@ -107,15 +108,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           )
 
           return null
-        }
-
-        const entitlements = await coreClient.account.getEntitlements.query({
-          accountURN: subMeta.accountURN,
-        })
-        if (entitlements?.subscriptionID !== id) {
-          throw new RollupError({
-            message: `Subscription ID ${id} does not match entitlements subscription ID ${entitlements?.subscriptionID}`,
-          })
         }
 
         await reconcileAppSubscriptions(
@@ -247,12 +239,22 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         break
       case 'invoice.payment_failed':
-        const { customer: customerFail } = event.data
-          .object as StripeInvoicePayload
+        const { customer: customerFail, payment_intent: paymentIntentFail } =
+          event.data.object as StripeInvoicePayload
         const customerDataFail = await stripeClient.customers.retrieve(
           customerFail
         )
-        if (!customerDataFail.deleted && customerDataFail.email) {
+        const paymentIntentInfo = await stripeClient.paymentIntents.retrieve(
+          paymentIntentFail
+        )
+
+        console.log(JSON.stringify({ paymentIntentInfo }, null, 2))
+
+        if (
+          !customerDataFail.deleted &&
+          customerDataFail.email &&
+          paymentIntentInfo.status !== 'requires_action'
+        ) {
           const { email, name } = customerDataFail
 
           await coreClient.address.sendFailedPaymentNotification.mutate({

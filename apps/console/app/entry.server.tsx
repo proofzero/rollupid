@@ -42,6 +42,7 @@ export default function handleRequest(
             SELF,
             'https://verify.walletconnect.com',
             'form.typeform.com',
+            'https://*.stripe.com',
           ],
           'connect-src': [
             SELF,
@@ -53,7 +54,12 @@ export default function handleRequest(
             // Used for Remix WebSocket Live Reaload
             ...(dev ? ['ws://localhost:*/socket'] : []),
           ],
-          'script-src': [SELF, `'nonce-${nonce}' ${STRICT_DYNAMIC}`],
+          'script-src': [
+            SELF,
+            `'nonce-${nonce}' ${STRICT_DYNAMIC}`,
+            'https://js.stripe.com',
+            'https://maps.googleapis.com',
+          ],
           'style-src': [
             SELF,
             UNSAFE_INLINE,
