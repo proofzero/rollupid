@@ -616,6 +616,7 @@ const AuthPanel = ({
                 errorMessage={
                   errors && errors['graphicURL'] ? errors['graphicURL'] : ''
                 }
+                variant="PassportAppCover"
               />
 
               {graphicURL && (
