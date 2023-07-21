@@ -38,17 +38,17 @@ export const sendReconciliationNotificationMethod = async ({
     settingsURL: input.settingsURL,
   })
 
-  for (const app of input.apps) {
-    if (!app.devEmail) {
-      continue
-    }
-
-    await ctx.emailClient.sendReconciliationNotification.query({
-      email: app.devEmail,
-      type: ReconciliationNotificationType.Dev,
-      appName: app.appName,
-      billingURL: input.billingURL,
-      settingsURL: input.settingsURL,
-    })
-  }
+  await Promise.all(
+    input.apps
+      .filter((a) => Boolean(a.devEmail))
+      .map((app) => {
+        ctx.emailClient.sendReconciliationNotification.query({
+          email: app.devEmail!,
+          type: ReconciliationNotificationType.Dev,
+          appName: app.appName,
+          billingURL: input.billingURL,
+          settingsURL: input.settingsURL,
+        })
+      })
+  )
 }
