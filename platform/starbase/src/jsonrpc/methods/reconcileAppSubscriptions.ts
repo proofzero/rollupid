@@ -85,7 +85,7 @@ export const reconcileAppSubscriptions = async ({
         devEmail: app.devEmail,
         appName: app.app?.name ?? 'Undefined',
         plan,
-        customDomain: app.customDomain ? true : false,
+        customDomain: Boolean(app.customDomain),
       }))
 
     for (const app of targetApps) {
