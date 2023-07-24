@@ -1,5 +1,15 @@
-import { getInvoices, getUpcomingInvoices } from '~/services/billing/stripe'
+import {
+  createSubscription,
+  getInvoices,
+  getUpcomingInvoices,
+  updateSubscription,
+} from '~/services/billing/stripe'
 import type { StripePaymentData } from '@proofzero/platform/account/src/types'
+import type Stripe from 'stripe'
+import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
+import { type AccountURN } from '@proofzero/urns/account'
+import { loadStripe } from '@stripe/stripe-js'
+import { type NavigateFunction } from '@remix-run/react'
 
 export type StripeInvoice = {
   id: string
@@ -61,4 +71,117 @@ export const getCurrentAndUpcomingInvoices = async (
     }
   }
   return invoices
+}
+
+export const createOrUpdateSubscription = async ({
+  subscriptionID,
+  SECRET_STRIPE_PRO_PLAN_ID,
+  SECRET_STRIPE_API_KEY,
+  quantity,
+  accountURN,
+  customerID,
+}: {
+  subscriptionID?: string | null
+  SECRET_STRIPE_PRO_PLAN_ID: string
+  SECRET_STRIPE_API_KEY: string
+  quantity: number
+  accountURN: AccountURN
+  customerID: string
+}) => {
+  let sub
+  if (!subscriptionID) {
+    sub = await createSubscription(
+      {
+        customerID: customerID,
+        planID: SECRET_STRIPE_PRO_PLAN_ID,
+        quantity,
+        accountURN,
+        handled: true,
+      },
+      SECRET_STRIPE_API_KEY
+    )
+  } else {
+    sub = await updateSubscription(
+      {
+        subscriptionID: subscriptionID,
+        planID: SECRET_STRIPE_PRO_PLAN_ID,
+        quantity,
+        handled: true,
+      },
+      SECRET_STRIPE_API_KEY
+    )
+  }
+  return sub
+}
+
+export const setPurchaseToastNotification = ({
+  sub,
+  flashSession,
+}: {
+  sub: Stripe.Subscription
+  flashSession: any
+}) => {
+  if (sub.status === 'active' || sub.status === 'trialing') {
+    flashSession.flash(
+      'toast_notification',
+      JSON.stringify({
+        type: ToastType.Success,
+        message: 'Entitlement(s) successfully bought',
+      })
+    )
+  } else {
+    if (
+      (sub.latest_invoice as unknown as StripeInvoice)?.payment_intent
+        ?.status === 'requires_action'
+    ) {
+      flashSession.flash(
+        'toast_notification',
+        JSON.stringify({
+          type: ToastType.Warning,
+          message: 'Payment requires additional action',
+        })
+      )
+    } else {
+      flashSession.flash(
+        'toast_notification',
+        JSON.stringify({
+          type: ToastType.Error,
+          message: 'Payment failed - check your card details',
+        })
+      )
+    }
+  }
+}
+
+export const process3DSecureCard = async ({
+  STRIPE_PUBLISHABLE_KEY,
+  actionData,
+  navigate,
+}: {
+  STRIPE_PUBLISHABLE_KEY: string
+  actionData: string
+  navigate: NavigateFunction
+}) => {
+  const stripeClient = await loadStripe(STRIPE_PUBLISHABLE_KEY)
+  const { status, client_secret, payment_method } = JSON.parse(actionData)
+  if (status === 'requires_action') {
+    const result = await stripeClient?.confirmCardPayment(client_secret, {
+      payment_method: payment_method,
+    })
+
+    // Approximately enough for webhook to be called and update entitlements
+    setTimeout(() => {
+      navigate('.', { replace: true })
+    }, 2000)
+
+    if (result?.error) {
+      toast(ToastType.Error, {
+        message: 'Something went wrong. Please try again',
+      })
+    } else {
+      toast(ToastType.Success, {
+        message: 'Successfully purchased entitlement(s)',
+      })
+    }
+  }
 }

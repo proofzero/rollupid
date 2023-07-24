@@ -23,16 +23,19 @@ import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
 } from '@proofzero/utils'
-import { useLoaderData, useOutletContext, useSubmit } from '@remix-run/react'
+import {
+  useActionData,
+  useLoaderData,
+  useNavigate,
+  useOutletContext,
+  useSubmit,
+} from '@remix-run/react'
 import { type GetEntitlementsOutput } from '@proofzero/platform/account/src/jsonrpc/methods/getEntitlements'
 import { type AccountURN } from '@proofzero/urns/account'
 import { BadRequestError } from '@proofzero/errors'
 import type { ToastNotification, appDetailsProps } from '~/types'
 import { type AppLoaderData } from '~/root'
-import {
-  createSubscription,
-  updateSubscription,
-} from '~/services/billing/stripe'
+
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { useEffect, useMemo, useState } from 'react'
@@ -42,8 +45,15 @@ import {
   Toaster,
   toast,
 } from '@proofzero/design-system/src/atoms/toast'
-import { Env } from 'bindings'
 import dangerVector from '~/images/danger.svg'
+import { type Env } from 'bindings'
+import {
+  type StripeInvoice,
+  getCurrentAndUpcomingInvoices,
+  setPurchaseToastNotification,
+  createOrUpdateSubscription,
+  process3DSecureCard,
+} from '~/utils/stripe'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -76,6 +86,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         entitlements,
         paymentData,
         toastNotification,
+        STRIPE_PUBLISHABLE_KEY: context.env.STRIPE_PUBLISHABLE_KEY,
       },
       {
         headers: {
@@ -178,86 +189,41 @@ const processPurchaseOp = async (
 
   const { customerID } = paymentData
   let sub
-  let quantity
-  try {
-    if (!entitlements.subscriptionID) {
-      quantity = 1
-      sub = await createSubscription(
-        {
-          customerID: customerID,
-          planID: env.SECRET_STRIPE_PRO_PLAN_ID,
-          quantity,
-          accountURN,
-          handled: true,
-        },
-        env
-      )
-    } else {
-      quantity = entitlements.plans[plan]?.entitlements
-        ? entitlements.plans[plan]?.entitlements! + 1
-        : 1
+  const quantity = entitlements.subscriptionID
+    ? entitlements.plans[plan]?.entitlements
+      ? entitlements.plans[plan]?.entitlements! + 1
+      : 1
+    : 1
 
-      sub = await updateSubscription(
-        {
-          subscriptionID: entitlements.subscriptionID,
-          planID: env.SECRET_STRIPE_PRO_PLAN_ID,
-          quantity,
-          handled: true,
-        },
-        env
-      )
-    }
+  sub = await createOrUpdateSubscription({
+    customerID,
+    SECRET_STRIPE_PRO_PLAN_ID: env.SECRET_STRIPE_PRO_PLAN_ID,
+    SECRET_STRIPE_API_KEY: env.SECRET_STRIPE_API_KEY,
+    quantity,
+    subscriptionID: entitlements.subscriptionID,
+    accountURN,
+  })
 
-    if (sub.status !== 'active' && sub.status !== 'trialing') {
-      flashSession.flash(
-        'toast_notification',
-        JSON.stringify({
-          type: ToastType.Error,
-          message: 'Payment failed - check your card details',
-        })
-      )
-      return new Response(null, {
-        headers: {
-          'Set-Cookie': await commitFlashSession(flashSession, env),
-        },
-      })
-    }
-  } catch (e) {
-    flashSession.flash(
-      'toast_notification',
-      JSON.stringify({
-        type: ToastType.Error,
-        message: 'Transaction failed. You were not charged.',
-      })
-    )
+  setPurchaseToastNotification({
+    sub,
+    flashSession,
+  })
+  if (sub.status === 'active' || sub.status === 'trialing') {
+    await coreClient.account.updateEntitlements.mutate({
+      accountURN: accountURN,
+      subscriptionID: sub.id,
+      quantity: quantity,
+      type: plan,
+    })
 
-    return new Response(null, {
-      headers: {
-        'Set-Cookie': await commitFlashSession(flashSession, env),
-      },
+    await coreClient.starbase.setAppPlan.mutate({
+      accountURN,
+      clientId,
+      plan,
     })
   }
 
-  await coreClient.account.updateEntitlements.mutate({
-    accountURN: accountURN,
-    subscriptionID: sub.id,
-    quantity: quantity,
-    type: plan,
-  })
-
-  await coreClient.starbase.setAppPlan.mutate({
-    accountURN,
-    clientId,
-    plan,
-  })
-
-  flashSession.flash(
-    'toast_notification',
-    JSON.stringify({
-      type: ToastType.Success,
-      message: `${plans[plan].title} purchased and assigned.`,
-    })
-  )
+  return sub
 }
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
@@ -269,18 +235,56 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
+    const parsedJwt = parseJwt(jwt!)
+    const accountURN = parsedJwt.sub as AccountURN
+
     const { clientId } = params
     if (!clientId) throw new BadRequestError({ message: 'Missing Client ID' })
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
+
+    const coreClient = createCoreClient(context.env.Core, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
+    const spd = await coreClient.account.getStripePaymentData.query({
+      accountURN,
+    })
+
+    const invoices = await getCurrentAndUpcomingInvoices(
+      spd,
+      context.env.SECRET_STRIPE_API_KEY
+    )
+
+    const flashSession = await getFlashSession(request, context.env)
+
+    for (const invoice of invoices) {
+      // We are not creating and/or updating subscriptions
+      // until we resolve our unpaid invoices
+      if (invoice?.status) {
+        if (['open', 'uncollectible'].includes(invoice.status)) {
+          flashSession.flash(
+            'toast_notification',
+            JSON.stringify({
+              type: ToastType.Error,
+              message: 'Payment failed - check your card details',
+            })
+          )
+          return new Response(null, {
+            headers: {
+              'Set-Cookie': await commitFlashSession(flashSession, context.env),
+            },
+          })
+        }
+      }
+    }
 
     const fd = await request.formData()
     const op = fd.get('op') as 'update' | 'purchase'
     const { plan } = JSON.parse(fd.get('payload') as string) as {
       plan: ServicePlanType
     }
-
-    const flashSession = await getFlashSession(request, context.env)
 
     switch (op) {
       case 'update': {
@@ -296,7 +300,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       }
 
       case 'purchase': {
-        await processPurchaseOp(
+        const sub = await processPurchaseOp(
           jwt,
           plan,
           clientId,
@@ -304,7 +308,22 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           context.env,
           traceHeader
         )
-        break
+
+        return new Response(
+          JSON.stringify({
+            status: (sub?.latest_invoice as unknown as StripeInvoice)
+              ?.payment_intent?.status,
+            client_secret: (sub?.latest_invoice as unknown as StripeInvoice)
+              .payment_intent?.client_secret,
+            payment_method: (sub?.latest_invoice as unknown as StripeInvoice)
+              .payment_intent?.payment_method,
+          }),
+          {
+            headers: {
+              'Set-Cookie': await commitFlashSession(flashSession, context.env),
+            },
+          }
+        )
       }
     }
 
@@ -329,6 +348,7 @@ const PlanCard = ({
   usedEntitlements,
   paymentData,
   featuresColor,
+  hasUnpaidInvoices,
 }: {
   planType: ServicePlanType
   currentPlan: ServicePlanType
@@ -336,6 +356,7 @@ const PlanCard = ({
   usedEntitlements?: number
   paymentData: PaymentData
   featuresColor: 'text-gray-500' | 'text-indigo-500'
+  hasUnpaidInvoices: boolean
 }) => {
   const plan = plans[planType]
   const active = planType === currentPlan
@@ -368,6 +389,7 @@ const PlanCard = ({
 
           {!active && (
             <EntitlementsCardButton
+              hasUnpaidInvoices={hasUnpaidInvoices}
               currentPlan={currentPlan}
               entitlement={{
                 planType,
@@ -404,11 +426,13 @@ const PurchaseConfirmationModal = ({
   setIsOpen,
   plan,
   paymentData,
+  hasUnpaidInvoices,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   plan: PlanDetails
   paymentData?: PaymentData
+  hasUnpaidInvoices: boolean
 }) => {
   const submit = useSubmit()
 
@@ -501,7 +525,7 @@ const PurchaseConfirmationModal = ({
       <section className="flex flex-row-reverse gap-4 m-5 mt-auto">
         <Button
           btnType="primary-alt"
-          disabled={!paymentData?.paymentMethodID}
+          disabled={!paymentData?.paymentMethodID || hasUnpaidInvoices}
           onClick={() => {
             setIsOpen(false)
 
@@ -604,6 +628,7 @@ const EntitlementsCardButton = ({
   currentPlan,
   entitlement,
   paymentData,
+  hasUnpaidInvoices,
 }: {
   currentPlan: ServicePlanType
   entitlement: {
@@ -611,6 +636,7 @@ const EntitlementsCardButton = ({
     totalEntitlements?: number
     usedEntitlements?: number
   }
+  hasUnpaidInvoices: boolean
   paymentData: PaymentData
 }) => {
   const [showPurchaseModal, setShowPurchaseModal] = useState(false)
@@ -640,6 +666,7 @@ const EntitlementsCardButton = ({
   return (
     <>
       <PurchaseConfirmationModal
+        hasUnpaidInvoices={hasUnpaidInvoices}
         isOpen={showPurchaseModal}
         setIsOpen={setShowPurchaseModal}
         plan={plans[entitlement.planType]}
@@ -705,16 +732,33 @@ export default () => {
     entitlements: { plans: entitlements },
     paymentData,
     toastNotification,
+    STRIPE_PUBLISHABLE_KEY,
   } = useLoaderData<{
+    STRIPE_PUBLISHABLE_KEY: string
     entitlements: GetEntitlementsOutput
     paymentData: PaymentData
     toastNotification: ToastNotification | undefined
   }>()
 
-  const { apps, appDetails } = useOutletContext<{
+  const actionData = useActionData()
+  const navigate = useNavigate()
+  const { apps, appDetails, hasUnpaidInvoices } = useOutletContext<{
     apps: AppLoaderData[]
     appDetails: appDetailsProps
+    hasUnpaidInvoices: boolean
   }>()
+
+  useEffect(() => {
+    if (actionData) {
+      ;(async () => {
+        await process3DSecureCard({
+          STRIPE_PUBLISHABLE_KEY,
+          actionData,
+          navigate,
+        })
+      })()
+    }
+  }, [actionData])
 
   useEffect(() => {
     if (toastNotification) {
@@ -730,12 +774,14 @@ export default () => {
 
       <section className="flex flex-col gap-4">
         <PlanCard
+          hasUnpaidInvoices={hasUnpaidInvoices}
           currentPlan={appDetails.appPlan}
           planType={ServicePlanType.FREE}
           paymentData={paymentData}
           featuresColor="text-gray-500"
         />
         <PlanCard
+          hasUnpaidInvoices={hasUnpaidInvoices}
           currentPlan={appDetails.appPlan}
           planType={ServicePlanType.PRO}
           totalEntitlements={entitlements[ServicePlanType.PRO]?.entitlements}

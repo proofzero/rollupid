@@ -66,21 +66,19 @@ import {
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 import { ToastInfo } from '@proofzero/design-system/src/atoms/toast/ToastInfo'
 import { DangerPill } from '@proofzero/design-system/src/atoms/pills/DangerPill'
-import {
-  createSubscription,
-  reconcileAppSubscriptions,
-  updateSubscription,
-} from '~/services/billing/stripe'
+import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { useHydrated } from 'remix-utils'
 import _ from 'lodash'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import iSvg from '@proofzero/design-system/src/atoms/info/i.svg'
 import {
+  createOrUpdateSubscription,
   getCurrentAndUpcomingInvoices,
+  process3DSecureCard,
+  setPurchaseToastNotification,
   type StripeInvoice,
 } from '~/utils/stripe'
 import { IoWarningOutline } from 'react-icons/io5'
-import { loadStripe } from '@stripe/stripe-js'
 import { type ToastNotification } from '~/types'
 
 type LoaderData = {
@@ -187,7 +185,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const spd = await accountClient.getStripePaymentData.query({
+    const spd = await coreClient.account.getStripePaymentData.query({
       accountURN,
     })
 
@@ -201,7 +199,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     for (const invoice of invoices) {
       // We are not creating and/or updating subscriptions
       // until we resolve our unpaid invoices
-      if (invoice.status) {
+      if (invoice?.status) {
         if (['open', 'uncollectible'].includes(invoice.status)) {
           flashSession.flash(
             'toast_notification',
@@ -250,29 +248,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
 
-    let sub
-    if (!entitlements.subscriptionID) {
-      sub = await createSubscription(
-        {
-          customerID: customerID,
-          planID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
-          quantity: +quantity,
-          accountURN,
-          handled: true,
-        },
-        context.env
-      )
-    } else {
-      sub = await updateSubscription(
-        {
-          subscriptionID: entitlements.subscriptionID,
-          planID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
-          quantity: +quantity,
-          handled: true,
-        },
-        context.env
-      )
-    }
+    const sub = await createOrUpdateSubscription({
+      customerID,
+      SECRET_STRIPE_PRO_PLAN_ID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
+      SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
+      quantity,
+      subscriptionID: entitlements.subscriptionID,
+      accountURN,
+    })
 
     if (
       (txType === 'buy' &&
@@ -293,23 +276,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     if (txType === 'buy') {
       // https://stripe.com/docs/billing/subscriptions/overview#subscription-statuses
-      if (sub.status === 'active' || sub.status === 'trialing') {
-        flashSession.flash(
-          'toast_notification',
-          JSON.stringify({
-            type: ToastType.Success,
-            message: 'Entitlement(s) successfully bought',
-          })
-        )
-      } else {
-        flashSession.flash(
-          'toast_notification',
-          JSON.stringify({
-            type: ToastType.Error,
-            message: 'Payment failed - check your card details',
-          })
-        )
-      }
+      setPurchaseToastNotification({
+        sub,
+        flashSession,
+      })
     }
     if (txType === 'remove') {
       flashSession.flash(
@@ -323,13 +293,18 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     return new Response(
       JSON.stringify({
-        status: (sub.latest_invoice as unknown as StripeInvoice).payment_intent!
-          .status,
+        status: (sub.latest_invoice as unknown as StripeInvoice)?.payment_intent
+          ?.status,
         client_secret: (sub.latest_invoice as unknown as StripeInvoice)
-          .payment_intent!.client_secret,
+          .payment_intent?.client_secret,
         payment_method: (sub.latest_invoice as unknown as StripeInvoice)
-          .payment_intent!.payment_method,
-      })
+          .payment_intent?.payment_method,
+      }),
+      {
+        headers: {
+          'Set-Cookie': await commitFlashSession(flashSession, context.env),
+        },
+      }
     )
   }
 )
@@ -1044,29 +1019,22 @@ export default () => {
   useEffect(() => {
     if (actionData) {
       ;(async () => {
-        const stripeClient = await loadStripe(STRIPE_PUBLISHABLE_KEY)
-        const { status, client_secret, payment_method } = JSON.parse(actionData)
-        if (status === 'requires_action') {
-          toast(ToastType.Warning, {
-            message: 'Payment requires additional action',
-          })
-          await stripeClient?.confirmCardPayment(client_secret, {
-            payment_method: payment_method,
-          })
-          // Approximately enough for webhook to be called and update entitlements
-          setTimeout(() => {
-            navigate('.', { replace: true })
-          }, 2000)
-        }
+        await process3DSecureCard({
+          STRIPE_PUBLISHABLE_KEY,
+          actionData,
+          navigate,
+        })
       })()
     }
+  }, [actionData])
 
+  useEffect(() => {
     if (toastNotification) {
       toast(toastNotification.type, {
         message: toastNotification.message,
       })
     }
-  }, [toastNotification, actionData])
+  }, [toastNotification])
 
   const redirectToPassport = () => {
     const currentURL = new URL(window.location.href)

@@ -126,9 +126,9 @@ export const createSubscription = async (
     accountURN,
     handled = false,
   }: CreateSubscriptionParams,
-  env: Env
+  SECRET_STRIPE_API_KEY: string
 ) => {
-  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
+  const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
@@ -159,9 +159,9 @@ export const updateSubscription = async (
     quantity,
     handled = false,
   }: UpdateSubscriptionParams,
-  env: Env
+  SECRET_STRIPE_API_KEY: string
 ) => {
-  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
+  const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 

@@ -146,7 +146,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         WALLET_CONNECT_PROJECT_ID,
       } = context.env
 
-      const spd = await accountClient.getStripePaymentData.query({
+      const spd = await coreClient.account.getStripePaymentData.query({
         accountURN,
       })
 
