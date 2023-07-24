@@ -1,4 +1,4 @@
-import { getInvoices } from '~/services/billing/stripe'
+import { getInvoices, getUpcomingInvoices } from '~/services/billing/stripe'
 import type { StripePaymentData } from '@proofzero/platform/account/src/types'
 
 export type StripeInvoice = {
@@ -21,33 +21,41 @@ export const getCurrentAndUpcomingInvoices = async (
   let invoices = [] as StripeInvoice[]
 
   if (spd?.customerID) {
+    // getting current invoices
     try {
-      const stripeInvoices = await getInvoices(
+      const currentInvoices = await getInvoices(
         {
           customerID: spd!.customerID,
         },
         SECRET_STRIPE_API_KEY
       )
 
-      invoices = stripeInvoices.invoices.data.map((i) => ({
+      invoices = currentInvoices.data.map((i) => ({
         id: i.id,
         amount: i.total / 100,
         timestamp: i.created * 1000,
         status: i.status,
         url: i.hosted_invoice_url ?? undefined,
       }))
-
-      if (stripeInvoices.upcomingInvoices) {
-        invoices = invoices.concat([
-          {
-            id: stripeInvoices.upcomingInvoices.lines.data[0].id,
-            amount: stripeInvoices.upcomingInvoices.lines.data[0].amount / 100,
-            timestamp:
-              stripeInvoices.upcomingInvoices.lines.data[0].period.start * 1000,
-            status: 'scheduled',
-          },
-        ])
-      }
+    } catch (er) {
+      console.error(er)
+    }
+    // getting upcoming invoices
+    try {
+      const stripeUpcomingInvoices = await getUpcomingInvoices(
+        {
+          customerID: spd!.customerID,
+        },
+        SECRET_STRIPE_API_KEY
+      )
+      invoices = invoices.concat([
+        {
+          id: stripeUpcomingInvoices.lines.data[0].id,
+          amount: stripeUpcomingInvoices.lines.data[0].amount / 100,
+          timestamp: stripeUpcomingInvoices.lines.data[0].period.start * 1000,
+          status: 'scheduled',
+        },
+      ])
     } catch (er) {
       console.error(er)
     }

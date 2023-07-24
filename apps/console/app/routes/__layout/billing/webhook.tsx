@@ -52,12 +52,23 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     switch (event.type) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
-        const { id, metadata: subMeta } = event.data.object as {
+        const {
+          id,
+          metadata: subMeta,
+          status: subStatus,
+        } = event.data.object as {
           id: string
           metadata: {
             accountURN: AccountURN
             handled?: string | null
           }
+          status: string
+        }
+
+        // We don't want to do anything with subscription
+        // if payment for it failed
+        if (subStatus !== 'active' && subStatus !== 'trialing') {
+          return null
         }
 
         if (event.data.previous_attributes) {
@@ -247,8 +258,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         const paymentIntentInfo = await stripeClient.paymentIntents.retrieve(
           paymentIntentFail
         )
-
-        console.log(JSON.stringify({ paymentIntentInfo }, null, 2))
 
         if (
           !customerDataFail.deleted &&

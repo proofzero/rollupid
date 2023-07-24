@@ -81,6 +81,7 @@ import {
 } from '~/utils/stripe'
 import { IoWarningOutline } from 'react-icons/io5'
 import { loadStripe } from '@stripe/stripe-js'
+import { type ToastNotification } from '~/types'
 
 type LoaderData = {
   STRIPE_PUBLISHABLE_KEY: string
@@ -88,10 +89,7 @@ type LoaderData = {
   entitlements: {
     [ServicePlanType.PRO]: number
   }
-  toastNotification?: {
-    message: string
-    type: ToastType
-  }
+  toastNotification?: ToastNotification
   connectedEmails: DropdownSelectListItem[]
   invoices: StripeInvoice[]
 }
@@ -116,7 +114,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const flashSession = await getFlashSession(request, context.env)
 
     let toastNotification = undefined
-    const toastStr = flashSession.get('toastNotification')
+    const toastStr = flashSession.get('toast_notification')
     if (toastStr) {
       toastNotification = JSON.parse(toastStr)
     }
@@ -210,7 +208,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     // until we resolve our unpaid invoices
     if (hasUnpaidInvoices) {
       flashSession.flash(
-        'toastNotification',
+        'toast_notification',
         JSON.stringify({
           type: ToastType.Error,
           message: 'Payment failed - check your card details',
@@ -241,6 +239,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         message: `Invalid quantity. Change ${
           quantity - assignedEntitlementCount
         } of the ${assignedEntitlementCount} apps to a different plan first.`,
+      })
+    }
+
+    if (quantity < 1 && txType === 'buy') {
+      throw new BadRequestError({
+        message: `Invalid quantity. Please enter a valid quantity.`,
       })
     }
 
@@ -293,7 +297,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       // https://stripe.com/docs/billing/subscriptions/overview#subscription-statuses
       if (sub.status === 'active' || sub.status === 'trialing') {
         flashSession.flash(
-          'toastNotification',
+          'toast_notification',
           JSON.stringify({
             type: ToastType.Success,
             message: 'Entitlement(s) successfully bought',
@@ -301,7 +305,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         )
       } else {
         flashSession.flash(
-          'toastNotification',
+          'toast_notification',
           JSON.stringify({
             type: ToastType.Error,
             message: 'Payment failed - check your card details',
@@ -311,7 +315,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
     if (txType === 'remove') {
       flashSession.flash(
-        'toastNotification',
+        'toast_notification',
         JSON.stringify({
           type: ToastType.Success,
           message: 'Entitlement(s) successfully removed',
@@ -477,7 +481,7 @@ const PurchaseProModal = ({
               onClick={() => {
                 setProEntitlementDelta((prev) => prev - 1)
               }}
-              disabled={proEntitlementDelta < 1}
+              disabled={proEntitlementDelta <= 1}
             >
               <HiMinus />
             </button>
@@ -1057,16 +1061,9 @@ export default () => {
     }
 
     if (toastNotification) {
-      if (toastNotification.type === ToastType.Success) {
-        toast(ToastType.Success, {
-          message: toastNotification.message,
-        })
-      }
-      if (toastNotification.type === ToastType.Error) {
-        toast(ToastType.Error, {
-          message: toastNotification.message,
-        })
-      }
+      toast(toastNotification.type, {
+        message: toastNotification.message,
+      })
     }
   }, [toastNotification, actionData])
 

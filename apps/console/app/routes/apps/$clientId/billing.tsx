@@ -1,14 +1,14 @@
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import plans, { PlanDetails } from '~/routes/__layout/billing/plans'
+import plans, { type PlanDetails } from '~/routes/__layout/billing/plans'
 import { PlanFeatures } from '~/routes/__layout/billing'
-import { PaymentData, ServicePlanType } from '@proofzero/types/account'
+import { type PaymentData, ServicePlanType } from '@proofzero/types/account'
 import { Button } from '@proofzero/design-system'
 import { StatusPill } from '@proofzero/design-system/src/atoms/pills/StatusPill'
 import {
-  ActionFunction,
-  LoaderFunction,
-  Session,
-  SessionData,
+  type ActionFunction,
+  type LoaderFunction,
+  type Session,
+  type SessionData,
   json,
 } from '@remix-run/cloudflare'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
@@ -24,11 +24,11 @@ import {
   parseJwt,
 } from '@proofzero/utils'
 import { useLoaderData, useOutletContext, useSubmit } from '@remix-run/react'
-import { GetEntitlementsOutput } from '@proofzero/platform/account/src/jsonrpc/methods/getEntitlements'
-import { AccountURN } from '@proofzero/urns/account'
+import { type GetEntitlementsOutput } from '@proofzero/platform/account/src/jsonrpc/methods/getEntitlements'
+import { type AccountURN } from '@proofzero/urns/account'
 import { BadRequestError } from '@proofzero/errors'
-import type { appDetailsProps } from '~/types'
-import { AppLoaderData } from '~/root'
+import type { ToastNotification, appDetailsProps } from '~/types'
+import { type AppLoaderData } from '~/root'
 import {
   createSubscription,
   updateSubscription,
@@ -65,15 +65,17 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const flashSession = await getFlashSession(request, context.env)
-    const successToast = flashSession.get('success_toast')
-    const errorToast = flashSession.get('error_toast')
+    let toastNotification: ToastNotification | undefined = undefined
+    const toastStr = flashSession.get('toast_notification')
+    if (toastStr) {
+      toastNotification = JSON.parse(toastStr)
+    }
 
     return json(
       {
         entitlements,
         paymentData,
-        successToast,
-        errorToast,
+        toastNotification,
       },
       {
         headers: {
@@ -136,8 +138,13 @@ const processUpdateOp = async (
       })
     }
   }
-
-  flashSession.flash('success_toast', `${plans[plan].title} assigned.`)
+  flashSession.flash(
+    'toast_notification',
+    JSON.stringify({
+      type: ToastType.Success,
+      message: `${plans[plan].title} assigned.`,
+    })
+  )
 }
 
 const processPurchaseOp = async (
@@ -200,10 +207,28 @@ const processPurchaseOp = async (
         env
       )
     }
+
+    if (sub.status !== 'active' && sub.status !== 'trialing') {
+      flashSession.flash(
+        'toast_notification',
+        JSON.stringify({
+          type: ToastType.Error,
+          message: 'Payment failed - check your card details',
+        })
+      )
+      return new Response(null, {
+        headers: {
+          'Set-Cookie': await commitFlashSession(flashSession, env),
+        },
+      })
+    }
   } catch (e) {
     flashSession.flash(
-      'error_toast',
-      'Transaction failed. You were not charged.'
+      'toast_notification',
+      JSON.stringify({
+        type: ToastType.Error,
+        message: 'Transaction failed. You were not charged.',
+      })
     )
 
     return new Response(null, {
@@ -227,8 +252,11 @@ const processPurchaseOp = async (
   })
 
   flashSession.flash(
-    'success_toast',
-    `${plans[plan].title} purchased and assigned.`
+    'toast_notification',
+    JSON.stringify({
+      type: ToastType.Success,
+      message: `${plans[plan].title} purchased and assigned.`,
+    })
   )
 }
 
@@ -414,7 +442,7 @@ const PurchaseConfirmationModal = ({
         </section>
       )}
 
-      <section className="m-5 border rounded-lg">
+      <section className="m-5 border rounded-lg overflow-auto thin-scrollbar">
         <div className="p-6">
           <Text size="lg" weight="semibold" className="text-gray-900 text-left">
             {plan.title}
@@ -676,13 +704,11 @@ export default () => {
   const {
     entitlements: { plans: entitlements },
     paymentData,
-    successToast,
-    errorToast,
+    toastNotification,
   } = useLoaderData<{
     entitlements: GetEntitlementsOutput
     paymentData: PaymentData
-    successToast: string
-    errorToast: string
+    toastNotification: ToastNotification | undefined
   }>()
 
   const { apps, appDetails } = useOutletContext<{
@@ -691,20 +717,12 @@ export default () => {
   }>()
 
   useEffect(() => {
-    if (successToast) {
-      toast(ToastType.Success, {
-        message: successToast,
+    if (toastNotification) {
+      toast(toastNotification.type, {
+        message: toastNotification.message,
       })
     }
-  }, [successToast])
-
-  useEffect(() => {
-    if (errorToast) {
-      toast(ToastType.Error, {
-        message: errorToast,
-      })
-    }
-  }, [errorToast])
+  }, [toastNotification])
 
   return (
     <>

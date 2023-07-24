@@ -227,14 +227,21 @@ export const getInvoices = async (
     customer: customerID,
   })
 
+  return invoices
+}
+
+export const getUpcomingInvoices = async (
+  { customerID }: GetInvoicesParams,
+  SECRET_STRIPE_API_KEY: string
+) => {
+  const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
+    apiVersion: '2022-11-15',
+  })
+
   const upcomingInvoices = await stripeClient.invoices.retrieveUpcoming({
     customer: customerID,
   })
-
-  return {
-    invoices,
-    upcomingInvoices,
-  }
+  return upcomingInvoices
 }
 
 export const voidInvoice = async (
