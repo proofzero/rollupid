@@ -241,7 +241,6 @@ export const getUpcomingInvoices = async (
 
   const upcomingInvoices = await stripeClient.invoices.retrieveUpcoming({
     customer: customerID,
-    expand: ['data.payment_intent'],
   })
   return upcomingInvoices
 }

@@ -238,9 +238,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    if (quantity < 1 && txType === 'buy') {
+    if ((quantity < 1 && txType === 'buy') || quantity < 0) {
       throw new BadRequestError({
-        message: `Invalid quantity. Please enter a valid quantity.`,
+        message: `Invalid quantity. Please enter a valid number of entitlements.`,
       })
     }
 
@@ -275,7 +275,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
 
     if (txType === 'buy') {
-      // https://stripe.com/docs/billing/subscriptions/overview#subscription-statuses
       setPurchaseToastNotification({
         sub,
         flashSession,
@@ -299,6 +298,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           .payment_intent?.client_secret,
         payment_method: (sub.latest_invoice as unknown as StripeInvoice)
           .payment_intent?.payment_method,
+        quantity,
+        subscriptionID: sub.id,
       }),
       {
         headers: {

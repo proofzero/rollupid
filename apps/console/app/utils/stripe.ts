@@ -121,6 +121,7 @@ export const setPurchaseToastNotification = ({
   sub: Stripe.Subscription
   flashSession: any
 }) => {
+  // https://stripe.com/docs/billing/subscriptions/overview#subscription-statuses
   if (sub.status === 'active' || sub.status === 'trialing') {
     flashSession.flash(
       'toast_notification',

@@ -232,6 +232,7 @@ export default function AppDetailIndexPage() {
                   appContactEmail,
                   paymaster,
                   accountURN,
+                  hasUnpaidInvoices,
                 }}
               />
             </section>
