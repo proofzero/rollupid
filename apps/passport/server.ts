@@ -14,6 +14,8 @@ import type { TraceableFetchEvent } from '@proofzero/platform-middleware/trace'
 import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 import manifestJSON from '__STATIC_CONTENT_MANIFEST'
 import { getCoreClient } from '~/platform.server'
+import { ResolveConfigFn, instrument } from '@microlabs/otel-cf-workers'
+import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-base'
 let manifest = JSON.parse(manifestJSON)
 
 type CfHostMetadata = {
@@ -128,13 +130,24 @@ const handleEvent = async (event: FetchEvent, env: Env) => {
   return response
 }
 
-export default {
-  async fetch(req: Request, env: Env, ctx: ExecutionContext) {
-    //This is the smallest set of event props Remix needs to handle assets correctly
-    const event = {
-      request: req,
-      waitUntil: ctx.waitUntil.bind(ctx),
-    } as FetchEvent
-    return await handleEvent(event, env)
-  },
+const exporter = new ConsoleSpanExporter()
+const config: ResolveConfigFn = (env: Env, _trigger) => {
+  return {
+    exporter: exporter,
+    service: { name: 'passport' },
+  }
 }
+
+export default instrument(
+  {
+    async fetch(req: Request, env: Env, ctx: ExecutionContext) {
+      //This is the smallest set of event props Remix needs to handle assets correctly
+      const event = {
+        request: req,
+        waitUntil: ctx.waitUntil.bind(ctx),
+      } as FetchEvent
+      return await handleEvent(event, env)
+    },
+  },
+  config
+)

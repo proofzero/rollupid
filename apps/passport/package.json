@@ -22,6 +22,8 @@
   },
   "dependencies": {
     "@ethersproject/keccak256": "5.7.0",
+    "@microlabs/otel-cf-workers": "1.0.0-rc.6",
+    "@opentelemetry/sdk-trace-base": "1.15.1",
     "@proofzero/design-system": "*",
     "@proofzero/platform-clients": "workspace:*",
     "@proofzero/platform.address": "workspace:*",
