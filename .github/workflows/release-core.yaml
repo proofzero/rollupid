@@ -38,6 +38,15 @@ jobs:
       - name: Test
         run: yarn run test
 
+      - name: Deploy edges D1 Database
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
+          accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: 'platform/core'
+          command: d1 migrations apply edges-v2-current --config wrangler.current.toml --env current
+          environment: 'current'
+
       - name: Deploy
         uses: cloudflare/wrangler-action@2.0.0
         with:
