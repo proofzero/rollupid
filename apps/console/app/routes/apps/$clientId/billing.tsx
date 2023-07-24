@@ -43,6 +43,7 @@ import {
   toast,
 } from '@proofzero/design-system/src/atoms/toast'
 import { Env } from 'bindings'
+import dangerVector from '~/images/danger.svg'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -497,6 +498,78 @@ const PurchaseConfirmationModal = ({
   )
 }
 
+const DowngradeConfirmationModal = ({
+  isOpen,
+  setIsOpen,
+  currentPlan,
+  updatedPlan,
+}: {
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+  currentPlan: ServicePlanType
+  updatedPlan: ServicePlanType
+}) => {
+  const submit = useSubmit()
+
+  return (
+    <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
+      <div
+        className={`w-[48vw] rounded-lg bg-white px-4 pb-4 sm:px-6 sm:pb-6 flex flex-col gap-4 text-left`}
+      >
+        <div className="flex flex-row gap-4 items-start">
+          <img src={dangerVector} />
+
+          <div className="flex-1 flex flex-col gap-4">
+            <Text size="lg" weight="medium" className="text-gray-900 mb-2">
+              Downgrade Application
+            </Text>
+
+            <Text>
+              You are about to downgrade the application to the{' '}
+              {plans[updatedPlan].title}, removing the following features:
+            </Text>
+
+            <ul className="list-disc">
+              {plans[currentPlan].features
+                .filter((f) => f.type === 'addon')
+                .map((f) => (
+                  <li>{f.title}</li>
+                ))}
+            </ul>
+
+            <Text>Are you sure you want to proceed?</Text>
+          </div>
+        </div>
+
+        <div className="flex justify-end items-center space-x-3">
+          <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            btnType="dangerous"
+            onClick={() => {
+              submit(
+                {
+                  op: 'update',
+                  payload: JSON.stringify({
+                    plan: updatedPlan,
+                  }),
+                },
+                {
+                  method: 'post',
+                }
+              )
+            }}
+          >
+            Downgrade
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
 const EntitlementsCardButton = ({
   currentPlan,
   entitlement,
@@ -511,6 +584,8 @@ const EntitlementsCardButton = ({
   paymentData: PaymentData
 }) => {
   const [showPurchaseModal, setShowPurchaseModal] = useState(false)
+  const [showDowngradeConfirmationModal, setShowDowngradeConfirmationModal] =
+    useState(false)
 
   const isUpgrade = (
     planType: ServicePlanType,
@@ -540,21 +615,33 @@ const EntitlementsCardButton = ({
         plan={plans[entitlement.planType]}
         paymentData={paymentData}
       />
+
+      <DowngradeConfirmationModal
+        isOpen={showDowngradeConfirmationModal}
+        setIsOpen={setShowDowngradeConfirmationModal}
+        currentPlan={currentPlan}
+        updatedPlan={ServicePlanType.FREE}
+      />
+
       <Button
         btnType={upgrade ? 'primary-alt' : 'secondary-alt'}
         onClick={() => {
           if (op === 'update') {
-            submit(
-              {
-                op: 'update',
-                payload: JSON.stringify({
-                  plan: entitlement.planType,
-                }),
-              },
-              {
-                method: 'post',
-              }
-            )
+            if (upgrade) {
+              submit(
+                {
+                  op: 'update',
+                  payload: JSON.stringify({
+                    plan: entitlement.planType,
+                  }),
+                },
+                {
+                  method: 'post',
+                }
+              )
+            } else {
+              setShowDowngradeConfirmationModal(true)
+            }
           } else {
             setShowPurchaseModal(true)
           }
