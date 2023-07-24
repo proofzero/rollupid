@@ -59,8 +59,10 @@ import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
-import { getStarbaseClient } from './platform.server'
 import { useHydrated } from 'remix-utils'
+
+import { getCoreClient } from './platform.server'
+
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
   title: 'Passport - Rollup',
@@ -111,8 +113,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
             websiteURL: 'https://rollup.id',
           }
         } else {
-          const sbClient = getStarbaseClient('', context.env, context.traceSpan)
-          appProps = await sbClient.getAppPublicProps.query({
+          const coreClient = getCoreClient({ context })
+          appProps = await coreClient.starbase.getAppPublicProps.query({
             clientId: params.clientId!,
           })
         }

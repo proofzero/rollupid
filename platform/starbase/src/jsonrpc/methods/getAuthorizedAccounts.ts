@@ -1,3 +1,4 @@
+import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
 import { EDGE_AUTHORIZES } from '@proofzero/platform.access/src/constants'
 
@@ -37,6 +38,10 @@ export const GetAuthorizedAccountsMethodOutput = z.object({
   metadata: EdgesMetadata,
 })
 
+export type GetAuthorizedAccountsMethodOutput = z.infer<
+  typeof GetAuthorizedAccountsMethodOutput
+>
+
 // Method
 // -----------------------------------------------------------------------------
 
@@ -46,8 +51,9 @@ export const getAuthorizedAccounts = async ({
 }: {
   input: GetAuthorizedAccountsParams
   ctx: Context
-}) => {
-  const edgesResult = await ctx.edges.getEdges.query({
+}): Promise<GetAuthorizedAccountsMethodOutput> => {
+  const caller = router.createCaller(ctx)
+  const edgesResult = await caller.edges.getEdges({
     query: {
       tag: EDGE_AUTHORIZES,
       dst: {

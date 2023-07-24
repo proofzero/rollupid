@@ -1,10 +1,8 @@
 export const seviceBindings = true
 
 interface Env {
-  Starbase: Fetcher
+  Core: Fetcher
   Images: Fetcher
-  Account: Fetcher
-  Address: Fetcher
 
   SECRET_SESSION_KEY: string
   SECRET_SESSION_SALT: string

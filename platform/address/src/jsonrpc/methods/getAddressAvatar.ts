@@ -2,8 +2,7 @@ import { z } from 'zod'
 
 import { OAuthAddressType } from '@proofzero/types/address'
 
-import { Context } from '../../context'
-
+import type { Context } from '../../context'
 import { MicrosoftAddress } from '../../nodes'
 
 export const GetAddressAvatarOutput = z.string()

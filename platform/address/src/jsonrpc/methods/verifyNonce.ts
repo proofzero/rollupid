@@ -1,15 +1,9 @@
 import { z } from 'zod'
-import { Context } from '../../context'
 
-import { ResponseType } from '@proofzero/types/access'
+import { router } from '@proofzero/platform.core'
 
-import getAccessClient from '@proofzero/platform-clients/access'
-
-import { appRouter } from '../router'
-import { Challenge } from '../../types'
-import { AddressNode } from '../../nodes'
-import CryptoAddress from '../../nodes/crypto'
-import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import type { Context } from '../../context'
+import { CryptoAddress, type AddressNode } from '../../nodes'
 
 export const VerifyNonceInput = z.object({
   nonce: z.string(),
@@ -39,8 +33,8 @@ export const verifyNonceMethod = async ({
 
   await nodeClient.verifyNonce(nonce, signature)
 
-  const caller = appRouter.createCaller(ctx)
-  const { existing } = await caller.resolveAccount({
+  const caller = router.createCaller(ctx)
+  const { existing } = await caller.address.resolveAccount({
     jwt,
     force: input.forceAccountCreation,
   })

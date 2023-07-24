@@ -1,0 +1,106 @@
+name: Core
+
+on:
+  push:
+    branches:
+      - main
+
+defaults:
+  run:
+    working-directory: platform/core
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: next
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: cachix/install-nix-action@v18
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - run: nix-build ../platform.nix
+
+      - name: Cache Dependencies
+        id: cache-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            .yarn
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Test
+        run: yarn run test
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
+          accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: platform/core
+          command: publish --config wrangler.next.toml
+          secrets: |
+            SECRET_JWK_CURRENT_KID
+            SECRET_JWKS
+
+            INTERNAL_DKIM_SELECTOR
+
+            INTERNAL_GOOGLE_OAUTH_CLIENT_ID
+            SECRET_GOOGLE_OAUTH_CLIENT_SECRET
+
+            INTERNAL_GITHUB_OAUTH_CLIENT_ID
+            SECRET_GITHUB_OAUTH_CLIENT_SECRET
+
+            INTERNAL_TWITTER_OAUTH_CLIENT_ID
+            SECRET_TWITTER_OAUTH_CLIENT_SECRET
+
+            INTERNAL_MICROSOFT_OAUTH_CLIENT_ID
+            SECRET_MICROSOFT_OAUTH_CLIENT_SECRET
+
+            INTERNAL_APPLE_OAUTH_CLIENT_ID
+            SECRET_APPLE_OAUTH_CLIENT_SECRET
+
+            INTERNAL_DISCORD_OAUTH_CLIENT_ID
+            SECRET_DISCORD_OAUTH_CLIENT_SECRET
+
+            INTERNAL_CLOUDFLARE_ZONE_ID
+            TOKEN_CLOUDFLARE_API
+
+            SECRET_ZERODEV_PROJECTID
+        env:
+          NODE_ENV: 'production'
+
+          SECRET_JWK_CURRENT_KID: ${{ secrets.SECRET_JWK_CURRENT_KID_TEST }}
+          SECRET_JWKS: ${{ secrets.SECRET_JWKS_TEST }}
+
+          INTERNAL_DKIM_SELECTOR: ${{ secrets.INTERNAL_DKIM_SELECTOR }}
+
+          INTERNAL_GOOGLE_OAUTH_CLIENT_ID: ${{ vars.INTERNAL_GOOGLE_OAUTH_CLIENT_ID_TEST }}
+          SECRET_GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.SECRET_GOOGLE_OAUTH_CLIENT_SECRET_TEST }}
+
+          INTERNAL_GITHUB_OAUTH_CLIENT_ID: ${{ vars.INTERNAL_GITHUB_OAUTH_CLIENT_ID_TEST }}
+          SECRET_GITHUB_OAUTH_CLIENT_SECRET: ${{ secrets.SECRET_GITHUB_OAUTH_CLIENT_SECRET_TEST }}
+
+          INTERNAL_TWITTER_OAUTH_CLIENT_ID: ${{ vars.INTERNAL_TWITTER_OAUTH_CLIENT_ID_TEST }}
+          SECRET_TWITTER_OAUTH_CLIENT_SECRET: ${{ secrets.SECRET_TWITTER_OAUTH_CLIENT_SECRET_TEST }}
+
+          INTERNAL_MICROSOFT_OAUTH_CLIENT_ID: ${{ vars.INTERNAL_MICROSOFT_OAUTH_CLIENT_ID_TEST }}
+          SECRET_MICROSOFT_OAUTH_CLIENT_SECRET: ${{ secrets.SECRET_MICROSOFT_OAUTH_CLIENT_SECRET_TEST }}
+
+          INTERNAL_APPLE_OAUTH_CLIENT_ID: ${{ vars.INTERNAL_APPLE_OAUTH_CLIENT_ID_TEST }}
+          SECRET_APPLE_OAUTH_CLIENT_SECRET: ${{ secrets.SECRET_APPLE_OAUTH_CLIENT_SECRET_TEST }}
+
+          INTERNAL_DISCORD_OAUTH_CLIENT_ID: ${{ vars.INTERNAL_DISCORD_OAUTH_CLIENT_ID_TEST }}
+          SECRET_DISCORD_OAUTH_CLIENT_SECRET: ${{ secrets.SECRET_DISCORD_OAUTH_CLIENT_SECRET_TEST }}
+
+          INTERNAL_CLOUDFLARE_ZONE_ID: ${{ secrets.INTERNAL_CLOUDFLARE_ZONE_ID }}
+          TOKEN_CLOUDFLARE_API: ${{ secrets.TOKEN_CLOUDFLARE_API }}
+
+          SECRET_ZERODEV_PROJECTID: ${{secrets.SECRET_ZERODEV_PROJECTID_TEST }}

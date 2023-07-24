@@ -1,9 +1,9 @@
 import { z } from 'zod'
+import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
 import * as oauth from '../../OAuth'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
-import createEdgesClient from '@proofzero/platform-clients/edges'
 import { EDGE_APPLICATION } from '../../types'
 
 export const CreateAppInputSchema = z.object({
@@ -36,9 +36,11 @@ export const createApp = async ({
   const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
   await appDO.class.init(clientId, input.clientName)
 
+  const caller = router.createCaller(ctx)
+
   // We need to create an edge between the logged in user node (aka
   // account) and the new app.
-  const edgeRes = await ctx.edges.makeEdge.mutate({
+  const edgeRes = await caller.edges.makeEdge({
     src: ctx.accountURN,
     dst: appURN,
     tag: EDGE_APPLICATION,

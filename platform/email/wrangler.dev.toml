@@ -1,0 +1,9 @@
+name = "email-dev"
+main = "src/index.ts"
+compatibility_date = "2022-10-05"
+logpush = true
+workers_dev = false
+
+[vars]
+NotificationFromName = "Rollup Dev - Notification"
+NotificationFromUser = 'noreply-dev'

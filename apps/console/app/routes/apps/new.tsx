@@ -1,5 +1,5 @@
 import { redirect } from '@remix-run/cloudflare'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { requireJWT } from '~/utilities/session.server'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
@@ -30,12 +30,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const jwt = await requireJWT(request, context.env)
 
-    const starbaseClient = createStarbaseClient(context.env.Starbase, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
     try {
-      const { clientId } = await starbaseClient.createApp.mutate({ clientName })
+      const { clientId } = await coreClient.starbase.createApp.mutate({
+        clientName,
+      })
       console.log({ clientId })
       return redirect(`/apps/${clientId}`)
     } catch (error) {

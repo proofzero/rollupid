@@ -13,7 +13,6 @@
     "lint:check": "run-s lint:check:src",
     "lint:check:src": "eslint src",
     "types:check": "tsc --project tsconfig.json",
-    "dev": "echo \"dev not enabled on service to save resources until useful\"",
     "start": "wrangler dev ",
     "deploy": "wrangler publish"
   },

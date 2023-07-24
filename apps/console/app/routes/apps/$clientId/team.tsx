@@ -13,10 +13,9 @@ import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResul
 import { requireJWT } from '~/utilities/session.server'
 import { checkToken } from '@proofzero/utils/token'
 
-import createAccountClient from '@proofzero/platform-clients/account'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
 
 import {
   getEmailIcon,
@@ -42,12 +41,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const payload = checkToken(jwt!)
     const accountURN = payload.sub as AccountURN
 
-    const accountClient = createAccountClient(context.env.Account, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const connectedAccounts = await accountClient.getAddresses.query({
+    const connectedAccounts = await coreClient.account.getAddresses.query({
       account: accountURN,
     })
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
@@ -61,18 +60,18 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const connectResult = requestURL.searchParams.get('rollup_result')
     if (connectResult && connectResult === 'SUCCESS') {
       if (connectedEmails.length === 1) {
-        const starbaseClient = createStarbaseClient(context.env.Starbase, {
+        const coreClient = createCoreClient(context.env.Core, {
           ...getAuthzHeaderConditionallyFromToken(jwt),
           ...generateTraceContextHeaders(context.traceSpan),
         })
 
         const appContactAddress =
-          await starbaseClient.getAppContactAddress.query({
+          await coreClient.starbase.getAppContactAddress.query({
             clientId,
           })
 
         if (!appContactAddress) {
-          await starbaseClient.upsertAppContactAddress.mutate({
+          await coreClient.starbase.upsertAppContactAddress.mutate({
             address: connectedEmails[0].value as AddressURN,
             clientId,
           })
@@ -101,13 +100,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const errors: errorsTeamProps = {}
 
-    const starbaseClient = createStarbaseClient(context.env.Starbase, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
     try {
-      await starbaseClient.upsertAppContactAddress.mutate({
+      await coreClient.starbase.upsertAppContactAddress.mutate({
         address: addressURN,
         clientId,
       })

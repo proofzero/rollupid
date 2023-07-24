@@ -3,8 +3,7 @@ import { AccountURN } from '@proofzero/urns/account'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { LoaderFunction, json } from '@remix-run/cloudflare'
 import { parseJwt, requireJWT } from '~/utilities/session.server'
-import createAccountClient from '@proofzero/platform-clients/account'
-import createAddressClient from '@proofzero/platform-clients/address'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 import { NO_OP_ADDRESS_PLACEHOLDER } from '@proofzero/platform/address/src/constants'
@@ -39,18 +38,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
-    const accountClient = createAccountClient(context.env.Account, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-
-    const addressClient = createAddressClient(context.env.Address, {
+    const coreClient = createCoreClient(context.env.Core, {
       [PlatformAddressURNHeader]: NO_OP_ADDRESS_PLACEHOLDER,
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
 
-    const groups = await accountClient.listIdentityGroups.query({
+    const groups = await coreClient.account.listIdentityGroups.query({
       accountURN,
     })
 
@@ -63,9 +57,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
             {} as Record<AddressURN, { URN: AddressURN; joinTimestamp: number }>
           )
 
-        const memberProfiles = await addressClient.getAddressProfileBatch.query(
-          group.members.map((m) => m.URN)
-        )
+        const memberProfiles =
+          await coreClient.address.getAddressProfileBatch.query(
+            group.members.map((m) => m.URN)
+          )
 
         const memberModels: GroupMemberModel[] = memberProfiles.map(
           (profile) => ({

@@ -16,7 +16,7 @@ import {
 
 import { encryptSession, decryptSession } from '@proofzero/utils/session'
 
-import { getAccountClient } from './platform.server'
+import { getCoreClient } from './platform.server'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 import { InternalServerError, UnauthorizedError } from '@proofzero/errors'
 import { AccountURNSpace } from '@proofzero/urns/account'
@@ -320,10 +320,11 @@ export async function getValidatedSessionContext(
 
   try {
     const payload = checkToken(jwt)
-    const accountClient = getAccountClient(jwt, env, traceSpan)
+    const context = { env: { Core: env.Core }, traceSpan: traceSpan }
+    const coreClient = getCoreClient({ context, jwt })
     if (
       !AccountURNSpace.is(payload.sub!) ||
-      !(await accountClient.isValid.query())
+      !(await coreClient.account.isValid.query())
     )
       throw InvalidSessionAccountError
     return {
@@ -331,6 +332,7 @@ export async function getValidatedSessionContext(
       accountUrn: payload.sub as AccountURN,
     }
   } catch (error) {
+    console.error('WTF', error)
     // TODO: Revise this logic
     const redirectTo = `/authenticate/${authzParams?.clientId}`
     if (error === InvalidTokenError)

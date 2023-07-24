@@ -239,17 +239,13 @@ export const reconcileAppSubscriptions = async (
   {
     subscriptionID,
     accountURN,
-    starbaseClient,
-    accountClient,
-    addressClient,
+    coreClient,
     billingURL,
     settingsURL,
   }: {
     subscriptionID: string
     accountURN: AccountURN
-    starbaseClient: any
-    accountClient: any
-    addressClient: any
+    coreClient: any
     billingURL: string
     settingsURL: string
   },
@@ -275,14 +271,14 @@ export const reconcileAppSubscriptions = async (
   }
 
   const { email: billingEmail } =
-    await accountClient.getStripePaymentData.query({
+    await coreClient.account.getStripePaymentData.query({
       accountURN,
     })
 
   let reconciliations: ReconcileAppsSubscriptionsOutput = []
   for (const pq of planQuantities) {
     const planReconciliations =
-      await starbaseClient.reconcileAppSubscriptions.mutate({
+      await coreClient.starbase.reconcileAppSubscriptions.mutate({
         accountURN: accountURN,
         count: pq.quantity,
         plan: priceIdToPlanTypeDict[pq.priceID],
@@ -290,7 +286,7 @@ export const reconcileAppSubscriptions = async (
 
     reconciliations = reconciliations.concat(planReconciliations)
 
-    await accountClient.updateEntitlements.mutate({
+    await coreClient.account.updateEntitlements.mutate({
       accountURN: accountURN,
       subscriptionID: subscriptionID,
       quantity: pq.quantity,
@@ -299,7 +295,7 @@ export const reconcileAppSubscriptions = async (
   }
 
   if (reconciliations.length > 0) {
-    await addressClient.sendReconciliationNotification.query({
+    await coreClient.address.sendReconciliationNotification.query({
       planType: plans[reconciliations[0].plan].title, // Only pro for now
       count: reconciliations.length,
       billingEmail,

@@ -1,8 +1,6 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 
-import createAddressClient from '@proofzero/platform-clients/address'
-import createAccessClient from '@proofzero/platform-clients/access'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
 
 import { Resolvers } from './typedefs'
@@ -35,10 +33,10 @@ const addressResolvers: Resolvers = {
       { provider, alias }: { provider: string; alias: string },
       { env, traceSpan }: ResolverContext
     ) => {
-      const addressClient = createAddressClient(env.Address, {
+      const coreClient = createCoreClient(env.Core, {
         ...generateTraceContextHeaders(traceSpan),
       })
-      const accountURN = await addressClient.getAccountByAlias.query({
+      const accountURN = await coreClient.address.getAccountByAlias.query({
         alias,
         provider,
       })
@@ -51,12 +49,12 @@ const addressResolvers: Resolvers = {
       { addressURN }: { addressURN: AddressURN },
       { env, traceSpan }: ResolverContext
     ) => {
-      const addressClient = createAddressClient(env.Address, {
+      const coreClient = createCoreClient(env.Core, {
         [PlatformAddressURNHeader]: addressURN,
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      const addressProfile = await addressClient.getAddressProfile.query()
+      const addressProfile = await coreClient.address.getAddressProfile.query()
 
       return addressProfile
     },
@@ -68,12 +66,12 @@ const addressResolvers: Resolvers = {
     ) => {
       const profiles = await Promise.all(
         addressURNList.map(async (urn) => {
-          const addressClient = createAddressClient(env.Address, {
+          const coreClient = createCoreClient(env.Core, {
             [PlatformAddressURNHeader]: urn,
             ...generateTraceContextHeaders(traceSpan),
           })
 
-          return addressClient.getAddressProfile.query()
+          return coreClient.address.getAddressProfile.query()
         })
       )
       return profiles
@@ -85,12 +83,12 @@ const addressResolvers: Resolvers = {
       { nickname, addressURN },
       { env, traceSpan }: ResolverContext
     ) => {
-      const addressClient = createAddressClient(env.Address, {
+      const coreClient = createCoreClient(env.Core, {
         [PlatformAddressURNHeader]: addressURN,
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      await addressClient.setNickname.query({
+      await coreClient.address.setNickname.query({
         nickname,
       })
 
@@ -133,11 +131,7 @@ const addressResolvers: Resolvers = {
       },
       { env, jwt, traceSpan, accountURN, clientId, apiKey }: ResolverContext
     ) => {
-      const accessClient = createAccessClient(env.Access, {
-        ...getAuthzHeaderConditionallyFromToken(jwt),
-        ...generateTraceContextHeaders(traceSpan),
-      })
-      const starbaseClient = createStarbaseClient(env.Starbase, {
+      const coreClient = createCoreClient(env.Core, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...generateTraceContextHeaders(traceSpan),
         [AppAPIKeyHeader]: apiKey,
@@ -145,8 +139,8 @@ const addressResolvers: Resolvers = {
 
       const [userInfo, paymaster]: [PersonaData, PaymasterType] =
         await Promise.all([
-          accessClient.getUserInfo.query({ access_token: jwt }),
-          starbaseClient.getPaymaster.query({ clientId }),
+          coreClient.access.getUserInfo.query({ access_token: jwt }),
+          coreClient.starbase.getPaymaster.query({ clientId }),
         ])
 
       if (
@@ -159,18 +153,14 @@ const addressResolvers: Resolvers = {
         throw new GraphQLError('Invalid smart contract wallet address.')
       }
 
-      const addressClient = createAddressClient(env.Address, {
-        ...generateTraceContextHeaders(traceSpan),
-      })
-
       try {
-        const sessionKey = await addressClient.registerSessionKey.mutate({
+        const sessionKey = await coreClient.address.registerSessionKey.mutate({
           paymaster,
           smartContractWalletAddress,
           sessionPublicKey,
         })
 
-        const appData = await accessClient.getAppData.query({
+        const appData = await coreClient.access.getAppData.query({
           clientId,
         })
 
@@ -185,7 +175,7 @@ const addressResolvers: Resolvers = {
           publicSessionKey: sessionPublicKey,
         })
 
-        await accessClient.setAppData.mutate({
+        await coreClient.access.setAppData.mutate({
           clientId,
           appData: {
             smartWalletSessionKeys,

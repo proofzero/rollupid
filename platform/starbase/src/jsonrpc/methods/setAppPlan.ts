@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { AppClientIdParamSchema } from '../validators/app'
@@ -34,8 +35,10 @@ export const setAppPlan = async ({
   )
   await appDO.class.setAppPlan(plan)
 
+  const caller = router.createCaller(ctx)
+
   if (plan && plan !== ServicePlanType.FREE) {
-    const { edges } = await ctx.edges.getEdges.query({
+    const { edges } = await caller.edges.getEdges({
       query: {
         src: { baseUrn: accountURN },
         tag: EDGE_PAYS_APP,
@@ -44,14 +47,14 @@ export const setAppPlan = async ({
     })
 
     if (edges.length === 0) {
-      await ctx.edges.makeEdge.mutate({
+      await caller.edges.makeEdge({
         src: accountURN,
         tag: EDGE_PAYS_APP,
         dst: appURN,
       })
     }
   } else {
-    await ctx.edges.removeEdge.mutate({
+    await caller.edges.removeEdge({
       src: accountURN,
       tag: EDGE_PAYS_APP,
       dst: appURN,

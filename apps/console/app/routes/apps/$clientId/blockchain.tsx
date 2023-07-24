@@ -10,7 +10,7 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { requireJWT } from '~/utilities/session.server'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { TbInfoCircle } from 'react-icons/tb'
 import zerodevIcon from '~/assets/paymasters/zerodev.svg'
 
@@ -57,7 +57,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
     const jwt = await requireJWT(request, context.env)
     let errors: errorsType = {}
-    const starbaseClient = createStarbaseClient(context.env.Starbase, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
@@ -78,7 +78,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       errors.label = `Provider secret is required`
     }
     try {
-      await starbaseClient.setPaymaster.mutate({
+      await coreClient.starbase.setPaymaster.mutate({
         clientId: params.clientId,
         paymaster: { provider: paymaster, secret },
       })

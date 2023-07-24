@@ -7,11 +7,13 @@ export const setAddressNodeClient: BaseMiddlewareFunction<Context> = async ({
   next,
   ctx,
 }) => {
-  if (!ctx.addressURN) {
-    throw new Error('missing addressURN')
-  }
-  const baseURN = AddressURNSpace.getBaseURN(ctx.addressURN)
-  const node = initAddressNodeByName(baseURN, ctx.Address)
+  if (!ctx.addressURN) return next({ ctx })
+
+  const node = initAddressNodeByName(
+    AddressURNSpace.getBaseURN(ctx.addressURN),
+    ctx.Address
+  )
+
   return next({
     ctx: {
       ...ctx,

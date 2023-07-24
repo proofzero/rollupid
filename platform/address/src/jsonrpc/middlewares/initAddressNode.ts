@@ -7,6 +7,7 @@ export const initAddressNode: BaseMiddlewareFunction<Context> = async ({
   next,
   ctx,
 }) => {
+  if (!ctx.address) return next({ ctx })
   const nodeClient = ctx.address
   const addressURN = ctx.addressURN
   const addrType = ctx.addrType

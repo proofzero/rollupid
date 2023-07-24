@@ -1,15 +1,17 @@
 import { z } from 'zod'
-import { Context } from '../../../context'
 import {
   AccountURNInput,
   AddressURNInput,
   IdentityGroupURNValidator,
 } from '@proofzero/platform-middleware/inputValidators'
+import { router } from '@proofzero/platform.core'
 import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 import { RollupError } from '@proofzero/errors'
 import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
+
+import { Context } from '../../../context'
 
 export const ListIdentityGroupsInputSchema = z.object({
   accountURN: AccountURNInput,
@@ -39,7 +41,8 @@ export const listIdentityGroups = async ({
   input: ListIdentityGroupsInput
   ctx: Context
 }): Promise<ListIdentityGroupsOutput> => {
-  const accountNode = await ctx.edges.findNode.query({
+  const caller = router.createCaller(ctx)
+  const accountNode = await caller.edges.findNode({
     baseUrn: input.accountURN,
   })
   if (!accountNode) {
@@ -52,7 +55,7 @@ export const listIdentityGroups = async ({
     accountNode.qc.primaryAddressURN as AddressURN
   )
 
-  const { edges: addressEdges } = await ctx.edges.getEdges.query({
+  const { edges: addressEdges } = await caller.edges.getEdges({
     query: {
       src: {
         baseUrn: input.accountURN,
@@ -67,7 +70,7 @@ export const listIdentityGroups = async ({
 
   const identityGroupResults = await Promise.all(
     addressURNList.map((addressURN) =>
-      ctx.edges.getEdges.query({
+      caller.edges.getEdges({
         query: {
           src: {
             baseUrn: addressURN,
@@ -94,7 +97,7 @@ export const listIdentityGroups = async ({
       const URN = edge!.dst.baseUrn as IdentityGroupURN
       const name = edge!.dst.qc.name
 
-      const { edges: groupMemberEdges } = await ctx.edges.getEdges.query({
+      const { edges: groupMemberEdges } = await caller.edges.getEdges({
         query: {
           tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
           dst: {

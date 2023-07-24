@@ -1,7 +1,7 @@
 import { json, redirect } from '@remix-run/cloudflare'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 
-import { getAddressClient } from '../../../platform.server'
+import { getCoreClient } from '../../../platform.server'
 import { AddressURNSpace } from '@proofzero/urns/address'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { CryptoAddressType, NodeType } from '@proofzero/types/address'
@@ -20,8 +20,6 @@ import {
   appendNonceTemplate,
 } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
-import { getStarbaseClient } from '~/platform.server'
-
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const { address } = params
@@ -35,11 +33,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       { alias: address }
     )
 
-    const addressClient = getAddressClient(
-      addressURN,
-      context.env,
-      context.traceSpan
-    )
+    const coreClient = getCoreClient({ context, addressURN })
 
     let signTemplate = AuthenticationScreenDefaults.defaultSignMessage
 
@@ -52,8 +46,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       return JsonError(ex, traceparent)
     }
     if (clientId !== 'console' && clientId !== 'passport') {
-      const sbClient = getStarbaseClient('', context.env, context.traceSpan)
-      const appProps = await sbClient.getAppPublicProps.query({
+      const appProps = await coreClient.starbase.getAppPublicProps.query({
         clientId,
       })
       if (appProps.appTheme?.signMessageTemplate) {
@@ -62,7 +55,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     try {
-      const nonce = await addressClient.getNonce.query({
+      const nonce = await coreClient.address.getNonce.query({
         address: address as string,
         template: appendNonceTemplate(signTemplate),
         state,
@@ -91,22 +84,18 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       { node_type: NodeType.Crypto, addr_type: CryptoAddressType.ETH },
       { alias: address }
     )
-    const addressClient = getAddressClient(
-      addressURN,
-      context.env,
-      context.traceSpan
-    )
+    const coreClient = getCoreClient({ context, addressURN })
     const formData = await request.formData()
 
     // TODO: validate from data
-    const { existing } = await addressClient.verifyNonce.mutate({
+    const { existing } = await coreClient.address.verifyNonce.mutate({
       nonce: formData.get('nonce') as string,
       signature: formData.get('signature') as string,
       jwt: await getUserSession(request, context.env, appData?.clientId),
       forceAccountCreation: !appData || appData.rollup_action !== 'connect',
     })
 
-    const accountURNFromAddress = await addressClient.getAccount.query()
+    const accountURNFromAddress = await coreClient.address.getAccount.query()
 
     if (appData?.rollup_action === 'connect' && existing) {
       const accountURN = parseJwt(jwt).sub! as AccountURN

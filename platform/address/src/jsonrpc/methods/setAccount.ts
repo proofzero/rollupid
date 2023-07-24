@@ -1,4 +1,5 @@
-import createEdgesClient from '@proofzero/platform-clients/edges'
+import { router } from '@proofzero/platform.core'
+
 import type { AccountURN } from '@proofzero/urns/account'
 import type { AddressURN } from '@proofzero/urns/address'
 import {
@@ -6,10 +7,10 @@ import {
   AddressURNInput,
 } from '@proofzero/platform-middleware/inputValidators'
 import { AccountURNSpace } from '@proofzero/urns/account'
-import { Context } from '../../context'
 import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 import { z } from 'zod'
-import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+
+import type { Context } from '../../context'
 
 export const SetAccountInput = AccountURNInput
 export const SetAccountOutput = z.object({
@@ -41,10 +42,8 @@ export const setAccountMethod = async ({
   // Store the owning account for the address node in the node itself.
   await nodeClient?.class.setAccount(account)
 
-  const edgesClient = createEdgesClient(ctx.Edges, {
-    ...generateTraceContextHeaders(ctx.traceSpan),
-  })
-  const linkResult = await edgesClient.makeEdge.mutate({
+  const caller = router.createCaller(ctx)
+  const linkResult = await caller.edges.makeEdge({
     src: account,
     dst: address,
     tag: EDGE_ADDRESS,

@@ -1,0 +1,18 @@
+name = "galaxy-next"
+main = "src/index.ts"
+compatibility_date = "2022-10-19"
+logpush = true
+node_compat = true
+wrangler_dev = false
+
+route = { pattern = "galaxy-next.rollup.id", custom_domain = true, zone_name = "rollup.id" }
+
+services = [
+  { binding = "Core", service = "core-next" },
+]
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalytics" },
+]
+
+unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]

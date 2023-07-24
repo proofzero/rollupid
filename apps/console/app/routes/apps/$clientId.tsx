@@ -7,8 +7,7 @@ import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
 import { commitFlashSession, requireJWT } from '~/utilities/session.server'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
-import createAddressClient from '@proofzero/platform-clients/address'
+import createCoreClient from '@proofzero/platform-clients/core'
 import type { appDetailsProps } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { Popover } from '@headlessui/react'
@@ -54,16 +53,16 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const clientId = params?.clientId
 
     try {
-      const starbaseClient = createStarbaseClient(context.env.Starbase, {
+      const coreClient = createCoreClient(context.env.Core, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...traceHeader,
       })
 
-      const appDetails = await starbaseClient.getAppDetails.query({
+      const appDetails = await coreClient.starbase.getAppDetails.query({
         clientId: clientId as string,
       })
 
-      const paymaster = await starbaseClient.getPaymaster.query({
+      const paymaster = await coreClient.starbase.getPaymaster.query({
         clientId: clientId as string,
       })
 
@@ -72,8 +71,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       //has just been created; we rotate both secrets and set the timestamps
       if (!appDetails.secretTimestamp && !appDetails.apiKeyTimestamp) {
         const [apiKeyRes, secretRes] = await Promise.all([
-          starbaseClient.rotateApiKey.mutate({ clientId }),
-          starbaseClient.rotateClientSecret.mutate({
+          coreClient.starbase.rotateApiKey.mutate({ clientId }),
+          coreClient.starbase.rotateClientSecret.mutate({
             clientId,
           }),
         ])
@@ -89,25 +88,27 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         appDetails.secretTimestamp = appDetails.apiKeyTimestamp = Date.now()
       }
 
-      const appContactAddress = await starbaseClient.getAppContactAddress.query(
-        {
+      const appContactAddress =
+        await coreClient.starbase.getAppContactAddress.query({
           clientId: params.clientId,
-        }
-      )
+        })
 
       let appContactEmail
       if (appContactAddress) {
-        const addressClient = createAddressClient(context.env.Address, {
+        const coreClient = createCoreClient(context.env.Core, {
           [PlatformAddressURNHeader]: appContactAddress,
           ...getAuthzHeaderConditionallyFromToken(jwt),
           ...generateTraceContextHeaders(context.traceSpan),
         })
 
-        const { address } = await addressClient.getAddressProfile.query()
+        const { address } = await coreClient.address.getAddressProfile.query()
         appContactEmail = address
       }
 
-      const { flashSession, toasts } = await getToastsAndFlashSession(request, context.env)
+      const { flashSession, toasts } = await getToastsAndFlashSession(
+        request,
+        context.env
+      )
 
       return json<LoaderData>(
         {

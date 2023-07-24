@@ -3,7 +3,7 @@ import { DOProxy, DurableObjectStubProxy } from 'do-proxy'
 import { AccountURN } from '@proofzero/urns/account'
 import { AddressType, NodeType } from '@proofzero/types/address'
 
-import type { Environment } from '../types'
+import type { Environment } from '@proofzero/platform.core'
 
 import ContractAddress from './contract'
 import CryptoAddress from './crypto'

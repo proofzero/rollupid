@@ -9,12 +9,7 @@ import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import warningImg from '~/assets/warning.svg'
 import InputText from '~/components/inputs/InputText'
 
-import {
-  getAccountClient,
-  getAccessClient,
-  getAddressClient,
-  getStarbaseClient,
-} from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import {
   getValidatedSessionContext,
   destroyUserSession,
@@ -38,26 +33,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     )
 
     try {
-      const accountClient = getAccountClient(
-        jwt,
-        context.env,
-        context.traceSpan
-      )
-      const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
-      const starbaseClient = getStarbaseClient(
-        jwt,
-        context.env,
-        context.traceSpan
-      )
-
+      const coreClient = getCoreClient({ context, jwt })
       const [addresses, apps, ownedApps] = await Promise.all([
-        accountClient.getAddresses.query({
+        coreClient.account.getAddresses.query({
           account: accountUrn,
         }),
-        accountClient.getAuthorizedApps.query({
+        coreClient.account.getAuthorizedApps.query({
           account: accountUrn,
         }),
-        starbaseClient.listApps.query(),
+        coreClient.starbase.listApps.query(),
       ])
 
       if (ownedApps.length > 0) {
@@ -74,7 +58,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       await Promise.all([
         Promise.all(
           apps.map((app) => {
-            return accessClient.revokeAppAuthorization.mutate({
+            return coreClient.access.revokeAppAuthorization.mutate({
               clientId: app.clientId,
               issuer: new URL(request.url).origin,
             })
@@ -82,12 +66,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         ),
         Promise.all(
           addressURNs.map((addressURN) => {
-            const addressClient = getAddressClient(
-              addressURN,
-              context.env,
-              context.traceSpan
-            )
-            return addressClient.deleteAddressNode.mutate({
+            const coreClient = getCoreClient({ context, addressURN })
+            return coreClient.address.deleteAddressNode.mutate({
               accountURN: accountUrn,
               forceDelete: true,
             })
@@ -95,7 +75,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         ),
       ])
 
-      await accountClient.deleteAccountNode.mutate({ account: accountUrn })
+      await coreClient.account.deleteAccountNode.mutate({ account: accountUrn })
     } catch (ex) {
       console.error(ex)
       throw new RollupError({

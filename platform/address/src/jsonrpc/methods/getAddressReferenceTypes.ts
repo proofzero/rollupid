@@ -1,15 +1,15 @@
 import { z } from 'zod'
+
+import { router } from '@proofzero/platform.core'
+
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
-import { Context } from '../../context'
-import { ApplicationURNSpace } from '@proofzero/urns/application'
+
 import { AccessURNSpace } from '@proofzero/urns/access'
 import { AccountURNSpace } from '@proofzero/urns/account'
+import { ApplicationURNSpace } from '@proofzero/urns/application'
 
-export enum ReferenceType {
-  Authorization = 'authorization',
-  DevNotificationsEmail = 'developerNotificationsEmail',
-  BillingEmail = 'billingEmail',
-}
+import { ReferenceType } from '../../types'
+import type { Context } from '../../context'
 
 export const GetAddressReferenceTypeOutput = z.array(
   z.nativeEnum(ReferenceType)
@@ -26,7 +26,8 @@ export const getAddressReferenceTypes = async ({
 }): Promise<GetAddressReferenceTypeResult> => {
   const { addressURN } = ctx
 
-  const { edges } = await ctx.edges.getEdges.query({
+  const caller = router.createCaller(ctx)
+  const { edges } = await caller.edges.getEdges({
     query: {
       dst: { baseUrn: addressURN },
       tag: EDGE_HAS_REFERENCE_TO,

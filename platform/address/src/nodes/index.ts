@@ -1,7 +1,9 @@
 import Address from './address'
+import OAuthAddress from './oauth'
 import ContractAddress from './contract'
-import AppleAddress from './apple'
 import CryptoAddress from './crypto'
+
+import AppleAddress from './apple'
 import DiscordAddress from './discord'
 import EmailAddress from './email'
 import GithubAddress from './github'
@@ -10,9 +12,11 @@ import MicrosoftAddress from './microsoft'
 import TwitterAddress from './twitter'
 
 export {
-  AppleAddress,
-  CryptoAddress,
+  Address,
   ContractAddress,
+  CryptoAddress,
+  OAuthAddress,
+  AppleAddress,
   DiscordAddress,
   EmailAddress,
   GithubAddress,

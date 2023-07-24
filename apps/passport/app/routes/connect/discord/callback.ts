@@ -11,7 +11,7 @@ import {
   createAuthenticatorSessionStorage,
   getDiscordStrategy,
 } from '~/auth.server'
-import { getAddressClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
 import {
   authenticateAddress,
@@ -54,25 +54,23 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         message: 'Could not get Discord login info.',
       })
 
-    const address = AddressURNSpace.componentizedUrn(
+    const addressURN = AddressURNSpace.componentizedUrn(
       generateHashedIDRef(OAuthAddressType.Discord, profile.__json.id),
       { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Discord },
       { alias: profile.__json.email, hidden: 'true' }
     )
-    const addressClient = getAddressClient(
-      address,
-      context.env,
-      context.traceSpan
-    )
-    const { accountURN, existing } = await addressClient.resolveAccount.query({
-      jwt: await getUserSession(request, context.env, appData?.clientId),
-      force: !appData || appData.rollup_action !== 'connect',
-    })
 
-    await addressClient.setOAuthData.mutate(authRes)
+    const coreClient = getCoreClient({ context, addressURN })
+    const { accountURN, existing } =
+      await coreClient.address.resolveAccount.query({
+        jwt: await getUserSession(request, context.env, appData?.clientId),
+        force: !appData || appData.rollup_action !== 'connect',
+      })
+
+    await coreClient.address.setOAuthData.mutate(authRes)
 
     return authenticateAddress(
-      address,
+      addressURN,
       accountURN,
       appData,
       request,

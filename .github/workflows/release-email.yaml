@@ -44,8 +44,7 @@ jobs:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: platform/email
-          command: publish --env current
-          environment: current
+          command: publish --config wrangler.current.toml
           secrets: |
             INTERNAL_DKIM_DOMAIN
             INTERNAL_DKIM_SELECTOR

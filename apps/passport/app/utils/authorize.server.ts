@@ -1,4 +1,4 @@
-import { getAccountClient, getAddressClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import {
   getEmailDropdownItems,
   getAddressDropdownItems,
@@ -66,9 +66,10 @@ export const getDataForScopes = async (
   let connectedEmails: Array<DropdownSelectListItem> = []
   let connectedAddresses: Array<DropdownSelectListItem> = []
 
-  const accountClient = getAccountClient(jwt || '', env, traceSpan)
+  const context = { env: { Core: env.Core }, traceSpan }
+  const coreClient = getCoreClient({ context, jwt })
 
-  const connectedAccounts = await accountClient.getAddresses.query({
+  const connectedAccounts = await coreClient.account.getAddresses.query({
     account: accountURN,
   })
 
@@ -90,15 +91,8 @@ export const getDataForScopes = async (
           return ca.baseUrn as AddressURN
         })
 
-      const addressClient = getAddressClient(
-        NO_OP_ADDRESS_PLACEHOLDER,
-        env,
-        traceSpan
-      )
-
-      const addressProfiles = await addressClient.getAddressProfileBatch.query(
-        addresses
-      )
+      const addressProfiles =
+        await coreClient.address.getAddressProfileBatch.query(addresses)
       connectedAddresses = getAddressDropdownItems(addressProfiles)
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!)) {
@@ -109,14 +103,8 @@ export const getDataForScopes = async (
         .map((ca) => {
           return ca.baseUrn as AddressURN
         })
-      const addressClient = getAddressClient(
-        NO_OP_ADDRESS_PLACEHOLDER,
-        env,
-        traceSpan
-      )
-      const addressProfiles = await addressClient.getAddressProfileBatch.query(
-        addresses
-      )
+      const addressProfiles =
+        await coreClient.address.getAddressProfileBatch.query(addresses)
       connectedSmartContractWallets = getAddressDropdownItems(addressProfiles)
     }
   }
@@ -196,9 +184,12 @@ export async function createNewSCWallet({
   env: Env
   traceSpan?: any
 }) {
-  const addressClient = getAddressClient(primaryAddressURN, env, traceSpan)
-  const { addressURN } = await addressClient.initSmartContractWallet.query({
-    nickname,
-  })
+  const context = { env: { Core: env.Core }, traceSpan }
+  const coreClient = getCoreClient({ context, addressURN: primaryAddressURN })
+  const { addressURN } = await coreClient.address.initSmartContractWallet.query(
+    {
+      nickname,
+    }
+  )
   return { addressURN }
 }

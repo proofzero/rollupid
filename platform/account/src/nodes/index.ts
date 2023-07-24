@@ -18,3 +18,5 @@ export const initIdentityGroupNodeByName = async (
   const node = MY_DO_BINDING.getByName(name)
   return node
 }
+
+export { Account, IdentityGroup }

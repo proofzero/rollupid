@@ -18,8 +18,7 @@ import {
   requireJWT,
 } from '~/utilities/session.server'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import createAccountClient from '@proofzero/platform-clients/account'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
@@ -56,15 +55,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const accountURN = parsedJwt.sub as AccountURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
-    const accountClient = createAccountClient(context.env.Account, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
 
-    const entitlements = await accountClient.getEntitlements.query({
+    const entitlements = await coreClient.account.getEntitlements.query({
       accountURN,
     })
-    const paymentData = await accountClient.getStripePaymentData.query({
+    const paymentData = await coreClient.account.getStripePaymentData.query({
       accountURN,
     })
 
@@ -99,21 +98,16 @@ const processUpdateOp = async (
   const parsedJwt = parseJwt(jwt)
   const accountURN = parsedJwt.sub as AccountURN
 
-  const starbaseClient = createStarbaseClient(env.Starbase, {
+  const coreClient = createCoreClient(env.Core, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...traceHeader,
   })
 
-  const accountClient = createAccountClient(env.Account, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...traceHeader,
-  })
-
-  const entitlements = await accountClient.getEntitlements.query({
+  const entitlements = await coreClient.account.getEntitlements.query({
     accountURN,
   })
 
-  const apps = await starbaseClient.listApps.query()
+  const apps = await coreClient.starbase.listApps.query()
   const allotedApps = apps.filter((a) => a.appPlan === plan).length
 
   if (
@@ -125,7 +119,7 @@ const processUpdateOp = async (
     })
   }
 
-  await starbaseClient.setAppPlan.mutate({
+  await coreClient.starbase.setAppPlan.mutate({
     accountURN,
     clientId,
     plan,
@@ -145,21 +139,16 @@ const processPurchaseOp = async (
   const parsedJwt = parseJwt(jwt)
   const accountURN = parsedJwt.sub as AccountURN
 
-  const starbaseClient = createStarbaseClient(env.Starbase, {
+  const coreClient = createCoreClient(env.Core, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...traceHeader,
   })
 
-  const accountClient = createAccountClient(env.Account, {
-    ...getAuthzHeaderConditionallyFromToken(jwt),
-    ...traceHeader,
-  })
-
-  const entitlements = await accountClient.getEntitlements.query({
+  const entitlements = await coreClient.account.getEntitlements.query({
     accountURN,
   })
 
-  const paymentData = await accountClient.getStripePaymentData.query({
+  const paymentData = await coreClient.account.getStripePaymentData.query({
     accountURN,
   })
   if (!paymentData || !paymentData.customerID) {
@@ -212,14 +201,14 @@ const processPurchaseOp = async (
     })
   }
 
-  await accountClient.updateEntitlements.mutate({
+  await coreClient.account.updateEntitlements.mutate({
     accountURN: accountURN,
     subscriptionID: sub.id,
     quantity: quantity,
     type: plan,
   })
 
-  await starbaseClient.setAppPlan.mutate({
+  await coreClient.starbase.setAppPlan.mutate({
     accountURN,
     clientId,
     plan,

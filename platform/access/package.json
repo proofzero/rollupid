@@ -1,9 +1,9 @@
 {
   "name": "@proofzero/platform.access",
   "version": "0.0.0",
+  "main": "src/index.ts",
   "private": true,
   "scripts": {
-    "build": "wrangler publish --dry-run --outdir=dist",
     "check": "run-s format:check lint:check types:check",
     "format": "run-s format:src",
     "format:src": "prettier --write src",
@@ -13,8 +13,6 @@
     "lint:check": "run-s lint:check:src",
     "lint:check:src": "eslint src",
     "types:check": "tsc --project tsconfig.json",
-    "dev": "env-cmd --file .dev.env wrangler dev ",
-    "deploy": "wrangler publish",
     "test": "run-s check"
   },
   "devDependencies": {
@@ -38,6 +36,7 @@
     "@proofzero/errors": "workspace:*",
     "@proofzero/platform-clients": "workspace:*",
     "@proofzero/platform-middleware": "workspace:*",
+    "@proofzero/platform.core": "workspace:*",
     "@proofzero/urns": "workspace:*",
     "@proofzero/utils": "workspace:*",
     "@trpc/server": "10.8.1",

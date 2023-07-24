@@ -1,17 +1,16 @@
 name = "galaxy"
 main = "src/index.ts"
-# NEED TO ADD ACCOUNT ID TO TEST REMOTE LOCALLY
 compatibility_date = "2022-10-19"
+logpush = true
 node_compat = true
 wrangler_dev = false
-logpush = true
 
-# Services binding for local development
 services = [
-  { binding = "Account", service = "account" },
-  { binding = "Access", service = "access" },
-  { binding = "Address", service = "address" },
-  { binding = "Starbase", service = "starbase" },
+  { binding = "Core", service = "core" },
+]
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalytics" },
 ]
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
@@ -20,55 +19,3 @@ unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 port = 10401
 inspector_port = 11401
 local_protocol = "http"
-
-analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalytics" },
-]
-
-unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
-
-
-[env.dev]
-route = { pattern = "galaxy-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" }
-services = [
-  { binding = "Account", service = "account-dev" },
-  { binding = "Access", service = "access-dev" },
-  { binding = "Address", service = "address-dev" },
-  { binding = "Starbase", service = "starbase-dev" },
-]
-
-analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsDev" },
-]
-
-unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
-
-[env.next]
-route = { pattern = "galaxy-next.rollup.id", custom_domain = true, zone_name = "rollup.id" }
-services = [
-  { binding = "Account", service = "account-next" },
-  { binding = "Address", service = "address-next" },
-  { binding = "Access", service = "access-next" },
-  { binding = "Starbase", service = "starbase-next" },
-]
-
-analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsNext" },
-]
-
-unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
-
-[env.current]
-route = { pattern = "galaxy.rollup.id", custom_domain = true, zone_name = "rollup.id" }
-services = [
-  { binding = "Account", service = "account-current" },
-  { binding = "Address", service = "address-current" },
-  { binding = "Access", service = "access-current" },
-  { binding = "Starbase", service = "starbase-current" },
-]
-
-analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent" },
-]
-
-unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]

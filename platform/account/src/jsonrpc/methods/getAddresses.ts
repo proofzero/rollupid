@@ -1,7 +1,10 @@
 import { z } from 'zod'
+
+import { router } from '@proofzero/platform.core'
+
 import { inputValidators } from '@proofzero/platform-middleware'
+
 import { Context } from '../../context'
-import { appRouter } from '../router'
 import { AddressesSchema } from '../validators/profile'
 
 export const GetAddressesInput = z.object({
@@ -25,12 +28,12 @@ export const getAddressesMethod = async ({
   input: GetAddressesParams
   ctx: Context
 }): Promise<GetAddressesOutputParams> => {
-  const caller = appRouter.createCaller(ctx)
+  const caller = router.createCaller(ctx)
 
   const getAddressesCall =
     ctx.accountURN === input.account
-      ? caller.getOwnAddresses
-      : caller.getPublicAddresses
+      ? caller.account.getOwnAddresses
+      : caller.account.getPublicAddresses
 
   const addresses = await getAddressesCall({ account: input.account })
 

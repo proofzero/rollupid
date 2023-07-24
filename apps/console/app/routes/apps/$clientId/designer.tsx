@@ -49,7 +49,7 @@ import {
 import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { GetAppThemeResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppTheme'
 import Authorization from '@proofzero/design-system/src/templates/authorization/Authorization'
@@ -1224,16 +1224,16 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
     const clientId = params?.clientId
 
-    const starbaseClient = createStarbaseClient(context.env.Starbase, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
 
-    const appTheme = await starbaseClient.getAppTheme.query({
+    const appTheme = await coreClient.starbase.getAppTheme.query({
       clientId,
     })
 
-    const emailTheme = await starbaseClient.getEmailOTPTheme.query({
+    const emailTheme = await coreClient.starbase.getEmailOTPTheme.query({
       clientId,
     })
 
@@ -1256,12 +1256,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
     const clientId = params?.clientId
 
-    const starbaseClient = createStarbaseClient(context.env.Starbase, {
+    const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
 
-    const appDetails = await starbaseClient.getAppDetails.query({
+    const appDetails = await coreClient.starbase.getAppDetails.query({
       clientId,
     })
 
@@ -1276,11 +1276,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       [key: string]: string
     } = {}
 
-    let theme = await starbaseClient.getAppTheme.query({
+    let theme = await coreClient.starbase.getAppTheme.query({
       clientId,
     })
 
-    let emailTheme = await starbaseClient.getEmailOTPTheme.query({
+    let emailTheme = await coreClient.starbase.getEmailOTPTheme.query({
       clientId,
     })
 
@@ -1337,7 +1337,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           return acc
         }, {} as { [key: string]: string })
       } else {
-        await starbaseClient.setAppTheme.mutate({
+        await coreClient.starbase.setAppTheme.mutate({
           clientId,
           theme,
         })
@@ -1377,7 +1377,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           return acc
         }, {} as { [key: string]: string })
       } else {
-        await starbaseClient.setEmailOTPTheme.mutate({
+        await coreClient.starbase.setEmailOTPTheme.mutate({
           clientId,
           theme,
         })

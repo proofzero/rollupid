@@ -3,9 +3,7 @@ import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
 import type { AccountURN } from '@proofzero/urns/account'
-import createAccessClient from '@proofzero/platform-clients/access'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
-import createAccountClient from '@proofzero/platform-clients/account'
+import createCoreClient from '@proofzero/platform-clients/core'
 
 import Env from '../../../env'
 import {
@@ -119,15 +117,15 @@ export const validateApiKey =
       const env = context.env as Env
       const traceSpan = context.traceSpan as TraceSpan
 
-      const starbaseClient = createStarbaseClient(
-        env.Starbase,
+      const coreClient = createCoreClient(
+        env.Core,
         generateTraceContextHeaders(traceSpan)
       )
 
       // API key validation
       let apiKeyValidity
       try {
-        apiKeyValidity = await starbaseClient.checkApiKey.query({ apiKey })
+        apiKeyValidity = await coreClient.starbase.checkApiKey.query({ apiKey })
       } catch (e) {
         throw new GraphQLError('Unable to validate given API key.', {
           extensions: {
@@ -151,14 +149,10 @@ export const validateApiKey =
       // Check matching between ClientId in API Key and in audience list of jwt
       // This is being checked only if jwt is presented
       if (context.jwt && context.jwt.length) {
-        const accessClient = createAccessClient(
-          env.Access,
-          generateTraceContextHeaders(traceSpan)
-        )
-
-        const { payload: jwtPayload } = await accessClient.verifyToken.query({
-          token: context.jwt,
-        })
+        const { payload: jwtPayload } =
+          await coreClient.access.verifyToken.query({
+            token: context.jwt,
+          })
 
         const jwtSub = jose.decodeJwt(apiKey).sub as ApplicationURN
         const clientId = ApplicationURNSpace.parse(jwtSub).decoded
@@ -176,9 +170,10 @@ export const validateApiKey =
           )
         }
 
-        const { customDomain } = await starbaseClient.getAppPublicProps.query({
-          clientId,
-        })
+        const { customDomain } =
+          await coreClient.starbase.getAppPublicProps.query({
+            clientId,
+          })
         if (customDomain?.isActive) {
           const expectedIssuer = `https://${customDomain.hostname}`
           if (expectedIssuer != jwtPayload.iss)
@@ -255,21 +250,21 @@ export const logAnalytics =
 
 export const getConnectedAddresses = async ({
   accountURN,
-  Account,
+  Core,
   jwt,
   traceSpan,
 }: {
   accountURN: AccountURN
-  Account: Fetcher
+  Core: Fetcher
   jwt?: string
   traceSpan: TraceSpan
 }) => {
-  const accountClient = createAccountClient(Account, {
+  const coreClient = createCoreClient(Core, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...generateTraceContextHeaders(traceSpan),
   })
 
-  const addresses = await accountClient.getAddresses.query({
+  const addresses = await coreClient.account.getAddresses.query({
     account: accountURN,
   })
 

@@ -2,7 +2,7 @@ import { initTRPC } from '@trpc/server'
 
 import { errorFormatter } from '@proofzero/utils/trpc'
 
-import { Context } from '../context'
+import type { Context } from '../context'
 
 import {
   ResolveAccountInput,
@@ -46,7 +46,11 @@ import { LogUsage } from '@proofzero/platform-middleware/log'
 import { parse3RN } from './middlewares/parse3RN'
 import { checkCryptoNodes } from './middlewares/checkCryptoNode'
 import { initAddressNode } from './middlewares/initAddressNode'
-import { getAccountMethod, GetAccountOutput } from './methods/getAccount'
+import {
+  getAccountMethod,
+  GetAccountInput,
+  GetAccountOutput,
+} from './methods/getAccount'
 import {
   InitSmartContractWalletInput,
   InitSmartContractWalletOutput,
@@ -135,6 +139,7 @@ export const appRouter = t.router({
     .use(setAddressNodeClient)
     .use(initAddressNode)
     .use(Analytics)
+    .input(GetAccountInput)
     .output(GetAccountOutput)
     .query(getAccountMethod),
   getAccountByAlias: t.procedure

@@ -8,11 +8,7 @@ import {
 } from '@remix-run/react'
 
 import { ResponseType } from '@proofzero/types/access'
-import {
-  getAccessClient,
-  getAccountClient,
-  getStarbaseClient,
-} from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import {
   createAuthzParamsCookieAndAuthenticate,
   destroyAuthzCookieParamsSession,
@@ -169,7 +165,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       context.env,
       context.traceSpan
     )
-    const accessClient = getAccessClient(context.env, context.traceSpan, jwt)
+    const coreClient = getCoreClient({ context, jwt })
 
     //Special case for console and passport - we just redirect
     if (['console', 'passport'].includes(clientId)) {
@@ -184,10 +180,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     //Scope validation
-    const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
     const [scopeMeta, appPublicProps] = await Promise.all([
-      sbClient.getScopes.query(),
-      sbClient.getAppPublicProps.query({
+      coreClient.starbase.getScopes.query(),
+      coreClient.starbase.getAppPublicProps.query({
         clientId: clientId as string,
       }),
     ])
@@ -234,7 +229,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       )
     ) {
       const responseType = ResponseType.Code
-      const preauthorizeRes = await accessClient.preauthorize.mutate({
+      const preauthorizeRes = await coreClient.access.preauthorize.mutate({
         account: accountUrn,
         responseType,
         clientId,
@@ -259,13 +254,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         })
       } //else we present the authz screen below
     }
-    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
 
     const [profile, personaData, dataForScopes] = await Promise.all([
-      accountClient.getProfile.query({
+      coreClient.account.getProfile.query({
         account: accountUrn,
       }),
-      accessClient.getPersonaData.query({
+      coreClient.access.getPersonaData.query({
         accountUrn,
         clientId,
       }),
@@ -341,10 +335,11 @@ export const action: ActionFunction = async ({ request, context }) => {
 
   const createSCWallet = form.get('createSCWallet') as string
 
+  const coreClient = getCoreClient({ context, jwt })
+
   if (createSCWallet?.length) {
     const nickname = JSON.parse(createSCWallet).nickname
-    const accountClient = getAccountClient(jwt, context.env, context.traceSpan)
-    const profile = await accountClient.getProfile.query({
+    const profile = await coreClient.account.getProfile.query({
       account: accountUrn,
     })
 
@@ -361,15 +356,11 @@ export const action: ActionFunction = async ({ request, context }) => {
   await validatePersonaData(
     accountUrn,
     personaData,
-    {
-      addressFetcher: context.env.Address,
-      accountFetcher: context.env.Account,
-    },
+    context.env.Core,
     context.traceSpan
   )
 
-  const accessClient = getAccessClient(context.env, context.traceSpan)
-  const authorizeRes = await accessClient.authorize.mutate({
+  const authorizeRes = await coreClient.access.authorize.mutate({
     account: accountUrn,
     responseType,
     clientId,

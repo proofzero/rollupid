@@ -2,7 +2,7 @@ import { Await, useLoaderData, useNavigate } from '@remix-run/react'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import { defer, json } from '@remix-run/cloudflare'
-import createStarbaseClient from '@proofzero/platform-clients/starbase'
+import createCoreClient from '@proofzero/platform-clients/core'
 import { Suspense } from 'react'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import type {
@@ -50,12 +50,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         throw new BadRequestError({ message: 'clientId is required' })
       }
 
-      const starbaseClient = createStarbaseClient(context.env.Starbase, {
+      const coreClient = createCoreClient(context.env.Core, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...generateTraceContextHeaders(context.traceSpan),
       })
 
-      const edgesResult = starbaseClient.getAuthorizedAccounts.query({
+      const edgesResult = coreClient.starbase.getAuthorizedAccounts.query({
         client,
         opt: {
           offset,

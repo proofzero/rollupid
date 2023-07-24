@@ -17,7 +17,7 @@ import {
 } from '~/components/applications/claims'
 import type { GetAuthorizedAppScopesMethodResult } from '@proofzero/platform/access/src/jsonrpc/methods/getAuthorizedAppScopes'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { getStarbaseClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import { getValidatedSessionContext } from '~/session.server'
 import type { ScopeMeta } from '@proofzero/security/scopes'
 
@@ -36,9 +36,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       context,
     })
 
-    const sbClient = getStarbaseClient(jwt, context.env, context.traceSpan)
-
-    const { scopes: scopeMeta } = await sbClient.getScopes.query()
+    const coreClient = getCoreClient({ context, jwt })
+    const { scopes: scopeMeta } = await coreClient.starbase.getScopes.query()
 
     return {
       clientId,

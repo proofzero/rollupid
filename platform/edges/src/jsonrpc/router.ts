@@ -1,9 +1,8 @@
 import { initTRPC } from '@trpc/server'
-import { ZodError } from 'zod'
 
 import { errorFormatter } from '@proofzero/utils/trpc'
 
-import { Context } from '../context'
+import type { Context } from '../context'
 
 import {
   findNodeBatchMethod,

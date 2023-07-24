@@ -4,11 +4,7 @@ import type { AccountURN } from '@proofzero/urns/account'
 
 import { GrantType, ResponseType } from '@proofzero/types/access'
 
-import {
-  getAccessClient,
-  getAccountClient,
-  getAddressClient,
-} from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import {
   createUserSession,
   getAuthzCookieParamsSession,
@@ -56,20 +52,18 @@ export const authenticateAddress = async (
       }
     }
 
-    const redirectURL = getAuthzRedirectURL(
-      appData,
-      result
-    )
+    const redirectURL = getAuthzRedirectURL(appData, result)
 
     return redirect(redirectURL)
   }
 
-  const accessClient = getAccessClient(env, traceSpan)
+  const context = { env: { Core: env.Core }, traceSpan }
+  const coreClient = getCoreClient({ context })
   const clientId = AddressURNSpace.decode(address)
   const redirectUri = env.PASSPORT_REDIRECT_URL
   const scope = ['admin']
   const state = ''
-  const { code } = await accessClient.authorize.mutate({
+  const { code } = await coreClient.access.authorize.mutate({
     account,
     responseType: ResponseType.Code,
     clientId,
@@ -79,7 +73,7 @@ export const authenticateAddress = async (
   })
 
   const grantType = GrantType.AuthenticationCode
-  const { accessToken } = await accessClient.exchangeToken.mutate({
+  const { accessToken } = await coreClient.access.exchangeToken.mutate({
     grantType,
     code,
     clientId,
@@ -125,20 +119,20 @@ const provisionProfile = async (
   jwt: string,
   env: Env,
   traceSpan: TraceSpan,
-  address: AddressURN
+  addressURN: AddressURN
 ) => {
-  const accountClient = getAccountClient(jwt, env, traceSpan)
+  const context = { env: { Core: env.Core }, traceSpan }
+  const coreClient = getCoreClient({ context, addressURN, jwt })
   const parsedJWT = parseJwt(jwt)
   const account = parsedJWT.sub as AccountURN
 
-  const profile = await accountClient.getProfile.query({
+  const profile = await coreClient.account.getProfile.query({
     account,
   })
 
   if (!profile) {
     console.log(`Profile doesn't exist for account ${account}. Creating one...`)
-    const addressClient = getAddressClient(address, env, traceSpan)
-    const newProfile = await addressClient.getAddressProfile
+    const newProfile = await coreClient.address.getAddressProfile
       .query()
       .then(async (res) => {
         const gradient = await generateGradient(res.address, env, traceSpan)
@@ -150,9 +144,9 @@ const provisionProfile = async (
         }
       })
     // set the default profile
-    await accountClient.setProfile.mutate({
+    await coreClient.account.setProfile.mutate({
       name: account,
-      profile: { ...newProfile, primaryAddressURN: address },
+      profile: { ...newProfile, primaryAddressURN: addressURN },
     })
   } else {
     console.log(`Profile for account ${account} found. Continuing...`)
@@ -167,18 +161,19 @@ export const setNewPrimaryAddress = async (
   pfp: string,
   displayName: string
 ) => {
-  const accountClient = getAccountClient(jwt, env, traceSpan)
+  const context = { env: { Core: env.Core }, traceSpan }
+  const coreClient = getCoreClient({ context, jwt })
   const parsedJWT = parseJwt(jwt)
   const account = parsedJWT.sub as AccountURN
 
-  const profile = await accountClient.getProfile.query({
+  const profile = await coreClient.account.getProfile.query({
     account,
   })
 
   // Update the profile with the new primary address if it exists
 
   if (profile) {
-    await accountClient.setProfile.mutate({
+    await coreClient.account.setProfile.mutate({
       name: account,
       profile: {
         displayName: displayName,

@@ -1,11 +1,13 @@
 import * as set from 'ts-set-utils'
 import { z } from 'zod'
+
+import { router } from '@proofzero/platform.core'
 import { inputValidators } from '@proofzero/platform-middleware'
+
 import { Context } from '../../context'
 import { AddressURNSpace } from '@proofzero/urns/address'
 
 import type { AddressList } from '../../types'
-import type { AccountURN } from '@proofzero/urns/account'
 import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 
 // Should this live in @proofzero/platform-middlewares/inputValidators?
@@ -21,23 +23,22 @@ export const AddressListInput = z.custom<AddressList>((input) => {
   return input as AddressList
 })
 
-export type HasAddressesParams = {
-  account: AccountURN
-  addresses: AddressList
-}
-
 export const HasAddressesInput = z.object({
   account: inputValidators.AccountURNInput,
   addresses: AddressListInput,
 })
+export type HasAddressesInput = z.infer<typeof HasAddressesInput>
+
+export const HasAddressesOutput = z.boolean()
+export type HasAddressesOutput = z.infer<typeof HasAddressesOutput>
 
 export const hasAddressesMethod = async ({
   input,
   ctx,
 }: {
-  input: HasAddressesParams
+  input: HasAddressesInput
   ctx: Context
-}) => {
+}): Promise<HasAddressesOutput> => {
   if (input.account !== ctx.accountURN) {
     throw Error('Invalid account input')
   }
@@ -56,7 +57,9 @@ export const hasAddressesMethod = async ({
       hidden: input.account === ctx.accountURN,
     },
   }
-  const edgesResult = await ctx.edges.getEdges.query({ query })
+
+  const caller = router.createCaller(ctx)
+  const edgesResult = await caller.edges.getEdges({ query })
   const edgeList = edgesResult.edges
 
   // A set of the addresses owned by the account.

@@ -60,11 +60,7 @@ export const getUserInfoMethod = async ({
     account,
     clientId,
     scope,
-    {
-      edgesFetcher: ctx.Edges,
-      accountFetcher: ctx.Account,
-      addressFetcher: ctx.Address,
-    },
+    ctx.Core,
     ctx.traceSpan,
     personaData
   )

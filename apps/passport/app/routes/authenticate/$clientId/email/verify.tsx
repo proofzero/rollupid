@@ -12,7 +12,7 @@ import {
   useTransition,
 } from '@remix-run/react'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
-import { getAddressClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { useEffect, useState } from 'react'
 
@@ -52,18 +52,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     if (successfulVerification) {
       const appData = await getAuthzCookieParams(request, context.env)
-      const addressClient = getAddressClient(
-        addressURN,
-        context.env,
-        context.traceSpan
-      )
+      const coreClient = getCoreClient({ context, addressURN })
 
-      const { accountURN, existing } = await addressClient.resolveAccount.query(
-        {
+      const { accountURN, existing } =
+        await coreClient.address.resolveAccount.query({
           jwt: await getUserSession(request, context.env, appData?.clientId),
           force: !appData || appData.rollup_action !== 'connect',
-        }
-      )
+        })
 
       return authenticateAddress(
         addressURN,

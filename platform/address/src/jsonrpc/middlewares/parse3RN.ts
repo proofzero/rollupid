@@ -12,7 +12,7 @@ export const parse3RN: BaseMiddlewareFunction<Context> = async ({
   const header =
     ctx.address3RN || ctx.req?.headers.get(PlatformAddressURNHeader)
   if (!header) {
-    throw new Error(`missing ${PlatformAddressURNHeader} header`)
+    return next({ ctx })
   }
   const addressURN = header as AddressURN
   const hashedIdref = AddressURNSpace.decode(addressURN)

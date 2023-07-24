@@ -1,8 +1,10 @@
 import { BadRequestError } from '@proofzero/errors'
-import { ReferenceType } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressReferenceTypes'
 import type { ActionFunction } from '@remix-run/cloudflare'
+
+import { ReferenceType } from '@proofzero/platform.address/src/types'
+
 import { AddressUsageDisconnectModel } from '~/components/settings/accounts/DisconnectModal'
-import { getAddressClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import {
   getDefaultAuthzParams,
   getValidatedSessionContext,
@@ -20,13 +22,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const formData = await request.formData()
     const addressURN = formData.get('addressURN') as string
-    const addressClient = getAddressClient(
-      addressURN,
-      context.env,
-      context.traceSpan
-    )
+    const coreClient = getCoreClient({ context, addressURN })
 
-    const references = await addressClient.getAddressReferenceTypes.query()
+    const references = await coreClient.address.getAddressReferenceTypes.query()
     const mappedReferences: AddressUsageDisconnectModel[] = references.map(
       (u: ReferenceType) => {
         switch (u) {

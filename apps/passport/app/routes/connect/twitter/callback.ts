@@ -12,7 +12,7 @@ import {
   createAuthenticatorSessionStorage,
   getTwitterStrategy,
 } from '~/auth.server'
-import { getAddressClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import {
   authenticateAddress,
   checkOAuthError,
@@ -43,29 +43,26 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         request
       )) as TwitterStrategyVerifyParams
 
-    const address = AddressURNSpace.componentizedUrn(
+    const addressURN = AddressURNSpace.componentizedUrn(
       generateHashedIDRef(OAuthAddressType.Twitter, profile.id_str),
       { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Twitter },
       { alias: profile.name, hidden: 'true' }
     )
-    const addressClient = getAddressClient(
-      address,
-      context.env,
-      context.traceSpan
-    )
-    const { accountURN, existing } = await addressClient.resolveAccount.query({
-      jwt: await getUserSession(request, context.env, appData?.clientId),
-      force: !appData || appData.rollup_action !== 'connect',
-    })
+    const coreClient = getCoreClient({ context, addressURN })
+    const { accountURN, existing } =
+      await coreClient.address.resolveAccount.query({
+        jwt: await getUserSession(request, context.env, appData?.clientId),
+        force: !appData || appData.rollup_action !== 'connect',
+      })
 
-    await addressClient.setOAuthData.mutate({
+    await coreClient.address.setOAuthData.mutate({
       accessToken,
       accessTokenSecret,
       profile: { ...profile, provider: OAuthAddressType.Twitter },
     })
 
     return authenticateAddress(
-      address,
+      addressURN,
       accountURN,
       appData,
       request,

@@ -1,5 +1,5 @@
 import type { ActionFunction } from '@remix-run/cloudflare'
-import { getAddressClient } from '~/platform.server'
+import { getCoreClient } from '~/platform.server'
 import {
   getDefaultAuthzParams,
   getValidatedSessionContext,
@@ -17,13 +17,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     )
 
     const formData = await request.formData()
-
-    const id = formData.get('id') as string
     const name = formData.get('name') as string
+    const addressURN = formData.get('id') as string
+    const coreClient = getCoreClient({ context, addressURN })
 
-    const addressClient = getAddressClient(id, context.env, context.traceSpan)
-
-    await addressClient.setNickname.query({
+    await coreClient.address.setNickname.query({
       nickname: name,
     })
 
@@ -32,7 +30,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       distinctId: accountUrn,
       eventName: 'address_renamed',
       properties: {
-        addressId: id,
+        addressId: addressURN,
         nickname: name,
       },
     })

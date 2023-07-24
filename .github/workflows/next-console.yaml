@@ -48,8 +48,7 @@ jobs:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'apps/console'
-          command: publish --env next
-          environment: 'next'
+          command: publish --config wrangler.next.toml
           secrets: |
             SECRET_SESSION_KEY
             SECRET_SESSION_SALT

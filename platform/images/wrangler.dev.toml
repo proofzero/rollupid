@@ -1,0 +1,19 @@
+name = "images-dev"
+main = "src/index.ts"
+compatibility_date = "2022-10-05"
+logpush = true
+workers_dev = false
+
+route = { pattern = "images-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" }
+
+[[rules]]
+globs = ["**/*.wasm"]
+type = "CompiledWasm"
+
+[[rules]]
+globs = ["**/*.png"]
+type = "Data"
+
+[vars]
+UPLOAD_WINDOW_SECONDS = 200
+HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID = "VqQy1abBMHYDZwVsTbsSMw"

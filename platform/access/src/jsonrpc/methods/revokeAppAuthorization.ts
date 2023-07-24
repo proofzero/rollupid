@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { router } from '@proofzero/platform.core'
+
 import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'
 
@@ -11,18 +13,12 @@ import { AccountURNSpace } from '@proofzero/urns/account'
 import { AccessURNSpace } from '@proofzero/urns/access'
 import { generateJKU, getPrivateJWK } from '../../jwk'
 
-import createStarbaseClient from '@proofzero/packages/platform-clients/starbase'
-import createAddressClient from '@proofzero/packages/platform-clients/address'
-
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import { appRouter } from '../router'
-import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
-import { generateSmartWalletAddressUrn } from '@proofzero/platform.address/src/utils'
 
 export const RevokeAppAuthorizationMethodInput = z.object({
   clientId: z.string().min(1),
-  issuer: z.string(),
+  issuer: z.string().optional(),
 })
 
 type RevokeAppAuthorizationMethodInput = z.infer<
@@ -47,7 +43,8 @@ interface RevokeAppAuthorizationMethod {
 
 export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
   async ({ ctx, input }) => {
-    const caller = appRouter.createCaller(ctx)
+    const caller = router.createCaller(ctx)
+
     const { clientId } = input
     const { accountURN } = ctx
 
@@ -57,12 +54,8 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
 
     const name = `${AccountURNSpace.decode(accountURN)}@${clientId}`
 
-    if (!ctx.edgesClient) {
-      throw new Error('Expected edgesClient to be present')
-    }
-
     const accessURN = AccessURNSpace.componentizedUrn(name)
-    const edgesResult = await ctx.edgesClient.getEdges.query({
+    const edgesResult = await caller.edges.getEdges({
       query: {
         src: { baseUrn: accountURN },
         dst: { baseUrn: accessURN },
@@ -83,7 +76,7 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
     }
 
     for (let i = 0; i < edgesResult?.edges.length; i++) {
-      await ctx.edgesClient.removeEdge.mutate({
+      await caller.edges.removeEdge({
         tag: EDGE_AUTHORIZES,
         src: edgesResult.edges[i].src.baseUrn,
         dst: edgesResult.edges[i].dst.baseUrn,
@@ -91,62 +84,55 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
     }
 
     const addresses =
-      (await ctx.accountClient.getAddresses.query({
+      (await caller.account.getAddresses({
         account: accountURN,
       })) ?? []
 
     for (const address of addresses) {
-      await ctx.edgesClient.removeEdge.mutate({
+      await caller.edges.removeEdge({
         tag: EDGE_HAS_REFERENCE_TO,
         src: accessURN,
         dst: address.baseUrn,
       })
     }
 
-    await ctx.edgesClient.deleteNode.mutate({
+    await caller.edges.deleteNode({
       urn: accessURN,
     })
 
     const accessNode = await initAccessNodeByName(name, ctx.Access)
 
-    const scope = ['admin']
+    // const scope = ['admin']
 
-    const internalAccessToken = await accessNode.class.generateAccessToken({
-      jku: generateJKU(input.issuer),
-      jwk: getPrivateJWK(ctx),
-      account: ROLLUP_INTERNAL_ACCESS_TOKEN_URN,
-      clientId,
-      expirationTime: '5 seconds',
-      issuer: input.issuer,
-      scope,
-    })
+    // const internalAccessToken = await accessNode.class.generateAccessToken({
+    //   jku: generateJKU(input.issuer),
+    //   jwk: getPrivateJWK(ctx),
+    //   account: ROLLUP_INTERNAL_ACCESS_TOKEN_URN,
+    //   clientId,
+    //   expirationTime: '5 seconds',
+    //   issuer: input.issuer,
+    //   scope,
+    // })
 
-    const starbaseClient = createStarbaseClient(ctx.Starbase, {
-      Authorization: `Bearer ${internalAccessToken}`,
-      ...generateTraceContextHeaders(ctx.traceSpan),
-    })
-    const paymaster = await starbaseClient.getPaymaster.query({
+    const paymaster = await caller.starbase.getPaymaster({
       clientId,
     })
 
-    const appData = await caller.getAppData({
+    const appData = await caller.access.getAppData({
       clientId,
     })
 
     if (
+      paymaster &&
       appData?.smartWalletSessionKeys &&
       appData.smartWalletSessionKeys.length
     ) {
-      const addressClient = createAddressClient(ctx.Address, {
-        ...generateTraceContextHeaders(ctx.traceSpan),
-      })
-
-      await addressClient.revokeWalletSessionKeyBatch.mutate({
+      await caller.address.revokeWalletSessionKeyBatch({
         projectId: paymaster.secret,
         smartWalletSessionKeys: appData.smartWalletSessionKeys,
       })
 
-      await caller.setAppData({
+      await caller.access.setAppData({
         clientId,
         appData: { smartWalletSessionKeys: [] },
       })
