@@ -39,6 +39,15 @@ jobs:
       - name: Test
         run: yarn run test
 
+      - name: Deploy edges D1 Database
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
+          accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: 'platform/core'
+          command: d1 migrations apply edges-v2-dev --config wrangler.dev.toml --env dev
+          environment: 'dev'
+
       - name: Deploy
         uses: cloudflare/wrangler-action@2.0.0
         with:
@@ -46,6 +55,7 @@ jobs:
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: platform/core
           command: publish --config wrangler.dev.toml
+          environment: 'dev'
           secrets: |
             SECRET_JWK_CURRENT_KID
             SECRET_JWKS

@@ -45,3 +45,4 @@ jobs:
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'platform/galaxy'
           command: publish --config wrangler.current.toml
+          environment: 'current'

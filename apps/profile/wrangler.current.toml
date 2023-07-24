@@ -1,10 +1,17 @@
-name = "profile-current"
+name = "profile"
 main = "./build/index.js"
 compatibility_date = "2022-04-05"
 compatibility_flags = ["no_minimal_subrequests"]
 workers_dev = false
 logpush = true
 
+[build]
+command = "yarn build"
+
+[site]
+bucket = "./public"
+
+[env.current]
 kv_namespaces = [
   { binding = "ProfileKV", id = "3a5214b7dab24414a1cb65733a6143b2" },
 ]
@@ -18,13 +25,7 @@ services = [
   { binding = "Images", service = "images-current" },
 ]
 
-[build]
-command = "yarn build"
-
-[site]
-bucket = "./public"
-
-[vars]
+[env.current.vars]
 PASSPORT_URL = "https://passport.rollup.id"
 PASSPORT_AUTH_URL = "https://passport.rollup.id/authorize"
 IMAGES_URL = "https://images.rollup.id/trpc"

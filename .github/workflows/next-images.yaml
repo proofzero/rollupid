@@ -48,6 +48,7 @@ jobs:
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'platform/images'
           command: publish --config wrangler.next.toml
+          environment: 'next'
           # This causes secrets to be set as if by: $ wrangler secret put.
           # Each supplied name must be defined in the env: config stanza.
           secrets: |
