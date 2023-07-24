@@ -196,29 +196,27 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       context.env.SECRET_STRIPE_API_KEY
     )
 
-    const hasUnpaidInvoices = invoices.some((invoice) => {
-      if (invoice.status)
-        return ['uncollectible', 'open'].includes(invoice.status)
-      return false
-    })
-
     const flashSession = await getFlashSession(request, context.env)
 
-    // We are not creating and/or updating subscriptions
-    // until we resolve our unpaid invoices
-    if (hasUnpaidInvoices) {
-      flashSession.flash(
-        'toast_notification',
-        JSON.stringify({
-          type: ToastType.Error,
-          message: 'Payment failed - check your card details',
-        })
-      )
-      return new Response(null, {
-        headers: {
-          'Set-Cookie': await commitFlashSession(flashSession, context.env),
-        },
-      })
+    for (const invoice of invoices) {
+      // We are not creating and/or updating subscriptions
+      // until we resolve our unpaid invoices
+      if (invoice.status) {
+        if (['open', 'uncollectible'].includes(invoice.status)) {
+          flashSession.flash(
+            'toast_notification',
+            JSON.stringify({
+              type: ToastType.Error,
+              message: 'Payment failed - check your card details',
+            })
+          )
+          return new Response(null, {
+            headers: {
+              'Set-Cookie': await commitFlashSession(flashSession, context.env),
+            },
+          })
+        }
+      }
     }
 
     const fd = await request.formData()
@@ -1049,6 +1047,9 @@ export default () => {
         const stripeClient = await loadStripe(STRIPE_PUBLISHABLE_KEY)
         const { status, client_secret, payment_method } = JSON.parse(actionData)
         if (status === 'requires_action') {
+          toast(ToastType.Warning, {
+            message: 'Payment requires additional action',
+          })
           await stripeClient?.confirmCardPayment(client_secret, {
             payment_method: payment_method,
           })
