@@ -28,7 +28,7 @@ analytics_engine_datasets = [
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
-[[env.next.vars.d1_databases]]
+[[env.next.d1_databases]]
 binding = "EDGES"
 database_name = "edges-v2-next"
 database_id = "058ddc84-7734-47ca-a84b-7f325c5336f7"
