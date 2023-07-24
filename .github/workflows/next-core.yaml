@@ -1,4 +1,4 @@
-name: Core
+name: Next Core
 
 on:
   push:
