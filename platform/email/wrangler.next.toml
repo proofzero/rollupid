@@ -1,9 +1,9 @@
-name = "email-next"
+name = "email"
 main = "src/index.ts"
 compatibility_date = "2022-10-05"
 logpush = true
 workers_dev = false
 
-[vars]
+[env.next.vars]
 NotificationFromName = "Rollup Next - Notification"
 NotificationFromUser = 'noreply-next'

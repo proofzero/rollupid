@@ -1,11 +1,17 @@
-name = "console-dev"
-
-workers_dev = false
+name = "console"
 main = "./build/index.js"
 compatibility_date = "2022-04-05"
 compatibility_flags = ["streams_enable_constructors"]
 logpush = true
+workers_dev = false
 
+[build]
+command = "yarn build"
+
+[site]
+bucket = "./public"
+
+[env.dev]
 routes = [
   { pattern = "console-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" },
 ]
@@ -15,13 +21,7 @@ services = [
   { binding = "Images", service = "images-dev" },
 ]
 
-[build]
-command = "yarn build"
-
-[site]
-bucket = "./public"
-
-[vars]
+[env.dev.vars]
 PASSPORT_URL = "https://passport-dev.rollup.id"
 COOKIE_DOMAIN = "rollup.id"
 STORAGE_NAMESPACE = "console"

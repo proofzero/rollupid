@@ -1,4 +1,4 @@
-name = "core-next"
+name = "core"
 main = "src/index.ts"
 compatibility_date = "2023-03-14"
 compatibility_flags = ["no_minimal_subrequests"]
@@ -6,6 +6,7 @@ logpush = true
 node_compat = true
 workers_dev = false
 
+[env.next]
 durable_objects.bindings = [
   { name = "Access", class_name = "Authorization" },
   { name = "Account", class_name = "Identity" },
@@ -27,24 +28,13 @@ analytics_engine_datasets = [
 
 unsafe.bindings = [{ type = "metadata", name = "ServiceDeploymentMetadata" }]
 
-[[d1_databases]]
+[[env.next.vars.d1_databases]]
 binding = "EDGES"
 database_name = "edges-v2-next"
 database_id = "058ddc84-7734-47ca-a84b-7f325c5336f7"
 migrations_dir = "../edges/migrations"
 
-[[migrations]]
-tag = "v0"
-new_classes = ["IdentityGroup"]
-transferred_classes = [
-  { from = "Access", from_script = "access-next", to = "Authorization" },
-  { from = "Account", from_script = "account-next", to = "Identity" },
-  { from = "Address", from_script = "address-next", to = "Account" },
-  { from = "Authorization", from_script = "access-next", to = "ExchangeCode" },
-  { from = "StarbaseApplication", from_script = "starbase-next", to = "StarbaseApplication" },
-]
-
-[vars]
+[env.next.vars]
 ENVIRONMENT = "next"
 
 INTERNAL_PASSPORT_SERVICE_NAME = "passport-next"
@@ -58,3 +48,14 @@ REGENERATION_COOLDOWN_PERIOD_IN_MS = 600_000
 MAX_ATTEMPTS_TIME_PERIOD_IN_MS = 300_000
 
 POSTHOG_API_KEY = "phc_JsZaA3PKO8jNF6gJ7HusRN3C7yzp56JakJJZfNRI9n7"
+
+[[migrations]]
+tag = "v0"
+new_classes = ["IdentityGroup"]
+transferred_classes = [
+  { from = "Access", from_script = "access-next", to = "Authorization" },
+  { from = "Account", from_script = "account-next", to = "Identity" },
+  { from = "Address", from_script = "address-next", to = "Account" },
+  { from = "Authorization", from_script = "access-next", to = "ExchangeCode" },
+  { from = "StarbaseApplication", from_script = "starbase-next", to = "StarbaseApplication" },
+]

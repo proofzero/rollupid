@@ -46,6 +46,7 @@ jobs:
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: platform/email
           command: publish --config wrangler.next.toml
+          environment: 'next'
           secrets: |
             INTERNAL_DKIM_DOMAIN
             INTERNAL_DKIM_SELECTOR

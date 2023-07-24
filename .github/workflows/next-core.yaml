@@ -46,6 +46,7 @@ jobs:
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: platform/core
           command: publish --config wrangler.next.toml
+          environment: 'next'
           secrets: |
             SECRET_JWK_CURRENT_KID
             SECRET_JWKS

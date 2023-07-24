@@ -46,6 +46,7 @@ jobs:
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'apps/profile'
           command: publish --config wrangler.next.toml
+          environment: 'next'
           secrets: |
             SECRET_SESSION_KEY
             SECRET_SESSION_SALT

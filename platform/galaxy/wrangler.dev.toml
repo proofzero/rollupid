@@ -1,10 +1,11 @@
-name = "galaxy-dev"
+name = "galaxy"
 main = "src/index.ts"
 compatibility_date = "2022-10-19"
 logpush = true
 node_compat = true
 wrangler_dev = false
 
+[env.dev]
 route = { pattern = "galaxy-dev.rollup.id", custom_domain = true, zone_name = "rollup.id" }
 
 services = [

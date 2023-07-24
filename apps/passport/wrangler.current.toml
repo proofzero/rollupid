@@ -1,4 +1,4 @@
-name = "passport-current"
+name = "passport"
 main = "./build/index.js"
 compatibility_date = "2022-04-05"
 compatibility_flags = ["streams_enable_constructors"]
@@ -6,6 +6,13 @@ node_compat = true
 workers_dev = false
 logpush = true
 
+[build]
+command = "yarn build"
+
+[site]
+bucket = "./public"
+
+[env.current]
 routes = [
   { pattern = "passport.rollup.id", custom_domain = true, zone_name = "rollup.id" },
   { pattern = "passport.pz3r0.com", custom_domain = true, zone_name = "pz3r0.com" },
@@ -16,13 +23,7 @@ services = [
   { binding = "Images", service = "images-current" },
 ]
 
-[build]
-command = "yarn build"
-
-[site]
-bucket = "./public"
-
-[vars]
+[env.current.vars]
 DEFAULT_HOSTS = ["passport.rollup.id", "passport.pz3r0.com"]
 COOKIE_DOMAIN = "rollup.id"
 PROFILE_APP_URL = "https://my.rollup.id"

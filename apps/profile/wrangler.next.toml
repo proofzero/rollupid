@@ -1,10 +1,17 @@
-name = "profile-next"
+name = "profile"
 main = "./build/index.js"
 compatibility_date = "2022-04-05"
 compatibility_flags = ["no_minimal_subrequests"]
 workers_dev = false
 logpush = true
 
+[build]
+command = "yarn build"
+
+[site]
+bucket = "./public"
+
+[env.next]
 kv_namespaces = [
   { binding = "ProfileKV", id = "451e189131d74dca87b41701555a839d" },
 ]
@@ -18,13 +25,7 @@ services = [
   { binding = "Images", service = "images-next" },
 ]
 
-[build]
-command = "yarn build"
-
-[site]
-bucket = "./public"
-
-[vars]
+[env.next.vars]
 PASSPORT_URL = "https://passport-next.rollup.id"
 PASSPORT_AUTH_URL = "https://passport-next.rollup.id/authorize"
 IMAGES_URL = "https://images-next.rollup.id/trpc"

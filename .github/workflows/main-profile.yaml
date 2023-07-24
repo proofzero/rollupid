@@ -48,6 +48,7 @@ jobs:
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'apps/profile'
           command: publish --config wrangler.dev.toml
+          environment: 'dev'
           secrets: |
             SECRET_SESSION_KEY
             SECRET_SESSION_SALT
