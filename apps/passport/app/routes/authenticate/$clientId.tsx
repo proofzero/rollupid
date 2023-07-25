@@ -76,7 +76,7 @@ export default () => {
         >
           <div
             className={
-              'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 dark:bg-[#1F2937] overflow-hidden'
+              'basis-2/5 h-[100dvh] w-full hidden 2xl:flex justify-center items-center bg-indigo-50 dark:bg-[#1F2937] overflow-hidden'
             }
             style={{
               backgroundImage: `url(${
@@ -87,7 +87,7 @@ export default () => {
               backgroundRepeat: 'no-repeat',
             }}
           ></div>
-          <div className={'basis-full basis-full lg:basis-3/5'}>
+          <div className={'basis-full basis-full 2xl:basis-3/5'}>
             <Outlet context={{ clientId, appProps, rollup_action, dark }} />
           </div>
         </div>
