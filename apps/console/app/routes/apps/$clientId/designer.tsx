@@ -499,6 +499,7 @@ const AuthPanel = ({
                 name="color"
                 value={color.light}
                 pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                maxLength={7}
                 onChange={(e) => {
                   let val = e.target.value
                   if (!val.startsWith('#')) {
@@ -510,7 +511,7 @@ const AuthPanel = ({
                     light: val,
                   })
                 }}
-                className="pl-9 pr-3 py-2 border border-gray-300 shadow-sm rounded text-sm font-normal text-gray-500 w-full"
+                className="pl-9 pr-3 py-2 border border-gray-300 shadow-sm rounded text-sm font-normal text-gray-500 w-full uppercase"
               />
 
               <Popover.Panel className="absolute z-10">
@@ -557,6 +558,7 @@ const AuthPanel = ({
                 id="colordark"
                 name="colordark"
                 value={color.dark}
+                maxLength={7}
                 pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
                 onChange={(e) => {
                   let val = e.target.value
@@ -569,7 +571,7 @@ const AuthPanel = ({
                     dark: val,
                   })
                 }}
-                className="pl-9 pr-3 py-2 border border-gray-300 shadow-sm rounded text-sm font-normal text-gray-500 w-full"
+                className="pl-9 pr-3 py-2 border border-gray-300 shadow-sm rounded text-sm font-normal text-gray-500 w-full uppercase"
               />
 
               <Popover.Panel className="absolute z-10">
