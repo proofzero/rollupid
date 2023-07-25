@@ -207,13 +207,6 @@ export default function IconPicker({
     e.stopPropagation()
   }
 
-  const appIcon =
-    icon !== '' ? (
-      <img className="rounded" src={icon} alt="Application icon" />
-    ) : (
-      <CameraIcon className="h-6 w-6 text-gray-300" aria-hidden="true" />
-    )
-
   const calculateDimensions = (
     aspectRatioWidth: number,
     aspectRatioHeight: number,
@@ -250,13 +243,23 @@ export default function IconPicker({
             style={{
               width: `${width}px`,
               height: `${height}px`,
+              backgroundImage:
+                iconUrl && iconUrl !== '' ? `url(${iconUrl})` : '',
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
             }}
             onDrop={(e) => handleDrop(e)}
             onDragOver={(e) => handleDragOver(e)}
             onDragEnter={(e) => handleDragEnter(e)}
             onDragLeave={(e) => handleDragLeave(e)}
           >
-            {appIcon}
+            {(!iconUrl || iconUrl === '') && (
+              <CameraIcon
+                className="h-6 w-6 text-gray-300"
+                aria-hidden="true"
+              />
+            )}
           </div>
 
           <div className="grid place-items-center">
