@@ -131,7 +131,7 @@ const processUpdateOp = async (
     }
 
     if (appDetails.customDomain) {
-      await starbaseClient.deleteCustomDomain.mutate({
+      await coreClient.starbase.deleteCustomDomain.mutate({
         clientId,
       })
     }
