@@ -295,6 +295,22 @@ export const reconcileAppSubscriptions = async (
   }
 
   if (reconciliations.length > 0) {
+    await Promise.all(
+      reconciliations
+        .filter((r) => r.customDomain)
+        .map(async (app) => {
+          try {
+            await coreClient.starbase.deleteCustomDomain.mutate({
+              clientId: app.clientID,
+            })
+          } catch (e) {
+            console.error(
+              `Failed to delete custom domain for app ${app.clientID}`
+            )
+          }
+        })
+    )
+
     await coreClient.address.sendReconciliationNotification.query({
       planType: plans[reconciliations[0].plan].title, // Only pro for now
       count: reconciliations.length,
