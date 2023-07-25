@@ -129,9 +129,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
     if (spd && !spd.addressURN) {
-      const targetAddressURN = await coreClient.address.getAddressURNForEmail.query(
-        spd.email.toLowerCase()
-      )
+      const targetAddressURN =
+        await coreClient.address.getAddressURNForEmail.query(
+          spd.email.toLowerCase()
+        )
 
       if (!targetAddressURN) {
         throw new InternalServerError({
@@ -312,7 +313,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
-export const PlanFeatures = ({ plan }: { plan: PlanDetails }) => {
+export const PlanFeatures = ({
+  plan,
+  featuresColor,
+}: {
+  plan: PlanDetails
+  featuresColor: 'text-indigo-500' | 'text-gray-500'
+}) => {
   return (
     <ul className="grid lg:grid-rows-4 grid-flow-row lg:grid-flow-col gap-4">
       {plan.features.map((feature) => (
@@ -321,14 +328,11 @@ export const PlanFeatures = ({ plan }: { plan: PlanDetails }) => {
           className={`flex flex-row items-center gap-3 text-[#6B7280]`}
         >
           <div className="w-3.5 h-3.5 flex justify-center items-center">
-            {feature.type === 'base' && (
-              <FaCheck className={`text-indigo-500`} />
-            )}
-            {feature.type === 'addon' && (
-              <FaCheck className={`text-gray-500`} />
+            {feature.type === 'current' && (
+              <FaCheck className={featuresColor} />
             )}
             {feature.type === 'future' && (
-              <TbHourglassHigh className="text-gray-500" />
+              <TbHourglassHigh className={featuresColor} />
             )}
           </div>
 
@@ -392,7 +396,7 @@ const PurchaseProModal = ({
             {plan.description}
           </Text>
 
-          <PlanFeatures plan={plan} />
+          <PlanFeatures plan={plan} featuresColor="text-gray-500" />
         </div>
 
         <div className="border-b border-gray-200"></div>
@@ -862,7 +866,7 @@ const PlanCard = ({
         <div className="w-full border-b border-gray-200"></div>
         <main>
           <div className="flex flex-row gap-7 p-4">
-            <PlanFeatures plan={plan} />
+            <PlanFeatures plan={plan} featuresColor="text-indigo-500" />
           </div>
 
           <div className="border-b border-gray-200"></div>

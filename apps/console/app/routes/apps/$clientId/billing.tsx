@@ -300,12 +300,14 @@ const PlanCard = ({
   totalEntitlements,
   usedEntitlements,
   paymentData,
+  featuresColor,
 }: {
   planType: ServicePlanType
   currentPlan: ServicePlanType
   totalEntitlements?: number
   usedEntitlements?: number
   paymentData: PaymentData
+  featuresColor: 'text-gray-500' | 'text-indigo-500'
 }) => {
   const plan = plans[planType]
   const active = planType === currentPlan
@@ -351,7 +353,7 @@ const PlanCard = ({
         <div className="w-full border-b border-gray-200"></div>
         <main>
           <div className="flex flex-row gap-7 p-4">
-            <PlanFeatures plan={plan} />
+            <PlanFeatures plan={plan} featuresColor={featuresColor} />
           </div>
         </main>
         <div className="w-full border-t border-gray-200"></div>
@@ -426,7 +428,7 @@ const PurchaseConfirmationModal = ({
             {plan.description}
           </Text>
 
-          <PlanFeatures plan={plan} />
+          <PlanFeatures plan={plan} featuresColor="text-indigo-500" />
         </div>
 
         <div className="border-b border-gray-200"></div>
@@ -713,6 +715,7 @@ export default () => {
           currentPlan={appDetails.appPlan}
           planType={ServicePlanType.FREE}
           paymentData={paymentData}
+          featuresColor="text-gray-500"
         />
         <PlanCard
           currentPlan={appDetails.appPlan}
@@ -722,6 +725,7 @@ export default () => {
             apps.filter((a) => a.appPlan === ServicePlanType.PRO).length
           }
           paymentData={paymentData}
+          featuresColor="text-indigo-500"
         />
       </section>
     </>
