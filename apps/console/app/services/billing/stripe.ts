@@ -42,6 +42,7 @@ type UpdateSubscriptionParams = {
 type SubscriptionMetadata = Partial<{
   accountURN: AccountURN
   handled: string | null
+  old_quantity: number | undefined
 }>
 
 type GetInvoicesParams = {
@@ -138,7 +139,7 @@ export const createSubscription = async (
   if (handled) metadata.handled = handled.toString()
 
   const subscription = await stripeClient.subscriptions.create({
-    customer: customerID,
+    customer: customerID as string,
     items: [
       {
         price: planID,
@@ -174,6 +175,8 @@ export const updateSubscription = async (
     throw new InternalServerError({
       message: 'Plan not found',
     })
+
+  metadata.old_quantity = planItem.quantity
 
   subscription = await stripeClient.subscriptions.update(subscription.id, {
     proration_behavior: 'always_invoice',
@@ -247,12 +250,23 @@ export const getUpcomingInvoices = async (
 
 export const voidInvoice = async (
   invoiceId: string,
+  customerId: string,
+  creation: boolean = false,
   SECRET_STRIPE_API_KEY: string
 ) => {
   const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
   await stripeClient.invoices.voidInvoice(invoiceId)
+
+  // When this is the creation of subscription, nothing needs to be adjusted
+  if (!creation) {
+    // We don't want to update the credit balance if the invoice is voided
+    const invoice = await stripeClient.invoices.retrieve(invoiceId)
+    await stripeClient.customers.update(customerId, {
+      balance: invoice.amount_due,
+    })
+  }
 }
 
 export const reconcileAppSubscriptions = async (

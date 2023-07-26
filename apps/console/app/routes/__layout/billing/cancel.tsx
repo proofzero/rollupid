@@ -16,6 +16,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const fd = await request.formData()
 
     const invoiceId = fd.get('invoiceId') as string
+    const customerId = fd.get('customerId') as string
+    const creation = fd.get('creation') as string
 
     const headers = request.headers
     let returnURL = headers.get('Referer') as string
@@ -23,7 +25,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const flashSession = await getFlashSession(request, context.env)
 
     try {
-      await voidInvoice(invoiceId, context.env.SECRET_STRIPE_API_KEY)
+      await voidInvoice(
+        invoiceId,
+        customerId,
+        creation === 'true',
+        context.env.SECRET_STRIPE_API_KEY
+      )
       flashSession.flash(
         'toastNotification',
         JSON.stringify({

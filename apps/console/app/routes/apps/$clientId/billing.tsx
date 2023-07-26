@@ -195,14 +195,16 @@ const processPurchaseOp = async (
       : 1
     : 1
 
-  sub = await createOrUpdateSubscription({
-    customerID,
-    SECRET_STRIPE_PRO_PLAN_ID: env.SECRET_STRIPE_PRO_PLAN_ID,
-    SECRET_STRIPE_API_KEY: env.SECRET_STRIPE_API_KEY,
-    quantity,
-    subscriptionID: entitlements.subscriptionID,
-    accountURN,
-  })
+  sub = (
+    await createOrUpdateSubscription({
+      customerID,
+      SECRET_STRIPE_PRO_PLAN_ID: env.SECRET_STRIPE_PRO_PLAN_ID,
+      SECRET_STRIPE_API_KEY: env.SECRET_STRIPE_API_KEY,
+      quantity,
+      subscriptionID: entitlements.subscriptionID,
+      accountURN,
+    })
+  ).sub
 
   setPurchaseToastNotification({
     sub,

@@ -88,8 +88,10 @@ export const createOrUpdateSubscription = async ({
   accountURN: AccountURN
   customerID: string
 }) => {
-  let sub
+  let sub,
+    creation = false
   if (!subscriptionID) {
+    creation = true
     sub = await createSubscription(
       {
         customerID: customerID,
@@ -111,7 +113,7 @@ export const createOrUpdateSubscription = async ({
       SECRET_STRIPE_API_KEY
     )
   }
-  return sub
+  return { sub, creation }
 }
 
 export const setPurchaseToastNotification = ({

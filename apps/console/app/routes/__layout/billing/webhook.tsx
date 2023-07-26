@@ -15,6 +15,8 @@ import { InternalServerError } from '@proofzero/errors'
 import { type AddressURN } from '@proofzero/urns/address'
 
 type StripeInvoicePayload = {
+  id: string
+  subscription: string
   customer: string
   payment_intent: string
   lines: {
@@ -24,6 +26,7 @@ type StripeInvoicePayload = {
       quantity: number
     }>
   }
+  metadata: any
 }
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
@@ -248,6 +251,52 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           })
         }
 
+        break
+      case 'invoice.voided':
+        const {
+          subscription: subVoided,
+          customer: customerVoided,
+          payment_intent: paymentIntentVoided,
+          metadata: metaVoided,
+        } = event.data.object as StripeInvoicePayload
+        const customerDataVoided = await stripeClient.customers.retrieve(
+          customerVoided
+        )
+        const paymentIntentInfoVoided =
+          await stripeClient.paymentIntents.retrieve(paymentIntentVoided)
+
+        if (
+          !customerDataVoided.deleted &&
+          customerDataVoided.email &&
+          paymentIntentInfoVoided.status !== 'requires_action'
+        ) {
+          const { email, name } = customerDataVoided
+
+          const oldSubInfo = await stripeClient.subscriptions.retrieve(
+            subVoided
+          )
+          const planItem = oldSubInfo.items.data.find(
+            (i) => i.price.id === context.env.SECRET_STRIPE_PRO_PLAN_ID
+          )
+
+          const oldQuantity = +oldSubInfo.metadata.old_quantity
+
+          await stripeClient.subscriptions.update(subVoided, {
+            proration_behavior: 'always_invoice',
+            items: [
+              {
+                id: planItem?.id,
+                quantity: oldQuantity,
+              },
+            ],
+            expand: ['latest_invoice.payment_intent'],
+          })
+
+          await coreClient.address.sendFailedPaymentNotification.mutate({
+            email,
+            name: name || 'Client',
+          })
+        }
         break
       case 'invoice.payment_failed':
         const { customer: customerFail, payment_intent: paymentIntentFail } =
