@@ -1,4 +1,5 @@
 import { InternalServerError } from '@proofzero/errors'
+import { type CoreClientType } from '@proofzero/platform-clients/core'
 import { ReconcileAppsSubscriptionsOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/reconcileAppSubscriptions'
 import { ServicePlanType } from '@proofzero/types/account'
 import { AccountURN } from '@proofzero/urns/account'
@@ -264,7 +265,7 @@ export const reconcileAppSubscriptions = async (
   }: {
     subscriptionID: string
     accountURN: AccountURN
-    coreClient: any
+    coreClient: CoreClientType
     billingURL: string
     settingsURL: string
   },

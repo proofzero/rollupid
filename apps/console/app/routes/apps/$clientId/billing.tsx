@@ -50,10 +50,11 @@ import { type Env } from 'bindings'
 import {
   type StripeInvoice,
   getCurrentAndUpcomingInvoices,
-  setPurchaseToastNotification,
   createOrUpdateSubscription,
   process3DSecureCard,
+  UnpaidInvoiceNotification,
 } from '~/utils/stripe'
+import { setPurchaseToastNotification } from '~/utils'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -195,16 +196,14 @@ const processPurchaseOp = async (
       : 1
     : 1
 
-  sub = (
-    await createOrUpdateSubscription({
-      customerID,
-      SECRET_STRIPE_PRO_PLAN_ID: env.SECRET_STRIPE_PRO_PLAN_ID,
-      SECRET_STRIPE_API_KEY: env.SECRET_STRIPE_API_KEY,
-      quantity,
-      subscriptionID: entitlements.subscriptionID,
-      accountURN,
-    })
-  ).sub
+  sub = await createOrUpdateSubscription({
+    customerID,
+    SECRET_STRIPE_PRO_PLAN_ID: env.SECRET_STRIPE_PRO_PLAN_ID,
+    SECRET_STRIPE_API_KEY: env.SECRET_STRIPE_API_KEY,
+    quantity,
+    subscriptionID: entitlements.subscriptionID,
+    accountURN,
+  })
 
   setPurchaseToastNotification({
     sub,
@@ -261,26 +260,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const flashSession = await getFlashSession(request, context.env)
 
-    for (const invoice of invoices) {
-      // We are not creating and/or updating subscriptions
-      // until we resolve our unpaid invoices
-      if (invoice?.status) {
-        if (['open', 'uncollectible'].includes(invoice.status)) {
-          flashSession.flash(
-            'toast_notification',
-            JSON.stringify({
-              type: ToastType.Error,
-              message: 'Payment failed - check your card details',
-            })
-          )
-          return new Response(null, {
-            headers: {
-              'Set-Cookie': await commitFlashSession(flashSession, context.env),
-            },
-          })
-        }
-      }
-    }
+    await UnpaidInvoiceNotification({
+      invoices,
+      flashSession,
+      env: context.env,
+    })
 
     const fd = await request.formData()
     const op = fd.get('op') as 'update' | 'purchase'
@@ -311,15 +295,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           traceHeader
         )
 
-        return new Response(
-          JSON.stringify({
+        return json(
+          {
             status: (sub?.latest_invoice as unknown as StripeInvoice)
               ?.payment_intent?.status,
             client_secret: (sub?.latest_invoice as unknown as StripeInvoice)
               .payment_intent?.client_secret,
             payment_method: (sub?.latest_invoice as unknown as StripeInvoice)
               .payment_intent?.payment_method,
-          }),
+          },
           {
             headers: {
               'Set-Cookie': await commitFlashSession(flashSession, context.env),
@@ -749,9 +733,11 @@ export default () => {
     hasUnpaidInvoices: boolean
   }>()
 
+  const navigate = useNavigate()
+
   useEffect(() => {
     if (actionData) {
-      const { status, client_secret, payment_method } = JSON.parse(actionData)
+      const { status, client_secret, payment_method } = actionData
       ;(async () => {
         await process3DSecureCard({
           STRIPE_PUBLISHABLE_KEY,
@@ -759,6 +745,7 @@ export default () => {
           client_secret,
           payment_method,
         })
+        navigate('.', { replace: true })
       })()
     }
   }, [actionData])

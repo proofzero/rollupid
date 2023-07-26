@@ -7,11 +7,8 @@ import createCoreClient from '@proofzero/platform-clients/core'
 import { type AccountURN } from '@proofzero/urns/account'
 
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import {
-  reconcileAppSubscriptions,
-  updateSubscriptionMetadata,
-} from '~/services/billing/stripe'
-import { InternalServerError } from '@proofzero/errors'
+import { reconcileAppSubscriptions } from '~/services/billing/stripe'
+import { InternalServerError, RollupError } from '@proofzero/errors'
 import { type AddressURN } from '@proofzero/urns/address'
 
 type StripeInvoicePayload = {
@@ -78,6 +75,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           invoice.status !== 'paid'
         ) {
           return null
+        }
+
+        const entitlements = await coreClient.account.getEntitlements.query({
+          accountURN: subMeta.accountURN,
+        })
+        if (entitlements?.subscriptionID !== id) {
+          throw new RollupError({
+            message: `Subscription ID ${id} does not match entitlements subscription ID ${entitlements?.subscriptionID}`,
+          })
         }
 
         await reconcileAppSubscriptions(

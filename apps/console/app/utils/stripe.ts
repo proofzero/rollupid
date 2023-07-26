@@ -5,11 +5,13 @@ import {
   updateSubscription,
 } from '~/services/billing/stripe'
 import type { StripePaymentData } from '@proofzero/platform/account/src/types'
-import type Stripe from 'stripe'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { type AccountURN } from '@proofzero/urns/account'
 import { type PaymentIntent, loadStripe } from '@stripe/stripe-js'
 import { type SubmitFunction } from '@remix-run/react'
+import { type Session, type SessionData } from '@remix-run/cloudflare'
+import { commitFlashSession } from '~/utilities/session.server'
+import { type Env } from 'bindings'
 
 export type StripeInvoice = {
   id: string
@@ -43,7 +45,7 @@ export const getCurrentAndUpcomingInvoices = async (
 
       invoices = currentInvoices.data.map((i) => ({
         id: i.id,
-        amount: i.total / 100,
+        amount: i.amount_due / 100,
         timestamp: i.created * 1000,
         status: i.status,
         url: i.hosted_invoice_url ?? undefined,
@@ -118,49 +120,6 @@ export const createOrUpdateSubscription = async ({
   return sub
 }
 
-export const setPurchaseToastNotification = ({
-  sub,
-  flashSession,
-}: {
-  sub: Stripe.Subscription
-  flashSession: any
-}) => {
-  // https://stripe.com/docs/billing/subscriptions/overview#subscription-statuses
-  if (
-    (sub.status === 'active' || sub.status === 'trialing') &&
-    sub.latest_invoice?.status === 'paid'
-  ) {
-    flashSession.flash(
-      'toast_notification',
-      JSON.stringify({
-        type: ToastType.Success,
-        message: 'Entitlement(s) successfully bought',
-      })
-    )
-  } else {
-    if (
-      (sub.latest_invoice as unknown as StripeInvoice)?.payment_intent
-        ?.status === 'requires_action'
-    ) {
-      flashSession.flash(
-        'toast_notification',
-        JSON.stringify({
-          type: ToastType.Warning,
-          message: 'Payment requires additional action',
-        })
-      )
-    } else {
-      flashSession.flash(
-        'toast_notification',
-        JSON.stringify({
-          type: ToastType.Error,
-          message: 'Payment failed - check your card details',
-        })
-      )
-    }
-  }
-}
-
 export const process3DSecureCard = async ({
   STRIPE_PUBLISHABLE_KEY,
   status,
@@ -203,5 +162,35 @@ export const process3DSecureCard = async ({
         message: 'Successfully purchased entitlement(s)',
       })
     }
+  }
+}
+
+export const UnpaidInvoiceNotification = async ({
+  invoices,
+  flashSession,
+  env,
+}: {
+  invoices: StripeInvoice[]
+  flashSession: Session<SessionData, SessionData>
+  env: Env
+}) => {
+  if (
+    invoices.some(
+      (invoice) =>
+        invoice?.status && ['open', 'uncollectible'].includes(invoice.status)
+    )
+  ) {
+    flashSession.flash(
+      'toast_notification',
+      JSON.stringify({
+        type: ToastType.Error,
+        message: 'Payment failed - check your card details',
+      })
+    )
+    throw new Response(null, {
+      headers: {
+        'Set-Cookie': await commitFlashSession(flashSession, env),
+      },
+    })
   }
 }

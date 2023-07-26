@@ -75,11 +75,12 @@ import {
   createOrUpdateSubscription,
   getCurrentAndUpcomingInvoices,
   process3DSecureCard,
-  setPurchaseToastNotification,
+  UnpaidInvoiceNotification,
   type StripeInvoice,
 } from '~/utils/stripe'
 import { IoWarningOutline } from 'react-icons/io5'
 import { type ToastNotification } from '~/types'
+import { setPurchaseToastNotification } from '~/utils'
 
 type LoaderData = {
   STRIPE_PUBLISHABLE_KEY: string
@@ -196,26 +197,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const flashSession = await getFlashSession(request, context.env)
 
-    for (const invoice of invoices) {
-      // We are not creating and/or updating subscriptions
-      // until we resolve our unpaid invoices
-      if (invoice?.status) {
-        if (['open', 'uncollectible'].includes(invoice.status)) {
-          flashSession.flash(
-            'toast_notification',
-            JSON.stringify({
-              type: ToastType.Error,
-              message: 'Payment failed - check your card details',
-            })
-          )
-          return new Response(null, {
-            headers: {
-              'Set-Cookie': await commitFlashSession(flashSession, context.env),
-            },
-          })
-        }
-      }
-    }
+    await UnpaidInvoiceNotification({
+      invoices,
+      flashSession,
+      env: context.env,
+    })
 
     const fd = await request.formData()
     const { customerID, quantity, txType } = JSON.parse(
@@ -290,8 +276,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       )
     }
 
-    return new Response(
-      JSON.stringify({
+    return json(
+      {
         status: (sub.latest_invoice as unknown as StripeInvoice)?.payment_intent
           ?.status,
         client_secret: (sub.latest_invoice as unknown as StripeInvoice)
@@ -300,7 +286,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           .payment_intent?.payment_method,
         quantity,
         subId: sub.id,
-      }),
+      },
       {
         headers: {
           'Set-Cookie': await commitFlashSession(flashSession, context.env),
@@ -1019,18 +1005,15 @@ export default () => {
 
   useEffect(() => {
     if (actionData) {
-      const { status, client_secret, payment_method, subId } =
-        JSON.parse(actionData)
-      ;(async () => {
-        await process3DSecureCard({
-          STRIPE_PUBLISHABLE_KEY,
-          status,
-          subId,
-          client_secret,
-          payment_method,
-          submit,
-        })
-      })()
+      const { status, client_secret, payment_method, subId } = actionData
+      process3DSecureCard({
+        STRIPE_PUBLISHABLE_KEY,
+        status,
+        subId,
+        client_secret,
+        payment_method,
+        submit,
+      })
     }
   }, [actionData])
 
@@ -1334,14 +1317,15 @@ export default () => {
                           {hydrated && (
                             <div className="flex flex-row items-center space-x-3">
                               <Text size="sm" className="gray-500">
-                                {new Date(invoice.timestamp).toLocaleString(
-                                  'default',
-                                  {
-                                    day: '2-digit',
-                                    month: 'short',
-                                    year: 'numeric',
-                                  }
-                                )}
+                                {hydrated &&
+                                  new Date(invoice.timestamp).toLocaleString(
+                                    'default',
+                                    {
+                                      day: '2-digit',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    }
+                                  )}
                               </Text>
 
                               {(invoice.status === 'open' ||
@@ -1398,7 +1382,7 @@ export default () => {
                               </a>
                               <button
                                 type="button"
-                                onClick={async () => {
+                                onClick={() => {
                                   submit(
                                     {
                                       invoice_id: invoice.id,
@@ -1413,7 +1397,7 @@ export default () => {
                                 }}
                               >
                                 <Text size="xs" className="text-red-500">
-                                  Cancel Invoice
+                                  Cancel Payment
                                 </Text>
                               </button>
                             </div>
