@@ -8,7 +8,7 @@ import type { StripePaymentData } from '@proofzero/platform/account/src/types'
 import type Stripe from 'stripe'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { type AccountURN } from '@proofzero/urns/account'
-import { loadStripe } from '@stripe/stripe-js'
+import { type PaymentIntent, loadStripe } from '@stripe/stripe-js'
 import { type SubmitFunction } from '@remix-run/react'
 
 export type StripeInvoice = {
@@ -18,9 +18,10 @@ export type StripeInvoice = {
   status: string | null
   url?: string
   payment_intent?: {
-    status: string
-    client_secret: string
-    payment_method: string
+    id?: string
+    status?: string
+    client_secret?: string
+    payment_method?: string
   }
 }
 
@@ -46,6 +47,9 @@ export const getCurrentAndUpcomingInvoices = async (
         timestamp: i.created * 1000,
         status: i.status,
         url: i.hosted_invoice_url ?? undefined,
+        payment_intent: i.payment_intent
+          ? { id: (i.payment_intent as PaymentIntent).id }
+          : undefined,
       }))
     } catch (er) {
       console.error(er)
@@ -124,7 +128,10 @@ export const setPurchaseToastNotification = ({
   flashSession: any
 }) => {
   // https://stripe.com/docs/billing/subscriptions/overview#subscription-statuses
-  if (sub.status === 'active' || sub.status === 'trialing') {
+  if (
+    (sub.status === 'active' || sub.status === 'trialing') &&
+    sub.latest_invoice?.status === 'paid'
+  ) {
     flashSession.flash(
       'toast_notification',
       JSON.stringify({
@@ -193,6 +200,7 @@ export const process3DSecureCard = async ({
         }
       )
     } else {
+      console.log({ paymentIntent: result?.paymentIntent })
       toast(ToastType.Success, {
         message: 'Successfully purchased entitlement(s)',
       })

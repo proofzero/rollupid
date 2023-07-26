@@ -1407,8 +1407,8 @@ export default () => {
                                 onClick={async () => {
                                   submit(
                                     {
-                                      invoiceId: invoice.id,
-                                      customerId:
+                                      invoice_id: invoice.id,
+                                      customer_id:
                                         paymentData?.customerID as string,
                                       creation,
                                     },

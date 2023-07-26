@@ -42,7 +42,6 @@ type UpdateSubscriptionParams = {
 type SubscriptionMetadata = Partial<{
   accountURN: AccountURN
   handled: string | null
-  old_quantity: number | undefined
 }>
 
 type GetInvoicesParams = {
@@ -154,20 +153,12 @@ export const createSubscription = async (
 }
 
 export const updateSubscription = async (
-  {
-    subscriptionID,
-    planID,
-    quantity,
-    handled = false,
-  }: UpdateSubscriptionParams,
+  { subscriptionID, planID, quantity }: UpdateSubscriptionParams,
   SECRET_STRIPE_API_KEY: string
 ) => {
   const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
-
-  let metadata: SubscriptionMetadata = {}
-  if (handled) metadata.handled = handled.toString()
 
   let subscription = await stripeClient.subscriptions.retrieve(subscriptionID)
   const planItem = subscription.items.data.find((i) => i.price.id === planID)
@@ -175,8 +166,6 @@ export const updateSubscription = async (
     throw new InternalServerError({
       message: 'Plan not found',
     })
-
-  metadata.old_quantity = planItem.quantity
 
   subscription = await stripeClient.subscriptions.update(subscription.id, {
     proration_behavior: 'always_invoice',
@@ -186,8 +175,8 @@ export const updateSubscription = async (
         quantity,
       },
     ],
+    payment_behavior: 'pending_if_incomplete',
     expand: ['latest_invoice.payment_intent'],
-    metadata,
   })
 
   return subscription
@@ -251,7 +240,6 @@ export const getUpcomingInvoices = async (
 export const voidInvoice = async (
   invoiceId: string,
   customerId: string,
-  creation: boolean = false,
   SECRET_STRIPE_API_KEY: string
 ) => {
   const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
@@ -259,14 +247,11 @@ export const voidInvoice = async (
   })
   await stripeClient.invoices.voidInvoice(invoiceId)
 
-  // When this is the creation of subscription, nothing needs to be adjusted
-  if (!creation) {
-    // We don't want to update the credit balance if the invoice is voided
-    const invoice = await stripeClient.invoices.retrieve(invoiceId)
-    await stripeClient.customers.update(customerId, {
-      balance: invoice.amount_due,
-    })
-  }
+  const customer = await stripeClient.customers.retrieve(customerId)
+  // We don't want to update the credit balance if the invoice is voided
+  await stripeClient.customers.update(customerId, {
+    balance: customer.object.balance,
+  })
 }
 
 export const reconcileAppSubscriptions = async (

@@ -15,8 +15,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const fd = await request.formData()
 
-    const invoiceId = fd.get('invoiceId') as string
-    const customerId = fd.get('customerId') as string
+    const invoiceId = fd.get('invoice_id') as string
+    const customerId = fd.get('customer_id') as string
     const creation = fd.get('creation') as string
 
     const headers = request.headers

@@ -59,68 +59,24 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           id,
           metadata: subMeta,
           status: subStatus,
+          latest_invoice: latestInvoice,
         } = event.data.object as {
           id: string
+          latest_invoice: string
           metadata: {
             accountURN: AccountURN
-            handled?: string | null
           }
           status: string
         }
 
+        const invoice = await stripeClient.invoices.retrieve(latestInvoice)
+
         // We don't want to do anything with subscription
         // if payment for it failed
-        if (subStatus !== 'active' && subStatus !== 'trialing') {
-          return null
-        }
-
-        if (event.data.previous_attributes) {
-          let metadataUpdateEvent = false
-
-          const { metadata } = event.data.previous_attributes as {
-            metadata?: {
-              handled?: string
-            }
-          }
-
-          // If previous attributes had a handled flag and the current
-          // event does not, then the webhook is handling only the
-          // handled removal so we shouldn't move further
-          if (
-            !subMeta.handled &&
-            metadata?.handled &&
-            JSON.parse(metadata.handled)
-          ) {
-            console.info(
-              `Cleared Subscription ${id} - ${event.type} handled flag`
-            )
-            metadataUpdateEvent = true
-          }
-
-          if (metadataUpdateEvent) {
-            return null
-          }
-        }
-
-        // When synchronously handling subscription update effects
-        // a flag is set to prevent the webhook from handling it again
-        // when it is received asynchronously
-        // This call clears the flag
-        if (subMeta.handled) {
-          console.info(
-            `Subscription ${id} - ${event.type} already handled synchronously`
-          )
-
-          subMeta.handled = null
-
-          await updateSubscriptionMetadata(
-            {
-              id,
-              metadata: subMeta,
-            },
-            context.env
-          )
-
+        if (
+          (subStatus !== 'active' && subStatus !== 'trialing') ||
+          invoice.status !== 'paid'
+        ) {
           return null
         }
 
@@ -252,52 +208,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         }
 
         break
-      case 'invoice.voided':
-        const {
-          subscription: subVoided,
-          customer: customerVoided,
-          payment_intent: paymentIntentVoided,
-          metadata: metaVoided,
-        } = event.data.object as StripeInvoicePayload
-        const customerDataVoided = await stripeClient.customers.retrieve(
-          customerVoided
-        )
-        const paymentIntentInfoVoided =
-          await stripeClient.paymentIntents.retrieve(paymentIntentVoided)
 
-        if (
-          !customerDataVoided.deleted &&
-          customerDataVoided.email &&
-          paymentIntentInfoVoided.status !== 'requires_action'
-        ) {
-          const { email, name } = customerDataVoided
-
-          const oldSubInfo = await stripeClient.subscriptions.retrieve(
-            subVoided
-          )
-          const planItem = oldSubInfo.items.data.find(
-            (i) => i.price.id === context.env.SECRET_STRIPE_PRO_PLAN_ID
-          )
-
-          const oldQuantity = +oldSubInfo.metadata.old_quantity
-
-          await stripeClient.subscriptions.update(subVoided, {
-            proration_behavior: 'always_invoice',
-            items: [
-              {
-                id: planItem?.id,
-                quantity: oldQuantity,
-              },
-            ],
-            expand: ['latest_invoice.payment_intent'],
-          })
-
-          await coreClient.address.sendFailedPaymentNotification.mutate({
-            email,
-            name: name || 'Client',
-          })
-        }
-        break
       case 'invoice.payment_failed':
         const { customer: customerFail, payment_intent: paymentIntentFail } =
           event.data.object as StripeInvoicePayload
