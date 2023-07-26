@@ -7,7 +7,7 @@ import {
   MicrosoftStrategy,
   MicrosoftStrategyOptions,
 } from 'remix-auth-microsoft'
-import { TwitterStrategy } from 'remix-auth-twitter'
+import { Twitter2Strategy } from 'remix-auth-twitter'
 
 import { AppleStrategy } from '~/utils/applestrategy.server'
 import { getCookieDomain } from './utils/cookie'
@@ -126,17 +126,14 @@ export const getMicrosoftStrategy = (
 }
 
 export const getTwitterStrategy = (env: Env) => {
-  return new TwitterStrategy(
+  return new Twitter2Strategy(
     {
       clientID: env.INTERNAL_TWITTER_OAUTH_CLIENT_ID,
       clientSecret: env.SECRET_TWITTER_OAUTH_CLIENT_SECRET,
       callbackURL: env.INTERNAL_TWITTER_OAUTH_CALLBACK_URL,
-      includeEmail: true,
-      alwaysReauthorize: false,
+      scopes: ['users.read', 'tweet.read'],
     },
-    async ({ ...args }) => {
-      return { ...args }
-    }
+    async (params) => params
   )
 }
 

@@ -16,9 +16,9 @@ export default class TwitterAddress extends OAuthAddress {
     if (!data) throw new InternalServerError({ message: 'no data' })
     const profile = data.profile as TwitterOAuthProfile
     return {
-      address: profile.screen_name,
+      address: profile.username,
       title: profile.name,
-      icon: profile.profile_image_url_https,
+      icon: profile.picture,
       type: OAuthAddressType.Twitter,
     }
   }

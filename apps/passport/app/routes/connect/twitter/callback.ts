@@ -1,7 +1,7 @@
 import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 
-import { TwitterStrategyDefaultName } from 'remix-auth-twitter'
-import type { TwitterStrategyVerifyParams } from 'remix-auth-twitter'
+import { Twitter2StrategyDefaultName } from 'remix-auth-twitter'
+import type { Twitter2StrategyVerifyParams } from 'remix-auth-twitter'
 
 import { NodeType, OAuthAddressType } from '@proofzero/types/address'
 
@@ -37,16 +37,31 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const authenticator = new Authenticator(authenticatorStorage)
     authenticator.use(getTwitterStrategy(context.env))
 
-    const { accessToken, accessTokenSecret, profile } =
-      (await authenticator.authenticate(
-        TwitterStrategyDefaultName,
-        request
-      )) as TwitterStrategyVerifyParams
+    const { accessToken } = (await authenticator.authenticate(
+      Twitter2StrategyDefaultName,
+      request
+    )) as Twitter2StrategyVerifyParams
+
+    const meURL = new URL('https://api.twitter.com/2/users/me')
+    meURL.searchParams.set('user.fields', 'id,name,profile_image_url,username')
+    const userResponse = await fetch(meURL.toString(), {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+
+    const { data } = await userResponse.json<{ data: any }>()
+    const profile = {
+      id: data.id,
+      name: data.name,
+      username: data.username,
+      picture: data.profile_image_url,
+    }
 
     const addressURN = AddressURNSpace.componentizedUrn(
-      generateHashedIDRef(OAuthAddressType.Twitter, profile.id_str),
+      generateHashedIDRef(OAuthAddressType.Twitter, profile.id),
       { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Twitter },
-      { alias: profile.name, hidden: 'true' }
+      { alias: profile.username, hidden: 'true' }
     )
     const coreClient = getCoreClient({ context, addressURN })
     const { accountURN, existing } =
@@ -57,7 +72,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     await coreClient.address.setOAuthData.mutate({
       accessToken,
-      accessTokenSecret,
       profile: { ...profile, provider: OAuthAddressType.Twitter },
     })
 
