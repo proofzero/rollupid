@@ -71,9 +71,10 @@ export type MicrosoftOAuthProfile =
   | MicrosoftOAuthProfileWork
 
 export interface TwitterOAuthProfile {
+  id: string
   name: string
-  screen_name: string
-  profile_image_url_https: string
+  username: string
+  picture: string
 }
 
 export enum ReferenceType {

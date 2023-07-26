@@ -5948,7 +5948,7 @@ __metadata:
     remix-auth-google: 1.2.0
     remix-auth-microsoft: 2.0.0
     remix-auth-oauth2: 1.5.0
-    remix-auth-twitter: 1.0.0
+    remix-auth-twitter: 2.0.1
     remix-utils: 6.3.0
     sass: 1.54.7
     sass-loader: 13.2.0
@@ -33660,9 +33660,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remix-auth-twitter@npm:1.0.0":
-  version: 1.0.0
-  resolution: "remix-auth-twitter@npm:1.0.0"
+"remix-auth-twitter@npm:2.0.1":
+  version: 2.0.1
+  resolution: "remix-auth-twitter@npm:2.0.1"
   dependencies:
     crypto-js: ^4.1.1
     debug: ^4.3.3
@@ -33670,7 +33670,7 @@ __metadata:
     uuid: ^8.3.2
   peerDependencies:
     "@remix-run/server-runtime": ^1.6.3
-  checksum: b2f8dbd17499f01b3aad9378c09be133bc674ac3a329c05f4fc1fe9400e95c6fe22e79247ddd9323c7fbf500213c698b962b936d3ff69aa3b74b307c0226f445
+  checksum: 520ceefd96df62831c1e9ceed7d0b51ee6d32077b0037250d610c6707e0ab60be011f0ae447a09666b87e9fbf9de1abd5a95aa62694302dd80e7e1b59a3a5d5e
   languageName: node
   linkType: hard
 

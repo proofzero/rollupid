@@ -47,7 +47,7 @@
     "remix-auth-google": "1.2.0",
     "remix-auth-microsoft": "2.0.0",
     "remix-auth-oauth2": "1.5.0",
-    "remix-auth-twitter": "1.0.0",
+    "remix-auth-twitter": "2.0.1",
     "remix-utils": "6.3.0",
     "viem": "1.0.0",
     "wagmi": "1.1.1"

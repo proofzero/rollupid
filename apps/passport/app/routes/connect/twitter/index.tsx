@@ -1,6 +1,6 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { Authenticator } from 'remix-auth'
-import { TwitterStrategyDefaultName } from 'remix-auth-twitter'
+import { Twitter2StrategyDefaultName } from 'remix-auth-twitter'
 
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
@@ -22,16 +22,16 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     )
 
     const strategy = getTwitterStrategy(context.env)
-    if (authnParams.get('oauth_token'))
+    if (authnParams.get('state'))
       // @ts-ignore
-      strategy.generateState = () => authnParams.get('oauth_token')
+      strategy.generateState = () => authnParams.get('state')
 
     const authenticator = new Authenticator(authenticatorInputs.sessionStorage)
     authenticator.use(strategy)
 
     try {
       const response = await authenticator.authenticate(
-        TwitterStrategyDefaultName,
+        Twitter2StrategyDefaultName,
         authenticatorInputs.newRequest
       )
       return response
