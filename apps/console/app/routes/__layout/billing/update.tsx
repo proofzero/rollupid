@@ -15,6 +15,14 @@ import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { type AccountURN } from '@proofzero/urns/account'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 
+/**
+ *  WARNING: Here be dragons, and not the cute, cuddly kind! This code is duplicated in both the webhook and server-side code
+ * We're doing this because we need to keep the front-end updated with the latest subscription info.
+ * Yes, it's as fun as a porcupine at a balloon party, but until we find a better solution, this is the mess we're in.
+ * So if you're about to change something here, make sure you update the other instance as well. Or else you'll be the one
+ * explaining to the boss why our app is acting like a drunk squirrel. Good luck, you're gonna need it!
+ */
+
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const jwt = await requireJWT(request, context.env)
