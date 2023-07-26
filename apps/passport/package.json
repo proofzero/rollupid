@@ -18,7 +18,8 @@
     "storybook:css": "npx tailwindcss -o ./app/styles/tailwind.css --watch",
     "storybook:start": "start-storybook -p 6009",
     "storybook": "run-p 'storybook:*'",
-    "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook"
+    "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook",
+    "version": "remix -version"
   },
   "dependencies": {
     "@ethersproject/keccak256": "5.7.0",
@@ -28,9 +29,9 @@
     "@proofzero/platform-clients": "workspace:*",
     "@proofzero/platform.address": "workspace:*",
     "@proofzero/utils": "workspace:*",
-    "@remix-run/cloudflare": "1.14.0",
-    "@remix-run/cloudflare-workers": "1.14.0",
-    "@remix-run/react": "1.14.0",
+    "@remix-run/cloudflare": "1.19.1",
+    "@remix-run/cloudflare-workers": "1.19.1",
+    "@remix-run/react": "1.19.1",
     "@tailwindcss/forms": "0.5.3",
     "connectkit": "1.4.0",
     "csp-header": "5.1.0",

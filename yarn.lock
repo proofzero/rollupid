@@ -5987,11 +5987,11 @@ __metadata:
     "@proofzero/platform-clients": "workspace:*"
     "@proofzero/platform.starbase": "workspace:*"
     "@proofzero/utils": "workspace:*"
-    "@remix-run/cloudflare": 1.14.0
-    "@remix-run/cloudflare-workers": 1.14.0
+    "@remix-run/cloudflare": 1.19.1
+    "@remix-run/cloudflare-workers": 1.19.1
     "@remix-run/dev": 1.14.0
     "@remix-run/eslint-config": 1.14.0
-    "@remix-run/react": 1.14.0
+    "@remix-run/react": 1.19.1
     "@storybook/addon-actions": 6.5.15
     "@storybook/addon-docs": 6.5.15
     "@storybook/addon-essentials": 6.5.15
@@ -6052,11 +6052,11 @@ __metadata:
     "@proofzero/platform-clients": "workspace:*"
     "@proofzero/platform.address": "workspace:*"
     "@proofzero/utils": "workspace:*"
-    "@remix-run/cloudflare": 1.14.0
-    "@remix-run/cloudflare-workers": 1.14.0
+    "@remix-run/cloudflare": 1.19.1
+    "@remix-run/cloudflare-workers": 1.19.1
     "@remix-run/dev": 1.14.0
     "@remix-run/eslint-config": 1.14.0
-    "@remix-run/react": 1.14.0
+    "@remix-run/react": 1.19.1
     "@remix-run/serve": 1.14.0
     "@storybook/addon-actions": 6.5.16
     "@storybook/addon-docs": 6.5.16
@@ -6145,11 +6145,11 @@ __metadata:
     "@proofzero/platform-clients": "workspace:*"
     "@proofzero/urns": "workspace:*"
     "@proofzero/utils": "workspace:*"
-    "@remix-run/cloudflare": 1.14.0
-    "@remix-run/cloudflare-workers": 1.14.0
+    "@remix-run/cloudflare": 1.19.1
+    "@remix-run/cloudflare-workers": 1.19.1
     "@remix-run/dev": 1.14.0
     "@remix-run/eslint-config": 1.14.0
-    "@remix-run/react": 1.14.0
+    "@remix-run/react": 1.19.1
     "@remix-run/serve": 1.14.0
     "@storybook/addon-a11y": 6.5.16
     "@storybook/addon-actions": 6.5.16
@@ -7087,27 +7087,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@remix-run/cloudflare-workers@npm:1.14.0":
-  version: 1.14.0
-  resolution: "@remix-run/cloudflare-workers@npm:1.14.0"
+"@remix-run/cloudflare-workers@npm:1.19.1":
+  version: 1.19.1
+  resolution: "@remix-run/cloudflare-workers@npm:1.19.1"
   dependencies:
     "@cloudflare/kv-asset-handler": ^0.1.3
-    "@remix-run/cloudflare": 1.14.0
+    "@remix-run/cloudflare": 1.19.1
   peerDependencies:
     "@cloudflare/workers-types": ^2.0.0 || ^3.0.0
-  checksum: 1620696f556eb16988405b617f13f6f659e1c12ef8150e3cce34148e2e1a452a820de9cd22e2f62681a8ca142fcf654155ed5a78b14f16183223848a677b7cf9
+  checksum: d54a11f3e058cf3616d1e9fdd2acbe6d27bca82d5b229237d26d8a5c9d8c8b433d53c8ca783617bf15e14d24d6fedd473a64eb7f7ace9c0b929a6a0f5c9eee2b
   languageName: node
   linkType: hard
 
-"@remix-run/cloudflare@npm:1.14.0":
-  version: 1.14.0
-  resolution: "@remix-run/cloudflare@npm:1.14.0"
+"@remix-run/cloudflare@npm:1.19.1":
+  version: 1.19.1
+  resolution: "@remix-run/cloudflare@npm:1.19.1"
   dependencies:
     "@cloudflare/kv-asset-handler": ^0.1.3
-    "@remix-run/server-runtime": 1.14.0
+    "@remix-run/server-runtime": 1.19.1
   peerDependencies:
     "@cloudflare/workers-types": ^2.0.0 || ^3.0.0
-  checksum: 89150e48c508df623403f377cf861c3cf715b10baaef3186760d50d7ca57b859f80df1629c5c7de8614d3fb3b10c9ab23a7e2ec5d2d409ac92b9e2b6f478f4cb
+  checksum: cdf7c5ea0e63284af13ed3f368ec771325d96b9d9846ebacbeaddb8a0a82d954c815609e365b88a7c45d75d0f7e98d3bcf62e7a2455a739e02b2545f73f8ca6d
   languageName: node
   linkType: hard
 
@@ -7237,17 +7237,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@remix-run/react@npm:1.14.0":
-  version: 1.14.0
-  resolution: "@remix-run/react@npm:1.14.0"
+"@remix-run/react@npm:1.19.1":
+  version: 1.19.1
+  resolution: "@remix-run/react@npm:1.19.1"
   dependencies:
-    "@remix-run/router": 1.3.3
-    react-router-dom: 6.8.2
-    use-sync-external-store: 1.2.0
+    "@remix-run/router": 1.7.2
+    react-router-dom: 6.14.2
   peerDependencies:
-    react: ">=16.8"
-    react-dom: ">=16.8"
-  checksum: 42dcd32b91ed995235b3661b715b674aafb5b4a87c3c488876c63266a87a8d9e1512708f2dcb9ce98a103dfe00e6ca4c0297061d75f55b128e288a9b0cc57495
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  checksum: dce237524ff7ff8766c542eb8a478f93146d0210b4453c3040ecf3bad111c0ad392de691cf8dddc0fb0b50c2b4c6b005f6e87bd06fc402985d4e062026b60b59
   languageName: node
   linkType: hard
 
@@ -7262,6 +7261,13 @@ __metadata:
   version: 1.3.3
   resolution: "@remix-run/router@npm:1.3.3"
   checksum: 9280f1c3e44c0fb84a74b401b5a47022dace06d5da0f26a7a68c7c0e57ad5ef95d30f3c2d333df2db3b63f84de81f7f8caa7e53189a7709d6c3eb466d126ed76
+  languageName: node
+  linkType: hard
+
+"@remix-run/router@npm:1.7.2":
+  version: 1.7.2
+  resolution: "@remix-run/router@npm:1.7.2"
+  checksum: ea43bb662f1f5c93965989b1667fb6e8a301cb69c44341ee92c81cb15ea685b494168e5905593b5777d59058f1455b4b58083d5b895f04382e49362e420d7af4
   languageName: node
   linkType: hard
 
@@ -7291,6 +7297,20 @@ __metadata:
     set-cookie-parser: ^2.4.8
     source-map: ^0.7.3
   checksum: 9c227723750275c71c750fbcfe66493359065818934f01e8d88b69e85d2b4fe61a4a1c4a931e20b1a298d6338e18d994d5c627581bbeaa8e8856fa9245fb284a
+  languageName: node
+  linkType: hard
+
+"@remix-run/server-runtime@npm:1.19.1":
+  version: 1.19.1
+  resolution: "@remix-run/server-runtime@npm:1.19.1"
+  dependencies:
+    "@remix-run/router": 1.7.2
+    "@types/cookie": ^0.4.1
+    "@web3-storage/multipart-parser": ^1.0.0
+    cookie: ^0.4.1
+    set-cookie-parser: ^2.4.8
+    source-map: ^0.7.3
+  checksum: 86a212c87cc0dcbb7330583301632377fb1f38e7cf278cbcb0bc8d125b5ea1793c3e9052dfc9ce11574555402965a1faff9ccb8ba87f1a69d4c14e0fb17723be
   languageName: node
   linkType: hard
 
@@ -12071,7 +12091,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/cookie@npm:^0.4.0":
+"@types/cookie@npm:^0.4.0, @types/cookie@npm:^0.4.1":
   version: 0.4.1
   resolution: "@types/cookie@npm:0.4.1"
   checksum: 3275534ed69a76c68eb1a77d547d75f99fedc80befb75a3d1d03662fb08d697e6f8b1274e12af1a74c6896071b11510631ba891f64d30c78528d0ec45a9c1a18
@@ -33111,6 +33131,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-router-dom@npm:6.14.2":
+  version: 6.14.2
+  resolution: "react-router-dom@npm:6.14.2"
+  dependencies:
+    "@remix-run/router": 1.7.2
+    react-router: 6.14.2
+  peerDependencies:
+    react: ">=16.8"
+    react-dom: ">=16.8"
+  checksum: a53dbc566ecab7890b829d42d38553684f704803c1f615db1bd6aa2d71542c369a1a79e4385be31ae71a14b72ddbcd0d8b51188248c2bccd44e015050d1927df
+  languageName: node
+  linkType: hard
+
 "react-router-dom@npm:6.4.3":
   version: 6.4.3
   resolution: "react-router-dom@npm:6.4.3"
@@ -33124,16 +33157,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:6.8.2":
-  version: 6.8.2
-  resolution: "react-router-dom@npm:6.8.2"
+"react-router@npm:6.14.2":
+  version: 6.14.2
+  resolution: "react-router@npm:6.14.2"
   dependencies:
-    "@remix-run/router": 1.3.3
-    react-router: 6.8.2
+    "@remix-run/router": 1.7.2
   peerDependencies:
     react: ">=16.8"
-    react-dom: ">=16.8"
-  checksum: eddc8b88e26c66408df894bdcf95efd6731e21b7cbfd7417cd456f0043916279e0559b06c6cdc19c2a55c6aefc4cc745fa4065d3505e519a95adbef0cc89e77f
+  checksum: 7507bf5732b3a8ddbd901c2061216eebca73e194449bff58acc1445171e22bdda36b455b8af066e467748ebfb5875b3c0a565941c46af65c6f653a6ed0dc4fe4
   languageName: node
   linkType: hard
 
@@ -33145,17 +33176,6 @@ __metadata:
   peerDependencies:
     react: ">=16.8"
   checksum: b89c0495c6837b1457915c08c5acc4eb7a2e9e3fae0420faf9bfc6311ecdfe78627cc1034c0e975bccd9aeeb70d1dcc5021322779dd3053d94c47e37339d77eb
-  languageName: node
-  linkType: hard
-
-"react-router@npm:6.8.2":
-  version: 6.8.2
-  resolution: "react-router@npm:6.8.2"
-  dependencies:
-    "@remix-run/router": 1.3.3
-  peerDependencies:
-    react: ">=16.8"
-  checksum: 9e98d03e1f18bfd5a35144a0c675adaf7c46a9ad436efdea2b52ef3a6e501ac6174a67ea90004e1339cd45019d6b1eb370627518320f7af9323ae74e0c6756ad
   languageName: node
   linkType: hard
 
