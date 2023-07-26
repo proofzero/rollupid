@@ -248,7 +248,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
 
-    const { sub, creation } = await createOrUpdateSubscription({
+    const sub = await createOrUpdateSubscription({
       customerID,
       SECRET_STRIPE_PRO_PLAN_ID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
       SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
@@ -300,7 +300,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           .payment_intent?.payment_method,
         quantity,
         subId: sub.id,
-        creation: creation,
       }),
       {
         headers: {
@@ -1018,11 +1017,6 @@ export default () => {
   const actionData = useActionData()
   const submit = useSubmit()
 
-  let creation: string = 'false'
-  if (actionData) {
-    creation = JSON.parse(actionData).creation
-  }
-
   useEffect(() => {
     if (actionData) {
       const { status, client_secret, payment_method, subId } =
@@ -1410,7 +1404,6 @@ export default () => {
                                       invoice_id: invoice.id,
                                       customer_id:
                                         paymentData?.customerID as string,
-                                      creation,
                                     },
                                     {
                                       method: 'post',

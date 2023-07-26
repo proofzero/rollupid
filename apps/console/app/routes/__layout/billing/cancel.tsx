@@ -17,7 +17,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const invoiceId = fd.get('invoice_id') as string
     const customerId = fd.get('customer_id') as string
-    const creation = fd.get('creation') as string
 
     const headers = request.headers
     let returnURL = headers.get('Referer') as string
@@ -28,7 +27,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       await voidInvoice(
         invoiceId,
         customerId,
-        creation === 'true',
         context.env.SECRET_STRIPE_API_KEY
       )
       flashSession.flash(
