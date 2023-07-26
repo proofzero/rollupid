@@ -741,7 +741,6 @@ export default () => {
   }>()
 
   const actionData = useActionData()
-  const navigate = useNavigate()
   const { apps, appDetails, hasUnpaidInvoices } = useOutletContext<{
     apps: AppLoaderData[]
     appDetails: appDetailsProps
@@ -750,11 +749,13 @@ export default () => {
 
   useEffect(() => {
     if (actionData) {
+      const { status, client_secret, payment_method } = JSON.parse(actionData)
       ;(async () => {
         await process3DSecureCard({
           STRIPE_PUBLISHABLE_KEY,
-          actionData,
-          navigate,
+          status,
+          client_secret,
+          payment_method,
         })
       })()
     }

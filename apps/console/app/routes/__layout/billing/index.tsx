@@ -299,7 +299,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         payment_method: (sub.latest_invoice as unknown as StripeInvoice)
           .payment_intent?.payment_method,
         quantity,
-        subscriptionID: sub.id,
+        subId: sub.id,
       }),
       {
         headers: {
@@ -1015,15 +1015,20 @@ export default () => {
     useOutletContext<OutletContextData>()
 
   const actionData = useActionData()
-  const navigate = useNavigate()
+  const submit = useSubmit()
 
   useEffect(() => {
     if (actionData) {
+      const { status, client_secret, payment_method, subId } =
+        JSON.parse(actionData)
       ;(async () => {
         await process3DSecureCard({
           STRIPE_PUBLISHABLE_KEY,
-          actionData,
-          navigate,
+          status,
+          subId,
+          client_secret,
+          payment_method,
+          submit,
         })
       })()
     }
@@ -1065,7 +1070,6 @@ export default () => {
     paymentData?.name
   )
 
-  const submit = useSubmit()
   const hydrated = useHydrated()
 
   const [invoiceSort, setInvoiceSort] = useState<'asc' | 'desc'>('desc')

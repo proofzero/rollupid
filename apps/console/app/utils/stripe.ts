@@ -9,7 +9,7 @@ import type Stripe from 'stripe'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { type AccountURN } from '@proofzero/urns/account'
 import { loadStripe } from '@stripe/stripe-js'
-import { type NavigateFunction } from '@remix-run/react'
+import { type SubmitFunction } from '@remix-run/react'
 
 export type StripeInvoice = {
   id: string
@@ -156,29 +156,40 @@ export const setPurchaseToastNotification = ({
 
 export const process3DSecureCard = async ({
   STRIPE_PUBLISHABLE_KEY,
-  actionData,
-  navigate,
+  status,
+  client_secret,
+  payment_method,
+  submit,
+  subId,
 }: {
   STRIPE_PUBLISHABLE_KEY: string
-  actionData: string
-  navigate: NavigateFunction
+  status: string
+  client_secret: string
+  payment_method: string
+  submit?: SubmitFunction
+  subId?: string
 }) => {
   const stripeClient = await loadStripe(STRIPE_PUBLISHABLE_KEY)
-  const { status, client_secret, payment_method } = JSON.parse(actionData)
   if (status === 'requires_action') {
     const result = await stripeClient?.confirmCardPayment(client_secret, {
       payment_method: payment_method,
     })
 
-    // Approximately enough for webhook to be called and update entitlements
-    setTimeout(() => {
-      navigate('.', { replace: true })
-    }, 2000)
-
     if (result?.error) {
       toast(ToastType.Error, {
         message: 'Something went wrong. Please try again',
       })
+      return null
+    }
+
+    if (subId && submit) {
+      submit(
+        { subId },
+        {
+          method: 'post',
+          action: `/billing/update`,
+        }
+      )
     } else {
       toast(ToastType.Success, {
         message: 'Successfully purchased entitlement(s)',
