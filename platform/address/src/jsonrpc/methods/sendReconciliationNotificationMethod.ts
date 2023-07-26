@@ -29,26 +29,25 @@ export const sendReconciliationNotificationMethod = async ({
   input: SendReconciliationNotificationParams
   ctx: Context
 }) => {
-  await ctx.emailClient.sendReconciliationNotification.query({
-    email: input.billingEmail,
-    type: ReconciliationNotificationType.Billing,
-    planType: input.planType,
-    count: input.count,
-    billingURL: input.billingURL,
-    settingsURL: input.settingsURL,
-  })
+  const devBatchModels = input.apps
+    .filter((a) => Boolean(a.devEmail))
+    .map((app) => ({
+      email: app.devEmail!,
+      type: ReconciliationNotificationType.Dev,
+      appName: app.appName,
+      billingURL: input.billingURL,
+      settingsURL: input.settingsURL,
+    }))
 
-  await Promise.all(
-    input.apps
-      .filter((a) => Boolean(a.devEmail))
-      .map((app) => {
-        ctx.emailClient.sendReconciliationNotification.query({
-          email: app.devEmail!,
-          type: ReconciliationNotificationType.Dev,
-          appName: app.appName,
-          billingURL: input.billingURL,
-          settingsURL: input.settingsURL,
-        })
-      })
-  )
+  await ctx.emailClient.sendReconciliationNotificationBatch.mutate([
+    {
+      email: input.billingEmail,
+      type: ReconciliationNotificationType.Billing,
+      planType: input.planType,
+      count: input.count,
+      billingURL: input.billingURL,
+      settingsURL: input.settingsURL,
+    },
+    ...devBatchModels,
+  ])
 }
