@@ -15,11 +15,21 @@ export default class TwitterAddress extends OAuthAddress {
     const data = await this.getData()
     if (!data) throw new InternalServerError({ message: 'no data' })
     const profile = data.profile as TwitterOAuthProfile
-    return {
-      address: profile.username,
-      title: profile.name,
-      icon: profile.picture,
-      type: OAuthAddressType.Twitter,
+    if (profile && profile.username) {
+      return {
+        address: profile.username,
+        title: profile.name,
+        icon: profile.picture,
+        type: OAuthAddressType.Twitter,
+      }
+    } else {
+      const address = await this.node.class.getAddress()
+      return {
+        address: address || 'Twitter',
+        title: 'Twitter',
+        disconnected: true,
+        type: OAuthAddressType.Twitter,
+      }
     }
   }
 
