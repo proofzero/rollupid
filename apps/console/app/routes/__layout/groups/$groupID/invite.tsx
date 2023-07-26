@@ -1,6 +1,6 @@
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction, redirect } from '@remix-run/cloudflare'
+import { ActionFunction, json } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -14,6 +14,10 @@ import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
+
+export type InviteRes = {
+  inviteCode: string
+}
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
@@ -50,12 +54,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    await coreClient.account.inviteIdentityGroupMember.mutate({
-      identifier,
-      addressType: addressType,
-      identityGroupURN: groupURN,
-    })
+    const { inviteCode } =
+      await coreClient.account.inviteIdentityGroupMember.mutate({
+        identifier,
+        addressType: addressType,
+        identityGroupURN: groupURN,
+      })
 
-    return redirect(`/groups/${groupID}`)
+    return json({
+      inviteCode,
+    } as InviteRes)
   }
 )

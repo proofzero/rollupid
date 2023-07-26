@@ -24,6 +24,7 @@ export const GetIdentityGroupMemberInvitationsOutputSchema = z.array(
       z.nativeEnum(OAuthAddressType),
       z.nativeEnum(CryptoAddressType),
     ]),
+    invitationCode: z.string(),
   })
 )
 type GetIdentityGroupMemberInvitationsOutput = z.infer<
@@ -54,5 +55,6 @@ export const getIdentityGroupMemberInvitations = async ({
   return invitations.map((invitation) => ({
     identifier: invitation.identifier,
     addressType: invitation.addressType,
+    invitationCode: invitation.inviteCode,
   }))
 }

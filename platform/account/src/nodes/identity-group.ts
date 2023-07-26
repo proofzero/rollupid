@@ -8,6 +8,7 @@ import { DOProxy } from 'do-proxy'
 export type InviteMemberInput = {
   identifier: string
   addressType: EmailAddressType | OAuthAddressType | CryptoAddressType
+  inviteCode: string
 }
 
 export type MemberInvitation = InviteMemberInput & {
@@ -25,6 +26,7 @@ export default class IdentityGroup extends DOProxy {
   async inviteMember({
     identifier,
     addressType,
+    inviteCode,
   }: InviteMemberInput): Promise<void> {
     const invitations =
       (await this.state.storage.get<MemberInvitation[]>('invitations')) || []
@@ -32,6 +34,7 @@ export default class IdentityGroup extends DOProxy {
     invitations.push({
       identifier,
       addressType,
+      inviteCode,
       timestamp: Date.now(),
     })
 
