@@ -31,25 +31,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v3
-
-      - uses: cachix/install-nix-action@v18
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-
-      - run: nix-build packages.nix
-
-      - name: Cache Dependencies
-        id: cache-modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            .yarn
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+      - uses: actions/checkout@v2
 
       - name: Install Dependencies
-        run: yarn install
+        run: yarn install --immutable
 
       - name: Build
         run: yarn build

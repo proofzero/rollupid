@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Restore cached Primes
+      - name: Restore node modules
         id: cache-node_modules-restore
         uses: actions/cache/restore@v3
         with:
@@ -45,7 +45,7 @@ jobs:
       - name: Install Dependencies
         run: yarn install --immutable
 
-      - name: Save Primes
+      - name: Save node modules
         id: cache-node_modules-save
         uses: actions/cache/save@v3
         with:
