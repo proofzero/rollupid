@@ -19,7 +19,8 @@
     "storybook:start": "start-storybook -p 6009",
     "storybook": "run-p 'storybook:*'",
     "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook",
-    "version": "remix -version"
+    "version": "remix -version",
+    "mydev": "remix dev --no-restart -c \"npm dev:wrangler\""
   },
   "dependencies": {
     "@ethersproject/keccak256": "5.7.0",
@@ -60,8 +61,8 @@
     "@cloudflare/workers-types": "4.20221111.1",
     "@mdx-js/react": "^1.6.22",
     "@playwright/test": "1.35.1",
-    "@remix-run/dev": "1.14.0",
-    "@remix-run/eslint-config": "1.14.0",
+    "@remix-run/dev": "1.19.1",
+    "@remix-run/eslint-config": "1.19.1",
     "@remix-run/serve": "1.14.0",
     "@storybook/addon-actions": "6.5.16",
     "@storybook/addon-docs": "6.5.16",

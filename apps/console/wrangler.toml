@@ -31,5 +31,5 @@ STRIPE_PUBLISHABLE_KEY = "pk_test_51NFemUKJnr9qdtTa8eIGrDR1QtpUTAwewEejO13AAnugH
 [site]
 bucket = "./public"
 
-[build]
-command = "yarn build -- --sourcemap"
+# [build]
+# command = "yarn build -- --sourcemap"

@@ -1,7 +1,7 @@
 name = "passport"
 main = "./build/index.js"
 compatibility_date = "2022-04-20"
-compatibility_flags = ["streams_enable_constructors", "nodejs_compat"]
+compatibility_flags = ["nodejs_compat", "streams_enable_constructors"]
 workers_dev = false
 logpush = true
 

@@ -13,7 +13,22 @@ module.exports = {
   serverMainFields: ['browser', 'module', 'main'],
   // Try the `workerd` condition first (this is new and slowly standardising), then `worker`, then `browser` (equivalent of `serverPlatform: browser` but without extra behaviour.
   serverConditions: ['workerd', 'worker', 'browser'],
-  // serverNodeBuiltinsPolyfill: ['async_hooks', 'crypto'],
+  serverNodeBuiltinsPolyfill: {
+    modules: {
+      crypto: true,
+      child_process: true,
+      os: true,
+      perf_hooks: true,
+      url: true,
+      http: true,
+      https: true,
+      zlib: true,
+      stream: true,
+      util: true,
+      fs: true,
+      process: true,
+    },
+  },
 
   // Keycloak rewrites. Needed here for CSR, also done in Cloudflare for SSR.
   routes: async (defineRoutes) => {
