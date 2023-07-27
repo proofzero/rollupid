@@ -5,7 +5,7 @@ import {
   updateSubscription,
 } from '~/services/billing/stripe'
 import type { StripePaymentData } from '@proofzero/platform/account/src/types'
-import { ToastType } from '@proofzero/design-system/src/atoms/toast'
+import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { type AccountURN } from '@proofzero/urns/account'
 import { type PaymentIntent, loadStripe } from '@stripe/stripe-js'
 import { type SubmitFunction } from '@remix-run/react'
@@ -13,6 +13,7 @@ import { type Session, type SessionData } from '@remix-run/cloudflare'
 import { commitFlashSession } from '~/utilities/session.server'
 import { type Env } from 'bindings'
 import Stripe from 'stripe'
+import { type CoreClientType } from '@proofzero/platform-clients/core'
 
 export type StripeInvoice = {
   id: string
@@ -87,6 +88,8 @@ export const createOrUpdateSubscription = async ({
   quantity,
   accountURN,
   customerID,
+  coreClient,
+  spd,
 }: {
   subscriptionID?: string | null
   SECRET_STRIPE_PRO_PLAN_ID: string
@@ -94,6 +97,8 @@ export const createOrUpdateSubscription = async ({
   quantity: number
   accountURN: AccountURN
   customerID: string
+  coreClient: CoreClientType
+  spd: StripePaymentData
 }) => {
   const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
@@ -129,20 +134,16 @@ export const createOrUpdateSubscription = async ({
     )
   }
 
-  if (
-    !['paid', 'requires_action'].includes(
-      (sub.latest_invoice as unknown as StripeInvoice)?.payment_intent
-        ?.status ||
-        (sub.latest_invoice as unknown as StripeInvoice)?.status ||
-        ''
-    )
-  ) {
-    await stripeClient.customers.update(customerID, {
-      balance,
+  if (spd) {
+    await coreClient.account.setStripePaymentData.mutate({
+      ...spd,
+      addressURN: spd?.addressURN!,
+      accountURN,
+      invoiceCreditBalance: balance || 0,
     })
   }
 
-  return { sub, balance }
+  return sub
 }
 
 export const process3DSecureCard = async ({
@@ -151,10 +152,8 @@ export const process3DSecureCard = async ({
   client_secret,
   payment_method,
   submit,
-  cusId,
   subId,
   redirectUrl,
-  balance,
 }: {
   STRIPE_PUBLISHABLE_KEY: string
   status: string
@@ -162,9 +161,7 @@ export const process3DSecureCard = async ({
   payment_method: string
   submit: SubmitFunction
   subId: string
-  cusId: string
   redirectUrl?: string
-  balance: string
 }) => {
   const stripeClient = await loadStripe(STRIPE_PUBLISHABLE_KEY)
   if (status === 'requires_action') {
@@ -172,18 +169,17 @@ export const process3DSecureCard = async ({
       payment_method: payment_method,
     })
 
-    let declinedPayment = 'false'
     if (result?.error || result?.paymentIntent.status !== 'succeeded') {
-      declinedPayment = 'true'
+      toast(ToastType.Error, {
+        message: 'Payment failed - check your card details',
+      })
+      return null
     }
 
     submit(
       {
         subId,
-        cusId,
         redirectUrl: redirectUrl ? redirectUrl : '/billing',
-        balance,
-        declinedPayment: declinedPayment,
       },
       {
         method: 'post',

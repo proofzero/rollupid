@@ -234,13 +234,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
 
-    const { sub, balance } = await createOrUpdateSubscription({
+    const sub = await createOrUpdateSubscription({
       customerID,
       SECRET_STRIPE_PRO_PLAN_ID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
       SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
       quantity,
       subscriptionID: entitlements.subscriptionID,
       accountURN,
+      coreClient,
+      spd,
     })
 
     if (
@@ -295,7 +297,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         payment_method,
         quantity,
         subId: sub.id,
-        balance,
       },
       {
         headers: {
@@ -1015,13 +1016,10 @@ export default () => {
 
   useEffect(() => {
     if (actionData) {
-      const { status, client_secret, payment_method, subId, balance } =
-        actionData
+      const { status, client_secret, payment_method, subId } = actionData
       process3DSecureCard({
         STRIPE_PUBLISHABLE_KEY,
-        cusId: paymentData?.customerID,
         status,
-        balance,
         subId,
         client_secret,
         payment_method,

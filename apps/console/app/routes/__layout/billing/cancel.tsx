@@ -8,10 +8,21 @@ import {
 
 import { voidInvoice } from '~/services/billing/stripe'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
+import createCoreClient from '@proofzero/platform-clients/core'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import {
+  getAuthzHeaderConditionallyFromToken,
+  parseJwt,
+} from '@proofzero/utils'
+import { type AccountURN } from '@proofzero/urns/account'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    await requireJWT(request, context.env)
+    const jwt = await requireJWT(request, context.env)
+    const parsedJwt = parseJwt(jwt!)
+    const accountURN = parsedJwt.sub as AccountURN
+
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
     const fd = await request.formData()
 
@@ -23,11 +34,21 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const flashSession = await getFlashSession(request, context.env)
 
+    const coreClient = createCoreClient(context.env.Core, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
+    const spd = await coreClient.account.getStripePaymentData.query({
+      accountURN,
+    })
+
     try {
       await voidInvoice(
         invoiceId,
         customerId,
-        context.env.SECRET_STRIPE_API_KEY
+        context.env.SECRET_STRIPE_API_KEY,
+        spd.invoiceCreditBalance
       )
       flashSession.flash(
         'toastNotification',

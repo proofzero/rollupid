@@ -28,4 +28,5 @@ export type PaymentData = {
   name: string
   paymentMethodID?: string
   addressURN?: AddressURN
+  invoiceCreditBalance?: number
 }

@@ -233,21 +233,19 @@ export const getUpcomingInvoices = async (
 export const voidInvoice = async (
   invoiceId: string,
   customerId: string,
-  SECRET_STRIPE_API_KEY: string
+  SECRET_STRIPE_API_KEY: string,
+  balance?: number
 ) => {
   const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
-  const customer = await stripeClient.customers.retrieve(customerId)
 
   await stripeClient.invoices.voidInvoice(invoiceId)
 
   // We don't want to update the credit balance if the invoice is voided
-  if (!customer.deleted) {
-    await stripeClient.customers.update(customerId, {
-      balance: customer.balance,
-    })
-  }
+  await stripeClient.customers.update(customerId, {
+    balance,
+  })
 }
 
 export const reconcileAppSubscriptions = async (

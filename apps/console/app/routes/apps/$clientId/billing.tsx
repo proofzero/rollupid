@@ -194,13 +194,15 @@ const processPurchaseOp = async (
       : 1
     : 1
 
-  const { sub, balance } = await createOrUpdateSubscription({
+  const sub = await createOrUpdateSubscription({
     customerID,
     SECRET_STRIPE_PRO_PLAN_ID: env.SECRET_STRIPE_PRO_PLAN_ID,
     SECRET_STRIPE_API_KEY: env.SECRET_STRIPE_API_KEY,
     quantity,
     subscriptionID: entitlements.subscriptionID,
     accountURN,
+    coreClient,
+    spd: paymentData,
   })
 
   setPurchaseToastNotification({
@@ -222,7 +224,7 @@ const processPurchaseOp = async (
     })
   }
 
-  return { sub, balance }
+  return sub
 }
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
@@ -284,7 +286,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       }
 
       case 'purchase': {
-        const { sub, balance } = await processPurchaseOp(
+        const sub = await processPurchaseOp(
           jwt,
           plan,
           clientId,
@@ -311,7 +313,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             status,
             client_secret,
             payment_method,
-            balance,
           },
           {
             headers: {
@@ -746,17 +747,14 @@ export default () => {
 
   useEffect(() => {
     if (actionData) {
-      const { status, client_secret, payment_method, subId, balance } =
-        actionData
+      const { status, client_secret, payment_method, subId } = actionData
       process3DSecureCard({
         submit,
-        cusId: paymentData?.customerID,
         subId,
         STRIPE_PUBLISHABLE_KEY,
         status,
         client_secret,
         payment_method,
-        balance,
         redirectUrl: `/apps/${appDetails.clientId}/billing`,
       })
     }
