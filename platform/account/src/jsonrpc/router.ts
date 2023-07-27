@@ -81,6 +81,11 @@ import {
   GetIdentityGroupMemberInvitationsOutputSchema,
   getIdentityGroupMemberInvitations,
 } from './methods/identity-groups/getIdentityGroupMemberInvitations'
+import {
+  GetIdentityGroupMemberInvitationDetailsInputSchema,
+  GetIdentityGroupMemberInvitationDetailsOutputSchema,
+  getIdentityGroupMemberInvitationDetails,
+} from './methods/identity-groups/getIdentityGroupmemberInvitationDetails'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -203,25 +208,39 @@ export const appRouter = t.router({
     .input(CancelServicePlansInput)
     .mutation(cancelServicePlans),
   createIdentityGroup: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .input(CreateIdentityGroupInputSchema)
     .mutation(createIdentityGroup),
   listIdentityGroups: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .input(ListIdentityGroupsInputSchema)
     .output(ListIdentityGroupsOutputSchema)
     .query(listIdentityGroups),
   inviteIdentityGroupMember: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .input(InviteIdentityGroupMemberInputSchema)
     .mutation(inviteIdentityGroupMember),
   getIdentityGroupMemberInvitations: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .input(GetIdentityGroupMemberInvitationsInputSchema)
     .output(GetIdentityGroupMemberInvitationsOutputSchema)
     .query(getIdentityGroupMemberInvitations),
+  getIdentityGroupmemberInvitationDetails: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetIdentityGroupMemberInvitationDetailsInputSchema)
+    .output(GetIdentityGroupMemberInvitationDetailsOutputSchema)
+    .query(getIdentityGroupMemberInvitationDetails),
 })

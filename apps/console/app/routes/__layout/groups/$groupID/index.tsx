@@ -90,9 +90,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const mappedInvitations = invitations.map((invitation) => ({
       identifier: invitation.identifier,
       addressType: invitation.addressType,
-      invitationURL: [context.env.CONSOLE_URL, invitation.invitationCode].join(
-        '/'
-      ),
+      invitationURL: [
+        context.env.CONSOLE_URL,
+        'groups',
+        'enroll',
+        params.groupID,
+        invitation.invitationCode,
+      ].join('/'),
     }))
 
     return json<LoaderData>({
@@ -290,7 +294,13 @@ const InviteMemberModal = ({
             <ReadOnlyInput
               id="inviteURL"
               label="Invite URL"
-              value={[consoleURL, inviteLinkFetcher.data.inviteCode].join('/')}
+              value={[
+                consoleURL,
+                'groups',
+                'enroll',
+                groupID,
+                inviteLinkFetcher.data.inviteCode,
+              ].join('/')}
               copyable
               onCopy={() =>
                 toast(
@@ -316,7 +326,13 @@ const InviteMemberModal = ({
                 }
 
                 navigator.clipboard.writeText(
-                  [consoleURL, inviteLinkFetcher.data!.inviteCode].join('/')
+                  [
+                    consoleURL,
+                    'groups',
+                    'enroll',
+                    groupID,
+                    inviteLinkFetcher.data!.inviteCode,
+                  ].join('/')
                 )
 
                 toast(
