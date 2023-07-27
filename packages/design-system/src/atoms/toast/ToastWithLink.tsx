@@ -8,19 +8,19 @@ export type ToastWithLinkProps = {
   message: string
   linkHref: string
   linkText: string
-  type?: 'urgent' | 'deffered'
+  type?: 'urgent' | 'deferred'
 
   remove?: () => void
 }
 
 const ToastIcon = {
   urgent: <IoWarning className="text-black w-5 h-5" />,
-  deffered: <HiInformationCircle className="text-indigo-400 w-5 h-5" />,
+  deferred: <HiInformationCircle className="text-indigo-400 w-5 h-5" />,
 }
 
 const ToastStyle = {
   urgent: 'bg-yellow-200 text-black w-full px-6',
-  deffered: 'bg-indigo-50 text-indigo-700 w-full',
+  deferred: 'bg-indigo-50 text-indigo-700 w-full',
 }
 
 export const ToastWithLink = ({
@@ -28,7 +28,7 @@ export const ToastWithLink = ({
   remove,
   linkHref,
   linkText,
-  type = 'deffered',
+  type = 'deferred',
 }: ToastWithLinkProps) => (
   <Toast
     message={message}

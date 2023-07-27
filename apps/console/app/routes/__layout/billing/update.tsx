@@ -14,9 +14,12 @@ import {
 import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { type AccountURN } from '@proofzero/urns/account'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
+import Stripe from 'stripe'
 
 /**
- *  WARNING: Here be dragons, and not the cute, cuddly kind! This code is duplicated in both the webhook and server-side code
+ *  WARNING: Here be dragons, and not the cute, cuddly kind! This code runs twice in certain scenarios because when the user * is doing this interactively, we first run it synchronously, followed by an asynchronous invocation that updated the object * idemptotently with the same data.
+ *
+ *
  * We're doing this because we need to keep the front-end updated with the latest subscription info.
  * Yes, it's as fun as a porcupine at a balloon party, but until we find a better solution, this is the mess we're in.
  * So if you're about to change something here, make sure you update the other instance as well. Or else you'll be the one
@@ -33,7 +36,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const fd = await request.formData()
 
     const subId = fd.get('subId') as string
+    const cusId = fd.get('cusId') as string
     const redirectUrl = fd.get('redirectUrl') as string
+    const balance = fd.get('balance') as string
+    const declinedPayment = fd.get('declinedPayment') as string
+
+    const stripeClient = new Stripe(context.env.SECRET_STRIPE_API_KEY, {
+      apiVersion: '2022-11-15',
+    })
 
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
@@ -52,19 +62,30 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         },
         context.env
       )
+      if (declinedPayment === 'true') {
+        await stripeClient.customers.update(cusId, { balance: +balance })
 
-      flashSession.flash(
-        'toast_notification',
-        JSON.stringify({
-          type: ToastType.Success,
-          message: 'Successfully purchased entitlement(s)',
-        })
-      )
+        flashSession.flash(
+          'toast_notification',
+          JSON.stringify({
+            type: ToastType.Error,
+            message: 'Something went wrong. Please try again',
+          })
+        )
+      } else {
+        flashSession.flash(
+          'toast_notification',
+          JSON.stringify({
+            type: ToastType.Success,
+            message: 'Successfully purchased entitlement(s)',
+          })
+        )
+      }
     } catch (ex) {
       flashSession.flash(
         'toast_notification',
         JSON.stringify({
-          type: ToastType.Success,
+          type: ToastType.Error,
           message: 'Something went wrong. Please try again',
         })
       )

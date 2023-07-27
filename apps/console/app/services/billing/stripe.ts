@@ -1,5 +1,5 @@
 import { InternalServerError } from '@proofzero/errors'
-import { type CoreClientType } from '@proofzero/packages/types/core'
+import { type CoreClientType } from '@proofzero/platform-clients/core'
 import { type ReconcileAppsSubscriptionsOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/reconcileAppSubscriptions'
 import { ServicePlanType } from '@proofzero/types/account'
 import { type AccountURN } from '@proofzero/urns/account'
@@ -127,12 +127,8 @@ export const createSubscription = async (
     accountURN,
     handled = false,
   }: CreateSubscriptionParams,
-  SECRET_STRIPE_API_KEY: string
+  stripeClient: Stripe
 ) => {
-  const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
-    apiVersion: '2022-11-15',
-  })
-
   const metadata: SubscriptionMetadata = {}
   metadata.accountURN = accountURN
 
@@ -155,12 +151,8 @@ export const createSubscription = async (
 
 export const updateSubscription = async (
   { subscriptionID, planID, quantity }: UpdateSubscriptionParams,
-  SECRET_STRIPE_API_KEY: string
+  stripeClient: Stripe
 ) => {
-  const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
-    apiVersion: '2022-11-15',
-  })
-
   let subscription = await stripeClient.subscriptions.retrieve(subscriptionID)
   const planItem = subscription.items.data.find((i) => i.price.id === planID)
   if (!planItem)

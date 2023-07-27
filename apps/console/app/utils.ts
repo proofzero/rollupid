@@ -5,7 +5,7 @@
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { useMatches } from '@remix-run/react'
 import { useMemo } from 'react'
-import { type StripeInvoice } from './utils/stripe'
+import { type StripeInvoice } from './utils/billing'
 import type Stripe from 'stripe'
 
 const DEFAULT_REDIRECT = '/'
@@ -62,10 +62,12 @@ export const setPurchaseToastNotification = ({
   sub: Stripe.Subscription
   flashSession: any
 }) => {
+  const status = (sub.latest_invoice as Stripe.Invoice).status
+
   // https://stripe.com/docs/billing/subscriptions/overview#subscription-statuses
   if (
     (sub.status === 'active' || sub.status === 'trialing') &&
-    sub.latest_invoice?.status === 'paid'
+    status === 'paid'
   ) {
     flashSession.flash(
       'toast_notification',

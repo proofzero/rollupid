@@ -76,10 +76,11 @@ import {
   process3DSecureCard,
   UnpaidInvoiceNotification,
   type StripeInvoice,
-} from '~/utils/stripe'
+} from '~/utils/billing'
 import { IoWarningOutline } from 'react-icons/io5'
 import { type ToastNotification } from '~/types'
 import { setPurchaseToastNotification } from '~/utils'
+import type Stripe from 'stripe'
 
 type LoaderData = {
   STRIPE_PUBLISHABLE_KEY: string
@@ -233,7 +234,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
 
-    const sub = await createOrUpdateSubscription({
+    const { sub, balance } = await createOrUpdateSubscription({
       customerID,
       SECRET_STRIPE_PRO_PLAN_ID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
       SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
@@ -275,16 +276,26 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       )
     }
 
+    let status, client_secret, payment_method
+    if (
+      sub.latest_invoice &&
+      (sub.latest_invoice as Stripe.Invoice).payment_intent
+    ) {
+      // lots of stripe type casting since by default many
+      // props are strings (not expanded versions)
+      ;({ status, client_secret, payment_method } = (
+        sub.latest_invoice as Stripe.Invoice
+      ).payment_intent as Stripe.PaymentIntent)
+    }
+
     return json(
       {
-        status: (sub.latest_invoice as unknown as StripeInvoice)?.payment_intent
-          ?.status,
-        client_secret: (sub.latest_invoice as unknown as StripeInvoice)
-          .payment_intent?.client_secret,
-        payment_method: (sub.latest_invoice as unknown as StripeInvoice)
-          .payment_intent?.payment_method,
+        status,
+        client_secret,
+        payment_method,
         quantity,
         subId: sub.id,
+        balance,
       },
       {
         headers: {
@@ -1004,10 +1015,13 @@ export default () => {
 
   useEffect(() => {
     if (actionData) {
-      const { status, client_secret, payment_method, subId } = actionData
+      const { status, client_secret, payment_method, subId, balance } =
+        actionData
       process3DSecureCard({
         STRIPE_PUBLISHABLE_KEY,
+        cusId: paymentData?.customerID,
         status,
+        balance,
         subId,
         client_secret,
         payment_method,

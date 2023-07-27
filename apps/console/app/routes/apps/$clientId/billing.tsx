@@ -47,13 +47,13 @@ import {
 import dangerVector from '~/images/danger.svg'
 import { type Env } from 'bindings'
 import {
-  type StripeInvoice,
   getCurrentAndUpcomingInvoices,
   createOrUpdateSubscription,
   process3DSecureCard,
   UnpaidInvoiceNotification,
-} from '~/utils/stripe'
+} from '~/utils/billing'
 import { setPurchaseToastNotification } from '~/utils'
+import type Stripe from 'stripe'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -188,14 +188,13 @@ const processPurchaseOp = async (
   }
 
   const { customerID } = paymentData
-  let sub
   const quantity = entitlements.subscriptionID
     ? entitlements.plans[plan]?.entitlements
       ? entitlements.plans[plan]?.entitlements! + 1
       : 1
     : 1
 
-  sub = await createOrUpdateSubscription({
+  const { sub, balance } = await createOrUpdateSubscription({
     customerID,
     SECRET_STRIPE_PRO_PLAN_ID: env.SECRET_STRIPE_PRO_PLAN_ID,
     SECRET_STRIPE_API_KEY: env.SECRET_STRIPE_API_KEY,
@@ -223,7 +222,7 @@ const processPurchaseOp = async (
     })
   }
 
-  return sub
+  return { sub, balance }
 }
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
@@ -285,7 +284,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       }
 
       case 'purchase': {
-        const sub = await processPurchaseOp(
+        const { sub, balance } = await processPurchaseOp(
           jwt,
           plan,
           clientId,
@@ -294,15 +293,25 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           traceHeader
         )
 
+        let status, client_secret, payment_method
+        if (
+          sub.latest_invoice &&
+          (sub.latest_invoice as Stripe.Invoice).payment_intent
+        ) {
+          // lots of stripe type casting since by default many
+          // props are strings (not expanded versions)
+          ;({ status, client_secret, payment_method } = (
+            sub.latest_invoice as Stripe.Invoice
+          ).payment_intent as Stripe.PaymentIntent)
+        }
+
         return json(
           {
             subId: sub.id,
-            status: (sub?.latest_invoice as unknown as StripeInvoice)
-              ?.payment_intent?.status,
-            client_secret: (sub?.latest_invoice as unknown as StripeInvoice)
-              .payment_intent?.client_secret,
-            payment_method: (sub?.latest_invoice as unknown as StripeInvoice)
-              .payment_intent?.payment_method,
+            status,
+            client_secret,
+            payment_method,
+            balance,
           },
           {
             headers: {
@@ -737,14 +746,17 @@ export default () => {
 
   useEffect(() => {
     if (actionData) {
-      const { status, client_secret, payment_method, subId } = actionData
+      const { status, client_secret, payment_method, subId, balance } =
+        actionData
       process3DSecureCard({
         submit,
+        cusId: paymentData?.customerID,
         subId,
         STRIPE_PUBLISHABLE_KEY,
         status,
         client_secret,
         payment_method,
+        balance,
         redirectUrl: `/apps/${appDetails.clientId}/billing`,
       })
     }
