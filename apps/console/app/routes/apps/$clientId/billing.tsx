@@ -201,8 +201,6 @@ const processPurchaseOp = async (
     quantity,
     subscriptionID: entitlements.subscriptionID,
     accountURN,
-    coreClient,
-    spd: paymentData,
   })
 
   setPurchaseToastNotification({

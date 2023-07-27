@@ -16,8 +16,9 @@ import { type AccountURN } from '@proofzero/urns/account'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 
 /**
- *  WARNING: Here be dragons, and not the cute, cuddly kind! This code runs twice in certain scenarios because when the user * is doing this interactively, we first run it synchronously, followed by an asynchronous invocation that updated the object * idemptotently with the same data.
- *
+ * WARNING: Here be dragons, and not the cute, cuddly kind! This code runs twice in certain scenarios because when the user
+ * is doing this interactively, we first run it synchronously, followed by an asynchronous invocation that updated the
+ * object idemptotently with the same data.
  *
  * We're doing this because we need to keep the front-end updated with the latest subscription info.
  * Yes, it's as fun as a porcupine at a balloon party, but until we find a better solution, this is the mess we're in.
