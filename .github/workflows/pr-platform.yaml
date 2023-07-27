@@ -33,8 +33,27 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Restore node modules
+        id: cache-node-modules-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            node_modules
+            .yarn
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+
       - name: Install Dependencies
         run: yarn install
+
+      - name: Save node modules
+        if: steps.cache-node-modules-restore.outputs.cache-hit != 'true'
+        id: cache-node_modules-save
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            node_modules
+            .yarn
+          key: ${{ steps.cache-node-modules-restore.outputs.cache-primary-key }}
 
       - name: Code Generation
         run: yarn gql
