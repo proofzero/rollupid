@@ -13,6 +13,7 @@ import { type Session, type SessionData } from '@remix-run/cloudflare'
 import { commitFlashSession } from '~/utilities/session.server'
 import { type Env } from 'bindings'
 import Stripe from 'stripe'
+import { type ServicePlanType } from '@proofzero/types/account'
 
 export type StripeInvoice = {
   id: string
@@ -134,6 +135,7 @@ export const process3DSecureCard = async ({
   submit,
   subId,
   redirectUrl,
+  updatePlanParams,
 }: {
   STRIPE_PUBLISHABLE_KEY: string
   status: string
@@ -142,6 +144,11 @@ export const process3DSecureCard = async ({
   submit: SubmitFunction
   subId: string
   redirectUrl?: string
+  updatePlanParams?: {
+    clientId?: string
+    quantity?: number
+    plan: ServicePlanType
+  }
 }) => {
   const stripeClient = await loadStripe(STRIPE_PUBLISHABLE_KEY)
   if (status === 'requires_action') {
@@ -160,6 +167,9 @@ export const process3DSecureCard = async ({
       {
         subId,
         redirectUrl: redirectUrl ? redirectUrl : '/billing',
+        updatePlanParams: updatePlanParams
+          ? JSON.stringify(updatePlanParams)
+          : '',
       },
       {
         method: 'post',

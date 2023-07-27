@@ -37,11 +37,32 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const subId = fd.get('subId') as string
     const redirectUrl = fd.get('redirectUrl') as string
+    const updatePlanParams = fd.get('updatePlanParams') as string
 
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
+
+    // if this method was called from "$clientId/billing" page, update the plan
+    // and assign the new plan to the app
+    if (updatePlanParams.length) {
+      const { clientId, quantity, plan } = JSON.parse(updatePlanParams)
+
+      await coreClient.account.updateEntitlements.mutate({
+        accountURN: accountURN,
+        subscriptionID: subId,
+        quantity: quantity,
+        type: plan,
+      })
+
+      await coreClient.starbase.setAppPlan.mutate({
+        accountURN,
+        clientId,
+        plan,
+      })
+    }
+
     const flashSession = await getFlashSession(request, context.env)
 
     try {

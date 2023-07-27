@@ -207,7 +207,13 @@ const processPurchaseOp = async (
     sub,
     flashSession,
   })
-  if (sub.status === 'active' || sub.status === 'trialing') {
+
+  const status = (sub.latest_invoice as Stripe.Invoice)?.status
+
+  if (
+    (sub.status === 'active' || sub.status === 'trialing') &&
+    status === 'paid'
+  ) {
     await coreClient.account.updateEntitlements.mutate({
       accountURN: accountURN,
       subscriptionID: sub.id,
@@ -222,7 +228,7 @@ const processPurchaseOp = async (
     })
   }
 
-  return sub
+  return { sub, quantity }
 }
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
@@ -284,7 +290,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       }
 
       case 'purchase': {
-        const sub = await processPurchaseOp(
+        const { sub, quantity } = await processPurchaseOp(
           jwt,
           plan,
           clientId,
@@ -309,6 +315,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           {
             subId: sub.id,
             status,
+            quantity,
             client_secret,
             payment_method,
           },
@@ -745,7 +752,8 @@ export default () => {
 
   useEffect(() => {
     if (actionData) {
-      const { status, client_secret, payment_method, subId } = actionData
+      const { status, client_secret, payment_method, subId, quantity } =
+        actionData
       process3DSecureCard({
         submit,
         subId,
@@ -753,6 +761,11 @@ export default () => {
         status,
         client_secret,
         payment_method,
+        updatePlanParams: {
+          clientId: appDetails.clientId,
+          quantity,
+          plan: ServicePlanType.PRO,
+        },
         redirectUrl: `/apps/${appDetails.clientId}/billing`,
       })
     }
