@@ -31,7 +31,6 @@ import {
   NavLink,
   useActionData,
   useLoaderData,
-  useNavigate,
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
@@ -1013,6 +1012,7 @@ export default () => {
         client_secret,
         payment_method,
         submit,
+        redirectUrl: '/billing',
       })
     }
   }, [actionData])

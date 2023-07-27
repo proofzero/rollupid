@@ -127,6 +127,7 @@ export const process3DSecureCard = async ({
   payment_method,
   submit,
   subId,
+  redirectUrl,
 }: {
   STRIPE_PUBLISHABLE_KEY: string
   status: string
@@ -134,6 +135,7 @@ export const process3DSecureCard = async ({
   payment_method: string
   submit?: SubmitFunction
   subId?: string
+  redirectUrl?: string
 }) => {
   const stripeClient = await loadStripe(STRIPE_PUBLISHABLE_KEY)
   if (status === 'requires_action') {
@@ -150,14 +152,13 @@ export const process3DSecureCard = async ({
 
     if (subId && submit) {
       submit(
-        { subId },
+        { subId, redirectUrl: redirectUrl ? redirectUrl : '/billing' },
         {
           method: 'post',
           action: `/billing/update`,
         }
       )
     } else {
-      console.log({ paymentIntent: result?.paymentIntent })
       toast(ToastType.Success, {
         message: 'Successfully purchased entitlement(s)',
       })

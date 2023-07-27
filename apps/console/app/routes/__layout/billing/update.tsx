@@ -33,6 +33,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const fd = await request.formData()
 
     const subId = fd.get('subId') as string
+    const redirectUrl = fd.get('redirectUrl') as string
 
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
@@ -59,12 +60,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           message: 'Successfully purchased entitlement(s)',
         })
       )
-
-      return redirect('/billing', {
-        headers: {
-          'Set-Cookie': await commitFlashSession(flashSession, context.env),
-        },
-      })
     } catch (ex) {
       flashSession.flash(
         'toast_notification',
@@ -73,11 +68,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           message: 'Something went wrong. Please try again',
         })
       )
-      return redirect('/billing', {
-        headers: {
-          'Set-Cookie': await commitFlashSession(flashSession, context.env),
-        },
-      })
     }
+
+    return redirect(`${redirectUrl}`, {
+      headers: {
+        'Set-Cookie': await commitFlashSession(flashSession, context.env),
+      },
+    })
   }
 )

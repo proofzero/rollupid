@@ -26,7 +26,6 @@ import {
 import {
   useActionData,
   useLoaderData,
-  useNavigate,
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
@@ -297,6 +296,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         return json(
           {
+            subId: sub.id,
             status: (sub?.latest_invoice as unknown as StripeInvoice)
               ?.payment_intent?.status,
             client_secret: (sub?.latest_invoice as unknown as StripeInvoice)
@@ -733,19 +733,21 @@ export default () => {
     hasUnpaidInvoices: boolean
   }>()
 
-  const navigate = useNavigate()
+  const submit = useSubmit()
 
   useEffect(() => {
     if (actionData) {
-      const { status, client_secret, payment_method } = actionData
+      const { status, client_secret, payment_method, subId } = actionData
       ;(async () => {
         await process3DSecureCard({
+          submit,
+          subId,
           STRIPE_PUBLISHABLE_KEY,
           status,
           client_secret,
           payment_method,
+          redirectUrl: `/apps/${appDetails.clientId}/billing`,
         })
-        navigate('.', { replace: true })
       })()
     }
   }, [actionData])

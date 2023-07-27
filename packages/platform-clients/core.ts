@@ -4,7 +4,7 @@ import type { CoreRouter } from '@proofzero/platform.core/src/router'
 import { trpcClientLoggerGenerator } from './utils'
 import { PlatformHeaders } from './base'
 
-const createCoreClient = (fetcher: Fetcher, headers: PlatformHeaders) =>
+export default (fetcher: Fetcher, headers: PlatformHeaders) =>
   createTRPCProxyClient<CoreRouter>({
     links: [
       loggerLink({
@@ -19,7 +19,3 @@ const createCoreClient = (fetcher: Fetcher, headers: PlatformHeaders) =>
       }),
     ],
   })
-
-export type CoreClientType = ReturnType<typeof createCoreClient>
-
-export default createCoreClient
