@@ -16,7 +16,7 @@ jobs:
       apps: ${{ steps.changes.outputs.apps }}
     steps:
       # find out what deploy stack to use
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: changes
         with:
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Restore node modules
         id: cache-node-modules-restore
