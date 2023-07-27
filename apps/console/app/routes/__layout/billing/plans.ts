@@ -36,11 +36,19 @@ const baseFeatures: PlanFeature[] = [
     type: 'current',
   },
   {
+    title: 'Account Linking',
+    type: 'current',
+  },
+  {
     title: 'Passkeys',
     type: 'future',
   },
   {
     title: 'SOC2',
+    type: 'future',
+  },
+  {
+    title: 'Organizations',
     type: 'future',
   },
 ]
