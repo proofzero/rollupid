@@ -2,53 +2,66 @@ import { ServicePlanType } from '@proofzero/types/account'
 
 type PlanFeature = {
   title: string
-  type: 'base' | 'addon' | 'future'
+  type: 'current' | 'future'
+  aggregateFeatures?: PlanFeature[]
 }
 
 const baseFeatures: PlanFeature[] = [
   {
     title: 'Unlimited MAUs',
-    type: 'base',
+    type: 'current',
   },
   {
     title: 'Wallet Login',
-    type: 'base',
+    type: 'current',
   },
   {
     title: 'Social Logins',
-    type: 'base',
+    type: 'current',
   },
   {
     title: 'Smart Contract Wallets',
-    type: 'base',
+    type: 'current',
   },
   {
     title: 'API Access',
-    type: 'base',
+    type: 'current',
   },
   {
     title: 'Community Support',
-    type: 'base',
+    type: 'current',
   },
   {
     title: 'Email Login',
-    type: 'base',
+    type: 'current',
+  },
+  {
+    title: 'Passkeys',
+    type: 'future',
+  },
+  {
+    title: 'SOC2',
+    type: 'future',
   },
 ]
 
 const proFeatures: PlanFeature[] = [
-  ...baseFeatures,
+  {
+    title: 'Free Plan Features',
+    type: 'current',
+    aggregateFeatures: baseFeatures,
+  },
   {
     title: 'Custom Branding',
-    type: 'addon',
+    type: 'current',
   },
   {
     title: 'Custom Domain',
-    type: 'addon',
+    type: 'current',
   },
   {
     title: 'Custom OAuth Credentials',
-    type: 'addon',
+    type: 'current',
   },
   {
     title: '4337 App Wallet',

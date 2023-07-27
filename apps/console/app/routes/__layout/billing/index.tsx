@@ -34,7 +34,7 @@ import {
   useSubmit,
 } from '@remix-run/react'
 import type { AppLoaderData, LoaderData as OutletContextData } from '~/root'
-import { Menu, Transition } from '@headlessui/react'
+import { Menu, Popover, Transition } from '@headlessui/react'
 import { Listbox } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
 import { HiOutlineMinusCircle } from 'react-icons/hi'
@@ -73,6 +73,7 @@ import {
 import { useHydrated } from 'remix-utils'
 import _ from 'lodash'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
+import iSvg from '@proofzero/design-system/src/atoms/info/i.svg'
 
 type StripeInvoice = {
   amount: number
@@ -129,9 +130,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       accountURN,
     })
     if (spd && !spd.addressURN) {
-      const targetAddressURN = await coreClient.address.getAddressURNForEmail.query(
-        spd.email.toLowerCase()
-      )
+      const targetAddressURN =
+        await coreClient.address.getAddressURNForEmail.query(
+          spd.email.toLowerCase()
+        )
 
       if (!targetAddressURN) {
         throw new InternalServerError({
@@ -312,7 +314,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
-export const PlanFeatures = ({ plan }: { plan: PlanDetails }) => {
+export const PlanFeatures = ({
+  plan,
+  featuresColor,
+}: {
+  plan: PlanDetails
+  featuresColor: 'text-indigo-500' | 'text-gray-500'
+}) => {
   return (
     <ul className="grid lg:grid-rows-4 grid-flow-row lg:grid-flow-col gap-4">
       {plan.features.map((feature) => (
@@ -321,20 +329,51 @@ export const PlanFeatures = ({ plan }: { plan: PlanDetails }) => {
           className={`flex flex-row items-center gap-3 text-[#6B7280]`}
         >
           <div className="w-3.5 h-3.5 flex justify-center items-center">
-            {feature.type === 'base' && (
-              <FaCheck className={`text-indigo-500`} />
-            )}
-            {feature.type === 'addon' && (
-              <FaCheck className={`text-gray-500`} />
+            {feature.type === 'current' && (
+              <FaCheck className={featuresColor} />
             )}
             {feature.type === 'future' && (
-              <TbHourglassHigh className="text-gray-500" />
+              <TbHourglassHigh className={featuresColor} />
             )}
           </div>
 
           <Text size="sm" weight="medium">
             {feature.title}
           </Text>
+
+          {feature.aggregateFeatures && (
+            <Popover className="relative">
+              <Popover.Button as="img" src={iSvg} className="cursor-pointer" />
+
+              <Popover.Panel className="absolute z-10 bg-white p-2 border rounded shadow mt-2">
+                <ul className="flex flex-col gap-2">
+                  {feature.aggregateFeatures.map((af) => (
+                    <li
+                      key={af.title}
+                      className={`flex flex-row items-center gap-3 text-[#6B7280]`}
+                    >
+                      <div className="w-3.5 h-3.5 flex justify-center items-center">
+                        {af.type === 'current' && (
+                          <FaCheck className={'text-gray-500'} />
+                        )}
+                        {af.type === 'future' && (
+                          <TbHourglassHigh className={'text-gray-500'} />
+                        )}
+                      </div>
+
+                      <Text
+                        size="sm"
+                        weight="medium"
+                        className="flex-1 text-left whitespace-nowrap"
+                      >
+                        {af.title}
+                      </Text>
+                    </li>
+                  ))}
+                </ul>
+              </Popover.Panel>
+            </Popover>
+          )}
         </li>
       ))}
     </ul>
@@ -392,7 +431,7 @@ const PurchaseProModal = ({
             {plan.description}
           </Text>
 
-          <PlanFeatures plan={plan} />
+          <PlanFeatures plan={plan} featuresColor="text-indigo-500" />
         </div>
 
         <div className="border-b border-gray-200"></div>
@@ -862,7 +901,7 @@ const PlanCard = ({
         <div className="w-full border-b border-gray-200"></div>
         <main>
           <div className="flex flex-row gap-7 p-4">
-            <PlanFeatures plan={plan} />
+            <PlanFeatures plan={plan} featuresColor="text-indigo-500" />
           </div>
 
           <div className="border-b border-gray-200"></div>
