@@ -228,7 +228,7 @@ const processPurchaseOp = async (
     })
   }
 
-  return { sub, quantity }
+  return sub
 }
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
@@ -290,7 +290,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       }
 
       case 'purchase': {
-        const { sub, quantity } = await processPurchaseOp(
+        const sub = await processPurchaseOp(
           jwt,
           plan,
           clientId,
@@ -315,7 +315,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           {
             subId: sub.id,
             status,
-            quantity,
             client_secret,
             payment_method,
           },
@@ -752,8 +751,7 @@ export default () => {
 
   useEffect(() => {
     if (actionData) {
-      const { status, client_secret, payment_method, subId, quantity } =
-        actionData
+      const { status, client_secret, payment_method, subId } = actionData
       process3DSecureCard({
         submit,
         subId,
@@ -763,7 +761,6 @@ export default () => {
         payment_method,
         updatePlanParams: {
           clientId: appDetails.clientId,
-          quantity,
           plan: ServicePlanType.PRO,
         },
         redirectUrl: `/apps/${appDetails.clientId}/billing`,
