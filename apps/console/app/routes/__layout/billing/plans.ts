@@ -3,6 +3,7 @@ import { ServicePlanType } from '@proofzero/types/account'
 type PlanFeature = {
   title: string
   type: 'current' | 'future'
+  aggregateFeatures?: PlanFeature[]
 }
 
 const baseFeatures: PlanFeature[] = [
@@ -48,6 +49,7 @@ const proFeatures: PlanFeature[] = [
   {
     title: 'Free Plan Features',
     type: 'current',
+    aggregateFeatures: baseFeatures,
   },
   {
     title: 'Custom Branding',
