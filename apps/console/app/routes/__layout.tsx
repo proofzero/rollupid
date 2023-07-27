@@ -17,8 +17,14 @@ import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWit
 
 export default function DashboardIndexPage() {
   const context = useOutletContext<OutletContextData>()
-  const { apps, avatarUrl, displayName, PASSPORT_URL, hasUnpaidInvoices } =
-    context
+  const {
+    apps,
+    avatarUrl,
+    displayName,
+    PASSPORT_URL,
+    hasUnpaidInvoices,
+    unpaidInvoiceURL,
+  } = context
 
   return (
     <Popover className="min-h-[100dvh] relative">
@@ -36,7 +42,7 @@ export default function DashboardIndexPage() {
             {hasUnpaidInvoices && (
               <ToastWithLink
                 message="We couldn't process payment for your account"
-                linkHref={`/billing/portal`}
+                linkHref={unpaidInvoiceURL}
                 linkText="Update payment information"
                 type={'urgent'}
               />

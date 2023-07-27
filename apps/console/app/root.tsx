@@ -87,6 +87,7 @@ export type LoaderData = {
   PASSPORT_URL: string
   displayName: string
   hasUnpaidInvoices: boolean
+  unpaidInvoiceURL: string
   ENV: {
     POSTHOG_API_KEY: string
     POSTHOG_PROXY_HOST: string
@@ -157,9 +158,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         context.env.SECRET_STRIPE_API_KEY
       )
 
+      let unpaidInvoiceURL = ''
+
       const hasUnpaidInvoices = invoices.some((invoice) => {
         if (invoice.status)
-          return ['uncollectible', 'open'].includes(invoice.status)
+          if (['uncollectible', 'open'].includes(invoice.status)) {
+            unpaidInvoiceURL = invoice.url as string
+            return true
+          }
         return false
       })
 
@@ -167,6 +173,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         apps: reshapedApps,
         avatarUrl,
         hasUnpaidInvoices,
+        unpaidInvoiceURL,
         PASSPORT_URL,
         ENV: {
           POSTHOG_API_KEY,
@@ -207,6 +214,7 @@ export default function App() {
     displayName,
     accountURN,
     hasUnpaidInvoices,
+    unpaidInvoiceURL,
   } = loaderData
 
   useEffect(() => {
@@ -274,6 +282,7 @@ export default function App() {
                 displayName,
                 accountURN,
                 hasUnpaidInvoices,
+                unpaidInvoiceURL,
               }}
             />
           </PostHogProvider>
@@ -286,6 +295,7 @@ export default function App() {
               displayName,
               accountURN,
               hasUnpaidInvoices,
+              unpaidInvoiceURL,
             }}
           />
         )}
