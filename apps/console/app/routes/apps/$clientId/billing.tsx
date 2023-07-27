@@ -208,11 +208,11 @@ const processPurchaseOp = async (
     flashSession,
   })
 
-  const status = (sub.latest_invoice as Stripe.Invoice)?.status
+  const invoiceStatus = (sub.latest_invoice as Stripe.Invoice)?.status
 
   if (
     (sub.status === 'active' || sub.status === 'trialing') &&
-    status === 'paid'
+    invoiceStatus === 'paid'
   ) {
     await coreClient.account.updateEntitlements.mutate({
       accountURN: accountURN,
