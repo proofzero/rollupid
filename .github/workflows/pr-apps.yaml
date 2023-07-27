@@ -11,7 +11,7 @@ defaults:
 
 jobs:
   changes:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     outputs:
       apps: ${{ steps.changes.outputs.apps }}
     steps:
@@ -28,7 +28,7 @@ jobs:
   build-test-apps:
     needs: changes
     if: needs.changes.outputs.apps == 'true'
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
