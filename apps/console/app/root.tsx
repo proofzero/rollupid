@@ -158,7 +158,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         context.env.SECRET_STRIPE_API_KEY
       )
 
-      let unpaidInvoiceURL = ''
+      let unpaidInvoiceURL = '/billing/portal'
 
       const hasUnpaidInvoices = invoices.some((invoice) => {
         if (invoice.status)
