@@ -246,13 +246,16 @@ export const voidInvoice = async (
   const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
+  const customer = await stripeClient.customers.retrieve(customerId)
+
   await stripeClient.invoices.voidInvoice(invoiceId)
 
-  const customer = await stripeClient.customers.retrieve(customerId)
   // We don't want to update the credit balance if the invoice is voided
-  await stripeClient.customers.update(customerId, {
-    balance: customer.object.balance,
-  })
+  if (!customer.deleted) {
+    await stripeClient.customers.update(customerId, {
+      balance: customer.balance,
+    })
+  }
 }
 
 export const reconcileAppSubscriptions = async (
