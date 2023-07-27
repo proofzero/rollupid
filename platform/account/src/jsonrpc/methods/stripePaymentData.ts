@@ -23,7 +23,6 @@ export const GetStripePaymentDataOutputSchema = z
     name: z.string(),
     paymentMethodID: z.string().optional(),
     addressURN: AddressURNInput.optional(),
-    invoiceCreditBalance: z.number().optional(),
   })
   .optional()
 type GetStripePaymentDataOutput = z.infer<
@@ -45,7 +44,6 @@ export const getStripePaymentData = async ({
 export const SetStripePaymentDataInputSchema = z.object({
   customerID: z.string(),
   paymentMethodID: z.string().optional(),
-  invoiceCreditBalance: z.number().optional(),
   accountURN: AccountURNInput,
   name: z.string(),
   email: z.string(),
@@ -62,15 +60,8 @@ export const setStripePaymentData = async ({
 }): Promise<void> => {
   const account = await initAccountNodeByName(input.accountURN, ctx.Account)
 
-  const {
-    customerID,
-    paymentMethodID,
-    email,
-    name,
-    accountURN,
-    addressURN,
-    invoiceCreditBalance,
-  } = input
+  const { customerID, paymentMethodID, email, name, accountURN, addressURN } =
+    input
 
   await account.class.setStripePaymentData({
     customerID,
@@ -78,7 +69,6 @@ export const setStripePaymentData = async ({
     email,
     addressURN,
     name,
-    invoiceCreditBalance,
   })
 
   const caller = router.createCaller(ctx)

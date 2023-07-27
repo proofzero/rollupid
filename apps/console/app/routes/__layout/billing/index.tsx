@@ -241,8 +241,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       quantity,
       subscriptionID: entitlements.subscriptionID,
       accountURN,
-      coreClient,
-      spd,
     })
 
     if (
@@ -1398,8 +1396,6 @@ export default () => {
                                   submit(
                                     {
                                       invoice_id: invoice.id,
-                                      customer_id:
-                                        paymentData?.customerID as string,
                                     },
                                     {
                                       method: 'post',

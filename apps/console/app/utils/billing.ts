@@ -13,7 +13,6 @@ import { type Session, type SessionData } from '@remix-run/cloudflare'
 import { commitFlashSession } from '~/utilities/session.server'
 import { type Env } from 'bindings'
 import Stripe from 'stripe'
-import { type CoreClientType } from '@proofzero/platform-clients/core'
 
 export type StripeInvoice = {
   id: string
@@ -88,8 +87,6 @@ export const createOrUpdateSubscription = async ({
   quantity,
   accountURN,
   customerID,
-  coreClient,
-  spd,
 }: {
   subscriptionID?: string | null
   SECRET_STRIPE_PRO_PLAN_ID: string
@@ -97,20 +94,12 @@ export const createOrUpdateSubscription = async ({
   quantity: number
   accountURN: AccountURN
   customerID: string
-  coreClient: CoreClientType
-  spd: StripePaymentData
 }) => {
   const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
-  const customer = await stripeClient.customers.retrieve(customerID)
-
-  let sub, balance
-  if (!customer.deleted) {
-    balance = customer.balance
-  }
-
+  let sub
   if (!subscriptionID) {
     sub = await createSubscription(
       {
@@ -132,15 +121,6 @@ export const createOrUpdateSubscription = async ({
       },
       stripeClient
     )
-  }
-
-  if (spd) {
-    await coreClient.account.setStripePaymentData.mutate({
-      ...spd,
-      addressURN: spd?.addressURN!,
-      accountURN,
-      invoiceCreditBalance: balance || 0,
-    })
   }
 
   return sub
