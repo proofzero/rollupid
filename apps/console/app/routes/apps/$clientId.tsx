@@ -27,6 +27,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 import { getToastsAndFlashSession } from '~/utils/toast.server'
 import { useEffect } from 'react'
+import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 
 type LoaderData = {
   appDetails: appDetailsProps
@@ -143,8 +144,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 export default function AppDetailIndexPage() {
   const loaderData = useLoaderData<LoaderData>()
 
-  const { apps, avatarUrl, PASSPORT_URL, displayName, accountURN } =
-    useOutletContext<OutletContextData>()
+  const {
+    apps,
+    avatarUrl,
+    PASSPORT_URL,
+    displayName,
+    accountURN,
+    hasUnpaidInvoices,
+  } = useOutletContext<OutletContextData>()
   const {
     appDetails,
     rotationResult,
@@ -193,16 +200,25 @@ export default function AppDetailIndexPage() {
           />
           <main className="flex flex-col flex-initial min-h-full w-full">
             <SiteHeader avatarUrl={avatarUrl} />
+            {hasUnpaidInvoices && (
+              <ToastWithLink
+                message="We couldn't process payment for your account"
+                linkHref={`/billing/portal`}
+                linkText="Update payment information"
+                type={'urgent'}
+              />
+            )}
             <Toaster position="top-right" reverseOrder={false} />
 
             <section
-              className={`${open
+              className={`${
+                open
                   ? 'max-lg:opacity-50\
                     max-lg:overflow-hidden\
                     max-lg:h-[calc(100dvh-80px)]\
                     min-h-[636px]'
                   : 'h-full '
-                } py-9 sm:mx-11 max-w-[1636px]`}
+              } py-9 sm:mx-11 max-w-[1636px]`}
             >
               <Outlet
                 context={{
@@ -216,6 +232,7 @@ export default function AppDetailIndexPage() {
                   appContactEmail,
                   paymaster,
                   accountURN,
+                  hasUnpaidInvoices,
                 }}
               />
             </section>

@@ -1,10 +1,11 @@
+import { type ToastType } from '@proofzero/design-system/src/atoms/toast'
 import type {
   AuthorizedUser,
   AppObject,
   EdgesMetadata,
   CustomDomain,
 } from '@proofzero/platform/starbase/src/types'
-import { ServicePlanType } from '@proofzero/types/account'
+import { type ServicePlanType } from '@proofzero/types/account'
 
 export enum RollType {
   RollAPIKey = 'roll_api_key',
@@ -44,3 +45,8 @@ export type AuthorizedProfile = AuthorizedUser
 
 export type edgesMetadata = EdgesMetadata
 export type notificationHandlerType = (val: boolean) => void
+
+export type ToastNotification = {
+  message: string
+  type: ToastType
+}

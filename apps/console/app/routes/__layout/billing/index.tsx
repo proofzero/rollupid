@@ -29,6 +29,7 @@ import {
 import {
   Link,
   NavLink,
+  useActionData,
   useLoaderData,
   useOutletContext,
   useSubmit,
@@ -64,33 +65,30 @@ import {
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 import { ToastInfo } from '@proofzero/design-system/src/atoms/toast/ToastInfo'
 import { DangerPill } from '@proofzero/design-system/src/atoms/pills/DangerPill'
-import {
-  createSubscription,
-  getInvoices,
-  reconcileAppSubscriptions,
-  updateSubscription,
-} from '~/services/billing/stripe'
+import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { useHydrated } from 'remix-utils'
 import _ from 'lodash'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import iSvg from '@proofzero/design-system/src/atoms/info/i.svg'
-
-type StripeInvoice = {
-  amount: number
-  timestamp: number
-  status: string | null
-  url?: string
-}
+import {
+  createOrUpdateSubscription,
+  getCurrentAndUpcomingInvoices,
+  process3DSecureCard,
+  UnpaidInvoiceNotification,
+  type StripeInvoice,
+} from '~/utils/billing'
+import { IoWarningOutline } from 'react-icons/io5'
+import { type ToastNotification } from '~/types'
+import { setPurchaseToastNotification } from '~/utils'
+import type Stripe from 'stripe'
 
 type LoaderData = {
+  STRIPE_PUBLISHABLE_KEY: string
   paymentData?: PaymentData
   entitlements: {
     [ServicePlanType.PRO]: number
   }
-  toastNotification?: {
-    message: string
-    type: ToastType
-  }
+  toastNotification?: ToastNotification
   connectedEmails: DropdownSelectListItem[]
   invoices: StripeInvoice[]
 }
@@ -108,15 +106,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const { plans, subscriptionID } =
-      await coreClient.account.getEntitlements.query({
-        accountURN,
-      })
+    const { plans } = await coreClient.account.getEntitlements.query({
+      accountURN,
+    })
 
     const flashSession = await getFlashSession(request, context.env)
 
     let toastNotification = undefined
-    const toastStr = flashSession.get('toastNotification')
+    const toastStr = flashSession.get('toast_notification')
     if (toastStr) {
       toastNotification = JSON.parse(toastStr)
     }
@@ -150,34 +147,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       spd.addressURN = targetAddressURN
     }
 
-    let invoices: StripeInvoice[] = []
-    if (subscriptionID) {
-      const stripeInvoices = await getInvoices(
-        {
-          customerID: spd.customerID,
-        },
-        context.env
-      )
-
-      invoices = stripeInvoices.invoices.data.map((i) => ({
-        amount: i.total / 100,
-        timestamp: i.created * 1000,
-        status: i.status,
-        url: i.hosted_invoice_url ?? undefined,
-      }))
-
-      if (stripeInvoices.upcomingInvoices) {
-        invoices = invoices.concat({
-          amount: stripeInvoices.upcomingInvoices.lines.data[0].amount / 100,
-          timestamp:
-            stripeInvoices.upcomingInvoices.lines.data[0].period.start * 1000,
-          status: 'scheduled',
-        })
-      }
-    }
+    const invoices = await getCurrentAndUpcomingInvoices(
+      spd,
+      context.env.SECRET_STRIPE_API_KEY
+    )
 
     return json<LoaderData>(
       {
+        STRIPE_PUBLISHABLE_KEY: context.env.STRIPE_PUBLISHABLE_KEY,
         paymentData: spd,
         entitlements: {
           [ServicePlanType.PRO]:
@@ -209,6 +186,23 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
+    const spd = await coreClient.account.getStripePaymentData.query({
+      accountURN,
+    })
+
+    const invoices = await getCurrentAndUpcomingInvoices(
+      spd,
+      context.env.SECRET_STRIPE_API_KEY
+    )
+
+    const flashSession = await getFlashSession(request, context.env)
+
+    await UnpaidInvoiceNotification({
+      invoices,
+      flashSession,
+      env: context.env,
+    })
+
     const fd = await request.formData()
     const { customerID, quantity, txType } = JSON.parse(
       fd.get('payload') as string
@@ -230,33 +224,24 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
+    if ((quantity < 1 && txType === 'buy') || quantity < 0) {
+      throw new BadRequestError({
+        message: `Invalid quantity. Please enter a valid number of entitlements.`,
+      })
+    }
+
     const entitlements = await coreClient.account.getEntitlements.query({
       accountURN,
     })
 
-    let sub
-    if (!entitlements.subscriptionID) {
-      sub = await createSubscription(
-        {
-          customerID: customerID,
-          planID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
-          quantity: +quantity,
-          accountURN,
-          handled: true,
-        },
-        context.env
-      )
-    } else {
-      sub = await updateSubscription(
-        {
-          subscriptionID: entitlements.subscriptionID,
-          planID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
-          quantity: +quantity,
-          handled: true,
-        },
-        context.env
-      )
-    }
+    const sub = await createOrUpdateSubscription({
+      customerID,
+      SECRET_STRIPE_PRO_PLAN_ID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
+      SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
+      quantity,
+      subscriptionID: entitlements.subscriptionID,
+      accountURN,
+    })
 
     if (
       (txType === 'buy' &&
@@ -275,30 +260,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       )
     }
 
-    const flashSession = await getFlashSession(request, context.env)
     if (txType === 'buy') {
-      // https://stripe.com/docs/billing/subscriptions/overview#subscription-statuses
-      if (sub.status === 'active' || sub.status === 'trialing') {
-        flashSession.flash(
-          'toastNotification',
-          JSON.stringify({
-            type: ToastType.Success,
-            message: 'Entitlement(s) successfully bought',
-          })
-        )
-      } else {
-        flashSession.flash(
-          'toastNotification',
-          JSON.stringify({
-            type: ToastType.Error,
-            message: 'Payment failed - check your card details',
-          })
-        )
-      }
+      setPurchaseToastNotification({
+        sub,
+        flashSession,
+      })
     }
     if (txType === 'remove') {
       flashSession.flash(
-        'toastNotification',
+        'toast_notification',
         JSON.stringify({
           type: ToastType.Success,
           message: 'Entitlement(s) successfully removed',
@@ -306,11 +276,32 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       )
     }
 
-    return new Response(null, {
-      headers: {
-        'Set-Cookie': await commitFlashSession(flashSession, context.env),
+    let status, client_secret, payment_method
+    if (
+      sub.latest_invoice &&
+      (sub.latest_invoice as Stripe.Invoice).payment_intent
+    ) {
+      // lots of stripe type casting since by default many
+      // props are strings (not expanded versions)
+      ;({ status, client_secret, payment_method } = (
+        sub.latest_invoice as Stripe.Invoice
+      ).payment_intent as Stripe.PaymentIntent)
+    }
+
+    return json(
+      {
+        status,
+        client_secret,
+        payment_method,
+        quantity,
+        subId: sub.id,
       },
-    })
+      {
+        headers: {
+          'Set-Cookie': await commitFlashSession(flashSession, context.env),
+        },
+      }
+    )
   }
 )
 
@@ -459,7 +450,7 @@ const PurchaseProModal = ({
               onClick={() => {
                 setProEntitlementDelta((prev) => prev - 1)
               }}
-              disabled={proEntitlementDelta < 1}
+              disabled={proEntitlementDelta <= 1}
             >
               <HiMinus />
             </button>
@@ -510,7 +501,6 @@ const PurchaseProModal = ({
           onClick={() => {
             setIsOpen(false)
             setProEntitlementDelta(1)
-
             submit(
               {
                 payload: JSON.stringify({
@@ -789,11 +779,13 @@ const PlanCard = ({
   apps,
   paymentData,
   submit,
+  hasUnpaidInvoices = false,
 }: {
   plan: PlanDetails
   entitlements: number
   apps: AppLoaderData[]
   paymentData?: PaymentData
+  hasUnpaidInvoices: boolean
   submit: (data: any, options: any) => void
 }) => {
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
@@ -855,43 +847,49 @@ const PlanCard = ({
                 </Menu.Button>
 
                 <Menu.Items className="absolute right-4 top-16 bg-white rounded-lg border shadow">
-                  <Menu.Item>
-                    <button
-                      type="button"
-                      className="flex flex-row items-center gap-3 py-3 px-4 cursor-pointer hover:bg-gray-50 rounded-t-lg"
-                      onClick={() => {
-                        setPurchaseProModalOpen(true)
-                      }}
-                    >
-                      <FaShoppingCart className="text-gray-500" />
+                  <Menu.Item
+                    as="button"
+                    className={classnames(
+                      'flex flex-row items-center \
+                       gap-3 py-3 px-4  rounded-t-lg',
+                      hasUnpaidInvoices
+                        ? 'cursor-not-allowed text-gray-300'
+                        : 'cursor-pointer hover:bg-gray-50 text-gray-700'
+                    )}
+                    onClick={() => {
+                      setPurchaseProModalOpen(true)
+                    }}
+                    disabled={hasUnpaidInvoices}
+                    type="button"
+                  >
+                    <FaShoppingCart />
 
-                      <Text size="sm" weight="medium" className="text-gray-700">
-                        Purchase Entitlement(s)
-                      </Text>
-                    </button>
+                    <Text size="sm" weight="medium">
+                      Purchase Entitlement(s)
+                    </Text>
                   </Menu.Item>
 
                   <div className="border-b border-gray-200 w-3/4 mx-auto"></div>
 
-                  <Menu.Item disabled={entitlements === 0}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setRemoveEntitlementModalOpen(true)
-                      }}
-                      className={classnames(
-                        'flex flex-row items-center gap-3 py-3 px-4 rounded-b-lg',
-                        entitlements !== 0
-                          ? 'cursor-pointer hover:bg-gray-50 text-red-600'
-                          : 'cursor-default text-red-300'
-                      )}
-                    >
-                      <HiOutlineMinusCircle />
+                  <Menu.Item
+                    as="button"
+                    disabled={entitlements === 0 || hasUnpaidInvoices}
+                    type="button"
+                    onClick={() => {
+                      setRemoveEntitlementModalOpen(true)
+                    }}
+                    className={classnames(
+                      'flex flex-row items-center gap-3 py-3 px-4 rounded-b-lg',
+                      entitlements !== 0 && !hasUnpaidInvoices
+                        ? 'cursor-pointer hover:bg-gray-50 text-red-600'
+                        : 'cursor-not-allowed text-red-300'
+                    )}
+                  >
+                    <HiOutlineMinusCircle />
 
-                      <Text size="sm" weight="medium">
-                        Remove Entitlement(s)
-                      </Text>
-                    </button>
+                    <Text size="sm" weight="medium">
+                      Remove Entitlement(s)
+                    </Text>
                   </Menu.Item>
                 </Menu.Items>
               </>
@@ -1000,6 +998,7 @@ const PlanCard = ({
 
 export default () => {
   const {
+    STRIPE_PUBLISHABLE_KEY,
     entitlements,
     toastNotification,
     paymentData,
@@ -1007,20 +1006,32 @@ export default () => {
     invoices,
   } = useLoaderData<LoaderData>()
 
-  const { apps, PASSPORT_URL } = useOutletContext<OutletContextData>()
+  const { apps, PASSPORT_URL, hasUnpaidInvoices } =
+    useOutletContext<OutletContextData>()
+
+  const actionData = useActionData()
+  const submit = useSubmit()
+
+  useEffect(() => {
+    if (actionData) {
+      const { status, client_secret, payment_method, subId } = actionData
+      process3DSecureCard({
+        STRIPE_PUBLISHABLE_KEY,
+        status,
+        subId,
+        client_secret,
+        payment_method,
+        submit,
+        redirectUrl: '/billing',
+      })
+    }
+  }, [actionData])
 
   useEffect(() => {
     if (toastNotification) {
-      if (toastNotification.type === ToastType.Success) {
-        toast(ToastType.Success, {
-          message: toastNotification.message,
-        })
-      }
-      if (toastNotification.type === ToastType.Error) {
-        toast(ToastType.Error, {
-          message: toastNotification.message,
-        })
-      }
+      toast(toastNotification.type, {
+        message: toastNotification.message,
+      })
     }
   }, [toastNotification])
 
@@ -1052,7 +1063,6 @@ export default () => {
     paymentData?.name
   )
 
-  const submit = useSubmit()
   const hydrated = useHydrated()
 
   const [invoiceSort, setInvoiceSort] = useState<'asc' | 'desc'>('desc')
@@ -1223,6 +1233,7 @@ export default () => {
           paymentData={paymentData}
           submit={submit}
           apps={apps.filter((a) => a.appPlan === ServicePlanType.PRO)}
+          hasUnpaidInvoices={hasUnpaidInvoices}
         />
       </section>
 
@@ -1314,16 +1325,32 @@ export default () => {
                       <tr key={idx} className="border-b border-gray-200">
                         <td className="px-6 py-3">
                           {hydrated && (
-                            <Text size="sm" className="gray-500">
-                              {new Date(invoice.timestamp).toLocaleString(
-                                'default',
-                                {
-                                  day: '2-digit',
-                                  month: 'short',
-                                  year: 'numeric',
-                                }
+                            <div className="flex flex-row items-center space-x-3">
+                              <Text size="sm" className="gray-500">
+                                {hydrated &&
+                                  new Date(invoice.timestamp).toLocaleString(
+                                    'default',
+                                    {
+                                      day: '2-digit',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    }
+                                  )}
+                              </Text>
+
+                              {(invoice.status === 'open' ||
+                                invoice.status === 'uncollectible') && (
+                                <div
+                                  className="rounded-xl bg-yellow-200 flex
+                                flex-row items-center space-x-1 p-1"
+                                >
+                                  <IoWarningOutline className="text-black w-4 h-4" />
+                                  <Text size="xs" className="text-black">
+                                    Payment Error
+                                  </Text>
+                                </div>
                               )}
-                            </Text>
+                            </div>
                           )}
                         </td>
 
@@ -1341,11 +1368,47 @@ export default () => {
                             {invoice.status && _.startCase(invoice.status)}
                           </Text>
                           {invoice.status === 'paid' && (
-                            <a href={invoice.url} target="_blank">
+                            <a
+                              href={invoice.url}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
                               <Text size="xs" className="text-indigo-500">
                                 View Invoice
                               </Text>
                             </a>
+                          )}
+                          {(invoice.status === 'open' ||
+                            invoice.status === 'uncollectible') && (
+                            <div className="flex flex-row space-x-2">
+                              <a
+                                href={invoice.url}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                <Text size="xs" className="text-indigo-500">
+                                  Update Payment
+                                </Text>
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  submit(
+                                    {
+                                      invoice_id: invoice.id,
+                                    },
+                                    {
+                                      method: 'post',
+                                      action: 'billing/cancel',
+                                    }
+                                  )
+                                }}
+                              >
+                                <Text size="xs" className="text-red-500">
+                                  Cancel Payment
+                                </Text>
+                              </button>
+                            </div>
                           )}
                         </td>
                       </tr>

@@ -14,6 +14,7 @@ import {
 import { createCustomer, updateCustomer } from '~/services/billing/stripe'
 import { AccountURN } from '@proofzero/urns/account'
 import { AddressURN } from '@proofzero/urns/address'
+import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -81,7 +82,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const flashSession = await getFlashSession(request, context.env)
-    flashSession.flash('success_toast', 'Payment data updated')
+    flashSession.flash(
+      'toast_notification',
+      JSON.stringify({
+        type: ToastType.Success,
+        message: 'Payment data updated',
+      })
+    )
 
     return redirect('/billing', {
       headers: {

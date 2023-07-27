@@ -7,15 +7,15 @@ import createCoreClient from '@proofzero/platform-clients/core'
 import { type AccountURN } from '@proofzero/urns/account'
 
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import {
-  reconcileAppSubscriptions,
-  updateSubscriptionMetadata,
-} from '~/services/billing/stripe'
+import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { InternalServerError, RollupError } from '@proofzero/errors'
-import { AddressURN } from '@proofzero/urns/address'
+import { type AddressURN } from '@proofzero/urns/address'
 
 type StripeInvoicePayload = {
+  id: string
+  subscription: string
   customer: string
+  payment_intent: string
   lines: {
     data: Array<{
       price: { product: string }
@@ -23,6 +23,7 @@ type StripeInvoicePayload = {
       quantity: number
     }>
   }
+  metadata: any
 }
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
@@ -51,61 +52,28 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     switch (event.type) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
-        const { id, metadata: subMeta } = event.data.object as {
+        const {
+          id,
+          metadata: subMeta,
+          status: subStatus,
+          latest_invoice: latestInvoice,
+        } = event.data.object as {
           id: string
+          latest_invoice: string
           metadata: {
             accountURN: AccountURN
-            handled?: string | null
           }
+          status: string
         }
 
-        if (event.data.previous_attributes) {
-          let metadataUpdateEvent = false
+        const invoice = await stripeClient.invoices.retrieve(latestInvoice)
 
-          const { metadata } = event.data.previous_attributes as {
-            metadata?: {
-              handled?: string
-            }
-          }
-
-          // If previous attributes had a handled flag and the current
-          // event does not, then the webhook is handling only the
-          // handled removal so we shouldn't move further
-          if (
-            !subMeta.handled &&
-            metadata?.handled &&
-            JSON.parse(metadata.handled)
-          ) {
-            console.info(
-              `Cleared Subscription ${id} - ${event.type} handled flag`
-            )
-            metadataUpdateEvent = true
-          }
-
-          if (metadataUpdateEvent) {
-            return null
-          }
-        }
-
-        // When synchronously handling subscription update effects
-        // a flag is set to prevent the webhook from handling it again
-        // when it is received asynchronously
-        // This call clears the flag
-        if (subMeta.handled) {
-          console.info(
-            `Subscription ${id} - ${event.type} already handled synchronously`
-          )
-
-          subMeta.handled = null
-
-          await updateSubscriptionMetadata(
-            {
-              id,
-              metadata: subMeta,
-            },
-            context.env
-          )
-
+        // We don't want to do anything with subscription
+        // if payment for it failed
+        if (
+          (subStatus !== 'active' && subStatus !== 'trialing') ||
+          invoice.status !== 'paid'
+        ) {
           return null
         }
 
@@ -160,7 +128,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           let inferredAddressURN
           if (paymentData && !paymentData.addressURN) {
             inferredAddressURN =
-              await addressClient.getAddressURNForEmail.query(
+              await coreClient.address.getAddressURNForEmail.query(
                 email.toLowerCase()
               )
 
@@ -246,13 +214,22 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         }
 
         break
+
       case 'invoice.payment_failed':
-        const { customer: customerFail } = event.data
-          .object as StripeInvoicePayload
+        const { customer: customerFail, payment_intent: paymentIntentFail } =
+          event.data.object as StripeInvoicePayload
         const customerDataFail = await stripeClient.customers.retrieve(
           customerFail
         )
-        if (!customerDataFail.deleted && customerDataFail.email) {
+        const paymentIntentInfo = await stripeClient.paymentIntents.retrieve(
+          paymentIntentFail
+        )
+
+        if (
+          !customerDataFail.deleted &&
+          customerDataFail.email &&
+          paymentIntentInfo.status !== 'requires_action'
+        ) {
           const { email, name } = customerDataFail
 
           await coreClient.address.sendFailedPaymentNotification.mutate({

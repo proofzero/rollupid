@@ -1,9 +1,10 @@
 import { InternalServerError } from '@proofzero/errors'
-import { ReconcileAppsSubscriptionsOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/reconcileAppSubscriptions'
+import { type CoreClientType } from '@proofzero/platform-clients/core'
+import { type ReconcileAppsSubscriptionsOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/reconcileAppSubscriptions'
 import { ServicePlanType } from '@proofzero/types/account'
-import { AccountURN } from '@proofzero/urns/account'
+import { type AccountURN } from '@proofzero/urns/account'
 import { redirect } from '@remix-run/cloudflare'
-import { Env } from 'bindings'
+import { type Env } from 'bindings'
 import Stripe from 'stripe'
 import plans from '~/routes/__layout/billing/plans'
 
@@ -126,25 +127,22 @@ export const createSubscription = async (
     accountURN,
     handled = false,
   }: CreateSubscriptionParams,
-  env: Env
+  stripeClient: Stripe
 ) => {
-  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
-    apiVersion: '2022-11-15',
-  })
-
   const metadata: SubscriptionMetadata = {}
   metadata.accountURN = accountURN
 
   if (handled) metadata.handled = handled.toString()
 
   const subscription = await stripeClient.subscriptions.create({
-    customer: customerID,
+    customer: customerID as string,
     items: [
       {
         price: planID,
         quantity,
       },
     ],
+    expand: ['latest_invoice.payment_intent'],
     metadata,
   })
 
@@ -152,21 +150,9 @@ export const createSubscription = async (
 }
 
 export const updateSubscription = async (
-  {
-    subscriptionID,
-    planID,
-    quantity,
-    handled = false,
-  }: UpdateSubscriptionParams,
-  env: Env
+  { subscriptionID, planID, quantity }: UpdateSubscriptionParams,
+  stripeClient: Stripe
 ) => {
-  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
-    apiVersion: '2022-11-15',
-  })
-
-  let metadata: SubscriptionMetadata = {}
-  if (handled) metadata.handled = handled.toString()
-
   let subscription = await stripeClient.subscriptions.retrieve(subscriptionID)
   const planItem = subscription.items.data.find((i) => i.price.id === planID)
   if (!planItem)
@@ -182,7 +168,8 @@ export const updateSubscription = async (
         quantity,
       },
     ],
-    metadata,
+    payment_behavior: 'pending_if_incomplete',
+    expand: ['latest_invoice.payment_intent'],
   })
 
   return subscription
@@ -215,24 +202,43 @@ export const updateSubscriptionMetadata = async (
 
 export const getInvoices = async (
   { customerID }: GetInvoicesParams,
-  env: Env
+  SECRET_STRIPE_API_KEY: string
 ) => {
-  const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
+  const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
     apiVersion: '2022-11-15',
   })
 
   const invoices = await stripeClient.invoices.list({
     customer: customerID,
+    expand: ['data.payment_intent'],
+  })
+
+  return invoices
+}
+
+export const getUpcomingInvoices = async (
+  { customerID }: GetInvoicesParams,
+  SECRET_STRIPE_API_KEY: string
+) => {
+  const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
+    apiVersion: '2022-11-15',
   })
 
   const upcomingInvoices = await stripeClient.invoices.retrieveUpcoming({
     customer: customerID,
   })
+  return upcomingInvoices
+}
 
-  return {
-    invoices,
-    upcomingInvoices,
-  }
+export const voidInvoice = async (
+  invoiceId: string,
+  SECRET_STRIPE_API_KEY: string
+) => {
+  const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
+    apiVersion: '2022-11-15',
+  })
+
+  await stripeClient.invoices.voidInvoice(invoiceId)
 }
 
 export const reconcileAppSubscriptions = async (
@@ -245,7 +251,7 @@ export const reconcileAppSubscriptions = async (
   }: {
     subscriptionID: string
     accountURN: AccountURN
-    coreClient: any
+    coreClient: CoreClientType
     billingURL: string
     settingsURL: string
   },
