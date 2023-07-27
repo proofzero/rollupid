@@ -738,17 +738,15 @@ export default () => {
   useEffect(() => {
     if (actionData) {
       const { status, client_secret, payment_method, subId } = actionData
-      ;(async () => {
-        await process3DSecureCard({
-          submit,
-          subId,
-          STRIPE_PUBLISHABLE_KEY,
-          status,
-          client_secret,
-          payment_method,
-          redirectUrl: `/apps/${appDetails.clientId}/billing`,
-        })
-      })()
+      process3DSecureCard({
+        submit,
+        subId,
+        STRIPE_PUBLISHABLE_KEY,
+        status,
+        client_secret,
+        payment_method,
+        redirectUrl: `/apps/${appDetails.clientId}/billing`,
+      })
     }
   }, [actionData])
 
