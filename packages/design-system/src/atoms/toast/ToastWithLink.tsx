@@ -9,7 +9,6 @@ export type ToastWithLinkProps = {
   linkHref: string
   linkText: string
   type?: 'urgent' | 'deferred' | 'warning'
-
   remove?: () => void
 }
 
