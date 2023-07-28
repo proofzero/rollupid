@@ -237,7 +237,7 @@ export const appRouter = t.router({
     .input(GetIdentityGroupMemberInvitationsInputSchema)
     .output(GetIdentityGroupMemberInvitationsOutputSchema)
     .query(getIdentityGroupMemberInvitations),
-  getIdentityGroupmemberInvitationDetails: t.procedure
+  getIdentityGroupMemberInvitationDetails: t.procedure
     .use(LogUsage)
     .use(Analytics)
     .input(GetIdentityGroupMemberInvitationDetailsInputSchema)
