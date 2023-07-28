@@ -72,13 +72,15 @@ export const deleteAddressNodeMethod = async ({
   })
 
   // Remove any edge that references the address node
-  addressEdges.forEach(async (edge) => {
-    await caller.edges.removeEdge({
+  const edgeDeletionPromises = addressEdges.map((edge) => {
+    return caller.edges.removeEdge({
       src: edge.src.baseUrn,
       dst: edge.dst.baseUrn,
       tag: edge.tag,
     })
   })
+
+  await Promise.all(edgeDeletionPromises)
 
   await caller.edges.deleteNode({
     urn: address,
