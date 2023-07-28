@@ -247,8 +247,9 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full">
-        {!GATag ? null : (
+        {GATag && (
           <>
+            {/* <!-- Google tag (gtag.js) --> */}
             <script
               async
               src={`https://www.googletagmanager.com/gtag/js?id=${GATag}`}
@@ -277,6 +278,7 @@ export default function App() {
             <Outlet
               context={{
                 apps,
+                ENV: loaderData.ENV,
                 avatarUrl,
                 PASSPORT_URL,
                 displayName,
@@ -290,6 +292,7 @@ export default function App() {
           <Outlet
             context={{
               apps,
+              ENV: loaderData.ENV,
               avatarUrl,
               PASSPORT_URL,
               displayName,
