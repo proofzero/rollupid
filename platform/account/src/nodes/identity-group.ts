@@ -1,3 +1,4 @@
+import { RollupError } from '@proofzero/errors'
 import {
   CryptoAddressType,
   EmailAddressType,
@@ -13,6 +14,10 @@ export type InviteMemberInput = {
 
 export type MemberInvitation = InviteMemberInput & {
   timestamp: number
+}
+
+export type ClaimInvitationInput = {
+  inviteCode: string
 }
 
 export default class IdentityGroup extends DOProxy {
@@ -45,5 +50,23 @@ export default class IdentityGroup extends DOProxy {
     return (
       (await this.state.storage.get<MemberInvitation[]>('invitations')) || []
     )
+  }
+
+  async claimInvitation({ inviteCode }: ClaimInvitationInput): Promise<void> {
+    const invitations =
+      (await this.state.storage.get<MemberInvitation[]>('invitations')) || []
+
+    const invitationIndex = invitations.findIndex(
+      (invitation) => invitation.inviteCode === inviteCode
+    )
+    if (invitationIndex === -1) {
+      throw new RollupError({
+        message: 'Invitation not found',
+      })
+    }
+
+    invitations.splice(invitationIndex, 1)
+
+    await this.state.storage.put('invitations', invitations)
   }
 }

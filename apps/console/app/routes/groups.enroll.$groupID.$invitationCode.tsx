@@ -1,19 +1,24 @@
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { LoaderFunction, json, redirect } from '@remix-run/cloudflare'
+import {
+  ActionFunction,
+  LoaderFunction,
+  json,
+  redirect,
+} from '@remix-run/cloudflare'
 import createCoreClient from '@proofzero/platform-clients/core'
 import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
 } from '@proofzero/utils'
-import { BadRequestError } from '@proofzero/errors'
+import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
 import {
   IdentityGroupURNSpace,
   type IdentityGroupURN,
 } from '@proofzero/urns/identity-group'
-import { CryptoAddressType, EmailAddressType } from '@proofzero/types/address'
+import { CryptoAddressType } from '@proofzero/types/address'
 
-import { useLoaderData } from '@remix-run/react'
+import { useLoaderData, useSubmit } from '@remix-run/react'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 import { requireJWT } from '~/utilities/session.server'
@@ -77,9 +82,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       case CryptoAddressType.ETH:
         login_hint = 'wallet'
         break
-      case EmailAddressType.Email:
-        login_hint = 'email microsoft google apple'
-        break
       default:
         login_hint = invDetails.addressType
     }
@@ -121,7 +123,55 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         : EnrollmentType.Other,
       loginHint: login_hint,
       passportURL: context.env.PASSPORT_URL,
+      groupID: groupID,
+      invitationCode: invitationCode,
     })
+  }
+)
+
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context, params }) => {
+    const groupID = params.groupID
+    if (!groupID || groupID === '') {
+      throw new BadRequestError({
+        message: 'Missing group',
+      })
+    }
+
+    const identityGroupURN = `${['urn:rollupid:identity-group', groupID].join(
+      '/'
+    )}` as IdentityGroupURN
+    if (!IdentityGroupURNSpace.is(identityGroupURN)) {
+      throw new Error('Invalid group ID')
+    }
+
+    const invitationCode = params.invitationCode
+    if (!invitationCode || invitationCode === '') {
+      throw new BadRequestError({
+        message: 'Missing invitation code',
+      })
+    }
+
+    const jwt = await requireJWT(request, context.env)
+    if (!jwt) {
+      throw new UnauthorizedError({
+        message: 'Missing JWT',
+      })
+    }
+
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+
+    const coreClient = createCoreClient(context.env.Core, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
+    await coreClient.account.acceptIdentityGroupMemberInvitation.mutate({
+      invitationCode,
+      identityGroupURN,
+    })
+
+    return redirect(`/groups/${groupID}`)
   }
 )
 
@@ -133,6 +183,8 @@ export default () => {
     enrollmentType,
     loginHint,
     passportURL,
+    groupID,
+    invitationCode,
   } = useLoaderData<{
     groupName: string
     identifier: string
@@ -140,6 +192,8 @@ export default () => {
     enrollmentType: EnrollmentType
     loginHint?: string
     passportURL: string
+    groupID: string
+    invitationCode: string
   }>()
 
   const redirectToPassport = () => {
@@ -159,6 +213,8 @@ export default () => {
 
     window.location.href = `${passportURL}/authorize?${qp.toString()}`
   }
+
+  const submit = useSubmit()
 
   return (
     <div
@@ -190,7 +246,19 @@ export default () => {
               </Text>
 
               <section className="flex flex-row justify-end gap-2">
-                <Button>Accept</Button>
+                <Button
+                  onClick={() => {
+                    submit(
+                      {},
+                      {
+                        method: 'post',
+                        action: `/groups/enroll/${groupID}/${invitationCode}`,
+                      }
+                    )
+                  }}
+                >
+                  Accept
+                </Button>
                 <Button>Deny</Button>
               </section>
             </>

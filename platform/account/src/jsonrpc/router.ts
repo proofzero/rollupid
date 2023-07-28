@@ -85,7 +85,12 @@ import {
   GetIdentityGroupMemberInvitationDetailsInputSchema,
   GetIdentityGroupMemberInvitationDetailsOutputSchema,
   getIdentityGroupMemberInvitationDetails,
-} from './methods/identity-groups/getIdentityGroupmemberInvitationDetails'
+} from './methods/identity-groups/getIdentityGroupMemberInvitationDetails'
+
+import {
+  AcceptIdentityGroupMemberInvitationInputSchema,
+  acceptIdentityGroupMemberInvitation,
+} from './methods/identity-groups/acceptIdentityGroupMemberInvitation'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -243,4 +248,12 @@ export const appRouter = t.router({
     .input(GetIdentityGroupMemberInvitationDetailsInputSchema)
     .output(GetIdentityGroupMemberInvitationDetailsOutputSchema)
     .query(getIdentityGroupMemberInvitationDetails),
+  acceptIdentityGroupMemberInvitation: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(injectAccountNode)
+    .input(AcceptIdentityGroupMemberInvitationInputSchema)
+    .mutation(acceptIdentityGroupMemberInvitation),
 })
