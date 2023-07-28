@@ -151,6 +151,7 @@ export default function AppDetailIndexPage() {
     displayName,
     accountURN,
     hasUnpaidInvoices,
+    unpaidInvoiceURL,
   } = useOutletContext<OutletContextData>()
   const {
     appDetails,
@@ -203,7 +204,7 @@ export default function AppDetailIndexPage() {
             {hasUnpaidInvoices && (
               <ToastWithLink
                 message="We couldn't process payment for your account"
-                linkHref={`/billing/portal`}
+                linkHref={unpaidInvoiceURL}
                 linkText="Update payment information"
                 type={'urgent'}
               />

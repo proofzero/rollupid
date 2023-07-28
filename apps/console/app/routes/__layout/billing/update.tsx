@@ -14,6 +14,8 @@ import {
 import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { type AccountURN } from '@proofzero/urns/account'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
+import Stripe from 'stripe'
+import { type ServicePlanType } from '@proofzero/types/account'
 
 /**
  * WARNING: Here be dragons, and not the cute, cuddly kind! This code runs twice in certain scenarios because when the user
@@ -37,14 +39,20 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const subId = fd.get('subId') as string
     const redirectUrl = fd.get('redirectUrl') as string
+    const updatePlanParams = fd.get('updatePlanParams') as string
 
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
+
+    // if this method was called from "$clientId/billing" page, update the plan
+    // and assign the new plan to the app
+
     const flashSession = await getFlashSession(request, context.env)
 
     try {
+      // First we reconcile the subscriptions
       await reconcileAppSubscriptions(
         {
           subscriptionID: subId,
@@ -55,6 +63,33 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         },
         context.env
       )
+
+      // Then based on reconciled result we update the plan
+      // We call this only if we update the plan for the app
+      if (updatePlanParams.length) {
+        const { clientId, plan } = JSON.parse(updatePlanParams) as {
+          clientId: string
+          plan: ServicePlanType
+          paymentIntentId: string
+        }
+
+        const entitlements = await coreClient.account.getEntitlements.query({
+          accountURN,
+        })
+
+        const numberOfEntitlements = entitlements.plans[plan]?.entitlements
+        const apps = await coreClient.starbase.listApps.query()
+        const allotedApps = apps.filter((a) => a.appPlan === plan).length
+
+        if (numberOfEntitlements && numberOfEntitlements > allotedApps) {
+          await coreClient.starbase.setAppPlan.mutate({
+            accountURN,
+            clientId,
+            plan,
+          })
+        }
+      }
+
       flashSession.flash(
         'toast_notification',
         JSON.stringify({

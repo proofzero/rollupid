@@ -207,7 +207,13 @@ const processPurchaseOp = async (
     sub,
     flashSession,
   })
-  if (sub.status === 'active' || sub.status === 'trialing') {
+
+  const invoiceStatus = (sub.latest_invoice as Stripe.Invoice)?.status
+
+  if (
+    (sub.status === 'active' || sub.status === 'trialing') &&
+    invoiceStatus === 'paid'
+  ) {
     await coreClient.account.updateEntitlements.mutate({
       accountURN: accountURN,
       subscriptionID: sub.id,
@@ -753,6 +759,10 @@ export default () => {
         status,
         client_secret,
         payment_method,
+        updatePlanParams: {
+          clientId: appDetails.clientId,
+          plan: ServicePlanType.PRO,
+        },
         redirectUrl: `/apps/${appDetails.clientId}/billing`,
       })
     }
