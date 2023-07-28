@@ -51,10 +51,6 @@
 * [Passport API](reference/passport-api.md)
 * [Scopes](reference/scopes.md)
 
-***
-
-* [Page](page.md)
-
 ## Troubleshooting
 
 * [FAQ](troubleshooting/faq.md)
