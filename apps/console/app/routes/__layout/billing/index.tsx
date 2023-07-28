@@ -63,7 +63,6 @@ import {
   type DropdownSelectListItem,
 } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
-import { ToastInfo } from '@proofzero/design-system/src/atoms/toast/ToastInfo'
 import { DangerPill } from '@proofzero/design-system/src/atoms/pills/DangerPill'
 import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { useHydrated } from 'remix-utils'
@@ -81,6 +80,7 @@ import { IoWarningOutline } from 'react-icons/io5'
 import { type ToastNotification } from '~/types'
 import { setPurchaseToastNotification } from '~/utils'
 import type Stripe from 'stripe'
+import { ToastWarning } from '@proofzero/design-system/src/atoms/toast/ToastWarning'
 
 type LoaderData = {
   STRIPE_PUBLISHABLE_KEY: string
@@ -403,6 +403,7 @@ const PurchaseProModal = ({
           <ToastWithLink
             message="Update your Payment Information to enable purchasing"
             linkHref={`/billing/payment`}
+            type={'warning'}
             linkText="Update payment information"
           />
         </section>
@@ -1089,6 +1090,7 @@ export default () => {
             <ToastWithLink
               message="Update your Payment Information to enable purchasing"
               linkHref={`/billing/payment`}
+              type={'warning'}
               linkText="Update payment information"
             />
           </article>
@@ -1096,7 +1098,7 @@ export default () => {
 
         {!paymentData && (
           <article className="mb-3.5">
-            <ToastInfo message="Please fill Billing Contact Section" />
+            <ToastWarning message="Please fill Billing Contact Section" />
           </article>
         )}
       </section>

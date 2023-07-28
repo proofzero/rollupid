@@ -451,6 +451,7 @@ const PurchaseConfirmationModal = ({
           <ToastWithLink
             message="Please add Billing Information in Billing & Invoicing section"
             linkHref={`/billing/`}
+            type={'warning'}
             linkText="Add Billing Information"
           />
         </section>
@@ -461,6 +462,7 @@ const PurchaseConfirmationModal = ({
           <ToastWithLink
             message="Update your Payment Information to enable purchasing"
             linkHref={`/billing/payment`}
+            type={'warning'}
             linkText="Update payment information"
           />
         </section>
