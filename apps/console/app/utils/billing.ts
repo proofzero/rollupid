@@ -167,9 +167,7 @@ export const process3DSecureCard = async ({
         subId,
         redirectUrl: redirectUrl ? redirectUrl : '/billing',
         updatePlanParams: updatePlanParams
-          ? JSON.stringify({
-              updatePlanParams,
-            })
+          ? JSON.stringify(updatePlanParams)
           : '',
       },
       {
