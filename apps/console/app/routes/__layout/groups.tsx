@@ -28,6 +28,7 @@ type GroupModel = {
 type GroupRootLoaderData = {
   groups: GroupModel[]
   CONSOLE_URL: string
+  ownAddressURNList: AddressURN[]
 }
 
 export type GroupRootContextData = GroupRootLoaderData
@@ -82,9 +83,16 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
     )
 
+    const ownAddresses = await coreClient.account.getOwnAddresses.query({
+      account: accountURN,
+    })
+    const ownAddressURNList =
+      ownAddresses?.map((a) => a.baseUrn as AddressURN) ?? []
+
     return json<GroupRootLoaderData>({
       groups: mappedGroups,
       CONSOLE_URL: context.env.CONSOLE_URL,
+      ownAddressURNList,
     })
   }
 )

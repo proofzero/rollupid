@@ -356,7 +356,8 @@ const InviteMemberModal = ({
 }
 
 export default () => {
-  const { groups, CONSOLE_URL } = useOutletContext<GroupRootContextData>()
+  const { groups, CONSOLE_URL, ownAddressURNList } =
+    useOutletContext<GroupRootContextData>()
   const { URN, groupID, invitations } = useLoaderData<LoaderData>()
 
   const group = useRef(groups.find((group) => group.URN === URN))
@@ -533,15 +534,17 @@ export default () => {
                           {item.val.title}
                         </Text>
 
-                        <Pill className="bg-indigo-50 rounded-lg !pr-2">
-                          <Text
-                            size="xs"
-                            weight="semibold"
-                            className="text-indigo-500 text-[10px]"
-                          >
-                            YOU
-                          </Text>
-                        </Pill>
+                        {ownAddressURNList.includes(item.key) && (
+                          <Pill className="bg-indigo-50 rounded-lg !pr-2">
+                            <Text
+                              size="xs"
+                              weight="semibold"
+                              className="text-indigo-500 text-[10px]"
+                            >
+                              YOU
+                            </Text>
+                          </Pill>
+                        )}
                       </div>
 
                       <div className="flex flex-row items-center gap-1 text-gray-500 truncate">
