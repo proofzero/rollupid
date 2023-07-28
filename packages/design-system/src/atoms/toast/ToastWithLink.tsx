@@ -35,7 +35,7 @@ export const ToastWithLink = ({
     remove={remove}
     PreMessage={ToastIcon[type]}
     PostMessage={
-      <a href={linkHref} rel="noreferrer" target="_blank">
+      <a href={linkHref}>
         <Text size="sm" weight="medium">
           {`${linkText} ->`}
         </Text>

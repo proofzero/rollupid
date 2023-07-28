@@ -45,9 +45,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
-    const stripeClient = new Stripe(context.env.SECRET_STRIPE_API_KEY, {
-      apiVersion: '2022-11-15',
-    })
 
     // if this method was called from "$clientId/billing" page, update the plan
     // and assign the new plan to the app
@@ -70,9 +67,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       // Then based on reconciled result we update the plan
       // We call this only if we update the plan for the app
       if (updatePlanParams.length) {
-        const { clientId, plan, paymentIntentId } = JSON.parse(
-          updatePlanParams
-        ) as {
+        const { clientId, plan } = JSON.parse(updatePlanParams) as {
           clientId: string
           plan: ServicePlanType
           paymentIntentId: string
@@ -86,14 +81,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         const apps = await coreClient.starbase.listApps.query()
         const allotedApps = apps.filter((a) => a.appPlan === plan).length
 
-        const paymentIntent = await stripeClient.paymentIntents.retrieve(
-          paymentIntentId
-        )
-        if (
-          paymentIntent.status === 'succeeded' &&
-          numberOfEntitlements &&
-          numberOfEntitlements > allotedApps
-        ) {
+        if (numberOfEntitlements && numberOfEntitlements > allotedApps) {
           await coreClient.starbase.setAppPlan.mutate({
             accountURN,
             clientId,
