@@ -10,10 +10,23 @@ import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 export default () => {
   const navigate = useNavigate()
-  const { apps } = useOutletContext<OutletContextData>()
+  const { apps, ENV } = useOutletContext<OutletContextData>()
+
+  const GATag = ENV?.INTERNAL_GOOGLE_ANALYTICS_TAG
 
   return (
     <>
+      {GATag && (
+        <>
+          {/* <!-- Event snippet for Sign-up conversion page -->  */}
+          <script
+            async
+            dangerouslySetInnerHTML={{
+              __html: `gtag('event', 'conversion', {'send_to': '${GATag}/x8scCNaPzMgYEPT6sYEq'});`,
+            }}
+          />
+        </>
+      )}
       <div className="mb-11">
         <InfoPanelDashboard />
       </div>
