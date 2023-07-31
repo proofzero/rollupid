@@ -1,5 +1,5 @@
+import identityResolver from './identity'
 import accountResolver from './account'
-import addressResolver from './address'
 import appResolver from './app'
 
-export { accountResolver, addressResolver, appResolver }
+export { identityResolver, accountResolver, appResolver }

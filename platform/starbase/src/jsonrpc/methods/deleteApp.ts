@@ -23,7 +23,7 @@ export const deleteApp = async ({
       `Request received for clientId ${input.clientId} which is not owned by provided account.`
     )
 
-  if (!ctx.accountURN) throw new Error('No account URN in context')
+  if (!ctx.identityURN) throw new Error('No identity URN in context')
 
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
@@ -52,7 +52,7 @@ export const deleteApp = async ({
     ),
     //Application edge
     caller.edges.removeEdge({
-      src: ctx.accountURN,
+      src: ctx.identityURN,
       dst: appURN,
       tag: EDGE_APPLICATION,
     }),

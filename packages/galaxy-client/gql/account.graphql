@@ -1,35 +1,33 @@
-query getProfile($targetAccountURN: String) {
-  profile(targetAccountURN: $targetAccountURN) {
-    pfp {
-      ... on StandardPFP {
-        image
-      }
-      ... on NFTPFP {
-        image
-        isToken
-      }
-    }
-    displayName
-  }
-}
-
-query getConnectedAddresses($targetAccountURN: String) {
-  addresses: connectedAddresses(targetAccountURN: $targetAccountURN) {
-    baseUrn
-    qc
-    rc
-  }
-}
-
-query getAuthorizedApps {
-  authorizedApps {
-    clientId
-    icon
+query getAccountProfile($accountURN: String!) {
+  accountProfile(accountURN: $accountURN) {
+    id
+    type
+    address
     title
-    timestamp
+    icon
   }
 }
 
-mutation disconnectAddress($addressURN: String!) {
-  disconnectAddress(addressURN: $addressURN)
+query getAccountProfiles($accountURNList: [String!]) {
+  accountProfiles(accountURNList: $accountURNList) {
+    id
+    type
+    address
+    title
+    icon
+  }
+}
+
+query getIdentityURNFromAlias($provider: String!, $alias: String!) {
+  identityFromAlias(provider: $provider, alias: $alias)
+}
+
+mutation updateAccountNickname($accountURN: String!, $nickname: String!) {
+  updateAccountNickname(accountURN: $accountURN, nickname: $nickname)
+}
+
+mutation updateConnectedAccountsProperties(
+  $accountURNList: [ConnectedAccountPropertiesUpdateInput!]!
+) {
+  updateConnectedAccountsProperties(accountURNList: $accountURNList)
 }

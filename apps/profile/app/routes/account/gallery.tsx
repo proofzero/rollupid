@@ -37,7 +37,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import SaveButton from '~/components/accounts/SaveButton'
 import PfpNftModal from '~/components/accounts/PfpNftModal'
-import NoCryptoAddresses from '~/components/accounts/NoCryptoAddresses'
+import NoCryptoAccounts from '~/components/accounts/NoCryptoAccounts'
 
 // Other helpers
 import { getAccessToken, parseJwt } from '~/utils/session.server'
@@ -49,13 +49,13 @@ import type { Maybe } from 'graphql/jsutils/Maybe'
 import type { NFT } from '~/types'
 import { GallerySchema } from '~/validation'
 import { getValidGallery } from '~/helpers/alchemy'
-import type { AccountURN } from '@proofzero/urns/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData()
 
   const jwt = await getAccessToken(request, context.env)
-  const { sub: accountURN } = parseJwt(jwt)
+  const { sub: identityURN } = parseJwt(jwt)
 
   const updatedGallery = formData.get('gallery') as string
   if (!updatedGallery) {
@@ -73,7 +73,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   }
 
   const currentProfile = await context.env.ProfileKV.get<FullProfile>(
-    accountURN!,
+    identityURN!,
     'json'
   )
   const updatedProfile = Object.assign(currentProfile || {}, {
@@ -84,13 +84,13 @@ export const action: ActionFunction = async ({ request, context }) => {
   updatedProfile.gallery = await getValidGallery(
     {
       gallery: updatedProfile.gallery,
-      accountURN: accountURN as AccountURN,
+      identityURN: identityURN as IdentityURN,
     },
     context.env,
     context.traceSpan
   )
 
-  await context.env.ProfileKV.put(accountURN!, JSON.stringify(updatedProfile))
+  await context.env.ProfileKV.put(identityURN!, JSON.stringify(updatedProfile))
 
   return true
 }
@@ -167,10 +167,10 @@ const SortableNft = (props: { url?: Maybe<string>; id: string }) => {
 
 const GalleryComponent = () => {
   const actionData = useActionData()
-  const { profile, cryptoAddresses, notify, accountURN } = useOutletContext<{
+  const { profile, cryptoAccounts, notify, identityURN } = useOutletContext<{
     profile: FullProfile
-    accountURN: string
-    cryptoAddresses: Node[]
+    identityURN: string
+    cryptoAccounts: Node[]
     notify: (success: boolean) => void
   }>()
 
@@ -243,11 +243,11 @@ const GalleryComponent = () => {
     const chain =
       collection !== ''
         ? modalFetcher.data?.ownedNfts.filter(
-          (nft: NFT) => nft.contract.address === collection
-        )[0].chain.chain
+            (nft: NFT) => nft.contract.address === collection
+          )[0].chain.chain
         : null
 
-    getMoreNftsModal(modalFetcher, accountURN, collection, chain)
+    getMoreNftsModal(modalFetcher, identityURN, collection, chain)
   }, [collection])
 
   return (
@@ -259,7 +259,7 @@ const GalleryComponent = () => {
         Here you can curate your profile gallery to show off your most precious
         NFTs
       </Text>
-      {cryptoAddresses?.length ? (
+      {cryptoAccounts?.length ? (
         <Form method="post">
           <fieldset disabled={transition.state !== 'idle'}>
             <PfpNftModal
@@ -352,10 +352,11 @@ const GalleryComponent = () => {
                     type="button"
                     className={`w-full h-full
               bg-gray-50 hover:bg-gray-100 transition-colors
-              rounded-lg transition-opacity ${activeId ? 'opacity-0' : 'opacity-100'
-                      }`}
-                    disabled={!cryptoAddresses?.length}
-                    onClick={() => setIsOpen(!!cryptoAddresses?.length)}
+              rounded-lg transition-opacity ${
+                activeId ? 'opacity-0' : 'opacity-100'
+              }`}
+                    disabled={!cryptoAccounts?.length}
+                    onClick={() => setIsOpen(!!cryptoAccounts?.length)}
                   >
                     <div
                       className="flex flex-col justify-center items-center h-full
@@ -421,7 +422,7 @@ const GalleryComponent = () => {
           </fieldset>
         </Form>
       ) : (
-        <NoCryptoAddresses
+        <NoCryptoAccounts
           redirectHandler={() => {
             navigate('/account/connections')
           }}

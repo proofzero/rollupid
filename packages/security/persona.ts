@@ -1,11 +1,14 @@
-import { AccessURN, AccessURNSpace } from '@proofzero/urns/access'
-import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
+import {
+  AuthorizationURN,
+  AuthorizationURNSpace,
+} from '@proofzero/urns/authorization'
+import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 import {
   generateTraceContextHeaders,
   TraceSpan,
 } from '@proofzero/platform-middleware/trace'
-import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
-import { PlatformAddressURNHeader } from '@proofzero/types/headers'
+import { IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
+import { PlatformAccountURNHeader } from '@proofzero/types/headers'
 import {
   BadRequestError,
   InternalServerError,
@@ -13,21 +16,21 @@ import {
   UnauthorizedError,
 } from '@proofzero/errors'
 import {
-  CryptoAddressType,
-  EmailAddressType,
-  OAuthAddressType,
-} from '@proofzero/types/address'
+  CryptoAccountType,
+  EmailAccountType,
+  OAuthAccountType,
+} from '@proofzero/types/account'
 import {
   AuthorizationControlSelection,
   PersonaData,
 } from '@proofzero/types/application'
 import { AnyURN } from '@proofzero/urns'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
-import { NO_OP_ADDRESS_PLACEHOLDER } from '@proofzero/platform.address/src/constants'
+import { NO_OP_ACCOUNT_PLACEHOLDER } from '@proofzero/platform.account/src/constants'
 import createCoreClient from '@proofzero/platform-clients/core'
 
 export async function validatePersonaData(
-  accountUrn: AccountURN,
+  identityURN: IdentityURN,
   personaData: PersonaData,
   coreFetcher: Fetcher,
   traceSpan: TraceSpan
@@ -38,72 +41,72 @@ export async function validatePersonaData(
   for (const [scopeName, claimValue] of Object.entries(personaData)) {
     //TODO: Make this more generic to apply to any claims
     if (scopeName === 'email') {
-      const addressUrnForEmail = claimValue
-      if (!AddressURNSpace.is(addressUrnForEmail))
+      const accountUrnForEmail = claimValue
+      if (!AccountURNSpace.is(accountUrnForEmail))
         throw new BadRequestError({
-          message: 'Bad data received for address identifier',
+          message: 'Bad data received for account identifier',
         })
 
       const coreClient = createCoreClient(coreFetcher, {
-        [PlatformAddressURNHeader]: addressUrnForEmail,
+        [PlatformAccountURNHeader]: accountUrnForEmail,
         ...generateTraceContextHeaders(traceSpan),
       })
-      const retrievedAccountUrn = await coreClient.address.getAccount.query()
+      const retrievedIdentityUrn = await coreClient.account.getIdentity.query()
 
-      if (retrievedAccountUrn !== accountUrn)
+      if (retrievedIdentityUrn !== identityURN)
         throw new BadRequestError({
-          message: 'Address provided does not belong to authenticated account',
+          message: 'Account provided does not belong to authenticated identity',
         })
 
-      const addressProfile = await coreClient.address.getAddressProfile.query()
+      const accountProfile = await coreClient.account.getAccountProfile.query()
       if (
-        addressProfile.type !== OAuthAddressType.Google &&
-        addressProfile.type !== OAuthAddressType.Microsoft &&
-        addressProfile.type !== OAuthAddressType.Apple &&
-        addressProfile.type !== EmailAddressType.Email
+        accountProfile.type !== OAuthAccountType.Google &&
+        accountProfile.type !== OAuthAccountType.Microsoft &&
+        accountProfile.type !== OAuthAccountType.Apple &&
+        accountProfile.type !== EmailAccountType.Email
       )
         throw new BadRequestError({
-          message: 'Address provided is not an email-compatible address',
+          message: 'Account provided is not an email-compatible account',
         })
     } else if (['connected_accounts', 'erc_4337'].includes(scopeName)) {
-      const authorizedAddressUrns = claimValue
+      const authorizedAccountUrns = claimValue
 
       //If user selection is ALL, there's nothing further to validate
       if (claimValue === AuthorizationControlSelection.ALL) continue
 
-      //If user selection is not ALL, check expected data type in personaData, ie. AddressURN[]
+      //If user selection is not ALL, check expected data type in personaData, ie. AccountURN[]
       if (
         !(
-          authorizedAddressUrns &&
-          Array.isArray(authorizedAddressUrns) &&
-          authorizedAddressUrns.every((e) => AddressURNSpace.is(e))
+          authorizedAccountUrns &&
+          Array.isArray(authorizedAccountUrns) &&
+          authorizedAccountUrns.every((e) => AccountURNSpace.is(e))
         )
       ) {
         throw new BadRequestError({
-          message: 'Bad data received for list of address identifiers',
+          message: 'Bad data received for list of account identifiers',
         })
       }
 
       const coreClient = createCoreClient(coreFetcher, {
         ...generateTraceContextHeaders(traceSpan),
       })
-      const accountAddresses = await coreClient.account.getAddresses.query({
-        account: accountUrn,
+      const identityAccounts = await coreClient.identity.getAccounts.query({
+        identity: identityURN,
       })
 
-      const ownedAddressURNList =
-        accountAddresses?.map((aa) => aa.baseUrn) || []
+      const ownedAccountURNList =
+        identityAccounts?.map((aa) => aa.baseUrn) || []
 
-      //Check if authorized address set is fully owned by the account doing the authorization
+      //Check if authorized account set is fully owned by the identity doing the authorization
       if (
-        !accountAddresses ||
-        !authorizedAddressUrns.every((addressURN) =>
-          ownedAddressURNList.includes(addressURN)
+        !identityAccounts ||
+        !authorizedAccountUrns.every((accountURN) =>
+          ownedAccountURNList.includes(accountURN)
         )
       ) {
         throw new UnauthorizedError({
           message:
-            'Mismatch in addresses provided vs addresses connected to account',
+            'Mismatch in accounts provided vs accounts connected to identity',
         })
       }
     }
@@ -113,7 +116,7 @@ export async function validatePersonaData(
 /* Sets authorization references to other nodes in the graph. Assumes that
  * validation has been executed and trusts validity of data being passed in */
 export async function setPersonaReferences(
-  accessNode: AccessURN,
+  authorizationNode: AuthorizationURN,
   scope: string[],
   personaData: PersonaData,
   coreFetcher: Fetcher,
@@ -134,8 +137,8 @@ export async function setPersonaReferences(
     ) {
       //This (correctly) gets skipped when personaData value of
       //connected_accounts is set to ALL
-      personaData.connected_accounts.forEach((addressUrn) =>
-        uniqueAuthorizationReferences.add(addressUrn)
+      personaData.connected_accounts.forEach((accountUrn) =>
+        uniqueAuthorizationReferences.add(accountUrn)
       )
     } else if (
       scopeEntry === 'erc_4337' &&
@@ -144,8 +147,8 @@ export async function setPersonaReferences(
     ) {
       //This (correctly) gets skipped when personaData value of
       //erc_4337 is set to ALL
-      personaData.erc_4337.forEach((addressUrn) =>
-        uniqueAuthorizationReferences.add(addressUrn)
+      personaData.erc_4337.forEach((accountUrn) =>
+        uniqueAuthorizationReferences.add(accountUrn)
       )
     }
   }
@@ -160,7 +163,7 @@ export async function setPersonaReferences(
 
   //Get existing references
   const edgesToDelete = await coreClient.edges.getEdges.query({
-    query: { tag: EDGE_HAS_REFERENCE_TO, src: { baseUrn: accessNode } },
+    query: { tag: EDGE_HAS_REFERENCE_TO, src: { baseUrn: authorizationNode } },
   })
 
   //Delete existing references
@@ -178,7 +181,7 @@ export async function setPersonaReferences(
     [...uniqueAuthorizationReferences].map((refUrn) => {
       //This returns promises that get awaited collectively above
       return coreClient.edges.makeEdge.mutate({
-        src: accessNode,
+        src: authorizationNode,
         tag: EDGE_HAS_REFERENCE_TO,
         dst: refUrn,
       })
@@ -211,9 +214,9 @@ export type ClaimData = {
 
 export type ScopeClaimRetrieverFunction = (
   scopeEntry: ScopeValueName,
-  accountUrn: AccountURN,
+  identityURN: IdentityURN,
   clientId: string,
-  accessUrn: AccessURN,
+  authorizationUrn: AuthorizationURN,
   coreFetcher: Fetcher,
   personaData: PersonaData,
   traceSpan: TraceSpan
@@ -240,9 +243,9 @@ class InvalidPersonaDataError extends RollupError {
 //These retriever functions will be moved elsewhere as part of ticket #2013
 async function emailClaimRetriever(
   scopeEntry: ScopeValueName,
-  accountUrn: AccountURN,
+  identityURN: IdentityURN,
   clientId: string,
-  accessUrn: AccessURN,
+  authorizationUrn: AuthorizationURN,
   coreFetcher: Fetcher,
   personaData: PersonaData,
   traceSpan: TraceSpan
@@ -253,22 +256,22 @@ async function emailClaimRetriever(
   )
 
   if (personaData.email) {
-    const emailAddressUrn = personaData.email
+    const emailAccountUrn = personaData.email
     const edgesResults = await coreClient.edges.getEdges.query({
       query: {
-        src: { baseUrn: accessUrn },
-        dst: { baseUrn: emailAddressUrn },
+        src: { baseUrn: authorizationUrn },
+        dst: { baseUrn: emailAccountUrn },
         tag: EDGE_HAS_REFERENCE_TO,
       },
     })
-    const emailAddress = edgesResults.edges[0].dst.qc.alias
+    const emailAccount = edgesResults.edges[0].dst.qc.alias
     const claimData: ClaimData = {
       [scopeEntry]: {
         claims: {
-          email: emailAddress,
+          email: emailAccount,
         },
         meta: {
-          urns: [emailAddressUrn],
+          urns: [emailAccountUrn],
           valid: true,
         },
       },
@@ -280,9 +283,9 @@ async function emailClaimRetriever(
 
 async function profileClaimsRetriever(
   scopeEntry: ScopeValueName,
-  accountUrn: AccountURN,
+  identityURN: IdentityURN,
   clientId: string,
-  accessUrn: AccessURN,
+  authorizationUrn: AuthorizationURN,
   coreFetcher: Fetcher,
   personaData: PersonaData,
   traceSpan: TraceSpan
@@ -292,7 +295,7 @@ async function profileClaimsRetriever(
     generateTraceContextHeaders(traceSpan)
   )
   const nodeResult = await coreClient.edges.findNode.query({
-    baseUrn: accountUrn,
+    baseUrn: identityURN,
   })
   if (nodeResult && nodeResult.baseUrn) {
     return {
@@ -312,9 +315,9 @@ async function profileClaimsRetriever(
 
 async function erc4337ClaimsRetriever(
   scopeEntry: ScopeValueName,
-  accountUrn: AccountURN,
+  identityURN: IdentityURN,
   clientId: string,
-  accessUrn: AccessURN,
+  authorizationUrn: AuthorizationURN,
   coreFetcher: Fetcher,
   personaData: PersonaData,
   traceSpan: TraceSpan
@@ -339,38 +342,38 @@ async function erc4337ClaimsRetriever(
   if (personaData.erc_4337 === AuthorizationControlSelection.ALL) {
     //Referencable persona submission pointing to all connected sc wallets
     //at any point in time
-    const accountAddresses =
+    const identityAccounts =
       (
-        await coreClient.account.getAddresses.query({
-          account: accountUrn,
+        await coreClient.identity.getAccounts.query({
+          identity: identityURN,
         })
       )?.filter(
-        (address) => address.rc.addr_type === CryptoAddressType.Wallet
+        (account) => account.rc.addr_type === CryptoAccountType.Wallet
       ) || []
 
-    for (const addressNode of accountAddresses) {
+    for (const accountNode of identityAccounts) {
       result.erc_4337.claims.erc_4337.push({
-        type: addressNode.rc.addr_type,
-        identifier: addressNode.qc.alias,
+        type: accountNode.rc.addr_type,
+        identifier: accountNode.qc.alias,
       })
-      result.erc_4337.meta.urns.push(addressNode.baseUrn)
+      result.erc_4337.meta.urns.push(accountNode.baseUrn)
     }
   } else {
-    const walletAddressUrns = personaData.erc_4337 as AddressURN[]
+    const walletAccountUrns = personaData.erc_4337 as AccountURN[]
 
     const coreClient = createCoreClient(
       coreFetcher,
       generateTraceContextHeaders(traceSpan)
     )
-    const addressProfiles =
-      await coreClient.address.getAddressProfileBatch.query(walletAddressUrns)
+    const accountProfiles =
+      await coreClient.account.getAccountProfileBatch.query(walletAccountUrns)
 
-    addressProfiles.forEach((profile, idx) => {
+    accountProfiles.forEach((profile, idx) => {
       result.erc_4337.claims.erc_4337.push({
         nickname: profile.title,
         address: profile.address,
       })
-      result.erc_4337.meta.urns.push(walletAddressUrns[idx])
+      result.erc_4337.meta.urns.push(walletAccountUrns[idx])
     })
   }
   return result
@@ -378,9 +381,9 @@ async function erc4337ClaimsRetriever(
 
 async function connectedAccountsClaimsRetriever(
   scopeEntry: ScopeValueName,
-  accountUrn: AccountURN,
+  identityURN: IdentityURN,
   clientId: string,
-  accessUrn: AccessURN,
+  authorizationUrn: AuthorizationURN,
   coreFetcher: Fetcher,
   personaData: PersonaData,
   traceSpan: TraceSpan
@@ -403,43 +406,43 @@ async function connectedAccountsClaimsRetriever(
   )
 
   if (personaData.connected_accounts === AuthorizationControlSelection.ALL) {
-    //Referencable persona submission pointing to all connected addresses
+    //Referencable persona submission pointing to all connected accounts
     //at any point in time
-    const accountAddresses =
+    const identityAccounts =
       (
-        await coreClient.account.getAddresses.query({
-          account: accountUrn,
+        await coreClient.identity.getAccounts.query({
+          identity: identityURN,
         })
       )?.filter(
-        (address) => address.rc.addr_type !== CryptoAddressType.Wallet
+        (account) => account.rc.addr_type !== CryptoAccountType.Wallet
       ) || []
 
-    for (const addressNode of accountAddresses) {
+    for (const accountNode of identityAccounts) {
       result.connected_accounts.claims.connected_accounts.push({
-        type: addressNode.rc.addr_type,
-        identifier: addressNode.qc.alias,
+        type: accountNode.rc.addr_type,
+        identifier: accountNode.qc.alias,
       })
-      result.connected_accounts.meta.urns.push(addressNode.baseUrn)
+      result.connected_accounts.meta.urns.push(accountNode.baseUrn)
     }
   } else {
-    //Static persona submission of addresses
-    const authorizedAddresses = personaData.connected_accounts as AddressURN[]
+    //Static persona submission of accounts
+    const authorizedAccounts = personaData.connected_accounts as AccountURN[]
 
-    const nodeQueries = authorizedAddresses.map((address) => ({
-      baseUrn: address,
+    const nodeQueries = authorizedAccounts.map((account) => ({
+      baseUrn: account,
     }))
     const nodeResults = await coreClient.edges.findNodeBatch.query(nodeQueries)
 
-    nodeResults.forEach((addressNode, i) => {
-      if (!addressNode)
+    nodeResults.forEach((accountNode, i) => {
+      if (!accountNode)
         throw new InternalServerError({
-          message: `Did not find result for node ${authorizedAddresses[i]}`,
+          message: `Did not find result for node ${authorizedAccounts[i]}`,
         })
       result.connected_accounts.claims.connected_accounts.push({
-        type: addressNode.rc.addr_type,
-        identifier: addressNode.qc.alias,
+        type: accountNode.rc.addr_type,
+        identifier: accountNode.qc.alias,
       })
-      result.connected_accounts.meta.urns.push(addressNode.baseUrn)
+      result.connected_accounts.meta.urns.push(accountNode.baseUrn)
     })
   }
   return result
@@ -456,7 +459,7 @@ export const scopeClaimRetrievers: Record<
 }
 
 export async function getClaimValues(
-  accountUrn: AccountURN,
+  identityURN: IdentityURN,
   clientId: string,
   scope: string[],
   coreFetcher: Fetcher,
@@ -471,14 +474,15 @@ export async function getClaimValues(
       coreFetcher,
       generateTraceContextHeaders(traceSpan)
     )
-    personaData = await coreClient.access.getPersonaData.query({
-      accountUrn,
+    personaData = await coreClient.authorization.getPersonaData.query({
+      identityURN,
       clientId,
     })
   }
 
-  const accessId = `${AccountURNSpace.decode(accountUrn)}@${clientId}`
-  const accessUrn = AccessURNSpace.componentizedUrn(accessId)
+  const authorizationId = `${IdentityURNSpace.decode(identityURN)}@${clientId}`
+  const authorizationUrn =
+    AuthorizationURNSpace.componentizedUrn(authorizationId)
 
   const retrieverPromises = scope.map((scopeValue) => {
     const retrieverFunction = scopeClaimRetrievers[scopeValue]
@@ -486,9 +490,9 @@ export async function getClaimValues(
     else
       return retrieverFunction(
         scopeValue,
-        accountUrn,
+        identityURN,
         clientId,
-        accessUrn,
+        authorizationUrn,
         coreFetcher,
         personaData || {},
         traceSpan

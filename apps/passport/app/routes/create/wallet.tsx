@@ -27,15 +27,15 @@ import { createNewSCWallet } from '~/utils/authorize.server'
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const authzCookieParams = await getAuthzCookieParams(request, context.env)
-    const { jwt, accountUrn } = await getValidatedSessionContext(
+    const { jwt, identityURN } = await getValidatedSessionContext(
       request,
       authzCookieParams,
       context.env,
       context.traceSpan
     )
     const coreClient = getCoreClient({ context, jwt })
-    const profile = await coreClient.account.getProfile.query({
-      account: accountUrn,
+    const profile = await coreClient.identity.getProfile.query({
+      identity: identityURN,
     })
 
     const formData = await request.formData()
@@ -43,7 +43,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     await createNewSCWallet({
       nickname,
-      primaryAddressURN: profile?.primaryAddressURN!,
+      primaryAccountURN: profile?.primaryAccountURN!,
       env: context.env,
       traceSpan: context.traceSpan,
     })

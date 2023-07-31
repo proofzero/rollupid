@@ -11,7 +11,7 @@ import { TbWorld } from 'react-icons/tb'
 import { Button, Text } from '@proofzero/design-system'
 
 import { useNavigate } from '@remix-run/react'
-import { ServicePlanType } from '@proofzero/types/account'
+import { ServicePlanType } from '@proofzero/types/identity'
 import { Pill } from '@proofzero/design-system/src/atoms/pills/Pill'
 
 // Utility

@@ -13,7 +13,7 @@ import {
 } from '@remix-run/react'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
 import { getCoreClient } from '~/platform.server'
-import { authenticateAddress } from '~/utils/authenticate.server'
+import { authenticateAccount } from '~/utils/authenticate.server'
 import { useEffect, useState } from 'react'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
@@ -48,14 +48,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const actionRes = await otpAction({ request, context, params })
-    const { addressURN, successfulVerification } = await actionRes.json()
+    const { accountURN, successfulVerification } = await actionRes.json()
 
     if (successfulVerification) {
       const appData = await getAuthzCookieParams(request, context.env)
-      const coreClient = getCoreClient({ context, addressURN })
+      const coreClient = getCoreClient({ context, accountURN })
 
-      const { accountURN, existing } =
-        await coreClient.address.resolveAccount.query({
+      const { identityURN, existing } =
+        await coreClient.account.resolveIdentity.query({
           jwt: await getUserSession(request, context.env, appData?.clientId),
           force:
             !appData ||
@@ -64,9 +64,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           clientId: appData?.clientId,
         })
 
-      return authenticateAddress(
-        addressURN,
+      return authenticateAccount(
         accountURN,
+        identityURN,
         appData,
         request,
         context.env,

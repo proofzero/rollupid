@@ -15,10 +15,10 @@ import {
 } from './jsonrpc/validators/customdomain'
 
 import {
-  GetAuthorizedAccountsMethodInput,
-  GetAuthorizedAccountsMethodOutput,
+  GetAuthorizedIdentitiesMethodInput,
+  GetAuthorizedIdentitiesMethodOutput,
   AuthorizedUser,
-} from './jsonrpc/methods/getAuthorizedAccounts'
+} from './jsonrpc/methods/getAuthorizedIdentities'
 import { EdgesMetadata } from '../../edges/src/jsonrpc/validators/edge'
 
 export const EDGE_APPLICATION: EdgeURN = EdgeSpace.urn('owns/app')
@@ -30,11 +30,11 @@ export type AppAllFields = z.infer<typeof AllFieldsSchema>
 export type AppClientIdParam = z.infer<typeof AppClientIdParamSchema>
 export type AppObject = z.infer<typeof AppObjectSchema>
 
-export type AuthorizedAccountsParams = z.infer<
-  typeof GetAuthorizedAccountsMethodInput
+export type AuthorizedIdentitiesParams = z.infer<
+  typeof GetAuthorizedIdentitiesMethodInput
 >
-export type AuthorizedAccountsOutput = z.infer<
-  typeof GetAuthorizedAccountsMethodOutput
+export type AuthorizedIdentitiesOutput = z.infer<
+  typeof GetAuthorizedIdentitiesMethodOutput
 >
 export type AuthorizedUser = z.infer<typeof AuthorizedUser>
 export type EdgesMetadata = z.infer<typeof EdgesMetadata>

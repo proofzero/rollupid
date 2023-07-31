@@ -1,4 +1,4 @@
-import { ServicePlanType } from '@proofzero/types/account'
+import { ServicePlanType } from '@proofzero/types/identity'
 
 type PlanFeature = {
   title: string

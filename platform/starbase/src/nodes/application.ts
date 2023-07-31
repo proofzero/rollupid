@@ -37,7 +37,7 @@ import { InternalServerError } from '@proofzero/errors'
 import type { CustomDomain } from '../types'
 import { getCloudflareFetcher, getCustomHostname } from '../utils/cloudflare'
 import { getDNSRecordValue } from '@proofzero/utils'
-import { ServicePlanType } from '@proofzero/types/account'
+import { ServicePlanType } from '@proofzero/types/identity'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields

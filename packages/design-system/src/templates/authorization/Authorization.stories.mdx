@@ -15,10 +15,10 @@ import { OptionType } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 import {
   NodeType,
-  OAuthAddressType,
-  EmailAddressType,
-  CryptoAddressType,
-} from '@proofzero/types/address'
+  OAuthAccountType,
+  EmailAccountType,
+  CryptoAccountType,
+} from '@proofzero/types/account'
 
 <Meta title="Templates/Authorization" component={Authorization} />
 
@@ -42,22 +42,22 @@ export const Template = (args) => (
     connectedEmails={[
       {
         title: 'email@gmail.com',
-        value: 'urn:rollupid:address/1',
+        value: 'urn:rollupid:account/1',
         icon: <img src={googleIcon} className="w-4 h-4 mr-3" />,
       },
       {
         title: 'email@microsoft.com',
-        value: 'urn:rollupid:address/2',
+        value: 'urn:rollupid:account/2',
         icon: <img src={microsoftIcon} className="w-4 h-4 mr-3" />,
       },
       {
         title: 'perez@apple.com',
-        value: 'urn:rollupid:address/5',
+        value: 'urn:rollupid:account/5',
         icon: <img src={appleIcon} className="w-4 h-4 mr-3" />,
       },
       {
         title: 'email@yahoo.com',
-        value: 'urn:rollupid:address/3',
+        value: 'urn:rollupid:account/3',
         icon: <HiOutlineEnvelope className="w-4 h-4 mr-3" />,
         selected: true,
       },
@@ -66,24 +66,24 @@ export const Template = (args) => (
     addNewEmailCallback={() => {}}
     connectedAccounts={[
       {
-        value: `urn:proofzero:address:0`,
+        value: `urn:rollupid:account:0`,
         title: `Account 0`,
-        subtitle: "SC Wallet - Address 0"
+        subtitle: "SC Wallet - Account 0"
       },
       {
-        value: `urn:proofzero:address:1`,
+        value: `urn:rollupid:account:1`,
         title: `Account 1`,
-        subtitle: "Github - Address 1"
+        subtitle: "Github - Account 1"
       },
       {
-        value: `urn:proofzero:address:2`,
+        value: `urn:rollupid:account:2`,
         title: `Account 2`,
-        subtitle: "Google - Address 2"
+        subtitle: "Google - Account 2"
       },
       {
-        value: `urn:proofzero:address:3`,
+        value: `urn:rollupid:account:3`,
         title: `Account 3`,
-        subtitle: "Microsoft - Address 3"
+        subtitle: "Microsoft - Account 3"
       },
     ]}
     selectAccountsCallback={() => {}}
@@ -91,24 +91,24 @@ export const Template = (args) => (
     transitionState={'idle'}
     connectedSmartContractWallets={[
       {
-        value: `urn:proofzero:address:0`,
+        value: `urn:rollupid:account:0`,
         title: `Account 0`,
-        subtitle: "SC Wallet - Address 0"
+        subtitle: "SC Wallet - Account 0"
       },
       {
-        value: `urn:proofzero:address:1`,
+        value: `urn:rollupid:account:1`,
         title: `Account 1`,
-        subtitle: "Github - Address 1"
+        subtitle: "Github - Account 1"
       },
       {
-        value: `urn:proofzero:address:2`,
+        value: `urn:rollupid:account:2`,
         title: `Account 2`,
-        subtitle: "Google - Address 2"
+        subtitle: "Google - Account 2"
       },
       {
-        value: `urn:proofzero:address:3`,
+        value: `urn:rollupid:account:3`,
         title: `Account 3`,
-        subtitle: "Microsoft - Address 3"
+        subtitle: "Microsoft - Account 3"
       },
     ]}
     selectSmartWalletCallback={() => {}}

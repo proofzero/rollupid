@@ -14,22 +14,22 @@ import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 
 import { TbCrown } from 'react-icons/tb'
 
-import { AddressList } from '~/components/addresses/AddressList'
+import { AccountList } from '~/components/accounts/AccountList'
 import InputText from '~/components/inputs/InputText'
 
-import { CryptoAddressType, NodeType } from '@proofzero/types/address'
+import { CryptoAccountType, NodeType } from '@proofzero/types/account'
 
 import { getValidatedSessionContext } from '~/session.server'
-import { setNewPrimaryAddress } from '~/utils/authenticate.server'
+import { setNewPrimaryAccount } from '~/utils/authenticate.server'
 import { InternalServerError } from '@proofzero/errors'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 import AccountDisconnectModal from '~/components/settings/accounts/DisconnectModal'
 
 import type { FetcherWithComponents } from '@remix-run/react'
 import type { ActionFunction } from '@remix-run/cloudflare'
-import type { AddressListProps } from '~/components/addresses/AddressList'
-import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
-import type { AddressURN } from '@proofzero/urns/address'
+import type { AccountListProps } from '~/components/accounts/AccountList'
+import type { AccountListItemProps } from '~/components/accounts/AccountListItem'
+import type { AccountURN } from '@proofzero/urns/account'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { HiOutlineX } from 'react-icons/hi'
 
@@ -44,25 +44,25 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     try {
       const formData = await request.formData()
-      const primaryAddress = JSON.parse(
-        formData.get('primaryAddress') as string
+      const primaryAccount = JSON.parse(
+        formData.get('primaryAccount') as string
       )
 
-      if (primaryAddress) {
-        await setNewPrimaryAddress(
+      if (primaryAccount) {
+        await setNewPrimaryAccount(
           jwt,
           context.env,
           context.traceSpan,
-          primaryAddress.id,
-          primaryAddress.icon,
-          primaryAddress.title
+          primaryAccount.id,
+          primaryAccount.icon,
+          primaryAccount.title
         )
       }
 
       return null
     } catch (e) {
       throw new InternalServerError({
-        message: 'Failed to set new primary address',
+        message: 'Failed to set new primary account',
       })
     }
   }
@@ -73,29 +73,29 @@ const distinctProfiles = (connectedProfiles: any[]) => {
   // context actions to desired types
   // e.x. rename to crypto profiles
   const cryptoProfiles = {
-    addresses: connectedProfiles.filter(
+    accounts: connectedProfiles.filter(
       (p) =>
-        p.nodeType === NodeType.Crypto && p.type !== CryptoAddressType.Wallet
+        p.nodeType === NodeType.Crypto && p.type !== CryptoAccountType.Wallet
     ),
-  } as AddressListProps
+  } as AccountListProps
 
   const smartContractWallets = {
-    addresses: connectedProfiles.filter(
+    accounts: connectedProfiles.filter(
       (p) =>
-        p.nodeType === NodeType.Crypto && p.type === CryptoAddressType.Wallet
+        p.nodeType === NodeType.Crypto && p.type === CryptoAccountType.Wallet
     ),
-  } as AddressListProps
+  } as AccountListProps
 
   const oAuthProfiles = {
-    addresses: connectedProfiles.filter((p) => p.nodeType === NodeType.OAuth),
-  } as AddressListProps
+    accounts: connectedProfiles.filter((p) => p.nodeType === NodeType.OAuth),
+  } as AccountListProps
 
   const emailProfiles = {
-    addresses: connectedProfiles.filter((p) => p.nodeType === NodeType.Email),
-  } as AddressListProps
+    accounts: connectedProfiles.filter((p) => p.nodeType === NodeType.Email),
+  } as AccountListProps
 
   return {
-    addressCount: connectedProfiles.length,
+    accountCount: connectedProfiles.length,
     cryptoProfiles,
     smartContractWallets,
     oAuthProfiles,
@@ -169,9 +169,9 @@ const RenameModal = ({
 export default function AccountsLayout() {
   const submit = useSubmit()
 
-  const { connectedProfiles, primaryAddressURN } = useOutletContext<{
+  const { connectedProfiles, primaryAccountURN } = useOutletContext<{
     connectedProfiles: any[]
-    primaryAddressURN: AddressURN
+    primaryAccountURN: AccountURN
   }>()
 
   const {
@@ -179,13 +179,13 @@ export default function AccountsLayout() {
     smartContractWallets,
     oAuthProfiles,
     emailProfiles,
-    addressCount,
+    accountCount,
   } = distinctProfiles(connectedProfiles)
 
-  const connectedAddresses = cryptoProfiles.addresses
-    .concat(smartContractWallets.addresses)
-    .concat(oAuthProfiles.addresses)
-    .concat(emailProfiles.addresses)
+  const connectedAccounts = cryptoProfiles.accounts
+    .concat(smartContractWallets.accounts)
+    .concat(oAuthProfiles.accounts)
+    .concat(emailProfiles.accounts)
 
   const navigate = useNavigate()
 
@@ -202,7 +202,7 @@ export default function AccountsLayout() {
   useConnectResult()
 
   useEffect(() => {
-    const selectedProfile = connectedAddresses.find(
+    const selectedProfile = connectedAccounts.find(
       (p: any) => p.id === actionId
     )
 
@@ -300,23 +300,23 @@ export default function AccountsLayout() {
               setIsOpen={setDisconnectModalOpen}
               id={actionId}
               data={actionProfile}
-              primaryAddressURN={primaryAddressURN}
+              primaryAccountURN={primaryAccountURN}
             />
           </>
         )}
 
-        <AddressList
-          primaryAddressURN={primaryAddressURN}
+        <AccountList
+          primaryAccountURN={primaryAccountURN}
           onSetPrimary={(id: string) => {
             const form = new FormData()
             form.set(
-              'primaryAddress',
-              JSON.stringify(connectedAddresses.find((p) => p.id === id))
+              'primaryAccount',
+              JSON.stringify(connectedAccounts.find((p) => p.id === id))
             )
             submit(form, { method: 'post', action: '/settings/accounts' })
           }}
-          addresses={cryptoProfiles.addresses
-            .map((ap: AddressListItemProps) => ({
+          accounts={cryptoProfiles.accounts
+            .map((ap: AccountListItemProps) => ({
               ...ap,
               onRenameAccount: ap.title.endsWith('.eth')
                 ? undefined
@@ -326,13 +326,13 @@ export default function AccountsLayout() {
                   },
             }))
             .concat(
-              oAuthProfiles.addresses.map((ap) => ({
+              oAuthProfiles.accounts.map((ap) => ({
                 ...ap,
                 onRenameAccount: undefined,
               }))
             )
             .concat(
-              emailProfiles.addresses.map((ap: AddressListItemProps) => ({
+              emailProfiles.accounts.map((ap: AccountListItemProps) => ({
                 ...ap,
                 onRenameAccount: (id: string) => {
                   setActionId(id)
@@ -340,10 +340,10 @@ export default function AccountsLayout() {
                 },
               }))
             )
-            .map((ap: AddressListItemProps) => ({
+            .map((ap: AccountListItemProps) => ({
               ...ap,
               onDisconnect:
-                addressCount === 1
+                accountCount === 1
                   ? undefined
                   : (id: string) => {
                       setActionId(id)
@@ -356,10 +356,10 @@ export default function AccountsLayout() {
           SMART CONTRACT WALLETS
         </Text>
 
-        <AddressList
-          primaryAddressURN={primaryAddressURN}
-          addresses={smartContractWallets.addresses.map(
-            (ap: AddressListItemProps) => ({
+        <AccountList
+          primaryAccountURN={primaryAccountURN}
+          accounts={smartContractWallets.accounts.map(
+            (ap: AccountListItemProps) => ({
               ...ap,
               onRenameAccount: (id: string) => {
                 setActionId(id)

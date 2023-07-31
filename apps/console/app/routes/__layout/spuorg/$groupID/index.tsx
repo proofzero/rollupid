@@ -15,10 +15,10 @@ import {
 import { GroupRootContextData } from '../../spuorg'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import {
-  CryptoAddressType,
-  EmailAddressType,
-  OAuthAddressType,
-} from '@proofzero/types/address'
+  CryptoAccountType,
+  EmailAccountType,
+  OAuthAccountType,
+} from '@proofzero/types/account'
 import _ from 'lodash'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
@@ -49,18 +49,18 @@ import {
 import { InviteRes } from './invite'
 import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
-import { AccountURN } from '@proofzero/urns/account'
+import { IdentityURN } from '@proofzero/urns/identity'
 import dangerVector from '~/images/danger.svg'
 
-const addressTypes = [
-  ...Object.values(EmailAddressType),
-  ...Object.values(OAuthAddressType),
-  ...Object.values(CryptoAddressType),
+const accountTypes = [
+  ...Object.values(EmailAccountType),
+  ...Object.values(OAuthAccountType),
+  ...Object.values(CryptoAccountType),
 ]
 
 type InvitationModel = {
   identifier: string
-  addressType: EmailAddressType | OAuthAddressType | CryptoAddressType
+  accountType: EmailAccountType | OAuthAccountType | CryptoAccountType
   invitationURL: string
 }
 
@@ -84,13 +84,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const invitations =
-      await coreClient.account.getIdentityGroupMemberInvitations.query({
+      await coreClient.identity.getIdentityGroupMemberInvitations.query({
         identityGroupURN: groupURN,
       })
 
     const mappedInvitations = invitations.map((invitation) => ({
       identifier: invitation.identifier,
-      addressType: invitation.addressType,
+      accountType: invitation.accountType,
       invitationURL: [
         context.env.PASSPORT_URL,
         'spuorg',
@@ -156,7 +156,7 @@ const InviteMemberModal = ({
   handleClose: () => void
 }) => {
   const [selectedProvider, setSelectedProvider] = useState<string>(
-    EmailAddressType.Email
+    EmailAccountType.Email
   )
 
   const inviteLinkFetcher = useFetcher<InviteRes>()
@@ -202,7 +202,7 @@ const InviteMemberModal = ({
               <Listbox
                 value={selectedProvider}
                 onChange={setSelectedProvider}
-                name="addressType"
+                name="accountType"
               >
                 {({ open }) => (
                   <div className="flex flex-col col-span-2">
@@ -241,7 +241,7 @@ const InviteMemberModal = ({
                         className="absolute bg-white p-2 flex flex-col gap-2 mt-1 focus-visible:ring-0 focus-visible:outline-none border shadow"
                         static
                       >
-                        {addressTypes.map((provider) => (
+                        {accountTypes.map((provider) => (
                           <Listbox.Option
                             key={provider}
                             value={provider}
@@ -364,14 +364,14 @@ const InviteMemberModal = ({
 }
 
 const RemoveMemberModal = ({
-  accountURN,
+  identityURN,
   userAlias,
   groupID,
   isOpen,
   handleClose,
   purge,
 }: {
-  accountURN: AccountURN
+  identityURN: IdentityURN
   userAlias: string
   groupID: string
   isOpen: boolean
@@ -393,7 +393,7 @@ const RemoveMemberModal = ({
             handleClose()
           }}
         >
-          <input name="accountURN" type="hidden" value={accountURN} />
+          <input name="identityURN" type="hidden" value={identityURN} />
           {purge && <input name="purge" type="hidden" value="true" />}
 
           <div className="flex flex-row items-center justify-between w-full mb-2">
@@ -425,7 +425,7 @@ const RemoveMemberModal = ({
 }
 
 export default () => {
-  const { groups, PASSPORT_URL, accountURN } =
+  const { groups, PASSPORT_URL, identityURN } =
     useOutletContext<GroupRootContextData>()
   const { URN, groupID, invitations } = useLoaderData<LoaderData>()
 
@@ -452,7 +452,7 @@ export default () => {
 
   const hydrated = useHydrated()
 
-  const [selectedMemberURN, setSelectedMemberURN] = useState<AccountURN>()
+  const [selectedMemberURN, setSelectedMemberURN] = useState<IdentityURN>()
   const [selectedMemberAlias, setSelectedMemberAlias] = useState<string>('')
   const [removeMemberModalOpen, setRemoveMemberModalOpen] = useState(false)
 
@@ -470,7 +470,7 @@ export default () => {
           isOpen={removeMemberModalOpen}
           handleClose={() => setRemoveMemberModalOpen(false)}
           groupID={groupID}
-          accountURN={selectedMemberURN}
+          identityURN={selectedMemberURN}
           userAlias={selectedMemberAlias}
           purge={group.members.length === 1}
         />
@@ -635,7 +635,7 @@ export default () => {
                           {item.val.title}
                         </Text>
 
-                        {accountURN === item.key && (
+                        {identityURN === item.key && (
                           <Pill className="bg-indigo-50 rounded-lg !pr-2">
                             <Text
                               size="xs"
@@ -665,7 +665,7 @@ export default () => {
                           •
                         </Text>
                         <Text size="xs" weight="normal" className="truncate">
-                          {item.val.address}
+                          {item.val.account}
                         </Text>
                       </div>
                     </div>

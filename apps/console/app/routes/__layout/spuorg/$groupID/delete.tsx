@@ -29,7 +29,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     let toastSession
 
     try {
-      await coreClient.account.deleteIdentityGroup.mutate(groupURN)
+      await coreClient.identity.deleteIdentityGroup.mutate(groupURN)
 
       toastSession = await appendToastToFlashSession(
         request,

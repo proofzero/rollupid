@@ -26,7 +26,7 @@ import { FullProfileSchema } from '~/validation'
 import InputTextarea from '@proofzero/design-system/src/atoms/form/InputTextarea'
 
 export const action: ActionFunction = async ({ request, context }) => {
-  const { sub: accountURN } = parseJwt(
+  const { sub: identityURN } = parseJwt(
     await getAccessToken(request, context.env)
   )
 
@@ -41,7 +41,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     formData.get('pfp_isToken')?.toString() === '1' ? true : false
 
   const currentProfile = await context.env.ProfileKV.get<FullProfile>(
-    accountURN!,
+    identityURN!,
     'json'
   )
   const updatedProfile = Object.assign(currentProfile || {}, {
@@ -65,7 +65,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   }
 
   await context.env.ProfileKV.put(
-    accountURN!,
+    identityURN!,
     JSON.stringify(zodValidation.data)
   )
 
@@ -73,10 +73,10 @@ export const action: ActionFunction = async ({ request, context }) => {
 }
 
 export default function AccountSettingsProfile() {
-  const { notify, profile, accountURN } = useOutletContext<{
+  const { notify, profile, identityURN } = useOutletContext<{
     profile: FullProfile
     notify: (success: boolean) => void
-    accountURN: string
+    identityURN: string
   }>()
 
   const { displayName, pfp, bio, job, location } = profile
@@ -171,7 +171,7 @@ export default function AccountSettingsProfile() {
             (nft: NFT) => nft.contract.address === collection
           )[0].chain.chain
         : null
-    getMoreNftsModal(modalFetcher, accountURN, collection, chain)
+    getMoreNftsModal(modalFetcher, identityURN, collection, chain)
   }, [collection])
   // --------------------- END OF MODAL PART ---------------------- //
 

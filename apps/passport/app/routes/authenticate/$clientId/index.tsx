@@ -87,18 +87,20 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
 
       const invDetails =
-        await coreClient.account.getIdentityGroupMemberInvitationDetails.query({
-          invitationCode,
-          identityGroupURN,
-        })
+        await coreClient.identity.getIdentityGroupMemberInvitationDetails.query(
+          {
+            invitationCode,
+            identityGroupURN,
+          }
+        )
 
       invitationData = {
         groupName: invDetails.identityGroupName,
         identifier: obfuscateAlias(
           invDetails.identifier,
-          invDetails.addressType
+          invDetails.accountType
         ),
-        addressType: invDetails.addressType,
+        accountType: invDetails.accountType,
         inviterAlias: invDetails.inviter,
       }
     }
@@ -152,7 +154,7 @@ const InnerComponent = ({
     inviterAlias: string
     groupName: string
     identifier: string
-    addressType: string
+    accountType: string
   }
 }) => {
   const [signData, setSignData] = useState<{
@@ -211,7 +213,7 @@ const InnerComponent = ({
                     type="span"
                     weight="bold"
                     className="text-orange-600"
-                  >{`${_.upperFirst(invitationData.addressType)} Account: ${
+                  >{`${_.upperFirst(invitationData.accountType)} Account: ${
                     invitationData.identifier
                   }`}</Text>
                 </Text>
@@ -269,7 +271,7 @@ const InnerComponent = ({
                   type="span"
                   weight="bold"
                   className="text-orange-600 truncate"
-                >{`${_.upperFirst(invitationData.addressType)} Account: ${
+                >{`${_.upperFirst(invitationData.accountType)} Account: ${
                   invitationData.identifier
                 }`}</Text>
               </Text>

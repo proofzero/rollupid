@@ -9,7 +9,7 @@ import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    const { accountUrn } = await getValidatedSessionContext(
+    const { identityURN } = await getValidatedSessionContext(
       request,
       getDefaultAuthzParams(request),
       context.env,
@@ -18,19 +18,19 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const formData = await request.formData()
     const name = formData.get('name') as string
-    const addressURN = formData.get('id') as string
-    const coreClient = getCoreClient({ context, addressURN })
+    const accountURN = formData.get('id') as string
+    const coreClient = getCoreClient({ context, accountURN })
 
-    await coreClient.address.setNickname.query({
+    await coreClient.account.setNickname.query({
       nickname: name,
     })
 
     await createAnalyticsEvent({
       apiKey: context.env.POSTHOG_API_KEY,
-      distinctId: accountUrn,
-      eventName: 'address_renamed',
+      distinctId: identityURN,
+      eventName: 'account_renamed',
       properties: {
-        addressId: addressURN,
+        accountId: accountURN,
         nickname: name,
       },
     })

@@ -21,8 +21,8 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20221111.1",
-    "@proofzero/platform.access": "workspace:*",
-    "@proofzero/platform.address": "workspace:*",
+    "@proofzero/platform.account": "workspace:*",
+    "@proofzero/platform.authorization": "workspace:*",
     "@proofzero/platform.object": "workspace:*",
     "@proofzero/platform.starbase": "workspace:*",
     "@proofzero/urns": "workspace:*",

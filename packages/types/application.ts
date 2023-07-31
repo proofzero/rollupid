@@ -1,4 +1,4 @@
-import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { z } from 'zod'
 
 //TODO: Will have to revise and integrated with Scope in next iteration
@@ -29,7 +29,7 @@ export const AppData = z.object({
   smartWalletSessionKeys: z
     .array(
       z.object({
-        urn: AddressURNInput,
+        urn: AccountURNInput,
         publicSessionKey: z.string(),
       })
     )

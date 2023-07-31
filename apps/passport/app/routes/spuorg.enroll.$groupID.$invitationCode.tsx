@@ -8,7 +8,7 @@ import {
   IdentityGroupURNSpace,
   type IdentityGroupURN,
 } from '@proofzero/urns/identity-group'
-import { CryptoAddressType } from '@proofzero/types/address'
+import { CryptoAccountType } from '@proofzero/types/account'
 import _ from 'lodash'
 import { getUserSession } from '~/session.server'
 
@@ -47,18 +47,18 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const invDetails =
-      await coreClient.account.getIdentityGroupMemberInvitationDetails.query({
+      await coreClient.identity.getIdentityGroupMemberInvitationDetails.query({
         invitationCode,
         identityGroupURN,
       })
 
     let login_hint = undefined
-    switch (invDetails.addressType) {
-      case CryptoAddressType.ETH:
+    switch (invDetails.accountType) {
+      case CryptoAccountType.ETH:
         login_hint = 'wallet'
         break
       default:
-        login_hint = invDetails.addressType
+        login_hint = invDetails.accountType
     }
 
     const qp = new URLSearchParams()

@@ -110,7 +110,7 @@ const AccountExpandedView = ({
   source,
   titleFieldName,
   titleFieldValue,
-  addressFieldName,
+  accountFieldName,
   connectedAccounts = false,
 }: {
   account: {
@@ -121,7 +121,7 @@ const AccountExpandedView = ({
   }
   titleFieldName?: string
   titleFieldValue?: JSX.Element
-  addressFieldName?: string
+  accountFieldName?: string
   source?: string
   connectedAccounts?: boolean
 }) => {
@@ -148,7 +148,7 @@ const AccountExpandedView = ({
 
       <div className="flex flex-row gap-1 items-center">
         <Text size="xs" weight="semibold" className="text-gray-500">
-          {addressFieldName}:
+          {accountFieldName}:
         </Text>
         <Text size="xs" weight="medium" className="text-gray-500 truncate">
           {account.address}
@@ -277,7 +277,7 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
                         </a>
                       </div>
                     }
-                    addressFieldName="Name"
+                    accountFieldName="Name"
                     source={sourceOfData}
                   />
                 </div>
@@ -294,7 +294,7 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
     title,
     source,
     titleFieldName,
-    addressFieldName,
+    accountFieldName,
     connectedAccounts = false,
     scWallets = false,
   }: {
@@ -307,7 +307,7 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
     title: string
     source?: string
     titleFieldName?: string
-    addressFieldName?: string
+    accountFieldName?: string
     connectedAccounts?: boolean
     scWallets?: boolean
   }) => {
@@ -401,7 +401,7 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
                       </Text>
                     ) : undefined
                   }
-                  addressFieldName={addressFieldName}
+                  accountFieldName={accountFieldName}
                   connectedAccounts={connectedAccounts}
                 />
               )}
@@ -421,8 +421,8 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
               <RowView
                 key={i}
                 appAskedFor="Email"
-                whatsBeingShared={scope.address}
-                sourceOfData={scope.address}
+                whatsBeingShared={scope.account}
+                sourceOfData={scope.account}
                 sourceOfDataIcon={
                   <img src={scope.icon} className="w-5 h-5 rounded-full" />
                 }
@@ -434,7 +434,7 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
               <ExpandableRowView
                 key={i}
                 title={'Connected Accounts'}
-                addressFieldName={'Address'}
+                accountFieldName={'Account'}
                 accounts={scope.accounts}
                 connectedAccounts={true}
               />
@@ -477,7 +477,7 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
                 accounts={scope.accounts}
                 source="Smart Contract Wallet"
                 titleFieldName="Wallet Name"
-                addressFieldName="Wallet ID"
+                accountFieldName="Wallet ID"
                 scWallets={true}
               />
             )
@@ -598,7 +598,7 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
                         </a>
                       </div>
                     }
-                    addressFieldName="Name"
+                    accountFieldName="Name"
                     source={sourceOfData}
                   />
                 </td>
@@ -615,7 +615,7 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
     title,
     source,
     titleFieldName,
-    addressFieldName,
+    accountFieldName,
     connectedAccounts = false,
     scWallets = false,
   }: {
@@ -628,7 +628,7 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
     title: string
     source?: string
     titleFieldName?: string
-    addressFieldName?: string
+    accountFieldName?: string
     connectedAccounts?: boolean
     scWallets?: boolean
   }) => {
@@ -733,7 +733,7 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
                         </Text>
                       ) : undefined
                     }
-                    addressFieldName={addressFieldName}
+                    accountFieldName={accountFieldName}
                     connectedAccounts={connectedAccounts}
                   />
                 )}
@@ -754,8 +754,8 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
               <RowView
                 key={i}
                 appAskedFor="Email"
-                whatsBeingShared={scope.address}
-                sourceOfData={scope.address}
+                whatsBeingShared={scope.account}
+                sourceOfData={scope.account}
                 sourceOfDataIcon={
                   <img src={scope.icon} className="w-5 h-5 rounded-full" />
                 }
@@ -767,7 +767,7 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
               <ExpandableRowView
                 key={i}
                 title={'Connected Accounts'}
-                addressFieldName={'Address'}
+                accountFieldName={'Account'}
                 accounts={scope.accounts}
                 connectedAccounts={true}
               />
@@ -810,7 +810,7 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
                 accounts={scope.accounts}
                 source="Smart Contract Wallet"
                 titleFieldName="Wallet Name"
-                addressFieldName="Wallet ID"
+                accountFieldName="Wallet ID"
                 scWallets={true}
               />
             )

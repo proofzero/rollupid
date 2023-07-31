@@ -9,16 +9,16 @@ import {
 } from '@proofzero/utils'
 import { BadRequestError } from '@proofzero/errors'
 import {
-  CryptoAddressType,
-  EmailAddressType,
-  OAuthAddressType,
-} from '@proofzero/types/address'
+  CryptoAccountType,
+  EmailAccountType,
+  OAuthAccountType,
+} from '@proofzero/types/account'
 import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
-import { type AccountURN } from '@proofzero/urns/account'
+import { type IdentityURN } from '@proofzero/urns/identity'
 export type InviteRes = {
   inviteCode: string
 }
@@ -32,13 +32,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
-    const accountURN = parsedJwt.sub as AccountURN
+    const identityURN = parsedJwt.sub as IdentityURN
 
     const fd = await request.formData()
-    const addressType = fd.get('addressType') as
-      | (EmailAddressType | OAuthAddressType | CryptoAddressType)
+    const accountType = fd.get('accountType') as
+      | (EmailAccountType | OAuthAccountType | CryptoAccountType)
       | undefined
-    if (!addressType) {
+    if (!accountType) {
       throw new BadRequestError({
         message: 'Type is required',
       })
@@ -58,15 +58,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const { inviteCode } =
-      await coreClient.account.inviteIdentityGroupMember.mutate({
+      await coreClient.identity.inviteIdentityGroupMember.mutate({
         identifier,
-        addressType: addressType,
+        accountType: accountType,
         identityGroupURN: groupURN,
       })
 
     await createAnalyticsEvent({
       eventName: 'member_invited_to_group',
-      distinctId: accountURN,
+      distinctId: identityURN,
       apiKey: context.env.POSTHOG_API_KEY,
       groups: {
         group: groupID,

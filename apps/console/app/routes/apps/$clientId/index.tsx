@@ -35,7 +35,7 @@ import type { RotatedSecrets } from '~/types'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { loader as usersLoader } from './users'
-import type { AuthorizedAccountsOutput } from '@proofzero/platform/starbase/src/types'
+import type { AuthorizedIdentitiesOutput } from '@proofzero/platform/starbase/src/types'
 import type { UsersLoaderData } from './users'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { BadRequestError } from '@proofzero/errors'
@@ -50,7 +50,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 export const NUMBER_OF_DISPLAYED_USERS = 8
 
 type LoaderData = {
-  edgesResult: Promise<AuthorizedAccountsOutput>
+  edgesResult: Promise<AuthorizedIdentitiesOutput>
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -319,7 +319,7 @@ export default function AppDetailIndexPage() {
                   return (
                     <LoginsPanel
                       authorizedProfiles={
-                        edgesResult.accounts.slice(
+                        edgesResult.identities.slice(
                           0,
                           NUMBER_OF_DISPLAYED_USERS
                         ) || []

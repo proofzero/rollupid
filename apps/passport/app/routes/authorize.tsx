@@ -7,7 +7,7 @@ import {
   useTransition,
 } from '@remix-run/react'
 
-import { ResponseType } from '@proofzero/types/access'
+import { ResponseType } from '@proofzero/types/authorization'
 import { getCoreClient } from '~/platform.server'
 import {
   createAuthzParamsCookieAndAuthenticate,
@@ -33,7 +33,7 @@ import sideGraphics from '~/assets/auth-side-graphics.svg'
 import type { ScopeDescriptor } from '@proofzero/security/scopes'
 import type { AppPublicProps } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { DataForScopes } from '~/utils/authorize.server'
-import type { GetProfileOutputParams } from '@proofzero/platform/account/src/jsonrpc/methods/getProfile'
+import type { GetProfileOutputParams } from '@proofzero/platform/identity/src/jsonrpc/methods/getProfile'
 
 import type { PersonaData } from '@proofzero/types/application'
 
@@ -44,7 +44,7 @@ import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
 import { Helmet } from 'react-helmet'
 import { getRGBColor, getTextColor } from '@proofzero/design-system/src/helpers'
-import { AddressURNSpace } from '@proofzero/urns/address'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
@@ -158,7 +158,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       )
     }
 
-    const { jwt, accountUrn } = await getValidatedSessionContext(
+    const { jwt, identityURN } = await getValidatedSessionContext(
       request,
       context.authzQueryParams,
       context.env,
@@ -228,14 +228,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       )
     ) {
       const responseType = ResponseType.Code
-      const preauthorizeRes = await coreClient.access.preauthorize.mutate({
-        account: accountUrn,
-        responseType,
-        clientId,
-        redirectUri,
-        scope: scope,
-        state,
-      })
+      const preauthorizeRes =
+        await coreClient.authorization.preauthorize.mutate({
+          identity: identityURN,
+          responseType,
+          clientId,
+          redirectUri,
+          scope: scope,
+          state,
+        })
 
       if (preauthorizeRes.preauthorized) {
         const redirectParams = new URLSearchParams({
@@ -255,14 +256,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const [profile, personaData, dataForScopes] = await Promise.all([
-      coreClient.account.getProfile.query({
-        account: accountUrn,
+      coreClient.identity.getProfile.query({
+        identity: identityURN,
       }),
-      coreClient.access.getPersonaData.query({
-        accountUrn,
+      coreClient.authorization.getPersonaData.query({
+        identityURN,
         clientId,
       }),
-      getDataForScopes(scope, accountUrn, jwt, context.env, context.traceSpan),
+      getDataForScopes(scope, identityURN, jwt, context.env, context.traceSpan),
     ])
 
     if (personaData) {
@@ -271,7 +272,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     if (!profile) {
       throw new InternalServerError({
-        message: 'No profile found for this account',
+        message: 'No profile found for this identity',
       })
     }
 
@@ -296,7 +297,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export const action: ActionFunction = async ({ request, context }) => {
-  const { jwt, accountUrn } = await getValidatedSessionContext(
+  const { jwt, identityURN } = await getValidatedSessionContext(
     request,
     context.authzQueryParams,
     context.env,
@@ -322,7 +323,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   const state = form.get('state') as string
   const clientId = form.get('client_id') as string
   if (
-    !accountUrn ||
+    !identityURN ||
     !responseType ||
     !redirectUri ||
     !scope ||
@@ -338,29 +339,29 @@ export const action: ActionFunction = async ({ request, context }) => {
 
   if (createSCWallet?.length) {
     const nickname = JSON.parse(createSCWallet).nickname
-    const profile = await coreClient.account.getProfile.query({
-      account: accountUrn,
+    const profile = await coreClient.identity.getProfile.query({
+      identity: identityURN,
     })
 
-    const { addressURN } = await createNewSCWallet({
+    const { accountURN } = await createNewSCWallet({
       nickname,
-      primaryAddressURN: profile?.primaryAddressURN!,
+      primaryAccountURN: profile?.primaryAccountURN!,
       env: context.env,
       traceSpan: context.traceSpan,
     })
 
-    personaData.erc_4337 = [AddressURNSpace.getBaseURN(addressURN)]
+    personaData.erc_4337 = [AccountURNSpace.getBaseURN(accountURN)]
   }
 
   await validatePersonaData(
-    accountUrn,
+    identityURN,
     personaData,
     context.env.Core,
     context.traceSpan
   )
 
-  const authorizeRes = await coreClient.access.authorize.mutate({
-    account: accountUrn,
+  const authorizeRes = await coreClient.authorization.authorize.mutate({
+    identity: identityURN,
     responseType,
     clientId,
     redirectUri,
@@ -375,7 +376,7 @@ export const action: ActionFunction = async ({ request, context }) => {
 
   await createAnalyticsEvent({
     eventName: 'app_authorized',
-    distinctId: accountUrn,
+    distinctId: identityURN,
     apiKey: context.env.POSTHOG_API_KEY,
     groups: {
       app: clientId,
@@ -443,8 +444,8 @@ export default function Authorize() {
       return [AuthorizationControlSelection.ALL]
     } else {
       return connectedAccounts?.length
-        ? connectedAccounts.filter((acc) =>
-            persona.connected_accounts?.includes(acc.value)
+        ? connectedAccounts.filter(
+            (acc) => persona.connected_accounts?.includes(acc.value)
           )
         : []
     }
@@ -456,8 +457,8 @@ export default function Authorize() {
       return [AuthorizationControlSelection.ALL]
     } else {
       return connectedSmartContractWallets?.length
-        ? connectedSmartContractWallets.filter((acc) =>
-            persona.erc_4337?.includes(acc.value)
+        ? connectedSmartContractWallets.filter(
+            (acc) => persona.erc_4337?.includes(acc.value)
           )
         : []
     }

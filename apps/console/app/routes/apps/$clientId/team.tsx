@@ -22,8 +22,8 @@ import {
   getEmailDropdownItems,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
-import type { AddressURN } from '@proofzero/urns/address'
 import type { AccountURN } from '@proofzero/urns/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import type { errorsTeamProps, notificationHandlerType } from '~/types'
 import { BadRequestError } from '@proofzero/errors'
@@ -39,15 +39,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const jwt = await requireJWT(request, context.env)
     const payload = checkToken(jwt!)
-    const accountURN = payload.sub as AccountURN
+    const identityURN = payload.sub as IdentityURN
 
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const connectedAccounts = await coreClient.account.getAddresses.query({
-      account: accountURN,
+    const connectedAccounts = await coreClient.identity.getAccounts.query({
+      identity: identityURN,
     })
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
@@ -72,7 +72,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
         if (!appContactAddress) {
           await coreClient.starbase.upsertAppContactAddress.mutate({
-            address: connectedEmails[0].value as AddressURN,
+            account: connectedEmails[0].value as AccountURN,
             clientId,
           })
 
@@ -93,9 +93,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const jwt = await requireJWT(request, context.env)
 
     const fd = await request.formData()
-    const addressURN = fd.get('addressURN') as AddressURN
-    if (!addressURN) {
-      throw new BadRequestError({ message: 'No addressURN' })
+    const accountURN = fd.get('accountURN') as AccountURN
+    if (!accountURN) {
+      throw new BadRequestError({ message: 'No accountURN' })
     }
 
     const errors: errorsTeamProps = {}
@@ -107,7 +107,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     try {
       await coreClient.starbase.upsertAppContactAddress.mutate({
-        address: addressURN,
+        account: accountURN,
         clientId,
       })
     } catch (e) {
@@ -141,7 +141,7 @@ export default () => {
     useOutletContext<{
       PASSPORT_URL: string
       notificationHandler: notificationHandlerType
-      appContactAddress?: AddressURN
+      appContactAddress?: AccountURN
     }>()
 
   const actionData = useActionData()
@@ -195,7 +195,7 @@ export default () => {
               <div className="flex space-x-3">
                 <HiOutlineMail className="w-6 h-6 text-gray-800" />
                 <Text weight="medium" className="flex-1 text-gray-800">
-                  Connect Email Address
+                  Connect Email Account
                 </Text>
               </div>
             </Button>
@@ -225,7 +225,7 @@ export default () => {
                     title: email.title,
                   }
                 })}
-                placeholder="Select an Email Address"
+                placeholder="Select an Email Account"
                 onSelect={(selected) => {
                   // type casting to DropdownSelectListItem instead of array
                   if (!Array.isArray(selected)) {
@@ -238,7 +238,7 @@ export default () => {
                     }
                     submit(
                       {
-                        addressURN: selected.value,
+                        accountURN: selected.value,
                       },
                       {
                         method: 'post',
@@ -247,7 +247,7 @@ export default () => {
                   }
                 }}
                 ConnectButtonCallback={redirectToPassport}
-                ConnectButtonPhrase="Connect New Email Address"
+                ConnectButtonPhrase="Connect New Email Account"
                 defaultItems={connectedEmails
                   .filter((el) => el.value === appContactAddress)
                   .map((email: DropdownSelectListItem) => ({

@@ -1,10 +1,10 @@
 import { DeploymentMetadata } from '@proofzero/types'
 
 export interface Environment {
-  Address: DurableObjectNamespace
-  Access: DurableObjectNamespace
   Account: DurableObjectNamespace
   Authorization: DurableObjectNamespace
+  ExchangeCode: DurableObjectNamespace
+  Identity: DurableObjectNamespace
   IdentityGroup: DurableObjectNamespace
   StarbaseApp: DurableObjectNamespace
 

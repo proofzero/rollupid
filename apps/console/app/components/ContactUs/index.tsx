@@ -1,10 +1,10 @@
 import { Button } from '@proofzero/design-system'
-import { AccountURN } from '@proofzero/urns/account'
+import { IdentityURN } from '@proofzero/urns/identity'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { useRef } from 'react'
 import { PopupButton } from '@typeform/embed-react'
 
-export default ({ urn, type }: { urn: AccountURN; type: 'btn' | 'text' }) => {
+export default ({ urn, type }: { urn: IdentityURN; type: 'btn' | 'text' }) => {
   const ref = useRef<any>(null)
   const openPopup = () => ref.current?.open()
 

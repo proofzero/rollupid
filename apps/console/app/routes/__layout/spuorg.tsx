@@ -1,23 +1,23 @@
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import { AccountURN } from '@proofzero/urns/account'
+import { IdentityURN } from '@proofzero/urns/identity'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { LoaderFunction, json } from '@remix-run/cloudflare'
 import { commitFlashSession, requireJWT } from '~/utilities/session.server'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import { PlatformAddressURNHeader } from '@proofzero/types/headers'
-import { NO_OP_ADDRESS_PLACEHOLDER } from '@proofzero/platform/address/src/constants'
-import { AddressURNSpace } from '@proofzero/urns/address'
+import { PlatformAccountURNHeader } from '@proofzero/types/headers'
+import { NO_OP_ACCOUNT_PLACEHOLDER } from '@proofzero/platform/account/src/constants'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
 import { Toaster, toast } from '@proofzero/design-system/src/atoms/toast'
 import { ToastModel, getToastsAndFlashSession } from '~/utils/toast.server'
 import { useEffect } from 'react'
 
 type GroupMemberModel = {
-  URN: AccountURN
+  URN: IdentityURN
   iconURL: string
   title: string
-  address?: string
+  account?: string
   joinTimestamp: number
 }
 
@@ -34,7 +34,7 @@ type GroupRootLoaderData = {
 }
 
 export type GroupRootContextData = GroupRootLoaderData & {
-  accountURN: AccountURN
+  identityURN: IdentityURN
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -44,12 +44,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
     const coreClient = createCoreClient(context.env.Core, {
-      [PlatformAddressURNHeader]: NO_OP_ADDRESS_PLACEHOLDER,
+      [PlatformAccountURNHeader]: NO_OP_ACCOUNT_PLACEHOLDER,
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
 
-    const groups = await coreClient.account.listIdentityGroups.query()
+    const groups = await coreClient.identity.listIdentityGroups.query()
 
     const mappedGroups = await Promise.all(
       groups.map(async (group) => {
@@ -57,10 +57,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           .filter((m) => m.joinTimestamp != null)
           .reduce(
             (acc, curr) => ({ ...acc, [curr.URN]: curr }),
-            {} as Record<AccountURN, { URN: AccountURN; joinTimestamp: number }>
+            {} as Record<
+              IdentityURN,
+              { URN: IdentityURN; joinTimestamp: number }
+            >
           )
 
-        const memberProfiles = await coreClient.account.getProfileBatch.query(
+        const memberProfiles = await coreClient.identity.getProfileBatch.query(
           group.members.map((m) => m.URN)
         )
 
@@ -70,11 +73,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
             URN: URN,
             iconURL: profile!.pfp!.image,
             title: profile!.displayName,
-            address: profile!.primaryAddressURN
-              ? profile!.addresses.find(
+            account: profile!.primaryAccountURN
+              ? profile!.accounts.find(
                   (a) =>
                     a.baseUrn ===
-                    AddressURNSpace.getBaseURN(profile!.primaryAddressURN!)
+                    AccountURNSpace.getBaseURN(profile!.primaryAccountURN!)
                 )?.qc.alias
               : undefined,
             joinTimestamp: memberMap[URN].joinTimestamp,
@@ -120,8 +123,8 @@ export default () => {
     }
   >()
 
-  const { accountURN } = useOutletContext<{
-    accountURN: AccountURN
+  const { identityURN } = useOutletContext<{
+    identityURN: IdentityURN
   }>()
 
   useEffect(() => {
@@ -141,7 +144,7 @@ export default () => {
       <Toaster position="top-right" />
       <Outlet
         context={{
-          accountURN,
+          identityURN,
           ...data,
         }}
       />

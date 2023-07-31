@@ -3,7 +3,7 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { AppClientIdParamSchema } from '../validators/app'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
-import { ServicePlanType } from '@proofzero/types/account'
+import { ServicePlanType } from '@proofzero/types/identity'
 
 export const GetAppPlanInputSchema = AppClientIdParamSchema
 type GetAppPlanInput = z.infer<typeof GetAppPlanInputSchema>

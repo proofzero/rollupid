@@ -1,10 +1,13 @@
 import { z } from 'zod'
-import { AccessURN, AccessURNSpace } from '@proofzero/urns/access'
-import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
+import {
+  AuthorizationURN,
+  AuthorizationURNSpace,
+} from '@proofzero/urns/authorization'
 import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
+import { IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
 import { AnyURN, parseURN } from '@proofzero/urns'
 import { EdgeURN } from '@proofzero/urns/edge'
-import { CryptoAddressType } from '@proofzero/types/address'
+import { CryptoAccountType } from '@proofzero/types/account'
 import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
@@ -12,33 +15,33 @@ import {
 
 export const NoInput = z.undefined()
 
-export const AccessURNInput = z.custom<AccessURN>((input) => {
+export const AuthorizationURNInput = z.custom<AuthorizationURN>((input) => {
   if (typeof input !== 'string') {
-    throw new Error(`AccessURNInput is not a string: ${input}`)
+    throw new Error(`AuthorizationURNInput is not a string: ${input}`)
   }
-  const parsed = AccessURNSpace.parse(input as AccessURN)
-  if (!AccessURNSpace.is(`urn:rollupid:${parsed.nss}`)) {
-    throw new Error(`invalid AccessURN entry: ${input}`)
+  const parsed = AuthorizationURNSpace.parse(input as AuthorizationURN)
+  if (!AuthorizationURNSpace.is(`urn:rollupid:${parsed.nss}`)) {
+    throw new Error(`invalid AuthorizationURN entry: ${input}`)
   }
-  return input as AccessURN
-})
-
-export const AddressURNInput = z.custom<AddressURN>((input) => {
-  if (typeof input !== 'string') {
-    throw new Error(`AddressURNInput is not a string: ${input}`)
-  }
-  const parsed = AddressURNSpace.parse(input as AddressURN)
-  if (!AddressURNSpace.is(`urn:rollupid:${parsed.nss}`)) {
-    throw new Error(`invalid AddressURN entry: ${input}`)
-  }
-  return input as AddressURN
+  return input as AuthorizationURN
 })
 
 export const AccountURNInput = z.custom<AccountURN>((input) => {
-  if (!AccountURNSpace.is(input as AccountURN)) {
-    throw new Error('Invalid AccountURN entry')
+  if (typeof input !== 'string') {
+    throw new Error(`AccountURNInput is not a string: ${input}`)
+  }
+  const parsed = AccountURNSpace.parse(input as AccountURN)
+  if (!AccountURNSpace.is(`urn:rollupid:${parsed.nss}`)) {
+    throw new Error(`invalid AccountURN entry: ${input}`)
   }
   return input as AccountURN
+})
+
+export const IdentityURNInput = z.custom<IdentityURN>((input) => {
+  if (!IdentityURNSpace.is(input as IdentityURN)) {
+    throw new Error('Invalid IdentityURN entry')
+  }
+  return input as IdentityURN
 })
 
 export const IdentityGroupURNValidator = z.custom<IdentityGroupURN>((input) => {
@@ -48,14 +51,14 @@ export const IdentityGroupURNValidator = z.custom<IdentityGroupURN>((input) => {
   return input as IdentityGroupURN
 })
 
-export const CryptoAddressTypeInput = z.custom<CryptoAddressType>((input) => {
-  let addrType: CryptoAddressType
+export const CryptoAccountTypeInput = z.custom<CryptoAccountType>((input) => {
+  let addrType: CryptoAccountType
   switch (input) {
-    case CryptoAddressType.ETH:
-      addrType = CryptoAddressType.ETH
+    case CryptoAccountType.ETH:
+      addrType = CryptoAccountType.ETH
       break
     default:
-      throw new TypeError(`invalid crypto address type: ${input}`)
+      throw new TypeError(`invalid crypto account type: ${input}`)
   }
 
   return addrType

@@ -9,12 +9,10 @@ import { createContext, type Context } from './context'
 import router from './router'
 import type { Environment } from './types'
 
-export {
-  Access as Authorization,
-  Authorization as ExchangeCode,
-} from '@proofzero/platform.access'
-export { Account as Identity, IdentityGroup } from '@proofzero/platform.account'
-export { Address as Account } from '@proofzero/platform.address'
+
+export { Account } from '@proofzero/platform.account'
+export { Identity, IdentityGroup } from '@proofzero/platform.identity'
+export { Authorization, ExchangeCode } from '@proofzero/platform.authorization'
 export { StarbaseApplication } from '@proofzero/platform.starbase'
 
 export default {

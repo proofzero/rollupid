@@ -1,14 +1,14 @@
 import UnfilteredNftGrid from '~/components/nfts/grid/unfiltered'
 
 import { useOutletContext } from '@remix-run/react'
-import type { AccountURN } from '@proofzero/urns/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
 import type { FullProfile } from '~/types'
 
 const ProfileRoute = () => {
   const { profile, isOwner } = useOutletContext<{
     profile: FullProfile
     isOwner: boolean
-    accountURN: AccountURN
+    identityURN: IdentityURN
   }>()
 
   const { displayName, pfp } = profile

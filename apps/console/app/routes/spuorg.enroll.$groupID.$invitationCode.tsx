@@ -17,13 +17,13 @@ import {
   IdentityGroupURNSpace,
   type IdentityGroupURN,
 } from '@proofzero/urns/identity-group'
-import { CryptoAddressType } from '@proofzero/types/address'
+import { CryptoAccountType } from '@proofzero/types/account'
 
 import { useLoaderData, useSubmit } from '@remix-run/react'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 import { requireJWT } from '~/utilities/session.server'
-import { AccountURN } from '@proofzero/urns/account'
+import { IdentityURN } from '@proofzero/urns/identity'
 
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Button } from '@proofzero/design-system'
@@ -60,7 +60,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
-    const accountURN = parsedJwt.sub as AccountURN
+    const identityURN = parsedJwt.sub as IdentityURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
@@ -70,35 +70,35 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const invDetails =
-      await coreClient.account.getIdentityGroupMemberInvitationDetails.query({
+      await coreClient.identity.getIdentityGroupMemberInvitationDetails.query({
         invitationCode,
         identityGroupURN,
       })
 
     let login_hint = undefined
-    switch (invDetails.addressType) {
-      case CryptoAddressType.ETH:
+    switch (invDetails.accountType) {
+      case CryptoAccountType.ETH:
         login_hint = 'wallet'
         break
       default:
-        login_hint = invDetails.addressType
+        login_hint = invDetails.accountType
     }
 
-    const accountAddresses = await coreClient.account.getOwnAddresses.query({
-      account: accountURN,
+    const identityAccounts = await coreClient.identity.getOwnAccounts.query({
+      identity: identityURN,
     })
-    const invitedAddress = accountAddresses.find(
+    const invitedAccount = identityAccounts.find(
       (aa) =>
         aa.qc.alias.toLowerCase() === invDetails.identifier.toLowerCase() &&
-        aa.rc.addr_type === invDetails.addressType
+        aa.rc.addr_type === invDetails.accountType
     )
 
     return json({
       inviterAlias: invDetails.inviter,
       groupName: invDetails.identityGroupName,
-      identifier: obfuscateAlias(invDetails.identifier, invDetails.addressType),
-      addressType: invDetails.addressType,
-      enrollmentType: invitedAddress
+      identifier: obfuscateAlias(invDetails.identifier, invDetails.accountType),
+      accountType: invDetails.accountType,
+      enrollmentType: invitedAccount
         ? EnrollmentType.Own
         : EnrollmentType.Other,
       loginHint: login_hint,
@@ -154,7 +154,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    await coreClient.account.acceptIdentityGroupMemberInvitation.mutate({
+    await coreClient.identity.acceptIdentityGroupMemberInvitation.mutate({
       invitationCode,
       identityGroupURN,
     })
@@ -168,7 +168,7 @@ export default () => {
     inviterAlias,
     groupName,
     identifier,
-    addressType,
+    accountType,
     enrollmentType,
     loginHint,
     passportURL,
@@ -178,7 +178,7 @@ export default () => {
     inviterAlias: string
     groupName: string
     identifier: string
-    addressType: string
+    accountType: string
     enrollmentType: EnrollmentType
     loginHint?: string
     passportURL: string
@@ -320,7 +320,7 @@ export default () => {
                 </Text>
 
                 <Text weight="bold" className="text-orange-600 truncate mb-4">
-                  {_.upperFirst(addressType)} Account: {identifier}
+                  {_.upperFirst(accountType)} Account: {identifier}
                 </Text>
 
                 <Button

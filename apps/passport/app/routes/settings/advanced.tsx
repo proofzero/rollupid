@@ -18,7 +18,7 @@ import {
 import { FLASH_MESSAGE } from '~/utils/flashMessage.server'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
-import type { AddressURN } from '@proofzero/urns/address'
+import type { AccountURN } from '@proofzero/urns/account'
 import { RollupError, ERROR_CODES, BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
@@ -26,7 +26,7 @@ import { HiOutlineX } from 'react-icons/hi'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    const { jwt, accountUrn } = await getValidatedSessionContext(
+    const { jwt, identityURN } = await getValidatedSessionContext(
       request,
       context.authzQueryParams,
       context.env,
@@ -35,12 +35,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     try {
       const coreClient = getCoreClient({ context, jwt })
-      const [addresses, apps, ownedApps] = await Promise.all([
-        coreClient.account.getAddresses.query({
-          account: accountUrn,
+      const [accounts, apps, ownedApps] = await Promise.all([
+        coreClient.identity.getAccounts.query({
+          identity: identityURN,
         }),
-        coreClient.account.getAuthorizedApps.query({
-          account: accountUrn,
+        coreClient.identity.getAuthorizedApps.query({
+          identity: identityURN,
         }),
         coreClient.starbase.listApps.query(),
       ])
@@ -52,32 +52,34 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         })
       }
 
-      const addressURNs = addresses?.map(
-        (address) => address.baseUrn
-      ) as AddressURN[]
+      const accountURNs = accounts?.map(
+        (account) => account.baseUrn
+      ) as AccountURN[]
 
       await Promise.all([
         Promise.all(
           apps.map((app) => {
-            return coreClient.access.revokeAppAuthorization.mutate({
+            return coreClient.authorization.revokeAppAuthorization.mutate({
               clientId: app.clientId,
               issuer: new URL(request.url).origin,
             })
           })
         ),
         Promise.all(
-          addressURNs.map((addressURN) => {
-            const coreClient = getCoreClient({ context, addressURN })
-            return coreClient.address.deleteAddressNode.mutate({
-              accountURN: accountUrn,
+          accountURNs.map((accountURN) => {
+            const coreClient = getCoreClient({ context, accountURN })
+            return coreClient.account.deleteAccountNode.mutate({
+              identityURN: identityURN,
               forceDelete: true,
             })
           })
         ),
-        coreClient.account.purgeIdentityGroupMemberships.mutate(),
+        coreClient.identity.purgeIdentityGroupMemberships.mutate(),
       ])
 
-      await coreClient.account.deleteAccountNode.mutate({ account: accountUrn })
+      await coreClient.identity.deleteIdentityNode.mutate({
+        identity: identityURN,
+      })
     } catch (ex) {
       console.error(ex)
       throw new RollupError({
@@ -90,7 +92,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     await createAnalyticsEvent({
       apiKey: context.env.POSTHOG_API_KEY,
       eventName: 'delete_rollup_identity',
-      distinctId: accountUrn,
+      distinctId: identityURN,
     })
 
     return await destroyUserSession(

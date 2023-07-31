@@ -1,9 +1,9 @@
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { FeaturePill } from '@proofzero/design-system/src/atoms/pills/FeaturePill'
 import { DocumentationBadge } from '../DocumentationBadge'
-import { AccountURN } from '@proofzero/urns/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
 import ContactUs from '../ContactUs'
-import { ServicePlanType } from '@proofzero/types/account'
+import { ServicePlanType } from '@proofzero/types/identity'
 import { isPlanGuarded } from '~/utils/planGate'
 import plans from '~/routes/__layout/billing/plans'
 import _ from 'lodash'
@@ -21,7 +21,7 @@ type EarlyAccessPanelProps = {
   imgClassName?: string
   currentPlan: ServicePlanType
   featurePlan?: ServicePlanType
-  accountURN: AccountURN
+  identityURN: IdentityURN
   earlyAccess: boolean
 }
 
@@ -35,7 +35,7 @@ const EarlyAccessPanel = ({
   imgClassName,
   currentPlan,
   featurePlan,
-  accountURN,
+  identityURN,
   earlyAccess,
 }: EarlyAccessPanelProps) => {
   return (
@@ -81,7 +81,7 @@ const EarlyAccessPanel = ({
           )}
 
           <ContactUs
-            urn={accountURN}
+            urn={identityURN}
             type={
               featurePlan
                 ? isPlanGuarded(currentPlan, featurePlan)

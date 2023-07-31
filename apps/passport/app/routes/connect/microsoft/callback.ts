@@ -1,17 +1,17 @@
 import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 
 import { generateHashedIDRef } from '@proofzero/urns/idref'
-import { AddressURNSpace } from '@proofzero/urns/address'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import {
   createAuthenticatorSessionStorage,
   getMicrosoftStrategy,
 } from '~/auth.server'
 import { getCoreClient } from '~/platform.server'
-import { NodeType, OAuthAddressType } from '@proofzero/types/address'
-import type { OAuthData } from '@proofzero/platform.address/src/types'
+import { NodeType, OAuthAccountType } from '@proofzero/types/account'
+import type { OAuthData } from '@proofzero/platform.account/src/types'
 import { MicrosoftStrategyDefaultName } from 'remix-auth-microsoft'
 import {
-  authenticateAddress,
+  authenticateAccount,
   checkOAuthError,
 } from '~/utils/authenticate.server'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
@@ -41,22 +41,22 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     )) as OAuthData
 
     const { profile } = authRes
-    if (profile.provider !== OAuthAddressType.Microsoft)
+    if (profile.provider !== OAuthAccountType.Microsoft)
       throw new InternalServerError({
         message: 'Unsupported provider returned in Microsoft callback.',
       })
 
-    const addressURN = AddressURNSpace.componentizedUrn(
-      generateHashedIDRef(OAuthAddressType.Microsoft, profile.id),
-      { addr_type: OAuthAddressType.Microsoft, node_type: NodeType.OAuth },
+    const accountURN = AccountURNSpace.componentizedUrn(
+      generateHashedIDRef(OAuthAccountType.Microsoft, profile.id),
+      { addr_type: OAuthAccountType.Microsoft, node_type: NodeType.OAuth },
       { alias: profile.emails[0]?.value || profile._json.email, hidden: 'true' }
     )
 
-    const coreClient = getCoreClient({ context, addressURN })
-    await coreClient.address.setOAuthData.mutate(authRes)
+    const coreClient = getCoreClient({ context, accountURN })
+    await coreClient.account.setOAuthData.mutate(authRes)
 
-    const { accountURN, existing } =
-      await coreClient.address.resolveAccount.query({
+    const { identityURN, existing } =
+      await coreClient.account.resolveIdentity.query({
         jwt: await getUserSession(request, context.env, appData?.clientId),
         force:
           !appData ||
@@ -65,9 +65,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         clientId: appData?.clientId,
       })
 
-    return authenticateAddress(
-      addressURN,
+    return authenticateAccount(
       accountURN,
+      identityURN,
       appData,
       request,
       context.env,

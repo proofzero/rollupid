@@ -10,7 +10,7 @@ import { getCoreClient } from '~/platform.server'
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ context }) => {
     const client = getCoreClient({ context })
-    const jwks = await client.access.getJWKS.query()
+    const jwks = await client.authorization.getJWKS.query()
     return json(jwks)
   }
 )

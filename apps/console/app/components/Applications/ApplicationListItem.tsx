@@ -1,7 +1,7 @@
 import { Menu, Transition } from '@headlessui/react'
 import { Pill } from '@proofzero/design-system/src/atoms/pills/Pill'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { ServicePlanType } from '@proofzero/types/account'
+import { ServicePlanType } from '@proofzero/types/identity'
 import { Fragment } from 'react'
 import { HiDotsVertical, HiOutlineCog } from 'react-icons/hi'
 import { HiOutlineTrash } from 'react-icons/hi2'

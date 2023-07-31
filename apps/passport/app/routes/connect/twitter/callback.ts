@@ -3,9 +3,9 @@ import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 import { Twitter2StrategyDefaultName } from 'remix-auth-twitter'
 import type { Twitter2StrategyVerifyParams } from 'remix-auth-twitter'
 
-import { NodeType, OAuthAddressType } from '@proofzero/types/address'
+import { NodeType, OAuthAccountType } from '@proofzero/types/account'
 
-import { AddressURNSpace } from '@proofzero/urns/address'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 
 import {
@@ -14,7 +14,7 @@ import {
 } from '~/auth.server'
 import { getCoreClient } from '~/platform.server'
 import {
-  authenticateAddress,
+  authenticateAccount,
   checkOAuthError,
 } from '~/utils/authenticate.server'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
@@ -58,14 +58,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       picture: data.profile_image_url,
     }
 
-    const addressURN = AddressURNSpace.componentizedUrn(
-      generateHashedIDRef(OAuthAddressType.Twitter, profile.id),
-      { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Twitter },
+    const accountURN = AccountURNSpace.componentizedUrn(
+      generateHashedIDRef(OAuthAccountType.Twitter, profile.id),
+      { node_type: NodeType.OAuth, addr_type: OAuthAccountType.Twitter },
       { alias: profile.username, hidden: 'true' }
     )
-    const coreClient = getCoreClient({ context, addressURN })
-    const { accountURN, existing } =
-      await coreClient.address.resolveAccount.query({
+    const coreClient = getCoreClient({ context, accountURN })
+    const { identityURN, existing } =
+      await coreClient.account.resolveIdentity.query({
         jwt: await getUserSession(request, context.env, appData?.clientId),
         force:
           !appData ||
@@ -74,14 +74,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         clientId: appData?.clientId,
       })
 
-    await coreClient.address.setOAuthData.mutate({
+    await coreClient.account.setOAuthData.mutate({
       accessToken,
-      profile: { ...profile, provider: OAuthAddressType.Twitter },
+      profile: { ...profile, provider: OAuthAccountType.Twitter },
     })
 
-    return authenticateAddress(
-      addressURN,
+    return authenticateAccount(
       accountURN,
+      identityURN,
       appData,
       request,
       context.env,

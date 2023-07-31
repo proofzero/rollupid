@@ -1,25 +1,30 @@
 import React from 'react'
 import { Dropdown, DropdownSelectListItem } from './DropdownSelectList'
 
-import { CryptoAddressType } from '@proofzero/types/address'
+import { CryptoAccountType } from '@proofzero/types/account'
 
 export default {
-    title: 'Atoms/Dropdown/SmartContractWallets',
-    component: Dropdown,
+  title: 'Atoms/Dropdown/SmartContractWallets',
+  component: Dropdown,
 }
 
 const modifyType = (string: string) => {
-    if (string === CryptoAddressType.Wallet) {
-        return "SC Wallet"
-    }
-    return string.charAt(0).toUpperCase() + string.slice(1)
+  if (string === CryptoAccountType.Wallet) {
+    return 'SC Wallet'
+  }
+  return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-const accounts: DropdownSelectListItem[] = Array.from({ length: 10 }, (_, i) => ({
-    value: `urn:proofzero:address:${i}`,
+const accounts: DropdownSelectListItem[] = Array.from(
+  { length: 10 },
+  (_, i) => ({
+    value: `urn:rollupid:account:${i}`,
     title: `Smart Contract Wallet ${i}`,
-    subtitle: `${modifyType(CryptoAddressType.Wallet as string)} - SC Wallet: ${i}`
-}))
+    subtitle: `${modifyType(
+      CryptoAccountType.Wallet as string
+    )} - SC Wallet: ${i}`,
+  })
+)
 
 const Template = () => (
     <div className="w-[280px]">

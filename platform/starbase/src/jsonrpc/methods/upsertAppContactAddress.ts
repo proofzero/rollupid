@@ -2,12 +2,12 @@ import { z } from 'zod'
 import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
-import { AddressURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 
 export const UpsertAppContactAddressInput = z.object({
   clientId: z.string(),
-  address: AddressURNInput,
+  account: AccountURNInput,
 })
 
 type UpsertAppContactAddressParams = z.infer<
@@ -36,7 +36,7 @@ export const upsertAppContactAddress = async ({
   })
 
   if (edges.length > 1) {
-    console.warn('More than one address found for app', input.clientId)
+    console.warn('More than one account found for app', input.clientId)
   }
 
   for (let i = 0; i < edges.length; i++) {
@@ -49,7 +49,7 @@ export const upsertAppContactAddress = async ({
 
   await caller.edges.makeEdge({
     src: appURN,
-    dst: input.address,
+    dst: input.account,
     tag: EDGE_HAS_REFERENCE_TO,
   })
 }

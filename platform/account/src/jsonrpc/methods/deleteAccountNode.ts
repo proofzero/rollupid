@@ -1,17 +1,21 @@
 import { z } from 'zod'
 
-import { UnauthorizedError } from '@proofzero/errors'
-
 import { router } from '@proofzero/platform.core'
-import { inputValidators } from '@proofzero/platform-middleware'
 
-import { Context } from '../../context'
+import { IdentityURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { RollupError, ERROR_CODES } from '@proofzero/errors'
+import { IdentityURNSpace } from '@proofzero/urns/identity'
+import { AccountURN } from '@proofzero/urns/account'
+
+import type { Context } from '../../context'
+import { getAccountReferenceTypes } from './getAccountReferenceTypes'
 
 export const DeleteAccountNodeInput = z.object({
-  account: inputValidators.AccountURNInput,
+  identityURN: IdentityURNInput,
+  forceDelete: z.boolean().optional(),
 })
 
-export type DeleteAccountNodeParams = z.infer<typeof DeleteAccountNodeInput>
+type DeleteAccountNodeParams = z.infer<typeof DeleteAccountNodeInput>
 
 export const deleteAccountNodeMethod = async ({
   input,
@@ -20,11 +24,67 @@ export const deleteAccountNodeMethod = async ({
   input: DeleteAccountNodeParams
   ctx: Context
 }) => {
-  if (ctx.accountURN !== input.account) throw new UnauthorizedError()
+  const { identityURN, forceDelete } = input
+
+  const nodeClient = ctx.account
 
   const caller = router.createCaller(ctx)
-  await caller.edges.deleteNode({ urn: input.account })
-  await ctx.accountNode?.storage.deleteAll()
+  const identityEdge = await caller.edges.findNode({
+    baseUrn: identityURN,
+  })
 
-  return null
+  if (!forceDelete) {
+    const primaryAccountURN = identityEdge?.qc.primaryAccountURN
+    if (primaryAccountURN === ctx.accountURN) {
+      throw new RollupError({
+        code: ERROR_CODES.BAD_REQUEST,
+        message: 'Cannot disconnect primary account',
+      })
+    }
+
+    const accountUsage = await getAccountReferenceTypes({ ctx })
+    if (accountUsage.length > 0) {
+      throw new RollupError({
+        code: ERROR_CODES.BAD_REQUEST,
+        message: `Cannot disconnect active account (${accountUsage.join(
+          ', '
+        )})`,
+      })
+    }
+  }
+
+  // Get the account associated with the authorization header included in the request.
+  const account = ctx.accountURN as AccountURN
+
+  if (!IdentityURNSpace.is(identityURN)) {
+    throw new Error('Invalid identity URN')
+  }
+
+  // Remove the stored identity in the node.
+  await nodeClient?.class.unsetIdentity()
+
+  const { edges: accountEdges } = await caller.edges.getEdges({
+    query: {
+      dst: {
+        baseUrn: account,
+      },
+    },
+  })
+
+  // Remove any edge that references the account node
+  const edgeDeletionPromises = accountEdges.map((edge) => {
+    return caller.edges.removeEdge({
+      src: edge.src.baseUrn,
+      dst: edge.dst.baseUrn,
+      tag: edge.tag,
+    })
+  })
+
+  await Promise.all(edgeDeletionPromises)
+
+  await caller.edges.deleteNode({
+    urn: account,
+  })
+
+  return ctx.account?.storage.deleteAll()
 }

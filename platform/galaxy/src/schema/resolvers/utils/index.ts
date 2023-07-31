@@ -2,7 +2,7 @@ import { GraphQLError } from 'graphql'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
-import type { AccountURN } from '@proofzero/urns/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
 import createCoreClient from '@proofzero/platform-clients/core'
 
 import Env from '../../../env'
@@ -14,7 +14,7 @@ import {
 
 import { WriteAnalyticsDataPoint } from '@proofzero/packages/platform-clients/analytics'
 
-import { NodeType } from '@proofzero/types/address'
+import { NodeType } from '@proofzero/types/account'
 import {
   generateTraceContextHeaders,
   TraceSpan,
@@ -50,14 +50,14 @@ export const setupContext = () => (next) => (root, args, context, info) => {
 
   const parsedJwt = jwt && parseJwt(jwt)
 
-  const accountURN = jwt ? parsedJwt?.sub : undefined
+  const identityURN = jwt ? parsedJwt?.sub : undefined
 
   const clientId = jwt ? parsedJwt?.aud?.[0] : undefined
 
   return next(
     root,
     args,
-    { ...context, jwt, apiKey, accountURN, parsedJwt, clientId },
+    { ...context, jwt, apiKey, identityURN, parsedJwt, clientId },
     info
   )
 }
@@ -150,7 +150,7 @@ export const validateApiKey =
       // This is being checked only if jwt is presented
       if (context.jwt && context.jwt.length) {
         const { payload: jwtPayload } =
-          await coreClient.access.verifyToken.query({
+          await coreClient.authorization.verifyToken.query({
             token: context.jwt,
           })
 
@@ -248,13 +248,13 @@ export const logAnalytics =
     return next(root, args, context, info)
   }
 
-export const getConnectedAddresses = async ({
-  accountURN,
+export const getConnectedAccounts = async ({
+  identityURN,
   Core,
   jwt,
   traceSpan,
 }: {
-  accountURN: AccountURN
+  identityURN: IdentityURN
   Core: Fetcher
   jwt?: string
   traceSpan: TraceSpan
@@ -264,10 +264,10 @@ export const getConnectedAddresses = async ({
     ...generateTraceContextHeaders(traceSpan),
   })
 
-  const addresses = await coreClient.account.getAddresses.query({
-    account: accountURN,
+  const accounts = await coreClient.identity.getAccounts.query({
+    identity: identityURN,
   })
 
   // for alchemy calls they need to be lowercased
-  return addresses
+  return accounts
 }

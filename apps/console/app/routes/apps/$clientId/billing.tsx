@@ -1,7 +1,7 @@
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import plans, { type PlanDetails } from '~/routes/__layout/billing/plans'
 import { PlanFeatures } from '~/routes/__layout/billing'
-import { type PaymentData, ServicePlanType } from '@proofzero/types/account'
+import { type PaymentData, ServicePlanType } from '@proofzero/types/identity'
 import { Button } from '@proofzero/design-system'
 import { StatusPill } from '@proofzero/design-system/src/atoms/pills/StatusPill'
 import {
@@ -29,8 +29,8 @@ import {
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
-import { type GetEntitlementsOutput } from '@proofzero/platform/account/src/jsonrpc/methods/getEntitlements'
-import { type AccountURN } from '@proofzero/urns/account'
+import { type GetEntitlementsOutput } from '@proofzero/platform/identity/src/jsonrpc/methods/getEntitlements'
+import { type IdentityURN } from '@proofzero/urns/identity'
 import { BadRequestError } from '@proofzero/errors'
 import type { ToastNotification, appDetailsProps } from '~/types'
 import { type AppLoaderData } from '~/root'
@@ -59,7 +59,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
-    const accountURN = parsedJwt.sub as AccountURN
+    const identityURN = parsedJwt.sub as IdentityURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
     const coreClient = createCoreClient(context.env.Core, {
@@ -67,11 +67,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const entitlements = await coreClient.account.getEntitlements.query({
-      accountURN,
+    const entitlements = await coreClient.identity.getEntitlements.query({
+      identityURN,
     })
-    const paymentData = await coreClient.account.getStripePaymentData.query({
-      accountURN,
+    const paymentData = await coreClient.identity.getStripePaymentData.query({
+      identityURN,
     })
 
     const flashSession = await getFlashSession(request, context.env)
@@ -106,15 +106,15 @@ const processUpdateOp = async (
   traceHeader: Record<'traceparent', string>
 ) => {
   const parsedJwt = parseJwt(jwt)
-  const accountURN = parsedJwt.sub as AccountURN
+  const identityURN = parsedJwt.sub as IdentityURN
 
   const coreClient = createCoreClient(env.Core, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...traceHeader,
   })
 
-  const entitlements = await coreClient.account.getEntitlements.query({
-    accountURN,
+  const entitlements = await coreClient.identity.getEntitlements.query({
+    identityURN,
   })
 
   const apps = await coreClient.starbase.listApps.query()
@@ -130,7 +130,7 @@ const processUpdateOp = async (
   }
 
   await coreClient.starbase.setAppPlan.mutate({
-    accountURN,
+    identityURN,
     clientId,
     plan,
   })
@@ -167,19 +167,19 @@ const processPurchaseOp = async (
   traceHeader: Record<'traceparent', string>
 ) => {
   const parsedJwt = parseJwt(jwt)
-  const accountURN = parsedJwt.sub as AccountURN
+  const identityURN = parsedJwt.sub as IdentityURN
 
   const coreClient = createCoreClient(env.Core, {
     ...getAuthzHeaderConditionallyFromToken(jwt),
     ...traceHeader,
   })
 
-  const entitlements = await coreClient.account.getEntitlements.query({
-    accountURN,
+  const entitlements = await coreClient.identity.getEntitlements.query({
+    identityURN,
   })
 
-  const paymentData = await coreClient.account.getStripePaymentData.query({
-    accountURN,
+  const paymentData = await coreClient.identity.getStripePaymentData.query({
+    identityURN,
   })
   if (!paymentData || !paymentData.customerID) {
     throw new BadRequestError({
@@ -200,7 +200,7 @@ const processPurchaseOp = async (
     SECRET_STRIPE_API_KEY: env.SECRET_STRIPE_API_KEY,
     quantity,
     subscriptionID: entitlements.subscriptionID,
-    accountURN,
+    identityURN,
   })
 
   setPurchaseToastNotification({
@@ -214,15 +214,15 @@ const processPurchaseOp = async (
     (sub.status === 'active' || sub.status === 'trialing') &&
     invoiceStatus === 'paid'
   ) {
-    await coreClient.account.updateEntitlements.mutate({
-      accountURN: accountURN,
+    await coreClient.identity.updateEntitlements.mutate({
+      identityURN: identityURN,
       subscriptionID: sub.id,
       quantity: quantity,
       type: plan,
     })
 
     await coreClient.starbase.setAppPlan.mutate({
-      accountURN,
+      identityURN,
       clientId,
       plan,
     })
@@ -241,7 +241,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const parsedJwt = parseJwt(jwt!)
-    const accountURN = parsedJwt.sub as AccountURN
+    const identityURN = parsedJwt.sub as IdentityURN
 
     const { clientId } = params
     if (!clientId) throw new BadRequestError({ message: 'Missing Client ID' })
@@ -253,8 +253,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const spd = await coreClient.account.getStripePaymentData.query({
-      accountURN,
+    const spd = await coreClient.identity.getStripePaymentData.query({
+      identityURN,
     })
 
     const invoices = await getCurrentAndUpcomingInvoices(

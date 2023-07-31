@@ -1,7 +1,7 @@
 import type { PlatformHeaders } from '@proofzero/platform-clients/base'
 import createCoreClient from '@proofzero/platform-clients/core'
 
-import { PlatformAddressURNHeader } from '@proofzero/types/headers'
+import { PlatformAccountURNHeader } from '@proofzero/types/headers'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
@@ -14,7 +14,7 @@ interface CoreClientOptions {
     traceSpan: TraceSpan
   }
   jwt?: string
-  addressURN?: string
+  accountURN?: string
 }
 
 export const getCoreClient = (options: CoreClientOptions) => {
@@ -25,7 +25,7 @@ export const getCoreClient = (options: CoreClientOptions) => {
   const headers: PlatformHeaders = generateTraceContextHeaders(traceSpan)
 
   if (options.jwt) headers.Authorization = `Bearer ${options.jwt}`
-  if (options.addressURN) headers[PlatformAddressURNHeader] = options.addressURN
+  if (options.accountURN) headers[PlatformAccountURNHeader] = options.accountURN
 
   return createCoreClient(Core, headers)
 }

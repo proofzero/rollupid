@@ -17,8 +17,8 @@ import noImg from '~/assets/noImg.svg'
 
 import { getCoreClient } from '~/platform.server'
 
-import type { AddressURN } from '@proofzero/urns/address'
-import type { NodeType } from '@proofzero/types/address'
+import type { AccountURN } from '@proofzero/urns/account'
+import type { NodeType } from '@proofzero/types/account'
 import type {
   LoaderFunction,
   MetaFunction,
@@ -55,7 +55,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const passportDefaultAuthzParams = getDefaultAuthzParams(request)
 
-    const { jwt, accountUrn } = await getValidatedSessionContext(
+    const { jwt, identityURN } = await getValidatedSessionContext(
       request,
       passportDefaultAuthzParams,
       context.env,
@@ -64,28 +64,28 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const coreClient = getCoreClient({ context, jwt })
 
-    const accountProfile = await coreClient.account.getProfile.query({
-      account: accountUrn,
+    const identityProfile = await coreClient.identity.getProfile.query({
+      identity: identityURN,
     })
 
-    const addressTypeUrns = accountProfile?.addresses.map((a) => ({
+    const accountTypeUrns = identityProfile?.accounts.map((a) => ({
       urn: a.baseUrn,
       nodeType: a.rc.node_type,
-    })) as { urn: AddressURN; nodeType: NodeType }[]
+    })) as { urn: AccountURN; nodeType: NodeType }[]
 
-    const addresses = addressTypeUrns.map((atu) => atu.urn)
+    const accounts = accountTypeUrns.map((atu) => atu.urn)
 
-    const apps = await coreClient.account.getAuthorizedApps.query({
-      account: accountUrn,
+    const apps = await coreClient.identity.getAuthorizedApps.query({
+      identity: identityURN,
     })
 
     const awaitedResults = await Promise.all([
       Promise.all(
         apps.map(async (a) => {
           const appAuthorizedScopes =
-            await coreClient.access.getAuthorizedAppScopes.query({
+            await coreClient.authorization.getAuthorizedAppScopes.query({
               clientId: a.clientId,
-              accountURN: accountUrn,
+              identityURN: identityURN,
             })
 
           return {
@@ -101,10 +101,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         apps: apps.map((a) => ({ clientId: a.clientId })),
         silenceErrors: true,
       }),
-      coreClient.address.getAddressProfileBatch.query(addresses),
+      coreClient.account.getAccountProfileBatch.query(accounts),
     ])
 
-    const [authorizedApps, appsPublicProps, addressProfiles] = awaitedResults
+    const [authorizedApps, appsPublicProps, accountProfiles] = awaitedResults
 
     const authzAppResults: AuthorizedAppsModel[] = []
     authorizedApps.forEach((authzApp, index) => {
@@ -120,19 +120,19 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         authzAppResults.push({ ...authzApp, icon: noImg, appDataError: true })
     })
 
-    const normalizedConnectedProfiles = addressProfiles.map((p, i) => ({
-      ...addressTypeUrns[i],
+    const normalizedConnectedProfiles = accountProfiles.map((p, i) => ({
+      ...accountTypeUrns[i],
       ...p,
     }))
 
     return json({
-      pfpUrl: accountProfile?.pfp?.image,
-      displayName: accountProfile?.displayName,
+      pfpUrl: identityProfile?.pfp?.image,
+      displayName: identityProfile?.displayName,
       authorizedApps: authzAppResults,
       connectedProfiles: normalizedConnectedProfiles,
       CONSOLE_URL: context.env.CONSOLE_APP_URL,
-      primaryAddressURN: accountProfile?.primaryAddressURN,
-      accountUrn,
+      primaryAccountURN: identityProfile?.primaryAccountURN,
+      identityURN,
     })
   }
 )
@@ -150,8 +150,8 @@ export default function SettingsLayout() {
     pfpUrl,
     CONSOLE_URL,
     displayName,
-    primaryAddressURN,
-    accountUrn,
+    primaryAccountURN,
+    identityURN,
   } = useLoaderData()
 
   const [isIdentified, setIsIdentified] = useState(false)
@@ -159,7 +159,7 @@ export default function SettingsLayout() {
 
   // need to identify only once
   useEffect(() => {
-    if (!isIdentified) posthog?.identify(accountUrn)
+    if (!isIdentified) posthog?.identify(identityURN)
     setIsIdentified(true)
   }, [isIdentified])
 
@@ -192,7 +192,7 @@ export default function SettingsLayout() {
                   context={{
                     authorizedApps,
                     connectedProfiles,
-                    primaryAddressURN,
+                    primaryAccountURN,
                     CONSOLE_URL,
                   }}
                 />

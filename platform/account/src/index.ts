@@ -1,1 +1,1 @@
-export { Account, IdentityGroup } from './nodes'
+export { Account, ContractAccount, CryptoAccount, OAuthAccount } from './nodes'
