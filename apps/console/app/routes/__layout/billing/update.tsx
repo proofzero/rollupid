@@ -81,7 +81,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         const apps = await coreClient.starbase.listApps.query()
         const allotedApps = apps.filter((a) => a.appPlan === plan).length
 
-        if (numberOfEntitlements && numberOfEntitlements > allotedApps) {
+        if (
+          clientId &&
+          numberOfEntitlements &&
+          numberOfEntitlements > allotedApps
+        ) {
           await coreClient.starbase.setAppPlan.mutate({
             accountURN,
             clientId,

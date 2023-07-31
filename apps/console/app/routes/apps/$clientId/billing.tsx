@@ -317,6 +317,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             status,
             client_secret,
             payment_method,
+            clientId,
           },
           {
             headers: {
