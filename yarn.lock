@@ -6554,9 +6554,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@microlabs/otel-cf-workers@npm:1.0.0-rc.6":
-  version: 1.0.0-rc.6
-  resolution: "@microlabs/otel-cf-workers@npm:1.0.0-rc.6"
+"@microlabs/otel-cf-workers@npm:1.0.0-rc.7":
+  version: 1.0.0-rc.7
+  resolution: "@microlabs/otel-cf-workers@npm:1.0.0-rc.7"
   dependencies:
     "@opentelemetry/api": ^1.4.1
     "@opentelemetry/core": ^1.11.0
@@ -6568,7 +6568,7 @@ __metadata:
     "@opentelemetry/semantic-conventions": ^1.11.0
     deepmerge: ^4.3.1
     ts-checked-fsm: ^1.1.0
-  checksum: bb6a7011cb6ed3424f666f23dc51dec57b602798ed1418769fecbf8eb43e640ed33326ee965f6d92fc2a696a32559060d977e7ce34de2ae1b2b0d43752a438be
+  checksum: 1a4daab92db705a12a12668837e30ef3645f6f42ca071d6d937871dc6b61c60a72f656aed702b2db316ca50993861fda820933633a5b8196bf0175ec66ea6465
   languageName: node
   linkType: hard
 
@@ -7406,7 +7406,7 @@ __metadata:
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/keccak256": 5.7.0
     "@mdx-js/react": ^1.6.22
-    "@microlabs/otel-cf-workers": 1.0.0-rc.6
+    "@microlabs/otel-cf-workers": 1.0.0-rc.7
     "@opentelemetry/sdk-trace-base": 1.15.1
     "@playwright/test": 1.35.1
     "@proofzero/design-system": "*"
