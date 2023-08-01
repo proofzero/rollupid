@@ -39,11 +39,16 @@ export const authenticateAddress = async (
   const jwt = await getUserSession(request, env, appData?.clientId)
   if (
     appData.rollup_action &&
-    ['connect', 'reconnect'].includes(appData?.rollup_action)
+    (['connect', 'reconnect'].includes(appData?.rollup_action) ||
+      appData?.rollup_action.startsWith('groupconnect'))
   ) {
     let result = undefined
 
-    if (existing && appData.rollup_action === 'connect') {
+    if (
+      existing &&
+      (appData.rollup_action === 'connect' ||
+        appData.rollup_action.startsWith('groupconnect'))
+    ) {
       const loggedInAccount = parseJwt(jwt).sub
       if (account !== loggedInAccount) {
         result = 'ACCOUNT_CONNECT_ERROR'

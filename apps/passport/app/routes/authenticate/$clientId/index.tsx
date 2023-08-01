@@ -25,6 +25,14 @@ import {
 } from '@proofzero/utils/errors'
 import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 import { BadRequestError } from '@proofzero/errors'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import createCoreClient from '@proofzero/platform-clients/core'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import _ from 'lodash'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -48,10 +56,48 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       displayKeys = hints
     }
 
+    const authzParams = await getAuthzCookieParams(
+      request,
+      context.env,
+      params.clientId
+    )
+
+    let invitationData
+    if (authzParams.rollup_action?.startsWith('group')) {
+      const groupID = authzParams.rollup_action.split('_')[1]
+      const invitationCode = authzParams.rollup_action.split('_')[2]
+
+      const identityGroupURN = `${['urn:rollupid:identity-group', groupID].join(
+        '/'
+      )}` as IdentityGroupURN
+      if (!IdentityGroupURNSpace.is(identityGroupURN)) {
+        throw new Error('Invalid group ID')
+      }
+
+      const traceHeader = generateTraceContextHeaders(context.traceSpan)
+      const coreClient = createCoreClient(context.env.Core, {
+        ...getAuthzHeaderConditionallyFromToken(undefined),
+        ...traceHeader,
+      })
+
+      const invDetails =
+        await coreClient.account.getIdentityGroupMemberInvitationDetails.query({
+          invitationCode,
+          identityGroupURN,
+        })
+
+      invitationData = {
+        groupName: invDetails.identityGroupName,
+        identifier: invDetails.identifier,
+        addressType: invDetails.addressType,
+      }
+    }
+
     return json({
       clientId: params.clientId,
       displayKeys,
       authnQueryParams: new URL(request.url).searchParams.toString(),
+      invitationData,
     })
   }
 )
@@ -84,6 +130,7 @@ const InnerComponent = ({
   displayKeys,
   clientId,
   authnQueryParams,
+  invitationData,
 }: {
   transitionState: string
   appProps?: GetAppPublicPropsResult
@@ -91,6 +138,11 @@ const InnerComponent = ({
   displayKeys?: any
   clientId: string
   authnQueryParams: string
+  invitationData?: {
+    groupName: string
+    identifier: string
+    addressType: string
+  }
 }) => {
   const [signData, setSignData] = useState<{
     nonce: string | undefined
@@ -124,7 +176,7 @@ const InnerComponent = ({
     history.replaceState(null, '', url.toString())
   }, [])
 
-  const generic = Boolean(rollup_action)
+  const generic = Boolean(rollup_action) && !rollup_action?.startsWith('group_')
 
   return (
     <Authentication
@@ -140,6 +192,19 @@ const InnerComponent = ({
               >
                 Connect Account
               </Text>
+
+              {invitationData && rollup_action?.startsWith('groupconnect_') && (
+                <Text className="text-gray-600 mb-8">
+                  To continue please connect your <br />
+                  <Text
+                    type="span"
+                    weight="bold"
+                    className="text-orange-600"
+                  >{`${_.upperFirst(invitationData.addressType)} Account: ${
+                    invitationData.identifier
+                  }`}</Text>
+                </Text>
+              )}
             </>
           )}
 
@@ -149,25 +214,38 @@ const InnerComponent = ({
                 src={iconURL ?? AuthenticationScreenDefaults.defaultLogoURL}
                 size="sm"
               ></Avatar>
-              <div className={'flex flex-col items-center gap-2'}>
-                <h1
-                  className={
-                    'font-semibold text-xl dark:text-white text-center'
-                  }
-                >
-                  {appProps?.appTheme?.heading
-                    ? appProps.appTheme.heading
-                    : appProps?.name
-                    ? `Login to ${appProps?.name}`
-                    : AuthenticationScreenDefaults.defaultHeading}
-                </h1>
-                <h2
-                  style={{ color: '#6B7280' }}
-                  className={'font-medium text-base'}
-                >
-                  {AuthenticationScreenDefaults.defaultSubheading}
-                </h2>
-              </div>
+
+              {!rollup_action?.startsWith('group') && (
+                <div className={'flex flex-col items-center gap-2'}>
+                  <h1
+                    className={
+                      'font-semibold text-xl dark:text-white text-center'
+                    }
+                  >
+                    {appProps?.appTheme?.heading
+                      ? appProps.appTheme.heading
+                      : appProps?.name
+                      ? `Login to ${appProps?.name}`
+                      : AuthenticationScreenDefaults.defaultHeading}
+                  </h1>
+                  <h2
+                    style={{ color: '#6B7280' }}
+                    className={'font-medium text-base'}
+                  >
+                    {AuthenticationScreenDefaults.defaultSubheading}
+                  </h2>
+                </div>
+              )}
+            </>
+          )}
+
+          {rollup_action?.startsWith('group_') && (
+            <>
+              <Text>"User" has invited you to join "GroupName"</Text>
+              <Text>
+                To accept please authenticate with your Google Account:
+                us**@**il.com
+              </Text>
             </>
           )}
         </>
@@ -316,7 +394,8 @@ export default () => {
     rollup_action?: string
   }>()
 
-  const { clientId, displayKeys, authnQueryParams } = useLoaderData()
+  const { clientId, displayKeys, authnQueryParams, invitationData } =
+    useLoaderData()
 
   const transition = useTransition()
 
@@ -331,6 +410,7 @@ export default () => {
             displayKeys={displayKeys}
             clientId={clientId}
             authnQueryParams={authnQueryParams}
+            invitationData={invitationData}
           />
         </LazyAuth>
       </Suspense>

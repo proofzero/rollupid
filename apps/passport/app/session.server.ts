@@ -176,7 +176,8 @@ export async function createAuthzParamsCookieAndAuthenticate(
   qp: URLSearchParams = new URLSearchParams()
 ) {
   let redirectURL = `/authenticate/${authzQueryParams.clientId}${
-    ['connect', 'reconnect'].includes(authzQueryParams.rollup_action || '')
+    ['connect', 'reconnect'].includes(authzQueryParams.rollup_action || '') ||
+    authzQueryParams.rollup_action?.startsWith('groupconnect')
       ? ''
       : `/account`
   }`

@@ -92,12 +92,19 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       nonce: formData.get('nonce') as string,
       signature: formData.get('signature') as string,
       jwt: await getUserSession(request, context.env, appData?.clientId),
-      forceAccountCreation: !appData || appData.rollup_action !== 'connect',
+      forceAccountCreation:
+        !appData ||
+        (appData.rollup_action !== 'connect' &&
+          !appData.rollup_action?.startsWith('groupconnect')),
     })
 
     const accountURNFromAddress = await coreClient.address.getAccount.query()
 
-    if (appData?.rollup_action === 'connect' && existing) {
+    if (
+      (appData?.rollup_action === 'connect' ||
+        appData?.rollup_action?.startsWith('groupconnect')) &&
+      existing
+    ) {
       const accountURN = parseJwt(jwt).sub! as AccountURN
       if (accountURN === accountURNFromAddress) {
         return redirect(getAuthzRedirectURL(appData, 'ALREADY_CONNECTED_ERROR'))
