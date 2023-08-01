@@ -1,7 +1,8 @@
 # Table of contents
 
-* [Introduction to Rollup](3id/overview/index.md)
-* [How it works](how-it-works.md)
+* [Welcome to Rollup](3id/overview/index.md)
+* [An Introduction to OpenID Connect (OIDC)](an-introduction-to-openid-connect-oidc.md)
+* [The Rollup Identity Graph](how-it-works.md)
 
 ## Getting Started
 

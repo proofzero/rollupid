@@ -1,8 +1,8 @@
 ---
-description: Identity management for the private web.
+description: Simple & Secure Auth the private web.
 ---
 
-# Introduction to Rollup
+# Welcome to Rollup
 
 Rollup ID is a user management platform designed to prioritize privacy, security, and ease of use for both you and your users. By providing a user-centric and privacy-focused digital identity solution, we empower users to take control of their online data and identities, while also offering your business enhanced security, control, and lifecycle management.
 
@@ -16,6 +16,6 @@ We're thrilled to have you on board and are committed to collaborating with you 
 
 #### Learn More
 
-1. [Understanding Passport](../../platform/passport.md)
+1. [An Introduction to OIDC](../../an-introduction-to-openid-connect-oidc.md)
 2. [Explore the Galaxy API](../../reference/galaxy-api.md)
 3. [Learn about the Profile Graph](../../platform/profile-graph.md)
