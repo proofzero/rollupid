@@ -21,7 +21,7 @@ import { CryptoAddressType } from '@proofzero/types/address'
 import { useLoaderData, useSubmit } from '@remix-run/react'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
-import { requireJWT } from '~/utilities/session.server'
+import { getUserSession, requireJWT } from '~/utilities/session.server'
 import { AccountURN } from '@proofzero/urns/account'
 
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
@@ -57,12 +57,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const jwt = await requireJWT(request, context.env)
-
-    let accountURN: AccountURN | undefined
-    if (jwt) {
-      const parsedJwt = parseJwt(jwt)
-      accountURN = parsedJwt.sub as AccountURN
-    }
+    const parsedJwt = parseJwt(jwt!)
+    const accountURN = parsedJwt.sub as AccountURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
@@ -86,31 +82,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         login_hint = invDetails.addressType
     }
 
-    if (!accountURN) {
-      const qp = new URLSearchParams()
-
-      if (login_hint) {
-        qp.append('login_hint', login_hint)
-      }
-
-      qp.append('clientId', 'passport')
-      qp.append('redirectUri', new URL(request.url).toString())
-      qp.append('state', 'skip')
-      qp.append('scope', '')
-
-      const redirectURL = new URL(
-        `${context.env.PASSPORT_URL}/authorize?${qp.toString()}`
-      )
-
-      return redirect(redirectURL.toString())
-    }
-
     const accountAddresses = await coreClient.account.getOwnAddresses.query({
       account: accountURN,
     })
     const invitedAddress = accountAddresses.find(
       (aa) =>
-        aa.qc.alias === invDetails.identifier &&
+        aa.qc.alias.toLowerCase() === invDetails.identifier.toLowerCase() &&
         aa.rc.addr_type === invDetails.addressType
     )
 
@@ -206,7 +183,7 @@ export default () => {
     qp.append('client_id', 'console')
 
     qp.append('redirect_uri', currentURL.toString())
-    qp.append('rollup_action', 'connect')
+    qp.append('rollup_action', `groupconnect_${groupID}_${invitationCode}`)
     if (loginHint) {
       qp.append('login_hint', loginHint)
     }

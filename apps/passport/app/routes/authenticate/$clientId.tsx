@@ -1,6 +1,6 @@
 import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
-import { getAuthzCookieParams } from '~/session.server'
+import { getAuthzCookieParams, isSupportedRollupAction } from '~/session.server'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 
@@ -18,12 +18,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const cp = await getAuthzCookieParams(request, context.env)
 
     let rollup_action
-    if (
-      cp &&
-      cp.rollup_action &&
-      ['connect', 'reconnect'].includes(cp?.rollup_action)
-    ) {
-      rollup_action = cp?.rollup_action
+    if (cp && cp.rollup_action && isSupportedRollupAction(cp.rollup_action)) {
+      rollup_action = cp.rollup_action
     }
 
     return json({

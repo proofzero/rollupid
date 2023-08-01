@@ -61,7 +61,7 @@ export const acceptIdentityGroupMemberInvitation = async ({
   })
   const targetAddress = addresses.find(
     (address) =>
-      address.qc.alias === invitation.identifier &&
+      address.qc.alias.toLowerCase() === invitation.identifier.toLowerCase() &&
       address.rc.addr_type === invitation.addressType
   )
   if (!targetAddress) {
