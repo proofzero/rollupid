@@ -8,8 +8,7 @@ export type ToastWithLinkProps = {
   message: string
   linkHref: string
   linkText: string
-  type?: 'urgent' | 'deferred'
-
+  type?: 'urgent' | 'deferred' | 'warning'
   remove?: () => void
 }
 
@@ -21,6 +20,7 @@ const ToastIcon = {
 const ToastStyle = {
   urgent: 'bg-yellow-200 text-black w-full px-6',
   deferred: 'bg-indigo-50 text-indigo-700 w-full',
+  warning: 'bg-orange-50 text-orange-600 w-full',
 }
 
 export const ToastWithLink = ({

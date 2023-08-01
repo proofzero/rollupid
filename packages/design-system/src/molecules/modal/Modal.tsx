@@ -61,9 +61,9 @@ export const Modal = ({
                   className={classNames(
                     'flex flex-col border bg-white rounded-lg shadow-xl thin-scrollbar',
                     {
-                      'h-max w-max min-[480px]:w-[96vw] lg:w-[62vw] h-[96vh] lg:h-[76vh]':
+                      'h-max min-w-fit w-max min-[480px]:w-[96vw] lg:w-[62vw] h-[96vh] lg:h-[76vh]':
                         fixed,
-                      'h-max w-max min-h-max max-w-[96vw] lg:w-full max-h-[89vh] lg:h-full':
+                      'h-max min-w-fit w-max min-h-max max-w-[96vw] lg:w-full max-h-[89vh] lg:h-full':
                         !fixed,
                     },
                     {

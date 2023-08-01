@@ -1,8 +1,8 @@
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 import audienceSVG from '~/assets/early/audience.svg'
 import { useOutletContext } from '@remix-run/react'
-import { appDetailsProps } from '~/types'
-import { AccountURN } from '@proofzero/urns/account'
+import { type appDetailsProps } from '~/types'
+import { type AccountURN } from '@proofzero/urns/account'
 
 export default () => {
   const { appDetails, accountURN } = useOutletContext<{
