@@ -236,12 +236,21 @@ const InnerComponent = ({
             </>
           )}
 
-          {rollup_action?.startsWith('group_') && (
+          {invitationData && rollup_action?.startsWith('group_') && (
             <>
-              <Text>"User" has invited you to join "GroupName"</Text>
+              <Text className="text-center">
+                "User" has invited you to join <br /> "
+                {invitationData.groupName}"
+              </Text>
               <Text>
-                To accept please authenticate with your Google Account:
-                us**@**il.com
+                To accept please authenticate with your <br />
+                <Text
+                  type="span"
+                  weight="bold"
+                  className="text-orange-600"
+                >{`${_.upperFirst(invitationData.addressType)} Account: ${
+                  invitationData.identifier
+                }`}</Text>
               </Text>
             </>
           )}
