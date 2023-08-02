@@ -24,7 +24,7 @@ With Rollup your can request access to your users [ERC 4337](https://eips.ethere
 6. In the scopes dropdown select `erc_4337` scope
 7. Update your application to include the `erc_4337` scope in the [authorization request](../../getting-started/auth-flow.md)
 
-<figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Registering Session Keys
 
