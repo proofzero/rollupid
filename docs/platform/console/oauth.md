@@ -24,7 +24,7 @@ Here you can roll your your app's client secret but make sure to update this val
 
 ### Details Panel
 
-<figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption><p>OAuth App Details Panel</p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1) (1).png" alt=""><figcaption><p>OAuth App Details Panel</p></figcaption></figure>
 
 The details panel is where you configure your application name, picture, [authorization scopes](../../reference/scopes.md), [custom domain](custom-domain.md), and other links.
 

@@ -8,11 +8,11 @@ description: Rollup Account Abstraction Claims and API
 
 With Rollup your can request access to your users [ERC 4337](https://eips.ethereum.org/EIPS/eip-4337) smart contract wallets. If they don't have a smart contract wallet, no sweat, we will help them create one when they onboard to your application. The following will guide you through setting up this flow.
 
-##### Currently for this feature we only support ethereum and polygon with their testnets. [Contact us](https://discord.com/invite/rollupid) if you'd like to add something else.
+**Currently for this feature we only support ethereum and polygon with their testnets.** [**Contact us**](https://discord.com/invite/rollupid) **if you'd like to add something else.**
 
 ### Prerequisites
 
-- Setup an application with one of our supported[ paymaster providers](../platform/console/blockchain.md#preferred-paymasters).
+* Setup an application with one of our supported[ paymaster providers](../platform/console/blockchain.md#preferred-paymasters).
 
 ### Setup
 
@@ -24,7 +24,7 @@ With Rollup your can request access to your users [ERC 4337](https://eips.ethere
 6. In the scopes dropdown select `erc_4337` scope
 7. Update your application to include the `erc_4337` scope in the [authorization request](../getting-started/auth-flow.md)
 
-<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Registering Session Keys
 
@@ -44,7 +44,7 @@ When your users login to your application you will now be presented with an acce
 
 <figure><img src="../.gitbook/assets/image (4).png" alt=""><figcaption></figcaption></figure>
 
-With this access token you can now make requests to the [galaxy-api.md](../reference/galaxy-api.md 'mention') to register your [session key](https://twitter.com/chainlink/status/1636781219848372235). To register a session key you will always need to generate a ethers wallet and send the public address along with the specified smart contract wallet to register. For example:
+With this access token you can now make requests to the [galaxy-api.md](../reference/galaxy-api.md "mention") to register your [session key](https://twitter.com/chainlink/status/1636781219848372235). To register a session key you will always need to generate a ethers wallet and send the public address along with the specified smart contract wallet to register. For example:
 
 ````typescript
 import { Wallet } from 'ethers'
@@ -92,7 +92,9 @@ Here's how to do that:
 
 This action will revoke all scopes user authorized app to use, including the revocation of session keys for all authorized smart contract wallets.
 
-{% hint style="warning" %} Revocation of Smart Contract wallets results in a blockchain transaction. Be aware that any revocation of smart contract wallet will cost gas fees. {% endhint %}
+{% hint style="warning" %}
+Revocation of Smart Contract wallets results in a blockchain transaction. Be aware that any revocation of smart contract wallet will cost gas fees.
+{% endhint %}
 
 ## Accessing Your App's Smart Contract Wallet
 
