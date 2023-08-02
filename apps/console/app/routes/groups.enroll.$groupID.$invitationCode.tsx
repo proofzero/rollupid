@@ -9,6 +9,7 @@ import {
 import createCoreClient from '@proofzero/platform-clients/core'
 import {
   getAuthzHeaderConditionallyFromToken,
+  obfuscateAlias,
   parseJwt,
 } from '@proofzero/utils'
 import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
@@ -91,8 +92,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     )
 
     return json({
+      inviterAlias: invDetails.inviter,
       groupName: invDetails.identityGroupName,
-      identifier: invDetails.identifier,
+      identifier: obfuscateAlias(invDetails.identifier),
       addressType: invDetails.addressType,
       enrollmentType: invitedAddress
         ? EnrollmentType.Own
@@ -153,6 +155,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
 export default () => {
   const {
+    inviterAlias,
     groupName,
     identifier,
     addressType,
@@ -162,6 +165,7 @@ export default () => {
     groupID,
     invitationCode,
   } = useLoaderData<{
+    inviterAlias: string
     groupName: string
     identifier: string
     addressType: string
@@ -235,7 +239,7 @@ export default () => {
 
               <Text className="mb-2">
                 <Text weight="bold" type="span">
-                  "User"
+                  "{inviterAlias}"
                 </Text>{' '}
                 has invited you to join{' '}
                 <Text weight="bold" type="span">
@@ -271,22 +275,23 @@ export default () => {
             <>
               <img src={danger} className="mb-4" />
 
-              <Text className="mb-2">
+              <Text className="mb-2 truncate">
                 <Text weight="bold" type="span">
                   Cannot accept
                 </Text>{' '}
                 Invite to join{' '}
-                <Text weight="bold" type="span">
+                <Text weight="bold" type="span" className="truncate">
                   "{groupName}"
                 </Text>
               </Text>
 
-              <Text className="text-gray-500 mb-4">
+              <Text className="text-gray-500">
                 Your account identifier didn't match the invitation record. To
-                proceed please connect the following account: <br />
-                <Text type="span" weight="bold" className="text-orange-600">
-                  {_.upperFirst(addressType)} Account: {identifier}
-                </Text>
+                proceed please connect the following account:
+              </Text>
+
+              <Text weight="bold" className="text-orange-600 truncate mb-4">
+                {_.upperFirst(addressType)} Account: {identifier}
               </Text>
 
               <Button

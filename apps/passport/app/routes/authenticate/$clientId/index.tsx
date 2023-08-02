@@ -31,7 +31,10 @@ import {
 } from '@proofzero/urns/identity-group'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import createCoreClient from '@proofzero/platform-clients/core'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import {
+  getAuthzHeaderConditionallyFromToken,
+  obfuscateAlias,
+} from '@proofzero/utils'
 import _ from 'lodash'
 
 const LazyAuth = lazy(() =>
@@ -85,8 +88,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
       invitationData = {
         groupName: invDetails.identityGroupName,
-        identifier: invDetails.identifier,
+        identifier: obfuscateAlias(invDetails.identifier),
         addressType: invDetails.addressType,
+        inviterAlias: invDetails.inviter,
       }
     }
 
@@ -136,6 +140,7 @@ const InnerComponent = ({
   clientId: string
   authnQueryParams: string
   invitationData?: {
+    inviterAlias: string
     groupName: string
     identifier: string
     addressType: string
@@ -238,16 +243,23 @@ const InnerComponent = ({
 
           {invitationData && rollup_action?.startsWith('group_') && (
             <>
-              <Text className="text-center">
-                "User" has invited you to join <br /> "
-                {invitationData.groupName}"
+              <Text className="text-center truncate max-w-xs">
+                <Text type="span" className="truncate" weight="bold">
+                  "{invitationData.inviterAlias}"
+                </Text>
+                <br />
+                has invited you to join group
+                <br />
+                <Text type="span" className="truncate" weight="bold">
+                  "{invitationData.groupName}""
+                </Text>
               </Text>
-              <Text>
+              <Text className="truncate max-w-xs">
                 To accept please authenticate with your <br />
                 <Text
                   type="span"
                   weight="bold"
-                  className="text-orange-600"
+                  className="text-orange-600 truncate"
                 >{`${_.upperFirst(invitationData.addressType)} Account: ${
                   invitationData.identifier
                 }`}</Text>

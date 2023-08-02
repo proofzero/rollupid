@@ -18,6 +18,7 @@ export const GetIdentityGroupMemberInvitationDetailsOutputSchema =
   GroupMemberInvitationSchema.extend({
     identityGroupURN: IdentityGroupURNValidator,
     identityGroupName: z.string(),
+    inviter: z.string(),
   })
 
 type GetIdentityGroupMemberInvitationDetailsOutput = z.infer<

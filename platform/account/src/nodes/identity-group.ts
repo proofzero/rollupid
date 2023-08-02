@@ -10,6 +10,7 @@ export type InviteMemberInput = {
   identifier: string
   addressType: EmailAddressType | OAuthAddressType | CryptoAddressType
   inviteCode: string
+  inviter: string
 }
 
 export type MemberInvitation = InviteMemberInput & {
@@ -29,6 +30,7 @@ export default class IdentityGroup extends DOProxy {
   }
 
   async inviteMember({
+    inviter,
     identifier,
     addressType,
     inviteCode,
@@ -39,6 +41,7 @@ export default class IdentityGroup extends DOProxy {
     const now = Date.now()
 
     invitations.push({
+      inviter,
       identifier,
       addressType,
       inviteCode,

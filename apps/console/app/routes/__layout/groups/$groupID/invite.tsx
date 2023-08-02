@@ -3,7 +3,10 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { ActionFunction, json } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import createCoreClient from '@proofzero/platform-clients/core'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import {
+  getAuthzHeaderConditionallyFromToken,
+  parseJwt,
+} from '@proofzero/utils'
 import { BadRequestError } from '@proofzero/errors'
 import {
   CryptoAddressType,
@@ -14,6 +17,7 @@ import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
+import { AccountURN } from '@proofzero/urns/account'
 
 export type InviteRes = {
   inviteCode: string
@@ -27,6 +31,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     ) as IdentityGroupURN
 
     const jwt = await requireJWT(request, context.env)
+    const parsedJwt = parseJwt(jwt!)
+    const accountURN = parsedJwt.sub as AccountURN
 
     const fd = await request.formData()
     const addressType = fd.get('addressType') as
@@ -53,6 +59,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const { inviteCode } =
       await coreClient.account.inviteIdentityGroupMember.mutate({
+        inviterAccountURN: accountURN,
         identifier,
         addressType: addressType,
         identityGroupURN: groupURN,

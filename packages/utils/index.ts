@@ -5,6 +5,7 @@ import getAuthzHeaderConditionallyFromToken from './getAuthzHeaderConditionallyF
 import getAuthzTokenFromReq from './getAuthzTokenFromReq'
 import { parseJwt } from './jwt'
 import getDNSRecordValue from './getDNSRecordValue'
+import { obfuscateAlias } from './text'
 
 export {
   checkEnv,
@@ -14,4 +15,5 @@ export {
   getAuthzTokenFromReq,
   parseJwt,
   getDNSRecordValue,
+  obfuscateAlias,
 }
