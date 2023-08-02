@@ -2,7 +2,7 @@
 description: Rollup Account Abstraction Claims and API
 ---
 
-# Using Smart Contract Wallets
+# Requesting Smart Contract Wallets
 
 ## Accessing You User's Smart Contract Wallets
 
@@ -12,23 +12,23 @@ With Rollup your can request access to your users [ERC 4337](https://eips.ethere
 
 ### Prerequisites
 
-* Setup an application with one of our supported[ paymaster providers](../platform/console/blockchain.md#preferred-paymasters).
+* Setup an application with one of our supported[ paymaster providers](../../platform/console/blockchain.md#preferred-paymasters).
 
 ### Setup
 
 1. Login into [Console](https://console.rollup.id)
-2. Go to your app (if you don't have one, [set one up](../getting-started/create-an-application.md))
+2. Go to your app (if you don't have one, [set one up](../../getting-started/create-an-application.md))
 3. Go to the Blockchain setting tab
 4. In the paymaster section, enter your paymaster credential and save.
 5. Go to the OAuth settings tab
 6. In the scopes dropdown select `erc_4337` scope
-7. Update your application to include the `erc_4337` scope in the [authorization request](../getting-started/auth-flow.md)
+7. Update your application to include the `erc_4337` scope in the [authorization request](../../getting-started/auth-flow.md)
 
-<figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Registering Session Keys
 
-When your users login to your application you will now be presented with an access [token](../advanced/tokens.md) that contains the `erc_4337` claim and a list of smart contract wallet addresses and a nickname. For example:
+When your users login to your application you will now be presented with an access [token](../../advanced/tokens.md) that contains the `erc_4337` claim and a list of smart contract wallet addresses and a nickname. For example:
 
 ```json
 {
@@ -42,9 +42,9 @@ When your users login to your application you will now be presented with an acce
 }
 ```
 
-<figure><img src="../.gitbook/assets/image (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (4).png" alt=""><figcaption></figcaption></figure>
 
-With this access token you can now make requests to the [galaxy-api.md](../reference/galaxy-api.md "mention") to register your [session key](https://twitter.com/chainlink/status/1636781219848372235). To register a session key you will always need to generate a ethers wallet and send the public address along with the specified smart contract wallet to register. For example:
+With this access token you can now make requests to the [galaxy-api.md](../../reference/galaxy-api.md "mention") to register your [session key](https://twitter.com/chainlink/status/1636781219848372235). To register a session key you will always need to generate a ethers wallet and send the public address along with the specified smart contract wallet to register. For example:
 
 ````typescript
 import { Wallet } from 'ethers'

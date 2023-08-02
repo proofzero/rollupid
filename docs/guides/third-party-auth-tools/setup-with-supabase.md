@@ -24,7 +24,7 @@ In order to implement these hops, configure Rollup, Supabase, and your app as fo
 
 Request authorization for the `Email` scope and set the Redirect URL to the Supabase Keycloak provider's redirect URL. You can get the redirect URL from the Keycloak provider configuration (see below).
 
-<figure><img src="../img/console-app-0xauth-supabase.png" alt="Set the redirect URL in Console to the Supabase callback URL and request the email and profile scopes."><figcaption><p>Rollup Console Configuration for the Supabase callback and required scopes.</p></figcaption></figure>
+<figure><img src="../../img/console-app-0xauth-supabase.png" alt="Set the redirect URL in Console to the Supabase callback URL and request the email and profile scopes."><figcaption><p>Rollup Console Configuration for the Supabase callback and required scopes.</p></figcaption></figure>
 
 Required scope values are:
 
@@ -39,7 +39,7 @@ Save and publish your application.
 
 Within Supabase, select "Authentication" a nd then under "Configuration" select "Providers"  and under the "Email" settings disable "Confirm Email" and save.
 
-<figure><img src="../.gitbook/assets/CleanShot 2023-05-16 at 10.00.06.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/CleanShot 2023-05-16 at 10.00.06.png" alt=""><figcaption></figcaption></figure>
 
 Next go to the  Keycloak settings and enable Keycloak.
 
@@ -49,7 +49,7 @@ Set your Keycloak Realm to `https://passport.rollup.id` (the screenshot below sh
 
 Copy your callback URL here and use it in your Rollup Console Application configuration (see above).
 
-<figure><img src="../img/supabase-keycloak-config.png" alt="Screenshot of Keycloak provider configuration for Supabase."><figcaption><p>Keycloak provider configuration for Supabase.</p></figcaption></figure>
+<figure><img src="../../img/supabase-keycloak-config.png" alt="Screenshot of Keycloak provider configuration for Supabase."><figcaption><p>Keycloak provider configuration for Supabase.</p></figcaption></figure>
 
 Save your settings.
 

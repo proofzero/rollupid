@@ -13,14 +13,16 @@
 
 ## Guides
 
-* [Adding Users to your Database](guides/connecting-to-your-database.md)
-* [Authenticating Users in your App](guides/authenticating-users-in-your-app.md)
-* [Setup with Supabase](guides/setup-with-supabase.md)
-* [Setup with Auth0](guides/setup-with-auth0.md)
-* [Requesting Email](guides/requesting-email.md)
-* [Connected Accounts](guides/connected-accounts.md)
-* [Using Smart Contract Wallets](guides/using-smart-contract-wallets.md)
-* [Using NextAuth.js](guides/using-nextauth.js.md)
+* [Storing Tokens](guides/connecting-to-your-database.md)
+* [Session Management](guides/authenticating-users-in-your-app.md)
+* [Using Scopes](guides/using-scopes/README.md)
+  * [Requesting Email](guides/using-scopes/requesting-email.md)
+  * [Requesting Connected Accounts](guides/using-scopes/connected-accounts.md)
+  * [Requesting Smart Contract Wallets](guides/using-scopes/using-smart-contract-wallets.md)
+* [Third Party Auth Tools](guides/third-party-auth-tools/README.md)
+  * [Setup with Auth0](guides/third-party-auth-tools/setup-with-auth0.md)
+  * [Setup with Supabase](guides/third-party-auth-tools/setup-with-supabase.md)
+  * [Setup with NextAuth.js](guides/third-party-auth-tools/using-nextauth.js.md)
 
 ## Platform
 
