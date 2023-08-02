@@ -18,6 +18,7 @@ import {
   HiOutlineShoppingCart,
   HiInformationCircle,
   HiArrowUp,
+  HiOutlineX,
 } from 'react-icons/hi'
 import {
   commitFlashSession,
@@ -402,16 +403,27 @@ const PurchaseProModal = ({
 
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
-      <Text
-        size="lg"
-        weight="semibold"
-        className="text-left text-gray-800 mx-5"
-      >
-        Purchase Entitlement(s)
-      </Text>
+      <div className="flex flex-row justify-between mt-2 items-center">
+        <Text
+          size="lg"
+          weight="semibold"
+          className="text-left text-gray-800 mx-5"
+        >
+          Purchase Entitlement(s)
+        </Text>
+        <div
+          className={`bg-white p-2 m-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+          onClick={() => {
+            setIsOpen(false)
+          }}
+        >
+          <HiOutlineX />
+        </div>
+      </div>
 
       {!paymentData?.paymentMethodID && (
-        <section className="mt-3.5 mx-5">
+        <section className="mx-5 mb-5">
           <ToastWithLink
             message="Update your Payment Information to enable purchasing"
             linkHref={`/billing/payment`}
@@ -421,7 +433,7 @@ const PurchaseProModal = ({
         </section>
       )}
 
-      <section className="m-5 border rounded-lg overflow-auto thin-scrollbar">
+      <section className="mx-5 mb-5 border rounded-lg overflow-auto thin-scrollbar">
         <div className="p-6">
           <Text size="lg" weight="semibold" className="text-gray-900 text-left">
             {plan.title}
@@ -539,6 +551,7 @@ const AssignEntitlementModal = ({
   isOpen,
   setIsOpen,
   entitlements,
+  paymentData,
   entitlementUsage,
   fetcher,
   apps,
@@ -575,7 +588,28 @@ const AssignEntitlementModal = ({
             {entitlementUsage} of {entitlements} Entitlements used
           </Text>
         </div>
-        <section className="border-t overflow-auto thin-scrollbar w-full my-4">
+        <div
+          className={`bg-white p-2 m-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+          onClick={() => {
+            setIsOpen(false)
+          }}
+        >
+          <HiOutlineX />
+        </div>
+      </div>
+      {paymentData && !paymentData.paymentMethodID ? (
+        <section className="mx-5 mb-5">
+          <ToastWithLink
+            message="Update your Payment Information to enable purchasing"
+            linkHref={`/billing/payment`}
+            type={'warning'}
+            linkText="Update payment information"
+          />
+        </section>
+      ) : null}
+      <div className="mx-5 pb-5 w-fit max-sm:w-screen sm:min-w-[640px] lg:min-w-[764px]">
+        <section className="border-t thin-scrollbar w-full my-4">
           {apps.map((app) => {
             return (
               <div

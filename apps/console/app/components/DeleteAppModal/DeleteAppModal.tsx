@@ -10,6 +10,7 @@ import dangerVector from '../../images/danger.svg'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { RiLoader5Fill } from 'react-icons/ri'
 
+import { HiOutlineX } from 'react-icons/hi'
 export type DeleteAppModalProps = {
   appName: string
   appClientID: string
@@ -35,8 +36,8 @@ export const DeleteAppModal = ({
       handleClose={() => deleteAppCallback(false)}
     >
       <div
-        className={`w-[48vw] rounded-lg bg-white px-4 pb-4
-         text-left  transition-all sm:px-6 sm:pb-6 overflow-y-auto flex items-start space-x-4`}
+        className={`w-fit rounded-lg bg-white p-4
+         text-left  transition-all sm:p-6 overflow-y-auto flex items-start space-x-4`}
       >
         <img src={dangerVector} />
 
@@ -56,6 +57,15 @@ export const DeleteAppModal = ({
               callback={deleteAppCallback}
             />
           )}
+        </div>
+        <div
+          className={`bg-white p-2 m-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+          onClick={() => {
+            deleteAppCallback(false)
+          }}
+        >
+          <HiOutlineX />
         </div>
       </div>
     </Modal>

@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 
-import { HiOutlineX } from 'react-icons/hi'
 import classNames from 'classnames'
 
 export type ModalProps = {
@@ -17,7 +16,6 @@ export const Modal = ({
   isOpen = false,
   fixed = false,
   handleClose,
-  closable = true,
   children,
   overflow,
   ...rest
@@ -70,19 +68,6 @@ export const Modal = ({
                     }
                   )}
                 >
-                  <div className="flex flex-row justify-end px-3">
-                    {closable && (
-                      <div
-                        className={`bg-white p-2 rounded-lg m-2 text-xl cursor-pointer
-                      hover:bg-[#F3F4F6]`}
-                        onClick={() => {
-                          if (handleClose) handleClose(false)
-                        }}
-                      >
-                        <HiOutlineX />
-                      </div>
-                    )}
-                  </div>
                   {children}
                 </div>
               </Dialog.Panel>
