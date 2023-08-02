@@ -49,7 +49,7 @@ export const Input = ({
       )}
 
       <input
-        className={`w-full form-input rounded border
+        className={`w-full form-input rounded-lg border
          shadow-sm text-sm font-normal py-2 px-3 ${className}
          ${error ? ' border-red-500' : 'border-gray-300'}
          ${

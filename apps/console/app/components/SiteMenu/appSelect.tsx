@@ -7,7 +7,7 @@
 import { useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { ChevronUpDownIcon } from '@heroicons/react/20/solid'
-import { HiGlobeAlt } from 'react-icons/hi'
+import { TbWorld } from 'react-icons/tb'
 import { Button, Text } from '@proofzero/design-system'
 
 import { useNavigate } from '@remix-run/react'
@@ -95,9 +95,8 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
                bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm sm:text-sm"
             >
               <span className="flex items-center">
-                {/* <img src={selected.icon} alt="" className="h-6 w-6 flex-shrink-0 rounded-full" /> */}
                 {selected.clientId === 'none' && (
-                  <HiGlobeAlt
+                  <TbWorld
                     className={`h-6 w-6 ${
                       apps?.length === 0 ? 'text-gray-600' : 'text-gray-300'
                     } mr-2.5`}
@@ -159,7 +158,7 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
                       clientId: 'all',
                     }}
                   >
-                    <HiGlobeAlt className={`h-6 w-6 mr-2.5`} />
+                    <TbWorld className={`h-6 w-6 mr-2.5`} />
 
                     <Text size="sm" weight="medium">
                       All Applications

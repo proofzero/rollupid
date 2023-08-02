@@ -357,6 +357,7 @@ export default function AppDetailIndexPage() {
                 message="Connect email address to enable publishing"
                 linkHref={`/apps/${appDetails.clientId}/team`}
                 linkText="Connect email address"
+                type="warning"
               />
             )}
 

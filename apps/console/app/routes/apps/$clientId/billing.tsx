@@ -409,7 +409,9 @@ const PlanCard = ({
         </main>
         <div className="w-full border-t border-gray-200"></div>
         <footer className="p-4 flex flex-row items-center justify-between">
-          <Text>${plan.price} per month</Text>
+          <Text>
+            {active ? null : '+'}${plan.price} per month
+          </Text>
           <Text size="sm" weight="medium" className="text-gray-500">
             {!active &&
               planType !== ServicePlanType.FREE &&

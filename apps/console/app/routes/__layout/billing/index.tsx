@@ -348,7 +348,7 @@ export const PlanFeatures = ({
             <Popover className="relative">
               <Popover.Button as="img" src={iSvg} className="cursor-pointer" />
 
-              <Popover.Panel className="absolute z-10 bg-white p-2 border rounded shadow mt-2">
+              <Popover.Panel className="absolute z-10 bg-white p-2 border rounded-lg mt-2">
                 <ul className="flex flex-col gap-2">
                   {feature.aggregateFeatures.map((af) => (
                     <li
@@ -749,7 +749,7 @@ const RemoveEntitelmentModal = ({
                     <div>
                       <Listbox.Button
                         className="relative w-full cursor-default border
-                  py-1.5 px-4 text-left shadow-sm sm:text-sm rounded-lg
+                  py-1.5 px-4 text-left sm:text-sm rounded-lg
                   focus:border-indigo-500 focus:outline-none focus:ring-1
                   flex flex-row space-x-3 items-center"
                       >
@@ -979,7 +979,7 @@ const PlanCard = ({
         setIsOpen={setAssignedAppModalOpen}
         apps={appsWithAssignedPlan}
       />
-      <article className="bg-white rounded border">
+      <article className="bg-white rounded-lg border">
         <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
           <div>
             <Text size="lg" weight="semibold" className="text-gray-900">
@@ -1067,7 +1067,7 @@ const PlanCard = ({
                       {appsWithAssignedPlan.length > 0 && (
                         <button
                           type="button"
-                          className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b disabled:text-indigo-300"
+                          className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b-lg disabled:text-indigo-300"
                           onClick={() => {
                             setAssignedAppModalOpen(true)
                           }}
@@ -1098,11 +1098,11 @@ const PlanCard = ({
         </main>
         <footer>
           {entitlements === 0 && (
-            <div className="bg-gray-50 rounded-b py-4 px-6">
+            <div className="bg-gray-50 rounded-b-lg py-4 px-6">
               <button
                 disabled={paymentData == undefined}
                 type="button"
-                className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b disabled:text-indigo-300"
+                className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b-lg disabled:text-indigo-300"
                 onClick={() => {
                   setPurchaseProModalOpen(true)
                 }}
@@ -1115,11 +1115,11 @@ const PlanCard = ({
             </div>
           )}
           {entitlements > appsWithAssignedPlan.length && (
-            <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer bg-gray-50 rounded-b py-4 px-6">
+            <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer bg-gray-50 rounded-b-lg py-4 px-6">
               <button
                 disabled={paymentData == undefined}
                 type="button"
-                className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b disabled:text-indigo-300"
+                className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b-lg disabled:text-indigo-300"
                 onClick={() => {
                   setRemoveEntitlementModalOpen(true)
                 }}
@@ -1276,7 +1276,7 @@ export default () => {
       </section>
 
       <section className="flex flex-col gap-4">
-        <article className="bg-white rounded border">
+        <article className="bg-white rounded-lg border">
           <header className="flex flex-col lg:flex-row justify-between lg:items-center p-4 relative">
             <div>
               <div className="flex flex-row gap-4 items-center">
@@ -1295,7 +1295,11 @@ export default () => {
             <Button
               btnType="primary-alt"
               btnSize="sm"
-              disabled={!fullName || !selectedEmail}
+              disabled={
+                !(fullName?.length && selectedEmail?.length) ||
+                (paymentData?.name === fullName &&
+                  paymentData?.email === selectedEmail)
+              }
               onClick={() => {
                 submit(
                   {
@@ -1498,7 +1502,12 @@ export default () => {
                           : a.timestamp - b.timestamp
                       )
                       .map((invoice, idx) => (
-                        <tr key={idx} className="border-b border-gray-200">
+                        <tr
+                          key={idx}
+                          className={`${
+                            idx === invoices.length - 1 ? '' : 'border-b'
+                          } border-gray-200`}
+                        >
                           <td className="px-6 py-3">
                             {hydrated && (
                               <div className="flex flex-row items-center space-x-3">

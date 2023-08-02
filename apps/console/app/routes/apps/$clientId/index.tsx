@@ -298,11 +298,7 @@ export default function AppDetailIndexPage() {
         </div>
         <div className="flex-1">
           <div className="flex h-full flex-col">
-            <Text
-              className="text-gray-900 py-3 px-6"
-              weight="semibold"
-              size="lg"
-            >
+            <Text className="text-gray-900 py-3" weight="semibold" size="lg">
               Users
             </Text>{' '}
             <Suspense
