@@ -22,12 +22,9 @@ export type InviteRes = {
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
     const groupID = params.groupID as string
-    const groupURN = `${['urn:rollupid:identity-group', groupID].join(
-      '/'
-    )}` as IdentityGroupURN
-    if (!IdentityGroupURNSpace.is(groupURN)) {
-      throw new Error('Invalid group ID')
-    }
+    const groupURN = IdentityGroupURNSpace.urn(
+      groupID as string
+    ) as IdentityGroupURN
 
     const jwt = await requireJWT(request, context.env)
 

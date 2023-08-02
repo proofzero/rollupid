@@ -44,12 +44,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    const identityGroupURN = `${['urn:rollupid:identity-group', groupID].join(
-      '/'
-    )}` as IdentityGroupURN
-    if (!IdentityGroupURNSpace.is(identityGroupURN)) {
-      throw new Error('Invalid group ID')
-    }
+    const identityGroupURN = IdentityGroupURNSpace.urn(
+      groupID
+    ) as IdentityGroupURN
 
     const invitationCode = params.invitationCode
     if (!invitationCode || invitationCode === '') {
@@ -117,9 +114,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    const identityGroupURN = `${['urn:rollupid:identity-group', groupID].join(
-      '/'
-    )}` as IdentityGroupURN
+    const identityGroupURN = IdentityGroupURNSpace.urn(
+      groupID
+    ) as IdentityGroupURN
     if (!IdentityGroupURNSpace.is(identityGroupURN)) {
       throw new Error('Invalid group ID')
     }

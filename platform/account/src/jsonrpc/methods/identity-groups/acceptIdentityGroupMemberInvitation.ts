@@ -1,12 +1,9 @@
 import { z } from 'zod'
-import {
-  AddressURNInput,
-  IdentityGroupURNValidator,
-} from '@proofzero/platform-middleware/inputValidators'
+import { IdentityGroupURNValidator } from '@proofzero/platform-middleware/inputValidators'
 
 import { Context } from '../../../context'
 import { initIdentityGroupNodeByName } from '../../../nodes'
-import { RollupError } from '@proofzero/errors'
+import { InternalServerError } from '@proofzero/errors'
 import { router } from '@proofzero/platform.core'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 
@@ -33,7 +30,7 @@ export const acceptIdentityGroupMemberInvitation = async ({
     ctx.IdentityGroup
   )
   if (!node) {
-    throw new RollupError({
+    throw new InternalServerError({
       message: 'Identity group DO not found',
     })
   }
@@ -43,7 +40,7 @@ export const acceptIdentityGroupMemberInvitation = async ({
     (invitation) => invitation.inviteCode === invitationCode
   )
   if (!invitation) {
-    throw new RollupError({
+    throw new InternalServerError({
       message: 'Invitation not found',
     })
   }
@@ -51,7 +48,7 @@ export const acceptIdentityGroupMemberInvitation = async ({
   const caller = router.createCaller(ctx)
 
   if (!ctx.accountURN) {
-    throw new RollupError({
+    throw new InternalServerError({
       message: 'No accountURN in context',
     })
   }
@@ -65,7 +62,7 @@ export const acceptIdentityGroupMemberInvitation = async ({
       address.rc.addr_type === invitation.addressType
   )
   if (!targetAddress) {
-    throw new RollupError({
+    throw new InternalServerError({
       message: 'Address not found',
     })
   }

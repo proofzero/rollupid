@@ -68,12 +68,9 @@ type LoaderData = {
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
-    const groupURN = `${['urn:rollupid:identity-group', params.groupID].join(
-      '/'
-    )}` as IdentityGroupURN
-    if (!IdentityGroupURNSpace.is(groupURN)) {
-      throw new Error('Invalid group ID')
-    }
+    const groupURN = IdentityGroupURNSpace.urn(
+      params.groupID as string
+    ) as IdentityGroupURN
 
     const jwt = await requireJWT(request, context.env)
     const traceHeader = generateTraceContextHeaders(context.traceSpan)

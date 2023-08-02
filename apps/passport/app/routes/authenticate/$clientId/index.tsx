@@ -67,12 +67,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       const groupID = authzParams.rollup_action.split('_')[1]
       const invitationCode = authzParams.rollup_action.split('_')[2]
 
-      const identityGroupURN = `${['urn:rollupid:identity-group', groupID].join(
-        '/'
-      )}` as IdentityGroupURN
-      if (!IdentityGroupURNSpace.is(identityGroupURN)) {
-        throw new Error('Invalid group ID')
-      }
+      const identityGroupURN = IdentityGroupURNSpace.urn(
+        groupID
+      ) as IdentityGroupURN
 
       const traceHeader = generateTraceContextHeaders(context.traceSpan)
       const coreClient = createCoreClient(context.env.Core, {
