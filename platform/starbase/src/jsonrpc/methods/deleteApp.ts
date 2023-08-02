@@ -6,6 +6,7 @@ import { BadRequestError } from '@proofzero/errors'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { AppClientIdParamSchema } from '../validators/app'
 import { EDGE_APPLICATION } from '../../types'
+import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 
 export const DeleteAppInput = AppClientIdParamSchema
 
@@ -36,11 +37,28 @@ export const deleteApp = async ({
 
   const caller = router.createCaller(ctx)
 
-  await caller.edges.removeEdge({
-    src: ctx.accountURN,
-    dst: appURN,
-    tag: EDGE_APPLICATION,
+  const referenceEdges = await caller.edges.getEdges({
+    query: { src: { baseUrn: appURN }, tag: EDGE_HAS_REFERENCE_TO },
   })
+
+  const edgesToRemove = [
+    //Reference edges
+    ...referenceEdges.edges.map((e) =>
+      caller.edges.removeEdge({
+        tag: e.tag,
+        src: e.src.baseUrn,
+        dst: e.dst.baseUrn,
+      })
+    ),
+    //Application edge
+    caller.edges.removeEdge({
+      src: ctx.accountURN,
+      dst: appURN,
+      tag: EDGE_APPLICATION,
+    }),
+  ]
+  await Promise.all(edgesToRemove)
+
   await caller.edges.deleteNode({
     urn: appURN,
   })
