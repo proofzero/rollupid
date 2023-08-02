@@ -79,6 +79,7 @@ export type AppLoaderData = {
   published?: boolean
   createdTimestamp?: number
   appPlan: ServicePlanType
+  hasCustomDomain: boolean
 }
 
 export type LoaderData = {
@@ -124,6 +125,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           published: a.published,
           createdTimestamp: a.createdTimestamp,
           appPlan: a.appPlan,
+          hasCustomDomain: Boolean(a.customDomain),
         }
       })
 

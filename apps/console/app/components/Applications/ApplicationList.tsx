@@ -25,6 +25,7 @@ export const ApplicationList = ({
     | {
         clientId: string
         name: string
+        hasCustomDomain: boolean
       }
     | undefined
   >()
@@ -65,8 +66,9 @@ export const ApplicationList = ({
             deleteAppCallback={() => {
               setDeleteModalOpen(false)
             }}
-            clientId={actionApp?.clientId}
+            appClientID={actionApp?.clientId}
             appName={actionApp?.name}
+            appHasCustomDomain={actionApp?.hasCustomDomain}
           />
         )}
 
@@ -75,10 +77,11 @@ export const ApplicationList = ({
             key={ali.id}
             navigate={navigate}
             {...ali}
-            onDeleteApplication={(clientId, appName) => {
+            onDeleteApplication={(clientId, appName, hasCustomDomain) => {
               setActionApp({
                 clientId,
                 name: appName,
+                hasCustomDomain,
               })
               setDeleteModalOpen(true)
             }}

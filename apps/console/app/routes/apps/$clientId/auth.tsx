@@ -297,11 +297,15 @@ export default function AppDetailIndexPage() {
   return (
     <>
       {isImgUploading ? <Loader /> : null}
-      <DeleteAppModal
-        appDetails={appDetails}
-        isOpen={deleteModalOpen}
-        deleteAppCallback={() => setDeleteModalOpen(false)}
-      />
+      {appDetails.clientId && (
+        <DeleteAppModal
+          appClientID={appDetails.clientId}
+          appName={appDetails.app.name}
+          appHasCustomDomain={Boolean(appDetails.customDomain)}
+          isOpen={deleteModalOpen}
+          deleteAppCallback={() => setDeleteModalOpen(false)}
+        />
+      )}
 
       <Form
         method="post"
@@ -436,7 +440,7 @@ export default function AppDetailIndexPage() {
                       label="Published"
                       disabled={!appContactAddress}
                       onToggle={() => {
-                        ; (setIsFormChanged as (val: boolean) => {})(true)
+                        ;(setIsFormChanged as (val: boolean) => {})(true)
                       }}
                       checked={appDetails.published}
                     />

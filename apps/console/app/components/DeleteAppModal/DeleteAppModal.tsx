@@ -10,21 +10,23 @@ import dangerVector from '../../images/danger.svg'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { RiLoader5Fill } from 'react-icons/ri'
 
-import type { appDetailsProps } from '~/types'
-
 export type DeleteAppModalProps = {
-  appDetails: appDetailsProps
+  appName: string
+  appClientID: string
+  appHasCustomDomain: boolean
   isOpen: boolean
   deleteAppCallback: (state: boolean) => unknown
 }
 
 export const DeleteAppModal = ({
-  appDetails,
+  appName,
+  appClientID,
+  appHasCustomDomain,
   isOpen,
   deleteAppCallback,
 }: DeleteAppModalProps) => {
   const fetcher = useFetcher()
-  const [hasCustomDomain] = useState(Boolean(appDetails.customDomain))
+  const [hasCustomDomain] = useState(Boolean(appHasCustomDomain))
 
   return (
     <Modal
@@ -44,12 +46,13 @@ export const DeleteAppModal = ({
           </Text>
 
           {hasCustomDomain && (
-            <HasCustomDomain appDetails={appDetails}></HasCustomDomain>
+            <HasCustomDomain clientID={appClientID}></HasCustomDomain>
           )}
           {!hasCustomDomain && (
             <DeleteModalAppForm
               fetcher={fetcher}
-              appDetails={appDetails}
+              appName={appName}
+              appClientID={appClientID}
               callback={deleteAppCallback}
             />
           )}
@@ -61,13 +64,15 @@ export const DeleteAppModal = ({
 
 type DeleteModalAppFormProps = {
   fetcher: FetcherWithComponents<any>
-  appDetails: appDetailsProps
+  appClientID: string
+  appName: string
   callback: (state: boolean) => unknown
 }
 
 const DeleteModalAppForm = ({
   fetcher,
-  appDetails,
+  appClientID,
+  appName,
   callback,
 }: DeleteModalAppFormProps) => {
   const [isAppNameMatches, setAppNameMatches] = useState(false)
@@ -75,8 +80,8 @@ const DeleteModalAppForm = ({
     <fetcher.Form method="post" action="/apps/delete" reloadDocument={true}>
       <section className="mb-4">
         <Text size="sm" weight="normal" className="text-gray-500 my-3">
-          Are you sure you want to delete <b>{appDetails.app.name}</b> app? This
-          action cannot be undone once confirmed.
+          Are you sure you want to delete <b>{appName}</b> app? This action
+          cannot be undone once confirmed.
         </Text>
         <Text size="sm" weight="normal" className="text-gray-500 my-3">
           Confirm you want to delete this application by typing its name below.
@@ -87,12 +92,10 @@ const DeleteModalAppForm = ({
           placeholder="My application"
           required
           className="mb-12"
-          onChange={(e) =>
-            setAppNameMatches(appDetails.app.name === e?.target?.value)
-          }
+          onChange={(e) => setAppNameMatches(appName === e?.target?.value)}
         />
       </section>
-      <input type="hidden" name="clientId" value={appDetails.clientId} />
+      <input type="hidden" name="clientId" value={appClientID} />
 
       <div className="flex justify-end items-center space-x-3">
         <Button
@@ -123,17 +126,17 @@ const DeleteModalAppForm = ({
 }
 
 type HasCustomDomainProps = {
-  appDetails: appDetailsProps
+  clientID: string
 }
 
-const HasCustomDomain = ({ appDetails }: HasCustomDomainProps) => (
+const HasCustomDomain = ({ clientID }: HasCustomDomainProps) => (
   <section className="flex flex-col mb-4">
     <Text size="sm" weight="normal" className="text-gray-500 my-3">
       This application has a custom domain configured. You need to delete it
       before you can delete the application.
     </Text>
 
-    <Link to={`/apps/${appDetails.clientId}/domain`} className="self-end">
+    <Link to={`/apps/${clientID}/domain`} className="self-end">
       <Button btnType="secondary-alt">Go to Custom Domain</Button>
     </Link>
   </section>
