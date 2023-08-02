@@ -36,12 +36,17 @@ export default class IdentityGroup extends DOProxy {
     const invitations =
       (await this.state.storage.get<MemberInvitation[]>('invitations')) || []
 
+    const now = Date.now()
+
     invitations.push({
       identifier,
       addressType,
       inviteCode,
-      timestamp: Date.now(),
+      timestamp: now,
     })
+
+    // Set alarm one day and 5 minutes from now
+    this.state.storage.setAlarm(now + 86_700_000)
 
     await this.state.storage.put('invitations', invitations)
   }
@@ -68,5 +73,19 @@ export default class IdentityGroup extends DOProxy {
     invitations.splice(invitationIndex, 1)
 
     await this.state.storage.put('invitations', invitations)
+  }
+
+  async alarm() {
+    const invitations =
+      (await this.state.storage.get<MemberInvitation[]>('invitations')) || []
+
+    const now = Date.now()
+
+    // Remove all invitations sent more than one day ago
+    const validInvitations = invitations.filter(
+      (invitation) => now - invitation.timestamp < 86_400_000
+    )
+
+    await this.state.storage.put('invitations', validInvitations)
   }
 }
