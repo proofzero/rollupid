@@ -41,7 +41,7 @@ export const deleteApp = async ({
     query: { src: { baseUrn: appURN }, tag: EDGE_HAS_REFERENCE_TO },
   })
 
-  const edgesToRemove = [
+  const edgeRemovalPromises = [
     //Reference edges
     ...referenceEdges.edges.map((e) =>
       caller.edges.removeEdge({
@@ -57,7 +57,7 @@ export const deleteApp = async ({
       tag: EDGE_APPLICATION,
     }),
   ]
-  await Promise.all(edgesToRemove)
+  await Promise.all(edgeRemovalPromises)
 
   await caller.edges.deleteNode({
     urn: appURN,
