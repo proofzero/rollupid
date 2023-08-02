@@ -74,6 +74,7 @@ export const publishApp = async ({
       eventName,
       apiKey: ctx.POSTHOG_API_KEY,
       properties: { client_id: input.clientId },
+      groups: { app: input.clientId },
     })
 
   return {

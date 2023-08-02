@@ -68,6 +68,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           !appData ||
           (appData.rollup_action !== 'connect' &&
             !appData.rollup_action?.startsWith('groupconnect')),
+        clientId: appData?.clientId,
       })
 
     await coreClient.address.setOAuthData.mutate(authRes)

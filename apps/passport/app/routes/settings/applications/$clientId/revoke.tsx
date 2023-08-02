@@ -40,6 +40,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         properties: {
           clientId,
         },
+        groups: { app: clientId },
       })
 
       session.flash(
