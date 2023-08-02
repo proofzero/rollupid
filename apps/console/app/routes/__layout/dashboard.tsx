@@ -5,8 +5,7 @@ import type { LoaderData as OutletContextData } from '~/root'
 
 import folderPlus from '~/images/folderPlus.svg'
 
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Button, Text } from '@proofzero/design-system'
 
 export default () => {
   const navigate = useNavigate()

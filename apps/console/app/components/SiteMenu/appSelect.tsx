@@ -7,9 +7,8 @@
 import { useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { ChevronUpDownIcon } from '@heroicons/react/20/solid'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { HiGlobeAlt } from 'react-icons/hi'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 
 import { useNavigate } from '@remix-run/react'
 
@@ -93,7 +92,7 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
           <div className="relative">
             <Listbox.Button
               className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-700
-               bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none sm:text-sm"
+               bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm sm:text-sm"
             >
               <span className="flex items-center">
                 {/* <img src={selected.icon} alt="" className="h-6 w-6 flex-shrink-0 rounded-full" /> */}

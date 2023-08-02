@@ -1,7 +1,6 @@
 import { HiOutlineArrowLeft } from 'react-icons/hi'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { useState, useEffect } from 'react'
 
 type EmailPanelProps = {

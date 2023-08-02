@@ -1,5 +1,4 @@
 import { Popover, Tab } from '@headlessui/react'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import {
   Form,
   Link,
@@ -29,7 +28,7 @@ import Authentication, {
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
 import IconPicker from '~/components/IconPicker'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { SortableList } from '@proofzero/design-system/src/atoms/lists/SortableList'
 import _ from 'lodash'

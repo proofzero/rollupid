@@ -13,10 +13,9 @@ import {
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import type { FetcherWithComponents } from '@remix-run/react'
 
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { Copier } from '@proofzero/design-system/src/atoms/copier/Copier'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'

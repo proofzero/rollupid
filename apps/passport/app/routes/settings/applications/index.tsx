@@ -8,8 +8,7 @@ import {
 } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
 

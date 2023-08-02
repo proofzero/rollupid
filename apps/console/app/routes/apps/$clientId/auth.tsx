@@ -32,7 +32,7 @@ import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyI
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
 import { MultiSelect } from '@proofzero/design-system/src/atoms/form/MultiSelect'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button } from '@proofzero/design-system'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'

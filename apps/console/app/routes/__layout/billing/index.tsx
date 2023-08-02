@@ -542,10 +542,10 @@ const AssignEntitlementModal = ({
   entitlementUsage,
   fetcher,
   apps,
+  paymentData,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
-  plan: PlanDetails
   entitlements: number
   entitlementUsage: number
   paymentData?: PaymentData
@@ -557,6 +557,16 @@ const AssignEntitlementModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div className="px-5 pb-5 max-sm:w-screen sm:min-w-[640px] lg:min-w-[764px]">
+        {paymentData && !paymentData.paymentMethodID ? (
+          <article className="mb-3.5">
+            <ToastWithLink
+              message="Update your Payment Information to enable purchasing"
+              linkHref={`/billing/payment`}
+              type={'warning'}
+              linkText="Update payment information"
+            />
+          </article>
+        ) : null}
         <div className=" flex flex-col items-start">
           <Text size="lg" weight="semibold" className="text-left text-gray-800">
             Assign Entitlement(s)
@@ -636,6 +646,7 @@ const AssignEntitlementModal = ({
                             }
                           )
                         }}
+                        disabled={!paymentData?.paymentMethodID}
                       >
                         <HiOutlineShoppingCart className="w-3.5 h-3.5" />
                         <Text>Purchase Entitlement</Text>
@@ -957,7 +968,6 @@ const PlanCard = ({
       <AssignEntitlementModal
         isOpen={assignEntitlementsModalOpen}
         setIsOpen={setAssignEntitlementsModalOpen}
-        plan={plan}
         entitlements={entitlements}
         entitlementUsage={appsWithAssignedPlan.length}
         paymentData={paymentData}

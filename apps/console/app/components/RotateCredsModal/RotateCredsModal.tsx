@@ -1,8 +1,7 @@
 import React from 'react'
 
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
 import dangerVector from '../../images/danger.svg'
 
@@ -20,7 +19,7 @@ export const RotateCredsModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={() => closeCallback()}>
       <div
-        className={`w-[62vw] rounded-lg  bg-white px-4 pb-4 
+        className={`w-[62vw] rounded-lg  bg-white px-4 pb-4
          text-left transition-all sm:px-6 sm:pb-6 overflow-y-auto flex items-start space-x-4`}
       >
         <img src={dangerVector} />

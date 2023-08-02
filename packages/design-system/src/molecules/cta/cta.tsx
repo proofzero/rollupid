@@ -18,11 +18,11 @@ export const CTA = ({
 }: CTAProps) => (
   <div
     className="w-full bg-white flex items-center justify-between
-rounded-lg border shadow"
+rounded-lg border"
   >
     <div className="flex items-center">
       <div
-        className="bg-[#eef2ff] min-h-[70px] min-w-[70px] 
+        className="bg-[#eef2ff] min-h-[70px] min-w-[70px]
         flex items-center justify-center
         rounded-lg m-3"
       >
