@@ -88,7 +88,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       identifier: invitation.identifier,
       addressType: invitation.addressType,
       invitationURL: [
-        context.env.CONSOLE_URL,
+        context.env.PASSPORT_URL,
         'groups',
         'enroll',
         params.groupID,
@@ -141,12 +141,12 @@ export const ActionCard = ({
 }
 
 const InviteMemberModal = ({
-  consoleURL,
+  passportURL,
   groupID,
   isOpen,
   handleClose,
 }: {
-  consoleURL: string
+  passportURL: string
   groupID: string
   isOpen: boolean
   handleClose: () => void
@@ -292,7 +292,7 @@ const InviteMemberModal = ({
               id="inviteURL"
               label="Invite URL"
               value={[
-                consoleURL,
+                passportURL,
                 'groups',
                 'enroll',
                 groupID,
@@ -324,7 +324,7 @@ const InviteMemberModal = ({
 
                 navigator.clipboard.writeText(
                   [
-                    consoleURL,
+                    passportURL,
                     'groups',
                     'enroll',
                     groupID,
@@ -353,7 +353,7 @@ const InviteMemberModal = ({
 }
 
 export default () => {
-  const { groups, CONSOLE_URL, ownAddressURNList } =
+  const { groups, PASSPORT_URL, ownAddressURNList } =
     useOutletContext<GroupRootContextData>()
   const { URN, groupID, invitations } = useLoaderData<LoaderData>()
 
@@ -369,7 +369,7 @@ export default () => {
         groupID={groupID}
         isOpen={inviteModalOpen}
         handleClose={() => setInviteModalOpen(false)}
-        consoleURL={CONSOLE_URL}
+        passportURL={PASSPORT_URL}
       />
 
       {group.current && (

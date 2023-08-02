@@ -28,6 +28,7 @@ type GroupModel = {
 type GroupRootLoaderData = {
   groups: GroupModel[]
   CONSOLE_URL: string
+  PASSPORT_URL: string
   ownAddressURNList: AddressURN[]
 }
 
@@ -92,6 +93,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     return json<GroupRootLoaderData>({
       groups: mappedGroups,
       CONSOLE_URL: context.env.CONSOLE_URL,
+      PASSPORT_URL: context.env.PASSPORT_URL,
       ownAddressURNList,
     })
   }
