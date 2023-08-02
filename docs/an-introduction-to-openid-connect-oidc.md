@@ -6,6 +6,8 @@ description: How Rollup ID works with OIDC / OAuth 2.0
 
 Rollup ID is an innovative Identity Provider (IDP) that leverages a unique, decentralized approach to identity management. By adhering to established protocols such as [OAuth 2.0](https://oauth.net/2/) and [OpenID](https://openid.net/developers/how-connect-works/) Connect (OIDC), Rollup ID offers a secure, consent-based authorization mechanism, enabling users to interact safely with online applications. This article will explore OIDC and its application within the Rollup ID platform.
 
+<figure><img src=".gitbook/assets/image (9).png" alt=""><figcaption></figcaption></figure>
+
 ### **Understanding OIDC**
 
 OpenID Connect (OIDC) is a straightforward identity layer built on top of the OAuth 2.0 protocol. It enables clients to verify an end-user's identity based on the authentication performed by an authorization server. Additionally, OIDC provides basic profile information about the end-user in an interoperable and REST-like manner.
