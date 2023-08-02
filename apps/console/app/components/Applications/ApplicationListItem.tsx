@@ -39,8 +39,13 @@ export type ApplicationListItemProps = {
   createdTimestamp?: number
   icon?: string
   published?: boolean
+  hasCustomDomain: boolean
   navigate?: (clientId: string) => void
-  onDeleteApplication?: (clientId: string, appName: string) => void
+  onDeleteApplication?: (
+    clientId: string,
+    appName: string,
+    hasCustomDomain: boolean
+  ) => void
 }
 export const ApplicationListItem = ({
   id,
@@ -48,6 +53,7 @@ export const ApplicationListItem = ({
   createdTimestamp,
   icon,
   published,
+  hasCustomDomain,
   onDeleteApplication,
   navigate,
 }: ApplicationListItemProps) => (
@@ -129,7 +135,7 @@ export const ApplicationListItem = ({
                 hover:rounded-[6px] hover:bg-gray-100 "
                 onClick={() => {
                   if (onDeleteApplication) {
-                    onDeleteApplication(id, name ?? '')
+                    onDeleteApplication(id, name ?? '', hasCustomDomain)
                   }
                 }}
               >
