@@ -89,6 +89,7 @@ export default () => {
             onChange={(e) => setEmail(e.target.value)}
             label="Enter your email address"
             className="h-12 rounded-lg"
+            skin={true}
             autoFocus
           />
           {errorMessage ? (

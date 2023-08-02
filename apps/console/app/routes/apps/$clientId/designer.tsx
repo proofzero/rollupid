@@ -628,7 +628,7 @@ const AuthPanel = ({
                     setGraphicURL(undefined)
                   }}
                 >
-                  <Text size="xs" weight="medium" className="text-gray-200">
+                  <Text size="xs" weight="medium" className="text-indigo-500">
                     Remove
                   </Text>
                 </button>
