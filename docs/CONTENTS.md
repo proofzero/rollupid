@@ -6,7 +6,6 @@
 
 ## Getting Started
 
-* [Overview](getting-started/overview.md)
 * [Create an application](getting-started/create-an-application.md)
 * [Logging in Users](getting-started/auth-flow.md)
 * [Accessing Profile API](getting-started/accessing-profile-api.md)
