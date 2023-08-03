@@ -85,7 +85,7 @@ import {
   GetIdentityGroupMemberInvitationDetailsInputSchema,
   GetIdentityGroupMemberInvitationDetailsOutputSchema,
   getIdentityGroupMemberInvitationDetails,
-} from './methods/identity-groups/getIdentityGroupMemberInvitationDetails'
+} from './methods/identity-groups/getIdentityGroupMemberInvitationDets'
 
 import {
   AcceptIdentityGroupMemberInvitationInputSchema,
