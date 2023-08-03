@@ -137,6 +137,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
+    const fd = await request.formData()
+    const op = fd.get('op')
+    if (op && op === 'deny') {
+      return redirect(
+        `${context.env.PASSPORT_URL}/settings/dashboard?toast=groupdeny`
+      )
+    }
+
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
     const coreClient = createCoreClient(context.env.Core, {
@@ -267,7 +275,23 @@ export default () => {
                 >
                   Accept
                 </Button>
-                <Button btnType="secondary-alt">Deny</Button>
+
+                <Button
+                  btnType="secondary-alt"
+                  onClick={() => {
+                    submit(
+                      {
+                        op: 'deny',
+                      },
+                      {
+                        method: 'post',
+                        action: `/groups/enroll/${groupID}/${invitationCode}`,
+                      }
+                    )
+                  }}
+                >
+                  Cancel
+                </Button>
               </section>
             </>
           )}
