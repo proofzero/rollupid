@@ -31,6 +31,7 @@ import type { AddressListProps } from '~/components/addresses/AddressList'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 import type { AddressURN } from '@proofzero/urns/address'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { HiOutlineX } from 'react-icons/hi'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -121,11 +122,22 @@ const RenameModal = ({
   <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
     <div
       className={`min-w-[300px] sm:min-w-[437px] relative
-      bg-white px-4 pb-4 text-left rounded-lg transition-all sm:px-6 sm:pb-6 overflow-y-auto`}
+      bg-white p-4 text-left rounded-lg transition-all sm:p-6 overflow-y-auto`}
     >
-      <Text size="lg" weight="semibold" className="text-gray-900 mb-4">
-        Name Your Account
-      </Text>
+      <div className="mb-4 flex flex-row items-center justify-between w-full">
+        <Text size="lg" weight="semibold" className="text-gray-900">
+          Name Your Account
+        </Text>
+        <button
+          className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+          onClick={() => {
+            setIsOpen(false)
+          }}
+        >
+          <HiOutlineX />
+        </button>
+      </div>
 
       <fetcher.Form method="post" action="/settings/accounts/rename">
         <input type="hidden" name="id" value={id} />
@@ -309,9 +321,9 @@ export default function AccountsLayout() {
               onRenameAccount: ap.title.endsWith('.eth')
                 ? undefined
                 : (id: string) => {
-                  setActionId(id)
-                  setRenameModalOpen(true)
-                },
+                    setActionId(id)
+                    setRenameModalOpen(true)
+                  },
             }))
             .concat(
               oAuthProfiles.addresses.map((ap) => ({
@@ -334,9 +346,9 @@ export default function AccountsLayout() {
                 addressCount === 1
                   ? undefined
                   : (id: string) => {
-                    setActionId(id)
-                    setDisconnectModalOpen(true)
-                  },
+                      setActionId(id)
+                      setDisconnectModalOpen(true)
+                    },
             }))}
         />
 

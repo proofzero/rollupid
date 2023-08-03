@@ -38,7 +38,7 @@ import { type AppLoaderData } from '~/root'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { useEffect, useMemo, useState } from 'react'
-import { HiArrowUp, HiOutlineShoppingCart } from 'react-icons/hi'
+import { HiArrowUp, HiOutlineShoppingCart, HiOutlineX } from 'react-icons/hi'
 import {
   ToastType,
   Toaster,
@@ -440,14 +440,21 @@ const PurchaseConfirmationModal = ({
   const submit = useSubmit()
 
   return (
-    <Modal isOpen={isOpen} fixed handleClose={() => setIsOpen(false)}>
-      <Text
-        size="lg"
-        weight="semibold"
-        className="text-left text-gray-800 mx-5"
-      >
-        Purchase Entitlement(s)
-      </Text>
+    <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
+      <div className="px-5 pt-5 flex flex-row justify-between items-center w-full">
+        <Text size="lg" weight="semibold" className="text-left text-gray-800">
+          Purchase Entitlement(s)
+        </Text>
+        <div
+          className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+          onClick={() => {
+            setIsOpen(false)
+          }}
+        >
+          <HiOutlineX />
+        </div>
+      </div>
 
       {!paymentData?.customerID && (
         <section className="mt-3.5 mx-5">
@@ -573,15 +580,26 @@ const DowngradeConfirmationModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div
-        className={`w-[48vw] rounded-lg bg-white px-4 pb-4 sm:px-6 sm:pb-6 flex flex-col gap-4 text-left`}
+        className={`w-[48vw] rounded-lg bg-white p-4 sm:p-6 flex flex-col gap-4 text-left`}
       >
         <div className="flex flex-row gap-4 items-start">
           <img src={dangerVector} />
 
           <div className="flex-1 flex flex-col gap-4">
-            <Text size="lg" weight="medium" className="text-gray-900 mb-2">
-              Downgrade Application
-            </Text>
+            <div className="flex flex-row items-center justify-between mb-2 w-full">
+              <Text size="lg" weight="medium" className="text-gray-900">
+                Downgrade Application
+              </Text>
+              <div
+                className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+                onClick={() => {
+                  setIsOpen(false)
+                }}
+              >
+                <HiOutlineX />
+              </div>
+            </div>
 
             <Text>
               You are about to downgrade the application to the{' '}

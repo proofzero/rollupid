@@ -4,8 +4,15 @@ import SaveButton from './SaveButton'
 import { Text } from '@proofzero/design-system'
 
 import warn from '../../assets/warning.svg'
+import { HiOutlineX } from 'react-icons/hi'
 
-const UnsavedChangesModal = ({ isOpen, handleClose }) => {
+const UnsavedChangesModal = ({
+  isOpen,
+  handleClose,
+}: {
+  isOpen: boolean
+  handleClose: (value: boolean) => void
+}) => {
   return (
     <Modal isOpen={isOpen} handleClose={handleClose}>
       <div className="relative rounded-lg bg-white lg:w-[32rem] pb-3 pr-6">
@@ -13,9 +20,20 @@ const UnsavedChangesModal = ({ isOpen, handleClose }) => {
           <div className="mb-[53px] flex flex-row items-start">
             <img src={warn} alt="warning" className="mr-4" />
             <div className="flex flex-col items-start">
-              <Text size="lg" className="text-gray-900 mb-2">
-                You have Unsaved Changes
-              </Text>
+              <div className="mb-2 flex flex-row items-center justify-between w-full">
+                <Text size="lg" className="text-gray-900">
+                  You have Unsaved Changes
+                </Text>
+                <button
+                  className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+                  onClick={() => {
+                    handleClose(false)
+                  }}
+                >
+                  <HiOutlineX />
+                </button>
+              </div>
               <Text size="sm" className="text-gray-500 text-left">
                 You have made some changes. Do you want to discard or save them?
               </Text>

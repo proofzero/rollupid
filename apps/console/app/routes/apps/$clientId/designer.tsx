@@ -17,7 +17,7 @@ import {
   useState,
 } from 'react'
 import { IconType } from 'react-icons'
-import { HiCog, HiOutlineCog, HiOutlineMail } from 'react-icons/hi'
+import { HiCog, HiOutlineCog, HiOutlineMail, HiOutlineX } from 'react-icons/hi'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
@@ -239,14 +239,25 @@ const ProviderModal = ({
   })
 
   return (
-    <Modal isOpen={isOpen} fixed handleClose={() => onClose(false)}>
+    <Modal isOpen={isOpen} handleClose={() => onClose(false)}>
       <div
-        className="bg-white rounded-lg px-6 pb-6 min-w-full lg:w-[543px]
+        className="bg-white rounded-lg p-6 min-w-full lg:w-[543px]
       lg:m-auto overflow-y-auto"
       >
-        <Text weight="semibold" className="text-left text-gray-800 mb-4">
-          Login Provider Configuration
-        </Text>
+        <div className="flex flex-row items-center justify-between mb-4 w-full">
+          <Text weight="semibold" className="text-left text-gray-800">
+            Login Provider Configuration
+          </Text>
+          <div
+            className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+            onClick={() => {
+              onClose(false)
+            }}
+          >
+            <HiOutlineX />
+          </div>
+        </div>
 
         <section>
           <SortableList

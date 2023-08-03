@@ -22,6 +22,7 @@ import type { AddressURN } from '@proofzero/urns/address'
 import { RollupError, ERROR_CODES, BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import { HiOutlineX } from 'react-icons/hi'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -117,8 +118,8 @@ const DeleteRollupIdentityModal = ({
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div
         className={`min-w-[260px] sm:min-w-[400px] md:max-w-[512px] lg:max-w-[512px]
-     relative bg-white px-4 pb-4 text-left
-    transition-all sm:px-6 rounded-lg sm:pb-6 overflow-y-auto`}
+     relative bg-white p-4 text-left
+    transition-all sm:p-6 rounded-lg overflow-y-auto`}
       >
         <div className="flex flex-row space-x-6 items-center justify-start">
           <img
@@ -128,9 +129,20 @@ const DeleteRollupIdentityModal = ({
           />
 
           <div className="flex flex-col space-y-2">
-            <Text weight="medium" size="lg" className="text-gray-900">
-              Delete Rollup Identity
-            </Text>
+            <div className="flex flex-row w-full items-center justify-between">
+              <Text weight="medium" size="lg" className="text-gray-900">
+                Delete Rollup Identity
+              </Text>
+              <button
+                className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+                onClick={() => {
+                  setIsOpen(false)
+                }}
+              >
+                <HiOutlineX />
+              </button>
+            </div>
             <Text size="xs" weight="normal">
               {hasOwnedApps
                 ? 'Identity cannot be deleted as it has applications associated to it.\

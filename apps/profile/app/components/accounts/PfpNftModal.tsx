@@ -5,9 +5,10 @@ import FilteredNftGrid from '../nfts/grid/filtered'
 import UnfilteredNftGrid from '../nfts/grid/unfiltered'
 import SelectableNft from '../nfts/interactible'
 import { LoadingGridSquares } from '../nfts/grid/loading'
+import { HiOutlineX } from 'react-icons/hi'
 
 type PfpNftModalProps = {
-  text?: string
+  text: string
   nfts: any[]
   pfp: string
   displayName: string
@@ -39,9 +40,9 @@ const PfpNftModal = ({
       <div
         className="flex-1 relative bg-white
         overflow-x-visible max-h-[900px] w-screen min-[480px]:w-full px-2
-      pb-4 text-left transition-all rounded-lg overflow-y-auto"
+      py-4 text-left transition-all rounded-lg overflow-y-auto"
       >
-        {text?.length && (
+        <div className="flex flex-col w-full items-center justify-between px-3 pb-2 lg:pb-4">
           <Text
             className="lg:px-4 px-3 pb-2 text-center
             text-gray-800"
@@ -50,7 +51,16 @@ const PfpNftModal = ({
           >
             {text}
           </Text>
-        )}
+          <button
+            className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+            onClick={() => {
+              handleClose(false)
+            }}
+          >
+            <HiOutlineX />
+          </button>
+        </div>
 
         {collection.length ? (
           <UnfilteredNftGrid

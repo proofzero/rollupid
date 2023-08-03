@@ -21,14 +21,25 @@ export const RotateCredsModal = ({
     <Modal isOpen={isOpen} handleClose={() => closeCallback()}>
       <div
         className={`w-[62vw] rounded-lg  bg-white p-4
-         text-left transition-all sm:p-6 overflow-y-auto flex items-start space-x-4`}
+         text-left transition-all sm:p-5 overflow-y-auto flex items-start space-x-4`}
       >
-        <img src={dangerVector} />
+        <img src={dangerVector} alt="danger" />
 
         <div className="flex-1">
-          <Text size="lg" weight="medium" className="text-gray-900 mb-2">
-            Roll Key
-          </Text>
+          <div className="flex flex-row items-center justify-between w-full mb-2">
+            <Text size="lg" weight="medium" className="text-gray-900">
+              Roll Key
+            </Text>
+            <div
+              className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+              onClick={() => {
+                closeCallback()
+              }}
+            >
+              <HiOutlineX />
+            </div>
+          </div>
 
           <section className="mb-4">
             <Text size="sm" weight="normal" className="text-gray-500">
@@ -48,15 +59,6 @@ export const RotateCredsModal = ({
               Roll
             </Button>
           </div>
-        </div>
-        <div
-          className={`bg-white p-2 m-2 rounded-lg text-xl cursor-pointer
-                      hover:bg-[#F3F4F6]`}
-          onClick={() => {
-            closeCallback()
-          }}
-        >
-          <HiOutlineX />
         </div>
       </div>
     </Modal>
