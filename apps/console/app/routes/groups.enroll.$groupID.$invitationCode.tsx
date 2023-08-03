@@ -94,7 +94,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     return json({
       inviterAlias: invDetails.inviter,
       groupName: invDetails.identityGroupName,
-      identifier: obfuscateAlias(invDetails.identifier),
+      identifier: obfuscateAlias(invDetails.identifier, invDetails.addressType),
       addressType: invDetails.addressType,
       enrollmentType: invitedAddress
         ? EnrollmentType.Own

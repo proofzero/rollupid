@@ -88,7 +88,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
       invitationData = {
         groupName: invDetails.identityGroupName,
-        identifier: obfuscateAlias(invDetails.identifier),
+        identifier: obfuscateAlias(
+          invDetails.identifier,
+          invDetails.addressType
+        ),
         addressType: invDetails.addressType,
         inviterAlias: invDetails.inviter,
       }
