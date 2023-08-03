@@ -4,10 +4,7 @@ import {
   OAuthAddressType,
 } from '@proofzero/types/address'
 
-const calculateVisibleChars = (
-  alias: string,
-  percentage: number = 0.2
-): number => {
+const calculateVisibleChars = (alias: string, percentage = 0.2): number => {
   const visibleCharCount = Math.max(Math.floor(alias.length * percentage), 1)
   return Math.max(1, Math.floor(visibleCharCount / 2))
 }
