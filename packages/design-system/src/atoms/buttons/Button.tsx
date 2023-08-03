@@ -16,6 +16,8 @@ export type ButtonProps = React.DetailedHTMLProps<
   btnType?: ButtonType
   isSubmit?: boolean
   onClick?: (e?: any) => unknown
+  disabled?: boolean
+  className?: string
 }
 
 export function Button({

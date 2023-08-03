@@ -114,7 +114,7 @@ export default ({
   return (
     <div
       className={`flex flex-col gap-4 basis-96 m-auto bg-white dark:bg-[#1F2937] p-6\
-           lg:rounded-${radius} min-h-fit lg:min-h-[580px] border border-[#D1D5DB] dark:border-gray-600`}
+           rounded-${radius} min-h-fit lg:min-h-[580px] border border-[#D1D5DB] dark:border-gray-600`}
       style={{
         width: 418,
         boxSizing: 'border-box',
@@ -161,8 +161,8 @@ export default ({
               return (
                 <div
                   className={`
-          border-b w-full transition-transform flex-row 
-          flex justify-between items-center px-3 bg-white 
+          border-b w-full transition-transform flex-row
+          flex justify-between items-center px-3 bg-white
           dark:bg-[#1F2937] dark:border-gray-600 py-2
           ${open ? 'bg-gray-50 shadow-sm rounded-lg' : ''}`}
                 >
@@ -177,11 +177,11 @@ export default ({
                       id={`popover-${scope}`}
                       role="tooltip"
                       className="absolute z-10 invisible inline-block
-                    font-[Inter] rounded-lg text-gray-500 
-                    min-w-64 text-sm font-light bg-white 
+                    font-[Inter] rounded-lg text-gray-500
+                    min-w-64 text-sm font-light bg-white
                     transition-opacity duration-300 border
                     dark:bg-[#1F2937] border-gray-200
-                    shadow-sm opacity-0 dark:text-gray-400 
+                    shadow-sm opacity-0 dark:text-gray-400
                     dark:border-gray-600 dark:bg-gray-800"
                     >
                       <div
@@ -279,7 +279,7 @@ export default ({
                 {(scope === 'profile' || scope === 'system_identifiers') && (
                   <div
                     className="w-full transition-transform flex flex-row
-                      justify-between items-center px-3 bg-white 
+                      justify-between items-center px-3 bg-white
                       dark:bg-[#1F2937] dark:border-gray-600 gap-2 py-2 border-b"
                   >
                     <Info

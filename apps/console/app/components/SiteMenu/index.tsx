@@ -30,8 +30,9 @@ import {
   TbUsers,
   TbWorld,
   TbRocket,
+  TbUserCog,
 } from 'react-icons/tb'
-import { BsGear } from 'react-icons/bs'
+
 import { Popover, Transition } from '@headlessui/react'
 import { usePopper } from 'react-popper'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
@@ -406,7 +407,7 @@ function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
             if (close) close()
           }}
         >
-          <BsGear size={24} className="mr-2" />
+          <TbUserCog size={24} className="mr-2" />
           <div className="flex flex-row w-full items-center justify-between">
             <Text size="sm" weight="medium">
               User Settings

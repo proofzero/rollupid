@@ -23,7 +23,6 @@ import { ogImageFromProfile } from '~/helpers/ogImage'
 import { getAccountProfile } from '~/helpers/profile'
 
 import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { gatewayFromIpfs } from '@proofzero/utils'
 
 import ProfileTabs from '~/components/profile/tabs/tabs'
@@ -34,7 +33,7 @@ import subtractLogo from '~/assets/subtract-logo.svg'
 import { CryptoAddressType, OAuthAddressType } from '@proofzero/types/address'
 import type { AccountURN } from '@proofzero/urns/account'
 import { AccountURNSpace } from '@proofzero/urns/account'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { imageFromAddressType } from '~/helpers'
 import type { FullProfile } from '~/types'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
@@ -86,7 +85,11 @@ export const loader: LoaderFunction = async ({ request, params, context }) => {
   try {
     jwt = await getAccessToken(request, context.env)
 
-    profile = await getAccountProfile({ jwt, accountURN }, context.env, context.traceSpan)
+    profile = await getAccountProfile(
+      { jwt, accountURN },
+      context.env,
+      context.traceSpan
+    )
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })

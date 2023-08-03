@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { redirect } from '@remix-run/cloudflare'
 import { useTransition } from '@remix-run/react'
 import {
@@ -90,6 +89,7 @@ export default () => {
             onChange={(e) => setEmail(e.target.value)}
             label="Enter your email address"
             className="h-12 rounded-lg"
+            skin={true}
             autoFocus
           />
           {errorMessage ? (

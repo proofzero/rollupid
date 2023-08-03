@@ -6,10 +6,8 @@ import classNames from 'classnames'
 
 export type ModalProps = {
   children: any
-
   isOpen: boolean
   handleClose?: (value: boolean) => void
-
   fixed?: boolean
   closable?: boolean
   overflow?: 'visible' | 'auto'

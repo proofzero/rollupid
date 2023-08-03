@@ -1,5 +1,4 @@
-import type { ButtonProps } from '@proofzero/design-system/src/atoms/buttons/Button'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, type ButtonProps } from '@proofzero/design-system'
 
 import logo from '../../assets/rollup-id-logo-white.svg'
 

@@ -15,10 +15,9 @@ import {
 } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Panel } from '@proofzero/design-system/src/atoms/panels/Panel'
 import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { CTA } from '@proofzero/design-system/src/molecules/cta/cta'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
@@ -138,10 +137,10 @@ export default function AppDetailIndexPage() {
 
   const { rotatedClientSecret, rotatedApiKey } =
     outletContext?.rotationResult ||
-    actionData?.rotatedSecrets || {
-      rotatedClientSecret: null,
-      rotatedApiKey: null,
-    }
+      actionData?.rotatedSecrets || {
+        rotatedClientSecret: null,
+        rotatedApiKey: null,
+      }
 
   return (
     <section>
@@ -299,18 +298,14 @@ export default function AppDetailIndexPage() {
         </div>
         <div className="flex-1">
           <div className="flex h-full flex-col">
-            <Text
-              className="text-gray-900 py-3 px-6"
-              weight="semibold"
-              size="lg"
-            >
+            <Text className="text-gray-900 py-3" weight="semibold" size="lg">
               Users
             </Text>{' '}
             <Suspense
               fallback={
                 <div
                   className="flex bg-white justify-center items-center h-full
-            rounded-lg border shadow"
+            rounded-lg border"
                 >
                   <Spinner />
                 </div>

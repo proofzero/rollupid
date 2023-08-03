@@ -16,8 +16,7 @@ import { TbLink } from 'react-icons/tb'
 import { AiOutlinePlus } from 'react-icons/ai'
 
 import type { AddressProfile } from '@proofzero/galaxy-client'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Button, Text } from '@proofzero/design-system'
 import { SortableList } from '@proofzero/design-system/src/atoms/lists/SortableList'
 
 import type { Link, Links } from '~/types'
@@ -304,13 +303,13 @@ export default function AccountSettingsLinks() {
   const [connectedLinks, setConnectedLinks] = useState<
     (
       | {
-        addressURN?: string
-        public?: boolean
-        address?: string | null
-        title?: string | null
-        icon?: string | null
-        provider?: string
-      }
+          addressURN?: string
+          public?: boolean
+          address?: string | null
+          title?: string | null
+          icon?: string | null
+          provider?: string
+        }
       | undefined
     )[]
   >(normalizedAddressProfiles)
@@ -459,8 +458,9 @@ export default function AccountSettingsLinks() {
               itemRenderer={(item) => {
                 return (
                   <SortableLink
-                    key={`${item.val.name || 'My Website'}-${item.val.url || 'https://mywebsite.com'
-                      }-${item.key}`}
+                    key={`${item.val.name || 'My Website'}-${
+                      item.val.url || 'https://mywebsite.com'
+                    }-${item.key}`}
                     id={`${item.key}`}
                     link={item.val}
                     setFormChanged={setFormChanged}
@@ -505,7 +505,7 @@ export default function AccountSettingsLinks() {
           div with absolute position below  */}
         <div className="h-[4rem]" />
         <div className="absolute bottom-0 right-0">
-          <SaveButton isFormChanged={isFormChanged} discardFn={() => { }} />
+          <SaveButton isFormChanged={isFormChanged} discardFn={() => {}} />
         </div>
       </Form>
     </div>

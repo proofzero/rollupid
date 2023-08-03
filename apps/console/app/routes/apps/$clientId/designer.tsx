@@ -1,5 +1,4 @@
 import { Popover, Tab } from '@headlessui/react'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import {
   Form,
   Link,
@@ -29,7 +28,7 @@ import Authentication, {
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
 import IconPicker from '~/components/IconPicker'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { SortableList } from '@proofzero/design-system/src/atoms/lists/SortableList'
 import _ from 'lodash'
@@ -178,14 +177,14 @@ const RadiusButton = ({
 }) => {
   let label
   switch (radius) {
-    case 'lg':
+    case 'xl':
       label = 'Large'
       break
-    case 'sm':
-      label = 'Small'
-      break
-    case 'md':
+    case 'lg':
       label = 'Medium'
+      break
+    case 'none':
+      label = 'Small'
       break
     default:
       throw new BadRequestError({ message: 'Invalid radius' })
@@ -454,17 +453,17 @@ const AuthPanel = ({
 
             <div className="p-1 border border-gray-300 shadow-sm rounded flex justify-evenly">
               <RadiusButton
+                radius={'xl'}
+                setRadius={setRadius}
+                selectedRadius={radius}
+              />
+              <RadiusButton
                 radius={'lg'}
                 setRadius={setRadius}
                 selectedRadius={radius}
               />
               <RadiusButton
-                radius={'md'}
-                setRadius={setRadius}
-                selectedRadius={radius}
-              />
-              <RadiusButton
-                radius={'sm'}
+                radius={'none'}
                 setRadius={setRadius}
                 selectedRadius={radius}
               />
@@ -629,7 +628,7 @@ const AuthPanel = ({
                     setGraphicURL(undefined)
                   }}
                 >
-                  <Text size="xs" weight="medium" className="text-gray-200">
+                  <Text size="xs" weight="medium" className="text-indigo-500">
                     Remove
                   </Text>
                 </button>
@@ -1046,7 +1045,7 @@ const EmailPanel = ({
           <div className="flex flex-col lg:flex-row lg:items-center px-8 py-4">
             <div className="flex-1 mb-2 lg:mb-0 flex flex-row items-center gap-4">
               {(!appContactEmail || !appPublished) && (
-                <img className="w-4 h-4" src={danger} />
+                <img className="w-8 h-8" src={danger} alt="danger" />
               )}
 
               <div>

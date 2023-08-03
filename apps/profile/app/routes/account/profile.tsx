@@ -5,11 +5,10 @@ import {
   useTransition,
   useFetcher,
 } from '@remix-run/react'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
 import InputText from '~/components/inputs/InputText'
 import { getAccessToken, parseJwt } from '~/utils/session.server'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Avatar } from '@proofzero/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 
@@ -169,8 +168,8 @@ export default function AccountSettingsProfile() {
     const chain =
       collection !== ''
         ? modalFetcher.data?.ownedNfts.filter(
-          (nft: NFT) => nft.contract.address === collection
-        )[0].chain.chain
+            (nft: NFT) => nft.contract.address === collection
+          )[0].chain.chain
         : null
     getMoreNftsModal(modalFetcher, accountURN, collection, chain)
   }, [collection])

@@ -15,7 +15,7 @@ export const Panel = ({
   children,
   experimental,
 }: PanelProps) => (
-  <div className="bg-white rounded-lg py-2.5 px-6 pb-7 flex flex-col space-y-4 h-full border shadow w-full">
+  <div className="bg-white rounded-lg py-4 px-6 flex flex-col space-y-4 h-full border w-full">
     <section className="flex-1 flex justify-between items-start">
       <div className="flex items-center">
         <Text size="lg" weight="semibold" className="text-gray-900 pr-2">

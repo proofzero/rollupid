@@ -1,5 +1,4 @@
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
+import { Button, Text } from '@proofzero/design-system'
 import { Pill } from '@proofzero/design-system/src/atoms/pills/Pill'
 import { PrimaryPill } from '@proofzero/design-system/src/atoms/pills/PrimaryPill'
 import { IconPill } from '@proofzero/design-system/src/atoms/pills/IconPill'

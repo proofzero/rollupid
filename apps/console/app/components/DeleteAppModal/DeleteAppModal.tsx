@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useFetcher } from '@remix-run/react'
 import type { FetcherWithComponents } from '@remix-run/react'
 
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button } from '@proofzero/design-system'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 

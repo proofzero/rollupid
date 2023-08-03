@@ -1,7 +1,6 @@
 import { HiOutlineArrowLeft } from 'react-icons/hi'
-import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
-import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
+import { Button, Text } from '@proofzero/design-system'
 import { useState, useEffect } from 'react'
 
 type EmailPanelProps = {
@@ -56,6 +55,7 @@ export const EmailPanel = ({
           pattern="[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$"
           required
           autoFocus
+          skin={true}
           onChange={(evt) => {
             setEmail(evt.target.value)
             setIsValidEmail(evt.target.checkValidity())
