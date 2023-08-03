@@ -16,6 +16,7 @@ import { randomBytes } from '@ethersproject/random'
 import { IDENTITY_GROUP_OPTIONS } from '../../../constants'
 import { router } from '@proofzero/platform.core'
 import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
+import generateRandomString from '@proofzero/utils/generateRandomString'
 
 export const InviteIdentityGroupMemberInputSchema = z.object({
   inviterAccountURN: AccountURNInput,
@@ -59,8 +60,8 @@ export const inviteIdentityGroupMember = async ({
     })
   }
 
-  const inviteCode = hexlify(
-    randomBytes(IDENTITY_GROUP_OPTIONS.inviteCodeLength)
+  const inviteCode = generateRandomString(
+    IDENTITY_GROUP_OPTIONS.inviteCodeLength
   )
 
   const caller = router.createCaller(ctx)
