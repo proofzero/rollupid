@@ -38,7 +38,7 @@ const DropdownListboxButtonDefault = ({
 }: DropdownListboxButtonType) => {
   return (
     <div
-      className="border border-gray-300 shadow-sm rounded w-full transition-transform
+      className="border border-gray-300 shadow-sm rounded-lg w-full transition-transform
                                     flex flex-row justify-between items-center py-2 px-3 hover:ring-1
                                     hover:ring-skin-primary focus:ring-1 focus:ring-skin-primary bg-white
                                     dark:bg-[#1F2937] dark:border-gray-600"
@@ -206,7 +206,7 @@ export const Dropdown = ({
             leaveTo="opacity-0"
           >
             <Listbox.Options
-              className="border border-gray-300 shadow-lg rounded absolute w-full mt-1 bg-white
+              className="border border-gray-300 shadow-lg rounded-lg absolute w-full mt-1 bg-white
                             pt-3 space-y-3 z-10 dark:bg-[#1F2937] dark:border-gray-600"
             >
               {items?.length ? (
@@ -237,7 +237,7 @@ export const Dropdown = ({
                         <input
                           readOnly
                           type="checkbox"
-                          className="h-4 w-4 rounded border-gray-300 bg-gray-50
+                          className="h-4 w-4 rounded-lg border-gray-300 bg-gray-50
                                                     text-skin-primary focus:ring-skin-primary"
                           checked={allItemsSelected}
                         />
@@ -274,7 +274,7 @@ export const Dropdown = ({
                           <Listbox.Option
                             key={item.value}
                             value={item}
-                            className={` rounded
+                            className={` rounded-lg
                                                         flex flex-row space-x-2 cursor-pointer py-1.5 px-4
                                                         ${
                                                           checked

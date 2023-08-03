@@ -409,9 +409,14 @@ const PlanCard = ({
         </main>
         <div className="w-full border-t border-gray-200"></div>
         <footer className="p-4 flex flex-row items-center justify-between">
-          <Text>
-            {active ? null : '+'}${plan.price} per month
-          </Text>
+          <div className="flex flex-row items-center gap-2">
+            <Text>
+              {active ? null : '+'}${plan.price}
+            </Text>
+            <Text size="sm" className="text-gray-500">
+              per month
+            </Text>
+          </div>
           <Text size="sm" weight="medium" className="text-gray-500">
             {!active &&
               planType !== ServicePlanType.FREE &&
@@ -520,11 +525,9 @@ const PurchaseConfirmationModal = ({
           </Text>
 
           <div className="flex flex-row gap-2 items-center">
-            <Text
-              size="lg"
-              weight="semibold"
-              className="text-gray-900"
-            >{`+$${plan.price}`}</Text>
+            <Text size="lg" weight="semibold" className="text-gray-900">
+              {`+$${plan.price}`}
+            </Text>
             <Text size="sm" weight="medium" className="text-gray-500">
               per month
             </Text>
