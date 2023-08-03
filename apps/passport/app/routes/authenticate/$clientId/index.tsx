@@ -24,6 +24,7 @@ import {
   getRollupReqFunctionErrorWrapper,
 } from '@proofzero/utils/errors'
 import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
+import { BadRequestError } from '@proofzero/errors'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -206,32 +207,41 @@ const InnerComponent = ({
           if (loading) return
           // fetch nonce and kickoff sign flow
           setLoading(true)
-          await fetch(`/connect/${address}/sign`) // NOTE: note using fetch because it messes with wagmi state
-            .then(async (res) => {
-              const resJson = await res.json<{
-                nonce: string
-                state: string
-                address: string
-              }>()
-              if (!res.ok) {
-                throw getErrorCause(resJson)
-              }
-              return resJson
-            })
-            .then(({ nonce, state, address }) => {
-              setSignData({
-                nonce,
-                state,
-                address,
-                signature: undefined,
-              })
-            })
-            .catch((ex) => {
-              toast(ToastType.Error, {
+          try {
+            if (window.navigator.onLine != true) {
+              throw new BadRequestError({
                 message:
-                  'Could not complete authentication. Please return to application and try again.',
+                  'You seem to be offline. Please connect to the internet and try again.',
               })
+            }
+
+            const res = await fetch(`/connect/${address}/sign`, {
+              method: 'GET',
+            }) // NOTE: note using fetch because it messes with wagmi state
+
+            const resJson = await res.json<{
+              nonce: string
+              state: string
+              address: string
+            }>()
+
+            if (!res.ok) {
+              throw getErrorCause(resJson)
+            }
+
+            setSignData({
+              nonce: resJson.nonce,
+              state: resJson.state,
+              address: resJson.address,
+              signature: undefined,
             })
+          } catch (ex) {
+            toast(ToastType.Error, {
+              message:
+                ex.message ??
+                'Could not complete authentication. Please return to application and try again.',
+            })
+          }
           setLoading(false)
         },
         walletSignCallback: (address, signature, nonce, state) => {
@@ -240,13 +250,28 @@ const InnerComponent = ({
             ...signData,
             signature,
           })
-          submit(
-            { signature, nonce, state },
-            {
-              method: 'post',
-              action: `/connect/${address}/sign`,
+          try {
+            if (window.navigator.onLine != true) {
+              throw new BadRequestError({
+                message:
+                  'You seem to be offline. Please connect to the internet and try again.',
+              })
             }
-          )
+
+            submit(
+              { signature, nonce, state },
+              {
+                method: 'post',
+                action: `/connect/${address}/sign`,
+              }
+            )
+          } catch (ex) {
+            toast(ToastType.Error, {
+              message:
+                ex.message ??
+                'Could not complete authentication. Please return to application and try again.',
+            })
+          }
         },
         walletConnectErrorCallback: (error) => {
           console.debug('transition.state: ', transitionState)
