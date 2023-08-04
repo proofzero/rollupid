@@ -97,7 +97,9 @@ const EmailTemplateBase = (
           }
 
           .logo {
+            display: block
             max-width: 375px;
+            max-height: 48px;
             margin-bottom: 37px;
           }
 
@@ -167,7 +169,7 @@ const EmailTemplateBase = (
         <div class="container adaptive">
           <div class="content adaptive">
             <div class="heading-logo">
-              <img class="logo" src="${logoURL}" alt="" style="display: block" />
+              <img class="logo" src="${logoURL}" alt="" style="display:block; max-width: 375px; max-height: 48px;"/>
             </div>
             ${content}
             <div class="divider"></div>
