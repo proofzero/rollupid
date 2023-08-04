@@ -14,6 +14,7 @@ import {
   destroyAuthzCookieParamsSession,
   getAuthzCookieParams,
   getValidatedSessionContext,
+  isSupportedRollupAction,
 } from '~/session.server'
 import { validatePersonaData } from '@proofzero/security/persona'
 
@@ -96,10 +97,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         message: 'The only prompt supported is "consent"',
       })
 
-    if (
-      rollup_action &&
-      !['connect', 'create', 'reconnect'].includes(rollup_action)
-    )
+    if (rollup_action && !isSupportedRollupAction(rollup_action))
       throw new BadRequestError({
         message:
           'only Rollup action supported are connect, create, and reconnect ',

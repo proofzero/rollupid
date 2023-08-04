@@ -1,5 +1,5 @@
 import { Form, useNavigate, useOutletContext } from '@remix-run/react'
-import { GroupRootContextData } from '../groups'
+import { GroupRootContextData } from '../spuorg'
 import { Button, Text } from '@proofzero/design-system'
 import { HiDotsVertical, HiUserGroup } from 'react-icons/hi'
 import { List } from '@proofzero/design-system/src/atoms/lists/List'
@@ -24,7 +24,7 @@ const CreateGroupModal = ({
 
         <Form
           method="post"
-          action="/groups/create"
+          action="/spuorg/create"
           className="flex flex-col gap-4"
           onSubmit={handleClose}
         >
@@ -179,7 +179,7 @@ export default () => {
               </article>
             )}
             onItemClick={(item) => {
-              navigate(`/groups/${item.val.URN.split('/')[1]}`)
+              navigate(`/spuorg/${item.val.URN.split('/')[1]}`)
             }}
           ></List>
         </section>

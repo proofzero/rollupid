@@ -4,8 +4,13 @@ import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
-import { Form, Link, useLoaderData, useOutletContext } from '@remix-run/react'
-import { GroupRootContextData } from '../../groups'
+import {
+  Link,
+  useFetcher,
+  useLoaderData,
+  useOutletContext,
+} from '@remix-run/react'
+import { GroupRootContextData } from '../../spuorg'
 import { useRef, useState } from 'react'
 import {
   CryptoAddressType,
@@ -38,6 +43,10 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
 } from '@heroicons/react/20/solid'
+import { InviteRes } from './invite'
+import { Input } from '@proofzero/design-system/src/atoms/form/Input'
+import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
+import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 
 const addressTypes = [
   ...Object.values(EmailAddressType),
@@ -59,12 +68,9 @@ type LoaderData = {
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
-    const groupURN = `${['urn:rollupid:identity-group', params.groupID].join(
-      '/'
-    )}` as IdentityGroupURN
-    if (!IdentityGroupURNSpace.is(groupURN)) {
-      throw new Error('Invalid group ID')
-    }
+    const groupURN = IdentityGroupURNSpace.urn(
+      params.groupID as string
+    ) as IdentityGroupURN
 
     const jwt = await requireJWT(request, context.env)
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
@@ -81,7 +87,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const mappedInvitations = invitations.map((invitation) => ({
       identifier: invitation.identifier,
       addressType: invitation.addressType,
-      invitationURL: '#',
+      invitationURL: [
+        context.env.PASSPORT_URL,
+        'spuorg',
+        'enroll',
+        params.groupID,
+        invitation.invitationCode,
+      ].join('/'),
     }))
 
     return json<LoaderData>({
@@ -129,10 +141,12 @@ export const ActionCard = ({
 }
 
 const InviteMemberModal = ({
+  passportURL,
   groupID,
   isOpen,
   handleClose,
 }: {
+  passportURL: string
   groupID: string
   isOpen: boolean
   handleClose: () => void
@@ -141,8 +155,22 @@ const InviteMemberModal = ({
     EmailAddressType.Email
   )
 
+  const inviteLinkFetcher = useFetcher<InviteRes>()
+  const closeAndClearFetcher = () => {
+    inviteLinkFetcher.submit(null, {
+      action: '/api/reset-fetcher',
+      method: 'post',
+    })
+
+    handleClose()
+  }
+
   return (
-    <Modal isOpen={isOpen} handleClose={handleClose} overflow="visible">
+    <Modal
+      isOpen={isOpen}
+      handleClose={() => closeAndClearFetcher()}
+      overflow="visible"
+    >
       <div className="p-6">
         <section className="mb-4">
           <Text size="lg" weight="semibold" className="text-left">
@@ -153,114 +181,180 @@ const InviteMemberModal = ({
           </Text>
         </section>
 
-        <Form
-          method="post"
-          action={`/groups/${groupID}/invite`}
-          className="flex flex-row gap-2"
-          onSubmit={() => {
-            handleClose()
-          }}
-        >
-          <div className="grid grid-cols-5 relative">
-            <Listbox
-              value={selectedProvider}
-              onChange={setSelectedProvider}
-              name="addressType"
-            >
-              {({ open }) => (
-                <div className="flex flex-col col-span-2">
-                  <Listbox.Button className="relative border rounded-l p-2 flex flex-row justify-between items-center flex-1 focus-visible:outline-none focus:border-indigo-500">
-                    <div className="flex flex-row items-center gap-2">
-                      <img
-                        className="w-5 h-5"
-                        src={getProviderIcons(selectedProvider)}
-                      />
-                      <Text size="sm" weight="normal" className="text-gray-800">
-                        {_.upperFirst(selectedProvider)}
-                      </Text>
-                    </div>
-
-                    {open ? (
-                      <ChevronDownIcon className="w-5 h-5 text-gray-500 shrink-0" />
-                    ) : (
-                      <ChevronUpIcon className="w-5 h-5 text-gray-500 shrink-0" />
-                    )}
-                  </Listbox.Button>
-
-                  <Transition
-                    show={open}
-                    enter="transition duration-100 ease-out"
-                    enterFrom="transform scale-95 opacity-0"
-                    enterTo="transform scale-100 opacity-100"
-                    leave="transition duration-75 ease-out"
-                    leaveFrom="transform scale-100 opacity-100"
-                    leaveTo="transform scale-95 opacity-0"
-                  >
-                    <Listbox.Options
-                      className="absolute bg-white p-2 flex flex-col gap-2 mt-1 focus-visible:ring-0 focus-visible:outline-none border shadow"
-                      static
-                    >
-                      {addressTypes.map((provider) => (
-                        <Listbox.Option
-                          key={provider}
-                          value={provider}
-                          className={({ active }) =>
-                            classNames(
-                              'flex flex-row items-center gap-2 hover:bg-gray-100 py-2 px-4 rounded-lg cursor-pointer',
-                              {
-                                'bg-gray-100': active,
-                              }
-                            )
-                          }
+        {!inviteLinkFetcher.data && (
+          <inviteLinkFetcher.Form
+            method="post"
+            action={`/spuorg/${groupID}/invite`}
+            className="flex flex-row gap-2"
+          >
+            <div className="grid grid-cols-5 relative">
+              <Listbox
+                value={selectedProvider}
+                onChange={setSelectedProvider}
+                name="addressType"
+              >
+                {({ open }) => (
+                  <div className="flex flex-col col-span-2">
+                    <Listbox.Button className="relative border rounded-l p-2 flex flex-row justify-between items-center flex-1 focus-visible:outline-none focus:border-indigo-500">
+                      <div className="flex flex-row items-center gap-2">
+                        <img
+                          className="w-5 h-5"
+                          src={getProviderIcons(selectedProvider)}
+                        />
+                        <Text
+                          size="sm"
+                          weight="normal"
+                          className="text-gray-800"
                         >
-                          {({ selected }) => (
-                            <>
-                              <img
-                                className="w-5 h-5"
-                                src={getProviderIcons(provider)}
-                              />
-                              <Text
-                                size="sm"
-                                weight="normal"
-                                className="text-gray-800"
-                              >
-                                {_.upperFirst(provider)}
-                              </Text>
-                              {selected && (
-                                <CheckIcon
-                                  className="h-5 w-5 text-indigo-600"
-                                  aria-hidden="true"
+                          {_.upperFirst(selectedProvider)}
+                        </Text>
+                      </div>
+
+                      {open ? (
+                        <ChevronDownIcon className="w-5 h-5 text-gray-500 shrink-0" />
+                      ) : (
+                        <ChevronUpIcon className="w-5 h-5 text-gray-500 shrink-0" />
+                      )}
+                    </Listbox.Button>
+
+                    <Transition
+                      show={open}
+                      enter="transition duration-100 ease-out"
+                      enterFrom="transform scale-95 opacity-0"
+                      enterTo="transform scale-100 opacity-100"
+                      leave="transition duration-75 ease-out"
+                      leaveFrom="transform scale-100 opacity-100"
+                      leaveTo="transform scale-95 opacity-0"
+                    >
+                      <Listbox.Options
+                        className="absolute bg-white p-2 flex flex-col gap-2 mt-1 focus-visible:ring-0 focus-visible:outline-none border shadow"
+                        static
+                      >
+                        {addressTypes.map((provider) => (
+                          <Listbox.Option
+                            key={provider}
+                            value={provider}
+                            className={({ active }) =>
+                              classNames(
+                                'flex flex-row items-center gap-2 hover:bg-gray-100 py-2 px-4 rounded-lg cursor-pointer',
+                                {
+                                  'bg-gray-100': active,
+                                }
+                              )
+                            }
+                          >
+                            {({ selected }) => (
+                              <>
+                                <img
+                                  className="w-5 h-5"
+                                  src={getProviderIcons(provider)}
                                 />
-                              )}
-                            </>
-                          )}
-                        </Listbox.Option>
-                      ))}
-                    </Listbox.Options>
-                  </Transition>
-                </div>
-              )}
-            </Listbox>
+                                <Text
+                                  size="sm"
+                                  weight="normal"
+                                  className="text-gray-800"
+                                >
+                                  {_.upperFirst(provider)}
+                                </Text>
+                                {selected && (
+                                  <CheckIcon
+                                    className="h-5 w-5 text-indigo-600"
+                                    aria-hidden="true"
+                                  />
+                                )}
+                              </>
+                            )}
+                          </Listbox.Option>
+                        ))}
+                      </Listbox.Options>
+                    </Transition>
+                  </div>
+                )}
+              </Listbox>
 
-            <input
-              required
-              type="text"
-              name="identifier"
-              className="border rounded-r border-gray-200 col-span-3 focus:ring-0 focus-visible:ring-0 focus:outline-none focus-visible:outline-none"
+              <input
+                required
+                type="text"
+                name="identifier"
+                className="border rounded-r border-gray-200 col-span-3 focus:ring-0 focus-visible:ring-0 focus:outline-none focus-visible:outline-none"
+              />
+            </div>
+
+            <Button btnType="primary-alt" type="submit">
+              Generate Invite Link
+            </Button>
+          </inviteLinkFetcher.Form>
+        )}
+
+        {inviteLinkFetcher.data && (
+          <>
+            <ReadOnlyInput
+              id="inviteURL"
+              label="Invite URL"
+              value={[
+                passportURL,
+                'spuorg',
+                'enroll',
+                groupID,
+                inviteLinkFetcher.data.inviteCode,
+              ].join('/')}
+              copyable
+              onCopy={() =>
+                toast(
+                  ToastType.Success,
+                  { message: 'Invite URL copied to clipboard!' },
+                  {
+                    duration: 2000,
+                  }
+                )
+              }
+              disabled
             />
-          </div>
 
-          <Button btnType="primary-alt" type="submit">
-            Generate Invite Link
-          </Button>
-        </Form>
+            <Button
+              className="w-full mt-4"
+              btnType="primary-alt"
+              type="button"
+              onClick={() => {
+                if (!navigator) {
+                  console.warn('Copying is not available')
+
+                  return
+                }
+
+                navigator.clipboard.writeText(
+                  [
+                    passportURL,
+                    'spuorg',
+                    'enroll',
+                    groupID,
+                    inviteLinkFetcher.data!.inviteCode,
+                  ].join('/')
+                )
+
+                toast(
+                  ToastType.Success,
+                  { message: 'Invite URL copied to clipboard!' },
+                  {
+                    duration: 2000,
+                  }
+                )
+
+                closeAndClearFetcher()
+              }}
+            >
+              Copy & Close
+            </Button>
+          </>
+        )}
       </div>
     </Modal>
   )
 }
 
 export default () => {
-  const { groups } = useOutletContext<GroupRootContextData>()
+  const { groups, PASSPORT_URL, ownAddressURNList } =
+    useOutletContext<GroupRootContextData>()
   const { URN, groupID, invitations } = useLoaderData<LoaderData>()
 
   const group = useRef(groups.find((group) => group.URN === URN))
@@ -275,6 +369,7 @@ export default () => {
         groupID={groupID}
         isOpen={inviteModalOpen}
         handleClose={() => setInviteModalOpen(false)}
+        passportURL={PASSPORT_URL}
       />
 
       {group.current && (
@@ -283,7 +378,7 @@ export default () => {
             trail={[
               {
                 label: 'Groups',
-                href: '/groups',
+                href: '/spuorg',
               },
               {
                 label: group.current.name,
@@ -436,15 +531,17 @@ export default () => {
                           {item.val.title}
                         </Text>
 
-                        <Pill className="bg-indigo-50 rounded-lg !pr-2">
-                          <Text
-                            size="xs"
-                            weight="semibold"
-                            className="text-indigo-500 text-[10px]"
-                          >
-                            YOU
-                          </Text>
-                        </Pill>
+                        {ownAddressURNList.includes(item.key) && (
+                          <Pill className="bg-indigo-50 rounded-lg !pr-2">
+                            <Text
+                              size="xs"
+                              weight="semibold"
+                              className="text-indigo-500 text-[10px]"
+                            >
+                              YOU
+                            </Text>
+                          </Pill>
+                        )}
                       </div>
 
                       <div className="flex flex-row items-center gap-1 text-gray-500 truncate">
@@ -567,7 +664,7 @@ export default () => {
                       </div>
                     </div>
 
-                    <div className="flex flex-row items-center gap-4">
+                    <div className="flex flex-row items-center gap-4 p-2">
                       <button className="p-2" disabled>
                         <HiOutlineTrash className="w-4 h-4 text-gray-500" />
                       </button>
@@ -575,8 +672,24 @@ export default () => {
                       <Button
                         btnType="secondary-alt"
                         className="flex flex-row items-center gap-2"
-                        disabled
                         btnSize="xs"
+                        onClick={() => {
+                          if (!navigator) {
+                            console.warn('Copying is not available')
+
+                            return
+                          }
+
+                          navigator.clipboard.writeText(item.val.invitationURL)
+
+                          toast(
+                            ToastType.Success,
+                            { message: 'Invite URL copied to clipboard!' },
+                            {
+                              duration: 2000,
+                            }
+                          )
+                        }}
                       >
                         <HiOutlineClipboardCopy className="w-4 h-4 text-gray-500" />
 

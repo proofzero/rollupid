@@ -9,6 +9,7 @@ import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 import { NO_OP_ADDRESS_PLACEHOLDER } from '@proofzero/platform/address/src/constants'
 import { AddressURN } from '@proofzero/urns/address'
 import { Outlet, useLoaderData } from '@remix-run/react'
+import { Toaster } from '@proofzero/design-system/src/atoms/toast'
 
 type GroupMemberModel = {
   URN: AddressURN
@@ -26,6 +27,9 @@ type GroupModel = {
 
 type GroupRootLoaderData = {
   groups: GroupModel[]
+  CONSOLE_URL: string
+  PASSPORT_URL: string
+  ownAddressURNList: AddressURN[]
 }
 
 export type GroupRootContextData = GroupRootLoaderData
@@ -80,8 +84,17 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
     )
 
+    const ownAddresses = await coreClient.account.getOwnAddresses.query({
+      account: accountURN,
+    })
+    const ownAddressURNList =
+      ownAddresses?.map((a) => a.baseUrn as AddressURN) ?? []
+
     return json<GroupRootLoaderData>({
       groups: mappedGroups,
+      CONSOLE_URL: context.env.CONSOLE_URL,
+      PASSPORT_URL: context.env.PASSPORT_URL,
+      ownAddressURNList,
     })
   }
 )
@@ -89,5 +102,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 export default () => {
   const data = useLoaderData<GroupRootLoaderData>()
 
-  return <Outlet context={data} />
+  return (
+    <>
+      <Toaster position="top-right" />
+      <Outlet context={data} />
+    </>
+  )
 }

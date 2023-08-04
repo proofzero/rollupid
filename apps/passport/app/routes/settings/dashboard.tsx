@@ -9,11 +9,13 @@ import dashboardChart from '~/assets/dashboard_chart.svg'
 import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
 import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
 
-import { WarningCTA } from "@proofzero/design-system/src/molecules/cta/warning"
+import { WarningCTA } from '@proofzero/design-system/src/molecules/cta/warning'
 
 import { useOutletContext } from '@remix-run/react'
 import type { AddressURN } from '@proofzero/urns/address'
 import { AuthorizedAppsModel } from '../settings'
+import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
+import { useEffect } from 'react'
 
 export default function DashboardLayout() {
   const { connectedProfiles, authorizedApps, primaryAddressURN } =
@@ -25,7 +27,30 @@ export default function DashboardLayout() {
 
   const navigate = useNavigate()
 
-  const appErrorExists = authorizedApps.some((app) => app.appDataError || app.appScopeError)
+  const appErrorExists = authorizedApps.some(
+    (app) => app.appDataError || app.appScopeError
+  )
+
+  useEffect(() => {
+    const url = new URL(window.location.href)
+
+    const toastResult = url.searchParams.get('toast')
+    if (toastResult) {
+      switch (toastResult) {
+        case 'groupdeny':
+          toast(
+            ToastType.Warning,
+            { message: 'Group invitation was cancelled by user' },
+            { duration: 2000 }
+          )
+          break
+      }
+
+      url.searchParams.delete('toast')
+
+      history.replaceState(null, '', url.toString())
+    }
+  }, [])
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -34,15 +59,16 @@ export default function DashboardLayout() {
           Dashboard
         </Text>
       </div>
-      {
-        appErrorExists
-          ? <WarningCTA
-            description='We detected a data error in your application(s).
-      Please revoke the authorization and re-authorize again in the affected application.'
-            btnText='Applications'
-            clickHandler={() => { navigate("/settings/applications") }} />
-          : null
-      }
+      {appErrorExists ? (
+        <WarningCTA
+          description="We detected a data error in your application(s).
+      Please revoke the authorization and re-authorize again in the affected application."
+          btnText="Applications"
+          clickHandler={() => {
+            navigate('/settings/applications')
+          }}
+        />
+      ) : null}
       <div
         className="dashboard flex flex-col md:flex-row
     items-center md:items-start md:space-x-4
@@ -117,55 +143,56 @@ export default function DashboardLayout() {
               </div>
 
               <div className="flex flex-1 flex-col">
-                {authorizedApps.map(
-                  (a) => (
-                    <article
-                      key={a.title}
-                      className="flex flex-row space-x-4 items-center py-5 px-8"
-                    >
-                      <div className="flex-1 w-min flex flex-row items-center space-x-2">
-                        <img
-                          src={a.icon}
-                          alt="app icon"
-                          className={`object-cover w-6 h-6 ${a.appDataError || a.appScopeError ? "" : "rounded"}`}
-                        />
-                        {a.title
-                          ? <Text
-                            size="sm"
-                            weight="medium"
-                            className="text-gray-500 w-fit py-[2px]">
-                            {a.title}
-                          </Text>
-                          : null}
-                        {a.appDataError || a.appScopeError
-                          ? <Text
-                            size="sm"
-                            weight="normal"
-                            className="text-gray-500 w-max py-[2px] px-2 
+                {authorizedApps.map((a) => (
+                  <article
+                    key={a.title}
+                    className="flex flex-row space-x-4 items-center py-5 px-8"
+                  >
+                    <div className="flex-1 w-min flex flex-row items-center space-x-2">
+                      <img
+                        src={a.icon}
+                        alt="app icon"
+                        className={`object-cover w-6 h-6 ${
+                          a.appDataError || a.appScopeError ? '' : 'rounded'
+                        }`}
+                      />
+                      {a.title ? (
+                        <Text
+                          size="sm"
+                          weight="medium"
+                          className="text-gray-500 w-fit py-[2px]"
+                        >
+                          {a.title}
+                        </Text>
+                      ) : null}
+                      {a.appDataError || a.appScopeError ? (
+                        <Text
+                          size="sm"
+                          weight="normal"
+                          className="text-gray-500 w-max py-[2px] px-2 
                             text-[#EA580C] bg-orange-50 rounded-xl"
-                          >
-                            Data Error
-                          </Text>
-                          : null}
-                      </div>
+                        >
+                          Data Error
+                        </Text>
+                      ) : null}
+                    </div>
 
-                      <Text
-                        size="sm"
-                        weight="medium"
-                        className="text-gray-500 flex-1 text-ellipsis"
-                      >
-                        {new Date(a.timestamp).toLocaleString('default', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit',
-                        })}
-                      </Text>
-                    </article>
-                  )
-                )}
+                    <Text
+                      size="sm"
+                      weight="medium"
+                      className="text-gray-500 flex-1 text-ellipsis"
+                    >
+                      {new Date(a.timestamp).toLocaleString('default', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                      })}
+                    </Text>
+                  </article>
+                ))}
               </div>
 
               <div className="w-full px-8">

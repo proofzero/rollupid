@@ -81,6 +81,16 @@ import {
   GetIdentityGroupMemberInvitationsOutputSchema,
   getIdentityGroupMemberInvitations,
 } from './methods/identity-groups/getIdentityGroupMemberInvitations'
+import {
+  GetIdentityGroupMemberInvitationDetailsInputSchema,
+  GetIdentityGroupMemberInvitationDetailsOutputSchema,
+  getIdentityGroupMemberInvitationDetails,
+} from './methods/identity-groups/getIdentityGroupMemberInvitationDetails'
+
+import {
+  AcceptIdentityGroupMemberInvitationInputSchema,
+  acceptIdentityGroupMemberInvitation,
+} from './methods/identity-groups/acceptIdentityGroupMemberInvitation'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -203,25 +213,47 @@ export const appRouter = t.router({
     .input(CancelServicePlansInput)
     .mutation(cancelServicePlans),
   createIdentityGroup: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .input(CreateIdentityGroupInputSchema)
     .mutation(createIdentityGroup),
   listIdentityGroups: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .input(ListIdentityGroupsInputSchema)
     .output(ListIdentityGroupsOutputSchema)
     .query(listIdentityGroups),
   inviteIdentityGroupMember: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .input(InviteIdentityGroupMemberInputSchema)
     .mutation(inviteIdentityGroupMember),
   getIdentityGroupMemberInvitations: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .input(GetIdentityGroupMemberInvitationsInputSchema)
     .output(GetIdentityGroupMemberInvitationsOutputSchema)
     .query(getIdentityGroupMemberInvitations),
+  getIdentityGroupMemberInvitationDetails: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetIdentityGroupMemberInvitationDetailsInputSchema)
+    .output(GetIdentityGroupMemberInvitationDetailsOutputSchema)
+    .query(getIdentityGroupMemberInvitationDetails),
+  acceptIdentityGroupMemberInvitation: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(injectAccountNode)
+    .input(AcceptIdentityGroupMemberInvitationInputSchema)
+    .mutation(acceptIdentityGroupMemberInvitation),
 })

@@ -16,15 +16,18 @@ type GetIdentityGroupMemberInvitationsInput = z.infer<
   typeof GetIdentityGroupMemberInvitationsInputSchema
 >
 
+export const GroupMemberInvitationSchema = z.object({
+  identifier: z.string(),
+  addressType: z.union([
+    z.nativeEnum(EmailAddressType),
+    z.nativeEnum(OAuthAddressType),
+    z.nativeEnum(CryptoAddressType),
+  ]),
+  invitationCode: z.string(),
+})
+
 export const GetIdentityGroupMemberInvitationsOutputSchema = z.array(
-  z.object({
-    identifier: z.string(),
-    addressType: z.union([
-      z.nativeEnum(EmailAddressType),
-      z.nativeEnum(OAuthAddressType),
-      z.nativeEnum(CryptoAddressType),
-    ]),
-  })
+  GroupMemberInvitationSchema
 )
 type GetIdentityGroupMemberInvitationsOutput = z.infer<
   typeof GetIdentityGroupMemberInvitationsOutputSchema
@@ -54,5 +57,6 @@ export const getIdentityGroupMemberInvitations = async ({
   return invitations.map((invitation) => ({
     identifier: invitation.identifier,
     addressType: invitation.addressType,
+    invitationCode: invitation.inviteCode,
   }))
 }

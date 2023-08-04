@@ -98,7 +98,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const coreClient = getCoreClient({ context, addressURN })
     const account = await coreClient.address.resolveAccount.query({
       jwt: await getUserSession(request, context.env, appData?.clientId),
-      force: !appData || appData.rollup_action !== 'connect',
+      force:
+        !appData ||
+        (appData.rollup_action !== 'connect' &&
+          !appData.rollup_action?.startsWith('groupconnect')),
     })
     const current = await coreClient.address.getOAuthData.query()
 

@@ -373,7 +373,7 @@ function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
       {false && (
         <div className="px-2 p-2 hover:bg-gray-800">
           <NavLink
-            to={'/groups'}
+            to={'/spuorg'}
             className={({ isActive }) => `${menuItemClass(isActive, false)} `}
           >
             <HiUserGroup size={24} className="mr-2" />

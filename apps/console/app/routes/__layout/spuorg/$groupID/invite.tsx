@@ -1,9 +1,12 @@
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction, redirect } from '@remix-run/cloudflare'
+import { ActionFunction, json } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import createCoreClient from '@proofzero/platform-clients/core'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
+import {
+  getAuthzHeaderConditionallyFromToken,
+  parseJwt,
+} from '@proofzero/utils'
 import { BadRequestError } from '@proofzero/errors'
 import {
   CryptoAddressType,
@@ -14,18 +17,22 @@ import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
+import { AccountURN } from '@proofzero/urns/account'
+
+export type InviteRes = {
+  inviteCode: string
+}
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
     const groupID = params.groupID as string
-    const groupURN = `${['urn:rollupid:identity-group', groupID].join(
-      '/'
-    )}` as IdentityGroupURN
-    if (!IdentityGroupURNSpace.is(groupURN)) {
-      throw new Error('Invalid group ID')
-    }
+    const groupURN = IdentityGroupURNSpace.urn(
+      groupID as string
+    ) as IdentityGroupURN
 
     const jwt = await requireJWT(request, context.env)
+    const parsedJwt = parseJwt(jwt!)
+    const accountURN = parsedJwt.sub as AccountURN
 
     const fd = await request.formData()
     const addressType = fd.get('addressType') as
@@ -50,12 +57,16 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    await coreClient.account.inviteIdentityGroupMember.mutate({
-      identifier,
-      addressType: addressType,
-      identityGroupURN: groupURN,
-    })
+    const { inviteCode } =
+      await coreClient.account.inviteIdentityGroupMember.mutate({
+        inviterAccountURN: accountURN,
+        identifier,
+        addressType: addressType,
+        identityGroupURN: groupURN,
+      })
 
-    return redirect(`/groups/${groupID}`)
+    return json({
+      inviteCode,
+    } as InviteRes)
   }
 )

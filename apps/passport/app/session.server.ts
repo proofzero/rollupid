@@ -176,7 +176,8 @@ export async function createAuthzParamsCookieAndAuthenticate(
   qp: URLSearchParams = new URLSearchParams()
 ) {
   let redirectURL = `/authenticate/${authzQueryParams.clientId}${
-    ['connect', 'reconnect'].includes(authzQueryParams.rollup_action || '')
+    ['connect', 'reconnect'].includes(authzQueryParams.rollup_action || '') ||
+    authzQueryParams.rollup_action?.startsWith('groupconnect')
       ? ''
       : `/account`
   }`
@@ -371,4 +372,10 @@ export function parseJwt(token: string): JWTPayload {
     throw InvalidTokenError
   }
   return payload
+}
+
+export function isSupportedRollupAction(rollupAction: string) {
+  return ['connect', 'create', 'reconnect', 'group', 'groupconnect'].includes(
+    rollupAction.split('_')[0]
+  )
 }
