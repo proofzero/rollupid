@@ -48,7 +48,7 @@ declare global {
     POSTHOG_API_KEY: string
     POSTHOG_PROXY_HOST: string
     //Needed to make Remix work with Cloudflare module workers
-    __STATIC_CONTENT: string
+    __STATIC_CONTENT: Fetcher
   }
 
   interface AuthzParams {

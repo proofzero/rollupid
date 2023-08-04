@@ -3275,6 +3275,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cloudflare/kv-asset-handler@npm:0.3.0":
+  version: 0.3.0
+  resolution: "@cloudflare/kv-asset-handler@npm:0.3.0"
+  dependencies:
+    mime: ^3.0.0
+  checksum: 6d3754096728d082765a7eb08f50e7cebcadee9224896beaee0e998ee43d919aa2e1447c69fb0934ed9df7acc3f8125992653af07522546bb3217086e249f0fb
+  languageName: node
+  linkType: hard
+
 "@cloudflare/kv-asset-handler@npm:^0.1.3":
   version: 0.1.3
   resolution: "@cloudflare/kv-asset-handler@npm:0.1.3"
@@ -7403,6 +7412,7 @@ __metadata:
   resolution: "@proofzero/apps.passport@workspace:apps/passport"
   dependencies:
     "@babel/core": ^7.20.2
+    "@cloudflare/kv-asset-handler": 0.3.0
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/keccak256": 5.7.0
     "@mdx-js/react": ^1.6.22

@@ -23,6 +23,7 @@
     "mydev": "remix dev --no-restart -c \"npm dev:wrangler\""
   },
   "dependencies": {
+    "@cloudflare/kv-asset-handler": "0.3.0",
     "@ethersproject/keccak256": "5.7.0",
     "@microlabs/otel-cf-workers": "1.0.0-rc.7",
     "@opentelemetry/sdk-trace-base": "1.15.1",
