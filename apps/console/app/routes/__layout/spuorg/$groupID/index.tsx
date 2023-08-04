@@ -10,7 +10,7 @@ import {
   useLoaderData,
   useOutletContext,
 } from '@remix-run/react'
-import { GroupRootContextData } from '../../groups'
+import { GroupRootContextData } from '../../spuorg'
 import { useRef, useState } from 'react'
 import {
   CryptoAddressType,
@@ -89,7 +89,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       addressType: invitation.addressType,
       invitationURL: [
         context.env.PASSPORT_URL,
-        'groups',
+        'spuorg',
         'enroll',
         params.groupID,
         invitation.invitationCode,
@@ -184,7 +184,7 @@ const InviteMemberModal = ({
         {!inviteLinkFetcher.data && (
           <inviteLinkFetcher.Form
             method="post"
-            action={`/groups/${groupID}/invite`}
+            action={`/spuorg/${groupID}/invite`}
             className="flex flex-row gap-2"
           >
             <div className="grid grid-cols-5 relative">
@@ -293,7 +293,7 @@ const InviteMemberModal = ({
               label="Invite URL"
               value={[
                 passportURL,
-                'groups',
+                'spuorg',
                 'enroll',
                 groupID,
                 inviteLinkFetcher.data.inviteCode,
@@ -325,7 +325,7 @@ const InviteMemberModal = ({
                 navigator.clipboard.writeText(
                   [
                     passportURL,
-                    'groups',
+                    'spuorg',
                     'enroll',
                     groupID,
                     inviteLinkFetcher.data!.inviteCode,
@@ -378,7 +378,7 @@ export default () => {
             trail={[
               {
                 label: 'Groups',
-                href: '/groups',
+                href: '/spuorg',
               },
               {
                 label: group.current.name,

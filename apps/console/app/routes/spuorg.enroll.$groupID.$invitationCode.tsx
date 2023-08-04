@@ -157,7 +157,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       identityGroupURN,
     })
 
-    return redirect(`/groups/${groupID}`)
+    return redirect(`/spuorg/${groupID}`)
   }
 )
 
@@ -269,7 +269,7 @@ export default () => {
                       },
                       {
                         method: 'post',
-                        action: `/groups/enroll/${groupID}/${invitationCode}`,
+                        action: `/spuorg/enroll/${groupID}/${invitationCode}`,
                       }
                     )
                   }}
@@ -283,7 +283,7 @@ export default () => {
                       {},
                       {
                         method: 'post',
-                        action: `/groups/enroll/${groupID}/${invitationCode}`,
+                        action: `/spuorg/enroll/${groupID}/${invitationCode}`,
                       }
                     )
                   }}

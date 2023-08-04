@@ -35,7 +35,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     let jwt = await getUserSession(request, context.env)
     if (jwt) {
       return redirect(
-        `${context.env.CONSOLE_APP_URL}/groups/enroll/${groupID}/${invitationCode}`
+        `${context.env.CONSOLE_APP_URL}/spuorg/enroll/${groupID}/${invitationCode}`
       )
     }
 
