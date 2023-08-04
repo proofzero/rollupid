@@ -10,6 +10,7 @@ import dangerVector from '../../images/danger.svg'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { RiLoader5Fill } from 'react-icons/ri'
 
+import { HiOutlineX } from 'react-icons/hi'
 export type DeleteAppModalProps = {
   appName: string
   appClientID: string
@@ -29,21 +30,29 @@ export const DeleteAppModal = ({
   const [hasCustomDomain] = useState(Boolean(appHasCustomDomain))
 
   return (
-    <Modal
-      isOpen={isOpen}
-      closable={fetcher.state !== 'submitting'}
-      handleClose={() => deleteAppCallback(false)}
-    >
+    <Modal isOpen={isOpen} handleClose={() => deleteAppCallback(false)}>
       <div
-        className={`w-[48vw] rounded-lg bg-white px-4 pb-4
-         text-left  transition-all sm:px-6 sm:pb-6 overflow-y-auto flex items-start space-x-4`}
+        className={`w-fit rounded-lg bg-white p-4
+         text-left  transition-all sm:p-5 overflow-y-auto flex items-start space-x-4`}
       >
-        <img src={dangerVector} />
+        <img src={dangerVector} alt="danger" />
 
         <div className="flex-1">
-          <Text size="lg" weight="medium" className="text-gray-900 mb-2">
-            Delete Application
-          </Text>
+          <div className="flex flex-row items-center justify-between w-full mb-2">
+            <Text size="lg" weight="medium" className="text-gray-900">
+              Delete Application
+            </Text>
+            <button
+              className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+              onClick={() => {
+                deleteAppCallback(false)
+              }}
+              disabled={fetcher.state === 'submitting'}
+            >
+              <HiOutlineX />
+            </button>
+          </div>
 
           {hasCustomDomain && (
             <HasCustomDomain clientID={appClientID}></HasCustomDomain>

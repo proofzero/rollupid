@@ -1,7 +1,7 @@
 import { Form, useNavigate, useOutletContext } from '@remix-run/react'
-import { GroupRootContextData } from '../spuorg'
+import { type GroupRootContextData } from '../spuorg'
 import { Button, Text } from '@proofzero/design-system'
-import { HiDotsVertical, HiUserGroup } from 'react-icons/hi'
+import { HiDotsVertical, HiOutlineX, HiUserGroup } from 'react-icons/hi'
 import { List } from '@proofzero/design-system/src/atoms/lists/List'
 import MultiAvatar from '@proofzero/design-system/src/molecules/avatar/MultiAvatar'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
@@ -18,9 +18,20 @@ const CreateGroupModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={handleClose}>
       <div className="p-6">
-        <Text size="lg" weight="semibold" className="mb-4 text-left">
-          Create Group
-        </Text>
+        <div className="flex flex-row w-full items-center justify-between mb-4">
+          <Text size="lg" weight="semibold">
+            Create Group
+          </Text>
+          <div
+            className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+            onClick={() => {
+              handleClose()
+            }}
+          >
+            <HiOutlineX />
+          </div>
+        </div>
 
         <Form
           method="post"

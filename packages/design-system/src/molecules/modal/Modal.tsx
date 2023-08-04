@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 
-import { HiOutlineX } from 'react-icons/hi'
 import classNames from 'classnames'
 
 export type ModalProps = {
@@ -9,17 +8,13 @@ export type ModalProps = {
   isOpen: boolean
   handleClose?: (value: boolean) => void
   fixed?: boolean
-  closable?: boolean
-  overflow?: 'visible' | 'auto'
 }
 
 export const Modal = ({
   isOpen = false,
   fixed = false,
   handleClose,
-  closable = true,
   children,
-  overflow,
   ...rest
 }: ModalProps) => {
   return (
@@ -57,32 +52,15 @@ export const Modal = ({
               <Dialog.Panel className={`${fixed ? 'pb-10' : ''}`}>
                 <div
                   className={classNames(
-                    'flex flex-col border bg-white rounded-lg shadow-xl thin-scrollbar',
+                    'border bg-white rounded-lg shadow-xl thin-scrollbar',
                     {
                       'h-max min-w-fit w-max min-[480px]:w-[96vw] lg:w-[62vw] h-[96vh] lg:h-[76vh]':
                         fixed,
                       'h-max min-w-fit w-max min-h-max max-w-[96vw] lg:w-full max-h-[89vh] lg:h-full':
                         !fixed,
-                    },
-                    {
-                      'overflow-auto': overflow === 'auto',
-                      'overflow-visible': overflow === 'visible',
                     }
                   )}
                 >
-                  <div className="flex flex-row justify-end px-3">
-                    {closable && (
-                      <div
-                        className={`bg-white p-2 rounded-lg m-2 text-xl cursor-pointer
-                      hover:bg-[#F3F4F6]`}
-                        onClick={() => {
-                          if (handleClose) handleClose(false)
-                        }}
-                      >
-                        <HiOutlineX />
-                      </div>
-                    )}
-                  </div>
                   {children}
                 </div>
               </Dialog.Panel>

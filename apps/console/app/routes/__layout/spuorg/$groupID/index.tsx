@@ -34,6 +34,7 @@ import {
   HiDotsVertical,
   HiOutlineClipboardCopy,
   HiOutlineTrash,
+  HiOutlineX,
 } from 'react-icons/hi'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { getProviderIcons } from '@proofzero/design-system/src/helpers'
@@ -166,19 +167,26 @@ const InviteMemberModal = ({
   }
 
   return (
-    <Modal
-      isOpen={isOpen}
-      handleClose={() => closeAndClearFetcher()}
-      overflow="visible"
-    >
+    <Modal isOpen={isOpen} handleClose={handleClose}>
       <div className="p-6">
-        <section className="mb-4">
-          <Text size="lg" weight="semibold" className="text-left">
-            Add Group Member
-          </Text>
-          <Text size="sm" weight="normal" className="text-left text-gray-500">
-            Each member has to be invited with unique link that expires in 24h
-          </Text>
+        <section className="mb-4 w-full flex flex-row items-start justify-between">
+          <div className="flex flex-col">
+            <Text size="lg" weight="semibold" className="text-left">
+              Add Group Member
+            </Text>
+            <Text size="sm" weight="normal" className="text-left text-gray-500">
+              Each member has to be invited with unique link that expires in 24h
+            </Text>
+          </div>
+          <div
+            className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+            onClick={() => {
+              handleClose()
+            }}
+          >
+            <HiOutlineX />
+          </div>
         </section>
 
         {!inviteLinkFetcher.data && (

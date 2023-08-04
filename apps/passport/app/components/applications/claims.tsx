@@ -15,7 +15,7 @@ import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import warningImg from '~/assets/warning.svg'
 import InputText from '~/components/inputs/InputText'
 import { startCase } from 'lodash'
-import { HiOutlineExternalLink } from 'react-icons/hi'
+import { HiOutlineExternalLink, HiOutlineX } from 'react-icons/hi'
 
 export const ConfirmRevocationModal = ({
   title,
@@ -35,8 +35,8 @@ export const ConfirmRevocationModal = ({
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div
         className={`min-w-[260px] sm:min-w-[400px] md:max-w-[512px] lg:max-w-[512px]
-       relative rounded-lg bg-white px-4 pb-4 text-left
-      transition-all sm:px-6 sm:pb-6 overflow-y-auto`}
+       relative rounded-lg bg-white p-4 text-left
+      transition-all sm:p-6 overflow-y-auto`}
       >
         <div className="flex flex-row space-x-6 items-center justify-start">
           <img
@@ -46,9 +46,20 @@ export const ConfirmRevocationModal = ({
           />
 
           <div className="flex flex-col space-y-2">
-            <Text weight="medium" size="lg" className="text-gray-900">
-              Revoke Access
-            </Text>
+            <div className="w-full flex flex-row items-center justify-between">
+              <Text weight="medium" size="lg" className="text-gray-900">
+                Revoke Access
+              </Text>
+              <button
+                className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+                onClick={() => {
+                  setIsOpen(false)
+                }}
+              >
+                <HiOutlineX />
+              </button>
+            </div>
             <Text size="xs" weight="normal">
               {`Are you sure you want to revoke access to ${title}? This action
                 cannot be undone once confirmed.`}
@@ -250,7 +261,7 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
                         <a
                           href={account!.icon}
                           className="text-sm
-                       weight-medium text-indigo-500 
+                       weight-medium text-indigo-500
                        cursor-pointer flex flex-row items-center gap-1.5 hover:underline"
                           target="_blank"
                           rel="noreferrer"
@@ -571,7 +582,7 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
                         <a
                           href={account!.icon}
                           className="text-sm
-                       weight-medium text-indigo-500 
+                       weight-medium text-indigo-500
                        cursor-pointer flex flex-row items-center gap-1.5 hover:underline"
                           target="_blank"
                           rel="noreferrer"

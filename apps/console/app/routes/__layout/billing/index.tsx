@@ -18,6 +18,7 @@ import {
   HiOutlineShoppingCart,
   HiInformationCircle,
   HiArrowUp,
+  HiOutlineX,
 } from 'react-icons/hi'
 import {
   commitFlashSession,
@@ -402,135 +403,160 @@ const PurchaseProModal = ({
 
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
-      <Text
-        size="lg"
-        weight="semibold"
-        className="text-left text-gray-800 mx-5"
-      >
-        Purchase Entitlement(s)
-      </Text>
+      <div className="max-sm:w-screen sm:min-w-[640px] lg:min-w-[764px] w-fit">
+        {!paymentData?.paymentMethodID ? (
+          <section className="mx-5 mt-5">
+            <ToastWithLink
+              message="Update your Payment Information to enable purchasing"
+              linkHref={`/billing/payment`}
+              type={'warning'}
+              linkText="Update payment information"
+            />
+          </section>
+        ) : null}
 
-      {!paymentData?.paymentMethodID && (
-        <section className="mt-3.5 mx-5">
-          <ToastWithLink
-            message="Update your Payment Information to enable purchasing"
-            linkHref={`/billing/payment`}
-            type={'warning'}
-            linkText="Update payment information"
-          />
-        </section>
-      )}
-
-      <section className="m-5 border rounded-lg overflow-auto thin-scrollbar">
-        <div className="p-6">
-          <Text size="lg" weight="semibold" className="text-gray-900 text-left">
-            {plan.title}
-          </Text>
-
+        <div className="flex flex-row justify-between w-full pb-2 pt-5 px-5 items-center">
           <Text
-            size="sm"
-            weight="medium"
-            className="text-gray-500 text-left mb-6"
+            size="lg"
+            weight="semibold"
+            className="text-left text-gray-800 "
           >
-            {plan.description}
+            Purchase Entitlement(s)
           </Text>
-
-          <PlanFeatures plan={plan} featuresColor="text-indigo-500" />
+          <div
+            className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+            onClick={() => {
+              setIsOpen(false)
+            }}
+          >
+            <HiOutlineX />
+          </div>
         </div>
 
-        <div className="border-b border-gray-200"></div>
+        <section className="mx-5 mb-5 border rounded-lg overflow-auto thin-scrollbar">
+          <div className="p-6">
+            <Text
+              size="lg"
+              weight="semibold"
+              className="text-gray-900 text-left"
+            >
+              {plan.title}
+            </Text>
 
-        <div className="p-6 flex justify-between items-center">
-          <div>
-            <Text size="sm" weight="medium" className="text-gray-800 text-left">
-              Number of Entitlements
+            <Text
+              size="sm"
+              weight="medium"
+              className="text-gray-500 text-left mb-6"
+            >
+              {plan.description}
             </Text>
-            <Text size="sm" weight="medium" className="text-gray-500 text-left">
-              {proEntitlementDelta} x ${plan.price}/month
-            </Text>
+
+            <PlanFeatures plan={plan} featuresColor="text-indigo-500" />
           </div>
 
-          <div className="flex flex-row">
-            <button
-              type="button"
-              className="flex justify-center items-center border
+          <div className="border-b border-gray-200"></div>
+
+          <div className="p-6 flex justify-between items-center">
+            <div>
+              <Text
+                size="sm"
+                weight="medium"
+                className="text-gray-800 text-left"
+              >
+                Number of Entitlements
+              </Text>
+              <Text
+                size="sm"
+                weight="medium"
+                className="text-gray-500 text-left"
+              >
+                {proEntitlementDelta} x ${plan.price}/month
+              </Text>
+            </div>
+
+            <div className="flex flex-row">
+              <button
+                type="button"
+                className="flex justify-center items-center border
               disabled:cursor-not-allowed
               border-gray-300 bg-gray-50 rounded-l-lg px-4"
-              onClick={() => {
-                setProEntitlementDelta((prev) => prev - 1)
-              }}
-              disabled={proEntitlementDelta <= 1}
-            >
-              <HiMinus />
-            </button>
+                onClick={() => {
+                  setProEntitlementDelta((prev) => prev - 1)
+                }}
+                disabled={proEntitlementDelta <= 1}
+              >
+                <HiMinus />
+              </button>
 
-            <input
-              type="text"
-              className="border border-x-0 text-center w-[4rem] border-gray-300 focus:ring-0 focus:outline-0 focus:border-gray-300"
-              readOnly
-              value={proEntitlementDelta}
-            />
+              <input
+                type="text"
+                className="border border-x-0 text-center w-[4rem] border-gray-300 focus:ring-0 focus:outline-0 focus:border-gray-300"
+                readOnly
+                value={proEntitlementDelta}
+              />
 
-            <button
-              type="button"
-              className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-r-lg px-4"
-              onClick={() => {
-                setProEntitlementDelta((prev) => prev + 1)
-              }}
-            >
-              <HiPlus />
-            </button>
+              <button
+                type="button"
+                className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-r-lg px-4"
+                onClick={() => {
+                  setProEntitlementDelta((prev) => prev + 1)
+                }}
+              >
+                <HiPlus />
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div className="border-b border-gray-200"></div>
+          <div className="border-b border-gray-200"></div>
 
-        <div className="p-6 flex justify-between items-center">
-          <Text size="sm" weight="medium" className="text-gray-800 text-left">
-            Changes to your subscription
-          </Text>
-
-          <div className="flex flex-row gap-2 items-center">
-            <Text size="lg" weight="semibold" className="text-gray-900">{`+$${
-              plan.price * proEntitlementDelta
-            }`}</Text>
-            <Text size="sm" weight="medium" className="text-gray-500">
-              per month
+          <div className="p-6 flex justify-between items-center">
+            <Text size="sm" weight="medium" className="text-gray-800 text-left">
+              Changes to your subscription
             </Text>
+
+            <div className="flex flex-row gap-2 items-center">
+              <Text size="lg" weight="semibold" className="text-gray-900">{`+$${
+                plan.price * proEntitlementDelta
+              }`}</Text>
+              <Text size="sm" weight="medium" className="text-gray-500">
+                per month
+              </Text>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <div className="flex-1"></div>
+        <div className="flex-1"></div>
 
-      <section className="flex flex-row-reverse gap-4 m-5 mt-auto">
-        <Button
-          btnType="primary-alt"
-          disabled={!paymentData?.paymentMethodID}
-          onClick={() => {
-            setIsOpen(false)
-            setProEntitlementDelta(1)
-            submit(
-              {
-                payload: JSON.stringify({
-                  planType: ServicePlanType.PRO,
-                  quantity: entitlements + proEntitlementDelta,
-                  customerID: paymentData?.customerID,
-                  txType: 'buy',
-                }),
-              },
-              {
-                method: 'post',
-              }
-            )
-          }}
-        >
-          Purchase
-        </Button>
-        <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
-          Cancel
-        </Button>
-      </section>
+        <section className="flex flex-row-reverse gap-4 m-5 mt-auto">
+          <Button
+            btnType="primary-alt"
+            disabled={!paymentData?.paymentMethodID}
+            onClick={() => {
+              setIsOpen(false)
+              setProEntitlementDelta(1)
+              submit(
+                {
+                  payload: JSON.stringify({
+                    planType: ServicePlanType.PRO,
+                    quantity: entitlements + proEntitlementDelta,
+                    customerID: paymentData?.customerID,
+                    txType: 'buy',
+                  }),
+                },
+                {
+                  method: 'post',
+                }
+              )
+            }}
+          >
+            Purchase
+          </Button>
+          <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+        </section>
+      </div>
     </Modal>
   )
 }
@@ -539,10 +565,10 @@ const AssignEntitlementModal = ({
   isOpen,
   setIsOpen,
   entitlements,
+  paymentData,
   entitlementUsage,
   fetcher,
   apps,
-  paymentData,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
@@ -556,117 +582,142 @@ const AssignEntitlementModal = ({
 
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
-      <div className="px-5 pb-5 max-sm:w-screen sm:min-w-[640px] lg:min-w-[764px]">
-        {paymentData && !paymentData.paymentMethodID ? (
-          <article className="mb-3.5">
+      <div className="max-sm:w-screen sm:min-w-[640px] lg:min-w-[764px] w-fit">
+        {!paymentData?.paymentMethodID ? (
+          <section className="mx-5 mt-5">
             <ToastWithLink
               message="Update your Payment Information to enable purchasing"
               linkHref={`/billing/payment`}
               type={'warning'}
               linkText="Update payment information"
             />
-          </article>
+          </section>
         ) : null}
-        <div className=" flex flex-col items-start">
-          <Text size="lg" weight="semibold" className="text-left text-gray-800">
-            Assign Entitlement(s)
-          </Text>
-          <Text className="text-left text-gray-500">
-            {entitlementUsage} of {entitlements} Entitlements used
-          </Text>
+        <div
+          className="pb-2 pt-5 px-5
+      flex flex-row items-start justify-between w-full"
+        >
+          <div className="flex flex-col items-start">
+            <Text
+              size="lg"
+              weight="semibold"
+              className="text-left text-gray-800"
+            >
+              Assign Entitlement(s)
+            </Text>
+            <Text className="text-left text-gray-500">
+              {entitlementUsage} of {entitlements} Entitlements used
+            </Text>
+          </div>
+          <div
+            className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+            onClick={() => {
+              setIsOpen(false)
+            }}
+          >
+            <HiOutlineX />
+          </div>
         </div>
-        <section className="border-t overflow-auto thin-scrollbar w-full my-4">
-          {apps.map((app) => {
-            return (
-              <div
-                key={app.clientId}
-                className="flex flex-row items-center justify-between
-                py-1.5 border-b"
-              >
-                <div className="flex flex-col items-start">
-                  <Text>{app.name}</Text>
-                  <Text className="text-gray-500">
-                    {app.appPlan[0] + app.appPlan.slice(1).toLowerCase()} Plan
-                  </Text>
-                </div>
-                {app.appPlan === ServicePlanType.PRO ? (
-                  <Button
-                    btnType="secondary-alt"
-                    onClick={() => {
-                      navigate(`/apps/${app.clientId}/billing`)
-                    }}
+        <div className="mb-5 w-full">
+          <section className="border-t thin-scrollbar w-full my-4">
+            <ul>
+              {apps.map((app) => {
+                return (
+                  <li
+                    key={app.clientId}
+                    className="flex flex-row items-center justify-between
+                py-1.5 border-b px-5"
                   >
-                    Manage
-                  </Button>
-                ) : (
-                  <>
-                    {entitlementUsage < entitlements ? (
+                    <div className="flex flex-col items-start">
+                      <Text>{app.name}</Text>
+                      <Text className="text-gray-500">
+                        {app.appPlan[0] + app.appPlan.slice(1).toLowerCase()}{' '}
+                        Plan
+                      </Text>
+                    </div>
+                    {app.appPlan === ServicePlanType.PRO ? (
                       <Button
-                        btnType="primary-alt"
-                        className="flex flex-row items-center gap-3"
-                        onClick={async () => {
-                          setIsOpen(false)
-                          fetcher.submit(
-                            {
-                              op: 'update',
-                              payload: JSON.stringify({
-                                plan: ServicePlanType.PRO,
-                              }),
-                            },
-                            {
-                              method: 'post',
-                              action: `/apps/${app.clientId}/billing`,
-                            }
-                          )
+                        btnType="secondary-alt"
+                        onClick={() => {
+                          navigate(`/apps/${app.clientId}/billing`)
                         }}
                       >
-                        <HiArrowUp className="w-3.5 h-3.5" />{' '}
-                        <Text>
-                          Upgrade to{' '}
-                          {ServicePlanType.PRO[0] +
-                            ServicePlanType.PRO.slice(1).toLowerCase()}
-                        </Text>
+                        Manage
                       </Button>
                     ) : (
-                      <Button
-                        btnType="primary-alt"
-                        className="flex flex-row items-center gap-3"
-                        onClick={() => {
-                          setIsOpen(false)
-                          fetcher.submit(
-                            {
-                              op: 'purchase',
-                              payload: JSON.stringify({
-                                plan: ServicePlanType.PRO,
-                              }),
-                            },
-                            {
-                              method: 'post',
-                              action: `/apps/${app.clientId}/billing`,
-                            }
-                          )
-                        }}
-                        disabled={!paymentData?.paymentMethodID}
-                      >
-                        <HiOutlineShoppingCart className="w-3.5 h-3.5" />
-                        <Text>Purchase Entitlement</Text>
-                      </Button>
+                      <>
+                        {entitlementUsage < entitlements ? (
+                          <Button
+                            btnType="primary-alt"
+                            className="flex flex-row items-center gap-3"
+                            onClick={async () => {
+                              setIsOpen(false)
+                              fetcher.submit(
+                                {
+                                  op: 'update',
+                                  payload: JSON.stringify({
+                                    plan: ServicePlanType.PRO,
+                                  }),
+                                },
+                                {
+                                  method: 'post',
+                                  action: `/apps/${app.clientId}/billing`,
+                                }
+                              )
+                            }}
+                          >
+                            <HiArrowUp className="w-3.5 h-3.5" />{' '}
+                            <Text>
+                              Upgrade to{' '}
+                              {ServicePlanType.PRO[0] +
+                                ServicePlanType.PRO.slice(1).toLowerCase()}
+                            </Text>
+                          </Button>
+                        ) : (
+                          <Button
+                            btnType="primary-alt"
+                            className="flex flex-row items-center gap-3"
+                            onClick={() => {
+                              setIsOpen(false)
+                              fetcher.submit(
+                                {
+                                  op: 'purchase',
+                                  payload: JSON.stringify({
+                                    plan: ServicePlanType.PRO,
+                                  }),
+                                },
+                                {
+                                  method: 'post',
+                                  action: `/apps/${app.clientId}/billing`,
+                                }
+                              )
+                            }}
+                            disabled={!paymentData?.paymentMethodID}
+                          >
+                            <HiOutlineShoppingCart className="w-3.5 h-3.5" />
+                            <Text>Purchase Entitlement</Text>
+                          </Button>
+                        )}
+                      </>
                     )}
-                  </>
-                )}
-              </div>
-            )
-          })}
-        </section>
-        <Button
-          className="w-full"
-          btnType="secondary-alt"
-          onClick={() => {
-            navigate('/apps/new')
-          }}
-        >
-          Create New Application
-        </Button>
+                  </li>
+                )
+              })}
+            </ul>
+          </section>
+          <section className=" px-5 w-full">
+            <Button
+              className="w-full"
+              btnType="secondary-alt"
+              onClick={() => {
+                navigate('/apps/new')
+              }}
+            >
+              Create New Application
+            </Button>
+          </section>
+        </div>
       </div>
     </Modal>
   )
@@ -693,173 +744,198 @@ const RemoveEntitelmentModal = ({
 
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
-      <Text
-        size="lg"
-        weight="semibold"
-        className="text-left text-gray-800 mx-5"
-      >
-        Remove Entitlement(s)
-      </Text>
-      <section className="m-5 border rounded-lg overflow-auto thin-scrollbar">
-        <div className="p-6">
-          <Text size="lg" weight="semibold" className="text-gray-900 text-left">
-            {plan.title}
+      <div className="max-sm:w-screen sm:min-w-[640px] lg:min-w-[764px] w-fit">
+        <div className="pb-2 pt-5 px-5 w-full flex flex-row items-center justify-between">
+          <Text size="lg" weight="semibold" className="text-left text-gray-800">
+            Remove Entitlement(s)
           </Text>
-          <ul className="pl-4">
-            <li className="list-disc text-sm font-medium text-gray-500 text-left">
-              You are currently using {entitlementUsage}/{entitlements}{' '}
-              {plan.title} entitlements
-            </li>
-            <li className="list-disc text-sm font-medium text-gray-500 text-left">
-              You can downgrade some of your applications if you'd like to pay
-              for fewer Entitlements.
-            </li>
-          </ul>
-        </div>
-        <div className="border-b border-gray-200"></div>
-        <div className="p-6 flex justify-between items-center">
-          <div>
-            <Text size="sm" weight="medium" className="text-gray-800 text-left">
-              Number of Entitlements
-            </Text>
-            <Text
-              size="sm"
-              weight="medium"
-              className="text-gray-500 text-left"
-            >{`${entitlementUsage} x ${
-              plans[ServicePlanType.PRO].price
-            }/month`}</Text>
+          <div
+            className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+            onClick={() => {
+              setIsOpen(false)
+            }}
+          >
+            <HiOutlineX />
           </div>
-
-          <div className="flex flex-row text-gray-500 space-x-4">
-            <div className="flex flex-row items-center space-x-2">
-              <Text size="sm">{entitlements} Entitlements</Text>
-              <HiArrowNarrowRight />
-            </div>
-
-            <div className="flex flex-row">
-              <Listbox
-                value={proEntitlementNew}
-                onChange={setProEntitlementNew}
-                disabled={entitlementUsage === entitlements}
-                as="div"
+        </div>
+        <section className="p-5 pt-auto w-full">
+          <div className="w-full border rounded-lg overflow-auto thin-scrollbar">
+            <div className="p-6">
+              <Text
+                size="lg"
+                weight="semibold"
+                className="text-gray-900 text-left"
               >
-                {({ open }) => {
-                  return (
-                    <div>
-                      <Listbox.Button
-                        className="relative w-full cursor-default border
+                {plan.title}
+              </Text>
+              <ul className="pl-4">
+                <li className="list-disc text-sm font-medium text-gray-500 text-left">
+                  You are currently using {entitlementUsage}/{entitlements}{' '}
+                  {plan.title} entitlements
+                </li>
+                <li className="list-disc text-sm font-medium text-gray-500 text-left">
+                  You can downgrade some of your applications if you'd like to
+                  pay for fewer Entitlements.
+                </li>
+              </ul>
+            </div>
+            <div className="border-b border-gray-200"></div>
+            <div className="p-6 flex justify-between items-center">
+              <div>
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="text-gray-800 text-left"
+                >
+                  Number of Entitlements
+                </Text>
+                <Text
+                  size="sm"
+                  weight="medium"
+                  className="text-gray-500 text-left"
+                >{`${entitlementUsage} x ${
+                  plans[ServicePlanType.PRO].price
+                }/month`}</Text>
+              </div>
+
+              <div className="flex flex-row text-gray-500 space-x-4">
+                <div className="flex flex-row items-center space-x-2">
+                  <Text size="sm">{entitlements} Entitlements</Text>
+                  <HiArrowNarrowRight />
+                </div>
+
+                <div className="flex flex-row">
+                  <Listbox
+                    value={proEntitlementNew}
+                    onChange={setProEntitlementNew}
+                    disabled={entitlementUsage === entitlements}
+                    as="div"
+                  >
+                    {({ open }) => {
+                      return (
+                        <div>
+                          <Listbox.Button
+                            className="relative w-full cursor-default border
                   py-1.5 px-4 text-left sm:text-sm rounded-lg
                   focus:border-indigo-500 focus:outline-none focus:ring-1
                   flex flex-row space-x-3 items-center"
-                      >
-                        <Text size="sm">{proEntitlementNew}</Text>
-                        {open ? (
-                          <HiChevronUp className="text-right" />
-                        ) : (
-                          <HiChevronDown className="text-right" />
-                        )}
-                      </Listbox.Button>
-                      <Transition
-                        show={open}
-                        as="div"
-                        leave="transition ease-in duration-100"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                        className="bg-gray-800"
-                      >
-                        <Listbox.Options
-                          className="absolute no-scrollbar w-full bg-white
+                          >
+                            <Text size="sm">{proEntitlementNew}</Text>
+                            {open ? (
+                              <HiChevronUp className="text-right" />
+                            ) : (
+                              <HiChevronDown className="text-right" />
+                            )}
+                          </Listbox.Button>
+                          <Transition
+                            show={open}
+                            as="div"
+                            leave="transition ease-in duration-100"
+                            leaveFrom="opacity-100"
+                            leaveTo="opacity-0"
+                            className="bg-gray-800"
+                          >
+                            <Listbox.Options
+                              className="absolute no-scrollbar w-full bg-white
                         rounded-lg border max-h-[200px] max-w-[66.1833px] overflow-auto"
-                        >
-                          {Array.apply(null, Array(entitlements + 1)).map(
-                            (_, i) => {
-                              return (
-                                <Listbox.Option
-                                  key={i}
-                                  value={i}
-                                  className="flex items-center
+                            >
+                              {Array.apply(null, Array(entitlements + 1)).map(
+                                (_, i) => {
+                                  return (
+                                    <Listbox.Option
+                                      key={i}
+                                      value={i}
+                                      className="flex items-center
                                 cursor-pointer hover:bg-gray-100
                                 rounded-lg m-1"
-                                >
-                                  {({ selected }) => {
-                                    return (
-                                      <div
-                                        className={`w-full h-full px-4 py-1.5
+                                    >
+                                      {({ selected }) => {
+                                        return (
+                                          <div
+                                            className={`w-full h-full px-4 py-1.5
                                       rounded-lg ${
                                         selected
                                           ? 'bg-gray-100  font-medium'
                                           : ''
                                       }`}
-                                      >
-                                        {i}
-                                      </div>
-                                    )
-                                  }}
-                                </Listbox.Option>
-                              )
-                            }
-                          )}
-                        </Listbox.Options>
-                      </Transition>
-                    </div>
-                  )
-                }}
-              </Listbox>
+                                          >
+                                            {i}
+                                          </div>
+                                        )
+                                      }}
+                                    </Listbox.Option>
+                                  )
+                                }
+                              )}
+                            </Listbox.Options>
+                          </Transition>
+                        </div>
+                      )
+                    }}
+                  </Listbox>
+                </div>
+              </div>
+            </div>
+            <div className="border-b border-gray-200"></div>
+
+            <div className="p-6 flex justify-between items-center">
+              <Text
+                size="sm"
+                weight="medium"
+                className="text-gray-800 text-left"
+              >
+                Changes to your subscription
+              </Text>
+
+              <div className="flex flex-row gap-2 items-center">
+                <Text size="lg" weight="semibold" className="text-gray-900">{`${
+                  plan.price * (entitlements - proEntitlementNew) !== 0
+                    ? '-'
+                    : ''
+                }$${plan.price * (entitlements - proEntitlementNew)}`}</Text>
+                <Text size="sm" weight="medium" className="text-gray-500">
+                  per month
+                </Text>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="border-b border-gray-200"></div>
+        </section>
+        <section className="flex flex-row-reverse gap-4 mt-auto m-5">
+          <Button
+            btnType="dangerous-alt"
+            disabled={
+              !paymentData?.paymentMethodID ||
+              entitlementUsage === entitlements ||
+              proEntitlementNew < entitlementUsage ||
+              proEntitlementNew === entitlements
+            }
+            onClick={() => {
+              setIsOpen(false)
+              setProEntitlementNew(1)
 
-        <div className="p-6 flex justify-between items-center">
-          <Text size="sm" weight="medium" className="text-gray-800 text-left">
-            Changes to your subscription
-          </Text>
-
-          <div className="flex flex-row gap-2 items-center">
-            <Text size="lg" weight="semibold" className="text-gray-900">{`${
-              plan.price * (entitlements - proEntitlementNew) !== 0 ? '-' : ''
-            }$${plan.price * (entitlements - proEntitlementNew)}`}</Text>
-            <Text size="sm" weight="medium" className="text-gray-500">
-              per month
-            </Text>
-          </div>
-        </div>
-      </section>
-      <section className="flex flex-row-reverse gap-4 mt-auto m-5">
-        <Button
-          btnType="dangerous-alt"
-          disabled={
-            !paymentData?.paymentMethodID ||
-            entitlementUsage === entitlements ||
-            proEntitlementNew < entitlementUsage ||
-            proEntitlementNew === entitlements
-          }
-          onClick={() => {
-            setIsOpen(false)
-            setProEntitlementNew(1)
-
-            submit(
-              {
-                payload: JSON.stringify({
-                  planType: ServicePlanType.PRO,
-                  quantity: proEntitlementNew,
-                  customerID: paymentData?.customerID,
-                  txType: 'remove',
-                }),
-              },
-              {
-                method: 'post',
-              }
-            )
-          }}
-        >
-          Remove Entitlement(s)
-        </Button>
-        <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
-          Cancel
-        </Button>
-      </section>
+              submit(
+                {
+                  payload: JSON.stringify({
+                    planType: ServicePlanType.PRO,
+                    quantity: proEntitlementNew,
+                    customerID: paymentData?.customerID,
+                    txType: 'remove',
+                  }),
+                },
+                {
+                  method: 'post',
+                }
+              )
+            }}
+          >
+            Remove Entitlement(s)
+          </Button>
+          <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+        </section>
+      </div>
     </Modal>
   )
 }
@@ -874,47 +950,56 @@ const AssignedAppModal = ({
   setIsOpen: (isOpen: boolean) => void
 }) => {
   return (
-    <Modal isOpen={isOpen} fixed handleClose={() => setIsOpen(false)}>
-      <Text
-        size="lg"
-        weight="semibold"
-        className="text-left text-gray-800 mx-5 mb-7"
-      >
-        Assigned Application(s)
-      </Text>
+    <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
+      <div className="max-sm:w-screen sm:min-w-[640px] lg:min-w-[764px]">
+        <div className="w-full flex flex-row justify-between items-center pb-2 px-5 pt-5">
+          <Text size="lg" weight="semibold" className="text-left text-gray-800">
+            Assigned Application(s)
+          </Text>
+          <div
+            className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+            onClick={() => {
+              setIsOpen(false)
+            }}
+          >
+            <HiOutlineX />
+          </div>
+        </div>
 
-      <section>
-        <ul>
-          {apps.map((app) => (
-            <li
-              key={app.clientId}
-              className="flex flex-row items-center justify-between
+        <section>
+          <ul>
+            {apps.map((app) => (
+              <li
+                key={app.clientId}
+                className="flex flex-row items-center justify-between
             p-5 border-t border-gray-200"
-            >
-              <div className="flex flex-col">
-                <Text
-                  size="sm"
-                  weight="medium"
-                  className="text-gray-900 text-left"
-                >
-                  {app.name}
-                </Text>
-                <Text
-                  size="sm"
-                  weight="medium"
-                  className="text-gray-500 text-left"
-                >
-                  {plans[app.appPlan].title}
-                </Text>
-              </div>
+              >
+                <div className="flex flex-col">
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="text-gray-900 text-left"
+                  >
+                    {app.name}
+                  </Text>
+                  <Text
+                    size="sm"
+                    weight="medium"
+                    className="text-gray-500 text-left"
+                  >
+                    {plans[app.appPlan].title}
+                  </Text>
+                </div>
 
-              <NavLink to={`/apps/${app.clientId}/billing`}>
-                <Button btnType="secondary-alt">Manage</Button>
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </section>
+                <NavLink to={`/apps/${app.clientId}/billing`}>
+                  <Button btnType="secondary-alt">Manage</Button>
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
     </Modal>
   )
 }
@@ -1258,11 +1343,6 @@ export default () => {
               message={'Application Entitlement available!'}
               PreMessage={
                 <HiInformationCircle className="text-indigo-400 w-5 h-5" />
-              }
-              PostMessage={
-                <Text size="sm" weight="medium">
-                  {`Assign to Upgrade ->`}
-                </Text>
               }
               className={'bg-indigo-50 text-indigo-700 w-full'}
             />

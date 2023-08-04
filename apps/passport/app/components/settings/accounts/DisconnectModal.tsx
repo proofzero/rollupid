@@ -13,6 +13,7 @@ import warn from '~/assets/warning.svg'
 import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
 
 import { FiExternalLink } from 'react-icons/fi'
+import { HiOutlineX } from 'react-icons/hi'
 
 export type AddressUsageDisconnectModel = {
   message: string
@@ -65,13 +66,17 @@ export default ({
   ) : (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div
-        className={`max-w-full w-[512px] relative bg-white text-left 
-        transition-all rounded-lg overflow-y-auto`}
+        className={`max-w-full w-[512px] relative bg-white text-left
+        transition-all rounded-lg overflow-y-auto flex flex-col`}
       >
-        <div className="flex flex-row space-x-4 pb-6 px-6">
+        <div className="flex flex-row space-x-4 p-6">
           <img src={warn} alt="Not Found" />
 
-          <div className="flex-1">
+          <div
+            className={`flex-1 flex flex-row ${
+              canDisconnect ? 'items-center' : 'items-start'
+            } justify-between`}
+          >
             {canDisconnect && (
               <Text size="lg" weight="medium" className="text-gray-900">
                 Disconnect account
@@ -79,7 +84,7 @@ export default ({
             )}
 
             {!canDisconnect && (
-              <>
+              <div className="flex flex-col">
                 <Text size="lg" weight="medium" className="text-gray-900">
                   You can't disconnect this account
                 </Text>
@@ -87,8 +92,17 @@ export default ({
                 <Text size="sm" weight="normal" className="text-gray-500 mt-2">
                   You can’t disconnect this account because:
                 </Text>
-              </>
+              </div>
             )}
+            <button
+              className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+              onClick={() => {
+                setIsOpen(false)
+              }}
+            >
+              <HiOutlineX />
+            </button>
           </div>
         </div>
 

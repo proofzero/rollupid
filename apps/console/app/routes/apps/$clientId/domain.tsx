@@ -45,6 +45,7 @@ import { appDetailsProps } from '~/types'
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 import domainSVG from '~/assets/early/domain.svg'
 import { AccountURN } from '@proofzero/urns/account'
+import { HiOutlineX } from 'react-icons/hi'
 
 type AppData = { customDomain?: CustomDomain; hostname: string; cname: string }
 
@@ -449,7 +450,7 @@ const DeleteModal = ({
 }: DeleteModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   return (
-    <Modal isOpen={isOpen} closable={!isSubmitting} handleClose={onClose}>
+    <Modal isOpen={isOpen} handleClose={onClose}>
       <div
         className={`flex w-[512px] rounded-lg  items-start space-x-4 px-4 pb-4 text-left overflow-y-auto bg-white
          transition-all`}
@@ -457,9 +458,21 @@ const DeleteModal = ({
         <img src={dangerVector} alt="Danger" />
 
         <div className="flex-1">
-          <Text size="lg" weight="medium" className="mb-2 text-gray-900">
-            Disconnect Domain
-          </Text>
+          <div className="mb-2 flex flex-row justify-between items-center w-full">
+            <Text size="lg" weight="medium" className="text-gray-900">
+              Disconnect Domain
+            </Text>
+            <button
+              className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+              onClick={() => {
+                onClose(false)
+              }}
+              disabled={isSubmitting}
+            >
+              <HiOutlineX />
+            </button>
+          </div>
 
           <fetcher.Form method="delete" onSubmit={() => setIsSubmitting(true)}>
             <section className="mb-4">
