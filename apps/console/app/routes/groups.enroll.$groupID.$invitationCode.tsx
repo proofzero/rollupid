@@ -256,26 +256,10 @@ export default () => {
               </Text>
 
               <Text className="text-gray-500 mb-4">
-                To get started continue with button below and select an account
-                to authenticate.
+                Continue by making a selection with the buttons below.
               </Text>
 
               <section className="flex flex-row justify-end gap-2">
-                <Button
-                  btnType="primary-alt"
-                  onClick={() => {
-                    submit(
-                      {},
-                      {
-                        method: 'post',
-                        action: `/groups/enroll/${groupID}/${invitationCode}`,
-                      }
-                    )
-                  }}
-                >
-                  Accept
-                </Button>
-
                 <Button
                   btnType="secondary-alt"
                   onClick={() => {
@@ -291,6 +275,20 @@ export default () => {
                   }}
                 >
                   Cancel
+                </Button>
+                <Button
+                  btnType="primary-alt"
+                  onClick={() => {
+                    submit(
+                      {},
+                      {
+                        method: 'post',
+                        action: `/groups/enroll/${groupID}/${invitationCode}`,
+                      }
+                    )
+                  }}
+                >
+                  Accept
                 </Button>
               </section>
             </>
