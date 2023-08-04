@@ -135,7 +135,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     return json(
       {
-        appProps,
+        appProps: { ...appProps, clientId: params.clientId },
         flashes,
         ENV: {
           POSTHOG_API_KEY: context.env.POSTHOG_API_KEY,
@@ -231,6 +231,9 @@ export default function App() {
           autocapture: false,
         })
         posthog?.reset()
+        posthog?.group('app', browserEnv.appProps?.clientId, {
+          name: browserEnv.appProps?.name,
+        })
       } catch (ex) {
         console.error(ex)
       }

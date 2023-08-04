@@ -17,6 +17,7 @@ import * as jose from 'jose'
 export const ResolveAccountInput = z.object({
   jwt: z.string().optional(),
   force: z.boolean().optional().default(false),
+  clientId: z.string().optional(),
 })
 
 export const ResolveAccountOutput = z.object({
@@ -72,6 +73,7 @@ export const resolveAccountMethod = async ({
     apiKey: ctx.POSTHOG_API_KEY,
     eventName,
     distinctId: resultURN,
+    groups: { app: input.clientId },
   })
 
   return {

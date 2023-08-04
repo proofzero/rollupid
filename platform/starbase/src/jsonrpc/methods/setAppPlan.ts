@@ -7,6 +7,7 @@ import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { ServicePlanType } from '@proofzero/types/account'
 import { EDGE_PAYS_APP } from '@proofzero/types/graph'
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const SetAppPlanInput = AppClientIdParamSchema.extend({
   accountURN: AccountURNInput,
@@ -53,6 +54,17 @@ export const setAppPlan = async ({
         dst: appURN,
       })
     }
+
+    await createAnalyticsEvent({
+      eventName: 'app_pro_plan_set',
+      apiKey: ctx.POSTHOG_API_KEY,
+      distinctId: input.accountURN,
+      groups: { app: input.clientId },
+      properties: {
+        clientId: input.clientId,
+        plan,
+      },
+    })
   } else {
     await caller.edges.removeEdge({
       src: accountURN,

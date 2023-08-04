@@ -61,6 +61,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             !appData ||
             (appData.rollup_action !== 'connect' &&
               !appData.rollup_action?.startsWith('groupconnect')),
+          clientId: appData?.clientId,
         })
 
       return authenticateAddress(

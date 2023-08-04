@@ -10,6 +10,8 @@ import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { InternalServerError, RollupError } from '@proofzero/errors'
 import { type AddressURN } from '@proofzero/urns/address'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import { ServicePlanType } from '@proofzero/types/account'
 
 type StripeInvoicePayload = {
   id: string
@@ -151,8 +153,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         break
       case 'invoice.payment_succeeded':
-        const { customer: customerSuccess, lines: linesSuccess } = event.data
-          .object as StripeInvoicePayload
+        const {
+          customer: customerSuccess,
+          lines: linesSuccess,
+          metadata: metaSuccess,
+        } = event.data.object as StripeInvoicePayload
         const customerDataSuccess = await stripeClient.customers.retrieve(
           customerSuccess
         )
@@ -201,6 +206,21 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
               if (item) return stripeClient.products.retrieve(item.productID)
             })
           )
+
+          await createAnalyticsEvent({
+            eventName: 'purchase',
+            apiKey: context.env.POSTHOG_API_KEY,
+            distinctId: customerDataSuccess.metadata.accountURN,
+            properties: {
+              plans: purchasedItems.map((item) => ({
+                quantity: item.quantity,
+                name: products.find(
+                  (product) => product?.id === item?.productID
+                )!.name,
+                type: ServicePlanType.PRO,
+              })),
+            },
+          })
 
           await coreClient.address.sendSuccessfulPaymentNotification.mutate({
             email,

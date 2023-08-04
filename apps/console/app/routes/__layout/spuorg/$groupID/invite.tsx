@@ -17,8 +17,8 @@ import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
-import { AccountURN } from '@proofzero/urns/account'
-
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import { type AccountURN } from '@proofzero/urns/account'
 export type InviteRes = {
   inviteCode: string
 }
@@ -64,6 +64,18 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         addressType: addressType,
         identityGroupURN: groupURN,
       })
+
+    await createAnalyticsEvent({
+      eventName: 'member_invited_to_group',
+      distinctId: accountURN,
+      apiKey: context.env.POSTHOG_API_KEY,
+      groups: {
+        group: groupID,
+      },
+      properties: {
+        groupID: groupID,
+      },
+    })
 
     return json({
       inviteCode,
