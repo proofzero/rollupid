@@ -642,8 +642,8 @@ export default () => {
   const [selectedMemberAlias, setSelectedMemberAlias] = useState<string>('')
   const [removeMemberModalOpen, setRemoveMemberModalOpen] = useState(false)
 
-  const ownAppRefs = useRef(apps.filter((a) => !a.groupID))
-  const groupAppRefs = useRef(apps.filter((a) => a.groupID === groupID))
+  const ownApps = apps.filter((a) => !a.groupID)
+  const groupApps = apps.filter((a) => a.groupID === groupID)
 
   return (
     <>
@@ -665,14 +665,12 @@ export default () => {
         />
       )}
 
-      {group && (
-        <TransferAppModal
-          isOpen={transferAppModalOpen}
-          handleClose={() => setTransferAppModalOpen(false)}
-          apps={ownAppRefs.current}
-          groupID={groupID}
-        />
-      )}
+      <TransferAppModal
+        isOpen={transferAppModalOpen}
+        handleClose={() => setTransferAppModalOpen(false)}
+        apps={ownApps}
+        groupID={groupID}
+      />
 
       {group && (
         <section className="-mt-4">
@@ -710,9 +708,7 @@ export default () => {
           title="Transfer Application"
           subtitle="Transfer Application to the Group"
           onClick={
-            ownAppRefs.current.length > 0
-              ? () => setTransferAppModalOpen(true)
-              : undefined
+            ownApps.length > 0 ? () => setTransferAppModalOpen(true) : undefined
           }
         />
 
@@ -734,12 +730,12 @@ export default () => {
 
               <Pill className="bg-gray-200 rounded-lg !pr-2">
                 <Text size="xs" weight="medium" className="text-gray-800">
-                  {groupAppRefs.current.length}
+                  {groupApps.length}
                 </Text>
               </Pill>
             </div>
 
-            {groupAppRefs.current.length === 0 && (
+            {groupApps.length === 0 && (
               <div className="bg-white border border-gray-300 rounded-lg p-9 flex flex-col justify-center items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -805,7 +801,7 @@ export default () => {
                 <Button
                   btnType="secondary-alt"
                   className="mt-6"
-                  disabled={ownAppRefs.current.length === 0}
+                  disabled={ownApps.length === 0}
                   onClick={() => {
                     setTransferAppModalOpen(true)
                   }}
@@ -816,7 +812,7 @@ export default () => {
             )}
 
             <List
-              items={groupAppRefs.current.map((ga) => ({
+              items={groupApps.map((ga) => ({
                 key: ga.clientId,
                 val: ga,
               }))}
@@ -847,8 +843,8 @@ export default () => {
 
                       <div
                         className={classNames(`w-2 h-2 rounded-full`, {
-                          'bg-green-500': item.val.published,
-                          'bg-red-500': !item.val.published,
+                          'bg-green-400': item.val.published,
+                          'bg-gray-300': !item.val.published,
                         })}
                       ></div>
 
