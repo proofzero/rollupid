@@ -10,7 +10,9 @@ import {
   useFetcher,
   useLoaderData,
   useNavigate,
+  useNavigation,
   useOutletContext,
+  useSubmit,
 } from '@remix-run/react'
 import { GroupRootContextData } from '../../spuorg'
 import { Fragment, useEffect, useMemo, useState } from 'react'
@@ -51,6 +53,7 @@ import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyI
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { IdentityURN } from '@proofzero/urns/identity'
 import dangerVector from '~/images/danger.svg'
+import { AppLoaderData } from '~/root'
 
 const accountTypes = [
   ...Object.values(EmailAccountType),
@@ -424,8 +427,189 @@ const RemoveMemberModal = ({
   )
 }
 
+const TransferAppModal = ({
+  isOpen,
+  handleClose,
+  apps,
+  groupID,
+}: {
+  isOpen: boolean
+  handleClose: () => void
+  apps: AppLoaderData[]
+  groupID: string
+}) => {
+  const [selectedApp, setSelectedApp] = useState<AppLoaderData>()
+
+  const submit = useSubmit()
+  const navigation = useNavigation()
+  useEffect(() => {
+    if (navigation.state === 'loading') {
+      handleClose()
+    }
+  }, [navigation])
+
+  return (
+    <Modal isOpen={isOpen} handleClose={handleClose}>
+      <div className="p-6">
+        <section className="mb-4 w-full flex flex-row items-start justify-between">
+          <div className="flex flex-col">
+            <Text size="lg" weight="semibold" className="text-left">
+              Transfer Application Ownership
+            </Text>
+            <Text size="sm" weight="normal" className="text-left text-gray-500">
+              Proceed with caution! Once the transfer is completed application
+              cannot <br /> be transferred back to your personal account.
+            </Text>
+          </div>
+          <div
+            className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+            onClick={() => {
+              handleClose()
+            }}
+          >
+            <HiOutlineX />
+          </div>
+        </section>
+
+        <section>
+          <Text size="sm" weight="medium" className="mb-2 text-left">
+            Take application ownership
+          </Text>
+
+          <Listbox
+            value={selectedApp}
+            onChange={setSelectedApp}
+            name="transferApp"
+            by="clientId"
+          >
+            {({ open }) => (
+              <div className="relative w-80">
+                <Listbox.Button className="relative border rounded p-2 flex flex-row justify-between items-center flex-1 focus-visible:outline-none focus:border-indigo-500 w-full">
+                  {selectedApp && (
+                    <div className="flex flex-row items-center gap-2">
+                      <div className="w-5 h-5 flex justify-center items-center rounded-full bg-gray-200">
+                        <Text className="text-gray-500" size="xs">
+                          {_.upperFirst(selectedApp?.name)[0]}
+                        </Text>
+                      </div>
+                      <Text size="sm" weight="normal" className="text-gray-800">
+                        {selectedApp?.name}
+                      </Text>
+                    </div>
+                  )}
+                  {!selectedApp && (
+                    <Text size="sm" weight="normal" className="text-gray-300">
+                      Select an application
+                    </Text>
+                  )}
+
+                  {open ? (
+                    <ChevronDownIcon className="w-5 h-5 text-gray-500 shrink-0" />
+                  ) : (
+                    <ChevronUpIcon className="w-5 h-5 text-gray-500 shrink-0" />
+                  )}
+                </Listbox.Button>
+
+                <Transition
+                  show={open}
+                  enter="transition duration-100 ease-out"
+                  enterFrom="transform scale-95 opacity-0"
+                  enterTo="transform scale-100 opacity-100"
+                  leave="transition duration-75 ease-out"
+                  leaveFrom="transform scale-100 opacity-100"
+                  leaveTo="transform scale-95 opacity-0"
+                >
+                  {apps.length > 0 && (
+                    <Listbox.Options
+                      className="absolute flex-1 bg-white p-2 flex flex-col gap-2 mt-1 focus-visible:ring-0 focus-visible:outline-none border shadow w-full"
+                      static
+                    >
+                      {apps.map((app) => (
+                        <Listbox.Option
+                          key={app.clientId}
+                          value={app}
+                          className={({ active }) =>
+                            classNames(
+                              'flex flex-row justify-between items-center gap-2 hover:bg-gray-100 py-2 px-4 rounded-lg cursor-pointer',
+                              {
+                                'bg-gray-100': active,
+                              }
+                            )
+                          }
+                        >
+                          {({ selected }) => (
+                            <>
+                              <div className="flex flex-row items-center gap-2">
+                                <div className="w-5 h-5 flex justify-center items-center rounded-full bg-gray-200">
+                                  <Text className="text-gray-500" size="xs">
+                                    {_.upperFirst(app?.name)[0]}
+                                  </Text>
+                                </div>
+                                <Text
+                                  size="sm"
+                                  weight={selected ? 'bold' : 'normal'}
+                                  className="text-gray-800"
+                                >
+                                  {app.name}
+                                </Text>
+                              </div>
+
+                              {selected && (
+                                <CheckIcon
+                                  className="h-5 w-5 text-indigo-600"
+                                  aria-hidden="true"
+                                />
+                              )}
+                            </>
+                          )}
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  )}
+                </Transition>
+              </div>
+            )}
+          </Listbox>
+        </section>
+
+        <section className="flex flex-row justify-end gap-2 items-center mt-8">
+          <Button
+            btnType="secondary-alt"
+            type="button"
+            onClick={() => handleClose()}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            btnType="primary-alt"
+            type="button"
+            disabled={!selectedApp}
+            onClick={() => {
+              if (!selectedApp) return
+
+              submit(
+                {
+                  clientID: selectedApp.clientId,
+                },
+                {
+                  method: 'post',
+                  action: `/spuorg/${groupID}/transfer`,
+                }
+              )
+            }}
+          >
+            Transfer Application
+          </Button>
+        </section>
+      </div>
+    </Modal>
+  )
+}
+
 export default () => {
-  const { groups, PASSPORT_URL, identityURN } =
+  const { groups, PASSPORT_URL, identityURN, apps } =
     useOutletContext<GroupRootContextData>()
   const { URN, groupID, invitations } = useLoaderData<LoaderData>()
 
@@ -449,6 +633,7 @@ export default () => {
   }, [group])
 
   const [inviteModalOpen, setInviteModalOpen] = useState(false)
+  const [transferAppModalOpen, setTransferAppModalOpen] = useState(false)
 
   const hydrated = useHydrated()
 
@@ -473,6 +658,15 @@ export default () => {
           identityURN={selectedMemberURN}
           userAlias={selectedMemberAlias}
           purge={group.members.length === 1}
+        />
+      )}
+
+      {group && (
+        <TransferAppModal
+          isOpen={transferAppModalOpen}
+          handleClose={() => setTransferAppModalOpen(false)}
+          apps={apps}
+          groupID={groupID}
         />
       )}
 
@@ -511,6 +705,9 @@ export default () => {
           Icon={TbApps}
           title="Transfer Application"
           subtitle="Transfer Application to the Group"
+          onClick={
+            apps.length > 0 ? () => setTransferAppModalOpen(true) : undefined
+          }
         />
 
         <ActionCard
