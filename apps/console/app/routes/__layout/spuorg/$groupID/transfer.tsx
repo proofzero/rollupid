@@ -33,11 +33,21 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const fd = await request.formData()
     const clientID = fd.get('clientID')
+    if (!clientID) {
+      throw new BadRequestError({
+        message: 'clientID is required',
+      })
+    }
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
+    })
+
+    await coreClient.starbase.transferAppToGroup.mutate({
+      identityGroupURN: groupURN,
+      clientID: clientID as string,
     })
 
     await createAnalyticsEvent({
