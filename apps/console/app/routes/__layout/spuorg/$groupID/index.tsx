@@ -832,7 +832,7 @@ export default () => {
                   )}
 
                   <div className="flex-1 truncate">
-                    <div className="flex flex-row items-center gap-2 mb-1">
+                    <div className="flex flex-row items-center gap-2">
                       <Text
                         size="sm"
                         weight="semibold"
@@ -847,28 +847,20 @@ export default () => {
                           'bg-gray-300': !item.val.published,
                         })}
                       ></div>
-
-                      <Pill className="rounded-lg !pr-2 border">
-                        <Text size="xs" className="text-gray-500">
-                          {item.val.groupName}
-                        </Text>
-                      </Pill>
                     </div>
 
-                    <div className="flex flex-row items-center gap-1 text-gray-500 truncate">
-                      {hydrated && item.val.createdTimestamp && (
-                        <Text size="xs" weight="normal" className="shrink-0">
-                          {new Date(item.val.createdTimestamp).toLocaleString(
-                            'default',
-                            {
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric',
-                            }
-                          )}
-                        </Text>
-                      )}
-                    </div>
+                    {hydrated && item.val.createdTimestamp && (
+                      <Text size="xs" weight="normal" className="shrink-0">
+                        {new Date(item.val.createdTimestamp).toLocaleString(
+                          'default',
+                          {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                          }
+                        )}
+                      </Text>
+                    )}
                   </div>
                 </article>
               )}
