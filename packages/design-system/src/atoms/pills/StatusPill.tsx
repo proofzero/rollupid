@@ -4,7 +4,7 @@ import { Pill } from './Pill'
 import { Text } from '../text/Text'
 
 export type StatusPillProps = {
-  text: string
+  text?: string
   status: 'success' | 'warning' | 'danger'
 }
 
@@ -17,8 +17,10 @@ export const StatusPill = ({ text, status }: StatusPillProps) => (
         'bg-red-500': status === 'danger',
       })}
     ></div>
-    <Text size="xs" weight="medium" className="text-gray-700">
-      {text}
-    </Text>
+    {text && (
+      <Text size="xs" weight="medium" className="text-gray-700">
+        {text}
+      </Text>
+    )}
   </Pill>
 )
