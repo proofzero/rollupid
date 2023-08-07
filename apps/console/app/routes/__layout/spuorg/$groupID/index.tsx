@@ -444,6 +444,7 @@ const TransferAppModal = ({
   const navigation = useNavigation()
   useEffect(() => {
     if (navigation.state === 'loading') {
+      setSelectedApp(undefined)
       handleClose()
     }
   }, [navigation])
