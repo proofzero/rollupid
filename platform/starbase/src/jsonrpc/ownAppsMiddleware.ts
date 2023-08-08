@@ -118,7 +118,7 @@ export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({
     ctx: {
       ...ctx,
       ownAppURNs,
-      allAppURNs: flattenedAppURNList,
+      allAppURNs: ownAppURNs.concat(flattenedAppURNList),
     },
   })
 }
