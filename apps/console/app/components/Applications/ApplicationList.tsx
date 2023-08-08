@@ -30,6 +30,32 @@ export const ApplicationList = ({
   >()
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
+  const ownApps = applications.filter((a) => !a.groupID && !a.groupName)
+  const groupApps = applications.filter((a) => a.groupID && a.groupName)
+
+  const groupedApplications = groupApps.reduce(
+    (acc, app) => {
+      const { groupName, groupID } = app
+      if (!acc[groupID!]) {
+        acc[groupID!] = {
+          groupName: groupName!,
+          apps: [],
+        }
+      }
+
+      acc[groupID!].apps.push(app)
+
+      return acc
+    },
+    {} as Record<
+      string,
+      {
+        groupName: string
+        apps: ApplicationListItemProps[]
+      }
+    >
+  )
+
   return (
     <div>
       <section className="flex justify-between items-start">
@@ -71,7 +97,7 @@ export const ApplicationList = ({
           />
         )}
 
-        {applications.map((ali) => (
+        {ownApps.map((ali) => (
           <ApplicationListItem
             key={ali.id}
             navigate={navigate}
@@ -85,6 +111,30 @@ export const ApplicationList = ({
               setDeleteModalOpen(true)
             }}
           />
+        ))}
+
+        {Object.entries(groupedApplications).map(([groupID, entry]) => (
+          <section key={groupID} className="flex flex-col space-y-2">
+            <Text size="sm" weight="medium" className="text-gray-500 mb-2">
+              {entry.groupName}
+            </Text>
+
+            {entry.apps.map((ali) => (
+              <ApplicationListItem
+                key={ali.id}
+                navigate={navigate}
+                {...ali}
+                onDeleteApplication={(clientId, appName, hasCustomDomain) => {
+                  setActionApp({
+                    clientId,
+                    name: appName,
+                    hasCustomDomain,
+                  })
+                  setDeleteModalOpen(true)
+                }}
+              />
+            ))}
+          </section>
         ))}
       </section>
     </div>
