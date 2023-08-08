@@ -54,6 +54,8 @@ import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { IdentityURN } from '@proofzero/urns/identity'
 import dangerVector from '~/images/danger.svg'
 import { AppLoaderData } from '~/root'
+import { ApplicationListItemPublishedState } from '~/components/Applications/ApplicationListItem'
+import { ServicePlanType } from '@proofzero/types/account'
 
 const accountTypes = [
   ...Object.values(EmailAccountType),
@@ -645,6 +647,8 @@ export default () => {
   const ownApps = apps.filter((a) => !a.groupID)
   const groupApps = apps.filter((a) => a.groupID === groupID)
 
+  const navigate = useNavigate()
+
   return (
     <>
       <InviteMemberModal
@@ -811,47 +815,51 @@ export default () => {
               </div>
             )}
 
-            <List
-              items={groupApps.map((ga) => ({
-                key: ga.clientId,
-                val: ga,
-              }))}
-              itemRenderer={(item) => (
-                <article className="w-full flex flex-row items-center truncate">
-                  {item.val.icon ? (
-                    <img
-                      src={item.val.icon}
-                      className="w-8 h-8 rounded-full mr-6"
-                    />
-                  ) : (
-                    <div className="rounded-full w-8 h-8 mr-6 flex justify-center items-center bg-gray-200 shrink-0 overflow-hidden">
-                      <Text className="text-gray-500">
-                        {item.val.name?.substring(0, 1)}
-                      </Text>
+            <section className="flex flex-col gap-3">
+              {groupApps.map((app) => (
+                <article className="flex justify-center items-center border border-gray-200 shadow-sm rounded bg-white">
+                  <section>
+                    <div className="rounded-l w-16 h-[3.25rem] flex justify-center items-center bg-gray-200 overflow-hidden">
+                      {!app.icon && (
+                        <Text className="text-gray-500">
+                          {app.name?.substring(0, 1)}
+                        </Text>
+                      )}
+                      {app.icon && (
+                        <img
+                          src={app.icon}
+                          alt="Not Found"
+                          className="object-cover"
+                        />
+                      )}
                     </div>
-                  )}
+                  </section>
 
-                  <div className="flex-1 truncate">
-                    <div className="flex flex-row items-center gap-2">
-                      <Text
-                        size="sm"
-                        weight="semibold"
-                        className="text-gray-800"
-                      >
-                        {item.val.name}
+                  <section className="px-4 flex-1">
+                    <div className="flex flex-row space-x-2 items-center">
+                      <Text size="sm" weight="medium" className="text-gray-900">
+                        <div
+                          onClick={() => {
+                            navigate(`/apps/${app.clientId}`)
+                          }}
+                          className="hover:underline cursor-pointer"
+                        >
+                          {app.name}
+                        </div>
                       </Text>
-
-                      <div
-                        className={classNames(`w-2 h-2 rounded-full`, {
-                          'bg-green-400': item.val.published,
-                          'bg-gray-300': !item.val.published,
-                        })}
-                      ></div>
+                      <ApplicationListItemPublishedState
+                        published={app.published}
+                      />
+                      {app.appPlan !== ServicePlanType.FREE ? (
+                        <Pill className="border rounded-3xl py-none">
+                          <Text size="xs">{app.appPlan}</Text>
+                        </Pill>
+                      ) : null}
                     </div>
 
-                    {hydrated && item.val.createdTimestamp && (
+                    {hydrated && app.createdTimestamp && (
                       <Text size="xs" weight="normal" className="shrink-0">
-                        {new Date(item.val.createdTimestamp).toLocaleString(
+                        {new Date(app.createdTimestamp).toLocaleString(
                           'default',
                           {
                             day: '2-digit',
@@ -861,10 +869,10 @@ export default () => {
                         )}
                       </Text>
                     )}
-                  </div>
+                  </section>
                 </article>
-              )}
-            />
+              ))}
+            </section>
           </div>
 
           <div>
