@@ -23,8 +23,8 @@ export const updateApp = async ({
     { name: input.updates.name, iconURL: input.updates.icon }
   )
   if (
-    !ctx.ownAppURNs ||
-    !ctx.ownAppURNs.includes(ApplicationURNSpace.getBaseURN(appURN))
+    !ctx.allAppURNs ||
+    !ctx.allAppURNs.includes(ApplicationURNSpace.getBaseURN(appURN))
   )
     throw new Error(
       `Request received for clientId ${input.clientId} which is not owned by provided account.`
