@@ -6,6 +6,7 @@ import { initIdentityGroupNodeByName } from '../../../nodes'
 import { InternalServerError } from '@proofzero/errors'
 import { router } from '@proofzero/platform.core'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
+import { AccountURN } from '@proofzero/urns/account'
 
 export const AcceptIdentityGroupMemberInvitationInputSchema = z.object({
   identityGroupURN: IdentityGroupURNValidator,
@@ -72,7 +73,7 @@ export const acceptIdentityGroupMemberInvitation = async ({
   })
 
   await caller.edges.makeEdge({
-    src: targetAddress.baseUrn,
+    src: ctx.accountURN as AccountURN,
     tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
     dst: identityGroupURN,
   })

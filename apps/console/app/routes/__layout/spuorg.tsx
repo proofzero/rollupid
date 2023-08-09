@@ -7,15 +7,15 @@ import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 import { NO_OP_ADDRESS_PLACEHOLDER } from '@proofzero/platform/address/src/constants'
-import { AddressURN } from '@proofzero/urns/address'
-import { Outlet, useLoaderData } from '@remix-run/react'
+import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
+import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
 import { Toaster } from '@proofzero/design-system/src/atoms/toast'
 
 type GroupMemberModel = {
-  URN: AddressURN
+  URN: AccountURN
   iconURL: string
   title: string
-  address: string
+  address?: string
   joinTimestamp: number
 }
 
@@ -29,16 +29,15 @@ type GroupRootLoaderData = {
   groups: GroupModel[]
   CONSOLE_URL: string
   PASSPORT_URL: string
-  ownAddressURNList: AddressURN[]
 }
 
-export type GroupRootContextData = GroupRootLoaderData
+export type GroupRootContextData = GroupRootLoaderData & {
+  accountURN: AccountURN
+}
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const jwt = await requireJWT(request, context.env)
-    const parsedJwt = parseJwt(jwt!)
-    const accountURN = parsedJwt.sub as AccountURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
@@ -48,9 +47,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const groups = await coreClient.account.listIdentityGroups.query({
-      accountURN,
-    })
+    const groups = await coreClient.account.listIdentityGroups.query()
 
     const mappedGroups = await Promise.all(
       groups.map(async (group) => {
@@ -58,23 +55,33 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           .filter((m) => m.joinTimestamp != null)
           .reduce(
             (acc, curr) => ({ ...acc, [curr.URN]: curr }),
-            {} as Record<AddressURN, { URN: AddressURN; joinTimestamp: number }>
+            {} as Record<AccountURN, { URN: AccountURN; joinTimestamp: number }>
           )
 
-        const memberProfiles =
-          await coreClient.address.getAddressProfileBatch.query(
-            group.members.map((m) => m.URN)
-          )
-
-        const memberModels: GroupMemberModel[] = memberProfiles.map(
-          (profile) => ({
-            URN: profile.id,
-            iconURL: profile.icon!,
-            title: profile.title,
-            address: profile.address,
-            joinTimestamp: memberMap[profile.id].joinTimestamp,
-          })
+        const memberProfiles = await Promise.all(
+          group.members.map(async (m) => ({
+            profile: await coreClient.account.getProfile.query({
+              account: m.URN,
+            }),
+            URN: m.URN,
+          }))
         )
+
+        const memberModels: GroupMemberModel[] = memberProfiles
+          .filter((mp) => Boolean(mp.profile))
+          .map(({ profile, URN }) => ({
+            URN: URN,
+            iconURL: profile!.pfp!.image,
+            title: profile!.displayName,
+            address: profile!.primaryAddressURN
+              ? profile!.addresses.find(
+                  (a) =>
+                    a.baseUrn ===
+                    AddressURNSpace.getBaseURN(profile!.primaryAddressURN!)
+                )?.qc.alias
+              : undefined,
+            joinTimestamp: memberMap[URN].joinTimestamp,
+          }))
 
         return {
           URN: group.URN,
@@ -84,28 +91,29 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
     )
 
-    const ownAddresses = await coreClient.account.getOwnAddresses.query({
-      account: accountURN,
-    })
-    const ownAddressURNList =
-      ownAddresses?.map((a) => a.baseUrn as AddressURN) ?? []
-
     return json<GroupRootLoaderData>({
       groups: mappedGroups,
       CONSOLE_URL: context.env.CONSOLE_URL,
       PASSPORT_URL: context.env.PASSPORT_URL,
-      ownAddressURNList,
     })
   }
 )
 
 export default () => {
   const data = useLoaderData<GroupRootLoaderData>()
+  const { accountURN } = useOutletContext<{
+    accountURN: AccountURN
+  }>()
 
   return (
     <>
       <Toaster position="top-right" />
-      <Outlet context={data} />
+      <Outlet
+        context={{
+          accountURN,
+          ...data,
+        }}
+      />
     </>
   )
 }

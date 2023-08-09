@@ -1,22 +1,15 @@
 import { z } from 'zod'
 import {
   AccountURNInput,
-  AddressURNInput,
   IdentityGroupURNValidator,
 } from '@proofzero/platform-middleware/inputValidators'
 import { router } from '@proofzero/platform.core'
-import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 import { RollupError } from '@proofzero/errors'
-import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
 
 import { Context } from '../../../context'
-
-export const ListIdentityGroupsInputSchema = z.object({
-  accountURN: AccountURNInput,
-})
-type ListIdentityGroupsInput = z.infer<typeof ListIdentityGroupsInputSchema>
+import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 
 export const ListIdentityGroupsOutputSchema = z.array(
   z.object({
@@ -24,7 +17,7 @@ export const ListIdentityGroupsOutputSchema = z.array(
     name: z.string(),
     members: z.array(
       z.object({
-        URN: AddressURNInput,
+        URN: AccountURNInput,
         joinTimestamp: z.number().nullable(),
       })
     ),
@@ -35,15 +28,13 @@ export type ListIdentityGroupsOutput = z.infer<
 >
 
 export const listIdentityGroups = async ({
-  input,
   ctx,
 }: {
-  input: ListIdentityGroupsInput
   ctx: Context
 }): Promise<ListIdentityGroupsOutput> => {
   const caller = router.createCaller(ctx)
   const accountNode = await caller.edges.findNode({
-    baseUrn: input.accountURN,
+    baseUrn: ctx.accountURN,
   })
   if (!accountNode) {
     throw new RollupError({
@@ -51,51 +42,19 @@ export const listIdentityGroups = async ({
     })
   }
 
-  const primaryAddressURN = AddressURNSpace.getBaseURN(
-    accountNode.qc.primaryAddressURN as AddressURN
-  )
-
-  const { edges: addressEdges } = await caller.edges.getEdges({
+  const { edges } = await caller.edges.getEdges({
     query: {
       src: {
-        baseUrn: input.accountURN,
+        baseUrn: ctx.accountURN,
       },
-      tag: EDGE_ADDRESS,
+      tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
     },
   })
 
-  const addressURNList = addressEdges
-    .map((edge) => edge.dst.baseUrn)
-    .concat(primaryAddressURN)
-
-  const identityGroupResults = await Promise.all(
-    addressURNList.map((addressURN) =>
-      caller.edges.getEdges({
-        query: {
-          src: {
-            baseUrn: addressURN,
-          },
-          tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
-        },
-      })
-    )
-  )
-  const identityGroupEdges = identityGroupResults.flatMap(
-    (result) => result.edges
-  )
-
-  const uniqueIdentityGroupEdges = [
-    ...new Set(identityGroupEdges.map((edge) => edge.dst.baseUrn)),
-  ]
-    .map((baseUrn) =>
-      identityGroupEdges.find((edge) => edge.dst.baseUrn === baseUrn)
-    )
-    .filter((edge) => edge != null)
-
   const identityGroups: ListIdentityGroupsOutput = await Promise.all(
-    uniqueIdentityGroupEdges.map(async (edge) => {
-      const URN = edge!.dst.baseUrn as IdentityGroupURN
-      const name = edge!.dst.qc.name
+    edges.map(async (edge) => {
+      const URN = edge.dst.baseUrn as IdentityGroupURN
+      const name = edge.dst.qc.name
 
       const { edges: groupMemberEdges } = await caller.edges.getEdges({
         query: {
@@ -106,12 +65,14 @@ export const listIdentityGroups = async ({
         },
       })
 
-      const mappedMembers = groupMemberEdges.map((edge) => ({
-        URN: edge.src.baseUrn as AddressURN,
-        joinTimestamp: edge.createdTimestamp
-          ? new Date((edge.createdTimestamp as string) + ' UTC').getTime()
-          : null,
-      }))
+      const mappedMembers = groupMemberEdges
+        .filter((edge) => AccountURNSpace.is(edge.src.baseUrn))
+        .map((edge) => ({
+          URN: edge.src.baseUrn as AccountURN,
+          joinTimestamp: edge.createdTimestamp
+            ? new Date((edge.createdTimestamp as string) + ' UTC').getTime()
+            : null,
+        }))
 
       return {
         URN,

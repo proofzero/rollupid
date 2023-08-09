@@ -68,7 +68,6 @@ import {
   createIdentityGroup,
 } from './methods/identity-groups/createIdentityGroup'
 import {
-  ListIdentityGroupsInputSchema,
   ListIdentityGroupsOutputSchema,
   listIdentityGroups,
 } from './methods/identity-groups/listIdentityGroups'
@@ -224,7 +223,6 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
-    .input(ListIdentityGroupsInputSchema)
     .output(ListIdentityGroupsOutputSchema)
     .query(listIdentityGroups),
   inviteIdentityGroupMember: t.procedure
