@@ -20,7 +20,7 @@ import {
   getAssetFromKV,
 } from '@cloudflare/kv-asset-handler'
 
-let manifest = manifestJSON
+let manifest = JSON.parse(manifestJSON)
 
 type CfHostMetadata = {
   clientId: string
@@ -68,14 +68,15 @@ const handleEvent = async (event: FetchEvent, env: Env) => {
     const ttl = url.pathname.startsWith('/build/')
       ? 60 * 60 * 24 * 365 // 1 year
       : 60 * 5 // 5 minutes
-    return await getAssetFromKV(event, {
-      ASSET_NAMESPACE: env.__STATIC_CONTENT,
-      ASSET_MANIFEST: manifest,
-      cacheControl: {
-        browserTTL: ttl,
-        edgeTTL: ttl,
-      },
-    })
+    if (url.pathname.startsWith('/build/'))
+      return await getAssetFromKV(event, {
+        ASSET_NAMESPACE: env.__STATIC_CONTENT,
+        ASSET_MANIFEST: manifest,
+        cacheControl: {
+          browserTTL: ttl,
+          edgeTTL: ttl,
+        },
+      })
   } catch (error: any) {
     console.debug(
       'ERROR',
@@ -87,7 +88,6 @@ const handleEvent = async (event: FetchEvent, env: Env) => {
       error.linenumber,
       error.filename
     )
-
     if (
       error instanceof MethodNotAllowedError ||
       error instanceof NotFoundError

@@ -1,10 +1,9 @@
 name = "core"
-main = "src/index.ts"
+main = "dist/index.js"
 compatibility_date = "2023-03-14"
-compatibility_flags = ["no_minimal_subrequests"]
-logpush = true
-node_compat = true
+compatibility_flags = ["nodejs_compat", "no_minimal_subrequests"]
 workers_dev = false
+# no_bundle = true
 
 durable_objects.bindings = [
   { name = "Access", class_name = "Authorization" },
@@ -25,6 +24,9 @@ services = [
 port = 10101
 inspector_port = 11101
 local_protocol = "http"
+
+[build]
+command = "node build.mjs"
 
 [[d1_databases]]
 binding = "EDGES"
