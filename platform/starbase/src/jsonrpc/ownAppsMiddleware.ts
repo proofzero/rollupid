@@ -52,20 +52,16 @@ export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({
 
   const caller = router.createCaller(ctx)
 
-  const edgeList = await caller.edges.getEdges({
+  const { edges: ownEdges } = await caller.edges.getEdges({
     query: {
       src: { baseUrn: ctx.identityURN },
       tag: EDGE_APPLICATION,
     },
   })
 
-  const ownAppURNs = []
-  for (const edge of edgeList && edgeList.edges) {
-    const appURN = ApplicationURNSpace.getBaseURN(
-      edge.dst.baseUrn as ApplicationURN
-    )
-    ownAppURNs.push(appURN)
-  }
+  const ownAppURNs: ApplicationURN[] = ownEdges.map(
+    (edge) => edge.dst.baseUrn as ApplicationURN
+  )
 
   const { edges: identityGroupEdges } = await caller.edges.getEdges({
     query: {
@@ -91,17 +87,15 @@ export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({
         },
       })
 
-      return appEdges.map((edge) => edge.dst.baseUrn)
+      return appEdges.map((edge) => edge.dst.baseUrn as ApplicationURN)
     })
   )
-
-  const flattenedAppURNList = groupAppURNList.flatMap((gau) => gau)
 
   return next({
     ctx: {
       ...ctx,
       ownAppURNs,
-      allAppURNs: ownAppURNs.concat(flattenedAppURNList),
+      allAppURNs: ownAppURNs.concat(groupAppURNList.flatMap((gau) => gau)),
     },
   })
 }
