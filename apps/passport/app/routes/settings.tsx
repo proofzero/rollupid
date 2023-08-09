@@ -19,10 +19,9 @@ import { getCoreClient } from '~/platform.server'
 
 import type { AddressURN } from '@proofzero/urns/address'
 import type { NodeType } from '@proofzero/types/address'
-import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction, V2_MetaFunction } from '@remix-run/cloudflare'
 import type { LinksFunction } from '@remix-run/cloudflare'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { NO_OP_ADDRESS_PLACEHOLDER } from '@proofzero/platform.address/src/constants'
 
 import { usePostHog } from 'posthog-js/react'
 import { useEffect, useState } from 'react'
@@ -134,11 +133,33 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
-export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  title: 'Passport Settings - Rollup',
-  viewport: 'width=device-width,initial-scale=1',
-})
+export const meta: V2_MetaFunction = () => {
+  return [
+    { name: 'viewport', content: 'width=device-width,initial-scale=1' },
+    { title: 'Passport Settings - Rollup' },
+
+    { property: 'og:url', content: 'https://passport.rollup.id' },
+    { property: 'og:title', content: 'Passport - Rollup' },
+    { property: 'og:description', content: 'Simple & Secure Private Auth' },
+    {
+      property: 'og:image',
+      content:
+        'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    },
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:site', content: '@rollupid_xyz' },
+    { name: 'twitter:creator', content: '@rollupid_xyz' },
+    {
+      name: 'twitter:image',
+      content:
+        'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    },
+    { name: 'theme-color', content: '#ffffff' },
+    { name: 'mobile-web-app-capable', content: 'yes' },
+    { name: 'apple-mobile-web-app-capable', content: 'yes' },
+    { charSet: 'utf-8' },
+  ]
+}
 
 export default function SettingsLayout() {
   const {

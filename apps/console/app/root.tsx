@@ -3,9 +3,9 @@
  */
 
 import type {
-  MetaFunction,
   LinksFunction,
   LoaderFunction,
+  V2_MetaFunction,
 } from '@remix-run/cloudflare'
 
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
@@ -65,12 +65,6 @@ export const links: LinksFunction = () => {
     { rel: 'shortcut icon', href: faviconSvg },
   ]
 }
-
-export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  title: 'Console - Rollup',
-  viewport: 'width=device-width,initial-scale=1',
-})
 
 export type AppLoaderData = {
   clientId: string
@@ -196,6 +190,22 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
   }
 )
+
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: 'Console - Rollup',
+    },
+    { charSet: 'utf-8' },
+    {
+      property: 'og:image',
+      content:
+        'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    },
+    { property: 'og:description', content: 'Simple & Secure Private Auth' },
+    { name: 'viewport', content: 'width=device-width,initial-scale=1' },
+  ]
+}
 
 export default function App() {
   const nonce = useContext(NonceContext)
@@ -330,7 +340,16 @@ export function ErrorBoundary({ error }) {
   return (
     <html lang="en">
       <head>
-        <Meta />
+        <meta charSet="utf-8" />
+        <meta
+          property="og:image"
+          content="https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png"
+        />
+        <meta
+          property="og:description"
+          content="Simple & Secure Private Auth"
+        />
+        <meta property="og:title" content="Console - Rollup" />
         <Links />
       </head>
       <body className="min-h-[100dvh] flex justify-center items-center">
@@ -374,7 +393,16 @@ export function CatchBoundary() {
   return (
     <html lang="en">
       <head>
-        <Meta />
+        <meta charSet="utf-8" />
+        <meta
+          property="og:image"
+          content="https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png"
+        />
+        <meta
+          property="og:description"
+          content="Simple & Secure Private Auth"
+        />
+        <meta property="og:title" content="Console - Rollup" />
         <Links />
       </head>
       <body>
