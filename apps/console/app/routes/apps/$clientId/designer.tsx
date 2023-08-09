@@ -17,7 +17,13 @@ import {
   useState,
 } from 'react'
 import { IconType } from 'react-icons'
-import { HiCog, HiOutlineCog, HiOutlineMail, HiOutlineX } from 'react-icons/hi'
+import {
+  HiCog,
+  HiOutlineCog,
+  HiOutlineMail,
+  HiOutlineX,
+  HiOutlineShare,
+} from 'react-icons/hi'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
@@ -1502,7 +1508,7 @@ export default () => {
 
         <Tab.Group>
           <Tab.List className="flex flex-row items-center border-b mb-6">
-            <Tab className="outline-0">
+            <Tab className="outline-none">
               {({ selected }) => (
                 <DesignerTab
                   Icon={HiOutlineCog}
@@ -1512,7 +1518,17 @@ export default () => {
               )}
             </Tab>
 
-            <Tab className="outline-0">
+            <Tab className="outline-none">
+              {({ selected }) => (
+                <DesignerTab
+                  Icon={HiOutlineShare}
+                  text="Open Graph"
+                  selected={selected}
+                />
+              )}
+            </Tab>
+
+            <Tab className="outline-none">
               {({ selected }) => (
                 <DesignerTab
                   Icon={HiOutlineMail}
@@ -1529,6 +1545,16 @@ export default () => {
               appTheme={appTheme}
               avatarURL={avatarUrl}
               appIconURL={appDetails.app.icon}
+              setLoading={setLoading}
+              errors={errors}
+            />
+
+            <EmailPanel
+              clientId={appDetails.clientId!}
+              addressURN={appContactAddress}
+              appContactEmail={appContactEmail}
+              appPublished={appDetails.published ?? false}
+              emailTheme={emailTheme}
               setLoading={setLoading}
               errors={errors}
             />
