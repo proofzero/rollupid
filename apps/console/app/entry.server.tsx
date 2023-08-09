@@ -60,6 +60,7 @@ export default function handleRequest(
             SELF,
             'https://js.stripe.com',
             'https://hooks.stripe.com',
+            'form.typeform.com',
           ],
           'script-src': [SELF, `'nonce-${nonce}' ${STRICT_DYNAMIC}`],
           'style-src': [
