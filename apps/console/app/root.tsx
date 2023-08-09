@@ -118,8 +118,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...traceHeader,
       })
-      const apps = await coreClient.starbase.listApps.query()
-      const groupApps = await coreClient.starbase.listGroupApps.query()
+
+      const [apps, groupApps] = await Promise.all([
+        coreClient.starbase.listApps.query(),
+        coreClient.starbase.listGroupApps.query(),
+      ])
 
       const reshapedApps = [
         ...apps.map((a) => {
