@@ -9,7 +9,6 @@ import {
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 import { EDGE_APPLICATION } from '../../types'
 import { router } from '@proofzero/platform.core'
-import { EDGE_ADDRESS } from '@proofzero/platform.address/src/constants'
 import { IdentityGroupURNValidator } from '@proofzero/platform-middleware/inputValidators'
 import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 
@@ -31,46 +30,26 @@ export const listGroupApps = async ({
 
   const caller = router.createCaller(ctx)
 
-  // Get all my addresses
-  const { edges: addressEdges } = await caller.edges.getEdges({
+  const { edges: identityGroupEdges } = await caller.edges.getEdges({
     query: {
       src: {
         baseUrn: ctx.accountURN,
       },
-      tag: EDGE_ADDRESS,
+      tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
     },
   })
-  const addressURNList = addressEdges.map((edge) => edge.dst.baseUrn)
 
-  // Get all groups where those addresses are members
-  const addressGroupURNList = await Promise.all(
-    addressURNList.map(async (au) => {
-      const { edges: identityGroupEdges } = await caller.edges.getEdges({
-        query: {
-          src: {
-            baseUrn: au,
-          },
-          tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
-        },
-      })
+  const identityGroupModels = identityGroupEdges.map((edge) => ({
+    urn: edge.dst.baseUrn,
+    name: edge.dst.qc.name,
+  }))
 
-      return identityGroupEdges.map((edge) => ({
-        urn: edge.dst.baseUrn,
-        name: edge.dst.qc.name,
-      }))
-    })
-  )
-  const flattenedUniqueGroupURNList = addressGroupURNList
-    .flatMap((agul) => agul)
-    .filter((v, i, a) => a.findIndex((t) => t.urn === v.urn) === i)
-
-  // Get all apps that are part of those groups
   const groupAppURNList = await Promise.all(
-    flattenedUniqueGroupURNList.map(async (gu) => {
+    identityGroupModels.map(async (igm) => {
       const { edges: appEdges } = await caller.edges.getEdges({
         query: {
           src: {
-            baseUrn: gu.urn,
+            baseUrn: igm.urn,
           },
           tag: EDGE_APPLICATION,
         },
@@ -78,35 +57,30 @@ export const listGroupApps = async ({
 
       return appEdges.map((edge) => ({
         urn: edge.dst.baseUrn,
-        groupName: gu.name,
-        groupURN: gu.urn as IdentityGroupURN,
+        groupName: igm.name,
+        groupURN: igm.urn as IdentityGroupURN,
       }))
     })
   )
   const flattenedAppList = groupAppURNList.flatMap((gaul) => gaul)
 
-  //Iterate through edges, pull out the clientId, and get app objects for each
-  //app edge
-  const result = []
-  for (const { urn, groupName, groupURN } of flattenedAppList || []) {
-    if (!ApplicationURNSpace.is(urn)) continue
-    const clientId = ApplicationURNSpace.decode(urn)
-    try {
+  const result = await Promise.all(
+    flattenedAppList.map(async ({ urn, groupName, groupURN }) => {
+      const clientId = ApplicationURNSpace.decode(urn)
+
       const appDO = await getApplicationNodeByClientId(
         clientId,
         ctx.StarbaseApp
       )
       const appDetails = await appDO.class.getDetails()
-      if (appDetails.app)
-        result.push({
-          ...appDetails,
-          groupName,
-          groupURN,
-        })
-    } catch (e) {
-      console.error(`Error when retrieving details for app ${urn}.`, e)
-    }
-  }
+
+      return {
+        ...appDetails,
+        groupName,
+        groupURN,
+      }
+    })
+  )
 
   return result
 }

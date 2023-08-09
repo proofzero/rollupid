@@ -11,9 +11,8 @@ import type { Context } from './context'
 
 import { parseJwt } from '@proofzero/utils'
 import { BadRequestError } from '@proofzero/errors'
-import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 import { ROLLUP_INTERNAL_ACCESS_TOKEN_URN } from '@proofzero/platform.authorization/src/constants'
-import { EDGE_ACCOUNT } from '@proofzero/platform.account/src/constants'
+import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 
 export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({
   ctx,
@@ -68,36 +67,21 @@ export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({
     ownAppURNs.push(appURN)
   }
 
-  const { edges: addressEdges } = await caller.edges.getEdges({
+  const { edges: identityGroupEdges } = await caller.edges.getEdges({
     query: {
       src: {
         baseUrn: ctx.accountURN,
       },
-      tag: EDGE_ACCOUNT,
+      tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
     },
   })
-  const addressURNList = addressEdges.map((edge) => edge.dst.baseUrn)
 
-  const addressGroupURNList = await Promise.all(
-    addressURNList.map(async (au) => {
-      const { edges: identityGroupEdges } = await caller.edges.getEdges({
-        query: {
-          src: {
-            baseUrn: au,
-          },
-          tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
-        },
-      })
-
-      return identityGroupEdges.map((edge) => edge.dst.baseUrn)
-    })
+  const identityGroupURNList = identityGroupEdges.map(
+    (edge) => edge.dst.baseUrn
   )
-  const flattenedUniqueGroupURNList = addressGroupURNList
-    .flatMap((agu) => agu)
-    .filter((v, i, a) => a.findIndex((t) => t === v) === i)
 
   const groupAppURNList = await Promise.all(
-    flattenedUniqueGroupURNList.map(async (igu) => {
+    identityGroupURNList.map(async (igu) => {
       const { edges: appEdges } = await caller.edges.getEdges({
         query: {
           src: {
@@ -110,9 +94,8 @@ export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({
       return appEdges.map((edge) => edge.dst.baseUrn)
     })
   )
-  const flattenedAppURNList = groupAppURNList.flatMap(
-    (gap) => gap
-  ) as ApplicationURN[]
+
+  const flattenedAppURNList = groupAppURNList.flatMap((gau) => gau)
 
   return next({
     ctx: {
