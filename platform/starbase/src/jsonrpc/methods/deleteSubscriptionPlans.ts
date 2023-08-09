@@ -49,6 +49,10 @@ export const deleteSubscriptionPlans = async ({
       // This is a way to delete all app plans
       Promise.all(
         clientIds.map(async (clientId) => {
+          await caller.starbase.deleteCustomDomain({
+            clientId,
+          })
+
           const appDO = await getApplicationNodeByClientId(
             clientId,
             ctx.StarbaseApp
