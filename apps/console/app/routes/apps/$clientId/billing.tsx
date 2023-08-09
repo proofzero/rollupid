@@ -117,8 +117,13 @@ const processUpdateOp = async (
     URN: identityURN,
   })
 
-  const apps = await coreClient.starbase.listApps.query()
-  const allotedApps = apps.filter((a) => a.appPlan === plan).length
+  const [ownApps, groupApps] = await Promise.all([
+    coreClient.starbase.listApps.query(),
+    coreClient.starbase.listGroupApps.query(),
+  ])
+  const apps = [...ownApps, ...groupApps]
+
+  const allotedApps = ownApps.filter((a) => a.appPlan === plan).length
 
   if (
     plan !== ServicePlanType.FREE &&
