@@ -13,7 +13,4 @@ module.exports = {
   serverMainFields: ['browser', 'module', 'main'],
   // Try the `workerd` condition first (this is new and slowly standardising), then `worker`, then `browser` (equivalent of `serverPlatform: browser` but without extra behaviour.
   serverConditions: ['workerd', 'worker', 'browser'],
-  future: {
-    v2_meta: true,
-  },
 }

@@ -36,7 +36,4 @@ module.exports = {
       })
     })
   },
-  future: {
-    v2_meta: true,
-  },
 }

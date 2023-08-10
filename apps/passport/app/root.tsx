@@ -1,7 +1,7 @@
 import type {
   LinksFunction,
   LoaderFunction,
-  V2_MetaFunction,
+  MetaFunction,
 } from '@remix-run/cloudflare'
 
 import { json } from '@remix-run/cloudflare'
@@ -148,31 +148,24 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
-export const meta: V2_MetaFunction = () => {
-  return [
-    { charSet: 'utf-8' },
-    { title: 'Passport - Rollup' },
-    { name: 'viewport', content: 'width=device-width,initial-scale=1' },
-    { property: 'og:url', content: 'https://passport.rollup.id' },
-    { property: 'og:title', content: 'Passport - Rollup' },
-    { property: 'og:description', content: 'Simple & Secure Private Auth' },
-    {
-      property: 'og:image',
-      content:
-        'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
-    },
-    { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:site', content: '@rollupid_xyz' },
-    { name: 'twitter:creator', content: '@rollupid_xyz' },
-    {
-      name: 'twitter:image',
-      content:
-        'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
-    },
-    { name: 'theme-color', content: '#ffffff' },
-    { name: 'mobile-web-app-capable', content: 'yes' },
-    { name: 'apple-mobile-web-app-capable', content: 'yes' },
-  ]
+export const meta: MetaFunction = () => {
+  return {
+    title: 'Passport - Rollup',
+    viewport: 'width=device-width,initial-scale=1',
+    'og:url': 'https://passport.rollup.id',
+    'og:title': 'Passport - Rollup',
+    'og:description': 'Simple & Secure Private Auth',
+    'og:image':
+      'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    'twitter:card': 'summary_large_image',
+    'twitter:site': '@rollupid_xyz',
+    'twitter:creator': '@rollupid_xyz',
+    'twitter:image':
+      'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    'theme-color': '#ffffff',
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+  }
 }
 
 export default function App() {
@@ -254,6 +247,7 @@ export default function App() {
   return (
     <html lang="en">
       <head>
+        <meta charSet="utf-8" />
         <Meta />
 
         {browserEnv.appProps?.iconURL ? (
@@ -350,28 +344,7 @@ export function ErrorBoundary({ error }) {
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta title="Passport - Rollup" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <meta property="og:url" content="https://passport.rollup.id" />
-        <meta property="og:title" content="Passport - Rollup" />
-        <meta
-          property="og:description"
-          content="Simple & Secure Private Auth"
-        />
-        <meta
-          property="og:image"
-          content="https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png"
-        />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@rollupid_xyz" />
-        <meta name="twitter:creator" content="@rollupid_xyz" />
-        <meta
-          name="twitter:image"
-          content="https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png"
-        />
-        <meta name="theme-color" content="#ffffff" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <Meta />
         <Links />
       </head>
       <body className="min-h-[100dvh] flex justify-center items-center">
@@ -416,28 +389,7 @@ export function CatchBoundary() {
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta title="Passport - Rollup" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <meta property="og:url" content="https://passport.rollup.id" />
-        <meta property="og:title" content="Passport - Rollup" />
-        <meta
-          property="og:description"
-          content="Simple & Secure Private Auth"
-        />
-        <meta
-          property="og:image"
-          content="https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png"
-        />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@rollupid_xyz" />
-        <meta name="twitter:creator" content="@rollupid_xyz" />
-        <meta
-          name="twitter:image"
-          content="https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png"
-        />
-        <meta name="theme-color" content="#ffffff" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <Meta />
         <Links />
       </head>
       <body>

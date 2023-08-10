@@ -5,7 +5,7 @@
 import type {
   LinksFunction,
   LoaderFunction,
-  V2_MetaFunction,
+  MetaFunction,
 } from '@remix-run/cloudflare'
 
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
@@ -191,20 +191,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
-export const meta: V2_MetaFunction = () => {
-  return [
-    {
-      title: 'Console - Rollup',
-    },
-    { charSet: 'utf-8' },
-    {
-      property: 'og:image',
-      content:
-        'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
-    },
-    { property: 'og:description', content: 'Simple & Secure Private Auth' },
-    { name: 'viewport', content: 'width=device-width,initial-scale=1' },
-  ]
+export const meta: MetaFunction = () => {
+  return {
+    title: 'Console - Rollup',
+    'og:image':
+      'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    'og:description': 'Simple & Secure Private Auth',
+    viewport: 'width=device-width,initial-scale=1',
+  }
 }
 
 export default function App() {
@@ -255,6 +249,7 @@ export default function App() {
   return (
     <html lang="en" className="h-full">
       <head>
+        <meta charSet="utf-8" />
         <Meta />
         <Links />
       </head>
@@ -341,15 +336,7 @@ export function ErrorBoundary({ error }) {
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta
-          property="og:image"
-          content="https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png"
-        />
-        <meta
-          property="og:description"
-          content="Simple & Secure Private Auth"
-        />
-        <meta property="og:title" content="Console - Rollup" />
+        <Meta />
         <Links />
       </head>
       <body className="min-h-[100dvh] flex justify-center items-center">
@@ -394,15 +381,7 @@ export function CatchBoundary() {
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta
-          property="og:image"
-          content="https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png"
-        />
-        <meta
-          property="og:description"
-          content="Simple & Secure Private Auth"
-        />
-        <meta property="og:title" content="Console - Rollup" />
+        <Meta />
         <Links />
       </head>
       <body>
