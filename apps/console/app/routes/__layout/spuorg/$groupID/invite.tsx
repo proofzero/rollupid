@@ -59,7 +59,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const { inviteCode } =
       await coreClient.account.inviteIdentityGroupMember.mutate({
-        inviterAccountURN: accountURN,
         identifier,
         addressType: addressType,
         identityGroupURN: groupURN,
