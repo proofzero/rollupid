@@ -1,15 +1,6 @@
-import type { Request as CfRequest } from '@cloudflare/workers-types'
-import {
-  createRequestHandler,
-  handleAsset,
-} from '@remix-run/cloudflare-workers'
+import { createRequestHandler } from '@remix-run/cloudflare-workers'
 import * as build from '@remix-run/dev/server-build'
 
-import createCoreClient from '@proofzero/platform-clients/core'
-import {
-  generateTraceContextHeaders,
-  generateTraceSpan,
-} from '@proofzero/platform-middleware/trace'
 import type { TraceableFetchEvent } from '@proofzero/platform-middleware/trace'
 import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 import manifestJSON from '__STATIC_CONTENT_MANIFEST'
@@ -19,6 +10,7 @@ import {
   NotFoundError,
   getAssetFromKV,
 } from '@cloudflare/kv-asset-handler'
+import { ServerBuild } from '@remix-run/cloudflare'
 
 let manifest = JSON.parse(manifestJSON)
 
@@ -61,43 +53,6 @@ export function parseParams(request: Request) {
 }
 
 const handleEvent = async (event: FetchEvent, env: Env) => {
-  //Create a new trace span with no parent
-  const newTraceSpan = generateTraceSpan()
-
-  const reqURL = new URL(event.request.url)
-  //Have to force injection of new field so it is available in the context setup above
-  const newEvent = Object.assign(event, { traceSpan: newTraceSpan })
-
-  console.debug(
-    `Started HTTP handler for ${reqURL.pathname}/${reqURL.searchParams}`,
-    newTraceSpan.toString()
-  )
-
-  const request = event.request as unknown as CfRequest<CfHostMetadata>
-  const host = request.headers.get('host') as string
-  if (!env.DEFAULT_HOSTS.includes(host)) {
-    const clientId = request.cf?.hostMetadata?.clientId
-    if (!clientId) return new Response(null, { status: 404 })
-    const coreClient = createCoreClient(
-      env.Core,
-      generateTraceContextHeaders(newTraceSpan)
-    )
-
-    try {
-      console.debug(`Before getAppProps`)
-      const app = await coreClient.starbase.getAppPublicProps.query({
-        clientId,
-      })
-      newEvent.request.app_props = app
-      const { customDomain } = app
-      if (!customDomain) return new Response(null, { status: 404 })
-      if (!customDomain.isActive || host !== customDomain?.hostname)
-        return new Response(null, { status: 404 })
-    } catch (error) {
-      return new Response(null, { status: 500 })
-    }
-  }
-
   const requestHandler = createRequestHandler({
     build,
     mode: process.env.NODE_ENV,
@@ -116,19 +71,65 @@ const handleEvent = async (event: FetchEvent, env: Env) => {
   let response
   try {
     console.debug(`Before requestHandler call`)
-    response = await requestHandler(newEvent)
+    response = await requestHandler(event)
   } finally {
-    console.debug(
-      `Completed HTTP handler ${
-        response?.status && response?.status >= 400 && response?.status <= 599
-          ? 'with errors '
-          : ''
-      }for ${reqURL.pathname}/${reqURL.searchParams}`,
-      newTraceSpan.toString()
-    )
+    console.log('done')
   }
 
   return response
+}
+
+export async function manuallyHandleAsset(
+  event: FetchEvent,
+  build: ServerBuild,
+  options?: any
+) {
+  try {
+    if (process.env.NODE_ENV === 'development') {
+      return await getAssetFromKV(event, {
+        cacheControl: {
+          bypassCache: true,
+        },
+        ...options,
+      })
+    }
+
+    let cacheControl = {}
+    let url = new URL(event.request.url)
+    let assetpath = build.assets.url.split('/').slice(0, -1).join('/')
+    let requestpath = url.pathname.split('/').slice(0, -1).join('/')
+
+    if (requestpath.startsWith(assetpath)) {
+      // Assets are hashed by Remix so are safe to cache in the browser
+      // And they're also hashed in KV storage, so are safe to cache on the edge
+      cacheControl = {
+        bypassCache: false, //<- Erwin
+        edgeTTL: 31536000,
+        browserTTL: 31536000,
+      }
+    } else {
+      // Assets are not necessarily hashed in the request URL, so we cannot cache in the browser
+      // But they are hashed in KV storage, so we can cache on the edge
+      cacheControl = {
+        bypassCache: false, //<- Erwin
+        edgeTTL: 31536000,
+      }
+    }
+
+    return await getAssetFromKV(event, {
+      cacheControl,
+      ...options,
+    })
+  } catch (error: unknown) {
+    if (
+      error instanceof MethodNotAllowedError ||
+      error instanceof NotFoundError
+    ) {
+      return null
+    }
+
+    throw error
+  }
 }
 
 const config: ResolveConfigFn = (env: Env, _trigger) => {
@@ -141,39 +142,23 @@ const config: ResolveConfigFn = (env: Env, _trigger) => {
   }
 }
 
-const apiFetchHandler = {
-  async fetch(req: Request, env: Env, ctx: ExecutionContext) {
-    //This is the smallest set of event props Remix needs to handle assets correctly
-    const event = {
-      request: req,
-      waitUntil: ctx.waitUntil.bind(ctx),
-    } as FetchEvent
-    console.log(`Handling event for ${req.url}`)
-    return await handleEvent(event, env)
-  },
-}
+export default instrument(
+  {
+    async fetch(req: Request, env: Env, ctx: ExecutionContext) {
+      //This is the smallest set of event props Remix needs to handle assets correctly
+      const event = {
+        request: req,
+        waitUntil: ctx.waitUntil.bind(ctx),
+      } as FetchEvent
 
-const instrumentableHandler = instrument(
-  apiFetchHandler,
+      let response = await manuallyHandleAsset(event, build, {
+        ASSET_NAMESPACE: env.__STATIC_CONTENT,
+        ASSET_MANIFEST: manifest,
+      })
+      if (response) return response
+
+      return await handleEvent(event, env)
+    },
+  },
   config
-) as ExportedHandler
-
-export default {
-  async fetch(req: Request, env: Env, ctx: ExecutionContext) {
-    //This is the smallest set of event props Remix needs to handle assets correctly
-    const event = {
-      request: req,
-      waitUntil: ctx.waitUntil.bind(ctx),
-    } as FetchEvent
-
-    let response = await handleAsset(event, build, {
-      ASSET_NAMESPACE: env.__STATIC_CONTENT,
-      ASSET_MANIFEST: manifest,
-    })
-
-    if (response) return response
-
-    //@ts-ignore
-    return await instrumentableHandler.fetch(req, env, ctx)
-  },
-}
+)
