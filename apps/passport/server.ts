@@ -61,41 +61,6 @@ export function parseParams(request: Request) {
 }
 
 const handleEvent = async (event: FetchEvent, env: Env) => {
-  console.debug(`Handling assets for ${event.request.url}`)
-  let response
-  try {
-    const url = new URL(event.request.url)
-    const ttl = url.pathname.startsWith('/build/')
-      ? 60 * 60 * 24 * 365 // 1 year
-      : 60 * 5 // 5 minutes
-    if (url.pathname.startsWith('/build/'))
-      return await getAssetFromKV(event, {
-        ASSET_NAMESPACE: env.__STATIC_CONTENT,
-        ASSET_MANIFEST: manifest,
-        cacheControl: {
-          browserTTL: ttl,
-          edgeTTL: ttl,
-        },
-      })
-  } catch (error: any) {
-    console.debug(
-      'ERROR',
-      error,
-      error.stack,
-      error.name,
-      error.message,
-      error.cause,
-      error.linenumber,
-      error.filename
-    )
-    if (
-      error instanceof MethodNotAllowedError ||
-      error instanceof NotFoundError
-    ) {
-      return null
-    }
-  }
-
   //Create a new trace span with no parent
   const newTraceSpan = generateTraceSpan()
 
@@ -110,7 +75,6 @@ const handleEvent = async (event: FetchEvent, env: Env) => {
 
   const request = event.request as unknown as CfRequest<CfHostMetadata>
   const host = request.headers.get('host') as string
-  console.debug(`Before env.DEFAULT_HOSTS`)
   if (!env.DEFAULT_HOSTS.includes(host)) {
     const clientId = request.cf?.hostMetadata?.clientId
     if (!clientId) return new Response(null, { status: 404 })
@@ -149,6 +113,7 @@ const handleEvent = async (event: FetchEvent, env: Env) => {
     },
   })
 
+  let response
   try {
     console.debug(`Before requestHandler call`)
     response = await requestHandler(newEvent)
@@ -176,17 +141,39 @@ const config: ResolveConfigFn = (env: Env, _trigger) => {
   }
 }
 
-export default instrument(
-  {
-    async fetch(req: Request, env: Env, ctx: ExecutionContext) {
-      //This is the smallest set of event props Remix needs to handle assets correctly
-      const event = {
-        request: req,
-        waitUntil: ctx.waitUntil.bind(ctx),
-      } as FetchEvent
-      console.log(`Handling event for ${req.url}`)
-      return await handleEvent(event, env)
-    },
+const apiFetchHandler = {
+  async fetch(req: Request, env: Env, ctx: ExecutionContext) {
+    //This is the smallest set of event props Remix needs to handle assets correctly
+    const event = {
+      request: req,
+      waitUntil: ctx.waitUntil.bind(ctx),
+    } as FetchEvent
+    console.log(`Handling event for ${req.url}`)
+    return await handleEvent(event, env)
   },
+}
+
+const instrumentableHandler = instrument(
+  apiFetchHandler,
   config
-)
+) as ExportedHandler
+
+export default {
+  async fetch(req: Request, env: Env, ctx: ExecutionContext) {
+    //This is the smallest set of event props Remix needs to handle assets correctly
+    const event = {
+      request: req,
+      waitUntil: ctx.waitUntil.bind(ctx),
+    } as FetchEvent
+
+    let response = await handleAsset(event, build, {
+      ASSET_NAMESPACE: env.__STATIC_CONTENT,
+      ASSET_MANIFEST: manifest,
+    })
+
+    if (response) return response
+
+    //@ts-ignore
+    return await instrumentableHandler.fetch(req, env, ctx)
+  },
+}

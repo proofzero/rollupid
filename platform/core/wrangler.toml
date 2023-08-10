@@ -2,8 +2,8 @@ name = "core"
 main = "dist/index.js"
 compatibility_date = "2023-03-14"
 compatibility_flags = ["nodejs_compat", "no_minimal_subrequests"]
+logpush = true
 workers_dev = false
-# no_bundle = true
 
 durable_objects.bindings = [
   { name = "Access", class_name = "Authorization" },

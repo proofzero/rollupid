@@ -1,9 +1,8 @@
 name = "core"
-main = "src/index.ts"
+main = "dist/index.js"
 compatibility_date = "2023-03-14"
-compatibility_flags = ["no_minimal_subrequests"]
+compatibility_flags = ["nodejs_compat", "no_minimal_subrequests"]
 logpush = true
-node_compat = true
 workers_dev = false
 
 [env.dev]

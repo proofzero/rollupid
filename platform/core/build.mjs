@@ -28,7 +28,7 @@ await esbuild.build({
   plugins: [
     nodejsCompatPlugin,
     polyfillNode({
-      polyfills: { http: true, https: true, zlib: true },
+      polyfills: { http: true, https: true, zlib: true, crypto: true },
     }),
   ],
 })

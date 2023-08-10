@@ -24,7 +24,7 @@ const config: ResolveConfigFn = (env: Environment, _trigger) => {
       url: 'https://api.honeycomb.io/v1/traces',
       headers: { 'x-honeycomb-team': '' },
     },
-    service: { name: 'passport' },
+    service: { name: 'core' },
   }
 }
 
@@ -35,15 +35,6 @@ export default instrument(
       env: Environment,
       ctx: Context
     ): Promise<Response> {
-      console.log('ENV', JSON.stringify(env, null, 2))
-      console.log('CTX', ctx)
-      const D1result = await env.EDGES.prepare('SELECT * from node').all()
-      console.log('D1', {
-        duration: D1result.meta.duration,
-        error: D1result.error,
-        results: D1result.results?.length,
-      })
-      // return new Response('blah', { status: 200 })
       return fetchRequestHandler({
         endpoint: '/trpc',
         req: request,
