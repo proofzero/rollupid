@@ -361,7 +361,7 @@ export function ErrorBoundary({ error }) {
 
 export function CatchBoundary() {
   const caught = useCatch()
-  console.error('CaughtBoundary', caught)
+  console.error('CaughtBoundary', JSON.stringify(caught, null, 2))
 
   const { status } = caught
 

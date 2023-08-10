@@ -148,7 +148,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = ({ data }) => {
   return {
     title: 'Passport - Rollup',
     viewport: 'width=device-width,initial-scale=1',
@@ -248,6 +248,18 @@ export default function App() {
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
+        <meta title="Passport - Rollup" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="og:url" content="https://passport-dev.rollup.id" />
+        <meta name="og:title" content="Passport - Rollup" />
+        <meta
+          property="og:description"
+          content="Simple & Secure Private Auth"
+        />
+        <meta
+          property="og:image"
+          content="https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png"
+        />
         <Meta />
 
         {browserEnv.appProps?.iconURL ? (
@@ -369,7 +381,8 @@ export function ErrorBoundary({ error }) {
 
 export function CatchBoundary() {
   const caught = useCatch()
-  console.error('CaughtBoundary', caught)
+
+  console.error('CaughtBoundary', JSON.stringify(caught, null, 2))
 
   const { status } = caught
 
@@ -385,11 +398,23 @@ export function CatchBoundary() {
       secondary = 'Internal Server Error'
       break
   }
+
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <Meta />
+        <meta title="Passport - Rollup" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="og:url" content="https://passport-dev.rollup.id" />
+        <meta name="og:title" content="Passport - Rollup" />
+        <meta
+          property="og:description"
+          content="Simple & Secure Private Auth"
+        />
+        <meta
+          property="og:image"
+          content="https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png"
+        />
         <Links />
       </head>
       <body>
