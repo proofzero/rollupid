@@ -524,28 +524,24 @@ export default function AppDetailIndexPage() {
 
                 <div className="flex flex-col md:flex-row space-y-8 my-4 md:space-y-0 md:space-x-8 md:items-end">
                   <div className="flex-1 mb-1">
-                    <ReadOnlyInput
-                      id="appDomains"
-                      label="Domain(s)"
-                      className="cursor-no-drop"
-                      value=""
-                      required
+                    <IconPicker
+                      label="Upload Icon* (256x256)"
+                      maxSize={1048576}
+                      id="icon"
+                      errorMessage={errors?.['icon']}
+                      invalid={
+                        errors !== undefined &&
+                        errors.hasOwnProperty('icon') &&
+                        (errors['icon'] as string).length > 0
+                      }
+                      setIsFormChanged={
+                        setIsFormChanged as (val: boolean) => void
+                      }
+                      setIsImgUploading={
+                        setIsImgUploading as (val: boolean) => void
+                      }
+                      url={appDetails.app.icon}
                     />
-
-                    <Text
-                      type="span"
-                      size="xs"
-                      weight="medium"
-                      className="text-gray-400"
-                    >
-                      <a
-                        className="text-indigo-500"
-                        href="https://discord.gg/rollupid"
-                      >
-                        Contact us
-                      </a>{' '}
-                      to enable this feature
-                    </Text>
                   </div>
 
                   <div className="flex-1">
@@ -570,33 +566,6 @@ export default function AppDetailIndexPage() {
                       <div className="sm:mb-[1.755rem]" />
                     )}
                   </div>
-                </div>
-
-                <div>
-                  <IconPicker
-                    label="Upload Icon* (256x256)"
-                    ar={{
-                      w: 1,
-                      h: 1,
-                    }}
-                    minW={256}
-                    minH={256}
-                    maxSize={1048576}
-                    id="icon"
-                    errorMessage={errors?.['icon']}
-                    invalid={
-                      errors !== undefined &&
-                      errors.hasOwnProperty('icon') &&
-                      (errors['icon'] as string).length > 0
-                    }
-                    setIsFormChanged={
-                      setIsFormChanged as (val: boolean) => void
-                    }
-                    setIsImgUploading={
-                      setIsImgUploading as (val: boolean) => void
-                    }
-                    url={appDetails.app.icon}
-                  />
                 </div>
               </div>
             </Panel>
