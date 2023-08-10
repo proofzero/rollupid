@@ -2,12 +2,12 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import { AccountURN } from '@proofzero/urns/account'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { LoaderFunction, json } from '@remix-run/cloudflare'
-import { parseJwt, requireJWT } from '~/utilities/session.server'
+import { requireJWT } from '~/utilities/session.server'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 import { NO_OP_ADDRESS_PLACEHOLDER } from '@proofzero/platform/address/src/constants'
-import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
+import { AddressURNSpace } from '@proofzero/urns/address'
 import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
 import { Toaster } from '@proofzero/design-system/src/atoms/toast'
 
@@ -19,7 +19,7 @@ type GroupMemberModel = {
   joinTimestamp: number
 }
 
-type GroupModel = {
+export type GroupModel = {
   URN: string
   name: string
   members: GroupMemberModel[]

@@ -1,12 +1,19 @@
 import { Form, useNavigate, useOutletContext } from '@remix-run/react'
-import { type GroupRootContextData } from '../spuorg'
+import { GroupModel, type GroupRootContextData } from '../spuorg'
 import { Button, Text } from '@proofzero/design-system'
-import { HiDotsVertical, HiOutlineX, HiUserGroup } from 'react-icons/hi'
+import {
+  HiDotsVertical,
+  HiOutlineTrash,
+  HiOutlineX,
+  HiUserGroup,
+} from 'react-icons/hi'
 import { List } from '@proofzero/design-system/src/atoms/lists/List'
 import MultiAvatar from '@proofzero/design-system/src/molecules/avatar/MultiAvatar'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
+import { Menu, Transition } from '@headlessui/react'
+import dangerVector from '~/images/danger.svg'
 
 const CreateGroupModal = ({
   isOpen,
@@ -61,11 +68,97 @@ const CreateGroupModal = ({
   )
 }
 
+const DeleteGroupModal = ({
+  group,
+  isOpen,
+  handleClose,
+}: {
+  group: GroupModel
+  isOpen: boolean
+  handleClose: () => void
+}) => {
+  const [groupName, setGroupName] = useState('')
+
+  const clearStateAndHandleClose = () => {
+    setGroupName('')
+    handleClose()
+  }
+
+  return (
+    <Modal isOpen={isOpen} handleClose={() => clearStateAndHandleClose()}>
+      <div
+        className={`w-fit rounded-lg bg-white p-4
+         text-left  transition-all sm:p-5 overflow-y-auto flex items-start space-x-4`}
+      >
+        <img src={dangerVector} alt="danger" />
+
+        <Form
+          method="post"
+          action={`/spuorg/${group.URN.split('/')[1]}/delete`}
+          className="flex-1"
+          onSubmit={() => clearStateAndHandleClose()}
+        >
+          <div className="flex flex-row items-center justify-between w-full mb-2">
+            <Text size="lg" weight="medium" className="text-gray-900">
+              Delete Application
+            </Text>
+            <button
+              type="button"
+              className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+              onClick={() => {
+                handleClose()
+              }}
+              tabIndex={-1}
+            >
+              <HiOutlineX />
+            </button>
+          </div>
+
+          <section className="mb-4">
+            <Text size="sm" weight="normal" className="text-gray-500 my-3">
+              Are you sure you want to delete <b>{group.name}</b> group? This
+              action cannot be undone once confirmed.
+            </Text>
+            <Text size="sm" weight="normal" className="text-gray-500 my-3">
+              Confirm you want to delete this group by typing its name below.
+            </Text>
+            <Input
+              id="group_name"
+              label="Group Name"
+              placeholder={group.name}
+              required
+              className="mb-12"
+              value={groupName}
+              onChange={(e) => setGroupName(e.target.value)}
+              autoFocus
+            />
+          </section>
+
+          <div className="flex justify-end items-center space-x-3">
+            <Button btnType="secondary-alt">Cancel</Button>
+            <Button
+              type="submit"
+              btnType="dangerous"
+              disabled={groupName !== group.name}
+            >
+              Delete
+            </Button>
+          </div>
+        </Form>
+      </div>
+    </Modal>
+  )
+}
+
 export default () => {
   const { groups } = useOutletContext<GroupRootContextData>()
   const navigate = useNavigate()
 
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false)
+  const [isDeleteGroupModalOpen, setIsDeleteGroupModalOpen] = useState(false)
+
+  const [selectedGroup, setSelectedGroup] = useState<GroupModel>()
 
   return (
     <>
@@ -73,6 +166,14 @@ export default () => {
         isOpen={isCreateGroupModalOpen}
         handleClose={() => setIsCreateGroupModalOpen(false)}
       />
+
+      {selectedGroup && (
+        <DeleteGroupModal
+          isOpen={isDeleteGroupModalOpen}
+          handleClose={() => setIsDeleteGroupModalOpen(false)}
+          group={selectedGroup}
+        />
+      )}
 
       <section className="flex flex-row items-center justify-between mb-5">
         <Text size="2xl" weight="semibold">
@@ -160,9 +261,14 @@ export default () => {
             itemRenderer={(item) => (
               <article
                 key={item.key}
-                className="flex flex-row items-center justify-between w-full"
+                className="flex flex-row items-center justify-between w-full cursor-pointer"
               >
-                <div>
+                <div
+                  className="flex-1"
+                  onClick={() => {
+                    navigate(`/spuorg/${item.val.URN.split('/')[1]}`)
+                  }}
+                >
                   <Text size="base" weight="semibold" className="text-gray-800">
                     {item.val.name}
                   </Text>
@@ -178,21 +284,60 @@ export default () => {
                     size={32}
                   />
 
-                  <button
-                    className="p-2"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                    }}
-                  >
-                    <HiDotsVertical className="w-5 h-5 text-gray-500" />
-                  </button>
+                  <section className="p-1.5">
+                    <Menu>
+                      <Menu.Button>
+                        <div
+                          className="w-8 h-8 flex justify-center items-center cursor-pointer
+          hover:bg-gray-100 hover:rounded-[6px]"
+                        >
+                          <HiDotsVertical className="text-lg text-gray-400" />
+                        </div>
+                      </Menu.Button>
+
+                      <Transition
+                        as={Fragment}
+                        enter="transition ease-out duration-100"
+                        enterFrom="transform opacity-0 scale-95"
+                        enterTo="transform opacity-100 scale-100"
+                        leave="transition ease-in duration-75"
+                        leaveFrom="transform opacity-100 scale-100"
+                        leaveTo="transform opacity-0 scale-95"
+                      >
+                        <Menu.Items
+                          className="absolute z-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100
+          rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y
+           divide-gray-100"
+                        >
+                          <div className="p-1 ">
+                            <Menu.Item
+                              as="div"
+                              className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                  hover:rounded-[6px] hover:bg-gray-100"
+                              onClick={() => {
+                                setSelectedGroup(item.val)
+                                setIsDeleteGroupModalOpen(true)
+                              }}
+                            >
+                              <HiOutlineTrash className="text-xl font-normal text-red-500" />
+
+                              <Text
+                                size="sm"
+                                weight="normal"
+                                className="text-red-500"
+                              >
+                                Delete
+                              </Text>
+                            </Menu.Item>
+                          </div>
+                        </Menu.Items>
+                      </Transition>
+                    </Menu>
+                  </section>
                 </div>
               </article>
             )}
-            onItemClick={(item) => {
-              navigate(`/spuorg/${item.val.URN.split('/')[1]}`)
-            }}
-          ></List>
+          />
         </section>
       )}
     </>
