@@ -8,6 +8,9 @@ import {
   getProfileMethod,
   GetProfileInput,
   GetProfileOutput,
+  GetProfileBatchInput,
+  GetProfileBatchOutput,
+  getProfileBatchMethod,
 } from './methods/getProfile'
 import { setProfileMethod, SetProfileInput } from './methods/setProfile'
 import {
@@ -90,11 +93,6 @@ import {
   AcceptIdentityGroupMemberInvitationInputSchema,
   acceptIdentityGroupMemberInvitation,
 } from './methods/identity-groups/acceptIdentityGroupMemberInvitation'
-import {
-  GetProfileBatchInput,
-  GetProfileBatchOutput,
-  getProfileBatchMethod,
-} from './methods/getProfileBatch'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -116,8 +114,6 @@ export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
 
 export const appRouter = t.router({
   getProfile: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
     .use(Analytics)
@@ -260,8 +256,6 @@ export const appRouter = t.router({
     .input(AcceptIdentityGroupMemberInvitationInputSchema)
     .mutation(acceptIdentityGroupMemberInvitation),
   getProfileBatch: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
     .use(Analytics)
