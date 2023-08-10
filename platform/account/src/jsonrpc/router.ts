@@ -90,6 +90,11 @@ import {
   AcceptIdentityGroupMemberInvitationInputSchema,
   acceptIdentityGroupMemberInvitation,
 } from './methods/identity-groups/acceptIdentityGroupMemberInvitation'
+import {
+  GetProfileBatchInput,
+  GetProfileBatchOutput,
+  getProfileBatchMethod,
+} from './methods/getProfileBatch'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -254,4 +259,13 @@ export const appRouter = t.router({
     .use(injectAccountNode)
     .input(AcceptIdentityGroupMemberInvitationInputSchema)
     .mutation(acceptIdentityGroupMemberInvitation),
+  getProfileBatch: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(Scopes)
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetProfileBatchInput)
+    .output(GetProfileBatchOutput)
+    .query(getProfileBatchMethod),
 })

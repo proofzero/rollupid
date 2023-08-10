@@ -58,13 +58,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
             {} as Record<AccountURN, { URN: AccountURN; joinTimestamp: number }>
           )
 
-        const memberProfiles = await Promise.all(
-          group.members.map(async (m) => ({
-            profile: await coreClient.account.getProfile.query({
-              account: m.URN,
-            }),
-            URN: m.URN,
-          }))
+        const memberProfiles = await coreClient.account.getProfileBatch.query(
+          group.members.map((m) => m.URN)
         )
 
         const memberModels: GroupMemberModel[] = memberProfiles
