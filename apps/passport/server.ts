@@ -7,6 +7,7 @@ import * as build from '@remix-run/dev/server-build'
 
 import createCoreClient from '@proofzero/platform-clients/core'
 import {
+  TraceSpan,
   generateTraceContextHeaders,
   generateTraceSpan,
 } from '@proofzero/platform-middleware/trace'
@@ -19,6 +20,7 @@ import {
   NotFoundError,
   getAssetFromKV,
 } from '@cloudflare/kv-asset-handler'
+import { ServerBuild } from '@remix-run/cloudflare'
 
 let manifest = JSON.parse(manifestJSON)
 
@@ -61,16 +63,10 @@ export function parseParams(request: Request) {
 }
 
 const handleEvent = async (event: FetchEvent, env: Env) => {
-  //Create a new trace span with no parent
-  const newTraceSpan = generateTraceSpan()
-
   const reqURL = new URL(event.request.url)
-  //Have to force injection of new field so it is available in the context setup above
-  const newEvent = Object.assign(event, { traceSpan: newTraceSpan })
 
   console.debug(
-    `Started HTTP handler for ${reqURL.pathname}/${reqURL.searchParams}`,
-    newTraceSpan.toString()
+    `Started HTTP handler for ${reqURL.pathname}/${reqURL.searchParams}`
   )
 
   const request = event.request as unknown as CfRequest<CfHostMetadata>
@@ -78,17 +74,14 @@ const handleEvent = async (event: FetchEvent, env: Env) => {
   if (!env.DEFAULT_HOSTS.includes(host)) {
     const clientId = request.cf?.hostMetadata?.clientId
     if (!clientId) return new Response(null, { status: 404 })
-    const coreClient = createCoreClient(
-      env.Core,
-      generateTraceContextHeaders(newTraceSpan)
-    )
+    const coreClient = createCoreClient(env.Core, {})
 
     try {
       console.debug(`Before getAppProps`)
       const app = await coreClient.starbase.getAppPublicProps.query({
         clientId,
       })
-      newEvent.request.app_props = app
+      event.request.app_props = app
       const { customDomain } = app
       if (!customDomain) return new Response(null, { status: 404 })
       if (!customDomain.isActive || host !== customDomain?.hostname)
@@ -108,7 +101,7 @@ const handleEvent = async (event: FetchEvent, env: Env) => {
         authzQueryParams,
         appProps: (event.request as CustomDomainRequest).app_props,
         env,
-        traceSpan,
+        traceSpan: generateTraceSpan(),
       }
     },
   })
@@ -116,15 +109,14 @@ const handleEvent = async (event: FetchEvent, env: Env) => {
   let response
   try {
     console.debug(`Before requestHandler call`)
-    response = await requestHandler(newEvent)
+    response = await requestHandler(event)
   } finally {
     console.debug(
       `Completed HTTP handler ${
         response?.status && response?.status >= 400 && response?.status <= 599
           ? 'with errors '
           : ''
-      }for ${reqURL.pathname}/${reqURL.searchParams}`,
-      newTraceSpan.toString()
+      }for ${reqURL.pathname}/${reqURL.searchParams}`
     )
   }
 
@@ -135,45 +127,83 @@ const config: ResolveConfigFn = (env: Env, _trigger) => {
   return {
     exporter: {
       url: 'https://api.honeycomb.io/v1/traces',
-      headers: { 'x-honeycomb-team': '' },
+      headers: { 'x-honeycomb-team': env.SECRET_HONEYCOMB_API_KEY },
     },
     service: { name: 'passport' },
   }
 }
 
-const apiFetchHandler = {
-  async fetch(req: Request, env: Env, ctx: ExecutionContext) {
-    //This is the smallest set of event props Remix needs to handle assets correctly
-    const event = {
-      request: req,
-      waitUntil: ctx.waitUntil.bind(ctx),
-    } as FetchEvent
-    console.log(`Handling event for ${req.url}`)
-    return await handleEvent(event, env)
-  },
-}
+export async function manuallyHandleAsset(
+  event: FetchEvent,
+  build: ServerBuild,
+  options?: any
+) {
+  try {
+    if (process.env.NODE_ENV === 'development') {
+      return await getAssetFromKV(event, {
+        cacheControl: {
+          bypassCache: true,
+        },
+        ...options,
+      })
+    }
 
-const instrumentableHandler = instrument(
-  apiFetchHandler,
-  config
-) as ExportedHandler
+    let cacheControl = {}
+    let url = new URL(event.request.url)
+    let assetpath = build.assets.url.split('/').slice(0, -1).join('/')
+    let requestpath = url.pathname.split('/').slice(0, -1).join('/')
 
-export default {
-  async fetch(req: Request, env: Env, ctx: ExecutionContext) {
-    //This is the smallest set of event props Remix needs to handle assets correctly
-    const event = {
-      request: req,
-      waitUntil: ctx.waitUntil.bind(ctx),
-    } as FetchEvent
+    if (requestpath.startsWith(assetpath)) {
+      // Assets are hashed by Remix so are safe to cache in the browser
+      // And they're also hashed in KV storage, so are safe to cache on the edge
+      cacheControl = {
+        bypassCache: true,
+        edgeTTL: 31536000,
+        browserTTL: 31536000,
+      }
+    } else {
+      // Assets are not necessarily hashed in the request URL, so we cannot cache in the browser
+      // But they are hashed in KV storage, so we can cache on the edge
+      cacheControl = {
+        bypassCache: true,
+        edgeTTL: 31536000,
+      }
+    }
 
-    let response = await handleAsset(event, build, {
-      ASSET_NAMESPACE: env.__STATIC_CONTENT,
-      ASSET_MANIFEST: manifest,
+    return await getAssetFromKV(event, {
+      cacheControl,
+      ...options,
     })
+  } catch (error: unknown) {
+    if (
+      error instanceof MethodNotAllowedError ||
+      error instanceof NotFoundError
+    ) {
+      return null
+    }
 
-    if (response) return response
-
-    //@ts-ignore
-    return await instrumentableHandler.fetch(req, env, ctx)
-  },
+    throw error
+  }
 }
+
+export default instrument(
+  {
+    async fetch(req: Request, env: Env, ctx: ExecutionContext) {
+      //This is the smallest set of event props Remix needs to handle assets correctly
+      const event = {
+        request: req,
+        waitUntil: ctx.waitUntil.bind(ctx),
+      } as FetchEvent
+
+      let response = await manuallyHandleAsset(event, build, {
+        ASSET_NAMESPACE: env.__STATIC_CONTENT,
+        ASSET_MANIFEST: manifest,
+      })
+
+      if (response) return response
+
+      return await handleEvent(event, env)
+    },
+  },
+  config
+)

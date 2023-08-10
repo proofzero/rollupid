@@ -54,4 +54,5 @@ export interface Environment {
 
   POSTHOG_API_KEY: string
   SECRET_ZERODEV_PROJECTID: string
+  SECRET_HONEYCOMB_API_KEY: string
 }

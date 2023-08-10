@@ -6,7 +6,7 @@ export interface BaseApi {
 }
 
 export type RequiredPlatformHeaders = {
-  [TRACEPARENT_HEADER_NAME]: string
+  [TRACEPARENT_HEADER_NAME]?: string
 }
 
 export type PlatformHeaders = Record<string, string> & RequiredPlatformHeaders

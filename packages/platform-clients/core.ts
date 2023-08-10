@@ -14,7 +14,13 @@ const createCoreClient = (fetcher: Fetcher, headers: PlatformHeaders) =>
         url: 'http://localhost:10201/trpc',
         fetch: fetcher.fetch.bind(fetcher), // NOTE: preflight middleware?
         headers() {
-          return headers || {}
+          const { traceparent, ...headersWithoutTracecontext } = headers
+          console.debug(
+            'HEADERS WITHOUUT TRACECONTEXT',
+            headersWithoutTracecontext,
+            traceparent
+          )
+          return headersWithoutTracecontext || {}
         },
       }),
     ],

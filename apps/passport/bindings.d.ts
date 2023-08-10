@@ -49,6 +49,7 @@ declare global {
     POSTHOG_PROXY_HOST: string
     //Needed to make Remix work with Cloudflare module workers
     __STATIC_CONTENT: Fetcher
+    SECRET_HONEYCOMB_API_KEY: string
   }
 
   interface AuthzParams {

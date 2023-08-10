@@ -22,7 +22,7 @@ const config: ResolveConfigFn = (env: Environment, _trigger) => {
   return {
     exporter: {
       url: 'https://api.honeycomb.io/v1/traces',
-      headers: { 'x-honeycomb-team': '' },
+      headers: { 'x-honeycomb-team': env.SECRET_HONEYCOMB_API_KEY },
     },
     service: { name: 'core' },
   }
