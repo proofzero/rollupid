@@ -1,7 +1,7 @@
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { ActionFunction, redirect } from '@remix-run/cloudflare'
-import { requireJWT } from '~/utilities/session.server'
+import { commitFlashSession, requireJWT } from '~/utilities/session.server'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import {
@@ -10,6 +10,8 @@ import {
 } from '@proofzero/urns/identity-group'
 import { BadRequestError } from '@proofzero/errors'
 import { AccountURN } from '@proofzero/urns/account'
+import { appendToastToFlashSession } from '~/utils/toast.server'
+import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -36,17 +38,56 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    if (purge) {
-      await coreClient.account.deleteIdentityGroup.mutate(groupURN)
+    let toastSession
 
-      return redirect('/spuorg')
+    try {
+      if (purge) {
+        await coreClient.account.deleteIdentityGroup.mutate(groupURN)
+
+        toastSession = await appendToastToFlashSession(
+          request,
+          {
+            message: `Succesfully purged group`,
+            type: ToastType.Success,
+          },
+          context.env
+        )
+
+        return redirect('/spuorg', {
+          headers: {
+            'Set-Cookie': await commitFlashSession(toastSession, context.env),
+          },
+        })
+      }
+
+      await coreClient.account.deleteIdentityGroupMembership.mutate({
+        accountURN: accountURN as AccountURN,
+        identityGroupURN: groupURN,
+      })
+
+      toastSession = await appendToastToFlashSession(
+        request,
+        {
+          message: `Succesfully removed member`,
+          type: ToastType.Success,
+        },
+        context.env
+      )
+    } catch (e) {
+      toastSession = await appendToastToFlashSession(
+        request,
+        {
+          message: `There was an error removing the member`,
+          type: ToastType.Error,
+        },
+        context.env
+      )
     }
 
-    await coreClient.account.deleteIdentityGroupMembership.mutate({
-      accountURN: accountURN as AccountURN,
-      identityGroupURN: groupURN,
+    return redirect(`/spuorg/${groupID}`, {
+      headers: {
+        'Set-Cookie': await commitFlashSession(toastSession, context.env),
+      },
     })
-
-    return redirect(`/spuorg/${groupID}`)
   }
 )
