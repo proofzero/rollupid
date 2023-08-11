@@ -77,6 +77,14 @@ export const EmailOTPThemeSchema = z.object({
 
 export type EmailOTPTheme = z.infer<typeof EmailOTPThemeSchema>
 
+export const OGThemeSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+  image: z.string().url().optional(),
+})
+
+export type OGTheme = z.infer<typeof OGThemeSchema>
+
 export const AppPublicPropsSchema = z.object({
   name: z.string(),
   iconURL: z.string(),

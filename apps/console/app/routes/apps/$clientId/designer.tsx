@@ -23,6 +23,7 @@ import {
   HiOutlineMail,
   HiOutlineX,
   HiOutlineShare,
+  HiOutlineExternalLink,
 } from 'react-icons/hi'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 
@@ -50,6 +51,7 @@ import {
   AppThemeSchema,
   EmailOTPTheme,
   EmailOTPThemeSchema,
+  OGTheme,
 } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
@@ -1230,6 +1232,174 @@ const EmailPanel = ({
   )
 }
 
+const OGPanel = ({
+  errors,
+  setLoading,
+  OGTheme,
+}: {
+  errors?: {
+    [key: string]: string
+  }
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>
+  OGTheme?: OGTheme
+}) => {
+  const [localErrors, setLocalErrors] = useState<{
+    [key: string]: string
+  }>()
+
+  const [ogImageURL, setOgImageURL] = useState<string | undefined>(
+    OGTheme?.image
+  )
+
+  const [ogDescription, setOgDescription] = useState<string | undefined>(
+    OGTheme?.description
+  )
+
+  const [ogTitle, setOgTitle] = useState<string | undefined>(OGTheme?.title)
+
+  useEffect(() => {
+    setLocalErrors(errors)
+  }, [errors])
+
+  return (
+    <>
+      <Tab.Panel className="flex flex-col lg:flex-row gap-7">
+        <input type="hidden" name="target" value="email" />
+
+        <section className="flex-1 bg-white border rounded-lg h-max">
+          <Text size="lg" weight="semibold" className="mx-8 my-4 text-gray-900">
+            Open Graph Settings
+          </Text>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement label="Open Graph Title">
+            <Input
+              id={'OGTitle'}
+              label={''}
+              placeholder={'Open Graph Title'}
+              onChange={(e) => {
+                setOgTitle(e.target.value)
+              }}
+              value={ogTitle}
+              error={errors && errors['OGTitle']}
+            />
+
+            {errors && errors['OGTitle'] && (
+              <Text
+                className="mb-1.5 mt-1.5 text-red-500"
+                size="xs"
+                weight="normal"
+              >
+                {errors['OGTitle']}
+              </Text>
+            )}
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement label="Business Address">
+            <InputTextarea
+              id="OGDescription"
+              heading=""
+              placeholder="Open Graph Description"
+              value={ogDescription ?? ''}
+              onChange={setOgDescription}
+              error={
+                localErrors && localErrors['OGTheme.description'] ? true : false
+              }
+            />
+
+            {localErrors && localErrors['OGTheme.description'] && (
+              <Text
+                className="mb-1.5 mt-1.5 text-red-500"
+                size="xs"
+                weight="normal"
+              >
+                {localErrors['OGTheme.description']}
+              </Text>
+            )}
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement
+            label="Open Graph Image"
+            sublabel="1,91:1 ratio (at least 1200x630px) images can't be larger than 2MB"
+          >
+            <div className="flex flex-row items-center gap-2">
+              <IconPicker
+                maxSize={2097152}
+                id="OGImage"
+                setIsFormChanged={(val) => {}}
+                setIsImgUploading={(val) => {
+                  setLoading(val)
+                }}
+                imageUploadCallback={setOgImageURL}
+                url={ogImageURL}
+                invalid={
+                  localErrors && localErrors['OGTheme.image'] ? true : false
+                }
+                errorMessage={
+                  localErrors && localErrors['OGTheme.image']
+                    ? localErrors['OGTheme.image']
+                    : ''
+                }
+              />
+
+              {ogImageURL && (
+                <button
+                  type="button"
+                  className="flex justify-center items-center py-2 px-4"
+                  onClick={() => {
+                    setOgImageURL(undefined)
+                  }}
+                >
+                  <Text size="xs" weight="medium" className="text-gray-200">
+                    Remove
+                  </Text>
+                </button>
+              )}
+            </div>
+          </FormElement>
+          <div className="w-full border-b border-gray-200"></div>
+          <FormElement label="Preview OpenGraph Meta Tags">
+            <div
+              className="text-indigo-500 hover:cursor-pointer hover:underline
+             flex flex-row items-center gap-1"
+            >
+              <Text size="sm">Preview</Text>
+              <HiOutlineExternalLink />
+            </div>
+          </FormElement>
+        </section>
+
+        <section className="bg-white border rounded-lg pb-3 px-6 min-w-[468px] h-max overflow-scroll">
+          <div className="flex flex-row items-center justify-between my-4">
+            <Text size="lg" weight="semibold" className="text-gray-900">
+              Preview
+            </Text>
+          </div>
+
+          <div className="w-full h-[256px] bg-gray-100 rounded-lg"></div>
+          <div className="flex-1 mb-2 lg:mb-0">
+            <Text size="lg" weight="semibold" className="text-gray-900 mb-2">
+              Open Graph Title
+            </Text>
+
+            <Text size="xs" weight="normal" className="text-gray-500">
+              Open Graph Description
+            </Text>
+            <Text size="xs" weight="normal" className="text-gray-500">
+              website.com/auth
+            </Text>
+          </div>
+        </section>
+      </Tab.Panel>
+    </>
+  )
+}
+
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
     if (!params.clientId) {
@@ -1549,15 +1719,7 @@ export default () => {
               errors={errors}
             />
 
-            <EmailPanel
-              clientId={appDetails.clientId!}
-              addressURN={appContactAddress}
-              appContactEmail={appContactEmail}
-              appPublished={appDetails.published ?? false}
-              emailTheme={emailTheme}
-              setLoading={setLoading}
-              errors={errors}
-            />
+            <OGPanel setLoading={setLoading} errors={errors} />
 
             <EmailPanel
               clientId={appDetails.clientId!}
