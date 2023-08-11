@@ -23,6 +23,7 @@ import type {
   EdgeQueryResults,
   NodeFilter,
 } from './types'
+import { InternalServerError } from '@proofzero/errors'
 
 enum compType {
   SRCQ = 'SRCQ',
@@ -132,7 +133,7 @@ export async function nodeBatch(
 ): Promise<(Node | undefined)[]> {
   const prepStatements = filters.map((f) => getPrepStatementForNodeFilter(g, f))
   const batchResults = await g.db.batch(prepStatements)
-  const results = batchResults.map((r) => getNodeFromResultSet(r))
+  const results = batchResults.flatMap((r) => getNodeFromResultSet(r))
   return results
 }
 
@@ -142,11 +143,15 @@ export async function node(
 ): Promise<Node | undefined> {
   const prepStatement = getPrepStatementForNodeFilter(g, filter)
   const resultSet = await prepStatement.all()
-  const node = getNodeFromResultSet(resultSet)
-  return node
+  const nodes = getNodeFromResultSet(resultSet)
+  if (nodes.length > 1)
+    throw new InternalServerError({
+      message: 'Mode than one node returned for a single-node query',
+    })
+  return nodes[0]
 }
 
-function getNodeFromResultSet(resultSet: D1Result): Node | undefined {
+function getNodeFromResultSet(resultSet: D1Result): Node[] {
   type resultRec = {
     urn: AnyURN
     compType: compType
@@ -154,11 +159,15 @@ function getNodeFromResultSet(resultSet: D1Result): Node | undefined {
     v: string
   }
 
-  let node: Node | undefined = undefined
+  let results: Node[] = []
+  let node = undefined
+
   for (const result of (resultSet.results as resultRec[]) || []) {
+    if (node && node.baseUrn !== result.urn) {
+      results.push(node)
+      node = undefined
+    }
     if (!node) node = { baseUrn: result.urn, qc: {}, rc: {} }
-    if (node.baseUrn !== result.urn)
-      throw new Error('More than one node found for given criteria.')
 
     if (result.compType === compType.SRCQ) {
       const compRec = { [result.k]: result.v }
@@ -169,8 +178,9 @@ function getNodeFromResultSet(resultSet: D1Result): Node | undefined {
       Object.assign(node.rc, compRec)
     }
   }
+  if (node) results.push(node)
 
-  return node
+  return results
 }
 
 function getPrepStatementForNodeFilter(

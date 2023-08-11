@@ -26,19 +26,24 @@ export const getAddressURNForEmailMethod = async ({
 }): Promise<GetAddressURNForEmailResult> => {
   const caller = router.createCaller(ctx)
 
-  let node = await caller.edges.findNode({
-    qc: {
-      alias: input,
+  let node = await caller.edges.findNodeBatch([
+    {
+      qc: {
+        alias: input,
+      },
     },
-  })
+  ])
 
   if (!node) {
-    node = await caller.edges.findNode({
-      qc: {
-        alias: input.toLowerCase(),
+    node = await caller.edges.findNodeBatch([
+      {
+        qc: {
+          alias: input.toLowerCase(),
+        },
       },
-    })
+    ])
   }
 
-  return node?.baseUrn as AddressURN
+  //We return first urn
+  return node.length > 0 ? (node[0]?.baseUrn as AddressURN) : undefined
 }
