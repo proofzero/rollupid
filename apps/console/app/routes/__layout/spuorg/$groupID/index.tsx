@@ -5,13 +5,15 @@ import {
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
 import {
+  Form,
   Link,
   useFetcher,
   useLoaderData,
+  useNavigate,
   useOutletContext,
 } from '@remix-run/react'
 import { GroupRootContextData } from '../../spuorg'
-import { useRef, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import {
   CryptoAddressType,
   EmailAddressType,
@@ -38,7 +40,7 @@ import {
 } from 'react-icons/hi'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { getProviderIcons } from '@proofzero/design-system/src/helpers'
-import { Listbox, Transition } from '@headlessui/react'
+import { Listbox, Menu, Transition } from '@headlessui/react'
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -48,6 +50,7 @@ import { InviteRes } from './invite'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
+import { AccountURN } from '@proofzero/urns/account'
 
 const addressTypes = [
   ...Object.values(EmailAddressType),
@@ -360,16 +363,63 @@ const InviteMemberModal = ({
   )
 }
 
+const RemoveMemberModal = ({
+  accountURN,
+  groupID,
+  isOpen,
+  handleClose,
+  purge,
+}: {
+  accountURN: AccountURN
+  groupID: string
+  isOpen: boolean
+  handleClose: () => void
+  purge?: boolean
+}) => {
+  return (
+    <Modal isOpen={isOpen} handleClose={handleClose}>
+      <div className="p-6">
+        <Form
+          method="post"
+          action={`/spuorg/${groupID}/kick`}
+          onSubmit={() => {
+            handleClose()
+          }}
+        >
+          <input name="accountURN" type="hidden" value={accountURN} />
+          {purge && <input name="purge" type="hidden" value="true" />}
+
+          <section className="flex flex-row items-center justify-end gap-4">
+            <Button type="button" btnType="secondary-alt">
+              Cancel
+            </Button>
+
+            <Button type="submit" btnType="primary-alt">
+              Confirm
+            </Button>
+          </section>
+        </Form>
+      </div>
+    </Modal>
+  )
+}
+
 export default () => {
   const { groups, PASSPORT_URL, accountURN } =
     useOutletContext<GroupRootContextData>()
   const { URN, groupID, invitations } = useLoaderData<LoaderData>()
 
-  const group = useRef(groups.find((group) => group.URN === URN))
+  const group = useMemo(
+    () => groups.find((group) => group.URN === URN),
+    [groups]
+  )
 
   const [inviteModalOpen, setInviteModalOpen] = useState(false)
 
   const hydrated = useHydrated()
+
+  const [selectedMemberURN, setSelectedMemberURN] = useState<AccountURN>()
+  const [removeMemberModalOpen, setRemoveMemberModalOpen] = useState(false)
 
   return (
     <>
@@ -380,7 +430,17 @@ export default () => {
         passportURL={PASSPORT_URL}
       />
 
-      {group.current && (
+      {group && selectedMemberURN && (
+        <RemoveMemberModal
+          isOpen={removeMemberModalOpen}
+          handleClose={() => setRemoveMemberModalOpen(false)}
+          groupID={groupID}
+          accountURN={selectedMemberURN}
+          purge={group.members.length === 1}
+        />
+      )}
+
+      {group && (
         <section className="-mt-4">
           <Breadcrumbs
             trail={[
@@ -389,7 +449,7 @@ export default () => {
                 href: '/spuorg',
               },
               {
-                label: group.current.name,
+                label: group.name,
               },
             ]}
             LinkType={Link}
@@ -399,7 +459,7 @@ export default () => {
 
       <section className="flex flex-row items-center justify-between mb-5">
         <Text size="2xl" weight="semibold">
-          {group.current?.name}
+          {group?.name}
         </Text>
       </section>
 
@@ -424,7 +484,7 @@ export default () => {
         />
       </section>
 
-      {group.current && (
+      {group && (
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div>
             <div className="mb-4 flex items-center gap-2">
@@ -511,14 +571,14 @@ export default () => {
 
               <Pill className="bg-gray-200 rounded-lg !pr-2">
                 <Text size="xs" weight="medium" className="text-gray-800">
-                  {group.current.members.length}
+                  {group.members.length}
                 </Text>
               </Pill>
             </div>
 
             <div>
               <List
-                items={group.current.members.map((m) => ({
+                items={group.members.map((m) => ({
                   key: m.URN,
                   val: m,
                 }))}
@@ -574,14 +634,56 @@ export default () => {
                       </div>
                     </div>
 
-                    <button
-                      className="p-2"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                      }}
-                    >
-                      <HiDotsVertical className="w-5 h-5 text-gray-500" />
-                    </button>
+                    <section className="p-1.5">
+                      <Menu>
+                        <Menu.Button>
+                          <div
+                            className="w-8 h-8 flex justify-center items-center cursor-pointer
+          hover:bg-gray-100 hover:rounded-[6px]"
+                          >
+                            <HiDotsVertical className="text-lg text-gray-400" />
+                          </div>
+                        </Menu.Button>
+
+                        <Transition
+                          as={Fragment}
+                          enter="transition ease-out duration-100"
+                          enterFrom="transform opacity-0 scale-95"
+                          enterTo="transform opacity-100 scale-100"
+                          leave="transition ease-in duration-75"
+                          leaveFrom="transform opacity-100 scale-100"
+                          leaveTo="transform opacity-0 scale-95"
+                        >
+                          <Menu.Items
+                            className="absolute z-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100
+          rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y
+           divide-gray-100"
+                          >
+                            <div className="p-1 ">
+                              <Menu.Item
+                                as="div"
+                                className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                  hover:rounded-[6px] hover:bg-gray-100"
+                                onClick={() => {
+                                  setSelectedMemberURN(item.val.URN)
+                                  setRemoveMemberModalOpen(true)
+                                }}
+                              >
+                                <HiOutlineTrash className="text-xl font-normal text-red-500" />
+
+                                <Text
+                                  size="sm"
+                                  weight="normal"
+                                  className="text-red-500"
+                                >
+                                  Delete
+                                </Text>
+                              </Menu.Item>
+                            </div>
+                          </Menu.Items>
+                        </Transition>
+                      </Menu>
+                    </section>
                   </article>
                 )}
               />

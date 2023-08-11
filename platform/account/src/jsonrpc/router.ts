@@ -283,5 +283,5 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(Analytics)
     .input(DeleteIdentityGroupMembershipInputSchema)
-    .query(deleteIdentityGroupMembership),
+    .mutation(deleteIdentityGroupMembership),
 })
