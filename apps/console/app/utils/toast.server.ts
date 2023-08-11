@@ -3,9 +3,14 @@ import { Session, SessionData } from '@remix-run/cloudflare'
 import { Env } from 'bindings'
 import { getFlashSession } from '~/utilities/session.server'
 
+export type ToastModel = {
+  type: ToastType
+  message: string
+}
+
 export const appendToastToFlashSession = async (
   request: Request,
-  toast: { type: ToastType; message: string },
+  toast: ToastModel,
   env: Env
 ) => {
   const flashSession = await getFlashSession(request, env)
@@ -22,10 +27,7 @@ export const getToastsAndFlashSession = async (request: Request, env: Env) => {
     SessionData,
     SessionData
   >
-  const toasts = (flashSession.get('toasts') ?? []) as {
-    type: ToastType
-    message: string
-  }[]
+  const toasts = (flashSession.get('toasts') ?? []) as ToastModel[]
 
   return {
     flashSession,

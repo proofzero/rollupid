@@ -2,14 +2,16 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import { AccountURN } from '@proofzero/urns/account'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { LoaderFunction, json } from '@remix-run/cloudflare'
-import { requireJWT } from '~/utilities/session.server'
+import { commitFlashSession, requireJWT } from '~/utilities/session.server'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { PlatformAddressURNHeader } from '@proofzero/types/headers'
 import { NO_OP_ADDRESS_PLACEHOLDER } from '@proofzero/platform/address/src/constants'
 import { AddressURNSpace } from '@proofzero/urns/address'
 import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
-import { Toaster } from '@proofzero/design-system/src/atoms/toast'
+import { Toaster, toast } from '@proofzero/design-system/src/atoms/toast'
+import { ToastModel, getToastsAndFlashSession } from '~/utils/toast.server'
+import { useEffect } from 'react'
 
 type GroupMemberModel = {
   URN: AccountURN
@@ -86,19 +88,53 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
     )
 
-    return json<GroupRootLoaderData>({
-      groups: mappedGroups,
-      CONSOLE_URL: context.env.CONSOLE_URL,
-      PASSPORT_URL: context.env.PASSPORT_URL,
-    })
+    const { flashSession, toasts } = await getToastsAndFlashSession(
+      request,
+      context.env
+    )
+
+    return json<
+      GroupRootLoaderData & {
+        toasts: ToastModel[]
+      }
+    >(
+      {
+        groups: mappedGroups,
+        CONSOLE_URL: context.env.CONSOLE_URL,
+        PASSPORT_URL: context.env.PASSPORT_URL,
+        toasts,
+      },
+      {
+        headers: {
+          'Set-Cookie': await commitFlashSession(flashSession, context.env),
+        },
+      }
+    )
   }
 )
 
 export default () => {
-  const data = useLoaderData<GroupRootLoaderData>()
+  const data = useLoaderData<
+    GroupRootLoaderData & {
+      toasts: ToastModel[]
+    }
+  >()
+
   const { accountURN } = useOutletContext<{
     accountURN: AccountURN
   }>()
+
+  useEffect(() => {
+    const toasts = data.toasts
+
+    if (!toasts || !toasts.length) return
+
+    for (const { type, message } of toasts) {
+      toast(type, {
+        message: message,
+      })
+    }
+  }, [data.toasts])
 
   return (
     <>
