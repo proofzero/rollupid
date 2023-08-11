@@ -6,20 +6,15 @@ import {
   EmailAddressType,
   OAuthAddressType,
 } from '@proofzero/types/address'
-import {
-  AccountURNInput,
-  IdentityGroupURNValidator,
-} from '@proofzero/platform-middleware/inputValidators'
+import { IdentityGroupURNValidator } from '@proofzero/platform-middleware/inputValidators'
 import { initIdentityGroupNodeByName } from '../../../nodes'
-import { hexlify } from '@ethersproject/bytes'
-import { randomBytes } from '@ethersproject/random'
 import { IDENTITY_GROUP_OPTIONS } from '../../../constants'
 import { router } from '@proofzero/platform.core'
 import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
 import generateRandomString from '@proofzero/utils/generateRandomString'
+import { AccountURN } from '@proofzero/urns/account'
 
 export const InviteIdentityGroupMemberInputSchema = z.object({
-  inviterAccountURN: AccountURNInput,
   identityGroupURN: IdentityGroupURNValidator,
   identifier: z.string(),
   addressType: z.union([
@@ -48,7 +43,8 @@ export const inviteIdentityGroupMember = async ({
   input: InviteIdentityGroupMemberInput
   ctx: Context
 }): Promise<InviteIdentityGroupMemberOutput> => {
-  const { inviterAccountURN, identityGroupURN, identifier, addressType } = input
+  const { identityGroupURN, identifier, addressType } = input
+  const inviterAccountURN = ctx.accountURN as AccountURN
 
   const node = await initIdentityGroupNodeByName(
     identityGroupURN,

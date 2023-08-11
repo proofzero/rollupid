@@ -6,6 +6,8 @@ import { appRouter } from '../router'
 import { ProfileSchema } from '../validators/profile'
 import { Node } from '../../../../edges/src/jsonrpc/validators/node'
 import { AddressURN } from '@proofzero/urns/address'
+import { AccountURN } from '@proofzero/urns/account'
+import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 
 export const GetProfileInput = z.object({
   account: inputValidators.AccountURNInput,
@@ -31,15 +33,11 @@ export const getProfileMethod = async ({
   const node = await initAccountNodeByName(input.account, ctx.Account)
   const caller = appRouter.createCaller(ctx)
 
-  const getAddressesCall =
-    ctx.accountURN === input.account
-      ? caller.getOwnAddresses
-      : caller.getPublicAddresses
-
   const [profile, addresses] = await Promise.all([
     node.class.getProfile(),
-    getAddressesCall({ account: input.account }),
+    caller.getPublicAddresses({ account: input.account }),
   ])
+
   if (!profile) return null
   if (!profile.primaryAddressURN) {
     const caller = appRouter.createCaller(ctx)
@@ -55,3 +53,37 @@ export const getProfileMethod = async ({
 
   return { ...profile, addresses }
 }
+
+export const GetProfileBatchInput = z.array(inputValidators.AccountURNInput)
+export const GetProfileBatchOutput = z.array(
+  z.object({
+    profile: ProfileSchema.merge(
+      z.object({
+        addresses: z.array(Node),
+      })
+    ).nullable(),
+    URN: AccountURNInput,
+  })
+)
+
+export type GetProfileBatchOutputParams = z.infer<typeof GetProfileBatchOutput>
+export type GetProfileBatchParams = z.infer<typeof GetProfileBatchInput>
+
+export const getProfileBatchMethod = async ({
+  input,
+  ctx,
+}: {
+  input: GetProfileBatchParams
+  ctx: Context
+}): Promise<GetProfileBatchOutputParams> =>
+  Promise.all(
+    input.map(async (accountURN) => ({
+      profile: await getProfileMethod({
+        input: {
+          account: accountURN,
+        },
+        ctx,
+      }),
+      URN: accountURN as AccountURN,
+    }))
+  )

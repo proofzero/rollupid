@@ -8,6 +8,9 @@ import {
   getProfileMethod,
   GetProfileInput,
   GetProfileOutput,
+  GetProfileBatchInput,
+  GetProfileBatchOutput,
+  getProfileBatchMethod,
 } from './methods/getProfile'
 import { setProfileMethod, SetProfileInput } from './methods/setProfile'
 import {
@@ -68,7 +71,6 @@ import {
   createIdentityGroup,
 } from './methods/identity-groups/createIdentityGroup'
 import {
-  ListIdentityGroupsInputSchema,
   ListIdentityGroupsOutputSchema,
   listIdentityGroups,
 } from './methods/identity-groups/listIdentityGroups'
@@ -112,8 +114,6 @@ export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
 
 export const appRouter = t.router({
   getProfile: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
     .use(Analytics)
@@ -224,7 +224,6 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
-    .input(ListIdentityGroupsInputSchema)
     .output(ListIdentityGroupsOutputSchema)
     .query(listIdentityGroups),
   inviteIdentityGroupMember: t.procedure
@@ -256,4 +255,11 @@ export const appRouter = t.router({
     .use(injectAccountNode)
     .input(AcceptIdentityGroupMemberInvitationInputSchema)
     .mutation(acceptIdentityGroupMemberInvitation),
+  getProfileBatch: t.procedure
+    .use(Scopes)
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetProfileBatchInput)
+    .output(GetProfileBatchOutput)
+    .query(getProfileBatchMethod),
 })

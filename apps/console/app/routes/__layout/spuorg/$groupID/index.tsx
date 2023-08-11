@@ -361,7 +361,7 @@ const InviteMemberModal = ({
 }
 
 export default () => {
-  const { groups, PASSPORT_URL, ownAddressURNList } =
+  const { groups, PASSPORT_URL, accountURN } =
     useOutletContext<GroupRootContextData>()
   const { URN, groupID, invitations } = useLoaderData<LoaderData>()
 
@@ -539,7 +539,7 @@ export default () => {
                           {item.val.title}
                         </Text>
 
-                        {ownAddressURNList.includes(item.key) && (
+                        {accountURN === item.key && (
                           <Pill className="bg-indigo-50 rounded-lg !pr-2">
                             <Text
                               size="xs"
