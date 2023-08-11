@@ -1,13 +1,15 @@
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { ActionFunction, redirect } from '@remix-run/cloudflare'
-import { requireJWT } from '~/utilities/session.server'
+import { commitFlashSession, requireJWT } from '~/utilities/session.server'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
+import { appendToastToFlashSession } from '~/utils/toast.server'
+import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -24,8 +26,34 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    await coreClient.account.deleteIdentityGroup.mutate(groupURN)
+    let toastSession
 
-    return redirect('/spuorg')
+    try {
+      await coreClient.account.deleteIdentityGroup.mutate(groupURN)
+
+      toastSession = await appendToastToFlashSession(
+        request,
+        {
+          message: `Succesfully deleted group`,
+          type: ToastType.Success,
+        },
+        context.env
+      )
+    } catch (e) {
+      toastSession = await appendToastToFlashSession(
+        request,
+        {
+          message: `There was an error deleting the group`,
+          type: ToastType.Error,
+        },
+        context.env
+      )
+    }
+
+    return redirect('/spuorg', {
+      headers: {
+        'Set-Cookie': await commitFlashSession(toastSession, context.env),
+      },
+    })
   }
 )
