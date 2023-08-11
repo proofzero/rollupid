@@ -819,7 +819,7 @@ export default () => {
               {groupApps.map((app) => (
                 <article className="flex justify-center items-center border border-gray-200 shadow-sm rounded bg-white">
                   <section>
-                    <div className="rounded-l w-16 h-[3.25rem] flex justify-center items-center bg-gray-200 overflow-hidden">
+                    <div className="rounded-l w-16 h-[3.75rem] flex justify-center items-center bg-gray-200 overflow-hidden">
                       {!app.icon && (
                         <Text className="text-gray-500">
                           {app.name?.substring(0, 1)}
