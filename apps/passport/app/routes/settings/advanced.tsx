@@ -74,6 +74,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             })
           })
         ),
+        coreClient.account.purgeIdentityGroupMemberships.mutate(),
       ])
 
       await coreClient.account.deleteAccountNode.mutate({ account: accountUrn })

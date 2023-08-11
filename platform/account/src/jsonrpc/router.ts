@@ -101,6 +101,7 @@ import {
   DeleteIdentityGroupInputSchema,
   deleteIdentityGroup,
 } from './methods/identity-groups/deleteIdentityGroup'
+import { purgeIdentityGroupMemberships } from './methods/identity-groups/purgeIdentityGroupMemberships'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -284,4 +285,10 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(DeleteIdentityGroupMembershipInputSchema)
     .mutation(deleteIdentityGroupMembership),
+  purgeIdentityGroupMemberships: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .mutation(purgeIdentityGroupMemberships),
 })
