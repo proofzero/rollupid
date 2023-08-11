@@ -71,7 +71,11 @@ export interface CreateInnerContextOptions
 export async function createContextInner(
   opts: CreateInnerContextOptions & Environment
 ) {
-  console.debug('RECEIVED HEADERS', JSON.stringify(opts.req?.headers, null, 2))
+  console.debug(
+    'RECEIVED HEADERS',
+    JSON.stringify(opts.req?.headers, null, 2),
+    opts.req?.headers.get('traceparent')
+  )
   const traceSpan = generateTraceSpan(opts.req?.headers)
   return {
     ...opts,

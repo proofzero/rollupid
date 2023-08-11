@@ -7216,7 +7216,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/api@npm:^1.4.1":
+"@opentelemetry/api@npm:1.4.1, @opentelemetry/api@npm:^1.4.1":
   version: 1.4.1
   resolution: "@opentelemetry/api@npm:1.4.1"
   checksum: e783c40d1a518abf9c4c5d65223237c1392cd9a6c53ac6e2c3ef0c05ff7266e3dfc4fd9874316dae0dcb7a97950878deb513bcbadfaad653d48f0215f2a0911b
@@ -8065,6 +8065,7 @@ __metadata:
   dependencies:
     "@cloudflare/workers-types": 4.20230518.0
     "@microlabs/otel-cf-workers": 1.0.0-rc.7
+    "@opentelemetry/api": 1.4.1
     "@opentelemetry/sdk-trace-base": 1.15.2
     "@proofzero/platform.access": "workspace:*"
     "@proofzero/platform.account": "workspace:*"
