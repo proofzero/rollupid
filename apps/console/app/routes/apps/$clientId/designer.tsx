@@ -1262,8 +1262,6 @@ const OGPanel = ({
 
   const [ogTitle, setOgTitle] = useState<string | undefined>(ogTheme?.title)
 
-  console.log({ localErrors })
-
   useEffect(() => {
     setLocalErrors(errors)
   }, [errors])
