@@ -11,7 +11,7 @@ services = [
 ]
 
 kv_namespaces = [
-  { binding = "ProfileKV", id = "ProfileKV" },
+  { binding = "ProfileKV", id = "ProfileKV", preview_id = "ProfileKV" },
 ]
 
 [build]
