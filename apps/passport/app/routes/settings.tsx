@@ -19,8 +19,12 @@ import { getCoreClient } from '~/platform.server'
 
 import type { AddressURN } from '@proofzero/urns/address'
 import type { NodeType } from '@proofzero/types/address'
-import type { LoaderFunction } from '@remix-run/cloudflare'
-import type { LinksFunction } from '@remix-run/cloudflare'
+import type {
+  LoaderFunction,
+  MetaFunction,
+  LinksFunction,
+} from '@remix-run/cloudflare'
+
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 import { usePostHog } from 'posthog-js/react'
@@ -132,6 +136,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
   }
 )
+
+export const meta: MetaFunction = () => ({
+  charset: 'utf-8',
+  title: 'Passport Settings - Rollup',
+  viewport: 'width=device-width,initial-scale=1',
+})
 
 export default function SettingsLayout() {
   const {
