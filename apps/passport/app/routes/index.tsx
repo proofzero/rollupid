@@ -15,11 +15,12 @@ export const loader: LoaderFunction = async ({ request }) => {
   // The lower the score, the more likely it is a bot
   // https://developers.cloudflare.com/bots/concepts/bot-score/
   if (
-    request.cf.botManagement.score > 30 ||
-    ['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
+    request.cf.botManagement.score <= 30 &&
+    !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
   ) {
-    return redirect(`/settings`)
-  } else return null
+    return null
+  }
+  return redirect(`/settings`)
 }
 
 export const meta: MetaFunction = ({ data }) => {

@@ -16,23 +16,23 @@ import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     if (
-      request.cf.botManagement.score > 30 ||
-      ['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
+      request.cf.botManagement.score <= 30 &&
+      !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
     ) {
-      const cp = await getAuthzCookieParams(request, context.env)
-
-      let rollup_action
-      if (cp && cp.rollup_action && isSupportedRollupAction(cp.rollup_action)) {
-        rollup_action = cp.rollup_action
-      }
-
-      return json({
-        clientId: params.clientId,
-        rollup_action,
-      })
-    } else {
       return null
     }
+
+    const cp = await getAuthzCookieParams(request, context.env)
+
+    let rollup_action
+    if (cp && cp.rollup_action && isSupportedRollupAction(cp.rollup_action)) {
+      rollup_action = cp.rollup_action
+    }
+
+    return json({
+      clientId: params.clientId,
+      rollup_action,
+    })
   }
 )
 

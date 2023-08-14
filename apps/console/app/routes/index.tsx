@@ -11,11 +11,12 @@ export const loader: LoaderFunction = async ({ request }) => {
   // Since it's redirecting to passport from root if there's no JWT -- it looks for Meta function in root.
   // This's why we don't use meta function in this file.
   if (
-    request.cf.botManagement.score > 30 ||
-    ['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
+    request.cf.botManagement.score <= 30 &&
+    !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
   ) {
-    return redirect('/dashboard')
-  } else return null
+    return null
+  }
+  return redirect('/dashboard')
 }
 
 // Component
