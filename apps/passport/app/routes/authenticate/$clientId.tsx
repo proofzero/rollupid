@@ -4,7 +4,7 @@ import { getAuthzCookieParams, isSupportedRollupAction } from '~/session.server'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 
-import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
 import type { GetAppPublicPropsResult } from '@proofzero/platform/starbase/src/jsonrpc/methods/getAppPublicProps'
 import { Helmet } from 'react-helmet'
 import { getRGBColor, getTextColor } from '@proofzero/design-system/src/helpers'
@@ -15,43 +15,19 @@ import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
-    try {
-      const cp = await getAuthzCookieParams(request, context.env)
+    const cp = await getAuthzCookieParams(request, context.env)
 
-      let rollup_action
-      if (cp && cp.rollup_action && isSupportedRollupAction(cp.rollup_action)) {
-        rollup_action = cp.rollup_action
-      }
-
-      return json({
-        clientId: params.clientId,
-        rollup_action,
-      })
-    } catch (ex) {
-      console.log(ex)
+    let rollup_action
+    if (cp && cp.rollup_action && isSupportedRollupAction(cp.rollup_action)) {
+      rollup_action = cp.rollup_action
     }
+
+    return json({
+      clientId: params.clientId,
+      rollup_action,
+    })
   }
 )
-
-export const meta: MetaFunction = ({ data }) => {
-  return {
-    title: 'Passport - Rollup',
-    viewport: 'width=device-width,initial-scale=1',
-    'og:url': 'https://passport.rollup.id',
-    'og:title': 'Passport - Rollup',
-    'og:description': 'Simple & Secure Private Auth',
-    'og:image':
-      'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
-    'twitter:card': 'summary_large_image',
-    'twitter:site': '@rollupid_xyz',
-    'twitter:creator': '@rollupid_xyz',
-    'twitter:image':
-      'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
-    'theme-color': '#ffffff',
-    'mobile-web-app-capable': 'yes',
-    'apple-mobile-web-app-capable': 'yes',
-  }
-}
 
 export default () => {
   const { clientId, rollup_action } = useLoaderData<{

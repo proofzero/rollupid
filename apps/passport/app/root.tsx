@@ -70,7 +70,6 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     let appProps
-
     if (context.appProps) {
       appProps = context.appProps
     } else {
@@ -150,6 +149,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
 export const meta: MetaFunction = ({ data }) => {
   return {
+    charset: 'utf-8',
     title: 'Passport - Rollup',
     viewport: 'width=device-width,initial-scale=1',
     'og:url': 'https://passport.rollup.id',
@@ -247,19 +247,6 @@ export default function App() {
   return (
     <html lang="en">
       <head>
-        <meta charSet="utf-8" />
-        <meta title="Passport - Rollup" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <meta name="og:url" content="https://passport-dev.rollup.id" />
-        <meta name="og:title" content="Passport - Rollup" />
-        <meta
-          property="og:description"
-          content="Simple & Secure Private Auth"
-        />
-        <meta
-          property="og:image"
-          content="https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png"
-        />
         <Meta />
 
         {browserEnv.appProps?.iconURL ? (
@@ -355,7 +342,6 @@ export function ErrorBoundary({ error }) {
   return (
     <html lang="en">
       <head>
-        <meta charSet="utf-8" />
         <Meta />
         <Links />
       </head>
@@ -402,19 +388,7 @@ export function CatchBoundary() {
   return (
     <html lang="en">
       <head>
-        <meta charSet="utf-8" />
-        <meta title="Passport - Rollup" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <meta name="og:url" content="https://passport-dev.rollup.id" />
-        <meta name="og:title" content="Passport - Rollup" />
-        <meta
-          property="og:description"
-          content="Simple & Secure Private Auth"
-        />
-        <meta
-          property="og:image"
-          content="https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png"
-        />
+        <Meta />
         <Links />
       </head>
       <body>

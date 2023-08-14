@@ -7,7 +7,9 @@ import type { LoaderFunction } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 
 export const loader: LoaderFunction = async ({ request }) => {
-  return redirect('/dashboard')
+  if (request.cf.botManagement.score > 30) {
+    return redirect('/dashboard')
+  } else return null
 }
 
 // Component
