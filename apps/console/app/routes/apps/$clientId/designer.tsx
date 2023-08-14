@@ -1305,7 +1305,7 @@ const OGPanel = ({
 
           <div className="w-full border-b border-gray-200"></div>
 
-          <FormElement label="Business Address">
+          <FormElement label="Description">
             <InputTextarea
               id="ogDescription"
               heading=""

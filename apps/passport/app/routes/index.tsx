@@ -1,12 +1,10 @@
 import type { LinksFunction, MetaFunction } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import { LiveReload, Meta, Scripts, ScrollRestoration } from '@remix-run/react'
-import { useContext } from 'react'
-import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
 
 import globalStyles from '@proofzero/design-system/src/styles/global.css'
 import styles from '../styles/tailwind.css'
+import { Meta } from '@remix-run/react'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
@@ -16,7 +14,10 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = async ({ request }) => {
   // The lower the score, the more likely it is a bot
   // https://developers.cloudflare.com/bots/concepts/bot-score/
-  if (request.cf.botManagement.score > 30) {
+  if (
+    request.cf.botManagement.score > 30 ||
+    ['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
+  ) {
     return redirect(`/settings`)
   } else return null
 }
@@ -45,10 +46,5 @@ export const meta: MetaFunction = ({ data }) => {
 // It doesn't go back to root file.
 // Instead it looks for Meta function in this file.
 export default function OGTheme() {
-  const nonce = useContext(NonceContext)
-  return (
-    <head>
-      <Meta />
-    </head>
-  )
+  return <Meta />
 }

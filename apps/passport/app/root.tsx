@@ -69,6 +69,23 @@ export const links: LinksFunction = () => [
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
+    if (
+      request.cf.botManagement.score <= 30 &&
+      !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
+    ) {
+      let ogTheme = {}
+      if (
+        params.clientId &&
+        !['console', 'passport'].includes(params.clientId)
+      ) {
+        const coreClient = getCoreClient({ context })
+        ogTheme = await coreClient.starbase.getOgTheme.query({
+          clientId: params.clientId!,
+        })
+      }
+
+      return ogTheme
+    }
     let appProps
     if (context.appProps) {
       appProps = context.appProps
@@ -150,17 +167,19 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 export const meta: MetaFunction = ({ data }) => {
   return {
     charset: 'utf-8',
-    title: 'Passport - Rollup',
+    title: data.title ?? 'Passport - Rollup',
     viewport: 'width=device-width,initial-scale=1',
     'og:url': 'https://passport.rollup.id',
-    'og:title': 'Passport - Rollup',
-    'og:description': 'Simple & Secure Private Auth',
+    'og:title': data.title ?? 'Passport - Rollup',
+    'og:description': data.description ?? 'Simple & Secure Private Auth',
     'og:image':
+      data.image ??
       'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
     'twitter:card': 'summary_large_image',
     'twitter:site': '@rollupid_xyz',
     'twitter:creator': '@rollupid_xyz',
     'twitter:image':
+      data.image ??
       'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
     'theme-color': '#ffffff',
     'mobile-web-app-capable': 'yes',
@@ -173,13 +192,13 @@ export default function App() {
 
   const location = useLocation()
   const transition = useTransition()
-  const browserEnv = useLoaderData()
+  const browserEnv = useLoaderData() ?? {}
 
   const hydrated = useHydrated()
 
-  const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+  const GATag = browserEnv?.ENV?.INTERNAL_GOOGLE_ANALYTICS_TAG
 
-  const remixDevPort = browserEnv.ENV.REMIX_DEV_SERVER_WS_PORT
+  const remixDevPort = browserEnv?.ENV?.REMIX_DEV_SERVER_WS_PORT
   useTreeshakeHack(remixDevPort)
 
   useEffect(() => {
@@ -189,20 +208,20 @@ export default function App() {
   }, [location, GATag])
 
   useEffect(() => {
-    browserEnv.flashes?.forEach(
+    browserEnv?.flashes?.forEach(
       (flash: { type: ToastType; message: string }) => {
         toast(flash.type, {
           message: flash.message,
         })
       }
     )
-  }, [browserEnv.flashes])
+  }, [browserEnv?.flashes])
 
   const loaderColorHandler = (isDark: boolean): string | undefined => {
     if (browserEnv?.appProps?.appTheme?.color) {
       return isDark
         ? browserEnv?.appProps?.appTheme?.color.dark
-        : browserEnv.appProps.appTheme.color.light
+        : browserEnv?.appProps.appTheme.color.light
     }
   }
 
@@ -230,13 +249,13 @@ export default function App() {
     // https://posthog.com/docs/libraries/react#posthog-provider
     if (hydrated) {
       try {
-        posthog?.init(browserEnv.ENV.POSTHOG_API_KEY, {
-          api_host: browserEnv.ENV.POSTHOG_PROXY_HOST,
+        posthog?.init(browserEnv?.ENV.POSTHOG_API_KEY, {
+          api_host: browserEnv?.ENV.POSTHOG_PROXY_HOST,
           autocapture: false,
         })
         posthog?.reset()
-        posthog?.group('app', browserEnv.appProps?.clientId, {
-          name: browserEnv.appProps?.name,
+        posthog?.group('app', browserEnv?.appProps?.clientId, {
+          name: browserEnv?.appProps?.name,
         })
       } catch (ex) {
         console.error(ex)
@@ -249,13 +268,13 @@ export default function App() {
       <head>
         <Meta />
 
-        {browserEnv.appProps?.iconURL ? (
+        {browserEnv?.appProps?.iconURL ? (
           <>
-            <link rel="icon" type="image" href={browserEnv.appProps.iconURL} />
+            <link rel="icon" type="image" href={browserEnv?.appProps.iconURL} />
             <link
               rel="shortcut icon"
               type="image"
-              href={browserEnv.appProps.iconURL}
+              href={browserEnv?.appProps.iconURL}
             />
           </>
         ) : (
@@ -304,10 +323,10 @@ export default function App() {
           >
             {typeof window !== 'undefined' ? (
               <PostHogProvider client={posthog}>
-                <Outlet context={{ appProps: browserEnv.appProps }} />
+                <Outlet context={{ appProps: browserEnv?.appProps }} />
               </PostHogProvider>
             ) : (
-              <Outlet context={{ appProps: browserEnv.appProps }} />
+              <Outlet context={{ appProps: browserEnv?.appProps }} />
             )}
           </ThemeContext.Provider>
         )}
@@ -317,7 +336,7 @@ export default function App() {
           nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `!window ? null : window.ENV = ${JSON.stringify(
-              browserEnv.ENV
+              browserEnv?.ENV ?? {}
             )}`,
           }}
         />
