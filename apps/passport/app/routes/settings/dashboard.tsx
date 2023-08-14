@@ -169,7 +169,7 @@ export default function DashboardLayout() {
                         <Text
                           size="sm"
                           weight="normal"
-                          className="text-gray-500 w-max py-[2px] px-2 
+                          className="text-gray-500 w-max py-[2px] px-2
                             text-[#EA580C] bg-orange-50 rounded-xl"
                         >
                           Data Error

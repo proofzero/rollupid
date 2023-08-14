@@ -19,10 +19,13 @@ import { getCoreClient } from '~/platform.server'
 
 import type { AddressURN } from '@proofzero/urns/address'
 import type { NodeType } from '@proofzero/types/address'
-import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
-import type { LinksFunction } from '@remix-run/cloudflare'
+import type {
+  LoaderFunction,
+  MetaFunction,
+  LinksFunction,
+} from '@remix-run/cloudflare'
+
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { NO_OP_ADDRESS_PLACEHOLDER } from '@proofzero/platform.address/src/constants'
 
 import { usePostHog } from 'posthog-js/react'
 import { useEffect, useState } from 'react'

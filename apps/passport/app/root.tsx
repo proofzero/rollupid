@@ -1,7 +1,7 @@
 import type {
-  MetaFunction,
   LinksFunction,
   LoaderFunction,
+  MetaFunction,
 } from '@remix-run/cloudflare'
 
 import { json } from '@remix-run/cloudflare'
@@ -30,7 +30,6 @@ import appleIcon from '~/assets/root-apple-touch-icon.png'
 import icon32 from '~/assets/root-favicon-32x32.png'
 import icon16 from '~/assets/root-favicon-16x16.png'
 import faviconSvg from '~/assets/root-favicon.svg'
-import social from '~/assets/passport-social.png'
 import LogoIndigo from '~/assets/PassportLogoIndigo.svg'
 
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
@@ -63,21 +62,6 @@ import { useHydrated } from 'remix-utils'
 
 import { getCoreClient } from './platform.server'
 
-export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  title: 'Passport - Rollup',
-  viewport: 'width=device-width,initial-scale=1',
-  'og:url': 'https://passport.rollup.id',
-  'og:description': 'Identity management for the private web.',
-  'og:image': social,
-  'twitter:card': 'summary_large_image',
-  'twitter:site': '@rollupid_xyz',
-  'twitter:creator': '@rollupid_xyz',
-  'theme-color': '#ffffff',
-  'mobile-web-app-capable': 'yes',
-  'apple-mobile-web-app-capable': 'yes',
-})
-
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
   { rel: 'stylesheet', href: globalStyles },
@@ -86,7 +70,6 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     let appProps
-
     if (context.appProps) {
       appProps = context.appProps
     } else {
@@ -163,6 +146,27 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     )
   }
 )
+
+export const meta: MetaFunction = ({ data }) => {
+  return {
+    charset: 'utf-8',
+    title: 'Passport - Rollup',
+    viewport: 'width=device-width,initial-scale=1',
+    'og:url': 'https://passport.rollup.id',
+    'og:title': 'Passport - Rollup',
+    'og:description': 'Simple & Secure Private Auth',
+    'og:image':
+      'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    'twitter:card': 'summary_large_image',
+    'twitter:site': '@rollupid_xyz',
+    'twitter:creator': '@rollupid_xyz',
+    'twitter:image':
+      'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    'theme-color': '#ffffff',
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+  }
+}
 
 export default function App() {
   const nonce = useContext(NonceContext)
@@ -244,6 +248,7 @@ export default function App() {
     <html lang="en">
       <head>
         <Meta />
+
         {browserEnv.appProps?.iconURL ? (
           <>
             <link rel="icon" type="image" href={browserEnv.appProps.iconURL} />
@@ -362,7 +367,8 @@ export function ErrorBoundary({ error }) {
 
 export function CatchBoundary() {
   const caught = useCatch()
-  console.error('CaughtBoundary', caught)
+
+  console.error('CaughtBoundary', JSON.stringify(caught, null, 2))
 
   const { status } = caught
 
@@ -378,6 +384,7 @@ export function CatchBoundary() {
       secondary = 'Internal Server Error'
       break
   }
+
   return (
     <html lang="en">
       <head>
@@ -399,7 +406,7 @@ export function CatchBoundary() {
           {caught.data?.isAuthenticated && (
             <RollupIdButton
               text={'Continue to Rollup'}
-              href={typeof window !== 'undefined' && window.ENV.PROFILE_APP_URL}
+              href={'https://rollup.id'}
             />
           )}
         </div>

@@ -3,9 +3,9 @@
  */
 
 import type {
-  MetaFunction,
   LinksFunction,
   LoaderFunction,
+  MetaFunction,
 } from '@remix-run/cloudflare'
 
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
@@ -66,12 +66,6 @@ export const links: LinksFunction = () => {
   ]
 }
 
-export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  title: 'Console - Rollup',
-  viewport: 'width=device-width,initial-scale=1',
-})
-
 export type AppLoaderData = {
   clientId: string
   name?: string
@@ -101,6 +95,9 @@ export type LoaderData = {
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
+    if (request.cf.botManagement.score < 30) {
+      return null
+    }
     const jwt = await requireJWT(request, context.env)
     if (!jwt) {
       throw new BadRequestError({
@@ -197,6 +194,27 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
+export const meta: MetaFunction = () => {
+  return {
+    charset: 'utf-8',
+    title: 'Console - Rollup',
+    viewport: 'width=device-width,initial-scale=1',
+    'og:image':
+      'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    'og:description': 'Simple & Secure Private Auth',
+    'og:title': 'Console - Rollup',
+    'og:url': 'https://console.rollup.id',
+    'twitter:card': 'summary_large_image',
+    'twitter:site': '@rollupid_xyz',
+    'twitter:creator': '@rollupid_xyz',
+    'twitter:image':
+      'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    'theme-color': '#ffffff',
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+  }
+}
+
 export default function App() {
   const nonce = useContext(NonceContext)
 
@@ -204,9 +222,9 @@ export default function App() {
   const location = useLocation()
   const loaderData = useLoaderData()
 
-  const GATag = loaderData.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+  const GATag = loaderData?.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
 
-  const remixDevPort = loaderData.ENV.REMIX_DEV_SERVER_WS_PORT
+  const remixDevPort = loaderData?.ENV.REMIX_DEV_SERVER_WS_PORT
   useTreeshakeHack(remixDevPort)
 
   const {
@@ -217,7 +235,7 @@ export default function App() {
     accountURN,
     hasUnpaidInvoices,
     unpaidInvoiceURL,
-  } = loaderData
+  } = loaderData ?? {}
 
   useEffect(() => {
     if (GATag) {
@@ -280,7 +298,7 @@ export default function App() {
             <Outlet
               context={{
                 apps,
-                ENV: loaderData.ENV,
+                ENV: loaderData?.ENV ?? {},
                 avatarUrl,
                 PASSPORT_URL,
                 displayName,
@@ -294,7 +312,7 @@ export default function App() {
           <Outlet
             context={{
               apps,
-              ENV: loaderData.ENV,
+              ENV: loaderData?.ENV ?? {},
               avatarUrl,
               PASSPORT_URL,
               displayName,
@@ -309,7 +327,7 @@ export default function App() {
           nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `!window ? null : window.ENV = ${JSON.stringify(
-              loaderData.ENV
+              loaderData?.ENV ? loaderData.ENV : {}
             )}`,
           }}
         />
@@ -355,7 +373,7 @@ export function ErrorBoundary({ error }) {
 
 export function CatchBoundary() {
   const caught = useCatch()
-  console.error('CaughtBoundary', caught)
+  console.error('CaughtBoundary', JSON.stringify(caught, null, 2))
 
   const { status } = caught
 
