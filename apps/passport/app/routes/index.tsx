@@ -47,15 +47,8 @@ export const meta: MetaFunction = ({ data }) => {
 export default function OGTheme() {
   const nonce = useContext(NonceContext)
   return (
-    <html lang="en">
-      <head>
-        <Meta />
-      </head>
-      <body className="min-h-[100dvh] flex justify-center items-center">
-        <ScrollRestoration nonce={nonce} />
-        <Scripts nonce={nonce} />
-        <LiveReload port={8002} nonce={nonce} />
-      </body>
-    </html>
+    <head>
+      <Meta />
+    </head>
   )
 }
