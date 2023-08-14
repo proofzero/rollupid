@@ -13,7 +13,7 @@ import {
   useOutletContext,
 } from '@remix-run/react'
 import { GroupRootContextData } from '../../spuorg'
-import { Fragment, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import {
   CryptoAddressType,
   EmailAddressType,
@@ -47,7 +47,6 @@ import {
   ChevronUpIcon,
 } from '@heroicons/react/20/solid'
 import { InviteRes } from './invite'
-import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { AccountURN } from '@proofzero/urns/account'
@@ -410,9 +409,23 @@ export default () => {
   const { URN, groupID, invitations } = useLoaderData<LoaderData>()
 
   const group = useMemo(
-    () => groups.find((group) => group.URN === URN),
+    () => groups.find((group) => group.URN === URN) ?? null,
     [groups]
   )
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    // Initial state is undefined
+    // Our not found state is null
+
+    // Because we load data client side
+    // We want to redirect if group
+    // is not found
+    if (group === null) {
+      navigate('/spuorg')
+    }
+  }, [group])
 
   const [inviteModalOpen, setInviteModalOpen] = useState(false)
 
