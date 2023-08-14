@@ -365,12 +365,14 @@ const InviteMemberModal = ({
 
 const RemoveMemberModal = ({
   accountURN,
+  userAlias,
   groupID,
   isOpen,
   handleClose,
   purge,
 }: {
   accountURN: AccountURN
+  userAlias: string
   groupID: string
   isOpen: boolean
   handleClose: () => void
@@ -402,7 +404,8 @@ const RemoveMemberModal = ({
 
           <section className="mb-4">
             <Text size="sm" weight="normal" className="text-gray-500 my-3">
-              Are you sure you want to remove “UserID” from the group? <br />
+              Are you sure you want to remove “{userAlias}” from the group?{' '}
+              <br />
               This action will remove member's access to the group and all{' '}
               <br />
               applications within the group.
@@ -450,6 +453,7 @@ export default () => {
   const hydrated = useHydrated()
 
   const [selectedMemberURN, setSelectedMemberURN] = useState<AccountURN>()
+  const [selectedMemberAlias, setSelectedMemberAlias] = useState<string>('')
   const [removeMemberModalOpen, setRemoveMemberModalOpen] = useState(false)
 
   return (
@@ -467,6 +471,7 @@ export default () => {
           handleClose={() => setRemoveMemberModalOpen(false)}
           groupID={groupID}
           accountURN={selectedMemberURN}
+          userAlias={selectedMemberAlias}
           purge={group.members.length === 1}
         />
       )}
@@ -697,6 +702,7 @@ export default () => {
                   hover:rounded-[6px] hover:bg-gray-100"
                                 onClick={() => {
                                   setSelectedMemberURN(item.val.URN)
+                                  setSelectedMemberAlias(item.val.title)
                                   setRemoveMemberModalOpen(true)
                                 }}
                               >
