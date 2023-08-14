@@ -50,6 +50,7 @@ import { InviteRes } from './invite'
 import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { AccountURN } from '@proofzero/urns/account'
+import dangerVector from '~/images/danger.svg'
 
 const addressTypes = [
   ...Object.values(EmailAddressType),
@@ -377,7 +378,12 @@ const RemoveMemberModal = ({
 }) => {
   return (
     <Modal isOpen={isOpen} handleClose={handleClose}>
-      <div className="p-6">
+      <div
+        className={`w-fit rounded-lg bg-white p-4
+         text-left  transition-all sm:p-5 overflow-y-auto flex items-start space-x-4`}
+      >
+        <img src={dangerVector} alt="danger" />
+
         <Form
           method="post"
           action={`/spuorg/${groupID}/kick`}
@@ -388,15 +394,27 @@ const RemoveMemberModal = ({
           <input name="accountURN" type="hidden" value={accountURN} />
           {purge && <input name="purge" type="hidden" value="true" />}
 
-          <section className="flex flex-row items-center justify-end gap-4">
-            <Button type="button" btnType="secondary-alt">
-              Cancel
-            </Button>
+          <div className="flex flex-row items-center justify-between w-full mb-2">
+            <Text size="lg" weight="medium" className="text-gray-900">
+              Remove Member
+            </Text>
+          </div>
 
-            <Button type="submit" btnType="primary-alt">
-              Confirm
-            </Button>
+          <section className="mb-4">
+            <Text size="sm" weight="normal" className="text-gray-500 my-3">
+              Are you sure you want to remove “UserID” from the group? <br />
+              This action will remove member's access to the group and all{' '}
+              <br />
+              applications within the group.
+            </Text>
           </section>
+
+          <div className="flex justify-end items-center space-x-3">
+            <Button btnType="secondary-alt">Cancel</Button>
+            <Button type="submit" btnType="dangerous">
+              Remove Member
+            </Button>
+          </div>
         </Form>
       </div>
     </Modal>
