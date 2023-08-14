@@ -2,6 +2,7 @@ import { Popover, Tab } from '@headlessui/react'
 import {
   Form,
   Link,
+  NavLink,
   useActionData,
   useFetcher,
   useLoaderData,
@@ -17,7 +18,14 @@ import {
   useState,
 } from 'react'
 import { IconType } from 'react-icons'
-import { HiCog, HiOutlineCog, HiOutlineMail, HiOutlineX } from 'react-icons/hi'
+import {
+  HiCog,
+  HiOutlineCog,
+  HiOutlineMail,
+  HiOutlineX,
+  HiOutlineShare,
+  HiOutlineExternalLink,
+} from 'react-icons/hi'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
@@ -44,6 +52,8 @@ import {
   AppThemeSchema,
   EmailOTPTheme,
   EmailOTPThemeSchema,
+  OGTheme,
+  OGThemeSchema,
 } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
@@ -86,6 +96,7 @@ import { planGuardWithToastException } from '~/utils/planGate'
 import designerSVG from '~/assets/early/designer.webp'
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 import { AccountURN } from '@proofzero/urns/account'
+import { GetOgThemeResult } from '@proofzero/platform.starbase/src/jsonrpc/methods/getOgTheme'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -1224,6 +1235,188 @@ const EmailPanel = ({
   )
 }
 
+const OGPanel = ({
+  errors,
+  setLoading,
+  ogTheme,
+  hostname,
+}: {
+  errors?: {
+    [key: string]: string
+  }
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>
+  ogTheme?: OGTheme
+  hostname?: string
+}) => {
+  const [localErrors, setLocalErrors] = useState<{
+    [key: string]: string
+  }>()
+
+  const [ogImageURL, setOgImageURL] = useState<string | undefined>(
+    ogTheme?.image
+  )
+
+  const [ogDescription, setOgDescription] = useState<string | undefined>(
+    ogTheme?.description
+  )
+
+  const [ogTitle, setOgTitle] = useState<string | undefined>(ogTheme?.title)
+
+  useEffect(() => {
+    setLocalErrors(errors)
+  }, [errors])
+
+  return (
+    <>
+      <Tab.Panel className="flex flex-col lg:flex-row gap-7">
+        <input type="hidden" name="target" value="og" />
+
+        <section className="flex-1 bg-white border rounded-lg h-max">
+          <Text size="lg" weight="semibold" className="mx-8 my-4 text-gray-900">
+            Open Graph Settings
+          </Text>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement label="Open Graph Title">
+            <Input
+              id={'ogTitle'}
+              label={''}
+              placeholder={'Open Graph Title'}
+              onChange={(e) => {
+                setOgTitle(e.target.value)
+              }}
+              value={ogTitle}
+              error={errors && errors['ogTitle']}
+            />
+
+            {errors && errors['ogTitle'] && (
+              <Text
+                className="mb-1.5 mt-1.5 text-red-500"
+                size="xs"
+                weight="normal"
+              >
+                {errors['ogTitle']}
+              </Text>
+            )}
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement label="Description">
+            <InputTextarea
+              id="ogDescription"
+              heading=""
+              placeholder="Open Graph Description"
+              value={ogDescription ?? ''}
+              onChange={setOgDescription}
+              error={
+                localErrors && localErrors['OGTheme.description'] ? true : false
+              }
+            />
+
+            {localErrors && localErrors['ogTheme.description'] && (
+              <Text
+                className="mb-1.5 mt-1.5 text-red-500"
+                size="xs"
+                weight="normal"
+              >
+                {localErrors['ogTheme.description']}
+              </Text>
+            )}
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement
+            label="Open Graph Image"
+            sublabel="1,91:1 ratio (at least 1200x630px) images can't be larger than 2MB"
+          >
+            <div className="flex flex-row items-center gap-2">
+              <IconPicker
+                maxSize={2097152}
+                id="ogImage"
+                setIsFormChanged={(val) => {}}
+                setIsImgUploading={(val) => {
+                  setLoading(val)
+                }}
+                imageUploadCallback={setOgImageURL}
+                url={ogImageURL}
+                invalid={
+                  localErrors && localErrors['ogTheme.image'] ? true : false
+                }
+                errorMessage={
+                  localErrors && localErrors['ogTheme.image']
+                    ? localErrors['ogTheme.image']
+                    : ''
+                }
+              />
+
+              {ogImageURL && (
+                <button
+                  type="button"
+                  className="flex justify-center items-center py-2 px-4"
+                  onClick={() => {
+                    setOgImageURL(undefined)
+                  }}
+                >
+                  <Text size="xs" weight="medium" className="text-gray-200">
+                    Remove
+                  </Text>
+                </button>
+              )}
+            </div>
+          </FormElement>
+          <div className="w-full border-b border-gray-200"></div>
+          <FormElement label="Preview OpenGraph Meta Tags">
+            <NavLink
+              to={`${hostname ? hostname : 'https://passport.rollup.id'}`}
+              target="_blank"
+              className="text-indigo-500 hover:cursor-pointer hover:underline
+             flex flex-row items-center gap-1"
+            >
+              <Text size="sm">Preview</Text>
+              <HiOutlineExternalLink />
+            </NavLink>
+          </FormElement>
+        </section>
+
+        <section className="bg-white border rounded-lg pb-3 px-6 min-w-[468px] h-max overflow-scroll">
+          <div className="flex flex-row items-center justify-between my-4">
+            <Text size="lg" weight="semibold" className="text-gray-900">
+              Preview
+            </Text>
+          </div>
+
+          {ogTheme?.image ? (
+            <img
+              src={`${ogTheme?.image}`}
+              className="w-full h-[256px] bg-gray-100 rounded-lg object-cover"
+              alt="og"
+            />
+          ) : (
+            <div className="w-full h-[256px] bg-gray-100 rounded-lg"></div>
+          )}
+          <div className="flex-1 mb-2">
+            <Text size="lg" weight="semibold" className="text-gray-900 mb-2">
+              {ogTheme?.title ? ogTheme.title : 'Open Graph Title'}
+            </Text>
+
+            <Text size="xs" weight="normal" className="text-gray-500">
+              {ogTheme?.description
+                ? ogTheme.description
+                : 'Open Graph Description'}
+            </Text>
+            <Text size="xs" weight="normal" className="text-gray-500">
+              {hostname ? hostname : 'https://passport.rollup.id'}
+            </Text>
+          </div>
+        </section>
+      </Tab.Panel>
+    </>
+  )
+}
+
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
     if (!params.clientId) {
@@ -1249,9 +1442,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       clientId,
     })
 
+    const ogTheme = await coreClient.starbase.getOgTheme.query({
+      clientId,
+    })
+
     return json({
       appTheme,
       emailTheme,
+      ogTheme,
     })
   }
 )
@@ -1293,6 +1491,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     let emailTheme = await coreClient.starbase.getEmailOTPTheme.query({
+      clientId,
+    })
+
+    let ogTheme = await coreClient.starbase.getOgTheme.query({
       clientId,
     })
 
@@ -1400,12 +1602,54 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
+    const updateOg = async (fd: FormData, theme: OGTheme) => {
+      let title = fd.get('ogTitle') as string | undefined
+      if (!title || title === '') title = undefined
+
+      let description = fd.get('ogDescription') as string | undefined
+      if (!description || description === '') description = undefined
+
+      let image = fd.get('ogImage') as string | undefined
+      if (!image || image === '') image = undefined
+
+      theme = {
+        ...theme,
+        title: title ?? theme?.title,
+        description: description ?? theme?.description,
+        image: image ?? theme?.image,
+      }
+
+      const zodErrors = await OGThemeSchema.spa(theme)
+      if (!zodErrors.success) {
+        const mappedIssues = zodErrors.error.issues.map((issue) => ({
+          path: `ogTheme.${issue.path.join('.')}`,
+          message: issue.message,
+        }))
+
+        errors = mappedIssues.reduce((acc, curr) => {
+          acc[curr.path] = curr.message
+          return acc
+        }, {} as { [key: string]: string })
+      } else {
+        await coreClient.starbase.setOgTheme.mutate({
+          clientId,
+          theme,
+        })
+      }
+
+      return json({
+        errors,
+      })
+    }
+
     const fd = await request.formData()
     switch (fd.get('target')) {
       case 'auth':
         return updateAuth(fd, theme)
       case 'email':
         return updateEmail(fd, emailTheme)
+      case 'og':
+        return updateOg(fd, ogTheme)
       default:
         throw new BadRequestError({
           message: 'Invalid target',
@@ -1415,9 +1659,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { appTheme, emailTheme } = useLoaderData<{
+  const { appTheme, emailTheme, ogTheme } = useLoaderData<{
     appTheme: GetAppThemeResult
     emailTheme: GetEmailOTPThemeResult
+    ogTheme: GetOgThemeResult
     toasts: {
       message: string
       type: ToastType
@@ -1502,7 +1747,7 @@ export default () => {
 
         <Tab.Group>
           <Tab.List className="flex flex-row items-center border-b mb-6">
-            <Tab className="outline-0">
+            <Tab className="outline-none">
               {({ selected }) => (
                 <DesignerTab
                   Icon={HiOutlineCog}
@@ -1512,7 +1757,17 @@ export default () => {
               )}
             </Tab>
 
-            <Tab className="outline-0">
+            <Tab className="outline-none">
+              {({ selected }) => (
+                <DesignerTab
+                  Icon={HiOutlineShare}
+                  text="Open Graph"
+                  selected={selected}
+                />
+              )}
+            </Tab>
+
+            <Tab className="outline-none">
               {({ selected }) => (
                 <DesignerTab
                   Icon={HiOutlineMail}
@@ -1531,6 +1786,13 @@ export default () => {
               appIconURL={appDetails.app.icon}
               setLoading={setLoading}
               errors={errors}
+            />
+
+            <OGPanel
+              setLoading={setLoading}
+              errors={errors}
+              ogTheme={ogTheme}
+              hostname={appDetails.customDomain?.hostname}
             />
 
             <EmailPanel

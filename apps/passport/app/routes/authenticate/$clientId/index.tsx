@@ -45,6 +45,12 @@ const LazyAuth = lazy(() =>
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
+    if (
+      request.cf.botManagement.score <= 30 &&
+      !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
+    ) {
+      return null
+    }
     const url = new URL(request.url)
 
     let displayKeys = AuthenticationScreenDefaults.knownKeys
@@ -416,7 +422,7 @@ export default () => {
   }>()
 
   const { clientId, displayKeys, authnQueryParams, invitationData } =
-    useLoaderData()
+    useLoaderData() ?? {}
 
   const transition = useTransition()
 

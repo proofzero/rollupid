@@ -29,6 +29,7 @@ import type {
 import {
   AppTheme,
   EmailOTPTheme,
+  OGTheme,
   PaymasterType,
 } from '../jsonrpc/validators/app'
 import { InternalServerError } from '@proofzero/errors'
@@ -311,6 +312,14 @@ export default class StarbaseApplication extends DOProxy {
 
   async setEmailOTPTheme(theme: EmailOTPTheme): Promise<void> {
     return this.state.storage.put('emailOTPTheme', theme)
+  }
+
+  async getOgTheme(): Promise<OGTheme | undefined> {
+    return this.state.storage.get<OGTheme>('ogTheme')
+  }
+
+  async setOgTheme(theme: OGTheme): Promise<void> {
+    return this.state.storage.put('ogTheme', theme)
   }
 
   async getAppPlan(): Promise<ServicePlanType | undefined> {

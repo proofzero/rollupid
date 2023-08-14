@@ -111,10 +111,12 @@ import {
   getEmailOTPTheme,
   GetEmailOTPThemeOutput,
 } from './methods/getEmailOTPTheme'
+import { getOgTheme, GetOgThemeOutput } from './methods/getOgTheme'
 import {
   setEmailOTPTheme,
   SetEmailOTPThemeInput,
 } from './methods/setEmailOTPTheme'
+import { setOgTheme, SetOgThemeInput } from './methods/setOgTheme'
 import { setAppPlan, SetAppPlanInput } from './methods/setAppPlan'
 import {
   DeleteSubscriptionPlansInput,
@@ -349,6 +351,19 @@ export const appRouter = t.router({
     .input(GetAppPlanInputSchema)
     .output(GetAppPlanOutputSchema)
     .query(getAppPlan),
+  setOgTheme: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .use(OwnAppsMiddleware)
+    .input(SetOgThemeInput)
+    .mutation(setOgTheme),
+  getOgTheme: t.procedure
+    .use(Analytics)
+    .input(AppClientIdParamSchema)
+    .output(GetOgThemeOutput)
+    .query(getOgTheme),
   deleteSubscriptionPlans: t.procedure
     .use(LogUsage)
     .use(Analytics)

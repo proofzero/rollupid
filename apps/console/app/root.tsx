@@ -95,7 +95,10 @@ export type LoaderData = {
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
-    if (request.cf.botManagement.score < 30) {
+    if (
+      request.cf.botManagement.score <= 30 &&
+      !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
+    ) {
       return null
     }
     const jwt = await requireJWT(request, context.env)
@@ -220,7 +223,7 @@ export default function App() {
 
   const transition = useTransition()
   const location = useLocation()
-  const loaderData = useLoaderData()
+  const loaderData = useLoaderData() ?? {}
 
   const GATag = loaderData?.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
 
