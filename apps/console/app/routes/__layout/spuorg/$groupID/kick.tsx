@@ -15,6 +15,9 @@ import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
+    const jwt = await requireJWT(request, context.env)
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+
     const groupID = params.groupID as string
     const groupURN = IdentityGroupURNSpace.urn(
       groupID as string
@@ -30,16 +33,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const purge = Boolean(fd.get('purge'))
 
-    const jwt = await requireJWT(request, context.env)
-    const traceHeader = generateTraceContextHeaders(context.traceSpan)
-
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
 
     let toastSession
-
     try {
       if (purge) {
         await coreClient.account.deleteIdentityGroup.mutate(groupURN)
