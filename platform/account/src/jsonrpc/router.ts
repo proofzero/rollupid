@@ -28,6 +28,7 @@ import { getAddressesMethod } from './methods/getAddresses'
 import {
   ValidateJWT,
   AuthorizationTokenFromHeader,
+  RequireAccount,
 } from '@proofzero/platform-middleware/jwt'
 import { LogUsage } from '@proofzero/platform-middleware/log'
 import { Scopes } from '@proofzero/platform-middleware/scopes'
@@ -93,6 +94,15 @@ import {
   AcceptIdentityGroupMemberInvitationInputSchema,
   acceptIdentityGroupMemberInvitation,
 } from './methods/identity-groups/acceptIdentityGroupMemberInvitation'
+import {
+  DeleteIdentityGroupMembershipInputSchema,
+  deleteIdentityGroupMembership,
+} from './methods/identity-groups/deleteIdentityGroupMembership'
+import {
+  DeleteIdentityGroupInputSchema,
+  deleteIdentityGroup,
+} from './methods/identity-groups/deleteIdentityGroup'
+import { purgeIdentityGroupMemberships } from './methods/identity-groups/purgeIdentityGroupMemberships'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -252,7 +262,7 @@ export const appRouter = t.router({
     .use(Analytics)
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
-    .use(injectAccountNode)
+    .use(RequireAccount)
     .input(AcceptIdentityGroupMemberInvitationInputSchema)
     .mutation(acceptIdentityGroupMemberInvitation),
   getProfileBatch: t.procedure
@@ -262,4 +272,27 @@ export const appRouter = t.router({
     .input(GetProfileBatchInput)
     .output(GetProfileBatchOutput)
     .query(getProfileBatchMethod),
+  deleteIdentityGroup: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireAccount)
+    .input(DeleteIdentityGroupInputSchema)
+    .mutation(deleteIdentityGroup),
+  deleteIdentityGroupMembership: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireAccount)
+    .input(DeleteIdentityGroupMembershipInputSchema)
+    .mutation(deleteIdentityGroupMembership),
+  purgeIdentityGroupMemberships: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireAccount)
+    .mutation(purgeIdentityGroupMemberships),
 })
