@@ -1,9 +1,11 @@
+import { Outlet, useLoaderData } from '@remix-run/react'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { type LoaderFunction, redirect } from '@remix-run/cloudflare'
+import { LoaderFunction, json, redirect } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
+import { ListIdentityGroupsOutput } from '@proofzero/platform/account/src/jsonrpc/methods/identity-groups/listIdentityGroups'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -16,11 +18,25 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const groups = await coreClient.identity.listIdentityGroups.query()
-    if (groups.length > 0) {
-      return redirect('/billing/spuorg')
+    const groups = await coreClient.account.listIdentityGroups.query()
+    if (groups.length === 0) {
+      return redirect('/billing/personal')
     }
 
-    return redirect('/billing/personal')
+    return json({
+      groups,
+    })
   }
 )
+
+export default () => {
+  const { groups } = useLoaderData<{ groups: ListIdentityGroupsOutput }>()
+
+  return (
+    <Outlet
+      context={{
+        groups,
+      }}
+    />
+  )
+}

@@ -1,6 +1,6 @@
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import plans, { type PlanDetails } from '~/routes/__layout/billing/plans'
-import { PlanFeatures } from '~/routes/__layout/billing'
+import { PlanFeatures } from '~/routes/__layout/billing/personal'
 import { type PaymentData, ServicePlanType } from '@proofzero/types/identity'
 import { Button } from '@proofzero/design-system'
 import { StatusPill } from '@proofzero/design-system/src/atoms/pills/StatusPill'
@@ -611,7 +611,7 @@ const DowngradeConfirmationModal = ({
 
             <ul className="list-disc">
               {plans[currentPlan].features
-                .filter((f) => f.type === 'addon')
+                .filter((f) => f.type === 'current')
                 .map((f) => (
                   <li>{f.title}</li>
                 ))}
