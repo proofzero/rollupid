@@ -333,9 +333,17 @@ export async function getValidatedSessionContext(
       identityURN: payload.sub as IdentityURN,
     }
   } catch (error) {
-    console.error('WTF', error)
-    // TODO: Revise this logic
-    const redirectTo = `/authenticate/${authzParams?.clientId}`
+    const url = new URL(request.url)
+    const { href } = url
+
+    const qp = new URLSearchParams()
+    qp.append('client_id', 'passport')
+    qp.append('redirect_uri', `${href}`)
+    qp.append('scope', '')
+    qp.append('state', 'skip')
+
+    const redirectTo = `/authorize?${qp.toString()}`
+
     if (error === InvalidTokenError)
       if (authzParams.clientId)
         throw await createAuthzParamsCookieAndAuthenticate(
