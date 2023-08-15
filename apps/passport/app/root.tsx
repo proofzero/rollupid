@@ -84,7 +84,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         })
       }
 
-      return ogTheme
+      return json(ogTheme)
     }
     let appProps
     if (context.appProps) {
@@ -167,20 +167,22 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 export const meta: MetaFunction = ({ data }) => {
   return {
     charset: 'utf-8',
-    title: data.title ?? 'Passport - Rollup',
+    title: data?.title ? data.title : 'Passport - Rollup',
     viewport: 'width=device-width,initial-scale=1',
     'og:url': 'https://passport.rollup.id',
-    'og:title': data.title ?? 'Passport - Rollup',
-    'og:description': data.description ?? 'Simple & Secure Private Auth',
-    'og:image':
-      data.image ??
-      'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    'og:title': data?.title ? data.title : 'Passport - Rollup',
+    'og:description': data?.description
+      ? data.description
+      : 'Simple & Secure Private Auth',
+    'og:image': data?.image
+      ? data.image
+      : 'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
     'twitter:card': 'summary_large_image',
     'twitter:site': '@rollupid_xyz',
     'twitter:creator': '@rollupid_xyz',
-    'twitter:image':
-      data.image ??
-      'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
+    'twitter:image': data?.image
+      ? data.image
+      : 'https://uploads-ssl.webflow.com/63d2527457e052627d01c416/64c91dd58d5781fa9a23ea85_OG%20(2).png',
     'theme-color': '#ffffff',
     'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
