@@ -17,13 +17,6 @@ export const deleteIdentityGroup = async ({
   input: DeleteIdentityGroupInput
   ctx: Context
 }): Promise<void> => {
-  if (!ctx.accountURN) {
-    throw new InternalServerError({
-      message:
-        'Account URN is not set in context. Make sure you are using the proper middleware.',
-    })
-  }
-
   const caller = router.createCaller(ctx)
 
   const { edges: membershipEdges } = await caller.edges.getEdges({

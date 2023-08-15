@@ -28,6 +28,7 @@ import { getAddressesMethod } from './methods/getAddresses'
 import {
   ValidateJWT,
   AuthorizationTokenFromHeader,
+  RequireAccount,
 } from '@proofzero/platform-middleware/jwt'
 import { LogUsage } from '@proofzero/platform-middleware/log'
 import { Scopes } from '@proofzero/platform-middleware/scopes'
@@ -261,7 +262,7 @@ export const appRouter = t.router({
     .use(Analytics)
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
-    .use(injectAccountNode)
+    .use(RequireAccount)
     .input(AcceptIdentityGroupMemberInvitationInputSchema)
     .mutation(acceptIdentityGroupMemberInvitation),
   getProfileBatch: t.procedure
@@ -272,23 +273,26 @@ export const appRouter = t.router({
     .output(GetProfileBatchOutput)
     .query(getProfileBatchMethod),
   deleteIdentityGroup: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireAccount)
     .input(DeleteIdentityGroupInputSchema)
     .mutation(deleteIdentityGroup),
   deleteIdentityGroupMembership: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireAccount)
     .input(DeleteIdentityGroupMembershipInputSchema)
     .mutation(deleteIdentityGroupMembership),
   purgeIdentityGroupMemberships: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireAccount)
     .mutation(purgeIdentityGroupMemberships),
 })

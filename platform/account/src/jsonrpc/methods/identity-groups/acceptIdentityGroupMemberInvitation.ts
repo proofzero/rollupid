@@ -48,14 +48,8 @@ export const acceptIdentityGroupMemberInvitation = async ({
 
   const caller = router.createCaller(ctx)
 
-  if (!ctx.accountURN) {
-    throw new InternalServerError({
-      message: 'No accountURN in context',
-    })
-  }
-
   const addresses = await caller.account.getOwnAddresses({
-    account: ctx.accountURN,
+    account: ctx.accountURN!,
   })
   const targetAddress = addresses.find(
     (address) =>
