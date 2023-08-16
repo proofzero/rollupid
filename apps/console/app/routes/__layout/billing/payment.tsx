@@ -24,11 +24,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const { customerID } = await coreClient.identity.getStripePaymentData.query(
-      {
-        identityURN,
-      }
-    )
+    const { customerID } = await coreClient.billing.getStripePaymentData.query({
+      URN: identityURN,
+    })
 
     const headers = request.headers
     let returnURL = headers.get('Referer')

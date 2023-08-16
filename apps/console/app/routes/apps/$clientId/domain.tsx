@@ -39,7 +39,7 @@ import { requireJWT } from '~/utilities/session.server'
 
 import dangerVector from '~/images/danger.svg'
 import { planGuardWithToastException } from '~/utils/planGate'
-import { ServicePlanType } from '@proofzero/types/identity'
+import { ServicePlanType } from '@proofzero/types/billing'
 import { appDetailsProps } from '~/types'
 
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'

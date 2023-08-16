@@ -14,8 +14,7 @@ import {
 import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { type IdentityURN } from '@proofzero/urns/identity'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
-import Stripe from 'stripe'
-import { type ServicePlanType } from '@proofzero/types/identity'
+import { ServicePlanType } from '@proofzero/types/billing'
 
 /**
  * WARNING: Here be dragons, and not the cute, cuddly kind! This code runs twice in certain scenarios because when the user
@@ -56,7 +55,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       await reconcileAppSubscriptions(
         {
           subscriptionID: subId,
-          identityURN,
+          URN: identityURN,
           coreClient,
           billingURL: `${context.env.CONSOLE_URL}/billing`,
           settingsURL: `${context.env.CONSOLE_URL}`,
@@ -73,8 +72,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           paymentIntentId: string
         }
 
-        const entitlements = await coreClient.identity.getEntitlements.query({
-          identityURN,
+        const entitlements = await coreClient.billing.getEntitlements.query({
+          URN: identityURN,
         })
 
         const numberOfEntitlements = entitlements.plans[plan]?.entitlements
@@ -87,7 +86,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           numberOfEntitlements > allotedApps
         ) {
           await coreClient.starbase.setAppPlan.mutate({
-            identityURN,
+            URN: identityURN,
             clientId,
             plan,
           })

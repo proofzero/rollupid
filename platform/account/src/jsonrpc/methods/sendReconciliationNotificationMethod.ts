@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 import { Context } from '../../context'
-import { ServicePlanType } from '@proofzero/types/identity'
 import { ReconciliationNotificationType } from '@proofzero/types/email'
+import { ServicePlanType } from '@proofzero/types/billing'
 
 export const SendReconciliationNotificationInput = z.object({
   planType: z.string(),

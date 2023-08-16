@@ -1,14 +1,14 @@
 import { z } from 'zod'
 import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
-import { ServicePlanType } from '@proofzero/types/identity'
-import { IdentityURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { AnyURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { EDGE_HAS_REFERENCE_TO, EDGE_PAYS_APP } from '@proofzero/types/graph'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { getApplicationNodeByClientId } from '../../nodes/application'
+import { ServicePlanType } from '@proofzero/types/billing'
 
 export const ReconcileAppSubscriptionsInputSchema = z.object({
-  identityURN: IdentityURNInput,
+  URN: AnyURNInput,
   count: z.number(),
   plan: z.nativeEnum(ServicePlanType),
 })
@@ -37,11 +37,11 @@ export const reconcileAppSubscriptions = async ({
   input: ReconcileAppSubscriptionsInput
   ctx: Context
 }): Promise<ReconcileAppsSubscriptionsOutput> => {
-  const { identityURN, plan, count } = input
+  const { URN, plan, count } = input
   const caller = router.createCaller(ctx)
   const { edges } = await caller.edges.getEdges({
     query: {
-      src: { baseUrn: identityURN },
+      src: { baseUrn: URN },
       tag: EDGE_PAYS_APP,
     },
   })
@@ -90,7 +90,7 @@ export const reconcileAppSubscriptions = async ({
 
     for (const app of targetApps) {
       await caller.edges.removeEdge({
-        src: identityURN,
+        src: URN,
         tag: EDGE_PAYS_APP,
         dst: app.appURN,
       })

@@ -91,7 +91,7 @@ import { AccountURN } from '@proofzero/urns/account'
 import danger from '~/images/danger.svg'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import classNames from 'classnames'
-import { ServicePlanType } from '@proofzero/types/identity'
+import { ServicePlanType } from '@proofzero/types/billing'
 import { planGuardWithToastException } from '~/utils/planGate'
 import designerSVG from '~/assets/early/designer.webp'
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
@@ -1546,13 +1546,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           message: issue.message,
         }))
 
-        errors = mappedIssues.reduce(
-          (acc, curr) => {
-            acc[curr.path] = curr.message
-            return acc
-          },
-          {} as { [key: string]: string }
-        )
+        errors = mappedIssues.reduce((acc, curr) => {
+          acc[curr.path] = curr.message
+          return acc
+        }, {} as { [key: string]: string })
       } else {
         await coreClient.starbase.setAppTheme.mutate({
           clientId,
@@ -1589,13 +1586,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           message: issue.message,
         }))
 
-        errors = mappedIssues.reduce(
-          (acc, curr) => {
-            acc[curr.path] = curr.message
-            return acc
-          },
-          {} as { [key: string]: string }
-        )
+        errors = mappedIssues.reduce((acc, curr) => {
+          acc[curr.path] = curr.message
+          return acc
+        }, {} as { [key: string]: string })
       } else {
         await coreClient.starbase.setEmailOTPTheme.mutate({
           clientId,
@@ -1632,13 +1626,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           message: issue.message,
         }))
 
-        errors = mappedIssues.reduce(
-          (acc, curr) => {
-            acc[curr.path] = curr.message
-            return acc
-          },
-          {} as { [key: string]: string }
-        )
+        errors = mappedIssues.reduce((acc, curr) => {
+          acc[curr.path] = curr.message
+          return acc
+        }, {} as { [key: string]: string })
       } else {
         await coreClient.starbase.setOgTheme.mutate({
           clientId,

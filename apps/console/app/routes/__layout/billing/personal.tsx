@@ -51,14 +51,12 @@ import { TbHourglassHigh } from 'react-icons/tb'
 import classnames from 'classnames'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
-import { type PaymentData, ServicePlanType } from '@proofzero/types/account'
 import {
   ToastType,
   Toaster,
   toast,
 } from '@proofzero/design-system/src/atoms/toast'
 import plans, { type PlanDetails } from './plans'
-import { type AccountURN } from '@proofzero/urns/account'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { HiArrowNarrowRight } from 'react-icons/hi'
@@ -91,6 +89,8 @@ import type Stripe from 'stripe'
 import { ToastWarning } from '@proofzero/design-system/src/atoms/toast/ToastWarning'
 import { Toast } from '@proofzero/design-system/src/atoms/toast/Toast'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
+import { ServicePlanType, type PaymentData } from '@proofzero/types/billing'
+import { IdentityURN } from '@proofzero/urns/identity'
 
 type LoaderData = {
   STRIPE_PUBLISHABLE_KEY: string
@@ -107,7 +107,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
     const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
-    const accountURN = parsedJwt.sub as AccountURN
+    const identityURN = parsedJwt.sub as IdentityURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
@@ -116,8 +116,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const { plans } = await coreClient.account.getEntitlements.query({
-      accountURN,
+    const { plans } = await coreClient.billing.getEntitlements.query({
+      URN: identityURN,
     })
 
     const flashSession = await getFlashSession(request, context.env)
@@ -128,33 +128,33 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       toastNotification = JSON.parse(toastStr)
     }
 
-    const connectedAccounts = await coreClient.account.getAddresses.query({
-      account: accountURN,
+    const connectedAccounts = await coreClient.identity.getAddresses.query({
+      account: identityURN,
     })
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
-    const spd = await coreClient.account.getStripePaymentData.query({
-      accountURN,
+    const spd = await coreClient.billing.getStripePaymentData.query({
+      URN: identityURN,
     })
-    if (spd && !spd.addressURN) {
-      const targetAddressURN =
-        await coreClient.address.getAddressURNForEmail.query(
+    if (spd && !spd.accountURN) {
+      const targetAccountURN =
+        await coreClient.identity.getAddressURNForEmail.query(
           spd.email.toLowerCase()
         )
 
-      if (!targetAddressURN) {
+      if (!targetAccountURN) {
         throw new InternalServerError({
           message: 'No address found for email',
         })
       }
 
-      await coreClient.account.setStripePaymentData.mutate({
+      await coreClient.billing.setStripePaymentData.mutate({
         ...spd,
-        addressURN: targetAddressURN,
-        accountURN,
+        accountURN: targetAccountURN,
+        URN: identityURN,
       })
 
-      spd.addressURN = targetAddressURN
+      spd.accountURN = targetAccountURN
     }
 
     const invoices = (
@@ -189,7 +189,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
-    const accountURN = parsedJwt.sub as AccountURN
+    const identityURN = parsedJwt.sub as IdentityURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
@@ -198,8 +198,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const spd = await coreClient.account.getStripePaymentData.query({
-      accountURN,
+    const spd = await coreClient.billing.getStripePaymentData.query({
+      URN: identityURN,
     })
 
     const invoices = await getCurrentAndUpcomingInvoices(
@@ -242,8 +242,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    const entitlements = await coreClient.account.getEntitlements.query({
-      accountURN,
+    const entitlements = await coreClient.billing.getEntitlements.query({
+      URN: identityURN,
     })
 
     const sub = await createOrUpdateSubscription({
@@ -252,7 +252,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
       quantity,
       subscriptionID: entitlements.subscriptionID,
-      accountURN,
+      identityURN,
     })
 
     if (
@@ -263,7 +263,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       await reconcileAppSubscriptions(
         {
           subscriptionID: sub.id,
-          accountURN,
+          URN: identityURN,
           coreClient,
           billingURL: `${context.env.CONSOLE_URL}/billing`,
           settingsURL: `${context.env.CONSOLE_URL}`,

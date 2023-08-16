@@ -1,11 +1,12 @@
-import { Outlet, useLoaderData } from '@remix-run/react'
+import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { LoaderFunction, json, redirect } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
-import { ListIdentityGroupsOutput } from '@proofzero/platform/account/src/jsonrpc/methods/identity-groups/listIdentityGroups'
+import type { LoaderData as OutletContextData } from '~/root'
+import { ListIdentityGroupsOutput } from '@proofzero/platform/identity/src/jsonrpc/methods/identity-groups/listIdentityGroups'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -18,7 +19,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const groups = await coreClient.account.listIdentityGroups.query()
+    const groups = await coreClient.identity.listIdentityGroups.query()
     if (groups.length === 0) {
       return redirect('/billing/personal')
     }
@@ -31,11 +32,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
 export default () => {
   const { groups } = useLoaderData<{ groups: ListIdentityGroupsOutput }>()
+  const { PASSPORT_URL } = useOutletContext<OutletContextData>()
 
   return (
     <Outlet
       context={{
         groups,
+        PASSPORT_URL,
       }}
     />
   )

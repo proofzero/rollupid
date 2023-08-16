@@ -3,7 +3,7 @@ import { FeaturePill } from '@proofzero/design-system/src/atoms/pills/FeaturePil
 import { DocumentationBadge } from '../DocumentationBadge'
 import type { IdentityURN } from '@proofzero/urns/identity'
 import ContactUs from '../ContactUs'
-import { ServicePlanType } from '@proofzero/types/identity'
+import { ServicePlanType } from '@proofzero/types/billing'
 import { isPlanGuarded } from '~/utils/planGate'
 import plans from '~/routes/__layout/billing/plans'
 import _ from 'lodash'

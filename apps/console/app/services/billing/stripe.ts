@@ -1,8 +1,8 @@
 import { InternalServerError } from '@proofzero/errors'
 import { type CoreClientType } from '@proofzero/platform-clients/core'
 import { type ReconcileAppsSubscriptionsOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/reconcileAppSubscriptions'
-import { ServicePlanType } from '@proofzero/types/identity'
-import { type IdentityURN } from '@proofzero/urns/identity'
+import { ServicePlanType } from '@proofzero/types/billing'
+import { AnyURN } from '@proofzero/urns'
 import { redirect } from '@remix-run/cloudflare'
 import { type Env } from 'bindings'
 import Stripe from 'stripe'
@@ -11,7 +11,7 @@ import plans from '~/routes/__layout/billing/plans'
 type CreateCustomerParams = {
   email: string
   name: string
-  identityURN: string
+  URN: AnyURN
 }
 
 type UpdateCustomerParams = {
@@ -29,7 +29,7 @@ type CreateSubscriptionParams = {
   customerID: string
   planID: string
   quantity: number
-  identityURN: IdentityURN
+  URN: AnyURN
   handled?: boolean
 }
 
@@ -41,7 +41,7 @@ type UpdateSubscriptionParams = {
 }
 
 type SubscriptionMetadata = Partial<{
-  identityURN: IdentityURN
+  URN: AnyURN
   handled: string | null
 }>
 
@@ -50,7 +50,7 @@ type GetInvoicesParams = {
 }
 
 export const createCustomer = async (
-  { email, name, identityURN }: CreateCustomerParams,
+  { email, name, URN }: CreateCustomerParams,
   env: Env
 ) => {
   const stripeClient = new Stripe(env.SECRET_STRIPE_API_KEY, {
@@ -61,7 +61,7 @@ export const createCustomer = async (
     email,
     name,
     metadata: {
-      identityURN,
+      URN,
     },
   })
 
@@ -124,13 +124,13 @@ export const createSubscription = async (
     customerID,
     planID,
     quantity,
-    identityURN,
+    URN,
     handled = false,
   }: CreateSubscriptionParams,
   stripeClient: Stripe
 ) => {
   const metadata: SubscriptionMetadata = {}
-  metadata.identityURN = identityURN
+  metadata.URN = URN
 
   if (handled) metadata.handled = handled.toString()
 
@@ -244,13 +244,13 @@ export const voidInvoice = async (
 export const reconcileAppSubscriptions = async (
   {
     subscriptionID,
-    identityURN,
+    URN,
     coreClient,
     billingURL,
     settingsURL,
   }: {
     subscriptionID: string
-    identityURN: IdentityURN
+    URN: AnyURN
     coreClient: CoreClientType
     billingURL: string
     settingsURL: string
@@ -277,25 +277,25 @@ export const reconcileAppSubscriptions = async (
   }
 
   const { email: billingEmail } =
-    await coreClient.identity.getStripePaymentData.query({
-      identityURN,
+    await coreClient.billing.getStripePaymentData.query({
+      URN,
     })
 
   let reconciliations: ReconcileAppsSubscriptionsOutput = []
   for (const pq of planQuantities) {
     const planReconciliations =
       await coreClient.starbase.reconcileAppSubscriptions.mutate({
-        identityURN,
-        count: pq.quantity,
+        URN: URN,
+        count: pq.quantity!,
         plan: priceIdToPlanTypeDict[pq.priceID],
       })
 
     reconciliations = reconciliations.concat(planReconciliations)
 
-    await coreClient.identity.updateEntitlements.mutate({
-      identityURN,
+    await coreClient.billing.updateEntitlements.mutate({
+      URN: URN,
       subscriptionID: subscriptionID,
-      quantity: pq.quantity,
+      quantity: pq.quantity!,
       type: priceIdToPlanTypeDict[pq.priceID],
     })
   }
@@ -318,7 +318,7 @@ export const reconcileAppSubscriptions = async (
     )
 
     await coreClient.account.sendReconciliationNotification.query({
-      planType: plans[reconciliations[0].plan].title, // Only pro for now
+      planType: plans[ServicePlanType.PRO].title, // Only pro for now
       count: reconciliations.length,
       billingEmail,
       apps: reconciliations.map((app) => ({

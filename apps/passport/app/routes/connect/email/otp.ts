@@ -9,7 +9,7 @@ import { getAuthzCookieParams } from '~/session.server'
 import type { EmailThemeProps } from '@proofzero/platform/email/src/emailFunctions'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ServicePlanType } from '@proofzero/types/identity'
+import { ServicePlanType } from '@proofzero/types/billing'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {

@@ -1,16 +1,11 @@
 import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import {
-  ApplicationURN,
-  ApplicationURNSpace,
-} from '@proofzero/urns/application'
+import { ApplicationURNSpace } from '@proofzero/urns/application'
 import {
   AppReadableFieldsSchema,
   AppUpdateableFieldsSchema,
 } from '../validators/app'
-import { EdgeDirection } from '@proofzero/types/graph'
-import { EDGE_APPLICATION } from '../../types'
 import { NoInput } from '@proofzero/platform-middleware/inputValidators'
 
 export const ListAppsOutput = z.array(

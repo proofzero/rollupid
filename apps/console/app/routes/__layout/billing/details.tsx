@@ -38,15 +38,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       name: string
     }
 
-    let paymentData = await coreClient.identity.getStripePaymentData.query({
-      identityURN,
+    let paymentData = await coreClient.billing.getStripePaymentData.query({
+      URN: identityURN,
     })
     if (!paymentData) {
       const customer = await createCustomer(
         {
           email,
           name,
-          identityURN,
+          URN: identityURN,
         },
         context.env
       )
@@ -75,9 +75,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       )
     }
 
-    await coreClient.identity.setStripePaymentData.mutate({
+    await coreClient.billing.setStripePaymentData.mutate({
       ...paymentData,
-      identityURN,
+      URN: identityURN,
       accountURN,
     })
 

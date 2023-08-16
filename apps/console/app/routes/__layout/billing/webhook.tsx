@@ -11,7 +11,8 @@ import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { InternalServerError, RollupError } from '@proofzero/errors'
 import { type AccountURN } from '@proofzero/urns/account'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
-import { ServicePlanType } from '@proofzero/types/identity'
+import { ServicePlanType } from '@proofzero/types/billing'
+import { AnyURN } from '@proofzero/urns'
 
 type StripeInvoicePayload = {
   id: string
@@ -51,6 +52,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       whSecret
     )
 
+    let URN
+
     switch (event.type) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
@@ -63,7 +66,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           id: string
           latest_invoice: string
           metadata: {
-            identityURN: IdentityURN
+            identityURN?: IdentityURN
+            accountURN?: AccountURN
+            URN?: AnyURN
           }
           status: string
         }
@@ -79,8 +84,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           return null
         }
 
-        const entitlements = await coreClient.identity.getEntitlements.query({
-          identityURN: subMeta.identityURN,
+        URN = (subMeta.URN ??
+          subMeta.accountURN ??
+          subMeta.identityURN) as AnyURN
+
+        const entitlements = await coreClient.billing.getEntitlements.query({
+          URN,
         })
         if (entitlements?.subscriptionID !== id) {
           throw new RollupError({
@@ -91,7 +100,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         await reconcileAppSubscriptions(
           {
             subscriptionID: id,
-            identityURN: subMeta.identityURN,
+            URN,
             coreClient,
             billingURL: `${context.env.CONSOLE_URL}/billing`,
             settingsURL: `${context.env.CONSOLE_URL}`,
@@ -112,14 +121,20 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             default_payment_method: string
           }
           metadata: {
-            identityURN: IdentityURN
+            identityURN?: IdentityURN
+            accountURN?: AccountURN
+            URN?: AnyURN
           }
         }
 
+        URN = (cusMeta.URN ??
+          cusMeta.accountURN ??
+          cusMeta.identityURN) as AnyURN
+
         if (invoice_settings?.default_payment_method) {
           const paymentData =
-            await coreClient.identity.getStripePaymentData.query({
-              identityURN: cusMeta.identityURN,
+            await coreClient.billing.getStripePaymentData.query({
+              URN,
             })
           paymentData.paymentMethodID = invoice_settings.default_payment_method
 
@@ -144,10 +159,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           const accountURN =
             paymentData.accountURN ?? (inferredAccountURN as AccountURN)
 
-          await coreClient.identity.setStripePaymentData.mutate({
+          await coreClient.billing.setStripePaymentData.mutate({
             ...paymentData,
             accountURN,
-            identityURN: cusMeta.identityURN,
+            URN,
           })
         }
 
@@ -268,7 +283,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           customer: string
           id: string
           metadata: {
-            identityURN: IdentityURN
+            identityURN?: IdentityURN
+            accountURN?: AccountURN
+            URN?: AnyURN
           }
         }
         const customerDataDel = await stripeClient.customers.retrieve(
@@ -277,18 +294,22 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         if (!customerDataDel.deleted && customerDataDel.email) {
           const { email, name } = customerDataDel
 
+          URN = (metaDel.URN ??
+            metaDel.accountURN ??
+            metaDel.identityURN) as AnyURN
+
           await Promise.all([
             coreClient.account.sendBillingNotification.mutate({
               email,
               name: name || 'Client',
             }),
-            coreClient.identity.cancelServicePlans.mutate({
-              identity: metaDel.identityURN,
+            coreClient.billing.cancelServicePlans.mutate({
+              URN,
               subscriptionID: subIdDel,
               deletePaymentData: event.type === 'customer.deleted',
             }),
             coreClient.starbase.deleteSubscriptionPlans.mutate({
-              identityURN: metaDel.identityURN,
+              URN,
             }),
           ])
         }

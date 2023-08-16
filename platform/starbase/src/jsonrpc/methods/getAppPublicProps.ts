@@ -7,7 +7,7 @@ import {
   AppPublicPropsSchema,
 } from '../validators/app'
 import type { CustomDomain } from '../../types'
-import { ServicePlanType } from '@proofzero/types/identity'
+import { ServicePlanType } from '@proofzero/types/billing'
 
 export const GetAppPublicPropsInput = AppClientIdParamSchema
 export const GetAppPublicPropsOutput = AppPublicPropsSchema
