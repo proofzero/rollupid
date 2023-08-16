@@ -1,0 +1,11 @@
+:secret = secret
+:limit = 100
+:offset = 0
+
+POST http://localhost:10101
+Content-Type: application/json
+X-Migration-Secret: :secret
+{
+  "limit": :limit,
+  "offset": :offset
+}

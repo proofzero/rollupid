@@ -1,0 +1,7 @@
+# DEV
+wrangler d1 time-travel restore edges-v2-dev --bookmark=0000018e-00000000-00004c81-69ea16750f299c7be796dfb9243fdaee
+
+# NEXT
+wrangler d1 time-travel restore edges-v2-next --bookmark=0000009b-00000000-00004c81-7cd740cfe4348fbd94820e1d6d4ac07c
+
+# CURRENT
