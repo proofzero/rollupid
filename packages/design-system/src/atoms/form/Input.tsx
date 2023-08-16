@@ -24,7 +24,7 @@ export const Input = ({
   const computedName = name ?? id
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col w-full">
       {label && (
         <label
           htmlFor={id}
