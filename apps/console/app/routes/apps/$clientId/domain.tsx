@@ -39,12 +39,12 @@ import { requireJWT } from '~/utilities/session.server'
 
 import dangerVector from '~/images/danger.svg'
 import { planGuardWithToastException } from '~/utils/planGate'
-import { ServicePlanType } from '@proofzero/types/account'
+import { ServicePlanType } from '@proofzero/types/identity'
 import { appDetailsProps } from '~/types'
 
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 import domainSVG from '~/assets/early/domain.svg'
-import { AccountURN } from '@proofzero/urns/account'
+import { IdentityURN } from '@proofzero/urns/identity'
 import { HiOutlineX } from 'react-icons/hi'
 
 type AppData = { customDomain?: CustomDomain; hostname: string; cname: string }
@@ -127,9 +127,9 @@ export default () => {
   const loaderData = useLoaderData<AppData>()
   const { customDomain, hostname } = fetcher.data || actionData || loaderData
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>()
-  const { appDetails, accountURN } = useOutletContext<{
+  const { appDetails, identityURN } = useOutletContext<{
     appDetails: appDetailsProps
-    accountURN: AccountURN
+    identityURN: IdentityURN
   }>()
 
   useEffect(() => {
@@ -151,7 +151,7 @@ export default () => {
         earlyAccess={false}
         currentPlan={appDetails.appPlan}
         featurePlan={ServicePlanType.PRO}
-        accountURN={accountURN}
+        identityURN={identityURN}
       />
     )
   }

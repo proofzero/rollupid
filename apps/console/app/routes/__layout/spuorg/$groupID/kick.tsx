@@ -9,7 +9,7 @@ import {
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
 import { BadRequestError } from '@proofzero/errors'
-import { AccountURN } from '@proofzero/urns/account'
+import { IdentityURN } from '@proofzero/urns/identity'
 import { appendToastToFlashSession } from '~/utils/toast.server'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 
@@ -24,10 +24,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     ) as IdentityGroupURN
 
     const fd = await request.formData()
-    const accountURN = fd.get('accountURN')
-    if (!accountURN) {
+    const identityURN = fd.get('identityURN')
+    if (!identityURN) {
       throw new BadRequestError({
-        message: 'accountURN is required',
+        message: 'identityURN is required',
       })
     }
 
@@ -41,7 +41,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     let toastSession
     try {
       if (purge) {
-        await coreClient.account.deleteIdentityGroup.mutate(groupURN)
+        await coreClient.identity.deleteIdentityGroup.mutate(groupURN)
 
         toastSession = await appendToastToFlashSession(
           request,
@@ -59,8 +59,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         })
       }
 
-      await coreClient.account.deleteIdentityGroupMembership.mutate({
-        accountURN: accountURN as AccountURN,
+      await coreClient.identity.deleteIdentityGroupMembership.mutate({
+        identityURN: identityURN as IdentityURN,
         identityGroupURN: groupURN,
       })
 

@@ -11,7 +11,7 @@ import type { Context } from './context'
 
 import { parseJwt } from '@proofzero/utils'
 import { BadRequestError } from '@proofzero/errors'
-import { ROLLUP_INTERNAL_ACCESS_TOKEN_URN } from '@proofzero/platform.access/src/constants'
+import { ROLLUP_INTERNAL_ACCESS_TOKEN_URN } from '@proofzero/platform/authorization/src/constants'
 
 export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({
   ctx,
@@ -47,14 +47,14 @@ export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({
     })
   }
 
-  if (!ctx.accountURN) throw new Error('No account URN in context')
+  if (!ctx.identityURN) throw new Error('No identity URN in context')
 
   const caller = router.createCaller(ctx)
 
-  //Get application edges for the given accountURN
+  //Get application edges for the given identityURN
   const edgeList = await caller.edges.getEdges({
     query: {
-      src: { baseUrn: ctx.accountURN },
+      src: { baseUrn: ctx.identityURN },
       tag: EDGE_APPLICATION,
     },
   })

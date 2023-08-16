@@ -64,10 +64,10 @@ import { GetAppThemeResult } from '@proofzero/platform/starbase/src/jsonrpc/meth
 import Authorization from '@proofzero/design-system/src/templates/authorization/Authorization'
 import { SCOPES_JSON } from '@proofzero/security/scopes'
 import {
-  CryptoAddressType,
-  EmailAddressType,
-  OAuthAddressType,
-} from '@proofzero/types/address'
+  CryptoAccountType,
+  EmailAccountType,
+  OAuthAccountType,
+} from '@proofzero/types/account'
 import { TbMoon, TbSunHigh } from 'react-icons/tb'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 import { Helmet } from 'react-helmet'
@@ -83,19 +83,19 @@ import { GetEmailOTPThemeResult } from '@proofzero/platform/starbase/src/jsonrpc
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import {
   getEmailIcon,
-  adjustAddressTypeToDisplay,
+  adjustAccountTypeToDisplay,
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import type { appDetailsProps } from '~/types'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
-import { AddressURN } from '@proofzero/urns/address'
+import { AccountURN } from '@proofzero/urns/account'
 import danger from '~/images/danger.svg'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import classNames from 'classnames'
-import { ServicePlanType } from '@proofzero/types/account'
+import { ServicePlanType } from '@proofzero/types/identity'
 import { planGuardWithToastException } from '~/utils/planGate'
 import designerSVG from '~/assets/early/designer.webp'
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
-import { AccountURN } from '@proofzero/urns/account'
+import { IdentityURN } from '@proofzero/urns/identity'
 import { GetOgThemeResult } from '@proofzero/platform.starbase/src/jsonrpc/methods/getOgTheme'
 
 const LazyAuth = lazy(() =>
@@ -788,15 +788,15 @@ const AuthPanel = ({
                     connectedEmails={[
                       {
                         title: 'email@example.com',
-                        icon: getEmailIcon(EmailAddressType.Email),
+                        icon: getEmailIcon(EmailAccountType.Email),
                         value:
-                          'urn:rollupid:address/0xc2b930f1fc2a55ddc1bf89e8844ca0479567ac44f3e2eea58216660e26947686',
+                          'urn:rollupid:account/0xc2b930f1fc2a55ddc1bf89e8844ca0479567ac44f3e2eea58216660e26947686',
                       },
                       {
                         title: 'email2@example.com',
-                        icon: getEmailIcon(OAuthAddressType.Microsoft),
+                        icon: getEmailIcon(OAuthAccountType.Microsoft),
                         value:
-                          'urn:rollupid:address/0xc2b930f1fc2a55ddc1bf99e8844ca0479567ac44f3e2eea58216660e26947686',
+                          'urn:rollupid:account/0xc2b930f1fc2a55ddc1bf99e8844ca0479567ac44f3e2eea58216660e26947686',
                       },
                     ]}
                     selectEmailCallback={() => {}}
@@ -805,35 +805,35 @@ const AuthPanel = ({
                     connectedAccounts={[
                       {
                         title: 'email@example.com',
-                        subtitle: `${adjustAddressTypeToDisplay(
-                          EmailAddressType.Email
+                        subtitle: `${adjustAccountTypeToDisplay(
+                          EmailAccountType.Email
                         )} - email@example.com`,
                         value:
-                          'urn:rollupid:address/0x98f8b8473269c7e4444756d5ecef7dce5457a5d58df4100b46478402f59de57c',
+                          'urn:rollupid:account/0x98f8b8473269c7e4444756d5ecef7dce5457a5d58df4100b46478402f59de57c',
                       },
                       {
                         title: 'MS Email',
-                        subtitle: `${adjustAddressTypeToDisplay(
-                          OAuthAddressType.Microsoft
+                        subtitle: `${adjustAccountTypeToDisplay(
+                          OAuthAccountType.Microsoft
                         )} - email2@example.com`,
                         value:
-                          'urn:rollupid:address/0x3c7d7e3fef81c03333ed63d4ac83d2a1840356122163985deb1615e6ecfc25be',
+                          'urn:rollupid:account/0x3c7d7e3fef81c03333ed63d4ac83d2a1840356122163985deb1615e6ecfc25be',
                       },
                       {
                         title: 'Github',
-                        subtitle: `${adjustAddressTypeToDisplay(
-                          OAuthAddressType.GitHub
+                        subtitle: `${adjustAccountTypeToDisplay(
+                          OAuthAccountType.GitHub
                         )} - Github-Account`,
                         value:
-                          'urn:rollupid:address/0xa69240d7b361e122d22aa68ff97b9530c7c85953fba9dac392ca8dbfb88e17cc',
+                          'urn:rollupid:account/0xa69240d7b361e122d22aa68ff97b9530c7c85953fba9dac392ca8dbfb88e17cc',
                       },
                       {
                         title: 'ens.eth',
-                        subtitle: `${adjustAddressTypeToDisplay(
-                          CryptoAddressType.ETH
+                        subtitle: `${adjustAccountTypeToDisplay(
+                          CryptoAccountType.ETH
                         )} - 0x6c60Da9471181Aa54C648c6e203663A5501363F3`,
                         value:
-                          'urn:rollupid:address/0x4416ad52d0d65d4b8852b8041039822e92ff4aa301af1b3ab987bd930f6fb4c8',
+                          'urn:rollupid:account/0x4416ad52d0d65d4b8852b8041039822e92ff4aa301af1b3ab987bd930f6fb4c8',
                       },
                     ]}
                     selectedSCWallets={[]}
@@ -872,7 +872,7 @@ const AuthPanel = ({
 
 const EmailPanel = ({
   clientId,
-  addressURN,
+  accountURN,
   appContactEmail,
   appPublished = false,
   emailTheme,
@@ -880,7 +880,7 @@ const EmailPanel = ({
   errors,
 }: {
   clientId: string
-  addressURN?: AddressURN
+  accountURN?: AccountURN
   appContactEmail?: string
   appPublished: boolean
   emailTheme?: EmailOTPTheme
@@ -1156,7 +1156,7 @@ const EmailPanel = ({
 
                     previewEmailFetcher.submit(
                       {
-                        addressURN: addressURN!,
+                        accountURN: accountURN!,
                         theme: JSON.stringify(previewTheme),
                       },
                       {
@@ -1546,10 +1546,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           message: issue.message,
         }))
 
-        errors = mappedIssues.reduce((acc, curr) => {
-          acc[curr.path] = curr.message
-          return acc
-        }, {} as { [key: string]: string })
+        errors = mappedIssues.reduce(
+          (acc, curr) => {
+            acc[curr.path] = curr.message
+            return acc
+          },
+          {} as { [key: string]: string }
+        )
       } else {
         await coreClient.starbase.setAppTheme.mutate({
           clientId,
@@ -1586,10 +1589,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           message: issue.message,
         }))
 
-        errors = mappedIssues.reduce((acc, curr) => {
-          acc[curr.path] = curr.message
-          return acc
-        }, {} as { [key: string]: string })
+        errors = mappedIssues.reduce(
+          (acc, curr) => {
+            acc[curr.path] = curr.message
+            return acc
+          },
+          {} as { [key: string]: string }
+        )
       } else {
         await coreClient.starbase.setEmailOTPTheme.mutate({
           clientId,
@@ -1626,10 +1632,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           message: issue.message,
         }))
 
-        errors = mappedIssues.reduce((acc, curr) => {
-          acc[curr.path] = curr.message
-          return acc
-        }, {} as { [key: string]: string })
+        errors = mappedIssues.reduce(
+          (acc, curr) => {
+            acc[curr.path] = curr.message
+            return acc
+          },
+          {} as { [key: string]: string }
+        )
       } else {
         await coreClient.starbase.setOgTheme.mutate({
           clientId,
@@ -1669,12 +1678,12 @@ export default () => {
     }[]
   }>()
 
-  const { appDetails, appContactAddress, appContactEmail, accountURN } =
+  const { appDetails, appContactAddress, appContactEmail, identityURN } =
     useOutletContext<{
       appDetails: appDetailsProps
-      appContactAddress?: AddressURN
+      appContactAddress?: AccountURN
       appContactEmail?: string
-      accountURN: AccountURN
+      identityURN: IdentityURN
     }>()
 
   const actionData = useActionData()
@@ -1706,7 +1715,7 @@ export default () => {
         earlyAccess={false}
         currentPlan={appDetails.appPlan}
         featurePlan={ServicePlanType.PRO}
-        accountURN={accountURN}
+        identityURN={identityURN}
       />
     )
   }
@@ -1797,7 +1806,7 @@ export default () => {
 
             <EmailPanel
               clientId={appDetails.clientId!}
-              addressURN={appContactAddress}
+              accountURN={appContactAddress}
               appContactEmail={appContactEmail}
               appPublished={appDetails.published ?? false}
               emailTheme={emailTheme}

@@ -64,11 +64,11 @@ import {
   GetAppPublicPropsInput,
   GetAppPublicPropsOutput,
 } from './methods/getAppPublicProps'
-import { getAuthorizedAccounts } from './methods/getAuthorizedAccounts'
+import { getAuthorizedIdentities } from './methods/getAuthorizedIdentities'
 import {
-  GetAuthorizedAccountsMethodInput,
-  GetAuthorizedAccountsMethodOutput,
-} from './methods/getAuthorizedAccounts'
+  GetAuthorizedIdentitiesMethodInput,
+  GetAuthorizedIdentitiesMethodOutput,
+} from './methods/getAuthorizedIdentities'
 import {
   getAppContactAddress,
   GetAppContactAddressInput,
@@ -195,15 +195,15 @@ export const appRouter = t.router({
     .input(GetAppProfileInput)
     .output(GetAppProfileOutput)
     .query(getAppProfile),
-  getAuthorizedAccounts: t.procedure
+  getAuthorizedIdentities: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .use(OwnAppsMiddleware)
-    .input(GetAuthorizedAccountsMethodInput)
-    .output(GetAuthorizedAccountsMethodOutput)
-    .query(getAuthorizedAccounts),
+    .input(GetAuthorizedIdentitiesMethodInput)
+    .output(GetAuthorizedIdentitiesMethodOutput)
+    .query(getAuthorizedIdentities),
   listApps: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)

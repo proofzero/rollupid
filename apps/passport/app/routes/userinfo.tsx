@@ -14,7 +14,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const { origin: issuer } = new URL(request.url)
 
     const coreClient = getCoreClient({ context })
-    const result = await coreClient.access.getUserInfo.query({
+    const result = await coreClient.authorization.getUserInfo.query({
       access_token,
       issuer,
     })

@@ -1,3 +1,3 @@
-export const PlatformAddressURNHeader = 'rollup-address-urn'
+export const PlatformAccountURNHeader = 'rollup-account-urn'
 
 export const AppAPIKeyHeader = 'APP-API-KEY'

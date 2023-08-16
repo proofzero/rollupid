@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@ethersproject/bytes": "5.7.0",
+    "@proofzero/platform.authorization": "workspace:*",
     "@proofzero/security": "workspace:*",
     "@proofzero/urns": "workspace:*",
     "@proofzero/utils": "workspace:*",

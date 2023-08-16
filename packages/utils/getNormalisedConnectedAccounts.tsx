@@ -2,10 +2,10 @@ import React from 'react'
 
 import {
   NodeType,
-  OAuthAddressType,
-  EmailAddressType,
-  CryptoAddressType,
-} from '@proofzero/types/address'
+  OAuthAccountType,
+  EmailAccountType,
+  CryptoAccountType,
+} from '@proofzero/types/account'
 
 import { HiOutlineEnvelope } from 'react-icons/hi2'
 
@@ -13,10 +13,10 @@ import googleIcon from '@proofzero/design-system/src/atoms/providers/Google'
 import microsoftIcon from '@proofzero/design-system/src/atoms/providers/Microsoft'
 import appleIcon from '@proofzero/design-system/src/atoms/providers/Apple'
 
-import type { Addresses } from '@proofzero/platform.account/src/types'
-import type { AddressURN } from '@proofzero/urns/address'
+import type { Accounts } from '@proofzero/platform.identity/src/types'
+import type { AccountURN } from '@proofzero/urns/account'
 import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
-import type { GetAddressProfileResult } from '@proofzero/platform.address/src/jsonrpc/methods/getAddressProfile'
+import type { GetAccountProfileResult } from '@proofzero/platform.account/src/jsonrpc/methods/getAccountProfile'
 
 export enum OptionType {
   AddNew,
@@ -25,83 +25,83 @@ export enum OptionType {
 
 export type EmailSelectListItem = {
   email: string
-  type: OAuthAddressType | EmailAddressType | OptionType
-  addressURN?: AddressURN
+  type: OAuthAccountType | EmailAccountType | OptionType
+  accountURN?: AccountURN
 }
 
 export type SCWalletSelectListItem = {
   title: string
-  type: CryptoAddressType | OptionType
-  addressURN: AddressURN
-  cryptoAddress?: string
+  type: CryptoAccountType | OptionType
+  accountURN: AccountURN
+  cryptoAccount?: string
 }
 
 export const getEmailIcon = (type: string): JSX.Element => {
-  return type === OAuthAddressType.Microsoft ? (
+  return type === OAuthAccountType.Microsoft ? (
     <img src={microsoftIcon} className="w-4 h-4 mr-3" />
-  ) : type === OAuthAddressType.Apple ? (
+  ) : type === OAuthAccountType.Apple ? (
     <img src={appleIcon} className="w-4 h-4 mr-3" />
-  ) : type === OAuthAddressType.Google ? (
+  ) : type === OAuthAccountType.Google ? (
     <img src={googleIcon} className="w-4 h-4 mr-3" />
   ) : (
     <HiOutlineEnvelope className="w-4 h-4 mr-3" />
   )
 }
 
-export const adjustAddressTypeToDisplay = (
-  addressType: OAuthAddressType | EmailAddressType | CryptoAddressType
+export const adjustAccountTypeToDisplay = (
+  accountType: OAuthAccountType | EmailAccountType | CryptoAccountType
 ) => {
-  if (addressType === CryptoAddressType.Wallet) {
+  if (accountType === CryptoAccountType.Wallet) {
     return 'SC Wallet'
   }
-  return addressType.charAt(0).toUpperCase() + addressType.slice(1)
+  return accountType.charAt(0).toUpperCase() + accountType.slice(1)
 }
 
 export const getEmailDropdownItems = (
-  connectedAddresses?: Addresses | null
+  connectedAccounts?: Accounts | null
 ): Array<DropdownSelectListItem> => {
-  if (!connectedAddresses) return []
+  if (!connectedAccounts) return []
 
-  const filteredEmailsFromConnectedAddresses = connectedAddresses.filter(
-    (address) => {
+  const filteredEmailsFromConnectedAccounts = connectedAccounts.filter(
+    (account) => {
       return (
-        (address.rc.node_type === NodeType.OAuth &&
-          (address.rc.addr_type === OAuthAddressType.Google ||
-            address.rc.addr_type === OAuthAddressType.Microsoft ||
-            address.rc.addr_type === OAuthAddressType.Apple)) ||
-        (address.rc.node_type === NodeType.Email &&
-          address.rc.addr_type === EmailAddressType.Email)
+        (account.rc.node_type === NodeType.OAuth &&
+          (account.rc.addr_type === OAuthAccountType.Google ||
+            account.rc.addr_type === OAuthAccountType.Microsoft ||
+            account.rc.addr_type === OAuthAccountType.Apple)) ||
+        (account.rc.node_type === NodeType.Email &&
+          account.rc.addr_type === EmailAccountType.Email)
       )
     }
   )
 
-  return filteredEmailsFromConnectedAddresses.map((address, i) => {
+  return filteredEmailsFromConnectedAccounts.map((account, i) => {
     return {
       // There's a problem when passing icon down to client (since icon is a JSX.Element)
       // My guess is that it should be rendered on the client side only.
       // that's why I'm passing type (as subtitle) instead of icon and then substitute it
       // with icon on the client side
-      subtitle: address.rc.addr_type as
-        | OAuthAddressType
-        | EmailAddressType
-        | CryptoAddressType,
-      title: address.qc.alias,
-      value: address.baseUrn as AddressURN,
+      subtitle: account.rc.addr_type as
+        | OAuthAccountType
+        | EmailAccountType
+        | CryptoAccountType,
+      title: account.qc.alias,
+      value: account.baseUrn as AccountURN,
     }
   })
 }
 
-//addressDropdownItems
-export const getAddressDropdownItems = (
-  addressProfiles?: Array<GetAddressProfileResult> | null
+//accountDropdownItems
+export const getAccountDropdownItems = (
+  accountProfiles?: Array<GetAccountProfileResult> | null
 ): Array<DropdownSelectListItem> => {
-  if (!addressProfiles) return []
-  return addressProfiles.map((address) => {
+  if (!accountProfiles) return []
+  return accountProfiles.map((account) => {
     return {
-      title: address.title,
-      value: address.id as AddressURN,
-      subtitle: `${adjustAddressTypeToDisplay(address.type)} - ${
-        address.address
+      title: account.title,
+      value: account.id as AccountURN,
+      subtitle: `${adjustAccountTypeToDisplay(account.type)} - ${
+        account.address
       }`,
     }
   })

@@ -1,1 +1,1 @@
-export * from '../../../platform/core/src/context'
+export * from '@proofzero/platform.core/src/context'

@@ -1,6 +1,6 @@
-import { BaseURN, URNSpace, parseURN, SpaceOptions } from 'urns'
+import { BaseURN, URNSpace, SpaceOptions } from 'urns'
 
-export { parseURN }
+export { parseURN } from 'urns'
 
 export type CompType = Record<string, string>
 

@@ -10,12 +10,12 @@ import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import type { FetcherWithComponents } from '@remix-run/react'
 
 import warn from '~/assets/warning.svg'
-import { AddressURN, AddressURNSpace } from '@proofzero/urns/address'
+import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 
 import { FiExternalLink } from 'react-icons/fi'
 import { HiOutlineX } from 'react-icons/hi'
 
-export type AddressUsageDisconnectModel = {
+export type AccountUsageDisconnectModel = {
   message: string
   external: boolean
   path: string
@@ -27,7 +27,7 @@ export default ({
   setIsOpen,
   id,
   data,
-  primaryAddressURN,
+  primaryAccountURN,
 }: {
   fetcher: FetcherWithComponents<any>
   isOpen: boolean
@@ -37,29 +37,29 @@ export default ({
     title: string
     type: string
   }
-  primaryAddressURN: AddressURN
+  primaryAccountURN: AccountURN
 }) => {
-  const primaryAddressBaseURN = AddressURNSpace.getBaseURN(primaryAddressURN)
+  const primaryAccountBaseURN = AccountURNSpace.getBaseURN(primaryAccountURN)
   const localFetcher = useFetcher()
 
   useEffect(() => {
-    if (!isOpen || id === primaryAddressBaseURN) {
+    if (!isOpen || id === primaryAccountBaseURN) {
       return
     }
 
     localFetcher.submit(
       {
-        addressURN: id,
+        accountURN: id,
       },
       {
         method: 'post',
         action: '/settings/accounts/references',
       }
     )
-  }, [id, primaryAddressBaseURN, isOpen])
+  }, [id, primaryAccountBaseURN, isOpen])
 
   const canDisconnect =
-    id !== primaryAddressBaseURN && localFetcher.data?.length === 0
+    id !== primaryAccountBaseURN && localFetcher.data?.length === 0
 
   return localFetcher.state !== 'idle' ? (
     <Loader />
@@ -121,7 +121,7 @@ export default ({
 
           {!canDisconnect && (
             <ul className="mb-6">
-              {primaryAddressBaseURN === id && (
+              {primaryAccountBaseURN === id && (
                 <>
                   <div className="w-full border-b border-gray-200"></div>
                   <li className="py-3 px-6">
@@ -133,9 +133,9 @@ export default ({
                 </>
               )}
 
-              {primaryAddressBaseURN !== id &&
+              {primaryAccountBaseURN !== id &&
                 localFetcher.data?.length > 0 &&
-                localFetcher.data.map((aum: AddressUsageDisconnectModel) => (
+                localFetcher.data.map((aum: AccountUsageDisconnectModel) => (
                   <>
                     <div className="w-full border-b border-gray-200"></div>
                     <li className="flex flex-row py-3 px-6">

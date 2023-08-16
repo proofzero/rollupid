@@ -19,14 +19,14 @@ import { encryptSession, decryptSession } from '@proofzero/utils/session'
 import { getCoreClient } from './platform.server'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 import { InternalServerError, UnauthorizedError } from '@proofzero/errors'
-import { AccountURNSpace } from '@proofzero/urns/account'
-import type { AccountURN } from '@proofzero/urns/account'
+import { IdentityURNSpace } from '@proofzero/urns/identity'
+import type { IdentityURN } from '@proofzero/urns/identity'
 
 import { FLASH_MESSAGE, FLASH_MESSAGE_KEY } from './utils/flashMessage.server'
 import { getCookieDomain } from './utils/cookie'
 
-export const InvalidSessionAccountError = new UnauthorizedError({
-  message: 'Session account is not valid',
+export const InvalidSessionIdentityError = new UnauthorizedError({
+  message: 'Session identity is not valid',
 })
 
 // FLASH SESSION
@@ -304,7 +304,7 @@ export function getDefaultAuthzParams(request: Request): AuthzParams {
 
 export type ValidatedSessionContext = {
   jwt: string
-  accountUrn: AccountURN
+  identityURN: IdentityURN
 }
 
 export async function getValidatedSessionContext(
@@ -324,18 +324,26 @@ export async function getValidatedSessionContext(
     const context = { env: { Core: env.Core }, traceSpan: traceSpan }
     const coreClient = getCoreClient({ context, jwt })
     if (
-      !AccountURNSpace.is(payload.sub!) ||
-      !(await coreClient.account.isValid.query())
+      !IdentityURNSpace.is(payload.sub!) ||
+      !(await coreClient.identity.isValid.query())
     )
-      throw InvalidSessionAccountError
+      throw InvalidSessionIdentityError
     return {
       jwt,
-      accountUrn: payload.sub as AccountURN,
+      identityURN: payload.sub as IdentityURN,
     }
   } catch (error) {
-    console.error('WTF', error)
-    // TODO: Revise this logic
-    const redirectTo = `/authenticate/${authzParams?.clientId}`
+    const url = new URL(request.url)
+    const { href } = url
+
+    const qp = new URLSearchParams()
+    qp.append('client_id', 'passport')
+    qp.append('redirect_uri', `${href}`)
+    qp.append('scope', '')
+    qp.append('state', 'skip')
+
+    const redirectTo = `/authorize?${qp.toString()}`
+
     if (error === InvalidTokenError)
       if (authzParams.clientId)
         throw await createAuthzParamsCookieAndAuthenticate(
@@ -346,7 +354,7 @@ export async function getValidatedSessionContext(
       else throw redirect(redirectTo)
     else if (
       error === ExpiredTokenError ||
-      error === InvalidSessionAccountError
+      error === InvalidSessionIdentityError
     ) {
       console.error(
         'Session/token error encountered. Invalidating session and redirecting to login page'

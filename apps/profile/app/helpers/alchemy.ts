@@ -13,8 +13,8 @@ import type {
 import type { Chain, Gallery, NFT } from '../types'
 import { NFTContractNormalizer, NFTNormalizer } from './nfts'
 import { sortNftsFn } from './strings'
-import type { AccountURN } from '@proofzero/urns/account'
-import { getAccountCryptoAddresses } from './profile'
+import type { IdentityURN } from '@proofzero/urns/identity'
+import { getIdentityCryptoAddresses } from './profile'
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
 
 // -------------------- TYPES --------------------------------------------------
@@ -199,19 +199,19 @@ export const getContractsForAllChains = async (
 export const getValidGallery = async (
   {
     gallery,
-    accountURN,
+    identityURN,
   }: {
     gallery: Gallery
-    accountURN: AccountURN
+    identityURN: IdentityURN
   },
   env: Env,
   traceSpan: TraceSpan
 ) => {
   const { ethereumClient, polygonClient } = getAlchemyClients(env)
 
-  const cryptoAddresses = await getAccountCryptoAddresses(
+  const cryptoAddresses = await getIdentityCryptoAddresses(
     {
-      accountURN,
+      identityURN,
     },
     env,
     traceSpan

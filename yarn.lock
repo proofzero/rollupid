@@ -5891,7 +5891,7 @@ __metadata:
     "@playwright/test": 1.35.1
     "@proofzero/design-system": "*"
     "@proofzero/platform-clients": "workspace:*"
-    "@proofzero/platform.address": "workspace:*"
+    "@proofzero/platform.account": "workspace:*"
     "@proofzero/utils": "workspace:*"
     "@remix-run/cloudflare": 1.14.0
     "@remix-run/cloudflare-workers": 1.14.0
@@ -6199,8 +6199,8 @@ __metadata:
   resolution: "@proofzero/platform-clients@workspace:packages/platform-clients"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
-    "@proofzero/platform.access": "workspace:*"
-    "@proofzero/platform.address": "workspace:*"
+    "@proofzero/platform.account": "workspace:*"
+    "@proofzero/platform.authorization": "workspace:*"
     "@proofzero/platform.object": "workspace:*"
     "@proofzero/platform.starbase": "workspace:*"
     "@proofzero/urns": "workspace:*"
@@ -6237,70 +6237,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@proofzero/platform.access@workspace:*, @proofzero/platform.access@workspace:platform/access":
-  version: 0.0.0-use.local
-  resolution: "@proofzero/platform.access@workspace:platform/access"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@ethersproject/bytes": 5.7.0
-    "@ethersproject/random": 5.7.0
-    "@proofzero/errors": "workspace:*"
-    "@proofzero/platform-clients": "workspace:*"
-    "@proofzero/platform-middleware": "workspace:*"
-    "@proofzero/platform.core": "workspace:*"
-    "@proofzero/types": "workspace:*"
-    "@proofzero/urns": "workspace:*"
-    "@proofzero/utils": "workspace:*"
-    "@trpc/server": 10.8.1
-    "@types/async": 3.2.16
-    "@types/node": 18.15.3
-    "@typescript-eslint/eslint-plugin": 5.42.1
-    "@typescript-eslint/parser": 5.42.1
-    async: 3.2.4
-    do-proxy: 1.3.3
-    env-cmd: 10.1.0
-    eslint: 8.28.0
-    eslint-config-prettier: 8.5.0
-    jose: 4.11.0
-    npm-run-all: 4.1.5
-    prettier: 2.7.1
-    typescript: 5.0.4
-    wrangler: 3.2.0
-    zod: 3.20.2
-  languageName: unknown
-  linkType: soft
-
 "@proofzero/platform.account@workspace:*, @proofzero/platform.account@workspace:platform/account":
   version: 0.0.0-use.local
   resolution: "@proofzero/platform.account@workspace:platform/account"
-  dependencies:
-    "@cloudflare/workers-types": 4.20221111.1
-    "@ethersproject/address": 5.7.0
-    "@ethersproject/bytes": 5.7.0
-    "@ethersproject/random": 5.7.0
-    "@proofzero/platform-middleware": "workspace:*"
-    "@proofzero/platform.core": "workspace:*"
-    "@proofzero/types": "workspace:*"
-    "@proofzero/utils": "workspace:*"
-    "@trpc/server": 10.8.1
-    "@types/node": 18.15.3
-    "@typescript-eslint/eslint-plugin": 5.42.1
-    "@typescript-eslint/parser": 5.42.1
-    do-proxy: 1.3.3
-    eslint: 8.28.0
-    eslint-config-prettier: 8.5.0
-    npm-run-all: 4.1.5
-    prettier: 2.7.1
-    ts-set-utils: 0.2.0
-    typed-json-rpc: 1.1.0
-    typescript: 5.0.4
-    urns: 0.6.0
-  languageName: unknown
-  linkType: soft
-
-"@proofzero/platform.address@workspace:*, @proofzero/platform.address@workspace:platform/address":
-  version: 0.0.0-use.local
-  resolution: "@proofzero/platform.address@workspace:platform/address"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/address": 5.7.0
@@ -6332,15 +6271,48 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@proofzero/platform.authorization@workspace:*, @proofzero/platform.authorization@workspace:platform/authorization":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/platform.authorization@workspace:platform/authorization"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@ethersproject/bytes": 5.7.0
+    "@ethersproject/random": 5.7.0
+    "@proofzero/errors": "workspace:*"
+    "@proofzero/platform-clients": "workspace:*"
+    "@proofzero/platform-middleware": "workspace:*"
+    "@proofzero/platform.core": "workspace:*"
+    "@proofzero/types": "workspace:*"
+    "@proofzero/urns": "workspace:*"
+    "@proofzero/utils": "workspace:*"
+    "@trpc/server": 10.8.1
+    "@types/async": 3.2.16
+    "@types/node": 18.15.3
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
+    async: 3.2.4
+    do-proxy: 1.3.3
+    env-cmd: 10.1.0
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    jose: 4.11.0
+    npm-run-all: 4.1.5
+    prettier: 2.7.1
+    typescript: 5.0.4
+    wrangler: 3.2.0
+    zod: 3.20.2
+  languageName: unknown
+  linkType: soft
+
 "@proofzero/platform.core@workspace:*, @proofzero/platform.core@workspace:platform/core":
   version: 0.0.0-use.local
   resolution: "@proofzero/platform.core@workspace:platform/core"
   dependencies:
     "@cloudflare/workers-types": 4.20230518.0
-    "@proofzero/platform.access": "workspace:*"
     "@proofzero/platform.account": "workspace:*"
-    "@proofzero/platform.address": "workspace:*"
+    "@proofzero/platform.authorization": "workspace:*"
     "@proofzero/platform.edges": "workspace:*"
+    "@proofzero/platform.identity": "workspace:*"
     "@proofzero/platform.starbase": "workspace:*"
     "@trpc/server": 10.8.1
     "@types/node": 20.3.1
@@ -6417,6 +6389,34 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@proofzero/platform.identity@workspace:*, @proofzero/platform.identity@workspace:platform/identity":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/platform.identity@workspace:platform/identity"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@ethersproject/address": 5.7.0
+    "@ethersproject/bytes": 5.7.0
+    "@ethersproject/random": 5.7.0
+    "@proofzero/platform-middleware": "workspace:*"
+    "@proofzero/platform.core": "workspace:*"
+    "@proofzero/types": "workspace:*"
+    "@proofzero/utils": "workspace:*"
+    "@trpc/server": 10.8.1
+    "@types/node": 18.15.3
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
+    do-proxy: 1.3.3
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    npm-run-all: 4.1.5
+    prettier: 2.7.1
+    ts-set-utils: 0.2.0
+    typed-json-rpc: 1.1.0
+    typescript: 5.0.4
+    urns: 0.6.0
+  languageName: unknown
+  linkType: soft
+
 "@proofzero/platform.object@workspace:*, @proofzero/platform.object@workspace:platform/object":
   version: 0.0.0-use.local
   resolution: "@proofzero/platform.object@workspace:platform/object"
@@ -6460,6 +6460,7 @@ __metadata:
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/bytes": 5.7.0
+    "@proofzero/platform.authorization": "workspace:*"
     "@proofzero/security": "workspace:*"
     "@proofzero/urns": "workspace:*"
     "@proofzero/utils": "workspace:*"
@@ -6634,7 +6635,7 @@ __metadata:
     "@dnsquery/dns-packet": 6.1.1
     "@proofzero/errors": "workspace:*"
     "@proofzero/platform.account": "workspace:*"
-    "@proofzero/platform.address": "workspace:*"
+    "@proofzero/platform.identity": "workspace:*"
     "@types/node": 18.15.3
     "@typescript-eslint/eslint-plugin": 5.41.0
     "@typescript-eslint/parser": 5.41.0

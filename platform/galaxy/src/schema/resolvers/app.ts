@@ -18,17 +18,18 @@ const appResolvers: Resolvers = {
     scopes: async (
       _parent: any,
       { clientId },
-      { env, accountURN, traceSpan }: ResolverContext
+      { env, identityURN, traceSpan }: ResolverContext
     ) => {
       const coreClient = createCoreClient(
         env.Core,
         generateTraceContextHeaders(traceSpan)
       )
 
-      const scopes = await coreClient.access.getAuthorizedAppScopes.query({
-        accountURN,
-        clientId,
-      })
+      const scopes =
+        await coreClient.authorization.getAuthorizedAppScopes.query({
+          identityURN,
+          clientId,
+        })
 
       return scopes.claimValues
     },
@@ -44,7 +45,7 @@ const appResolvers: Resolvers = {
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      await coreClient.access.revokeAppAuthorization.mutate({
+      await coreClient.authorization.revokeAppAuthorization.mutate({
         clientId,
       })
 

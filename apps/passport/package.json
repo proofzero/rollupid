@@ -24,7 +24,7 @@
     "@ethersproject/keccak256": "5.7.0",
     "@proofzero/design-system": "*",
     "@proofzero/platform-clients": "workspace:*",
-    "@proofzero/platform.address": "workspace:*",
+    "@proofzero/platform.account": "workspace:*",
     "@proofzero/utils": "workspace:*",
     "@remix-run/cloudflare": "1.14.0",
     "@remix-run/cloudflare-workers": "1.14.0",

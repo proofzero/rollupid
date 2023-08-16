@@ -12,15 +12,15 @@ import {
   parseJwt,
 } from '@proofzero/utils'
 import { createCustomer, updateCustomer } from '~/services/billing/stripe'
+import { IdentityURN } from '@proofzero/urns/identity'
 import { AccountURN } from '@proofzero/urns/account'
-import { AddressURN } from '@proofzero/urns/address'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
-    const accountURN = parsedJwt.sub as AccountURN
+    const identityURN = parsedJwt.sub as IdentityURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
@@ -30,23 +30,23 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const fd = await request.formData()
-    const { email, addressURN, name } = JSON.parse(
+    const { email, accountURN, name } = JSON.parse(
       fd.get('payload') as string
     ) as {
       email: string
-      addressURN: AddressURN
+      accountURN: AccountURN
       name: string
     }
 
-    let paymentData = await coreClient.account.getStripePaymentData.query({
-      accountURN,
+    let paymentData = await coreClient.identity.getStripePaymentData.query({
+      identityURN,
     })
     if (!paymentData) {
       const customer = await createCustomer(
         {
           email,
           name,
-          accountURN,
+          identityURN,
         },
         context.env
       )
@@ -55,14 +55,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         customerID: customer.id,
         email,
         name,
-        addressURN,
+        accountURN,
       }
     } else {
       paymentData = {
         ...paymentData,
         email,
         name,
-        addressURN,
+        accountURN,
       }
 
       await updateCustomer(
@@ -75,10 +75,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       )
     }
 
-    await coreClient.account.setStripePaymentData.mutate({
+    await coreClient.identity.setStripePaymentData.mutate({
       ...paymentData,
+      identityURN,
       accountURN,
-      addressURN,
     })
 
     const flashSession = await getFlashSession(request, context.env)

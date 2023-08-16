@@ -3,10 +3,10 @@ import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 
 import { decodeJwt } from 'jose'
 
-import { NodeType, OAuthAddressType } from '@proofzero/types/address'
-import type { AppleOAuthProfile } from '@proofzero/platform.address/src/types'
+import { NodeType, OAuthAccountType } from '@proofzero/types/account'
+import type { AppleOAuthProfile } from '@proofzero/platform.account/src/types'
 
-import { AddressURNSpace } from '@proofzero/urns/address'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 
 import { AppleStrategyDefaultName } from '~/utils/applestrategy.server'
@@ -18,7 +18,7 @@ import {
 } from '~/auth.server'
 import { getCoreClient } from '~/platform.server'
 import {
-  authenticateAddress,
+  authenticateAccount,
   checkOAuthError,
 } from '~/utils/authenticate.server'
 import { redirectToCustomDomainHost } from '~/utils/connect-proxy'
@@ -81,7 +81,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const user = getUser(request)
 
     const profile: AppleOAuthProfile & { provider: string; sub: string } = {
-      provider: OAuthAddressType.Apple,
+      provider: OAuthAccountType.Apple,
       email: token.email as string,
       name: user?.name
         ? `${user.name.firstName} ${user.name.lastName}`
@@ -90,13 +90,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       picture: '',
     }
 
-    const addressURN = AddressURNSpace.componentizedUrn(
-      generateHashedIDRef(OAuthAddressType.Apple, token.sub),
-      { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Apple },
+    const accountURN = AccountURNSpace.componentizedUrn(
+      generateHashedIDRef(OAuthAccountType.Apple, token.sub),
+      { node_type: NodeType.OAuth, addr_type: OAuthAccountType.Apple },
       { alias: profile.email, hidden: 'true' }
     )
-    const coreClient = getCoreClient({ context, addressURN })
-    const account = await coreClient.address.resolveAccount.query({
+    const coreClient = getCoreClient({ context, accountURN })
+    const identity = await coreClient.account.resolveIdentity.query({
       jwt: await getUserSession(request, context.env, appData?.clientId),
       force:
         !appData ||
@@ -104,17 +104,17 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           !appData.rollup_action?.startsWith('groupconnect')),
       clientId: appData?.clientId,
     })
-    const current = await coreClient.address.getOAuthData.query()
+    const current = await coreClient.account.getOAuthData.query()
 
     if (current) {
-      await coreClient.address.setOAuthData.mutate({
+      await coreClient.account.setOAuthData.mutate({
         ...current,
         accessToken,
         refreshToken,
         extraParams,
       })
     } else {
-      await coreClient.address.setOAuthData.mutate({
+      await coreClient.account.setOAuthData.mutate({
         accessToken,
         refreshToken,
         extraParams,
@@ -122,9 +122,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    return authenticateAddress(
-      addressURN,
-      account.accountURN,
+    return authenticateAccount(
+      accountURN,
+      identity.identityURN,
       appData,
       request,
       context.env,

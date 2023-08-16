@@ -7,17 +7,17 @@ import { MdOutlineEmail } from 'react-icons/md'
 import { Text } from '../../atoms/text/Text'
 import { Button } from '../../build'
 
-import { EmailAddressType, OAuthAddressType } from '@proofzero/types/address'
+import { EmailAccountType, OAuthAccountType } from '@proofzero/types/account'
 import { NestedErrorPage } from '../../pages/nested-error/NestedErrorPage'
 
 type NonEmptyArray<T> = [T, ...T[]]
 
 export type EmailConnectionProp = {
   addr_type:
-  | EmailAddressType.Email
-  | OAuthAddressType.Google
-  | OAuthAddressType.Microsoft
-  | OAuthAddressType.Apple
+    | EmailAccountType.Email
+    | OAuthAccountType.Google
+    | OAuthAccountType.Microsoft
+    | OAuthAccountType.Apple
   callback: () => void
 }
 
@@ -27,16 +27,16 @@ export type EmailConnectionsProps = {
 }
 
 const iconMapper = {
-  [OAuthAddressType.Google]: (
+  [OAuthAccountType.Google]: (
     <img src={googleIcon} alt="google" className="my-2" />
   ),
-  [OAuthAddressType.Microsoft]: (
+  [OAuthAccountType.Microsoft]: (
     <img src={microsoftIcon} alt="microsoft" className="my-2" />
   ),
-  [OAuthAddressType.Apple]: (
+  [OAuthAccountType.Apple]: (
     <img src={appleIcon} alt="microsoft" className="my-2" />
   ),
-  [EmailAddressType.Email]: <MdOutlineEmail size={24} className="my-2" />,
+  [EmailAccountType.Email]: <MdOutlineEmail size={24} className="my-2" />,
 }
 
 export const EmailConnection = ({
@@ -44,11 +44,11 @@ export const EmailConnection = ({
   cancelCallback,
 }: EmailConnectionsProps) => {
   const genericEmailProvider = providers.filter(
-    (provider) => provider.addr_type === EmailAddressType.Email
+    (provider) => provider.addr_type === EmailAccountType.Email
   )
 
   const nonGenericEmailProviders = providers.filter(
-    (provider) => provider.addr_type !== EmailAddressType.Email
+    (provider) => provider.addr_type !== EmailAccountType.Email
   )
 
   return providers.length ? (

@@ -6,12 +6,12 @@ import createCoreClient from '@proofzero/platform-clients/core'
 import { Suspense } from 'react'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import type {
-  AuthorizedAccountsOutput,
+  AuthorizedIdentitiesOutput,
   AuthorizedUser,
 } from '@proofzero/platform/starbase/src/types'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
-import { AccountURNSpace } from '@proofzero/urns/account'
+import { IdentityURNSpace } from '@proofzero/urns/identity'
 
 import { noLoginsSvg } from '~/components/Applications/LoginsPanel/LoginsPanel'
 import { User } from '~/components/Applications/Users/User'
@@ -28,7 +28,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 export const PAGE_LIMIT = 10
 
 export type UsersLoaderData = {
-  edgesResult?: Promise<AuthorizedAccountsOutput>
+  edgesResult?: Promise<AuthorizedIdentitiesOutput>
   PROFILE_APP_URL?: string
   error: any
 }
@@ -55,7 +55,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         ...generateTraceContextHeaders(context.traceSpan),
       })
 
-      const edgesResult = coreClient.starbase.getAuthorizedAccounts.query({
+      const edgesResult = coreClient.starbase.getAuthorizedIdentities.query({
         client,
         opt: {
           offset,
@@ -124,15 +124,15 @@ rounded-lg border"
               edgesResult.metadata.offset = 0
             }
             const authorizedProfiles = edgesResult
-            edgesResult.accounts.forEach((account: AuthorizedUser) => {
-              const decodedAccountURN = AccountURNSpace.decode(
-                account.accountURN
+            edgesResult.identities.forEach((identity: AuthorizedUser) => {
+              const decodedIdentityURN = IdentityURNSpace.decode(
+                identity.identityURN
               )
 
-              // Keys are decoded accountURNs
-              Users.set(decodedAccountURN, {
-                name: account.name!,
-                date: new Date(account.timestamp).toLocaleString('default', {
+              // Keys are decoded identityURNs
+              Users.set(decodedIdentityURN, {
+                name: identity.name!,
+                date: new Date(identity.timestamp).toLocaleString('default', {
                   day: '2-digit',
                   month: 'short',
                   year: 'numeric',
@@ -140,7 +140,7 @@ rounded-lg border"
                   minute: '2-digit',
                   second: '2-digit',
                 }),
-                imageURL: account.imageURL!,
+                imageURL: identity.imageURL!,
               })
             })
 

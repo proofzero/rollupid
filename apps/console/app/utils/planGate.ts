@@ -1,4 +1,4 @@
-import { ServicePlanType } from '@proofzero/types/account'
+import { ServicePlanType } from '@proofzero/types/identity'
 import { appendToastToFlashSession } from './toast.server'
 import plans from '~/routes/__layout/billing/plans'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'

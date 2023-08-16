@@ -1,8 +1,8 @@
 import {
-  CryptoAddressType,
-  EmailAddressType,
-  OAuthAddressType,
-} from '@proofzero/types/address'
+  CryptoAccountType,
+  EmailAccountType,
+  OAuthAccountType,
+} from '@proofzero/types/account'
 
 const calculateVisibleChars = (alias: string, percentage = 0.2): number => {
   const visibleCharCount = Math.max(Math.floor(alias.length * percentage), 1)
@@ -33,13 +33,13 @@ const obfuscateOauthAlias = (alias: string, visibleChars: number): string => {
 
 export const obfuscateAlias = (
   alias: string,
-  addressType: CryptoAddressType | EmailAddressType | OAuthAddressType
+  accountType: CryptoAccountType | EmailAccountType | OAuthAccountType
 ): string => {
   const visibleChars = calculateVisibleChars(alias)
 
-  switch (addressType) {
-    case EmailAddressType.Email:
-    case CryptoAddressType.ETH:
+  switch (accountType) {
+    case EmailAccountType.Email:
+    case CryptoAccountType.ETH:
       return obfuscateEmailOrCryptoAlias(alias, visibleChars)
     default:
       return obfuscateOauthAlias(alias, visibleChars)

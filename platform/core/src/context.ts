@@ -3,8 +3,8 @@ import type { inferAsyncReturnType } from '@trpc/server'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 
 import type { BaseContext } from '@proofzero/types'
-import type { AddressType, NodeType } from '@proofzero/types/address'
-import type { AddressURN } from '@proofzero/urns/address'
+import type { AccountType, NodeType } from '@proofzero/types/account'
+import type { AccountURN } from '@proofzero/urns/account'
 
 import { ENSRes } from '@proofzero/platform-clients/ens-utils'
 import createEmailClient from '@proofzero/platform-clients/email'
@@ -14,13 +14,16 @@ import {
   generateTraceSpan,
 } from '@proofzero/platform-middleware/trace'
 
-import { Access, Authorization } from '@proofzero/platform.access/src'
-import type { Account } from '@proofzero/platform.account'
+import {
+  Authorization,
+  ExchangeCode,
+} from '@proofzero/platform.authorization/src'
+import type { Identity } from '@proofzero/platform.identity'
 
 import * as db from '@proofzero/platform.edges/src/db'
 
 import type { Environment } from './types'
-import type { AddressNode } from '@proofzero/platform.address/src/nodes'
+import type { AccountNode } from '@proofzero/platform.account/src/nodes'
 
 export const GeoContext = 'com.kubelt.geo/location'
 
@@ -40,20 +43,20 @@ export type DeploymentMetadata = {
 export interface CreateInnerContextOptions
   extends Environment,
     Partial<FetchCreateContextFnOptions & BaseContext> {
-  access?: Access
   authorization?: Authorization
+  exchangeCode?: ExchangeCode
 
-  accessNode?: DurableObjectStubProxy<Access>
-  accountNode?: DurableObjectStubProxy<Account>
+  authorizationNode?: DurableObjectStubProxy<Authorization>
+  identityNode?: DurableObjectStubProxy<Identity>
 
-  address?: AddressNode
-  address3RN?: AddressURN
-  addressURN?: AddressURN
+  account?: AccountNode
+  account3RN?: AccountURN
+  accountURN?: AccountURN
   alias?: string
   hashedIdref?: string
   nodeType?: NodeType
-  addrType?: AddressType
-  addressDescription?: ENSRes
+  addrType?: AccountType
+  accountDescription?: ENSRes
 
   apiKey?: string
   ownAppURNs?: string[]

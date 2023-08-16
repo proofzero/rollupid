@@ -2,9 +2,9 @@ import { json, redirect } from '@remix-run/cloudflare'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 
 import { getCoreClient } from '../../../platform.server'
-import { AddressURNSpace } from '@proofzero/urns/address'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
-import { CryptoAddressType, NodeType } from '@proofzero/types/address'
+import { CryptoAccountType, NodeType } from '@proofzero/types/account'
 import { getAuthzCookieParams, getUserSession } from '../../../session.server'
 import { getAuthzRedirectURL } from '../../../utils/authenticate.server'
 
@@ -14,7 +14,7 @@ import {
   JsonError,
   getRollupReqFunctionErrorWrapper,
 } from '@proofzero/utils/errors'
-import type { AccountURN } from '@proofzero/urns/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
 import {
   AuthenticationScreenDefaults,
   appendNonceTemplate,
@@ -27,13 +27,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       throw new BadRequestError({ message: 'No address included in request' })
 
     const state = Math.random().toString(36).substring(7)
-    const addressURN = AddressURNSpace.componentizedUrn(
-      generateHashedIDRef(CryptoAddressType.ETH, address),
-      { node_type: NodeType.Crypto, addr_type: CryptoAddressType.ETH },
+    const accountURN = AccountURNSpace.componentizedUrn(
+      generateHashedIDRef(CryptoAccountType.ETH, address),
+      { node_type: NodeType.Crypto, addr_type: CryptoAccountType.ETH },
       { alias: address }
     )
 
-    const coreClient = getCoreClient({ context, addressURN })
+    const coreClient = getCoreClient({ context, accountURN })
 
     let signTemplate = AuthenticationScreenDefaults.defaultSignMessage
 
@@ -55,7 +55,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     try {
-      const nonce = await coreClient.address.getNonce.query({
+      const nonce = await coreClient.account.getNonce.query({
         address: address as string,
         template: appendNonceTemplate(signTemplate),
         state,
@@ -79,16 +79,16 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     if (!address)
       throw new BadRequestError({ message: 'No address included in request' })
 
-    const addressURN = AddressURNSpace.componentizedUrn(
-      generateHashedIDRef(CryptoAddressType.ETH, address),
-      { node_type: NodeType.Crypto, addr_type: CryptoAddressType.ETH },
+    const accountURN = AccountURNSpace.componentizedUrn(
+      generateHashedIDRef(CryptoAccountType.ETH, address),
+      { node_type: NodeType.Crypto, addr_type: CryptoAccountType.ETH },
       { alias: address }
     )
-    const coreClient = getCoreClient({ context, addressURN })
+    const coreClient = getCoreClient({ context, accountURN })
     const formData = await request.formData()
 
     // TODO: validate from data
-    const { existing } = await coreClient.address.verifyNonce.mutate({
+    const { existing } = await coreClient.account.verifyNonce.mutate({
       nonce: formData.get('nonce') as string,
       signature: formData.get('signature') as string,
       jwt: await getUserSession(request, context.env, appData?.clientId),
@@ -98,15 +98,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           !appData.rollup_action?.startsWith('groupconnect')),
     })
 
-    const accountURNFromAddress = await coreClient.address.getAccount.query()
+    const identityURNFromAccount = await coreClient.account.getIdentity.query()
 
     if (
       (appData?.rollup_action === 'connect' ||
         appData?.rollup_action?.startsWith('groupconnect')) &&
       existing
     ) {
-      const accountURN = parseJwt(jwt).sub! as AccountURN
-      if (accountURN === accountURNFromAddress) {
+      const identityURN = parseJwt(jwt).sub! as IdentityURN
+      if (identityURN === identityURNFromAccount) {
         return redirect(getAuthzRedirectURL(appData, 'ALREADY_CONNECTED_ERROR'))
       }
       return redirect(getAuthzRedirectURL(appData, 'ACCOUNT_CONNECT_ERROR'))

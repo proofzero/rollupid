@@ -4,13 +4,13 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { AppClientIdParamSchema } from '../validators/app'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
-import { ServicePlanType } from '@proofzero/types/account'
+import { ServicePlanType } from '@proofzero/types/identity'
 import { EDGE_PAYS_APP } from '@proofzero/types/graph'
-import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { IdentityURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const SetAppPlanInput = AppClientIdParamSchema.extend({
-  accountURN: AccountURNInput,
+  identityURN: IdentityURNInput,
   plan: z.nativeEnum(ServicePlanType),
 })
 type SetAppPlanParams = z.infer<typeof SetAppPlanInput>
@@ -22,12 +22,12 @@ export const setAppPlan = async ({
   input: SetAppPlanParams
   ctx: Context
 }): Promise<void> => {
-  const { plan, clientId, accountURN } = input
+  const { plan, clientId, identityURN } = input
 
   const appURN = ApplicationURNSpace.componentizedUrn(clientId)
   if (!ctx.ownAppURNs || !ctx.ownAppURNs.includes(appURN))
     throw new Error(
-      `Request received for clientId ${clientId} which is not owned by provided account.`
+      `Request received for clientId ${clientId} which is not owned by provided identity.`
     )
 
   const appDO = await getApplicationNodeByClientId(
@@ -41,7 +41,7 @@ export const setAppPlan = async ({
   if (plan && plan !== ServicePlanType.FREE) {
     const { edges } = await caller.edges.getEdges({
       query: {
-        src: { baseUrn: accountURN },
+        src: { baseUrn: identityURN },
         tag: EDGE_PAYS_APP,
         dst: { baseUrn: appURN },
       },
@@ -49,7 +49,7 @@ export const setAppPlan = async ({
 
     if (edges.length === 0) {
       await caller.edges.makeEdge({
-        src: accountURN,
+        src: identityURN,
         tag: EDGE_PAYS_APP,
         dst: appURN,
       })
@@ -58,7 +58,7 @@ export const setAppPlan = async ({
     await createAnalyticsEvent({
       eventName: 'app_pro_plan_set',
       apiKey: ctx.POSTHOG_API_KEY,
-      distinctId: input.accountURN,
+      distinctId: input.identityURN,
       groups: { app: input.clientId },
       properties: {
         clientId: input.clientId,
@@ -67,7 +67,7 @@ export const setAppPlan = async ({
     })
   } else {
     await caller.edges.removeEdge({
-      src: accountURN,
+      src: identityURN,
       tag: EDGE_PAYS_APP,
       dst: appURN,
     })

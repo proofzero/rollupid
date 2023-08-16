@@ -1,4 +1,4 @@
-import { type AccountURN } from '@proofzero/urns/account'
+import { type IdentityURN } from '@proofzero/urns/identity'
 import {
   type ActionFunction,
   type LoaderFunction,
@@ -37,9 +37,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const jwt = await getUserSession(request, context.env, params.clientId)
     if (!jwt) return redirectToAuthentication(request, params.clientId)
 
-    const account = parseJwt(jwt).sub as AccountURN
+    const identity = parseJwt(jwt).sub as IdentityURN
     const coreClient = getCoreClient({ context, jwt })
-    const profile = await coreClient.account.getProfile.query({ account })
+    const profile = await coreClient.identity.getProfile.query({ identity })
     if (!profile) return redirectToAuthentication(request, params.clientId)
     return json({
       profile,

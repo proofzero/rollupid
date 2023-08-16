@@ -24,7 +24,7 @@ export const listApps = async ({
   input: z.infer<typeof NoInput>
   ctx: Context
 }): Promise<z.infer<typeof ListAppsOutput>> => {
-  if (!ctx.accountURN) throw new Error('No account URN in context')
+  if (!ctx.identityURN) throw new Error('No identity URN in context')
   //Iterate through edges, pull out the clientId, and get app objects for each
   //app edge
   const result = []

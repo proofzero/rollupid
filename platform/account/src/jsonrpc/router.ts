@@ -5,294 +5,315 @@ import { errorFormatter } from '@proofzero/utils/trpc'
 import type { Context } from '../context'
 
 import {
-  getProfileMethod,
-  GetProfileInput,
-  GetProfileOutput,
-  GetProfileBatchInput,
-  GetProfileBatchOutput,
-  getProfileBatchMethod,
-} from './methods/getProfile'
-import { setProfileMethod, SetProfileInput } from './methods/setProfile'
+  ResolveIdentityInput,
+  resolveIdentityMethod,
+  ResolveIdentityOutput,
+} from './methods/resolveIdentity'
 import {
-  getOwnAddressesMethod,
-  GetAddressesInput,
-} from './methods/getOwnAddresses'
+  setIdentityMethod,
+  SetIdentityInput,
+  SetIdentityOutput,
+} from './methods/setIdentity'
 import {
-  hasAddressesMethod,
-  HasAddressesInput,
-  HasAddressesOutput,
-} from './methods/hasAddresses'
-
-import { getAddressesMethod } from './methods/getAddresses'
-
+  getAccountAvatarMethod,
+  GetAccountAvatarOutput,
+} from './methods/getAccountAvatar'
 import {
-  ValidateJWT,
-  AuthorizationTokenFromHeader,
-  RequireAccount,
-} from '@proofzero/platform-middleware/jwt'
+  GetAccountProfileBatchInput,
+  getAccountProfileBatchMethod,
+  GetAccountProfileBatchOutput,
+  getAccountProfileMethod,
+  GetAccountProfileOutput,
+} from './methods/getAccountProfile'
+import {
+  getNonceMethod,
+  GetNonceInput,
+  GetNonceOutput,
+} from './methods/getNonce'
+import {
+  verifyNonceMethod,
+  VerifyNonceInput,
+  VerifyNonceOutput,
+} from './methods/verifyNonce'
+import { getOAuthDataMethod, GetOAuthDataOutput } from './methods/getOAuthData'
+import { setOAuthDataMethod, SetOAuthDataInput } from './methods/setOAuthData'
+import {
+  getIdentityByAliasMethod,
+  GetIdentityByAliasInput,
+  GetIdentityByAliasOutput,
+} from './methods/getIdentityByAlias'
 import { LogUsage } from '@proofzero/platform-middleware/log'
-import { Scopes } from '@proofzero/platform-middleware/scopes'
+import { parse3RN } from './middlewares/parse3RN'
+import { checkCryptoNodes } from './middlewares/checkCryptoNode'
+import { initAccountNode } from './middlewares/initAccountNode'
+import {
+  getIdentityMethod,
+  GetIdentityInput,
+  GetIdentityOutput,
+} from './methods/getIdentity'
+import {
+  InitSmartContractWalletInput,
+  InitSmartContractWalletOutput,
+  initSmartContractWalletMethod,
+} from './methods/initSmartContractWallet'
+import { checkOAuthNode } from './middlewares/checkOAuthNode'
 
-import { initAccountNodeByName } from '../nodes'
 import { Analytics } from '@proofzero/platform-middleware/analytics'
-import { getPublicAddressesMethod } from './methods/getPublicAddresses'
+import { setAccountNodeClient } from './middlewares/setAccountNodeClient'
 import {
-  GetAuthorizedAppsMethodInput,
-  GetAuthorizedAppsMethodOutput,
-  getAuthorizedAppsMethod,
-} from './methods/getAuthorizedApps'
-import { isValidMethod, IsValidOutput } from './methods/isValid'
+  SetAccountNicknameInput,
+  setAccountNicknameMethod,
+} from './methods/setAccountNickname'
 import {
-  DeleteAccountNodeInput,
-  deleteAccountNodeMethod,
-} from './methods/deleteAccountNode'
-import { UnauthorizedError } from '@proofzero/errors'
+  GenerateEmailOTPInput,
+  generateEmailOTPMethod,
+  GenerateEmailOTPOutput,
+} from './methods/generateEmailOTP'
 import {
-  GetEntitlementsInputSchema,
-  GetEntitlementsOutputSchema,
-  getEntitlements,
-} from './methods/getEntitlements'
-import {
-  UpdateEntitlementsInputSchema,
-  updateEntitlements,
-} from './methods/updateEntitlements'
-import {
-  GetStripPaymentDataInputSchema,
-  GetStripePaymentDataOutputSchema,
-  SetStripePaymentDataInputSchema,
-  getStripePaymentData,
-  setStripePaymentData,
-} from './methods/stripePaymentData'
-import {
-  CancelServicePlansInput,
-  cancelServicePlans,
-} from './methods/cancelServicePlans'
-import {
-  CreateIdentityGroupInputSchema,
-  createIdentityGroup,
-} from './methods/identity-groups/createIdentityGroup'
-import {
-  ListIdentityGroupsOutputSchema,
-  listIdentityGroups,
-} from './methods/identity-groups/listIdentityGroups'
-import {
-  InviteIdentityGroupMemberInputSchema,
-  inviteIdentityGroupMember,
-} from './methods/identity-groups/inviteIdentityGroupMember'
-import {
-  GetIdentityGroupMemberInvitationsInputSchema,
-  GetIdentityGroupMemberInvitationsOutputSchema,
-  getIdentityGroupMemberInvitations,
-} from './methods/identity-groups/getIdentityGroupMemberInvitations'
-import {
-  GetIdentityGroupMemberInvitationDetailsInputSchema,
-  GetIdentityGroupMemberInvitationDetailsOutputSchema,
-  getIdentityGroupMemberInvitationDetails,
-} from './methods/identity-groups/getIdentityGroupMemberInvitationDetails'
+  VerifyEmailOTPInput,
+  verifyEmailOTPMethod,
+  VerifyEmailOTPOutput,
+} from './methods/verifyEmailOTP'
 
 import {
-  AcceptIdentityGroupMemberInvitationInputSchema,
-  acceptIdentityGroupMemberInvitation,
-} from './methods/identity-groups/acceptIdentityGroupMemberInvitation'
+  deleteAccountNodeMethod,
+  DeleteAccountNodeInput,
+} from './methods/deleteAccountNode'
 import {
-  DeleteIdentityGroupMembershipInputSchema,
-  deleteIdentityGroupMembership,
-} from './methods/identity-groups/deleteIdentityGroupMembership'
+  getAccountReferenceTypes,
+  GetAccountReferenceTypeOutput,
+} from './methods/getAccountReferenceTypes'
 import {
-  DeleteIdentityGroupInputSchema,
-  deleteIdentityGroup,
-} from './methods/identity-groups/deleteIdentityGroup'
-import { purgeIdentityGroupMemberships } from './methods/identity-groups/purgeIdentityGroupMemberships'
+  registerSessionKeyMethod,
+  RegisterSessionKeyInput,
+  RegisterSessionKeyOutput,
+} from './methods/registerWalletSessionKey'
+import {
+  RevokeWalletSessionKeyInput,
+  RevokeWalletSessionKeyBatchInput,
+  revokeWalletSessionKeyMethod,
+  revokeWalletSessionKeyBatchMethod,
+} from './methods/revokeWalletSessionKey'
+import {
+  SendBillingNotificationInput,
+  sendBillingNotificationMethod,
+} from './methods/sendBillingNotification'
+import {
+  SendReconciliationNotificationInput,
+  sendReconciliationNotificationMethod,
+} from './methods/sendReconciliationNotificationMethod'
+import {
+  SendFailedPaymentNotificationInput,
+  sendFailedPaymentNotificationMethod,
+} from './methods/sendFailedPaymentNotification'
+import {
+  sendSuccessfulPaymentNotificationMethod,
+  SendSuccessfulPaymentNotificationInput,
+} from './methods/sendSuccessfulPaymentNotification'
+import {
+  GetAccountURNForEmailInputSchema,
+  getAccountURNForEmailMethod,
+  GetAccountURNForEmailOutputSchema,
+} from './methods/getAccountURNForEmail'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
-export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
-  const accountURN = ctx.accountURN
-
-  if (!accountURN)
-    throw new UnauthorizedError({ message: 'No accountURN in context' })
-
-  const accountNode = await initAccountNodeByName(accountURN, ctx.Account)
-
-  return next({
-    ctx: {
-      accountNode,
-      ...ctx,
-    },
-  })
-})
-
 export const appRouter = t.router({
-  getProfile: t.procedure
-    .use(Scopes)
+  resolveIdentity: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    // .use(injectCustomAnalytics)
+    .use(Analytics)
+    .input(ResolveIdentityInput)
+    .output(ResolveIdentityOutput)
+    .query(resolveIdentityMethod),
+  getIdentity: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    .use(Analytics)
+    .input(GetIdentityInput)
+    .output(GetIdentityOutput)
+    .query(getIdentityMethod),
+  getIdentityByAlias: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(GetProfileInput)
-    .output(GetProfileOutput)
-    .query(getProfileMethod),
-  setProfile: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(Scopes)
-    .use(injectAccountNode)
+    .input(GetIdentityByAliasInput)
+    .output(GetIdentityByAliasOutput)
+    .query(getIdentityByAliasMethod),
+  registerSessionKey: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(SetProfileInput)
-    .mutation(setProfileMethod),
-  isValid: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(injectAccountNode)
+    .input(RegisterSessionKeyInput)
+    .output(RegisterSessionKeyOutput)
+    .mutation(registerSessionKeyMethod),
+  setIdentity: t.procedure
     .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
     .use(Analytics)
-    .output(IsValidOutput)
-    .query(isValidMethod),
-  getAddresses: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(Scopes)
+    .input(SetIdentityInput)
+    .output(SetIdentityOutput)
+    .mutation(setIdentityMethod),
+  getAccountAvatar: t.procedure
     .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
     .use(Analytics)
-    .input(GetAddressesInput)
-    // .output(AddressListSchema)
-    .query(getAddressesMethod),
-  getOwnAddresses: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(Scopes)
+    .output(GetAccountAvatarOutput)
+    .query(getAccountAvatarMethod),
+  getAccountProfile: t.procedure
     .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
     .use(Analytics)
-    .input(GetAddressesInput)
-    // .output(AddressListSchema)
-    .query(getOwnAddressesMethod),
-  getPublicAddresses: t.procedure
+    .output(GetAccountProfileOutput)
+    .query(getAccountProfileMethod),
+  getAccountProfileBatch: t.procedure
     .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
     .use(Analytics)
-    .input(GetAddressesInput)
-    // .output(AddressListSchema)
-    .query(getPublicAddressesMethod),
-  hasAddresses: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(Scopes)
+    .input(GetAccountProfileBatchInput)
+    .output(GetAccountProfileBatchOutput)
+    .query(getAccountProfileBatchMethod),
+  setNickname: t.procedure
     .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
     .use(Analytics)
-    .input(HasAddressesInput)
-    .output(HasAddressesOutput)
-    .mutation(hasAddressesMethod),
-  getAuthorizedApps: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(Scopes)
+    .input(SetAccountNicknameInput)
+    .query(setAccountNicknameMethod),
+  generateEmailOTP: t.procedure
     .use(LogUsage)
-    .input(GetAuthorizedAppsMethodInput)
-    .output(GetAuthorizedAppsMethodOutput)
-    .query(getAuthorizedAppsMethod),
+    .use(parse3RN)
+    .use(setAccountNodeClient)
+    .use(Analytics)
+    .input(GenerateEmailOTPInput)
+    .output(GenerateEmailOTPOutput)
+    .mutation(generateEmailOTPMethod),
+  verifyEmailOTP: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setAccountNodeClient)
+    .use(Analytics)
+    .input(VerifyEmailOTPInput)
+    .output(VerifyEmailOTPOutput)
+    .mutation(verifyEmailOTPMethod),
+  getNonce: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(setAccountNodeClient)
+    .use(Analytics)
+    .input(GetNonceInput)
+    .output(GetNonceOutput)
+    .query(getNonceMethod),
+  verifyNonce: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(setAccountNodeClient)
+    .use(Analytics)
+    .input(VerifyNonceInput)
+    .output(VerifyNonceOutput)
+    .mutation(verifyNonceMethod),
+  getOAuthData: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    .use(Analytics)
+    .output(GetOAuthDataOutput)
+    .query(getOAuthDataMethod),
+  setOAuthData: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    .use(Analytics)
+    .input(SetOAuthDataInput)
+    .mutation(setOAuthDataMethod),
+  initSmartContractWallet: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setAccountNodeClient)
+    .input(InitSmartContractWalletInput)
+    .output(InitSmartContractWalletOutput)
+    .query(initSmartContractWalletMethod),
   deleteAccountNode: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(injectAccountNode)
     .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    .use(Analytics)
     .input(DeleteAccountNodeInput)
     .mutation(deleteAccountNodeMethod),
-  getEntitlements: t.procedure
+  getAccountReferenceTypes: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(Analytics)
+    .output(GetAccountReferenceTypeOutput)
+    .query(getAccountReferenceTypes),
+  revokeWalletSessionKey: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(Analytics)
+    .input(RevokeWalletSessionKeyInput)
+    .mutation(revokeWalletSessionKeyMethod),
+  revokeWalletSessionKeyBatch: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(GetEntitlementsInputSchema)
-    .output(GetEntitlementsOutputSchema)
-    .query(getEntitlements),
-  updateEntitlements: t.procedure
+    .input(RevokeWalletSessionKeyBatchInput)
+    .mutation(revokeWalletSessionKeyBatchMethod),
+  sendBillingNotification: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(UpdateEntitlementsInputSchema)
-    .mutation(updateEntitlements),
-  getStripePaymentData: t.procedure
+    .input(SendBillingNotificationInput)
+    .mutation(sendBillingNotificationMethod),
+  sendReconciliationNotification: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(GetStripPaymentDataInputSchema)
-    .output(GetStripePaymentDataOutputSchema)
-    .query(getStripePaymentData),
-  setStripePaymentData: t.procedure
+    .input(SendReconciliationNotificationInput)
+    .query(sendReconciliationNotificationMethod),
+  sendFailedPaymentNotification: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(SetStripePaymentDataInputSchema)
-    .mutation(setStripePaymentData),
-  cancelServicePlans: t.procedure
+    .input(SendFailedPaymentNotificationInput)
+    .mutation(sendFailedPaymentNotificationMethod),
+  sendSuccessfulPaymentNotification: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(CancelServicePlansInput)
-    .mutation(cancelServicePlans),
-  createIdentityGroup: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
+    .input(SendSuccessfulPaymentNotificationInput)
+    .mutation(sendSuccessfulPaymentNotificationMethod),
+  getAccountURNForEmail: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(CreateIdentityGroupInputSchema)
-    .mutation(createIdentityGroup),
-  listIdentityGroups: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(LogUsage)
-    .use(Analytics)
-    .output(ListIdentityGroupsOutputSchema)
-    .query(listIdentityGroups),
-  inviteIdentityGroupMember: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(LogUsage)
-    .use(Analytics)
-    .input(InviteIdentityGroupMemberInputSchema)
-    .mutation(inviteIdentityGroupMember),
-  getIdentityGroupMemberInvitations: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(LogUsage)
-    .use(Analytics)
-    .input(GetIdentityGroupMemberInvitationsInputSchema)
-    .output(GetIdentityGroupMemberInvitationsOutputSchema)
-    .query(getIdentityGroupMemberInvitations),
-  getIdentityGroupMemberInvitationDetails: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .input(GetIdentityGroupMemberInvitationDetailsInputSchema)
-    .output(GetIdentityGroupMemberInvitationDetailsOutputSchema)
-    .query(getIdentityGroupMemberInvitationDetails),
-  acceptIdentityGroupMemberInvitation: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(RequireAccount)
-    .input(AcceptIdentityGroupMemberInvitationInputSchema)
-    .mutation(acceptIdentityGroupMemberInvitation),
-  getProfileBatch: t.procedure
-    .use(Scopes)
-    .use(LogUsage)
-    .use(Analytics)
-    .input(GetProfileBatchInput)
-    .output(GetProfileBatchOutput)
-    .query(getProfileBatchMethod),
-  deleteIdentityGroup: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(RequireAccount)
-    .input(DeleteIdentityGroupInputSchema)
-    .mutation(deleteIdentityGroup),
-  deleteIdentityGroupMembership: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(RequireAccount)
-    .input(DeleteIdentityGroupMembershipInputSchema)
-    .mutation(deleteIdentityGroupMembership),
-  purgeIdentityGroupMemberships: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(RequireAccount)
-    .mutation(purgeIdentityGroupMemberships),
+    .input(GetAccountURNForEmailInputSchema)
+    .output(GetAccountURNForEmailOutputSchema)
+    .query(getAccountURNForEmailMethod),
 })

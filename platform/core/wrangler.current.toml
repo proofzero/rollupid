@@ -8,10 +8,10 @@ workers_dev = false
 
 [env.current]
 durable_objects.bindings = [
-  { name = "Access", class_name = "Authorization" },
-  { name = "Account", class_name = "Identity" },
-  { name = "Address", class_name = "Account" },
-  { name = "Authorization", class_name = "ExchangeCode" },
+  { name = "Account", class_name = "Account" },
+  { name = "Authorization", class_name = "Authorization" },
+  { name = "ExchangeCode", class_name = "ExchangeCode" },
+  { name = "Identity", class_name = "Identity" },
   { name = "IdentityGroup", class_name = "IdentityGroup" },
   { name = "StarbaseApp", class_name = "StarbaseApplication" },
 ]

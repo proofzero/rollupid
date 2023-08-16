@@ -15,7 +15,7 @@ import { FiEdit } from 'react-icons/fi'
 import { TbLink } from 'react-icons/tb'
 import { AiOutlinePlus } from 'react-icons/ai'
 
-import type { AddressProfile } from '@proofzero/galaxy-client'
+import type { AccountProfile } from '@proofzero/galaxy-client'
 import { Button, Text } from '@proofzero/design-system'
 import { SortableList } from '@proofzero/design-system/src/atoms/lists/SortableList'
 
@@ -29,11 +29,11 @@ import type { ActionFunction } from '@remix-run/cloudflare'
 
 import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
 import {
-  CryptoAddressType,
-  EmailAddressType,
-  OAuthAddressType,
-} from '@proofzero/types/address'
-import { imageFromAddressType } from '~/helpers'
+  CryptoAccountType,
+  EmailAccountType,
+  OAuthAccountType,
+} from '@proofzero/types/account'
+import { imageFromAccountType } from '~/helpers'
 import type { FullProfile } from '~/types'
 
 /**
@@ -42,90 +42,90 @@ import type { FullProfile } from '~/types'
  * Adds additional properties that are used
  * for filtering when posting data to the server.
  */
-const normalizeAddressProfile = (ap: AddressProfile) => {
+const normalizeAccountProfile = (ap: AccountProfile) => {
   switch (ap.type) {
-    case CryptoAddressType.ETH:
+    case CryptoAccountType.ETH:
       return {
-        addressURN: ap.urn,
+        accountURN: ap.urn,
         // Some providers can be built on client side
         address: `https://etherscan.io/address/${ap.address}`,
         title: ap.title,
-        icon: imageFromAddressType(CryptoAddressType.ETH),
-        provider: CryptoAddressType.ETH,
+        icon: imageFromAccountType(CryptoAccountType.ETH),
+        provider: CryptoAccountType.ETH,
       }
-    case CryptoAddressType.Wallet:
+    case CryptoAccountType.Wallet:
       return {
-        addressURN: ap.urn,
+        accountURN: ap.urn,
         address: `https://etherscan.io/address/${ap.address}`,
         title: ap.title,
-        icon: imageFromAddressType(CryptoAddressType.Wallet),
-        provider: CryptoAddressType.Wallet,
+        icon: imageFromAccountType(CryptoAccountType.Wallet),
+        provider: CryptoAccountType.Wallet,
       }
-    case EmailAddressType.Email:
+    case EmailAccountType.Email:
       return {
-        addressURN: ap.urn,
+        accountURN: ap.urn,
         address: ap.address,
         title: ap.title,
-        icon: imageFromAddressType(EmailAddressType.Email),
-        provider: EmailAddressType.Email,
+        icon: imageFromAccountType(EmailAccountType.Email),
+        provider: EmailAccountType.Email,
       }
-    case OAuthAddressType.Apple:
+    case OAuthAccountType.Apple:
       return {
-        addressURN: ap.urn,
+        accountURN: ap.urn,
         address: '',
         title: 'Apple',
-        icon: imageFromAddressType(OAuthAddressType.Apple),
-        provider: OAuthAddressType.Apple,
+        icon: imageFromAccountType(OAuthAccountType.Apple),
+        provider: OAuthAccountType.Apple,
       }
-    case OAuthAddressType.Discord:
+    case OAuthAccountType.Discord:
       return {
-        addressURN: ap.urn,
+        accountURN: ap.urn,
         address: '',
         title: 'Discord',
-        icon: imageFromAddressType(OAuthAddressType.Discord),
-        provider: OAuthAddressType.Discord,
+        icon: imageFromAccountType(OAuthAccountType.Discord),
+        provider: OAuthAccountType.Discord,
       }
-    case OAuthAddressType.GitHub:
+    case OAuthAccountType.GitHub:
       return {
-        addressURN: ap.urn,
+        accountURN: ap.urn,
         // Some providers give us public
         // endpoints
         address: ap.address,
         title: 'GitHub',
-        icon: imageFromAddressType(OAuthAddressType.GitHub),
-        provider: OAuthAddressType.GitHub,
+        icon: imageFromAccountType(OAuthAccountType.GitHub),
+        provider: OAuthAccountType.GitHub,
       }
-    case OAuthAddressType.Google:
+    case OAuthAccountType.Google:
       return {
-        addressURN: ap.urn,
+        accountURN: ap.urn,
         // Some providers don't have an address
         // and are thus unlinkable
         address: '',
         title: 'Google',
-        icon: imageFromAddressType(OAuthAddressType.Google),
-        provider: OAuthAddressType.Google,
+        icon: imageFromAccountType(OAuthAccountType.Google),
+        provider: OAuthAccountType.Google,
       }
-    case OAuthAddressType.Microsoft:
+    case OAuthAccountType.Microsoft:
       return {
-        addressURN: ap.urn,
+        accountURN: ap.urn,
         address: '',
         title: 'Microsoft',
-        icon: imageFromAddressType(OAuthAddressType.Microsoft),
-        provider: OAuthAddressType.Microsoft,
+        icon: imageFromAccountType(OAuthAccountType.Microsoft),
+        provider: OAuthAccountType.Microsoft,
       }
-    case OAuthAddressType.Twitter:
+    case OAuthAccountType.Twitter:
       return {
-        addressURN: ap.urn,
+        accountURN: ap.urn,
         address: `https://twitter.com/${ap.address}`,
         title: 'Twitter',
         icon: ap.icon,
-        provider: OAuthAddressType.Twitter,
+        provider: OAuthAccountType.Twitter,
       }
   }
 }
 
 export const action: ActionFunction = async ({ request, context }) => {
-  const { sub: accountURN } = parseJwt(
+  const { sub: identityURN } = parseJwt(
     await getAccessToken(request, context.env)
   )
 
@@ -149,13 +149,13 @@ export const action: ActionFunction = async ({ request, context }) => {
   }
 
   const currentProfile = await context.env.ProfileKV.get<FullProfile>(
-    accountURN!,
+    identityURN!,
     'json'
   )
   const updatedProfile = Object.assign(currentProfile || {}, {
     links: zodValidation.data,
   })
-  await context.env.ProfileKV.put(accountURN!, JSON.stringify(updatedProfile))
+  await context.env.ProfileKV.put(identityURN!, JSON.stringify(updatedProfile))
 
   return { updatedLinks: updatedLinks || [] }
 }
@@ -291,8 +291,8 @@ export default function AccountSettingsLinks() {
   const actionData = useActionData()
   const fetcher = useFetcher()
 
-  const normalizedAddressProfiles = connectedProfiles.map(
-    normalizeAddressProfile
+  const normalizedAccountProfiles = connectedProfiles.map(
+    normalizeAccountProfile
   )
 
   const [links, setLinks] = useState<(Link & { editing?: boolean })[]>(
@@ -303,16 +303,16 @@ export default function AccountSettingsLinks() {
   const [connectedLinks, setConnectedLinks] = useState<
     (
       | {
-          addressURN?: string
+          accountURN?: string
           public?: boolean
-          address?: string | null
+          account?: string | null
           title?: string | null
           icon?: string | null
           provider?: string
         }
       | undefined
     )[]
-  >(normalizedAddressProfiles)
+  >(normalizedAccountProfiles)
   const [isFormChanged, setFormChanged] = useState(false)
   const [isConnectionsChanged, setIsConnectionsChanged] = useState(false)
 
@@ -327,12 +327,12 @@ export default function AccountSettingsLinks() {
   }, [transition])
 
   useEffect(() => {
-    if (isConnectionsChanged && normalizedAddressProfiles !== connectedLinks) {
+    if (isConnectionsChanged && normalizedAccountProfiles !== connectedLinks) {
       fetcher.submit(
         {
           connections: JSON.stringify(
             connectedLinks.map((l) => {
-              return { addressURN: l?.addressURN, public: l?.public || false }
+              return { accountURN: l?.accountURN, public: l?.public || false }
             })
           ),
         },
@@ -367,7 +367,7 @@ export default function AccountSettingsLinks() {
         <fieldset disabled={true}>
           <SortableList
             items={connectedLinks.map((l: any) => ({
-              key: `${l.addressURN}`,
+              key: `${l.accountURN}`,
               val: l,
               disabled: true,
             }))}
@@ -389,13 +389,13 @@ export default function AccountSettingsLinks() {
                 </div>
 
                 <InputToggle
-                  id={`enable_${item.val.addressURN}`}
+                  id={`enable_${item.val.accountURN}`}
                   label={''}
                   checked={item.val.public}
                   disabled={true}
                   onToggle={(val) => {
                     const index = connectedLinks.findIndex(
-                      (pl: any) => pl.addressURN === item.val.addressURN
+                      (pl: any) => pl.accountURN === item.val.accountURN
                     )
 
                     // This just updates
@@ -447,7 +447,7 @@ export default function AccountSettingsLinks() {
           className="flex flex-col
         w-screen -mx-4 sm:w-full sm:mx-0"
         >
-          {/* Links that are already in account DO */}
+          {/* Links that are already in identity DO */}
           <div className="flex flex-col mb-3">
             <SortableList
               items={links.map((l, i) => ({

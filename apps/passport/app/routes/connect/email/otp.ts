@@ -1,5 +1,5 @@
-import { EmailAddressType, NodeType } from '@proofzero/types/address'
-import { AddressURNSpace } from '@proofzero/urns/address'
+import { EmailAccountType, NodeType } from '@proofzero/types/account'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { json } from '@remix-run/cloudflare'
 import { getCoreClient } from '~/platform.server'
@@ -9,7 +9,7 @@ import { getAuthzCookieParams } from '~/session.server'
 import type { EmailThemeProps } from '@proofzero/platform/email/src/emailFunctions'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ServicePlanType } from '@proofzero/types/account'
+import { ServicePlanType } from '@proofzero/types/identity'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -20,13 +20,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       if (!email)
         throw new BadRequestError({ message: 'No address included in request' })
 
-      const addressURN = AddressURNSpace.componentizedUrn(
-        generateHashedIDRef(EmailAddressType.Email, email.toLowerCase()),
-        { node_type: NodeType.Email, addr_type: EmailAddressType.Email },
+      const accountURN = AccountURNSpace.componentizedUrn(
+        generateHashedIDRef(EmailAccountType.Email, email.toLowerCase()),
+        { node_type: NodeType.Email, addr_type: EmailAccountType.Email },
         { alias: email, hidden: 'true' }
       )
 
-      const coreClient = getCoreClient({ context, addressURN })
+      const coreClient = getCoreClient({ context, accountURN })
 
       let clientId: string = ''
       try {
@@ -76,7 +76,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         }
       }
 
-      const state = await coreClient.address.generateEmailOTP.mutate({
+      const state = await coreClient.account.generateEmailOTP.mutate({
         email,
         themeProps,
       })
@@ -97,18 +97,18 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         message: 'No email address included in request',
       })
 
-    const addressURN = AddressURNSpace.componentizedUrn(
-      generateHashedIDRef(EmailAddressType.Email, email.toLowerCase()),
-      { node_type: NodeType.Email, addr_type: EmailAddressType.Email },
+    const accountURN = AccountURNSpace.componentizedUrn(
+      generateHashedIDRef(EmailAccountType.Email, email.toLowerCase()),
+      { node_type: NodeType.Email, addr_type: EmailAccountType.Email },
       { alias: email, hidden: 'true' }
     )
-    const coreClient = getCoreClient({ context, addressURN })
+    const coreClient = getCoreClient({ context, accountURN })
     const successfulVerification =
-      await coreClient.address.verifyEmailOTP.mutate({
+      await coreClient.account.verifyEmailOTP.mutate({
         code: formData.get('code') as string,
         state: formData.get('state') as string,
       })
 
-    return json({ addressURN, successfulVerification })
+    return json({ accountURN, successfulVerification })
   }
 )

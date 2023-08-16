@@ -2,12 +2,12 @@ import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 import messagingSVG from '~/assets/early/messaging.svg'
 import { useOutletContext } from '@remix-run/react'
 import { appDetailsProps } from '~/types'
-import { AccountURN } from '@proofzero/urns/account'
+import { IdentityURN } from '@proofzero/urns/identity'
 
 export default () => {
-  const { appDetails, accountURN } = useOutletContext<{
+  const { appDetails, identityURN } = useOutletContext<{
     appDetails: appDetailsProps
-    accountURN: AccountURN
+    identityURN: IdentityURN
   }>()
 
   return (
@@ -20,7 +20,7 @@ export default () => {
       url={'https://docs.rollup.id/platform/console/messaging'}
       earlyAccess={true}
       currentPlan={appDetails.appPlan}
-      accountURN={accountURN}
+      identityURN={identityURN}
     />
   )
 }

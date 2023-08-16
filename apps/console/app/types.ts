@@ -5,7 +5,7 @@ import type {
   EdgesMetadata,
   CustomDomain,
 } from '@proofzero/platform/starbase/src/types'
-import { type ServicePlanType } from '@proofzero/types/account'
+import { type ServicePlanType } from '@proofzero/types/identity'
 
 export enum RollType {
   RollAPIKey = 'roll_api_key',

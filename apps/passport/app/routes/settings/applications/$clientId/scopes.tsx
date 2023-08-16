@@ -6,7 +6,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
-    const { accountUrn } = await getValidatedSessionContext(
+    const { identityURN } = await getValidatedSessionContext(
       request,
       context.authzQueryParams,
       context.env,
@@ -19,9 +19,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const coreClient = getCoreClient({ context })
-    return await coreClient.access.getAuthorizedAppScopes.query({
+    return await coreClient.authorization.getAuthorizedAppScopes.query({
       clientId,
-      accountURN: accountUrn,
+      identityURN,
     })
   }
 )

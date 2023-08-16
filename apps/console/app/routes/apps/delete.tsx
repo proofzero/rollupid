@@ -14,7 +14,7 @@ import {
 } from '@proofzero/utils/errors'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
-import { type AccountURN } from '@proofzero/urns/account'
+import { type IdentityURN } from '@proofzero/urns/identity'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -26,7 +26,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt as string)
-    const accountURN = parsedJwt.sub as AccountURN
+    const identityURN = parsedJwt.sub as IdentityURN
 
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
@@ -37,7 +37,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       await createAnalyticsEvent({
         apiKey: context.env.POSTHOG_API_KEY,
         eventName: 'app_deleted',
-        distinctId: accountURN,
+        distinctId: identityURN,
         properties: {
           client_id: clientId,
         },

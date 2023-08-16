@@ -2,10 +2,10 @@ import type { LoaderFunction } from '@remix-run/cloudflare'
 import { DiscordStrategyDefaultName } from 'remix-auth-discord'
 
 import { generateHashedIDRef } from '@proofzero/urns/idref'
-import { AddressURNSpace } from '@proofzero/urns/address'
-import { NodeType, OAuthAddressType } from '@proofzero/types/address'
+import { AccountURNSpace } from '@proofzero/urns/account'
+import { NodeType, OAuthAccountType } from '@proofzero/types/account'
 
-import type { OAuthData } from '@proofzero/platform.address/src/types'
+import type { OAuthData } from '@proofzero/platform.account/src/types'
 
 import {
   createAuthenticatorSessionStorage,
@@ -14,7 +14,7 @@ import {
 import { getCoreClient } from '~/platform.server'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
 import {
-  authenticateAddress,
+  authenticateAccount,
   checkOAuthError,
 } from '~/utils/authenticate.server'
 import { redirectToCustomDomainHost } from '~/utils/connect-proxy'
@@ -44,7 +44,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const { profile } = authRes
 
-    if (profile.provider !== OAuthAddressType.Discord)
+    if (profile.provider !== OAuthAccountType.Discord)
       throw new InternalServerError({
         message: 'Unsupported provider returned in Discord callback.',
       })
@@ -54,15 +54,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         message: 'Could not get Discord login info.',
       })
 
-    const addressURN = AddressURNSpace.componentizedUrn(
-      generateHashedIDRef(OAuthAddressType.Discord, profile.__json.id),
-      { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Discord },
+    const accountURN = AccountURNSpace.componentizedUrn(
+      generateHashedIDRef(OAuthAccountType.Discord, profile.__json.id),
+      { node_type: NodeType.OAuth, addr_type: OAuthAccountType.Discord },
       { alias: profile.__json.email, hidden: 'true' }
     )
 
-    const coreClient = getCoreClient({ context, addressURN })
-    const { accountURN, existing } =
-      await coreClient.address.resolveAccount.query({
+    const coreClient = getCoreClient({ context, accountURN })
+    const { identityURN, existing } =
+      await coreClient.account.resolveIdentity.query({
         jwt: await getUserSession(request, context.env, appData?.clientId),
         force:
           !appData ||
@@ -71,11 +71,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         clientId: appData?.clientId,
       })
 
-    await coreClient.address.setOAuthData.mutate(authRes)
+    await coreClient.account.setOAuthData.mutate(authRes)
 
-    return authenticateAddress(
-      addressURN,
+    return authenticateAccount(
       accountURN,
+      identityURN,
       appData,
       request,
       context.env,

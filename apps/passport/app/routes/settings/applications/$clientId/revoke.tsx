@@ -13,7 +13,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
     const session = await getFlashSession(request, context.env)
 
-    const { jwt, accountUrn } = await getValidatedSessionContext(
+    const { jwt, identityURN } = await getValidatedSessionContext(
       request,
       context.authzQueryParams,
       context.env,
@@ -28,14 +28,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     try {
       const coreClient = getCoreClient({ context, jwt })
-      await coreClient.access.revokeAppAuthorization.mutate({
+      await coreClient.authorization.revokeAppAuthorization.mutate({
         clientId,
         issuer: new URL(request.url).origin,
       })
 
       await createAnalyticsEvent({
         apiKey: context.env.POSTHOG_API_KEY,
-        distinctId: accountUrn,
+        distinctId: identityURN,
         eventName: 'app_authorization_revoked',
         properties: {
           clientId,

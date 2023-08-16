@@ -31,7 +31,7 @@ export const createApp = async ({
   const appURN = ApplicationURNSpace.componentizedUrn(clientId, undefined, {
     name: input.clientName,
   })
-  if (!ctx.accountURN) throw new Error('No account URN in context')
+  if (!ctx.identityURN) throw new Error('No identity URN in context')
 
   const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
   await appDO.class.init(clientId, input.clientName)
@@ -41,7 +41,7 @@ export const createApp = async ({
   // We need to create an edge between the logged in user node (aka
   // account) and the new app.
   const edgeRes = await caller.edges.makeEdge({
-    src: ctx.accountURN,
+    src: ctx.identityURN,
     dst: appURN,
     tag: EDGE_APPLICATION,
   })

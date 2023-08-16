@@ -348,7 +348,7 @@ export default ({
                       onSelect={(selectedItem: DropdownSelectListItem) => {
                         selectEmailCallback(selectedItem)
                       }}
-                      ConnectButtonPhrase="Connect New Email Address"
+                      ConnectButtonPhrase="Connect New Email Account"
                       ConnectButtonCallback={addNewEmailCallback}
                       DropdownListboxButton={DropdownListboxButton}
                     />

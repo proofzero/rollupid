@@ -36,7 +36,7 @@ export const ProfileLogo = () => {
 
 type HeadNavProps = {
   open: boolean
-  accountURN: string
+  identityURN: string
   avatarUrl?: string
   displayName?: string
   isToken?: boolean
@@ -44,7 +44,7 @@ type HeadNavProps = {
 }
 
 export default function HeadNav({
-  accountURN,
+  identityURN,
   avatarUrl,
   loggedIn,
   displayName,
@@ -126,8 +126,8 @@ export default function HeadNav({
                                   displayName={displayName}
                                   close={close}
                                   profileUrl={
-                                    accountURN
-                                      ? `/p/${accountURN}`
+                                    identityURN
+                                      ? `/p/${identityURN}`
                                       : '/account/connections'
                                   }
                                 />
@@ -204,7 +204,7 @@ export default function HeadNav({
                 displayName: displayName!,
               }}
               close={close}
-              accountURN={accountURN!}
+              identityURN={identityURN!}
               ref={setReferenceElement}
               open={open}
             />

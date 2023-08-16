@@ -20,11 +20,11 @@ import {
 } from '@proofzero/design-system/src/atoms/toast'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import type { LoaderData as OutletContextData } from '~/root'
-import type { AddressURN } from '@proofzero/urns/address'
+import type { AccountURN } from '@proofzero/urns/account'
 import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import { BadRequestError, NotFoundError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { PlatformAddressURNHeader } from '@proofzero/types/headers'
+import { PlatformAccountURNHeader } from '@proofzero/types/headers'
 import { getToastsAndFlashSession } from '~/utils/toast.server'
 import { useEffect } from 'react'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
@@ -32,7 +32,7 @@ import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWit
 type LoaderData = {
   appDetails: appDetailsProps
   rotationResult?: RotatedSecrets
-  appContactAddress?: AddressURN
+  appContactAddress?: AccountURN
   appContactEmail?: string
   paymaster: PaymasterType
   toasts: {
@@ -97,12 +97,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       let appContactEmail
       if (appContactAddress) {
         const coreClient = createCoreClient(context.env.Core, {
-          [PlatformAddressURNHeader]: appContactAddress,
+          [PlatformAccountURNHeader]: appContactAddress,
           ...getAuthzHeaderConditionallyFromToken(jwt),
           ...generateTraceContextHeaders(context.traceSpan),
         })
 
-        const { address } = await coreClient.address.getAddressProfile.query()
+        const { address } = await coreClient.account.getAccountProfile.query()
         appContactEmail = address
       }
 
@@ -132,7 +132,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         throw error
       } else
         throw new NotFoundError({
-          message: `Request received for clientId ${clientId} which is not owned by provided account`,
+          message: `Request received for clientId ${clientId} which is not owned by provided identity`,
         })
     }
   }
@@ -149,7 +149,7 @@ export default function AppDetailIndexPage() {
     avatarUrl,
     PASSPORT_URL,
     displayName,
-    accountURN,
+    identityURN,
     hasUnpaidInvoices,
     unpaidInvoiceURL,
   } = useOutletContext<OutletContextData>()
@@ -232,7 +232,7 @@ export default function AppDetailIndexPage() {
                   appContactAddress,
                   appContactEmail,
                   paymaster,
-                  accountURN,
+                  identityURN,
                   hasUnpaidInvoices,
                 }}
               />

@@ -36,7 +36,7 @@ import { Button } from '@proofzero/design-system'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
-import type { AddressURN } from '@proofzero/urns/address'
+import type { AccountURN } from '@proofzero/urns/account'
 import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import type { notificationHandlerType } from '~/types'
 import { SCOPE_SMART_CONTRACT_WALLETS } from '@proofzero/security/scopes'
@@ -238,7 +238,7 @@ export default function AppDetailIndexPage() {
     appDetails: appDetailsProps
     rotationResult: any
     paymaster: PaymasterType
-    appContactAddress?: AddressURN
+    appContactAddress?: AccountURN
   }>()
   const { appContactAddress, paymaster, notificationHandler, appDetails } =
     outletContextData

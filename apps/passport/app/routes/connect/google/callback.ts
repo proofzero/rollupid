@@ -1,6 +1,6 @@
 import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
-import { AddressURNSpace } from '@proofzero/urns/address'
+import { AccountURNSpace } from '@proofzero/urns/account'
 import { GoogleStrategyDefaultName } from 'remix-auth-google'
 import {
   createAuthenticatorSessionStorage,
@@ -8,13 +8,13 @@ import {
 } from '~/auth.server'
 import { getCoreClient } from '~/platform.server'
 import {
-  authenticateAddress,
+  authenticateAccount,
   checkOAuthError,
 } from '~/utils/authenticate.server'
 import { redirectToCustomDomainHost } from '~/utils/connect-proxy'
 
-import type { OAuthData } from '@proofzero/platform.address/src/types'
-import { NodeType, OAuthAddressType } from '@proofzero/types/address'
+import type { OAuthData } from '@proofzero/platform.account/src/types'
+import { NodeType, OAuthAccountType } from '@proofzero/types/account'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
 import { Authenticator } from 'remix-auth'
 import { InternalServerError } from '@proofzero/errors'
@@ -41,20 +41,20 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const { profile } = authRes
 
-    if (profile.provider !== OAuthAddressType.Google)
+    if (profile.provider !== OAuthAccountType.Google)
       throw new InternalServerError({
         message: 'Unsupported provider returned in Google callback.',
       })
 
-    const addressURN = AddressURNSpace.componentizedUrn(
-      generateHashedIDRef(OAuthAddressType.Google, profile._json.email),
-      { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Google },
+    const accountURN = AccountURNSpace.componentizedUrn(
+      generateHashedIDRef(OAuthAccountType.Google, profile._json.email),
+      { node_type: NodeType.OAuth, addr_type: OAuthAccountType.Google },
       { alias: profile._json.email, hidden: 'true' }
     )
-    const coreClient = getCoreClient({ context, addressURN })
+    const coreClient = getCoreClient({ context, accountURN })
 
-    const { accountURN, existing } =
-      await coreClient.address.resolveAccount.query({
+    const { identityURN, existing } =
+      await coreClient.account.resolveIdentity.query({
         jwt: await getUserSession(request, context.env, appData?.clientId),
         force:
           !appData ||
@@ -63,11 +63,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         clientId: appData?.clientId,
       })
 
-    await coreClient.address.setOAuthData.mutate(authRes)
+    await coreClient.account.setOAuthData.mutate(authRes)
 
-    return authenticateAddress(
-      addressURN,
+    return authenticateAccount(
       accountURN,
+      identityURN,
       appData,
       request,
       context.env,

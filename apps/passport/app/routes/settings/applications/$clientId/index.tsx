@@ -7,7 +7,7 @@ import { Button, Text } from '@proofzero/design-system'
 import { FaChevronRight } from 'react-icons/fa'
 
 import { useMemo, useState } from 'react'
-import { getDefaultIconUrl } from '~/components/addresses/AddressListItem'
+import { getDefaultIconUrl } from '~/components/accounts/AccountListItem'
 
 import { useHydrated } from 'remix-utils'
 import {
@@ -15,7 +15,7 @@ import {
   ClaimsWideView,
   ConfirmRevocationModal,
 } from '~/components/applications/claims'
-import type { GetAuthorizedAppScopesMethodResult } from '@proofzero/platform/access/src/jsonrpc/methods/getAuthorizedAppScopes'
+import type { GetAuthorizedAppScopesMethodResult } from '@proofzero/platform/authorization/src/jsonrpc/methods/getAuthorizedAppScopes'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { getCoreClient } from '~/platform.server'
 import { getValidatedSessionContext } from '~/session.server'
@@ -72,7 +72,7 @@ export default () => {
         continue
       if (scopeValue === 'email') {
         const profile = connectedProfiles.find(
-          //There should be only one address urn provided for email
+          //There should be only one account urn provided for email
           (profile) =>
             profile.urn === scopeValues.claimValues[scopeValue].meta.urns[0]
         )

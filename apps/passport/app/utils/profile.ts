@@ -1,28 +1,28 @@
 import {
-  EmailAddressType,
-  OAuthAddressType,
-  CryptoAddressType,
-} from '@proofzero/types/address'
+  EmailAccountType,
+  OAuthAccountType,
+  CryptoAccountType,
+} from '@proofzero/types/account'
 
 export const getProfileTypeTitle = (type: string) => {
   switch (type) {
-    case CryptoAddressType.ETH:
+    case CryptoAccountType.ETH:
       return 'Ethereum'
-    case CryptoAddressType.Wallet:
+    case CryptoAccountType.Wallet:
       return 'Smart Wallet'
-    case EmailAddressType.Email:
+    case EmailAccountType.Email:
       return 'Email'
-    case OAuthAddressType.Apple:
+    case OAuthAccountType.Apple:
       return 'Apple'
-    case OAuthAddressType.Discord:
+    case OAuthAccountType.Discord:
       return 'Discord'
-    case OAuthAddressType.GitHub:
+    case OAuthAccountType.GitHub:
       return 'GitHub'
-    case OAuthAddressType.Google:
+    case OAuthAccountType.Google:
       return 'Google'
-    case OAuthAddressType.Microsoft:
+    case OAuthAccountType.Microsoft:
       return 'Microsoft'
-    case OAuthAddressType.Twitter:
+    case OAuthAccountType.Twitter:
       return 'Twitter'
     default:
       return ''

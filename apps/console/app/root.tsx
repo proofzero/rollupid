@@ -42,13 +42,13 @@ import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
-import type { AccountURN } from '@proofzero/urns/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
 
 import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-context'
 
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { type ServicePlanType } from '@proofzero/types/account'
+import { type ServicePlanType } from '@proofzero/types/identity'
 import { BadRequestError } from '@proofzero/errors'
 import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
@@ -90,7 +90,7 @@ export type LoaderData = {
     REMIX_DEV_SERVER_WS_PORT?: number
     WALLET_CONNECT_PROJECT_ID: string
   }
-  accountURN: AccountURN
+  identityURN: IdentityURN
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -109,7 +109,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
     const parsedJwt = parseJwt(jwt)
-    const accountURN = parsedJwt.sub as AccountURN
+    const identityURN = parsedJwt.sub as IdentityURN
 
     try {
       const coreClient = createCoreClient(context.env.Core, {
@@ -132,8 +132,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       let avatarUrl = ''
       let displayName = ''
       try {
-        const profile = await coreClient.account.getProfile.query({
-          account: accountURN,
+        const profile = await coreClient.identity.getProfile.query({
+          identity: identityURN,
         })
         avatarUrl = profile?.pfp?.image || ''
         displayName = profile?.displayName || ''
@@ -149,8 +149,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         WALLET_CONNECT_PROJECT_ID,
       } = context.env
 
-      const spd = await coreClient.account.getStripePaymentData.query({
-        accountURN,
+      const spd = await coreClient.identity.getStripePaymentData.query({
+        identityURN,
       })
 
       // might be quite heavy object
@@ -188,7 +188,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           WALLET_CONNECT_PROJECT_ID,
         },
         displayName,
-        accountURN,
+        identityURN,
       })
     } catch (error) {
       console.error({ error })
@@ -235,7 +235,7 @@ export default function App() {
     avatarUrl,
     PASSPORT_URL,
     displayName,
-    accountURN,
+    identityURN,
     hasUnpaidInvoices,
     unpaidInvoiceURL,
   } = loaderData ?? {}
@@ -256,7 +256,7 @@ export default function App() {
           autocapture: false,
         })
 
-        posthog?.identify(accountURN)
+        posthog?.identify(identityURN)
       } catch (ex) {
         console.error(ex)
       }
@@ -305,7 +305,7 @@ export default function App() {
                 avatarUrl,
                 PASSPORT_URL,
                 displayName,
-                accountURN,
+                identityURN,
                 hasUnpaidInvoices,
                 unpaidInvoiceURL,
               }}
@@ -319,7 +319,7 @@ export default function App() {
               avatarUrl,
               PASSPORT_URL,
               displayName,
-              accountURN,
+              identityURN,
               hasUnpaidInvoices,
               unpaidInvoiceURL,
             }}

@@ -8,14 +8,14 @@ import {
   parseJwt,
 } from '@proofzero/utils'
 import { accessCustomerPortal } from '~/services/billing/stripe'
-import { AccountURN } from '@proofzero/urns/account'
+import { IdentityURN } from '@proofzero/urns/identity'
 import { BadRequestError } from '@proofzero/errors'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
-    const accountURN = parsedJwt.sub as AccountURN
+    const identityURN = parsedJwt.sub as IdentityURN
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
 
@@ -24,9 +24,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const { customerID } = await coreClient.account.getStripePaymentData.query({
-      accountURN,
-    })
+    const { customerID } = await coreClient.identity.getStripePaymentData.query(
+      {
+        identityURN,
+      }
+    )
 
     const headers = request.headers
     let returnURL = headers.get('Referer')

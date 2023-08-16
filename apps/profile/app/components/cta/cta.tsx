@@ -9,10 +9,10 @@ import { determineProfileCompletionStatus } from '../../utils/cta.client'
 
 const CTA = ({
   profile,
-  addresses,
+  accounts,
 }: {
   profile: FullProfile
-  addresses: any[]
+  accounts: any[]
 }) => {
   const ctaDict: {
     [key: string]: {
@@ -67,7 +67,7 @@ const CTA = ({
   }
 
   const handleCompletionStatus = () => {
-    const pcs = determineProfileCompletionStatus(profile, addresses)
+    const pcs = determineProfileCompletionStatus(profile, accounts)
 
     let ctaKey
     ctaKey = handleCTAKey(pcs, 'gallery') || ctaKey

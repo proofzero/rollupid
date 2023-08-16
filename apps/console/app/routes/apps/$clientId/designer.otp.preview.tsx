@@ -3,7 +3,7 @@ import { requireJWT } from '~/utilities/session.server'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import { PlatformAddressURNHeader } from '@proofzero/types/headers'
+import { PlatformAccountURNHeader } from '@proofzero/types/headers'
 import {
   EmailOTPTheme,
   EmailOTPThemeSchema,
@@ -44,16 +44,16 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    const addressURN = formData.get('addressURN') as string
+    const accountURN = formData.get('accountURN') as string
 
     const coreClient = createCoreClient(context.env.Core, {
-      [PlatformAddressURNHeader]: addressURN,
+      [PlatformAccountURNHeader]: accountURN,
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
     const { address: email } =
-      await coreClient.address.getAddressProfile.query()
+      await coreClient.account.getAccountProfile.query()
 
     let [appProps, customDomain] = await Promise.all([
       coreClient.starbase.getAppPublicProps.query({
@@ -65,7 +65,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     ])
 
     try {
-      await coreClient.address.generateEmailOTP.mutate({
+      await coreClient.account.generateEmailOTP.mutate({
         email,
         themeProps: {
           privacyURL: appProps.privacyURL as string,

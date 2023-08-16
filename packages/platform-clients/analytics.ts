@@ -1,5 +1,5 @@
 import { BaseContext } from '@proofzero/types'
-import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
+import { IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
 import { getAuthzTokenFromReq } from '@proofzero/utils'
 import { decodeJwt } from 'jose'
 type PathContext = { path?: string; type?: string } & BaseContext
@@ -20,15 +20,17 @@ export const WriteAnalyticsDataPoint = (
       ctx.ServiceDeploymentMetadata?.deployment?.timestamp || 'unknown',
   }
 
-  const account = ctx.accountURN
-    ? AccountURNSpace.componentizedParse(ctx.accountURN).decoded
+  const identity = ctx.identityURN
+    ? IdentityURNSpace.componentizedParse(ctx.identityURN).decoded
     : null
   const token = ctx.req ? getAuthzTokenFromReq(ctx.req) : null
-  const sub = token ? (decodeJwt(token).sub as AccountURN) : null
-  const subAcct = sub ? AccountURNSpace.componentizedParse(sub).decoded : null
+  const sub = token ? (decodeJwt(token).sub as IdentityURN) : null
+  const subIdentity = sub
+    ? IdentityURNSpace.componentizedParse(sub).decoded
+    : null
 
   // TODO: Move to the types from the types package and parse JWT here for account URN.
-  const raw_key = account || subAcct || rayId || null
+  const raw_key = identity || subIdentity || rayId || null
 
   const customAnalytics =
     customDatapoint ||
@@ -46,7 +48,7 @@ export const WriteAnalyticsDataPoint = (
     ctx?.path ? ctx.path : 'unknown',
     ctx?.type ? ctx.type : 'unknown',
     // 'AFTER',
-    account,
+    identity,
     rayId,
     ...(customAnalytics.blobs || []),
   ].slice(0, 20) // The maximum allowed number of blobs is 20.

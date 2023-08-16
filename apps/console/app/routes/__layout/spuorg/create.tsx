@@ -24,7 +24,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    await coreClient.account.createIdentityGroup.mutate({
+    await coreClient.identity.createIdentityGroup.mutate({
       name: name as string,
     })
 

@@ -1,7 +1,7 @@
 import { ActionFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
-import { GrantType } from '@proofzero/types/access'
+import { GrantType } from '@proofzero/types/authorization'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 import { getCoreClient } from '../platform.server'
@@ -22,14 +22,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const coreClient = getCoreClient({ context })
 
     const tokens = refreshToken
-      ? await coreClient.access.exchangeToken.mutate({
+      ? await coreClient.authorization.exchangeToken.mutate({
           grantType: GrantType.RefreshToken,
           refreshToken,
           clientId,
           clientSecret,
           issuer,
         })
-      : await coreClient.access.exchangeToken.mutate({
+      : await coreClient.authorization.exchangeToken.mutate({
           grantType: GrantType.AuthorizationCode,
           code,
           clientId,

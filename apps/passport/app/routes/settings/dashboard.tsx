@@ -1,28 +1,28 @@
 import { Text } from '@proofzero/design-system'
 
 import SectionTitle from '~/components/typography/sectionTitle'
-import { AddressList } from '~/components/addresses/AddressList'
+import { AccountList } from '~/components/accounts/AccountList'
 
 import { Link, useNavigate } from '@remix-run/react'
 
 import dashboardChart from '~/assets/dashboard_chart.svg'
-import type { AddressListItemProps } from '~/components/addresses/AddressListItem'
+import type { AccountListItemProps } from '~/components/accounts/AccountListItem'
 import { NestedErrorPage } from '@proofzero/design-system/src/pages/nested-error/NestedErrorPage'
 
 import { WarningCTA } from '@proofzero/design-system/src/molecules/cta/warning'
 
 import { useOutletContext } from '@remix-run/react'
-import type { AddressURN } from '@proofzero/urns/address'
+import type { AccountURN } from '@proofzero/urns/account'
 import { AuthorizedAppsModel } from '../settings'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { useEffect } from 'react'
 
 export default function DashboardLayout() {
-  const { connectedProfiles, authorizedApps, primaryAddressURN } =
+  const { connectedProfiles, authorizedApps, primaryAccountURN } =
     useOutletContext<{
       connectedProfiles: any[]
       authorizedApps: AuthorizedAppsModel[]
-      primaryAddressURN: AddressURN
+      primaryAccountURN: AccountURN
     }>()
 
   const navigate = useNavigate()
@@ -109,9 +109,9 @@ export default function DashboardLayout() {
               </Link>
             </div>
 
-            <AddressList
-              primaryAddressURN={primaryAddressURN}
-              addresses={connectedProfiles as AddressListItemProps[]}
+            <AccountList
+              primaryAccountURN={primaryAccountURN}
+              accounts={connectedProfiles as AccountListItemProps[]}
               showReconnectAccount={false}
             />
           </div>
