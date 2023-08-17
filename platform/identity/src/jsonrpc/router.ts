@@ -48,26 +48,6 @@ import {
 } from './methods/deleteIdentityNode'
 import { UnauthorizedError } from '@proofzero/errors'
 import {
-  GetEntitlementsInputSchema,
-  GetEntitlementsOutputSchema,
-  getEntitlements,
-} from './methods/getEntitlements'
-import {
-  UpdateEntitlementsInputSchema,
-  updateEntitlements,
-} from './methods/updateEntitlements'
-import {
-  GetStripPaymentDataInputSchema,
-  GetStripePaymentDataOutputSchema,
-  SetStripePaymentDataInputSchema,
-  getStripePaymentData,
-  setStripePaymentData,
-} from './methods/stripePaymentData'
-import {
-  CancelServicePlansInput,
-  cancelServicePlans,
-} from './methods/cancelServicePlans'
-import {
   CreateIdentityGroupInputSchema,
   createIdentityGroup,
 } from './methods/identity-groups/createIdentityGroup'
@@ -195,33 +175,6 @@ export const appRouter = t.router({
     .use(LogUsage)
     .input(DeleteIdentityNodeInput)
     .mutation(deleteIdentityNodeMethod),
-  getEntitlements: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .input(GetEntitlementsInputSchema)
-    .output(GetEntitlementsOutputSchema)
-    .query(getEntitlements),
-  updateEntitlements: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .input(UpdateEntitlementsInputSchema)
-    .mutation(updateEntitlements),
-  getStripePaymentData: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .input(GetStripPaymentDataInputSchema)
-    .output(GetStripePaymentDataOutputSchema)
-    .query(getStripePaymentData),
-  setStripePaymentData: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .input(SetStripePaymentDataInputSchema)
-    .mutation(setStripePaymentData),
-  cancelServicePlans: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .input(CancelServicePlansInput)
-    .mutation(cancelServicePlans),
   createIdentityGroup: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
