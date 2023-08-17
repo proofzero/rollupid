@@ -6,9 +6,9 @@
 
 ## Getting Started
 
-* [Create an application](getting-started/create-an-application.md)
-* [Logging in Users](getting-started/auth-flow.md)
-* [Accessing Profile API](getting-started/accessing-profile-api.md)
+* [Create an Application](getting-started/create-an-application.md)
+* [Setup Auth Flow](getting-started/auth-flow.md)
+* [API Access](getting-started/accessing-profile-api.md)
 
 ## Guides
 

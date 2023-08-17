@@ -1,42 +1,54 @@
 ---
-description: Authenticating and authorizing users into your application.
+description: Logging in users into your application.
 ---
 
-# Logging in Users
+# Setup Auth Flow
 
 {% hint style="warning" %}
 For this step you will need the **Client ID** and the **Client Secret** from the [previous step](create-an-application.md).
 {% endhint %}
 
-Since Rollup ID is **standards-compliant**, integrating it into your application is similar to integrating other OAuth-based authentication services like [Auth0](https://auth0.com/) or [Firebase](https://firebase.google.com/) / [Supabase](https://supabase.com/). You can use off-the-shelf [open-source libraries](https://oauth.net/code/) to build your OAuth flow.
+The Rollup ID authentication flow is built upon the [OpenID Connect (OIDC) protocol](https://openid.net/developers/how-connect-works/), ensuring a secure and standardized process. This guide will walk you through the steps involved in this flow.
 
-We recommend setting up two routes in your application called `/auth/login` and `/auth/callback` to manage the authorization flow.
+For this step, since Rollup ID is **standards-compliant,** you can use off-the-shelf [open-source libraries](https://oauth.net/code/) to build your OAuth flow.
 
 {% hint style="info" %}
 We have created a reference implementation using [Remix](https://remix.run/) and the [Remix OAuth](https://github.com/sergiodxa/remix-auth) library [here](https://github.com/proofzero/rollupid/tree/main/apps/profile/app/routes/auth) which we will refer to several times in this step.
 {% endhint %}
 
-### Step 1: Initiate Authentication
+### Step 1: Initiate the Auth Request
 
-To begin the authentication flow, redirect users to the Passport authorization endpoint with the Client ID and a randomly generated state parameter included in the query string. The URL should look like this: `https://passport.rollup.id/authorize?client_id=<your_app_id>&state=<generated_state>&scope=email`
+To log in or register to a user your application the first step is to send an authorization request to your Rollup ID application. This is typically handled by a redirect route (e.g.`/auth`) in your application.&#x20;
 
-You can achieve this by redirecting users to a route in your application that subsequently redirects them to the URL above.&#x20;
+This request contains essential parameters, including the `client_id` (your application's ID), `response_type`, `scope`, `state` and `redirect_url`.&#x20;
+
+The `state` parameter is a CSRF token used to protect against potential attacks and to maintain any state that might be useful after the authentication process (more on this later). Before redirecting users to the Rollup ID auth flow, it is important that the state parameter is persisted in a cookie or other storage method for reference in a later step.
+
+For example, your authorization URL should look like this: `https://passport.rollup.id/authorize?client_id=<your_app_id>&state=<generated_state>&scope=email`.
 
 {% hint style="info" %}
-For PRO accounts, custom hostnames of Passport are allowed.
+If this sounds complicated don't worry, many open source OAuth client libraries like [Auth.js](https://auth.js) will automatically create the necessary routes and manage client state and requests for your application.
 {% endhint %}
 
-Persist the state parameter in a cookie or other storage method for reference in a later step. In our reference implementation, the remix-oauth library handles this automatically. In your application, your chosen library will typically handle this for you.
+{% hint style="info" %}
+For PRO apps, [custom hostnames](../platform/console/custom-domain.md) are allowed and would replace `passport.rollup.id` with your domain name and more customization features would be available in the [designer](../platform/console/designer.md).
+{% endhint %}
 
-Rollup ID will use the provided Client ID to look up your application details, displaying your application name and branding information. If your application requires specific authorization scopes, users will be presented with an authorization screen.
+### Step 2: User Authentication & Authorization
 
-<figure><img src="../.gitbook/assets/13.png" alt=""><figcaption></figcaption></figure>
+Rollup ID will use the provided `client_id` to look up your application details, displaying your application name and branding information.
 
-Upon completion, users will be redirected back to your app using the "Redirect URL" set in the previous step.
+If the user is not signed in they will be displayed the authentication page where they can choose from various authentication methods. After successful authentication, the user will be shown the authorization screen to provide consent for the requested scopes, allowing your application to access specific data.
 
-### Step 2: Handle Callback
+Upon completion, users will be redirected back to your app using the `redirect_url` set in the previous step.
 
-Your Redirect URL should be ready to accept an exchange token and state parameters in the following format:
+
+
+<figure><img src="../.gitbook/assets/ezgif.com-video-to-gif.gif" alt=""><figcaption></figcaption></figure>
+
+### Step 3: **Authorization Code Exchange**
+
+Your `redirect_url` should be ready to accept an exchange token and state parameters in the following format:
 
 ```
 // https://<redirect_url>?code=<exchange code>&state=<state>
@@ -46,7 +58,7 @@ Your Redirect URL should be ready to accept an exchange token and state paramete
 * **State:** this state should match the state you created for the user/client in Step 1. _Typically your chosen OAuth library will manage this for you._
 * **Redirect URL**: the redirect url set in your app in the [previous step](create-an-application.md). _For development, "localhost" is an accepted redirect url host._
 
-Ensure the state parameter matches the state you sent when initiating the auth flow in Step 1. This security measure helps prevent replay attacks. Send the exchange code along with the Client Secret and **grant type** to Passport's token endpoint (see below) to receive the access token, refresh token, and minimal user profile (encoded in an ID token) as base64-encoded signed JWTs, completing the flow.
+Ensure the state parameter matches the state you sent when initiating the auth flow in Step 1. This security measure helps prevent replay attacks. Send the exchange code along with the **Client Secret** and **grant type** to Passport's token endpoint (see below) to receive the access token, refresh token, and minimal user profile (encoded in an ID token) as base64-encoded signed JWTs, completing the flow.
 
 {% swagger method="post" path="" baseUrl="https://passport.rollup.id/token" summary="Exchange access code for access token" %}
 {% swagger-description %}
@@ -85,35 +97,24 @@ Appication client secret
 {% endswagger-response %}
 {% endswagger %}
 
-#### Access Token
+### Step 4: Access Token & ID Token
 
-Access tokens are valid for 1 hour, with the expiry time stored in the "exp" property in the JWT. Refresh tokens, on the other hand, are valid for 90 days and can be used to request another access token using the same exchange code endpoint with the "refresh\_token" grant type.
-
-{% hint style="info" %}
-There are multiple ways to manage this refresh flow, [here](../../apps/profile/app/utils/session.server.tsx#L52) is our reference implementation. In summary, we store the tokens encrypted in a user cookie that is valid for 90 days and refresh when needed.\
-\
-If you ever find yourself with an expired refresh token you can consider this as the user being "logged out" and redirect them back to passport for login to repeat this flow.
-{% endhint %}
-
-#### ID Token
-
-ID tokens are only supplied when the initial set of tokens is retrieved, and are not provided again during usage of refresh tokens. Use the `/userinfo` [endpoint](../reference/passport-api.md#user-info) to retrieve fresh user details. The response, as well as what is encoded in the ID token, is shaped as follows:
-
-```typescript
-{
-    name: string,
-    picture: string,
-    email: string,
-    //...ID token encodes other claims as well
-}
-```
+With the obtained access token, your application can now fetch the [id token](../advanced/tokens.md#id-tokens) from the Rollup ID `/userinfo`[endpoint](../reference/passport-api.md#user-info) to fetch or any authorized endpoint from the [Galaxy API](../reference/galaxy-api.md).
 
 {% hint style="info" %}
 Inside the ID token object you will find a unique claim called `sub` which will be consistent across all logins. This will match the value of the `sub` claim in access and refresh tokens also.
 {% endhint %}
 
-For more information on tokens and how to decode them please check out the [Tokens](../advanced/tokens.md) page.
+Ensure you handle this data with care, respecting user privacy and adhering to data protection regulations.
 
-Here is a [link](../../apps/profile/app/routes/auth/callback.tsx) to the reference implementation doing just this. With the access token you can make authorized requests to the [Profile Graph](../platform/profile-graph.md) for this user.
+### Step 5: Refresh Tokens (optional)
 
-If you are coming from an existing provider please check out the [Migration Guide](../advanced/migration-guide.md).
+Access tokens are valid for 1 hour, with the expiry time stored in the "exp" property in the JWT. If your application requires prolonged access to user data without prompting the user for re-authentication, consider implementing refresh tokens using the [exchange token endpoint](../reference/passport-api.md#exchange-token).&#x20;
+
+Refresh tokens allow your application to obtain new access tokens, ensuring uninterrupted access to user data.
+
+If you ever find yourself with an expired refresh token you can consider this as the user being "logged out" and redirect them to repeat the auth flow.
+
+### Next Steps
+
+Once you've successfully integrated Rollup ID and authenticated your users, the next step is to access their profile data. This guide will walk you through the process of fetching and managing this data using the Rollup ID API.
