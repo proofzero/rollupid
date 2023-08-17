@@ -13,7 +13,7 @@ import { getEmailDropdownItems } from '@proofzero/utils/getNormalisedConnectedAc
 import { type DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, context, params }) => {
+  async ({ request, context }) => {
     const jwt = await requireJWT(request, context.env)
     const payload = checkToken(jwt!)
     const accountURN = payload.sub as AccountURN

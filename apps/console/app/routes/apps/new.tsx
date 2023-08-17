@@ -38,7 +38,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       const { clientId } = await coreClient.starbase.createApp.mutate({
         clientName,
       })
-      console.log({ clientId })
       return redirect(`/apps/${clientId}`)
     } catch (error) {
       console.error({ error })
