@@ -1,6 +1,6 @@
 import { Button } from '@proofzero/design-system'
 import { List } from '@proofzero/design-system/src/atoms/lists/List'
-import { ListIdentityGroupsOutput } from '@proofzero/platform/account/src/jsonrpc/methods/identity-groups/listIdentityGroups'
+import { ListIdentityGroupsOutput } from '@proofzero/platform/identity/src/jsonrpc/methods/identity-groups/listIdentityGroups'
 import { NavLink, useOutletContext } from '@remix-run/react'
 
 export default () => {

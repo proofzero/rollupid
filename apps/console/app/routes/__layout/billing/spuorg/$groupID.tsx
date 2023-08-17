@@ -154,8 +154,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       toastNotification = JSON.parse(toastStr)
     }
 
-    const connectedAccounts = await coreClient.identity.getAddresses.query({
-      account: identityURN,
+    const connectedAccounts = await coreClient.identity.getAccounts.query({
+      identity: identityURN,
     })
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
@@ -164,7 +164,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
     if (spd && !spd.accountURN) {
       const targetAccountURN =
-        await coreClient.identity.getAddressURNForEmail.query(
+        await coreClient.account.getAccountURNForEmail.query(
           spd.email.toLowerCase()
         )
 

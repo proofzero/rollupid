@@ -83,6 +83,11 @@ import {
   deleteIdentityGroup,
 } from './methods/identity-groups/deleteIdentityGroup'
 import { purgeIdentityGroupMemberships } from './methods/identity-groups/purgeIdentityGroupMemberships'
+import {
+  HasIdentityGroupAuthorizationInputSchema,
+  HasIdentityGroupAuthorizationOutputSchema,
+  hasIdentityGroupAuthorization,
+} from './methods/identity-groups/hasIdentityGroupAuthorization'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -248,4 +253,10 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(RequireIdentity)
     .mutation(purgeIdentityGroupMemberships),
+  hasIdentityGroupAuthorization: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(HasIdentityGroupAuthorizationInputSchema)
+    .output(HasIdentityGroupAuthorizationOutputSchema)
+    .query(hasIdentityGroupAuthorization),
 })
