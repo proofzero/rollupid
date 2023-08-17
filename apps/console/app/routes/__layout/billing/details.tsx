@@ -15,6 +15,12 @@ import { createCustomer, updateCustomer } from '~/services/billing/stripe'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { AccountURN } from '@proofzero/urns/account'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
+import { AnyURN } from '@proofzero/urns'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
+import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -29,24 +35,47 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
+    const returnURL = request.headers.get('Referer')
+    if (!returnURL) {
+      throw new BadRequestError({
+        message: 'No Referer found in request.',
+      })
+    }
+
     const fd = await request.formData()
-    const { email, accountURN, name } = JSON.parse(
+    const { email, accountURN, name, URN } = JSON.parse(
       fd.get('payload') as string
     ) as {
       email: string
       accountURN: AccountURN
       name: string
+      URN?: AnyURN
+    }
+
+    let targetURN = URN ?? identityURN
+    if (IdentityGroupURNSpace.is(targetURN)) {
+      const authorized =
+        await coreClient.identity.hasIdentityGroupAuthorization.query({
+          identityURN,
+          identityGroupURN: targetURN as IdentityGroupURN,
+        })
+
+      if (!authorized) {
+        throw new UnauthorizedError({
+          message: 'You are not authorized to update this identity group.',
+        })
+      }
     }
 
     let paymentData = await coreClient.billing.getStripePaymentData.query({
-      URN: identityURN,
+      URN: targetURN,
     })
     if (!paymentData) {
       const customer = await createCustomer(
         {
           email,
           name,
-          URN: identityURN,
+          URN: targetURN,
         },
         context.env
       )
@@ -77,7 +106,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     await coreClient.billing.setStripePaymentData.mutate({
       ...paymentData,
-      URN: identityURN,
+      URN: targetURN,
       accountURN,
     })
 
@@ -90,7 +119,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     )
 
-    return redirect('/billing', {
+    return redirect(returnURL, {
       headers: {
         'Set-Cookie': await commitFlashSession(flashSession, context.env),
       },

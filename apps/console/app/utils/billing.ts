@@ -6,14 +6,14 @@ import {
 } from '~/services/billing/stripe'
 import type { StripePaymentData } from '@proofzero/platform/identity/src/types'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
-import { type IdentityURN } from '@proofzero/urns/identity'
 import { type PaymentIntent, loadStripe } from '@stripe/stripe-js'
 import { type SubmitFunction } from '@remix-run/react'
 import { type Session, type SessionData } from '@remix-run/cloudflare'
 import { commitFlashSession } from '~/utilities/session.server'
 import { type Env } from 'bindings'
 import Stripe from 'stripe'
-import { type ServicePlanType } from '@proofzero/types/identity'
+import { AnyURN } from '@proofzero/urns'
+import { ServicePlanType } from '@proofzero/types/billing'
 
 export type StripeInvoice = {
   id: string
@@ -86,14 +86,14 @@ export const createOrUpdateSubscription = async ({
   SECRET_STRIPE_PRO_PLAN_ID,
   SECRET_STRIPE_API_KEY,
   quantity,
-  identityURN,
+  URN,
   customerID,
 }: {
   subscriptionID?: string | null
   SECRET_STRIPE_PRO_PLAN_ID: string
   SECRET_STRIPE_API_KEY: string
   quantity: number
-  identityURN: IdentityURN
+  URN: AnyURN
   customerID: string
 }) => {
   const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
@@ -107,7 +107,7 @@ export const createOrUpdateSubscription = async ({
         customerID: customerID,
         planID: SECRET_STRIPE_PRO_PLAN_ID,
         quantity,
-        identityURN,
+        URN,
         handled: true,
       },
       stripeClient

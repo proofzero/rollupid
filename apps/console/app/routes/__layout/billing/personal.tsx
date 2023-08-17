@@ -252,7 +252,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
       quantity,
       subscriptionID: entitlements.subscriptionID,
-      identityURN,
+      URN: identityURN,
     })
 
     if (
@@ -1298,7 +1298,7 @@ export default () => {
     paymentData?.email
   )
   const [selectedEmailURN, setSelectedEmailURN] = useState<string | undefined>(
-    paymentData?.addressURN
+    paymentData?.accountURN
   )
   const [fullName, setFullName] = useState<string | undefined>(
     paymentData?.name
@@ -1473,7 +1473,7 @@ export default () => {
                     ConnectButtonPhrase="Connect New Email Address"
                     defaultItems={
                       connectedEmails.filter(
-                        (ce) => ce.value === paymentData?.addressURN
+                        (ce) => ce.value === paymentData?.accountURN
                       ) as DropdownSelectListItem[]
                     }
                   />

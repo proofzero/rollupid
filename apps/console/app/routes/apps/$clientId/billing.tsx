@@ -53,6 +53,7 @@ import { setPurchaseToastNotification } from '~/utils'
 import type Stripe from 'stripe'
 import { PaymentData, ServicePlanType } from '@proofzero/types/billing'
 import { IdentityURN } from '@proofzero/urns/identity'
+import { GetEntitlementsOutput } from '@proofzero/platform/billing/src/jsonrpc/methods/getEntitlements'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -199,7 +200,7 @@ const processPurchaseOp = async (
     SECRET_STRIPE_API_KEY: env.SECRET_STRIPE_API_KEY,
     quantity,
     subscriptionID: entitlements.subscriptionID,
-    identityURN,
+    URN: identityURN,
   })
 
   setPurchaseToastNotification({

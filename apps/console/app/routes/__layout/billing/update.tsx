@@ -15,6 +15,12 @@ import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { type IdentityURN } from '@proofzero/urns/identity'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { ServicePlanType } from '@proofzero/types/billing'
+import { AnyURN } from '@proofzero/urns'
+import { UnauthorizedError } from '@proofzero/errors'
+import {
+  IdentityGroupURNSpace,
+  IdentityGroupURN,
+} from '@proofzero/urns/identity-group'
 
 /**
  * WARNING: Here be dragons, and not the cute, cuddly kind! This code runs twice in certain scenarios because when the user
@@ -39,11 +45,27 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const subId = fd.get('subId') as string
     const redirectUrl = fd.get('redirectUrl') as string
     const updatePlanParams = fd.get('updatePlanParams') as string
+    const URN = fd.get('URN') as AnyURN | undefined
 
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
+
+    let targetURN = URN ?? identityURN
+    if (IdentityGroupURNSpace.is(targetURN)) {
+      const authorized =
+        await coreClient.identity.hasIdentityGroupAuthorization.query({
+          identityURN,
+          identityGroupURN: targetURN as IdentityGroupURN,
+        })
+
+      if (!authorized) {
+        throw new UnauthorizedError({
+          message: 'You are not authorized to update this identity group.',
+        })
+      }
+    }
 
     // if this method was called from "$clientId/billing" page, update the plan
     // and assign the new plan to the app
@@ -55,7 +77,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       await reconcileAppSubscriptions(
         {
           subscriptionID: subId,
-          URN: identityURN,
+          URN: targetURN,
           coreClient,
           billingURL: `${context.env.CONSOLE_URL}/billing`,
           settingsURL: `${context.env.CONSOLE_URL}`,
@@ -73,7 +95,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         }
 
         const entitlements = await coreClient.billing.getEntitlements.query({
-          URN: identityURN,
+          URN: targetURN,
         })
 
         const numberOfEntitlements = entitlements.plans[plan]?.entitlements
@@ -86,7 +108,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           numberOfEntitlements > allotedApps
         ) {
           await coreClient.starbase.setAppPlan.mutate({
-            URN: identityURN,
+            URN: targetURN,
             clientId,
             plan,
           })

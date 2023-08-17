@@ -72,7 +72,11 @@ import { DangerPill } from '@proofzero/design-system/src/atoms/pills/DangerPill'
 import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { useHydrated } from 'remix-utils'
 import _ from 'lodash'
-import { BadRequestError, InternalServerError } from '@proofzero/errors'
+import {
+  BadRequestError,
+  InternalServerError,
+  UnauthorizedError,
+} from '@proofzero/errors'
 import iSvg from '@proofzero/design-system/src/atoms/info/i.svg'
 import {
   createOrUpdateSubscription,
@@ -89,6 +93,11 @@ import { ToastWarning } from '@proofzero/design-system/src/atoms/toast/ToastWarn
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import plans, { PlanDetails } from '../plans'
 import { PaymentData, ServicePlanType } from '@proofzero/types/billing'
+import {
+  IdentityGroupURNSpace,
+  IdentityGroupURN,
+} from '@proofzero/urns/identity-group'
+import { PlanFeatures } from '../personal'
 import { IdentityURN } from '@proofzero/urns/identity'
 
 type LoaderData = {
@@ -100,6 +109,7 @@ type LoaderData = {
   toastNotification?: ToastNotification
   connectedEmails: DropdownSelectListItem[]
   invoices: StripeInvoice[]
+  groupURN: IdentityGroupURN
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -115,8 +125,25 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
+    const groupID = params.groupID as string
+    const groupURN = IdentityGroupURNSpace.urn(
+      groupID as string
+    ) as IdentityGroupURN
+
+    const authorized =
+      await coreClient.identity.hasIdentityGroupAuthorization.query({
+        identityURN,
+        identityGroupURN: groupURN,
+      })
+
+    if (!authorized) {
+      throw new UnauthorizedError({
+        message: 'You are not authorized to update this identity group.',
+      })
+    }
+
     const { plans } = await coreClient.billing.getEntitlements.query({
-      URN: identityURN,
+      URN: groupURN,
     })
 
     const flashSession = await getFlashSession(request, context.env)
@@ -133,7 +160,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
     const spd = await coreClient.billing.getStripePaymentData.query({
-      URN: identityURN,
+      URN: groupURN,
     })
     if (spd && !spd.accountURN) {
       const targetAccountURN =
@@ -150,7 +177,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       await coreClient.billing.setStripePaymentData.mutate({
         ...spd,
         accountURN: targetAccountURN,
-        URN: identityURN,
+        URN: groupURN,
       })
 
       spd.accountURN = targetAccountURN
@@ -174,6 +201,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         connectedEmails,
         invoices,
         toastNotification,
+        groupURN,
       },
       {
         headers: {
@@ -185,7 +213,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, context }) => {
+  async ({ request, context, params }) => {
     const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
     const identityURN = parsedJwt.sub as IdentityURN
@@ -197,8 +225,25 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
+    const groupID = params.groupID as string
+    const groupURN = IdentityGroupURNSpace.urn(
+      groupID as string
+    ) as IdentityGroupURN
+
+    const authorized =
+      await coreClient.identity.hasIdentityGroupAuthorization.query({
+        identityURN,
+        identityGroupURN: groupURN,
+      })
+
+    if (!authorized) {
+      throw new UnauthorizedError({
+        message: 'You are not authorized to update this identity group.',
+      })
+    }
+
     const spd = await coreClient.billing.getStripePaymentData.query({
-      URN: identityURN,
+      URN: groupURN,
     })
 
     const invoices = await getCurrentAndUpcomingInvoices(
@@ -242,7 +287,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const entitlements = await coreClient.billing.getEntitlements.query({
-      URN: identityURN,
+      URN: groupURN,
     })
 
     const sub = await createOrUpdateSubscription({
@@ -251,7 +296,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
       quantity,
       subscriptionID: entitlements.subscriptionID,
-      identityURN,
+      URN: groupURN,
     })
 
     if (
@@ -262,7 +307,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       await reconcileAppSubscriptions(
         {
           subscriptionID: sub.id,
-          URN: identityURN,
+          URN: groupURN,
           coreClient,
           billingURL: `${context.env.CONSOLE_URL}/billing`,
           settingsURL: `${context.env.CONSOLE_URL}`,
@@ -315,72 +360,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
-export const PlanFeatures = ({
-  plan,
-  featuresColor,
-}: {
-  plan: PlanDetails
-  featuresColor: 'text-indigo-500' | 'text-gray-500'
-}) => {
-  return (
-    <ul className="grid lg:grid-rows-4 grid-flow-row lg:grid-flow-col gap-4">
-      {plan.features.map((feature) => (
-        <li
-          key={feature.title}
-          className={`flex flex-row items-center gap-3 text-gray-500`}
-        >
-          <div className="w-3.5 h-3.5 flex justify-center items-center">
-            {feature.type === 'current' && (
-              <FaCheck className={featuresColor} />
-            )}
-            {feature.type === 'future' && (
-              <TbHourglassHigh className={featuresColor} />
-            )}
-          </div>
-
-          <Text size="sm" weight="medium">
-            {feature.title}
-          </Text>
-
-          {feature.aggregateFeatures && (
-            <Popover className="relative">
-              <Popover.Button as="img" src={iSvg} className="cursor-pointer" />
-
-              <Popover.Panel className="absolute z-10 bg-white p-2 border rounded-lg mt-2">
-                <ul className="flex flex-col gap-2">
-                  {feature.aggregateFeatures.map((af) => (
-                    <li
-                      key={af.title}
-                      className={`flex flex-row items-center gap-3 text-gray-500`}
-                    >
-                      <div className="w-3.5 h-3.5 flex justify-center items-center">
-                        {af.type === 'current' && (
-                          <FaCheck className={'text-gray-500'} />
-                        )}
-                        {af.type === 'future' && (
-                          <TbHourglassHigh className={'text-gray-500'} />
-                        )}
-                      </div>
-
-                      <Text
-                        size="sm"
-                        weight="medium"
-                        className="flex-1 text-left whitespace-nowrap"
-                      >
-                        {af.title}
-                      </Text>
-                    </li>
-                  ))}
-                </ul>
-              </Popover.Panel>
-            </Popover>
-          )}
-        </li>
-      ))}
-    </ul>
-  )
-}
-
 const PurchaseProModal = ({
   isOpen,
   setIsOpen,
@@ -388,6 +367,7 @@ const PurchaseProModal = ({
   entitlements,
   paymentData,
   submit,
+  URN,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
@@ -395,6 +375,7 @@ const PurchaseProModal = ({
   entitlements: number
   paymentData?: PaymentData
   submit: SubmitFunction
+  URN: IdentityGroupURN
 }) => {
   const [proEntitlementDelta, setProEntitlementDelta] = useState(1)
 
@@ -405,7 +386,7 @@ const PurchaseProModal = ({
           <section className="mx-5 mt-5">
             <ToastWithLink
               message="Update your Payment Information to enable purchasing"
-              linkHref={`/billing/payment`}
+              linkHref={`/billing/payment?URN=${URN}`}
               type={'warning'}
               linkText="Update payment information"
             />
@@ -566,6 +547,7 @@ const AssignEntitlementModal = ({
   entitlementUsage,
   fetcher,
   apps,
+  URN,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
@@ -574,6 +556,7 @@ const AssignEntitlementModal = ({
   paymentData?: PaymentData
   fetcher: FetcherWithComponents<any>
   apps: AppLoaderData[]
+  URN: IdentityGroupURN
 }) => {
   const navigate = useNavigate()
 
@@ -584,7 +567,7 @@ const AssignEntitlementModal = ({
           <section className="mx-5 mt-5">
             <ToastWithLink
               message="Update your Payment Information to enable purchasing"
-              linkHref={`/billing/payment`}
+              linkHref={`/billing/payment?URN=${URN}`}
               type={'warning'}
               linkText="Update payment information"
             />
@@ -1009,6 +992,7 @@ const PlanCard = ({
   submit,
   fetcher,
   hasUnpaidInvoices = false,
+  URN,
 }: {
   plan: PlanDetails
   entitlements: number
@@ -1017,6 +1001,7 @@ const PlanCard = ({
   hasUnpaidInvoices: boolean
   submit: SubmitFunction
   fetcher: FetcherWithComponents<any>
+  URN: IdentityGroupURN
 }) => {
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
   const [removeEntitlementModalOpen, setRemoveEntitlementModalOpen] =
@@ -1037,6 +1022,7 @@ const PlanCard = ({
         entitlements={entitlements}
         paymentData={paymentData}
         submit={submit}
+        URN={URN}
       />
       <RemoveEntitelmentModal
         isOpen={removeEntitlementModalOpen}
@@ -1055,6 +1041,7 @@ const PlanCard = ({
         paymentData={paymentData}
         fetcher={fetcher}
         apps={apps}
+        URN={URN}
       />
       <AssignedAppModal
         isOpen={assignedAppModalOpen}
@@ -1230,6 +1217,7 @@ export default () => {
     paymentData,
     connectedEmails,
     invoices,
+    groupURN,
   } = loaderData
 
   const { PASSPORT_URL } = useOutletContext<OutletContextData>()
@@ -1291,7 +1279,7 @@ export default () => {
     paymentData?.email
   )
   const [selectedEmailURN, setSelectedEmailURN] = useState<string | undefined>(
-    paymentData?.addressURN
+    paymentData?.accountURN
   )
   const [fullName, setFullName] = useState<string | undefined>(
     paymentData?.name
@@ -1322,7 +1310,7 @@ export default () => {
           <article className="mb-3.5">
             <ToastWithLink
               message="Update your Payment Information to enable purchasing"
-              linkHref={`/billing/payment`}
+              linkHref={`/billing/payment?URN=${groupURN}`}
               type={'warning'}
               linkText="Update payment information"
             />
@@ -1367,6 +1355,7 @@ export default () => {
                       name: fullName,
                       email: selectedEmail,
                       addressURN: selectedEmailURN,
+                      URN: groupURN,
                     }),
                   },
                   {
@@ -1455,7 +1444,7 @@ export default () => {
                     ConnectButtonPhrase="Connect New Email Address"
                     defaultItems={
                       connectedEmails.filter(
-                        (ce) => ce.value === paymentData?.addressURN
+                        (ce) => ce.value === paymentData?.accountURN
                       ) as DropdownSelectListItem[]
                     }
                   />
@@ -1473,6 +1462,7 @@ export default () => {
           apps={[]}
           fetcher={fetcher}
           hasUnpaidInvoices={false}
+          URN={groupURN}
         />
       </section>
 
@@ -1483,7 +1473,7 @@ export default () => {
               Invoices & Payments
             </Text>
 
-            <Link to="/billing/portal">
+            <Link to={`/billing/portal?URN=${groupURN}`}>
               <Button
                 btnType="secondary-alt"
                 className="flex flex-row items-center gap-2"
@@ -1662,7 +1652,7 @@ export default () => {
                 </table>
               </main>
               <div className="w-full mt-2 text-end">
-                <NavLink to="/billing/portal" target="_blank">
+                <NavLink to={`/billing/portal?URN=${groupURN}`} target="_blank">
                   <Text size="sm" className="text-indigo-500 hover:underline">
                     View invoice history
                   </Text>
