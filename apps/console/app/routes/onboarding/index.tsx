@@ -22,7 +22,7 @@ import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
-import type { AddressURN } from '@proofzero/urns/address'
+import type { AccountURN } from '@proofzero/urns/account'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -37,9 +37,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     try {
       const clientName = formData.get('clientName') as string
-      const address = formData.get('address') as AddressURN
+      const account = formData.get('account') as AccountURN
 
-      if (!clientName?.length || !address?.length)
+      if (!clientName?.length || !account?.length)
         throw new BadRequestError({
           message: 'App name and email address are required',
         })
@@ -48,11 +48,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
 
       await coreClient.starbase.upsertAppContactAddress.mutate({
-        address,
+        account,
         clientId,
       })
 
-      return json({ clientId })
+      return json({ clientId, success: true })
     } catch (error) {
       console.error({ error })
       return new InternalServerError({
@@ -180,13 +180,13 @@ const ConnectEmail = ({
   PASSPORT_URL,
   setPage,
   page,
-  setEmailAddressURN,
+  setEmailAccountURN,
 }: {
   connectedEmails: DropdownSelectListItem[]
   PASSPORT_URL: string
   setPage: (value: number) => void
   page: number
-  setEmailAddressURN: (value: AddressURN) => void
+  setEmailAccountURN: (value: AccountURN) => void
 }) => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -285,7 +285,7 @@ const ConnectEmail = ({
                   return
                 }
                 setEmail(selected)
-                setEmailAddressURN(selected.value as AddressURN)
+                setEmailAccountURN(selected.value as AccountURN)
               }
             }}
             ConnectButtonCallback={() =>
@@ -314,7 +314,7 @@ const ConnectEmail = ({
               payload: JSON.stringify({
                 name: `${lastName} ${firstName}`,
                 email: email?.title,
-                addressURN: email?.value,
+                accountURN: email?.value,
               }),
               redirect: 'false',
             },
@@ -466,12 +466,12 @@ const CreateApp = ({
   setPage,
   page,
   setClientId,
-  emailAddressURN,
+  emailAccountURN,
 }: {
   setPage: (value: number) => void
   page: number
   setClientId: (value: string) => void
-  emailAddressURN?: AddressURN
+  emailAccountURN?: AccountURN
 }) => {
   const [clientName, setClientName] = useState('')
 
@@ -521,12 +521,12 @@ const CreateApp = ({
           !clientName ||
           !clientName?.length ||
           fetcher.state !== 'idle' ||
-          !emailAddressURN?.length
+          !emailAccountURN?.length
         }
         onClick={() => {
-          if (emailAddressURN) {
+          if (emailAccountURN) {
             fetcher.submit(
-              { clientName, address: emailAddressURN },
+              { clientName, account: emailAccountURN },
               { method: 'post' }
             )
           }
@@ -619,7 +619,7 @@ export default function Landing() {
 
   const [page, setPage] = useState(0)
   const [clientId, setClientId] = useState('')
-  const [emailAddressURN, setEmailAddressURN] = useState<AddressURN>()
+  const [emailAccountURN, setEmailAccountURN] = useState<AccountURN>()
   const [orgType, setOrgType] = useState<'solo' | 'team'>('solo')
 
   return (
@@ -634,7 +634,7 @@ export default function Landing() {
         PASSPORT_URL={PASSPORT_URL}
         setPage={setPage}
         page={page}
-        setEmailAddressURN={setEmailAddressURN}
+        setEmailAccountURN={setEmailAccountURN}
       />
       {orgType === 'team' ? (
         <CreateGroup setPage={setPage} page={page} />
@@ -643,7 +643,7 @@ export default function Landing() {
           setPage={setPage}
           page={page}
           setClientId={setClientId}
-          emailAddressURN={emailAddressURN}
+          emailAccountURN={emailAccountURN}
         />
       )}
       <CongratsPage

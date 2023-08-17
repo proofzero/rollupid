@@ -10,7 +10,7 @@ import type {
 
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 
-import { json } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
 
 import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
 
@@ -117,6 +117,20 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         ...traceHeader,
       })
       const apps = await coreClient.starbase.listApps.query()
+
+      const hasIdentityAnyGroupAuthorization =
+        await coreClient.identity.isMemberOfAnyGroup.query({
+          identityURN,
+        })
+
+      if (
+        !apps?.length &&
+        !hasIdentityAnyGroupAuthorization &&
+        !request.url.includes('/onboarding')
+      ) {
+        return redirect('/onboarding')
+      }
+
       const reshapedApps = apps.map((a) => {
         return {
           clientId: a.clientId,

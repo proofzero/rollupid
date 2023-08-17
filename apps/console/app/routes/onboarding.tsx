@@ -1,13 +1,17 @@
-import { json, type LoaderFunction } from '@remix-run/cloudflare'
+import { json, redirect, type LoaderFunction } from '@remix-run/cloudflare'
 import onboardingImage from '../images/console_onboarding.svg'
 
-import { Outlet, useLoaderData } from '@remix-run/react'
+import {
+  Outlet,
+  type ShouldRevalidateFunction,
+  useLoaderData,
+} from '@remix-run/react'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { requireJWT } from '~/utilities/session.server'
 import { checkToken } from '@proofzero/utils/token'
-import type { AccountURN } from '@proofzero/urns/account'
+import type { IdentityURN } from '@proofzero/urns/identity'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getEmailDropdownItems } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { type DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
@@ -16,15 +20,26 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const jwt = await requireJWT(request, context.env)
     const payload = checkToken(jwt!)
-    const accountURN = payload.sub as AccountURN
+    const identityURN = payload.sub as IdentityURN
 
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const connectedAccounts = await coreClient.account.getAddresses.query({
-      account: accountURN,
+    const apps = await coreClient.starbase.listApps.query()
+
+    const isMemberOfAnyGroup =
+      await coreClient.identity.isMemberOfAnyGroup.query({
+        identityURN,
+      })
+
+    if (apps?.length || isMemberOfAnyGroup) {
+      return redirect('/dashboard')
+    }
+
+    const connectedAccounts = await coreClient.identity.getAccounts.query({
+      identity: identityURN,
     })
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
@@ -34,6 +49,16 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
   }
 )
+
+export const shouldRevalidate: ShouldRevalidateFunction = ({
+  actionResult,
+  defaultShouldRevalidate,
+}) => {
+  if (actionResult?.success) {
+    return false
+  }
+  return defaultShouldRevalidate
+}
 
 export default function Onboarding() {
   const { connectedEmails, PASSPORT_URL } = useLoaderData<{
