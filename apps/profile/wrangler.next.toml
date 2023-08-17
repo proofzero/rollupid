@@ -13,7 +13,7 @@ bucket = "./public"
 
 [env.next]
 kv_namespaces = [
-  { binding = "ProfileKV", id = "451e189131d74dca87b41701555a839d" },
+  { binding = "ProfileKV", id = "d4190ed6b22849bebba393fabb2feb9b" },
 ]
 
 routes = [
