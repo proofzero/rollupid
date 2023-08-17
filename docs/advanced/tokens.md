@@ -15,7 +15,7 @@ The decoded contents of an ID token looks like the following:
 ```json
 {
   "iss": "https://passport.rollup.id/",
-  "sub": "{accountUrn}",
+  "sub": "{identityUrn}",
   "aud": ["{yourClientId}"],
   "exp": 1311281970,
   "iat": 1311280970,
@@ -42,7 +42,7 @@ Here is an example of an access token:
 ```json
 {
   "iss": "https://passport.rollup.id/",
-  "sub": "{accountUrn}",
+  "sub": "{identityUrn}",
   "aud": ["{yourClientId}"],
   "azp": "{yourClientId}",
   "exp": 1489179954,
