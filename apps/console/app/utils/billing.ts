@@ -4,7 +4,7 @@ import {
   getUpcomingInvoices,
   updateSubscription,
 } from '~/services/billing/stripe'
-import type { StripePaymentData } from '@proofzero/platform/identity/src/types'
+import type { StripePaymentData } from '@proofzero/platform/billing/src/types'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { type PaymentIntent, loadStripe } from '@stripe/stripe-js'
 import { type SubmitFunction } from '@remix-run/react'
