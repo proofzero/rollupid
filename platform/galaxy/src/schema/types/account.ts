@@ -25,7 +25,7 @@ export default /* GraphQL */ `
     ): Boolean
     registerSessionKey(
       sessionPublicKey: String!
-      smartContractWalletAccount: String!
+      smartContractWalletAddress: String!
     ): String!
   }
 `
