@@ -14,7 +14,7 @@ import { generateSmartWalletAccountUrn } from '../../utils'
 
 export const RegisterSessionKeyInput = z.object({
   sessionPublicKey: z.string(),
-  smartContractWalletAccount: z.string(),
+  smartContractWalletAddress: z.string(),
   paymaster: PaymasterSchema,
 })
 
@@ -34,10 +34,10 @@ export const registerSessionKeyMethod = async ({
   // This method is being called only from galaxy
   // All authorization checks are done in galaxy
 
-  const { paymaster, smartContractWalletAccount, sessionPublicKey } = input
+  const { paymaster, smartContractWalletAddress, sessionPublicKey } = input
 
   const { baseAccountURN } = await generateSmartWalletAccountUrn(
-    smartContractWalletAccount,
+    smartContractWalletAddress,
     '' // empty string because we only care about base urn
   )
 

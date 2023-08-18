@@ -124,10 +124,10 @@ const accountResolvers: Resolvers = {
       _parent: any,
       {
         sessionPublicKey,
-        smartContractWalletAccount,
+        smartContractWalletAddress,
       }: {
         sessionPublicKey: string
-        smartContractWalletAccount: string
+        smartContractWalletAddress: string
       },
       { env, jwt, traceSpan, identityURN, clientId, apiKey }: ResolverContext
     ) => {
@@ -147,7 +147,7 @@ const accountResolvers: Resolvers = {
         !userInfo ||
         !userInfo.erc_4337.some(
           (scWallet: { nickname: string; address: string }) =>
-            scWallet.address === smartContractWalletAccount
+            scWallet.address === smartContractWalletAddress
         )
       ) {
         throw new GraphQLError('Invalid smart contract wallet address.')
@@ -156,7 +156,7 @@ const accountResolvers: Resolvers = {
       try {
         const sessionKey = await coreClient.account.registerSessionKey.mutate({
           paymaster,
-          smartContractWalletAccount,
+          smartContractWalletAddress,
           sessionPublicKey,
         })
 
@@ -166,7 +166,7 @@ const accountResolvers: Resolvers = {
 
         const smartWalletSessionKeys = appData?.smartWalletSessionKeys || []
         const { baseAccountURN } = generateSmartWalletAccountUrn(
-          smartContractWalletAccount,
+          smartContractWalletAddress,
           '' // empty string because we only need a base urn
         )
 
