@@ -126,7 +126,7 @@ const SelectOrgType = ({
     <div
       className={`w-full h-full flex flex-col gap-2
     transition-opacity ease-in-out delay-150 ${
-      page === 0 ? 'opacity-100' : 'opacity-0 collapse'
+      page === 0 ? 'opacity-100' : 'hide'
     }`}
     >
       <Text size="lg" className="text-gray-400">
@@ -204,7 +204,7 @@ const ConnectEmail = ({
     <div
       className={`w-full h-full flex flex-col gap-2
        transition-opacity ease-in-out delay-150 ${
-         page === 1 ? 'opacity-100' : 'opacity-0 collapse'
+         page === 1 ? 'opacity-100' : 'hide'
        }`}
     >
       <div className="flex flex-row items-center gap-2">
@@ -325,11 +325,7 @@ const ConnectEmail = ({
           )
         }}
       >
-        {fetcher.state === 'idle' ? (
-          <Text>Create Application</Text>
-        ) : (
-          <Spinner />
-        )}
+        {fetcher.state === 'idle' ? <Text>Continue</Text> : <Spinner />}
       </Button>
       <div className="mt-auto flex flex-row gap-2 w-full">
         <div className="border w-full rounded-lg border-2 border-indigo-500" />
@@ -355,8 +351,8 @@ const CreateGroup = ({
   return (
     <div
       className={`w-full h-full flex flex-col gap-2
-      transition-opacity ease-in-out delay-150
-      ${page === 2 ? 'opacity-100' : 'opacity-0 collapse'}`}
+      transition-opacity  ease-in-out delay-150
+      ${page === 2 ? 'opacity-100' : 'hide'}`}
     >
       <div className="flex flex-row items-center gap-2">
         <HiOutlineArrowLeft
@@ -487,8 +483,8 @@ const CreateApp = ({
   return (
     <div
       className={`w-full h-full flex flex-col gap-2
-    transition-opacity ease-in-out delay-150
-    ${page === 2 ? 'opacity-100' : 'opacity-0 collapse'}`}
+    transition-opacity  ease-in-out delay-150
+    ${page === 2 ? 'opacity-100' : 'hide'}`}
     >
       <div className="flex flex-row items-center gap-2">
         <HiOutlineArrowLeft
@@ -562,8 +558,8 @@ const CongratsPage = ({
   return (
     <div
       className={`w-full h-full flex flex-col gap-2
-    transition-opacity ease-in-out delay-150
-    ${page === 3 ? 'opacity-100' : 'opacity-0 collapse'}`}
+    transition-opacity  ease-in-out delay-150
+    ${page === 3 ? 'opacity-100' : 'hide'}`}
     >
       <Text size="2xl" weight="medium">
         🎉 You are ready to go!
