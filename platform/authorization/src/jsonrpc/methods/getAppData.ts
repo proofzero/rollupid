@@ -9,6 +9,7 @@ import { initAuthorizationNodeByName } from '../../nodes'
 import { AppData } from '@proofzero/types/application'
 import type { AppDataType } from '@proofzero/types/application'
 import type { IdentityURN } from '@proofzero/urns/identity'
+import { AccountURNSpace } from '@proofzero/urns/account'
 
 export const GetAppDataInput = z.object({
   clientId: z.string(),
@@ -42,5 +43,11 @@ export const getAppDataMethod = async ({
 
   const appData =
     (await node.storage.get<AppDataType>('appData')) || ({} as AppDataType)
+
+  //Remove legacy, non-account urns from result
+  if (appData && Array.isArray(appData.smartWalletSessionKeys))
+    appData.smartWalletSessionKeys = appData.smartWalletSessionKeys.filter(
+      (scwk) => AccountURNSpace.is(scwk.urn)
+    )
   return appData
 }
