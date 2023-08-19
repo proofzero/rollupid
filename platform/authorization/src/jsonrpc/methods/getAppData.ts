@@ -9,6 +9,7 @@ import { initAuthorizationNodeByName } from '../../nodes'
 import { AppData } from '@proofzero/types/application'
 import type { AppDataType } from '@proofzero/types/application'
 import type { IdentityURN } from '@proofzero/urns/identity'
+import { AccountURNSpace } from '@proofzero/urns/account'
 
 export const GetAppDataInput = z.object({
   clientId: z.string(),
