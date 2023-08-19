@@ -41,7 +41,7 @@ export const getAppDataMethod = async ({
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
   const node = initAuthorizationNodeByName(urn, ctx.Authorization)
 
-  let appData =
+  const appData =
     (await node.storage.get<AppDataType>('appData')) || ({} as AppDataType)
 
   //Remove legacy, non-account urns from result
