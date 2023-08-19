@@ -40,7 +40,13 @@ export const getAppDataMethod = async ({
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
   const node = initAuthorizationNodeByName(urn, ctx.Authorization)
 
-  const appData =
+  let appData =
     (await node.storage.get<AppDataType>('appData')) || ({} as AppDataType)
+
+  //Remove legacy, non-account urns from result
+  if (appData && Array.isArray(appData.smartWalletSessionKeys))
+    appData.smartWalletSessionKeys = appData.smartWalletSessionKeys.filter(
+      (scwk) => AccountURNSpace.is(scwk.urn)
+    )
   return appData
 }
