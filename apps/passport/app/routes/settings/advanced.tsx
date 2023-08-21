@@ -80,6 +80,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       await coreClient.identity.deleteIdentityNode.mutate({
         identity: identityURN,
       })
+
+      await createAnalyticsEvent({
+        apiKey: context.env.POSTHOG_API_KEY,
+        eventName: 'delete_rollup_identity',
+        distinctId: identityURN,
+      })
     } catch (ex) {
       console.error(ex)
       throw new RollupError({
@@ -88,12 +94,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         cause: ex,
       })
     }
-
-    await createAnalyticsEvent({
-      apiKey: context.env.POSTHOG_API_KEY,
-      eventName: 'delete_rollup_identity',
-      distinctId: identityURN,
-    })
 
     return await destroyUserSession(
       request,

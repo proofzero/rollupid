@@ -13,6 +13,7 @@ import { router } from '@proofzero/platform.core'
 import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 import generateRandomString from '@proofzero/utils/generateRandomString'
 import { IdentityURN } from '@proofzero/urns/identity'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const InviteIdentityGroupMemberInputSchema = z.object({
   identityGroupURN: IdentityGroupURNValidator,
@@ -85,6 +86,15 @@ export const inviteIdentityGroupMember = async ({
     identifier,
     accountType,
     inviteCode,
+  })
+
+  await createAnalyticsEvent({
+    eventName: 'member_invited_to_group',
+    distinctId: inviterIdentityURN,
+    apiKey: ctx.POSTHOG_API_KEY,
+    properties: {
+      $groups: { group: identityGroupURN },
+    },
   })
 
   return {

@@ -7,6 +7,8 @@ import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { AppClientIdParamSchema } from '../validators/app'
 import { EDGE_APPLICATION } from '../../types'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import type { IdentityURN } from '@proofzero/urns/identity'
 
 export const DeleteAppInput = AppClientIdParamSchema
 
@@ -64,5 +66,12 @@ export const deleteApp = async ({
   })
   await appDO.class.delete()
 
-  console.log(`Deleted app ${input.clientId} from account ${ctx.accountURN}`)
+  await createAnalyticsEvent({
+    apiKey: ctx.POSTHOG_API_KEY,
+    eventName: 'app_deleted',
+    distinctId: ctx.identityURN as IdentityURN,
+    properties: {
+      $groups: { app: input.clientId },
+    },
+  })
 }

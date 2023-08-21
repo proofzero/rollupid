@@ -46,7 +46,6 @@ import { Helmet } from 'react-helmet'
 import { getRGBColor, getTextColor } from '@proofzero/design-system/src/helpers'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
-import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export type UserProfile = {
   displayName: string
@@ -373,16 +372,6 @@ export const action: ActionFunction = async ({ request, context }) => {
   if (!authorizeRes) {
     throw json({ message: 'Failed to authorize' }, 400)
   }
-
-  await createAnalyticsEvent({
-    eventName: 'app_authorized',
-    distinctId: identityURN,
-    apiKey: context.env.POSTHOG_API_KEY,
-    properties: {
-      scope: scope,
-      $groups: { app: clientId },
-    },
-  })
 
   const redirectParams = new URLSearchParams({
     code: authorizeRes.code,

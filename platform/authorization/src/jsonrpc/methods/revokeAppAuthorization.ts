@@ -5,16 +5,12 @@ import { router } from '@proofzero/platform.core'
 import { Context } from '../../context'
 import { initAuthorizationNodeByName } from '../../nodes'
 
-import {
-  EDGE_AUTHORIZES,
-  ROLLUP_INTERNAL_ACCESS_TOKEN_URN,
-} from '../../constants'
+import { EDGE_AUTHORIZES } from '../../constants'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
 import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
-import { generateJKU, getPrivateJWK } from '../../jwk'
 
-import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const RevokeAppAuthorizationMethodInput = z.object({
   clientId: z.string().min(1),
@@ -143,4 +139,13 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
     }
 
     await authorizationNode.class.deleteAll()
+
+    await createAnalyticsEvent({
+      apiKey: ctx.POSTHOG_API_KEY,
+      distinctId: identityURN,
+      eventName: 'app_authorization_revoked',
+      properties: {
+        $groups: { app: clientId },
+      },
+    })
   }
