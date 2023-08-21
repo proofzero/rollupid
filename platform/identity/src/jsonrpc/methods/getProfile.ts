@@ -35,7 +35,7 @@ export const getProfileMethod = async ({
 
   const [profile, accounts] = await Promise.all([
     node.class.getProfile(),
-    caller.getPublicAccounts({ identity: input.identity }),
+    caller.getPublicAccounts({ URN: input.identity }),
   ])
 
   if (!profile) return null

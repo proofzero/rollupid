@@ -85,7 +85,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const identityAccounts = await coreClient.identity.getOwnAccounts.query({
-      identity: identityURN,
+      URN: identityURN,
     })
     const invitedAccount = identityAccounts.find(
       (aa) =>
