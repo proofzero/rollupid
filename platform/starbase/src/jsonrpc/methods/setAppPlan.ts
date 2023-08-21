@@ -63,12 +63,14 @@ export const setAppPlan = async ({
   }
 
   await createAnalyticsEvent({
-    eventName: `app_${input.plan}_plan_set`,
+    eventName: `app_set_${input.plan}_plan`,
     apiKey: ctx.POSTHOG_API_KEY,
     distinctId: input.identityURN,
     properties: {
-      plan,
       $groups: { app: input.clientId },
+      $group_set: {
+        plan: input.plan,
+      },
     },
   })
 }

@@ -83,7 +83,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
       await createAnalyticsEvent({
         apiKey: context.env.POSTHOG_API_KEY,
-        eventName: 'delete_rollup_identity',
+        eventName: 'user_deleted_identity',
         distinctId: identityURN,
       })
     } catch (ex) {

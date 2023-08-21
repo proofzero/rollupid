@@ -68,7 +68,7 @@ export const deleteApp = async ({
 
   await createAnalyticsEvent({
     apiKey: ctx.POSTHOG_API_KEY,
-    eventName: 'app_deleted',
+    eventName: 'user_deleted_app',
     distinctId: ctx.identityURN as IdentityURN,
     properties: {
       $groups: { app: input.clientId },

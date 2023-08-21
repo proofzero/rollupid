@@ -61,7 +61,7 @@ export const authorizeMethod = async ({
   )
 
   await createAnalyticsEvent({
-    eventName: 'app_authorized',
+    eventName: 'app_authorized_identity',
     distinctId: identity,
     apiKey: ctx.POSTHOG_API_KEY,
     properties: {

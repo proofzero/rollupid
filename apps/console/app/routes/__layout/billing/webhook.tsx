@@ -208,7 +208,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           )
 
           await createAnalyticsEvent({
-            eventName: 'purchase',
+            eventName: 'user_purchased_entitlement(s)',
             apiKey: context.env.POSTHOG_API_KEY,
             distinctId: customerDataSuccess.metadata.identityURN,
             properties: {

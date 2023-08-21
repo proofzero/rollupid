@@ -89,7 +89,7 @@ export const inviteIdentityGroupMember = async ({
   })
 
   await createAnalyticsEvent({
-    eventName: 'member_invited_to_group',
+    eventName: 'group_invited_member',
     distinctId: inviterIdentityURN,
     apiKey: ctx.POSTHOG_API_KEY,
     properties: {
