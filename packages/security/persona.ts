@@ -91,7 +91,7 @@ export async function validatePersonaData(
         ...generateTraceContextHeaders(traceSpan),
       })
       const identityAccounts = await coreClient.identity.getAccounts.query({
-        identity: identityURN,
+        URN: identityURN,
       })
 
       const ownedAccountURNList =
@@ -345,7 +345,7 @@ async function erc4337ClaimsRetriever(
     const identityAccounts =
       (
         await coreClient.identity.getAccounts.query({
-          identity: identityURN,
+          URN: identityURN,
         })
       )?.filter(
         (account) => account.rc.addr_type === CryptoAccountType.Wallet
@@ -411,7 +411,7 @@ async function connectedAccountsClaimsRetriever(
     const identityAccounts =
       (
         await coreClient.identity.getAccounts.query({
-          identity: identityURN,
+          URN: identityURN,
         })
       )?.filter(
         (account) => account.rc.addr_type !== CryptoAccountType.Wallet

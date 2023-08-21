@@ -37,7 +37,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       const coreClient = getCoreClient({ context, jwt })
       const [accounts, apps, ownedApps] = await Promise.all([
         coreClient.identity.getAccounts.query({
-          identity: identityURN,
+          URN: identityURN,
         }),
         coreClient.identity.getAuthorizedApps.query({
           identity: identityURN,

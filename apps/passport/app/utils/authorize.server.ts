@@ -70,7 +70,7 @@ export const getDataForScopes = async (
   const coreClient = getCoreClient({ context, jwt })
 
   const connectedAccounts = await coreClient.identity.getAccounts.query({
-    identity: identityURN,
+    URN: identityURN,
   })
 
   if (connectedAccounts && connectedAccounts.length) {

@@ -155,7 +155,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const connectedAccounts = await coreClient.identity.getAccounts.query({
-      identity: identityURN,
+      URN: groupURN,
     })
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
@@ -1354,7 +1354,7 @@ export default () => {
                     payload: JSON.stringify({
                       name: fullName,
                       email: selectedEmail,
-                      addressURN: selectedEmailURN,
+                      accountURN: selectedEmailURN,
                       URN: groupURN,
                     }),
                   },

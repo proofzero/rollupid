@@ -8,7 +8,7 @@ import { Context } from '../../context'
 import { AccountsSchema } from '../validators/profile'
 
 export const GetAccountsInput = z.object({
-  identity: inputValidators.IdentityURNInput,
+  URN: inputValidators.AnyURNInput,
   filter: z
     .object({
       type: inputValidators.CryptoAccountTypeInput.optional(),
@@ -31,11 +31,11 @@ export const getAccountsMethod = async ({
   const caller = router.createCaller(ctx)
 
   const getAccountsCall =
-    ctx.identityURN === input.identity
+    ctx.identityURN === input.URN
       ? caller.identity.getOwnAccounts
       : caller.identity.getPublicAccounts
 
-  const accounts = await getAccountsCall({ identity: input.identity })
+  const accounts = await getAccountsCall({ URN: input.URN })
 
   return accounts
 }

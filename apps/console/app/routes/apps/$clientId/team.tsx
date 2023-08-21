@@ -47,7 +47,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const connectedAccounts = await coreClient.identity.getAccounts.query({
-      identity: identityURN,
+      URN: identityURN,
     })
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
