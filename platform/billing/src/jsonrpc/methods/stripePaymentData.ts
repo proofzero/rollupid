@@ -44,7 +44,7 @@ export const getStripePaymentData = async ({
 }): Promise<GetStripePaymentDataOutput> => {
   let ownerNode
   if (IdentityURNSpace.is(input.URN)) {
-    ownerNode = initIdentityNodeByName(input.URN, ctx.Account)
+    ownerNode = initIdentityNodeByName(input.URN, ctx.Identity)
   } else if (IdentityGroupURNSpace.is(input.URN)) {
     ownerNode = initIdentityGroupNodeByName(input.URN, ctx.IdentityGroup)
   } else {
@@ -75,7 +75,7 @@ export const setStripePaymentData = async ({
 }): Promise<void> => {
   let ownerNode
   if (IdentityURNSpace.is(input.URN)) {
-    ownerNode = initIdentityNodeByName(input.URN, ctx.Account)
+    ownerNode = initIdentityNodeByName(input.URN, ctx.Identity)
   } else if (IdentityGroupURNSpace.is(input.URN)) {
     ownerNode = initIdentityGroupNodeByName(input.URN, ctx.IdentityGroup)
   } else {

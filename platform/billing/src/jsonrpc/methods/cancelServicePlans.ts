@@ -25,7 +25,7 @@ export const cancelServicePlans = async ({
 }) => {
   let ownerNode
   if (IdentityURNSpace.is(input.URN)) {
-    ownerNode = initIdentityNodeByName(input.URN, ctx.Account)
+    ownerNode = initIdentityNodeByName(input.URN, ctx.Identity)
   } else if (IdentityGroupURNSpace.is(input.URN)) {
     ownerNode = initIdentityGroupNodeByName(input.URN, ctx.IdentityGroup)
   } else {
