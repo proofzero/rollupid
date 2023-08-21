@@ -255,7 +255,6 @@ export default function App() {
           api_host: loaderData.ENV.POSTHOG_PROXY_HOST,
           autocapture: false,
         })
-        posthog?.group('app', 'console')
         posthog?.identify(identityURN)
       } catch (ex) {
         console.error(ex)
