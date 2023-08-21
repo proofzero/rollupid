@@ -56,4 +56,13 @@ export const createIdentityGroup = async ({
       },
     },
   })
+
+  await createAnalyticsEvent({
+    eventName: 'user_created_group',
+    apiKey: ctx.POSTHOG_API_KEY,
+    distinctId: ctx.identityURN as IdentityURN,
+    properties: {
+      $groups: { group: groupURN },
+    },
+  })
 }

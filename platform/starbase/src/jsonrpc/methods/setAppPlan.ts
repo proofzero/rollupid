@@ -62,15 +62,27 @@ export const setAppPlan = async ({
     })
   }
 
+  // This is the way how we can update group properties
+  // https://posthog.com/tutorials/frontend-vs-backend-group-analytics
   await createAnalyticsEvent({
-    eventName: `app_set_${input.plan}_plan`,
+    eventName: '$groupidentify',
     apiKey: ctx.POSTHOG_API_KEY,
-    distinctId: input.identityURN,
+    distinctId: identityURN,
     properties: {
-      $groups: { app: input.clientId },
+      $group_type: 'app',
+      $group_key: clientId,
       $group_set: {
-        plan: input.plan,
+        plan,
       },
+    },
+  })
+
+  await createAnalyticsEvent({
+    eventName: `app_set_${plan}_plan`,
+    apiKey: ctx.POSTHOG_API_KEY,
+    distinctId: identityURN,
+    properties: {
+      $groups: { app: clientId },
     },
   })
 }
