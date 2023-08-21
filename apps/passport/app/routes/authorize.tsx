@@ -378,12 +378,9 @@ export const action: ActionFunction = async ({ request, context }) => {
     eventName: 'app_authorized',
     distinctId: identityURN,
     apiKey: context.env.POSTHOG_API_KEY,
-    groups: {
-      app: clientId,
-    },
     properties: {
-      clientId: clientId,
       scope: scope,
+      $groups: { app: clientId },
     },
   })
 
@@ -444,8 +441,8 @@ export default function Authorize() {
       return [AuthorizationControlSelection.ALL]
     } else {
       return connectedAccounts?.length
-        ? connectedAccounts.filter(
-            (acc) => persona.connected_accounts?.includes(acc.value)
+        ? connectedAccounts.filter((acc) =>
+            persona.connected_accounts?.includes(acc.value)
           )
         : []
     }
@@ -457,8 +454,8 @@ export default function Authorize() {
       return [AuthorizationControlSelection.ALL]
     } else {
       return connectedSmartContractWallets?.length
-        ? connectedSmartContractWallets.filter(
-            (acc) => persona.erc_4337?.includes(acc.value)
+        ? connectedSmartContractWallets.filter((acc) =>
+            persona.erc_4337?.includes(acc.value)
           )
         : []
     }

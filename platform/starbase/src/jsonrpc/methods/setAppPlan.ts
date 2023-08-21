@@ -66,10 +66,9 @@ export const setAppPlan = async ({
     eventName: `app_${input.plan}_plan_set`,
     apiKey: ctx.POSTHOG_API_KEY,
     distinctId: input.identityURN,
-    groups: { app: input.clientId },
     properties: {
-      clientId: input.clientId,
       plan,
+      $groups: { app: input.clientId },
     },
   })
 }

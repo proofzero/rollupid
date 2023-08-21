@@ -39,7 +39,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         eventName: 'app_deleted',
         distinctId: identityURN,
         properties: {
-          client_id: clientId,
+          $groups: { app: clientId },
         },
       })
       return redirect('/')

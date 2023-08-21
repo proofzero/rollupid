@@ -256,9 +256,6 @@ export default function App() {
           autocapture: false,
         })
         posthog?.reset()
-        posthog?.group('app', browserEnv?.appProps?.clientId, {
-          name: browserEnv?.appProps?.name,
-        })
       } catch (ex) {
         console.error(ex)
       }

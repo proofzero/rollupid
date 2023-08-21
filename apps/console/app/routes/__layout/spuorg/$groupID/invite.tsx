@@ -68,11 +68,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       eventName: 'member_invited_to_group',
       distinctId: identityURN,
       apiKey: context.env.POSTHOG_API_KEY,
-      groups: {
-        group: groupID,
-      },
       properties: {
-        groupID: groupID,
+        $groups: { group: groupID },
       },
     })
 

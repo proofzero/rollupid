@@ -38,9 +38,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         distinctId: identityURN,
         eventName: 'app_authorization_revoked',
         properties: {
-          clientId,
+          $groups: { app: clientId },
         },
-        groups: { app: clientId },
       })
 
       session.flash(

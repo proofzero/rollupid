@@ -73,7 +73,9 @@ export const resolveIdentityMethod = async ({
     apiKey: ctx.POSTHOG_API_KEY,
     eventName,
     distinctId: resultURN,
-    groups: { app: input.clientId },
+    properties: {
+      $groups: { app: input.clientId },
+    },
   })
 
   return {
