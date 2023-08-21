@@ -8,6 +8,7 @@ import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
+import type { IdentityURN } from '@proofzero/urns/identity'
 
 export const PublishAppInput = z.object({
   clientId: z.string(),
@@ -58,7 +59,7 @@ export const publishApp = async ({
   await appDO.class.publish(input.published)
 
   await createAnalyticsEvent({
-    distinctId: ctx.accountURN as string,
+    distinctId: ctx.identityURN as IdentityURN,
     eventName: input.published ? 'app_published' : 'app_unpublished',
     apiKey: ctx.POSTHOG_API_KEY,
     properties: { $groups: { app: input.clientId } },
