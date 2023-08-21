@@ -66,6 +66,7 @@ export const createApp = async ({
       $group_key: clientId,
       $group_set: {
         name: input.clientName,
+        clientId: clientId,
         date_joined: new Date().toISOString(),
       },
     },

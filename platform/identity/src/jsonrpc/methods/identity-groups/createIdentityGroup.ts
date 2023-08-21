@@ -51,6 +51,7 @@ export const createIdentityGroup = async ({
       $group_key: groupURN,
       $group_set: {
         name: input.name,
+        groupURN: groupURN,
         date_joined: new Date().toISOString(),
       },
     },
