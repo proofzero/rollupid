@@ -201,8 +201,11 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   const scope = (resultMap.get('scope') || []) as string[]
   const newPersonaData = (resultMap.get('personaData') || {}) as PersonaData
   const nss = `${IdentityURNSpace.decode(identity)}@${clientId}`
-  const urn = AuthorizationURNSpace.componentizedUrn(nss)
-  const authorizationNode = initAuthorizationNodeByName(urn, ctx.Authorization)
+  const baseURN = AuthorizationURNSpace.componentizedUrn(nss)
+  const authorizationNode = initAuthorizationNodeByName(
+    baseURN,
+    ctx.Authorization
+  )
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
 
   //We take the existing (already-authorized) personaData and update it with
@@ -216,16 +219,16 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     clientId,
     personaData: combinedPersonaData,
   })
-  const authorization = AuthorizationURNSpace.componentizedUrn(urn, {
+  const fullAuthzURN = AuthorizationURNSpace.componentizedUrn(nss, {
     client_id: clientId,
   })
   await caller.edges.makeEdge({
     src: identity,
-    dst: authorization,
+    dst: fullAuthzURN,
     tag: EDGE_AUTHORIZES,
   })
   await setPersonaReferences(
-    authorization,
+    fullAuthzURN,
     scope,
     combinedPersonaData,
     ctx.Core,
