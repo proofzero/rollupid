@@ -177,7 +177,7 @@ export async function createAuthzParamsCookieAndAuthenticate(
 ) {
   let redirectURL = `/authenticate/${authzQueryParams.clientId}${
     ['connect', 'reconnect'].includes(authzQueryParams.rollup_action || '') ||
-    authzQueryParams.rollup_action?.startsWith('groupconnect')
+    authzQueryParams.rollup_action?.startsWith('group')
       ? ''
       : `/account`
   }`
@@ -383,7 +383,12 @@ export function parseJwt(token: string): JWTPayload {
 }
 
 export function isSupportedRollupAction(rollupAction: string) {
-  return ['connect', 'create', 'reconnect', 'group', 'groupconnect'].includes(
-    rollupAction.split('_')[0]
-  )
+  return [
+    'connect',
+    'create',
+    'reconnect',
+    'group',
+    'groupconnect',
+    'groupemailconnect',
+  ].includes(rollupAction.split('_')[0])
 }

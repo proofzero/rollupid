@@ -72,7 +72,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     )
 
     let invitationData
-    if (authzParams.rollup_action?.startsWith('group')) {
+    if (authzParams.rollup_action?.startsWith('groupconnect')) {
       const groupID = authzParams.rollup_action.split('_')[1]
       const invitationCode = authzParams.rollup_action.split('_')[2]
 
@@ -228,7 +228,7 @@ const InnerComponent = ({
                 size="sm"
               ></Avatar>
 
-              {!rollup_action?.startsWith('group') && (
+              {!rollup_action?.startsWith('groupconnect') && (
                 <div className={'flex flex-col items-center gap-2'}>
                   <h1
                     className={

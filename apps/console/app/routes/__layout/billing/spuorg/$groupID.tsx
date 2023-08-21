@@ -1267,8 +1267,8 @@ export default () => {
     qp.append('client_id', 'console')
 
     qp.append('redirect_uri', currentURL.toString())
-    qp.append('rollup_action', 'connect')
-    qp.append('login_hint', 'email microsoft google apple')
+    qp.append('rollup_action', `groupemailconnect_${groupURN.split('/')[1]}`)
+    qp.append('login_hint', 'email')
 
     window.location.href = `${PASSPORT_URL}/authorize?${qp.toString()}`
   }
