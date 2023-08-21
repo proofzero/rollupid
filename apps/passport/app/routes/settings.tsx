@@ -159,7 +159,10 @@ export default function SettingsLayout() {
 
   // need to identify only once
   useEffect(() => {
-    if (!isIdentified) posthog?.identify(identityURN)
+    if (!isIdentified) {
+      posthog?.group('app', 'passport')
+      posthog?.identify(identityURN)
+    }
     setIsIdentified(true)
   }, [isIdentified])
 
