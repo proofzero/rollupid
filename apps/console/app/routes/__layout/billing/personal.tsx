@@ -1384,7 +1384,7 @@ export default () => {
                     payload: JSON.stringify({
                       name: fullName,
                       email: selectedEmail,
-                      addressURN: selectedEmailURN,
+                      accountURN: selectedEmailURN,
                     }),
                   },
                   {
