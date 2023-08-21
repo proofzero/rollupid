@@ -54,17 +54,6 @@ export const setAppPlan = async ({
         dst: appURN,
       })
     }
-
-    await createAnalyticsEvent({
-      eventName: 'app_pro_plan_set',
-      apiKey: ctx.POSTHOG_API_KEY,
-      distinctId: input.identityURN,
-      groups: { app: input.clientId },
-      properties: {
-        clientId: input.clientId,
-        plan,
-      },
-    })
   } else {
     await caller.edges.removeEdge({
       src: identityURN,
@@ -72,4 +61,15 @@ export const setAppPlan = async ({
       dst: appURN,
     })
   }
+
+  await createAnalyticsEvent({
+    eventName: `app_${input.plan}_plan_set`,
+    apiKey: ctx.POSTHOG_API_KEY,
+    distinctId: input.identityURN,
+    groups: { app: input.clientId },
+    properties: {
+      clientId: input.clientId,
+      plan,
+    },
+  })
 }

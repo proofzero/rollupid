@@ -15,8 +15,7 @@ export const createAnalyticsEvent = async ({
     api_key: apiKey,
     event: eventName,
     distinct_id: distinctId,
-    groups: groups,
-    properties: properties,
+    properties: { ...properties, $groups: groups },
   })
 
   const init = {
