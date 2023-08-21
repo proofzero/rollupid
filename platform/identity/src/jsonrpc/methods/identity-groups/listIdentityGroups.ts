@@ -10,6 +10,7 @@ import { RollupError } from '@proofzero/errors'
 
 import { Context } from '../../../context'
 import { IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
+import { initIdentityGroupNodeByName } from '../../../nodes'
 
 export const ListIdentityGroupsOutputSchema = z.array(
   z.object({
@@ -21,6 +22,9 @@ export const ListIdentityGroupsOutputSchema = z.array(
         joinTimestamp: z.number().nullable(),
       })
     ),
+    flags: z.object({
+      billingConfigured: z.boolean().default(false),
+    }),
   })
 )
 export type ListIdentityGroupsOutput = z.infer<
@@ -56,6 +60,9 @@ export const listIdentityGroups = async ({
       const URN = edge.dst.baseUrn as IdentityGroupURN
       const name = edge.dst.qc.name
 
+      const igNode = initIdentityGroupNodeByName(URN, ctx.IdentityGroup)
+      const pd = await igNode.class.getStripePaymentData()
+
       const { edges: groupMemberEdges } = await caller.edges.getEdges({
         query: {
           tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
@@ -78,6 +85,9 @@ export const listIdentityGroups = async ({
         URN,
         name,
         members: mappedMembers,
+        flags: {
+          billingConfigured: Boolean(pd?.paymentMethodID),
+        },
       }
     })
   )
