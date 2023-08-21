@@ -27,15 +27,17 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const apps = await coreClient.starbase.listApps.query()
+    const spd = await coreClient.identity.getStripePaymentData.query({
+      identityURN,
+    })
 
     const isMemberOfAnyGroup =
       await coreClient.identity.isMemberOfAnyGroup.query({
         identityURN,
       })
 
-    if (apps?.length || isMemberOfAnyGroup) {
-      return redirect('/dashboard')
+    if (spd?.email || isMemberOfAnyGroup) {
+      return redirect('/')
     }
 
     const connectedAccounts = await coreClient.identity.getAccounts.query({

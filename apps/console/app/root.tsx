@@ -118,14 +118,18 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
       const apps = await coreClient.starbase.listApps.query()
 
-      const hasIdentityAnyGroupAuthorization =
+      const isMemberOfAnyGroup =
         await coreClient.identity.isMemberOfAnyGroup.query({
           identityURN,
         })
 
+      const spd = await coreClient.billing.getStripePaymentData.query({
+        URN: identityURN,
+      })
+
       if (
-        !apps?.length &&
-        !hasIdentityAnyGroupAuthorization &&
+        !spd?.email &&
+        !isMemberOfAnyGroup &&
         !request.url.includes('/onboarding')
       ) {
         return redirect('/onboarding')
@@ -162,10 +166,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         INTERNAL_GOOGLE_ANALYTICS_TAG,
         WALLET_CONNECT_PROJECT_ID,
       } = context.env
-
-      const spd = await coreClient.billing.getStripePaymentData.query({
-        URN: identityURN,
-      })
 
       // might be quite heavy object
       // for that reason I don't put it in outlet context

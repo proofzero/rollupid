@@ -188,8 +188,7 @@ const ConnectEmail = ({
   page: number
   setEmailAccountURN: (value: AccountURN) => void
 }) => {
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+  const [name, setName] = useState('')
   const [email, setEmail] = useState<DropdownSelectListItem | null>(null)
 
   const fetcher = useFetcher()
@@ -224,16 +223,10 @@ const ConnectEmail = ({
       </Text>
       <div className="flex flex-row items-center gap-2 w-full">
         <Input
-          label="First Name"
-          id="firstName"
+          label="Full Name"
+          id="name"
           className="w-full"
-          onChange={(ev) => setFirstName(ev.target.value)}
-        />
-        <Input
-          label="Last Name"
-          id="lastName"
-          className="w-full"
-          onChange={(ev) => setLastName(ev.target.value)}
+          onChange={(ev) => setName(ev.target.value)}
         />
       </div>
       {connectedEmails && connectedEmails.length === 0 && (
@@ -302,17 +295,12 @@ const ConnectEmail = ({
         className="w-full"
         btnType="primary-alt"
         btnSize="xl"
-        disabled={
-          !firstName?.length ||
-          !lastName?.length ||
-          fetcher.state !== 'idle' ||
-          !email?.title
-        }
+        disabled={!name?.length || fetcher.state !== 'idle' || !email?.title}
         onClick={() => {
           fetcher.submit(
             {
               payload: JSON.stringify({
-                name: `${lastName} ${firstName}`,
+                name,
                 email: email?.title,
                 accountURN: email?.value,
               }),
@@ -373,7 +361,7 @@ const CreateGroup = ({
 
       <Input
         label="Group Name"
-        id="firstName"
+        id="groupName"
         className="w-full"
         onChange={(ev) => setGroupName(ev.target.value)}
       />
@@ -504,7 +492,7 @@ const CreateApp = ({
 
       <Input
         label="Application Name"
-        id="firstName"
+        id="clientName"
         className="w-full"
         onChange={(ev) => setClientName(ev.target.value)}
       />
