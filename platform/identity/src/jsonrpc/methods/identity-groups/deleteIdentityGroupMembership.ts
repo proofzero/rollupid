@@ -5,13 +5,13 @@ import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 
 import { Context } from '../../../context'
 import {
-  AccountURNInput,
   IdentityGroupURNValidator,
+  IdentityURNInput,
 } from '@proofzero/platform-middleware/inputValidators'
 import { InternalServerError } from '@proofzero/errors'
 
 export const DeleteIdentityGroupMembershipInputSchema = z.object({
-  accountURN: AccountURNInput,
+  identityURN: IdentityURNInput,
   identityGroupURN: IdentityGroupURNValidator,
 })
 type DeleteIdentityGroupMembershipInput = z.infer<
@@ -27,7 +27,7 @@ export const deleteIdentityGroupMembership = async ({
 }): Promise<void> => {
   const caller = router.createCaller(ctx)
 
-  const { identityGroupURN, accountURN } = input
+  const { identityGroupURN, identityURN } = input
 
   const { edges } = await caller.edges.getEdges({
     query: {
@@ -38,7 +38,7 @@ export const deleteIdentityGroupMembership = async ({
     },
   })
 
-  const ownEdge = edges.find((edge) => edge.src.baseUrn === ctx.accountURN)
+  const ownEdge = edges.find((edge) => edge.src.baseUrn === ctx.identityURN)
   if (!ownEdge) {
     throw new InternalServerError({
       message: 'Requesting account is not part of group',
@@ -52,7 +52,7 @@ export const deleteIdentityGroupMembership = async ({
     })
   }
 
-  const targetEdge = edges.find((edge) => edge.src.baseUrn === accountURN)
+  const targetEdge = edges.find((edge) => edge.src.baseUrn === identityURN)
   if (!targetEdge) {
     throw new InternalServerError({
       message: 'Target account is not part of group',
@@ -60,7 +60,7 @@ export const deleteIdentityGroupMembership = async ({
   }
 
   await caller.edges.removeEdge({
-    src: accountURN,
+    src: identityURN,
     tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
     dst: identityGroupURN,
   })

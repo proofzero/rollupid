@@ -1,31 +1,19 @@
-import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { LoaderFunction, json } from '@remix-run/cloudflare'
-import {
-  IdentityGroupURN,
-  IdentityGroupURNSpace,
-} from '@proofzero/urns/identity-group'
 import {
   Form,
   Link,
   useFetcher,
-  useLoaderData,
   useNavigate,
   useNavigation,
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
-import { GroupRootContextData } from '../../spuorg'
-import { Fragment, useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import {
   CryptoAccountType,
   EmailAccountType,
   OAuthAccountType,
 } from '@proofzero/types/account'
 import _ from 'lodash'
-import createCoreClient from '@proofzero/platform-clients/core'
-import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import { requireJWT } from '~/utilities/session.server'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import Breadcrumbs from '@proofzero/design-system/src/atoms/breadcrumbs/Breadcrumbs'
 import { Button, Text } from '@proofzero/design-system'
 import classNames from 'classnames'
@@ -56,62 +44,13 @@ import dangerVector from '~/images/danger.svg'
 import { AppLoaderData } from '~/root'
 import { ApplicationListItemPublishedState } from '~/components/Applications/ApplicationListItem'
 import { ServicePlanType } from '@proofzero/types/identity'
+import { GroupDetailsContextData } from '../$groupID'
 
 const accountTypes = [
   ...Object.values(EmailAccountType),
   ...Object.values(OAuthAccountType),
   ...Object.values(CryptoAccountType),
 ]
-
-type InvitationModel = {
-  identifier: string
-  accountType: EmailAccountType | OAuthAccountType | CryptoAccountType
-  invitationURL: string
-}
-
-type LoaderData = {
-  groupID: string
-  URN: IdentityGroupURN
-  invitations: InvitationModel[]
-}
-
-export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, params, context }) => {
-    const groupURN = IdentityGroupURNSpace.urn(
-      params.groupID as string
-    ) as IdentityGroupURN
-
-    const jwt = await requireJWT(request, context.env)
-    const traceHeader = generateTraceContextHeaders(context.traceSpan)
-    const coreClient = createCoreClient(context.env.Core, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-
-    const invitations =
-      await coreClient.identity.getIdentityGroupMemberInvitations.query({
-        identityGroupURN: groupURN,
-      })
-
-    const mappedInvitations = invitations.map((invitation) => ({
-      identifier: invitation.identifier,
-      accountType: invitation.accountType,
-      invitationURL: [
-        context.env.PASSPORT_URL,
-        'spuorg',
-        'enroll',
-        params.groupID,
-        invitation.invitationCode,
-      ].join('/'),
-    }))
-
-    return json<LoaderData>({
-      groupID: params.groupID as string,
-      URN: groupURN,
-      invitations: mappedInvitations,
-    })
-  }
-)
 
 export const ActionCard = ({
   Icon,
@@ -612,28 +551,8 @@ const TransferAppModal = ({
 }
 
 export default () => {
-  const { groups, PASSPORT_URL, identityURN, apps } =
-    useOutletContext<GroupRootContextData>()
-  const { URN, groupID, invitations } = useLoaderData<LoaderData>()
-
-  const group = useMemo(
-    () => groups.find((group) => group.URN === URN) ?? null,
-    [groups]
-  )
-
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    // Initial state is undefined
-    // Our not found state is null
-
-    // Because we load data client side
-    // We want to redirect if group
-    // is not found
-    if (group === null) {
-      navigate('/spuorg')
-    }
-  }, [group])
+  const { apps, group, groupID, PASSPORT_URL, identityURN, invitations } =
+    useOutletContext<GroupDetailsContextData>()
 
   const [inviteModalOpen, setInviteModalOpen] = useState(false)
   const [transferAppModalOpen, setTransferAppModalOpen] = useState(false)
@@ -646,6 +565,8 @@ export default () => {
 
   const ownApps = apps.filter((a) => !a.groupID)
   const groupApps = apps.filter((a) => a.groupID === groupID)
+
+  const navigate = useNavigate()
 
   return (
     <>

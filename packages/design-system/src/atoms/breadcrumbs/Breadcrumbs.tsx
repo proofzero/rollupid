@@ -16,24 +16,25 @@ export default ({ trail, LinkType }: BreadcrumbsProps) => (
   <>
     <div className="flex flex-row items-center gap-4">
       {trail.map(({ label, href }, index) => (
-        <div key={index} className="flex flex-row items-center">
-          {href && (
-            <LinkType to={href}>
-              <Text size="sm" weight="medium" className="text-indigo-500">
+        <>
+          <div key={index} className="flex flex-row items-center">
+            {href && (
+              <LinkType to={href}>
+                <Text size="sm" weight="medium" className="text-indigo-500">
+                  {label}
+                </Text>
+              </LinkType>
+            )}
+            {!href && (
+              <Text size="sm" weight="medium" className="text-gray-500">
                 {label}
               </Text>
-            </LinkType>
-          )}
-          {!href && (
-            <Text size="sm" weight="medium" className="text-gray-500">
-              {label}
-            </Text>
-          )}
-
+            )}
+          </div>
           {index < trail.length - 1 && (
             <HiChevronRight className="w-5 h-5 text-gray-400" />
           )}
-        </div>
+        </>
       ))}
     </div>
   </>
