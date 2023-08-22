@@ -838,11 +838,11 @@ const RemoveEntitelmentModal = ({
                           >
                             <Listbox.Options
                               className="absolute no-scrollbar w-full bg-white
-                        rounded-lg border max-h-[200px] max-w-[66.1833px] overflow-auto"
+                        rounded-lg border max-h-[150px] max-w-[66.1833px] overflow-auto"
                             >
                               {Array.apply(null, Array(entitlements + 1)).map(
                                 (_, i) => {
-                                  return (
+                                  return i >= entitlementUsage ? (
                                     <Listbox.Option
                                       key={i}
                                       value={i}
@@ -865,7 +865,7 @@ const RemoveEntitelmentModal = ({
                                         )
                                       }}
                                     </Listbox.Option>
-                                  )
+                                  ) : null
                                 }
                               )}
                             </Listbox.Options>
