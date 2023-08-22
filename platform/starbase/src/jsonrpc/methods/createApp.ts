@@ -75,7 +75,7 @@ export const createApp = async ({
   })
 
   await createAnalyticsEvent({
-    eventName: 'user_created_app',
+    eventName: 'identity_created_app',
     apiKey: ctx.POSTHOG_API_KEY,
     distinctId: ctx.identityURN,
     properties: {

@@ -38,7 +38,7 @@ export const resolveIdentityMethod = async ({
 }): Promise<ResolveIdentityResult> => {
   const nodeClient = ctx.account
 
-  let eventName = 'app_resolved_identity'
+  let eventName = 'account_resolved_identity'
 
   let resultURN = await nodeClient?.class.getIdentity()
   if (input.jwt && resultURN) {
@@ -56,7 +56,7 @@ export const resolveIdentityMethod = async ({
     } else {
       const name = hexlify(randomBytes(IDENTITY_OPTIONS.length))
       urn = IdentityURNSpace.componentizedUrn(name)
-      eventName = 'app_created_identity'
+      eventName = 'account_created_identity'
     }
     const caller = router.createCaller(ctx)
     await caller.account.setIdentity(urn) // this will lazy create an identity node when identity worker is called

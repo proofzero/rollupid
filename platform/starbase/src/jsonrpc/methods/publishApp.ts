@@ -60,7 +60,9 @@ export const publishApp = async ({
 
   await createAnalyticsEvent({
     distinctId: ctx.identityURN as IdentityURN,
-    eventName: input.published ? 'user_published_app' : 'user_unpublished_app',
+    eventName: input.published
+      ? 'identity_published_app'
+      : 'identity_unpublished_app',
     apiKey: ctx.POSTHOG_API_KEY,
     properties: { $groups: { app: input.clientId } },
   })

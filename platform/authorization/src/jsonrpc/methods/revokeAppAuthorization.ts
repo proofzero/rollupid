@@ -143,7 +143,7 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
     await createAnalyticsEvent({
       apiKey: ctx.POSTHOG_API_KEY,
       distinctId: identityURN,
-      eventName: 'app_revoked_authorization',
+      eventName: 'identity_revoked_authorization',
       properties: {
         $groups: { app: clientId },
       },
