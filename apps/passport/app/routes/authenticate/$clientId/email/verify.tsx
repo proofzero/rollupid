@@ -94,7 +94,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         const { existing } =
           await coreClient.identity.connectIdentityGroupEmail.mutate({
-            accountURN: AccountURNSpace.getBaseURN(accountURN),
+            accountURN: accountURN,
             identityGroupURN,
           })
 
