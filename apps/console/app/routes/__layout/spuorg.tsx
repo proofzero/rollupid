@@ -36,6 +36,7 @@ type GroupRootLoaderData = {
 
 export type GroupRootContextData = GroupRootLoaderData & {
   identityURN: IdentityURN
+  apps: AppLoaderData[]
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(

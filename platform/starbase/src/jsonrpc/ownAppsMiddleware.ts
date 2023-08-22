@@ -66,7 +66,7 @@ export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({
   const { edges: identityGroupEdges } = await caller.edges.getEdges({
     query: {
       src: {
-        baseUrn: ctx.accountURN,
+        baseUrn: ctx.identityURN,
       },
       tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
     },

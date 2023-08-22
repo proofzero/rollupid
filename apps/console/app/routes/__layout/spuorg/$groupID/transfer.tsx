@@ -13,9 +13,9 @@ import {
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
-import { type AccountURN } from '@proofzero/urns/account'
 import { appendToastToFlashSession } from '~/utils/toast.server'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
+import { IdentityURN } from '@proofzero/urns/identity'
 export type InviteRes = {
   inviteCode: string
 }
@@ -29,7 +29,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const jwt = await requireJWT(request, context.env)
     const parsedJwt = parseJwt(jwt!)
-    const accountURN = parsedJwt.sub as AccountURN
+    const identityURN = parsedJwt.sub as IdentityURN
 
     const fd = await request.formData()
     const clientID = fd.get('clientID')
@@ -52,7 +52,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     await createAnalyticsEvent({
       eventName: 'app_transferred_to_group',
-      distinctId: accountURN,
+      distinctId: identityURN,
       apiKey: context.env.POSTHOG_API_KEY,
       groups: {
         group: groupID,

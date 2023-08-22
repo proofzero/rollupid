@@ -55,7 +55,7 @@ import { IdentityURN } from '@proofzero/urns/identity'
 import dangerVector from '~/images/danger.svg'
 import { AppLoaderData } from '~/root'
 import { ApplicationListItemPublishedState } from '~/components/Applications/ApplicationListItem'
-import { ServicePlanType } from '@proofzero/types/account'
+import { ServicePlanType } from '@proofzero/types/identity'
 
 const accountTypes = [
   ...Object.values(EmailAccountType),
@@ -646,8 +646,6 @@ export default () => {
 
   const ownApps = apps.filter((a) => !a.groupID)
   const groupApps = apps.filter((a) => a.groupID === groupID)
-
-  const navigate = useNavigate()
 
   return (
     <>

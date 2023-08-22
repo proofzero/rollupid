@@ -26,14 +26,14 @@ export const listGroupApps = async ({
 }: {
   ctx: Context
 }): Promise<z.infer<typeof ListGroupAppsOutput>> => {
-  if (!ctx.accountURN) throw new Error('No account URN in context')
+  if (!ctx.identityURN) throw new Error('No identity URN in context')
 
   const caller = router.createCaller(ctx)
 
   const { edges: identityGroupEdges } = await caller.edges.getEdges({
     query: {
       src: {
-        baseUrn: ctx.accountURN,
+        baseUrn: ctx.identityURN,
       },
       tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
     },
