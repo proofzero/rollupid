@@ -7,7 +7,8 @@ import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 
 import { Context } from '../../../context'
-import { IdentityURN } from '@proofzero/urns/identity'
+import type { IdentityURN } from '@proofzero/urns/identity'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const CreateIdentityGroupInputSchema = z.object({
   name: z.string(),
@@ -38,5 +39,30 @@ export const createIdentityGroup = async ({
     src: ctx.identityURN as IdentityURN,
     tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
     dst: baseGroupURN,
+  })
+
+  await createAnalyticsEvent({
+    eventName: '$groupidentify',
+    apiKey: ctx.POSTHOG_API_KEY,
+    distinctId: ctx.identityURN as IdentityURN,
+    properties: {
+      $groups: { group: groupURN },
+      $group_type: 'group',
+      $group_key: groupURN,
+      $group_set: {
+        name: input.name,
+        groupURN: groupURN,
+        date_joined: new Date().toISOString(),
+      },
+    },
+  })
+
+  await createAnalyticsEvent({
+    eventName: 'identity_created_group',
+    apiKey: ctx.POSTHOG_API_KEY,
+    distinctId: ctx.identityURN as IdentityURN,
+    properties: {
+      $groups: { group: groupURN },
+    },
   })
 }

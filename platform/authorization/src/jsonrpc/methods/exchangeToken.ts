@@ -38,6 +38,7 @@ import {
   userClaimsFormatter,
 } from '@proofzero/security/persona'
 import { UnauthorizedError } from '@proofzero/errors'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 const AuthenticationCodeInput = z.object({
   grantType: z.literal(GrantType.AuthenticationCode),
@@ -121,15 +122,30 @@ export const exchangeTokenMethod: ExchangeTokenMethod = async ({
   input,
 }) => {
   const { grantType } = input
+  let result, eventObject
   if (grantType == GrantType.AuthenticationCode) {
-    return handleAuthenticationCode({ ctx, input })
+    result = handleAuthenticationCode({ ctx, input })
+    eventObject = 'authn_code'
   } else if (grantType == GrantType.AuthorizationCode) {
-    return handleAuthorizationCode({ ctx, input })
+    result = handleAuthorizationCode({ ctx, input })
+    eventObject = 'auth_code'
   } else if (grantType == GrantType.RefreshToken) {
-    return handleRefreshToken({ ctx, input })
+    result = handleRefreshToken({ ctx, input })
+    eventObject = 'refresh_token'
   } else {
     throw new UnsupportedGrantTypeError(grantType)
   }
+
+  await createAnalyticsEvent({
+    eventName: `app_exchanged_${eventObject}`,
+    distinctId: ctx.identityURN as IdentityURN,
+    apiKey: ctx.POSTHOG_API_KEY,
+    properties: {
+      $groups: { app: input.clientId },
+    },
+  })
+
+  return result
 }
 
 const handleAuthenticationCode: ExchangeTokenMethod<

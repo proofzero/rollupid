@@ -5,6 +5,8 @@ import * as oauth from '../../OAuth'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { EDGE_APPLICATION } from '../../types'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import { ServicePlanType } from '@proofzero/types/identity'
 
 export const CreateAppInputSchema = z.object({
   clientName: z.string(),
@@ -54,6 +56,32 @@ export const createApp = async ({
   } else {
     console.log(`Created app ${clientId} for account ${ctx.accountURN}`)
   }
+
+  await createAnalyticsEvent({
+    eventName: '$groupidentify',
+    apiKey: ctx.POSTHOG_API_KEY,
+    distinctId: ctx.identityURN,
+    properties: {
+      $groups: { app: clientId },
+      $group_type: 'app',
+      $group_key: clientId,
+      $group_set: {
+        name: input.clientName,
+        plan: ServicePlanType.FREE,
+        clientId: clientId,
+        date_joined: new Date().toISOString(),
+      },
+    },
+  })
+
+  await createAnalyticsEvent({
+    eventName: 'identity_created_app',
+    apiKey: ctx.POSTHOG_API_KEY,
+    distinctId: ctx.identityURN,
+    properties: {
+      $groups: { app: clientId },
+    },
+  })
 
   return {
     clientId: clientId,

@@ -54,17 +54,6 @@ export const setAppPlan = async ({
         dst: appURN,
       })
     }
-
-    await createAnalyticsEvent({
-      eventName: 'app_pro_plan_set',
-      apiKey: ctx.POSTHOG_API_KEY,
-      distinctId: input.identityURN,
-      groups: { app: input.clientId },
-      properties: {
-        clientId: input.clientId,
-        plan,
-      },
-    })
   } else {
     await caller.edges.removeEdge({
       src: identityURN,
@@ -72,4 +61,28 @@ export const setAppPlan = async ({
       dst: appURN,
     })
   }
+
+  // This is the way how we can update group properties
+  // https://posthog.com/tutorials/frontend-vs-backend-group-analytics
+  await createAnalyticsEvent({
+    eventName: '$groupidentify',
+    apiKey: ctx.POSTHOG_API_KEY,
+    distinctId: identityURN,
+    properties: {
+      $group_type: 'app',
+      $group_key: clientId,
+      $group_set: {
+        plan,
+      },
+    },
+  })
+
+  await createAnalyticsEvent({
+    eventName: `app_set_${plan}_plan`,
+    apiKey: ctx.POSTHOG_API_KEY,
+    distinctId: identityURN,
+    properties: {
+      $groups: { app: clientId },
+    },
+  })
 }

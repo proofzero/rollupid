@@ -38,7 +38,7 @@ export const resolveIdentityMethod = async ({
 }): Promise<ResolveIdentityResult> => {
   const nodeClient = ctx.account
 
-  let eventName = 'identity-resolved'
+  let eventName = 'account_resolved_identity'
 
   let resultURN = await nodeClient?.class.getIdentity()
   if (input.jwt && resultURN) {
@@ -56,7 +56,7 @@ export const resolveIdentityMethod = async ({
     } else {
       const name = hexlify(randomBytes(IDENTITY_OPTIONS.length))
       urn = IdentityURNSpace.componentizedUrn(name)
-      eventName = 'identity-created'
+      eventName = 'account_created_identity'
     }
     const caller = router.createCaller(ctx)
     await caller.account.setIdentity(urn) // this will lazy create an identity node when identity worker is called
@@ -73,7 +73,9 @@ export const resolveIdentityMethod = async ({
     apiKey: ctx.POSTHOG_API_KEY,
     eventName,
     distinctId: resultURN,
-    groups: { app: input.clientId },
+    properties: {
+      $groups: { app: input.clientId },
+    },
   })
 
   return {

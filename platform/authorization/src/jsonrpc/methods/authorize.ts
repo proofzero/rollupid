@@ -8,6 +8,7 @@ import { initExchangeCodeNodeByName } from '../../nodes'
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 import { PersonaData } from '@proofzero/types/application'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const AuthorizeMethodInput = z.object({
   identity: IdentityURNInput,
@@ -58,6 +59,19 @@ export const authorizeMethod = async ({
     state,
     personaData
   )
+
+  // We don't track hacky way to create user session.
+  if (!scope.includes('admin')) {
+    await createAnalyticsEvent({
+      eventName: 'identity_authorized_app',
+      distinctId: identity,
+      apiKey: ctx.POSTHOG_API_KEY,
+      properties: {
+        scope: scope,
+        $groups: { app: clientId },
+      },
+    })
+  }
 
   return { ...result }
 }

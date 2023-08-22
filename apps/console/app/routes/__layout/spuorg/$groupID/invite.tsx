@@ -1,24 +1,20 @@
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction, json } from '@remix-run/cloudflare'
+import { type ActionFunction, json } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import createCoreClient from '@proofzero/platform-clients/core'
-import {
-  getAuthzHeaderConditionallyFromToken,
-  parseJwt,
-} from '@proofzero/utils'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { BadRequestError } from '@proofzero/errors'
-import {
+import type {
   CryptoAccountType,
   EmailAccountType,
   OAuthAccountType,
 } from '@proofzero/types/account'
 import {
-  IdentityGroupURN,
+  type IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
-import { createAnalyticsEvent } from '@proofzero/utils/analytics'
-import { type IdentityURN } from '@proofzero/urns/identity'
+
 export type InviteRes = {
   inviteCode: string
 }
@@ -31,8 +27,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     ) as IdentityGroupURN
 
     const jwt = await requireJWT(request, context.env)
-    const parsedJwt = parseJwt(jwt!)
-    const identityURN = parsedJwt.sub as IdentityURN
 
     const fd = await request.formData()
     const accountType = fd.get('accountType') as
@@ -63,18 +57,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         accountType: accountType,
         identityGroupURN: groupURN,
       })
-
-    await createAnalyticsEvent({
-      eventName: 'member_invited_to_group',
-      distinctId: identityURN,
-      apiKey: context.env.POSTHOG_API_KEY,
-      groups: {
-        group: groupID,
-      },
-      properties: {
-        groupID: groupID,
-      },
-    })
 
     return json({
       inviteCode,

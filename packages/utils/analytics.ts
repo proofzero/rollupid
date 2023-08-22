@@ -3,20 +3,17 @@ export const createAnalyticsEvent = async ({
   apiKey,
   distinctId,
   properties,
-  groups,
 }: {
   eventName: string
   apiKey: string
   distinctId: string
-  groups?: Record<string, any>
   properties?: Record<string, any>
 }) => {
   const body = JSON.stringify({
     api_key: apiKey,
     event: eventName,
     distinct_id: distinctId,
-    groups: groups,
-    properties: properties,
+    properties,
   })
 
   const init = {

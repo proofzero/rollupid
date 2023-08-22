@@ -208,22 +208,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           )
 
           await createAnalyticsEvent({
-            eventName: 'purchase',
-            apiKey: context.env.POSTHOG_API_KEY,
-            distinctId: customerDataSuccess.metadata.identityURN,
-            properties: {
-              plans: purchasedItems.map((item) => ({
-                quantity: item.quantity,
-                name: products.find(
-                  (product) => product?.id === item?.productID
-                )!.name,
-                type: ServicePlanType.PRO,
-              })),
-            },
-          })
-
-          await createAnalyticsEvent({
-            eventName: 'purchase',
+            eventName: 'identity_purchased_entitlement',
             apiKey: context.env.POSTHOG_API_KEY,
             distinctId: customerDataSuccess.metadata.identityURN,
             properties: {

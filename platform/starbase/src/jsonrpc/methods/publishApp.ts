@@ -8,6 +8,7 @@ import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
+import type { IdentityURN } from '@proofzero/urns/identity'
 
 export const PublishAppInput = z.object({
   clientId: z.string(),
@@ -57,25 +58,14 @@ export const publishApp = async ({
 
   await appDO.class.publish(input.published)
 
-  let eventName = undefined
-
-  if (!appDetails.published && input.published) {
-    eventName = 'app_published'
-  } else if (appDetails.published && !input.published) {
-    /**
-     * We can unpublish an app only if it was published before.
-     */
-    eventName = 'app_unpublished'
-  }
-
-  if (eventName)
-    await createAnalyticsEvent({
-      distinctId: ctx.accountURN as string,
-      eventName,
-      apiKey: ctx.POSTHOG_API_KEY,
-      properties: { client_id: input.clientId },
-      groups: { app: input.clientId },
-    })
+  await createAnalyticsEvent({
+    distinctId: ctx.identityURN as IdentityURN,
+    eventName: input.published
+      ? 'identity_published_app'
+      : 'identity_unpublished_app',
+    apiKey: ctx.POSTHOG_API_KEY,
+    properties: { $groups: { app: input.clientId } },
+  })
 
   return {
     published: true,
