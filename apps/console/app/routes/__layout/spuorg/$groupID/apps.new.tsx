@@ -8,24 +8,75 @@ import { ActionFunction, redirect } from '@remix-run/cloudflare'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { appendToastToFlashSession } from '~/utils/toast.server'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
-import { commitFlashSession } from '~/utilities/session.server'
+import { commitFlashSession, requireJWT } from '~/utilities/session.server'
+import { BadRequestError } from '@proofzero/errors'
+import createCoreClient from '@proofzero/platform-clients/core'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import {
+  IdentityGroupURNSpace,
+  IdentityGroupURN,
+} from '@proofzero/urns/identity-group'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
-    const toastSession = await appendToastToFlashSession(
-      request,
-      {
-        message: `Awesome`,
-        type: ToastType.Success,
-      },
-      context.env
-    )
+    const groupID = params.groupID as string
+    const groupURN = IdentityGroupURNSpace.urn(
+      groupID as string
+    ) as IdentityGroupURN
 
-    return redirect(`/spuorg/${params.groupID}/apps/new`, {
-      headers: {
-        'Set-Cookie': await commitFlashSession(toastSession, context.env),
-      },
+    const jwt = await requireJWT(request, context.env)
+
+    const fd = await request.formData()
+    const appName = fd.get('app_name')
+    if (!appName) {
+      throw new BadRequestError({
+        message: 'appName is required',
+      })
+    }
+
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+    const coreClient = createCoreClient(context.env.Core, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
     })
+
+    try {
+      const { clientId } = await coreClient.starbase.createApp.mutate({
+        clientName: appName as string,
+        identityGroupURN: groupURN,
+      })
+
+      const toastSession = await appendToastToFlashSession(
+        request,
+        {
+          message: `Application created successfully.`,
+          type: ToastType.Success,
+        },
+        context.env
+      )
+
+      return redirect(`/apps/${clientId}`, {
+        headers: {
+          'Set-Cookie': await commitFlashSession(toastSession, context.env),
+        },
+      })
+    } catch (ex) {
+      const toastSession = await appendToastToFlashSession(
+        request,
+        {
+          message: `There was an issue creating the application. Please try again.`,
+          type: ToastType.Error,
+        },
+        context.env
+      )
+
+      return redirect(`/spuorg/${params.groupID}/apps/new`, {
+        headers: {
+          'Set-Cookie': await commitFlashSession(toastSession, context.env),
+        },
+      })
+    }
   }
 )
 
