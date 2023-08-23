@@ -4,7 +4,7 @@ import {
   PaymentData,
   ServicePlanType,
   ServicePlans,
-} from '@proofzero/types/identity'
+} from '@proofzero/types/billing'
 import { RollupError } from '@proofzero/errors'
 
 export default class Identity extends DOProxy {

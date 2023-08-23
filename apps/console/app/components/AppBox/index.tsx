@@ -3,7 +3,7 @@
  */
 
 // TODO migrate to FolderPlusIcon and remove bespoke version
-import { type ServicePlanType } from '@proofzero/types/identity'
+import { ServicePlanType } from '@proofzero/types/billing'
 import { ApplicationList } from '../Applications/ApplicationList'
 
 // AppBox
