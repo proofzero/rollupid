@@ -242,7 +242,7 @@ export default () => {
         client_secret,
         payment_method,
         submit,
-        redirectUrl: '/billing',
+        redirectUrl: '/billing/personal',
         updatePlanParams: {
           clientId,
           plan: ServicePlanType.PRO,
