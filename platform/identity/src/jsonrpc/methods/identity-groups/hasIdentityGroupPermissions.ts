@@ -8,26 +8,26 @@ import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 
 import { Context } from '../../../context'
 
-export const HasIdentityGroupAuthorizationInputSchema = z.object({
+export const HasIdentityGroupPermissionsInputSchema = z.object({
   identityURN: IdentityURNInput,
   identityGroupURN: IdentityGroupURNValidator,
 })
-export type HasIdentityGroupAuthorizationInput = z.infer<
-  typeof HasIdentityGroupAuthorizationInputSchema
+export type HasIdentityGroupPermissionsInput = z.infer<
+  typeof HasIdentityGroupPermissionsInputSchema
 >
 
-export const HasIdentityGroupAuthorizationOutputSchema = z.boolean()
-export type HasIdentityGroupAuthorizationOutput = z.infer<
-  typeof HasIdentityGroupAuthorizationOutputSchema
+export const HasIdentityGroupPermissionsOutputSchema = z.boolean()
+export type HasIdentityGroupPermissionsOutput = z.infer<
+  typeof HasIdentityGroupPermissionsOutputSchema
 >
 
-export const hasIdentityGroupAuthorization = async ({
+export const hasIdentityGroupPermissions = async ({
   input,
   ctx,
 }: {
-  input: HasIdentityGroupAuthorizationInput
+  input: HasIdentityGroupPermissionsInput
   ctx: Context
-}): Promise<HasIdentityGroupAuthorizationOutput> => {
+}): Promise<HasIdentityGroupPermissionsOutput> => {
   const caller = router.createCaller(ctx)
 
   const { edges } = await caller.edges.getEdges({

@@ -55,7 +55,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     let targetURN = URN ?? identityURN
     if (IdentityGroupURNSpace.is(targetURN)) {
       const authorized =
-        await coreClient.identity.hasIdentityGroupAuthorization.query({
+        await coreClient.identity.hasIdentityGroupPermissions.query({
           identityURN,
           identityGroupURN: targetURN as IdentityGroupURN,
         })

@@ -84,10 +84,10 @@ import {
 } from './methods/identity-groups/deleteIdentityGroup'
 import { purgeIdentityGroupMemberships } from './methods/identity-groups/purgeIdentityGroupMemberships'
 import {
-  HasIdentityGroupAuthorizationInputSchema,
-  HasIdentityGroupAuthorizationOutputSchema,
-  hasIdentityGroupAuthorization,
-} from './methods/identity-groups/hasIdentityGroupAuthorization'
+  HasIdentityGroupPermissionsInputSchema,
+  HasIdentityGroupPermissionsOutputSchema,
+  hasIdentityGroupPermissions,
+} from './methods/identity-groups/hasIdentityGroupPermissions'
 import {
   ConnectIdentityGroupEmailInputSchema,
   ConnectIdentityGroupEmailOutputSchema,
@@ -258,12 +258,12 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(RequireIdentity)
     .mutation(purgeIdentityGroupMemberships),
-  hasIdentityGroupAuthorization: t.procedure
+  hasIdentityGroupPermissions: t.procedure
     .use(LogUsage)
     .use(Analytics)
-    .input(HasIdentityGroupAuthorizationInputSchema)
-    .output(HasIdentityGroupAuthorizationOutputSchema)
-    .query(hasIdentityGroupAuthorization),
+    .input(HasIdentityGroupPermissionsInputSchema)
+    .output(HasIdentityGroupPermissionsOutputSchema)
+    .query(hasIdentityGroupPermissions),
   connectIdentityGroupEmail: t.procedure
     .use(LogUsage)
     .use(Analytics)

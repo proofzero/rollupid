@@ -131,7 +131,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     ) as IdentityGroupURN
 
     const authorized =
-      await coreClient.identity.hasIdentityGroupAuthorization.query({
+      await coreClient.identity.hasIdentityGroupPermissions.query({
         identityURN,
         identityGroupURN: groupURN,
       })
@@ -231,7 +231,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     ) as IdentityGroupURN
 
     const authorized =
-      await coreClient.identity.hasIdentityGroupAuthorization.query({
+      await coreClient.identity.hasIdentityGroupPermissions.query({
         identityURN,
         identityGroupURN: groupURN,
       })
