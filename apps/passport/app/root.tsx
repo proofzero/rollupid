@@ -69,14 +69,15 @@ export const links: LinksFunction = () => [
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
+    const clientId = new URL(request.url).searchParams.get('client_id')
     if (
       request.cf.botManagement.score <= 30 &&
       !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
     ) {
       let ogTheme = {}
       if (
-        params.clientId &&
-        !['console', 'passport'].includes(params.clientId)
+        (params.clientId || clientId) &&
+        !['console', 'passport'].includes(params.clientId!)
       ) {
         const coreClient = getCoreClient({ context })
         ogTheme = await coreClient.starbase.getOgTheme.query({
@@ -90,7 +91,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     if (context.appProps) {
       appProps = context.appProps
     } else {
-      if (!params.clientId) {
+      if (!params.clientId && !clientId) {
         const name = 'Passport'
         appProps = {
           name: `Rollup - ${name}`,
@@ -103,7 +104,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       } else {
         if (['console', 'passport'].includes(params.clientId!)) {
           const name =
-            params.clientId.charAt(0).toUpperCase() + params.clientId.slice(1)
+            params.clientId!.charAt(0).toUpperCase() + params.clientId!.slice(1)
           appProps = {
             name: `Rollup - ${name}`,
             iconURL: LogoIndigo,
@@ -115,7 +116,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         } else {
           const coreClient = getCoreClient({ context })
           appProps = await coreClient.starbase.getAppPublicProps.query({
-            clientId: params.clientId!,
+            clientId: (params.clientId || clientId) as string,
           })
         }
       }
@@ -261,6 +262,8 @@ export default function App() {
       }
     }
   }, [hydrated])
+
+  console.log({ browserEnv })
 
   return (
     <html lang="en">
