@@ -123,6 +123,7 @@ export default function AppDetailIndexPage() {
   const actionData = useActionData()
   const outletContext = useOutletContext<{
     appDetails: appDetailsProps
+    authorizationURL: string
     rotationResult: RotatedSecrets
   }>()
   const { edgesResult } = useLoaderData()
@@ -134,6 +135,7 @@ export default function AppDetailIndexPage() {
     useState(false)
 
   const { appDetails: app } = outletContext
+  const { authorizationURL } = outletContext
 
   const { rotatedClientSecret, rotatedApiKey } =
     outletContext?.rotationResult ||
@@ -285,6 +287,33 @@ export default function AppDetailIndexPage() {
                   )
                 }
               />
+
+              <hr />
+
+              <div className="space-y-3">
+                <ReadOnlyInput
+                  id="oAuthAppAuthURL"
+                  label="My Auth URL"
+                  className="text-ellipsis"
+                  value={
+                    app.published
+                      ? authorizationURL
+                      : 'Publish the application to get the auth URL'
+                  }
+                  copyable={true}
+                  onCopy={() =>
+                    toast(
+                      ToastType.Success,
+                      { message: 'Auth URL copied to clipboard!' },
+                      { duration: 2000 }
+                    )
+                  }
+                />
+                <Text size="sm" className="text-gray-500">
+                  This link is for testing purposes only! Auth flow won't be
+                  successful.
+                </Text>
+              </div>
             </div>
           </Panel>
 
