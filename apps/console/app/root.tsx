@@ -288,6 +288,7 @@ export default function App() {
                   gtag('config', '${GATag}', {
                     page_path: window.location.pathname,
                   });
+                  gtag('event', 'conversion', {'send_to': '${GATag}'});
               `,
               }}
               nonce={nonce}
