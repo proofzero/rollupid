@@ -272,6 +272,11 @@ export default function App() {
 
         {browserEnv?.appProps?.iconURL ? (
           <>
+            <link
+              rel="apple-touch-icon"
+              href={browserEnv?.appProps.iconURL}
+              sizes="180x180"
+            />
             <link rel="icon" type="image" href={browserEnv?.appProps.iconURL} />
             <link
               rel="shortcut icon"
