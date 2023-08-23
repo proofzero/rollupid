@@ -1,6 +1,5 @@
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import plans, { type PlanDetails } from '~/routes/__layout/billing/plans'
-import { PlanFeatures } from '~/routes/__layout/billing/personal'
+import plans, { type PlanDetails } from '~/utils/plans'
 import { Button } from '@proofzero/design-system'
 import { StatusPill } from '@proofzero/design-system/src/atoms/pills/StatusPill'
 import {
@@ -54,6 +53,7 @@ import type Stripe from 'stripe'
 import { PaymentData, ServicePlanType } from '@proofzero/types/billing'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { GetEntitlementsOutput } from '@proofzero/platform/billing/src/jsonrpc/methods/getEntitlements'
+import { PlanFeatures } from '~/components/Billing'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {

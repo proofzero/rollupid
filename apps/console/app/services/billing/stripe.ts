@@ -6,7 +6,7 @@ import { BillingCustomerURN } from '@proofzero/urns/billing'
 import { redirect } from '@remix-run/cloudflare'
 import { type Env } from 'bindings'
 import Stripe from 'stripe'
-import plans from '~/routes/__layout/billing/plans'
+import plans from '~/utils/plans'
 
 type CreateCustomerParams = {
   email: string
