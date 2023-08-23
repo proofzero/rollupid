@@ -4,10 +4,10 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { EDGE_PAYS_APP } from '@proofzero/types/graph'
-import { AnyURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { BillingCustomerURNValidator } from '@proofzero/platform-middleware/inputValidators'
 
 export const DeleteSubscriptionPlansInput = z.object({
-  URN: AnyURNInput,
+  URN: BillingCustomerURNValidator,
 })
 type DeleteSubscriptionPlansParams = z.infer<
   typeof DeleteSubscriptionPlansInput

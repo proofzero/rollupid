@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { Context } from '../../context'
-import { AnyURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { BadRequestError } from '@proofzero/errors'
 import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
@@ -8,8 +7,10 @@ import {
   initIdentityGroupNodeByName,
   initIdentityNodeByName,
 } from '../../../../identity/src/nodes'
+import { BillingCustomerURNValidator } from '@proofzero/platform-middleware/inputValidators'
+
 export const CancelServicePlansInput = z.object({
-  URN: AnyURNInput,
+  URN: BillingCustomerURNValidator,
   subscriptionID: z.string(),
   deletePaymentData: z.boolean().optional(),
 })

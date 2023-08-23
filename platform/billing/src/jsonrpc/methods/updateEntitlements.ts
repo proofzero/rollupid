@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { Context } from '../../context'
-import { AnyURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { BillingCustomerURNValidator } from '@proofzero/platform-middleware/inputValidators'
 import { ServicePlanType } from '@proofzero/types/billing'
 import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 import { BadRequestError } from '@proofzero/errors'
@@ -11,7 +11,7 @@ import {
 } from '../../../../identity/src/nodes'
 
 export const UpdateEntitlementsInputSchema = z.object({
-  URN: AnyURNInput,
+  URN: BillingCustomerURNValidator,
   subscriptionID: z.string(),
   type: z.nativeEnum(ServicePlanType),
   quantity: z.number(),

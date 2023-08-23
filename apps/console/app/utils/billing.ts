@@ -12,8 +12,8 @@ import { type Session, type SessionData } from '@remix-run/cloudflare'
 import { commitFlashSession } from '~/utilities/session.server'
 import { type Env } from 'bindings'
 import Stripe from 'stripe'
-import { AnyURN } from '@proofzero/urns'
 import { ServicePlanType } from '@proofzero/types/billing'
+import { BillingCustomerURN } from '@proofzero/urns/billing'
 
 export type StripeInvoice = {
   id: string
@@ -93,7 +93,7 @@ export const createOrUpdateSubscription = async ({
   SECRET_STRIPE_PRO_PLAN_ID: string
   SECRET_STRIPE_API_KEY: string
   quantity: number
-  URN: AnyURN
+  URN: BillingCustomerURN
   customerID: string
 }) => {
   const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {

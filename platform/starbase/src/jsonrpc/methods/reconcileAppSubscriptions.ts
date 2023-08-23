@@ -1,14 +1,14 @@
 import { z } from 'zod'
 import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
-import { AnyURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { BillingCustomerURNValidator } from '@proofzero/platform-middleware/inputValidators'
 import { EDGE_HAS_REFERENCE_TO, EDGE_PAYS_APP } from '@proofzero/types/graph'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ServicePlanType } from '@proofzero/types/billing'
 
 export const ReconcileAppSubscriptionsInputSchema = z.object({
-  URN: AnyURNInput,
+  URN: BillingCustomerURNValidator,
   count: z.number(),
   plan: z.nativeEnum(ServicePlanType),
 })

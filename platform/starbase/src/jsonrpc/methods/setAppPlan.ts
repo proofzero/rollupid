@@ -6,11 +6,11 @@ import { AppClientIdParamSchema } from '../validators/app'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { ServicePlanType } from '@proofzero/types/billing'
 import { EDGE_PAYS_APP } from '@proofzero/types/graph'
-import { AnyURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { BillingCustomerURNValidator } from '@proofzero/platform-middleware/inputValidators'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const SetAppPlanInput = AppClientIdParamSchema.extend({
-  URN: AnyURNInput,
+  URN: BillingCustomerURNValidator,
   plan: z.nativeEnum(ServicePlanType),
 })
 type SetAppPlanParams = z.infer<typeof SetAppPlanInput>

@@ -12,7 +12,7 @@ import { InternalServerError, RollupError } from '@proofzero/errors'
 import { type AccountURN } from '@proofzero/urns/account'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { ServicePlanType } from '@proofzero/types/billing'
-import { AnyURN } from '@proofzero/urns'
+import { BillingCustomerURN } from '@proofzero/urns/billing'
 
 type StripeInvoicePayload = {
   id: string
@@ -68,7 +68,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           metadata: {
             identityURN?: IdentityURN
             accountURN?: AccountURN
-            URN?: AnyURN
+            URN?: BillingCustomerURN
           }
           status: string
         }
@@ -86,7 +86,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         URN = (subMeta.URN ??
           subMeta.accountURN ??
-          subMeta.identityURN) as AnyURN
+          subMeta.identityURN) as BillingCustomerURN
 
         const entitlements = await coreClient.billing.getEntitlements.query({
           URN,
@@ -123,13 +123,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           metadata: {
             identityURN?: IdentityURN
             accountURN?: AccountURN
-            URN?: AnyURN
+            URN?: BillingCustomerURN
           }
         }
 
         URN = (cusMeta.URN ??
           cusMeta.accountURN ??
-          cusMeta.identityURN) as AnyURN
+          cusMeta.identityURN) as BillingCustomerURN
 
         if (invoice_settings?.default_payment_method) {
           const paymentData =
@@ -285,7 +285,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           metadata: {
             identityURN?: IdentityURN
             accountURN?: AccountURN
-            URN?: AnyURN
+            URN?: BillingCustomerURN
           }
         }
         const customerDataDel = await stripeClient.customers.retrieve(
@@ -296,7 +296,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
           URN = (metaDel.URN ??
             metaDel.accountURN ??
-            metaDel.identityURN) as AnyURN
+            metaDel.identityURN) as BillingCustomerURN
 
           await Promise.all([
             coreClient.account.sendBillingNotification.mutate({

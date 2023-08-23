@@ -2,7 +2,7 @@ import { InternalServerError } from '@proofzero/errors'
 import { type CoreClientType } from '@proofzero/platform-clients/core'
 import { type ReconcileAppsSubscriptionsOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/reconcileAppSubscriptions'
 import { ServicePlanType } from '@proofzero/types/billing'
-import { AnyURN } from '@proofzero/urns'
+import { BillingCustomerURN } from '@proofzero/urns/billing'
 import { redirect } from '@remix-run/cloudflare'
 import { type Env } from 'bindings'
 import Stripe from 'stripe'
@@ -11,7 +11,7 @@ import plans from '~/routes/__layout/billing/plans'
 type CreateCustomerParams = {
   email: string
   name: string
-  URN: AnyURN
+  URN: BillingCustomerURN
 }
 
 type UpdateCustomerParams = {
@@ -29,7 +29,7 @@ type CreateSubscriptionParams = {
   customerID: string
   planID: string
   quantity: number
-  URN: AnyURN
+  URN: BillingCustomerURN
   handled?: boolean
 }
 
@@ -41,7 +41,7 @@ type UpdateSubscriptionParams = {
 }
 
 type SubscriptionMetadata = Partial<{
-  URN: AnyURN
+  URN: BillingCustomerURN
   handled: string | null
 }>
 
@@ -250,7 +250,7 @@ export const reconcileAppSubscriptions = async (
     settingsURL,
   }: {
     subscriptionID: string
-    URN: AnyURN
+    URN: BillingCustomerURN
     coreClient: CoreClientType
     billingURL: string
     settingsURL: string

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { Context } from '../../context'
-import { AnyURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { BillingCustomerURNValidator } from '@proofzero/platform-middleware/inputValidators'
 import { ServicePlanType } from '@proofzero/types/billing'
 import { BadRequestError } from '@proofzero/errors'
 import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
@@ -11,7 +11,7 @@ import {
 } from '../../../../identity/src/nodes'
 
 export const GetEntitlementsInputSchema = z.object({
-  URN: AnyURNInput,
+  URN: BillingCustomerURNValidator,
 })
 
 type GetEntitlementsInput = z.infer<typeof GetEntitlementsInputSchema>

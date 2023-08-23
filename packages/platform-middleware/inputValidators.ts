@@ -5,6 +5,7 @@ import {
 } from '@proofzero/urns/authorization'
 import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 import { IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
+import { BillingCustomerURN } from '@proofzero/urns/billing'
 import { AnyURN, parseURN } from '@proofzero/urns'
 import { EdgeURN } from '@proofzero/urns/edge'
 import { CryptoAccountType } from '@proofzero/types/account'
@@ -81,3 +82,16 @@ export const NodeFilterInput = z.object({
   qc: z.record(z.string(), z.string().or(z.boolean()).optional()).optional(),
   rc: z.record(z.string(), z.string().or(z.boolean()).optional()).optional(),
 })
+
+export const BillingCustomerURNValidator = z.custom<BillingCustomerURN>(
+  (input) => {
+    if (
+      !IdentityURNSpace.is(input as IdentityURN) &&
+      !IdentityGroupURNSpace.is(input as IdentityGroupURN)
+    ) {
+      throw new Error('Invalid BillingCustomerURN entry')
+    }
+
+    return input as BillingCustomerURN
+  }
+)

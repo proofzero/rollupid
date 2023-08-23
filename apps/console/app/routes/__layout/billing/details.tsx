@@ -15,12 +15,12 @@ import { createCustomer, updateCustomer } from '~/services/billing/stripe'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { AccountURN } from '@proofzero/urns/account'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
-import { AnyURN } from '@proofzero/urns'
 import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
 import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
+import { BillingCustomerURN } from '@proofzero/urns/billing'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -49,7 +49,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       email: string
       accountURN: AccountURN
       name: string
-      URN?: AnyURN
+      URN?: BillingCustomerURN
     }
 
     let targetURN = URN ?? identityURN

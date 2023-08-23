@@ -15,12 +15,12 @@ import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { type IdentityURN } from '@proofzero/urns/identity'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { ServicePlanType } from '@proofzero/types/billing'
-import { AnyURN } from '@proofzero/urns'
 import { UnauthorizedError } from '@proofzero/errors'
 import {
   IdentityGroupURNSpace,
   IdentityGroupURN,
 } from '@proofzero/urns/identity-group'
+import { BillingCustomerURN } from '@proofzero/urns/billing'
 
 /**
  * WARNING: Here be dragons, and not the cute, cuddly kind! This code runs twice in certain scenarios because when the user
@@ -45,7 +45,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const subId = fd.get('subId') as string
     const redirectUrl = fd.get('redirectUrl') as string
     const updatePlanParams = fd.get('updatePlanParams') as string
-    const URN = fd.get('URN') as AnyURN | undefined
+    const URN = fd.get('URN') as BillingCustomerURN | undefined
 
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
