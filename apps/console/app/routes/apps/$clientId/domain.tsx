@@ -309,7 +309,7 @@ const HostnameStatus = ({
           </div>
 
           <Text size="sm" weight="medium" className="text-gray-700">
-            Step 2: CNAME Record
+            Step 2: Permanent Records
           </Text>
           <div className="flex flex-col p-4 space-y-5 box-border border rounded-lg">
             {isPreValidated &&
