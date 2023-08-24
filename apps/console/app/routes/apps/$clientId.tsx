@@ -13,11 +13,7 @@ import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { Popover } from '@headlessui/react'
 
 import type { RotatedSecrets } from '~/types'
-import {
-  toast,
-  Toaster,
-  ToastType,
-} from '@proofzero/design-system/src/atoms/toast'
+import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import type { LoaderData as OutletContextData } from '~/root'
 import type { AccountURN } from '@proofzero/urns/account'
@@ -26,7 +22,6 @@ import { BadRequestError, NotFoundError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { PlatformAccountURNHeader } from '@proofzero/types/headers'
 import { getToastsAndFlashSession } from '~/utils/toast.server'
-import { useEffect } from 'react'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 
 type LoaderData = {
@@ -35,10 +30,6 @@ type LoaderData = {
   appContactAddress?: AccountURN
   appContactEmail?: string
   paymaster: PaymasterType
-  toasts: {
-    message: string
-    type: ToastType
-  }[]
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -106,26 +97,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         appContactEmail = address
       }
 
-      const { flashSession, toasts } = await getToastsAndFlashSession(
-        request,
-        context.env
-      )
-
-      return json<LoaderData>(
-        {
-          appDetails: appDetails as appDetailsProps,
-          rotationResult,
-          appContactAddress,
-          appContactEmail,
-          paymaster,
-          toasts,
-        },
-        {
-          headers: {
-            'Set-Cookie': await commitFlashSession(flashSession, context.env),
-          },
-        }
-      )
+      return json<LoaderData>({
+        appDetails: appDetails as appDetailsProps,
+        rotationResult,
+        appContactAddress,
+        appContactEmail,
+        paymaster,
+      })
     } catch (error) {
       console.error('Caught error in loader', { error })
       if (error instanceof Response) {
@@ -159,7 +137,6 @@ export default function AppDetailIndexPage() {
     appContactAddress,
     appContactEmail,
     paymaster,
-    toasts,
   } = loaderData
 
   const notify = (success: boolean = true) => {
@@ -176,16 +153,6 @@ export default function AppDetailIndexPage() {
       )
     }
   }
-
-  useEffect(() => {
-    if (!toasts || !toasts.length) return
-
-    for (const { type, message } of toasts) {
-      toast(type, {
-        message: message,
-      })
-    }
-  }, [toasts])
 
   return (
     <Popover className="min-h-[100dvh] relative">
@@ -209,7 +176,6 @@ export default function AppDetailIndexPage() {
                 type={'urgent'}
               />
             )}
-            <Toaster position="top-right" reverseOrder={false} />
 
             <section
               className={`${

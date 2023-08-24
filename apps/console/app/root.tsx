@@ -37,7 +37,11 @@ import icon32 from './images/favicon-32x32.png'
 import icon16 from './images/favicon-16x16.png'
 
 import * as gtag from '~/utils/gtags.client'
-import { parseJwt, requireJWT } from './utilities/session.server'
+import {
+  commitFlashSession,
+  parseJwt,
+  requireJWT,
+} from './utilities/session.server'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
@@ -54,6 +58,12 @@ import { PostHogProvider } from 'posthog-js/react'
 import { useHydrated } from 'remix-utils'
 import { getCurrentAndUpcomingInvoices } from './utils/billing'
 import { ServicePlanType } from '@proofzero/types/billing'
+import {
+  type ToastType,
+  Toaster,
+  toast,
+} from '@proofzero/design-system/src/atoms/toast'
+import { getToastsAndFlashSession } from './utils/toast.server'
 
 export const links: LinksFunction = () => {
   return [
@@ -91,6 +101,10 @@ export type LoaderData = {
     WALLET_CONNECT_PROJECT_ID: string
   }
   identityURN: IdentityURN
+  toasts: {
+    message: string
+    type: ToastType
+  }[]
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -111,6 +125,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const parsedJwt = parseJwt(jwt)
     const identityURN = parsedJwt.sub as IdentityURN
 
+    const { flashSession, toasts } = await getToastsAndFlashSession(
+      request,
+      context.env
+    )
+
     try {
       const coreClient = createCoreClient(context.env.Core, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
@@ -126,17 +145,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       const spd = await coreClient.billing.getStripePaymentData.query({
         URN: identityURN,
       })
-
-      const profile = await coreClient.identity.getProfile.query({
-        identity: identityURN,
-      })
-
-      if (
-        !profile?.consoleOnboardingData?.isComplete &&
-        !request.url.includes('/onboarding')
-      ) {
-        return redirect('/onboarding')
-      }
 
       const reshapedApps = apps.map((a) => {
         return {
@@ -188,28 +196,44 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         return false
       })
 
-      return json<LoaderData>({
-        apps: reshapedApps,
-        avatarUrl,
-        hasUnpaidInvoices,
-        unpaidInvoiceURL,
-        PASSPORT_URL,
-        ENV: {
-          POSTHOG_API_KEY,
-          POSTHOG_PROXY_HOST,
-          INTERNAL_GOOGLE_ANALYTICS_TAG,
-          REMIX_DEV_SERVER_WS_PORT:
-            process.env.NODE_ENV === 'development'
-              ? +process.env.REMIX_DEV_SERVER_WS_PORT!
-              : undefined,
-          WALLET_CONNECT_PROJECT_ID,
+      return json<LoaderData>(
+        {
+          apps: reshapedApps,
+          avatarUrl,
+          hasUnpaidInvoices,
+          unpaidInvoiceURL,
+          PASSPORT_URL,
+          ENV: {
+            POSTHOG_API_KEY,
+            POSTHOG_PROXY_HOST,
+            INTERNAL_GOOGLE_ANALYTICS_TAG,
+            REMIX_DEV_SERVER_WS_PORT:
+              process.env.NODE_ENV === 'development'
+                ? +process.env.REMIX_DEV_SERVER_WS_PORT!
+                : undefined,
+            WALLET_CONNECT_PROJECT_ID,
+          },
+          displayName,
+          identityURN,
+          toasts,
         },
-        displayName,
-        identityURN,
-      })
+        {
+          headers: {
+            'Set-Cookie': await commitFlashSession(flashSession, context.env),
+          },
+        }
+      )
     } catch (error) {
       console.error({ error })
-      return json({ error }, { status: 500 })
+      return json(
+        { error, toasts },
+        {
+          status: 500,
+          headers: {
+            'Set-Cookie': await commitFlashSession(flashSession, context.env),
+          },
+        }
+      )
     }
   }
 )
@@ -255,6 +279,7 @@ export default function App() {
     identityURN,
     hasUnpaidInvoices,
     unpaidInvoiceURL,
+    toasts,
   } = loaderData ?? {}
 
   useEffect(() => {
@@ -262,6 +287,16 @@ export default function App() {
       gtag.pageview(location.pathname, GATag)
     }
   }, [location, GATag])
+
+  useEffect(() => {
+    if (!toasts || !toasts.length) return
+
+    for (const { type, message } of toasts) {
+      toast(type, {
+        message: message,
+      })
+    }
+  }, [toasts])
 
   const hydrated = useHydrated()
   useEffect(() => {
@@ -342,6 +377,7 @@ export default function App() {
             }}
           />
         )}
+        <Toaster position="top-right" reverseOrder={false} />
         <ScrollRestoration nonce={nonce} />
         <script
           nonce={nonce}

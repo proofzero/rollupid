@@ -50,9 +50,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 )
 
 // https://remix.run/docs/en/main/route/should-revalidate#actionresult
-export const shouldRevalidate: ShouldRevalidateFunction = ({
+export const shouldRevalidate = ({
   actionResult,
   defaultShouldRevalidate,
+}: {
+  actionResult: { success: boolean }
+  defaultShouldRevalidate: ShouldRevalidateFunction
 }) => {
   if (actionResult?.success) {
     return false
