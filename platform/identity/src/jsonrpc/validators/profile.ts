@@ -11,12 +11,6 @@ export const ProfileSchema = z.object({
     })
     .optional(),
   primaryAccountURN: inputValidators.AccountURNInput.optional(),
-  consoleOnboardingData: z
-    .object({
-      isComplete: z.boolean().optional(),
-      orgType: z.enum(['solo', 'team']).optional(),
-    })
-    .optional(),
 })
 
 export const AccountsSchema = z.array(Node)

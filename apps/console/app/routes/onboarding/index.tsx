@@ -23,78 +23,36 @@ import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import type { AccountURN } from '@proofzero/urns/account'
-import type { Profile } from '@proofzero/platform.identity/src/types'
-import { checkToken } from '@proofzero/utils/token'
-import type { IdentityURN } from '@proofzero/urns/identity'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const formData = await request.formData()
 
     const jwt = await requireJWT(request, context.env)
-    const payload = checkToken(jwt!)
-    const identityURN = payload.sub as IdentityURN
 
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const profile = await coreClient.identity.getProfile.query({
-      identity: identityURN,
-    })
-
     try {
-      const op = formData.get('op') as string
+      const clientName = formData.get('clientName') as string
+      const account = formData.get('account') as AccountURN
 
-      switch (op) {
-        case 'setOrgType':
-          const orgType = formData.get('orgType') as 'solo' | 'team'
-          if (profile) {
-            await coreClient.identity.setProfile.mutate({
-              name: identityURN,
-              profile: {
-                ...profile,
-                consoleOnboardingData: {
-                  orgType,
-                },
-              },
-            })
-          }
-          return json({ success: true, orgType })
-        case 'createApp':
-          const clientName = formData.get('clientName') as string
-          const account = formData.get('account') as AccountURN
+      if (!clientName?.length || !account?.length)
+        throw new BadRequestError({
+          message: 'App name and email address are required',
+        })
+      const { clientId } = await coreClient.starbase.createApp.mutate({
+        clientName,
+      })
 
-          if (!clientName?.length || !account?.length)
-            throw new BadRequestError({
-              message: 'App name and email address are required',
-            })
-          const { clientId } = await coreClient.starbase.createApp.mutate({
-            clientName,
-          })
+      await coreClient.starbase.upsertAppContactAddress.mutate({
+        account,
+        clientId,
+      })
 
-          await coreClient.starbase.upsertAppContactAddress.mutate({
-            account,
-            clientId,
-          })
-
-          if (profile) {
-            await coreClient.identity.setProfile.mutate({
-              name: identityURN,
-              profile: {
-                ...profile,
-                consoleOnboardingData: {
-                  ...profile.consoleOnboardingData,
-                  // And user will never see this page again.
-                  isComplete: true,
-                },
-              },
-            })
-          }
-
-          return json({ clientId, success: true })
-      }
+      return json({ clientId, success: true })
     } catch (error) {
       console.error({ error })
       return new InternalServerError({
@@ -111,7 +69,6 @@ const Option = ({
   description,
   selected = false,
   disabled = false,
-  onClick,
   setSelectedType,
 }: {
   Icon: IconType
@@ -119,7 +76,6 @@ const Option = ({
   description: string
   selected?: boolean
   disabled?: boolean
-  onClick: () => void
   setSelectedType: (value: 'solo' | 'team') => void
   type: 'solo' | 'team'
 }) => {
@@ -131,7 +87,6 @@ const Option = ({
       }`}
       onClick={() => {
         if (disabled) return
-        onClick()
         setSelectedType(type)
       }}
     >
@@ -157,21 +112,13 @@ const SelectOrgType = ({
   setPage,
   page,
   setOrgType,
+  orgType,
 }: {
   setPage: (value: number) => void
   page: number
   setOrgType: (value: 'solo' | 'team') => void
+  orgType: 'solo' | 'team'
 }) => {
-  const [selectedType, setSelectedType] = useState<'solo' | 'team'>('solo')
-  const fetcher = useFetcher()
-
-  useEffect(() => {
-    if (fetcher.state === 'idle' && fetcher.data?.success) {
-      setOrgType(fetcher.data.orgType)
-      setPage(page + 1)
-    }
-  }, [fetcher.state])
-
   return (
     <div
       className={`w-full h-full flex flex-col gap-2
@@ -192,32 +139,27 @@ const SelectOrgType = ({
         Icon={TbUser}
         header="I'm solo developer"
         description="I'm setting up app for myself"
-        selected={selectedType === 'solo'}
-        onClick={() => setSelectedType('solo')}
+        selected={orgType === 'solo'}
+        setSelectedType={setOrgType}
         type="solo"
-        setSelectedType={setSelectedType}
       />
       <Option
         Icon={TbUsers}
         header="I'm part of a team"
         description="I'm setting up app for a team"
         disabled={true}
-        selected={selectedType === 'team'}
-        onClick={() => setSelectedType('team')}
+        selected={orgType === 'team'}
         type="team"
-        setSelectedType={setSelectedType}
+        setSelectedType={setOrgType}
       />
       <Button
         className="w-full"
         btnType="primary-alt"
-        disabled={!selectedType?.length}
+        disabled={!orgType?.length}
         btnSize="xl"
-        onClick={() =>
-          fetcher.submit(
-            { op: 'setOrgType', orgType: selectedType },
-            { method: 'post' }
-          )
-        }
+        onClick={() => {
+          setPage(page + 1)
+        }}
       >
         Continue
       </Button>
@@ -616,15 +558,15 @@ const CongratsPage = ({
       <ul className="list-disc w-full flex flex-col gap-2">
         <li className="w-full">
           <div className="flex flex-row gap-2 items-center">
-            <Text>Lorem</Text>
+            <Text>Configure OAuth settings</Text>
             <DocumentationBadge
-              url={'https://docs.rollup.id/platform/console/users'}
+              url={'https://docs.rollup.id/platform/console/oauth'}
             />
           </div>
         </li>
         <li className="w-full">
           <div className="flex flex-row gap-2 items-center">
-            <Text>Ipsum</Text>
+            <Text>Configure account abstractions</Text>
             <DocumentationBadge
               url={'https://docs.rollup.id/platform/console/blockchain'}
             />
@@ -632,9 +574,9 @@ const CongratsPage = ({
         </li>
         <li className="w-full">
           <div className="flex flex-row gap-2 items-center">
-            <Text>Lorem Ipsum</Text>
+            <Text>Configure custom design</Text>
             <DocumentationBadge
-              url={'https://docs.rollup.id/platform/console/kyc'}
+              url={'https://docs.rollup.id/platform/console/designer'}
             />
           </div>
         </li>
@@ -654,19 +596,18 @@ const CongratsPage = ({
 }
 
 export default function Landing() {
-  const { connectedEmails, PASSPORT_URL, profile } = useOutletContext<{
+  const { connectedEmails, PASSPORT_URL, currentPage } = useOutletContext<{
     connectedEmails: DropdownSelectListItem[]
     PASSPORT_URL: string
-    profile: Profile
+    currentPage: number
   }>()
 
-  const [orgType, setOrgType] = useState<'solo' | 'team' | undefined>(
-    profile.consoleOnboardingData?.orgType
-  )
+  // Currently 'team' is not an option. It is here for future use.
+  const [orgType, setOrgType] = useState<'solo' | 'team'>('solo')
   const [clientId, setClientId] = useState('')
   const [emailAccountURN, setEmailAccountURN] = useState<AccountURN>()
 
-  const [page, setPage] = useState(orgType ? 1 : 0)
+  const [page, setPage] = useState(currentPage)
 
   return (
     <div
@@ -674,7 +615,12 @@ export default function Landing() {
      items-start gap-2 w-[50%] h-full"
     >
       <img src={consoleLogo} alt="console logo" className="w-[40%] mb-10" />
-      <SelectOrgType setPage={setPage} page={page} setOrgType={setOrgType} />
+      <SelectOrgType
+        setPage={setPage}
+        page={page}
+        setOrgType={setOrgType}
+        orgType={orgType}
+      />
       <ConnectEmail
         connectedEmails={connectedEmails}
         PASSPORT_URL={PASSPORT_URL}

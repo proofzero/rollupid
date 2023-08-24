@@ -36,11 +36,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
+    const spd = await coreClient.identity.getStripePaymentData.query({
+      identityURN,
+    })
+
     const profile = await coreClient.identity.getProfile.query({
       identity: identityURN,
     })
 
-    if (profile?.consoleOnboardingData?.isComplete) {
+    if (spd?.email?.length) {
       return redirect('/')
     }
 
@@ -78,6 +82,16 @@ export default function Onboarding() {
     profile: Profile
   }>()
 
+  let currentPage = 0
+
+  if (typeof window !== 'undefined') {
+    const url = new URL(window.location.href)
+    const connectResult = url.searchParams.get('rollup_result')
+    if (connectResult) {
+      currentPage = 1
+    }
+  }
+
   useConnectResult()
 
   const submit = useSubmit()
@@ -92,7 +106,7 @@ export default function Onboarding() {
             'basis-full 2xl:basis-2/5 flex items-start justify-center py-[2.5%] h-full'
           }
         >
-          <Outlet context={{ connectedEmails, PASSPORT_URL, profile }} />
+          <Outlet context={{ connectedEmails, PASSPORT_URL, currentPage }} />
         </div>
         <div className="basis-3/5 h-[100dvh] w-full hidden 2xl:flex justify-end items-center bg-gray-50 dark:bg-gray-800 overflow-hidden">
           <img

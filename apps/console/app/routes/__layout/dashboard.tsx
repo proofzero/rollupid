@@ -24,11 +24,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
-    const profile = await coreClient.identity.getProfile.query({
-      identity: identityURN,
+    const spd = await coreClient.identity.getStripePaymentData.query({
+      identityURN,
     })
 
-    if (!profile?.consoleOnboardingData?.isComplete) {
+    if (!spd?.email?.length) {
       return redirect('/onboarding')
     }
   }
