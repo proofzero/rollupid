@@ -117,18 +117,7 @@ const PurchaseProModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div className="max-sm:w-screen sm:min-w-[640px] lg:min-w-[764px] w-fit">
-        {!paymentData?.paymentMethodID ? (
-          <section className="mx-5 mt-5">
-            <ToastWithLink
-              message="Update your Payment Information to enable purchasing"
-              linkHref={`/billing/payment`}
-              type={'warning'}
-              linkText="Update payment information"
-            />
-          </section>
-        ) : null}
-
-        <div className="flex flex-row justify-between w-full pb-2 pt-5 px-5 items-center">
+        <div className="flex flex-row justify-between w-full pt-5 pb-3 px-5 items-center">
           <Text
             size="lg"
             weight="semibold"
@@ -138,7 +127,7 @@ const PurchaseProModal = ({
           </Text>
           <div
             className={`bg-white p-2 rounded-lg text-xl cursor-pointer
-                        hover:bg-[#F3F4F6]`}
+                      hover:bg-[#F3F4F6]`}
             onClick={() => {
               setIsOpen(false)
             }}
@@ -146,6 +135,17 @@ const PurchaseProModal = ({
             <HiOutlineX />
           </div>
         </div>
+
+        {!paymentData?.paymentMethodID ? (
+          <section className="mx-5 mb-3">
+            <ToastWithLink
+              message="Update your Payment Information to enable purchasing"
+              linkHref={`/billing/payment`}
+              type={'warning'}
+              linkText="Update payment information"
+            />
+          </section>
+        ) : null}
 
         <section className="mx-5 mb-5 border rounded-lg overflow-auto thin-scrollbar">
           <div className="p-6">
@@ -192,8 +192,8 @@ const PurchaseProModal = ({
               <button
                 type="button"
                 className="flex justify-center items-center border
-                disabled:cursor-not-allowed
-                border-gray-300 bg-gray-50 rounded-l-lg px-4"
+              disabled:cursor-not-allowed
+              border-gray-300 bg-gray-50 rounded-l-lg px-4"
                 onClick={() => {
                   setProEntitlementDelta((prev) => prev - 1)
                 }}
@@ -296,19 +296,9 @@ const AssignEntitlementModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div className="max-sm:w-screen sm:min-w-[640px] lg:min-w-[764px] w-fit">
-        {!paymentData?.paymentMethodID ? (
-          <section className="mx-5 mt-5">
-            <ToastWithLink
-              message="Update your Payment Information to enable purchasing"
-              linkHref={`/billing/payment`}
-              type={'warning'}
-              linkText="Update payment information"
-            />
-          </section>
-        ) : null}
         <div
           className="pb-2 pt-5 px-5
-        flex flex-row items-start justify-between w-full"
+      flex flex-row items-start justify-between w-full"
         >
           <div className="flex flex-col items-start">
             <Text
@@ -324,7 +314,7 @@ const AssignEntitlementModal = ({
           </div>
           <div
             className={`bg-white p-2 rounded-lg text-xl cursor-pointer
-                        hover:bg-[#F3F4F6]`}
+                      hover:bg-[#F3F4F6]`}
             onClick={() => {
               setIsOpen(false)
             }}
@@ -332,6 +322,16 @@ const AssignEntitlementModal = ({
             <HiOutlineX />
           </div>
         </div>
+        {!paymentData?.paymentMethodID ? (
+          <section className="mx-5 mb-3">
+            <ToastWithLink
+              message="Update your Payment Information to enable purchasing"
+              linkHref={`/billing/payment`}
+              type={'warning'}
+              linkText="Update payment information"
+            />
+          </section>
+        ) : null}
         <div className="mb-5 w-full">
           <section className="border-t thin-scrollbar w-full my-4">
             <ul>
@@ -340,7 +340,7 @@ const AssignEntitlementModal = ({
                   <li
                     key={app.clientId}
                     className="flex flex-row items-center justify-between
-                  py-1.5 border-b px-5"
+                py-1.5 border-b px-5"
                   >
                     <div className="flex flex-col items-start">
                       <Text>{app.name}</Text>
@@ -464,7 +464,7 @@ const RemoveEntitelmentModal = ({
           </Text>
           <div
             className={`bg-white p-2 rounded-lg text-xl cursor-pointer
-                        hover:bg-[#F3F4F6]`}
+                      hover:bg-[#F3F4F6]`}
             onClick={() => {
               setIsOpen(false)
             }}
@@ -530,9 +530,9 @@ const RemoveEntitelmentModal = ({
                         <div>
                           <Listbox.Button
                             className="relative w-full cursor-default border
-                    py-1.5 px-4 text-left sm:text-sm rounded-lg
-                    focus:border-indigo-500 focus:outline-none focus:ring-1
-                    flex flex-row space-x-3 items-center"
+                  py-1.5 px-4 text-left sm:text-sm rounded-lg
+                  focus:border-indigo-500 focus:outline-none focus:ring-1
+                  flex flex-row space-x-3 items-center"
                           >
                             <Text size="sm">{proEntitlementNew}</Text>
                             {open ? (
@@ -551,34 +551,34 @@ const RemoveEntitelmentModal = ({
                           >
                             <Listbox.Options
                               className="absolute no-scrollbar w-full bg-white
-                          rounded-lg border max-h-[200px] max-w-[66.1833px] overflow-auto"
+                        rounded-lg border max-h-[150px] max-w-[66.1833px] overflow-auto"
                             >
                               {Array.apply(null, Array(entitlements + 1)).map(
                                 (_, i) => {
-                                  return (
+                                  return i >= entitlementUsage ? (
                                     <Listbox.Option
                                       key={i}
                                       value={i}
                                       className="flex items-center
-                                  cursor-pointer hover:bg-gray-100
-                                  rounded-lg m-1"
+                                cursor-pointer hover:bg-gray-100
+                                rounded-lg m-1"
                                     >
                                       {({ selected }) => {
                                         return (
                                           <div
                                             className={`w-full h-full px-4 py-1.5
-                                        rounded-lg ${
-                                          selected
-                                            ? 'bg-gray-100  font-medium'
-                                            : ''
-                                        }`}
+                                      rounded-lg ${
+                                        selected
+                                          ? 'bg-gray-100  font-medium'
+                                          : ''
+                                      }`}
                                           >
                                             {i}
                                           </div>
                                         )
                                       }}
                                     </Listbox.Option>
-                                  )
+                                  ) : null
                                 }
                               )}
                             </Listbox.Options>
