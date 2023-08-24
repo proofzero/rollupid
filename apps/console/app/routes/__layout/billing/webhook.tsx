@@ -4,7 +4,6 @@ import { type ActionFunction } from '@remix-run/cloudflare'
 
 import Stripe from 'stripe'
 import createCoreClient from '@proofzero/platform-clients/core'
-import { type IdentityURN } from '@proofzero/urns/identity'
 
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { reconcileAppSubscriptions } from '~/services/billing/stripe'
@@ -66,8 +65,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           id: string
           latest_invoice: string
           metadata: {
-            identityURN?: IdentityURN
-            accountURN?: AccountURN
             URN?: BillingCustomerURN
           }
           status: string
@@ -84,9 +81,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           return null
         }
 
-        URN = (subMeta.URN ??
-          subMeta.accountURN ??
-          subMeta.identityURN) as BillingCustomerURN
+        URN = subMeta.URN as BillingCustomerURN
 
         const entitlements = await coreClient.billing.getEntitlements.query({
           URN,
@@ -121,15 +116,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             default_payment_method: string
           }
           metadata: {
-            identityURN?: IdentityURN
-            accountURN?: AccountURN
             URN?: BillingCustomerURN
           }
         }
 
-        URN = (cusMeta.URN ??
-          cusMeta.accountURN ??
-          cusMeta.identityURN) as BillingCustomerURN
+        URN = cusMeta.URN as BillingCustomerURN
 
         if (invoice_settings?.default_payment_method) {
           const paymentData =
@@ -225,7 +216,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           await createAnalyticsEvent({
             eventName: 'identity_purchased_entitlement',
             apiKey: context.env.POSTHOG_API_KEY,
-            distinctId: customerDataSuccess.metadata.identityURN,
+            distinctId: customerDataSuccess.metadata.URN,
             properties: {
               plans: purchasedItems.map((item) => ({
                 quantity: item.quantity,
@@ -283,8 +274,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           customer: string
           id: string
           metadata: {
-            identityURN?: IdentityURN
-            accountURN?: AccountURN
             URN?: BillingCustomerURN
           }
         }
@@ -294,9 +283,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         if (!customerDataDel.deleted && customerDataDel.email) {
           const { email, name } = customerDataDel
 
-          URN = (metaDel.URN ??
-            metaDel.accountURN ??
-            metaDel.identityURN) as BillingCustomerURN
+          URN = metaDel.URN as BillingCustomerURN
 
           await Promise.all([
             coreClient.account.sendBillingNotification.mutate({
