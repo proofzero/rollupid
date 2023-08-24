@@ -37,11 +37,7 @@ import icon32 from './images/favicon-32x32.png'
 import icon16 from './images/favicon-16x16.png'
 
 import * as gtag from '~/utils/gtags.client'
-import {
-  commitFlashSession,
-  parseJwt,
-  requireJWT,
-} from './utilities/session.server'
+import { parseJwt, requireJWT } from './utilities/session.server'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
@@ -101,10 +97,6 @@ export type LoaderData = {
     WALLET_CONNECT_PROJECT_ID: string
   }
   identityURN: IdentityURN
-  toasts: {
-    message: string
-    type: ToastType
-  }[]
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -124,11 +116,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
     const parsedJwt = parseJwt(jwt)
     const identityURN = parsedJwt.sub as IdentityURN
-
-    const { flashSession, toasts } = await getToastsAndFlashSession(
-      request,
-      context.env
-    )
 
     try {
       const coreClient = createCoreClient(context.env.Core, {
@@ -187,53 +174,42 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
       let unpaidInvoiceURL = '/billing/portal'
 
-      const hasUnpaidInvoices = invoices.some((invoice) => {
-        if (invoice.status)
-          if (['uncollectible', 'open'].includes(invoice.status)) {
-            unpaidInvoiceURL = invoice.url as string
-            return true
-          }
-        return false
-      })
+      let hasUnpaidInvoices = false
+      try {
+        hasUnpaidInvoices = invoices.some((invoice) => {
+          if (invoice.status)
+            if (['uncollectible', 'open'].includes(invoice.status)) {
+              unpaidInvoiceURL = invoice.url as string
+              return true
+            }
+          return false
+        })
+      } catch (e) {
+        console.error('Could not retrieve invoices.', e)
+      }
 
-      return json<LoaderData>(
-        {
-          apps: reshapedApps,
-          avatarUrl,
-          hasUnpaidInvoices,
-          unpaidInvoiceURL,
-          PASSPORT_URL,
-          ENV: {
-            POSTHOG_API_KEY,
-            POSTHOG_PROXY_HOST,
-            INTERNAL_GOOGLE_ANALYTICS_TAG,
-            REMIX_DEV_SERVER_WS_PORT:
-              process.env.NODE_ENV === 'development'
-                ? +process.env.REMIX_DEV_SERVER_WS_PORT!
-                : undefined,
-            WALLET_CONNECT_PROJECT_ID,
-          },
-          displayName,
-          identityURN,
-          toasts,
+      return json<LoaderData>({
+        apps: reshapedApps,
+        avatarUrl,
+        hasUnpaidInvoices,
+        unpaidInvoiceURL,
+        PASSPORT_URL,
+        ENV: {
+          POSTHOG_API_KEY,
+          POSTHOG_PROXY_HOST,
+          INTERNAL_GOOGLE_ANALYTICS_TAG,
+          REMIX_DEV_SERVER_WS_PORT:
+            process.env.NODE_ENV === 'development'
+              ? +process.env.REMIX_DEV_SERVER_WS_PORT!
+              : undefined,
+          WALLET_CONNECT_PROJECT_ID,
         },
-        {
-          headers: {
-            'Set-Cookie': await commitFlashSession(flashSession, context.env),
-          },
-        }
-      )
+        displayName,
+        identityURN,
+      })
     } catch (error) {
       console.error({ error })
-      return json(
-        { error, toasts },
-        {
-          status: 500,
-          headers: {
-            'Set-Cookie': await commitFlashSession(flashSession, context.env),
-          },
-        }
-      )
+      return json({ error }, { status: 500 })
     }
   }
 )
@@ -279,7 +255,6 @@ export default function App() {
     identityURN,
     hasUnpaidInvoices,
     unpaidInvoiceURL,
-    toasts,
   } = loaderData ?? {}
 
   useEffect(() => {
@@ -287,16 +262,6 @@ export default function App() {
       gtag.pageview(location.pathname, GATag)
     }
   }, [location, GATag])
-
-  useEffect(() => {
-    if (!toasts || !toasts.length) return
-
-    for (const { type, message } of toasts) {
-      toast(type, {
-        message: message,
-      })
-    }
-  }, [toasts])
 
   const hydrated = useHydrated()
   useEffect(() => {
@@ -377,7 +342,6 @@ export default function App() {
             }}
           />
         )}
-        <Toaster position="top-right" reverseOrder={false} />
         <ScrollRestoration nonce={nonce} />
         <script
           nonce={nonce}

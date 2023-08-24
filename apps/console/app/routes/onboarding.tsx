@@ -22,6 +22,8 @@ import { Menu, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
 import { HiOutlineBookOpen, HiOutlineLogout } from 'react-icons/hi'
 import { TbUserCog } from 'react-icons/tb'
+import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
+import { Toaster } from '@proofzero/design-system/src/atoms/toast'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -76,6 +78,8 @@ export default function Onboarding() {
     profile: Profile
   }>()
 
+  useConnectResult()
+
   const submit = useSubmit()
 
   return (
@@ -98,6 +102,7 @@ export default function Onboarding() {
           />
         </div>
       </div>
+      <Toaster position="top-right" reverseOrder={false} />
 
       <Menu as="div" className="absolute top-7 right-7">
         {({ close }) => {
