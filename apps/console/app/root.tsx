@@ -127,9 +127,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         URN: identityURN,
       })
 
+      const profile = await coreClient.identity.getProfile.query({
+        identity: identityURN,
+      })
+
       if (
-        !spd?.email &&
-        !isMemberOfAnyGroup &&
+        !profile?.consoleOnboardingData?.isComplete &&
         !request.url.includes('/onboarding')
       ) {
         return redirect('/onboarding')

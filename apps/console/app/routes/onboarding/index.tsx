@@ -23,36 +23,78 @@ import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import type { AccountURN } from '@proofzero/urns/account'
+import type { Profile } from '@proofzero/platform.identity/src/types'
+import { checkToken } from '@proofzero/utils/token'
+import type { IdentityURN } from '@proofzero/urns/identity'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
     const formData = await request.formData()
 
     const jwt = await requireJWT(request, context.env)
+    const payload = checkToken(jwt!)
+    const identityURN = payload.sub as IdentityURN
 
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
+    const profile = await coreClient.identity.getProfile.query({
+      identity: identityURN,
+    })
+
     try {
-      const clientName = formData.get('clientName') as string
-      const account = formData.get('account') as AccountURN
+      const op = formData.get('op') as string
 
-      if (!clientName?.length || !account?.length)
-        throw new BadRequestError({
-          message: 'App name and email address are required',
-        })
-      const { clientId } = await coreClient.starbase.createApp.mutate({
-        clientName,
-      })
+      switch (op) {
+        case 'setOrgType':
+          const orgType = formData.get('orgType') as 'solo' | 'team'
+          if (profile) {
+            await coreClient.identity.setProfile.mutate({
+              name: identityURN,
+              profile: {
+                ...profile,
+                consoleOnboardingData: {
+                  orgType,
+                },
+              },
+            })
+          }
+          return json({ success: true, orgType })
+        case 'createApp':
+          const clientName = formData.get('clientName') as string
+          const account = formData.get('account') as AccountURN
 
-      await coreClient.starbase.upsertAppContactAddress.mutate({
-        account,
-        clientId,
-      })
+          if (!clientName?.length || !account?.length)
+            throw new BadRequestError({
+              message: 'App name and email address are required',
+            })
+          const { clientId } = await coreClient.starbase.createApp.mutate({
+            clientName,
+          })
 
-      return json({ clientId, success: true })
+          await coreClient.starbase.upsertAppContactAddress.mutate({
+            account,
+            clientId,
+          })
+
+          if (profile) {
+            await coreClient.identity.setProfile.mutate({
+              name: identityURN,
+              profile: {
+                ...profile,
+                consoleOnboardingData: {
+                  ...profile.consoleOnboardingData,
+                  // And user will never see this page again.
+                  isComplete: true,
+                },
+              },
+            })
+          }
+
+          return json({ clientId, success: true })
+      }
     } catch (error) {
       console.error({ error })
       return new InternalServerError({
@@ -121,6 +163,14 @@ const SelectOrgType = ({
   setOrgType: (value: 'solo' | 'team') => void
 }) => {
   const [selectedType, setSelectedType] = useState<'solo' | 'team'>('solo')
+  const fetcher = useFetcher()
+
+  useEffect(() => {
+    if (fetcher.state === 'idle' && fetcher.data?.success) {
+      setOrgType(fetcher.data.orgType)
+      setPage(page + 1)
+    }
+  }, [fetcher.state])
 
   return (
     <div
@@ -143,7 +193,7 @@ const SelectOrgType = ({
         header="I'm solo developer"
         description="I'm setting up app for myself"
         selected={selectedType === 'solo'}
-        onClick={() => setOrgType('solo')}
+        onClick={() => setSelectedType('solo')}
         type="solo"
         setSelectedType={setSelectedType}
       />
@@ -153,15 +203,21 @@ const SelectOrgType = ({
         description="I'm setting up app for a team"
         disabled={true}
         selected={selectedType === 'team'}
-        onClick={() => setOrgType('team')}
+        onClick={() => setSelectedType('team')}
         type="team"
         setSelectedType={setSelectedType}
       />
       <Button
         className="w-full"
         btnType="primary-alt"
+        disabled={!selectedType?.length}
         btnSize="xl"
-        onClick={() => setPage(page + 1)}
+        onClick={() =>
+          fetcher.submit(
+            { op: 'setOrgType', orgType: selectedType },
+            { method: 'post' }
+          )
+        }
       >
         Continue
       </Button>
@@ -510,7 +566,7 @@ const CreateApp = ({
         onClick={() => {
           if (emailAccountURN) {
             fetcher.submit(
-              { clientName, account: emailAccountURN },
+              { op: 'createApp', clientName, account: emailAccountURN },
               { method: 'post' }
             )
           }
@@ -596,15 +652,19 @@ const CongratsPage = ({
 }
 
 export default function Landing() {
-  const { connectedEmails, PASSPORT_URL } = useOutletContext<{
+  const { connectedEmails, PASSPORT_URL, profile } = useOutletContext<{
     connectedEmails: DropdownSelectListItem[]
     PASSPORT_URL: string
+    profile: Profile
   }>()
 
-  const [page, setPage] = useState(0)
+  const [orgType, setOrgType] = useState<'solo' | 'team' | undefined>(
+    profile.consoleOnboardingData?.orgType
+  )
   const [clientId, setClientId] = useState('')
   const [emailAccountURN, setEmailAccountURN] = useState<AccountURN>()
-  const [orgType, setOrgType] = useState<'solo' | 'team'>('solo')
+
+  const [page, setPage] = useState(orgType ? 1 : 0)
 
   return (
     <div

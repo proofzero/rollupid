@@ -15,6 +15,7 @@ import type { IdentityURN } from '@proofzero/urns/identity'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getEmailDropdownItems } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { type DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import type { Profile } from '@proofzero/platform.identity/src/types'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -27,16 +28,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const spd = await coreClient.identity.getStripePaymentData.query({
-      identityURN,
+    const profile = await coreClient.identity.getProfile.query({
+      identity: identityURN,
     })
 
-    const isMemberOfAnyGroup =
-      await coreClient.identity.isMemberOfAnyGroup.query({
-        identityURN,
-      })
-
-    if (spd?.email || isMemberOfAnyGroup) {
+    if (profile?.consoleOnboardingData?.isComplete) {
       return redirect('/')
     }
 
@@ -46,6 +42,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
     return json({
+      profile,
       connectedEmails,
       PASSPORT_URL: context.env.PASSPORT_URL,
     })
@@ -64,9 +61,10 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 }
 
 export default function Onboarding() {
-  const { connectedEmails, PASSPORT_URL } = useLoaderData<{
+  const { connectedEmails, PASSPORT_URL, profile } = useLoaderData<{
     connectedEmails: DropdownSelectListItem[]
     PASSPORT_URL: string
+    profile: Profile
   }>()
 
   return (
@@ -79,7 +77,7 @@ export default function Onboarding() {
             'basis-full 2xl:basis-2/5 flex items-start justify-center py-[2.5%] h-full'
           }
         >
-          <Outlet context={{ connectedEmails, PASSPORT_URL }} />
+          <Outlet context={{ connectedEmails, PASSPORT_URL, profile }} />
         </div>
         <div className="basis-3/5 h-[100dvh] w-full hidden 2xl:flex justify-end items-center bg-gray-50 dark:bg-gray-800 overflow-hidden">
           <img
