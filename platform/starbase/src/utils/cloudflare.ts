@@ -153,7 +153,6 @@ export const deleteWorkerRoute = async (
 
 export const getExpectedCustomDomainDNSRecords = async (
   customHostname: string,
-  passportUrl: string,
   ctx: Context
 ): Promise<CustomDomainDNSRecords> => {
   const result: CustomDomainDNSRecords = []
@@ -161,7 +160,7 @@ export const getExpectedCustomDomainDNSRecords = async (
   result.push({
     name: customHostname,
     record_type: 'CNAME',
-    expected_value: passportUrl,
+    expected_value: new URL(ctx.PASSPORT_URL).hostname,
   })
 
   result.push({

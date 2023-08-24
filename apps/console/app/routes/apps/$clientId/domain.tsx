@@ -47,7 +47,7 @@ import domainSVG from '~/assets/early/domain.svg'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { HiOutlineX } from 'react-icons/hi'
 
-type AppData = { customDomain?: CustomDomain; hostname: string; cname: string }
+type AppData = { customDomain?: CustomDomain; cname: string }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
@@ -64,9 +64,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       clientId,
     })
 
-    const { hostname } = new URL(context.env.PASSPORT_URL)
-
-    return json({ customDomain, hostname })
+    return json({ customDomain })
   }
 )
 
@@ -91,9 +89,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       context.env
     )
 
-    const passportUrl = new URL(context.env.PASSPORT_URL)
-    const { hostname } = passportUrl
-
     if (request.method === 'PUT') {
       const formData = await request.formData()
 
@@ -104,7 +99,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       const customDomain = await coreClient.starbase.createCustomDomain.mutate({
         clientId,
         hostname,
-        passportHostname: passportUrl.hostname,
       })
 
       return json({ customDomain, hostname })
@@ -113,10 +107,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         clientId,
         refresh: true,
       })
-      return json({ customDomain, hostname })
+      return json({ customDomain })
     } else if (request.method === 'DELETE') {
       await coreClient.starbase.deleteCustomDomain.mutate({ clientId })
-      return json({ customDomain: null, hostname })
+      return json({ customDomain: null })
     }
   }
 )
@@ -220,11 +214,7 @@ type HostnameStatusProps = {
   hostname: string
 }
 
-const HostnameStatus = ({
-  fetcher,
-  customDomain,
-  hostname,
-}: HostnameStatusProps) => {
+const HostnameStatus = ({ fetcher, customDomain }: HostnameStatusProps) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const isPreValidated =
     customDomain.status === 'active' && customDomain.ssl.status === 'active'
