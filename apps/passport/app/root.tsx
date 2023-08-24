@@ -263,8 +263,6 @@ export default function App() {
     }
   }, [hydrated])
 
-  console.log({ browserEnv })
-
   return (
     <html lang="en">
       <head>
