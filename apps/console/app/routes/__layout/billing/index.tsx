@@ -404,18 +404,7 @@ const PurchaseProModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div className="max-sm:w-screen sm:min-w-[640px] lg:min-w-[764px] w-fit">
-        {!paymentData?.paymentMethodID ? (
-          <section className="mx-5 mt-5">
-            <ToastWithLink
-              message="Update your Payment Information to enable purchasing"
-              linkHref={`/billing/payment`}
-              type={'warning'}
-              linkText="Update payment information"
-            />
-          </section>
-        ) : null}
-
-        <div className="flex flex-row justify-between w-full pb-2 pt-5 px-5 items-center">
+        <div className="flex flex-row justify-between w-full pt-5 pb-3 px-5 items-center">
           <Text
             size="lg"
             weight="semibold"
@@ -433,6 +422,17 @@ const PurchaseProModal = ({
             <HiOutlineX />
           </div>
         </div>
+
+        {!paymentData?.paymentMethodID ? (
+          <section className="mx-5 mb-3">
+            <ToastWithLink
+              message="Update your Payment Information to enable purchasing"
+              linkHref={`/billing/payment`}
+              type={'warning'}
+              linkText="Update payment information"
+            />
+          </section>
+        ) : null}
 
         <section className="mx-5 mb-5 border rounded-lg overflow-auto thin-scrollbar">
           <div className="p-6">
@@ -583,16 +583,6 @@ const AssignEntitlementModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
       <div className="max-sm:w-screen sm:min-w-[640px] lg:min-w-[764px] w-fit">
-        {!paymentData?.paymentMethodID ? (
-          <section className="mx-5 mt-5">
-            <ToastWithLink
-              message="Update your Payment Information to enable purchasing"
-              linkHref={`/billing/payment`}
-              type={'warning'}
-              linkText="Update payment information"
-            />
-          </section>
-        ) : null}
         <div
           className="pb-2 pt-5 px-5
       flex flex-row items-start justify-between w-full"
@@ -619,6 +609,16 @@ const AssignEntitlementModal = ({
             <HiOutlineX />
           </div>
         </div>
+        {!paymentData?.paymentMethodID ? (
+          <section className="mx-5 mb-3">
+            <ToastWithLink
+              message="Update your Payment Information to enable purchasing"
+              linkHref={`/billing/payment`}
+              type={'warning'}
+              linkText="Update payment information"
+            />
+          </section>
+        ) : null}
         <div className="mb-5 w-full">
           <section className="border-t thin-scrollbar w-full my-4">
             <ul>
@@ -838,11 +838,11 @@ const RemoveEntitelmentModal = ({
                           >
                             <Listbox.Options
                               className="absolute no-scrollbar w-full bg-white
-                        rounded-lg border max-h-[200px] max-w-[66.1833px] overflow-auto"
+                        rounded-lg border max-h-[150px] max-w-[66.1833px] overflow-auto"
                             >
                               {Array.apply(null, Array(entitlements + 1)).map(
                                 (_, i) => {
-                                  return (
+                                  return i >= entitlementUsage ? (
                                     <Listbox.Option
                                       key={i}
                                       value={i}
@@ -865,7 +865,7 @@ const RemoveEntitelmentModal = ({
                                         )
                                       }}
                                     </Listbox.Option>
-                                  )
+                                  ) : null
                                 }
                               )}
                             </Listbox.Options>
