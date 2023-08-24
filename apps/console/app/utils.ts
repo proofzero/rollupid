@@ -105,7 +105,7 @@ export const redirectToPassport = ({
   login_hint,
   scope = '',
   state = 'skip',
-  rollup_action = 'connect',
+  rollup_action,
 }: {
   PASSPORT_URL: string
   login_hint: string
@@ -122,7 +122,7 @@ export const redirectToPassport = ({
   qp.append('client_id', 'console')
 
   qp.append('redirect_uri', currentURL.toString())
-  qp.append('rollup_action', rollup_action)
+  if (rollup_action) qp.append('rollup_action', rollup_action)
   qp.append('login_hint', login_hint)
 
   window.location.href = `${PASSPORT_URL}/authorize?${qp.toString()}`

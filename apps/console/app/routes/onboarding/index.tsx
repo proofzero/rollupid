@@ -291,6 +291,7 @@ const ConnectEmail = ({
             redirectToPassport({
               PASSPORT_URL,
               login_hint: 'email microsoft google apple',
+              rollup_action: 'connect',
             })
           }
           className="w-full"
@@ -341,6 +342,7 @@ const ConnectEmail = ({
               redirectToPassport({
                 PASSPORT_URL,
                 login_hint: 'email microsoft google apple',
+                rollup_action: 'connect',
               })
             }
             ConnectButtonPhrase="Connect New Email Address"

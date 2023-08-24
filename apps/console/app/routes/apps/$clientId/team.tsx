@@ -181,6 +181,7 @@ export default () => {
                 redirectToPassport({
                   PASSPORT_URL,
                   login_hint: 'email microsoft google apple',
+                  rollup_action: 'connect',
                 })
               }
               btnType="secondary-alt"
@@ -243,6 +244,7 @@ export default () => {
                   redirectToPassport({
                     PASSPORT_URL,
                     login_hint: 'email microsoft google apple',
+                    rollup_action: 'connect',
                   })
                 }
                 ConnectButtonPhrase="Connect New Email Address"
