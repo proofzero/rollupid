@@ -31,6 +31,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     if (!spd?.email?.length) {
       return redirect('/onboarding')
     }
+    return null
   }
 )
 
