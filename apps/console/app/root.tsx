@@ -123,7 +123,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         ...traceHeader,
       })
       const apps = await coreClient.starbase.listApps.query()
-
       const reshapedApps = apps.map((a) => {
         return {
           clientId: a.clientId,
