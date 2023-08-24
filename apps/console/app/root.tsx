@@ -124,15 +124,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
       const apps = await coreClient.starbase.listApps.query()
 
-      const isMemberOfAnyGroup =
-        await coreClient.identity.isMemberOfAnyGroup.query({
-          identityURN,
-        })
-
-      const spd = await coreClient.billing.getStripePaymentData.query({
-        URN: identityURN,
-      })
-
       const reshapedApps = apps.map((a) => {
         return {
           clientId: a.clientId,
@@ -164,6 +155,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         INTERNAL_GOOGLE_ANALYTICS_TAG,
         WALLET_CONNECT_PROJECT_ID,
       } = context.env
+
+      const spd = await coreClient.billing.getStripePaymentData.query({
+        URN: identityURN,
+      })
 
       // might be quite heavy object
       // for that reason I don't put it in outlet context

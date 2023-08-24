@@ -65,11 +65,6 @@ import {
   getIdentityGroupMemberInvitations,
 } from './methods/identity-groups/getIdentityGroupMemberInvitations'
 import {
-  IsMemberOfAnyGroupInputSchema,
-  IsMemberOfAnyGroupOutputSchema,
-  isMemberOfAnyGroup,
-} from './methods/identity-groups/isMemberOfAnyGroup'
-import {
   GetIdentityGroupMemberInvitationDetailsInputSchema,
   GetIdentityGroupMemberInvitationDetailsOutputSchema,
   getIdentityGroupMemberInvitationDetails,
@@ -225,12 +220,6 @@ export const appRouter = t.router({
     .input(GetIdentityGroupMemberInvitationDetailsInputSchema)
     .output(GetIdentityGroupMemberInvitationDetailsOutputSchema)
     .query(getIdentityGroupMemberInvitationDetails),
-  isMemberOfAnyGroup: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .input(IsMemberOfAnyGroupInputSchema)
-    .output(IsMemberOfAnyGroupOutputSchema)
-    .query(isMemberOfAnyGroup),
   acceptIdentityGroupMemberInvitation: t.procedure
     .use(LogUsage)
     .use(Analytics)
