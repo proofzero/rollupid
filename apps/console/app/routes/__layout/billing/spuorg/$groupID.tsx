@@ -31,9 +31,14 @@ import { ToastWarning } from '@proofzero/design-system/src/atoms/toast/ToastWarn
 import plans from '../../../../utils/plans'
 import { ServicePlanType } from '@proofzero/types/billing'
 import { PlanCard } from '~/components/Billing'
-import { LoaderData, loader as billingLoader } from '../loader'
+import {
+  LoaderData,
+  loader as billingLoader,
+  action as billingAction,
+} from '../ops'
 
-export const loader: LoaderFunction = billingLoader
+export const loader = billingLoader
+export const action = billingAction
 
 export default () => {
   const loaderData = useLoaderData<LoaderData>()

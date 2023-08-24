@@ -1,29 +1,10 @@
 import { Button } from '@proofzero/design-system'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import {
-  type ActionFunction,
-  type LoaderFunction,
-  json,
-} from '@remix-run/cloudflare'
 import {
   HiOutlineCreditCard,
   HiOutlineMail,
   HiInformationCircle,
 } from 'react-icons/hi'
-import {
-  commitFlashSession,
-  getFlashSession,
-  requireJWT,
-} from '~/utilities/session.server'
-import createCoreClient, {
-  type CoreClientType,
-} from '@proofzero/platform-clients/core'
-import {
-  getAuthzHeaderConditionallyFromToken,
-  parseJwt,
-} from '@proofzero/utils'
 import {
   Link,
   NavLink,
@@ -35,11 +16,7 @@ import {
 } from '@remix-run/react'
 import type { LoaderData as OutletContextData } from '~/root'
 import { useEffect, useState } from 'react'
-import {
-  ToastType,
-  Toaster,
-  toast,
-} from '@proofzero/design-system/src/atoms/toast'
+import { Toaster, toast } from '@proofzero/design-system/src/atoms/toast'
 import plans from '../../../utils/plans'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
@@ -50,158 +27,22 @@ import {
 } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 import { DangerPill } from '@proofzero/design-system/src/atoms/pills/DangerPill'
-import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { useHydrated } from 'remix-utils'
 import _ from 'lodash'
-import { BadRequestError } from '@proofzero/errors'
-import {
-  createOrUpdateSubscription,
-  getCurrentAndUpcomingInvoices,
-  process3DSecureCard,
-  UnpaidInvoiceNotification,
-} from '~/utils/billing'
+import { process3DSecureCard } from '~/utils/billing'
 import { IoWarningOutline } from 'react-icons/io5'
-import { setPurchaseToastNotification } from '~/utils'
-import type Stripe from 'stripe'
 import { ToastWarning } from '@proofzero/design-system/src/atoms/toast/ToastWarning'
 import { Toast } from '@proofzero/design-system/src/atoms/toast/Toast'
 import { ServicePlanType } from '@proofzero/types/billing'
-import { IdentityURN } from '@proofzero/urns/identity'
 import { PlanCard } from '~/components/Billing'
-import { LoaderData, loader as billingLoader } from './loader'
+import {
+  LoaderData,
+  loader as billingLoader,
+  action as billingAction,
+} from './ops'
 
-export const loader: LoaderFunction = billingLoader
-
-export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, context }) => {
-    const jwt = await requireJWT(request, context.env)
-    const parsedJwt = parseJwt(jwt!)
-    const identityURN = parsedJwt.sub as IdentityURN
-
-    const traceHeader = generateTraceContextHeaders(context.traceSpan)
-
-    const coreClient: CoreClientType = createCoreClient(context.env.Core, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-
-    const spd = await coreClient.billing.getStripePaymentData.query({
-      URN: identityURN,
-    })
-
-    const invoices = await getCurrentAndUpcomingInvoices(
-      spd,
-      context.env.SECRET_STRIPE_API_KEY
-    )
-
-    const flashSession = await getFlashSession(request, context.env)
-
-    await UnpaidInvoiceNotification({
-      invoices,
-      flashSession,
-      env: context.env,
-    })
-
-    const fd = await request.formData()
-    const { customerID, quantity, txType } = JSON.parse(
-      fd.get('payload') as string
-    ) as {
-      customerID: string
-      quantity: number
-      txType: 'buy' | 'remove'
-    }
-
-    const apps = await coreClient.starbase.listApps.query()
-    const assignedEntitlementCount = apps.filter(
-      (a) => a.appPlan === ServicePlanType.PRO
-    ).length
-    if (assignedEntitlementCount > quantity) {
-      throw new BadRequestError({
-        message: `Invalid quantity. Change ${
-          quantity - assignedEntitlementCount
-        } of the ${assignedEntitlementCount} apps to a different plan first.`,
-      })
-    }
-
-    if ((quantity < 1 && txType === 'buy') || quantity < 0) {
-      throw new BadRequestError({
-        message: `Invalid quantity. Please enter a valid number of entitlements.`,
-      })
-    }
-
-    const entitlements = await coreClient.billing.getEntitlements.query({
-      URN: identityURN,
-    })
-
-    const sub = await createOrUpdateSubscription({
-      customerID,
-      SECRET_STRIPE_PRO_PLAN_ID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
-      SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
-      quantity,
-      subscriptionID: entitlements.subscriptionID,
-      URN: identityURN,
-    })
-
-    if (
-      (txType === 'buy' &&
-        (sub.status === 'active' || sub.status === 'trialing')) ||
-      txType !== 'buy'
-    ) {
-      await reconcileAppSubscriptions(
-        {
-          subscriptionID: sub.id,
-          URN: identityURN,
-          coreClient,
-          billingURL: `${context.env.CONSOLE_URL}/billing`,
-          settingsURL: `${context.env.CONSOLE_URL}`,
-        },
-        context.env
-      )
-    }
-
-    if (txType === 'buy') {
-      setPurchaseToastNotification({
-        sub,
-        flashSession,
-      })
-    }
-    if (txType === 'remove') {
-      flashSession.flash(
-        'toast_notification',
-        JSON.stringify({
-          type: ToastType.Success,
-          message: 'Entitlement(s) successfully removed',
-        })
-      )
-    }
-
-    let status, client_secret, payment_method
-    if (
-      sub.latest_invoice &&
-      (sub.latest_invoice as Stripe.Invoice).payment_intent
-    ) {
-      // lots of stripe type casting since by default many
-      // props are strings (not expanded versions)
-      ;({ status, client_secret, payment_method } = (
-        sub.latest_invoice as Stripe.Invoice
-      ).payment_intent as Stripe.PaymentIntent)
-    }
-
-    return json(
-      {
-        status,
-        client_secret,
-        payment_method,
-        subId: sub.id,
-      },
-      {
-        headers: {
-          'Set-Cookie': await commitFlashSession(flashSession, context.env),
-        },
-      }
-    )
-  }
-)
+export const loader = billingLoader
+export const action = billingAction
 
 export default () => {
   const loaderData = useLoaderData<LoaderData>()
