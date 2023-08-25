@@ -140,12 +140,14 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
 
     await authorizationNode.class.deleteAll()
 
-    await createAnalyticsEvent({
-      apiKey: ctx.POSTHOG_API_KEY,
-      distinctId: identityURN,
-      eventName: 'identity_revoked_authorization',
-      properties: {
-        $groups: { app: clientId },
-      },
-    })
+    ctx.waitUntil?.(
+      createAnalyticsEvent({
+        apiKey: ctx.POSTHOG_API_KEY,
+        distinctId: identityURN,
+        eventName: 'identity_revoked_authorization',
+        properties: {
+          $groups: { app: clientId },
+        },
+      })
+    )
   }

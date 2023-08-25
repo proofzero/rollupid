@@ -58,14 +58,16 @@ export const publishApp = async ({
 
   await appDO.class.publish(input.published)
 
-  await createAnalyticsEvent({
-    distinctId: ctx.identityURN as IdentityURN,
-    eventName: input.published
-      ? 'identity_published_app'
-      : 'identity_unpublished_app',
-    apiKey: ctx.POSTHOG_API_KEY,
-    properties: { $groups: { app: input.clientId } },
-  })
+  ctx.waitUntil?.(
+    createAnalyticsEvent({
+      distinctId: ctx.identityURN as IdentityURN,
+      eventName: input.published
+        ? 'identity_published_app'
+        : 'identity_unpublished_app',
+      apiKey: ctx.POSTHOG_API_KEY,
+      properties: { $groups: { app: input.clientId } },
+    })
+  )
 
   return {
     published: true,

@@ -72,7 +72,10 @@ export interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(
-  opts: CreateInnerContextOptions & Environment
+  opts: CreateInnerContextOptions &
+    Environment & {
+      waitUntil?: (promise: Promise<unknown>) => void
+    }
 ) {
   const traceSpan = generateTraceSpan(opts.req?.headers)
   return {
@@ -92,7 +95,9 @@ export async function createContextInner(
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContext(
-  opts: FetchCreateContextFnOptions,
+  opts: FetchCreateContextFnOptions & {
+    waitUntil?: (promise: Promise<unknown>) => void
+  },
   env: Environment
 ) {
   const { req } = opts

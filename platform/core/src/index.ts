@@ -15,14 +15,25 @@ export { Authorization, ExchangeCode } from '@proofzero/platform.authorization'
 export { StarbaseApplication } from '@proofzero/platform.starbase'
 
 export default {
-  async fetch(request: Request, env: Environment): Promise<Response> {
+  async fetch(
+    request: Request,
+    env: Environment,
+    ctx: ExecutionContext
+  ): Promise<Response> {
     return fetchRequestHandler({
       endpoint: '/trpc',
       req: request,
       router,
       onError,
-      createContext: (opts: FetchCreateContextFnOptions) =>
-        createContext(opts, env),
+      createContext: (
+        opts: FetchCreateContextFnOptions & {
+          // It doesn't exist on native tRPC types, so we can't force it here
+          waitUntil?: (promise: Promise<unknown>) => void
+        }
+      ) => {
+        Object.assign(opts, { waitUntil: ctx.waitUntil.bind(ctx) })
+        return createContext(opts, env)
+      },
     })
   },
 }

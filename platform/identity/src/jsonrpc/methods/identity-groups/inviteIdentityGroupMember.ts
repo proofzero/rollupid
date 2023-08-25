@@ -88,14 +88,16 @@ export const inviteIdentityGroupMember = async ({
     inviteCode,
   })
 
-  await createAnalyticsEvent({
-    eventName: 'group_invited_member',
-    distinctId: inviterIdentityURN,
-    apiKey: ctx.POSTHOG_API_KEY,
-    properties: {
-      $groups: { group: identityGroupURN },
-    },
-  })
+  ctx.waitUntil?.(
+    createAnalyticsEvent({
+      eventName: 'group_invited_member',
+      distinctId: inviterIdentityURN,
+      apiKey: ctx.POSTHOG_API_KEY,
+      properties: {
+        $groups: { group: identityGroupURN },
+      },
+    })
+  )
 
   return {
     inviteCode,

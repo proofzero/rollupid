@@ -57,31 +57,35 @@ export const createApp = async ({
     console.log(`Created app ${clientId} for account ${ctx.accountURN}`)
   }
 
-  await createAnalyticsEvent({
-    eventName: '$groupidentify',
-    apiKey: ctx.POSTHOG_API_KEY,
-    distinctId: ctx.identityURN,
-    properties: {
-      $groups: { app: clientId },
-      $group_type: 'app',
-      $group_key: clientId,
-      $group_set: {
-        name: input.clientName,
-        plan: ServicePlanType.FREE,
-        clientId: clientId,
-        date_joined: new Date().toISOString(),
+  ctx.waitUntil?.(
+    createAnalyticsEvent({
+      eventName: '$groupidentify',
+      apiKey: ctx.POSTHOG_API_KEY,
+      distinctId: ctx.identityURN,
+      properties: {
+        $groups: { app: clientId },
+        $group_type: 'app',
+        $group_key: clientId,
+        $group_set: {
+          name: input.clientName,
+          plan: ServicePlanType.FREE,
+          clientId: clientId,
+          date_joined: new Date().toISOString(),
+        },
       },
-    },
-  })
+    })
+  )
 
-  await createAnalyticsEvent({
-    eventName: 'identity_created_app',
-    apiKey: ctx.POSTHOG_API_KEY,
-    distinctId: ctx.identityURN,
-    properties: {
-      $groups: { app: clientId },
-    },
-  })
+  ctx.waitUntil?.(
+    createAnalyticsEvent({
+      eventName: 'identity_created_app',
+      apiKey: ctx.POSTHOG_API_KEY,
+      distinctId: ctx.identityURN,
+      properties: {
+        $groups: { app: clientId },
+      },
+    })
+  )
 
   return {
     clientId: clientId,

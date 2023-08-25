@@ -108,6 +108,7 @@ const handleEvent = async (event: FetchEvent, env: Env) => {
         appProps: (event.request as CustomDomainRequest).app_props,
         env,
         traceSpan,
+        waitUntil: event.waitUntil,
       }
     },
   })

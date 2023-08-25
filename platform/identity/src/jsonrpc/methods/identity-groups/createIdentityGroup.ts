@@ -41,28 +41,32 @@ export const createIdentityGroup = async ({
     dst: baseGroupURN,
   })
 
-  await createAnalyticsEvent({
-    eventName: '$groupidentify',
-    apiKey: ctx.POSTHOG_API_KEY,
-    distinctId: ctx.identityURN as IdentityURN,
-    properties: {
-      $groups: { group: groupURN },
-      $group_type: 'group',
-      $group_key: groupURN,
-      $group_set: {
-        name: input.name,
-        groupURN: groupURN,
-        date_joined: new Date().toISOString(),
+  ctx.waitUntil?.(
+    createAnalyticsEvent({
+      eventName: '$groupidentify',
+      apiKey: ctx.POSTHOG_API_KEY,
+      distinctId: ctx.identityURN as IdentityURN,
+      properties: {
+        $groups: { group: groupURN },
+        $group_type: 'group',
+        $group_key: groupURN,
+        $group_set: {
+          name: input.name,
+          groupURN: groupURN,
+          date_joined: new Date().toISOString(),
+        },
       },
-    },
-  })
+    })
+  )
 
-  await createAnalyticsEvent({
-    eventName: 'identity_created_group',
-    apiKey: ctx.POSTHOG_API_KEY,
-    distinctId: ctx.identityURN as IdentityURN,
-    properties: {
-      $groups: { group: groupURN },
-    },
-  })
+  ctx.waitUntil?.(
+    createAnalyticsEvent({
+      eventName: 'identity_created_group',
+      apiKey: ctx.POSTHOG_API_KEY,
+      distinctId: ctx.identityURN as IdentityURN,
+      properties: {
+        $groups: { group: groupURN },
+      },
+    })
+  )
 }

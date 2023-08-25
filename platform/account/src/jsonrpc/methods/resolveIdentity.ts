@@ -69,14 +69,16 @@ export const resolveIdentityMethod = async ({
     blobs: [ctx.alias, resultURN, eventName],
   } as AnalyticsEngineDataPoint)
 
-  await createAnalyticsEvent({
-    apiKey: ctx.POSTHOG_API_KEY,
-    eventName,
-    distinctId: resultURN,
-    properties: {
-      $groups: { app: input.clientId },
-    },
-  })
+  ctx.waitUntil?.(
+    createAnalyticsEvent({
+      apiKey: ctx.POSTHOG_API_KEY,
+      eventName,
+      distinctId: resultURN,
+      properties: {
+        $groups: { app: input.clientId },
+      },
+    })
+  )
 
   return {
     identityURN: resultURN,
