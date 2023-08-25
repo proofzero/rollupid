@@ -45,3 +45,10 @@
 .font-ibm-plex-mono {
   font-family: 'IBM Plex Mono', Courier, monospace;
 }
+
+.hide {
+  transition: opacity 150ms;
+  overflow: hidden;
+  opacity: 0;
+  height: 0;
+}

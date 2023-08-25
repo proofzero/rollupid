@@ -32,6 +32,7 @@ import {
   Dropdown,
   DropdownSelectListItem,
 } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import { redirectToPassport } from '~/utils'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -154,22 +155,6 @@ export default () => {
     }
   }, [errors])
 
-  const redirectToPassport = () => {
-    const currentURL = new URL(window.location.href)
-    currentURL.search = ''
-
-    const qp = new URLSearchParams()
-    qp.append('scope', '')
-    qp.append('state', 'skip')
-    qp.append('client_id', 'console')
-
-    qp.append('redirect_uri', currentURL.toString())
-    qp.append('rollup_action', 'connect')
-    qp.append('login_hint', 'email microsoft google apple')
-
-    window.location.href = `${PASSPORT_URL}/authorize?${qp.toString()}`
-  }
-
   return (
     <>
       <div className="flex flex-row items-center space-x-3 pb-5">
@@ -191,7 +176,16 @@ export default () => {
 
         <div className="self-start mb-8 w-80">
           {connectedEmails && connectedEmails.length === 0 && (
-            <Button onClick={redirectToPassport} btnType="secondary-alt">
+            <Button
+              onClick={() =>
+                redirectToPassport({
+                  PASSPORT_URL,
+                  login_hint: 'email microsoft google apple',
+                  rollup_action: 'connect',
+                })
+              }
+              btnType="secondary-alt"
+            >
               <div className="flex space-x-3">
                 <HiOutlineMail className="w-6 h-6 text-gray-800" />
                 <Text weight="medium" className="flex-1 text-gray-800">
@@ -246,8 +240,14 @@ export default () => {
                     )
                   }
                 }}
-                ConnectButtonCallback={redirectToPassport}
-                ConnectButtonPhrase="Connect New Email Account"
+                ConnectButtonCallback={() =>
+                  redirectToPassport({
+                    PASSPORT_URL,
+                    login_hint: 'email microsoft google apple',
+                    rollup_action: 'connect',
+                  })
+                }
+                ConnectButtonPhrase="Connect New Email Address"
                 defaultItems={connectedEmails
                   .filter((el) => el.value === appContactAddress)
                   .map((email: DropdownSelectListItem) => ({

@@ -1,6 +1,6 @@
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { ActionFunction, redirect } from '@remix-run/cloudflare'
+import { ActionFunction, json, redirect } from '@remix-run/cloudflare'
 import {
   commitFlashSession,
   getFlashSession,
@@ -52,6 +52,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       URN?: IdentityRefURN
     }
 
+    if (!email?.length || !accountURN?.length || !name?.length) {
+      throw new BadRequestError({ message: 'Email and name are required' })
+    }
     let targetURN = URN ?? identityURN
     if (IdentityGroupURNSpace.is(targetURN)) {
       const authorized =
@@ -118,6 +121,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         message: 'Payment data updated',
       })
     )
+
+    const needRedirect = fd.get('redirect') as string
+    if (needRedirect === 'false') {
+      return json({ success: true })
+    }
 
     return redirect(returnURL, {
       headers: {

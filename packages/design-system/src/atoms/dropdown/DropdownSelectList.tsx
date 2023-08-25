@@ -119,8 +119,8 @@ export const Dropdown = ({
     | Array<DropdownSelectListItem>
     | Array<AuthorizationControlSelection>
   multiple?: boolean
-  ConnectButtonPhrase: string
-  ConnectButtonCallback: () => void
+  ConnectButtonPhrase?: string
+  ConnectButtonCallback?: () => void
   onSelectAll?: (val: Array<AuthorizationControlSelection>) => void
   selectAllCheckboxTitle?: string
   selectAllCheckboxDescription?: string
@@ -392,22 +392,26 @@ export const Dropdown = ({
                   </div>
                 )
               ) : null}
-              {items?.length ? (
-                <div className="mx-4 w-100 border-b border-gray-200"></div>
-              ) : null}
-              <div className="px-3 pb-3">
-                <Button
-                  btnType="secondary-alt-skin"
-                  onClick={ConnectButtonCallback}
-                  className={`w-full min-w-[238px] flex flex-row items-center gap-1 justify-center
+              {ConnectButtonPhrase && ConnectButtonCallback ? (
+                <>
+                  {items?.length ? (
+                    <div className="mx-4 w-100 border-b border-gray-200"></div>
+                  ) : null}
+                  <div className="px-3 pb-3">
+                    <Button
+                      btnType="secondary-alt-skin"
+                      onClick={ConnectButtonCallback}
+                      className={`w-full min-w-[238px] flex flex-row items-center gap-1 justify-center
                                          px-[12px]`}
-                >
-                  <TbCirclePlus size={18} className="dark:text-white" />
-                  <Text size="sm" className="dark:text-white">
-                    {ConnectButtonPhrase}
-                  </Text>
-                </Button>
-              </div>
+                    >
+                      <TbCirclePlus size={18} className="dark:text-white" />
+                      <Text size="sm" className="dark:text-white">
+                        {ConnectButtonPhrase}
+                      </Text>
+                    </Button>
+                  </div>
+                </>
+              ) : null}
             </Listbox.Options>
           </Transition>
         </div>

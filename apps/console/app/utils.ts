@@ -99,3 +99,31 @@ export const setPurchaseToastNotification = ({
     }
   }
 }
+
+export const redirectToPassport = ({
+  PASSPORT_URL,
+  login_hint,
+  scope = '',
+  state = 'skip',
+  rollup_action,
+}: {
+  PASSPORT_URL: string
+  login_hint: string
+  scope?: string
+  state?: string
+  rollup_action?: string
+}) => {
+  const currentURL = new URL(window.location.href)
+  currentURL.search = ''
+
+  const qp = new URLSearchParams()
+  qp.append('scope', scope)
+  qp.append('state', state)
+  qp.append('client_id', 'console')
+
+  qp.append('redirect_uri', currentURL.toString())
+  if (rollup_action) qp.append('rollup_action', rollup_action)
+  qp.append('login_hint', login_hint)
+
+  window.location.href = `${PASSPORT_URL}/authorize?${qp.toString()}`
+}

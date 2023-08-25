@@ -10,7 +10,7 @@ import type {
 
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 
-import { json } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
 
 import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
 
@@ -53,7 +53,7 @@ import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
 import { useHydrated } from 'remix-utils'
 import { getCurrentAndUpcomingInvoices } from './utils/billing'
-import { ServicePlanType } from '@proofzero/types/billing'
+import type { ServicePlanType } from '@proofzero/types/billing'
 
 export const links: LinksFunction = () => {
   return [
@@ -162,14 +162,19 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
       let unpaidInvoiceURL = '/billing/portal'
 
-      const hasUnpaidInvoices = invoices.some((invoice) => {
-        if (invoice.status)
-          if (['uncollectible', 'open'].includes(invoice.status)) {
-            unpaidInvoiceURL = invoice.url as string
-            return true
-          }
-        return false
-      })
+      let hasUnpaidInvoices = false
+      try {
+        hasUnpaidInvoices = invoices.some((invoice) => {
+          if (invoice.status)
+            if (['uncollectible', 'open'].includes(invoice.status)) {
+              unpaidInvoiceURL = invoice.url as string
+              return true
+            }
+          return false
+        })
+      } catch (e) {
+        console.error('Could not retrieve invoices.', e)
+      }
 
       return json<LoaderData>({
         apps: reshapedApps,
