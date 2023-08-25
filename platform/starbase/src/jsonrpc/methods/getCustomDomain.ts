@@ -36,9 +36,10 @@ export const getCustomDomain: GetCustomDomainMethod = async ({
   )
   if (!stored) return
   if (!stored.dns_records) {
-    //This is here as a quick way to address setups that were created before infroduction
-    //of DNS records in the customDomain structure. Could not load the custom domain page
-    //to delete and set up again without this check.
+    //This is here as a quick way to address setups that were created
+    //before infroduction of DNS records in the customDomain
+    //structure. Could not load the custom domain page to delete and
+    //set up again without this check.
     stored.dns_records = [
       {
         name: 'Error',
