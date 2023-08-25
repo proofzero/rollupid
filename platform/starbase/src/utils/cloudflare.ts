@@ -151,10 +151,10 @@ export const deleteWorkerRoute = async (
   )
 }
 
-export const getExpectedCustomDomainDNSRecords = async (
+export const getExpectedCustomDomainDNSRecords = (
   customHostname: string,
   ctx: Context
-): Promise<CustomDomainDNSRecords> => {
+): CustomDomainDNSRecords => {
   const result: CustomDomainDNSRecords = []
 
   result.push({
