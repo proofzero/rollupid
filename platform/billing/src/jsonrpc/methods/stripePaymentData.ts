@@ -3,16 +3,22 @@ import { z } from 'zod'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 
 import { router } from '@proofzero/platform.core'
-import {
-  IdentityURNInput,
-  AccountURNInput,
-} from '@proofzero/platform-middleware/inputValidators'
 
 import { Context } from '../../context'
-import { initIdentityNodeByName } from '../../nodes'
+import {
+  AccountURNInput,
+  IdentityRefURNValidator,
+} from '@proofzero/platform-middleware/inputValidators'
+import { IdentityURNSpace } from '@proofzero/urns/identity'
+import {
+  initIdentityGroupNodeByName,
+  initIdentityNodeByName,
+} from '../../../../identity/src/nodes'
+import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
+import { BadRequestError } from '@proofzero/errors'
 
 export const GetStripPaymentDataInputSchema = z.object({
-  identityURN: IdentityURNInput,
+  URN: IdentityRefURNValidator,
 })
 type GetStripPaymentDataInput = z.infer<typeof GetStripPaymentDataInputSchema>
 
@@ -36,15 +42,24 @@ export const getStripePaymentData = async ({
   ctx: Context
   input: GetStripPaymentDataInput
 }): Promise<GetStripePaymentDataOutput> => {
-  const identity = await initIdentityNodeByName(input.identityURN, ctx.Identity)
+  let ownerNode
+  if (IdentityURNSpace.is(input.URN)) {
+    ownerNode = initIdentityNodeByName(input.URN, ctx.Identity)
+  } else if (IdentityGroupURNSpace.is(input.URN)) {
+    ownerNode = initIdentityGroupNodeByName(input.URN, ctx.IdentityGroup)
+  } else {
+    throw new BadRequestError({
+      message: `URN type not supported`,
+    })
+  }
 
-  return identity.class.getStripePaymentData()
+  return ownerNode.class.getStripePaymentData()
 }
 
 export const SetStripePaymentDataInputSchema = z.object({
+  URN: IdentityRefURNValidator,
   customerID: z.string(),
   paymentMethodID: z.string().optional(),
-  identityURN: IdentityURNInput,
   name: z.string(),
   email: z.string(),
   accountURN: AccountURNInput,
@@ -58,12 +73,20 @@ export const setStripePaymentData = async ({
   ctx: Context
   input: SetStripePaymentDataInput
 }): Promise<void> => {
-  const identity = await initIdentityNodeByName(input.identityURN, ctx.Identity)
+  let ownerNode
+  if (IdentityURNSpace.is(input.URN)) {
+    ownerNode = initIdentityNodeByName(input.URN, ctx.Identity)
+  } else if (IdentityGroupURNSpace.is(input.URN)) {
+    ownerNode = initIdentityGroupNodeByName(input.URN, ctx.IdentityGroup)
+  } else {
+    throw new BadRequestError({
+      message: `URN type not supported`,
+    })
+  }
 
-  const { customerID, paymentMethodID, email, name, identityURN, accountURN } =
-    input
+  const { customerID, paymentMethodID, email, name, accountURN } = input
 
-  await identity.class.setStripePaymentData({
+  await ownerNode.class.setStripePaymentData({
     customerID,
     paymentMethodID,
     email,
@@ -76,13 +99,13 @@ export const setStripePaymentData = async ({
   if (accountURN) {
     const { edges } = await caller.edges.getEdges({
       query: {
-        src: { baseUrn: identityURN },
+        src: { baseUrn: input.URN },
         tag: EDGE_HAS_REFERENCE_TO,
       },
     })
 
     if (edges.length > 1) {
-      console.warn(`More than one edge found for ${identityURN} -> account`)
+      console.warn(`More than one edge found for ${input.URN} -> account`)
     }
 
     for (const edge of edges) {
@@ -94,9 +117,9 @@ export const setStripePaymentData = async ({
     }
 
     await caller.edges.makeEdge({
-      src: identityURN,
-      dst: accountURN,
+      src: input.URN,
       tag: EDGE_HAS_REFERENCE_TO,
+      dst: accountURN,
     })
   }
 }

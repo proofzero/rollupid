@@ -48,12 +48,12 @@ import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-
 
 import useTreeshakeHack from '@proofzero/design-system/src/hooks/useTreeshakeHack'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { type ServicePlanType } from '@proofzero/types/identity'
 import { BadRequestError } from '@proofzero/errors'
 import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
 import { useHydrated } from 'remix-utils'
 import { getCurrentAndUpcomingInvoices } from './utils/billing'
+import { ServicePlanType } from '@proofzero/types/billing'
 
 export const links: LinksFunction = () => {
   return [
@@ -149,8 +149,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         WALLET_CONNECT_PROJECT_ID,
       } = context.env
 
-      const spd = await coreClient.identity.getStripePaymentData.query({
-        identityURN,
+      const spd = await coreClient.billing.getStripePaymentData.query({
+        URN: identityURN,
       })
 
       // might be quite heavy object

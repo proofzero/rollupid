@@ -4,10 +4,10 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { EDGE_PAYS_APP } from '@proofzero/types/graph'
-import { IdentityURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { IdentityRefURNValidator } from '@proofzero/platform-middleware/inputValidators'
 
 export const DeleteSubscriptionPlansInput = z.object({
-  identityURN: IdentityURNInput,
+  URN: IdentityRefURNValidator,
 })
 type DeleteSubscriptionPlansParams = z.infer<
   typeof DeleteSubscriptionPlansInput
@@ -20,13 +20,13 @@ export const deleteSubscriptionPlans = async ({
   input: DeleteSubscriptionPlansParams
   ctx: Context
 }): Promise<void> => {
-  const { identityURN } = input
+  const { URN } = input
 
   const caller = router.createCaller(ctx)
 
   const { edges } = await caller.edges.getEdges({
     query: {
-      src: { baseUrn: identityURN },
+      src: { baseUrn: URN },
       tag: EDGE_PAYS_APP,
     },
   })
@@ -40,7 +40,7 @@ export const deleteSubscriptionPlans = async ({
       Promise.all(
         appURNs.map((appURN) =>
           caller.edges.removeEdge({
-            src: identityURN,
+            src: URN,
             tag: EDGE_PAYS_APP,
             dst: appURN,
           })

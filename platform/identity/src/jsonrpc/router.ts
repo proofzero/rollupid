@@ -48,26 +48,6 @@ import {
 } from './methods/deleteIdentityNode'
 import { UnauthorizedError } from '@proofzero/errors'
 import {
-  GetEntitlementsInputSchema,
-  GetEntitlementsOutputSchema,
-  getEntitlements,
-} from './methods/getEntitlements'
-import {
-  UpdateEntitlementsInputSchema,
-  updateEntitlements,
-} from './methods/updateEntitlements'
-import {
-  GetStripPaymentDataInputSchema,
-  GetStripePaymentDataOutputSchema,
-  SetStripePaymentDataInputSchema,
-  getStripePaymentData,
-  setStripePaymentData,
-} from './methods/stripePaymentData'
-import {
-  CancelServicePlansInput,
-  cancelServicePlans,
-} from './methods/cancelServicePlans'
-import {
   CreateIdentityGroupInputSchema,
   createIdentityGroup,
 } from './methods/identity-groups/createIdentityGroup'
@@ -103,6 +83,16 @@ import {
   deleteIdentityGroup,
 } from './methods/identity-groups/deleteIdentityGroup'
 import { purgeIdentityGroupMemberships } from './methods/identity-groups/purgeIdentityGroupMemberships'
+import {
+  HasIdentityGroupPermissionsInputSchema,
+  HasIdentityGroupPermissionsOutputSchema,
+  hasIdentityGroupPermissions,
+} from './methods/identity-groups/hasIdentityGroupPermissions'
+import {
+  ConnectIdentityGroupEmailInputSchema,
+  ConnectIdentityGroupEmailOutputSchema,
+  connectIdentityGroupEmail,
+} from './methods/identity-groups/connectIdentityGroupEmail'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -195,33 +185,6 @@ export const appRouter = t.router({
     .use(LogUsage)
     .input(DeleteIdentityNodeInput)
     .mutation(deleteIdentityNodeMethod),
-  getEntitlements: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .input(GetEntitlementsInputSchema)
-    .output(GetEntitlementsOutputSchema)
-    .query(getEntitlements),
-  updateEntitlements: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .input(UpdateEntitlementsInputSchema)
-    .mutation(updateEntitlements),
-  getStripePaymentData: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .input(GetStripPaymentDataInputSchema)
-    .output(GetStripePaymentDataOutputSchema)
-    .query(getStripePaymentData),
-  setStripePaymentData: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .input(SetStripePaymentDataInputSchema)
-    .mutation(setStripePaymentData),
-  cancelServicePlans: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .input(CancelServicePlansInput)
-    .mutation(cancelServicePlans),
   createIdentityGroup: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
@@ -295,4 +258,19 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(RequireIdentity)
     .mutation(purgeIdentityGroupMemberships),
+  hasIdentityGroupPermissions: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(HasIdentityGroupPermissionsInputSchema)
+    .output(HasIdentityGroupPermissionsOutputSchema)
+    .query(hasIdentityGroupPermissions),
+  connectIdentityGroupEmail: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireIdentity)
+    .input(ConnectIdentityGroupEmailInputSchema)
+    .output(ConnectIdentityGroupEmailOutputSchema)
+    .mutation(connectIdentityGroupEmail),
 })

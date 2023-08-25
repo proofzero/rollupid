@@ -4,16 +4,16 @@ import {
   getUpcomingInvoices,
   updateSubscription,
 } from '~/services/billing/stripe'
-import type { StripePaymentData } from '@proofzero/platform/identity/src/types'
+import type { StripePaymentData } from '@proofzero/platform/billing/src/types'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
-import { type IdentityURN } from '@proofzero/urns/identity'
 import { type PaymentIntent, loadStripe } from '@stripe/stripe-js'
 import { type SubmitFunction } from '@remix-run/react'
 import { type Session, type SessionData } from '@remix-run/cloudflare'
 import { commitFlashSession } from '~/utilities/session.server'
 import { type Env } from 'bindings'
 import Stripe from 'stripe'
-import { type ServicePlanType } from '@proofzero/types/identity'
+import { ServicePlanType } from '@proofzero/types/billing'
+import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 
 export type StripeInvoice = {
   id: string
@@ -86,14 +86,14 @@ export const createOrUpdateSubscription = async ({
   SECRET_STRIPE_PRO_PLAN_ID,
   SECRET_STRIPE_API_KEY,
   quantity,
-  identityURN,
+  URN,
   customerID,
 }: {
   subscriptionID?: string | null
   SECRET_STRIPE_PRO_PLAN_ID: string
   SECRET_STRIPE_API_KEY: string
   quantity: number
-  identityURN: IdentityURN
+  URN: IdentityRefURN
   customerID: string
 }) => {
   const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
@@ -107,7 +107,7 @@ export const createOrUpdateSubscription = async ({
         customerID: customerID,
         planID: SECRET_STRIPE_PRO_PLAN_ID,
         quantity,
-        identityURN,
+        URN,
         handled: true,
       },
       stripeClient
@@ -136,6 +136,7 @@ export const process3DSecureCard = async ({
   subId,
   redirectUrl,
   updatePlanParams,
+  URN,
 }: {
   STRIPE_PUBLISHABLE_KEY: string
   status: string
@@ -148,6 +149,7 @@ export const process3DSecureCard = async ({
     clientId?: string
     plan: ServicePlanType
   }
+  URN?: IdentityRefURN
 }) => {
   const stripeClient = await loadStripe(STRIPE_PUBLISHABLE_KEY)
   if (status === 'requires_action') {
@@ -162,19 +164,26 @@ export const process3DSecureCard = async ({
       return null
     }
 
-    submit(
-      {
-        subId,
-        redirectUrl: redirectUrl ? redirectUrl : '/billing',
-        updatePlanParams: updatePlanParams
-          ? JSON.stringify(updatePlanParams)
-          : '',
-      },
-      {
-        method: 'post',
-        action: `/billing/update`,
-      }
-    )
+    let payload: {
+      subId: string
+      redirectUrl: string
+      updatePlanParams: string
+      URN?: IdentityRefURN
+    } = {
+      subId,
+      redirectUrl: redirectUrl ? redirectUrl : '/billing',
+      updatePlanParams: updatePlanParams
+        ? JSON.stringify(updatePlanParams)
+        : '',
+    }
+    if (URN) {
+      payload.URN = URN
+    }
+
+    submit(payload, {
+      method: 'post',
+      action: `/billing/update`,
+    })
   }
 }
 

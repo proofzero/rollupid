@@ -9,7 +9,7 @@ import { Context } from '../../context'
 import { Node } from '@proofzero/platform.edges/src/jsonrpc/validators/node'
 
 export const GetAccountsInput = z.object({
-  identity: inputValidators.IdentityURNInput,
+  URN: inputValidators.AnyURNInput,
   filter: z
     .object({
       type: inputValidators.CryptoAccountTypeInput.optional(),
@@ -34,7 +34,7 @@ export const getPublicAccountsMethod = async ({
     // We are only interested in edges that start at the identity node and
     // terminate at the account node, assuming that identity nodes link to
     // the account nodes that they own.
-    src: { baseUrn: input.identity },
+    src: { baseUrn: input.URN },
     // We only want edges that link to account nodes.
     tag: EDGE_ACCOUNT,
 

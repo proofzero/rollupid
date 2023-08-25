@@ -40,7 +40,7 @@ import type { IconType } from 'react-icons'
 import { Avatar } from '@proofzero/design-system'
 
 import { usePostHog } from 'posthog-js/react'
-import { ServicePlanType } from '@proofzero/types/identity'
+import { ServicePlanType } from '@proofzero/types/billing'
 import _ from 'lodash'
 import { isPlanGuarded } from '~/utils/planGate'
 

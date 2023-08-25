@@ -6,7 +6,6 @@ import {
   getSuccessfulPaymentEmailContent,
 } from '../../emailFunctions'
 import { EmailThemePropsSchema } from '../../emailFunctions'
-import { PlansSchema } from '@proofzero/platform.identity/src/jsonrpc/methods/getEntitlements'
 
 export const EmailPlansSchema = z.array(
   z.object({

@@ -5,6 +5,7 @@ import {
 } from '@proofzero/urns/authorization'
 import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 import { IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
+import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 import { AnyURN, parseURN } from '@proofzero/urns'
 import { EdgeURN } from '@proofzero/urns/edge'
 import { CryptoAccountType } from '@proofzero/types/account'
@@ -80,4 +81,15 @@ export const NodeFilterInput = z.object({
   baseUrn: AnyURNInput.optional(),
   qc: z.record(z.string(), z.string().or(z.boolean()).optional()).optional(),
   rc: z.record(z.string(), z.string().or(z.boolean()).optional()).optional(),
+})
+
+export const IdentityRefURNValidator = z.custom<IdentityRefURN>((input) => {
+  if (
+    !IdentityURNSpace.is(input as IdentityURN) &&
+    !IdentityGroupURNSpace.is(input as IdentityGroupURN)
+  ) {
+    throw new Error('Invalid IdentityRefURN entry')
+  }
+
+  return input as IdentityRefURN
 })

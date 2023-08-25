@@ -18,7 +18,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     if (
       !authzCookieParams.rollup_action ||
       (!['connect', 'reconnect'].includes(authzCookieParams.rollup_action) &&
-        !authzCookieParams.rollup_action.startsWith('groupconnect'))
+        !authzCookieParams.rollup_action.startsWith('group'))
     ) {
       throw new InternalServerError({ message: 'Not a connect flow' })
     }

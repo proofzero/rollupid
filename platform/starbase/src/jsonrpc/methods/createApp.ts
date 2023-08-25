@@ -6,7 +6,7 @@ import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { EDGE_APPLICATION } from '../../types'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
-import { ServicePlanType } from '@proofzero/types/identity'
+import { ServicePlanType } from '@proofzero/types/billing'
 
 export const CreateAppInputSchema = z.object({
   clientName: z.string(),

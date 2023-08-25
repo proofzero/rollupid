@@ -265,7 +265,7 @@ export const getConnectedAccounts = async ({
   })
 
   const accounts = await coreClient.identity.getAccounts.query({
-    identity: identityURN,
+    URN: identityURN,
   })
 
   // for alchemy calls they need to be lowercased

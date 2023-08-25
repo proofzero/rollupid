@@ -49,7 +49,7 @@ export const acceptIdentityGroupMemberInvitation = async ({
   const caller = router.createCaller(ctx)
 
   const accounts = await caller.identity.getOwnAccounts({
-    identity: ctx.identityURN!,
+    URN: ctx.identityURN!,
   })
   const targetAccount = accounts.find(
     (account) =>

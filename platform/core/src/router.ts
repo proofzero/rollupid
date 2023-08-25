@@ -5,6 +5,7 @@ import { appRouter as authorization } from '@proofzero/platform.authorization/sr
 import { appRouter as edges } from '@proofzero/platform.edges/src/jsonrpc/router'
 import { appRouter as identity } from '@proofzero/platform.identity/src/jsonrpc/router'
 import { appRouter as starbase } from '@proofzero/platform.starbase/src/jsonrpc/router'
+import { appRouter as billing } from '@proofzero/platform.billing/src/jsonrpc/router'
 
 export const coreRouter = router({
   account,
@@ -12,6 +13,7 @@ export const coreRouter = router({
   edges,
   identity,
   starbase,
+  billing,
 })
 
 export type CoreRouter = typeof coreRouter

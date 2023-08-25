@@ -82,7 +82,7 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
 
     const accounts =
       (await caller.identity.getAccounts({
-        identity: identityURN,
+        URN: identityURN,
       })) ?? []
 
     for (const account of accounts) {

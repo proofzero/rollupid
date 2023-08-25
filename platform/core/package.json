@@ -35,6 +35,7 @@
   "dependencies": {
     "@proofzero/platform.account": "workspace:*",
     "@proofzero/platform.authorization": "workspace:*",
+    "@proofzero/platform.billing": "workspace:*",
     "@proofzero/platform.edges": "workspace:*",
     "@proofzero/platform.identity": "workspace:*",
     "@proofzero/platform.starbase": "workspace:*",

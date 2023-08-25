@@ -8,7 +8,7 @@ import { Context } from '../../context'
 import { Node } from '@proofzero/platform.edges/src/jsonrpc/validators/node'
 
 export const GetAccountsInput = z.object({
-  identity: inputValidators.IdentityURNInput,
+  URN: inputValidators.AnyURNInput,
   filter: z
     .object({
       type: inputValidators.CryptoAccountTypeInput.optional(),
@@ -29,7 +29,7 @@ export const getOwnAccountsMethod = async ({
   ctx: Context
 }): Promise<GetAccountsOutput> => {
   // TODO: check scopes on jwt for now we will just use the identityURN to you get get your own accounts
-  if (input.identity !== ctx.identityURN) {
+  if (input.URN !== ctx.identityURN) {
     throw Error('Invalid identity input')
   }
 
@@ -38,7 +38,7 @@ export const getOwnAccountsMethod = async ({
     // terminate at the account node, assuming that identity nodes link to
     // the account nodes that they own.
     src: {
-      baseUrn: input.identity,
+      baseUrn: input.URN,
     },
 
     // We only want edges that link to account nodes.

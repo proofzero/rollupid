@@ -1,7 +1,5 @@
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import plans, { type PlanDetails } from '~/routes/__layout/billing/plans'
-import { PlanFeatures } from '~/routes/__layout/billing'
-import { type PaymentData, ServicePlanType } from '@proofzero/types/identity'
+import plans, { type PlanDetails } from '~/utils/plans'
 import { Button } from '@proofzero/design-system'
 import { StatusPill } from '@proofzero/design-system/src/atoms/pills/StatusPill'
 import {
@@ -29,8 +27,6 @@ import {
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
-import { type GetEntitlementsOutput } from '@proofzero/platform/identity/src/jsonrpc/methods/getEntitlements'
-import { type IdentityURN } from '@proofzero/urns/identity'
 import { BadRequestError } from '@proofzero/errors'
 import type { ToastNotification, appDetailsProps } from '~/types'
 import { type AppLoaderData } from '~/root'
@@ -54,6 +50,10 @@ import {
 } from '~/utils/billing'
 import { setPurchaseToastNotification } from '~/utils'
 import type Stripe from 'stripe'
+import { PaymentData, ServicePlanType } from '@proofzero/types/billing'
+import { IdentityURN } from '@proofzero/urns/identity'
+import { GetEntitlementsOutput } from '@proofzero/platform/billing/src/jsonrpc/methods/getEntitlements'
+import { PlanFeatures } from '~/components/Billing'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -67,11 +67,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const entitlements = await coreClient.identity.getEntitlements.query({
-      identityURN,
+    const entitlements = await coreClient.billing.getEntitlements.query({
+      URN: identityURN,
     })
-    const paymentData = await coreClient.identity.getStripePaymentData.query({
-      identityURN,
+    const paymentData = await coreClient.billing.getStripePaymentData.query({
+      URN: identityURN,
     })
 
     const flashSession = await getFlashSession(request, context.env)
@@ -113,8 +113,8 @@ const processUpdateOp = async (
     ...traceHeader,
   })
 
-  const entitlements = await coreClient.identity.getEntitlements.query({
-    identityURN,
+  const entitlements = await coreClient.billing.getEntitlements.query({
+    URN: identityURN,
   })
 
   const apps = await coreClient.starbase.listApps.query()
@@ -130,7 +130,7 @@ const processUpdateOp = async (
   }
 
   await coreClient.starbase.setAppPlan.mutate({
-    identityURN,
+    URN: identityURN,
     clientId,
     plan,
   })
@@ -174,12 +174,12 @@ const processPurchaseOp = async (
     ...traceHeader,
   })
 
-  const entitlements = await coreClient.identity.getEntitlements.query({
-    identityURN,
+  const entitlements = await coreClient.billing.getEntitlements.query({
+    URN: identityURN,
   })
 
-  const paymentData = await coreClient.identity.getStripePaymentData.query({
-    identityURN,
+  const paymentData = await coreClient.billing.getStripePaymentData.query({
+    URN: identityURN,
   })
   if (!paymentData || !paymentData.customerID) {
     throw new BadRequestError({
@@ -200,7 +200,7 @@ const processPurchaseOp = async (
     SECRET_STRIPE_API_KEY: env.SECRET_STRIPE_API_KEY,
     quantity,
     subscriptionID: entitlements.subscriptionID,
-    identityURN,
+    URN: identityURN,
   })
 
   setPurchaseToastNotification({
@@ -214,15 +214,15 @@ const processPurchaseOp = async (
     (sub.status === 'active' || sub.status === 'trialing') &&
     invoiceStatus === 'paid'
   ) {
-    await coreClient.identity.updateEntitlements.mutate({
-      identityURN: identityURN,
+    await coreClient.billing.updateEntitlements.mutate({
+      URN: identityURN,
       subscriptionID: sub.id,
       quantity: quantity,
       type: plan,
     })
 
     await coreClient.starbase.setAppPlan.mutate({
-      identityURN,
+      URN: identityURN,
       clientId,
       plan,
     })
@@ -253,8 +253,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const spd = await coreClient.identity.getStripePaymentData.query({
-      identityURN,
+    const spd = await coreClient.billing.getStripePaymentData.query({
+      URN: identityURN,
     })
 
     const invoices = await getCurrentAndUpcomingInvoices(
@@ -611,7 +611,7 @@ const DowngradeConfirmationModal = ({
 
             <ul className="list-disc">
               {plans[currentPlan].features
-                .filter((f) => f.type === 'addon')
+                .filter((f) => f.type === 'current')
                 .map((f) => (
                   <li>{f.title}</li>
                 ))}

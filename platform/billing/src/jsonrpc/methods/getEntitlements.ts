@@ -1,11 +1,17 @@
-import { ServicePlanType } from '@proofzero/types/identity'
 import { z } from 'zod'
 import { Context } from '../../context'
-import { IdentityURNInput } from '@proofzero/platform-middleware/inputValidators'
-import { initIdentityNodeByName } from '../../nodes'
+import { IdentityRefURNValidator } from '@proofzero/platform-middleware/inputValidators'
+import { ServicePlanType } from '@proofzero/types/billing'
+import { BadRequestError } from '@proofzero/errors'
+import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
+import { IdentityURNSpace } from '@proofzero/urns/identity'
+import {
+  initIdentityGroupNodeByName,
+  initIdentityNodeByName,
+} from '../../../../identity/src/nodes'
 
 export const GetEntitlementsInputSchema = z.object({
-  identityURN: IdentityURNInput,
+  URN: IdentityRefURNValidator,
 })
 
 type GetEntitlementsInput = z.infer<typeof GetEntitlementsInputSchema>
@@ -36,9 +42,18 @@ export const getEntitlements = async ({
     plans: {},
   }
 
-  const identity = await initIdentityNodeByName(input.identityURN, ctx.Identity)
+  let ownerNode
+  if (IdentityURNSpace.is(input.URN)) {
+    ownerNode = initIdentityNodeByName(input.URN, ctx.Identity)
+  } else if (IdentityGroupURNSpace.is(input.URN)) {
+    ownerNode = initIdentityGroupNodeByName(input.URN, ctx.IdentityGroup)
+  } else {
+    throw new BadRequestError({
+      message: `URN type not supported`,
+    })
+  }
 
-  const servicePlans = await identity.class.getServicePlans()
+  const servicePlans = await ownerNode.class.getServicePlans()
   result.subscriptionID = servicePlans?.subscriptionID
 
   for (const key of Object.keys(ServicePlanType)) {

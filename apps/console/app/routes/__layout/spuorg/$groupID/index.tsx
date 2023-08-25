@@ -517,6 +517,7 @@ export default () => {
           Icon={TbReceipt2}
           title="Group Billing & Invoicing"
           subtitle="Manage Billing and Entitlements"
+          onClick={() => navigate(`/billing/spuorg/${groupID}`)}
         />
       </section>
 

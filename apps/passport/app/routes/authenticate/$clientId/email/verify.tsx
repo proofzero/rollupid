@@ -1,33 +1,45 @@
-import { json } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
 import { action as otpAction } from '~/routes/connect/email/otp'
 import { EmailOTPValidator } from '@proofzero/design-system/src/molecules/email-otp-validator'
 import {
   useActionData,
   useFetcher,
   useLoaderData,
-  useLocation,
   useNavigate,
   useOutletContext,
   useSubmit,
   useTransition,
 } from '@remix-run/react'
-import { getAuthzCookieParams, getUserSession } from '~/session.server'
+import {
+  getAuthzCookieParams,
+  getUserSession,
+  getValidatedSessionContext,
+} from '~/session.server'
 import { getCoreClient } from '~/platform.server'
-import { authenticateAccount } from '~/utils/authenticate.server'
-import { useEffect, useState } from 'react'
+import {
+  authenticateAccount,
+  getAuthzRedirectURL,
+} from '~/utils/authenticate.server'
+import { useState } from 'react'
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import {
   BadRequestError,
   ERROR_CODES,
   HTTP_STATUS_CODES,
+  UnauthorizedError,
 } from '@proofzero/errors'
 import { Button, Text } from '@proofzero/design-system'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { generateEmailOTP } from '~/utils/emailOTP'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
+import { AccountURNSpace } from '@proofzero/urns/account'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, context, params }) => {
+  async ({ request, params }) => {
     const qp = new URL(request.url).searchParams
 
     const email = qp.get('email')
@@ -52,7 +64,48 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     if (successfulVerification) {
       const appData = await getAuthzCookieParams(request, context.env)
-      const coreClient = getCoreClient({ context, accountURN })
+      let coreClient = getCoreClient({ context, accountURN })
+
+      if (appData?.rollup_action?.startsWith('groupemailconnect')) {
+        const { jwt } = await getValidatedSessionContext(
+          request,
+          context.authzQueryParams,
+          context.env,
+          context.traceSpan
+        )
+
+        if (!jwt) {
+          throw new UnauthorizedError({
+            message: 'No JWT in session context',
+          })
+        }
+
+        coreClient = getCoreClient({
+          context,
+          jwt,
+        })
+
+        let result = undefined
+
+        const identityGroupID = appData.rollup_action.split('_')[1]
+        const identityGroupURN = IdentityGroupURNSpace.urn(
+          identityGroupID as string
+        ) as IdentityGroupURN
+
+        const { existing } =
+          await coreClient.identity.connectIdentityGroupEmail.mutate({
+            accountURN: accountURN,
+            identityGroupURN,
+          })
+
+        if (existing) {
+          result = 'ALREADY_CONNECTED_ERROR'
+        }
+
+        const redirectURL = getAuthzRedirectURL(appData, result)
+
+        return redirect(redirectURL)
+      }
 
       const { identityURN, existing } =
         await coreClient.account.resolveIdentity.query({

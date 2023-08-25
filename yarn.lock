@@ -6304,6 +6304,34 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@proofzero/platform.billing@workspace:*, @proofzero/platform.billing@workspace:platform/billing":
+  version: 0.0.0-use.local
+  resolution: "@proofzero/platform.billing@workspace:platform/billing"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@ethersproject/address": 5.7.0
+    "@ethersproject/bytes": 5.7.0
+    "@ethersproject/random": 5.7.0
+    "@proofzero/platform-middleware": "workspace:*"
+    "@proofzero/platform.core": "workspace:*"
+    "@proofzero/types": "workspace:*"
+    "@proofzero/utils": "workspace:*"
+    "@trpc/server": 10.8.1
+    "@types/node": 18.15.3
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
+    do-proxy: 1.3.3
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    npm-run-all: 4.1.5
+    prettier: 2.7.1
+    ts-set-utils: 0.2.0
+    typed-json-rpc: 1.1.0
+    typescript: 5.0.4
+    urns: 0.6.0
+  languageName: unknown
+  linkType: soft
+
 "@proofzero/platform.core@workspace:*, @proofzero/platform.core@workspace:platform/core":
   version: 0.0.0-use.local
   resolution: "@proofzero/platform.core@workspace:platform/core"
@@ -6311,6 +6339,7 @@ __metadata:
     "@cloudflare/workers-types": 4.20230518.0
     "@proofzero/platform.account": "workspace:*"
     "@proofzero/platform.authorization": "workspace:*"
+    "@proofzero/platform.billing": "workspace:*"
     "@proofzero/platform.edges": "workspace:*"
     "@proofzero/platform.identity": "workspace:*"
     "@proofzero/platform.starbase": "workspace:*"

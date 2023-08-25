@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { CustomDomainSchema } from './customdomain'
-import { ServicePlanType } from '@proofzero/types/identity'
+import { ServicePlanType } from '@proofzero/types/billing'
 
 export const AppObjectSchema = z.object({
   name: z.string(),
