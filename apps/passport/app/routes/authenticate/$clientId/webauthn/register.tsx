@@ -1,61 +1,67 @@
-import { json } from '@remix-run/cloudflare'
-import { action as otpAction } from '~/routes/connect/email/otp'
 import {
   Form,
-  useActionData,
-  useFetcher,
-  useLoaderData,
-  useNavigate,
   useOutletContext,
-  useSubmit,
-  useTransition,
 } from '@remix-run/react'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
 import { getCoreClient } from '~/platform.server'
 import { authenticateAccount } from '~/utils/authenticate.server'
 import { useEffect, useState } from 'react'
 
-import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import {
-  BadRequestError,
-} from '@proofzero/errors'
+import type { ActionFunction } from '@remix-run/cloudflare'
 import { Button, Text } from '@proofzero/design-system'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { HiOutlineArrowLeft } from 'react-icons/hi2'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
+import { AccountURNSpace } from '@proofzero/urns/account'
+import { generateHashedIDRef } from '@proofzero/urns/idref'
+import { NodeType, WebauthnAccountType } from '@proofzero/types/account'
+import { fromBase64, toBase64 } from '@proofzero/utils/buffer'
 
+
+type RegistrationPayload = {
+  nickname: string,
+  credentialId: string,
+  clientDataJSON: string,
+  authenticatorData: string,
+  publicKey: string
+}
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
-    const actionRes = await otpAction({ request, context, params })
-    const { accountURN, successfulVerification } = await actionRes.json()
 
-    if (successfulVerification) {
-      const appData = await getAuthzCookieParams(request, context.env)
-      const coreClient = getCoreClient({ context, accountURN })
+    const registrationPayload: RegistrationPayload = await request.json()
 
-      const { identityURN, existing } =
-        await coreClient.account.resolveIdentity.query({
-          jwt: await getUserSession(request, context.env, appData?.clientId),
-          force:
-            !appData ||
-            (appData.rollup_action !== 'connect' &&
-              !appData.rollup_action?.startsWith('groupconnect')),
-          clientId: appData?.clientId,
-        })
+    console.debug("reg payload backend", registrationPayload)
+    console.debug("clientDataJSON", new TextDecoder().decode(fromBase64(registrationPayload.clientDataJSON)))
+    const accountURN = AccountURNSpace.componentizedUrn(
+      generateHashedIDRef(WebauthnAccountType.WebAuthN, registrationPayload.credentialId),
+      { node_type: NodeType.WebAuthN, addr_type: WebauthnAccountType.WebAuthN },
+      { alias: registrationPayload.nickname, hidden: 'false' }
+    )
 
-      return authenticateAccount(
-        accountURN,
-        identityURN,
-        appData,
-        request,
-        context.env,
-        context.traceSpan,
-        existing
-      )
-    }
+    const appData = await getAuthzCookieParams(request, context.env)
+    const coreClient = getCoreClient({ context, accountURN })
 
-    return json({ error: true })
+    const { identityURN, existing } =
+      await coreClient.account.resolveIdentity.query({
+        jwt: await getUserSession(request, context.env, appData?.clientId),
+        force:
+          !appData ||
+          (appData.rollup_action !== 'connect' &&
+            !appData.rollup_action?.startsWith('groupconnect')),
+        clientId: appData?.clientId,
+      })
+
+    return authenticateAccount(
+      accountURN,
+      identityURN,
+      appData,
+      request,
+      context.env,
+      context.traceSpan,
+      existing
+    )
+
   }
 )
 
@@ -69,7 +75,7 @@ export default () => {
   const [keyName, setKeyName] = useState('')
 
   const registerKey = async (name: string) => {
-    const challenge = new Uint8Array(32)
+    const challenge = new Uint8Array(64)
     crypto.getRandomValues(challenge)
 
     let credential = await navigator.credentials.create({
@@ -84,7 +90,20 @@ export default () => {
         pubKeyCredParams: [{ type: "public-key", alg: -7 }]
       }
     });
-    console.log("CREDS AFTER REGISTRATION", credential)
+    console.log("CREDS AFTER REGISTRATION", credential, credential instanceof PublicKeyCredential, (credential as any).response instanceof AuthenticatorAssertionResponse)
+    if (credential instanceof PublicKeyCredential && credential.response instanceof AuthenticatorAttestationResponse) {
+      const registrationPayload = {
+        nickname: name,
+        credentialId: credential.id,
+        clientDataJSON: toBase64(credential.response.clientDataJSON),
+        authenticatorData: toBase64(credential.response.getAuthenticatorData()),
+        publicKey: toBase64(credential.response.getPublicKey() || new ArrayBuffer(0))
+      }
+      const response = await fetch('http://localhost:10001/authenticate/passport/webauthn/register',
+        { method: 'POST', body: JSON.stringify(registrationPayload) })
+      console.debug("REG FETCH RESPONSE", JSON.stringify(response))
+
+    }
   }
 
   useEffect(() => {
@@ -148,12 +167,14 @@ export default () => {
           <Button
             type="submit"
             btnSize="xl"
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
               setRequestedRegistration(true)
             }}
             className="w-full"
           >
-            Send Code
+            Register Passkey
           </Button>
         </section>
       </Form>

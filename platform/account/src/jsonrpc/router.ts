@@ -115,6 +115,7 @@ import {
   getAccountURNForEmailMethod,
   GetAccountURNForEmailOutputSchema,
 } from './methods/getAccountURNForEmail'
+import { checkWebauthnNode } from './middlewares/checkWebauthnNode'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 

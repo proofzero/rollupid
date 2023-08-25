@@ -3,6 +3,7 @@ import {
   EmailAccountType,
   NodeType,
   OAuthAccountType,
+  WebauthnAccountType,
 } from '@proofzero/types/account'
 import type { AccountURN } from '@proofzero/urns/account'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -145,6 +146,8 @@ export const getProfileTypeTitle = (type: string) => {
       return 'Ethereum'
     case EmailAccountType.Email:
       return 'Email'
+    case WebauthnAccountType.WebAuthN:
+      return 'Passkey'
     case OAuthAccountType.Apple:
       return 'Apple'
     case OAuthAccountType.Discord:

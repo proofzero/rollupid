@@ -50,7 +50,7 @@ export default () => {
 
   useEffect(() => {
     const webauthnLogin = async () => {
-      const challenge = new Uint8Array(32)
+      const challenge = new Uint8Array(64)
       crypto.getRandomValues(challenge)
       let credential = await navigator.credentials.get({
         publicKey: {

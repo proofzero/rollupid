@@ -2,6 +2,7 @@ import {
   EmailAccountType,
   OAuthAccountType,
   CryptoAccountType,
+  WebauthnAccountType,
 } from '@proofzero/types/account'
 
 export const getProfileTypeTitle = (type: string) => {
@@ -12,6 +13,8 @@ export const getProfileTypeTitle = (type: string) => {
       return 'Smart Wallet'
     case EmailAccountType.Email:
       return 'Email'
+    case WebauthnAccountType.WebAuthN:
+      return 'Passkey'
     case OAuthAccountType.Apple:
       return 'Apple'
     case OAuthAccountType.Discord:
