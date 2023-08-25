@@ -35,6 +35,8 @@ import {
   loader as billingLoader,
   action as billingAction,
 } from '../ops'
+import Breadcrumbs from '@proofzero/design-system/src/atoms/breadcrumbs/Breadcrumbs'
+import { ListIdentityGroupsOutput } from '@proofzero/platform/identity/src/jsonrpc/methods/identity-groups/listIdentityGroups'
 
 export const loader = billingLoader
 export const action = billingAction
@@ -54,7 +56,10 @@ export default () => {
     unpaidInvoiceURL,
   } = loaderData
 
-  const { PASSPORT_URL } = useOutletContext<OutletContextData>()
+  const { PASSPORT_URL, groups } = useOutletContext<{
+    PASSPORT_URL: string
+    groups: ListIdentityGroupsOutput
+  }>()
 
   const submit = useSubmit()
   const fetcher = useFetcher()
@@ -124,6 +129,8 @@ export default () => {
 
   const [invoiceSort, setInvoiceSort] = useState<'asc' | 'desc'>('desc')
 
+  const group = groups.find((g) => g.URN === groupURN)
+
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
@@ -138,6 +145,23 @@ export default () => {
           />
         </section>
       )}
+
+      <section className="-mt-4">
+        {group && (
+          <Breadcrumbs
+            trail={[
+              {
+                label: 'Billing & Invoicing',
+                href: '/billing',
+              },
+              {
+                label: group.name,
+              },
+            ]}
+            LinkType={Link}
+          />
+        )}
+      </section>
 
       <section className="flex flex-col lg:flex-row items-center justify-between mb-11">
         <div className="flex flex-row items-center space-x-3">
