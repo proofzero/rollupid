@@ -71,7 +71,7 @@ declare module '@remix-run/cloudflare' {
     authzQueryParams: AuthzParams
     env: Env
     traceSpan: TraceSpan
-    waitUntil: (promise: Promise<unknown>) => void
+    waitUntil: (promise: Promise<void>) => void
     // for custom domains only
     appProps?: GetAppPublicPropsResult
   }
