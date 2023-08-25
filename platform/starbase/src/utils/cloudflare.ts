@@ -172,6 +172,12 @@ export const getExpectedCustomDomainDNSRecords = (
       name: `_dmarc.${customHostname}`,
       expected_value: `_dmarc.notifications.rollup.id`,
     },
+    {
+      record_type: 'TXT',
+      name: `_mailchannels.${customHostname}`,
+      required: false,
+      expected_value: 'v=mc1 cfid=rollup.id',
+    },
   ]
 
   if (current.length == 0) return expected
