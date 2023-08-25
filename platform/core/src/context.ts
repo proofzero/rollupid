@@ -102,7 +102,6 @@ export async function createContext(
 ) {
   const { req } = opts
   const contextInner = await createContextInner({ ...opts, ...env })
-
   return {
     ...contextInner,
     req,
