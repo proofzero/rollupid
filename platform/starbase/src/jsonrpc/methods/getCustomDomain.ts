@@ -2,8 +2,14 @@ import { z } from 'zod'
 
 import { Context } from '../context'
 import { CustomDomainSchema } from '../validators/customdomain'
+import { type CustomDomain } from '../../types'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import { getCloudflareFetcher, getCustomHostname } from '../../utils/cloudflare'
+
+import {
+  getCloudflareFetcher,
+  getCustomHostname,
+  getExpectedCustomDomainDNSRecords,
+} from '../../utils/cloudflare'
 import { getDNSRecordValue } from '@proofzero/utils'
 
 export const GetCustomDomainInput = z.object({
@@ -30,10 +36,7 @@ export const getCustomDomain: GetCustomDomainMethod = async ({
 }) => {
   const { clientId, refresh } = input
   const node = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
-
-  const stored = await node.storage.get<z.infer<typeof CustomDomainSchema>>(
-    'customDomain'
-  )
+  const stored = await node.storage.get<CustomDomain>('customDomain')
   if (!stored) return
   if (!stored.dns_records) {
     //This is here as a quick way to address setups that were created
@@ -47,7 +50,15 @@ export const getCustomDomain: GetCustomDomainMethod = async ({
         record_type: 'TXT',
       },
     ]
+  } else {
+    stored.dns_records = getExpectedCustomDomainDNSRecords(
+      stored.hostname,
+      stored.dns_records,
+      ctx
+    )
+    await node.storage.put('customDomain', stored)
   }
+
   if (!refresh) return stored
 
   const fetcher = getCloudflareFetcher(ctx.TOKEN_CLOUDFLARE_API)

@@ -56,6 +56,7 @@ export const createCustomDomain: CreateCustomDomainMethod = async ({
       ...customHostname,
       dns_records: getExpectedCustomDomainDNSRecords(
         customHostname.hostname,
+        [],
         ctx
       ),
     }
