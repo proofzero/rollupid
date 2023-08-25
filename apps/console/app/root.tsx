@@ -53,13 +53,7 @@ import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
 import { useHydrated } from 'remix-utils'
 import { getCurrentAndUpcomingInvoices } from './utils/billing'
-import { ServicePlanType } from '@proofzero/types/billing'
-import {
-  type ToastType,
-  Toaster,
-  toast,
-} from '@proofzero/design-system/src/atoms/toast'
-import { getToastsAndFlashSession } from './utils/toast.server'
+import type { ServicePlanType } from '@proofzero/types/billing'
 
 export const links: LinksFunction = () => {
   return [

@@ -24,8 +24,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
-    const spd = await coreClient.identity.getStripePaymentData.query({
-      identityURN,
+    const spd = await coreClient.billing.getStripePaymentData.query({
+      URN: identityURN,
     })
 
     if (!spd?.email?.length) {

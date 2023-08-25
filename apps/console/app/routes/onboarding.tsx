@@ -36,8 +36,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    const spd = await coreClient.identity.getStripePaymentData.query({
-      identityURN,
+    const spd = await coreClient.billing.getStripePaymentData.query({
+      URN: identityURN,
     })
 
     const profile = await coreClient.identity.getProfile.query({
@@ -49,7 +49,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const connectedAccounts = await coreClient.identity.getAccounts.query({
-      identity: identityURN,
+      URN: identityURN,
     })
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
