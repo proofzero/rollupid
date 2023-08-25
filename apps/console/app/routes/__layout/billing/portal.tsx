@@ -14,7 +14,7 @@ import {
   IdentityGroupURN,
 } from '@proofzero/urns/identity-group'
 import { IdentityURN } from '@proofzero/urns/identity'
-import { BillingCustomerURN } from '@proofzero/urns/billing'
+import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -30,7 +30,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const qp = new URL(request.url).searchParams
-    const URN = qp.get('URN') as BillingCustomerURN | undefined
+    const URN = qp.get('URN') as IdentityRefURN | undefined
 
     let targetURN = URN ?? identityURN
     if (IdentityGroupURNSpace.is(targetURN)) {

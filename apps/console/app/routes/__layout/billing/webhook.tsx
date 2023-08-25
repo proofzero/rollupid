@@ -11,7 +11,7 @@ import { InternalServerError, RollupError } from '@proofzero/errors'
 import { type AccountURN } from '@proofzero/urns/account'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { ServicePlanType } from '@proofzero/types/billing'
-import { BillingCustomerURN } from '@proofzero/urns/billing'
+import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 
 type StripeInvoicePayload = {
   id: string
@@ -65,7 +65,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           id: string
           latest_invoice: string
           metadata: {
-            URN?: BillingCustomerURN
+            URN?: IdentityRefURN
           }
           status: string
         }
@@ -81,7 +81,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           return null
         }
 
-        URN = subMeta.URN as BillingCustomerURN
+        URN = subMeta.URN as IdentityRefURN
 
         const entitlements = await coreClient.billing.getEntitlements.query({
           URN,
@@ -116,11 +116,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             default_payment_method: string
           }
           metadata: {
-            URN?: BillingCustomerURN
+            URN?: IdentityRefURN
           }
         }
 
-        URN = cusMeta.URN as BillingCustomerURN
+        URN = cusMeta.URN as IdentityRefURN
 
         if (invoice_settings?.default_payment_method) {
           const paymentData =
@@ -274,7 +274,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           customer: string
           id: string
           metadata: {
-            URN?: BillingCustomerURN
+            URN?: IdentityRefURN
           }
         }
         const customerDataDel = await stripeClient.customers.retrieve(
@@ -283,7 +283,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         if (!customerDataDel.deleted && customerDataDel.email) {
           const { email, name } = customerDataDel
 
-          URN = metaDel.URN as BillingCustomerURN
+          URN = metaDel.URN as IdentityRefURN
 
           await Promise.all([
             coreClient.account.sendBillingNotification.mutate({

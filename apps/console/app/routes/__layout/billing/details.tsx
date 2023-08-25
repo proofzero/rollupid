@@ -20,7 +20,7 @@ import {
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
 import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
-import { BillingCustomerURN } from '@proofzero/urns/billing'
+import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -49,7 +49,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       email: string
       accountURN: AccountURN
       name: string
-      URN?: BillingCustomerURN
+      URN?: IdentityRefURN
     }
 
     let targetURN = URN ?? identityURN

@@ -11,7 +11,7 @@ import createCoreClient, {
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { PaymentData, ServicePlanType } from '@proofzero/types/billing'
-import { BillingCustomerURN } from '@proofzero/urns/billing'
+import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 import { IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
 import {
   IdentityGroupURN,
@@ -72,7 +72,7 @@ export const loader = getRollupReqFunctionErrorWrapper(
       ) as IdentityGroupURN
     }
 
-    const targetURN: BillingCustomerURN = groupURN ?? identityURN
+    const targetURN: IdentityRefURN = groupURN ?? identityURN
     if (IdentityGroupURNSpace.is(targetURN)) {
       const authorized =
         await coreClient.identity.hasIdentityGroupPermissions.query({
@@ -188,7 +188,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ) as IdentityGroupURN
     }
 
-    const targetURN: BillingCustomerURN = groupURN ?? identityURN
+    const targetURN: IdentityRefURN = groupURN ?? identityURN
     if (IdentityGroupURNSpace.is(targetURN)) {
       const authorized =
         await coreClient.identity.hasIdentityGroupPermissions.query({

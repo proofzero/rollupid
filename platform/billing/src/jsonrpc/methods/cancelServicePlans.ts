@@ -7,10 +7,10 @@ import {
   initIdentityGroupNodeByName,
   initIdentityNodeByName,
 } from '../../../../identity/src/nodes'
-import { BillingCustomerURNValidator } from '@proofzero/platform-middleware/inputValidators'
+import { IdentityRefURNValidator } from '@proofzero/platform-middleware/inputValidators'
 
 export const CancelServicePlansInput = z.object({
-  URN: BillingCustomerURNValidator,
+  URN: IdentityRefURNValidator,
   subscriptionID: z.string(),
   deletePaymentData: z.boolean().optional(),
 })

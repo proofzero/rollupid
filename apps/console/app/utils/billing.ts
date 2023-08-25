@@ -13,7 +13,7 @@ import { commitFlashSession } from '~/utilities/session.server'
 import { type Env } from 'bindings'
 import Stripe from 'stripe'
 import { ServicePlanType } from '@proofzero/types/billing'
-import { BillingCustomerURN } from '@proofzero/urns/billing'
+import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 
 export type StripeInvoice = {
   id: string
@@ -93,7 +93,7 @@ export const createOrUpdateSubscription = async ({
   SECRET_STRIPE_PRO_PLAN_ID: string
   SECRET_STRIPE_API_KEY: string
   quantity: number
-  URN: BillingCustomerURN
+  URN: IdentityRefURN
   customerID: string
 }) => {
   const stripeClient = new Stripe(SECRET_STRIPE_API_KEY, {
@@ -149,7 +149,7 @@ export const process3DSecureCard = async ({
     clientId?: string
     plan: ServicePlanType
   }
-  URN?: BillingCustomerURN
+  URN?: IdentityRefURN
 }) => {
   const stripeClient = await loadStripe(STRIPE_PUBLISHABLE_KEY)
   if (status === 'requires_action') {
@@ -168,7 +168,7 @@ export const process3DSecureCard = async ({
       subId: string
       redirectUrl: string
       updatePlanParams: string
-      URN?: BillingCustomerURN
+      URN?: IdentityRefURN
     } = {
       subId,
       redirectUrl: redirectUrl ? redirectUrl : '/billing',

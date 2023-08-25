@@ -20,7 +20,7 @@ import {
   IdentityGroupURNSpace,
   IdentityGroupURN,
 } from '@proofzero/urns/identity-group'
-import { BillingCustomerURN } from '@proofzero/urns/billing'
+import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 
 /**
  * WARNING: Here be dragons, and not the cute, cuddly kind! This code runs twice in certain scenarios because when the user
@@ -45,7 +45,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const subId = fd.get('subId') as string
     const redirectUrl = fd.get('redirectUrl') as string
     const updatePlanParams = fd.get('updatePlanParams') as string
-    const URN = fd.get('URN') as BillingCustomerURN | undefined
+    const URN = fd.get('URN') as IdentityRefURN | undefined
 
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),

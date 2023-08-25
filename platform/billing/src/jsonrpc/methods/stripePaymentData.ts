@@ -7,7 +7,7 @@ import { router } from '@proofzero/platform.core'
 import { Context } from '../../context'
 import {
   AccountURNInput,
-  BillingCustomerURNValidator,
+  IdentityRefURNValidator,
 } from '@proofzero/platform-middleware/inputValidators'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
 import {
@@ -18,7 +18,7 @@ import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 import { BadRequestError } from '@proofzero/errors'
 
 export const GetStripPaymentDataInputSchema = z.object({
-  URN: BillingCustomerURNValidator,
+  URN: IdentityRefURNValidator,
 })
 type GetStripPaymentDataInput = z.infer<typeof GetStripPaymentDataInputSchema>
 
@@ -57,7 +57,7 @@ export const getStripePaymentData = async ({
 }
 
 export const SetStripePaymentDataInputSchema = z.object({
-  URN: BillingCustomerURNValidator,
+  URN: IdentityRefURNValidator,
   customerID: z.string(),
   paymentMethodID: z.string().optional(),
   name: z.string(),
