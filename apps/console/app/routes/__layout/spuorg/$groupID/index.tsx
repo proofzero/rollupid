@@ -41,7 +41,7 @@ import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { IdentityURN } from '@proofzero/urns/identity'
 import dangerVector from '~/images/danger.svg'
 import { ApplicationListItemPublishedState } from '~/components/Applications/ApplicationListItem'
-import { ServicePlanType } from '@proofzero/types/identity'
+import { ServicePlanType } from '@proofzero/types/billing'
 import { GroupDetailsContextData } from '../$groupID'
 
 const accountTypes = [
