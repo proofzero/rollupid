@@ -136,14 +136,16 @@ export const exchangeTokenMethod: ExchangeTokenMethod = async ({
     throw new UnsupportedGrantTypeError(grantType)
   }
 
-  await createAnalyticsEvent({
-    eventName: `app_exchanged_${eventObject}`,
-    distinctId: ctx.identityURN as IdentityURN,
-    apiKey: ctx.POSTHOG_API_KEY,
-    properties: {
-      $groups: { app: input.clientId },
-    },
-  })
+  ctx.waitUntil(
+    createAnalyticsEvent({
+      eventName: `app_exchanged_${eventObject}`,
+      distinctId: ctx.identityURN as IdentityURN,
+      apiKey: ctx.POSTHOG_API_KEY,
+      properties: {
+        $groups: { app: input.clientId },
+      },
+    })
+  )
 
   return result
 }

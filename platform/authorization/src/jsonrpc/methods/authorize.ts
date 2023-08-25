@@ -62,15 +62,17 @@ export const authorizeMethod = async ({
 
   // We don't track hacky way to create user session.
   if (!scope.includes('admin')) {
-    await createAnalyticsEvent({
-      eventName: 'identity_authorized_app',
-      distinctId: identity,
-      apiKey: ctx.POSTHOG_API_KEY,
-      properties: {
-        scope: scope,
-        $groups: { app: clientId },
-      },
-    })
+    ctx.waitUntil(
+      createAnalyticsEvent({
+        eventName: 'identity_authorized_app',
+        distinctId: identity,
+        apiKey: ctx.POSTHOG_API_KEY,
+        properties: {
+          scope: scope,
+          $groups: { app: clientId },
+        },
+      })
+    )
   }
 
   return { ...result }

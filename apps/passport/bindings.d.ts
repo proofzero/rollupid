@@ -1,4 +1,5 @@
 import type { TraceSpan } from '@proofzero/platform-middleware/trace'
+import type { GetAppPublicPropsResult } from '@proofzero/platform.starbase/src/jsonrpc/methods/getAppPublicProps'
 
 export const seviceBindings = true
 
@@ -70,5 +71,8 @@ declare module '@remix-run/cloudflare' {
     authzQueryParams: AuthzParams
     env: Env
     traceSpan: TraceSpan
+    waitUntil: (promise: Promise<unknown>) => void
+    // for custom domains only
+    appProps?: GetAppPublicPropsResult
   }
 }
