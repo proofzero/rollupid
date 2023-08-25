@@ -136,6 +136,7 @@ export const process3DSecureCard = async ({
   subId,
   redirectUrl,
   updatePlanParams,
+  URN,
 }: {
   STRIPE_PUBLISHABLE_KEY: string
   status: string
@@ -148,6 +149,7 @@ export const process3DSecureCard = async ({
     clientId?: string
     plan: ServicePlanType
   }
+  URN?: BillingCustomerURN
 }) => {
   const stripeClient = await loadStripe(STRIPE_PUBLISHABLE_KEY)
   if (status === 'requires_action') {
@@ -162,19 +164,26 @@ export const process3DSecureCard = async ({
       return null
     }
 
-    submit(
-      {
-        subId,
-        redirectUrl: redirectUrl ? redirectUrl : '/billing',
-        updatePlanParams: updatePlanParams
-          ? JSON.stringify(updatePlanParams)
-          : '',
-      },
-      {
-        method: 'post',
-        action: `/billing/update`,
-      }
-    )
+    let payload: {
+      subId: string
+      redirectUrl: string
+      updatePlanParams: string
+      URN?: BillingCustomerURN
+    } = {
+      subId,
+      redirectUrl: redirectUrl ? redirectUrl : '/billing',
+      updatePlanParams: updatePlanParams
+        ? JSON.stringify(updatePlanParams)
+        : '',
+    }
+    if (URN) {
+      payload.URN = URN
+    }
+
+    submit(payload, {
+      method: 'post',
+      action: `/billing/update`,
+    })
   }
 }
 

@@ -1,6 +1,5 @@
 import { Button } from '@proofzero/design-system'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
-import { type LoaderFunction } from '@remix-run/cloudflare'
 import { HiOutlineCreditCard, HiOutlineMail } from 'react-icons/hi'
 import {
   Link,
@@ -54,7 +53,8 @@ export default () => {
     groupURN,
   } = loaderData
 
-  const { PASSPORT_URL } = useOutletContext<OutletContextData>()
+  const { PASSPORT_URL, hasUnpaidInvoices } =
+    useOutletContext<OutletContextData>()
 
   const submit = useSubmit()
   const fetcher = useFetcher()
@@ -74,11 +74,12 @@ export default () => {
         client_secret,
         payment_method,
         submit,
-        redirectUrl: '/billing',
+        redirectUrl: `/billing/spuorg/${groupURN?.split('/')[1]}`,
         updatePlanParams: {
           clientId,
           plan: ServicePlanType.PRO,
         },
+        URN: groupURN,
       })
     }
   }, [actionData, fetcher.data])
@@ -295,7 +296,7 @@ export default () => {
           submit={submit}
           apps={[]}
           fetcher={fetcher}
-          hasUnpaidInvoices={false}
+          hasUnpaidInvoices={hasUnpaidInvoices}
         />
       </section>
 
