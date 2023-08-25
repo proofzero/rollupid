@@ -46,8 +46,9 @@ export const getCustomDomain: GetCustomDomainMethod = async ({
     stored.dns_records = [
       {
         name: 'Error',
-        expected_value: 'Delete custom domain and reconfigure',
         record_type: 'TXT',
+        required: true,
+        expected_value: 'Delete custom domain and reconfigure',
       },
     ]
   } else {

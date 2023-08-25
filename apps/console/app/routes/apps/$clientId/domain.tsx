@@ -220,7 +220,9 @@ const HostnameStatus = ({ fetcher, customDomain }: HostnameStatusProps) => {
     customDomain.status === 'active' && customDomain.ssl.status === 'active'
   const isValidated =
     isPreValidated &&
-    customDomain.dns_records.every((r) => r.value?.includes(r.expected_value))
+    customDomain.dns_records
+      .filter((r) => r.required)
+      .every((r) => r.value?.includes(r.expected_value))
   const bgStatusColor = isValidated ? 'bg-green-600' : 'bg-orange-500'
   const textStatusColor = isValidated ? 'text-green-600' : 'text-orange-500'
   const statusText = isValidated ? 'Validated' : 'Not Validated'

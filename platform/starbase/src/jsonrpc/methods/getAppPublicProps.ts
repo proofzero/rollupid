@@ -86,9 +86,9 @@ async function getPublicPropsForApp(clientId: string, ctx: Context) {
           customDomain?.status === 'active' &&
           customDomain?.ssl.status === 'active' &&
           Boolean(
-            customDomain?.dns_records?.every((r) =>
-              r.value?.includes(r.expected_value)
-            )
+            customDomain?.dns_records
+              ?.filter((r) => r.required)
+              .every((r) => r.value?.includes(r.expected_value))
           ),
       },
     }
