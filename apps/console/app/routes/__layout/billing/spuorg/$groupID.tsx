@@ -51,10 +51,10 @@ export default () => {
     connectedEmails,
     invoices,
     groupURN,
+    unpaidInvoiceURL,
   } = loaderData
 
-  const { PASSPORT_URL, hasUnpaidInvoices } =
-    useOutletContext<OutletContextData>()
+  const { PASSPORT_URL } = useOutletContext<OutletContextData>()
 
   const submit = useSubmit()
   const fetcher = useFetcher()
@@ -127,6 +127,17 @@ export default () => {
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
+
+      {unpaidInvoiceURL && (
+        <section className="mb-6">
+          <ToastWithLink
+            message="We couldn't process payment for your account"
+            linkHref={unpaidInvoiceURL}
+            linkText="Update payment information"
+            type={'urgent'}
+          />
+        </section>
+      )}
 
       <section className="flex flex-col lg:flex-row items-center justify-between mb-11">
         <div className="flex flex-row items-center space-x-3">
@@ -296,7 +307,7 @@ export default () => {
           submit={submit}
           apps={[]}
           fetcher={fetcher}
-          hasUnpaidInvoices={hasUnpaidInvoices}
+          hasUnpaidInvoices={Boolean(unpaidInvoiceURL)}
         />
       </section>
 

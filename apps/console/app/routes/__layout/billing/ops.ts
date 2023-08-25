@@ -49,6 +49,7 @@ export type LoaderData = {
   connectedEmails: DropdownSelectListItem[]
   invoices: StripeInvoice[]
   groupURN?: IdentityGroupURN
+  unpaidInvoiceURL?: string
 }
 
 export const loader = getRollupReqFunctionErrorWrapper(
@@ -129,12 +130,20 @@ export const loader = getRollupReqFunctionErrorWrapper(
       spd.accountURN = targetAccountURN
     }
 
-    const invoices = (
-      await getCurrentAndUpcomingInvoices(
-        spd,
-        context.env.SECRET_STRIPE_API_KEY
-      )
-    ).slice(0, 7)
+    const cuInvoices = await getCurrentAndUpcomingInvoices(
+      spd,
+      context.env.SECRET_STRIPE_API_KEY
+    )
+
+    let unpaidInvoiceURL
+    cuInvoices.some((invoice) => {
+      if (invoice.status)
+        if (['uncollectible', 'open'].includes(invoice.status)) {
+          unpaidInvoiceURL = invoice.url as string
+        }
+    })
+
+    const invoices = cuInvoices.slice(0, 7)
 
     return json<LoaderData>(
       {
@@ -148,6 +157,7 @@ export const loader = getRollupReqFunctionErrorWrapper(
         invoices,
         toastNotification,
         groupURN,
+        unpaidInvoiceURL,
       },
       {
         headers: {
