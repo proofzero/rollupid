@@ -54,6 +54,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
     return json({
+      url: request.url,
       profile,
       connectedEmails,
       PASSPORT_URL: context.env.PASSPORT_URL,
@@ -76,21 +77,14 @@ export const shouldRevalidate = ({
 }
 
 export default function Onboarding() {
-  const { connectedEmails, PASSPORT_URL, profile } = useLoaderData<{
+  const { connectedEmails, PASSPORT_URL, profile, url } = useLoaderData<{
     connectedEmails: DropdownSelectListItem[]
     PASSPORT_URL: string
     profile: Profile
+    url: string
   }>()
 
-  let currentPage = 0
-
-  if (typeof window !== 'undefined') {
-    const url = new URL(window.location.href)
-    const connectResult = url.searchParams.get('rollup_result')
-    if (connectResult) {
-      currentPage = 1
-    }
-  }
+  const currentPage = new URL(url).searchParams.get('rollup_result') ? 1 : 0
 
   useConnectResult()
 
