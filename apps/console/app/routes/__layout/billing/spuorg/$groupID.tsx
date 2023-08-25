@@ -10,7 +10,6 @@ import {
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
-import type { LoaderData as OutletContextData } from '~/root'
 import { useEffect, useState } from 'react'
 import { Toaster, toast } from '@proofzero/design-system/src/atoms/toast'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'

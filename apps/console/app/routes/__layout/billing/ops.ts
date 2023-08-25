@@ -12,7 +12,7 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import { reconcileAppSubscriptions } from '~/services/billing/stripe'
 import { PaymentData, ServicePlanType } from '@proofzero/types/billing'
 import { BillingCustomerURN } from '@proofzero/urns/billing'
-import { IdentityURN } from '@proofzero/urns/identity'
+import { IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
 import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
@@ -231,16 +231,18 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       txType: 'buy' | 'remove'
     }
 
-    const apps = await coreClient.starbase.listApps.query()
-    const assignedEntitlementCount = apps.filter(
-      (a) => a.appPlan === ServicePlanType.PRO
-    ).length
-    if (assignedEntitlementCount > quantity) {
-      throw new BadRequestError({
-        message: `Invalid quantity. Change ${
-          quantity - assignedEntitlementCount
-        } of the ${assignedEntitlementCount} apps to a different plan first.`,
-      })
+    if (IdentityURNSpace.is(targetURN)) {
+      const apps = await coreClient.starbase.listApps.query()
+      const assignedEntitlementCount = apps.filter(
+        (a) => a.appPlan === ServicePlanType.PRO
+      ).length
+      if (assignedEntitlementCount > quantity) {
+        throw new BadRequestError({
+          message: `Invalid quantity. Change ${
+            quantity - assignedEntitlementCount
+          } of the ${assignedEntitlementCount} apps to a different plan first.`,
+        })
+      }
     }
 
     if ((quantity < 1 && txType === 'buy') || quantity < 0) {
