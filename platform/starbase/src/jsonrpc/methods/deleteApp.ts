@@ -66,7 +66,7 @@ export const deleteApp = async ({
   })
   await appDO.class.delete()
 
-  ctx.waitUntil(
+  ctx.waitUntil?.(
     createAnalyticsEvent({
       apiKey: ctx.POSTHOG_API_KEY,
       eventName: 'identity_deleted_app',

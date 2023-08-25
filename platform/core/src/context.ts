@@ -74,7 +74,7 @@ export interface CreateInnerContextOptions
 export async function createContextInner(
   opts: CreateInnerContextOptions &
     Environment & {
-      waitUntil: (promise: Promise<unknown>) => void
+      waitUntil?: (promise: Promise<unknown>) => void
     }
 ) {
   const traceSpan = generateTraceSpan(opts.req?.headers)
@@ -96,7 +96,7 @@ export async function createContextInner(
  */
 export async function createContext(
   opts: FetchCreateContextFnOptions & {
-    waitUntil: (promise: Promise<unknown>) => void
+    waitUntil?: (promise: Promise<unknown>) => void
   },
   env: Environment
 ) {

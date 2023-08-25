@@ -25,7 +25,12 @@ export default {
       req: request,
       router,
       onError,
-      createContext: (opts: FetchCreateContextFnOptions) => {
+      createContext: (
+        opts: FetchCreateContextFnOptions & {
+          // It doesn't exist on native tRPC types, so we can't force it here
+          waitUntil?: (promise: Promise<unknown>) => void
+        }
+      ) => {
         Object.assign(opts, { waitUntil: ctx.waitUntil.bind(ctx) })
         return createContext(opts, env)
       },

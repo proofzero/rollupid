@@ -41,7 +41,7 @@ export const createIdentityGroup = async ({
     dst: baseGroupURN,
   })
 
-  ctx.waitUntil(
+  ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: '$groupidentify',
       apiKey: ctx.POSTHOG_API_KEY,
@@ -59,7 +59,7 @@ export const createIdentityGroup = async ({
     })
   )
 
-  ctx.waitUntil(
+  ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: 'identity_created_group',
       apiKey: ctx.POSTHOG_API_KEY,

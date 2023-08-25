@@ -136,7 +136,7 @@ export const exchangeTokenMethod: ExchangeTokenMethod = async ({
     throw new UnsupportedGrantTypeError(grantType)
   }
 
-  ctx.waitUntil(
+  ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: `app_exchanged_${eventObject}`,
       distinctId: ctx.identityURN as IdentityURN,

@@ -69,7 +69,7 @@ export const resolveIdentityMethod = async ({
     blobs: [ctx.alias, resultURN, eventName],
   } as AnalyticsEngineDataPoint)
 
-  ctx.waitUntil(
+  ctx.waitUntil?.(
     createAnalyticsEvent({
       apiKey: ctx.POSTHOG_API_KEY,
       eventName,

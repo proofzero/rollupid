@@ -88,7 +88,7 @@ export const inviteIdentityGroupMember = async ({
     inviteCode,
   })
 
-  ctx.waitUntil(
+  ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: 'group_invited_member',
       distinctId: inviterIdentityURN,

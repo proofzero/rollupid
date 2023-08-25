@@ -62,7 +62,7 @@ export const authorizeMethod = async ({
 
   // We don't track hacky way to create user session.
   if (!scope.includes('admin')) {
-    ctx.waitUntil(
+    ctx.waitUntil?.(
       createAnalyticsEvent({
         eventName: 'identity_authorized_app',
         distinctId: identity,

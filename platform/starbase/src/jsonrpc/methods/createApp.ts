@@ -57,7 +57,7 @@ export const createApp = async ({
     console.log(`Created app ${clientId} for account ${ctx.accountURN}`)
   }
 
-  ctx.waitUntil(
+  ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: '$groupidentify',
       apiKey: ctx.POSTHOG_API_KEY,
@@ -76,7 +76,7 @@ export const createApp = async ({
     })
   )
 
-  ctx.waitUntil(
+  ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: 'identity_created_app',
       apiKey: ctx.POSTHOG_API_KEY,

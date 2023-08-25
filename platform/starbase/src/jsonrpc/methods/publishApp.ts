@@ -58,7 +58,7 @@ export const publishApp = async ({
 
   await appDO.class.publish(input.published)
 
-  ctx.waitUntil(
+  ctx.waitUntil?.(
     createAnalyticsEvent({
       distinctId: ctx.identityURN as IdentityURN,
       eventName: input.published

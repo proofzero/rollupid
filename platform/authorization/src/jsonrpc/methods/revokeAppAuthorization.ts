@@ -140,7 +140,7 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
 
     await authorizationNode.class.deleteAll()
 
-    ctx.waitUntil(
+    ctx.waitUntil?.(
       createAnalyticsEvent({
         apiKey: ctx.POSTHOG_API_KEY,
         distinctId: identityURN,
