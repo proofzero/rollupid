@@ -5,6 +5,7 @@ export const CustomDomainDNSRecordsSchema = z.array(
     name: z.string(),
     record_type: z.union([z.literal('TXT'), z.literal('CNAME')]),
     expected_value: z.string(),
+    required: z.boolean().default(true).optional(),
     value: z.array(z.string()).optional(),
   })
 )

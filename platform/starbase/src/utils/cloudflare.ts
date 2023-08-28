@@ -151,30 +151,48 @@ export const deleteWorkerRoute = async (
   )
 }
 
-export const getExpectedCustomDomainDNSRecords = async (
+export const getExpectedCustomDomainDNSRecords = (
   customHostname: string,
-  passportUrl: string,
+  current: CustomDomainDNSRecords,
   ctx: Context
-): Promise<CustomDomainDNSRecords> => {
-  const result: CustomDomainDNSRecords = []
+): CustomDomainDNSRecords => {
+  const expected: CustomDomainDNSRecords = [
+    {
+      name: customHostname,
+      record_type: 'CNAME',
+      expected_value: new URL(ctx.PASSPORT_URL).hostname,
+    },
+    {
+      record_type: 'CNAME',
+      name: `${ctx.INTERNAL_DKIM_SELECTOR}._domainkey.${customHostname}`,
+      expected_value: `${ctx.INTERNAL_DKIM_SELECTOR}._domainkey.notifications.rollup.id`,
+    },
+    {
+      record_type: 'CNAME',
+      name: `_dmarc.${customHostname}`,
+      expected_value: `_dmarc.notifications.rollup.id`,
+    },
+    {
+      record_type: 'TXT',
+      name: `_mailchannels.${customHostname}`,
+      required: false,
+      expected_value: 'v=mc1 cfid=rollup.id',
+    },
+  ]
 
-  result.push({
-    name: customHostname,
-    record_type: 'CNAME',
-    expected_value: passportUrl,
-  })
+  if (current.length == 0) return expected
 
-  result.push({
-    record_type: 'CNAME',
-    name: `${ctx.INTERNAL_DKIM_SELECTOR}._domainkey.${customHostname}`,
-    expected_value: `${ctx.INTERNAL_DKIM_SELECTOR}._domainkey.notifications.rollup.id`,
-  })
+  const missing: CustomDomainDNSRecords = []
 
-  result.push({
-    record_type: 'CNAME',
-    name: `_dmarc.${customHostname}`,
-    expected_value: `_dmarc.notifications.rollup.id`,
-  })
+  for (const e of expected) {
+    const found = current.some((c) => {
+      const name = e.name === c.name
+      const recordType = e.record_type === c.record_type
+      const expectedValue = e.expected_value === e.expected_value
+      return name && recordType && expectedValue
+    })
+    if (!found) missing.push(e)
+  }
 
-  return result
+  return current.concat(missing)
 }

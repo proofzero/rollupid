@@ -16,7 +16,6 @@ import { CustomDomain } from '../../types'
 export const CreateCustomDomainInput = z.object({
   clientId: z.string(),
   hostname: z.string(),
-  passportHostname: z.string(),
 })
 
 export const CreateCustomDomainOutput = CustomDomainSchema
@@ -55,9 +54,9 @@ export const createCustomDomain: CreateCustomDomainMethod = async ({
     )
     const customDomain: CustomDomain = {
       ...customHostname,
-      dns_records: await getExpectedCustomDomainDNSRecords(
+      dns_records: getExpectedCustomDomainDNSRecords(
         customHostname.hostname,
-        input.passportHostname,
+        [],
         ctx
       ),
     }
