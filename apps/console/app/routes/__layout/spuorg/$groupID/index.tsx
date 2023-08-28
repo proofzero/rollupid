@@ -570,6 +570,9 @@ export default () => {
                       <ApplicationListItemPublishedState
                         published={app.published}
                       />
+                      <Pill className="border rounded-3xl py-none">
+                        <Text size="xs">{group.name}</Text>
+                      </Pill>
                       {app.appPlan !== ServicePlanType.FREE ? (
                         <Pill className="border rounded-3xl py-none">
                           <Text size="xs">{app.appPlan}</Text>
