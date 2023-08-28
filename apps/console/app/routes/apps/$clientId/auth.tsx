@@ -236,12 +236,18 @@ export default function AppDetailIndexPage() {
   const outletContextData = useOutletContext<{
     notificationHandler: notificationHandlerType
     appDetails: appDetailsProps
+    authorizationURL: string
     rotationResult: any
     paymaster: PaymasterType
     appContactAddress?: AccountURN
   }>()
-  const { appContactAddress, paymaster, notificationHandler, appDetails } =
-    outletContextData
+  const {
+    appContactAddress,
+    paymaster,
+    notificationHandler,
+    appDetails,
+    authorizationURL,
+  } = outletContextData
   const { scopeMeta }: { scopeMeta: ScopeMeta } = useLoaderData()
 
   const ref = useRef(null)
@@ -566,6 +572,33 @@ export default function AppDetailIndexPage() {
                       <div className="sm:mb-[1.755rem]" />
                     )}
                   </div>
+                </div>
+
+                <hr />
+
+                <div className="w-[500px] space-y-3">
+                  <ReadOnlyInput
+                    id="oAuthAppAuthURL"
+                    label="My Auth URL"
+                    className="text-ellipsis"
+                    value={
+                      appDetails.published
+                        ? authorizationURL
+                        : 'Publish the application to get the auth URL'
+                    }
+                    copyable={true}
+                    onCopy={() =>
+                      toast(
+                        ToastType.Success,
+                        { message: 'Auth URL copied to clipboard!' },
+                        { duration: 2000 }
+                      )
+                    }
+                  />
+                  <Text size="sm" className="text-gray-500">
+                    This link is for testing purposes only! Auth flow won't be
+                    successful.
+                  </Text>
                 </div>
               </div>
             </Panel>

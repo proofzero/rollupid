@@ -28,9 +28,11 @@ import { PlatformAccountURNHeader } from '@proofzero/types/headers'
 import { getToastsAndFlashSession } from '~/utils/toast.server'
 import { useEffect } from 'react'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
+import { ResponseType } from '@proofzero/types/authorization'
 
 type LoaderData = {
   appDetails: appDetailsProps
+  authorizationURL: string
   rotationResult?: RotatedSecrets
   appContactAddress?: AccountURN
   appContactEmail?: string
@@ -59,13 +61,32 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         ...traceHeader,
       })
 
-      const appDetails = await coreClient.starbase.getAppDetails.query({
+      const appDetails = (await coreClient.starbase.getAppDetails.query({
         clientId: clientId as string,
-      })
+      })) as appDetailsProps
 
       const paymaster = await coreClient.starbase.getPaymaster.query({
         clientId: clientId as string,
       })
+
+      const authorizationURLBase =
+        appDetails.customDomain?.status === 'active'
+          ? `https://${appDetails.customDomain?.hostname}`
+          : context.env.PASSPORT_URL
+
+      const authorizationScope = appDetails.app?.scopes
+        ? Array.from(appDetails.app.scopes)
+        : ['openid']
+
+      const authorizationSearch = new URLSearchParams({
+        client_id: appDetails.clientId as string,
+        scope: authorizationScope.join(' '),
+        redirect_uri: appDetails.app?.redirectURI as string,
+        response_type: ResponseType.Code,
+        state: 'a-random-string',
+      })
+      const authorizationURL = new URL('/authorize', authorizationURLBase)
+      authorizationURL.search = authorizationSearch.toString()
 
       let rotationResult
       //If there's no timestamps, then the secrets have never been set, signifying the app
@@ -113,7 +134,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
       return json<LoaderData>(
         {
-          appDetails: appDetails as appDetailsProps,
+          appDetails,
+          authorizationURL: authorizationURL.toString(),
           rotationResult,
           appContactAddress,
           appContactEmail,
@@ -155,6 +177,7 @@ export default function AppDetailIndexPage() {
   } = useOutletContext<OutletContextData>()
   const {
     appDetails,
+    authorizationURL,
     rotationResult,
     appContactAddress,
     appContactEmail,
@@ -226,6 +249,7 @@ export default function AppDetailIndexPage() {
                   apps,
                   notificationHandler: notify,
                   appDetails,
+                  authorizationURL,
                   avatarUrl,
                   rotationResult,
                   PASSPORT_URL,
