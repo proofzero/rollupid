@@ -131,10 +131,6 @@ import {
   GetAppPlanInputSchema,
   GetAppPlanOutputSchema,
 } from './methods/getAppPlan'
-import {
-  transferAppToGroup,
-  TransferAppToGroupInput,
-} from './methods/transferAppToGroup'
 import { listGroupApps, ListGroupAppsOutput } from './methods/listGroupApps'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
@@ -379,14 +375,6 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(ReconcileAppSubscriptionsInputSchema)
     .mutation(reconcileAppSubscriptions),
-  transferAppToGroup: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(LogUsage)
-    .use(Analytics)
-    .use(OwnAppsMiddleware)
-    .input(TransferAppToGroupInput)
-    .mutation(transferAppToGroup),
   listGroupApps: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
