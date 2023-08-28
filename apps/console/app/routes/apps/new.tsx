@@ -12,13 +12,14 @@ import { Popover } from '@headlessui/react'
 import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
-import { Form, useOutletContext } from '@remix-run/react'
+import { Form, NavLink, useOutletContext } from '@remix-run/react'
 
 import type { LoaderData as OutletContextData } from '~/root'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { usePostHog } from 'posthog-js/react'
+import classNames from 'classnames'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -95,34 +96,43 @@ export default function CreateNewApp() {
                   Create Application
                 </Text>
 
-                <Form method="post" onSubmit={() => setIsSubmitting(true)}>
+                <Form
+                  className="flex flex-col gap-4 w-[464px]"
+                  method="post"
+                  onSubmit={() => setIsSubmitting(true)}
+                >
                   <Input
                     autoFocus
                     id="client_name"
                     label="Application Name"
                     placeholder="My application"
                     required
-                    className="mb-12"
                   />
 
-                  <div className="flex justify-end items-center space-x-3">
-                    <Button
-                      type="submit"
-                      btnType="primary-alt"
-                      className={
-                        isSubmitting
-                          ? 'flex items-center justify-between transition'
-                          : ''
-                      }
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting && (
-                        <RiLoader5Fill className="animate-spin" size={22} />
-                      )}
-                      Create
-                    </Button>
-                  </div>
+                  <Button
+                    type="submit"
+                    btnType="primary-alt"
+                    className={classNames(
+                      'w-full',
+                      isSubmitting
+                        ? 'flex items-center justify-between transition'
+                        : ''
+                    )}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting && (
+                      <RiLoader5Fill className="animate-spin" size={22} />
+                    )}
+                    Create
+                  </Button>
                 </Form>
+
+                <Text className="mt-4" size="sm">
+                  Did you want to create this application within a group?{' '}
+                  <NavLink to="/spuorg" className="text-[#6366F1]">
+                    Go to Groups
+                  </NavLink>
+                </Text>
               </div>
             </section>
           </main>
