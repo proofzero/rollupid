@@ -1,25 +1,41 @@
 import { useEffect, useState } from 'react'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
-import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { Button, Text } from '@proofzero/design-system'
 import { redirect } from '@remix-run/cloudflare'
-import { useTransition } from '@remix-run/react'
-import {
-  Form,
-  useNavigate,
-  useOutletContext,
-  useSubmit,
-} from '@remix-run/react'
+import { Form, useNavigate, useOutletContext } from '@remix-run/react'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
-import {
-  BadRequestError,
-  ERROR_CODES,
-  HTTP_STATUS_CODES,
-} from '@proofzero/errors'
-import { generateEmailOTP } from '~/utils/emailOTP'
+import { BadRequestError } from '@proofzero/errors'
+import { fromBase64, toBase64 } from '@proofzero/utils/buffer'
+import { decode, encode } from 'cbor-x'
+
+type LoginPayload = {
+  credentialId: string
+  clientDataJSON: string
+  authenticatorData: string
+  userHandle: string
+  signature: string
+}
 
 export const action: ActionFunction = async ({ request, params }) => {
+  const loginPayload: LoginPayload = await request.json()
+
+  console.debug('reg login backend', loginPayload)
+  const clientDataJSON = new TextDecoder().decode(
+    fromBase64(loginPayload.clientDataJSON)
+  )
+  const clientDataJSONObject = JSON.parse(clientDataJSON)
+
+  console.debug('clientDataJSONObject', clientDataJSONObject)
+
+  const authenticatorData = new TextDecoder().decode(
+    fromBase64(loginPayload.authenticatorData)
+  )
+
+  console.debug('authenticatorData', authenticatorData)
+
+  return null
+
   const fd = await request.formData()
 
   const email = fd.get('email')
@@ -43,7 +59,6 @@ export default () => {
     prompt?: string
   }>()
 
-
   const navigate = useNavigate()
 
   const [loginRequested, setLoginRequested] = useState(false)
@@ -55,19 +70,41 @@ export default () => {
       let credential = await navigator.credentials.get({
         publicKey: {
           challenge,
-          rpId: "localhost",
+          rpId: 'localhost',
           allowCredentials: [],
           // userVerification: "required",
+        },
+      })
+      console.log('CREDENTIAL', credential)
+      if (
+        credential instanceof PublicKeyCredential &&
+        credential.response instanceof AuthenticatorAssertionResponse
+      ) {
+        const loginPayload: LoginPayload = {
+          credentialId: credential?.id || '',
+          clientDataJSON: toBase64(credential.response.clientDataJSON),
+          authenticatorData: toBase64(credential.response.authenticatorData),
+          userHandle: toBase64(
+            credential.response.userHandle || new ArrayBuffer(0)
+          ),
+          signature: toBase64(credential.response.signature),
         }
-      });
-      console.log("CREDENTIAL", credential)
+        console.debug('LOGIN PAYLOAD', loginPayload)
+        const response = await fetch(
+          'http://localhost:10001/authenticate/passport/webauthn/',
+          {
+            method: 'POST',
+            body: JSON.stringify(loginPayload),
+            // redirect: 'follow',
+          }
+        )
+      }
     }
 
     if (loginRequested) {
       webauthnLogin()
       setLoginRequested(false)
     }
-
   }, [loginRequested])
 
   return (
@@ -105,7 +142,9 @@ export default () => {
             btnType="secondary-alt-skin"
             className="w-full hover:bg-gray-100"
             disabled={loginRequested}
-            onClick={() => { setLoginRequested(true) }}
+            onClick={() => {
+              setLoginRequested(true)
+            }}
           >
             Login
           </Button>
@@ -117,10 +156,8 @@ export default () => {
           >
             Register
           </Button>
-
         </section>
-        <section className="flex-1">
-        </section>
+        <section className="flex-1"></section>
       </Form>
 
       {prompt && (
