@@ -282,6 +282,7 @@ const AssignEntitlementModal = ({
   entitlementUsage,
   fetcher,
   apps,
+  newAppURL = '/apps/new',
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
@@ -290,6 +291,7 @@ const AssignEntitlementModal = ({
   paymentData?: PaymentData
   fetcher: FetcherWithComponents<any>
   apps: AppLoaderData[]
+  newAppURL?: string
 }) => {
   const navigate = useNavigate()
 
@@ -424,7 +426,7 @@ const AssignEntitlementModal = ({
               className="w-full"
               btnType="secondary-alt"
               onClick={() => {
-                navigate('/apps/new')
+                navigate(newAppURL)
               }}
             >
               Create New Application
@@ -725,6 +727,7 @@ export const PlanCard = ({
   submit,
   fetcher,
   hasUnpaidInvoices = false,
+  newAppURL,
 }: {
   plan: PlanDetails
   entitlements: number
@@ -733,6 +736,7 @@ export const PlanCard = ({
   hasUnpaidInvoices: boolean
   submit: SubmitFunction
   fetcher: FetcherWithComponents<any>
+  newAppURL?: string
 }) => {
   const [purchaseProModalOpen, setPurchaseProModalOpen] = useState(false)
   const [removeEntitlementModalOpen, setRemoveEntitlementModalOpen] =
@@ -771,6 +775,7 @@ export const PlanCard = ({
         paymentData={paymentData}
         fetcher={fetcher}
         apps={apps}
+        newAppURL={newAppURL}
       />
       <AssignedAppModal
         isOpen={assignedAppModalOpen}
