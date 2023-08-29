@@ -32,7 +32,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
 export default () => {
   const { groups } = useLoaderData<{ groups: ListIdentityGroupsOutput }>()
-  const { PASSPORT_URL, hasUnpaidInvoices } =
+  const { PASSPORT_URL, hasUnpaidInvoices, apps } =
     useOutletContext<OutletContextData>()
 
   return (
@@ -41,6 +41,7 @@ export default () => {
         groups,
         PASSPORT_URL,
         hasUnpaidInvoices,
+        apps,
       }}
     />
   )
