@@ -84,7 +84,7 @@ export const ApplicationList = ({
         </div>
       </section>
 
-      <section className="flex flex-col space-y-2">
+      <section className="flex flex-col">
         {actionApp && (
           <DeleteAppModal
             isOpen={deleteModalOpen}
@@ -114,7 +114,7 @@ export const ApplicationList = ({
         ))}
 
         {Object.entries(groupedApplications).map(([groupID, entry]) => (
-          <section key={groupID} className="flex flex-col space-y-2">
+          <section key={groupID} className="flex flex-col space-y-2 mt-5">
             <Text size="sm" weight="medium" className="text-gray-500 mb-2">
               {entry.groupName}
             </Text>
