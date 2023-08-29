@@ -7,7 +7,10 @@ import { Form, useNavigate, useOutletContext } from '@remix-run/react'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { BadRequestError } from '@proofzero/errors'
 import { fromBase64, toBase64 } from '@proofzero/utils/buffer'
-import { decode, encode } from 'cbor-x'
+import { AccountURNSpace } from '@proofzero/urns/account'
+import { generateHashedIDRef } from '@proofzero/urns/idref'
+import { NodeType, WebauthnAccountType } from '@proofzero/types/account'
+import { getCoreClient } from '~/platform.server'
 
 type LoginPayload = {
   credentialId: string
@@ -17,7 +20,7 @@ type LoginPayload = {
   signature: string
 }
 
-export const action: ActionFunction = async ({ request, params }) => {
+export const action: ActionFunction = async ({ request, params, context }) => {
   const loginPayload: LoginPayload = await request.json()
 
   console.debug('reg login backend', loginPayload)
@@ -28,12 +31,25 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   console.debug('clientDataJSONObject', clientDataJSONObject)
 
-  const authenticatorData = new TextDecoder().decode(
-    fromBase64(loginPayload.authenticatorData)
+  // const authenticatorData = new TextDecoder().decode(
+  //   fromBase64(loginPayload.authenticatorData)
+  // )
+
+  // console.debug('authenticatorData', authenticatorData)
+
+  const accountURN = AccountURNSpace.componentizedUrn(
+    generateHashedIDRef(WebauthnAccountType.WebAuthN, loginPayload.credentialId),
+    { node_type: NodeType.WebAuthN, addr_type: WebauthnAccountType.WebAuthN },
+    { alias: loginPayload.credentialId }
   )
 
-  console.debug('authenticatorData', authenticatorData)
+  console.debug("LOGIN ACCOUNTURN", accountURN)
 
+  const coreClient = getCoreClient({ context, accountURN })
+
+  const webAuthnData = await coreClient.account.getWebAuthNData.query();
+
+  console.log("WEBAUTHN DATA IN STORAGE", webAuthnData)
   return null
 
   const fd = await request.formData()
@@ -139,7 +155,6 @@ export default () => {
           </Text>
           <Button
             btnSize="l"
-            btnType="secondary-alt-skin"
             className="w-full hover:bg-gray-100"
             disabled={loginRequested}
             onClick={() => {
@@ -150,7 +165,6 @@ export default () => {
           </Button>
           <Button
             btnSize="l"
-            btnType="secondary-alt-skin"
             className="w-full hover:bg-gray-100"
             onClick={() => navigate('register')}
           >
@@ -164,7 +178,6 @@ export default () => {
         <div className="flex w-full">
           <Button
             btnSize="l"
-            btnType="secondary-alt-skin"
             className="w-full hover:bg-gray-100"
             onClick={() => navigate('/authenticate/cancel')}
           >

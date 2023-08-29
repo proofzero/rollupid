@@ -17,10 +17,19 @@ import Account from './account'
 import { Context } from '../context'
 
 type WebauthnAccountProfile = AccountProfile<WebauthnAccountType.WebAuthN>
+type WebAuthNData = any
 
 export default class WebauthnAccount {
   declare node: AccountNode
   declare ctx: Context
+
+  async getData(): Promise<WebAuthNData | undefined> {
+    return this.node.storage.get<WebAuthNData>('data')
+  }
+
+  async setData(data: WebAuthNData): Promise<void> {
+    return this.node.storage.put('data', data)
+  }
 
   constructor(node: AccountNode, ctx: Context) {
     this.node = node
@@ -48,4 +57,4 @@ export default class WebauthnAccount {
     }
   }
 }
-export type EmailAccountProxyStub = DurableObjectStubProxy<WebauthnAccount>
+export type WebAuthNAccountProxyStub = DurableObjectStubProxy<WebauthnAccount>
