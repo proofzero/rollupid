@@ -17,10 +17,7 @@ import {
 } from '~/utilities/session.server'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import createCoreClient from '@proofzero/platform-clients/core'
-import {
-  getAuthzHeaderConditionallyFromToken,
-  parseJwt,
-} from '@proofzero/utils'
+import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import {
   useActionData,
   useLoaderData,
@@ -51,10 +48,11 @@ import {
 import { setPurchaseToastNotification } from '~/utils'
 import type Stripe from 'stripe'
 import { PaymentData, ServicePlanType } from '@proofzero/types/billing'
-import { IdentityURN } from '@proofzero/urns/identity'
 import { GetEntitlementsOutput } from '@proofzero/platform/billing/src/jsonrpc/methods/getEntitlements'
 import { PlanFeatures } from '~/components/Billing'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
+import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
+import { IdentityURNSpace } from '@proofzero/urns/identity'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -85,12 +83,17 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       toastNotification = JSON.parse(toastStr)
     }
 
+    const groupID = IdentityGroupURNSpace.is(appDetails.ownerURN)
+      ? appDetails.ownerURN.split('/')[1]
+      : undefined
+
     return json(
       {
         entitlements,
         paymentData,
         toastNotification,
         STRIPE_PUBLISHABLE_KEY: context.env.STRIPE_PUBLISHABLE_KEY,
+        groupID,
       },
       {
         headers: {
@@ -119,13 +122,18 @@ const processUpdateOp = async (
     URN: targetURN,
   })
 
-  const [ownApps, groupApps] = await Promise.all([
-    coreClient.starbase.listApps.query(),
-    coreClient.starbase.listGroupApps.query(),
-  ])
-  const apps = [...ownApps, ...groupApps]
+  let apps = []
+  if (IdentityGroupURNSpace.is(targetURN)) {
+    apps = await coreClient.starbase.listGroupApps.query()
+  } else if (IdentityURNSpace.is(targetURN)) {
+    apps = await coreClient.starbase.listApps.query()
+  } else {
+    throw new BadRequestError({
+      message: `Invalid URN`,
+    })
+  }
 
-  const allotedApps = ownApps.filter((a) => a.appPlan === plan).length
+  const allotedApps = apps.filter((a) => a.appPlan === plan).length
 
   if (
     plan !== ServicePlanType.FREE &&
@@ -762,11 +770,13 @@ export default () => {
     paymentData,
     toastNotification,
     STRIPE_PUBLISHABLE_KEY,
+    groupID,
   } = useLoaderData<{
     STRIPE_PUBLISHABLE_KEY: string
     entitlements: GetEntitlementsOutput
     paymentData: PaymentData
-    toastNotification: ToastNotification | undefined
+    toastNotification?: ToastNotification
+    groupID?: string
   }>()
 
   const actionData = useActionData()
@@ -823,7 +833,9 @@ export default () => {
           planType={ServicePlanType.PRO}
           totalEntitlements={entitlements[ServicePlanType.PRO]?.entitlements}
           usedEntitlements={
-            apps.filter((a) => a.appPlan === ServicePlanType.PRO).length
+            apps
+              .filter((a) => (groupID ? a.groupID === groupID : true))
+              .filter((a) => a.appPlan === ServicePlanType.PRO).length
           }
           paymentData={paymentData}
           featuresColor="text-indigo-500"

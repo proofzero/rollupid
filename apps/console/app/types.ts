@@ -6,6 +6,7 @@ import type {
   CustomDomain,
 } from '@proofzero/platform/starbase/src/types'
 import { ServicePlanType } from '@proofzero/types/billing'
+import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 
 export enum RollType {
   RollAPIKey = 'roll_api_key',
@@ -25,6 +26,7 @@ export type appDetailsProps = {
   apiKeyTimestamp?: number
   customDomain?: CustomDomain
   appPlan: ServicePlanType
+  ownerURN: IdentityRefURN
 }
 
 export type errorsAuthProps = {
