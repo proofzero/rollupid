@@ -12,6 +12,8 @@ import { NodeType, WebauthnAccountType } from '@proofzero/types/account'
 import { getCoreClient } from '~/platform.server'
 import { Fido2Lib } from 'fido2-lib'
 import { base64url } from 'jose'
+import { EncryptJWT, jwtDecrypt } from 'jose'
+import { decrypt, encrypt, importKey } from '@proofzero/utils/crypto'
 
 type LoginPayload = {
   credentialId: string
@@ -27,6 +29,15 @@ const fixedChallenge =
 
 export const action: ActionFunction = async ({ request, params, context }) => {
   const loginPayload: LoginPayload = await request.json()
+  const algorithm = { name: 'AES-GCM' }
+
+  const key = await importKey(fromBase64(context.env.SECRET_SESSION_KEY), algorithm)
+
+  const dataArray = new TextEncoder().encode(JSON.stringify({ exp: Date.now(), challenge:  }))
+  const encryptedData = await encrypt(key, algorithm, dataArray)
+  console.debug("Encyrpted ", encryptedData)
+  const decyrptedData = await decrypt(key, algorithm, new Uint8Array(encryptedData.cipher), new Uint8Array(encryptedData.iv))
+  console.debug("Decrypted", decyrptedData)
 
   console.debug('reg login backend', loginPayload)
   const clientDataJSON = new TextDecoder().decode(
