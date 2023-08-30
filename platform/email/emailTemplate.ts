@@ -97,15 +97,7 @@ const EmailTemplateBase = (
             border-radius: 8px;
           }
 
-          .logo {
-            display: block;
-            max-width: 375px;
-            max-height: 48px;
-            margin-bottom: 37px;
-          }
-
-          .heading,
-          .heading-logo {
+          .heading {
             font-size: 36px;
             font-weight: bold;
             line-height: 44px;
@@ -167,8 +159,8 @@ const EmailTemplateBase = (
       <body class="adaptive" style="font-family: 'Inter', sans-serif; background-color: #ffffff; color: #6b7280;">
         <div class="container adaptive" style="display: block; width: 98%; text-align: center; background-color: #ffffff;">
           <div class="content adaptive" style="display: inline-block; vertical-align: top; text-align: left; max-width: 375px; border-radius: 8px; background-color: #ffffff;">
-            <div class="heading-logo" style="font-size: 36px; font-weight: bold; line-height: 44px; margin-bottom: 16px;">
-              <img class="logo" src="${logoURL}" alt="" style="display: block; max-width: 375px; max-height: 48px; margin-bottom: 37px;"/>
+            <div style="margin-bottom: 16px;">
+              <img src="${logoURL}" style="position: relative; max-width: 375px; max-height: 48px; object-fit: contain;" />
             </div>
             ${content}
             <div class="divider" style="border-bottom: 1px solid #e5e7eb; width: 100%; margin-bottom: 10px;"></div>
