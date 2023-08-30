@@ -160,9 +160,8 @@ const EmailTemplateBase = (
       <body class="adaptive" style="font-family: 'Inter', sans-serif; background-color: #ffffff; color: #6b7280;">
         <div class="container adaptive" style="display: block; width: 98%; text-align: center; background-color: #ffffff;">
           <div class="content adaptive" style="display: inline-block; vertical-align: top; text-align: left; max-width: 375px; border-radius: 8px; background-color: #ffffff;">
-            <div style="margin-bottom: 16px;">
-              <div style="position: relative; width: 375px; height: 48px; background-image: url(${logoURL}); background-size: contain; background-repeat: no-repeat; background-position: left center;" />
-            </div>
+            <div style="position: relative; width: 375px; height: 48px; background-image: url(${logoURL}); background-size: contain; background-repeat: no-repeat; background-position: left center;" />
+            <div style="height: 48px"></div>
             ${content}
             <div class="divider" style="border-bottom: 1px solid #e5e7eb; width: 100%; margin-bottom: 10px;"></div>
             <div style="width: 100%;">
