@@ -102,7 +102,7 @@ export default function Onboarding() {
         >
           <Outlet context={{ connectedEmails, PASSPORT_URL, currentPage }} />
         </div>
-        <div className="basis-3/5 h-[100dvh] w-full hidden 2xl:flex justify-end items-center bg-gray-50 dark:bg-gray-800 overflow-hidden">
+        <div className="basis-3/5 h-[100dvh] w-full hidden lg:flex justify-end items-center bg-gray-50 dark:bg-gray-800 overflow-hidden">
           <img
             className="max-h-fit mt-[10%]"
             alt="onboarding"

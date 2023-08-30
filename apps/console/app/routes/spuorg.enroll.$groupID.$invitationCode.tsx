@@ -217,7 +217,7 @@ export default () => {
       >
         <div
           className={
-            'basis-2/5 h-[100dvh] w-full hidden 2xl:flex justify-center items-center bg-indigo-50 dark:bg-[#1F2937] overflow-hidden'
+            'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 dark:bg-[#1F2937] overflow-hidden'
           }
           style={{
             backgroundImage: `url(${sideGraphics})`,
@@ -228,7 +228,7 @@ export default () => {
         ></div>
         <div
           className={
-            'basis-full basis-full 2xl:basis-3/5 flex flex-col justify-center items-center'
+            'basis-full basis-full lg:basis-3/5 flex flex-col justify-center items-center'
           }
         >
           <div className="bg-white rounded rounded-lg border p-6 max-w-lg">
