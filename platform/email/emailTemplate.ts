@@ -3,47 +3,47 @@ import { type EmailPlans } from './src/jsonrpc/methods/sendSuccesfullPaymentNoti
 
 export const darkModeStyles = `
     body {
-        background-color: #1A202C;
-        color: #E2E8F0;
+        background-color: #1A202C !important;
+        color: #E2E8F0 !important;
     }
     .content, .container {
-        background-color: #1A202C;
+        background-color: #1A202C !important;
     }
     .divider {
-        border-bottom-color: #4A5568;
+        border-bottom-color: #4A5568 !important;
     }
     #passcode {
-        background-color: #2D3748;
+        background-color: #2D3748 !important;
     }
     .footer-links {
-        color: #E2E8F0;
-        border-bottom-color: #E2E8F0;
+        color: #E2E8F0 !important;
+        border-bottom-color: #E2E8F0 !important;
     }
     .vl {
-        border-color: #E2E8F0;
+        border-color: #E2E8F0 !important;
     }
 `
 
 export const lightModeStyles = `
     body {
-        background-color: #ffffff;
-        color: #6b7280;
+        background-color: #ffffff !important;
+        color: #6b7280 !important;
     }
     .content, .container {
-        background-color: #ffffff;
+        background-color: #ffffff !important;
     }
     .divider {
-        border-bottom-color: #e5e7eb;
+        border-bottom-color: #e5e7eb !important;
     }
     #passcode {
-        background-color: #f3f4f6;
+        background-color: #f3f4f6 !important;
     }
     .footer-links {
-        color: #6b7280;
-        border-bottom-color: #6b7280;
+        color: #6b7280 !important;
+        border-bottom-color: #6b7280 !important;
     }
     .vl {
-        border-color: #6b7280;
+        border-color: #6b7280 !important;
     }
 `
 
@@ -75,6 +75,7 @@ const EmailTemplateBase = (
           rel="stylesheet"
         />
         <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
+
         <style type="text/css">
           body,
           .container,
@@ -97,7 +98,7 @@ const EmailTemplateBase = (
           }
 
           .logo {
-            display: block
+            display: block;
             max-width: 375px;
             max-height: 48px;
             margin-bottom: 37px;
@@ -162,69 +163,55 @@ const EmailTemplateBase = (
               ${darkModeStyles}
           }
         </style>
-        <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
       </head>
-
-      <body class="adaptive">
-        <div class="container adaptive">
-          <div class="content adaptive">
-            <div class="heading-logo">
-              <img class="logo" src="${logoURL}" alt="" style="display:block; max-width: 375px; max-height: 48px;"/>
+      <body class="adaptive" style="font-family: 'Inter', sans-serif; background-color: #ffffff; color: #6b7280;">
+        <div class="container adaptive" style="display: block; width: 98%; text-align: center; background-color: #ffffff;">
+          <div class="content adaptive" style="display: inline-block; vertical-align: top; text-align: left; max-width: 375px; border-radius: 8px; background-color: #ffffff;">
+            <div class="heading-logo" style="font-size: 36px; font-weight: bold; line-height: 44px; margin-bottom: 16px;">
+              <img class="logo" src="${logoURL}" alt="" style="display: block; max-width: 375px; max-height: 48px; margin-bottom: 37px;"/>
             </div>
             ${content}
-            <div class="divider"></div>
-            <div style="width: 100%">
+            <div class="divider" style="border-bottom: 1px solid #e5e7eb; width: 100%; margin-bottom: 10px;"></div>
+            <div style="width: 100%;">
               <a
                 class="footer-links"
+                style="font-size: 12px; text-decoration: none; border-bottom: 1px solid #6b7280; margin-right: 10px; color: #6b7280; width: auto;"
                 href="${termsURL}"
                 target="_blank"
                 rel="noreferrer"
-                >Terms & Conditions</a
-              >
-              <div class="vl"></div>
+              >Terms & Conditions</a>
+              <div class="vl" style="border: 0.5px solid #6b7280; display: inline; margin-right: 15px;"></div>
               <a
                 class="footer-links"
+                style="font-size: 12px; text-decoration: none; border-bottom: 1px solid #6b7280; margin-right: 10px; color: #6b7280; width: auto;"
                 href="${privacyURL}"
                 target="_blank"
                 rel="noreferrer"
-                >Privacy Policy</a
-              >
+              >Privacy Policy</a>
               ${
                 contactURL && contactURL !== ''
                   ? `
-              <div class="vl"></div>
+              <div class="vl" style="border: 0.5px solid #6b7280; display: inline; margin-right: 15px;"></div>
               <a
                 class="footer-links"
+                style="font-size: 12px; text-decoration: none; border-bottom: 1px solid #6b7280; margin-right: 10px; color: #6b7280; width: auto;"
                 href="${contactURL}"
                 target="_blank"
                 rel="noreferrer"
-                >Contact Us</a
-              >`
+              >Contact Us</a>`
                   : ''
               }
             </div>
-
             ${
               address && address !== ''
                 ? `
             <pre
-              style="
-                font-size: 12px;
-                line-height: 16px;
-                color: #6b7280;
-                margin-bottom: 4px;
-                margin-top: 10px;
-              "
+              style="font-size: 12px; line-height: 16px; color: #6b7280; margin-bottom: 4px; margin-top: 10px;"
             >${address}</pre>`
                 : ''
             }
             <p
-              style="
-                font-size: 12px;
-                line-height: 20px;
-                color: #6b7280;
-                margin-bottom: 10px;
-              "
+              style="font-size: 12px; line-height: 20px; color: #6b7280; margin-bottom: 10px;"
             >
               All rights reserved.
             </p>
@@ -235,13 +222,7 @@ const EmailTemplateBase = (
                 style="max-width: 11px; display: inline-block"
               />
               <p
-                style="
-                  font-size: 12px;
-                  line-height: 12px;
-                  color: #9ca3af;
-                  display: inline-block;
-                  margin-bottom: 10px;
-                "
+                style="font-size: 12px; line-height: 12px; color: #9ca3af; display: inline-block; margin-bottom: 10px;"
               >
                 Powered by
                 <a
@@ -249,8 +230,8 @@ const EmailTemplateBase = (
                   target="_blank"
                   rel="noreferrer"
                   class="powered-by"
-                  >rollup.id</a
-                >
+                  style="font-size: 12px; text-decoration: none;"
+                >rollup.id</a>
               </p>
             </div>
           </div>
@@ -265,15 +246,14 @@ export const EmailTemplateOTP = (
   params: EmailTemplateParams
 ): EmailContent => {
   const content = `
-            <div class="heading">Confirm Your Email Address</div>
-            <p>Please copy the code below into the email verification screen.</p>
-            <div id="passcode">${passcode}</div>
-            <p>Please note: the code will be valid for the next 10 minutes.</p>
-            <p>
-              If you didn&apos;t request this email, there&apos;s nothing to worry
-              about - you can safely ignore it.
-            </p>
-            `
+    <div class="heading" style="font-size: 36px; font-weight: bold; line-height: 44px; margin-bottom: 16px;">Confirm Your Email Address</div>
+    <p style="font-size: 16px; font-weight: normal; line-height: 24px; margin-bottom: 16px;">Please copy the code below into the email verification screen.</p>
+    <div id="passcode" style="width: 100%; text-align: center; font-size: 46px; font-weight: bold; border-radius: 8px; margin-top: 20px; margin-bottom: 20px; padding: 15px 0; background-color: #f3f4f6;">${passcode}</div>
+    <p style="font-size: 16px; font-weight: normal; line-height: 24px; margin-bottom: 16px;">Please note: the code will be valid for the next 10 minutes.</p>
+    <p style="font-size: 16px; font-weight: normal; line-height: 24px; margin-bottom: 16px;">
+      If you didn&apos;t request this email, there&apos;s nothing to worry about - you can safely ignore it.
+    </p>
+  `
 
   const subject = `Your ${params.appName ?? `Rollup ID`} one-time passcode`
 
