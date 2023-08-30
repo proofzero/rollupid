@@ -30,7 +30,8 @@ type RegistrationPayload = {
   rawId: string
 }
 
-const fixedChallenge = "9czL/AqVkQah8J127PTEShBn6GJUOhS5oivgYu3xby7k/mwk/+bEViam0yNSbHpt74o5yXW0MHkchNhA4B37dA=="
+const fixedChallenge =
+  '9czL/AqVkQah8J127PTEShBn6GJUOhS5oivgYu3xby7k/mwk/+bEViam0yNSbHpt74o5yXW0MHkchNhA4B37dA=='
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -45,9 +46,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       authenticatorRequireResidentKey: false,
       authenticatorUserVerification: 'required',
     })
-    const registrationOptions = await f2l.attestationOptions() as any
+    const registrationOptions = (await f2l.attestationOptions()) as any
     registrationOptions.challenge = fixedChallenge
-    console.debug('REGISTRATION OPTIONS', JSON.stringify(registrationOptions, null, 2))
+    console.debug(
+      'REGISTRATION OPTIONS',
+      JSON.stringify(registrationOptions, null, 2)
+    )
     return json({ registrationOptions })
   }
 )
@@ -69,9 +73,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         authenticatorAttachment: 'platform',
         authenticatorRequireResidentKey: false,
         authenticatorUserVerification: 'required',
-      }!
+      }
     )
 
+    //This throws in case it can't verify 
     const registrationResults = await f2l.attestationResult(
       {
         rawId: base64url.decode(registrationPayload.rawId).buffer,
@@ -86,7 +91,17 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         factor: 'first',
       }
     )
-    console.debug("AFTER VERIFICATION REG RESULTS", registrationResults)
+
+    const webauthnData = {
+      counter: registrationResults.authnrData.get("counter"),
+      // credentialId: registrationResults.request.id,
+      publicKey: registrationResults.authnrData.get("credentialPublicKeyPem"),
+    }
+
+    console.debug(
+      'AFTER VERIFICATION REG RESULTS',
+      registrationPayload.credentialId, webauthnData
+    )
 
     console.debug(
       'clientDataJSON',
@@ -109,7 +124,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const appData = await getAuthzCookieParams(request, context.env)
     const coreClient = getCoreClient({ context, accountURN })
 
-    await coreClient.account.setWebAuthNData.mutate(registrationPayload)
+    await coreClient.account.setWebAuthNData.mutate(webauthnData)
     await coreClient.account.setNickname.query({
       nickname: registrationPayload.nickname,
     })
@@ -142,9 +157,16 @@ export default () => {
   }>()
 
   const { registrationOptions } = useLoaderData()
-  console.debug('REGISTRAION OPTIONS CLIENT', JSON.stringify(registrationOptions, null, 2))
+  console.debug(
+    'REGISTRAION OPTIONS CLIENT',
+    JSON.stringify(registrationOptions, null, 2)
+  )
 
-  if (registrationOptions && registrationOptions.challenge && typeof registrationOptions.challenge === 'string') {
+  if (
+    registrationOptions &&
+    registrationOptions.challenge &&
+    typeof registrationOptions.challenge === 'string'
+  ) {
     // console.debug("STRING TO DECODE", registrationOptions.challenge)
     // alert(registrationOptions.challenge + " " + typeof registrationOptions.challenge)
     registrationOptions.challenge = fromBase64(registrationOptions.challenge)
@@ -155,15 +177,13 @@ export default () => {
   const [keyName, setKeyName] = useState('')
 
   const registerKey = async (name: string) => {
-
     registrationOptions.user = {
       id: new TextEncoder().encode('asdfasdfasdfa'),
       name,
-      displayName: name
+      displayName: name,
     }
     let credential = await navigator.credentials.create({
-      publicKey: registrationOptions
-
+      publicKey: registrationOptions,
     })
     console.log(
       'CREDS AFTER REGISTRATION',
@@ -177,15 +197,20 @@ export default () => {
     ) {
       const registrationPayload = {
         nickname: name,
-        credentialId: base64url.encode(credential.id),
+        credentialId: credential.id,
         rawId: base64url.encode(new Uint8Array(credential.rawId)),
-        clientDataJSON: base64url.encode(new Uint8Array(credential.response.clientDataJSON)),
-        authenticatorData: base64url.encode(new Uint8Array((credential.response.getAuthenticatorData()))),
-        attestationObject: base64url.encode(new Uint8Array(credential.response.attestationObject)),
+        clientDataJSON: base64url.encode(
+          new Uint8Array(credential.response.clientDataJSON)
+        ),
+        authenticatorData: base64url.encode(
+          new Uint8Array(credential.response.getAuthenticatorData())
+        ),
+        attestationObject: base64url.encode(
+          new Uint8Array(credential.response.attestationObject)
+        ),
         publicKey: toBase64(
           credential.response.getPublicKey() || new ArrayBuffer(0)
         ),
-        publicKeyAlgo: credential.response.getPublicKeyAlgorithm(),
       }
       const response = await fetch(
         'http://localhost:10001/authenticate/passport/webauthn/register',

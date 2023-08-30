@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
 import { Button, Text } from '@proofzero/design-system'
-import { redirect } from '@remix-run/cloudflare'
 import { Form, useNavigate, useOutletContext } from '@remix-run/react'
 
 import type { ActionFunction } from '@remix-run/cloudflare'
@@ -11,6 +10,8 @@ import { AccountURNSpace } from '@proofzero/urns/account'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { NodeType, WebauthnAccountType } from '@proofzero/types/account'
 import { getCoreClient } from '~/platform.server'
+import { Fido2Lib } from 'fido2-lib'
+import { base64url } from 'jose'
 
 type LoginPayload = {
   credentialId: string
@@ -18,7 +19,11 @@ type LoginPayload = {
   authenticatorData: string
   userHandle: string
   signature: string
+  rawId: string
 }
+
+const fixedChallenge =
+  '9czL/AqVkQah8J127PTEShBn6GJUOhS5oivgYu3xby7k/mwk/+bEViam0yNSbHpt74o5yXW0MHkchNhA4B37dA=='
 
 export const action: ActionFunction = async ({ request, params, context }) => {
   const loginPayload: LoginPayload = await request.json()
@@ -31,43 +36,57 @@ export const action: ActionFunction = async ({ request, params, context }) => {
 
   console.debug('clientDataJSONObject', clientDataJSONObject)
 
-  // const authenticatorData = new TextDecoder().decode(
-  //   fromBase64(loginPayload.authenticatorData)
-  // )
-
-  // console.debug('authenticatorData', authenticatorData)
-
   const accountURN = AccountURNSpace.componentizedUrn(
-    generateHashedIDRef(WebauthnAccountType.WebAuthN, loginPayload.credentialId),
+    generateHashedIDRef(
+      WebauthnAccountType.WebAuthN,
+      loginPayload.credentialId
+    ),
     { node_type: NodeType.WebAuthN, addr_type: WebauthnAccountType.WebAuthN },
     { alias: loginPayload.credentialId }
   )
 
-  console.debug("LOGIN ACCOUNTURN", accountURN)
+  console.debug('LOGIN ACCOUNTURN', accountURN)
 
   const coreClient = getCoreClient({ context, accountURN })
 
-  const webAuthnData = await coreClient.account.getWebAuthNData.query();
+  const webAuthnData = await coreClient.account.getWebAuthNData.query()
 
-  console.log("WEBAUTHN DATA IN STORAGE", webAuthnData)
-  return null
+  console.log('WEBAUTHN DATA IN STORAGE', webAuthnData)
 
-  const fd = await request.formData()
+  const f2l = new Fido2Lib({
+    timeout: 42,
+    rpId: 'localhost',
+    rpName: 'Rollup (localhost)',
+    challengeSize: 64,
+    attestation: 'none',
+    cryptoParams: [-7, -257],
+    authenticatorAttachment: 'platform',
+    authenticatorRequireResidentKey: false,
+    authenticatorUserVerification: 'required',
+  })
 
-  const email = fd.get('email')
-  if (!email)
-    throw new BadRequestError({ message: 'No address included in request' })
-  const state = fd.get('state')
-  if (!state)
-    throw new BadRequestError({ message: 'No state included in request' })
-
-  const qp = new URLSearchParams()
-  qp.append('email', email as string)
-  qp.append('state', state as string)
-
-  return redirect(
-    `/authenticate/${params.clientId}/email/verify?${qp.toString()}`
+  const loginResult = await f2l.assertionResult(
+    {
+      response: {
+        authenticatorData: base64url.decode(loginPayload.authenticatorData).buffer,
+        clientDataJSON: loginPayload.clientDataJSON,
+        signature: loginPayload.signature,
+        userHandle: loginPayload.userHandle,
+      },
+      rawId: base64url.decode(loginPayload.rawId).buffer
+    },
+    {
+      challenge: fixedChallenge,
+      factor: 'first',
+      origin: 'http://localhost:10001',
+      prevCounter: webAuthnData.counter,
+      publicKey: webAuthnData.publicKey,
+      userHandle: loginPayload.userHandle,
+    }
   )
+  console.debug("ASSERTION RESPONSE", JSON.stringify(Object.fromEntries(loginResult.authnrData.entries()), null, 2))
+
+  return null
 }
 
 export default () => {
@@ -81,11 +100,10 @@ export default () => {
 
   useEffect(() => {
     const webauthnLogin = async () => {
-      const challenge = new Uint8Array(64)
-      crypto.getRandomValues(challenge)
+
       let credential = await navigator.credentials.get({
         publicKey: {
-          challenge,
+          challenge: base64url.decode(fixedChallenge),
           rpId: 'localhost',
           allowCredentials: [],
           // userVerification: "required",
@@ -98,12 +116,19 @@ export default () => {
       ) {
         const loginPayload: LoginPayload = {
           credentialId: credential?.id || '',
-          clientDataJSON: toBase64(credential.response.clientDataJSON),
-          authenticatorData: toBase64(credential.response.authenticatorData),
-          userHandle: toBase64(
-            credential.response.userHandle || new ArrayBuffer(0)
+          clientDataJSON: base64url.encode(
+            new Uint8Array(credential.response.clientDataJSON)
           ),
-          signature: toBase64(credential.response.signature),
+          authenticatorData: base64url.encode(
+            new Uint8Array(credential.response.authenticatorData)
+          ),
+          userHandle: base64url.encode(
+            new Uint8Array(credential.response.userHandle || new ArrayBuffer(0))
+          ),
+          signature: base64url.encode(
+            new Uint8Array(credential.response.signature)
+          ),
+          rawId: base64url.encode(new Uint8Array(credential.rawId))
         }
         console.debug('LOGIN PAYLOAD', loginPayload)
         const response = await fetch(
