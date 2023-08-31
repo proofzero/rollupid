@@ -82,9 +82,8 @@ const Option = ({
   return (
     <div
       className={`w-full flex p-4 flex-row items-center justify-start border rounded-lg gap-4
-    ${selected ? 'border-indigo-500' : ''} ${
-        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-      }`}
+    ${selected ? 'border-indigo-500' : ''} ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+        }`}
       onClick={() => {
         if (disabled) return
         setSelectedType(type)
@@ -122,9 +121,8 @@ const SelectOrgType = ({
   return (
     <div
       className={`w-full h-full flex flex-col gap-2
-    transition-opacity ease-in-out delay-150 ${
-      page === 0 ? 'opacity-100' : 'hide'
-    }`}
+    transition-opacity ease-in-out delay-150 ${page === 0 ? 'opacity-100' : 'hide'
+        }`}
     >
       <Text size="lg" className="text-gray-400">
         1/4
@@ -200,9 +198,8 @@ const ConnectEmail = ({
   return (
     <div
       className={`w-full h-full flex flex-col gap-2
-       transition-opacity ease-in-out delay-150 ${
-         page === 1 ? 'opacity-100' : 'hide'
-       }`}
+       transition-opacity ease-in-out delay-150 ${page === 1 ? 'opacity-100' : 'hide'
+        }`}
     >
       <div className="flex flex-row items-center gap-2">
         <HiOutlineArrowLeft
@@ -545,38 +542,38 @@ const CongratsPage = ({
 
   return (
     <div
-      className={`w-full h-full flex flex-col gap-2
+      className={`w-full h-full flex flex-col
     transition-opacity  ease-in-out delay-150
     ${page === 3 ? 'opacity-100' : 'hide'}`}
     >
-      <Text size="2xl" weight="medium">
+      <Text size="2xl" weight="medium" className="mb-2">
         🎉 You are ready to go!
       </Text>
-      <Text size="lg" className="text-gray-400 mb-2">
+      <Text size="lg" className="text-gray-500 mb-4">
         Here is what you can do next
       </Text>
-      <ul className="list-disc w-full flex flex-col gap-2">
+      <ul className="list-disc w-full flex flex-col text-gray-500 space-y-4 mb-8 pl-8">
         <li className="w-full">
           <div className="flex flex-row gap-2 items-center">
-            <Text>Configure OAuth settings</Text>
+            <Text>Configure your application</Text>
             <DocumentationBadge
-              url={'https://docs.rollup.id/platform/console/oauth'}
+              url={'https://docs.rollup.id/getting-started/create-an-application'}
             />
           </div>
         </li>
         <li className="w-full">
           <div className="flex flex-row gap-2 items-center">
-            <Text>Configure account abstractions</Text>
+            <Text>Learn about OIDC / OAuth 2.0</Text>
             <DocumentationBadge
-              url={'https://docs.rollup.id/platform/console/blockchain'}
+              url={'https://docs.rollup.id/an-introduction-to-openid-connect-oidc'}
             />
           </div>
         </li>
         <li className="w-full">
           <div className="flex flex-row gap-2 items-center">
-            <Text>Configure custom design</Text>
+            <Text>Using Scopes</Text>
             <DocumentationBadge
-              url={'https://docs.rollup.id/platform/console/designer'}
+              url={'https://docs.rollup.id/guides/using-scopes'}
             />
           </div>
         </li>
