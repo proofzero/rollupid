@@ -37,8 +37,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const f2l = new Fido2Lib({
       timeout: 42,
-      rpId: 'localhost',
-      rpName: 'Rollup (localhost)',
+      rpId: 'passport-dev.rollup.id',
+      rpName: 'Rollup (dev)',
       challengeSize: 64,
       attestation: 'none',
       cryptoParams: [-7, -257],
@@ -65,8 +65,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const f2l = new Fido2Lib(
       {
         timeout: 42,
-        rpId: 'localhost',
-        rpName: 'Rollup (localhost)',
+        rpId: 'passport-dev.rollup.id',
+        rpName: 'Rollup (dev)',
         challengeSize: 64,
         attestation: 'none',
         cryptoParams: [-7, -257],
@@ -86,7 +86,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         },
       },
       {
-        origin: 'http://localhost:10001',
+        origin: 'https://passport-dev.rollup.id',
         challenge: fixedChallenge,
         factor: 'first',
       }
@@ -213,7 +213,7 @@ export default () => {
         ),
       }
       const response = await fetch(
-        'http://localhost:10001/authenticate/passport/webauthn/register',
+        'https://passport-dev.rollup.id/authenticate/passport/webauthn/register',
         {
           method: 'POST',
           body: JSON.stringify(registrationPayload),

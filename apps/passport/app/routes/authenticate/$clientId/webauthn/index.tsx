@@ -3,7 +3,7 @@ import { HiOutlineArrowLeft } from 'react-icons/hi'
 import { Button, Text } from '@proofzero/design-system'
 import { Form, useNavigate, useOutletContext } from '@remix-run/react'
 
-import type { ActionFunction } from '@remix-run/cloudflare'
+import { json, type ActionFunction, type LoaderFunction } from '@remix-run/cloudflare'
 import { BadRequestError } from '@proofzero/errors'
 import { fromBase64, toBase64 } from '@proofzero/utils/buffer'
 import { AccountURNSpace } from '@proofzero/urns/account'
@@ -14,6 +14,7 @@ import { Fido2Lib } from 'fido2-lib'
 import { base64url } from 'jose'
 import { EncryptJWT, jwtDecrypt } from 'jose'
 import { decrypt, encrypt, importKey } from '@proofzero/utils/crypto'
+import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 type LoginPayload = {
   credentialId: string
@@ -27,13 +28,13 @@ type LoginPayload = {
 const fixedChallenge =
   '9czL/AqVkQah8J127PTEShBn6GJUOhS5oivgYu3xby7k/mwk/+bEViam0yNSbHpt74o5yXW0MHkchNhA4B37dA=='
 
-export const action: ActionFunction = async ({ request, params, context }) => {
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(async ({ request, params, context }) => {
   const loginPayload: LoginPayload = await request.json()
   const algorithm = { name: 'AES-GCM' }
 
   const key = await importKey(fromBase64(context.env.SECRET_SESSION_KEY), algorithm)
 
-  const dataArray = new TextEncoder().encode(JSON.stringify({ exp: Date.now(), challenge:  }))
+  const dataArray = new TextEncoder().encode(JSON.stringify({ exp: Date.now(), challenge: 'asd' }))
   const encryptedData = await encrypt(key, algorithm, dataArray)
   console.debug("Encyrpted ", encryptedData)
   const decyrptedData = await decrypt(key, algorithm, new Uint8Array(encryptedData.cipher), new Uint8Array(encryptedData.iv))
@@ -64,10 +65,11 @@ export const action: ActionFunction = async ({ request, params, context }) => {
 
   console.log('WEBAUTHN DATA IN STORAGE', webAuthnData)
 
+  const passportUrl = new URL(request.url)
   const f2l = new Fido2Lib({
     timeout: 42,
-    rpId: 'localhost',
-    rpName: 'Rollup (localhost)',
+    rpId: passportUrl.hostname,
+    rpName: 'Rollup ID',
     challengeSize: 64,
     attestation: 'none',
     cryptoParams: [-7, -257],
@@ -89,7 +91,7 @@ export const action: ActionFunction = async ({ request, params, context }) => {
     {
       challenge: fixedChallenge,
       factor: 'first',
-      origin: 'http://localhost:10001',
+      origin: passportUrl.origin,
       prevCounter: webAuthnData.counter,
       publicKey: webAuthnData.publicKey,
       userHandle: loginPayload.userHandle,
@@ -98,7 +100,30 @@ export const action: ActionFunction = async ({ request, params, context }) => {
   console.debug("ASSERTION RESPONSE", JSON.stringify(Object.fromEntries(loginResult.authnrData.entries()), null, 2))
 
   return null
-}
+})
+
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context, params }) => {
+    const f2l = new Fido2Lib({
+      timeout: 42,
+      rpId: 'passport-dev.rollup.id',
+      rpName: 'Rollup (dev)',
+      challengeSize: 64,
+      attestation: 'none',
+      cryptoParams: [-7, -257],
+      authenticatorAttachment: 'platform',
+      authenticatorRequireResidentKey: false,
+      authenticatorUserVerification: 'required',
+    })
+    const loginOptions = (await f2l.assertionOptions()) as any
+    loginOptions.challenge = fixedChallenge
+    console.debug(
+      'REGISTRATION OPTIONS',
+      JSON.stringify(loginOptions, null, 2)
+    )
+    return json({ loginOptions })
+  }
+)
 
 export default () => {
   const { prompt } = useOutletContext<{
@@ -115,7 +140,7 @@ export default () => {
       let credential = await navigator.credentials.get({
         publicKey: {
           challenge: base64url.decode(fixedChallenge),
-          rpId: 'localhost',
+          rpId: 'passport-dev.rollup.id',
           allowCredentials: [],
           // userVerification: "required",
         },
@@ -143,7 +168,7 @@ export default () => {
         }
         console.debug('LOGIN PAYLOAD', loginPayload)
         const response = await fetch(
-          'http://localhost:10001/authenticate/passport/webauthn/',
+          'https://passport-dev.rollup.id/authenticate/passport/webauthn/',
           {
             method: 'POST',
             body: JSON.stringify(loginPayload),
