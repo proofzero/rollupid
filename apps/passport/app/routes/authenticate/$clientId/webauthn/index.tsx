@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
 import { Button, Text } from '@proofzero/design-system'
-import { Form, useNavigate, useOutletContext } from '@remix-run/react'
+import { Form, useLoaderData, useNavigate, useOutletContext } from '@remix-run/react'
 
 import { json, type ActionFunction, type LoaderFunction } from '@remix-run/cloudflare'
 import { BadRequestError } from '@proofzero/errors'
@@ -104,10 +104,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(async ({ 
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
+    const passportUrl = new URL(request.url)
     const f2l = new Fido2Lib({
       timeout: 42,
-      rpId: 'passport-dev.rollup.id',
-      rpName: 'Rollup (dev)',
+      rpId: passportUrl.hostname,
+      rpName: 'Rollup ID',
       challengeSize: 64,
       attestation: 'none',
       cryptoParams: [-7, -257],
@@ -118,10 +119,10 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const loginOptions = (await f2l.assertionOptions()) as any
     loginOptions.challenge = fixedChallenge
     console.debug(
-      'REGISTRATION OPTIONS',
+      'LOGIN OPTIONS',
       JSON.stringify(loginOptions, null, 2)
     )
-    return json({ loginOptions })
+    return json({ loginOptions, passportOrigin: passportUrl.origin })
   }
 )
 
@@ -130,6 +131,7 @@ export default () => {
     prompt?: string
   }>()
 
+  const { loginOptions, passportOrigin } = useLoaderData()
   const navigate = useNavigate()
 
   const [loginRequested, setLoginRequested] = useState(false)
@@ -140,7 +142,7 @@ export default () => {
       let credential = await navigator.credentials.get({
         publicKey: {
           challenge: base64url.decode(fixedChallenge),
-          rpId: 'passport-dev.rollup.id',
+          rpId: new URL(passportOrigin).hostname,
           allowCredentials: [],
           // userVerification: "required",
         },
@@ -168,7 +170,7 @@ export default () => {
         }
         console.debug('LOGIN PAYLOAD', loginPayload)
         const response = await fetch(
-          'https://passport-dev.rollup.id/authenticate/passport/webauthn/',
+          `${passportOrigin}/authenticate/passport/webauthn/`,
           {
             method: 'POST',
             body: JSON.stringify(loginPayload),

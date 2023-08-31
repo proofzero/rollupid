@@ -14,7 +14,7 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = async ({ request }) => {
   // The lower the score, the more likely it is a bot
   // https://developers.cloudflare.com/bots/concepts/bot-score/
-  if (
+  if (request.cf &&
     request.cf.botManagement.score <= 30 &&
     !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
   ) {

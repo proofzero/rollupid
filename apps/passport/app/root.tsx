@@ -70,7 +70,7 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const clientId = new URL(request.url).searchParams.get('client_id')
-    if (
+    if (request.cf &&
       request.cf.botManagement.score <= 30 &&
       !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
     ) {

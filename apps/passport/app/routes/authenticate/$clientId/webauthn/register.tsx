@@ -35,10 +35,12 @@ const fixedChallenge =
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
+    const passportUrl = new URL(request.url)
+
     const f2l = new Fido2Lib({
       timeout: 42,
-      rpId: 'passport-dev.rollup.id',
-      rpName: 'Rollup (dev)',
+      rpId: passportUrl.hostname,
+      rpName: 'Rollup ID',
       challengeSize: 64,
       attestation: 'none',
       cryptoParams: [-7, -257],
@@ -52,7 +54,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       'REGISTRATION OPTIONS',
       JSON.stringify(registrationOptions, null, 2)
     )
-    return json({ registrationOptions })
+    return json({ registrationOptions, passportOrigin: passportUrl.origin })
   }
 )
 
@@ -62,11 +64,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     console.debug('reg payload backend', registrationPayload)
 
+    const passportUrl = new URL(request.url)
+
     const f2l = new Fido2Lib(
       {
         timeout: 42,
-        rpId: 'passport-dev.rollup.id',
-        rpName: 'Rollup (dev)',
+        rpId: passportUrl.hostname,
+        rpName: 'Rollup ID',
         challengeSize: 64,
         attestation: 'none',
         cryptoParams: [-7, -257],
@@ -86,7 +90,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         },
       },
       {
-        origin: 'https://passport-dev.rollup.id',
+        origin: passportUrl.origin,
         challenge: fixedChallenge,
         factor: 'first',
       }
@@ -152,11 +156,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { prompt } = useOutletContext<{
-    prompt?: string
-  }>()
 
-  const { registrationOptions } = useLoaderData()
+  const { registrationOptions, passportOrigin } = useLoaderData()
   console.debug(
     'REGISTRAION OPTIONS CLIENT',
     JSON.stringify(registrationOptions, null, 2)
@@ -213,7 +214,7 @@ export default () => {
         ),
       }
       const response = await fetch(
-        'https://passport-dev.rollup.id/authenticate/passport/webauthn/register',
+        `${passportOrigin}/authenticate/passport/webauthn/register`,
         {
           method: 'POST',
           body: JSON.stringify(registrationPayload),
