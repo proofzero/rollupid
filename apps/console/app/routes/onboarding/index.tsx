@@ -542,17 +542,17 @@ const CongratsPage = ({
 
   return (
     <div
-      className={`w-full h-full flex flex-col gap-2
+      className={`w-full h-full flex flex-col
     transition-opacity  ease-in-out delay-150
     ${page === 3 ? 'opacity-100' : 'hide'}`}
     >
-      <Text size="2xl" weight="medium">
+      <Text size="2xl" weight="medium" className="mb-2">
         🎉 You are ready to go!
       </Text>
-      <Text size="lg" className="text-gray-400 mb-2">
+      <Text size="lg" className="text-gray-500 mb-4">
         Here is what you can do next
       </Text>
-      <ul className="list-disc w-full flex flex-col gap-2">
+      <ul className="list-disc w-full flex flex-col text-gray-500 space-y-4 mb-8 pl-8">
         <li className="w-full">
           <div className="flex flex-row gap-2 items-center">
             <Text>Configure your application</Text>
