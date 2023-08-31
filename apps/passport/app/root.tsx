@@ -378,7 +378,7 @@ export function ErrorBoundary({ error }) {
       </head>
       <body className="min-h-[100dvh] flex justify-center items-center">
         <section className="absolute right-0 top-0 p-4">
-          <Form action="/signout" method="post">
+          <Form action="/signout" method="get">
             <Button type="submit">Sign Out</Button>
           </Form>
         </section>
@@ -436,7 +436,7 @@ export function CatchBoundary() {
           }
         >
           <section className="absolute right-0 top-0 p-4">
-            <Form action="/signout" method="post">
+            <Form action="/signout" method="get">
               <Button type="submit">Sign Out</Button>
             </Form>
           </section>
