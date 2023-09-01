@@ -27,9 +27,7 @@ type RegistrationPayload = {
   nickname: string
   credentialId: string
   clientDataJSON: string
-  authenticatorData: string
   attestationObject: string
-  publicKey: string
   rawId: string
 }
 
@@ -52,7 +50,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const webauthnChallengeJwks = JSON.parse(context.env.SECRET_WEBAUTHN_SIGNING_KEY) as KeyPairSerialized
     const challengeJwt = await createSignedWebauthnChallenge(webauthnChallengeJwks)
     registrationOptions.challenge = challengeJwt
-    return json({ registrationOptions, passportOrigin: passportUrl.origin })
+    return json({ registrationOptions })
   }
 )
 
@@ -60,13 +58,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
 
     const formdata = await request.formData()
-    const registrationPayload = {
+    const registrationPayload: RegistrationPayload = {
       credentialId: formdata.get('credentialId') as string,
-      authenticatorData: formdata.get('authenticatorData') as string,
       clientDataJSON: formdata.get('clientDataJSON') as string,
       attestationObject: formdata.get('attestationObject') as string,
       nickname: formdata.get('nickname') as string,
-      publicKey: formdata.get('publicKey') as string,
       rawId: formdata.get('rawId') as string,
 
     }
@@ -158,12 +154,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
 export default () => {
 
-  const { registrationOptions, passportOrigin } = useLoaderData()
-  console.debug(
-    'REGISTRAION OPTIONS CLIENT',
-    JSON.stringify(registrationOptions, null, 2)
-  )
-
+  const { registrationOptions } = useLoaderData()
   if (
     registrationOptions &&
     registrationOptions.challenge &&
@@ -171,7 +162,6 @@ export default () => {
   ) {
     registrationOptions.challenge = new TextEncoder().encode(registrationOptions.challenge)
   }
-  const [errorMessage, setErrorMessage] = useState('')
 
   const submit = useSubmit()
   const [requestedRegistration, setRequestedRegistration] = useState(false)
@@ -181,48 +171,27 @@ export default () => {
   crypto.getRandomValues(randomBuffer)
   const registerKey = async (name: string) => {
     registrationOptions.user = {
-      id: randomBuffer,
+      id: base64url.encode(randomBuffer),
       name,
       displayName: name,
     }
     let credential = await navigator.credentials.create({
       publicKey: registrationOptions,
     })
-    console.log(
-      'CREDS AFTER REGISTRATION',
-      credential,
-      credential instanceof PublicKeyCredential,
-      (credential as any).response instanceof AuthenticatorAssertionResponse
-    )
     if (
       credential instanceof PublicKeyCredential &&
       credential.response instanceof AuthenticatorAttestationResponse
     ) {
-      const registrationPayload = {
-        nickname: name,
-        credentialId: credential.id,
-        rawId: base64url.encode(new Uint8Array(credential.rawId)),
-        clientDataJSON: base64url.encode(
-          new Uint8Array(credential.response.clientDataJSON)
-        ),
-        authenticatorData: base64url.encode(
-          new Uint8Array(credential.response.getAuthenticatorData())
-        ),
-        attestationObject: base64url.encode(
-          new Uint8Array(credential.response.attestationObject)
-        ),
-        publicKey: base64url.encode(
-          new Uint8Array(credential.response.getPublicKey() || new ArrayBuffer(0))
-        ),
-      }
       const submitPayload = new FormData()
-      submitPayload.set('credentialId', registrationPayload.credentialId)
-      submitPayload.set('clientDataJSON', registrationPayload.clientDataJSON)
-      submitPayload.set('authenticatorData', registrationPayload.authenticatorData)
-      submitPayload.set('attestationObject', registrationPayload.attestationObject)
-      submitPayload.set('nickname', registrationPayload.nickname)
-      submitPayload.set('publicKey', registrationPayload.publicKey)
-      submitPayload.set('rawId', registrationPayload.rawId)
+      submitPayload.set('credentialId', credential.id)
+      submitPayload.set('clientDataJSON', base64url.encode(
+        new Uint8Array(credential.response.clientDataJSON)
+      ))
+      submitPayload.set('attestationObject', base64url.encode(
+        new Uint8Array(credential.response.attestationObject)
+      ))
+      submitPayload.set('nickname', name)
+      submitPayload.set('rawId', base64url.encode(new Uint8Array(credential.rawId)))
       submit(submitPayload, { method: 'post' })
 
     }
