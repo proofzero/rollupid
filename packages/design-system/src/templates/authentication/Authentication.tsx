@@ -12,6 +12,7 @@ import { AuthButton } from '../../molecules/auth-button/AuthButton'
 import { HiOutlineKey, HiOutlineMail } from 'react-icons/hi'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import { ThemeContext } from '../../contexts/theme'
+import WebauthnGraphic from '../../atoms/providers/Webauthn'
 
 const ConnectButton = lazy(() =>
   import('../../atoms/buttons/connect-button/ConnectButton').then((module) => ({
@@ -29,9 +30,9 @@ Sign this message to accept the Rollup Terms of Service (https://rollup.id/tos),
 This will not trigger a blockchain transaction or cost any gas fees.`,
   defaultSubheading: 'How would you like to continue?',
   knownKeys: [
+    'webauthn',
     'wallet',
     'email',
-    'webauthn',
     'google',
     'microsoft',
     'apple',
@@ -192,8 +193,8 @@ const displayKeyMapper = (
         <AuthButton
           key={key}
           onClick={() => navigate(`/authenticate/${clientId}/webauthn`)}
-          Graphic={<HiOutlineKey className="w-full h-full dark:text-white" />}
-          text={'Passkeys'}
+          Graphic={<img src={WebauthnGraphic} className="w-full h-full dark:text-white" />}
+          text={'Passkey'}
           fullSize={flex}
           displayContinueWith={displayContinueWith}
         />

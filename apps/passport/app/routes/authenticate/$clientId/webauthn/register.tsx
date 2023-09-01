@@ -1,4 +1,4 @@
-import { Form, useLoaderData, useOutletContext } from '@remix-run/react'
+import { Form, useLoaderData, useSubmit } from '@remix-run/react'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
 import { getCoreClient } from '~/platform.server'
 import { authenticateAccount } from '~/utils/authenticate.server'
@@ -16,9 +16,12 @@ import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { NodeType, WebauthnAccountType } from '@proofzero/types/account'
-import { fromBase64, toBase64 } from '@proofzero/utils/buffer'
 import { Fido2Lib } from 'fido2-lib'
 import { base64url } from 'jose'
+import { TosAndPPol } from '@proofzero/design-system/src/atoms/info/TosAndPPol'
+import subtractLogo from '~/assets/subtract-logo.svg'
+import { KeyPairSerialized, createSignedWebauthnChallenge, verifySignedWebauthnChallenge } from './utils'
+
 
 type RegistrationPayload = {
   nickname: string
@@ -30,8 +33,6 @@ type RegistrationPayload = {
   rawId: string
 }
 
-const fixedChallenge =
-  '9czL/AqVkQah8J127PTEShBn6GJUOhS5oivgYu3xby7k/mwk/+bEViam0yNSbHpt74o5yXW0MHkchNhA4B37dA=='
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -44,25 +45,41 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       challengeSize: 64,
       attestation: 'none',
       cryptoParams: [-7, -257],
-      authenticatorAttachment: 'platform',
       authenticatorRequireResidentKey: false,
       authenticatorUserVerification: 'required',
     })
     const registrationOptions = (await f2l.attestationOptions()) as any
-    registrationOptions.challenge = fixedChallenge
-    console.debug(
-      'REGISTRATION OPTIONS',
-      JSON.stringify(registrationOptions, null, 2)
-    )
+    const webauthnChallengeJwks = JSON.parse(context.env.SECRET_WEBAUTHN_SIGNING_KEY) as KeyPairSerialized
+    const challengeJwt = await createSignedWebauthnChallenge(webauthnChallengeJwks)
+    registrationOptions.challenge = challengeJwt
     return json({ registrationOptions, passportOrigin: passportUrl.origin })
   }
 )
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
-    const registrationPayload: RegistrationPayload = await request.json()
 
-    console.debug('reg payload backend', registrationPayload)
+    const formdata = await request.formData()
+    const registrationPayload = {
+      credentialId: formdata.get('credentialId') as string,
+      authenticatorData: formdata.get('authenticatorData') as string,
+      clientDataJSON: formdata.get('clientDataJSON') as string,
+      attestationObject: formdata.get('attestationObject') as string,
+      nickname: formdata.get('nickname') as string,
+      publicKey: formdata.get('publicKey') as string,
+      rawId: formdata.get('rawId') as string,
+
+    }
+
+    const clientDataJSON = new TextDecoder().decode(
+      base64url.decode(registrationPayload.clientDataJSON)
+    )
+
+    const clientDataJSONObject = JSON.parse(clientDataJSON)
+
+    const challenge = new TextDecoder().decode(base64url.decode(clientDataJSONObject.challenge))
+    const webauthnChallengeJwks = JSON.parse(context.env.SECRET_WEBAUTHN_SIGNING_KEY) as KeyPairSerialized
+    await verifySignedWebauthnChallenge(challenge, webauthnChallengeJwks)
 
     const passportUrl = new URL(request.url)
 
@@ -74,7 +91,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         challengeSize: 64,
         attestation: 'none',
         cryptoParams: [-7, -257],
-        authenticatorAttachment: 'platform',
         authenticatorRequireResidentKey: false,
         authenticatorUserVerification: 'required',
       }
@@ -91,28 +107,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       },
       {
         origin: passportUrl.origin,
-        challenge: fixedChallenge,
+        challenge: challenge,
         factor: 'first',
       }
     )
 
     const webauthnData = {
       counter: registrationResults.authnrData.get("counter"),
-      // credentialId: registrationResults.request.id,
       publicKey: registrationResults.authnrData.get("credentialPublicKeyPem"),
     }
-
-    console.debug(
-      'AFTER VERIFICATION REG RESULTS',
-      registrationPayload.credentialId, webauthnData
-    )
-
-    console.debug(
-      'clientDataJSON',
-      new TextDecoder().decode(fromBase64(registrationPayload.clientDataJSON))
-    )
-
-    //TODO: verify challenge before continuing; loader creates signed challenge, action verifies it
 
     const accountURN = AccountURNSpace.componentizedUrn(
       generateHashedIDRef(
@@ -122,8 +125,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       { node_type: NodeType.WebAuthN, addr_type: WebauthnAccountType.WebAuthN },
       { alias: registrationPayload.credentialId }
     )
-
-    console.debug('REGISTRATION ACCOUNTURN', accountURN)
 
     const appData = await getAuthzCookieParams(request, context.env)
     const coreClient = getCoreClient({ context, accountURN })
@@ -168,18 +169,19 @@ export default () => {
     registrationOptions.challenge &&
     typeof registrationOptions.challenge === 'string'
   ) {
-    // console.debug("STRING TO DECODE", registrationOptions.challenge)
-    // alert(registrationOptions.challenge + " " + typeof registrationOptions.challenge)
-    registrationOptions.challenge = fromBase64(registrationOptions.challenge)
+    registrationOptions.challenge = new TextEncoder().encode(registrationOptions.challenge)
   }
   const [errorMessage, setErrorMessage] = useState('')
 
+  const submit = useSubmit()
   const [requestedRegistration, setRequestedRegistration] = useState(false)
   const [keyName, setKeyName] = useState('')
 
+  const randomBuffer = new Uint8Array(32)
+  crypto.getRandomValues(randomBuffer)
   const registerKey = async (name: string) => {
     registrationOptions.user = {
-      id: new TextEncoder().encode('asdfasdfasdfa'),
+      id: randomBuffer,
       name,
       displayName: name,
     }
@@ -209,19 +211,20 @@ export default () => {
         attestationObject: base64url.encode(
           new Uint8Array(credential.response.attestationObject)
         ),
-        publicKey: toBase64(
-          credential.response.getPublicKey() || new ArrayBuffer(0)
+        publicKey: base64url.encode(
+          new Uint8Array(credential.response.getPublicKey() || new ArrayBuffer(0))
         ),
       }
-      const response = await fetch(
-        `${passportOrigin}/authenticate/passport/webauthn/register`,
-        {
-          method: 'POST',
-          body: JSON.stringify(registrationPayload),
-          redirect: 'follow',
-        }
-      )
-      console.debug('REG FETCH RESPONSE', JSON.stringify(response))
+      const submitPayload = new FormData()
+      submitPayload.set('credentialId', registrationPayload.credentialId)
+      submitPayload.set('clientDataJSON', registrationPayload.clientDataJSON)
+      submitPayload.set('authenticatorData', registrationPayload.authenticatorData)
+      submitPayload.set('attestationObject', registrationPayload.attestationObject)
+      submitPayload.set('nickname', registrationPayload.nickname)
+      submitPayload.set('publicKey', registrationPayload.publicKey)
+      submitPayload.set('rawId', registrationPayload.rawId)
+      submit(submitPayload, { method: 'post' })
+
     }
   }
 
@@ -232,6 +235,7 @@ export default () => {
     }
   }, [requestedRegistration])
 
+  console.log("KEYNAME", keyName, keyName.length, (keyName && keyName.length >= 4) ? true : false)
   return (
     <div
       className={
@@ -259,30 +263,24 @@ export default () => {
             weight="semibold"
             className="text-[#2D333A] dark:text-white"
           >
-            Register Webauthn nickname
+            Connect with Passkey
           </Text>
         </section>
         <section className="flex-1">
           <Input
             type="text"
             id="webauthn_nickname"
-            label="Enter nickname for your key"
+            label="Name your Passkey"
             className="h-12 rounded-lg"
             onChange={(e) => setKeyName(e.target.value)}
             skin={true}
             autoFocus
           />
-          {errorMessage ? (
-            <Text
-              size="sm"
-              weight="medium"
-              className="text-red-500 mt-4 mb-2 text-center"
-            >
-              {errorMessage}
+          <label>
+            <Text size="sm" weight="medium" className="text-gray-400 my-2">
+              Name must be at least 4 characters long
             </Text>
-          ) : undefined}
-        </section>
-        <section>
+          </label>
           <Button
             type="submit"
             btnSize="xl"
@@ -291,12 +289,24 @@ export default () => {
               e.stopPropagation()
               setRequestedRegistration(true)
             }}
-            className="w-full"
+            className="w-full mt-4"
+            disabled={keyName.length <= 4}
           >
-            Register Passkey
+            Create new Passkey
           </Button>
         </section>
       </Form>
-    </div>
+      <div className="mt-14 flex justify-center items-center space-x-2">
+        <img src={subtractLogo} alt="powered by rollup.id" />
+        <Text size="xs" weight="normal" className="text-gray-400">
+          Powered by{' '}
+          <a href="https://rollup.id" className="hover:underline">
+            rollup.id
+          </a>
+        </Text>
+        <TosAndPPol />
+      </div>
+
+    </div >
   )
 }

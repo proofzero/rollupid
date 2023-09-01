@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { HiOutlineArrowLeft } from 'react-icons/hi'
+import { HiKey, HiOutlineArrowLeft, HiUserAdd } from 'react-icons/hi'
 import { Button, Text } from '@proofzero/design-system'
 import {
   Form,
   useLoaderData,
   useNavigate,
   useOutletContext,
+  useSubmit,
 } from '@remix-run/react'
 
 import {
@@ -24,6 +25,15 @@ import { JWK, base64url } from 'jose'
 import { EncryptJWT, jwtDecrypt, jwtVerify, SignJWT, importJWK } from 'jose'
 import { decrypt, encrypt, importKey } from '@proofzero/utils/crypto'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { getAuthzCookieParams, getUserSession } from '~/session.server'
+import { authenticateAccount } from '~/utils/authenticate.server'
+import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/AuthButton'
+import { TosAndPPol } from '@proofzero/design-system/src/atoms/info/TosAndPPol'
+import subtractLogo from '~/assets/subtract-logo.svg'
+import { TbFingerprint } from 'react-icons/tb'
+import webauthnNewKeyIcon from './WebauthnNewKeyIcon'
+import { verifySignedWebauthnChallenge, KeyPairSerialized, createSignedWebauthnChallenge } from './utils'
+
 
 type LoginPayload = {
   credentialId: string
@@ -34,40 +44,24 @@ type LoginPayload = {
   rawId: string
 }
 
-const fixedChallenge =
-  '9czL/AqVkQah8J127PTEShBn6GJUOhS5oivgYu3xby7k/mwk/+bEViam0yNSbHpt74o5yXW0MHkchNhA4B37dA=='
-
-type KeyPairSerialized = {
-  publicKey: JWK,
-  privateKey: JWK
-}
-
-export const createSignedWebauthnChallenge = async (keyPairJSON: KeyPairSerialized) => {
-  const privateKey = await importJWK(keyPairJSON.privateKey)
-  const payload = { challenge: 'asdf' }
-  const challengeJwt = await new SignJWT(payload)
-    .setProtectedHeader({ alg: 'ES256' })
-    .setExpirationTime('5 min')
-    .sign(privateKey)
-  return challengeJwt
-}
-
-export const verifySignedWebauthnChallenge = async (challengeJwt: string, keyPairJSON: KeyPairSerialized) => {
-  const publicKey = await importJWK(keyPairJSON.publicKey)
-  const verificationResults = await jwtVerify(challengeJwt, publicKey)
-}
-
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
-    const loginPayload: LoginPayload = await request.json()
-    console.debug('reg login backend', loginPayload)
+    // const loginPayload: LoginPayload = await request.json()
+    const formdata = await request.formData()
+    const loginPayload = {
+      credentialId: formdata.get('credentialId') as string,
+      authenticatorData: formdata.get('authenticatorData') as string,
+      clientDataJSON: formdata.get('clientDataJSON') as string,
+      userHandle: formdata.get('userHandle') as string,
+      signature: formdata.get('signature') as string,
+      rawId: formdata.get('rawId') as string,
+    }
+
     const clientDataJSON = new TextDecoder().decode(
       base64url.decode(loginPayload.clientDataJSON)
     )
     const clientDataJSONObject = JSON.parse(clientDataJSON)
-    console.debug('clientDataJSONObject', clientDataJSONObject)
     const challenge = new TextDecoder().decode(base64url.decode(clientDataJSONObject.challenge))
-    console.debug('\n\n\nDECODED CHALLENGE', challenge)
     const webauthnChallengeJwks = JSON.parse(context.env.SECRET_WEBAUTHN_SIGNING_KEY) as KeyPairSerialized
     await verifySignedWebauthnChallenge(challenge, webauthnChallengeJwks)
 
@@ -81,13 +75,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       { alias: loginPayload.credentialId }
     )
 
-    console.debug('LOGIN ACCOUNTURN', accountURN)
-
     const coreClient = getCoreClient({ context, accountURN })
 
     const webAuthnData = await coreClient.account.getWebAuthNData.query()
-
-    console.log('WEBAUTHN DATA IN STORAGE', webAuthnData)
 
     const passportUrl = new URL(request.url)
     const f2l = new Fido2Lib({
@@ -97,7 +87,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       challengeSize: 200,
       attestation: 'none',
       cryptoParams: [-7, -257],
-      authenticatorAttachment: 'platform',
+      authenticatorAttachment: 'cross-platform',
       authenticatorRequireResidentKey: false,
       authenticatorUserVerification: 'required',
     })
@@ -122,16 +112,29 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         userHandle: loginPayload.userHandle,
       }
     )
-    console.debug(
-      'ASSERTION RESPONSE',
-      JSON.stringify(
-        Object.fromEntries(loginResult.authnrData.entries()),
-        null,
-        2
-      )
+
+    const appData = await getAuthzCookieParams(request, context.env)
+
+    const { identityURN, existing } =
+      await coreClient.account.resolveIdentity.query({
+        jwt: await getUserSession(request, context.env, appData?.clientId),
+        force:
+          !appData ||
+          (appData.rollup_action !== 'connect' &&
+            !appData.rollup_action?.startsWith('groupconnect')),
+        clientId: appData?.clientId,
+      })
+
+    return authenticateAccount(
+      accountURN,
+      identityURN,
+      appData,
+      request,
+      context.env,
+      context.traceSpan,
+      existing
     )
 
-    return null
   }
 )
 
@@ -145,16 +148,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       challengeSize: 200,
       attestation: 'none',
       cryptoParams: [-7, -257],
-      authenticatorAttachment: 'platform',
+      authenticatorAttachment: 'cross-platform',
       authenticatorRequireResidentKey: false,
       authenticatorUserVerification: 'required',
     })
     const loginOptions = (await f2l.assertionOptions()) as any
     const webauthnChallengeJwks = JSON.parse(context.env.SECRET_WEBAUTHN_SIGNING_KEY) as KeyPairSerialized
     const challengeJwt = await createSignedWebauthnChallenge(webauthnChallengeJwks)
-    console.debug("CHALLENGE JWT", challengeJwt)
     loginOptions.challenge = challengeJwt
-    console.debug('LOGIN OPTIONS', JSON.stringify(loginOptions, null, 2))
     return json({ loginOptions, passportOrigin: passportUrl.origin })
   }
 )
@@ -166,6 +167,7 @@ export default () => {
 
   const { loginOptions, passportOrigin } = useLoaderData()
   const navigate = useNavigate()
+  const submit = useSubmit()
 
   const [loginRequested, setLoginRequested] = useState(false)
 
@@ -176,19 +178,12 @@ export default () => {
           challenge: new TextEncoder().encode(loginOptions.challenge),
           rpId: new URL(passportOrigin).hostname,
           allowCredentials: [],
-          // userVerification: "required",
         },
       })
-      console.log('CREDENTIAL', credential)
       if (
         credential instanceof PublicKeyCredential &&
         credential.response instanceof AuthenticatorAssertionResponse
       ) {
-        console.log("NEW CLIENTJSON", JSON.parse(new TextDecoder().decode(credential.response.clientDataJSON)).challenge)
-        console.log("CHALLENGES", {
-          textEncoder: new TextDecoder().decode(new TextEncoder().encode(loginOptions.challenge)),
-          b64decoded: new TextDecoder().decode(base64url.decode(JSON.parse(new TextDecoder().decode(credential.response.clientDataJSON)).challenge))
-        })
         const loginPayload: LoginPayload = {
           credentialId: credential?.id || '',
           clientDataJSON: base64url.encode(
@@ -205,14 +200,15 @@ export default () => {
           ),
           rawId: base64url.encode(new Uint8Array(credential.rawId)),
         }
-        console.log('LOGIN PAYLOAD', loginPayload)
-        const response = await fetch(
-          `${passportOrigin}/authenticate/passport/webauthn/`,
-          {
-            method: 'POST',
-            body: JSON.stringify(loginPayload),
-          }
-        )
+
+        const submitPayload = new FormData()
+        submitPayload.set('credentialId', loginPayload.credentialId)
+        submitPayload.set('clientDataJSON', loginPayload.clientDataJSON)
+        submitPayload.set('authenticatorData', loginPayload.authenticatorData)
+        submitPayload.set('userHandle', loginPayload.userHandle)
+        submitPayload.set('signature', loginPayload.signature)
+        submitPayload.set('rawId', loginPayload.rawId)
+        submit(submitPayload, { method: 'post' })
       }
     }
 
@@ -250,25 +246,26 @@ export default () => {
             weight="semibold"
             className="text-[#2D333A] dark:text-white"
           >
-            Passkeys
+            Connect with Passkey
           </Text>
-          <Button
-            btnSize="l"
-            className="w-full hover:bg-gray-100"
-            disabled={loginRequested}
-            onClick={() => {
-              setLoginRequested(true)
-            }}
-          >
-            Login
-          </Button>
-          <Button
-            btnSize="l"
-            className="w-full hover:bg-gray-100"
-            onClick={() => navigate('register')}
-          >
-            Register
-          </Button>
+        </section>
+        <section>
+          <div className="flex-1 w-full flex flex-col gap-4 relative">
+
+            <AuthButton
+              disabled={loginRequested}
+              Graphic={<TbFingerprint className="w-full h-full dark:text-white"></TbFingerprint>}
+              onClick={() => {
+                setLoginRequested(true)
+              }}
+              text='Use existing Passkey'
+            />
+            <AuthButton
+              Graphic={< img src={webauthnNewKeyIcon} className="w-full h-full dark:text-white" />}
+              onClick={() => navigate('register')}
+              text='Add new Passkey'
+            />
+          </div>
         </section>
         <section className="flex-1"></section>
       </Form>
@@ -284,6 +281,17 @@ export default () => {
           </Button>
         </div>
       )}
+      <div className="mt-14 flex justify-center items-center space-x-2">
+        <img src={subtractLogo} alt="powered by rollup.id" />
+        <Text size="xs" weight="normal" className="text-gray-400">
+          Powered by{' '}
+          <a href="https://rollup.id" className="hover:underline">
+            rollup.id
+          </a>
+        </Text>
+        <TosAndPPol />
+      </div>
     </div>
+
   )
 }
