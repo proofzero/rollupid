@@ -45,7 +45,8 @@ const LazyAuth = lazy(() =>
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
-    if (request.cf &&
+    if (
+      request.cf &&
       request.cf.botManagement.score <= 30 &&
       !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
     ) {

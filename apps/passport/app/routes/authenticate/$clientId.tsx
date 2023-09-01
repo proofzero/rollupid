@@ -15,7 +15,8 @@ import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
-    if (request.cf &&
+    if (
+      request.cf &&
       request.cf.botManagement.score <= 30 &&
       !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
     ) {

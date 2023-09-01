@@ -20,9 +20,12 @@ import { Fido2Lib } from 'fido2-lib'
 import { base64url } from 'jose'
 import { TosAndPPol } from '@proofzero/design-system/src/atoms/info/TosAndPPol'
 import subtractLogo from '~/assets/subtract-logo.svg'
-import { KeyPairSerialized, createSignedWebauthnChallenge, verifySignedWebauthnChallenge } from './utils'
+import {
+  KeyPairSerialized,
+  createSignedWebauthnChallenge,
+  verifySignedWebauthnChallenge,
+} from './utils'
 import { BadRequestError } from '@proofzero/errors'
-
 
 type RegistrationPayload = {
   nickname: string
@@ -31,7 +34,6 @@ type RegistrationPayload = {
   attestationObject: string
   rawId: string
 }
-
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -48,8 +50,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       authenticatorUserVerification: 'required',
     })
     const registrationOptions = (await f2l.attestationOptions()) as any
-    const webauthnChallengeJwks = JSON.parse(context.env.SECRET_WEBAUTHN_SIGNING_KEY) as KeyPairSerialized
-    const challengeJwt = await createSignedWebauthnChallenge(webauthnChallengeJwks)
+    const webauthnChallengeJwks = JSON.parse(
+      context.env.SECRET_WEBAUTHN_SIGNING_KEY
+    ) as KeyPairSerialized
+    const challengeJwt = await createSignedWebauthnChallenge(
+      webauthnChallengeJwks
+    )
     registrationOptions.challenge = challengeJwt
     return json({ registrationOptions })
   }
@@ -57,7 +63,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
-
     const formdata = await request.formData()
     const registrationPayload: RegistrationPayload = {
       credentialId: formdata.get('credentialId') as string,
@@ -65,37 +70,43 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       attestationObject: formdata.get('attestationObject') as string,
       nickname: formdata.get('nickname') as string,
       rawId: formdata.get('rawId') as string,
-
     }
 
-    if (!registrationPayload.nickname || (registrationPayload.nickname && registrationPayload.nickname.length < 4))
-      throw new BadRequestError({ message: 'Name of key is required to be 4 or more characters' })
+    if (
+      !registrationPayload.nickname ||
+      (registrationPayload.nickname && registrationPayload.nickname.length < 4)
+    )
+      throw new BadRequestError({
+        message: 'Name of key is required to be 4 or more characters',
+      })
 
     const clientDataJSON = new TextDecoder().decode(
       base64url.decode(registrationPayload.clientDataJSON)
     )
 
     const clientDataJSONObject = JSON.parse(clientDataJSON)
-    const challenge = new TextDecoder().decode(base64url.decode(clientDataJSONObject.challenge))
-    const webauthnChallengeJwks = JSON.parse(context.env.SECRET_WEBAUTHN_SIGNING_KEY) as KeyPairSerialized
+    const challenge = new TextDecoder().decode(
+      base64url.decode(clientDataJSONObject.challenge)
+    )
+    const webauthnChallengeJwks = JSON.parse(
+      context.env.SECRET_WEBAUTHN_SIGNING_KEY
+    ) as KeyPairSerialized
     await verifySignedWebauthnChallenge(challenge, webauthnChallengeJwks)
 
     const passportUrl = new URL(request.url)
 
-    const f2l = new Fido2Lib(
-      {
-        timeout: 42,
-        rpId: passportUrl.hostname,
-        rpName: 'Rollup ID',
-        challengeSize: 64,
-        attestation: 'none',
-        cryptoParams: [-7, -257],
-        authenticatorRequireResidentKey: false,
-        authenticatorUserVerification: 'required',
-      }
-    )
+    const f2l = new Fido2Lib({
+      timeout: 42,
+      rpId: passportUrl.hostname,
+      rpName: 'Rollup ID',
+      challengeSize: 64,
+      attestation: 'none',
+      cryptoParams: [-7, -257],
+      authenticatorRequireResidentKey: false,
+      authenticatorUserVerification: 'required',
+    })
 
-    //This throws in case it can't verify 
+    //This throws in case it can't verify
     const registrationResults = await f2l.attestationResult(
       {
         rawId: base64url.decode(registrationPayload.rawId).buffer,
@@ -112,8 +123,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     )
 
     const webauthnData = {
-      counter: registrationResults.authnrData.get("counter"),
-      publicKey: registrationResults.authnrData.get("credentialPublicKeyPem"),
+      counter: registrationResults.authnrData.get('counter'),
+      publicKey: registrationResults.authnrData.get('credentialPublicKeyPem'),
     }
 
     const accountURN = AccountURNSpace.componentizedUrn(
@@ -156,14 +167,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-
   const { registrationOptions } = useLoaderData()
   if (
     registrationOptions &&
     registrationOptions.challenge &&
     typeof registrationOptions.challenge === 'string'
   ) {
-    registrationOptions.challenge = new TextEncoder().encode(registrationOptions.challenge)
+    registrationOptions.challenge = new TextEncoder().encode(
+      registrationOptions.challenge
+    )
   }
 
   const submit = useSubmit()
@@ -187,16 +199,20 @@ export default () => {
     ) {
       const submitPayload = new FormData()
       submitPayload.set('credentialId', credential.id)
-      submitPayload.set('clientDataJSON', base64url.encode(
-        new Uint8Array(credential.response.clientDataJSON)
-      ))
-      submitPayload.set('attestationObject', base64url.encode(
-        new Uint8Array(credential.response.attestationObject)
-      ))
+      submitPayload.set(
+        'clientDataJSON',
+        base64url.encode(new Uint8Array(credential.response.clientDataJSON))
+      )
+      submitPayload.set(
+        'attestationObject',
+        base64url.encode(new Uint8Array(credential.response.attestationObject))
+      )
       submitPayload.set('nickname', name)
-      submitPayload.set('rawId', base64url.encode(new Uint8Array(credential.rawId)))
+      submitPayload.set(
+        'rawId',
+        base64url.encode(new Uint8Array(credential.rawId))
+      )
       submit(submitPayload, { method: 'post' })
-
     }
   }
 
@@ -277,7 +293,6 @@ export default () => {
         </Text>
         <TosAndPPol />
       </div>
-
-    </div >
+    </div>
   )
 }

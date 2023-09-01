@@ -29,8 +29,11 @@ import { TosAndPPol } from '@proofzero/design-system/src/atoms/info/TosAndPPol'
 import subtractLogo from '~/assets/subtract-logo.svg'
 import { TbFingerprint } from 'react-icons/tb'
 import webauthnNewKeyIcon from './WebauthnNewKeyIcon'
-import { verifySignedWebauthnChallenge, KeyPairSerialized, createSignedWebauthnChallenge } from './utils'
-
+import {
+  verifySignedWebauthnChallenge,
+  KeyPairSerialized,
+  createSignedWebauthnChallenge,
+} from './utils'
 
 type LoginPayload = {
   credentialId: string
@@ -58,10 +61,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       base64url.decode(loginPayload.clientDataJSON)
     )
     const clientDataJSONObject = JSON.parse(clientDataJSON)
-    const challenge = new TextDecoder().decode(base64url.decode(clientDataJSONObject.challenge))
-    const webauthnChallengeJwks = JSON.parse(context.env.SECRET_WEBAUTHN_SIGNING_KEY) as KeyPairSerialized
+    const challenge = new TextDecoder().decode(
+      base64url.decode(clientDataJSONObject.challenge)
+    )
+    const webauthnChallengeJwks = JSON.parse(
+      context.env.SECRET_WEBAUTHN_SIGNING_KEY
+    ) as KeyPairSerialized
     await verifySignedWebauthnChallenge(challenge, webauthnChallengeJwks)
-
 
     const accountURN = AccountURNSpace.componentizedUrn(
       generateHashedIDRef(
@@ -77,7 +83,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const webAuthnData = await coreClient.account.getWebAuthNData.query()
 
     if (!webAuthnData || !webAuthnData.counter || !webAuthnData.publicKey)
-      throw new InternalServerError({ message: "Could not retrieve passkey data. Try again or register new key." })
+      throw new InternalServerError({
+        message:
+          'Could not retrieve passkey data. Try again or register new key.',
+      })
 
     const passportUrl = new URL(request.url)
     const f2l = new Fido2Lib({
@@ -134,7 +143,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       context.traceSpan,
       existing
     )
-
   }
 )
 
@@ -153,8 +161,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       authenticatorUserVerification: 'required',
     })
     const loginOptions = (await f2l.assertionOptions()) as any
-    const webauthnChallengeJwks = JSON.parse(context.env.SECRET_WEBAUTHN_SIGNING_KEY) as KeyPairSerialized
-    const challengeJwt = await createSignedWebauthnChallenge(webauthnChallengeJwks)
+    const webauthnChallengeJwks = JSON.parse(
+      context.env.SECRET_WEBAUTHN_SIGNING_KEY
+    ) as KeyPairSerialized
+    const challengeJwt = await createSignedWebauthnChallenge(
+      webauthnChallengeJwks
+    )
     loginOptions.challenge = challengeJwt
     return json({ loginOptions, passportOrigin: passportUrl.origin })
   }
@@ -251,19 +263,25 @@ export default () => {
         </section>
         <section>
           <div className="flex-1 w-full flex flex-col gap-4 relative">
-
             <AuthButton
               disabled={loginRequested}
-              Graphic={<TbFingerprint className="w-full h-full dark:text-white"></TbFingerprint>}
+              Graphic={
+                <TbFingerprint className="w-full h-full dark:text-white"></TbFingerprint>
+              }
               onClick={() => {
                 setLoginRequested(true)
               }}
-              text='Use existing Passkey'
+              text="Use existing Passkey"
             />
             <AuthButton
-              Graphic={< img src={webauthnNewKeyIcon} className="w-full h-full dark:text-white" />}
+              Graphic={
+                <img
+                  src={webauthnNewKeyIcon}
+                  className="w-full h-full dark:text-white"
+                />
+              }
               onClick={() => navigate('register')}
-              text='Add new Passkey'
+              text="Add new Passkey"
             />
           </div>
         </section>
@@ -292,6 +310,5 @@ export default () => {
         <TosAndPPol />
       </div>
     </div>
-
   )
 }
