@@ -21,6 +21,7 @@ import { base64url } from 'jose'
 import { TosAndPPol } from '@proofzero/design-system/src/atoms/info/TosAndPPol'
 import subtractLogo from '~/assets/subtract-logo.svg'
 import { KeyPairSerialized, createSignedWebauthnChallenge, verifySignedWebauthnChallenge } from './utils'
+import { BadRequestError } from '@proofzero/errors'
 
 
 type RegistrationPayload = {
@@ -67,12 +68,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     }
 
+    if (!registrationPayload.nickname || (registrationPayload.nickname && registrationPayload.nickname.length < 4))
+      throw new BadRequestError({ message: 'Name of key is required to be 4 or more characters' })
+
     const clientDataJSON = new TextDecoder().decode(
       base64url.decode(registrationPayload.clientDataJSON)
     )
 
     const clientDataJSONObject = JSON.parse(clientDataJSON)
-
     const challenge = new TextDecoder().decode(base64url.decode(clientDataJSONObject.challenge))
     const webauthnChallengeJwks = JSON.parse(context.env.SECRET_WEBAUTHN_SIGNING_KEY) as KeyPairSerialized
     await verifySignedWebauthnChallenge(challenge, webauthnChallengeJwks)
@@ -103,7 +106,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       },
       {
         origin: passportUrl.origin,
-        challenge: challenge,
+        challenge: clientDataJSONObject.challenge,
         factor: 'first',
       }
     )
@@ -171,7 +174,7 @@ export default () => {
   crypto.getRandomValues(randomBuffer)
   const registerKey = async (name: string) => {
     registrationOptions.user = {
-      id: base64url.encode(randomBuffer),
+      id: new TextEncoder().encode(base64url.encode(randomBuffer)),
       name,
       displayName: name,
     }
@@ -204,7 +207,6 @@ export default () => {
     }
   }, [requestedRegistration])
 
-  console.log("KEYNAME", keyName, keyName.length, (keyName && keyName.length >= 4) ? true : false)
   return (
     <div
       className={

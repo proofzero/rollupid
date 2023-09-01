@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { HiKey, HiOutlineArrowLeft, HiUserAdd } from 'react-icons/hi'
+import { HiOutlineArrowLeft } from 'react-icons/hi'
 import { Button, Text } from '@proofzero/design-system'
 import {
   Form,
@@ -14,16 +14,13 @@ import {
   type ActionFunction,
   type LoaderFunction,
 } from '@remix-run/cloudflare'
-import { BadRequestError } from '@proofzero/errors'
-import { fromBase64, toBase64 } from '@proofzero/utils/buffer'
+import { InternalServerError } from '@proofzero/errors'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { NodeType, WebauthnAccountType } from '@proofzero/types/account'
 import { getCoreClient } from '~/platform.server'
 import { Fido2Lib } from 'fido2-lib'
-import { JWK, base64url } from 'jose'
-import { EncryptJWT, jwtDecrypt, jwtVerify, SignJWT, importJWK } from 'jose'
-import { decrypt, encrypt, importKey } from '@proofzero/utils/crypto'
+import { base64url } from 'jose'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { getAuthzCookieParams, getUserSession } from '~/session.server'
 import { authenticateAccount } from '~/utils/authenticate.server'
@@ -78,6 +75,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const coreClient = getCoreClient({ context, accountURN })
 
     const webAuthnData = await coreClient.account.getWebAuthNData.query()
+
+    if (!webAuthnData || !webAuthnData.counter || !webAuthnData.publicKey)
+      throw new InternalServerError({ message: "Could not retrieve passkey data. Try again or register new key." })
 
     const passportUrl = new URL(request.url)
     const f2l = new Fido2Lib({
