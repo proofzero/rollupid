@@ -42,6 +42,7 @@ export function getRollupReqFunctionErrorWrapper(
       const result = await reqFunction(args)
       return result
     } catch (e) {
+      console.error('ERROR BEFORE PROCESSING', e)
       //Needed for when we throw redirects
       if (e instanceof Response) return e as Response
 
@@ -56,7 +57,7 @@ export function getRollupReqFunctionErrorWrapper(
         originalError: e,
         traceparent,
       }
-      console.error(result)
+      console.error(JSON.stringify(result, null, 2))
       throw JsonError(e, traceparent)
     }
   }

@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react'
 import { HiOutlineArrowLeft } from 'react-icons/hi'
 import { Button, Text } from '@proofzero/design-system'
-import { Form, useLoaderData, useNavigate, useOutletContext } from '@remix-run/react'
+import {
+  Form,
+  useLoaderData,
+  useNavigate,
+  useOutletContext,
+} from '@remix-run/react'
 
-import { json, type ActionFunction, type LoaderFunction } from '@remix-run/cloudflare'
+import {
+  json,
+  type ActionFunction,
+  type LoaderFunction,
+} from '@remix-run/cloudflare'
 import { BadRequestError } from '@proofzero/errors'
 import { fromBase64, toBase64 } from '@proofzero/utils/buffer'
 import { AccountURNSpace } from '@proofzero/urns/account'
@@ -11,8 +20,8 @@ import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { NodeType, WebauthnAccountType } from '@proofzero/types/account'
 import { getCoreClient } from '~/platform.server'
 import { Fido2Lib } from 'fido2-lib'
-import { base64url } from 'jose'
-import { EncryptJWT, jwtDecrypt } from 'jose'
+import { JWK, base64url } from 'jose'
+import { EncryptJWT, jwtDecrypt, jwtVerify, SignJWT, importJWK } from 'jose'
 import { decrypt, encrypt, importKey } from '@proofzero/utils/crypto'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
@@ -28,79 +37,103 @@ type LoginPayload = {
 const fixedChallenge =
   '9czL/AqVkQah8J127PTEShBn6GJUOhS5oivgYu3xby7k/mwk/+bEViam0yNSbHpt74o5yXW0MHkchNhA4B37dA=='
 
-export const action: ActionFunction = getRollupReqFunctionErrorWrapper(async ({ request, params, context }) => {
-  const loginPayload: LoginPayload = await request.json()
-  const algorithm = { name: 'AES-GCM' }
+type KeyPairSerialized = {
+  publicKey: JWK,
+  privateKey: JWK
+}
 
-  const key = await importKey(fromBase64(context.env.SECRET_SESSION_KEY), algorithm)
+export const createSignedWebauthnChallenge = async (keyPairJSON: KeyPairSerialized) => {
+  const privateKey = await importJWK(keyPairJSON.privateKey)
+  const payload = { challenge: 'asdf' }
+  const challengeJwt = await new SignJWT(payload)
+    .setProtectedHeader({ alg: 'ES256' })
+    .setExpirationTime('5 min')
+    .sign(privateKey)
+  return challengeJwt
+}
 
-  const dataArray = new TextEncoder().encode(JSON.stringify({ exp: Date.now(), challenge: 'asd' }))
-  const encryptedData = await encrypt(key, algorithm, dataArray)
-  console.debug("Encyrpted ", encryptedData)
-  const decyrptedData = await decrypt(key, algorithm, new Uint8Array(encryptedData.cipher), new Uint8Array(encryptedData.iv))
-  console.debug("Decrypted", decyrptedData)
+export const verifySignedWebauthnChallenge = async (challengeJwt: string, keyPairJSON: KeyPairSerialized) => {
+  const publicKey = await importJWK(keyPairJSON.publicKey)
+  const verificationResults = await jwtVerify(challengeJwt, publicKey)
+}
 
-  console.debug('reg login backend', loginPayload)
-  const clientDataJSON = new TextDecoder().decode(
-    fromBase64(loginPayload.clientDataJSON)
-  )
-  const clientDataJSONObject = JSON.parse(clientDataJSON)
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, params, context }) => {
+    const loginPayload: LoginPayload = await request.json()
+    console.debug('reg login backend', loginPayload)
+    const clientDataJSON = new TextDecoder().decode(
+      base64url.decode(loginPayload.clientDataJSON)
+    )
+    const clientDataJSONObject = JSON.parse(clientDataJSON)
+    console.debug('clientDataJSONObject', clientDataJSONObject)
+    const challenge = new TextDecoder().decode(base64url.decode(clientDataJSONObject.challenge))
+    console.debug('\n\n\nDECODED CHALLENGE', challenge)
+    const webauthnChallengeJwks = JSON.parse(context.env.SECRET_WEBAUTHN_SIGNING_KEY) as KeyPairSerialized
+    await verifySignedWebauthnChallenge(challenge, webauthnChallengeJwks)
 
-  console.debug('clientDataJSONObject', clientDataJSONObject)
 
-  const accountURN = AccountURNSpace.componentizedUrn(
-    generateHashedIDRef(
-      WebauthnAccountType.WebAuthN,
-      loginPayload.credentialId
-    ),
-    { node_type: NodeType.WebAuthN, addr_type: WebauthnAccountType.WebAuthN },
-    { alias: loginPayload.credentialId }
-  )
+    const accountURN = AccountURNSpace.componentizedUrn(
+      generateHashedIDRef(
+        WebauthnAccountType.WebAuthN,
+        loginPayload.credentialId
+      ),
+      { node_type: NodeType.WebAuthN, addr_type: WebauthnAccountType.WebAuthN },
+      { alias: loginPayload.credentialId }
+    )
 
-  console.debug('LOGIN ACCOUNTURN', accountURN)
+    console.debug('LOGIN ACCOUNTURN', accountURN)
 
-  const coreClient = getCoreClient({ context, accountURN })
+    const coreClient = getCoreClient({ context, accountURN })
 
-  const webAuthnData = await coreClient.account.getWebAuthNData.query()
+    const webAuthnData = await coreClient.account.getWebAuthNData.query()
 
-  console.log('WEBAUTHN DATA IN STORAGE', webAuthnData)
+    console.log('WEBAUTHN DATA IN STORAGE', webAuthnData)
 
-  const passportUrl = new URL(request.url)
-  const f2l = new Fido2Lib({
-    timeout: 42,
-    rpId: passportUrl.hostname,
-    rpName: 'Rollup ID',
-    challengeSize: 64,
-    attestation: 'none',
-    cryptoParams: [-7, -257],
-    authenticatorAttachment: 'platform',
-    authenticatorRequireResidentKey: false,
-    authenticatorUserVerification: 'required',
-  })
+    const passportUrl = new URL(request.url)
+    const f2l = new Fido2Lib({
+      timeout: 42,
+      rpId: passportUrl.hostname,
+      rpName: 'Rollup ID',
+      challengeSize: 200,
+      attestation: 'none',
+      cryptoParams: [-7, -257],
+      authenticatorAttachment: 'platform',
+      authenticatorRequireResidentKey: false,
+      authenticatorUserVerification: 'required',
+    })
 
-  const loginResult = await f2l.assertionResult(
-    {
-      response: {
-        authenticatorData: base64url.decode(loginPayload.authenticatorData).buffer,
-        clientDataJSON: loginPayload.clientDataJSON,
-        signature: loginPayload.signature,
-        userHandle: loginPayload.userHandle,
+    const loginResult = await f2l.assertionResult(
+      {
+        response: {
+          authenticatorData: base64url.decode(loginPayload.authenticatorData)
+            .buffer,
+          clientDataJSON: loginPayload.clientDataJSON,
+          signature: loginPayload.signature,
+          userHandle: loginPayload.userHandle,
+        },
+        rawId: base64url.decode(loginPayload.rawId).buffer,
       },
-      rawId: base64url.decode(loginPayload.rawId).buffer
-    },
-    {
-      challenge: fixedChallenge,
-      factor: 'first',
-      origin: passportUrl.origin,
-      prevCounter: webAuthnData.counter,
-      publicKey: webAuthnData.publicKey,
-      userHandle: loginPayload.userHandle,
-    }
-  )
-  console.debug("ASSERTION RESPONSE", JSON.stringify(Object.fromEntries(loginResult.authnrData.entries()), null, 2))
+      {
+        challenge: clientDataJSONObject.challenge,
+        factor: 'first',
+        origin: passportUrl.origin,
+        prevCounter: webAuthnData.counter,
+        publicKey: webAuthnData.publicKey,
+        userHandle: loginPayload.userHandle,
+      }
+    )
+    console.debug(
+      'ASSERTION RESPONSE',
+      JSON.stringify(
+        Object.fromEntries(loginResult.authnrData.entries()),
+        null,
+        2
+      )
+    )
 
-  return null
-})
+    return null
+  }
+)
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -109,7 +142,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       timeout: 42,
       rpId: passportUrl.hostname,
       rpName: 'Rollup ID',
-      challengeSize: 64,
+      challengeSize: 200,
       attestation: 'none',
       cryptoParams: [-7, -257],
       authenticatorAttachment: 'platform',
@@ -117,11 +150,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       authenticatorUserVerification: 'required',
     })
     const loginOptions = (await f2l.assertionOptions()) as any
-    loginOptions.challenge = fixedChallenge
-    console.debug(
-      'LOGIN OPTIONS',
-      JSON.stringify(loginOptions, null, 2)
-    )
+    const webauthnChallengeJwks = JSON.parse(context.env.SECRET_WEBAUTHN_SIGNING_KEY) as KeyPairSerialized
+    const challengeJwt = await createSignedWebauthnChallenge(webauthnChallengeJwks)
+    console.debug("CHALLENGE JWT", challengeJwt)
+    loginOptions.challenge = challengeJwt
+    console.debug('LOGIN OPTIONS', JSON.stringify(loginOptions, null, 2))
     return json({ loginOptions, passportOrigin: passportUrl.origin })
   }
 )
@@ -138,10 +171,9 @@ export default () => {
 
   useEffect(() => {
     const webauthnLogin = async () => {
-
       let credential = await navigator.credentials.get({
         publicKey: {
-          challenge: base64url.decode(fixedChallenge),
+          challenge: new TextEncoder().encode(loginOptions.challenge),
           rpId: new URL(passportOrigin).hostname,
           allowCredentials: [],
           // userVerification: "required",
@@ -152,6 +184,11 @@ export default () => {
         credential instanceof PublicKeyCredential &&
         credential.response instanceof AuthenticatorAssertionResponse
       ) {
+        console.log("NEW CLIENTJSON", JSON.parse(new TextDecoder().decode(credential.response.clientDataJSON)).challenge)
+        console.log("CHALLENGES", {
+          textEncoder: new TextDecoder().decode(new TextEncoder().encode(loginOptions.challenge)),
+          b64decoded: new TextDecoder().decode(base64url.decode(JSON.parse(new TextDecoder().decode(credential.response.clientDataJSON)).challenge))
+        })
         const loginPayload: LoginPayload = {
           credentialId: credential?.id || '',
           clientDataJSON: base64url.encode(
@@ -166,15 +203,14 @@ export default () => {
           signature: base64url.encode(
             new Uint8Array(credential.response.signature)
           ),
-          rawId: base64url.encode(new Uint8Array(credential.rawId))
+          rawId: base64url.encode(new Uint8Array(credential.rawId)),
         }
-        console.debug('LOGIN PAYLOAD', loginPayload)
+        console.log('LOGIN PAYLOAD', loginPayload)
         const response = await fetch(
           `${passportOrigin}/authenticate/passport/webauthn/`,
           {
             method: 'POST',
             body: JSON.stringify(loginPayload),
-            // redirect: 'follow',
           }
         )
       }
