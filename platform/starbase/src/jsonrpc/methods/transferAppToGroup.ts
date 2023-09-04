@@ -3,8 +3,7 @@ import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { IdentityGroupURNValidator } from '@proofzero/platform-middleware/inputValidators'
-import { InternalServerError } from '@proofzero/errors'
-import { EDGE_APPLICATION } from '../../types'
+import { BadRequestError } from '@proofzero/errors'
 
 export const TransferAppToGroupInput = z.object({
   clientID: z.string(),
@@ -22,9 +21,15 @@ export const transferAppToGroup = async ({
 }): Promise<void> => {
   const { clientID, identityGroupURN } = input
 
+  if (!ctx.identityURN) {
+    throw new BadRequestError({
+      message: 'Request received without identityURN.',
+    })
+  }
+
   const appURN = ApplicationURNSpace.componentizedUrn(clientID)
   if (!ctx.ownAppURNs || !ctx.ownAppURNs.includes(appURN))
-    throw new InternalServerError({
+    throw new BadRequestError({
       message: `Request received for clientId ${clientID} which is not owned by provided account.`,
     })
 
@@ -33,31 +38,25 @@ export const transferAppToGroup = async ({
   const { edges } = await caller.edges.getEdges({
     query: {
       dst: { baseUrn: appURN },
-      tag: EDGE_APPLICATION,
+      src: {
+        baseUrn: ctx.identityURN,
+      },
     },
   })
 
-  if (edges.length === 0) {
-    console.warn('No ownership edge found for ', appURN)
-  }
-
-  if (edges.length > 1) {
-    console.warn('More than one ownership edge found for ', appURN)
-  }
-
-  await caller.edges.makeEdge({
-    src: identityGroupURN,
-    dst: appURN,
-    tag: EDGE_APPLICATION,
-  })
-
   await Promise.all(
-    edges.map((edge) =>
-      caller.edges.removeEdge({
-        src: edge.src.baseUrn,
-        tag: EDGE_APPLICATION,
+    edges.map(async (edge) => {
+      await caller.edges.makeEdge({
+        src: identityGroupURN,
+        tag: edge.tag,
         dst: edge.dst.baseUrn,
       })
-    )
+
+      await caller.edges.removeEdge({
+        src: edge.src.baseUrn,
+        tag: edge.tag,
+        dst: edge.dst.baseUrn,
+      })
+    })
   )
 }

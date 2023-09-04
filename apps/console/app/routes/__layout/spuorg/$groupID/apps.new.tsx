@@ -1,4 +1,4 @@
-import { Form, Link, useOutletContext } from '@remix-run/react'
+import { Form, Link, NavLink, useOutletContext } from '@remix-run/react'
 import { GroupDetailsContextData } from '../$groupID'
 import Breadcrumbs from '@proofzero/design-system/src/atoms/breadcrumbs/Breadcrumbs'
 import { Text } from '@proofzero/design-system'
@@ -81,7 +81,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { group, groupID } = useOutletContext<GroupDetailsContextData>()
+  const { group, groupID, apps } = useOutletContext<GroupDetailsContextData>()
 
   return (
     <>
@@ -129,6 +129,12 @@ export default () => {
           </Button>
         </Form>
       </section>
+
+      {apps.filter((a) => !a.groupID) && (
+        <section>
+          <NavLink to={`/spuorg/${groupID}/apps/transfer`}>Transfer!</NavLink>
+        </section>
+      )}
     </>
   )
 }

@@ -132,6 +132,10 @@ import {
   GetAppPlanOutputSchema,
 } from './methods/getAppPlan'
 import { listGroupApps, ListGroupAppsOutput } from './methods/listGroupApps'
+import {
+  transferAppToGroup,
+  TransferAppToGroupInput,
+} from './methods/transferAppToGroup'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -382,6 +386,14 @@ export const appRouter = t.router({
     .use(Analytics)
     .output(ListGroupAppsOutput)
     .query(listGroupApps),
+  transferAppToGroup: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(OwnAppsMiddleware)
+    .input(TransferAppToGroupInput)
+    .mutation(transferAppToGroup),
 })
 
 export type StarbaseRouter = typeof appRouter
