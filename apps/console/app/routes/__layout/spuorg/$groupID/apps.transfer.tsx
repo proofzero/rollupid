@@ -2,7 +2,6 @@ import {
   Form,
   Link,
   useActionData,
-  useFetcher,
   useLoaderData,
   useOutletContext,
   useSubmit,
@@ -288,10 +287,6 @@ export default () => {
   const [needsGroupBilling, setNeedsGroupBilling] = useState(false)
   const [needsEntitlement, setNeedsEntitlement] = useState(false)
 
-  const formRef = useRef<HTMLFormElement>(null)
-
-  const [disableSubmitButton, setDisableSubmitButton] = useState(false)
-
   const submit = useSubmit()
 
   useEffect(() => {
@@ -313,21 +308,15 @@ export default () => {
           0
         ) {
           setNeedsEntitlement(true)
+        } else {
+          setNeedsEntitlement(false)
         }
       }
     }
-  }, [selectedApp])
+  }, [selectedApp, entitlements])
 
   useEffect(() => {
     if (actionData && selectedApp) {
-      setDisableSubmitButton(true)
-
-      setFetcherInterval(
-        setInterval(() => {
-          fetcher.load(`/api/get-entitlements?URN=${groupURN}`)
-        }, 1000)
-      )
-
       const { status, client_secret, payment_method, subId } = actionData
       process3DSecureCard({
         submit,
@@ -337,25 +326,10 @@ export default () => {
         client_secret,
         payment_method,
         redirectUrl: `/spuorg/${groupID}/apps/transfer/`,
+        URN: groupURN,
       })
     }
   }, [actionData])
-
-  const fetcher = useFetcher()
-  const [fetcherInterval, setFetcherInterval] = useState<NodeJS.Timer>()
-
-  useEffect(() => {
-    if (selectedApp && fetcher.data?.entitlements) {
-      if (
-        fetcher.data.entitlements.plans[selectedApp.appPlan]?.entitlements !==
-        entitlements.plans[selectedApp.appPlan]?.entitlements
-      ) {
-        clearInterval(fetcherInterval)
-
-        formRef.current?.requestSubmit()
-      }
-    }
-  }, [fetcher])
 
   return (
     <>
@@ -431,11 +405,7 @@ export default () => {
       </section>
 
       <section className="flex justify-center items-center">
-        <Form
-          ref={formRef}
-          className="flex flex-col gap-4 w-[464px]"
-          method="post"
-        >
+        <Form className="flex flex-col gap-4 w-[464px]" method="post">
           <Input
             id="group_name"
             label="Group"
@@ -583,8 +553,7 @@ export default () => {
             disabled={
               apps.filter((a) => !a.groupID).length === 0 ||
               needsGroupBilling ||
-              !selectedApp ||
-              disableSubmitButton
+              !selectedApp
             }
           >
             {!needsEntitlement && `Transfer Application`}
