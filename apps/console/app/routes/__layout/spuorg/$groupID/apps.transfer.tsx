@@ -52,6 +52,7 @@ import {
   process3DSecureCard,
 } from '~/utils/billing'
 import Stripe from 'stripe'
+import plans from '~/utils/plans'
 
 type GroupAppTransferLoaderData = {
   hasPaymentMethod: boolean
@@ -244,13 +245,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       const toastSession = await appendToastToFlashSession(
         request,
         {
-          message: `Application transferred successfully.`,
+          message: `Application transferred.`,
           type: ToastType.Success,
         },
         context.env
       )
 
-      return redirect(`/apps/${clientID}`, {
+      return redirect(`/spuorg/${groupID}`, {
         headers: {
           'Set-Cookie': await commitFlashSession(toastSession, context.env),
         },
@@ -456,7 +457,7 @@ export default () => {
                         <div className="flex flex-row items-center gap-2">
                           {!selectedApp.icon && (
                             <div className="rounded-full w-5 h-5 flex justify-center items-center bg-gray-200 shrink-0 overflow-hidden">
-                              <Text className="text-gray-500">
+                              <Text size="xs" className="text-gray-500">
                                 {selectedApp.name?.substring(0, 1)}
                               </Text>
                             </div>
@@ -536,7 +537,7 @@ export default () => {
                               <div className="flex flex-row items-center gap-2">
                                 {!app.icon && (
                                   <div className="rounded-full w-5 h-5 flex justify-center items-center bg-gray-200 shrink-0 overflow-hidden">
-                                    <Text className="text-gray-500">
+                                    <Text size="xs" className="text-gray-500">
                                       {app.name?.substring(0, 1)}
                                     </Text>
                                   </div>
@@ -587,11 +588,48 @@ export default () => {
             {!needsEntitlement && `Transfer Application`}
             {needsEntitlement && `Purchase Entitlement & Complete Transfer`}
           </Button>
+
+          {selectedApp && needsEntitlement && (
+            <article className="p-4 bg-orange-50 rounded-lg">
+              <section className="mb-3 flex flex-row items-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                >
+                  <path
+                    d="M9.9993 7.5V9.16667M9.9993 12.5H10.0076M4.22579 15.8333H15.7728C17.0558 15.8333 17.8577 14.4444 17.2162 13.3333L11.4427 3.33333C10.8012 2.22222 9.19742 2.22222 8.55592 3.33333L2.78242 13.3333C2.14092 14.4444 2.94279 15.8333 4.22579 15.8333Z"
+                    stroke="#FB923C"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+
+                <Text size="sm" className="text-orange-600">
+                  Insufficient Entitlements within Group
+                </Text>
+              </section>
+              <Text size="sm" className="text-gray-700">
+                Application you are trying to transfer is on{' '}
+                <Text size="sm" type="span" weight="semibold">
+                  Pro Plan
+                </Text>
+                .<br /> There are{' '}
+                <Text size="sm" type="span" weight="semibold">
+                  {entitlements.plans[selectedApp.appPlan]?.entitlements}{' '}
+                  {plans[selectedApp.appPlan].title} Entitlements
+                </Text>{' '}
+                available in your group.{' '}
+              </Text>
+            </article>
+          )}
         </Form>
       </section>
 
       {needsGroupBilling && <section>PLEASE ADD BILLING INFORMATION</section>}
-      {needsEntitlement && <section>PLEASE ADD ENTITLEMENT</section>}
     </>
   )
 }
