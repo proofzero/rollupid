@@ -1,4 +1,12 @@
-import { Form, Link, useLoaderData, useOutletContext } from '@remix-run/react'
+import {
+  Form,
+  Link,
+  useActionData,
+  useFetcher,
+  useLoaderData,
+  useOutletContext,
+  useSubmit,
+} from '@remix-run/react'
 import { GroupDetailsContextData } from '../$groupID'
 import Breadcrumbs from '@proofzero/design-system/src/atoms/breadcrumbs/Breadcrumbs'
 import { Text } from '@proofzero/design-system'
@@ -13,7 +21,11 @@ import {
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { appendToastToFlashSession } from '~/utils/toast.server'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
-import { commitFlashSession, requireJWT } from '~/utilities/session.server'
+import {
+  commitFlashSession,
+  getFlashSession,
+  requireJWT,
+} from '~/utilities/session.server'
 import { BadRequestError } from '@proofzero/errors'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
@@ -23,7 +35,7 @@ import {
 } from '@proofzero/urns/identity-group'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { Listbox, Transition } from '@headlessui/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AppLoaderData } from '~/root'
 import {
   CheckIcon,
@@ -34,12 +46,17 @@ import classNames from 'classnames'
 import _ from 'lodash'
 import { ServicePlanType } from '@proofzero/types/billing'
 import { GetEntitlementsOutput } from '@proofzero/platform.billing/src/jsonrpc/methods/getEntitlements'
-import { createOrUpdateSubscription } from '~/utils/billing'
+import {
+  StripeInvoice,
+  createOrUpdateSubscription,
+  process3DSecureCard,
+} from '~/utils/billing'
 import Stripe from 'stripe'
 
 type GroupAppTransferLoaderData = {
   hasPaymentMethod: boolean
   entitlements: GetEntitlementsOutput
+  STRIPE_PUBLISHABLE_KEY: string
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -66,6 +83,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     return json<GroupAppTransferLoaderData>({
       hasPaymentMethod: spd && spd.paymentMethodID ? true : false,
       entitlements,
+      STRIPE_PUBLISHABLE_KEY: context.env.STRIPE_PUBLISHABLE_KEY,
     })
   }
 )
@@ -149,6 +167,70 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             quantity: quantity,
             type: appDetails.appPlan,
           })
+        } else {
+          let toastSession = await getFlashSession(request, context.env)
+
+          if (
+            (sub.latest_invoice as unknown as StripeInvoice)?.payment_intent
+              ?.status === 'requires_action'
+          ) {
+            await coreClient.billing.updateEntitlements.mutate({
+              URN: groupURN,
+              subscriptionID: sub.id,
+              quantity: quantity - 1,
+              type: appDetails.appPlan,
+            })
+
+            toastSession = await appendToastToFlashSession(
+              request,
+              {
+                message: `Payment requires additional action`,
+                type: ToastType.Warning,
+              },
+              context.env
+            )
+
+            let status, client_secret, payment_method
+            ;({ status, client_secret, payment_method } = (
+              sub.latest_invoice as Stripe.Invoice
+            ).payment_intent as Stripe.PaymentIntent)
+
+            return json(
+              {
+                subId: sub.id,
+                status,
+                client_secret,
+                payment_method,
+                clientID,
+              },
+              {
+                headers: {
+                  'Set-Cookie': await commitFlashSession(
+                    toastSession,
+                    context.env
+                  ),
+                },
+              }
+            )
+          } else {
+            toastSession = await appendToastToFlashSession(
+              request,
+              {
+                message: `Payment failed - check your card details`,
+                type: ToastType.Error,
+              },
+              context.env
+            )
+
+            return new Response(null, {
+              headers: {
+                'Set-Cookie': await commitFlashSession(
+                  toastSession,
+                  context.env
+                ),
+              },
+            })
+          }
         }
       }
     }
@@ -183,7 +265,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         context.env
       )
 
-      return redirect(`/spuorg/${params.groupID}/apps/new`, {
+      return redirect(`/spuorg/${params.groupID}/apps/transfer`, {
         headers: {
           'Set-Cookie': await commitFlashSession(toastSession, context.env),
         },
@@ -193,16 +275,23 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { group, groupID, apps } = useOutletContext<GroupDetailsContextData>()
-  const { hasPaymentMethod, entitlements } =
+  const { group, groupID, groupURN, apps } =
+    useOutletContext<GroupDetailsContextData>()
+  const { hasPaymentMethod, entitlements, STRIPE_PUBLISHABLE_KEY } =
     useLoaderData<GroupAppTransferLoaderData>()
 
-  const [selectedApp, setSelectedApp] = useState<AppLoaderData | undefined>(
-    undefined
-  )
+  const actionData = useActionData()
+
+  const [selectedApp, setSelectedApp] = useState<AppLoaderData | null>(null)
 
   const [needsGroupBilling, setNeedsGroupBilling] = useState(false)
   const [needsEntitlement, setNeedsEntitlement] = useState(false)
+
+  const formRef = useRef<HTMLFormElement>(null)
+
+  const [disableSubmitButton, setDisableSubmitButton] = useState(false)
+
+  const submit = useSubmit()
 
   useEffect(() => {
     if (!selectedApp) {
@@ -225,6 +314,45 @@ export default () => {
       }
     }
   }, [selectedApp])
+
+  useEffect(() => {
+    if (actionData && selectedApp) {
+      setDisableSubmitButton(true)
+
+      setFetcherInterval(
+        setInterval(() => {
+          fetcher.load(`/api/get-entitlements?URN=${groupURN}`)
+        }, 1000)
+      )
+
+      const { status, client_secret, payment_method, subId } = actionData
+      process3DSecureCard({
+        submit,
+        subId,
+        STRIPE_PUBLISHABLE_KEY,
+        status,
+        client_secret,
+        payment_method,
+        redirectUrl: `/spuorg/${groupID}/apps/transfer/`,
+      })
+    }
+  }, [actionData])
+
+  const fetcher = useFetcher()
+  const [fetcherInterval, setFetcherInterval] = useState<NodeJS.Timer>()
+
+  useEffect(() => {
+    if (selectedApp && fetcher.data?.entitlements) {
+      if (
+        fetcher.data.entitlements.plans[selectedApp.appPlan]?.entitlements !==
+        entitlements.plans[selectedApp.appPlan]?.entitlements
+      ) {
+        clearInterval(fetcherInterval)
+
+        formRef.current?.requestSubmit()
+      }
+    }
+  }, [fetcher])
 
   return (
     <>
@@ -256,7 +384,11 @@ export default () => {
       </section>
 
       <section className="flex justify-center items-center">
-        <Form className="flex flex-col gap-4 w-[464px]" method="post">
+        <Form
+          ref={formRef}
+          className="flex flex-col gap-4 w-[464px]"
+          method="post"
+        >
           <Input
             id="group_name"
             label="Group"
@@ -355,7 +487,8 @@ export default () => {
             disabled={
               apps.filter((a) => !a.groupID).length === 0 ||
               needsGroupBilling ||
-              !selectedApp
+              !selectedApp ||
+              disableSubmitButton
             }
           >
             {!needsEntitlement && `Transfer Application`}
