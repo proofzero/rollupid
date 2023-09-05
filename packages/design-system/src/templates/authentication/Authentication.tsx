@@ -9,10 +9,10 @@ import ConnectOAuthButton, {
   OAuthProvider,
 } from '../../atoms/buttons/connect-oauth-button'
 import { AuthButton } from '../../molecules/auth-button/AuthButton'
-import { HiOutlineKey, HiOutlineMail } from 'react-icons/hi'
+import { HiOutlineMail } from 'react-icons/hi'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import { ThemeContext } from '../../contexts/theme'
-import WebauthnGraphic from '../../atoms/providers/Webauthn'
+import { WrappedSVG as WebauthnGraphic } from '../../atoms/providers/Webauthn'
 
 const ConnectButton = lazy(() =>
   import('../../atoms/buttons/connect-button/ConnectButton').then((module) => ({
@@ -193,7 +193,7 @@ const displayKeyMapper = (
         <AuthButton
           key={key}
           onClick={() => navigate(`/authenticate/${clientId}/webauthn`)}
-          Graphic={<img src={WebauthnGraphic} className="w-full h-full dark:text-white" />}
+          Graphic={WebauthnGraphic}
           text={'Passkey'}
           fullSize={flex}
           displayContinueWith={displayContinueWith}

@@ -81,6 +81,7 @@ export default class Account extends DOProxy {
         return OAuthAccount.alarm(this)
       case NodeType.Email:
         return EmailAccount.alarm(this)
+      //No alarm needed for WebAuthN type
       default:
         console.log('Unknown node type', type)
     }

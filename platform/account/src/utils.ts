@@ -19,6 +19,7 @@ export const isNodeType = (type: string): type is NodeType => {
     case NodeType.Contract:
     case NodeType.OAuth:
     case NodeType.Email:
+    case NodeType.WebAuthN:
     case NodeType.Handle:
       return true
     default:

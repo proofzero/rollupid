@@ -83,7 +83,8 @@ export const getDataForScopes = async (
           return (
             (ca.rc.node_type === NodeType.OAuth ||
               ca.rc.node_type === NodeType.Email ||
-              ca.rc.node_type === NodeType.Crypto) &&
+              ca.rc.node_type === NodeType.Crypto ||
+              ca.rc.node_type === NodeType.WebAuthN) &&
             ca.rc.addr_type !== CryptoAccountType.Wallet
           )
         })

@@ -1,4 +1,5 @@
-import { JWK, SignJWT, importJWK, jwtVerify } from 'jose'
+import { BadRequestError } from '@proofzero/errors'
+import { JWK, SignJWT, importJWK, jwtVerify, errors } from 'jose'
 
 //TODO: refactor the same type from Starbase
 export type KeyPairSerialized = {
@@ -25,6 +26,13 @@ export const verifySignedWebauthnChallenge = async (
   keyPairJSON: KeyPairSerialized
 ) => {
   const publicKey = await importJWK(keyPairJSON.publicKey)
-  //TODO: Add custom error wrapping to this
-  const verificationResults = await jwtVerify(challengeJwt, publicKey)
+  try {
+    await jwtVerify(challengeJwt, publicKey)
+  } catch (e) {
+    if (e instanceof errors.JWTExpired)
+      throw new BadRequestError({
+        message:
+          'Passkey request authentication has expired. Please try again.',
+      })
+  }
 }

@@ -2,6 +2,7 @@ import {
   CryptoAccountType,
   EmailAccountType,
   OAuthAccountType,
+  WebauthnAccountType,
 } from '@proofzero/types/account'
 
 import ethereumIcon from '@proofzero/design-system/src/assets/social_icons/ethereum.svg'
@@ -13,6 +14,7 @@ import githubIcon from '@proofzero/design-system/src/atoms/providers/Github'
 import googleIcon from '@proofzero/design-system/src/atoms/providers/Google'
 import microsoftIcon from '@proofzero/design-system/src/atoms/providers/Microsoft'
 import twitterIcon from '@proofzero/design-system/src/assets/social_icons/twitter.svg'
+import webauthnIcon from '@proofzero/design-system/src/atoms/providers/Webauthn'
 
 export const imageFromAccountType = (accountType: string) => {
   let providerIcon = null
@@ -25,6 +27,9 @@ export const imageFromAccountType = (accountType: string) => {
       break
     case EmailAccountType.Email:
       providerIcon = emailIcon
+      break
+    case WebauthnAccountType.WebAuthN:
+      providerIcon = webauthnIcon
       break
     case OAuthAccountType.Apple:
       providerIcon = appleIcon

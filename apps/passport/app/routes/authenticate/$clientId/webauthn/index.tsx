@@ -28,7 +28,7 @@ import { AuthButton } from '@proofzero/design-system/src/molecules/auth-button/A
 import { TosAndPPol } from '@proofzero/design-system/src/atoms/info/TosAndPPol'
 import subtractLogo from '~/assets/subtract-logo.svg'
 import { TbFingerprint } from 'react-icons/tb'
-import webauthnNewKeyIcon from './WebauthnNewKeyIcon'
+import { WrappedSVG as WebauthnNewKeyIcon } from './WebauthnNewKeyIcon'
 import {
   verifySignedWebauthnChallenge,
   KeyPairSerialized,
@@ -82,7 +82,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const webAuthnData = await coreClient.account.getWebAuthNData.query()
 
-    if (!webAuthnData || !webAuthnData.counter || !webAuthnData.publicKey)
+    if (!webAuthnData || webAuthnData.counter === undefined || webAuthnData.publicKey === undefined)
       throw new InternalServerError({
         message:
           'Could not retrieve passkey data. Try again or register new key.',
@@ -274,12 +274,7 @@ export default () => {
               text="Use existing Passkey"
             />
             <AuthButton
-              Graphic={
-                <img
-                  src={webauthnNewKeyIcon}
-                  className="w-full h-full dark:text-white"
-                />
-              }
+              Graphic={WebauthnNewKeyIcon}
               onClick={() => navigate('register')}
               text="Add new Passkey"
             />
