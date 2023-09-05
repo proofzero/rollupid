@@ -834,7 +834,7 @@ export default () => {
           totalEntitlements={entitlements[ServicePlanType.PRO]?.entitlements}
           usedEntitlements={
             apps
-              .filter((a) => (groupID ? a.groupID === groupID : true))
+              .filter((a) => (groupID ? a.groupID === groupID : !a.groupID))
               .filter((a) => a.appPlan === ServicePlanType.PRO).length
           }
           paymentData={paymentData}
