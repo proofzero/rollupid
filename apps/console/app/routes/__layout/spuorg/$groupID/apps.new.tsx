@@ -131,8 +131,17 @@ export default () => {
       </section>
 
       {apps.filter((a) => !a.groupID) && (
-        <section>
-          <NavLink to={`/spuorg/${groupID}/apps/transfer`}>Transfer!</NavLink>
+        <section className="flex flex-row justify-center mt-4">
+          <Text size="sm" className="text-gray-600 text-center">
+            Would you like to transfer an existing application <br />
+            into this group?{' '}
+            <Link
+              to={`/spuorg/${groupID}/apps/transfer`}
+              className="text-[#6366F1]"
+            >
+              Go to transfer
+            </Link>
+          </Text>
         </section>
       )}
     </>
