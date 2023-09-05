@@ -449,20 +449,46 @@ export default () => {
           >
             {({ open }) => (
               <div className="flex flex-col col-span-2">
-                <Listbox.Button className="relative border rounded-l p-2 flex flex-row justify-between items-center flex-1 focus-visible:outline-none focus:border-indigo-500">
-                  <div className="flex flex-row items-center gap-2">
-                    {selectedApp?.icon && (
-                      <img className="w-5 h-5" src={selectedApp.icon} />
-                    )}
-                    <Text size="sm" weight="normal" className="text-gray-800">
-                      {_.upperFirst(selectedApp?.name)}
+                <Listbox.Button className="relative border rounded-l py-2 px-3 flex flex-row justify-between items-center flex-1 focus-visible:outline-none focus:border-indigo-500 bg-white disabled:bg-gray-100 px-2">
+                  {apps.filter((a) => !a.groupID).length > 0 && (
+                    <>
+                      {selectedApp && (
+                        <div className="flex flex-row items-center gap-2">
+                          {selectedApp?.icon && (
+                            <img className="w-5 h-5" src={selectedApp.icon} />
+                          )}
+                          <Text
+                            size="sm"
+                            weight="normal"
+                            className="text-gray-800"
+                          >
+                            {_.upperFirst(selectedApp?.name)}
+                          </Text>
+                        </div>
+                      )}
+
+                      {!selectedApp && (
+                        <Text
+                          size="sm"
+                          weight="normal"
+                          className="text-gray-400"
+                        >
+                          Select an Application
+                        </Text>
+                      )}
+                    </>
+                  )}
+
+                  {apps.filter((a) => !a.groupID).length === 0 && (
+                    <Text size="sm" weight="normal" className="text-gray-500">
+                      No Application Available
                     </Text>
-                  </div>
+                  )}
 
                   {open ? (
-                    <ChevronDownIcon className="w-5 h-5 text-gray-500 shrink-0" />
-                  ) : (
                     <ChevronUpIcon className="w-5 h-5 text-gray-500 shrink-0" />
+                  ) : (
+                    <ChevronDownIcon className="w-5 h-5 text-gray-500 shrink-0" />
                   )}
                 </Listbox.Button>
 
