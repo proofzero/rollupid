@@ -1,19 +1,11 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 
-import { BadRequestError, InternalServerError } from '@proofzero/errors'
-import {
-  EmailAccountType,
-  NodeType,
-  WebauthnAccountType,
-} from '@proofzero/types/account'
-import generateRandomString from '@proofzero/utils/generateRandomString'
+import { InternalServerError } from '@proofzero/errors'
+import { WebauthnAccountType } from '@proofzero/types/account'
 
 import { AccountProfile } from '../types'
 
-import { EMAIL_VERIFICATION_OPTIONS } from '../constants'
-
 import { AccountNode } from '.'
-import Account from './account'
 import { Context } from '../context'
 
 type WebauthnAccountProfile = AccountProfile<WebauthnAccountType.WebAuthN>
@@ -35,8 +27,6 @@ export default class WebauthnAccount {
     this.node = node
     this.ctx = ctx
   }
-
-  static async alarm(account: Account) {}
 
   async getProfile(): Promise<WebauthnAccountProfile> {
     const [nickname, gradient, address] = await Promise.all([

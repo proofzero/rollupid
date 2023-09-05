@@ -5,6 +5,7 @@ import {
   OAuthAccountType,
   EmailAccountType,
   CryptoAccountType,
+  WebauthnAccountType,
 } from '@proofzero/types/account'
 
 import { HiOutlineEnvelope } from 'react-icons/hi2'
@@ -49,7 +50,7 @@ export const getEmailIcon = (type: string): JSX.Element => {
 }
 
 export const adjustAccountTypeToDisplay = (
-  accountType: OAuthAccountType | EmailAccountType | CryptoAccountType
+  accountType: OAuthAccountType | EmailAccountType | CryptoAccountType | WebauthnAccountType
 ) => {
   if (accountType === CryptoAccountType.Wallet) {
     return 'SC Wallet'
@@ -100,9 +101,8 @@ export const getAccountDropdownItems = (
     return {
       title: account.title,
       value: account.id as AccountURN,
-      subtitle: `${adjustAccountTypeToDisplay(account.type)} - ${
-        account.address
-      }`,
+      subtitle: `${adjustAccountTypeToDisplay(account.type)} - ${account.address
+        }`,
     }
   })
 }
