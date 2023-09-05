@@ -307,7 +307,9 @@ export default () => {
       } else {
         if (
           (entitlements.plans[selectedApp.appPlan]?.entitlements ?? 0) -
-            apps.filter((a) => a.groupID === groupID).length <=
+            apps.filter(
+              (a) => a.groupID === groupID && a.appPlan === selectedApp.appPlan
+            ).length <=
           0
         ) {
           setNeedsEntitlement(true)
@@ -619,7 +621,13 @@ export default () => {
                 </Text>
                 .<br /> There are{' '}
                 <Text size="sm" type="span" weight="semibold">
-                  {entitlements.plans[selectedApp.appPlan]?.entitlements}{' '}
+                  {(entitlements.plans[selectedApp.appPlan]?.entitlements ??
+                    0) -
+                    apps.filter(
+                      (a) =>
+                        a.groupID === groupID &&
+                        a.appPlan === selectedApp.appPlan
+                    ).length}{' '}
                   {plans[selectedApp.appPlan].title} Entitlements
                 </Text>{' '}
                 available in your group.{' '}
