@@ -454,8 +454,19 @@ export default () => {
                     <>
                       {selectedApp && (
                         <div className="flex flex-row items-center gap-2">
-                          {selectedApp?.icon && (
-                            <img className="w-5 h-5" src={selectedApp.icon} />
+                          {!selectedApp.icon && (
+                            <div className="rounded-full w-5 h-5 flex justify-center items-center bg-gray-200 shrink-0 overflow-hidden">
+                              <Text className="text-gray-500">
+                                {selectedApp.name?.substring(0, 1)}
+                              </Text>
+                            </div>
+                          )}
+                          {selectedApp.icon && (
+                            <img
+                              src={selectedApp.icon}
+                              className="object-cover w-5 h-5 rounded-full"
+                              alt="app icon"
+                            />
                           )}
                           <Text
                             size="sm"
@@ -521,19 +532,31 @@ export default () => {
                           }
                         >
                           {({ selected }) => (
-                            <article className="flex flex-row justify-between items-center">
-                              <section>
+                            <article className="flex flex-row items-center justify-between">
+                              <div className="flex flex-row items-center gap-2">
+                                {!app.icon && (
+                                  <div className="rounded-full w-5 h-5 flex justify-center items-center bg-gray-200 shrink-0 overflow-hidden">
+                                    <Text className="text-gray-500">
+                                      {app.name?.substring(0, 1)}
+                                    </Text>
+                                  </div>
+                                )}
                                 {app.icon && (
-                                  <img className="w-5 h-5" src={app.icon} />
+                                  <img
+                                    src={app.icon}
+                                    className="object-cover w-5 h-5 rounded-full"
+                                    alt="app icon"
+                                  />
                                 )}
                                 <Text
                                   size="sm"
                                   weight="normal"
                                   className="text-gray-800"
                                 >
-                                  {_.upperFirst(app.name)}
+                                  {_.upperFirst(app?.name)}
                                 </Text>
-                              </section>
+                              </div>
+
                               {selected && (
                                 <CheckIcon
                                   className="h-5 w-5 text-indigo-600"
