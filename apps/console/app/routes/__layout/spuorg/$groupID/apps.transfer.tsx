@@ -381,6 +381,50 @@ export default () => {
         <Text size="2xl" weight="semibold">
           Transfer Application
         </Text>
+
+        <div className="flex flex-row gap-2 items-center mt-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+          >
+            <g clipPath="url(#clip0_14155_25188)">
+              <path
+                d="M6.82538 2.63765L1.21071 12.011C1.09503 12.2114 1.03383 12.4387 1.03321 12.6702C1.03258 12.9016 1.09255 13.1292 1.20715 13.3303C1.32175 13.5314 1.48699 13.699 1.68644 13.8164C1.88589 13.9338 2.11261 13.997 2.34404 13.9996H13.574C13.8055 13.997 14.0322 13.9338 14.2316 13.8164C14.4311 13.699 14.5963 13.5314 14.7109 13.3303C14.8255 13.1292 14.8855 12.9016 14.8849 12.6702C14.8843 12.4387 14.8231 12.2114 14.7074 12.011L9.09204 2.63765C8.97381 2.44297 8.80742 2.28204 8.60891 2.17035C8.41041 2.05867 8.18648 2 7.95871 2C7.73094 2 7.50702 2.05867 7.30851 2.17035C7.11001 2.28204 6.94362 2.44297 6.82538 2.63765Z"
+                stroke="#6B7280"
+                strokeWidth="1.66667"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M8 6V8.66667"
+                stroke="#6B7280"
+                strokeWidth="1.66667"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M8 11.3335H8.006"
+                stroke="#6B7280"
+                strokeWidth="1.66667"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </g>
+            <defs>
+              <clipPath id="clip0_14155_25188">
+                <rect width="16" height="16" fill="white" />
+              </clipPath>
+            </defs>
+          </svg>
+
+          <Text size="sm" className="text-gray-500">
+            Proceed with caution! Once the transfer is completed application
+            cannot be transferred back to your personal account.
+          </Text>
+        </div>
       </section>
 
       <section className="flex justify-center items-center">
