@@ -5991,8 +5991,6 @@ __metadata:
     autoprefixer: 10.4.8
     babel-loader: ^8.3.0
     babel-plugin-named-exports-order: 0.0.2
-    base64url: 3.0.1
-    cbor: 9.0.1
     chromatic: 6.11.4
     concurrently: 7.3.0
     connectkit: 1.4.0
@@ -16155,13 +16153,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"base64url@npm:3.0.1":
-  version: 3.0.1
-  resolution: "base64url@npm:3.0.1"
-  checksum: a77b2a3a526b3343e25be424de3ae0aa937d78f6af7c813ef9020ef98001c0f4e2323afcd7d8b2d2978996bf8c42445c3e9f60c218c622593e5fdfd54a3d6e18
-  languageName: node
-  linkType: hard
-
 "base@npm:^0.11.1":
   version: 0.11.2
   resolution: "base@npm:0.11.2"
@@ -17174,15 +17165,6 @@ __metadata:
     cbor-extract:
       optional: true
   checksum: 589513dcfae2255c3c0da6733b3f90af159b254871d5835c85ae506a5190aeecb747222ae1f2f6edde7413dc7c80af247e7578d541470cf31965f782172d9158
-  languageName: node
-  linkType: hard
-
-"cbor@npm:9.0.1":
-  version: 9.0.1
-  resolution: "cbor@npm:9.0.1"
-  dependencies:
-    nofilter: ^3.1.0
-  checksum: 42333ac3d42cc3f6fcc7a529e68417a2dd8099eda43ca4be1304cdc5bc7494efe058e2db8a3d3b46ae60d69c7331ea813c22dbd019c4ac592d23e599d72bbcc9
   languageName: node
   linkType: hard
 
@@ -29672,13 +29654,6 @@ __metadata:
   version: 2.0.6
   resolution: "node-releases@npm:2.0.6"
   checksum: e86a926dc9fbb3b41b4c4a89d998afdf140e20a4e8dbe6c0a807f7b2948b42ea97d7fd3ad4868041487b6e9ee98409829c6e4d84a734a4215dff060a7fbeb4bf
-  languageName: node
-  linkType: hard
-
-"nofilter@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "nofilter@npm:3.1.0"
-  checksum: 58aa85a5b4b35cbb6e42de8a8591c5e338061edc9f3e7286f2c335e9e9b9b8fa7c335ae45daa8a1f3433164dc0b9a3d187fa96f9516e04a17a1f9ce722becc4f
   languageName: node
   linkType: hard
 

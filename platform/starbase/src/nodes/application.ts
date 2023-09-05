@@ -38,6 +38,7 @@ import type { CustomDomain } from '../types'
 import { getCloudflareFetcher, getCustomHostname } from '../utils/cloudflare'
 import { getDNSRecordValue } from '@proofzero/utils'
 import { ServicePlanType } from '@proofzero/types/billing'
+import { KeyPairSerialized } from '@proofzero/packages/types/application'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields
@@ -45,11 +46,6 @@ type AppProfile = AppUpdateableFields
 interface KeyPair {
   publicKey: KeyLike | Uint8Array
   privateKey: KeyLike | Uint8Array
-}
-
-interface KeyPairSerialized {
-  publicKey: JWK
-  privateKey: JWK
 }
 
 type Alarms = {

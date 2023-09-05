@@ -21,11 +21,11 @@ import { base64url } from 'jose'
 import { TosAndPPol } from '@proofzero/design-system/src/atoms/info/TosAndPPol'
 import subtractLogo from '~/assets/subtract-logo.svg'
 import {
-  KeyPairSerialized,
   createSignedWebauthnChallenge,
   verifySignedWebauthnChallenge,
 } from './utils'
 import { BadRequestError } from '@proofzero/errors'
+import { KeyPairSerialized } from '@proofzero/packages/types/application'
 
 type RegistrationPayload = {
   nickname: string

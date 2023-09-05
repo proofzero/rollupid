@@ -31,9 +31,9 @@ import { TbFingerprint } from 'react-icons/tb'
 import { WrappedSVG as WebauthnNewKeyIcon } from './WebauthnNewKeyIcon'
 import {
   verifySignedWebauthnChallenge,
-  KeyPairSerialized,
   createSignedWebauthnChallenge,
 } from './utils'
+import { KeyPairSerialized } from '@proofzero/packages/types/application'
 
 type LoginPayload = {
   credentialId: string
@@ -46,7 +46,6 @@ type LoginPayload = {
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
-    // const loginPayload: LoginPayload = await request.json()
     const formdata = await request.formData()
     const loginPayload = {
       credentialId: formdata.get('credentialId') as string,
@@ -85,7 +84,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     if (!webAuthnData || webAuthnData.counter === undefined || webAuthnData.publicKey === undefined)
       throw new InternalServerError({
         message:
-          'Could not retrieve passkey data. Try again or register new key.',
+          'Could not retrieve passkey verification data. Try again or register new key.',
       })
 
     const passportUrl = new URL(request.url)

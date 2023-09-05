@@ -1,11 +1,6 @@
 import { BadRequestError } from '@proofzero/errors'
+import { KeyPairSerialized } from '@proofzero/packages/types/application'
 import { JWK, SignJWT, importJWK, jwtVerify, errors } from 'jose'
-
-//TODO: refactor the same type from Starbase
-export type KeyPairSerialized = {
-  publicKey: JWK
-  privateKey: JWK
-}
 
 export const createSignedWebauthnChallenge = async (
   keyPairJSON: KeyPairSerialized

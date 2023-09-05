@@ -13,6 +13,5 @@ export const getWebAuthNDataMethod = async ({
 }): Promise<z.infer<typeof GetWebAuthNDataOutput>> => {
   const nodeClient = new WebauthnAccount(ctx.account as AccountNode, ctx)
   const data = await nodeClient.getData()
-  console.debug('INSIDE GETWEBAUTHNDATA', data)
   return data
 }
