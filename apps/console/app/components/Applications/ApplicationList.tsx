@@ -8,6 +8,7 @@ import {
 } from './ApplicationListItem'
 
 import type { ApplicationListItemProps } from './ApplicationListItem'
+import _ from 'lodash'
 
 type ApplicationListProps = {
   applications: ApplicationListItemProps[]
@@ -33,28 +34,13 @@ export const ApplicationList = ({
   const ownApps = applications.filter((a) => !a.groupID && !a.groupName)
   const groupApps = applications.filter((a) => a.groupID && a.groupName)
 
-  const groupedApplications = groupApps.reduce(
-    (acc, app) => {
-      const { groupName, groupID } = app
-      if (!acc[groupID!]) {
-        acc[groupID!] = {
-          groupName: groupName!,
-          apps: [],
-        }
-      }
-
-      acc[groupID!].apps.push(app)
-
-      return acc
-    },
-    {} as Record<
-      string,
-      {
-        groupName: string
-        apps: ApplicationListItemProps[]
-      }
-    >
-  )
+  const groupedAppsByGroupID = _.groupBy(groupApps, 'groupID')
+  const groupedApplications = _.mapValues(groupedAppsByGroupID, (apps) => {
+    return {
+      groupName: apps[0].groupName,
+      apps,
+    }
+  })
 
   return (
     <div>
