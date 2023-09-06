@@ -1,4 +1,4 @@
-import { BadRequestError } from '@proofzero/errors'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { KeyPairSerialized } from '@proofzero/packages/types/application'
 import { JWK, SignJWT, importJWK, jwtVerify, errors } from 'jose'
 
@@ -28,6 +28,10 @@ export const verifySignedWebauthnChallenge = async (
       throw new BadRequestError({
         message:
           'Passkey request authentication has expired. Please try again.',
+      })
+    else
+      throw new InternalServerError({
+        message: 'Could not authenticate your request. Please try again.',
       })
   }
 }

@@ -74,7 +74,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     if (
       !registrationPayload.nickname ||
-      (registrationPayload.nickname && registrationPayload.nickname.length < 4)
+      (registrationPayload.nickname?.length < 4)
     )
       throw new BadRequestError({
         message: 'Name of key is required to be 4 or more characters',
@@ -169,8 +169,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 export default () => {
   const { registrationOptions } = useLoaderData()
   if (
-    registrationOptions &&
-    registrationOptions.challenge &&
+    registrationOptions?.challenge &&
     typeof registrationOptions.challenge === 'string'
   ) {
     registrationOptions.challenge = new TextEncoder().encode(
