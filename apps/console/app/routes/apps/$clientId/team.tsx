@@ -23,7 +23,6 @@ import {
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 import type { AccountURN } from '@proofzero/urns/account'
-import type { IdentityURN } from '@proofzero/urns/identity'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import type { errorsTeamProps, notificationHandlerType } from '~/types'
 import { BadRequestError } from '@proofzero/errors'
@@ -39,16 +38,17 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const clientId = params.clientId as string
 
     const jwt = await requireJWT(request, context.env)
-    const payload = checkToken(jwt!)
-    const identityURN = payload.sub as IdentityURN
-
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
+    const { ownerURN } = await coreClient.starbase.getAppDetails.query({
+      clientId,
+    })
+
     const connectedAccounts = await coreClient.identity.getAccounts.query({
-      URN: identityURN,
+      URN: ownerURN,
     })
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
