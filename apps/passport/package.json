@@ -32,6 +32,7 @@
     "@tailwindcss/forms": "0.5.3",
     "connectkit": "1.4.0",
     "csp-header": "5.1.0",
+    "fido2-lib": "3.4.1",
     "flowbite": "1.6.5",
     "flowbite-react": "0.4.3",
     "graphql-request": "5.0.0",

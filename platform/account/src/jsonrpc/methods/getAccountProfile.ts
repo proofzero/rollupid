@@ -6,6 +6,7 @@ import {
   CryptoAccountType,
   EmailAccountType,
   OAuthAccountType,
+  WebauthnAccountType,
 } from '@proofzero/types/account'
 
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
@@ -23,6 +24,7 @@ import {
   TwitterAccount,
   ContractAccount,
   initAccountNodeByName,
+  WebauthnAccount,
 } from '../../nodes'
 
 import { AccountProfileSchema } from '../validators/profile'
@@ -92,6 +94,7 @@ async function getProfile(
     | ContractAccount
     | CryptoAccount
     | EmailAccount
+    | WebauthnAccount
     | OAuthAccount
     | undefined => {
     switch (type) {
@@ -101,6 +104,8 @@ async function getProfile(
         return new ContractAccount(nodeClient)
       case EmailAccountType.Email:
         return new EmailAccount(nodeClient, ctx)
+      case WebauthnAccountType.WebAuthN:
+        return new WebauthnAccount(nodeClient, ctx)
       case OAuthAccountType.Apple:
         return new AppleAccount(nodeClient, ctx)
       case OAuthAccountType.Discord:

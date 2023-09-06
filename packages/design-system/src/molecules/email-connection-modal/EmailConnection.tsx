@@ -14,10 +14,10 @@ type NonEmptyArray<T> = [T, ...T[]]
 
 export type EmailConnectionProp = {
   addr_type:
-    | EmailAccountType.Email
-    | OAuthAccountType.Google
-    | OAuthAccountType.Microsoft
-    | OAuthAccountType.Apple
+  | EmailAccountType.Email
+  | OAuthAccountType.Google
+  | OAuthAccountType.Microsoft
+  | OAuthAccountType.Apple
   callback: () => void
 }
 
@@ -34,7 +34,7 @@ const iconMapper = {
     <img src={microsoftIcon} alt="microsoft" className="my-2" />
   ),
   [OAuthAccountType.Apple]: (
-    <img src={appleIcon} alt="microsoft" className="my-2" />
+    <img src={appleIcon} alt="apple" className="my-2" />
   ),
   [EmailAccountType.Email]: <MdOutlineEmail size={24} className="my-2" />,
 }

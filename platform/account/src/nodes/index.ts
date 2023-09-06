@@ -10,6 +10,7 @@ import GithubAccount from './github'
 import GoogleAccount from './google'
 import MicrosoftAccount from './microsoft'
 import TwitterAccount from './twitter'
+import WebauthnAccount from './webauthn'
 
 export {
   Account,
@@ -23,6 +24,7 @@ export {
   GoogleAccount,
   MicrosoftAccount,
   TwitterAccount,
+  WebauthnAccount,
 }
 
 export const initAccountNodeByName = (

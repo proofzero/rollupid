@@ -16,6 +16,7 @@ import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     if (
+      request.cf &&
       request.cf.botManagement.score <= 30 &&
       !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
     ) {
@@ -53,23 +54,23 @@ export default () => {
         <style type="text/css">{`
             :root {
                 ${getRGBColor(
-                  dark
-                    ? appProps?.appTheme?.color?.dark ??
-                        AuthenticationScreenDefaults.color.dark
-                    : appProps?.appTheme?.color?.light ??
-                        AuthenticationScreenDefaults.color.light,
-                  'primary'
-                )}
+          dark
+            ? appProps?.appTheme?.color?.dark ??
+            AuthenticationScreenDefaults.color.dark
+            : appProps?.appTheme?.color?.light ??
+            AuthenticationScreenDefaults.color.light,
+          'primary'
+        )}
                 ${getRGBColor(
-                  getTextColor(
-                    dark
-                      ? appProps?.appTheme?.color?.dark ??
-                          AuthenticationScreenDefaults.color.dark
-                      : appProps?.appTheme?.color?.light ??
-                          AuthenticationScreenDefaults.color.light
-                  ),
-                  'primary-contrast-text'
-                )}
+          getTextColor(
+            dark
+              ? appProps?.appTheme?.color?.dark ??
+              AuthenticationScreenDefaults.color.dark
+              : appProps?.appTheme?.color?.light ??
+              AuthenticationScreenDefaults.color.light
+          ),
+          'primary-contrast-text'
+        )}
              {
          `}</style>
       </Helmet>
@@ -83,9 +84,8 @@ export default () => {
               'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 dark:bg-[#1F2937] overflow-hidden'
             }
             style={{
-              backgroundImage: `url(${
-                appProps?.appTheme?.graphicURL ?? sideGraphics
-              })`,
+              backgroundImage: `url(${appProps?.appTheme?.graphicURL ?? sideGraphics
+                })`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',

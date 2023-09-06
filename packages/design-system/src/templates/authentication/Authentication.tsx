@@ -12,6 +12,7 @@ import { AuthButton } from '../../molecules/auth-button/AuthButton'
 import { HiOutlineMail } from 'react-icons/hi'
 import { TosAndPPol } from '../../atoms/info/TosAndPPol'
 import { ThemeContext } from '../../contexts/theme'
+import { WrappedSVG as WebauthnGraphic } from '../../atoms/providers/Webauthn'
 
 const ConnectButton = lazy(() =>
   import('../../atoms/buttons/connect-button/ConnectButton').then((module) => ({
@@ -29,6 +30,7 @@ Sign this message to accept the Rollup Terms of Service (https://rollup.id/tos),
 This will not trigger a blockchain transaction or cost any gas fees.`,
   defaultSubheading: 'How would you like to continue?',
   knownKeys: [
+    'webauthn',
     'wallet',
     'email',
     'google',
@@ -73,8 +75,7 @@ export default function Authentication({
       <div
         className={`flex grow-0 flex-col items-center
          gap-4 mx-auto bg-white dark:bg-[#1F2937] p-6 min-h-[100dvh] lg:min-h-[580px]
-          max-h-[100dvh] w-full lg:w-[418px] rounded-${
-            theme?.radius ? theme.radius : AuthenticationScreenDefaults.radius
+          max-h-[100dvh] w-full lg:w-[418px] rounded-${theme?.radius ? theme.radius : AuthenticationScreenDefaults.radius
           } mt-auto border border-[#D1D5DB] dark:border-gray-600`}
         style={{
           boxSizing: 'border-box',
@@ -146,10 +147,10 @@ const displayKeyMapper = (
   {
     clientId,
     signData,
-    walletConnectCallback = () => {},
-    walletSignCallback = () => {},
-    walletConnectErrorCallback = () => {},
-    navigate = () => {},
+    walletConnectCallback = () => { },
+    walletSignCallback = () => { },
+    walletConnectErrorCallback = () => { },
+    navigate = () => { },
     authnQueryParams,
     loading = false,
     flex = false,
@@ -182,6 +183,18 @@ const displayKeyMapper = (
           onClick={() => navigate(`/authenticate/${clientId}/email`)}
           Graphic={<HiOutlineMail className="w-full h-full dark:text-white" />}
           text={'Email'}
+          fullSize={flex}
+          displayContinueWith={displayContinueWith}
+        />
+      )
+      break
+    case 'webauthn':
+      el = (
+        <AuthButton
+          key={key}
+          onClick={() => navigate(`/authenticate/${clientId}/webauthn`)}
+          Graphic={WebauthnGraphic}
+          text={'Passkey'}
           fullSize={flex}
           displayContinueWith={displayContinueWith}
         />

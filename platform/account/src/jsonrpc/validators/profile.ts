@@ -4,7 +4,9 @@ import {
   CryptoAccountType,
   EmailAccountType,
   OAuthAccountType,
+  WebauthnAccountType,
 } from '@proofzero/types/account'
+import { WebauthnAccount } from '../../nodes'
 
 export const AccountProfileSchema = z.object({
   address: z.string(),
@@ -15,6 +17,7 @@ export const AccountProfileSchema = z.object({
     z.literal(CryptoAccountType.ETH),
     z.literal(CryptoAccountType.Wallet),
     z.literal(EmailAccountType.Email),
+    z.literal(WebauthnAccountType.WebAuthN),
     z.literal(OAuthAccountType.Apple),
     z.literal(OAuthAccountType.Discord),
     z.literal(OAuthAccountType.GitHub),

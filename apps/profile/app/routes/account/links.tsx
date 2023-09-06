@@ -32,6 +32,7 @@ import {
   CryptoAccountType,
   EmailAccountType,
   OAuthAccountType,
+  WebauthnAccountType,
 } from '@proofzero/types/account'
 import { imageFromAccountType } from '~/helpers'
 import type { FullProfile } from '~/types'
@@ -68,6 +69,14 @@ const normalizeAccountProfile = (ap: AccountProfile) => {
         title: ap.title,
         icon: imageFromAccountType(EmailAccountType.Email),
         provider: EmailAccountType.Email,
+      }
+    case WebauthnAccountType.WebAuthN:
+      return {
+        accountURN: ap.urn,
+        address: ap.address,
+        title: ap.title,
+        icon: imageFromAccountType(WebauthnAccountType.WebAuthN),
+        provider: WebauthnAccountType.WebAuthN,
       }
     case OAuthAccountType.Apple:
       return {
@@ -303,13 +312,13 @@ export default function AccountSettingsLinks() {
   const [connectedLinks, setConnectedLinks] = useState<
     (
       | {
-          accountURN?: string
-          public?: boolean
-          account?: string | null
-          title?: string | null
-          icon?: string | null
-          provider?: string
-        }
+        accountURN?: string
+        public?: boolean
+        account?: string | null
+        title?: string | null
+        icon?: string | null
+        provider?: string
+      }
       | undefined
     )[]
   >(normalizedAccountProfiles)
@@ -458,9 +467,8 @@ export default function AccountSettingsLinks() {
               itemRenderer={(item) => {
                 return (
                   <SortableLink
-                    key={`${item.val.name || 'My Website'}-${
-                      item.val.url || 'https://mywebsite.com'
-                    }-${item.key}`}
+                    key={`${item.val.name || 'My Website'}-${item.val.url || 'https://mywebsite.com'
+                      }-${item.key}`}
                     id={`${item.key}`}
                     link={item.val}
                     setFormChanged={setFormChanged}
@@ -505,7 +513,7 @@ export default function AccountSettingsLinks() {
           div with absolute position below  */}
         <div className="h-[4rem]" />
         <div className="absolute bottom-0 right-0">
-          <SaveButton isFormChanged={isFormChanged} discardFn={() => {}} />
+          <SaveButton isFormChanged={isFormChanged} discardFn={() => { }} />
         </div>
       </Form>
     </div>

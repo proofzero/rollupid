@@ -5,6 +5,7 @@ export enum NodeType {
   OAuth = 'oauth',
   Email = 'email',
   Handle = 'handle',
+  WebAuthN = 'webauthn',
 }
 
 export enum CryptoAccountType {
@@ -25,6 +26,10 @@ export enum EmailAccountType {
   Email = 'email',
 }
 
+export enum WebauthnAccountType {
+  WebAuthN = 'webauthn',
+}
+
 export enum HandleAccountType {
   Handle = 'handle',
 }
@@ -34,3 +39,4 @@ export type AccountType =
   | OAuthAccountType
   | HandleAccountType
   | EmailAccountType
+  | WebauthnAccountType

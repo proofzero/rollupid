@@ -46,6 +46,7 @@ const LazyAuth = lazy(() =>
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
     if (
+      request.cf &&
       request.cf.botManagement.score <= 30 &&
       !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
     ) {
@@ -213,9 +214,8 @@ const InnerComponent = ({
                     type="span"
                     weight="bold"
                     className="text-orange-600"
-                  >{`${_.upperFirst(invitationData.accountType)} Account: ${
-                    invitationData.identifier
-                  }`}</Text>
+                  >{`${_.upperFirst(invitationData.accountType)} Account: ${invitationData.identifier
+                    }`}</Text>
                 </Text>
               )}
             </>
@@ -238,8 +238,8 @@ const InnerComponent = ({
                     {appProps?.appTheme?.heading
                       ? appProps.appTheme.heading
                       : appProps?.name
-                      ? `Login to ${appProps?.name}`
-                      : AuthenticationScreenDefaults.defaultHeading}
+                        ? `Login to ${appProps?.name}`
+                        : AuthenticationScreenDefaults.defaultHeading}
                   </h1>
                   <h2
                     style={{ color: '#6B7280' }}
@@ -271,9 +271,8 @@ const InnerComponent = ({
                   type="span"
                   weight="bold"
                   className="text-orange-600 truncate"
-                >{`${_.upperFirst(invitationData.accountType)} Account: ${
-                  invitationData.identifier
-                }`}</Text>
+                >{`${_.upperFirst(invitationData.accountType)} Account: ${invitationData.identifier
+                  }`}</Text>
               </Text>
             </>
           )}

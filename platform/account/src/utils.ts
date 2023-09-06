@@ -8,6 +8,7 @@ import {
   HandleAccountType,
   NodeType,
   OAuthAccountType,
+  WebauthnAccountType,
 } from '@proofzero/types/account'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
@@ -18,6 +19,7 @@ export const isNodeType = (type: string): type is NodeType => {
     case NodeType.Contract:
     case NodeType.OAuth:
     case NodeType.Email:
+    case NodeType.WebAuthN:
     case NodeType.Handle:
       return true
     default:
@@ -56,6 +58,14 @@ export const isEmailAccountType = (type: string | undefined) => {
       return false
   }
 }
+export const isWebauthnAccountType = (type: string | undefined) => {
+  switch (type) {
+    case WebauthnAccountType.WebAuthN:
+      return NodeType.WebAuthN
+    default:
+      return false
+  }
+}
 
 export const isHandleAccountType = (type: string) => {
   switch (type) {
@@ -71,6 +81,7 @@ export const isValidAccountType = (type: string) => {
     isCryptoAccountType(type) ||
     isOAuthAccountType(type) ||
     isEmailAccountType(type) ||
+    isWebauthnAccountType(type) ||
     isHandleAccountType(type)
   )
 }

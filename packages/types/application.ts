@@ -1,4 +1,5 @@
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
+import { JWK } from 'jose'
 import { z } from 'zod'
 
 //TODO: Will have to revise and integrated with Scope in next iteration
@@ -37,3 +38,8 @@ export const AppData = z.object({
 })
 
 export type AppDataType = z.infer<typeof AppData>
+
+export interface KeyPairSerialized {
+  publicKey: JWK
+  privateKey: JWK
+}

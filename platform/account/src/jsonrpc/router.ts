@@ -115,6 +115,14 @@ import {
   getAccountURNForEmailMethod,
   GetAccountURNForEmailOutputSchema,
 } from './methods/getAccountURNForEmail'
+import {
+  getWebAuthNDataMethod,
+  GetWebAuthNDataOutput,
+} from './methods/getWebAuthNData'
+import {
+  setWebAuthNDataMethod,
+  SetWebAuthNInput,
+} from './methods/setWebAuthNData'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -257,6 +265,24 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(SetOAuthDataInput)
     .mutation(setOAuthDataMethod),
+  getWebAuthNData: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    .use(Analytics)
+    .output(GetWebAuthNDataOutput)
+    .query(getWebAuthNDataMethod),
+  setWebAuthNData: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkOAuthNode)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    .use(Analytics)
+    .input(SetWebAuthNInput)
+    .mutation(setWebAuthNDataMethod),
   initSmartContractWallet: t.procedure
     .use(LogUsage)
     .use(parse3RN)

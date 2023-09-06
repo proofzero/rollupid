@@ -13,6 +13,7 @@ declare global {
     COOKIE_DOMAIN: string
     SECRET_SESSION_KEY: string
     SECRET_SESSION_SALT: string
+    SECRET_WEBAUTHN_SIGNING_KEY: string
     PROFILE_APP_URL: string
     CONSOLE_APP_URL: string
     PASSPORT_REDIRECT_URL: string

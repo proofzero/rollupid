@@ -93,6 +93,9 @@ const distinctProfiles = (connectedProfiles: any[]) => {
   const emailProfiles = {
     accounts: connectedProfiles.filter((p) => p.nodeType === NodeType.Email),
   } as AccountListProps
+  const webauthnProfiles = {
+    accounts: connectedProfiles.filter((p) => p.nodeType === NodeType.WebAuthN),
+  } as AccountListProps
 
   return {
     accountCount: connectedProfiles.length,
@@ -100,6 +103,7 @@ const distinctProfiles = (connectedProfiles: any[]) => {
     smartContractWallets,
     oAuthProfiles,
     emailProfiles,
+    webauthnProfiles
   }
 }
 
@@ -180,12 +184,14 @@ export default function AccountsLayout() {
     oAuthProfiles,
     emailProfiles,
     accountCount,
+    webauthnProfiles,
   } = distinctProfiles(connectedProfiles)
 
   const connectedAccounts = cryptoProfiles.accounts
     .concat(smartContractWallets.accounts)
     .concat(oAuthProfiles.accounts)
     .concat(emailProfiles.accounts)
+    .concat(webauthnProfiles.accounts)
 
   const navigate = useNavigate()
 
@@ -321,12 +327,18 @@ export default function AccountsLayout() {
               onRenameAccount: ap.title.endsWith('.eth')
                 ? undefined
                 : (id: string) => {
-                    setActionId(id)
-                    setRenameModalOpen(true)
-                  },
+                  setActionId(id)
+                  setRenameModalOpen(true)
+                },
             }))
             .concat(
               oAuthProfiles.accounts.map((ap) => ({
+                ...ap,
+                onRenameAccount: undefined,
+              }))
+            )
+            .concat(
+              webauthnProfiles.accounts.map((ap) => ({
                 ...ap,
                 onRenameAccount: undefined,
               }))
@@ -346,9 +358,9 @@ export default function AccountsLayout() {
                 accountCount === 1
                   ? undefined
                   : (id: string) => {
-                      setActionId(id)
-                      setDisconnectModalOpen(true)
-                    },
+                    setActionId(id)
+                    setDisconnectModalOpen(true)
+                  },
             }))}
         />
 
