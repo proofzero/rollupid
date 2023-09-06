@@ -19,7 +19,7 @@ import {
   useLocation,
   useTransition,
   useLoaderData,
-  Form,
+  Link,
 } from '@remix-run/react'
 
 import { RollupIdButton } from '~/components'
@@ -378,9 +378,9 @@ export function ErrorBoundary({ error }) {
       </head>
       <body className="min-h-[100dvh] flex justify-center items-center">
         <section className="absolute right-0 top-0 p-4">
-          <Form action="/signout" method="get">
-            <Button type="submit">Sign Out</Button>
-          </Form>
+          <Link to="/signout" onClick={() => posthog?.reset()}>
+            <Button type="button">Sign Out</Button>
+          </Link>
         </section>
 
         <div className="w-full">
@@ -436,9 +436,9 @@ export function CatchBoundary() {
           }
         >
           <section className="absolute right-0 top-0 p-4">
-            <Form action="/signout" method="get">
-              <Button type="submit">Sign Out</Button>
-            </Form>
+            <Link to="/signout" onClick={() => posthog?.reset()}>
+              <Button type="button">Sign Out</Button>
+            </Link>
           </section>
 
           <h1>{status}</h1>
