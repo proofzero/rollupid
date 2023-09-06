@@ -104,7 +104,7 @@ export default function Onboarding() {
         </div>
         <div className="basis-3/5 h-[100dvh] w-full hidden lg:flex justify-end items-center bg-gray-50 dark:bg-gray-800 overflow-hidden">
           <img
-            className="max-h-fit mt-[10%]"
+            className="max-h-fit mt-[10%] w-9/12"
             alt="onboarding"
             src={onboardingImage}
           />
