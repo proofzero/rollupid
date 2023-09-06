@@ -276,7 +276,7 @@ export default () => {
               setRequestedRegistration(true)
             }}
             className="w-full mt-4"
-            disabled={keyName.length <= 4}
+            disabled={keyName.length < 4}
           >
             Create new Passkey
           </Button>
