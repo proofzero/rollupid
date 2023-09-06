@@ -191,6 +191,7 @@ export default function AccountsLayout() {
     .concat(smartContractWallets.accounts)
     .concat(oAuthProfiles.accounts)
     .concat(emailProfiles.accounts)
+    .concat(webauthnProfiles.accounts)
 
   const navigate = useNavigate()
 
