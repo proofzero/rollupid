@@ -137,7 +137,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           appDetails,
           authorizationURL: authorizationURL.toString(),
           rotationResult,
-          appContactAddress: AccountURNSpace.getBaseURN(appContactAddress),
+          appContactAddress: appContactAddress
+            ? AccountURNSpace.getBaseURN(appContactAddress)
+            : undefined,
           appContactEmail,
           paymaster,
           toasts,

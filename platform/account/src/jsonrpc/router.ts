@@ -123,6 +123,11 @@ import {
   setWebAuthNDataMethod,
   SetWebAuthNInput,
 } from './methods/setWebAuthNData'
+import {
+  ConnectIdentityGroupEmailInputSchema,
+  ConnectIdentityGroupEmailOutputSchema,
+  connectIdentityGroupEmail,
+} from './methods/identity-groups/connectIdentityGroupEmail'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -342,4 +347,13 @@ export const appRouter = t.router({
     .input(GetAccountURNForEmailInputSchema)
     .output(GetAccountURNForEmailOutputSchema)
     .query(getAccountURNForEmailMethod),
+  connectIdentityGroupEmail: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(parse3RN)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    .input(ConnectIdentityGroupEmailInputSchema)
+    .output(ConnectIdentityGroupEmailOutputSchema)
+    .mutation(connectIdentityGroupEmail),
 })

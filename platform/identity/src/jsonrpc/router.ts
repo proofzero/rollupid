@@ -88,11 +88,6 @@ import {
   HasIdentityGroupPermissionsOutputSchema,
   hasIdentityGroupPermissions,
 } from './methods/identity-groups/hasIdentityGroupPermissions'
-import {
-  ConnectIdentityGroupEmailInputSchema,
-  ConnectIdentityGroupEmailOutputSchema,
-  connectIdentityGroupEmail,
-} from './methods/identity-groups/connectIdentityGroupEmail'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -264,13 +259,4 @@ export const appRouter = t.router({
     .input(HasIdentityGroupPermissionsInputSchema)
     .output(HasIdentityGroupPermissionsOutputSchema)
     .query(hasIdentityGroupPermissions),
-  connectIdentityGroupEmail: t.procedure
-    .use(LogUsage)
-    .use(Analytics)
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(RequireIdentity)
-    .input(ConnectIdentityGroupEmailInputSchema)
-    .output(ConnectIdentityGroupEmailOutputSchema)
-    .mutation(connectIdentityGroupEmail),
 })
