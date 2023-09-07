@@ -39,27 +39,24 @@ export const deleteApp = async ({
 
   const caller = router.createCaller(ctx)
 
-  const referenceEdges = await caller.edges.getEdges({
-    query: { src: { baseUrn: appURN }, tag: EDGE_HAS_REFERENCE_TO },
-  })
+  const [{ edges: srcEdges }, { edges: dstEdges }] = await Promise.all([
+    caller.edges.getEdges({
+      query: { src: { baseUrn: appURN } },
+    }),
+    caller.edges.getEdges({
+      query: { dst: { baseUrn: appURN } },
+    }),
+  ])
 
-  const edgeRemovalPromises = [
-    //Reference edges
-    ...referenceEdges.edges.map((e) =>
+  await Promise.all(
+    srcEdges.concat(dstEdges).map((e) =>
       caller.edges.removeEdge({
         tag: e.tag,
         src: e.src.baseUrn,
         dst: e.dst.baseUrn,
       })
-    ),
-    //Application edge
-    caller.edges.removeEdge({
-      src: ctx.identityURN,
-      dst: appURN,
-      tag: EDGE_APPLICATION,
-    }),
-  ]
-  await Promise.all(edgeRemovalPromises)
+    )
+  )
 
   await caller.edges.deleteNode({
     urn: appURN,
