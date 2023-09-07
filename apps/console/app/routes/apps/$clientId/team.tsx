@@ -11,7 +11,6 @@ import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { redirect } from '@remix-run/cloudflare'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 import { requireJWT } from '~/utilities/session.server'
-import { checkToken } from '@proofzero/utils/token'
 
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -32,6 +31,7 @@ import {
   DropdownSelectListItem,
 } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import { redirectToPassport } from '~/utils'
+import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -84,6 +84,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     return {
       connectedEmails,
+      groupID: IdentityGroupURNSpace.is(ownerURN)
+        ? ownerURN.split('/')[1]
+        : undefined,
     }
   }
 )
@@ -134,7 +137,8 @@ export default () => {
 
   const submit = useSubmit()
 
-  let { connectedEmails } = useLoaderData() as {
+  let { connectedEmails, groupID } = useLoaderData() as {
+    groupID?: string
     connectedEmails: Array<DropdownSelectListItem>
   }
 
@@ -243,8 +247,12 @@ export default () => {
                 ConnectButtonCallback={() =>
                   redirectToPassport({
                     PASSPORT_URL,
-                    login_hint: 'email microsoft google apple',
-                    rollup_action: 'connect',
+                    login_hint: groupID
+                      ? 'email'
+                      : 'email microsoft google apple',
+                    rollup_action: groupID
+                      ? `groupemailconnect_${groupID}`
+                      : 'connect',
                   })
                 }
                 ConnectButtonPhrase="Connect New Email Address"
