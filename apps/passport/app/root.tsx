@@ -19,6 +19,7 @@ import {
   useLocation,
   useTransition,
   useLoaderData,
+  Link,
 } from '@remix-run/react'
 
 import { RollupIdButton } from '~/components'
@@ -61,6 +62,7 @@ import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 import { useHydrated } from 'remix-utils'
 
 import { getCoreClient } from './platform.server'
+import { Button } from '@proofzero/design-system'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
@@ -375,6 +377,12 @@ export function ErrorBoundary({ error }) {
         <Links />
       </head>
       <body className="min-h-[100dvh] flex justify-center items-center">
+        <section className="absolute right-0 top-0 p-4">
+          <Link to="/signout" onClick={() => posthog?.reset()}>
+            <Button type="button">Sign Out</Button>
+          </Link>
+        </section>
+
         <div className="w-full">
           <ErrorPage
             code="Error"
@@ -396,6 +404,7 @@ export function ErrorBoundary({ error }) {
 
 export function CatchBoundary() {
   const caught = useCatch()
+  const nonce = useContext(NonceContext)
 
   console.error('CaughtBoundary', JSON.stringify(caught, null, 2))
 
@@ -426,6 +435,12 @@ export function CatchBoundary() {
             'flex flex-col h-[100dvh] gap-4 justify-center items-center'
           }
         >
+          <section className="absolute right-0 top-0 p-4">
+            <Link to="/signout" onClick={() => posthog?.reset()}>
+              <Button type="button">Sign Out</Button>
+            </Link>
+          </section>
+
           <h1>{status}</h1>
           <p>
             {secondary}
@@ -439,9 +454,9 @@ export function CatchBoundary() {
             />
           )}
         </div>
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload port={8002} />
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
+        <LiveReload port={8002} nonce={nonce} />
       </body>
     </html>
   )
