@@ -3,7 +3,11 @@ import { z } from 'zod'
 import { router } from '@proofzero/platform.core'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
-import { AccountURN } from '@proofzero/urns/account'
+import {
+  AccountQComp,
+  AccountRComp,
+  AccountURNSpace,
+} from '@proofzero/urns/account'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 
 import { Context } from '../context'
@@ -44,5 +48,11 @@ export const getAppContactAddress = async ({
     return undefined
   }
 
-  return edges[0].dst.baseUrn as AccountURN
+  const accountURN = AccountURNSpace.componentizedUrn(
+    edges[0].dst.baseUrn,
+    edges[0].dst.rc as AccountRComp,
+    edges[0].dst.qc as AccountQComp
+  )
+
+  return accountURN
 }
