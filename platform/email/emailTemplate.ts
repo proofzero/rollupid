@@ -159,7 +159,7 @@ const EmailTemplateBase = (
       </head>
       <body class="adaptive" style="font-family: 'Inter', sans-serif; background-color: #ffffff; color: #6b7280;">
         <div class="container adaptive" style="display: block; width: 98%; text-align: center; background-color: #ffffff;">
-          <div class="content adaptive" style="display: inline-block; vertical-align: top; text-align: left; max-width: 375px; border-radius: 8px; background-color: #ffffff;">
+          <div class="content adaptive" style="display: inline-block; vertical-align: top; text-align: left; max-width: 375px; border-radius: 8px; background-color: #ffffff; padding: 8px;">
             <div style="position: relative; width: 375px; height: 48px; background-image: url(${logoURL}); background-size: contain; background-repeat: no-repeat; background-position: left center;"></div>
             <div style="height: 48px"></div>
             ${content}
@@ -211,7 +211,7 @@ const EmailTemplateBase = (
               <img
                 src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/71edc886-0478-4584-beca-a6715937f000/public"
                 alt=""
-                style="max-width: 11px; display: inline-block"
+                style="max-width: 11px; max-height: 11px; display: inline-block"
               />
               <p
                 style="font-size: 12px; line-height: 12px; color: #9ca3af; display: inline-block; margin-bottom: 10px;"
