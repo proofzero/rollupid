@@ -102,15 +102,20 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           websiteURL: 'https://rollup.id',
         }
       } else {
-        if (['console', 'passport'].includes(params.clientId!)) {
+        if (
+          ['console', 'passport'].includes(params.clientId!) ||
+          (clientId && ['console', 'passport'].includes(clientId))
+        ) {
+          const effectiveClientId = params.clientId! ?? clientId
           const name =
-            params.clientId!.charAt(0).toUpperCase() + params.clientId!.slice(1)
+            effectiveClientId.charAt(0).toUpperCase() +
+            effectiveClientId.slice(1)
           appProps = {
             name: `Rollup - ${name}`,
             iconURL: LogoIndigo,
             termsURL: 'https://rollup.id/tos',
             privacyURL: 'https://rollup.id/privacy-policy',
-            redirectURI: `https://${params.clientId}.rollup.id`,
+            redirectURI: `https://${effectiveClientId}.rollup.id`,
             websiteURL: 'https://rollup.id',
           }
         } else {
