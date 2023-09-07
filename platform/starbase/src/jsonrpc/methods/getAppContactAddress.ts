@@ -49,7 +49,7 @@ export const getAppContactAddress = async ({
   }
 
   const accountURN = AccountURNSpace.componentizedUrn(
-    edges[0].dst.baseUrn,
+    AccountURNSpace.parse(edges[0].dst.baseUrn).decoded,
     edges[0].dst.rc as AccountRComp,
     edges[0].dst.qc as AccountQComp
   )
