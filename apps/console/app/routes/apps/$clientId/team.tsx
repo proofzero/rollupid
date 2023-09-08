@@ -184,8 +184,12 @@ export default () => {
               onClick={() =>
                 redirectToPassport({
                   PASSPORT_URL,
-                  login_hint: 'email microsoft google apple',
-                  rollup_action: 'connect',
+                  login_hint: groupID
+                    ? 'email'
+                    : 'email microsoft google apple',
+                  rollup_action: groupID
+                    ? `groupemailconnect_${groupID}`
+                    : 'connect',
                 })
               }
               btnType="secondary-alt"
