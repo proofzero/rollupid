@@ -2,12 +2,17 @@ import { z } from 'zod'
 import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
-import { IdentityGroupURNValidator } from '@proofzero/platform-middleware/inputValidators'
+import {
+  AccountURNInput,
+  IdentityGroupURNValidator,
+} from '@proofzero/platform-middleware/inputValidators'
 import { BadRequestError } from '@proofzero/errors'
+import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 
 export const TransferAppToGroupInput = z.object({
   clientID: z.string(),
   identityGroupURN: IdentityGroupURNValidator,
+  emailURN: AccountURNInput,
 })
 
 type TransferAppToGroupParams = z.infer<typeof TransferAppToGroupInput>
@@ -19,7 +24,7 @@ export const transferAppToGroup = async ({
   input: TransferAppToGroupParams
   ctx: Context
 }): Promise<void> => {
-  const { clientID, identityGroupURN } = input
+  const { clientID, identityGroupURN, emailURN } = input
 
   if (!ctx.identityURN) {
     throw new BadRequestError({
@@ -52,6 +57,29 @@ export const transferAppToGroup = async ({
         dst: edge.dst.baseUrn,
       })
 
+      await caller.edges.removeEdge({
+        src: edge.src.baseUrn,
+        tag: edge.tag,
+        dst: edge.dst.baseUrn,
+      })
+    })
+  )
+
+  const { edges: emailEdges } = await caller.edges.getEdges({
+    query: {
+      src: { baseUrn: appURN },
+      tag: EDGE_HAS_REFERENCE_TO,
+    },
+  })
+
+  await caller.edges.makeEdge({
+    src: appURN,
+    tag: EDGE_HAS_REFERENCE_TO,
+    dst: emailURN,
+  })
+
+  await Promise.all(
+    emailEdges.map(async (edge) => {
       await caller.edges.removeEdge({
         src: edge.src.baseUrn,
         tag: edge.tag,

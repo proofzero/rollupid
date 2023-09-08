@@ -34,7 +34,7 @@ import {
 } from '@proofzero/urns/identity-group'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { Listbox, Transition } from '@headlessui/react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AppLoaderData } from '~/root'
 import {
   CheckIcon,
@@ -52,8 +52,20 @@ import {
 } from '~/utils/billing'
 import Stripe from 'stripe'
 import plans from '~/utils/plans'
+import {
+  getEmailDropdownItems,
+  getEmailIcon,
+} from '@proofzero/utils/getNormalisedConnectedAccounts'
+import {
+  Dropdown,
+  DropdownSelectListItem,
+} from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import { redirectToPassport } from '~/utils'
+import { HiOutlineMail } from 'react-icons/hi'
+import { AccountURN } from '@proofzero/urns/account'
 
 type GroupAppTransferLoaderData = {
+  connectedEmails: DropdownSelectListItem[]
   hasPaymentMethod: boolean
   entitlements: GetEntitlementsOutput
   STRIPE_PUBLISHABLE_KEY: string
@@ -80,7 +92,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       URN: groupURN,
     })
 
+    const connectedAccounts = await coreClient.identity.getAccounts.query({
+      URN: groupURN,
+    })
+    const connectedEmails = getEmailDropdownItems(connectedAccounts)
+
     return json<GroupAppTransferLoaderData>({
+      connectedEmails,
       hasPaymentMethod: spd && spd.paymentMethodID ? true : false,
       entitlements,
       STRIPE_PUBLISHABLE_KEY: context.env.STRIPE_PUBLISHABLE_KEY,
@@ -102,6 +120,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     if (!clientID) {
       throw new BadRequestError({
         message: 'app[clientId] is required',
+      })
+    }
+
+    const emailURN = fd.get('emailURN') as AccountURN
+    if (!emailURN) {
+      throw new BadRequestError({
+        message: 'emailURN is required',
       })
     }
 
@@ -239,6 +264,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       await coreClient.starbase.transferAppToGroup.mutate({
         clientID: clientID as string,
         identityGroupURN: groupURN,
+        emailURN,
       })
 
       const toastSession = await appendToastToFlashSession(
@@ -275,10 +301,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { group, groupID, groupURN, apps } =
+  const { group, groupID, groupURN, apps, PASSPORT_URL } =
     useOutletContext<GroupDetailsContextData>()
-  const { hasPaymentMethod, entitlements, STRIPE_PUBLISHABLE_KEY } =
-    useLoaderData<GroupAppTransferLoaderData>()
+  const {
+    hasPaymentMethod,
+    entitlements,
+    STRIPE_PUBLISHABLE_KEY,
+    connectedEmails,
+  } = useLoaderData<GroupAppTransferLoaderData>()
 
   const actionData = useActionData()
 
@@ -286,6 +316,8 @@ export default () => {
 
   const [needsGroupBilling, setNeedsGroupBilling] = useState(false)
   const [needsEntitlement, setNeedsEntitlement] = useState(false)
+
+  const [selectedEmailURN, setSelectedEmailURN] = useState<AccountURN>()
 
   const submit = useSubmit()
 
@@ -421,7 +453,7 @@ export default () => {
             disabled={apps.filter((a) => !a.groupID).length === 0}
           >
             {({ open }) => (
-              <div className="flex flex-col col-span-2">
+              <div className="flex flex-col col-span-2 z-10">
                 <Listbox.Button className="relative border rounded-l py-2 px-3 flex flex-row justify-between items-center flex-1 focus-visible:outline-none focus:border-indigo-500 bg-white disabled:bg-gray-100 px-2">
                   {apps.filter((a) => !a.groupID).length > 0 && (
                     <>
@@ -546,6 +578,86 @@ export default () => {
             )}
           </Listbox>
 
+          <div className="self-start w-full">
+            {connectedEmails && connectedEmails.length === 0 && (
+              <Button
+                onClick={() =>
+                  redirectToPassport({
+                    PASSPORT_URL,
+                    login_hint: groupID
+                      ? 'email'
+                      : 'email microsoft google apple',
+                    rollup_action: groupID
+                      ? `groupemailconnect_${groupID}`
+                      : 'connect',
+                  })
+                }
+                btnSize="xs"
+                btnType="secondary-alt"
+                className="w-full"
+              >
+                <div className="flex space-x-3 items-center">
+                  <HiOutlineMail className="w-6 h-6 text-gray-800" />
+                  <Text
+                    weight="medium"
+                    className="flex-1 text-gray-800 text-left"
+                  >
+                    Connect Email Account
+                  </Text>
+                </div>
+              </Button>
+            )}
+
+            {connectedEmails && connectedEmails.length > 0 && (
+              <>
+                <input
+                  name="emailURN"
+                  type="hidden"
+                  value={selectedEmailURN}
+                  required
+                />
+
+                <Dropdown
+                  items={(connectedEmails as DropdownSelectListItem[]).map(
+                    (email) => {
+                      email.value === ''
+                        ? (email.selected = true)
+                        : (email.selected = false)
+                      email.subtitle && !email.icon
+                        ? (email.icon = getEmailIcon(email.subtitle))
+                        : null
+                      return {
+                        value: email.value,
+                        selected: email.selected,
+                        icon: email.icon,
+                        title: email.title,
+                      }
+                    }
+                  )}
+                  placeholder="Select an Email Account"
+                  ConnectButtonCallback={() =>
+                    redirectToPassport({
+                      PASSPORT_URL,
+                      login_hint: 'email',
+                      rollup_action: `groupemailconnect_${groupID}`,
+                    })
+                  }
+                  ConnectButtonPhrase="Connect New Email Address"
+                  onSelect={(selected) => {
+                    if (!Array.isArray(selected)) {
+                      if (!selected || !selected.value) {
+                        console.error('Error selecting email, try again')
+                        return
+                      }
+
+                      setSelectedEmailURN(selected.value as AccountURN)
+                    }
+                  }}
+                />
+              </>
+            )}
+          </div>
+
           <Button
             btnType="primary-alt"
             type="submit"
@@ -553,7 +665,8 @@ export default () => {
             disabled={
               apps.filter((a) => !a.groupID).length === 0 ||
               needsGroupBilling ||
-              !selectedApp
+              !selectedApp ||
+              !selectedEmailURN
             }
           >
             {!needsEntitlement && `Transfer Application`}
