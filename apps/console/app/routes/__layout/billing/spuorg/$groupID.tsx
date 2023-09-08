@@ -36,6 +36,7 @@ import {
 } from '../ops'
 import Breadcrumbs from '@proofzero/design-system/src/atoms/breadcrumbs/Breadcrumbs'
 import { ListIdentityGroupsOutput } from '@proofzero/platform/identity/src/jsonrpc/methods/identity-groups/listIdentityGroups'
+import { AppLoaderData } from '~/root'
 
 export const loader = billingLoader
 export const action = billingAction
@@ -55,9 +56,10 @@ export default () => {
     unpaidInvoiceURL,
   } = loaderData
 
-  const { PASSPORT_URL, groups } = useOutletContext<{
+  const { PASSPORT_URL, groups, apps } = useOutletContext<{
     PASSPORT_URL: string
     groups: ListIdentityGroupsOutput
+    apps: AppLoaderData[]
   }>()
 
   const submit = useSubmit()
@@ -328,9 +330,10 @@ export default () => {
           entitlements={entitlements[ServicePlanType.PRO]}
           paymentData={paymentData}
           submit={submit}
-          apps={[]}
+          apps={apps.filter((app) => app.groupID === groupURN?.split('/')[1])}
           fetcher={fetcher}
           hasUnpaidInvoices={Boolean(unpaidInvoiceURL)}
+          newAppURL={`/spuorg/${groupURN?.split('/')[1]}/apps/new`}
         />
       </section>
 

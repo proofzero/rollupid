@@ -60,6 +60,7 @@ export interface CreateInnerContextOptions
 
   apiKey?: string
   ownAppURNs?: string[]
+  allAppURNs?: string[]
 }
 
 /**

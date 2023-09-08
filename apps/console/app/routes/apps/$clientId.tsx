@@ -20,7 +20,7 @@ import {
 } from '@proofzero/design-system/src/atoms/toast'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import type { LoaderData as OutletContextData } from '~/root'
-import type { AccountURN } from '@proofzero/urns/account'
+import { AccountURNSpace, type AccountURN } from '@proofzero/urns/account'
 import type { PaymasterType } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
 import { BadRequestError, NotFoundError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
@@ -137,7 +137,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           appDetails,
           authorizationURL: authorizationURL.toString(),
           rotationResult,
-          appContactAddress,
+          appContactAddress: appContactAddress
+            ? AccountURNSpace.getBaseURN(appContactAddress)
+            : undefined,
           appContactEmail,
           paymaster,
           toasts,

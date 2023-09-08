@@ -43,6 +43,7 @@ type AppListboxProps = {
     name?: string
     icon?: string
     appPlan?: ServicePlanType
+    groupName?: string
   }[]
   //
   selectedAppIndex: number
@@ -190,13 +191,25 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
                               />
                             )}
 
-                            <Text
-                              size="sm"
-                              className="truncate"
-                              weight="medium"
-                            >
-                              {app.name}
-                            </Text>
+                            <div className="flex flex-col justify-start">
+                              <Text
+                                size="sm"
+                                className="truncate"
+                                weight={selected ? 'semibold' : 'medium'}
+                              >
+                                {app.name}
+                              </Text>
+
+                              {app.groupName && (
+                                <Text
+                                  size="xs"
+                                  weight="medium"
+                                  className="text-gray-400"
+                                >
+                                  {app.groupName}
+                                </Text>
+                              )}
+                            </div>
                           </div>
 
                           {app.appPlan !== ServicePlanType.FREE ? (
@@ -240,6 +253,7 @@ type AppSelectProps = {
     name?: string
     icon?: string
     appPlan?: ServicePlanType
+    groupName?: string
   }[]
   // The currently selected Client ID.
   selected?: string

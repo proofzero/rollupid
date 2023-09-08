@@ -12,6 +12,7 @@ import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
 import { Toaster, toast } from '@proofzero/design-system/src/atoms/toast'
 import { ToastModel, getToastsAndFlashSession } from '~/utils/toast.server'
 import { useEffect } from 'react'
+import { AppLoaderData } from '~/root'
 
 type GroupMemberModel = {
   URN: IdentityURN
@@ -35,6 +36,7 @@ type GroupRootLoaderData = {
 
 export type GroupRootContextData = GroupRootLoaderData & {
   identityURN: IdentityURN
+  apps: AppLoaderData[]
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -122,8 +124,8 @@ export default () => {
       toasts: ToastModel[]
     }
   >()
-
-  const { identityURN } = useOutletContext<{
+  const { apps, identityURN } = useOutletContext<{
+    apps: AppLoaderData[]
     identityURN: IdentityURN
   }>()
 
@@ -146,6 +148,7 @@ export default () => {
         context={{
           identityURN,
           ...data,
+          apps,
         }}
       />
     </>

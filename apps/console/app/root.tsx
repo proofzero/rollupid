@@ -74,6 +74,8 @@ export type AppLoaderData = {
   createdTimestamp?: number
   appPlan: ServicePlanType
   hasCustomDomain: boolean
+  groupID?: string
+  groupName?: string
 }
 
 export type LoaderData = {
@@ -116,9 +118,25 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...traceHeader,
       })
-      const apps = await coreClient.starbase.listApps.query()
-      const reshapedApps = apps.map((a) => {
-        return {
+
+      const [apps, groupApps] = await Promise.all([
+        coreClient.starbase.listApps.query(),
+        coreClient.starbase.listGroupApps.query(),
+      ])
+
+      const reshapedApps = [
+        ...apps.map((a) => {
+          return {
+            clientId: a.clientId,
+            name: a.app?.name,
+            icon: a.app?.icon,
+            published: a.published,
+            createdTimestamp: a.createdTimestamp,
+            appPlan: a.appPlan,
+            hasCustomDomain: Boolean(a.customDomain),
+          }
+        }),
+        ...groupApps.map((a) => ({
           clientId: a.clientId,
           name: a.app?.name,
           icon: a.app?.icon,
@@ -126,8 +144,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           createdTimestamp: a.createdTimestamp,
           appPlan: a.appPlan,
           hasCustomDomain: Boolean(a.customDomain),
-        }
-      })
+          groupName: a.groupName,
+          groupID: a.groupURN.split('/')[1],
+        })),
+      ].sort(
+        (a, b) =>
+          a.name!.localeCompare(b.name!) ||
+          (a.createdTimestamp || 0) - (b.createdTimestamp || 0)
+      )
 
       let avatarUrl = ''
       let displayName = ''

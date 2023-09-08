@@ -312,7 +312,7 @@ export default () => {
           entitlements={entitlements[ServicePlanType.PRO]}
           paymentData={paymentData}
           submit={submit}
-          apps={apps}
+          apps={apps.filter((a) => !Boolean(a.groupID))}
           fetcher={fetcher}
           hasUnpaidInvoices={hasUnpaidInvoices}
         />

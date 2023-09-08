@@ -68,6 +68,7 @@ type RollupMenuProps = {
     name?: string
     icon?: string
     appPlan: ServicePlanType
+    groupName?: string
   }[]
   // Current selected Client ID.
   selected?: string

@@ -19,7 +19,7 @@ export const setEmailOTPTheme = async ({
   const { theme, clientId } = input
 
   const appURN = ApplicationURNSpace.componentizedUrn(clientId)
-  if (!ctx.ownAppURNs || !ctx.ownAppURNs.includes(appURN))
+  if (!ctx.allAppURNs || !ctx.allAppURNs.includes(appURN))
     throw new Error(
       `Request received for clientId ${clientId} which is not owned by provided account.`
     )

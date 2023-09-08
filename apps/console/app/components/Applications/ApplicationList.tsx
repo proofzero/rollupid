@@ -8,6 +8,7 @@ import {
 } from './ApplicationListItem'
 
 import type { ApplicationListItemProps } from './ApplicationListItem'
+import _ from 'lodash'
 
 type ApplicationListProps = {
   applications: ApplicationListItemProps[]
@@ -29,6 +30,17 @@ export const ApplicationList = ({
     | undefined
   >()
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+
+  const ownApps = applications.filter((a) => !a.groupID && !a.groupName)
+  const groupApps = applications.filter((a) => a.groupID && a.groupName)
+
+  const groupedAppsByGroupID = _.groupBy(groupApps, 'groupID')
+  const groupedApplications = _.mapValues(groupedAppsByGroupID, (apps) => {
+    return {
+      groupName: apps[0].groupName,
+      apps,
+    }
+  })
 
   return (
     <div>
@@ -58,7 +70,7 @@ export const ApplicationList = ({
         </div>
       </section>
 
-      <section className="flex flex-col space-y-2">
+      <section className="flex flex-col">
         {actionApp && (
           <DeleteAppModal
             isOpen={deleteModalOpen}
@@ -71,7 +83,7 @@ export const ApplicationList = ({
           />
         )}
 
-        {applications.map((ali) => (
+        {ownApps.map((ali) => (
           <ApplicationListItem
             key={ali.id}
             navigate={navigate}
@@ -85,6 +97,30 @@ export const ApplicationList = ({
               setDeleteModalOpen(true)
             }}
           />
+        ))}
+
+        {Object.entries(groupedApplications).map(([groupID, entry]) => (
+          <section key={groupID} className="flex flex-col space-y-2 mt-5">
+            <Text size="sm" weight="medium" className="text-gray-500 mb-2">
+              {entry.groupName}
+            </Text>
+
+            {entry.apps.map((ali) => (
+              <ApplicationListItem
+                key={ali.id}
+                navigate={navigate}
+                {...ali}
+                onDeleteApplication={(clientId, appName, hasCustomDomain) => {
+                  setActionApp({
+                    clientId,
+                    name: appName,
+                    hasCustomDomain,
+                  })
+                  setDeleteModalOpen(true)
+                }}
+              />
+            ))}
+          </section>
         ))}
       </section>
     </div>

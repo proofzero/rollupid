@@ -11,7 +11,6 @@ import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { redirect } from '@remix-run/cloudflare'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 import { requireJWT } from '~/utilities/session.server'
-import { checkToken } from '@proofzero/utils/token'
 
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
@@ -23,7 +22,6 @@ import {
 } from '@proofzero/utils/getNormalisedConnectedAccounts'
 
 import type { AccountURN } from '@proofzero/urns/account'
-import type { IdentityURN } from '@proofzero/urns/identity'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import type { errorsTeamProps, notificationHandlerType } from '~/types'
 import { BadRequestError } from '@proofzero/errors'
@@ -33,22 +31,24 @@ import {
   DropdownSelectListItem,
 } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import { redirectToPassport } from '~/utils'
+import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const clientId = params.clientId as string
 
     const jwt = await requireJWT(request, context.env)
-    const payload = checkToken(jwt!)
-    const identityURN = payload.sub as IdentityURN
-
     const coreClient = createCoreClient(context.env.Core, {
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
+    const { ownerURN } = await coreClient.starbase.getAppDetails.query({
+      clientId,
+    })
+
     const connectedAccounts = await coreClient.identity.getAccounts.query({
-      URN: identityURN,
+      URN: ownerURN,
     })
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
@@ -84,6 +84,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     return {
       connectedEmails,
+      groupID: IdentityGroupURNSpace.is(ownerURN)
+        ? ownerURN.split('/')[1]
+        : undefined,
     }
   }
 )
@@ -134,7 +137,8 @@ export default () => {
 
   const submit = useSubmit()
 
-  let { connectedEmails } = useLoaderData() as {
+  let { connectedEmails, groupID } = useLoaderData() as {
+    groupID?: string
     connectedEmails: Array<DropdownSelectListItem>
   }
 
@@ -180,8 +184,12 @@ export default () => {
               onClick={() =>
                 redirectToPassport({
                   PASSPORT_URL,
-                  login_hint: 'email microsoft google apple',
-                  rollup_action: 'connect',
+                  login_hint: groupID
+                    ? 'email'
+                    : 'email microsoft google apple',
+                  rollup_action: groupID
+                    ? `groupemailconnect_${groupID}`
+                    : 'connect',
                 })
               }
               btnType="secondary-alt"
@@ -243,8 +251,12 @@ export default () => {
                 ConnectButtonCallback={() =>
                   redirectToPassport({
                     PASSPORT_URL,
-                    login_hint: 'email microsoft google apple',
-                    rollup_action: 'connect',
+                    login_hint: groupID
+                      ? 'email'
+                      : 'email microsoft google apple',
+                    rollup_action: groupID
+                      ? `groupemailconnect_${groupID}`
+                      : 'connect',
                   })
                 }
                 ConnectButtonPhrase="Connect New Email Address"

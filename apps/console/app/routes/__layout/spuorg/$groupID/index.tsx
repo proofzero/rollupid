@@ -1,29 +1,18 @@
-import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { LoaderFunction, json } from '@remix-run/cloudflare'
-import {
-  IdentityGroupURN,
-  IdentityGroupURNSpace,
-} from '@proofzero/urns/identity-group'
 import {
   Form,
   Link,
+  NavLink,
   useFetcher,
-  useLoaderData,
   useNavigate,
   useOutletContext,
 } from '@remix-run/react'
-import { GroupRootContextData } from '../../spuorg'
-import { Fragment, useEffect, useMemo, useState } from 'react'
+import { Fragment, useState } from 'react'
 import {
   CryptoAccountType,
   EmailAccountType,
   OAuthAccountType,
 } from '@proofzero/types/account'
 import _ from 'lodash'
-import createCoreClient from '@proofzero/platform-clients/core'
-import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import { requireJWT } from '~/utilities/session.server'
-import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import Breadcrumbs from '@proofzero/design-system/src/atoms/breadcrumbs/Breadcrumbs'
 import { Button, Text } from '@proofzero/design-system'
 import classNames from 'classnames'
@@ -51,62 +40,15 @@ import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyI
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import { IdentityURN } from '@proofzero/urns/identity'
 import dangerVector from '~/images/danger.svg'
+import { ApplicationListItemPublishedState } from '~/components/Applications/ApplicationListItem'
+import { ServicePlanType } from '@proofzero/types/billing'
+import { GroupDetailsContextData } from '../$groupID'
 
 const accountTypes = [
   ...Object.values(EmailAccountType),
   ...Object.values(OAuthAccountType),
   ...Object.values(CryptoAccountType),
 ]
-
-type InvitationModel = {
-  identifier: string
-  accountType: EmailAccountType | OAuthAccountType | CryptoAccountType
-  invitationURL: string
-}
-
-type LoaderData = {
-  groupID: string
-  URN: IdentityGroupURN
-  invitations: InvitationModel[]
-}
-
-export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, params, context }) => {
-    const groupURN = IdentityGroupURNSpace.urn(
-      params.groupID as string
-    ) as IdentityGroupURN
-
-    const jwt = await requireJWT(request, context.env)
-    const traceHeader = generateTraceContextHeaders(context.traceSpan)
-    const coreClient = createCoreClient(context.env.Core, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...traceHeader,
-    })
-
-    const invitations =
-      await coreClient.identity.getIdentityGroupMemberInvitations.query({
-        identityGroupURN: groupURN,
-      })
-
-    const mappedInvitations = invitations.map((invitation) => ({
-      identifier: invitation.identifier,
-      accountType: invitation.accountType,
-      invitationURL: [
-        context.env.PASSPORT_URL,
-        'spuorg',
-        'enroll',
-        params.groupID,
-        invitation.invitationCode,
-      ].join('/'),
-    }))
-
-    return json<LoaderData>({
-      groupID: params.groupID as string,
-      URN: groupURN,
-      invitations: mappedInvitations,
-    })
-  }
-)
 
 export const ActionCard = ({
   Icon,
@@ -425,28 +367,8 @@ const RemoveMemberModal = ({
 }
 
 export default () => {
-  const { groups, PASSPORT_URL, identityURN } =
-    useOutletContext<GroupRootContextData>()
-  const { URN, groupID, invitations } = useLoaderData<LoaderData>()
-
-  const group = useMemo(
-    () => groups.find((group) => group.URN === URN) ?? null,
-    [groups]
-  )
-
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    // Initial state is undefined
-    // Our not found state is null
-
-    // Because we load data client side
-    // We want to redirect if group
-    // is not found
-    if (group === null) {
-      navigate('/spuorg')
-    }
-  }, [group])
+  const { apps, group, groupID, PASSPORT_URL, identityURN, invitations } =
+    useOutletContext<GroupDetailsContextData>()
 
   const [inviteModalOpen, setInviteModalOpen] = useState(false)
 
@@ -455,6 +377,11 @@ export default () => {
   const [selectedMemberURN, setSelectedMemberURN] = useState<IdentityURN>()
   const [selectedMemberAlias, setSelectedMemberAlias] = useState<string>('')
   const [removeMemberModalOpen, setRemoveMemberModalOpen] = useState(false)
+
+  const ownApps = apps.filter((a) => !a.groupID)
+  const groupApps = apps.filter((a) => a.groupID === groupID)
+
+  const navigate = useNavigate()
 
   return (
     <>
@@ -509,8 +436,9 @@ export default () => {
 
         <ActionCard
           Icon={TbApps}
-          title="Transfer Application"
-          subtitle="Transfer Application to the Group"
+          title="Create Application"
+          subtitle="Create new app for this group"
+          onClick={() => navigate(`/spuorg/${groupID}/apps/new`)}
         />
 
         <ActionCard
@@ -531,73 +459,143 @@ export default () => {
 
               <Pill className="bg-gray-200 rounded-lg !pr-2">
                 <Text size="xs" weight="medium" className="text-gray-800">
-                  0
+                  {groupApps.length}
                 </Text>
               </Pill>
             </div>
 
-            <div className="bg-white border border-gray-300 rounded-lg p-9 flex flex-col justify-center items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="92"
-                height="92"
-                viewBox="0 0 92 92"
-                fill="none"
-              >
-                <path
-                  d="M46 91.667C71.4051 91.667 92 71.1466 92 45.8335C92 20.5203 71.4051 0 46 0C20.5949 0 0 20.5203 0 45.8335C0 71.1466 20.5949 91.667 46 91.667Z"
-                  fill="#F9FAFB"
-                />
-                <path
-                  d="M72.3758 30.5439H19.6292C17.9355 30.5439 16.5625 31.7402 16.5625 33.2159V89.3278C16.5625 90.8035 17.9355 91.9997 19.6292 91.9997H72.3758C74.0695 91.9997 75.4425 90.8035 75.4425 89.3278V33.2159C75.4425 31.7402 74.0695 30.5439 72.3758 30.5439Z"
-                  fill="white"
-                />
-                <path
-                  d="M39.8677 38.5605H23.9211C22.9049 38.5605 22.0811 39.2783 22.0811 40.1637C22.0811 41.0492 22.9049 41.7669 23.9211 41.7669H39.8677C40.8839 41.7669 41.7077 41.0492 41.7077 40.1637C41.7077 39.2783 40.8839 38.5605 39.8677 38.5605Z"
-                  fill="#F3F4F6"
-                />
-                <path
-                  d="M50.9077 45.5078H23.9211C22.9049 45.5078 22.0811 46.2256 22.0811 47.111C22.0811 47.9964 22.9049 48.7142 23.9211 48.7142H50.9077C51.9239 48.7142 52.7477 47.9964 52.7477 47.111C52.7477 46.2256 51.9239 45.5078 50.9077 45.5078Z"
-                  fill="#F9FAFB"
-                />
-                <path
-                  d="M39.8677 52.9912H23.9211C22.9049 52.9912 22.0811 53.709 22.0811 54.5944C22.0811 55.4798 22.9049 56.1976 23.9211 56.1976H39.8677C40.8839 56.1976 41.7077 55.4798 41.7077 54.5944C41.7077 53.709 40.8839 52.9912 39.8677 52.9912Z"
-                  fill="#F3F4F6"
-                />
-                <path
-                  d="M50.9077 59.9385H23.9211C22.9049 59.9385 22.0811 60.6563 22.0811 61.5417C22.0811 62.4271 22.9049 63.1449 23.9211 63.1449H50.9077C51.9239 63.1449 52.7477 62.4271 52.7477 61.5417C52.7477 60.6563 51.9239 59.9385 50.9077 59.9385Z"
-                  fill="#F9FAFB"
-                />
-                <path
-                  d="M39.8677 67.4189H23.9211C22.9049 67.4189 22.0811 68.1367 22.0811 69.0221C22.0811 69.9076 22.9049 70.6253 23.9211 70.6253H39.8677C40.8839 70.6253 41.7077 69.9076 41.7077 69.0221C41.7077 68.1367 40.8839 67.4189 39.8677 67.4189Z"
-                  fill="#F3F4F6"
-                />
-                <path
-                  d="M50.9077 74.3662H23.9211C22.9049 74.3662 22.0811 75.084 22.0811 75.9694C22.0811 76.8548 22.9049 77.5726 23.9211 77.5726H50.9077C51.9239 77.5726 52.7477 76.8548 52.7477 75.9694C52.7477 75.084 51.9239 74.3662 50.9077 74.3662Z"
-                  fill="#F9FAFB"
-                />
-                <path
-                  d="M72.3758 4.37109H19.6292C17.9355 4.37109 16.5625 5.56739 16.5625 7.04309V23.075C16.5625 24.5507 17.9355 25.747 19.6292 25.747H72.3758C74.0695 25.747 75.4425 24.5507 75.4425 23.075V7.04309C75.4425 5.56739 74.0695 4.37109 72.3758 4.37109Z"
-                  fill="#E5E7EB"
-                />
-                <path
-                  d="M39.8687 10.252H23.922C22.9058 10.252 22.082 10.9697 22.082 11.8551C22.082 12.7406 22.9058 13.4583 23.922 13.4583H39.8687C40.8849 13.4583 41.7087 12.7406 41.7087 11.8551C41.7087 10.9697 40.8849 10.252 39.8687 10.252Z"
-                  fill="white"
-                />
-                <path
-                  d="M50.9087 17.1992H23.922C22.9058 17.1992 22.082 17.917 22.082 18.8024C22.082 19.6878 22.9058 20.4056 23.922 20.4056H50.9087C51.9249 20.4056 52.7487 19.6878 52.7487 18.8024C52.7487 17.917 51.9249 17.1992 50.9087 17.1992Z"
-                  fill="white"
-                />
-              </svg>
+            {groupApps.length === 0 && (
+              <div className="bg-white border border-gray-300 rounded-lg p-9 flex flex-col justify-center items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="92"
+                  height="92"
+                  viewBox="0 0 92 92"
+                  fill="none"
+                >
+                  <path
+                    d="M46 91.667C71.4051 91.667 92 71.1466 92 45.8335C92 20.5203 71.4051 0 46 0C20.5949 0 0 20.5203 0 45.8335C0 71.1466 20.5949 91.667 46 91.667Z"
+                    fill="#F9FAFB"
+                  />
+                  <path
+                    d="M72.3758 30.5439H19.6292C17.9355 30.5439 16.5625 31.7402 16.5625 33.2159V89.3278C16.5625 90.8035 17.9355 91.9997 19.6292 91.9997H72.3758C74.0695 91.9997 75.4425 90.8035 75.4425 89.3278V33.2159C75.4425 31.7402 74.0695 30.5439 72.3758 30.5439Z"
+                    fill="white"
+                  />
+                  <path
+                    d="M39.8677 38.5605H23.9211C22.9049 38.5605 22.0811 39.2783 22.0811 40.1637C22.0811 41.0492 22.9049 41.7669 23.9211 41.7669H39.8677C40.8839 41.7669 41.7077 41.0492 41.7077 40.1637C41.7077 39.2783 40.8839 38.5605 39.8677 38.5605Z"
+                    fill="#F3F4F6"
+                  />
+                  <path
+                    d="M50.9077 45.5078H23.9211C22.9049 45.5078 22.0811 46.2256 22.0811 47.111C22.0811 47.9964 22.9049 48.7142 23.9211 48.7142H50.9077C51.9239 48.7142 52.7477 47.9964 52.7477 47.111C52.7477 46.2256 51.9239 45.5078 50.9077 45.5078Z"
+                    fill="#F9FAFB"
+                  />
+                  <path
+                    d="M39.8677 52.9912H23.9211C22.9049 52.9912 22.0811 53.709 22.0811 54.5944C22.0811 55.4798 22.9049 56.1976 23.9211 56.1976H39.8677C40.8839 56.1976 41.7077 55.4798 41.7077 54.5944C41.7077 53.709 40.8839 52.9912 39.8677 52.9912Z"
+                    fill="#F3F4F6"
+                  />
+                  <path
+                    d="M50.9077 59.9385H23.9211C22.9049 59.9385 22.0811 60.6563 22.0811 61.5417C22.0811 62.4271 22.9049 63.1449 23.9211 63.1449H50.9077C51.9239 63.1449 52.7477 62.4271 52.7477 61.5417C52.7477 60.6563 51.9239 59.9385 50.9077 59.9385Z"
+                    fill="#F9FAFB"
+                  />
+                  <path
+                    d="M39.8677 67.4189H23.9211C22.9049 67.4189 22.0811 68.1367 22.0811 69.0221C22.0811 69.9076 22.9049 70.6253 23.9211 70.6253H39.8677C40.8839 70.6253 41.7077 69.9076 41.7077 69.0221C41.7077 68.1367 40.8839 67.4189 39.8677 67.4189Z"
+                    fill="#F3F4F6"
+                  />
+                  <path
+                    d="M50.9077 74.3662H23.9211C22.9049 74.3662 22.0811 75.084 22.0811 75.9694C22.0811 76.8548 22.9049 77.5726 23.9211 77.5726H50.9077C51.9239 77.5726 52.7477 76.8548 52.7477 75.9694C52.7477 75.084 51.9239 74.3662 50.9077 74.3662Z"
+                    fill="#F9FAFB"
+                  />
+                  <path
+                    d="M72.3758 4.37109H19.6292C17.9355 4.37109 16.5625 5.56739 16.5625 7.04309V23.075C16.5625 24.5507 17.9355 25.747 19.6292 25.747H72.3758C74.0695 25.747 75.4425 24.5507 75.4425 23.075V7.04309C75.4425 5.56739 74.0695 4.37109 72.3758 4.37109Z"
+                    fill="#E5E7EB"
+                  />
+                  <path
+                    d="M39.8687 10.252H23.922C22.9058 10.252 22.082 10.9697 22.082 11.8551C22.082 12.7406 22.9058 13.4583 23.922 13.4583H39.8687C40.8849 13.4583 41.7087 12.7406 41.7087 11.8551C41.7087 10.9697 40.8849 10.252 39.8687 10.252Z"
+                    fill="white"
+                  />
+                  <path
+                    d="M50.9087 17.1992H23.922C22.9058 17.1992 22.082 17.917 22.082 18.8024C22.082 19.6878 22.9058 20.4056 23.922 20.4056H50.9087C51.9249 20.4056 52.7487 19.6878 52.7487 18.8024C52.7487 17.917 51.9249 17.1992 50.9087 17.1992Z"
+                    fill="white"
+                  />
+                </svg>
 
-              <Text size="base" weight="medium" className="text-gray-400 mt-4">
-                No Applications
-              </Text>
+                <Text
+                  size="base"
+                  weight="medium"
+                  className="text-gray-400 mt-4"
+                >
+                  No Applications
+                </Text>
 
-              <Button btnType="secondary-alt" disabled className="mt-6">
-                Transfer Application
-              </Button>
-            </div>
+                <NavLink to={`/spuorg/${groupID}/apps/new`}>
+                  <Button btnType="secondary-alt" className="mt-6">
+                    Create an Application
+                  </Button>
+                </NavLink>
+              </div>
+            )}
+
+            <section className="flex flex-col gap-3">
+              {groupApps.map((app) => (
+                <article className="flex justify-center items-center border border-gray-200 shadow-sm rounded bg-white">
+                  <section>
+                    <div className="rounded-l w-16 h-[3.75rem] flex justify-center items-center bg-gray-200 overflow-hidden">
+                      {!app.icon && (
+                        <Text className="text-gray-500">
+                          {app.name?.substring(0, 1)}
+                        </Text>
+                      )}
+                      {app.icon && (
+                        <img
+                          src={app.icon}
+                          alt="Not Found"
+                          className="object-cover"
+                        />
+                      )}
+                    </div>
+                  </section>
+
+                  <section className="px-4 flex-1">
+                    <div className="flex flex-row space-x-2 items-center">
+                      <Text size="sm" weight="medium" className="text-gray-900">
+                        <div
+                          onClick={() => {
+                            navigate(`/apps/${app.clientId}`)
+                          }}
+                          className="hover:underline cursor-pointer"
+                        >
+                          {app.name}
+                        </div>
+                      </Text>
+                      <ApplicationListItemPublishedState
+                        published={app.published}
+                      />
+                      <Pill className="border rounded-3xl py-none">
+                        <Text size="xs">{group.name}</Text>
+                      </Pill>
+                      {app.appPlan !== ServicePlanType.FREE ? (
+                        <Pill className="border rounded-3xl py-none">
+                          <Text size="xs">{app.appPlan}</Text>
+                        </Pill>
+                      ) : null}
+                    </div>
+
+                    {hydrated && app.createdTimestamp && (
+                      <Text size="xs" weight="normal" className="shrink-0">
+                        {new Date(app.createdTimestamp).toLocaleString(
+                          'default',
+                          {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                          }
+                        )}
+                      </Text>
+                    )}
+                  </section>
+                </article>
+              ))}
+            </section>
           </div>
 
           <div>

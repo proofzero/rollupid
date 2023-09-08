@@ -5,7 +5,6 @@ import {
   AccountURNInput,
   IdentityGroupURNValidator,
 } from '@proofzero/platform-middleware/inputValidators'
-import { initIdentityGroupNodeByName } from '../../../nodes'
 import { router } from '@proofzero/platform.core'
 import { EDGE_ACCOUNT } from '@proofzero/platform.account/src/constants'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
@@ -35,13 +34,6 @@ export const connectIdentityGroupEmail = async ({
   ctx: Context
 }): Promise<ConnectIdentityGroupEmailOutput> => {
   const { identityGroupURN, accountURN } = input
-
-  const node = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
-  if (!node) {
-    throw new InternalServerError({
-      message: 'Identity group DO not found',
-    })
-  }
 
   const caller = router.createCaller(ctx)
 

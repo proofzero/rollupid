@@ -7,9 +7,13 @@ import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { EDGE_APPLICATION } from '../../types'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { ServicePlanType } from '@proofzero/types/billing'
+import { IdentityGroupURNValidator } from '@proofzero/platform-middleware/inputValidators'
+import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
+import { InternalServerError } from '@proofzero/errors'
 
 export const CreateAppInputSchema = z.object({
   clientName: z.string(),
+  identityGroupURN: IdentityGroupURNValidator.optional(),
 })
 
 export const CreateAppOutputSchema = z.object({
@@ -40,21 +44,39 @@ export const createApp = async ({
 
   const caller = router.createCaller(ctx)
 
-  // We need to create an edge between the logged in user node (aka
-  // account) and the new app.
+  if (input.identityGroupURN) {
+    const { edges } = await caller.edges.getEdges({
+      query: {
+        src: {
+          baseUrn: ctx.identityURN,
+        },
+        tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
+        dst: {
+          baseUrn: input.identityGroupURN,
+        },
+      },
+    })
+
+    if (edges.length === 0) {
+      throw new InternalServerError({
+        message: 'Requesting account is not part of group',
+      })
+    }
+  }
+
+  const targetURN = input.identityGroupURN ?? ctx.identityURN
+
   const edgeRes = await caller.edges.makeEdge({
-    src: ctx.identityURN,
+    src: targetURN,
     dst: appURN,
     tag: EDGE_APPLICATION,
   })
 
   if (!edgeRes.edge) {
     console.error({ edgeRes })
-    throw new Error(
-      `Could not link app ${clientId} to account ${ctx.accountURN}`
-    )
+    throw new Error(`Could not link app ${clientId} to identity ${targetURN}`)
   } else {
-    console.log(`Created app ${clientId} for account ${ctx.accountURN}`)
+    console.log(`Created app ${clientId} for identity ${targetURN}`)
   }
 
   ctx.waitUntil?.(

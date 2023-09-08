@@ -10,7 +10,7 @@ import {
 import { List } from '@proofzero/design-system/src/atoms/lists/List'
 import MultiAvatar from '@proofzero/design-system/src/molecules/avatar/MultiAvatar'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
-import { Fragment, useState } from 'react'
+import { Fragment, useState, useRef } from 'react'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { Menu, Transition } from '@headlessui/react'
 import dangerVector from '~/images/danger.svg'
@@ -152,13 +152,15 @@ const DeleteGroupModal = ({
 }
 
 export default () => {
-  const { groups } = useOutletContext<GroupRootContextData>()
+  const { groups, apps } = useOutletContext<GroupRootContextData>()
   const navigate = useNavigate()
 
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false)
   const [isDeleteGroupModalOpen, setIsDeleteGroupModalOpen] = useState(false)
 
   const [selectedGroup, setSelectedGroup] = useState<GroupModel>()
+
+  const groupAppRefs = useRef(apps.filter((a) => Boolean(a.groupID)))
 
   return (
     <>
@@ -272,9 +274,22 @@ export default () => {
                   <Text size="base" weight="semibold" className="text-gray-800">
                     {item.val.name}
                   </Text>
-                  <Text size="sm" weight="normal" className="text-gray-500">
-                    No applications
-                  </Text>
+                  {groupAppRefs.current.filter(
+                    (ga) => ga.groupID === item.val.URN.split('/')[1]
+                  ).length === 0 ? (
+                    <Text size="sm" weight="normal" className="text-gray-500">
+                      No applications
+                    </Text>
+                  ) : (
+                    <Text size="sm" weight="normal" className="text-gray-500">
+                      {
+                        groupAppRefs.current.filter(
+                          (ga) => ga.groupID === item.val.URN.split('/')[1]
+                        ).length
+                      }{' '}
+                      applications
+                    </Text>
+                  )}
                 </div>
 
                 <div className="flex flex-row items-center gap-3">

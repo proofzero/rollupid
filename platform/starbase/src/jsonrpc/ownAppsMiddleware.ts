@@ -11,7 +11,8 @@ import type { Context } from './context'
 
 import { parseJwt } from '@proofzero/utils'
 import { BadRequestError } from '@proofzero/errors'
-import { ROLLUP_INTERNAL_ACCESS_TOKEN_URN } from '@proofzero/platform/authorization/src/constants'
+import { ROLLUP_INTERNAL_ACCESS_TOKEN_URN } from '@proofzero/platform.authorization/src/constants'
+import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 
 export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({
   ctx,
@@ -51,26 +52,50 @@ export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({
 
   const caller = router.createCaller(ctx)
 
-  //Get application edges for the given identityURN
-  const edgeList = await caller.edges.getEdges({
+  const { edges: ownEdges } = await caller.edges.getEdges({
     query: {
       src: { baseUrn: ctx.identityURN },
       tag: EDGE_APPLICATION,
     },
   })
 
-  const ownAppURNs = []
-  for (const edge of edgeList && edgeList.edges) {
-    const appURN = ApplicationURNSpace.getBaseURN(
-      edge.dst.baseUrn as ApplicationURN
-    )
-    ownAppURNs.push(appURN)
-  }
+  const ownAppURNs: ApplicationURN[] = ownEdges.map(
+    (edge) => edge.dst.baseUrn as ApplicationURN
+  )
+
+  const { edges: identityGroupEdges } = await caller.edges.getEdges({
+    query: {
+      src: {
+        baseUrn: ctx.identityURN,
+      },
+      tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
+    },
+  })
+
+  const identityGroupURNList = identityGroupEdges.map(
+    (edge) => edge.dst.baseUrn
+  )
+
+  const groupAppURNList = await Promise.all(
+    identityGroupURNList.map(async (igu) => {
+      const { edges: appEdges } = await caller.edges.getEdges({
+        query: {
+          src: {
+            baseUrn: igu,
+          },
+          tag: EDGE_APPLICATION,
+        },
+      })
+
+      return appEdges.map((edge) => edge.dst.baseUrn as ApplicationURN)
+    })
+  )
 
   return next({
     ctx: {
       ...ctx,
       ownAppURNs,
+      allAppURNs: ownAppURNs.concat(groupAppURNList.flatMap((gau) => gau)),
     },
   })
 }

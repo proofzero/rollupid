@@ -43,6 +43,8 @@ export type ApplicationListItemProps = {
   published?: boolean
   hasCustomDomain: boolean
   appPlan: ServicePlanType
+  groupName?: string
+  groupID?: string
   navigate?: (clientId: string) => void
   onDeleteApplication?: (
     clientId: string,
