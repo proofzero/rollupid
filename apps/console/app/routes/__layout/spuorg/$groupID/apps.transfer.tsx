@@ -123,12 +123,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    const emailURN = fd.get('emailURN') as AccountURN
-    if (!emailURN) {
-      throw new BadRequestError({
-        message: 'emailURN is required',
-      })
-    }
+    const emailURN = fd.get('emailURN') as AccountURN | undefined
 
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
     const coreClient = createCoreClient(context.env.Core, {
@@ -139,6 +134,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const appDetails = await coreClient.starbase.getAppDetails.query({
       clientId: clientID as string,
     })
+
+    if (appDetails.published && !emailURN) {
+      throw new BadRequestError({
+        message: 'emailURN is required',
+      })
+    }
 
     if (appDetails.appPlan !== ServicePlanType.FREE) {
       const spd = await coreClient.billing.getStripePaymentData.query({
@@ -578,85 +579,87 @@ export default () => {
             )}
           </Listbox>
 
-          <div className="self-start w-full">
-            {connectedEmails && connectedEmails.length === 0 && (
-              <Button
-                onClick={() =>
-                  redirectToPassport({
-                    PASSPORT_URL,
-                    login_hint: groupID
-                      ? 'email'
-                      : 'email microsoft google apple',
-                    rollup_action: groupID
-                      ? `groupemailconnect_${groupID}`
-                      : 'connect',
-                  })
-                }
-                btnSize="xs"
-                btnType="secondary-alt"
-                className="w-full"
-              >
-                <div className="flex space-x-3 items-center">
-                  <HiOutlineMail className="w-6 h-6 text-gray-800" />
-                  <Text
-                    weight="medium"
-                    className="flex-1 text-gray-800 text-left"
-                  >
-                    Connect Email Account
-                  </Text>
-                </div>
-              </Button>
-            )}
-
-            {connectedEmails && connectedEmails.length > 0 && (
-              <>
-                <input
-                  name="emailURN"
-                  type="hidden"
-                  value={selectedEmailURN}
-                  required
-                />
-
-                <Dropdown
-                  items={(connectedEmails as DropdownSelectListItem[]).map(
-                    (email) => {
-                      email.value === ''
-                        ? (email.selected = true)
-                        : (email.selected = false)
-                      email.subtitle && !email.icon
-                        ? (email.icon = getEmailIcon(email.subtitle))
-                        : null
-                      return {
-                        value: email.value,
-                        selected: email.selected,
-                        icon: email.icon,
-                        title: email.title,
-                      }
-                    }
-                  )}
-                  placeholder="Select an Email Account"
-                  ConnectButtonCallback={() =>
+          {selectedApp?.published && (
+            <div className="self-start w-full">
+              {connectedEmails && connectedEmails.length === 0 && (
+                <Button
+                  onClick={() =>
                     redirectToPassport({
                       PASSPORT_URL,
-                      login_hint: 'email',
-                      rollup_action: `groupemailconnect_${groupID}`,
+                      login_hint: groupID
+                        ? 'email'
+                        : 'email microsoft google apple',
+                      rollup_action: groupID
+                        ? `groupemailconnect_${groupID}`
+                        : 'connect',
                     })
                   }
-                  ConnectButtonPhrase="Connect New Email Address"
-                  onSelect={(selected) => {
-                    if (!Array.isArray(selected)) {
-                      if (!selected || !selected.value) {
-                        console.error('Error selecting email, try again')
-                        return
-                      }
+                  btnSize="xs"
+                  btnType="secondary-alt"
+                  className="w-full"
+                >
+                  <div className="flex space-x-3 items-center">
+                    <HiOutlineMail className="w-6 h-6 text-gray-800" />
+                    <Text
+                      weight="medium"
+                      className="flex-1 text-gray-800 text-left"
+                    >
+                      Connect Email Account
+                    </Text>
+                  </div>
+                </Button>
+              )}
 
-                      setSelectedEmailURN(selected.value as AccountURN)
+              {connectedEmails && connectedEmails.length > 0 && (
+                <>
+                  <input
+                    name="emailURN"
+                    type="hidden"
+                    value={selectedEmailURN}
+                    required
+                  />
+
+                  <Dropdown
+                    items={(connectedEmails as DropdownSelectListItem[]).map(
+                      (email) => {
+                        email.value === ''
+                          ? (email.selected = true)
+                          : (email.selected = false)
+                        email.subtitle && !email.icon
+                          ? (email.icon = getEmailIcon(email.subtitle))
+                          : null
+                        return {
+                          value: email.value,
+                          selected: email.selected,
+                          icon: email.icon,
+                          title: email.title,
+                        }
+                      }
+                    )}
+                    placeholder="Select an Email Account"
+                    ConnectButtonCallback={() =>
+                      redirectToPassport({
+                        PASSPORT_URL,
+                        login_hint: 'email',
+                        rollup_action: `groupemailconnect_${groupID}`,
+                      })
                     }
-                  }}
-                />
-              </>
-            )}
-          </div>
+                    ConnectButtonPhrase="Connect New Email Address"
+                    onSelect={(selected) => {
+                      if (!Array.isArray(selected)) {
+                        if (!selected || !selected.value) {
+                          console.error('Error selecting email, try again')
+                          return
+                        }
+
+                        setSelectedEmailURN(selected.value as AccountURN)
+                      }
+                    }}
+                  />
+                </>
+              )}
+            </div>
+          )}
 
           <Button
             btnType="primary-alt"
@@ -666,7 +669,7 @@ export default () => {
               apps.filter((a) => !a.groupID).length === 0 ||
               needsGroupBilling ||
               !selectedApp ||
-              !selectedEmailURN
+              (selectedApp?.published && !selectedEmailURN)
             }
           >
             {!needsEntitlement && `Transfer Application`}

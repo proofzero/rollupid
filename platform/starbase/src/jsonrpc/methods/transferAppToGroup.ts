@@ -12,7 +12,7 @@ import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 export const TransferAppToGroupInput = z.object({
   clientID: z.string(),
   identityGroupURN: IdentityGroupURNValidator,
-  emailURN: AccountURNInput,
+  emailURN: AccountURNInput.optional().nullable(),
 })
 
 type TransferAppToGroupParams = z.infer<typeof TransferAppToGroupInput>
@@ -72,19 +72,21 @@ export const transferAppToGroup = async ({
     },
   })
 
-  await caller.edges.makeEdge({
-    src: appURN,
-    tag: EDGE_HAS_REFERENCE_TO,
-    dst: emailURN,
-  })
-
-  await Promise.all(
-    emailEdges.map(async (edge) => {
-      await caller.edges.removeEdge({
-        src: edge.src.baseUrn,
-        tag: edge.tag,
-        dst: edge.dst.baseUrn,
-      })
+  if (emailURN) {
+    await caller.edges.makeEdge({
+      src: appURN,
+      tag: EDGE_HAS_REFERENCE_TO,
+      dst: emailURN,
     })
-  )
+
+    await Promise.all(
+      emailEdges.map(async (edge) => {
+        await caller.edges.removeEdge({
+          src: edge.src.baseUrn,
+          tag: edge.tag,
+          dst: edge.dst.baseUrn,
+        })
+      })
+    )
+  }
 }
