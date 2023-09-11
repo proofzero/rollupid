@@ -454,7 +454,7 @@ export default () => {
           >
             {({ open }) => (
               <div className="flex flex-col col-span-2 z-10">
-                <Listbox.Button className="relative border rounded-l py-2 px-3 flex flex-row justify-between items-center flex-1 focus-visible:outline-none focus:border-indigo-500 bg-white disabled:bg-gray-100 px-2">
+                <Listbox.Button className="relative border rounded-lg py-2 px-3 flex flex-row justify-between items-center flex-1 focus-visible:outline-none focus:border-indigo-500 bg-white disabled:bg-gray-100 px-2 border-gray-300">
                   {apps.filter((a) => !a.groupID).length > 0 && (
                     <>
                       {selectedApp && (
@@ -674,46 +674,43 @@ export default () => {
           </Button>
 
           {selectedApp && needsEntitlement && (
-            <article className="p-4 bg-orange-50 rounded-lg">
-              <section className="mb-3 flex flex-row items-center gap-2">
+            <article className="p-4 bg-gray-100 rounded-lg">
+              <section className="flex flex-row items-center gap-2">
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
                   width="20"
                   height="20"
                   viewBox="0 0 20 20"
                   fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M9.9993 7.5V9.16667M9.9993 12.5H10.0076M4.22579 15.8333H15.7728C17.0558 15.8333 17.8577 14.4444 17.2162 13.3333L11.4427 3.33333C10.8012 2.22222 9.19742 2.22222 8.55592 3.33333L2.78242 13.3333C2.14092 14.4444 2.94279 15.8333 4.22579 15.8333Z"
-                    stroke="#FB923C"
+                    d="M10.8333 13.3333H10V10H9.16667M10 6.66667H10.0083M17.5 10C17.5 14.1421 14.1421 17.5 10 17.5C5.85786 17.5 2.5 14.1421 2.5 10C2.5 5.85786 5.85786 2.5 10 2.5C14.1421 2.5 17.5 5.85786 17.5 10Z"
+                    stroke="#6B7280"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 </svg>
 
-                <Text size="sm" className="text-orange-600">
-                  Insufficient Entitlements within Group
+                <Text size="sm" className="text-gray-700">
+                  Application you are trying to transfer is on{' '}
+                  <Text size="sm" type="span" weight="semibold">
+                    Pro Plan
+                  </Text>
+                  .<br /> There are{' '}
+                  <Text size="sm" type="span" weight="semibold">
+                    {(entitlements.plans[selectedApp.appPlan]?.entitlements ??
+                      0) -
+                      apps.filter(
+                        (a) =>
+                          a.groupID === groupID &&
+                          a.appPlan === selectedApp.appPlan
+                      ).length}{' '}
+                    {plans[selectedApp.appPlan].title} Entitlements
+                  </Text>{' '}
+                  available in your group.{' '}
                 </Text>
               </section>
-              <Text size="sm" className="text-gray-700">
-                Application you are trying to transfer is on{' '}
-                <Text size="sm" type="span" weight="semibold">
-                  Pro Plan
-                </Text>
-                .<br /> There are{' '}
-                <Text size="sm" type="span" weight="semibold">
-                  {(entitlements.plans[selectedApp.appPlan]?.entitlements ??
-                    0) -
-                    apps.filter(
-                      (a) =>
-                        a.groupID === groupID &&
-                        a.appPlan === selectedApp.appPlan
-                    ).length}{' '}
-                  {plans[selectedApp.appPlan].title} Entitlements
-                </Text>{' '}
-                available in your group.{' '}
-              </Text>
             </article>
           )}
 
