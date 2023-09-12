@@ -75,7 +75,11 @@ export const getCurrentAndUpcomingInvoices = async (
         },
       ])
     } catch (er) {
-      console.error(er)
+      if ((er as Stripe.errors.StripeError).code === 'invoice_upcoming_none') {
+        console.info(`No upcoming invoices for customer ${spd.customerID}`)
+      } else {
+        throw er
+      }
     }
   }
   return invoices
