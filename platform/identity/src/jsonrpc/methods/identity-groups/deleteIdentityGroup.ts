@@ -7,6 +7,8 @@ import { IdentityGroupURNValidator } from '@proofzero/platform-middleware/inputV
 import { initIdentityGroupNodeByName } from '../../../nodes'
 import { BadRequestError } from '@proofzero/errors'
 import { EDGE_APPLICATION } from '@proofzero/platform.starbase/src/types'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import { IdentityURN } from '@proofzero/urns/identity'
 
 export const DeleteIdentityGroupInputSchema = IdentityGroupURNValidator
 type DeleteIdentityGroupInput = z.infer<typeof DeleteIdentityGroupInputSchema>
@@ -67,11 +69,19 @@ export const deleteIdentityGroup = async ({
     urn: identityGroupURN,
   })
 
-  const DO = await initIdentityGroupNodeByName(
-    identityGroupURN,
-    ctx.IdentityGroup
-  )
+  const DO = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
   if (DO) {
     await DO.storage.deleteAll()
   }
+
+  ctx.waitUntil?.(
+    createAnalyticsEvent({
+      eventName: 'group_deleted',
+      apiKey: ctx.POSTHOG_API_KEY,
+      distinctId: ctx.identityURN as IdentityURN,
+      properties: {
+        $groups: { group: identityGroupURN },
+      },
+    })
+  )
 }

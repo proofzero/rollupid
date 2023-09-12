@@ -2,9 +2,9 @@ import { router } from '@proofzero/platform.core'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 
 import { Context } from '../../../context'
-import { InternalServerError } from '@proofzero/errors'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { initIdentityGroupNodeByName } from '../../../nodes'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const purgeIdentityGroupMemberships = async ({
   ctx,
@@ -45,11 +45,19 @@ export const purgeIdentityGroupMemberships = async ({
           urn: igu,
         })
 
-        const DO = await initIdentityGroupNodeByName(igu, ctx.IdentityGroup)
+        const DO = initIdentityGroupNodeByName(igu, ctx.IdentityGroup)
         if (DO) {
           await DO.storage.deleteAll()
         }
       }
+    })
+  )
+
+  ctx.waitUntil?.(
+    createAnalyticsEvent({
+      eventName: 'group_memberships_purged',
+      apiKey: ctx.POSTHOG_API_KEY,
+      distinctId: ctx.identityURN as IdentityURN,
     })
   )
 }

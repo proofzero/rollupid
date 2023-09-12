@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { Context } from '../../../context'
-import { InternalServerError, UnauthorizedError } from '@proofzero/errors'
+import { UnauthorizedError } from '@proofzero/errors'
 import {
   AccountURNInput,
   IdentityGroupURNValidator,
@@ -8,6 +8,7 @@ import {
 import { router } from '@proofzero/platform.core'
 import { EDGE_ACCOUNT } from '@proofzero/platform.account/src/constants'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const ConnectIdentityGroupEmailInputSchema = z.object({
   identityGroupURN: IdentityGroupURNValidator,
@@ -77,6 +78,18 @@ export const connectIdentityGroupEmail = async ({
     tag: EDGE_ACCOUNT,
     dst: accountURN,
   })
+
+  ctx.waitUntil?.(
+    createAnalyticsEvent({
+      eventName: 'group_email_connected',
+      apiKey: ctx.POSTHOG_API_KEY,
+      distinctId: identityGroupURN,
+      properties: {
+        $groups: { group: identityGroupURN },
+        connectedAccountURN: accountURN,
+      },
+    })
+  )
 
   return {
     existing: false,

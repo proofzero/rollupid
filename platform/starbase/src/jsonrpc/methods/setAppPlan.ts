@@ -8,6 +8,9 @@ import { ServicePlanType } from '@proofzero/types/billing'
 import { EDGE_PAYS_APP } from '@proofzero/types/graph'
 import { IdentityRefURNValidator } from '@proofzero/platform-middleware/inputValidators'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import { EDGE_APPLICATION } from '../../types'
+import { InternalServerError } from '@proofzero/errors'
+import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 
 export const SetAppPlanInput = AppClientIdParamSchema.extend({
   URN: IdentityRefURNValidator,
@@ -79,13 +82,30 @@ export const setAppPlan = async ({
     })
   )
 
+  const { edges: ownershipEdges } = await caller.edges.getEdges({
+    query: {
+      tag: EDGE_APPLICATION,
+      dst: { baseUrn: appURN },
+    },
+  })
+  if (ownershipEdges.length === 0) {
+    throw new InternalServerError({
+      message: 'App ownership edge not found',
+    })
+  }
+
   ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: `app_set_${plan}_plan`,
       apiKey: ctx.POSTHOG_API_KEY,
       distinctId: input.URN,
       properties: {
-        $groups: { app: clientId },
+        $groups: {
+          app: clientId,
+          group: IdentityGroupURNSpace.is(ownershipEdges[0].src.baseUrn)
+            ? ownershipEdges[0].src.baseUrn
+            : undefined,
+        },
       },
     })
   )

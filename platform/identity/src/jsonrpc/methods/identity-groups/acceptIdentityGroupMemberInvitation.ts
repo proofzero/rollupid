@@ -7,6 +7,7 @@ import { InternalServerError } from '@proofzero/errors'
 import { router } from '@proofzero/platform.core'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 import { IdentityURN } from '@proofzero/urns/identity'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const AcceptIdentityGroupMemberInvitationInputSchema = z.object({
   identityGroupURN: IdentityGroupURNValidator,
@@ -68,4 +69,15 @@ export const acceptIdentityGroupMemberInvitation = async ({
     tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
     dst: identityGroupURN,
   })
+
+  ctx.waitUntil?.(
+    createAnalyticsEvent({
+      eventName: 'group_invitation_accepted',
+      apiKey: ctx.POSTHOG_API_KEY,
+      distinctId: ctx.identityURN as IdentityURN,
+      properties: {
+        $groups: { group: identityGroupURN },
+      },
+    })
+  )
 }
