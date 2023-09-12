@@ -18,7 +18,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const groups = await coreClient.identity.listIdentityGroups.query()
     if (groups.length > 0) {
-      return redirect('/billing/spuorg')
+      return redirect('/billing/groups')
     }
 
     return redirect('/billing/personal')

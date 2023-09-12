@@ -278,7 +278,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         context.env
       )
 
-      return redirect(`/spuorg/${groupID}`, {
+      return redirect(`/groups/${groupID}`, {
         headers: {
           'Set-Cookie': await commitFlashSession(toastSession, context.env),
         },
@@ -293,7 +293,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         context.env
       )
 
-      return redirect(`/spuorg/${params.groupID}/apps/transfer`, {
+      return redirect(`/groups/${params.groupID}/apps/transfer`, {
         headers: {
           'Set-Cookie': await commitFlashSession(toastSession, context.env),
         },
@@ -359,7 +359,7 @@ export default () => {
         status,
         client_secret,
         payment_method,
-        redirectUrl: `/spuorg/${groupID}/apps/transfer/`,
+        redirectUrl: `/groups/${groupID}/apps/transfer/`,
         URN: groupURN,
       })
     }
@@ -373,11 +373,11 @@ export default () => {
             trail={[
               {
                 label: 'Groups',
-                href: '/spuorg',
+                href: '/groups',
               },
               {
                 label: group.name,
-                href: `/spuorg/${groupID}`,
+                href: `/groups/${groupID}`,
               },
               {
                 label: 'Transfer Application',
@@ -747,7 +747,7 @@ export default () => {
                 Please use the link below to add the information.
               </Text>
 
-              <Link to={`/billing/spuorg/${groupID}`}>
+              <Link to={`/billing/groups/${groupID}`}>
                 <Text size="sm" className="text-orange-600">
                   Add Billing Information →
                 </Text>

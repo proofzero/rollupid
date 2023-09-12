@@ -129,7 +129,7 @@ export default function CreateNewApp() {
 
                 <Text className="mt-4" size="sm">
                   Did you want to create this application within a group?{' '}
-                  <NavLink to="/spuorg" className="text-[#6366F1]">
+                  <NavLink to="/groups" className="text-[#6366F1]">
                     Go to Groups
                   </NavLink>
                 </Text>

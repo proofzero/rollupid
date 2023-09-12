@@ -71,7 +71,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         context.env
       )
 
-      return redirect(`/spuorg/${params.groupID}/apps/new`, {
+      return redirect(`/groups/${params.groupID}/apps/new`, {
         headers: {
           'Set-Cookie': await commitFlashSession(toastSession, context.env),
         },
@@ -91,11 +91,11 @@ export default () => {
             trail={[
               {
                 label: 'Groups',
-                href: '/spuorg',
+                href: '/groups',
               },
               {
                 label: group.name,
-                href: `/spuorg/${groupID}`,
+                href: `/groups/${groupID}`,
               },
               {
                 label: 'Create Application',
@@ -136,7 +136,7 @@ export default () => {
             Would you like to transfer an existing application <br />
             into this group?{' '}
             <Link
-              to={`/spuorg/${groupID}/apps/transfer`}
+              to={`/groups/${groupID}/apps/transfer`}
               className="text-[#6366F1]"
             >
               Go to transfer

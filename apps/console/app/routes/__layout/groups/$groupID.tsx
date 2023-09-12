@@ -19,7 +19,7 @@ import {
   useOutletContext,
 } from '@remix-run/react'
 import { requireJWT } from '~/utilities/session.server'
-import { GroupModel, GroupRootContextData } from '../spuorg'
+import { GroupModel, GroupRootContextData } from '../groups'
 import { useEffect, useMemo } from 'react'
 
 type InvitationModel = {
@@ -62,7 +62,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       accountType: invitation.accountType,
       invitationURL: [
         context.env.PASSPORT_URL,
-        'spuorg',
+        'groups',
         'enroll',
         params.groupID,
         invitation.invitationCode,
@@ -98,7 +98,7 @@ export default () => {
     // We want to redirect if group
     // is not found
     if (group === null) {
-      navigate('/spuorg')
+      navigate('/groups')
     }
   }, [group])
 

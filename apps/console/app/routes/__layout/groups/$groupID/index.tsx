@@ -138,7 +138,7 @@ const InviteMemberModal = ({
         {!inviteLinkFetcher.data && (
           <inviteLinkFetcher.Form
             method="post"
-            action={`/spuorg/${groupID}/invite`}
+            action={`/groups/${groupID}/invite`}
             className="flex flex-row gap-2"
           >
             <div className="grid grid-cols-5 relative">
@@ -247,7 +247,7 @@ const InviteMemberModal = ({
               label="Invite URL"
               value={[
                 passportURL,
-                'spuorg',
+                'groups',
                 'enroll',
                 groupID,
                 inviteLinkFetcher.data.inviteCode,
@@ -279,7 +279,7 @@ const InviteMemberModal = ({
                 navigator.clipboard.writeText(
                   [
                     passportURL,
-                    'spuorg',
+                    'groups',
                     'enroll',
                     groupID,
                     inviteLinkFetcher.data!.inviteCode,
@@ -331,7 +331,7 @@ const RemoveMemberModal = ({
 
         <Form
           method="post"
-          action={`/spuorg/${groupID}/kick`}
+          action={`/groups/${groupID}/kick`}
           onSubmit={() => {
             handleClose()
           }}
@@ -393,7 +393,7 @@ const RemoveInvitationModal = ({
 
         <Form
           method="post"
-          action={`/spuorg/${groupID}/uninvite`}
+          action={`/groups/${groupID}/uninvite`}
           onSubmit={() => {
             handleClose()
           }}
@@ -490,7 +490,7 @@ export default () => {
             trail={[
               {
                 label: 'Groups',
-                href: '/spuorg',
+                href: '/groups',
               },
               {
                 label: group.name,
@@ -523,14 +523,14 @@ export default () => {
           Icon={TbApps}
           title="Create Application"
           subtitle="Create new app for this group"
-          onClick={() => navigate(`/spuorg/${groupID}/apps/new`)}
+          onClick={() => navigate(`/groups/${groupID}/apps/new`)}
         />
 
         <ActionCard
           Icon={TbReceipt2}
           title="Group Billing & Invoicing"
           subtitle="Manage Billing and Entitlements"
-          onClick={() => navigate(`/billing/spuorg/${groupID}`)}
+          onClick={() => navigate(`/billing/groups/${groupID}`)}
         />
       </section>
 
@@ -612,7 +612,7 @@ export default () => {
                   No Applications
                 </Text>
 
-                <NavLink to={`/spuorg/${groupID}/apps/new`}>
+                <NavLink to={`/groups/${groupID}/apps/new`}>
                   <Button btnType="secondary-alt" className="mt-6">
                     Create an Application
                   </Button>

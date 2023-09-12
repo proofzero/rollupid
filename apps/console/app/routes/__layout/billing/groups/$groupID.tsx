@@ -80,7 +80,7 @@ export default () => {
         client_secret,
         payment_method,
         submit,
-        redirectUrl: `/billing/spuorg/${groupURN?.split('/')[1]}`,
+        redirectUrl: `/billing/groups/${groupURN?.split('/')[1]}`,
         updatePlanParams: {
           clientId,
           plan: ServicePlanType.PRO,
@@ -333,7 +333,7 @@ export default () => {
           apps={apps.filter((app) => app.groupID === groupURN?.split('/')[1])}
           fetcher={fetcher}
           hasUnpaidInvoices={Boolean(unpaidInvoiceURL)}
-          newAppURL={`/spuorg/${groupURN?.split('/')[1]}/apps/new`}
+          newAppURL={`/groups/${groupURN?.split('/')[1]}/apps/new`}
         />
       </section>
 

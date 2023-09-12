@@ -61,7 +61,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       )
     }
 
-    return redirect(`/spuorg/${groupID}`, {
+    return redirect(`/groups/${groupID}`, {
       headers: {
         'Set-Cookie': await commitFlashSession(toastSession, context.env),
       },
