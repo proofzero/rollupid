@@ -84,17 +84,18 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       params.groupID as string
     ) as IdentityGroupURN
 
-    const spd = await coreClient.billing.getStripePaymentData.query({
-      URN: groupURN,
-    })
+    const [spd, entitlements, connectedAccounts] = await Promise.all([
+      await coreClient.billing.getStripePaymentData.query({
+        URN: groupURN,
+      }),
+      await coreClient.billing.getEntitlements.query({
+        URN: groupURN,
+      }),
+      await coreClient.identity.getAccounts.query({
+        URN: groupURN,
+      }),
+    ])
 
-    const entitlements = await coreClient.billing.getEntitlements.query({
-      URN: groupURN,
-    })
-
-    const connectedAccounts = await coreClient.identity.getAccounts.query({
-      URN: groupURN,
-    })
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
     return json<GroupAppTransferLoaderData>({
@@ -242,7 +243,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             toastSession = await appendToastToFlashSession(
               request,
               {
-                message: `Payment failed - check your card details`,
+                message: `Payment failed - correct the failed transaction in Billing & Invoicing and retry application transfer`,
                 type: ToastType.Error,
               },
               context.env

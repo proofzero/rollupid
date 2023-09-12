@@ -8,6 +8,7 @@ import {
 } from '@proofzero/platform-middleware/inputValidators'
 import { BadRequestError } from '@proofzero/errors'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
+import { AccountURNSpace } from '@proofzero/urns/account'
 
 export const TransferAppToGroupInput = z.object({
   clientID: z.string(),
@@ -65,28 +66,36 @@ export const transferAppToGroup = async ({
     })
   )
 
-  const { edges: emailEdges } = await caller.edges.getEdges({
-    query: {
-      src: { baseUrn: appURN },
-      tag: EDGE_HAS_REFERENCE_TO,
-    },
-  })
-
   if (emailURN) {
+    // Get all edges of type has/refTo
+    // Which should target the app's team email
+    const { edges: emailEdges } = await caller.edges.getEdges({
+      query: {
+        src: { baseUrn: appURN },
+        tag: EDGE_HAS_REFERENCE_TO,
+      },
+    })
+
+    // Create a new edge using
+    // the new email as a destination
     await caller.edges.makeEdge({
       src: appURN,
       tag: EDGE_HAS_REFERENCE_TO,
       dst: emailURN,
     })
 
+    // Remove any previously linked team emails
+    // This should be a single edge
     await Promise.all(
-      emailEdges.map(async (edge) => {
-        await caller.edges.removeEdge({
-          src: edge.src.baseUrn,
-          tag: edge.tag,
-          dst: edge.dst.baseUrn,
+      emailEdges
+        .filter((edge) => AccountURNSpace.is(edge.dst.baseUrn))
+        .map(async (edge) => {
+          await caller.edges.removeEdge({
+            src: edge.src.baseUrn,
+            tag: edge.tag,
+            dst: edge.dst.baseUrn,
+          })
         })
-      })
     )
   }
 }
