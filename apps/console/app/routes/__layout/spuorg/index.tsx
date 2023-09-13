@@ -161,38 +161,39 @@ const GroupHasAppsModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={handleClose}>
       <div
-        className={`w-fit rounded-lg bg-white p-4 text-left transition-all sm:p-5 overflow-y-auto flex flex-col space-y-4`}
+        className={`w-fit rounded-lg bg-white p-4
+         text-left  transition-all sm:p-5 overflow-y-auto flex flex-row items-start space-x-4`}
       >
-        <section className="flex flex-row items-center justify-between w-full">
-          <Text size="lg" weight="medium" className="text-gray-900">
-            Delete Application
-          </Text>
-          <button
-            type="button"
-            className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+        <img src={dangerVector} alt="danger" />
+
+        <section className="flex flex-col space-y-4">
+          <div className="flex flex-row items-center justify-between w-full">
+            <Text size="lg" weight="medium" className="text-gray-900">
+              Group cannot be deleted
+            </Text>
+            <button
+              type="button"
+              className={`bg-white p-2 rounded-lg text-xl cursor-pointer
                       hover:bg-[#F3F4F6]`}
-            onClick={() => {
-              handleClose()
-            }}
-            tabIndex={-1}
-          >
-            <HiOutlineX />
-          </button>
-        </section>
+              onClick={handleClose}
+              tabIndex={-1}
+            >
+              <HiOutlineX />
+            </button>
+          </div>
 
-        <section className="flex flex-row items-center space-x-4">
-          <img src={dangerVector} alt="danger" />
+          <section>
+            <Text size="sm" weight="normal" className="text-gray-500 my-3">
+              The group owns one or more apps. <br /> Please delete or transfer
+              out those apps first if you want to remove the group.
+            </Text>
+          </section>
 
-          <Text size="sm">
-            This group owns one or more apps. <br />
-            Please delete those apps first if you want to remove the group.
-          </Text>
-        </section>
-
-        <section className="flex justify-end">
-          <Button btnType="primary-alt" onClick={handleClose}>
-            OK
-          </Button>
+          <div className="flex justify-end items-center space-x-3">
+            <Button btnType="secondary-alt" onClick={handleClose}>
+              Okay
+            </Button>
+          </div>
         </section>
       </div>
     </Modal>
