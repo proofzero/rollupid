@@ -27,6 +27,7 @@ type CustomDomainRequest = Request & {
 export function parseParams(request: Request) {
   const url = new URL(request.url)
   const clientId = url.searchParams.get('client_id') || ''
+  const responseType = url.searchParams.get('response_type') || ''
   const state = url.searchParams.get('state') || ''
   const redirectUri = url.searchParams.get('redirect_uri') || ''
   const scope = url.searchParams.get('scope')
@@ -44,6 +45,7 @@ export function parseParams(request: Request) {
 
   return {
     clientId,
+    responseType,
     state,
     redirectUri,
     scope: decodedScope ? decodedScope.split(' ') : [],

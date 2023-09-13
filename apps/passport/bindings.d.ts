@@ -55,6 +55,7 @@ declare global {
 
   interface AuthzParams {
     clientId: string
+    response_type: string
     redirectUri: string
     scope: string[]
     state: string

@@ -54,13 +54,15 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     params.clientId
   )
 
-  const { redirectUri, state, scope, clientId, prompt } = authzCookieParams
+  const { redirectUri, state, scope, clientId, prompt, responseType } =
+    authzCookieParams
 
   const qp = new URLSearchParams()
   qp.append('client_id', clientId)
   qp.append('redirect_uri', redirectUri)
   qp.append('state', state)
   qp.append('scope', scope.join(' '))
+  qp.append('response_type', responseType)
 
   if (prompt) qp.append('prompt', prompt)
 
