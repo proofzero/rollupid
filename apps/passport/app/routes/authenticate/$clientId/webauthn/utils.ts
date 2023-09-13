@@ -1,6 +1,6 @@
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { KeyPairSerialized } from '@proofzero/packages/types/application'
-import { JWK, SignJWT, importJWK, jwtVerify, errors } from 'jose'
+import { SignJWT, importJWK, jwtVerify, errors } from 'jose'
 
 export const createSignedWebauthnChallenge = async (
   keyPairJSON: KeyPairSerialized
@@ -34,4 +34,10 @@ export const verifySignedWebauthnChallenge = async (
         message: 'Could not authenticate your request. Please try again.',
       })
   }
+}
+
+export const webauthnConstants = {
+  challengeSize: 200,
+  timeout: 60,
+  cryptoAlgsArray: [-7, -8, -257],
 }

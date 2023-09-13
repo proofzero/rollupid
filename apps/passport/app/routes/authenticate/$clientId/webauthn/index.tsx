@@ -32,6 +32,7 @@ import { WrappedSVG as WebauthnNewKeyIcon } from './WebauthnNewKeyIcon'
 import {
   verifySignedWebauthnChallenge,
   createSignedWebauthnChallenge,
+  webauthnConstants,
 } from './utils'
 import { KeyPairSerialized } from '@proofzero/packages/types/application'
 
@@ -89,12 +90,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const passportUrl = new URL(request.url)
     const f2l = new Fido2Lib({
-      timeout: 42,
+      timeout: webauthnConstants.timeout,
       rpId: passportUrl.hostname,
       rpName: 'Rollup ID',
-      challengeSize: 200,
+      challengeSize: webauthnConstants.challengeSize,
       attestation: 'none',
-      cryptoParams: [-7, -257],
+      cryptoParams: webauthnConstants.cryptoAlgsArray,
       authenticatorAttachment: 'cross-platform',
       authenticatorRequireResidentKey: false,
       authenticatorUserVerification: 'required',
@@ -181,6 +182,7 @@ export default () => {
   const submit = useSubmit()
 
   const [loginRequested, setLoginRequested] = useState(false)
+  const webauthnSupported = !!window.PublicKeyCredential
 
   useEffect(() => {
     const webauthnLogin = async () => {
@@ -260,10 +262,21 @@ export default () => {
             Connect with Passkey
           </Text>
         </section>
+        {!webauthnSupported && (
+          <section><Text
+            size="sm"
+            weight="medium"
+            className="text-red-500 mt-4 mb-2 text-center"
+          >
+            Your browser does not support Passkeys. Please change your security settings or try another browser.
+          </Text></section>
+
+        )}
+
         <section>
           <div className="flex-1 w-full flex flex-col gap-4 relative">
             <AuthButton
-              disabled={loginRequested}
+              disabled={loginRequested || !webauthnSupported}
               Graphic={
                 <TbFingerprint className="w-full h-full dark:text-white"></TbFingerprint>
               }
@@ -273,6 +286,7 @@ export default () => {
               text="Use existing Passkey"
             />
             <AuthButton
+              disabled={!webauthnSupported}
               Graphic={WebauthnNewKeyIcon}
               onClick={() => navigate('register')}
               text="Add new Passkey"
