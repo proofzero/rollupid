@@ -161,15 +161,39 @@ const GroupHasAppsModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={handleClose}>
       <div
-        className={`w-fit rounded-lg bg-white p-4
-     text-left transition-all sm:p-5 overflow-y-auto flex flex-row items-center space-x-4`}
+        className={`w-fit rounded-lg bg-white p-4 text-left transition-all sm:p-5 overflow-y-auto flex flex-col space-y-4`}
       >
-        <img src={dangerVector} alt="danger" />
+        <section className="flex flex-row items-center justify-between w-full">
+          <Text size="lg" weight="medium" className="text-gray-900">
+            Delete Application
+          </Text>
+          <button
+            type="button"
+            className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+            onClick={() => {
+              handleClose()
+            }}
+            tabIndex={-1}
+          >
+            <HiOutlineX />
+          </button>
+        </section>
 
-        <Text size="sm">
-          This group owns one or more apps. Please delete those apps first if
-          you want to remove the group.
-        </Text>
+        <section className="flex flex-row items-center space-x-4">
+          <img src={dangerVector} alt="danger" />
+
+          <Text size="sm">
+            This group owns one or more apps. <br />
+            Please delete those apps first if you want to remove the group.
+          </Text>
+        </section>
+
+        <section className="flex justify-end">
+          <Button btnType="primary-alt" onClick={handleClose}>
+            OK
+          </Button>
+        </section>
       </div>
     </Modal>
   )
