@@ -5,7 +5,8 @@ import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 import { Context } from '../../../context'
 import { IdentityGroupURNValidator } from '@proofzero/platform-middleware/inputValidators'
 import { initIdentityGroupNodeByName } from '../../../nodes'
-import { BadRequestError, InternalServerError } from '@proofzero/errors'
+import { BadRequestError } from '@proofzero/errors'
+import { EDGE_APPLICATION } from '@proofzero/platform.starbase/src/types'
 
 export const DeleteIdentityGroupInputSchema = IdentityGroupURNValidator
 type DeleteIdentityGroupInput = z.infer<typeof DeleteIdentityGroupInputSchema>
@@ -34,6 +35,21 @@ export const deleteIdentityGroup = async ({
   if (!ownEdge) {
     throw new BadRequestError({
       message: 'Caller is not part of identity group',
+    })
+  }
+
+  const { edges: appEdges } = await caller.edges.getEdges({
+    query: {
+      src: {
+        baseUrn: identityGroupURN,
+      },
+      tag: EDGE_APPLICATION,
+    },
+  })
+  if (appEdges.length > 0) {
+    throw new BadRequestError({
+      message: `This group owns one or more apps. Please delete those apps first if
+      you want to remove the group.`,
     })
   }
 
