@@ -10,6 +10,7 @@ import {
   PaymentData,
   Seats,
 } from '@proofzero/types/billing'
+import { IdentityURN } from '@proofzero/urns/identity'
 import { DOProxy } from 'do-proxy'
 
 export type InviteMemberInput = {
@@ -179,5 +180,17 @@ export default class IdentityGroup extends DOProxy {
 
   async getSeats(): Promise<Seats | undefined> {
     return this.state.storage.get<Seats>('seats')
+  }
+
+  async getOrderedMembers(): Promise<IdentityURN[]> {
+    const orderedMembers = await this.state.storage.get<IdentityURN[]>(
+      'orderedMembers'
+    )
+
+    return orderedMembers || []
+  }
+
+  async setOrderedMembers(members: IdentityURN[]): Promise<void> {
+    await this.state.storage.put('orderedMembers', members)
   }
 }
