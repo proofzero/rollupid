@@ -257,7 +257,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const sub = await createOrUpdateSubscription({
       customerID,
-      SECRET_STRIPE_PRO_PLAN_ID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
+      planID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
       SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
       quantity,
       subscriptionID: entitlements.subscriptionID,
