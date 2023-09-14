@@ -2,11 +2,14 @@ import {
   Form,
   Link,
   NavLink,
+  useActionData,
   useFetcher,
+  useLoaderData,
   useNavigate,
   useOutletContext,
+  useSubmit,
 } from '@remix-run/react'
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import {
   CryptoAccountType,
   EmailAccountType,
@@ -37,12 +40,24 @@ import {
 } from '@heroicons/react/20/solid'
 import { InviteRes } from './invite'
 import { ReadOnlyInput } from '@proofzero/design-system/src/atoms/form/ReadOnlyInput'
-import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
+import {
+  ToastType,
+  Toaster,
+  toast,
+} from '@proofzero/design-system/src/atoms/toast'
 import { IdentityURN } from '@proofzero/urns/identity'
 import dangerVector from '~/images/danger.svg'
 import { ApplicationListItemPublishedState } from '~/components/Applications/ApplicationListItem'
 import { ServicePlanType } from '@proofzero/types/billing'
 import { GroupDetailsContextData } from '../$groupID'
+import { PurchaseGroupSeatingModal } from '~/components/Billing/seating'
+import {
+  LoaderData,
+  TxTarget,
+  action as billingAction,
+  loader as billingLoader,
+} from '../../billing/ops'
+import { process3DSecureCard } from '~/utils/billing'
 
 const accountTypes = [
   ...Object.values(EmailAccountType),
@@ -434,10 +449,23 @@ const RemoveInvitationModal = ({
     </Modal>
   )
 }
+export const loader = billingLoader
+export const action = billingAction
 
 export default () => {
-  const { apps, group, groupID, PASSPORT_URL, identityURN, invitations } =
-    useOutletContext<GroupDetailsContextData>()
+  const {
+    apps,
+    group,
+    groupID,
+    groupURN,
+    PASSPORT_URL,
+    identityURN,
+    invitations,
+  } = useOutletContext<GroupDetailsContextData>()
+
+  const { STRIPE_PUBLISHABLE_KEY, toastNotification, paymentData, groupSeats } =
+    useLoaderData<LoaderData>()
+  const actionData = useActionData()
 
   const [inviteModalOpen, setInviteModalOpen] = useState(false)
 
@@ -450,12 +478,47 @@ export default () => {
   const [removeInvitationModalOpen, setRemoveInvitationModalOpen] =
     useState(false)
 
+  const [purchaseGroupSeatingModalOpen, setPurchaseGroupSeatingModalOpen] =
+    useState(false)
+
   const groupApps = apps.filter((a) => a.groupID === groupID)
 
   const navigate = useNavigate()
+  const submit = useSubmit()
+
+  const fetcher = useFetcher()
+  useEffect(() => {
+    // Checking status for 3DS payment authentication
+    if (actionData?.status || fetcher.data?.status) {
+      const { status, client_secret, payment_method, subId } = actionData
+        ? actionData
+        : fetcher.data
+
+      process3DSecureCard({
+        STRIPE_PUBLISHABLE_KEY,
+        status,
+        subId,
+        client_secret,
+        payment_method,
+        submit,
+        redirectUrl: `/spuorg/${groupID}`,
+        URN: groupURN,
+      })
+    }
+  }, [actionData, fetcher.data])
+
+  useEffect(() => {
+    if (toastNotification) {
+      toast(toastNotification.type, {
+        message: toastNotification.message,
+      })
+    }
+  }, [toastNotification])
 
   return (
     <>
+      <Toaster position="top-right" reverseOrder={false} />
+
       <InviteMemberModal
         groupID={groupID}
         isOpen={inviteModalOpen}
@@ -483,6 +546,27 @@ export default () => {
           userAlias={selectedMemberAlias}
         />
       )}
+      <PurchaseGroupSeatingModal
+        groupID={groupID}
+        isOpen={purchaseGroupSeatingModalOpen}
+        setIsOpen={setPurchaseGroupSeatingModalOpen}
+        paymentIsSetup={Boolean(paymentData?.paymentMethodID)}
+        purchaseFn={(quantity) => {
+          submit(
+            {
+              payload: JSON.stringify({
+                quantity: groupSeats.total + quantity,
+                customerID: paymentData?.customerID,
+                txType: 'buy',
+                txTarget: TxTarget.GroupSeats,
+              }),
+            },
+            {
+              method: 'post',
+            }
+          )
+        }}
+      />
 
       {group && (
         <section className="-mt-4">
@@ -695,6 +779,20 @@ export default () => {
                 </Text>
               </Pill>
             </div>
+
+            <section className="flex flex-row justify-between items-center">
+              <div className="flex flex-row items-center">
+                <Text>Unassigned User Seats:</Text>
+                <Text>Total {groupSeats.total}</Text>
+                <Text>Free {3 - Math.min(3, group.members.length)}</Text>
+                <Text>Purchased {groupSeats.total - groupSeats.used}</Text>
+              </div>
+              <div>
+                <Button onClick={() => setPurchaseGroupSeatingModalOpen(true)}>
+                  Add seats
+                </Button>
+              </div>
+            </section>
 
             <div>
               <List
