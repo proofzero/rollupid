@@ -76,7 +76,6 @@ export default () => {
         ? actionData
         : fetcher.data
 
-      let clientId = fetcher.data?.clientId
       process3DSecureCard({
         STRIPE_PUBLISHABLE_KEY,
         status,
@@ -85,10 +84,6 @@ export default () => {
         payment_method,
         submit,
         redirectUrl: `/billing/groups/${groupURN?.split('/')[1]}`,
-        updatePlanParams: {
-          clientId,
-          plan: ServicePlanType.PRO,
-        },
         URN: groupURN,
       })
     }
