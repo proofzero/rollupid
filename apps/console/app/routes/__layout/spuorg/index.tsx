@@ -385,7 +385,12 @@ export default () => {
                               className="py-2 px-4 flex items-center space-x-3 cursor-pointer
                   hover:rounded-[6px] hover:bg-gray-100"
                               onClick={() => {
-                                if (groupAppRefs.current.length > 0) {
+                                if (
+                                  groupAppRefs.current.filter(
+                                    (ga) =>
+                                      ga.groupID === item.val.URN.split('/')[1]
+                                  ).length > 0
+                                ) {
                                   setGroupHasAppsModalOpen(true)
                                 } else {
                                   setSelectedGroup(item.val)
