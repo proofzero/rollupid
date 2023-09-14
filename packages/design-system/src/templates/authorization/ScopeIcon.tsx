@@ -57,7 +57,6 @@ const smartContractsSVG = (
   </svg>
 )
 
-
 // eslint-disable-next-line react/display-name
 export default ({ scope }: { scope: string }) => {
   let svg
@@ -73,7 +72,7 @@ export default ({ scope }: { scope: string }) => {
       break
   }
   return (
-    <div className="w-[38px] h-[38px] rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-200 flex justify-center items-center">
+    <div className="w-[38px] h-[38px] rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-200 flex justify-center items-center flex-shrink-0">
       {svg}
     </div>
   )

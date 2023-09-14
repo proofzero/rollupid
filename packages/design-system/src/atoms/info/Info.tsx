@@ -12,13 +12,15 @@ export default function Info({
   placement?: 'top' | 'bottom' | 'left' | 'right'
 }) {
   return (
-    <Tooltip
-      arrow={false}
-      content={description}
-      className="bg-white text-black dark:text-white shadow absolute z-5 w-max"
-      placement={placement}
-    >
-      <img src={iIcon} alt={`${name} info`} />
-    </Tooltip>
+    <div className="w-fit flex-shrink-0">
+      <Tooltip
+        arrow={false}
+        content={description}
+        className="bg-white text-black dark:text-white shadow absolute z-5 w-max"
+        placement={placement}
+      >
+        <img src={iIcon} alt={`${name} info`} />
+      </Tooltip>
+    </div>
   )
 }
