@@ -23,9 +23,11 @@ import subtractLogo from '~/assets/subtract-logo.svg'
 import {
   createSignedWebauthnChallenge,
   verifySignedWebauthnChallenge,
+  webauthnConstants
 } from './utils'
 import { BadRequestError } from '@proofzero/errors'
 import { KeyPairSerialized } from '@proofzero/packages/types/application'
+import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
 
 type RegistrationPayload = {
   nickname: string
@@ -40,12 +42,12 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const passportUrl = new URL(request.url)
 
     const f2l = new Fido2Lib({
-      timeout: 42,
+      timeout: webauthnConstants.timeout,
       rpId: passportUrl.hostname,
       rpName: 'Rollup ID',
-      challengeSize: 64,
+      challengeSize: webauthnConstants.challengeSize,
       attestation: 'none',
-      cryptoParams: [-7, -257],
+      cryptoParams: webauthnConstants.cryptoAlgsArray,
       authenticatorRequireResidentKey: false,
       authenticatorUserVerification: 'required',
     })
@@ -74,7 +76,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     if (
       !registrationPayload.nickname ||
-      (registrationPayload.nickname?.length < 4)
+      registrationPayload.nickname?.length < 4
     )
       throw new BadRequestError({
         message: 'Name of key is required to be 4 or more characters',
@@ -99,7 +101,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       timeout: 42,
       rpId: passportUrl.hostname,
       rpName: 'Rollup ID',
-      challengeSize: 64,
+      challengeSize: 200,
       attestation: 'none',
       cryptoParams: [-7, -257],
       authenticatorRequireResidentKey: false,
@@ -181,6 +183,8 @@ export default () => {
   const [requestedRegistration, setRequestedRegistration] = useState(false)
   const [keyName, setKeyName] = useState('')
 
+  const webauthnSupported = !!window.PublicKeyCredential
+
   const randomBuffer = new Uint8Array(32)
   crypto.getRandomValues(randomBuffer)
   const registerKey = async (name: string) => {
@@ -189,9 +193,20 @@ export default () => {
       name,
       displayName: name,
     }
-    let credential = await navigator.credentials.create({
-      publicKey: registrationOptions,
-    })
+    let credential
+    try {
+      credential = await navigator.credentials.create({
+        publicKey: registrationOptions,
+      })
+    } catch (e) {
+      console.error("Passkey registration error", JSON.stringify(e, null, 2))
+      if (e instanceof DOMException && e.name === 'NotAllowedError') {
+        toast(ToastType.Error, {
+          message:
+            'Your browser did not allow creation of the credential. You may need to try again or switch to another browser.',
+        })
+      }
+    }
     if (
       credential instanceof PublicKeyCredential &&
       credential.response instanceof AuthenticatorAttestationResponse
@@ -252,10 +267,23 @@ export default () => {
             Connect with Passkey
           </Text>
         </section>
+        {!webauthnSupported && (
+          <section>
+            <Text
+              size="sm"
+              weight="medium"
+              className="text-red-500 mt-4 mb-2 text-center"
+            >
+              Your browser does not support Passkeys. Please change your
+              security settings or try another browser.
+            </Text>
+          </section>
+        )}
         <section className="flex-1">
           <Input
             type="text"
             id="webauthn_nickname"
+            disabled={!webauthnSupported}
             label="Name your Passkey"
             className="h-12 rounded-lg"
             onChange={(e) => setKeyName(e.target.value)}
@@ -276,7 +304,7 @@ export default () => {
               setRequestedRegistration(true)
             }}
             className="w-full mt-4"
-            disabled={keyName.length < 4}
+            disabled={!webauthnSupported || keyName.length < 4}
           >
             Create new Passkey
           </Button>
