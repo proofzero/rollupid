@@ -2,6 +2,10 @@ import { InternalServerError } from '@proofzero/errors'
 import { type CoreClientType } from '@proofzero/platform-clients/core'
 import { type ReconcileAppsSubscriptionsOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/reconcileAppSubscriptions'
 import { ServicePlanType } from '@proofzero/types/billing'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 import { redirect } from '@remix-run/cloudflare'
 import { type Env } from 'bindings'
@@ -265,12 +269,12 @@ export const reconcileAppSubscriptions = async (
     subscription: subscriptionID,
   })
 
-  const planQuantities = subItems.data
+  const mappedSubItems = subItems.data
     .map((si) => ({
       priceID: si.price.id,
       quantity: si.quantity,
     }))
-    .filter((pq) => pq.quantity != null)
+    .filter((pq) => Boolean(pq.quantity))
 
   const priceIdToPlanTypeDict = {
     [env.SECRET_STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
@@ -281,7 +285,11 @@ export const reconcileAppSubscriptions = async (
       URN,
     })
 
-  let reconciliations: ReconcileAppsSubscriptionsOutput = []
+  const planQuantities = mappedSubItems.filter((msu) =>
+    Boolean(priceIdToPlanTypeDict[msu.priceID])
+  )
+
+  let reconciledPlans: ReconcileAppsSubscriptionsOutput = []
   for (const pq of planQuantities) {
     const planReconciliations =
       await coreClient.starbase.reconcileAppSubscriptions.mutate({
@@ -290,7 +298,7 @@ export const reconcileAppSubscriptions = async (
         plan: priceIdToPlanTypeDict[pq.priceID],
       })
 
-    reconciliations = reconciliations.concat(planReconciliations)
+    reconciledPlans = reconciledPlans.concat(planReconciliations)
 
     await coreClient.billing.updateEntitlements.mutate({
       URN: URN,
@@ -300,9 +308,9 @@ export const reconcileAppSubscriptions = async (
     })
   }
 
-  if (reconciliations.length > 0) {
+  if (reconciledPlans.length > 0) {
     await Promise.all(
-      reconciliations
+      reconciledPlans
         .filter((r) => r.customDomain)
         .map(async (app) => {
           try {
@@ -319,9 +327,9 @@ export const reconcileAppSubscriptions = async (
 
     await coreClient.account.sendReconciliationNotification.query({
       planType: plans[ServicePlanType.PRO].title, // Only pro for now
-      count: reconciliations.length,
+      count: reconciledPlans.length,
       billingEmail,
-      apps: reconciliations.map((app) => ({
+      apps: reconciledPlans.map((app) => ({
         appName: app.appName,
         devEmail: app.devEmail,
         plan: app.plan,
@@ -329,5 +337,26 @@ export const reconcileAppSubscriptions = async (
       billingURL,
       settingsURL,
     })
+  }
+
+  if (IdentityGroupURNSpace.is(URN)) {
+    const seatQuantities = mappedSubItems.find(
+      (msu) => !Boolean(priceIdToPlanTypeDict[msu.priceID])
+    )
+    if (seatQuantities) {
+      const { quantity: stripeSeatQuantity } = seatQuantities
+      const { quantity: currentSeatQuantity } =
+        await coreClient.billing.getIdentityGroupSeats.query({
+          URN: URN as IdentityGroupURN,
+        })
+
+      if (currentSeatQuantity !== stripeSeatQuantity!) {
+        await coreClient.billing.updateIdentityGroupSeats.mutate({
+          URN: URN as IdentityGroupURN,
+          subscriptionID: subscriptionID,
+          quantity: stripeSeatQuantity!,
+        })
+      }
+    }
   }
 }
