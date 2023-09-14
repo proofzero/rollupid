@@ -25,6 +25,15 @@ import {
   GetEntitlementsOutputSchema,
   getEntitlements,
 } from './methods/getEntitlements'
+import {
+  GetIdentityGroupSeatsInputSchema,
+  GetIdentityGroupSeatsOutputSchema,
+  getIdentityGroupSeats,
+} from './methods/getIdentityGroupSeats'
+import {
+  UpdateIdentityGroupSeatsInputSchema,
+  updateIdentityGroupSeats,
+} from './methods/updateIdentityGroupSeats'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -56,4 +65,15 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(CancelServicePlansInput)
     .mutation(cancelServicePlans),
+  getIdentityGroupSeats: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetIdentityGroupSeatsInputSchema)
+    .output(GetIdentityGroupSeatsOutputSchema)
+    .query(getIdentityGroupSeats),
+  updateIdentityGroupSeats: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(UpdateIdentityGroupSeatsInputSchema)
+    .mutation(updateIdentityGroupSeats),
 })

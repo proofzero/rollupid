@@ -8,6 +8,7 @@ import {
   ServicePlans,
   ServicePlanType,
   PaymentData,
+  Seats,
 } from '@proofzero/types/billing'
 import { DOProxy } from 'do-proxy'
 
@@ -154,5 +155,29 @@ export default class IdentityGroup extends DOProxy {
     )
 
     await this.state.storage.put('invitations', validInvitations)
+  }
+
+  async updateSeats(quantity: number, subscriptionID: string): Promise<void> {
+    let seats = await this.state.storage.get<Seats>('seats')
+    if (!seats) {
+      seats = {
+        subscriptionID,
+        quantity,
+      }
+    } else {
+      if (seats.subscriptionID !== subscriptionID) {
+        throw new RollupError({
+          message: 'Subscription ID mismatch',
+        })
+      }
+
+      seats.quantity = quantity
+    }
+
+    await this.state.storage.put('seats', seats)
+  }
+
+  async getSeats(): Promise<Seats | undefined> {
+    return this.state.storage.get<Seats>('seats')
   }
 }

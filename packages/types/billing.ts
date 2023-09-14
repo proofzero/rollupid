@@ -14,6 +14,11 @@ export type ServicePlans = {
   }>
 }
 
+export type Seats = {
+  subscriptionID: string
+  quantity: number
+}
+
 export type PaymentData = {
   customerID: string
   email: string
