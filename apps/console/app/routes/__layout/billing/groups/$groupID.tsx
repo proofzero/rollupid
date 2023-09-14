@@ -56,6 +56,7 @@ export default () => {
     invoices,
     groupURN,
     unpaidInvoiceURL,
+    groupSeats,
   } = loaderData
 
   const { PASSPORT_URL, groups, apps } = useOutletContext<{
@@ -342,8 +343,9 @@ export default () => {
         {featureFlags['seats'] && groupURN && (
           <GroupSeatingCard
             groupID={groupURN.split('/')[1]}
-            seatsTotal={3}
-            seatsUsed={2}
+            paymentData={paymentData}
+            seatsTotal={groupSeats.total}
+            seatsUsed={groupSeats.used}
             purchaseFn={() => {}}
           />
         )}

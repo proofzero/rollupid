@@ -50,6 +50,10 @@ export type LoaderData = {
   invoices: StripeInvoice[]
   groupURN?: IdentityGroupURN
   unpaidInvoiceURL?: string
+  groupSeats: {
+    total: number
+    used: number
+  }
 }
 
 export const loader = getRollupReqFunctionErrorWrapper(
@@ -72,6 +76,10 @@ export const loader = getRollupReqFunctionErrorWrapper(
       ) as IdentityGroupURN
     }
 
+    const groupSeats = {
+      total: 0,
+      used: 0,
+    }
     const targetURN: IdentityRefURN = groupURN ?? identityURN
     if (IdentityGroupURNSpace.is(targetURN)) {
       const authorized =
@@ -87,6 +95,21 @@ export const loader = getRollupReqFunctionErrorWrapper(
       }
 
       groupURN = targetURN as IdentityGroupURN
+
+      const groups = await coreClient.identity.listIdentityGroups.query()
+      const targetGroup = groups.find((g) => g.URN === groupURN!)
+
+      const seatQuery = await coreClient.billing.getIdentityGroupSeats.query({
+        URN: groupURN,
+      })
+      const groupMemberCount = Math.max(
+        (targetGroup?.members.length ?? 0) - 3,
+        0
+      )
+      const seats = seatQuery?.quantity ?? 0
+
+      groupSeats.total = seats
+      groupSeats.used = groupMemberCount
     }
 
     const { plans } = await coreClient.billing.getEntitlements.query({
@@ -158,6 +181,7 @@ export const loader = getRollupReqFunctionErrorWrapper(
         toastNotification,
         groupURN,
         unpaidInvoiceURL,
+        groupSeats,
       },
       {
         headers: {
