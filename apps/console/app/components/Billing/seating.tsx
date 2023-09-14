@@ -221,83 +221,87 @@ export const GroupSeatingCard = ({
           </div>
         </header>
         <div className="w-full border-b border-gray-200"></div>
-        <main>
-          <div className="p-4">
-            <div className="flex flex-row items-center gap-6">
-              <div className="flex-1">
-                <Text size="sm" weight="medium" className="text-gray-900">
-                  Entitlements
-                </Text>
-
-                <div className="flex-1 bg-gray-200 rounded-full h-2.5 my-2">
-                  <div
-                    className="bg-blue-600 h-2.5 rounded-full"
-                    style={{
-                      width: `${(seatsUsed / seatsTotal) * 100}%`,
-                    }}
-                  ></div>
-                </div>
-
-                <div className="flex flex-row items-center">
+        {seatsTotal > 0 && (
+          <>
+            <main>
+              <div className="p-4">
+                <div className="flex flex-row items-center gap-6">
                   <div className="flex-1">
-                    <Link to={`/spuorg/${groupID}`}>
-                      <button
-                        type="button"
-                        className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b-lg disabled:text-indigo-300"
-                      >
-                        <Text size="sm" weight="medium">
-                          Manage Seat Assignments
-                        </Text>
-                      </button>
-                    </Link>
+                    <Text size="sm" weight="medium" className="text-gray-900">
+                      Additional Seats
+                    </Text>
+
+                    <div className="flex-1 bg-gray-200 rounded-full h-2.5 my-2">
+                      <div
+                        className="bg-blue-600 h-2.5 rounded-full"
+                        style={{
+                          width: `${(seatsUsed / seatsTotal) * 100}%`,
+                        }}
+                      ></div>
+                    </div>
+
+                    <div className="flex flex-row items-center">
+                      <div className="flex-1">
+                        <Link to={`/spuorg/${groupID}`}>
+                          <button
+                            type="button"
+                            className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b-lg disabled:text-indigo-300"
+                          >
+                            <Text size="sm" weight="medium">
+                              Manage Seat Assignments
+                            </Text>
+                          </button>
+                        </Link>
+                      </div>
+                      <Text size="sm" weight="medium" className="text-gray-500">
+                        {`${seatsUsed} out of ${seatsTotal} Additional Seats used`}
+                      </Text>
+                    </div>
                   </div>
-                  <Text size="sm" weight="medium" className="text-gray-500">
-                    {`${seatsUsed} out of ${seatsTotal} Additional Seats used`}
-                  </Text>
+
+                  <div className="flex flex-row items-center gap-2">
+                    <Text size="lg" weight="semibold" className="text-gray-900">
+                      {seatingCost * seatsTotal}
+                    </Text>
+                    <Text size="sm" className="text-gray-500">
+                      per month
+                    </Text>
+                  </div>
                 </div>
               </div>
+            </main>
+            <footer>
+              {seatsTotal === 0 && (
+                <div className="bg-gray-50 rounded-b-lg py-4 px-6">
+                  <button
+                    type="button"
+                    className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b-lg disabled:text-indigo-300"
+                    onClick={() => setIsPurchaseModalOpen(true)}
+                  >
+                    <HiOutlineShoppingCart className="w-3.5 h-3.5" />
+                    <Text size="sm" weight="medium">
+                      Purchase Seats
+                    </Text>
+                  </button>
+                </div>
+              )}
 
-              <div className="flex flex-row items-center gap-2">
-                <Text size="lg" weight="semibold" className="text-gray-900">
-                  {seatingCost * seatsTotal}
-                </Text>
-                <Text size="sm" className="text-gray-500">
-                  per month
-                </Text>
-              </div>
-            </div>
-          </div>
-        </main>
-        <footer>
-          {seatsTotal === 0 && (
-            <div className="bg-gray-50 rounded-b-lg py-4 px-6">
-              <button
-                type="button"
-                className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b-lg disabled:text-indigo-300"
-                onClick={() => setIsPurchaseModalOpen(true)}
-              >
-                <HiOutlineShoppingCart className="w-3.5 h-3.5" />
-                <Text size="sm" weight="medium">
-                  Purchase Seats
-                </Text>
-              </button>
-            </div>
-          )}
-
-          {seatsUsed < seatsTotal && (
-            <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer bg-gray-50 rounded-b-lg py-4 px-6">
-              <button
-                type="button"
-                className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b-lg disabled:text-indigo-300"
-              >
-                <FaTrash className="w-3.5 h-3.5" />
-                <Text size="sm" weight="medium">
-                  Remove Unused Seats
-                </Text>
-              </button>
-            </div>
-          )}
-        </footer>
+              {seatsUsed < seatsTotal && (
+                <div className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer bg-gray-50 rounded-b-lg py-4 px-6">
+                  <button
+                    type="button"
+                    className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b-lg disabled:text-indigo-300"
+                  >
+                    <FaTrash className="w-3.5 h-3.5" />
+                    <Text size="sm" weight="medium">
+                      Remove Unused Seats
+                    </Text>
+                  </button>
+                </div>
+              )}
+            </footer>
+          </>
+        )}
       </article>
     </>
   )
