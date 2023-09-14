@@ -22,13 +22,15 @@ export const PurchaseGroupSeatingModal = ({
   setIsOpen,
   groupID,
   paymentIsSetup,
+  purchaseFn,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   groupID: string
   paymentIsSetup: boolean
+  purchaseFn: (quantity: number) => void
 }) => {
-  const [seatCountDelta, setSeaCountDelta] = useState(1)
+  const [seatCountDelta, setSeatCountDelta] = useState(1)
 
   return (
     <Modal isOpen={isOpen} handleClose={() => setIsOpen(false)}>
@@ -113,7 +115,7 @@ export const PurchaseGroupSeatingModal = ({
                 border-gray-300 bg-gray-50 rounded-l-lg px-4"
                 disabled={seatCountDelta <= 1}
                 onClick={() => {
-                  setSeaCountDelta((prev) => prev - 1)
+                  setSeatCountDelta((prev) => prev - 1)
                 }}
               >
                 <HiMinus />
@@ -130,7 +132,7 @@ export const PurchaseGroupSeatingModal = ({
                 type="button"
                 className="flex justify-center items-center border border-gray-300 bg-gray-50 rounded-r-lg px-4"
                 onClick={() => {
-                  setSeaCountDelta((prev) => prev + 1)
+                  setSeatCountDelta((prev) => prev + 1)
                 }}
               >
                 <HiPlus />
@@ -159,7 +161,16 @@ export const PurchaseGroupSeatingModal = ({
         <div className="flex-1"></div>
 
         <section className="flex flex-row-reverse gap-4 m-5 mt-auto">
-          <Button btnType="primary-alt">Purchase</Button>
+          <Button
+            btnType="primary-alt"
+            onClick={() => {
+              setIsOpen(false)
+              setSeatCountDelta(1)
+              purchaseFn(seatCountDelta)
+            }}
+          >
+            Purchase
+          </Button>
           <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
             Cancel
           </Button>
@@ -174,11 +185,13 @@ export const GroupSeatingCard = ({
   seatsTotal,
   seatsUsed,
   paymentData,
+  purchaseFn,
 }: {
   groupID: string
   seatsTotal: number
   seatsUsed: number
   paymentData?: PaymentData
+  purchaseFn: (quantity: number) => void
 }) => {
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false)
 
@@ -189,6 +202,7 @@ export const GroupSeatingCard = ({
         setIsOpen={setIsPurchaseModalOpen}
         groupID={groupID}
         paymentIsSetup={Boolean(paymentData?.paymentMethodID)}
+        purchaseFn={purchaseFn}
       />
 
       <article className="bg-white rounded-lg border">
