@@ -33,6 +33,7 @@ import {
   LoaderData,
   loader as billingLoader,
   action as billingAction,
+  TxTarget,
 } from '../ops'
 import Breadcrumbs from '@proofzero/design-system/src/atoms/breadcrumbs/Breadcrumbs'
 import { ListIdentityGroupsOutput } from '@proofzero/platform/identity/src/jsonrpc/methods/identity-groups/listIdentityGroups'
@@ -346,7 +347,21 @@ export default () => {
             paymentData={paymentData}
             seatsTotal={groupSeats.total}
             seatsUsed={groupSeats.used}
-            purchaseFn={() => {}}
+            purchaseFn={(quantity) => {
+              submit(
+                {
+                  payload: JSON.stringify({
+                    quantity: groupSeats.total + quantity,
+                    customerID: paymentData?.customerID,
+                    txType: 'buy',
+                    txTarget: TxTarget.GroupSeats,
+                  }),
+                },
+                {
+                  method: 'post',
+                }
+              )
+            }}
           />
         )}
       </section>

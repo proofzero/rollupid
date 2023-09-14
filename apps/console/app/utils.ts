@@ -7,6 +7,7 @@ import { useMatches } from '@remix-run/react'
 import { useMemo } from 'react'
 import { type StripeInvoice } from './utils/billing'
 import type Stripe from 'stripe'
+import { TxTarget } from './routes/__layout/billing/ops'
 
 const DEFAULT_REDIRECT = '/'
 
@@ -58,9 +59,11 @@ export function useMatchesData(
 export const setPurchaseToastNotification = ({
   sub,
   flashSession,
+  txTarget,
 }: {
   sub: Stripe.Subscription
   flashSession: any
+  txTarget?: TxTarget
 }) => {
   const status = (sub.latest_invoice as Stripe.Invoice).status
 
@@ -73,7 +76,11 @@ export const setPurchaseToastNotification = ({
       'toast_notification',
       JSON.stringify({
         type: ToastType.Success,
-        message: 'Entitlement(s) successfully bought',
+        message: `${
+          !txTarget || txTarget === TxTarget.Entitlements
+            ? 'Entitlement(s)'
+            : 'Seat(s)'
+        } successfully bought`,
       })
     )
   } else {

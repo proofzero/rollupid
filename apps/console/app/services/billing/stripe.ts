@@ -341,16 +341,16 @@ export const reconcileAppSubscriptions = async (
 
   if (IdentityGroupURNSpace.is(URN)) {
     const seatQuantities = mappedSubItems.find(
-      (msu) => !Boolean(priceIdToPlanTypeDict[msu.priceID])
+      (msu) => msu.priceID === env.SECRET_STRIPE_GROUP_SEAT_PLAN_ID
     )
+
     if (seatQuantities) {
       const { quantity: stripeSeatQuantity } = seatQuantities
-      const { quantity: currentSeatQuantity } =
-        await coreClient.billing.getIdentityGroupSeats.query({
-          URN: URN as IdentityGroupURN,
-        })
+      const groupSeats = await coreClient.billing.getIdentityGroupSeats.query({
+        URN: URN as IdentityGroupURN,
+      })
 
-      if (currentSeatQuantity !== stripeSeatQuantity!) {
+      if (!groupSeats || groupSeats.quantity !== stripeSeatQuantity!) {
         await coreClient.billing.updateIdentityGroupSeats.mutate({
           URN: URN as IdentityGroupURN,
           subscriptionID: subscriptionID,

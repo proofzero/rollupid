@@ -39,6 +39,11 @@ import {
   getCurrentAndUpcomingInvoices,
 } from '~/utils/billing'
 
+export enum TxTarget {
+  Entitlements = 'entitlements',
+  GroupSeats = 'groupSeats',
+}
+
 export type LoaderData = {
   STRIPE_PUBLISHABLE_KEY: string
   paymentData?: PaymentData
@@ -247,46 +252,70 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const fd = await request.formData()
-    const { customerID, quantity, txType } = JSON.parse(
+    const { customerID, quantity, txType, txTarget } = JSON.parse(
       fd.get('payload') as string
     ) as {
       customerID: string
       quantity: number
       txType: 'buy' | 'remove'
-    }
-
-    if (IdentityURNSpace.is(targetURN)) {
-      const apps = await coreClient.starbase.listApps.query()
-      const assignedEntitlementCount = apps.filter(
-        (a) => a.appPlan === ServicePlanType.PRO
-      ).length
-      if (assignedEntitlementCount > quantity) {
-        throw new BadRequestError({
-          message: `Invalid quantity. Change ${
-            quantity - assignedEntitlementCount
-          } of the ${assignedEntitlementCount} apps to a different plan first.`,
-        })
-      }
+      txTarget?: TxTarget
     }
 
     if ((quantity < 1 && txType === 'buy') || quantity < 0) {
       throw new BadRequestError({
-        message: `Invalid quantity. Please enter a valid number of entitlements.`,
+        message: `Invalid quantity. Please enter a valid quantity.`,
       })
     }
 
-    const entitlements = await coreClient.billing.getEntitlements.query({
-      URN: targetURN,
-    })
+    let sub
+    if (!txTarget || txTarget === TxTarget.Entitlements) {
+      if (IdentityURNSpace.is(targetURN)) {
+        const apps = await coreClient.starbase.listApps.query()
+        const assignedEntitlementCount = apps.filter(
+          (a) => a.appPlan === ServicePlanType.PRO
+        ).length
+        if (assignedEntitlementCount > quantity) {
+          throw new BadRequestError({
+            message: `Invalid quantity. Change ${
+              quantity - assignedEntitlementCount
+            } of the ${assignedEntitlementCount} apps to a different plan first.`,
+          })
+        }
+      }
 
-    const sub = await createOrUpdateSubscription({
-      customerID,
-      planID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
-      SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
-      quantity,
-      subscriptionID: entitlements.subscriptionID,
-      URN: targetURN,
-    })
+      const entitlements = await coreClient.billing.getEntitlements.query({
+        URN: targetURN,
+      })
+
+      sub = await createOrUpdateSubscription({
+        customerID,
+        planID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
+        SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
+        quantity,
+        subscriptionID: entitlements.subscriptionID,
+        URN: targetURN,
+      })
+    } else if (txTarget === TxTarget.GroupSeats) {
+      const seats = await coreClient.billing.getIdentityGroupSeats.query({
+        URN: groupURN as IdentityGroupURN,
+      })
+      const subID = seats?.subscriptionID
+
+      sub = await createOrUpdateSubscription({
+        customerID,
+        planID: context.env.SECRET_STRIPE_GROUP_SEAT_PLAN_ID,
+        SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
+        quantity,
+        subscriptionID: subID,
+        URN: targetURN,
+      })
+    }
+
+    if (!sub) {
+      throw new BadRequestError({
+        message: `Invalid target. Please select a valid target.`,
+      })
+    }
 
     if (
       (txType === 'buy' &&
@@ -309,6 +338,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       setPurchaseToastNotification({
         sub,
         flashSession,
+        txTarget,
       })
     }
     if (txType === 'remove') {
@@ -316,7 +346,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         'toast_notification',
         JSON.stringify({
           type: ToastType.Success,
-          message: 'Entitlement(s) successfully removed',
+          message: `${
+            !txTarget || txTarget === TxTarget.Entitlements
+              ? 'Entitlement(s)'
+              : 'Seat(s)'
+          } successfully removed`,
         })
       )
     }
