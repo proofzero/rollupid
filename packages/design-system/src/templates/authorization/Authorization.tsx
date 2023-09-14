@@ -166,7 +166,7 @@ export default ({
           dark:bg-[#1F2937] dark:border-gray-600 py-2
           ${open ? 'bg-gray-50 shadow-sm rounded-lg' : ''}`}
                 >
-                  <div className="flex flex-row items-center gap-2 ">
+                  <div className="flex flex-row items-center gap-2 min-w-0">
                     <Info
                       name={scopeMeta.scopes[scope].name}
                       description={scopeMeta.scopes[scope].description}
@@ -201,7 +201,7 @@ export default ({
                     </div>
                     <ScopeIcon scope={scope} />
 
-                    <div className="flex flex-col items-start w-max">
+                    <div className="flex flex-col items-start w-max min-w-0 truncate">
                       <Text
                         size="sm"
                         weight="medium"
@@ -220,7 +220,7 @@ export default ({
               ? ''
               : 'text-orange-500 dark:text-orange-500'
           }
-          dark:text-white truncate text-ellipsis
+          dark:text-white truncate text-ellipsis w-full text-left
           `}
                           >
                             {placeholder}
@@ -230,7 +230,7 @@ export default ({
                       {selectedItem?.title?.length && (
                         <Text
                           size="sm"
-                          className="text-gray-500 dark:text-white truncate text-ellipsis"
+                          className="text-gray-500 dark:text-white truncate text-ellipsis w-full"
                         >
                           {selectedItem.title}
                         </Text>
@@ -239,7 +239,7 @@ export default ({
                       {selectedItems?.length > 1 && !allItemsSelected && (
                         <Text
                           size="sm"
-                          className="text-gray-500 dark:text-white truncate text-ellipsis"
+                          className="text-gray-500 dark:text-white truncate text-ellipsis w-full"
                         >
                           {selectedItems?.length} items selected
                         </Text>
@@ -248,7 +248,7 @@ export default ({
                       {selectedItems?.length === 1 && !allItemsSelected && (
                         <Text
                           size="sm"
-                          className="text-gray-500 dark:text-white truncate text-ellipsis"
+                          className="text-gray-500 dark:text-white truncate text-ellipsis w-full"
                         >
                           {selectedItems?.[0].title} selected
                         </Text>
@@ -257,7 +257,7 @@ export default ({
                       {allItemsSelected && (
                         <Text
                           size="sm"
-                          className="text-gray-500 dark:text-white truncate text-ellipsis"
+                          className="text-gray-500 dark:text-white truncate text-ellipsis w-full"
                         >
                           {selectAllCheckboxTitle}
                         </Text>
