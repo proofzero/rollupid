@@ -37,6 +37,8 @@ import {
 import Breadcrumbs from '@proofzero/design-system/src/atoms/breadcrumbs/Breadcrumbs'
 import { ListIdentityGroupsOutput } from '@proofzero/platform/identity/src/jsonrpc/methods/identity-groups/listIdentityGroups'
 import { AppLoaderData } from '~/root'
+import { FeatureFlags } from '@proofzero/utils/feature-flags'
+import { GroupSeatingCard } from '~/components/Billing/seating'
 
 export const loader = billingLoader
 export const action = billingAction
@@ -56,10 +58,11 @@ export default () => {
     unpaidInvoiceURL,
   } = loaderData
 
-  const { PASSPORT_URL, groups, apps } = useOutletContext<{
+  const { PASSPORT_URL, groups, apps, featureFlags } = useOutletContext<{
     PASSPORT_URL: string
     groups: ListIdentityGroupsOutput
     apps: AppLoaderData[]
+    featureFlags: FeatureFlags
   }>()
 
   const submit = useSubmit()
@@ -335,6 +338,15 @@ export default () => {
           hasUnpaidInvoices={Boolean(unpaidInvoiceURL)}
           newAppURL={`/groups/${groupURN?.split('/')[1]}/apps/new`}
         />
+
+        {featureFlags['seats'] && groupURN && (
+          <GroupSeatingCard
+            groupID={groupURN.split('/')[1]}
+            seatsTotal={3}
+            seatsUsed={2}
+            purchaseFn={() => {}}
+          />
+        )}
       </section>
 
       <section className="mt-10">

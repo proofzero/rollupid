@@ -7,6 +7,7 @@ import { LoaderFunction, json, redirect } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import type { LoaderData as OutletContextData } from '~/root'
 import { ListIdentityGroupsOutput } from '@proofzero/platform/identity/src/jsonrpc/methods/identity-groups/listIdentityGroups'
+import { FeatureFlags, parseFeatureFlags } from '@proofzero/utils/feature-flags'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -24,14 +25,20 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       return redirect('/billing/personal')
     }
 
+    const featureFlags = parseFeatureFlags(context.env)
+
     return json({
       groups,
+      featureFlags,
     })
   }
 )
 
 export default () => {
-  const { groups } = useLoaderData<{ groups: ListIdentityGroupsOutput }>()
+  const { groups, featureFlags } = useLoaderData<{
+    groups: ListIdentityGroupsOutput
+    featureFlags: FeatureFlags
+  }>()
   const { PASSPORT_URL, hasUnpaidInvoices, apps } =
     useOutletContext<OutletContextData>()
 
@@ -42,6 +49,7 @@ export default () => {
         PASSPORT_URL,
         hasUnpaidInvoices,
         apps,
+        featureFlags,
       }}
     />
   )

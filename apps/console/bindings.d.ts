@@ -29,4 +29,6 @@ interface Env {
   CONSOLE_URL: string
   //Needed to make Remix work with Cloudflare module workers
   __STATIC_CONTENT: string
+
+  FEATURE_FLAGS: string
 }
