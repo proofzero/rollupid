@@ -16,7 +16,7 @@ export const parseFeatureFlags = (env: unknown): FeatureFlags => {
 
   const featureFlags: FeatureFlags = {}
   envFeatureFlags.split(',').forEach((flag) => {
-    featureFlags[flag] = true
+    featureFlags[flag.toLowerCase()] = true
   })
 
   return featureFlags
