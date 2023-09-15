@@ -21,6 +21,6 @@ export const updateIdentityGroupSeats = async ({
 }): Promise<void> => {
   const { quantity, subscriptionID } = input
 
-  let ownerNode = initIdentityGroupNodeByName(input.URN, ctx.IdentityGroup)
+  const ownerNode = initIdentityGroupNodeByName(input.URN, ctx.IdentityGroup)
   await ownerNode.class.updateSeats(quantity, subscriptionID)
 }

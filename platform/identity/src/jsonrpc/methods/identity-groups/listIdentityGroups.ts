@@ -61,10 +61,13 @@ export const listIdentityGroups = async ({
       const name = edge.dst.qc.name
 
       const igNode = initIdentityGroupNodeByName(URN, ctx.IdentityGroup)
-      let [pd, orderedMembers] = await Promise.all([
+      const opRes = await Promise.all([
         igNode.class.getStripePaymentData(),
         igNode.class.getOrderedMembers(),
       ])
+
+      const spd = opRes[0]
+      let orderedMembers = opRes[1]
 
       const { edges: groupMemberEdges } = await caller.edges.getEdges({
         query: {
@@ -107,7 +110,7 @@ export const listIdentityGroups = async ({
         name,
         members: mappedOrderedMembers,
         flags: {
-          billingConfigured: Boolean(pd?.paymentMethodID),
+          billingConfigured: Boolean(spd?.paymentMethodID),
         },
       }
     })

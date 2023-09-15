@@ -28,6 +28,6 @@ export const getIdentityGroupSeats = async ({
   input: GetIdentityGroupSeatsInput
   ctx: Context
 }): Promise<GetIdentityGroupSeatsOutput> => {
-  let ownerNode = initIdentityGroupNodeByName(input.URN, ctx.IdentityGroup)
+  const ownerNode = initIdentityGroupNodeByName(input.URN, ctx.IdentityGroup)
   return ownerNode.class.getSeats()
 }
