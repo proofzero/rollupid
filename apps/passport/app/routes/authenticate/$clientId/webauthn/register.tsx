@@ -240,9 +240,10 @@ export default () => {
   return (
     <div
       className={
-        'flex shrink flex-col items-center justify-center gap-4 mx-auto\
-      bg-white p-6 h-[100dvh] lg:h-[580px] lg:max-h-[100dvh] w-full\
-       lg:w-[418px] lg:border-rounded-lg dark:bg-gray-800 border border-[#D1D5DB] dark:border-gray-600'
+        'flex shrink flex-col items-center\
+         justify-center gap-4 mx-auto bg-white p-6 h-[100dvh]\
+          lg:h-[580px] lg:max-h-[100dvh] w-full lg:w-[418px]\
+          lg:rounded-lg dark:bg-gray-800 border border-[#D1D5DB] dark:border-gray-600'
       }
       style={{
         boxSizing: 'border-box',
@@ -296,14 +297,15 @@ export default () => {
             </Text>
           </label>
           <Button
-            type="submit"
             btnSize="xl"
+            btnType="primary-alt"
+            className="flex-1 w-full"
+            type="submit"
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
               setRequestedRegistration(true)
             }}
-            className="w-full mt-4"
             disabled={!webauthnSupported || keyName.length < 4}
           >
             Create new Passkey
