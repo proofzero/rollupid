@@ -31,6 +31,7 @@ import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import Authentication, {
   AuthenticationScreenDefaults,
+  getDisplayNameFromProviderString,
 } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
@@ -233,21 +234,16 @@ const ProviderModal = ({
 }: {
   providers: {
     key: string
+    val: string
     enabled: boolean
   }[]
   isOpen: boolean
   onClose: (val: boolean) => void
-  saveCallback: (providers: { key: string; enabled: boolean }[]) => void
+  saveCallback: (
+    providers: { key: string; val: string; enabled: boolean }[]
+  ) => void
 }) => {
-  const [selectedProviders, setSelectedProviders] = useState(() => {
-    return providers.map((p) => {
-      return {
-        key: p.key,
-        val: _.startCase(p.key),
-        enabled: p.enabled,
-      }
-    })
-  })
+  const [selectedProviders, setSelectedProviders] = useState(providers)
 
   return (
     <Modal isOpen={isOpen} handleClose={() => onClose(false)}>
@@ -370,12 +366,14 @@ const AuthPanel = ({
   const [providers, setProviders] = useState<
     {
       key: string
+      val: string
       enabled: boolean
     }[]
   >(
     appTheme?.providers ??
       AuthenticationScreenDefaults.knownKeys.map((k) => ({
         key: k,
+        val: getDisplayNameFromProviderString(k),
         enabled: true,
       }))
   )
@@ -390,6 +388,7 @@ const AuthPanel = ({
     setProviders(
       AuthenticationScreenDefaults.knownKeys.map((k) => ({
         key: k,
+        val: getDisplayNameFromProviderString(k),
         enabled: true,
       }))
     )
