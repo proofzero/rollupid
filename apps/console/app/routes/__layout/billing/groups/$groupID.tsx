@@ -357,6 +357,21 @@ export default () => {
                 }
               )
             }}
+            removalFn={(quantity) => {
+              submit(
+                {
+                  payload: JSON.stringify({
+                    quantity: quantity,
+                    customerID: paymentData?.customerID,
+                    txType: 'remove',
+                    txTarget: TxTarget.GroupSeats,
+                  }),
+                },
+                {
+                  method: 'post',
+                }
+              )
+            }}
           />
         )}
       </section>
