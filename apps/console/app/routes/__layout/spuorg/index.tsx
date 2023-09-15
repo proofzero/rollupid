@@ -151,12 +151,62 @@ const DeleteGroupModal = ({
   )
 }
 
+const GroupHasAppsModal = ({
+  isOpen,
+  handleClose,
+}: {
+  isOpen: boolean
+  handleClose: () => void
+}) => {
+  return (
+    <Modal isOpen={isOpen} handleClose={handleClose}>
+      <div
+        className={`w-fit rounded-lg bg-white p-4
+         text-left  transition-all sm:p-5 overflow-y-auto flex flex-row items-start space-x-4`}
+      >
+        <img src={dangerVector} alt="danger" />
+
+        <section className="flex flex-col space-y-4">
+          <div className="flex flex-row items-center justify-between w-full">
+            <Text size="lg" weight="medium" className="text-gray-900">
+              Group cannot be deleted
+            </Text>
+            <button
+              type="button"
+              className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+              onClick={handleClose}
+              tabIndex={-1}
+            >
+              <HiOutlineX />
+            </button>
+          </div>
+
+          <section>
+            <Text size="sm" weight="normal" className="text-gray-500 my-3">
+              The group owns one or more apps. <br /> Please delete or transfer
+              out those apps first if you want to remove the group.
+            </Text>
+          </section>
+
+          <div className="flex justify-end items-center space-x-3">
+            <Button btnType="secondary-alt" onClick={handleClose}>
+              Okay
+            </Button>
+          </div>
+        </section>
+      </div>
+    </Modal>
+  )
+}
+
 export default () => {
   const { groups, apps } = useOutletContext<GroupRootContextData>()
   const navigate = useNavigate()
 
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false)
   const [isDeleteGroupModalOpen, setIsDeleteGroupModalOpen] = useState(false)
+  const [groupHasAppsModalOpen, setGroupHasAppsModalOpen] = useState(false)
 
   const [selectedGroup, setSelectedGroup] = useState<GroupModel>()
 
@@ -176,6 +226,11 @@ export default () => {
           group={selectedGroup}
         />
       )}
+
+      <GroupHasAppsModal
+        isOpen={groupHasAppsModalOpen}
+        handleClose={() => setGroupHasAppsModalOpen(false)}
+      />
 
       <section className="flex flex-row items-center justify-between mb-5">
         <Text size="2xl" weight="semibold">
@@ -330,8 +385,17 @@ export default () => {
                               className="py-2 px-4 flex items-center space-x-3 cursor-pointer
                   hover:rounded-[6px] hover:bg-gray-100"
                               onClick={() => {
-                                setSelectedGroup(item.val)
-                                setIsDeleteGroupModalOpen(true)
+                                if (
+                                  groupAppRefs.current.filter(
+                                    (ga) =>
+                                      ga.groupID === item.val.URN.split('/')[1]
+                                  ).length > 0
+                                ) {
+                                  setGroupHasAppsModalOpen(true)
+                                } else {
+                                  setSelectedGroup(item.val)
+                                  setIsDeleteGroupModalOpen(true)
+                                }
                               }}
                             >
                               <HiOutlineTrash className="text-xl font-normal text-red-500" />

@@ -83,21 +83,23 @@ export const ApplicationList = ({
           />
         )}
 
-        {ownApps.map((ali) => (
-          <ApplicationListItem
-            key={ali.id}
-            navigate={navigate}
-            {...ali}
-            onDeleteApplication={(clientId, appName, hasCustomDomain) => {
-              setActionApp({
-                clientId,
-                name: appName,
-                hasCustomDomain,
-              })
-              setDeleteModalOpen(true)
-            }}
-          />
-        ))}
+        <div className="flex flex-col space-y-2">
+          {ownApps.map((ali) => (
+            <ApplicationListItem
+              key={ali.id}
+              navigate={navigate}
+              {...ali}
+              onDeleteApplication={(clientId, appName, hasCustomDomain) => {
+                setActionApp({
+                  clientId,
+                  name: appName,
+                  hasCustomDomain,
+                })
+                setDeleteModalOpen(true)
+              }}
+            />
+          ))}
+        </div>
 
         {Object.entries(groupedApplications).map(([groupID, entry]) => (
           <section key={groupID} className="flex flex-col space-y-2 mt-5">
