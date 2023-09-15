@@ -8,6 +8,7 @@ import google from '../atoms/providers/Google'
 import microsoft from '../atoms/providers/Microsoft'
 import twitter from '../assets/social_icons/twitter.svg'
 import wallets from '../assets/social_icons/wallets.png'
+import webauthn from '../atoms/providers/Webauthn'
 
 export default (provider: string) => {
   switch (provider) {
@@ -17,6 +18,8 @@ export default (provider: string) => {
       return discord
     case 'email':
       return email
+    case 'webauthn':
+      return webauthn
     case 'ethereum':
       return ethereum
     case 'facebook':

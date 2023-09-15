@@ -47,6 +47,15 @@ This will not trigger a blockchain transaction or cost any gas fees.`,
   radius: 'lg',
 }
 
+export const getDisplayNameFromProviderString = (provider: string): string => {
+  switch (provider) {
+    case 'webauthn':
+      return 'Passkeys'
+    default:
+      return provider.charAt(0).toUpperCase() + provider.substring(1).toLowerCase()
+  }
+}
+
 export const appendNonceTemplate = (signMessage: string) =>
   `${signMessage}${signMessage.endsWith('\n') ? '' : '\n'}\n{{nonce}}`
 
