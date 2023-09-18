@@ -1,12 +1,16 @@
 import { useEffect } from 'react'
 
+// Automatically called once on component mount due to useEffect with an empty dependency array.
 export const registerFeatureFlag = () => {
   useEffect(() => {
     const url = new URL(window.location.href)
-
     const featureFlag = url.searchParams.get('feature_flag')
+
     if (featureFlag) {
+      // Retrieve existing feature flags from localStorage or initialize to null
       let featureFlags = localStorage?.getItem('feature_flags') ?? null
+
+      // Update the feature flags object and store it back in localStorage
       if (!featureFlags) {
         featureFlags = JSON.stringify({
           [featureFlag]: true,
@@ -19,23 +23,19 @@ export const registerFeatureFlag = () => {
 
       localStorage?.setItem('feature_flags', featureFlags)
 
+      // Clean up the URL by removing the 'feature_flag' query parameter
       url.searchParams.delete('feature_flag')
       history.replaceState(null, '', url.toString())
     }
   }, [])
 }
 
-export const useFeatureFlags = (
-  hydrated: boolean = false
-): Record<string, boolean> => {
-  if (!hydrated) {
-    return {}
-  }
+// Retrieves feature flags from localStorage, assuming the client-side is "hydrated"
+export const useFeatureFlags = (hydrated = false) => {
+  // Return an empty object if local storage is not initialized
+  if (!hydrated) return {}
 
+  // Retrieve and parse the feature flags from localStorage, if they exist
   const featureFlags = localStorage?.getItem('feature_flags')
-  if (featureFlags) {
-    return JSON.parse(featureFlags)
-  }
-
-  return {}
+  return featureFlags ? JSON.parse(featureFlags) : {}
 }
