@@ -37,8 +37,8 @@ import {
 import Breadcrumbs from '@proofzero/design-system/src/atoms/breadcrumbs/Breadcrumbs'
 import { ListIdentityGroupsOutput } from '@proofzero/platform/identity/src/jsonrpc/methods/identity-groups/listIdentityGroups'
 import { AppLoaderData } from '~/root'
-import { FeatureFlags } from '@proofzero/utils/feature-flags'
 import { GroupSeatingCard } from '~/components/Billing/seating'
+import { useFeatureFlags } from '@proofzero/design-system/src/hooks/feature-flags'
 
 export const loader = billingLoader
 export const action = billingAction
@@ -58,11 +58,10 @@ export default () => {
     unpaidInvoiceURL,
   } = loaderData
 
-  const { PASSPORT_URL, groups, apps, featureFlags } = useOutletContext<{
+  const { PASSPORT_URL, groups, apps } = useOutletContext<{
     PASSPORT_URL: string
     groups: ListIdentityGroupsOutput
     apps: AppLoaderData[]
-    featureFlags: FeatureFlags
   }>()
 
   const submit = useSubmit()
@@ -130,6 +129,7 @@ export default () => {
   )
 
   const hydrated = useHydrated()
+  const featureFlags = useFeatureFlags(hydrated)
 
   const [invoiceSort, setInvoiceSort] = useState<'asc' | 'desc'>('desc')
 
