@@ -22,7 +22,7 @@ export type MemberInvitation = InviteMemberInput & {
   timestamp: number
 }
 
-export type ClaimInvitationInput = {
+export type ClearInvitationInput = {
   inviteCode: string
 }
 
@@ -124,7 +124,7 @@ export default class IdentityGroup extends DOProxy {
     )
   }
 
-  async claimInvitation({ inviteCode }: ClaimInvitationInput): Promise<void> {
+  async clearInvitation({ inviteCode }: ClearInvitationInput): Promise<void> {
     const invitations =
       (await this.state.storage.get<MemberInvitation[]>('invitations')) || []
 

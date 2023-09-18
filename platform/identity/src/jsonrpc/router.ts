@@ -88,6 +88,10 @@ import {
   HasIdentityGroupPermissionsOutputSchema,
   hasIdentityGroupPermissions,
 } from './methods/identity-groups/hasIdentityGroupPermissions'
+import {
+  DeleteIdentityGroupInvitationInputSchema,
+  deleteIdentityGroupInvitation,
+} from './methods/identity-groups/deleteIdentityGroupInvitation'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -259,4 +263,12 @@ export const appRouter = t.router({
     .input(HasIdentityGroupPermissionsInputSchema)
     .output(HasIdentityGroupPermissionsOutputSchema)
     .query(hasIdentityGroupPermissions),
+  deleteIdentityGroupInvitation: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireIdentity)
+    .input(DeleteIdentityGroupInvitationInputSchema)
+    .mutation(deleteIdentityGroupInvitation),
 })
