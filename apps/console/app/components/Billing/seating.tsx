@@ -275,7 +275,7 @@ export const GroupSeatingCard = ({
 
                   <div className="flex flex-row items-center gap-2">
                     <Text size="lg" weight="semibold" className="text-gray-900">
-                      {seatingCost * seatsTotal}
+                      {`$${seatingCost * seatsTotal}`}
                     </Text>
                     <Text size="sm" className="text-gray-500">
                       per month
