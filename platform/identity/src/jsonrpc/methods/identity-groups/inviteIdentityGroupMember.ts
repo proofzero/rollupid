@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { Context } from '../../../context'
-import { InternalServerError } from '@proofzero/errors'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import {
   CryptoAccountType,
   EmailAccountType,
@@ -14,6 +14,7 @@ import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 import generateRandomString from '@proofzero/utils/generateRandomString'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 
 export const InviteIdentityGroupMemberInputSchema = z.object({
   identityGroupURN: IdentityGroupURNValidator,
@@ -47,13 +48,33 @@ export const inviteIdentityGroupMember = async ({
   const { identityGroupURN, identifier, accountType } = input
   const inviterIdentityURN = ctx.identityURN as IdentityURN
 
-  const node = await initIdentityGroupNodeByName(
-    identityGroupURN,
-    ctx.IdentityGroup
-  )
+  const node = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
   if (!node) {
     throw new InternalServerError({
       message: 'Identity group DO not found',
+    })
+  }
+
+  const invitations = await node.class.getInvitations()
+  const invitationCount = invitations.length
+
+  const caller = router.createCaller(ctx)
+
+  const { edges: memberEdges } = await caller.edges.getEdges({
+    query: {
+      src: {
+        baseUrn: inviterIdentityURN,
+      },
+      tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
+    },
+  })
+
+  if (
+    invitationCount + memberEdges.length >
+    IDENTITY_GROUP_OPTIONS.maxFreeMembers
+  ) {
+    throw new BadRequestError({
+      message: 'Max members reached',
     })
   }
 
@@ -61,7 +82,6 @@ export const inviteIdentityGroupMember = async ({
     IDENTITY_GROUP_OPTIONS.inviteCodeLength
   )
 
-  const caller = router.createCaller(ctx)
   const inviterProfile = await caller.identity.getProfile({
     identity: inviterIdentityURN,
   })

@@ -64,8 +64,9 @@ export const ActionCard = ({
   return (
     <button
       className={classNames(
-        'bg-white border rounded-lg shadow p-4 flex flex-row items-center gap-3.5',
-        { 'hover:bg-gray-50': onClick }
+        'border rounded-lg shadow p-4 flex flex-row items-center gap-3.5',
+        { 'hover:bg-gray-50 bg-white': onClick },
+        { 'bg-gray-100': !onClick }
       )}
       disabled={!onClick}
       onClick={onClick}
@@ -378,7 +379,6 @@ export default () => {
   const [selectedMemberAlias, setSelectedMemberAlias] = useState<string>('')
   const [removeMemberModalOpen, setRemoveMemberModalOpen] = useState(false)
 
-  const ownApps = apps.filter((a) => !a.groupID)
   const groupApps = apps.filter((a) => a.groupID === groupID)
 
   const navigate = useNavigate()
@@ -431,7 +431,11 @@ export default () => {
           Icon={TbUserPlus}
           title="Add Group Member"
           subtitle="Invite Members to the Group"
-          onClick={() => setInviteModalOpen(true)}
+          onClick={
+            group.members.length + invitations.length < 3
+              ? () => setInviteModalOpen(true)
+              : undefined
+          }
         />
 
         <ActionCard
@@ -606,7 +610,7 @@ export default () => {
 
               <Pill className="bg-gray-200 rounded-lg !pr-2">
                 <Text size="xs" weight="medium" className="text-gray-800">
-                  {group.members.length}
+                  {group.members.length}/3
                 </Text>
               </Pill>
             </div>
