@@ -356,7 +356,9 @@ const RemoveMemberModal = ({
           </section>
 
           <div className="flex justify-end items-center space-x-3">
-            <Button btnType="secondary-alt">Cancel</Button>
+            <Button btnType="secondary-alt" onClick={handleClose}>
+              Cancel
+            </Button>
             <Button type="submit" btnType="dangerous">
               Remove Member
             </Button>
@@ -397,22 +399,34 @@ const RemoveInvitationModal = ({
           }}
         >
           <input name="invitationCode" type="hidden" value={invitationCode} />
-          <div className="flex flex-row items-center justify-between w-full mb-2">
-            <Text size="lg" weight="medium" className="text-gray-900">
-              Remove Invitation
+
+          <div className="flex flex-row w-full items-center justify-between mb-2">
+            <Text size="lg" weight="semibold">
+              Cancel Invitation
             </Text>
+            <div
+              className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+              onClick={() => {
+                handleClose()
+              }}
+            >
+              <HiOutlineX />
+            </div>
           </div>
 
           <section className="mb-4">
             <Text size="sm" weight="normal" className="text-gray-500 my-3">
-              Are you sure you want to cancel “{userAlias}”'s invitation?
+              Are you sure you want to cancel the invitation for {userAlias}?
             </Text>
           </section>
 
           <div className="flex justify-end items-center space-x-3">
-            <Button btnType="secondary-alt">Cancel</Button>
+            <Button btnType="secondary-alt" onClick={handleClose}>
+              Cancel
+            </Button>
             <Button type="submit" btnType="dangerous">
-              Uninvite Member
+              Cancel invitation
             </Button>
           </div>
         </Form>
