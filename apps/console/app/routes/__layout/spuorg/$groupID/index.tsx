@@ -356,9 +356,77 @@ const RemoveMemberModal = ({
           </section>
 
           <div className="flex justify-end items-center space-x-3">
-            <Button btnType="secondary-alt">Cancel</Button>
+            <Button btnType="secondary-alt" onClick={handleClose}>
+              Cancel
+            </Button>
             <Button type="submit" btnType="dangerous">
               Remove Member
+            </Button>
+          </div>
+        </Form>
+      </div>
+    </Modal>
+  )
+}
+
+const RemoveInvitationModal = ({
+  groupID,
+  invitationCode,
+  userAlias,
+  isOpen,
+  handleClose,
+}: {
+  groupID: string
+  invitationCode: string
+  userAlias: string
+  isOpen: boolean
+  handleClose: () => void
+  purge?: boolean
+}) => {
+  return (
+    <Modal isOpen={isOpen} handleClose={handleClose}>
+      <div
+        className={`w-fit rounded-lg bg-white p-4
+         text-left  transition-all sm:p-5 overflow-y-auto flex items-start space-x-4`}
+      >
+        <img src={dangerVector} alt="danger" />
+
+        <Form
+          method="post"
+          action={`/spuorg/${groupID}/uninvite`}
+          onSubmit={() => {
+            handleClose()
+          }}
+        >
+          <input name="invitationCode" type="hidden" value={invitationCode} />
+
+          <div className="flex flex-row w-full items-center justify-between mb-2">
+            <Text size="lg" weight="semibold">
+              Cancel Invitation
+            </Text>
+            <div
+              className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+              onClick={() => {
+                handleClose()
+              }}
+            >
+              <HiOutlineX />
+            </div>
+          </div>
+
+          <section className="mb-4">
+            <Text size="sm" weight="normal" className="text-gray-500 my-3">
+              Are you sure you want to cancel the invitation for {userAlias}?
+            </Text>
+          </section>
+
+          <div className="flex justify-end items-center space-x-3">
+            <Button btnType="secondary-alt" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button type="submit" btnType="dangerous">
+              Cancel invitation
             </Button>
           </div>
         </Form>
@@ -376,8 +444,11 @@ export default () => {
   const hydrated = useHydrated()
 
   const [selectedMemberURN, setSelectedMemberURN] = useState<IdentityURN>()
+  const [selectedInvitationCode, setSelectedInvitationCode] = useState<string>()
   const [selectedMemberAlias, setSelectedMemberAlias] = useState<string>('')
   const [removeMemberModalOpen, setRemoveMemberModalOpen] = useState(false)
+  const [removeInvitationModalOpen, setRemoveInvitationModalOpen] =
+    useState(false)
 
   const groupApps = apps.filter((a) => a.groupID === groupID)
 
@@ -400,6 +471,16 @@ export default () => {
           identityURN={selectedMemberURN}
           userAlias={selectedMemberAlias}
           purge={group.members.length === 1}
+        />
+      )}
+
+      {group && selectedInvitationCode && (
+        <RemoveInvitationModal
+          isOpen={removeInvitationModalOpen}
+          handleClose={() => setRemoveInvitationModalOpen(false)}
+          groupID={groupID}
+          invitationCode={selectedInvitationCode}
+          userAlias={selectedMemberAlias}
         />
       )}
 
@@ -815,8 +896,17 @@ export default () => {
                     </div>
 
                     <div className="flex flex-row items-center gap-4 p-2">
-                      <button className="p-2" disabled>
-                        <HiOutlineTrash className="w-4 h-4 text-gray-500" />
+                      <button className="p-2">
+                        <HiOutlineTrash
+                          className="w-4 h-4 text-gray-500"
+                          onClick={() => {
+                            setSelectedInvitationCode(
+                              _.last(item.val.invitationURL.split('/'))
+                            )
+                            setSelectedMemberAlias(item.val.identifier)
+                            setRemoveInvitationModalOpen(true)
+                          }}
+                        />
                       </button>
 
                       <Button

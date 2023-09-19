@@ -26,10 +26,7 @@ export const acceptIdentityGroupMemberInvitation = async ({
 }): Promise<void> => {
   const { identityGroupURN, invitationCode } = input
 
-  const node = await initIdentityGroupNodeByName(
-    identityGroupURN,
-    ctx.IdentityGroup
-  )
+  const node = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
   if (!node) {
     throw new InternalServerError({
       message: 'Identity group DO not found',
@@ -62,7 +59,7 @@ export const acceptIdentityGroupMemberInvitation = async ({
     })
   }
 
-  await node.class.claimInvitation({
+  await node.class.clearInvitation({
     inviteCode: invitationCode,
   })
 
