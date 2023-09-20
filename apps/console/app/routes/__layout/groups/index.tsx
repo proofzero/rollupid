@@ -1,5 +1,5 @@
 import { Form, useNavigate, useOutletContext } from '@remix-run/react'
-import { GroupModel, type GroupRootContextData } from '../spuorg'
+import { GroupModel, type GroupRootContextData } from '../groups'
 import { Button, Text } from '@proofzero/design-system'
 import {
   HiDotsVertical,
@@ -42,7 +42,7 @@ const CreateGroupModal = ({
 
         <Form
           method="post"
-          action="/spuorg/create"
+          action="/groups/create"
           className="flex flex-col gap-4"
           onSubmit={handleClose}
         >
@@ -94,7 +94,7 @@ const DeleteGroupModal = ({
 
         <Form
           method="post"
-          action={`/spuorg/${group.URN.split('/')[1]}/delete`}
+          action={`/groups/${group.URN.split('/')[1]}/delete`}
           className="flex-1"
           onSubmit={() => clearStateAndHandleClose()}
         >
@@ -323,7 +323,7 @@ export default () => {
                 <div
                   className="flex-1"
                   onClick={() => {
-                    navigate(`/spuorg/${item.val.URN.split('/')[1]}`)
+                    navigate(`/groups/${item.val.URN.split('/')[1]}`)
                   }}
                 >
                   <Text size="base" weight="semibold" className="text-gray-800">

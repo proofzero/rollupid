@@ -28,6 +28,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       name: name as string,
     })
 
-    return redirect('/spuorg')
+    return redirect('/groups')
   }
 )

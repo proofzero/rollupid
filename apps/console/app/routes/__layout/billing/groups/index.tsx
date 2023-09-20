@@ -63,7 +63,7 @@ export default () => {
                 <DangerPill text="Not Configured" />
               )}
               <NavLink
-                to={`/billing/spuorg/${item.val.URN.split('/')[1]}`}
+                to={`/billing/groups/${item.val.URN.split('/')[1]}`}
                 className="p-2"
               >
                 <Button btnSize="sm" btnType="secondary-alt">
