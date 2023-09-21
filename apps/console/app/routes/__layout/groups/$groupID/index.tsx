@@ -501,7 +501,7 @@ export default () => {
         client_secret,
         payment_method,
         submit,
-        redirectUrl: `/spuorg/${groupID}`,
+        redirectUrl: `/groups/${groupID}`,
         URN: groupURN,
       })
     }
