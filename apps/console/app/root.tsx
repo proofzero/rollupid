@@ -10,7 +10,7 @@ import type {
 
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 
-import { json, redirect } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 
 import { ErrorPage } from '@proofzero/design-system/src/pages/error/ErrorPage'
 
@@ -54,6 +54,7 @@ import { PostHogProvider } from 'posthog-js/react'
 import { useHydrated } from 'remix-utils'
 import { getCurrentAndUpcomingInvoices } from './utils/billing'
 import type { ServicePlanType } from '@proofzero/types/billing'
+import { registerFeatureFlag } from '@proofzero/design-system/src/hooks/feature-flags'
 
 export const links: LinksFunction = () => {
   return [
@@ -290,6 +291,8 @@ export default function App() {
       }
     }
   }, [hydrated])
+
+  registerFeatureFlag()
 
   return (
     <html lang="en" className="h-full">
