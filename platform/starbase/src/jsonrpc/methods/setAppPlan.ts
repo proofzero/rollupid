@@ -82,19 +82,19 @@ export const setAppPlan = async ({
     })
   )
 
-  const { edges: ownershipEdges } = await caller.edges.getEdges({
-    query: {
-      tag: EDGE_APPLICATION,
-      dst: { baseUrn: appURN },
-    },
-  })
-  if (ownershipEdges.length === 0) {
-    throw new InternalServerError({
-      message: 'App ownership edge not found',
+  const buildAnalyticsEvent = async () => {
+    const { edges: ownershipEdges } = await caller.edges.getEdges({
+      query: {
+        tag: EDGE_APPLICATION,
+        dst: { baseUrn: appURN },
+      },
     })
-  }
+    if (ownershipEdges.length === 0) {
+      throw new InternalServerError({
+        message: 'App ownership edge not found',
+      })
+    }
 
-  ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: `app_set_${plan}_plan`,
       apiKey: ctx.POSTHOG_API_KEY,
@@ -108,5 +108,7 @@ export const setAppPlan = async ({
         },
       },
     })
-  )
+  }
+
+  ctx.waitUntil?.(buildAnalyticsEvent())
 }

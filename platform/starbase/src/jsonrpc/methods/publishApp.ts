@@ -61,19 +61,19 @@ export const publishApp = async ({
 
   await appDO.class.publish(input.published)
 
-  const { edges: ownershipEdges } = await caller.edges.getEdges({
-    query: {
-      tag: EDGE_APPLICATION,
-      dst: { baseUrn: appURN },
-    },
-  })
-  if (ownershipEdges.length === 0) {
-    throw new InternalServerError({
-      message: 'App ownership edge not found',
+  const buildAnalyticsEvent = async () => {
+    const { edges: ownershipEdges } = await caller.edges.getEdges({
+      query: {
+        tag: EDGE_APPLICATION,
+        dst: { baseUrn: appURN },
+      },
     })
-  }
+    if (ownershipEdges.length === 0) {
+      throw new InternalServerError({
+        message: 'App ownership edge not found',
+      })
+    }
 
-  ctx.waitUntil?.(
     createAnalyticsEvent({
       distinctId: ctx.identityURN as IdentityURN,
       eventName: input.published
@@ -89,7 +89,9 @@ export const publishApp = async ({
         },
       },
     })
-  )
+  }
+
+  ctx.waitUntil?.(buildAnalyticsEvent())
 
   return {
     published: true,
