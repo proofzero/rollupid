@@ -256,7 +256,7 @@ export const GroupSeatingCard = ({
 
                     <div className="flex flex-row items-center">
                       <div className="flex-1">
-                        <Link to={`/spuorg/${groupID}`}>
+                        <Link to={`/groups/${groupID}`}>
                           <button
                             type="button"
                             className="flex flex-row items-center gap-3.5 text-indigo-500 cursor-pointer rounded-b-lg disabled:text-indigo-300"
