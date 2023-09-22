@@ -23,11 +23,12 @@ import subtractLogo from '~/assets/subtract-logo.svg'
 import {
   createSignedWebauthnChallenge,
   verifySignedWebauthnChallenge,
-  webauthnConstants
+  webauthnConstants,
 } from './utils'
 import { BadRequestError } from '@proofzero/errors'
 import { KeyPairSerialized } from '@proofzero/packages/types/application'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
+import generateRandomString from '@proofzero/utils/generateRandomString'
 
 type RegistrationPayload = {
   nickname: string
@@ -55,11 +56,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const webauthnChallengeJwks = JSON.parse(
       context.env.SECRET_WEBAUTHN_SIGNING_KEY
     ) as KeyPairSerialized
+    const credentialId = generateRandomString(
+      webauthnConstants.credentialIdLength
+    )
+    console.debug('\n\n\nSERVER GENERATED CREDS', credentialId)
     const challengeJwt = await createSignedWebauthnChallenge(
       webauthnChallengeJwks
     )
     registrationOptions.challenge = challengeJwt
-    return json({ registrationOptions })
+    return json({ registrationOptions, credentialId })
   }
 )
 
@@ -74,6 +79,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       rawId: formdata.get('rawId') as string,
     }
 
+    console.debug('\n\n\nSUBMITTED REGISTRATION PAYLOAD', registrationPayload)
     if (
       !registrationPayload.nickname ||
       registrationPayload.nickname?.length < 4
@@ -98,12 +104,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const passportUrl = new URL(request.url)
 
     const f2l = new Fido2Lib({
-      timeout: 42,
+      timeout: webauthnConstants.timeout,
       rpId: passportUrl.hostname,
       rpName: 'Rollup ID',
-      challengeSize: 200,
+      challengeSize: webauthnConstants.challengeSize,
       attestation: 'none',
-      cryptoParams: [-7, -257],
+      cryptoParams: webauthnConstants.cryptoAlgsArray,
       authenticatorRequireResidentKey: false,
       authenticatorUserVerification: 'required',
     })
@@ -169,7 +175,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { registrationOptions } = useLoaderData()
+  const { registrationOptions, credentialId } = useLoaderData()
   if (
     registrationOptions?.challenge &&
     typeof registrationOptions.challenge === 'string'
@@ -185,11 +191,9 @@ export default () => {
 
   const webauthnSupported = !!window.PublicKeyCredential
 
-  const randomBuffer = new Uint8Array(32)
-  crypto.getRandomValues(randomBuffer)
   const registerKey = async (name: string) => {
     registrationOptions.user = {
-      id: new TextEncoder().encode(base64url.encode(randomBuffer)),
+      id: new TextEncoder().encode(credentialId),
       name,
       displayName: name,
     }
@@ -199,7 +203,7 @@ export default () => {
         publicKey: registrationOptions,
       })
     } catch (e) {
-      console.error("Passkey registration error", JSON.stringify(e, null, 2))
+      console.error('Passkey registration error', JSON.stringify(e, null, 2))
       if (e instanceof DOMException && e.name === 'NotAllowedError') {
         toast(ToastType.Error, {
           message:
@@ -211,6 +215,13 @@ export default () => {
       credential instanceof PublicKeyCredential &&
       credential.response instanceof AuthenticatorAttestationResponse
     ) {
+      console.log('CREDENTIALS', {
+        mine: credentialId,
+        theirs: credential.id,
+        theirsb64decoded: new TextDecoder().decode(
+          base64url.decode(credential.id)
+        ),
+      })
       const submitPayload = new FormData()
       submitPayload.set('credentialId', credential.id)
       submitPayload.set(

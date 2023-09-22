@@ -56,7 +56,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       signature: formdata.get('signature') as string,
       rawId: formdata.get('rawId') as string,
     }
-
+    console.debug("\n\n\nUSER HANDLE", new TextDecoder().decode(base64url.decode(loginPayload.userHandle)))
     const clientDataJSON = new TextDecoder().decode(
       base64url.decode(loginPayload.clientDataJSON)
     )

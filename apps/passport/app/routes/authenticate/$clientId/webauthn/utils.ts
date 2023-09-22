@@ -40,4 +40,5 @@ export const webauthnConstants = {
   challengeSize: 200,
   timeout: 60,
   cryptoAlgsArray: [-7, -8, -257],
+  credentialIdLength: 42,
 }
