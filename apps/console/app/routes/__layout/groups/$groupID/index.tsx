@@ -58,6 +58,7 @@ import {
   loader as billingLoader,
 } from '../../billing/ops'
 import { process3DSecureCard } from '~/utils/billing'
+import { useFeatureFlags } from '@proofzero/design-system/src/hooks/feature-flags'
 
 const accountTypes = [
   ...Object.values(EmailAccountType),
@@ -515,6 +516,8 @@ export default () => {
     }
   }, [toastNotification])
 
+  const featureFlags = useFeatureFlags(hydrated)
+
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
@@ -780,35 +783,37 @@ export default () => {
               </Pill>
             </div>
 
-            <section className="flex flex-row justify-between items-center mb-4">
-              <div className="flex flex-row items-center space-x-1">
-                <Text size="sm" className="text-gray-500">
-                  Unassigned User Seats:
-                </Text>
-                <Pill className="bg-white flex flex-row items-center rounded-xl">
-                  <div className="w-2 h-2 rounded-full mr-2 bg-blue-300"></div>
-                  <Text size="xs" weight="medium" className="text-gray-700">
-                    {`Free ${3 - Math.min(3, group.members.length)}`}
+            {featureFlags['seats'] && (
+              <section className="flex flex-row justify-between items-center mb-4">
+                <div className="flex flex-row items-center space-x-1">
+                  <Text size="sm" className="text-gray-500">
+                    Unassigned User Seats:
                   </Text>
-                </Pill>
+                  <Pill className="bg-white flex flex-row items-center rounded-xl">
+                    <div className="w-2 h-2 rounded-full mr-2 bg-blue-300"></div>
+                    <Text size="xs" weight="medium" className="text-gray-700">
+                      {`Free ${3 - Math.min(3, group.members.length)}`}
+                    </Text>
+                  </Pill>
 
-                <Pill className="bg-white flex flex-row items-center rounded-xl">
-                  <div className="w-2 h-2 rounded-full mr-2 bg-gray-600"></div>
-                  <Text size="xs" weight="medium" className="text-gray-700">
-                    {`Purchased ${groupSeats.total - groupSeats.used}`}
-                  </Text>
-                </Pill>
-              </div>
-              <div>
-                <Button
-                  onClick={() => setPurchaseGroupSeatingModalOpen(true)}
-                  btnType="secondary-alt"
-                  btnSize="sm"
-                >
-                  Add seats
-                </Button>
-              </div>
-            </section>
+                  <Pill className="bg-white flex flex-row items-center rounded-xl">
+                    <div className="w-2 h-2 rounded-full mr-2 bg-gray-600"></div>
+                    <Text size="xs" weight="medium" className="text-gray-700">
+                      {`Purchased ${groupSeats.total - groupSeats.used}`}
+                    </Text>
+                  </Pill>
+                </div>
+                <div>
+                  <Button
+                    onClick={() => setPurchaseGroupSeatingModalOpen(true)}
+                    btnType="secondary-alt"
+                    btnSize="sm"
+                  >
+                    Add seats
+                  </Button>
+                </div>
+              </section>
+            )}
 
             <div>
               <List
