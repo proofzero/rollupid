@@ -48,6 +48,25 @@ export const inviteIdentityGroupMember = async ({
   const { identityGroupURN, identifier, accountType } = input
   const inviterIdentityURN = ctx.identityURN as IdentityURN
 
+  const caller = router.createCaller(ctx)
+  const { edges: selfMembershipEdges } = await caller.edges.getEdges({
+    query: {
+      src: {
+        baseUrn: inviterIdentityURN,
+      },
+      tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
+      dst: {
+        baseUrn: identityGroupURN,
+      },
+    },
+  })
+
+  if (selfMembershipEdges.length < 1) {
+    throw new BadRequestError({
+      message: 'Inviter is not a member of the group',
+    })
+  }
+
   const node = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
   if (!node) {
     throw new InternalServerError({
@@ -58,19 +77,17 @@ export const inviteIdentityGroupMember = async ({
   const invitations = await node.class.getInvitations()
   const invitationCount = invitations.length
 
-  const caller = router.createCaller(ctx)
-
-  const { edges: memberEdges } = await caller.edges.getEdges({
+  const { edges: groupMembershipEdges } = await caller.edges.getEdges({
     query: {
-      src: {
-        baseUrn: inviterIdentityURN,
-      },
       tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
+      dst: {
+        baseUrn: identityGroupURN,
+      },
     },
   })
 
   if (
-    invitationCount + memberEdges.length >
+    invitationCount + groupMembershipEdges.length >
     IDENTITY_GROUP_OPTIONS.maxFreeMembers
   ) {
     throw new BadRequestError({
