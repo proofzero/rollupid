@@ -74,7 +74,7 @@ export const publishApp = async ({
       })
     }
 
-    createAnalyticsEvent({
+    await createAnalyticsEvent({
       distinctId: ctx.identityURN as IdentityURN,
       eventName: input.published
         ? 'identity_published_app'
