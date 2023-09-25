@@ -9,6 +9,9 @@ import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import type { IdentityURN } from '@proofzero/urns/identity'
+import { EDGE_APPLICATION } from '../../types'
+import { InternalServerError } from '@proofzero/errors'
+import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 
 export const PublishAppInput = z.object({
   clientId: z.string(),
@@ -58,16 +61,37 @@ export const publishApp = async ({
 
   await appDO.class.publish(input.published)
 
-  ctx.waitUntil?.(
-    createAnalyticsEvent({
+  const buildAnalyticsEvent = async () => {
+    const { edges: ownershipEdges } = await caller.edges.getEdges({
+      query: {
+        tag: EDGE_APPLICATION,
+        dst: { baseUrn: appURN },
+      },
+    })
+    if (ownershipEdges.length === 0) {
+      throw new InternalServerError({
+        message: 'App ownership edge not found',
+      })
+    }
+
+    await createAnalyticsEvent({
       distinctId: ctx.identityURN as IdentityURN,
       eventName: input.published
         ? 'identity_published_app'
         : 'identity_unpublished_app',
       apiKey: ctx.POSTHOG_API_KEY,
-      properties: { $groups: { app: input.clientId } },
+      properties: {
+        $groups: {
+          app: input.clientId,
+          group: IdentityGroupURNSpace.is(ownershipEdges[0].src.baseUrn)
+            ? ownershipEdges[0].src.baseUrn
+            : undefined,
+        },
+      },
     })
-  )
+  }
+
+  ctx.waitUntil?.(buildAnalyticsEvent())
 
   return {
     published: true,

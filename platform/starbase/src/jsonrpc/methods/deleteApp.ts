@@ -2,13 +2,12 @@ import { z } from 'zod'
 import { router } from '@proofzero/platform.core'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import { BadRequestError } from '@proofzero/errors'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { AppClientIdParamSchema } from '../validators/app'
-import { EDGE_APPLICATION } from '../../types'
-import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
-import type { IdentityURN } from '@proofzero/urns/identity'
+import { IdentityURNSpace, type IdentityURN } from '@proofzero/urns/identity'
+import { EDGE_APPLICATION } from '../../types'
 
 export const DeleteAppInput = AppClientIdParamSchema
 
@@ -48,6 +47,15 @@ export const deleteApp = async ({
     }),
   ])
 
+  const appOwnershipEdge = dstEdges.find(
+    (edge) => edge.tag === EDGE_APPLICATION
+  )
+  if (!appOwnershipEdge) {
+    throw new InternalServerError({
+      message: 'App ownership edge not found',
+    })
+  }
+
   await Promise.all(
     srcEdges.concat(dstEdges).map((e) =>
       caller.edges.removeEdge({
@@ -69,7 +77,12 @@ export const deleteApp = async ({
       eventName: 'identity_deleted_app',
       distinctId: ctx.identityURN as IdentityURN,
       properties: {
-        $groups: { app: input.clientId },
+        $groups: {
+          app: input.clientId,
+          group: IdentityURNSpace.is(appOwnershipEdge.src.baseUrn)
+            ? appOwnershipEdge.src.baseUrn
+            : undefined,
+        },
       },
     })
   )

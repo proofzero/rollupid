@@ -8,6 +8,9 @@ import { ServicePlanType } from '@proofzero/types/billing'
 import { EDGE_PAYS_APP } from '@proofzero/types/graph'
 import { IdentityRefURNValidator } from '@proofzero/platform-middleware/inputValidators'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import { EDGE_APPLICATION } from '../../types'
+import { InternalServerError } from '@proofzero/errors'
+import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 
 export const SetAppPlanInput = AppClientIdParamSchema.extend({
   URN: IdentityRefURNValidator,
@@ -62,10 +65,10 @@ export const setAppPlan = async ({
     })
   }
 
-  // This is the way how we can update group properties
-  // https://posthog.com/tutorials/frontend-vs-backend-group-analytics
-  ctx.waitUntil?.(
-    createAnalyticsEvent({
+  const buildAnalyticsEvent = async () => {
+    // This is the way how we can update group properties
+    // https://posthog.com/tutorials/frontend-vs-backend-group-analytics
+    await createAnalyticsEvent({
       eventName: '$groupidentify',
       apiKey: ctx.POSTHOG_API_KEY,
       distinctId: input.URN,
@@ -77,16 +80,33 @@ export const setAppPlan = async ({
         },
       },
     })
-  )
 
-  ctx.waitUntil?.(
-    createAnalyticsEvent({
+    const { edges: ownershipEdges } = await caller.edges.getEdges({
+      query: {
+        tag: EDGE_APPLICATION,
+        dst: { baseUrn: appURN },
+      },
+    })
+    if (ownershipEdges.length === 0) {
+      throw new InternalServerError({
+        message: 'App ownership edge not found',
+      })
+    }
+
+    await createAnalyticsEvent({
       eventName: `app_set_${plan}_plan`,
       apiKey: ctx.POSTHOG_API_KEY,
       distinctId: input.URN,
       properties: {
-        $groups: { app: clientId },
+        $groups: {
+          app: clientId,
+          group: IdentityGroupURNSpace.is(ownershipEdges[0].src.baseUrn)
+            ? ownershipEdges[0].src.baseUrn
+            : undefined,
+        },
       },
     })
-  )
+  }
+
+  ctx.waitUntil?.(buildAnalyticsEvent())
 }

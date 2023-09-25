@@ -9,6 +9,8 @@ import {
   IdentityURNInput,
 } from '@proofzero/platform-middleware/inputValidators'
 import { InternalServerError } from '@proofzero/errors'
+import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import { IdentityURN } from '@proofzero/urns/identity'
 
 export const DeleteIdentityGroupMembershipInputSchema = z.object({
   identityURN: IdentityURNInput,
@@ -64,4 +66,16 @@ export const deleteIdentityGroupMembership = async ({
     tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
     dst: identityGroupURN,
   })
+
+  ctx.waitUntil?.(
+    createAnalyticsEvent({
+      eventName: 'group_member_removed',
+      apiKey: ctx.POSTHOG_API_KEY,
+      distinctId: ctx.identityURN as IdentityURN,
+      properties: {
+        $groups: { group: identityGroupURN },
+        removedIdentityURN: identityURN,
+      },
+    })
+  )
 }

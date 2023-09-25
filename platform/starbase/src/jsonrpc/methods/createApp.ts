@@ -104,7 +104,7 @@ export const createApp = async ({
       apiKey: ctx.POSTHOG_API_KEY,
       distinctId: ctx.identityURN,
       properties: {
-        $groups: { app: clientId },
+        $groups: { app: clientId, group: input.identityGroupURN },
       },
     })
   )

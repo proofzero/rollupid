@@ -47,12 +47,12 @@ export const createIdentityGroup = async ({
       apiKey: ctx.POSTHOG_API_KEY,
       distinctId: ctx.identityURN as IdentityURN,
       properties: {
-        $groups: { group: groupURN },
+        $groups: { group: baseGroupURN },
         $group_type: 'group',
-        $group_key: groupURN,
+        $group_key: baseGroupURN,
         $group_set: {
           name: input.name,
-          groupURN: groupURN,
+          groupURN: baseGroupURN,
           date_joined: new Date().toISOString(),
         },
       },
@@ -65,7 +65,7 @@ export const createIdentityGroup = async ({
       apiKey: ctx.POSTHOG_API_KEY,
       distinctId: ctx.identityURN as IdentityURN,
       properties: {
-        $groups: { group: groupURN },
+        $groups: { group: baseGroupURN },
       },
     })
   )
