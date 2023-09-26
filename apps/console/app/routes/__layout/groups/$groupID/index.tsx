@@ -53,7 +53,7 @@ import { GroupDetailsContextData } from '../$groupID'
 import { PurchaseGroupSeatingModal } from '~/components/Billing/seating'
 import {
   LoaderData,
-  TxTarget,
+  TxProduct,
   action as billingAction,
   loader as billingLoader,
 } from '../../billing/ops'
@@ -561,7 +561,7 @@ export default () => {
                 quantity: groupSeats.total + quantity,
                 customerID: paymentData?.customerID,
                 txType: 'buy',
-                txTarget: TxTarget.GroupSeats,
+                txTarget: TxProduct.GroupSeats,
               }),
             },
             {

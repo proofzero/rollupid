@@ -33,7 +33,7 @@ import {
   LoaderData,
   loader as billingLoader,
   action as billingAction,
-  TxTarget,
+  TxProduct,
 } from '../ops'
 import Breadcrumbs from '@proofzero/design-system/src/atoms/breadcrumbs/Breadcrumbs'
 import { ListIdentityGroupsOutput } from '@proofzero/platform/identity/src/jsonrpc/methods/identity-groups/listIdentityGroups'
@@ -349,7 +349,7 @@ export default () => {
                     quantity: groupSeats.total + quantity,
                     customerID: paymentData?.customerID,
                     txType: 'buy',
-                    txTarget: TxTarget.GroupSeats,
+                    txTarget: TxProduct.GroupSeats,
                   }),
                 },
                 {

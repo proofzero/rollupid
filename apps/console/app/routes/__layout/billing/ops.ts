@@ -39,7 +39,7 @@ import {
   getCurrentAndUpcomingInvoices,
 } from '~/utils/billing'
 
-export enum TxTarget {
+export enum TxProduct {
   Entitlements = 'entitlements',
   GroupSeats = 'groupSeats',
 }
@@ -258,7 +258,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       customerID: string
       quantity: number
       txType: 'buy' | 'remove'
-      txTarget?: TxTarget
+      txTarget?: TxProduct
     }
 
     if ((quantity < 1 && txType === 'buy') || quantity < 0) {
@@ -268,7 +268,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
 
     let sub
-    if (!txTarget || txTarget === TxTarget.Entitlements) {
+    if (!txTarget || txTarget === TxProduct.Entitlements) {
       if (IdentityURNSpace.is(targetURN)) {
         const apps = await coreClient.starbase.listApps.query()
         const assignedEntitlementCount = apps.filter(
@@ -295,7 +295,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         subscriptionID: entitlements.subscriptionID,
         URN: targetURN,
       })
-    } else if (txTarget === TxTarget.GroupSeats) {
+    } else if (txTarget === TxProduct.GroupSeats) {
       const seats = await coreClient.billing.getIdentityGroupSeats.query({
         URN: groupURN as IdentityGroupURN,
       })
@@ -347,7 +347,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         JSON.stringify({
           type: ToastType.Success,
           message: `${
-            !txTarget || txTarget === TxTarget.Entitlements
+            !txTarget || txTarget === TxProduct.Entitlements
               ? 'Entitlement(s)'
               : 'Seat(s)'
           } successfully removed`,
