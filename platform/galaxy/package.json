@@ -25,7 +25,7 @@
     "@graphql-tools/stitch": "8.7.49",
     "@graphql-yoga/plugin-sofa": "1.9.1",
     "@proofzero/utils": "workspace:*",
-    "graphql": "16.6.0",
+    "graphql": "16.8.1",
     "graphql-type-json": "0.3.2",
     "graphql-yoga": "3.9.1",
     "jose": "4.14.4"
