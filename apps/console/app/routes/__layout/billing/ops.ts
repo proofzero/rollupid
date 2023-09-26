@@ -41,7 +41,7 @@ import {
 
 export enum TxProduct {
   Entitlements = 'entitlements',
-  GroupSeats = 'groupSeats',
+  Seats = 'seats',
 }
 
 export type LoaderData = {
@@ -295,7 +295,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         subscriptionID: entitlements.subscriptionID,
         URN: targetURN,
       })
-    } else if (txTarget === TxProduct.GroupSeats) {
+    } else if (txTarget === TxProduct.Seats) {
       const seats = await coreClient.billing.getIdentityGroupSeats.query({
         URN: groupURN as IdentityGroupURN,
       })
