@@ -70,6 +70,12 @@ export const acceptIdentityGroupMemberInvitation = async ({
     dst: identityGroupURN,
   })
 
+  const orderedMembers = await node.class.getOrderedMembers()
+  await node.class.setOrderedMembers([
+    ...orderedMembers,
+    ctx.identityURN as IdentityURN,
+  ])
+
   ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: 'group_invitation_accepted',
