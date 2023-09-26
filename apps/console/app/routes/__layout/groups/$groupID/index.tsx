@@ -553,7 +553,7 @@ export default () => {
         groupID={groupID}
         isOpen={purchaseGroupSeatingModalOpen}
         setIsOpen={setPurchaseGroupSeatingModalOpen}
-        paymentIsSetup={Boolean(paymentData?.paymentMethodID)}
+        paymentData={paymentData}
         purchaseFn={(quantity) => {
           submit(
             {
