@@ -61,7 +61,13 @@ export const listIdentityGroups = async ({
       const name = edge.dst.qc.name
 
       const igNode = initIdentityGroupNodeByName(URN, ctx.IdentityGroup)
-      const pd = await igNode.class.getStripePaymentData()
+      const opRes = await Promise.all([
+        igNode.class.getStripePaymentData(),
+        igNode.class.getOrderedMembers(),
+      ])
+
+      const spd = opRes[0]
+      let orderedMembers = opRes[1]
 
       const { edges: groupMemberEdges } = await caller.edges.getEdges({
         query: {
@@ -72,6 +78,17 @@ export const listIdentityGroups = async ({
         },
       })
 
+      // If there is no ordered members in the DO
+      // or if the numbers mismatch
+      // we do a reinitialization with
+      // the graph as a source of truth
+      if (groupMemberEdges.length > orderedMembers.length) {
+        orderedMembers = groupMemberEdges.map(
+          (edge) => edge.src.baseUrn as IdentityURN
+        )
+        await igNode.class.setOrderedMembers(orderedMembers)
+      }
+
       const mappedMembers = groupMemberEdges
         .filter((edge) => IdentityURNSpace.is(edge.src.baseUrn))
         .map((edge) => ({
@@ -81,12 +98,19 @@ export const listIdentityGroups = async ({
             : null,
         }))
 
+      const mappedOrderedMembers = orderedMembers
+        .map((om) => mappedMembers.find((m) => m.URN === om))
+        .filter(Boolean) as {
+        URN: IdentityURN
+        joinTimestamp: number | null
+      }[]
+
       return {
         URN,
         name,
-        members: mappedMembers,
+        members: mappedOrderedMembers,
         flags: {
-          billingConfigured: Boolean(pd?.paymentMethodID),
+          billingConfigured: Boolean(spd?.paymentMethodID),
         },
       }
     })

@@ -21,13 +21,13 @@ export const PurchaseGroupSeatingModal = ({
   isOpen,
   setIsOpen,
   groupID,
-  paymentIsSetup,
+  paymentData,
   purchaseFn,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   groupID: string
-  paymentIsSetup: boolean
+  paymentData?: PaymentData
   purchaseFn: (quantity: number) => void
 }) => {
   const [seatCountDelta, setSeatCountDelta] = useState(1)
@@ -54,13 +54,15 @@ export const PurchaseGroupSeatingModal = ({
           </div>
         </div>
 
-        {!paymentIsSetup && (
+        {!paymentData?.paymentMethodID && (
           <section className="mx-5 mb-3">
             <ToastWithLink
               message="Update your Payment Information to enable purchasing"
-              linkHref={`/billing/payment?URN=${IdentityGroupURNSpace.urn(
-                groupID
-              )}`}
+              linkHref={
+                paymentData?.customerID
+                  ? `/billing/payment?URN=${IdentityGroupURNSpace.urn(groupID)}`
+                  : `/billing/groups/${groupID}`
+              }
               type={'warning'}
               linkText="Update payment information"
             />
@@ -168,6 +170,7 @@ export const PurchaseGroupSeatingModal = ({
               setSeatCountDelta(1)
               purchaseFn(seatCountDelta)
             }}
+            disabled={!paymentData?.paymentMethodID}
           >
             Purchase
           </Button>
@@ -201,7 +204,7 @@ export const GroupSeatingCard = ({
         isOpen={isPurchaseModalOpen}
         setIsOpen={setIsPurchaseModalOpen}
         groupID={groupID}
-        paymentIsSetup={Boolean(paymentData?.paymentMethodID)}
+        paymentData={paymentData}
         purchaseFn={purchaseFn}
       />
 

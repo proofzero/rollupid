@@ -39,6 +39,11 @@ import {
   getCurrentAndUpcomingInvoices,
 } from '~/utils/billing'
 
+export enum TxProduct {
+  Entitlements = 'entitlements',
+  Seats = 'seats',
+}
+
 export type LoaderData = {
   STRIPE_PUBLISHABLE_KEY: string
   paymentData?: PaymentData
@@ -50,6 +55,10 @@ export type LoaderData = {
   invoices: StripeInvoice[]
   groupURN?: IdentityGroupURN
   unpaidInvoiceURL?: string
+  groupSeats: {
+    total: number
+    used: number
+  }
 }
 
 export const loader = getRollupReqFunctionErrorWrapper(
@@ -72,6 +81,10 @@ export const loader = getRollupReqFunctionErrorWrapper(
       ) as IdentityGroupURN
     }
 
+    const groupSeats = {
+      total: 0,
+      used: 0,
+    }
     const targetURN: IdentityRefURN = groupURN ?? identityURN
     if (IdentityGroupURNSpace.is(targetURN)) {
       const authorized =
@@ -87,6 +100,21 @@ export const loader = getRollupReqFunctionErrorWrapper(
       }
 
       groupURN = targetURN as IdentityGroupURN
+
+      const groups = await coreClient.identity.listIdentityGroups.query()
+      const targetGroup = groups.find((g) => g.URN === groupURN!)
+
+      const seatQuery = await coreClient.billing.getIdentityGroupSeats.query({
+        URN: groupURN,
+      })
+      const groupMemberCount = Math.max(
+        (targetGroup?.members.length ?? 0) - 3,
+        0
+      )
+      const seats = seatQuery?.quantity ?? 0
+
+      groupSeats.total = seats
+      groupSeats.used = groupMemberCount
     }
 
     const { plans } = await coreClient.billing.getEntitlements.query({
@@ -158,6 +186,7 @@ export const loader = getRollupReqFunctionErrorWrapper(
         toastNotification,
         groupURN,
         unpaidInvoiceURL,
+        groupSeats,
       },
       {
         headers: {
@@ -223,46 +252,70 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const fd = await request.formData()
-    const { customerID, quantity, txType } = JSON.parse(
+    const { customerID, quantity, txType, txTarget } = JSON.parse(
       fd.get('payload') as string
     ) as {
       customerID: string
       quantity: number
       txType: 'buy' | 'remove'
-    }
-
-    if (IdentityURNSpace.is(targetURN)) {
-      const apps = await coreClient.starbase.listApps.query()
-      const assignedEntitlementCount = apps.filter(
-        (a) => a.appPlan === ServicePlanType.PRO
-      ).length
-      if (assignedEntitlementCount > quantity) {
-        throw new BadRequestError({
-          message: `Invalid quantity. Change ${
-            quantity - assignedEntitlementCount
-          } of the ${assignedEntitlementCount} apps to a different plan first.`,
-        })
-      }
+      txTarget?: TxProduct
     }
 
     if ((quantity < 1 && txType === 'buy') || quantity < 0) {
       throw new BadRequestError({
-        message: `Invalid quantity. Please enter a valid number of entitlements.`,
+        message: `Invalid quantity. Please enter a valid quantity.`,
       })
     }
 
-    const entitlements = await coreClient.billing.getEntitlements.query({
-      URN: targetURN,
-    })
+    let sub
+    if (!txTarget || txTarget === TxProduct.Entitlements) {
+      if (IdentityURNSpace.is(targetURN)) {
+        const apps = await coreClient.starbase.listApps.query()
+        const assignedEntitlementCount = apps.filter(
+          (a) => a.appPlan === ServicePlanType.PRO
+        ).length
+        if (assignedEntitlementCount > quantity) {
+          throw new BadRequestError({
+            message: `Invalid quantity. Change ${
+              quantity - assignedEntitlementCount
+            } of the ${assignedEntitlementCount} apps to a different plan first.`,
+          })
+        }
+      }
 
-    const sub = await createOrUpdateSubscription({
-      customerID,
-      SECRET_STRIPE_PRO_PLAN_ID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
-      SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
-      quantity,
-      subscriptionID: entitlements.subscriptionID,
-      URN: targetURN,
-    })
+      const entitlements = await coreClient.billing.getEntitlements.query({
+        URN: targetURN,
+      })
+
+      sub = await createOrUpdateSubscription({
+        customerID,
+        planID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
+        SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
+        quantity,
+        subscriptionID: entitlements.subscriptionID,
+        URN: targetURN,
+      })
+    } else if (txTarget === TxProduct.Seats) {
+      const seats = await coreClient.billing.getIdentityGroupSeats.query({
+        URN: groupURN as IdentityGroupURN,
+      })
+      const subID = seats?.subscriptionID
+
+      sub = await createOrUpdateSubscription({
+        customerID,
+        planID: context.env.SECRET_STRIPE_GROUP_SEAT_PLAN_ID,
+        SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
+        quantity,
+        subscriptionID: subID,
+        URN: targetURN,
+      })
+    }
+
+    if (!sub) {
+      throw new BadRequestError({
+        message: `Invalid target. Please select a valid target.`,
+      })
+    }
 
     if (
       (txType === 'buy' &&
@@ -285,6 +338,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       setPurchaseToastNotification({
         sub,
         flashSession,
+        txTarget,
       })
     }
     if (txType === 'remove') {
@@ -292,7 +346,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         'toast_notification',
         JSON.stringify({
           type: ToastType.Success,
-          message: 'Entitlement(s) successfully removed',
+          message: `${
+            !txTarget || txTarget === TxProduct.Entitlements
+              ? 'Entitlement(s)'
+              : 'Seat(s)'
+          } successfully removed`,
         })
       )
     }

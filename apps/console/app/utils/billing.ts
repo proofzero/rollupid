@@ -87,14 +87,14 @@ export const getCurrentAndUpcomingInvoices = async (
 
 export const createOrUpdateSubscription = async ({
   subscriptionID,
-  SECRET_STRIPE_PRO_PLAN_ID,
+  planID,
   SECRET_STRIPE_API_KEY,
   quantity,
   URN,
   customerID,
 }: {
   subscriptionID?: string | null
-  SECRET_STRIPE_PRO_PLAN_ID: string
+  planID: string
   SECRET_STRIPE_API_KEY: string
   quantity: number
   URN: IdentityRefURN
@@ -109,7 +109,7 @@ export const createOrUpdateSubscription = async ({
     sub = await createSubscription(
       {
         customerID: customerID,
-        planID: SECRET_STRIPE_PRO_PLAN_ID,
+        planID,
         quantity,
         URN,
         handled: true,
@@ -120,7 +120,7 @@ export const createOrUpdateSubscription = async ({
     sub = await updateSubscription(
       {
         subscriptionID: subscriptionID,
-        planID: SECRET_STRIPE_PRO_PLAN_ID,
+        planID,
         quantity,
         handled: true,
       },

@@ -83,15 +83,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         URN = subMeta.URN as IdentityRefURN
 
-        const entitlements = await coreClient.billing.getEntitlements.query({
-          URN,
-        })
-        if (entitlements?.subscriptionID !== id) {
-          throw new RollupError({
-            message: `Subscription ID ${id} does not match entitlements subscription ID ${entitlements?.subscriptionID}`,
-          })
-        }
-
         await reconcileAppSubscriptions(
           {
             subscriptionID: id,

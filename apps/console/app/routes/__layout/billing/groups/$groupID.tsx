@@ -33,6 +33,7 @@ import {
   LoaderData,
   loader as billingLoader,
   action as billingAction,
+  TxProduct,
 } from '../ops'
 import Breadcrumbs from '@proofzero/design-system/src/atoms/breadcrumbs/Breadcrumbs'
 import { ListIdentityGroupsOutput } from '@proofzero/platform/identity/src/jsonrpc/methods/identity-groups/listIdentityGroups'
@@ -56,6 +57,7 @@ export default () => {
     invoices,
     groupURN,
     unpaidInvoiceURL,
+    groupSeats,
   } = loaderData
 
   const { PASSPORT_URL, groups, apps } = useOutletContext<{
@@ -74,7 +76,6 @@ export default () => {
         ? actionData
         : fetcher.data
 
-      let clientId = fetcher.data?.clientId
       process3DSecureCard({
         STRIPE_PUBLISHABLE_KEY,
         status,
@@ -83,10 +84,6 @@ export default () => {
         payment_method,
         submit,
         redirectUrl: `/billing/groups/${groupURN?.split('/')[1]}`,
-        updatePlanParams: {
-          clientId,
-          plan: ServicePlanType.PRO,
-        },
         URN: groupURN,
       })
     }
@@ -342,9 +339,24 @@ export default () => {
         {featureFlags['seats'] && groupURN && (
           <GroupSeatingCard
             groupID={groupURN.split('/')[1]}
-            seatsTotal={3}
-            seatsUsed={2}
-            purchaseFn={() => {}}
+            paymentData={paymentData}
+            seatsTotal={groupSeats.total}
+            seatsUsed={groupSeats.used}
+            purchaseFn={(quantity) => {
+              submit(
+                {
+                  payload: JSON.stringify({
+                    quantity: groupSeats.total + quantity,
+                    customerID: paymentData?.customerID,
+                    txType: 'buy',
+                    txTarget: TxProduct.Seats,
+                  }),
+                },
+                {
+                  method: 'post',
+                }
+              )
+            }}
           />
         )}
       </section>

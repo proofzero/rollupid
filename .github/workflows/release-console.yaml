@@ -50,6 +50,7 @@ jobs:
             SECRET_STRIPE_API_KEY
             SECRET_STRIPE_WEBHOOK_SECRET
             SECRET_STRIPE_PRO_PLAN_ID
+            SECRET_STRIPE_GROUP_SEAT_PLAN_ID
         env:
           # A secret used for session encryption.
           SECRET_SESSION_KEY: ${{ secrets.SECRET_SESSION_KEY_PROD }}
@@ -57,3 +58,4 @@ jobs:
           SECRET_STRIPE_API_KEY: ${{ secrets.SECRET_STRIPE_API_KEY_PROD }}
           SECRET_STRIPE_WEBHOOK_SECRET: ${{ secrets.SECRET_STRIPE_WEBHOOK_SECRET_PROD }}
           SECRET_STRIPE_PRO_PLAN_ID: ${{ secrets.SECRET_STRIPE_PRO_PLAN_ID_PROD }}
+          SECRET_STRIPE_GROUP_SEAT_PLAN_ID: ${{ secrets.SECRET_STRIPE_GROUP_SEAT_PLAN_ID_PROD }}

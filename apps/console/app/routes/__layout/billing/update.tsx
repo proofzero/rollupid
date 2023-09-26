@@ -119,7 +119,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         'toast_notification',
         JSON.stringify({
           type: ToastType.Success,
-          message: 'Successfully purchased entitlement(s)',
+          message: 'Successfully updated purchases',
         })
       )
     } catch (ex) {
