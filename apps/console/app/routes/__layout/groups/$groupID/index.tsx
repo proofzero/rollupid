@@ -601,7 +601,7 @@ export default () => {
           title="Add Group Member"
           subtitle="Invite Members to the Group"
           onClick={
-            group.members.length + invitations.length <=
+            group.members.length + invitations.length <
             IDENTITY_GROUP_OPTIONS.maxFreeMembers +
               (groupSeats.total - groupSeats.used)
               ? () => setInviteModalOpen(true)
