@@ -364,7 +364,7 @@ export default () => {
                     quantity: quantity,
                     customerID: paymentData?.customerID,
                     txType: 'remove',
-                    txProduct: TxProduct.GroupSeats,
+                    txProduct: TxProduct.Seats,
                   }),
                 },
                 {
