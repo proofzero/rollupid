@@ -59,6 +59,7 @@ import {
 } from '../../billing/ops'
 import { process3DSecureCard } from '~/utils/billing'
 import { useFeatureFlags } from '@proofzero/design-system/src/hooks/feature-flags'
+import { IDENTITY_GROUP_OPTIONS } from '@proofzero/platform/identity/src/constants'
 
 const accountTypes = [
   ...Object.values(EmailAccountType),
@@ -600,7 +601,8 @@ export default () => {
           title="Add Group Member"
           subtitle="Invite Members to the Group"
           onClick={
-            group.members.length + invitations.length < 3
+            group.members.length + invitations.length <
+            IDENTITY_GROUP_OPTIONS.maxFreeMembers
               ? () => setInviteModalOpen(true)
               : undefined
           }
@@ -778,7 +780,7 @@ export default () => {
 
               <Pill className="bg-gray-200 rounded-lg !pr-2">
                 <Text size="xs" weight="medium" className="text-gray-800">
-                  {group.members.length}/3
+                  {group.members.length}/{IDENTITY_GROUP_OPTIONS.maxFreeMembers}
                 </Text>
               </Pill>
             </div>
@@ -792,7 +794,13 @@ export default () => {
                   <Pill className="bg-white flex flex-row items-center rounded-xl">
                     <div className="w-2 h-2 rounded-full mr-2 bg-blue-300"></div>
                     <Text size="xs" weight="medium" className="text-gray-700">
-                      {`Free ${3 - Math.min(3, group.members.length)}`}
+                      {`Free ${
+                        IDENTITY_GROUP_OPTIONS.maxFreeMembers -
+                        Math.min(
+                          IDENTITY_GROUP_OPTIONS.maxFreeMembers,
+                          group.members.length
+                        )
+                      }`}
                     </Text>
                   </Pill>
 
@@ -817,9 +825,13 @@ export default () => {
 
             <div>
               <List
-                items={group.members.map((m) => ({
+                items={group.members.map((m, i) => ({
                   key: m.URN,
                   val: m,
+                  colorCode:
+                    i < IDENTITY_GROUP_OPTIONS.maxFreeMembers
+                      ? '#93C5FD'
+                      : '#4B5563',
                 }))}
                 itemRenderer={(item) => (
                   <article className="w-full flex flex-row items-center truncate">

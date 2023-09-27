@@ -38,6 +38,7 @@ import {
   createOrUpdateSubscription,
   getCurrentAndUpcomingInvoices,
 } from '~/utils/billing'
+import { IDENTITY_GROUP_OPTIONS } from '@proofzero/platform/identity/src/constants'
 
 export enum TxProduct {
   Entitlements = 'entitlements',
@@ -108,7 +109,8 @@ export const loader = getRollupReqFunctionErrorWrapper(
         URN: groupURN,
       })
       const groupMemberCount = Math.max(
-        (targetGroup?.members.length ?? 0) - 3,
+        (targetGroup?.members.length ?? 0) -
+          IDENTITY_GROUP_OPTIONS.maxFreeMembers,
         0
       )
       const seats = seatQuery?.quantity ?? 0
