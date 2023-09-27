@@ -89,7 +89,7 @@ export const inviteIdentityGroupMember = async ({
   })
 
   if (
-    invitationCount + groupMembershipEdges.length >
+    invitationCount + groupMembershipEdges.length >=
     IDENTITY_GROUP_OPTIONS.maxFreeMembers + (seats?.quantity ?? 0)
   ) {
     throw new BadRequestError({
