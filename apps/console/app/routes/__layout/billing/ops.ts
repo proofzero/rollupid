@@ -252,13 +252,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     })
 
     const fd = await request.formData()
-    const { customerID, quantity, txType, txTarget } = JSON.parse(
+    const { customerID, quantity, txType, txProduct } = JSON.parse(
       fd.get('payload') as string
     ) as {
       customerID: string
       quantity: number
       txType: 'buy' | 'remove'
-      txTarget?: TxProduct
+      txProduct?: TxProduct
     }
 
     if ((quantity < 1 && txType === 'buy') || quantity < 0) {
@@ -268,7 +268,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
 
     let sub
-    if (!txTarget || txTarget === TxProduct.Entitlements) {
+    if (!txProduct || txProduct === TxProduct.Entitlements) {
       if (IdentityURNSpace.is(targetURN)) {
         const apps = await coreClient.starbase.listApps.query()
         const assignedEntitlementCount = apps.filter(
@@ -295,7 +295,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         subscriptionID: entitlements.subscriptionID,
         URN: targetURN,
       })
-    } else if (txTarget === TxProduct.Seats) {
+    } else if (txProduct === TxProduct.Seats) {
       const seats = await coreClient.billing.getIdentityGroupSeats.query({
         URN: groupURN as IdentityGroupURN,
       })
@@ -338,7 +338,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       setPurchaseToastNotification({
         sub,
         flashSession,
-        txTarget,
+        txProduct,
       })
     }
     if (txType === 'remove') {
@@ -347,7 +347,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         JSON.stringify({
           type: ToastType.Success,
           message: `${
-            !txTarget || txTarget === TxProduct.Entitlements
+            !txProduct || txProduct === TxProduct.Entitlements
               ? 'Entitlement(s)'
               : 'Seat(s)'
           } successfully removed`,

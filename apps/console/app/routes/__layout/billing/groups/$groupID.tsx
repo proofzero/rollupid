@@ -349,7 +349,7 @@ export default () => {
                     quantity: groupSeats.total + quantity,
                     customerID: paymentData?.customerID,
                     txType: 'buy',
-                    txTarget: TxProduct.Seats,
+                    txProduct: TxProduct.Seats,
                   }),
                 },
                 {
@@ -364,7 +364,7 @@ export default () => {
                     quantity: quantity,
                     customerID: paymentData?.customerID,
                     txType: 'remove',
-                    txTarget: TxTarget.GroupSeats,
+                    txProduct: TxProduct.GroupSeats,
                   }),
                 },
                 {

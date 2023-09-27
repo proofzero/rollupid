@@ -260,7 +260,7 @@ export const RemoveGroupSeatingModal = ({
 
               <div className="flex flex-row text-gray-500 space-x-4">
                 <div className="flex flex-row items-center space-x-2">
-                  <Text size="sm">{totalSeats} Entitlements</Text>
+                  <Text size="sm">{totalSeats} Seat(s)</Text>
                   <HiArrowNarrowRight />
                 </div>
 
@@ -372,7 +372,7 @@ export const RemoveGroupSeatingModal = ({
               removalFn(seatsNew)
             }}
           >
-            Remove Entitlement(s)
+            Remove Seat(s)
           </Button>
           <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
             Cancel

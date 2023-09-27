@@ -561,7 +561,7 @@ export default () => {
                 quantity: groupSeats.total + quantity,
                 customerID: paymentData?.customerID,
                 txType: 'buy',
-                txTarget: TxProduct.Seats,
+                txProduct: TxProduct.Seats,
               }),
             },
             {
