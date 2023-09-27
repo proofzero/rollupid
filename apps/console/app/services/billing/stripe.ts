@@ -274,7 +274,7 @@ export const reconcileAppSubscriptions = async (
       priceID: si.price.id,
       quantity: si.quantity,
     }))
-    .filter((pq) => Boolean(pq.quantity))
+    .filter((pq) => pq.quantity != null)
 
   const priceIdToPlanTypeDict = {
     [env.SECRET_STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,

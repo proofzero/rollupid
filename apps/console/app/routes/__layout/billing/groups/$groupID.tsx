@@ -349,7 +349,22 @@ export default () => {
                     quantity: groupSeats.total + quantity,
                     customerID: paymentData?.customerID,
                     txType: 'buy',
-                    txTarget: TxProduct.Seats,
+                    txProduct: TxProduct.Seats,
+                  }),
+                },
+                {
+                  method: 'post',
+                }
+              )
+            }}
+            removalFn={(quantity) => {
+              submit(
+                {
+                  payload: JSON.stringify({
+                    quantity: quantity,
+                    customerID: paymentData?.customerID,
+                    txType: 'remove',
+                    txProduct: TxProduct.Seats,
                   }),
                 },
                 {

@@ -59,11 +59,11 @@ export function useMatchesData(
 export const setPurchaseToastNotification = ({
   sub,
   flashSession,
-  txTarget,
+  txProduct,
 }: {
   sub: Stripe.Subscription
   flashSession: any
-  txTarget?: TxProduct
+  txProduct?: TxProduct
 }) => {
   const status = (sub.latest_invoice as Stripe.Invoice).status
 
@@ -77,7 +77,7 @@ export const setPurchaseToastNotification = ({
       JSON.stringify({
         type: ToastType.Success,
         message: `${
-          !txTarget || txTarget === TxProduct.Entitlements
+          !txProduct || txProduct === TxProduct.Entitlements
             ? 'Entitlement(s)'
             : 'Seat(s)'
         } successfully bought`,
