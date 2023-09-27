@@ -601,8 +601,9 @@ export default () => {
           title="Add Group Member"
           subtitle="Invite Members to the Group"
           onClick={
-            group.members.length + invitations.length <
-            IDENTITY_GROUP_OPTIONS.maxFreeMembers
+            group.members.length + invitations.length <=
+            IDENTITY_GROUP_OPTIONS.maxFreeMembers +
+              (groupSeats.total - groupSeats.used)
               ? () => setInviteModalOpen(true)
               : undefined
           }
@@ -780,7 +781,8 @@ export default () => {
 
               <Pill className="bg-gray-200 rounded-lg !pr-2">
                 <Text size="xs" weight="medium" className="text-gray-800">
-                  {group.members.length}/{IDENTITY_GROUP_OPTIONS.maxFreeMembers}
+                  {group.members.length}/
+                  {IDENTITY_GROUP_OPTIONS.maxFreeMembers + groupSeats.total}
                 </Text>
               </Pill>
             </div>

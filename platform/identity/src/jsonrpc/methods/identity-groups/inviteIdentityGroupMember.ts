@@ -77,6 +77,8 @@ export const inviteIdentityGroupMember = async ({
   const invitations = await node.class.getInvitations()
   const invitationCount = invitations.length
 
+  const seats = await node.class.getSeats()
+
   const { edges: groupMembershipEdges } = await caller.edges.getEdges({
     query: {
       tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
@@ -88,7 +90,7 @@ export const inviteIdentityGroupMember = async ({
 
   if (
     invitationCount + groupMembershipEdges.length >
-    IDENTITY_GROUP_OPTIONS.maxFreeMembers
+    IDENTITY_GROUP_OPTIONS.maxFreeMembers + (seats?.quantity ?? 0)
   ) {
     throw new BadRequestError({
       message: 'Max members reached',
