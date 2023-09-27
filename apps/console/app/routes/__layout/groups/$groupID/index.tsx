@@ -602,8 +602,7 @@ export default () => {
           subtitle="Invite Members to the Group"
           onClick={
             group.members.length + invitations.length <
-            IDENTITY_GROUP_OPTIONS.maxFreeMembers +
-              (groupSeats.total - groupSeats.used)
+            IDENTITY_GROUP_OPTIONS.maxFreeMembers + groupSeats.total
               ? () => setInviteModalOpen(true)
               : undefined
           }
