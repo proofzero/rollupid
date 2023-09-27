@@ -28,6 +28,7 @@ export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({
         ctx: {
           ...ctx,
           ownAppURNs,
+          allAppURNs: ownAppURNs,
         },
       })
     }
@@ -44,6 +45,7 @@ export const OwnAppsMiddleware: BaseMiddlewareFunction<Context> = async ({
       ctx: {
         ...ctx,
         ownAppURNs,
+        allAppURNs: ownAppURNs,
       },
     })
   }
