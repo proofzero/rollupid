@@ -6,6 +6,7 @@ export type ListItemProps = {
   id: Key
   onClick?: (id: Key) => void
   disabled?: boolean
+  colorCode?: string
 }
 
 export const ListItem = ({
@@ -13,23 +14,31 @@ export const ListItem = ({
   children,
   disabled = false,
   onClick,
+  colorCode,
 }: ListItemProps) => {
   return (
     <div
       key={id}
-      className={classNames(
-        `border border-gray-300 rounded-md
-                py-2 mb-3 bg-white
-                flex flex-row items-center justify-between
-                shadow-sm px-4 truncate`,
-        {
-          'bg-gray-100': disabled === true,
-          'cursor-pointer hover:bg-[#F3F4F6]': onClick != null,
-        }
-      )}
-      onClick={() => onClick && onClick(id)}
+      className="border border-gray-300 rounded-md mb-3 shadow-sm truncate"
     >
-      <div className="flex flex-1 truncate">{children}</div>
+      <div
+        className={classNames(
+          `py-2 bg-white
+                flex flex-row items-center justify-between
+                px-4 truncate`,
+          {
+            'border-l-4 rounded-[5px]': colorCode != null,
+            'bg-gray-100': disabled === true,
+            'cursor-pointer hover:bg-[#F3F4F6]': onClick != null,
+          }
+        )}
+        style={{
+          ...(colorCode != null ? { borderLeftColor: colorCode } : {}),
+        }}
+        onClick={() => onClick && onClick(id)}
+      >
+        <div className="flex flex-1 truncate">{children}</div>
+      </div>
     </div>
   )
 }

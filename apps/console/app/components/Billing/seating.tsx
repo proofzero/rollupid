@@ -3,6 +3,7 @@ import { Button } from '@proofzero/design-system'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
+import { IDENTITY_GROUP_OPTIONS } from '@proofzero/platform/identity/src/constants'
 import { PaymentData } from '@proofzero/types/billing'
 import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 import { Link } from '@remix-run/react'
@@ -88,8 +89,10 @@ export const PurchaseGroupSeatingModal = ({
               weight="medium"
               className="text-gray-500 text-left mb-6"
             >
-              Each group has 3 free user seats. If you wish to add more than 3
-              members, additional seats need to be purchased.
+              Each group has {IDENTITY_GROUP_OPTIONS.maxFreeMembers} free user
+              seats. If you wish to add more than{' '}
+              {IDENTITY_GROUP_OPTIONS.maxFreeMembers} members, additional seats
+              need to be purchased.
             </Text>
           </div>
 
@@ -427,8 +430,10 @@ export const GroupSeatingCard = ({
               Additional User Seats
             </Text>
             <Text size="sm" weight="medium" className="text-gray-500">
-              Each group has 3 free user seats. If you wish to add more than 3
-              members, additional seats need to be purchased.
+              Each group has {IDENTITY_GROUP_OPTIONS.maxFreeMembers} free user
+              seats. If you wish to add more than{' '}
+              {IDENTITY_GROUP_OPTIONS.maxFreeMembers} members, additional seats
+              need to be purchased.
             </Text>
           </div>
 

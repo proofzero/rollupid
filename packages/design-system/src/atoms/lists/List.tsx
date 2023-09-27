@@ -6,6 +6,7 @@ type ListItem = {
   val: any
   disabled?: boolean
   onClick?: (id: Key) => void
+  colorCode?: string
 }
 
 export type ListProps<T extends ListItem> = {
@@ -26,6 +27,7 @@ export const List = <T extends ListItem>({
           key={item.key}
           id={item.key}
           disabled={item.disabled}
+          colorCode={item.colorCode}
           onClick={
             onItemClick != null
               ? (key) => onItemClick(items.find((i) => i.key === key))
