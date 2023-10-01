@@ -5,7 +5,8 @@ import * as jose from 'jose'
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
-import { InternalServerError } from '@proofzero/errors'
+import { InternalServerError, RollupError } from '@proofzero/errors'
+import { NodeMethodReturnValue } from '@proofzero/types/node'
 
 import { IdentityURN } from '@proofzero/urns/identity'
 import type { Scope } from '@proofzero/types/authorization'
@@ -176,19 +177,25 @@ export default class Authorization extends DOProxy {
     jwt: string,
     jwks: jose.JSONWebKeySet,
     options: jose.JWTVerifyOptions = {}
-  ): Promise<jose.JWTVerifyResult> {
+  ): Promise<NodeMethodReturnValue<jose.JWTVerifyResult, RollupError>> {
     const { kid } = jose.decodeProtectedHeader(jwt)
     if (kid) {
       try {
-        return await jose.jwtVerify(jwt, jose.createLocalJWKSet(jwks), options)
+        return {
+          value: await jose.jwtVerify(
+            jwt,
+            jose.createLocalJWKSet(jwks),
+            options
+          ),
+        }
       } catch (error) {
         if (error instanceof jose.errors.JWTClaimValidationFailed)
-          throw TokenClaimValidationFailedError
+          return { error: TokenClaimValidationFailedError }
         else if (error instanceof jose.errors.JWTExpired)
-          throw ExpiredTokenError
+          return { error: ExpiredTokenError }
         else if (error instanceof jose.errors.JWTInvalid)
-          throw InvalidTokenError
-        else throw TokenVerificationFailedError
+          return { error: InvalidTokenError }
+        else return { error: TokenVerificationFailedError }
       }
     } else {
       // TODO: Initial signing keys didn't have `kid` property.
@@ -199,20 +206,20 @@ export default class Authorization extends DOProxy {
         const { alg } = JWT_OPTIONS
         const key = await jose.importJWK(local, alg)
         try {
-          return await jose.jwtVerify(jwt, key, options)
+          return { value: await jose.jwtVerify(jwt, key, options) }
         } catch (error) {
           if (error instanceof jose.errors.JWTClaimValidationFailed)
-            throw TokenClaimValidationFailedError
+            return { error: TokenClaimValidationFailedError }
           else if (error instanceof jose.errors.JWTExpired)
-            throw ExpiredTokenError
+            return { error: ExpiredTokenError }
           else if (error instanceof jose.errors.JWTInvalid)
-            throw InvalidTokenError
-          else throw TokenVerificationFailedError
+            return { error: InvalidTokenError }
+          else return { error: TokenVerificationFailedError }
         }
       }
     }
 
-    throw TokenVerificationFailedError
+    return { error: TokenVerificationFailedError }
   }
 
   async revoke(
@@ -220,7 +227,9 @@ export default class Authorization extends DOProxy {
     jwks: jose.JSONWebKeySet,
     options: jose.JWTVerifyOptions = {}
   ): Promise<void> {
-    const { payload } = await this.verify(token, jwks, options)
+    const { value, error } = await this.verify(token, jwks, options)
+    if (error) throw error
+    const { payload } = value
     await this.state.storage.transaction(async (txn) => {
       const { jti } = payload
       if (!jti) {

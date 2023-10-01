@@ -5,6 +5,7 @@ import { router } from '@proofzero/platform.core'
 import type { AuthorizationJWTPayload } from '@proofzero/types/authorization'
 import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
+import { getErrorCause } from '@proofzero/utils/errors'
 
 import { Context } from '../../context'
 import { getJWKS } from '../../jwk'
@@ -62,5 +63,8 @@ export const verifyTokenMethod: VerifyTokenMethod = async ({ ctx, input }) => {
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
   const node = initAuthorizationNodeByName(urn, ctx.Authorization)
   const jwks = getJWKS(ctx)
-  return node.class.verify(token, jwks, { issuer })
+
+  const { value, error } = await node.class.verify(token, jwks, { issuer })
+  if (error) throw getErrorCause(error)
+  return value
 }
