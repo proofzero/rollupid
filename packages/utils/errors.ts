@@ -18,7 +18,7 @@ import {
 import { TraceSpan } from '@proofzero/platform-middleware/trace'
 
 export type RemixRequestFunctionWrapper<
-  T extends LoaderFunction | ActionFunction
+  T extends LoaderFunction | ActionFunction,
 > = (func: T) => T extends LoaderFunction ? LoaderFunction : ActionFunction
 
 /** Returns `LoaderFunction` or `ActionFunction` passed in, with the Rollup's

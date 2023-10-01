@@ -112,7 +112,7 @@ type ExchangeTokenParams<T = ExchangeTokenMethodInput> = {
 
 interface ExchangeTokenMethod<
   T = ExchangeTokenMethodInput,
-  R = ExchangeTokenMethodOutput
+  R = ExchangeTokenMethodOutput,
 > {
   (params: ExchangeTokenParams<T>): Promise<R>
 }
