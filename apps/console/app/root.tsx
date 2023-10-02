@@ -55,6 +55,7 @@ import { useHydrated } from 'remix-utils'
 import { getCurrentAndUpcomingInvoices } from './utils/billing'
 import type { ServicePlanType } from '@proofzero/types/billing'
 import { registerFeatureFlag } from '@proofzero/design-system/src/hooks/feature-flags'
+import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 
 export const links: LinksFunction = () => {
   return [
@@ -94,6 +95,7 @@ export type LoaderData = {
     WALLET_CONNECT_PROJECT_ID: string
   }
   identityURN: IdentityURN
+  nastyIG: IdentityGroupURN[]
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -201,6 +203,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         console.error('Could not retrieve invoices.', e)
       }
 
+      const nastyIG = await coreClient.identity.listNastyIdentityGroups.query()
+
       return json<LoaderData>({
         apps: reshapedApps,
         avatarUrl,
@@ -219,6 +223,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         },
         displayName,
         identityURN,
+        nastyIG,
       })
     } catch (error) {
       console.error({ error })
@@ -268,6 +273,7 @@ export default function App() {
     identityURN,
     hasUnpaidInvoices,
     unpaidInvoiceURL,
+    nastyIG,
   } = loaderData ?? {}
 
   useEffect(() => {
@@ -340,6 +346,7 @@ export default function App() {
                 identityURN,
                 hasUnpaidInvoices,
                 unpaidInvoiceURL,
+                nastyIG,
               }}
             />
           </PostHogProvider>
@@ -354,6 +361,7 @@ export default function App() {
               identityURN,
               hasUnpaidInvoices,
               unpaidInvoiceURL,
+              nastyIG,
             }}
           />
         )}

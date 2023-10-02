@@ -24,6 +24,7 @@ export default function DashboardIndexPage() {
     PASSPORT_URL,
     hasUnpaidInvoices,
     unpaidInvoiceURL,
+    nastyIG,
   } = context
 
   return (
@@ -36,6 +37,7 @@ export default function DashboardIndexPage() {
             open={open}
             pfpUrl={avatarUrl}
             displayName={displayName}
+            nastyIG={nastyIG}
           />
           <main className="flex flex-col flex-initial min-h-full w-full bg-white">
             <SiteHeader avatarUrl={avatarUrl} />

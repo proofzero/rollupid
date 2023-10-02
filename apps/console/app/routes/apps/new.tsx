@@ -53,7 +53,7 @@ export default function CreateNewApp() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const posthog = usePostHog()
 
-  const { apps, avatarUrl, PASSPORT_URL, displayName } =
+  const { apps, avatarUrl, PASSPORT_URL, displayName, nastyIG } =
     useOutletContext<OutletContextData>()
 
   return (
@@ -66,6 +66,7 @@ export default function CreateNewApp() {
             PASSPORT_URL={PASSPORT_URL}
             displayName={displayName}
             pfpUrl={avatarUrl}
+            nastyIG={nastyIG}
           />
 
           <main
