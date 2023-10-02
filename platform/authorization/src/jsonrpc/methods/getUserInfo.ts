@@ -1,11 +1,7 @@
 import { z } from 'zod'
 import { decodeJwt } from 'jose'
 
-import {
-  BadRequestError,
-  InternalServerError,
-  UnauthorizedError,
-} from '@proofzero/errors'
+import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
 import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
 import { AuthorizationJWTPayload } from '@proofzero/types/authorization'
@@ -19,6 +15,7 @@ import {
   userClaimsFormatter,
 } from '@proofzero/security/persona'
 import { PersonaData } from '@proofzero/types/application'
+import { getErrorCause } from '@proofzero/utils/errors'
 
 export const GetUserInfoInput = z.object({
   access_token: z.string(),
@@ -54,7 +51,12 @@ export const getUserInfoMethod = async ({
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
   const authorizationNode = initAuthorizationNodeByName(urn, ctx.Authorization)
   const jwks = getJWKS(ctx)
-  await authorizationNode.class.verify(token, jwks, { issuer: input.issuer })
+
+  const { error } = await authorizationNode.class.verify(token, jwks, {
+    issuer: input.issuer,
+  })
+
+  if (error) throw getErrorCause(error)
 
   const personaData = await authorizationNode.storage.get<PersonaData>(
     'personaData'

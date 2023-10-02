@@ -39,6 +39,7 @@ import {
 } from '@proofzero/security/persona'
 import { UnauthorizedError } from '@proofzero/errors'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import { getErrorCause } from '@proofzero/utils/errors'
 
 const AuthenticationCodeInput = z.object({
   grantType: z.literal(GrantType.AuthenticationCode),
@@ -329,7 +330,8 @@ const handleRefreshToken: ExchangeTokenMethod<
   const authorizationNode = initAuthorizationNodeByName(urn, ctx.Authorization)
 
   const jwks = getJWKS(ctx)
-  await authorizationNode.class.verify(refreshToken, jwks)
+  const { error } = await authorizationNode.class.verify(refreshToken, jwks)
+  if (error) throw getErrorCause(error)
 
   const scope = payload.scope.split(' ')
   const { expirationTime } = ACCESS_TOKEN_OPTIONS

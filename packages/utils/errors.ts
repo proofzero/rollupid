@@ -70,7 +70,7 @@ export const ROLLUP_ERROR_CLASS_BY_CODE = {
   [ERROR_CODES.NOT_FOUND]: NotFoundError,
 }
 
-export const getErrorCause = (error: unknown): Error => {
+export const getErrorCause = (error: unknown): RollupError | Error => {
   if (error instanceof RollupError) {
     return error
   } else if (error instanceof TRPCClientError) {

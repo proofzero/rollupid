@@ -21,19 +21,14 @@ export const ValidateJWT: BaseMiddlewareFunction<{
   token?: string
 }> = ({ ctx, next }) => {
   if (ctx.token) {
-    try {
-      const { sub: subject } = checkToken(ctx.token)
-      if (subject && IdentityURNSpace.is(subject)) {
-        return next({
-          ctx: {
-            ...ctx,
-            identityURN: subject,
-          },
-        })
-      }
-    } catch (error) {
-      if (error instanceof RollupError) return next({ ctx })
-      else throw error
+    const { sub: subject } = checkToken(ctx.token)
+    if (subject && IdentityURNSpace.is(subject)) {
+      return next({
+        ctx: {
+          ...ctx,
+          identityURN: subject,
+        },
+      })
     }
   }
 
