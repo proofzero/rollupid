@@ -13,6 +13,7 @@ import { Toaster, toast } from '@proofzero/design-system/src/atoms/toast'
 import { ToastModel, getToastsAndFlashSession } from '~/utils/toast.server'
 import { useEffect } from 'react'
 import { AppLoaderData } from '~/root'
+import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 
 type GroupMemberModel = {
   URN: IdentityURN
@@ -37,6 +38,7 @@ type GroupRootLoaderData = {
 export type GroupRootContextData = GroupRootLoaderData & {
   identityURN: IdentityURN
   apps: AppLoaderData[]
+  nastyIG: IdentityGroupURN[]
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -124,9 +126,10 @@ export default () => {
       toasts: ToastModel[]
     }
   >()
-  const { apps, identityURN } = useOutletContext<{
+  const { apps, identityURN, nastyIG } = useOutletContext<{
     apps: AppLoaderData[]
     identityURN: IdentityURN
+    nastyIG: IdentityGroupURN[]
   }>()
 
   useEffect(() => {
@@ -149,6 +152,7 @@ export default () => {
           identityURN,
           ...data,
           apps,
+          nastyIG,
         }}
       />
     </>

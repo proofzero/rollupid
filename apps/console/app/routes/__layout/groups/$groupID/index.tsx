@@ -60,6 +60,8 @@ import {
 import { process3DSecureCard } from '~/utils/billing'
 import { useFeatureFlags } from '@proofzero/design-system/src/hooks/feature-flags'
 import { IDENTITY_GROUP_OPTIONS } from '@proofzero/platform/identity/src/constants'
+import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
+import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 
 const accountTypes = [
   ...Object.values(EmailAccountType),
@@ -463,6 +465,7 @@ export default () => {
     PASSPORT_URL,
     identityURN,
     invitations,
+    nastyIG,
   } = useOutletContext<GroupDetailsContextData>()
 
   const { STRIPE_PUBLISHABLE_KEY, toastNotification, paymentData, groupSeats } =
@@ -522,6 +525,21 @@ export default () => {
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
+
+      {nastyIG.includes(groupURN) && (
+        <section className="mb-6">
+          <ToastWithLink
+            message="Payment for group user seats failed. Update group Payment Information to enable members' access"
+            linkHref={
+              paymentData?.customerID
+                ? `/billing/payment?URN=${IdentityGroupURNSpace.urn(groupID)}`
+                : `/billing/groups/${groupID}`
+            }
+            linkText="Update payment information"
+            type="warning"
+          />
+        </section>
+      )}
 
       <InviteMemberModal
         groupID={groupID}
@@ -806,10 +824,18 @@ export default () => {
                   </Pill>
 
                   <Pill className="bg-white flex flex-row items-center rounded-xl">
-                    <div className="w-2 h-2 rounded-full mr-2 bg-gray-600"></div>
+                    <div
+                      className={classNames('w-2 h-2 rounded-full mr-2', {
+                        'bg-gray-600': !nastyIG.includes(groupURN),
+                        'bg-orange-400': nastyIG.includes(groupURN),
+                      })}
+                    ></div>
                     <Text size="xs" weight="medium" className="text-gray-700">
                       {`Purchased ${groupSeats.total - groupSeats.used}`}
                     </Text>
+                    {nastyIG.includes(groupURN) && (
+                      <img src={dangerVector} className="w-4 h-4 ml-2" />
+                    )}
                   </Pill>
                 </div>
                 <div>
@@ -832,6 +858,8 @@ export default () => {
                   colorCode:
                     i < IDENTITY_GROUP_OPTIONS.maxFreeMembers
                       ? '#93C5FD'
+                      : nastyIG.includes(groupURN)
+                      ? '#FB923C'
                       : '#4B5563',
                 }))}
                 itemRenderer={(item) => (

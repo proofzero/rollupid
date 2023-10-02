@@ -201,7 +201,7 @@ const GroupHasAppsModal = ({
 }
 
 export default () => {
-  const { groups, apps } = useOutletContext<GroupRootContextData>()
+  const { groups, apps, nastyIG } = useOutletContext<GroupRootContextData>()
   const navigate = useNavigate()
 
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false)
