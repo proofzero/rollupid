@@ -25,4 +25,5 @@ export type PaymentData = {
   name: string
   paymentMethodID?: string
   accountURN?: AccountURN
+  paymentFailed?: boolean
 }

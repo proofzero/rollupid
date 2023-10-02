@@ -12,6 +12,10 @@ import { type AccountURN } from '@proofzero/urns/account'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { ServicePlanType } from '@proofzero/types/billing'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
 
 type StripeInvoicePayload = {
   id: string
@@ -61,6 +65,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           metadata: subMeta,
           status: subStatus,
           latest_invoice: latestInvoice,
+          plan: { id: planID },
         } = event.data.object as {
           id: string
           latest_invoice: string
@@ -68,9 +73,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             URN?: IdentityRefURN
           }
           status: string
+          plan: {
+            id: string
+          }
         }
 
         const invoice = await stripeClient.invoices.retrieve(latestInvoice)
+
+        URN = subMeta.URN as IdentityRefURN
 
         // We don't want to do anything with subscription
         // if payment for it failed
@@ -78,10 +88,29 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           (subStatus !== 'active' && subStatus !== 'trialing') ||
           invoice.status !== 'paid'
         ) {
+          console.log(
+            'SHOULD ENTER FAILURE MODE',
+            JSON.stringify(planID, null, 2)
+          )
+          // If the subscription contains seats
+          // We need to mark the group as having a failed payment
+          if (planID === context.env.SECRET_STRIPE_GROUP_SEAT_PLAN_ID) {
+            await coreClient.billing.setPaymentFailed.mutate({
+              URN: URN as IdentityGroupURN,
+            })
+          }
+
           return null
         }
 
-        URN = subMeta.URN as IdentityRefURN
+        // If the subscription contains seats
+        // We need to remove failed payment flag from group
+        if (planID === context.env.SECRET_STRIPE_GROUP_SEAT_PLAN_ID) {
+          await coreClient.billing.setPaymentFailed.mutate({
+            URN: URN as IdentityGroupURN,
+            failed: false,
+          })
+        }
 
         await reconcileAppSubscriptions(
           {
@@ -289,6 +318,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             coreClient.starbase.deleteSubscriptionPlans.mutate({
               URN,
             }),
+            async () => {
+              if (IdentityGroupURNSpace.is(URN!)) {
+                await coreClient.billing.updateIdentityGroupSeats.mutate({
+                  subscriptionID: subIdDel,
+                  URN: URN as IdentityGroupURN,
+                  quantity: 0,
+                })
+              }
+            },
           ])
         }
 

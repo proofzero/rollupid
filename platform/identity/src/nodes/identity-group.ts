@@ -1,4 +1,4 @@
-import { RollupError } from '@proofzero/errors'
+import { InternalServerError, RollupError } from '@proofzero/errors'
 import {
   CryptoAccountType,
   EmailAccountType,
@@ -192,5 +192,20 @@ export default class IdentityGroup extends DOProxy {
 
   async setOrderedMembers(members: IdentityURN[]): Promise<void> {
     await this.state.storage.put('orderedMembers', members)
+  }
+
+  async setPaymentFailed(failed: boolean = true) {
+    const paymentData = await this.getStripePaymentData()
+    if (!paymentData) {
+      throw new InternalServerError({
+        message: 'No payment data found',
+      })
+    }
+
+    paymentData.paymentFailed = failed
+
+    console.log('SET PAYMENT FAILED', JSON.stringify(paymentData, null, 2))
+
+    await this.state.storage.put('stripePaymentData', paymentData)
   }
 }
