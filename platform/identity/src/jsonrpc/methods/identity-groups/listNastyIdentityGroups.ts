@@ -29,18 +29,17 @@ export const listNastyIdentityGroups = async ({
     },
   })
 
-  const identityGroups: ListNastyIdentityGroupsOutput = await Promise.all(
-    edges
-      .filter(async (edge) => {
-        const URN = edge.dst.baseUrn as IdentityGroupURN
+  const resURNs = []
+  for (const edge of edges) {
+    const igNode = initIdentityGroupNodeByName(
+      edge.dst.baseUrn,
+      ctx.IdentityGroup
+    )
+    const spd = await igNode.class.getStripePaymentData()
+    if (spd && spd.paymentFailed) {
+      resURNs.push(edge.dst.baseUrn)
+    }
+  }
 
-        const igNode = initIdentityGroupNodeByName(URN, ctx.IdentityGroup)
-        const spd = await igNode.class.getStripePaymentData()
-
-        return Boolean(spd?.paymentFailed)
-      })
-      .map((edge) => edge.dst.baseUrn as IdentityGroupURN)
-  )
-
-  return identityGroups
+  return resURNs as ListNastyIdentityGroupsOutput
 }
