@@ -357,6 +357,20 @@ export const reconcileAppSubscriptions = async (
           quantity: stripeSeatQuantity!,
         })
       }
+
+      // If the group has more seats than the subscription, set payment failed
+      // because this flag is responsible for displaying the "Payment failed"
+      // in the UI
+      if (groupSeats && groupSeats.quantity > stripeSeatQuantity!) {
+        await coreClient.billing.setPaymentFailed.mutate({
+          URN: URN as IdentityGroupURN,
+        })
+      } else if (!groupSeats || groupSeats.quantity < stripeSeatQuantity!) {
+        await coreClient.billing.setPaymentFailed.mutate({
+          URN: URN as IdentityGroupURN,
+          failed: false,
+        })
+      }
     }
   }
 }
