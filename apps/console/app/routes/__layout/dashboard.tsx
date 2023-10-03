@@ -13,6 +13,7 @@ import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import type { IdentityURN } from '@proofzero/urns/identity'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { redirect, type LoaderFunction } from '@remix-run/cloudflare'
+import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -37,7 +38,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
 export default () => {
   const navigate = useNavigate()
-  const { apps, ENV } = useOutletContext<OutletContextData>()
+  const { apps, ENV } = useOutletContext<
+    OutletContextData & {
+      nastyIG: IdentityGroupURN[]
+    }
+  >()
 
   const GATag = ENV?.INTERNAL_GOOGLE_ANALYTICS_TAG
 

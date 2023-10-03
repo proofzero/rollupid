@@ -7,6 +7,7 @@ import { LoaderFunction, json, redirect } from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import type { LoaderData as OutletContextData } from '~/root'
 import { ListIdentityGroupsOutput } from '@proofzero/platform/identity/src/jsonrpc/methods/identity-groups/listIdentityGroups'
+import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -32,8 +33,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
 export default () => {
   const { groups } = useLoaderData<{ groups: ListIdentityGroupsOutput }>()
-  const { PASSPORT_URL, hasUnpaidInvoices, apps, nastyIG } =
-    useOutletContext<OutletContextData>()
+  const { PASSPORT_URL, hasUnpaidInvoices, apps, nastyIG } = useOutletContext<
+    OutletContextData & {
+      nastyIG: IdentityGroupURN[]
+    }
+  >()
 
   return (
     <Outlet
