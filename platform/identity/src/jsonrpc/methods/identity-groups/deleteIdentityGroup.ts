@@ -5,10 +5,11 @@ import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 import { Context } from '../../../context'
 import { IdentityGroupURNValidator } from '@proofzero/platform-middleware/inputValidators'
 import { initIdentityGroupNodeByName } from '../../../nodes'
-import { BadRequestError } from '@proofzero/errors'
+import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
 import { EDGE_APPLICATION } from '@proofzero/platform.starbase/src/types'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { IdentityURN } from '@proofzero/urns/identity'
+import { getErrorCause } from '@proofzero/utils/errors'
 
 export const DeleteIdentityGroupInputSchema = IdentityGroupURNValidator
 type DeleteIdentityGroupInput = z.infer<typeof DeleteIdentityGroupInputSchema>
@@ -20,8 +21,19 @@ export const deleteIdentityGroup = async ({
   input: DeleteIdentityGroupInput
   ctx: Context
 }): Promise<void> => {
-  const caller = router.createCaller(ctx)
+  if (!ctx.identityURN) {
+    throw new BadRequestError({
+      message: 'No identity URN in context',
+    })
+  }
 
+  const DO = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
+  const { error } = await DO.class.validateAdmin(ctx.identityURN)
+  if (error) {
+    throw getErrorCause(error)
+  }
+
+  const caller = router.createCaller(ctx)
   const { edges: membershipEdges } = await caller.edges.getEdges({
     query: {
       tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
@@ -30,15 +42,6 @@ export const deleteIdentityGroup = async ({
       },
     },
   })
-
-  const ownEdge = membershipEdges.find(
-    (me) => me.src.baseUrn === ctx.identityURN
-  )
-  if (!ownEdge) {
-    throw new BadRequestError({
-      message: 'Caller is not part of identity group',
-    })
-  }
 
   const { edges: appEdges } = await caller.edges.getEdges({
     query: {
@@ -69,7 +72,6 @@ export const deleteIdentityGroup = async ({
     urn: identityGroupURN,
   })
 
-  const DO = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
   if (DO) {
     await DO.storage.deleteAll()
   }

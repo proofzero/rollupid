@@ -1,4 +1,8 @@
-import { InternalServerError, RollupError } from '@proofzero/errors'
+import {
+  InternalServerError,
+  RollupError,
+  UnauthorizedError,
+} from '@proofzero/errors'
 import {
   CryptoAccountType,
   EmailAccountType,
@@ -12,6 +16,8 @@ import {
 } from '@proofzero/types/billing'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { DOProxy } from 'do-proxy'
+import { NodeMethodReturnValue } from '@proofzero/types/node'
+import { IDENTITY_GROUP_OPTIONS } from '../constants'
 
 export type InviteMemberInput = {
   identifier: string
@@ -207,5 +213,60 @@ export default class IdentityGroup extends DOProxy {
     console.log('SET PAYMENT FAILED', JSON.stringify(paymentData, null, 2))
 
     await this.state.storage.put('stripePaymentData', paymentData)
+  }
+
+  async validateAdmin(
+    identityURN: IdentityURN
+  ): Promise<NodeMethodReturnValue<boolean, RollupError>> {
+    const storageRes = await this.state.storage.get([
+      'stripePaymentData',
+      'orderedMembers',
+      'seats',
+    ])
+
+    const spd = storageRes.get('stripePaymentData') as PaymentData | undefined
+    const orderedMembers = storageRes.get('orderedMembers') as
+      | IdentityURN[]
+      | undefined
+    const seats = storageRes.get('seats') as Seats | undefined
+
+    if (!orderedMembers) {
+      return {
+        error: new InternalServerError({
+          message: 'No ordered members found',
+        }),
+      }
+    }
+
+    if (!spd || (spd && spd.paymentFailed)) {
+      const freeMembers = orderedMembers.slice(
+        0,
+        IDENTITY_GROUP_OPTIONS.maxFreeMembers
+      )
+
+      if (!freeMembers.includes(identityURN)) {
+        return {
+          error: new UnauthorizedError({
+            message: 'Unauthorized',
+          }),
+        }
+      }
+    } else if (spd) {
+      const seatCount =
+        IDENTITY_GROUP_OPTIONS.maxFreeMembers + (seats?.quantity || 0)
+      const members = orderedMembers.slice(0, seatCount)
+
+      if (!members.includes(identityURN)) {
+        return {
+          error: new UnauthorizedError({
+            message: 'Unauthorized',
+          }),
+        }
+      }
+    }
+
+    return {
+      value: true,
+    }
   }
 }
