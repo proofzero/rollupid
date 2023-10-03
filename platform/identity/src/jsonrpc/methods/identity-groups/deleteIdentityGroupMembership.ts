@@ -11,6 +11,7 @@ import {
 import { InternalServerError } from '@proofzero/errors'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { IdentityURN } from '@proofzero/urns/identity'
+import { initIdentityGroupNodeByName } from '../../../nodes'
 
 export const DeleteIdentityGroupMembershipInputSchema = z.object({
   identityURN: IdentityURNInput,
@@ -30,6 +31,13 @@ export const deleteIdentityGroupMembership = async ({
   const caller = router.createCaller(ctx)
 
   const { identityGroupURN, identityURN } = input
+
+  const node = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
+  if (!node) {
+    throw new InternalServerError({
+      message: 'Identity group DO not found',
+    })
+  }
 
   const { edges } = await caller.edges.getEdges({
     query: {
@@ -66,6 +74,11 @@ export const deleteIdentityGroupMembership = async ({
     tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
     dst: identityGroupURN,
   })
+
+  const orderedMembers = await node.class.getOrderedMembers()
+  await node.class.setOrderedMembers(
+    orderedMembers.filter((urn) => urn !== identityURN)
+  )
 
   ctx.waitUntil?.(
     createAnalyticsEvent({

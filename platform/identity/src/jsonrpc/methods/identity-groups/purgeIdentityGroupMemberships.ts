@@ -40,12 +40,19 @@ export const purgeIdentityGroupMemberships = async ({
         dst: igu,
       })
 
+      const DO = initIdentityGroupNodeByName(igu, ctx.IdentityGroup)
+      if (DO) {
+        const orderedMembers = await DO.class.getOrderedMembers()
+        await DO.class.setOrderedMembers(
+          orderedMembers.filter((urn) => urn !== ctx.identityURN)
+        )
+      }
+
       if (igMembershipEdges.length === 1) {
         await caller.edges.deleteNode({
           urn: igu,
         })
 
-        const DO = initIdentityGroupNodeByName(igu, ctx.IdentityGroup)
         if (DO) {
           await DO.storage.deleteAll()
         }
