@@ -12,6 +12,7 @@ import { InternalServerError } from '@proofzero/errors'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { initIdentityGroupNodeByName } from '../../../nodes'
+import { IDENTITY_GROUP_OPTIONS } from '../../../constants'
 
 export const DeleteIdentityGroupMembershipInputSchema = z.object({
   identityURN: IdentityURNInput,
@@ -79,6 +80,24 @@ export const deleteIdentityGroupMembership = async ({
   await node.class.setOrderedMembers(
     orderedMembers.filter((urn) => urn !== identityURN)
   )
+
+  const oldMemberCount = edges.length
+  const newMemberCount = edges.length - 1
+
+  const seats = await node.class.getSeats()
+  const seatCount =
+    IDENTITY_GROUP_OPTIONS.maxFreeMembers + (seats?.quantity || 0)
+
+  const spd = await node.class.getStripePaymentData()
+
+  if (spd?.paymentFailed) {
+    if (oldMemberCount > seatCount && newMemberCount <= seatCount) {
+      // This might conflict with an actual failed payment
+      // How do we know if the payment failed because of the
+      // group size or because of a card error?
+      await node.class.setPaymentFailed(false)
+    }
+  }
 
   ctx.waitUntil?.(
     createAnalyticsEvent({
