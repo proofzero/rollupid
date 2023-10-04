@@ -15,6 +15,7 @@ import generateRandomString from '@proofzero/utils/generateRandomString'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
+import identityGroupAdminValidator from '@proofzero/security/identity-group-admin-validator'
 
 export const InviteIdentityGroupMemberInputSchema = z.object({
   identityGroupURN: IdentityGroupURNValidator,
@@ -46,6 +47,9 @@ export const inviteIdentityGroupMember = async ({
   ctx: Context
 }): Promise<InviteIdentityGroupMemberOutput> => {
   const { identityGroupURN, identifier, accountType } = input
+
+  await identityGroupAdminValidator(ctx, input.identityGroupURN)
+
   const inviterIdentityURN = ctx.identityURN as IdentityURN
 
   const caller = router.createCaller(ctx)

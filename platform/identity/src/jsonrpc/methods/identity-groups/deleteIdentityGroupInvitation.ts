@@ -4,6 +4,7 @@ import { Context } from '../../../context'
 import { IdentityGroupURNValidator } from '@proofzero/platform-middleware/inputValidators'
 import { InternalServerError } from '@proofzero/errors'
 import { initIdentityGroupNodeByName } from '../../../nodes'
+import identityGroupAdminValidator from '@proofzero/security/identity-group-admin-validator'
 
 export const DeleteIdentityGroupInvitationInputSchema = z.object({
   identityGroupURN: IdentityGroupURNValidator,
@@ -21,6 +22,8 @@ export const deleteIdentityGroupInvitation = async ({
   ctx: Context
 }): Promise<void> => {
   const { identityGroupURN, invitationCode } = input
+
+  await identityGroupAdminValidator(ctx, identityGroupURN)
 
   const node = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
   if (!node) {
