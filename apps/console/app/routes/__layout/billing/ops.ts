@@ -9,7 +9,7 @@ import createCoreClient, {
   CoreClientType,
 } from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import { reconcileAppSubscriptions } from '~/services/billing/stripe'
+import { reconcileSubscriptions } from '~/services/billing/stripe'
 import { PaymentData, ServicePlanType } from '@proofzero/types/billing'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 import { IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
@@ -324,7 +324,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         (sub.status === 'active' || sub.status === 'trialing')) ||
       txType !== 'buy'
     ) {
-      await reconcileAppSubscriptions(
+      await reconcileSubscriptions(
         {
           subscriptionID: sub.id,
           URN: targetURN,

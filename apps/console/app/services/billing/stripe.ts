@@ -245,7 +245,7 @@ export const voidInvoice = async (
   await stripeClient.invoices.voidInvoice(invoiceId)
 }
 
-export const reconcileAppSubscriptions = async (
+export const reconcileSubscriptions = async (
   {
     subscriptionID,
     URN,
@@ -265,111 +265,126 @@ export const reconcileAppSubscriptions = async (
     apiVersion: '2022-11-15',
   })
 
-  const subItems = await stripeClient.subscriptionItems.list({
-    subscription: subscriptionID,
+  const sub = await stripeClient.subscriptions.retrieve(subscriptionID, {
+    expand: ['items.data', 'latest_invoice'],
   })
 
-  const mappedSubItems = subItems.data
+  const activeSub = sub.status === 'active' || sub.status === 'trialing'
+  // Unexpanded is string, expanded is object
+  const paidInvoice =
+    (sub.latest_invoice as Stripe.Invoice | undefined)?.status === 'paid'
+
+  const mappedSubItems = sub.items.data
     .map((si) => ({
       priceID: si.price.id,
       quantity: si.quantity,
     }))
     .filter((pq) => pq.quantity != null)
 
-  const priceIdToPlanTypeDict = {
-    [env.SECRET_STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
-  }
+  if (activeSub && paidInvoice) {
+    const priceIdToPlanTypeDict = {
+      [env.SECRET_STRIPE_PRO_PLAN_ID]: ServicePlanType.PRO,
+    }
 
-  const { email: billingEmail } =
-    await coreClient.billing.getStripePaymentData.query({
-      URN,
-    })
+    const { email: billingEmail } =
+      await coreClient.billing.getStripePaymentData.query({
+        URN,
+      })
 
-  const planQuantities = mappedSubItems.filter((msu) =>
-    Boolean(priceIdToPlanTypeDict[msu.priceID])
-  )
+    const planQuantities = mappedSubItems.filter((msu) =>
+      Boolean(priceIdToPlanTypeDict[msu.priceID])
+    )
 
-  let reconciledPlans: ReconcileAppsSubscriptionsOutput = []
-  for (const pq of planQuantities) {
-    const planReconciliations =
-      await coreClient.starbase.reconcileAppSubscriptions.mutate({
+    let reconciledPlans: ReconcileAppsSubscriptionsOutput = []
+    for (const pq of planQuantities) {
+      const planReconciliations =
+        await coreClient.starbase.reconcileAppSubscriptions.mutate({
+          URN: URN,
+          count: pq.quantity!,
+          plan: priceIdToPlanTypeDict[pq.priceID],
+        })
+
+      reconciledPlans = reconciledPlans.concat(planReconciliations)
+
+      await coreClient.billing.updateEntitlements.mutate({
         URN: URN,
-        count: pq.quantity!,
-        plan: priceIdToPlanTypeDict[pq.priceID],
+        subscriptionID: subscriptionID,
+        quantity: pq.quantity!,
+        type: priceIdToPlanTypeDict[pq.priceID],
       })
+    }
 
-    reconciledPlans = reconciledPlans.concat(planReconciliations)
+    if (reconciledPlans.length > 0) {
+      await Promise.all(
+        reconciledPlans
+          .filter((r) => r.customDomain)
+          .map(async (app) => {
+            try {
+              await coreClient.starbase.deleteCustomDomain.mutate({
+                clientId: app.clientID,
+              })
+            } catch (e) {
+              console.error(
+                `Failed to delete custom domain for app ${app.clientID}`
+              )
+            }
+          })
+      )
 
-    await coreClient.billing.updateEntitlements.mutate({
-      URN: URN,
-      subscriptionID: subscriptionID,
-      quantity: pq.quantity!,
-      type: priceIdToPlanTypeDict[pq.priceID],
-    })
+      await coreClient.account.sendReconciliationNotification.query({
+        planType: plans[ServicePlanType.PRO].title, // Only pro for now
+        count: reconciledPlans.length,
+        billingEmail,
+        apps: reconciledPlans.map((app) => ({
+          appName: app.appName,
+          devEmail: app.devEmail,
+          plan: app.plan,
+        })),
+        billingURL,
+        settingsURL,
+      })
+    }
   }
 
-  if (reconciledPlans.length > 0) {
-    await Promise.all(
-      reconciledPlans
-        .filter((r) => r.customDomain)
-        .map(async (app) => {
-          try {
-            await coreClient.starbase.deleteCustomDomain.mutate({
-              clientId: app.clientID,
-            })
-          } catch (e) {
-            console.error(
-              `Failed to delete custom domain for app ${app.clientID}`
-            )
+  if (activeSub) {
+    if (IdentityGroupURNSpace.is(URN)) {
+      const seatQuantities = mappedSubItems.find(
+        (msu) => msu.priceID === env.SECRET_STRIPE_GROUP_SEAT_PLAN_ID
+      )
+
+      if (seatQuantities) {
+        const { quantity: stripeSeatQuantity } = seatQuantities
+        const groupSeats = await coreClient.billing.getIdentityGroupSeats.query(
+          {
+            URN: URN as IdentityGroupURN,
           }
-        })
-    )
+        )
 
-    await coreClient.account.sendReconciliationNotification.query({
-      planType: plans[ServicePlanType.PRO].title, // Only pro for now
-      count: reconciledPlans.length,
-      billingEmail,
-      apps: reconciledPlans.map((app) => ({
-        appName: app.appName,
-        devEmail: app.devEmail,
-        plan: app.plan,
-      })),
-      billingURL,
-      settingsURL,
-    })
-  }
+        // If the group has more seats than the subscription, set payment failed
+        // because this flag is responsible for displaying the "Payment failed"
+        // in the UI
+        if (
+          !paidInvoice ||
+          (groupSeats && groupSeats.quantity > stripeSeatQuantity!)
+        ) {
+          await coreClient.billing.setPaymentFailed.mutate({
+            URN: URN as IdentityGroupURN,
+          })
+        } else if (
+          paidInvoice &&
+          (!groupSeats || groupSeats.quantity <= stripeSeatQuantity!)
+        ) {
+          await coreClient.billing.updateIdentityGroupSeats.mutate({
+            URN: URN as IdentityGroupURN,
+            subscriptionID: subscriptionID,
+            quantity: stripeSeatQuantity!,
+          })
 
-  if (IdentityGroupURNSpace.is(URN)) {
-    const seatQuantities = mappedSubItems.find(
-      (msu) => msu.priceID === env.SECRET_STRIPE_GROUP_SEAT_PLAN_ID
-    )
-
-    if (seatQuantities) {
-      const { quantity: stripeSeatQuantity } = seatQuantities
-      const groupSeats = await coreClient.billing.getIdentityGroupSeats.query({
-        URN: URN as IdentityGroupURN,
-      })
-
-      if (!groupSeats || groupSeats.quantity !== stripeSeatQuantity!) {
-        await coreClient.billing.updateIdentityGroupSeats.mutate({
-          URN: URN as IdentityGroupURN,
-          subscriptionID: subscriptionID,
-          quantity: stripeSeatQuantity!,
-        })
-      }
-
-      // If the group has more seats than the subscription, set payment failed
-      // because this flag is responsible for displaying the "Payment failed"
-      // in the UI
-      if (groupSeats && groupSeats.quantity > stripeSeatQuantity!) {
-        await coreClient.billing.setPaymentFailed.mutate({
-          URN: URN as IdentityGroupURN,
-        })
-      } else if (!groupSeats || groupSeats.quantity < stripeSeatQuantity!) {
-        await coreClient.billing.setPaymentFailed.mutate({
-          URN: URN as IdentityGroupURN,
-          failed: false,
-        })
+          await coreClient.billing.setPaymentFailed.mutate({
+            URN: URN as IdentityGroupURN,
+            failed: false,
+          })
+        }
       }
     }
   }

@@ -210,8 +210,6 @@ export default class IdentityGroup extends DOProxy {
 
     paymentData.paymentFailed = failed
 
-    console.log('SET PAYMENT FAILED', JSON.stringify(paymentData, null, 2))
-
     await this.state.storage.put('stripePaymentData', paymentData)
   }
 
