@@ -56,15 +56,16 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const webauthnChallengeJwks = JSON.parse(
       context.env.SECRET_WEBAUTHN_SIGNING_KEY
     ) as KeyPairSerialized
-    const credentialId = generateRandomString(
+    const userHandle = `wa_${generateRandomString(
       webauthnConstants.credentialIdLength
-    )
-    console.debug('\n\n\nSERVER GENERATED CREDS', credentialId)
+    )}`
+
     const challengeJwt = await createSignedWebauthnChallenge(
-      webauthnChallengeJwks
+      webauthnChallengeJwks,
+      userHandle
     )
     registrationOptions.challenge = challengeJwt
-    return json({ registrationOptions, credentialId })
+    return json({ registrationOptions, userHandle })
   }
 )
 
@@ -79,7 +80,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       rawId: formdata.get('rawId') as string,
     }
 
-    console.debug('\n\n\nSUBMITTED REGISTRATION PAYLOAD', registrationPayload)
     if (
       !registrationPayload.nickname ||
       registrationPayload.nickname?.length < 4
@@ -99,7 +99,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const webauthnChallengeJwks = JSON.parse(
       context.env.SECRET_WEBAUTHN_SIGNING_KEY
     ) as KeyPairSerialized
-    await verifySignedWebauthnChallenge(challenge, webauthnChallengeJwks)
+    const userHandle = await verifySignedWebauthnChallenge(
+      challenge,
+      webauthnChallengeJwks
+    )
+    if (!userHandle)
+      throw new BadRequestError({
+        message:
+          'Invalid data received from the browser. Try again or use another browser.',
+      })
 
     const passportUrl = new URL(request.url)
 
@@ -133,15 +141,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const webauthnData = {
       counter: registrationResults.authnrData.get('counter'),
       publicKey: registrationResults.authnrData.get('credentialPublicKeyPem'),
+      credentialId: registrationPayload.credentialId,
     }
 
     const accountURN = AccountURNSpace.componentizedUrn(
-      generateHashedIDRef(
-        WebauthnAccountType.WebAuthN,
-        registrationPayload.credentialId
-      ),
+      generateHashedIDRef(WebauthnAccountType.WebAuthN, userHandle),
       { node_type: NodeType.WebAuthN, addr_type: WebauthnAccountType.WebAuthN },
-      { alias: registrationPayload.credentialId }
+      { alias: userHandle }
     )
 
     const appData = await getAuthzCookieParams(request, context.env)
@@ -175,7 +181,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { registrationOptions, credentialId } = useLoaderData()
+  const { registrationOptions, userHandle } = useLoaderData()
   if (
     registrationOptions?.challenge &&
     typeof registrationOptions.challenge === 'string'
@@ -193,7 +199,7 @@ export default () => {
 
   const registerKey = async (name: string) => {
     registrationOptions.user = {
-      id: new TextEncoder().encode(credentialId),
+      id: new TextEncoder().encode(userHandle),
       name,
       displayName: name,
     }
@@ -215,13 +221,6 @@ export default () => {
       credential instanceof PublicKeyCredential &&
       credential.response instanceof AuthenticatorAttestationResponse
     ) {
-      console.log('CREDENTIALS', {
-        mine: credentialId,
-        theirs: credential.id,
-        theirsb64decoded: new TextDecoder().decode(
-          base64url.decode(credential.id)
-        ),
-      })
       const submitPayload = new FormData()
       submitPayload.set('credentialId', credential.id)
       submitPayload.set(

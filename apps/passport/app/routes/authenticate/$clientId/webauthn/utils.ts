@@ -1,28 +1,34 @@
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { KeyPairSerialized } from '@proofzero/packages/types/application'
-import { SignJWT, importJWK, jwtVerify, errors } from 'jose'
+import { SignJWT, importJWK, jwtVerify, errors, decodeJwt } from 'jose'
 
 export const createSignedWebauthnChallenge = async (
-  keyPairJSON: KeyPairSerialized
+  keyPairJSON: KeyPairSerialized,
+  userId?: string
 ) => {
   const privateKey = await importJWK(keyPairJSON.privateKey)
   const challengeRandomBuffer = new Uint8Array(48)
   crypto.getRandomValues(challengeRandomBuffer)
   const payload = { challenge: challengeRandomBuffer }
-  const challengeJwt = await new SignJWT(payload)
+  const signableJwt = await new SignJWT(payload)
     .setProtectedHeader({ alg: 'ES256' })
     .setExpirationTime('5 min')
-    .sign(privateKey)
+
+  if (userId) signableJwt.setSubject(userId)
+
+  const challengeJwt = signableJwt.sign(privateKey)
   return challengeJwt
 }
 
 export const verifySignedWebauthnChallenge = async (
   challengeJwt: string,
   keyPairJSON: KeyPairSerialized
-) => {
+): Promise<string | undefined> => {
   const publicKey = await importJWK(keyPairJSON.publicKey)
   try {
     await jwtVerify(challengeJwt, publicKey)
+    const jwt = decodeJwt(challengeJwt)
+    return jwt.sub
   } catch (e) {
     if (e instanceof errors.JWTExpired)
       throw new BadRequestError({
@@ -37,7 +43,7 @@ export const verifySignedWebauthnChallenge = async (
 }
 
 export const webauthnConstants = {
-  challengeSize: 200,
+  challengeSize: 250,
   timeout: 60,
   cryptoAlgsArray: [-7, -8, -257],
   credentialIdLength: 42,

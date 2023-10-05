@@ -14,7 +14,7 @@ import {
   type ActionFunction,
   type LoaderFunction,
 } from '@remix-run/cloudflare'
-import { InternalServerError } from '@proofzero/errors'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { generateHashedIDRef } from '@proofzero/urns/idref'
 import { NodeType, WebauthnAccountType } from '@proofzero/types/account'
@@ -56,7 +56,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       signature: formdata.get('signature') as string,
       rawId: formdata.get('rawId') as string,
     }
-    console.debug("\n\n\nUSER HANDLE", new TextDecoder().decode(base64url.decode(loginPayload.userHandle)))
+    const decodedUserHandle = new TextDecoder().decode(
+      base64url.decode(loginPayload.userHandle)
+    )
     const clientDataJSON = new TextDecoder().decode(
       base64url.decode(loginPayload.clientDataJSON)
     )
@@ -70,25 +72,31 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     await verifySignedWebauthnChallenge(challenge, webauthnChallengeJwks)
 
     const accountURN = AccountURNSpace.componentizedUrn(
-      generateHashedIDRef(
-        WebauthnAccountType.WebAuthN,
-        loginPayload.credentialId
-      ),
+      generateHashedIDRef(WebauthnAccountType.WebAuthN, decodedUserHandle),
       { node_type: NodeType.WebAuthN, addr_type: WebauthnAccountType.WebAuthN },
-      { alias: loginPayload.credentialId }
+      { alias: decodedUserHandle }
     )
 
     const coreClient = getCoreClient({ context, accountURN })
 
     const webAuthnData = await coreClient.account.getWebAuthNData.query()
 
-    if (!webAuthnData || webAuthnData.counter === undefined || webAuthnData.publicKey === undefined)
+    if (
+      !webAuthnData ||
+      webAuthnData.counter === undefined ||
+      webAuthnData.publicKey === undefined
+    )
       throw new InternalServerError({
         message:
           'Could not retrieve passkey verification data. Try again or register new key.',
       })
 
     const passportUrl = new URL(request.url)
+    if (webAuthnData.credentialId !== loginPayload.credentialId)
+      throw new BadRequestError({
+        message: `The browser's authenticator returned data we cannot verify. Please try again or use another browser.`,
+      })
+
     const f2l = new Fido2Lib({
       timeout: webauthnConstants.timeout,
       rpId: passportUrl.hostname,
@@ -263,14 +271,16 @@ export default () => {
           </Text>
         </section>
         {!webauthnSupported && (
-          <section><Text
-            size="sm"
-            weight="medium"
-            className="text-red-500 mt-4 mb-2 text-center"
-          >
-            Your browser does not support Passkeys. Please change your security settings or try another browser.
-          </Text></section>
-
+          <section>
+            <Text
+              size="sm"
+              weight="medium"
+              className="text-red-500 mt-4 mb-2 text-center"
+            >
+              Your browser does not support Passkeys. Please change your
+              security settings or try another browser.
+            </Text>
+          </section>
         )}
 
         <section>
