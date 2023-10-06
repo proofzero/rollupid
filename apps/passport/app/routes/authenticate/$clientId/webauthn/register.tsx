@@ -23,11 +23,12 @@ import subtractLogo from '~/assets/subtract-logo.svg'
 import {
   createSignedWebauthnChallenge,
   verifySignedWebauthnChallenge,
-  webauthnConstants
+  webauthnConstants,
 } from './utils'
 import { BadRequestError } from '@proofzero/errors'
 import { KeyPairSerialized } from '@proofzero/packages/types/application'
 import { toast, ToastType } from '@proofzero/design-system/src/atoms/toast'
+import generateRandomString from '@proofzero/utils/generateRandomString'
 
 type RegistrationPayload = {
   nickname: string
@@ -55,11 +56,16 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const webauthnChallengeJwks = JSON.parse(
       context.env.SECRET_WEBAUTHN_SIGNING_KEY
     ) as KeyPairSerialized
+    const userHandle = `wa_${generateRandomString(
+      webauthnConstants.credentialIdLength
+    )}`
+
     const challengeJwt = await createSignedWebauthnChallenge(
-      webauthnChallengeJwks
+      webauthnChallengeJwks,
+      userHandle
     )
     registrationOptions.challenge = challengeJwt
-    return json({ registrationOptions })
+    return json({ registrationOptions, userHandle })
   }
 )
 
@@ -93,17 +99,25 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const webauthnChallengeJwks = JSON.parse(
       context.env.SECRET_WEBAUTHN_SIGNING_KEY
     ) as KeyPairSerialized
-    await verifySignedWebauthnChallenge(challenge, webauthnChallengeJwks)
+    const userHandle = await verifySignedWebauthnChallenge(
+      challenge,
+      webauthnChallengeJwks
+    )
+    if (!userHandle)
+      throw new BadRequestError({
+        message:
+          'Invalid data received from the browser. Try again or use another browser.',
+      })
 
     const passportUrl = new URL(request.url)
 
     const f2l = new Fido2Lib({
-      timeout: 42,
+      timeout: webauthnConstants.timeout,
       rpId: passportUrl.hostname,
       rpName: 'Rollup ID',
-      challengeSize: 200,
+      challengeSize: webauthnConstants.challengeSize,
       attestation: 'none',
-      cryptoParams: [-7, -257],
+      cryptoParams: webauthnConstants.cryptoAlgsArray,
       authenticatorRequireResidentKey: false,
       authenticatorUserVerification: 'required',
     })
@@ -127,15 +141,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const webauthnData = {
       counter: registrationResults.authnrData.get('counter'),
       publicKey: registrationResults.authnrData.get('credentialPublicKeyPem'),
+      credentialId: registrationPayload.credentialId,
     }
 
     const accountURN = AccountURNSpace.componentizedUrn(
-      generateHashedIDRef(
-        WebauthnAccountType.WebAuthN,
-        registrationPayload.credentialId
-      ),
+      generateHashedIDRef(WebauthnAccountType.WebAuthN, userHandle),
       { node_type: NodeType.WebAuthN, addr_type: WebauthnAccountType.WebAuthN },
-      { alias: registrationPayload.credentialId }
+      { alias: userHandle }
     )
 
     const appData = await getAuthzCookieParams(request, context.env)
@@ -169,7 +181,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { registrationOptions } = useLoaderData()
+  const { registrationOptions, userHandle } = useLoaderData()
   if (
     registrationOptions?.challenge &&
     typeof registrationOptions.challenge === 'string'
@@ -185,11 +197,9 @@ export default () => {
 
   const webauthnSupported = !!window.PublicKeyCredential
 
-  const randomBuffer = new Uint8Array(32)
-  crypto.getRandomValues(randomBuffer)
   const registerKey = async (name: string) => {
     registrationOptions.user = {
-      id: new TextEncoder().encode(base64url.encode(randomBuffer)),
+      id: new TextEncoder().encode(userHandle),
       name,
       displayName: name,
     }
@@ -199,7 +209,7 @@ export default () => {
         publicKey: registrationOptions,
       })
     } catch (e) {
-      console.error("Passkey registration error", JSON.stringify(e, null, 2))
+      console.error('Passkey registration error', JSON.stringify(e, null, 2))
       if (e instanceof DOMException && e.name === 'NotAllowedError') {
         toast(ToastType.Error, {
           message:
