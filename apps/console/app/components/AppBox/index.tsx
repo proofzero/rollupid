@@ -21,6 +21,7 @@ type AppBoxProps = {
     appPlan: ServicePlanType
     groupName?: string
     groupID?: string
+    groupPaymentFailed?: boolean
   }[]
   // Link target for creating a new application.
   createLink: string
@@ -39,6 +40,7 @@ export default function AppBox(props: AppBoxProps) {
     hasCustomDomain: app.hasCustomDomain,
     appPlan: app.appPlan,
     groupName: app.groupName,
+    groupPaymentFailed: app.groupPaymentFailed,
     groupID: app.groupID,
   }))
 

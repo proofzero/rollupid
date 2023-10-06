@@ -9,6 +9,8 @@ import {
 
 import type { ApplicationListItemProps } from './ApplicationListItem'
 import _ from 'lodash'
+import { DangerPill } from '@proofzero/design-system/src/atoms/pills/DangerPill'
+import { Link } from '@remix-run/react'
 
 type ApplicationListProps = {
   applications: ApplicationListItemProps[]
@@ -38,6 +40,7 @@ export const ApplicationList = ({
   const groupedApplications = _.mapValues(groupedAppsByGroupID, (apps) => {
     return {
       groupName: apps[0].groupName,
+      groupPaymentFailed: apps[0].groupPaymentFailed,
       apps,
     }
   })
@@ -103,9 +106,17 @@ export const ApplicationList = ({
 
         {Object.entries(groupedApplications).map(([groupID, entry]) => (
           <section key={groupID} className="flex flex-col space-y-2 mt-5">
-            <Text size="sm" weight="medium" className="text-gray-500 mb-2">
-              {entry.groupName}
-            </Text>
+            <div className="flex mb-2 flex-row space-x-2 items-center">
+              <Text size="sm" weight="medium" className="text-gray-500">
+                {entry.groupName}
+              </Text>
+
+              {entry.groupPaymentFailed && (
+                <Link to={`/billing/groups/${groupID}`}>
+                  <DangerPill text="Update Payment Information" />
+                </Link>
+              )}
+            </div>
 
             {entry.apps.map((ali) => (
               <ApplicationListItem
