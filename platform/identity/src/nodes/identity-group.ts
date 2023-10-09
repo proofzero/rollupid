@@ -245,7 +245,8 @@ export default class IdentityGroup extends DOProxy {
       if (!freeMembers.includes(identityURN)) {
         return {
           error: new UnauthorizedError({
-            message: 'Unauthorized',
+            message:
+              'Group seat count limit exceeded; this can be due to a payment failure. Members affected by payment failures or exceeding the free seat count limit are not allowed mutation operations on the group.',
           }),
         }
       }
@@ -257,7 +258,7 @@ export default class IdentityGroup extends DOProxy {
       if (!members.includes(identityURN)) {
         return {
           error: new UnauthorizedError({
-            message: 'Unauthorized',
+            message: 'Requesting identity is not authorized to mutate group.',
           }),
         }
       }
