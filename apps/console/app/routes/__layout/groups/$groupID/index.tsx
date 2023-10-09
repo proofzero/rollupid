@@ -62,6 +62,7 @@ import { useFeatureFlags } from '@proofzero/design-system/src/hooks/feature-flag
 import { IDENTITY_GROUP_OPTIONS } from '@proofzero/platform/identity/src/constants'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
+import { HiOutlineExclamationTriangle } from 'react-icons/hi2'
 
 const accountTypes = [
   ...Object.values(EmailAccountType),
@@ -836,7 +837,7 @@ export default () => {
                       {`Purchased ${groupSeats.total - groupSeats.used}`}
                     </Text>
                     {paymentFailedIdentityGroups.includes(groupURN) && (
-                      <img src={dangerVector} className="w-4 h-4 ml-2" />
+                      <HiOutlineExclamationTriangle className="text-orange-400 w-4 h-4 ml-2" />
                     )}
                   </Pill>
                 </div>
