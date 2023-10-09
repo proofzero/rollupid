@@ -4,6 +4,13 @@ import { Context } from '../context'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
+import { InternalServerError } from '@proofzero/errors'
+import identityGroupAdminValidator from '@proofzero/security/identity-group-admin-validator'
+import {
+  IdentityGroupURNSpace,
+  IdentityGroupURN,
+} from '@proofzero/urns/identity-group'
+import { EDGE_APPLICATION } from '../../types'
 
 export const UpsertAppContactAddressInput = z.object({
   clientId: z.string(),
@@ -28,6 +35,20 @@ export const upsertAppContactAddress = async ({
     )
 
   const caller = router.createCaller(ctx)
+  const { edges: appOwnershipEdges } = await caller.edges.getEdges({
+    query: { dst: { baseUrn: appURN }, tag: EDGE_APPLICATION },
+  })
+  if (appOwnershipEdges.length === 0) {
+    throw new InternalServerError({
+      message: 'App ownership edge not found',
+    })
+  }
+
+  const ownershipURN = appOwnershipEdges[0].src.baseUrn
+  if (IdentityGroupURNSpace.is(ownershipURN)) {
+    await identityGroupAdminValidator(ctx, ownershipURN as IdentityGroupURN)
+  }
+
   const { edges } = await caller.edges.getEdges({
     query: {
       src: { baseUrn: appURN },
