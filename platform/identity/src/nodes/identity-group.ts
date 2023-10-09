@@ -200,7 +200,7 @@ export default class IdentityGroup extends DOProxy {
     await this.state.storage.put('orderedMembers', members)
   }
 
-  async setPaymentFailed(failed: boolean = true) {
+  async setPaymentFailed(failed = true) {
     const paymentData = await this.getStripePaymentData()
     if (!paymentData) {
       throw new InternalServerError({
