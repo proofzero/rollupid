@@ -54,13 +54,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     let targetURN = URN ?? identityURN
     if (IdentityGroupURNSpace.is(targetURN)) {
-      const authorized =
+      const { write } =
         await coreClient.identity.hasIdentityGroupPermissions.query({
           identityURN,
           identityGroupURN: targetURN as IdentityGroupURN,
         })
 
-      if (!authorized) {
+      if (!write) {
         throw new UnauthorizedError({
           message: 'You are not authorized to update this identity group.',
         })

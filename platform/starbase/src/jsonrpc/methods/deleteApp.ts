@@ -8,6 +8,11 @@ import { AppClientIdParamSchema } from '../validators/app'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { IdentityURNSpace, type IdentityURN } from '@proofzero/urns/identity'
 import { EDGE_APPLICATION } from '../../types'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
+import identityGroupAdminValidator from '@proofzero/security/identity-group-admin-validator'
 
 export const DeleteAppInput = AppClientIdParamSchema
 
@@ -54,6 +59,11 @@ export const deleteApp = async ({
     throw new InternalServerError({
       message: 'App ownership edge not found',
     })
+  }
+
+  const ownershipURN = appOwnershipEdge.src.baseUrn
+  if (IdentityGroupURNSpace.is(ownershipURN)) {
+    await identityGroupAdminValidator(ctx, ownershipURN as IdentityGroupURN)
   }
 
   await Promise.all(

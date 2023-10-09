@@ -57,13 +57,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
     let targetURN = URN ?? identityURN
     if (IdentityGroupURNSpace.is(targetURN)) {
-      const authorized =
+      const { read } =
         await coreClient.identity.hasIdentityGroupPermissions.query({
           identityURN,
           identityGroupURN: targetURN as IdentityGroupURN,
         })
 
-      if (!authorized) {
+      // We want to allow members of the identity group to update the payment data
+      // even if they don't have the `write` permission. So we use 'read' permission.
+      if (!read) {
         throw new UnauthorizedError({
           message: 'You are not authorized to update this identity group.',
         })

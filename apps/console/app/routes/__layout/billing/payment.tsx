@@ -34,15 +34,15 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     let targetURN = URN ?? identityURN
     if (IdentityGroupURNSpace.is(targetURN)) {
-      const authorized =
+      const { read } =
         await coreClient.identity.hasIdentityGroupPermissions.query({
           identityURN,
           identityGroupURN: targetURN as IdentityGroupURN,
         })
 
-      if (!authorized) {
+      if (!read) {
         throw new UnauthorizedError({
-          message: 'You are not authorized to update this identity group.',
+          message: 'You are not authorized to read this identity group.',
         })
       }
     }
