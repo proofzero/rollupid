@@ -526,21 +526,6 @@ export default () => {
     <>
       <Toaster position="top-right" reverseOrder={false} />
 
-      {nastyIG.includes(groupURN) && (
-        <section className="mb-6">
-          <ToastWithLink
-            message="Payment for group user seats failed. Update group Payment Information to enable members' access"
-            linkHref={
-              paymentData?.customerID
-                ? `/billing/payment?URN=${IdentityGroupURNSpace.urn(groupID)}`
-                : `/billing/groups/${groupID}`
-            }
-            linkText="Update payment information"
-            type="warning"
-          />
-        </section>
-      )}
-
       <InviteMemberModal
         groupID={groupID}
         isOpen={inviteModalOpen}
@@ -612,6 +597,21 @@ export default () => {
           {group?.name}
         </Text>
       </section>
+
+      {nastyIG.includes(groupURN) && (
+        <section className="my-3">
+          <ToastWithLink
+            message="Payment for group user seats failed. Update group Payment Information to enable members' access"
+            linkHref={
+              paymentData?.customerID
+                ? `/billing/payment?URN=${IdentityGroupURNSpace.urn(groupID)}`
+                : `/billing/groups/${groupID}`
+            }
+            linkText="Update payment information"
+            type="warning"
+          />
+        </section>
+      )}
 
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-12">
         <ActionCard

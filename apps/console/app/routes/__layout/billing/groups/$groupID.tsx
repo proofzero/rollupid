@@ -40,6 +40,7 @@ import { ListIdentityGroupsOutput } from '@proofzero/platform/identity/src/jsonr
 import { AppLoaderData } from '~/root'
 import { GroupSeatingCard } from '~/components/Billing/seating'
 import { useFeatureFlags } from '@proofzero/design-system/src/hooks/feature-flags'
+import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 
 export const loader = billingLoader
 export const action = billingAction
@@ -60,10 +61,11 @@ export default () => {
     groupSeats,
   } = loaderData
 
-  const { PASSPORT_URL, groups, apps } = useOutletContext<{
+  const { PASSPORT_URL, groups, apps, nastyIG } = useOutletContext<{
     PASSPORT_URL: string
     groups: ListIdentityGroupsOutput
     apps: AppLoaderData[]
+    nastyIG: IdentityGroupURN[]
   }>()
 
   const submit = useSubmit()
@@ -193,6 +195,21 @@ export default () => {
           </article>
         ) : null}
       </section>
+
+      {groupURN && nastyIG.includes(groupURN) && (
+        <section className="my-3">
+          <ToastWithLink
+            message="Payment for group user seats failed. Update group Payment Information to enable members' access"
+            linkHref={
+              paymentData?.customerID
+                ? `/billing/payment?URN=${groupURN}`
+                : `/billing/groups/${groupURN.split('/')[1]}`
+            }
+            linkText="Update payment information"
+            type="warning"
+          />
+        </section>
+      )}
 
       <section className="flex flex-col gap-4">
         <article className="bg-white rounded-lg border">
