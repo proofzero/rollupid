@@ -295,9 +295,11 @@ export default function App() {
 
   registerFeatureFlag()
 
-  const paymentFailedIGFetcher = useFetcher()
+  const paymentFailedIdentityGroupsFetcher = useFetcher()
   useEffect(() => {
-    paymentFailedIGFetcher.load('/api/payment-failed-identity-groups')
+    paymentFailedIdentityGroupsFetcher.load(
+      '/api/payment-failed-identity-groups'
+    )
   }, [])
 
   return (
@@ -346,7 +348,8 @@ export default function App() {
                 identityURN,
                 hasUnpaidInvoices,
                 unpaidInvoiceURL,
-                paymentFailedIG: paymentFailedIGFetcher.data ?? [],
+                paymentFailedIdentityGroups:
+                  paymentFailedIdentityGroupsFetcher.data ?? [],
               }}
             />
           </PostHogProvider>
@@ -361,7 +364,8 @@ export default function App() {
               identityURN,
               hasUnpaidInvoices,
               unpaidInvoiceURL,
-              paymentFailedIG: paymentFailedIGFetcher.data ?? [],
+              paymentFailedIdentityGroups:
+                paymentFailedIdentityGroupsFetcher.data ?? [],
             }}
           />
         )}

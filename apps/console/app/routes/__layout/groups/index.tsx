@@ -203,7 +203,7 @@ const GroupHasAppsModal = ({
 }
 
 export default () => {
-  const { groups, apps, paymentFailedIG } =
+  const { groups, apps, paymentFailedIdentityGroups } =
     useOutletContext<GroupRootContextData>()
   const navigate = useNavigate()
 
@@ -351,7 +351,7 @@ export default () => {
                 </div>
 
                 <div className="flex flex-row items-center gap-3">
-                  {paymentFailedIG.includes(
+                  {paymentFailedIdentityGroups.includes(
                     item.val.URN as IdentityGroupURN
                   ) && (
                     <Link to={`/billing/groups/${item.val.URN.split('/')[1]}`}>

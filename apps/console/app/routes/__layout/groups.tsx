@@ -38,7 +38,7 @@ type GroupRootLoaderData = {
 export type GroupRootContextData = GroupRootLoaderData & {
   identityURN: IdentityURN
   apps: AppLoaderData[]
-  paymentFailedIG: IdentityGroupURN[]
+  paymentFailedIdentityGroups: IdentityGroupURN[]
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -126,10 +126,10 @@ export default () => {
       toasts: ToastModel[]
     }
   >()
-  const { apps, identityURN, paymentFailedIG } = useOutletContext<{
+  const { apps, identityURN, paymentFailedIdentityGroups } = useOutletContext<{
     apps: AppLoaderData[]
     identityURN: IdentityURN
-    paymentFailedIG: IdentityGroupURN[]
+    paymentFailedIdentityGroups: IdentityGroupURN[]
   }>()
 
   useEffect(() => {
@@ -152,7 +152,7 @@ export default () => {
           identityURN,
           ...data,
           apps,
-          paymentFailedIG,
+          paymentFailedIdentityGroups,
         }}
       />
     </>

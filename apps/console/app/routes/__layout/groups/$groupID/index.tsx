@@ -465,7 +465,7 @@ export default () => {
     PASSPORT_URL,
     identityURN,
     invitations,
-    paymentFailedIG,
+    paymentFailedIdentityGroups,
   } = useOutletContext<GroupDetailsContextData>()
 
   const { STRIPE_PUBLISHABLE_KEY, toastNotification, paymentData, groupSeats } =
@@ -598,7 +598,7 @@ export default () => {
         </Text>
       </section>
 
-      {paymentFailedIG.includes(groupURN) && (
+      {paymentFailedIdentityGroups.includes(groupURN) && (
         <section className="my-3">
           <ToastWithLink
             message="Payment for group user seats failed. Update group Payment Information to enable members' access"
@@ -826,14 +826,16 @@ export default () => {
                   <Pill className="bg-white flex flex-row items-center rounded-xl">
                     <div
                       className={classNames('w-2 h-2 rounded-full mr-2', {
-                        'bg-gray-600': !paymentFailedIG.includes(groupURN),
-                        'bg-orange-400': paymentFailedIG.includes(groupURN),
+                        'bg-gray-600':
+                          !paymentFailedIdentityGroups.includes(groupURN),
+                        'bg-orange-400':
+                          paymentFailedIdentityGroups.includes(groupURN),
                       })}
                     ></div>
                     <Text size="xs" weight="medium" className="text-gray-700">
                       {`Purchased ${groupSeats.total - groupSeats.used}`}
                     </Text>
-                    {paymentFailedIG.includes(groupURN) && (
+                    {paymentFailedIdentityGroups.includes(groupURN) && (
                       <img src={dangerVector} className="w-4 h-4 ml-2" />
                     )}
                   </Pill>
@@ -858,7 +860,7 @@ export default () => {
                   colorCode:
                     i < IDENTITY_GROUP_OPTIONS.maxFreeMembers
                       ? '#93C5FD'
-                      : paymentFailedIG.includes(groupURN)
+                      : paymentFailedIdentityGroups.includes(groupURN)
                       ? '#FB923C'
                       : '#4B5563',
                 }))}

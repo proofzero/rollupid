@@ -41,9 +41,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
 export default () => {
   const navigate = useNavigate()
-  const { apps, ENV, paymentFailedIG } = useOutletContext<
+  const { apps, ENV, paymentFailedIdentityGroups } = useOutletContext<
     OutletContextData & {
-      paymentFailedIG: IdentityGroupURN[]
+      paymentFailedIdentityGroups: IdentityGroupURN[]
     }
   >()
 
@@ -78,7 +78,7 @@ export default () => {
               ...app,
               groupPaymentFailed: Boolean(
                 app.groupID &&
-                  paymentFailedIG.includes(
+                  paymentFailedIdentityGroups.includes(
                     IdentityGroupURNSpace.urn(app.groupID) as IdentityGroupURN
                   )
               ),

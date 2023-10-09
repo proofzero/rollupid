@@ -45,7 +45,7 @@ import _ from 'lodash'
 import { isPlanGuarded } from '~/utils/planGate'
 import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 
-import dangerVector from '../../images/danger.svg'
+import { HiExclamationTriangle } from 'react-icons/hi2'
 
 // RollupLogo
 // -----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ type RollupMenuProps = {
   PASSPORT_URL: string
   pfpUrl: string
   displayName: string
-  paymentFailedIG: IdentityGroupURN[]
+  paymentFailedIdentityGroups: IdentityGroupURN[]
 }
 
 const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
@@ -113,7 +113,7 @@ export default function SiteMenu(props: RollupMenuProps) {
         <ExternalLinks
           PASSPORT_URL={props.PASSPORT_URL}
           docsURL={'https://docs.rollup.id'}
-          paymentFailedIG={props.paymentFailedIG}
+          paymentFailedIdentityGroups={props.paymentFailedIdentityGroups}
         />
       </div>
       {/* Mobile menu */}
@@ -159,7 +159,9 @@ export default function SiteMenu(props: RollupMenuProps) {
                     PASSPORT_URL={props.PASSPORT_URL}
                     docsURL={'https://docs.rollup.id'}
                     close={close}
-                    paymentFailedIG={props.paymentFailedIG}
+                    paymentFailedIdentityGroups={
+                      props.paymentFailedIdentityGroups
+                    }
                   />
                 </div>
                 <div
@@ -372,13 +374,13 @@ type ExternalLinksProps = {
   PASSPORT_URL: string
   docsURL: string
   close?: () => void
-  paymentFailedIG: IdentityGroupURN[]
+  paymentFailedIdentityGroups: IdentityGroupURN[]
 }
 
 function ExternalLinks({
   PASSPORT_URL,
   docsURL,
-  paymentFailedIG,
+  paymentFailedIdentityGroups,
 }: ExternalLinksProps) {
   return (
     <div className="mt-2 border-t border-gray-700">
@@ -406,8 +408,8 @@ function ExternalLinks({
               Billing & Invoicing
             </Text>
 
-            {paymentFailedIG?.length > 0 && (
-              <img className="w-[22px] h-[22px]" src={dangerVector} />
+            {paymentFailedIdentityGroups?.length > 0 && (
+              <HiExclamationTriangle className="w-[22px] h-[22px] text-orange-400" />
             )}
           </div>
         </NavLink>

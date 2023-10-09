@@ -7,9 +7,9 @@ import { DangerPill } from '@proofzero/design-system/src/atoms/pills/DangerPill'
 import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 
 export default () => {
-  const { groups, paymentFailedIG } = useOutletContext<{
+  const { groups, paymentFailedIdentityGroups } = useOutletContext<{
     groups: ListIdentityGroupsOutput
-    paymentFailedIG: IdentityGroupURN[]
+    paymentFailedIdentityGroups: IdentityGroupURN[]
   }>()
   return (
     <>
@@ -64,7 +64,7 @@ export default () => {
               {!item.val.flags.billingConfigured && (
                 <DangerPill text="Not Configured" />
               )}
-              {paymentFailedIG.includes(item.val.URN) && (
+              {paymentFailedIdentityGroups.includes(item.val.URN) && (
                 <DangerPill text="Update Payment Information" />
               )}
               <NavLink
