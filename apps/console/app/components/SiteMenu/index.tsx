@@ -72,6 +72,7 @@ type RollupMenuProps = {
     icon?: string
     appPlan: ServicePlanType
     groupName?: string
+    groupID?: string
   }[]
   // Current selected Client ID.
   selected?: string
@@ -359,7 +360,12 @@ function AppMenu({ props, close }: AppMenuProps) {
 
   return (
     <div>
-      <AppSelect apps={props.apps} selected={props.selected} close={close} />
+      <AppSelect
+        apps={props.apps}
+        selected={props.selected}
+        paymentFailedIdentityGroups={props.paymentFailedIdentityGroups}
+        close={close}
+      />
 
       {props.selected && (
         <section className="px-2 lg:flex lg:flex-col">
