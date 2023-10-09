@@ -267,6 +267,7 @@ export default function AppDetailIndexPage() {
                   paymaster,
                   identityURN,
                   hasUnpaidInvoices,
+                  paymentFailedIdentityGroups,
                 }}
               />
             </section>
