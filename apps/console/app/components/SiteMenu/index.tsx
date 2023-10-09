@@ -79,7 +79,7 @@ type RollupMenuProps = {
   PASSPORT_URL: string
   pfpUrl: string
   displayName: string
-  nastyIG: IdentityGroupURN[]
+  paymentFailedIG: IdentityGroupURN[]
 }
 
 const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
@@ -113,7 +113,7 @@ export default function SiteMenu(props: RollupMenuProps) {
         <ExternalLinks
           PASSPORT_URL={props.PASSPORT_URL}
           docsURL={'https://docs.rollup.id'}
-          nastyIG={props.nastyIG}
+          paymentFailedIG={props.paymentFailedIG}
         />
       </div>
       {/* Mobile menu */}
@@ -159,7 +159,7 @@ export default function SiteMenu(props: RollupMenuProps) {
                     PASSPORT_URL={props.PASSPORT_URL}
                     docsURL={'https://docs.rollup.id'}
                     close={close}
-                    nastyIG={props.nastyIG}
+                    paymentFailedIG={props.paymentFailedIG}
                   />
                 </div>
                 <div
@@ -372,10 +372,14 @@ type ExternalLinksProps = {
   PASSPORT_URL: string
   docsURL: string
   close?: () => void
-  nastyIG: IdentityGroupURN[]
+  paymentFailedIG: IdentityGroupURN[]
 }
 
-function ExternalLinks({ PASSPORT_URL, docsURL, nastyIG }: ExternalLinksProps) {
+function ExternalLinks({
+  PASSPORT_URL,
+  docsURL,
+  paymentFailedIG,
+}: ExternalLinksProps) {
   return (
     <div className="mt-2 border-t border-gray-700">
       <div className="px-2 p-2 hover:bg-gray-800">
@@ -402,7 +406,7 @@ function ExternalLinks({ PASSPORT_URL, docsURL, nastyIG }: ExternalLinksProps) {
               Billing & Invoicing
             </Text>
 
-            {nastyIG?.length > 0 && (
+            {paymentFailedIG?.length > 0 && (
               <img className="w-[22px] h-[22px]" src={dangerVector} />
             )}
           </div>

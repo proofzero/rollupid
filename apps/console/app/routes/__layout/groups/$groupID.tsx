@@ -79,7 +79,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
 export default () => {
   const ctx = useOutletContext<GroupRootContextData>()
-  const { groups, nastyIG } = ctx
+  const { groups, paymentFailedIG } = ctx
 
   const { groupURN, groupID, invitations } = useLoaderData<LoaderData>()
 
@@ -110,7 +110,7 @@ export default () => {
         groupID,
         groupURN,
         invitations,
-        nastyIG,
+        paymentFailedIG,
       }}
     />
   )

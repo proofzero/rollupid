@@ -269,7 +269,6 @@ export default function App() {
     identityURN,
     hasUnpaidInvoices,
     unpaidInvoiceURL,
-    nastyIG,
   } = loaderData ?? {}
 
   useEffect(() => {
@@ -296,9 +295,9 @@ export default function App() {
 
   registerFeatureFlag()
 
-  const nastyIGFetcher = useFetcher()
+  const paymentFailedIGFetcher = useFetcher()
   useEffect(() => {
-    nastyIGFetcher.load('/api/nasty-identity-groups')
+    paymentFailedIGFetcher.load('/api/payment-failed-identity-groups')
   }, [])
 
   return (
@@ -347,7 +346,7 @@ export default function App() {
                 identityURN,
                 hasUnpaidInvoices,
                 unpaidInvoiceURL,
-                nastyIG: nastyIGFetcher.data ?? [],
+                paymentFailedIG: paymentFailedIGFetcher.data ?? [],
               }}
             />
           </PostHogProvider>
@@ -362,7 +361,7 @@ export default function App() {
               identityURN,
               hasUnpaidInvoices,
               unpaidInvoiceURL,
-              nastyIG: nastyIGFetcher.data ?? [],
+              paymentFailedIG: paymentFailedIGFetcher.data ?? [],
             }}
           />
         )}

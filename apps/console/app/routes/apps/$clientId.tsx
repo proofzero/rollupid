@@ -177,10 +177,10 @@ export default function AppDetailIndexPage() {
     identityURN,
     hasUnpaidInvoices,
     unpaidInvoiceURL,
-    nastyIG,
+    paymentFailedIG,
   } = useOutletContext<
     OutletContextData & {
-      nastyIG: IdentityGroupURN[]
+      paymentFailedIG: IdentityGroupURN[]
     }
   >()
   const {
@@ -229,7 +229,7 @@ export default function AppDetailIndexPage() {
             PASSPORT_URL={PASSPORT_URL}
             displayName={displayName}
             pfpUrl={avatarUrl}
-            nastyIG={nastyIG}
+            paymentFailedIG={paymentFailedIG}
           />
           <main className="flex flex-col flex-initial min-h-full w-full">
             <SiteHeader avatarUrl={avatarUrl} />

@@ -54,10 +54,10 @@ export default function CreateNewApp() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const posthog = usePostHog()
 
-  const { apps, avatarUrl, PASSPORT_URL, displayName, nastyIG } =
+  const { apps, avatarUrl, PASSPORT_URL, displayName, paymentFailedIG } =
     useOutletContext<
       OutletContextData & {
-        nastyIG: IdentityGroupURN[]
+        paymentFailedIG: IdentityGroupURN[]
       }
     >()
 
@@ -71,7 +71,7 @@ export default function CreateNewApp() {
             PASSPORT_URL={PASSPORT_URL}
             displayName={displayName}
             pfpUrl={avatarUrl}
-            nastyIG={nastyIG}
+            paymentFailedIG={paymentFailedIG}
           />
 
           <main

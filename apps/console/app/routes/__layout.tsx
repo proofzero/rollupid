@@ -19,7 +19,7 @@ import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 export default function DashboardIndexPage() {
   const context = useOutletContext<
     OutletContextData & {
-      nastyIG: IdentityGroupURN[]
+      paymentFailedIG: IdentityGroupURN[]
     }
   >()
   const {
@@ -29,7 +29,7 @@ export default function DashboardIndexPage() {
     PASSPORT_URL,
     hasUnpaidInvoices,
     unpaidInvoiceURL,
-    nastyIG,
+    paymentFailedIG,
   } = context
 
   return (
@@ -42,7 +42,7 @@ export default function DashboardIndexPage() {
             open={open}
             pfpUrl={avatarUrl}
             displayName={displayName}
-            nastyIG={nastyIG}
+            paymentFailedIG={paymentFailedIG}
           />
           <main className="flex flex-col flex-initial min-h-full w-full bg-white">
             <SiteHeader avatarUrl={avatarUrl} />

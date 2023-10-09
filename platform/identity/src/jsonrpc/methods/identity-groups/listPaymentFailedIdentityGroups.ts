@@ -2,23 +2,22 @@ import { z } from 'zod'
 import { IdentityGroupURNValidator } from '@proofzero/platform-middleware/inputValidators'
 import { router } from '@proofzero/platform.core'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
-import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 
 import { Context } from '../../../context'
 import { initIdentityGroupNodeByName } from '../../../nodes'
 
-export const ListNastyIdentityGroupsOutputSchema = z.array(
+export const ListPaymentFailedIdentityGroupsOutputSchema = z.array(
   IdentityGroupURNValidator
 )
-export type ListNastyIdentityGroupsOutput = z.infer<
-  typeof ListNastyIdentityGroupsOutputSchema
+export type ListPaymentFailedIdentityGroupsOutput = z.infer<
+  typeof ListPaymentFailedIdentityGroupsOutputSchema
 >
 
-export const listNastyIdentityGroups = async ({
+export const listPaymentFailedIdentityGroups = async ({
   ctx,
 }: {
   ctx: Context
-}): Promise<ListNastyIdentityGroupsOutput> => {
+}): Promise<ListPaymentFailedIdentityGroupsOutput> => {
   const caller = router.createCaller(ctx)
   const { edges } = await caller.edges.getEdges({
     query: {
@@ -41,5 +40,5 @@ export const listNastyIdentityGroups = async ({
     }
   }
 
-  return resURNs as ListNastyIdentityGroupsOutput
+  return resURNs as ListPaymentFailedIdentityGroupsOutput
 }

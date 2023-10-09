@@ -15,6 +15,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    return coreClient.identity.listNastyIdentityGroups.query()
+    return coreClient.identity.listPaymentFailedIdentityGroups.query()
   }
 )

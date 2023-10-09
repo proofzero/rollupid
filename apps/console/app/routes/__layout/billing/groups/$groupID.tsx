@@ -61,11 +61,11 @@ export default () => {
     groupSeats,
   } = loaderData
 
-  const { PASSPORT_URL, groups, apps, nastyIG } = useOutletContext<{
+  const { PASSPORT_URL, groups, apps, paymentFailedIG } = useOutletContext<{
     PASSPORT_URL: string
     groups: ListIdentityGroupsOutput
     apps: AppLoaderData[]
-    nastyIG: IdentityGroupURN[]
+    paymentFailedIG: IdentityGroupURN[]
   }>()
 
   const submit = useSubmit()
@@ -196,7 +196,7 @@ export default () => {
         ) : null}
       </section>
 
-      {groupURN && nastyIG.includes(groupURN) && (
+      {groupURN && paymentFailedIG.includes(groupURN) && (
         <section className="my-3">
           <ToastWithLink
             message="Payment for group user seats failed. Update group Payment Information to enable members' access"

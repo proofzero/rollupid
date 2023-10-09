@@ -203,7 +203,8 @@ const GroupHasAppsModal = ({
 }
 
 export default () => {
-  const { groups, apps, nastyIG } = useOutletContext<GroupRootContextData>()
+  const { groups, apps, paymentFailedIG } =
+    useOutletContext<GroupRootContextData>()
   const navigate = useNavigate()
 
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false)
@@ -350,7 +351,9 @@ export default () => {
                 </div>
 
                 <div className="flex flex-row items-center gap-3">
-                  {nastyIG.includes(item.val.URN as IdentityGroupURN) && (
+                  {paymentFailedIG.includes(
+                    item.val.URN as IdentityGroupURN
+                  ) && (
                     <Link to={`/billing/groups/${item.val.URN.split('/')[1]}`}>
                       <DangerPill text="Update Payment Information" />
                     </Link>
