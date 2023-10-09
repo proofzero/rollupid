@@ -374,17 +374,17 @@ export const reconcileSubscriptions = async (
           paidInvoice &&
           (!groupSeats || groupSeats.quantity <= stripeSeatQuantity!)
         ) {
-          await coreClient.billing.updateIdentityGroupSeats.mutate({
-            URN: URN as IdentityGroupURN,
-            subscriptionID: subscriptionID,
-            quantity: stripeSeatQuantity!,
-          })
-
           await coreClient.billing.setPaymentFailed.mutate({
             URN: URN as IdentityGroupURN,
             failed: false,
           })
         }
+
+        await coreClient.billing.updateIdentityGroupSeats.mutate({
+          URN: URN as IdentityGroupURN,
+          subscriptionID: subscriptionID,
+          quantity: stripeSeatQuantity!,
+        })
       }
     }
   }
