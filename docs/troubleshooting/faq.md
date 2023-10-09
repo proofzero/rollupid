@@ -10,7 +10,7 @@ You can get support from the team by joining our [Discord](https://discord.gg/ro
 
 ## When will WebAuthn/Passkeys be supported?
 
-We're working on that now. Check out progress [here](https://github.com/proofzero/rollupid/milestone/6).
+Passkeys/WebAuthn has now been implemented and is now one of the available authentication methods in Rollup Passport.
 
 ## What is a Vault and when will it be available?
 
