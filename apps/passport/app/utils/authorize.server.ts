@@ -16,7 +16,11 @@ import {
 import type { IdentityURN } from '@proofzero/urns/identity'
 import type { PersonaData } from '@proofzero/types/application'
 import { redirect } from '@remix-run/cloudflare'
-import { CryptoAccountType, NodeType } from '@proofzero/types/account'
+import {
+  CryptoAccountType,
+  EmailAccountType,
+  NodeType,
+} from '@proofzero/types/account'
 import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import type { AccountURN } from '@proofzero/urns/account'
 
@@ -78,14 +82,16 @@ export const getDataForScopes = async (
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_CONNECTED_ACCOUNTS)!)) {
       const accounts = connectedAccounts
-        .filter((ca) => {
-          return (
-            (ca.rc.node_type === NodeType.OAuth ||
-              ca.rc.node_type === NodeType.Email ||
-              ca.rc.node_type === NodeType.Crypto ||
-              ca.rc.node_type === NodeType.WebAuthN) &&
-            ca.rc.addr_type !== CryptoAccountType.Wallet
-          )
+        .filter(({ rc: { addr_type, node_type } }) => {
+          switch (node_type) {
+            case NodeType.Email:
+              return addr_type === EmailAccountType.Email
+            case NodeType.Crypto:
+              return addr_type !== CryptoAccountType.Wallet
+            case NodeType.OAuth:
+            case NodeType.WebAuthN:
+              return true
+          }
         })
         .map((ca) => {
           return ca.baseUrn as AccountURN
@@ -94,6 +100,20 @@ export const getDataForScopes = async (
       const accountProfiles =
         await coreClient.account.getAccountProfileBatch.query(accounts)
       connectedAddresses = getAccountDropdownItems(accountProfiles)
+
+      if (connectedEmails.length) {
+        connectedAddresses = connectedAddresses.map((ca) => {
+          const emailAccount = connectedEmails.find(
+            (ce) => ca.value === ce.value
+          )
+          if (!emailAccount) return ca
+          if (!emailAccount.mask) return ca
+          return {
+            ...ca,
+            mask: emailAccount.mask,
+          }
+        })
+      }
     }
     if (requestedScope.includes(Symbol.keyFor(SCOPE_SMART_CONTRACT_WALLETS)!)) {
       const accounts = connectedAccounts

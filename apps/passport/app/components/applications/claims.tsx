@@ -2,6 +2,9 @@ import { Form, useTransition } from '@remix-run/react'
 
 import { Button, Text } from '@proofzero/design-system'
 import { FaChevronDown, FaChevronRight } from 'react-icons/fa'
+import { TbShield } from 'react-icons/tb'
+
+import { EmailAccountType } from '@proofzero/types/account'
 
 import MultiAvatar from '@proofzero/design-system/src/molecules/avatar/MultiAvatar'
 import UserPill from '@proofzero/design-system/src/atoms/pills/UserPill'
@@ -10,12 +13,14 @@ import { Disclosure } from '@headlessui/react'
 import { useState } from 'react'
 
 import passportLogoURL from '~/assets/PassportIcon.svg'
+import { HiOutlineMail } from 'react-icons/hi'
 import { TbCrown } from 'react-icons/tb'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import warningImg from '~/assets/warning.svg'
 import InputText from '~/components/inputs/InputText'
 import { startCase } from 'lodash'
 import { HiOutlineExternalLink, HiOutlineX } from 'react-icons/hi'
+import { EmailMaskedPill } from '@proofzero/design-system/src/atoms/pills/EmailMaskPill'
 
 export const ConfirmRevocationModal = ({
   title,
@@ -129,11 +134,16 @@ const AccountExpandedView = ({
     <div className="flex flex-col gap-2 p-2.5 bg-white rounded-lg">
       {connectedAccounts && (
         <section className="flex flex-row gap-2 items-center">
-          <img src={account.icon} className="rounded-full w-5 h-5" />
+          {account.type === EmailAccountType.Mask ? (
+            <TbShield />
+          ) : (
+            <img src={account.icon} className="rounded-full w-5 h-5" />
+          )}
 
           <Text size="sm" weight="semibold" className="text-gray-800 truncate">
             {account.address}
           </Text>
+          {account.type === EmailAccountType.Mask ? <EmailMaskedPill /> : null}
         </section>
       )}
 
@@ -171,12 +181,14 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
   const RowView = ({
     account,
     appAskedFor,
+    masked = false,
     whatsBeingShared,
     sourceOfData,
     sourceOfDataIcon,
     dropdown = true,
   }: {
     appAskedFor: string
+    masked: boolean
     sourceOfData: string
     sourceOfDataIcon: JSX.Element
     dropdown?: boolean
@@ -203,6 +215,7 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
                   >
                     {appAskedFor}
                   </Text>
+                  {masked && <EmailMaskedPill />}
                   {whatsBeingShared && (
                     <Text
                       size="sm"
@@ -229,6 +242,7 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
                   >
                     {appAskedFor}
                   </Text>
+                  {masked && <EmailMaskedPill />}
                   {whatsBeingShared && (
                     <Text
                       size="sm"
@@ -373,6 +387,7 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
                     size={20}
                     text={scWallets ? a.title! : a.address}
                     avatarURL={a.icon}
+                    masked={a.type === EmailAccountType.Mask}
                     onClick={() => setSelectedAccount(a)}
                     className={'pointer-events-auto'}
                   />
@@ -421,11 +436,10 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
               <RowView
                 key={i}
                 appAskedFor="Email"
-                whatsBeingShared={scope.account}
+                masked={scope.masked}
+                whatsBeingShared={scope.address}
                 sourceOfData={scope.account}
-                sourceOfDataIcon={
-                  <img src={scope.icon} className="w-5 h-5 rounded-full" />
-                }
+                sourceOfDataIcon={<HiOutlineMail className="w-5 h-5" />}
                 dropdown={false}
               />
             )
@@ -491,12 +505,14 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
   const RowView = ({
     account,
     appAskedFor,
+    masked = false,
     whatsBeingShared,
     sourceOfData,
     sourceOfDataIcon,
     dropdown = true,
   }: {
     appAskedFor: string
+    masked: boolean
     sourceOfData: string
     sourceOfDataIcon: JSX.Element
     dropdown?: boolean
@@ -527,15 +543,19 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
                     >
                       {appAskedFor}
                     </Text>
+                    {masked && <EmailMaskedPill />}
                   </Disclosure.Button>
                 ) : (
-                  <Text
-                    size="sm"
-                    weight="medium"
-                    className="text-gray-500 truncate"
-                  >
-                    {appAskedFor}
-                  </Text>
+                  <div className="flex space-x-1">
+                    <Text
+                      size="sm"
+                      weight="medium"
+                      className="text-gray-500 truncate"
+                    >
+                      {appAskedFor}
+                    </Text>
+                    {masked && <EmailMaskedPill />}
+                  </div>
                 )}
               </td>
               <td className="px-6 py-3">
@@ -636,6 +656,7 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
       | {
           icon: string
           address: string
+          source: string
           type: string
           title?: string
         }
@@ -675,7 +696,9 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
                     Wallet(s)
                   </Text>
                 ) : (
-                  <MultiAvatar avatars={accounts.map((a) => a.icon)!} />
+                  <MultiAvatar
+                    avatars={accounts.filter((a) => a.icon).map((a) => a.icon)}
+                  />
                 )}
               </td>
               <td className="px-6 py-3 flex flex-row items-center gap-2.5">
@@ -706,6 +729,7 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
                       size={20}
                       text={scWallets ? a.title! : a.address}
                       avatarURL={a.icon}
+                      masked={a.type === EmailAccountType.Mask}
                       onClick={() => setSelectedAccount(a)}
                       className={'pointer-events-auto'}
                     />
@@ -717,7 +741,8 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
                     source={
                       source
                         ? source
-                        : `${startCase(selectedAccount.type)} - ${
+                        : selectedAccount.source ||
+                          `${startCase(selectedAccount.type)} - ${
                             selectedAccount.address
                           }`
                     }
@@ -754,11 +779,10 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
               <RowView
                 key={i}
                 appAskedFor="Email"
-                whatsBeingShared={scope.account}
-                sourceOfData={scope.account}
-                sourceOfDataIcon={
-                  <img src={scope.icon} className="w-5 h-5 rounded-full" />
-                }
+                masked={scope.masked}
+                whatsBeingShared={scope.address}
+                sourceOfData={scope.masked ? scope.source : scope.address}
+                sourceOfDataIcon={<HiOutlineMail className="w-5 h-5" />}
                 dropdown={false}
               />
             )

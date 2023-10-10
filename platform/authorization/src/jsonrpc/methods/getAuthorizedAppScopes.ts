@@ -23,6 +23,13 @@ export const GetAuthorizedAppScopesMethodOutput = z.object({
       claims: z.record(z.string(), z.any()),
       meta: z.object({
         urns: z.array(z.string()),
+        source: z
+          .object({
+            urn: inputValidators.AccountURNInput,
+            type: z.string(),
+            identifier: z.string(),
+          })
+          .optional(),
         valid: z.boolean(),
       }),
     })

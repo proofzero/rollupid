@@ -53,6 +53,7 @@ export const isOAuthAccountType = (type: string | undefined) => {
 export const isEmailAccountType = (type: string | undefined) => {
   switch (type) {
     case EmailAccountType.Email:
+    case EmailAccountType.Mask:
       return NodeType.Email
     default:
       return false

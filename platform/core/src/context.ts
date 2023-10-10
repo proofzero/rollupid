@@ -14,7 +14,8 @@ import {
   generateTraceSpan,
 } from '@proofzero/platform-middleware/trace'
 
-import {
+import type { Account } from '@proofzero/platform.account/src'
+import type {
   Authorization,
   ExchangeCode,
 } from '@proofzero/platform.authorization/src'
@@ -23,7 +24,6 @@ import type { Identity } from '@proofzero/platform.identity'
 import * as db from '@proofzero/platform.edges/src/db'
 
 import type { Environment } from './types'
-import type { AccountNode } from '@proofzero/platform.account/src/nodes'
 
 export const GeoContext = 'com.kubelt.geo/location'
 
@@ -50,7 +50,7 @@ export interface CreateInnerContextOptions
   authorizationNode?: DurableObjectStubProxy<Authorization>
   identityNode?: DurableObjectStubProxy<Identity>
 
-  account?: AccountNode
+  account?: DurableObjectStubProxy<Account>
   account3RN?: AccountURN
   accountURN?: AccountURN
   alias?: string

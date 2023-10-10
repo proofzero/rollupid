@@ -1,4 +1,7 @@
 import React from 'react'
+
+import { HiOutlineExclamationTriangle } from 'react-icons/hi2'
+
 import iIcon from './i.svg'
 import { Tooltip } from 'flowbite-react'
 import { Text } from '../../atoms/text/Text'
@@ -8,11 +11,13 @@ export default function Info({
   description,
   placement = 'bottom',
   editable = false,
+  warning = false,
 }: {
   name: string
   description: string
   placement?: 'top' | 'bottom' | 'left' | 'right'
   editable?: boolean
+  warning?: boolean
 }) {
   return (
     <div className="w-fit flex-shrink-0">
@@ -33,7 +38,11 @@ export default function Info({
         className="!bg-white shadow absolute z-5 w-max"
         placement={placement}
       >
-        <img src={iIcon} alt={`${name} info`} />
+        {warning ? (
+          <HiOutlineExclamationTriangle className="text-orange-500" />
+        ) : (
+          <img src={iIcon} alt={`${name} info`} />
+        )}
       </Tooltip>
     </div>
   )

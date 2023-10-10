@@ -6465,6 +6465,7 @@ __metadata:
     jose: 4.11.0
     npm-run-all: 4.1.5
     prettier: 2.7.1
+    random-words: 2.0.0
     remix-auth-google: 1.2.0
     typescript: 5.0.4
     zod: 3.22.4
@@ -32955,6 +32956,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"random-words@npm:2.0.0":
+  version: 2.0.0
+  resolution: "random-words@npm:2.0.0"
+  dependencies:
+    seedrandom: ^3.0.5
+  checksum: d574955cc5f38700a2394d67457673f811866db3dd818431e7f73e31f739f9e1bb2861cc679d83538f7ac87cad95f101a609dbb916019e6c2e18432db220c5eb
+  languageName: node
+  linkType: hard
+
 "randombytes@npm:^2.0.0, randombytes@npm:^2.0.1, randombytes@npm:^2.0.5, randombytes@npm:^2.1.0":
   version: 2.1.0
   resolution: "randombytes@npm:2.1.0"
@@ -35160,6 +35170,13 @@ __metadata:
     node-gyp: latest
     node-gyp-build: ^4.2.0
   checksum: 21e219adc0024fbd75021001358780a3cc6ac21273c3fcaef46943af73969729709b03f1df7c012a0baab0830fb9a06ccc6b42f8d50050c665cb98078eab477b
+  languageName: node
+  linkType: hard
+
+"seedrandom@npm:^3.0.5":
+  version: 3.0.5
+  resolution: "seedrandom@npm:3.0.5"
+  checksum: 728b56bc3bc1b9ddeabd381e449b51cb31bdc0aa86e27fcd0190cea8c44613d5bcb2f6bb63ed79f78180cbe791c20b8ec31a9627f7b7fc7f476fd2bdb7e2da9f
   languageName: node
   linkType: hard
 

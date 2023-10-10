@@ -4,7 +4,7 @@ import { Text } from '../text/Text'
 
 export type InputToggleProps = {
   id: string
-  label: string
+  label?: string
   name?: string
   onToggle?: (val: boolean) => void
   checked?: boolean
@@ -33,9 +33,11 @@ export const InputToggle = ({
         label && label !== '' ? 'space-x-8' : ''
       }`}
     >
-      <Text size="sm" weight="medium" className="text-gray-800">
-        {label}
-      </Text>
+      {label && (
+        <Text size="sm" weight="medium" className="text-gray-800">
+          {label}
+        </Text>
+      )}
 
       <input
         id={id}

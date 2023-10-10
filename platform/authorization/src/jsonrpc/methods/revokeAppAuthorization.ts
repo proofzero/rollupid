@@ -3,9 +3,13 @@ import { z } from 'zod'
 import { router } from '@proofzero/platform.core'
 
 import { Context } from '../../context'
+import { generateJKU, getPrivateJWK } from '../../jwk'
 import { initAuthorizationNodeByName } from '../../nodes'
 
-import { EDGE_AUTHORIZES } from '../../constants'
+import {
+  EDGE_AUTHORIZES,
+  ROLLUP_INTERNAL_ACCESS_TOKEN_URN,
+} from '../../constants'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
 import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
 
@@ -14,7 +18,7 @@ import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 
 export const RevokeAppAuthorizationMethodInput = z.object({
   clientId: z.string().min(1),
-  issuer: z.string().optional(),
+  issuer: z.string(),
 })
 
 type RevokeAppAuthorizationMethodInput = z.infer<
@@ -102,19 +106,26 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
       ctx.env.Authorization
     )
 
-    // const scope = ['admin']
+    const scope = ['admin']
 
-    // const internalAccessToken = await authorizationNode.class.generateAccessToken({
-    //   jku: generateJKU(input.issuer),
-    //   jwk: getPrivateJWK(ctx),
-    //   identity: ROLLUP_INTERNAL_ACCESS_TOKEN_URN,
-    //   clientId,
-    //   expirationTime: '5 seconds',
-    //   issuer: input.issuer,
-    //   scope,
-    // })
+    const internalAccessToken =
+      await authorizationNode.class.generateAccessToken({
+        jku: generateJKU(input.issuer),
+        jwk: getPrivateJWK(ctx.env),
+        identity: ROLLUP_INTERNAL_ACCESS_TOKEN_URN,
+        clientId,
+        expirationTime: '5 seconds',
+        issuer: input.issuer,
+        scope,
+      })
 
-    const paymaster = await caller.starbase.getPaymaster({
+    const privilegedCaller = router.createCaller({
+      ...ctx,
+      req: undefined,
+      token: internalAccessToken,
+    })
+
+    const paymaster = await privilegedCaller.starbase.getPaymaster({
       clientId,
     })
 

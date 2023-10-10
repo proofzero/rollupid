@@ -51,7 +51,17 @@ export async function validatePersonaData(
         [PlatformAccountURNHeader]: accountUrnForEmail,
         ...generateTraceContextHeaders(traceSpan),
       })
-      const retrievedIdentityUrn = await coreClient.account.getIdentity.query()
+
+      let retrievedIdentityUrn = await coreClient.account.getIdentity.query()
+      const sourceAccountUrn = await coreClient.account.getSourceAccount.query()
+
+      if (!retrievedIdentityUrn && sourceAccountUrn) {
+        const coreClient = createCoreClient(coreFetcher, {
+          [PlatformAccountURNHeader]: sourceAccountUrn,
+          ...generateTraceContextHeaders(traceSpan),
+        })
+        retrievedIdentityUrn = await coreClient.account.getIdentity.query()
+      }
 
       if (retrievedIdentityUrn !== identityURN)
         throw new BadRequestError({
@@ -63,7 +73,8 @@ export async function validatePersonaData(
         accountProfile.type !== OAuthAccountType.Google &&
         accountProfile.type !== OAuthAccountType.Microsoft &&
         accountProfile.type !== OAuthAccountType.Apple &&
-        accountProfile.type !== EmailAccountType.Email
+        accountProfile.type !== EmailAccountType.Email &&
+        accountProfile.type !== EmailAccountType.Mask
       )
         throw new BadRequestError({
           message: 'Account provided is not an email-compatible account',
@@ -130,6 +141,14 @@ export async function setPersonaReferences(
     //TODO: make this more generic so it applies to all claims
     if (scopeEntry === 'email' && personaData.email) {
       uniqueAuthorizationReferences.add(personaData.email)
+
+      const coreClient = createCoreClient(coreFetcher, {
+        [PlatformAccountURNHeader]: personaData.email,
+        ...generateTraceContextHeaders(traceSpan),
+      })
+
+      const sourceAccountURN = await coreClient.account.getSourceAccount.query()
+      sourceAccountURN && uniqueAuthorizationReferences.add(sourceAccountURN)
     } else if (
       scopeEntry === 'connected_accounts' &&
       personaData.connected_accounts &&
@@ -200,12 +219,21 @@ export type ClaimName = string
 export type ScopeValueName = string
 export type ClaimValuePairs = Record<ClaimName, ClaimValueType>
 
+type AccountClaim = {
+  urn: AccountURN
+  type: string
+  identifier: string
+}
+
+export type ClaimMeta = {
+  urns: AnyURN[]
+  source?: AccountClaim
+  valid: boolean
+}
+
 export type ScopeClaimsResponse = {
   claims: ClaimValuePairs
-  meta: {
-    urns: AnyURN[]
-    valid: boolean
-  }
+  meta: ClaimMeta
 }
 
 export type ClaimData = {
@@ -221,6 +249,21 @@ export type ScopeClaimRetrieverFunction = (
   personaData: PersonaData,
   traceSpan: TraceSpan
 ) => Promise<ClaimData>
+
+type EmailScopeClaim = {
+  claims: {
+    type: EmailAccountType
+    email: string
+  }
+  meta: ClaimMeta
+}
+
+type ConnectedAccountsScopeClaim = {
+  claims: {
+    connected_accounts: Array<AccountClaim>
+  }
+  meta: ClaimMeta
+}
 
 function createInvalidClaimDataObject(scopeEntry: ScopeValueName): ClaimData {
   return {
@@ -264,14 +307,33 @@ async function emailClaimRetriever(
         tag: EDGE_HAS_REFERENCE_TO,
       },
     })
-    const emailAccount = edgesResults.edges[0].dst.qc.alias
+
+    const { addr_type: type } = edgesResults.edges[0].dst.rc
+    const { alias: email, source: sourceURN } = edgesResults.edges[0].dst.qc
+
+    let source
+
+    if (sourceURN) {
+      const node = await coreClient.edges.findNode.query({
+        baseUrn: sourceURN as AccountURN,
+      })
+      if (node) {
+        const urn = sourceURN as AccountURN
+        const type = node.rc.addr_type
+        const identifier = node.qc.alias
+        source = { urn, identifier, type }
+      }
+    }
+
     const claimData: ClaimData = {
       [scopeEntry]: {
         claims: {
-          email: emailAccount,
+          email,
+          type,
         },
         meta: {
           urns: [emailAccountUrn],
+          source,
           valid: true,
         },
       },
@@ -379,6 +441,11 @@ async function erc4337ClaimsRetriever(
   return result
 }
 
+type ConnectedAccount = {
+  type: string
+  identifier: string
+}
+
 async function connectedAccountsClaimsRetriever(
   scopeEntry: ScopeValueName,
   identityURN: IdentityURN,
@@ -391,10 +458,10 @@ async function connectedAccountsClaimsRetriever(
   const result = {
     connected_accounts: {
       claims: {
-        connected_accounts: new Array(),
+        connected_accounts: new Array<ConnectedAccount>(),
       },
       meta: {
-        urns: new Array(),
+        urns: new Array<AccountURN>(),
         valid: true,
       },
     },
@@ -408,22 +475,48 @@ async function connectedAccountsClaimsRetriever(
   if (personaData.connected_accounts === AuthorizationControlSelection.ALL) {
     //Referencable persona submission pointing to all connected accounts
     //at any point in time
-    const identityAccounts =
-      (
-        await coreClient.identity.getAccounts.query({
-          URN: identityURN,
-        })
-      )?.filter(
-        (account) => account.rc.addr_type !== CryptoAccountType.Wallet
-      ) || []
+    let identityAccounts =
+      (await coreClient.identity.getAccounts.query({
+        URN: identityURN,
+      })) || []
 
-    for (const accountNode of identityAccounts) {
-      result.connected_accounts.claims.connected_accounts.push({
-        type: accountNode.rc.addr_type,
-        identifier: accountNode.qc.alias,
-      })
-      result.connected_accounts.meta.urns.push(accountNode.baseUrn)
+    identityAccounts = identityAccounts.filter(
+      ({ rc: { addr_type } }) => addr_type !== CryptoAccountType.Wallet
+    )
+
+    if (personaData.email) {
+      const [emailProfile] =
+        await coreClient.account.getAccountProfileBatch.query([
+          personaData.email,
+        ])
+
+      if (
+        emailProfile.type === EmailAccountType.Mask &&
+        'source' in emailProfile
+      )
+        identityAccounts = identityAccounts.filter(({ baseUrn }) => {
+          return baseUrn !== emailProfile.source.id
+        })
+
+      identityAccounts = identityAccounts.filter(
+        ({ baseUrn, rc: { addr_type } }) => {
+          if (addr_type !== EmailAccountType.Mask) return true
+          else return baseUrn === emailProfile.id
+        }
+      )
+    } else {
+      identityAccounts = identityAccounts.filter(
+        ({ rc: { addr_type } }) => addr_type !== EmailAccountType.Mask
+      )
     }
+
+    identityAccounts.forEach((node) => {
+      result.connected_accounts.claims.connected_accounts.push({
+        type: node.rc.addr_type,
+        identifier: node.qc.alias,
+      })
+      result.connected_accounts.meta.urns.push(node.baseUrn)
+    })
   } else {
     //Static persona submission of accounts
     const authorizedAccounts = personaData.connected_accounts as AccountURN[]
@@ -442,7 +535,9 @@ async function connectedAccountsClaimsRetriever(
         type: accountNode.rc.addr_type,
         identifier: accountNode.qc.alias,
       })
-      result.connected_accounts.meta.urns.push(accountNode.baseUrn)
+      result.connected_accounts.meta.urns.push(
+        accountNode.baseUrn as AccountURN
+      )
     })
   }
   return result
@@ -527,4 +622,37 @@ export const userClaimsFormatter = (
     }
   }
   return result
+}
+
+const formatEmailScopeClaim = (scope: EmailScopeClaim) => {
+  if (scope.claims.type !== EmailAccountType.Mask) return
+  if (!scope.meta.source) return
+  scope.claims.type = EmailAccountType.Email
+}
+
+const formatConnectedAccounts = (
+  connectedAccounts: ConnectedAccountsScopeClaim,
+  email: EmailScopeClaim
+) => {
+  if (!email.meta.source) return
+  const { connected_accounts: accounts } = connectedAccounts.claims
+  if (!Array.isArray(accounts)) return
+  accounts
+    .filter((a) => a.type === EmailAccountType.Mask)
+    .forEach((a) => (a.type = EmailAccountType.Email))
+}
+
+export const maskAccountFormatter = (claims: ClaimData) => {
+  if (claims.email) {
+    const emailScope = claims.email as unknown as EmailScopeClaim
+    formatEmailScopeClaim(emailScope)
+
+    if (claims.connected_accounts) {
+      const connectedAccountsScope =
+        claims.connected_accounts as ConnectedAccountsScopeClaim
+      formatConnectedAccounts(connectedAccountsScope, emailScope)
+    }
+  }
+
+  return claims
 }

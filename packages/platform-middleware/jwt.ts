@@ -7,7 +7,9 @@ import { BaseMiddlewareFunction } from './types'
 
 export const AuthorizationTokenFromHeader: BaseMiddlewareFunction<{
   req?: Request
+  token?: string
 }> = ({ ctx, next }) => {
+  if (ctx.token) return next({ ctx })
   const token = ctx.req ? getAuthzTokenFromReq(ctx.req) : undefined
   return next({
     ctx: {

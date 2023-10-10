@@ -19,7 +19,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const coreClient = getCoreClient({ context })
-    return await coreClient.authorization.getAuthorizedAppScopes.query({
+    return coreClient.authorization.getAuthorizedAppScopes.query({
       clientId,
       identityURN,
     })

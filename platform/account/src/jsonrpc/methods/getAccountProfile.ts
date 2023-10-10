@@ -14,6 +14,7 @@ import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 import type { Context } from '../../context'
 
 import {
+  AccountNode,
   AppleAccount,
   CryptoAccount,
   DiscordAccount,
@@ -27,13 +28,21 @@ import {
   WebauthnAccount,
 } from '../../nodes'
 
-import { AccountProfileSchema } from '../validators/profile'
+import {
+  AccountProfileSchema,
+  MaskAccountProfileSchema,
+} from '../validators/profile'
 import OAuthAccount from '../../nodes/oauth'
 import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 
-export const GetAccountProfileOutput = AccountProfileSchema.extend({
-  id: AccountURNInput,
-})
+export const GetAccountProfileOutput = z.union([
+  MaskAccountProfileSchema.extend({
+    id: AccountURNInput,
+  }),
+  AccountProfileSchema.extend({
+    id: AccountURNInput,
+  }),
+])
 
 export const GetAccountProfileBatchInput = z.array(AccountURNInput)
 export const GetAccountProfileBatchOutput = z.array(GetAccountProfileOutput)
@@ -55,7 +64,7 @@ export const getAccountProfileMethod: GetAccountProfileMethod = async ({
   if (!nodeClient)
     throw new InternalServerError({ message: 'missing nodeClient' })
 
-  return await getProfile(ctx, nodeClient, ctx.accountURN!)
+  return getProfile(ctx, nodeClient, ctx.accountURN!)
 }
 
 export const getAccountProfileBatchMethod = async ({
@@ -74,65 +83,77 @@ export const getAccountProfileBatchMethod = async ({
     const nodeClient = initAccountNodeByName(baseURN, ctx.env.Account)
     resultPromises.push(getProfile(ctx, nodeClient, accountURN))
   }
-  return await Promise.all(resultPromises)
+  return Promise.all(resultPromises)
 }
 
 async function getProfile(
   ctx: Context,
-  nodeClient: ReturnType<typeof initAccountNodeByName>,
+  node: AccountNode,
   accountURN: AccountURN
-) {
-  const address = await nodeClient?.class.getAddress()
-  const type = await nodeClient?.class.getType()
+): Promise<GetAccountProfileResult> {
+  const address = await node.class.getAddress()
+  const type = await node.class.getType()
   if (!address || !type) {
     throw new InternalServerError({ message: 'missing address or type' })
   }
 
   if (!accountURN) throw new BadRequestError({ message: 'missing accountURN' })
 
-  const getProfileNode = ():
-    | ContractAccount
-    | CryptoAccount
-    | EmailAccount
-    | WebauthnAccount
-    | OAuthAccount
-    | undefined => {
+  const getAccount = (node: AccountNode) => {
     switch (type) {
       case CryptoAccountType.ETH:
-        return new CryptoAccount(nodeClient)
+        return new CryptoAccount(node)
       case CryptoAccountType.Wallet:
-        return new ContractAccount(nodeClient)
+        return new ContractAccount(node)
+      case EmailAccountType.Mask:
       case EmailAccountType.Email:
-        return new EmailAccount(nodeClient, ctx.env)
+        return new EmailAccount(node, ctx.env)
       case WebauthnAccountType.WebAuthN:
-        return new WebauthnAccount(nodeClient)
+        return new WebauthnAccount(node)
       case OAuthAccountType.Apple:
-        return new AppleAccount(nodeClient, ctx.env)
+        return new AppleAccount(node, ctx.env)
       case OAuthAccountType.Discord:
-        return new DiscordAccount(nodeClient, ctx.env)
+        return new DiscordAccount(node, ctx.env)
       case OAuthAccountType.GitHub:
-        return new GithubAccount(nodeClient)
+        return new GithubAccount(node)
       case OAuthAccountType.Google:
-        return new GoogleAccount(nodeClient, ctx.env)
+        return new GoogleAccount(node, ctx.env)
       case OAuthAccountType.Microsoft:
-        return new MicrosoftAccount(nodeClient, ctx.hashedIdref!, ctx.env)
+        return new MicrosoftAccount(node, ctx.hashedIdref!, ctx.env)
       case OAuthAccountType.Twitter:
-        return new TwitterAccount(nodeClient)
+        return new TwitterAccount(node)
     }
   }
 
-  const node = getProfileNode()
-  if (!node) {
+  const account = getAccount(node)
+  if (!account) {
     throw new InternalServerError({
       message: 'unsupported account type',
       cause: { type },
     })
   }
 
-  const profile = await node.getProfile()
+  const id = AccountURNSpace.getBaseURN(accountURN)
+  const profile = await account.getProfile()
+
+  if (account instanceof EmailAccount && type === EmailAccountType.Mask) {
+    const sourceAccountURN = await account.getSourceAccount()
+    if (sourceAccountURN) {
+      const sourceAccountNode = initAccountNodeByName(
+        sourceAccountURN,
+        ctx.env.Account
+      )
+      const source = await getProfile(ctx, sourceAccountNode, sourceAccountURN)
+      return {
+        ...profile,
+        id,
+        source,
+      }
+    }
+  }
 
   return {
-    id: accountURN,
     ...profile,
+    id,
   }
 }

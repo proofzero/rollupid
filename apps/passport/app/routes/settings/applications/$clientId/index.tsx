@@ -20,6 +20,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { getCoreClient } from '~/platform.server'
 import { getValidatedSessionContext } from '~/session.server'
 import type { ScopeMeta } from '@proofzero/security/scopes'
+import { EmailAccountType } from '@proofzero/types/account'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
@@ -71,17 +72,27 @@ export default () => {
       )
         continue
       if (scopeValue === 'email') {
-        const profile = connectedProfiles.find(
-          //There should be only one account urn provided for email
-          (profile) =>
-            profile.urn === scopeValues.claimValues[scopeValue].meta.urns[0]
-        )
+        //There should be only one account urn provided for email
+        const scope = scopeValues.claimValues[scopeValue]
+        const { meta } = scope
+        const masked = scope.claims.type === EmailAccountType.Mask
+        const urn = masked ? meta.source?.urn : meta.urns[0]
+        const profile = connectedProfiles.find((profile) => profile.urn === urn)
+
+        const claim = 'email'
+        const address = masked ? scope.claims.email : profile.address
+        const { icon, type } = profile
+        const source = scope.meta.source?.identifier || profile.address
+        const sourceIcon = getDefaultIconUrl(type)
+
         aggregator.push({
-          claim: 'email',
-          icon: profile.icon,
-          address: profile.address,
-          type: profile.type,
-          sourceIcon: getDefaultIconUrl(profile.type),
+          claim,
+          icon,
+          address,
+          type,
+          masked,
+          source,
+          sourceIcon,
         })
       } else if (scopeValue === 'connected_accounts') {
         const profiles = connectedProfiles.filter((profile) =>
@@ -90,11 +101,28 @@ export default () => {
 
         aggregator.push({
           claim: 'connected_accounts',
-          accounts: profiles.map((profile) => ({
-            icon: profile.icon,
-            address: profile.address,
-            type: profile.type === 'eth' ? 'blockchain' : profile.type,
-          })),
+          accounts: profiles.map((profile) => {
+            if (scopeValues.claimValues.email) {
+              const { email } = scopeValues.claimValues
+              const masked =
+                email.claims.type === EmailAccountType.Mask &&
+                profile.urn === email.meta.urns[0]
+              if (masked) {
+                const address = email.claims.email
+                const source = email.meta?.source?.identifier
+                return {
+                  address,
+                  source,
+                  type: EmailAccountType.Mask,
+                }
+              }
+            }
+            return {
+              icon: profile.icon,
+              address: profile.address,
+              type: profile.type === 'eth' ? 'blockchain' : profile.type,
+            }
+          }),
         })
       } else if (scopeValue === 'profile') {
         aggregator.push({

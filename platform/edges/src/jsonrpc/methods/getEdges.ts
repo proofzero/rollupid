@@ -14,6 +14,7 @@ export const GetEdgesMethodInput = z.object({
 })
 
 export const GetEdgesMethodOutput = EdgeQueryResultsOutput
+export type GetEdgesMethodOutput = z.infer<typeof GetEdgesMethodOutput>
 
 export type GetEdgesParams = z.infer<typeof GetEdgesMethodInput>
 

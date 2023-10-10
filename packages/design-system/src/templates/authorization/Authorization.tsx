@@ -1,5 +1,10 @@
 import React from 'react'
+import {
+  EmailMaskedPill,
+  EmailUnmaskedPill,
+} from '@proofzero/design-system/src/atoms/pills/EmailMaskPill'
 import { Avatar } from '../../atoms/profile/avatar/Avatar'
+import { InputToggle } from '../../atoms/form/InputToggle'
 import { Text } from '../../atoms/text/Text'
 import authorizeCheck from './authorize-check.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
@@ -55,6 +60,10 @@ type AuthorizationProps = {
   selectEmailCallback: (selected: DropdownSelectListItem) => void
   selectedEmail?: DropdownSelectListItem
 
+  maskEmail: boolean
+  loadingMaskEmail: boolean
+  setMaskEmail: (state: boolean) => void
+
   connectedAccounts?: Array<DropdownSelectListItem>
   addNewAccountCallback: () => void
   selectAccountsCallback: (selected: Array<DropdownSelectListItem>) => void
@@ -85,6 +94,9 @@ export default ({
   addNewEmailCallback,
   selectEmailCallback,
   selectedEmail,
+  maskEmail,
+  loadingMaskEmail,
+  setMaskEmail,
   connectedAccounts,
   addNewAccountCallback,
   selectAccountsCallback,
@@ -161,11 +173,18 @@ export default ({
           ${open ? 'bg-gray-50 shadow-sm rounded-lg' : ''}`}
                 >
                   <div className="flex flex-row items-center gap-2 min-w-0">
-                    <Info
-                      name={scopeMeta.scopes[scope].name}
-                      description={scopeMeta.scopes[scope].description}
-                      editable={true}
-                    />
+                    {scope === 'connected_accounts' && maskEmail ? (
+                      <Info
+                        name="Connected Accounts"
+                        description="You have masked your email account which can be exposed to the application if you share an account having the same email address."
+                        warning={true}
+                      />
+                    ) : (
+                      <Info
+                        name={scopeMeta.scopes[scope].name}
+                        description={scopeMeta.scopes[scope].description}
+                      />
+                    )}
 
                     <div
                       data-popover
@@ -197,13 +216,22 @@ export default ({
                     <ScopeIcon scope={scope} />
 
                     <div className="flex flex-col items-start w-max min-w-0 truncate">
-                      <Text
-                        size="sm"
-                        weight="medium"
-                        className="flex-1 text-gray-500"
-                      >
-                        {scopeMeta.scopes[scope].name}
-                      </Text>
+                      <div className="flex space-x-1">
+                        <Text
+                          size="sm"
+                          weight="medium"
+                          className="text-gray-500"
+                        >
+                          {scopeMeta.scopes[scope].name}
+                        </Text>
+                        {scope === 'email' ? (
+                          maskEmail ? (
+                            <EmailMaskedPill />
+                          ) : (
+                            <EmailUnmaskedPill />
+                          )
+                        ) : null}
+                      </div>
                       {!selectedItem &&
                         !selectedItems?.length &&
                         !allItemsSelected && (
@@ -225,16 +253,18 @@ export default ({
                       {selectedItem?.title?.length && (
                         <Text
                           size="sm"
-                          className="text-gray-500 dark:text-white truncate text-ellipsis w-full"
+                          className="text-left text-gray-500 dark:text-white truncate text-ellipsis w-full"
                         >
-                          {selectedItem.title}
+                          {maskEmail && selectedItem.mask
+                            ? selectedItem.mask.title
+                            : selectedItem.title}
                         </Text>
                       )}
 
                       {selectedItems?.length > 1 && !allItemsSelected && (
                         <Text
                           size="sm"
-                          className="text-gray-500 dark:text-white truncate text-ellipsis w-full"
+                          className="text-gray-500 dark:text-white truncate text-ellipsis"
                         >
                           {selectedItems?.length} items selected
                         </Text>
@@ -342,8 +372,28 @@ export default ({
                       items={connectedEmails}
                       defaultItems={[selectedEmail]}
                       placeholder="Select an Email Address"
-                      onSelect={(selectedItem: DropdownSelectListItem) => {
-                        selectEmailCallback(selectedItem)
+                      refreshSelectedItem={true}
+                      maskAccount={maskEmail && selectedEmail.value}
+                      onSelect={selectEmailCallback}
+                      listboxOptions={{
+                        topAction: (
+                          <div className="flex flex-row items-center justify-between px-4 pt-1">
+                            <Text
+                              size="sm"
+                              type="span"
+                              className="text-gray-900 dark:text-white"
+                            >
+                              Mask Email
+                            </Text>
+                            {loadingMaskEmail && <Spinner />}
+                            <InputToggle
+                              name="mask-email"
+                              id="mask-email"
+                              onToggle={() => setMaskEmail(!maskEmail)}
+                              checked={maskEmail}
+                            />
+                          </div>
+                        ),
                       }}
                       ConnectButtonPhrase="Connect New Email Account"
                       ConnectButtonCallback={addNewEmailCallback}
@@ -357,11 +407,9 @@ export default ({
                     <Dropdown
                       items={connectedAccounts}
                       defaultItems={selectedConnectedAccounts}
-                      onSelect={(
-                        selectedItems: Array<DropdownSelectListItem>
-                      ) => {
-                        selectAccountsCallback(selectedItems)
-                      }}
+                      switchTitles={true}
+                      maskAccount={maskEmail && selectedEmail.value}
+                      onSelect={selectAccountsCallback}
                       onSelectAll={selectAllAccountsCallback}
                       placeholder="Select at least one"
                       ConnectButtonPhrase="Connect New Account"
