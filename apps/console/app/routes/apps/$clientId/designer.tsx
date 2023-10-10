@@ -115,8 +115,9 @@ const DesignerTab = ({
   selected: boolean
 }) => (
   <div
-    className={`box-border -mb-0.5 mr-8 pb-4 px-1 flex flex-row items-center gap-2 border-b-2 ${selected ? 'border-indigo-600' : 'border-transparent'
-      }`}
+    className={`box-border -mb-0.5 mr-8 pb-4 px-1 flex flex-row items-center gap-2 border-b-2 ${
+      selected ? 'border-indigo-600' : 'border-transparent'
+    }`}
   >
     <Icon
       className={`w-5 h-5 ${selected ? 'text-indigo-600' : 'text-gray-500'}`}
@@ -206,8 +207,9 @@ const RadiusButton = ({
   return (
     <button
       type="button"
-      className={`w-full py-1.5 px-2.5 rounded-md ${selected ? 'bg-indigo-500' : ''
-        }`}
+      className={`w-full py-1.5 px-2.5 rounded-md ${
+        selected ? 'bg-indigo-500' : ''
+      }`}
       onClick={(e) => {
         e.preventDefault()
         setRadius(radius)
@@ -345,7 +347,7 @@ const AuthPanel = ({
 
   const [signMessage, setSignMessage] = useState<string>(
     appTheme?.signMessageTemplate ??
-    AuthenticationScreenDefaults.defaultSignMessage
+      AuthenticationScreenDefaults.defaultSignMessage
   )
 
   const [radius, setRadius] = useState<string>(
@@ -372,11 +374,11 @@ const AuthPanel = ({
       ...p,
       val: getDisplayNameFromProviderString(p.key),
     })) ??
-    AuthenticationScreenDefaults.knownKeys.map((k) => ({
-      key: k,
-      val: getDisplayNameFromProviderString(k),
-      enabled: true,
-    }))
+      AuthenticationScreenDefaults.knownKeys.map((k) => ({
+        key: k,
+        val: getDisplayNameFromProviderString(k),
+        enabled: true,
+      }))
   )
   const [providerModalOpen, setProviderModalOpen] = useState<boolean>(false)
 
@@ -402,9 +404,9 @@ const AuthPanel = ({
             :root {
                 ${getRGBColor(dark ? color.dark : color.light, 'primary')}
                 ${getRGBColor(
-          getTextColor(dark ? color.dark : color.light),
-          'primary-contrast-text'
-        )}
+                  getTextColor(dark ? color.dark : color.light),
+                  'primary-contrast-text'
+                )}
              {
          `}</style>
       </Helmet>
@@ -629,7 +631,7 @@ const AuthPanel = ({
               <IconPicker
                 maxSize={2097152}
                 id="image"
-                setIsFormChanged={(val) => { }}
+                setIsFormChanged={(val) => {}}
                 setIsImgUploading={(val) => {
                   setLoading(val)
                 }}
@@ -799,8 +801,8 @@ const AuthPanel = ({
                           'urn:rollupid:account/0xc2b930f1fc2a55ddc1bf99e8844ca0479567ac44f3e2eea58216660e26947686',
                       },
                     ]}
-                    selectEmailCallback={() => { }}
-                    addNewEmailCallback={() => { }}
+                    selectEmailCallback={() => {}}
+                    addNewEmailCallback={() => {}}
                     selectedConnectedAccounts={[]}
                     connectedAccounts={[
                       {
@@ -838,16 +840,16 @@ const AuthPanel = ({
                     ]}
                     selectedSCWallets={[]}
                     connectedSmartContractWallets={[]}
-                    addNewAccountCallback={() => { }}
-                    addNewSmartWalletCallback={() => { }}
-                    selectSmartWalletsCallback={() => { }}
-                    selectAccountsCallback={() => { }}
-                    selectAllAccountsCallback={() => { }}
-                    selectAllSmartWalletsCallback={() => { }}
+                    addNewAccountCallback={() => {}}
+                    addNewSmartWalletCallback={() => {}}
+                    selectSmartWalletsCallback={() => {}}
+                    selectAccountsCallback={() => {}}
+                    selectAllAccountsCallback={() => {}}
+                    selectAllSmartWalletsCallback={() => {}}
                     // disableAuthorize={true}
                     transitionState={'idle'}
-                    cancelCallback={() => { }}
-                    authorizeCallback={() => { }}
+                    cancelCallback={() => {}}
+                    authorizeCallback={() => {}}
                     radius={radius}
                   />
                 </Tab.Panel>
@@ -984,7 +986,7 @@ const EmailPanel = ({
               <IconPicker
                 maxSize={2097152}
                 id="logoURL"
-                setIsFormChanged={(val) => { }}
+                setIsFormChanged={(val) => {}}
                 setIsImgUploading={(val) => {
                   setLoading(val)
                 }}
@@ -1336,7 +1338,7 @@ const OGPanel = ({
               <IconPicker
                 maxSize={2097152}
                 id="ogImage"
-                setIsFormChanged={(val) => { }}
+                setIsFormChanged={(val) => {}}
                 setIsImgUploading={(val) => {
                   setLoading(val)
                 }}
@@ -1531,9 +1533,9 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         color:
           color && colorDark
             ? {
-              light: color,
-              dark: colorDark,
-            }
+                light: color,
+                dark: colorDark,
+              }
             : undefined,
         graphicURL: graphicURL,
         providers: providers,
