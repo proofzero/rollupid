@@ -102,18 +102,32 @@ export const loader = getRollupReqFunctionErrorWrapper(
 
       groupURN = targetURN as IdentityGroupURN
 
-      const groups = await coreClient.identity.listIdentityGroups.query()
+      const [groups, seatQuery, invitations] = await Promise.all([
+        coreClient.identity.listIdentityGroups.query(),
+        coreClient.billing.getIdentityGroupSeats.query({
+          URN: groupURN,
+        }),
+        coreClient.identity.getIdentityGroupMemberInvitations.query({
+          identityGroupURN: groupURN,
+        }),
+      ])
+
+      const seats = seatQuery?.quantity ?? 0
+
       const targetGroup = groups.find((g) => g.URN === groupURN!)
 
-      const seatQuery = await coreClient.billing.getIdentityGroupSeats.query({
-        URN: groupURN,
-      })
+      // This wonderful max min is supposed to do the following:
+      // - Prevent displaying negative group seats (due to some bug)
+      // - Prevent displaying more seats than the group has (due to some bug)
       const groupMemberCount = Math.max(
-        (targetGroup?.members.length ?? 0) -
-          IDENTITY_GROUP_OPTIONS.maxFreeMembers,
+        Math.min(
+          (targetGroup?.members.length ?? 0) +
+            invitations.length -
+            IDENTITY_GROUP_OPTIONS.maxFreeMembers,
+          seats
+        ),
         0
       )
-      const seats = seatQuery?.quantity ?? 0
 
       groupSeats.total = seats
       groupSeats.used = groupMemberCount
