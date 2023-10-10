@@ -370,7 +370,10 @@ const AuthPanel = ({
       enabled: boolean
     }[]
   >(
-    appTheme?.providers ??
+    appTheme?.providers?.map((p) => ({
+      ...p,
+      val: getDisplayNameFromProviderString(p.key),
+    })) ??
       AuthenticationScreenDefaults.knownKeys.map((k) => ({
         key: k,
         val: getDisplayNameFromProviderString(k),
