@@ -11,14 +11,8 @@ import {
   getCloudflareFetcher,
   getExpectedCustomDomainDNSRecords,
 } from '../../utils/cloudflare'
-import { CustomDomain, EDGE_APPLICATION } from '../../types'
-import { ApplicationURNSpace } from '@proofzero/urns/application'
-import { router } from '@proofzero/platform.core'
-import identityGroupAdminValidator from '@proofzero/security/identity-group-admin-validator'
-import {
-  IdentityGroupURNSpace,
-  IdentityGroupURN,
-} from '@proofzero/urns/identity-group'
+import { CustomDomain } from '../../types'
+import { groupAdminValidatorByClientID } from '@proofzero/security/identity-group-validators'
 
 export const CreateCustomDomainInput = z.object({
   clientId: z.string(),
@@ -45,22 +39,7 @@ export const createCustomDomain: CreateCustomDomainMethod = async ({
 }) => {
   const { clientId, hostname } = input
 
-  const appURN = ApplicationURNSpace.componentizedUrn(clientId)
-
-  const caller = router.createCaller(ctx)
-  const { edges: appOwnershipEdges } = await caller.edges.getEdges({
-    query: { dst: { baseUrn: appURN }, tag: EDGE_APPLICATION },
-  })
-  if (appOwnershipEdges.length === 0) {
-    throw new InternalServerError({
-      message: 'App ownership edge not found',
-    })
-  }
-
-  const ownershipURN = appOwnershipEdges[0].src.baseUrn
-  if (IdentityGroupURNSpace.is(ownershipURN)) {
-    await identityGroupAdminValidator(ctx, ownershipURN as IdentityGroupURN)
-  }
+  await groupAdminValidatorByClientID(ctx, clientId)
 
   const fetcher = getCloudflareFetcher(ctx.TOKEN_CLOUDFLARE_API)
 

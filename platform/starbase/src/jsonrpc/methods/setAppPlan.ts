@@ -14,7 +14,7 @@ import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
-import identityGroupAdminValidator from '@proofzero/security/identity-group-admin-validator'
+import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 
 export const SetAppPlanInput = AppClientIdParamSchema.extend({
   URN: IdentityRefURNValidator,
@@ -49,7 +49,10 @@ export const setAppPlan = async ({
 
   const ownershipURN = appOwnershipEdges[0].src.baseUrn
   if (IdentityGroupURNSpace.is(ownershipURN)) {
-    await identityGroupAdminValidator(ctx, ownershipURN as IdentityGroupURN)
+    await groupAdminValidatorByIdentityGroupURN(
+      ctx,
+      ownershipURN as IdentityGroupURN
+    )
   }
 
   const appDO = await getApplicationNodeByClientId(

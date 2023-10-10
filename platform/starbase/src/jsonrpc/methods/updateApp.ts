@@ -4,13 +4,7 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { AppObjectSchema } from '../validators/app'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
-import { InternalServerError } from '@proofzero/errors'
-import identityGroupAdminValidator from '@proofzero/security/identity-group-admin-validator'
-import {
-  IdentityGroupURNSpace,
-  IdentityGroupURN,
-} from '@proofzero/urns/identity-group'
-import { EDGE_APPLICATION } from '../../types'
+import { groupAdminValidatorByAppURN } from '@proofzero/security/identity-group-validators'
 
 export const UpdateAppInput = z.object({
   clientId: z.string(),
@@ -38,22 +32,8 @@ export const updateApp = async ({
     )
 
   const caller = router.createCaller(ctx)
-  const { edges: appOwnershipEdges } = await caller.edges.getEdges({
-    query: {
-      dst: { baseUrn: ApplicationURNSpace.getBaseURN(appURN) },
-      tag: EDGE_APPLICATION,
-    },
-  })
-  if (appOwnershipEdges.length === 0) {
-    throw new InternalServerError({
-      message: 'App ownership edge not found',
-    })
-  }
 
-  const ownershipURN = appOwnershipEdges[0].src.baseUrn
-  if (IdentityGroupURNSpace.is(ownershipURN)) {
-    await identityGroupAdminValidator(ctx, ownershipURN as IdentityGroupURN)
-  }
+  await groupAdminValidatorByAppURN(ctx, appURN)
 
   const appDO = await getApplicationNodeByClientId(
     input.clientId,

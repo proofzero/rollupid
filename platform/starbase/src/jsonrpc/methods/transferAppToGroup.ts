@@ -9,7 +9,7 @@ import {
 import { BadRequestError } from '@proofzero/errors'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 import { AccountURNSpace } from '@proofzero/urns/account'
-import identityGroupAdminValidator from '@proofzero/security/identity-group-admin-validator'
+import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 
 export const TransferAppToGroupInput = z.object({
   clientID: z.string(),
@@ -28,7 +28,7 @@ export const transferAppToGroup = async ({
 }): Promise<void> => {
   const { clientID, identityGroupURN, emailURN } = input
 
-  await identityGroupAdminValidator(ctx, identityGroupURN)
+  await groupAdminValidatorByIdentityGroupURN(ctx, identityGroupURN)
 
   if (!ctx.identityURN) {
     throw new BadRequestError({

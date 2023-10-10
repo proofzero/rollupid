@@ -13,7 +13,7 @@ import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { initIdentityGroupNodeByName } from '../../../nodes'
 import { IDENTITY_GROUP_OPTIONS } from '../../../constants'
-import identityGroupAdminValidator from '@proofzero/security/identity-group-admin-validator'
+import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 
 export const DeleteIdentityGroupMembershipInputSchema = z.object({
   identityURN: IdentityURNInput,
@@ -32,7 +32,7 @@ export const deleteIdentityGroupMembership = async ({
 }): Promise<void> => {
   const { identityGroupURN, identityURN } = input
 
-  await identityGroupAdminValidator(ctx, identityGroupURN)
+  await groupAdminValidatorByIdentityGroupURN(ctx, identityGroupURN)
 
   const caller = router.createCaller(ctx)
   const node = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)

@@ -9,7 +9,7 @@ import { BadRequestError } from '@proofzero/errors'
 import { EDGE_APPLICATION } from '@proofzero/platform.starbase/src/types'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { IdentityURN } from '@proofzero/urns/identity'
-import identityGroupAdminValidator from '@proofzero/packages/security/identity-group-admin-validator'
+import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 
 export const DeleteIdentityGroupInputSchema = IdentityGroupURNValidator
 type DeleteIdentityGroupInput = z.infer<typeof DeleteIdentityGroupInputSchema>
@@ -21,7 +21,7 @@ export const deleteIdentityGroup = async ({
   input: DeleteIdentityGroupInput
   ctx: Context
 }): Promise<void> => {
-  await identityGroupAdminValidator(ctx, identityGroupURN)
+  await groupAdminValidatorByIdentityGroupURN(ctx, identityGroupURN)
 
   const caller = router.createCaller(ctx)
   const { edges: membershipEdges } = await caller.edges.getEdges({

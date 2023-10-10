@@ -15,7 +15,7 @@ import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
-import identityGroupAdminValidator from '@proofzero/security/identity-group-admin-validator'
+import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 
 export const PublishAppInput = z.object({
   clientId: z.string(),
@@ -51,7 +51,10 @@ export const publishApp = async ({
 
   const ownershipURN = appOwnershipEdges[0].src.baseUrn
   if (IdentityGroupURNSpace.is(ownershipURN)) {
-    await identityGroupAdminValidator(ctx, ownershipURN as IdentityGroupURN)
+    await groupAdminValidatorByIdentityGroupURN(
+      ctx,
+      ownershipURN as IdentityGroupURN
+    )
   }
 
   const appDO = await getApplicationNodeByClientId(

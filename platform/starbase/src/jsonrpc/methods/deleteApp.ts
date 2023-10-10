@@ -12,7 +12,7 @@ import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
-import identityGroupAdminValidator from '@proofzero/security/identity-group-admin-validator'
+import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 
 export const DeleteAppInput = AppClientIdParamSchema
 
@@ -63,7 +63,10 @@ export const deleteApp = async ({
 
   const ownershipURN = appOwnershipEdge.src.baseUrn
   if (IdentityGroupURNSpace.is(ownershipURN)) {
-    await identityGroupAdminValidator(ctx, ownershipURN as IdentityGroupURN)
+    await groupAdminValidatorByIdentityGroupURN(
+      ctx,
+      ownershipURN as IdentityGroupURN
+    )
   }
 
   await Promise.all(
