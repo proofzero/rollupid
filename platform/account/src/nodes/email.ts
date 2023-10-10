@@ -2,6 +2,7 @@ import { DurableObjectStubProxy } from 'do-proxy'
 
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { EmailAccountType, NodeType } from '@proofzero/types/account'
+import { type AccountURN } from '@proofzero/urns/account'
 import generateRandomString from '@proofzero/utils/generateRandomString'
 import type { Environment } from '@proofzero/platform.core'
 
@@ -12,7 +13,7 @@ import { EMAIL_VERIFICATION_OPTIONS } from '../constants'
 import { AccountNode } from '.'
 import Account from './account'
 
-type EmailAccountProfile = AccountProfile<EmailAccountType.Email>
+type EmailAccountProfile = AccountProfile<EmailAccountType>
 
 type VerificationPayload = {
   state: string
@@ -217,22 +218,42 @@ export default class EmailAccount {
   }
 
   async getProfile(): Promise<EmailAccountProfile> {
-    const [nickname, gradient, address] = await Promise.all([
+    const [nickname, gradient, address, type] = await Promise.all([
       this.node.class.getNickname(),
       this.node.class.getGradient(),
       this.node.class.getAddress(),
+      this.node.class.getType(),
     ])
     if (!address)
       throw new InternalServerError({
         message: 'Cannot load profile for email account node',
         cause: 'missing account',
       })
+
     return {
       address,
+      type: type as EmailAccountType,
       title: nickname ?? address,
       icon: gradient,
-      type: EmailAccountType.Email,
     }
   }
+
+  async getSourceAccount() {
+    return this.node.storage.get<AccountURN>('source-account')
+  }
+
+  async setSourceAccount(accountURN: AccountURN) {
+    await this.node.storage.put<AccountURN>('source-account', accountURN)
+  }
+
+  async getMaskedAddress(clientId: string): Promise<string> {
+    const key = `masked-address/${clientId}`
+    const stored = await this.node.storage.get<string>(key)
+    if (stored) return stored
+    const address = `${generateRandomString(6)}.gate@rollup.email`
+    await this.node.storage.put<string>(key, address)
+    return address
+  }
 }
+
 export type EmailAccountProxyStub = DurableObjectStubProxy<EmailAccount>

@@ -38,7 +38,10 @@ import type { PersonaData } from '@proofzero/types/application'
 
 import Authorization from '@proofzero/design-system/src/templates/authorization/Authorization'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
-import { getEmailIcon } from '@proofzero/utils/getNormalisedConnectedAccounts'
+import {
+  decorateAccountDropdownItem,
+  getEmailIcon,
+} from '@proofzero/utils/getNormalisedConnectedAccounts'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
 import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
 import { Helmet } from 'react-helmet'
@@ -397,13 +400,13 @@ export const action: ActionFunction = async ({ request, context }) => {
 }
 
 export default function Authorize() {
+  const loaderData = useLoaderData<LoaderData>()
   const {
     clientId,
     appProfile,
     scopeMeta,
     state,
     redirectOverride,
-    dataForScopes,
     redirectUri,
     profile,
     prompt,
@@ -412,10 +415,11 @@ export default function Authorize() {
 
   const userProfile = profile as UserProfile
 
+  const [dataForScopes, setDataForScopes] = useState(loaderData.dataForScopes)
   const {
-    connectedEmails,
     personaData,
     requestedScope,
+    connectedEmails,
     connectedAccounts,
     connectedSmartContractWallets,
   } = dataForScopes as DataForScopes
@@ -434,6 +438,52 @@ export default function Authorize() {
     }
     return selected
   })
+
+  const [maskEmail, setMaskEmail] = useState<boolean>(false)
+  useEffect(() => {
+    if (!maskEmail) return
+    if (selectedEmail?.mask) return
+    setMaskEmailCallback()
+  })
+
+  const setMaskEmailCallback = async () => {
+    if (!maskEmail) return
+
+    const accountURN = selectedEmail?.value
+    if (!accountURN) return
+    if (selectedEmail.mask) return
+
+    const response = await fetch('/create/account-mask', {
+      body: JSON.stringify({ accountURN, clientId }),
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+    })
+
+    let maskedAccount = selectedEmail
+    const maskAccount = await response.json()
+    const newState = {
+      ...dataForScopes,
+      connectedAccounts: connectedAccounts.map((ca) => {
+        if (ca.value !== accountURN) return ca
+        return {
+          ...ca,
+          mask: decorateAccountDropdownItem(maskAccount),
+        }
+      }),
+      connectedEmails: connectedEmails.map((ce) => {
+        if (ce.value !== accountURN) return ce
+        maskedAccount = {
+          ...ce,
+          mask: decorateAccountDropdownItem(maskAccount),
+        }
+        return maskedAccount
+      }),
+    }
+
+    setDataForScopes(newState)
+    setSelectedEmail(maskedAccount)
+  }
+
   const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
     Array<DropdownSelectListItem> | Array<AuthorizationControlSelection>
   >(() => {
@@ -510,7 +560,9 @@ export default function Authorize() {
     }
 
     if (requestedScope.includes('email') && selectedEmail) {
-      personaData.email = selectedEmail.value
+      personaData.email = maskEmail
+        ? selectedEmail.mask?.value
+        : selectedEmail.value
     }
 
     if (
@@ -521,7 +573,12 @@ export default function Authorize() {
         personaData.connected_accounts = AuthorizationControlSelection.ALL
       } else {
         personaData.connected_accounts = selectedConnectedAccounts.map(
-          (account) => (account as DropdownSelectListItem).value
+          (account) => {
+            const item = account as DropdownSelectListItem
+            if (!maskEmail) return item.value
+            if (item.value === selectedEmail?.value) return item.mask?.value
+            return item.value
+          }
         )
       }
     }
@@ -640,10 +697,13 @@ export default function Authorize() {
                   // Substituting subtitle with icon
                   // on the client side
                   return {
+                    address: email.address,
+                    type: email.type,
                     icon: getEmailIcon(email.subtitle!),
                     title: email.title,
                     selected: email.selected,
                     value: email.value,
+                    mask: email.mask,
                   }
                 }) ?? []
               }
@@ -661,6 +721,8 @@ export default function Authorize() {
               }}
               selectEmailCallback={setSelectedEmail}
               selectedEmail={selectedEmail}
+              maskEmail={maskEmail}
+              setMaskEmail={setMaskEmail}
               connectedAccounts={connectedAccounts ?? []}
               selectedConnectedAccounts={selectedConnectedAccounts}
               addNewAccountCallback={() => {

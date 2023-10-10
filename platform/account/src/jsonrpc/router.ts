@@ -128,6 +128,16 @@ import {
   ConnectIdentityGroupEmailOutputSchema,
   connectIdentityGroupEmail,
 } from './methods/identity-groups/connectIdentityGroupEmail'
+import {
+  getMaskedAddressMethod,
+  GetMaskedAddressInput,
+  GetMaskedAddressOutput,
+} from './methods/getMaskedAddress'
+import {
+  setSourceAccountMethod,
+  SetSourceAccountInput,
+  SetSourceAccountOutput,
+} from './methods/setSourceAccount'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -356,4 +366,20 @@ export const appRouter = t.router({
     .input(ConnectIdentityGroupEmailInputSchema)
     .output(ConnectIdentityGroupEmailOutputSchema)
     .mutation(connectIdentityGroupEmail),
+  getMaskedAddress: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setAccountNodeClient)
+    .use(Analytics)
+    .input(GetMaskedAddressInput)
+    .output(GetMaskedAddressOutput)
+    .query(getMaskedAddressMethod),
+  setSourceAccount: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setAccountNodeClient)
+    .use(Analytics)
+    .input(SetSourceAccountInput)
+    .output(SetSourceAccountOutput)
+    .mutation(setSourceAccountMethod),
 })

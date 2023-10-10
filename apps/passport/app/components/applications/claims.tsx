@@ -10,12 +10,14 @@ import { Disclosure } from '@headlessui/react'
 import { useState } from 'react'
 
 import passportLogoURL from '~/assets/PassportIcon.svg'
+import { HiOutlineMail } from 'react-icons/hi'
 import { TbCrown } from 'react-icons/tb'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import warningImg from '~/assets/warning.svg'
 import InputText from '~/components/inputs/InputText'
 import { startCase } from 'lodash'
 import { HiOutlineExternalLink, HiOutlineX } from 'react-icons/hi'
+import { EmailMaskedPill } from '@proofzero/design-system/src/atoms/pills/EmailMaskPill'
 
 export const ConfirmRevocationModal = ({
   title,
@@ -171,12 +173,14 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
   const RowView = ({
     account,
     appAskedFor,
+    masked = false,
     whatsBeingShared,
     sourceOfData,
     sourceOfDataIcon,
     dropdown = true,
   }: {
     appAskedFor: string
+    masked: boolean
     sourceOfData: string
     sourceOfDataIcon: JSX.Element
     dropdown?: boolean
@@ -421,11 +425,10 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
               <RowView
                 key={i}
                 appAskedFor="Email"
-                whatsBeingShared={scope.account}
+                masked={scope.masked}
+                whatsBeingShared={scope.address}
                 sourceOfData={scope.account}
-                sourceOfDataIcon={
-                  <img src={scope.icon} className="w-5 h-5 rounded-full" />
-                }
+                sourceOfDataIcon={<HiOutlineMail className="w-5 h-5" />}
                 dropdown={false}
               />
             )
@@ -491,12 +494,14 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
   const RowView = ({
     account,
     appAskedFor,
+    masked = false,
     whatsBeingShared,
     sourceOfData,
     sourceOfDataIcon,
     dropdown = true,
   }: {
     appAskedFor: string
+    masked: boolean
     sourceOfData: string
     sourceOfDataIcon: JSX.Element
     dropdown?: boolean
@@ -527,15 +532,19 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
                     >
                       {appAskedFor}
                     </Text>
+                    {masked ? <EmailMaskedPill /> : null}
                   </Disclosure.Button>
                 ) : (
-                  <Text
-                    size="sm"
-                    weight="medium"
-                    className="text-gray-500 truncate"
-                  >
-                    {appAskedFor}
-                  </Text>
+                  <>
+                    <Text
+                      size="sm"
+                      weight="medium"
+                      className="text-gray-500 truncate"
+                    >
+                      {appAskedFor}
+                    </Text>
+                    {masked ? <EmailMaskedPill /> : null}
+                  </>
                 )}
               </td>
               <td className="px-6 py-3">
@@ -754,11 +763,12 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
               <RowView
                 key={i}
                 appAskedFor="Email"
-                whatsBeingShared={scope.account}
-                sourceOfData={scope.account}
-                sourceOfDataIcon={
-                  <img src={scope.icon} className="w-5 h-5 rounded-full" />
+                masked={scope.masked}
+                whatsBeingShared={
+                  scope.masked ? scope.address : scope.source.address
                 }
+                sourceOfData={scope.address}
+                sourceOfDataIcon={<HiOutlineMail className="w-5 h-5" />}
                 dropdown={false}
               />
             )

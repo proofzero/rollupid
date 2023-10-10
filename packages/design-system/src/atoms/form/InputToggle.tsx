@@ -4,7 +4,7 @@ import { Text } from '../text/Text'
 
 export type InputToggleProps = {
   id: string
-  label: string
+  label?: string
   name?: string
   onToggle?: (val: boolean) => void
   checked?: boolean

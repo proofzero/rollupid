@@ -1,5 +1,10 @@
 import React from 'react'
+import {
+  EmailMaskedPill,
+  EmailUnmaskedPill,
+} from '@proofzero/design-system/src/atoms/pills/EmailMaskPill'
 import { Avatar } from '../../atoms/profile/avatar/Avatar'
+import { InputToggle } from '../../atoms/form/InputToggle'
 import { Text } from '../../atoms/text/Text'
 import authorizeCheck from './authorize-check.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
@@ -55,6 +60,9 @@ type AuthorizationProps = {
   selectEmailCallback: (selected: DropdownSelectListItem) => void
   selectedEmail?: DropdownSelectListItem
 
+  maskEmail: boolean
+  setMaskEmail: (state: boolean) => void
+
   connectedAccounts?: Array<DropdownSelectListItem>
   addNewAccountCallback: () => void
   selectAccountsCallback: (selected: Array<DropdownSelectListItem>) => void
@@ -85,6 +93,8 @@ export default ({
   addNewEmailCallback,
   selectEmailCallback,
   selectedEmail,
+  maskEmail,
+  setMaskEmail,
   connectedAccounts,
   addNewAccountCallback,
   selectAccountsCallback,
@@ -209,6 +219,13 @@ export default ({
                       >
                         {scopeMeta.scopes[scope].name}
                       </Text>
+                      {scope === 'email' ? (
+                        maskEmail ? (
+                          <EmailMaskedPill />
+                        ) : (
+                          <EmailUnmaskedPill />
+                        )
+                      ) : null}
                       {!selectedItem &&
                         !selectedItems?.length &&
                         !allItemsSelected && (
@@ -232,7 +249,9 @@ export default ({
                           size="sm"
                           className="text-gray-500 dark:text-white truncate text-ellipsis w-full"
                         >
-                          {selectedItem.title}
+                          {maskEmail && selectedItem.mask
+                            ? selectedItem.mask.title
+                            : selectedItem.title}
                         </Text>
                       )}
 
@@ -345,8 +364,27 @@ export default ({
                       items={connectedEmails}
                       defaultItems={[selectedEmail]}
                       placeholder="Select an Email Address"
-                      onSelect={(selectedItem: DropdownSelectListItem) => {
-                        selectEmailCallback(selectedItem)
+                      refreshSelectedItem={true}
+                      maskedAccount={maskEmail && selectedEmail.value}
+                      onSelect={selectEmailCallback}
+                      listboxOptions={{
+                        topAction: (
+                          <div className="flex flex-row items-center justify-between px-4 pt-1">
+                            <Text
+                              size="sm"
+                              type="span"
+                              className="text-gray-900 dark:text-white"
+                            >
+                              Mask Email
+                            </Text>
+                            <InputToggle
+                              name="mask-email"
+                              id="mask-email"
+                              onToggle={() => setMaskEmail(!maskEmail)}
+                              checked={maskEmail}
+                            />
+                          </div>
+                        ),
                       }}
                       ConnectButtonPhrase="Connect New Email Account"
                       ConnectButtonCallback={addNewEmailCallback}
@@ -360,11 +398,9 @@ export default ({
                     <Dropdown
                       items={connectedAccounts}
                       defaultItems={selectedConnectedAccounts}
-                      onSelect={(
-                        selectedItems: Array<DropdownSelectListItem>
-                      ) => {
-                        selectAccountsCallback(selectedItems)
-                      }}
+                      switchTitles={true}
+                      maskedAccount={maskEmail && selectedEmail.value}
+                      onSelect={selectAccountsCallback}
                       onSelectAll={selectAllAccountsCallback}
                       placeholder="Select at least one"
                       ConnectButtonPhrase="Connect New Account"

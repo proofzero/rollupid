@@ -20,6 +20,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { getCoreClient } from '~/platform.server'
 import { getValidatedSessionContext } from '~/session.server'
 import type { ScopeMeta } from '@proofzero/security/scopes'
+import { EmailAccountType } from '@proofzero/types/account'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params, context }) => {
@@ -76,12 +77,19 @@ export default () => {
           (profile) =>
             profile.urn === scopeValues.claimValues[scopeValue].meta.urns[0]
         )
+
+        const claim = 'email'
+        const { address, icon, type } = profile.source || profile
+        const sourceIcon = getDefaultIconUrl(type)
+        const masked = profile.type === EmailAccountType.Mask
+
         aggregator.push({
-          claim: 'email',
-          icon: profile.icon,
-          address: profile.address,
-          type: profile.type,
-          sourceIcon: getDefaultIconUrl(profile.type),
+          claim,
+          icon,
+          address,
+          type,
+          masked,
+          sourceIcon,
         })
       } else if (scopeValue === 'connected_accounts') {
         const profiles = connectedProfiles.filter((profile) =>

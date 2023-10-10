@@ -18,7 +18,7 @@ import noImg from '~/assets/noImg.svg'
 import { getCoreClient } from '~/platform.server'
 
 import type { AccountURN } from '@proofzero/urns/account'
-import type { NodeType } from '@proofzero/types/account'
+import { EmailAccountType, type NodeType } from '@proofzero/types/account'
 import type {
   LoaderFunction,
   MetaFunction,
@@ -68,10 +68,13 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       identity: identityURN,
     })
 
-    const accountTypeUrns = identityProfile?.accounts.map((a) => ({
-      urn: a.baseUrn,
-      nodeType: a.rc.node_type,
-    })) as { urn: AccountURN; nodeType: NodeType }[]
+    const accountTypeUrns = identityProfile?.accounts
+      // TODO: turn on after development
+      // .filter((a) => a.rc.addr_type !== EmailAccountType.Mask)
+      .map((a) => ({
+        urn: a.baseUrn,
+        nodeType: a.rc.node_type,
+      })) as { urn: AccountURN; nodeType: NodeType }[]
 
     const accounts = accountTypeUrns.map((atu) => atu.urn)
 

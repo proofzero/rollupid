@@ -50,7 +50,11 @@ export const getEmailIcon = (type: string): JSX.Element => {
 }
 
 export const adjustAccountTypeToDisplay = (
-  accountType: OAuthAccountType | EmailAccountType | CryptoAccountType | WebauthnAccountType
+  accountType:
+    | OAuthAccountType
+    | EmailAccountType
+    | CryptoAccountType
+    | WebauthnAccountType
 ) => {
   if (accountType === CryptoAccountType.Wallet) {
     return 'SC Wallet'
@@ -63,33 +67,55 @@ export const getEmailDropdownItems = (
 ): Array<DropdownSelectListItem> => {
   if (!connectedAccounts) return []
 
+  const emailAddressTypes = [EmailAccountType.Email]
+  const oauthAddressTypes = [
+    OAuthAccountType.Apple,
+    OAuthAccountType.Google,
+    OAuthAccountType.Microsoft,
+  ]
+
   const filteredEmailsFromConnectedAccounts = connectedAccounts.filter(
-    (account) => {
-      return (
-        (account.rc.node_type === NodeType.OAuth &&
-          (account.rc.addr_type === OAuthAccountType.Google ||
-            account.rc.addr_type === OAuthAccountType.Microsoft ||
-            account.rc.addr_type === OAuthAccountType.Apple)) ||
-        (account.rc.node_type === NodeType.Email &&
-          account.rc.addr_type === EmailAccountType.Email)
-      )
+    ({ rc: { addr_type, node_type } }) => {
+      switch (node_type) {
+        case NodeType.Email:
+          return emailAddressTypes.includes(addr_type as EmailAccountType)
+        case NodeType.OAuth: {
+          return oauthAddressTypes.includes(addr_type as OAuthAccountType)
+        }
+      }
     }
   )
 
-  return filteredEmailsFromConnectedAccounts.map((account, i) => {
+  const maskEmailAccounts = connectedAccounts.filter(
+    ({ rc: { addr_type } }) => addr_type === EmailAccountType.Mask
+  )
+
+  return filteredEmailsFromConnectedAccounts.map((account) => {
+    const maskAccount = maskEmailAccounts.find(
+      (a) => a.qc.source === account.baseUrn
+    )
     return {
-      // There's a problem when passing icon down to client (since icon is a JSX.Element)
-      // My guess is that it should be rendered on the client side only.
-      // that's why I'm passing type (as subtitle) instead of icon and then substitute it
-      // with icon on the client side
-      subtitle: account.rc.addr_type as
-        | OAuthAccountType
-        | EmailAccountType
-        | CryptoAccountType,
-      title: account.qc.alias,
-      value: account.baseUrn as AccountURN,
+      ...decorateAccountDropdownItem(account),
+      mask: maskAccount ? decorateAccountDropdownItem(maskAccount) : undefined,
     }
   })
+}
+
+export const decorateAccountDropdownItem = (account) => {
+  return {
+    address: account.qc.alias,
+    type: account.rc.addr_type,
+    // There's a problem when passing icon down to client (since icon is a JSX.Element)
+    // My guess is that it should be rendered on the client side only.
+    // that's why I'm passing type (as subtitle) instead of icon and then substitute it
+    // with icon on the client side
+    subtitle: account.rc.addr_type as
+      | OAuthAccountType
+      | EmailAccountType
+      | CryptoAccountType,
+    title: account.qc.alias,
+    value: account.baseUrn as AccountURN,
+  }
 }
 
 //accountDropdownItems
@@ -99,10 +125,13 @@ export const getAccountDropdownItems = (
   if (!accountProfiles) return []
   return accountProfiles.map((account) => {
     return {
+      address: account.address,
       title: account.title,
+      type: account.type,
       value: account.id as AccountURN,
-      subtitle: `${adjustAccountTypeToDisplay(account.type)} - ${account.address
-        }`,
+      subtitle: `${adjustAccountTypeToDisplay(account.type)} - ${
+        account.address
+      }`,
     }
   })
 }

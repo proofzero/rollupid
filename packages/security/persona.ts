@@ -63,7 +63,8 @@ export async function validatePersonaData(
         accountProfile.type !== OAuthAccountType.Google &&
         accountProfile.type !== OAuthAccountType.Microsoft &&
         accountProfile.type !== OAuthAccountType.Apple &&
-        accountProfile.type !== EmailAccountType.Email
+        accountProfile.type !== EmailAccountType.Email &&
+        accountProfile.type !== EmailAccountType.Mask
       )
         throw new BadRequestError({
           message: 'Account provided is not an email-compatible account',
