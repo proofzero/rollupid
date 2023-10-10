@@ -61,7 +61,7 @@ export const AppThemeSchema = z.object({
     .array(
       z.object({
         key: z.string(),
-        val: z.string(),
+        val: z.string().optional(),
         enabled: z.boolean(),
       })
     )
