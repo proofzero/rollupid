@@ -82,7 +82,7 @@ export default () => {
             Your Email Address
           </Text>
         </section>
-        <section className="flex-1">
+        <section className="mb-4">
           <Input
             type="email"
             id="email"
@@ -96,7 +96,7 @@ export default () => {
             <Text
               size="sm"
               weight="medium"
-              className="text-red-500 mt-4 mb-2 text-center"
+              className="text-red-500 mt-4 text-center"
             >
               {errorMessage}
             </Text>

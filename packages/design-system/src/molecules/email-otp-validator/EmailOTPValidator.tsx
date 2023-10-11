@@ -120,12 +120,12 @@ export default function EmailOTPValidator({
         </Text>
       </section>
 
-      <section className="flex-1">
+      <section>
         <div className="flex flex-col items-center mt-4 mb-8 text-center">
           <Text className="text-gray-500 dark:text-gray-400">
             We&apos;ve sent a code to
           </Text>
-          <Text className="text-gray-500 dark:text-gray-400 font-medium w-[368px] inline-block float-left whitespace-nowrap truncate">
+          <Text className="text-gray-500 dark:text-gray-400 font-medium max-w-[85dvw] inline-block float-left whitespace-nowrap truncate">
             {email}
           </Text>
         </div>

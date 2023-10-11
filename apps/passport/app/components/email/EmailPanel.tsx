@@ -47,7 +47,7 @@ export const EmailPanel = ({
           Your Email Address
         </Text>
       </section>
-      <section className="flex-1">
+      <section className="mb-4">
         <Input
           type="email"
           id="email"
