@@ -168,9 +168,10 @@ export default () => {
   return (
     <div
       className={
-        'flex shrink flex-col items-center justify-center gap-4 mx-auto\
-      bg-white p-6 h-[100dvh] lg:h-[580px] lg:max-h-[100dvh] w-full\
-       lg:w-[418px] lg:border-rounded-lg dark:bg-gray-800 border border-[#D1D5DB] dark:border-gray-600'
+        'flex shrink flex-col items-center\
+        gap-4 mx-auto bg-white p-6 h-[100dvh]\
+        lg:h-[580px] lg:max-h-[100dvh] w-full lg:w-[418px]\
+        lg:rounded-lg dark:bg-gray-800 border border-[#D1D5DB] dark:border-gray-600'
       }
       style={{
         boxSizing: 'border-box',
