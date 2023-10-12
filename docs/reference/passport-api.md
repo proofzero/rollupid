@@ -26,11 +26,10 @@ Application client secret
 {% endswagger-parameter %}
 
 {% swagger-parameter in="body" name="grant_type" type="String" required="true" %}
-"authorization_code" or "refresh_token"
+"authorization\_code" or "refresh\_token"
 {% endswagger-parameter %}
 
 {% swagger-response status="201: Created" description="Exchange token response" %}
-
 ```javascript
 {
     access_token: string,
@@ -39,7 +38,6 @@ Application client secret
     id_token: string
 }
 ```
-
 {% endswagger-response %}
 {% endswagger %}
 
@@ -47,10 +45,9 @@ Application client secret
 
 {% tabs %}
 {% tab title="Javascript" %}
-
 ```typescript
 const tokenForm = new Form()
-tokenForm.append('exchange_code', exchangeCode)
+tokenForm.append('code', exchangeCode)
 tokenForm.append('grant_type', grantType)
 tokenForm.append('client_id', clientId)
 tokenForm.append('client_secret', clientSecret)
@@ -63,20 +60,17 @@ const { access_code, refresh_token } = await fetch(
   }
 )
 ```
-
 {% endtab %}
 
 {% tab title="Curl" %}
-
 ```bash
 curl https://passport.rollup.id/token -X POST \
   --header "Content-Type: application/x-www-form-urlencoded" \
   --data-urlencode "client_id={clientId}" \
   --data-urlencode "client_secret={clientSecret}"
-  --data-urlencode "exchange_code={exchangeCode}"
+  --data-urlencode "code={exchangeCode}"
   --data-urlencode "grant_type=authorization_code"
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -98,7 +92,6 @@ Call this method to retrieve basic identity information for the user.
 {% endswagger-parameter %}
 
 {% swagger-response status="200: OK" description="User Info response" %}
-
 ```javascript
 {
     name: '(some name here)',
@@ -122,7 +115,6 @@ Call this method to retrieve basic identity information for the user.
     ]
 }
 ```
-
 {% endswagger-response %}
 {% endswagger %}
 
@@ -130,7 +122,6 @@ Call this method to retrieve basic identity information for the user.
 
 {% tabs %}
 {% tab title="Javascript" %}
-
 ```typescript
 const access_token = '(some access token value)'
 
@@ -141,17 +132,14 @@ const response = await fetch('https://passport.rollup.id/userinfo', {
 })
 const { name, picture } = await response.json()
 ```
-
 {% endtab %}
 
 {% tab title="Curl" %}
-
 ```bash
 export token="(some token value)"
 curl https://passport.rollup.id/userinfo \
   --header "Authorization: Bearer $token"
 ```
-
 {% endtab %}
 {% endtabs %}
 
@@ -160,9 +148,11 @@ curl https://passport.rollup.id/userinfo \
 The OpenID provider metadata can be accessed in the endpoint described below.
 
 {% swagger method="get" path="" baseUrl="https://passport.rollup.id/.well-known/openid-configuration" summary="OpenID Configuration" %}
+{% swagger-description %}
+
+{% endswagger-description %}
 
 {% swagger-response status="200: OK" description="OpenID Configuration" %}
-
 ```json
 {
   "issuer": "https://passport.rollup.id",
@@ -182,7 +172,6 @@ The OpenID provider metadata can be accessed in the endpoint described below.
   "service_documentation": "https://docs.rollup.id/"
 }
 ```
-
 {% endswagger-response %}
 {% endswagger %}
 
@@ -191,9 +180,11 @@ The OpenID provider metadata can be accessed in the endpoint described below.
 The JWKS is the list of public keys to be used to validate token signatures.
 
 {% swagger method="get" path="" baseUrl="https://passport.rollup.id/.well-known/jwks.json" summary="JWKS" %}
+{% swagger-description %}
+
+{% endswagger-description %}
 
 {% swagger-response status="200: OK" description="JWKS" %}
-
 ```json
 {
   "keys": [
@@ -216,6 +207,5 @@ The JWKS is the list of public keys to be used to validate token signatures.
   ]
 }
 ```
-
 {% endswagger-response %}
 {% endswagger %}
