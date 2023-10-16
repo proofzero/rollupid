@@ -11,7 +11,7 @@ import {
   getAuthzHeaderConditionallyFromToken,
   parseJwt,
 } from '@proofzero/utils'
-import { reconcileAppSubscriptions } from '~/services/billing/stripe'
+import { reconcileSubscriptions } from '~/services/billing/stripe'
 import { type IdentityURN } from '@proofzero/urns/identity'
 import { ToastType } from '@proofzero/design-system/src/atoms/toast'
 import { ServicePlanType } from '@proofzero/types/billing'
@@ -54,13 +54,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     let targetURN = URN ?? identityURN
     if (IdentityGroupURNSpace.is(targetURN)) {
-      const authorized =
+      const { write } =
         await coreClient.identity.hasIdentityGroupPermissions.query({
           identityURN,
           identityGroupURN: targetURN as IdentityGroupURN,
         })
 
-      if (!authorized) {
+      if (!write) {
         throw new UnauthorizedError({
           message: 'You are not authorized to update this identity group.',
         })
@@ -74,7 +74,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     try {
       // First we reconcile the subscriptions
-      await reconcileAppSubscriptions(
+      await reconcileSubscriptions(
         {
           subscriptionID: subId,
           URN: targetURN,

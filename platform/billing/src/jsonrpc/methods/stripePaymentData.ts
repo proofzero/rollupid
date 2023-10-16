@@ -86,7 +86,9 @@ export const setStripePaymentData = async ({
 
   const { customerID, paymentMethodID, email, name, accountURN } = input
 
+  const spd = await ownerNode.class.getStripePaymentData()
   await ownerNode.class.setStripePaymentData({
+    ...spd,
     customerID,
     paymentMethodID,
     email,

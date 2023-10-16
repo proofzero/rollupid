@@ -1,4 +1,8 @@
-import { RollupError } from '@proofzero/errors'
+import {
+  InternalServerError,
+  RollupError,
+  UnauthorizedError,
+} from '@proofzero/errors'
 import {
   CryptoAccountType,
   EmailAccountType,
@@ -12,6 +16,8 @@ import {
 } from '@proofzero/types/billing'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { DOProxy } from 'do-proxy'
+import { NodeMethodReturnValue } from '@proofzero/types/node'
+import { IDENTITY_GROUP_OPTIONS } from '../constants'
 
 export type InviteMemberInput = {
   identifier: string
@@ -192,5 +198,74 @@ export default class IdentityGroup extends DOProxy {
 
   async setOrderedMembers(members: IdentityURN[]): Promise<void> {
     await this.state.storage.put('orderedMembers', members)
+  }
+
+  async setPaymentFailed(failed = true) {
+    const paymentData = await this.getStripePaymentData()
+    if (!paymentData) {
+      throw new InternalServerError({
+        message: 'No payment data found',
+      })
+    }
+
+    paymentData.paymentFailed = failed
+
+    await this.state.storage.put('stripePaymentData', paymentData)
+  }
+
+  async validateAdmin(
+    identityURN: IdentityURN
+  ): Promise<NodeMethodReturnValue<boolean, RollupError>> {
+    const storageRes = await this.state.storage.get([
+      'stripePaymentData',
+      'orderedMembers',
+      'seats',
+    ])
+
+    const spd = storageRes.get('stripePaymentData') as PaymentData | undefined
+    const orderedMembers = storageRes.get('orderedMembers') as
+      | IdentityURN[]
+      | undefined
+    const seats = storageRes.get('seats') as Seats | undefined
+
+    if (!orderedMembers) {
+      return {
+        error: new InternalServerError({
+          message: 'No ordered members found',
+        }),
+      }
+    }
+
+    if (!spd || (spd && spd.paymentFailed)) {
+      const freeMembers = orderedMembers.slice(
+        0,
+        IDENTITY_GROUP_OPTIONS.maxFreeMembers
+      )
+
+      if (!freeMembers.includes(identityURN)) {
+        return {
+          error: new UnauthorizedError({
+            message:
+              'Group seat count limit exceeded; this can be due to a payment failure. Members affected by payment failures or exceeding the free seat count limit are not allowed mutation operations on the group.',
+          }),
+        }
+      }
+    } else if (spd) {
+      const seatCount =
+        IDENTITY_GROUP_OPTIONS.maxFreeMembers + (seats?.quantity || 0)
+      const members = orderedMembers.slice(0, seatCount)
+
+      if (!members.includes(identityURN)) {
+        return {
+          error: new UnauthorizedError({
+            message: 'Requesting identity is not authorized to mutate group.',
+          }),
+        }
+      }
+    }
+
+    return {
+      value: true,
+    }
   }
 }

@@ -3,6 +3,7 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { AppClientIdParamSchema, OGThemeSchema } from '../validators/app'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
+import { groupAdminValidatorByAppURN } from '@proofzero/security/identity-group-validators'
 
 export const SetOgThemeInput = AppClientIdParamSchema.extend({
   theme: OGThemeSchema,
@@ -27,5 +28,8 @@ export const setOgTheme = async ({
     input.clientId,
     ctx.StarbaseApp
   )
+
+  await groupAdminValidatorByAppURN(ctx, appURN)
+
   return appDO.class.setOgTheme(theme)
 }

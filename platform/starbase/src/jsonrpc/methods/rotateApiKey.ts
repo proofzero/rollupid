@@ -3,6 +3,7 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { AppClientIdParamSchema } from '../validators/app'
+import { groupAdminValidatorByAppURN } from '@proofzero/security/identity-group-validators'
 
 export const RotateApiKeyInput = AppClientIdParamSchema
 
@@ -22,6 +23,8 @@ export const rotateApiKey = async ({
     throw new Error(
       `Request received for clientId ${input.clientId} which is not owned by provided account.`
     )
+
+  await groupAdminValidatorByAppURN(ctx, appURN)
 
   console.log(`rotating API key for ${appURN}`)
 

@@ -5,6 +5,7 @@ import { getApplicationNodeByClientId } from '../../nodes/application'
 import * as secret from '../../secret'
 import { AppClientIdParamSchema } from '../validators/app'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
+import { groupAdminValidatorByAppURN } from '@proofzero/security/identity-group-validators'
 
 export const RotateClientSecretInput = AppClientIdParamSchema
 export const RotateClientSecretOutput = z.object({
@@ -23,6 +24,8 @@ export const rotateClientSecret = async ({
     throw new Error(
       `Request received for clientId ${input.clientId} which is not owned by provided account.`
     )
+
+  await groupAdminValidatorByAppURN(ctx, appURN)
 
   //Make secret and hash it
   const clientSecret = oauth.makeClientSecret()

@@ -8,6 +8,7 @@ import {
   deleteWorkerRoute,
   getCloudflareFetcher,
 } from '../../utils/cloudflare'
+import { groupAdminValidatorByClientID } from '@proofzero/security/identity-group-validators'
 
 export const DeleteCustomDomainInput = z.object({ clientId: z.string() })
 export const DeleteCustomDomainOutput = z.void()
@@ -29,6 +30,9 @@ export const deleteCustomDomain: DeleteCustomDomainMethod = async ({
   ctx,
 }) => {
   const { clientId } = input
+
+  await groupAdminValidatorByClientID(ctx, clientId)
+
   const node = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
 
   const fetcher = getCloudflareFetcher(ctx.TOKEN_CLOUDFLARE_API)

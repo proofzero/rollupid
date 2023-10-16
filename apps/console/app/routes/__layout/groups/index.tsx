@@ -1,4 +1,4 @@
-import { Form, useNavigate, useOutletContext } from '@remix-run/react'
+import { Form, Link, useNavigate, useOutletContext } from '@remix-run/react'
 import { GroupModel, type GroupRootContextData } from '../groups'
 import { Button, Text } from '@proofzero/design-system'
 import {
@@ -14,6 +14,8 @@ import { Fragment, useState, useRef } from 'react'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { Menu, Transition } from '@headlessui/react'
 import dangerVector from '~/images/danger.svg'
+import { IdentityGroupURN } from '@proofzero/urns/identity-group'
+import { DangerPill } from '@proofzero/design-system/src/atoms/pills/DangerPill'
 
 const CreateGroupModal = ({
   isOpen,
@@ -201,7 +203,8 @@ const GroupHasAppsModal = ({
 }
 
 export default () => {
-  const { groups, apps } = useOutletContext<GroupRootContextData>()
+  const { groups, apps, paymentFailedIdentityGroups } =
+    useOutletContext<GroupRootContextData>()
   const navigate = useNavigate()
 
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false)
@@ -348,6 +351,14 @@ export default () => {
                 </div>
 
                 <div className="flex flex-row items-center gap-3">
+                  {paymentFailedIdentityGroups.includes(
+                    item.val.URN as IdentityGroupURN
+                  ) && (
+                    <Link to={`/billing/groups/${item.val.URN.split('/')[1]}`}>
+                      <DangerPill text="Update Payment Information" />
+                    </Link>
+                  )}
+
                   <MultiAvatar
                     avatars={item.val.members.map((m) => m.iconURL)}
                     cutoff={3}

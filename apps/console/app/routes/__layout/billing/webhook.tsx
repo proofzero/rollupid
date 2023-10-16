@@ -6,12 +6,16 @@ import Stripe from 'stripe'
 import createCoreClient from '@proofzero/platform-clients/core'
 
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
-import { reconcileAppSubscriptions } from '~/services/billing/stripe'
+import { reconcileSubscriptions } from '~/services/billing/stripe'
 import { InternalServerError, RollupError } from '@proofzero/errors'
 import { type AccountURN } from '@proofzero/urns/account'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { ServicePlanType } from '@proofzero/types/billing'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
 
 type StripeInvoicePayload = {
   id: string
@@ -56,34 +60,16 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     switch (event.type) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated':
-        const {
-          id,
-          metadata: subMeta,
-          status: subStatus,
-          latest_invoice: latestInvoice,
-        } = event.data.object as {
+        const { id, metadata: subMeta } = event.data.object as {
           id: string
-          latest_invoice: string
           metadata: {
             URN?: IdentityRefURN
           }
-          status: string
-        }
-
-        const invoice = await stripeClient.invoices.retrieve(latestInvoice)
-
-        // We don't want to do anything with subscription
-        // if payment for it failed
-        if (
-          (subStatus !== 'active' && subStatus !== 'trialing') ||
-          invoice.status !== 'paid'
-        ) {
-          return null
         }
 
         URN = subMeta.URN as IdentityRefURN
 
-        await reconcileAppSubscriptions(
+        await reconcileSubscriptions(
           {
             subscriptionID: id,
             URN,
@@ -289,6 +275,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             coreClient.starbase.deleteSubscriptionPlans.mutate({
               URN,
             }),
+            async () => {
+              if (IdentityGroupURNSpace.is(URN!)) {
+                await coreClient.billing.updateIdentityGroupSeats.mutate({
+                  subscriptionID: subIdDel,
+                  URN: URN as IdentityGroupURN,
+                  quantity: 0,
+                })
+              }
+            },
           ])
         }
 

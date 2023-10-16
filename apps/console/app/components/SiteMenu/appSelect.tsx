@@ -13,6 +13,10 @@ import { Button, Text } from '@proofzero/design-system'
 import { useNavigate } from '@remix-run/react'
 import { ServicePlanType } from '@proofzero/types/billing'
 import { Pill } from '@proofzero/design-system/src/atoms/pills/Pill'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
 
 // Utility
 // -----------------------------------------------------------------------------
@@ -48,9 +52,15 @@ type AppListboxProps = {
   //
   selectedAppIndex: number
   close?: () => void
+  paymentFailedIdentityGroups?: IdentityGroupURN[]
 }
 
-function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
+function AppListbox({
+  apps,
+  selectedAppIndex,
+  close,
+  paymentFailedIdentityGroups,
+}: AppListboxProps) {
   const navigate = useNavigate()
 
   const initiateSelectedApp = (apps: any[], selectedAppIndex: number) => {
@@ -108,11 +118,11 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
                 )}
 
                 {selected.clientId !== 'none' && (
-                  <>
+                  <div className="relative mr-2.5">
                     {!selected.icon && (
                       <div
                         className="rounded-full w-6 h-6 flex justify-center shrink-0
-                        items-center bg-gray-200 overflow-hidden mr-2.5"
+                        items-center bg-gray-200 overflow-hidden"
                       >
                         <Text className="text-gray-500">
                           {selected.name?.substring(0, 1)}
@@ -122,11 +132,19 @@ function AppListbox({ apps, selectedAppIndex, close }: AppListboxProps) {
                     {selected.icon && (
                       <img
                         src={selected.icon}
-                        className="object-cover w-6 h-6 rounded-full mr-2.5"
+                        className="object-cover w-6 h-6 rounded-full"
                         alt="app icon"
                       />
                     )}
-                  </>
+                    {selected.groupID &&
+                      paymentFailedIdentityGroups?.includes(
+                        IdentityGroupURNSpace.urn(
+                          selected.groupID
+                        ) as IdentityGroupURN
+                      ) && (
+                        <div className="absolute right-0 bottom-0 w-2 h-2 bg-orange-400 rounded-full border border-white"></div>
+                      )}
+                  </div>
                 )}
 
                 <Text
@@ -258,6 +276,7 @@ type AppSelectProps = {
   // The currently selected Client ID.
   selected?: string
   close?: () => void
+  paymentFailedIdentityGroups?: IdentityGroupURN[]
 }
 
 export default function AppSelect(props: AppSelectProps) {
@@ -269,6 +288,7 @@ export default function AppSelect(props: AppSelectProps) {
       apps={props.apps}
       selectedAppIndex={appIndex}
       close={props.close}
+      paymentFailedIdentityGroups={props.paymentFailedIdentityGroups}
     />
   )
 }

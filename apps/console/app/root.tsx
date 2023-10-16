@@ -25,6 +25,7 @@ import {
   useLoaderData,
   useTransition,
   useCatch,
+  useFetcher,
 } from '@remix-run/react'
 
 import { useContext, useEffect } from 'react'
@@ -294,6 +295,13 @@ export default function App() {
 
   registerFeatureFlag()
 
+  const paymentFailedIdentityGroupsFetcher = useFetcher()
+  useEffect(() => {
+    paymentFailedIdentityGroupsFetcher.load(
+      '/api/payment-failed-identity-groups'
+    )
+  }, [])
+
   return (
     <html lang="en" className="h-full">
       <head>
@@ -340,6 +348,8 @@ export default function App() {
                 identityURN,
                 hasUnpaidInvoices,
                 unpaidInvoiceURL,
+                paymentFailedIdentityGroups:
+                  paymentFailedIdentityGroupsFetcher.data ?? [],
               }}
             />
           </PostHogProvider>
@@ -354,6 +364,8 @@ export default function App() {
               identityURN,
               hasUnpaidInvoices,
               unpaidInvoiceURL,
+              paymentFailedIdentityGroups:
+                paymentFailedIdentityGroupsFetcher.data ?? [],
             }}
           />
         )}

@@ -43,6 +43,9 @@ import { usePostHog } from 'posthog-js/react'
 import { ServicePlanType } from '@proofzero/types/billing'
 import _ from 'lodash'
 import { isPlanGuarded } from '~/utils/planGate'
+import { IdentityGroupURN } from '@proofzero/urns/identity-group'
+
+import { HiExclamationTriangle } from 'react-icons/hi2'
 
 // RollupLogo
 // -----------------------------------------------------------------------------
@@ -69,6 +72,7 @@ type RollupMenuProps = {
     icon?: string
     appPlan: ServicePlanType
     groupName?: string
+    groupID?: string
   }[]
   // Current selected Client ID.
   selected?: string
@@ -76,6 +80,7 @@ type RollupMenuProps = {
   PASSPORT_URL: string
   pfpUrl: string
   displayName: string
+  paymentFailedIdentityGroups: IdentityGroupURN[]
 }
 
 const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
@@ -109,6 +114,7 @@ export default function SiteMenu(props: RollupMenuProps) {
         <ExternalLinks
           PASSPORT_URL={props.PASSPORT_URL}
           docsURL={'https://docs.rollup.id'}
+          paymentFailedIdentityGroups={props.paymentFailedIdentityGroups}
         />
       </div>
       {/* Mobile menu */}
@@ -154,6 +160,9 @@ export default function SiteMenu(props: RollupMenuProps) {
                     PASSPORT_URL={props.PASSPORT_URL}
                     docsURL={'https://docs.rollup.id'}
                     close={close}
+                    paymentFailedIdentityGroups={
+                      props.paymentFailedIdentityGroups
+                    }
                   />
                 </div>
                 <div
@@ -351,7 +360,12 @@ function AppMenu({ props, close }: AppMenuProps) {
 
   return (
     <div>
-      <AppSelect apps={props.apps} selected={props.selected} close={close} />
+      <AppSelect
+        apps={props.apps}
+        selected={props.selected}
+        paymentFailedIdentityGroups={props.paymentFailedIdentityGroups}
+        close={close}
+      />
 
       {props.selected && (
         <section className="px-2 lg:flex lg:flex-col">
@@ -366,9 +380,14 @@ type ExternalLinksProps = {
   PASSPORT_URL: string
   docsURL: string
   close?: () => void
+  paymentFailedIdentityGroups: IdentityGroupURN[]
 }
 
-function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
+function ExternalLinks({
+  PASSPORT_URL,
+  docsURL,
+  paymentFailedIdentityGroups,
+}: ExternalLinksProps) {
   return (
     <div className="mt-2 border-t border-gray-700">
       <div className="px-2 p-2 hover:bg-gray-800">
@@ -394,6 +413,10 @@ function ExternalLinks({ PASSPORT_URL, docsURL }: ExternalLinksProps) {
             <Text size="sm" weight="medium">
               Billing & Invoicing
             </Text>
+
+            {paymentFailedIdentityGroups?.length > 0 && (
+              <HiExclamationTriangle className="w-[22px] h-[22px] text-orange-400" />
+            )}
           </div>
         </NavLink>
       </div>

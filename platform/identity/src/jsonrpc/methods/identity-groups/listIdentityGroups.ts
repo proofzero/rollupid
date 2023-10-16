@@ -82,7 +82,7 @@ export const listIdentityGroups = async ({
       // or if the numbers mismatch
       // we do a reinitialization with
       // the graph as a source of truth
-      if (groupMemberEdges.length > orderedMembers.length) {
+      if (groupMemberEdges.length !== orderedMembers.length) {
         orderedMembers = groupMemberEdges.map(
           (edge) => edge.src.baseUrn as IdentityURN
         )

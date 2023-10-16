@@ -3,6 +3,7 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { AppClientIdParamSchema, AppThemeSchema } from '../validators/app'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
+import { groupAdminValidatorByAppURN } from '@proofzero/security/identity-group-validators'
 
 export const SetAppThemeInput = AppClientIdParamSchema.extend({
   theme: AppThemeSchema,
@@ -23,6 +24,9 @@ export const setAppTheme = async ({
     throw new Error(
       `Request received for clientId ${clientId} which is not owned by provided account.`
     )
+
+  await groupAdminValidatorByAppURN(ctx, appURN)
+
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
     ctx.StarbaseApp

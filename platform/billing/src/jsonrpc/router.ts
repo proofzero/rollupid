@@ -34,6 +34,10 @@ import {
   UpdateIdentityGroupSeatsInputSchema,
   updateIdentityGroupSeats,
 } from './methods/updateIdentityGroupSeats'
+import {
+  SetPaymentFailedInput,
+  setPaymentFailed,
+} from './methods/setPaymentFailed'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -76,4 +80,9 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(UpdateIdentityGroupSeatsInputSchema)
     .mutation(updateIdentityGroupSeats),
+  setPaymentFailed: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(SetPaymentFailedInput)
+    .mutation(setPaymentFailed),
 })

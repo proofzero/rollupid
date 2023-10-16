@@ -10,7 +10,11 @@ import { IdentityRefURNValidator } from '@proofzero/platform-middleware/inputVal
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { EDGE_APPLICATION } from '../../types'
 import { InternalServerError } from '@proofzero/errors'
-import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
+import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 
 export const SetAppPlanInput = AppClientIdParamSchema.extend({
   URN: IdentityRefURNValidator,
@@ -33,13 +37,29 @@ export const setAppPlan = async ({
       `Request received for clientId ${clientId} which is not owned by provided identity.`
     )
 
+  const caller = router.createCaller(ctx)
+  const { edges: appOwnershipEdges } = await caller.edges.getEdges({
+    query: { dst: { baseUrn: appURN }, tag: EDGE_APPLICATION },
+  })
+  if (appOwnershipEdges.length === 0) {
+    throw new InternalServerError({
+      message: 'App ownership edge not found',
+    })
+  }
+
+  const ownershipURN = appOwnershipEdges[0].src.baseUrn
+  if (IdentityGroupURNSpace.is(ownershipURN)) {
+    await groupAdminValidatorByIdentityGroupURN(
+      ctx,
+      ownershipURN as IdentityGroupURN
+    )
+  }
+
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
     ctx.StarbaseApp
   )
   await appDO.class.setAppPlan(plan)
-
-  const caller = router.createCaller(ctx)
 
   if (plan && plan !== ServicePlanType.FREE) {
     const { edges } = await caller.edges.getEdges({
@@ -81,18 +101,6 @@ export const setAppPlan = async ({
       },
     })
 
-    const { edges: ownershipEdges } = await caller.edges.getEdges({
-      query: {
-        tag: EDGE_APPLICATION,
-        dst: { baseUrn: appURN },
-      },
-    })
-    if (ownershipEdges.length === 0) {
-      throw new InternalServerError({
-        message: 'App ownership edge not found',
-      })
-    }
-
     await createAnalyticsEvent({
       eventName: `app_set_${plan}_plan`,
       apiKey: ctx.POSTHOG_API_KEY,
@@ -100,8 +108,8 @@ export const setAppPlan = async ({
       properties: {
         $groups: {
           app: clientId,
-          group: IdentityGroupURNSpace.is(ownershipEdges[0].src.baseUrn)
-            ? ownershipEdges[0].src.baseUrn
+          group: IdentityGroupURNSpace.is(appOwnershipEdges[0].src.baseUrn)
+            ? appOwnershipEdges[0].src.baseUrn
             : undefined,
         },
       },

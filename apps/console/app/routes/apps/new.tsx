@@ -20,6 +20,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { usePostHog } from 'posthog-js/react'
 import classNames from 'classnames'
+import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -53,8 +54,17 @@ export default function CreateNewApp() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const posthog = usePostHog()
 
-  const { apps, avatarUrl, PASSPORT_URL, displayName } =
-    useOutletContext<OutletContextData>()
+  const {
+    apps,
+    avatarUrl,
+    PASSPORT_URL,
+    displayName,
+    paymentFailedIdentityGroups,
+  } = useOutletContext<
+    OutletContextData & {
+      paymentFailedIdentityGroups: IdentityGroupURN[]
+    }
+  >()
 
   return (
     <Popover className="min-h-[100dvh] relative">
@@ -66,6 +76,7 @@ export default function CreateNewApp() {
             PASSPORT_URL={PASSPORT_URL}
             displayName={displayName}
             pfpUrl={avatarUrl}
+            paymentFailedIdentityGroups={paymentFailedIdentityGroups}
           />
 
           <main

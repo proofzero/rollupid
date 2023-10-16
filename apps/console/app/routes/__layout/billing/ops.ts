@@ -9,7 +9,7 @@ import createCoreClient, {
   CoreClientType,
 } from '@proofzero/platform-clients/core'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import { reconcileAppSubscriptions } from '~/services/billing/stripe'
+import { reconcileSubscriptions } from '~/services/billing/stripe'
 import { PaymentData, ServicePlanType } from '@proofzero/types/billing'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
 import { IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
@@ -88,32 +88,46 @@ export const loader = getRollupReqFunctionErrorWrapper(
     }
     const targetURN: IdentityRefURN = groupURN ?? identityURN
     if (IdentityGroupURNSpace.is(targetURN)) {
-      const authorized =
+      const { read } =
         await coreClient.identity.hasIdentityGroupPermissions.query({
           identityURN,
           identityGroupURN: targetURN as IdentityGroupURN,
         })
 
-      if (!authorized) {
+      if (!read) {
         throw new UnauthorizedError({
-          message: 'You are not authorized to update this identity group.',
+          message: 'You are not authorized to read this identity group.',
         })
       }
 
       groupURN = targetURN as IdentityGroupURN
 
-      const groups = await coreClient.identity.listIdentityGroups.query()
+      const [groups, seatQuery, invitations] = await Promise.all([
+        coreClient.identity.listIdentityGroups.query(),
+        coreClient.billing.getIdentityGroupSeats.query({
+          URN: groupURN,
+        }),
+        coreClient.identity.getIdentityGroupMemberInvitations.query({
+          identityGroupURN: groupURN,
+        }),
+      ])
+
+      const seats = seatQuery?.quantity ?? 0
+
       const targetGroup = groups.find((g) => g.URN === groupURN!)
 
-      const seatQuery = await coreClient.billing.getIdentityGroupSeats.query({
-        URN: groupURN,
-      })
+      // This wonderful max min is supposed to do the following:
+      // - Prevent displaying negative group seats (due to some bug)
+      // - Prevent displaying more seats than the group has (due to some bug)
       const groupMemberCount = Math.max(
-        (targetGroup?.members.length ?? 0) -
-          IDENTITY_GROUP_OPTIONS.maxFreeMembers,
+        Math.min(
+          (targetGroup?.members.length ?? 0) +
+            invitations.length -
+            IDENTITY_GROUP_OPTIONS.maxFreeMembers,
+          seats
+        ),
         0
       )
-      const seats = seatQuery?.quantity ?? 0
 
       groupSeats.total = seats
       groupSeats.used = groupMemberCount
@@ -221,13 +235,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     const targetURN: IdentityRefURN = groupURN ?? identityURN
     if (IdentityGroupURNSpace.is(targetURN)) {
-      const authorized =
+      const { write } =
         await coreClient.identity.hasIdentityGroupPermissions.query({
           identityURN,
           identityGroupURN: targetURN as IdentityGroupURN,
         })
 
-      if (!authorized) {
+      if (!write) {
         throw new UnauthorizedError({
           message: 'You are not authorized to update this identity group.',
         })
@@ -324,7 +338,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         (sub.status === 'active' || sub.status === 'trialing')) ||
       txType !== 'buy'
     ) {
-      await reconcileAppSubscriptions(
+      await reconcileSubscriptions(
         {
           subscriptionID: sub.id,
           URN: targetURN,

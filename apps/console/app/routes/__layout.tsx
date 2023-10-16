@@ -11,12 +11,17 @@ import { Popover } from '@headlessui/react'
 
 import type { LoaderData as OutletContextData } from '~/root'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
+import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 
 // Component
 // -----------------------------------------------------------------------------
 
 export default function DashboardIndexPage() {
-  const context = useOutletContext<OutletContextData>()
+  const context = useOutletContext<
+    OutletContextData & {
+      paymentFailedIdentityGroups: IdentityGroupURN[]
+    }
+  >()
   const {
     apps,
     avatarUrl,
@@ -24,6 +29,7 @@ export default function DashboardIndexPage() {
     PASSPORT_URL,
     hasUnpaidInvoices,
     unpaidInvoiceURL,
+    paymentFailedIdentityGroups,
   } = context
 
   return (
@@ -36,6 +42,7 @@ export default function DashboardIndexPage() {
             open={open}
             pfpUrl={avatarUrl}
             displayName={displayName}
+            paymentFailedIdentityGroups={paymentFailedIdentityGroups}
           />
           <main className="flex flex-col flex-initial min-h-full w-full bg-white">
             <SiteHeader avatarUrl={avatarUrl} />

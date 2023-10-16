@@ -11,6 +11,9 @@ import {
 import { InternalServerError } from '@proofzero/errors'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { IdentityURN } from '@proofzero/urns/identity'
+import { initIdentityGroupNodeByName } from '../../../nodes'
+import { IDENTITY_GROUP_OPTIONS } from '../../../constants'
+import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 
 export const DeleteIdentityGroupMembershipInputSchema = z.object({
   identityURN: IdentityURNInput,
@@ -27,9 +30,17 @@ export const deleteIdentityGroupMembership = async ({
   input: DeleteIdentityGroupMembershipInput
   ctx: Context
 }): Promise<void> => {
-  const caller = router.createCaller(ctx)
-
   const { identityGroupURN, identityURN } = input
+
+  await groupAdminValidatorByIdentityGroupURN(ctx, identityGroupURN)
+
+  const caller = router.createCaller(ctx)
+  const node = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
+  if (!node) {
+    throw new InternalServerError({
+      message: 'Identity group DO not found',
+    })
+  }
 
   const { edges } = await caller.edges.getEdges({
     query: {
@@ -66,6 +77,29 @@ export const deleteIdentityGroupMembership = async ({
     tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
     dst: identityGroupURN,
   })
+
+  const orderedMembers = await node.class.getOrderedMembers()
+  await node.class.setOrderedMembers(
+    orderedMembers.filter((urn) => urn !== identityURN)
+  )
+
+  const oldMemberCount = edges.length
+  const newMemberCount = edges.length - 1
+
+  const seats = await node.class.getSeats()
+  const seatCount =
+    IDENTITY_GROUP_OPTIONS.maxFreeMembers + (seats?.quantity || 0)
+
+  const spd = await node.class.getStripePaymentData()
+
+  if (spd?.paymentFailed) {
+    if (oldMemberCount > seatCount && newMemberCount <= seatCount) {
+      // This might conflict with an actual failed payment
+      // How do we know if the payment failed because of the
+      // group size or because of a card error?
+      await node.class.setPaymentFailed(false)
+    }
+  }
 
   ctx.waitUntil?.(
     createAnalyticsEvent({

@@ -13,6 +13,10 @@ import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import type { IdentityURN } from '@proofzero/urns/identity'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { redirect, type LoaderFunction } from '@remix-run/cloudflare'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -37,7 +41,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
 export default () => {
   const navigate = useNavigate()
-  const { apps, ENV } = useOutletContext<OutletContextData>()
+  const { apps, ENV, paymentFailedIdentityGroups } = useOutletContext<
+    OutletContextData & {
+      paymentFailedIdentityGroups: IdentityGroupURN[]
+    }
+  >()
 
   const GATag = ENV?.INTERNAL_GOOGLE_ANALYTICS_TAG
 
@@ -66,7 +74,15 @@ export default () => {
               navigate('/apps/new')
             }}
             navigate={(clientId: string) => navigate(`/apps/${clientId}`)}
-            apps={apps}
+            apps={apps.map((app) => ({
+              ...app,
+              groupPaymentFailed: Boolean(
+                app.groupID &&
+                  paymentFailedIdentityGroups.includes(
+                    IdentityGroupURNSpace.urn(app.groupID) as IdentityGroupURN
+                  )
+              ),
+            }))}
           />
         </>
       )}

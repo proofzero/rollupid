@@ -10,6 +10,7 @@ import { ServicePlanType } from '@proofzero/types/billing'
 import { IdentityGroupURNValidator } from '@proofzero/platform-middleware/inputValidators'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 import { InternalServerError } from '@proofzero/errors'
+import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 
 export const CreateAppInputSchema = z.object({
   clientName: z.string(),
@@ -45,6 +46,8 @@ export const createApp = async ({
   const caller = router.createCaller(ctx)
 
   if (input.identityGroupURN) {
+    await groupAdminValidatorByIdentityGroupURN(ctx, input.identityGroupURN)
+
     const { edges } = await caller.edges.getEdges({
       query: {
         src: {

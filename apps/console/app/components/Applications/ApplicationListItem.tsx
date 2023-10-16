@@ -45,6 +45,7 @@ export type ApplicationListItemProps = {
   appPlan: ServicePlanType
   groupName?: string
   groupID?: string
+  groupPaymentFailed?: boolean
   navigate?: (clientId: string) => void
   onDeleteApplication?: (
     clientId: string,

@@ -40,6 +40,11 @@ import type { UsersLoaderData } from './users'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
+import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -125,6 +130,7 @@ export default function AppDetailIndexPage() {
     appDetails: appDetailsProps
     authorizationURL: string
     rotationResult: RotatedSecrets
+    paymentFailedIdentityGroups: IdentityGroupURN[]
   }>()
   const { edgesResult } = useLoaderData()
 
@@ -144,6 +150,13 @@ export default function AppDetailIndexPage() {
         rotatedApiKey: null,
       }
 
+  const seatPaymentFailed =
+    IdentityGroupURNSpace.is(outletContext.appDetails.ownerURN) &&
+    outletContext.paymentFailedIdentityGroups.length > 0 &&
+    outletContext.paymentFailedIdentityGroups.includes(
+      outletContext.appDetails.ownerURN as IdentityGroupURN
+    )
+
   return (
     <section>
       <div className="flex flex-row items-center space-x-3 pb-5 max-sm:px-6">
@@ -154,6 +167,19 @@ export default function AppDetailIndexPage() {
           url={'https://docs.rollup.id/platform/console/dashboard'}
         />
       </div>
+
+      {seatPaymentFailed && (
+        <section className="my-3">
+          <ToastWithLink
+            message="Payment for user seats has failed. Update Payment Information to regain full access to the application."
+            linkHref={`/billing/groups/${
+              outletContext.appDetails.ownerURN.split('/')[1]
+            }`}
+            linkText="Update payment information"
+            type="warning"
+          />
+        </section>
+      )}
 
       <RotateCredsModal
         isOpen={apiKeyRollModalOpen}

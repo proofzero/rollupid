@@ -4,6 +4,7 @@ import { Context } from '../context'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
 import { AccountURNInput } from '@proofzero/platform-middleware/inputValidators'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
+import { groupAdminValidatorByAppURN } from '@proofzero/security/identity-group-validators'
 
 export const UpsertAppContactAddressInput = z.object({
   clientId: z.string(),
@@ -28,6 +29,9 @@ export const upsertAppContactAddress = async ({
     )
 
   const caller = router.createCaller(ctx)
+
+  await groupAdminValidatorByAppURN(ctx, appURN)
+
   const { edges } = await caller.edges.getEdges({
     query: {
       src: { baseUrn: appURN },

@@ -11,7 +11,11 @@ import { getApplicationNodeByClientId } from '../../nodes/application'
 import type { IdentityURN } from '@proofzero/urns/identity'
 import { EDGE_APPLICATION } from '../../types'
 import { InternalServerError } from '@proofzero/errors'
-import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
+import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 
 export const PublishAppInput = z.object({
   clientId: z.string(),
@@ -35,6 +39,24 @@ export const publishApp = async ({
       `Request received for clientId ${input.clientId} which is not owned by provided account.`
     )
 
+  const caller = router.createCaller(ctx)
+  const { edges: appOwnershipEdges } = await caller.edges.getEdges({
+    query: { dst: { baseUrn: appURN }, tag: EDGE_APPLICATION },
+  })
+  if (appOwnershipEdges.length === 0) {
+    throw new InternalServerError({
+      message: 'App ownership edge not found',
+    })
+  }
+
+  const ownershipURN = appOwnershipEdges[0].src.baseUrn
+  if (IdentityGroupURNSpace.is(ownershipURN)) {
+    await groupAdminValidatorByIdentityGroupURN(
+      ctx,
+      ownershipURN as IdentityGroupURN
+    )
+  }
+
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
     ctx.StarbaseApp
@@ -47,7 +69,6 @@ export const publishApp = async ({
   if (!hasClientSecret)
     throw new Error('Client Secret must be set to publish app')
 
-  const caller = router.createCaller(ctx)
   const { edges } = await caller.edges.getEdges({
     query: {
       src: { baseUrn: appURN },
@@ -62,18 +83,6 @@ export const publishApp = async ({
   await appDO.class.publish(input.published)
 
   const buildAnalyticsEvent = async () => {
-    const { edges: ownershipEdges } = await caller.edges.getEdges({
-      query: {
-        tag: EDGE_APPLICATION,
-        dst: { baseUrn: appURN },
-      },
-    })
-    if (ownershipEdges.length === 0) {
-      throw new InternalServerError({
-        message: 'App ownership edge not found',
-      })
-    }
-
     await createAnalyticsEvent({
       distinctId: ctx.identityURN as IdentityURN,
       eventName: input.published
@@ -83,8 +92,8 @@ export const publishApp = async ({
       properties: {
         $groups: {
           app: input.clientId,
-          group: IdentityGroupURNSpace.is(ownershipEdges[0].src.baseUrn)
-            ? ownershipEdges[0].src.baseUrn
+          group: IdentityGroupURNSpace.is(appOwnershipEdges[0].src.baseUrn)
+            ? appOwnershipEdges[0].src.baseUrn
             : undefined,
         },
       },

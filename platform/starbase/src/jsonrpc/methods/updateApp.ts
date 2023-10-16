@@ -4,6 +4,7 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { AppObjectSchema } from '../validators/app'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
+import { groupAdminValidatorByAppURN } from '@proofzero/security/identity-group-validators'
 
 export const UpdateAppInput = z.object({
   clientId: z.string(),
@@ -30,6 +31,10 @@ export const updateApp = async ({
       `Request received for clientId ${input.clientId} which is not owned by provided account.`
     )
 
+  const caller = router.createCaller(ctx)
+
+  await groupAdminValidatorByAppURN(ctx, appURN)
+
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
     ctx.StarbaseApp
@@ -37,6 +42,5 @@ export const updateApp = async ({
   appDO.class.update(input.updates)
 
   //TODO: Make this asynchronous so user doesn't have to wait for the second IO hop
-  const caller = router.createCaller(ctx)
   await caller.edges.updateNode({ urnOfNode: appURN })
 }

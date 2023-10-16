@@ -29,6 +29,7 @@ import { getToastsAndFlashSession } from '~/utils/toast.server'
 import { useEffect } from 'react'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { ResponseType } from '@proofzero/types/authorization'
+import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 
 type LoaderData = {
   appDetails: appDetailsProps
@@ -176,7 +177,12 @@ export default function AppDetailIndexPage() {
     identityURN,
     hasUnpaidInvoices,
     unpaidInvoiceURL,
-  } = useOutletContext<OutletContextData>()
+    paymentFailedIdentityGroups,
+  } = useOutletContext<
+    OutletContextData & {
+      paymentFailedIdentityGroups: IdentityGroupURN[]
+    }
+  >()
   const {
     appDetails,
     authorizationURL,
@@ -223,6 +229,7 @@ export default function AppDetailIndexPage() {
             PASSPORT_URL={PASSPORT_URL}
             displayName={displayName}
             pfpUrl={avatarUrl}
+            paymentFailedIdentityGroups={paymentFailedIdentityGroups}
           />
           <main className="flex flex-col flex-initial min-h-full w-full">
             <SiteHeader avatarUrl={avatarUrl} />
@@ -260,6 +267,7 @@ export default function AppDetailIndexPage() {
                   paymaster,
                   identityURN,
                   hasUnpaidInvoices,
+                  paymentFailedIdentityGroups,
                 }}
               />
             </section>

@@ -9,6 +9,7 @@ import { BadRequestError } from '@proofzero/errors'
 import { EDGE_APPLICATION } from '@proofzero/platform.starbase/src/types'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 import { IdentityURN } from '@proofzero/urns/identity'
+import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 
 export const DeleteIdentityGroupInputSchema = IdentityGroupURNValidator
 type DeleteIdentityGroupInput = z.infer<typeof DeleteIdentityGroupInputSchema>
@@ -20,8 +21,9 @@ export const deleteIdentityGroup = async ({
   input: DeleteIdentityGroupInput
   ctx: Context
 }): Promise<void> => {
-  const caller = router.createCaller(ctx)
+  await groupAdminValidatorByIdentityGroupURN(ctx, identityGroupURN)
 
+  const caller = router.createCaller(ctx)
   const { edges: membershipEdges } = await caller.edges.getEdges({
     query: {
       tag: EDGE_MEMBER_OF_IDENTITY_GROUP,
@@ -30,15 +32,6 @@ export const deleteIdentityGroup = async ({
       },
     },
   })
-
-  const ownEdge = membershipEdges.find(
-    (me) => me.src.baseUrn === ctx.identityURN
-  )
-  if (!ownEdge) {
-    throw new BadRequestError({
-      message: 'Caller is not part of identity group',
-    })
-  }
 
   const { edges: appEdges } = await caller.edges.getEdges({
     query: {

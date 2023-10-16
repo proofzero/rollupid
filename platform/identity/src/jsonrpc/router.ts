@@ -92,6 +92,10 @@ import {
   DeleteIdentityGroupInvitationInputSchema,
   deleteIdentityGroupInvitation,
 } from './methods/identity-groups/deleteIdentityGroupInvitation'
+import {
+  ListPaymentFailedIdentityGroupsOutputSchema,
+  listPaymentFailedIdentityGroups,
+} from './methods/identity-groups/listPaymentFailedIdentityGroups'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -198,6 +202,13 @@ export const appRouter = t.router({
     .use(Analytics)
     .output(ListIdentityGroupsOutputSchema)
     .query(listIdentityGroups),
+  listPaymentFailedIdentityGroups: t.procedure
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .use(Analytics)
+    .output(ListPaymentFailedIdentityGroupsOutputSchema)
+    .query(listPaymentFailedIdentityGroups),
   inviteIdentityGroupMember: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)

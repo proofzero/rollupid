@@ -12,6 +12,7 @@ import {
   getExpectedCustomDomainDNSRecords,
 } from '../../utils/cloudflare'
 import { CustomDomain } from '../../types'
+import { groupAdminValidatorByClientID } from '@proofzero/security/identity-group-validators'
 
 export const CreateCustomDomainInput = z.object({
   clientId: z.string(),
@@ -37,6 +38,9 @@ export const createCustomDomain: CreateCustomDomainMethod = async ({
   ctx,
 }) => {
   const { clientId, hostname } = input
+
+  await groupAdminValidatorByClientID(ctx, clientId)
+
   const fetcher = getCloudflareFetcher(ctx.TOKEN_CLOUDFLARE_API)
 
   try {

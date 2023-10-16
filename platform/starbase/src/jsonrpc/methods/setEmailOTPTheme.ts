@@ -3,6 +3,7 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { AppClientIdParamSchema, EmailOTPThemeSchema } from '../validators/app'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
+import { groupAdminValidatorByAppURN } from '@proofzero/security/identity-group-validators'
 
 export const SetEmailOTPThemeInput = AppClientIdParamSchema.extend({
   theme: EmailOTPThemeSchema,
@@ -23,6 +24,9 @@ export const setEmailOTPTheme = async ({
     throw new Error(
       `Request received for clientId ${clientId} which is not owned by provided account.`
     )
+
+  await groupAdminValidatorByAppURN(ctx, appURN)
+
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
     ctx.StarbaseApp
