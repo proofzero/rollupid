@@ -324,6 +324,7 @@ const AuthPanel = ({
   avatarURL,
   appIconURL,
   authorizationURL,
+  appPublished,
   setLoading,
   errors,
 }: {
@@ -332,6 +333,7 @@ const AuthPanel = ({
   avatarURL: string
   appIconURL?: string
   authorizationURL: string
+  appPublished: boolean
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
   errors?: {
     [key: string]: string
@@ -698,17 +700,35 @@ const AuthPanel = ({
 
           <div className="w-full border-b border-gray-200"></div>
 
-          <FormElement label="Live Preview Mode">
+          <FormElement
+            label="Live Preview Mode"
+            sublabel={
+              appPublished ? undefined : `Application has to be published`
+            }
+          >
             <button
               className="flex flex-row items-center gap-2"
               type="button"
               onClick={previewAuth}
+              disabled={!appPublished}
             >
-              <Text size="sm" weight="normal" className="text-indigo-600">
+              <Text
+                size="sm"
+                weight="normal"
+                className={classNames(
+                  { 'text-indigo-600': appPublished },
+                  { 'text-gray-300': !appPublished }
+                )}
+              >
                 Open in new tab
               </Text>
 
-              <HiOutlineExternalLink className="text-indigo-600" />
+              <HiOutlineExternalLink
+                className={classNames(
+                  { 'text-indigo-600': appPublished },
+                  { 'text-gray-300': !appPublished }
+                )}
+              />
             </button>
           </FormElement>
 
@@ -1821,6 +1841,7 @@ export default () => {
               avatarURL={avatarUrl}
               appIconURL={appDetails.app.icon}
               authorizationURL={authorizationURL}
+              appPublished={appDetails.published ?? false}
               setLoading={setLoading}
               errors={errors}
             />
