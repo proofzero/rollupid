@@ -23,8 +23,8 @@ type EarlyAccessPanelProps = {
   featurePlan?: ServicePlanType
   identityURN: IdentityURN
   earlyAccess: boolean
-  preview?: boolean
-  handlePreview?: () => void
+  showPreviewButton?: boolean
+  handlePreviewButtonClick?: () => void
 }
 
 const EarlyAccessPanel = ({
@@ -39,8 +39,8 @@ const EarlyAccessPanel = ({
   featurePlan,
   identityURN,
   earlyAccess,
-  preview = false,
-  handlePreview,
+  showPreviewButton = false,
+  handlePreviewButtonClick,
 }: EarlyAccessPanelProps) => {
   return (
     <>
@@ -83,8 +83,11 @@ const EarlyAccessPanel = ({
               </NavLink>
             )}
 
-            {preview && (
-              <Button btnType="secondary-alt" onClick={handlePreview}>
+            {showPreviewButton && (
+              <Button
+                btnType="secondary-alt"
+                onClick={handlePreviewButtonClick}
+              >
                 Preview
               </Button>
             )}

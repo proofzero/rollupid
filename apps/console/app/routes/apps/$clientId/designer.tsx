@@ -1477,9 +1477,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
-    const reqURL = new URL(request.url)
-    const previewMode = reqURL.searchParams.get('preview') != null
-
     const jwt = await requireJWT(request, context.env)
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
     const clientId = params?.clientId
@@ -1505,7 +1502,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       appTheme,
       emailTheme,
       ogTheme,
-      previewMode,
     })
   }
 )
@@ -1704,7 +1700,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { appTheme, emailTheme, ogTheme, previewMode } = useLoaderData<{
+  const { appTheme, emailTheme, ogTheme } = useLoaderData<{
     appTheme: GetAppThemeResult
     emailTheme: GetEmailOTPThemeResult
     ogTheme: GetOgThemeResult
@@ -1712,7 +1708,6 @@ export default () => {
       message: string
       type: ToastType
     }[]
-    previewMode: boolean
   }>()
 
   const {
@@ -1743,9 +1738,9 @@ export default () => {
   }, [errors])
 
   const [loading, setLoading] = useState<boolean>(false)
-  const [preview, setPreview] = useState<boolean>(previewMode)
+  const [previewState, setPreviewState] = useState<boolean>(false)
 
-  if (appDetails.appPlan === ServicePlanType.FREE && !preview) {
+  if (appDetails.appPlan === ServicePlanType.FREE && !previewState) {
     return (
       <EarlyAccessPanel
         clientID={appDetails.clientId as string}
@@ -1759,9 +1754,9 @@ export default () => {
         currentPlan={appDetails.appPlan}
         featurePlan={ServicePlanType.PRO}
         identityURN={identityURN}
-        preview={true}
-        handlePreview={() => {
-          setPreview(true)
+        showPreviewButton={true}
+        handlePreviewButtonClick={() => {
+          setPreviewState(true)
         }}
       />
     )
