@@ -469,6 +469,12 @@ export default function Authorize() {
   useConnectResult()
 
   const cancelCallback = () => {
+    if (preview) {
+      window.close()
+
+      return
+    }
+
     const redirectURL = new URL(redirectUri)
     redirectURL.search = `?error=access_denied&state=${state}`
 
