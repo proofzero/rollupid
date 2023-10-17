@@ -360,6 +360,14 @@ const AuthPanel = ({
     appTheme?.graphicURL
   )
 
+  const diffOfProviders = AuthenticationScreenDefaults.knownKeys
+    .filter((k) => !appTheme?.providers?.some((v) => v.key === k))
+    .map((k) => ({
+      key: k,
+      val: getDisplayNameFromProviderString(k),
+      enabled: true,
+    }))
+
   const [providers, setProviders] = useState<
     {
       key: string
@@ -367,7 +375,7 @@ const AuthPanel = ({
       enabled: boolean
     }[]
   >(
-    appTheme?.providers?.map((p) => ({
+    appTheme?.providers?.concat(diffOfProviders).map((p) => ({
       ...p,
       val: getDisplayNameFromProviderString(p.key),
     })) ??
