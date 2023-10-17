@@ -484,7 +484,7 @@ export default function Authorize() {
     if (preview) {
       toast(
         ToastType.Warning,
-        { message: 'Authorization not allowed in preview mode' },
+        { message: 'This step cannot be completed in Preview Mode' },
         { duration: 2000 }
       )
 
