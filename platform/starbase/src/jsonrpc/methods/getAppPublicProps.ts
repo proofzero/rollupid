@@ -11,7 +11,7 @@ import { ServicePlanType } from '@proofzero/types/billing'
 
 export const GetAppPublicPropsInput = AppClientIdParamSchema.merge(
   z.object({
-    previewTheme: z.boolean().optional(),
+    preview: z.boolean().optional(),
   })
 )
 
@@ -33,7 +33,7 @@ export const getAppPublicProps = async ({
   input: z.infer<typeof GetAppPublicPropsInput>
   ctx: Context
 }): Promise<GetAppPublicPropsResult> => {
-  return await getPublicPropsForApp(ctx, input.clientId, input.previewTheme)
+  return await getPublicPropsForApp(ctx, input.clientId, input.preview)
 }
 
 export const getAppPublicPropsBatch = async ({
@@ -45,10 +45,10 @@ export const getAppPublicPropsBatch = async ({
 }): Promise<z.infer<typeof GetAppPublicPropsBatchOutput>> => {
   const { apps, silenceErrors } = input
   const resultMap: (AppPublicProps | undefined)[] = []
-  for (const { clientId, previewTheme } of apps) {
+  for (const { clientId, preview } of apps) {
     let appResult
     try {
-      appResult = await getPublicPropsForApp(ctx, clientId, previewTheme)
+      appResult = await getPublicPropsForApp(ctx, clientId, preview)
     } catch (e) {
       if (silenceErrors) appResult = undefined
       else throw e
@@ -61,14 +61,14 @@ export const getAppPublicPropsBatch = async ({
 async function getPublicPropsForApp(
   ctx: Context,
   clientId: string,
-  previewTheme?: boolean
+  preview?: boolean
 ) {
   const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
   const appDetails = await appDO.class.getDetails()
   const { appPlan } = appDetails
 
   let appTheme = await appDO.class.getTheme()
-  if (!previewTheme && (!appPlan || appPlan === ServicePlanType.FREE)) {
+  if (!preview && (!appPlan || appPlan === ServicePlanType.FREE)) {
     appTheme = undefined
   }
 

@@ -68,7 +68,7 @@ export type LoaderData = {
   dataForScopes: DataForScopes
   profile: GetProfileOutputParams
   prompt?: string
-  previewTheme: boolean
+  preview: boolean
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -186,7 +186,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       coreClient.starbase.getScopes.query(),
       coreClient.starbase.getAppPublicProps.query({
         clientId: clientId as string,
-        previewTheme: lastCP?.rollup_action === 'preview',
+        preview: lastCP?.rollup_action === 'preview',
       }),
     ])
 
@@ -294,7 +294,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         dataForScopes,
         profile,
         prompt,
-        previewTheme: lastCP?.rollup_action === 'preview',
+        preview: lastCP?.rollup_action === 'preview',
       },
       {
         headers,
@@ -405,7 +405,7 @@ export default function Authorize() {
     redirectUri,
     profile,
     prompt,
-    previewTheme,
+    preview,
   } = useLoaderData<LoaderData>()
 
   const userProfile = profile as UserProfile
@@ -481,7 +481,7 @@ export default function Authorize() {
   }
 
   const authorizeCallback = async (scopes: string[]) => {
-    if (previewTheme) {
+    if (preview) {
       toast(
         ToastType.Warning,
         { message: 'Authorization not allowed in preview mode' },

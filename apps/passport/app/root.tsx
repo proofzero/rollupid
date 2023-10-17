@@ -132,7 +132,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
           appProps = await coreClient.starbase.getAppPublicProps.query({
             clientId: (params.clientId || clientId) as string,
-            previewTheme: rollupAction === 'preview',
+            preview: rollupAction === 'preview',
           })
         }
       }
