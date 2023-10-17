@@ -323,6 +323,7 @@ const AuthPanel = ({
   appTheme,
   avatarURL,
   appIconURL,
+  authorizationURL,
   setLoading,
   errors,
 }: {
@@ -330,6 +331,7 @@ const AuthPanel = ({
   appTheme?: AppTheme
   avatarURL: string
   appIconURL?: string
+  authorizationURL: string
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
   errors?: {
     [key: string]: string
@@ -400,6 +402,13 @@ const AuthPanel = ({
         enabled: true,
       }))
     )
+  }
+
+  const previewAuth = () => {
+    const authURL = new URL(authorizationURL)
+    authURL.searchParams.set('rollup_action', 'preview')
+
+    window.open(authURL.toString(), '_blank')
   }
 
   return (
@@ -667,21 +676,6 @@ const AuthPanel = ({
 
           <div className="w-full border-b border-gray-200"></div>
 
-          <FormElement label="Default Style Settings">
-            <button
-              type="button"
-              onClick={() => {
-                resetToDefaults()
-              }}
-            >
-              <Text size="sm" weight="normal" className="text-indigo-600">
-                Reset to default
-              </Text>
-            </button>
-          </FormElement>
-
-          <div className="w-full border-b border-gray-200"></div>
-
           <FormElement label="Login Provider Configuration">
             <input
               type="hidden"
@@ -700,6 +694,37 @@ const AuthPanel = ({
                 Configure
               </Text>
             </Button>
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement label="Live Preview Mode">
+            <button
+              className="flex flex-row items-center gap-2"
+              type="button"
+              onClick={previewAuth}
+            >
+              <Text size="sm" weight="normal" className="text-indigo-600">
+                Open in new tab
+              </Text>
+
+              <HiOutlineExternalLink className="text-indigo-600" />
+            </button>
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement label="Default Style Settings">
+            <button
+              type="button"
+              onClick={() => {
+                resetToDefaults()
+              }}
+            >
+              <Text size="sm" weight="normal" className="text-indigo-600">
+                Reset to default
+              </Text>
+            </button>
           </FormElement>
 
           <div className="w-full border-b border-gray-200"></div>
@@ -1697,17 +1722,8 @@ export default () => {
     }
   }, [errors])
 
-  const {} = useOutletContext<{}>()
-
   const [loading, setLoading] = useState<boolean>(false)
   const [preview, setPreview] = useState<boolean>(previewMode)
-
-  const previewAuth = () => {
-    const authURL = new URL(authorizationURL)
-    authURL.searchParams.set('rollup_action', 'preview')
-
-    window.location.href = authURL.toString()
-  }
 
   if (appDetails.appPlan === ServicePlanType.FREE && !preview) {
     return (
@@ -1750,10 +1766,6 @@ export default () => {
           </div>
 
           <div className="flex flex-row justify-end items-center gap-2 mt-2 lg:mt-0">
-            <Button btnType="secondary-alt" type="button" onClick={previewAuth}>
-              Live preview
-            </Button>
-
             <Button
               btnType="secondary-alt"
               type="button"
@@ -1808,6 +1820,7 @@ export default () => {
               appTheme={appTheme}
               avatarURL={avatarUrl}
               appIconURL={appDetails.app.icon}
+              authorizationURL={authorizationURL}
               setLoading={setLoading}
               errors={errors}
             />

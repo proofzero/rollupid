@@ -76,13 +76,19 @@ const EarlyAccessPanel = ({
           </Text>
           <div className="w-full border-t border-gray-200 mt-8 mb-4" />
 
-          {featurePlan && isPlanGuarded(currentPlan, featurePlan) && (
-            <NavLink to={`/apps/${clientID}/billing`}>
-              <Button btnType="primary-alt" className="mb-4">
-                Upgrade Plan
+          <div className="flex flex-row gap-4 items-center mb-4">
+            {featurePlan && isPlanGuarded(currentPlan, featurePlan) && (
+              <NavLink to={`/apps/${clientID}/billing`}>
+                <Button btnType="primary-alt">Upgrade Plan</Button>
+              </NavLink>
+            )}
+
+            {preview && (
+              <Button btnType="secondary-alt" onClick={handlePreview}>
+                Preview
               </Button>
-            </NavLink>
-          )}
+            )}
+          </div>
 
           <ContactUs
             urn={identityURN}
@@ -94,16 +100,6 @@ const EarlyAccessPanel = ({
                 : 'btn'
             }
           />
-
-          {preview && (
-            <Button
-              btnType="primary-alt"
-              className="mb-4"
-              onClick={handlePreview}
-            >
-              Preview
-            </Button>
-          )}
         </section>
 
         <section className="hidden lg:block">

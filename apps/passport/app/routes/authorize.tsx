@@ -47,6 +47,7 @@ import { Helmet } from 'react-helmet'
 import { getRGBColor, getTextColor } from '@proofzero/design-system/src/helpers'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 
 export type UserProfile = {
   displayName: string
@@ -339,12 +340,6 @@ export const action: ActionFunction = async ({ request, context }) => {
     throw json({ message: 'Missing required fields' }, 400)
   }
 
-  if (form.get('rollup_action') === 'preview') {
-    return redirect(
-      `${context.env.CONSOLE_APP_URL}/apps/${clientId}/designer?preview=true`
-    )
-  }
-
   const createSCWallet = form.get('createSCWallet') as string
 
   const coreClient = getCoreClient({ context, jwt })
@@ -486,6 +481,16 @@ export default function Authorize() {
   }
 
   const authorizeCallback = async (scopes: string[]) => {
+    if (previewTheme) {
+      toast(
+        ToastType.Warning,
+        { message: 'Authorization not allowed in preview mode' },
+        { duration: 2000 }
+      )
+
+      return
+    }
+
     const form = new FormData()
     form.append('scopes', scopes.join(' '))
     form.append('state', state)
@@ -538,10 +543,6 @@ export default function Authorize() {
     // it doesn't end up being submitted
 
     form.append('personaData', JSON.stringify(personaData))
-
-    if (previewTheme) {
-      form.append('rollup_action', 'preview')
-    }
 
     submit(form, { method: 'post' })
   }
