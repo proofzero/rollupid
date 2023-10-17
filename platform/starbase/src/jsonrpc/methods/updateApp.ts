@@ -33,7 +33,7 @@ export const updateApp = async ({
 
   const caller = router.createCaller(ctx)
 
-  await groupAdminValidatorByAppURN(ctx, appURN)
+  await groupAdminValidatorByAppURN(ctx, ApplicationURNSpace.getBaseURN(appURN))
 
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
