@@ -23,6 +23,8 @@ type EarlyAccessPanelProps = {
   featurePlan?: ServicePlanType
   identityURN: IdentityURN
   earlyAccess: boolean
+  preview?: boolean
+  handlePreview?: () => void
 }
 
 const EarlyAccessPanel = ({
@@ -37,6 +39,8 @@ const EarlyAccessPanel = ({
   featurePlan,
   identityURN,
   earlyAccess,
+  preview = false,
+  handlePreview,
 }: EarlyAccessPanelProps) => {
   return (
     <>
@@ -90,6 +94,16 @@ const EarlyAccessPanel = ({
                 : 'btn'
             }
           />
+
+          {preview && (
+            <Button
+              btnType="primary-alt"
+              className="mb-4"
+              onClick={handlePreview}
+            >
+              Preview
+            </Button>
+          )}
         </section>
 
         <section className="hidden lg:block">

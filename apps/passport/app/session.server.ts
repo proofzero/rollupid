@@ -382,7 +382,7 @@ export function parseJwt(token: string): JWTPayload {
   return payload
 }
 
-export function isSupportedRollupAction(rollupAction: string) {
+export function getSupportedRollupActions() {
   return [
     'connect',
     'create',
@@ -390,5 +390,10 @@ export function isSupportedRollupAction(rollupAction: string) {
     'group',
     'groupconnect',
     'groupemailconnect',
-  ].includes(rollupAction.split('_')[0])
+    'preview',
+  ]
+}
+
+export function isSupportedRollupAction(rollupAction: string) {
+  return getSupportedRollupActions().includes(rollupAction.split('_')[0])
 }

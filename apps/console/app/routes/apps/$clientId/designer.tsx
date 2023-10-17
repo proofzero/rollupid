@@ -93,13 +93,13 @@ import danger from '~/images/danger.svg'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import classNames from 'classnames'
 import { ServicePlanType } from '@proofzero/types/billing'
-import { planGuardWithToastException } from '~/utils/planGate'
 import designerSVG from '~/assets/early/designer.webp'
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { GetOgThemeResult } from '@proofzero/platform.starbase/src/jsonrpc/methods/getOgTheme'
 
 const LazyAuth = lazy(() =>
+  // @ts-ignore :(
   import('../../../web3/lazyAuth').then((module) => ({
     default: module.LazyAuth,
   }))
@@ -1432,6 +1432,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       })
     }
 
+    const reqURL = new URL(request.url)
+    const previewMode = reqURL.searchParams.get('preview') != null
+
     const jwt = await requireJWT(request, context.env)
     const traceHeader = generateTraceContextHeaders(context.traceSpan)
     const clientId = params?.clientId
@@ -1457,6 +1460,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       appTheme,
       emailTheme,
       ogTheme,
+      previewMode,
     })
   }
 )
@@ -1477,17 +1481,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...getAuthzHeaderConditionallyFromToken(jwt),
       ...traceHeader,
     })
-
-    const appDetails = await coreClient.starbase.getAppDetails.query({
-      clientId,
-    })
-
-    await planGuardWithToastException(
-      appDetails.appPlan,
-      ServicePlanType.PRO,
-      request,
-      context.env
-    )
 
     let errors: {
       [key: string]: string
@@ -1666,7 +1659,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { appTheme, emailTheme, ogTheme } = useLoaderData<{
+  const { appTheme, emailTheme, ogTheme, previewMode } = useLoaderData<{
     appTheme: GetAppThemeResult
     emailTheme: GetEmailOTPThemeResult
     ogTheme: GetOgThemeResult
@@ -1674,15 +1667,26 @@ export default () => {
       message: string
       type: ToastType
     }[]
+    previewMode: boolean
   }>()
 
-  const { appDetails, appContactAddress, appContactEmail, identityURN } =
-    useOutletContext<{
-      appDetails: appDetailsProps
-      appContactAddress?: AccountURN
-      appContactEmail?: string
-      identityURN: IdentityURN
-    }>()
+  const {
+    appDetails,
+    appContactAddress,
+    appContactEmail,
+    identityURN,
+    avatarUrl,
+    notificationHandler,
+    authorizationURL,
+  } = useOutletContext<{
+    appDetails: appDetailsProps
+    appContactAddress?: AccountURN
+    appContactEmail?: string
+    identityURN: IdentityURN
+    avatarUrl: string
+    notificationHandler: notificationHandlerType
+    authorizationURL: string
+  }>()
 
   const actionData = useActionData()
   const errors = actionData?.errors
@@ -1693,14 +1697,19 @@ export default () => {
     }
   }, [errors])
 
-  const { avatarUrl, notificationHandler } = useOutletContext<{
-    avatarUrl: string
-    notificationHandler: notificationHandlerType
-  }>()
+  const {} = useOutletContext<{}>()
 
   const [loading, setLoading] = useState<boolean>(false)
+  const [preview, setPreview] = useState<boolean>(previewMode)
 
-  if (appDetails.appPlan === ServicePlanType.FREE) {
+  const previewAuth = () => {
+    const authURL = new URL(authorizationURL)
+    authURL.searchParams.set('rollup_action', 'preview')
+
+    window.location.href = authURL.toString()
+  }
+
+  if (appDetails.appPlan === ServicePlanType.FREE && !preview) {
     return (
       <EarlyAccessPanel
         clientID={appDetails.clientId as string}
@@ -1714,6 +1723,10 @@ export default () => {
         currentPlan={appDetails.appPlan}
         featurePlan={ServicePlanType.PRO}
         identityURN={identityURN}
+        preview={true}
+        handlePreview={() => {
+          setPreview(true)
+        }}
       />
     )
   }
@@ -1737,6 +1750,10 @@ export default () => {
           </div>
 
           <div className="flex flex-row justify-end items-center gap-2 mt-2 lg:mt-0">
+            <Button btnType="secondary-alt" type="button" onClick={previewAuth}>
+              Live preview
+            </Button>
+
             <Button
               btnType="secondary-alt"
               type="button"

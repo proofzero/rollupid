@@ -72,7 +72,10 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
     const clientId = new URL(request.url).searchParams.get('client_id')
-    if (request.cf &&
+    if (
+      // @ts-ignore :(
+      request.cf &&
+      // @ts-ignore :(
       request.cf.botManagement.score <= 30 &&
       !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
     ) {
@@ -122,8 +125,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
           }
         } else {
           const coreClient = getCoreClient({ context })
+
+          const rollupAction = new URL(request.url).searchParams.get(
+            'rollup_action'
+          )
+
           appProps = await coreClient.starbase.getAppPublicProps.query({
             clientId: (params.clientId || clientId) as string,
+            previewTheme: rollupAction === 'preview',
           })
         }
       }

@@ -13,6 +13,7 @@ import {
   createAuthzParamsCookieAndAuthenticate,
   destroyAuthzCookieParamsSession,
   getAuthzCookieParams,
+  getSupportedRollupActions,
   getValidatedSessionContext,
   isSupportedRollupAction,
 } from '~/session.server'
@@ -66,6 +67,7 @@ export type LoaderData = {
   dataForScopes: DataForScopes
   profile: GetProfileOutputParams
   prompt?: string
+  previewTheme: boolean
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -99,8 +101,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     if (rollup_action && !isSupportedRollupAction(rollup_action))
       throw new BadRequestError({
-        message:
-          'only Rollup action supported are connect, create, and reconnect ',
+        message: `only Rollup action supported are: ${getSupportedRollupActions().join(
+          ', '
+        )}`,
       })
 
     const lastCP = await getAuthzCookieParams(request, context.env)
@@ -182,6 +185,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       coreClient.starbase.getScopes.query(),
       coreClient.starbase.getAppPublicProps.query({
         clientId: clientId as string,
+        previewTheme: lastCP?.rollup_action === 'preview',
       }),
     ])
 
@@ -211,7 +215,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     //If requested scope values are a subset of allowed scope values
     if (
-      !scope.every((scopeValue) => appPublicProps.scopes.includes(scopeValue))
+      !scope.every((scopeValue) =>
+        (appPublicProps.scopes ?? []).includes(scopeValue)
+      )
     )
       throw new BadRequestError({
         message:
@@ -287,6 +293,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         dataForScopes,
         profile,
         prompt,
+        previewTheme: lastCP?.rollup_action === 'preview',
       },
       {
         headers,
@@ -330,6 +337,12 @@ export const action: ActionFunction = async ({ request, context }) => {
     !personaData
   ) {
     throw json({ message: 'Missing required fields' }, 400)
+  }
+
+  if (form.get('rollup_action') === 'preview') {
+    return redirect(
+      `${context.env.CONSOLE_APP_URL}/apps/${clientId}/designer?preview=true`
+    )
   }
 
   const createSCWallet = form.get('createSCWallet') as string
@@ -397,6 +410,7 @@ export default function Authorize() {
     redirectUri,
     profile,
     prompt,
+    previewTheme,
   } = useLoaderData<LoaderData>()
 
   const userProfile = profile as UserProfile
@@ -524,6 +538,10 @@ export default function Authorize() {
     // it doesn't end up being submitted
 
     form.append('personaData', JSON.stringify(personaData))
+
+    if (previewTheme) {
+      form.append('rollup_action', 'preview')
+    }
 
     submit(form, { method: 'post' })
   }
