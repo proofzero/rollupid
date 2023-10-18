@@ -381,19 +381,3 @@ export function parseJwt(token: string): JWTPayload {
   }
   return payload
 }
-
-export function getSupportedRollupActions() {
-  return [
-    'connect',
-    'create',
-    'reconnect',
-    'group',
-    'groupconnect',
-    'groupemailconnect',
-    'preview',
-  ]
-}
-
-export function isSupportedRollupAction(rollupAction: string) {
-  return getSupportedRollupActions().includes(rollupAction.split('_')[0])
-}

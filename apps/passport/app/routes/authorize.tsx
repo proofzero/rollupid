@@ -13,9 +13,7 @@ import {
   createAuthzParamsCookieAndAuthenticate,
   destroyAuthzCookieParamsSession,
   getAuthzCookieParams,
-  getSupportedRollupActions,
   getValidatedSessionContext,
-  isSupportedRollupAction,
 } from '~/session.server'
 import { validatePersonaData } from '@proofzero/security/persona'
 
@@ -48,6 +46,10 @@ import { getRGBColor, getTextColor } from '@proofzero/design-system/src/helpers'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
+import {
+  getSupportedRollupActions,
+  isSupportedRollupAction,
+} from '~/utils/actions'
 
 export type UserProfile = {
   displayName: string
@@ -102,7 +104,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     if (rollup_action && !isSupportedRollupAction(rollup_action))
       throw new BadRequestError({
-        message: `only Rollup action supported are: ${getSupportedRollupActions().join(
+        message: `only Rollup actions supported are: ${getSupportedRollupActions().join(
           ', '
         )}`,
       })

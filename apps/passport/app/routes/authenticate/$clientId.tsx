@@ -1,6 +1,6 @@
 import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
-import { getAuthzCookieParams, isSupportedRollupAction } from '~/session.server'
+import { getAuthzCookieParams } from '~/session.server'
 
 import sideGraphics from '~/assets/auth-side-graphics.svg'
 
@@ -12,6 +12,7 @@ import { useContext } from 'react'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { AuthenticationScreenDefaults } from '@proofzero/design-system/src/templates/authentication/Authentication'
 import { ThemeContext } from '@proofzero/design-system/src/contexts/theme'
+import { isSupportedRollupAction } from '~/utils/actions'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -54,23 +55,23 @@ export default () => {
         <style type="text/css">{`
             :root {
                 ${getRGBColor(
-          dark
-            ? appProps?.appTheme?.color?.dark ??
-            AuthenticationScreenDefaults.color.dark
-            : appProps?.appTheme?.color?.light ??
-            AuthenticationScreenDefaults.color.light,
-          'primary'
-        )}
+                  dark
+                    ? appProps?.appTheme?.color?.dark ??
+                        AuthenticationScreenDefaults.color.dark
+                    : appProps?.appTheme?.color?.light ??
+                        AuthenticationScreenDefaults.color.light,
+                  'primary'
+                )}
                 ${getRGBColor(
-          getTextColor(
-            dark
-              ? appProps?.appTheme?.color?.dark ??
-              AuthenticationScreenDefaults.color.dark
-              : appProps?.appTheme?.color?.light ??
-              AuthenticationScreenDefaults.color.light
-          ),
-          'primary-contrast-text'
-        )}
+                  getTextColor(
+                    dark
+                      ? appProps?.appTheme?.color?.dark ??
+                          AuthenticationScreenDefaults.color.dark
+                      : appProps?.appTheme?.color?.light ??
+                          AuthenticationScreenDefaults.color.light
+                  ),
+                  'primary-contrast-text'
+                )}
              {
          `}</style>
       </Helmet>
@@ -84,8 +85,9 @@ export default () => {
               'basis-2/5 h-[100dvh] w-full hidden lg:flex justify-center items-center bg-indigo-50 dark:bg-[#1F2937] overflow-hidden'
             }
             style={{
-              backgroundImage: `url(${appProps?.appTheme?.graphicURL ?? sideGraphics
-                })`,
+              backgroundImage: `url(${
+                appProps?.appTheme?.graphicURL ?? sideGraphics
+              })`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
