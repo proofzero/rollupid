@@ -11,6 +11,10 @@ import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 import { EDGE_APPLICATION } from '../../types'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
 
 export const TransferAppToGroupInput = z.object({
   clientID: z.string(),
@@ -54,11 +58,19 @@ export const transferAppToGroup = async ({
     })
   }
 
+  const ownershipURN = appOwnershipEdges[0].src.baseUrn
+  if (IdentityGroupURNSpace.is(ownershipURN)) {
+    await groupAdminValidatorByIdentityGroupURN(
+      ctx,
+      ownershipURN as IdentityGroupURN
+    )
+  }
+
   const { edges } = await caller.edges.getEdges({
     query: {
       dst: { baseUrn: appURN },
       src: {
-        baseUrn: appOwnershipEdges[0].src.baseUrn,
+        baseUrn: ownershipURN,
       },
     },
   })
