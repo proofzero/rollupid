@@ -521,47 +521,49 @@ export default () => {
                     className="absolute bg-white p-2 flex flex-col gap-2 mt-1 focus-visible:ring-0 focus-visible:outline-none border shadow w-full"
                     static
                   >
-                    {identityGroups.map((ig) => (
-                      <Listbox.Option
-                        key={ig.URN}
-                        value={ig}
-                        className={({ active }) =>
-                          classNames(
-                            'flex flex-row items-center gap-2 hover:bg-gray-100 py-2 px-4 rounded-lg cursor-pointer',
-                            {
-                              'bg-gray-100': active,
-                            }
-                          )
-                        }
-                      >
-                        {({ selected }) => (
-                          <article className="flex flex-row items-center justify-between">
-                            <div className="flex flex-row items-center gap-2">
-                              <div className="rounded-full w-5 h-5 flex justify-center items-center bg-gray-200 shrink-0 overflow-hidden">
-                                <Text size="xs" className="text-gray-500">
-                                  {ig.name.substring(0, 1)}
+                    {identityGroups
+                      .filter((ig) => ig.URN !== appDetails.ownerURN)
+                      .map((ig) => (
+                        <Listbox.Option
+                          key={ig.URN}
+                          value={ig}
+                          className={({ active }) =>
+                            classNames(
+                              'flex flex-row items-center gap-2 hover:bg-gray-100 py-2 px-4 rounded-lg cursor-pointer',
+                              {
+                                'bg-gray-100': active,
+                              }
+                            )
+                          }
+                        >
+                          {({ selected }) => (
+                            <article className="flex flex-row items-center justify-between">
+                              <div className="flex flex-row items-center gap-2">
+                                <div className="rounded-full w-5 h-5 flex justify-center items-center bg-gray-200 shrink-0 overflow-hidden">
+                                  <Text size="xs" className="text-gray-500">
+                                    {ig.name.substring(0, 1)}
+                                  </Text>
+                                </div>
+
+                                <Text
+                                  size="sm"
+                                  weight="normal"
+                                  className="text-gray-800"
+                                >
+                                  {ig.name}
                                 </Text>
                               </div>
 
-                              <Text
-                                size="sm"
-                                weight="normal"
-                                className="text-gray-800"
-                              >
-                                {ig.name}
-                              </Text>
-                            </div>
-
-                            {selected && (
-                              <CheckIcon
-                                className="h-5 w-5 text-indigo-600"
-                                aria-hidden="true"
-                              />
-                            )}
-                          </article>
-                        )}
-                      </Listbox.Option>
-                    ))}
+                              {selected && (
+                                <CheckIcon
+                                  className="h-5 w-5 text-indigo-600"
+                                  aria-hidden="true"
+                                />
+                              )}
+                            </article>
+                          )}
+                        </Listbox.Option>
+                      ))}
                   </Listbox.Options>
                 </Transition>
               </div>
