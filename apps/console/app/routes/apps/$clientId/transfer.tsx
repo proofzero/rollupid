@@ -367,21 +367,21 @@ export default () => {
     }
   }, [groupInfoFetcher])
 
-  // useEffect(() => {
-  //   if (actionData && selectedApp) {
-  //     const { status, client_secret, payment_method, subId } = actionData
-  //     process3DSecureCard({
-  //       submit,
-  //       subId,
-  //       STRIPE_PUBLISHABLE_KEY,
-  //       status,
-  //       client_secret,
-  //       payment_method,
-  //       redirectUrl: `/groups/${groupID}/apps/transfer/`,
-  //       URN: groupURN,
-  //     })
-  //   }
-  // }, [actionData])
+  useEffect(() => {
+    if (actionData && selectedGroup) {
+      const { status, client_secret, payment_method, subId } = actionData
+      process3DSecureCard({
+        submit,
+        subId,
+        STRIPE_PUBLISHABLE_KEY,
+        status,
+        client_secret,
+        payment_method,
+        redirectUrl: `/app/${appDetails.clientId}/transfer/`,
+        URN: selectedGroup.URN,
+      })
+    }
+  }, [actionData])
 
   return (
     <>
