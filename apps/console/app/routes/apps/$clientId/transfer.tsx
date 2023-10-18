@@ -102,6 +102,200 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
+export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context, params }) => {
+    const jwt = await requireJWT(request, context.env)
+
+    const fd = await request.formData()
+    const groupURN = fd.get('identityGroup[URN]') as
+      | IdentityGroupURN
+      | undefined
+    if (!groupURN) {
+      throw new BadRequestError({
+        message: 'identityGroup[URN] is required',
+      })
+    }
+
+    const clientID = params.clientId as string
+
+    const emailURN = fd.get('emailURN') as AccountURN | undefined
+
+    const traceHeader = generateTraceContextHeaders(context.traceSpan)
+    const coreClient = createCoreClient(context.env.Core, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...traceHeader,
+    })
+
+    const appDetails = await coreClient.starbase.getAppDetails.query({
+      clientId: clientID,
+    })
+
+    if (appDetails.published && !emailURN) {
+      throw new BadRequestError({
+        message: 'emailURN is required',
+      })
+    }
+
+    if (appDetails.appPlan !== ServicePlanType.FREE) {
+      const spd = await coreClient.billing.getStripePaymentData.query({
+        URN: groupURN,
+      })
+      if (!spd.paymentMethodID) {
+        throw new BadRequestError({
+          message: 'Group has no payment method configured',
+        })
+      }
+
+      const entitlements = await coreClient.billing.getEntitlements.query({
+        URN: groupURN,
+      })
+
+      const groupApps = await coreClient.starbase.listGroupApps.query()
+      const currentGroupApps = groupApps.filter((a) => a.groupURN === groupURN)
+      const currentGroupPlanApps = currentGroupApps.filter(
+        (a) => a.appPlan === appDetails.appPlan
+      )
+
+      if (
+        (entitlements.plans[appDetails.appPlan]?.entitlements ?? 0) -
+          currentGroupPlanApps.length <=
+        0
+      ) {
+        const quantity = entitlements.subscriptionID
+          ? entitlements.plans[appDetails.appPlan]?.entitlements
+            ? entitlements.plans[appDetails.appPlan]?.entitlements! + 1
+            : 1
+          : 1
+
+        const sub = await createOrUpdateSubscription({
+          customerID: spd.customerID,
+          planID: context.env.SECRET_STRIPE_PRO_PLAN_ID,
+          SECRET_STRIPE_API_KEY: context.env.SECRET_STRIPE_API_KEY,
+          quantity,
+          subscriptionID: entitlements.subscriptionID,
+          URN: groupURN,
+        })
+
+        const invoiceStatus = (sub.latest_invoice as Stripe.Invoice)?.status
+
+        if (
+          (sub.status === 'active' || sub.status === 'trialing') &&
+          invoiceStatus === 'paid'
+        ) {
+          await coreClient.billing.updateEntitlements.mutate({
+            URN: groupURN,
+            subscriptionID: sub.id,
+            quantity: quantity,
+            type: appDetails.appPlan,
+          })
+        } else {
+          let toastSession = await getFlashSession(request, context.env)
+
+          if (
+            (sub.latest_invoice as unknown as StripeInvoice)?.payment_intent
+              ?.status === 'requires_action'
+          ) {
+            await coreClient.billing.updateEntitlements.mutate({
+              URN: groupURN,
+              subscriptionID: sub.id,
+              quantity: quantity - 1,
+              type: appDetails.appPlan,
+            })
+
+            toastSession = await appendToastToFlashSession(
+              request,
+              {
+                message: `Payment requires additional action`,
+                type: ToastType.Warning,
+              },
+              context.env
+            )
+
+            let status, client_secret, payment_method
+            ;({ status, client_secret, payment_method } = (
+              sub.latest_invoice as Stripe.Invoice
+            ).payment_intent as Stripe.PaymentIntent)
+
+            return json(
+              {
+                subId: sub.id,
+                status,
+                client_secret,
+                payment_method,
+                clientID,
+              },
+              {
+                headers: {
+                  'Set-Cookie': await commitFlashSession(
+                    toastSession,
+                    context.env
+                  ),
+                },
+              }
+            )
+          } else {
+            toastSession = await appendToastToFlashSession(
+              request,
+              {
+                message: `Payment failed - correct the failed transaction in Billing & Invoicing and retry application transfer`,
+                type: ToastType.Error,
+              },
+              context.env
+            )
+
+            return new Response(null, {
+              headers: {
+                'Set-Cookie': await commitFlashSession(
+                  toastSession,
+                  context.env
+                ),
+              },
+            })
+          }
+        }
+      }
+    }
+
+    try {
+      await coreClient.starbase.transferAppToGroup.mutate({
+        clientID: clientID,
+        identityGroupURN: groupURN,
+        emailURN,
+      })
+
+      const toastSession = await appendToastToFlashSession(
+        request,
+        {
+          message: `Application transferred.`,
+          type: ToastType.Success,
+        },
+        context.env
+      )
+
+      return redirect(`/groups/${groupURN.split('/')[1]}`, {
+        headers: {
+          'Set-Cookie': await commitFlashSession(toastSession, context.env),
+        },
+      })
+    } catch (ex) {
+      const toastSession = await appendToastToFlashSession(
+        request,
+        {
+          message: `There was an issue transferring the application. Please try again.`,
+          type: ToastType.Error,
+        },
+        context.env
+      )
+
+      return redirect(`/apps/${params.clientId}/transfer`, {
+        headers: {
+          'Set-Cookie': await commitFlashSession(toastSession, context.env),
+        },
+      })
+    }
+  }
+)
+
 export default () => {
   const { identityGroups, STRIPE_PUBLISHABLE_KEY } = useLoaderData<LoaderData>()
   const { appDetails, apps, PASSPORT_URL } = useOutletContext<{
@@ -123,8 +317,6 @@ export default () => {
   const groupInfoFetcher = useFetcher<GroupAppTransferInfo>()
 
   useEffect(() => {
-    setNeedsEntitlement(false)
-    setNeedsGroupBilling(false)
     setSelectedEmailURN(undefined)
 
     if (!selectedGroup) {
@@ -170,8 +362,6 @@ export default () => {
           0
         ) {
           setNeedsEntitlement(true)
-        } else {
-          setNeedsEntitlement(false)
         }
       }
     }
