@@ -7,7 +7,6 @@ import {
   useOutletContext,
   useSubmit,
 } from '@remix-run/react'
-import Breadcrumbs from '@proofzero/design-system/src/atoms/breadcrumbs/Breadcrumbs'
 import { Text } from '@proofzero/design-system'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { Button } from '@proofzero/design-system/src/atoms/buttons/Button'
@@ -44,7 +43,6 @@ import {
 import classNames from 'classnames'
 import _ from 'lodash'
 import { ServicePlanType } from '@proofzero/types/billing'
-import { GetEntitlementsOutput } from '@proofzero/platform.billing/src/jsonrpc/methods/getEntitlements'
 import {
   StripeInvoice,
   createOrUpdateSubscription,
@@ -52,10 +50,7 @@ import {
 } from '~/utils/billing'
 import Stripe from 'stripe'
 import plans from '~/utils/plans'
-import {
-  getEmailDropdownItems,
-  getEmailIcon,
-} from '@proofzero/utils/getNormalisedConnectedAccounts'
+import { getEmailIcon } from '@proofzero/utils/getNormalisedConnectedAccounts'
 import {
   Dropdown,
   DropdownSelectListItem,
