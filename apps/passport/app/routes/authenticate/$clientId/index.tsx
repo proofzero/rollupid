@@ -36,6 +36,7 @@ import {
   obfuscateAlias,
 } from '@proofzero/utils'
 import _ from 'lodash'
+import { isConnectRollupAction } from '~/utils/actions'
 
 const LazyAuth = lazy(() =>
   import('../../../web3/lazyAuth').then((module) => ({
@@ -190,7 +191,8 @@ const InnerComponent = ({
     history.replaceState(null, '', url.toString())
   }, [])
 
-  const generic = Boolean(rollup_action) && !rollup_action?.startsWith('group_')
+  const generic =
+    Boolean(rollup_action) && isConnectRollupAction(rollup_action!)
 
   return (
     <Authentication
@@ -214,8 +216,9 @@ const InnerComponent = ({
                     type="span"
                     weight="bold"
                     className="text-orange-600"
-                  >{`${_.upperFirst(invitationData.accountType)} Account: ${invitationData.identifier
-                    }`}</Text>
+                  >{`${_.upperFirst(invitationData.accountType)} Account: ${
+                    invitationData.identifier
+                  }`}</Text>
                 </Text>
               )}
             </>
@@ -238,8 +241,8 @@ const InnerComponent = ({
                     {appProps?.appTheme?.heading
                       ? appProps.appTheme.heading
                       : appProps?.name
-                        ? `Login to ${appProps?.name}`
-                        : AuthenticationScreenDefaults.defaultHeading}
+                      ? `Login to ${appProps?.name}`
+                      : AuthenticationScreenDefaults.defaultHeading}
                   </h1>
                   <h2
                     style={{ color: '#6B7280' }}
@@ -271,8 +274,9 @@ const InnerComponent = ({
                   type="span"
                   weight="bold"
                   className="text-orange-600 truncate"
-                >{`${_.upperFirst(invitationData.accountType)} Account: ${invitationData.identifier
-                  }`}</Text>
+                >{`${_.upperFirst(invitationData.accountType)} Account: ${
+                  invitationData.identifier
+                }`}</Text>
               </Text>
             </>
           )}

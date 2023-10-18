@@ -14,7 +14,6 @@ import {
   destroyAuthzCookieParamsSession,
   getAuthzCookieParams,
   getValidatedSessionContext,
-  isSupportedRollupAction,
 } from '~/session.server'
 import { validatePersonaData } from '@proofzero/security/persona'
 
@@ -46,6 +45,11 @@ import { Helmet } from 'react-helmet'
 import { getRGBColor, getTextColor } from '@proofzero/design-system/src/helpers'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
+import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
+import {
+  getSupportedRollupActions,
+  isSupportedRollupAction,
+} from '~/utils/actions'
 
 export type UserProfile = {
   displayName: string
@@ -66,6 +70,7 @@ export type LoaderData = {
   dataForScopes: DataForScopes
   profile: GetProfileOutputParams
   prompt?: string
+  previewMode: boolean
 }
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
@@ -99,8 +104,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     if (rollup_action && !isSupportedRollupAction(rollup_action))
       throw new BadRequestError({
-        message:
-          'only Rollup action supported are connect, create, and reconnect ',
+        message: `only Rollup actions supported are: ${getSupportedRollupActions().join(
+          ', '
+        )}`,
       })
 
     const lastCP = await getAuthzCookieParams(request, context.env)
@@ -182,6 +188,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       coreClient.starbase.getScopes.query(),
       coreClient.starbase.getAppPublicProps.query({
         clientId: clientId as string,
+        previewMode: lastCP?.rollup_action === 'preview',
       }),
     ])
 
@@ -211,7 +218,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     //If requested scope values are a subset of allowed scope values
     if (
-      !scope.every((scopeValue) => appPublicProps.scopes.includes(scopeValue))
+      !scope.every((scopeValue) =>
+        (appPublicProps.scopes ?? []).includes(scopeValue)
+      )
     )
       throw new BadRequestError({
         message:
@@ -287,6 +296,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         dataForScopes,
         profile,
         prompt,
+        previewMode: lastCP?.rollup_action === 'preview',
       },
       {
         headers,
@@ -397,6 +407,7 @@ export default function Authorize() {
     redirectUri,
     profile,
     prompt,
+    previewMode,
   } = useLoaderData<LoaderData>()
 
   const userProfile = profile as UserProfile
@@ -460,6 +471,12 @@ export default function Authorize() {
   useConnectResult()
 
   const cancelCallback = () => {
+    if (previewMode) {
+      window.close()
+
+      return
+    }
+
     const redirectURL = new URL(redirectUri)
     redirectURL.search = `?error=access_denied&state=${state}`
 
@@ -472,6 +489,16 @@ export default function Authorize() {
   }
 
   const authorizeCallback = async (scopes: string[]) => {
+    if (previewMode) {
+      toast(
+        ToastType.Warning,
+        { message: 'This step cannot be completed in Preview Mode' },
+        { duration: 2000 }
+      )
+
+      return
+    }
+
     const form = new FormData()
     form.append('scopes', scopes.join(' '))
     form.append('state', state)

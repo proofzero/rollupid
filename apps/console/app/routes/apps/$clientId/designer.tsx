@@ -93,13 +93,13 @@ import danger from '~/images/danger.svg'
 import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 import classNames from 'classnames'
 import { ServicePlanType } from '@proofzero/types/billing'
-import { planGuardWithToastException } from '~/utils/planGate'
 import designerSVG from '~/assets/early/designer.webp'
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { GetOgThemeResult } from '@proofzero/platform.starbase/src/jsonrpc/methods/getOgTheme'
 
 const LazyAuth = lazy(() =>
+  // @ts-ignore :(
   import('../../../web3/lazyAuth').then((module) => ({
     default: module.LazyAuth,
   }))
@@ -323,6 +323,8 @@ const AuthPanel = ({
   appTheme,
   avatarURL,
   appIconURL,
+  authorizationURL,
+  appPublished,
   setLoading,
   errors,
 }: {
@@ -330,6 +332,8 @@ const AuthPanel = ({
   appTheme?: AppTheme
   avatarURL: string
   appIconURL?: string
+  authorizationURL: string
+  appPublished: boolean
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
   errors?: {
     [key: string]: string
@@ -400,6 +404,13 @@ const AuthPanel = ({
         enabled: true,
       }))
     )
+  }
+
+  const previewAuth = () => {
+    const authURL = new URL(authorizationURL)
+    authURL.searchParams.set('rollup_action', 'preview')
+
+    window.open(authURL.toString(), '_blank')
   }
 
   return (
@@ -667,21 +678,6 @@ const AuthPanel = ({
 
           <div className="w-full border-b border-gray-200"></div>
 
-          <FormElement label="Default Style Settings">
-            <button
-              type="button"
-              onClick={() => {
-                resetToDefaults()
-              }}
-            >
-              <Text size="sm" weight="normal" className="text-indigo-600">
-                Reset to default
-              </Text>
-            </button>
-          </FormElement>
-
-          <div className="w-full border-b border-gray-200"></div>
-
           <FormElement label="Login Provider Configuration">
             <input
               type="hidden"
@@ -700,6 +696,55 @@ const AuthPanel = ({
                 Configure
               </Text>
             </Button>
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement
+            label="Live Preview Mode"
+            sublabel={
+              appPublished ? undefined : `Application has to be published`
+            }
+          >
+            <button
+              className="flex flex-row items-center gap-2"
+              type="button"
+              onClick={previewAuth}
+              disabled={!appPublished}
+            >
+              <Text
+                size="sm"
+                weight="normal"
+                className={classNames(
+                  { 'text-indigo-600': appPublished },
+                  { 'text-gray-300': !appPublished }
+                )}
+              >
+                Open in new tab
+              </Text>
+
+              <HiOutlineExternalLink
+                className={classNames(
+                  { 'text-indigo-600': appPublished },
+                  { 'text-gray-300': !appPublished }
+                )}
+              />
+            </button>
+          </FormElement>
+
+          <div className="w-full border-b border-gray-200"></div>
+
+          <FormElement label="Default Style Settings">
+            <button
+              type="button"
+              onClick={() => {
+                resetToDefaults()
+              }}
+            >
+              <Text size="sm" weight="normal" className="text-indigo-600">
+                Reset to default
+              </Text>
+            </button>
           </FormElement>
 
           <div className="w-full border-b border-gray-200"></div>
@@ -1478,17 +1523,6 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...traceHeader,
     })
 
-    const appDetails = await coreClient.starbase.getAppDetails.query({
-      clientId,
-    })
-
-    await planGuardWithToastException(
-      appDetails.appPlan,
-      ServicePlanType.PRO,
-      request,
-      context.env
-    )
-
     let errors: {
       [key: string]: string
     } = {}
@@ -1676,13 +1710,23 @@ export default () => {
     }[]
   }>()
 
-  const { appDetails, appContactAddress, appContactEmail, identityURN } =
-    useOutletContext<{
-      appDetails: appDetailsProps
-      appContactAddress?: AccountURN
-      appContactEmail?: string
-      identityURN: IdentityURN
-    }>()
+  const {
+    appDetails,
+    appContactAddress,
+    appContactEmail,
+    identityURN,
+    avatarUrl,
+    notificationHandler,
+    authorizationURL,
+  } = useOutletContext<{
+    appDetails: appDetailsProps
+    appContactAddress?: AccountURN
+    appContactEmail?: string
+    identityURN: IdentityURN
+    avatarUrl: string
+    notificationHandler: notificationHandlerType
+    authorizationURL: string
+  }>()
 
   const actionData = useActionData()
   const errors = actionData?.errors
@@ -1693,14 +1737,10 @@ export default () => {
     }
   }, [errors])
 
-  const { avatarUrl, notificationHandler } = useOutletContext<{
-    avatarUrl: string
-    notificationHandler: notificationHandlerType
-  }>()
-
   const [loading, setLoading] = useState<boolean>(false)
+  const [previewState, setPreviewState] = useState<boolean>(false)
 
-  if (appDetails.appPlan === ServicePlanType.FREE) {
+  if (appDetails.appPlan === ServicePlanType.FREE && !previewState) {
     return (
       <EarlyAccessPanel
         clientID={appDetails.clientId as string}
@@ -1714,6 +1754,10 @@ export default () => {
         currentPlan={appDetails.appPlan}
         featurePlan={ServicePlanType.PRO}
         identityURN={identityURN}
+        showPreviewButton={true}
+        handlePreviewButtonClick={() => {
+          setPreviewState(true)
+        }}
       />
     )
   }
@@ -1791,6 +1835,8 @@ export default () => {
               appTheme={appTheme}
               avatarURL={avatarUrl}
               appIconURL={appDetails.app.icon}
+              authorizationURL={authorizationURL}
+              appPublished={appDetails.published ?? false}
               setLoading={setLoading}
               errors={errors}
             />

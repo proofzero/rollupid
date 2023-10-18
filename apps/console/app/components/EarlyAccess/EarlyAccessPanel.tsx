@@ -23,6 +23,8 @@ type EarlyAccessPanelProps = {
   featurePlan?: ServicePlanType
   identityURN: IdentityURN
   earlyAccess: boolean
+  showPreviewButton?: boolean
+  handlePreviewButtonClick?: () => void
 }
 
 const EarlyAccessPanel = ({
@@ -37,6 +39,8 @@ const EarlyAccessPanel = ({
   featurePlan,
   identityURN,
   earlyAccess,
+  showPreviewButton = false,
+  handlePreviewButtonClick,
 }: EarlyAccessPanelProps) => {
   return (
     <>
@@ -72,13 +76,22 @@ const EarlyAccessPanel = ({
           </Text>
           <div className="w-full border-t border-gray-200 mt-8 mb-4" />
 
-          {featurePlan && isPlanGuarded(currentPlan, featurePlan) && (
-            <NavLink to={`/apps/${clientID}/billing`}>
-              <Button btnType="primary-alt" className="mb-4">
-                Upgrade Plan
+          <div className="flex flex-row gap-4 items-center mb-4">
+            {featurePlan && isPlanGuarded(currentPlan, featurePlan) && (
+              <NavLink to={`/apps/${clientID}/billing`}>
+                <Button btnType="primary-alt">Upgrade Plan</Button>
+              </NavLink>
+            )}
+
+            {showPreviewButton && (
+              <Button
+                btnType="secondary-alt"
+                onClick={handlePreviewButtonClick}
+              >
+                Preview
               </Button>
-            </NavLink>
-          )}
+            )}
+          </div>
 
           <ContactUs
             urn={identityURN}
