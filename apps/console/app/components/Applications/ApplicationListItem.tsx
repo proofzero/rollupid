@@ -28,7 +28,7 @@ export const ApplicationListItemIcon = ({
   title,
   iconUrl,
 }: ApplicationListItemIconProps) => (
-  <div className="rounded-l w-16 h-14 flex justify-center items-center bg-gray-200 overflow-hidden">
+  <div className="rounded-l w-16 h-16 flex justify-center items-center bg-gray-200 overflow-hidden">
     {!iconUrl && (
       <Text className="text-gray-500">{title?.substring(0, 1)}</Text>
     )}
