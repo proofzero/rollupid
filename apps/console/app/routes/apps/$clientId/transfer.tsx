@@ -56,10 +56,12 @@ import {
   DropdownSelectListItem,
 } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import { redirectToPassport } from '~/utils'
-import { HiOutlineMail } from 'react-icons/hi'
+import { HiOutlineMail, HiOutlineX } from 'react-icons/hi'
 import { AccountURN } from '@proofzero/urns/account'
 import { appDetailsProps } from '~/types'
 import { GroupAppTransferInfo } from '~/routes/api/group-app-transfer-info'
+import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
+import dangerVector from '~/images/danger.svg'
 
 type GroupModel = {
   name: string
@@ -173,6 +175,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
         const invoiceStatus = (sub.latest_invoice as Stripe.Invoice)?.status
 
+        let toastSession = await getFlashSession(request, context.env)
+
         if (
           (sub.status === 'active' || sub.status === 'trialing') &&
           invoiceStatus === 'paid'
@@ -183,9 +187,22 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             quantity: quantity,
             type: appDetails.appPlan,
           })
-        } else {
-          let toastSession = await getFlashSession(request, context.env)
 
+          toastSession = await appendToastToFlashSession(
+            request,
+            {
+              message: `Entitlement successfully purchased`,
+              type: ToastType.Success,
+            },
+            context.env
+          )
+
+          return new Response(null, {
+            headers: {
+              'Set-Cookie': await commitFlashSession(toastSession, context.env),
+            },
+          })
+        } else {
           if (
             (sub.latest_invoice as unknown as StripeInvoice)?.payment_intent
               ?.status === 'requires_action'
@@ -291,6 +308,99 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   }
 )
 
+const TransferAppModal = ({
+  isOpen,
+  handleClose,
+  appClientID,
+  appName,
+  groupURN,
+  emailURN,
+}: {
+  isOpen: boolean
+  handleClose: () => void
+  appClientID: string
+  appName: string
+  groupURN: IdentityGroupURN
+  emailURN: AccountURN | undefined
+}) => {
+  const [name, setName] = useState('')
+
+  const clearStateAndHandleClose = () => {
+    setName('')
+    handleClose()
+  }
+
+  return (
+    <Modal isOpen={isOpen} handleClose={() => clearStateAndHandleClose()}>
+      <div
+        className={`w-fit rounded-lg bg-white p-4
+         text-left  transition-all sm:p-5 overflow-y-auto flex items-start space-x-4`}
+      >
+        <img src={dangerVector} alt="danger" />
+
+        <Form
+          method="post"
+          action={`/apps/${appClientID}/transfer`}
+          className="flex-1"
+          onSubmit={() => clearStateAndHandleClose()}
+        >
+          <div className="flex flex-row items-center justify-between w-full mb-2">
+            <Text size="lg" weight="medium" className="text-gray-900">
+              Transfer Application
+            </Text>
+            <button
+              type="button"
+              className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+              onClick={() => {
+                handleClose()
+              }}
+              tabIndex={-1}
+            >
+              <HiOutlineX />
+            </button>
+          </div>
+
+          <section className="mb-4">
+            <Text size="sm" weight="normal" className="text-gray-500 my-3">
+              Are you sure you want to transfer <b>{appName}</b>?
+            </Text>
+            <Text size="sm" weight="normal" className="text-gray-500 my-3">
+              Confirm you want to transfer this application by typing its name
+              below.
+            </Text>
+            <Input
+              id="app_name"
+              label="Application Name"
+              placeholder={appName}
+              required
+              className="mb-12"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoFocus
+            />
+            <input type="hidden" value={groupURN} name="identityGroup[URN]" />
+            {emailURN && (
+              <input type="hidden" value={emailURN} name="emailURN" />
+            )}
+          </section>
+
+          <div className="flex justify-end items-center space-x-3">
+            <Button btnType="secondary-alt">Cancel</Button>
+            <Button
+              type="submit"
+              btnType="dangerous"
+              disabled={appName !== name}
+            >
+              Transfer
+            </Button>
+          </div>
+        </Form>
+      </div>
+    </Modal>
+  )
+}
+
 export default () => {
   const { identityGroups, STRIPE_PUBLISHABLE_KEY } = useLoaderData<LoaderData>()
   const { appDetails, apps, PASSPORT_URL } = useOutletContext<{
@@ -378,8 +488,20 @@ export default () => {
     }
   }, [actionData])
 
+  const [showTransferModal, setShowTransferModal] = useState(false)
+
   return (
     <>
+      {groupInfoFetcher.data && selectedGroup && appDetails.clientId && (
+        <TransferAppModal
+          appClientID={appDetails.clientId}
+          appName={appDetails.app.name}
+          groupURN={selectedGroup.URN}
+          emailURN={selectedEmailURN}
+          isOpen={showTransferModal}
+          handleClose={() => setShowTransferModal(false)}
+        />
+      )}
       <section className="mb-[87px]">
         <Text size="2xl" weight="semibold">
           Transfer Application
@@ -452,13 +574,15 @@ export default () => {
             onChange={setSelectedGroup}
             name="identityGroup"
             disabled={
-              identityGroups.length === 0 || groupInfoFetcher.state !== 'idle'
+              identityGroups.filter((ig) => ig.URN !== appDetails.ownerURN)
+                .length === 0 || groupInfoFetcher.state !== 'idle'
             }
           >
             {({ open }) => (
               <div className="flex flex-col col-span-2 z-10">
                 <Listbox.Button className="relative border rounded-lg py-2 px-3 flex flex-row justify-between items-center flex-1 focus-visible:outline-none focus:border-indigo-500 bg-white disabled:bg-gray-100 px-2 border-gray-300">
-                  {identityGroups.length > 0 && (
+                  {identityGroups.filter((ig) => ig.URN !== appDetails.ownerURN)
+                    .length > 0 && (
                     <>
                       {selectedGroup && (
                         <div className="flex flex-row items-center gap-2">
@@ -490,7 +614,8 @@ export default () => {
                     </>
                   )}
 
-                  {identityGroups.length === 0 && (
+                  {identityGroups.filter((ig) => ig.URN !== appDetails.ownerURN)
+                    .length === 0 && (
                     <Text size="sm" weight="normal" className="text-gray-500">
                       No Groups Available
                     </Text>
@@ -652,23 +777,47 @@ export default () => {
             </div>
           )}
 
-          <Button
-            btnType="primary-alt"
-            type="submit"
-            className="w-full"
-            disabled={
-              identityGroups.length === 0 ||
-              needsGroupBilling ||
-              !selectedGroup ||
-              (appDetails.published && !selectedEmailURN) ||
-              groupInfoFetcher.state !== 'idle'
-            }
-          >
-            {!needsEntitlement && `Transfer Application`}
-            {needsEntitlement && `Purchase Entitlement & Complete Transfer`}
-          </Button>
+          {!needsEntitlement && (
+            <Button
+              btnType="primary-alt"
+              type="button"
+              className="w-full"
+              disabled={
+                identityGroups.filter((ig) => ig.URN !== appDetails.ownerURN)
+                  .length === 0 ||
+                needsGroupBilling ||
+                !selectedGroup ||
+                (appDetails.published && !selectedEmailURN) ||
+                groupInfoFetcher.state !== 'idle'
+              }
+              onClick={() => {
+                setShowTransferModal(true)
+              }}
+            >
+              Transfer Application
+            </Button>
+          )}
 
-          {identityGroups.length === 0 && (
+          {needsEntitlement && (
+            <Button
+              btnType="primary-alt"
+              type="submit"
+              className="w-full"
+              disabled={
+                identityGroups.filter((ig) => ig.URN !== appDetails.ownerURN)
+                  .length === 0 ||
+                needsGroupBilling ||
+                !selectedGroup ||
+                (appDetails.published && !selectedEmailURN) ||
+                groupInfoFetcher.state !== 'idle'
+              }
+            >
+              Purchase Entitlement
+            </Button>
+          )}
+
+          {identityGroups.filter((ig) => ig.URN !== appDetails.ownerURN)
+            .length === 0 && (
             <article className="p-4 bg-orange-50 rounded-lg">
               <section className="mb-3 flex flex-row items-center gap-2">
                 <svg
