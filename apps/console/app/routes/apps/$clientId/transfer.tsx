@@ -6,6 +6,7 @@ import {
   useLoaderData,
   useOutletContext,
   useSubmit,
+  useTransition,
 } from '@remix-run/react'
 import { Text } from '@proofzero/design-system'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
@@ -197,11 +198,19 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             context.env
           )
 
-          return new Response(null, {
-            headers: {
-              'Set-Cookie': await commitFlashSession(toastSession, context.env),
+          return json(
+            {
+              paymentSuccesful: true,
             },
-          })
+            {
+              headers: {
+                'Set-Cookie': await commitFlashSession(
+                  toastSession,
+                  context.env
+                ),
+              },
+            }
+          )
         } else {
           if (
             (sub.latest_invoice as unknown as StripeInvoice)?.payment_intent
@@ -420,6 +429,7 @@ export default () => {
   const submit = useSubmit()
 
   const groupInfoFetcher = useFetcher<GroupAppTransferInfo>()
+  const transition = useTransition()
 
   useEffect(() => {
     setSelectedEmailURN(undefined)
@@ -474,17 +484,22 @@ export default () => {
 
   useEffect(() => {
     if (actionData && selectedGroup) {
-      const { status, client_secret, payment_method, subId } = actionData
-      process3DSecureCard({
-        submit,
-        subId,
-        STRIPE_PUBLISHABLE_KEY,
-        status,
-        client_secret,
-        payment_method,
-        redirectUrl: `/apps/${appDetails.clientId}/transfer/`,
-        URN: selectedGroup.URN,
-      })
+      if (actionData.paymentSuccesful) {
+        setNeedsGroupBilling(false)
+        setNeedsEntitlement(false)
+      } else {
+        const { status, client_secret, payment_method, subId } = actionData
+        process3DSecureCard({
+          submit,
+          subId,
+          STRIPE_PUBLISHABLE_KEY,
+          status,
+          client_secret,
+          payment_method,
+          redirectUrl: `/apps/${appDetails.clientId}/transfer/`,
+          URN: selectedGroup.URN,
+        })
+      }
     }
   }, [actionData])
 
@@ -789,7 +804,8 @@ export default () => {
                 needsGroupBilling ||
                 !selectedGroup ||
                 (appDetails.published && !selectedEmailURN) ||
-                groupInfoFetcher.state !== 'idle'
+                groupInfoFetcher.state !== 'idle' ||
+                transition.state !== 'idle'
               }
               onClick={() => {
                 setShowTransferModal(true)
@@ -809,7 +825,8 @@ export default () => {
                 needsGroupBilling ||
                 !selectedGroup ||
                 (appDetails.published && !selectedEmailURN) ||
-                groupInfoFetcher.state !== 'idle'
+                groupInfoFetcher.state !== 'idle' ||
+                transition.state !== 'idle'
               }
             >
               Purchase Entitlement
