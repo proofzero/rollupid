@@ -198,19 +198,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             context.env
           )
 
-          return json(
-            {
-              paymentSuccesful: true,
+          return new Response(null, {
+            headers: {
+              'Set-Cookie': await commitFlashSession(toastSession, context.env),
             },
-            {
-              headers: {
-                'Set-Cookie': await commitFlashSession(
-                  toastSession,
-                  context.env
-                ),
-              },
-            }
-          )
+          })
         } else {
           if (
             (sub.latest_invoice as unknown as StripeInvoice)?.payment_intent
@@ -450,6 +442,25 @@ export default () => {
   }, [selectedGroup])
 
   useEffect(() => {
+    setNeedsEntitlement(false)
+    setNeedsGroupBilling(false)
+
+    if (!selectedGroup) {
+      return
+    }
+
+    groupInfoFetcher.submit(
+      {
+        URN: selectedGroup.URN,
+      },
+      {
+        method: 'post',
+        action: `/api/group-app-transfer-info`,
+      }
+    )
+  }, [transition])
+
+  useEffect(() => {
     if (!selectedGroup) {
       setNeedsEntitlement(false)
       setNeedsGroupBilling(false)
@@ -484,22 +495,17 @@ export default () => {
 
   useEffect(() => {
     if (actionData && selectedGroup) {
-      if (actionData.paymentSuccesful) {
-        setNeedsGroupBilling(false)
-        setNeedsEntitlement(false)
-      } else {
-        const { status, client_secret, payment_method, subId } = actionData
-        process3DSecureCard({
-          submit,
-          subId,
-          STRIPE_PUBLISHABLE_KEY,
-          status,
-          client_secret,
-          payment_method,
-          redirectUrl: `/apps/${appDetails.clientId}/transfer/`,
-          URN: selectedGroup.URN,
-        })
-      }
+      const { status, client_secret, payment_method, subId } = actionData
+      process3DSecureCard({
+        submit,
+        subId,
+        STRIPE_PUBLISHABLE_KEY,
+        status,
+        client_secret,
+        payment_method,
+        redirectUrl: `/apps/${appDetails.clientId}/transfer/`,
+        URN: selectedGroup.URN,
+      })
     }
   }, [actionData])
 
@@ -594,7 +600,8 @@ export default () => {
             name="identityGroup"
             disabled={
               availableIdentityGroups.length === 0 ||
-              groupInfoFetcher.state !== 'idle'
+              groupInfoFetcher.state !== 'idle' ||
+              transition.state !== 'idle'
             }
           >
             {({ open }) => (
@@ -787,7 +794,10 @@ export default () => {
                           setSelectedEmailURN(selected.value as AccountURN)
                         }
                       }}
-                      disabled={groupInfoFetcher.state !== 'idle'}
+                      disabled={
+                        groupInfoFetcher.state !== 'idle' ||
+                        transition.state !== 'idle'
+                      }
                     />
                   </>
                 )}
