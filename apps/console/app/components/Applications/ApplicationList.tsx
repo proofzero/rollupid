@@ -16,12 +16,14 @@ type ApplicationListProps = {
   applications: ApplicationListItemProps[]
   onCreate: () => void
   navigate: (clientId: string) => void
+  transfer: (clientId: string) => void
 }
 
 export const ApplicationList = ({
   applications,
   onCreate,
   navigate,
+  transfer,
 }: ApplicationListProps) => {
   const [actionApp, setActionApp] = useState<
     | {
@@ -91,6 +93,7 @@ export const ApplicationList = ({
             <ApplicationListItem
               key={ali.id}
               navigate={navigate}
+              transfer={transfer}
               {...ali}
               onDeleteApplication={(clientId, appName, hasCustomDomain) => {
                 setActionApp({
@@ -122,6 +125,7 @@ export const ApplicationList = ({
               <ApplicationListItem
                 key={ali.id}
                 navigate={navigate}
+                transfer={transfer}
                 {...ali}
                 onDeleteApplication={(clientId, appName, hasCustomDomain) => {
                   setActionApp({

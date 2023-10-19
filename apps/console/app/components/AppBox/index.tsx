@@ -27,6 +27,7 @@ type AppBoxProps = {
   createLink: string
   onCreate: () => void
   navigate: (clientId: string) => void
+  transfer: (clientId: string) => void
 }
 
 export default function AppBox(props: AppBoxProps) {
@@ -50,6 +51,7 @@ export default function AppBox(props: AppBoxProps) {
         applications={mappedApps}
         onCreate={props.onCreate}
         navigate={props.navigate}
+        transfer={props.transfer}
       />
     </div>
   )
