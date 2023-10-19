@@ -482,13 +482,17 @@ export default () => {
         status,
         client_secret,
         payment_method,
-        redirectUrl: `/app/${appDetails.clientId}/transfer/`,
+        redirectUrl: `/apps/${appDetails.clientId}/transfer/`,
         URN: selectedGroup.URN,
       })
     }
   }, [actionData])
 
   const [showTransferModal, setShowTransferModal] = useState(false)
+
+  const availableIdentityGroups = identityGroups.filter(
+    (ig) => ig.URN !== appDetails.ownerURN
+  )
 
   return (
     <>
@@ -574,15 +578,14 @@ export default () => {
             onChange={setSelectedGroup}
             name="identityGroup"
             disabled={
-              identityGroups.filter((ig) => ig.URN !== appDetails.ownerURN)
-                .length === 0 || groupInfoFetcher.state !== 'idle'
+              availableIdentityGroups.length === 0 ||
+              groupInfoFetcher.state !== 'idle'
             }
           >
             {({ open }) => (
               <div className="flex flex-col col-span-2 z-10">
                 <Listbox.Button className="relative border rounded-lg py-2 px-3 flex flex-row justify-between items-center flex-1 focus-visible:outline-none focus:border-indigo-500 bg-white disabled:bg-gray-100 px-2 border-gray-300">
-                  {identityGroups.filter((ig) => ig.URN !== appDetails.ownerURN)
-                    .length > 0 && (
+                  {availableIdentityGroups.length > 0 && (
                     <>
                       {selectedGroup && (
                         <div className="flex flex-row items-center gap-2">
@@ -614,8 +617,7 @@ export default () => {
                     </>
                   )}
 
-                  {identityGroups.filter((ig) => ig.URN !== appDetails.ownerURN)
-                    .length === 0 && (
+                  {availableIdentityGroups.length === 0 && (
                     <Text size="sm" weight="normal" className="text-gray-500">
                       No Groups Available
                     </Text>
@@ -783,8 +785,7 @@ export default () => {
               type="button"
               className="w-full"
               disabled={
-                identityGroups.filter((ig) => ig.URN !== appDetails.ownerURN)
-                  .length === 0 ||
+                availableIdentityGroups.length === 0 ||
                 needsGroupBilling ||
                 !selectedGroup ||
                 (appDetails.published && !selectedEmailURN) ||
@@ -804,8 +805,7 @@ export default () => {
               type="submit"
               className="w-full"
               disabled={
-                identityGroups.filter((ig) => ig.URN !== appDetails.ownerURN)
-                  .length === 0 ||
+                availableIdentityGroups.length === 0 ||
                 needsGroupBilling ||
                 !selectedGroup ||
                 (appDetails.published && !selectedEmailURN) ||
@@ -816,8 +816,7 @@ export default () => {
             </Button>
           )}
 
-          {identityGroups.filter((ig) => ig.URN !== appDetails.ownerURN)
-            .length === 0 && (
+          {availableIdentityGroups.length === 0 && (
             <article className="p-4 bg-orange-50 rounded-lg">
               <section className="mb-3 flex flex-row items-center gap-2">
                 <svg
