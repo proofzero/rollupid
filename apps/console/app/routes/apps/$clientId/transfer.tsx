@@ -668,6 +668,44 @@ export default () => {
             {needsEntitlement && `Purchase Entitlement & Complete Transfer`}
           </Button>
 
+          {identityGroups.length === 0 && (
+            <article className="p-4 bg-orange-50 rounded-lg">
+              <section className="mb-3 flex flex-row items-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                >
+                  <path
+                    d="M9.9993 7.5V9.16667M9.9993 12.5H10.0076M4.22579 15.8333H15.7728C17.0558 15.8333 17.8577 14.4444 17.2162 13.3333L11.4427 3.33333C10.8012 2.22222 9.19742 2.22222 8.55592 3.33333L2.78242 13.3333C2.14092 14.4444 2.94279 15.8333 4.22579 15.8333Z"
+                    stroke="#FB923C"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+
+                <Text size="sm" className="text-orange-600">
+                  No Group to transfer into
+                </Text>
+              </section>
+
+              <Text size="sm" className="text-gray-700 mb-3">
+                There is no group you can transfer the application into. <br />
+                Please create a new Group using the link bellow if you want to
+                transfer the application.
+              </Text>
+
+              <Link to={`/groups`}>
+                <Text size="sm" className="text-orange-600">
+                  Create new Group →
+                </Text>
+              </Link>
+            </article>
+          )}
+
           {groupInfoFetcher.data && selectedGroup && needsEntitlement && (
             <article className="p-4 bg-gray-100 rounded-lg">
               <section className="flex flex-row items-center gap-2">
@@ -710,7 +748,7 @@ export default () => {
             </article>
           )}
 
-          {selectedGroup && needsGroupBilling && (
+          {groupInfoFetcher.data && selectedGroup && needsGroupBilling && (
             <article className="p-4 bg-orange-50 rounded-lg">
               <section className="mb-3 flex flex-row items-center gap-2">
                 <svg
