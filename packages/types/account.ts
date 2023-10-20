@@ -24,6 +24,7 @@ export enum OAuthAccountType {
 
 export enum EmailAccountType {
   Email = 'email',
+  Mask = 'mask',
 }
 
 export enum WebauthnAccountType {
