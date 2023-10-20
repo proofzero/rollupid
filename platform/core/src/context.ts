@@ -43,6 +43,8 @@ export type DeploymentMetadata = {
 export interface CreateInnerContextOptions
   extends Environment,
     Partial<FetchCreateContextFnOptions & BaseContext> {
+  env: Environment
+
   authorization?: Authorization
   exchangeCode?: ExchangeCode
 
@@ -102,7 +104,7 @@ export async function createContext(
   env: Environment
 ) {
   const { req } = opts
-  const contextInner = await createContextInner({ ...opts, ...env })
+  const contextInner = await createContextInner({ ...opts, ...env, env })
   return {
     ...contextInner,
     req,
