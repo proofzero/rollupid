@@ -10,14 +10,14 @@ export interface Environment {
 }
 
 /** CF EmailMessage type; not provided in CF types lib */
-export interface CloudflareEmailMessage<Body = unknown> {
+export interface CloudflareEmailMessage {
   readonly from: string
   readonly to: string
   readonly headers: Headers
-  readonly raw: ReadableStream
+  readonly raw: ReadableStream<Uint8Array>
   readonly rawSize: number
 
-  setReject(reason: String): void
+  setReject(reason: string): void
   forward(rcptTo: string, headers?: Headers): Promise<void>
 }
 

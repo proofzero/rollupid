@@ -7,7 +7,10 @@ import { serverOnError as onError } from '@proofzero/utils/trpc'
 
 import { createContext, type Context } from './context'
 import router from './router'
+import relay, { type CloudflareEmailMessage } from './relay'
 import type { Environment } from './types'
+
+import type { CloudflareEmailMessage } from '@proofzero/services.email/src/types'
 
 export { Account } from '@proofzero/platform.account'
 export { Identity, IdentityGroup } from '@proofzero/platform.identity'
@@ -35,6 +38,17 @@ export default {
         return createContext(opts, env)
       },
     })
+  },
+  async email(message: CloudflareEmailMessage, env: Environment) {
+    const decoder = new TextDecoder()
+    const reader = message.raw.getReader()
+    let content = ''
+    while (true) {
+      const { done, value } = await reader.read()
+      content += decoder.decode(value)
+      if (done) break
+    }
+    return relay(content, env)
   },
 }
 
