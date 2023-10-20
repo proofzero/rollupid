@@ -6433,7 +6433,7 @@ __metadata:
     prettier: 2.8.0
     typed-json-rpc: 1.1.0
     typescript: 5.0.4
-    zod: 3.20.2
+    zod: 3.22.4
   languageName: unknown
   linkType: soft
 
@@ -6467,7 +6467,7 @@ __metadata:
     prettier: 2.7.1
     remix-auth-google: 1.2.0
     typescript: 5.0.4
-    zod: 3.20.2
+    zod: 3.22.4
   languageName: unknown
   linkType: soft
 
@@ -6500,7 +6500,7 @@ __metadata:
     prettier: 2.7.1
     typescript: 5.0.4
     wrangler: 3.2.0
-    zod: 3.20.2
+    zod: 3.22.4
   languageName: unknown
   linkType: soft
 
@@ -6556,7 +6556,7 @@ __metadata:
     prettier: 2.8.8
     typescript: 5.1.3
     wrangler: 3.2.0
-    zod: 3.21.4
+    zod: 3.22.4
   languageName: unknown
   linkType: soft
 
@@ -6590,7 +6590,7 @@ __metadata:
     typescript: 5.0.4
     urns: 0.6.0
     yarn-run-all: 3.1.1
-    zod: 3.20.2
+    zod: 3.22.4
   languageName: unknown
   linkType: soft
 
@@ -40497,14 +40497,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:3.20.2, zod@npm:^3.20.2":
+"zod@npm:3.22.4":
+  version: 3.22.4
+  resolution: "zod@npm:3.22.4"
+  checksum: 80bfd7f8039b24fddeb0718a2ec7c02aa9856e4838d6aa4864335a047b6b37a3273b191ef335bf0b2002e5c514ef261ffcda5a589fb084a48c336ffc4cdbab7f
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.20.2":
   version: 3.20.2
   resolution: "zod@npm:3.20.2"
   checksum: 04172f7e9350372684ccd298d4716908edc9113751295b6c4e1b3ea84e2af8997e504b33ba36f4741417bb2a5dc90bfd40501f6b0e7389df10e42a63d6d8366c
   languageName: node
   linkType: hard
 
-"zod@npm:3.21.4, zod@npm:^3.20.6":
+"zod@npm:^3.20.6":
   version: 3.21.4
   resolution: "zod@npm:3.21.4"
   checksum: f185ba87342ff16f7a06686767c2b2a7af41110c7edf7c1974095d8db7a73792696bcb4a00853de0d2edeb34a5b2ea6a55871bc864227dace682a0a28de33e1f
