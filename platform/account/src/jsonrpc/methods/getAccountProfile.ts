@@ -103,7 +103,7 @@ async function getProfile(
       case CryptoAccountType.Wallet:
         return new ContractAccount(nodeClient)
       case EmailAccountType.Email:
-        return new EmailAccount(nodeClient, ctx)
+        return new EmailAccount(nodeClient, ctx.env)
       case WebauthnAccountType.WebAuthN:
         return new WebauthnAccount(nodeClient, ctx)
       case OAuthAccountType.Apple:

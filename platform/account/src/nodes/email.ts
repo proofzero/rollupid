@@ -3,6 +3,7 @@ import { DurableObjectStubProxy } from 'do-proxy'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { EmailAccountType, NodeType } from '@proofzero/types/account'
 import generateRandomString from '@proofzero/utils/generateRandomString'
+import type { Environment } from '@proofzero/platform.core'
 
 import { AccountProfile } from '../types'
 
@@ -10,7 +11,6 @@ import { EMAIL_VERIFICATION_OPTIONS } from '../constants'
 
 import { AccountNode } from '.'
 import Account from './account'
-import { Context } from '../context'
 
 type EmailAccountProfile = AccountProfile<EmailAccountType.Email>
 
@@ -28,11 +28,11 @@ const OTP_KEY_NAME = 'otp'
 
 export default class EmailAccount {
   declare node: AccountNode
-  declare ctx: Context
+  declare env: Environment
 
-  constructor(node: AccountNode, ctx: Context) {
+  constructor(node: AccountNode, env: Environment) {
     this.node = node
-    this.ctx = ctx
+    this.env = env
   }
 
   private createCode = async ({
@@ -44,7 +44,7 @@ export default class EmailAccount {
     delayMiliseconds,
   }: VerificationPayload) => {
     if (
-      firstAttemptTimestamp + this.ctx.MAX_ATTEMPTS_TIME_PERIOD_IN_MS <=
+      firstAttemptTimestamp + this.env.MAX_ATTEMPTS_TIME_PERIOD_IN_MS <=
       Date.now()
     ) {
       numberOfAttempts = 1
@@ -68,7 +68,7 @@ export default class EmailAccount {
     delayMiliseconds?: number
   ): Promise<string> {
     if (!delayMiliseconds) {
-      delayMiliseconds = this.ctx.DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS
+      delayMiliseconds = this.env.DELAY_BETWEEN_REGENERATION_ATTEMPTS_IN_MS
     }
 
     const verificationPayload =
@@ -92,28 +92,28 @@ export default class EmailAccount {
       } = verificationPayload
 
       // Extracted common calculations and constants for better readability
-      const isAboveMaxAttempts = numberOfAttempts + 1 > this.ctx.MAX_ATTEMPTS
+      const isAboveMaxAttempts = numberOfAttempts + 1 > this.env.MAX_ATTEMPTS
       const isCooldownPeriodActive =
-        creationTimestamp + this.ctx.REGENERATION_COOLDOWN_PERIOD_IN_MS >
+        creationTimestamp + this.env.REGENERATION_COOLDOWN_PERIOD_IN_MS >
         currentTime
       const isRegenDelayActive =
         creationTimestamp + delayMiliseconds > currentTime
       const isMaxAttemptsReachedWithinTimePeriod =
-        firstAttemptTimestamp + this.ctx.MAX_ATTEMPTS_TIME_PERIOD_IN_MS >
+        firstAttemptTimestamp + this.env.MAX_ATTEMPTS_TIME_PERIOD_IN_MS >
         currentTime
 
       // After limit for 5 attempts is hit, we set a cool down 10 minutes from the last attempt
       if (isAboveMaxAttempts && isCooldownPeriodActive) {
         const timeLeft =
           verificationPayload.creationTimestamp +
-          this.ctx.REGENERATION_COOLDOWN_PERIOD_IN_MS -
+          this.env.REGENERATION_COOLDOWN_PERIOD_IN_MS -
           currentTime
 
         throw new BadRequestError({
           message: `Cannot generate new code for the address. You can only generate  ${
-            this.ctx.MAX_ATTEMPTS
+            this.env.MAX_ATTEMPTS
           } new codes within ${
-            this.ctx.MAX_ATTEMPTS_TIME_PERIOD_IN_MS / 1000 / 60
+            this.env.MAX_ATTEMPTS_TIME_PERIOD_IN_MS / 1000 / 60
           }
           minutes. Try again in ${Math.ceil(timeLeft / 1000 / 60)} minutes`,
         })
@@ -132,15 +132,15 @@ export default class EmailAccount {
       // once the limit of 5 attempts is hit, we set a cool down 10 minutes from the last attempt
       // and we set new alarm
       if (
-        numberOfAttempts + 1 === this.ctx.MAX_ATTEMPTS &&
+        numberOfAttempts + 1 === this.env.MAX_ATTEMPTS &&
         isMaxAttemptsReachedWithinTimePeriod
       ) {
         await this.node.storage.setAlarm(
-          currentTime + this.ctx.REGENERATION_COOLDOWN_PERIOD_IN_MS
+          currentTime + this.env.REGENERATION_COOLDOWN_PERIOD_IN_MS
         )
       } else {
         // If limit wasn't hit, we set this alarm
-        await this.node.storage.setAlarm(currentTime + this.ctx.TTL_IN_MS)
+        await this.node.storage.setAlarm(currentTime + this.env.TTL_IN_MS)
       }
 
       // we increment the number of attempts independently of any conditions
@@ -155,7 +155,7 @@ export default class EmailAccount {
 
       return code
     }
-    await this.node.storage.setAlarm(currentTime + this.ctx.TTL_IN_MS)
+    await this.node.storage.setAlarm(currentTime + this.env.TTL_IN_MS)
 
     await this.createCode({
       state,
@@ -188,7 +188,7 @@ export default class EmailAccount {
     }
 
     if (
-      emailVerification.creationTimestamp + this.ctx.TTL_IN_MS <=
+      emailVerification.creationTimestamp + this.env.TTL_IN_MS <=
       Date.now()
     ) {
       //We anticipate we'll encounter this only if an address has multiple OTP codes in the
