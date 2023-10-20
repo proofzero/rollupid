@@ -29,7 +29,7 @@ export const listApps = async ({
     try {
       const appDO = await getApplicationNodeByClientId(
         clientId,
-        ctx.StarbaseApp
+        ctx.env.StarbaseApp
       )
       const appDetails = await appDO.class.getDetails()
       if (appDetails.app) result.push(appDetails)

@@ -17,6 +17,9 @@ export const setPaymentFailed = async ({
   input: SetPaymentFailedParams
   ctx: Context
 }) => {
-  const ownerNode = initIdentityGroupNodeByName(input.URN, ctx.IdentityGroup)
+  const ownerNode = initIdentityGroupNodeByName(
+    input.URN,
+    ctx.env.IdentityGroup
+  )
   await ownerNode.class.setPaymentFailed(input.failed)
 }

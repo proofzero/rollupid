@@ -29,5 +29,5 @@ interface GetJWKSMethod {
 }
 
 export const getJWKSMethod: GetJWKSMethod = ({ ctx }) => {
-  return getJWKS(ctx)
+  return getJWKS(ctx.env)
 }

@@ -33,7 +33,7 @@ export const deleteApp = async ({
 
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
-    ctx.StarbaseApp
+    ctx.env.StarbaseApp
   )
 
   if (await appDO.storage.get('customDomain'))
@@ -86,7 +86,7 @@ export const deleteApp = async ({
 
   ctx.waitUntil?.(
     createAnalyticsEvent({
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       eventName: 'identity_deleted_app',
       distinctId: ctx.identityURN as IdentityURN,
       properties: {

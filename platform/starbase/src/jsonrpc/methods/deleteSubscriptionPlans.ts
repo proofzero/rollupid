@@ -55,7 +55,7 @@ export const deleteSubscriptionPlans = async ({
 
           const appDO = await getApplicationNodeByClientId(
             clientId,
-            ctx.StarbaseApp
+            ctx.env.StarbaseApp
           )
           appDO.class.deleteAppPlan()
         })

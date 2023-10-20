@@ -35,7 +35,7 @@ export const getCustomDomain: GetCustomDomainMethod = async ({
   ctx,
 }) => {
   const { clientId, refresh } = input
-  const node = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
+  const node = await getApplicationNodeByClientId(clientId, ctx.env.StarbaseApp)
   const stored = await node.storage.get<CustomDomain>('customDomain')
   if (!stored) return
   if (!stored.dns_records) {
@@ -62,10 +62,10 @@ export const getCustomDomain: GetCustomDomainMethod = async ({
 
   if (!refresh) return stored
 
-  const fetcher = getCloudflareFetcher(ctx.TOKEN_CLOUDFLARE_API)
+  const fetcher = getCloudflareFetcher(ctx.env.TOKEN_CLOUDFLARE_API)
   const customDomain = await getCustomHostname(
     fetcher,
-    ctx.INTERNAL_CLOUDFLARE_ZONE_ID,
+    ctx.env.INTERNAL_CLOUDFLARE_ZONE_ID,
     stored.id
   )
   if (stored.ownership_verification)

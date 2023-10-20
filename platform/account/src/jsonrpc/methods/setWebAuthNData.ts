@@ -11,6 +11,6 @@ export const setWebAuthNDataMethod = async ({
   input: z.infer<typeof SetWebAuthNInput>
   ctx: Context
 }): Promise<void> => {
-  const nodeClient = new WebauthnAccount(ctx.account as AccountNode, ctx)
+  const nodeClient = new WebauthnAccount(ctx.account as AccountNode)
   await nodeClient.setData(input)
 }

@@ -1,6 +1,6 @@
 import type { JSONWebKeySet, JWK } from 'jose'
 
-import { Context } from './context'
+import type { Environment } from '@proofzero/platform.core'
 
 type Pair = {
   privateKey: JWK
@@ -9,10 +9,10 @@ type Pair = {
 
 type JWKS = Array<Pair>
 
-export const getPrivateJWK = (context: Context): JWK => {
+export const getPrivateJWK = (env: Environment): JWK => {
   try {
-    const pairs: JWKS = JSON.parse(context.SECRET_JWKS)
-    const currentKid: string = context.SECRET_JWK_CURRENT_KID
+    const pairs: JWKS = JSON.parse(env.SECRET_JWKS)
+    const currentKid: string = env.SECRET_JWK_CURRENT_KID
     for (const pair of pairs) {
       if (pair.privateKey.kid === currentKid) {
         return pair.privateKey
@@ -25,9 +25,9 @@ export const getPrivateJWK = (context: Context): JWK => {
   }
 }
 
-export const getJWKS = (context: Context): JSONWebKeySet => {
+export const getJWKS = (env: Environment): JSONWebKeySet => {
   try {
-    const pairs: JWKS = JSON.parse(context.SECRET_JWKS)
+    const pairs: JWKS = JSON.parse(env.SECRET_JWKS)
 
     const jwks = {
       keys: pairs.map((p) => p.publicKey),

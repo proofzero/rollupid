@@ -43,7 +43,7 @@ export const uploadMethod = async ({
   // - maximum: now + 6 hours
   // NB: Date.now() is the number of milliseconds since the epoch.
   const expiryDate = dateAdd(Date.now(), {
-    seconds: ctx.UPLOAD_WINDOW_SECONDS,
+    seconds: ctx.env.UPLOAD_WINDOW_SECONDS,
   })
   // The API expects the expiry time to be an RFC3339-format value.
   const expiry = dateFormat(expiryDate)
@@ -54,7 +54,7 @@ export const uploadMethod = async ({
   formData.append('metadata', metadata)
   formData.append('expiry', expiry)
   // URL for "Create authenticated direct upload URL V2" endpoint.
-  const url = `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`
+  const url = `https://api.cloudflare.com/client/v4/accounts/${ctx.env.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`
   // Direct uploads allow users to upload images without API keys. A
   // common use case are web apps, client-side applications, or mobile
   // devices where users upload content directly to Cloudflare
@@ -67,7 +67,7 @@ export const uploadMethod = async ({
   const uploadRequest = new Request(url, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${ctx.TOKEN_CLOUDFLARE_API}`,
+      Authorization: `Bearer ${ctx.env.TOKEN_CLOUDFLARE_API}`,
     },
     // NB: do *not* explicitly set the Content-Type header to
     // "multipart/form-data"; this prevents the header from being set

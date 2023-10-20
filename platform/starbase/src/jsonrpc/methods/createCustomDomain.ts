@@ -41,20 +41,20 @@ export const createCustomDomain: CreateCustomDomainMethod = async ({
 
   await groupAdminValidatorByClientID(ctx, clientId)
 
-  const fetcher = getCloudflareFetcher(ctx.TOKEN_CLOUDFLARE_API)
+  const fetcher = getCloudflareFetcher(ctx.env.TOKEN_CLOUDFLARE_API)
 
   try {
     const customHostname = await createCustomHostname(
       fetcher,
       clientId,
-      ctx.INTERNAL_CLOUDFLARE_ZONE_ID,
+      ctx.env.INTERNAL_CLOUDFLARE_ZONE_ID,
       hostname
     )
     const { id: workerRouteId } = await createWorkerRoute(
       fetcher,
-      ctx.INTERNAL_CLOUDFLARE_ZONE_ID,
+      ctx.env.INTERNAL_CLOUDFLARE_ZONE_ID,
       hostname,
-      ctx.INTERNAL_PASSPORT_SERVICE_NAME
+      ctx.env.INTERNAL_PASSPORT_SERVICE_NAME
     )
     const customDomain: CustomDomain = {
       ...customHostname,
@@ -64,7 +64,10 @@ export const createCustomDomain: CreateCustomDomainMethod = async ({
         ctx
       ),
     }
-    const node = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
+    const node = await getApplicationNodeByClientId(
+      clientId,
+      ctx.env.StarbaseApp
+    )
     await node.storage.put({ customDomain, workerRouteId })
     await node.class.setCustomDomainAlarm()
     return customDomain

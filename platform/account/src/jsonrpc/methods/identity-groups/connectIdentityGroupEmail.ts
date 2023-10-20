@@ -82,7 +82,7 @@ export const connectIdentityGroupEmail = async ({
   ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: 'group_email_connected',
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       distinctId: identityGroupURN,
       properties: {
         $groups: { group: identityGroupURN },

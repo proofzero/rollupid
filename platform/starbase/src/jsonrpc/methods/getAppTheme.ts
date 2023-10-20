@@ -17,7 +17,7 @@ export const getAppTheme = async ({
 }): Promise<GetAppThemeResult> => {
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
-    ctx.StarbaseApp
+    ctx.env.StarbaseApp
   )
   return appDO.class.getTheme()
 }

@@ -8,7 +8,6 @@ import { PersonaData } from '@proofzero/types/application'
 import { appRouter } from '../router'
 import { AuthorizationURNSpace } from '@proofzero/urns/authorization'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
-import { SCOPES, scope as scopeSymbol } from '@proofzero/security/scopes'
 
 export const PreAuthorizeMethodInput = z.object({
   identity: IdentityURNInput,
@@ -47,7 +46,10 @@ export const preauthorizeMethod = async ({
 
   const nss = `${IdentityURNSpace.decode(identity)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
-  const authorizationNode = initAuthorizationNodeByName(urn, ctx.Authorization)
+  const authorizationNode = initAuthorizationNodeByName(
+    urn,
+    ctx.env.Authorization
+  )
 
   const existingPersonaData = await authorizationNode.storage.get('personaData')
   const { tokenMap } = await authorizationNode.class.getTokenState()

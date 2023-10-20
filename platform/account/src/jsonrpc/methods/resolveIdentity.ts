@@ -71,7 +71,7 @@ export const resolveIdentityMethod = async ({
 
   ctx.waitUntil?.(
     createAnalyticsEvent({
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       eventName,
       distinctId: resultURN,
       properties: {

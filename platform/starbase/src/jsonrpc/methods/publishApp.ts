@@ -59,7 +59,7 @@ export const publishApp = async ({
 
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
-    ctx.StarbaseApp
+    ctx.env.StarbaseApp
   )
   const appDetails = await appDO.class.getDetails()
   if (appDetails.clientName?.length === 0 || false)
@@ -88,7 +88,7 @@ export const publishApp = async ({
       eventName: input.published
         ? 'identity_published_app'
         : 'identity_unpublished_app',
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       properties: {
         $groups: {
           app: input.clientId,

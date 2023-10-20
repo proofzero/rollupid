@@ -29,7 +29,7 @@ export const setAppTheme = async ({
 
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
-    ctx.StarbaseApp
+    ctx.env.StarbaseApp
   )
   return appDO.class.setTheme(theme)
 }

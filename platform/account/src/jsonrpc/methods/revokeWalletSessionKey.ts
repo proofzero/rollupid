@@ -46,7 +46,7 @@ export const revokeWalletSessionKeyMethod = async ({
 }): Promise<void> => {
   const smartContractWalletNode = initAccountNodeByName(
     ctx.accountURN as AccountURN,
-    ctx.Account
+    ctx.env.Account
   )
 
   await revokeWalletSessionKey({
@@ -66,7 +66,10 @@ export const revokeWalletSessionKeyBatchMethod = async ({
   const resultPromises = []
   for (const smartWalletSessionKey of input.smartWalletSessionKeys) {
     const baseURN = AccountURNSpace.getBaseURN(smartWalletSessionKey.urn)
-    const smartContractWalletNode = initAccountNodeByName(baseURN, ctx.Account)
+    const smartContractWalletNode = initAccountNodeByName(
+      baseURN,
+      ctx.env.Account
+    )
     resultPromises.push(
       revokeWalletSessionKey({
         smartContractWalletNode,

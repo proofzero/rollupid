@@ -63,7 +63,10 @@ async function getPublicPropsForApp(
   clientId: string,
   previewMode?: boolean
 ) {
-  const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
+  const appDO = await getApplicationNodeByClientId(
+    clientId,
+    ctx.env.StarbaseApp
+  )
   const appDetails = await appDO.class.getDetails()
   const { appPlan } = appDetails
 

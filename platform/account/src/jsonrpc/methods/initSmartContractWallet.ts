@@ -47,7 +47,7 @@ export const initSmartContractWalletMethod = async ({
 
   const smartContractWallet = await getZeroDevSigner({
     skipFetchSetup: true,
-    projectId: ctx.SECRET_ZERODEV_PROJECTID,
+    projectId: ctx.env.SECRET_ZERODEV_PROJECTID,
     owner,
   })
 
@@ -60,10 +60,10 @@ export const initSmartContractWalletMethod = async ({
 
   const smartContractWalletNode = initAccountNodeByName(
     baseAccountURN,
-    ctx.Account
+    ctx.env.Account
   )
 
-  const imageClient = createImageClient(ctx.Images, {
+  const imageClient = createImageClient(ctx.env.Images, {
     headers: generateTraceContextHeaders(ctx.traceSpan),
   })
   const gradient = await imageClient.getGradient.mutate({

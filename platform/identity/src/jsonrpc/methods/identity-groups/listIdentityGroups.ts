@@ -60,7 +60,7 @@ export const listIdentityGroups = async ({
       const URN = edge.dst.baseUrn as IdentityGroupURN
       const name = edge.dst.qc.name
 
-      const igNode = initIdentityGroupNodeByName(URN, ctx.IdentityGroup)
+      const igNode = initIdentityGroupNodeByName(URN, ctx.env.IdentityGroup)
       const opRes = await Promise.all([
         igNode.class.getStripePaymentData(),
         igNode.class.getOrderedMembers(),

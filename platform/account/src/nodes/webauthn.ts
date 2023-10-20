@@ -6,14 +6,12 @@ import { WebauthnAccountType } from '@proofzero/types/account'
 import { AccountProfile } from '../types'
 
 import { AccountNode } from '.'
-import { Context } from '../context'
 
 type WebauthnAccountProfile = AccountProfile<WebauthnAccountType.WebAuthN>
 type WebAuthNData = any
 
 export default class WebauthnAccount {
   declare node: AccountNode
-  declare ctx: Context
 
   async getData(): Promise<WebAuthNData | undefined> {
     return this.node.storage.get<WebAuthNData>('data')
@@ -23,9 +21,8 @@ export default class WebauthnAccount {
     return this.node.storage.put('data', data)
   }
 
-  constructor(node: AccountNode, ctx: Context) {
+  constructor(node: AccountNode) {
     this.node = node
-    this.ctx = ctx
   }
 
   async getProfile(): Promise<WebauthnAccountProfile> {

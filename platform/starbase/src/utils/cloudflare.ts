@@ -160,12 +160,12 @@ export const getExpectedCustomDomainDNSRecords = (
     {
       name: customHostname,
       record_type: 'CNAME',
-      expected_value: new URL(ctx.PASSPORT_URL).hostname,
+      expected_value: new URL(ctx.env.PASSPORT_URL).hostname,
     },
     {
       record_type: 'CNAME',
-      name: `${ctx.INTERNAL_DKIM_SELECTOR}._domainkey.${customHostname}`,
-      expected_value: `${ctx.INTERNAL_DKIM_SELECTOR}._domainkey.notifications.rollup.id`,
+      name: `${ctx.env.INTERNAL_DKIM_SELECTOR}._domainkey.${customHostname}`,
+      expected_value: `${ctx.env.INTERNAL_DKIM_SELECTOR}._domainkey.notifications.rollup.id`,
     },
     {
       record_type: 'CNAME',

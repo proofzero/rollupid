@@ -1,5 +1,5 @@
 import { generateTraceSpan } from '@proofzero/platform-middleware/trace'
-import { BaseContext, DeploymentMetadata } from '@proofzero/types'
+import { BaseContext } from '@proofzero/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import type { Environment } from './types'
@@ -10,10 +10,7 @@ import type { Environment } from './types'
  */
 interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
-  Analytics: AnalyticsEngineDataset
-  ServiceDeploymentMetadata: DeploymentMetadata
-  Meta: DurableObjectNamespace
-  Bucket: R2Bucket
+  env: Environment
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
@@ -41,7 +38,7 @@ export async function createContext(
   opts: FetchCreateContextFnOptions,
   env: Environment
 ) {
-  const contextInner = await createContextInner({ ...opts, ...env })
+  const contextInner = await createContextInner({ ...opts, env })
   return {
     req: opts.req,
     resHeaders: opts.resHeaders,

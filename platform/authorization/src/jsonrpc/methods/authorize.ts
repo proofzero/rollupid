@@ -48,7 +48,7 @@ export const authorizeMethod = async ({
 
   // TODO: validate the scopes are legitmate here or when we ask for it back in exchangeToken
 
-  const node = await initExchangeCodeNodeByName(code, ctx.ExchangeCode)
+  const node = initExchangeCodeNodeByName(code, ctx.env.ExchangeCode)
   const result = await node.class.authorize(
     code,
     identity,
@@ -66,7 +66,7 @@ export const authorizeMethod = async ({
       createAnalyticsEvent({
         eventName: 'identity_authorized_app',
         distinctId: identity,
-        apiKey: ctx.POSTHOG_API_KEY,
+        apiKey: ctx.env.POSTHOG_API_KEY,
         properties: {
           scope: scope,
           $groups: { app: clientId },

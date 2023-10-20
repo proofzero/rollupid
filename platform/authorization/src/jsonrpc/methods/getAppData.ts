@@ -39,7 +39,7 @@ export const getAppDataMethod = async ({
 
   const nss = `${IdentityURNSpace.decode(identityURN)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
-  const node = initAuthorizationNodeByName(urn, ctx.Authorization)
+  const node = initAuthorizationNodeByName(urn, ctx.env.Authorization)
 
   const appData =
     (await node.storage.get<AppDataType>('appData')) || ({} as AppDataType)

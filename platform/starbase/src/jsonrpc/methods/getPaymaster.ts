@@ -25,7 +25,7 @@ export const getPaymaster = async ({
 
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
-    ctx.StarbaseApp
+    ctx.env.StarbaseApp
   )
   const paymaster = appDO.class.getPaymaster()
   return paymaster

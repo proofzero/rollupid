@@ -71,7 +71,7 @@ export const getAccountProfileBatchMethod = async ({
   const resultPromises = []
   for (const accountURN of input) {
     const baseURN = AccountURNSpace.getBaseURN(accountURN)
-    const nodeClient = initAccountNodeByName(baseURN, ctx.Account)
+    const nodeClient = initAccountNodeByName(baseURN, ctx.env.Account)
     resultPromises.push(getProfile(ctx, nodeClient, accountURN))
   }
   return await Promise.all(resultPromises)
@@ -103,19 +103,19 @@ async function getProfile(
       case CryptoAccountType.Wallet:
         return new ContractAccount(nodeClient)
       case EmailAccountType.Email:
-        return new EmailAccount(nodeClient, ctx)
+        return new EmailAccount(nodeClient, ctx.env)
       case WebauthnAccountType.WebAuthN:
-        return new WebauthnAccount(nodeClient, ctx)
+        return new WebauthnAccount(nodeClient)
       case OAuthAccountType.Apple:
-        return new AppleAccount(nodeClient, ctx)
+        return new AppleAccount(nodeClient, ctx.env)
       case OAuthAccountType.Discord:
-        return new DiscordAccount(nodeClient, ctx)
+        return new DiscordAccount(nodeClient, ctx.env)
       case OAuthAccountType.GitHub:
         return new GithubAccount(nodeClient)
       case OAuthAccountType.Google:
-        return new GoogleAccount(nodeClient, ctx)
+        return new GoogleAccount(nodeClient, ctx.env)
       case OAuthAccountType.Microsoft:
-        return new MicrosoftAccount(nodeClient, ctx)
+        return new MicrosoftAccount(nodeClient, ctx.hashedIdref!, ctx.env)
       case OAuthAccountType.Twitter:
         return new TwitterAccount(nodeClient)
     }

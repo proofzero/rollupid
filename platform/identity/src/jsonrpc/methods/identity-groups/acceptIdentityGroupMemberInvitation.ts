@@ -27,7 +27,10 @@ export const acceptIdentityGroupMemberInvitation = async ({
 }): Promise<void> => {
   const { identityGroupURN, invitationCode } = input
 
-  const node = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
+  const node = initIdentityGroupNodeByName(
+    identityGroupURN,
+    ctx.env.IdentityGroup
+  )
   if (!node) {
     throw new InternalServerError({
       message: 'Identity group DO not found',
@@ -79,7 +82,7 @@ export const acceptIdentityGroupMemberInvitation = async ({
   ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: 'group_invitation_accepted',
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       distinctId: ctx.identityURN as IdentityURN,
       properties: {
         $groups: { group: identityGroupURN },
