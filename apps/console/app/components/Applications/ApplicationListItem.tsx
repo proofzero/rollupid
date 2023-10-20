@@ -5,6 +5,7 @@ import { ServicePlanType } from '@proofzero/types/billing'
 import { Fragment } from 'react'
 import { HiDotsVertical, HiOutlineCog } from 'react-icons/hi'
 import { HiOutlineTrash } from 'react-icons/hi2'
+import { TbArrowsTransferUp } from 'react-icons/tb'
 
 type ApplicationListItemPublishedStateProps = {
   published?: boolean
@@ -27,7 +28,7 @@ export const ApplicationListItemIcon = ({
   title,
   iconUrl,
 }: ApplicationListItemIconProps) => (
-  <div className="rounded-l w-16 h-14 flex justify-center items-center bg-gray-200 overflow-hidden">
+  <div className="rounded-l w-16 h-16 flex justify-center items-center bg-gray-200 overflow-hidden">
     {!iconUrl && (
       <Text className="text-gray-500">{title?.substring(0, 1)}</Text>
     )}
@@ -47,6 +48,7 @@ export type ApplicationListItemProps = {
   groupID?: string
   groupPaymentFailed?: boolean
   navigate?: (clientId: string) => void
+  transfer?: (clientId: string) => void
   onDeleteApplication?: (
     clientId: string,
     appName: string,
@@ -62,6 +64,7 @@ export const ApplicationListItem = ({
   hasCustomDomain,
   onDeleteApplication,
   navigate,
+  transfer,
   appPlan,
 }: ApplicationListItemProps) => (
   <article className="flex justify-center items-center border border-gray-200 shadow-sm rounded bg-white">
@@ -135,6 +138,26 @@ export const ApplicationListItem = ({
                   <HiOutlineCog className="text-xl font-normal text-gray-400" />
                   <Text size="sm" weight="normal" className="text-gray-700">
                     Settings
+                  </Text>
+                </Menu.Item>
+              </div>
+            </div>
+
+            <div className="p-1 ">
+              <div
+                onClick={() => {
+                  if (transfer) transfer(id)
+                }}
+                className="cursor-pointer"
+              >
+                <Menu.Item
+                  as="div"
+                  className="py-2 px-4 flex items-center space-x-3 cursor-pointer
+                  hover:rounded-[6px] hover:bg-gray-100"
+                >
+                  <TbArrowsTransferUp className="text-xl font-normal text-gray-400" />
+                  <Text size="sm" weight="normal" className="text-gray-700">
+                    Transfer Application
                   </Text>
                 </Menu.Item>
               </div>

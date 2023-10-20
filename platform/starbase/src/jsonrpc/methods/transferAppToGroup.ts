@@ -6,10 +6,15 @@ import {
   AccountURNInput,
   IdentityGroupURNValidator,
 } from '@proofzero/platform-middleware/inputValidators'
-import { BadRequestError } from '@proofzero/errors'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { EDGE_HAS_REFERENCE_TO } from '@proofzero/types/graph'
 import { AccountURNSpace } from '@proofzero/urns/account'
 import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
+import { EDGE_APPLICATION } from '../../types'
+import {
+  IdentityGroupURN,
+  IdentityGroupURNSpace,
+} from '@proofzero/urns/identity-group'
 
 export const TransferAppToGroupInput = z.object({
   clientID: z.string(),
@@ -37,18 +42,35 @@ export const transferAppToGroup = async ({
   }
 
   const appURN = ApplicationURNSpace.componentizedUrn(clientID)
-  if (!ctx.ownAppURNs || !ctx.ownAppURNs.includes(appURN))
+  if (!ctx.allAppURNs || !ctx.allAppURNs.includes(appURN))
     throw new BadRequestError({
       message: `Request received for clientId ${clientID} which is not owned by provided account.`,
     })
 
   const caller = router.createCaller(ctx)
 
+  const { edges: appOwnershipEdges } = await caller.edges.getEdges({
+    query: { dst: { baseUrn: appURN }, tag: EDGE_APPLICATION },
+  })
+  if (appOwnershipEdges.length === 0) {
+    throw new InternalServerError({
+      message: 'App ownership edge not found',
+    })
+  }
+
+  const ownershipURN = appOwnershipEdges[0].src.baseUrn
+  if (IdentityGroupURNSpace.is(ownershipURN)) {
+    await groupAdminValidatorByIdentityGroupURN(
+      ctx,
+      ownershipURN as IdentityGroupURN
+    )
+  }
+
   const { edges } = await caller.edges.getEdges({
     query: {
       dst: { baseUrn: appURN },
       src: {
-        baseUrn: ctx.identityURN,
+        baseUrn: ownershipURN,
       },
     },
   })

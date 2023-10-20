@@ -47,8 +47,6 @@ import {
 } from '@proofzero/design-system/src/atoms/toast'
 import { IdentityURN } from '@proofzero/urns/identity'
 import dangerVector from '~/images/danger.svg'
-import { ApplicationListItemPublishedState } from '~/components/Applications/ApplicationListItem'
-import { ServicePlanType } from '@proofzero/types/billing'
 import { GroupDetailsContextData } from '../$groupID'
 import { PurchaseGroupSeatingModal } from '~/components/Billing/seating'
 import {
@@ -63,6 +61,7 @@ import { IDENTITY_GROUP_OPTIONS } from '@proofzero/platform/identity/src/constan
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
 import { HiOutlineExclamationTriangle } from 'react-icons/hi2'
+import { ApplicationList } from '~/components/Applications/ApplicationList'
 
 const accountTypes = [
   ...Object.values(EmailAccountType),
@@ -729,65 +728,20 @@ export default () => {
             )}
 
             <section className="flex flex-col gap-3">
-              {groupApps.map((app) => (
-                <article className="flex justify-center items-center border border-gray-200 shadow-sm rounded bg-white">
-                  <section>
-                    <div className="rounded-l w-16 h-[3.75rem] flex justify-center items-center bg-gray-200 overflow-hidden">
-                      {!app.icon && (
-                        <Text className="text-gray-500">
-                          {app.name?.substring(0, 1)}
-                        </Text>
-                      )}
-                      {app.icon && (
-                        <img
-                          src={app.icon}
-                          alt="Not Found"
-                          className="object-cover"
-                        />
-                      )}
-                    </div>
-                  </section>
-
-                  <section className="px-4 flex-1">
-                    <div className="flex flex-row space-x-2 items-center">
-                      <Text size="sm" weight="medium" className="text-gray-900">
-                        <div
-                          onClick={() => {
-                            navigate(`/apps/${app.clientId}`)
-                          }}
-                          className="hover:underline cursor-pointer"
-                        >
-                          {app.name}
-                        </div>
-                      </Text>
-                      <ApplicationListItemPublishedState
-                        published={app.published}
-                      />
-                      <Pill className="border rounded-3xl py-none">
-                        <Text size="xs">{group.name}</Text>
-                      </Pill>
-                      {app.appPlan !== ServicePlanType.FREE ? (
-                        <Pill className="border rounded-3xl py-none">
-                          <Text size="xs">{app.appPlan}</Text>
-                        </Pill>
-                      ) : null}
-                    </div>
-
-                    {hydrated && app.createdTimestamp && (
-                      <Text size="xs" weight="normal" className="shrink-0">
-                        {new Date(app.createdTimestamp).toLocaleString(
-                          'default',
-                          {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                          }
-                        )}
-                      </Text>
-                    )}
-                  </section>
-                </article>
-              ))}
+              <ApplicationList
+                applications={groupApps.map((ga) => ({
+                  ...ga,
+                  id: ga.clientId,
+                }))}
+                onCreate={() => {
+                  navigate(`/groups/${groupID}/apps/new`)
+                }}
+                navigate={(clientId: string) => navigate(`/apps/${clientId}`)}
+                transfer={(clientId: string) =>
+                  navigate(`/apps/${clientId}/transfer`)
+                }
+                lite={true}
+              />
             </section>
           </div>
 

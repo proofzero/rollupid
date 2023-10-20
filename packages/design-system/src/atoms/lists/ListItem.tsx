@@ -19,11 +19,11 @@ export const ListItem = ({
   return (
     <div
       key={id}
-      className="border border-gray-300 rounded-md mb-3 shadow-sm truncate"
+      className="border border-gray-300 rounded-md mb-2 shadow-sm truncate"
     >
       <div
         className={classNames(
-          `py-2 bg-white
+          `py-[0.625rem] bg-white
                 flex flex-row items-center justify-between
                 px-4 truncate`,
           {

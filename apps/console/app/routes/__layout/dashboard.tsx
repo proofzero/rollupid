@@ -74,6 +74,9 @@ export default () => {
               navigate('/apps/new')
             }}
             navigate={(clientId: string) => navigate(`/apps/${clientId}`)}
+            transfer={(clientId: string) =>
+              navigate(`/apps/${clientId}/transfer`)
+            }
             apps={apps.map((app) => ({
               ...app,
               groupPaymentFailed: Boolean(

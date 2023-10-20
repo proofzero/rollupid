@@ -109,6 +109,7 @@ export const Dropdown = ({
   selectAllCheckboxTitle,
   selectAllCheckboxDescription,
   DropdownListboxButton = DropdownListboxButtonDefault,
+  disabled = false,
 }: {
   items: Array<DropdownSelectListItem>
   placeholder: string
@@ -132,6 +133,7 @@ export const Dropdown = ({
     selectAllCheckboxTitle,
     open,
   }: DropdownListboxButtonType) => JSX.Element
+  disabled?: boolean
 }) => {
   if (defaultItems?.length && defaultItems?.length > 1 && !multiple) {
     throw new BadRequestError({
@@ -186,6 +188,7 @@ export const Dropdown = ({
         }
       }}
       multiple={multiple}
+      disabled={disabled}
     >
       {({ open }) => (
         <div className="relative select-none">
