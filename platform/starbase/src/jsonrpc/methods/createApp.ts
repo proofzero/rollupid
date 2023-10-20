@@ -40,7 +40,10 @@ export const createApp = async ({
   })
   if (!ctx.identityURN) throw new Error('No identity URN in context')
 
-  const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
+  const appDO = await getApplicationNodeByClientId(
+    clientId,
+    ctx.env.StarbaseApp
+  )
   await appDO.class.init(clientId, input.clientName)
 
   const caller = router.createCaller(ctx)
@@ -85,7 +88,7 @@ export const createApp = async ({
   ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: '$groupidentify',
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       distinctId: ctx.identityURN,
       properties: {
         $groups: { app: clientId },
@@ -104,7 +107,7 @@ export const createApp = async ({
   ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: 'identity_created_app',
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       distinctId: ctx.identityURN,
       properties: {
         $groups: { app: clientId, group: input.identityGroupURN },

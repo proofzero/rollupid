@@ -11,7 +11,7 @@ export const setAccountNodeClient: BaseMiddlewareFunction<Context> = async ({
 
   const node = initAccountNodeByName(
     AccountURNSpace.getBaseURN(ctx.accountURN),
-    ctx.Account
+    ctx.env.Account
   )
 
   return next({

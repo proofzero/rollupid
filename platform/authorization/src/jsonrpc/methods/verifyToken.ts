@@ -61,7 +61,7 @@ export const verifyTokenMethod: VerifyTokenMethod = async ({ ctx, input }) => {
   const identityURN = payload.sub
   const nss = `${IdentityURNSpace.decode(identityURN)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
-  const node = initAuthorizationNodeByName(urn, ctx.Authorization)
+  const node = initAuthorizationNodeByName(urn, ctx.env.Authorization)
   const jwks = getJWKS(ctx)
 
   const { value, error } = await node.class.verify(token, jwks, { issuer })

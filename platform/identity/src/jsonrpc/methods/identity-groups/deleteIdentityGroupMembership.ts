@@ -35,7 +35,10 @@ export const deleteIdentityGroupMembership = async ({
   await groupAdminValidatorByIdentityGroupURN(ctx, identityGroupURN)
 
   const caller = router.createCaller(ctx)
-  const node = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
+  const node = initIdentityGroupNodeByName(
+    identityGroupURN,
+    ctx.env.IdentityGroup
+  )
   if (!node) {
     throw new InternalServerError({
       message: 'Identity group DO not found',
@@ -104,7 +107,7 @@ export const deleteIdentityGroupMembership = async ({
   ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: 'group_member_removed',
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       distinctId: ctx.identityURN as IdentityURN,
       properties: {
         $groups: { group: identityGroupURN },

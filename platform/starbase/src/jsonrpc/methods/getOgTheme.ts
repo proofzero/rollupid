@@ -17,7 +17,7 @@ export const getOgTheme = async ({
 }): Promise<GetOgThemeResult> => {
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
-    ctx.StarbaseApp
+    ctx.env.StarbaseApp
   )
   return appDO.class.getOgTheme()
 }

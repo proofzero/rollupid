@@ -40,7 +40,7 @@ export const purgeIdentityGroupMemberships = async ({
         dst: igu,
       })
 
-      const DO = initIdentityGroupNodeByName(igu, ctx.IdentityGroup)
+      const DO = initIdentityGroupNodeByName(igu, ctx.env.IdentityGroup)
       if (DO) {
         const orderedMembers = await DO.class.getOrderedMembers()
         await DO.class.setOrderedMembers(
@@ -63,7 +63,7 @@ export const purgeIdentityGroupMemberships = async ({
   ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: 'group_memberships_purged',
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       distinctId: ctx.identityURN as IdentityURN,
     })
   )

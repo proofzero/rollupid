@@ -71,7 +71,7 @@ export const getAccountProfileBatchMethod = async ({
   const resultPromises = []
   for (const accountURN of input) {
     const baseURN = AccountURNSpace.getBaseURN(accountURN)
-    const nodeClient = initAccountNodeByName(baseURN, ctx.Account)
+    const nodeClient = initAccountNodeByName(baseURN, ctx.env.Account)
     resultPromises.push(getProfile(ctx, nodeClient, accountURN))
   }
   return await Promise.all(resultPromises)
@@ -103,7 +103,7 @@ async function getProfile(
       case CryptoAccountType.Wallet:
         return new ContractAccount(nodeClient)
       case EmailAccountType.Email:
-        return new EmailAccount(nodeClient, ctx)
+        return new EmailAccount(nodeClient, ctx.env)
       case WebauthnAccountType.WebAuthN:
         return new WebauthnAccount(nodeClient, ctx)
       case OAuthAccountType.Apple:

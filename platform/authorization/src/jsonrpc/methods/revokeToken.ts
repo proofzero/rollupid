@@ -54,7 +54,7 @@ export const revokeTokenMethod: RevokeTokenMethod = async ({ ctx, input }) => {
   const identityURN = payload.sub
   const nss = `${IdentityURNSpace.decode(identityURN)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
-  const node = initAuthorizationNodeByName(urn, ctx.Authorization)
+  const node = initAuthorizationNodeByName(urn, ctx.env.Authorization)
   const jwks = getJWKS(ctx)
   await node.class.revoke(token, jwks, { issuer })
 }

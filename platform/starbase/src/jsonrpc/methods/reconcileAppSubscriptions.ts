@@ -50,7 +50,10 @@ export const reconcileAppSubscriptions = async ({
   const apps = []
   for (const edge of edges) {
     const clientID = ApplicationURNSpace.decode(edge.dst.baseUrn)
-    const appDO = await getApplicationNodeByClientId(clientID, ctx.StarbaseApp)
+    const appDO = await getApplicationNodeByClientId(
+      clientID,
+      ctx.env.StarbaseApp
+    )
 
     const appDetails = await appDO.class.getDetails()
     if (appDetails.createdTimestamp != null) {
@@ -97,7 +100,7 @@ export const reconcileAppSubscriptions = async ({
 
       const appDO = await getApplicationNodeByClientId(
         app.clientID,
-        ctx.StarbaseApp
+        ctx.env.StarbaseApp
       )
       await appDO.class.deleteAppPlan()
 

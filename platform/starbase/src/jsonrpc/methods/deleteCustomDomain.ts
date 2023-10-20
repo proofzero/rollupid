@@ -33,17 +33,16 @@ export const deleteCustomDomain: DeleteCustomDomainMethod = async ({
 
   await groupAdminValidatorByClientID(ctx, clientId)
 
-  const node = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
+  const node = await getApplicationNodeByClientId(clientId, ctx.env.StarbaseApp)
 
-  const fetcher = getCloudflareFetcher(ctx.TOKEN_CLOUDFLARE_API)
+  const fetcher = getCloudflareFetcher(ctx.env.TOKEN_CLOUDFLARE_API)
 
-  const customDomain = await node.storage.get<
-    z.infer<typeof CustomDomainSchema>
-  >('customDomain')
+  const customDomain =
+    await node.storage.get<z.infer<typeof CustomDomainSchema>>('customDomain')
   if (customDomain)
     await deleteCustomHostname(
       fetcher,
-      ctx.INTERNAL_CLOUDFLARE_ZONE_ID,
+      ctx.env.INTERNAL_CLOUDFLARE_ZONE_ID,
       customDomain.id
     )
 
@@ -51,7 +50,7 @@ export const deleteCustomDomain: DeleteCustomDomainMethod = async ({
   if (workerRouteId)
     await deleteWorkerRoute(
       fetcher,
-      ctx.INTERNAL_CLOUDFLARE_ZONE_ID,
+      ctx.env.INTERNAL_CLOUDFLARE_ZONE_ID,
       workerRouteId
     )
 

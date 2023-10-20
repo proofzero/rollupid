@@ -44,7 +44,10 @@ export const getAuthorizedAppScopesMethod = async ({
 
   const nss = `${IdentityURNSpace.decode(identityURN)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
-  const authorizationNode = initAuthorizationNodeByName(urn, ctx.Authorization)
+  const authorizationNode = initAuthorizationNodeByName(
+    urn,
+    ctx.env.Authorization
+  )
 
   const authorizationCaller = appRouter.createCaller(ctx)
   const [tokenState, personaData] = await Promise.all([
@@ -64,7 +67,7 @@ export const getAuthorizedAppScopesMethod = async ({
     identityURN,
     clientId,
     scopes,
-    ctx.Core,
+    ctx.env.Core,
     ctx.traceSpan,
     personaData
   )

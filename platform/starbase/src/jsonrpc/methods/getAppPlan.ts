@@ -19,7 +19,10 @@ export const getAppPlan = async ({
 }): Promise<GetAppPlanOutput> => {
   const { clientId } = input
 
-  const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
+  const appDO = await getApplicationNodeByClientId(
+    clientId,
+    ctx.env.StarbaseApp
+  )
   const appPlan = await appDO.class.getAppPlan()
 
   return appPlan ?? ServicePlanType.FREE

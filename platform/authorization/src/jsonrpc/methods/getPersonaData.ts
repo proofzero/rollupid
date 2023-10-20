@@ -36,7 +36,10 @@ export const getPersonaDataMethod = async ({
 
   const nss = `${IdentityURNSpace.decode(identityURN)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
-  const authorizationNode = initAuthorizationNodeByName(urn, ctx.Authorization)
+  const authorizationNode = initAuthorizationNodeByName(
+    urn,
+    ctx.env.Authorization
+  )
 
   const personaData =
     (await authorizationNode.storage.get<PersonaData>('personaData')) || {}

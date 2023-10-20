@@ -1,8 +1,8 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 
 import { OAuthAccountType } from '@proofzero/types/account'
+import type { Environment } from '@proofzero/platform.core'
 
-import type { Context } from '../context'
 import { AccountProfile, GoogleOAuthProfile } from '../types'
 
 import Account from './account'
@@ -18,10 +18,10 @@ export default class GoogleAccount extends OAuthAccount {
   declare clientId: string
   declare clientSecret: string
 
-  constructor(node: AccountNode, ctx: Context) {
+  constructor(node: AccountNode, env: Environment) {
     super(node)
-    this.clientId = ctx.INTERNAL_GOOGLE_OAUTH_CLIENT_ID
-    this.clientSecret = ctx.SECRET_GOOGLE_OAUTH_CLIENT_SECRET
+    this.clientId = env.INTERNAL_GOOGLE_OAUTH_CLIENT_ID
+    this.clientSecret = env.SECRET_GOOGLE_OAUTH_CLIENT_SECRET
   }
 
   getTokenURL(): string {

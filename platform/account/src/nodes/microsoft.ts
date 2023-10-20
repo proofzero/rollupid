@@ -1,8 +1,8 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 
 import { OAuthAccountType } from '@proofzero/types/account'
+import type { Environment } from '@proofzero/platform.core'
 
-import { Context } from '../context'
 import type {
   AccountProfile,
   MicrosoftOAuthProfile,
@@ -20,15 +20,17 @@ const PHOTO_URL = 'https://graph.microsoft.com/v1.0/me/photo/$value'
 const USERINFO_URL = 'https://graph.microsoft.com/oidc/userinfo'
 
 export default class MicrosoftAccount extends OAuthAccount {
-  declare ctx: Context
+  declare env: Environment
   declare clientId: string
   declare clientSecret: string
+  declare hashedIdRef: string
 
-  constructor(node: AccountNode, ctx: Context) {
+  constructor(node: AccountNode, hashedIdRef: string, env: Environment) {
     super(node)
-    this.ctx = ctx
-    this.clientId = ctx.INTERNAL_MICROSOFT_OAUTH_CLIENT_ID
-    this.clientSecret = ctx.SECRET_MICROSOFT_OAUTH_CLIENT_SECRET
+    this.env = env
+    this.clientId = env.INTERNAL_MICROSOFT_OAUTH_CLIENT_ID
+    this.clientSecret = env.SECRET_MICROSOFT_OAUTH_CLIENT_SECRET
+    this.hashedIdRef = hashedIdRef
   }
 
   async getAvatar() {
@@ -90,7 +92,7 @@ export default class MicrosoftAccount extends OAuthAccount {
       return {
         address: profile.email,
         title: name,
-        icon: `${this.ctx.PASSPORT_URL}/avatars/${this.ctx.hashedIdref}`,
+        icon: `${this.env.PASSPORT_URL}/avatars/${this.hashedIdref}`,
         type: OAuthAccountType.Microsoft,
       }
     } else {

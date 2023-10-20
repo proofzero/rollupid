@@ -71,7 +71,10 @@ export const inviteIdentityGroupMember = async ({
     })
   }
 
-  const node = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
+  const node = initIdentityGroupNodeByName(
+    identityGroupURN,
+    ctx.env.IdentityGroup
+  )
   if (!node) {
     throw new InternalServerError({
       message: 'Identity group DO not found',
@@ -135,7 +138,7 @@ export const inviteIdentityGroupMember = async ({
     createAnalyticsEvent({
       eventName: 'group_invited_member',
       distinctId: inviterIdentityURN,
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       properties: {
         $groups: { group: identityGroupURN },
       },

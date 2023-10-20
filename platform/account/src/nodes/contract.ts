@@ -2,7 +2,6 @@ import { DurableObjectStubProxy } from 'do-proxy'
 
 import { InternalServerError } from '@proofzero/errors'
 import { CryptoAccountType } from '@proofzero/types/account'
-import ENSUtils from '@proofzero/platform-clients/ens-utils'
 
 import { AccountNode } from '.'
 import { AccountProfile } from '../types'

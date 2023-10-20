@@ -30,7 +30,7 @@ export const rotateApiKey = async ({
 
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
-    ctx.StarbaseApp
+    ctx.env.StarbaseApp
   )
   const result = await appDO.class.rotateApiKey(appURN)
 

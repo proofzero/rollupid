@@ -113,7 +113,7 @@ type ExchangeTokenParams<T = ExchangeTokenMethodInput> = {
 
 interface ExchangeTokenMethod<
   T = ExchangeTokenMethodInput,
-  R = ExchangeTokenMethodOutput
+  R = ExchangeTokenMethodOutput,
 > {
   (params: ExchangeTokenParams<T>): Promise<R>
 }
@@ -141,7 +141,7 @@ export const exchangeTokenMethod: ExchangeTokenMethod = async ({
     createAnalyticsEvent({
       eventName: `app_exchanged_${eventObject}`,
       distinctId: ctx.identityURN as IdentityURN,
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       properties: {
         $groups: { app: input.clientId },
       },
@@ -157,9 +157,9 @@ const handleAuthenticationCode: ExchangeTokenMethod<
 > = async ({ ctx, input }) => {
   const { code, clientId, issuer } = input
 
-  const exchangeCodeNode = await initExchangeCodeNodeByName(
+  const exchangeCodeNode = initExchangeCodeNodeByName(
     code,
-    ctx.ExchangeCode
+    ctx.env.ExchangeCode
   )
 
   await exchangeCodeNode.class.exchangeToken(code, clientId)
@@ -170,7 +170,10 @@ const handleAuthenticationCode: ExchangeTokenMethod<
 
   const nss = `${IdentityURNSpace.decode(identity)}@${identity}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
-  const authorizationNode = initAuthorizationNodeByName(urn, ctx.Authorization)
+  const authorizationNode = initAuthorizationNodeByName(
+    urn,
+    ctx.env.Authorization
+  )
   await authorizationNode.storage.put({ identity, clientId: 'rollup' })
 
   const { expirationTime } = AUTHENTICATION_TOKEN_OPTIONS
@@ -206,9 +209,9 @@ const handleAuthorizationCode: ExchangeTokenMethod<
 
   if (!valid) throw InvalidClientCredentialsError
 
-  const exchangeCodeNode = await initExchangeCodeNodeByName(
+  const exchangeCodeNode = initExchangeCodeNodeByName(
     code,
-    ctx.ExchangeCode
+    ctx.env.ExchangeCode
   )
 
   await exchangeCodeNode.class.exchangeToken(code, clientId)
@@ -223,7 +226,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   const baseURN = AuthorizationURNSpace.componentizedUrn(nss)
   const authorizationNode = initAuthorizationNodeByName(
     baseURN,
-    ctx.Authorization
+    ctx.env.Authorization
   )
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
 
@@ -250,7 +253,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     fullAuthzURN,
     scope,
     combinedPersonaData,
-    ctx.Core,
+    ctx.env.Core,
     ctx.traceSpan
   )
 
@@ -282,7 +285,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     identity,
     clientId,
     scope,
-    ctx.Core,
+    ctx.env.Core,
     ctx.traceSpan,
     combinedPersonaData
   )
@@ -327,7 +330,10 @@ const handleRefreshToken: ExchangeTokenMethod<
   const identity = payload.sub
   const nss = `${IdentityURNSpace.decode(identity)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
-  const authorizationNode = initAuthorizationNodeByName(urn, ctx.Authorization)
+  const authorizationNode = initAuthorizationNodeByName(
+    urn,
+    ctx.env.Authorization
+  )
 
   const jwks = getJWKS(ctx)
   const { error } = await authorizationNode.class.verify(refreshToken, jwks)

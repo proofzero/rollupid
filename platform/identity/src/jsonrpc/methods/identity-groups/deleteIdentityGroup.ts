@@ -62,7 +62,10 @@ export const deleteIdentityGroup = async ({
     urn: identityGroupURN,
   })
 
-  const DO = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
+  const DO = initIdentityGroupNodeByName(
+    identityGroupURN,
+    ctx.env.IdentityGroup
+  )
   if (DO) {
     await DO.storage.deleteAll()
   }
@@ -70,7 +73,7 @@ export const deleteIdentityGroup = async ({
   ctx.waitUntil?.(
     createAnalyticsEvent({
       eventName: 'group_deleted',
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       distinctId: ctx.identityURN as IdentityURN,
       properties: {
         $groups: { group: identityGroupURN },

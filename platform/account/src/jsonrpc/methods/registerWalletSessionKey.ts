@@ -43,7 +43,7 @@ export const registerSessionKeyMethod = async ({
 
   const smartContractWalletNode = initAccountNodeByName(
     baseAccountURN,
-    ctx.Account
+    ctx.env.Account
   )
 
   const ownerPrivateKey = (await smartContractWalletNode.storage.get(

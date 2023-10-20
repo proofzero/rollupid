@@ -99,7 +99,7 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
 
     const authorizationNode = initAuthorizationNodeByName(
       authorizationURN,
-      ctx.Authorization
+      ctx.env.Authorization
     )
 
     // const scope = ['admin']
@@ -142,7 +142,7 @@ export const revokeAppAuthorizationMethod: RevokeAppAuthorizationMethod =
 
     ctx.waitUntil?.(
       createAnalyticsEvent({
-        apiKey: ctx.POSTHOG_API_KEY,
+        apiKey: ctx.env.POSTHOG_API_KEY,
         distinctId: identityURN,
         eventName: 'identity_revoked_authorization',
         properties: {

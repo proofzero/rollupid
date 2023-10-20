@@ -1,10 +1,9 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 
 import { InternalServerError } from '@proofzero/errors'
-
 import { OAuthAccountType } from '@proofzero/types/account'
+import type { Environment } from '@proofzero/platform.core'
 
-import { Context } from '../context'
 import { AccountProfile, AppleOAuthProfile } from '../types'
 
 import Account from './account'
@@ -19,10 +18,10 @@ export default class AppleAccount extends OAuthAccount {
   declare clientId: string
   declare clientSecret: string
 
-  constructor(node: AccountNode, ctx: Context) {
+  constructor(node: AccountNode, env: Environment) {
     super(node)
-    this.clientId = ctx.INTERNAL_APPLE_OAUTH_CLIENT_ID
-    this.clientSecret = ctx.SECRET_APPLE_OAUTH_CLIENT_SECRET
+    this.clientId = env.INTERNAL_APPLE_OAUTH_CLIENT_ID
+    this.clientSecret = env.SECRET_APPLE_OAUTH_CLIENT_SECRET
   }
 
   async getProfile(): Promise<AppleAccountProfile> {

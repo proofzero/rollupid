@@ -57,7 +57,7 @@ export const setAppPlan = async ({
 
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
-    ctx.StarbaseApp
+    ctx.env.StarbaseApp
   )
   await appDO.class.setAppPlan(plan)
 
@@ -90,7 +90,7 @@ export const setAppPlan = async ({
     // https://posthog.com/tutorials/frontend-vs-backend-group-analytics
     await createAnalyticsEvent({
       eventName: '$groupidentify',
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       distinctId: input.URN,
       properties: {
         $group_type: 'app',
@@ -103,7 +103,7 @@ export const setAppPlan = async ({
 
     await createAnalyticsEvent({
       eventName: `app_set_${plan}_plan`,
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       distinctId: input.URN,
       properties: {
         $groups: {

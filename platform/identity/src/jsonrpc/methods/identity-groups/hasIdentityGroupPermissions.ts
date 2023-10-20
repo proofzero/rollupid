@@ -48,7 +48,7 @@ export const hasIdentityGroupPermissions = async ({
 
   const DO = initIdentityGroupNodeByName(
     input.identityGroupURN,
-    ctx.IdentityGroup
+    ctx.env.IdentityGroup
   )
   const { error } = await DO.class.validateAdmin(input.identityURN)
 
