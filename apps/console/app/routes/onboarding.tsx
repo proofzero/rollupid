@@ -24,6 +24,7 @@ import { HiOutlineBookOpen, HiOutlineLogout } from 'react-icons/hi'
 import { TbUserCog } from 'react-icons/tb'
 import useConnectResult from '@proofzero/design-system/src/hooks/useConnectResult'
 import { Toaster } from '@proofzero/design-system/src/atoms/toast'
+import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -53,11 +54,19 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
     const connectedEmails = getEmailDropdownItems(connectedAccounts)
 
+    const igs = await coreClient.identity.listIdentityGroups.query()
+    const targetIG =
+      (igs[0] &&
+        igs[0].members.length > 1 &&
+        igs[0].members[0].URN !== identityURN) ??
+      undefined
+
     return json({
       url: request.url,
       profile,
       connectedEmails,
       PASSPORT_URL: context.env.PASSPORT_URL,
+      targetIG,
     })
   }
 )
@@ -77,14 +86,22 @@ export const shouldRevalidate = ({
 }
 
 export default function Onboarding() {
-  const { connectedEmails, PASSPORT_URL, profile, url } = useLoaderData<{
-    connectedEmails: DropdownSelectListItem[]
-    PASSPORT_URL: string
-    profile: Profile
-    url: string
-  }>()
+  const { connectedEmails, PASSPORT_URL, profile, url, targetIG } =
+    useLoaderData<{
+      connectedEmails: DropdownSelectListItem[]
+      PASSPORT_URL: string
+      profile: Profile
+      url: string
+      targetIG:
+        | {
+            name: string
+            URN: IdentityGroupURN
+          }
+        | undefined
+    }>()
 
-  const currentPage = new URL(url).searchParams.get('rollup_result') ? 1 : 0
+  const currentPage =
+    new URL(url).searchParams.get('rollup_result') || targetIG ? 1 : 0
 
   useConnectResult()
 
@@ -100,7 +117,9 @@ export default function Onboarding() {
             'basis-full 2xl:basis-2/5 flex items-start justify-center py-[2.5%] h-full'
           }
         >
-          <Outlet context={{ connectedEmails, PASSPORT_URL, currentPage }} />
+          <Outlet
+            context={{ connectedEmails, PASSPORT_URL, currentPage, targetIG }}
+          />
         </div>
         <div className="basis-3/5 h-[100dvh] w-full hidden lg:flex justify-end items-center bg-gray-50 dark:bg-gray-800 overflow-hidden">
           <img

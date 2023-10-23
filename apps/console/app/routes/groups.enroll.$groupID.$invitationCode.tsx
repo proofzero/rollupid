@@ -159,7 +159,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       identityGroupURN,
     })
 
-    return redirect(`/groups/${groupID}`)
+    return redirect(`/onboarding`)
   }
 )
 

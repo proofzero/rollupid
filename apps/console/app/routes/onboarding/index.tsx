@@ -16,13 +16,44 @@ import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
 import { requireJWT } from '~/utilities/session.server'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
-import { json, type ActionFunction } from '@remix-run/cloudflare'
+import {
+  json,
+  type ActionFunction,
+  LoaderFunction,
+} from '@remix-run/cloudflare'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import type { AccountURN } from '@proofzero/urns/account'
+import { IdentityGroupURN } from '@proofzero/urns/identity-group'
+import { checkToken } from '@proofzero/utils/token'
+import { IdentityURN } from '@proofzero/urns/identity'
+
+export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
+  async ({ request, context }) => {
+    const jwt = await requireJWT(request, context.env)
+    const payload = checkToken(jwt!)
+    const identityURN = payload.sub as IdentityURN
+
+    const coreClient = createCoreClient(context.env.Core, {
+      ...getAuthzHeaderConditionallyFromToken(jwt),
+      ...generateTraceContextHeaders(context.traceSpan),
+    })
+
+    const igs = await coreClient.identity.listIdentityGroups.query()
+    const targetIG =
+      (igs[0] &&
+        igs[0].members.length > 1 &&
+        igs[0].members[0].URN !== identityURN) ??
+      undefined
+
+    return json({
+      targetIG,
+    })
+  }
+)
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -663,11 +694,18 @@ const CongratsPage = ({
 }
 
 export default function Landing() {
-  const { connectedEmails, PASSPORT_URL, currentPage } = useOutletContext<{
-    connectedEmails: DropdownSelectListItem[]
-    PASSPORT_URL: string
-    currentPage: number
-  }>()
+  const { connectedEmails, PASSPORT_URL, currentPage, targetIG } =
+    useOutletContext<{
+      connectedEmails: DropdownSelectListItem[]
+      PASSPORT_URL: string
+      currentPage: number
+      targetIG:
+        | {
+            name: string
+            URN: IdentityGroupURN
+          }
+        | undefined
+    }>()
 
   // Currently 'team' is not an option. It is here for future use.
   const [orgType, setOrgType] = useState<'solo' | 'team'>('solo')
@@ -696,24 +734,31 @@ export default function Landing() {
         page={page}
         setEmailAccountURN={setEmailAccountURN}
       />
-      {orgType === 'team' ? (
+      {targetIG && <>FOO</>}
+
+      {!targetIG && (
         <>
-          {emailAccountURN && (
-            <CreateGroup
+          {orgType === 'team' ? (
+            <>
+              {emailAccountURN && (
+                <CreateGroup
+                  setPage={setPage}
+                  page={page}
+                  setGroupID={setGroupID}
+                />
+              )}
+            </>
+          ) : (
+            <CreateApp
               setPage={setPage}
               page={page}
-              setGroupID={setGroupID}
+              setClientId={setClientId}
+              emailAccountURN={emailAccountURN}
             />
           )}
         </>
-      ) : (
-        <CreateApp
-          setPage={setPage}
-          page={page}
-          setClientId={setClientId}
-          emailAccountURN={emailAccountURN}
-        />
       )}
+
       <CongratsPage
         navigateUrl={
           orgType === 'solo' ? `/apps/${clientId}` : `/groups/${groupID}`
