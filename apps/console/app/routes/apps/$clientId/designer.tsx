@@ -97,6 +97,7 @@ import designerSVG from '~/assets/early/designer.webp'
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { GetOgThemeResult } from '@proofzero/platform.starbase/src/jsonrpc/methods/getOgTheme'
+import createImageClient from '@proofzero/platform-clients/image'
 
 const LazyAuth = lazy(() =>
   // @ts-ignore :(
@@ -1567,6 +1568,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       let colorDark = fd.get('colordark') as string | undefined
       if (!colorDark || colorDark === '') colorDark = undefined
 
+      const ogGraphicURL = theme.graphicURL
+
       let graphicURL = fd.get('image') as string | undefined
       if (!graphicURL || graphicURL === '') graphicURL = undefined
 
@@ -1607,6 +1610,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           clientId,
           theme,
         })
+
+        if (ogGraphicURL && ogGraphicURL !== theme.graphicURL) {
+          const imageClient = createImageClient(context.env.Images, {
+            headers: generateTraceContextHeaders(context.traceSpan),
+          })
+
+          await imageClient.delete.mutate(ogGraphicURL)
+        }
       }
 
       return json({
