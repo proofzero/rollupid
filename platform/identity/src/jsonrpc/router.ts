@@ -49,6 +49,7 @@ import {
 import { UnauthorizedError } from '@proofzero/errors'
 import {
   CreateIdentityGroupInputSchema,
+  CreateIdentityGroupOutputSchema,
   createIdentityGroup,
 } from './methods/identity-groups/createIdentityGroup'
 import {
@@ -194,6 +195,7 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(Analytics)
     .input(CreateIdentityGroupInputSchema)
+    .output(CreateIdentityGroupOutputSchema)
     .mutation(createIdentityGroup),
   listIdentityGroups: t.procedure
     .use(AuthorizationTokenFromHeader)

@@ -35,7 +35,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       ...generateTraceContextHeaders(context.traceSpan),
     })
 
-    try {
+    const createApp = async (formData: FormData) => {
       const clientName = formData.get('clientName') as string
       const account = formData.get('account') as AccountURN
 
@@ -52,12 +52,60 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         clientId,
       })
 
-      return json({ clientId, success: true })
-    } catch (error) {
-      console.error({ error })
-      return new InternalServerError({
-        message: 'Could not create the application',
+      return {
+        clientId,
+        success: true,
+      }
+    }
+
+    const createGroup = async (formData: FormData) => {
+      const groupName = formData.get('groupName') as undefined | string
+
+      if (!groupName?.length) {
+        throw new BadRequestError({
+          message: 'Group name is required',
+        })
+      }
+
+      const { groupID } = await coreClient.identity.createIdentityGroup.mutate({
+        name: groupName,
       })
+
+      return {
+        groupID,
+        success: true,
+      }
+    }
+
+    switch (formData.get('op')) {
+      case 'createApp':
+        try {
+          const { clientId, success: createAppSuccess } = await createApp(
+            formData
+          )
+
+          return json({ clientId, success: createAppSuccess })
+        } catch (error) {
+          return new InternalServerError({
+            message: 'Could not create the application',
+          })
+        }
+      case 'createGroup':
+        try {
+          const { groupID, success: createGroupSuccess } = await createGroup(
+            formData
+          )
+
+          return json({ groupID, success: createGroupSuccess })
+        } catch (error) {
+          return new InternalServerError({
+            message: 'Could not create the group',
+          })
+        }
+      default:
+        throw new BadRequestError({
+          message: 'Invalid operation',
+        })
     }
   }
 )
@@ -82,8 +130,9 @@ const Option = ({
   return (
     <div
       className={`w-full flex p-4 flex-row items-center justify-start border rounded-lg gap-4
-    ${selected ? 'border-indigo-500' : ''} ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-        }`}
+    ${selected ? 'border-indigo-500' : ''} ${
+        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+      }`}
       onClick={() => {
         if (disabled) return
         setSelectedType(type)
@@ -121,8 +170,9 @@ const SelectOrgType = ({
   return (
     <div
       className={`w-full h-full flex flex-col gap-2
-    transition-opacity ease-in-out delay-150 ${page === 0 ? 'opacity-100' : 'hide'
-        }`}
+    transition-opacity ease-in-out delay-150 ${
+      page === 0 ? 'opacity-100' : 'hide'
+    }`}
     >
       <Text size="lg" className="text-gray-400">
         1/4
@@ -138,17 +188,16 @@ const SelectOrgType = ({
         header="I'm solo developer"
         description="I'm setting up app for myself"
         selected={orgType === 'solo'}
-        setSelectedType={setOrgType}
+        setSelectedType={() => setOrgType('solo')}
         type="solo"
       />
       <Option
         Icon={TbUsers}
         header="I'm part of a team"
         description="I'm setting up app for a team"
-        disabled={true}
         selected={orgType === 'team'}
         type="team"
-        setSelectedType={setOrgType}
+        setSelectedType={() => setOrgType('team')}
       />
       <Button
         className="w-full"
@@ -198,8 +247,9 @@ const ConnectEmail = ({
   return (
     <div
       className={`w-full h-full flex flex-col gap-2
-       transition-opacity ease-in-out delay-150 ${page === 1 ? 'opacity-100' : 'hide'
-        }`}
+       transition-opacity ease-in-out delay-150 ${
+         page === 1 ? 'opacity-100' : 'hide'
+       }`}
     >
       <div className="flex flex-row items-center gap-2">
         <HiOutlineArrowLeft
@@ -221,7 +271,9 @@ const ConnectEmail = ({
           label="Full Name"
           id="name"
           className="w-full"
-          onChange={(ev) => setName(ev.target.value)}
+          onChange={(ev) => {
+            setName(ev.target.value)
+          }}
         />
       </div>
       {connectedEmails && connectedEmails.length === 0 && (
@@ -323,15 +375,26 @@ const ConnectEmail = ({
 }
 
 const CreateGroup = ({
+  setGroupID,
   setPage,
   page,
 }: {
+  setGroupID: (value: string) => void
   setPage: (value: number) => void
   page: number
 }) => {
   const [groupName, setGroupName] = useState('')
   const [groupSize, setGroupSize] = useState('2-10 members')
   const [groupRole, setGroupRole] = useState('Founder or leadership')
+
+  const fetcher = useFetcher()
+
+  useEffect(() => {
+    if (fetcher.state === 'idle' && fetcher.data?.groupID) {
+      setGroupID(fetcher.data?.groupID)
+      setPage(page + 1)
+    }
+  }, [fetcher.data, fetcher.state])
 
   return (
     <div
@@ -425,13 +488,16 @@ const CreateGroup = ({
         btnType="primary-alt"
         btnSize="xl"
         disabled={
-          !groupName?.length || !groupSize?.length || !groupRole?.length
+          !groupName?.length ||
+          !groupSize?.length ||
+          !groupRole?.length ||
+          fetcher.state !== 'idle'
         }
         onClick={() => {
-          setPage(page + 1)
+          fetcher.submit({ op: 'createGroup', groupName }, { method: 'post' })
         }}
       >
-        Create Group
+        {fetcher.state === 'idle' ? <Text>Create Group</Text> : <Spinner />}
       </Button>
       <div className="mt-auto flex flex-row gap-2 w-full">
         <div className="border w-full rounded-lg border-2 border-indigo-500" />
@@ -557,7 +623,9 @@ const CongratsPage = ({
           <div className="flex flex-row gap-2 items-center">
             <Text>Configure your application</Text>
             <DocumentationBadge
-              url={'https://docs.rollup.id/getting-started/create-an-application'}
+              url={
+                'https://docs.rollup.id/getting-started/create-an-application'
+              }
             />
           </div>
         </li>
@@ -565,7 +633,9 @@ const CongratsPage = ({
           <div className="flex flex-row gap-2 items-center">
             <Text>Learn about OIDC / OAuth 2.0</Text>
             <DocumentationBadge
-              url={'https://docs.rollup.id/an-introduction-to-openid-connect-oidc'}
+              url={
+                'https://docs.rollup.id/an-introduction-to-openid-connect-oidc'
+              }
             />
           </div>
         </li>
@@ -605,6 +675,7 @@ export default function Landing() {
   const [emailAccountURN, setEmailAccountURN] = useState<AccountURN>()
 
   const [page, setPage] = useState(currentPage)
+  const [groupID, setGroupID] = useState('')
 
   return (
     <div
@@ -626,7 +697,15 @@ export default function Landing() {
         setEmailAccountURN={setEmailAccountURN}
       />
       {orgType === 'team' ? (
-        <CreateGroup setPage={setPage} page={page} />
+        <>
+          {emailAccountURN && (
+            <CreateGroup
+              setPage={setPage}
+              page={page}
+              setGroupID={setGroupID}
+            />
+          )}
+        </>
       ) : (
         <CreateApp
           setPage={setPage}
@@ -636,7 +715,9 @@ export default function Landing() {
         />
       )}
       <CongratsPage
-        navigateUrl={orgType === 'solo' ? `/apps/${clientId}` : `/dashboard`}
+        navigateUrl={
+          orgType === 'solo' ? `/apps/${clientId}` : `/groups/${groupID}`
+        }
         page={page}
         navigateText={
           orgType === 'solo' ? 'Go to my Application' : 'Go to my Group'
