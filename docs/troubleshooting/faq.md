@@ -14,7 +14,7 @@ Passkeys/WebAuthn has now been implemented and is now one of the available authe
 
 ## What is a Vault and when will it be available?
 
-Vault is an ETH "burner wallet" linked to a user identity and can be created by developers using progressive authorizations. Access to these wallet is governed by advanced OAuth scopes and available over API and is perfect for onboarding non-technical users to blockchain powered applications.
+Vault is an ETH "burner wallet" linked to a user identity and can be created by developers using progressive authorizations. Access to these wallets is governed by advanced OAuth scopes and available over API and is perfect for onboarding non-technical users to blockchain powered applications.
 
 You can check out progress on this feature [here](https://github.com/proofzero/rollupid/milestones).
 
@@ -23,7 +23,7 @@ You can check out progress on this feature [here](https://github.com/proofzero/r
 1. Login to [https://console.rollup.id](https://console.rollup.id)
 2. Go to the "Billing and Invoicing" section on the bottom left navigation.
 3. Follow the prompt to select a billing email address.
-4. Email [promo@rollup.id](mailto:promo@rollup.id?subject=Claim%20my%20credits) with the email address selected in step 3. If you are claiming the additional $200 existing app credit and $200 1000 MAU credit let us know in the email by providing your app domain name and a screen shot of your total users.
+4. Email [promo@rollup.id](mailto:promo@rollup.id?subject=Claim%20my%20credits) with the email address selected in step 3. If you are claiming the additional $200 existing app credit and $200 1000 MAU credit let us know in the email by providing your app domain name and a screenshot of your total users.
 5. Someone will reply when credits have been applied
 
 {% hint style="info" %}
