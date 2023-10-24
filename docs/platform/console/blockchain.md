@@ -24,14 +24,14 @@ Your paymaster credentials will only be used to sponsor registration of session 
 
 ### [ZeroDev](https://zerodev.app)
 
-To configure ZeroDev with your Rollup ID app you will need create a project and copy the project id into the applications.
+To configure ZeroDev with your Rollup ID app you will need to create a project and copy the project id into the applications.
 
 ## Interested in becoming an Account Abstraction Provider
 
 Please answer the following questions to see if you qualify:
 
 * [ ] Do you have an SDK or API?
-  * Does your SDK use `fetcher`? (We do not support `XMLHttpRequest` and therefore do cannot integrate your SDK) OR
+  * Does your SDK use `fetcher`? (We do not support `XMLHttpRequest` and therefore cannot integrate your SDK) OR
   * Can your service be used with API calls?
 * [ ] Are your smart contracts 4337 compatible?
   * Do you have a smart contract factory to generate the same smart contract wallet address across all chains?
