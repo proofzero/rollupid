@@ -12,7 +12,7 @@ Passport is an OAuth-based authentication and authorization gateway for your app
 
 The authentication step takes care of identifying profiles on the [Profile Graph](profile-graph.md). The authentication method a user chooses acts like a DNS resolver to a users profile. If a profile is not found, one will be created.
 
-Once authenticated the user will the be redirected to the authorization screen.
+Once authenticated the user will be redirected to the authorization screen.
 
 <figure><img src="../.gitbook/assets/MacBook Pro 14_ - 1 (1).png" alt=""><figcaption></figcaption></figure>
 
@@ -38,7 +38,7 @@ No scope is equivalent to an auto authorization with access only to public profi
 
 <figure><img src="../.gitbook/assets/MacBook Pro 14_ - 4.png" alt=""><figcaption></figcaption></figure>
 
-Once authorized your the user will be redirected back to your application with the state and exchange code [described in the guide](../getting-started/auth-flow.md) to complete the auth flow and receive an access token.
+Once authorized the user will be redirected back to your application with the state and exchange code [described in the guide](../getting-started/auth-flow.md) to complete the auth flow and receive an access token.
 
 ### Tokens & Sessions
 
