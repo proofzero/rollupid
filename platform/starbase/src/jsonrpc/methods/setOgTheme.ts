@@ -26,7 +26,7 @@ export const setOgTheme = async ({
     )
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
-    ctx.StarbaseApp
+    ctx.env.StarbaseApp
   )
 
   await groupAdminValidatorByAppURN(ctx, appURN)

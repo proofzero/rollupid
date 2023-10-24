@@ -49,8 +49,11 @@ export const getUserInfoMethod = async ({
 
   const nss = `${IdentityURNSpace.decode(identityURN)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
-  const authorizationNode = initAuthorizationNodeByName(urn, ctx.Authorization)
-  const jwks = getJWKS(ctx)
+  const authorizationNode = initAuthorizationNodeByName(
+    urn,
+    ctx.env.Authorization
+  )
+  const jwks = getJWKS(ctx.env)
 
   const { error } = await authorizationNode.class.verify(token, jwks, {
     issuer: input.issuer,
@@ -65,7 +68,7 @@ export const getUserInfoMethod = async ({
     identityURN,
     clientId,
     scope,
-    ctx.Core,
+    ctx.env.Core,
     ctx.traceSpan,
     personaData
   )

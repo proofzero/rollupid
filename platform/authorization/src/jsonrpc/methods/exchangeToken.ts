@@ -141,7 +141,7 @@ export const exchangeTokenMethod: ExchangeTokenMethod = async ({
     createAnalyticsEvent({
       eventName: `app_exchanged_${eventObject}`,
       distinctId: ctx.identityURN as IdentityURN,
-      apiKey: ctx.POSTHOG_API_KEY,
+      apiKey: ctx.env.POSTHOG_API_KEY,
       properties: {
         $groups: { app: input.clientId },
       },
@@ -157,9 +157,9 @@ const handleAuthenticationCode: ExchangeTokenMethod<
 > = async ({ ctx, input }) => {
   const { code, clientId, issuer } = input
 
-  const exchangeCodeNode = await initExchangeCodeNodeByName(
+  const exchangeCodeNode = initExchangeCodeNodeByName(
     code,
-    ctx.ExchangeCode
+    ctx.env.ExchangeCode
   )
 
   await exchangeCodeNode.class.exchangeToken(code, clientId)
@@ -170,14 +170,17 @@ const handleAuthenticationCode: ExchangeTokenMethod<
 
   const nss = `${IdentityURNSpace.decode(identity)}@${identity}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
-  const authorizationNode = initAuthorizationNodeByName(urn, ctx.Authorization)
+  const authorizationNode = initAuthorizationNodeByName(
+    urn,
+    ctx.env.Authorization
+  )
   await authorizationNode.storage.put({ identity, clientId: 'rollup' })
 
   const { expirationTime } = AUTHENTICATION_TOKEN_OPTIONS
   const scope: Scope = (await authorizationNode.storage.get('scope')) || []
 
   const jku = generateJKU(issuer)
-  const jwk = getPrivateJWK(ctx)
+  const jwk = getPrivateJWK(ctx.env)
 
   return {
     accessToken: await authorizationNode.class.generateAccessToken({
@@ -206,9 +209,9 @@ const handleAuthorizationCode: ExchangeTokenMethod<
 
   if (!valid) throw InvalidClientCredentialsError
 
-  const exchangeCodeNode = await initExchangeCodeNodeByName(
+  const exchangeCodeNode = initExchangeCodeNodeByName(
     code,
-    ctx.ExchangeCode
+    ctx.env.ExchangeCode
   )
 
   await exchangeCodeNode.class.exchangeToken(code, clientId)
@@ -223,7 +226,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
   const baseURN = AuthorizationURNSpace.componentizedUrn(nss)
   const authorizationNode = initAuthorizationNodeByName(
     baseURN,
-    ctx.Authorization
+    ctx.env.Authorization
   )
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
 
@@ -250,12 +253,12 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     fullAuthzURN,
     scope,
     combinedPersonaData,
-    ctx.Core,
+    ctx.env.Core,
     ctx.traceSpan
   )
 
   const jku = generateJKU(issuer)
-  const jwk = getPrivateJWK(ctx)
+  const jwk = getPrivateJWK(ctx.env)
 
   const accessToken = await authorizationNode.class.generateAccessToken({
     jku,
@@ -282,7 +285,7 @@ const handleAuthorizationCode: ExchangeTokenMethod<
     identity,
     clientId,
     scope,
-    ctx.Core,
+    ctx.env.Core,
     ctx.traceSpan,
     combinedPersonaData
   )
@@ -327,9 +330,12 @@ const handleRefreshToken: ExchangeTokenMethod<
   const identity = payload.sub
   const nss = `${IdentityURNSpace.decode(identity)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
-  const authorizationNode = initAuthorizationNodeByName(urn, ctx.Authorization)
+  const authorizationNode = initAuthorizationNodeByName(
+    urn,
+    ctx.env.Authorization
+  )
 
-  const jwks = getJWKS(ctx)
+  const jwks = getJWKS(ctx.env)
   const { error } = await authorizationNode.class.verify(refreshToken, jwks)
   if (error) throw getErrorCause(error)
 
@@ -337,7 +343,7 @@ const handleRefreshToken: ExchangeTokenMethod<
   const { expirationTime } = ACCESS_TOKEN_OPTIONS
 
   const jku = generateJKU(issuer)
-  const jwk = getPrivateJWK(ctx)
+  const jwk = getPrivateJWK(ctx.env)
 
   return {
     accessToken: await authorizationNode.class.generateAccessToken({

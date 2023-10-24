@@ -25,7 +25,10 @@ export const checkApiKey = async ({
   const jwtSub = decodeJwt(input.apiKey).sub as ApplicationURN
   const clientId = ApplicationURNSpace.parse(jwtSub).decoded
 
-  const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
+  const appDO = await getApplicationNodeByClientId(
+    clientId,
+    ctx.env.StarbaseApp
+  )
 
   try {
     await appDO.class.verify(input.apiKey)

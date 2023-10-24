@@ -42,9 +42,9 @@ export const getIdentityGroupMemberInvitations = async ({
 }): Promise<GetIdentityGroupMemberInvitationsOutput> => {
   const { identityGroupURN } = input
 
-  const node = await initIdentityGroupNodeByName(
+  const node = initIdentityGroupNodeByName(
     identityGroupURN,
-    ctx.IdentityGroup
+    ctx.env.IdentityGroup
   )
   if (!node) {
     throw new RollupError({

@@ -44,9 +44,9 @@ export const getStripePaymentData = async ({
 }): Promise<GetStripePaymentDataOutput> => {
   let ownerNode
   if (IdentityURNSpace.is(input.URN)) {
-    ownerNode = initIdentityNodeByName(input.URN, ctx.Identity)
+    ownerNode = initIdentityNodeByName(input.URN, ctx.env.Identity)
   } else if (IdentityGroupURNSpace.is(input.URN)) {
-    ownerNode = initIdentityGroupNodeByName(input.URN, ctx.IdentityGroup)
+    ownerNode = initIdentityGroupNodeByName(input.URN, ctx.env.IdentityGroup)
   } else {
     throw new BadRequestError({
       message: `URN type not supported`,
@@ -75,9 +75,9 @@ export const setStripePaymentData = async ({
 }): Promise<void> => {
   let ownerNode
   if (IdentityURNSpace.is(input.URN)) {
-    ownerNode = initIdentityNodeByName(input.URN, ctx.Identity)
+    ownerNode = initIdentityNodeByName(input.URN, ctx.env.Identity)
   } else if (IdentityGroupURNSpace.is(input.URN)) {
-    ownerNode = initIdentityGroupNodeByName(input.URN, ctx.IdentityGroup)
+    ownerNode = initIdentityGroupNodeByName(input.URN, ctx.env.IdentityGroup)
   } else {
     throw new BadRequestError({
       message: `URN type not supported`,

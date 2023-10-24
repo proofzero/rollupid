@@ -35,7 +35,7 @@ export const putObjectMethod = async ({
   const { visibility } = options || {}
 
   const baseKey = getBaseKey(namespace, path)
-  const node = await initObjectNodeByName(baseKey, ctx.Meta)
+  const node = await initObjectNodeByName(baseKey, ctx.env.Meta)
   const index = await node.class.get()
 
   index.version += 1
@@ -44,7 +44,7 @@ export const putObjectMethod = async ({
   }
 
   try {
-    const Bucket: R2Bucket = ctx.Bucket
+    const Bucket: R2Bucket = ctx.env.Bucket
     const metadata = await Bucket.put(
       getObjectKey(node.id.toString(), baseKey, index.version),
       JSON.stringify(value)

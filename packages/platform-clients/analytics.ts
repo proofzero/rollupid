@@ -1,8 +1,16 @@
-import { BaseContext } from '@proofzero/types'
+import { BaseContext, DeploymentMetadata } from '@proofzero/types'
 import { IdentityURN, IdentityURNSpace } from '@proofzero/urns/identity'
 import { getAuthzTokenFromReq } from '@proofzero/utils'
 import { decodeJwt } from 'jose'
-type PathContext = { path?: string; type?: string } & BaseContext
+
+type PathContext = {
+  path?: string
+  type?: string
+  env: {
+    Analytics?: AnalyticsEngineDataset
+    ServiceDeploymentMetadata?: DeploymentMetadata
+  }
+} & BaseContext
 
 export const WriteAnalyticsDataPoint = (
   ctx: PathContext,
@@ -12,12 +20,14 @@ export const WriteAnalyticsDataPoint = (
   const rayId = ctx.req?.headers.get('cf-ray') || null
 
   const service = {
-    name: ctx.ServiceDeploymentMetadata?.name || 'unknown',
-    deploymentId: ctx.ServiceDeploymentMetadata?.deployment?.id || 'unknown',
+    name: ctx.env.ServiceDeploymentMetadata?.name || 'unknown',
+    deploymentId:
+      ctx.env.ServiceDeploymentMetadata?.deployment?.id || 'unknown',
     deploymentNumber:
-      String(ctx.ServiceDeploymentMetadata?.deployment?.number) || 'unknown',
+      String(ctx.env.ServiceDeploymentMetadata?.deployment?.number) ||
+      'unknown',
     deploymentTimestamp:
-      ctx.ServiceDeploymentMetadata?.deployment?.timestamp || 'unknown',
+      ctx.env.ServiceDeploymentMetadata?.deployment?.timestamp || 'unknown',
   }
 
   const identity = ctx.identityURN
@@ -65,6 +75,6 @@ export const WriteAnalyticsDataPoint = (
   }
 
   // Allow the caller to specify a custom dataset.
-  const dataset = customDataset ? customDataset : ctx.Analytics
+  const dataset = customDataset ? customDataset : ctx.env.Analytics
   dataset?.writeDataPoint(point)
 }

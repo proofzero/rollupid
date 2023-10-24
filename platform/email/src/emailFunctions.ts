@@ -277,11 +277,11 @@ export const getEmailContent = ({
 }) => {
   if (
     !(
-      ctx.NotificationFromUser &&
-      ctx.NotificationFromName &&
-      ctx.INTERNAL_DKIM_DOMAIN &&
-      ctx.KEY_DKIM_PRIVATEKEY &&
-      ctx.INTERNAL_DKIM_SELECTOR
+      ctx.env.NotificationFromUser &&
+      ctx.env.NotificationFromName &&
+      ctx.env.INTERNAL_DKIM_DOMAIN &&
+      ctx.env.KEY_DKIM_PRIVATEKEY &&
+      ctx.env.INTERNAL_DKIM_SELECTOR
     )
   )
     throw new Error(
@@ -289,13 +289,13 @@ export const getEmailContent = ({
     )
 
   const env: Environment = {
-    NotificationFromUser: ctx.NotificationFromUser,
-    NotificationFromName: ctx.NotificationFromName,
-    INTERNAL_DKIM_DOMAIN: ctx.INTERNAL_DKIM_DOMAIN,
-    KEY_DKIM_PRIVATEKEY: ctx.KEY_DKIM_PRIVATEKEY,
-    INTERNAL_DKIM_SELECTOR: ctx.INTERNAL_DKIM_SELECTOR,
-    SECRET_TEST_API_TEST_TOKEN: ctx.SECRET_TEST_API_TEST_TOKEN,
-    Test: ctx.Test,
+    NotificationFromUser: ctx.env.NotificationFromUser,
+    NotificationFromName: ctx.env.NotificationFromName,
+    INTERNAL_DKIM_DOMAIN: ctx.env.INTERNAL_DKIM_DOMAIN,
+    KEY_DKIM_PRIVATEKEY: ctx.env.KEY_DKIM_PRIVATEKEY,
+    INTERNAL_DKIM_SELECTOR: ctx.env.INTERNAL_DKIM_SELECTOR,
+    SECRET_TEST_API_TEST_TOKEN: ctx.env.SECRET_TEST_API_TEST_TOKEN,
+    Test: ctx.env.Test,
   }
 
   const notification: EmailNotification = {

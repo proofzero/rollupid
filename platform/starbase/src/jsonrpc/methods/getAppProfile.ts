@@ -26,7 +26,7 @@ export const getAppProfile = async ({
 
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
-    ctx.StarbaseApp
+    ctx.env.StarbaseApp
   )
   const appProfile = await appDO.class.getProfile()
 

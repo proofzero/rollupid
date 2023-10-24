@@ -91,11 +91,11 @@ export const getGradientMethod = async ({
   formData.append('file', new Blob([ogImage], { type: 'image/png' }))
   formData.append('id', id)
   const imageUrlJson = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1`,
+    `https://api.cloudflare.com/client/v4/accounts/${ctx.env.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1`,
     {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${ctx.TOKEN_CLOUDFLARE_API}`,
+        Authorization: `Bearer ${ctx.env.TOKEN_CLOUDFLARE_API}`,
       },
       body: formData,
     }
@@ -104,7 +104,7 @@ export const getGradientMethod = async ({
   let responseJSON = null
   if (imageUrlJson.status === 409) {
     //If image has previously been uploaded, we get a HTTP 409, so we return the cached one
-    const cached = `https://imagedelivery.net/${ctx.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
+    const cached = `https://imagedelivery.net/${ctx.env.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
     responseJSON = {
       success: false,
       result: { variants: [cached] },

@@ -17,7 +17,7 @@ export const getEmailOTPTheme = async ({
 }): Promise<GetEmailOTPThemeResult> => {
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
-    ctx.StarbaseApp
+    ctx.env.StarbaseApp
   )
   return appDO.class.getEmailOTPTheme()
 }

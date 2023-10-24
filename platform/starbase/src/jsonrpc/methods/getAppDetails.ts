@@ -36,7 +36,7 @@ export const getAppDetails = async ({
     )
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
-    ctx.StarbaseApp
+    ctx.env.StarbaseApp
   )
   const appDetails = await appDO.class.getDetails()
 

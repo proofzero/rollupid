@@ -21,7 +21,10 @@ export const checkAppAuth = async ({
 }): Promise<z.infer<typeof CheckAppAuthOutput>> => {
   const { clientId, clientSecret } = input
 
-  const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
+  const appDO = await getApplicationNodeByClientId(
+    clientId,
+    ctx.env.StarbaseApp
+  )
   const appDetails = await appDO.class.getDetails()
   const hashedSecret = await secret.hash(clientSecret)
   const secretValidity =

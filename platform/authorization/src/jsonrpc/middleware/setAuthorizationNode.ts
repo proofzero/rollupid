@@ -30,7 +30,10 @@ export const setAuthorizationNode: BaseMiddlewareFunction<Context> = async ({
 
   const nss = `${IdentityURNSpace.decode(identityURN)}@${clientId}`
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
-  const authorizationNode = initAuthorizationNodeByName(urn, ctx.Authorization)
+  const authorizationNode = initAuthorizationNodeByName(
+    urn,
+    ctx.env.Authorization
+  )
 
   if (!authorizationNode) {
     throw new Error('unable to get authorization node client')

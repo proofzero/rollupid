@@ -26,7 +26,7 @@ export const getObjectMethod = async ({
   const { namespace, path } = input
 
   const baseKey = getBaseKey(namespace, path)
-  const node = await initObjectNodeByName(baseKey, ctx.Meta)
+  const node = await initObjectNodeByName(baseKey, ctx.env.Meta)
 
   const { version } = await node.class.get()
 
@@ -36,7 +36,7 @@ export const getObjectMethod = async ({
   }
 
   const objectKey = getObjectKey(node.id.toString(), baseKey, version)
-  const Bucket: R2Bucket = await ctx.Bucket
+  const Bucket: R2Bucket = ctx.env.Bucket
   const stored = await Bucket.get(objectKey)
 
   if (!stored) {

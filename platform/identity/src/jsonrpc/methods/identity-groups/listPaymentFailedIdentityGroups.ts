@@ -32,7 +32,7 @@ export const listPaymentFailedIdentityGroups = async ({
   for (const edge of edges) {
     const igNode = initIdentityGroupNodeByName(
       edge.dst.baseUrn,
-      ctx.IdentityGroup
+      ctx.env.IdentityGroup
     )
     const spd = await igNode.class.getStripePaymentData()
     if (spd && spd.paymentFailed) {

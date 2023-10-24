@@ -41,8 +41,9 @@ export type DeploymentMetadata = {
  * Add fields here that the inner context brings.
  */
 export interface CreateInnerContextOptions
-  extends Environment,
-    Partial<FetchCreateContextFnOptions & BaseContext> {
+  extends Partial<FetchCreateContextFnOptions & BaseContext> {
+  env: Environment
+
   authorization?: Authorization
   exchangeCode?: ExchangeCode
 
@@ -73,18 +74,17 @@ export interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(
-  opts: CreateInnerContextOptions &
-    Environment & {
-      waitUntil?: (promise: Promise<unknown>) => void
-    }
+  opts: CreateInnerContextOptions & {
+    waitUntil?: (promise: Promise<unknown>) => void
+  }
 ) {
   const traceSpan = generateTraceSpan(opts.req?.headers)
   return {
     ...opts,
     traceSpan,
-    graph: db.init(opts.EDGES),
+    graph: db.init(opts.env.EDGES),
     emailClient: createEmailClient(
-      opts.Email,
+      opts.env.Email,
       generateTraceContextHeaders(traceSpan)
     ),
   }
@@ -102,7 +102,7 @@ export async function createContext(
   env: Environment
 ) {
   const { req } = opts
-  const contextInner = await createContextInner({ ...opts, ...env })
+  const contextInner = await createContextInner({ ...opts, env })
   return {
     ...contextInner,
     req,

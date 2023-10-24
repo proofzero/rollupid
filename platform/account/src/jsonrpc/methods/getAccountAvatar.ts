@@ -31,7 +31,11 @@ export const getAccountAvatarMethod: GetAccountAvatarMethod = async ({
   }
 
   if (type == OAuthAccountType.Microsoft) {
-    const oAuthNode = new MicrosoftAccount(nodeClient, ctx)
+    const oAuthNode = new MicrosoftAccount(
+      nodeClient,
+      ctx.hashedIdref!,
+      ctx.env
+    )
     return oAuthNode.getAvatar()
   }
 

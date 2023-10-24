@@ -27,7 +27,7 @@ export const generateEmailOTPMethod = async ({
   ctx: Context
 }): Promise<string> => {
   const { email, themeProps, preview } = input
-  const emailAccountNode = new EmailAccount(ctx.account as AccountNode, ctx)
+  const emailAccountNode = new EmailAccount(ctx.account as AccountNode, ctx.env)
 
   const state = generateRandomString(EMAIL_VERIFICATION_OPTIONS.STATE_LENGTH)
 

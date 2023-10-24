@@ -37,7 +37,7 @@ export const updateApp = async ({
 
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
-    ctx.StarbaseApp
+    ctx.env.StarbaseApp
   )
   appDO.class.update(input.updates)
 

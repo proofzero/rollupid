@@ -70,7 +70,7 @@ export const listGroupApps = async ({
 
       const appDO = await getApplicationNodeByClientId(
         clientId,
-        ctx.StarbaseApp
+        ctx.env.StarbaseApp
       )
       const appDetails = await appDO.class.getDetails()
 

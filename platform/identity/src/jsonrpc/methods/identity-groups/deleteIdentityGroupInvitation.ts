@@ -25,7 +25,10 @@ export const deleteIdentityGroupInvitation = async ({
 
   await groupAdminValidatorByIdentityGroupURN(ctx, identityGroupURN)
 
-  const node = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
+  const node = initIdentityGroupNodeByName(
+    identityGroupURN,
+    ctx.env.IdentityGroup
+  )
   if (!node) {
     throw new InternalServerError({
       message: 'Identity group DO not found',

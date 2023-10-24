@@ -1,12 +1,11 @@
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
-import { router } from '@proofzero/platform/core'
+import { router, type Context } from '@proofzero/platform/core'
 import { initIdentityGroupNodeByName } from '@proofzero/platform/identity/src/nodes'
 import { EDGE_APPLICATION } from '@proofzero/platform/starbase/src/types'
 import {
   ApplicationURN,
   ApplicationURNSpace,
 } from '@proofzero/urns/application'
-import { IdentityURN } from '@proofzero/urns/identity'
 import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
@@ -14,10 +13,7 @@ import {
 import { getErrorCause } from '@proofzero/utils/errors'
 
 export const groupAdminValidatorByIdentityGroupURN = async (
-  ctx: unknown & {
-    identityURN?: IdentityURN
-    IdentityGroup?: DurableObjectNamespace
-  },
+  ctx: Context,
   identityGroupURN: IdentityGroupURN
 ) => {
   if (!ctx.identityURN) {
@@ -26,13 +22,16 @@ export const groupAdminValidatorByIdentityGroupURN = async (
     })
   }
 
-  if (!ctx.IdentityGroup) {
+  if (!ctx.env.IdentityGroup) {
     throw new BadRequestError({
       message: 'No IdentityGroup in context',
     })
   }
 
-  const DO = initIdentityGroupNodeByName(identityGroupURN, ctx.IdentityGroup)
+  const DO = initIdentityGroupNodeByName(
+    identityGroupURN,
+    ctx.env.IdentityGroup
+  )
   const { error } = await DO.class.validateAdmin(ctx.identityURN)
   if (error) {
     throw getErrorCause(error)
@@ -40,10 +39,7 @@ export const groupAdminValidatorByIdentityGroupURN = async (
 }
 
 export const groupAdminValidatorByClientID = async (
-  ctx: unknown & {
-    identityURN?: IdentityURN
-    IdentityGroup?: DurableObjectNamespace
-  },
+  ctx: Context,
   clientID: string
 ) => {
   const appURN = ApplicationURNSpace.componentizedUrn(clientID)
@@ -52,10 +48,7 @@ export const groupAdminValidatorByClientID = async (
 }
 
 export const groupAdminValidatorByAppURN = async (
-  ctx: unknown & {
-    identityURN?: IdentityURN
-    IdentityGroup?: DurableObjectNamespace
-  },
+  ctx: Context,
   appURN: ApplicationURN
 ) => {
   const caller = router.createCaller(ctx as any)

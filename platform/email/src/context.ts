@@ -5,7 +5,9 @@ import type { Environment } from './types'
 import { generateTraceSpan } from '@proofzero/platform-middleware/trace'
 
 interface CreateInnerContextOptions
-  extends Partial<FetchCreateContextFnOptions & BaseContext & Environment> {}
+  extends Partial<FetchCreateContextFnOptions & BaseContext> {
+  env: Environment
+}
 
 export async function createContextInner(opts: CreateInnerContextOptions) {
   const traceSpan = generateTraceSpan(opts.req?.headers)
@@ -17,7 +19,7 @@ export async function createContext(
   opts: FetchCreateContextFnOptions,
   env: Environment
 ) {
-  const contextInner = await createContextInner({ ...opts, ...env })
+  const contextInner = await createContextInner({ ...opts, env })
   return {
     req: opts.req,
     resHeaders: opts.resHeaders,

@@ -2,10 +2,8 @@ import { DOProxy, DurableObjectStubProxy } from 'do-proxy'
 
 import { IdentityURN } from '@proofzero/urns/identity'
 import { AccountType, NodeType } from '@proofzero/types/account'
-
 import type { Environment } from '@proofzero/platform.core'
 
-import ContractAccount from './contract'
 import CryptoAccount from './crypto'
 import OAuthAccount from './oauth'
 import EmailAccount from './email'
