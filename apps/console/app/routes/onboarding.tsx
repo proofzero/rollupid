@@ -56,10 +56,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
 
     const igs = await coreClient.identity.listIdentityGroups.query()
     const targetIG =
-      (igs[0] &&
-        igs[0].members.length > 1 &&
-        igs[0].members[0].URN !== identityURN) ??
-      undefined
+      igs[0] &&
+      igs[0].members.length > 1 &&
+      igs[0].members[0].URN !== identityURN
+        ? igs[0]
+        : undefined
 
     return json({
       url: request.url,

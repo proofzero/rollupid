@@ -28,32 +28,6 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import { Spinner } from '@proofzero/design-system/src/atoms/spinner/Spinner'
 import type { AccountURN } from '@proofzero/urns/account'
 import { IdentityGroupURN } from '@proofzero/urns/identity-group'
-import { checkToken } from '@proofzero/utils/token'
-import { IdentityURN } from '@proofzero/urns/identity'
-
-export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
-  async ({ request, context }) => {
-    const jwt = await requireJWT(request, context.env)
-    const payload = checkToken(jwt!)
-    const identityURN = payload.sub as IdentityURN
-
-    const coreClient = createCoreClient(context.env.Core, {
-      ...getAuthzHeaderConditionallyFromToken(jwt),
-      ...generateTraceContextHeaders(context.traceSpan),
-    })
-
-    const igs = await coreClient.identity.listIdentityGroups.query()
-    const targetIG =
-      (igs[0] &&
-        igs[0].members.length > 1 &&
-        igs[0].members[0].URN !== identityURN) ??
-      undefined
-
-    return json({
-      targetIG,
-    })
-  }
-)
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -540,6 +514,100 @@ const CreateGroup = ({
   )
 }
 
+const EnrollToGroup = ({
+  groupName,
+  setPage,
+  page,
+}: {
+  groupName: string
+  setPage: (value: number) => void
+  page: number
+}) => {
+  const [groupRole, setGroupRole] = useState('Founder or leadership')
+
+  return (
+    <div
+      className={`w-full h-full flex flex-col gap-2
+      transition-opacity  ease-in-out delay-150
+      ${page === 2 ? 'opacity-100' : 'hide'}`}
+    >
+      <div className="flex flex-row items-center gap-2">
+        <HiOutlineArrowLeft
+          className="text-lg text-gray-400 cursor-pointer"
+          onClick={() => setPage(page - 1)}
+        />
+        <Text size="lg" className="text-gray-400">
+          3/4
+        </Text>
+      </div>
+      <Text size="2xl" weight="medium">
+        Workspace Details
+      </Text>
+      <Text size="lg" className="text-gray-400 mb-2">
+        Tell us more about your workspace so we can provide you a personalized
+        experience
+      </Text>
+
+      <Input
+        label="Group Name"
+        id="groupName"
+        className="w-full"
+        disabled={true}
+        readOnly={true}
+        value={groupName}
+        defaultValue={groupName}
+      />
+      <div className="w-full">
+        <Text size="sm" weight="medium" className="mb-0.5">
+          Your Role
+        </Text>
+
+        <Dropdown
+          items={[
+            { title: 'Founder or leadership', value: 'Founder or leadership' },
+            { title: 'Engineering manager', value: 'Product manager' },
+            { title: 'Software developer', value: 'Software developer' },
+            { title: 'Other', value: 'Other' },
+            { title: 'Prefer not to share', value: 'Prefer not to share' },
+          ]}
+          placeholder="Set your role"
+          defaultItems={[
+            { title: 'Founder or leadership', value: 'Founder or leadership' },
+          ]}
+          onSelect={(selected) => {
+            // type casting to DropdownSelectListItem instead of array
+            if (!Array.isArray(selected)) {
+              if (!selected || !selected.value) {
+                console.error('Error selecting email, try again')
+                return
+              }
+              setGroupRole(selected.value)
+            }
+          }}
+        />
+      </div>
+
+      <Button
+        className="w-full"
+        btnType="primary-alt"
+        btnSize="xl"
+        disabled={!groupName?.length || !groupRole?.length}
+        onClick={() => {
+          setPage(page + 1)
+        }}
+      >
+        <Text>Continue</Text>
+      </Button>
+      <div className="mt-auto flex flex-row gap-2 w-full">
+        <div className="border w-full rounded-lg border-2 border-indigo-500" />
+        <div className="border w-full rounded-lg border-2 border-indigo-500" />
+        <div className="border w-full rounded-lg border-2 border-indigo-500" />
+        <div className="border w-full rounded-lg border-2" />
+      </div>
+    </div>
+  )
+}
+
 const CreateApp = ({
   setPage,
   page,
@@ -700,20 +768,24 @@ export default function Landing() {
       PASSPORT_URL: string
       currentPage: number
       targetIG:
+        | undefined
         | {
             name: string
             URN: IdentityGroupURN
           }
-        | undefined
     }>()
 
   // Currently 'team' is not an option. It is here for future use.
-  const [orgType, setOrgType] = useState<'solo' | 'team'>('solo')
+  const [orgType, setOrgType] = useState<'solo' | 'team'>(
+    targetIG ? 'team' : 'solo'
+  )
   const [clientId, setClientId] = useState('')
   const [emailAccountURN, setEmailAccountURN] = useState<AccountURN>()
 
   const [page, setPage] = useState(currentPage)
-  const [groupID, setGroupID] = useState('')
+  const [groupID, setGroupID] = useState(
+    targetIG ? targetIG.URN.split('/')[1] : ''
+  )
 
   return (
     <div
@@ -734,7 +806,13 @@ export default function Landing() {
         page={page}
         setEmailAccountURN={setEmailAccountURN}
       />
-      {targetIG && <>FOO</>}
+      {targetIG && (
+        <EnrollToGroup
+          groupName={targetIG.name}
+          setPage={setPage}
+          page={page}
+        />
+      )}
 
       {!targetIG && (
         <>
