@@ -15,7 +15,7 @@ To prevent abuse, the service limits requests for each application to 10 per min
 There are several ways you can consume GQL APIs and we've documented how below. If you are interested in a deeper understanding of GraphQL you can visit the [GraphQL documentation portal.](https://graphql.org/learn/)
 
 {% hint style="info" %}
-For these example we are using Javascript but you would be able to achieve similar results with your preferred language.
+For these examples we are using Javascript but you would be able to achieve similar results with your preferred language.
 {% endhint %}
 
 {% tabs %}
@@ -122,7 +122,7 @@ const { profile } = fetch("https://galaxy.rollup.id/graphql", {
 {% tab title="2. GQL Client" %}
 **Option 2: GraphQL Clients**
 
-Our reccomended approach is to use a general purpose GQL Client. One such client we recommend for Javascript is [graphql-request.](https://www.npmjs.com/package/graphql-request)
+Our recommended approach is to use a general purpose GQL Client. One such client we recommend for Javascript is [graphql-request.](https://www.npmjs.com/package/graphql-request)
 
 GraphQL Request helps reduce the overhead of making GQL API calls with a simple fetch. Let's demonstrate the same examples in Option 1 with this library.
 
