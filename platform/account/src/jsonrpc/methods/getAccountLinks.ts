@@ -59,7 +59,6 @@ export const getAccountLinks = async ({
         const clientId = (edge.src.baseUrn as AuthorizationURN)
           .split('/')[1]
           .split('@')[1]
-        // const appDetails = await caller.starbase.getAppDetails({ clientId })
 
         return buildResType(
           ReferenceType.Authorization,
