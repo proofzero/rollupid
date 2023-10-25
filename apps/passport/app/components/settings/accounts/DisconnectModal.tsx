@@ -1,6 +1,6 @@
 import { useFetcher, Link } from '@remix-run/react'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Text } from '@proofzero/design-system'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
@@ -64,8 +64,17 @@ const ReferenceTypeDisclosure: React.FC<{
   setIsOpen: (open: boolean) => void
   aums: AccountUsageDisconnectModel[]
   referenceType: ReferenceType
+  toggledReferenceType?: ReferenceType
   defaultOpen?: boolean
-}> = ({ setIsOpen, aums, referenceType, defaultOpen = false }) => {
+  handleToggle: (open: boolean) => void
+}> = ({
+  setIsOpen,
+  aums,
+  referenceType,
+  handleToggle,
+  toggledReferenceType,
+  defaultOpen = false,
+}) => {
   const DisclosureTitle: React.FC<{
     referenceType: ReferenceType
   }> = ({ referenceType }) => {
@@ -85,9 +94,16 @@ const ReferenceTypeDisclosure: React.FC<{
     <>
       {aums.filter((aum) => aum.type === referenceType).length > 0 && (
         <Disclosure defaultOpen={defaultOpen}>
-          {({ open }) => (
+          {({ open, close }) => (
             <>
-              <Disclosure.Button className="flex flex-row items-center justify-between py-3 px-6 w-full">
+              {open &&
+                toggledReferenceType &&
+                toggledReferenceType !== referenceType &&
+                close()}
+              <Disclosure.Button
+                className="flex flex-row items-center justify-between py-3 px-6 w-full"
+                onClick={() => handleToggle(!open)}
+              >
                 <Text size="sm" className="text-gray-500">
                   <DisclosureTitle referenceType={referenceType} />
                 </Text>
@@ -101,8 +117,12 @@ const ReferenceTypeDisclosure: React.FC<{
               <Disclosure.Panel>
                 {aums
                   .filter((aum) => aum.type === referenceType)
-                  .map((aum) => (
-                    <AccountUsageItem setIsOpen={setIsOpen} aum={aum} />
+                  .map((aum, index) => (
+                    <AccountUsageItem
+                      key={index}
+                      setIsOpen={setIsOpen}
+                      aum={aum}
+                    />
                   ))}
                 <div className="w-full border-b border-gray-200"></div>
               </Disclosure.Panel>
@@ -153,6 +173,13 @@ export default ({
 
   const canDisconnect =
     id !== primaryAccountBaseURN && localFetcher.data?.length === 0
+
+  const [toggledReferenceType, setToggledReferenceType] =
+    useState<ReferenceType>()
+  const handleDiscolsureToggle = (
+    open: boolean,
+    referenceType: ReferenceType
+  ) => setToggledReferenceType(open ? referenceType : undefined)
 
   return localFetcher.state !== 'idle' ? (
     <Loader />
@@ -235,18 +262,36 @@ export default ({
                       aums={localFetcher.data}
                       referenceType={ReferenceType.Authorization}
                       defaultOpen={true}
+                      toggledReferenceType={toggledReferenceType}
+                      handleToggle={(open) =>
+                        handleDiscolsureToggle(
+                          open,
+                          ReferenceType.Authorization
+                        )
+                      }
                     />
 
                     <ReferenceTypeDisclosure
                       setIsOpen={setIsOpen}
                       aums={localFetcher.data}
                       referenceType={ReferenceType.DevNotificationsEmail}
+                      toggledReferenceType={toggledReferenceType}
+                      handleToggle={(open) =>
+                        handleDiscolsureToggle(
+                          open,
+                          ReferenceType.DevNotificationsEmail
+                        )
+                      }
                     />
 
                     <ReferenceTypeDisclosure
                       setIsOpen={setIsOpen}
                       aums={localFetcher.data}
                       referenceType={ReferenceType.BillingEmail}
+                      toggledReferenceType={toggledReferenceType}
+                      handleToggle={(open) =>
+                        handleDiscolsureToggle(open, ReferenceType.BillingEmail)
+                      }
                     />
                   </>
                 )}
