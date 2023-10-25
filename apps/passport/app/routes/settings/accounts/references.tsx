@@ -108,9 +108,7 @@ const getLinksWithAuthorizedAppNames = async (
     if (l.type === ReferenceType.Authorization) {
       return {
         ...l,
-        title: l.identifier
-          ? authorizedAppNamesMap[l.identifier] || undefined
-          : undefined,
+        title: l.identifier && authorizedAppNamesMap[l.identifier],
       }
     }
     return l

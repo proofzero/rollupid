@@ -33,9 +33,9 @@ export const getAppNameBatch = async ({
   ctx: Context
 }): Promise<z.infer<typeof GetAppNameBatchOutput>> =>
   Promise.all(
-    input.map(async (clientID) => ({
-      clientId: clientID,
-      name: await getNameForApp(ctx, clientID),
+    input.map(async (clientId) => ({
+      clientId,
+      name: await getNameForApp(ctx, clientId),
     }))
   )
 
