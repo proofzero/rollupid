@@ -136,6 +136,11 @@ import {
   transferAppToGroup,
   TransferAppToGroupInput,
 } from './methods/transferAppToGroup'
+import {
+  getAppNameBatch,
+  GetAppNameBatchInput,
+  GetAppNameBatchOutput,
+} from './methods/getAppName'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -394,6 +399,12 @@ export const appRouter = t.router({
     .use(OwnAppsMiddleware)
     .input(TransferAppToGroupInput)
     .mutation(transferAppToGroup),
+  getAppNameBatch: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAppNameBatchInput)
+    .output(GetAppNameBatchOutput)
+    .query(getAppNameBatch),
 })
 
 export type StarbaseRouter = typeof appRouter

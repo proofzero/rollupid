@@ -13,12 +13,105 @@ import warn from '~/assets/warning.svg'
 import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 
 import { FiExternalLink } from 'react-icons/fi'
-import { HiOutlineX } from 'react-icons/hi'
+import { HiChevronDown, HiChevronUp, HiOutlineX } from 'react-icons/hi'
+import { ReferenceType } from '@proofzero/platform/account/src/types'
+
+import { Disclosure } from '@headlessui/react'
 
 export type AccountUsageDisconnectModel = {
-  message: string
+  title?: string
   external: boolean
   path: string
+  type: ReferenceType
+}
+
+const AccountUsageItem: React.FC<{
+  setIsOpen: (open: boolean) => void
+  aum: AccountUsageDisconnectModel
+}> = ({ setIsOpen, aum }) => (
+  <>
+    <div className="w-full border-b border-gray-200"></div>
+    <li className="flex flex-row py-3 px-6 bg-gray-50">
+      <Text size="xs" weight="medium" className="text-gray-500 flex-1">
+        {aum.title}
+      </Text>
+
+      {aum.external && (
+        <a href={aum.path} target="_blank" onClick={() => setIsOpen(false)}>
+          <Text
+            size="xs"
+            weight="medium"
+            className="text-indigo-500 flex flex-row items-center space-x-2"
+          >
+            <span>Edit</span>
+            <FiExternalLink className="text-indigo-500 w-3 h-3" />
+          </Text>
+        </a>
+      )}
+
+      {!aum.external && (
+        <Link to={aum.path} onClick={() => setIsOpen(false)}>
+          <Text size="xs" weight="medium" className="text-indigo-500 pr-5">
+            <span>Edit</span>
+          </Text>
+        </Link>
+      )}
+    </li>
+  </>
+)
+
+const ReferenceTypeDisclosure: React.FC<{
+  setIsOpen: (open: boolean) => void
+  aums: AccountUsageDisconnectModel[]
+  referenceType: ReferenceType
+  defaultOpen?: boolean
+}> = ({ setIsOpen, aums, referenceType, defaultOpen = false }) => {
+  const DisclosureTitle: React.FC<{
+    referenceType: ReferenceType
+  }> = ({ referenceType }) => {
+    switch (referenceType) {
+      case ReferenceType.Authorization:
+        return <>Address is being used for app(s) authorizations</>
+      case ReferenceType.DevNotificationsEmail:
+        return <>Email is being used as contact in Console</>
+      case ReferenceType.BillingEmail:
+        return <>Email is being used as billing email in Console</>
+      default:
+        return <>Unknown</>
+    }
+  }
+
+  return (
+    <>
+      {aums.filter((aum) => aum.type === referenceType).length > 0 && (
+        <Disclosure defaultOpen={defaultOpen}>
+          {({ open }) => (
+            <>
+              <Disclosure.Button className="flex flex-row items-center justify-between py-3 px-6 w-full">
+                <Text size="sm" className="text-gray-500">
+                  <DisclosureTitle referenceType={referenceType} />
+                </Text>
+
+                {open ? (
+                  <HiChevronUp className="h-6 w-6 text-indigo-500" />
+                ) : (
+                  <HiChevronDown className="h-6 w-6" />
+                )}
+              </Disclosure.Button>
+              <Disclosure.Panel>
+                {aums
+                  .filter((aum) => aum.type === referenceType)
+                  .map((aum) => (
+                    <AccountUsageItem setIsOpen={setIsOpen} aum={aum} />
+                  ))}
+                <div className="w-full border-b border-gray-200"></div>
+              </Disclosure.Panel>
+            </>
+          )}
+        </Disclosure>
+      )}
+    </>
+  )
 }
 
 export default ({
@@ -40,7 +133,7 @@ export default ({
   primaryAccountURN: AccountURN
 }) => {
   const primaryAccountBaseURN = AccountURNSpace.getBaseURN(primaryAccountURN)
-  const localFetcher = useFetcher()
+  const localFetcher = useFetcher<AccountUsageDisconnectModel[]>()
 
   useEffect(() => {
     if (!isOpen || id === primaryAccountBaseURN) {
@@ -90,7 +183,7 @@ export default ({
                 </Text>
 
                 <Text size="sm" weight="normal" className="text-gray-500 mt-2">
-                  You can’t disconnect this account because:
+                  You can't disconnect this account because:
                 </Text>
               </div>
             )}
@@ -134,50 +227,29 @@ export default ({
               )}
 
               {primaryAccountBaseURN !== id &&
-                localFetcher.data?.length > 0 &&
-                localFetcher.data.map((aum: AccountUsageDisconnectModel) => (
+                localFetcher.data &&
+                localFetcher.data.length > 0 && (
                   <>
-                    <div className="w-full border-b border-gray-200"></div>
-                    <li className="flex flex-row py-3 px-6">
-                      <Text
-                        size="sm"
-                        weight="normal"
-                        className="text-gray-500 flex-1"
-                      >
-                        {aum.message}
-                      </Text>
+                    <ReferenceTypeDisclosure
+                      setIsOpen={setIsOpen}
+                      aums={localFetcher.data}
+                      referenceType={ReferenceType.Authorization}
+                      defaultOpen={true}
+                    />
 
-                      {aum.external && (
-                        <a
-                          href={aum.path}
-                          target="_blank"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <Text
-                            size="sm"
-                            weight="medium"
-                            className="text-indigo-500 flex flex-row items-center space-x-2"
-                          >
-                            <span>Edit</span>
-                            <FiExternalLink className="text-indigo-500 w-4 h-4" />
-                          </Text>
-                        </a>
-                      )}
+                    <ReferenceTypeDisclosure
+                      setIsOpen={setIsOpen}
+                      aums={localFetcher.data}
+                      referenceType={ReferenceType.DevNotificationsEmail}
+                    />
 
-                      {!aum.external && (
-                        <Link to={aum.path} onClick={() => setIsOpen(false)}>
-                          <Text
-                            size="sm"
-                            weight="medium"
-                            className="text-indigo-500 pr-6"
-                          >
-                            <span>Edit</span>
-                          </Text>
-                        </Link>
-                      )}
-                    </li>
+                    <ReferenceTypeDisclosure
+                      setIsOpen={setIsOpen}
+                      aums={localFetcher.data}
+                      referenceType={ReferenceType.BillingEmail}
+                    />
                   </>
-                ))}
+                )}
               <div className="w-full border-b border-gray-200"></div>
             </ul>
           )}

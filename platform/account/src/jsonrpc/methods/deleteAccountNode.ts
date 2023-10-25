@@ -8,7 +8,7 @@ import { IdentityURNSpace } from '@proofzero/urns/identity'
 import { AccountURN } from '@proofzero/urns/account'
 
 import type { Context } from '../../context'
-import { getAccountReferenceTypes } from './getAccountReferenceTypes'
+import { getAccountLinks } from './getAccountLinks'
 
 export const DeleteAccountNodeInput = z.object({
   identityURN: IdentityURNInput,
@@ -42,7 +42,7 @@ export const deleteAccountNodeMethod = async ({
       })
     }
 
-    const accountUsage = await getAccountReferenceTypes({ ctx })
+    const accountUsage = await getAccountLinks({ ctx })
     if (accountUsage.length > 0) {
       throw new RollupError({
         code: ERROR_CODES.BAD_REQUEST,
