@@ -227,7 +227,7 @@ export default function AppDetailIndexPage() {
       <div className="flex flex-col md:flex-row space-y-5 md:space-y-0 md:space-x-5">
         <div className="flex-1 flex flex-col space-y-5">
           <Panel
-            title="Galaxy GraphQL API Key"
+            title="Galaxy API"
             titleCompanion={
               <div>
                 <Text size="xs" weight="medium" className="text-gray-400">
