@@ -95,7 +95,11 @@ export const getRollupAuthenticator = (env: Env) => {
 // our authenticate function receives the Request, the Session and a Headers
 // we make the headers optional so loaders don't need to pass one
 // https://sergiodxa.com/articles/working-with-refresh-tokens-in-remix
-export async function requireJWT(request: Request, env: Env, headers = new Headers()) {
+export async function requireJWT(
+  request: Request,
+  env: Env,
+  headers = new Headers()
+) {
   const session = await getProfileSession(request, env)
   const { user } = session.data
   if (!user) throw redirect('/auth')
@@ -115,7 +119,11 @@ export async function requireJWT(request: Request, env: Env, headers = new Heade
         if (!cipher || !iv) throw redirect('/auth')
         const accessToken = await refreshAccessToken({
           tokenURL: env.PASSPORT_TOKEN_URL,
-          refreshToken: await decryptSession(env.SECRET_SESSION_KEY, cipher, iv),
+          refreshToken: await decryptSession(
+            env.SECRET_SESSION_KEY,
+            cipher,
+            iv
+          ),
           clientId: env.PROFILE_CLIENT_ID,
           clientSecret: env.PROFILE_CLIENT_SECRET,
         })
@@ -123,7 +131,9 @@ export async function requireJWT(request: Request, env: Env, headers = new Heade
           await encryptSession(env.SECRET_SESSION_KEY, accessToken)
         )
         session.set('user', user)
-        const cookie = await getProfileSessionStorage(env).commitSession(session)
+        const cookie = await getProfileSessionStorage(env).commitSession(
+          session
+        )
         headers.append('Set-Cookie', cookie)
 
         if (request.method === 'GET') throw redirect(request.url, { headers })
@@ -183,7 +193,10 @@ export async function commitProfileSession(session: Session, env: Env) {
   return storage.commitSession(session)
 }
 
-export const getAccessToken = async (request: Request, env: Env): Promise<string> => {
+export const getAccessToken = async (
+  request: Request,
+  env: Env
+): Promise<string> => {
   const session = await getProfileSession(request, env)
   const { cipher, iv } = JSON.parse(session.get('user').accessToken)
   return decryptSession(env.SECRET_SESSION_KEY, cipher, iv)

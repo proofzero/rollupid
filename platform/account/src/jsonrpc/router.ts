@@ -80,9 +80,9 @@ import {
   DeleteAccountNodeInput,
 } from './methods/deleteAccountNode'
 import {
-  getAccountReferenceTypes,
-  GetAccountReferenceTypeOutput,
-} from './methods/getAccountReferenceTypes'
+  getAccountLinks,
+  GetAccountLinksOutput,
+} from './methods/getAccountLinks'
 import {
   registerSessionKeyMethod,
   RegisterSessionKeyInput,
@@ -304,12 +304,12 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(DeleteAccountNodeInput)
     .mutation(deleteAccountNodeMethod),
-  getAccountReferenceTypes: t.procedure
+  getAccountLinks: t.procedure
     .use(LogUsage)
     .use(parse3RN)
     .use(Analytics)
-    .output(GetAccountReferenceTypeOutput)
-    .query(getAccountReferenceTypes),
+    .output(GetAccountLinksOutput)
+    .query(getAccountLinks),
   revokeWalletSessionKey: t.procedure
     .use(LogUsage)
     .use(parse3RN)
