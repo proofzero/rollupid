@@ -276,6 +276,11 @@ export default ({
                       aums={localFetcher.data}
                       referenceType={ReferenceType.DevNotificationsEmail}
                       toggledReferenceType={toggledReferenceType}
+                      defaultOpen={
+                        localFetcher.data.filter(
+                          (el) => el.type === ReferenceType.Authorization
+                        ).length === 0
+                      }
                       handleToggle={(open) =>
                         handleDiscolsureToggle(
                           open,
@@ -289,6 +294,12 @@ export default ({
                       aums={localFetcher.data}
                       referenceType={ReferenceType.BillingEmail}
                       toggledReferenceType={toggledReferenceType}
+                      defaultOpen={
+                        localFetcher.data.filter(
+                          (el) =>
+                            el.type === ReferenceType.DevNotificationsEmail
+                        ).length === 0
+                      }
                       handleToggle={(open) =>
                         handleDiscolsureToggle(open, ReferenceType.BillingEmail)
                       }
