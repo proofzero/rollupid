@@ -342,14 +342,6 @@ export default function AppDetailIndexPage() {
               </div>
             </div>
           </Panel>
-
-          <Panel title="Smart Contracts">
-            <div className="flex justify-center p-8">
-              <Button btnType="secondary-alt" btnSize="xxl" disabled>
-                Connect Smart Contract
-              </Button>
-            </div>
-          </Panel>
         </div>
         <div className="flex-1">
           <div className="flex h-full flex-col">
