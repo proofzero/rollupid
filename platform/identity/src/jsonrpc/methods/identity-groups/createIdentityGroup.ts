@@ -13,8 +13,12 @@ import { createAnalyticsEvent } from '@proofzero/utils/analytics'
 export const CreateIdentityGroupInputSchema = z.object({
   name: z.string(),
 })
-
 type CreateIdentityGroupInput = z.infer<typeof CreateIdentityGroupInputSchema>
+
+export const CreateIdentityGroupOutputSchema = z.object({
+  groupID: z.string(),
+})
+type CreateIdentityGroupOutput = z.infer<typeof CreateIdentityGroupOutputSchema>
 
 export const createIdentityGroup = async ({
   input,
@@ -22,7 +26,7 @@ export const createIdentityGroup = async ({
 }: {
   input: CreateIdentityGroupInput
   ctx: Context
-}): Promise<void> => {
+}): Promise<CreateIdentityGroupOutput> => {
   const name = hexlify(randomBytes(IDENTITY_GROUP_OPTIONS.length))
   const groupURN = IdentityGroupURNSpace.componentizedUrn(name, undefined, {
     name: input.name,
@@ -69,4 +73,8 @@ export const createIdentityGroup = async ({
       },
     })
   )
+
+  return {
+    groupID: name,
+  }
 }
