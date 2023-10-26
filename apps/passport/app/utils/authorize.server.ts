@@ -19,8 +19,6 @@ import { redirect } from '@remix-run/cloudflare'
 import { CryptoAccountType, NodeType } from '@proofzero/types/account'
 import type { DropdownSelectListItem } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import type { AccountURN } from '@proofzero/urns/account'
-import { Address } from 'viem'
-import { NO_OP_ACCOUNT_PLACEHOLDER } from '@proofzero/platform.account/src/constants'
 
 export type DataForScopes = {
   connectedEmails: DropdownSelectListItem[]
@@ -31,22 +29,23 @@ export type DataForScopes = {
 }
 
 // Deterministically sort scopes so that they are always in the same order
-// when returned to the client. Email is always last.
+// when returned to the client.
 // -----------------------------------------------------------------------------
-const orderOfScopes: Record<string, number> = {
-  openid: 0,
-  system_identifiers: 0,
-  profile: 1,
-  email: 2,
-  connected_accounts: 3,
-}
+const orderOfScopes = [
+  'email',
+  'erc_4337',
+  'connected_accounts',
+  'openid',
+  'system_identifiers',
+  'profile',
+]
 
 export const reorderScope = (scopes: string[]): string[] => {
   return scopes.sort((a, b) => {
-    const aIndex = orderOfScopes[a]
-    const bIndex = orderOfScopes[b]
-    if (aIndex === undefined) return 1
-    if (bIndex === undefined) return -1
+    const aIndex = orderOfScopes.indexOf(a)
+    const bIndex = orderOfScopes.indexOf(b)
+    if (aIndex === -1) return 1
+    if (bIndex === -1) return -1
     return aIndex - bIndex
   })
 }

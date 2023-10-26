@@ -109,7 +109,7 @@ export default ({
         "Read account's system identifiers and other non-personally identifiable information",
       class: 'implied',
     }
-    scopesToDisplay.unshift('system_identifiers')
+    scopesToDisplay.push('system_identifiers')
   }
   return (
     <div
