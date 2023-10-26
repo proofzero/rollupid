@@ -16,7 +16,7 @@ export default function Info({
       <Tooltip
         arrow={false}
         content={description}
-        className="bg-white text-black dark:text-white shadow absolute z-5 w-max"
+        className="!bg-white !text-gray-500 !dark:text-white shadow absolute z-5 w-max"
         placement={placement}
       >
         <img src={iIcon} alt={`${name} info`} />
