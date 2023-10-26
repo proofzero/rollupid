@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { TbUserCircle, TbWorldCog } from 'react-icons/tb'
+
 const connectedAccountsSVG = (
   <svg
     width="24"
@@ -59,21 +61,27 @@ const smartContractsSVG = (
 
 // eslint-disable-next-line react/display-name
 export default ({ scope }: { scope: string }) => {
-  let svg
+  let icon: JSX.Element
   switch (scope) {
     case 'connected_accounts':
-      svg = connectedAccountsSVG
+      icon = connectedAccountsSVG
       break
     case 'email':
-      svg = emailSVG
+      icon = emailSVG
       break
     case 'erc_4337':
-      svg = smartContractsSVG
+      icon = smartContractsSVG
+      break
+    case 'profile':
+      icon = <TbUserCircle className="w-6 h-6" />
+      break
+    case 'system_identifiers':
+      icon = <TbWorldCog className="w-6 h-6" />
       break
   }
   return (
     <div className="w-[38px] h-[38px] rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-200 flex justify-center items-center flex-shrink-0">
-      {svg}
+      {icon}
     </div>
   )
 }

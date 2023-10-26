@@ -301,6 +301,8 @@ export default ({
                       </div>
                     </div>
 
+                    <ScopeIcon scope={scope} />
+
                     <Text
                       size="sm"
                       weight="medium"
