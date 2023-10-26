@@ -109,7 +109,7 @@ export default ({
         "Read account's system identifiers and other non-personally identifiable information",
       class: 'implied',
     }
-    scopesToDisplay.unshift('system_identifiers')
+    scopesToDisplay.push('system_identifiers')
   }
   return (
     <div
@@ -139,12 +139,6 @@ export default ({
         </p>
       </div>
       <div className={'flex flex-col gap-4 items-start justify-start w-full'}>
-        <p
-          style={{ color: '#6B7280' }}
-          className={'mb-2 font-extralight text-xs'}
-        >
-          APP ASKS FOR
-        </p>
         <ul
           style={{ color: '#6B7280' }}
           className={'flex flex-col font-light text-base w-full'}
@@ -170,6 +164,7 @@ export default ({
                     <Info
                       name={scopeMeta.scopes[scope].name}
                       description={scopeMeta.scopes[scope].description}
+                      editable={true}
                     />
 
                     <div
@@ -306,6 +301,8 @@ export default ({
                         </p>
                       </div>
                     </div>
+
+                    <ScopeIcon scope={scope} />
 
                     <Text
                       size="sm"
