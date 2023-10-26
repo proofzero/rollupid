@@ -164,6 +164,7 @@ export default ({
                     <Info
                       name={scopeMeta.scopes[scope].name}
                       description={scopeMeta.scopes[scope].description}
+                      editable={true}
                     />
 
                     <div
