@@ -139,12 +139,6 @@ export default ({
         </p>
       </div>
       <div className={'flex flex-col gap-4 items-start justify-start w-full'}>
-        <p
-          style={{ color: '#6B7280' }}
-          className={'mb-2 font-extralight text-xs'}
-        >
-          APP ASKS FOR
-        </p>
         <ul
           style={{ color: '#6B7280' }}
           className={'flex flex-col font-light text-base w-full'}
