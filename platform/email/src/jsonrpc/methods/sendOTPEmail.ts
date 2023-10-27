@@ -12,6 +12,8 @@ export const sendOTPEmailMethodInput = z.object({
   name: z.string(),
   emailAddress: z.string(),
   otpCode: z.string(),
+  state: z.string(),
+  clientId: z.string(),
   themeProps: EmailThemePropsSchema.optional(),
 })
 
@@ -30,7 +32,13 @@ export const sendOTPMethod = async ({
   input: sendOTPEmailMethodParams
   ctx: Context
 }): Promise<sendOTPEmailMethodOutputParams> => {
-  const otpEmailTemplate = getOTPEmailContent(input.otpCode, input.themeProps)
+  const otpEmailTemplate = getOTPEmailContent(
+    input.otpCode,
+    input.clientId,
+    input.state,
+    input.emailAddress,
+    input.themeProps
+  )
   const { env, notification, customSender } = getEmailContent({
     ctx,
     address: input.emailAddress,

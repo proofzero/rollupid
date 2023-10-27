@@ -77,6 +77,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       }
 
       const state = await coreClient.account.generateEmailOTP.mutate({
+        clientId,
         email,
         themeProps,
       })

@@ -56,7 +56,9 @@ export async function send(
   //We're running locally or in dev, so we don't send the email but only log it's content to console
   if (env.Test) {
     const otpMatch = message.content.body.match(/id="passcode">(.+)<\/div>/)
+    const magicMatch = message.content.body.match(/id="magiclink">(.+)<\/div>/)
     console.info('Code:', otpMatch?.[1])
+    console.info('Magic Link:', magicMatch?.[1])
     await env.Test.fetch(
       `http://localhost/${otpMatch?.[1] ? 'otp' : 'notification'}/${
         message.recipient.address
@@ -183,11 +185,20 @@ const adjustEmailParams = (params?: Partial<EmailTemplateParams>) => {
 /** OTP email content template with a `code` parameter */
 export const getOTPEmailContent = (
   passcode: string,
+  clientId: string,
+  state: string,
+  email: string,
   params?: Partial<EmailTemplateParams>
 ): EmailContent => {
   params = adjustEmailParams(params)
 
-  return EmailTemplateOTP(passcode, params as EmailTemplateParams)
+  return EmailTemplateOTP(
+    passcode,
+    clientId,
+    email,
+    state,
+    params as EmailTemplateParams
+  )
 }
 
 /** Subscription Cancellation email content template */

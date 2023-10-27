@@ -36,7 +36,6 @@ import {
   IdentityGroupURN,
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
-import { AccountURNSpace } from '@proofzero/urns/account'
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params }) => {
