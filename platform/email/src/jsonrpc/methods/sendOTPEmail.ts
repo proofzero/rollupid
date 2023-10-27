@@ -15,6 +15,7 @@ export const sendOTPEmailMethodInput = z.object({
   state: z.string(),
   clientId: z.string(),
   themeProps: EmailThemePropsSchema.optional(),
+  passportURL: z.string().url(),
 })
 
 export type sendOTPEmailMethodParams = z.infer<typeof sendOTPEmailMethodInput>
@@ -37,6 +38,7 @@ export const sendOTPMethod = async ({
     input.clientId,
     input.state,
     input.emailAddress,
+    input.passportURL,
     input.themeProps
   )
   const { env, notification, customSender } = getEmailContent({

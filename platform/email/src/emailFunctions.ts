@@ -188,6 +188,7 @@ export const getOTPEmailContent = (
   clientId: string,
   state: string,
   email: string,
+  passportURL: string,
   params?: Partial<EmailTemplateParams>
 ): EmailContent => {
   params = adjustEmailParams(params)
@@ -197,6 +198,7 @@ export const getOTPEmailContent = (
     clientId,
     email,
     state,
+    passportURL,
     params as EmailTemplateParams
   )
 }
