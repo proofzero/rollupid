@@ -81,7 +81,7 @@ export const action: ActionFunction = async ({ request, context }) => {
       headers: generateTraceContextHeaders(context.traceSpan),
     })
 
-    imageClient.delete.mutate(currentProfile.pfp.image)
+    await imageClient.delete.mutate(currentProfile.pfp.image)
   }
 
   return null

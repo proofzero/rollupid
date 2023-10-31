@@ -1573,7 +1573,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       let colorDark = fd.get('colordark') as string | undefined
       if (!colorDark || colorDark === '') colorDark = undefined
 
-      const ogGraphicURL = theme.graphicURL
+      const ogGraphicURL = theme?.graphicURL
 
       let graphicURL = fd.get('image') as string | undefined
       if (!graphicURL || graphicURL === '') graphicURL = undefined
@@ -1616,7 +1616,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           theme,
         })
 
-        deleteUpdatedImage(context, ogGraphicURL, graphicURL)
+        await deleteUpdatedImage(context, ogGraphicURL, graphicURL)
       }
 
       return json({
@@ -1625,7 +1625,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const updateEmail = async (fd: FormData, theme: EmailOTPTheme) => {
-      const ogLogoURL = theme.logoURL
+      const ogLogoURL = theme?.logoURL
       let logoURL = fd.get('logoURL') as string | undefined
       if (!logoURL || logoURL === '') logoURL = undefined
 
@@ -1659,7 +1659,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           theme,
         })
 
-        deleteUpdatedImage(context, ogLogoURL, logoURL)
+        await deleteUpdatedImage(context, ogLogoURL, logoURL)
       }
 
       return json({
@@ -1674,7 +1674,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       let description = fd.get('ogDescription') as string | undefined
       if (!description || description === '') description = undefined
 
-      const ogImageURL = theme.image
+      const ogImageURL = theme?.image
       let image = fd.get('ogImage') as string | undefined
       if (!image || image === '') image = undefined
 
@@ -1702,7 +1702,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           theme,
         })
 
-        deleteUpdatedImage(context, ogImageURL, image)
+        await deleteUpdatedImage(context, ogImageURL, image)
       }
 
       return json({

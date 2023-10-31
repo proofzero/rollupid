@@ -19,11 +19,11 @@ export const deleteMethod = async ({
   const imageComponents = input.split('/')
   const imageID = imageComponents[imageComponents.length - 2]
 
-  const url = `https://api.cloudflare.com/client/v4/accounts/${ctx.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1/${imageID}`
+  const url = `https://api.cloudflare.com/client/v4/accounts/${ctx.env.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1/${imageID}`
   const deleteRequest = new Request(url, {
     method: 'DELETE',
     headers: {
-      Authorization: `Bearer ${ctx.TOKEN_CLOUDFLARE_API}`,
+      Authorization: `Bearer ${ctx.env.TOKEN_CLOUDFLARE_API}`,
     },
   })
 

@@ -226,7 +226,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
               headers: generateTraceContextHeaders(context.traceSpan),
             })
 
-            imageClient.delete.mutate(ogAppIcon)
+            await imageClient.delete.mutate(ogAppIcon)
           }
         }
         break
