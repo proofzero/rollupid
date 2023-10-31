@@ -42,6 +42,7 @@ import type { notificationHandlerType } from '~/types'
 import { SCOPE_SMART_CONTRACT_WALLETS } from '@proofzero/security/scopes'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import createImageClient from '@proofzero/platform-clients/image'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -171,6 +172,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         ).secret
         break
       case 'update_app':
+        const appDetails = await coreClient.starbase.getAppDetails.query({
+          clientId: params.clientId,
+        })
+
         const entries = formData.entries()
         const scopes = Array.from(entries)
           .filter((entry) => {
@@ -203,6 +208,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         }
 
         if (Object.keys(errors).length === 0) {
+          const ogAppIcon = appDetails.app?.icon
+
           await Promise.all([
             coreClient.starbase.updateApp.mutate({
               clientId: params.clientId,
@@ -213,6 +220,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
               published: published,
             }),
           ])
+
+          if (ogAppIcon && ogAppIcon !== updates.icon) {
+            const imageClient = createImageClient(context.env.Images, {
+              headers: generateTraceContextHeaders(context.traceSpan),
+            })
+
+            imageClient.delete.mutate(ogAppIcon)
+          }
         }
         break
     }

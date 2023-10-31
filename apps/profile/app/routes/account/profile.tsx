@@ -24,6 +24,8 @@ import { getMoreNftsModal } from '~/helpers/nfts'
 import type { FullProfile, NFT } from '~/types'
 import { FullProfileSchema } from '~/validation'
 import InputTextarea from '@proofzero/design-system/src/atoms/form/InputTextarea'
+import createImageClient from '@proofzero/platform-clients/image'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const { sub: identityURN } = parseJwt(
@@ -68,6 +70,19 @@ export const action: ActionFunction = async ({ request, context }) => {
     identityURN!,
     JSON.stringify(zodValidation.data)
   )
+
+  if (
+    currentProfile &&
+    currentProfile.pfp.image &&
+    !currentProfile.pfp.isToken &&
+    currentProfile.pfp.image !== updatedProfile.pfp.image
+  ) {
+    const imageClient = createImageClient(context.env.Images, {
+      headers: generateTraceContextHeaders(context.traceSpan),
+    })
+
+    imageClient.delete.mutate(currentProfile.pfp.image)
+  }
 
   return null
 }
