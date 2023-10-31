@@ -46,6 +46,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     identityURN!,
     'json'
   )
+  const ogImage = currentProfile?.pfp.image
   const updatedProfile = Object.assign(currentProfile || {}, {
     displayName,
     pfp: {
@@ -71,17 +72,12 @@ export const action: ActionFunction = async ({ request, context }) => {
     JSON.stringify(zodValidation.data)
   )
 
-  if (
-    currentProfile &&
-    currentProfile.pfp.image &&
-    !currentProfile.pfp.isToken &&
-    currentProfile.pfp.image !== updatedProfile.pfp.image
-  ) {
+  if (ogImage && ogImage !== updatedProfile.pfp.image) {
     const imageClient = createImageClient(context.env.Images, {
       headers: generateTraceContextHeaders(context.traceSpan),
     })
 
-    await imageClient.delete.mutate(currentProfile.pfp.image)
+    await imageClient.delete.mutate(ogImage)
   }
 
   return null
