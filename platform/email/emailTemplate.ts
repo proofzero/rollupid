@@ -16,8 +16,8 @@ export const darkModeStyles = `
         background-color: #2D3748 !important;
     }
     .primary-button {
-        background: #6366f1;
-        color: #fff;
+        background: #6366f1 !important;
+        color: #fff !important;
     }
     .footer-links {
         color: #E2E8F0 !important;
