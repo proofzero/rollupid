@@ -245,11 +245,13 @@ export default function EmailOTPValidator({
           </Text>
         )}
 
-        {!code && (
+        {(!code || invalid) && (
           <div className="flex flex-col lg:flex-row space-x-1 justify-center items-center mt-4">
-            <Text type="span" size="sm" className="text-gray-500">
-              Did not get the code?
-            </Text>
+            {!code && (
+              <Text type="span" size="sm" className="text-gray-500">
+                Did not get the code?
+              </Text>
+            )}
             <Text
               type="span"
               size="sm"

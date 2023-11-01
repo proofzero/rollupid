@@ -56,9 +56,7 @@ export async function send(
   //We're running locally or in dev, so we don't send the email but only log it's content to console
   if (env.Test) {
     const otpMatch = message.content.body.match(/id="passcode">(.+)<\/div>/)
-    const magicMatch = message.content.body.match(/id="magiclink">(.+)<\/div>/)
     console.info('Code:', otpMatch?.[1])
-    console.info('Magic Link:', magicMatch?.[1])
     await env.Test.fetch(
       `http://localhost/${otpMatch?.[1] ? 'otp' : 'notification'}/${
         message.recipient.address
