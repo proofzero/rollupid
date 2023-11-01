@@ -208,7 +208,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         }
 
         if (Object.keys(errors).length === 0) {
-          const ogAppIcon = appDetails.app?.icon
+          const oauthLogo = appDetails.app?.icon
 
           await Promise.all([
             coreClient.starbase.updateApp.mutate({
@@ -221,12 +221,12 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
             }),
           ])
 
-          if (ogAppIcon && ogAppIcon !== updates.icon) {
+          if (oauthLogo && oauthLogo !== updates.icon) {
             const imageClient = createImageClient(context.env.Images, {
               headers: generateTraceContextHeaders(context.traceSpan),
             })
 
-            await imageClient.delete.mutate(ogAppIcon)
+            await imageClient.delete.mutate(oauthLogo)
           }
         }
         break
