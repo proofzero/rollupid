@@ -17,7 +17,7 @@ export const darkModeStyles = `
     }
     .primary-button {
         background: #6366f1 !important;
-        color: #fff !important;
+        color: #ffffff !important;
     }
     .footer-links {
         color: #E2E8F0 !important;
@@ -44,7 +44,7 @@ export const lightModeStyles = `
     }
     .primary-button {
         background: #6366f1 !important;
-        color: #fff !important;
+        color: #ffffff !important;
     }
     .footer-links {
         color: #6b7280 !important;
@@ -270,7 +270,7 @@ export const EmailTemplateOTP = (
     <p style="font-size: 16px; font-weight: normal; line-height: 24px; margin-bottom: 16px;">Please copy the code below into the email verification screen.</p>
     <div style="width: 100%; text-align: center; font-size: 46px; font-weight: bold; border-radius: 8px; margin-top: 20px; margin-bottom: 20px; padding: 15px 0; background-color: #f3f4f6;" id="passcode">${passcode}</div>
     <p style="font-size: 16px; font-weight: normal; line-height: 24px; margin-bottom: 16px;">Or submit the code by clicking button below</p>
-    <a class="primary-button" style="margin-top: 20px; margin-bottom: 20px; display: flex; padding: 13px 25px; justify-content: center; align-items: center; align-self: stretch; border-radius: 6px; background: #6366f1; color: #fff; font-size: 16px; font-style: normal; font-weight: 500; line-height: 24px; text-decoration: none;" href="${passportURL}/authenticate/${clientId}/email/verify?email=${email}&state=${state}&code=${passcode}">Verify Email Address</a>
+    <a class="primary-button" style="margin-top: 20px; margin-bottom: 20px; display: flex; padding: 13px 25px; justify-content: center; align-items: center; align-self: stretch; border-radius: 6px; background: #6366f1; color: #ffffff; font-size: 16px; font-style: normal; font-weight: 500; line-height: 24px; text-decoration: none;" href="${passportURL}/authenticate/${clientId}/email/verify?email=${email}&state=${state}&code=${passcode}">Verify Email Address</a>
     <p style="font-size: 16px; font-weight: normal; line-height: 24px; margin-bottom: 16px;">Please note: the code will be valid for the next 10 minutes.</p>
     <p style="font-size: 16px; font-weight: normal; line-height: 24px; margin-bottom: 16px;">
       If you didn&apos;t request this email, there&apos;s nothing to worry about - you can safely ignore it.
