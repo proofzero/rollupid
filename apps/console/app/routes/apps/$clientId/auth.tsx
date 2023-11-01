@@ -337,64 +337,82 @@ export default function AppDetailIndexPage() {
         onSubmitCapture={async (event) => {
           event.preventDefault()
 
-          const form = event.currentTarget as HTMLFormElement
-          const fileInputs = form.querySelectorAll('input[type="file"]')
-
-          const filteredFileInputs = Array.from(fileInputs)
-            .filter((input) => {
-              const inputElement = input as HTMLInputElement
-              if (!inputElement) {
-                return
-              }
-
-              const { dataset, files } = inputElement
-              if (!dataset || !dataset.variant) {
-                return false
-              }
-
-              if (!files || !files[0]) {
-                return false
-              }
-
-              return true
-            })
-            .map((input) => ({
-              variant: (input as HTMLInputElement).dataset.variant!,
-              file: (input as HTMLInputElement).files![0],
-            }))
-
-          const fileUrls = await Promise.all(
-            filteredFileInputs.map(async ({ file, variant }) => {
-              const imgUploadUrl = (await fetch('/api/image-upload-url', {
-                method: 'post',
-              }).then((res) => {
-                return res.json()
-              })) as string
-
-              const formData = new FormData()
-              formData.append('file', file)
-
-              const cfUploadRes: {
-                success: boolean
-                result: {
-                  variants: string[]
-                }
-              } = await fetch(imgUploadUrl, {
-                method: 'POST',
-                body: formData,
-              }).then((res) => res.json())
-
-              const variantUrls = cfUploadRes.result.variants.filter((v) =>
-                v.endsWith(variant)
+          const getFilteredFileInputs = (formElement: HTMLFormElement) => {
+            return Array.from(
+              formElement.querySelectorAll('input[type="file"]')
+            )
+              .map((input) => input as HTMLInputElement)
+              .filter(
+                (input) =>
+                  input.dataset.variant && input.files && input.files[0]
               )
+              .map((input) => ({
+                variant: input.dataset.variant,
+                file: input.files![0],
+              }))
+          }
 
-              return variantUrls[0]
+          const getUploadUrl = async () => {
+            const response = await fetch('/api/image-upload-url', {
+              method: 'POST',
             })
-          )
+            if (!response.ok) {
+              throw new Error('Failed to retrieve the image upload URL.')
+            }
+            return response.json<string>()
+          }
 
-          console.log(fileUrls)
+          const uploadFile = async (file: File, uploadUrl: string) => {
+            const formData = new FormData()
+            formData.append('file', file)
+            const response = await fetch(uploadUrl, {
+              method: 'POST',
+              body: formData,
+            })
+            if (!response.ok) {
+              throw new Error('Failed to upload the image.')
+            }
+            return response.json<{
+              result: {
+                variants: string[]
+              }
+            }>()
+          }
 
-          // submit(form)
+          const extractVariantUrl = (
+            uploadResponse: {
+              result: {
+                variants: string[]
+              }
+            },
+            variant: string
+          ) => {
+            const variantUrl = uploadResponse.result.variants.find((v) =>
+              v.endsWith(variant)
+            )
+            if (!variantUrl) {
+              throw new Error(`No URL found for variant: ${variant}`)
+            }
+            return variantUrl
+          }
+
+          const formElement = event.currentTarget
+          const filteredFileInputs = getFilteredFileInputs(formElement)
+
+          try {
+            const imgUploadUrl = await getUploadUrl()
+            const fileUrls = await Promise.all(
+              filteredFileInputs.map(async ({ file, variant }) => {
+                const uploadResponse = await uploadFile(file, imgUploadUrl)
+                return extractVariantUrl(uploadResponse, variant!)
+              })
+            )
+
+            console.log(fileUrls)
+            // submit(formElement);
+          } catch (error) {
+            console.error('Error during file upload:', error)
+          }
         }}
       >
         <fieldset disabled={isImgUploading}>
