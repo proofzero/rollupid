@@ -39,6 +39,18 @@ import {
 
 export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, params }) => {
+    const cfReq = request as {
+      cf?: {
+        botManagement: {
+          score: number
+        }
+      }
+    }
+    const isBot =
+      cfReq.cf &&
+      cfReq.cf.botManagement.score <= 30 &&
+      !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
+
     const qp = new URL(request.url).searchParams
 
     const email = qp.get('email')
@@ -48,10 +60,14 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     if (!state)
       throw new BadRequestError({ message: 'No state included in request' })
 
+    const code = qp.get('code')
+
     return json({
       email,
       initialState: state,
       clientId: params.clientId,
+      code,
+      isBot,
     })
   }
 )
@@ -136,7 +152,7 @@ export default () => {
     prompt?: string
   }>()
 
-  const { email, initialState } = useLoaderData()
+  const { email, initialState, code, isBot } = useLoaderData()
   const ad = useActionData()
   const submit = useSubmit()
   const navigate = useNavigate()
@@ -197,6 +213,8 @@ export default () => {
           )
         }}
         goBack={() => history.back()}
+        autoVerify={!isBot}
+        code={code}
       >
         {errorMessage ? (
           <Text

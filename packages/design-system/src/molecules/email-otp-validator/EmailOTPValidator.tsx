@@ -26,6 +26,9 @@ type EmailOTPValidatorProps = {
   ) => Promise<void>
 
   regenerationTimerSeconds?: number
+
+  autoVerify?: boolean
+  code?: string
 }
 
 export default function EmailOTPValidator({
@@ -39,13 +42,15 @@ export default function EmailOTPValidator({
   requestRegeneration,
   requestVerification,
   regenerationTimerSeconds = 30,
+  autoVerify = false,
+  code,
 }: EmailOTPValidatorProps) {
   const inputLen = 6
   const inputRefs = Array.from({ length: inputLen }, () =>
     useRef<HTMLInputElement>()
   )
 
-  const [fullCode, setFullCode] = useState('')
+  const [fullCode, setFullCode] = useState(code ?? '')
   const updateFullCode = useCallback(() => {
     const updatedCode = inputRefs.map((ir) => ir.current?.value).join('')
     setFullCode(updatedCode)
@@ -98,6 +103,24 @@ export default function EmailOTPValidator({
       window.removeEventListener('keydown', handleKeyPress)
     }
   }, [email, fullCode, loadedState, loading, isInvalid])
+
+  useEffect(() => {
+    if (code && email && loadedState) {
+      const codeArray = code.split('').slice(0, inputLen)
+      codeArray.forEach((value, index) => {
+        inputRefs[index].current.value = value
+      })
+
+      if (autoVerify) {
+        setShowInvalidMessage(false)
+
+        const asyncFn = async () => {
+          await requestVerification(email, code, loadedState)
+        }
+        asyncFn()
+      }
+    }
+  }, [email, code, loadedState])
 
   return (
     <>

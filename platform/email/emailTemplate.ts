@@ -245,7 +245,7 @@ export const EmailTemplateOTP = (
     <div class="heading" style="font-size: 36px; font-weight: bold; line-height: 44px; margin-bottom: 16px;">Confirm Your Email Address</div>
     <p style="font-size: 16px; font-weight: normal; line-height: 24px; margin-bottom: 16px;">Please copy the code below into the email verification screen.</p>
     <div style="width: 100%; text-align: center; font-size: 46px; font-weight: bold; border-radius: 8px; margin-top: 20px; margin-bottom: 20px; padding: 15px 0; background-color: #f3f4f6;" id="passcode">${passcode}</div>
-    <div style="width: 100%; text-align: center; font-size: 46px; font-weight: bold; border-radius: 8px; margin-top: 20px; margin-bottom: 20px; padding: 15px 0; background-color: #f3f4f6;" id="magiclink">${passportURL}/authenticate/${clientId}/email/magic?code=${passcode}&state=${state}&email=${email}&clientId=${clientId}</div>
+    <div style="width: 100%; text-align: center; font-size: 46px; font-weight: bold; border-radius: 8px; margin-top: 20px; margin-bottom: 20px; padding: 15px 0; background-color: #f3f4f6;" id="magiclink">${passportURL}/authenticate/${clientId}/email/verify?email=${email}&state=${state}&code=${passcode}</div>
     <p style="font-size: 16px; font-weight: normal; line-height: 24px; margin-bottom: 16px;">Please note: the code will be valid for the next 10 minutes.</p>
     <p style="font-size: 16px; font-weight: normal; line-height: 24px; margin-bottom: 16px;">
       If you didn&apos;t request this email, there&apos;s nothing to worry about - you can safely ignore it.
