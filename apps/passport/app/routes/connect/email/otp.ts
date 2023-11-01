@@ -77,8 +77,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       }
 
       const state = await coreClient.account.generateEmailOTP.mutate({
-        passportURL:
-          context.env.PASSPORT_REDIRECT_URL.split('/connect/token')[0],
+        passportURL: new URL(request.url).host,
         clientId,
         email,
         themeProps,
