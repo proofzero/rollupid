@@ -48,7 +48,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     }
     const isBot =
       cfReq.cf &&
-      cfReq.cf.botManagement.score <= 30 &&
+      cfReq.cf.botManagement.score <= 89 &&
       !['localhost', '127.0.0.1'].includes(new URL(request.url).hostname)
 
     const qp = new URL(request.url).searchParams
