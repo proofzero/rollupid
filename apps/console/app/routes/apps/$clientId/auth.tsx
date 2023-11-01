@@ -334,6 +334,68 @@ export default function AppDetailIndexPage() {
         onChange={() => {
           setIsFormChanged(true)
         }}
+        onSubmitCapture={async (event) => {
+          event.preventDefault()
+
+          const form = event.currentTarget as HTMLFormElement
+          const fileInputs = form.querySelectorAll('input[type="file"]')
+
+          const filteredFileInputs = Array.from(fileInputs)
+            .filter((input) => {
+              const inputElement = input as HTMLInputElement
+              if (!inputElement) {
+                return
+              }
+
+              const { dataset, files } = inputElement
+              if (!dataset || !dataset.variant) {
+                return false
+              }
+
+              if (!files || !files[0]) {
+                return false
+              }
+
+              return true
+            })
+            .map((input) => ({
+              variant: (input as HTMLInputElement).dataset.variant!,
+              file: (input as HTMLInputElement).files![0],
+            }))
+
+          const fileUrls = await Promise.all(
+            filteredFileInputs.map(async ({ file, variant }) => {
+              const imgUploadUrl = (await fetch('/api/image-upload-url', {
+                method: 'post',
+              }).then((res) => {
+                return res.json()
+              })) as string
+
+              const formData = new FormData()
+              formData.append('file', file)
+
+              const cfUploadRes: {
+                success: boolean
+                result: {
+                  variants: string[]
+                }
+              } = await fetch(imgUploadUrl, {
+                method: 'POST',
+                body: formData,
+              }).then((res) => res.json())
+
+              const variantUrls = cfUploadRes.result.variants.filter((v) =>
+                v.endsWith(variant)
+              )
+
+              return variantUrls[0]
+            })
+          )
+
+          console.log(fileUrls)
+
+          // submit(form)
+        }}
       >
         <fieldset disabled={isImgUploading}>
           <input type="hidden" name="op" value="update_app" />
@@ -562,6 +624,7 @@ export default function AppDetailIndexPage() {
                         setIsImgUploading as (val: boolean) => void
                       }
                       url={appDetails.app.icon}
+                      variant="public"
                     />
                   </div>
 
