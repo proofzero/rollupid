@@ -53,7 +53,7 @@ export const ConsoleLogo = () => {
   return (
     <Link to="/">
       <img
-        className="mx-4 my-5 h-[40px] lg:h-[80px] max-w-[180px]"
+        className="mx-4 h-[40px] lg:h-[80px] max-w-[180px]"
         src={consoleLogo}
         alt="console logo"
       />
