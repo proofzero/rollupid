@@ -11,6 +11,8 @@ import {
   useSubmit,
   useOutletContext,
   useLoaderData,
+  FormMethod,
+  FormEncType,
 } from '@remix-run/react'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { requireJWT } from '~/utilities/session.server'
@@ -337,82 +339,25 @@ export default function AppDetailIndexPage() {
         onSubmitCapture={async (event) => {
           event.preventDefault()
 
-          const getFilteredFileInputs = (formElement: HTMLFormElement) => {
-            return Array.from(
-              formElement.querySelectorAll('input[type="file"]')
-            )
-              .map((input) => input as HTMLInputElement)
-              .filter(
-                (input) =>
-                  input.dataset.variant && input.files && input.files[0]
-              )
-              .map((input) => ({
-                variant: input.dataset.variant,
-                file: input.files![0],
-              }))
-          }
+          const form = event.currentTarget
+          const action = form.action
+          const method = form.method.toLowerCase()
+          const encType = form.enctype.toLowerCase()
 
-          const getUploadUrl = async () => {
-            const response = await fetch('/api/image-upload-url', {
-              method: 'POST',
-            })
-            if (!response.ok) {
-              throw new Error('Failed to retrieve the image upload URL.')
-            }
-            return response.json<string>()
-          }
+          const formData = new FormData(form)
 
-          const uploadFile = async (file: File, uploadUrl: string) => {
-            const formData = new FormData()
-            formData.append('file', file)
-            const response = await fetch(uploadUrl, {
-              method: 'POST',
-              body: formData,
-            })
-            if (!response.ok) {
-              throw new Error('Failed to upload the image.')
-            }
-            return response.json<{
-              result: {
-                variants: string[]
-              }
-            }>()
-          }
+          setIsImgUploading(true)
+          const imgUrls = await cfImgHelper(event)
+          imgUrls.forEach((imgUrl) => {
+            formData.set(imgUrl.name, imgUrl.url)
+          })
+          setIsImgUploading(false)
 
-          const extractVariantUrl = (
-            uploadResponse: {
-              result: {
-                variants: string[]
-              }
-            },
-            variant: string
-          ) => {
-            const variantUrl = uploadResponse.result.variants.find((v) =>
-              v.endsWith(variant)
-            )
-            if (!variantUrl) {
-              throw new Error(`No URL found for variant: ${variant}`)
-            }
-            return variantUrl
-          }
-
-          const formElement = event.currentTarget
-          const filteredFileInputs = getFilteredFileInputs(formElement)
-
-          try {
-            const imgUploadUrl = await getUploadUrl()
-            const fileUrls = await Promise.all(
-              filteredFileInputs.map(async ({ file, variant }) => {
-                const uploadResponse = await uploadFile(file, imgUploadUrl)
-                return extractVariantUrl(uploadResponse, variant!)
-              })
-            )
-
-            console.log(fileUrls)
-            // submit(formElement);
-          } catch (error) {
-            console.error('Error during file upload:', error)
-          }
+          submit(formData, {
+            action,
+            method: method as FormMethod,
+            encType: encType as FormEncType,
+          })
         }}
       >
         <fieldset disabled={isImgUploading}>
@@ -431,7 +376,7 @@ export default function AppDetailIndexPage() {
               <Button
                 type="submit"
                 btnType="primary-alt"
-                disabled={!isFormChanged}
+                disabled={!isFormChanged || isImgUploading}
               >
                 Save
               </Button>
@@ -788,4 +733,83 @@ export default function AppDetailIndexPage() {
       </Form>
     </>
   )
+}
+
+const cfImgHelper = async (event: React.FormEvent<HTMLFormElement>) => {
+  const getFilteredFileInputs = (formElement: HTMLFormElement) => {
+    return Array.from(formElement.querySelectorAll('input[type="file"]'))
+      .map((input) => input as HTMLInputElement)
+      .filter(
+        (input) =>
+          input.dataset.name &&
+          input.dataset.variant &&
+          input.files &&
+          input.files[0]
+      )
+      .map((input) => ({
+        name: input.dataset.name!,
+        variant: input.dataset.variant!,
+        file: input.files![0],
+      }))
+  }
+
+  const getUploadUrl = async () => {
+    const response = await fetch('/api/image-upload-url', {
+      method: 'POST',
+    })
+    if (!response.ok) {
+      throw new Error('Failed to retrieve the image upload URL.')
+    }
+    return response.json<string>()
+  }
+
+  const uploadFile = async (file: File, uploadUrl: string) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    const response = await fetch(uploadUrl, {
+      method: 'POST',
+      body: formData,
+    })
+    if (!response.ok) {
+      throw new Error('Failed to upload the image.')
+    }
+    return response.json<{
+      result: {
+        variants: string[]
+      }
+    }>()
+  }
+
+  const extractVariantUrl = (
+    uploadResponse: {
+      result: {
+        variants: string[]
+      }
+    },
+    variant: string
+  ) => {
+    const variantUrl = uploadResponse.result.variants.find((v) =>
+      v.endsWith(variant)
+    )
+    if (!variantUrl) {
+      throw new Error(`No URL found for variant: ${variant}`)
+    }
+    return variantUrl
+  }
+
+  const formElement = event.currentTarget
+  const filteredFileInputs = getFilteredFileInputs(formElement)
+
+  const imgUploadUrl = await getUploadUrl()
+  const fileUrls = await Promise.all(
+    filteredFileInputs.map(async ({ file, variant, name }) => {
+      const uploadResponse = await uploadFile(file, imgUploadUrl)
+      return {
+        name,
+        url: extractVariantUrl(uploadResponse, variant!),
+      }
+    })
+  )
+
+  return fileUrls
 }

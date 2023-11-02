@@ -186,7 +186,7 @@ export default function IconPicker({
 
           <div className="grid place-items-center">
             <label
-              htmlFor={id}
+              htmlFor={`${id}_file`}
               className={`rounded bg-transparent text-sm border
                  py-2 px-4 hover:bg-gray-100
                focus:bg-indigo-400 hover:cursor-pointer
@@ -197,9 +197,10 @@ export default function IconPicker({
               </Text>
               <input
                 type="file"
-                id={id}
-                name={id}
+                id={`${id}_file`}
+                name={`${id}_file`}
                 data-variant={variant}
+                data-name={id}
                 accept="image/png,image/jpeg,image/gif,image/webp"
                 className="sr-only"
                 onChange={async (event) => {
