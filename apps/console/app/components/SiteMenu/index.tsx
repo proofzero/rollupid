@@ -390,7 +390,7 @@ function ExternalLinks({
 }: ExternalLinksProps) {
   return (
     <div className="mt-2 border-t border-gray-700">
-      <div className="px-2 p-2 hover:bg-gray-800">
+      <div className="px-2 hover:bg-gray-800">
         <NavLink
           to={'/groups'}
           className={({ isActive }) => `${menuItemClass(isActive, false)} `}
@@ -403,7 +403,7 @@ function ExternalLinks({
           </div>
         </NavLink>
       </div>
-      <div className="px-2 p-2 hover:bg-gray-800">
+      <div className="px-2 hover:bg-gray-800">
         <NavLink
           to={'/billing'}
           className={({ isActive }) => `${menuItemClass(isActive, false)} `}
@@ -420,7 +420,7 @@ function ExternalLinks({
           </div>
         </NavLink>
       </div>
-      <div className="px-2 p-2 hover:bg-gray-800">
+      <div className="px-2 hover:bg-gray-800">
         <NavLink
           to={PASSPORT_URL}
           target="_blank"
@@ -438,7 +438,7 @@ function ExternalLinks({
           </div>
         </NavLink>
       </div>
-      <div className="px-2 py-2 hover:bg-gray-800">
+      <div className="px-2 hover:bg-gray-800">
         <NavLink
           to={docsURL}
           target="_blank"
