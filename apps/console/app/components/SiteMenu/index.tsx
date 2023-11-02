@@ -438,21 +438,6 @@ function ExternalLinks({
           </div>
         </NavLink>
       </div>
-      <div className="px-2 hover:bg-gray-800">
-        <NavLink
-          to={docsURL}
-          target="_blank"
-          className={({ isActive }) => menuItemClass(isActive, false)}
-        >
-          <HiOutlineBookOpen size={24} className="mr-2" />
-          <div className="flex flex-row w-full items-center justify-between">
-            <Text size="sm" weight="medium">
-              Documentation
-            </Text>
-            <HiOutlineExternalLink size={22} className="right-0" />
-          </div>
-        </NavLink>
-      </div>
     </div>
   )
 }
