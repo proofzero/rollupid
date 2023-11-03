@@ -12,7 +12,7 @@ export type ENSRes = {
 }
 
 class ENSUtils implements IENSUtils {
-  async getEnsEntry(address: string): Promise<ENSRes> {
+  async getEnsEntry(address: string): Promise<ENSRes | undefined> {
     const ensRes = await fetch(
       `https://api.ensideas.com/ens/resolve/${address}`,
       {
@@ -24,33 +24,24 @@ class ENSUtils implements IENSUtils {
       }
     )
 
-    const res: ENSRes = await ensRes.json()
+    if (ensRes.status === 200) return ensRes.json<ENSRes>()
 
-    if (res.error) {
-      console.error(`Error requesting ens from address: ${res.error}`)
-
-      throw new Error(res.error)
-    }
-
-    return res
+    console.error(`ENSIdeasError: ${await ensRes.text()}`)
   }
 
-  async getENSDisplayName(addressOrEns: string): Promise<string | null> {
-    const { displayName } = await this.getEnsEntry(addressOrEns)
-
-    return displayName
+  async getENSDisplayName(addressOrEns: string): Promise<string> {
+    const profile = await this.getEnsEntry(addressOrEns)
+    return profile?.displayName || ''
   }
 
   async getENSAddress(addressOrEns: string): Promise<string> {
-    const { address } = await this.getEnsEntry(addressOrEns)
-
-    return address
+    const profile = await this.getEnsEntry(addressOrEns)
+    return profile?.address || ''
   }
 
-  async getENSAddressAvatar(addressOrEns: string): Promise<string | null> {
-    const { avatar } = await this.getEnsEntry(addressOrEns)
-
-    return avatar
+  async getENSAddressAvatar(addressOrEns: string): Promise<string> {
+    const profile = await this.getEnsEntry(addressOrEns)
+    return profile?.avatar || ''
   }
 }
 
