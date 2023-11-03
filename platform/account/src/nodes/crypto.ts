@@ -110,12 +110,12 @@ const getCryptoAccountProfile = async (
   address: string
 ): Promise<CryptoAccountProfile> => {
   const ensClient = new ENSUtils()
-  const { avatar, displayName } = await ensClient.getEnsEntry(address)
+  const profile = await ensClient.getEnsEntry(address)
 
   return {
     address,
-    title: displayName || '',
-    icon: avatar || '',
+    title: profile?.displayName || '',
+    icon: profile?.avatar || '',
     type: CryptoAccountType.ETH,
   }
 }
