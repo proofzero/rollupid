@@ -33,8 +33,9 @@ export const checkCryptoNodes: BaseMiddlewareFunction<Context> = async ({
     if (alias && alias.endsWith('.eth')) {
       const ensClient = new ENSUtils()
       const response = await ensClient.getEnsEntry(alias)
-      const { address: ethAddress } = response
+      if (!response) return next({ ctx })
 
+      const { address: ethAddress } = response
       const hash = generateHashedIDRef(CryptoAccountType.ETH, ethAddress)
 
       if (hash !== hashedIdref) {

@@ -28,7 +28,8 @@ export const getIdentityByAliasMethod = async ({
 }): Promise<GetIdentityByAliasResult> => {
   let alias = input.alias
   if (input.provider === 'eth' && input.alias.endsWith('.eth')) {
-    alias = (await new ENSUtils().getEnsEntry(input.alias)).address
+    const addressFromENS = await new ENSUtils().getENSAddress(input.alias)
+    if (addressFromENS) alias = addressFromENS
   }
 
   const caller = router.createCaller(ctx)
