@@ -31,6 +31,8 @@ import {
   TbWorld,
   TbRocket,
   TbUserCog,
+  TbBrandGithub,
+  TbBook,
 } from 'react-icons/tb'
 
 import { Popover, Transition } from '@headlessui/react'
@@ -119,6 +121,21 @@ export default function SiteMenu(props: RollupMenuProps) {
       </div>
       {/* Mobile menu */}
       <div className="lg:hidden">
+        <section className="absolute top-6 right-14 flex flex-row items-center gap-2">
+          <a
+            href="https://github.com/proofzero/rollupid"
+            className="p-1 hover:bg-gray-100 rounded"
+          >
+            <TbBrandGithub className="text-gray-500 w-5 h-5" />
+          </a>
+
+          <a
+            href="https://docs.rollup.id"
+            className="p-1 hover:bg-gray-100 rounded"
+          >
+            <TbBook className="text-gray-500 w-5 h-5" />
+          </a>
+        </section>
         <Popover.Button
           ref={setReferenceElement}
           className="absolute top-0 right-2 sm:max-md:right-5 md:right-10

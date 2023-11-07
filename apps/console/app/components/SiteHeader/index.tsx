@@ -12,7 +12,7 @@ import { ConsoleLogo } from '../SiteMenu'
 
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 import { HiOutlineBookOpen, HiOutlineLogout } from 'react-icons/hi'
-import { TbUserCog } from 'react-icons/tb'
+import { TbBook, TbBrandGithub, TbUserCog } from 'react-icons/tb'
 import { PostHog } from 'posthog-js'
 
 // RollupHeader
@@ -37,6 +37,22 @@ export default function RollupHeader(props: RollupHeaderProps) {
       <div className="lg:hidden">
         <ConsoleLogo />
       </div>
+
+      <section className="mr-6 flex-row gap-2 items-center hidden lg:flex">
+        <a
+          href="https://github.com/proofzero/rollupid"
+          className="p-1 hover:bg-gray-100 rounded"
+        >
+          <TbBrandGithub className="text-gray-500 w-5 h-5" />
+        </a>
+
+        <a
+          href="https://docs.rollup.id"
+          className="p-1 hover:bg-gray-100 rounded"
+        >
+          <TbBook className="text-gray-500 w-5 h-5" />
+        </a>
+      </section>
 
       <Form action="/signout" method="post" className="hidden lg:block">
         <Menu as="div" className="relative ml-3">
