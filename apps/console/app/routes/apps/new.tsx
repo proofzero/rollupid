@@ -12,7 +12,7 @@ import { Popover } from '@headlessui/react'
 import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
-import { Form, NavLink, useOutletContext } from '@remix-run/react'
+import { Form, NavLink, useOutletContext, useSubmit } from '@remix-run/react'
 
 import type { LoaderData as OutletContextData } from '~/root'
 import type { ActionFunction } from '@remix-run/cloudflare'
@@ -66,6 +66,8 @@ export default function CreateNewApp() {
     }
   >()
 
+  const submit = useSubmit()
+
   return (
     <Popover className="min-h-[100dvh] relative">
       {({ open }) => (
@@ -83,7 +85,13 @@ export default function CreateNewApp() {
             className="flex flex-col
            flex-initial min-h-full w-full"
           >
-            <SiteHeader avatarUrl={avatarUrl} />
+            <SiteHeader
+              avatarUrl={avatarUrl}
+              passportURL={PASSPORT_URL}
+              displayName={displayName}
+              submit={submit}
+              posthog={posthog}
+            />
 
             <section
               className={`${

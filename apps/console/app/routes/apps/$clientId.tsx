@@ -1,6 +1,11 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 
-import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
+import {
+  Outlet,
+  useLoaderData,
+  useOutletContext,
+  useSubmit,
+} from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
 import SiteMenu from '~/components/SiteMenu'
@@ -30,6 +35,7 @@ import { useEffect } from 'react'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { ResponseType } from '@proofzero/types/authorization'
 import { IdentityGroupURN } from '@proofzero/urns/identity-group'
+import { usePostHog } from 'posthog-js/react'
 
 type LoaderData = {
   appDetails: appDetailsProps
@@ -218,6 +224,9 @@ export default function AppDetailIndexPage() {
     }
   }, [toasts])
 
+  const submit = useSubmit()
+  const posthog = usePostHog()
+
   return (
     <Popover className="min-h-[100dvh] relative">
       {({ open }) => (
@@ -232,7 +241,13 @@ export default function AppDetailIndexPage() {
             paymentFailedIdentityGroups={paymentFailedIdentityGroups}
           />
           <main className="flex flex-col flex-initial min-h-full w-full">
-            <SiteHeader avatarUrl={avatarUrl} />
+            <SiteHeader
+              avatarUrl={avatarUrl}
+              passportURL={PASSPORT_URL}
+              displayName={displayName}
+              submit={submit}
+              posthog={posthog}
+            />
             {hasUnpaidInvoices && (
               <ToastWithLink
                 message="We couldn't process payment for your account"
