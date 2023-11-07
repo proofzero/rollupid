@@ -99,11 +99,7 @@ export default function SiteMenu(props: RollupMenuProps) {
   const submit = useSubmit()
 
   return (
-    <div
-      className="text-center bg-gray-900 lg:min-h-[100dvh]
-    lg:min-w-[256px] lg:text-left
-    flex flex-col lg:sticky lg:top-0 max-h-[100dvh]"
-    >
+    <div className="text-center bg-gray-900 lg:h-[100dvh] lg:min-w-[256px] lg:text-left flex flex-col lg:sticky lg:top-0">
       {/* Desktop menu */}
       <div className="hidden lg:block object-left">
         <ConsoleLogo />
@@ -161,10 +157,7 @@ export default function SiteMenu(props: RollupMenuProps) {
           leaveTo="transform opacity-0 scale-95"
         >
           <Popover.Panel
-            className={`
-        flex flex-col bg-gray-900 mt-[80px] lg:hidden z-50
-        min-h-[706px] h-[calc(100dvh-80px)] max-h-[calc(100dvh-80px)] w-[280px]
-        overflow-scroll no-scrollbar`}
+            className={`flex flex-col bg-gray-900 mt-[80px] lg:hidden z-50 h-[calc(100dvh-80px)] w-[280px] overflow-scroll no-scrollbar`}
             ref={setPopperElement}
             style={{ position: 'absolute', right: '0', top: '0' }}
             {...attributes.popper}

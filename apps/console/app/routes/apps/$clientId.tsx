@@ -228,9 +228,9 @@ export default function AppDetailIndexPage() {
   const posthog = usePostHog()
 
   return (
-    <Popover className="min-h-[100dvh] relative">
+    <Popover className="h-[100dvh] relative">
       {({ open }) => (
-        <div className="flex flex-col relative lg:flex-row min-h-screen bg-gray-50">
+        <div className="flex flex-col relative lg:flex-row lg:h-[100dvh] bg-gray-50 overflow-hidden">
           <SiteMenu
             apps={apps}
             open={open}
@@ -240,7 +240,7 @@ export default function AppDetailIndexPage() {
             pfpUrl={avatarUrl}
             paymentFailedIdentityGroups={paymentFailedIdentityGroups}
           />
-          <main className="flex flex-col flex-initial min-h-full w-full">
+          <main className="flex flex-col flex-initial overflow-auto w-full">
             <SiteHeader
               avatarUrl={avatarUrl}
               passportURL={PASSPORT_URL}
@@ -265,7 +265,7 @@ export default function AppDetailIndexPage() {
                     max-lg:overflow-hidden\
                     max-lg:h-[calc(100dvh-80px)]\
                     min-h-[636px]'
-                  : 'h-full '
+                  : ''
               } py-9 sm:mx-11 max-w-[1636px]`}
             >
               <Outlet
