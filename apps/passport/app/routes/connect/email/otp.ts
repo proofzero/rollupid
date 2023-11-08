@@ -76,6 +76,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         }
       }
 
+      // When making requests from localhost to the e-mail otp endpoint,
+      // the localhost url is sent without a protocol
+      // and trpc fails validation for proper url
       let passportURL = new URL(request.url).host
       if (passportURL.includes('localhost')) {
         passportURL = `http://${passportURL}`
