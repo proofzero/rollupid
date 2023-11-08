@@ -80,7 +80,8 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       // the localhost url is sent without a protocol
       // and trpc fails validation for proper url
       let passportURL = new URL(request.url).host
-      if (passportURL.includes('localhost')) {
+      let hostWithoutPort = passportURL.split(':')[0]
+      if (hostWithoutPort === 'localhost') {
         passportURL = `http://${passportURL}`
       }
 
