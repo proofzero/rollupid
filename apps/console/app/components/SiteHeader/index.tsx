@@ -28,12 +28,7 @@ type RollupHeaderProps = {
 
 export default function RollupHeader(props: RollupHeaderProps) {
   return (
-    <header
-      className="w-full min-h-[80px] h-[80px] bg-gray-900
-      lg:bg-white lg:border-b lg:shadow
-      flex items-center justify-start lg:justify-end
-      px-2 sm:max-md:px-5 md:px-10"
-    >
+    <header className="w-full min-h-[80px] h-[80px] bg-gray-900 lg:bg-white lg:border-b lg:shadow flex items-center justify-start lg:justify-end px-2 sm:max-md:px-5 md:px-10">
       <div className="lg:hidden">
         <ConsoleLogo />
       </div>
@@ -71,11 +66,7 @@ export default function RollupHeader(props: RollupHeaderProps) {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items
-              className="absolute right-0 z-10 mt-2 w-56
-                        origin-top-right bg-white shadow-lg
-                        ring-1 ring-black ring-opacity-5 focus:outline-none rounded-lg"
-            >
+            <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none rounded-lg">
               <Menu.Item>
                 <div className="pl-3 pr-2 py-2 flex flex-col w-full">
                   <div className="flex flex-col items-center justify-center my-4 gap-3">
@@ -97,8 +88,7 @@ export default function RollupHeader(props: RollupHeaderProps) {
                 onClick={() => {
                   close()
                 }}
-                className="p-3 hover:bg-gray-100
-        w-full text-left flex gap-3 items-center border-t text-gray-700 cursor-pointer"
+                className="p-3 hover:bg-gray-100 w-full text-left flex gap-3 items-center border-t text-gray-700 cursor-pointer"
               >
                 <HiOutlineBookOpen className="w-5 h-5 text-gray-400" />
                 <Text size="sm">Documentation</Text>
@@ -110,16 +100,14 @@ export default function RollupHeader(props: RollupHeaderProps) {
                 onClick={() => {
                   close()
                 }}
-                className="p-3 hover:bg-gray-100
-              w-full text-left flex gap-3 items-center border-t text-gray-700 cursor-pointer"
+                className="p-3 hover:bg-gray-100 w-full text-left flex gap-3 items-center border-t text-gray-700 cursor-pointer"
               >
                 <TbUserCog className="w-5 h-5 text-gray-400" />
                 <Text size="sm">User Settings</Text>
               </Menu.Item>
               <Menu.Item
                 as="button"
-                className="p-3 hover:bg-gray-100 rounded-b-lg
-        w-full text-left flex gap-3 items-center border-t text-red-500 cursor-pointer"
+                className="p-3 hover:bg-gray-100 rounded-b-lg w-full text-left flex gap-3 items-center border-t text-red-500 cursor-pointer"
                 onClick={() => {
                   close()
                   props.posthog?.reset()
