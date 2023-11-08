@@ -98,15 +98,27 @@ export default function SiteMenu(props: RollupMenuProps) {
 
   const submit = useSubmit()
 
+  const appPlan = props.apps.find((a) => a.clientId === props.selected)?.appPlan
+
   return (
     <div className="text-center bg-gray-900 lg:h-[100dvh] lg:min-w-[256px] lg:text-left flex flex-col lg:sticky lg:top-0">
       {/* Desktop menu */}
       <div className="hidden lg:block object-left">
         <ConsoleLogo />
       </div>
-      <div className="hidden lg:block overflow-scroll no-scrollbar">
-        <AppMenu props={props} />
+      <div className="hidden lg:block">
+        <AppSelect
+          apps={props.apps}
+          selected={props.selected}
+          paymentFailedIdentityGroups={props.paymentFailedIdentityGroups}
+        />
       </div>
+
+      {props.selected && (
+        <section className="hidden lg:flex px-2 flex-col flex-1 overflow-auto no-scrollbar">
+          {AppSubmenu(props.selected, appPlan)}
+        </section>
+      )}
 
       <div className="hidden lg:block mt-auto">
         <ExternalLinks
@@ -164,7 +176,21 @@ export default function SiteMenu(props: RollupMenuProps) {
           >
             {({ close }) => (
               <>
-                <AppMenu props={props} close={close} />
+                <AppSelect
+                  apps={props.apps}
+                  selected={props.selected}
+                  paymentFailedIdentityGroups={
+                    props.paymentFailedIdentityGroups
+                  }
+                  close={close}
+                />
+
+                {props.selected && (
+                  <section className="px-2 flex-col flex-1 overflow-auto no-scrollbar">
+                    {AppSubmenu(props.selected, appPlan, close)}
+                  </section>
+                )}
+
                 <div className="mt-auto">
                   <ExternalLinks
                     PASSPORT_URL={props.PASSPORT_URL}
@@ -363,27 +389,6 @@ const AppSubmenu = (
       </section>
     </div>
   ))
-}
-
-function AppMenu({ props, close }: AppMenuProps) {
-  const appPlan = props.apps.find((a) => a.clientId === props.selected)?.appPlan
-
-  return (
-    <div>
-      <AppSelect
-        apps={props.apps}
-        selected={props.selected}
-        paymentFailedIdentityGroups={props.paymentFailedIdentityGroups}
-        close={close}
-      />
-
-      {props.selected && (
-        <section className="px-2 lg:flex lg:flex-col">
-          {AppSubmenu(props.selected, appPlan, close)}
-        </section>
-      )}
-    </div>
-  )
 }
 
 type ExternalLinksProps = {
