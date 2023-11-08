@@ -103,158 +103,156 @@ function AppListbox({
     <Listbox value={selected} onChange={setSelected}>
       {({ open }) => (
         <>
-          <div className="relative">
-            <Listbox.Button
-              className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-700
+          <Listbox.Button
+            className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-700
                bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm sm:text-sm"
-            >
-              <span className="flex items-center">
-                {selected.clientId === 'none' && (
-                  <TbWorld
-                    className={`h-6 w-6 ${
-                      apps?.length === 0 ? 'text-gray-600' : 'text-gray-300'
-                    } mr-2.5`}
-                  />
-                )}
-
-                {selected.clientId !== 'none' && (
-                  <div className="relative mr-2.5">
-                    {!selected.icon && (
-                      <div
-                        className="rounded-full w-6 h-6 flex justify-center shrink-0
-                        items-center bg-gray-200 overflow-hidden"
-                      >
-                        <Text className="text-gray-500">
-                          {selected.name?.substring(0, 1)}
-                        </Text>
-                      </div>
-                    )}
-                    {selected.icon && (
-                      <img
-                        src={selected.icon}
-                        className="object-cover w-6 h-6 rounded-full"
-                        alt="app icon"
-                      />
-                    )}
-                    {selected.groupID &&
-                      paymentFailedIdentityGroups?.includes(
-                        IdentityGroupURNSpace.urn(
-                          selected.groupID
-                        ) as IdentityGroupURN
-                      ) && (
-                        <div className="absolute right-0 bottom-0 w-2 h-2 bg-orange-400 rounded-full border border-white"></div>
-                      )}
-                  </div>
-                )}
-
-                <Text
-                  weight="medium"
-                  className={`${
-                    apps?.length === 0 ? 'text-gray-300' : 'text-white'
-                  } truncate`}
-                >
-                  {selected.name}
-                </Text>
-              </span>
-              <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
-                <ChevronUpDownIcon
-                  className="h-5 w-5 text-gray-400"
-                  aria-hidden="true"
+          >
+            <span className="flex items-center">
+              {selected.clientId === 'none' && (
+                <TbWorld
+                  className={`h-6 w-6 ${
+                    apps?.length === 0 ? 'text-gray-600' : 'text-gray-300'
+                  } mr-2.5`}
                 />
-              </span>
-            </Listbox.Button>
+              )}
 
-            <Transition
-              show={open}
-              as="div"
-              leave="transition ease-in duration-100"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-              className="bg-gray-800"
-            >
-              <Listbox.Options static className="w-full text-gray-300">
-                {apps.length ? (
-                  <Listbox.Option
-                    className="flex items-center px-4 py-4 border border-l-0 border-r-0 border-t-0 border-gray-700 cursor-pointer hover:bg-gray-700"
-                    value={{
-                      clientId: 'all',
-                    }}
-                  >
-                    <TbWorld className={`h-6 w-6 mr-2.5`} />
-
-                    <Text size="sm" weight="medium">
-                      All Applications
-                    </Text>
-                  </Listbox.Option>
-                ) : null}
-
-                {apps?.map((app) => (
-                  <Listbox.Option key={app.clientId} value={app}>
-                    {({ selected, active }) => (
-                      <>
-                        <div className="flex items-center justify-between py-2 pl-4 pr-2 cursor-pointer hover:bg-gray-700 ">
-                          <div className="flex flex-row items-center space-x-2.5">
-                            {!app.icon && (
-                              <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 shrink-0 overflow-hidden">
-                                <Text className="text-gray-500">
-                                  {app.name?.substring(0, 1)}
-                                </Text>
-                              </div>
-                            )}
-                            {app.icon && (
-                              <img
-                                src={app.icon}
-                                className="object-cover w-6 h-6 rounded-full mr-2.5"
-                                alt="app icon"
-                              />
-                            )}
-
-                            <div className="flex flex-col justify-start">
-                              <Text
-                                size="sm"
-                                className="truncate"
-                                weight={selected ? 'semibold' : 'medium'}
-                              >
-                                {app.name}
-                              </Text>
-
-                              {app.groupName && (
-                                <Text
-                                  size="xs"
-                                  weight="medium"
-                                  className="text-gray-400"
-                                >
-                                  {app.groupName}
-                                </Text>
-                              )}
-                            </div>
-                          </div>
-
-                          {app.appPlan !== ServicePlanType.FREE ? (
-                            <Pill
-                              className={`rounded-3xl py-none text-gray-400 ${
-                                active ? 'bg-gray-800' : 'bg-gray-700'
-                              }`}
-                            >
-                              <Text size="xs">{app.appPlan}</Text>
-                            </Pill>
-                          ) : null}
-                        </div>
-                      </>
+              {selected.clientId !== 'none' && (
+                <div className="relative mr-2.5">
+                  {!selected.icon && (
+                    <div
+                      className="rounded-full w-6 h-6 flex justify-center shrink-0
+                        items-center bg-gray-200 overflow-hidden"
+                    >
+                      <Text className="text-gray-500">
+                        {selected.name?.substring(0, 1)}
+                      </Text>
+                    </div>
+                  )}
+                  {selected.icon && (
+                    <img
+                      src={selected.icon}
+                      className="object-cover w-6 h-6 rounded-full"
+                      alt="app icon"
+                    />
+                  )}
+                  {selected.groupID &&
+                    paymentFailedIdentityGroups?.includes(
+                      IdentityGroupURNSpace.urn(
+                        selected.groupID
+                      ) as IdentityGroupURN
+                    ) && (
+                      <div className="absolute right-0 bottom-0 w-2 h-2 bg-orange-400 rounded-full border border-white"></div>
                     )}
-                  </Listbox.Option>
-                ))}
+                </div>
+              )}
+
+              <Text
+                weight="medium"
+                className={`${
+                  apps?.length === 0 ? 'text-gray-300' : 'text-white'
+                } truncate`}
+              >
+                {selected.name}
+              </Text>
+            </span>
+            <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
+              <ChevronUpDownIcon
+                className="h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
+            </span>
+          </Listbox.Button>
+
+          <Transition
+            show={open}
+            as="div"
+            leave="transition ease-in duration-100"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+            className="bg-gray-800"
+          >
+            <Listbox.Options static className="w-full text-gray-300">
+              {apps.length ? (
                 <Listbox.Option
-                  value={{ clientId: 'new' }}
-                  className="w-full justify-center border border-l-0 border-r-0 border-gray-700 px-4 py-3"
+                  className="flex items-center px-4 py-4 border border-l-0 border-r-0 border-t-0 border-gray-700 cursor-pointer hover:bg-gray-700"
+                  value={{
+                    clientId: 'all',
+                  }}
                 >
-                  <Button className="w-full" btnType="primary-alt">
-                    Create Application
-                  </Button>
+                  <TbWorld className={`h-6 w-6 mr-2.5`} />
+
+                  <Text size="sm" weight="medium">
+                    All Applications
+                  </Text>
                 </Listbox.Option>
-              </Listbox.Options>
-            </Transition>
-          </div>
+              ) : null}
+
+              {apps?.map((app) => (
+                <Listbox.Option key={app.clientId} value={app}>
+                  {({ selected, active }) => (
+                    <>
+                      <div className="flex items-center justify-between py-2 pl-4 pr-2 cursor-pointer hover:bg-gray-700 ">
+                        <div className="flex flex-row items-center space-x-2.5">
+                          {!app.icon && (
+                            <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 shrink-0 overflow-hidden">
+                              <Text className="text-gray-500">
+                                {app.name?.substring(0, 1)}
+                              </Text>
+                            </div>
+                          )}
+                          {app.icon && (
+                            <img
+                              src={app.icon}
+                              className="object-cover w-6 h-6 rounded-full mr-2.5"
+                              alt="app icon"
+                            />
+                          )}
+
+                          <div className="flex flex-col justify-start">
+                            <Text
+                              size="sm"
+                              className="truncate"
+                              weight={selected ? 'semibold' : 'medium'}
+                            >
+                              {app.name}
+                            </Text>
+
+                            {app.groupName && (
+                              <Text
+                                size="xs"
+                                weight="medium"
+                                className="text-gray-400"
+                              >
+                                {app.groupName}
+                              </Text>
+                            )}
+                          </div>
+                        </div>
+
+                        {app.appPlan !== ServicePlanType.FREE ? (
+                          <Pill
+                            className={`rounded-3xl py-none text-gray-400 ${
+                              active ? 'bg-gray-800' : 'bg-gray-700'
+                            }`}
+                          >
+                            <Text size="xs">{app.appPlan}</Text>
+                          </Pill>
+                        ) : null}
+                      </div>
+                    </>
+                  )}
+                </Listbox.Option>
+              ))}
+              <Listbox.Option
+                value={{ clientId: 'new' }}
+                className="w-full justify-center border border-l-0 border-r-0 border-gray-700 px-4 py-3"
+              >
+                <Button className="w-full" btnType="primary-alt">
+                  Create Application
+                </Button>
+              </Listbox.Option>
+            </Listbox.Options>
+          </Transition>
         </>
       )}
     </Listbox>

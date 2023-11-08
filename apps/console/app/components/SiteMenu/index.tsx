@@ -101,7 +101,7 @@ export default function SiteMenu(props: RollupMenuProps) {
   const appPlan = props.apps.find((a) => a.clientId === props.selected)?.appPlan
 
   return (
-    <div className="text-center bg-gray-900 lg:h-[100dvh] lg:min-w-[256px] lg:text-left flex flex-col lg:sticky lg:top-0">
+    <div className="text-center bg-gray-900 lg:h-[100dvh] lg:min-w-[256px] lg:text-left flex flex-col lg:sticky lg:top-0 overflow-auto">
       {/* Desktop menu */}
       <div className="hidden lg:block object-left">
         <ConsoleLogo />
