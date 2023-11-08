@@ -26,6 +26,9 @@ type EmailOTPValidatorProps = {
   ) => Promise<void>
 
   regenerationTimerSeconds?: number
+
+  autoVerify?: boolean
+  code?: string
 }
 
 export default function EmailOTPValidator({
@@ -39,13 +42,15 @@ export default function EmailOTPValidator({
   requestRegeneration,
   requestVerification,
   regenerationTimerSeconds = 30,
+  autoVerify = false,
+  code,
 }: EmailOTPValidatorProps) {
   const inputLen = 6
   const inputRefs = Array.from({ length: inputLen }, () =>
     useRef<HTMLInputElement>()
   )
 
-  const [fullCode, setFullCode] = useState('')
+  const [fullCode, setFullCode] = useState(code ?? '')
   const updateFullCode = useCallback(() => {
     const updatedCode = inputRefs.map((ir) => ir.current?.value).join('')
     setFullCode(updatedCode)
@@ -99,6 +104,24 @@ export default function EmailOTPValidator({
     }
   }, [email, fullCode, loadedState, loading, isInvalid])
 
+  useEffect(() => {
+    if (code && email && loadedState) {
+      const codeArray = code.split('').slice(0, inputLen)
+      codeArray.forEach((value, index) => {
+        inputRefs[index].current.value = value
+      })
+
+      if (autoVerify) {
+        setShowInvalidMessage(false)
+
+        const asyncFn = async () => {
+          await requestVerification(email, code, loadedState)
+        }
+        asyncFn()
+      }
+    }
+  }, [email, code, loadedState])
+
   return (
     <>
       <section
@@ -111,13 +134,23 @@ export default function EmailOTPValidator({
             onClick={goBack}
           />
         )}
-        <Text
-          size="xl"
-          weight="semibold"
-          className="text-[#2D333A] dark:text-white"
-        >
-          Please check your email
-        </Text>
+        {code ? (
+          <Text
+            size="xl"
+            weight="semibold"
+            className="text-[#2D333A] dark:text-white"
+          >
+            Email Verification
+          </Text>
+        ) : (
+          <Text
+            size="xl"
+            weight="semibold"
+            className="text-[#2D333A] dark:text-white"
+          >
+            Please check your email
+          </Text>
+        )}
       </section>
 
       <section>
@@ -138,6 +171,7 @@ export default function EmailOTPValidator({
               ref={ref}
               id={`code_${i}`}
               name={`code_${i}`}
+              readOnly={Boolean(code) && !invalid}
               required
               maxLength={1}
               minLength={1}
@@ -196,7 +230,7 @@ export default function EmailOTPValidator({
               }}
               className={`flex text-base lg:text-2xl py-7 px-3.5 h-20 justify-center items-center text-gray-600 dark:text-white dark:bg-gray-800 border rounded-lg text-center ${
                 isInvalid ? 'border-red-500' : 'dark:border-gray-600'
-              }`}
+              } read-only:bg-gray-100`}
             />
           ))}
         </div>
@@ -211,44 +245,48 @@ export default function EmailOTPValidator({
           </Text>
         )}
 
-        <div className="flex flex-col lg:flex-row space-x-1 justify-center items-center mt-4">
-          <Text type="span" size="sm" className="text-gray-500">
-            Did not get the code?
-          </Text>
-          <Text
-            type="span"
-            size="sm"
-            className={`${
-              regenerationRequested ? 'text-gray-300' : 'text-indigo-500'
-            } cursor-pointer relative`}
-            onClick={() => {
-              if (regenerationRequested) return
-
-              setRegenerationRequested(true)
-              requestRegeneration(email)
-              setShowChildren(true)
-            }}
-          >
-            Click to send another
-            {regenerationRequested && (
-              <div className="absolute right-[-20px] top-[2.5px]">
-                <CountdownCircleTimer
-                  size={16}
-                  strokeWidth={2}
-                  isPlaying
-                  duration={regenerationTimerSeconds}
-                  rotation={'counterclockwise'}
-                  colors={'#6366f1'}
-                  isGrowing={true}
-                  onComplete={() => {
-                    setRegenerationRequested(false)
-                    setShowChildren(false)
-                  }}
-                />
-              </div>
+        {(!code || invalid) && (
+          <div className="flex flex-col lg:flex-row space-x-1 justify-center items-center mt-4">
+            {!code && (
+              <Text type="span" size="sm" className="text-gray-500">
+                Did not get the code?
+              </Text>
             )}
-          </Text>
-        </div>
+            <Text
+              type="span"
+              size="sm"
+              className={`${
+                regenerationRequested ? 'text-gray-300' : 'text-indigo-500'
+              } cursor-pointer relative`}
+              onClick={() => {
+                if (regenerationRequested) return
+
+                setRegenerationRequested(true)
+                requestRegeneration(email)
+                setShowChildren(true)
+              }}
+            >
+              Click to send another
+              {regenerationRequested && (
+                <div className="absolute right-[-20px] top-[2.5px]">
+                  <CountdownCircleTimer
+                    size={16}
+                    strokeWidth={2}
+                    isPlaying
+                    duration={regenerationTimerSeconds}
+                    rotation={'counterclockwise'}
+                    colors={'#6366f1'}
+                    isGrowing={true}
+                    onComplete={() => {
+                      setRegenerationRequested(false)
+                      setShowChildren(false)
+                    }}
+                  />
+                </div>
+              )}
+            </Text>
+          </div>
+        )}
 
         {children && showChildren && <div className="my-3">{children}</div>}
       </section>
@@ -275,7 +313,7 @@ export default function EmailOTPValidator({
             await requestVerification(email, fullCode, loadedState)
           }}
         >
-          Verify
+          {loading ? `Verifying...` : `Verify`}
         </Button>
       </section>
     </>

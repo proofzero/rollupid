@@ -12,7 +12,10 @@ export const sendOTPEmailMethodInput = z.object({
   name: z.string(),
   emailAddress: z.string(),
   otpCode: z.string(),
+  state: z.string(),
+  clientId: z.string(),
   themeProps: EmailThemePropsSchema.optional(),
+  passportURL: z.string().url(),
 })
 
 export type sendOTPEmailMethodParams = z.infer<typeof sendOTPEmailMethodInput>
@@ -30,7 +33,14 @@ export const sendOTPMethod = async ({
   input: sendOTPEmailMethodParams
   ctx: Context
 }): Promise<sendOTPEmailMethodOutputParams> => {
-  const otpEmailTemplate = getOTPEmailContent(input.otpCode, input.themeProps)
+  const otpEmailTemplate = getOTPEmailContent(
+    input.otpCode,
+    input.clientId,
+    input.state,
+    input.emailAddress,
+    input.passportURL,
+    input.themeProps
+  )
   const { env, notification, customSender } = getEmailContent({
     ctx,
     address: input.emailAddress,

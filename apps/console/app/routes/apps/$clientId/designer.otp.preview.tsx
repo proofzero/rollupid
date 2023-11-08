@@ -66,6 +66,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 
     try {
       await coreClient.account.generateEmailOTP.mutate({
+        passportURL: context.env.PASSPORT_URL,
+        clientId,
         email,
         themeProps: {
           privacyURL: appProps.privacyURL as string,

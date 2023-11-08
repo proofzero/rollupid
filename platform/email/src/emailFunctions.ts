@@ -183,11 +183,22 @@ const adjustEmailParams = (params?: Partial<EmailTemplateParams>) => {
 /** OTP email content template with a `code` parameter */
 export const getOTPEmailContent = (
   passcode: string,
+  clientId: string,
+  state: string,
+  email: string,
+  passportURL: string,
   params?: Partial<EmailTemplateParams>
 ): EmailContent => {
   params = adjustEmailParams(params)
 
-  return EmailTemplateOTP(passcode, params as EmailTemplateParams)
+  return EmailTemplateOTP(
+    passcode,
+    clientId,
+    email,
+    state,
+    passportURL,
+    params as EmailTemplateParams
+  )
 }
 
 /** Subscription Cancellation email content template */
