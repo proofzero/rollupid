@@ -31,6 +31,8 @@ import {
   TbWorld,
   TbRocket,
   TbUserCog,
+  TbBrandGithub,
+  TbBook,
 } from 'react-icons/tb'
 
 import { Popover, Transition } from '@headlessui/react'
@@ -53,7 +55,7 @@ export const ConsoleLogo = () => {
   return (
     <Link to="/">
       <img
-        className="mx-4 my-5 h-[40px] lg:h-[80px] max-w-[180px]"
+        className="mx-4 h-[40px] lg:h-[80px] max-w-[180px]"
         src={consoleLogo}
         alt="console logo"
       />
@@ -96,19 +98,27 @@ export default function SiteMenu(props: RollupMenuProps) {
 
   const submit = useSubmit()
 
+  const appPlan = props.apps.find((a) => a.clientId === props.selected)?.appPlan
+
   return (
-    <div
-      className="text-center bg-gray-900 lg:min-h-[100dvh]
-    lg:min-w-[256px] lg:text-left
-    flex flex-col lg:sticky lg:top-0 max-h-[100dvh]"
-    >
+    <div className="text-center bg-gray-900 lg:h-[100dvh] lg:min-w-[256px] lg:text-left flex flex-col lg:sticky lg:top-0 overflow-auto">
       {/* Desktop menu */}
       <div className="hidden lg:block object-left">
         <ConsoleLogo />
       </div>
-      <div className="hidden lg:block overflow-scroll no-scrollbar">
-        <AppMenu props={props} />
+      <div className="hidden lg:block">
+        <AppSelect
+          apps={props.apps}
+          selected={props.selected}
+          paymentFailedIdentityGroups={props.paymentFailedIdentityGroups}
+        />
       </div>
+
+      {props.selected && (
+        <section className="hidden lg:flex px-2 flex-col flex-1 overflow-auto no-scrollbar">
+          {AppSubmenu(props.selected, appPlan)}
+        </section>
+      )}
 
       <div className="hidden lg:block mt-auto">
         <ExternalLinks
@@ -119,6 +129,21 @@ export default function SiteMenu(props: RollupMenuProps) {
       </div>
       {/* Mobile menu */}
       <div className="lg:hidden">
+        <section className="absolute top-6 right-14 flex flex-row items-center gap-2">
+          <a
+            href="https://github.com/proofzero/rollupid"
+            className="p-1 hover:bg-gray-100 rounded"
+          >
+            <TbBrandGithub className="text-gray-500 w-5 h-5" />
+          </a>
+
+          <a
+            href="https://docs.rollup.id"
+            className="p-1 hover:bg-gray-100 rounded"
+          >
+            <TbBook className="text-gray-500 w-5 h-5" />
+          </a>
+        </section>
         <Popover.Button
           ref={setReferenceElement}
           className="absolute top-0 right-2 sm:max-md:right-5 md:right-10
@@ -144,17 +169,28 @@ export default function SiteMenu(props: RollupMenuProps) {
           leaveTo="transform opacity-0 scale-95"
         >
           <Popover.Panel
-            className={`
-        flex flex-col bg-gray-900 mt-[80px] lg:hidden z-50
-        min-h-[706px] h-[calc(100dvh-80px)] max-h-[calc(100dvh-80px)] w-[280px]
-        overflow-scroll no-scrollbar`}
+            className={`flex flex-col bg-gray-900 mt-[80px] lg:hidden z-50 h-[calc(100dvh-80px)] w-[280px] overflow-scroll no-scrollbar`}
             ref={setPopperElement}
             style={{ position: 'absolute', right: '0', top: '0' }}
             {...attributes.popper}
           >
             {({ close }) => (
               <>
-                <AppMenu props={props} close={close} />
+                <AppSelect
+                  apps={props.apps}
+                  selected={props.selected}
+                  paymentFailedIdentityGroups={
+                    props.paymentFailedIdentityGroups
+                  }
+                  close={close}
+                />
+
+                {props.selected && (
+                  <section className="px-2 flex-col flex-1 overflow-auto no-scrollbar">
+                    {AppSubmenu(props.selected, appPlan, close)}
+                  </section>
+                )}
+
                 <div className="mt-auto">
                   <ExternalLinks
                     PASSPORT_URL={props.PASSPORT_URL}
@@ -355,27 +391,6 @@ const AppSubmenu = (
   ))
 }
 
-function AppMenu({ props, close }: AppMenuProps) {
-  const appPlan = props.apps.find((a) => a.clientId === props.selected)?.appPlan
-
-  return (
-    <div>
-      <AppSelect
-        apps={props.apps}
-        selected={props.selected}
-        paymentFailedIdentityGroups={props.paymentFailedIdentityGroups}
-        close={close}
-      />
-
-      {props.selected && (
-        <section className="px-2 lg:flex lg:flex-col">
-          {AppSubmenu(props.selected, appPlan, close)}
-        </section>
-      )}
-    </div>
-  )
-}
-
 type ExternalLinksProps = {
   PASSPORT_URL: string
   docsURL: string
@@ -390,7 +405,7 @@ function ExternalLinks({
 }: ExternalLinksProps) {
   return (
     <div className="mt-2 border-t border-gray-700">
-      <div className="px-2 p-2 hover:bg-gray-800">
+      <div className="px-2 hover:bg-gray-800">
         <NavLink
           to={'/groups'}
           className={({ isActive }) => `${menuItemClass(isActive, false)} `}
@@ -403,7 +418,7 @@ function ExternalLinks({
           </div>
         </NavLink>
       </div>
-      <div className="px-2 p-2 hover:bg-gray-800">
+      <div className="px-2 hover:bg-gray-800">
         <NavLink
           to={'/billing'}
           className={({ isActive }) => `${menuItemClass(isActive, false)} `}
@@ -420,7 +435,7 @@ function ExternalLinks({
           </div>
         </NavLink>
       </div>
-      <div className="px-2 p-2 hover:bg-gray-800">
+      <div className="px-2 hover:bg-gray-800">
         <NavLink
           to={PASSPORT_URL}
           target="_blank"
@@ -433,21 +448,6 @@ function ExternalLinks({
           <div className="flex flex-row w-full items-center justify-between">
             <Text size="sm" weight="medium">
               User Settings
-            </Text>
-            <HiOutlineExternalLink size={22} className="right-0" />
-          </div>
-        </NavLink>
-      </div>
-      <div className="px-2 py-2 hover:bg-gray-800">
-        <NavLink
-          to={docsURL}
-          target="_blank"
-          className={({ isActive }) => menuItemClass(isActive, false)}
-        >
-          <HiOutlineBookOpen size={24} className="mr-2" />
-          <div className="flex flex-row w-full items-center justify-between">
-            <Text size="sm" weight="medium">
-              Documentation
             </Text>
             <HiOutlineExternalLink size={22} className="right-0" />
           </div>
