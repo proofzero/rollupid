@@ -286,6 +286,11 @@ const appSubmenuStruct: {
         subroute: '/blockchain',
       },
       {
+        title: 'Storage',
+        icon: HiOutlineDocument,
+        subroute: '/storage',
+      },
+      {
         title: 'Designer',
         icon: HiOutlineColorSwatch,
         subroute: '/designer',
