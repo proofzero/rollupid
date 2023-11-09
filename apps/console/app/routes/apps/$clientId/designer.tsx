@@ -930,6 +930,7 @@ const EmailPanel = ({
   emailTheme,
   setLoading,
   errors,
+  passportURL,
 }: {
   clientId: string
   accountURN?: AccountURN
@@ -940,6 +941,7 @@ const EmailPanel = ({
   errors?: {
     [key: string]: string
   }
+  passportURL: string
 }) => {
   const [logoURL, setLogoURL] = useState<string | undefined>(
     emailTheme?.logoURL
@@ -1257,16 +1259,24 @@ const EmailPanel = ({
             ref={iFrameRef}
             className="w-full border rounded-lg"
             srcDoc={
-              EmailTemplateOTP('XXXXXX', {
-                appName: 'Designer',
-                logoURL:
-                  logoURL ??
-                  'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public',
-                privacyURL: '#',
-                termsURL: '#',
-                contactURL: contact,
-                address: address,
-              }).body
+              EmailTemplateOTP(
+                'XXXXXX',
+                clientId,
+                appContactEmail ?? 'test@email.com',
+                'none',
+                passportURL,
+                {
+                  appName: 'Designer',
+                  logoURL:
+                    logoURL ??
+                    'https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/70676dfd-2899-4556-81ef-e5f48f5eb900/public',
+                  privacyURL: '#',
+                  termsURL: '#',
+                  contactURL: contact,
+                  address: address,
+                },
+                true
+              ).body
             }
             onLoad={(ev) => {
               const iFrame = ev.target as HTMLIFrameElement
@@ -1502,6 +1512,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       appTheme,
       emailTheme,
       ogTheme,
+      passportURL: context.env.PASSPORT_URL,
     })
   }
 )
@@ -1700,14 +1711,11 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
 )
 
 export default () => {
-  const { appTheme, emailTheme, ogTheme } = useLoaderData<{
+  const { appTheme, emailTheme, ogTheme, passportURL } = useLoaderData<{
     appTheme: GetAppThemeResult
     emailTheme: GetEmailOTPThemeResult
     ogTheme: GetOgThemeResult
-    toasts: {
-      message: string
-      type: ToastType
-    }[]
+    passportURL: string
   }>()
 
   const {
@@ -1856,6 +1864,7 @@ export default () => {
               emailTheme={emailTheme}
               setLoading={setLoading}
               errors={errors}
+              passportURL={passportURL}
             />
           </Tab.Panels>
         </Tab.Group>
