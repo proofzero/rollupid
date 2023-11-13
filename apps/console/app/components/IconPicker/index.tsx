@@ -116,7 +116,7 @@ export default function IconPicker({
   setIsFormChanged,
   setIsImgUploading,
   imageUploadCallback = () => {},
-  variant,
+  variant = 'public',
 }: IconPickerProps) {
   const [iconURL, setIconURL] = useState<string>('')
   const [invalidState, setInvalidState] = useState(invalid)

@@ -7,6 +7,7 @@ import {
   useFetcher,
   useLoaderData,
   useOutletContext,
+  useSubmit,
 } from '@remix-run/react'
 import {
   ReactNode,
@@ -103,6 +104,7 @@ import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { GetOgThemeResult } from '@proofzero/platform.starbase/src/jsonrpc/methods/getOgTheme'
 import createImageClient from '@proofzero/platform-clients/image'
+import { captureFormSubmitAndReplaceImages } from '~/utils/formCFImages.client'
 
 const LazyAuth = lazy(() =>
   // @ts-ignore :(
@@ -1786,11 +1788,18 @@ export default () => {
     )
   }
 
+  const submit = useSubmit()
+
   return (
     <Suspense fallback={<Loader />}>
       {loading && <Loader />}
 
-      <Form method="post">
+      <Form
+        method="post"
+        onSubmitCapture={(event) =>
+          captureFormSubmitAndReplaceImages(event, submit, setLoading)
+        }
+      >
         <section className="flex flex-col lg:flex-row items-center justify-between mb-11">
           <div className="flex flex-row items-center space-x-3">
             <Text
@@ -1899,6 +1908,6 @@ const deleteUpdatedImage = async (
       headers: generateTraceContextHeaders(context.traceSpan),
     })
 
-    await imageClient.delete.mutate(previousURL)
+    context.waitUntil(imageClient.delete.mutate(previousURL))
   }
 }
