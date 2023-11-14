@@ -1766,6 +1766,8 @@ export default () => {
   const [loading, setLoading] = useState<boolean>(false)
   const [previewState, setPreviewState] = useState<boolean>(false)
 
+  const submit = useSubmit()
+
   if (appDetails.appPlan === ServicePlanType.FREE && !previewState) {
     return (
       <EarlyAccessPanel
@@ -1787,8 +1789,6 @@ export default () => {
       />
     )
   }
-
-  const submit = useSubmit()
 
   return (
     <Suspense fallback={<Loader />}>
