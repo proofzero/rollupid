@@ -7,6 +7,7 @@ import {
   useFetcher,
   useLoaderData,
   useOutletContext,
+  useSubmit,
 } from '@remix-run/react'
 import {
   ReactNode,
@@ -56,7 +57,12 @@ import {
   OGTheme,
   OGThemeSchema,
 } from '@proofzero/platform/starbase/src/jsonrpc/validators/app'
-import { ActionFunction, LoaderFunction, json } from '@remix-run/cloudflare'
+import {
+  ActionFunction,
+  AppLoadContext,
+  LoaderFunction,
+  json,
+} from '@remix-run/cloudflare'
 import { requireJWT } from '~/utilities/session.server'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 import createCoreClient from '@proofzero/platform-clients/core'
@@ -97,6 +103,8 @@ import designerSVG from '~/assets/early/designer.webp'
 import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { GetOgThemeResult } from '@proofzero/platform.starbase/src/jsonrpc/methods/getOgTheme'
+import createImageClient from '@proofzero/platform-clients/image'
+import { captureFormSubmitAndReplaceImages } from '~/utils/formCFImages.client'
 
 const LazyAuth = lazy(() =>
   // @ts-ignore :(
@@ -1567,6 +1575,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       let colorDark = fd.get('colordark') as string | undefined
       if (!colorDark || colorDark === '') colorDark = undefined
 
+      const ogGraphicURL = theme?.graphicURL
+
       let graphicURL = fd.get('image') as string | undefined
       if (!graphicURL || graphicURL === '') graphicURL = undefined
 
@@ -1607,6 +1617,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           clientId,
           theme,
         })
+
+        await deleteUpdatedImage(context, ogGraphicURL, graphicURL)
       }
 
       return json({
@@ -1615,6 +1627,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     }
 
     const updateEmail = async (fd: FormData, theme: EmailOTPTheme) => {
+      const ogLogoURL = theme?.logoURL
       let logoURL = fd.get('logoURL') as string | undefined
       if (!logoURL || logoURL === '') logoURL = undefined
 
@@ -1647,6 +1660,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           clientId,
           theme,
         })
+
+        await deleteUpdatedImage(context, ogLogoURL, logoURL)
       }
 
       return json({
@@ -1661,6 +1676,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       let description = fd.get('ogDescription') as string | undefined
       if (!description || description === '') description = undefined
 
+      const ogImageURL = theme?.image
       let image = fd.get('ogImage') as string | undefined
       if (!image || image === '') image = undefined
 
@@ -1687,6 +1703,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
           clientId,
           theme,
         })
+
+        await deleteUpdatedImage(context, ogImageURL, image)
       }
 
       return json({
@@ -1770,11 +1788,18 @@ export default () => {
     )
   }
 
+  const submit = useSubmit()
+
   return (
     <Suspense fallback={<Loader />}>
       {loading && <Loader />}
 
-      <Form method="post">
+      <Form
+        method="post"
+        onSubmitCapture={(event) =>
+          captureFormSubmitAndReplaceImages(event, submit, setLoading)
+        }
+      >
         <section className="flex flex-col lg:flex-row items-center justify-between mb-11">
           <div className="flex flex-row items-center space-x-3">
             <Text
@@ -1871,4 +1896,18 @@ export default () => {
       </Form>
     </Suspense>
   )
+}
+
+const deleteUpdatedImage = async (
+  context: AppLoadContext,
+  previousURL: string | undefined,
+  newURL: string | undefined
+) => {
+  if (previousURL && previousURL !== newURL) {
+    const imageClient = createImageClient(context.env.Images, {
+      headers: generateTraceContextHeaders(context.traceSpan),
+    })
+
+    context.waitUntil(imageClient.delete.mutate(previousURL))
+  }
 }

@@ -21,6 +21,11 @@ import {
 } from './methods/getGradient'
 
 import { Context } from '../context'
+import {
+  DeleteMethodInputSchema,
+  DeleteMethodOutputSchema,
+  deleteMethod,
+} from './methods/delete'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -31,6 +36,12 @@ export const appRouter = t.router({
     .input(uploadMethodInput)
     .output(uploadMethodOutput)
     .mutation(uploadMethod),
+  delete: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(DeleteMethodInputSchema)
+    .output(DeleteMethodOutputSchema)
+    .mutation(deleteMethod),
   getOgImage: t.procedure
     .use(LogUsage)
     .use(Analytics)

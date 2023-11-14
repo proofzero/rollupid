@@ -4,6 +4,7 @@ import {
   useOutletContext,
   useTransition,
   useFetcher,
+  useSubmit,
 } from '@remix-run/react'
 import { Button, Text } from '@proofzero/design-system'
 import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
@@ -24,6 +25,9 @@ import { getMoreNftsModal } from '~/helpers/nfts'
 import type { FullProfile, NFT } from '~/types'
 import { FullProfileSchema } from '~/validation'
 import InputTextarea from '@proofzero/design-system/src/atoms/form/InputTextarea'
+import createImageClient from '@proofzero/platform-clients/image'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import { captureFormSubmitAndReplaceImages } from '~/utils/formCFImages.client'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const { sub: identityURN } = parseJwt(
@@ -44,6 +48,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     identityURN!,
     'json'
   )
+  const ogImage = currentProfile?.pfp.image
   const updatedProfile = Object.assign(currentProfile || {}, {
     displayName,
     pfp: {
@@ -68,6 +73,14 @@ export const action: ActionFunction = async ({ request, context }) => {
     identityURN!,
     JSON.stringify(zodValidation.data)
   )
+
+  if (ogImage && ogImage !== updatedProfile.pfp.image) {
+    const imageClient = createImageClient(context.env.Images, {
+      headers: generateTraceContextHeaders(context.traceSpan),
+    })
+
+    context.waitUntil(imageClient.delete.mutate(ogImage))
+  }
 
   return null
 }
@@ -115,46 +128,7 @@ export default function AccountSettingsProfile() {
   const [pfpUploading, setPfpUploading] = useState(false)
   const [isFormChanged, setFormChanged] = useState(false)
 
-  const handlePfpUpload = async (e: any) => {
-    const pfpFile = (e.target as HTMLInputElement & EventTarget).files?.item(0)
-    if (!pfpFile) {
-      return
-    }
-
-    setPfpUploading(true)
-
-    const imgUploadUrl = (await fetch('/account/profile/image-upload-url', {
-      method: 'post',
-    })
-      .then((res) => res.json())
-      .catch((e) => {
-        console.error(e)
-      })) as string
-
-    const formData = new FormData()
-    formData.append('file', pfpFile)
-
-    const cfUploadRes: {
-      success: boolean
-      result: {
-        variants: string[]
-      }
-    } = await fetch(imgUploadUrl, {
-      method: 'POST',
-      body: formData,
-    }).then((res) => res.json())
-
-    const publicVariantUrls = cfUploadRes.result.variants.filter((v) =>
-      v.endsWith('public')
-    )
-
-    if (publicVariantUrls.length) {
-      setPfpUrl(publicVariantUrls[0])
-      setIsToken(false)
-    }
-
-    setPfpUploading(false)
-  }
+  const submit = useSubmit()
 
   // ------------------- START OF MODAL PART ---------------------- //
   // STATE
@@ -223,22 +197,11 @@ export default function AccountSettingsProfile() {
                 Change NFT Avatar
               </Button>
 
-              <input
-                ref={pfpUploadRef}
-                type="file"
-                id="pfp-upload"
-                name="pfp"
-                accept="image/png, image/jpeg"
-                className="sr-only"
-                onChange={handlePfpUpload}
-              />
-
               <Button
                 btnType={'secondary'}
                 btnSize={'sm'}
                 onClick={() => {
                   pfpUploadRef.current?.click()
-                  setFormChanged(true)
                 }}
                 className="!text-gray-600 border-none"
               >
@@ -257,9 +220,28 @@ export default function AccountSettingsProfile() {
           onReset={() => {
             setFormChanged(false)
           }}
+          onSubmitCapture={(event) => {
+            captureFormSubmitAndReplaceImages(event, submit, setPfpUploading)
+          }}
         >
-          <input name="pfp_url" type="hidden" value={pfpUrl} />
           <input name="pfp_isToken" type="hidden" value={isToken ? 1 : 0} />
+          <input
+            ref={pfpUploadRef}
+            type="file"
+            id={`pfp_file`}
+            name={`pfp_file`}
+            data-variant="public"
+            data-name={'pfp_url'}
+            accept="image/png,image/jpeg,image/gif,image/webp"
+            className="sr-only"
+            onChange={(event) => {
+              if (event.target.files?.[0]) {
+                setPfpUrl(URL.createObjectURL(event.target.files?.[0]))
+                setIsToken(false)
+                setFormChanged(true)
+              }
+            }}
+          />
 
           <div className="lg:w-3/6 lg:pr-4">
             <InputText

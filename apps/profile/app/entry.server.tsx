@@ -11,6 +11,7 @@ import {
   SELF,
   STRICT_DYNAMIC,
   UNSAFE_INLINE,
+  BLOB,
 } from 'csp-header'
 
 export default function handleRequest(
@@ -45,7 +46,7 @@ export default function handleRequest(
           ],
           'script-src': [SELF, `'nonce-${nonce}' ${STRICT_DYNAMIC}`],
           'style-src': [SELF, UNSAFE_INLINE, 'fonts.cdnfonts.com'],
-          'img-src': [dev ? 'http:' : 'https:', DATA],
+          'img-src': [dev ? 'http:' : 'https:', DATA, BLOB],
           'font-src': [SELF, 'fonts.cdnfonts.com'],
           'object-src': [NONE],
           'base-uri': [SELF],

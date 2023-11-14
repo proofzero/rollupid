@@ -42,6 +42,8 @@ import type { notificationHandlerType } from '~/types'
 import { SCOPE_SMART_CONTRACT_WALLETS } from '@proofzero/security/scopes'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import createImageClient from '@proofzero/platform-clients/image'
+import { captureFormSubmitAndReplaceImages } from '~/utils/formCFImages.client'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -171,6 +173,10 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         ).secret
         break
       case 'update_app':
+        const appDetails = await coreClient.starbase.getAppDetails.query({
+          clientId: params.clientId,
+        })
+
         const entries = formData.entries()
         const scopes = Array.from(entries)
           .filter((entry) => {
@@ -203,6 +209,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         }
 
         if (Object.keys(errors).length === 0) {
+          const oauthLogo = appDetails.app?.icon
+
           await Promise.all([
             coreClient.starbase.updateApp.mutate({
               clientId: params.clientId,
@@ -213,6 +221,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
               published: published,
             }),
           ])
+
+          if (oauthLogo && oauthLogo !== updates.icon) {
+            const imageClient = createImageClient(context.env.Images, {
+              headers: generateTraceContextHeaders(context.traceSpan),
+            })
+
+            context.waitUntil(imageClient.delete.mutate(oauthLogo))
+          }
         }
         break
     }
@@ -319,6 +335,9 @@ export default function AppDetailIndexPage() {
         onChange={() => {
           setIsFormChanged(true)
         }}
+        onSubmitCapture={(event) =>
+          captureFormSubmitAndReplaceImages(event, submit, setIsImgUploading)
+        }
       >
         <fieldset disabled={isImgUploading}>
           <input type="hidden" name="op" value="update_app" />
@@ -336,7 +355,7 @@ export default function AppDetailIndexPage() {
               <Button
                 type="submit"
                 btnType="primary-alt"
-                disabled={!isFormChanged}
+                disabled={!isFormChanged || isImgUploading}
               >
                 Save
               </Button>

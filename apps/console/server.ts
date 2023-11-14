@@ -18,6 +18,7 @@ declare module '@remix-run/server-runtime' {
   interface AppLoadContext {
     traceSpan: TraceSpan
     env: Env
+    waitUntil: (promise: Promise<any>) => void
   }
 }
 
@@ -48,6 +49,7 @@ const handleEvent = async (event: FetchEvent, env: Env) => {
         return {
           env,
           traceSpan,
+          waitUntil: event.waitUntil,
         }
       },
     })
