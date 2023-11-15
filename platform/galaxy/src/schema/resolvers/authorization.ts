@@ -16,7 +16,7 @@ const authorizationResolvers: Resolvers = {
   Query: {
     getExternalData: async (
       _parent: any,
-      { clientId },
+      {},
       { env, jwt, traceSpan }: ResolverContext
     ) => {
       return null
@@ -25,7 +25,7 @@ const authorizationResolvers: Resolvers = {
   Mutation: {
     setExternalData: async (
       _parent: any,
-      { clientId },
+      { payload },
       { env, jwt, traceSpan }: ResolverContext
     ) => {
       const coreClient = createCoreClient(env.Core, {

@@ -3,7 +3,11 @@ import { mergeTypeDefs } from '@graphql-tools/merge'
 import GraphQLJSON from 'graphql-type-json'
 
 import types from './types'
-import { accountResolver, identityResolver } from './resolvers'
+import {
+  accountResolver,
+  authorizationResolvers,
+  identityResolver,
+} from './resolvers'
 import { GalaxyServerContext } from '..'
 
 const mergedTypes = mergeTypeDefs(types)
@@ -13,6 +17,7 @@ export default createSchema<GalaxyServerContext>({
   resolvers: [
     accountResolver,
     identityResolver,
+    authorizationResolvers,
     {
       JSON: GraphQLJSON,
     },
