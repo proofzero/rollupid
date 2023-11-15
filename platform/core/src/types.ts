@@ -1,6 +1,8 @@
 import { DeploymentMetadata } from '@proofzero/types'
 
 export interface Environment {
+  UsageKV: KVNamespace
+
   Account: DurableObjectNamespace
   Authorization: DurableObjectNamespace
   ExchangeCode: DurableObjectNamespace

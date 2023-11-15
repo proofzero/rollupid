@@ -6,6 +6,10 @@ logpush = true
 node_compat = true
 workers_dev = false
 
+kv_namespaces = [
+  { binding = "UsageKV", id = "UsageKV", preview_id = "UsageKV" },
+]
+
 durable_objects.bindings = [
   { name = "Account", class_name = "Account" },
   { name = "Authorization", class_name = "Authorization" },
