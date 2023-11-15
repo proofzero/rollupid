@@ -1,5 +1,5 @@
 query getExternalData {
-  getExternalData
+  externalData: getExternalData
 }
 
 mutation setExternalData($payload: JSON!) {
