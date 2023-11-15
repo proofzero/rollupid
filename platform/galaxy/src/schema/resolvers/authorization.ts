@@ -17,8 +17,13 @@ const authorizationResolvers: Resolvers = {
     getExternalData: async (
       _parent: any,
       {},
-      { env, jwt, traceSpan }: ResolverContext
+      { env, jwt, traceSpan, identityURN, clientId }: ResolverContext
     ) => {
+      const coreClient = createCoreClient(env.Core, {
+        ...getAuthzHeaderConditionallyFromToken(jwt),
+        ...generateTraceContextHeaders(traceSpan),
+      })
+
       return null
     },
   },
@@ -26,7 +31,7 @@ const authorizationResolvers: Resolvers = {
     setExternalData: async (
       _parent: any,
       { payload },
-      { env, jwt, traceSpan }: ResolverContext
+      { env, jwt, traceSpan, identityURN, clientId }: ResolverContext
     ) => {
       const coreClient = createCoreClient(env.Core, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
