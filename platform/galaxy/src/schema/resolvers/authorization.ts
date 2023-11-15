@@ -17,26 +17,38 @@ const authorizationResolvers: Resolvers = {
     getExternalData: async (
       _parent: any,
       {},
-      { env, jwt, traceSpan, identityURN, clientId }: ResolverContext
+      { env, jwt, traceSpan, clientId }: ResolverContext
     ) => {
       const coreClient = createCoreClient(env.Core, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      return null
+      return coreClient.authorization.getExternalData.query({
+        clientId,
+      })
     },
   },
   Mutation: {
     setExternalData: async (
       _parent: any,
       { payload },
-      { env, jwt, traceSpan, identityURN, clientId }: ResolverContext
+      { env, jwt, traceSpan, clientId }: ResolverContext
     ) => {
       const coreClient = createCoreClient(env.Core, {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...generateTraceContextHeaders(traceSpan),
       })
+
+      try {
+        await coreClient.authorization.setExternalData.mutate({
+          clientId,
+          payload,
+        })
+      } catch (ex) {
+        console.error(ex)
+        return false
+      }
 
       return true
     },
