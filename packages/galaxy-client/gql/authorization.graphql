@@ -1,0 +1,7 @@
+query getExternalData($clientId: String!) {
+  getExternalData(clientId: $clientId)
+}
+
+mutation setExternalData($clientId: String!, $externalData: JSON!) {
+  setExternalData(clientId: $clientId, externalData: $externalData)
+}
