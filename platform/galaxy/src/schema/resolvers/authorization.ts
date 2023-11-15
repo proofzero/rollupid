@@ -6,6 +6,7 @@ import {
   logAnalytics,
   requestLogging,
   setupContext,
+  validateJWTAndAPIKeyPresence,
 } from './utils'
 import { ResolverContext } from './common'
 import createCoreClient from '@proofzero/platform-clients/core'
@@ -59,6 +60,7 @@ const AuthorizationResolverComposition = {
   'Query.getExternalData': [
     requestLogging(),
     setupContext(),
+    validateJWTAndAPIKeyPresence(),
     validateApiKey(),
     isAuthorized(),
     logAnalytics(),
@@ -66,6 +68,7 @@ const AuthorizationResolverComposition = {
   'Mutation.setExternalData': [
     requestLogging(),
     setupContext(),
+    validateJWTAndAPIKeyPresence(),
     validateApiKey(),
     isAuthorized(),
     logAnalytics(),

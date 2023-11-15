@@ -98,6 +98,33 @@ export const isAuthorized = () => (next) => (root, args, context, info) => {
   return next(root, args, context, info)
 }
 
+export const validateJWTAndAPIKeyPresence =
+  () => (next) => async (root, args, context, info) => {
+    const apiKey = context.apiKey
+    if (!apiKey) {
+      throw new GraphQLError('No API Key provided.', {
+        extensions: {
+          http: {
+            status: 400,
+          },
+        },
+      })
+    }
+
+    const clientId = context.clientId
+    if (!clientId) {
+      throw new GraphQLError('No clientId provided.', {
+        extensions: {
+          http: {
+            status: 400,
+          },
+        },
+      })
+    }
+
+    return next(root, args, context, info)
+  }
+
 export const validateApiKey =
   () => (next) => async (root, args, context, info) => {
     //If request isn't coming from a service binding then we check for API key validity;
