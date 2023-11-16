@@ -19,7 +19,7 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { requireJWT } from '~/utilities/session.server'
 import { InternalServerError } from '@proofzero/errors'
-import { IdentityFeatures } from '@proofzero/platform.starbase/src/types'
+import { AppFeatures } from '@proofzero/platform.starbase/src/types'
 import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
 import classNames from 'classnames'
 
@@ -44,7 +44,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     })
 
     return {
-      featureEnabled: (features & IdentityFeatures.STORAGE) !== 0,
+      featureEnabled: (features & AppFeatures.STORAGE) !== 0,
     }
   }
 )
@@ -69,15 +69,15 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       clientId,
     })
 
-    if ((features & IdentityFeatures.STORAGE) === 0) {
+    if ((features & AppFeatures.STORAGE) === 0) {
       await coreClient.starbase.enableFeature.mutate({
         clientId,
-        feature: IdentityFeatures.STORAGE,
+        feature: AppFeatures.STORAGE,
       })
     } else {
       await coreClient.starbase.disableFeature.mutate({
         clientId,
-        feature: IdentityFeatures.STORAGE,
+        feature: AppFeatures.STORAGE,
       })
     }
 

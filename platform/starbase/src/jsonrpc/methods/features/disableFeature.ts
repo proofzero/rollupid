@@ -1,12 +1,12 @@
 import { z } from 'zod'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
-import { IdentityFeatures } from '../../../types'
+import { AppFeatures } from '../../../types'
 import { Context } from '../../context'
 import { AppClientIdParamSchema } from '../../validators/app'
 import { getApplicationNodeByClientId } from '../../../nodes/application'
 
 export const DisableFeatureInputSchema = AppClientIdParamSchema.extend({
-  feature: z.nativeEnum(IdentityFeatures),
+  feature: z.nativeEnum(AppFeatures),
 })
 type DisableFeatureInput = z.infer<typeof DisableFeatureInputSchema>
 
