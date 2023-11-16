@@ -20,11 +20,12 @@ import {
   CUSTOM_DOMAIN_CHECK_PERIOD,
   STARBASE_API_KEY_ISSUER,
 } from '../constants'
-import type {
+import {
   AppAllFields,
   AppObject,
   AppReadableFields,
   AppUpdateableFields,
+  IdentityFeatures,
 } from '../types'
 import {
   AppTheme,
@@ -328,6 +329,15 @@ export default class StarbaseApplication extends DOProxy {
 
   async deleteAppPlan(): Promise<boolean> {
     return this.state.storage.delete('appPlan')
+  }
+
+  async getFeatures(): Promise<IdentityFeatures> {
+    const stored = await this.state.storage.get<IdentityFeatures>('features')
+    return stored || IdentityFeatures.NONE
+  }
+
+  async setFeatures(features: IdentityFeatures): Promise<void> {
+    return this.state.storage.put('features', features)
   }
 }
 

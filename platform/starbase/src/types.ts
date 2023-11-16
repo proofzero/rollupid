@@ -43,3 +43,8 @@ export type CustomDomain = z.infer<typeof CustomDomainSchema>
 export type CustomDomainDNSRecords = z.infer<
   typeof CustomDomainDNSRecordsSchema
 >
+
+export enum IdentityFeatures {
+  NONE = 0,
+  STORAGE = 1,
+}
