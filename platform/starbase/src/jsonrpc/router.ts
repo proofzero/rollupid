@@ -424,7 +424,7 @@ export const appRouter = t.router({
     .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(EnableFeatureInputSchema)
-    .query(enableFeature),
+    .mutation(enableFeature),
   disableFeature: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
@@ -432,7 +432,7 @@ export const appRouter = t.router({
     .use(Analytics)
     .use(OwnAppsMiddleware)
     .input(DisableFeatureInputSchema)
-    .query(disableFeature),
+    .mutation(disableFeature),
   getFeatures: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
