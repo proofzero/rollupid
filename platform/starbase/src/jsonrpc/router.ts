@@ -142,17 +142,9 @@ import {
   GetAppNameBatchOutput,
 } from './methods/getAppName'
 import {
-  getFeatures,
-  GetFeaturesInputSchema,
-} from './methods/features/getFeatures'
-import {
-  enableFeature,
-  EnableFeatureInputSchema,
-} from './methods/features/enableFeature'
-import {
-  disableFeature,
-  DisableFeatureInputSchema,
-} from './methods/features/disableFeature'
+  setExternalDataPackage,
+  SetExternalDataPackageInputSchema,
+} from './methods/setExternalDataPackage'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -417,30 +409,14 @@ export const appRouter = t.router({
     .input(GetAppNameBatchInput)
     .output(GetAppNameBatchOutput)
     .query(getAppNameBatch),
-  enableFeature: t.procedure
+  setExternalDataPackage: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .use(OwnAppsMiddleware)
-    .input(EnableFeatureInputSchema)
-    .mutation(enableFeature),
-  disableFeature: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(LogUsage)
-    .use(Analytics)
-    .use(OwnAppsMiddleware)
-    .input(DisableFeatureInputSchema)
-    .mutation(disableFeature),
-  getFeatures: t.procedure
-    .use(AuthorizationTokenFromHeader)
-    .use(ValidateJWT)
-    .use(LogUsage)
-    .use(Analytics)
-    .use(OwnAppsMiddleware)
-    .input(GetFeaturesInputSchema)
-    .query(getFeatures),
+    .input(SetExternalDataPackageInputSchema)
+    .mutation(setExternalDataPackage),
 })
 
 export type StarbaseRouter = typeof appRouter

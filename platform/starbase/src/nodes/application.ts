@@ -6,7 +6,6 @@ import {
   exportJWK,
   generateKeyPair,
   importJWK,
-  JWK,
   jwtVerify,
   JWTVerifyResult,
   KeyLike,
@@ -25,7 +24,6 @@ import {
   AppObject,
   AppReadableFields,
   AppUpdateableFields,
-  AppFeatures,
 } from '../types'
 import {
   AppTheme,
@@ -35,7 +33,7 @@ import {
 } from '../jsonrpc/validators/app'
 import { InternalServerError } from '@proofzero/errors'
 
-import type { CustomDomain } from '../types'
+import type { CustomDomain, ExternalDataPackageFeatures } from '../types'
 import { getCloudflareFetcher, getCustomHostname } from '../utils/cloudflare'
 import { getDNSRecordValue } from '@proofzero/utils'
 import { ServicePlanType } from '@proofzero/types/billing'
@@ -130,6 +128,7 @@ export default class StarbaseApplication extends DOProxy {
       'privacyURL',
       'customDomain',
       'appPlan',
+      'externalDataPackageFeatures',
     ]
     const appObj = await this.state.storage.get(keysWeWant)
     const result = Object.fromEntries(appObj) as AppDetails
@@ -327,17 +326,29 @@ export default class StarbaseApplication extends DOProxy {
     return this.state.storage.put('appPlan', planType)
   }
 
+  async getExternalDataPackage(): Promise<
+    ExternalDataPackageFeatures | undefined
+  > {
+    return this.state.storage.get<ExternalDataPackageFeatures>(
+      'externalDataPackage'
+    )
+  }
+
+  async setExternalDataPackage(
+    packageFeatures: ExternalDataPackageFeatures | undefined
+  ): Promise<void> {
+    if (packageFeatures) {
+      await this.state.storage.put(
+        'externalDataPackageFeatures',
+        packageFeatures
+      )
+    } else {
+      await this.state.storage.delete('externalDataPackageFeatures')
+    }
+  }
+
   async deleteAppPlan(): Promise<boolean> {
     return this.state.storage.delete('appPlan')
-  }
-
-  async getFeatures(): Promise<AppFeatures> {
-    const stored = await this.state.storage.get<AppFeatures>('features')
-    return stored || AppFeatures.NONE
-  }
-
-  async setFeatures(features: AppFeatures): Promise<void> {
-    return this.state.storage.put('features', features)
   }
 }
 

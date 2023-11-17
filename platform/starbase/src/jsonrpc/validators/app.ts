@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { CustomDomainSchema } from './customdomain'
 import { ServicePlanType } from '@proofzero/types/billing'
+import { ExternalDataPackageFeaturesSchema } from './externalDataPackage'
 
 export const AppObjectSchema = z.object({
   name: z.string(),
@@ -30,6 +31,7 @@ export const AppReadableFieldsSchema = z.object({
   privacyURL: z.string().optional(),
   customDomain: CustomDomainSchema.optional(),
   appPlan: z.nativeEnum(ServicePlanType).default(ServicePlanType.FREE),
+  externalDataPackageFeatures: ExternalDataPackageFeaturesSchema.optional(),
 })
 
 export const AppInternalFieldSchema = z.object({

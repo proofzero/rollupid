@@ -38,16 +38,19 @@ export const setExternalDataMethod = async ({
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
   const node = initAuthorizationNodeByName(urn, ctx.env.Authorization)
 
-  // TODO: Check if service is enabled
-  // TODO: Error handling
-  let externalStorageWrites =
-    (await ctx.env.UsageKV.get<number>(`${clientId}:external-storage:write`)) ??
-    0
+  const externalStorageWrites = await ctx.env.UsageKV.get<number>(
+    `${clientId}:external-storage:write`
+  )
+  if (!externalStorageWrites) {
+    throw new BadRequestError({
+      message: 'external storage not enabled',
+    })
+  }
 
   await node.storage.put('externalData', payload)
 
   await ctx.env.UsageKV.put(
     `${clientId}:external-storage:write`,
-    `${++externalStorageWrites}`
+    `${externalStorageWrites + 1}`
   )
 }
