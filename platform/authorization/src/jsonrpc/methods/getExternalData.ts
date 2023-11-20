@@ -6,10 +6,7 @@ import { IdentityURNSpace } from '@proofzero/urns/identity'
 
 import { Context } from '../../context'
 import { initAuthorizationNodeByName } from '../../nodes'
-import { AppData } from '@proofzero/types/application'
-import type { AppDataType } from '@proofzero/types/application'
 import type { IdentityURN } from '@proofzero/urns/identity'
-import { AccountURNSpace } from '@proofzero/urns/account'
 import { AppClientIdParamSchema } from '@proofzero/platform.starbase/src/jsonrpc/validators/app'
 
 export const GetExternalDataInputSchema = AppClientIdParamSchema
