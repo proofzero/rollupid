@@ -49,7 +49,6 @@ export type Mutation = {
   __typename?: 'Mutation';
   disconnectAccount?: Maybe<Scalars['Boolean']>;
   registerSessionKey: Scalars['String'];
-  revokeAppAuthorization?: Maybe<Scalars['Boolean']>;
   updateAccountNickname?: Maybe<Scalars['Boolean']>;
   updateConnectedAccountsProperties?: Maybe<Scalars['Boolean']>;
 };
@@ -63,11 +62,6 @@ export type MutationDisconnectAccountArgs = {
 export type MutationRegisterSessionKeyArgs = {
   sessionPublicKey: Scalars['String'];
   smartContractWalletAddress: Scalars['String'];
-};
-
-
-export type MutationRevokeAppAuthorizationArgs = {
-  clientId: Scalars['String'];
 };
 
 
@@ -126,7 +120,6 @@ export type Query = {
   connectedAccounts?: Maybe<Array<Node>>;
   identityFromAlias: Scalars['String'];
   profile?: Maybe<Profile>;
-  scopes: Array<Maybe<Scope>>;
 };
 
 
@@ -153,17 +146,6 @@ export type QueryIdentityFromAliasArgs = {
 
 export type QueryProfileArgs = {
   targetIdentityURN?: InputMaybe<Scalars['String']>;
-};
-
-
-export type QueryScopesArgs = {
-  clientId: Scalars['String'];
-};
-
-export type Scope = {
-  __typename?: 'Scope';
-  permission: Scalars['String'];
-  scopes: Array<Maybe<Scalars['String']>>;
 };
 
 export type StandardPfp = {
@@ -207,20 +189,6 @@ export type UpdateConnectedAccountsPropertiesMutationVariables = Exact<{
 
 
 export type UpdateConnectedAccountsPropertiesMutation = { __typename?: 'Mutation', updateConnectedAccountsProperties?: boolean | null };
-
-export type GetAuthorizedAppScopesQueryVariables = Exact<{
-  clientId: Scalars['String'];
-}>;
-
-
-export type GetAuthorizedAppScopesQuery = { __typename?: 'Query', scopes: Array<{ __typename?: 'Scope', permission: string, scopes: Array<string | null> } | null> };
-
-export type RevokeAppAuthorizationMutationVariables = Exact<{
-  clientId: Scalars['String'];
-}>;
-
-
-export type RevokeAppAuthorizationMutation = { __typename?: 'Mutation', revokeAppAuthorization?: boolean | null };
 
 export type GetProfileQueryVariables = Exact<{
   targetIdentityURN?: InputMaybe<Scalars['String']>;
@@ -286,19 +254,6 @@ export const UpdateConnectedAccountsPropertiesDocument = gql`
   updateConnectedAccountsProperties(accountURNList: $accountURNList)
 }
     `;
-export const GetAuthorizedAppScopesDocument = gql`
-    query getAuthorizedAppScopes($clientId: String!) {
-  scopes(clientId: $clientId) {
-    permission
-    scopes
-  }
-}
-    `;
-export const RevokeAppAuthorizationDocument = gql`
-    mutation revokeAppAuthorization($clientId: String!) {
-  revokeAppAuthorization(clientId: $clientId)
-}
-    `;
 export const GetProfileDocument = gql`
     query getProfile($targetIdentityURN: String) {
   profile(targetIdentityURN: $targetIdentityURN) {
@@ -361,12 +316,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateConnectedAccountsProperties(variables: UpdateConnectedAccountsPropertiesMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateConnectedAccountsPropertiesMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateConnectedAccountsPropertiesMutation>(UpdateConnectedAccountsPropertiesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateConnectedAccountsProperties', 'mutation');
-    },
-    getAuthorizedAppScopes(variables: GetAuthorizedAppScopesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAuthorizedAppScopesQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetAuthorizedAppScopesQuery>(GetAuthorizedAppScopesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAuthorizedAppScopes', 'query');
-    },
-    revokeAppAuthorization(variables: RevokeAppAuthorizationMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RevokeAppAuthorizationMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<RevokeAppAuthorizationMutation>(RevokeAppAuthorizationDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'revokeAppAuthorization', 'mutation');
     },
     getProfile(variables?: GetProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProfileQuery>(GetProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfile', 'query');
