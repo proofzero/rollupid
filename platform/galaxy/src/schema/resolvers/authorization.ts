@@ -12,8 +12,6 @@ import { ResolverContext } from './common'
 import createCoreClient from '@proofzero/platform-clients/core'
 import { getAuthzHeaderConditionallyFromToken } from '@proofzero/utils'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import { AppFeatures } from '@proofzero/platform.starbase/src/types'
-import { BadRequestError } from '@proofzero/errors'
 
 const authorizationResolvers: Resolvers = {
   Query: {
@@ -26,15 +24,6 @@ const authorizationResolvers: Resolvers = {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...generateTraceContextHeaders(traceSpan),
       })
-
-      const appFeatures = await coreClient.starbase.getFeatures.query({
-        clientId,
-      })
-      if ((appFeatures & AppFeatures.STORAGE) === 0) {
-        throw new BadRequestError({
-          message: 'App does not have storage feature enabled',
-        })
-      }
 
       return coreClient.authorization.getExternalData.query({
         clientId,
@@ -51,15 +40,6 @@ const authorizationResolvers: Resolvers = {
         ...getAuthzHeaderConditionallyFromToken(jwt),
         ...generateTraceContextHeaders(traceSpan),
       })
-
-      const appFeatures = await coreClient.starbase.getFeatures.query({
-        clientId,
-      })
-      if ((appFeatures & AppFeatures.STORAGE) === 0) {
-        throw new BadRequestError({
-          message: 'App does not have storage feature enabled',
-        })
-      }
 
       try {
         await coreClient.authorization.setExternalData.mutate({
