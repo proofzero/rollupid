@@ -19,7 +19,7 @@ import {
   CUSTOM_DOMAIN_CHECK_PERIOD,
   STARBASE_API_KEY_ISSUER,
 } from '../constants'
-import {
+import type {
   AppAllFields,
   AppObject,
   AppReadableFields,
