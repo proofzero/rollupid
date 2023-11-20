@@ -117,18 +117,23 @@ export const inviteIdentityGroupMember = async ({
     })
   }
 
-  const primaryAccountURN = AccountURNSpace.componentizedParse(
+  const primaryAccountBaseURN = AccountURNSpace.getBaseURN(
     inviterProfile.primaryAccountURN as AccountURN
   )
-  const alias = primaryAccountURN.qcomponent?.alias
-  if (!alias) {
+
+  const accountProfile = await caller.account.getAccountProfileBatch([
+    primaryAccountBaseURN,
+  ])
+
+  const address = accountProfile[0]?.address
+  if (!address) {
     throw new InternalServerError({
       message: 'Inviter primary account alias not found',
     })
   }
 
   await node.class.inviteMember({
-    inviter: alias,
+    inviter: address,
     identifier,
     accountType,
     inviteCode,
