@@ -1,7 +1,7 @@
 import { ExternalDataPackageType } from '@proofzero/types/billing'
-import { ExternalDataPackageFeatures } from '../types'
+import { ExternalDataPackageDefinition } from '../types'
 
-const packages: ExternalDataPackageFeatures[] = [
+const packages: ExternalDataPackageDefinition[] = [
   {
     packageType: ExternalDataPackageType.BASE,
     title: 'Base Plan',
@@ -13,4 +13,4 @@ const packages: ExternalDataPackageFeatures[] = [
 export default packages.reduce((acc, curr) => {
   acc[curr.packageType] = curr
   return acc
-}, {} as Record<ExternalDataPackageType, ExternalDataPackageFeatures>)
+}, {} as Record<ExternalDataPackageType, ExternalDataPackageDefinition>)

@@ -82,19 +82,19 @@ export default () => {
 
             <div
               className={classNames('w-2 h-2 rounded-full', {
-                'bg-green-500': Boolean(appDetails.externalDataPackageFeatures),
-                'bg-gray-300': !Boolean(appDetails.externalDataPackageFeatures),
+                'bg-green-500': Boolean(appDetails.externalDataPackageDefinition),
+                'bg-gray-300': !Boolean(appDetails.externalDataPackageDefinition),
               })}
             ></div>
           </div>
 
           <InputToggle
             id="toggle_storage"
-            checked={Boolean(appDetails.externalDataPackageFeatures)}
+            checked={Boolean(appDetails.externalDataPackageDefinition)}
             onToggle={() => {
               submit(
                 {
-                  op: Boolean(appDetails.externalDataPackageFeatures)
+                  op: Boolean(appDetails.externalDataPackageDefinition)
                     ? 'disable'
                     : 'enable',
                 },

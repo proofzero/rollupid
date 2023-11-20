@@ -33,7 +33,7 @@ import {
 } from '../jsonrpc/validators/app'
 import { InternalServerError } from '@proofzero/errors'
 
-import type { CustomDomain, ExternalDataPackageFeatures } from '../types'
+import type { CustomDomain, ExternalDataPackageDefinition } from '../types'
 import { getCloudflareFetcher, getCustomHostname } from '../utils/cloudflare'
 import { getDNSRecordValue } from '@proofzero/utils'
 import { ServicePlanType } from '@proofzero/types/billing'
@@ -128,7 +128,7 @@ export default class StarbaseApplication extends DOProxy {
       'privacyURL',
       'customDomain',
       'appPlan',
-      'externalDataPackageFeatures',
+      'externalDataPackageDefinition',
     ]
     const appObj = await this.state.storage.get(keysWeWant)
     const result = Object.fromEntries(appObj) as AppDetails
@@ -327,23 +327,23 @@ export default class StarbaseApplication extends DOProxy {
   }
 
   async getExternalDataPackage(): Promise<
-    ExternalDataPackageFeatures | undefined
+    ExternalDataPackageDefinition | undefined
   > {
-    return this.state.storage.get<ExternalDataPackageFeatures>(
+    return this.state.storage.get<ExternalDataPackageDefinition>(
       'externalDataPackage'
     )
   }
 
   async setExternalDataPackage(
-    packageFeatures: ExternalDataPackageFeatures | undefined
+    packageDefinition: ExternalDataPackageDefinition | undefined
   ): Promise<void> {
-    if (packageFeatures) {
+    if (packageDefinition) {
       await this.state.storage.put(
-        'externalDataPackageFeatures',
-        packageFeatures
+        'externalDataPackageDefinition',
+        packageDefinition
       )
     } else {
-      await this.state.storage.delete('externalDataPackageFeatures')
+      await this.state.storage.delete('externalDataPackageDefinition')
     }
   }
 
