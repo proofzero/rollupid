@@ -33,6 +33,7 @@ import {
   TbUserCog,
   TbBrandGithub,
   TbBook,
+  TbServerBolt,
 } from 'react-icons/tb'
 
 import { Popover, Transition } from '@headlessui/react'
@@ -287,7 +288,7 @@ const appSubmenuStruct: {
       },
       {
         title: 'Storage',
-        icon: HiOutlineDocument,
+        icon: TbServerBolt,
         subroute: '/storage',
       },
       {
