@@ -39,7 +39,7 @@ export const setExternalAppDataMethod = async ({
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
   const node = initAuthorizationNodeByName(urn, ctx.env.Authorization)
 
-  const externalStorageWrites = await ctx.env.UsageKV.get<number>(
+  const externalStorageWrites = await ctx.env.UsageKV.get<string>(
     generateUsageKey(clientId, 'external-storage', 'write')
   )
   if (!externalStorageWrites) {
@@ -48,11 +48,13 @@ export const setExternalAppDataMethod = async ({
     })
   }
 
+  const externalStorageWritesNum = parseInt(externalStorageWrites)
+
   await Promise.all([
     node.storage.put('externalAppData', payload),
     ctx.env.UsageKV.put(
       generateUsageKey(clientId, 'external-storage', 'write'),
-      `${externalStorageWrites + 1}`
+      `${externalStorageWritesNum + 1}`
     ),
   ])
 }

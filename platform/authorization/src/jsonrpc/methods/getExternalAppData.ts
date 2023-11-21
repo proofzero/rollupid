@@ -40,7 +40,7 @@ export const getExternalAppDataMethod = async ({
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
   const node = initAuthorizationNodeByName(urn, ctx.env.Authorization)
 
-  const externalStorageReads = await ctx.env.UsageKV.get<number>(
+  const externalStorageReads = await ctx.env.UsageKV.get<string>(
     generateUsageKey(clientId, 'external-storage', 'read')
   )
   if (!externalStorageReads) {
@@ -49,11 +49,13 @@ export const getExternalAppDataMethod = async ({
     })
   }
 
+  const externalStorageReadsNum = parseInt(externalStorageReads)
+
   const [externalAppData] = await Promise.all([
     node.storage.get('externalAppData'),
     ctx.env.UsageKV.put(
       generateUsageKey(clientId, 'external-storage', 'read'),
-      `${externalStorageReads + 1}`
+      `${externalStorageReadsNum + 1}`
     ),
   ])
 
