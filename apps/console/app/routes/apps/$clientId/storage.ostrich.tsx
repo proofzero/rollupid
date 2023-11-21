@@ -36,7 +36,7 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       case 'enable':
         await coreClient.starbase.setExternalDataPackage.mutate({
           clientId,
-          packageType: ExternalDataPackageType.BASE,
+          packageType: ExternalDataPackageType.STARTER,
         })
         break
       case 'disable':
@@ -82,8 +82,12 @@ export default () => {
 
             <div
               className={classNames('w-2 h-2 rounded-full', {
-                'bg-green-500': Boolean(appDetails.externalDataPackageDefinition),
-                'bg-gray-300': !Boolean(appDetails.externalDataPackageDefinition),
+                'bg-green-500': Boolean(
+                  appDetails.externalDataPackageDefinition
+                ),
+                'bg-gray-300': !Boolean(
+                  appDetails.externalDataPackageDefinition
+                ),
               })}
             ></div>
           </div>

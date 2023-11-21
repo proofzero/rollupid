@@ -3,7 +3,7 @@ import { ExternalDataPackageDefinition } from '../types'
 
 const packages: ExternalDataPackageDefinition[] = [
   {
-    packageType: ExternalDataPackageType.BASE,
+    packageType: ExternalDataPackageType.STARTER,
     title: 'Base Plan',
     reads: 1000,
     writes: 1000,
