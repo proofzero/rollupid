@@ -80,7 +80,10 @@ export const setExternalAppDataPackage = async ({
   )
 
   const packageDetails = packageType
-    ? ExternalAppDataPackages[packageType]
+    ? {
+        packageType,
+        ...ExternalAppDataPackages[packageType],
+      }
     : undefined
 
   if (packageDetails) {
