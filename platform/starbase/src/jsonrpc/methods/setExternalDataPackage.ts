@@ -13,6 +13,7 @@ import {
 } from '@proofzero/urns/identity-group'
 import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 import ExternalDataPackages from '../../utils/externalDataPackages'
+import { generateUsageKey } from '@proofzero/utils/usage'
 
 export const SetExternalDataPackageInputSchema = AppClientIdParamSchema.extend({
   packageType: z.nativeEnum(ExternalDataPackageType).optional(),
@@ -59,11 +60,22 @@ export const setExternalDataPackage = async ({
     ctx.env.StarbaseApp
   )
 
+  const externalStorageUsageWriteKey = generateUsageKey(
+    clientId,
+    'external-storage',
+    'write'
+  )
+  const externalStorageUsageReadKey = generateUsageKey(
+    clientId,
+    'external-storage',
+    'read'
+  )
+
   const externalStorageWrites = await ctx.env.UsageKV.get<number>(
-    `${clientId}:external-storage:write`
+    externalStorageUsageWriteKey
   )
   const externalStorageReads = await ctx.env.UsageKV.get<number>(
-    `${clientId}:external-storage:read`
+    externalStorageUsageReadKey
   )
 
   const packageDetails = packageType
@@ -82,10 +94,10 @@ export const setExternalDataPackage = async ({
     }
 
     if (!externalStorageWrites) {
-      await ctx.env.UsageKV.put(`${clientId}:external-storage:write`, '0')
+      await ctx.env.UsageKV.put(externalStorageUsageWriteKey, '0')
     }
     if (!externalStorageReads) {
-      await ctx.env.UsageKV.put(`${clientId}:external-storage:read`, '0')
+      await ctx.env.UsageKV.put(externalStorageUsageReadKey, '0')
     }
   } else {
     if (!externalStorageWrites && !externalStorageReads) {
@@ -98,8 +110,8 @@ export const setExternalDataPackage = async ({
       )
     }
 
-    await ctx.env.UsageKV.delete(`${clientId}:external-storage:write`)
-    await ctx.env.UsageKV.delete(`${clientId}:external-storage:read`)
+    await ctx.env.UsageKV.delete(externalStorageUsageWriteKey)
+    await ctx.env.UsageKV.delete(externalStorageUsageReadKey)
   }
 
   await appDO.class.setExternalDataPackage(packageDetails)
