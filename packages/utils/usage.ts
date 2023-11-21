@@ -1,8 +1,9 @@
-type UsageType = 'read' | 'write'
-type UsageFeature = 'external-storage'
+export enum UsageCategory {
+  ExternalAppDataRead = 'external-app-data:read',
+  ExternalAppDataWrite = 'external-app-data:write',
+}
 
 export const generateUsageKey = (
   clientID: string,
-  feature: UsageFeature,
-  type: UsageType
-) => `${clientID}:${feature}:${type}`
+  usageCategory: UsageCategory
+) => `${clientID}:${usageCategory}`

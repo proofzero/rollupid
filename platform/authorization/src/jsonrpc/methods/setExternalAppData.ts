@@ -8,7 +8,7 @@ import { Context } from '../../context'
 import { initAuthorizationNodeByName } from '../../nodes'
 import type { IdentityURN } from '@proofzero/urns/identity'
 import { AppClientIdParamSchema } from '@proofzero/platform.starbase/src/jsonrpc/validators/app'
-import { generateUsageKey } from '@proofzero/utils/usage'
+import { UsageCategory, generateUsageKey } from '@proofzero/utils/usage'
 
 export const SetExternalAppDataInputSchema = AppClientIdParamSchema.extend({
   payload: z.any(),
@@ -41,8 +41,7 @@ export const setExternalAppDataMethod = async ({
 
   const externalStorageWriteKey = generateUsageKey(
     clientId,
-    'external-storage',
-    'write'
+    UsageCategory.ExternalAppDataWrite
   )
 
   const externalStorageWriteStr = await ctx.env.UsageKV.get<string>(

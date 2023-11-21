@@ -13,7 +13,7 @@ import {
 } from '@proofzero/urns/identity-group'
 import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
 import ExternalAppDataPackages from '../../utils/externalAppDataPackages'
-import { generateUsageKey } from '@proofzero/utils/usage'
+import { UsageCategory, generateUsageKey } from '@proofzero/utils/usage'
 
 export const SetExternalAppDataPackageInputSchema =
   AppClientIdParamSchema.extend({
@@ -63,13 +63,11 @@ export const setExternalAppDataPackage = async ({
 
   const externalStorageUsageWriteKey = generateUsageKey(
     clientId,
-    'external-storage',
-    'write'
+    UsageCategory.ExternalAppDataWrite
   )
   const externalStorageUsageReadKey = generateUsageKey(
     clientId,
-    'external-storage',
-    'read'
+    UsageCategory.ExternalAppDataRead
   )
 
   const externalStorageWrites = await ctx.env.UsageKV.get<number>(
