@@ -4,7 +4,7 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { AppClientIdParamSchema } from '../validators/app'
 import { ApplicationURNSpace } from '@proofzero/urns/application'
-import { ExternalDataPackageType } from '@proofzero/types/billing'
+import { ExternalAppDataPackageType } from '@proofzero/types/billing'
 import { EDGE_APPLICATION } from '../../types'
 import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import {
@@ -12,21 +12,22 @@ import {
   IdentityGroupURNSpace,
 } from '@proofzero/urns/identity-group'
 import { groupAdminValidatorByIdentityGroupURN } from '@proofzero/security/identity-group-validators'
-import ExternalDataPackages from '../../utils/externalDataPackages'
+import ExternalAppDataPackages from '../../utils/externalAppDataPackages'
 import { generateUsageKey } from '@proofzero/utils/usage'
 
-export const SetExternalDataPackageInputSchema = AppClientIdParamSchema.extend({
-  packageType: z.nativeEnum(ExternalDataPackageType).optional(),
-})
-type SetExternalDataPackageInput = z.infer<
-  typeof SetExternalDataPackageInputSchema
+export const SetExternalAppDataPackageInputSchema =
+  AppClientIdParamSchema.extend({
+    packageType: z.nativeEnum(ExternalAppDataPackageType).optional(),
+  })
+type SetExternalAppDataPackageInput = z.infer<
+  typeof SetExternalAppDataPackageInputSchema
 >
 
-export const setExternalDataPackage = async ({
+export const setExternalAppDataPackage = async ({
   input,
   ctx,
 }: {
-  input: SetExternalDataPackageInput
+  input: SetExternalAppDataPackageInput
   ctx: Context
 }): Promise<void> => {
   const { packageType, clientId } = input
@@ -79,7 +80,7 @@ export const setExternalDataPackage = async ({
   )
 
   const packageDetails = packageType
-    ? ExternalDataPackages[packageType]
+    ? ExternalAppDataPackages[packageType]
     : undefined
 
   if (packageDetails) {
@@ -114,5 +115,5 @@ export const setExternalDataPackage = async ({
     await ctx.env.UsageKV.delete(externalStorageUsageReadKey)
   }
 
-  await appDO.class.setExternalDataPackage(packageDetails)
+  await appDO.class.setExternalAppDataPackage(packageDetails)
 }

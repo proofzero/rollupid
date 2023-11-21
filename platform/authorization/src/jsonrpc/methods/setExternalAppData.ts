@@ -10,16 +10,16 @@ import type { IdentityURN } from '@proofzero/urns/identity'
 import { AppClientIdParamSchema } from '@proofzero/platform.starbase/src/jsonrpc/validators/app'
 import { generateUsageKey } from '@proofzero/utils/usage'
 
-export const SetExternalDataInputSchema = AppClientIdParamSchema.extend({
+export const SetExternalAppDataInputSchema = AppClientIdParamSchema.extend({
   payload: z.any(),
 })
-type SetExternalDataInput = z.infer<typeof SetExternalDataInputSchema>
+type SetExternalAppDataInput = z.infer<typeof SetExternalAppDataInputSchema>
 
-export const setExternalDataMethod = async ({
+export const setExternalAppDataMethod = async ({
   input,
   ctx,
 }: {
-  input: SetExternalDataInput
+  input: SetExternalAppDataInput
   ctx: Context
 }) => {
   const identityURN = ctx.identityURN as IdentityURN
@@ -48,7 +48,7 @@ export const setExternalDataMethod = async ({
     })
   }
 
-  await node.storage.put('externalData', payload)
+  await node.storage.put('externalAppData', payload)
 
   await ctx.env.UsageKV.put(
     generateUsageKey(clientId, 'external-storage', 'write'),

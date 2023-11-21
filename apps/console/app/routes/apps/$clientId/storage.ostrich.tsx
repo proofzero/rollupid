@@ -13,7 +13,7 @@ import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { InputToggle } from '@proofzero/design-system/src/atoms/form/InputToggle'
 import classNames from 'classnames'
 import { appDetailsProps } from '~/types'
-import { ExternalDataPackageType } from '@proofzero/types/billing'
+import { ExternalAppDataPackageType } from '@proofzero/types/billing'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context, params }) => {
@@ -34,13 +34,13 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
     const fd = await request.formData()
     switch (fd.get('op')) {
       case 'enable':
-        await coreClient.starbase.setExternalDataPackage.mutate({
+        await coreClient.starbase.setExternalAppDataPackage.mutate({
           clientId,
-          packageType: ExternalDataPackageType.STARTER,
+          packageType: ExternalAppDataPackageType.STARTER,
         })
         break
       case 'disable':
-        await coreClient.starbase.setExternalDataPackage.mutate({
+        await coreClient.starbase.setExternalAppDataPackage.mutate({
           clientId,
         })
         break
@@ -83,10 +83,10 @@ export default () => {
             <div
               className={classNames('w-2 h-2 rounded-full', {
                 'bg-green-500': Boolean(
-                  appDetails.externalDataPackageDefinition
+                  appDetails.externalAppDataPackageDefinition
                 ),
                 'bg-gray-300': !Boolean(
-                  appDetails.externalDataPackageDefinition
+                  appDetails.externalAppDataPackageDefinition
                 ),
               })}
             ></div>
@@ -94,11 +94,11 @@ export default () => {
 
           <InputToggle
             id="toggle_storage"
-            checked={Boolean(appDetails.externalDataPackageDefinition)}
+            checked={Boolean(appDetails.externalAppDataPackageDefinition)}
             onToggle={() => {
               submit(
                 {
-                  op: Boolean(appDetails.externalDataPackageDefinition)
+                  op: Boolean(appDetails.externalAppDataPackageDefinition)
                     ? 'disable'
                     : 'enable',
                 },

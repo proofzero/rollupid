@@ -1,7 +1,7 @@
-query getExternalData {
-  externalData: getExternalData
+query getExternalAppData {
+  externalAppData: getExternalAppData
 }
 
-mutation setExternalData($payload: JSON!) {
-  setExternalData(payload: $payload)
+mutation setExternalAppData($payload: JSON!) {
+  setExternalAppData(payload: $payload)
 }

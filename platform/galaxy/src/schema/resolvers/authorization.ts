@@ -15,7 +15,7 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 
 const authorizationResolvers: Resolvers = {
   Query: {
-    getExternalData: async (
+    getExternalAppData: async (
       _parent: any,
       {},
       { env, jwt, traceSpan, clientId }: ResolverContext
@@ -25,13 +25,13 @@ const authorizationResolvers: Resolvers = {
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      return coreClient.authorization.getExternalData.query({
+      return coreClient.authorization.getExternalAppData.query({
         clientId,
       })
     },
   },
   Mutation: {
-    setExternalData: async (
+    setExternalAppData: async (
       _parent: any,
       { payload },
       { env, jwt, traceSpan, clientId }: ResolverContext
@@ -42,7 +42,7 @@ const authorizationResolvers: Resolvers = {
       })
 
       try {
-        await coreClient.authorization.setExternalData.mutate({
+        await coreClient.authorization.setExternalAppData.mutate({
           clientId,
           payload,
         })
@@ -57,7 +57,7 @@ const authorizationResolvers: Resolvers = {
 }
 
 const AuthorizationResolverComposition = {
-  'Query.getExternalData': [
+  'Query.getExternalAppData': [
     requestLogging(),
     setupContext(),
     validateJWTAndAPIKeyPresence(),
@@ -65,7 +65,7 @@ const AuthorizationResolverComposition = {
     isAuthorized(),
     logAnalytics(),
   ],
-  'Mutation.setExternalData': [
+  'Mutation.setExternalAppData': [
     requestLogging(),
     setupContext(),
     validateJWTAndAPIKeyPresence(),

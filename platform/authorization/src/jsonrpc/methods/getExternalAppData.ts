@@ -10,19 +10,19 @@ import type { IdentityURN } from '@proofzero/urns/identity'
 import { AppClientIdParamSchema } from '@proofzero/platform.starbase/src/jsonrpc/validators/app'
 import { generateUsageKey } from '@proofzero/utils/usage'
 
-export const GetExternalDataInputSchema = AppClientIdParamSchema
-type GetExternalDataInput = z.infer<typeof GetExternalDataInputSchema>
+export const GetExternalAppDataInputSchema = AppClientIdParamSchema
+type GetExternalAppDataInput = z.infer<typeof GetExternalAppDataInputSchema>
 
-export const GetExternalDataOutputSchema = z.any()
-type GetExternalDataOutput = z.infer<typeof GetExternalDataOutputSchema>
+export const GetExternalAppDataOutputSchema = z.any()
+type GetExternalAppDataOutput = z.infer<typeof GetExternalAppDataOutputSchema>
 
-export const getExternalDataMethod = async ({
+export const getExternalAppDataMethod = async ({
   input,
   ctx,
 }: {
-  input: GetExternalDataInput
+  input: GetExternalAppDataInput
   ctx: Context
-}): Promise<GetExternalDataOutput> => {
+}): Promise<GetExternalAppDataOutput> => {
   const identityURN = ctx.identityURN as IdentityURN
   const { clientId } = input
 
@@ -49,12 +49,12 @@ export const getExternalDataMethod = async ({
     })
   }
 
-  const externalData = await node.storage.get('externalData')
+  const externalAppData = await node.storage.get('externalAppData')
 
   await ctx.env.UsageKV.put(
     generateUsageKey(clientId, 'external-storage', 'read'),
     `${externalStorageReads + 1}`
   )
 
-  return externalData
+  return externalAppData
 }

@@ -4,7 +4,7 @@ import type {
   AppObject,
   EdgesMetadata,
   CustomDomain,
-  ExternalDataPackageDefinition,
+  ExternalAppDataPackageDefinition,
 } from '@proofzero/platform/starbase/src/types'
 import { ServicePlanType } from '@proofzero/types/billing'
 import { IdentityRefURN } from '@proofzero/urns/identity-ref'
@@ -28,7 +28,7 @@ export type appDetailsProps = {
   customDomain?: CustomDomain
   appPlan: ServicePlanType
   ownerURN: IdentityRefURN
-  externalDataPackageDefinition?: ExternalDataPackageDefinition
+  externalAppDataPackageDefinition?: ExternalAppDataPackageDefinition
 }
 
 export type errorsAuthProps = {

@@ -142,9 +142,9 @@ import {
   GetAppNameBatchOutput,
 } from './methods/getAppName'
 import {
-  setExternalDataPackage,
-  SetExternalDataPackageInputSchema,
-} from './methods/setExternalDataPackage'
+  setExternalAppDataPackage,
+  SetExternalAppDataPackageInputSchema,
+} from './methods/setExternalAppDataPackage'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -409,14 +409,14 @@ export const appRouter = t.router({
     .input(GetAppNameBatchInput)
     .output(GetAppNameBatchOutput)
     .query(getAppNameBatch),
-  setExternalDataPackage: t.procedure
+  setExternalAppDataPackage: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .use(OwnAppsMiddleware)
-    .input(SetExternalDataPackageInputSchema)
-    .mutation(setExternalDataPackage),
+    .input(SetExternalAppDataPackageInputSchema)
+    .mutation(setExternalAppDataPackage),
 })
 
 export type StarbaseRouter = typeof appRouter

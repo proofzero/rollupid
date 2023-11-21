@@ -5,7 +5,7 @@ export enum ServicePlanType {
   PRO = 'PRO',
 }
 
-export enum ExternalDataPackageType {
+export enum ExternalAppDataPackageType {
   STARTER = 'STARTER',
 }
 

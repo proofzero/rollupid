@@ -20,7 +20,7 @@ import {
   AuthorizedUser,
 } from './jsonrpc/methods/getAuthorizedIdentities'
 import { EdgesMetadata } from '../../edges/src/jsonrpc/validators/edge'
-import { ExternalDataPackageDefinitionSchema } from './jsonrpc/validators/externalDataPackageDefinition'
+import { ExternalAppDataPackageDefinitionSchema } from './jsonrpc/validators/externalAppDataPackageDefinition'
 
 export const EDGE_APPLICATION: EdgeURN = EdgeSpace.urn('owns/app')
 
@@ -45,6 +45,6 @@ export type CustomDomainDNSRecords = z.infer<
   typeof CustomDomainDNSRecordsSchema
 >
 
-export type ExternalDataPackageDefinition = z.infer<
-  typeof ExternalDataPackageDefinitionSchema
+export type ExternalAppDataPackageDefinition = z.infer<
+  typeof ExternalAppDataPackageDefinitionSchema
 >

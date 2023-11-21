@@ -1,9 +1,9 @@
 export default /* GraphQL */ `
   type Query {
-    getExternalData: JSON
+    getExternalAppData: JSON
   }
 
   type Mutation {
-    setExternalData(payload: JSON!): Boolean
+    setExternalAppData(payload: JSON!): Boolean
   }
 `

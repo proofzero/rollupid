@@ -49,7 +49,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   disconnectAccount?: Maybe<Scalars['Boolean']>;
   registerSessionKey: Scalars['String'];
-  setExternalData?: Maybe<Scalars['Boolean']>;
+  setExternalAppData?: Maybe<Scalars['Boolean']>;
   updateAccountNickname?: Maybe<Scalars['Boolean']>;
   updateConnectedAccountsProperties?: Maybe<Scalars['Boolean']>;
 };
@@ -66,7 +66,7 @@ export type MutationRegisterSessionKeyArgs = {
 };
 
 
-export type MutationSetExternalDataArgs = {
+export type MutationSetExternalAppDataArgs = {
   payload: Scalars['JSON'];
 };
 
@@ -124,7 +124,7 @@ export type Query = {
   accountProfiles: Array<AccountProfile>;
   authorizedApps?: Maybe<Array<Maybe<App>>>;
   connectedAccounts?: Maybe<Array<Node>>;
-  getExternalData?: Maybe<Scalars['JSON']>;
+  getExternalAppData?: Maybe<Scalars['JSON']>;
   identityFromAlias: Scalars['String'];
   profile?: Maybe<Profile>;
 };
@@ -197,17 +197,17 @@ export type UpdateConnectedAccountsPropertiesMutationVariables = Exact<{
 
 export type UpdateConnectedAccountsPropertiesMutation = { __typename?: 'Mutation', updateConnectedAccountsProperties?: boolean | null };
 
-export type GetExternalDataQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetExternalAppDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetExternalDataQuery = { __typename?: 'Query', externalData?: any | null };
+export type GetExternalAppDataQuery = { __typename?: 'Query', externalAppData?: any | null };
 
-export type SetExternalDataMutationVariables = Exact<{
+export type SetExternalAppDataMutationVariables = Exact<{
   payload: Scalars['JSON'];
 }>;
 
 
-export type SetExternalDataMutation = { __typename?: 'Mutation', setExternalData?: boolean | null };
+export type SetExternalAppDataMutation = { __typename?: 'Mutation', setExternalAppData?: boolean | null };
 
 export type GetProfileQueryVariables = Exact<{
   targetIdentityURN?: InputMaybe<Scalars['String']>;
@@ -273,14 +273,14 @@ export const UpdateConnectedAccountsPropertiesDocument = gql`
   updateConnectedAccountsProperties(accountURNList: $accountURNList)
 }
     `;
-export const GetExternalDataDocument = gql`
-    query getExternalData {
-  externalData: getExternalData
+export const GetExternalAppDataDocument = gql`
+    query getExternalAppData {
+  externalAppData: getExternalAppData
 }
     `;
-export const SetExternalDataDocument = gql`
-    mutation setExternalData($payload: JSON!) {
-  setExternalData(payload: $payload)
+export const SetExternalAppDataDocument = gql`
+    mutation setExternalAppData($payload: JSON!) {
+  setExternalAppData(payload: $payload)
 }
     `;
 export const GetProfileDocument = gql`
@@ -346,11 +346,11 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     updateConnectedAccountsProperties(variables: UpdateConnectedAccountsPropertiesMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateConnectedAccountsPropertiesMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateConnectedAccountsPropertiesMutation>(UpdateConnectedAccountsPropertiesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateConnectedAccountsProperties', 'mutation');
     },
-    getExternalData(variables?: GetExternalDataQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetExternalDataQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetExternalDataQuery>(GetExternalDataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getExternalData', 'query');
+    getExternalAppData(variables?: GetExternalAppDataQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetExternalAppDataQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetExternalAppDataQuery>(GetExternalAppDataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getExternalAppData', 'query');
     },
-    setExternalData(variables: SetExternalDataMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetExternalDataMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<SetExternalDataMutation>(SetExternalDataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setExternalData', 'mutation');
+    setExternalAppData(variables: SetExternalAppDataMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<SetExternalAppDataMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<SetExternalAppDataMutation>(SetExternalAppDataDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'setExternalAppData', 'mutation');
     },
     getProfile(variables?: GetProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProfileQuery>(GetProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfile', 'query');

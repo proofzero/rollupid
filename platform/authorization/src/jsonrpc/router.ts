@@ -72,14 +72,14 @@ import {
   GetAppDataOutput,
 } from './methods/getAppData'
 import {
-  GetExternalDataInputSchema,
-  getExternalDataMethod,
-  GetExternalDataOutputSchema,
-} from './methods/getExternalData'
+  GetExternalAppDataInputSchema,
+  getExternalAppDataMethod,
+  GetExternalAppDataOutputSchema,
+} from './methods/getExternalAppData'
 import {
-  SetExternalDataInputSchema,
-  setExternalDataMethod,
-} from './methods/setExternalData'
+  SetExternalAppDataInputSchema,
+  setExternalAppDataMethod,
+} from './methods/setExternalAppData'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -185,19 +185,19 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(SetAppDataInput)
     .mutation(setAppDataMethod),
-  setExternalData: t.procedure
+  setExternalAppData: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
-    .input(SetExternalDataInputSchema)
-    .mutation(setExternalDataMethod),
-  getExternalData: t.procedure
+    .input(SetExternalAppDataInputSchema)
+    .mutation(setExternalAppDataMethod),
+  getExternalAppData: t.procedure
     .use(AuthorizationTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
-    .input(GetExternalDataInputSchema)
-    .output(GetExternalDataOutputSchema)
-    .query(getExternalDataMethod),
+    .input(GetExternalAppDataInputSchema)
+    .output(GetExternalAppDataOutputSchema)
+    .query(getExternalAppDataMethod),
 })
