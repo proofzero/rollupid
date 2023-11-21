@@ -31,13 +31,23 @@ import {
   OGTheme,
   PaymasterType,
 } from '../jsonrpc/validators/app'
-import { InternalServerError } from '@proofzero/errors'
+import { InternalServerError, RollupError } from '@proofzero/errors'
 
 import type { CustomDomain, ExternalAppDataPackageDefinition } from '../types'
 import { getCloudflareFetcher, getCustomHostname } from '../utils/cloudflare'
 import { getDNSRecordValue } from '@proofzero/utils'
-import { ServicePlanType } from '@proofzero/types/billing'
+import {
+  ExternalAppDataPackageType,
+  ServicePlanType,
+} from '@proofzero/types/billing'
 import { KeyPairSerialized } from '@proofzero/packages/types/application'
+import { generateUsageKey, UsageCategory } from '@proofzero/utils/usage'
+import ExternalAppDataPackages from '../utils/externalAppDataPackages'
+import { NodeMethodReturnValue } from '@proofzero/types/node'
+import {
+  ExternalStorageAlreadyDisabledError,
+  ExternalStorageAlreadyEnabledError,
+} from '../errors'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields
@@ -335,16 +345,70 @@ export default class StarbaseApplication extends DOProxy {
   }
 
   async setExternalAppDataPackage(
-    packageDefinition: ExternalAppDataPackageDefinition | undefined
-  ): Promise<void> {
-    if (packageDefinition) {
+    clientId: string,
+    packageType: ExternalAppDataPackageType | undefined
+  ): Promise<NodeMethodReturnValue<boolean, RollupError>> {
+    const externalStorageUsageWriteKey = generateUsageKey(
+      clientId,
+      UsageCategory.ExternalAppDataWrite
+    )
+    const externalStorageUsageReadKey = generateUsageKey(
+      clientId,
+      UsageCategory.ExternalAppDataRead
+    )
+
+    const externalStorageWrites = await this.env.UsageKV.get<number>(
+      externalStorageUsageWriteKey
+    )
+    const externalStorageReads = await this.env.UsageKV.get<number>(
+      externalStorageUsageReadKey
+    )
+
+    const packageDetails = packageType
+      ? {
+          packageType,
+          ...ExternalAppDataPackages[packageType],
+        }
+      : undefined
+
+    if (packageDetails) {
+      if (externalStorageWrites && externalStorageReads) {
+        return { error: ExternalStorageAlreadyEnabledError }
+      } else if (!externalStorageWrites || !externalStorageReads) {
+        console.warn(
+          `external storage reads or writes for ${clientId} in a bad state; ${externalStorageWrites} writes and ${externalStorageReads} reads.`
+        )
+      }
+
+      if (!externalStorageWrites) {
+        await this.env.UsageKV.put(externalStorageUsageWriteKey, '0')
+      }
+      if (!externalStorageReads) {
+        await this.env.UsageKV.put(externalStorageUsageReadKey, '0')
+      }
+    } else {
+      if (!externalStorageWrites && !externalStorageReads) {
+        return { error: ExternalStorageAlreadyDisabledError }
+      } else if (externalStorageWrites || externalStorageReads) {
+        console.warn(
+          `external storage reads or writes for ${clientId} in a bad state; ${externalStorageWrites} writes and ${externalStorageReads} reads.`
+        )
+      }
+
+      await this.env.UsageKV.delete(externalStorageUsageWriteKey)
+      await this.env.UsageKV.delete(externalStorageUsageReadKey)
+    }
+
+    if (packageDetails) {
       await this.state.storage.put(
         'externalAppDataPackageDefinition',
-        packageDefinition
+        packageDetails
       )
     } else {
       await this.state.storage.delete('externalAppDataPackageDefinition')
     }
+
+    return { value: true }
   }
 
   async deleteAppPlan(): Promise<boolean> {
