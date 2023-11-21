@@ -49,12 +49,13 @@ export const getExternalAppDataMethod = async ({
     })
   }
 
-  const externalAppData = await node.storage.get('externalAppData')
-
-  await ctx.env.UsageKV.put(
-    generateUsageKey(clientId, 'external-storage', 'read'),
-    `${externalStorageReads + 1}`
-  )
+  const [externalAppData] = await Promise.all([
+    node.storage.get('externalAppData'),
+    ctx.env.UsageKV.put(
+      generateUsageKey(clientId, 'external-storage', 'read'),
+      `${externalStorageReads + 1}`
+    ),
+  ])
 
   return externalAppData
 }

@@ -48,10 +48,11 @@ export const setExternalAppDataMethod = async ({
     })
   }
 
-  await node.storage.put('externalAppData', payload)
-
-  await ctx.env.UsageKV.put(
-    generateUsageKey(clientId, 'external-storage', 'write'),
-    `${externalStorageWrites + 1}`
-  )
+  await Promise.all([
+    node.storage.put('externalAppData', payload),
+    ctx.env.UsageKV.put(
+      generateUsageKey(clientId, 'external-storage', 'write'),
+      `${externalStorageWrites + 1}`
+    ),
+  ])
 }
