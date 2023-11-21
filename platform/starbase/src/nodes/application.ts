@@ -330,7 +330,7 @@ export default class StarbaseApplication extends DOProxy {
     ExternalDataPackageDefinition | undefined
   > {
     return this.state.storage.get<ExternalDataPackageDefinition>(
-      'externalDataPackage'
+      'externalDataPackageDefinition'
     )
   }
 

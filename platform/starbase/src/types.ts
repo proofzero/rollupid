@@ -20,7 +20,7 @@ import {
   AuthorizedUser,
 } from './jsonrpc/methods/getAuthorizedIdentities'
 import { EdgesMetadata } from '../../edges/src/jsonrpc/validators/edge'
-import { ExternalDataPackageDefinitionSchema } from './jsonrpc/validators/externalDataPackage'
+import { ExternalDataPackageDefinitionSchema } from './jsonrpc/validators/externalDataPackageDefinition'
 
 export const EDGE_APPLICATION: EdgeURN = EdgeSpace.urn('owns/app')
 
