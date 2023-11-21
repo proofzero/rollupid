@@ -39,21 +39,32 @@ export const setExternalAppDataMethod = async ({
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
   const node = initAuthorizationNodeByName(urn, ctx.env.Authorization)
 
-  const externalStorageWrites = await ctx.env.UsageKV.get<string>(
-    generateUsageKey(clientId, 'external-storage', 'write')
+  const externalStorageWriteKey = generateUsageKey(
+    clientId,
+    'external-storage',
+    'write'
   )
-  if (!externalStorageWrites) {
+
+  const externalStorageWriteStr = await ctx.env.UsageKV.get<string>(
+    externalStorageWriteKey
+  )
+  if (!externalStorageWriteStr) {
     throw new BadRequestError({
       message: 'external storage not enabled',
     })
   }
 
-  const externalStorageWritesNum = parseInt(externalStorageWrites)
+  const externalStorageWritesNum = Number(externalStorageWriteStr)
+  if (isNaN(externalStorageWritesNum)) {
+    throw new BadRequestError({
+      message: 'invalid external storage write count',
+    })
+  }
 
   await Promise.all([
     node.storage.put('externalAppData', payload),
     ctx.env.UsageKV.put(
-      generateUsageKey(clientId, 'external-storage', 'write'),
+      externalStorageWriteKey,
       `${externalStorageWritesNum + 1}`
     ),
   ])

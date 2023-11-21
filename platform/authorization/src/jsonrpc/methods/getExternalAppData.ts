@@ -40,21 +40,32 @@ export const getExternalAppDataMethod = async ({
   const urn = AuthorizationURNSpace.componentizedUrn(nss)
   const node = initAuthorizationNodeByName(urn, ctx.env.Authorization)
 
-  const externalStorageReads = await ctx.env.UsageKV.get<string>(
-    generateUsageKey(clientId, 'external-storage', 'read')
+  const externalStorageReadKey = generateUsageKey(
+    clientId,
+    'external-storage',
+    'read'
   )
-  if (!externalStorageReads) {
+
+  const externalStorageReadStr = await ctx.env.UsageKV.get<string>(
+    externalStorageReadKey
+  )
+  if (!externalStorageReadStr) {
     throw new BadRequestError({
       message: 'external storage not enabled',
     })
   }
 
-  const externalStorageReadsNum = parseInt(externalStorageReads)
+  const externalStorageReadsNum = Number(parseInt(externalStorageReadStr))
+  if (isNaN(externalStorageReadsNum)) {
+    throw new BadRequestError({
+      message: 'invalid external storage read count',
+    })
+  }
 
   const [externalAppData] = await Promise.all([
     node.storage.get('externalAppData'),
     ctx.env.UsageKV.put(
-      generateUsageKey(clientId, 'external-storage', 'read'),
+      externalStorageReadKey,
       `${externalStorageReadsNum + 1}`
     ),
   ])
