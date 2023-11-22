@@ -22,7 +22,7 @@ import { requireJWT } from '~/utilities/session.server'
 import { GroupModel, GroupRootContextData } from '../groups'
 import { useEffect, useMemo } from 'react'
 
-type InvitationModel = {
+export type InvitationModel = {
   identifier: string
   accountType: EmailAccountType | OAuthAccountType | CryptoAccountType
   invitationURL: string

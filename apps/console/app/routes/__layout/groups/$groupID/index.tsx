@@ -47,7 +47,7 @@ import {
 } from '@proofzero/design-system/src/atoms/toast'
 import { IdentityURN } from '@proofzero/urns/identity'
 import dangerVector from '~/images/danger.svg'
-import { GroupDetailsContextData } from '../$groupID'
+import { GroupDetailsContextData, InvitationModel } from '../$groupID'
 import { PurchaseGroupSeatingModal } from '~/components/Billing/seating'
 import {
   LoaderData,
@@ -107,11 +107,13 @@ export const ActionCard = ({
 }
 
 const InviteMemberModal = ({
+  invitations,
   passportURL,
   groupID,
   isOpen,
   handleClose,
 }: {
+  invitations: InvitationModel[]
   passportURL: string
   groupID: string
   isOpen: boolean
@@ -120,6 +122,7 @@ const InviteMemberModal = ({
   const [selectedProvider, setSelectedProvider] = useState<string>(
     EmailAccountType.Email
   )
+  const [identifier, setIdentifier] = useState<string>('')
 
   const inviteLinkFetcher = useFetcher<InviteRes>()
   const closeAndClearFetcher = () => {
@@ -128,11 +131,27 @@ const InviteMemberModal = ({
       method: 'post',
     })
 
+    setIdentifier('')
+    setSelectedProvider(EmailAccountType.Email)
+
     handleClose()
   }
 
+  const [invitationExists, setInvitationExists] = useState(false)
+  useEffect(() => {
+    if (
+      invitations.find(
+        (i) => i.identifier === identifier && i.accountType === selectedProvider
+      )
+    ) {
+      setInvitationExists(true)
+    } else {
+      setInvitationExists(false)
+    }
+  }, [invitations, selectedProvider, identifier])
+
   return (
-    <Modal isOpen={isOpen} handleClose={handleClose}>
+    <Modal isOpen={isOpen} handleClose={closeAndClearFetcher}>
       <div className="p-6">
         <section className="mb-4 w-full flex flex-row items-start justify-between">
           <div className="flex flex-col">
@@ -147,119 +166,140 @@ const InviteMemberModal = ({
             className={`bg-white p-2 rounded-lg text-xl cursor-pointer
                       hover:bg-[#F3F4F6]`}
             onClick={() => {
-              handleClose()
+              closeAndClearFetcher()
             }}
           >
             <HiOutlineX />
           </div>
         </section>
 
-        {!inviteLinkFetcher.data && (
-          <inviteLinkFetcher.Form
-            method="post"
-            action={`/groups/${groupID}/invite`}
-            className="flex flex-row gap-2"
-          >
-            <div className="grid grid-cols-5 relative">
-              <Listbox
-                value={selectedProvider}
-                onChange={setSelectedProvider}
-                name="accountType"
-              >
-                {({ open }) => (
-                  <div className="flex flex-col col-span-2">
-                    <Listbox.Button className="relative border rounded-l p-2 flex flex-row justify-between items-center flex-1 focus-visible:outline-none focus:border-indigo-500">
-                      <div className="flex flex-row items-center gap-2">
-                        <img
-                          className="w-5 h-5"
-                          src={getProviderIcons(selectedProvider)}
-                        />
-                        <Text
-                          size="sm"
-                          weight="normal"
-                          className="text-gray-800"
-                        >
-                          {_.upperFirst(selectedProvider)}
-                        </Text>
-                      </div>
-
-                      {open ? (
-                        <ChevronDownIcon className="w-5 h-5 text-gray-500 shrink-0" />
-                      ) : (
-                        <ChevronUpIcon className="w-5 h-5 text-gray-500 shrink-0" />
-                      )}
-                    </Listbox.Button>
-
-                    <Transition
-                      show={open}
-                      enter="transition duration-100 ease-out"
-                      enterFrom="transform scale-95 opacity-0"
-                      enterTo="transform scale-100 opacity-100"
-                      leave="transition duration-75 ease-out"
-                      leaveFrom="transform scale-100 opacity-100"
-                      leaveTo="transform scale-95 opacity-0"
-                    >
-                      <Listbox.Options
-                        className="absolute bg-white p-2 flex flex-col gap-2 mt-1 focus-visible:ring-0 focus-visible:outline-none border shadow"
-                        static
+        {!inviteLinkFetcher.data?.inviteCode && (
+          <>
+            <inviteLinkFetcher.Form
+              method="post"
+              action={`/groups/${groupID}/invite`}
+              className="flex flex-row gap-2"
+            >
+              <div className="grid grid-cols-5 relative">
+                <Listbox
+                  value={selectedProvider}
+                  onChange={setSelectedProvider}
+                  name="accountType"
+                >
+                  {({ open }) => (
+                    <div className="flex flex-col col-span-2">
+                      <Listbox.Button
+                        autoFocus={false}
+                        className="relative border rounded-l p-2 flex flex-row justify-between items-center flex-1 focus-visible:outline-none focus:border-indigo-500"
                       >
-                        {accountTypes.map((provider) => (
-                          <Listbox.Option
-                            key={provider}
-                            value={provider}
-                            className={({ active }) =>
-                              classNames(
-                                'flex flex-row items-center gap-2 hover:bg-gray-100 py-2 px-4 rounded-lg cursor-pointer',
-                                {
-                                  'bg-gray-100': active,
-                                }
-                              )
-                            }
+                        <div className="flex flex-row items-center gap-2">
+                          <img
+                            className="w-5 h-5"
+                            src={getProviderIcons(selectedProvider)}
+                          />
+                          <Text
+                            size="sm"
+                            weight="normal"
+                            className="text-gray-800"
                           >
-                            {({ selected }) => (
-                              <>
-                                <img
-                                  className="w-5 h-5"
-                                  src={getProviderIcons(provider)}
-                                />
-                                <Text
-                                  size="sm"
-                                  weight="normal"
-                                  className="text-gray-800"
-                                >
-                                  {_.upperFirst(provider)}
-                                </Text>
-                                {selected && (
-                                  <CheckIcon
-                                    className="h-5 w-5 text-indigo-600"
-                                    aria-hidden="true"
+                            {_.upperFirst(selectedProvider)}
+                          </Text>
+                        </div>
+
+                        {open ? (
+                          <ChevronDownIcon className="w-5 h-5 text-gray-500 shrink-0" />
+                        ) : (
+                          <ChevronUpIcon className="w-5 h-5 text-gray-500 shrink-0" />
+                        )}
+                      </Listbox.Button>
+
+                      <Transition
+                        show={open}
+                        enter="transition duration-100 ease-out"
+                        enterFrom="transform scale-95 opacity-0"
+                        enterTo="transform scale-100 opacity-100"
+                        leave="transition duration-75 ease-out"
+                        leaveFrom="transform scale-100 opacity-100"
+                        leaveTo="transform scale-95 opacity-0"
+                      >
+                        <Listbox.Options
+                          className="absolute bg-white p-2 flex flex-col gap-2 mt-1 focus-visible:ring-0 focus-visible:outline-none border shadow"
+                          static
+                        >
+                          {accountTypes.map((provider) => (
+                            <Listbox.Option
+                              key={provider}
+                              value={provider}
+                              className={({ active }) =>
+                                classNames(
+                                  'flex flex-row items-center gap-2 hover:bg-gray-100 py-2 px-4 rounded-lg cursor-pointer',
+                                  {
+                                    'bg-gray-100': active,
+                                  }
+                                )
+                              }
+                            >
+                              {({ selected }) => (
+                                <>
+                                  <img
+                                    className="w-5 h-5"
+                                    src={getProviderIcons(provider)}
                                   />
-                                )}
-                              </>
-                            )}
-                          </Listbox.Option>
-                        ))}
-                      </Listbox.Options>
-                    </Transition>
-                  </div>
-                )}
-              </Listbox>
+                                  <Text
+                                    size="sm"
+                                    weight="normal"
+                                    className="text-gray-800"
+                                  >
+                                    {_.upperFirst(provider)}
+                                  </Text>
+                                  {selected && (
+                                    <CheckIcon
+                                      className="h-5 w-5 text-indigo-600"
+                                      aria-hidden="true"
+                                    />
+                                  )}
+                                </>
+                              )}
+                            </Listbox.Option>
+                          ))}
+                        </Listbox.Options>
+                      </Transition>
+                    </div>
+                  )}
+                </Listbox>
 
-              <input
-                required
-                type="text"
-                name="identifier"
-                className="border rounded-r border-gray-200 col-span-3 focus:ring-0 focus-visible:ring-0 focus:outline-none focus-visible:outline-none"
-              />
-            </div>
+                <input
+                  autoFocus
+                  required
+                  type="text"
+                  name="identifier"
+                  className="border rounded-r border-gray-200 col-span-3 focus:ring-0 focus-visible:ring-0 focus:outline-none focus-visible:outline-none"
+                  onChange={(e) => {
+                    setIdentifier(e.target.value)
+                  }}
+                />
+              </div>
 
-            <Button btnType="primary-alt" type="submit">
-              Generate Invite Link
-            </Button>
-          </inviteLinkFetcher.Form>
+              <Button
+                btnType="primary-alt"
+                type="submit"
+                disabled={
+                  inviteLinkFetcher.state !== 'idle' || invitationExists
+                }
+              >
+                Generate Invite Link
+              </Button>
+            </inviteLinkFetcher.Form>
+
+            {invitationExists && (
+              <Text size="sm" className="text-orange-500 mt-2 text-left">
+                Invitation for {identifier} already sent
+              </Text>
+            )}
+          </>
         )}
 
-        {inviteLinkFetcher.data && (
+        {inviteLinkFetcher.data?.inviteCode && (
           <>
             <ReadOnlyInput
               id="inviteURL"
@@ -527,6 +567,7 @@ export default () => {
       <Toaster position="top-right" reverseOrder={false} />
 
       <InviteMemberModal
+        invitations={invitations}
         groupID={groupID}
         isOpen={inviteModalOpen}
         handleClose={() => setInviteModalOpen(false)}
