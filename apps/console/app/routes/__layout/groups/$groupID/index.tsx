@@ -293,7 +293,7 @@ const InviteMemberModal = ({
 
             {invitationExists && (
               <Text size="sm" className="text-orange-500 mt-2 text-left">
-                Invitation for {identifier} already sent
+                Invitation for {identifier} already exists
               </Text>
             )}
           </>
