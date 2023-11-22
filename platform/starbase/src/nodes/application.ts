@@ -357,10 +357,10 @@ export default class StarbaseApplication extends DOProxy {
       UsageCategory.ExternalAppDataRead
     )
 
-    const externalStorageWrites = await this.env.UsageKV.get<number>(
+    const externalStorageWrites = await this.env.UsageKV.get(
       externalStorageUsageWriteKey
     )
-    const externalStorageReads = await this.env.UsageKV.get<number>(
+    const externalStorageReads = await this.env.UsageKV.get(
       externalStorageUsageReadKey
     )
 
@@ -381,10 +381,18 @@ export default class StarbaseApplication extends DOProxy {
       }
 
       if (!externalStorageWrites) {
-        await this.env.UsageKV.put(externalStorageUsageWriteKey, '0')
+        await this.env.UsageKV.put(externalStorageUsageWriteKey, '0', {
+          metadata: {
+            limit: packageDetails.writes,
+          },
+        })
       }
       if (!externalStorageReads) {
-        await this.env.UsageKV.put(externalStorageUsageReadKey, '0')
+        await this.env.UsageKV.put(externalStorageUsageReadKey, '0', {
+          metadata: {
+            limit: packageDetails.reads,
+          },
+        })
       }
     } else {
       if (!externalStorageWrites && !externalStorageReads) {

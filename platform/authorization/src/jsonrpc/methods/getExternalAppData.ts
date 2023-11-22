@@ -45,12 +45,18 @@ export const getExternalAppDataMethod = async ({
     UsageCategory.ExternalAppDataRead
   )
 
-  const externalStorageReadStr = await ctx.env.UsageKV.get<string>(
-    externalStorageReadKey
-  )
+  const { value: externalStorageReadStr, metadata } =
+    await ctx.env.UsageKV.getWithMetadata<{
+      limit?: number
+    }>(externalStorageReadKey)
   if (!externalStorageReadStr) {
     throw new BadRequestError({
       message: 'external storage not enabled',
+    })
+  }
+  if (!metadata || !metadata.limit) {
+    throw new BadRequestError({
+      message: 'missing metadata',
     })
   }
 
@@ -61,11 +67,20 @@ export const getExternalAppDataMethod = async ({
     })
   }
 
+  if (externalStorageReadsNum >= metadata.limit) {
+    throw new BadRequestError({
+      message: 'external storage read limit reached',
+    })
+  }
+
   const [externalAppData] = await Promise.all([
     node.storage.get('externalAppData'),
     ctx.env.UsageKV.put(
       externalStorageReadKey,
-      `${externalStorageReadsNum + 1}`
+      `${externalStorageReadsNum + 1}`,
+      {
+        metadata,
+      }
     ),
   ])
 
