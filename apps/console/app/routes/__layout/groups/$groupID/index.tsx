@@ -151,7 +151,11 @@ const InviteMemberModal = ({
   }, [invitations, selectedProvider, identifier])
 
   return (
-    <Modal isOpen={isOpen} handleClose={closeAndClearFetcher}>
+    <Modal
+      isOpen={isOpen}
+      handleClose={closeAndClearFetcher}
+      overflowAbsolute={true}
+    >
       <div className="p-6">
         <section className="mb-4 w-full flex flex-row items-start justify-between">
           <div className="flex flex-col">
@@ -226,42 +230,48 @@ const InviteMemberModal = ({
                           className="absolute bg-white p-2 flex flex-col gap-2 mt-1 focus-visible:ring-0 focus-visible:outline-none border shadow"
                           static
                         >
-                          {accountTypes.map((provider) => (
-                            <Listbox.Option
-                              key={provider}
-                              value={provider}
-                              className={({ active }) =>
-                                classNames(
-                                  'flex flex-row items-center gap-2 hover:bg-gray-100 py-2 px-4 rounded-lg cursor-pointer',
-                                  {
-                                    'bg-gray-100': active,
-                                  }
-                                )
-                              }
-                            >
-                              {({ selected }) => (
-                                <>
-                                  <img
-                                    className="w-5 h-5"
-                                    src={getProviderIcons(provider)}
-                                  />
-                                  <Text
-                                    size="sm"
-                                    weight="normal"
-                                    className="text-gray-800"
-                                  >
-                                    {_.upperFirst(provider)}
-                                  </Text>
-                                  {selected && (
-                                    <CheckIcon
-                                      className="h-5 w-5 text-indigo-600"
-                                      aria-hidden="true"
+                          {accountTypes
+                            .filter(
+                              (provider) =>
+                                provider !== EmailAccountType.Mask &&
+                                provider !== CryptoAccountType.Wallet
+                            )
+                            .map((provider) => (
+                              <Listbox.Option
+                                key={provider}
+                                value={provider}
+                                className={({ active }) =>
+                                  classNames(
+                                    'flex flex-row items-center gap-2 hover:bg-gray-100 py-2 px-4 rounded-lg cursor-pointer',
+                                    {
+                                      'bg-gray-100': active,
+                                    }
+                                  )
+                                }
+                              >
+                                {({ selected }) => (
+                                  <>
+                                    <img
+                                      className="w-5 h-5"
+                                      src={getProviderIcons(provider)}
                                     />
-                                  )}
-                                </>
-                              )}
-                            </Listbox.Option>
-                          ))}
+                                    <Text
+                                      size="sm"
+                                      weight="normal"
+                                      className="text-gray-800"
+                                    >
+                                      {_.upperFirst(provider)}
+                                    </Text>
+                                    {selected && (
+                                      <CheckIcon
+                                        className="h-5 w-5 text-indigo-600"
+                                        aria-hidden="true"
+                                      />
+                                    )}
+                                  </>
+                                )}
+                              </Listbox.Option>
+                            ))}
                         </Listbox.Options>
                       </Transition>
                     </div>
