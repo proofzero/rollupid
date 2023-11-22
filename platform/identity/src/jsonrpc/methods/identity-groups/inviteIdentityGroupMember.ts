@@ -84,6 +84,16 @@ export const inviteIdentityGroupMember = async ({
   const invitations = await node.class.getInvitations()
   const invitationCount = invitations.length
 
+  if (
+    invitations.find(
+      (inv) => inv.identifier === identifier && inv.accountType === accountType
+    )
+  ) {
+    throw new BadRequestError({
+      message: 'Invitation already exists',
+    })
+  }
+
   const seats = await node.class.getSeats()
 
   const { edges: groupMembershipEdges } = await caller.edges.getEdges({
