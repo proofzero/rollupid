@@ -21,6 +21,7 @@ export default (provider: string) => {
     case 'webauthn':
       return webauthn
     case 'ethereum':
+    case 'eth':
       return ethereum
     case 'facebook':
       return facebook
