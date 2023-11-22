@@ -74,7 +74,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     )
 
     let invitationData
-    if (authzParams.rollup_action?.startsWith('groupconnect')) {
+    if (authzParams.rollup_action?.startsWith('group_')) {
       const groupID = authzParams.rollup_action.split('_')[1]
       const invitationCode = authzParams.rollup_action.split('_')[2]
 
@@ -265,7 +265,7 @@ const InnerComponent = ({
                 has invited you to join group
                 <br />
                 <Text type="span" className="truncate" weight="bold">
-                  "{invitationData.groupName}""
+                  "{invitationData.groupName}"
                 </Text>
               </Text>
               <Text className="truncate max-w-xs">
