@@ -336,14 +336,6 @@ export default class StarbaseApplication extends DOProxy {
     return this.state.storage.put('appPlan', planType)
   }
 
-  async getExternalAppDataPackage(): Promise<
-    ExternalAppDataPackageDefinition | undefined
-  > {
-    return this.state.storage.get<ExternalAppDataPackageDefinition>(
-      'externalAppDataPackageDefinition'
-    )
-  }
-
   async setExternalAppDataPackage(
     clientId: string,
     packageType: ExternalAppDataPackageType | undefined
