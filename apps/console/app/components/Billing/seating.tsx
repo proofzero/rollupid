@@ -19,8 +19,7 @@ import {
   HiOutlineX,
   HiPlus,
 } from 'react-icons/hi'
-
-const seatingCost = 42
+import { price as seatingCost } from '~/utils/groupSeats'
 
 export const PurchaseGroupSeatingModal = ({
   isOpen,

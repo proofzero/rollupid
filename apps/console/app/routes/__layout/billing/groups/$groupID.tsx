@@ -39,7 +39,6 @@ import Breadcrumbs from '@proofzero/design-system/src/atoms/breadcrumbs/Breadcru
 import { ListIdentityGroupsOutput } from '@proofzero/platform/identity/src/jsonrpc/methods/identity-groups/listIdentityGroups'
 import { AppLoaderData } from '~/root'
 import { GroupSeatingCard } from '~/components/Billing/seating'
-import { useFeatureFlags } from '@proofzero/design-system/src/hooks/feature-flags'
 import { IdentityGroupURN } from '@proofzero/urns/identity-group'
 
 export const loader = billingLoader
@@ -129,7 +128,6 @@ export default () => {
   )
 
   const hydrated = useHydrated()
-  const featureFlags = useFeatureFlags(hydrated)
 
   const [invoiceSort, setInvoiceSort] = useState<'asc' | 'desc'>('desc')
 
@@ -354,7 +352,7 @@ export default () => {
           newAppURL={`/groups/${groupURN?.split('/')[1]}/apps/new`}
         />
 
-        {featureFlags['seats'] && groupURN && (
+        {groupURN && (
           <GroupSeatingCard
             groupID={groupURN.split('/')[1]}
             paymentData={paymentData}

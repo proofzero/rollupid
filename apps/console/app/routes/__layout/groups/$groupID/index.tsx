@@ -56,7 +56,6 @@ import {
   loader as billingLoader,
 } from '../../billing/ops'
 import { process3DSecureCard } from '~/utils/billing'
-import { useFeatureFlags } from '@proofzero/design-system/src/hooks/feature-flags'
 import { IDENTITY_GROUP_OPTIONS } from '@proofzero/platform/identity/src/constants'
 import { ToastWithLink } from '@proofzero/design-system/src/atoms/toast/ToastWithLink'
 import { IdentityGroupURNSpace } from '@proofzero/urns/identity-group'
@@ -570,8 +569,6 @@ export default () => {
     }
   }, [toastNotification])
 
-  const featureFlags = useFeatureFlags(hydrated)
-
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
@@ -810,53 +807,51 @@ export default () => {
               </Pill>
             </div>
 
-            {featureFlags['seats'] && (
-              <section className="flex flex-row justify-between items-center mb-4">
-                <div className="flex flex-row items-center space-x-1">
-                  <Text size="sm" className="text-gray-500">
-                    Unassigned User Seats:
+            <section className="flex flex-row justify-between items-center mb-4">
+              <div className="flex flex-row items-center space-x-1">
+                <Text size="sm" className="text-gray-500">
+                  Unassigned User Seats:
+                </Text>
+                <Pill className="bg-white flex flex-row items-center rounded-xl">
+                  <div className="w-2 h-2 rounded-full mr-2 bg-blue-300"></div>
+                  <Text size="xs" weight="medium" className="text-gray-700">
+                    {`Free ${
+                      IDENTITY_GROUP_OPTIONS.maxFreeMembers -
+                      Math.min(
+                        IDENTITY_GROUP_OPTIONS.maxFreeMembers,
+                        group.members.length
+                      )
+                    }`}
                   </Text>
-                  <Pill className="bg-white flex flex-row items-center rounded-xl">
-                    <div className="w-2 h-2 rounded-full mr-2 bg-blue-300"></div>
-                    <Text size="xs" weight="medium" className="text-gray-700">
-                      {`Free ${
-                        IDENTITY_GROUP_OPTIONS.maxFreeMembers -
-                        Math.min(
-                          IDENTITY_GROUP_OPTIONS.maxFreeMembers,
-                          group.members.length
-                        )
-                      }`}
-                    </Text>
-                  </Pill>
+                </Pill>
 
-                  <Pill className="bg-white flex flex-row items-center rounded-xl">
-                    <div
-                      className={classNames('w-2 h-2 rounded-full mr-2', {
-                        'bg-gray-600':
-                          !paymentFailedIdentityGroups.includes(groupURN),
-                        'bg-orange-400':
-                          paymentFailedIdentityGroups.includes(groupURN),
-                      })}
-                    ></div>
-                    <Text size="xs" weight="medium" className="text-gray-700">
-                      {`Purchased ${groupSeats.total - groupSeats.used}`}
-                    </Text>
-                    {paymentFailedIdentityGroups.includes(groupURN) && (
-                      <HiOutlineExclamationTriangle className="text-orange-400 w-4 h-4 ml-2" />
-                    )}
-                  </Pill>
-                </div>
-                <div>
-                  <Button
-                    onClick={() => setPurchaseGroupSeatingModalOpen(true)}
-                    btnType="secondary-alt"
-                    btnSize="sm"
-                  >
-                    Add seats
-                  </Button>
-                </div>
-              </section>
-            )}
+                <Pill className="bg-white flex flex-row items-center rounded-xl">
+                  <div
+                    className={classNames('w-2 h-2 rounded-full mr-2', {
+                      'bg-gray-600':
+                        !paymentFailedIdentityGroups.includes(groupURN),
+                      'bg-orange-400':
+                        paymentFailedIdentityGroups.includes(groupURN),
+                    })}
+                  ></div>
+                  <Text size="xs" weight="medium" className="text-gray-700">
+                    {`Purchased ${groupSeats.total - groupSeats.used}`}
+                  </Text>
+                  {paymentFailedIdentityGroups.includes(groupURN) && (
+                    <HiOutlineExclamationTriangle className="text-orange-400 w-4 h-4 ml-2" />
+                  )}
+                </Pill>
+              </div>
+              <div>
+                <Button
+                  onClick={() => setPurchaseGroupSeatingModalOpen(true)}
+                  btnType="secondary-alt"
+                  btnSize="sm"
+                >
+                  Add seats
+                </Button>
+              </div>
+            </section>
 
             <div>
               <List
