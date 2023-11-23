@@ -20,7 +20,7 @@ import {
   HiPlus,
 } from 'react-icons/hi'
 
-const seatingCost = 42
+const seatingCost = 4
 
 export const PurchaseGroupSeatingModal = ({
   isOpen,
