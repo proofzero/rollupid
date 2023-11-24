@@ -227,12 +227,14 @@ const ConnectEmail = ({
   setPage,
   page,
   setEmailAccountURN,
+  onboardType,
 }: {
   connectedEmails: DropdownSelectListItem[]
   PASSPORT_URL: string
   setPage: (value: number) => void
   page: number
   setEmailAccountURN: (value: AccountURN) => void
+  onboardType: 'solo' | 'team'
 }) => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState<DropdownSelectListItem | null>(null)
@@ -284,6 +286,9 @@ const ConnectEmail = ({
               PASSPORT_URL,
               login_hint: 'email microsoft google apple',
               rollup_action: 'connect',
+              extraRedirectURLQueryParams: new URLSearchParams({
+                onboard_type: onboardType,
+              }),
             })
           }
           className="w-full"
@@ -335,6 +340,9 @@ const ConnectEmail = ({
                 PASSPORT_URL,
                 login_hint: 'email microsoft google apple',
                 rollup_action: 'connect',
+                extraRedirectURLQueryParams: new URLSearchParams({
+                  onboard_type: onboardType,
+                }),
               })
             }
             ConnectButtonPhrase="Connect New Email Address"
@@ -758,7 +766,7 @@ const CongratsPage = ({
 }
 
 export default function Landing() {
-  const { connectedEmails, PASSPORT_URL, currentPage, targetIG } =
+  const { connectedEmails, PASSPORT_URL, currentPage, targetIG, url } =
     useOutletContext<{
       connectedEmails: DropdownSelectListItem[]
       PASSPORT_URL: string
@@ -769,11 +777,14 @@ export default function Landing() {
             name: string
             URN: IdentityGroupURN
           }
+      url: string
     }>()
 
-  // Currently 'team' is not an option. It is here for future use.
+  // For coming back from an e-mail connect flow
+  const onboardType = new URL(url).searchParams.get('onboard_type')
+
   const [orgType, setOrgType] = useState<'solo' | 'team'>(
-    targetIG ? 'team' : 'solo'
+    targetIG || onboardType === 'team' ? 'team' : 'solo'
   )
   const [clientId, setClientId] = useState('')
   const [emailAccountURN, setEmailAccountURN] = useState<AccountURN>()
@@ -801,6 +812,7 @@ export default function Landing() {
         setPage={setPage}
         page={page}
         setEmailAccountURN={setEmailAccountURN}
+        onboardType={orgType}
       />
       {targetIG && (
         <EnrollToGroup

@@ -113,15 +113,23 @@ export const redirectToPassport = ({
   scope = '',
   state = 'skip',
   rollup_action,
+  extraRedirectURLQueryParams,
 }: {
   PASSPORT_URL: string
   login_hint: string
   scope?: string
   state?: string
   rollup_action?: string
+  extraRedirectURLQueryParams?: URLSearchParams
 }) => {
   const currentURL = new URL(window.location.href)
   currentURL.search = ''
+
+  if (extraRedirectURLQueryParams) {
+    for (const [key, value] of extraRedirectURLQueryParams.entries()) {
+      currentURL.searchParams.append(key, value)
+    }
+  }
 
   const qp = new URLSearchParams()
   qp.append('scope', scope)
