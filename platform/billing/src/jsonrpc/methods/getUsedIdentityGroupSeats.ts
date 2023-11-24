@@ -28,10 +28,7 @@ export const getUsedIdentityGroupSeats = async ({
   )
 
   const orderedMembers = await ownerNode.class.getOrderedMembers()
+  const invitations = await ownerNode.class.getInvitations()
 
-  // Do we want to include invitations here too?
-  // I don't think so as we'll add the check when accepting invites
-  // const invitations = await ownerNode.class.getInvitations()
-
-  return orderedMembers.length // + invitations.length
+  return orderedMembers.length + invitations.length
 }
