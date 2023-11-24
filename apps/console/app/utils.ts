@@ -107,12 +107,24 @@ export const setPurchaseToastNotification = ({
   }
 }
 
-type RedirectQueryParams = {
-  onboard_type?: 'team' | 'solo'
+export enum RedirectQueryParamKeys {
+  OnboardType = 'onboard_type',
 }
 
-const validExtraParams: Record<string, string[]> = {
-  onboard_type: ['team', 'solo'],
+export enum OnboardTypeValues {
+  Team = 'team',
+  Solo = 'solo',
+}
+
+type RedirectQueryParams = {
+  onboard_type?: OnboardTypeValues
+}
+
+const validExtraParams: Record<RedirectQueryParamKeys, string[]> = {
+  [RedirectQueryParamKeys.OnboardType]: [
+    OnboardTypeValues.Team,
+    OnboardTypeValues.Solo,
+  ],
 }
 
 export const redirectToPassport = ({
@@ -135,7 +147,11 @@ export const redirectToPassport = ({
 
   if (redirectQueryParams) {
     for (const [key, value] of Object.entries(redirectQueryParams)) {
-      if (key in validExtraParams && validExtraParams[key].includes(value)) {
+      const enumKey = key as RedirectQueryParamKeys
+      if (
+        enumKey in validExtraParams &&
+        validExtraParams[enumKey].includes(value)
+      ) {
         currentURL.searchParams.append(key, value)
       }
     }
