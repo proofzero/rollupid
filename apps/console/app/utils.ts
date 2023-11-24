@@ -107,27 +107,37 @@ export const setPurchaseToastNotification = ({
   }
 }
 
+type RedirectQueryParams = {
+  onboard_type?: 'team' | 'solo'
+}
+
+const validExtraParams: Record<string, string[]> = {
+  onboard_type: ['team', 'solo'],
+}
+
 export const redirectToPassport = ({
   PASSPORT_URL,
   login_hint,
   scope = '',
   state = 'skip',
   rollup_action,
-  extraRedirectURLQueryParams,
+  redirectQueryParams,
 }: {
   PASSPORT_URL: string
   login_hint: string
   scope?: string
   state?: string
   rollup_action?: string
-  extraRedirectURLQueryParams?: URLSearchParams
+  redirectQueryParams?: RedirectQueryParams
 }) => {
   const currentURL = new URL(window.location.href)
   currentURL.search = ''
 
-  if (extraRedirectURLQueryParams) {
-    for (const [key, value] of extraRedirectURLQueryParams.entries()) {
-      currentURL.searchParams.append(key, value)
+  if (redirectQueryParams) {
+    for (const [key, value] of Object.entries(redirectQueryParams)) {
+      if (key in validExtraParams && validExtraParams[key].includes(value)) {
+        currentURL.searchParams.append(key, value)
+      }
     }
   }
 
@@ -135,9 +145,12 @@ export const redirectToPassport = ({
   qp.append('scope', scope)
   qp.append('state', state)
   qp.append('client_id', 'console')
-
   qp.append('redirect_uri', currentURL.toString())
-  if (rollup_action) qp.append('rollup_action', rollup_action)
+
+  if (rollup_action) {
+    qp.append('rollup_action', rollup_action)
+  }
+
   qp.append('login_hint', login_hint)
 
   window.location.href = `${PASSPORT_URL}/authorize?${qp.toString()}`

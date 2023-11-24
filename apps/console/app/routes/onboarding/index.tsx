@@ -286,9 +286,9 @@ const ConnectEmail = ({
               PASSPORT_URL,
               login_hint: 'email microsoft google apple',
               rollup_action: 'connect',
-              extraRedirectURLQueryParams: new URLSearchParams({
+              redirectQueryParams: {
                 onboard_type: onboardType,
-              }),
+              },
             })
           }
           className="w-full"
@@ -340,9 +340,9 @@ const ConnectEmail = ({
                 PASSPORT_URL,
                 login_hint: 'email microsoft google apple',
                 rollup_action: 'connect',
-                extraRedirectURLQueryParams: new URLSearchParams({
+                redirectQueryParams: {
                   onboard_type: onboardType,
-                }),
+                },
               })
             }
             ConnectButtonPhrase="Connect New Email Address"
