@@ -770,22 +770,27 @@ const CongratsPage = ({
 }
 
 export default function Landing() {
-  const { connectedEmails, PASSPORT_URL, currentPage, targetIG, url } =
-    useOutletContext<{
-      connectedEmails: DropdownSelectListItem[]
-      PASSPORT_URL: string
-      currentPage: number
-      targetIG:
-        | undefined
-        | {
-            name: string
-            URN: IdentityGroupURN
-          }
-      url: string
-    }>()
+  const {
+    connectedEmails,
+    PASSPORT_URL,
+    currentPage,
+    targetIG,
+    currentPageURL,
+  } = useOutletContext<{
+    connectedEmails: DropdownSelectListItem[]
+    PASSPORT_URL: string
+    currentPage: number
+    targetIG:
+      | undefined
+      | {
+          name: string
+          URN: IdentityGroupURN
+        }
+    currentPageURL: string
+  }>()
 
   // For coming back from an e-mail connect flow
-  const onboardTypeQueryParam = new URL(url).searchParams.get(
+  const onboardTypeQueryParam = new URL(currentPageURL).searchParams.get(
     RedirectQueryParamKeys.OnboardType
   )
 
