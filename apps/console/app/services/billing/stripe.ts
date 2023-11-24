@@ -1,6 +1,6 @@
 import { InternalServerError } from '@proofzero/errors'
 import { type CoreClientType } from '@proofzero/platform-clients/core'
-import { IDENTITY_GROUP_OPTIONS } from '@proofzero/platform.identity/src/constants'
+import { IDENTITY_GROUP_OPTIONS } from '@proofzero/platform/identity/src/constants'
 import { type ReconcileAppsSubscriptionsOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/reconcileAppSubscriptions'
 import { ServicePlanType } from '@proofzero/types/billing'
 import {
