@@ -10,7 +10,11 @@ import {
 } from '@proofzero/design-system/src/atoms/dropdown/DropdownSelectList'
 import { useFetcher, useNavigate, useOutletContext } from '@remix-run/react'
 import { getEmailIcon } from '@proofzero/utils/getNormalisedConnectedAccounts'
-import { redirectToPassport } from '~/utils'
+import {
+  OnboardTypeValues,
+  RedirectQueryParamKeys,
+  redirectToPassport,
+} from '~/utils'
 import { HiOutlineArrowLeft, HiOutlineMail } from 'react-icons/hi'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { DocumentationBadge } from '~/components/DocumentationBadge'
@@ -125,8 +129,8 @@ const Option = ({
   description: string
   selected?: boolean
   disabled?: boolean
-  setSelectedType: (value: 'solo' | 'team') => void
-  type: 'solo' | 'team'
+  setSelectedType: (value: OnboardTypeValues) => void
+  type: OnboardTypeValues
 }) => {
   return (
     <div
@@ -165,8 +169,8 @@ const SelectOrgType = ({
 }: {
   setPage: (value: number) => void
   page: number
-  setOrgType: (value: 'solo' | 'team') => void
-  orgType: 'solo' | 'team'
+  setOrgType: (value: OnboardTypeValues) => void
+  orgType: OnboardTypeValues
 }) => {
   return (
     <div
@@ -188,17 +192,17 @@ const SelectOrgType = ({
         Icon={TbUser}
         header="I'm solo developer"
         description="I'm setting up app for myself"
-        selected={orgType === 'solo'}
-        setSelectedType={() => setOrgType('solo')}
-        type="solo"
+        selected={orgType === OnboardTypeValues.Solo}
+        setSelectedType={() => setOrgType(OnboardTypeValues.Solo)}
+        type={OnboardTypeValues.Solo}
       />
       <Option
         Icon={TbUsers}
         header="I'm part of a team"
         description="I'm setting up app for a team"
-        selected={orgType === 'team'}
-        type="team"
-        setSelectedType={() => setOrgType('team')}
+        selected={orgType === OnboardTypeValues.Team}
+        type={OnboardTypeValues.Team}
+        setSelectedType={() => setOrgType(OnboardTypeValues.Team)}
       />
       <Button
         className="w-full"
@@ -227,12 +231,14 @@ const ConnectEmail = ({
   setPage,
   page,
   setEmailAccountURN,
+  onboardType,
 }: {
   connectedEmails: DropdownSelectListItem[]
   PASSPORT_URL: string
   setPage: (value: number) => void
   page: number
   setEmailAccountURN: (value: AccountURN) => void
+  onboardType: OnboardTypeValues
 }) => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState<DropdownSelectListItem | null>(null)
@@ -284,6 +290,9 @@ const ConnectEmail = ({
               PASSPORT_URL,
               login_hint: 'email microsoft google apple',
               rollup_action: 'connect',
+              redirectQueryParams: {
+                [RedirectQueryParamKeys.OnboardType]: onboardType,
+              },
             })
           }
           className="w-full"
@@ -335,6 +344,9 @@ const ConnectEmail = ({
                 PASSPORT_URL,
                 login_hint: 'email microsoft google apple',
                 rollup_action: 'connect',
+                redirectQueryParams: {
+                  [RedirectQueryParamKeys.OnboardType]: onboardType,
+                },
               })
             }
             ConnectButtonPhrase="Connect New Email Address"
@@ -758,22 +770,34 @@ const CongratsPage = ({
 }
 
 export default function Landing() {
-  const { connectedEmails, PASSPORT_URL, currentPage, targetIG } =
-    useOutletContext<{
-      connectedEmails: DropdownSelectListItem[]
-      PASSPORT_URL: string
-      currentPage: number
-      targetIG:
-        | undefined
-        | {
-            name: string
-            URN: IdentityGroupURN
-          }
-    }>()
+  const {
+    connectedEmails,
+    PASSPORT_URL,
+    currentPage,
+    targetIG,
+    currentPageURL,
+  } = useOutletContext<{
+    connectedEmails: DropdownSelectListItem[]
+    PASSPORT_URL: string
+    currentPage: number
+    targetIG:
+      | undefined
+      | {
+          name: string
+          URN: IdentityGroupURN
+        }
+    currentPageURL: string
+  }>()
 
-  // Currently 'team' is not an option. It is here for future use.
-  const [orgType, setOrgType] = useState<'solo' | 'team'>(
-    targetIG ? 'team' : 'solo'
+  // For coming back from an e-mail connect flow
+  const onboardTypeQueryParam = new URL(currentPageURL).searchParams.get(
+    RedirectQueryParamKeys.OnboardType
+  )
+
+  const [orgType, setOrgType] = useState<OnboardTypeValues>(
+    targetIG || onboardTypeQueryParam === OnboardTypeValues.Team
+      ? OnboardTypeValues.Team
+      : OnboardTypeValues.Solo
   )
   const [clientId, setClientId] = useState('')
   const [emailAccountURN, setEmailAccountURN] = useState<AccountURN>()
@@ -801,6 +825,7 @@ export default function Landing() {
         setPage={setPage}
         page={page}
         setEmailAccountURN={setEmailAccountURN}
+        onboardType={orgType}
       />
       {targetIG && (
         <EnrollToGroup
@@ -812,7 +837,7 @@ export default function Landing() {
 
       {!targetIG && (
         <>
-          {orgType === 'team' ? (
+          {orgType === OnboardTypeValues.Team ? (
             <>
               {emailAccountURN && (
                 <CreateGroup
@@ -835,11 +860,15 @@ export default function Landing() {
 
       <CongratsPage
         navigateUrl={
-          orgType === 'solo' ? `/apps/${clientId}` : `/groups/${groupID}`
+          orgType === OnboardTypeValues.Solo
+            ? `/apps/${clientId}`
+            : `/groups/${groupID}`
         }
         page={page}
         navigateText={
-          orgType === 'solo' ? 'Go to my Application' : 'Go to my Group'
+          orgType === OnboardTypeValues.Solo
+            ? 'Go to my Application'
+            : 'Go to my Group'
         }
       />
     </div>

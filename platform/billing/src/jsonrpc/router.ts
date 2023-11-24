@@ -38,6 +38,11 @@ import {
   SetPaymentFailedInput,
   setPaymentFailed,
 } from './methods/setPaymentFailed'
+import {
+  GetUsedIdentityGroupSeatsInputSchema,
+  GetUsedIdentityGroupSeatsOutputSchema,
+  getUsedIdentityGroupSeats,
+} from './methods/getUsedIdentityGroupSeats'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -69,6 +74,12 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(CancelServicePlansInput)
     .mutation(cancelServicePlans),
+  getUsedIdentityGroupSeats: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetUsedIdentityGroupSeatsInputSchema)
+    .output(GetUsedIdentityGroupSeatsOutputSchema)
+    .query(getUsedIdentityGroupSeats),
   getIdentityGroupSeats: t.procedure
     .use(LogUsage)
     .use(Analytics)

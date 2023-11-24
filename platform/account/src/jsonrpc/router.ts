@@ -128,6 +128,10 @@ import {
   ConnectIdentityGroupEmailOutputSchema,
   connectIdentityGroupEmail,
 } from './methods/identity-groups/connectIdentityGroupEmail'
+import {
+  AuthorizationTokenFromHeader,
+  ValidateJWT,
+} from '@proofzero/platform-middleware/jwt'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -350,6 +354,8 @@ export const appRouter = t.router({
   connectIdentityGroupEmail: t.procedure
     .use(LogUsage)
     .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
     .use(parse3RN)
     .use(setAccountNodeClient)
     .use(initAccountNode)

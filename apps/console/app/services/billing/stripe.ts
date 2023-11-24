@@ -1,5 +1,6 @@
 import { InternalServerError } from '@proofzero/errors'
 import { type CoreClientType } from '@proofzero/platform-clients/core'
+import { IDENTITY_GROUP_OPTIONS } from '@proofzero/platform/identity/src/constants'
 import { type ReconcileAppsSubscriptionsOutput } from '@proofzero/platform/starbase/src/jsonrpc/methods/reconcileAppSubscriptions'
 import { ServicePlanType } from '@proofzero/types/billing'
 import {
@@ -354,25 +355,26 @@ export const reconcileSubscriptions = async (
 
       if (seatQuantities) {
         const { quantity: stripeSeatQuantity } = seatQuantities
-        const groupSeats = await coreClient.billing.getIdentityGroupSeats.query(
-          {
+        const usedSeats =
+          await coreClient.billing.getUsedIdentityGroupSeats.query({
             URN: URN as IdentityGroupURN,
-          }
-        )
+          })
 
         // If the group has more seats than the subscription, set payment failed
         // because this flag is responsible for displaying the "Payment failed"
         // in the UI
         if (
           !paidInvoice ||
-          (groupSeats && groupSeats.quantity > stripeSeatQuantity!)
+          usedSeats >
+            stripeSeatQuantity! + IDENTITY_GROUP_OPTIONS.maxFreeMembers
         ) {
           await coreClient.billing.setPaymentFailed.mutate({
             URN: URN as IdentityGroupURN,
           })
         } else if (
           paidInvoice &&
-          (!groupSeats || groupSeats.quantity <= stripeSeatQuantity!)
+          usedSeats <=
+            stripeSeatQuantity! + IDENTITY_GROUP_OPTIONS.maxFreeMembers
         ) {
           await coreClient.billing.setPaymentFailed.mutate({
             URN: URN as IdentityGroupURN,

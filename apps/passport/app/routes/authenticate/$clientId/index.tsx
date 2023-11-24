@@ -231,7 +231,7 @@ const InnerComponent = ({
                 size="sm"
               ></Avatar>
 
-              {!rollup_action?.startsWith('groupconnect') && (
+              {!rollup_action?.startsWith('group') && (
                 <div className={'flex flex-col items-center gap-2'}>
                   <h1
                     className={
@@ -257,18 +257,26 @@ const InnerComponent = ({
 
           {invitationData && rollup_action?.startsWith('group_') && (
             <>
-              <Text className="text-center truncate max-w-xs">
-                <Text type="span" className="truncate" weight="bold">
+              <Text className="text-center truncate max-w-xs dark:text-[#6B7280]">
+                <Text
+                  type="span"
+                  className="truncate dark:text-white"
+                  weight="bold"
+                >
                   "{invitationData.inviterAlias}"
                 </Text>
                 <br />
                 has invited you to join group
                 <br />
-                <Text type="span" className="truncate" weight="bold">
+                <Text
+                  type="span"
+                  className="truncate dark:text-white"
+                  weight="bold"
+                >
                   "{invitationData.groupName}"
                 </Text>
               </Text>
-              <Text className="truncate max-w-xs">
+              <Text className="truncate max-w-xs dark:text-white">
                 To accept please authenticate with your <br />
                 <Text
                   type="span"

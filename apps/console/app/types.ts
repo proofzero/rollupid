@@ -40,7 +40,7 @@ export type errorsAuthProps = {
 }
 
 export type errorsTeamProps = {
-  upserteAppContactAddress?: string
+  upsertAppContactAddress?: string
 }
 
 export type AuthorizedProfile = AuthorizedUser

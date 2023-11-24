@@ -9,7 +9,11 @@ import {
   getErrorCause,
   getRollupReqFunctionErrorWrapper,
 } from '@proofzero/utils/errors'
-import { BadRequestError, InternalServerError } from '@proofzero/errors'
+import {
+  BadRequestError,
+  InternalServerError,
+  UnauthorizedError,
+} from '@proofzero/errors'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -33,6 +37,8 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       const traceparent = context.traceSpan.getTraceParent()
       if (cause instanceof BadRequestError) {
         throw cause
+      } else if (cause instanceof UnauthorizedError) {
+        throw error
       } else {
         console.error(error)
         throw JsonError(

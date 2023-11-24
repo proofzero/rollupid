@@ -63,7 +63,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
         : undefined
 
     return json({
-      url: request.url,
+      currentPageURL: request.url,
       profile,
       connectedEmails,
       PASSPORT_URL: context.env.PASSPORT_URL,
@@ -87,12 +87,12 @@ export const shouldRevalidate = ({
 }
 
 export default function Onboarding() {
-  const { connectedEmails, PASSPORT_URL, profile, url, targetIG } =
+  const { connectedEmails, PASSPORT_URL, profile, currentPageURL, targetIG } =
     useLoaderData<{
       connectedEmails: DropdownSelectListItem[]
       PASSPORT_URL: string
       profile: Profile
-      url: string
+      currentPageURL: string
       targetIG:
         | {
             name: string
@@ -102,7 +102,9 @@ export default function Onboarding() {
     }>()
 
   const currentPage =
-    new URL(url).searchParams.get('rollup_result') || targetIG ? 1 : 0
+    new URL(currentPageURL).searchParams.get('rollup_result') || targetIG
+      ? 1
+      : 0
 
   useConnectResult()
 
@@ -119,7 +121,13 @@ export default function Onboarding() {
           }
         >
           <Outlet
-            context={{ connectedEmails, PASSPORT_URL, currentPage, targetIG }}
+            context={{
+              connectedEmails,
+              PASSPORT_URL,
+              currentPageURL,
+              currentPage,
+              targetIG,
+            }}
           />
         </div>
         <div className="basis-3/5 h-[100dvh] w-full hidden lg:flex justify-end items-center bg-gray-50 dark:bg-gray-800 overflow-hidden">

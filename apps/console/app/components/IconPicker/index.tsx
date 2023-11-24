@@ -195,6 +195,7 @@ export default function IconPicker({
               <Text type="span" size="xs">
                 Upload
               </Text>
+              {iconURL && <input type="hidden" name={id} value={iconURL} />}
               <input
                 type="file"
                 id={`${id}_file`}

@@ -24,8 +24,11 @@ import {
 import type { AccountURN } from '@proofzero/urns/account'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import type { errorsTeamProps, notificationHandlerType } from '~/types'
-import { BadRequestError } from '@proofzero/errors'
-import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
+import { BadRequestError, UnauthorizedError } from '@proofzero/errors'
+import {
+  getErrorCause,
+  getRollupReqFunctionErrorWrapper,
+} from '@proofzero/utils/errors'
 import {
   Dropdown,
   DropdownSelectListItem,
@@ -114,8 +117,14 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
         account: accountURN,
         clientId,
       })
-    } catch (e) {
-      errors.upserteAppContactAddress = "Failed to upsert app's contact address"
+    } catch (error) {
+      const cause = getErrorCause(error)
+      if (cause instanceof UnauthorizedError) {
+        errors.upsertAppContactAddress = "You don't have permission to do this"
+      } else {
+        errors.upsertAppContactAddress =
+          "Failed to upsert app's contact address"
+      }
     }
 
     // Remix preserves route from before
@@ -272,6 +281,12 @@ export default () => {
             </>
           )}
         </div>
+
+        {errors?.upsertAppContactAddress && (
+          <Text size="sm" weight="normal" className="text-red-500">
+            {errors.upsertAppContactAddress}
+          </Text>
+        )}
 
         <Text size="sm" weight="normal" className="text-gray-500">
           This will be used for notifications about your application
