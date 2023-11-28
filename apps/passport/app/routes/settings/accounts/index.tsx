@@ -1,9 +1,4 @@
-import {
-  useOutletContext,
-  useFetcher,
-  useNavigate,
-  useSubmit,
-} from '@remix-run/react'
+import { useOutletContext, useFetcher, useNavigate } from '@remix-run/react'
 
 import { useState, useEffect } from 'react'
 
@@ -12,7 +7,7 @@ import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { Button } from '@proofzero/design-system'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 
-import { TbCrown } from 'react-icons/tb'
+import { TbInfoCircle } from 'react-icons/tb'
 
 import { AccountList } from '~/components/accounts/AccountList'
 import InputText from '~/components/inputs/InputText'
@@ -32,6 +27,7 @@ import type { AccountListItemProps } from '~/components/accounts/AccountListItem
 import type { AccountURN } from '@proofzero/urns/account'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import { HiOutlineX } from 'react-icons/hi'
+import dangerVector from '~/assets/warning.svg'
 
 export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
   async ({ request, context }) => {
@@ -103,7 +99,7 @@ const distinctProfiles = (connectedProfiles: any[]) => {
     smartContractWallets,
     oAuthProfiles,
     emailProfiles,
-    webauthnProfiles
+    webauthnProfiles,
   }
 }
 
@@ -170,9 +166,71 @@ const RenameModal = ({
   </Modal>
 )
 
-export default function AccountsLayout() {
-  const submit = useSubmit()
+const SetPrimaryModal = ({
+  isOpen,
+  setIsOpen,
+  fetcher,
+  accountData,
+}: {
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+  fetcher: FetcherWithComponents<any>
+  accountData?: AccountListItemProps
+}) => (
+  <Modal isOpen={isOpen} handleClose={setIsOpen}>
+    <div
+      className={`w-fit rounded-lg bg-white p-4
+         text-left  transition-all sm:p-5 overflow-y-auto flex flex-row items-start space-x-4`}
+    >
+      <img src={dangerVector} alt="danger" />
 
+      <section className="flex flex-col space-y-4">
+        <div className="flex flex-row items-center justify-between w-full">
+          <Text size="lg" weight="medium" className="text-gray-900">
+            Set Account as Passport Profile
+          </Text>
+          <button
+            type="button"
+            className={`bg-white p-2 rounded-lg text-xl cursor-pointer
+                      hover:bg-[#F3F4F6]`}
+            onClick={() => setIsOpen(false)}
+            tabIndex={-1}
+          >
+            <HiOutlineX />
+          </button>
+        </div>
+
+        <section>
+          <Text size="sm" weight="normal" className="text-gray-500 my-3">
+            Are you sure you want to set the account as Passport Profile? <br />
+            This action will override your current profile picture and username
+            using ones from this Account.
+          </Text>
+        </section>
+
+        <fetcher.Form method="post" action="/settings/accounts">
+          <input
+            type="hidden"
+            name="primaryAccount"
+            value={JSON.stringify(accountData)}
+          />
+
+          <div className="flex justify-end items-center space-x-3 mt-7">
+            <Button btnType="secondary-alt" onClick={() => setIsOpen(false)}>
+              Cancel
+            </Button>
+
+            <Button type="submit" btnType="dangerous-alt">
+              Confirm & Set
+            </Button>
+          </div>
+        </fetcher.Form>
+      </section>
+    </div>
+  </Modal>
+)
+
+export default function AccountsLayout() {
   const { connectedProfiles, primaryAccountURN } = useOutletContext<{
     connectedProfiles: any[]
     primaryAccountURN: AccountURN
@@ -197,6 +255,7 @@ export default function AccountsLayout() {
 
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [disconnectModalOpen, setDisconnectModalOpen] = useState(false)
+  const [setPrimaryModalOpen, setSetPrimaryModalOpen] = useState(false)
 
   const [actionId, setActionId] = useState<null | string>()
   const [actionProfile, setActionProfile] = useState<any>()
@@ -219,6 +278,7 @@ export default function AccountsLayout() {
     if (fetcher.state === 'submitting' && fetcher.type === 'actionSubmission') {
       setRenameModalOpen(false)
       setDisconnectModalOpen(false)
+      setSetPrimaryModalOpen(false)
 
       setActionId(undefined)
     }
@@ -273,13 +333,12 @@ export default function AccountsLayout() {
         </Button>
       </div>
       <div className="flex flex-col mb-6">
-        <div className="flex flex-row justify-start">
-          <div className="bg-gray-100 h-[16px] px-2 mx-2 rounded-xl">
-            <TbCrown className="text-[#F59E0B]" />
-          </div>
+        <div className="flex flex-row justify-start items-center gap-2 bg-gray-100 rounded-lg p-4">
+          <TbInfoCircle className="h-7 w-7 text-gray-500" />
           <Text size="sm" weight="normal" className="text-gray-500">
-            Primary account drives which name and picture is shared with
-            authorised applications
+            Passport Profile sets your default name and profile picture that is
+            shared with authorized applications. <br />
+            You can edit both in Profile Settings.
           </Text>
         </div>
       </div>
@@ -308,18 +367,21 @@ export default function AccountsLayout() {
               data={actionProfile}
               primaryAccountURN={primaryAccountURN}
             />
+
+            <SetPrimaryModal
+              fetcher={fetcher}
+              isOpen={setPrimaryModalOpen}
+              setIsOpen={setSetPrimaryModalOpen}
+              accountData={connectedAccounts.find((p) => p.id === actionId)}
+            />
           </>
         )}
 
         <AccountList
           primaryAccountURN={primaryAccountURN}
           onSetPrimary={(id: string) => {
-            const form = new FormData()
-            form.set(
-              'primaryAccount',
-              JSON.stringify(connectedAccounts.find((p) => p.id === id))
-            )
-            submit(form, { method: 'post', action: '/settings/accounts' })
+            setActionId(id)
+            setSetPrimaryModalOpen(true)
           }}
           accounts={cryptoProfiles.accounts
             .map((ap: AccountListItemProps) => ({
@@ -327,9 +389,9 @@ export default function AccountsLayout() {
               onRenameAccount: ap.title.endsWith('.eth')
                 ? undefined
                 : (id: string) => {
-                  setActionId(id)
-                  setRenameModalOpen(true)
-                },
+                    setActionId(id)
+                    setRenameModalOpen(true)
+                  },
             }))
             .concat(
               oAuthProfiles.accounts.map((ap) => ({
@@ -358,9 +420,9 @@ export default function AccountsLayout() {
                 accountCount === 1
                   ? undefined
                   : (id: string) => {
-                    setActionId(id)
-                    setDisconnectModalOpen(true)
-                  },
+                      setActionId(id)
+                      setDisconnectModalOpen(true)
+                    },
             }))}
         />
 
