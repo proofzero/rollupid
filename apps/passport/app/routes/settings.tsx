@@ -1,4 +1,4 @@
-import { Outlet, useLoaderData } from '@remix-run/react'
+import { Outlet, useFetcher, useLoaderData } from '@remix-run/react'
 
 import { json, redirect } from '@remix-run/cloudflare'
 import {
@@ -165,6 +165,8 @@ export default function SettingsLayout() {
     setIsIdentified(true)
   }, [isIdentified])
 
+  const editProfileFetcher = useFetcher()
+
   return (
     <Popover className="bg-white lg:bg-gray-50 min-h-[100dvh] relative">
       {({ open }) => {
@@ -178,7 +180,18 @@ export default function SettingsLayout() {
             />
 
             <div className={`flex flex-col w-full`}>
-              <Header pfpUrl={pfpUrl} />
+              <Header
+                pfpUrl={pfpUrl}
+                accounts={connectedProfiles.map(
+                  (cp: { urn: AccountURN; title: string; icon?: string }) => ({
+                    URN: cp.urn,
+                    title: cp.title,
+                    icon: cp.icon,
+                  })
+                )}
+                primaryAccountURN={primaryAccountURN}
+                editProfileFetcher={editProfileFetcher}
+              />
               <div
                 className={`${
                   open

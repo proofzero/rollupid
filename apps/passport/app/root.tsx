@@ -20,6 +20,7 @@ import {
   useTransition,
   useLoaderData,
   Link,
+  useFetchers,
 } from '@remix-run/react'
 
 import { RollupIdButton } from '~/components'
@@ -279,6 +280,8 @@ export default function App() {
     }
   }, [hydrated])
 
+  const fetchers = useFetchers()
+
   return (
     <html lang="en">
       <head>
@@ -333,7 +336,10 @@ export default function App() {
             />
           </>
         )}
-        {transition.state !== 'idle' && <Loader mainColor={loaderColor} />}
+        {(transition.state !== 'idle' ||
+          fetchers.some((f) => f.state !== 'idle')) && (
+          <Loader mainColor={loaderColor} />
+        )}
         <Toaster position="top-right" />
         {ueComplete && (
           <ThemeContext.Provider
