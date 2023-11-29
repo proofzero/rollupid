@@ -101,6 +101,7 @@ import {
   PatchProfileFieldsInputSchema,
   patchProfileFieldsMethod,
 } from './methods/patchProfileFields'
+import { resetProfileFieldsMethod } from './methods/resetProfileFields'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -297,4 +298,12 @@ export const appRouter = t.router({
     .use(injectIdentityNode)
     .input(PatchProfileFieldsInputSchema)
     .mutation(patchProfileFieldsMethod),
+  resetProfileFields: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireIdentity)
+    .use(injectIdentityNode)
+    .mutation(resetProfileFieldsMethod),
 })

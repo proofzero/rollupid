@@ -148,10 +148,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     return json({
       pfpUrl: identityProfile?.pfp?.image,
       displayName: identityProfile?.displayName,
+      primaryAccountURN: identityProfile?.primaryAccountURN,
+      isProfileCustomized: identityProfile?.isCustomized,
       authorizedApps: authzAppResults,
       connectedProfiles: normalizedConnectedProfiles,
       CONSOLE_URL: context.env.CONSOLE_APP_URL,
-      primaryAccountURN: identityProfile?.primaryAccountURN,
       identityURN,
     })
   }
@@ -172,6 +173,7 @@ export default function SettingsLayout() {
     displayName,
     primaryAccountURN,
     identityURN,
+    isProfileCustomized,
   } = useLoaderData()
 
   const [isIdentified, setIsIdentified] = useState(false)
@@ -205,6 +207,7 @@ export default function SettingsLayout() {
                 name={displayName}
                 primaryAccountURN={primaryAccountURN}
                 editProfileFetcher={editProfileFetcher}
+                isProfileCustomized={isProfileCustomized}
               />
               <div
                 className={`${

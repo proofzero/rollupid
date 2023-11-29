@@ -19,11 +19,13 @@ const Header = ({
   pfpUrl,
   name,
   primaryAccountURN,
+  isProfileCustomized,
   editProfileFetcher,
 }: {
   pfpUrl: string
   name: string
   primaryAccountURN: AccountURN
+  isProfileCustomized: boolean
   editProfileFetcher: FetcherWithComponents<any>
 }) => {
   const posthog = usePostHog()
@@ -38,7 +40,7 @@ const Header = ({
           name,
           picture: pfpUrl,
           primaryAccountURN,
-          patched: false,
+          patched: isProfileCustomized,
         }}
         fetcher={editProfileFetcher}
       />
