@@ -97,6 +97,10 @@ import {
   ListPaymentFailedIdentityGroupsOutputSchema,
   listPaymentFailedIdentityGroups,
 } from './methods/identity-groups/listPaymentFailedIdentityGroups'
+import {
+  PatchProfileFieldsInputSchema,
+  patchProfileFieldsMethod,
+} from './methods/patchProfileFields'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -284,4 +288,13 @@ export const appRouter = t.router({
     .use(RequireIdentity)
     .input(DeleteIdentityGroupInvitationInputSchema)
     .mutation(deleteIdentityGroupInvitation),
+  patchProfileFields: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .use(AuthorizationTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireIdentity)
+    .use(injectIdentityNode)
+    .input(PatchProfileFieldsInputSchema)
+    .mutation(patchProfileFieldsMethod),
 })

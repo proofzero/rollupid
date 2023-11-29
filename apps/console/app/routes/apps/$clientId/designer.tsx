@@ -36,7 +36,7 @@ import Authentication, {
 } from '@proofzero/design-system/src/templates/authentication/Authentication'
 
 import { Avatar } from '@proofzero/packages/design-system/src/atoms/profile/avatar/Avatar'
-import IconPicker from '~/components/IconPicker'
+import IconPicker from '@proofzero/design-system/src/atoms/form/IconPicker'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { Button, Text } from '@proofzero/design-system'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'

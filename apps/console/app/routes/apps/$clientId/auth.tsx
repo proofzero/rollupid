@@ -22,7 +22,7 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 
 import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
 import type { appDetailsProps, errorsAuthProps } from '~/types'
-import IconPicker from '~/components/IconPicker'
+import IconPicker from '@proofzero/design-system/src/atoms/form/IconPicker'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
 
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'

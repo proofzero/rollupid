@@ -17,16 +17,12 @@ import { TbUserEdit } from 'react-icons/tb'
 
 const Header = ({
   pfpUrl,
-  accounts,
+  name,
   primaryAccountURN,
   editProfileFetcher,
 }: {
   pfpUrl: string
-  accounts: {
-    URN: AccountURN
-    icon?: string
-    title: string
-  }[]
+  name: string
   primaryAccountURN: AccountURN
   editProfileFetcher: FetcherWithComponents<any>
 }) => {
@@ -38,8 +34,12 @@ const Header = ({
       <EditProfileModal
         isOpen={editProfileModalOpen}
         setIsOpen={setEditProfileModalOpen}
-        accounts={accounts}
-        primaryAccountURN={primaryAccountURN}
+        profile={{
+          name,
+          picture: pfpUrl,
+          primaryAccountURN,
+          patched: false,
+        }}
         fetcher={editProfileFetcher}
       />
       <header className="w-full min-h-[80px] h-[80px] border-b bg-white lg:b-gray-50 flex items-center justify-start lg:justify-end px-2 md:px-10">

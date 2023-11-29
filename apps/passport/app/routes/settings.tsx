@@ -29,6 +29,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 import { usePostHog } from 'posthog-js/react'
 import { useEffect, useState } from 'react'
+import { InternalServerError } from '@proofzero/errors'
 
 export type AuthorizedAppsModel = {
   clientId: string
@@ -67,6 +68,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const identityProfile = await coreClient.identity.getProfile.query({
       identity: identityURN,
     })
+    if (!identityProfile) {
+      throw new InternalServerError({
+        message: 'Identity profile not found',
+      })
+    }
 
     const accountTypeUrns = identityProfile?.accounts.map((a) => ({
       urn: a.baseUrn,
@@ -125,6 +131,20 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...p,
     }))
 
+    // const passportProfileIndex = normalizedConnectedProfiles.findIndex(
+    //   (ncp) => ncp.urn === identityProfile?.primaryAccountURN
+    // )
+    // if (passportProfileIndex === -1) {
+    //   throw new InternalServerError({
+    //     message: 'Primary account not found in connected profiles',
+    //   })
+    // }
+    // normalizedConnectedProfiles[passportProfileIndex] = {
+    //   ...normalizedConnectedProfiles[passportProfileIndex],
+    //   title: identityProfile.displayName,
+    //   icon: identityProfile.pfp?.image,
+    // }
+
     return json({
       pfpUrl: identityProfile?.pfp?.image,
       displayName: identityProfile?.displayName,
@@ -182,13 +202,7 @@ export default function SettingsLayout() {
             <div className={`flex flex-col w-full`}>
               <Header
                 pfpUrl={pfpUrl}
-                accounts={connectedProfiles.map(
-                  (cp: { urn: AccountURN; title: string; icon?: string }) => ({
-                    URN: cp.urn,
-                    title: cp.title,
-                    icon: cp.icon,
-                  })
-                )}
+                name={displayName}
                 primaryAccountURN={primaryAccountURN}
                 editProfileFetcher={editProfileFetcher}
               />

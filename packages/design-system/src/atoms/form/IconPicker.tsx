@@ -1,9 +1,10 @@
 /**
  * @file app/shared/components/IconPicker/index.tsx
  */
+import React from 'react'
 
 import { useEffect, useState } from 'react'
-import { Text } from '@proofzero/design-system'
+import { Text } from '../text/Text'
 
 import { CameraIcon } from '@heroicons/react/24/outline'
 
