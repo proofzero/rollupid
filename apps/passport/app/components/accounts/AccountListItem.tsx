@@ -252,7 +252,7 @@ export const AccountListItem = ({
                                 weight="normal"
                                 className="text-gray-700"
                               >
-                                Set as Passport Profile
+                                Set as Primary Account
                               </Text>
                             </Menu.Item>
                           )}

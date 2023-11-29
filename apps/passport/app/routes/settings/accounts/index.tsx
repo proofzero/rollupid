@@ -187,7 +187,7 @@ const SetPrimaryModal = ({
       <section className="flex flex-col space-y-4">
         <div className="flex flex-row items-center justify-between w-full">
           <Text size="lg" weight="medium" className="text-gray-900">
-            Set Account as Passport Profile
+            Set Account as Primary Account
           </Text>
           <button
             type="button"
@@ -202,7 +202,7 @@ const SetPrimaryModal = ({
 
         <section>
           <Text size="sm" weight="normal" className="text-gray-500 my-3">
-            Are you sure you want to set the account as Passport Profile? <br />
+            Are you sure you want to set the account as Primary Account? <br />
             This action will override your current profile picture and username
             using ones from this Account.
           </Text>
@@ -331,16 +331,6 @@ export default function AccountsLayout() {
         >
           Connect Account
         </Button>
-      </div>
-      <div className="flex flex-col mb-6">
-        <div className="flex flex-row justify-start items-center gap-2 bg-gray-100 rounded-lg p-4">
-          <TbInfoCircle className="h-7 w-7 text-gray-500" />
-          <Text size="sm" weight="normal" className="text-gray-500">
-            Passport Profile sets your default name and profile picture that is
-            shared with authorized applications. <br />
-            You can edit both in Profile Settings.
-          </Text>
-        </div>
       </div>
       {loading && <Loader />}
 
