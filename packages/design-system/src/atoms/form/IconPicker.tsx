@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { Text } from '../text/Text'
 
 import { CameraIcon } from '@heroicons/react/24/outline'
+import classNames from 'classnames'
 
 // pickIcon
 // -----------------------------------------------------------------------------
@@ -83,6 +84,10 @@ type IconPickerProps = {
    */
   maxSize?: number
   /**
+   * Preview image size in pixels.
+   */
+  previewSize?: number
+  /**
    * Aspect ratio of the image.
    */
   aspectRatio?: {
@@ -102,11 +107,14 @@ type IconPickerProps = {
   setIsImgUploading: (val: boolean) => void
   imageUploadCallback?: (url: string) => void
   variant?: string
+  previewStyle?: 'rounded' | 'round'
+  UploadElement?: React.ReactNode
 }
 
 export default function IconPicker({
   label,
   maxSize,
+  previewSize = 64,
   aspectRatio,
   minWidth,
   minHeight,
@@ -118,6 +126,17 @@ export default function IconPicker({
   setIsImgUploading,
   imageUploadCallback = () => {},
   variant = 'public',
+  previewStyle = 'rounded',
+  UploadElement = (
+    <button
+      type="button"
+      className="rounded bg-transparent text-sm border py-2 px-4 hover:bg-gray-100"
+    >
+      <Text type="span" size="xs">
+        Upload
+      </Text>
+    </button>
+  ),
 }: IconPickerProps) {
   const [iconURL, setIconURL] = useState<string>('')
   const [invalidState, setInvalidState] = useState(invalid)
@@ -138,7 +157,7 @@ export default function IconPicker({
   const calculateDimensions = (
     aspectRatioWidth: number,
     aspectRatioHeight: number,
-    maxSize: number = 64
+    maxSize: number = previewSize
   ) => {
     let width: number
     let height: number
@@ -155,8 +174,10 @@ export default function IconPicker({
   }
 
   const { width, height } = aspectRatio
-    ? calculateDimensions(aspectRatio.width, aspectRatio.height, 64)
-    : { width: 64, height: 64 }
+    ? calculateDimensions(aspectRatio.width, aspectRatio.height, previewSize)
+    : { width: previewSize, height: previewSize }
+
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
 
   return (
     <div>
@@ -164,9 +185,12 @@ export default function IconPicker({
         <label className="text-sm font-medium text-gray-700">{label}</label>
       )}
       <div className="flex flex-col md:flex-row md:gap-4 items-center">
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-row gap-4 items-center">
           <div
-            className={`grid place-items-center bg-[#F3F4F6] rounded`}
+            className={classNames('grid place-items-center bg-[#F3F4F6]', {
+              'rounded-full': previewStyle === 'round',
+              rounded: previewStyle === 'rounded',
+            })}
             style={{
               width: `${width}px`,
               height: `${height}px`,
@@ -185,49 +209,53 @@ export default function IconPicker({
             )}
           </div>
 
-          <div className="grid place-items-center">
-            <label
-              htmlFor={`${id}_file`}
-              className={`rounded bg-transparent text-sm border
-                 py-2 px-4 hover:bg-gray-100
-               focus:bg-indigo-400 hover:cursor-pointer
-                ${invalid ? 'border-red-400' : 'border-gray-300'}`}
+          <label
+            htmlFor={`${id}_file`}
+            className={classNames('hover:cursor-pointer', {
+              'border-red-400': invalid,
+              'border-gray-300': !invalid,
+            })}
+          >
+            <div
+              onClick={(e) => {
+                e.preventDefault()
+                fileInputRef.current?.click()
+              }}
             >
-              <Text type="span" size="xs">
-                Upload
-              </Text>
-              {iconURL && <input type="hidden" name={id} value={iconURL} />}
-              <input
-                type="file"
-                id={`${id}_file`}
-                name={`${id}_file`}
-                data-variant={variant}
-                data-name={id}
-                accept="image/png,image/jpeg,image/gif,image/webp"
-                className="sr-only"
-                onChange={async (event) => {
-                  event.stopPropagation()
-                  setIsFormChanged(false)
-                  setIsImgUploading(true)
-                  const errors = await pickIcon(
-                    setIconURL,
-                    maxSize,
-                    aspectRatio,
-                    minWidth,
-                    minHeight
-                  )(event)
-                  if (Object.keys(errors).length) {
-                    setInvalidState(true)
-                    setErrorMessageState(errors[Object.keys(errors)[0]])
-                  } else {
-                    setInvalidState(false)
-                  }
-                  setIsImgUploading(false)
-                  setIsFormChanged(true)
-                }}
-              />
-            </label>
-          </div>
+              {UploadElement}
+            </div>
+            {iconURL && <input type="hidden" name={id} value={iconURL} />}
+            <input
+              ref={fileInputRef}
+              type="file"
+              id={`${id}_file`}
+              name={`${id}_file`}
+              data-variant={variant}
+              data-name={id}
+              accept="image/png,image/jpeg,image/gif,image/webp"
+              className="sr-only"
+              onChange={async (event) => {
+                event.stopPropagation()
+                setIsFormChanged(false)
+                setIsImgUploading(true)
+                const errors = await pickIcon(
+                  setIconURL,
+                  maxSize,
+                  aspectRatio,
+                  minWidth,
+                  minHeight
+                )(event)
+                if (Object.keys(errors).length) {
+                  setInvalidState(true)
+                  setErrorMessageState(errors[Object.keys(errors)[0]])
+                } else {
+                  setInvalidState(false)
+                }
+                setIsImgUploading(false)
+                setIsFormChanged(true)
+              }}
+            />
+          </label>
         </div>
         {invalidState && (
           <Text

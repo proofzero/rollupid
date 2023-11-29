@@ -8,6 +8,7 @@ import IconPicker from '@proofzero/design-system/src/atoms/form/IconPicker'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { captureFormSubmitAndReplaceImages } from '~/utils/formCFImages.client'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
+import { HiOutlineUpload } from 'react-icons/hi'
 
 const EditProfileModal: React.FC<{
   isOpen: boolean
@@ -77,6 +78,16 @@ const EditProfileModal: React.FC<{
                   setIsFormChanged={() => {}}
                   setIsImgUploading={() => {}}
                   url={profile.picture}
+                  previewStyle="round"
+                  previewSize={47}
+                  UploadElement={
+                    <button
+                      type="button"
+                      className="bg-white rounded shadow-sm border border-gray-300 w-8 h-8 flex justify-center items-center"
+                    >
+                      <HiOutlineUpload />
+                    </button>
+                  }
                 />
 
                 <Input
