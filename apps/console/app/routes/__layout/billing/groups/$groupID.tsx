@@ -487,7 +487,7 @@ export default () => {
                           <td className="px-6 py-3">
                             {hydrated && (
                               <div className="flex flex-row items-center space-x-3">
-                                <Text size="sm" className="gray-500">
+                                <Text size="sm">
                                   {hydrated &&
                                     new Date(invoice.timestamp).toLocaleString(
                                       'default',
@@ -516,16 +516,26 @@ export default () => {
                           </td>
 
                           <td className="px-6 py-3">
-                            <Text size="sm" className="gray-500">
-                              {invoice.amount < 0 ? '-' : ''}$
-                              {invoice.amount < 0
-                                ? (invoice.amount * -1).toFixed(2)
-                                : invoice.amount.toFixed(2)}
+                            <Text size="sm" className="">
+                              ${invoice.amount < 0 ? '0.00' : ''}
+                              {invoice.amount < 0 ? (
+                                <Text
+                                  size="xs"
+                                  className="text-gray-500"
+                                  type="span"
+                                >
+                                  {' '}
+                                  (current credit: $
+                                  {(-1 * invoice.amount).toFixed(2)})
+                                </Text>
+                              ) : (
+                                invoice.amount.toFixed(2)
+                              )}
                             </Text>
                           </td>
 
                           <td className="px-6 py-3">
-                            <Text size="xs" className="test-gray-500">
+                            <Text size="xs">
                               {invoice.status && _.startCase(invoice.status)}
                             </Text>
                             {invoice.status === 'paid' && (

@@ -229,9 +229,20 @@ export const getUpcomingInvoices = async (
     apiVersion: '2022-11-15',
   })
 
-  const upcomingInvoices = await stripeClient.invoices.retrieveUpcoming({
+  const customerSubscriptions = await stripeClient.subscriptions.list({
     customer: customerID,
   })
+  const subscriptionIds = customerSubscriptions.data.map((s) => s.id)
+
+  const upcomingInvoices = await Promise.all(
+    subscriptionIds.map((s) =>
+      stripeClient.invoices.retrieveUpcoming({
+        customer: customerID,
+        subscription: s,
+      })
+    )
+  )
+
   return upcomingInvoices
 }
 
