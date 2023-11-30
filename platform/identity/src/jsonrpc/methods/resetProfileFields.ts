@@ -67,7 +67,7 @@ export const resetProfileFieldsMethod = async ({
     ctx.identityNode.class.setProfileCustomized(false),
     caller.edges.updateNode({
       urnOfNode: IdentityURNSpace.componentizedUrn(
-        identityGraphNode.baseUrn.replace('urn:rollupid:identity/', ''), // wtf...
+        IdentityURNSpace.nss(identityGraphNode.baseUrn).split('/')[1],
         identityGraphNode.rc,
         identityGraphNode.qc
       ),

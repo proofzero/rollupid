@@ -69,7 +69,7 @@ export const patchProfileFieldsMethod = async ({
     ctx.identityNode.class.setProfileCustomized(true), // Should this be merged in setProfile?
     caller.edges.updateNode({
       urnOfNode: IdentityURNSpace.componentizedUrn(
-        identityGraphNode.baseUrn.replace('urn:rollupid:identity/', ''), // wtf...
+        IdentityURNSpace.nss(identityGraphNode.baseUrn).split('/')[1],
         identityGraphNode.rc,
         identityGraphNode.qc
       ),
