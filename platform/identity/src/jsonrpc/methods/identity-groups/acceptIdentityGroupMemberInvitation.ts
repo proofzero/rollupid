@@ -3,11 +3,12 @@ import { IdentityGroupURNValidator } from '@proofzero/platform-middleware/inputV
 
 import { Context } from '../../../context'
 import { initIdentityGroupNodeByName } from '../../../nodes'
-import { InternalServerError } from '@proofzero/errors'
+import { BadRequestError, InternalServerError } from '@proofzero/errors'
 import { router } from '@proofzero/platform.core'
 import { EDGE_MEMBER_OF_IDENTITY_GROUP } from '@proofzero/types/graph'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { createAnalyticsEvent } from '@proofzero/utils/analytics'
+import { IDENTITY_GROUP_OPTIONS } from '../../../constants'
 
 export const AcceptIdentityGroupMemberInvitationInputSchema = z.object({
   identityGroupURN: IdentityGroupURNValidator,
@@ -44,6 +45,17 @@ export const acceptIdentityGroupMemberInvitation = async ({
   if (!invitation) {
     throw new InternalServerError({
       message: 'Invitation not found',
+    })
+  }
+
+  const seats = await node.class.getSeats()
+  const members = await node.class.getOrderedMembers()
+  if (
+    members.length >=
+    IDENTITY_GROUP_OPTIONS.maxFreeMembers + (seats?.quantity ?? 0)
+  ) {
+    throw new BadRequestError({
+      message: 'Max members reached',
     })
   }
 
