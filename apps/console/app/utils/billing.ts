@@ -69,9 +69,9 @@ export const getCurrentAndUpcomingInvoices = async (
       const upcomingInvoices = []
       for (const upcomingInvoice of stripeUpcomingInvoices) {
         upcomingInvoices.push({
-          id: upcomingInvoice.lines.data[0].id,
-          amount: upcomingInvoice.lines.data[0].amount / 100,
-          timestamp: upcomingInvoice.lines.data[0].period.start * 1000,
+          id: 'upcoming',
+          amount: upcomingInvoice.total / 100,
+          timestamp: upcomingInvoice.created * 1000,
           status: 'scheduled',
         })
       }
