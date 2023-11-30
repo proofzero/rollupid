@@ -7,8 +7,6 @@ import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { Button } from '@proofzero/design-system'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 
-import { TbInfoCircle } from 'react-icons/tb'
-
 import { AccountList } from '~/components/accounts/AccountList'
 import InputText from '~/components/inputs/InputText'
 
@@ -166,7 +164,7 @@ const RenameModal = ({
   </Modal>
 )
 
-const SetPrimaryModal = ({
+const SetPrimaryAccountModal = ({
   isOpen,
   setIsOpen,
   fetcher,
@@ -255,7 +253,7 @@ export default function AccountsLayout() {
 
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [disconnectModalOpen, setDisconnectModalOpen] = useState(false)
-  const [setPrimaryModalOpen, setSetPrimaryModalOpen] = useState(false)
+  const [setPrimaryModalOpen, setSetPrimaryAccountModalOpen] = useState(false)
 
   const [actionId, setActionId] = useState<null | string>()
   const [actionProfile, setActionProfile] = useState<any>()
@@ -278,7 +276,7 @@ export default function AccountsLayout() {
     if (fetcher.state === 'submitting' && fetcher.type === 'actionSubmission') {
       setRenameModalOpen(false)
       setDisconnectModalOpen(false)
-      setSetPrimaryModalOpen(false)
+      setSetPrimaryAccountModalOpen(false)
 
       setActionId(undefined)
     }
@@ -358,10 +356,10 @@ export default function AccountsLayout() {
               primaryAccountURN={primaryAccountURN}
             />
 
-            <SetPrimaryModal
+            <SetPrimaryAccountModal
               fetcher={fetcher}
               isOpen={setPrimaryModalOpen}
-              setIsOpen={setSetPrimaryModalOpen}
+              setIsOpen={setSetPrimaryAccountModalOpen}
               accountData={connectedAccounts.find((p) => p.id === actionId)}
             />
           </>
@@ -371,7 +369,7 @@ export default function AccountsLayout() {
           primaryAccountURN={primaryAccountURN}
           onSetPrimary={(id: string) => {
             setActionId(id)
-            setSetPrimaryModalOpen(true)
+            setSetPrimaryAccountModalOpen(true)
           }}
           accounts={cryptoProfiles.accounts
             .map((ap: AccountListItemProps) => ({
