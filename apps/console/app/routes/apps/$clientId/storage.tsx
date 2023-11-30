@@ -15,8 +15,8 @@ export default () => {
     <EarlyAccessPanel
       clientID={appDetails.clientId as string}
       title="Storage"
-      subtitle="Storage"
-      copy="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Nullam rhoncus aliquam metus. Sed elit dui, pellentesque a, faucibus vel, interdum nec, diam. Etiam ligula pede, sagittis quis, interdum ultricies, scelerisque eu. Pellentesque ipsum. Etiam bibendum elit eget erat."
+      subtitle="App Data Storage"
+      copy="App Data Storage service provides a hassle-free way to store and retrieve per-user data for your application. Once activated, the service can be accessed through our Galaxy API and it supports storing data up to 128kb, per user."
       imgSrc={storageSVG}
       url={'https://docs.rollup.id/platform/console/storage'}
       earlyAccess={false}

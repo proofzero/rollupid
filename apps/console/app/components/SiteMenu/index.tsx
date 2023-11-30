@@ -290,6 +290,7 @@ const appSubmenuStruct: {
         title: 'Storage',
         icon: TbServerBolt,
         subroute: '/storage',
+        plan: ServicePlanType.PRO,
       },
       {
         title: 'Designer',

@@ -113,27 +113,11 @@ export default () => {
 
         <section className="mt-2">
           <Text size="sm" className="text-gray-600">
-            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Nullam
-            rhoncus aliquam metus. Sed elit dui, pellentesque a, faucibus vel,
-            interdum nec, diam. Etiam ligula pede, sagittis quis, interdum
-            ultricies, scelerisque eu.
+            App Data Storage service provides a hassle-free way to store and
+            retrieve per-user data for your application. Once activated, the
+            service can be accessed through our Galaxy API and it supports
+            storing data up to 128kb, per user.
           </Text>
-        </section>
-
-        <section className="mt-4">
-          <ReadOnlyInput
-            id="url"
-            value="https://rollup.id/API/EqUEbCGHGnZXDMSUbrxhX7"
-            label="API url"
-            copyable={true}
-            onCopy={() =>
-              toast(
-                ToastType.Success,
-                { message: 'Client secret copied to clipboard!' },
-                { duration: 2000 }
-              )
-            }
-          />
         </section>
       </section>
     </section>
