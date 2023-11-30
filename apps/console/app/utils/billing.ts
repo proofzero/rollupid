@@ -47,7 +47,7 @@ export const getCurrentAndUpcomingInvoices = async (
 
       invoices = currentInvoices.data.map((i) => ({
         id: i.id,
-        amount: i.amount_due / 100,
+        amount: (i.ending_balance || i.amount_due) / 100,
         timestamp: i.created * 1000,
         status: i.status,
         url: i.hosted_invoice_url ?? undefined,
@@ -66,14 +66,16 @@ export const getCurrentAndUpcomingInvoices = async (
         },
         SECRET_STRIPE_API_KEY
       )
-      invoices = invoices.concat([
-        {
-          id: stripeUpcomingInvoices.lines.data[0].id,
-          amount: stripeUpcomingInvoices.lines.data[0].amount / 100,
-          timestamp: stripeUpcomingInvoices.lines.data[0].period.start * 1000,
+      const upcomingInvoices = []
+      for (const upcomingInvoice of stripeUpcomingInvoices) {
+        upcomingInvoices.push({
+          id: 'upcoming',
+          amount: upcomingInvoice.total / 100,
+          timestamp: upcomingInvoice.created * 1000,
           status: 'scheduled',
-        },
-      ])
+        })
+      }
+      invoices = [...upcomingInvoices, ...invoices]
     } catch (er) {
       if ((er as Stripe.errors.StripeError).code === 'invoice_upcoming_none') {
         console.info(`No upcoming invoices for customer ${spd.customerID}`)
