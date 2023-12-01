@@ -49,6 +49,8 @@ export const patchProfileFieldsMethod = async ({
 
     profile.displayName = input.displayName
     identityGraphNode.qc.name = input.displayName
+
+    profile.customized = true
   }
   if (input.pictureURL) {
     if (profile.pfp?.image !== identityGraphNode.qc.picture) {
@@ -62,11 +64,12 @@ export const patchProfileFieldsMethod = async ({
       isToken: false,
     }
     identityGraphNode.qc.picture = input.pictureURL
+
+    profile.customized = true
   }
 
   await Promise.all([
     ctx.identityNode.class.setProfile(profile),
-    ctx.identityNode.class.setProfileCustomized(true), // Should this be merged in setProfile?
     caller.edges.updateNode({
       urnOfNode: IdentityURNSpace.componentizedUrn(
         IdentityURNSpace.nss(identityGraphNode.baseUrn).split('/')[1],

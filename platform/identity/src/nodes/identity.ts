@@ -85,16 +85,4 @@ export default class Identity extends DOProxy {
 
     await this.state.storage.put('stripePaymentData', paymentData)
   }
-
-  async setProfileCustomized(customized: boolean): Promise<void> {
-    if (customized) {
-      await this.state.storage.put('profileCustomized', true)
-    } else {
-      await this.state.storage.delete('profileCustomized')
-    }
-  }
-
-  async isProfileCustomized(): Promise<boolean> {
-    return Boolean(await this.state.storage.get('profileCustomized'))
-  }
 }

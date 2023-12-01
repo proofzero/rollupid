@@ -16,7 +16,6 @@ export const GetProfileInput = z.object({
 export const GetProfileOutput = ProfileSchema.merge(
   z.object({
     accounts: z.array(Node),
-    isCustomized: z.boolean(),
   })
 ).nullable()
 
@@ -34,9 +33,8 @@ export const getProfileMethod = async ({
   const node = initIdentityNodeByName(input.identity, ctx.env.Identity)
   const caller = appRouter.createCaller(ctx)
 
-  const [profile, isCustomized, accounts] = await Promise.all([
+  const [profile, accounts] = await Promise.all([
     node.class.getProfile(),
-    node.class.isProfileCustomized(),
     caller.getPublicAccounts({ URN: input.identity }),
   ])
 
@@ -52,7 +50,7 @@ export const getProfileMethod = async ({
     })
   }
 
-  return { ...profile, isCustomized, accounts }
+  return { ...profile, accounts }
 }
 
 export const GetProfileBatchInput = z.array(inputValidators.IdentityURNInput)

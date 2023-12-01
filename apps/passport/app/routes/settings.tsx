@@ -131,6 +131,9 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...p,
     }))
 
+    // TODO: Remove this before merge, this can be built upon if we want
+    // to show the primary account overloads in the connected profiles list
+    //
     // const passportProfileIndex = normalizedConnectedProfiles.findIndex(
     //   (ncp) => ncp.urn === identityProfile?.primaryAccountURN
     // )
@@ -149,7 +152,7 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       pfpUrl: identityProfile?.pfp?.image,
       displayName: identityProfile?.displayName,
       primaryAccountURN: identityProfile?.primaryAccountURN,
-      isProfileCustomized: identityProfile?.isCustomized,
+      isProfileCustomized: Boolean(identityProfile?.customized),
       authorizedApps: authzAppResults,
       connectedProfiles: normalizedConnectedProfiles,
       CONSOLE_URL: context.env.CONSOLE_APP_URL,

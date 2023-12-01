@@ -62,9 +62,10 @@ export const resetProfileFieldsMethod = async ({
     identityGraphNode.qc.picture = primaryAccountProfile.icon
   }
 
+  profile.customized = false
+
   await Promise.all([
     ctx.identityNode.class.setProfile(profile),
-    ctx.identityNode.class.setProfileCustomized(false),
     caller.edges.updateNode({
       urnOfNode: IdentityURNSpace.componentizedUrn(
         IdentityURNSpace.nss(identityGraphNode.baseUrn).split('/')[1],
