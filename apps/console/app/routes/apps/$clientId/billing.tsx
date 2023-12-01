@@ -623,7 +623,7 @@ const DowngradeConfirmationModal = ({
             <ul className="list-disc">
               {plans[currentPlan].features
                 .filter(
-                  (f) => f.type === 'current' || !Boolean(f.aggregateFeatures)
+                  (f) => f.type === 'current' && !Boolean(f.aggregateFeatures)
                 )
                 .map((f) => (
                   <li>{f.title}</li>
