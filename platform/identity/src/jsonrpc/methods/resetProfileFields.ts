@@ -2,6 +2,8 @@ import { Context } from '../../context'
 import { InternalServerError } from '@proofzero/errors'
 import { router } from '@proofzero/platform.core'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
+import createImageClient from '@proofzero/platform-clients/image'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 export const resetProfileFieldsMethod = async ({
   ctx,
@@ -49,6 +51,9 @@ export const resetProfileFieldsMethod = async ({
 
   const primaryAccountProfile = accountNodeProfiles[0]
 
+  const primaryAccountPicture = primaryAccountProfile.icon
+  const existingProfilePicture = profile.pfp?.image
+
   profile.displayName = primaryAccountProfile.title
   identityGraphNode.qc.name = primaryAccountProfile.title
 
@@ -74,4 +79,15 @@ export const resetProfileFieldsMethod = async ({
       ),
     }),
   ])
+
+  if (
+    existingProfilePicture &&
+    existingProfilePicture !== primaryAccountPicture
+  ) {
+    const imageClient = createImageClient(ctx.env.Images, {
+      headers: generateTraceContextHeaders(ctx.traceSpan),
+    })
+
+    ctx.waitUntil(imageClient.delete.mutate(existingProfilePicture))
+  }
 }

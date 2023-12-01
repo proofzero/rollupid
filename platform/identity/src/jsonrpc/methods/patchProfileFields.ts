@@ -3,6 +3,8 @@ import { Context } from '../../context'
 import { InternalServerError } from '@proofzero/errors'
 import { router } from '@proofzero/platform.core'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
+import createImageClient from '@proofzero/platform-clients/image'
+import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
 
 export const PatchProfileFieldsInputSchema = z.object({
   displayName: z.string().max(50).optional(),
@@ -39,6 +41,25 @@ export const patchProfileFieldsMethod = async ({
       message: 'Identity graph node not found',
     })
   }
+
+  if (profile.primaryAccountURN !== identityGraphNode.qc.primaryAccountURN) {
+    throw new InternalServerError({
+      message: 'Primary account URN mismatch',
+    })
+  }
+
+  const primaryAccountURN = profile.primaryAccountURN
+  const accountNodeProfiles = await caller.account.getAccountProfileBatch([
+    primaryAccountURN,
+  ])
+  if (!accountNodeProfiles || accountNodeProfiles.length === 0) {
+    throw new InternalServerError({
+      message: 'Primary account node not found',
+    })
+  }
+
+  const primaryAccountPicture = accountNodeProfiles[0].icon
+  const existingProfilePicture = profile.pfp?.image
 
   if (input.displayName) {
     if (profile.displayName !== identityGraphNode.qc.name) {
@@ -78,4 +99,16 @@ export const patchProfileFieldsMethod = async ({
       ),
     }),
   ])
+
+  if (
+    existingProfilePicture &&
+    existingProfilePicture !== profile.pfp?.image &&
+    existingProfilePicture !== primaryAccountPicture
+  ) {
+    const imageClient = createImageClient(ctx.env.Images, {
+      headers: generateTraceContextHeaders(ctx.traceSpan),
+    })
+
+    ctx.waitUntil(imageClient.delete.mutate(existingProfilePicture))
+  }
 }
