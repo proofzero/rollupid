@@ -41,15 +41,10 @@ const authorizationResolvers: Resolvers = {
         ...generateTraceContextHeaders(traceSpan),
       })
 
-      try {
-        await coreClient.authorization.setExternalAppData.mutate({
-          clientId,
-          payload,
-        })
-      } catch (ex) {
-        console.error(ex)
-        return false
-      }
+      await coreClient.authorization.setExternalAppData.mutate({
+        clientId,
+        payload,
+      })
 
       return true
     },

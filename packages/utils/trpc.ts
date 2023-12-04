@@ -38,7 +38,7 @@ const formatRollupError = (shape: TRPCErrorShape, error: RollupError) => {
       ...shape.data,
       code: error.code,
       httpStatus: HTTP_STATUS_CODES[error.code],
-      rollupError: error,
+      rollupError: { ...error, message: error.message },
     },
   }
 }
