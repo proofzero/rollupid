@@ -60,9 +60,19 @@ export const setExternalAppDataPackage = async ({
     ctx.env.StarbaseApp
   )
 
+  // // If state is deleting, we can't set a new package
+  // if (appDO.state === 'deleting') {
+  //   throw new InternalServerError({
+  //     message: 'App is being deleted',
+  //   })
+  // }
+
   const { error } = await appDO.class.setExternalAppDataPackage(
     clientId,
     packageType
   )
   if (error) throw getErrorCause(error)
 }
+
+// Use DO with enhanced externalAppDataPackage storage value to hold package + state (enabled, disabled, deleting)
+// Add new DeletionKV (ExternalAppDataDeletionKV)

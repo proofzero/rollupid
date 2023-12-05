@@ -7,3 +7,8 @@ export default {
     writes: 1000,
   },
 }
+
+// {
+//   package: undefined,
+//   state: 'deleting'
+// }

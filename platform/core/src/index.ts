@@ -50,6 +50,7 @@ export default {
 
     return relay(content, env)
   },
+  async queue() {},
 }
 
 export { router, type Context, type Environment }
