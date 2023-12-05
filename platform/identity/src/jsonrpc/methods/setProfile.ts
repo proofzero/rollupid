@@ -82,7 +82,9 @@ export const setProfileMethod = async ({
         headers: generateTraceContextHeaders(ctx.traceSpan),
       })
 
-      ctx.waitUntil(imageClient.delete.mutate(existingProfile.pfp?.image))
+      if (ctx.waitUntil) {
+        ctx.waitUntil(imageClient.delete.mutate(existingProfile.pfp?.image))
+      }
     }
   }
 }

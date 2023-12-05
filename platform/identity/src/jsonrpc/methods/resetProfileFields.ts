@@ -88,6 +88,8 @@ export const resetProfileFieldsMethod = async ({
       headers: generateTraceContextHeaders(ctx.traceSpan),
     })
 
-    ctx.waitUntil(imageClient.delete.mutate(existingProfilePicture))
+    if (ctx.waitUntil) {
+      ctx.waitUntil(imageClient.delete.mutate(existingProfilePicture))
+    }
   }
 }

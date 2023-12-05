@@ -5,7 +5,7 @@ export type IdentityQComps = {
   picture?: string
 }
 
-export type IdentityRComps = {} | never
+export type IdentityRComps = Record<string, string> | never
 
 export type IdentityURN = RollupIdURN<`identity/${string}`>
 export const IdentityURNSpace = createRollupIdURNSpace<
