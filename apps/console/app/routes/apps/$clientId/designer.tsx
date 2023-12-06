@@ -104,7 +104,7 @@ import EarlyAccessPanel from '~/components/EarlyAccess/EarlyAccessPanel'
 import { IdentityURN } from '@proofzero/urns/identity'
 import { GetOgThemeResult } from '@proofzero/platform.starbase/src/jsonrpc/methods/getOgTheme'
 import createImageClient from '@proofzero/platform-clients/image'
-import { captureFormSubmitAndReplaceImages } from '~/utils/formCFImages.client'
+import { captureFormSubmitAndReplaceImages } from '@proofzero/design-system/src/utils/form-cf-images'
 
 const LazyAuth = lazy(() =>
   // @ts-ignore :(

@@ -43,7 +43,7 @@ import { SCOPE_SMART_CONTRACT_WALLETS } from '@proofzero/security/scopes'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import createImageClient from '@proofzero/platform-clients/image'
-import { captureFormSubmitAndReplaceImages } from '~/utils/formCFImages.client'
+import { captureFormSubmitAndReplaceImages } from '@proofzero/design-system/src/utils/form-cf-images'
 
 /**
  * @file app/routes/dashboard/index.tsx

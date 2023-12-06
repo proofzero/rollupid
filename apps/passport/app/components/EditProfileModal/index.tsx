@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { TbInfoCircle } from 'react-icons/tb'
 import IconPicker from '@proofzero/design-system/src/atoms/form/IconPicker'
 import { Input } from '@proofzero/design-system/src/atoms/form/Input'
-import { captureFormSubmitAndReplaceImages } from '~/utils/formCFImages.client'
+import { captureFormSubmitAndReplaceImages } from '@proofzero/design-system/src/utils/form-cf-images'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { HiOutlineUpload } from 'react-icons/hi'
 

@@ -27,7 +27,7 @@ import { FullProfileSchema } from '~/validation'
 import InputTextarea from '@proofzero/design-system/src/atoms/form/InputTextarea'
 import createImageClient from '@proofzero/platform-clients/image'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
-import { captureFormSubmitAndReplaceImages } from '~/utils/formCFImages.client'
+import { captureFormSubmitAndReplaceImages } from '@proofzero/design-system/src/utils/form-cf-images'
 
 export const action: ActionFunction = async ({ request, context }) => {
   const { sub: identityURN } = parseJwt(
