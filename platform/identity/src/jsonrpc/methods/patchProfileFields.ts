@@ -109,8 +109,6 @@ export const patchProfileFieldsMethod = async ({
       headers: generateTraceContextHeaders(ctx.traceSpan),
     })
 
-    if (ctx.waitUntil) {
-      ctx.waitUntil(imageClient.delete.mutate(existingProfilePicture))
-    }
+    ctx.waitUntil!(imageClient.delete.mutate(existingProfilePicture))
   }
 }
