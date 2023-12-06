@@ -1,4 +1,4 @@
-import type { ActionFunction } from '@remix-run/cloudflare'
+import { json, type ActionFunction } from '@remix-run/cloudflare'
 import { getCoreClient } from '~/platform.server'
 import { getValidatedSessionContext } from '~/session.server'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
@@ -12,9 +12,19 @@ export const action: ActionFunction = getRollupReqFunctionErrorWrapper(
       context.traceSpan
     )
 
-    const coreClient = getCoreClient({ context, jwt })
-    await coreClient.identity.resetProfileFields.mutate()
+    try {
+      const coreClient = getCoreClient({ context, jwt })
+      await coreClient.identity.resetProfileFields.mutate()
+    } catch (ex) {
+      return json({
+        error: true,
+        message: 'Profile update unsuccessful',
+      })
+    }
 
-    return null
+    return json({
+      error: false,
+      message: 'Profile updated successfully',
+    })
   }
 )

@@ -9,6 +9,7 @@ import { Input } from '@proofzero/design-system/src/atoms/form/Input'
 import { captureFormSubmitAndReplaceImages } from '@proofzero/design-system/src/utils/form-cf-images'
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
 import { HiOutlineUpload } from 'react-icons/hi'
+import { ToastType, toast } from '@proofzero/design-system/src/atoms/toast'
 
 const EditProfileModal: React.FC<{
   isOpen: boolean
@@ -26,6 +27,16 @@ const EditProfileModal: React.FC<{
   useEffect(() => {
     if (fetcher.state === 'idle' && fetcher.type === 'done') {
       setIsOpen(false)
+
+      if (!fetcher.data?.error) {
+        toast(ToastType.Success, {
+          message: fetcher.data.message,
+        })
+      } else if (fetcher.data?.error) {
+        toast(ToastType.Error, {
+          message: fetcher.data.message,
+        })
+      }
     }
   }, [fetcher])
 
