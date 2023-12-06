@@ -131,23 +131,6 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
       ...p,
     }))
 
-    // TODO: Remove this before merge, this can be built upon if we want
-    // to show the primary account overloads in the connected profiles list
-    //
-    // const passportProfileIndex = normalizedConnectedProfiles.findIndex(
-    //   (ncp) => ncp.urn === identityProfile?.primaryAccountURN
-    // )
-    // if (passportProfileIndex === -1) {
-    //   throw new InternalServerError({
-    //     message: 'Primary account not found in connected profiles',
-    //   })
-    // }
-    // normalizedConnectedProfiles[passportProfileIndex] = {
-    //   ...normalizedConnectedProfiles[passportProfileIndex],
-    //   title: identityProfile.displayName,
-    //   icon: identityProfile.pfp?.image,
-    // }
-
     return json({
       pfpUrl: identityProfile?.pfp?.image,
       displayName: identityProfile?.displayName,
