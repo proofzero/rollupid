@@ -4,6 +4,7 @@ import { router } from '@proofzero/platform.core'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
 import createImageClient from '@proofzero/platform-clients/image'
 import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trace'
+import { AccountURN, AccountURNSpace } from '@proofzero/urns/account'
 
 export const resetProfileFieldsMethod = async ({
   ctx,
@@ -33,7 +34,23 @@ export const resetProfileFieldsMethod = async ({
     })
   }
 
-  if (profile.primaryAccountURN !== identityGraphNode.qc.primaryAccountURN) {
+  if (!profile.primaryAccountURN) {
+    throw new InternalServerError({
+      message: 'Primary account URN not found',
+    })
+  }
+  if (!identityGraphNode.qc.primaryAccountURN) {
+    throw new InternalServerError({
+      message: 'Identity graph node primary account URN not found',
+    })
+  }
+
+  if (
+    AccountURNSpace.getBaseURN(profile.primaryAccountURN) !==
+    AccountURNSpace.getBaseURN(
+      identityGraphNode.qc.primaryAccountURN as AccountURN
+    )
+  ) {
     throw new InternalServerError({
       message: 'Primary account URN mismatch',
     })
