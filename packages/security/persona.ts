@@ -631,10 +631,8 @@ const formatEmailScopeClaim = (scope: EmailScopeClaim) => {
 }
 
 const formatConnectedAccounts = (
-  connectedAccounts: ConnectedAccountsScopeClaim,
-  email: EmailScopeClaim
+  connectedAccounts: ConnectedAccountsScopeClaim
 ) => {
-  if (!email.meta.source) return
   const { connected_accounts: accounts } = connectedAccounts.claims
   if (!Array.isArray(accounts)) return
   accounts
@@ -646,12 +644,12 @@ export const maskAccountFormatter = (claims: ClaimData) => {
   if (claims.email) {
     const emailScope = claims.email as unknown as EmailScopeClaim
     formatEmailScopeClaim(emailScope)
+  }
 
-    if (claims.connected_accounts) {
-      const connectedAccountsScope =
-        claims.connected_accounts as ConnectedAccountsScopeClaim
-      formatConnectedAccounts(connectedAccountsScope, emailScope)
-    }
+  if (claims.connected_accounts) {
+    const connectedAccountsScope =
+      claims.connected_accounts as ConnectedAccountsScopeClaim
+    formatConnectedAccounts(connectedAccountsScope)
   }
 
   return claims
