@@ -12,6 +12,7 @@ import { initAuthorizationNodeByName } from '../../nodes'
 
 import {
   getClaimValues,
+  maskAccountFormatter,
   userClaimsFormatter,
 } from '@proofzero/security/persona'
 import { PersonaData } from '@proofzero/types/application'
@@ -79,6 +80,9 @@ export const getUserInfoMethod = async ({
         message: 'Authorized data error. Re-authorization by user required',
       })
   }
+
+  const claims = userClaimsFormatter(maskAccountFormatter(claimValues))
+
   //`sub` is a mandatory field in the userinfo result
-  return { ...userClaimsFormatter(claimValues), sub: jwt.sub }
+  return { ...claims, sub: jwt.sub }
 }

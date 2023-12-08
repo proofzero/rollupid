@@ -325,9 +325,7 @@ export const action: ActionFunction = async ({ request, context }) => {
   const scope = (form.get('scopes') as string).split(' ')
   /* This stores the selection made from the user in the authorization
   screen; gets validated and stored for later retrieval at token generation stage */
-  const personaData = JSON.parse(
-    form.get('personaData') as string
-  ) as PersonaData
+  let personaData = JSON.parse(form.get('personaData') as string) as PersonaData
 
   const state = form.get('state') as string
   const clientId = form.get('client_id') as string
@@ -369,6 +367,15 @@ export const action: ActionFunction = async ({ request, context }) => {
     context.traceSpan
   )
 
+  if (personaData.email) {
+    const emailAccountCoreClient = getCoreClient({
+      context,
+      jwt,
+      accountURN: personaData.email,
+    })
+    await emailAccountCoreClient.account.resolveIdentity.query({ jwt })
+  }
+
   const authorizeRes = await coreClient.authorization.authorize.mutate({
     identity: identityURN,
     responseType,
@@ -397,13 +404,13 @@ export const action: ActionFunction = async ({ request, context }) => {
 }
 
 export default function Authorize() {
+  const loaderData = useLoaderData<LoaderData>()
   const {
     clientId,
     appProfile,
     scopeMeta,
     state,
     redirectOverride,
-    dataForScopes,
     redirectUri,
     profile,
     prompt,
@@ -412,10 +419,11 @@ export default function Authorize() {
 
   const userProfile = profile as UserProfile
 
+  const [dataForScopes, setDataForScopes] = useState(loaderData.dataForScopes)
   const {
-    connectedEmails,
     personaData,
     requestedScope,
+    connectedEmails,
     connectedAccounts,
     connectedSmartContractWallets,
   } = dataForScopes as DataForScopes
@@ -434,6 +442,54 @@ export default function Authorize() {
     }
     return selected
   })
+
+  const [maskEmail, setMaskEmail] = useState<boolean>(false)
+  useEffect(() => {
+    setMaskEmailCallback()
+  })
+
+  const [loadingMaskEmail, setLoadingMaskEmail] = useState<boolean>(false)
+
+  const setMaskEmailCallback = async () => {
+    if (!maskEmail) return
+
+    const accountURN = selectedEmail?.value
+    if (!accountURN) return
+    if (selectedEmail.mask) return
+
+    setLoadingMaskEmail(true)
+
+    const response = await fetch('/create/account-mask', {
+      body: JSON.stringify({ clientId, state, accountURN }),
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+    })
+
+    let maskAccount = selectedEmail
+    const [mask] = await response.json<DropdownSelectListItem[]>()
+
+    setDataForScopes((state) => ({
+      ...state,
+      connectedAccounts: connectedAccounts.map((ca) => {
+        if (ca.value !== accountURN) return ca
+        return {
+          ...ca,
+          mask,
+        }
+      }),
+      connectedEmails: connectedEmails.map((ce) => {
+        if (ce.value !== accountURN) return ce
+        maskAccount = {
+          ...ce,
+          mask,
+        }
+        return maskAccount
+      }),
+    }))
+    setSelectedEmail(maskAccount)
+    setLoadingMaskEmail(false)
+  }
+
   const [selectedConnectedAccounts, setSelectedConnectedAccounts] = useState<
     Array<DropdownSelectListItem> | Array<AuthorizationControlSelection>
   >(() => {
@@ -510,7 +566,9 @@ export default function Authorize() {
     }
 
     if (requestedScope.includes('email') && selectedEmail) {
-      personaData.email = selectedEmail.value
+      personaData.email = maskEmail
+        ? selectedEmail.mask?.value
+        : selectedEmail.value
     }
 
     if (
@@ -521,7 +579,12 @@ export default function Authorize() {
         personaData.connected_accounts = AuthorizationControlSelection.ALL
       } else {
         personaData.connected_accounts = selectedConnectedAccounts.map(
-          (account) => (account as DropdownSelectListItem).value
+          (account) => {
+            const item = account as DropdownSelectListItem
+            if (!maskEmail) return item.value
+            if (item.value === selectedEmail?.value) return item.mask?.value
+            return item.value
+          }
         )
       }
     }
@@ -640,10 +703,13 @@ export default function Authorize() {
                   // Substituting subtitle with icon
                   // on the client side
                   return {
+                    address: email.address,
+                    type: email.type,
                     icon: getEmailIcon(email.subtitle!),
                     title: email.title,
                     selected: email.selected,
                     value: email.value,
+                    mask: email.mask,
                   }
                 }) ?? []
               }
@@ -661,6 +727,9 @@ export default function Authorize() {
               }}
               selectEmailCallback={setSelectedEmail}
               selectedEmail={selectedEmail}
+              maskEmail={maskEmail}
+              loadingMaskEmail={loadingMaskEmail}
+              setMaskEmail={setMaskEmail}
               connectedAccounts={connectedAccounts ?? []}
               selectedConnectedAccounts={selectedConnectedAccounts}
               addNewAccountCallback={() => {

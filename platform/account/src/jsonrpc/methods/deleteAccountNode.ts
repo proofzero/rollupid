@@ -7,7 +7,11 @@ import { RollupError, ERROR_CODES } from '@proofzero/errors'
 import { IdentityURNSpace } from '@proofzero/urns/identity'
 import { AccountURN } from '@proofzero/urns/account'
 
+import { GetEdgesMethodOutput } from '@proofzero/platform.edges/src/jsonrpc/methods/getEdges'
+
 import type { Context } from '../../context'
+import { initAccountNodeByName } from '../../nodes'
+
 import { getAccountLinks } from './getAccountLinks'
 
 export const DeleteAccountNodeInput = z.object({
@@ -26,14 +30,17 @@ export const deleteAccountNodeMethod = async ({
 }) => {
   const { identityURN, forceDelete } = input
 
-  const nodeClient = ctx.account
+  if (!IdentityURNSpace.is(identityURN)) throw new Error('Invalid identity URN')
+  if (!ctx.accountURN) throw new Error('missing account URN')
+  if (!ctx.account) throw new Error('missing account node')
 
   const caller = router.createCaller(ctx)
-  const identityEdge = await caller.edges.findNode({
-    baseUrn: identityURN,
-  })
 
   if (!forceDelete) {
+    const identityEdge = await caller.edges.findNode({
+      baseUrn: identityURN,
+    })
+
     const primaryAccountURN = identityEdge?.qc.primaryAccountURN
     if (primaryAccountURN === ctx.accountURN) {
       throw new RollupError({
@@ -53,38 +60,43 @@ export const deleteAccountNodeMethod = async ({
     }
   }
 
-  // Get the account associated with the authorization header included in the request.
-  const account = ctx.accountURN as AccountURN
+  const maskAccountNodes = await caller.edges.findNodeBatch([
+    { qc: { source: ctx.accountURN } },
+  ])
 
-  if (!IdentityURNSpace.is(identityURN)) {
-    throw new Error('Invalid identity URN')
+  const maskAccountURNs = maskAccountNodes.reduce<AccountURN[]>((acc, cur) => {
+    cur && acc.push(cur.baseUrn as AccountURN)
+    return acc
+  }, [])
+
+  let edges: GetEdgesMethodOutput['edges'] = []
+  for (const baseUrn of [ctx.accountURN, ...maskAccountURNs]) {
+    const query = { dst: { baseUrn } }
+    const result = await caller.edges.getEdges({ query })
+    edges = edges.concat(result.edges)
   }
 
-  // Remove the stored identity in the node.
-  await nodeClient?.class.unsetIdentity()
-
-  const { edges: accountEdges } = await caller.edges.getEdges({
-    query: {
-      dst: {
-        baseUrn: account,
-      },
-    },
-  })
-
-  // Remove any edge that references the account node
-  const edgeDeletionPromises = accountEdges.map((edge) => {
-    return caller.edges.removeEdge({
-      src: edge.src.baseUrn,
-      dst: edge.dst.baseUrn,
-      tag: edge.tag,
+  await Promise.all(
+    edges.map((edge) => {
+      return caller.edges.removeEdge({
+        src: edge.src.baseUrn,
+        dst: edge.dst.baseUrn,
+        tag: edge.tag,
+      })
     })
-  })
+  )
 
-  await Promise.all(edgeDeletionPromises)
+  await Promise.all(
+    [ctx.accountURN, ...maskAccountURNs].map((urn) =>
+      caller.edges.deleteNode({ urn })
+    )
+  )
 
-  await caller.edges.deleteNode({
-    urn: account,
-  })
+  const maskAccounts = maskAccountURNs.map((urn) =>
+    initAccountNodeByName(urn, ctx.env.Account)
+  )
 
-  return ctx.account?.storage.deleteAll()
+  await Promise.all(
+    [ctx.account, ...maskAccounts].map((node) => node.storage.deleteAll())
+  )
 }

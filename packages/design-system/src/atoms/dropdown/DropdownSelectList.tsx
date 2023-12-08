@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { Text } from '../text/Text'
 import {
@@ -10,13 +10,18 @@ import { Button } from '../buttons/Button'
 import { TbCirclePlus } from 'react-icons/tb'
 import { BadRequestError } from '@proofzero/errors'
 import { AuthorizationControlSelection } from '@proofzero/types/application'
+import { adjustAccountTypeToDisplay } from '@proofzero/utils/getNormalisedConnectedAccounts'
+import { EmailMaskedPill } from '@proofzero/design-system/src/atoms/pills/EmailMaskPill'
 
 export type DropdownSelectListItem = {
+  address: string
+  type: string
   title: string
   value?: string
   icon?: JSX.Element
   selected?: boolean
   subtitle?: string
+  mask?: DropdownSelectListItem
 }
 
 export type DropdownListboxButtonType = {
@@ -103,16 +108,23 @@ export const Dropdown = ({
   placeholder,
   ConnectButtonPhrase,
   ConnectButtonCallback,
+  switchTitles = false,
+  maskAccount,
+  refreshSelectedItem = false,
   onSelect,
   multiple = false,
   onSelectAll,
   selectAllCheckboxTitle,
   selectAllCheckboxDescription,
+  listboxOptions,
   DropdownListboxButton = DropdownListboxButtonDefault,
   disabled = false,
 }: {
   items: Array<DropdownSelectListItem>
   placeholder: string
+  switchTitles?: boolean
+  maskAccount?: string
+  refreshSelectedItem?: boolean
   onSelect: (
     selected: Array<DropdownSelectListItem> | DropdownSelectListItem
   ) => void
@@ -125,6 +137,9 @@ export const Dropdown = ({
   onSelectAll?: (val: Array<AuthorizationControlSelection>) => void
   selectAllCheckboxTitle?: string
   selectAllCheckboxDescription?: string
+  listboxOptions?: {
+    topAction: JSX.Element
+  }
   DropdownListboxButton?: ({
     selectedItem,
     selectedItems,
@@ -149,6 +164,15 @@ export const Dropdown = ({
     DropdownSelectListItem | undefined
   >(() => {
     if (!multiple) return defaultItems?.[0] as DropdownSelectListItem
+  })
+
+  useEffect(() => {
+    if (!refreshSelectedItem) return
+    if (!defaultItems || !defaultItems[0]) return
+    const { value } = defaultItems[0] as DropdownSelectListItem
+    if (typeof value !== 'string') return
+    const item = items.find((i) => i.value === value)
+    setSelectedItem(item)
   })
 
   /**
@@ -212,11 +236,19 @@ export const Dropdown = ({
               className="border border-gray-300 shadow-lg rounded-lg absolute w-full mt-1 bg-white
                             pt-3 space-y-3 z-10 dark:bg-[#1F2937] dark:border-gray-600"
             >
+              {Boolean(defaultItems?.[0]) && listboxOptions?.topAction && (
+                <>
+                  {listboxOptions.topAction}
+                  <div className="mx-4 w-100 border-b border-gray-200 dark:border-gray-600"></div>
+                </>
+              )}
+
               {items?.length ? (
                 multiple ? (
                   /**
                    * Multi select
                    */
+
                   <>
                     <div
                       className="flex flex-row space-x-2 cursor-pointer items-center px-4"
@@ -297,17 +329,26 @@ export const Dropdown = ({
                               />
                             </div>
                             <div className="flex-1 flex flex-col truncate">
-                              <Text
-                                size="sm"
-                                weight="medium"
-                                className={`truncate text-ellipsis ${
-                                  allItemsSelected
-                                    ? 'text-gray-400 dark:text-gray-500'
-                                    : 'text-gray-900 dark:text-gray-100'
-                                }`}
-                              >
-                                {item.title}
-                              </Text>
+                              <div className="flex space-x-1">
+                                <Text
+                                  size="sm"
+                                  weight="medium"
+                                  className={`truncate text-ellipsis ${
+                                    allItemsSelected
+                                      ? 'text-gray-400 dark:text-gray-500'
+                                      : 'text-gray-900 dark:text-gray-100'
+                                  }`}
+                                >
+                                  {maskAccount === item.value && item.mask
+                                    ? switchTitles
+                                      ? item.mask.title
+                                      : item.title
+                                    : item.title}
+                                </Text>
+                                {maskAccount === item.value && item.mask && (
+                                  <EmailMaskedPill />
+                                )}
+                              </div>
                               {item.subtitle ? (
                                 <Text
                                   size="xs"
@@ -318,7 +359,17 @@ export const Dropdown = ({
                                       : 'text-gray-500'
                                   }`}
                                 >
-                                  {item.subtitle}
+                                  {maskAccount === item.value && item.mask
+                                    ? switchTitles
+                                      ? `${adjustAccountTypeToDisplay(
+                                          item.type
+                                        )} - ${item.title}`
+                                      : `${adjustAccountTypeToDisplay(
+                                          item.type
+                                        )} - ${item.mask.address}`
+                                    : `${adjustAccountTypeToDisplay(
+                                        item.type
+                                      )} - ${item.title}`}
                                 </Text>
                               ) : null}
                             </div>
@@ -368,6 +419,17 @@ export const Dropdown = ({
                                   >
                                     {item.title}
                                   </Text>
+                                  {preselected &&
+                                  maskAccount === item.value &&
+                                  item.mask ? (
+                                    <Text
+                                      size="xs"
+                                      weight="normal"
+                                      className={`truncate w-full text-gray-500 dark:text-gray-400`}
+                                    >
+                                      {`Masked | ${item.mask.title}`}
+                                    </Text>
+                                  ) : null}
                                   {item.subtitle ? (
                                     <Text
                                       size="xs"

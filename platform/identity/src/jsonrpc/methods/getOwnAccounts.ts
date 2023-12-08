@@ -4,8 +4,9 @@ import { router } from '@proofzero/platform.core'
 import { inputValidators } from '@proofzero/platform-middleware'
 
 import { EDGE_ACCOUNT } from '@proofzero/platform.account/src/constants'
+
 import { Context } from '../../context'
-import { Node } from '@proofzero/platform.edges/src/jsonrpc/validators/node'
+import { AccountSchema } from '../validators/profile'
 
 export const GetAccountsInput = z.object({
   URN: inputValidators.AnyURNInput,
@@ -18,7 +19,7 @@ export const GetAccountsInput = z.object({
 
 export type GetAccountsParams = z.infer<typeof GetAccountsInput>
 
-export const GetAccountsOutput = z.array(Node)
+export const GetAccountsOutput = z.array(AccountSchema)
 export type GetAccountsOutput = z.infer<typeof GetAccountsOutput>
 
 export const getOwnAccountsMethod = async ({
@@ -57,6 +58,5 @@ export const getOwnAccountsMethod = async ({
   // nodes, filtered by account type if provided.
   const caller = router.createCaller(ctx)
   const { edges } = await caller.edges.getEdges({ query })
-
-  return edges.map((e) => e.dst)
+  return edges.map((e) => e.dst) as GetAccountsOutput
 }

@@ -132,6 +132,21 @@ import {
   AuthorizationTokenFromHeader,
   ValidateJWT,
 } from '@proofzero/platform-middleware/jwt'
+import {
+  getMaskedAddressMethod,
+  GetMaskedAddressInput,
+  GetMaskedAddressOutput,
+} from './methods/getMaskedAddress'
+import {
+  getSourceAccountMethod,
+  GetSourceAccountInput,
+  GetSourceAccountOutput,
+} from './methods/getSourceAccount'
+import {
+  setSourceAccountMethod,
+  SetSourceAccountInput,
+  SetSourceAccountOutput,
+} from './methods/setSourceAccount'
 
 const t = initTRPC.context<Context>().create({ errorFormatter })
 
@@ -362,4 +377,30 @@ export const appRouter = t.router({
     .input(ConnectIdentityGroupEmailInputSchema)
     .output(ConnectIdentityGroupEmailOutputSchema)
     .mutation(connectIdentityGroupEmail),
+  getMaskedAddress: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setAccountNodeClient)
+    .use(Analytics)
+    .input(GetMaskedAddressInput)
+    .output(GetMaskedAddressOutput)
+    .query(getMaskedAddressMethod),
+  getSourceAccount: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    .use(Analytics)
+    .input(GetSourceAccountInput)
+    .output(GetSourceAccountOutput)
+    .query(getSourceAccountMethod),
+  setSourceAccount: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setAccountNodeClient)
+    .use(initAccountNode)
+    .use(Analytics)
+    .input(SetSourceAccountInput)
+    .output(SetSourceAccountOutput)
+    .mutation(setSourceAccountMethod),
 })

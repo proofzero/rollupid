@@ -1,6 +1,8 @@
 import { AccountURNSpace } from '@proofzero/urns/account'
 import type { AccountURN } from '@proofzero/urns/account'
 
+import { EmailAccountType } from '@proofzero/types/account'
+
 import { List } from '@proofzero/design-system/src/atoms/lists/List'
 import { Text } from '@proofzero/design-system/src/atoms/text/Text'
 
@@ -22,13 +24,15 @@ export const AccountList = ({
 }: AccountListProps) => {
   return accounts.length ? (
     <List
-      items={accounts.map((ali) => ({
-        key: ali.id,
-        val: ali,
-        primary:
-          AccountURNSpace.decode(ali.id as AccountURN) ===
-          AccountURNSpace.decode(primaryAccountURN),
-      }))}
+      items={accounts
+        .filter((ali) => ali.type !== EmailAccountType.Mask)
+        .map((ali) => ({
+          key: ali.id,
+          val: ali,
+          primary:
+            AccountURNSpace.decode(ali.id as AccountURN) ===
+            AccountURNSpace.decode(primaryAccountURN),
+        }))}
       itemRenderer={(item) => (
         <AccountListItem
           key={item.key}

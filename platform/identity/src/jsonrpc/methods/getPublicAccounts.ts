@@ -6,7 +6,7 @@ import { inputValidators } from '@proofzero/platform-middleware'
 import { EDGE_ACCOUNT } from '@proofzero/platform.account/src/constants'
 
 import { Context } from '../../context'
-import { Node } from '@proofzero/platform.edges/src/jsonrpc/validators/node'
+import { AccountSchema } from '../validators/profile'
 
 export const GetAccountsInput = z.object({
   URN: inputValidators.AnyURNInput,
@@ -20,7 +20,7 @@ export const GetAccountsInput = z.object({
 
 export type GetAccountsParams = z.infer<typeof GetAccountsInput>
 
-export const GetAccountsOutput = z.array(Node)
+export const GetAccountsOutput = z.array(AccountSchema)
 export type GetAccountsOutput = z.infer<typeof GetAccountsOutput>
 
 export const getPublicAccountsMethod = async ({
@@ -53,5 +53,5 @@ export const getPublicAccountsMethod = async ({
   // nodes, filtered by account type if provided.
   return caller.edges
     .getEdges({ query })
-    .then((res) => res.edges.map((e) => e.dst))
+    .then((res) => res.edges.map((e) => e.dst) as GetAccountsOutput)
 }
