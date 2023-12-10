@@ -446,7 +446,7 @@ export default function Authorize() {
   const [maskEmail, setMaskEmail] = useState<boolean>(false)
   useEffect(() => {
     setMaskEmailCallback()
-  })
+  }, [maskEmail])
 
   const [loadingMaskEmail, setLoadingMaskEmail] = useState<boolean>(false)
 
