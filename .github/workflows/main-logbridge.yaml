@@ -40,7 +40,7 @@ jobs:
       - name: Deploy
         uses: cloudflare/wrangler-action@2.0.0
         with:
-          wranglerVersion: '3.2.0'
+          wranglerVersion: '3.19.0'
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: platform/logbridge
