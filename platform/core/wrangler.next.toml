@@ -6,6 +6,10 @@ logpush = true
 node_compat = true
 workers_dev = false
 
+kv_namespaces = [
+  { binding = "UsageKV", id = "56f1544de4704f538a01e84393d3d5c7" },
+]
+
 [env.next]
 durable_objects.bindings = [
   { name = "Account", class_name = "Account" },

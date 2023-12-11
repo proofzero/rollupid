@@ -14,7 +14,6 @@ import {
 
 import { WriteAnalyticsDataPoint } from '@proofzero/packages/platform-clients/analytics'
 
-import { NodeType } from '@proofzero/types/account'
 import {
   generateTraceContextHeaders,
   TraceSpan,
@@ -97,6 +96,27 @@ export const isAuthorized = () => (next) => (root, args, context, info) => {
 
   return next(root, args, context, info)
 }
+
+export const validateJWTAndAPIKeyPresence =
+  () => (next) => async (root, args, context, info) => {
+    const apiKey = context.apiKey
+    const jwt = getAuthzTokenFromReq(context.request)
+
+    if (!apiKey || !jwt) {
+      throw new GraphQLError(
+        'This endpoint requires both the API Key and the JWT to be present.',
+        {
+          extensions: {
+            http: {
+              status: 400,
+            },
+          },
+        }
+      )
+    }
+
+    return next(root, args, context, info)
+  }
 
 export const validateApiKey =
   () => (next) => async (root, args, context, info) => {

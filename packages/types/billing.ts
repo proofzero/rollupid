@@ -5,6 +5,10 @@ export enum ServicePlanType {
   PRO = 'PRO',
 }
 
+export enum ExternalAppDataPackageType {
+  STARTER = 'STARTER',
+}
+
 export type ServicePlans = {
   subscriptionID?: string
   plans?: Partial<{
