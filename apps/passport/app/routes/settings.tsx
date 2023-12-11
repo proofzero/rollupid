@@ -1,4 +1,4 @@
-import { Outlet, useLoaderData } from '@remix-run/react'
+import { Outlet, useFetcher, useLoaderData } from '@remix-run/react'
 
 import { json, redirect } from '@remix-run/cloudflare'
 import {
@@ -29,6 +29,7 @@ import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 
 import { usePostHog } from 'posthog-js/react'
 import { useEffect, useState } from 'react'
+import { InternalServerError } from '@proofzero/errors'
 
 export type AuthorizedAppsModel = {
   clientId: string
@@ -67,6 +68,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     const identityProfile = await coreClient.identity.getProfile.query({
       identity: identityURN,
     })
+    if (!identityProfile) {
+      throw new InternalServerError({
+        message: 'Identity profile not found',
+      })
+    }
 
     const accountTypeUrns = identityProfile?.accounts.map((a) => ({
       urn: a.baseUrn,
@@ -128,10 +134,11 @@ export const loader: LoaderFunction = getRollupReqFunctionErrorWrapper(
     return json({
       pfpUrl: identityProfile?.pfp?.image,
       displayName: identityProfile?.displayName,
+      primaryAccountURN: identityProfile?.primaryAccountURN,
+      isProfileCustomized: Boolean(identityProfile?.customized),
       authorizedApps: authzAppResults,
       connectedProfiles: normalizedConnectedProfiles,
       CONSOLE_URL: context.env.CONSOLE_APP_URL,
-      primaryAccountURN: identityProfile?.primaryAccountURN,
       identityURN,
     })
   }
@@ -152,6 +159,7 @@ export default function SettingsLayout() {
     displayName,
     primaryAccountURN,
     identityURN,
+    isProfileCustomized,
   } = useLoaderData()
 
   const [isIdentified, setIsIdentified] = useState(false)
@@ -164,6 +172,8 @@ export default function SettingsLayout() {
     }
     setIsIdentified(true)
   }, [isIdentified])
+
+  const editProfileFetcher = useFetcher()
 
   return (
     <Popover className="bg-white lg:bg-gray-50 min-h-[100dvh] relative">
@@ -178,7 +188,13 @@ export default function SettingsLayout() {
             />
 
             <div className={`flex flex-col w-full`}>
-              <Header pfpUrl={pfpUrl} />
+              <Header
+                pfpUrl={pfpUrl}
+                name={displayName}
+                primaryAccountURN={primaryAccountURN}
+                editProfileFetcher={editProfileFetcher}
+                isProfileCustomized={isProfileCustomized}
+              />
               <div
                 className={`${
                   open

@@ -5,6 +5,7 @@ import { NonceContext } from '@proofzero/design-system/src/atoms/contexts/nonce-
 
 import { addSecurityHeaders } from '@proofzero/utils/owasp'
 import {
+  BLOB,
   DATA,
   getCSP,
   NONE,
@@ -44,12 +45,13 @@ export default function handleRequest(
             '*.alchemyapi.io',
             '*.google-analytics.com',
             'https://analytics.rollup.id',
+            'https://upload.imagedelivery.net',
             // Used for Remix WebSocket Live Reaload
             ...(dev ? ['ws://localhost:*/socket'] : []),
           ],
           'script-src': [SELF, `'nonce-${nonce}' ${STRICT_DYNAMIC}`],
           'style-src': [SELF, UNSAFE_INLINE, 'fonts.cdnfonts.com'],
-          'img-src': [dev ? 'http:' : 'https:', DATA],
+          'img-src': [dev ? 'http:' : 'https:', DATA, BLOB],
           'font-src': [SELF, 'fonts.cdnfonts.com'],
           'object-src': [NONE],
           'base-uri': [SELF],

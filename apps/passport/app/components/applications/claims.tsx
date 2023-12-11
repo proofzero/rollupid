@@ -14,7 +14,7 @@ import { useState } from 'react'
 
 import passportLogoURL from '~/assets/PassportIcon.svg'
 import { HiOutlineMail } from 'react-icons/hi'
-import { TbCrown } from 'react-icons/tb'
+import { TbUserCircle } from 'react-icons/tb'
 import { Modal } from '@proofzero/design-system/src/molecules/modal/Modal'
 import warningImg from '~/assets/warning.svg'
 import InputText from '~/components/inputs/InputText'
@@ -470,15 +470,8 @@ export const ClaimsMobileView = ({ scopes }: { scopes: any[] }) => {
               <RowView
                 appAskedFor="Profile"
                 whatsBeingShared="Picture, Name"
-                sourceOfData="Primary Account"
-                sourceOfDataIcon={
-                  <div
-                    className="flex items-center justify-center
-                      w-5 h-5 bg-gray-50 rounded-full"
-                  >
-                    <TbCrown className="text-[#F59E0B]" />
-                  </div>
-                }
+                sourceOfData="Passport Profile"
+                sourceOfDataIcon={<TbUserCircle className="w-5 h-5" />}
                 key={i}
                 account={scope.account}
               />
@@ -813,15 +806,8 @@ export const ClaimsWideView = ({ scopes }: { scopes: any[] }) => {
               <RowView
                 appAskedFor="Profile"
                 whatsBeingShared="Picture, Name"
-                sourceOfData="Primary Account"
-                sourceOfDataIcon={
-                  <div
-                    className="flex items-center justify-center
-                      w-5 h-5 bg-gray-50 rounded-full"
-                  >
-                    <TbCrown className="text-[#F59E0B]" />
-                  </div>
-                }
+                sourceOfData="Passport Profile"
+                sourceOfDataIcon={<TbUserCircle className="w-5 h-5" />}
                 key={i}
                 account={scope.account}
               />

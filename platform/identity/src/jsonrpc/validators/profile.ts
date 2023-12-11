@@ -11,6 +11,7 @@ export const ProfileSchema = z.object({
     })
     .optional(),
   primaryAccountURN: AccountURNInput.optional(),
+  customized: z.boolean().optional(),
 })
 
 export const AccountSchema = Node.extend({

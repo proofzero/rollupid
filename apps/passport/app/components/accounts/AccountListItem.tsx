@@ -16,7 +16,6 @@ import {
   HiDotsHorizontal,
   HiOutlineEyeOff,
   HiOutlinePencilAlt,
-  HiOutlineStar,
   HiOutlinePhotograph,
   HiOutlineTrash,
 } from 'react-icons/hi'
@@ -24,6 +23,7 @@ import { Menu, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
 
 import { getProfileTypeTitle } from '../../utils/profile'
+import { TbUserCircle } from 'react-icons/tb'
 
 type AccountListItemIconProps = {
   type: string
@@ -124,7 +124,7 @@ export const AccountListItem = ({
             {title}
           </Text>
 
-          {primary && <PrimaryPill text="Primary" />}
+          {primary && <PrimaryPill />}
 
           {hidden && <IconPill Icon={HiOutlineEyeOff} />}
 
@@ -245,14 +245,14 @@ export const AccountListItem = ({
                                 onSetPrimary(id)
                               }}
                             >
-                              <HiOutlineStar className="text-xl font-normal text-gray-600" />
+                              <TbUserCircle className="text-xl font-normal text-gray-600" />
 
                               <Text
                                 size="sm"
                                 weight="normal"
                                 className="text-gray-700"
                               >
-                                Set as Primary
+                                Set as Primary Account
                               </Text>
                             </Menu.Item>
                           )}

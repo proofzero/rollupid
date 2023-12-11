@@ -22,7 +22,7 @@ import { generateTraceContextHeaders } from '@proofzero/platform-middleware/trac
 
 import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
 import type { appDetailsProps, errorsAuthProps } from '~/types'
-import IconPicker from '~/components/IconPicker'
+import IconPicker from '@proofzero/design-system/src/atoms/form/IconPicker'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
 
 import { Loader } from '@proofzero/design-system/src/molecules/loader/Loader'
@@ -43,7 +43,7 @@ import { SCOPE_SMART_CONTRACT_WALLETS } from '@proofzero/security/scopes'
 import { BadRequestError } from '@proofzero/errors'
 import { getRollupReqFunctionErrorWrapper } from '@proofzero/utils/errors'
 import createImageClient from '@proofzero/platform-clients/image'
-import { captureFormSubmitAndReplaceImages } from '~/utils/formCFImages.client'
+import { captureFormSubmitAndReplaceImages } from '@proofzero/design-system/src/utils/form-cf-images'
 
 /**
  * @file app/routes/dashboard/index.tsx

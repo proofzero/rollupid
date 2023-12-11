@@ -36,8 +36,11 @@ const accountResolvers: Resolvers = {
       const coreClient = createCoreClient(env.Core, {
         ...generateTraceContextHeaders(traceSpan),
       })
+      // TODO: this is a hack to get around the fact that sometimes the alias is url encoded
+      // Ex: e@mail.com vs. e%40mail.com
+      const urlEncodedAlias = encodeURIComponent(decodeURIComponent(alias))
       const identityURN = await coreClient.account.getIdentityByAlias.query({
-        alias,
+        alias: urlEncodedAlias,
         provider,
       })
 

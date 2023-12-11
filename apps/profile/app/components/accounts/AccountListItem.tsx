@@ -71,7 +71,7 @@ export const AccountListItem = ({
             {title}
           </Text>
 
-          {primary && <PrimaryPill text="Primary" />}
+          {primary && <PrimaryPill />}
 
           {hidden && <IconPill Icon={HiOutlineEyeOff} />}
         </div>

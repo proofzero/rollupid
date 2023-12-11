@@ -30,7 +30,10 @@ export default function Info({
                 NON-EDITABLE FIELD
               </Text>
             )}
-            <Text size="xs" className="text-left text-gray-700">
+            <Text
+              size="xs"
+              className="text-left text-gray-700 whitespace-normal"
+            >
               {description}
             </Text>
           </div>
